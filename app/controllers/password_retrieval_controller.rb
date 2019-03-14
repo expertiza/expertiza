@@ -40,7 +40,7 @@ class PasswordRetrievalController < ApplicationController
       if password_reset
         # URL expires after 1 day
         expired_url = password_reset.updated_at + 1.day
-        if Time.now < expired_url
+        if Time.zone.now < expired_url
           # redirect_to action: 'reset_password', email: password_reset.user_email
           @email = password_reset.user_email
           render template: "password_retrieval/reset_password"
@@ -73,12 +73,11 @@ class PasswordRetrievalController < ApplicationController
         PasswordReset.delete_all(user_email: user.email)
         ExpertizaLogger.info LoggerMessage.new(controller_name, user.name, 'Password was reset for the user', request)
         flash[:success] = "Password was successfully reset"
-        redirect_to "/"
       else
         ExpertizaLogger.error LoggerMessage.new(controller_name, user.name, 'Password reset operation failed for the user while saving record', request)
         flash[:error] = "Password cannot be updated. Please try again"
-        redirect_to "/"
       end
+      redirect_to "/"
     else
       ExpertizaLogger.error LoggerMessage.new(controller_name, "", 'Password provided by the user did not match', request)
       flash[:error] = "Password and confirm-password do not match. Try again"

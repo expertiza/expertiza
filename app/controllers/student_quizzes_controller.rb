@@ -4,7 +4,7 @@ class StudentQuizzesController < ApplicationController
      'Instructor',
      'Teaching Assistant'].include? current_role_name or
     (current_role_name.eql?("Student") and
-      ((%w[index].include? action_name) ? are_needed_authorizations_present?(params[:id], "reviewer", "submitter") : true))
+      (%w[index].include? action_name) ? are_needed_authorizations_present?(params[:id], "reviewer", "submitter") : true)
   end
 
   def index
@@ -96,8 +96,8 @@ class StudentQuizzesController < ApplicationController
     if map.response.empty?
       response = Response.new
       response.map_id = params[:map_id]
-      response.created_at = DateTime.current
-      response.updated_at = DateTime.current
+      response.created_at = Time.current
+      response.updated_at = Time.current
       response.save
 
       calculate_score map, response

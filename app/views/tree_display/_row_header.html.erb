@@ -13,7 +13,6 @@
   <td WIDTH="2%">&nbsp;</td>
   <td WIDTH="2%">&nbsp;</td>
 <% else %>
-    <!-- # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb -->
   <% if parent_node.get_name == 'Courses'&& session[:user].role_id == 6 %>
   <%else%>
     <% if child_nodes %>
@@ -24,7 +23,6 @@
 <% end %>
 <% width = 66 - depth * 2 %>
 <td COLSPAN="<%= 3 - depth %>" WIDTH="<%= width %>%">
-  <!-- # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb -->
   <% if parent_node.get_name == 'Courses'&& session[:user].role_id == 6 %>
   <%else%>
     <%= parent_node.get_name(session[:ip]) %>

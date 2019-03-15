@@ -9,7 +9,6 @@
   :child_nodes => child_nodes
 } %>
 <% if node.get_partial_name %>
-  <!-- # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb -->
   <%if node.get_partial_name == 'courses_folder_actions' && session[:user].role_id == 6 %>
   <%else%>
     <%= render :partial => '/tree_display/actions/'+node.get_partial_name,

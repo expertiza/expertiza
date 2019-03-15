@@ -115,7 +115,6 @@ class SiteControllersController < ApplicationController
   # which that controller will respond.
 
   def controller_actions(controller_name)
-    #controllers = controller_classes
     actions = {}
 
     if @controller_classes.key? controller_name

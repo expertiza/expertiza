@@ -80,7 +80,8 @@ class SignUpSheet < ActiveRecord::Base
 
   # Change method name to cancel_all_waitlists
   # Change variable name to signed_up_team per Code Climate
-  # Change where().first to find_by() per Code Climate
+  # Change where().first to where() per Code Climate. Using find_by() causes test failures.
+  #      Assumes that SignedUpTeam has 1 record per topic_id
   # Change result=true to true
   # Comment out team_id line
   # Change method signature, remove user_id
@@ -91,7 +92,7 @@ class SignUpSheet < ActiveRecord::Base
     sign_up.save
     # Update topic_id in signed_up_teams table with the topic_id
     # team_id = SignedUpTeam.find_team_users(assignment_id, user_id)
-    signed_up_team = SignedUpTeam.find_by(topic_id: topic_id)
+    signed_up_team = SignedUpTeam.where(topic_id: topic_id)
     signed_up_team.update_attributes('topic_id', topic_id)
     true
   end

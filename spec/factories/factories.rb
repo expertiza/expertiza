@@ -1,4 +1,5 @@
 FactoryBot.define do
+
   factory :institution, class: Institution do
     name 'North Carolina State University'
   end
@@ -101,11 +102,13 @@ FactoryBot.define do
   end
 
   factory :instructor, class: Instructor do
-    name 'instructor6'
+    # Help multiple factory-created instructors get unique names
+    # Generate name in block so that block will be executed with each new call to factory
+    name { "instructor#{Instructor.last ? Instructor.last.id + 1 : 1}" }
     role { Role.where(name: 'Instructor').first || association(:role_of_instructor) }
     password 'password'
     password_confirmation 'password'
-    fullname '6, instructor'
+    fullname { "#{Instructor.last ? Instructor.last.id + 1 : 1}, instructor" }
     email 'expertiza@mailinator.com'
     parent_id 1
     private_by_default  false

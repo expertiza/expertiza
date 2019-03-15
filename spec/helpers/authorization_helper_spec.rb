@@ -187,91 +187,103 @@ describe AuthorizationHelper do
 
   describe ".teaching_staff_of_assignment?" do
 
+    # Rather than specifying IDs explicitly for instructor, TA, course, etc.
+    # Use factory create method to auto generate IDs.
+    # In this way we have less risk of making a mistake (e.g. duplication) in the ID numbers.
+
     it 'returns true if the instructor is assigned to the course of the assignment' do
-      instructor1 = build(:instructor, id: 20)
-      instructor1.save!
 
-      course = build(:course, id: 40, instructor_id: 20)
-      course.save!
+      # To be on the safe side (avoid passing this test when there might be some problem)
+      # Create 2 instructors and associate the 2nd one with the assignment
+      # See comments in other tests of this method
+      # Briefly: There is some implicit automatic association to 1st instructor via factory
 
-      assignment = build(:assignment, id: 1, course_id: 40)
-      assignment.save!
+      instructor1 = create(:instructor)
+      instructor2 = create(:instructor)
+      course = create(:course, instructor_id: instructor2.id)
+      assignment = create(:assignment, course_id: course.id)
+      stub_current_user(instructor2, instructor2.role.name, instructor2.role)
 
-      stub_current_user(instructor1, instructor1.role.name, instructor1.role)
       expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be true
+
     end
 
     it 'returns false if the instructor is not assigned to the course of the assignment' do
-      instructor1 = build(:instructor, name: "Lucy", id: 27)
-      instructor1.save!
 
-      instructor2 = build(:instructor, name: "Jeb", id: 20)
-      instructor2.save!
+      # This test requires some extra care
+      # The assignment factory will associate the created assignment with the first course
+      # (or will create a course if needed)
+      # The assignment factory in will ALSO associate the assignment with the first instructor
+      # (or will create an instructor if needed)
+      # Therefore, with no extra care, the assignment will end up associated with the first instructor
+      # Therefore, we must take care that we specify both the course and the instructor for the assignment
 
-      course = build(:course, id: 41, instructor_id: 20)
-      course.save!
-
-      assignment = build(:assignment, id: 1, course_id: 41)
-      assignment.save!
-
+      instructor1 = create(:instructor)
+      instructor2 = create(:instructor)
+      course = create(:course, instructor_id: instructor2.id)
+      assignment = create(:assignment, course_id: course.id, instructor_id: instructor2.id)
       stub_current_user(instructor1, instructor1.role.name, instructor1.role)
+
       expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be false
+
     end
 
     it 'returns true if the instructor is associated with the assignment' do
-      instructor1 = build(:instructor, name: "Lucy", id: 27)
-      instructor1.save!
 
-      assignment = build(:assignment, id: 1, instructor_id: 27)
-      assignment.save!
+      # To be on the safe side (avoid passing this test when there might be some problem)
+      # Create 2 instructors and associate the 2nd one with the assignment
+      # See comments in other tests of this method
+      # Briefly: There is some implicit automatic association to 1st instructor via factory
 
-      stub_current_user(instructor1, instructor1.role.name, instructor1.role)
+      instructor1 = create(:instructor)
+      instructor2 = create(:instructor)
+      assignment = create(:assignment, instructor_id: instructor2.id)
+      stub_current_user(instructor2, instructor2.role.name, instructor2.role)
+
       expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be true
+
     end
 
     it 'returns false if the instructor is not associated with the assignment' do
-      instructor1 = build(:instructor, name: "Lucy", id: 13)
-      instructor1.save!
 
-      instructor2 = build(:instructor, name: "Jeb", id: 27)
-      instructor2.save!
+      # This test requires some extra care
+      # The assignment factory will associate the created assignment with the first course
+      # (or will create a course if needed)
+      # The course factory in turn will associate the course with the first instructor
+      # (or will create an instructor if needed)
+      # Therefore, with no extra care, the assignment will end up associated indirectly with the first instructor
+      # Therefore, we must take care that the current user we stub here is NOT the first instructor
 
-      assignment = build(:assignment, id: 1, instructor_id: 27)
-      assignment.save!
+      instructor1 = create(:instructor)
+      instructor2 = create(:instructor)
+      assignment = create(:assignment, instructor_id: instructor1.id)
+      stub_current_user(instructor2, instructor2.role.name, instructor2.role)
 
-      stub_current_user(instructor1, instructor1.role.name, instructor1.role)
       expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be false
+
     end
 
     it 'returns true if the teaching assistant is associated with the course of the assignment' do
-      teaching_assistant1 = build(:teaching_assistant, id: 13, name: "Lillian")
-      teaching_assistant1.save!
 
-      course = build(:course, id: 41)
-      course.save!
-
-      assignment = build(:assignment, id: 1 )
-      assignment.save!
-
-      ta_mapping = TaMapping.new(ta_id: 13, course_id: 41)
-      ta_mapping.save!
-
+      teaching_assistant1 = create(:teaching_assistant)
+      course = create(:course)
+      assignment = create(:assignment)
+      ta_mapping = TaMapping.new(ta_id: teaching_assistant1.id, course_id: course.id)
       stub_current_user(teaching_assistant1, teaching_assistant1.role.name, teaching_assistant1.role)
+
       expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be true
+
     end
 
     it 'returns false if the teaching assistant is not associated with the course of the assignment' do
-      instructor1 = build(:instructor, name: "Lucy", id: 33)
-      instructor1.save!
 
-      teaching_assistant1 = build(:teaching_assistant, id: 13, name: "Lillian")
-      teaching_assistant1.save!
-
-      assignment = build(:assignment, id: 1, instructor_id: 33)
-      assignment.save!
-
+      instructor1 = create(:instructor)
+      teaching_assistant1 = create(:teaching_assistant)
+      assignment = create(:assignment, instructor_id: instructor1.id)
       stub_current_user(teaching_assistant1, teaching_assistant1.role.name, teaching_assistant1.role)
+
       expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be false
+
     end
 
   end

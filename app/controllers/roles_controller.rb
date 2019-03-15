@@ -61,6 +61,12 @@ class RolesController < ApplicationController
     redirect_to Role
   end
 
+  private
+
+  def role_params
+    params.require(:role).permit(:name, :parent_id, :description, :default_page_id)
+  end
+
   protected
 
   def foreign
@@ -68,10 +74,4 @@ class RolesController < ApplicationController
 
     @users = @role.users
   end
-  
-  private
-  
-  def role_params
-    params.require(:role).permit( :name, :parent_id, :description, :default_page_id )
-  end    
 end

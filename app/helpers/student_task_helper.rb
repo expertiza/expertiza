@@ -14,10 +14,9 @@ module StudentTaskHelper
   end
 
   def check_reviewable_topics(assignment)
-    if !assignment.topics?
-	# assignment is reviewable if review_allowed_id is ok / late
-        return true if assignment.can_review(nil)
-    end	
+    # Determine if current stage can be reviewed if assignment has no topics
+    return assignment.can_review(nil) if !assignment.topics?
+
     sign_up_topics = SignUpTopic.where(assignment_id: assignment.id)
     sign_up_topics.each {|topic| return true if assignment.can_review(topic.id) }
     false

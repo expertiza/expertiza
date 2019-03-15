@@ -169,7 +169,7 @@ class PopupController < ApplicationController
         end
       end
 
-      if !reviews.empty?
+      unless reviews.empty?
         index = 0
         revs = {
           reviews: reviews

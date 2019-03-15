@@ -4,7 +4,7 @@ class StudentQuizzesController < ApplicationController
      'Instructor',
      'Teaching Assistant'].include? current_role_name or
     (current_role_name.eql?("Student") and
-      (%w[index].include? action_name) ? are_needed_authorizations_present?(params[:id], "reviewer", "submitter") : true)
+      %w[index].include? action_name ? are_needed_authorizations_present?(params[:id], "reviewer", "submitter") : true)
   end
 
   def index

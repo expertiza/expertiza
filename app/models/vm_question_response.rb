@@ -43,53 +43,42 @@ class VmQuestionResponse
   end
 
   def add_reviews(participant, team, vary)
-    if @questionnaire_type == "ReviewQuestionnaire"
+    reviews = nil
+    if @questionnaire_type == 'ReviewQuestionnaire'
       reviews = if vary
                   ReviewResponseMap.get_responses_for_team_round(team, @round)
                 else
                   ReviewResponseMap.get_assessments_for(team)
                 end
-      reviews.each do |review|
-        review_mapping = ReviewResponseMap.find(review.map_id)
-        if review_mapping.present?
-          participant = Participant.find(review_mapping.reviewer_id)
-          @list_of_reviewers << participant
-        end
-      end
-      @list_of_reviews = reviews
-    elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"
-      reviews = participant.feedback # feedback reviews
-      reviews.each do |review|
-        review_mapping = FeedbackResponseMap.find_by(id: review.map_id)
-        participant = Participant.find(review_mapping.reviewer_id)
-        @list_of_reviewers << participant
-        @list_of_reviews << review
-      end
-    elsif @questionnaire_type == "TeammateReviewQuestionnaire"
+      response_map = 'ReviewResponseMap'.constantize
+    elsif @questionnaire_type == 'AuthorFeedbackQuestionnaire'
+      # feedback reviews
+      reviews = participant.feedback
+      response_map = 'FeedbackResponseMap'.constantize
+    elsif @questionnaire_type == 'TeammateReviewQuestionnaire'
+      # teammate reviews
       reviews = participant.teammate_reviews
-      reviews.each do |review|
-        review_mapping = TeammateReviewResponseMap.find_by(id: review.map_id)
-        participant = Participant.find(review_mapping.reviewer_id)
-        # commenting out teamreviews. I just realized that teammate reviews are hidden during the current semester,
-        # and I don't know how to implement the logic, so I'm being safe.
-        @list_of_reviewers << participant
-        @list_of_reviews << review
-      end
-    elsif @questionnaire_type == "MetareviewQuestionnaire"
+      response_map = 'TeammateReviewResponseMap'.constantize
+    elsif @questionnaire_type == 'MetareviewQuestionnaire'
+      # meta reviews
       reviews = participant.metareviews
-      reviews.each do |review|
-        review_mapping = MetareviewResponseMap.find_by(id: review.map_id)
+      response_map = 'MetareviewResponseMap'.constantize
+    end
+    # Return if questionnaire type did not match any of given types.
+    return if reviews.nil?
+    # Otherwise, add all found reviews to the list of reviews, find participant of each review, and add him/her to the
+    # list of reviewers, find and add all review answers.
+    reviews.each do |review|
+      review_mapping = response_map.find_by(id: review.map_id)
+      if review_mapping.present?
         participant = Participant.find(review_mapping.reviewer_id)
         @list_of_reviewers << participant
-        @list_of_reviews << review
       end
-    end
-
-    reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
         add_answer(answer)
       end
+      @list_of_reviews << review
     end
   end
 

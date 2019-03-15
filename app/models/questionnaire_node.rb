@@ -55,7 +55,7 @@ class QuestionnaireNode < Node
     Questionnaire.find_by(id: self.node_object_id).try(:updated_at)
   end
 
-  def is_leaf
+  def leaf?
     true
   end
 end

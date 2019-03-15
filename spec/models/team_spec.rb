@@ -159,7 +159,7 @@ describe Team do
       allow(Team).to receive(:find_by).with(name: 'Team_1').and_return(team)
 
       allow(Team).to receive(:find_by).with(name: 'Team_2').and_return(nil)
-      expect(Team.generate_team_name('no name')).to eq('Team_2')
+      expect(Team.generate_team_name).to eq('Team_2')
     end
   end
 
@@ -167,8 +167,8 @@ describe Team do
     context 'when cannot find a user by name' do
       it 'raises an ImportError' do
         allow(User).to receive(:find_by).with(name: 'no name').and_return(nil)
-        expect { team.import_team_members(0, {teammembers: ['no name']}) }.to raise_error(ImportError,
-                                                                           "The user 'no name' was not found. <a href='/users/new'>Create</a> this user?")
+        expect { team.import_team_members({teammembers: ['no name']}) }.to raise_error(ImportError,
+                                                                                       "The user 'no name' was not found. <a href='/users/new'>Create</a> this user?")
       end
     end
 
@@ -177,7 +177,7 @@ describe Team do
         allow(User).to receive(:find_by).with(name: 'no name').and_return(user)
         allow(TeamsUser).to receive(:find_by).with(team_id: 1, user_id: 1).and_return(nil)
         allow_any_instance_of(Team).to receive(:add_member).with(user).and_return(true)
-        expect(team.import_team_members(0, {teammembers: ['no name']})).to eq(['no name'])
+        expect(team.import_team_members({teammembers: ['no name']})).to eq(['no name'])
       end
     end
   end
@@ -219,22 +219,22 @@ describe Team do
   describe '.handle_duplicate' do
     context 'when parameterized team is nil' do
       it 'returns team name' do
-        expect(Team.handle_duplicate(nil, 'no name', 1, 'replace', CourseTeam.new)).to eq('no name')
+        expect(Team.handle_duplicate(nil, 'no name', 'replace', CourseTeam.new)).to eq('no name')
       end
     end
 
     context 'when parameterized team is not nil' do
       context 'when handle_dups option is ignore' do
         it 'does not create the new team and returns nil' do
-          expect(Team.handle_duplicate(team, 'no name', 1, 'ignore', CourseTeam.new)).to be nil
+          expect(Team.handle_duplicate(team, 'no name', 'ignore', CourseTeam.new)).to be nil
         end
       end
 
       context 'when handle_dups option is rename' do
         it 'returns new team name' do
           allow(Course).to receive(:find).with(1).and_return(double('Course', name: 'no course'))
-          allow(Team).to receive(:generate_team_name).with('no course').and_return('new team name')
-          expect(Team.handle_duplicate(team, 'no name', 1, 'rename', CourseTeam.new)).to eq('new team name')
+          allow(Team).to receive(:generate_team_name).and_return('new team name')
+          expect(Team.handle_duplicate(team, 'no name', 'rename', CourseTeam.new)).to eq('new team name')
         end
       end
 
@@ -242,7 +242,7 @@ describe Team do
         it 'deletes the old team' do
           allow(TeamsUser).to receive_message_chain(:where, :find_each).with(team_id: 1).with(no_args).and_yield(team_user)
           allow(team_user).to receive(:destroy).and_return(team_user)
-          expect(Team.handle_duplicate(team, 'no name', 1, 'replace', CourseTeam.new)).to eq('no name')
+          expect(Team.handle_duplicate(team, 'no name', 'replace', CourseTeam.new)).to eq('no name')
         end
       end
     end

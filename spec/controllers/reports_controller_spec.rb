@@ -124,26 +124,30 @@ describe ReportsController do
     describe 'calibration' do
       context 'when type is Calibration and participant variable is nil' do
         it 'renders response_report page with corresponding data' do
-          allow(AssignmentParticipant).to receive(:where).with(parent_id: '1', user_id: 3).and_return([nil])
-          allow(AssignmentParticipant).to receive(:create)
-            .with(parent_id: '1', user_id: 3, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
-            .and_return(participant)
-          allow(ReviewQuestionnaire).to receive(:select).with('id').and_return([1, 2, 3])
-          assignment_questionnaire = double('AssignmentQuestionnaire')
-          allow(AssignmentQuestionnaire).to receive(:retrieve_questionnaire_for_assignment).with('1').and_return([assignment_questionnaire])
-          allow(assignment_questionnaire).to receive_message_chain(:questionnaire, :questions)
-            .and_return([double('Question', type: 'Criterion')])
-          allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: '1', calibrate_to: 1).and_return([review_response_map])
-          allow(ReviewResponseMap).to receive_message_chain(:select, :where)
-            .with('id').with(reviewed_object_id: '1', calibrate_to: 0).and_return([1, 2])
-          allow(Response).to receive(:where).with(map_id: [1, 2]).and_return([double('response')])
+
+          # Create stubs using factories
+          # This helps in the following ways:
+          # - Users have roles (needed by authorization helper)
+          # - Basic queries don't return nil (more fully-formed objects to play with)
+          # - DRY (factory has a lot of smarts, use them)
+          # - Avoids hard-coded IDs (fragile)
+          teaching_assistant = create(:teaching_assistant)
+          stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
+          assignment = create(:assignment)
+          create(:questionnaire)
+          create(:assignment_questionnaire)
+          create(:question)
+          create(:review_response_map)
+          create(:response)
           params = {
-            id: 1,
+            id: assignment.id,
             report: {type: 'Calibration'}
           }
-          session = {user: user}
+
+          # Test
           get :response_report, params, session
           expect(response).to render_template(:response_report)
+
         end
       end
     end

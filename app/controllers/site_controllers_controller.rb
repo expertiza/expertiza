@@ -115,27 +115,21 @@ class SiteControllersController < ApplicationController
   # which that controller will respond.
 
   def controller_actions(controller_name)
-#    controllers = controller_classes
+    #controllers = controller_classes
     actions = {}
 
     if @controller_classes.key? controller_name
       controller = @controller_classes[controller_name]
 
-#      for method in controller.public_instance_methods do
-#        actions[method] = true
-#      end
       controller.public_instance_methods.each do |method|
         actions[method] = true
       end
 
-#      for hidden in controller.hidden_actions do
-#        actions.delete hidden
-#      end
       controller.hidden_actions.each do |hidden|
         actions.delete hidden
       end
     end
-      
+
     actions.keys
   end
 end

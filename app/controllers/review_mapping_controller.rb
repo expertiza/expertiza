@@ -1,4 +1,6 @@
 class ReviewMappingController < ApplicationController
+  include AuthorizationHelper
+
   autocomplete :user, :name
   # use_google_charts
   require 'gchart'
@@ -20,8 +22,7 @@ class ReviewMappingController < ApplicationController
           'assign_quiz_dynamically',
           'start_self_review'
       true
-      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-    else ['Instructor', 'Teaching Assistant', 'Administrator'].include? current_role_name
+    else current_user_has_instructor_privileges?
     end
   end
 

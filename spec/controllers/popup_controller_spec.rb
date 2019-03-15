@@ -2,8 +2,13 @@ describe PopupController do
   let(:team) { build(:assignment_team, id: 1, name: "team1", assignment: assignment) }
   let(:student) { build(:student, id: 1, name: "student") }
   let(:student2) { build(:student, id: 2, name: "student2") }
+  let(:admin) { build(:admin) }
+  let(:instructor) { build(:instructor) }
+  let(:ta) { build(:teaching_assistant) }
   let(:participant) { build(:participant, id: 1, user: student, assignment: assignment) }
   let(:participant2) { build(:participant, id: 2, user: student2, assignment: assignment) }
+
+  
   let(:response) { build(:response, id: 1) }
   let(:assignment) { build(:assignment, id: 1) }
   let(:response_map) { build(:review_response_map, id: 1, reviewee_id: team.id, reviewer_id: participant2.id, response: [response], assignment: assignment) }
@@ -17,6 +22,33 @@ describe PopupController do
 
   describe '#action_allowed?' do
     ## INSERT CONTEXT/DESCRIPTION/CODE HERE
+    context 'when the role name of current user is super admin or admin' do
+        it 'allows certain action' do
+          stub_current_user(admin, admin.role.name, admin.role)
+          expect(controller.send(:action_allowed?)).to be true
+        end
+      end
+
+    context 'when the role current user is super instructor' do
+      it 'allows certain action' do
+        stub_current_user(instructor, instructor.role.name, instructor.role)
+        expect(controller.send(:action_allowed?)).to be true
+      end
+    end
+
+    context 'when the role current user is ta' do
+      it 'allows certain action' do
+        stub_current_user(ta, ta.role.name, ta.role)
+        expect(controller.send(:action_allowed?)).to be true
+      end
+    end
+
+    context 'when the role current user is student' do
+      it 'does not allow certain action' do
+        stub_current_user(student, student.role.name, student.role)
+        expect(controller.send(:action_allowed?)).to be false
+      end
+    end
   end
 
   describe '#author_feedback_popup' do

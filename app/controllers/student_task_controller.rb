@@ -7,13 +7,13 @@ class StudentTaskController < ApplicationController
 
   def impersonating_as_admin?
     original_user = session[:original_user]
-    admin_role_ids = Role.where(name:['Administrator','Super-Administrator']).pluck(:id)
+    admin_role_ids = Role.where(name: ['Administrator', 'Super-Administrator']).pluck(:id)
     admin_role_ids.include? original_user.role_id
   end
 
   def impersonating_as_ta?
     original_user = session[:original_user]
-    ta_role = Role.where(name:['Teaching Assistant']).pluck(:id)
+    ta_role = Role.where(name: ['Teaching Assistant']).pluck(:id)
     ta_role.include? original_user.role_id
   end
 
@@ -24,8 +24,8 @@ class StudentTaskController < ApplicationController
     if session[:impersonate] && !impersonating_as_admin?
 
       if impersonating_as_ta?
-        ta_course_ids = TaMapping.where(:ta_id => session[:original_user].id).pluck(:course_id)
-        @student_tasks = @student_tasks.select {|t| ta_course_ids.include?t.assignment.course_id }
+        ta_course_ids = TaMapping.where(ta_id: session[:original_user].id).pluck(:course_id)
+        @student_tasks = @student_tasks.select { |t| ta_course_ids.include?t.assignment.course_id }
       else
         @student_tasks = @student_tasks.select {|t| session[:original_user].id == t.assignment.course.instructor_id }
       end
@@ -66,8 +66,8 @@ class StudentTaskController < ApplicationController
     due_dates = AssignmentDueDate.where(parent_id: @assignment.id)
     @very_last_due_date = AssignmentDueDate.where(parent_id: @assignment.id).order("due_at DESC").limit(1)
     next_due_date = @very_last_due_date[0]
-    for due_date in due_dates
-      if due_date.due_at > Time.now
+    due_dates.each do |due_date|
+      if due_date.due_at > Time.zone.now
         next_due_date = due_date if due_date.due_at < next_due_date.due_at
       end
     end

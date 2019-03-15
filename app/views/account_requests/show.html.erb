@@ -1,0 +1,39 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @account_request.name %>
+</p>
+
+<p>
+  <strong>Role:</strong>
+  <%= @account_request.role_id %>
+</p>
+
+<p>
+  <strong>Fullname:</strong>
+  <%= @account_request.fullname %>
+</p>
+
+<p>
+  <strong>Institution:</strong>
+  <%= @account_request.institution_id %>
+</p>
+
+<p>
+  <strong>Email:</strong>
+  <%= @account_request.email %>
+</p>
+
+<p>
+  <strong>Status:</strong>
+  <%= @account_request.status %>
+</p>
+
+<p>
+  <strong>Self introduction:</strong>
+  <%= @account_request.self_introduction %>
+</p>
+
+<%= link_to 'Edit', edit_account_request_path(@account_request) %> |
+<%= link_to 'Back', account_requests_path %>

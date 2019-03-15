@@ -1,0 +1,39 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Account Requests</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Role</th>
+      <th>Fullname</th>
+      <th>Institution</th>
+      <th>Email</th>
+      <th>Status</th>
+      <th>Self introduction</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @account_requests.each do |account_request| %>
+      <tr>
+        <td><%= account_request.name %></td>
+        <td><%= account_request.role_id %></td>
+        <td><%= account_request.fullname %></td>
+        <td><%= account_request.institution_id %></td>
+        <td><%= account_request.email %></td>
+        <td><%= account_request.status %></td>
+        <td><%= account_request.self_introduction %></td>
+        <td><%= link_to 'Show', account_request %></td>
+        <td><%= link_to 'Edit', edit_account_request_path(account_request) %></td>
+        <td><%= link_to 'Destroy', account_request, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Account request', new_account_request_path %>

@@ -58,8 +58,9 @@ class UsersController < ApplicationController
 
   # for displaying the list of users
   def list
-    user = session[:user]
-    @users = user.get_user_list
+    #user = session[:user]
+    @records_per_page = params[:records_per_page]
+    @users = paginate_list(@records_per_page)
   end
 
   def list_pending_requested
@@ -340,26 +341,26 @@ class UsersController < ApplicationController
   end
 
   # For filtering the users list with proper search and pagination.
-  def paginate_list(users)
-    paginate_options = {"1" => 25, "2" => 50, "3" => 100}
-
+  def paginate_list(records_per_page)
+    paginate_options = {"1" => 25, "2" => 50, "3" => 100, "4" => User.count}
     # If the above hash does not have a value for the key,
     # it means that we need to show all the users on the page
     #
     # Just a point to remember, when we use pagination, the
     # 'users' variable should be an object, not an array
 
+    # call is commented out due to broken search functionality
+    
     # The type of condition for the search depends on what the user has selected from the search_by dropdown
-    @search_by = params[:search_by]
-
+    #@search_by = params[:search_by]
     # search for corresponding users
     # users = User.search_users(role, user_id, letter, @search_by)
 
     # paginate
-    users = if paginate_options[@per_page.to_s].nil? # displaying all - no pagination
-              User.paginate(page: params[:page], per_page: users.count)
+    users = if paginate_options[records_per_page.to_s].nil? # displaying Default 25 records per page
+              User.all.paginate(page: params[:page], per_page: paginate_options["1"])
             else # some pagination is active - use the per_page
-              User.paginate(page: params[:page], per_page: paginate_options[@per_page.to_s])
+              User.all.paginate(page: params[:page], per_page: paginate_options[records_per_page.to_s])
             end
     users
   end

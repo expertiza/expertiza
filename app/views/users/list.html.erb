@@ -14,6 +14,11 @@
 
 <%= render :partial => 'links' %>
 
+<%= form_tag :action => 'list' do %>
+<%= label_tag :records, 'Records per page: ' %>
+<%= select_tag(:records_per_page, options_for_select([['25', 1], ['50', 2], ['100', 3], ['ALL', 4]],@records_per_page), :onchange => "this.form.submit();") %>
+<% end %>
+
 <div class="exp">
   <table>
     <tr><th colspan=5></th><th colspan=3 class="head">E-mail on ...</th></tr>
@@ -33,6 +38,7 @@
       <% end %>
     <% end -%>
   </table>
+<%= will_paginate @users %>
 </div>
 <br/>
 <% session[:return_to] = "#{request.protocol}#{request.host_with_port}#{request.fullpath}" %>

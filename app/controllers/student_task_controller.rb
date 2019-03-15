@@ -25,7 +25,7 @@ class StudentTaskController < ApplicationController
 
       if impersonating_as_ta?
         ta_course_ids = TaMapping.where(ta_id: session[:original_user].id).pluck(:course_id)
-        @student_tasks = @student_tasks.select { |t| ta_course_ids.include?t.assignment.course_id }
+        @student_tasks = @student_tasks.select {|t| ta_course_ids.include? t.assignment.course_id }
       else
         @student_tasks = @student_tasks.select {|t| session[:original_user].id == t.assignment.course.instructor_id }
       end

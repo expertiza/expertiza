@@ -48,6 +48,8 @@ class ApplicationController < ActionController::Base
     message + "<a href = #{url_for(controller: :versions, action: :revert, id: version.id, redo: !params[:redo])}>#{link_name}</a>"
   end
 
+  # E1915 TODO: are_needed_authorizations_present? should either be ditched or rewritten in authorization_helper.rb
+  # E1915 TODO: awaiting response from Dr. Gehringer on are_needed_authorizations_present? method inscrutability
   def are_needed_authorizations_present?(id, *authorizations)
     participant = Participant.find_by(id: id)
     return false if participant.nil?

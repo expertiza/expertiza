@@ -61,10 +61,10 @@ module AuthorizationHelper
     session[:user] && session[:user].role ? session[:user].role.name == role_name : false
   end
 
-  # Get the current user's ID
+  # Determine if the current user has the passed in id value
   # TODO (Ginger): need to write tests
-  def current_user_id_as_string
-    session[:user].id.to_s
+  def current_user_has_id?(id)
+    session[:user].id.eql? id.to_i
   end
 
   # Determine if the currently logged-in user created the bookmark with the given ID

@@ -82,7 +82,7 @@ class UsersController < ApplicationController
   end
 
   def show
-    if params[:id].nil? || ((current_user_is_a? 'Student') && (!current_user_id_as_string.eql? params[:id]))
+    if params[:id].nil? || ((current_user_is_a? 'Student') && (!current_user_has_id? params[:id]))
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
       @user = User.find(params[:id])
@@ -247,7 +247,7 @@ class UsersController < ApplicationController
   end
 
   def keys
-    if params[:id].nil? || ((current_user_is_a? 'Student') && (!current_user_id_as_string.eql? params[:id]))
+    if params[:id].nil? || ((current_user_is_a? 'Student') && (!current_user_has_id? params[:id]))
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
       @user = User.find(params[:id])

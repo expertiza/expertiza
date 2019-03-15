@@ -56,15 +56,15 @@ module AuthorizationHelper
 
   # Determine if the currently logged-in user IS of the given role name
   # If there is no currently logged-in user simply return false
-  # TODO (Ginger): need to write tests
+  # parameter role_name should be one of: 'Student', 'Teaching Assistant', 'Instructor', 'Administrator', 'Super-Administrator'
   def current_user_is_a?(role_name)
     session[:user] && session[:user].role ? session[:user].role.name == role_name : false
   end
 
   # Determine if the current user has the passed in id value
-  # TODO (Ginger): need to write tests
+  # parameter id can be integer or string
   def current_user_has_id?(id)
-    session[:user].id.eql? id.to_i
+    session[:user] ? session[:user].id.eql?(id.to_i) : false
   end
 
   # Determine if the currently logged-in user created the bookmark with the given ID

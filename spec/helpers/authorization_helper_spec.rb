@@ -356,4 +356,75 @@ describe AuthorizationHelper do
 
   end
 
+  describe ".current_user_is_a?" do
+
+    it 'returns false if there is no current user' do
+      expect(current_user_is_a? 'Student').to be false
+    end
+
+    it 'returns false if there is a current user no role' do
+      random_user = build(:teaching_assistant, role_id: nil)
+      session[:user] = random_user
+      expect(current_user_is_a? 'Teaching Assistant').to be false
+    end
+
+    it 'returns false if an erroneous role is passed in' do
+      expect(current_user_is_a? 'Random Role').to be false
+    end
+
+    it 'returns true if current user and parameter are both Student' do
+      stub_current_user(student, student.role.name, student.role)
+      expect(current_user_is_a? 'Student').to be true
+    end
+
+    it 'returns true if current user and parameter are both Teaching Assistant' do
+      stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
+      expect(current_user_is_a? 'Teaching Assistant').to be true
+    end
+
+    it 'returns true if current user and parameter are both Instructor' do
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      expect(current_user_is_a? 'Instructor').to be true
+    end
+
+    it 'returns true if current user and parameter are both Administrator' do
+      stub_current_user(admin, admin.role.name, admin.role)
+      expect(current_user_is_a? 'Administrator').to be true
+    end
+
+    it 'returns true if current user and parameter are both Super-Administrator' do
+      stub_current_user(superadmin, superadmin.role.name, superadmin.role)
+      expect(current_user_is_a? 'Super-Administrator').to be true
+    end
+
+  end
+
+  describe ".current_user_has_id?" do
+
+    it 'returns false if there is no current user' do
+      expect(current_user_has_id? -1).to be false
+    end
+
+    it 'returns false if current user exists but an erroneous id is passed in' do
+      stub_current_user(admin, admin.role.name, admin.role)
+      expect(current_user_has_id? -1).to be false
+    end
+
+    it 'returns false if passed in id does not match current user id' do
+      stub_current_user(student, student.role.name, student.role)
+      expect(current_user_has_id? student.id + 1).to be false
+    end
+
+    it 'returns true if passed in id matches the current user id' do
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      expect(current_user_has_id? instructor.id).to be true
+    end
+
+    it 'returns true if passed in id is the string version of current user id' do
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      expect(current_user_has_id? instructor.id.to_s).to be true
+    end
+
+  end
+
 end

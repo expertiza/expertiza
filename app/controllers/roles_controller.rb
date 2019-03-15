@@ -72,7 +72,6 @@ class RolesController < ApplicationController
   private
   
   def role_params
-    params.require(:role).permit(:name,:parent_id,:description, :default_page_id)
-  end
-    
+    params.require(:role).permit( :name, :parent_id, :description, :default_page_id )
+  end    
 end

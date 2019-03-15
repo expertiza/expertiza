@@ -42,7 +42,6 @@
 </tr>
 </table>
 <p>
-  <!-- # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb -->
   <% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' && session[:user] != nil && (session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4) %>
     <%= form_tag :action => 'submit', :id => @suggestion do %>
       <%= submit_tag "Approve suggestion", :name => 'approve_suggestion' %>

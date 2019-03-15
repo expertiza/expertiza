@@ -1,6 +1,5 @@
 <td><%= topic.topic_identifier %></td>
 <td><%= render :partial => '/sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>
-<!-- # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb -->
 <% if not @assignment.is_intelligent or ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].
   include? current_user_role?.name %>
   <% if @assignment.microtask? %>

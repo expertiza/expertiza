@@ -18,7 +18,6 @@
             <td><label for="user_email_on_review_of_review">When someone else reviews one of my reviews (<strong>metareviews</strong> my work)</label></td>
             <td><%= check_box 'user', 'email_on_review_of_review', {}, true, false %></td>
           </tr>
-    <!-- # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb -->
           <% if @user.role_id == 2 %>
             <tr>
               <td><label for="copy_of_emails">Send me copies of emails sent for assigments</label></td>

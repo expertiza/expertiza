@@ -1,6 +1,6 @@
 class TeammateReviewResponseMap < ResponseMap
-  belongs_to :reviewee, class_name: 'Participant', foreign_key: 'reviewee_id'
-  belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
+  belongs_to :reviewee, inverse_of: :response_maps, class_name: 'Participant', foreign_key: 'reviewee_id'
+  belongs_to :assignment, inverse_of: :response_maps, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
 
   def questionnaire
     self.assignment.questionnaires.find_by(type: 'TeammateReviewQuestionnaire')
@@ -10,7 +10,7 @@ class TeammateReviewResponseMap < ResponseMap
     nil
   end
 
-  def get_title
+  def title
     "Teammate Review"
   end
 
@@ -22,8 +22,6 @@ class TeammateReviewResponseMap < ResponseMap
   # Refactored from email method in response.rb
   def email(defn, participant, assignment)
     defn[:body][:type] = "Teammate Review"
-    participant = AssignmentParticipant.find(reviewee_id)
-    topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
     defn[:body][:obj_name] = assignment.name
     user = User.find(participant.user_id)
     defn[:body][:first_name] = user.fullname

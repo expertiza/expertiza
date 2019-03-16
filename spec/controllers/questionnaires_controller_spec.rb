@@ -48,6 +48,7 @@ describe QuestionnairesController do
           check_access(ta).to be true
         end
       end
+
       context 'when current user is a ta but not the ta of the course which current questionnaires belongs to' do
         it 'does not allow certain action' do
           allow(TaMapping).to receive(:exists?).with(ta_id: 10, course_id: 1).and_return(false)
@@ -142,7 +143,7 @@ describe QuestionnairesController do
                                 min_question_score: 0,
                                 max_question_score: 5,
                                 type: 'ReviewQuestionnaire'}}
-      session = {user: double('Instructor', id: 6)}
+      session = {user: instructor}
       tree_folder = double('TreeFolder', id: 1)
       allow(TreeFolder).to receive_message_chain(:where, :first).with(['name like ?', 'Review']).with(no_args).and_return(tree_folder)
       allow(FolderNode).to receive(:find_by).with(node_object_id: 1).and_return(double('FolderNode', id: 1))

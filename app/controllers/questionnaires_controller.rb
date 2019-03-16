@@ -10,14 +10,12 @@ class QuestionnairesController < ApplicationController
 
   # Check role access for edit questionnaire
   def action_allowed?
-    if params[:action] == "edit"
+    case params[:action]
+    when 'edit'
       @questionnaire = Questionnaire.find(params[:id])
-      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-      (['Super-Administrator',
-        'Administrator'].include? current_role_name) ||
-          ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id))) ||
-          ((['Teaching Assistant'].include? current_role_name) && assign_instructor_id == @questionnaire.try(:instructor_id))
-
+      current_user_has_admin_privileges? ||
+          (current_user_is_a?('Instructor') && current_user_id?(@questionnaire.try(:instructor_id))) ||
+          (current_user_is_a?('Teaching Assistant') && assign_instructor_id == @questionnaire.try(:instructor_id))
     else
       current_user_has_student_privileges?
     end

@@ -49,7 +49,11 @@ class TagPromptDeployment < ActiveRecord::Base
           tagged_answers_ids = tags.map(&:answer_id)
           percentage = answers.count.zero? ? "-" : format("%.1f", tags.count.to_f / answers.count * 100)
           not_tagged_answers = answers.where.not(id: tagged_answers_ids)
-          answer_tagging = VmUserAnswerTagging.new(user, percentage, tags.count, not_tagged_answers.count, answers.count)
+          answer_tagging = VmUserAnswerTagging.new(user: user,
+                                                   percentage: percentage,
+                                                   no_tagged: tags.count,
+                                                   no_not_tagged: not_tagged_answers.count,
+                                                   no_tagable: answers.count)
           user_answer_tagging.append(answer_tagging)
         end
       end

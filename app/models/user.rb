@@ -1,11 +1,3 @@
-# E1920
-# Code Climate mistakenly reports
-# "Mass assignment is not restricted using attr_accessible"
-# https://github.com/presidentbeef/brakeman/issues/579
-#
-# Changes to this model are tested in models/user_spec.rb
-#                                     models/assignment_form_spec.rb
-
 class User < ActiveRecord::Base
   acts_as_authentic do |config|
     config.validates_uniqueness_of_email_field_options = {if: -> { false }} # Don't validate email uniqueness
@@ -13,14 +5,14 @@ class User < ActiveRecord::Base
     Authlogic::CryptoProviders::Sha1.join_token = ''
     Authlogic::CryptoProviders::Sha1.stretches = 1
   end
-  has_many :participants, class_name: 'Participant', foreign_key: 'user_id', dependent: :destroy
-  has_many :assignment_participants, class_name: 'AssignmentParticipant', foreign_key: 'user_id', dependent: :destroy
+  has_many :participants, inverse_of: :user, class_name: 'Participant', foreign_key: 'user_id', dependent: :destroy
+  has_many :assignment_participants, inverse_of: :user, class_name: 'AssignmentParticipant', foreign_key: 'user_id', dependent: :destroy
   has_many :assignments, through: :participants
   has_many :teams_users, dependent: :destroy
   has_many :teams, through: :teams_users
   has_many :sent_invitations, class_name: 'Invitation', foreign_key: 'from_id', dependent: :destroy
   has_many :received_invitations, class_name: 'Invitation', foreign_key: 'to_id', dependent: :destroy
-  has_many :children, class_name: 'User', foreign_key: 'parent_id'
+  has_many :children, class_name: 'User', foreign_key: 'parent_id', dependent: :destroy
   has_many :track_notifications, dependent: :destroy
   belongs_to :parent, class_name: 'User'
   belongs_to :role
@@ -74,16 +66,16 @@ class User < ActiveRecord::Base
     self.recursively_parent_of(p)
   end
 
-  def get_user_list
+  def user_list
     user_list = []
     # If the user is a super admin, fetch all users
-    user_list = SuperAdministrator.get_user_list if self.role.super_admin?
+    user_list = SuperAdministrator.user_list if self.role.super_admin?
 
     # If the user is an instructor, fetch all users in his course/assignment
-    user_list = Instructor.get_user_list(self) if self.role.instructor?
+    user_list = Instructor.user_list(self) if self.role.instructor?
 
     # If the user is a TA, fetch all users in his courses
-    user_list = Ta.get_user_list(self) if self.role.ta?
+    user_list = Ta.user_list(self) if self.role.ta?
 
     # Add the children to the list
     unless self.role.super_admin?
@@ -99,7 +91,7 @@ class User < ActiveRecord::Base
 
   # Zhewei: anonymized view for demo purposes - 1/3/2018
   def self.anonymized_view?(ip_address = nil)
-    anonymized_view_starter_ips = $redis.get('anonymized_view_starter_ips') || ''
+    anonymized_view_starter_ips = Redis.current.get('anonymized_view_starter_ips') || ''
     return true if ip_address and anonymized_view_starter_ips.include? ip_address
     false
   end
@@ -151,7 +143,7 @@ class User < ActiveRecord::Base
 
   def self.import(row_hash, _row_header, session, id = nil)
     raise ArgumentError, "Only #{row_hash.length} column(s) is(are) found. It must contain at least username, full name, email." if row_hash.length < 3
-    user = User.find_by_name(row_hash[:name])
+    user = User.find_by(name: row_hash[:name])
     if user.nil?
       attributes = ImportFileHelper.define_attributes(row_hash)
       user = ImportFileHelper.create_new_user(attributes, session)
@@ -163,7 +155,6 @@ class User < ActiveRecord::Base
       user.parent_id = (session[:user]).id
       user.save
     end
-
   end
 
   def self.yesorno(elt)
@@ -183,15 +174,14 @@ class User < ActiveRecord::Base
     user = User.find_by(email: login)
     if user.nil?
       items = login.split("@")
-      shortName = items[0]
-      userList = User.where("name = ?", shortName)
-      user = userList.first if !userList.nil? && userList.length == 1
+      short_name = items[0]
+      user_list = User.where("name = ?", short_name)
+      user = user_list.first if !user_list.nil? && user_list.length == 1
     end
     user
   end
 
-  # Change to copy_instructor per Code Climate
-  def copy_instructor(new_assignment)
+  def assign_instructor_for_assignment(new_assignment)
     new_assignment.instructor_id = self.id
   end
 
@@ -225,14 +215,14 @@ class User < ActiveRecord::Base
     # when replacing an existing key, update any digital signatures made previously with the new key
     if replacing_key
       participants = AssignmentParticipant.where(user_id: self.id)
-      for participant in participants
+      participants.each do |participant|
         AssignmentParticipant.grant_publishing_rights(new_key.to_pem, [participant]) if participant.permission_granted
       end
     end
 
     # return the new private key
     new_key.to_pem
-    end
+  end
 
   def initialize(attributes = nil)
     super(attributes)
@@ -295,7 +285,7 @@ class User < ActiveRecord::Base
   end
 
   def teaching_assistant?
-    return true if self.role.ta?
+    true if self.role.ta?
   end
 
   def self.search_users(role, user_id, letter, search_by)

@@ -1,12 +1,3 @@
-# E1920
-# Code Climate mistakenly reports
-# "Mass assignment is not restricted using attr_accessible"
-# https://github.com/presidentbeef/brakeman/issues/579
-#
-# Changes in superclass User may require changes to this model
-# Changes to this model are tested in models/user_spec.rb
-#                                     models/assignment_form_spec.rb
-
 class Instructor < User
   has_many :questionnaires
 
@@ -42,7 +33,7 @@ class Instructor < User
     ta_ids
   end
 
-  def self.get_user_list(user)
+  def self.user_list(user)
     participants = []
     user_list = []
     Course.where(instructor_id: user.id).find_each do |course|

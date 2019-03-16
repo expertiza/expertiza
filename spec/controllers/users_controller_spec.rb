@@ -28,7 +28,7 @@ describe UsersController do
     end
 
     it 'renders list if user is instructor' do
-      allow(instructor).to receive(:get_user_list).and_return(student1)
+      allow(instructor).to receive(:user_list).and_return(student1)
       @params = {}
       session = {user: instructor}
       get :index, @params, session

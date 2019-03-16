@@ -5,7 +5,7 @@ class SubmittedContentController < ApplicationController
      'Administrator',
      'Super-Administrator',
      'Student'].include? current_role_name and
-    ((%w[edit].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "reviewer") : true) and
+    (%w[edit].include? action_name ? are_needed_authorizations_present?(params[:id], "reader", "reviewer") : true) and
     one_team_can_submit_work?
   end
 

@@ -3,7 +3,11 @@ class StudentQuizzesController < ApplicationController
 
   def action_allowed?
     if current_user_is_a? 'Student'
-      action_name.eql? 'index' ? are_needed_authorizations_present?(params[:id], "reviewer", "submitter") : true
+      if action_name.eql? 'index'
+        return are_needed_authorizations_present?(params[:id], "reviewer", "submitter")
+      else
+        true
+      end
     else
       current_user_has_ta_privileges?
     end

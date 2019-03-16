@@ -11,15 +11,12 @@ class GradesController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'view_my_scores'
-      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       current_user_has_student_privileges? and
       are_needed_authorizations_present?(params[:id], "reader", "reviewer") and
       check_self_review_status
     when 'view_team'
-      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-      if ['Student'].include? current_role_name # students can only see the head map for their own team
-        participant = AssignmentParticipant.find(params[:id])
-        session[:user].id == participant.user_id
+      if current_user_is_a? 'Student' # students can only see the head map for their own team
+        current_user_is_assignment_participant?(assignment_participant_id: params[:id])
       else
         true
       end

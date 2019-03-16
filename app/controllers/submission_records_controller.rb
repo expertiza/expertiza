@@ -12,16 +12,16 @@ class SubmissionRecordsController < ApplicationController
     return true if assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.id
     false
   end
-  
+
   def show
   end
-  
+
   def edit
   end
-  
+
   def update
   end
-  
+
   def destroy
   end
 

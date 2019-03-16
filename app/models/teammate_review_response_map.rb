@@ -1,6 +1,6 @@
 class TeammateReviewResponseMap < ResponseMap
-  belongs_to :reviewee, class_name: 'Participant', foreign_key: 'reviewee_id'
-  belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
+  belongs_to :reviewee, inverse_of: :response_maps, class_name: 'Participant', foreign_key: 'reviewee_id'
+  belongs_to :assignment, inverse_of: :response_maps, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
 
   def questionnaire
     self.assignment.questionnaires.find_by(type: 'TeammateReviewQuestionnaire')
@@ -10,7 +10,7 @@ class TeammateReviewResponseMap < ResponseMap
     nil
   end
 
-  def get_title
+  def title
     "Teammate Review"
   end
 

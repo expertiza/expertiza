@@ -40,7 +40,7 @@ class Invitation < ActiveRecord::Base
   # Last the users team entry will be added to the TeamsUser table and their assigned topic is updated
   def self.accept_invite(team_id, inviter_user_id, invited_user_id, assignment_id)
     # if you are on a team and you accept another invitation and if your old team does not have any members, delete the entry for the team
-    if TeamsUser.is_team_empty(team_id) and team_id != '0'
+    if TeamsUser.team_empty?(team_id) and team_id != '0'
       assignment_id = AssignmentTeam.find(team_id).assignment.id
       # Release topics for the team has selected by the invited users empty team
       SignedUpTeam.release_topics_selected_by_team_for_assignment(team_id, assignment_id)

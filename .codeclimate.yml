@@ -1,6 +1,5 @@
 ---
-version: "2"
-plugins:
+engines:
   brakeman:
     enabled: true
     checks:
@@ -25,54 +24,16 @@ plugins:
     enabled: true
   rubocop:
     enabled: true
-exclude_patterns:
-- '**/*'
-- '!app/models/section_header.rb'
-- '!app/models/self_review_response_map.rb'
-- '!app/models/session.rb'
-- '!app/models/signed_up_team.rb'
-- '!app/models/signup_resubmission_quota.rb'
-- '!app/models/sign_up_sheet.rb'
-- '!app/models/sign_up_topic.rb'
-- '!app/models/simicheck_webservice.rb'
-- '!app/models/site_controller.rb'
-- '!app/models/student_task.rb'
-- '!app/models/submission_content_fetcher.rb'
-- '!app/models/submission_record.rb'
-- '!app/models/suggestion_comment.rb'
-- '!app/models/suggestion.rb'
-- '!app/models/super_administrator.rb'
-- '!app/models/survey_deployment.rb'
-- '!app/models/survey_questionnaire.rb'
-- '!app/models/survey_response_map.rb'
-- '!app/models/system_settings.rb'
-- '!app/models/table_header.rb'
-- '!app/models/tag_prompt_deployment.rb'
-- '!app/models/tag_prompt.rb'
-- '!app/models/ta_mapping.rb'
-- '!app/models/ta.rb'
-- '!app/models/team_exists_error.rb'
-- '!app/models/teammate_review_questionnaire.rb'
-- '!app/models/teammate_review_response_map.rb'
-- '!app/models/team_node.rb'
-- '!app/models/team.rb'
-- '!app/models/teams_user.rb'
-- '!app/models/team_user_node.rb'
-- '!app/models/text_area.rb'
-- '!app/models/text_field.rb'
-- '!app/models/text_response.rb'
-- '!app/models/topic_due_date.rb'
-- '!app/models/track_notification.rb'
-- '!app/models/tree_folder.rb'
-- '!app/models/true_false.rb'
-- '!app/models/unscored_question.rb'
-- '!app/models/upload_file.rb'
-- '!app/models/user_pastebin.rb'
-- '!app/models/version.rb'
-- '!app/models/vm_question_response.rb'
-- '!app/models/vm_question_response_row.rb'
-- '!app/models/vm_question_response_score_cell.rb'
-- '!app/models/vm_tag_prompt_answer.rb'
-- '!app/models/vm_user_answer_tagging.rb'
-- '!app/models/waitlist.rb'
-- '!app/models/website_fetcher.rb'
+ratings:
+  paths:
+  - "**.erb"
+  - "**.haml"
+  - "**.rb"
+  - "**.rhtml"
+exclude_paths:
+- 'bin/**/*'
+- 'config/**/*'
+- 'db/**/*'
+- 'lib/**/*'
+- 'public/**/*'
+- 'vendor/**/*'

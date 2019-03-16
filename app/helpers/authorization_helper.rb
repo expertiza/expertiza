@@ -35,15 +35,26 @@ module AuthorizationHelper
     current_user_has_privileges_of?('Student')
   end
 
-  # Determine if the currently logged-in user is participating in an Assignment based on the passed in AssignmentTeam ID.
-  # Although it would be better to take the Assignment ID as a parameter, the controller that this function gets used
-  # in does not get passed an Assignment ID, only an AssignmentTeam ID
-  def current_user_is_assignment_participant?(assignment_team_id)
-    team = AssignmentTeam.find_by(id: assignment_team_id)
-    if team && session[:user]
-      participant = AssignmentParticipant.find_by(parent_id: team.assignment.id, user_id: current_user_id)
+  # Determine if the currently logged-in user is participating in an Assignment. This method takes 1 argument, either
+  # an AssignmentTeam ID or an AssignmentParticipant ID. The default value for both arguments is false
+  # Usage: current_user_is_assignment_participant?(assignment_team_id: <id>) or
+  # current_user_is_assignment_participant?(assignment_participant_id: <id>)
+  def current_user_is_assignment_participant?(assignment_team_id: false, assignment_participant_id: false)
+    if assignment_team_id
+      team = AssignmentTeam.find_by(id: assignment_team_id)
+      if team && session[:user]
+        participant = AssignmentParticipant.find_by(parent_id: team.assignment.id, user_id: current_user_id)
+      end
+      participant ? (return true) : (return false)
     end
-    participant ? true : false
+
+    if assignment_participant_id
+      participant = AssignmentParticipant.find_by(id: assignment_participant_id)
+      if participant
+        current_user_has_id?(participant.user_id) ? (return true) : (return false)
+      end
+    end
+    false
   end
 
   def current_user_teaching_staff_of_assignment?(assignment_id)

@@ -5,7 +5,8 @@ class AdvertiseForPartnerController < ApplicationController
     # Any user with at least a Student role should be able to advertise for a partner
     # For the create, edit, update, and remove actions the current user should also be a participant in the assignment
     if %w[create, edit, update, remove].include? params[:action]
-      current_user_is_assignment_participant?(params[:id]) && current_user_has_student_privileges?
+      current_user_is_assignment_participant?(assignment_team_id: params[:id]) &&
+          current_user_has_student_privileges?
     else
       current_user_has_student_privileges?
     end

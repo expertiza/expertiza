@@ -3,7 +3,6 @@ class ImpersonateController < ApplicationController
   include AuthorizationHelper
 
   def action_allowed?
-    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     if current_user_has_student_privileges?
       !session[:super_user].nil?
     else

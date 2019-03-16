@@ -13,17 +13,13 @@ class SubmissionRecordsController < ApplicationController
     false
   end
 
-  def show
-  end
+  def show end
 
-  def edit
-  end
+  def edit end
 
-  def update
-  end
+  def update end
 
-  def destroy
-  end
+  def destroy end
 
   # Show submission records.
   # expects to get team_id from params

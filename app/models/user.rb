@@ -10,11 +10,11 @@ class User < ActiveRecord::Base
   has_many :assignments, through: :participants
   has_many :teams_users, dependent: :destroy
   has_many :teams, through: :teams_users
-  has_many :sent_invitations, class_name: 'Invitation', foreign_key: 'from_id', dependent: :destroy
-  has_many :received_invitations, class_name: 'Invitation', foreign_key: 'to_id', dependent: :destroy
-  has_many :children, class_name: 'User', foreign_key: 'parent_id', dependent: :destroy
+  has_many :sent_invitations, inverse_of: :user, class_name: 'Invitation', foreign_key: 'from_id', dependent: :destroy
+  has_many :received_invitations, inverse_of: :user, class_name: 'Invitation', foreign_key: 'to_id', dependent: :destroy
+  has_many :children, inverse_of: :parent, class_name: 'User', foreign_key: 'parent_id', dependent: :destroy
   has_many :track_notifications, dependent: :destroy
-  belongs_to :parent, class_name: 'User'
+  belongs_to :parent, inverse_of: :children, class_name: 'User'
   belongs_to :role
   validates :name, presence: true
   validates :name, uniqueness: true
@@ -141,7 +141,7 @@ class User < ActiveRecord::Base
     password
   end
 
-  def self.import(row_hash, _row_header, session, id = nil)
+  def self.import(row_hash, row_header, session, id = nil)
     raise ArgumentError, "Only #{row_hash.length} column(s) is(are) found. It must contain at least username, full name, email." if row_hash.length < 3
     user = User.find_by(name: row_hash[:name])
     if user.nil?

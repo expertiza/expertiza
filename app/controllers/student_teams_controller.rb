@@ -53,9 +53,10 @@ class StudentTeamsController < ApplicationController
 
     @users_on_waiting_list = (SignUpTopic.find(current_team.topic).users_on_waiting_list if @student.assignment.topics? && current_team && current_team.topic)
 
-    @teammate_review_allowed = true if @student.assignment.find_current_stage == 'Finished' || 
-      @current_due_date && (@current_due_date.teammate_review_allowed_id == 3 || 
-        @current_due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
+    @teammate_review_allowed = true if @student.assignment.find_current_stage == 'Finished' ||
+      @current_due_date && (@current_due_date.teammate_review_allowed_id == 3 ||
+        # late(2) or yes(3)
+        @current_due_date.teammate_review_allowed_id == 2)
   end
 
   def create
@@ -65,7 +66,7 @@ class StudentTeamsController < ApplicationController
       if params[:team][:name].blank?
         flash[:notice] = 'The team name is empty.'
         ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Team name missing while creating team', request)
-      #  redirect_to view_student_teams_path student_id: student.id
+        redirect_to view_student_teams_path student_id: student.id
         return
       end
       team = AssignmentTeam.new(name: params[:team][:name], parent_id: student.parent_id)
@@ -75,12 +76,10 @@ class StudentTeamsController < ApplicationController
       user = User.find student.user_id
       team.add_member user, team.parent_id
       team_created_successfully(team)
-     # redirect_to view_student_teams_path student_id: student.id
 
     else
       flash[:notice] = 'That team name is already in use.'
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, 'Team name being created was already in use', request)
-    #  redirect_to view_student_teams_path student_id: student.id
     end
     redirect_to view_student_teams_path student_id: student.id
   end

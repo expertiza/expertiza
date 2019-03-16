@@ -449,4 +449,92 @@ describe AuthorizationHelper do
 
   end
 
+  describe ".given_user_can_submit?" do
+
+    it 'returns false if there is no given user' do
+      expect(given_user_can_submit?(nil)).to be false
+    end
+
+    it 'returns false if the given user cannot be found' do
+      expect(given_user_can_submit?(-1)).to be false
+    end
+
+    it 'returns false if the given user cannot submit' do
+      participant = create(:participant, can_submit: 0)
+      expect(given_user_can_submit?(participant.id)).to be false
+    end
+
+    it 'returns true if the given user can submit' do
+      participant = create(:participant, can_submit: 1)
+      expect(given_user_can_submit?(participant.id)).to be true
+    end
+
+  end
+
+  describe ".given_user_can_review?" do
+
+    it 'returns false if there is no given user' do
+      expect(given_user_can_review?(nil)).to be false
+    end
+
+    it 'returns false if the given user cannot be found' do
+      expect(given_user_can_review?(-1)).to be false
+    end
+
+    it 'returns false if the given user cannot review' do
+      participant = create(:participant, can_review: 0)
+      expect(given_user_can_review?(participant.id)).to be false
+    end
+
+    it 'returns true if the given user can review' do
+      participant = create(:participant, can_review: 1)
+      expect(given_user_can_review?(participant.id)).to be true
+    end
+
+  end
+
+  describe ".given_user_can_take_quiz?" do
+
+    it 'returns false if there is no given user' do
+      expect(given_user_can_take_quiz?(nil)).to be false
+    end
+
+    it 'returns false if the given user cannot be found' do
+      expect(given_user_can_take_quiz?(-1)).to be false
+    end
+
+    it 'returns false if the given user cannot read' do
+      participant = create(:participant, can_take_quiz: 0)
+      expect(given_user_can_take_quiz?(participant.id)).to be false
+    end
+
+    it 'returns true if the given user can read' do
+      participant = create(:participant, can_take_quiz: 1)
+      expect(given_user_can_take_quiz?(participant.id)).to be true
+    end
+
+  end
+
+  describe ".given_user_can_read?" do
+
+    it 'returns false if there is no given user' do
+      expect(given_user_can_read?(nil)).to be false
+    end
+
+    it 'returns false if the given user cannot be found' do
+      expect(given_user_can_read?(-1)).to be false
+    end
+
+    it 'returns false if the given user cannot read' do
+      participant = create(:participant, can_take_quiz: 0)
+      expect(given_user_can_read?(participant.id)).to be false
+    end
+
+    it 'returns true if the given user can read' do
+      participant = create(:participant, can_take_quiz: 1)
+      expect(given_user_can_read?(participant.id)).to be true
+    end
+
+  end
+
 end

@@ -92,6 +92,30 @@ module AuthorizationHelper
     return false
   end
 
+  # Determine if the given user can submit work
+  def given_user_can_submit?(user_id)
+    given_user_can?(user_id, 'submit')
+  end
+
+  # Determine if the given user can review work
+  def given_user_can_review?(user_id)
+    given_user_can?(user_id, 'review')
+  end
+
+  # Determine if the given user can take quizzes
+  def given_user_can_take_quiz?(user_id)
+    given_user_can?(user_id, 'take_quiz')
+  end
+
+  # Determine if the given user can read work
+  def given_user_can_read?(user_id)
+    # Note that the ability to read is in the model as can_take_quiz
+    # Per Dr. Gehringer, "I believe that 'can_take_quiz' means that the participant is a reader,
+    # but please check the code to verify".
+    # This was verified in the Participant model
+    given_user_can_take_quiz?(user_id)
+  end
+
   # PRIVATE METHODS
   private
 
@@ -108,6 +132,23 @@ module AuthorizationHelper
   # This is done instead of returning nil to be very explicit and avoid matching to records which have nil user ID
   def current_user_id
     (session[:user] && session[:user].id) ? session[:user].id : -1
+  end
+
+  # Determine if the given user is a participant of some kind
+  # who is allowed to perform the given action ("submit", "review", "take_quiz")
+  def given_user_can?(user_id, action)
+    participant = Participant.find_by(id: user_id)
+    return false if participant.nil?
+    case action
+    when 'submit'
+      participant.can_submit
+    when 'review'
+      participant.can_review
+    when 'take_quiz'
+      participant.can_take_quiz
+    else
+      raise "Did not recognize user action '" + action + "'"
+    end
   end
 
 end

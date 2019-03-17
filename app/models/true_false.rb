@@ -27,13 +27,12 @@ class TrueFalse < QuizQuestion
   def complete
     quiz_question_choices = QuizQuestionChoice.where(question_id: self.id)
     html = "<label for=\"" + self.id.to_s + "\">" + self.txt + "</label><br>"
-    for i in 0..1
-      txt = quiz_question_choices[i].txt
+    0..1.each do |i|
       html += "<input name = " + "\"#{self.id}\" "
       html += "id = " + "\"#{self.id}" + "_" + "#{i + 1}\" "
       html += "value = " + "\"#{quiz_question_choices[i].txt}\" "
       html += "type=\"radio\"/>"
-      html += if i == 0
+      html += if i.zero?
                 "True"
               else
                 "False"
@@ -69,14 +68,14 @@ class TrueFalse < QuizQuestion
     valid = "valid"
     valid = "Please make sure all questions have text" if self.txt == ''
     correct_count = 0
-    choice_info.each do |_idx, value|
+    choice_info.each_value do |value|
       if value[:txt] == ''
         valid = "Please make sure every question has text for all options"
         break
       end
       correct_count += 1 if value.key?(:iscorrect)
     end
-    valid = "Please select a correct answer for all questions" if correct_count == 0
+    valid = "Please select a correct answer for all questions" if correct_count.zero?
     valid
   end
 end

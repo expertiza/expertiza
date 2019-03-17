@@ -65,7 +65,7 @@ class SignUpSheet < ActiveRecord::Base
     sign_up.is_waitlisted = false
     sign_up.save
     # Update topic_id in signed_up_teams table with the topic_id
-    signed_up_team = SignedUpTeam.where(topic_id: topic_id)
+    signed_up_team = SignedUpTeam.find_by(topic_id: topic_id)
     signed_up_team.update_attributes(topic_id: topic_id)
     true
   end

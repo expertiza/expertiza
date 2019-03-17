@@ -140,7 +140,7 @@ class SignUpTopic < ActiveRecord::Base
   def update_waitlisted_users(max_choosers)
     num_of_users_promotable = max_choosers.to_i - self.max_choosers.to_i
     num_of_users_promotable.times do
-      next_wait_listed_team = SignedUpTeam.where(topic_id: self.id, is_waitlisted: true).first
+      next_wait_listed_team = SignedUpTeam.find_by(topic_id: self.id, is_waitlisted: true)
       # if slot exist, then confirm the topic for this team and delete all waitlists for this team
       SignUpTopic.assign_to_first_waiting_team(next_wait_listed_team) if next_wait_listed_team
     end

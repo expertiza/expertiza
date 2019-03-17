@@ -73,7 +73,7 @@ class SuggestionController < ApplicationController
     @suggestion.assignment_id = session[:assignment_id]
     @assignment = Assignment.find(session[:assignment_id])
     @suggestion.status = 'Initiated'
-    @suggestion.unityID = if params[:suggestion_anonymous].nil? 
+    @suggestion.unityID = if params[:suggestion_anonymous].nil?
                             session[:user].name
                           else
                             ""
@@ -145,17 +145,15 @@ class SuggestionController < ApplicationController
       # if this user do not have team in this assignment, create one for him/her and assign this topic to this team.
       if @team_id.nil?
         create_new_team
-      else # this user has a team in this assignment, check whether this team has topic or not
-        if @topic_id.nil?
+      elsif @topic_id.nil? # this user has a team in this assignment, check whether this team has topic or not
           # clean waitlists
-          SignedUpTeam.where(team_id: @team_id, is_waitlisted: 1).destroy_all
-          SignedUpTeam.create(topic_id: @signuptopic.id, team_id: @team_id, is_waitlisted: 0)
-        else
-          @signuptopic.private_to = @user_id
-          @signuptopic.save
-          # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team
-          send_email
-        end
+         SignedUpTeam.where(team_id: @team_id, is_waitlisted: 1).destroy_all
+         SignedUpTeam.create(topic_id: @signuptopic.id, team_id: @team_id, is_waitlisted: 0)
+      else
+         @signuptopic.private_to = @user_id
+         @signuptopic.save
+         # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team
+         send_email
       end
     else
       # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team

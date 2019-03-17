@@ -109,11 +109,11 @@ class StudentTeamsController < ApplicationController
   end
 
   def advertise_for_partners
-    Team.update_all advertise_for_partner: true, id: params[:team_id]
+    Team.update_attributes(advertise_for_partner: true, id: params[:team_id])
   end
 
   def remove_advertisement
-    Team.update_all advertise_for_partner: false, id: params[:team_id]
+    Team.update_attributes(advertise_for_partner: false, id: params[:team_id])
     redirect_to view_student_teams_path student_id: params[:team_id]
   end
 

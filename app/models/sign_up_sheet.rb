@@ -60,8 +60,6 @@ class SignUpSheet < ActiveRecord::Base
     result
   end
 
-  # Change where().first to where() per Code Climate. Using find_by() causes test failures.
-  #      Assumes that SignedUpTeam has 1 record per topic_id
   def self.cancel_all_waitlists(assignment_id, sign_up, team_id, topic_id)
     Waitlist.cancel_all_waitlists(team_id, assignment_id)
     sign_up.is_waitlisted = false

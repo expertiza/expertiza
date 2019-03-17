@@ -27,7 +27,7 @@ class TrueFalse < QuizQuestion
   def complete
     quiz_question_choices = QuizQuestionChoice.where(question_id: self.id)
     html = "<label for=\"" + self.id.to_s + "\">" + self.txt + "</label><br>"
-    0..1.each do |i|
+    (0..1).each do |i|
       html += "<input name = " + "\"#{self.id}\" "
       html += "id = " + "\"#{self.id}" + "_" + "#{i + 1}\" "
       html += "value = " + "\"#{quiz_question_choices[i].txt}\" "

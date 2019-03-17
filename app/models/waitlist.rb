@@ -5,7 +5,7 @@ class Waitlist < ActiveRecord::Base
     destroy_topics(waitlisted_topics) unless waitlisted_topics.nil?
   end
 
-  private def self.destroy_topics(waitlisted_topics)
+  def self.destroy_topics(waitlisted_topics)
     waitlisted_topics.each do |waitlisted_topic|
       entry = SignedUpTeam.find(waitlisted_topic.id)
       entry.destroy

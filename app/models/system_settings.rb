@@ -1,7 +1,6 @@
 class SystemSettings < ActiveRecord::Base
   self.table_name = 'system_settings'
 
-
   attr_writer :public_role, :default_markup_style
   attr_writer :site_default_page, :not_found_page, :permission_denied_page,
               :session_expired_page

@@ -73,7 +73,12 @@ class SuggestionController < ApplicationController
     @suggestion.assignment_id = session[:assignment_id]
     @assignment = Assignment.find(session[:assignment_id])
     @suggestion.status = 'Initiated'
-    @suggestion.unityID = if params[:suggestion_anonymous].nil? session[:user].name else "" end
+    #@suggestion.unityID = if params[:suggestion_anonymous].nil? session[:user].name else "" end
+    if params[:suggestion_anonymous].nil?
+      @suggestion.unityID = session[:user].name
+    else
+      @suggestion.unityID = ""
+    end
 
     if @suggestion.save
       flash[:success] = 'Thank you for your suggestion!' if @suggestion.unityID != ''

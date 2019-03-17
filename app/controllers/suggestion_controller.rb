@@ -73,12 +73,11 @@ class SuggestionController < ApplicationController
     @suggestion.assignment_id = session[:assignment_id]
     @assignment = Assignment.find(session[:assignment_id])
     @suggestion.status = 'Initiated'
-    #@suggestion.unityID = if params[:suggestion_anonymous].nil? session[:user].name else "" end
-    if params[:suggestion_anonymous].nil?
-      @suggestion.unityID = session[:user].name
-    else
-      @suggestion.unityID = ""
-    end
+    @suggestion.unityID = if params[:suggestion_anonymous].nil? 
+                            session[:user].name
+                          else
+                            ""
+                          end
 
     if @suggestion.save
       flash[:success] = 'Thank you for your suggestion!' if @suggestion.unityID != ''
@@ -173,7 +172,7 @@ class SuggestionController < ApplicationController
   def reject_suggestion
     @suggestion = Suggestion.find(params[:id])
 
-    if @suggestion.update_attribute('status', 'Rejected')
+    if @suggestion.update_attributes('status', 'Rejected')
       flash[:notice] = 'The suggestion has been successfully rejected.'
     else
       flash[:error] = 'An error occurred when rejecting the suggestion.'
@@ -200,7 +199,7 @@ class SuggestionController < ApplicationController
     @signuptopic.topic_name = @suggestion.title
     @signuptopic.assignment_id = @suggestion.assignment_id
     @signuptopic.max_choosers = 1
-    if @signuptopic.save && @suggestion.update_attribute('status', 'Approved')
+    if @signuptopic.save && @suggestion.update_attributes('status', 'Approved')
       flash[:success] = 'The suggestion was successfully approved.'
     else
       flash[:error] = 'An error occurred when approving the suggestion.'

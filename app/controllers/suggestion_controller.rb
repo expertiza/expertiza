@@ -146,14 +146,14 @@ class SuggestionController < ApplicationController
       if @team_id.nil?
         create_new_team
       elsif @topic_id.nil? # this user has a team in this assignment, check whether this team has topic or not
-          # clean waitlists
-         SignedUpTeam.where(team_id: @team_id, is_waitlisted: 1).destroy_all
-         SignedUpTeam.create(topic_id: @signuptopic.id, team_id: @team_id, is_waitlisted: 0)
+        # clean waitlists
+        SignedUpTeam.where(team_id: @team_id, is_waitlisted: 1).destroy_all
+        SignedUpTeam.create(topic_id: @signuptopic.id, team_id: @team_id, is_waitlisted: 0)
       else
-         @signuptopic.private_to = @user_id
-         @signuptopic.save
-         # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team
-         send_email
+        @signuptopic.private_to = @user_id
+        @signuptopic.save
+        # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team
+        send_email
       end
     else
       # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team

@@ -11,6 +11,7 @@ class Question < ActiveRecord::Base
   validates :txt, length: {minimum: 0, allow_nil: false, message: "can't be nil"} # user must define text content for a question
   validates :type, presence: true # user must define type for a question
   validates :break_before, presence: true
+  attr_accessible :txt, :weight, :questionnaire_id, :seq, :type, :size, :alternatives, :break_before, :max_label, :min_label
 
   has_paper_trail
 

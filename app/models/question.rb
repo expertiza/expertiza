@@ -58,10 +58,16 @@ class Question < ActiveRecord::Base
     nil
   end
 
-  # this method decide what to display if an instructor (etc.) is viewing a questionnaire
+  # This method returns what to display if an instructor (etc.) is viewing a questionnaire
   def view_question_text
-    nil
+    html = '<TR><TD align="left"> ' + self.txt + ' </TD>'
+    html += '<TD align="left">' + self.type + '</TD>'
+    html += '<td align="center">' + self.weight.to_s + '</TD>'
+    html += '<TD align="center">&mdash;</TD>'
+    html += '</TR>'
+    html.html_safe
   end
+
 
   # this method decide what to display if a student is filling out a questionnaire
   def view_completed_question

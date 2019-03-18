@@ -1,5 +1,5 @@
 describe VmQuestionResponseRow do
-  let(:row){ VmQuestionResponseRow.new('Question for testing average score', 1, 1, 5, 1)}
+  let(:row){ VmQuestionResponseRow.new(text: 'Question for testing average score', id: 1, weight: 1, max_score: 5, seq: 1)}
 
   describe "#average_score_for_row" do
     it 'returns correct average score for all not nil scores' do

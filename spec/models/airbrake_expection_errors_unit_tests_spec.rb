@@ -11,11 +11,11 @@ describe 'Airbrake-1781551925379466692' do
     @qs = VmQuestionResponse.new(questionnaire, assignment)
     # @list_of_reviews = [Response.new(id: 1)]
     @qs.instance_variable_set(:@list_of_reviews, [instance_double('Response', response_id: 1)])
-    @qs.instance_variable_set(:@list_of_rows, [VmQuestionResponseRow.new('', 1, 1, 5, 0)])
+    @qs.instance_variable_set(:@list_of_rows, [VmQuestionResponseRow.new(text: '', id: 1, weight: 1, max_score: 5, seq: 0)])
   end
 
   it 'can deal with comment is not nil, with one comments greater than 10' do
-    # @list_of_rows = [VmQuestionResponseRow.new('', 1, 1, 5, 0)]
+    # @list_of_rows = [VmQuestionResponseRow.new(text: '', id: 1, weight: 1, max_score: 5, seq: 0)]
     allow(Answer).to receive(:where).with(any_args).
       and_return([double("Answer", question_id: 1, response_id: 1, comments: 'one two three four five six seven eight nine ten eleven'),
                   double("Answer", question_id: 1, response_id: 1, comments: '233')])

@@ -36,7 +36,7 @@ class VmQuestionResponse
       question_max_score = corresponding_questionnaire.max_question_score
       # if this question is a header (table header, section header, column header), ignore this question
       unless question.is_a? QuestionnaireHeader
-        row = VmQuestionResponseRow.new(question.txt, question.id, question.weight, question_max_score, question.seq)
+        row = VmQuestionResponseRow.new(text: question.txt, id: question.id, weight: question.weight, max_score: question_max_score, seq: question.seq)
         @list_of_rows << row
       end
     end

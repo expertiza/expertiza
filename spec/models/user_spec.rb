@@ -138,34 +138,34 @@ describe User do
     end
   end
 
-  describe '#get_user_list' do
+  describe '#user_list' do
     before(:each) do
       allow(user).to receive_message_chain("role.super_admin?") { false }
       allow(user).to receive_message_chain("role.instructor?") { false }
       allow(user).to receive_message_chain("role.ta?") { false }
-      allow(SuperAdministrator).to receive(:get_user_list).and_return([user1, user2])
-      allow(Instructor).to receive(:get_user_list).and_return([user1, user2])
-      allow(Ta).to receive(:get_user_list).and_return([user1, user2])
+      allow(SuperAdministrator).to receive(:user_list).and_return([user1, user2])
+      allow(Instructor).to receive(:user_list).and_return([user1, user2])
+      allow(Ta).to receive(:user_list).and_return([user1, user2])
     end
 
     context 'when current user is super admin' do
       it 'fetches all users' do
         allow(user).to receive_message_chain("role.super_admin?") { true }
-        expect(user.get_user_list).to eq([user1, user2])
+        expect(user.user_list).to eq([user1, user2])
       end
     end
 
     context 'when current user is an instructor' do
       it 'fetches all users in his/her course/assignment' do
         allow(user).to receive_message_chain("role.instructor?") { true }
-        expect(user.get_user_list).to eq([user1, user2])
+        expect(user.user_list).to eq([user1, user2])
       end
     end
 
     context 'when current user is a TA' do
       it 'fetches all users in his/her courses' do
         allow(user).to receive_message_chain("role.ta?") { true }
-        expect(user.get_user_list).to eq([user1, user2])
+        expect(user.user_list).to eq([user1, user2])
       end
     end
   end

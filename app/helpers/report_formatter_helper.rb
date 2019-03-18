@@ -97,7 +97,11 @@ module ReportFormatterHelper
 
   def user_summary_report(line)
     if @user_tagging_report[line.user.name].nil?
-      @user_tagging_report[line.user.name] = VmUserAnswerTagging.new(line.user, line.percentage, line.no_tagged, line.no_not_tagged, line.no_tagable)
+      @user_tagging_report[line.user.name] = VmUserAnswerTagging.new(user: line.user,
+                                                                     percentage: line.percentage,
+                                                                     no_tagged: line.no_tagged,
+                                                                     no_not_tagged: line.no_not_tagged,
+                                                                     no_tagable: line.no_tagable)
     else
       @user_tagging_report[line.user.name].no_tagged += line.no_tagged
       @user_tagging_report[line.user.name].no_not_tagged += line.no_not_tagged

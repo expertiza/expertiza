@@ -1,11 +1,3 @@
-# E1920
-# Code Climate mistakenly reports
-# "Mass assignment is not restricted using attr_accessible"
-# https://github.com/presidentbeef/brakeman/issues/579
-#
-# Changes to this model are tested in models/user_spec.rb
-#                                     models/assignment_form_spec.rb
-
 class Ta < User
   has_many :ta_mappings, dependent: :destroy
 
@@ -44,7 +36,6 @@ class Ta < User
     end
   end
 
-  # Change where().first to find_by() per Code Climate
   def get(object_type, id, user_id)
     object_type.find_by(["id = ? AND (instructor_id = ? OR private = 0)", id, user_id])
   end
@@ -89,15 +80,13 @@ class Ta < User
     ids
   end
 
-  # Change name to instructor per Code Climate
   def instructor
     Ta.get_my_instructor(self.id)
   end
 
-  # Change to copy_instructor per Code Climate
-  def copy_instructor(new_assign)
-    new_assign.instructor_id = Ta.get_my_instructor(self.id)
-    new_assign.course_id = TaMapping.get_course_id(self.id)
+  def assign_instructor_for_assignment(new_assignment)
+    new_assignment.instructor_id = Ta.get_my_instructor(self.id)
+    new_assignment.course_id = TaMapping.get_course_id(self.id)
   end
 
   def set_courses_to_assignment
@@ -108,7 +97,7 @@ class Ta < User
     true
   end
 
-  def self.get_user_list(user)
+  def self.user_list(user)
     courses = Ta.get_mapped_courses(user.id)
     participants = []
     user_list = []

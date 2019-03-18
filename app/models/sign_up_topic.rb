@@ -1,14 +1,8 @@
-# E1920
-# Code Climate mistakenly reports
-# "Mass assignment is not restricted using attr_accessible"
-# https://github.com/presidentbeef/brakeman/issues/579
-#
-# Add inverse_of relationships per Code Climate
 class SignUpTopic < ActiveRecord::Base
-  has_many :signed_up_teams, inverse_of: :sign_up_topics, foreign_key: 'topic_id', dependent: :destroy
+  has_many :signed_up_teams, inverse_of: :topic, foreign_key: 'topic_id', dependent: :destroy
   has_many :teams, through: :signed_up_teams # list all teams choose this topic, no matter in waitlist or not
-  has_many :due_dates, inverse_of: :sign_up_topics, class_name: 'TopicDueDate', foreign_key: 'parent_id', dependent: :destroy
-  has_many :bids, inverse_of: :sign_up_topics, foreign_key: 'topic_id', dependent: :destroy
+  has_many :due_dates, inverse_of: :topic, class_name: 'TopicDueDate', foreign_key: 'parent_id', dependent: :destroy
+  has_many :bids, inverse_of: :topic, foreign_key: 'topic_id', dependent: :destroy
   belongs_to :assignment
 
   has_paper_trail
@@ -22,8 +16,6 @@ class SignUpTopic < ActiveRecord::Base
   #  return find_by_sql("select t.id from teams t,teams_users u where t.id=u.team_id and u.user_id = 5");
   # end
 
-  # Shorten raise line per Code Climate
-  # Change where().first to find_by() per Code Climate
   def self.import(row_hash, session, _id = nil)
     if row_hash.length < 3
       raise ArgumentError, "The CSV File expects the format: Topic identifier, Topic name, Max choosers, " \
@@ -65,7 +57,6 @@ class SignUpTopic < ActiveRecord::Base
   #   end
   # end
 
-  # Use multi-line string per Code Climate
   def self.find_slots_filled(assignment_id)
     # SignUpTopic.find_by_sql("SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t" \
     # "JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id =" + assignment_id+  " and u.is_waitlisted = false GROUP BY t.id")
@@ -74,7 +65,6 @@ class SignUpTopic < ActiveRecord::Base
                                  "WHERE t.assignment_id = ? and u.is_waitlisted = false GROUP BY t.id", assignment_id])
   end
 
-  # Use multi-line string per Code Climate
   def self.find_slots_waitlisted(assignment_id)
     # SignUpTopic.find_by_sql("SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t" \
     # " JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id =" + assignment_id +  " and u.is_waitlisted = true GROUP BY t.id")
@@ -83,7 +73,6 @@ class SignUpTopic < ActiveRecord::Base
                                  "WHERE t.assignment_id = ? and u.is_waitlisted = true GROUP BY t.id", assignment_id])
   end
 
-  # Use multi-line string per Code Climate
   def self.find_waitlisted_topics(assignment_id, team_id)
     # SignedUpTeam.find_by_sql("SELECT u.id FROM sign_up_topics t, signed_up_teams u" \
     # " WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = " + assignment_id.to_s + " and u.team_id = " + team_id.to_s)
@@ -92,29 +81,14 @@ class SignUpTopic < ActiveRecord::Base
                                                           "and u.team_id = ?", assignment_id.to_s, team_id.to_s])
   end
 
-  # Rename to slot_available? per Code Climate
-  # Rubify return statement logic per Code Climate
   def self.slot_available?(topic_id)
     topic = SignUpTopic.find(topic_id)
     no_of_students_who_selected_the_topic = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: false)
 
-    # if !no_of_students_who_selected_the_topic.nil?
-    #   if topic.max_choosers > no_of_students_who_selected_the_topic.size
-    #     return true
-    #   else
-    #     return false
-    #   end
-    # else
-    #   return true
-    # end
     return true if no_of_students_who_selected_the_topic.nil?
     topic.max_choosers > no_of_students_who_selected_the_topic.size
   end
 
-  # Change dropDate to drop_date per Code Climate
-  # Change where().first to find_by() per Code Climate
-  # Add zone to Time
-  # Decrease if nesting
   def self.reassign_topic(session_user_id, assignment_id, topic_id)
     # find whether assignment is team assignment
     assignment = Assignment.find(assignment_id)
@@ -133,8 +107,6 @@ class SignUpTopic < ActiveRecord::Base
       signup_record = SignedUpTeam.find_by(topic_id: topic_id, team_id: users_team[0].t_id)
       assignment = Assignment.find(assignment_id)
       # if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
-      # Change if statements to decrease nesting
-      # unless assignment.is_intelligent?
       if !assignment.is_intelligent? and !signup_record.try(:is_waitlisted)
         # find the first wait listed user if exists
         first_waitlisted_user = SignedUpTeam.find_by(topic_id: topic_id, is_waitlisted: true)
@@ -164,7 +136,7 @@ class SignUpTopic < ActiveRecord::Base
     Waitlist.cancel_all_waitlists(team_id, assignment_id)
   end
 
-  # Change where().first to find_by() per Code Climate
+  # Need to figure out why SignedUpTeam has issues with find_by()
   def update_waitlisted_users(max_choosers)
     num_of_users_promotable = max_choosers.to_i - self.max_choosers.to_i
     num_of_users_promotable.times do

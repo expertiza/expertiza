@@ -88,7 +88,7 @@ describe '.confirm_topic' do
     user_signup = SignedUpTeam.new
     user_signup.is_waitlisted = true
     allow(SignUpSheet).to receive(:update_attribute) { [user_signup] }
-    allow(SignedUpTeam).to receive(:where) { user_signup }
+    allow(SignedUpTeam).to receive(:find_by) { user_signup }
     allow(user_signup).to receive(:first) { user_signup }
     allow(user_signup).to receive(:update_attribute)
     allow(SignUpSheet).to receive(:other_confirmed_topic_for_user) { [user_signup] }

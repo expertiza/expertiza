@@ -119,7 +119,6 @@ class SimiCheckWebService
   # end
 
   # Gets the latest results for the similarity of one file wrt. all other files in a comparison
-  # DRY headers
   def self.get_similarity_1xn(comparison_id, filename)
     json_body = {"filename" => filename}.to_json
     request_execute_payload(:get, '/similarity_1xn/' + comparison_id, json_body, make_header)

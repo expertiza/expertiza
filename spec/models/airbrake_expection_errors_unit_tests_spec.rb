@@ -86,14 +86,14 @@ describe 'Airbrake-1766248124300920137' do
   end
 
   it 'can reassign topic successfully, if the signup record is not nil' do
-    allow(SignedUpTeam).to receive_message_chain(:where, :first){}
-    allow(SignedUpTeam).to receive_message_chain(:where, :first).with(1, 1).and_return([build(:signed_up_team)])
+    allow(SignedUpTeam).to receive(:find_by){}
+    allow(SignedUpTeam).to receive(:find_by).with(1, 1).and_return([build(:signed_up_team)])
     expect(SignUpTopic.reassign_topic(1, 1, 1)).to eq(true)
   end
 
   it 'can reassign topic successfully, if the signup record is nil' do
-    allow(SignedUpTeam).to receive_message_chain(:where, :first){}
-    allow(SignedUpTeam).to receive_message_chain(:where, :first).with(1, 1).and_return(nil)
+    allow(SignedUpTeam).to receive(:find_by){}
+    allow(SignedUpTeam).to receive(:find_by).with(1, 1).and_return(nil)
     expect(SignUpTopic.reassign_topic(1, 1, 1)).to eq(true)
   end
 end

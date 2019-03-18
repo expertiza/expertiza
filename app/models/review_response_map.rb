@@ -1,5 +1,3 @@
-# E1920
-# Change get_title to title due to SelfReviewResponseMap change
 class ReviewResponseMap < ResponseMap
   belongs_to :reviewee, class_name: 'Team', foreign_key: 'reviewee_id'
   belongs_to :contributor, class_name: 'Team', foreign_key: 'reviewee_id'
@@ -15,7 +13,6 @@ class ReviewResponseMap < ResponseMap
     Questionnaire.find_by(id: self.assignment.review_questionnaire_id(round))
   end
 
-  # Change from get_title to title per Code Climate
   def title
     "Review"
   end

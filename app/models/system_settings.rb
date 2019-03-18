@@ -1,15 +1,6 @@
-# E1920
-# Code Climate mistakenly reports
-# "Mass assignment is not restricted using attr_accessible"
-# https://github.com/presidentbeef/brakeman/issues/579
-#
 class SystemSettings < ActiveRecord::Base
   self.table_name = 'system_settings'
 
-  # Change to attr_writer per Code Climate
-  # attr_accessor :public_role, :default_markup_style
-  # attr_accessor :site_default_page, :not_found_page, :permission_denied_page,
-  #               :session_expired_page
   attr_writer :public_role, :default_markup_style
   attr_writer :site_default_page, :not_found_page, :permission_denied_page,
               :session_expired_page
@@ -18,7 +9,6 @@ class SystemSettings < ActiveRecord::Base
     @public_role ||= Role.find(self.public_role_id)
   end
 
-  # Rubify code
   def default_markup_style
     @default_markup_style ||= if self.default_markup_style_id
                                 MarkupStyle.find(self.default_markup_style_id)
@@ -46,8 +36,6 @@ class SystemSettings < ActiveRecord::Base
 
   # Returns an array of system page settings for a given page,
   # or nil if the page is not a system page.
-  # Rubify return statements
-  # Rubify strings using single quotes
   def system_pages(pageid)
     pages = []
 

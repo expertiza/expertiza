@@ -1,10 +1,10 @@
 class VmUserAnswerTagging
-  def initialize(user, percentage, no_tagged, no_not_tagged, no_tagable)
-    @user = user
-    @percentage = percentage
-    @no_tagged = no_tagged
-    @no_not_tagged = no_not_tagged
-    @no_tagable = no_tagable
+  def initialize(argument_hash = {})
+    @user = argument_hash.fetch(:user)
+    @percentage = argument_hash.fetch(:percentage)
+    @no_tagged = argument_hash.fetch(:no_tagged)
+    @no_not_tagged = argument_hash.fetch(:no_not_tagged)
+    @no_tagable = argument_hash.fetch(:no_tagable)
   end
 
   attr_accessor :user

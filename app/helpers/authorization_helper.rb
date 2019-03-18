@@ -42,16 +42,15 @@ module AuthorizationHelper
   def current_user_is_assignment_participant?(assignment_team_id: false, assignment_participant_id: false)
     if assignment_team_id
       team = AssignmentTeam.find_by(id: assignment_team_id)
-      if team && session[:user]
-        participant = AssignmentParticipant.find_by(parent_id: team.assignment.id, user_id: current_user_id)
+      if team && user_logged_in?
+        return AssignmentParticipant.exists?(parent_id: team.assignment.id, user_id: session[:user].id)
       end
-      participant ? (return true) : (return false)
     end
 
     if assignment_participant_id
       participant = AssignmentParticipant.find_by(id: assignment_participant_id)
       if participant
-        current_user_has_id?(participant.user_id) ? (return true) : (return false)
+        return current_user_has_id?(participant.user_id)
       end
     end
     false
@@ -60,7 +59,8 @@ module AuthorizationHelper
   def current_user_teaching_staff_of_assignment?(assignment_id)
     assignment = Assignment.find(assignment_id)
     user_logged_in? &&
-    ((assignment.course_id && Course.find(assignment.course_id).instructor_id == session[:user].id) ||
+    ((assignment.course_id &&
+        Course.find(assignment.course_id).instructor_id == session[:user].id) ||
         assignment_instructor?(assignment) ||
         ta_mapping_exists_for_user?(assignment))
   end
@@ -69,13 +69,13 @@ module AuthorizationHelper
   # If there is no currently logged-in user simply return false
   # parameter role_name should be one of: 'Student', 'Teaching Assistant', 'Instructor', 'Administrator', 'Super-Administrator'
   def current_user_is_a?(role_name)
-    session[:user] && session[:user].role ? session[:user].role.name == role_name : false
+    current_user_and_role_exist? && session[:user].role.name == role_name
   end
 
   # Determine if the current user has the passed in id value
   # parameter id can be integer or string
   def current_user_has_id?(id)
-    user_logged_in? ? session[:user].id.eql?(id.to_i) : false
+    user_logged_in? && session[:user].id.eql?(id.to_i)
   end
 
   # Determine if the currently logged-in user created the bookmark with the given ID
@@ -83,9 +83,7 @@ module AuthorizationHelper
   # Bookmark ID can be passed as string or number
   # If the bookmark is not found, simply return false
   def current_user_created_bookmark_id?(bookmark_id)
-    return false unless current_user_id
-    return false unless bookmark_id
-    Bookmark.find(bookmark_id.to_i).user_id == current_user_id
+    user_logged_in? && !bookmark_id.nil? && Bookmark.find(bookmark_id.to_i).user_id == session[:user].id
   rescue ActiveRecord::RecordNotFound
     return false
   end
@@ -123,8 +121,8 @@ module AuthorizationHelper
           (current_user_has_id?(user_id) ||
           reviewee_team.user?(session[:user]) ||
           current_user_has_admin_privileges? ||
-          (session[:user].role.name == 'Instructor' && assignment_instructor?(assignment)) ||
-          (session[:user].role.name == 'Teaching Assistant' && ta_mapping_exists_for_user?(assignment))
+          (current_user_is_a?('Instructor') && assignment_instructor?(assignment)) ||
+          (current_user_is_a?('Teaching Assistant') && ta_mapping_exists_for_user?(assignment))
           )
     end
     current_user_has_id?(user_id)
@@ -137,15 +135,7 @@ module AuthorizationHelper
   # Let the Role model define this logic for the sake of DRY
   # If there is no currently logged-in user simply return false
   def current_user_has_privileges_of?(role_name)
-    session[:user] && session[:user].role ? session[:user].role.hasAllPrivilegesOf(Role.find_by(name: role_name)) : false
-  end
-
-  # Get the ID of the currently logged-in user
-  # Return -1 if there is no currently logged-in user
-  # Return -1 if the currently logged-in user has no id
-  # This is done instead of returning nil to be very explicit and avoid matching to records which have nil user ID
-  def current_user_id
-    (session[:user] && session[:user].id) ? session[:user].id : -1
+    current_user_and_role_exist? && session[:user].role.hasAllPrivilegesOf(Role.find_by(name: role_name))
   end
 
   # Determine if the given user is a participant of some kind
@@ -166,11 +156,15 @@ module AuthorizationHelper
   end
 
   def assignment_instructor?(assignment)
-    session[:user] && assignment.instructor_id == session[:user].id
+   user_logged_in? && assignment.instructor_id == session[:user].id
   end
 
   def ta_mapping_exists_for_user?(assignment)
-    session[:user] && TaMapping.exists?(ta_id: session[:user].id, course_id: assignment.course.id)
+    user_logged_in? && TaMapping.exists?(ta_id: session[:user].id, course_id: assignment.course.id)
+  end
+
+  def current_user_and_role_exist?
+    user_logged_in? && !session[:user].role.nil?
   end
 
   def user_logged_in?

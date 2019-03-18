@@ -15,7 +15,7 @@ class PublishingController < ApplicationController
     if params[:allow] == '1'
       redirect_to action: 'grant'
     else
-      participant.update_attribute('permission_granted', params[:allow])
+      participant.update_attributes('permission_granted', params[:allow])
       redirect_to action: 'view'
     end
   end
@@ -26,7 +26,7 @@ class PublishingController < ApplicationController
     else
       participants = AssignmentParticipant.where(user_id: session[:user].id)
       participants.each do |participant|
-        participant.update_attribute('permission_granted', params[:allow])
+        participant.update_attributes('permission_granted', params[:allow])
         participant.digital_signature = nil
         participant.time_stamp = nil
         participant.save
@@ -41,7 +41,7 @@ class PublishingController < ApplicationController
     # This will be nil when the user is granting to all past assignments.
     @participant = AssignmentParticipant.find(params[:id]) unless params[:id].nil?
     @user = User.find(session[:user].id) # Find again, because the user's certificate may have changed since login
-    end
+  end
 
   # Grant publishing rights using the private key supplied by the student
   def grant_with_private_key

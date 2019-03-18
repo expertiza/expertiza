@@ -59,12 +59,10 @@ module AuthorizationHelper
 
   def current_user_teaching_staff_of_assignment?(assignment_id)
     assignment = Assignment.find(assignment_id)
-    session[:user] &&
-        (
-          assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user_id ||
-          assignment.instructor_id == current_user_id ||
-          TaMapping.exists?(ta_id: current_user_id, course_id: assignment.course_id)
-        )
+    user_logged_in? &&
+    ((assignment.course_id && Course.find(assignment.course_id).instructor_id == session[:user].id) ||
+        assignment_instructor?(assignment) ||
+        ta_mapping_exists_for_user?(assignment))
   end
 
   # Determine if the currently logged-in user IS of the given role name
@@ -77,7 +75,7 @@ module AuthorizationHelper
   # Determine if the current user has the passed in id value
   # parameter id can be integer or string
   def current_user_has_id?(id)
-    session[:user] ? session[:user].id.eql?(id.to_i) : false
+    user_logged_in? ? session[:user].id.eql?(id.to_i) : false
   end
 
   # Determine if the currently logged-in user created the bookmark with the given ID
@@ -116,6 +114,22 @@ module AuthorizationHelper
     given_user_can_take_quiz?(user_id)
   end
 
+  def response_edit_allowed?(map, user_id)
+    assignment = map.reviewer.assignment
+    # if it is a review response map, all the members of reviewee team should be able to view the response (can be done from heat map)
+    if map.is_a? ReviewResponseMap
+      reviewee_team = AssignmentTeam.find(map.reviewee_id)
+      return user_logged_in? &&
+          (current_user_has_id?(user_id) ||
+          reviewee_team.user?(session[:user]) ||
+          current_user_has_admin_privileges? ||
+          (session[:user].role.name == 'Instructor' && assignment_instructor?(assignment)) ||
+          (session[:user].role.name == 'Teaching Assistant' && ta_mapping_exists_for_user?(assignment))
+          )
+    end
+    current_user_has_id?(user_id)
+  end
+
   # PRIVATE METHODS
   private
 
@@ -149,6 +163,18 @@ module AuthorizationHelper
     else
       raise "Did not recognize user action '" + action + "'"
     end
+  end
+
+  def assignment_instructor?(assignment)
+    session[:user] && assignment.instructor_id == session[:user].id
+  end
+
+  def ta_mapping_exists_for_user?(assignment)
+    session[:user] && TaMapping.exists?(ta_id: session[:user].id, course_id: assignment.course.id)
+  end
+
+  def user_logged_in?
+    !session[:user].nil?
   end
 
 end

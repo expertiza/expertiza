@@ -7,11 +7,11 @@ describe AuthorizationHelper do
   # Makes use of spec/factories/factories.rb
   # Use create instead of build so that these users get IDs
   # https://stackoverflow.com/questions/41149787/how-do-i-create-an-user-id-for-a-factorygirl-build
-  let(:student) { create(:student) }
-  let(:teaching_assistant) { create(:teaching_assistant) }
-  let(:instructor) { create(:instructor) }
-  let(:admin) { create(:admin) }
-  let(:superadmin) { create(:superadmin) }
+  let(:student) {create(:student)}
+  let(:teaching_assistant) {create(:teaching_assistant)}
+  let(:instructor) {create(:instructor)}
+  let(:admin) {create(:admin)}
+  let(:superadmin) {create(:superadmin)}
   let(:assignment_team) {create(:assignment_team)}
 
   # The global before(:each) in spec/spec_helper.rb establishes roles before each test runs
@@ -185,14 +185,22 @@ describe AuthorizationHelper do
 
   end
 
-  describe ".teaching_staff_of_assignment?" do
+  describe ".current_user_teaching_staff_of_assignment?" do
 
     # Rather than specifying IDs explicitly for instructor, TA, course, etc.
     # Use factory create method to auto generate IDs.
     # In this way we have less risk of making a mistake (e.g. duplication) in the ID numbers.
 
-    it 'returns true if the instructor is assigned to the course of the assignment' do
+    it 'returns false if the user is not logged in' do
+      instructor1 = create(:instructor)
+      instructor2 = create(:instructor)
+      course = create(:course, instructor_id: instructor2.id)
+      assignment = create(:assignment, course_id: course.id)
+      session[:user] = nil
+      expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be false
+    end
 
+    it 'returns true if the instructor is assigned to the course of the assignment' do
       # To be on the safe side (avoid passing this test when there might be some problem)
       # Create 2 instructors and associate the 2nd one with the assignment
       # See comments in other tests of this method
@@ -203,13 +211,10 @@ describe AuthorizationHelper do
       course = create(:course, instructor_id: instructor2.id)
       assignment = create(:assignment, course_id: course.id)
       stub_current_user(instructor2, instructor2.role.name, instructor2.role)
-
       expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be true
-
     end
 
     it 'returns false if the instructor is not assigned to the course of the assignment' do
-
       # This test requires some extra care
       # The assignment factory will associate the created assignment with the first course
       # (or will create a course if needed)
@@ -223,13 +228,10 @@ describe AuthorizationHelper do
       course = create(:course, instructor_id: instructor2.id)
       assignment = create(:assignment, course_id: course.id, instructor_id: instructor2.id)
       stub_current_user(instructor1, instructor1.role.name, instructor1.role)
-
       expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be false
-
     end
 
     it 'returns true if the instructor is associated with the assignment' do
-
       # To be on the safe side (avoid passing this test when there might be some problem)
       # Create 2 instructors and associate the 2nd one with the assignment
       # See comments in other tests of this method
@@ -239,13 +241,10 @@ describe AuthorizationHelper do
       instructor2 = create(:instructor)
       assignment = create(:assignment, instructor_id: instructor2.id)
       stub_current_user(instructor2, instructor2.role.name, instructor2.role)
-
       expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be true
-
     end
 
     it 'returns false if the instructor is not associated with the assignment' do
-
       # This test requires some extra care
       # The assignment factory will associate the created assignment with the first course
       # (or will create a course if needed)
@@ -258,21 +257,16 @@ describe AuthorizationHelper do
       instructor2 = create(:instructor)
       assignment = create(:assignment, instructor_id: instructor1.id)
       stub_current_user(instructor2, instructor2.role.name, instructor2.role)
-
       expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be false
-
     end
 
     it 'returns true if the teaching assistant is associated with the course of the assignment' do
-
       teaching_assistant1 = create(:teaching_assistant)
       course = create(:course)
       assignment = create(:assignment)
-      ta_mapping = TaMapping.new(ta_id: teaching_assistant1.id, course_id: course.id)
+      TaMapping.create(ta_id: teaching_assistant1.id, course_id: course.id)
       stub_current_user(teaching_assistant1, teaching_assistant1.role.name, teaching_assistant1.role)
-
       expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be true
-
     end
 
     it 'returns false if the teaching assistant is not associated with the course of the assignment' do
@@ -281,9 +275,7 @@ describe AuthorizationHelper do
       teaching_assistant1 = create(:teaching_assistant)
       assignment = create(:assignment, instructor_id: instructor1.id)
       stub_current_user(teaching_assistant1, teaching_assistant1.role.name, teaching_assistant1.role)
-
       expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be false
-
     end
 
   end
@@ -533,6 +525,70 @@ describe AuthorizationHelper do
     it 'returns true if the given user can read' do
       participant = create(:participant, can_take_quiz: 1)
       expect(given_user_can_read?(participant.id)).to be true
+    end
+
+  end
+
+  describe '.response_edit_allowed?' do
+
+    it 'returns false if current user is not logged in' do
+      map = create(:review_response_map)
+      session[:user] = nil
+      expect(response_edit_allowed?(map, 1)).to be false
+    end
+
+    it 'returns false if map is not of type ReviewResponseMap and logged in user is not the reviewer' do
+      map = create(:meta_review_response_map)
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      expect(response_edit_allowed?(map, 80)).to be false
+    end
+
+    it 'returns true if map is not of type ReviewResponseMap and logged in user is the reviewer' do
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+
+      reviewer = create(:participant, user_id: session[:user].id)
+      map = create(:meta_review_response_map, reviewer: reviewer)
+      expect(response_edit_allowed?(map, map.reviewer.user_id)).to be true
+    end
+
+    it 'returns true if map is of type ReviewResponseMap and logged in user is the reviewer' do
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      reviewer = create(:participant, user_id: session[:user].id)
+      map = create(:review_response_map, reviewer: reviewer)
+      expect(response_edit_allowed?(map, map.reviewer.user_id)).to be true
+    end
+
+    it 'returns true if map is of type ReviewResponseMap and current user is on the reviewee team' do
+    stub_current_user(student, student.role.name, student.role)
+    reviewer = create(:participant)
+    team = create(:assignment_team)
+    TeamNode.create(node_object_id: team.id)
+    team.add_member(session[:user])
+    map = create(:review_response_map, reviewer: reviewer, reviewee_id: team.id)
+    expect(response_edit_allowed?(map, map.reviewer.user_id)).to be true
+    end
+
+    it 'returns true if map is of type ReviewResponseMap and user is an admin' do
+      stub_current_user(admin, admin.role.name, admin.role)
+      map = create(:review_response_map)
+      expect(response_edit_allowed?(map, map.reviewer.user_id)).to be true
+    end
+
+    it 'returns true if map is of type ReviewResponseMap and user is an instructor associated with the assignment' do
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      assignment = create(:assignment, instructor_id: session[:user].id)
+      reviewer = create(:participant, assignment: assignment)
+      map = create(:review_response_map, reviewer: reviewer)
+      expect(response_edit_allowed?(map, map.reviewer.user_id)).to be true
+    end
+
+    it 'returns true if map is of type ReviewResponseMap and user is a Teaching Assistant and a mapping exists between the user and the course of the assignment' do
+      stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
+      course = create(:course)
+      TaMapping.create(ta_id: session[:user].id, course_id: course.id)
+      reviewer = create(:participant)
+      map = create(:review_response_map, reviewer: reviewer)
+      expect(response_edit_allowed?(map, map.reviewer.user_id)).to be true
     end
 
   end

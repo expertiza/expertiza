@@ -14,32 +14,14 @@ class ResponseController < ApplicationController
     case action
     when 'edit' # If response has been submitted, no further editing allowed
       return false if response.is_submitted
-      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       return current_user_id?(user_id)
       # Deny access to anyone except reviewer & author's team
     when 'delete', 'update'
-      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       return current_user_id?(user_id)
     when 'view'
-      return edit_allowed?(response.map, user_id)
+      return response_edit_allowed?(response.map, user_id)
     else
-      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
       current_user
-    end
-  end
-
-  def edit_allowed?(map, user_id)
-    assignment = map.reviewer.assignment
-    # if it is a review response map, all the members of reviewee team should be able to view the response (can be done from heat map)
-    if map.is_a? ReviewResponseMap
-      reviewee_team = AssignmentTeam.find(map.reviewee_id)
-      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-      return current_user_id?(user_id) || reviewee_team.user?(current_user) || current_user_has_admin_privileges? ||
-        (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) ||
-        (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
-    else
-      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-      current_user_id?(user_id)
     end
   end
 

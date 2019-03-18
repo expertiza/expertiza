@@ -40,7 +40,7 @@ class QuestionsController < ApplicationController
   # Save a question created by the user
   # follows from new
   def create
-    @question = Question.new(params[:question])
+    @question = Question.new(questions_params)
     if @question.save
       flash[:notice] = 'The question was successfully created.'
       redirect_to action: 'list'
@@ -58,7 +58,7 @@ class QuestionsController < ApplicationController
   # follows from edit
   def update
     @question = Question.find(params[:id])
-    if @question.update_attributes(params[:question])
+    if @question.update_attributes(questions_params)
       flash[:notice] = 'The question was successfully updated.'
       redirect_to action: 'show', id: @question
     else
@@ -84,5 +84,12 @@ class QuestionsController < ApplicationController
   def types
     types = Question.distinct.pluck(:type)
     render json: types.to_a
+  end
+  
+  private
+  
+  def questions_params
+    params.require(:question).permit(:txt, :weight, :questionnaire_id, :seq, :type,
+                                     :size, :alternatives, :break_before, :max_label, :min_label)
   end
 end

@@ -13,7 +13,7 @@ class AssignmentsController < ApplicationController
       # or a TA for the course
       # or owner of the Course
       # (%w[Super-Administrator Administrator].include? current_role_name) ||
-      (['Super-Administrator', 'Administrator', 'Instructor', 'Teaching Assistant'].include? current_role_name) ||
+      (['Super-Administrator', 'Administrator'].include? current_role_name) ||
       (assignment.instructor_id == user_id) ||
       TaMapping.exists?(ta_id: user_id, course_id: assignment.course_id) ||
       (assignment.course_id && Course.find(assignment.course_id).instructor_id == user_id)

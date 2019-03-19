@@ -12,12 +12,12 @@ class AssignmentsController < ApplicationController
       # or instructor for the course
       # or a TA for the course
       # or owner of the Course
-      #(%w[Super-Administrator Administrator].include? current_role_name) ||
-      ['Super-Administrator', 'Administrator', 'Instructor', 'Teaching Assistant'].include? current_role_name ||
+      # (%w[Super-Administrator Administrator].include? current_role_name) ||
+      (['Super-Administrator', 'Administrator', 'Instructor', 'Teaching Assistant'].include? current_role_name) ||
       (assignment.instructor_id == user_id) ||
       TaMapping.exists?(ta_id: user_id, course_id: assignment.course_id) ||
       (assignment.course_id && Course.find(assignment.course_id).instructor_id == user_id)
-    #else
+    # else
      # ['Super-Administrator', 'Administrator', 'Instructor', 'Teaching Assistant'].include? current_role_name
     end
   end
@@ -241,7 +241,7 @@ class AssignmentsController < ApplicationController
 
   # used to be update_nil_dd_deadline_name
   def update_due_date_deadline_name(due_date_all)
-    #goes through all the due dates and sets the deadline name
+    # goes through all the due dates and sets the deadline name
     due_date_all.each do |dd|
       dd.deadline_name ||= ''
     end
@@ -250,7 +250,7 @@ class AssignmentsController < ApplicationController
 
   # used to be update_nil_dd_description_url
   def update_due_date_description_url(due_date_all)
-    #goes through all the due dates and sets the description url
+    # goes through all the due dates and sets the description url
     due_date_all.each do |dd|
       dd.description_url ||= ''
     end
@@ -293,7 +293,7 @@ class AssignmentsController < ApplicationController
       @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_SUBMISSION }
       @assignment_review_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_REVIEW }
     end
-    #if it is not true then set it to true
+    # if it is not true then set it to true
     @assignment_form.assignment.staggered_deadline == true
   end
 
@@ -337,6 +337,7 @@ class AssignmentsController < ApplicationController
       end
     end
   end
+
   # used to be handle_assignment_directory_path_nonexist_case_and_answer_tagging
   def nonexist_path_with_tagging
     if @assignment_form.assignment.directory_path.blank?

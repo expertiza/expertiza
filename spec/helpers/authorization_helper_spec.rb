@@ -1,7 +1,5 @@
 describe AuthorizationHelper do
 
-  # E1915 TODO each and every method defined in app/helpers/authorization_helper.rb should be thoroughly tested here
-
   # Set up some dummy users
   # Inspired by spec/controllers/users_controller_spec.rb
   # Makes use of spec/factories/factories.rb

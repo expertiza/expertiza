@@ -1,6 +1,8 @@
 class ProfileController < ApplicationController
+  include AuthorizationHelper
+
   def action_allowed?
-    current_user
+    user_logged_in?
   end
 
   def edit

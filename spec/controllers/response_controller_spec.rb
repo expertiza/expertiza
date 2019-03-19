@@ -306,7 +306,7 @@ describe ResponseController do
     context 'when session[:user] is nil' do
       it 'redirects to root path (/)' do
         params = {}
-        session = {}
+        session[:user] = nil
         get :pending_surveys, params, session
         expect(response).to redirect_to('/')
       end

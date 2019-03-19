@@ -21,7 +21,7 @@ class ResponseController < ApplicationController
     when 'view'
       return response_edit_allowed?(response.map, user_id)
     else
-      current_user
+      user_logged_in?
     end
   end
 

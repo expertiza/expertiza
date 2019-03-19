@@ -75,7 +75,7 @@ class TreeDisplayController < ApplicationController
   # called when the display is requested
   # ajbudlon, July 3rd 2008
   def list
-    redirect_to controller: :content_pages, action: :view if current_user.nil?
+    redirect_to controller: :content_pages, action: :view unless user_logged_in?
     redirect_to controller: :student_task, action: :list if current_user.try(:student?)
   end
 

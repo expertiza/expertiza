@@ -124,6 +124,16 @@ module AuthorizationHelper
     current_user_has_id?(user_id)
   end
 
+  # Determine if there is a current user
+  # The application controller method current_user
+  # will return a user even if session[:user] has been explicitly cleared out
+  # because it is "sticky" in that it uses "@current_user ||= session[:user]"
+  # So, this method can be used to answer a controller's question
+  # "is anyone CURRENTLY logged in"
+  def user_logged_in?
+    !session[:user].nil?
+  end
+
   # PRIVATE METHODS
   private
 
@@ -152,7 +162,7 @@ module AuthorizationHelper
   end
 
   def assignment_instructor?(assignment)
-   user_logged_in? && assignment.instructor_id == session[:user].id
+    user_logged_in? && assignment.instructor_id == session[:user].id
   end
 
   def ta_mapping_exists_for_user?(assignment)
@@ -161,10 +171,6 @@ module AuthorizationHelper
 
   def current_user_and_role_exist?
     user_logged_in? && !session[:user].role.nil?
-  end
-
-  def user_logged_in?
-    !session[:user].nil?
   end
 
 end

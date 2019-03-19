@@ -613,7 +613,7 @@ class Assignment < ActiveRecord::Base
 
 
 
-  /** New functions during refactoring below **/
-  def stageFinished?( topic_id = nil )
-  end
+  # New functions during refactoring below
+  #def stageFinished?( topic_id = nil )
+  #end 
 end

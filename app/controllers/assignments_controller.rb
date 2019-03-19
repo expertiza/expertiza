@@ -4,16 +4,22 @@ class AssignmentsController < ApplicationController
   before_action :authorize
 
   def action_allowed?
+    # check for the controller method name being called...
     if %w[edit update list_submissions].include? params[:action]
       assignment = Assignment.find(params[:id])
+      user_id = current_user.try(:id)
+      # either current_user is an admin
       (%w[Super-Administrator Administrator].include? current_role_name) ||
-      (assignment.instructor_id == current_user.try(:id)) ||
-      TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) ||
-      (assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id))
+      # or instructor for the course
+      (assignment.instructor_id == user_id) ||
+      # or a TA for the course
+      TaMapping.exists?(ta_id: user_id, course_id: assignment.course_id) ||
+      # or owner of the Course
+      (assignment.course_id && Course.find(assignment.course_id).instructor_id == user_id)
     else
       ['Super-Administrator',
        'Administrator',
-       'Instructor',
+       'Instrucator',
        'Teaching Assistant'].include? current_role_name
     end
   end
@@ -65,22 +71,22 @@ class AssignmentsController < ApplicationController
     ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Timezone not specified", request) if current_user.timezonepref.nil?
     flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines." if current_user.timezonepref.nil?
     edit_params_setting
-    #used to be assignment_form_assignment_staggered_deadline?
+    # used to be assignment_form_assignment_staggered_deadline?
     assignment_staggered_deadline?
     @due_date_all.each do |dd|
-      #used to be check_due_date_nameurl_not_empty(dd)
+      # used to be check_due_date_nameurl_not_empty(dd)
       check_due_date_nameurl(dd)
       adjust_timezone_when_due_date_present(dd)
       break if validate_due_date
     end
     check_assignment_questionnaires_usage
-    #used to be @due_date_all = update_nil_dd_deadline_name(@due_date_all)
+    # used to be @due_date_all = update_nil_dd_deadline_name(@due_date_all)
     @due_date_all = update_due_date_deadline_name(@due_date_all)
-    #used to be @due_date_all = update_nil_dd_description_url(@due_date_all)
+    # used to be @due_date_all = update_nil_dd_description_url(@due_date_all)
     @due_date_all = update_due_date_description_url(@due_date_all)
     # only when instructor does not assign rubrics and in assignment edit page will show this error message.
     handle_rubrics_not_assigned_case
-    #handle_assignment_directory_path_nonexist_case_and_answer_tagging refactored to be
+    # handle_assignment_directory_path_nonexist_case_and_answer_tagging refactored to be
     nonexist_path_with_tagging
     # assigned badges will hold all the badges that have been assigned to an assignment
     # added it to display the assigned badges while creating a badge in the assignments page
@@ -90,14 +96,14 @@ class AssignmentsController < ApplicationController
 
   def update
     unless params.key?(:assignment_form)
-      #used to be assignment_form_key_nonexist_case_handler
+      # used to be assignment_form_key_nonexist_case_handler
       assignment_saving
       return
     end
     retrieve_assignment_form
-    #used to be handle_current_user_timezonepref_nil
+    # used to be handle_current_user_timezonepref_nil
     nil_timezone_handler
-    #used to be update_feedback_assignment_form_attributes
+    # used to be update_feedback_assignment_form_attributes
     update_feedback_attributes
     redirect_to edit_assignment_path @assignment_form.assignment.id
   end
@@ -244,7 +250,7 @@ class AssignmentsController < ApplicationController
     due_date_all
   end
 
-  #used to be update_nil_dd_description_url
+  # used to be update_nil_dd_description_url
   def update_due_date_description_url(due_date_all)
     #goes through all the due dates and sets the description url
     due_date_all.each do |dd|
@@ -281,9 +287,9 @@ class AssignmentsController < ApplicationController
     @teams_count = @assignment_form.assignment.teams.size
   end
 
-  #used to be assignment_form_assignment_staggered_deadline?
+  # used to be assignment_form_assignment_staggered_deadline?
   def assignment_staggered_deadline?
-    #if there is a staggered deadline then set the following variables
+    # if there is a staggered deadline then set the following variables
     if @assignment_form.assignment.staggered_deadline == true
       @review_rounds = @assignment_form.assignment.num_review_rounds
       @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_SUBMISSION }
@@ -293,7 +299,7 @@ class AssignmentsController < ApplicationController
     @assignment_form.assignment.staggered_deadline == true
   end
 
-  #used to be check_due_date_nameurl_not_empty
+  # used to be check_due_date_nameurl_not_empty
   def check_due_date_nameurl(dd)
     # remember the following variable bool values
     @due_date_nameurl_not_empty = due_date_nameurl_not_empty?(dd)
@@ -333,7 +339,7 @@ class AssignmentsController < ApplicationController
       end
     end
   end
-  #used to be handle_assignment_directory_path_nonexist_case_and_answer_tagging
+  # used to be handle_assignment_directory_path_nonexist_case_and_answer_tagging
   def nonexist_path_with_tagging
     if @assignment_form.assignment.directory_path.blank?
       flash.now[:error] = "You did not specify your submission directory."
@@ -385,17 +391,17 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  #used to be update_feedback_assignment_form_attributes
+  # used to be update_feedback_assignment_form_attributes
   def update_feedback_attributes
-    #if there are reviews submitted then you cant reduce the number of review as instructor
+    # if there are reviews submitted then you cant reduce the number of review as instructor
     if params[:set_pressed][:bool] == 'false'
       flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."
     else
-      #otherwise update the form
+      # otherwise update the form
       if @assignment_form.update_attributes(assignment_form_params, current_user)
         flash[:note] = 'The assignment was successfully saved....'
       else
-        #if for some reason it didnt update
+        # if for some reason it didnt update
         flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
       end
     end

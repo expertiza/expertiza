@@ -2,13 +2,18 @@ class SubmittedContentController < ApplicationController
   include AuthorizationHelper
 
   def action_allowed?
-    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-    # E1915 TODO: specifically, are_needed_authorizations_present? should either be ditched or rewritten in authorization_helper.rb
-    # E1915 TODO: either way, test all callers of are_needed_authorizations_present? before pushing changes
-    # E1915 TODO: awaiting response from Dr. Gehringer on are_needed_authorizations_present? method inscrutability
-    current_user_has_student_privileges?and
-    ((%w[edit].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "reviewer") : true) and
-    one_team_can_submit_work?
+
+    case params[:action]
+    when 'edit'
+      current_user_has_student_privileges? &&
+      are_needed_authorizations_present?(params[:id], "reader", "reviewer")
+    when 'submit_file', 'submit_hyperlink'
+      current_user_has_student_privileges? &&
+      one_team_can_submit_work?
+    else
+      current_user_has_student_privileges?
+    end
+
   end
 
   # The view have already tested that @assignment.submission_allowed(topic_id) is true,
@@ -227,12 +232,7 @@ class SubmittedContentController < ApplicationController
   end
 
   # if one team do not hold a topic (still in waitlist), they cannot submit their work.
-  # E1915 TODO move this to authorization helper as well?
-  # E1915 TODO definitely action_name should NOT be all the way down here, it belongs in action_allowed?
-  # E1915 TODO definitely the ending "or" in this method is not good - repetitive
-  # E1915 TODO what does "one team" have to do with this method??
   def one_team_can_submit_work?
-    return true unless %w[submit_file submit_hyperlink].include? action_name # should work only when submit_file/hyperlink is called
     @participant = if params[:id].nil?
                      AssignmentParticipant.find(params[:hyperlinks][:participant_id])
                    else

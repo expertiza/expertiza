@@ -19,7 +19,7 @@ class AssignmentsController < ApplicationController
     else
       ['Super-Administrator',
        'Administrator',
-       'Instrucator',
+       'Instructor',
        'Teaching Assistant'].include? current_role_name
     end
   end

@@ -21,6 +21,7 @@ describe AuthorizationHelper do
   describe ".current_user_has_super_admin_privileges?" do
 
     it 'returns false if there is no current user' do
+      session[:user] = nil
       expect(current_user_has_super_admin_privileges?).to be false
     end
 
@@ -54,6 +55,7 @@ describe AuthorizationHelper do
   describe ".current_user_has_admin_privileges?" do
 
     it 'returns false if there is no current user' do
+      session[:user] = nil
       expect(current_user_has_admin_privileges?).to be false
     end
 
@@ -87,6 +89,7 @@ describe AuthorizationHelper do
   describe ".current_user_has_instructor_privileges?" do
 
     it 'returns false if there is no current user' do
+      session[:user] = nil
       expect(current_user_has_instructor_privileges?).to be false
     end
 
@@ -120,6 +123,7 @@ describe AuthorizationHelper do
   describe ".current_user_has_ta_privileges?" do
 
     it 'returns false if there is no current user' do
+      session[:user] = nil
       expect(current_user_has_ta_privileges?).to be false
     end
 
@@ -153,6 +157,7 @@ describe AuthorizationHelper do
   describe ".current_user_has_student_privileges?" do
 
     it 'returns false if there is no current user' do
+      session[:user] = nil
       expect(current_user_has_student_privileges?).to be false
     end
 
@@ -285,6 +290,7 @@ describe AuthorizationHelper do
     # Both factories point to Assignment.first
 
     it 'returns false if there is no current user' do
+      session[:user] = nil
       participant = create(:participant, user: session[:user])
       expect(current_user_is_assignment_participant?(assignment_team_id: assignment_team.id)).to be false
       expect(current_user_is_assignment_participant?(assignment_participant_id: participant.id)).to be false
@@ -345,6 +351,7 @@ describe AuthorizationHelper do
   describe ".current_user_created_bookmark_id?" do
 
     it 'returns false if there is no current user' do
+      session[:user] = nil
       create(:bookmark, user: student)
       expect(current_user_created_bookmark_id?(Bookmark.first.id)).to be false
     end
@@ -371,6 +378,7 @@ describe AuthorizationHelper do
   describe ".current_user_is_a?" do
 
     it 'returns false if there is no current user' do
+      session[:user] = nil
       expect(current_user_is_a? 'Student').to be false
     end
 
@@ -414,6 +422,7 @@ describe AuthorizationHelper do
   describe ".current_user_has_id?" do
 
     it 'returns false if there is no current user' do
+      session[:user] = nil
       expect(current_user_has_id? -1).to be false
     end
 

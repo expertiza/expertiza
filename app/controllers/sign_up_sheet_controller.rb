@@ -17,10 +17,11 @@ class SignUpSheetController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
-      # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
-      current_user_has_student_privileges? and
-      ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer") : true)
+    when 'set_priority', 'sign_up', 'delete_signup', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
+        current_user_has_student_privileges?
+    when 'list'
+        current_user_has_student_privileges? &&
+            are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer")
     else
       current_user_has_ta_privileges?
     end

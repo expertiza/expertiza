@@ -374,6 +374,7 @@ class Assignment < ActiveRecord::Base
     rounds
   end
 
+  #Actually returns due date as a string or Finished
   def find_current_stage(topic_id = nil)
     next_due_date = DueDate.get_next_due_date(self.id, topic_id)
     return 'Finished' if next_due_date.nil?
@@ -608,5 +609,11 @@ class Assignment < ActiveRecord::Base
 
   def find_due_dates(type)
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: type).id }
+  end
+
+
+
+  /** New functions during refactoring below **/
+  def stageFinished?( topic_id = nil )
   end
 end

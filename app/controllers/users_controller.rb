@@ -16,7 +16,8 @@ class UsersController < ApplicationController
       true
     when 'create_requested_user_record'
       true
-    when 'keys'
+    when 'keys', 'index', 'show'
+      # These action methods are all written with the expectation that a student should be allowed to proceed
       current_user_has_student_privileges?
     else
       current_user_has_ta_privileges?

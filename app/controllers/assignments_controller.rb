@@ -9,12 +9,12 @@ class AssignmentsController < ApplicationController
       assignment = Assignment.find(params[:id])
       user_id = current_user.try(:id)
       # either current_user is an admin
-      (%w[Super-Administrator Administrator].include? current_role_name) ||
       # or instructor for the course
-      (assignment.instructor_id == user_id) ||
       # or a TA for the course
-      TaMapping.exists?(ta_id: user_id, course_id: assignment.course_id) ||
       # or owner of the Course
+      (%w[Super-Administrator Administrator].include? current_role_name) ||
+      (assignment.instructor_id == user_id) ||
+      TaMapping.exists?(ta_id: user_id, course_id: assignment.course_id) ||
       (assignment.course_id && Course.find(assignment.course_id).instructor_id == user_id)
     else
       ['Super-Administrator',

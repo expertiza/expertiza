@@ -18,7 +18,7 @@ class AssignmentsController < ApplicationController
 
       (assignment.course_id && Course.find(assignment.course_id).instructor_id == user_id)
     else
-     ['Super-Administrator', 'Administrator', 'Instructor', 'Teaching Assistant'].include? current_role_name
+      ['Super-Administrator', 'Administrator', 'Instructor', 'Teaching Assistant'].include? current_role_name
     end
   end
 

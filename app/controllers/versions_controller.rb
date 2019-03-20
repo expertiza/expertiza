@@ -1,7 +1,7 @@
 class VersionsController < ApplicationController
   def action_allowed?
     ['Administrator',
-     'Super-Administrator',].include? current_role_name
+     'Super-Administrator'].include? current_role_name
   end
 
   def index

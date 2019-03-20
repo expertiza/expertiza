@@ -238,14 +238,14 @@ class TreeDisplayController < ApplicationController
   end
 
   # check if current user is ta for instructor
-  def is_user_ta?(instructor_id, child)
+  def user_ta?(instructor_id, child)
     # instructor created the course, current user is the ta of this course.
     session[:user].role_id == 6 and
         Ta.get_my_instructors(session[:user].id).include?(instructor_id) and ta_for_current_course?(child)
   end
 
   # check if current user is instructor
-  def is_user_instructor?(instructor_id)
+  def user_instructor?(instructor_id)
     # ta created the course, current user is the instructor of this ta.
     instructor_ids = []
     TaMapping.where(ta_id: instructor_id).each {|mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }

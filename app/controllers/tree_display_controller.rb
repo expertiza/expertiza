@@ -241,7 +241,6 @@ class TreeDisplayController < ApplicationController
   # check if current user is ta for instructor
   def is_user_ta?(instructor_id, child)
     # instructor created the course, current user is the ta of this course.
-    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     session[:user].role_id == 6 and
         Ta.get_my_instructors(session[:user].id).include?(instructor_id) and ta_for_current_course?(child)
   end
@@ -251,7 +250,6 @@ class TreeDisplayController < ApplicationController
     # ta created the course, current user is the instructor of this ta.
     instructor_ids = []
     TaMapping.where(ta_id: instructor_id).each {|mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
-    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     session[:user].role_id == 2 and instructor_ids.include? session[:user].id
   end
 

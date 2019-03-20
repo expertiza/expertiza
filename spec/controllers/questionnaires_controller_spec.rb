@@ -21,10 +21,13 @@ describe QuestionnairesController do
   end
 
   describe '#action_allowed?' do
+
     let(:questionnaire) { build(:questionnaire, id: 1) }
     let(:instructor) { build(:instructor, id: 1) }
     let(:ta) { build(:teaching_assistant, id: 10, parent_id: 66) }
+
     context 'when params action is edit or update' do
+
       before(:each) do
         controller.params = {id: '1', action: 'edit'}
         controller.request.session[:user] = instructor
@@ -44,16 +47,27 @@ describe QuestionnairesController do
 
       context 'when current user is the ta of the course which current questionnaires belongs to' do
         it 'allows certain action' do
-          allow(TaMapping).to receive(:exists?).with(ta_id: 8, course_id: 1).and_return(true)
-          check_access(ta).to be true
+          teaching_assistant = create(:teaching_assistant)
+          stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
+          course = create(:course)
+          TaMapping.create(ta_id: teaching_assistant.id, course_id: course.id)
+          check_access(teaching_assistant).to be true
         end
       end
 
       context 'when current user is a ta but not the ta of the course which current questionnaires belongs to' do
         it 'does not allow certain action' do
-          allow(TaMapping).to receive(:exists?).with(ta_id: 10, course_id: 1).and_return(false)
-          controller.request.session[:user] = instructor2
-          check_access(ta).to be false
+          # The questionnaire is associated with the first instructor
+          # A factory created course will associate itself with the first instructor
+          # So here we want the TA on a course that explicitly has some other instructor
+          # Otherwise the TA will be indirectly associated with the questionnaire
+          teaching_assistant = create(:teaching_assistant)
+          stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
+          instructor1 = create(:instructor)
+          instructor2 = create(:instructor)
+          course = create(:course, instructor_id: instructor2.id)
+          TaMapping.create(ta_id: teaching_assistant.id, course_id: course.id)
+          check_access(teaching_assistant).to be false
         end
       end
 

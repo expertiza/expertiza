@@ -20,6 +20,7 @@ class PopupController < ApplicationController
       @total_percentage = @response.average_score
       @sum = @response.total_score
       @total_possible = @response.maximum_score
+      puts "total+possibla: #{@total_possible}"
     end
 
     @maxscore = 5 if @maxscore.nil?

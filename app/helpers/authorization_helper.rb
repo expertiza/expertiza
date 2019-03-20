@@ -61,17 +61,6 @@ module AuthorizationHelper
         ta_mapping_exists_for_user?(assignment))
   end
 
-  # Determine if the currently logged-in user is an ancestor of the passed in assignment's instructor
-  def current_user_ancestor_of_assignment_instructor?(assignment_id)
-    assignment = Assignment.find(assignment_id)
-    if user_logged_in? && assignment
-      assignment_instructor = Course.find(assignment.course_id).instructor_id
-      session[:user].recursively_parent_of(assignment_instructor)
-    else
-      false
-    end
-  end
-
   # Determine if the currently logged-in user IS of the given role name
   # If there is no currently logged-in user simply return false
   # parameter role_name should be one of: 'Student', 'Teaching Assistant', 'Instructor', 'Administrator', 'Super-Administrator'
@@ -143,6 +132,12 @@ module AuthorizationHelper
   # "is anyone CURRENTLY logged in"
   def user_logged_in?
     !session[:user].nil?
+  end
+
+  # Determine if the currently logged-in user is an ancestor of the passed in user
+  def current_user_ancestor_of?(user)
+    return session[:user].recursively_parent_of(user) if user_logged_in?
+    false
   end
 
   # PRIVATE METHODS

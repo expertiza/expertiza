@@ -56,7 +56,13 @@ class ResponseController < ApplicationController
 
   # Prepare the parameters when student clicks "Edit"
   def edit
-    assign_instance_vars
+    #assign_instance_vars
+    #instance variables for Edit action
+    @header = 'Edit'
+    @next_action = 'update'
+    @response = Response.find(params[:id])
+    @map = @response.map
+    @contributor = @map.contributor
     @prev = Response.where(map_id: @map.id)
     @review_scores = @prev.to_a
     if @prev.present?
@@ -73,7 +79,6 @@ class ResponseController < ApplicationController
     @questionnaire = set_questionnaire
     render action: 'response'
   end
-
 
 
   # Update the response and answers when student "edit" existing response
@@ -99,7 +104,13 @@ class ResponseController < ApplicationController
   end
 
   def new
-    assign_instance_vars
+    #assign_instance_vars
+    #instance variable for New action
+    @header = 'New'
+    @next_action = 'create'
+    @feedback = params[:feedback]
+    @map = ResponseMap.find(params[:id])
+    @modified_object = @map.id
     set_content(true)
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
     # Because of the autosave feature and the javascript that sync if two reviewing windows are opened
@@ -150,7 +161,7 @@ class ResponseController < ApplicationController
       @round = nil
     end
     is_submitted = (params[:isSubmit] == 'Yes')
-    was_submitted = false
+    #was_submitted = false  Removed, this is not needed
     # There could be multiple responses per round, when re-submission is enabled for that round.
     # Hence we need to pick the latest response.
     @response = Response.where(map_id: @map.id, round: @round.to_i).order(created_at: :desc).first
@@ -290,23 +301,24 @@ class ResponseController < ApplicationController
   end
 
   # assigning the instance variables for Edit and New actions
-  def assign_instance_vars
-    case params[:action]
-    when 'edit'
-      @header = 'Edit'
-      @next_action = 'update'
-      @response = Response.find(params[:id])
-      @map = @response.map
-      @contributor = @map.contributor
-    when 'new'
-      @header = 'New'
-      @next_action = 'create'
-      @feedback = params[:feedback]
-      @map = ResponseMap.find(params[:id])
-      @modified_object = @map.id
-    end
-    @return = params[:return]
-  end
+  # This method can be removed as it was integrated into the Edit and New actions
+  # def assign_instance_vars
+   # case params[:action]
+    #when 'edit'
+     # @header = 'Edit'
+     # @next_action = 'update'
+     # @response = Response.find(params[:id])
+     # @map = @response.map
+     # @contributor = @map.contributor
+   # when 'new'
+    #  @header = 'New'
+     # @next_action = 'create'
+     # @feedback = params[:feedback]
+     # @map = ResponseMap.find(params[:id])
+     # @modified_object = @map.id
+   # end
+   # @return = params[:return]
+ # end
 
   def set_questionnaire_for_new_response
     case @map.type

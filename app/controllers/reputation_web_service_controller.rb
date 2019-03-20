@@ -5,14 +5,14 @@ require 'openssl'
 require 'base64'
 
 class ReputationWebServiceController < ApplicationController
-  @@request_body = ''
-  @@response_body = ''
-  @@assignment_id = ''
-  @@another_assignment_id = ''
-  @@round_num = ''
-  @@algorithm = ''
-  @@additional_info = ''
-  @@response = ''
+  @request_body = ''
+  @response_body = ''
+  @assignment_id = ''
+  @another_assignment_id = ''
+  @round_num = ''
+  @algorithm = ''
+  @additional_info = ''
+  @response = ''
 
   def action_allowed?
     ['Super-Administrator',
@@ -117,15 +117,15 @@ class ReputationWebServiceController < ApplicationController
   end
 
   def client
-    @request_body = @@request_body
-    @response_body = @@response_body
+    # @request_body = @@request_body
+    # @response_body = @@response_body
     @max_assignment_id = Assignment.last.id
-    @assignment = Assignment.find(@@assignment_id) rescue nil
-    @another_assignment = Assignment.find(@@another_assignment_id) rescue nil
-    @round_num = @@round_num
-    @algorithm = @@algorithm
-    @additional_info = @@additional_info
-    @response = @@response
+    @assignment = Assignment.find(@assignment_id) rescue nil
+    @another_assignment = Assignment.find(@another_assignment_id) rescue nil
+    # @round_num = @@round_num
+    # @algorithm = @@algorithm
+    # @additional_info = @@additional_info
+    # @response = @@response
   end
 
   def send_post_request
@@ -134,33 +134,62 @@ class ReputationWebServiceController < ApplicationController
     curr_assignment_id = (params[:assignment_id].empty? ? '724' : params[:assignment_id])
     req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
     req.body[0] = '' # remove the first '{'
-    @@assignment_id = params[:assignment_id]
-    @@round_num = params[:round_num]
-    @@algorithm = params[:algorithm]
-    @@another_assignment_id = params[:another_assignment_id]
+    @assignment_id = params[:assignment_id]
+    @round_num = params[:round_num]
+    @algorithm = params[:algorithm]
+    @another_assignment_id = params[:another_assignment_id]
 
     if params[:checkbox][:expert_grade] == 'Add expert grades'
-      @@additional_info = 'add expert grades'
+      @additional_info = 'add expert grades'
       case params[:assignment_id]
       when '724' # expert grades of Wiki 1a (724)
         if params[:another_assignment_id].to_i.zero?
-          req.body.prepend("\"expert_grades\": {\"submission23967\":93,\"submission23969\":89,\"submission23971\":95,\"submission23972\":86,\"submission23973\":91,\"submission23975\":94,\"submission23979\":90,\"submission23980\":94,\"submission23981\":87,\"submission23982\":79,\"submission23983\":91,\"submission23986\":92,\"submission23987\":91,\"submission23988\":93,\"submission23991\":98,\"submission23992\":91,\"submission23994\":87,\"submission23995\":93,\"submission23998\":92,\"submission23999\":87,\"submission24000\":93,\"submission24001\":93,\"submission24006\":96,\"submission24007\":87,\"submission24008\":92,\"submission24009\":92,\"submission24010\":93,\"submission24012\":94,\"submission24013\":96,\"submission24016\":91,\"submission24018\":93,\"submission24024\":96,\"submission24028\":88,\"submission24031\":94,\"submission24040\":93,\"submission24043\":95,\"submission24044\":91,\"submission24046\":95,\"submission24051\":92},")
+          req.body.prepend("\"expert_grades\": {\"submission23967\":93,\"submission23969\":89,\"submission23971\":95,
+	                   \"submission23972\":86,\"submission23973\":91,\"submission23975\":94,\"submission23979\":90,
+			   \"submission23980\":94,\"submission23981\":87,\"submission23982\":79,\"submission23983\":91,
+			   \"submission23986\":92,\"submission23987\":91,\"submission23988\":93,\"submission23991\":98,
+			   \"submission23992\":91,\"submission23994\":87,\"submission23995\":93,\"submission23998\":92,\"submission23999\":87,
+			   \"submission24000\":93,\"submission24001\":93,\"submission24006\":96,\"submission24007\":87,\"submission24008\":92,
+			   \"submission24009\":92,\"submission24010\":93,\"submission24012\":94,\"submission24013\":96,
+			   \"submission24016\":91,\"submission24018\":93,\"submission24024\":96,\"submission24028\":88,
+			   \"submission24031\":94,\"submission24040\":93,\"submission24043\":95,\"submission24044\":91,
+			   \"submission24046\":95,\"submission24051\":92},")
         else # expert grades of Wiki 1a and 1b (724, 733)
-          req.body.prepend("\"expert_grades\": {\"submission23967\":93, \"submission23969\":89, \"submission23971\":95, \"submission23972\":86, \"submission23973\":91, \"submission23975\":94, \"submission23979\":90, \"submission23980\":94, \"submission23981\":87, \"submission23982\":79, \"submission23983\":91, \"submission23986\":92, \"submission23987\":91, \"submission23988\":93, \"submission23991\":98, \"submission23992\":91, \"submission23994\":87, \"submission23995\":93, \"submission23998\":92, \"submission23999\":87, \"submission24000\":93, \"submission24001\":93, \"submission24006\":96, \"submission24007\":87, \"submission24008\":92, \"submission24009\":92, \"submission24010\":93, \"submission24012\":94, \"submission24013\":96, \"submission24016\":91, \"submission24018\":93, \"submission24024\":96, \"submission24028\":88, \"submission24031\":94, \"submission24040\":93, \"submission24043\":95, \"submission24044\":91, \"submission24046\":95, \"submission24051\":92, \"submission24100\":90, \"submission24079\":92, \"submission24298\":86, \"submission24545\":92, \"submission24082\":96, \"submission24080\":86, \"submission24284\":92, \"submission24534\":93, \"submission24285\":94, \"submission24297\":91},")
+          req.body.prepend("\"expert_grades\": {\"submission23967\":93, \"submission23969\":89, \"submission23971\":95, \"submission23972\":86,
+	                   \"submission23973\":91,\"submission23975\":94, \"submission23979\":90, \"submission23980\":94, \"submission23981\":87,
+			   \"submission23982\":79, \"submission23983\":91,\"submission23986\":92, \"submission23987\":91, \"submission23988\":93,
+			   \"submission23991\":98, \"submission23992\":91, \"submission23994\":87,\"submission23995\":93, \"submission23998\":92,
+			   \"submission23999\":87, \"submission24000\":93, \"submission24001\":93, \"submission24006\":96, \"submission24007\":87,
+			   \"submission24008\":92, \"submission24009\":92, \"submission24010\":93, \"submission24012\":94, \"submission24013\":96,
+			   \"submission24016\":91, \"submission24018\":93, \"submission24024\":96, \"submission24028\":88, \"submission24031\":94,
+			   \"submission24040\":93, \"submission24043\":95, \"submission24044\":91, \"submission24046\":95, \"submission24051\":92,
+			   \"submission24100\":90, \"submission24079\":92, \"submission24298\":86, \"submission24545\":92, \"submission24082\":96,
+			   \"submission24080\":86, \"submission24284\":92, \"submission24534\":93, \"submission24285\":94, \"submission24297\":91},")
         end
       when '735' # expert grades of program 1 (735)
-        req.body.prepend("\"expert_grades\": {\"submission24083\":96.084,\"submission24085\":88.811,\"submission24086\":100,\"submission24087\":100,\"submission24088\":92.657,\"submission24091\":96.783,\"submission24092\":90.21,\"submission24093\":100,\"submission24097\":90.909,\"submission24098\":98.601,\"submission24101\":99.301,\"submission24278\":98.601,\"submission24279\":72.727,\"submission24281\":54.476,\"submission24289\":94.406,\"submission24291\":99.301,\"submission24293\":93.706,\"submission24296\":98.601,\"submission24302\":83.217,\"submission24303\":91.329,\"submission24305\":100,\"submission24307\":100,\"submission24308\":100,\"submission24311\":95.804,\"submission24313\":91.049,\"submission24314\":100,\"submission24315\":97.483,\"submission24316\":91.608,\"submission24317\":98.182,\"submission24320\":90.21,\"submission24321\":90.21,\"submission24322\":98.601},")
+        req.body.prepend("\"expert_grades\": {\"submission24083\":96.084,\"submission24085\":88.811,\"submission24086\":100,\"submission24087\":100,
+	                 \"submission24088\":92.657,\"submission24091\":96.783,\"submission24092\":90.21,\"submission24093\":100,\"submission24097\":90.909,
+			 \"submission24098\":98.601,\"submission24101\":99.301,\"submission24278\":98.601,\"submission24279\":72.727,\"submission24281\":54.476,
+			 \"submission24289\":94.406,\"submission24291\":99.301,\"submission24293\":93.706,\"submission24296\":98.601,\"submission24302\":83.217,
+			 \"submission24303\":91.329,\"submission24305\":100,\"submission24307\":100,\"submission24308\":100,\"submission24311\":95.804,
+			 \"submission24313\":91.049,\"submission24314\":100,\"submission24315\":97.483,\"submission24316\":91.608,
+			 \"submission24317\":98.182,\"submission24320\":90.21,\"submission24321\":90.21,\"submission24322\":98.601},")
       when '754' # expert grades of Wiki contribution (754)
-        req.body.prepend("\"expert_grades\": {\"submission25030\":95,\"submission25031\":92,\"submission25033\":88,\"submission25034\":98,\"submission25035\":100,\"submission25037\":95,\"submission25038\":95,\"submission25039\":93,\"submission25040\":96,\"submission25041\":90,\"submission25042\":100,\"submission25046\":95,\"submission25049\":90,\"submission25050\":88,\"submission25053\":91,\"submission25054\":96,\"submission25055\":94,\"submission25059\":96,\"submission25071\":85,\"submission25082\":100,\"submission25086\":95,\"submission25097\":90,\"submission25098\":85,\"submission25102\":97,\"submission25103\":94,\"submission25105\":98,\"submission25114\":95,\"submission25115\":94},")
+        req.body.prepend("\"expert_grades\": {\"submission25030\":95,\"submission25031\":92,\"submission25033\":88,\"submission25034\":98,
+	                 \"submission25035\":100,\"submission25037\":95,\"submission25038\":95,\"submission25039\":93,\"submission25040\":96,
+			 \"submission25041\":90,\"submission25042\":100,\"submission25046\":95,\"submission25049\":90,\"submission25050\":88,
+			 \"submission25053\":91,\"submission25054\":96,\"submission25055\":94,\"submission25059\":96,\"submission25071\":85,
+			 \"submission25082\":100,\"submission25086\":95,\"submission25097\":90,\"submission25098\":85,
+			 \"submission25102\":97,\"submission25103\":94,\"submission25105\":98,\"submission25114\":95,\"submission25115\":94},")
       when '756' # expert grades of Wikipedia contribution (756)
         req.body.prepend("\"expert_grades\": {\"submission25107\":76.6667,\"submission25109\":83.3333},")
       end
     elsif params[:checkbox][:hamer] == 'Add initial Hamer reputation values'
-      @@additional_info = 'add initial hamer reputation values'
+      @additional_info = 'add initial hamer reputation values'
     elsif params[:checkbox][:lauw] == 'Add initial Lauw reputation values'
-      @@additional_info = 'add initial lauw reputation values'
+      @additional_info = 'add initial lauw reputation values'
     elsif params[:checkbox][:quiz] == 'Add quiz scores'
-      @@additional_info = 'add quiz scores'
+      @additional_info = 'add quiz scores'
       quiz_str = json_generator(params[:assignment_id].to_i, params[:another_assignment_id].to_i, params[:round_num].to_i, 'quiz scores').to_json
       quiz_str[0] = ''
       quiz_str.prepend('"quiz_scores":{')
@@ -168,7 +197,7 @@ class ReputationWebServiceController < ApplicationController
       quiz_str = quiz_str.gsub('"N/A"', '20.0')
       req.body.prepend(quiz_str)
     else
-      @@additional_info = ''
+      @additional_info = ''
     end
 
     # Eg.
@@ -178,7 +207,7 @@ class ReputationWebServiceController < ApplicationController
     # "quiz_scores" : {"submission1" : {"stu1":100, "stu3":80}, "submission2":{"stu2":40, "stu1":60}}, #optional
     # "submission1": {"stu1":91, "stu3":99},"submission2": {"stu5":92, "stu8":90},"submission3": {"stu2":91, "stu4":88}}"
     req.body.prepend("{")
-    @@request_body = req.body
+    @request_body = req.body
     # puts 'This is the request prior to encryption: ' + req.body
     # puts
     # Encryption
@@ -208,8 +237,8 @@ class ReputationWebServiceController < ApplicationController
     # puts "Response #{response.code} #{response.message}:
     # {response.body}"
     # puts
-    @@response = response
-    @@response_body = response.body
+    @response = response
+    @response_body = response.body
 
     JSON.parse(response.body.to_s).each do |alg, list|
       next unless alg == "Hamer" || alg == "Lauw"

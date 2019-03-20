@@ -1,7 +1,104 @@
+--------------------------------------------------------
 Complete
-
-TODO
 - Get Expertiza code running
+
+--------------------------------------------------------
+TODO
 - Start to look at modifying documentation
 - Fix Issue #98 - all topic waitlists need to be cleared when a drop-topic deadline passes (and update documentation)
 - Fix Issue #154 - same drop-topic deadlines applies to all topics of a staggered-deadline assignment (and update documentation)
+
+--------------------------------------------------------
+Accounts
+The following accounts will be used for testing:
+instructor6/password
+student6390 (can impersonate using instructor6 account)
+student6391 (can impersonate using instructor6 account)
+student6392 (can impersonate using instructor6 account)
+student6393 (can impersonate using instructor6 account)
+student6394 (can impersonate using instructor6 account)
+
+--------------------------------------------------------
+Documentation of recreating issue 98
+- Login as username = instructor6, password = password
+
+- Click "Manage...", then "Courses"
+- Make sure "Courses" is selected when the page loads
+- Click the blue plus sign (new) button
+- On the "New Course" page, fill out / check the following:
+    - Institution Name
+    - Course Name
+    - Course Directory
+    - Course Information
+    - Private course
+- Click "Create"
+
+- Click "Assignments" and then the blue plus sign (new) button
+- On "General" page, fill out / check ONLY the following:
+    - Assignment name
+    - Course (select the recently created course)
+    - Available to students?
+- On "Rubrics" page, fill out the following:
+    - Review: "Questionnaire"
+    - Author Feedback: "Questionnaire"
+- On "Review strategy", leave all as is
+- On "Due dates" page, fill out the following:
+    - Round 1: Submission "Date & time"
+    - Round 1: Review "Date & time"
+- Click "Create"
+
+- If not sent to "Editing Assignment:" page, navigate to it.
+
+- In the "Topics" tab:
+    - Click "New topic"
+    - Fill out all fields (put a small number for "Number of slots")
+    - Click Create
+
+- In the "Other stuff" tab:
+    - Click "Add Participant"
+    - Enter a username and click "Add" as "participant"
+        - (do this for mulitple students - student6390, student6391, etc.)
+
+- Navigate to the "Editing Assignment:" page for the assignment you just created
+- In the "Due dates" tab:
+    - Check "Use signup deadline"
+    - Check "Use drop topic deadline"
+    - Fill out Drop topic "Date & time"
+- Click Save
+
+- On the toolbar, hover over "Manage..."
+- Click "Impersonate User"
+- Enter a student's username who is a participant of this assignment
+- Click on the assignment you just created
+- Click "Signup sheet"
+- Click the green checkmark under "Actions"
+- (Repeat the above steps until there are enough students to have one on the waitlist)
+
+- Revert the user impersonation so you're again controlling the instructor
+- Navigate to the "Editing Assignment:" page again
+- In the "Due dates" tab
+    - Uncheck "Use drop topic deadline"
+    - Check "Use signup deadline"
+    - Check "Use drop topic deadline"
+    - Modify the drop topic deadline so it is soon, but not immediately
+- Click save
+
+- On the toolbar, hover over "Manage..."
+- Click "Impersonate User"
+- Enter a student's username who has signed up for a topic of this assignment
+- Click on the assignment you just created
+- Click "Signup sheet"
+- Notice how the student has the option to drop this topic
+- Also notice there is a student on the waitlist
+- Allow the drop topic deadline you set to pass
+- Refresh the page
+- Notice now the student does not have the option to drop this topic
+    - This is working as desired
+- Also notice there is still a student on the waitlist
+    - This is Expertiza issue #98
+    - The waitlist should be cleared when a drop topic deadline has passed
+
+--------------------------------------------------------
+Other related issues found
+- When editing an assignment's due dates, the drop topic deadline
+won't display unless the signup deadline is displayed

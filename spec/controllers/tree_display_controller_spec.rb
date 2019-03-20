@@ -32,6 +32,8 @@ describe TreeDisplayController do
 
   describe "#ta_for_current_mappings?" do
     it "should return true if current user is a TA for current course" do
+      ta = build(:teaching_assistant)
+      stub_current_user(ta, ta.role.name, ta.role)
       allow(session[:user]).to receive("ta?").and_return(true)
     end
   end
@@ -110,7 +112,8 @@ describe TreeDisplayController do
       @course = create(:course)
       create(:assignment_node)
       create(:course_node)
-      @instructor = User.where(role_id: 1).first
+      @instructor = create(:instructor)
+      stub_current_user(@instructor, @instructor.role.name, @instructor.role)
     end
 
     it "returns a list of course objects(private) as json" do

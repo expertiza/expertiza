@@ -1,6 +1,7 @@
 class TreeDisplayController < ApplicationController
   helper :application
   include SecurityHelper
+  include AuthorizationHelper
 
   def action_allowed?
     true

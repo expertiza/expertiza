@@ -7,9 +7,14 @@ class AssignmentQuestionnaireController < ApplicationController
   # According to Dr. Gehringer, only the instructor, an ancestor of the instructor,
   # or the TA for the course should be allowed to execute a method of this controller
   def action_allowed?
-    assignment_id = params[:assignment_id]
-    current_user_teaching_staff_of_assignment?(assignment_id) ||
-        current_user_ancestor_of_assignment_instructor?(assignment_id)
+    assignment = Assignment.find(params[:assignment_id])
+
+    if assignment
+      current_user_teaching_staff_of_assignment?(assignment.id) ||
+          current_user_ancestor_of?(assignment.instructor)
+    else
+      false
+    end
   end
 
   # delete all AssignmentQuestionnaire entry that's associated with an assignment

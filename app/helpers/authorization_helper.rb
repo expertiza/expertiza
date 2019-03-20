@@ -136,7 +136,7 @@ module AuthorizationHelper
 
   # Determine if the currently logged-in user is an ancestor of the passed in user
   def current_user_ancestor_of?(user)
-    return session[:user].recursively_parent_of(user) if user_logged_in?
+    return session[:user].recursively_parent_of(user) if user_logged_in? && user
     false
   end
 

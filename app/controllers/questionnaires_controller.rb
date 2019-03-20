@@ -238,7 +238,7 @@ class QuestionnairesController < ApplicationController
   # Separate methods for quiz questionnaire
   #=========================================================================================================
   # View a quiz questionnaire
-  =begin
+=begin
   def view_quiz
     @questionnaire = Questionnaire.find(params[:id])
     @participant = Participant.find(params[:pid]) # creating an instance variable since it needs to be sent to submitted_content/edit
@@ -386,8 +386,8 @@ class QuestionnairesController < ApplicationController
       end
     end
     valid
-  end
-  =end
+    end
+=end
   private
 
   # save questionnaire object after create or edit
@@ -468,6 +468,7 @@ class QuestionnairesController < ApplicationController
   # method to save the choices associated with a question in a quiz to the database
   # only for quiz questionnaire
   #---------------Nitin: to be deleted from this point----------------
+=begin
   def save_choices(questionnaire_id)
     return unless params[:new_question] or params[:new_choices]
     questions = Question.where(questionnaire_id: questionnaire_id)
@@ -513,7 +514,7 @@ class QuestionnairesController < ApplicationController
       question.weight = 1
     end
   end
-
+=end
 #-------Nitin: end of delete------------
   def questionnaire_params
     params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score,
@@ -526,7 +527,8 @@ class QuestionnairesController < ApplicationController
   end
 
   # FIXME: These private methods belong in the Questionnaire model
-
+  # Aarya: moved to Questionnaire model
+=begin
   def export
     @questionnaire = Questionnaire.find(params[:id])
 
@@ -544,7 +546,6 @@ class QuestionnairesController < ApplicationController
 
     @questionnaire.questions << QuestionnaireHelper.get_questions_from_csv(@questionnaire, file)
   end
-
   # clones the contents of a questionnaire, including the questions and associated advice
   def copy_questionnaire_details(questions, orig_questionnaire)
     @questionnaire.instructor_id = assign_instructor_id
@@ -585,4 +586,5 @@ class QuestionnairesController < ApplicationController
       Ta.get_my_instructor(session[:user].id)
     end
   end
+=end
 end

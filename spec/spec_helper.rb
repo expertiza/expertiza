@@ -106,12 +106,16 @@ RSpec.configure do |config|
   #   The authorization helper depends on roles actually existing
   #   These are not explicitly used in tests
   #   But they must exist in memory for the authorization helper to work correctly
+  # Parent IDs are the IDs of lesser privileged roles, per role.rb
+  #   Some tests call code that makes use of parent_id
+  #   so populate this information here
+  #   by defining the least to most privileged roles
   config.before(:each) do
-    create(:role_of_student)
-    create(:role_of_teaching_assistant)
-    create(:role_of_instructor)
-    create(:role_of_administrator)
-    create(:role_of_superadministrator)
+    role_student = create(:role_of_student)
+    role_teaching_assistant = create(:role_of_teaching_assistant, parent_id: role_student.id)
+    role_instructor = create(:role_of_instructor, parent_id: role_teaching_assistant.id)
+    role_admin = create(:role_of_administrator, parent_id: role_instructor.id)
+    create(:role_of_superadministrator, parent_id: role_admin.id)
   end
 
   Dir["./spec/features/helpers/*.rb"].each do |filename|

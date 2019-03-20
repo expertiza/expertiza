@@ -12,9 +12,7 @@ class UsersController < ApplicationController
     case params[:action]
     when 'list_pending_requested'
       current_user_has_admin_privileges?
-    when 'request_new'
-      true
-    when 'create_requested_user_record'
+    when 'request_new', 'create_requested_user_record'
       true
     when 'keys', 'index'
       # These action methods are all written with the clear expectation
@@ -74,9 +72,14 @@ class UsersController < ApplicationController
   end
 
   def show_selection
-    @user = User.find_by(name: params[:user][:name])
+    @user = User.find_by(name: params['user']['name'])
     if !@user.nil?
       get_role
+      # The 'parent' of a role is a lesser-privileged role
+      # So this logic says:
+      # if you are trying to perform this action for a role of the lowest privilege, go for it
+      # if you are trying to perform this action for a role of lesser privilege than the current user, go for it
+      # if you are trying to perform this action for the current user themselves, go for it
       if @role.parent_id.nil? || @role.parent_id < session[:user].role_id || @user.id == session[:user].id
         render action: 'show'
       else

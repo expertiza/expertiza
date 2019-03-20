@@ -79,12 +79,16 @@ describe UsersController do
     end
 
     it 'user is not nil but is not available for editing' do
-      allow(User).to receive(:find_by).with(name: 'instructor6').and_return(student4)
-      allow(Role).to receive(:find).with(4).and_return(student5)
-      session = {user: student3}
+      # Set up a TA and an instructor
+      # The TA should not be allowed to edit the instructor (lower rank)
+      # Use a TA rather than a student to get past the controller's action_allowed? method
+      teaching_assistant = create(:teaching_assistant)
+      instructor = create(:instructor)
+      stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
       params = {
-        user: {name: 'instructor6'}
+        user: {name: instructor.name}
       }
+      # Test
       post :show_selection, params, session
       expect(response).to redirect_to('http://test.host/users/list')
     end

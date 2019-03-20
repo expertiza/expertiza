@@ -8,16 +8,13 @@ class AssignmentsController < ApplicationController
     if %w[edit update list_submissions].include? params[:action]
       assignment = Assignment.find(params[:id])
       user_id = current_user.try(:id)
-      # either current_user is an admin
-      # or instructor for the course
-      # or a TA for the course
-      # or owner of the Course
+      # either current_user is an super/admin or instructor for the assignment or a TA for the course exists or owner of the Course
       (['Super-Administrator', 'Administrator'].include? current_role_name) ||
       (assignment.instructor_id == user_id) ||
       TaMapping.exists?(ta_id: user_id, course_id: assignment.course_id) ||
       (assignment.course_id && Course.find(assignment.course_id).instructor_id == user_id)
-    else
-     ['Super-Administrator', 'Administrator', 'Instructor', 'Teaching Assistant'].include? current_role_name
+    # else
+     # ['Super-Administrator', 'Administrator', 'Instructor', 'Teaching Assistant'].include? current_role_name
     end
   end
 

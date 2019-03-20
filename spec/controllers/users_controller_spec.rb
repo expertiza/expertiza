@@ -7,7 +7,6 @@ describe UsersController do
   let(:student3) { build(:student, id: 10, role_id: 1, parent_id: nil) }
   let(:student4) { build(:student, id: 20, role_id: 4) }
   let(:student5) { build(:student, role_id: 4, parent_id: 3) }
-  let(:student6) { build(:student, role_id: nil, name: :lilith)}
 
   let(:institution1) {build(:institution, id: 1)}
   let(:requested_user1) {RequestedUser.new id: 4, name: 'requester1', role_id: 2, fullname: 're, requester1', 
@@ -102,10 +101,11 @@ describe UsersController do
     end
 
     it 'when params[:id] is not nil but role_id is nil' do
-      allow(controller).to receive(:current_user).and_return(student6)
-      allow(User).to receive(:find).with('6').and_return(student6)
-      @params = {id: 6}
-      session = {user: student6}
+      student_no_role_id = create(:student)
+      stub_current_user(student_no_role_id, student_no_role_id.role.name, student_no_role_id.role)
+      session = {user: student_no_role_id}
+      session[:user].role_id = nil
+      @params = {id: student_no_role_id.id}
       get :show, @params, session
       expect(response).to render_template(:show)
     end

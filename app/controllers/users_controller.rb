@@ -16,9 +16,16 @@ class UsersController < ApplicationController
       true
     when 'create_requested_user_record'
       true
-    when 'keys', 'index', 'show'
-      # These action methods are all written with the expectation that a student should be allowed to proceed
+    when 'keys', 'index'
+      # These action methods are all written with the clear expectation
+      # that a student should be allowed to proceed
       current_user_has_student_privileges?
+    when 'show'
+      # This action method is written with the clear expectation
+      # that a student should be allowed to proceed
+      # Furthermore, there is an RSPec test that a 'student' with no role id
+      # should be allowed to proceed
+      user_logged_in?
     else
       current_user_has_ta_privileges?
     end

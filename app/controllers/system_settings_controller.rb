@@ -33,7 +33,7 @@ class SystemSettingsController < ApplicationController
   end
 
   def create
-    @system_settings = SystemSettings.new(params[:system_settings])
+    @system_settings = SystemSettings.new(system_settings_params)
     if @system_settings.save
       flash[:notice] = 'The system settings have been successfully created.'
       redirect_to action: 'list'
@@ -49,7 +49,7 @@ class SystemSettingsController < ApplicationController
 
   def update
     @system_settings = SystemSettings.find(params[:id])
-    if @system_settings.update_attributes(params[:system_settings])
+    if @system_settings.update_attributes(system_settings_params)
       flash[:notice] = 'The system settings have been successfully updated.'
       redirect_to action: 'show', id: @system_settings
     else
@@ -70,4 +70,10 @@ class SystemSettingsController < ApplicationController
     @markup_styles = MarkupStyle.order('name')
     @markup_styles.unshift MarkupStyle.new(id: nil, name: '(none)')
   end
+end
+
+private
+
+def system_settings_params
+  params.require(:system_settings)
 end

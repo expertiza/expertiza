@@ -4,6 +4,7 @@
 # If you are a student writing that functionality, feel free to remove this comment!
 
 describe Assessment360Controller do
+  let(:instructor) { build(:instructor, id: 6) }
   let(:course) { double('Course', instructor_id: 6, path: '/cscs', name: 'abc') }
 
   describe '#all_students_all_reviews' do
@@ -23,7 +24,13 @@ describe Assessment360Controller do
     end
 
     context 'when course has participants' do
-      # allow(Course).to receive(:find).with('1').and_return(course)
+      it 'does not divide by zero' do
+        params = {id: 1}
+        session = {user: instructor}
+        allow(Course).to receive(:find).with(1).and_return(course)
+        get :all_students_all_reviews, params, session
+        expect(controller.send(:action_allowed?)).to be true
+      end
     end
   end
 

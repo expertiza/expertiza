@@ -5,11 +5,13 @@ describe PopupController do
   let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor) }
   let(:ta) { build(:teaching_assistant) }
-  let(:participant) { build(:participant, id: 1, user: student, assignment: assignment) }
+  let(:participant) { build(:participant, id: 1, user_id: 1, user: student, assignment: assignment) }
   let(:participant2) { build(:participant, id: 2, user: student2, assignment: assignment) }
 
   let(:response) { build(:response, id: 1) }
-
+  let(:questionnaire) { build(:questionnaire, id: 1, max_question_score: 15)}
+  let(:question) { build(:question, id: 1, questionnaire_id: questionnaire.id)}
+  let(:answer) { build(:answer, id: 1, question_id: question.id, response_id: response.id) }
 
   let(:assignment) { build(:assignment, id: 1) }
   let(:response_map) { build(:review_response_map, id: 1, reviewee_id: team.id, reviewer_id: participant2.id, response: [response], assignment: assignment) }
@@ -18,6 +20,8 @@ describe PopupController do
     review_round_two: {questionnaire_id: 2, response_ids: []},
     review_round_three: {questionnaire_id: 3, response_ids: []}
   }
+
+
   test_url = "http://peerlogic.csc.ncsu.edu/reviewsentiment/viz/478-5hf542"
   mocked_comments_one = OpenStruct.new(comments: "test comment")
 
@@ -53,9 +57,6 @@ describe PopupController do
   end
 
   describe '#author_feedback_popup' do
-    let(:questionnaire) { build(:questionnaire, id: 1, max_question_score: 15)}
-    let(:question) { build(:question, id: 1, questionnaire_id: 1)}
-    let(:answer) { build(:answer, id: 1, question_id: 1, response_id: 1) }
     ## INSERT CONTEXT/DESCRIPTION/CODE HERE
     context 'when response_id exists' do
       it 'get the result' do
@@ -65,12 +66,13 @@ describe PopupController do
         allow(Question).to receive(:find).with(1).and_return(question)
         allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire)
         allow(Response).to receive(:find).with(any_args).and_return(response)
-        allow(response).to receive(:average_score).and_return(100)
+        allow(response).to receive(:average_score).and_return(80)
         allow(response).to receive(:total_score).and_return(100)
-        allow(response).to receive(:maximum_score).and_return(100)
+        allow(response).to receive(:maximum_score).and_return(90)
         get :author_feedback_popup, params, session
-        # expect(controller.instance_variable_get(:@maxscore)).to eq 15
-        expect(controller.instance_variable_get(:@total_possible)).to eq 100
+        expect(controller.instance_variable_get(:@total_percentage)).to eq 80
+        expect(controller.instance_variable_get(:@total_possible)).to eq 90
+        expect(controller.instance_variable_get(:@sum)).to eq 100
       end
     end
   end
@@ -122,6 +124,16 @@ describe PopupController do
 
   describe '#reviewer_details_popup' do
     ## INSERT CONTEXT/DESCRIPTION/CODE HERE
+    context 'it will show the reviewer details' do
+      it 'it will show the reviewer details' do
+        params = {assignment_id: 1, id: 1}
+        allow(Participant).to receive(:find).with(any_args).and_return(participant)
+        allow(User).to receive(:find).with(1).and_return(1)
+        session = {user: instructor}
+        get :reviewer_details_popup, params, session
+        expect(controller.instance_variable_get(:@id)).to eq "1"
+      end
+    end
   end
 
   describe '#self_review_popup' do

@@ -138,5 +138,22 @@ describe PopupController do
 
   describe '#self_review_popup' do
     ## INSERT CONTEXT/DESCRIPTION/CODE HERE
+    context 'when response_id exists' do
+      it 'get the result' do
+        params = {response_id: 1, user_fullname: 1}
+        session = {user: instructor}
+        allow(Answer).to receive(:where).with(any_args).and_return([answer])
+        allow(Question).to receive(:find).with(1).and_return(question)
+        allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire)
+        allow(Response).to receive(:find).with(any_args).and_return(response)
+        allow(response).to receive(:average_score).and_return(80)
+        allow(response).to receive(:total_score).and_return(100)
+        allow(response).to receive(:maximum_score).and_return(90)
+        get :self_review_popup, params, session
+        expect(controller.instance_variable_get(:@total_percentage)).to eq 80
+        expect(controller.instance_variable_get(:@total_possible)).to eq 90
+        expect(controller.instance_variable_get(:@sum)).to eq 100
+      end
+    end
   end
 end

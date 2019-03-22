@@ -15,8 +15,9 @@ class DueDateController < ApplicationController
     assignment = Assignment.find(params[:assignment_id])
 
     if assignment
+      instructor = find_assignment_instructor(assignment)
       current_user_teaching_staff_of_assignment?(assignment.id) ||
-          current_user_ancestor_of?(assignment.instructor)
+          current_user_ancestor_of?(instructor)
     else
       false
     end

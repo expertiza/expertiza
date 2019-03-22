@@ -102,3 +102,5 @@ Documentation of recreating issue 98
 Other related issues found
 - When editing an assignment's due dates, the drop topic deadline
 won't display unless the signup deadline is displayed
+- When a student is on the waitlist for more than one topic, only the row for one of the topics is grey
+- There seems to be about a 20 minute drop topic deadline lag, some of the time

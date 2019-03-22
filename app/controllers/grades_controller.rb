@@ -16,8 +16,8 @@ class GradesController < ApplicationController
       check_self_review_status
     when 'view_team'
       if current_user_is_a? 'Student' # students can only see the head map for their own team
-        assignment_participant = AssignmentParticipant.find(params[:id])
-        current_user_is_assignment_participant?(assignment_id: assignment_participant.parent_id)
+        participant = AssignmentParticipant.find(params[:id])
+        current_user_is_assignment_participant?(participant.assignment.id)
       else
         true
       end

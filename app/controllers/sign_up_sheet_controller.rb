@@ -169,8 +169,8 @@ class SignUpSheetController < ApplicationController
     end
     p topic_id1
     if !topic_id1.nil? and !@drop_topic_deadline1.nil? and Time.now > @drop_topic_deadline1.due_at
-      SignedUpTeam.remove_team_from_waitlist(topic_id1.topic_id,team_id)
-      # If teams were removed from waitlist, the slots_waitlisted variable shoudl be updated
+      SignedUpTeam.remove_from_waitlist(topic_id1.topic_id,team_id)
+      # If teams were removed from waitlist, the slots_waitlisted variable should be updated
       @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
     end
     #BOBBY

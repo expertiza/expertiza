@@ -55,7 +55,7 @@ class SignedUpTeam < ActiveRecord::Base
 
   # BOBBY
   # If team
-  def self.remove_team_from_waitlist(topic_id, team_id)
+  def self.remove_from_waitlist(topic_id, team_id)
     waitlisted_teams = SignedUpTeam.where(topic_id: topic_id, team_id: team_id)
 
     waitlisted_teams.each do |team|

@@ -1,7 +1,7 @@
 # Author: Hao Liu
 # Email: hliu11@ncsu.edu
 
-class AssignmentQuestionnaireController < ApplicationController
+class AssignmentQuestionnairesController < ApplicationController
   include AuthorizationHelper
 
   # According to Dr. Gehringer, only the instructor, an ancestor of the instructor,

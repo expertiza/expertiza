@@ -35,7 +35,7 @@ module AuthorizationHelper
   # an AssignmentTeam ID or an AssignmentParticipant ID. The default value for both arguments is false
   # Usage: current_user_is_assignment_participant?(assignment_team_id: <id>) or
   # current_user_is_assignment_participant?(assignment_participant_id: <id>)
-  def current_user_is_assignment_participant?(assignment_team_id: false, assignment_participant_id: false)
+  def current_user_is_assignment_participant?(assignment_team_id: false, assignment_id: false)
     if assignment_team_id
       team = AssignmentTeam.find_by(id: assignment_team_id)
       if team && user_logged_in?
@@ -43,11 +43,9 @@ module AuthorizationHelper
       end
     end
 
-    if assignment_participant_id
-      participant = AssignmentParticipant.find_by(id: assignment_participant_id)
-      if participant
-        return current_user_has_id?(participant.user_id)
-      end
+    if assignment_id
+      participant = AssignmentParticipant.where(parent_id: assignment_id, user_id: session[:user])
+      participant ? true : false
     end
     false
   end
@@ -138,6 +136,23 @@ module AuthorizationHelper
   def current_user_ancestor_of?(user)
     return session[:user].recursively_parent_of(user) if user_logged_in? && user
     false
+  end
+
+
+  def find_assignment_from_response_id(response_id)
+    response = Response.find(response_id.to_i)
+    response_map = ResponseMap.find(response.map_id)
+    assignment = Assignment.find(response_map.reviewed_object_id)
+    return assignment unless assignment.nil?
+    find_assignment_from_response_id(response_map.reviewed_object_id)
+  end
+
+  def find_assignment_instructor(assignment)
+    if assignment.course_id
+      Course.find(assignment.course_id).instructor
+    else
+      assignment.instructor
+    end
   end
 
   # PRIVATE METHODS

@@ -31,21 +31,10 @@ module AuthorizationHelper
     current_user_has_privileges_of?('Student')
   end
 
-  # Determine if the currently logged-in user is participating in an Assignment. This method takes 1 argument, either
-  # an AssignmentTeam ID or an AssignmentParticipant ID. The default value for both arguments is false
-  # Usage: current_user_is_assignment_participant?(assignment_team_id: <id>) or
-  # current_user_is_assignment_participant?(assignment_participant_id: <id>)
-  def current_user_is_assignment_participant?(assignment_team_id: false, assignment_id: false)
-    if assignment_team_id
-      team = AssignmentTeam.find_by(id: assignment_team_id)
-      if team && user_logged_in?
-        return AssignmentParticipant.exists?(parent_id: team.assignment.id, user_id: session[:user].id)
-      end
-    end
-
-    if assignment_id
-      participant = AssignmentParticipant.where(parent_id: assignment_id, user_id: session[:user])
-      participant ? true : false
+  # Determine if the currently logged-in user is participating in an Assignment based on the assignment_id argument
+  def current_user_is_assignment_participant?(assignment_id)
+    if user_logged_in?
+      return AssignmentParticipant.exists?(parent_id: assignment_id, user_id: session[:user].id)
     end
     false
   end

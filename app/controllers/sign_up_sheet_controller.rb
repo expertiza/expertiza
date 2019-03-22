@@ -162,17 +162,20 @@ class SignUpSheetController < ApplicationController
     team_id = @participant.team.try(:id)
 
     # BOBBY
-    @drop_topic_deadline1 = @assignment.due_dates.find_by(deadline_type_id: DeadlineHelper::DEADLINE_TYPE_DROP_TOPIC)
-    topic_id1 = SignedUpTeam.where(team_id: team_id).first
-    if @assignment.staggered_deadline?
-      @drop_topic_deadline1 = TopicDueDate.where(parent_id: topic_id1.topic_id, deadline_type_id: DeadlineHelper::DEADLINE_TYPE_DROP_TOPIC).first rescue nil
+    all_topics = SignUpTopic.where(assignment_id: @assignment.id)
+
+    all_topics.each do |topic|
+      drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: DeadlineHelper::DEADLINE_TYPE_DROP_TOPIC)
+      if @assignment.staggered_deadline?
+        drop_topic_deadline = TopicDueDate.where(parent_id: topic.id, deadline_type_id: DeadlineHelper::DEADLINE_TYPE_DROP_TOPIC).first rescue nil
+      end
+
+      if !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
+        SignedUpTeam.clear_waitlisted_teams_for_topic(topic.id)
+      end
     end
-    p topic_id1
-    if !topic_id1.nil? and !@drop_topic_deadline1.nil? and Time.now > @drop_topic_deadline1.due_at
-      SignedUpTeam.remove_from_waitlist(topic_id1.topic_id,team_id)
-      # If teams were removed from waitlist, the slots_waitlisted variable should be updated
-      @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
-    end
+
+    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
     #BOBBY
 
     if @assignment.is_intelligent

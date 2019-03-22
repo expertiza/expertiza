@@ -53,6 +53,19 @@ class SignedUpTeam < ActiveRecord::Base
                 .where('sign_up_topics.assignment_id = ? and signed_up_teams.team_id = ?', assignment_id, team_id)
   end
 
+  # BOBBY
+  # If team
+  def self.remove_team_from_waitlist(topic_id, team_id)
+    waitlisted_teams = SignedUpTeam.where(topic_id: topic_id, team_id: team_id)
+
+    waitlisted_teams.each do |team|
+      if(team.is_waitlisted == true)
+        SignedUpTeam.delete(team.id)
+        team.save
+      end
+    end
+  end
+
   # If a signup sheet exists then release topics that the given team has selected for the given assignment.
   def self.release_topics_selected_by_team_for_assignment(team_id, assignment_id)
     old_teams_signups = SignedUpTeam.where(team_id: team_id)

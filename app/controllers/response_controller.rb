@@ -56,7 +56,6 @@ class ResponseController < ApplicationController
 
   # Prepare the parameters when student clicks "Edit"
   def edit
-    #assign_instance_vars
     #instance variables for Edit action
     @header = 'Edit'
     @next_action = 'update'
@@ -104,7 +103,6 @@ class ResponseController < ApplicationController
   end
 
   def new
-    #assign_instance_vars
     #instance variable for New action
     @header = 'New'
     @next_action = 'create'
@@ -151,6 +149,7 @@ class ResponseController < ApplicationController
   end
 
   def create
+    #TODO: Need to revise the map_id variable as it does not make sense.
     map_id = params[:id]
     map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
     @map = ResponseMap.find(map_id)
@@ -161,7 +160,6 @@ class ResponseController < ApplicationController
       @round = nil
     end
     is_submitted = (params[:isSubmit] == 'Yes')
-    #was_submitted = false  Removed, this is not needed
     # There could be multiple responses per round, when re-submission is enabled for that round.
     # Hence we need to pick the latest response.
     @response = Response.where(map_id: @map.id, round: @round.to_i).order(created_at: :desc).first
@@ -173,7 +171,8 @@ class ResponseController < ApplicationController
         is_submitted: is_submitted
       )
     end
-    was_submitted = @response.is_submitted
+    #determine if the response has already been submitted
+    previously_submitted = @response.is_submitted
     @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
 
     # ,:version_num=>@version)
@@ -182,8 +181,8 @@ class ResponseController < ApplicationController
     create_answers(params, questions) if params[:responses]
     msg = "Your response was successfully saved."
     error_msg = ""
-    # only notify if is_submitted changes from false to true
-    if (@map.is_a? ReviewResponseMap) && (was_submitted == false && @response.is_submitted) && @response.significant_difference?
+    # only notify if is_submitted changes from false to true,
+    if (@map.is_a? ReviewResponseMap) && (previously_submitted == false && @response.is_submitted) && @response.significant_difference?
       @response.notify_instructor_on_difference
       @response.email
     end
@@ -300,25 +299,7 @@ class ResponseController < ApplicationController
     @max = @questionnaire.max_question_score
   end
 
-  # assigning the instance variables for Edit and New actions
-  # This method can be removed as it was integrated into the Edit and New actions
-  # def assign_instance_vars
-   # case params[:action]
-    #when 'edit'
-     # @header = 'Edit'
-     # @next_action = 'update'
-     # @response = Response.find(params[:id])
-     # @map = @response.map
-     # @contributor = @map.contributor
-   # when 'new'
-    #  @header = 'New'
-     # @next_action = 'create'
-     # @feedback = params[:feedback]
-     # @map = ResponseMap.find(params[:id])
-     # @modified_object = @map.id
-   # end
-   # @return = params[:return]
- # end
+  # E1907, removed assign_instance_vars section as it was not needed, combined in Edit and New sections
 
   def set_questionnaire_for_new_response
     case @map.type

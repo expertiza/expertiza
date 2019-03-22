@@ -12,7 +12,7 @@ class AutomatedMetareviewsController < ApplicationController
 
     current_user_teaching_staff_of_assignment?(assignment.id) ||
         current_user_ancestor_of?(instructor) ||
-        current_user_is_assignment_participant?(assignment_id: assignment.id)
+        current_user_is_assignment_participant?(assignment.id)
   end
 
   def index

@@ -32,13 +32,11 @@ describe Assessment360Controller do
       end
 
       it 'redirects to back and flashes error as there are no participants' do
-        # allow(Course).to receive(:find).with(1).and_return(course)
-        # THE LINE ABOVE DOES NOT WORK AND I DON'T KNOW WHY
-        allow(Course).to receive(:find).and_return(course)
+        allow(Course).to receive(:find).with("1").and_return(course)
         allow(course).to receive(:assignments).and_return([assignment])
         allow(assignment).to receive(:reject).and_return(assignment)
         allow(course).to receive(:get_participants).and_return([]) #no participants
-        params = {id: 1}
+        params = {course_id: 1}
         session = {user: instructor}
         get :all_students_all_reviews, params, session
         expect(controller.send(:action_allowed?)).to be true
@@ -71,11 +69,11 @@ describe Assessment360Controller do
       end
 
       it 'redirects to back and flashes error as there are no participants' do
-        allow(Course).to receive(:find).and_return(course)
+        allow(Course).to receive(:find).with("1").and_return(course)
         allow(course).to receive(:assignments).and_return([assignment])
         allow(assignment).to receive(:reject).and_return(assignment)
         allow(course).to receive(:get_participants).and_return([]) #no participants
-        params = {id: 1}
+        params = {course_id: 1}
         session = {user: instructor}
         get :course_student_grade_summary, params, session
         expect(controller.send(:action_allowed?)).to be true

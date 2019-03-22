@@ -36,12 +36,12 @@ describe 'new user request' do
       fill_in 'user_name', with: 'requester'
       fill_in 'user_fullname', with: 'requester, requester'
       fill_in 'user_email', with: 'test@test.com'
-      expect { click_on 'Request' }.to change { RequestedUser.count }.by(1)
-      expect(RequestedUser.first.name).to eq('requester')
-      expect(RequestedUser.first.role_id).to eq(2)
-      expect(RequestedUser.first.fullname).to eq('requester, requester')
-      expect(RequestedUser.first.email).to eq('test@test.com')
-      expect(RequestedUser.first.status).to eq('Under Review')
+      expect { click_on 'Request' }.to change { AccountRequest.count }.by(1)
+      expect(AccountRequest.first.name).to eq('requester')
+      expect(AccountRequest.first.role_id).to eq(2)
+      expect(AccountRequest.first.fullname).to eq('requester, requester')
+      expect(AccountRequest.first.email).to eq('test@test.com')
+      expect(AccountRequest.first.status).to eq('Under Review')
     end
   end
 
@@ -64,7 +64,7 @@ describe 'new user request' do
         choose(name: 'status', option: 'Rejected')
         click_on('Submit')
         expect(page).to have_content('The user "requester1" has been Rejected.')
-        expect(RequestedUser.first.status).to eq('Rejected')
+        expect(AccountRequest.first.status).to eq('Rejected')
         expect(page).to have_content('requester1')
         expect(page).to have_content('Rejected')
       end
@@ -77,7 +77,7 @@ describe 'new user request' do
         visit '/users/list_pending_requested'
         ActionMailer::Base.deliveries.clear
         expect(page).to have_content('requester1')
-        expect(RequestedUser.first.status).to eq('Under Review')
+        expect(AccountRequest.first.status).to eq('Under Review')
         choose(name: 'status', option: 'Approved')
         click_on('Submit')
         expect(page).to have_content('requester1')

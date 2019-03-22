@@ -10,8 +10,8 @@ describe UsersController do
   let(:student6) { build(:student, role_id: nil, name: :lilith)}
 
   let(:institution1) {build(:institution, id: 1)}
-  let(:requested_user1) {RequestedUser.new id: 4, name: 'requester1', role_id: 2, fullname: 're, requester1', 
-    institution_id: 1, email: 'requester1@test.com', status: nil, self_introduction: 'no one'}
+  let(:requested_user1) {AccountRequest.new id: 4, name: 'requester1', role_id: 2, fullname: 're, requester1',
+                                            institution_id: 1, email: 'requester1@test.com', status: nil, self_introduction: 'no one'}
   let(:superadmin) {build(:superadmin)}
   let(:assignment) {build(:assignment, id: 1, name: "test_assignment", instructor_id: 2, 
     participants: [build(:participant, id: 1, user_id: 1, assignment: assignment)], course_id: 1)}
@@ -262,7 +262,7 @@ describe UsersController do
     end
 
     it 'if requested user is not saved' do
-      expect_any_instance_of(RequestedUser).to receive(:save).and_return(false)
+      expect_any_instance_of(AccountRequest).to receive(:save).and_return(false)
       params = {
         user: {name: 'instructor6',
                role_id: 2,
@@ -292,7 +292,7 @@ describe UsersController do
 
   context "#create_approved_user" do
     before(:each) do
-      allow(RequestedUser).to receive(:find_by).with(id: "4").and_return(requested_user1)
+      allow(AccountRequest).to receive(:find_by).with(id: "4").and_return(requested_user1)
       allow(User).to receive(:find_by).with(id: 3).and_return(admin)
     end
 
@@ -313,7 +313,7 @@ describe UsersController do
         status: 'Approved'
       }
       post :create_approved_user, params, session
-      allow_any_instance_of(RequestedUser).to receive(:undo_link).with('The user "requester1" has been successfully created. ').and_return(true)
+      allow_any_instance_of(AccountRequest).to receive(:undo_link).with('The user "requester1" has been successfully created. ').and_return(true)
       expect(flash[:success]).to eq "A new password has been sent to new user's e-mail address." or 'The user "requester1" has been successfully updated.'
       expect(response).to redirect_to('http://test.host/users/list_pending_requested')
     end
@@ -341,7 +341,7 @@ describe UsersController do
     end
 
     it 'the input status is Rejected but update_colums fails' do
-      expect_any_instance_of(RequestedUser).to receive(:update_columns).and_return(false)
+      expect_any_instance_of(AccountRequest).to receive(:update_columns).and_return(false)
       params = {
         id: 4,
         status: 'Rejected'

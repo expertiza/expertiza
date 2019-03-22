@@ -6,7 +6,7 @@
 # added the below lines E913
 # No changes needed
 # our changes end E913
-class DueDateController < ApplicationController
+class DueDatesController < ApplicationController
   include AuthorizationHelper
 
   # According to Dr. Gehringer, only the instructor, an ancestor of the instructor,

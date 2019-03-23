@@ -1,5 +1,5 @@
 Expertiza::Application.routes.draw do
-  resources :account_requests
+
   ###
   # Please insert new routes alphabetically!
   ###

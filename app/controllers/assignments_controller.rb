@@ -309,11 +309,10 @@ class AssignmentsController < ApplicationController
     return unless !empty_rubrics_list.empty? && request.original_fullpath == "/assignments/#{@assignment_form.assignment.id}/edit"
     rubrics_needed = needed_rubrics(empty_rubrics_list)
     ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Rubrics missing for #{@assignment_form.assignment.name}.", request)
-    if flash.now[:error] != "Failed to save the assignment: [\"Total weight of rubrics should add up to either 0 or 100%\"]"
-      flash.now[:error] = "You did not specify all the necessary rubrics. You need " + rubrics_needed +
-          " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics" \
-          " <a id='go_to_tabs2' style='color: blue;'>here</a>."
-    end
+    return unless flash.now[:error] != "Failed to save the assignment: [\"Total weight of rubrics should add up to either 0 or 100%\"]"
+    flash.now[:error] = "You did not specify all the necessary rubrics. You need " + rubrics_needed +
+        " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics" \
+        " <a id='go_to_tabs2' style='color: blue;'>here</a>."
   end
 
   def handle_assignment_directory_path_nonexist_case_and_answer_tagging
@@ -358,8 +357,8 @@ class AssignmentsController < ApplicationController
     return unless current_user.timezonepref.nil?
     parent_id = current_user.parent_id
     parent_timezone = User.find(parent_id).timezonepref
-    flash[:error] = "We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. For now we assume you are in "
-                      + parent_timezone
+    flash[:error] = "We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. \
+                    For now we assume you are in " + parent_timezone
     current_user.timezonepref = parent_timezone
   end
 

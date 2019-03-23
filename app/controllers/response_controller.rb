@@ -165,7 +165,7 @@ class ResponseController < ApplicationController
     was_submitted = @response.is_submitted
     @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
 
-    # ,:version_num=>@version)
+    # :version_num=>@version)
     # Change the order for displaying questions for editing response views.
     questions = sort_questions(@questionnaire.questions)
     create_answers(params, questions) if params[:responses]
@@ -201,8 +201,10 @@ class ResponseController < ApplicationController
   end
 
   def redirect
-    flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
-    flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
+    error_id = params[:error_msg]
+    message_id  = params[:msg]
+    flash[:error] = error_id unless  error_id.empty?
+    flash[:note] = message_id unless message_id.empty?
     @map = Response.find_by(map_id: params[:id])
     if params[:return] == "feedback"
       redirect_to controller: 'grades', action: 'view_my_scores', id: @map.reviewer.id
@@ -307,7 +309,8 @@ class ResponseController < ApplicationController
     end
     @return = params[:return]
   end
-
+  #identifying the questionnaire type
+  #updating the current round for the reviewer's responses
   def set_questionnaire_for_new_response
     case @map.type
     when "ReviewResponseMap", "SelfReviewResponseMap"
@@ -324,7 +327,6 @@ class ResponseController < ApplicationController
       @questionnaire = @map.questionnaire
     end
   end
-
   def scores
     @review_scores = []
     @questions.each do |question|

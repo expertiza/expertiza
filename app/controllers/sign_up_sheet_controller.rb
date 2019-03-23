@@ -226,6 +226,30 @@ class SignUpSheetController < ApplicationController
     redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
   end
 
+  # Checks if participant has permission to delete a topic, reports errors otherwise
+  def can_delete_topic?(is_instructor?, participant, assignment, drop_topic_deadline)
+    submission_error_message = ""
+    deadline_error_message = ""
+
+    if is_instructor?
+      submission_error_message = "The student has already submitted their work, so you are not allowed to remove them"
+      deadline_error_message = "You cannot drop a student after the drop topic deadline!"
+    else
+      submission_error_message = "You have already submitted your work, so you are not allowed to drop your topic."
+      deadline_error_message = "You cannot drop your topic after the drop topic deadline!"
+
+    if !participant.team.submitted_files.empty? or !participant.team.hyperlinks.empty?
+      flash[:error] = submission_error_message
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for already submitted work: ' + params[:topic_id].to_s)
+      return false
+    elsif !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
+      flash[:error] = deadline_error_message
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for ended work: ' + params[:topic_id].to_s)
+      return false
+    
+    return true
+  end
+
   # this function is used to delete a previous signup
   def delete_signup
     participant = AssignmentParticipant.find(params[:id])
@@ -235,13 +259,7 @@ class SignUpSheetController < ApplicationController
     # (A student/team has submitted if participant directory_num is non-null or submitted_hyperlinks is non-null.)
     # If there is no drop topic deadline, student can drop topic at any time (if all the submissions are deleted)
     # If there is a drop topic deadline, student cannot drop topic after this deadline.
-    if !participant.team.submitted_files.empty? or !participant.team.hyperlinks.empty?
-      flash[:error] = "You have already submitted your work, so you are not allowed to drop your topic."
-      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Dropping topic for already submitted a work: ' + params[:topic_id].to_s)
-    elsif !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
-      flash[:error] = "You cannot drop your topic after the drop topic deadline!"
-      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Dropping topic for ended work: ' + params[:topic_id].to_s)
-    else
+    if can_delete_topic?(false, participant, assignment, drop_topic_deadline)
       delete_signup_for_topic(assignment.id, params[:topic_id], session[:user].id)
       flash[:success] = "You have successfully dropped your topic!"
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].id, 'Student has dropped the topic: ' + params[:topic_id].to_s)
@@ -256,13 +274,8 @@ class SignUpSheetController < ApplicationController
     user = TeamsUser.find_by(team_id: team.id).user
     participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
     drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
-    if !participant.team.submitted_files.empty? or !participant.team.hyperlinks.empty?
-      flash[:error] = "The student has already submitted their work, so you are not allowed to remove them."
-      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for already submitted work: ' + params[:topic_id].to_s)
-    elsif !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
-      flash[:error] = "You cannot drop a student after the drop topic deadline!"
-      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for ended work: ' + params[:topic_id].to_s)
-    else
+
+    if can_delete_topic?(true, participant, assignment, drop_topic_deadline)
       delete_signup_for_topic(assignment.id, params[:topic_id], participant.user_id)
       flash[:success] = "You have successfully dropped the student from the topic!"
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Student has been dropped from the topic: ' + params[:topic_id].to_s)

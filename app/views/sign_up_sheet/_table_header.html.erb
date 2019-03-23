@@ -8,7 +8,7 @@
   <th width="5%">Available slots</th>
   <th width="5%">Num. on waitlist</th>
   <th width="10%">Bookmarks</th>
-  <% if @assignment.current_stage_name(@topic_id) != 'Finished' %>
+  <% unless @assignment.finished?(@topic_id) %>
       <th width="10%">Actions</th>
       <th width="5%">Advertise- ment(s)</th>
   <% end %>

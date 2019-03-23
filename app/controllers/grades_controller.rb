@@ -300,7 +300,7 @@ class GradesController < ApplicationController
     participant = Participant.find(params[:id])
     assignment = participant.try(:assignment)
     return false if assignment.try(:is_selfreview_enabled) and unsubmitted_self_review?(participant.try(:id))
-    return true
+    true
   end
 
   def mean(array)

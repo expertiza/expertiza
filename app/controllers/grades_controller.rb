@@ -262,11 +262,10 @@ class GradesController < ApplicationController
   end
 
   def remove_negative_scores_and_build_charts(symbol)
-    if @participant_score and @participant_score[symbol]
-      scores = get_scores_for_chart @participant_score[symbol][:assessments], symbol.to_s
-      scores -= [-1.0]
-      @grades_bar_charts[symbol] = bar_chart(scores)
-    end
+    return unless @participant_score and @participant_score[symbol]
+    scores = get_scores_for_chart @participant_score[symbol][:assessments], symbol.to_s
+    scores -= [-1.0]
+    @grades_bar_charts[symbol] = bar_chart(scores)
   end
 
   def get_scores_for_chart(reviews, symbol)
@@ -300,14 +299,11 @@ class GradesController < ApplicationController
   def check_self_review_status
     participant = Participant.find(params[:id])
     assignment = participant.try(:assignment)
-    if assignment.try(:is_selfreview_enabled) and unsubmitted_self_review?(participant.try(:id))
-      return false
-    else
-      return true
-    end
+    return false if assignment.try(:is_selfreview_enabled) and unsubmitted_self_review?(participant.try(:id))
+    return true
   end
 
   def mean(array)
-    array.inject(0) {|sum, x| sum += x } / array.size.to_f
+    array.inject(0) {|sum, x| sum + x } / array.size.to_f
   end
 end

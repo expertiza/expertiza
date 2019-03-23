@@ -166,9 +166,6 @@ class SignUpSheetController < ApplicationController
 
     all_topics.each do |topic|
       drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: DeadlineHelper::DEADLINE_TYPE_DROP_TOPIC)
-      if @assignment.staggered_deadline?
-        drop_topic_deadline = TopicDueDate.where(parent_id: topic.id, deadline_type_id: DeadlineHelper::DEADLINE_TYPE_DROP_TOPIC).first rescue nil
-      end
 
       if !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
         SignedUpTeam.clear_waitlisted_teams_for_topic(topic.id)

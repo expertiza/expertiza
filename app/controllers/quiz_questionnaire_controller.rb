@@ -29,6 +29,7 @@ class QuizQuestionnaireController < QuestionnairesController
           valid_request = false
         end
       end
+      render 'questionnaires/new_quiz'
     end
 
     if valid_request && Questionnaire::QUESTIONNAIRE_TYPES.include?(params[:model])
@@ -75,7 +76,7 @@ class QuizQuestionnaireController < QuestionnairesController
   def edit_quiz
     @questionnaire = Questionnaire.find(params[:id])
     if !@questionnaire.taken_by_anyone?
-      render :edit
+      render :'questionnaires/edit'
     else
       flash[:error] = "Your quiz has been taken by some other students, you cannot edit it anymore."
       redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]

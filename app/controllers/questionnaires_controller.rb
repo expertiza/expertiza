@@ -238,7 +238,7 @@ class QuestionnairesController < ApplicationController
   # Separate methods for quiz questionnaire
   #=========================================================================================================
   # View a quiz questionnaire
-  =begin
+=begin
   def view_quiz
     @questionnaire = Questionnaire.find(params[:id])
     @participant = Participant.find(params[:pid]) # creating an instance variable since it needs to be sent to submitted_content/edit
@@ -387,7 +387,7 @@ class QuestionnairesController < ApplicationController
     end
     valid
   end
-  =end
+=end
   private
 
   # save questionnaire object after create or edit

@@ -220,19 +220,27 @@ resources :institution, except: [:destroy] do
       get :set_publish_permission
     end
   end
-
+#Nitin - removed quiz related routes from questionnaires controller
   resources :questionnaires, only: %i[new create edit update] do
     collection do
       get :copy
-      get :new_quiz
       get :select_questionnaire_type
       post :select_questionnaire_type
       get :toggle_access
-      get :view
-      post :create_quiz_questionnaire
-      post :update_quiz
+      get :view  
       post :add_new_questions
       post :save_all_questions
+    end
+  end
+
+#Nitin - Created new routes for quiz_questionnaire
+  resources :quiz_questionnaire, only: %i[new create edit update] do
+    collection do
+      get :new_quiz
+      post :create_quiz_questionnaire
+      get :edit_quiz
+      post :update_quiz
+      
     end
   end
 

@@ -25,7 +25,7 @@ class ResponseController < ApplicationController
 
   def edit_allowed?(map, user_id)
     assignment = map.reviewer.assignment
-    # if it is a review response map, all the members of reviewee team should be able to view the reponse (can be done from heat map)
+    # if it is a review response map, all the members of reviewee team should be able to view the response (can be done from heat map)
     if map.is_a? ReviewResponseMap
       reviewee_team = AssignmentTeam.find(map.reviewee_id)
       return current_user_id?(user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' ||
@@ -56,7 +56,7 @@ class ResponseController < ApplicationController
 
   # Prepare the parameters when student clicks "Edit"
   def edit
-    #instance variables for Edit action
+    # instance variables for Edit action
     @header = 'Edit'
     @next_action = 'update'
     @response = Response.find(params[:id])
@@ -103,7 +103,7 @@ class ResponseController < ApplicationController
   end
 
   def new
-    #instance variable for New action
+    # instance variable for New action
     @header = 'New'
     @next_action = 'create'
     @feedback = params[:feedback]
@@ -149,7 +149,7 @@ class ResponseController < ApplicationController
   end
 
   def create
-    #TODO: Need to revise the map_id variable as it does not make sense.
+    # TO DO: Need to revise the map_id variable as it does not make sense.
     map_id = params[:id]
     map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
     @map = ResponseMap.find(map_id)
@@ -171,7 +171,6 @@ class ResponseController < ApplicationController
         is_submitted: is_submitted
       )
     end
-    #determine if the response has already been submitted
     previously_submitted = @response.is_submitted
     @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
 

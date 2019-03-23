@@ -332,7 +332,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def stage_deadline(topic_id = nil)
-    return 'Unknown' if topic_id.nil? and self.staggered_deadline?
+    return 'Unknown' if topic_missing?(topic_id)
     due_date = find_current_stage(topic_id)
     due_date.nil? || due_date == 'Finished' ? due_date : due_date.due_at.to_s
   end
@@ -356,7 +356,7 @@ class Assignment < ActiveRecord::Base
 
   # Zhewei: this method is almost the same as 'stage_deadline'
   def get_current_stage(topic_id = nil)
-    return 'Unknown' if topic_id.nil? and self.staggered_deadline?
+    return 'Unknown' if topic_missing?(topic_id)
      finished?(topic_id)? "Finished" : DeadlineType.find(due_date.deadline_type_id).name
   end
 

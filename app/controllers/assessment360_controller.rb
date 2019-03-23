@@ -50,12 +50,14 @@ class Assessment360Controller < ApplicationController
       end
       # calculate average grade for each student on all assignments in this course
       if @teammate_review_info_per_stu[1] > 0
-        temp_avg_grade = @teammate_review_info_per_stu[0] * 1.0 / @teammate_review_info_per_stu[1]
-        @teammate_review[cp.id][:avg_grade_for_assgt] = temp_avg_grade.round.to_s + '%'
+        # temp_avg_grade = @teammate_review_info_per_stu[0] * 1.0 / @teammate_review_info_per_stu[1]
+        # @teammate_review[cp.id][:avg_grade_for_assgt] = temp_avg_grade.round.to_s + '%'
+        calculate_avg_grade(@teammate_review_info_per_stu, @teammate_review, cp.id)
       end
       if @meta_review_info_per_stu[1] > 0
-        temp_avg_grade = @meta_review_info_per_stu[0] * 1.0 / @meta_review_info_per_stu[1]
-        @meta_review[cp.id][:avg_grade_for_assgt] = temp_avg_grade.round.to_s + '%'
+        # temp_avg_grade = @meta_review_info_per_stu[0] * 1.0 / @meta_review_info_per_stu[1]
+        # @meta_review[cp.id][:avg_grade_for_assgt] = temp_avg_grade.round.to_s + '%'
+        calculate_avg_grade(@meta_review_info_per_stu, @meta_review, cp.id)
       end
     end
     # avoid divide by zero error
@@ -164,6 +166,11 @@ class Assessment360Controller < ApplicationController
     score.nil? ? '-' : score
   end
 
+  def calculate_avg_grade(review_info_per_stu, review, cp.id)
+    temp_avg_grade = review_info_per_stu[0] * 1.0 / review_info_per_stu[1]
+    review[cp.id][:avg_grade_for_assgt] = temp_avg_grade.round.to_s + '%'
+  end
+  
   helper_method :format_score
   helper_method :format_topic
 end

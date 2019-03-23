@@ -29,50 +29,16 @@ class AssignmentsController < ApplicationController
     @num_reviews_round = 0
   end
 
-  def update_assignment_form
-    exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
-    assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
-    if assignment_form_params[:assignment][:directory_path].blank?
-      assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
-    end
-    ques_array = assignment_form_params[:assignment_questionnaire]
-    due_array = assignment_form_params[:due_date]
-    ques_array.each do |cur_questionnaire|
-      cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
-    end
-    due_array.each do |cur_due|
-      cur_due[:parent_id] = exist_assignment.id.to_s
-    end
-    assignment_form_params[:assignment_questionnaire] = ques_array
-    assignment_form_params[:due_date] = due_array
-    @assignment_form.update(assignment_form_params, current_user)
-  end
-
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
     if params[:button]
       if @assignment_form.save
         @assignment_form.create_assignment_node
 
+        # update ids in the form
         update_assignment_form
 
-        # exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
-        # assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
-        # if assignment_form_params[:assignment][:directory_path].blank?
-        #   assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
-        # end
-        # ques_array = assignment_form_params[:assignment_questionnaire]
-        # due_array = assignment_form_params[:due_date]
-        # ques_array.each do |cur_questionnaire|
-        #   cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
-        # end
-        # due_array.each do |cur_due|
-        #   cur_due[:parent_id] = exist_assignment.id.to_s
-        # end
-        # assignment_form_params[:assignment_questionnaire] = ques_array
-        # assignment_form_params[:due_date] = due_array
-        # @assignment_form.update(assignment_form_params, current_user)
-
+        # send out success notifications and navigate to edit page
         aid = Assignment.find_by(name: @assignment_form.assignment.name).id
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
         redirect_to edit_assignment_path aid
@@ -213,6 +179,25 @@ class AssignmentsController < ApplicationController
   end
 
   private
+
+  def update_assignment_form
+    exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
+    assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
+    if assignment_form_params[:assignment][:directory_path].blank?
+      assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
+    end
+    ques_array = assignment_form_params[:assignment_questionnaire]
+    due_array = assignment_form_params[:due_date]
+    ques_array.each do |cur_questionnaire|
+      cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
+    end
+    due_array.each do |cur_due|
+      cur_due[:parent_id] = exist_assignment.id.to_s
+    end
+    assignment_form_params[:assignment_questionnaire] = ques_array
+    assignment_form_params[:due_date] = due_array
+    @assignment_form.update(assignment_form_params, current_user)
+  end
 
   # check whether rubrics are set before save assignment
   def empty_rubrics_list

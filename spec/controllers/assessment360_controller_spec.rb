@@ -129,8 +129,7 @@ describe Assessment360Controller do
         session = {user: instructor}
         get :course_student_grade_summary, params, session
         expect(controller.send(:action_allowed?)).to be true
-        expect(response).to redirect_to(:back)
-        expect(flash[:error]).to be_present
+        expect(response.status).to eq(200)
       end
     end
   end

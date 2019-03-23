@@ -10,6 +10,8 @@ class AccountRequestsController < ApplicationController
       true
     when 'create_requested_user_record'
       true
+    when 'keys'
+      current_role_name.eql? 'Student'
     else
       ['Super-Administrator',
        'Administrator',

@@ -66,7 +66,7 @@ class Question < ActiveRecord::Base
     html += '<td><!--placeholder (UploadFile does not need weight)--></td>'
     html += '</tr>'
 
-    html.html_safe
+    html
   end
 
   # This method returns what to display if an instructor (etc.) is viewing a questionnaire
@@ -76,7 +76,7 @@ class Question < ActiveRecord::Base
     html += '<td align="center">' + self.weight.to_s + '</TD>'
     html += '<TD align="center">&mdash;</TD>'
     html += '</TR>'
-    html.html_safe
+    html
   end
 
 

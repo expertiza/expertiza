@@ -8,7 +8,7 @@ class TextField < TextResponse
     html += 'value="' + answer.comments.to_s unless answer.nil?
     html += '">'
     html += '<BR/><BR/>' if self.type == 'TextField' and self.break_before == false
-    html.html_safe
+    html
   end
 
   def view_completed_question(count, answer)
@@ -22,6 +22,6 @@ class TextField < TextResponse
       html += answer.comments
       html += '<BR/><BR/>'
     end
-    html.html_safe
+    html
   end
 end

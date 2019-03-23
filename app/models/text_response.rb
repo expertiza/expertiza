@@ -16,7 +16,7 @@ class TextResponse < Question
             '" name="question[' + self.id.to_s + '][size]" id="question_' + self.id.to_s + '_size" type="text"></td>'
     html += '</tr>'
 
-    html.html_safe
+    html
   end
 
   def complete; end

@@ -14,12 +14,12 @@ class TextArea < TextResponse
     html += answer.comments unless answer.nil?
     html += '</textarea>'
     html += '</p>'
-    html.html_safe
+    html
   end
 
   def view_completed_question(count, answer)
     html = '<b>' + count.to_s + ". " + self.txt + "</b><BR/>"
     html += '&nbsp;' * 8 + answer.comments.gsub('^p', '').gsub(/\n/, '<BR/>') + '<BR/><BR/>'
-    html.html_safe
+    html
   end
 end

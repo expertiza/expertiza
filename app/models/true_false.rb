@@ -60,7 +60,7 @@ class TrueFalse < QuizQuestion
 
     html += '</b>'
     html += '<br><br><hr>'
-    html.html_safe
+    html
     # html += 'i += 1'
   end
 

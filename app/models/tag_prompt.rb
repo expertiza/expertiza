@@ -24,7 +24,7 @@ class TagPrompt < ActiveRecord::Base
         end
       end
     end
-    html.html_safe
+    html
   end
 
   def checkbox_control(answer, tag_prompt_deployment, stored_tags)

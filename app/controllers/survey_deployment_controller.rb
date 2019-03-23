@@ -139,7 +139,6 @@ class SurveyDeploymentController < ApplicationController
       redirect_to '/'
       return
     end
-
     # Get all the course survey deployments for this user
     @surveys = []
     [CourseParticipant, AssignmentParticipant].each do |participant_type|
@@ -151,9 +150,10 @@ class SurveyDeploymentController < ApplicationController
         survey_deployments = survey_deployment_type.where(parent_id: p.parent_id)
         next unless survey_deployments
         survey_deployments.each do |survey_deployment|
-          next unless survey_deployment && Time.current > survey_deployment.start_date && Time.current < survey_deployment.end_date
+          next unless survey_deployment && Time.zone.now > survey_deployment.start_date && Time.zone.now < survey_deployment.end_date
           @surveys <<
-              [   'survey' => Questionnaire.find(survey_deployment.questionnaire_id),
+              [
+                  'survey' => Questionnaire.find(survey_deployment.questionnaire_id),
                   'survey_deployment_id' => survey_deployment.id,
                   'start_date' => survey_deployment.start_date,
                   'end_date' => survey_deployment.end_date,
@@ -165,7 +165,6 @@ class SurveyDeploymentController < ApplicationController
       end
     end
   end
-
   # This method should be moved to survey_deployment_controller.rb
   def view_responses
     sd = SurveyDeployment.find(params[:id])

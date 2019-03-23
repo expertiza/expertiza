@@ -64,7 +64,7 @@ to display the label "Your team" in the student assignment tasks-->
         <% @alias_name = "Your readings" %>
       <% end %>
       <!--Zhewei: professor mentioned that a submission is reviewable if the submission is in a stage where reviews can be done. It does not depend on the stage of the topic the reviewer is writing on-->
-      <% if check_reviewable_topics(@assignment) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@topic_id) == "Finished" %>
+      <% if check_reviewable_topics(@assignment) or @assignment.metareview_allowed(nil) or @assignment.finished?(@topic_id) %>
         <%= link_to "#{@alias_name}",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
       <% else %>
         <font color="gray"><%= @alias_name%></font>
@@ -77,7 +77,7 @@ to display the label "Your team" in the student assignment tasks-->
   <%if @assignment.require_quiz%>
     <% if @authorization == 'participant' or @can_take_quiz == true %>
       <li>
-        <% if @assignment.require_quiz and (@assignment.quiz_allowed(@topic_id) or @assignment.get_current_stage(@topic_id) == "Finished") %>
+        <% if @assignment.require_quiz and (@assignment.quiz_allowed(@topic_id) or @assignment.finished?(@topic_id)) %>
           <%= link_to "Take quizzes", student_quizzes_path(:id => @participant.id) %>
         <% else %>
           <font color="gray">Take quizzes</font>

@@ -56,7 +56,7 @@
                     <% end %>
                 <% end %>
             <% end %>
-        <% elsif @assignment.finished?(@topic_id) && @assignment.submission_allowed(@topic_id) %>
+        <% elsif !@assignment.finished?(@topic_id) && @assignment.submission_allowed(@topic_id) %>
             <td>&nbsp;&nbsp;</td>
             <td><%= link_to 'Begin', {:controller => 'response', :action => 'new', :id => @review_mappings[0].id} %></td>
         <% end %>

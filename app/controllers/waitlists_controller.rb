@@ -37,11 +37,15 @@ class WaitlistsController < ApplicationController
   def update
     @waitlist = Waitlist.find(params[:id])
     if @waitlist.update_attributes(waitlist_params)
-      flash[:notice] = 'The wait list was successfully updated.'
-      redirect_to action: 'show', id: @waitlist
+      flash_update
     else
       render action: 'edit'
     end
+  end
+  
+  def flash_update
+    flash[:notice] = 'The wait list was successfully updated.'
+    redirect_to action: 'show', id: @waitlist
   end
 
   def destroy

@@ -207,6 +207,10 @@ class AssignmentParticipant < Participant
     return if AssignmentParticipant.exists?(user_id: user.id, parent_id: id)
     new_part = AssignmentParticipant.create(user_id: user.id, parent_id: id)
     new_part.set_handle
+    # Spring19 AHP
+    prepared_mail = MailerHelper.send_mail_to_user(user, "Your Expertiza account and password have been created.", "user_welcome", "password")
+    prepared_mail.deliver
+    #-------------------------------------------------------
   end
 
   # grant publishing rights to one or more assignments. Using the supplied private key,

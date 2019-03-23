@@ -8,6 +8,7 @@ describe Assessment360Controller do
   let(:course) { double('Course', instructor_id: 6, path: '/cscs', name: 'abc') }
   let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true) }
   let(:due_date) { build(:assignment_due_date, deadline_type_id: 1) }
+  let(:course_participant) { build(:course_participant) }
 
   describe '#all_students_all_reviews' do
     context 'when course does not have participants' do
@@ -32,6 +33,19 @@ describe Assessment360Controller do
       end
 
       it 'redirects to back and flashes error as there are no participants' do
+        allow(Course).to receive(:find).with("1").and_return(course)
+        allow(course).to receive(:assignments).and_return([assignment])
+        allow(assignment).to receive(:reject).and_return(assignment)
+        allow(course).to receive(:get_participants).and_return([]) #no participants
+        params = {course_id: 1}
+        session = {user: instructor}
+        get :all_students_all_reviews, params, session
+        expect(controller.send(:action_allowed?)).to be true
+        expect(response).to redirect_to(:back)
+        expect(flash[:error]).to be_present
+      end
+
+      it 'has participants and avoids dividing by zero' do
         allow(Course).to receive(:find).with("1").and_return(course)
         allow(course).to receive(:assignments).and_return([assignment])
         allow(assignment).to receive(:reject).and_return(assignment)

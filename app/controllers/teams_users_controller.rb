@@ -36,8 +36,8 @@ class TeamsUsersController < ApplicationController
         url_assignment_participant_list =
           url_for controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment', authorization: 'participant'
         flash[:error] =
-          "\"#{user.name}\" is not a"\
-          "participant of the current assignment. Please <a href=\"#{url_assignment_participant_list}\">add</a> this user before continuing."
+          "\"#{user.name}\" is not a participant of the current assignment."\
+          " Please <a href=\"#{url_assignment_participant_list}\">add</a> this user before continuing."
       else
         add_member_return = team.add_member(user, team.parent_id)
         flash[:error] = "This team already has the maximum number of members." if add_member_return == false
@@ -52,7 +52,8 @@ class TeamsUsersController < ApplicationController
           url_for controller: 'participants', action: 'list', id: course.id, model: 'Course', authorization: 'participant'
         flash[:error] =
           "\"#{user.name}\" is not a participant"\
-          "of the current course. Please <a href=\"#{url_course_participant_list}\">add</a> this user before continuing."
+          "of the current course."\ 
+          "Please <a href=\"#{url_course_participant_list}\">add</a> this user before continuing."
       else
         add_member_return = team.add_member(user)
         flash[:error] = "This team already has the maximum number of members." if add_member_return == false

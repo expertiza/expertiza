@@ -125,7 +125,7 @@ class Assessment360Controller < ApplicationController
           @final_grades[cp.id] += @assignment_grades[cp.id][assignment_id]
         end
 
-        unless (peer_review_score.nil? || peer_review_score[:review][:scores][:avg].nil?)
+        unless peer_review_score.nil? || peer_review_score[:review][:scores][:avg].nil?
           @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
         end
       end

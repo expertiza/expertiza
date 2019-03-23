@@ -105,7 +105,7 @@ class Assessment360Controller < ApplicationController
         user_id = cp.user_id
         assignment_id = assignment.id
 
-        assignment_participant = assignment.participants.find_by(user_id: user_id)
+        # assignment_participant = assignment.participants.find_by(user_id: user_id)
         next if assignment.participants.find_by(user_id: user_id).nil?
 
         # A topic exists if a team signed up for a topic, which can be found via the user and the assignment

@@ -326,12 +326,6 @@ class Assignment < ActiveRecord::Base
     next_due_date.round ||= 0
   end
 
-  # For varying rubric feature - return current stage name or return deadline_name
-  def current_stage_name(topic_id = nil)
-      return (topic_id.nil? ? 'Unknown' : get_current_stage(topic_id))
-  end
-
-
   # check if this assignment has multiple review phases with different review rubrics
   def varying_rubrics_by_round?
     AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: 2).size >= 1

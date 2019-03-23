@@ -30,7 +30,7 @@ gem 'foreman'
 gem 'gchartrb', require: 'google_chart'
 gem 'gdata', require: false
 gem "googlecharts", require: "gchart"
-# gem 'haml-rails'
+gem 'haml-rails'
 gem 'jquery-colorbox-rails'
 gem 'jquery-datetimepicker-rails'
 gem 'jquery-rails'

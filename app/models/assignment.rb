@@ -326,22 +326,6 @@ class Assignment < ActiveRecord::Base
     next_due_date.round ||= 0
   end
 
-  # For varying rubric feature
-  def current_stage_name(topic_id = nil)
-    if self.staggered_deadline?
-      return (topic_id.nil? ? 'Unknown' : get_current_stage(topic_id))
-    end
-    due_date = find_current_stage(topic_id)
-
-    unless self.staggered_deadline?
-      if due_date != 'Finished' && !due_date.nil? && !due_date.deadline_name.nil?
-        return due_date.deadline_name
-      else
-        return get_current_stage(topic_id)
-      end
-    end
-  end
-
   # check if this assignment has multiple review phases with different review rubrics
   def varying_rubrics_by_round?
     AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: 2).size >= 1
@@ -381,12 +365,14 @@ class Assignment < ActiveRecord::Base
     next_due_date
   end
 
+
   # Zhewei: this method is almost the same as 'stage_deadline'
   def get_current_stage(topic_id = nil)
     return 'Unknown' if topic_id.nil? and self.staggered_deadline?
-    due_date = find_current_stage(topic_id)
-    due_date.nil? || due_date == 'Finished' ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
+     finished?(topic_id)? "Finished" : DeadlineType.find(due_date.deadline_type_id).name
   end
+
+
 
   def review_questionnaire_id(round = nil)
     # Get the round it's in from the next duedates

@@ -117,9 +117,9 @@
           <!--current stage-->
           <td>
           <% if participant.assignment.link_for_current_stage(topic_id)!= nil && participant.assignment.link_for_current_stage(topic_id).length!=0%>
-              <%= link_to participant.assignment.current_stage_name(topic_id), participant.assignment.link_for_current_stage(topic_id) %>
+              <%= link_to participant.assignment.get_current_stage(topic_id), participant.assignment.link_for_current_stage(topic_id) %>
               <% else %>
-              <%= participant.assignment.current_stage_name(topic_id) %>
+              <%= participant.assignment.get_current_stage(topic_id) %>
               <% end %>
           </td>
           <!--review grade-->

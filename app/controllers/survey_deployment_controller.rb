@@ -12,7 +12,7 @@ class SurveyDeploymentController < ApplicationController
   end
 
   def survey_deployment_type
-    params[:type].constantize if params[:type].in? survey_deployment_types
+    params[:type] if params[:type].in? survey_deployment_types
   end
 
   def new
@@ -145,15 +145,14 @@ class SurveyDeploymentController < ApplicationController
     @all_answers = list_answers(@questions, response_map_list)
     @global_survey_present = false
 
-    unless sd.global_survey_id
-      @global_survey_present = true
-      @global_questionnaire = Questionnaire.find(sd.global_survey_id)
-      @global_questions = Question.where(questionnaire_id: @global_questionnaire.id)
-      # retrieve all the answers on the global survey based on this survey deploment.
-      # Please note that, for a survey deployment which requires taking a global survey,
-      # there will be two different response_maps.
-      @global_answers = list_answers(@global_questions, response_map_list)
-    end
+    return unless sd.global_survey_id
+    @global_survey_present = true
+    @global_questionnaire = Questionnaire.find(sd.global_survey_id)
+    @global_questions = Question.where(questionnaire_id: @global_questionnaire.id)
+    # retrieve all the answers on the global survey based on this survey deploment.
+    # Please note that, for a survey deployment which requires taking a global survey,
+    # there will be two different response_maps.
+    @global_answers = list_answers(@global_questions, response_map_list)
   end
 
   private

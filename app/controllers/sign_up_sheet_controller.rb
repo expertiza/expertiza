@@ -56,7 +56,7 @@ class SignUpSheetController < ApplicationController
     if topic.nil?
       setup_new_topic
     else
-      update_existing_topic topic
+      flash[:error] = "The topic already exists."
     end
   end
 

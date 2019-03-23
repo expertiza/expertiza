@@ -121,9 +121,7 @@ class Assessment360Controller < ApplicationController
 
         # Set the assignment grade, peer review score, and sum for the final student summary
         @assignment_grades[cp.id][assignment_id] = team[:grade_for_submission]
-        unless @assignment_grades[cp.id][assignment_id].nil?
-          @final_grades[cp.id] += @assignment_grades[cp.id][assignment_id]
-        end
+        @final_grades[cp.id] += @assignment_grades[cp.id][assignment_id] unless @assignment_grades[cp.id][assignment_id].nil?
 
         unless peer_review_score.nil? || peer_review_score[:review][:scores][:avg].nil?
           @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)

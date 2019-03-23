@@ -202,7 +202,7 @@ class ResponseController < ApplicationController
 
   def redirect
     error_id = params[:error_msg]
-    message_id  = params[:msg]
+    message_id = params[:msg]
     flash[:error] = error_id unless  error_id.empty?
     flash[:note] = message_id unless message_id.empty?
     @map = Response.find_by(map_id: params[:id])
@@ -309,8 +309,8 @@ class ResponseController < ApplicationController
     end
     @return = params[:return]
   end
-  #identifying the questionnaire type
-  #updating the current round for the reviewer's responses
+  # identifying the questionnaire type
+  # updating the current round for the reviewer's responses
   def set_questionnaire_for_new_response
     case @map.type
     when "ReviewResponseMap", "SelfReviewResponseMap"

@@ -170,7 +170,7 @@ class LotteryController < ApplicationController
     end
 
     # Remove is_intelligent property from assignment so that it can revert to the default signup state
-    assignment.update_attributes(:is_intelligent => false)
+    assignment.update_attributes(is_intelligent: false) 
     flash[:success] = 'The intelligent assignment was successfully completed for ' + assignment.name + '.'
   end
   # rubocop:enable Metrics/AbcSize

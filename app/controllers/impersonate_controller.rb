@@ -53,43 +53,39 @@ class ImpersonateController < ApplicationController
           redirect_back
           return
         end
-      else
         # Impersonate a new account
-        if !params[:impersonate][:name].empty?
-          # check if special chars /\?<>|&$# are used to avoid html tags or system command
-          if warn_for_special_chars(params[:impersonate][:name], "Username")
-            redirect_back
-            return
-          end
-          user = User.find_by(name: params[:impersonate][:name])
-          if user
-            unless original_user.can_impersonate? user
-              flash[:error] = "You cannot impersonate #{params[:user][:name]}."
-              redirect_back
-              return
-            end
-            AuthController.clear_user_info(session, nil)
-            session[:user] = user
-            session[:impersonate] =  true
-            session[:original_user] = original_user
-          else
-            flash[:error] = message
-            redirect_back
-            return
-          end
-          # Revert to original account
-        else
-          if !session[:super_user].nil?
-            AuthController.clear_user_info(session, nil)
-            session[:user] = session[:super_user]
-            user = session[:user]
-            session[:super_user] = nil
-          else
-            flash[:error] = "No original account was found. Please close your browser and start a new session."
-            redirect_back
-            return
-          end
+      elsif !params[:impersonate][:name].empty?
+        # check if special chars /\?<>|&$# are used to avoid html tags or system command
+        if warn_for_special_chars(params[:impersonate][:name], "Username")
+          redirect_back
+          return
         end
+        user = User.find_by(name: params[:impersonate][:name])
+        if user
+          unless original_user.can_impersonate? user
+            flash[:error] = "You cannot impersonate #{params[:user][:name]}."
+            redirect_back
+            return
+          end
+          AuthController.clear_user_info(session, nil)
+          session[:user] = user
+          session[:impersonate] = true
+          session[:original_user] = original_user
+        else
+          flash[:error] = message
+          redirect_back
+          return
+        end
+        # Revert to original account
+      elsif !session[:super_user].nil?
+        AuthController.clear_user_info(session, nil)
+        session[:user] = session[:super_user]
+        user = session[:user]
+        session[:super_user] = nil
+      else
+        flash[:error] = "No original account was found. Please close your browser and start a new session."
+        redirect_back
+        return
       end
       # Navigate to user's home location
       AuthController.set_current_role(user.role_id, session)

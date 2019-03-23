@@ -166,11 +166,11 @@ class Assessment360Controller < ApplicationController
     score.nil? ? '-' : score
   end
 
-  def calculate_avg_grade(review_info_per_stu, review, cp.id)
-    temp_avg_grade = review_info_per_stu[0] * 1.0 / review_info_per_stu[1]
-    review[cp.id][:avg_grade_for_assgt] = temp_avg_grade.round.to_s + '%'
-  end
-  
   helper_method :format_score
   helper_method :format_topic
+end
+
+def calculate_avg_grade(review_info_per_stu, review, cp.id)
+  temp_avg_grade = review_info_per_stu[0] * 1.0 / review_info_per_stu[1]
+  review[cp.id][:avg_grade_for_assgt] = temp_avg_grade.round.to_s + '%'
 end

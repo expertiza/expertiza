@@ -23,7 +23,7 @@ class TeamsController < ApplicationController
     @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == 'Assignment'
     begin
       if allowed_types.include? session[:team_type]
-        team_type_holder = allowed_types.select {|type| type == session[:team_type]}
+        team_type_holder = allowed_types.select { |type| type == session[:team_type] }
         @root_node = Object.const_get(team_type_holder + 'Node').find_by(node_object_id: params[:id])
         @child_nodes = @root_node.get_teams
       end

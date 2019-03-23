@@ -52,7 +52,7 @@ class TeamsUsersController < ApplicationController
           url_for controller: 'participants', action: 'list', id: course.id, model: 'Course', authorization: 'participant'
         flash[:error] =
           "\"#{user.name}\" is not a participant"\
-          "of the current course."\ 
+          "of the current course."\
           "Please <a href=\"#{url_course_participant_list}\">add</a> this user before continuing."
       else
         add_member_return = team.add_member(user)

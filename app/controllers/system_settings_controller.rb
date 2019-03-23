@@ -49,12 +49,9 @@ class SystemSettingsController < ApplicationController
 
   def update
     @system_settings = SystemSettings.find(params[:id])
-    if @system_settings.update_attributes(system_settings_params)
-      flash[:notice] = 'The system settings have been successfully updated.'
-      redirect_to action: 'show', id: @system_settings
-    else
-      render action: 'edit'
-    end
+    render action: 'edit' unless @system_settings.update_attributes(system_settings_params)
+    flash[:notice] = 'The system settings have been successfully updated.'
+    redirect_to action: 'show', id: @system_settings
   end
 
   def destroy

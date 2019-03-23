@@ -55,8 +55,6 @@ class SurveyDeploymentController < ApplicationController
   def param_test
     params.require(:survey_deployment).permit(:questionnaire_id, :start_date, :end_date, :parent_id)
   end
-
-
   def create
     if params[:add_global_survey]
       global = GlobalSurveyQuestionnaire.find_by(private: false)

@@ -217,7 +217,7 @@ class ResponseController < ApplicationController
     elsif params[:return] == "selfreview"
       redirect_to controller: 'submitted_content', action: 'edit', id: @map.response_map.reviewer_id
     elsif params[:return] == "survey"
-      redirect_to controller: 'response', action: 'pending_surveys'
+      redirect_to controller: 'survey_deployment', action: 'pending_surveys'
     else
       redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
     end
@@ -233,7 +233,6 @@ class ResponseController < ApplicationController
     @assignment_questionnaire = AssignmentQuestionnaire.where(["assignment_id = ? and questionnaire_id IN (?)", @assignment.id, @review_questionnaire_ids]).first
     @questions = @assignment_questionnaire.questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }
   end
-  
 
   private
 
@@ -257,7 +256,6 @@ class ResponseController < ApplicationController
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
   end
-
   # assigning the instance variables for Edit and New actions
   def assign_instance_vars
     case params[:action]

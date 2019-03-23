@@ -147,14 +147,16 @@ class Assessment360Controller < ApplicationController
       avg_grades = (grades * 1.0 / reviews.count).round
       hash_per_stu[course_participant.id][assignment.id] = avg_grades.to_s + '%'
     end
-    if avg_grades and grades > 0
+
+    # if avg_grades and grades > 0
+      return unless avg_grades and grades > 0
       # for each assignment
       review_info_per_stu[0] += avg_grades
       review_info_per_stu[1] += 1
       # for course
       overall_review_grade_hash[assignment.id] += avg_grades
       overall_review_count_hash[assignment.id] += 1
-    end
+    # end
   end
 
   # The peer review score is taken from the questions for the assignment

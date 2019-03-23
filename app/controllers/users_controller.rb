@@ -55,7 +55,7 @@ class UsersController < ApplicationController
     redis.set('anonymized_view_starter_ips', anonymized_view_starter_ips)
     redirect_to :back
   end
-  
+
   #
   # create a local instance of Redis variable
   #
@@ -206,7 +206,7 @@ class UsersController < ApplicationController
       end
     elsif requested_user.status == "Rejected"
       # If the user request has been rejected, a flash message is shown and redirected to review page
-      if requested_user.update_columns(status: params[:status])
+      if requested_user.update_attributes(status: params[:status])
         flash[:success] = "The user \"#{requested_user.name}\" has been Rejected."
         redirect_to action: 'list_pending_requested'
         return

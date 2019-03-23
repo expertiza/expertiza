@@ -45,22 +45,15 @@ class UsersController < ApplicationController
   # for anonymized view for demo purposes
   #
   def set_anonymized_view
-    anonymized_view_starter_ips = redis.get('anonymized_view_starter_ips') || ''
+    anonymized_view_starter_ips = $redis.get('anonymized_view_starter_ips') || ''
     session[:ip] = request.remote_ip
     if anonymized_view_starter_ips.include? session[:ip]
       anonymized_view_starter_ips.delete!(" #{session[:ip]}")
     else
       anonymized_view_starter_ips += " #{session[:ip]}"
     end
-    redis.set('anonymized_view_starter_ips', anonymized_view_starter_ips)
+    $redis.set('anonymized_view_starter_ips', anonymized_view_starter_ips)
     redirect_to :back
-  end
-
-  #
-  # create a local instance of Redis variable
-  #
-  def redis
-    Redis.current
   end
 
   # for displaying the list of users
@@ -77,7 +70,7 @@ class UsersController < ApplicationController
   def show_selection
     @user = User.find_by(name: params[:user][:name])
     if !@user.nil?
-      getrole
+      get_role
       if @role.parent_id.nil? || @role.parent_id < session[:user].role_id || @user.id == session[:user].id
         render action: 'show'
       else
@@ -95,7 +88,7 @@ class UsersController < ApplicationController
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
       @user = User.find(params[:id])
-      getrole
+      get_role
       # obtain number of assignments participated
       @assignment_participant_num = 0
       AssignmentParticipant.where(user_id: @user.id).each {|_participant| @assignment_participant_num += 1 }
@@ -182,7 +175,7 @@ class UsersController < ApplicationController
     requested_user.status = params[:status]
     if requested_user.status.nil?
       flash[:error] = "Please Approve or Reject before submitting"
-    elsif requested_user.update_attributes(user_params)
+    elsif requested_user.update_attributes(params[:user])
       flash[:success] = "The user \"#{requested_user.name}\" has been successfully updated."
     end
     if requested_user.status == "Approved"
@@ -206,7 +199,7 @@ class UsersController < ApplicationController
       end
     elsif requested_user.status == "Rejected"
       # If the user request has been rejected, a flash message is shown and redirected to review page
-      if requested_user.update_attributes(status: params[:status])
+      if requested_user.update_columns(status: params[:status])
         flash[:success] = "The user \"#{requested_user.name}\" has been Rejected."
         redirect_to action: 'list_pending_requested'
         return
@@ -219,19 +212,19 @@ class UsersController < ApplicationController
 
   def edit
     @user = User.find(params[:id])
-    getrole
+    get_role
     foreign
   end
 
   def update
-    # params.permit!
+    params.permit!
     @user = User.find params[:id]
     # update username, when the user cannot be deleted
     # rename occurs in 'show' page, not in 'edit' page
     # eg. /users/5408?name=5408
     @user.name += '_hidden' if request.original_fullpath == "/users/#{@user.id}?name=#{@user.id}"
 
-    if @user.update_attributes(user_params)
+    if @user.update_attributes(params[:user])
       flash[:success] = "The user \"#{@user.name}\" has been successfully updated."
       redirect_to @user
     else
@@ -307,7 +300,7 @@ class UsersController < ApplicationController
           .merge(self_introduction: params[:requested_user][:self_introduction])
   end
 
-  def getrole
+  def get_role
     if @user && @user.role_id
       @role = Role.find(@user.role_id)
     elsif @user

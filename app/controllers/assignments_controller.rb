@@ -374,6 +374,6 @@ class AssignmentsController < ApplicationController
   end
 
   def assignment_form_params
-    params.require(:assignment_form).permit!
+    params.require(:assignment_form, :without_protection => true).permit!
   end
 end

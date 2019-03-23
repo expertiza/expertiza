@@ -9,7 +9,7 @@ module QuizAssignment
 
     # Reject contributions of topics whose deadline has passed
     contributor_set.reject! do |contributor|
-      contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "Complete" or
+      contributor.assignment.finished?(signed_up_topic(contributor).id) or
           contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "submission"
     end
 

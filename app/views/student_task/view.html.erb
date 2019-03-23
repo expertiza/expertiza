@@ -102,7 +102,7 @@ to display the label "Your team" in the student assignment tasks-->
       <li><%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
     <% end %>
 
-    <% if @assignment.get_current_stage(@topic_id) == "Complete" %>
+    <% if @assignment.finished?(@topic_id) %>
       <!-- removed code for survey assignment add in line above && SurveyHelper::is_user_eligible_for_survey?	(@assignment.id, session[:user].id)  -->
       <li><%= link_to "Take a survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id} %> (This will log you out)</li>
     <% end %>

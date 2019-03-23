@@ -43,10 +43,10 @@ class Assessment360Controller < ApplicationController
         next if assignment_participant.nil?
         teammate_reviews = assignment_participant.teammate_reviews
         meta_reviews = assignment_participant.metareviews
-        populate_hash_for_all_students_all_reviews(assignment,cp,teammate_reviews,@teammate_review,@overall_teammate_review_grades,
-                                                   @overall_teammate_review_count,@teammate_review_info_per_stu)
-        populate_hash_for_all_students_all_reviews(assignment,cp,meta_reviews,@meta_review,@overall_meta_review_grades,
-                                                  @overall_meta_review_count,@meta_review_info_per_stu)
+        populate_hash_for_all_students_all_reviews(assignment, cp, teammate_reviews, @teammate_review, @overall_teammate_review_grades,
+                                                   @overall_teammate_review_count, @teammate_review_info_per_stu)
+        populate_hash_for_all_students_all_reviews(assignment,cp,meta_reviews, @meta_review, @overall_meta_review_grades,
+                                                   @overall_meta_review_count, @meta_review_info_per_stu)
       end
       # calculate average grade for each student on all assignments in this course
       if @teammate_review_info_per_stu[1] > 0

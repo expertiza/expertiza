@@ -8,10 +8,9 @@ class TagPromptsController < ApplicationController
   # GET /tag_prompts/view
   def show
     @popup = false
-    if params.key?(:popup) and params[:popup].to_s.casecmp('true').zero?
-      @popup = true
-      render layout: false
-    end
+    return unless params.key?(:popup) and params[:popup].to_s.casecmp('true').zero?
+    @popup = true
+    render layout: false
   end
 
   def index

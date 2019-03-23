@@ -70,10 +70,20 @@ class SystemSettingsController < ApplicationController
     @markup_styles = MarkupStyle.order('name')
     @markup_styles.unshift MarkupStyle.new(id: nil, name: '(none)')
   end
-end
 
-private
+  private
 
-def system_settings_params
-  params.require(:system_settings)
+  def system_settings_params
+    params.require(:system_settings).permit(:site_name,
+                                            :site_subtitle,
+                                            :footer_message,
+                                            :public_role_id,
+                                            :session_timeout,
+                                            :default_markup_style_id,
+                                            :site_default_page_id,
+                                            :not_found_page_id,
+                                            :permission_denied_page_id,
+                                            :session_expired_page_id,
+                                            :menu_depth)
+  end
 end

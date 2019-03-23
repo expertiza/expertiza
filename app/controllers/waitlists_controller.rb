@@ -52,10 +52,10 @@ class WaitlistsController < ApplicationController
     Waitlist.find(params[:id]).destroy
     redirect_to action: 'list'
   end
-end
 
-private
+  private
 
-def waitlist_params
-  params.require(:waitlist)
+  def waitlist_params
+    params.require(:waitlist).permit(:id, :page)
+  end
 end

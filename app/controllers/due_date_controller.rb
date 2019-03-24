@@ -39,7 +39,7 @@ class DueDateController < ApplicationController
       return
     end
 
-    due_at = DateTime.parse(params[:due_at])
+    due_at = Date.parse(params[:due_at])
     if due_at.nil?
       flash[:error] = "You need to specify all due dates and times."
       return

@@ -18,7 +18,7 @@ class AuthController < ApplicationController
     if request.get?
       AuthController.clear_session(session)
     else
-      user = User.find_by_login(params[:login][:name])
+      user = User.find_by(params[:login][:name])
       if user and user.valid_password?(params[:login][:password])
         after_login(user)
       else
@@ -27,8 +27,9 @@ class AuthController < ApplicationController
         redirect_to controller: 'password_retrieval', action: 'forgotten'
       end
     end
-  end # def login
+  end
 
+  # def login
   # function to handle common functionality for conventional user login and google login
   def after_login(user)
     session[:user] = user
@@ -88,8 +89,9 @@ class AuthController < ApplicationController
       if check_controller
         authorised = true if session[:credentials].controllers.key?(params[:controller]) and session[:credentials].controllers[params[:controller]]
       end
-    end # Check permissions
+    end
 
+    # Check permissions
     ExpertizaLogger.info "Authorised? #{authorised}, check_controller? #{check_controller}"
     authorised
   end
@@ -101,16 +103,15 @@ class AuthController < ApplicationController
   end
 
   def self.set_current_role(role_id, session)
-    if role_id
-      role = Role.find role_id
-      if role
-        Role.rebuild_cache if !role.cache || !role.cache.try(:has_key?, :credentials)
-        session[:credentials] = role.cache[:credentials]
-        session[:menu] = role.cache[:menu]
-        ExpertizaLogger.info "Logging in user as role #{session[:credentials].class}"
-      else
-        ExpertizaLogger.error "Something went seriously wrong with the role."
-      end
+    return unless role_id
+    role = Role.find role_id
+    if role
+      Role.rebuild_cache if !role.cache || !role.cache.try(:has_key?, :credentials)
+      session[:credentials] = role.cache[:credentials]
+      session[:menu] = role.cache[:menu]
+      ExpertizaLogger.info "Logging in user as role #{session[:credentials].class}"
+    else
+      ExpertizaLogger.error "Something went seriously wrong with the role."
     end
   end
 

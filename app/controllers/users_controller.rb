@@ -57,54 +57,46 @@ class UsersController < ApplicationController
   end
 
 
+  #E1914
+  # Scenarios in which show_selection is called:
+  #   in users/list.html.erb, a list of users is shown. On top of the list there is a functionality to search the list.
+  #   When a person searches for a particular student, and selects that student, the show_selection method is called.
+  #   If the person is allowed to see that student, the user is directed to the show() method.
+  #   Otherwise the person stays on the list view.
+  # Scenarios in which show() is called:
+  #   From the edit.html.erb, if the person wants to see the information instead of editing it.
+  #   From show_selection() as desribed in the above comments.
 
-  # Differences between show _selection and show:
-  #   The key difference between show_selection and the show methods is in how they determine whether the current user has the authority to delete/edit a selected user
-  #   The show method only checks if the current user is not a student or him/herself. It assumes that all other roles are authorised to edit/delete the information of all users.
-  #   The show_selection method allows access only if the current user is higher up the hierarchy of roles than the user s/he is requesting to edit.
-  # The show method additionally calculates the number of total users and the number of groups the user is participating in.
-  # These numbers are used in the show view to display appropriate warning messages when deleting a user.
-
-  # determines if the current user is authorised to see/edit the information of the user in params.
-  # the test used to determine is whether the current user is higher up the hierarchy of roles than the user s/he is requesting to edit.
-  # If these permissions check out, the user is redirected to the 'show' view
-  # If these checks come out negative, the user to given an error message and redirected to a list of all users.
   def show_selection
     @user = User.find_by(name: params[:user][:name])
-    #make sure that the requested user exists
     if !@user.nil?
       role
       # if the role is higher in the hierarchy, permission is granted
       if @role.parent_id.nil? || @role.parent_id < session[:user].role_id || @user.id == session[:user].id
         render action: 'show'
       else
-        #else redirect with an error message
         flash[:note] = 'The specified user is not available for editing.'
         redirect_to action: 'list'
       end
-      #redirect to the list of users if the user does not exist.
     else
       flash[:note] = params[:user][:name] + ' does not exist.'
       redirect_to action: 'list'
     end
   end
 
-
-  #finds out the current user's role. If that is not a a student, permission is granted to edit the information of the requested user.
+  #E1914
+  #finds out the current user's role.
+  # If that is not a a student, permission is granted to edit the information of the requested user.
   def show
     # if permission is not granted, the current user is redirected to home.
     if params[:id].nil? || ((current_user_role? == "Student") && (session[:user].id != params[:id].to_i))
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
-      #find the users information from the model.
       @user = User.find(params[:id])
       role
-      # obtain number of assignments participated
       @assignment_participant_num = 0
       AssignmentParticipant.where(user_id: @user.id).each {|_participant| @assignment_participant_num += 1 }
-      # judge whether this user become reviewer or reviewee
       @maps = ResponseMap.where('reviewee_id = ? or reviewer_id = ?', params[:id], params[:id])
-      # count the number of users in DB
       @total_user_num = User.count
     end
   end
@@ -194,10 +186,10 @@ class UsersController < ApplicationController
 
   protected
 
+  #E1914
   # finds the list of roles that the current user can have
   # used to display a dropdown selection of roles for the current user in the views
   def foreign
-    # finds what the role of the current user is.
     role = Role.find(session[:user].role_id)
 
     # this statement finds a list of roles that the current user can have
@@ -232,7 +224,12 @@ class UsersController < ApplicationController
                                  :institution_id)
   end
 
-
+  #E1914
+  # It was not preferred to move this method to the model because this has some selection logic and
+  # that should not be placed in the model.
+  # this follows the style guideline that anything that does not alter the data structure
+  # should not be placed in the model.
+  # This method was previously named get_role but is now renamed to role.
   def role
     if @user && @user.role_id
       @role = Role.find(@user.role_id)

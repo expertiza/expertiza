@@ -61,20 +61,17 @@ class UsersController < ApplicationController
   # Differences between show _selection and show:
   #   The key difference between show_selection and the show methods is in how they determine whether the current user has the authority to delete/edit a selected user
   #   The show method only checks if the current user is not a student or him/herself. It assumes that all other roles are authorised to edit/delete the information of all users.
-  #   The show_selection method allows access only if the current user is higher up the hierarchy of roles than the user s/he is requesting to edit.
-  # The show method additionally calculates the number of total users and the number of groups the user is participating in.
-  # These numbers are used in the show view to display appropriate warning messages when deleting a user.
 
   # determines if the current user is authorised to see/edit the information of the user in params.
   # the test used to determine is whether the current user is higher up the hierarchy of roles than the user s/he is requesting to edit.
   # If these permissions check out, the user is redirected to the 'show' view
   # If these checks come out negative, the user to given an error message and redirected to a list of all users.
+
+  # show_selection is called from app/views/users/list.html.erb
   def show_selection
     @user = User.find_by(name: params[:user][:name])
-    #make sure that the requested user exists
     if !@user.nil?
       role
-      # if the role is higher in the hierarchy, permission is granted
       if @role.parent_id.nil? || @role.parent_id < session[:user].role_id || @user.id == session[:user].id
         render action: 'show'
       else
@@ -91,6 +88,7 @@ class UsersController < ApplicationController
 
 
   #finds out the current user's role. If that is not a a student, permission is granted to edit the information of the requested user.
+  # The show method is being called from app/views/users/show.html.erb
   def show
     # if permission is not granted, the current user is redirected to home.
     if params[:id].nil? || ((current_user_role? == "Student") && (session[:user].id != params[:id].to_i))

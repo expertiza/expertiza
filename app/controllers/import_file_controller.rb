@@ -56,7 +56,9 @@ class ImportFileController < ApplicationController
 
   def import
     errors = import_from_hash(session, params)
-    err_msg = "The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>"
+    err_msg = "The following errors were encountered during import.
+              <br/>Other records may have been added.
+              A second submission will not duplicate these records.<br/><ul>"
     errors.each do |error|
       err_msg = err_msg + "<li>" + error.to_s + "<br/>"
     end
@@ -70,18 +72,6 @@ class ImportFileController < ApplicationController
     end
     redirect_to session[:return_to]
   end
-
-  # def import
-  #   errors = importFile(session, params)
-  #   err_msg = "The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>"
-  #   errors.each do |error|
-  #     err_msg = err_msg + "<li>" + error.to_s + "<br/>"
-  #   end
-  #   err_msg += "</ul>"
-  #   flash[:error] = err_msg unless errors.empty?
-  #   undo_link("The file has been successfully imported.")
-  #   redirect_to session[:return_to]
-  # end
 
   def import_from_hash(session, params)
     if params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
@@ -127,19 +117,19 @@ class ImportFileController < ApplicationController
     elsif params[:model] == 'SignUpTopic' || params[:model] == 'SignUpSheet'
       contents_hash = eval(params[:contents_hash])
       if params[:has_header] == 'true'
-        @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
+        @header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
       elsif params[:optional_count] == '0'
         new_header = [params[:select1], params[:select2], params[:select3]]
-        @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
+        @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
       elsif params[:optional_count] == '1'
         new_header = [params[:select1], params[:select2], params[:select3], params[:select4]]
-        @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
+        @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
       elsif params[:optional_count] == '2'
         new_header = [params[:select1], params[:select2], params[:select3], params[:select4], params[:select5]]
-        @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
+        @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
       elsif params[:optional_count] == '3'
         new_header = [params[:select1], params[:select2], params[:select3], params[:select4], params[:select5], params[:select6]]
-        @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
+        @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
       end
       errors = []
       begin
@@ -208,9 +198,10 @@ class ImportFileController < ApplicationController
         new_body << header.zip(row).to_h
       end
     elsif params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
-      header.map! {|column_name| column_name.to_sym}
+      # header.map! { |column_name| column_name.to_sym }
+      header.map! (&:to_sym)
       body.each do |row|
-        h = Hash.new()
+        h = Hash.new
         if params[:has_teamname] == "true_first"
           h[header[0]] = row.shift
           h[header[1]] = row
@@ -223,9 +214,10 @@ class ImportFileController < ApplicationController
         new_body << h
       end
     elsif params[:model] == "ReviewResponseMap"
-      header.map! { |column_name| column_name.to_sym }
+      # header.map! { |column_name| column_name.to_sym }
+      header.map! (&:to_sym)
       body.each do |row|
-        h = Hash.new()
+        h = Hash.new
         if params[:has_reviewee] == "true_first"
           h[header[0]] = row.shift
           h[header[1]] = row
@@ -238,9 +230,10 @@ class ImportFileController < ApplicationController
         new_body << h
       end
     elsif params[:model] == "MetareviewResponseMap"
-      header.map! { |column_name| column_name.to_sym }
+      # header.map! { |column_name| column_name.to_sym }
+      header.map!(&:to_sym)
       body.each do |row|
-        h = Hash.new()
+        h = Hash.new
         if params[:has_reviewee] == "true_first"
           h[header[0]] = row.shift
           h[header[1]] = row.shift

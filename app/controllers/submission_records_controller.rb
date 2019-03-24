@@ -4,14 +4,12 @@ class SubmissionRecordsController < ApplicationController
   before_action :set_submission_record, only: %i[show edit update destroy]
 
   def action_allowed?
-    # E1915 TODO: instead, use helper method(s) from app/helpers/authorization_helper.rb
     # currently we only have a index method which shows all the submission records given a team_id
     assignment_team = AssignmentTeam.find(params[:team_id])
     assignment = Assignment.find(assignment_team.parent_id)
     return true if current_user_has_admin_privileges?
-    return true if assignment.instructor_id == current_user.id
-    return true if TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course_id) && (TaMapping.where(course_id: assignment.course_id).include? TaMapping.where(ta_id: current_user.id, course_id: assignment.course_id).first)
-    return true if assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.id
+    return true if current_user_instructs_assignment?(assignment)
+    return true if current_user_has_ta_mapping_for_assignment?(assignment)
     false
   end
 

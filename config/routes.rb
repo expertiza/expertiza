@@ -466,13 +466,14 @@ resources :institution, except: [:destroy] do
     end
   end
 
-  resources :account_requests do
+  resources :account_requests, constraints: {id: /\d+/} do
     collection do
       get :list_pending_requested
       post :create_requested_user_record
       post :create_approved_user
     end
   end
+
 
 
   resources :user_pastebins

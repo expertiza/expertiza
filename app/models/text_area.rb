@@ -11,13 +11,13 @@ class TextArea < TextResponse
     end
     text_area_text = answer.comments unless answer.nil?
     capture do
-      content_tag(:p, content_tag(:label, self.txt, {for: 'responses_' + count.to_s}, false), {}, false)
-      tag(:input, {id: 'responses_' + count.to_s + '_score', name: 'responses[' + count.to_s + '][score]',
-                   type: "hidden", value: ""}, true, false)
-      content_tag(:p,
-                  content_tag(:textarea, text_area_text, {cols: cols, rows: rows, id: 'responses_' + count.to_s + '_comments',
-                                                          name: 'responses[' + count.to_s + '][comment]', class: "tinymce"}, false),
-                  {}, false)
+      concat content_tag(:p, content_tag(:label, self.txt, {for: 'responses_' + count.to_s}, false), {}, false)
+      concat tag(:input, {id: 'responses_' + count.to_s + '_score', name: 'responses[' + count.to_s + '][score]',
+                          type: "hidden", value: ""}, true, false)
+      concat content_tag(:p,
+                          content_tag(:textarea, text_area_text, {cols: cols, rows: rows, id: 'responses_' + count.to_s + '_comments',
+                                                                  name: 'responses[' + count.to_s + '][comment]', class: "tinymce"}, false),
+                          {}, false)
     end
   end
 
@@ -26,13 +26,12 @@ class TextArea < TextResponse
     # html += '&nbsp;' * 8 + answer.comments.gsub('^p', '').gsub(/\n/, '<BR/>') + #'<BR/><BR/>'
     # html
 
-    answer_comments = '&nbsp;' * 8 + answer.comments.gsub('^p', '').gsub(/\n/, '<BR/>')
     capture do
-      content_tag(:b, count.ts_s + ". " + self.txt, {}, false)
-      content_tag(nil, answer_comments, {}, false)
-      tag("br")
-      tag("br")
-      tag("br")
+      concat content_tag(:b, count.ts_s + ". " + self.txt, {}, false)
+      concat tag("br")
+      concat '&nbsp;' * 8 + answer.comments.gsub('^p', '').gsub(/\n/, '<BR/>')
+      concat tag("br")
+      concat tag("br")
     end
   end
 end

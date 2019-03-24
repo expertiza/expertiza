@@ -172,4 +172,15 @@ module AssignmentHelper
       redirect_to edit_assignment_path @assignment.id
     end
   end
+
+  # used to be check_due_date_nameurl_not_empty
+  # Setting various variables with boolean values
+  def check_due_date_nameurl(dd)
+    @due_date_nameurl_not_empty = due_date_nameurl_not_empty?(dd)
+    @due_date_nameurl_not_empty_checkbox = @due_date_nameurl_not_empty
+    @metareview_allowed = meta_review_allowed?(dd)
+    @drop_topic_allowed = drop_topic_allowed?(dd)
+    @signup_allowed = signup_allowed?(dd)
+    @team_formation_allowed = team_formation_allowed?(dd)
+  end
 end

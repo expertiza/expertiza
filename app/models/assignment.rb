@@ -350,8 +350,8 @@ class Assignment < ActiveRecord::Base
   # Zhewei: this method is almost the same as 'stage_deadline'
   def get_current_stage_name(topic_id = nil)
     return 'Unknown' if topic_missing?(topic_id)
-    deadline_type_id = DueDate.get_next_due_date(self.id, topic_id).deadline_type_id
-     finished?(topic_id)? "Finished" : DeadlineType.find(deadline_type_id).name
+    due_date = DueDate.get_next_due_date(self.id, topic_id)
+     finished?(topic_id)? "Finished" : DeadlineType.find(due_date.deadline_type_id).name
   end
 
 

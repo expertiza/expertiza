@@ -14,23 +14,23 @@ class TextField < TextResponse
   end
 
   def view_completed_question(count, answer)
+    # html = '<b>' + count.to_s + ". " + self.txt + "</b>"
+    # html += '&nbsp;&nbsp;&nbsp;&nbsp;'
+    # html += answer.comments.to_s
+    # html += '<BR/><BR/>' if Question.exists?(answer.question_id + 1) && Question.find(answer.question_id + 1).break_before
     html = if self.type == 'TextField' and self.break_before
-      # html = '<b>' + count.to_s + ". " + self.txt + "</b>"
-      # html += '&nbsp;&nbsp;&nbsp;&nbsp;'
-      # html += answer.comments.to_s
-      # html += '<BR/><BR/>' if Question.exists?(answer.question_id + 1) && Question.find(answer.question_id + 1).break_before
-      capture do
-        concat content_tag(:b, count.to_s + ". " + self.txt, {}, false)
-        concat '&nbsp;&nbsp;&nbsp;&nbsp;' + answer.comments.to_s
-        concat tag('br') if Question.exists?(answer.question_id + 1) && Question.find(answer.question_id + 1).break_before
-        concat tag('br') if Question.exists?(answer.question_id + 1) && Question.find(answer.question_id + 1).break_before
-      end
-    else
-      capture do
-        concat self.txt + answer.comments
-        concat tag("br")
-        concat tag("br")
-      end
-    end
+             capture do
+               concat content_tag(:b, count.to_s + ". " + self.txt, {}, false)
+               concat '&nbsp;&nbsp;&nbsp;&nbsp;' + answer.comments.to_s
+               concat tag('br') if Question.exists?(answer.question_id + 1) && Question.find(answer.question_id + 1).break_before
+               concat tag('br') if Question.exists?(answer.question_id + 1) && Question.find(answer.question_id + 1).break_before
+             end
+           else
+             capture do
+               concat self.txt + answer.comments
+               concat tag("br")
+               concat tag("br")
+             end
+           end
   end
 end

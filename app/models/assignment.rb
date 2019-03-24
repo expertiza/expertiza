@@ -585,9 +585,8 @@ class Assignment < ActiveRecord::Base
   def find_due_dates(type)
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: type).id }
   end
-
-
-  # New functions during refactoring below
+  
+  # New function to check if the assignment is finished
   def finished?( topic_id = nil )
     DueDate.get_next_due_date(self.id, topic_id).nil?
   end

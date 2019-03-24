@@ -404,23 +404,4 @@ class AssignmentsController < ApplicationController
     @signup_allowed = signup_allowed?(dd)
     @team_formation_allowed = team_formation_allowed?(dd)
   end
-
-  # helper methods for update
-  # used to be assignment_form_key_nonexist_case_handler
-  # Finds assignment and course id, if the assignment is savable then flash and log
-  # If it is not savable then flash and log appropriately
-  def assignment_submission_handler
-    @assignment = Assignment.find(params[:id])
-    @assignment.course_id = params[:course_id]
-
-    if @assignment.save
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "The assignment was successfully saved: #{@assignment.as_json}", request)
-      flash[:note] = 'The assignment was successfully saved.'
-      redirect_to list_tree_display_index_path
-    else
-      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Failed assignment: #{@assignment.errors.full_messages.join(' ')}", request)
-      flash[:error] = "Failed to save the assignment: #{@assignment.errors.full_messages.join(' ')}"
-      redirect_to edit_assignment_path @assignment.id
-    end
-  end
 end

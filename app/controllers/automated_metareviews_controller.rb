@@ -8,11 +8,15 @@ class AutomatedMetareviewsController < ApplicationController
   # or student in the course should be able to access this controller
   def action_allowed?
     assignment = find_assignment_from_response_id(params[:id])
-    instructor = find_assignment_instructor(assignment)
 
-    current_user_teaching_staff_of_assignment?(assignment.id) ||
-        current_user_ancestor_of?(instructor) ||
-        current_user_is_assignment_participant?(assignment.id)
+    if assignment
+      instructor = find_assignment_instructor(assignment)
+      current_user_teaching_staff_of_assignment?(assignment.id) ||
+          current_user_ancestor_of?(instructor) ||
+          current_user_is_assignment_participant?(assignment.id)
+    else
+      false
+    end
   end
 
   def index

@@ -338,4 +338,3 @@ class ResponseController < ApplicationController
     end
   end
 end
-

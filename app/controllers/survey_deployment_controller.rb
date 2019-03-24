@@ -55,6 +55,7 @@ class SurveyDeploymentController < ApplicationController
   def param_test
     params.require(:survey_deployment).permit(:questionnaire_id, :start_date, :end_date, :parent_id)
   end
+
   def create
     if params[:add_global_survey]
       global = GlobalSurveyQuestionnaire.find_by(private: false)
@@ -139,10 +140,8 @@ class SurveyDeploymentController < ApplicationController
       redirect_to '/'
       return
     end
-    # Get all the course survey deployments for this user
-    @surveys = []
-    [CourseParticipant, AssignmentParticipant].each do |participant_type|
-      # Get all the participant(course or assignment) entries for this user
+    @surveys = [] # Get all the course survey deployments for this user
+    [CourseParticipant, AssignmentParticipant].each do |participant_type| # Get all the participant(course or assignment) entries for this user
       participants = participant_type.where(user_id: session[:user].id)
       next unless participants
       participants.each do |p|
@@ -152,19 +151,18 @@ class SurveyDeploymentController < ApplicationController
         survey_deployments.each do |survey_deployment|
           next unless survey_deployment && Time.zone.now > survey_deployment.start_date && Time.zone.now < survey_deployment.end_date
           @surveys <<
-              [
-                  'survey' => Questionnaire.find(survey_deployment.questionnaire_id),
-                  'survey_deployment_id' => survey_deployment.id,
-                  'start_date' => survey_deployment.start_date,
-                  'end_date' => survey_deployment.end_date,
-                  'parent_id' => p.parent_id,
-                  'participant_id' => p.id,
-                  'global_survey_id' => survey_deployment.global_survey_id
-              ]
+              ['survey' => Questionnaire.find(survey_deployment.questionnaire_id),
+               'survey_deployment_id' => survey_deployment.id,
+               'start_date' => survey_deployment.start_date,
+               'end_date' => survey_deployment.end_date,
+               'parent_id' => p.parent_id,
+               'participant_id' => p.id,
+               'global_survey_id' => survey_deployment.global_survey_id]
         end
       end
     end
   end
+
   # This method should be moved to survey_deployment_controller.rb
   def view_responses
     sd = SurveyDeployment.find(params[:id])

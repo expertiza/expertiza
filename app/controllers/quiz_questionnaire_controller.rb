@@ -245,7 +245,4 @@ class QuizQuestionnaireController < QuestionnairesController
     params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score,
                                           :max_question_score, :type, :display_type, :instruction_loc)
   end
-
-
-#-------Nitin: end of private methods
 end

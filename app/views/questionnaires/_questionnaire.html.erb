@@ -73,12 +73,6 @@
     <hr/>
         <%= link_to 'Import Questionnaire', :controller=>'import_file', :action=>'start', :model => 'Question', :id=> @questionnaire.id, :expected_fields => 'txt, type ,seq,size, break_before' %>|
         <%= link_to 'Export Questionnaire', :controller=>'export_file',:action=>'start',:model=> 'Question',:id=> @questionnaire.id %>
-    <!--<h4>Import/Export (from/to CSV format)</h4>
-    <input type="file" name="csv" />
-    <br />
-    <input type="submit" name="import" value="Import questions"/>
-    <br />
-    <input type="submit" name="export" value="Export questions to CSV"%>-->
   <% end %>
 <% end %>
 

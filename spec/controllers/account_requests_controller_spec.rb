@@ -2,12 +2,6 @@ describe AccountRequestsController do
   let(:admin) { build(:admin, id: 3) }
   let(:super_admin) {build (:superadmin)}
   let(:instructor) { build(:instructor, id: 2) }
-  let(:student1) { build(:student, id: 1, name: :lily) }
-  let(:student2) { build(:student) }
-  let(:student3) { build(:student, id: 10, role_id: 1, parent_id: nil) }
-  let(:student4) { build(:student, id: 20, role_id: 4) }
-  let(:student5) { build(:student, role_id: 4, parent_id: 3) }
-  let(:student6) { build(:student, role_id: nil, name: :lilith)}
 
   let(:institution1) {build(:institution, id: 1)}
   let(:requested_user1) {AccountRequest.new id: 4, name: 'requester1', role_id: 2, fullname: 're, requester1',
@@ -27,14 +21,7 @@ describe AccountRequestsController do
     end
   end
 
-  context "#request new" do
-    it '1' do
-      allow(Role).to receive(:find_by).with(name: 'instructor').and_return('instructor')
-      params = {role: 'instructor'}
-      post :request_new, params
-      expect(response).to render_template(:request_new)
-    end
-  end
+
 
   context "#create_requested_user_record" do
     it 'if user not exists and requested user is saved' do
@@ -155,6 +142,15 @@ describe AccountRequestsController do
       expect(flash[:success]).to eq 'The user "requester1" has been successfully updated.'
       expect(flash[:error]).to eq 'Error processing request.'
       expect(response).to redirect_to('http://test.host/account_requests/list_pending_requested')
+    end
+  end
+
+  context "#request new" do
+    it '1' do
+      allow(Role).to receive(:find_by).with(name: 'instructor').and_return('instructor')
+      params = {role: 'instructor'}
+      post :request_new, params
+      expect(response).to render_template(:request_new)
     end
   end
 

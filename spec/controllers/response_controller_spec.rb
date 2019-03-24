@@ -286,10 +286,10 @@ describe ResponseController do
     end
 
     context 'when params[:return] is survey' do
-      it 'redirects to response#pending_surveys page' do
+      it 'redirects to survey_deployment#pending_surveys page' do
         @params[:return] = 'survey'
         get :redirect, @params
-        expect(response).to redirect_to('/response/pending_surveys')
+        expect(response).to redirect_to('/survey_deployment/pending_surveys')
       end
     end
 

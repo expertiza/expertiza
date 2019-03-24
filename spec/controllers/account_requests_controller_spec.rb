@@ -63,7 +63,7 @@ describe AccountRequestsController do
       }
       post :create_requested_user_record, params
       expect(flash[:error]).to eq 'The account you are requesting has already existed in Expertiza.'
-      expect(response).to redirect_to('http://test.host/users/request_new?role=Student')
+      expect(response).to redirect_to('http://test.host/account_requests/request_new?role=Student')
     end
 
     it 'if requested user is not saved' do
@@ -77,7 +77,7 @@ describe AccountRequestsController do
         requested_user: {self_introduction: 'I am good'}
       }
       post :create_requested_user_record, params
-      expect(response).to redirect_to('http://test.host/users/request_new?role=Student')
+      expect(response).to redirect_to('http://test.host/account_requests/request_new?role=Student')
     end
 
     it 'if user not exists, requested user is saved and params[:user][:institution_id] is empty' do
@@ -108,7 +108,7 @@ describe AccountRequestsController do
       }
       post :create_approved_user, params
       expect(flash[:error]).to eq 'Please Approve or Reject before submitting'
-      expect(response).to redirect_to('http://test.host/users/list_pending_requested')
+      expect(response).to redirect_to('http://test.host/account_requests/list_pending_requested')
     end
 
     it 'the input status is Approved' do
@@ -120,7 +120,7 @@ describe AccountRequestsController do
       post :create_approved_user, params, session
       allow_any_instance_of(AccountRequest).to receive(:undo_link).with('The user "requester1" has been successfully created. ').and_return(true)
       expect(flash[:success]).to eq "A new password has been sent to new user's e-mail address." or 'The user "requester1" has been successfully updated.'
-      expect(response).to redirect_to('http://test.host/users/list_pending_requested')
+      expect(response).to redirect_to('http://test.host/account_requests/list_pending_requested')
     end
 
     it 'the input status is Approved but save fails' do
@@ -132,7 +132,7 @@ describe AccountRequestsController do
       }
       post :create_approved_user, params, session
       expect(flash[:success]).to eq 'The user "requester1" has been successfully updated.'
-      expect(response).to redirect_to('http://test.host/users/list_pending_requested')
+      expect(response).to redirect_to('http://test.host/account_requests/list_pending_requested')
     end
 
     it 'the input status is Rejected' do
@@ -142,7 +142,7 @@ describe AccountRequestsController do
       }
       post :create_approved_user, params
       expect(flash[:success]).to eq 'The user "requester1" has been Rejected.' or 'The user "requester1" has been successfully updated.'
-      expect(response).to redirect_to('http://test.host/users/list_pending_requested')
+      expect(response).to redirect_to('http://test.host/account_requests/list_pending_requested')
     end
 
     it 'the input status is Rejected but update_colums fails' do
@@ -154,7 +154,7 @@ describe AccountRequestsController do
       post :create_approved_user, params
       expect(flash[:success]).to eq 'The user "requester1" has been successfully updated.'
       expect(flash[:error]).to eq 'Error processing request.'
-      expect(response).to redirect_to('http://test.host/users/list_pending_requested')
+      expect(response).to redirect_to('http://test.host/account_requests/list_pending_requested')
     end
   end
 

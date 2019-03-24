@@ -73,7 +73,7 @@ class AssignmentsController < ApplicationController
     # only when instructor does not assign rubrics and in assignment edit page will show this error message.
     handle_rubrics_not_assigned_case
     # handle_assignment_directory_path_nonexist_case_and_answer_tagging refactored to be
-    nonexist_path_with_tagging
+    missing_submission_directory
     # assigned badges will hold all the badges that have been assigned to an assignment
     # added it to display the assigned badges while creating a badge in the assignments page
     @assigned_badges = @assignment_form.assignment.badges
@@ -83,12 +83,12 @@ class AssignmentsController < ApplicationController
   def update
     unless params.key?(:assignment_form)
       # used to be assignment_form_key_nonexist_case_handler
-      assignment_saving
+      assignment_submission_handler
       return
     end
     retrieve_assignment_form
     # used to be handle_current_user_timezonepref_nil
-    nil_timezone_handler
+    timezone_handler
     # used to be update_feedback_assignment_form_attributes
     update_feedback_attributes
     redirect_to edit_assignment_path @assignment_form.assignment.id
@@ -264,55 +264,17 @@ class AssignmentsController < ApplicationController
     due_date_all
   end
 
-  # helper methods for edit
-  def edit_params_setting
-    @assignment = Assignment.find(params[:id])
-    @num_submissions_round = @assignment.find_due_dates('submission').nil? ? 0 : @assignment.find_due_dates('submission').count
-    @num_reviews_round = @assignment.find_due_dates('review').nil? ? 0 : @assignment.find_due_dates('review').count
-
-    @topics = SignUpTopic.where(assignment_id: params[:id])
-    @assignment_form = AssignmentForm.create_form_object(params[:id])
-    @user = current_user
-
-    @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
-    @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
-    @reviewvarycheck = false
-    @due_date_nameurl_not_empty = false
-    @due_date_nameurl_not_empty_checkbox = false
-    @metareview_allowed = false
-    @metareview_allowed_checkbox = false
-    @signup_allowed = false
-    @signup_allowed_checkbox = false
-    @drop_topic_allowed = false
-    @drop_topic_allowed_checkbox = false
-    @team_formation_allowed = false
-    @team_formation_allowed_checkbox = false
-    @participants_count = @assignment_form.assignment.participants.size
-    @teams_count = @assignment_form.assignment.teams.size
-  end
-
   # used to be assignment_form_assignment_staggered_deadline?
   # When there is a staggered deadline the submission due date and the review due date deadline_type_id are set
   # If the assignment deadline is not staggered then set the variable to true
   def assignment_staggered_deadline?
-    if @assignment_form.assignment.staggered_deadline == true
+    if @assignment_form.assignment.staggered_deadline #== true
       @review_rounds = @assignment_form.assignment.num_review_rounds
       @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_SUBMISSION }
       @assignment_review_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_REVIEW }
     end
     # if it is not true then set it to true
     @assignment_form.assignment.staggered_deadline == true
-  end
-
-  # used to be check_due_date_nameurl_not_empty
-  # Setting various variables with boolean values
-  def check_due_date_nameurl(dd)
-    @due_date_nameurl_not_empty = due_date_nameurl_not_empty?(dd)
-    @due_date_nameurl_not_empty_checkbox = @due_date_nameurl_not_empty
-    @metareview_allowed = meta_review_allowed?(dd)
-    @drop_topic_allowed = drop_topic_allowed?(dd)
-    @signup_allowed = signup_allowed?(dd)
-    @team_formation_allowed = team_formation_allowed?(dd)
   end
 
   def adjust_timezone_when_due_date_present(dd)
@@ -348,31 +310,12 @@ class AssignmentsController < ApplicationController
   # used to be handle_assignment_directory_path_nonexist_case_and_answer_tagging
   # When the submission directory is not set flash error and log
   # Otherwise when answer tagging is allowed then tagpromptdeployment is initialized with assignment id
-  def nonexist_path_with_tagging
-    if @assignment_form.assignment.directory_path.blank?
+  def missing_submission_directory
+  if @assignment_form.assignment.directory_path.blank?
       flash.now[:error] = "You did not specify your submission directory."
       ExpertizaLogger.error LoggerMessage.new(controller_name, "", "Submission directory not specified", request)
     end
     @assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id]) if @assignment_form.assignment.is_answer_tagging_allowed
-  end
-
-  # helper methods for update
-  # used to be assignment_form_key_nonexist_case_handler
-  # Finds assignment and course id, if the assignment is savable then flash and log
-  # If it is not savable then flash and log appropriately
-  def assignment_saving
-    @assignment = Assignment.find(params[:id])
-    @assignment.course_id = params[:course_id]
-
-    if @assignment.save
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "The assignment was successfully saved: #{@assignment.as_json}", request)
-      flash[:note] = 'The assignment was successfully saved.'
-      redirect_to list_tree_display_index_path
-    else
-      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Failed assignment: #{@assignment.errors.full_messages.join(' ')}", request)
-      flash[:error] = "Failed to save the assignment: #{@assignment.errors.full_messages.join(' ')}"
-      redirect_to edit_assignment_path @assignment.id
-    end
   end
 
   def retrieve_assignment_form
@@ -392,7 +335,7 @@ class AssignmentsController < ApplicationController
   # used to be handle_current_user_timezonepref_nil
   # If the current user has not set the time zone then flash a message
   # Then set the time zone equal to the parent timezone
-  def nil_timezone_handler
+  def timezone_handler
     if current_user.timezonepref.nil?
       parent_id = current_user.parent_id
       parent_timezone = User.find(parent_id).timezonepref

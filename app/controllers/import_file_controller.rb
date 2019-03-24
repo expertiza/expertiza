@@ -7,45 +7,47 @@ class ImportFileController < ApplicationController
   end
 
   def show
-    @id = params[:id]
-    @model = params[:model]
-    @options = params[:options]
-    @delimiter = get_delimiter(params)
-    @has_header = params[:has_header]
+    # @id = params[:id]
+    # @model = params[:model]
+    # @options = params[:options]
+    # @delimiter = get_delimiter(params)
+    # @has_header = params[:has_header]
     # if @model == 'AssignmentTeam' || @model == 'CourseTeam'
     #   @has_teamname = params[:has_teamname]
     # else
     #   @has_teamname = "nil"
     # end
-    @has_teamname = if @model == 'AssignmentTeam' || @model == 'CourseTeam'?
+    @has_teamname = if @model == 'AssignmentTeam' || @model == 'CourseTeam'
                       params[:has_teamname]
                     else
                       "nil"
+                    end
     # if @model == 'ReviewResponseMap'
     #   @has_reviewee = params[:has_reviewee]
     # else
     #   @has_reviewee = nil
-    @has_reviewee = if @model == 'ReviewResponseMap'?
+    @has_reviewee = if @model == 'ReviewResponseMap'
                       params[:has_reviewee]
                     else
                       nil
-    if @model == 'MetareviewResponseMap'
-      @has_reviewee = params[:has_reviewee]
-      @has_reviewer = params[:has_reviewer]
-    else
-      @has_reviewee = "nil"
-      @has_reviewer = "nil"
-    end
-    @optional_count = 0
-    if @model == 'SignUpTopic'
-      @optional_count += 1 if params[:category] == 'true'
-      @optional_count += 1 if params[:description] == 'true'
-      @optional_count += 1 if params[:link] == 'true'
-    end
-    @current_file = params[:file]
-    @current_file_contents = @current_file.read
-    @contents_grid = parse_to_grid(@current_file_contents, @delimiter)
-    @contents_hash = parse_to_hash(@contents_grid, params[:has_header])
+                    end
+    # if @model == 'MetareviewResponseMap'
+    #   @has_reviewee = params[:has_reviewee]
+    #   @has_reviewer = params[:has_reviewer]
+    # else
+    #   @has_reviewee = "nil"
+    #   @has_reviewer = "nil"
+    # end
+    # @optional_count = 0
+    # if @model == 'SignUpTopic'
+    #   @optional_count += 1 if params[:category] == 'true'
+    #   @optional_count += 1 if params[:description] == 'true'
+    #   @optional_count += 1 if params[:link] == 'true'
+    # end
+    # @current_file = params[:file]
+    # @current_file_contents = @current_file.read
+    # @contents_grid = parse_to_grid(@current_file_contents, @delimiter)
+    # @contents_hash = parse_to_hash(@contents_grid, params[:has_header])
   end
 
 
@@ -88,12 +90,11 @@ class ImportFileController < ApplicationController
           # else
           #   teamtype = CourseTeam
           # end
-          teamtype = if params[:model] == "AssignmentTeam"?
+          teamtype = if params[:model] == "AssignmentTeam"
                        AssignmentTeam
                      else
                        CourseTeam
                      end
-
           options = eval(params[:options])
           options[:has_teamname] = params[:has_teamname]
           Team.import(row_hash, params[:id], options, teamtype)

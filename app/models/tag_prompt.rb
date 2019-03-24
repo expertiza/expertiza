@@ -71,10 +71,10 @@ class TagPrompt < ActiveRecord::Base
     end
 
     content_tag(:div,
-                content_tag(:div, "No", {class: no_text_class, id: "no_text_"+element_id}, false) +
+                content_tag(:div, "No", {class: no_text_class, id: "no_text_" + element_id}, false) +
                     content_tag(:div,
                                 content_tag(:input, nil, {type: "range", name: "tag_checkboxes[]",
-                                                          id: control_id,min: "-1", class: "rangeAll", max: "1",
+                                                          id: control_id, min: "-1", class: "rangeAll", max: "1",
                                                           value: value, onLoad: "toggleLabel(this)",
                                                           onChange: on_change_value}, false),
                                 {class: "range-field", style: " width:60px"}, false) +

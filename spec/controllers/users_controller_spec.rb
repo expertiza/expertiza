@@ -47,6 +47,7 @@ describe UsersController do
     end
   end
 
+=begin
   context "#list_pending_requested" do
     it 'test list_pednign_requested view' do
       stub_current_user(super_admin, super_admin.role.name, super_admin.role)
@@ -54,6 +55,7 @@ describe UsersController do
       expect(response).to render_template(:list_pending_requested)
     end
   end
+=end
 
   context "#show_selection" do
     before(:each) do
@@ -91,6 +93,7 @@ describe UsersController do
     end
   end
 
+
   context '#show' do
     it 'when params[:id] is not nil' do
       allow(controller).to receive(:current_user).and_return(student1)
@@ -117,6 +120,8 @@ describe UsersController do
     end
   end
 
+
+
   context "#new" do
     it '1' do
       allow(Role).to receive(:find_by).with(name: 'instructor').and_return('instructor')
@@ -127,6 +132,7 @@ describe UsersController do
     end
   end
 
+=begin
   context "#request new" do
     it '1' do
       allow(Role).to receive(:find_by).with(name: 'instructor').and_return('instructor')
@@ -135,6 +141,8 @@ describe UsersController do
       expect(response).to render_template(:request_new)
     end
   end
+=end
+
 
   context "#create" do
     before(:each) do
@@ -231,6 +239,7 @@ describe UsersController do
     end
   end
 
+=begin
   context "#create_requested_user_record" do
     it 'if user not exists and requested user is saved' do
       params = {
@@ -352,7 +361,7 @@ describe UsersController do
       expect(response).to redirect_to('http://test.host/users/list_pending_requested')
     end
   end
-
+=end
   context '#edit' do
     it 'renders users#edit page' do
       allow(User).to receive(:find).with('1').and_return(student1)
@@ -362,6 +371,7 @@ describe UsersController do
       expect(response).to render_template(:edit)
     end
   end
+
 
   context '#update' do
     it 'when user is updated successfully' do

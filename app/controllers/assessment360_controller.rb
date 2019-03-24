@@ -50,14 +50,11 @@ class Assessment360Controller < ApplicationController
       end
       # calculate average grade for each student on all assignments in this course
       if @teammate_review_info_per_stu[1] > 0
-        s = @teammate_review_info_per_stu[0] * 1.0
-        temp_avg_grade = s / @teammate_review_info_per_stu[1]
-        t = temp_avg_grade.round.to_s
-        @teammate_review[cp.id][:avg_grade_for_assgt] = t + '%'
+        temp_avg_grade = @teammate_review_info_per_stu[0] * 1.0 / @teammate_review_info_per_stu[1]
+        @teammate_review[cp.id][:avg_grade_for_assgt] = temp_avg_grade.round.to_s + '%'
       end
       if @meta_review_info_per_stu[1] > 0
-        s1 = @meta_review_info_per_stu[1]
-        temp_avg= @meta_review_info_per_stu[0] * 1.0 / s1
+        temp_avg= @meta_review_info_per_stu[0] * 1.0 / @meta_review_info_per_stu[1]
         @meta_review[cp.id][:avg_grade_for_assgt] = temp_avg.round.to_s + '%'
       end
     end

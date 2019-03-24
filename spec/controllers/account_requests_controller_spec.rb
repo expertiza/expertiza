@@ -63,7 +63,7 @@ describe AccountRequestsController do
       }
       post :create_requested_user_record, params
       expect(flash[:error]).to eq 'The account you are requesting has already existed in Expertiza.'
-      expect(response).to redirect_to('http://test.host/account_requests/request_new?role=Student')
+      expect(response).to redirect_to('http://test.host/account_requests/request_new')
     end
 
     it 'if requested user is not saved' do

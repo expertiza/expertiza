@@ -21,7 +21,7 @@ class TrueFalse < QuizQuestion
     html += '/>False'
     html += '</td></tr>'
 
-    html.html_safe
+    html
   end
 
   def complete

@@ -11,7 +11,7 @@ describe "UploadFile" do
   describe "#view_question_text" do
     it "returns the html " do
       html = uf.view_question_text.to_s
-      expect(html).to eq("<TR><TD align=\"left\"> test txt </TD><TD align=\"left\">UploadFile</TD><td align=\"center\">1</TD><TD align=\"center\">&mdash;</TD></TR>")
+      expect(html).to eq("<tr><td align=\"left\"> test txt </td><td align=\"left\">UploadFile</td><td align=\"center\">1</td><td align=\"center\">&mdash;</td></tr>")
     end
   end
 end

@@ -1,10 +1,18 @@
 Expertiza::Application.routes.draw do
-  resources :account_requests
+
   ###
   # Please insert new routes alphabetically!
   ###
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
+
+  resources :account_requests, constraints: {id: /\d+/} do
+    collection do
+      get :list_pending_requested
+      post :create_requested_user_record
+      post :create_approved_user
+    end
+  end
 
   resources :admin, only: [] do
     collection do
@@ -465,6 +473,7 @@ resources :institution, except: [:destroy] do
       post :create_approved_user
     end
   end
+
 
   resources :user_pastebins
 

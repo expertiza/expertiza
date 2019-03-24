@@ -5,7 +5,7 @@ class PopupController < ApplicationController
      'Instructor',
      'Teaching Assistant'].include? current_role_name
   end
-  
+ 
   def questionare_details_populate(response_id)
     unless response_id.nil?
       first_question_in_questionnaire = Answer.where(response_id: response_id).first.question_id
@@ -26,7 +26,7 @@ class PopupController < ApplicationController
     @response_id = params[:response_id]
     questionare_details_populate(@response_id)
     @reviewee_id = params[:reviewee_id]
-    
+
     return unless @response_id.nil?
     participant = Participant.find(@reviewee_id)
     @user = User.find(participant.user_id)

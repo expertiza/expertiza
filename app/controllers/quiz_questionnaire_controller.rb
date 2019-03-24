@@ -29,7 +29,6 @@ class QuizQuestionnaireController < QuestionnairesController
           valid_request = false
         end
       end
-      render 'questionnaires/new_quiz'
     end
 
     if valid_request && Questionnaire::QUESTIONNAIRE_TYPES.include?(params[:model])
@@ -37,8 +36,8 @@ class QuizQuestionnaireController < QuestionnairesController
       @questionnaire.private = params[:private]
       @questionnaire.min_question_score = 0
       @questionnaire.max_question_score = 1
+      render 'questionnaires/new_quiz'
 
-      render :new_quiz
     else
       redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
     end

@@ -85,9 +85,9 @@ class QuestionsController < ApplicationController
     types = Question.distinct.pluck(:type)
     render json: types.to_a
   end
-  
+
   private
-  
+
   def questions_params
     params.require(:question).permit(:txt, :weight, :questionnaire_id, :seq, :type,
                                      :size, :alternatives, :break_before, :max_label, :min_label)

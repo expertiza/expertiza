@@ -257,9 +257,9 @@ class UsersController < ApplicationController
 
     # paginate
     users = if paginate_options[records_per_page.to_s].nil? # displaying Default 25 records per page
-              User.all.paginate(page: params[:page], per_page: paginate_options["1"])
+              session[:user].get_user_list.paginate(page: params[:page], per_page: paginate_options["1"])
             else # some pagination is active - use the per_page
-              User.all.paginate(page: params[:page], per_page: paginate_options[records_per_page.to_s])
+              session[:user].get_user_list.paginate(page: params[:page], per_page: paginate_options[records_per_page.to_s])
             end
     users
   end

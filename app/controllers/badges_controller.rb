@@ -22,8 +22,8 @@ class BadgesController < ApplicationController
     image_file = params[:badge][:image_file]
     if !image_file.nil?
       File.open(Rails.root.join('app', 'assets', 'images', 'badges', image_file.original_filename), 'wb') do |file|
-      file.write(image_file.read)
-    end
+        file.write(image_file.read)
+      end
     @badge.image_name = image_file.original_filename
     else
       @badge.image_name = ''

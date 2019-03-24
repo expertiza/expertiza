@@ -127,7 +127,7 @@ module AuthorizationHelper
     false
   end
 
-  # Recursively find an assignment given the passed in Response id. Because a ResponseMap
+  # Recursively find an assignment for a given Response id. Because a ResponseMap
   # can either point to an Assignment or another Response, recursively search until the
   # ResponseMap object's reviewed_object_id points to an Assignment.
   def find_assignment_from_response_id(response_id)
@@ -135,14 +135,17 @@ module AuthorizationHelper
     response_map = response.response_map
     if response_map.assignment
       return response_map.assignment
-    elsif response_map.review_mapping
+    else
       find_assignment_from_response_id(response_map.reviewed_object_id)
     end
   end
 
+  # Finds the assignment_instructor for a given assignment. If the assignment is associated with
+  # a course, the instructor for the course is returned. If not, the instructor associated
+  # with the assignment is return.
   def find_assignment_instructor(assignment)
-    if assignment.course_id
-      Course.find(assignment.course_id).instructor
+    if assignment.course
+      Course.find_by(id: assignment.course.id).instructor
     else
       assignment.instructor
     end

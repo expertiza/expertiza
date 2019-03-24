@@ -656,7 +656,7 @@ describe AuthorizationHelper do
   end
 
   describe ".find_assignment_from_response_id" do
-    # Makes use of existing :response, :review_response_map, and :meta_review_response_map
+    # Makes use of existing :response, :review_response_map, and :meta_review_response_map factories
 
     it 'returns the assignment if one is found without recursion' do
       response = create(:response)
@@ -675,6 +675,24 @@ describe AuthorizationHelper do
       metareview_response2 = create(:meta_review_response_map, review_mapping: metareview_response1)
       response = create(:response, response_map: metareview_response2)
       expect(find_assignment_from_response_id(response.id)).to eq(response.response_map.review_mapping.review_mapping.assignment)
+    end
+
+    describe ".find_assignment_instructor" do
+      # Makes use of existing :assignment and :course factories. Both point to Instructor.first
+
+      it 'returns the instructor if the assignment belongs to a course' do
+        instructor = create(:instructor).becomes(User)
+        course = create(:course, instructor: instructor)
+        assignment = create(:assignment, course: course, instructor: nil)
+        expect(find_assignment_instructor(assignment)).to eq(assignment.course.instructor)
+      end
+
+      it 'returns the instructor if the assignment does not belong to a course' do
+        instructor = create(:instructor).becomes(User)
+        assignment = create(:assignment, course: nil, instructor: instructor)
+        expect(find_assignment_instructor(assignment)).to eq(assignment.instructor)
+      end
+
     end
 
   end

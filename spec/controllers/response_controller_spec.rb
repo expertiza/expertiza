@@ -302,7 +302,6 @@ describe ResponseController do
     end
   end
 
-
   describe '#json' do
     allow(Response).to receive(:find).with(response_id: 1).and_return([review_response])
     allow(response).to receive(:response_id).and_return(1)

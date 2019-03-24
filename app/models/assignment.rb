@@ -583,8 +583,11 @@ class Assignment < ActiveRecord::Base
     DueDate.get_next_due_date(self.id, topic_id).nil?
   end
 
+
   # Function to check if topic id is null when its a staggered assignment
   def topic_missing?( topic_id = nil)
     topic_id.nil? and self.staggered_deadline?
   end
+
+  private :topic_missing?
 end

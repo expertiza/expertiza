@@ -344,34 +344,6 @@ describe Assignment do
     end
   end
 
-  describe '#current_stage_name' do
-    context 'when assignment has staggered deadline' do
-      before(:each) { allow(assignment).to receive(:staggered_deadline?).and_return(true) }
-      context 'topic_id is nil' do
-        it 'returns Unknow' do
-          expect(assignment.current_stage_name(nil)).to eq('Unknown')
-        end
-      end
-
-      context 'topic_id is not nil' do
-        it 'returns Submission' do
-          allow(assignment).to receive(:get_current_stage_name).with(123).and_return('Submission')
-          expect(assignment.current_stage_name(123)).to eq('Submission')
-        end
-      end
-    end
-
-    context 'when assignment does not have staggered deadline' do
-      before(:each) { allow(assignment).to receive(:staggered_deadline?).and_return(false) }
-      context "when due date is not equal to 'Finished', due date is not nil and its deadline name is not nil" do
-        it 'returns the deadline name of current due date' do
-          allow(assignment).to receive(:find_current_stage).with(123).and_return(assignment_due_date)
-          expect(assignment.current_stage_name(123)).to eq('Review')
-        end
-      end
-    end
-  end
-
   describe '#microtask?' do
     it 'checks whether assignment is a micro task' do
       assignment = build(:assignment, microtask: true)
@@ -386,31 +358,6 @@ describe Assignment do
     end
   end
 
-  describe '#link_for_current_stage' do
-    context 'when current assignment has staggered deadline and topic id is nil' do
-      it 'returns nil' do
-        allow(assignment).to receive(:staggered_deadline?).and_return(true)
-        expect(assignment.link_for_current_stage(nil)).to eq(nil)
-      end
-    end
-
-    context 'when current assignment does not have staggered deadline' do
-      before(:each) { allow(assignment).to receive(:staggered_deadline?).and_return(false) }
-      context 'when due date is a TopicDueDate' do
-        it 'returns nil' do
-          allow(assignment).to receive(:find_current_stage).with(123).and_return(topic_due_date)
-          expect(assignment.link_for_current_stage(123)).to eq(nil)
-        end
-      end
-
-      context 'when due_date is not nil, not finished and is not a TopicDueDate' do
-        it 'returns description url of current due date' do
-          allow(assignment).to receive(:find_current_stage).with(123).and_return(assignment_due_date)
-          expect(assignment.link_for_current_stage(123)).to eq('https://expertiza.ncsu.edu/')
-        end
-      end
-    end
-  end
 
   describe '#stage_deadline' do
     context 'when topic id is nil and current assignment has staggered deadline' do
@@ -423,14 +370,15 @@ describe Assignment do
     context 'when current assignment does not have staggered deadline' do
       context 'when due date is nil' do
         it 'returns nil' do
-          allow(assignment).to receive(:find_current_stage).with(123).and_return(nil)
+          allow(assignment).to receive(:finished).with(123).and_return(true)
           expect(assignment.stage_deadline(123)).to be nil
         end
       end
 
       context 'when due date is not nil and due date is not equal to Finished' do
         it 'returns due date' do
-          allow(assignment).to receive(:find_current_stage).with(123).and_return(assignment_due_date)
+          allow(assignment).to receive(:finished?).with(123).and_return(false)
+          allow(DueDate).to receive(:get_next_due_date).with(123).and_return(assignment_due_date)
           expect(assignment.stage_deadline(123)).to match('2011-11-11 11:11:11')
         end
       end
@@ -441,22 +389,6 @@ describe Assignment do
     it 'returns max round number in all due dates of current assignment' do
       allow(AssignmentDueDate).to receive(:where).with(parent_id: 1).and_return([assignment_due_date])
       expect(assignment.num_review_rounds).to eq(1)
-    end
-  end
-
-  describe '#find_current_stage' do
-    context 'when next due date is nil' do
-      it 'returns Finished' do
-        allow(DueDate).to receive(:get_next_due_date).with(1, 123).and_return(nil)
-        expect(assignment.find_current_stage(123)).to eq('Finished')
-      end
-    end
-
-    context 'when next due date is nil' do
-      it 'returns next due date object' do
-        allow(DueDate).to receive(:get_next_due_date).with(1, 123).and_return(assignment_due_date)
-        expect(assignment.find_current_stage(123)).to eq(assignment_due_date)
-      end
     end
   end
 
@@ -543,6 +475,24 @@ describe Assignment do
       it ' return assignment nil' do
         assignment = create(:assignment)
         expect(assignment.find_due_dates("submission").first).to eq(nil)
+      end
+    end
+  end
+
+  describe '#finished?' do
+    context 'when assignment next due date is nil' do
+      it 'returns True' do
+        allow(DueDate).to receive(:get_next_due_date).with(1, 123).and_return(nil)
+        expect(assignment.finished?(123)).to eq(TRUE)
+      end
+    end
+  end
+
+  describe '#finished?' do
+    context 'when there is a next due date' do
+      it 'returns False' do
+        allow(DueDate).to receive(:get_next_due_date).with(1, 123).and_return('2021-11-11 11:11:11')
+        expect(assignment.finished?(123)).to eq(FALSE)
       end
     end
   end

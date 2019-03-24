@@ -130,8 +130,6 @@ module AuthorizationHelper
   # Recursively find an assignment given the passed in Response id. Because a ResponseMap
   # can either point to an Assignment or another Response, recursively search until the
   # ResponseMap object's reviewed_object_id points to an Assignment.
-  # Returns false if the Response with the passed in response_id does not map to
-  # either an Assignment or another Response object.
   def find_assignment_from_response_id(response_id)
     response = Response.find(response_id.to_i)
     response_map = response.response_map
@@ -139,8 +137,6 @@ module AuthorizationHelper
       return response_map.assignment
     elsif response_map.review_mapping
       find_assignment_from_response_id(response_map.reviewed_object_id)
-    else
-      false
     end
   end
 

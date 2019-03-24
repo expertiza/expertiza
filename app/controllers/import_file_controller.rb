@@ -21,7 +21,6 @@ class ImportFileController < ApplicationController
                       params[:has_teamname]
                     else
                       "nil"
-                    end
     # if @model == 'ReviewResponseMap'
     #   @has_reviewee = params[:has_reviewee]
     # else
@@ -30,7 +29,6 @@ class ImportFileController < ApplicationController
                       params[:has_reviewee]
                     else
                       nil
-                    end
     if @model == 'MetareviewResponseMap'
       @has_reviewee = params[:has_reviewee]
       @has_reviewer = params[:has_reviewer]
@@ -40,15 +38,16 @@ class ImportFileController < ApplicationController
     end
     @optional_count = 0
     if @model == 'SignUpTopic'
-        @optional_count += 1 if params[:category] == 'true'
-        @optional_count += 1 if params[:description] == 'true'
-        @optional_count += 1 if params[:link] == 'true'
+      @optional_count += 1 if params[:category] == 'true'
+      @optional_count += 1 if params[:description] == 'true'
+      @optional_count += 1 if params[:link] == 'true'
     end
     @current_file = params[:file]
     @current_file_contents = @current_file.read
     @contents_grid = parse_to_grid(@current_file_contents, @delimiter)
     @contents_hash = parse_to_hash(@contents_grid, params[:has_header])
   end
+
 
   def start
     @id = params[:id]

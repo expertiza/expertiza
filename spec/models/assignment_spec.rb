@@ -478,4 +478,22 @@ describe Assignment do
       end
     end
   end
+
+  describe '#finished?' do
+    context 'when assignment next due date is nil' do
+      it 'returns True' do
+        allow(DueDate).to receive(:get_next_due_date).with(1, 123).and_return(nil)
+        expect(assignment.finished?(123)).to eq(TRUE)
+      end
+    end
+  end
+
+  describe '#finished?' do
+    context 'when there is a next due date' do
+      it 'returns False' do
+        allow(DueDate).to receive(:get_next_due_date).with(1, 123).and_return('2021-11-11 11:11:11')
+        expect(assignment.finished?(123)).to eq(FALSE)
+      end
+    end
+  end
 end

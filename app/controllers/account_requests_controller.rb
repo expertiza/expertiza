@@ -155,7 +155,7 @@ def create_requested_user_record
     flash[:error] = requested_user.errors.full_messages.to_sentence
   end
   ExpertizaLogger.error LoggerMessage.new(controller_name, requested_user.name, flash[:error], request)
-  redirect_to controller: 'users', action: 'request_new', role: 'Student'
+  redirect_to controller: 'account_requests', action: 'request_new'
 end
 
 

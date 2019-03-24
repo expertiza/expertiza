@@ -21,7 +21,14 @@ describe AccountRequestsController do
     end
   end
 
-
+  context "#request new" do
+    it '1' do
+      allow(Role).to receive(:find_by).with(name: 'instructor').and_return('instructor')
+      params = {role: 'instructor'}
+      post :request_new, params
+      expect(response).to render_template(:request_new)
+    end
+  end
 
   context "#create_requested_user_record" do
     it 'if user not exists and requested user is saved' do
@@ -142,15 +149,6 @@ describe AccountRequestsController do
       expect(flash[:success]).to eq 'The user "requester1" has been successfully updated.'
       expect(flash[:error]).to eq 'Error processing request.'
       expect(response).to redirect_to('http://test.host/account_requests/list_pending_requested')
-    end
-  end
-
-  context "#request new" do
-    it '1' do
-      allow(Role).to receive(:find_by).with(name: 'instructor').and_return('instructor')
-      params = {role: 'instructor'}
-      post :request_new, params
-      expect(response).to render_template(:request_new)
     end
   end
 

@@ -1,3 +1,5 @@
+include ActionView::Helpers
+
 class TagPrompt < ActiveRecord::Base
   validates :prompt, presence: true
   validates :desc, presence: true
@@ -38,15 +40,15 @@ class TagPrompt < ActiveRecord::Base
 
     element_id = answer.id.to_s + '_' + self.id.to_s
     control_id = "tag_prompt_" + element_id
+    on_change_value = 'toggleLabel(this); save_tag(' + answer.id.to_s + ', ' +
+        tag_prompt_deployment.id.to_s + ', ' + control_id + ');'
 
-    html += '<div class="toggle-container tag_prompt_container" title="' + self.desc.to_s + '">'
-    html += '<input type="checkbox" name="tag_checkboxes[]" id="' + control_id +
-            '" value="' + value + '" onLoad="toggleLabel(this)" onChange="toggleLabel(this); ' \
-            'save_tag(' + answer.id.to_s + ', ' + tag_prompt_deployment.id.to_s + ', ' + control_id + ');" />'
-    html += '<label for="' + control_id + '">&nbsp;'
-    html += self.prompt.to_s + '</label>'
-    html += '</div>'
-    html
+    content_tag(:div, #'<div class="toggle-container tag_prompt_container" title="' + self.desc.to_s + '">'
+        content_tag(:input, nil, {:type => "checkbox", :name => "tag_checkboxes[]", :id => control_id,
+                                  :value => value, :onLoad => "toggleLabel(this)",
+                                  :onChange => on_change_value}, false) +
+        content_tag(:label, '&nbsp;' + self.prompt.to_s, {:for => " "+control_id}, false),
+        {:class => "toggle-container tag_prompt_container", :title => self.desc.to_s}, false)
   end
 
   def slider_control(answer, tag_prompt_deployment, stored_tags)
@@ -58,9 +60,11 @@ class TagPrompt < ActiveRecord::Base
     end
     element_id = answer.id.to_s + '_' + self.id.to_s
     control_id = "tag_prompt_" + element_id
+    on_change_value = 'toggleLabel(this); save_tag(' + answer.id.to_s + ', ' +
+        tag_prompt_deployment.id.to_s + ', ' + control_id + ');'
+
     no_text_class = "toggle-false-msg"
     yes_text_class = "toggle-true-msg"
-
     # change the color of the label based on its value
     if value.to_i < 0
       no_text_class += " textActive"
@@ -68,17 +72,16 @@ class TagPrompt < ActiveRecord::Base
       yes_text_class += " textActive"
     end
 
-    html += '<div class="toggle-container tag_prompt_container" title="' + self.desc.to_s + '">'
-    html += ' <div class="' + no_text_class + '" id="no_text_' + element_id + '">No</div>'
-    html += ' <div class="range-field" style=" width:60px">'
-    html += '   <input type="range" name="tag_checkboxes[]" id="' + control_id +
-            '" min="-1" class="rangeAll" max="1" value="' + value + '" onLoad="toggleLabel(this)" onChange="toggleLabel(this); '\
-            'save_tag(' + answer.id.to_s + ', ' + tag_prompt_deployment.id.to_s + ', ' + control_id + ');"></input>'
-    html += ' </div>'
-    html += ' <div class="' + yes_text_class + '" id="yes_text_' + element_id + '">Yes</div>'
-    html += ' <div class="toggle-caption">' + self.prompt.to_s + '</div>'
-    html += '</div>'
-
-    html
+    content_tag(:div,
+        content_tag(:div, "No", {:class => no_text_class, :id => "no_text_"+element_id}, false) +
+        content_tag(:div,
+            content_tag(:input, nil, {:type => "range", :name => "tag_checkboxes[]", :id => control_id,
+                                      :min => "-1", :class => "rangeAll", :max => "1", :value => value,
+                                      :onLoad => "toggleLabel(this)",
+                                      :onChange => on_change_value}, false),
+                    {:class =>"range-field", :style => " width:60px"}, false) +
+        content_tag(:div, "Yes", {:class => yes_text_class, :id => "yes_text_"+element_id}, false) +
+        content_tag(:div, self.prompt.to_s, {:class => "toggle-caption"}, false),
+        {:class => "toggle-container tag_prompt_container", :title => self.desc.to_s}, false)
   end
 end

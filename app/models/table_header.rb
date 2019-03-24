@@ -9,7 +9,7 @@ class TableHeader < QuestionnaireHeader
     make_html
   end
 
-  def make_html
+  private def make_html
     capture do
       concat tag("br", nil, false, false)
       concat content_tag(:big, content_tag(:b, self.txt, {}, false), {}, false)

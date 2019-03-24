@@ -26,9 +26,7 @@ class ImportFileController < ApplicationController
     #   @has_reviewee = params[:has_reviewee]
     # else
     #   @has_reviewee = nil
-    @has_reviewee = if @model == 'ReviewResponseMap'
-                      params[:has_reviewee]
-                    end
+    @has_reviewee = params[:has_reviewee] if @model == 'ReviewResponseMap'
     if @model == 'MetareviewResponseMap'
       @has_reviewee = params[:has_reviewee]
       @has_reviewer = params[:has_reviewer]
@@ -276,10 +274,7 @@ class ImportFileController < ApplicationController
     #   file_hash[:header] = nil
     #   # file_hash[:body] = import_grid
     # end
-    file_hash[:header] = if has_header == 'true'
-                           import_grid.shift
-                         end
-
+    file_hash[:header] = import_grid.shift if has_header == 'true'
     file_hash[:body] = import_grid
     file_hash
   end

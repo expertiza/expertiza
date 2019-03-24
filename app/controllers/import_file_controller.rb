@@ -199,7 +199,7 @@ class ImportFileController < ApplicationController
       end
     elsif params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
       # header.map! { |column_name| column_name.to_sym }
-      header.map! (&:to_sym)
+      header.map!(&:to_sym)
       body.each do |row|
         h = Hash.new
         if params[:has_teamname] == "true_first"
@@ -215,7 +215,7 @@ class ImportFileController < ApplicationController
       end
     elsif params[:model] == "ReviewResponseMap"
       # header.map! { |column_name| column_name.to_sym }
-      header.map! (&:to_sym)
+      header.map!(&:to_sym)
       body.each do |row|
         h = Hash.new
         if params[:has_reviewee] == "true_first"

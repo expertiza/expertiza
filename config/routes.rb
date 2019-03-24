@@ -275,7 +275,6 @@ resources :institution, except: [:destroy] do
       get :redirect
       get :show_calibration_results_for_student
       post :custom_create
-      get :pending_surveys
       get :json
     end
   end
@@ -411,6 +410,7 @@ resources :institution, except: [:destroy] do
     collection do
       get :list
       get :reminder_thread
+      get :pending_surveys
     end
   end
 

@@ -238,6 +238,7 @@ class QuestionnairesController < ApplicationController
   # Separate methods for quiz questionnaire
   #=========================================================================================================
   # View a quiz questionnaire
+=begin
   def view_quiz
     @questionnaire = Questionnaire.find(params[:id])
     @participant = Participant.find(params[:pid]) # creating an instance variable since it needs to be sent to submitted_content/edit
@@ -386,7 +387,7 @@ class QuestionnairesController < ApplicationController
     end
     valid
   end
-
+=end
   private
 
   # save questionnaire object after create or edit
@@ -466,6 +467,7 @@ class QuestionnairesController < ApplicationController
 
   # method to save the choices associated with a question in a quiz to the database
   # only for quiz questionnaire
+  #---------------Nitin: to be deleted from this point----------------
   def save_choices(questionnaire_id)
     return unless params[:new_question] or params[:new_choices]
     questions = Question.where(questionnaire_id: questionnaire_id)
@@ -512,6 +514,7 @@ class QuestionnairesController < ApplicationController
     end
   end
 
+#-------Nitin: end of delete------------
   def questionnaire_params
     params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score,
                                           :max_question_score, :type, :display_type, :instruction_loc)

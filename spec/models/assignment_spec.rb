@@ -355,7 +355,7 @@ describe Assignment do
 
       context 'topic_id is not nil' do
         it 'returns Submission' do
-          allow(assignment).to receive(:get_current_stage).with(123).and_return('Submission')
+          allow(assignment).to receive(:get_current_stage_name).with(123).and_return('Submission')
           expect(assignment.current_stage_name(123)).to eq('Submission')
         end
       end

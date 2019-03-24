@@ -347,20 +347,11 @@ class Assignment < ActiveRecord::Base
     rounds
   end
 
-  #Actually returns due date as a string or Finished
-  def find_current_stage(topic_id = nil)
-    next_due_date = DueDate.get_next_due_date(self.id, topic_id)
-    return 'Finished' if next_due_date.nil?
-    next_due_date
-  end
-
-
   # Zhewei: this method is almost the same as 'stage_deadline'
-  def get_current_stage(topic_id = nil)
+  def get_current_stage_name(topic_id = nil)
     return 'Unknown' if topic_missing?(topic_id)
      finished?(topic_id)? "Finished" : DeadlineType.find(due_date.deadline_type_id).name
   end
-
 
 
   def review_questionnaire_id(round = nil)

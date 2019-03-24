@@ -14,7 +14,7 @@ class Participant < ActiveRecord::Base
   validates :grade, numericality: {allow_nil: true}
   has_paper_trail
   delegate :course, to: :assignment
-  delegate :get_current_stage, to: :assignment
+  delegate :get_current_stage_name, to: :assignment
   delegate :stage_deadline, to: :assignment
 
   PARTICIPANT_TYPES = %w[Course Assignment].freeze

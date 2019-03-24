@@ -311,7 +311,7 @@ class AssignmentsController < ApplicationController
   # When the submission directory is not set flash error and log
   # Otherwise when answer tagging is allowed then tagpromptdeployment is initialized with assignment id
   def missing_submission_directory
-  if @assignment_form.assignment.directory_path.blank?
+    if @assignment_form.assignment.directory_path.blank?
       flash.now[:error] = "You did not specify your submission directory."
       ExpertizaLogger.error LoggerMessage.new(controller_name, "", "Submission directory not specified", request)
     end

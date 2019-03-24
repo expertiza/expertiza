@@ -1,0 +1,15 @@
+<%= error_messages_for 'user' %>
+
+<!--[form:user]-->
+<p><label for="user_name" class="label_account_request">Username</label><br/>
+  <%= text_field 'user', 'name'  %></p>
+
+<% new_user ||= false %>
+<%= render :partial => 'account_requests/name' %>
+<%= render :partial => 'account_requests/email' %>
+<%= render :partial => 'account_requests/password', :locals => { :new_user => new_user, :request_user => request_user } %>
+<%= render :partial => 'account_requests/prefs', :locals => { :request_user => request_user } %>
+<%= render :partial => 'account_requests/institutions' %>
+<%= render :partial => 'account_requests/self_introduction' if request_user%>
+<!--[eoform:user]-->
+<br/>

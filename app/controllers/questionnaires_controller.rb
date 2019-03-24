@@ -13,7 +13,7 @@ class QuestionnairesController < ApplicationController
       (['Super-Administrator',
         'Administrator'].include? current_role_name) ||
           ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id))) ||
-          ((['Teaching Assistant'].include? current_role_name) && assign_instructor_id == @questionnaire.try(:instructor_id))
+          ((['Teaching Assistant'].include? current_role_name) && session[:user].instructor_id == @questionnaire.try(:instructor_id))
 
     else
       ['Super-Administrator',
@@ -544,7 +544,7 @@ class QuestionnairesController < ApplicationController
 
   # clones the contents of a questionnaire, including the questions and associated advice
   def copy_questionnaire_details(questions, orig_questionnaire)
-    @questionnaire.instructor_id = assign_instructor_id
+    @questionnaire.instructor_id = session[:user].instructor_id
     @questionnaire.name = 'Copy of ' + orig_questionnaire.name
     begin
       @questionnaire.created_at = Time.now
@@ -571,15 +571,6 @@ class QuestionnairesController < ApplicationController
     rescue StandardError
       flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.' + $ERROR_INFO
       redirect_to action: 'list', controller: 'tree_display'
-    end
-  end
-
-  def assign_instructor_id
-    # if the user to copy the questionnaire is a TA, the instructor should be the owner instead of the TA
-    if session[:user].role.name != "Teaching Assistant"
-      session[:user].id
-    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
-      Ta.get_my_instructor(session[:user].id)
     end
   end
 end

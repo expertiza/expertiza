@@ -366,4 +366,61 @@ class AssignmentsController < ApplicationController
   def assignment_form_params
     params.require(:assignment_form).permit!
   end
+
+  # helper methods for edit
+  def edit_params_setting
+    @assignment = Assignment.find(params[:id])
+    @num_submissions_round = @assignment.find_due_dates('submission').nil? ? 0 : @assignment.find_due_dates('submission').count
+    @num_reviews_round = @assignment.find_due_dates('review').nil? ? 0 : @assignment.find_due_dates('review').count
+
+    @topics = SignUpTopic.where(assignment_id: params[:id])
+    @assignment_form = AssignmentForm.create_form_object(params[:id])
+    @user = current_user
+
+    @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
+    @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
+    @reviewvarycheck = false
+    @due_date_nameurl_not_empty = false
+    @due_date_nameurl_not_empty_checkbox = false
+    @metareview_allowed = false
+    @metareview_allowed_checkbox = false
+    @signup_allowed = false
+    @signup_allowed_checkbox = false
+    @drop_topic_allowed = false
+    @drop_topic_allowed_checkbox = false
+    @team_formation_allowed = false
+    @team_formation_allowed_checkbox = false
+    @participants_count = @assignment_form.assignment.participants.size
+    @teams_count = @assignment_form.assignment.teams.size
+  end
+
+  # used to be check_due_date_nameurl_not_empty
+  # Setting various variables with boolean values
+  def check_due_date_nameurl(dd)
+    @due_date_nameurl_not_empty = due_date_nameurl_not_empty?(dd)
+    @due_date_nameurl_not_empty_checkbox = @due_date_nameurl_not_empty
+    @metareview_allowed = meta_review_allowed?(dd)
+    @drop_topic_allowed = drop_topic_allowed?(dd)
+    @signup_allowed = signup_allowed?(dd)
+    @team_formation_allowed = team_formation_allowed?(dd)
+  end
+
+  # helper methods for update
+  # used to be assignment_form_key_nonexist_case_handler
+  # Finds assignment and course id, if the assignment is savable then flash and log
+  # If it is not savable then flash and log appropriately
+  def assignment_submission_handler
+    @assignment = Assignment.find(params[:id])
+    @assignment.course_id = params[:course_id]
+
+    if @assignment.save
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "The assignment was successfully saved: #{@assignment.as_json}", request)
+      flash[:note] = 'The assignment was successfully saved.'
+      redirect_to list_tree_display_index_path
+    else
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Failed assignment: #{@assignment.errors.full_messages.join(' ')}", request)
+      flash[:error] = "Failed to save the assignment: #{@assignment.errors.full_messages.join(' ')}"
+      redirect_to edit_assignment_path @assignment.id
+    end
+  end
 end

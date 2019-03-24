@@ -77,7 +77,7 @@ describe AccountRequestsController do
         requested_user: {self_introduction: 'I am good'}
       }
       post :create_requested_user_record, params
-      expect(response).to redirect_to('http://test.host/account_requests/request_new?role=Student')
+      expect(response).to redirect_to('http://test.host/account_requests/request_new')
     end
 
     it 'if user not exists, requested user is saved and params[:user][:institution_id] is empty' do

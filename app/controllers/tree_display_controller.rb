@@ -255,8 +255,8 @@ class TreeDisplayController < ApplicationController
   def update_is_available_2(res2, instructor_id, child)
     # current user is the instructor (role can be admin/instructor/ta) of this course. is_available_condition1
     res2["is_available"] = is_available(session[:user], instructor_id) ||
-        is_user_ta?(instructor_id, child) ||
-        is_user_instructor?(instructor_id)
+        user_ta?(instructor_id, child) ||
+        user_instructor?(instructor_id)
   end
 
   # attaches assignment nodes to course node of instructor

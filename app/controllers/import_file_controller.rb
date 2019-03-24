@@ -7,11 +7,11 @@ class ImportFileController < ApplicationController
   end
 
   def show
-    # @id = params[:id]
-    # @model = params[:model]
-    # @options = params[:options]
-    # @delimiter = get_delimiter(params)
-    # @has_header = params[:has_header]
+    @id = params[:id]
+    @model = params[:model]
+    @options = params[:options]
+    @delimiter = get_delimiter(params)
+    @has_header = params[:has_header]
     # if @model == 'AssignmentTeam' || @model == 'CourseTeam'
     #   @has_teamname = params[:has_teamname]
     # else
@@ -28,28 +28,25 @@ class ImportFileController < ApplicationController
     #   @has_reviewee = nil
     @has_reviewee = if @model == 'ReviewResponseMap'
                       params[:has_reviewee]
-                    else
-                      nil
                     end
-    # if @model == 'MetareviewResponseMap'
-    #   @has_reviewee = params[:has_reviewee]
-    #   @has_reviewer = params[:has_reviewer]
-    # else
-    #   @has_reviewee = "nil"
-    #   @has_reviewer = "nil"
-    # end
-    # @optional_count = 0
-    # if @model == 'SignUpTopic'
-    #   @optional_count += 1 if params[:category] == 'true'
-    #   @optional_count += 1 if params[:description] == 'true'
-    #   @optional_count += 1 if params[:link] == 'true'
-    # end
-    # @current_file = params[:file]
-    # @current_file_contents = @current_file.read
-    # @contents_grid = parse_to_grid(@current_file_contents, @delimiter)
-    # @contents_hash = parse_to_hash(@contents_grid, params[:has_header])
+    if @model == 'MetareviewResponseMap'
+      @has_reviewee = params[:has_reviewee]
+      @has_reviewer = params[:has_reviewer]
+    else
+      @has_reviewee = "nil"
+      @has_reviewer = "nil"
+    end
+    @optional_count = 0
+    if @model == 'SignUpTopic'
+      @optional_count += 1 if params[:category] == 'true'
+      @optional_count += 1 if params[:description] == 'true'
+      @optional_count += 1 if params[:link] == 'true'
+    end
+    @current_file = params[:file]
+    @current_file_contents = @current_file.read
+    @contents_grid = parse_to_grid(@current_file_contents, @delimiter)
+    @contents_hash = parse_to_hash(@contents_grid, params[:has_header])
   end
-
 
   def start
     @id = params[:id]
@@ -114,7 +111,7 @@ class ImportFileController < ApplicationController
         errors << $ERROR_INFO
       end
     elsif params[:model] == "MetareviewResponseMap"
-      #contents_hash = eval(params[:contents_hash])
+      # contents_hash = eval(params[:contents_hash])
       @header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
       errors = []
       begin
@@ -272,13 +269,17 @@ class ImportFileController < ApplicationController
   #
   def parse_to_hash(import_grid, has_header)
     file_hash = {}
-    if has_header == 'true'
-      file_hash[:header] = import_grid.shift
-      # file_hash[:body] = import_grid
-    else
-      file_hash[:header] = nil
-      # file_hash[:body] = import_grid
-    end
+    # if has_header == 'true'
+    #   file_hash[:header] = import_grid.shift
+    #   # file_hash[:body] = import_grid
+    # else
+    #   file_hash[:header] = nil
+    #   # file_hash[:body] = import_grid
+    # end
+    file_hash[:header] = if has_header == 'true'
+                           import_grid.shift
+                         end
+
     file_hash[:body] = import_grid
     file_hash
   end

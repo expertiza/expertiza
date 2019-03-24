@@ -587,7 +587,7 @@ class Assignment < ActiveRecord::Base
 
 
 
-  # New functions during refactoring below
+  # New function to check if the assignment is finished
   def finished?( topic_id = nil )
     DueDate.get_next_due_date(self.id, topic_id).nil?
   end

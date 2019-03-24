@@ -366,31 +366,4 @@ class AssignmentsController < ApplicationController
   def assignment_form_params
     params.require(:assignment_form).permit!
   end
-
-  # helper methods for edit
-  def edit_params_setting
-    @assignment = Assignment.find(params[:id])
-    @num_submissions_round = @assignment.find_due_dates('submission').nil? ? 0 : @assignment.find_due_dates('submission').count
-    @num_reviews_round = @assignment.find_due_dates('review').nil? ? 0 : @assignment.find_due_dates('review').count
-
-    @topics = SignUpTopic.where(assignment_id: params[:id])
-    @assignment_form = AssignmentForm.create_form_object(params[:id])
-    @user = current_user
-
-    @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
-    @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
-    @reviewvarycheck = false
-    @due_date_nameurl_not_empty = false
-    @due_date_nameurl_not_empty_checkbox = false
-    @metareview_allowed = false
-    @metareview_allowed_checkbox = false
-    @signup_allowed = false
-    @signup_allowed_checkbox = false
-    @drop_topic_allowed = false
-    @drop_topic_allowed_checkbox = false
-    @team_formation_allowed = false
-    @team_formation_allowed_checkbox = false
-    @participants_count = @assignment_form.assignment.participants.size
-    @teams_count = @assignment_form.assignment.teams.size
-  end
 end

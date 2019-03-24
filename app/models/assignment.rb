@@ -50,6 +50,7 @@ class Assignment < ActiveRecord::Base
   def team_assignment?
     true
   end
+
   alias team_assignment team_assignment?
 
   def topics?
@@ -332,7 +333,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def stage_deadline(topic_id = nil)
-    return 'Unknown' if topic_id.nil? and self.staggered_deadline?
+    return 'Unknown' if topic_missing?(topic_id)
     return nil if finished?(topic_id)
     DueDate.get_next_due_date(topic_id).due_at.to_s
   end
@@ -584,7 +585,6 @@ class Assignment < ActiveRecord::Base
   def find_due_dates(type)
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: type).id }
   end
-
 
 
   # New functions during refactoring below

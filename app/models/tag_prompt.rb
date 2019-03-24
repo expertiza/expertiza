@@ -1,6 +1,6 @@
-include ActionView::Helpers
-
 class TagPrompt < ActiveRecord::Base
+  include ActionView::Helpers
+
   validates :prompt, presence: true
   validates :desc, presence: true
   validates :control_type, presence: true
@@ -43,12 +43,12 @@ class TagPrompt < ActiveRecord::Base
     on_change_value = 'toggleLabel(this); save_tag(' + answer.id.to_s + ', ' +
         tag_prompt_deployment.id.to_s + ', ' + control_id + ');'
 
-    content_tag(:div, #'<div class="toggle-container tag_prompt_container" title="' + self.desc.to_s + '">'
-        content_tag(:input, nil, {:type => "checkbox", :name => "tag_checkboxes[]", :id => control_id,
-                                  :value => value, :onLoad => "toggleLabel(this)",
-                                  :onChange => on_change_value}, false) +
+    content_tag(:div,
+        content_tag(:input, nil, {type: "checkbox", name: "tag_checkboxes[]", id: control_id,
+                                  value: value, onLoad: "toggleLabel(this)",
+                                  onChange: on_change_value}, false) +
         content_tag(:label, '&nbsp;' + self.prompt.to_s, {:for => " "+control_id}, false),
-        {:class => "toggle-container tag_prompt_container", :title => self.desc.to_s}, false)
+        {class: "toggle-container tag_prompt_container", title: self.desc.to_s}, false)
   end
 
   def slider_control(answer, tag_prompt_deployment, stored_tags)
@@ -73,15 +73,15 @@ class TagPrompt < ActiveRecord::Base
     end
 
     content_tag(:div,
-        content_tag(:div, "No", {:class => no_text_class, :id => "no_text_"+element_id}, false) +
+        content_tag(:div, "No", {class: no_text_class, id: "no_text_"+element_id}, false) +
         content_tag(:div,
-            content_tag(:input, nil, {:type => "range", :name => "tag_checkboxes[]", :id => control_id,
-                                      :min => "-1", :class => "rangeAll", :max => "1", :value => value,
-                                      :onLoad => "toggleLabel(this)",
-                                      :onChange => on_change_value}, false),
-                    {:class =>"range-field", :style => " width:60px"}, false) +
-        content_tag(:div, "Yes", {:class => yes_text_class, :id => "yes_text_"+element_id}, false) +
-        content_tag(:div, self.prompt.to_s, {:class => "toggle-caption"}, false),
-        {:class => "toggle-container tag_prompt_container", :title => self.desc.to_s}, false)
+            content_tag(:input, nil, {type: "range", name: "tag_checkboxes[]", id: control_id,
+                                      min: "-1", class: "rangeAll", max: "1", value: value,
+                                      onLoad: "toggleLabel(this)",
+                                      onChange: on_change_value}, false),
+                    {class: "range-field", style: " width:60px"}, false) +
+        content_tag(:div, "Yes", {class: yes_text_class, id: "yes_text_"+element_id}, false) +
+        content_tag(:div, self.prompt.to_s, {class: "toggle-caption"}, false),
+        {class: "toggle-container tag_prompt_container", title: self.desc.to_s}, false)
   end
 end

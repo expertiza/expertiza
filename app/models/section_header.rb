@@ -1,6 +1,6 @@
-include ActionView::Helpers
-
 class SectionHeader < QuestionnaireHeader
+  include ActionView::Helpers
+
   def complete(_count, _answer = nil)
     capture do
       concat make_header
@@ -14,6 +14,6 @@ class SectionHeader < QuestionnaireHeader
   end
 
   private def make_header
-    content_tag(:b, self.txt, {:style => "color: #986633", :font-size => "x-large"}, false)
+    content_tag(:b, self.txt, {style: "color: #986633", 'font-size': "x-large"}, false)
   end
 end

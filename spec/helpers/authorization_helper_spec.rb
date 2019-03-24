@@ -655,4 +655,32 @@ describe AuthorizationHelper do
 
   end
 
+  describe ".find_assignment_from_response_id" do
+    # Makes use of existing :response, :review_response_map, and :meta_review_response_map
+
+    it 'returns the assignment if one is found without recursion' do
+      response = create(:response)
+      expect(find_assignment_from_response_id(response.id)).to eq(response.response_map.assignment)
+    end
+
+    it 'returns the assignment if one is found with 1 level of recursion' do
+      metareview_response = create(:meta_review_response_map)
+      response = create(:response, response_map: metareview_response)
+      expect(find_assignment_from_response_id(response.id)).to eq(response.response_map.review_mapping.assignment)
+    end
+
+    it 'returns the assignment if one is found with multiple levels of recursion' do
+      review_response = create(:review_response_map)
+      metareview_response1 = create(:meta_review_response_map, review_mapping: review_response)
+      metareview_response2 = create(:meta_review_response_map, review_mapping: metareview_response1)
+      response = create(:response, response_map: metareview_response2)
+      expect(find_assignment_from_response_id(response.id)).to eq(response.response_map.review_mapping.review_mapping.assignment)
+    end
+
+    it 'returns false if the response is not mapped to an assignment or another response' do
+
+    end
+
+  end
+
 end

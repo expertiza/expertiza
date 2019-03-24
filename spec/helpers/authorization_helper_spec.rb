@@ -677,10 +677,6 @@ describe AuthorizationHelper do
       expect(find_assignment_from_response_id(response.id)).to eq(response.response_map.review_mapping.review_mapping.assignment)
     end
 
-    it 'returns false if the response is not mapped to an assignment or another response' do
-
-    end
-
   end
 
 end

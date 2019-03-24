@@ -370,7 +370,7 @@ describe Assignment do
     context 'when current assignment does not have staggered deadline' do
       context 'when due date is nil' do
         it 'returns nil' do
-          allow(assignment).to receive(:find_current_stage).with(123).and_return(nil)
+          allow(assignment).to receive(:finished).with(123).and_return(true)
           expect(assignment.stage_deadline(123)).to be nil
         end
       end

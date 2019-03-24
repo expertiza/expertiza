@@ -224,9 +224,6 @@ class QuestionnairesController < ApplicationController
       flash[:error] = $ERROR_INFO
     end
 
-    export if params[:export]
-    import if params[:import]
-
     if params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     elsif !questionnaire_id.nil?
@@ -523,24 +520,6 @@ class QuestionnairesController < ApplicationController
   end
 
   # FIXME: These private methods belong in the Questionnaire model
-
-  def export
-    @questionnaire = Questionnaire.find(params[:id])
-
-    csv_data = QuestionnaireHelper.create_questionnaire_csv @questionnaire, session[:user].name
-
-    send_data csv_data,
-              type: 'text/csv; charset=iso-8859-1; header=present',
-              disposition: "attachment; filename=questionnaires.csv"
-  end
-
-  def import
-    @questionnaire = Questionnaire.find(params[:id])
-
-    file = params['csv']
-
-    @questionnaire.questions << QuestionnaireHelper.get_questions_from_csv(@questionnaire, file)
-  end
 
   # clones the contents of a questionnaire, including the questions and associated advice
   def copy_questionnaire_details(questions, orig_questionnaire)

@@ -164,6 +164,21 @@ end
     @all_roles = Role.where(name: roles_can_be_requested_online)
   end
 
+  protected
+
+# finds the list of roles that the current user can have
+# used to display a dropdown selection of roles for the current user in the views
+  def foreign
+    # finds what the role of the current user is.
+    role = Role.find(session[:user].role_id)
+
+    # this statement finds a list of roles that the current user can have
+    # The @all_roles variable is used in the view to present the user a list of options
+    # of the roles they may select from.
+    @all_roles = Role.where('id in (?) or id = ?', role.get_available_roles, role.id)
+  end
+
+
   private
   def requested_user_params
     params.require(:user).permit(:name, :role_id, :fullname, :institution_id, :email)

@@ -655,4 +655,75 @@ describe AuthorizationHelper do
 
   end
 
+  describe ".current_user_instructs_assignment?" do
+
+    it 'returns false if there is no logged in user' do
+      assignment = create(:assignment)
+      session[:user] = nil
+      expect(current_user_instructs_assignment?(assignment)).to be false
+    end
+
+    it 'returns false if the assignment argument is nil' do
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      expect(current_user_instructs_assignment?(nil)) .to be false
+    end
+
+    it 'returns false if the assignment has some other instructor' do
+      instructor1 = create(:instructor)
+      instructor2 = create(:instructor)
+      assignment = create(:assignment, instructor_id: instructor1.id)
+      stub_current_user(instructor2, instructor2.role.name, instructor2.role)
+      expect(current_user_instructs_assignment?(assignment)).to be false
+    end
+
+    it 'returns true if the assignment is instructed by the current user' do
+      assignment = create(:assignment, instructor_id: instructor.id)
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      expect(current_user_instructs_assignment?(assignment)).to be true
+    end
+
+    it 'returns true if the course associated with the assignment is instructed by the current user' do
+      instructor1 = create(:instructor)
+      instructor2 = create(:instructor)
+      course = create(:course, instructor_id: instructor1.id)
+      assignment = create(:assignment, instructor_id: instructor2.id, course_id: course.id)
+      stub_current_user(instructor1, instructor1.role.name, instructor1.role)
+      expect(current_user_instructs_assignment?(assignment)).to be true
+    end
+
+  end
+
+  describe ".current_user_has_ta_mapping_for_assignment?" do
+
+    it 'returns false if there is no logged in user' do
+      assignment = create(:assignment)
+      session[:user] = nil
+      expect(current_user_has_ta_mapping_for_assignment?(assignment)).to be false
+    end
+
+    it 'returns false if the assignment argument is nil' do
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      expect(current_user_has_ta_mapping_for_assignment?(nil)) .to be false
+    end
+
+    it 'returns false if the current user and the given assignment are NOT associated by a TA mapping' do
+      ta1 = create(:teaching_assistant)
+      ta2 = create(:teaching_assistant)
+      course = create(:course)
+      assignment = create(:assignment, course_id: course.id)
+      TaMapping.create(ta_id: ta1.id, course_id: course.id)
+      stub_current_user(ta2, ta2.role.name, ta2.role)
+      expect(current_user_has_ta_mapping_for_assignment?(assignment)).to be false
+    end
+
+    it 'returns true if the current user and the given assignment are associated by a TA mapping' do
+      course = create(:course)
+      assignment = create(:assignment, course_id: course.id)
+      TaMapping.create(ta_id: teaching_assistant.id, course_id: course.id)
+      stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
+      expect(current_user_has_ta_mapping_for_assignment?(assignment)).to be true
+    end
+
+  end
+
 end

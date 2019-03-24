@@ -126,11 +126,13 @@ FactoryBot.define do
   end
 
   factory :teaching_assistant, class: Ta do
-    name 'teaching_assistant5888'
+    # Help multiple factory-created teaching assistants get unique names
+    # Generate name in block so that block will be executed with each new call to factory
+    name { "teaching_assistant#{Ta.last ? Ta.last.id + 1 : 1}" }
     role { Role.where(name: 'Teaching Assistant').first || association(:role_of_teaching_assistant) }
     password 'password'
     password_confirmation 'password'
-    fullname '5888, teaching assistant'
+    fullname { "#{Ta.last ? Ta.last.id + 1 : 1}, teaching assistant" }
     email 'expertiza@mailinator.com'
     parent_id 1
     private_by_default  false

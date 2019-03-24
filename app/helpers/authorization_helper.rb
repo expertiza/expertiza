@@ -42,10 +42,10 @@ module AuthorizationHelper
   def current_user_teaching_staff_of_assignment?(assignment_id)
     assignment = Assignment.find(assignment_id)
     user_logged_in? &&
-    ((assignment.course_id &&
-        Course.find(assignment.course_id).instructor_id == session[:user].id) ||
-        assignment_instructor?(assignment) ||
-        ta_mapping_exists_for_user?(assignment))
+    (
+        current_user_instructs_assignment?(assignment) ||
+        current_user_has_ta_mapping_for_assignment?(assignment)
+    )
   end
 
   # Determine if the currently logged-in user IS of the given role name
@@ -101,11 +101,12 @@ module AuthorizationHelper
     if map.is_a? ReviewResponseMap
       reviewee_team = AssignmentTeam.find(map.reviewee_id)
       return user_logged_in? &&
-          (current_user_has_id?(user_id) ||
-          reviewee_team.user?(session[:user]) ||
-          current_user_has_admin_privileges? ||
-          (current_user_is_a?('Instructor') && assignment_instructor?(assignment)) ||
-          (current_user_is_a?('Teaching Assistant') && ta_mapping_exists_for_user?(assignment))
+          (
+            current_user_has_id?(user_id) ||
+            reviewee_team.user?(session[:user]) ||
+            current_user_has_admin_privileges? ||
+            (current_user_is_a?('Instructor') && current_user_instructs_assignment?(assignment)) ||
+            (current_user_is_a?('Teaching Assistant') && current_user_has_ta_mapping_for_assignment?(assignment))
           )
     end
     current_user_has_id?(user_id)
@@ -127,6 +128,18 @@ module AuthorizationHelper
     false
   end
 
+  # Determine if the current user is an instructor for the given assignment
+  def current_user_instructs_assignment?(assignment)
+    user_logged_in? && !assignment.nil? && (
+      assignment.instructor_id == session[:user].id ||
+      (assignment.course_id && Course.find(assignment.course_id).instructor_id == session[:user].id)
+    )
+  end
+
+  # Determine if the current user and the given assignment are associated by a TA mapping
+  def current_user_has_ta_mapping_for_assignment?(assignment)
+    user_logged_in? && !assignment.nil? && TaMapping.exists?(ta_id: session[:user].id, course_id: assignment.course.id)
+  end
 
   def find_assignment_from_response_id(response_id)
     response = Response.find(response_id.to_i)
@@ -169,14 +182,6 @@ module AuthorizationHelper
     else
       raise "Did not recognize user action '" + action + "'"
     end
-  end
-
-  def assignment_instructor?(assignment)
-    user_logged_in? && assignment.instructor_id == session[:user].id
-  end
-
-  def ta_mapping_exists_for_user?(assignment)
-    user_logged_in? && TaMapping.exists?(ta_id: session[:user].id, course_id: assignment.course.id)
   end
 
   def current_user_and_role_exist?

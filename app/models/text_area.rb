@@ -15,9 +15,9 @@ class TextArea < TextResponse
       concat tag(:input, {id: 'responses_' + count.to_s + '_score', name: 'responses[' + count.to_s + '][score]',
                           type: "hidden", value: ""}, true, false)
       concat content_tag(:p,
-                          content_tag(:textarea, text_area_text, {cols: cols, rows: rows, id: 'responses_' + count.to_s + '_comments',
+                         content_tag(:textarea, text_area_text, {cols: cols, rows: rows, id: 'responses_' + count.to_s + '_comments',
                                                                   name: 'responses[' + count.to_s + '][comment]', class: "tinymce"}, false),
-                          {}, false)
+                         {}, false)
     end
   end
 

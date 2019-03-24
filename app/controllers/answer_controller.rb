@@ -5,10 +5,10 @@ class AnswerController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'index'
-        ['Instructor',
-         'Teaching Assistant',
-         'Student',
-         'Administrator'].include? current_role_name
+      ['Instructor',
+       'Teaching Assistant',
+       'Student',
+       'Administrator'].include? current_role_name
     end
   end
 

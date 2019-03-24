@@ -94,7 +94,7 @@ class ApplicationController < ActionController::Base
     redirect_back
   end
 
-  def is_available(user, owner_id)
+  def available?(user, owner_id)
     user.id == owner_id ||
         user.admin? ||
         user.super_admin?
@@ -121,7 +121,6 @@ class ApplicationController < ActionController::Base
   end
 
   protected
-  
   # Use this method to validate the current user in order to avoid allowing users
   # to see unauthorized data.
   # Ex: return unless current_user_id?(params[:user_id])

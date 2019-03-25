@@ -113,8 +113,8 @@ module ReviewMappingHelper
     submission_due_last_round = due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
     (link_updated_at < submission_due_date) && (link_updated_at > submission_due_last_round)
   end
-  
-#For assignments with 1 team member, the following method returns user's fullname else it returns "team name" that a particular reviewee belongs to.
+
+  # For assignments with 1 team member, the following method returns user's fullname else it returns "team name" that a particular reviewee belongs to.
   def get_team_reviewed_link_name(max_team_size, response, reviewee_id)
     team_reviewed_link_name = if max_team_size == 1
                                 TeamsUser.where(team_id: reviewee_id).first.user.fullname
@@ -125,15 +125,16 @@ module ReviewMappingHelper
     team_reviewed_link_name
   end
 
-#if the current stage is "submission" or "review", function returns the current round number otherwise if the current stage is "Finished" or "metareview", function returns the number of rounds of review completed.
+  # if the current stage is "submission" or "review", function returns the current round number otherwise, 
+  # if the current stage is "Finished" or "metareview", function returns the number of rounds of review completed.
   def get_current_round_for_review_report(reviewer_id)
     user_id = Participant.find(reviewer_id).user.id
     topic_id = SignedUpTeam.topic_id(@assignment.id, user_id)
     @assignment.number_of_current_round(topic_id)
     @assignment.num_review_rounds if @assignment.get_current_stage(topic_id) == "Finished" || @assignment.get_current_stage(topic_id) == "metareview"
   end
-
-  # gets the review score awarded based on each round of the review 
+ 
+  # gets the review score awarded based on each round of the review
   def get_each_round_score_awarded_for_review_report(reviewer_id, team_id)
     (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----') }
     (1..@assignment.num_review_rounds).each do |round|

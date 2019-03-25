@@ -14,6 +14,7 @@ class TextField < TextResponse
     end
   end
 
+  # Use raw() to render the nbsp and the answer.comments
   def view_completed_question(count, answer)
     if self.type == 'TextField' and self.break_before
       capture do

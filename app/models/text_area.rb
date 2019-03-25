@@ -19,13 +19,14 @@ class TextArea < TextResponse
     end
   end
 
+  # Use raw() to render the nbsp and the answer.comments
   def view_completed_question(count, answer)
     capture do
       concat content_tag(:b, count.to_s + ". " + self.txt, {}, false)
       concat tag("br")
+      concat raw("&nbsp;" * 8 + answer.comments.gsub('^p', '').gsub(/\n/, '<BR/>'))
+      concat tag("br")
+      concat tag("br")
     end
-    out = "&nbsp;" * 8 + answer.comments.gsub('^p', '').gsub(/\n/, '<BR/>').html_safe
-    out.concat(tag("br"))
-    out.concat(tag("br"))
   end
 end

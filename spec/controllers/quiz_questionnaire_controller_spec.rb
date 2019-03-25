@@ -1,4 +1,4 @@
-describe QuizQuestionnairesController do
+describe QuizQuestionnaireController do
   let(:questionnaire) do
     build(id: 1, name: 'questionnaire', ta_id: 8, course_id: 1, private: false, min_question_score: 0, max_question_score: 5, type: 'ReviewQuestionnaire')
   end

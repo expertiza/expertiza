@@ -233,6 +233,7 @@ class QuestionnairesController < ApplicationController
       redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
     end
   end
+  
   private
 
   # save questionnaire object after create or edit

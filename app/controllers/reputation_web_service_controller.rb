@@ -130,7 +130,8 @@ class ReputationWebServiceController < ApplicationController
 
   def send_post_request
     # https://www.socialtext.net/open/very_simple_rest_in_ruby_part_3_post_to_create_a_new_workspace
-    req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader = {'Content-Type' => 'application/json', 'charset' => 'utf-8'})
+    initheader = {'Content-Type' => 'application/json', 'charset' => 'utf-8'}
+    req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader)
     curr_assignment_id = (params[:assignment_id].empty? ? '724' : params[:assignment_id])
     req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
     req.body[0] = '' # remove the first '{'
@@ -241,7 +242,7 @@ class ReputationWebServiceController < ApplicationController
     @response_body = response.body
 
     JSON.parse(response.body.to_s).each do |alg, list|
-      next unless alg == "Hamer" || alg == "Lauw"
+      next unless %w[Hamer Lauw].include?(alg)
       list.each do |id, rep|
         Participant.find_by(user_id: id).update(alg.to_sym => rep) unless /leniency/ =~ id.to_s
       end

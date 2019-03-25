@@ -14,15 +14,6 @@ class UploadFile < Question
                     content_tag(:td, '<!--placeholder (UploadFile does not need weight)-->', {}, false), {}, false)
   end
 
-  # This method returns what to display if an instructor (etc.) is viewing a questionnaire
-  def view_question_text
-    content_tag(:tr,
-                content_tag(:td, ' ' + self.txt + ' ', {align: "left"}, false) +
-                    content_tag(:td, self.type, {align: "left"}, false) +
-                    content_tag(:td, self.weight.to_s, {align: "center"}, false) +
-                    content_tag(:td, '&mdash;', {align: "center"}, false), {}, false)
-  end
-
   def complete(count, answer = nil)
     # Use "app/views/submitted_content/_submitted_files.html.erb" partial.
   end

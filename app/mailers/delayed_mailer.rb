@@ -1,4 +1,4 @@
-lass DelayedMailer
+class DelayedMailer
   # Keeps info required for delayed job
   # to perform an action at a particular time
   # such as sending a reminder email, or dropping outstanding review

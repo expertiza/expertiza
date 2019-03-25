@@ -42,7 +42,7 @@ class WaitlistsController < ApplicationController
       render action: 'edit'
     end
   end
- 
+
   def flash_update
     flash[:notice] = 'The wait list was successfully updated.'
     redirect_to action: 'show', id: @waitlist

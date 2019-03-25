@@ -188,7 +188,7 @@ class TreeDisplayController < ApplicationController
     # fnode is short for foldernode which is the parent node
     # ch_nodes are childrens
     # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
-    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
+    ch_nodes = fnode.children(nil, nil, session[:user].id, nil, nil)
     tmp_res[fnode.name] = ch_nodes
   end
 
@@ -301,7 +301,7 @@ class TreeDisplayController < ApplicationController
   def get_tmp_res(params, child_nodes)
     fnode = (params[:reactParams2][:nodeType]).constantize.new
     initialize_fnode_2(fnode, child_nodes)
-    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
+    ch_nodes = fnode.children(nil, nil, session[:user].id, nil, nil)
     res_node_for_child_2(ch_nodes)
   end
 

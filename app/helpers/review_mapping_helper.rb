@@ -19,7 +19,7 @@ module ReviewMappingHelper
   end
 
   #
-  # for review report
+  # gets the response map data such as reviewer id, reviewd object id and type for the review report
   #
   def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
     rspan = 0
@@ -37,7 +37,7 @@ module ReviewMappingHelper
   end
 
   #
-  # gets color according to review and assignment submission status
+  # gets the team name's color according to review and assignment submission status
   #
   def get_team_name_color_in_review_report(response_map)
     assignment_created = @assignment.created_at
@@ -69,7 +69,7 @@ module ReviewMappingHelper
     end
   end
 
-  # checks if a review was submitted in every round
+  # checks if a review was submitted in every round and gives the total responses count
   def response_for_each_round?(response_map)
     num_responses = 0
     total_num_rounds = @assignment.num_review_rounds
@@ -91,7 +91,7 @@ module ReviewMappingHelper
     !subm_created_at.try(:first).try(:created_at).nil?
   end
 
-  # returns submitted hyperlink
+  # returns hyperlink of the assignment that has been submitted on the due date
   def submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
     submission_due_date = assignment_due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
     subm_hyperlink = SubmissionRecord.where(team_id: response_map.reviewee_id, operation: 'Submit Hyperlink')

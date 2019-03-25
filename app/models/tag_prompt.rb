@@ -69,15 +69,16 @@ class TagPrompt < ActiveRecord::Base
     end
 
     content_tag(:div,
-                content_tag(:div, "No", {class: no_text_class, id: "no_text_" + element_id}, false) +
-                    content_tag(:div,
-                                content_tag(:input, nil, {type: "range", name: "tag_checkboxes[]",
-                                                          id: control_id, min: "-1", class: "rangeAll", max: "1",
-                                                          value: value, onLoad: "toggleLabel(this)",
-                                                          onChange: on_change_value}, false),
-                                {class: "range-field", style: " width:60px"}, false) +
-                    content_tag(:div, "Yes", {class: yes_text_class, id: "yes_text_" + element_id}, false) +
-                    content_tag(:div, self.prompt.to_s, {class: "toggle-caption"}, false),
-                {class: "toggle-container tag_prompt_container", title: self.desc.to_s}, false)
+                capture do
+                  concat content_tag(:div, "No", {class: no_text_class, id: "no_text_" + element_id}, false)
+                  concat content_tag(:div,
+                                     content_tag(:input, nil, {type: "range", name: "tag_checkboxes[]",
+                                                               id: control_id, min: "-1", class: "rangeAll", max: "1",
+                                                               value: value, onLoad: "toggleLabel(this)",
+                                                               onChange: on_change_value}, false),
+                                     {class: "range-field", style: " width:60px"}, false)
+                  concat content_tag(:div, "Yes", {class: yes_text_class, id: "yes_text_" + element_id}, false)
+                  concat content_tag(:div, self.prompt.to_s, {class: "toggle-caption"}, false)
+                end, {class: "toggle-container tag_prompt_container", title: self.desc.to_s}, false)
   end
 end

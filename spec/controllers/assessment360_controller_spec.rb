@@ -6,7 +6,7 @@
 describe Assessment360Controller do
   let(:instructor) { build(:instructor, id: 6) }
   let(:course) { double('Course', instructor_id: 6, path: '/cscs', name: 'abc', id: 1) }
-  let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true) }
+  let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true, teams: [build(:assignment_team)]) }
   let(:assignment_list) { [assignment] }
   let(:due_date) { build(:assignment_due_date, deadline_type_id: 1) }
   let(:course_participant) { build(:course_participant, user_id: 1) }
@@ -20,6 +20,9 @@ describe Assessment360Controller do
   let(:review2) { double('Review', average_score: 100) }
   let(:teammate_review) { [review1, review2] }
   let(:meta_review) { [review2] }
+  let(:topic) { build(:topic, id: 1) }
+  let(:signed_up_team) { build(:signed_up_team, team: team, topic: topic) }
+  let(:team) { build(:assignment_team, id: 1, assignment: assignment) }
 
   describe '#all_students_all_reviews' do
     context 'when course does not have participants' do
@@ -150,11 +153,45 @@ describe Assessment360Controller do
         expect(flash[:error]).to be_present
       end
 
-      it 'redirects to back and flashes error as there are no participants' do
+      it 'has participants, next assignment participant does not exist' do
         allow(Course).to receive(:find).with("1").and_return(course)
-        allow(course).to receive(:assignments).and_return([assignment])
-        allow(assignment).to receive(:reject).and_return(assignment)
+        allow(course).to receive(:assignments).and_return(assignment_with_participants_list)
+        allow(assignment_with_participants_list).to receive(:reject).and_return(assignment_with_participants_list)
         allow(course).to receive(:get_participants).and_return([course_participant]) #has participants
+        allow(assignment_list).to receive(:reject).and_return(assignment_list)
+        params = {course_id: 1}
+        session = {user: instructor}
+        get :course_student_grade_summary, params, session
+        expect(controller.send(:action_allowed?)).to be true
+        expect(response.status).to eq(200)
+      end
+
+      it 'has participants, next assignment participant exists, but there are no team id exists' do
+        allow(Course).to receive(:find).with("1").and_return(course)
+        allow(course).to receive(:assignments).and_return(assignment_with_participants_list)
+        allow(assignment_with_participants_list).to receive(:reject).and_return(assignment_with_participants_list)
+        allow(course).to receive(:get_participants).and_return([course_participant]) #has participants
+        allow(assignment_list).to receive(:reject).and_return(assignment_list)
+        allow(assignment_with_participants.participants).to receive(:find_by).with({:user_id=>course_participant.user_id}).and_return(course_participant)
+        allow(signed_up_team).to receive(:topic_id).with(assignment.id, course_participant.user_id).and_return(1)
+        allow(team).to receive(:team_id).with(assignment.id, course_participant.user_id).and_return(1)
+        params = {course_id: 1}
+        session = {user: instructor}
+        get :course_student_grade_summary, params, session
+        expect(controller.send(:action_allowed?)).to be true
+        expect(response.status).to eq(200)
+      end
+
+      it 'has participants, next assignment participant exists, but there are no team id exists' do
+        allow(Course).to receive(:find).with("1").and_return(course)
+        allow(course).to receive(:assignments).and_return(assignment_with_participants_list)
+        allow(assignment_with_participants_list).to receive(:reject).and_return(assignment_with_participants_list)
+        allow(course).to receive(:get_participants).and_return([course_participant]) #has participants
+        allow(assignment_list).to receive(:reject).and_return(assignment_list)
+        allow(assignment_with_participants.participants).to receive(:find_by).with({:user_id=>course_participant.user_id}).and_return(course_participant)
+        allow(signed_up_team).to receive(:topic_id).with(assignment.id, course_participant.user_id).and_return(1)
+        # THIS LINE BELOW
+        allow(team).to receive(:team_id).with(assignment.id, course_participant.user_id).and_return(1)
         params = {course_id: 1}
         session = {user: instructor}
         get :course_student_grade_summary, params, session

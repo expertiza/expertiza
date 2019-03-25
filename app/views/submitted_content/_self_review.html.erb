@@ -9,7 +9,7 @@
     <!--Heading-->
     <td><b>Self Review:</b><BR/></td>
     <% @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-    <% @review_phase = @assignment.get_current_stage_name(@topic_id) %>
+    <% @review_phase = @assignment.current_stage_name(@topic_id) %>
     <% @review_mappings = SelfReviewResponseMap.where(reviewer_id: @participant.id) %>
     <% if !@review_mappings.nil? && !@review_mappings.empty? %>
         <!--If there is a review mapping (requested a self-review) that already exists, then show options such as Begin/View/Edit/Update -->

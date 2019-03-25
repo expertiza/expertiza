@@ -14,7 +14,7 @@ class StudentReviewController < ApplicationController
     @assignment = @participant.assignment
     # Find the current phase that the assignment is in.
     @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
-    @review_phase = @assignment.get_current_stage_name(@topic_id)
+    @review_phase = @assignment.current_stage_name(@topic_id)
     # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
 

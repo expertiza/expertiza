@@ -6,7 +6,7 @@
 
 <% if !(@map.instance_of? TeammateReviewResponseMap) && !@map.survey? %>
   <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-  <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor.participants.first, :stage => @assignment.get_current_stage_name(topic_id)} %>
+  <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor.participants.first, :stage => @assignment.current_stage_name(topic_id)} %>
 <% end %>
 <% @review_versions = @map.get_all_versions() %>
 <% if !@review_versions.empty? %>

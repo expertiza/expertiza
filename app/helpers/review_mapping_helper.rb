@@ -128,7 +128,7 @@ module ReviewMappingHelper
     user_id = Participant.find(reviewer_id).user.id
     topic_id = SignedUpTeam.topic_id(@assignment.id, user_id)
     @assignment.number_of_current_round(topic_id)
-    @assignment.num_review_rounds if @assignment.finished?(topic_id) || @assignment.get_current_stage_name(topic_id) == "metareview"
+    @assignment.num_review_rounds if @assignment.finished?(topic_id) || @assignment.current_stage_name(topic_id) == "metareview"
   end
 
   # varying rubric by round

@@ -16,7 +16,7 @@
             <td><%= link_to "View", {:controller => 'student_quizzes', :action => 'finished_quiz', :map_id => map.id} %></td>
           <% unless @assignment.finished?(topic) %>
             <% if @assignment.staggered_deadline?%>
-              <% if @assignment.get_current_stage_name(topic) != 'submission'%>
+              <% if @assignment.current_stage_name(topic) != 'submission'%>
                 <td><%= link_to "Begin",{:controller => 'response', :action => 'new', :id => map.id} %></td>
               <%else%>
                 <td>Begin</td><td> (Work has not yet been submitted)</td>

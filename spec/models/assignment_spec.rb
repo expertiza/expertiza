@@ -385,11 +385,11 @@ describe Assignment do
     end
   end
 
-  describe '#get_current_stage_name' do
+  describe '#current_stage_name' do
       context 'when topic id is nil and current assignment has staggered deadline' do
            it 'returns Unknown' do
               allow(assignment).to receive(:topic_missing?).and_return(true)
-              expect(assignment.get_current_stage_name).to eq('Unknown')
+              expect(assignment.current_stage_name).to eq('Unknown')
            end
        end
 
@@ -397,7 +397,7 @@ describe Assignment do
           context 'when due date is nil' do
               it 'returns Finished' do
                   allow(assignment).to receive(:finished?).with(123).and_return(true)
-                  expect(assignment.get_current_stage_name(123)).to eq('Finished')
+                  expect(assignment.current_stage_name(123)).to eq('Finished')
               end
           end
 
@@ -408,7 +408,7 @@ describe Assignment do
                   allow(DueDate).to receive(:get_next_due_date).with(1,123).and_return(assignment_due_date)
                   deadline = create(:deadline_type, id: 1, name:"Review")
                   allow(DeadlineType).to receive(:find).with(1).and_return(deadline)
-                  expect(assignment.get_current_stage_name(123)).to eq('Review')
+                  expect(assignment.current_stage_name(123)).to eq('Review')
               end
           end # receive_message_chain(:where, :order).with(instructor_id: 6).with(:name)
       end
@@ -512,7 +512,7 @@ describe Assignment do
     context 'when assignment next due date is nil' do
       it 'returns True' do
         allow(DueDate).to receive(:get_next_due_date).with(1, 123).and_return(nil)
-        expect(assignment.finished?(123)).to eq(TRUE)
+        expect(assignment.finished?(123)).to eq(true)
       end
     end
   end
@@ -521,7 +521,7 @@ describe Assignment do
     context 'when there is a next due date' do
       it 'returns False' do
         allow(DueDate).to receive(:get_next_due_date).with(1, 123).and_return('2021-11-11 11:11:11')
-        expect(assignment.finished?(123)).to eq(FALSE)
+        expect(assignment.finished?(123)).to eq(false)
       end
     end
   end

@@ -1,5 +1,4 @@
 class QuizQuestionnaireController < QuestionnairesController
-
 # View a quiz questionnaire
   def view_quiz
     @questionnaire = Questionnaire.find(params[:id])
@@ -47,7 +46,6 @@ class QuizQuestionnaireController < QuestionnairesController
   def create_quiz_questionnaire
     valid = valid_quiz
     if valid.eql?("valid")
-      #--------Nitin: changes here----------------------------------
       @questionnaire = Object.const_get(params[:questionnaire][:type]).new(questionnaire_params)
       participant_id = params[:pid] # creating a local variable to send as parameter to submitted content if it is a quiz questionnaire
       @questionnaire.min_question_score = 0
@@ -63,8 +61,6 @@ class QuizQuestionnaireController < QuestionnairesController
 
       flash[:note] = "The quiz was successfully created." if @successful_create
       redirect_to controller: 'submitted_content', action: 'edit', id: participant_id
-      #create_questionnaire
-      #-----------Nitin: end of changes----------------------------------
     else
       flash[:error] = valid.to_s
       redirect_to :back
@@ -101,35 +97,20 @@ class QuizQuestionnaireController < QuestionnairesController
         i = 1
         @quiz_question_choices.each do |quiz_question_choice|
           if @question.type == "MultipleChoiceCheckbox"
-            if params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s]
-              quiz_question_choice.update_attributes(iscorrect: params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:iscorrect], txt: params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:txt])
-            else
-              quiz_question_choice.update_attributes(iscorrect: '0', txt: params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
-            end
+            multiple_choice_checkbox(quiz_question_choice,i)
           end
           if @question.type == "MultipleChoiceRadio"
-            if params[:quiz_question_choices][@question.id.to_s][@question.type][:correctindex] == i.to_s
-              quiz_question_choice.update_attributes(iscorrect: '1', txt: params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:txt])
-            else
-              quiz_question_choice.update_attributes(iscorrect: '0', txt: params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:txt])
-            end
+            multiple_choice_radio(quiz_question_choice,i)
           end
           if @question.type == "TrueFalse"
             if params[:quiz_question_choices][@question.id.to_s][@question.type][1.to_s][:iscorrect] == "True" # the statement is correct
-              if quiz_question_choice.txt == "True"
-                quiz_question_choice.update_attributes(iscorrect: '1') # the statement is correct so "True" is the right answer
-              else
-                quiz_question_choice.update_attributes(iscorrect: '0')
-              end
+              quiz_question_choice.txt == "True"? quiz_question_choice.update_attributes(iscorrect: '1'):quiz_question_choice.update_attributes(iscorrect: '0')
+                # the statement is correct so "True" is the right answer
             else # the statement is not correct
-              if quiz_question_choice.txt == "True"
-                quiz_question_choice.update_attributes(iscorrect: '0')
-              else
-                quiz_question_choice.update_attributes(iscorrect: '1') # the statement is not correct so "False" is the right answer
-              end
+              quiz_question_choice.txt == "True"?quiz_question_choice.update_attributes(iscorrect: '0'): quiz_question_choice.update_attributes(iscorrect: '1')
+              # the statement is not correct so "False" is the right answer
             end
           end
-
           i += 1
         end
       end
@@ -167,34 +148,50 @@ class QuizQuestionnaireController < QuestionnairesController
     valid
   end
 
-#-----Nitin: added private methods--------------------
- private
- 	def save
-    	@questionnaire.save!
+  private
 
-    	save_questions @questionnaire.id if !@questionnaire.id.nil? and @questionnaire.id > 0
-    	undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
-  	end
+ 	def multiple_choice_checkbox(quiz_question_choice, i)
+    if params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s]
+      quiz_question_choice.update_attributes(iscorrect: params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:iscorrect], txt: params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:txt])
+    else
+      quiz_question_choice.update_attributes(iscorrect: '0', txt: params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
+    end
+  end
 
-  	def save_questions(questionnaire_id)
-    	delete_questions questionnaire_id
-    	save_new_questions questionnaire_id
+  def multiple_choice_radio(quiz_question_choice,i)
+    if params[:quiz_question_choices][@question.id.to_s][@question.type][:correctindex] == i.to_s
+      quiz_question_choice.update_attributes(iscorrect: '1', txt: params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:txt])
+    else
+      quiz_question_choice.update_attributes(iscorrect: '0', txt: params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:txt])
+    end
+  end
 
-    	if params[:question]
-      		params[:question].keys.each do |question_key|
-        		if params[:question][question_key][:txt].strip.empty?
-          			# question text is empty, delete the question
-          			Question.delete(question_key)
-        		else
-          			# Update existing question.
-          			question = Question.find(question_key)
-          			Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
-        		end
+  def save
+    @questionnaire.save!
+
+  	save_questions @questionnaire.id if !@questionnaire.id.nil? and @questionnaire.id > 0
+  	undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
+  end
+
+	def save_questions(questionnaire_id)
+    delete_questions questionnaire_id
+  	save_new_questions questionnaire_id
+
+  	if params[:question]
+    		params[:question].keys.each do |question_key|
+      		if params[:question][question_key][:txt].strip.empty?
+        			# question text is empty, delete the question
+        			Question.delete(question_key)
+      		else
+        			# Update existing question.
+        			question = Question.find(question_key)
+        			Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
       		end
-    	end
+    		end
   	end
+	end
 
-  	def save_choices(questionnaire_id)
+  def save_choices(questionnaire_id)
     return unless params[:new_question] or params[:new_choices]
     questions = Question.where(questionnaire_id: questionnaire_id)
     question_num = 1
@@ -202,38 +199,38 @@ class QuizQuestionnaireController < QuestionnairesController
     questions.each do |question|
       q_type = params[:question_type][question_num.to_s][:type]
       params[:new_choices][question_num.to_s][q_type].keys.each do |choice_key|
-        score = if params[:new_choices][question_num.to_s][q_type][choice_key]["weight"] == 1.to_s
-                  1
-                else
-                  0
-                end
-        if q_type == "MultipleChoiceCheckbox"
-          q = if params[:new_choices][question_num.to_s][q_type][choice_key][:iscorrect] == 1.to_s
-                QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
-              else
-                QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
-              end
+      # score = if params[:new_choices][question_num.to_s][q_type][choice_key]["weight"] == 1.to_s
+      #             1
+      #           else
+      #             0
+      #           end
+      if q_type == "MultipleChoiceCheckbox"
+        q = if params[:new_choices][question_num.to_s][q_type][choice_key][:iscorrect] == 1.to_s
+              QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
+            else
+              QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
+            end
+        q.save
+      elsif q_type == "TrueFalse"
+        if params[:new_choices][question_num.to_s][q_type][1.to_s][:iscorrect] == choice_key
+          q = QuizQuestionChoice.new(txt: "True", iscorrect: "true", question_id: question.id)
           q.save
-        elsif q_type == "TrueFalse"
-          if params[:new_choices][question_num.to_s][q_type][1.to_s][:iscorrect] == choice_key
-            q = QuizQuestionChoice.new(txt: "True", iscorrect: "true", question_id: question.id)
-            q.save
-            q = QuizQuestionChoice.new(txt: "False", iscorrect: "false", question_id: question.id)
-            q.save
-          else
-            q = QuizQuestionChoice.new(txt: "True", iscorrect: "false", question_id: question.id)
-            q.save
-            q = QuizQuestionChoice.new(txt: "False", iscorrect: "true", question_id: question.id)
-            q.save
-          end
+          q = QuizQuestionChoice.new(txt: "False", iscorrect: "false", question_id: question.id)
+          q.save
         else
-          q = if params[:new_choices][question_num.to_s][q_type][1.to_s][:iscorrect] == choice_key
-                QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
-              else
-                QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
-              end
+          q = QuizQuestionChoice.new(txt: "True", iscorrect: "false", question_id: question.id)
+          q.save
+          q = QuizQuestionChoice.new(txt: "False", iscorrect: "true", question_id: question.id)
           q.save
         end
+      else
+        q = if params[:new_choices][question_num.to_s][q_type][1.to_s][:iscorrect] == choice_key
+              QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
+            else
+              QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
+            end
+        q.save
+      end
       end
       question_num += 1
       question.weight = 1

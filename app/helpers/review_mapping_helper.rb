@@ -39,7 +39,7 @@ module ReviewMappingHelper
   #
   # gets the team name's color according to review and assignment submission status
   #
-  def get_team_name_color_in_review_report(response_map)
+  def get_team_colour(response_map)
     assignment_created = @assignment.created_at
     assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
     if Response.exists?(map_id: response_map.id)
@@ -127,7 +127,7 @@ module ReviewMappingHelper
 
   # if the current stage is "submission" or "review", function returns the current round number otherwise, 
   # if the current stage is "Finished" or "metareview", function returns the number of rounds of review completed.
-  def get_current_round_for_review_report(reviewer_id)
+  def get_current_round(reviewer_id)
     user_id = Participant.find(reviewer_id).user.id
     topic_id = SignedUpTeam.topic_id(@assignment.id, user_id)
     @assignment.number_of_current_round(topic_id)
@@ -135,7 +135,7 @@ module ReviewMappingHelper
   end
  
   # gets the review score awarded based on each round of the review
-  def get_each_round_score_awarded_for_review_report(reviewer_id, team_id)
+  def get_awarded_review_score(reviewer_id, team_id)
     (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----') }
     (1..@assignment.num_review_rounds).each do |round|
       if @review_scores[reviewer_id] && @review_scores[reviewer_id][round] && @review_scores[reviewer_id][round][team_id] && @review_scores[reviewer_id][round][team_id] != -1.0
@@ -145,7 +145,7 @@ module ReviewMappingHelper
   end
 
   # gets minimum, maximum and average value for all the reviews
-  def get_min_max_avg_value_for_review_report(round, team_id)
+  def get_review_metrics(round, team_id)
     %i[max min avg].each {|metric| instance_variable_set('@' + metric.to_s, '-----') }
     if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? {|k| @avg_and_ranges[team_id][round].key? k }
       %i[max min avg].each do |metric|

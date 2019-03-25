@@ -210,11 +210,11 @@ class AssignmentsController < ApplicationController
     temp_array.each do |cur_ele|
       if option == 1
         cur_ele[:assignment_id] = exist_assignment.id.to_s
-      else 
+      else
         cur_ele[:parent_id] = exist_assignment.id.to_s
       end
     end
-    return temp_array
+    temp_array
   end
 
   # check whether rubrics are set before save assignment

@@ -82,12 +82,16 @@ class TrueFalse < QuizQuestion
     # html += 'i += 1'
 
     is_correct_text = quiz_question_choices[0].iscorrect ? 'True' : 'False'
-    img_src = user_answer_first.answer == 1 ? "/assets/Check-icon.png" : "/assets/delete_icon.png"
+    image_source = user_answer.first.answer == 1 ? "/assets/Check-icon.png" : "/assets/delete_icon.png"
     capture do
       concat 'Correct Answer is: '
       concat content_tag(:b, is_correct_text, {}, false)
       concat "Your answer is: "
-      concat content_tag(:b, tag(:img, {src: image_src}, false, false), {}, false)
+      concat content_tag(:b,
+                         capture do
+                           concat user_answer.first.comments.to_s
+                           concat tag(:img, {src: image_source}, false, false)
+                         end, {}, false)
       concat tag("br", {}, false, false)
       concat tag("br", {}, true, false)
       concat tag("br", {}, true, false)
@@ -122,7 +126,7 @@ class TrueFalse < QuizQuestion
   end
 
   private def input_tag(quiz_question_choices, i)
-    text = %w[True, False]
+    text = %w[True False]
     content_tag(:br,
                 capture do
                   concat tag(:input, {name: "\"#{self.id}\" ", id: "\"#{self.id}" + "_" + "#{i + 1}\" ",

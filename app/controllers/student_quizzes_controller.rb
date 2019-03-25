@@ -53,24 +53,21 @@ class StudentQuizzesController < ApplicationController
       score = 0
       correct_answers = QuizQuestionChoice.where(question_id: question.id, iscorrect: true)
       ques_type = question.type
-      if ques_type.eql? 'MultipleChoiceCheckbox'
-        if params[question.id.to_s].nil?
-          valid = false
-        else
-          params[question.id.to_s].each do |choice|
-            # loop the quiz taker's choices and see if 1)all the correct choice are checked and 2) # of quiz taker's choice matches the # of the correct choices
-            correct_answers.each do |correct|
-              score += 1 if choice.eql? correct.txt
-            end
+      if ques_type.eql?("MultipleChoiceCheckbox") && params[question.id.to_s].nil?
+        valid = false
+      elsif ques_type.eql?("MultipleChoiceCheckbox") && !params[question.id.to_s].nil?
+        params[question.id.to_s].each do |choice|
+          # loop the quiz taker's choices and see if 1)all the correct choice are checked and 2) # of quiz taker's choice matches the # of the correct choices
+          correct_answers.each do |correct|
+            score += 1 if choice.eql? correct.txt
           end
-          score = score == correct_answers.count && score == params[question.id.to_s].count ? 1 : 0
-          # for MultipleChoiceCheckbox, score =1 means the quiz taker have done this question correctly, not just make select this choice correctly.
-          params[question.id.to_s].each do |choice|
-            new_score = Answer.new comments: choice, question_id: question.id, response_id: response.id, answer: score
-
-            valid = false unless new_score.valid?
-            scores.push(new_score)
-          end
+        end
+        score = score == correct_answers.count && score == params[question.id.to_s].count ? 1 : 0
+        # for MultipleChoiceCheckbox, score =1 means the quiz taker have done this question correctly, not just make select this choice correctly.
+        params[question.id.to_s].each do |choice|
+          new_score = Answer.new comments: choice, question_id: question.id, response_id: response.id, answer: score
+          valid = false unless new_score.valid?
+          scores.push(new_score)
         end
       else # TrueFalse and MultipleChoiceRadio
         correct_answer = correct_answers.first

@@ -1,6 +1,7 @@
 class ResponseMap < ActiveRecord::Base
-  has_many :response, foreign_key: 'map_id', dependent: :destroy
-  belongs_to :reviewer, class_name: 'Participant', foreign_key: 'reviewer_id'
+  attr_accessor :response_maps
+  has_many :response, foreign_key: 'map_id', dependent: :destroy, inverse_of: :response_map
+  belongs_to :reviewer, class_name: 'Participant', foreign_key: 'reviewer_id', inverse_of: :response_map
 
   def map_id
     id
@@ -9,7 +10,7 @@ class ResponseMap < ActiveRecord::Base
   # return latest versions of the responses
   def self.get_assessments_for(team)
     responses = []
-    stime = Time.now
+    # stime = Time.now.in_time_zone
     if team
       @array_sort = []
       @sort_to = []
@@ -42,7 +43,7 @@ class ResponseMap < ActiveRecord::Base
   end
 
   # Placeholder method, override in derived classes if required.
-  def get_all_versions
+  def fetch_all_versions
     []
   end
 

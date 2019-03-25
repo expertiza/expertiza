@@ -20,7 +20,7 @@ describe QuizQuestionnaireController do
     expect(controller.send(:action_allowed?))
   end
 
-describe '#create_quiz_questionnaire, #create_questionnaire and #save' do
+describe '#create_quiz_questionnaire and #save' do
     context 'when quiz is valid' do
       before(:each) do
         # create_quiz_questionnaire

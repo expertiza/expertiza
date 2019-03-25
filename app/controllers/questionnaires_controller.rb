@@ -66,17 +66,9 @@ class QuestionnairesController < ApplicationController
         @questionnaire.type = params[:questionnaire][:type]
         # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
         # In the future, we need to write migration files to make them consistency.
-        case display_type
-        when 'AuthorFeedback'
-          display_type = 'Author%Feedback'
-        when 'CourseSurvey'
-          display_type = 'Course%Survey'
-        when 'TeammateReview'
-          display_type = 'Teammate%Review'
-        when 'GlobalSurvey'
-          display_type = 'Global%Survey'
-        when 'AssignmentSurvey'
-          display_type = 'Assignment%Survey'
+        # E1903 : We are not sure of other type of cases, so have added a if statement. If there are only 5 cases, remove the if statement
+        if ["AuthorFeedback", "CourseSurvey", "TeammateReview", "GlobalSurvey", "AssignmentSurvey"].include?(display_type)
+          display_type = (display_type.split /(?=[A-Z])/).join("%")
         end
         @questionnaire.display_type = display_type
         @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
@@ -95,24 +87,8 @@ class QuestionnairesController < ApplicationController
 
   def create_questionnaire
     @questionnaire = Object.const_get(params[:questionnaire][:type]).new(questionnaire_params)
-
-    # TODO: check for Quiz Questionnaire?
-    if @questionnaire.type == "QuizQuestionnaire" # checking if it is a quiz questionnaire
-      participant_id = params[:pid] # creating a local variable to send as parameter to submitted content if it is a quiz questionnaire
-      @questionnaire.min_question_score = 0
-      @questionnaire.max_question_score = 1
-      author_team = AssignmentTeam.team(Participant.find(participant_id))
-
-      @questionnaire.instructor_id = author_team.id # for a team assignment, set the instructor id to the team_id
-
-      @successful_create = true
-      save
-
-      save_choices @questionnaire.id
-
-      flash[:note] = "The quiz was successfully created." if @successful_create
-      redirect_to controller: 'submitted_content', action: 'edit', id: participant_id
-    else # if it is not a quiz questionnaire
+    # Create Quiz content has been moved to Quiz Questionnaire Controller
+    if @questionnaire.type != "QuizQuestionnaire" # checking if it is a quiz questionnaire
       @questionnaire.instructor_id = Ta.get_my_instructor(session[:user].id) if session[:user].role.name == "Teaching Assistant"
       save
 
@@ -233,7 +209,7 @@ class QuestionnairesController < ApplicationController
       redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
     end
   end
-  
+
   private
 
   # save questionnaire object after create or edit

@@ -94,13 +94,13 @@ class QuizQuestionnaireController < QuestionnairesController
         @question.save
 
         @quiz_question_choices = QuizQuestionChoice.where(question_id: qid)
-        i = 1
+        question_index = 1
         @quiz_question_choices.each do |quiz_question_choice|
           if @question.type == "MultipleChoiceCheckbox"
-            multiple_choice_checkbox(quiz_question_choice, i)
+            multiple_choice_checkbox(quiz_question_choice, question_index) # Call to private method to handle  Multile Choice Questions
           end
           if @question.type == "MultipleChoiceRadio"
-            multiple_choice_radio(quiz_question_choice, i)
+            multiple_choice_radio(quiz_question_choice, question_index)
           end
           if @question.type == "TrueFalse"
             if params[:quiz_question_choices][@question.id.to_s][@question.type][1.to_s][:iscorrect] == "True" # the statement is correct
@@ -111,7 +111,7 @@ class QuizQuestionnaireController < QuestionnairesController
               # the statement is not correct so "False" is the right answer
             end
           end
-          i += 1
+          question_index += 1
         end
       end
     end
@@ -123,14 +123,11 @@ class QuizQuestionnaireController < QuestionnairesController
     valid = "valid"
 
     (1..num_quiz_questions).each do |i|
-      if params[:questionnaire][:name] == ""
-        # questionnaire name is not specified
+      if params[:questionnaire][:name] == "" # questionnaire name is not specified
         valid = "Please specify quiz name (please do not use your name or id)."
-        break
       elsif !params.key?(:question_type) || !params[:question_type].key?(i.to_s) || params[:question_type][i.to_s][:type].nil?
         # A type isnt selected for a question
         valid = "Please select a type for each question"
-        break
       else
         @new_question = Object.const_get(params[:question_type][i.to_s][:type]).create(txt: '', type: params[:question_type][i.to_s][:type], break_before: true)
         @new_question.update_attributes(txt: params[:new_question][i.to_s])
@@ -138,31 +135,30 @@ class QuizQuestionnaireController < QuestionnairesController
         choice_info = params[:new_choices][i.to_s][type] # choice info for one question of its type
         if choice_info.nil?
           valid = "Please select a correct answer for all questions"
-          break
         else
           valid = @new_question.isvalid(choice_info)
-          break if valid != "valid"
         end
       end
+      break if valid != "valid"
     end
     valid
   end
 
   private
 
-  def multiple_choice_checkbox(quiz_question_choice, i)
-    if params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s]
-      quiz_question_choice.update_attributes(iscorrect: params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:iscorrect], txt: params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:txt])
+  def multiple_choice_checkbox(quiz_question_choice, question_index)
+    if params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s]
+      quiz_question_choice.update_attributes(iscorrect: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:iscorrect], txt: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:txt])
     else
       quiz_question_choice.update_attributes(iscorrect: '0', txt: params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
     end
   end
 
-  def multiple_choice_radio(quiz_question_choice, i)
-    if params[:quiz_question_choices][@question.id.to_s][@question.type][:correctindex] == i.to_s
-      quiz_question_choice.update_attributes(iscorrect: '1', txt: params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:txt])
+  def multiple_choice_radio(quiz_question_choice, question_index)
+    if params[:quiz_question_choices][@question.id.to_s][@question.type][:correctindex] == question_index.to_s
+      quiz_question_choice.update_attributes(iscorrect: '1', txt: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:txt])
     else
-      quiz_question_choice.update_attributes(iscorrect: '0', txt: params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:txt])
+      quiz_question_choice.update_attributes(iscorrect: '0', txt: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:txt])
     end
   end
 

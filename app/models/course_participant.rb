@@ -27,9 +27,9 @@ class CourseParticipant < Participant
     unless CourseParticipant.exists?(user_id: user.id, parent_id: id)
       CourseParticipant.create(user_id: user.id, parent_id: id)
       # Spring19 AHP
-      # MailerHelper.prepared_mail_deliver(user)
-      prepared_mail = MailerHelper.send_mail_to_user(user, "Your Expertiza account and password have been created.", "user_welcome", "password")
-      prepared_mail.deliver
+      MailerHelper.prepared_mail_deliver(user)
+      # prepared_mail = MailerHelper.send_mail_to_user(user, "Your Expertiza account and password have been created.", "user_welcome", "password")
+      # prepared_mail.deliver
       #-------------------------------------------------------
     end
   end

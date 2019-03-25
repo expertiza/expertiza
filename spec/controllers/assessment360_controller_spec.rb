@@ -191,7 +191,7 @@ describe Assessment360Controller do
         allow(assignment_with_participants.participants).to receive(:find_by).with({:user_id=>course_participant.user_id}).and_return(course_participant)
         allow(signed_up_team).to receive(:topic_id).with(assignment.id, course_participant.user_id).and_return(1)
         # THIS LINE BELOW
-        allow(team).to receive(:team_id).with(assignment.id, course_participant.user_id).and_return(1)
+        allow(TeamsUser).to receive(:team_id).with(assignment.id, course_participant.user_id).and_return(1)
         params = {course_id: 1}
         session = {user: instructor}
         get :course_student_grade_summary, params, session

@@ -1,5 +1,6 @@
 class Instructor < User
-  has_many :questionnaires
+  # has_many :questionnaires
+  has_many :questionnaires, dependent: :nullify
 
   QUESTIONNAIRE = [['My questionnaires', 'list_mine'],
                    ['All public questionnaires', 'list_all']].freeze
@@ -19,11 +20,12 @@ class Instructor < User
   end
 
   def get(object_type, id, user_id)
-    object_type.where("id = ? AND (instructor_id = ? OR private = 0)", id, user_id).first
+    # object_type.where("id = ? AND (instructor_id = ? OR private = 0)", id, user_id).first
+    object_type.find_by("id = ? AND (instructor_id = ? OR private = 0)", id, user_id)
   end
 
   def self.get_my_tas(instructor_id)
-    instructor = Instructor.find(instructor_id)
+    # instructor = Instructor.find(instructor_id)
     courses = Course.where(instructor_id: instructor_id)
     ta_ids = []
     courses.each do |course|

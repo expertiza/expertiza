@@ -1,12 +1,12 @@
 class Participant < ActiveRecord::Base
   has_paper_trail
   belongs_to :user
-  belongs_to :topic, class_name: 'SignUpTopic', inverse_of: :participant
-  belongs_to :assignment, foreign_key: 'parent_id', inverse_of: :participant
+  belongs_to :topic, class_name: 'SignUpTopic'
+  belongs_to :assignment, foreign_key: 'parent_id'
   has_many   :join_team_requests, dependent: :destroy
-  has_many   :reviews, class_name: 'ResponseMap', foreign_key: 'reviewer_id', dependent: :destroy, inverse_of: :participants
-  has_many   :team_reviews, class_name: 'ReviewResponseMap', foreign_key: 'reviewer_id', dependent: :destroy, inverse_of: :participants
-  has_many :response_maps, class_name: 'ResponseMap', foreign_key: 'reviewee_id', dependent: :destroy, inverse_of: :participants
+  has_many   :reviews, class_name: 'ResponseMap', foreign_key: 'reviewer_id', dependent: :destroy
+  has_many   :team_reviews, class_name: 'ReviewResponseMap', foreign_key: 'reviewer_id', dependent: :destroy
+  has_many :response_maps, class_name: 'ResponseMap', foreign_key: 'reviewee_id', dependent: :destroy
   has_many :awarded_badges, dependent: :destroy
   has_many :badges, through: :awarded_badges
   has_one :review_grade, dependent: :destroy
@@ -41,8 +41,11 @@ class Participant < ActiveRecord::Base
 
   def delete(force = nil)
     maps = ResponseMap.where('reviewee_id = ? or reviewer_id = ?', self.id, self.id)
-    raise "Associations exist for this participant" unless force or (maps.blank? and self.team.nil?)
-    force_delete(maps)
+    if force or (maps.blank? and self.team.nil?)
+      force_delete(maps)
+    else
+      raise "Associations exist for this participant."
+    end
   end
 
   def force_delete(maps)

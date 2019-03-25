@@ -21,7 +21,8 @@ class MenuItem < ActiveRecord::Base
                    ["parent_id is null and seq = ?", self.seq - 1]
                  end
 
-    MenuItem.where(conditions).first
+    # MenuItem.where(conditions).first
+    MenuItem.find_by(conditions)
   end
 
   def below
@@ -31,7 +32,8 @@ class MenuItem < ActiveRecord::Base
                    ["parent_id is null and seq = ?", self.seq + 1]
                  end
 
-    MenuItem.where(conditions).first
+    # MenuItem.where(conditions).first
+    MenuItem.find_by(conditions)
   end
 
   def self.repack(repack_id)

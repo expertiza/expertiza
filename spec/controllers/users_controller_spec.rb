@@ -30,7 +30,7 @@ describe UsersController do
       @params = {}
       session = {user: instructor}
       get :index, @params, session
-      expect(controller.instance_variable_get(:@users)).to equal(paginated_list)
+      expect(controller.instance_variable_get(:@users)).to eq(paginated_list)
       expect(response).to render_template(:list)
     end
   end

@@ -1,6 +1,6 @@
 class QuestionnaireNode < Node
-  belongs_to :questionnaire, class_name: "Questionnaire", foreign_key: "node_object_id"
-  belongs_to :node_object, class_name: "Questionnaire", foreign_key: "node_object_id"
+  belongs_to :questionnaire, class_name: "Questionnaire", foreign_key: "node_object_id", inverse_of: :questionnaire_node
+  belongs_to :node_object, class_name: "Questionnaire", foreign_key: "node_object_id", inverse_of: :questionnaire_node
 
   def self.table
     "questionnaires"
@@ -12,13 +12,13 @@ class QuestionnaireNode < Node
                      'questionnaires.instructor_id = ?'
                    else
                      'questionnaires.instructor_id in (?)'
-                                end
+                   end
                  else
                    if User.find(user_id).role.name != "Teaching Assistant"
                      '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
                    else
                      '(questionnaires.private = 0 or questionnaires.instructor_id in (?))'
-                                end
+                   end
                  end
 
     values = if User.find(user_id).role.name != "Teaching Assistant"
@@ -39,23 +39,23 @@ class QuestionnaireNode < Node
     end
   end
 
-  def get_name
+  def name
     Questionnaire.find_by(id: self.node_object_id).try(:name)
   end
 
-  def get_private
+  def private
     Questionnaire.find_by(id: self.node_object_id).try(:private)
   end
 
-  def get_creation_date
+  def creation_date
     Questionnaire.find_by(id: self.node_object_id).try(:created_at)
   end
 
-  def get_modified_date
+  def modified_date
     Questionnaire.find_by(id: self.node_object_id).try(:updated_at)
   end
 
-  def is_leaf
+  def leaf?
     true
   end
 end

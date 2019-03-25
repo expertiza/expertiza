@@ -602,54 +602,39 @@ describe AuthorizationHelper do
     end
 
     it 'returns false if there is a currently logged in user, but the target user has no parent' do
-      # current user is an instructor
       stub_current_user(instructor, instructor.role.name, instructor.role)
-      # force the target user to have no parent
       allow(student).to receive(:parent).and_return(nil)
-      # pass the target user into our method
       expect(current_user_ancestor_of? student).to be false
     end
 
     it 'returns false if the current user is not an ancestor of the target user' do
-      # current user is a TA
       stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
-      # create an instructor who will be the parent of a student
       parent = create(:instructor, parent_id: nil )
       allow(student).to receive(:parent).and_return(parent)
-      #pass the student into our method
       expect(current_user_ancestor_of? student).to be false
     end
 
     it 'returns true if the current user is a parent of the target user' do
       ta = create(:teaching_assistant, parent_id: nil)
-      # current user is a TA who will be the parent of a student
       stub_current_user(ta, ta.role.name, ta.role)
       allow(student).to receive(:parent).and_return(ta)
-      # pass the student into our method
       expect(current_user_ancestor_of? student).to be true
     end
 
     it 'returns true if the current user is a grandparent of the target user' do
       instructor1 = create(:instructor, parent_id: nil )
-      # current user is a instructor who will be the parent of a TA
       stub_current_user(instructor1, instructor1.role.name, instructor1.role)
       allow(teaching_assistant).to receive(:parent).and_return(instructor1)
-      # force the TA to be the parent of a student
       allow(student).to receive(:parent).and_return(teaching_assistant)
-      # pass the student to our method
       expect(current_user_ancestor_of? student).to be true
     end
 
     it 'returns true if the current user is a great grandparent of the target user' do
       admin1 = create(:admin, parent_id: nil)
-      # the current user is an admin who will be the parent of an instructor
       stub_current_user(admin1, admin1.role.name, admin1.role)
       allow(instructor).to receive(:parent).and_return(admin1)
-      # the instructor will be the parent of the TA
       allow(teaching_assistant).to receive(:parent).and_return(instructor)
-      # the TA will be the parent of a student
       allow(student).to receive(:parent).and_return(teaching_assistant)
-      # pass the student to our method
       expect(current_user_ancestor_of? student).to be true
     end
 

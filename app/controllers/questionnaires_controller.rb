@@ -45,7 +45,6 @@ class QuestionnairesController < ApplicationController
   end
 
   def create
-    print("Inside Create")
     if params[:questionnaire][:name].blank?
       flash[:error] = 'A rubric or survey must have a title.'
       redirect_to controller: 'questionnaires', action: 'new', model: params[:questionnaire][:type], private: params[:questionnaire][:private]

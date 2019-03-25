@@ -1,6 +1,4 @@
 class SectionHeader < QuestionnaireHeader
-  include ActionView::Helpers
-
   def complete(_count, _answer = nil)
     capture do
       concat make_header

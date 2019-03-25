@@ -1,6 +1,4 @@
 class TagPrompt < ActiveRecord::Base
-  include ActionView::Helpers
-
   validates :prompt, presence: true
   validates :desc, presence: true
   validates :control_type, presence: true

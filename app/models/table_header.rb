@@ -1,6 +1,4 @@
 class TableHeader < QuestionnaireHeader
-  include ActionView::Helpers
-
   def complete(_count, _answer = nil)
     make_html
   end

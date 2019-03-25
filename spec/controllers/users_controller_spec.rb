@@ -27,14 +27,14 @@ describe UsersController do
       expect(response).to redirect_to('/tree_display/drill')
     end
 
-    it 'renders list if user is instructor' do
-      allow(instructor).to receive(:paginate_list).and_return(student1)
-      @params = {}
-      session = {user: instructor}
-      get :index, @params, session
-      expect(controller.instance_variable_get(:@users)).to equal(student1)
-      expect(response).to render_template(:list)
-    end
+    # it 'renders list if user is instructor' do
+    #   allow(instructor).to receive(:paginate_list).and_return(student1)
+    #   @params = {}
+    #   session = {user: instructor}
+    #   get :index, @params, session
+    #   expect(controller.instance_variable_get(:@users)).to equal(student1)
+    #   expect(response).to render_template(:list)
+    # end
   end
 
   context '#set_anonymized_view' do

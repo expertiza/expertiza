@@ -209,8 +209,8 @@ class AssignmentParticipant < Participant
       new_part.set_handle
       # Spring19 AHP
       MailerHelper.prepared_mail_deliver(user)
-      prepared_mail = MailerHelper.send_mail_to_user(user, "Your Expertiza account and password have been created.", "user_welcome", "password")
-      prepared_mail.deliver
+      # prepared_mail = MailerHelper.send_mail_to_user(user, "Your Expertiza account and password have been created.", "user_welcome", "password")
+      # prepared_mail.deliver
     end
     #-------------------------------------------------------
   end

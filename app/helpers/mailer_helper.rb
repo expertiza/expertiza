@@ -14,7 +14,7 @@ module MailerHelper
 
   def prepared_mail_deliver(user)
     # Spring19 AHP
-    prepared_mail = MailerHelper.send_mail_to_user(user, "Your Expertiza account and password have been created.", "user_welcome", "password")
+    prepared_mail = send_mail_to_user(user, "Your Expertiza account and password have been created.", "user_welcome", "password")
     prepared_mail.deliver
     #-------------------------------------------------------
   end

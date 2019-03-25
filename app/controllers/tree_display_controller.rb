@@ -280,7 +280,7 @@ class TreeDisplayController < ApplicationController
           "name" => child.name,
           "key" => params[:reactParams2][:key],
           "type" => node_type,
-          "private" => child.get_private,
+          "private" => child.private,
           "creation_date" => child.creation_date,
           "updated_date" => child.modified_date
         }

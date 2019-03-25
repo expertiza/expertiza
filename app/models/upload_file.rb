@@ -2,10 +2,10 @@ class UploadFile < Question
   include ActionView::Helpers
 
   # This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
-  def edit(_count)
+  def edit
     content_tag(:tr,
                 capture do
-                  super(_count)
+                  super(nil)
                   content_tag(:td, '<!--placeholder (UploadFile does not need weight)-->', {}, false)
                 end, {}, false)
   end

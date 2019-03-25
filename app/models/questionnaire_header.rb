@@ -2,7 +2,7 @@ class QuestionnaireHeader < Question
   include ActionView::Helpers
 
   # This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
-  def edit(_count)
+  def edit
     # html = '<tr>'
     # html += '<td align="center"><a rel="nofollow" data-method="delete" href="/questions/' + self.id.to_s + '">Remove</a></td>'
     # html += '<td><input size="6" value="' + self.seq.to_s + '" name="question[' + self.id.to_s + '][seq]" id="question_' +
@@ -17,7 +17,7 @@ class QuestionnaireHeader < Question
     # html.html_safe
     content_tag(:tr,
                 capture do
-                  super(_count)
+                  super(nil)
                   content_tag(:td, '<!--placeholder (UploadFile does not need weight)-->', {}, false)
                 end, {}, false)
   end

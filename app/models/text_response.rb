@@ -4,7 +4,7 @@ class TextResponse < Question
   validates :size, presence: true
 
   # This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
-  def edit(_count)
+  def edit
     # html = '<tr>'
     # html += '<td align="center"><a rel="nofollow" data-method="delete" href="/questions/' + self.id.to_s + '">Remove</a></td>'
     # html += '<td><input size="6" value="' + self.seq.to_s +
@@ -21,7 +21,7 @@ class TextResponse < Question
     # html.html_safe
     content_tag(:tr,
                 capture do
-                  super(_count)
+                  super(nil)
                   content_tag(:td, '<!--placeholder (TextRsponse does not need weight)-->', {}, false)
                   content_tag(:td, 'text area size <input size="6" value="' + self.size.to_s +
                           '" name="question[' + self.id.to_s + '][size]" id="question_' + self.id.to_s + '_size" type="text">', {}, false)

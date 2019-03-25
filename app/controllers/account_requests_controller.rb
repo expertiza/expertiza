@@ -22,20 +22,20 @@ class AccountRequestsController < ApplicationController
 
 
 def create_approved_user
-  requested_user = AccountRequest.find_by(id: params[:id])
-  requested_user.status = params[:status]
-  if requested_user.status.nil?
+  account_request = AccountRequest.find_by(id: params[:id])
+  account_request.status = params[:status]
+  if account_request.status.nil?
     flash[:error] = "Please Approve or Reject before submitting"
-  elsif requested_user.update_attributes(params[:user])
-    flash[:success] = "The user \"#{requested_user.name}\" has been successfully updated."
+  elsif account_request.update_attributes(params[:user])
+    flash[:success] = "The user \"#{account_request.name}\" has been successfully updated."
   end
-  if requested_user.status == "Approved"
+  if account_request.status == "Approved"
     new_user = User.new
-    new_user.name = requested_user.name
-    new_user.role_id = requested_user.role_id
-    new_user.institution_id = requested_user.institution_id
-    new_user.fullname = requested_user.fullname
-    new_user.email = requested_user.email
+    new_user.name = account_request.name
+    new_user.role_id = account_request.role_id
+    new_user.institution_id = account_request.institution_id
+    new_user.fullname = account_request.fullname
+    new_user.email = account_request.email
     new_user.parent_id = session[:user].id
     new_user.timezonepref = User.find_by(id: new_user.parent_id).timezonepref
     if new_user.save
@@ -44,14 +44,14 @@ def create_approved_user
       prepared_mail = MailerHelper.send_mail_to_user(new_user, "Your Expertiza account and password have been created.", "user_welcome", password)
       prepared_mail.deliver
       flash[:success] = "A new password has been sent to new user's e-mail address."
-      undo_link("The user \"#{requested_user.name}\" has been successfully created. ")
+      undo_link("The user \"#{account_request.name}\" has been successfully created. ")
     else
       foreign
     end
-  elsif requested_user.status == "Rejected"
+  elsif account_request.status == "Rejected"
     # If the user request has been rejected, a flash message is shown and redirected to review page
-    if requested_user.update_columns(status: params[:status])
-      flash[:success] = "The user \"#{requested_user.name}\" has been Rejected."
+    if account_request.update_columns(status: params[:status])
+      flash[:success] = "The user \"#{account_request.name}\" has been Rejected."
       redirect_to action: 'list_pending_requested'
       return
     else
@@ -62,7 +62,7 @@ def create_approved_user
 end
 
 def list_pending_requested
-  @requested_users = AccountRequest.all
+  @account_requests = AccountRequest.all
   @roles = Role.all
 end
 
@@ -74,31 +74,31 @@ def request_new
 end
 
 def create_requested_user_record
-  requested_user = AccountRequest.new(requested_user_params)
+  account_request = AccountRequest.new(account_request_params)
   if params[:user][:institution_id].empty?
     institution = Institution.find_or_create_by(name: params[:institution][:name])
-    requested_user.institution_id = institution.id
+    account_request.institution_id = institution.id
   end
-  requested_user.status = 'Under Review'
+  account_request.status = 'Under Review'
   # The super admin receives a mail about a new user request with the user name
-  user_existed = User.find_by(name: requested_user.name) or User.find_by(name: requested_user.email)
-  requested_user_saved = requested_user.save
-  if !user_existed and requested_user_saved
+  user_existed = User.find_by(name: account_request.name) or User.find_by(name: account_request.email)
+  account_request_saved = account_request.save
+  if !user_existed and account_request_saved
     super_users = User.joins(:role).where('roles.name = ?', 'Super-Administrator')
     super_users.each do |super_user|
-      prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, requested_user, 'New account Request')
+      prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, account_request, 'New account Request')
       prepared_mail.deliver
     end
-    ExpertizaLogger.info LoggerMessage.new(controller_name, requested_user.name, 'The account you are requesting has been created successfully.', request)
-    flash[:success] = "User signup for \"#{requested_user.name}\" has been successfully requested."
+    ExpertizaLogger.info LoggerMessage.new(controller_name, account_request.name, 'The account you are requesting has been created successfully.', request)
+    flash[:success] = "User signup for \"#{account_request.name}\" has been successfully requested."
     redirect_to '/instructions/home'
     return
   elsif user_existed
     flash[:error] = "The account you are requesting has already existed in Expertiza."
   else
-    flash[:error] = requested_user.errors.full_messages.to_sentence
+    flash[:error] = account_request.errors.full_messages.to_sentence
   end
-  ExpertizaLogger.error LoggerMessage.new(controller_name, requested_user.name, flash[:error], request)
+  ExpertizaLogger.error LoggerMessage.new(controller_name, account_request.name, flash[:error], request)
   redirect_to controller: 'account_requests', action: 'request_new'
 end
 
@@ -124,9 +124,9 @@ end
 
 
   private
-  def requested_user_params
+  def account_request_params
     params.require(:user).permit(:name, :role_id, :fullname, :institution_id, :email)
-        .merge(self_introduction: params[:requested_user][:self_introduction])
+        .merge(self_introduction: params[:account_request][:self_introduction])
   end
 
 end

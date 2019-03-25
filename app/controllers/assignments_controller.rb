@@ -188,42 +188,22 @@ class AssignmentsController < ApplicationController
     end
 
     update_assignment_questionnaire_id
-    # ques_array = assignment_form_params[:assignment_questionnaire]
-    # ques_array.each do |cur_questionnaire|
-    #   cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
-    # end
-    # assignment_form_params[:assignment_questionnaire] = ques_array
-
     update_due_date_id
-    # due_array = assignment_form_params[:due_date]
-    # due_array.each do |cur_due|
-    #   cur_due[:parent_id] = exist_assignment.id.to_s
-    # end
-    # assignment_form_params[:due_date] = due_array
 
     @assignment_form.update(assignment_form_params, current_user)
   end
 
   def update_assignment_questionnaire_id
-    # exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
     ques_array = assignment_form_params[:assignment_questionnaire]
     ques_array = array_traverser(ques_array, 1)
-    # ques_array.each do |cur_questionnaire|
-    #   cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
-    # end
     assignment_form_params[:assignment_questionnaire] = ques_array
   end
 
   def update_due_date_id
-    # exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
     due_array = assignment_form_params[:due_date]
     due_array = array_traverser(due_array, 2)
-    # due_array.each do |cur_due|
-    #   cur_due[:parent_id] = exist_assignment.id.to_s
-    # end
     assignment_form_params[:due_date] = due_array
   end
-
 
   def array_traverser(temp_array, option)
     exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)

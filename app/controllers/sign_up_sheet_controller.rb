@@ -100,7 +100,7 @@ class SignUpSheetController < ApplicationController
   # Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
   # Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics can have different deadlines.
   def add_signup_topics
-    load_add_signup_topics(params[:id])
+    get_assignment_data(params[:id])
     SignUpSheet.add_signup_topic(params[:id])
   end
 
@@ -109,7 +109,7 @@ class SignUpSheetController < ApplicationController
   end
 
   # retrieves all the data associated with the given assignment. Includes all topics,
-  def load_add_signup_topics(assignment_id)
+  def get_assignment_data(assignment_id)
     @id = assignment_id
     @sign_up_topics = SignUpTopic.where('assignment_id = ?', assignment_id)
     @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
@@ -374,7 +374,7 @@ class SignUpSheetController < ApplicationController
   # This method is called when a student click on the trumpet icon. So this is a bad method name. --Yang
   def show_team
     if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
-      @results = ad_info(assignment.id, topic.id)
+      @results = get_ad(assignment.id, topic.id)
       @results.each do |result|
         result.keys.each do |key|
           @current_team_name = result[key] if key.equal? :name
@@ -457,7 +457,7 @@ class SignUpSheetController < ApplicationController
 
   # get info related to the ad for partners so that it can be displayed when an assignment_participant
   # clicks to see ads related to a topic
-  def ad_info(_assignment_id, topic_id)
+  def get_ad(_assignment_id, topic_id)
     # List that contains individual result object
     @result_list = []
     # Get the results

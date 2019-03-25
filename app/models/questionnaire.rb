@@ -78,6 +78,37 @@ class Questionnaire < ActiveRecord::Base
     results[0].max_score
   end
 
+  #clones the contents of a questionnaire, including the questions and associated advice
+  #moved from controller to model.
+  def self.copy_questionnaire_details(params, instructor_id)
+    orig_questionnaire = Questionnaire.find(params[:id])
+    questions = Question.where(questionnaire_id: params[:id])
+    questionnaire = orig_questionnaire.dup
+    questionnaire.instructor_id = instructor_id
+    questionnaire.name = 'Copy of ' + orig_questionnaire.name
+    begin
+      questionnaire.created_at = Time.now
+      questionnaire.save!
+      questions.each do |question|
+        new_question = question.dup
+        new_question.questionnaire_id = questionnaire.id
+        new_question.size = '50,3' if (new_question.is_a? Criterion or new_question.is_a? TextResponse) and new_question.size.nil?
+        new_question.save!
+        advices = QuestionAdvice.where(question_id: question.id)
+        next if advices.empty?
+        advices.each do |advice|
+          new_advice = advice.dup
+          new_advice.question_id = new_question.id
+          new_advice.save!
+        end
+      end
+    p_folder = TreeFolder.find_by(name: questionnaire.display_type)
+    parent = FolderNode.find_by(node_object_id: p_folder.id)
+    QuestionnaireNode.find_or_create_by(parent_id: parent.id, node_object_id: questionnaire.id)
+    return questionnaire
+    end
+  end  
+
   # validate the entries for this questionnaire
   def validate_questionnaire
     errors.add(:max_question_score, "The maximum question score must be a positive integer.") if max_question_score < 1

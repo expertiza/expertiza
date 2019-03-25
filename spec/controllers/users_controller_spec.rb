@@ -28,7 +28,7 @@ describe UsersController do
     end
 
     it 'renders list if user is instructor' do
-      allow(instructor).to receive(:list).and_return(student1)
+      allow(instructor).to receive(:paginate_list).with(anything()).and_return(student1)
       @params = {}
       session = {user: instructor}
       get :index, @params, session
@@ -46,6 +46,7 @@ describe UsersController do
       expect(response).to redirect_to("http://www.example.com")
     end
   end
+
 
   context "#show_selection" do
     before(:each) do

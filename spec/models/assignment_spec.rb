@@ -410,7 +410,7 @@ describe Assignment do
                   allow(DeadlineType).to receive(:find).with(1).and_return(deadline)
                   expect(assignment.get_current_stage_name(123)).to eq('Review')
               end
-          end # receive_message_chain(:where, :order).with(instructor_id: 6).with(:name)
+          end
       end
   end
 

@@ -1,5 +1,3 @@
-require 'will_paginate/array'
-
 describe UsersController do
   let(:admin) { build(:admin, id: 3) }
   let(:instructor) { build(:instructor, id: 2) }
@@ -25,12 +23,11 @@ describe UsersController do
     end
 
     it 'renders list if user is instructor' do
-      paginated_list = [student1].paginate(page: 1, per_page: 25)
-      allow(instructor).to receive(:get_user_list).and_return(paginated_list)
+      allow(instructor).to receive(:get_user_list).and_return([student1])
       @params = {}
       session = {user: instructor}
       get :index, @params, session
-      expect(controller.instance_variable_get(:@users)).to eq(paginated_list)
+      expect(controller.instance_variable_get(:@users)).to eq([student1])
       expect(response).to render_template(:list)
     end
   end

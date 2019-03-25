@@ -144,6 +144,7 @@ class SignUpSheetController < ApplicationController
     redirect_to controller: 'assignments', action: 'edit', id: assignment_id
   end
 
+  # function to list all topics and bids to a participant
   def list
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
@@ -155,6 +156,8 @@ class SignUpSheetController < ApplicationController
     @max_team_size = @assignment.max_team_size
     team_id = @participant.team.try(:id)
 
+    # If the assignment supports bidding, add all the bids of an 
+    # individual or team to the list of signed topics
     if @assignment.is_intelligent
       @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
       signed_up_topics = []
@@ -172,6 +175,7 @@ class SignUpSheetController < ApplicationController
     @drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 6)
     @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id)
 
+    # Show selected topics only if the assignment's deadline hasn't passed
     unless @assignment.due_dates.find_by(deadline_type_id: 1).nil?
       @show_actions = false if !@assignment.staggered_deadline? and @assignment.due_dates.find_by(deadline_type_id: 1).due_at < Time.now
 

@@ -131,7 +131,7 @@ module ReviewMappingHelper
     @assignment.num_review_rounds if @assignment.get_current_stage(topic_id) == "Finished" || @assignment.get_current_stage(topic_id) == "metareview"
   end
 
-  # varying rubric by round
+  # gets the review score awarded based on each round of the review 
   def get_each_round_score_awarded_for_review_report(reviewer_id, team_id)
     (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----') }
     (1..@assignment.num_review_rounds).each do |round|
@@ -141,6 +141,7 @@ module ReviewMappingHelper
     end
   end
 
+  # gets minimum, maximum and average value for all the reviews
   def get_min_max_avg_value_for_review_report(round, team_id)
     %i[max min avg].each {|metric| instance_variable_set('@' + metric.to_s, '-----') }
     if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? {|k| @avg_and_ranges[team_id][round].key? k }
@@ -151,6 +152,7 @@ module ReviewMappingHelper
     end
   end
 
+  # sorts the reviewers by the average volume of reviews in each round, in descending order
   def sort_reviewer_by_review_volume_desc
     @reviewers.each do |r|
       r.overall_avg_vol,
@@ -165,6 +167,7 @@ module ReviewMappingHelper
     @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 
+  # displays the average scores in round 1, 2 and 3
   def display_volume_metric(overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3)
     metric = "Avg. Volume: #{overall_avg_vol} <br/> ("
     metric += "1st: " + avg_vol_in_round_1.to_s if avg_vol_in_round_1 > 0
@@ -174,6 +177,7 @@ module ReviewMappingHelper
     metric.html_safe
   end
 
+  # moves data of reviews in each round from a current round
   def initialize_chart_elements(reviewer)
     round = 0
     labels = []
@@ -203,6 +207,7 @@ module ReviewMappingHelper
     [labels, reviewer_data, all_reviewers_data]
   end
 
+  # The data of all the reviews is displayed in the form of a bar chart
   def display_volume_metric_chart(reviewer)
     labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
     data = {

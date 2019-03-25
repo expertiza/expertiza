@@ -7,6 +7,7 @@ class SiteController < ActiveRecord::Base
 
   scope :builtin, -> { where(builtin: 1).order(:name) }
   scope :application, -> { where('builtin is null or builtin = 0').order(:name) }
+  attr_accessible :name, :permission_id, :builtin
 
   def actions
     @actions ||= controller_actions.order(:name)

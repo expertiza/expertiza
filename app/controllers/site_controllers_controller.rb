@@ -32,7 +32,7 @@ class SiteControllersController < ApplicationController
   end
 
   def create
-    @site_controller = SiteController.new(params[:site_controller])
+    @site_controller = SiteController.new(site_controller_params)
     if @site_controller.save
       flash[:notice] = 'The site controller was successfully created.'
       Role.rebuild_cache
@@ -50,7 +50,7 @@ class SiteControllersController < ApplicationController
 
   def update
     @site_controller = SiteController.find(params[:id])
-    if @site_controller.update_attributes(params[:site_controller])
+    if @site_controller.update_attributes(site_controller_params)
       flash[:notice] = 'The site controller was successfully updated.'
       Role.rebuild_cache
       redirect_to @site_controller
@@ -64,6 +64,12 @@ class SiteControllersController < ApplicationController
     SiteController.find(params[:id]).destroy
     Role.rebuild_cache
     redirect_to action: 'index'
+  end
+
+  private
+
+  def site_controller_params
+    params.require(:site_controller).permit(:name, :permission_id, :builtin)
   end
 
   protected

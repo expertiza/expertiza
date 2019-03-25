@@ -26,11 +26,10 @@ class QuestionnairesController < ApplicationController
   # Create a clone of the given questionnaire, copying all associated
   # questions. The name and creator are updated.
   def copy
-    orig_questionnaire = Questionnaire.find(params[:id])
-    questions = Question.where(questionnaire_id: params[:id])
-    @questionnaire = orig_questionnaire.dup
-    @questionnaire.instructor_id = session[:user].instructor_id ## Why was TA-specific code removed here?  See Project E713.
-    copy_questionnaire_details(questions, orig_questionnaire)
+    instructor_id = session[:user].instructor_id
+    @questionnaire = Questionnaire.copy_questionnaire_details(params, instructor_id)
+    undo_link("Copy of questionnaire #{@questionnaire.name} has been created successfully.")
+    redirect_to controller: 'questionnaires', action: 'view', id: @questionnaire.id
   end
 
   def view
@@ -520,36 +519,4 @@ class QuestionnairesController < ApplicationController
   end
 
   # FIXME: These private methods belong in the Questionnaire model
-
-  # clones the contents of a questionnaire, including the questions and associated advice
-  def copy_questionnaire_details(questions, orig_questionnaire)
-    @questionnaire.instructor_id = session[:user].instructor_id
-    @questionnaire.name = 'Copy of ' + orig_questionnaire.name
-    begin
-      @questionnaire.created_at = Time.now
-      @questionnaire.save!
-      questions.each do |question|
-        new_question = question.dup
-        new_question.questionnaire_id = @questionnaire.id
-        new_question.size = '50,3' if (new_question.is_a? Criterion or new_question.is_a? TextResponse) and new_question.size.nil?
-        new_question.save!
-        advices = QuestionAdvice.where(question_id: question.id)
-        next if advices.empty?
-        advices.each do |advice|
-          new_advice = advice.dup
-          new_advice.question_id = new_question.id
-          new_advice.save!
-        end
-      end
-
-      p_folder = TreeFolder.find_by(name: @questionnaire.display_type)
-      parent = FolderNode.find_by(node_object_id: p_folder.id)
-      QuestionnaireNode.find_or_create_by(parent_id: parent.id, node_object_id: @questionnaire.id)
-      undo_link("Copy of questionnaire #{orig_questionnaire.name} has been created successfully.")
-      redirect_to controller: 'questionnaires', action: 'view', id: @questionnaire.id
-    rescue StandardError
-      flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.' + $ERROR_INFO
-      redirect_to action: 'list', controller: 'tree_display'
-    end
-  end
 end

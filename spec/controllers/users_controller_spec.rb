@@ -7,6 +7,8 @@ describe UsersController do
   let(:student4) { build(:student, id: 20, role_id: 4) }
   let(:student5) { build(:student, role_id: 4, parent_id: 3) }
   let(:student6) { build(:student, role_id: nil, name: :lilith)}
+  let(:course) { double('Course', instructor_id: 2, path: '/cscs', name: 'abc') }
+  let(:course_participant) { build(:course_participant) }
 
   before(:each) do
     stub_current_user(instructor, instructor.role.name, instructor.role)

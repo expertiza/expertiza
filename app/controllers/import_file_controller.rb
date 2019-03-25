@@ -94,7 +94,7 @@ class ImportFileController < ApplicationController
           options[:has_teamname] = params[:has_teamname]
           Team.import(row_hash, params[:id], options, teamtype)
         end
-      rescue
+      rescue StandardError
         errors << $ERROR_INFO
       end
     elsif params[:model] == "ReviewResponseMap"
@@ -105,7 +105,7 @@ class ImportFileController < ApplicationController
         @header_integrated_body.each do |row_hash|
           ReviewResponseMap.import(row_hash, session, params[:id])
         end
-      rescue
+      rescue StandardError
         errors << $ERROR_INFO
       end
     elsif params[:model] == "MetareviewResponseMap"
@@ -116,7 +116,7 @@ class ImportFileController < ApplicationController
         @header_integrated_body.each do |row_hash|
           MetareviewResponseMap.import(row_hash, session, params[:id])
         end
-      rescue
+      rescue StandardError
         errors << $ERROR_INFO
       end
     elsif params[:model] == 'SignUpTopic' || params[:model] == 'SignUpSheet'
@@ -142,7 +142,7 @@ class ImportFileController < ApplicationController
           session[:assignment_id] = params[:id]
           Object.const_get(params[:model]).import(row_hash, session, params[:id])
         end
-      rescue
+      rescue StandardError
         errors << $ERROR_INFO
       end
     elsif params[:model] == 'AssignmentParticipant' || params[:model] == 'CourseParticipant'
@@ -164,7 +164,7 @@ class ImportFileController < ApplicationController
             CourseParticipant.import(row_hash, session, params[:id])
           end
         end
-      rescue
+      rescue StandardError
         errors << $ERROR_INFO
       end
     else # params[:model] = "User"

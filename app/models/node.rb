@@ -8,8 +8,8 @@ class Node < ActiveRecord::Base
   has_paper_trail
   # acts_as_nested_set
 
-  belongs_to :parent, class_name: 'Node', foreign_key: 'parent_id'
-  has_many :children, class_name: Node, foreign_key: 'parent_id'
+  belongs_to :parent, class_name: 'Node', foreign_key: 'parent_id', inverse_of: :nodes
+  has_many :children, class_name: Node, foreign_key: 'parent_id', inverse_of: :node, dependent: :destroy
 
   # Retrieves the nodes of this type
   def self.get(_sortvar = nil, _sortorder = nil, _user_id = nil, _show = nil, _parent_id = nil, _search = nil); end
@@ -18,14 +18,14 @@ class Node < ActiveRecord::Base
   def get_children(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, search = nil); end
 
   # Retrieves the action partial for this node
-  def get_partial_name
+  def partial_name
     self.class.table + "_actions"
   end
 
   # Most objects are not leaves
   # Currently only assignment and questionnaire are a leaf
   # type node
-  def is_leaf
+  def leaf?
     false
   end
 
@@ -34,17 +34,17 @@ class Node < ActiveRecord::Base
   def self.table; end
 
   # Retreives the node's object name
-  def get_name; end
+  def name; end
 
   # Retrieves the node's object directory
-  def get_directory; end
+  def directory; end
 
   # Retrieves the node's object create_at
-  def get_creation_date; end
+  def creation_date; end
 
   # Retrieves the node's object create_at
-  def get_modified_date; end
+  def modified_date; end
 
   # Retrieves the type of children this node has
-  def get_child_type; end
+  def child_type; end
 end

@@ -194,11 +194,12 @@ class AssignmentsController < ApplicationController
     # end
     # assignment_form_params[:assignment_questionnaire] = ques_array
 
-    due_array = assignment_form_params[:due_date]
-    due_array.each do |cur_due|
-      cur_due[:parent_id] = exist_assignment.id.to_s
-    end
-    assignment_form_params[:due_date] = due_array
+    update_due_date_id
+    # due_array = assignment_form_params[:due_date]
+    # due_array.each do |cur_due|
+    #   cur_due[:parent_id] = exist_assignment.id.to_s
+    # end
+    # assignment_form_params[:due_date] = due_array
 
     @assignment_form.update(assignment_form_params, current_user)
   end
@@ -211,6 +212,16 @@ class AssignmentsController < ApplicationController
     end
     assignment_form_params[:assignment_questionnaire] = ques_array
   end
+
+  def update_due_date_id
+    exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
+    due_array = assignment_form_params[:due_date]
+    due_array.each do |cur_due|
+      cur_due[:parent_id] = exist_assignment.id.to_s
+    end
+    assignment_form_params[:due_date] = due_array
+  end
+  
   # check whether rubrics are set before save assignment
   def empty_rubrics_list
     rubrics_list = %w[ReviewQuestionnaire

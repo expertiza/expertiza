@@ -1,15 +1,24 @@
 class QuizResponseMap < ResponseMap
+<<<<<<< HEAD
   belongs_to :reviewee, class_name: 'Participant', foreign_key: 'reviewee_id', inverse_of: false
   belongs_to :contributor, class_name: 'Participant', foreign_key: 'reviewee_id', inverse_of: false
   belongs_to :quiz_questionnaire, class_name: 'QuizQuestionnaire', foreign_key: 'reviewed_object_id', inverse_of: false
   belongs_to :assignment, class_name: 'Assignment', inverse_of: false
   has_many :quiz_responses, foreign_key: :map_id, dependent: :destroy, inverse_of: false
+=======
+  attr_accessor :response_maps
+  belongs_to :reviewee, class_name: 'Participant', foreign_key: 'reviewee_id', inverse_of: :quiz_responses
+  belongs_to :contributor, class_name: 'Participant', foreign_key: 'reviewee_id', inverse_of: :quiz_responses
+  belongs_to :quiz_questionnaire, class_name: 'QuizQuestionnaire', foreign_key: 'reviewed_object_id', inverse_of: :quiz_responses
+  belongs_to :assignment, class_name: 'Assignment', inverse_of: :quiz_responses
+  has_many :quiz_responses, foreign_key: :map_id, inverse_of: :quiz_responses, dependent: :destroy
+>>>>>>> Rahul and Shraddha Code Climate Fixes
 
   def questionnaire
     self.quiz_questionnaire
   end
 
-  def get_title
+  def fetch_title
     "Quiz"
   end
 
@@ -26,6 +35,7 @@ class QuizResponseMap < ResponseMap
     questionnaire_id = self.reviewed_object_id  # the reviewed id is questionnaire id in response map table
     response_id = self.response.first.id rescue nil
 
+<<<<<<< HEAD
     # quiz not taken yet
     return "N/A" if response_id.nil?
 
@@ -45,6 +55,16 @@ class QuizResponseMap < ResponseMap
 
     if calculated_score.nil? or calculated_score[0].nil? or calculated_score[0].graded_percent.nil?
       return "N/A"
+=======
+    return 'N/A' if response_id.nil? # this quiz has not been taken yet
+
+    questions.each do |question|
+      score = Answer.find_by(response_id: response_id, question_id: question.id).first
+     # The quiz has been taken but not all the answers are stored correctly.
+      return 'N/A' unless score.nil?
+      quiz_score += score.answer
+
+>>>>>>> Rahul and Shraddha Code Climate Fixes
     end
 
     # convert the obtained percentage to float and round it to 1st precision

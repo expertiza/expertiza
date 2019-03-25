@@ -39,6 +39,7 @@ class Question < ActiveRecord::Base
     self.destroy
   end
 
+<<<<<<< HEAD
   # for quiz questions, we store 'TrueFalse', 'MultipleChoiceCheckbox', 'MultipleChoiceRadio' in the DB, and the full names are returned below
   def get_formatted_question_type
     type = self.type
@@ -51,6 +52,19 @@ class Question < ActiveRecord::Base
       statement = 'Multiple Choice - Radio'
     end
     statement
+=======
+  # for quiz questions, we store 'TrueFalse', 'ultipleChoiceCheckbox', 'MultipleChoiceRadio' in the DB, and the full names are returned below
+  def get_formatted_question_type
+    type = self.type
+
+    if type == 'TrueFalse'
+      return 'True/False'
+    elsif type == 'MultipleChoiceCheckbox'
+      return 'Multiple Choice - Checked'
+    elsif type == 'MultipleChoiceRadio'
+      return 'Multiple Choice - Radio'
+    end
+>>>>>>> Rahul and Shraddha Code Climate Fixes
   end
 
   # Placeholder methods, override in derived classes if required.
@@ -89,33 +103,52 @@ class Question < ActiveRecord::Base
     question_ids
   end
 
+<<<<<<< HEAD
   def self.import(row, _row_header, _session, q_id = nil)
+=======
+  def self.import(row, _row_header, session, _id = nil)
+>>>>>>> Rahul and Shraddha Code Climate Fixes
     if row.length != 5
       raise ArgumentError,  "Not enough items: expect 3 columns: your login name, your full name" \
                             "(first and last name, not seperated with the delimiter), and your email."
     end
+<<<<<<< HEAD
     # questionnaire = Questionnaire.find_by_id(_id)
     questionnaire = Questionnaire.find_by(id: q_id)
+=======
+    questionnaire = Questionnaire.find_by_id(_id)
+>>>>>>> Rahul and Shraddha Code Climate Fixes
     questions = questionnaire.questions
     qid = 0
-    questions.each do |q|
+    for q in questions
       if q.seq == row[2].strip.to_f
         qid = q.id
         break
       end
     end
+<<<<<<< HEAD
     raise ArgumentError, "Questionnaire Not Found" if questionnaire.nil?
 
     if qid > 0
       # question = Question.find_by_id(qid)
       question = Question.find_by(id: qid)
+=======
+    if questionnaire.nil?
+      raise ArgumentError, "Questionnaire Not Found"
+    elsif qid > 0
+      question = Question.find_by_id(qid)
+>>>>>>> Rahul and Shraddha Code Climate Fixes
       attributes = {}
       attributes["txt"] = row[0].strip
       attributes["type"] = row[1].strip
       attributes["seq"] = row[2].strip.to_f
       attributes["size"] = row[3].strip
       attributes["break_before"] = row[4].strip
+<<<<<<< HEAD
       question.questionnaire_id = q_id
+=======
+      question.questionnaire_id=_id
+>>>>>>> Rahul and Shraddha Code Climate Fixes
       question.update(attributes)
     else
       attributes = {}
@@ -123,9 +156,15 @@ class Question < ActiveRecord::Base
       attributes["type"] = row[1].strip
       attributes["seq"] = row[2].strip.to_f
       attributes["size"] = row[3].strip
+<<<<<<< HEAD
       # attributes["break_before"] = row[4].strip
       question = Question.new(attributes)
       question.questionnaire_id = q_id
+=======
+      #attributes["break_before"] = row[4].strip
+      question = Question.new(attributes)
+      question.questionnaire_id=_id
+>>>>>>> Rahul and Shraddha Code Climate Fixes
       question.save
     end
   end

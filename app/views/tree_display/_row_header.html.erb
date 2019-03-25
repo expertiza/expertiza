@@ -30,7 +30,11 @@
       <br/><I>Directory:</I> <%= parent_node.get_directory %>
   <% end %>
   <% if parent_node.get_creation_date != nil %>
+<<<<<<< HEAD
     <br/><I>Creation Date:</I> <%= parent_node.get_creation_date.strftime("%Y-%m-%d %H:%M") %>
+=======
+    <br/><I>Creation Date:</I> <%= parent_node.get_creation_date.strftime("%F") %>
+>>>>>>> Rahul and Shraddha Code Climate Fixes
 <% end %>
 <% if parent_node.get_modified_date != nil %>
   <br/><I>Updated Date:</I> <%= parent_node.get_modified_date %>

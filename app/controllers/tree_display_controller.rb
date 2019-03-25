@@ -67,20 +67,104 @@ class TreeDisplayController < ApplicationController
     end
   end
 
-  # Returns the contents of the Courses and Questionaire subfolders
-  def get_sub_folder_contents
-    # Convert the object received in parameters to a FolderNode object.
-    folder_node = (params[:reactParams2][:nodeType]).constantize.new
-    params[:reactParams2][:child_nodes].each do |key, value|
-      folder_node[key] = value
+  # getting all attributes of assignment node
+  def assignments_method(node, tmp_object)
+    tmp_object.merge!(
+      "course_id" => node.get_course_id,
+      "max_team_size" => node.get_max_team_size,
+      "is_intelligent" => node.get_is_intelligent,
+      "require_quiz" => node.get_require_quiz,
+      "allow_suggestions" => node.get_allow_suggestions,
+      "has_topic" => SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first ? true : false
+    )
+  end
+
+  def update_in_ta_course_listing(instructor_id, node, tmp_object)
+    tmp_object["private"] = true if session[:user].role.ta? == 'Teaching Assistant' &&
+        Ta.get_my_instructors(session[:user].id).include?(instructor_id) &&
+        ta_for_current_course?(node)
+  end
+
+  def update_is_available(tmp_object, instructor_id, node)
+    tmp_object["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role.ta? &&
+        Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
+  end
+
+  # updating instructor value for tmp_object
+  def update_instructor(tmp_object, instructor_id)
+    tmp_object["instructor_id"] = instructor_id
+    tmp_object["instructor"] = nil
+    tmp_object["instructor"] = User.find(instructor_id).name(session[:ip]) if instructor_id
+  end
+
+  def update_tmp_obj(tmp_object, node)
+    tmp = {
+      "directory" => node.get_directory,
+      "creation_date" => node.get_creation_date,
+      "updated_date" => node.get_modified_date,
+      "institution" => Institution.where(id: node.retrieve_institution_id),
+      "private" => node.get_instructor_id == session[:user].id
+    }
+    tmp_object.merge!(tmp)
+  end
+
+  def courses_assignments_obj(node_type, tmp_object, node)
+    update_tmp_obj(tmp_object, node)
+    # tmpObject["private"] = node.get_private
+    instructor_id = node.get_instructor_id
+    ## if current user's role is TA for a course, then that course will be listed under his course listing.
+    update_in_ta_course_listing(instructor_id, node, tmp_object)
+    update_instructor(tmp_object, instructor_id)
+    update_is_available(tmp_object, instructor_id, node)
+    assignments_method(node, tmp_object) if node_type == "Assignments"
+  end
+
+  # getting result nodes for child
+  # Changes to this method were done as part of E1788_OSS_project_Maroon_Heatmap_fixes
+  #
+  # courses_assignments_obj method makes a call to update_in_ta_course_listing which
+  # separates out courses based on if he/she is the TA for the course passed
+  # by marking private to be true in that case
+  #
+  # this also ensures that instructors (who are not ta) would have update_in_ta_course_listing
+  # not changing the private value if he/she is not TA which was set to true for all courses before filtering
+  # in update_tmp_obj in courses_assignments_obj
+  #
+  # below objects/variable names were part of the project as before and
+  # refactoring could have affected other functionalities too, so it was avoided in this fix
+  #
+  # fix comment end
+  #
+  def res_node_for_child(tmp_res)
+    res = {}
+    tmp_res.each_key do |node_type|
+      res[node_type] = []
+      tmp_res[node_type].each do |node|
+        tmp_object = {
+          "nodeinfo" => node,
+          "name" => node.get_name,
+          "type" => node.type
+        }
+        courses_assignments_obj(node_type, tmp_object, node) if %w[Courses Assignments].include? node_type
+        res[node_type] << tmp_object
+      end
     end
-    
-    # Get all of the children in the sub-folder.
-    child_nodes = folder_node.get_children(nil, nil, session[:user].id, nil, nil)
-    # Serialize the contents of each node so it can be displayed on the UI
-    contents = []
-    child_nodes.each do |node|
-      contents.push(serialize_sub_folder_to_json(node))
+    res
+  end
+
+  def update_fnode_children(fnode, tmp_res)
+    # fnode is short for foldernode which is the parent node
+    # ch_nodes are childrens
+    # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
+    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
+    tmp_res[fnode.get_name] = ch_nodes
+  end
+
+  # initialize parent node and update child nodes for it
+  def initialize_fnode_update_children(params, node, tmp_res)
+    fnode = (params[:reactParams][:nodeType]).constantize.new
+    node.each do |a|
+      fnode[a[0]] = a[1]
     end
   end
   # for child nodes
@@ -162,7 +246,6 @@ class TreeDisplayController < ApplicationController
         res2 = {
           "nodeinfo" => child,
           "name" => child.get_name,
-          "instructor_id" => child.get_instructor_id, # add instructor id to the payload to make it available in the frontend
           "key" => params[:reactParams2][:key],
           "type" => node_type,
           "private" => child.get_private,
@@ -181,7 +264,19 @@ class TreeDisplayController < ApplicationController
     child_nodes.each do |key, value|
       fnode[key] = value
     end
-    
+  end
+
+  def get_tmp_res(params, child_nodes)
+    fnode = (params[:reactParams2][:nodeType]).constantize.new
+    initialize_fnode_2(fnode, child_nodes)
+    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
+    res_node_for_child_2(ch_nodes)
+  end
+
+  # for child nodes
+  def children_node_2_ng
+    child_nodes = child_nodes_from_params(params[:reactParams2][:child_nodes])
+    res = get_tmp_res(params, child_nodes)
     respond_to do |format|
       format.html { render json: contents }
     end

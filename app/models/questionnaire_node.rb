@@ -1,6 +1,11 @@
 class QuestionnaireNode < Node
+<<<<<<< HEAD
   belongs_to :questionnaire, class_name: "Questionnaire", foreign_key: "node_object_id", inverse_of: false
   belongs_to :node_object, class_name: "Questionnaire", foreign_key: "node_object_id", inverse_of: false
+=======
+  belongs_to :questionnaire, class_name: "Questionnaire", foreign_key: "node_object_id"
+  belongs_to :node_object, class_name: "Questionnaire", foreign_key: "node_object_id"
+>>>>>>> Rahul and Shraddha Code Climate Fixes
 
   def self.table
     "questionnaires"
@@ -12,11 +17,21 @@ class QuestionnaireNode < Node
                      'questionnaires.instructor_id = ?'
                    else
                      'questionnaires.instructor_id in (?)'
+<<<<<<< HEAD
                    end
                  elsif User.find(user_id).role.name != "Teaching Assistant"
                    '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
                  else
                    '(questionnaires.private = 0 or questionnaires.instructor_id in (?))'
+=======
+                                end
+                 else
+                   if User.find(user_id).role.name != "Teaching Assistant"
+                     '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
+                   else
+                     '(questionnaires.private = 0 or questionnaires.instructor_id in (?))'
+                                end
+>>>>>>> Rahul and Shraddha Code Climate Fixes
                  end
 
     values = if User.find(user_id).role.name != "Teaching Assistant"
@@ -40,6 +55,7 @@ class QuestionnaireNode < Node
     Questionnaire.find_by(id: self.node_object_id).try(:name)
   end
 
+<<<<<<< HEAD
   # this method return instructor id associated with a questionnaire
   # expects no arguments
   # returns int
@@ -47,6 +63,8 @@ class QuestionnaireNode < Node
     Questionnaire.find_by(id: self.node_object_id).try(:instructor_id)
   end
 
+=======
+>>>>>>> Rahul and Shraddha Code Climate Fixes
   def get_private
     Questionnaire.find_by(id: self.node_object_id).try(:private)
   end

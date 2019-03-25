@@ -378,7 +378,7 @@ describe Assignment do
       context 'when due date is not nil and due date is not equal to Finished' do
         it 'returns due date' do
           allow(assignment).to receive(:finished?).with(123).and_return(false)
-          allow(DueDate).to receive(:get_next_due_date).with(1, 123).and_return(assignment_due_date)
+          allow(assignment).to receive(:next_due_date).with(123).and_return(assignment_due_date)
           expect(assignment.stage_deadline(123)).to match('2011-11-11 11:11:11')
         end
       end
@@ -405,7 +405,7 @@ describe Assignment do
               it 'returns current stage name' do
                   allow(assignment).to receive(:finished?).with(123).and_return(false)
                   allow(assignment).to receive(:topic_missing?).with(123).and_return(false)
-                  allow(DueDate).to receive(:get_next_due_date).with(1,123).and_return(assignment_due_date)
+                  allow(assignment).to receive(:next_due_date).with(123).and_return(assignment_due_date)
                   deadline = create(:deadline_type, id: 1, name:"Review")
                   allow(DeadlineType).to receive(:find).with(1).and_return(deadline)
                   expect(assignment.current_stage_name(123)).to eq('Review')
@@ -520,7 +520,7 @@ describe Assignment do
   describe '#finished?' do
     context 'when there is a next due date' do
       it 'returns False' do
-        allow(DueDate).to receive(:get_next_due_date).with(1, 123).and_return('2021-11-11 11:11:11')
+        allow(DueDate).to receive(:get_next_due_date).with(1,123).and_return('2021-11-11 11:11:11')
         expect(assignment.finished?(123)).to eq(false)
       end
     end

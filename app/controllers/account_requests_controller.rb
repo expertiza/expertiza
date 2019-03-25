@@ -69,8 +69,7 @@ end
 def request_new
   flash[:warn] = "If you are a student, please contact your teaching staff to get your Expertiza ID."
   @user = User.new
-  @role = Role.new
-  @rolename = Role.find_by(name: "Instructor")
+  @rolename = Role.find_by(name: "instructor")
   roles_for_request_sign_up
 end
 
@@ -100,7 +99,7 @@ def create_requested_user_record
     flash[:error] = requested_user.errors.full_messages.to_sentence
   end
   ExpertizaLogger.error LoggerMessage.new(controller_name, requested_user.name, flash[:error], request)
-  redirect_to controller: 'users', action: 'request_new', role: 'Student'
+  redirect_to controller: 'account_requests', action: 'request_new'
 end
 
 
@@ -108,6 +107,21 @@ end
     roles_can_be_requested_online = ["Instructor", "Teaching Assistant"]
     @all_roles = Role.where(name: roles_can_be_requested_online)
   end
+
+  protected
+
+# finds the list of roles that the current user can have
+# used to display a dropdown selection of roles for the current user in the views
+  def foreign
+    # finds what the role of the current user is.
+    role = Role.find(session[:user].role_id)
+
+    # this statement finds a list of roles that the current user can have
+    # The @all_roles variable is used in the view to present the user a list of options
+    # of the roles they may select from.
+    @all_roles = Role.where('id in (?) or id = ?', role.get_available_roles, role.id)
+  end
+
 
   private
   def requested_user_params

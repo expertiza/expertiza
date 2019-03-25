@@ -1,9 +1,12 @@
 class Invitation < ActiveRecord::Base
-  belongs_to :to_user, class_name: "User", foreign_key: "to_id"
-  belongs_to :from_user, class_name: "User", foreign_key: "from_id"
+  # belongs_to :to_user, class_name: "User", foreign_key: "to_id"
+  belongs_to :to_user, class_name: "User", foreign_key: "to_id", inverse_of: false
+  # belongs_to :from_user, class_name: "User", foreign_key: "from_id"
+  belongs_to :from_user, class_name: "User", foreign_key: "from_id", inverse_of: false
 
   def self.remove_waitlists_for_team(topic_id, _assignment_id)
-    first_waitlisted_signup = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
+    # first_waitlisted_signup = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
+    first_waitlisted_signup = SignedUpTeam.find_by(topic_id: topic_id, is_waitlisted: true)
 
     # As this user is going to be allocated a confirmed topic, all of his waitlisted topic signups should be purged
     first_waitlisted_signup.is_waitlisted = false
@@ -26,7 +29,8 @@ class Invitation < ActiveRecord::Base
     # if so, update the original record; else create a new record
     original_team_id = TeamsUser.team_id(assignment_id, invited_user_id)
     if original_team_id
-      team_user_mapping = TeamsUser.where(team_id: original_team_id, user_id: invited_user_id).first
+      # team_user_mapping = TeamsUser.where(team_id: original_team_id, user_id: invited_user_id).first
+      team_user_mapping = TeamsUser.find_by(team_id: original_team_id, user_id: invited_user_id)
       TeamsUser.update(team_user_mapping.id, team_id: new_team_id)
     else
       TeamsUser.create(team_id: new_team_id, user_id: invited_user_id)
@@ -58,9 +62,9 @@ class Invitation < ActiveRecord::Base
     if can_add_member # The member was successfully added to the team (the team was not full)
       Invitation.update_users_topic_after_invite_accept(inviter_user_id, invited_user_id, assignment_id)
 
-      invited_participant = Participant.where(user_id: invited_user_id, parent_id: assignment_id).first
-      inviter_participant = Participant.where(user_id: inviter_user_id, parent_id: assignment_id).first
-      inviter_assignment_team = AssignmentTeam.team(inviter_participant)
+      # invited_participant = Participant.where(user_id: invited_user_id, parent_id: assignment_id).first
+      # inviter_participant = Participant.where(user_id: inviter_user_id, parent_id: assignment_id).first
+      # inviter_assignment_team = AssignmentTeam.team(inviter_participant)
     end
 
     can_add_member

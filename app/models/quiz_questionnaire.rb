@@ -1,4 +1,5 @@
 class QuizQuestionnaire < Questionnaire
+  attr_accessor :questionnaire
   after_initialize :post_initialization
   def post_initialization
     self.display_type = 'Quiz'
@@ -22,8 +23,8 @@ class QuizQuestionnaire < Questionnaire
       scores[:quiz][:scores][:avg] * 100 / 100.to_f
     else
       0
-      end
     end
+  end
 
   def taken_by_anyone?
     !ResponseMap.where(reviewed_object_id: self.id, type: 'QuizResponseMap').empty?
@@ -32,4 +33,4 @@ class QuizQuestionnaire < Questionnaire
   def taken_by? participant
     !ResponseMap.where(reviewed_object_id: self.id, type: 'QuizResponseMap', reviewer_id: participant.id).empty?
   end
-  end
+end

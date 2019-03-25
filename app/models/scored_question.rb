@@ -1,7 +1,7 @@
 class ScoredQuestion < ChoiceQuestion
   validates :weight, presence: true # user must specify a weight for a question
   validates :weight, numericality: true # the weight must be numeric
-
+  attr_accessor :weight, :max_label, :min_label
   def edit; end
 
   def view_question_text; end
@@ -11,7 +11,7 @@ class ScoredQuestion < ChoiceQuestion
   def view_completed_question; end
 
   def self.compute_question_score(response_id)
-    answer = Answer.where(question_id: self.id, response_id: response_id).first
+    answer = Answer.find_by(question_id: self.id, response_id: response_id)
     self.weight * answer.answer
   end
 end

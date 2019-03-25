@@ -1,4 +1,5 @@
 class QuestionAdvice < ActiveRecord::Base
+  attr_accessor :question_id, :score, :advice
   belongs_to :question
 
   # This method returns an array of fields present in question advice model

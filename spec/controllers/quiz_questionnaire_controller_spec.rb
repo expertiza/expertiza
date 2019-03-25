@@ -289,3 +289,4 @@ describe '#create_quiz_questionnaire, #create_questionnaire and #save' do
     end
   end
 end
+end

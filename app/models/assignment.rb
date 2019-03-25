@@ -335,7 +335,7 @@ class Assignment < ActiveRecord::Base
   def stage_deadline(topic_id = nil)
     return 'Unknown' if topic_missing?(topic_id)
     return nil if finished?(topic_id)
-    DueDate.get_next_due_date(topic_id).due_at.to_s
+    DueDate.get_next_due_date(self.id, topic_id).due_at.to_s
   end
 
   def num_review_rounds

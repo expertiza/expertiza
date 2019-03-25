@@ -378,7 +378,7 @@ describe Assignment do
       context 'when due date is not nil and due date is not equal to Finished' do
         it 'returns due date' do
           allow(assignment).to receive(:finished?).with(123).and_return(false)
-          allow(DueDate).to receive(:get_next_due_date).with(123).and_return(assignment_due_date)
+          allow(DueDate).to receive(:get_next_due_date).with(1, 123).and_return(assignment_due_date)
           expect(assignment.stage_deadline(123)).to match('2011-11-11 11:11:11')
         end
       end
@@ -404,11 +404,13 @@ describe Assignment do
           context 'when due date is not nil and due date is not equal to Finished' do
               it 'returns current stage name' do
                   allow(assignment).to receive(:finished?).with(123).and_return(false)
-                  allow(DueDate).to receive(:get_next_due_date).with(123).and_return(assignment_due_date)
-                  allow(DeadlineType).to receive(:find).with(1).and_return(assignment_due_date.deadline_name)
+                  allow(assignment).to receive(:topic_missing?).with(123).and_return(false)
+                  allow(DueDate).to receive(:get_next_due_date).with(1,123).and_return(assignment_due_date)
+                  deadline = create(:deadline_type, id: 1, name:"Review")
+                  allow(DeadlineType).to receive(:find).with(1).and_return(deadline)
                   expect(assignment.get_current_stage_name(123)).to eq('Review')
               end
-          end
+          end # receive_message_chain(:where, :order).with(instructor_id: 6).with(:name)
       end
   end
 

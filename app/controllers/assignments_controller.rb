@@ -186,16 +186,19 @@ class AssignmentsController < ApplicationController
     if assignment_form_params[:assignment][:directory_path].blank?
       assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
     end
+    
     ques_array = assignment_form_params[:assignment_questionnaire]
-    due_array = assignment_form_params[:due_date]
     ques_array.each do |cur_questionnaire|
       cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
     end
+    assignment_form_params[:assignment_questionnaire] = ques_array
+
+    due_array = assignment_form_params[:due_date]
     due_array.each do |cur_due|
       cur_due[:parent_id] = exist_assignment.id.to_s
     end
-    assignment_form_params[:assignment_questionnaire] = ques_array
     assignment_form_params[:due_date] = due_array
+
     @assignment_form.update(assignment_form_params, current_user)
   end
 

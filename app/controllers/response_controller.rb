@@ -17,13 +17,13 @@ class ResponseController < ApplicationController
     when 'delete', 'update'
       return current_user_id?(user_id)
     when 'view'
-      return edit_allowed?(response.map, user_id)
+      return view_allowed?(response.map, user_id)
     else
       current_user
     end
   end
 
-  def edit_allowed?(map, user_id)
+  def view_allowed?(map, user_id)
     assignment = map.reviewer.assignment
     # if it is a review response map, all the members of reviewee team should be able to view the reponse (can be done from heat map)
     if map.is_a? ReviewResponseMap

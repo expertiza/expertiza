@@ -1,4 +1,7 @@
 class TagPrompt < ActiveRecord::Base
+  include ActionView::Helpers
+  include ActionView::Context
+
   validates :prompt, presence: true
   validates :desc, presence: true
   validates :control_type, presence: true
@@ -41,11 +44,11 @@ class TagPrompt < ActiveRecord::Base
         tag_prompt_deployment.id.to_s + ', ' + control_id + ');'
 
     content_tag(:div,
-                content_tag(:input, nil,
-                            {type: "checkbox", name: "tag_checkboxes[]", id: control_id, value: value,
-                             onLoad: "toggleLabel(this)", onChange: on_change_value}, false) +
-                    content_tag(:label, '&nbsp;' + self.prompt.to_s, {for: " " + control_id}, false),
-                {class: "toggle-container tag_prompt_container", title: self.desc.to_s}, false)
+                capture do
+                   concat tag(:input, {type: "checkbox", name: "tag_checkboxes[]", id: control_id, value: value,
+                                      onLoad: "toggleLabel(this)", onChange: on_change_value}, false, false)
+                   concat content_tag(:label, '&nbsp;' + self.prompt.to_s, {for: " " + control_id}, false)
+                end, {class: "toggle-container tag_prompt_container", title: self.desc.to_s}, false)
   end
 
   def slider_control(answer, tag_prompt_deployment, stored_tags)

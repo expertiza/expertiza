@@ -73,10 +73,10 @@ class Question < ActiveRecord::Base
   def view_question_text
     content_tag(:tr,
                 capture do
-                  content_tag(:td, ' ' + self.txt + ' ', {align: "left"}, false)
-                  content_tag(:td, self.type, {align: "left"}, false)
-                  content_tag(:td, self.weight.to_s, {align: "center"}, false)
-                  content_tag(:td, '&mdash;', {align: "center"}, false)
+                  concat content_tag(:td, ' ' + self.txt + ' ', {align: "left"}, false)
+                  concat content_tag(:td, self.type, {align: "left"}, false)
+                  concat content_tag(:td, self.weight.to_s, {align: "center"}, false)
+                  concat content_tag(:td, '&mdash;', {align: "center"}, false)
                 end, {}, false)
   end
 

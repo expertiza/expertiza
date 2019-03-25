@@ -7,7 +7,7 @@ class TextResponse < Question
                 capture do
                   concat super(nil)
                   concat content_tag(:td, '<!--placeholder (TextRsponse does not need weight)-->', {}, false)
-                  cconcat ontent_tag(:td, 'text area size <input size="6" value="' + self.size.to_s +
+                  concat content_tag(:td, 'text area size <input size="6" value="' + self.size.to_s +
                           '" name="question[' + self.id.to_s + '][size]" id="question_' + self.id.to_s + '_size" type="text">', {}, false)
                 end, {}, false)
   end

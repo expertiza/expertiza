@@ -67,9 +67,6 @@ class UsersController < ApplicationController
   #   From the edit.html.erb, if the person wants to see the information instead of editing it.
   #   From show_selection() as desribed in the above comments.
 
-<<<<<<< HEAD
-=======
->>>>>>> debug
   def show_selection
     @user = User.find_by(name: params[:user][:name])
     if !@user.nil?
@@ -86,12 +83,9 @@ class UsersController < ApplicationController
     end
   end
 
-<<<<<<< HEAD
   #E1914
   #finds out the current user's role.
   # If that is not a a student, permission is granted to edit the information of the requested user.
-=======
->>>>>>> debug
   def show
     # if permission is not granted, the current user is redirected to home.
     if params[:id].nil? || ((current_user_role? == "Student") && (session[:user].id != params[:id].to_i))

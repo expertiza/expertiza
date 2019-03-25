@@ -46,7 +46,7 @@ describe 'new user request' do
   end
 
   context 'on users#list_pending_requested page' do
-    before(:each) { create(:requested_user) }
+    before(:each) { create(:account_request) }
 
     it 'allows super-admin and admin to communicate with requesters by clicking email addresses' do
       visit '/'

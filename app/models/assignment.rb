@@ -332,6 +332,7 @@ class Assignment < ActiveRecord::Base
     AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: 2).size >= 1
   end
 
+  #Gives the next stage deadline date and nil if its finished assignment 
   def stage_deadline(topic_id = nil)
     return 'Unknown' if topic_missing?(topic_id)
     return nil if finished?(topic_id)
@@ -347,11 +348,11 @@ class Assignment < ActiveRecord::Base
     rounds
   end
 
-  # Zhewei: this method is almost the same as 'stage_deadline'
+  #Gives the current stage name of the assignment
   def current_stage_name(topic_id = nil)
     return 'Unknown' if topic_missing?(topic_id)
     due_date = next_due_date(topic_id)
-     finished?(topic_id)? "Finished" : DeadlineType.find(due_date.deadline_type_id).name
+    finished?(topic_id)? "Finished" : DeadlineType.find(due_date.deadline_type_id).name
   end
 
 

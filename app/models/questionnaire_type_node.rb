@@ -1,6 +1,6 @@
 class QuestionnaireTypeNode < FolderNode
-  belongs_to :table, class_name: "TreeFolder", foreign_key: "node_object_id"
-  belongs_to :node_object, class_name: "TreeFolder"
+  belongs_to :table, class_name: "TreeFolder", foreign_key: "node_object_id", inverse_of: :questionnaire_type_node
+  belongs_to :node_object, class_name: "TreeFolder", inverse_of: :questionnaire_type_node
 
   def self.table
     "tree_folders"
@@ -17,15 +17,15 @@ class QuestionnaireTypeNode < FolderNode
     nodes
   end
 
-  def get_partial_name
+  def partial_name
     "questionnaire_type_actions"
   end
 
-  def get_name
+  def name
     TreeFolder.find(self.node_object_id).name
   end
 
-  def get_children(sortvar = nil, sortorder = nil, user_id = nil, show = nil, _parent_id = nil, search = nil)
+  def children(sortvar = nil, sortorder = nil, user_id = nil, show = nil, _parent_id = nil, search = nil)
     QuestionnaireNode.get(sortvar, sortorder, user_id, show, self.node_object_id, search)
   end
 end

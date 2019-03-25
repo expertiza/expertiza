@@ -205,29 +205,31 @@ class SignUpSheetController < ApplicationController
   # routes to new page to specficy student
   def signup_as_instructor; end
 
+  def signup_student user
+    if SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
+      flash[:success] = "You have successfully signed up the student for the topic!"
+      ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor signed up student for topic: ' + params[:topic_id].to_s)
+    else
+      flash[:error] = "The student has already signed up for a topic!"
+      ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor is signing up a student who already has a topic')
+    end
+  end
+
   def signup_as_instructor_action
     user = User.find_by(name: params[:username])
     if user.nil? # validate invalid user
       flash[:error] = "That student does not exist!"
+    end
+    if !user.nil? and AssignmentParticipant.exists? user_id: user.id, parent_id: params[:assignment_id]
+      signup_student(user);
     else
-      if AssignmentParticipant.exists? user_id: user.id, parent_id: params[:assignment_id]
-        if SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
-          flash[:success] = "You have successfully signed up the student for the topic!"
-          ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor signed up student for topic: ' + params[:topic_id].to_s)
-        else
-          flash[:error] = "The student has already signed up for a topic!"
-          ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor is signing up a student who already has a topic')
-        end
-      else
-        flash[:error] = "The student is not registered for the assignment!"
-        ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'The student is not registered for the assignment: ' << user.id)
-      end
+      flash[:error] = "The student is not registered for the assignment!"
+      ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'The student is not registered for the assignment: ' << user.id)
     end
     redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
   end
 
-  # Checks if participant has permission to delete a topic, reports errors otherwise
-  def can_delete_topic?(is_instructor?, participant, assignment, drop_topic_deadline)
+  def can_delete_topic? is_instructor, participant, assignment, drop_topic_deadline
     submission_error_message = ""
     deadline_error_message = ""
 
@@ -237,7 +239,7 @@ class SignUpSheetController < ApplicationController
     else
       submission_error_message = "You have already submitted your work, so you are not allowed to drop your topic."
       deadline_error_message = "You cannot drop your topic after the drop topic deadline!"
-
+    end
     if !participant.team.submitted_files.empty? or !participant.team.hyperlinks.empty?
       flash[:error] = submission_error_message
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for already submitted work: ' + params[:topic_id].to_s)
@@ -246,7 +248,7 @@ class SignUpSheetController < ApplicationController
       flash[:error] = deadline_error_message
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for ended work: ' + params[:topic_id].to_s)
       return false
-    
+    end
     return true
   end
 
@@ -274,7 +276,6 @@ class SignUpSheetController < ApplicationController
     user = TeamsUser.find_by(team_id: team.id).user
     participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
     drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
-
     if can_delete_topic?(true, participant, assignment, drop_topic_deadline)
       delete_signup_for_topic(assignment.id, params[:topic_id], participant.user_id)
       flash[:success] = "You have successfully dropped the student from the topic!"

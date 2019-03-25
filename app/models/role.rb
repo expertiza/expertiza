@@ -11,6 +11,7 @@ class Role < ActiveRecord::Base
 
   attr_accessor :cache
   attr_reader :student, :ta, :instructor, :administrator, :superadministrator
+  attr_accessible :name, :parent_id, :description, :default_page_id
 
   def cache
     @cache = {}

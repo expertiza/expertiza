@@ -109,7 +109,9 @@ module AuthorizationHelper
             (current_user_is_a?('Teaching Assistant') && current_user_has_ta_mapping_for_assignment?(assignment))
           )
     end
-    current_user_has_id?(user_id)
+    current_user_has_id?(user_id) ||
+        (current_user_is_a?('Instructor') && current_user_instructs_assignment?(assignment)) ||
+        (assignment.course && current_user_is_a?('Teaching Assistant') && current_user_has_ta_mapping_for_assignment?(assignment))
   end
 
   # Determine if there is a current user

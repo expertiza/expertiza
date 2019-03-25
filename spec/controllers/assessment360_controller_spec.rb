@@ -24,6 +24,8 @@ describe Assessment360Controller do
   let(:signed_up_team) { build(:signed_up_team, team: team, topic: topic) }
   let(:team) { build(:assignment_team, id: 1, assignment: assignment) }
   let(:participant) { build(:participant)}
+  let(:scores) {}
+
 
   describe '#all_students_all_reviews' do
     context 'when course does not have participants' do
@@ -191,11 +193,12 @@ describe Assessment360Controller do
         allow(assignment_list).to receive(:reject).and_return(assignment_list)
         allow(assignment_with_participants.participants).to receive(:find_by).with({:user_id=>course_participant.user_id}).and_return(course_participant)
         allow(SignedUpTeam).to receive(:topic_id).with(assignment.id, course_participant.user_id).and_return(1)
-        # THIS LINE BELOW
         allow(TeamsUser).to receive(:team_id).with(assignment.id, course_participant.user_id).and_return(1)
         allow(Team).to receive(:find).with(1).and_return(signed_up_team)
         allow(AssignmentParticipant).to receive(:find_by).with({:user_id=>course_participant.user_id, :parent_id=>assignment.id}).and_return(participant)
         allow(participant).to receive(:assignment).and_return(assignment)
+        allow(participant).to receive(:scores).with(any_args).and_return(scores)
+
         params = {course_id: 1}
         session = {user: instructor}
         get :course_student_grade_summary, params, session

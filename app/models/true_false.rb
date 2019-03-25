@@ -1,4 +1,6 @@
 class TrueFalse < QuizQuestion
+  include ActionView::Helpers
+
   def edit
     quiz_question_choices = QuizQuestionChoice.where(question_id: self.id)
 
@@ -79,10 +81,8 @@ class TrueFalse < QuizQuestion
     # html
     # html += 'i += 1'
 
-    is_correct_text = 'False'
-    is_correct_text = 'True' if quiz_question_choices[0].iscorrect
-    img_src = "/assets/delete_icon.png"
-    img_src = "/assets/Check-icon.png" if user_answer-first.answer == 1
+    is_correct_text = quiz_question_choices[0].iscorrect ? 'True' : 'False'
+    img_src = user_answer_first.answer == 1 ? "/assets/Check-icon.png" : "/assets/delete_icon.png"
     capture do
       concat 'Correct Answer is: '
       concat content_tag(:b, is_correct_text, {}, false)
@@ -96,8 +96,7 @@ class TrueFalse < QuizQuestion
   end
 
   def isvalid(choice_info)
-    valid = "valid"
-    valid = "Please make sure all questions have text" if self.txt == ''
+    valid = self.txt == '' ? "Please make sure all questions have text" : "valid"
     correct_count = 0
     choice_info.each_value do |value|
       if value[:txt] == ''
@@ -123,7 +122,7 @@ class TrueFalse < QuizQuestion
   end
 
   private def input_tag(quiz_question_choices, i)
-    text = ["True", "False"]
+    text = %w[True, False]
     content_tag(:br,
                 capture do
                   concat tag(:input, {name: "\"#{self.id}\" ", id: "\"#{self.id}" + "_" + "#{i + 1}\" ",

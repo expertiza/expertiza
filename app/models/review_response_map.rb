@@ -1,7 +1,7 @@
 class ReviewResponseMap < ResponseMap
-  belongs_to :reviewee, class_name: 'Team', foreign_key: 'reviewee_id'
-  belongs_to :contributor, class_name: 'Team', foreign_key: 'reviewee_id'
-  belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
+  belongs_to :reviewee, class_name: 'Team', foreign_key: 'reviewee_id', inverse_of: :reviewResponseMap
+  belongs_to :contributor, class_name: 'Team', foreign_key: 'reviewee_id', inverse_of: :reviewResponseMap
+  belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id', inverse_of: :reviewResponseMap
 
   # In if this assignment uses "varying rubrics" feature, the sls
   # "used_in_round" field should not be nil
@@ -13,7 +13,7 @@ class ReviewResponseMap < ResponseMap
     Questionnaire.find_by(id: self.assignment.review_questionnaire_id(round))
   end
 
-  def get_title
+  def fetch_title
     "Review"
   end
 

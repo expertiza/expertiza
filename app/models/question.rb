@@ -3,7 +3,7 @@ class Question < ActiveRecord::Base
   belongs_to :review_score  # each review_score pertains to a particular question
   belongs_to :review_of_review_score # ditto
   has_many :question_advices, dependent: :destroy # for each question, there is separate advice about each possible score
-  has_many :signup_choices, dependent: :destroy # ?? this may reference signup type questionnaires
+  has_many :signup_choices # ?? this may reference signup type questionnaires
   has_many :answers, dependent: :destroy
 
   validates :seq, presence: true # user must define sequence for a question
@@ -40,11 +40,16 @@ class Question < ActiveRecord::Base
   end
 
   # for quiz questions, we store 'TrueFalse', 'ultipleChoiceCheckbox', 'MultipleChoiceRadio' in the DB, and the full names are returned below
-  def formatted_question_type
+  def get_formatted_question_type
     type = self.type
-    'True/False' if type == 'TrueFalse'
-    'Multiple Choice - Checked' if type == 'MultipleChoiceCheckbox'
-    'Multiple Choice - Radio' if type == 'MultipleChoiceRadio'
+
+    if type == 'TrueFalse'
+      return 'True/False'
+    elsif type == 'MultipleChoiceCheckbox'
+      return 'Multiple Choice - Checked'
+    elsif type == 'MultipleChoiceRadio'
+      return 'Multiple Choice - Radio'
+    end
   end
 
   # Placeholder methods, override in derived classes if required.
@@ -83,29 +88,30 @@ class Question < ActiveRecord::Base
     question_ids
   end
 
-  def self.import(row, _row_header, _session, id = nil)
+  def self.import(row, _row_header, session, _id = nil)
     if row.length != 5
       raise ArgumentError, "Not enough items: expect 3 columns: your login name, your full name (first and last name, not seperated with the delimiter), and your email."
     end
-    questionnaire = Questionnaire.find_by(id: id)
+    questionnaire = Questionnaire.find_by_id(_id)
     questions = questionnaire.questions
     qid = 0
-    questions.each do |q|
+    for q in questions
       if q.seq == row[2].strip.to_f
         qid = q.id
         break
       end
     end
-    raise ArgumentError, "Questionnaire Not Found" if questionnaire.nil?
-    if qid > 0
-      question = Question.find_by(id: qid)
+    if questionnaire.nil?
+      raise ArgumentError, "Questionnaire Not Found"
+    elsif qid > 0
+      question = Question.find_by_id(qid)
       attributes = {}
       attributes["txt"] = row[0].strip
       attributes["type"] = row[1].strip
       attributes["seq"] = row[2].strip.to_f
       attributes["size"] = row[3].strip
       attributes["break_before"] = row[4].strip
-      question.questionnaire_id = id
+      question.questionnaire_id=_id
       question.update(attributes)
     else
       attributes = {}
@@ -113,8 +119,9 @@ class Question < ActiveRecord::Base
       attributes["type"] = row[1].strip
       attributes["seq"] = row[2].strip.to_f
       attributes["size"] = row[3].strip
+      #attributes["break_before"] = row[4].strip
       question = Question.new(attributes)
-      question.questionnaire_id = id
+      question.questionnaire_id=_id
       question.save
     end
   end

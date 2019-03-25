@@ -3,14 +3,14 @@ require "menu"
 
 class Role < ActiveRecord::Base
   belongs_to :parent, class_name: 'Role'
-  has_many :users
+  has_many :users, dependent: :destroy
 
   serialize :cache
   validates :name, presence: true
   validates :name, uniqueness: true
 
-  attr_accessor :cache
-  attr_reader :student, :ta, :instructor, :administrator, :superadministrator
+  attr_accessor :cache, :student, :ta, :instructor, :administrator, :superadministrator
+  # attr_reader :student, :ta, :instructor, :administrator, :superadministrator
 
   def cache
     @cache = {}
@@ -26,7 +26,7 @@ class Role < ActiveRecord::Base
   end
 
   def self.student
-    @@student_role ||= find_by name: 'Student'
+    @student_role ||= find_by name: 'Student'
   end
 
   def student?
@@ -46,15 +46,15 @@ class Role < ActiveRecord::Base
   end
 
   def self.ta
-    @@ta_role ||= find_by name: 'Teaching Assistant'
+    @ta_role ||= find_by name: 'Teaching Assistant'
   end
 
   def self.instructor
-    @@instructor_role ||= find_by name: 'Instructor'
+    @instructor_role ||= find_by name: 'Instructor'
   end
 
   def self.administrator
-    @@administrator_role ||= find_by name: 'Administrator'
+    @administrator_role ||= find_by name: 'Administrator'
   end
 
   def self.admin
@@ -62,7 +62,7 @@ class Role < ActiveRecord::Base
   end
 
   def self.superadministrator
-    @@superadministrator_role ||= find_by name: 'Super-Administrator'
+    @superadministrator_role ||= find_by name: 'Super-Administrator'
   end
 
   def super_admin?
@@ -94,7 +94,7 @@ class Role < ActiveRecord::Base
   end
 
   # return ids of roles that are below this role
-  def get_available_roles
+  def fetch_available_roles
     ids = []
 
     current = self.parent_id
@@ -110,7 +110,7 @@ class Role < ActiveRecord::Base
   end
 
   # "parents" are lesser roles. This returns a list including this role and all lesser roels.
-  def get_parents
+  def read_parents
     parents = []
     seen = {}
 
@@ -135,7 +135,7 @@ class Role < ActiveRecord::Base
   end
 
   # determine if the current role has all the privileges of the parameter role
-  def hasAllPrivilegesOf(target_role)
+  def all_privileges_of?(target_role)
     privileges = {}
     privileges["Student"] = 1
     privileges["Teaching Assistant"] = 2
@@ -152,7 +152,7 @@ class Role < ActiveRecord::Base
       self.parent_id = role_params[:parent_id]
       self.description = role_params[:description]
       self.save
-    rescue StandardError => e
+    rescue StandardError => _
       false
     end
   end

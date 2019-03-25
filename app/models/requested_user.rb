@@ -1,4 +1,5 @@
 class RequestedUser < ActiveRecord::Base
+  attr_accessor :user
   before_save { self.email = email.downcase }
   before_save { self.name }
   validates :name, presence: true, length: {maximum: 50, message: "is too long"}

@@ -5,7 +5,7 @@ class Questionnaire < ActiveRecord::Base
   belongs_to :instructor # the creator of this questionnaire
   has_many :assignment_questionnaires, dependent: :destroy
   has_many :assignments, through: :assignment_questionnaires
-  has_one :questionnaire_node, foreign_key: 'node_object_id', dependent: :destroy
+  has_one :questionnaire_node, foreign_key: 'node_object_id', dependent: :destroy, inverse_of: :questionnaire
 
   validate :validate_questionnaire
   validates :name, presence: true
@@ -14,20 +14,20 @@ class Questionnaire < ActiveRecord::Base
   DEFAULT_MIN_QUESTION_SCORE = 0  # The lowest score that a reviewer can assign to any questionnaire question
   DEFAULT_MAX_QUESTION_SCORE = 5  # The highest score that a reviewer can assign to any questionnaire question
   DEFAULT_QUESTIONNAIRE_URL = "http://www.courses.ncsu.edu/csc517".freeze
-  QUESTIONNAIRE_TYPES = ['ReviewQuestionnaire',	
-                         'MetareviewQuestionnaire',	
-                         'Author FeedbackQuestionnaire',	
-                         'AuthorFeedbackQuestionnaire',	
-                         'Teammate ReviewQuestionnaire',	
-                         'TeammateReviewQuestionnaire',	
-                         'SurveyQuestionnaire',	
-                         'AssignmentSurveyQuestionnaire',	
-                         'Assignment SurveyQuestionnaire',	
-                         'Global SurveyQuestionnaire',	
-                         'GlobalSurveyQuestionnaire',	
-                         'Course SurveyQuestionnaire',	
-                         'CourseSurveyQuestionnaire',	
-                         'BookmarkratingQuestionnaire',	
+  QUESTIONNAIRE_TYPES = ['ReviewQuestionnaire',
+                         'MetareviewQuestionnaire',
+                         'Author FeedbackQuestionnaire',
+                         'AuthorFeedbackQuestionnaire',
+                         'Teammate ReviewQuestionnaire',
+                         'TeammateReviewQuestionnaire',
+                         'SurveyQuestionnaire',
+                         'AssignmentSurveyQuestionnaire',
+                         'Assignment SurveyQuestionnaire',
+                         'Global SurveyQuestionnaire',
+                         'GlobalSurveyQuestionnaire',
+                         'Course SurveyQuestionnaire',
+                         'CourseSurveyQuestionnaire',
+                         'BookmarkratingQuestionnaire',
                          'QuizQuestionnaire'].freeze
   has_paper_trail
 

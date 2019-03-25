@@ -67,6 +67,11 @@ class Question < ActiveRecord::Base
                     content_tag(:td, '&mdash;', {align: "center"}, false), {}, false)
   end
 
+  # this method decide what to display if a student is filling out a questionnaire
+  def view_completed_question
+    nil
+  end
+
   # this method decide what to display if a student is viewing a filled-out questionnaire
   def complete
     nil

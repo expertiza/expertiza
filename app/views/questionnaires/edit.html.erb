@@ -22,10 +22,13 @@
       <% for @question in @questionnaire.questions %>
 
         <%-# The following line call certain method of the object, which returns html string-%>
-        <%= @question.edit %>
-
+          <% if @question.is_a? Criterion %>
+              <%= render :partial => 'criterion' %>
+          <% else %>
+              <%=@question.edit%>
+          <% end %>
         <tr><td><br></tr></td>
-        
+
       <% end %>
     </table> 
 

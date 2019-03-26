@@ -22,6 +22,7 @@ describe PopupController do
       review_round_two: {questionnaire_id: 2, response_ids: [2]},
       review_round_three: {questionnaire_id: 3, response_ids: [3], }
   }}
+
   test_url = "http://peerlogic.csc.ncsu.edu/reviewsentiment/viz/478-5hf542"
   mocked_comments_one = OpenStruct.new(comments: "test comment")
 
@@ -47,6 +48,7 @@ describe PopupController do
         expect(controller.send(:action_allowed?)).to be true
       end
     end
+
 
     context 'when the role current user is super instructor' do
       it 'allows certain action' do
@@ -244,7 +246,9 @@ describe PopupController do
     end
 
     describe '#view_review_scores_popup' do
+
       context 'review tone analysis is calculated' do
+
         it 'prepares tone analysis report for building' do
           params = {reviewer_id: 1, assignment_id: 1}
           session = {user: instructor}
@@ -254,6 +258,7 @@ describe PopupController do
           expect(controller.instance_variable_get(:@review_final_versions)).to eq final_versions
           expect(controller.instance_variable_get(:@reviews)).to eq []
         end
+
       end
     end
   end
@@ -263,6 +268,7 @@ describe PopupController do
     before(:each) do
       allow(Questionnaire).to receive(:find).with(any_args).and_return(questionnaire)
       allow(Question).to receive(:where).with(:questionnaire_id => questionnaire.id).and_return([question])
+
     end
 
       describe 'answer is not provided' do

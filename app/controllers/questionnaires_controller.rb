@@ -26,10 +26,15 @@ class QuestionnairesController < ApplicationController
   # Create a clone of the given questionnaire, copying all associated
   # questions. The name and creator are updated.
   def copy
-    instructor_id = session[:user].instructor_id
-    @questionnaire = Questionnaire.copy_questionnaire_details(params, instructor_id)
-    undo_link("Copy of questionnaire #{@questionnaire.name} has been created successfully.")
-    redirect_to controller: 'questionnaires', action: 'view', id: @questionnaire.id
+    begin
+      instructor_id = session[:user].instructor_id
+      @questionnaire = Questionnaire.copy_questionnaire_details(params, instructor_id)
+      undo_link("Copy of questionnaire #{@questionnaire.name} has been created successfully.")
+      redirect_to controller: 'questionnaires', action: 'view', id: @questionnaire.id
+    rescue StandardError
+      flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.' + $ERROR_INFO
+      redirect_to action: 'list', controller: 'tree_display'
+    end
   end
 
   def view

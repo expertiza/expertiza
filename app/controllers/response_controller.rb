@@ -283,7 +283,7 @@ class ResponseController < ApplicationController
       @current_round = @assignment.number_of_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
     when
-    "MetareviewResponseMap",
+        "MetareviewResponseMap",
         "TeammateReviewResponseMap",
         "FeedbackResponseMap",
         "CourseSurveyResponseMap",
@@ -292,6 +292,7 @@ class ResponseController < ApplicationController
       @questionnaire = @map.questionnaire
     end
   end
+  # maps questions based on their id to its corresponding to its review score
   def scores
     @review_scores = []
     @questions.each do |question|
@@ -301,21 +302,20 @@ class ResponseController < ApplicationController
       ).first
     end
   end
-
+  # if user is not filling a new rubric, the @response object should be available.
+  # we can find the questionnaire from the question_id in answers
   def set_questionnaire
-    # if user is not filling a new rubric, the @response object should be available.
-    # we can find the questionnaire from the question_id in answers
     answer = @response.scores.first
     @questionnaire = @response.questionnaire_by_answer(answer)
   end
-
+  # checks if the questionnaire is nil and opens drop down or rating accordingly
   def set_dropdown_or_scale
     use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.try(:id),
                                                  questionnaire_id: @questionnaire.try(:id))
                        .first.try(:dropdown)
     @dropdown_or_scale = (use_dropdown ? 'dropdown' : 'scale')
   end
-
+  # sorts by sequence number
   def sort_questions(questions)
     questions.sort_by(&:seq)
   end

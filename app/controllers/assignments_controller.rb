@@ -306,13 +306,15 @@ class AssignmentsController < ApplicationController
   end
 
   def handle_rubrics_not_assigned_case
-    return unless !empty_rubrics_list.empty? && request.original_fullpath == "/assignments/#{@assignment_form.assignment.id}/edit"
-    rubrics_needed = needed_rubrics(empty_rubrics_list)
-    ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Rubrics missing for #{@assignment_form.assignment.name}.", request)
-    return unless flash.now[:error] != "Failed to save the assignment: [\"Total weight of rubrics should add up to either 0 or 100%\"]"
-    flash.now[:error] = "You did not specify all the necessary rubrics. You need " + rubrics_needed +
-        " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics" \
-        " <a id='go_to_tabs2' style='color: blue;'>here</a>."
+    if !empty_rubrics_list.empty? && request.original_fullpath == "/assignments/#{@assignment_form.assignment.id}/edit"
+      rubrics_needed = needed_rubrics(empty_rubrics_list)
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Rubrics missing for #{@assignment_form.assignment.name}.", request)
+      if flash.now[:error] != "Failed to save the assignment: [\"Total weight of rubrics should add up to either 0 or 100%\"]"
+        flash.now[:error] = "You did not specify all the necessary rubrics. You need " + rubrics_needed +
+            " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics" \
+            " <a id='go_to_tabs2' style='color: blue;'>here</a>."
+      end
+    end
   end
 
   def handle_assignment_directory_path_nonexist_case_and_answer_tagging
@@ -354,21 +356,23 @@ class AssignmentsController < ApplicationController
   end
 
   def handle_current_user_timezonepref_nil
-    return unless current_user.timezonepref.nil?
-    parent_id = current_user.parent_id
-    parent_timezone = User.find(parent_id).timezonepref
-    flash[:error] = "We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. \
-                    For now we assume you are in " + parent_timezone
-    current_user.timezonepref = parent_timezone
+    if current_user.timezonepref.nil?
+      parent_id = current_user.parent_id
+      parent_timezone = User.find(parent_id).timezonepref
+      flash[:error] = "We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. For now we assume you are in " + parent_timezone
+      current_user.timezonepref = parent_timezone
+    end
   end
 
   def update_feedback_assignment_form_attributes
     if params[:set_pressed][:bool] == 'false'
       flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."
-    elsif @assignment_form.update_attributes(assignment_form_params, current_user)
-      flash[:note] = 'The assignment was successfully saved....'
     else
-      flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
+      if @assignment_form.update_attributes(assignment_form_params, current_user)
+        flash[:note] = 'The assignment was successfully saved....'
+      else
+        flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
+      end
     end
     ExpertizaLogger.info LoggerMessage.new("", session[:user].name, "The assignment was saved: #{@assignment_form.as_json}", request)
   end

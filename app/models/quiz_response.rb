@@ -6,6 +6,5 @@ class QuizResponse < Response
   belongs_to :participant
   belongs_to :response_map, foreign_key: :map_id, inverse_of: :quiz_responses
   belongs_to :quiz_response_map, foreign_key: :map_id, inverse_of: :quiz_responses
-
   # validates :response, :presence => true
 end

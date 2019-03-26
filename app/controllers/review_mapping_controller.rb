@@ -378,35 +378,12 @@ class ReviewMappingController < ApplicationController
                         .where("created_at > :time",
                                time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
 
-      participants_with_insufficient_review_num = []
-      participants_hash.each do |participant_id, review_num|
-        participants_with_insufficient_review_num << participant_id if review_num < review_strategy.reviews_per_student
-      end
-      unsorted_teams_hash = {}
+      participants_with_insufficient_review_num = generate_insufficient_review_collection(participants_hash, review_strategy)
 
-      ReviewResponseMap.where(reviewed_object_id: assignment_id,
-                              calibrate_to: 0).each do |response_map|
-        if unsorted_teams_hash.key? response_map.reviewee_id
-          unsorted_teams_hash[response_map.reviewee_id] += 1
-        else
-          unsorted_teams_hash[response_map.reviewee_id] = 1
-        end
-      end
+      unsorted_teams_hash = generate_teams_hash(assignment_id)
       teams_hash = unsorted_teams_hash.sort_by {|_, v| v }.to_h
 
-      participants_with_insufficient_review_num.each do |participant_id|
-        teams_hash.each_key do |team_id, _num_review_received|
-          next if TeamsUser.exists?(team_id: team_id,
-                                    user_id: Participant.find(participant_id).user_id)
-
-          ReviewResponseMap.where(reviewee_id: team_id, reviewer_id: participant_id,
-                                  reviewed_object_id: assignment_id).first_or_create
-
-          teams_hash[team_id] += 1
-          teams_hash = teams_hash.sort_by {|_, v| v }.to_h
-          break
-        end
-      end
+      teams_hash = assign_reviewers(assignment_id, participants_with_insufficient_review_num, teams_hash)
     end
     @@time_create_last_review_mapping_record = ReviewResponseMap.
                                                where(reviewed_object_id: assignment_id).
@@ -528,6 +505,9 @@ class ReviewMappingController < ApplicationController
     end
   end
 
+  #Gets a count of how many calibrated artifacts there are and calculates the number of uncalibrated ones
+  #A calibrated artifact is a review that has been completed by an expert
+  #Calls on the strategy mapping function for calibrated and uncalibrated artifacts
   def maps_strategies_for_artifacts(assignment_id, teams, participants, calibrated_artifacts_num, uncalibrated_artifacts_num)
     teams_with_calibrated_artifacts = []
     teams_with_uncalibrated_artifacts = []
@@ -541,5 +521,50 @@ class ReviewMappingController < ApplicationController
     # since after first mapping, participants (delete_at) will be nil
     participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.select(&:can_review).shuffle!
     automatic_review_mapping_strategy(assignment_id, participants, teams_with_uncalibrated_artifacts.shuffle!, uncalibrated_artifacts_num, 0)
+  end
+
+  #If the participant has not completed as many reviews as required, their ID will be added to the collection
+  def generate_insufficient_review_collection(participants_hash, review_strategy)
+    participants_with_insufficient_review_num = []
+    participants_hash.each do |participant_id, review_num|
+      participants_with_insufficient_review_num << participant_id if review_num < review_strategy.reviews_per_student
+    end
+    return participants_with_insufficient_review_num
+  end
+
+  #creates the unsorted teams hash map.
+  #if the key exists, increase the value by one
+  #else create a new key with initial value of one
+  def generate_teams_hash(assignment_id)
+    unsorted_teams_hash = {}
+
+    ReviewResponseMap.where(reviewed_object_id: assignment_id,
+                            calibrate_to: 0).each do |response_map|
+      if unsorted_teams_hash.key? response_map.reviewee_id
+        unsorted_teams_hash[response_map.reviewee_id] += 1
+      else
+        unsorted_teams_hash[response_map.reviewee_id] = 1
+      end
+    end
+  end
+
+  #all of the participants who did not reach the required review count are put through this function
+  #once the team and user combination is found, a review is added to the teams_hash key, registered by their team_id.
+  #every iteration of adding in the team_id to the hash map, we sort the map
+  def assign_reviewers(assignment_id, participants_with_insufficient_review_num, teams_hash)
+    participants_with_insufficient_review_num.each do |participant_id|
+      teams_hash.each_key do |team_id, _num_review_received|
+        next if TeamsUser.exists?(team_id: team_id,
+                                  user_id: Participant.find(participant_id).user_id)
+
+        ReviewResponseMap.where(reviewee_id: team_id, reviewer_id: participant_id,
+                                reviewed_object_id: assignment_id).first_or_create
+
+        teams_hash[team_id] += 1
+        teams_hash = teams_hash.sort_by {|_, v| v }.to_h
+        break
+      end
+    end
+    return teams_hash
   end
 end

@@ -45,9 +45,9 @@ class TagPrompt < ActiveRecord::Base
 
     content_tag(:div,
                 capture do
-                   concat tag(:input, {type: "checkbox", name: "tag_checkboxes[]", id: control_id, value: value,
+                  concat tag(:input, {type: "checkbox", name: "tag_checkboxes[]", id: control_id, value: value,
                                       onLoad: "toggleLabel(this)", onChange: on_change_value}, false, false)
-                   concat content_tag(:label, '&nbsp;' + self.prompt.to_s, {for: " " + control_id}, false)
+                  concat content_tag(:label, '&nbsp;' + self.prompt.to_s, {for: " " + control_id}, false)
                 end, {class: "toggle-container tag_prompt_container", title: self.desc.to_s}, false)
   end
 

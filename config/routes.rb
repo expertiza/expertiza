@@ -383,6 +383,7 @@ resources :institution, except: [:destroy] do
 
   resources :submitted_content, only: [:edit] do
     collection do
+      get :begin_planning
       get :download
       get :folder_action
       get :remove_hyperlink
@@ -391,7 +392,7 @@ resources :institution, except: [:destroy] do
       post :submit_file
       post :folder_action
       post :submit_hyperlink
-      post :begin_planning
+      post :revision_planning
       get :submit_hyperlink
       get :view
     end

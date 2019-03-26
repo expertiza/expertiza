@@ -9,15 +9,14 @@
     <br/><br/>
     <%= render partial: 'submitted_content/self_review', locals: {participant: @participant, stage: @stage, origin: ''} %>
 <% end %>
-<h3>Revision Planning</h3>
 <% if @round > 1 && @assignment.can_modify_rubric == true %>
     <h3>Revision Planning</h3>
-    <%# if @record.nil? %>
-    <%= render :partial => 'submitted_content/revision', :locals => {:participant => @participant} %>
-    <%= link_to 'Begin', begin_planning_submitted_content_index_path(id: @participant.id) %>
-    <%#else %>
-    <%#= link_to 'Edit', edit_questionnaire_path(id: @questionnaire.id) %>
-    <%# end %>
+    <% if @questionnaire.nil? %>
+
+    <%= link_to 'Begin', controller: :submitted_content, action: :begin_planning, id: @participant_id %>
+    <%else %>
+    <%= link_to 'Edit Questionnaire', controller: 'questionnaires', action: 'edit', id: @questionnaire.questionnaire_id, ppid: @participant_id %>
+    <% end %>
 <% end %>
 <BR/>
 <BR/>

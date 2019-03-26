@@ -9,10 +9,12 @@ class SubmittedContentController < ApplicationController
     one_team_can_submit_work?
   end
 
+
+
   # The view have already tested that @assignment.submission_allowed(topic_id) is true,
   # so @can_submit should be true
   def edit
-    @ques = Questionnaire.new
+    @participant_id = params[:id]
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
     @assignment = @participant.assignment
@@ -25,8 +27,12 @@ class SubmittedContentController < ApplicationController
     @stage = @assignment.get_current_stage(topic_id)
     # Find the round of the current assignment
     @round = @assignment.number_of_current_round(topic_id)
+    @questionnaire = questionnaire_for_revision
   end
 
+  def questionnaire_for_revision
+    @questionnaire = AssignmentQuestionnaire.find_by(user_id: @participant.team.participants.collect{|p| p.user_id})
+  end
   # view is called when @assignment.submission_allowed(topic_id) is false
   # so @can_submit should be false
   def view
@@ -159,6 +165,35 @@ class SubmittedContentController < ApplicationController
     end
   end
 
+
+  def begin_planning
+    @participant_id = params[:id]
+    @q = Questionnaire.new
+
+  end
+
+  def revision_planning
+    review_questionnaire = Questionnaire.new
+    review_questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
+    review_questionnaire.name = params[:questionnaire][:name]
+    review_questionnaire.instructor_id = session[:user].id
+    review_questionnaire.min_question_score = params[:questionnaire][:min_question_score]
+    review_questionnaire.max_question_score = params[:questionnaire][:max_question_score]
+    review_questionnaire.type = 'ReviewQuestionnaire'
+    review_questionnaire.private = params[:questionnaire][:private]
+    review_questionnaire.save
+    participant_id = params[:id]
+    participant = AssignmentParticipant.find(participant_id)
+    return unless current_user_id?(participant.user_id)
+    aq = AssignmentQuestionnaire.new
+    aq.assignment = Assignment.find(participant.parent_id)
+    aq.questionnaire = review_questionnaire
+    aq.user_id = participant.user_id
+    aq.save
+    redirect_to controller: 'questionnaires', action: 'edit', id: review_questionnaire.id, ppid: participant_id
+  end
+
+
   private
 
   def get_file_type file_name
@@ -241,8 +276,5 @@ class SubmittedContentController < ApplicationController
     (!@topics.empty? and !SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id).nil?) or @topics.empty?
   end
 
-  def begin_planning
-    @name = params[:questionnaire][:name]
-    SubmittedContentHelper.revision_planning(@name)
-  end
+
 end

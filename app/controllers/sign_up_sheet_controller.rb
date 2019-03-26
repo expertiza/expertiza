@@ -204,6 +204,7 @@ class SignUpSheetController < ApplicationController
   end
 
   # routes to new page to specficy student
+  # Specifies the student and displays a new page, its called via a get request. 
   def signup_as_instructor; end
 
   def signup_student user
@@ -216,6 +217,7 @@ class SignUpSheetController < ApplicationController
     end
   end
 
+  # This is an action called via a post request, whose aim to signup the student.
   def signup_as_instructor_action
     user = User.find_by(name: params[:username])
     if user.nil? # validate invalid user

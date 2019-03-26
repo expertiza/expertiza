@@ -64,7 +64,11 @@
       <% i = 1 %>
       <%questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }%>
       <% for @question in questions %>
-        <%=@question.edit(i)%>
+          <% if @question.is_a? Criterion %>
+            <%= render :partial => 'criterion' %>
+          <% else %>
+            <%=@question.edit(i)%>
+          <% end %>
         <% i += 1 %>
       <% end %>
     </table>

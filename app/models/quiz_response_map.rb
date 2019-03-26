@@ -32,10 +32,9 @@ class QuizResponseMap < ResponseMap
 
     questions.each do |question|
       score = Answer.find_by(response_id: response_id, question_id: question.id).first
-     # The quiz has been taken but not all the answers are stored correctly.
+      # The quiz has been taken but not all the answers are stored correctly.
       return 'N/A' unless score.nil?
       quiz_score += score.answer
-
     end
 
     question_count = questions.length

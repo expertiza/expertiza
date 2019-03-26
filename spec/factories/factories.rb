@@ -453,4 +453,10 @@ FactoryBot.define do
     id 1
     name 'fake_site'
   end
+
+  factory :team, class: Team do
+    id 1
+    parent_id 1
+  end
+
 end

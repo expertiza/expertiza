@@ -383,7 +383,7 @@ class ReviewMappingController < ApplicationController
       unsorted_teams_hash = generate_teams_hash(assignment_id)
       teams_hash = unsorted_teams_hash.sort_by {|_, v| v }.to_h
 
-      teams_hash = assign_reviewers(assignment_id, participants_with_insufficient_review_num, teams_hash)
+      teams_hash = insufficient_assign_reviewers(assignment_id, participants_with_insufficient_review_num, teams_hash)
     end
     @@time_create_last_review_mapping_record = ReviewResponseMap.
                                                where(reviewed_object_id: assignment_id).
@@ -551,7 +551,7 @@ class ReviewMappingController < ApplicationController
   #all of the participants who did not reach the required review count are put through this function
   #once the team and user combination is found, a review is added to the teams_hash key, registered by their team_id.
   #every iteration of adding in the team_id to the hash map, we sort the map
-  def assign_reviewers(assignment_id, participants_with_insufficient_review_num, teams_hash)
+  def insufficient_assign_reviewers(assignment_id, participants_with_insufficient_review_num, teams_hash)
     participants_with_insufficient_review_num.each do |participant_id|
       teams_hash.each_key do |team_id, _num_review_received|
         next if TeamsUser.exists?(team_id: team_id,

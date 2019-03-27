@@ -229,7 +229,6 @@ describe PopupController do
 
       allow(Questionnaire).to receive(:find).with(any_args).and_return(questionnaire)
       allow(Question).to receive(:where).with(:questionnaire_id => questionnaire.id).and_return([question])
-
     end
 
     describe '#tone_analysis_chart_popup' do
@@ -258,7 +257,6 @@ describe PopupController do
           expect(controller.instance_variable_get(:@review_final_versions)).to eq final_versions
           expect(controller.instance_variable_get(:@reviews)).to eq []
         end
-
       end
     end
   end
@@ -268,7 +266,6 @@ describe PopupController do
     before(:each) do
       allow(Questionnaire).to receive(:find).with(any_args).and_return(questionnaire)
       allow(Question).to receive(:where).with(:questionnaire_id => questionnaire.id).and_return([question])
-
     end
 
       describe 'answer is not provided' do
@@ -288,20 +285,14 @@ describe PopupController do
 
           # controller.send(:build_tone_analysis_report)
           # expect(controller.instance_variable_get(:@sentiment_summary)).to eq nil
-
         end
       end
-
   end
 
 
   describe '#build_tone_analysis_heatmap' do
-
-
     describe 'sentiment is empyt' do
-
       before(:each) do
-
         allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', assignment_team.id).and_return([response_map])
         allow(Assignment).to receive(:find).with('reviewee_id = ?', assignment_team.id).and_return(assignment)
         allow(ReviewResponseMap).to receive(:final_versions_from_reviewer).with("1").and_return(final_versions)
@@ -311,67 +302,13 @@ describe PopupController do
         controller.instance_variable_set(:@review_final_versions, final_versions)
         controller.instance_variable_set(:@sentiment_summary, sentiment_summary)
         controller.send(:build_tone_analysis_heatmap)
-
-
-
-
       end
 
       it 'build tone analysis heatmap' do
-        # controller.instance_variable_set(:@sentiment_summary, sentiment_summary)
-        # controller.send(:build_tone_analysis_heatmap)
-
-
-        # allow(Questionnaire).to receive(:find).with(any_args).and_return(questionnaire)
-        # allow(Question).to receive(:where).with(:questionnaire_id => questionnaire.id).and_return([question])
-
-
-
-
-
-
       end
     end
-
   end
 
-
-
-
-
-    # describe '#build_tone_analysis_report' do
-    #
-    #
-    # end
-    #
-    #
-    #
-    # describe '#build_tone_analysis_heatmap' do
-    #   ## INSERT CONTEXT/DESCRIPTION/CODE HERE
-    #
-    #   context 'sentiment summary is empty' do
-    #
-    #
-    #     it 'set a sentiment value' do
-    #       # session = {user: instructor}
-    #       # get :build_tone_analysis_heatmap, session
-    #       # expect(controller.instance_variable_get(:@sentiment_summary)).to eq nil
-    #       # controller.send(:build_tone_analysis_heatmap
-    #
-    #
-    #
-    #       allow(Questionnaire).to receive(:find).with(any_args).and_return(questionnaire)
-    #       allow(Question).to receive(:where).with(:questionnaire_id => questionnaire.id).and_return([question])
-    #
-    #
-    #     end
-    #   end
-    #
-    #
-    #
-    # end
-
-  ##########################################
 
   describe '#reviewer_details_popup' do
     ## INSERT CONTEXT/DESCRIPTION/CODE HERE

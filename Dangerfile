@@ -7,7 +7,7 @@ CURRENT_MAINTAINERS = %w[
 MODIFIED_FILES = git.modified_files + git.added_files
 
 # ------------------------------------------------------------------------------
-# Welcome message
+# 0. Welcome message
 # ------------------------------------------------------------------------------
 unless CURRENT_MAINTAINERS.include? github.pr_author
   if github.pr_title =~ /E[0-9]{4}/
@@ -39,20 +39,7 @@ If you have any questions, please send email to <a href="mailto:expertiza-suppor
 end
 
 # ------------------------------------------------------------------------------
-# You've made changes to app, but didn't write any tests?
-# ------------------------------------------------------------------------------
-if MODIFIED_FILES.grep(/app/).any? && MODIFIED_FILES.grep(/spec/).empty?
-  NO_TEST_MESSAGE =
-    markdown <<-MARKDOWN
-There are code changes, but no corresponding tests.
-Please include tests if this PR introduces any modifications in behavior.
-    MARKDOWN
-
-  warn(NO_TEST_MESSAGE, sticky: true)
-end
-
-# ------------------------------------------------------------------------------
-# Your PR is too big (more than 500 LoC).
+# 1. Your pull request should not be too big (more than 500 LoC).
 # ------------------------------------------------------------------------------
 if git.lines_of_code > 500
   BIG_PR_MESSAGE =
@@ -65,7 +52,7 @@ Please make sure you did not commit unnecessary changes, such as `schema.rb`, `n
 end
 
 # ------------------------------------------------------------------------------
-# Your course project PR is too small (less than 50 LoC).
+# 2. Your pull request should not be too small (less than 50 LoC).
 # ------------------------------------------------------------------------------
 if github.pr_title =~ /E[0-9]{4}/ and git.lines_of_code < 50
   SMALL_PR_MESSAGE =
@@ -78,7 +65,7 @@ If you are finished refactoring the code, please consider writing corresponding 
 end
 
 # ------------------------------------------------------------------------------
-# Your PR touches too many files (more than 30 files).
+# 3. Your pull request should not touch too many files (more than 30 files).
 # ------------------------------------------------------------------------------
 if MODIFIED_FILES.size > 30
   BIG_PR_MESSAGE =
@@ -91,7 +78,7 @@ Please make sure you did not commit unnecessary changes, such as `node_modules`,
 end
 
 # ------------------------------------------------------------------------------
-# Your PR should not have too many duplicated commit messages.
+# 4. Your pull request should not have too many duplicated commit messages.
 # ------------------------------------------------------------------------------
 messages = git.commits.map(&:message)
 if messages.size - messages.uniq.size >= 5
@@ -105,7 +92,7 @@ And using meaningful commit messages later.
 end
 
 # ------------------------------------------------------------------------------
-# If a PR is a work in progress and it shouldn't be merged.
+# 5. Your pull request is "work in progress" and it will not be merged.
 # ------------------------------------------------------------------------------
 if github.pr_title.include? "WIP" or github.pr_title.include? "wip"
   WIP_MESSAGE =
@@ -117,7 +104,7 @@ This pull request is classed as `Work in Progress`. It cannot be merged right no
 end
 
 # ------------------------------------------------------------------------------
-# The PR should not contain "Todo".
+# 6. Your pull request should not contain "Todo" keyword.
 # ------------------------------------------------------------------------------
 if github.pr_diff.include? "TODO" or
   github.pr_diff.include? "Todo" or
@@ -132,7 +119,7 @@ This pull request contains `TODO` task(s); please fix them.
 end
 
 # ------------------------------------------------------------------------------
-# The PR should not include temp, tmp, cache file.
+# 7. Your pull request should not include temp, tmp, cache file.
 # ------------------------------------------------------------------------------
 if git.added_files.grep(/.*temp.*/).any? or
    git.added_files.grep(/.*tmp.*/).any? or
@@ -146,7 +133,43 @@ You committed `temp`, `tmp` or `cache` files. Please remove them.
 end
 
 # ------------------------------------------------------------------------------
-# The PR should not include skipped/pending/focused test cases.
+# 8. Your pull request should avoid using global variables and/or class variables.
+# ------------------------------------------------------------------------------
+if github.pr_diff =~ /\$[A-Za-z0-9_]+/ or github.pr_diff =~ /@@[A-Za-z0-9_]+/
+  GLOBAL_CLASS_VARIABLE_MESSAGE =
+    markdown <<-MARKDOWN
+You are using global variables (`$`) or class variables (`@@`); please double-check whether this is necessary.
+    MARKDOWN
+
+  warn(GLOBAL_CLASS_VARIABLE_MESSAGE, sticky: true)
+end
+
+# ------------------------------------------------------------------------------
+# 9. Your pull request should avoid keeping debugging code.
+# ------------------------------------------------------------------------------
+if github.pr_diff.include? "puts " or
+   github.pr_diff.include? "print " or
+   github.pr_diff.include? "binding.pry" or
+   github.pr_diff.include? "debugger;" or
+   github.pr_diff.include? "console.log"
+  fail("You are including debug code in your pull request, please remove it.", sticky: true)
+end
+
+# ------------------------------------------------------------------------------
+# 10. You should write tests after making changes to the application.
+# ------------------------------------------------------------------------------
+if MODIFIED_FILES.grep(/app/).any? && MODIFIED_FILES.grep(/spec/).empty?
+  NO_TEST_MESSAGE =
+    markdown <<-MARKDOWN
+There are code changes, but no corresponding tests.
+Please include tests if this PR introduces any modifications in behavior.
+    MARKDOWN
+
+  warn(NO_TEST_MESSAGE, sticky: true)
+end
+
+# ------------------------------------------------------------------------------
+# 11. Your pull request should not include skipped/pending/focused test cases.
 # ------------------------------------------------------------------------------
 MODIFIED_FILES.each do |file|
   next unless file =~ /.*_spec\.rb$/
@@ -170,7 +193,59 @@ There are one or more skipped/pending/focused test cases in your pull request. P
 end
 
 # ------------------------------------------------------------------------------
-# Most of time, the PR should not change or add *.md files.
+# 12. Unit tests and integration tests should avoid using "create" keyword.
+# ------------------------------------------------------------------------------
+MODIFIED_FILES.each do |file|
+  next unless file =~ /spec\/models/ or file =~ /spec\/controllers/
+  diff = git.diff_for_file(file).patch
+  next unless diff.include? " create(" or diff.include? "{create("
+  CREATE_MOCK_UP_OBJ_MESSAGE =
+    markdown <<-MARKDOWN
+  Using `create` in unit tests or integration tests may be overkill. Try to use `build` or `double` instead.
+        MARKDOWN
+
+  warn(CREATE_MOCK_UP_OBJ_MESSAGE, sticky: true)
+  break
+end
+
+# ------------------------------------------------------------------------------
+# 13. RSpec tests should avoid using "should" keyword.
+# ------------------------------------------------------------------------------
+MODIFIED_FILES.each do |file|
+  next unless file =~ /.*_spec\.rb$/
+  next unless git.diff_for_file(file).patch.include? ".should"
+  NO_SHOULD_SYNTAX_MESSAGE =
+    markdown <<-MARKDOWN
+The `should` syntax is deprecated in RSpec 3. Please use `expect` syntax instead.
+Even in test descriptions, please avoid using `should`.
+    MARKDOWN
+
+  warn(NO_SHOULD_SYNTAX_MESSAGE, sticky: true)
+  break
+end
+
+# ------------------------------------------------------------------------------
+# 14. Your RSpec testing files do not need to require helper files (e.g., rails_helper.rb, spec_helper.rb). 
+# ------------------------------------------------------------------------------
+if !CURRENT_MAINTAINERS.include? github.pr_author and
+  (MODIFIED_FILES.grep(/rails_helper\.rb/).any? or MODIFIED_FILES.grep(/spec_helper\.rb/).any?)
+  TEST_HELPER_FILE_MESSAGE =
+    markdown <<-MARKDOWN
+You should not change `rails_helper.rb` or `spec_helper.rb` file; please revert these changes.
+  MARKDOWN
+
+  warn(TEST_HELPER_FILE_MESSAGE, sticky: true)
+end
+
+# ------------------------------------------------------------------------------
+# 15. You should avoid committing text files for RSpec tests.
+# ------------------------------------------------------------------------------
+if MODIFIED_FILES.grep(/.*spec.*\.txt/).any? or MODIFIED_FILES.grep(/.*spec.*\.csv/).any?
+  warn("You committed text files (`*.txt` or `*.csv`) for RSpec tests; please double-check whether this is necessary.", sticky: true)
+end
+
+# ------------------------------------------------------------------------------
+# 16. Your pull request should not change or add *.md files unless you have a good reason.
 # ------------------------------------------------------------------------------
 if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/\.md/).any?
   MARKDOWN_CHANGE_MESSAGE =
@@ -183,7 +258,7 @@ Alternatively, you can insert project-related content in the description field o
 end
 
 # ------------------------------------------------------------------------------
-# The PR should change db schema only if there is new db migrations.
+# 17. Your pull request should not change DB schema unless there is new DB migrations.
 # ------------------------------------------------------------------------------
 if !CURRENT_MAINTAINERS.include? github.pr_author and
   (MODIFIED_FILES.grep(/schema\.rb/).any? or MODIFIED_FILES.grep(/schema\.json/).any?)
@@ -197,30 +272,7 @@ Please double check your code. If you did not aim to change the DB, please rever
 end
 
 # ------------------------------------------------------------------------------
-# The PR should normally avoid using global variables and/or class variables.
-# ------------------------------------------------------------------------------
-if github.pr_diff =~ /\$[A-Za-z0-9_]+/ or github.pr_diff =~ /@@[A-Za-z0-9_]+/
-  GLOBAL_CLASS_VARIABLE_MESSAGE =
-    markdown <<-MARKDOWN
-You are using global variables (`$`) or class variables (`@@`); please double-check whether this is necessary.
-    MARKDOWN
-
-  warn(GLOBAL_CLASS_VARIABLE_MESSAGE, sticky: true)
-end
-
-# ------------------------------------------------------------------------------
-# The PR should avoid keeping debugging code.
-# ------------------------------------------------------------------------------
-if github.pr_diff.include? "puts " or
-   github.pr_diff.include? "print " or
-   github.pr_diff.include? "binding.pry" or
-   github.pr_diff.include? "debugger;" or
-   github.pr_diff.include? "console.log"
-  fail("You are including debug code in your pull request, please remove it.", sticky: true)
-end
-
-# ------------------------------------------------------------------------------
-# The PR should not modify *.yml or *.yml.example file.
+# 18. Your pull request should not modify *.yml or *.yml.example file.
 # ------------------------------------------------------------------------------
 if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/\.yml/).any?
   YAML_FILE_MESSAGE =
@@ -232,35 +284,7 @@ You changed YAML (`*.yml`) or example (`*.yml.example`) files; please double-che
 end
 
 # ------------------------------------------------------------------------------
-# The PR should not modify rails_helper.rb or spec_helper.rb file.
-# ------------------------------------------------------------------------------
-if !CURRENT_MAINTAINERS.include? github.pr_author and
-  (MODIFIED_FILES.grep(/rails_helper\.rb/).any? or MODIFIED_FILES.grep(/spec_helper\.rb/).any?)
-  TEST_HELPER_FILE_MESSAGE =
-    markdown <<-MARKDOWN
-You should not change `rails_helper.rb` or `spec_helper.rb` file; please revert these changes.
-  MARKDOWN
-
-  warn(TEST_HELPER_FILE_MESSAGE, sticky: true)
-end
-
-# ------------------------------------------------------------------------------
-# The PR should not modify Gemfile, Gemfile.lock.
-# ------------------------------------------------------------------------------
-if !CURRENT_MAINTAINERS.include? github.pr_author and
-  (MODIFIED_FILES.include? "Gemfile" or MODIFIED_FILES.include? "Gemfile.lock")
-  GEMFILE_CHANGE_MESSAGE =
-    markdown <<-MARKDOWN
-You are modifying `Gemfile` or `Gemfile.lock`, please double check whether it is necessary.
-You are suppose to add a new gem only if you have a very good reason. Try to use existing gems instead.
-Please revert changes to `Gemfile.lock` made by the IDE.
-    MARKDOWN
-
-  warn(GEMFILE_CHANGE_MESSAGE, sticky: true)
-end
-
-# ------------------------------------------------------------------------------
-# The rspec does not need to require helper files.
+# 19. Your pull request should not modify test-related helper files.
 # ------------------------------------------------------------------------------
 if github.pr_diff.include? "require 'rspec'" or
    github.pr_diff.include? "require \"rspec\"" or
@@ -282,111 +306,87 @@ There have already been included, you do not need to require them again. Please 
 end
 
 # ------------------------------------------------------------------------------
-# Unit tests and integration tests should avoid using "create" keyword.
+# 20. Your pull request should not modify Gemfile, Gemfile.lock.
 # ------------------------------------------------------------------------------
-MODIFIED_FILES.each do |file|
-  next unless file =~ /spec\/models/ or file =~ /spec\/controllers/
-  diff = git.diff_for_file(file).patch
-  next unless diff.include? " create(" or diff.include? "{create("
-  CREATE_MOCK_UP_OBJ_MESSAGE =
+if !CURRENT_MAINTAINERS.include? github.pr_author and
+  (MODIFIED_FILES.include? "Gemfile" or MODIFIED_FILES.include? "Gemfile.lock")
+  GEMFILE_CHANGE_MESSAGE =
     markdown <<-MARKDOWN
-  Using `create` in unit tests or integration tests may be overkill. Try to use `build` or `double` instead.
-        MARKDOWN
-
-  warn(CREATE_MOCK_UP_OBJ_MESSAGE, sticky: true)
-  break
-end
-
-# ------------------------------------------------------------------------------
-# RSpec tests should avoid using "should" keyword.
-# ------------------------------------------------------------------------------
-MODIFIED_FILES.each do |file|
-  next unless file =~ /.*_spec\.rb$/
-  next unless git.diff_for_file(file).patch.include? ".should"
-  NO_SHOULD_SYNTAX_MESSAGE =
-    markdown <<-MARKDOWN
-The `should` syntax is deprecated in RSpec 3. Please use `expect` syntax instead.
-Even in test descriptions, please avoid using `should`.
+You are modifying `Gemfile` or `Gemfile.lock`, please double check whether it is necessary.
+You are suppose to add a new gem only if you have a very good reason. Try to use existing gems instead.
+Please revert changes to `Gemfile.lock` made by the IDE.
     MARKDOWN
 
-  warn(NO_SHOULD_SYNTAX_MESSAGE, sticky: true)
-  break
+  warn(GEMFILE_CHANGE_MESSAGE, sticky: true)
 end
 
 # ------------------------------------------------------------------------------
-# RSpec tests should avoid committing text files.
-# ------------------------------------------------------------------------------
-if MODIFIED_FILES.grep(/.*\.txt/).any? or MODIFIED_FILES.grep(/.*\.csv/).any?
-  warn("You committed text files (`*.txt` or `*.csv`); please double-check whether this is necessary.", sticky: true)
-end
-
-# ------------------------------------------------------------------------------
-# You should not change .bowerrc.
+# 21. You should not change .bowerrc.
 # ------------------------------------------------------------------------------
 fail("You changed .bowerrc; please double-check whether this is necessary", sticky: true) if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/\.bowerrc/).any?
 
 # ------------------------------------------------------------------------------
-# You should not change .gitignore.
+# 22. You should not change .gitignore.
 # ------------------------------------------------------------------------------
 fail("You changed .gitignore; please double-check whether this is necessary.", sticky: true) if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/\.gitignore/).any?
 
 # ------------------------------------------------------------------------------
-# You should not change .mention-bot.
+# 23. You should not change .mention-bot.
 # ------------------------------------------------------------------------------
 fail("You changed .mention-bot; please double-check whether this is necessary.", sticky: true) if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/\.mention-bot/).any?
 
 # ------------------------------------------------------------------------------
-# You should not change .rspec.
+# 24. You should not change .rspec.
 # ------------------------------------------------------------------------------
 fail("You changed .rspec; please double-check whether this is necessary.", sticky: true) if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/\.rspec/).any?
 
 # ------------------------------------------------------------------------------
-# You should not change Capfile.
+# 25. You should not change Capfile.
 # ------------------------------------------------------------------------------
 fail("You changed Capfile; please double-check whether this is necessary.", sticky: true) if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/Capfile/).any?
 
 # ------------------------------------------------------------------------------
-# You should not change Dangerfile.
+# 26. You should not change Dangerfile.
 # ------------------------------------------------------------------------------
 fail("You changed Dangerfile; please double-check whether this is necessary.", sticky: true) if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/Dangerfile/).any?
 
 # ------------------------------------------------------------------------------
-# You should not change Guardfile.
+# 27. You should not change Guardfile.
 # ------------------------------------------------------------------------------
 fail("You changed Guardfile; please double-check whether this is necessary.", sticky: true) if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/Guardfile/).any?
 
 # ------------------------------------------------------------------------------
-# You should not change LICENSE.
+# 28. You should not change LICENSE.
 # ------------------------------------------------------------------------------
 fail("You changed LICENSE; please double-check whether this is necessary.", sticky: true) if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/LICENSE/).any?
 
 # ------------------------------------------------------------------------------
-# You should not change Procfile.
+# 29. You should not change Procfile.
 # ------------------------------------------------------------------------------
 fail("You changed Procfile; please double-check whether this is necessary.", sticky: true) if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/Procfile/).any?
 
 # ------------------------------------------------------------------------------
-# You should not change Rakefile.
+# 30. You should not change Rakefile.
 # ------------------------------------------------------------------------------
 fail("You changed Rakefile; please double-check whether this is necessary.", sticky: true) if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/Rakefile/).any?
 
 # ------------------------------------------------------------------------------
-# You should not change bower.json.
+# 31. You should not change bower.json.
 # ------------------------------------------------------------------------------
 fail("You changed bower.json; please double-check whether this is necessary.", sticky: true) if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/bower\.json/).any?
 
 # ------------------------------------------------------------------------------
-# You should not change config.ru.
+# 32. You should not change config.ru.
 # ------------------------------------------------------------------------------
 fail("You changed config.ru; please double-check whether this is necessary.", sticky: true) if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/config\.ru/).any?
 
 # ------------------------------------------------------------------------------
-# You should not change setup.sh.
+# 33. You should not change setup.sh.
 # ------------------------------------------------------------------------------
 fail("You changed setup.sh; please double-check whether this is necessary.", sticky: true) if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/setup\.sh/).any?
 
 # ------------------------------------------------------------------------------
-# The PR should not modify vendor folder.
+# 34. The PR should not modify vendor folder.
 # ------------------------------------------------------------------------------
 if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/vendor/).any?
   VENDOR_MESSAGE =
@@ -398,7 +398,7 @@ You modified `vendor` folder, please double-check whether it is necessary.
 end
 
 # ------------------------------------------------------------------------------
-# The PR should not modify /spec/factories/ folder.
+# 35. You should not modify /spec/factories/ folder.
 # ------------------------------------------------------------------------------
 if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/spec\/factories/).any?
   FIXTURE_FILE_MESSAGE =
@@ -411,7 +411,7 @@ end
 
 # git.added_files
 # ------------------------------------------------------------------------------
-# The PR should not include .vscode folder.
+# 35. You should not include .vscode folder.
 # ------------------------------------------------------------------------------
 if git.added_files.grep(/\.vscode/).any?
   VSCODE_MESSAGE =
@@ -423,7 +423,7 @@ You committed `.vscode/` folder; please remove it.
 end
 
 # ------------------------------------------------------------------------------
-# RSpec tests should avoid shallow tests.
+# 37. RSpec tests should avoid shallow tests.
 # ------------------------------------------------------------------------------
 MODIFIED_FILES.each do |file|
   next unless file =~ /.*_spec\.rb$/

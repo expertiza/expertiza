@@ -411,7 +411,7 @@ end
 
 # git.added_files
 # ------------------------------------------------------------------------------
-# 35. You should not include .vscode folder.
+# 36. You should not commit .vscode folder to your pull request.
 # ------------------------------------------------------------------------------
 if git.added_files.grep(/\.vscode/).any?
   VSCODE_MESSAGE =

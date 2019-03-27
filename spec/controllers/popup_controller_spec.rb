@@ -1,7 +1,7 @@
 describe PopupController do
   let(:assignment_team) { build(:assignment_team, id: 1, name: "team1", assignment: assignment) }
-  let(:team) {build(:team)}
-  let(:team_user) {build(:team_user)}
+  let(:team) { build(:team) }
+  let(:team_user) { build(:team_user) }
   let(:student) { build(:student, id: 1, name: "student") }
   let(:student2) { build(:student, id: 2, name: "student2") }
   let(:admin) { build(:admin) }
@@ -10,21 +10,18 @@ describe PopupController do
   let(:participant) { build(:participant, id: 1, user_id: 1, user: student, assignment: assignment) }
   let(:participant2) { build(:participant, id: 2, user: student2, assignment: assignment) }
   let(:response) { build(:response, id: 1) }
-  let(:questionnaire) { build(:questionnaire, id: 1, max_question_score: 15)}
-  let(:question) { build(:question, id: 1, questionnaire_id: questionnaire.id)}
+  let(:questionnaire) { build(:questionnaire, id: 1, max_question_score: 15) }
+  let(:question) { build(:question, id: 1, questionnaire_id: questionnaire.id) }
   let(:answer) { build(:answer, id: 1, question_id: question.id, response_id: response.id, answer: 10) }
   let(:assignment) { build(:assignment, id: 1) }
   let(:response_map) { build(:review_response_map, id: 1, reviewee_id: assignment_team.id, reviewer_id: participant2.id, response: [response], assignment: assignment) }
-  let(:final_versions) {{
-      review_round_one: {questionnaire_id: 1, response_ids: [1]},
-      review_round_two: {questionnaire_id: 2, response_ids: [2]},
-      review_round_three: {questionnaire_id: 3, response_ids: [3], }
-  }}
+  let(:final_versions) { { review_round_one:{ questionnaire_id: 1, response_ids: [1] },
+      review_round_two: { questionnaire_id: 2, response_ids: [2] },
+      review_round_three: { questionnaire_id: 3, response_ids: [3] }
+  } }
   test_url = "http://peerlogic.csc.ncsu.edu/reviewsentiment/viz/478-5hf542"
   mocked_comments_one = OpenStruct.new(comments: "test comment")
-  let(:sentiment_summary) {
-    [{"sentiments"=>[{"id"=>0, "neg"=>"0.00", "neu"=>"1.00", "pos"=>"0.00", "sentiment"=>"0.00", "text"=>"N/A"}]}]
-  }
+  let(:sentiment_summary) {[{"sentiments"=>[{ "id" => 0, "neg" => "0.00", "neu" => "1.00", "pos" => "0.00", "sentiment" => "0.00", "text" => "N/A" }]}]}
 
   describe '#action_allowed?' do
     context 'when the role name of current user is super admin or admin' do
@@ -196,7 +193,7 @@ describe PopupController do
       allow(Answer).to receive(:where).with(any_args).and_return(mocked_comments_one)
       @request.host = test_url
       allow(Questionnaire).to receive(:find).with(any_args).and_return(questionnaire)
-      allow(Question).to receive(:where).with(:questionnaire_id => questionnaire.id).and_return([question])
+      allow(Question).to receive(:where).with(:questionnaire_id: questionnaire.id).and_return([question])
     end
 
     describe '#tone_analysis_chart_popup' do
@@ -230,23 +227,23 @@ describe PopupController do
   describe '#build_tone_analysis_report' do
     before(:each) do
       allow(Questionnaire).to receive(:find).with(any_args).and_return(questionnaire)
-      allow(Question).to receive(:where).with(:questionnaire_id => questionnaire.id).and_return([question])
+      allow(Question).to receive(:where).with(:questionnaire_id: questionnaire.id).and_return([question])
     end
-      describe 'answer is not provided' do
-        it 'build tone analysis report' do
-          controller.instance_variable_set(:@review_final_versions, final_versions)
+    describe 'answer is not provided' do
+       it 'build tone analysis report' do
+         controller.instance_variable_set(:@review_final_versions, final_versions)
           allow(Answer).to receive(:where).with(any_args).and_return([])
-          controller.send(:build_tone_analysis_report)
-        end
-      end
+         controller.send(:build_tone_analysis_report)
+       end
+     end
 
-      describe 'answer is provided' do
-        it 'build tone analysis report' do
-          controller.instance_variable_set(:@review_final_versions, final_versions)
+    describe 'answer is provided' do
+       it 'build tone analysis report' do
+         controller.instance_variable_set(:@review_final_versions, final_versions)
           allow(Answer).to receive(:where).with(any_args).and_return([answer])
-          controller.send(:build_tone_analysis_report)
-        end
-      end
+         controller.send(:build_tone_analysis_report)
+       end
+    end
   end
 
   describe '#build_tone_analysis_heatmap' do
@@ -256,7 +253,7 @@ describe PopupController do
         allow(Assignment).to receive(:find).with('reviewee_id = ?', assignment_team.id).and_return(assignment)
         allow(ReviewResponseMap).to receive(:final_versions_from_reviewer).with("1").and_return(final_versions)
         allow(Questionnaire).to receive(:find).with(any_args).and_return(questionnaire)
-        allow(Question).to receive(:where).with(:questionnaire_id => questionnaire).and_return([question])
+        allow(Question).to receive(:where).with(:questionnaire_id: questionnaire).and_return([question])
         controller.instance_variable_set(:@review_final_versions, final_versions)
         controller.instance_variable_set(:@sentiment_summary, sentiment_summary)
         controller.send(:build_tone_analysis_heatmap)

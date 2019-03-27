@@ -8,6 +8,7 @@ AllCops:
     - 'lib/**/*'
     - 'public/**/*'
     - 'vendor/**/*'
+    - 'Dangerfile'
 Rails:
   Enabled: true
 

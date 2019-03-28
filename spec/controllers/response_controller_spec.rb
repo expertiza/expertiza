@@ -202,7 +202,6 @@ describe ResponseController do
 
   describe '#create' do
     it 'creates a new response and redirects to response#save page' do
-      allow(Response).to receive(:where).with(map_id: 1).and_return([review_response])
       allow(ResponseMap).to receive(:find).with('1').and_return(review_response_map)
       allow(Response).to receive_message_chain(:where, :order).with(map_id: 1, round: 1).with(created_at: :desc).and_return([review_response_round1])
       allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)

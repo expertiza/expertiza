@@ -155,7 +155,6 @@ module AssignmentHelper
   end
 
   # helper methods for update
-  # used to be assignment_form_key_nonexist_case_handler
   # Finds assignment and course id, if the assignment is savable then flash and log
   # If it is not savable then flash and log appropriately
   def assignment_submission_handler
@@ -173,7 +172,6 @@ module AssignmentHelper
     end
   end
 
-  # used to be check_due_date_nameurl_not_empty
   # Setting various variables with boolean values
   def check_due_date_nameurl(dd)
     @due_date_nameurl_not_empty = due_date_nameurl_not_empty?(dd)

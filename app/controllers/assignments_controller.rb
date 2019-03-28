@@ -3,19 +3,16 @@ class AssignmentsController < ApplicationController
   autocomplete :user, :name
   before_action :authorize
 
+  # either current_user is an super/admin or instructor for the assignment
+  # or a TA for the course exists or owner of the Course
   def action_allowed?
-    # check for the controller method name being called...
     if %w[edit update list_submissions].include? params[:action]
       assignment = Assignment.find(params[:id])
       user_id = current_user.try(:id)
-      # either current_user is an super/admin or instructor for the assignment or a TA for the course exists or owner of the Course
 
       (%w[Super-Administrator Administrator].include? current_role_name) ||
-
       (assignment.instructor_id == user_id) ||
-
       TaMapping.exists?(ta_id: user_id, course_id: assignment.course_id) ||
-
       (assignment.course_id && Course.find(assignment.course_id).instructor_id == user_id)
     else
       ['Super-Administrator', 'Administrator', 'Instructor', 'Teaching Assistant'].include? current_role_name
@@ -57,22 +54,17 @@ class AssignmentsController < ApplicationController
     ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Timezone not specified", request) if current_user.timezonepref.nil?
     flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines." if current_user.timezonepref.nil?
     edit_params_setting
-    # used to be assignment_form_assignment_staggered_deadline?
     assignment_staggered_deadline?
     @due_date_all.each do |dd|
-      # used to be check_due_date_nameurl_not_empty(dd)
       check_due_date_nameurl(dd)
       adjust_timezone_when_due_date_present(dd)
       break if validate_due_date
     end
     check_assignment_questionnaires_usage
-    # used to be @due_date_all = update_nil_dd_deadline_name(@due_date_all)
     @due_date_all = update_due_date_deadline_name(@due_date_all)
-    # used to be @due_date_all = update_nil_dd_description_url(@due_date_all)
     @due_date_all = update_due_date_description_url(@due_date_all)
     # only when instructor does not assign rubrics and in assignment edit page will show this error message.
     handle_rubrics_not_assigned_case
-    # handle_assignment_directory_path_nonexist_case_and_answer_tagging refactored to be
     missing_submission_directory
     # assigned badges will hold all the badges that have been assigned to an assignment
     # added it to display the assigned badges while creating a badge in the assignments page
@@ -82,14 +74,11 @@ class AssignmentsController < ApplicationController
 
   def update
     unless params.key?(:assignment_form)
-      # used to be assignment_form_key_nonexist_case_handler
       assignment_submission_handler
       return
     end
     retrieve_assignment_form
-    # used to be handle_current_user_timezonepref_nil
     timezone_handler
-    # used to be update_feedback_assignment_form_attributes
     update_feedback_attributes
     redirect_to edit_assignment_path @assignment_form.assignment.id
   end
@@ -264,7 +253,6 @@ class AssignmentsController < ApplicationController
     dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_TEAM_FORMATION
   end
 
-  # used to be update_nil_dd_deadline_name
   # Iterates through all the due dates and sets the deadline name to ''
   def update_due_date_deadline_name(due_date_all)
     due_date_all.each do |dd|
@@ -273,7 +261,6 @@ class AssignmentsController < ApplicationController
     due_date_all
   end
 
-  # used to be update_nil_dd_description_url
   # Iterates through all the due dates and sets the description url to ''
   def update_due_date_description_url(due_date_all)
     due_date_all.each do |dd|
@@ -282,7 +269,6 @@ class AssignmentsController < ApplicationController
     due_date_all
   end
 
-  # used to be assignment_form_assignment_staggered_deadline?
   # When there is a staggered deadline the submission due date and the review due date deadline_type_id are set
   # If the assignment deadline is not staggered then set the variable to true
   def assignment_staggered_deadline?
@@ -325,7 +311,6 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  # used to be handle_assignment_directory_path_nonexist_case_and_answer_tagging
   # When the submission directory is not set flash error and log
   # Otherwise when answer tagging is allowed then tagpromptdeployment is initialized with assignment id
   def missing_submission_directory
@@ -344,13 +329,11 @@ class AssignmentsController < ApplicationController
     end
 
     # Deleting Due date info from table if meta-review is unchecked. - UNITY ID: ralwan and vsreeni
-
     @due_date_info = DueDate.find_each(parent_id: params[:id])
 
     DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all if params[:metareviewAllowed] == "false"
   end
 
-  # used to be handle_current_user_timezonepref_nil
   # If the current user has not set the time zone then flash a message
   # Then set the time zone equal to the parent timezone
   def timezone_handler
@@ -362,19 +345,15 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  # used to be update_feedback_assignment_form_attributes
   # When there have been submissions for reviews then the number of reviews expected can not be reduced
   # If there are no reviews yet then update the assignment if possible and log results
   def update_feedback_attributes
-    # if there are reviews submitted then you cant reduce the number of review as instructor
     if params[:set_pressed][:bool] == 'false'
       flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."
     else
-      # otherwise update the form
       if @assignment_form.update_attributes(assignment_form_params, current_user)
         flash[:note] = 'The assignment was successfully saved....'
       else
-        # if for some reason it didnt update
         flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
       end
     end

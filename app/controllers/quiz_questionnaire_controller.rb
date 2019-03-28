@@ -104,10 +104,10 @@ class QuizQuestionnaireController < QuestionnairesController
           end
           if @question.type == "TrueFalse"
             if params[:quiz_question_choices][@question.id.to_s][@question.type][1.to_s][:iscorrect] == "True" # the statement is correct
-              quiz_question_choice.txt == "True" ? quiz_question_choice.update_attributes(iscorrect: '1'):quiz_question_choice.update_attributes(iscorrect: '0')
+              quiz_question_choice.txt == "True" ? quiz_question_choice.update_attributes(iscorrect: '1') : quiz_question_choice.update_attributes(iscorrect: '0')
               # the statement is correct so "True" is the right answer
             else # the statement is not correct
-              quiz_question_choice.txt == "True" ? quiz_question_choice.update_attributes(iscorrect: '0'): quiz_question_choice.update_attributes(iscorrect: '1')
+              quiz_question_choice.txt == "True" ? quiz_question_choice.update_attributes(iscorrect: '0') : quiz_question_choice.update_attributes(iscorrect: '1')
               # the statement is not correct so "False" is the right answer
             end
           end
@@ -133,11 +133,11 @@ class QuizQuestionnaireController < QuestionnairesController
         @new_question.update_attributes(txt: params[:new_question][i.to_s])
         type = params[:question_type][i.to_s][:type]
         choice_info = params[:new_choices][i.to_s][type] # choice info for one question of its type
-        if choice_info.nil?
-          valid = "Please select a correct answer for all questions"
-        else
-          valid = @new_question.isvalid(choice_info)
-        end
+        valid = if choice_info.nil?
+                  "Please select a correct answer for all questions"
+                else
+                  @new_question.isvalid(choice_info)
+                end
       end
       break if valid != "valid"
     end
@@ -174,16 +174,16 @@ class QuizQuestionnaireController < QuestionnairesController
     save_new_questions questionnaire_id
 
     if params[:question]
-        params[:question].keys.each do |question_key|
-          if params[:question][question_key][:txt].strip.empty?
-              # question text is empty, delete the question
-              Question.delete(question_key)
-          else
-              # Update existing question.
-              question = Question.find(question_key)
-              Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
-          end
+      params[:question].keys.each do |question_key|
+        if params[:question][question_key][:txt].strip.empty?
+          # question text is empty, delete the question
+          Question.delete(question_key)
+        else
+          # Update existing question.
+          question = Question.find(question_key)
+          Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
         end
+      end
     end
   end
 
@@ -195,8 +195,8 @@ class QuizQuestionnaireController < QuestionnairesController
     questions.each do |question|
       q_type = params[:question_type][question_num.to_s][:type]
       params[:new_choices][question_num.to_s][q_type].keys.each do |choice_key|
-      if q_type == "MultipleChoiceCheckbox"
-        q = if params[:new_choices][question_num.to_s][q_type][choice_key][:iscorrect] == 1.to_s
+        if q_type == "MultipleChoiceCheckbox"
+          q = if params[:new_choices][question_num.to_s][q_type][choice_key][:iscorrect] == 1.to_s
               QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
             else
               QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)

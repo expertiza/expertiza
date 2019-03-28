@@ -181,7 +181,7 @@ describe QuestionnairesController do
           allow(TreeFolder).to receive(:find_by).with(name: 'Review').and_return(double('TreeFolder', id: 1))
           allow(FolderNode).to receive(:find_by).with(node_object_id: 1).and_return(double('FolderNode'))
           allow_any_instance_of(QuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
-          post :create_quiz_questionnaire, params, session
+          post :create_questionnaire, params, session
           expect(flash[:note]).to be nil
           expect(response).to redirect_to('/tree_display/list')
           expect(controller.instance_variable_get(:@questionnaire).private).to eq false

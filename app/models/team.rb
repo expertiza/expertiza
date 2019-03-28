@@ -163,7 +163,6 @@ class Team < ActiveRecord::Base
   end
 
   # Extract team members from the csv and push to DB,  changed to hash by E1776
-  # todo check if the starting_index is necessary
   def import_team_members(row_hash, starting_index = 0)
     index = 0
     row_hash[:teammembers].each do |teammember|

@@ -232,7 +232,7 @@ class SignUpSheetController < ApplicationController
     redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
   end
 
-  def can_delete_topic? is_instructor, participant, assignment, drop_topic_deadline
+  def can_delete_topic? is_instructor?, participant, assignment, drop_topic_deadline
     submission_error_message = ""
     deadline_error_message = ""
 

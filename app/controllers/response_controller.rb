@@ -28,7 +28,8 @@ class ResponseController < ApplicationController
     if map.is_a? ReviewResponseMap
       reviewee_team = AssignmentTeam.find(map.reviewee_id)
       return current_user_id?(user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' ||
-        (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) || (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
+        (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id)||
+          (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
     else
       current_user_id?(user_id)
     end
@@ -204,23 +205,25 @@ class ResponseController < ApplicationController
     flash[:error] = error_id unless error_id and error_id.empty?
     flash[:note] = message_id unless message_id and message_id.empty?
     @map = Response.find_by(map_id: params[:id])
-    if params[:return] == "feedback"
-      redirect_to controller: 'grades', action: 'view_my_scores', id: @map.reviewer.id
-    elsif params[:return] == "teammate"
-      redirect_to view_student_teams_path student_id: @map.reviewer.id
-    elsif params[:return] == "instructor"
-      redirect_to controller: 'grades', action: 'view', id: @map.response_map.assignment.id
-    elsif params[:return] == "assignment_edit"
-      redirect_to controller: 'assignments', action: 'edit', id: @map.response_map.assignment.id
-    elsif params[:return] == "selfreview"
-      redirect_to controller: 'submitted_content', action: 'edit', id: @map.response_map.reviewer_id
-    elsif params[:return] == "survey"
-      redirect_to controller: 'survey_deployment', action: 'pending_surveys'
+    case params[:return]
+    when "feedback"
+     redirect_to :controller => 'grades', :action => 'view_my_scores', :id => @map.reviewer.id
+    when "teammate"
+     redirect_to view_student_teams_path student_id: @map.reviewer.id
+    when "instructor"
+     redirect_to :controller => 'grades', :action => 'view', :id => @map.response_map.assignment.id
+    when "assignment_edit"
+     redirect_to controller: 'assignments', action: 'edit', id: @map.response_map.assignment.id
+    when "selfreview"
+     redirect_to controller: 'submitted_content', action: 'edit', id: @map.response_map.reviewer_id
+    when "survey"
+     redirect_to controller: 'survey_deployment', action: 'pending_surveys'
     else
-      redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
-    end
+     redirect_to :controller => 'student_review', :action => 'list', :id => @map.reviewer.id
+   end
   end
 
+  #assigning variables for the expert reviews
   def show_calibration_results_for_student
     calibration_response_map = ReviewResponseMap.find(params[:calibration_response_map_id])
     review_response_map = ReviewResponseMap.find(params[:review_response_map_id])
@@ -290,6 +293,7 @@ class ResponseController < ApplicationController
       @questionnaire = @map.questionnaire
     end
   end
+  #stores the first instance of the score for each question
   def scores
     @review_scores = []
     @questions.each do |question|
@@ -307,6 +311,7 @@ class ResponseController < ApplicationController
     @questionnaire = @response.questionnaire_by_answer(answer)
   end
 
+  #checks if the questionnaire is nil and opens drop down or rating accordingly
   def set_dropdown_or_scale
     use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.try(:id),
                                                  questionnaire_id: @questionnaire.try(:id))
@@ -314,12 +319,12 @@ class ResponseController < ApplicationController
     @dropdown_or_scale = (use_dropdown ? 'dropdown' : 'scale')
   end
 
+   #sorts by sequence number
   def sort_questions(questions)
     questions.sort_by(&:seq)
   end
-
+ # For each question in the list, starting with the first one, you update the comment and score
   def create_answers(params, questions)
-    # create score if it is not found. If it is found update it otherwise update it
     params[:responses].each_pair do |k, v|
       score = Answer.where(response_id: @response.id, question_id: questions[k.to_i].id).first
       score ||= Answer.create(response_id: @response.id, question_id: questions[k.to_i].id, answer: v[:score], comments: v[:comment])

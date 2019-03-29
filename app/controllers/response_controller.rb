@@ -207,19 +207,19 @@ class ResponseController < ApplicationController
     @map = Response.find_by(map_id: params[:id])
     case params[:return]
     when "feedback"
-       redirect_to controller: 'grades', action: 'view_my_scores', id: @map.reviewer.id
+      redirect_to controller: 'grades', action: 'view_my_scores', id: @map.reviewer.id
     when "teammate"
-       redirect_to view_student_teams_path student_id: @map.reviewer.id
+      redirect_to view_student_teams_path student_id: @map.reviewer.id
     when "instructor"
-       redirect_to controller: 'grades', action: 'view', id: @map.response_map.assignment.id
+      redirect_to controller: 'grades', action: 'view', id: @map.response_map.assignment.id
     when "assignment_edit"
-       redirect_to controller: 'assignments', action: 'edit', id: @map.response_map.assignment.id
+      redirect_to controller: 'assignments', action: 'edit', id: @map.response_map.assignment.id
     when "selfreview"
-       redirect_to controller: 'submitted_content', action: 'edit', id: @map.response_map.reviewer_id
+      redirect_to controller: 'submitted_content', action: 'edit', id: @map.response_map.reviewer_id
     when "survey"
-       redirect_to controller: 'survey_deployment', action: 'pending_surveys'
+      redirect_to controller: 'survey_deployment', action: 'pending_surveys'
     else
-       redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
+      redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
     end
   end
 
@@ -319,11 +319,11 @@ class ResponseController < ApplicationController
     @dropdown_or_scale = (use_dropdown ? 'dropdown' : 'scale')
   end
 
-   # sorts by sequence number
+  # sorts by sequence number
   def sort_questions(questions)
     questions.sort_by(&:seq)
   end
- # For each question in the list, starting with the first one, you update the comment and score
+  # For each question in the list, starting with the first one, you update the comment and score
   def create_answers(params, questions)
     params[:responses].each_pair do |k, v|
       score = Answer.where(response_id: @response.id, question_id: questions[k.to_i].id).first

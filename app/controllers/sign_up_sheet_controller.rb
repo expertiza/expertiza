@@ -237,7 +237,7 @@ class SignUpSheetController < ApplicationController
     deadline_error_message = ""
 
     if is_instructor
-      submission_error_message = "The student has already submitted their work, so you are not allowed to remove them"
+      submission_error_message = "The student has already submitted their work, so you are not allowed to remove them."
       deadline_error_message = "You cannot drop a student after the drop topic deadline!"
     else
       submission_error_message = "You have already submitted your work, so you are not allowed to drop your topic."

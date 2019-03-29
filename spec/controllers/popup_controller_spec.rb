@@ -193,7 +193,7 @@ describe PopupController do
       allow(Answer).to receive(:where).with(any_args).and_return(mocked_comments_one)
       @request.host = test_url
       allow(Questionnaire).to receive(:find).with(any_args).and_return(questionnaire)
-      allow(Question).to receive(:where).with(:questionnaire_id: questionnaire.id).and_return([question])
+      allow(Question).to receive(:where).with(:questionnaire_id => questionnaire.id).and_return([question])
     end
 
     describe '#tone_analysis_chart_popup' do
@@ -227,7 +227,7 @@ describe PopupController do
   describe '#build_tone_analysis_report' do
     before(:each) do
       allow(Questionnaire).to receive(:find).with(any_args).and_return(questionnaire)
-      allow(Question).to receive(:where).with(:questionnaire_id: questionnaire.id).and_return([question])
+      allow(Question).to receive(:where).with(:questionnaire_id => questionnaire.id).and_return([question])
     end
     describe 'answer is not provided' do
        it 'build tone analysis report' do
@@ -253,7 +253,7 @@ describe PopupController do
         allow(Assignment).to receive(:find).with('reviewee_id = ?', assignment_team.id).and_return(assignment)
         allow(ReviewResponseMap).to receive(:final_versions_from_reviewer).with("1").and_return(final_versions)
         allow(Questionnaire).to receive(:find).with(any_args).and_return(questionnaire)
-        allow(Question).to receive(:where).with(:questionnaire_id: questionnaire).and_return([question])
+        allow(Question).to receive(:where).with(:questionnaire_id => questionnaire).and_return([question])
         controller.instance_variable_set(:@review_final_versions, final_versions)
         controller.instance_variable_set(:@sentiment_summary, sentiment_summary)
         controller.send(:build_tone_analysis_heatmap)

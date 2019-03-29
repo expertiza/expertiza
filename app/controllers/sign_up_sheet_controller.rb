@@ -232,11 +232,11 @@ class SignUpSheetController < ApplicationController
     redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
   end
 
-  def can_delete_topic? is_instructor?, participant, assignment, drop_topic_deadline
+  def can_delete_topic? is_instructor, participant, assignment, drop_topic_deadline
     submission_error_message = ""
     deadline_error_message = ""
 
-    if is_instructor?
+    if is_instructor
       submission_error_message = "The student has already submitted their work, so you are not allowed to remove them"
       deadline_error_message = "You cannot drop a student after the drop topic deadline!"
     else

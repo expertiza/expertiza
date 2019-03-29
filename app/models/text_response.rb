@@ -2,7 +2,7 @@ class TextResponse < Question
   validates :size, presence: true
 
   # This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
-  def edit
+  def edit(_count)
     content_tag(:tr,
                 capture do
                   concat super(nil)

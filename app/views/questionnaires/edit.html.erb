@@ -20,10 +20,9 @@
       </tr>
 
       <% for @question in @questionnaire.questions %>
-
-        <%-# The following line call certain method of the object, which returns html string-%>
+          <%# E1911: Call the criterion_edit partial if question is of type Criterion -%>
           <% if @question.is_a? Criterion %>
-              <%= render :partial => 'criterion' %>
+              <%= render :partial => 'criterion_edit' %>
           <% else %>
               <%=@question.edit%>
           <% end %>

@@ -94,7 +94,7 @@ class ApplicationController < ActionController::Base
     redirect_back
   end
 
-  def available?(user, owner_id)
+  def is_available(user, owner_id)
     user.id == owner_id ||
         user.admin? ||
         user.super_admin?

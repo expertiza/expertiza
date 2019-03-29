@@ -3,13 +3,6 @@ describe "criterion" do
   let(:criterion) { Criterion.new id: 1, type: "Criterion", seq: 1.0, txt: "test txt", weight: 1, questionnaire: questionnaire }
   let(:answer) { Answer.new answer: 8 }
 
-  describe "#view_question_text" do
-    it "returns the html " do
-      html = criterion.view_question_text.to_s
-      expect(html).to eq("<TR><TD align=\"left\"> test txt </TD><TD align=\"left\">Criterion</TD><td align=\"center\">1</TD><TD align=\"center\"> () 0 to 5 ()</TD></TR>")
-    end
-  end
-
   describe "#complete" do
     it "returns the html " do
       html = criterion.complete(0, nil, 0, 5).to_s

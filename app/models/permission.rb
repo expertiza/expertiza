@@ -4,6 +4,6 @@ class Permission < ActiveRecord::Base
   validates :name, presence: true
   validates :name, uniqueness: true
 
-  has_many :content_pages
-  has_many :controller_actions
+  has_many :content_pages, dependent: :destroy
+  has_many :controller_actions, dependent: :destroy
 end

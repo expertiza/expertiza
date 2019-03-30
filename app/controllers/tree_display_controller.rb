@@ -131,9 +131,9 @@ class TreeDisplayController < ApplicationController
 
   def update_tmp_obj(tmp_object, node)
     tmp = {
-      "directory" => node.get_directory,
-      "creation_date" => node.get_creation_date,
-      "updated_date" => node.get_modified_date,
+      "directory" => node.directory,
+      "creation_date" => node.creation_date,
+      "updated_date" => node.modified_date,
       "institution" => Institution.where(id: node.retrieve_institution_id),
       "private" => node.get_instructor_id == session[:user].id
     }
@@ -174,7 +174,7 @@ class TreeDisplayController < ApplicationController
       tmp_res[node_type].each do |node|
         tmp_object = {
           "nodeinfo" => node,
-          "name" => node.get_name,
+          "name" => node.name,
           "type" => node.type
         }
         courses_assignments_obj(node_type, tmp_object, node) if %w[Courses Assignments].include? node_type
@@ -189,7 +189,7 @@ class TreeDisplayController < ApplicationController
     # ch_nodes are childrens
     # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
     ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
-    tmp_res[fnode.get_name] = ch_nodes
+    tmp_res[fnode.name] = ch_nodes
   end
 
   # initialize parent node and update child nodes for it
@@ -261,7 +261,7 @@ class TreeDisplayController < ApplicationController
 
   # attaches assignment nodes to course node of instructor
   def coursenode_assignmentnode(res2, child)
-    res2["directory"] = child.get_directory
+    res2["directory"] = child.directory
     instructor_id = child.get_instructor_id
     update_instructor(res2, instructor_id)
     update_is_available_2(res2, instructor_id, child)
@@ -277,12 +277,12 @@ class TreeDisplayController < ApplicationController
         node_type = child.type
         res2 = {
           "nodeinfo" => child,
-          "name" => child.get_name,
+          "name" => child.name,
           "key" => params[:reactParams2][:key],
           "type" => node_type,
           "private" => child.get_private,
-          "creation_date" => child.get_creation_date,
-          "updated_date" => child.get_modified_date
+          "creation_date" => child.creation_date,
+          "updated_date" => child.modified_date
         }
         coursenode_assignmentnode(res2, child) if %w[CourseNode AssignmentNode].include? node_type
         res << res2

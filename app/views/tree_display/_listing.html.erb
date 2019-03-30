@@ -7,8 +7,8 @@
   :parent_node => node,
   :child_nodes => child_nodes
 } %>
-<% if node.get_partial_name %>
-  <%= render :partial => '/tree_display/actions/'+node.get_partial_name,
+<% if node.partial_name %>
+  <%= render :partial => '/tree_display/actions/'+node.partial_name,
     :locals => {:id => node.node_object_id} %>
 <% else %>
   <%= render :partial=> '/tree_display/actions/no_actions' %>

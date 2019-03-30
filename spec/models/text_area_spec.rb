@@ -1,10 +1,10 @@
 describe 'TextArea' do
   let(:ta) { TextArea.new(txt: 'test text') }
-  let(:ans) { Answer.new(comments: 'test comment')}
+  let(:ans) { Answer.new(comments: 'test comment') }
 
   context 'when the answer is nil' do
     describe '#complete' do
-      before (:each) do
+      before(:each) do
         @ta_html = ta.complete(0, nil)
       end
       it 'returns an html_safe string to be rendered' do
@@ -18,7 +18,7 @@ describe 'TextArea' do
 
   context 'when the answer is not nil' do
     describe '#complete' do
-      before (:each) do
+      before(:each) do
         @ta_html = ta.complete(0, ans)
       end
       it 'returns an html_safe string to be rendered' do
@@ -30,7 +30,7 @@ describe 'TextArea' do
     end
 
     describe '#view_completed_question' do
-      before (:each) do
+      before(:each) do
         @ta_html = ta.view_completed_question(0, ans)
       end
       it 'returns an html_safe string to be rendered' do

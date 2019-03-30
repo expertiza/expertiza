@@ -4,7 +4,7 @@ describe 'TextField' do
 
   context 'when the answer is nil' do
     describe '#complete' do
-      before (:each) do
+      before(:each) do
         @tf_html = tf.complete(0, nil)
       end
       it 'returns an html_safe string to be rendered' do
@@ -18,7 +18,7 @@ describe 'TextField' do
 
   context 'when the answer is not nil' do
     describe '#complete' do
-      before (:each) do
+      before(:each) do
         @tf_html = tf.complete(0, ans)
       end
       it 'returns an html_safe string to be rendered' do
@@ -30,7 +30,7 @@ describe 'TextField' do
     end
 
     describe '#view_completed_question' do
-      before (:each) do
+      before(:each) do
         @tf_html = tf.view_completed_question(0, ans)
       end
       it 'returns an html_safe string to be rendered' do

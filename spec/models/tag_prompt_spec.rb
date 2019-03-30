@@ -23,7 +23,7 @@ describe TagPrompt do
   end
 
   describe 'when the control_type is a checkbox' do
-    before (:each) do
+    before(:each) do
       @tp_html = tp.html_control(tag_dep, an_long, 1)
     end
     it 'returns an html safe string' do
@@ -36,7 +36,7 @@ describe TagPrompt do
   end
 
   describe 'when the control_type is a slider' do
-    before (:each) do
+    before(:each) do
       @tp_html = tp2.html_control(tag_dep_slider, an_long, 1)
     end
     it 'returns an html safe string' do

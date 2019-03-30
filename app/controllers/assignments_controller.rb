@@ -176,24 +176,17 @@ class AssignmentsController < ApplicationController
       assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
     end
 
-    update_assignment_questionnaire_id
-    update_due_date_id
-
-    @assignment_form.update(assignment_form_params, current_user)
-  end
-
-  def update_assignment_questionnaire_id
     ques_array = assignment_form_params[:assignment_questionnaire]
     ques_array = array_traverser(ques_array, 1)
     assignment_form_params[:assignment_questionnaire] = ques_array
-  end
 
-  def update_due_date_id
     due_array = assignment_form_params[:due_date]
     due_array = array_traverser(due_array, 2)
     assignment_form_params[:due_date] = due_array
-  end
 
+    @assignment_form.update(assignment_form_params, current_user)
+  end
+  
   def array_traverser(temp_array, option)
     exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
     temp_array.each do |cur_ele|

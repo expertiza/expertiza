@@ -59,7 +59,7 @@ class SignedUpTeam < ActiveRecord::Base
     waitlisted_teams = SignedUpTeam.where(topic_id: topic_id)
 
     waitlisted_teams.each do |team|
-      if (team.is_waitlisted == true)
+      if team.is_waitlisted
         SignedUpTeam.delete(team.id)
         team.save
       end

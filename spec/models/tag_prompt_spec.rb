@@ -30,7 +30,6 @@ describe TagPrompt do
       expect(@tp_html.html_safe?).to be_truthy
     end
     it 'returns a checkbox' do
-#      expect(@tp_html).to have_tag('div'){ with_tag('input', type: "checkbox") }
       expect(@tp_html).to match(/<input/).and match(/type="checkbox"/)
     end
   end

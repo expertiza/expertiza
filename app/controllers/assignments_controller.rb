@@ -177,11 +177,11 @@ class AssignmentsController < ApplicationController
     end
 
     ques_array = assignment_form_params[:assignment_questionnaire]
-    ques_array = array_traverser(ques_array,1)
+    ques_array = array_traverser(ques_array, 1)
     assignment_form_params[:assignment_questionnaire] = ques_array
 
     due_array = assignment_form_params[:due_date]
-    due_array = array_traverser(due_array,2)
+    due_array = array_traverser(due_array, 2)
     assignment_form_params[:due_date] = due_array
 
     @assignment_form.update(assignment_form_params, current_user)

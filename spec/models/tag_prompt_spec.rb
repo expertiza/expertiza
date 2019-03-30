@@ -54,7 +54,6 @@ describe TagPrompt do
     end
   end
 
-
   it "returns an empty string when the question_type is not Criterion" do
     expect(tp.html_control(tag_dep, an_cb, 1)).to eql("")
   end

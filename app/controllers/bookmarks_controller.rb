@@ -63,7 +63,7 @@ class BookmarksController < ApplicationController
     if @bookmark_rating.blank?
       BookmarkRating.create(bookmark_id: @bookmark.id, user_id: session[:user].id, rating: params[:rating])
     else
-      @bookmark_rating.update_attribute('rating', params[:rating].to_i)
+      @bookmark_rating.update_attributes('rating', params[:rating].to_i)
     end
     redirect_to action: 'list', id: @bookmark.topic_id
   end

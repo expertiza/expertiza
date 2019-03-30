@@ -1,21 +1,8 @@
 module ReviewMappingHelper
   def create_report_table_header(headers = {})
-    table_header = "<div class = 'reviewreport'>\
-                    <table width='100% cellspacing='0' cellpadding='2' border='0' class='table table-striped'>\
-                    <tr bgcolor='#CCCCCC'>"
-    headers.each do |header, percentage|
-      table_header += if percentage
-                        "<th width = #{percentage}>\
-                        #{header.humanize}\
-                                        </th>"
-                      else
-                        "<th>\
-                        #{header.humanize}\
-                                        </th>"
-                      end
-    end
-    table_header += "</tr>"
-    table_header.html_safe
+
+    render partial: 'report_table_header', locals: {headers: headers}
+
   end
 
   #

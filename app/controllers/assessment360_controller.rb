@@ -54,7 +54,7 @@ class Assessment360Controller < ApplicationController
         @teammate_review[cp.id][:avg_grade_for_assgt] = temp_avg_grade.round.to_s + '%'
       end
       if @meta_review_info_per_stu[1] > 0
-        temp_avg= @meta_review_info_per_stu[0] * 1.0 / @meta_review_info_per_stu[1]
+        temp_avg = @meta_review_info_per_stu[0] * 1.0 / @meta_review_info_per_stu[1]
         @meta_review[cp.id][:avg_grade_for_assgt] = temp_avg.round.to_s + '%'
       end
     end

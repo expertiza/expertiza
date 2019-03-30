@@ -175,30 +175,29 @@ class AssignmentsController < ApplicationController
     if assignment_form_params[:assignment][:directory_path].blank?
       assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
     end
+
     ques_array = assignment_form_params[:assignment_questionnaire]
-    due_array = assignment_form_params[:due_date]
-    ques_array.each do |cur_questionnaire|
-      cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
-    end
-    due_array.each do |cur_due|
-      cur_due[:parent_id] = exist_assignment.id.to_s
-    end
+    ques_array = array_traverser(ques_array,1)
     assignment_form_params[:assignment_questionnaire] = ques_array
+
+    due_array = assignment_form_params[:due_date]
+    due_array = array_traverser(due_array,2)
     assignment_form_params[:due_date] = due_array
+
     @assignment_form.update(assignment_form_params, current_user)
   end
 
-  #def array_traverser(temp_array, option)
-  #  exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
-   # temp_array.each do |cur_ele|
-    #  if option == 1
-    #    cur_ele[:assignment_id] = exist_assignment.id.to_s
-    #  else
-    #    cur_ele[:parent_id] = exist_assignment.id.to_s
-    #  end
-   # end
-    #temp_array
-  #end
+  def array_traverser(temp_array, option)
+    exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
+    temp_array.each do |cur_ele|
+      if option == 1
+        cur_ele[:assignment_id] = exist_assignment.id.to_s
+      else
+        cur_ele[:parent_id] = exist_assignment.id.to_s
+      end
+    end
+    temp_array
+  end
 
   # check whether rubrics are set before save assignment
   def empty_rubrics_list

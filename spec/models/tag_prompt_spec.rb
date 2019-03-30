@@ -10,12 +10,13 @@ describe TagPrompt do
   let(:an_short) { Answer.new question: ct_criterion, answer: 5, comments: "yes" }
   let(:tp) { TagPrompt.new(prompt: "test prompt", desc: "test desc", control_type: "Checkbox") }
   let(:tp2) { TagPrompt.new(prompt: "test prompt2", desc: "test desc2", control_type: "Slider") }
-  let(:tag_dep) { TagPromptDeployment.new id: 1, tag_prompt: tp,  question_type: "Criterion", answer_length_threshold: 5 }
-  let(:tag_dep_slider) { TagPromptDeployment.new id: 2, tag_prompt: tp2,  question_type: "Criterion", answer_length_threshold: 5 }
+  let(:tag_dep) { TagPromptDeployment.new id: 1, tag_prompt: tp, question_type: "Criterion", answer_length_threshold: 5 }
+  let(:tag_dep_slider) { TagPromptDeployment.new id: 2, tag_prompt: tp2, question_type: "Criterion", answer_length_threshold: 5 }
   let(:answer_tag) { AnswerTag.new(tag_prompt_deployment_id: 2, answer: an_long, user_id: 1, value: 1) }
 
   it "is valid with valid attributes" do
     expect(TagPrompt.new(prompt: "test prompt", desc: "test desc", control_type: "Checkbox")).to be_valid
+    expect(tp).to be_valid#TagPrompt.new(prompt: "test prompt", desc: "test desc", control_type: "Checkbox")).to be_valid
   end
 
   it "is invalid without valid attributes" do
@@ -24,25 +25,25 @@ describe TagPrompt do
 
   describe 'when the control_type is a checkbox' do
     before(:each) do
-      @tp_html = tp.html_control(tag_dep, an_long, 1)
+      @checkbox_html = tp.html_control(tag_dep, an_long, 1)
     end
     it 'returns an html safe string' do
-      expect(@tp_html.html_safe?).to be_truthy
+      expect(@checkbox_html.html_safe?).to be_truthy
     end
     it 'returns a checkbox' do
-      expect(@tp_html).to match(/<input/).and match(/type="checkbox"/)
+      expect(@checkbox_html).to match(/<input/).and match(/type="checkbox"/)
     end
   end
 
   describe 'when the control_type is a slider' do
     before(:each) do
-      @tp_html = tp2.html_control(tag_dep_slider, an_long, 1)
+      @slider_html = tp2.html_control(tag_dep_slider, an_long, 1)
     end
     it 'returns an html safe string' do
-      expect(@tp_html.html_safe?).to be_truthy
+      expect(@slider_html.html_safe?).to be_truthy
     end
     it 'returns a slider' do
-      expect(@tp_html).to match(/<input/).and match(/type="range"/)
+      expect(@slider_html).to match(/<input/).and match(/type="range"/)
     end
   end
 

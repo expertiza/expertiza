@@ -1,6 +1,6 @@
 describe 'TextField' do
-  let(:tf) { TextField.new(txt: 'test text') }
-  let(:ans) { Answer.new(comments: 'test comment') }
+  let(:tf) { TextField.new(txt: 'text field text') }
+  let(:ans) { Answer.new(comments: 'text field comment') }
 
   context 'when the answer is nil' do
     describe '#complete' do

@@ -1,6 +1,6 @@
 describe 'TextArea' do
-  let(:ta) { TextArea.new(txt: 'test text') }
-  let(:ans) { Answer.new(comments: 'test comment') }
+  let(:ta) { TextArea.new(txt: 'text area text') }
+  let(:ans) { Answer.new(comments: 'text area comment') }
 
   context 'when the answer is nil' do
     describe '#complete' do

@@ -161,19 +161,15 @@ class SignUpSheetController < ApplicationController
     @max_team_size = @assignment.max_team_size
     team_id = @participant.team.try(:id)
 
-    # BOBBY
     all_topics = SignUpTopic.where(assignment_id: @assignment.id)
 
     all_topics.each do |topic|
       drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: DeadlineHelper::DEADLINE_TYPE_DROP_TOPIC)
 
-      if !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
-        SignedUpTeam.clear_waitlisted_teams_for_topic(topic.id)
-      end
+      SignedUpTeam.clear_waitlisted_teams_for_topic(topic.id) if !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
     end
 
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
-    #BOBBY
 
     if @assignment.is_intelligent
       @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)

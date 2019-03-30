@@ -186,7 +186,7 @@ class AssignmentsController < ApplicationController
 
     @assignment_form.update(assignment_form_params, current_user)
   end
-  
+
   def array_traverser(temp_array, option)
     exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
     temp_array.each do |cur_ele|

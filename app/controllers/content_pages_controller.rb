@@ -100,11 +100,10 @@ class ContentPagesController < ApplicationController
   def foreign
     @markup_styles = MarkupStyle.order('name')
     @permissions = Permission.order('name')
-    if @content_page.id
-      @menu_items = MenuItem
-                    .order('label')
-                    .where('content_page_id=?', @content_page.id)
-      @system_pages = @settings.system_pages @content_page.id
-    end
+    return unless @content_page.id
+    @menu_items = MenuItem
+                  .order('label')
+                  .where('content_page_id=?', @content_page.id)
+    @system_pages = @settings.system_pages @content_page.id
   end
 end

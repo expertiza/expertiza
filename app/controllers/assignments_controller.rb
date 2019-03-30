@@ -33,13 +33,17 @@ class AssignmentsController < ApplicationController
         @assignment_form.create_assignment_node
 
         # update ids in the form
-        update_assignment_form
+        if update_assignment_form
+          # send out success notifications and navigate to edit page
+          aid = Assignment.find_by(name: @assignment_form.assignment.name).id
+          ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
+          redirect_to edit_assignment_path aid
+          undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
+        else
+          flash.now[:error] = "Failed to update assignment IDs"
+          render 'new'
+        end
 
-        # send out success notifications and navigate to edit page
-        aid = Assignment.find_by(name: @assignment_form.assignment.name).id
-        ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
-        redirect_to edit_assignment_path aid
-        undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
       else
         flash.now[:error] = "Failed to create assignment"
         render 'new'

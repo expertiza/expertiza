@@ -15,8 +15,7 @@ describe TagPrompt do
   let(:answer_tag) { AnswerTag.new(tag_prompt_deployment_id: 2, answer: an_long, user_id: 1, value: 1) }
 
   it "is valid with valid attributes" do
-    expect(TagPrompt.new(prompt: "test prompt", desc: "test desc", control_type: "Checkbox")).to be_valid
-    expect(tp).to be_valid#TagPrompt.new(prompt: "test prompt", desc: "test desc", control_type: "Checkbox")).to be_valid
+    expect(tp).to be_valid
   end
 
   it "is invalid without valid attributes" do
@@ -45,17 +44,16 @@ describe TagPrompt do
     it 'returns a slider' do
       expect(@slider_html).to match(/<input/).and match(/type="range"/)
     end
+    it 'returns a slider with a value of 1 when user 1 has tagged an answer with 1' do
+      allow(AnswerTag).to receive(:where).and_return([answer_tag])
+      expect(tp2.html_control(tag_dep_slider, an_long, 1)).to include('input type="range"', 'value="1"')
+    end
+    it 'returns a slider without a value when user 2 has not tagged an answer with 1' do
+      allow(AnswerTag).to receive(:where).and_return([])
+      expect(tp2.html_control(tag_dep_slider, an_long, 2)).not_to include('value="1"')
+    end
   end
 
-  it "returns a slider with a value of 1 when user 1 has tagged an answer with 1" do
-    allow(AnswerTag).to receive(:where).and_return([answer_tag])
-    expect(tp2.html_control(tag_dep_slider, an_long, 1)).to include("input type=\"range\"", "value=\"1\"")
-  end
-
-  it "returns a slider without a value when user 2 hasn't tagged an answer with 1" do
-    allow(AnswerTag).to receive(:where).and_return([])
-    expect(tp2.html_control(tag_dep_slider, an_long, 2)).not_to include("value=\"1\"")
-  end
 
   it "returns an empty string when the question_type is not Criterion" do
     expect(tp.html_control(tag_dep, an_cb, 1)).to eql("")

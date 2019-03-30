@@ -55,9 +55,9 @@ class SignedUpTeam < ActiveRecord::Base
 
   # If a topic's drop topic deadline has passed, this method will be called to clear all waitlisted students/teams
   def self.clear_waitlisted_teams_for_topic(topic_id)
-    waitlisted_teams = SignedUpTeam.where(topic_id: topic_id)
+    signed_up_teams = SignedUpTeam.where(topic_id: topic_id)
 
-    waitlisted_teams.each do |team|
+    signed_up_teams.each do |team|
       if team.is_waitlisted
         SignedUpTeam.delete(team.id)
         team.save

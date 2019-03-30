@@ -154,7 +154,6 @@ class SignUpSheetController < ApplicationController
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
     @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
-    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
     @show_actions = true
     @priority = 0
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
@@ -169,6 +168,8 @@ class SignUpSheetController < ApplicationController
       SignedUpTeam.clear_waitlisted_teams_for_topic(topic.id) if !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
     end
 
+    # Wait to compute the slots waitlisted until after waitlists have potentialy been cleared due
+    # to the passing of the drop topic deadline
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
 
     if @assignment.is_intelligent

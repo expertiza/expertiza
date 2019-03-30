@@ -22,12 +22,29 @@ describe TagPrompt do
     expect(TagPrompt.new).not_to be_valid
   end
 
-  it "returns a checkbox when the control_type is checkbox" do
-    expect(tp.html_control(tag_dep, an_long, 1)).to include("input type=\"checkbox\"")
+  describe 'when the control_type is a checkbox' do
+    before (:each) do
+      @tp_html = tp.html_control(tag_dep, an_long, 1)
+    end
+    it 'returns an html safe string' do
+      expect(@tp_html.html_safe?).to be_truthy
+    end
+    it 'returns a checkbox' do
+#      expect(@tp_html).to have_tag('div'){ with_tag('input', type: "checkbox") }
+      expect(@tp_html).to match(/<input/).and match(/type="checkbox"/)
+    end
   end
 
-  it "returns a slider when the control_type is slider" do
-    expect(tp2.html_control(tag_dep_slider, an_long, 1)).to include("input type=\"range\"")
+  describe 'when the control_type is a slider' do
+    before (:each) do
+      @tp_html = tp2.html_control(tag_dep_slider, an_long, 1)
+    end
+    it 'returns an html safe string' do
+      expect(@tp_html.html_safe?).to be_truthy
+    end
+    it 'returns a slider' do
+      expect(@tp_html).to match(/<input/).and match(/type="range"/)
+    end
   end
 
   it "returns a slider with a value of 1 when user 1 has tagged an answer with 1" do

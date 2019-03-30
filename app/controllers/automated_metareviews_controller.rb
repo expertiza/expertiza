@@ -22,8 +22,10 @@ class AutomatedMetareviewsController < ApplicationController
 
     # fetching average metrics values
     avg_existing_metareviews = AutomatedMetareview.find_by_sql(["select avg(relevance) as relevance, avg(content_summative) as summative,
-                                                                avg(content_problem) as problem, avg(content_advisory) as advisory, avg(tone_positive) as positive, avg(tone_negative) as negative,
-                                                                avg(tone_neutral) as neutral, avg(quantity) as quantity from automated_metareviews where response_id <> ?", @automated_metareview.response_id])[0]
+                                                                avg(content_problem) as problem, avg(content_advisory) as advisory,
+                                                                avg(tone_positive) as positive, avg(tone_negative) as negative,
+                                                                avg(tone_neutral) as neutral, avg(quantity) as quantity from automated_metareviews where response_id <> ?",
+                                                                @automated_metareview.response_id])[0]
     unless avg_existing_metareviews.nil?
       # if any of the values are -ve, set them as 0 (for graph display)
       avg_existing_metareviews.relevance = 0 if avg_existing_metareviews.relevance.nil? or avg_existing_metareviews.relevance < 0
@@ -45,20 +47,21 @@ class AutomatedMetareviewsController < ApplicationController
     @automated_metareview.tone_neutral = 0 if @automated_metareview.tone_neutral.to_f < 0
     # creating the arrays to be graphed
     current_metareview_data = [@automated_metareview.relevance.to_f, @automated_metareview.content_summative.to_f,
-                               @automated_metareview.content_problem.to_f, @automated_metareview.content_advisory.to_f, @automated_metareview.tone_positive.to_f,
+                               @automated_metareview.content_problem.to_f, @automated_metareview.content_advisory.to_f,
+                               @automated_metareview.tone_positive.to_f,
                                @automated_metareview.tone_negative.to_f, @automated_metareview.tone_neutral.to_f]
 
     existing_metareview_data = [avg_existing_metareviews.relevance.to_f, avg_existing_metareviews.summative.to_f,
                                 avg_existing_metareviews.problem.to_f, avg_existing_metareviews.advisory.to_f, avg_existing_metareviews.positive.to_f,
                                 avg_existing_metareviews.negative.to_f, avg_existing_metareviews.neutral.to_f]
 
-    color_1 = 'c53711'
-    color_2 = '0000ff'
+    color1 = 'c53711'
+    color2 = '0000ff'
     # labels in reverse order of content being displayed
     names_array = ["Neutral Tone", "Negative Tone", "Positive Tone", "Advisory Content", "Problem Content", "Summative Content", "Relevance"]
     GoogleChart::BarChart.new("500x450", "Your work Vs Average performance on reviews", :horizontal, false) do |bc|
-      bc.data "Your work", current_metareview_data, color_1
-      bc.data "Avg. performance on reviews", existing_metareview_data, color_2
+      bc.data "Your work", current_metareview_data, color1
+      bc.data "Avg. performance on reviews", existing_metareview_data, color2
       bc.axis :y, labels: names_array, font_size: 10
       bc.axis :x, range: [0, 1]
       bc.show_legend = true

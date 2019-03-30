@@ -31,7 +31,7 @@ class InvitationsController < ApplicationController
     return unless participant
     old_entry = JoinTeamRequest.where('participant_id = ? and team_id = ?', participant.id, params[:team_id]).first
     # Status code A for accepted
-    old_entry.update_attribute("status", 'A') if old_entry
+    old_entry.update_attributes("status", 'A') if old_entry
   end
 
   def auto_complete_for_user_name

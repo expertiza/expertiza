@@ -114,8 +114,8 @@ class MenuItemsController < ApplicationController
     @above = @menu_item.above
 
     if @above
-      @menu_item.update_attribute :seq, (@menu_item.seq - 1)
-      @above.update_attribute :seq, (@above.seq + 1)
+      @menu_item.update_attributes :seq, (@menu_item.seq - 1)
+      @above.update_attributes :seq, (@above.seq + 1)
       Role.rebuild_cache
     end
     redirect_to action: 'list'
@@ -126,8 +126,8 @@ class MenuItemsController < ApplicationController
     @below = @menu_item.below
 
     if @below
-      @menu_item.update_attribute :seq, (@menu_item.seq + 1)
-      @below.update_attribute :seq, (@below.seq - 1)
+      @menu_item.update_attributes :seq, (@menu_item.seq + 1)
+      @below.update_attributes :seq, (@below.seq - 1)
       Role.rebuild_cache
     end
     redirect_to action: 'list'

@@ -5,6 +5,10 @@
 
 describe Assessment360Controller do
   let(:instructor) { build(:instructor, id: 6) }
+  let(:student) { build(:student, id: 6) }
+  let(:ta) { build(:teaching_assistant, id: 6) }
+  let(:administrator) { build(:admin, id: 6) }
+  let(:superadmin) { build(:superadmin, id: 6) }
   let(:course) { double('Course', instructor_id: 6, path: '/cscs', name: 'abc', id: 1) }
   let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true, teams: [build(:assignment_team)]) }
   let(:assignment_list) { [assignment] }
@@ -26,6 +30,36 @@ describe Assessment360Controller do
   let(:participant) { build(:participant)}
   let(:scores) {}
 
+  describe 'checking controller permissions' do
+    context 'when different roles call the controller' do
+      it 'does not allow student' do
+        params = {course_id: 1}
+        session = {user: student}
+        get :all_students_all_reviews, params, session
+        expect(controller.send(:action_allowed?)).to be false
+      end
+
+      it 'allows TA' do
+        stub_current_user(ta, ta.role.name, ta.role)
+        expect(controller.send(:action_allowed?)).to be true
+      end
+
+      it 'allows instructor' do
+        stub_current_user(instructor, instructor.role.name, instructor.role)
+        expect(controller.send(:action_allowed?)).to be true
+      end
+
+      it 'allows administrator' do
+        stub_current_user(administrator, administrator.role.name, administrator.role)
+        expect(controller.send(:action_allowed?)).to be true
+      end
+
+      it 'allows super administrator' do
+        stub_current_user(superadmin, superadmin.role.name, superadmin.role)
+        expect(controller.send(:action_allowed?)).to be true
+      end
+    end
+  end
 
   describe '#all_students_all_reviews' do
     context 'when course does not have participants' do

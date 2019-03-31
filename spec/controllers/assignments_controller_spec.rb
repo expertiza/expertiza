@@ -139,9 +139,9 @@ describe AssignmentsController do
         post :create, @params
 
         puts assignment_form
-        
-        expect(assignment_form[:due_date][0]["parent_id"]).to eq(1)
-        expect(assignment_form[:due_date][1]["parent_id"]).to eq(1)
+
+        expect(assignment_form.due_date][0]["parent_id"]).to eq(1)
+        expect(assignment_form.due_date][1]["parent_id"]).to eq(1)
         # expect(assignment_form).to receive(:update).with(any_args).and_return(true)
       end
       it 'redirects to assignment#edit page' do

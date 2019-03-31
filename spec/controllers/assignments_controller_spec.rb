@@ -136,15 +136,13 @@ describe AssignmentsController do
         allow(Assignment).to receive(:find_by).with(name: 'test assignment').and_return(assignment)
         allow_any_instance_of(AssignmentsController).to receive(:undo_link)
           .with('Assignment "test assignment" has been created successfully. ').and_return(true)
-        allow(assignment_form).to receive(:due_date).with(any_args)
         post :create, @params
 
-        print "SHOULD SEE OUTPUT BELOW"
-        print assignment_form.assignment
-        print "\r\n\r\n"
-        print Assignment
+        print "SHOULD SEE OUTPUT BELOW\r\n"
+        print controller.instance_variable_get(:@assignment_form).due_date
         print "\r\n"
 
+        # expect(controller.instance_variable_get(:@drop_topic_allowed)).to be false
 
         # expect(assignment_form.due_date[0]["parent_id"]).to eq(1)
         # expect(assignment_form.due_date[1]["parent_id"]).to eq(1)

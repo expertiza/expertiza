@@ -129,6 +129,10 @@ describe AssignmentsController do
     end
     context 'when assignment_form is saved successfully' do
       it 'updates given IDs successfully' do
+        allow(assignment_form).to receive(:assignment).and_return(assignment)
+        allow(assignment_form).to receive(:save).and_return(true)
+        allow(assignment_form).to receive(:update).with(any_args).and_return(true)
+        allow(assignment_form).to receive(:create_assignment_node).and_return(double('node'))
         post :create, @params
         expect(assignment_form[:due_date][0]["parent_id"]).to eq(1)
         expect(assignment_form[:due_date][1]["parent_id"]).to eq(1)

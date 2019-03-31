@@ -173,6 +173,7 @@ class AssignmentsController < ApplicationController
 
   private
 
+  # The questionnaire array and due date params are updated for the current user
   def update_assignment_form
     exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
     assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
@@ -191,6 +192,7 @@ class AssignmentsController < ApplicationController
     @assignment_form.update(assignment_form_params, current_user)
   end
 
+  # Iterates through an array and makes each id a string.
   def array_traverser(temp_array, option)
     exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
     temp_array.each do |cur_ele|

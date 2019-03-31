@@ -3,7 +3,7 @@ describe AssignmentsController do
     build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true, directory_path: 'same path',
                        participants: [build(:participant)], teams: [build(:assignment_team)], course_id: 1)
   end
-  let(:assignment_form) { double('AssignmentForm', assignment: assignment,) }
+  let(:assignment_form) { double('AssignmentForm', assignment: assignment) }
   let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:instructor2) { build(:instructor, id: 66) }
@@ -166,7 +166,6 @@ describe AssignmentsController do
         expect(response).to render_template(:new)
       end
     end
-
   end
 
   describe '#edit' do

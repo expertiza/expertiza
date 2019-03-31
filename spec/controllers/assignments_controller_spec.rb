@@ -140,7 +140,8 @@ describe AssignmentsController do
         post :create, @params
 
         print "SHOULD SEE OUTPUT BELOW"
-        print assignment_form
+        print response
+        print "\r\n"
 
         expect(assignment_form.due_date[0]["parent_id"]).to eq(1)
         expect(assignment_form.due_date[1]["parent_id"]).to eq(1)

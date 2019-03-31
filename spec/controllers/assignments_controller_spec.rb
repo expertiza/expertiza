@@ -128,27 +128,15 @@ describe AssignmentsController do
       }
     end
     context 'when assignment_form is saved successfully' do
-      it 'updates given IDs successfully' do
+      it 'also updates the ID for due_date and successfully' do
         allow(assignment_form).to receive(:assignment).and_return(assignment)
         allow(assignment_form).to receive(:save).and_return(true)
-        allow(assignment_form).to receive(:update).with(any_args).and_return(true)
+        allow(assignment_form).to receive(:update).with(any_args)
         allow(assignment_form).to receive(:create_assignment_node).and_return(double('node'))
-        # allow(assignment_form).to receive(:due_date).and_return(double('due_date'))
         allow(Assignment).to receive(:find_by).with(name: 'test assignment').and_return(assignment)
         allow_any_instance_of(AssignmentsController).to receive(:undo_link)
           .with('Assignment "test assignment" has been created successfully. ').and_return(true)
         post :create, @params
-
-        # print "SHOULD SEE OUTPUT BELOW\r\n"
-        # print assignment.name
-        # print "\r\n\r\n"
-        # print controller.instance_variable_get(:@assignment_form).due_date
-        # print "\r\n"
-
-        # expect(controller.instance_variable_get(:@drop_topic_allowed)).to be false
-
-        # expect(assignment_form.due_date[0]["parent_id"]).to eq(1)
-        # expect(assignment_form.due_date[1]["parent_id"]).to eq(1)
         expect(assignment_form.update).to be true
       end
       it 'redirects to assignment#edit page' do

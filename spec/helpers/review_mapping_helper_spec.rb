@@ -2,7 +2,7 @@ describe 'My Test Cases' do
   before(:each) do
     create(:instructor)
     create(:role_of_student)
-    login_as 'instructor6'
+    login_as("instructor6")
     visit '/tree_display/list'
     click_link 'View reports'
     expect(page).to have_current_path('/reports/response_report')

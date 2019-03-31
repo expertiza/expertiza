@@ -1,8 +1,6 @@
 module ReviewMappingHelper
   def create_report_table_header(headers = {})
-
     render partial: 'report_table_header', locals: {headers: headers}
-
   end
 
   #
@@ -112,15 +110,15 @@ module ReviewMappingHelper
     team_reviewed_link_name
   end
 
-  # if the current stage is "submission" or "review", function returns the current round number otherwise, 
+  # if the current stage is "submission" or "review", function returns the current round number otherwise,
   # if the current stage is "Finished" or "metareview", function returns the number of rounds of review completed.
-  def get_current_round(reviewer_id)
-    user_id = Participant.find(reviewer_id).user.id
-    topic_id = SignedUpTeam.topic_id(@assignment.id, user_id)
-    @assignment.number_of_current_round(topic_id)
-    @assignment.num_review_rounds if @assignment.get_current_stage(topic_id) == "Finished" || @assignment.get_current_stage(topic_id) == "metareview"
-  end
- 
+  # def get_current_round(reviewer_id)
+  #   user_id = Participant.find(reviewer_id).user.id
+  #   topic_id = SignedUpTeam.topic_id(@assignment.id, user_id)
+  #   @assignment.number_of_current_round(topic_id)
+  #   @assignment.num_review_rounds if @assignment.get_current_stage(topic_id) == "Finished" || @assignment.get_current_stage(topic_id) == "metareview"
+  # end
+
   # gets the review score awarded based on each round of the review
   def get_awarded_review_score(reviewer_id, team_id)
     (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----') }
@@ -300,8 +298,7 @@ module ReviewMappingHelper
     html.html_safe
   end
 
-  
-  # gets review and feedback responses for all rounds for the feedback report 
+  # gets review and feedback responses for all rounds for the feedback report
   def get_each_review_and_feedback_response_map(author)
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     # Calculate how many responses one team received from each round
@@ -321,7 +318,7 @@ module ReviewMappingHelper
     @rspan_round_three = @review_responses_round_three.nil? ? 0 : @review_responses_round_three.length
   end
 
-  # gets review and feedback responses for a certain round for the feedback report 
+  # gets review and feedback responses for a certain round for the feedback report
   def get_certain_review_and_feedback_response_map(author)
     @feedback_response_maps = FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?", @all_review_response_ids, author.id])
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)

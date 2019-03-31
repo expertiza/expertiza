@@ -1,8 +1,6 @@
-
 require 'rspec'
 
 describe 'My Test Cases' do
-
   it "can display review metrics", js: true do
     create(:instructor)
     create(:role_of_student)
@@ -35,5 +33,4 @@ describe 'My Test Cases' do
     click_link 'View'
     expect(page).to have_content('Reviews done')
   end
-
 end

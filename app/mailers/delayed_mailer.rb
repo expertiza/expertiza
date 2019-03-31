@@ -111,7 +111,7 @@ class DelayedMailer
     email_reminder(emails, self.deadline_type) unless emails.empty?
   end
 
-  # E1834 Fall 18
+  # Spring 19 AHP
   def mail_reviewers
     email_list = []
     reviews = ReviewResponseMap.where(reviewed_object_id: self.assignment_id)
@@ -122,7 +122,7 @@ class DelayedMailer
     review_reminder_email(email_list, self.deadline_type) unless email_list.empty?
   end
 
-  # E1834 Fall 18
+  # Spring 19 AHP
   def review_reminder_email(email_list, deadline_type)
     assignment = Assignment.find(self.assignment_id)
     subject = "Message regarding #{deadline_type} for assignment #{assignment.name}"
@@ -138,7 +138,6 @@ class DelayedMailer
     @count += 1
     if @count % 3 == 0
       if assignment.instructor.copy_of_emails
-        # if email is sent to instructor, notice that the link in that email will contain the '?id=' field of the last participant
         @mail = Mailer.delayed_message(bcc: [assignment.instructor.email], subject: subject, body: body)
         @mail.deliver_now
       end
@@ -159,8 +158,6 @@ class DelayedMailer
     @count += 1
     if @count % 3 == 0
       emails << assignment.instructor.email if assignment.instructor.copy_of_emails
-
-      # emails<< "expertiza-support@lists.ncsu.edu"
     end
 
     emails.each do |mail|

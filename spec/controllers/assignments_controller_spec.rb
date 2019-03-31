@@ -139,7 +139,7 @@ describe AssignmentsController do
         post :create, @params
 
         print "SHOULD SEE OUTPUT BELOW\r\n"
-        print controller.instance_variable_get(:@assignment_form).due_date
+        print controller.instance_variable_get(:@assignment_form)
         print "\r\n"
 
         # expect(controller.instance_variable_get(:@drop_topic_allowed)).to be false

@@ -164,4 +164,19 @@ class SignUpTopic < ActiveRecord::Base
     topic_display += self.topic_identifier.to_s + ' - '
     topic_display + self.topic_name
   end
+
+  def self.clear_waitlists_if_drop_passed(assignment)
+    # Get all topics for the input assignment
+    all_topics = SignUpTopic.where(assignment_id: assignment.id)
+
+    # For each topic, check if the drop-topic deadline has passed, and if so, remove any teams that are on the waitlist.
+    # Note: A drop topic deadline is currently only defined for the whole assignment and not for each topic (even
+    # in a staggered deadline assignment).
+    all_topics.each do |topic|
+      drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: DeadlineHelper::DEADLINE_TYPE_DROP_TOPIC)
+
+      SignedUpTeam.clear_waitlisted_teams_for_topic(topic.id) if !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
+    end
+  end
+
 end

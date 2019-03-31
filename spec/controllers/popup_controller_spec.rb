@@ -247,7 +247,7 @@ describe PopupController do
   end
 
   describe '#build_tone_analysis_heatmap' do
-    describe 'sentiment is empyt' do
+    describe 'sentiment is empty' do
       before(:each) do
         allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', assignment_team.id).and_return([response_map])
         allow(Assignment).to receive(:find).with('reviewee_id = ?', assignment_team.id).and_return(assignment)

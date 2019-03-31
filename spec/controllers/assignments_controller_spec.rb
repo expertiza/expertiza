@@ -137,6 +137,9 @@ describe AssignmentsController do
         allow_any_instance_of(AssignmentsController).to receive(:undo_link)
           .with('Assignment "test assignment" has been created successfully. ').and_return(true)
         post :create, @params
+
+        puts assignment_form
+        
         expect(assignment_form[:due_date][0]["parent_id"]).to eq(1)
         expect(assignment_form[:due_date][1]["parent_id"]).to eq(1)
         # expect(assignment_form).to receive(:update).with(any_args).and_return(true)

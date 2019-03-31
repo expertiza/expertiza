@@ -95,19 +95,19 @@ class QuizQuestionnaireController < QuestionnairesController
 
         @quiz_question_choices = QuizQuestionChoice.where(question_id: qid)
         question_index = 1
-        @quiz_question_choices.each do |quiz_question_choice|
+        @quiz_question_choices.each do |question_choice|
           if @question.type == "MultipleChoiceCheckbox"
-            multiple_choice_checkbox(quiz_question_choice, question_index) # Call to private method to handle  Multile Choice Questions
+            multiple_choice_checkbox(question_choice, question_index) # Call to private method to handle  Multile Choice Questions
           end
           if @question.type == "MultipleChoiceRadio"
-            multiple_choice_radio(quiz_question_choice, question_index)
+            multiple_choice_radio(question_choice, question_index)
           end
           if @question.type == "TrueFalse"
             if params[:quiz_question_choices][@question.id.to_s][@question.type][1.to_s][:iscorrect] == "True" # the statement is correct
-              quiz_question_choice.txt == "True" ? quiz_question_choice.update_attributes(iscorrect: '1') : quiz_question_choice.update_attributes(iscorrect: '0')
+              question_choice.txt == "True" ? question_choice.update_attributes(iscorrect: '1') : question_choice.update_attributes(iscorrect: '0')
               # the statement is correct so "True" is the right answer
             else # the statement is not correct
-              quiz_question_choice.txt == "True" ? quiz_question_choice.update_attributes(iscorrect: '0') : quiz_question_choice.update_attributes(iscorrect: '1')
+              question_choice.txt == "True" ? question_choice.update_attributes(iscorrect: '0') : question_choice.update_attributes(iscorrect: '1')
               # the statement is not correct so "False" is the right answer
             end
           end
@@ -146,19 +146,19 @@ class QuizQuestionnaireController < QuestionnairesController
 
   private
 
-  def multiple_choice_checkbox(quiz_question_choice, question_index)
+  def multiple_choice_checkbox(question_choice, question_index)
     if params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s]
-      quiz_question_choice.update_attributes(iscorrect: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:iscorrect], txt: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:txt])
+      question_choice.update_attributes(iscorrect: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:iscorrect], txt: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:txt])
     else
-      quiz_question_choice.update_attributes(iscorrect: '0', txt: params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
+      question_choice.update_attributes(iscorrect: '0', txt: params[:quiz_question_choices][question_choice.id.to_s][:txt])
     end
   end
 
-  def multiple_choice_radio(quiz_question_choice, question_index)
+  def multiple_choice_radio(question_choice, question_index)
     if params[:quiz_question_choices][@question.id.to_s][@question.type][:correctindex] == question_index.to_s
-      quiz_question_choice.update_attributes(iscorrect: '1', txt: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:txt])
+      question_choice.update_attributes(iscorrect: '1', txt: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:txt])
     else
-      quiz_question_choice.update_attributes(iscorrect: '0', txt: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:txt])
+      question_choice.update_attributes(iscorrect: '0', txt: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:txt])
     end
   end
 

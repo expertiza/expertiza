@@ -1,5 +1,11 @@
 describe VmQuestionResponseRow do
   let(:row){ VmQuestionResponseRow.new(text: 'Question for testing average score', id: 1, weight: 1, max_score: 5, seq: 1)}
+  let(:question) { Question.new }
+  let(:scored_question) { ScoredQuestion.new }
+  before(:each) do
+    allow(Question).to receive(:find).with(1).and_return(question)
+    allow(Question).to receive(:find).with(2).and_return(scored_question)
+  end
 
   describe "#average_score_for_row" do
     it 'returns correct average score for all not nil scores' do
@@ -74,6 +80,27 @@ describe VmQuestionResponseRow do
       scores = [score1, score2, score3, score4]
       row.instance_variable_set(:@score_row, scores)
       expect(row.average_score_for_row).to eq(2.5)
+    end
+  end
+
+  describe "#question_max_score" do
+    it 'returns N/A since the question type is not specified and question is not scored question' do
+      expect(row.question_max_score).to eq('N/A')
+    end
+
+    it 'returns N/A since the question type is MultipleChoiceCheckbox and question is not scored question' do
+      question.type = 'MultipleChoiceCheckbox'
+      expect(row.question_max_score).to eq('N/A')
+    end
+
+    it 'returns 1 by specifying the type to Checkbox and question is not scored question' do
+      question.type = 'Checkbox'
+      expect(row.question_max_score).to eq(1)
+    end
+
+    it 'returns correct by specifying the type to Checkbox and question is not scored question' do
+      row.instance_variable_set(:@question_id, 2)
+      expect(row.question_max_score).to eq(5)
     end
   end
 end

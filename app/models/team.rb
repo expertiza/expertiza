@@ -174,26 +174,26 @@ class Team < ActiveRecord::Base
     end
   end
 
-  #  changed to hash by E1776
+  # Creates or retrieves the team before importing members into it
   def self.import(row_hash, id, options, teamtype)
     raise ArgumentError, 'Not enough fields on this line.' if row_hash.empty? ||
-        (row_hash[:teammembers].length < 2 && (options[:has_teamname] == 'true_first' || options[:has_teamname] == 'true_last'))
+        (row_hash[:teammembers].size < 2 && (options[:has_teamname] == 'true_first' || options[:has_teamname] == 'true_last'))
     if options[:has_teamname] == 'true_first' || options[:has_teamname] == 'true_last'
       name = row_hash[:teamname].to_s
       team = find_by(name: name, parent_id: id)
       team_exists = !team.nil?
       name = handle_duplicate(team, name, options[:handle_dups], teamtype)
     else
-      name = self.generate_team_name if teamtype.is_a?(CourseTeam)
-      name = self.generate_team_name if teamtype.is_a?(AssignmentTeam)
+      name = self.generate_team_name if teamtype.is_a?(CourseTeam) || teamtype.is_a?(AssignmentTeam)
     end
     if name
-      team = Object.const_get(teamtype.to_s).create_team_and_node(id)
+      team = Object.const_get(teamtype.class.to_s).create_team_and_node(id)
       team.name = name
       team.save
     end
-
-    # insert team members into team unless team was pre-existing & we ignore duplicate teams
+    # Return if team is not retrieved or is not created
+    return if team.nil?
+    # Otherwise, insert team members into team unless team was pre-existing & we ignore duplicate teams
     team.import_team_members(row_hash) unless team_exists && options[:handle_dups] == 'ignore'
   end
 
@@ -201,8 +201,7 @@ class Team < ActiveRecord::Base
   def self.handle_duplicate(team, name, handle_dups, teamtype)
     return name if team.nil? # no duplicate
     if handle_dups == 'rename' # rename: rename new team
-      return self.generate_team_name if teamtype.is_a?(CourseTeam)
-      return self.generate_team_name if teamtype.is_a?(AssignmentTeam)
+      return self.generate_team_name if teamtype.is_a?(CourseTeam) || teamtype.is_a?(AssignmentTeam)
     end
     if handle_dups == 'replace' # replace: delete old team
       team.delete
@@ -217,6 +216,9 @@ class Team < ActiveRecord::Base
   def self.export(csv, parent_id, options, teamtype)
     teams = CourseTeam.where(parent_id: parent_id) if teamtype.is_a?(CourseTeam)
     teams = AssignmentTeam.where(parent_id: parent_id) if teamtype.is_a?(AssignmentTeam)
+    # Return if teams are not retrieved
+    return csv if teams.nil?
+    # Otherwise, iterate through each team and export its name and each team memeber of a team into csv
     teams.each do |team|
       output = []
       output.push(team.name)

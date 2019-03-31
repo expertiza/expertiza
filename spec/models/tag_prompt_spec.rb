@@ -22,7 +22,7 @@ describe TagPrompt do
     expect(TagPrompt.new).not_to be_valid
   end
 
-  describe 'when the control_type is a checkbox' do
+  context 'when the control_type is a checkbox' do
     before(:each) do
       @checkbox_html = tp.html_control(tag_dep, an_long, 1)
     end
@@ -34,7 +34,7 @@ describe TagPrompt do
     end
   end
 
-  describe 'when the control_type is a slider' do
+  context 'when the control_type is a slider' do
     before(:each) do
       @slider_html = tp2.html_control(tag_dep_slider, an_long, 1)
     end

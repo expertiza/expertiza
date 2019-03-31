@@ -23,7 +23,7 @@ describe 'TextField' do
       it 'returns an html_safe string to be rendered' do
         expect(@tf_html.html_safe?).to be_truthy
       end
-      it 'returns a text which include the answer' do
+      it 'returns a text which includes the answer' do
         expect(@tf_html).to match(/<input/).and match(/type="text"/).and include(ans.comments)
       end
     end

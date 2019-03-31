@@ -1,8 +1,8 @@
 describe 'TextArea' do
   let(:cols) { '60' }
-  let (:rows) { '50' }
+  let(:rows) { '50' }
   let(:ta_nil_size) { TextArea.new(txt: 'text area text', size: nil) }
-  let(:ta_size) { TextArea.new(txt: 'text area text', size: cols+','+rows) }
+  let(:ta_size) { TextArea.new(txt: 'text area text', size: cols + ',' + rows) }
   let(:ans) { Answer.new(comments: 'text area comment') }
 
   describe '#complete' do
@@ -17,7 +17,7 @@ describe 'TextArea' do
         expect(@ta_html).to match(/<input/)
       end
       it 'returns a textarea tag of specified size' do
-        expect(@ta_html).to match(/<textarea/).and include('rows="'+rows).and include('cols="'+cols)
+        expect(@ta_html).to match(/<textarea/).and include('rows="' + rows).and include('cols="' + cols)
       end
     end
 

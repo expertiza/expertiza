@@ -139,7 +139,9 @@ describe AssignmentsController do
         allow(assignment_form).to receive(:due_date).with(any_args)
         post :create, @params
 
-        puts assignment_form
+        print "SHOULD SEE OUTPUT BELOW"
+        print assignment_form
+        print @params
 
         expect(assignment_form.due_date[0]["parent_id"]).to eq(1)
         expect(assignment_form.due_date[1]["parent_id"]).to eq(1)

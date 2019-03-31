@@ -133,6 +133,9 @@ describe AssignmentsController do
         allow(assignment_form).to receive(:save).and_return(true)
         allow(assignment_form).to receive(:update).with(any_args).and_return(true)
         allow(assignment_form).to receive(:create_assignment_node).and_return(double('node'))
+        allow(Assignment).to receive(:find_by).with(name: 'test assignment').and_return(assignment)
+        allow_any_instance_of(AssignmentsController).to receive(:undo_link)
+          .with('Assignment "test assignment" has been created successfully. ').and_return(true)
         post :create, @params
         expect(assignment_form[:due_date][0]["parent_id"]).to eq(1)
         expect(assignment_form[:due_date][1]["parent_id"]).to eq(1)

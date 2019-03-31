@@ -3,7 +3,7 @@ describe AssignmentsController do
     build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true, directory_path: 'same path',
                        participants: [build(:participant)], teams: [build(:assignment_team)], course_id: 1)
   end
-  let(:assignment_form) { double('AssignmentForm', assignment: assignment) }
+  let(:assignment_form) { double('AssignmentForm', assignment: assignment,) }
   let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:instructor2) { build(:instructor, id: 66) }
@@ -136,6 +136,7 @@ describe AssignmentsController do
         allow(Assignment).to receive(:find_by).with(name: 'test assignment').and_return(assignment)
         allow_any_instance_of(AssignmentsController).to receive(:undo_link)
           .with('Assignment "test assignment" has been created successfully. ').and_return(true)
+        allow(assignment_form).to receive(:due_date).with(any_args)
         post :create, @params
 
         puts assignment_form

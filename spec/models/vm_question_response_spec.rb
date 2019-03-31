@@ -3,6 +3,7 @@ describe VmQuestionResponse do
   let(:author_feedback_questionnaire) { AuthorFeedbackQuestionnaire.new }
   let(:teammate_review_questionnaire) { TeammateReviewQuestionnaire.new }
   let(:metareview_questionnaire) { MetareviewQuestionnaire.new }
+  let(:bookmarkrating_questionnaire) { BookmarkRatingQuestionnaire.new }
   let(:assignment) { build(:assignment) }
   let(:question) { build(:question, id: 2, questionnaire: review_questionnaire, weight: 2, type: 'good') }
   let(:questions) { [question] }
@@ -107,6 +108,19 @@ describe VmQuestionResponse do
         expect(response.list_of_reviewers.size).to eq(1)
         expect(response.list_of_reviews.first.map_id).to eq(1)
         expect(response.list_of_reviewers.first).to eq(participant)
+      end
+    end
+
+    context 'when intitialized with a bookmark review type (unhandled)' do
+      it 'does not add reviews' do
+        response = VmQuestionResponse.new(bookmarkrating_questionnaire, assignment, 1)
+        allow(participant).to receive(:bookmark_reviews).and_return(reviews)
+        allow(BookmarkRatingResponseMap).to receive(:find_by).with(id: 1).and_return(double('BookmarkRatingResponseMap', reviewer_id: 1))
+        response.add_reviews(participant, team, false)
+        expect(response.list_of_reviews).to be_empty
+        expect(response.list_of_reviewers).to be_empty
+        expect(response.list_of_reviews.first).to be_nil
+        expect(response.list_of_reviewers.first).to be_nil
       end
     end
   end

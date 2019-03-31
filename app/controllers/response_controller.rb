@@ -57,7 +57,8 @@ class ResponseController < ApplicationController
   # Prepare the parameters when student clicks "Edit"
   def edit
     assign_instance_vars
-    get_all_responses
+    @prev = Response.where(map_id: @map.id)
+    @review_scores = @prev.to_a
     if @prev.present?
       @sorted = @review_scores.sort {|m1, m2| m1.version_num.to_i && m2.version_num.to_i ? m2.version_num.to_i <=> m1.version_num.to_i : (m1.version_num ? -1 : 1) }
       @largest_version_num = @sorted[0]
@@ -142,7 +143,6 @@ class ResponseController < ApplicationController
     map_id = params[:id]
     map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
     @map = ResponseMap.find(map_id)
-    get_all_responses
     if params[:review][:questionnaire_id]
       @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
       @round = params[:review][:round]
@@ -369,14 +369,5 @@ class ResponseController < ApplicationController
       a = Answer.where(response_id: @response.id, question_id: q.id).first
       Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '') if a.nil?
     end
-  end
-
-  def get_all_responses
-    # get all previous versions of responses for the response map.
-    # I guess if we're in the middle of creating a new response, this would be
-    # all 'previous' responses to this new one (which is not yet saved)?
-    @prev = Response.where(map_id: @map.id)
-    # not sure what this is about
-    @review_scores = @prev.to_a
   end
 end

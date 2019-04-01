@@ -18,7 +18,7 @@ class AuthController < ApplicationController
     if request.get?
       AuthController.clear_session(session)
     else
-      user = User.find_by(params[:login][:name])
+      user = User.find_by_login(params[:login][:name])
       if user and user.valid_password?(params[:login][:password])
         after_login(user)
       else

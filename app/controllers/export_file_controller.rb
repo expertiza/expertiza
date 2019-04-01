@@ -101,7 +101,7 @@ class ExportFileController < ApplicationController
   def export_tags
     tag_deployments = TagPromptDeployment.all
     puts (params[:names])
-    @students = AnswerTag.select('answers.*, answer_tags.*').joins(user: :answer).where("answer_tags.answer_id = answers.id and users.id=answer_tags.user_id ")
+    @students = AnswerTag.select('answers.*, answer_tags.*').joins( :answer).where("answer_tags.answer_id = answers.id")
     # @students = @students.where("answer_tags.answer_id = answers.id and users.id=answer_tags.user_id and users.name IN (?)",params[:names])
     delimiter = ","
     attributes = %w[comments user_id value]

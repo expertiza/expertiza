@@ -1,5 +1,5 @@
 class PlagiarismCheckerAssignmentSubmission < ActiveRecord::Base
-  attr_accessor :name , :simicheck_id, :created_at, :updated_at
+  attr_accessible :name
   belongs_to :assignment
   has_many :plagiarism_checker_comparisons, dependent: :destroy
 

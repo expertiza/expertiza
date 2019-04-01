@@ -23,8 +23,8 @@ class MultipleChoiceRadio < QuizQuestion
       html += '</td></tr>'
     end
 
-    # html.html_safe
-    safe_join(html)
+    html.html_safe
+    # safe_join(html)
   end
 
   def complete
@@ -64,8 +64,8 @@ class MultipleChoiceRadio < QuizQuestion
             end
     html += '</b>'
     html += '<br><br><hr>'
-    # html.html_safe
-    safe_join(html)
+    html.html_safe
+    # safe_join(html)
   end
 
   def isvalid(choice_info)

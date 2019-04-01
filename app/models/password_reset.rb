@@ -1,7 +1,6 @@
 class PasswordReset < ActiveRecord::Base
-  attr_accessor :user_email, :token, :updated_at
   validates :user_email, presence: true
-
+  attr_accessible :user_email, :token
   def self.save_token(user, token)
     password_reset = PasswordReset.find_by(user_email: user.email)
     if password_reset

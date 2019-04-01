@@ -27,7 +27,7 @@ class PopupController < ApplicationController
     questionare_details_populate(@response_id)
     @reviewee_id = params[:reviewee_id]
 
-    return unless !@response_id.nil?
+    return if @response_id.nil?
     participant = Participant.find(@reviewee_id)
     @user = User.find(participant.user_id)
   end
@@ -40,7 +40,7 @@ class PopupController < ApplicationController
     @team_users = TeamsUser.where(team_id: params[:id])
 
     # id2 is a response_map id
-    return unless !params[:id2].nil?
+    return if params[:id2].nil?
     participant_id = ResponseMap.find(params[:id2]).reviewer_id
     @reviewer_id = Participant.find(participant_id).user_id
     # get the last response in each round from response_map id

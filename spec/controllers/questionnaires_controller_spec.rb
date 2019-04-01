@@ -82,7 +82,7 @@ describe QuestionnairesController do
       end
     end
   end
-  describe '#copy and #copy_questionnaire_details' do
+  describe '#copy' do
     it 'redirects to view page of copied questionnaire' do
       allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
       allow(Question).to receive(:where).with(questionnaire_id: '1').and_return([question])

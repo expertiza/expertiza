@@ -85,7 +85,7 @@ class Questionnaire < ActiveRecord::Base
     questionnaire = orig_questionnaire.dup
     questionnaire.instructor_id = instructor_id
     questionnaire.name = 'Copy of ' + orig_questionnaire.name
-    questionnaire.created_at = Time.now
+    questionnaire.created_at = Time.zone.now
     questionnaire.save!
     questions.each do |question|
       new_question = question.dup
@@ -100,10 +100,7 @@ class Questionnaire < ActiveRecord::Base
         new_advice.save!
       end
     end
-    p_folder = TreeFolder.find_by(name: questionnaire.display_type)
-    parent = FolderNode.find_by(node_object_id: p_folder.id)
-    QuestionnaireNode.find_or_create_by(parent_id: parent.id, node_object_id: questionnaire.id)
-    return questionnaire
+    questionnaire
   end  
 
   # validate the entries for this questionnaire

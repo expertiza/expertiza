@@ -332,18 +332,12 @@ module ReviewMappingHelper
   #
   def get_css_style_for_calibration_report(diff)
     # diff - difference between stu's answer and instructor's answer
-    css_class = case diff.abs
-                when 0
-                  'c5'
-                when 1
-                  'c4'
-                when 2
-                  'c3'
-                when 3
-                  'c2'
-                else
-                  'c1'
-                end
+    dict = {0 => 'c5',1 => 'c4',2 => 'c3',3 => 'c2'}
+    if dict.key?(diff.abs)
+      css_class = dict[diff.abs]
+    else
+      css_class = 'c1'
+    end
     css_class
   end
 

@@ -1,6 +1,5 @@
 class QuizQuestion < Question
-  attr_accessor :questionnaire
-  has_many :quiz_question_choices, class_name: 'QuizQuestionChoice', foreign_key: 'question_id', dependent: :destroy, inverse_of: :quiz_questions
+  has_many :quiz_question_choices, class_name: 'QuizQuestionChoice', foreign_key: 'question_id', inverse_of: false, dependent: :nullify
   def edit; end
 
   def view_question_text
@@ -16,8 +15,7 @@ class QuizQuestion < Question
       end
       html += '<br />'
     end
-    # html.html_safe
-    content_tag(html)
+    html.html_safe
   end
 
   def complete; end

@@ -1,16 +1,17 @@
 class Participant < ActiveRecord::Base
   has_paper_trail
   belongs_to :user
-  belongs_to :topic, class_name: 'SignUpTopic'
-  belongs_to :assignment, foreign_key: 'parent_id'
+  belongs_to :topic, class_name: 'SignUpTopic', inverse_of: false
+  belongs_to :assignment, foreign_key: 'parent_id', inverse_of: false
   has_many   :join_team_requests, dependent: :destroy
-  has_many   :reviews, class_name: 'ResponseMap', foreign_key: 'reviewer_id', dependent: :destroy
-  has_many   :team_reviews, class_name: 'ReviewResponseMap', foreign_key: 'reviewer_id', dependent: :destroy
-  has_many :response_maps, class_name: 'ResponseMap', foreign_key: 'reviewee_id', dependent: :destroy
+  has_many   :reviews, class_name: 'ResponseMap', foreign_key: 'reviewer_id', dependent: :destroy, inverse_of: false
+  has_many   :team_reviews, class_name: 'ReviewResponseMap', foreign_key: 'reviewer_id', dependent: :destroy, inverse_of: false
+  has_many :response_maps, class_name: 'ResponseMap', foreign_key: 'reviewee_id', dependent: :destroy, inverse_of: false
   has_many :awarded_badges, dependent: :destroy
   has_many :badges, through: :awarded_badges
   has_one :review_grade, dependent: :destroy
-
+  attr_accessible :can_submit, :can_review, :user_id, :parent_id, :submitted_at, :permission_granted,
+                  :penalty_accumulated, :grade, :type, :handle, :digital_signature, :duty, :can_take_quiz, :Hamer, :Lauw
   validates :grade, numericality: {allow_nil: true}
   has_paper_trail
   delegate :course, to: :assignment
@@ -41,11 +42,9 @@ class Participant < ActiveRecord::Base
 
   def delete(force = nil)
     maps = ResponseMap.where('reviewee_id = ? or reviewer_id = ?', self.id, self.id)
-    if force or (maps.blank? and self.team.nil?)
-      force_delete(maps)
-    else
-      raise "Associations exist for this participant."
-    end
+
+    raise "Associations exist for this participant." unless force or (maps.blank? and self.team.nil?)
+    force_delete(maps)
   end
 
   def force_delete(maps)

@@ -64,6 +64,8 @@ class AssignmentsController < ApplicationController
   def edit
     ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Timezone not specified", request) if current_user.timezonepref.nil?
     flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines." if current_user.timezonepref.nil?
+    # If drop topic deadline has passed, clear the waitlists for the assignment's topics
+    SignUpTopic.clear_waitlists_if_drop_passed(Assignment.find(params[:id]))
     edit_params_setting
     assignment_form_assignment_staggered_deadline?
     @due_date_all.each do |dd|
@@ -88,6 +90,8 @@ class AssignmentsController < ApplicationController
       assignment_form_key_nonexist_case_handler
       return
     end
+    # If drop topic deadline has passed, clear the waitlists for the assignment's topics
+    SignUpTopic.clear_waitlists_if_drop_passed(Assignment.find(params[:id]))
     retrieve_assignment_form
     handle_current_user_timezonepref_nil
     update_feedback_assignment_form_attributes

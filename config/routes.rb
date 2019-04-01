@@ -111,9 +111,19 @@ Expertiza::Application.routes.draw do
       post :export
       post :exportdetails
       post :export_advices
+      put :exporttags
+      post :exporttags
     end
   end
 
+  put '/tags.csv', to: 'export_file#export_tags'
+
+  resources :export_tags, only: [] do
+    collection do
+      put :exporttags
+      post :exporttags
+    end
+  end
   resources :grades, only: %i[edit update] do
     collection do
       get :view

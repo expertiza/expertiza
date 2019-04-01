@@ -67,9 +67,10 @@
             <th class="sorter-true"># tags done</th>
             <th class="sorter-true"># tags not done</th>
             <th class="sorter-true"># possible tags to do<img src='/assets/info.png' title='Number of answers that fulfil the prerequisite setup for each tags (Answer of certain question types and has a length of greater than the threshold).'/></th>
-            <th >Tags export</th>
+            <th>Tags export</th>
           </tr>
           </thead>
+          <%= form_tag('/tags.csv', method: 'put',:id => 'tst') do %>
           <% @user_tagging_report.each do |key, val| %>
               <tr>
                 <td><%= val.user.name(session[:ip]) %></td>
@@ -78,10 +79,12 @@
                 <td><%= val.no_tagged.to_s %></td>
                 <td><%= val.no_not_tagged.to_s %></td>
                 <td><%= val.no_tagable %></td>
-                <td><%= check_box_tag 'name[]', val.user.name(session[:ip]), true %></td>
+                <td><%= check_box_tag 'names[]', val.user.name(session[:ip]), true %></td>
               </tr>
           <% end %>
         </table>
+            <%= submit_tag("Export", :class => "btn btn-default") %>
+            <% end %>
       </div>
       </p>
     </div>

@@ -1,7 +1,6 @@
 class ResponseMap < ActiveRecord::Base
   has_many :response, foreign_key: 'map_id', dependent: :destroy, inverse_of: false
   belongs_to :reviewer, class_name: 'Participant', foreign_key: 'reviewer_id', inverse_of: false
-  attr_accessible :reviewed_object_id, :reviewer_id, :reviewee_id, :type, :calibrate_to
 
   def map_id
     id

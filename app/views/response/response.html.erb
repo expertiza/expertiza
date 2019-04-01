@@ -346,8 +346,10 @@
           <% @questions.each do |question| %>
             <% answer = Answer.where(question_id: question.id, response_id: @response.id).first if !@response.nil?%>
             <% if question.instance_of? Criterion%>
-              <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
-            <% elsif question.instance_of? Scale %>
+
+                  <%= render partial: 'criterion_complete', :locals => {:question => question, :count => i, :answer => answer, :questionnaire_min => @questionnaire.min_question_score, :questionnaire_max => @questionnaire.max_question_score, :dropdown_or_scale => @dropdown_or_scale} %>
+
+        <% elsif question.instance_of? Scale %>
               <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score) %>
             <% else %>
               <%= question.complete(i, answer) %>
@@ -375,26 +377,10 @@
       </tr>
 
       <!-- Add a Good Teammate badge to the Teammate Review Questionnaire if the assignment has badges -->
-      <% if @assignment.has_badge? and (@questionnaire.type == 'TeammateReviewQuestionnaire' or @questionnaire.type == 'Teammate ReviewQuestionnaire') and AssignmentBadge.where(assignment_id: @assignment.id, badge_id: Badge.get_id_from_name('Good Teammate')).any?%>
-        <tr>
-          <td>
-            <img width = "100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Teammate")}" %> title="GoodTeammate">
-             Would you like to award a Good Teammate badge?
-            <input type="checkbox" id="good_teammate_checkbox" name="review[good_teammate_checkbox]">
-          </td>
-        </tr>
-      <% end%>
+
 
       <!-- Add a Good Reviewer badge to the Feedback Review Questionnaire if the assignment has badges -->
-      <% if @assignment.has_badge? and (@questionnaire.type == 'AuthorFeedbackQuestionnaire' or @questionnaire.type == 'Author FeedbackQuestionnaire') and AssignmentBadge.where(assignment_id: @assignment.id, badge_id: Badge.get_id_from_name('Good Reviewer')).any?%>
-        <tr>
-          <td>
-            <img width="100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Reviewer")}" %> title="GoodReviewer">
-            Would you like to award a Good Reviewer badge?
-            <input type="checkbox" id="good_reviewer_checkbox" name="review[good_reviewer_checkbox]">
-          </td>
-        </tr>
-      <% end %>
+
 
     </table>
     <%if @current_round%>

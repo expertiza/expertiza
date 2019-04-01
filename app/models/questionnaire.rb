@@ -100,7 +100,7 @@ class Questionnaire < ActiveRecord::Base
         new_advice.save!
       end
     end
-    return questionnaire
+    questionnaire
   end  
 
   # validate the entries for this questionnaire

@@ -77,7 +77,7 @@ describe QuizQuestionnaireController do
           expect(response).to redirect_to('www.google.com')
         end
       end
-  end
+    end
 
   describe '#view_quiz' do
     it 'renders questionnaires#view_quiz' do

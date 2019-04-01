@@ -86,7 +86,7 @@ class QuizQuestionnaireController < QuestionnairesController
     if params['save'] && params[:question].try(:keys)
       @questionnaire.update_attributes(questionnaire_params)
 
-      params[:question].keys.each do |qid|
+      params[:question].each_key do |qid|
         @question = Question.find(qid)
         @question.txt = params[:question][qid.to_sym][:txt]
         @question.save
@@ -114,7 +114,7 @@ class QuizQuestionnaireController < QuestionnairesController
   end
 
   def valid_quiz
-    num_questions = Assignment.find(params[:aid]).num_questions
+    num_questions = Assignment.find(params[:aid]).num_quiz_questions
     valid = "valid"
 
     (1..num_questions).each do |i|
@@ -187,13 +187,13 @@ class QuizQuestionnaireController < QuestionnairesController
 
     questions.each do |question|
       q_type = params[:question_type][question_num.to_s][:type]
-      params[:new_choices][question_num.to_s][q_type].keys.each do |choice_key|
+      params[:new_choices][question_num.to_s][q_type].each_key do |choice_key|
         if q_type == "MultipleChoiceCheckbox"
           q = if params[:new_choices][question_num.to_s][q_type][choice_key][:iscorrect] == 1.to_s
                 QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
-            else
+              else
                 QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
-            end
+              end
           q.save
         elsif q_type == "TrueFalse"
           if params[:new_choices][question_num.to_s][q_type][1.to_s][:iscorrect] == choice_key

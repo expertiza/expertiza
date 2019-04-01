@@ -297,8 +297,8 @@ class QuestionnairesController < ApplicationController
 
   # separate method for creating a question choice to reduce effort creating choice each time
   def create_quiz_question_choice(txt, iscorrect, question_id)
-  	q = QuizQuestionChoice.new(txt: txt, iscorrect: iscorrect, question_id: question_id)
-  	q.save
+    q = QuizQuestionChoice.new(txt: txt, iscorrect: iscorrect, question_id: question_id)
+    q.save
   end
 
   # edit a quiz questionnaire
@@ -500,14 +500,14 @@ class QuestionnairesController < ApplicationController
             create_quiz_question_choice("True", "true", question.id)
             create_quiz_question_choice("False", "false", question.id)
           else
-          	create_quiz_question_choice("True", "false", question.id)
-          	create_quiz_question_choice("False", "true", question.id)
+            create_quiz_question_choice("True", "false", question.id)
+            create_quiz_question_choice("False", "true", question.id)
           end
         else
           if params[:new_choices][question_num.to_s][q_type][1.to_s][:iscorrect] == choice_key
-          	create_quiz_question_choice(params[:new_choices][question_num.to_s][q_type][choice_key][:txt], "true", question.id)
+            create_quiz_question_choice(params[:new_choices][question_num.to_s][q_type][choice_key][:txt], "true", question.id)
           else
-          	create_quiz_question_choice(params[:new_choices][question_num.to_s][q_type][choice_key][:txt], "false", question.id)
+            create_quiz_question_choice(params[:new_choices][question_num.to_s][q_type][choice_key][:txt], "false", question.id)
           end
         end
       end

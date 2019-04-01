@@ -85,7 +85,7 @@ class Questionnaire < ActiveRecord::Base
     questionnaire = orig_questionnaire.dup
     questionnaire.instructor_id = instructor_id
     questionnaire.name = 'Copy of ' + orig_questionnaire.name
-    questionnaire.created_at = Time.now
+    questionnaire.created_at = Time.zone.now
     questionnaire.save!
     questions.each do |question|
       new_question = question.dup

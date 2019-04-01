@@ -13,10 +13,12 @@
     <TH align="left">&nbsp Score Range &nbsp</TH>
   </TR>
   <%questions=@questionnaire.questions.sort { |a,b| a.seq <=> b.seq }%>
-  <%questions.each do |question| %>
-
-    <%if question.is_a? Question%>
-      <%=question.view_question_text.html_safe%>
+  <% for @question in questions %>
+    <%# E1911: Call the criterion_view partial if question is of type Criterion %>
+    <%if @question.is_a? Criterion %>
+          <%= render :partial => 'criterion_view' %>
+      <%elsif @question.is_a? Question%>
+          <%= @question.view_question_text.html_safe %>
     <%end%>
 
   <% end %>

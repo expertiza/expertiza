@@ -2,48 +2,6 @@ class Criterion < ScoredQuestion
   include ActionView::Helpers
   validates :size, presence: true
 
-  # This method returns what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
-  def edit(_count)
-    # html = '<td align="center"><a rel="nofollow" data-method="delete" href="/questions/' + self.id.to_s + '">Remove</a></td>'
-    #
-    # html += '<td><input size="6" value="' + self.seq.to_s + '" name="question[' + self.id.to_s + '][seq]"'
-    # html += ' id="question_' + self.id.to_s + '_seq" type="text"></td>'
-    #
-    # html += '<td><textarea cols="50" rows="1" name="question[' + self.id.to_s + '][txt]"'
-    # html += ' id="question_' + self.id.to_s + '_txt" placeholder="Edit question content here">' + self.txt + '</textarea></td>'
-    #
-    # html += '<td><input size="10" disabled="disabled" value="' + self.type + '" name="question[' + self.id.to_s + '][type]"'
-    # html += ' id="question_' + self.id.to_s + '_type" type="text"></td>'
-    #
-    # html += '<td><input size="2" value="' + self.weight.to_s
-    # html += '" name="question[' + self.id.to_s + '][weight]" id="question_' + self.id.to_s + '_weight" type="text"></td>'
-    #
-    # html += '<td>text area size <input size="3" value="' + self.size.to_s
-    # html += '" name="question[' + self.id.to_s + '][size]" id="question_' + self.id.to_s + '_size" type="text"></td>'
-    #
-    # html += '<td> max_label <input size="10" value="' + self.max_label.to_s + '" name="question[' + self.id.to_s
-    # html += '][max_label]" id="question_' + self.id.to_s + '_max_label" type="text">  min_label <input size="12" value="' + self.min_label.to_s
-    # html += '" name="question[' + self.id.to_s + '][min_label]" id="question_' + self.id.to_s + '_min_label" type="text"></td>'
-    #
-    # safe_join(["<tr>".html_safe, "</tr>".html_safe], html.html_safe)
-  end
-
-  # This method returns what to display if an instructor (etc.) is viewing a questionnaire
-  def view_question_text
-    html = '<TD align="left"> ' + self.txt + ' </TD>'
-    html += '<TD align="left">' + self.type + '</TD>'
-    html += '<td align="center">' + self.weight.to_s + '</TD>'
-    questionnaire = self.questionnaire
-    if !self.max_label.nil? && !self.min_label.nil?
-      html += '<TD align="center"> (' + self.min_label + ') ' + questionnaire.min_question_score.to_s
-      html += ' to ' + questionnaire.max_question_score.to_s + ' (' + self.max_label + ')</TD>'
-    else
-      html += '<TD align="center">' + questionnaire.min_question_score.to_s + ' to ' + questionnaire.max_question_score.to_s + '</TD>'
-    end
-
-    safe_join(["<TR>".html_safe, "</TR>".html_safe], html.html_safe)
-  end
-
   def complete(count, answer = nil, questionnaire_min, questionnaire_max, dropdown_or_scale)
   #   if self.size.nil?
   #     cols = '70'

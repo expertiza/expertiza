@@ -1,7 +1,6 @@
 require 'rspec'
 
 describe 'Tests Review report' do
-
   before(:each) do
     create(:instructor)
     create(:assignment, course: nil, name: 'Test Assignment')
@@ -47,18 +46,17 @@ describe "Test Author feedback report" do
     expect(page).to have_content('Rejoinder')
   end
 
-  it "can display author feedbacks done"  do
-    expect(page).to have_content('author feedbacks done' )
+  it "can display author feedbacks done" do
+    expect(page).to have_content('author feedbacks done')
   end
 
-  it "can display Review response rejoined"  do
+  it "can display Review response rejoined" do
     expect(page).to have_content('Review response rejoined ')
   end
 
-  it "can display Last rejoined at"  do
+  it "can display Last rejoined at" do
     expect(page).to have_content('Last rejoined at')
   end
-
 end
 
 describe "Test Teammate Review report" do
@@ -76,16 +74,15 @@ describe "Test Teammate Review report" do
     expect(page).to have_content('Reviewer')
   end
 
-  it "can display teammate reviews done"  do
-    expect(page).to have_content('teammate reviews done' )
+  it "can display teammate reviews done" do
+    expect(page).to have_content('teammate reviews done')
   end
 
-  it "can display Teammate reviewed"  do
+  it "can display Teammate reviewed" do
     expect(page).to have_content('Teammate reviewed')
   end
 
-  it "can display Last reviewed at"  do
+  it "can display Last reviewed at" do
     expect(page).to have_content('Last reviewed at')
   end
-
 end

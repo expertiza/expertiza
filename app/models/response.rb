@@ -3,11 +3,11 @@ require 'lingua/en/readability'
 
 class Response < ActiveRecord::Base
   include ResponseAnalytic
-
-  belongs_to :response_map, class_name: 'ResponseMap', foreign_key: 'map_id'
-  has_many :scores, class_name: 'Answer', foreign_key: 'response_id', dependent: :destroy
+  attr_accessible :map_id, :additional_comment, :version_num, :round, :is_submitted
+  belongs_to :response_map, class_name: 'ResponseMap', foreign_key: 'map_id', inverse_of: false
+  has_many :scores, class_name: 'Answer', foreign_key: 'response_id', dependent: :destroy, inverse_of: false
   # TODO: change metareview_response_map relationship to belongs_to
-  has_many :metareview_response_maps, class_name: 'MetareviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy
+  has_many :metareview_response_maps, class_name: 'MetareviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy, inverse_of: false
   alias map response_map
   attr_accessor :difficulty_rating
   delegate :questionnaire, :reviewee, :reviewer, to: :map
@@ -63,7 +63,8 @@ class Response < ActiveRecord::Base
 
   # Returns the maximum possible score for this response
   def maximum_score
-    # only count the scorable questions, only when the answer is not nil (we accept nil as answer for scorable questions, and they will not be counted towards the total score)
+    # only count the scorable questions, only when the answer is not nil (we accept nil as
+    # answer for scorable questions, and they will not be counted towards the total score)
     total_weight = 0
     scores.each do |s|
       question = Question.find(s.question_id)
@@ -146,7 +147,9 @@ class Response < ActiveRecord::Base
     review_comments_volume = []
     review_comments_volume.push(overall_avg_vol)
     (1..3).each do |i|
-      avg_vol_in_round = (Lingua::EN::Readability.new(instance_variable_get('@comments_in_round' + i.to_s)).num_words / (instance_variable_get('@counter_in_round' + i.to_s).zero? ? 1 : instance_variable_get('@counter_in_round' + i.to_s))).round(0)
+      num = Lingua::EN::Readability.new(instance_variable_get('@comments_in_round' + i.to_s)).num_words
+      den = (instance_variable_get('@counter_in_round' + i.to_s).zero? ? 1 : instance_variable_get('@counter_in_round' + i.to_s))
+      avg_vol_in_round = (num / den).round(0)
       review_comments_volume.push(avg_vol_in_round)
     end
     review_comments_volume
@@ -161,7 +164,7 @@ class Response < ActiveRecord::Base
     existing_responses = map_class.get_assessments_for(self.map.reviewee)
     average_score_on_same_artifact_from_others, count = Response.avg_scores_and_count_for_prev_reviews(existing_responses, self)
     # if this response is the first on this artifact, there's no grade conflict
-    return false if count == 0
+    return false if count.zero?
     # This score has already skipped the unfilled scorable question(s)
     score = total_score.to_f / maximum_score
     questionnaire = questionnaire_by_answer(self.scores.first)
@@ -196,18 +199,18 @@ class Response < ActiveRecord::Base
     reviewee_name = User.find(reviewee_participant.user_id).fullname
     assignment = Assignment.find(reviewer_participant.parent_id)
     Mailer.notify_grade_conflict_message(
-      to: assignment.instructor.email,
-      subject: 'Expertiza Notification: A review score is outside the acceptable range',
-      body: {
-        reviewer_name: reviewer_name,
-        type: 'review',
-        reviewee_name: reviewee_name,
-        new_score: total_score.to_f / maximum_score,
-        assignment: assignment,
-        conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s,
-        summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
-        assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
-      }
+        to: assignment.instructor.email,
+        subject: 'Expertiza Notification: A review score is outside the acceptable range',
+        body: {
+            reviewer_name: reviewer_name,
+            type: 'review',
+            reviewee_name: reviewee_name,
+            new_score: total_score.to_f / maximum_score,
+            assignment: assignment,
+            conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s,
+            summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
+            assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
+        }
     ).deliver_now
   end
 
@@ -262,7 +265,7 @@ class Response < ActiveRecord::Base
       code += '<tr class="' + row_class + '"><td>'
       if !answer.nil? or question.is_a? QuestionnaireHeader
         code += if question.instance_of? Criterion
-                  #Answer Tags are enabled only for Criterion questions at the moment.
+                  # Answer Tags are enabled only for Criterion questions at the moment.
                   question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments, current_user) || ''
                 elsif question.instance_of? Scale
                   question.view_completed_question(count, answer, questionnaire_max) || ''

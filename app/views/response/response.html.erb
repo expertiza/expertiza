@@ -348,7 +348,7 @@
             <% if question.instance_of? Criterion%>
               <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
             <% elsif question.instance_of? Scale %>
-              <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score) %>
+              <%= question.complete(i, @questionnaire.min_question_score, @questionnaire.max_question_score, answer) %>
             <% else %>
               <%= question.complete(i, answer) %>
             <% end %>

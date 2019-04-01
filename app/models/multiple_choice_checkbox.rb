@@ -26,7 +26,7 @@ class MultipleChoiceCheckbox < QuizQuestion
       html += '</td></tr>'
     end
 
-    # html.html_safe
+    html.html_safe
     safe_join(html)
   end
 
@@ -62,8 +62,8 @@ class MultipleChoiceCheckbox < QuizQuestion
       html += '<b>' + answer.comments.to_s + '</b><br>'
     end
     html += '<br><hr>'
-    # html.html_safe
-    safe_join(html)
+    html.html_safe
+    # safe_join(html)
   end
 
   def isvalid(choice_info)

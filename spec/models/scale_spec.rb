@@ -19,7 +19,7 @@ describe "scale" do
 
   describe "#complete" do
     it "returns the html " do
-      html = scale.complete(0, nil, 0, 5).to_s
+      html = scale.complete(0, 0, 5, nil).to_s
       expect(html).to eq("<div><label for=\"responses_0\">test txt</label></div><input id=\"responses_0_score\" name=\"responses[0][score]\" type=\"hidden\"><input id=\"responses_0_comments\" name=\"responses[0][comment]\" type=\"hidden\" value=\"\"><table><tr><td width=\"10%\"></td><td width=\"10%\"><label>0</label></td><td width=\"10%\"><label>1</label></td><td width=\"10%\"><label>2</label></td><td width=\"10%\"><label>3</label></td><td width=\"10%\"><label>4</label></td><td width=\"10%\"><label>5</label></td><td width=\"10%\"></td></tr><tr><td width=\"10%\"></td><td width=\"10%\"><input type=\"radio\" id=\"0\" value=\"0\" name=\"Radio_1\"checked=\"checked\"></td><td width=\"10%\"><input type=\"radio\" id=\"1\" value=\"1\" name=\"Radio_1\"></td><td width=\"10%\"><input type=\"radio\" id=\"2\" value=\"2\" name=\"Radio_1\"></td><td width=\"10%\"><input type=\"radio\" id=\"3\" value=\"3\" name=\"Radio_1\"></td><td width=\"10%\"><input type=\"radio\" id=\"4\" value=\"4\" name=\"Radio_1\"></td><td width=\"10%\"><input type=\"radio\" id=\"5\" value=\"5\" name=\"Radio_1\"></td><script>jQuery(\"input[name=Radio_1]:radio\").change(function() {var response_score = jQuery(\"#responses_0_score\");var checked_value = jQuery(\"input[name=Radio_1]:checked\").val();response_score.val(checked_value);});</script><td width=\"10%\"></td><td width=\"10%\"></td></tr></table><br/>")
     end
   end

@@ -1,5 +1,4 @@
 class ReviewQuestionnaire < Questionnaire
-  attr_accessor :questionnaire
   after_initialize :post_initialization
   @print_name = "Review Rubric"
 

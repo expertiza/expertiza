@@ -100,9 +100,6 @@ class Questionnaire < ActiveRecord::Base
         new_advice.save!
       end
     end
-    p_folder = TreeFolder.find_by(name: questionnaire.display_type)
-    parent = FolderNode.find_by(node_object_id: p_folder.id)
-    QuestionnaireNode.find_or_create_by(parent_id: parent.id, node_object_id: questionnaire.id)
     return questionnaire
   end  
 

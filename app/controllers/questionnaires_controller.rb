@@ -29,10 +29,13 @@ class QuestionnairesController < ApplicationController
     begin
       instructor_id = session[:user].instructor_id
       @questionnaire = Questionnaire.copy_questionnaire_details(params, instructor_id)
+      p_folder = TreeFolder.find_by(name: @questionnaire.display_type)
+      parent = FolderNode.find_by(node_object_id: p_folder.id)
+      QuestionnaireNode.find_or_create_by(parent_id: parent.id, node_object_id: @questionnaire.id)
       undo_link("Copy of questionnaire #{@questionnaire.name} has been created successfully.")
       redirect_to controller: 'questionnaires', action: 'view', id: @questionnaire.id
     rescue StandardError
-      flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.' + $ERROR_INFO
+      flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.' + $ERROR_INFO.to_s
       redirect_to action: 'list', controller: 'tree_display'
     end
   end

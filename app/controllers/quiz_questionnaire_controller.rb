@@ -22,11 +22,9 @@ class QuizQuestionnaireController < QuestionnairesController
       if team.nil? # flash error if this current participant does not have a team
         flash[:error] = "You should create or join a team first."
         valid_request = false
-      else
-        if assignment.topics? && team.topic.nil? # flash error if this assignment has topic but current team does not have a topic
-          flash[:error] = "Your team should have a topic."
-          valid_request = false
-        end
+      elsif assignment.topics? && team.topic.nil? # flash error if this assignment has topic but current team does not have a topic
+        flash[:error] = "Your team should have a topic."
+        valid_request = false
       end
     end
 
@@ -96,12 +94,9 @@ class QuizQuestionnaireController < QuestionnairesController
         @quiz_question_choices = QuizQuestionChoice.where(question_id: qid)
         question_index = 1
         @quiz_question_choices.each do |question_choice|
-          if @question.type == "MultipleChoiceCheckbox"
-            multiple_choice_checkbox(question_choice, question_index) # Call to private method to handle  Multile Choice Questions
-          end
-          if @question.type == "MultipleChoiceRadio"
-            multiple_choice_radio(question_choice, question_index)
-          end
+          # Call to private method to handle  Multile Choice Questions
+          multiple_choice_checkbox(question_choice, question_index) if @question.type == "MultipleChoiceCheckbox"
+          multiple_choice_radio(question_choice, question_index) if @question.type == "MultipleChoiceRadio"
           if @question.type == "TrueFalse"
             if params[:quiz_question_choices][@question.id.to_s][@question.type][1.to_s][:iscorrect] == "True" # the statement is correct
               question_choice.txt == "True" ? question_choice.update_attributes(iscorrect: '1') : question_choice.update_attributes(iscorrect: '0')
@@ -119,10 +114,10 @@ class QuizQuestionnaireController < QuestionnairesController
   end
 
   def valid_quiz
-    num_quiz_questions = Assignment.find(params[:aid]).num_quiz_questions
+    num_questions = Assignment.find(params[:aid]).num_questions
     valid = "valid"
 
-    (1..num_quiz_questions).each do |i|
+    (1..num_questions).each do |i|
       if params[:questionnaire][:name] == "" # questionnaire name is not specified
         valid = "Please specify quiz name (please do not use your name or id)."
       elsif !params.key?(:question_type) || !params[:question_type].key?(i.to_s) || params[:question_type][i.to_s][:type].nil?
@@ -172,18 +167,16 @@ class QuizQuestionnaireController < QuestionnairesController
   def save_questions(questionnaire_id)
     delete_questions questionnaire_id
     save_new_questions questionnaire_id
-
-    if params[:question]
-      params[:question].keys.each do |question_key|
-        if params[:question][question_key][:txt].strip.empty?
-          # question text is empty, delete the question
-          Question.delete(question_key)
-        else
-          # Update existing question.
-          question = Question.find(question_key)
-          Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
-        end
+    params[:question].each_key do |question_key| if params[:question]
+      if params[:question][question_key][:txt].strip.empty?
+        # question text is empty, delete the question
+        Question.delete(question_key)
+      else
+        # Update existing question.
+        question = Question.find(question_key)
+        Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
       end
+    end
     end
   end
 
@@ -197,31 +190,31 @@ class QuizQuestionnaireController < QuestionnairesController
       params[:new_choices][question_num.to_s][q_type].keys.each do |choice_key|
         if q_type == "MultipleChoiceCheckbox"
           q = if params[:new_choices][question_num.to_s][q_type][choice_key][:iscorrect] == 1.to_s
-              QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
+                QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
             else
-              QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
+                QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
             end
-        q.save
-      elsif q_type == "TrueFalse"
-        if params[:new_choices][question_num.to_s][q_type][1.to_s][:iscorrect] == choice_key
-          q = QuizQuestionChoice.new(txt: "True", iscorrect: "true", question_id: question.id)
           q.save
-          q = QuizQuestionChoice.new(txt: "False", iscorrect: "false", question_id: question.id)
-          q.save
+        elsif q_type == "TrueFalse"
+          if params[:new_choices][question_num.to_s][q_type][1.to_s][:iscorrect] == choice_key
+            q = QuizQuestionChoice.new(txt: "True", iscorrect: "true", question_id: question.id)
+            q.save
+            q = QuizQuestionChoice.new(txt: "False", iscorrect: "false", question_id: question.id)
+            q.save
+          else
+            q = QuizQuestionChoice.new(txt: "True", iscorrect: "false", question_id: question.id)
+            q.save
+            q = QuizQuestionChoice.new(txt: "False", iscorrect: "true", question_id: question.id)
+            q.save
+          end
         else
-          q = QuizQuestionChoice.new(txt: "True", iscorrect: "false", question_id: question.id)
-          q.save
-          q = QuizQuestionChoice.new(txt: "False", iscorrect: "true", question_id: question.id)
+          q = if params[:new_choices][question_num.to_s][q_type][1.to_s][:iscorrect] == choice_key
+                QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
+              else
+                QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
+              end
           q.save
         end
-      else
-        q = if params[:new_choices][question_num.to_s][q_type][1.to_s][:iscorrect] == choice_key
-              QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
-            else
-              QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
-            end
-        q.save
-      end
       end
       question_num += 1
       question.weight = 1

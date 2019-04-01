@@ -2,130 +2,6 @@ class Criterion < ScoredQuestion
   include ActionView::Helpers
   validates :size, presence: true
 
-  def complete(count, answer = nil, questionnaire_min, questionnaire_max, dropdown_or_scale)
-  #   if self.size.nil?
-  #     cols = '70'
-  #     rows = '1'
-  #   else
-  #     cols = self.size.split(',')[0]
-  #     rows = self.size.split(',')[1]
-  #   end
-  #
-  #   html = '<div><label for="responses_' + count.to_s + '">' + self.txt + '</label></div>'
-  #   # show advice for each criterion question
-  #   question_advices = QuestionAdvice.where(question_id: self.id).sort_by(&:id)
-  #   advice_total_length = 0
-  #
-  #   question_advices.each do |question_advice|
-  #     advice_total_length += question_advice.advice.length if question_advice.advice && question_advice.advice != ""
-  #   end
-  #
-  #   if !question_advices.empty? and advice_total_length > 0
-  #     html += '<a id="showAdivce_' + self.id.to_s + '" onclick="showAdvice(' + self.id.to_s + ')">Show advice</a>'
-  #     html += '<script>'
-  #     html += 'function showAdvice(i){'
-  #     html += 'var element = document.getElementById("showAdivce_" + i.toString());'
-  #     html += 'var show = element.innerHTML == "Hide advice";'
-  #     html += 'if (show){'
-  #     html += 'element.innerHTML="Show advice";'
-  #     html += '}else{'
-  #     html += 'element.innerHTML="Hide advice";}'
-  #     html += 'toggleAdvice(i);}'
-  #
-  #     html += 'function toggleAdvice(i) {'
-  #     html += 'var elem = document.getElementById(i.toString() + "_myDiv");'
-  #     html += 'if (elem.style.display == "none") {'
-  #     html += 'elem.style.display = "";'
-  #     html += '} else {'
-  #     html += 'elem.style.display = "none";}}'
-  #     html += '</script>'
-  #
-  #     html += '<div id="' + self.id.to_s + '_myDiv" style="display: none;">'
-  #     # [2015-10-26] Zhewei:
-  #     # best to order advices high to low, e.g., 5 to 1
-  #     # each level used to be a link;
-  #     # clicking on the link caused the dropbox to be filled in with the corresponding number
-  #     question_advices.reverse.each_with_index do |question_advice, index|
-  #       html += '<a id="changeScore_>' + self.id.to_s + '" onclick="changeScore(' + count.to_s + ',' + index.to_s + ')">'
-  #       html += (self.questionnaire.max_question_score - index).to_s + ' - ' + question_advice.advice + '</a><br/>'
-  #       html += '<script>'
-  #       html += 'function changeScore(i, j) {'
-  #       html += 'var elem = jQuery("#responses_" + i.toString() + "_score");'
-  #       html += 'var opts = elem.children("option").length;'
-  #       html += 'elem.val((' + self.questionnaire.max_question_score.to_s + ' - j).toString());}'
-  #       html += '</script>'
-  #     end
-  #     html += '</div>'
-  #   end
-  #
-  #   if dropdown_or_scale == 'dropdown'
-  #     current_value = ""
-  #     current_value += 'data-current-rating =' + answer.answer.to_s if !answer.nil?
-  #     html += '<div><select id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" class="review-rating" ' + current_value + '>'
-  #     html += "<option value = ''>--</option>"
-  #     questionnaire_min.upto(questionnaire_max).each do |j|
-  #       html += if !answer.nil? and j == answer.answer
-  #                 '<option value=' + j.to_s + ' selected="selected">'
-  #               else
-  #                 '<option value=' + j.to_s + '>'
-  #               end
-  #
-  #       html += j.to_s
-  #       if j == questionnaire_min
-  #         html += "-" + self.min_label if self.min_label.present?
-  #       elsif j == questionnaire_max
-  #         html += "-" + self.max_label if self.max_label.present?
-  #       end
-  #       html += "</option>"
-  #     end
-  #     html += "</select></div><br><br>"
-  #     html += '<textarea' + ' id="responses_' + count.to_s + '_comments"' \
-  #      ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
-  #     html += answer.comments unless answer.nil?
-  #     html += '</textarea></td>'
-  #   elsif dropdown_or_scale == 'scale'
-  #     html += '<input id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" type="hidden"'
-  #     html += 'value="' + answer.answer.to_s + '"' unless answer.nil?
-  #     html += '>'
-  #
-  #     html += '<table>'
-  #     html += '<tr><td width="10%"></td>'
-  #     (questionnaire_min..questionnaire_max).each do |j|
-  #       html += '<td width="10%"><label>' + j.to_s + '</label></td>'
-  #     end
-  #     html += '<td width="10%"></td></tr><tr>'
-  #
-  #     html += if !self.min_label.nil?
-  #               '<td width="10%">' + self.min_label + '</td>'
-  #             else
-  #               '<td width="10%"></td>'
-  #             end
-  #     (questionnaire_min..questionnaire_max).each do |j|
-  #       html += '<td width="10%"><input type="radio" id="' + j.to_s + '" value="' + j.to_s + '" name="Radio_' + self.id.to_s + '"'
-  #       html += 'checked="checked"' if (!answer.nil? and answer.answer == j) or (answer.nil? and questionnaire_min == j)
-  #       html += '></td>'
-  #     end
-  #     html += '<script>jQuery("input[name=Radio_' + self.id.to_s + ']:radio").change(function() {'
-  #     html += 'var response_score = jQuery("#responses_' + count.to_s + '_score");'
-  #     html += 'var checked_value = jQuery("input[name=Radio_' + self.id.to_s + ']:checked").val();'
-  #     html += 'response_score.val(checked_value);});</script>'
-  #
-  #     html += if !self.max_label.nil?
-  #               '<td width="10%">' + self.max_label + '</td>'
-  #             else
-  #               '<td width="10%"></td>'
-  #             end
-  #
-  #     html += '<td width="10%"></td></tr></table>'
-  #     html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments"' \
-  #       ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
-  #     html += answer.comments unless answer.nil?
-  #     html += '</textarea>'
-  #
-  #   end
-  #   html += '<script>alert("Third function found");</script>'
-  #   safe_join(["".html_safe, "".html_safe], html.html_safe)
-   end
 
   # This method returns what to display if a student is viewing a filled-out questionnaire
   def view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments = nil, current_user = nil)
@@ -181,7 +57,6 @@ class Criterion < ScoredQuestion
       #### end code to show tag prompts ####
     end
     html += '</tr></table>'
-    html += '<script>alert("Found function last");</script>'
     safe_join(["".html_safe, "".html_safe], html.html_safe)
   end
 end

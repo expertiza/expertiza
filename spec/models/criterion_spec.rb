@@ -3,7 +3,7 @@ describe "criterion" do
   let(:criterion) { Criterion.new id: 1, type: "Criterion", seq: 1.0, txt: "test txt", weight: 1, questionnaire: questionnaire }
   let(:answer) { Answer.new answer: 8 }
 
-  
+
   describe "#view_completed_question" do
     it "returns the html " do
       html = criterion.view_completed_question(0, answer, 5).to_s

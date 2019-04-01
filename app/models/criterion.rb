@@ -2,7 +2,14 @@ class Criterion < ScoredQuestion
   include ActionView::Helpers
   validates :size, presence: true
 
+  #E1911:The edit method from here has been moved to the views/questionnaires/_criterion_edit.html.erb partial
 
+  #E1911:The view_question_text method from here has been moved to the views/questionnaires/_criterion_view.html.erb partial
+
+
+  #E1911:The complete method from here has been moved to the views/responses/_criterion_complete.html.erb partial
+
+  #E1911:This method cannot be refactored without refactoring entire response.rb
   # This method returns what to display if a student is viewing a filled-out questionnaire
   def view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments = nil, current_user = nil)
     html = '<b>' + count.to_s + ". " + self.txt + ' [Max points: ' + questionnaire_max.to_s + "]</b>"

@@ -18,7 +18,6 @@ class QuizQuestionnaireController < QuestionnairesController
       valid_request = false
     else
       team = AssignmentParticipant.find(@participant_id).team
-
       if team.nil? # flash error if this current participant does not have a team
         flash[:error] = "You should create or join a team first."
         valid_request = false
@@ -27,14 +26,12 @@ class QuizQuestionnaireController < QuestionnairesController
         valid_request = false
       end
     end
-
     if valid_request && Questionnaire::QUESTIONNAIRE_TYPES.include?(params[:model])
       @questionnaire = Object.const_get(params[:model]).new
       @questionnaire.private = params[:private]
       @questionnaire.min_question_score = 0
       @questionnaire.max_question_score = 1
       render 'questionnaires/new_quiz'
-
     else
       redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
     end
@@ -167,14 +164,16 @@ class QuizQuestionnaireController < QuestionnairesController
   def save_questions(questionnaire_id)
     delete_questions questionnaire_id
     save_new_questions questionnaire_id
-    params[:question].each_key do |question_key| if params[:question]
-      if params[:question][question_key][:txt].strip.empty?
-        # question text is empty, delete the question
-        Question.delete(question_key)
-      else
-        # Update existing question.
-        question = Question.find(question_key)
-        Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
+    if params[:question]
+      params[:question].each_key do |question_key|
+        if params[:question][question_key][:txt].strip.empty?
+          # question text is empty, delete the question
+          Question.delete(question_key)
+        else
+          # Update existing question.
+          question = Question.find(question_key)
+          Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
+        end
       end
     end
     end

@@ -10,8 +10,6 @@ class Participant < ActiveRecord::Base
   has_many :awarded_badges, dependent: :destroy
   has_many :badges, through: :awarded_badges
   has_one :review_grade, dependent: :destroy
-  attr_accessible :can_submit, :can_review, :user_id, :parent_id, :submitted_at, :permission_granted,
-                  :penalty_accumulated, :grade, :type, :handle, :digital_signature, :duty, :can_take_quiz, :Hamer, :Lauw
   validates :grade, numericality: {allow_nil: true}
   has_paper_trail
   delegate :course, to: :assignment

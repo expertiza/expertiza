@@ -178,5 +178,4 @@ class SignUpTopic < ActiveRecord::Base
       SignedUpTeam.clear_waitlisted_teams_for_topic(topic.id) if !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
     end
   end
-
 end

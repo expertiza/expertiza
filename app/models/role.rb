@@ -3,19 +3,24 @@ require "menu"
 
 class Role < ActiveRecord::Base
 <<<<<<< HEAD
+<<<<<<< HEAD
   belongs_to :parent, class_name: 'Role', inverse_of: false
   has_many :users, inverse_of: false, dependent: :nullify
 =======
   belongs_to :parent, class_name: 'Role'
   has_many :users, dependent: :destroy
 >>>>>>> Rahul and Shraddha Code Climate Fixes
+=======
+  belongs_to :parent, class_name: 'Role', inverse_of: false
+  has_many :users, inverse_of: false, dependent: :nullify
+>>>>>>> Final changes with all tests passed
 
   serialize :cache
   validates :name, presence: true
   validates :name, uniqueness: true
 
-  attr_accessor :cache, :student, :ta, :instructor, :administrator, :superadministrator
-  # attr_reader :student, :ta, :instructor, :administrator, :superadministrator
+  attr_accessor :cache
+  attr_reader :student, :ta, :instructor, :administrator, :superadministrator
 
   def cache
     @cache = {}
@@ -99,7 +104,7 @@ class Role < ActiveRecord::Base
   end
 
   # return ids of roles that are below this role
-  def fetch_available_roles
+  def get_available_roles
     ids = []
 
     current = self.parent_id
@@ -119,8 +124,12 @@ class Role < ActiveRecord::Base
   def get_parents
 =======
   # "parents" are lesser roles. This returns a list including this role and all lesser roels.
+<<<<<<< HEAD
   def read_parents
 >>>>>>> Rahul and Shraddha Code Climate Fixes
+=======
+  def get_parents
+>>>>>>> Final changes with all tests passed
     parents = []
     seen = {}
 
@@ -146,6 +155,7 @@ class Role < ActiveRecord::Base
 
   # determine if the current role has all the privileges of the parameter role
 <<<<<<< HEAD
+<<<<<<< HEAD
   # If the current role is the same as the parameter role, return true
   # That is, use greater-than-or-equal-to logic
 
@@ -153,6 +163,9 @@ class Role < ActiveRecord::Base
 =======
   def all_privileges_of?(target_role)
 >>>>>>> Rahul and Shraddha Code Climate Fixes
+=======
+  def all_privileges_of(target_role)
+>>>>>>> Final changes with all tests passed
     privileges = {}
     privileges["Student"] = 1
     privileges["Teaching Assistant"] = 2
@@ -170,10 +183,14 @@ class Role < ActiveRecord::Base
       self.description = role_params[:description]
       self.save
 <<<<<<< HEAD
+<<<<<<< HEAD
     rescue StandardError
 =======
     rescue StandardError => _
 >>>>>>> Rahul and Shraddha Code Climate Fixes
+=======
+    rescue StandardError
+>>>>>>> Final changes with all tests passed
       false
     end
   end

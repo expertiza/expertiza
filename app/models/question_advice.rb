@@ -1,9 +1,13 @@
 class QuestionAdvice < ActiveRecord::Base
 <<<<<<< HEAD
+<<<<<<< HEAD
   attr_accessible :score, :advice
 =======
   attr_accessor :question_id, :score, :advice
 >>>>>>> Rahul and Shraddha Code Climate Fixes
+=======
+  attr_accessible :score, :advice
+>>>>>>> Final changes with all tests passed
   belongs_to :question
 
   # This method returns an array of fields present in question advice model

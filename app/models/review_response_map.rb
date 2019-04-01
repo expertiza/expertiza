@@ -1,5 +1,6 @@
 class ReviewResponseMap < ResponseMap
 <<<<<<< HEAD
+<<<<<<< HEAD
   belongs_to :reviewee, class_name: 'Team', foreign_key: 'reviewee_id', inverse_of: false
   belongs_to :contributor, class_name: 'Team', foreign_key: 'reviewee_id', inverse_of: false
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id', inverse_of: false
@@ -16,13 +17,18 @@ class ReviewResponseMap < ResponseMap
   belongs_to :contributor, class_name: 'Team', foreign_key: 'reviewee_id', inverse_of: :reviewResponseMap
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id', inverse_of: :reviewResponseMap
 >>>>>>> Rahul and Shraddha Code Climate Fixes
+=======
+  belongs_to :reviewee, class_name: 'Team', foreign_key: 'reviewee_id', inverse_of: false
+  belongs_to :contributor, class_name: 'Team', foreign_key: 'reviewee_id', inverse_of: false
+  belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id', inverse_of: false
+>>>>>>> Final changes with all tests passed
 
   # Find a review questionnaire associated with this review response map's assignment
   def questionnaire(round_number = nil, topic_id = nil)
     Questionnaire.find(self.assignment.review_questionnaire_id(round_number, topic_id))
   end
 
-  def fetch_title
+  def get_title
     "Review"
   end
 

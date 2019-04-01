@@ -9,12 +9,18 @@ class Node < ActiveRecord::Base
   # acts_as_nested_set
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   belongs_to :parent, class_name: 'Node', foreign_key: 'parent_id', inverse_of: false
   has_many :children, class_name: Node, foreign_key: 'parent_id', dependent: :nullify, inverse_of: false
 =======
   belongs_to :parent, class_name: 'Node', foreign_key: 'parent_id'
   has_many :children, class_name: Node, foreign_key: 'parent_id'
 >>>>>>> Rahul and Shraddha Code Climate Fixes
+=======
+  belongs_to :parent, class_name: 'Node', foreign_key: 'parent_id', inverse_of: false
+  has_many :children, class_name: Node, foreign_key: 'parent_id', dependent: :nullify, inverse_of: false
+  attr_accessible :parent_id, :node_object_id, :type
+>>>>>>> Final changes with all tests passed
 
   # Retrieves the nodes of this type
   def self.get(_sortvar = nil, _sortorder = nil, _user_id = nil, _show = nil, _parent_id = nil, _search = nil); end

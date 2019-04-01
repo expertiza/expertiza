@@ -1,11 +1,16 @@
 class QuestionnaireNode < Node
 <<<<<<< HEAD
+<<<<<<< HEAD
   belongs_to :questionnaire, class_name: "Questionnaire", foreign_key: "node_object_id", inverse_of: false
   belongs_to :node_object, class_name: "Questionnaire", foreign_key: "node_object_id", inverse_of: false
 =======
   belongs_to :questionnaire, class_name: "Questionnaire", foreign_key: "node_object_id"
   belongs_to :node_object, class_name: "Questionnaire", foreign_key: "node_object_id"
 >>>>>>> Rahul and Shraddha Code Climate Fixes
+=======
+  belongs_to :questionnaire, class_name: "Questionnaire", foreign_key: "node_object_id", inverse_of: false
+  belongs_to :node_object, class_name: "Questionnaire", foreign_key: "node_object_id", inverse_of: false
+>>>>>>> Final changes with all tests passed
 
   def self.table
     "questionnaires"
@@ -17,6 +22,7 @@ class QuestionnaireNode < Node
                      'questionnaires.instructor_id = ?'
                    else
                      'questionnaires.instructor_id in (?)'
+<<<<<<< HEAD
 <<<<<<< HEAD
                    end
                  elsif User.find(user_id).role.name != "Teaching Assistant"
@@ -32,6 +38,13 @@ class QuestionnaireNode < Node
                      '(questionnaires.private = 0 or questionnaires.instructor_id in (?))'
                                 end
 >>>>>>> Rahul and Shraddha Code Climate Fixes
+=======
+                   end
+                 elsif User.find(user_id).role.name != "Teaching Assistant"
+                   '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
+                 else
+                   '(questionnaires.private = 0 or questionnaires.instructor_id in (?))'
+>>>>>>> Final changes with all tests passed
                  end
 
     values = if User.find(user_id).role.name != "Teaching Assistant"
@@ -47,8 +60,13 @@ class QuestionnaireNode < Node
     end
     sortvar = 'name' if sortvar.nil? or sortvar == 'directory_path'
     sortorder = 'ASC' if sortorder.nil?
+<<<<<<< HEAD
     (self.includes(:questionnaire).where([conditions, values]).order("questionnaires.#{sortvar} #{sortorder}") if Questionnaire.column_names.include? sortvar and
         %w[ASC DESC asc desc].include? sortorder)
+=======
+    self.includes(:questionnaire).where([conditions, values]).order("questionnaires.#{sortvar} #{sortorder}") if Questionnaire.column_names.include? sortvar and
+        %w[ASC DESC asc desc].include? sortorder
+>>>>>>> Final changes with all tests passed
   end
 
   def get_name

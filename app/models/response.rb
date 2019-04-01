@@ -5,8 +5,13 @@ class Response < ActiveRecord::Base
   # Added for E1973. A team review will have a lock on it so only one user at a time may edit it.
   include Lockable
   include ResponseAnalytic
+<<<<<<< HEAD
   belongs_to :response_map, class_name: 'ResponseMap', foreign_key: 'map_id', inverse_of: false
   
+=======
+  attr_accessible :map_id, :additional_comment, :version_num, :round, :is_submitted
+  belongs_to :response_map, class_name: 'ResponseMap', foreign_key: 'map_id', inverse_of: false
+>>>>>>> Final changes with all tests passed
   has_many :scores, class_name: 'Answer', foreign_key: 'response_id', dependent: :destroy, inverse_of: false
   # TODO: change metareview_response_map relationship to belongs_to
   has_many :metareview_response_maps, class_name: 'MetareviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy, inverse_of: false
@@ -207,18 +212,18 @@ class Response < ActiveRecord::Base
     reviewee_name = User.find(reviewee_participant.user_id).fullname
     assignment = Assignment.find(reviewer_participant.parent_id)
     Mailer.notify_grade_conflict_message(
-      to: assignment.instructor.email,
-      subject: 'Expertiza Notification: A review score is outside the acceptable range',
-      body: {
-        reviewer_name: reviewer_name,
-        type: 'review',
-        reviewee_name: reviewee_name,
-        new_score: total_score.to_f / maximum_score,
-        assignment: assignment,
-        conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s,
-        summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
-        assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
-      }
+        to: assignment.instructor.email,
+        subject: 'Expertiza Notification: A review score is outside the acceptable range',
+        body: {
+            reviewer_name: reviewer_name,
+            type: 'review',
+            reviewee_name: reviewee_name,
+            new_score: total_score.to_f / maximum_score,
+            assignment: assignment,
+            conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s,
+            summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
+            assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
+        }
     ).deliver_now
   end
 

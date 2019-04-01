@@ -1,9 +1,13 @@
 class PlagiarismCheckerAssignmentSubmission < ActiveRecord::Base
 <<<<<<< HEAD
+<<<<<<< HEAD
   attr_accessible :name
 =======
   attr_accessor :name , :simicheck_id, :created_at, :updated_at
 >>>>>>> Rahul and Shraddha Code Climate Fixes
+=======
+  attr_accessible :name
+>>>>>>> Final changes with all tests passed
   belongs_to :assignment
   has_many :plagiarism_checker_comparisons, dependent: :destroy
 

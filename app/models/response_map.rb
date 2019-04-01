@@ -1,5 +1,6 @@
 class ResponseMap < ActiveRecord::Base
 <<<<<<< HEAD
+<<<<<<< HEAD
   has_many :response, foreign_key: 'map_id', dependent: :destroy, inverse_of: false
   belongs_to :reviewer, class_name: 'Participant', foreign_key: 'reviewer_id', inverse_of: false
 =======
@@ -7,6 +8,11 @@ class ResponseMap < ActiveRecord::Base
   has_many :response, foreign_key: 'map_id', dependent: :destroy, inverse_of: :response_map
   belongs_to :reviewer, class_name: 'Participant', foreign_key: 'reviewer_id', inverse_of: :response_map
 >>>>>>> Rahul and Shraddha Code Climate Fixes
+=======
+  has_many :response, foreign_key: 'map_id', dependent: :destroy, inverse_of: false
+  belongs_to :reviewer, class_name: 'Participant', foreign_key: 'reviewer_id', inverse_of: false
+  attr_accessible :reviewed_object_id, :reviewer_id, :reviewee_id, :type, :calibrate_to
+>>>>>>> Final changes with all tests passed
 
   def map_id
     id
@@ -16,10 +22,14 @@ class ResponseMap < ActiveRecord::Base
   def self.get_assessments_for(team)
     responses = []
 <<<<<<< HEAD
+<<<<<<< HEAD
     # stime = Time.now
 =======
     # stime = Time.now.in_time_zone
 >>>>>>> Rahul and Shraddha Code Climate Fixes
+=======
+    # stime = Time.now
+>>>>>>> Final changes with all tests passed
     if team
       @array_sort = []
       @sort_to = []
@@ -57,13 +67,17 @@ class ResponseMap < ActiveRecord::Base
 
   # return latest versions of the response given by reviewer
   def self.get_reviewer_assessments_for(team, reviewer)
+<<<<<<< HEAD
     # get_reviewer may return an AssignmentParticipant or an AssignmentTeam
     map = where(reviewee_id: team.id, reviewer_id: reviewer.get_reviewer.id)
+=======
+    map = where(reviewee_id: team.id, reviewer_id: reviewer.id)
+>>>>>>> Final changes with all tests passed
     Response.where(map_id: map).sort {|m1, m2| self.comparator(m1, m2) }[0]
   end
 
   # Placeholder method, override in derived classes if required.
-  def fetch_all_versions
+  def get_all_versions
     []
   end
 

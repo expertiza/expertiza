@@ -34,12 +34,17 @@ class MultipleChoiceRadio < QuizQuestion
     end
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     html.html_safe
     # safe_join(html)
 =======
     # html.html_safe
     safe_join(html)
 >>>>>>> Rahul and Shraddha Code Climate Fixes
+=======
+    html.html_safe
+    # safe_join(html)
+>>>>>>> Final changes with all tests passed
   end
 
   def complete
@@ -80,12 +85,17 @@ class MultipleChoiceRadio < QuizQuestion
     html += '</b>'
     html += '<br><br><hr>'
 <<<<<<< HEAD
+<<<<<<< HEAD
     html.html_safe
     # safe_join(html)
 =======
     # html.html_safe
     safe_join(html)
 >>>>>>> Rahul and Shraddha Code Climate Fixes
+=======
+    html.html_safe
+    # safe_join(html)
+>>>>>>> Final changes with all tests passed
   end
 
   def isvalid(choice_info)

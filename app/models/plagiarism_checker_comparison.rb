@@ -1,9 +1,13 @@
 class PlagiarismCheckerComparison < ActiveRecord::Base
 <<<<<<< HEAD
+<<<<<<< HEAD
   attr_accessible :similarity_link, :similarity_percentage, :file1_name, :file1_team, :file2_name, :file2_team
 =======
   attr_accessor :similarity_link, :similarity_percentage, file1_name, file1_id, file1_team, file2_name, file2_id, file2_team
 >>>>>>> Rahul and Shraddha Code Climate Fixes
+=======
+  attr_accessible :similarity_link, :similarity_percentage, :file1_name, :file1_team, :file2_name, :file2_team
+>>>>>>> Final changes with all tests passed
   belongs_to :plagiarism_checker_assignment_submission
 
   # t.string :similarity_link

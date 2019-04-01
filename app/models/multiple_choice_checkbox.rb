@@ -37,10 +37,14 @@ class MultipleChoiceCheckbox < QuizQuestion
     end
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     html.html_safe
     # safe_join(html)
 =======
     # html.html_safe
+=======
+    html.html_safe
+>>>>>>> Final changes with all tests passed
     safe_join(html)
 >>>>>>> Rahul and Shraddha Code Climate Fixes
   end
@@ -78,12 +82,17 @@ class MultipleChoiceCheckbox < QuizQuestion
     end
     html += '<br><hr>'
 <<<<<<< HEAD
+<<<<<<< HEAD
     html.html_safe
     # safe_join(html)
 =======
     # html.html_safe
     safe_join(html)
 >>>>>>> Rahul and Shraddha Code Climate Fixes
+=======
+    html.html_safe
+    # safe_join(html)
+>>>>>>> Final changes with all tests passed
   end
 
   def isvalid(choice_info)

@@ -176,7 +176,6 @@ class QuizQuestionnaireController < QuestionnairesController
         end
       end
     end
-    end
   end
 
   def save_choices(questionnaire_id)

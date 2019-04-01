@@ -56,6 +56,7 @@
         </p>
       <% end %>
       <p>
+      <%= form_tag('/tags.csv', method: 'put',:id => 'tst') do %>
       <div id="tab-summary">
         <h4  align="center">Summary for each user</h4>
         <table class="table table-striped sortable">
@@ -70,7 +71,7 @@
             <th>Tags export</th>
           </tr>
           </thead>
-          <%= form_tag('/tags.csv', method: 'put',:id => 'tst') do %>
+
           <% @user_tagging_report.each do |key, val| %>
               <tr>
                 <td><%= val.user.name(session[:ip]) %></td>
@@ -83,9 +84,9 @@
               </tr>
           <% end %>
         </table>
-            <%= submit_tag("Export", :class => "btn btn-default") %>
-            <% end %>
       </div>
+      <%= submit_tag "Export",:value => 'Export' ,:form => 'tst',method: 'put' %>
+      <% end %>
       </p>
     </div>
 <% end %>

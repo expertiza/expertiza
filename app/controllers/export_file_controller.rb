@@ -99,12 +99,14 @@ class ExportFileController < ApplicationController
   end
 
   def export_tags
-    tag_deployments = TagPromptDeployment.all
-    puts (params[:names])
-    @students = AnswerTag.select('answers.*, answer_tags.*').joins( :answer).where("answer_tags.answer_id = answers.id")
+    puts params
+    @user_ids = User.where("name IN (?)", params[:names])
+    @students = AnswerTag.select('answers.*, answer_tags.*').joins(:answer).where("answer_tags.answer_id = answers.id and answer_tags.user_id IN (?)", @user_ids.pluck(:id))
+
+    # @students = AnswerTag.select('answers.*, answer_tags.*').joins( :answer).where("answer_tags.answer_id = answers.id")
     # @students = @students.where("answer_tags.answer_id = answers.id and users.id=answer_tags.user_id and users.name IN (?)",params[:names])
     delimiter = ","
-    attributes = %w[comments user_id value]
+    attributes = %w[user_id comments value]
 
     csv_data = CSV.generate(col_sep: delimiter) do |csv|
       csv << attributes

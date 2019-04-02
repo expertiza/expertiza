@@ -423,7 +423,7 @@ class ReviewMappingController < ApplicationController
           break if selected_participants.size == participants.size - num_participants_this_team
 
           # generate random number
-          rand_num = assign_random_number(iterator, num_participants, participants_hash)
+          rand_num = assign_random_number(participants, iterator, num_participants, participants_hash)
 
           # prohibit one student to review his/her own artifact
           next if TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id)
@@ -552,7 +552,7 @@ class ReviewMappingController < ApplicationController
   #Moved the min_value checking down as well because it is only used to create the random_num
   #assigns a random number to be used. If condition 1 or 2 are met, randomize from 0 to participant count - 1
   #if condition 1 or 2 are not met, randomize between 0 and participants with the minimum amount of reviews assigned count - 1
-  def assign_random_number(iterator, num_participants, participants_hash)
+  def assign_random_number(participants, iterator, num_participants, participants_hash)
     index_shift = 1
     index_start = 0
     single_student = 1

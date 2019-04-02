@@ -271,20 +271,20 @@ describe QuestionnairesController do
                                  display_type: 'Review',
                                  instructor_loc: ''}}
       @params_with_question = {id: 1,
-                                questionnaire: {name: 'test questionnaire',
-                                                instructor_id: 6,
-                                                private: 0,
-                                                min_question_score: 0,
-                                                max_question_score: 5,
-                                                type: 'ReviewQuestionnaire',
-                                                display_type: 'Review',
-                                                instructor_loc: ''},
-                                question: {'1' => {seq: 66.0,
-                                                   txt: 'WOW',
-                                                   weight: 10,
-                                                   size: '50,3',
-                                                   max_label: 'Strong agree',
-                                                   min_label: 'Not agree'}}}
+                               questionnaire: {name: 'test questionnaire',
+                                               instructor_id: 6,
+                                               private: 0,
+                                               min_question_score: 0,
+                                               max_question_score: 5,
+                                               type: 'ReviewQuestionnaire',
+                                               display_type: 'Review',
+                                               instructor_loc: ''},
+                               question: {'1' => {seq: 66.0,
+                                                  txt: 'WOW',
+                                                  weight: 10,
+                                                  size: '50,3',
+                                                  max_label: 'Strong agree',
+                                                  min_label: 'Not agree'}}}
     end
     context 'successfully updates the attributes of questionnaire' do
       it 'redirects to questionnaires#edit page after updating' do
@@ -330,9 +330,9 @@ describe QuestionnairesController do
         params = {id: 1,
                   add_new_questions: true,
                   new_question: {total_num: 2,
-                             type: 'Criterion'}}
+                                 type: 'Criterion'}}
         post :update, params
-        expect(response).to redirect_to :action => :add_new_questions, :id => params[:id], :question => params[:new_question]
+        expect(response).to redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]
       end
     end
   end

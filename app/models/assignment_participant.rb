@@ -204,16 +204,24 @@ class AssignmentParticipant < Participant
     user = ImportFileHelper.create_new_user(attributes, session)
 
     raise ImportError, "The assignment with id \"#{id}\" was not found." if Assignment.find(id).nil?
-    unless AssignmentParticipant.exists?(user_id: user.id, parent_id: id)
-      new_part = AssignmentParticipant.create(user_id: user.id, parent_id: id)
-      new_part.set_handle
-      # Spring19 AHP
-      # MailerHelper.prepared_mail_deliver(user)
-      prepared_mail = MailerHelper.send_mail_to_user(user, "Your Expertiza account and password have been created.", "user_welcome", "password")
-      prepared_mail.deliver
-    end
-    #-------------------------------------------------------
+    return if AssignmentParticipant.exists?(user_id: user.id, parent_id: id)
+    new_part = AssignmentParticipant.create(user_id: user.id, parent_id: id)
+    new_part.set_handle
   end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   # grant publishing rights to one or more assignments. Using the supplied private key,
   # digital signatures are generated.
@@ -268,5 +276,13 @@ class AssignmentParticipant < Participant
       return (assignment.staggered_deadline? ? TopicDueDate.find_by(parent_id: topic_id).try(:last).try(:due_at) : assignment.due_dates.last.due_at).to_s
     end
     stage
+  end
+
+#function to check if it is final round
+  def final_round?
+    topic_id = SignedUpTeam.topic_id(self.parent_id, self.user_id)
+    return false if topic_id.nil? and self.staggered_deadline?
+    next_due_date = DueDate.get_next_due_date(self.parent_id, topic_id)
+    return !!(next_due_date.round == assignment.num_review_rounds && next_due_date.deadline_type_id == 2)
   end
 end

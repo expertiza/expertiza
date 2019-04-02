@@ -140,7 +140,7 @@ class QuestionnairesController < ApplicationController
         @questionnaire.update_attributes(questionnaire_params)
 
         # Save all questions
-        if !params[:question].nil?
+        unless params[:question].nil?
           params[:question].each_pair do |k, v|
             @question = Question.find(k)
             # example of 'v' value

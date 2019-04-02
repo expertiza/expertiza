@@ -592,7 +592,6 @@ ActiveRecord::Schema.define(version: 20190322164307) do
     t.integer "team_id",                    limit: 4, default: 0,     null: false
     t.boolean "is_waitlisted",                        default: false, null: false
     t.integer "preference_priority_number", limit: 4
-    t.boolean "auto_dropped_from_waitlist",           default: false, null: false
   end
 
   add_index "signed_up_teams", ["topic_id"], name: "fk_signed_up_users_sign_up_topics", using: :btree

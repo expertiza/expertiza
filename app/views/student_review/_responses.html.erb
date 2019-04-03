@@ -70,7 +70,7 @@
                       <% end %>
                     <% end %>
 
-                    <td><%= link_to "Nominate", {:controller => 'team_nominations', :action => 'list_badges', :id => @assignment, :model => 'Assignment', :team_id => map.reviewee_id} %></td>
+                    <td><%= link_to "Nominate", {:controller => 'team_nominations', :action => 'list_badges', :id => @assignment, :model => 'Assignment', :team_id => map.reviewee_id}, target: :_blank %></td>
 
                     <td><%= "  -- latest update at #{@latest_response.updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p")}" %></td>
           <%end%>

@@ -55,5 +55,5 @@ When editing existing files:
  * Keep the existing line ending style (dos/unix)
  * Follow the Ruby style Guide on code you add or edit, as above
 
-Please do no go crazy changing old code to match these guidelines; it will just create lots of potential merge conflicts.
+Please do not go crazy changing old code to match these guidelines; it will just create lots of potential merge conflicts.
 Applying style guidelines to code you add and modify is good enough. :-)

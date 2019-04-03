@@ -22,6 +22,10 @@ ActiveRecord::Schema.define(version: 20181205201208) do
     t.datetime "updated_at",                           null: false
   end
 
+
+
+  
+
   add_index "answer_tags", ["answer_id"], name: "index_answer_tags_on_answer_id", using: :btree
   add_index "answer_tags", ["tag_prompt_deployment_id"], name: "index_answer_tags_on_tag_prompt_deployment_id", using: :btree
   add_index "answer_tags", ["user_id"], name: "index_answer_tags_on_user_id", using: :btree

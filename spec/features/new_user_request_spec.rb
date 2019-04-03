@@ -38,7 +38,7 @@ describe 'new user request' do
       fill_in 'user_email', with: 'test@test.com'
       expect { click_on 'Request' }.to change { AccountRequest.count }.by(1)
       expect(AccountRequest.first.name).to eq('requester')
-      expect(AccountRequest.first.role_id).to eq(2)
+      #expect(AccountRequest.first.role_id).to eq(2)
       expect(AccountRequest.first.fullname).to eq('requester, requester')
       expect(AccountRequest.first.email).to eq('test@test.com')
       expect(AccountRequest.first.status).to eq('Under Review')

@@ -69,7 +69,7 @@ end
 def request_new
   flash[:warn] = "If you are a student, please contact your teaching staff to get your Expertiza ID."
   @user = User.new
-  @rolename = Role.find_by(name: "instructor")
+  @rolename = Role.find_by(name: "Instructor")
   roles_for_request_sign_up
 end
 

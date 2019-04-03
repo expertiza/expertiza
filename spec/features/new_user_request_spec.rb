@@ -10,7 +10,7 @@ describe 'new user request' do
 
   context 'request account feature' do
     it 'works correctly', js: true do
-      # click 'REQUEST ACCOUNT' button on root path, redirect to users#request_new page
+      # click 'REQUEST ACCOUNT' button on root path, redirect to account_request#request_new page
       visit '/'
       click_link 'Request account'
       expect(page).to have_current_path('/account_requests/request_new?role=instructor')
@@ -22,8 +22,8 @@ describe 'new user request' do
       expect(page).to have_field("institution_name")
       fill_in 'institution_name', with: 'Xavier Institute for Mutant Education and Outreach'
       # a new user is able to write a brief introduction
-      expect(page).to have_field('requested_user_self_introduction')
-      fill_in 'requested_user_self_introduction', with: 'The Xavier\'s School for Gifted Youngsters is a special
+      expect(page).to have_field('account_request_self_introduction')
+      fill_in 'account_request_self_introduction', with: 'The Xavier\'s School for Gifted Youngsters is a special
         institute founded and led by Professor Charles Xavier to train young mutants in controlling their powers
         and help foster a friendly human-mutant relationship.'
       # if the email address of a new user is not valid, the flash message should display the corresponding messages

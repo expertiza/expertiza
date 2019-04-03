@@ -462,7 +462,7 @@ ActiveRecord::Schema.define(version: 20190315164730) do
     t.boolean "iscorrect",                 default: false
   end
 
-  create_table "requested_users", force: :cascade do |t|
+  create_table "account_requests", force: :cascade do |t|
     t.string   "name",              limit: 255
     t.integer  "role_id",           limit: 4
     t.string   "fullname",          limit: 255

@@ -5,9 +5,6 @@ describe AccountRequestsController do
 
   let(:requested_user1) {AccountRequest.new id: 4, name: 'requester1', role_id: 2, fullname: 're, requester1',
                                             institution_id: 1, email: 'requester1@test.com', status: nil, self_introduction: 'no one'}
-  let(:superadmin) {build(:superadmin)}
-  let(:assignment) {build(:assignment, id: 1, name: "test_assignment", instructor_id: 2, 
-    participants: [build(:participant, id: 1, user_id: 1, assignment: assignment)], course_id: 1)}
   before(:each) do
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
@@ -32,12 +29,12 @@ describe AccountRequestsController do
   context "#create_requested_user_record" do
     it 'if user not exists and requested user is saved' do
       params = {
-        user: {name: 'instructor6',
+          user: {name: 'instructor6',
                role_id: 2,
                fullname: '6, instructor',
                institution_id: 1,
                email: 'chenzy@gmail.com'},
-        requested_user: {self_introduction: 'I am good'}
+          account_request: {self_introduction: 'I am good'}
       }
       post :create_requested_user_record, params # session
       expect(flash[:success]).to eq 'User signup for "instructor6" has been successfully requested.'
@@ -47,12 +44,12 @@ describe AccountRequestsController do
     it 'if user exists' do
       allow(User).to receive(:find_by).with(name: 'instructor6').and_return(instructor)
       params = {
-        user: {name: 'instructor6',
+          user: {name: 'instructor6',
                role_id: 2,
                fullname: '6, instructor',
                institution_id: 1,
                email: 'chenzy@gmail.com'},
-        requested_user: {self_introduction: 'I am good'}
+          account_request: {self_introduction: 'I am good'}
       }
       post :create_requested_user_record, params
       expect(flash[:error]).to eq 'The account you are requesting has already existed in Expertiza.'
@@ -62,12 +59,12 @@ describe AccountRequestsController do
     it 'if requested user is not saved' do
       expect_any_instance_of(AccountRequest).to receive(:save).and_return(false)
       params = {
-        user: {name: 'instructor6',
+          user: {name: 'instructor6',
                role_id: 2,
                fullname: '6, instructor',
                institution_id: 1,
                email: 'chenzy@gmail.com'},
-        requested_user: {self_introduction: 'I am good'}
+          account_request: {self_introduction: 'I am good'}
       }
       post :create_requested_user_record, params
       expect(response).to redirect_to('http://test.host/account_requests/request_new')
@@ -75,13 +72,13 @@ describe AccountRequestsController do
 
     it 'if user not exists, requested user is saved and params[:user][:institution_id] is empty' do
       params = {
-        user: {name: 'instructor6',
+          user: {name: 'instructor6',
                role_id: 2,
                fullname: '6, instructor',
                institution_id: [],
                email: 'chenzy@gmail.com'},
-        requested_user: {self_introduction: 'I am good'},
-        institution: {name: 'google'}
+          account_request: {self_introduction: 'I am good'},
+          institution: {name: 'google'}
       }
       post :create_requested_user_record, params
       expect(response).to redirect_to('http://test.host/instructions/home')

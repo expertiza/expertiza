@@ -13,7 +13,7 @@ describe 'new user request' do
       # click 'REQUEST ACCOUNT' button on root path, redirect to users#request_new page
       visit '/'
       click_link 'Request account'
-      expect(page).to have_current_path('/account_requests/request_new?role=Instructor')
+      expect(page).to have_current_path('/account_requests/request_new?role=instructor')
       select 'Instructor', from: 'user_role_id'
       fill_in 'user_name', with: 'requester'
       fill_in 'user_fullname', with: 'requester, requester'

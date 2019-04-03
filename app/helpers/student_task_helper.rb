@@ -37,4 +37,8 @@ module StudentTaskHelper
     end
     info.html_safe
   end
+
+  def has_review_deadline?(assignment)
+    return assignment.find_due_dates('review').present?
+  end
 end

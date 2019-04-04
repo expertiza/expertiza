@@ -1,0 +1,15 @@
+%p#notice= notice
+
+%p
+  %b Topic:
+  = @review_bid.topic_id
+%p
+  %b Student:
+  = @review_bid.student_id
+%p
+  %b Priority:
+  = @review_bid.priority
+
+= link_to 'Edit', edit_review_bid_path(@review_bid)
+\|
+= link_to 'Back', review_bids_path

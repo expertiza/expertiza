@@ -1,4 +1,5 @@
 Expertiza::Application.routes.draw do
+  resources :review_bids
   ###
   # Please insert new routes alphabetically!
   ###

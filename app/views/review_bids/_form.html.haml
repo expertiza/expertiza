@@ -1,0 +1,19 @@
+= form_for @review_bid do |f|
+  - if @review_bid.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@review_bid.errors.count, "error")} prohibited this review_bid from being saved:"
+      %ul
+        - @review_bid.errors.full_messages.each do |message|
+          %li= message
+
+  .field
+    = f.label :topic_id
+    = f.number_field :topic_id
+  .field
+    = f.label :student_id
+    = f.number_field :student_id
+  .field
+    = f.label :priority
+    = f.number_field :priority
+  .actions
+    = f.submit 'Save'

@@ -1,0 +1,25 @@
+%h1 Listing review_bids
+
+%table
+  %thead
+    %tr
+      %th Topic
+      %th Student
+      %th Priority
+      %th
+      %th
+      %th
+
+  %tbody
+    - @review_bids.each do |review_bid|
+      %tr
+        %td= review_bid.topic_id
+        %td= review_bid.student_id
+        %td= review_bid.priority
+        %td= link_to 'Show', review_bid
+        %td= link_to 'Edit', edit_review_bid_path(review_bid)
+        %td= link_to 'Destroy', review_bid, method: :delete, data: { confirm: 'Are you sure?' }
+
+%br
+
+= link_to 'New Review bid', new_review_bid_path

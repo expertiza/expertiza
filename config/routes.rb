@@ -2,6 +2,9 @@ Expertiza::Application.routes.draw do
   ###
   # Please insert new routes alphabetically!
   ###
+  require 'sidekiq/web'
+  mount Sidekiq::Web => '/sidekiq'
+
   resources :admin, only: [] do
     collection do
       get :list_super_administrators
@@ -37,10 +40,8 @@ Expertiza::Application.routes.draw do
 
   resources :assessment360, only: [] do
     collection do
-      # get :one_course_all_assignments
+      get :course_student_grade_summary
       get :all_students_all_reviews
-      # get :one_student_all_reviews
-      # get :one_assignment_all_students
     end
   end
 
@@ -109,6 +110,7 @@ Expertiza::Application.routes.draw do
       get :export
       post :export
       post :exportdetails
+      post :export_advices
     end
   end
 
@@ -223,8 +225,6 @@ resources :institution, except: [:destroy] do
   resources :questionnaires, only: %i[new create edit update] do
     collection do
       get :copy
-      get :list
-      post :list_questionnaires
       get :new_quiz
       get :select_questionnaire_type
       post :select_questionnaire_type
@@ -250,6 +250,13 @@ resources :institution, except: [:destroy] do
   resources :questions do
     collection do
       get :types
+    end
+  end
+
+  resources :reports, only: [] do
+    collection do
+      post :response_report
+      get :response_report
     end
   end
 
@@ -289,8 +296,8 @@ resources :institution, except: [:destroy] do
       get :delete_reviewer
       get :distribution
       get :list_mappings
-      get :response_report
-      post :response_report
+      # post :response_report
+      # get :response_report
       get :select_metareviewer
       get :select_reviewer
       get :select_mapping
@@ -461,10 +468,9 @@ resources :institution, except: [:destroy] do
 
   resources :user_pastebins
 
-  resources :versions, only: %i[index show destroy] do
+  resources :versions, only: %i[index show] do
     collection do
       get :search
-      delete '', action: :destroy_all
     end
   end
 

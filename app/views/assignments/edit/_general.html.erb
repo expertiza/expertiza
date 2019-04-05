@@ -50,7 +50,7 @@ function microtaskChanged() {
 
 <tr><div class="form-inline">
 <td style='padding:5px'><%= label_tag('assignment_form[assignment][directory_path]', 'Submission directory:') %></td>
-<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, :style => 'width:250px', class: 'form-control') %>  (Mandatory field. No space or special chars.)
+<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, :style => 'width:250px', class: 'form-control') %>  (Mandatory field. No space or special chars. <br/> Directory name will be auto-generated if not provided. In the form of assignment_[assignment_id].)
   <img src="/assets/info.png" title='- DO NOT change this filed for an on-going assignment. This may cause lost of student submitted file.'>
 </td></div>
 </tr>
@@ -178,22 +178,22 @@ function microtaskChanged() {
     <td style='padding:5px'>
       <input type="checkbox" name = "toggle_simicheck_setting" id="toggle_simicheck_setting" <%= "checked" if @assignment_form.assignment.simicheck != -1 %> onclick="useSimicheckChanged()"></input>
       <%= label_tag('toggle_simicheck_setting', 'Use simicheck?') %>
-    </td>
-    <td style='padding:5px' id='assignment_simicheck_field' <%= "hidden" if @assignment_form.assignment.simicheck == -1 %> >
-      <div class="form-inline">
-      <%= label_tag('assignment_form[assignment][simicheck]', 'SimiCheck Delay') %>
-      <%= select('assignment_form[assignment]', 'simicheck', (-1..100).to_a.map{|n| n== -1? ['No SimiCheck', -1] : [n, n]}, {:selected => @assignment_form.assignment.simicheck}, {:class => 'form-control', :style => 'width: 150px'}) %><b> hours</b>
-      <br></br>
-      <%= label_tag('assignment_form[assignment][simicheck_threshold]', 'SimiCheck Similarity Threshold') %>
-      <%= select('assignment_form[assignment]', 'simicheck_threshold', (0..100).to_a.map{|n| n== 100? ['', 100]: [n, n]}, {:selected => @assignment_form.assignment.simicheck_threshold}, {:class => 'form-control', :style => 'width: 50px'}) %><b> %</b>
-      <br>(Filter that refers to % text same between 2 docs)</br>
+      <div style='padding:5px' id='assignment_simicheck_field' <%= "hidden" if @assignment_form.assignment.simicheck == -1 %> >
+        <div class="form-inline">
+          <%= label_tag('assignment_form[assignment][simicheck]', 'SimiCheck Delay') %>
+          <%= select('assignment_form[assignment]', 'simicheck', (-1..100).to_a.map{|n| n== -1? ['No SimiCheck', -1] : [n, n]}, {:selected => @assignment_form.assignment.simicheck}, {:class => 'form-control', :style => 'width: 150px'}) %><b> hours</b>
+          <br></br>
+          <%= label_tag('assignment_form[assignment][simicheck_threshold]', 'SimiCheck Similarity Threshold') %>
+          <%= select('assignment_form[assignment]', 'simicheck_threshold', (0..100).to_a.map{|n| n== 100? ['', 100]: [n, n]}, {:selected => @assignment_form.assignment.simicheck_threshold}, {:class => 'form-control', :style => 'width: 70px'}) %><b> %</b>
+          <br>(Filter that refers to % text same between 2 docs)</br>
+        </div>
       </div>
     </td>
   </tr>
 
   <!-- Start answer tagging code -->
   <tr>
-    <td style='padding:5px' class="form-inline">
+    <td style='padding:5px' class="form-inline" colspan="2">
       <input name="assignment_form[assignment][is_answer_tagging_allowed]" type="hidden" value="false" onclick="useAnswerTagChanged()"/>
       <%= check_box_tag('assignment_form[assignment][is_answer_tagging_allowed]', 'true', @assignment_form.assignment.is_answer_tagging_allowed) %>
       <%= label_tag('assignment_form[assignment][is_answer_tagging_allowed]', 'Allow feedback comments to be tagged by the author?') %>

@@ -65,7 +65,7 @@
 
         <td align = 'left'> <%= Question.find(s.question_id).txt%></td>
         <td align = 'center'> <%= s.score%>/<%=@maxscore%></td>
-        <td align = 'left'> <%= s.comments %> </td>
+        <td align = 'left'> <%= sanitize s.comments %> </td>
 
       </tr>
     <%end%>
@@ -84,7 +84,7 @@
         <%if (Response.find(@reviewid).additional_comment)== nil%>
           <td> No Comments </td>
         <%else%>
-          <td> <%= Response.find(@reviewid).additional_comment%> </td>
+          <td> <%= sanitize Response.find(@reviewid).additional_comment%> </td>
         <%end%>
       </tr>
     </table>

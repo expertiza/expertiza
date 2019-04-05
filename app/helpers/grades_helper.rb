@@ -83,7 +83,7 @@ module GradesHelper
       vm.add_questions(questions)
       vm.add_team_members(@team)
       vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
-      vm.get_number_of_comments_greater_than_10_words
+      vm.number_of_comments_greater_than_10_words
       @vmlist << vm
     end
     # @current_role_name = current_role_name/
@@ -104,6 +104,7 @@ module GradesHelper
   def underlined?(score)
     return "underlined" if score.comment.present?
   end
+
 
   def display_github_metrics(parsed_data, authors, dates)
     data_array = []
@@ -162,5 +163,18 @@ module GradesHelper
         }
       }]
     }
+
+  def retrieve_questions(questionnaires, assignment_id)
+    questions = {}
+    questionnaires.each do |questionnaire|
+      round = AssignmentQuestionnaire.where(assignment_id: assignment_id, questionnaire_id: questionnaire.id).first.used_in_round
+      questionnaire_symbol = if !round.nil?
+                               (questionnaire.symbol.to_s + round.to_s).to_sym
+                             else
+                               questionnaire.symbol
+                             end
+      questions[questionnaire_symbol] = questionnaire.questions
+    end
+    questions
   end
 end

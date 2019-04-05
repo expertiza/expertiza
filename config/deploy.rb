@@ -55,7 +55,8 @@ set :linked_dirs, %w{log pg_data vendor/assets/components}
 # Default value for default_env is {}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
 set :default_env, { 
-  "PASSENGER_INSTANCE_REGISTRY_DIR" => "/var/run/passenger-instreg"
+  "PASSENGER_INSTANCE_REGISTRY_DIR" => "/var/run/passenger-instreg",
+  "JAVA_HOME" => "/usr/lib/jvm/java-1.8.0-openjdk.x86_64"
 }
 
 # Default value for local_user is ENV['USER']
@@ -68,20 +69,9 @@ set :keep_releases, 10
 # set :ssh_options, verify_host_key: :secure
 
 set :passenger_in_gemfile, true
-set :passenger_restart_with_touch, false
+set :passenger_restart_with_touch, true
 
 namespace :deploy do
-
-  desc 'Restart application'
-  task :restart do
-    on roles(:app), in: :sequence, wait: 5 do
-      execute :mkdir, '-p', "#{ release_path }/tmp"
-      execute :touch, release_path.join('tmp/restart.txt')
-    end
-  end
-
-  after :publishing, :restart
-
   after :restart, :clear_cache do
     on roles(:web), in: :groups, limit: 3, wait: 10 do
       # Here we can do anything such as:

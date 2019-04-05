@@ -433,6 +433,11 @@ end
 MODIFIED_FILES.each do |file|
   next unless file =~ /.*_spec\.rb$/
   diff = git.diff_for_file(file).patch
+  p '====diff================================================================================================'
+  p diff
+  break
+
+
   num_of_tests = diff.scan(/\s*it\s['"]/).count
   num_of_expect_key_words = diff.scan(/\s*expect\s*\(/).count
   num_of_expectation_without_machers = diff.scan(/\s*expect\s*[({][0-9a-zA-Z._]*[)}]\s*$/).count

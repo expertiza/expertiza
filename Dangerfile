@@ -113,7 +113,7 @@ if github.pr_diff.include? "TODO" or
   TODO_MESSAGE =
     markdown <<-MARKDOWN
 This pull request contains `TODO` task(s); please fix them.
-  MARKDOWN
+    MARKDOWN
 
   warn(TODO_MESSAGE, sticky: true)
 end
@@ -127,7 +127,7 @@ if git.added_files.grep(/.*temp.*/).any? or
   TEMP_FILE_MESSAGE =
     markdown <<-MARKDOWN
 You committed `temp`, `tmp` or `cache` files. Please remove them.
-   MARKDOWN
+    MARKDOWN
 
   fail(TEMP_FILE_MESSAGE, sticky: true)
 end
@@ -202,7 +202,7 @@ MODIFIED_FILES.each do |file|
   CREATE_MOCK_UP_OBJ_MESSAGE =
     markdown <<-MARKDOWN
   Using `create` in unit tests or integration tests may be overkill. Try to use `build` or `double` instead.
-        MARKDOWN
+    MARKDOWN
 
   warn(CREATE_MOCK_UP_OBJ_MESSAGE, sticky: true)
   break
@@ -232,7 +232,7 @@ if !CURRENT_MAINTAINERS.include? github.pr_author and
   TEST_HELPER_FILE_MESSAGE =
     markdown <<-MARKDOWN
 You should not change `rails_helper.rb` or `spec_helper.rb` file; please revert these changes.
-  MARKDOWN
+    MARKDOWN
 
   warn(TEST_HELPER_FILE_MESSAGE, sticky: true)
 end
@@ -404,7 +404,7 @@ if !CURRENT_MAINTAINERS.include? github.pr_author and MODIFIED_FILES.grep(/spec\
   FIXTURE_FILE_MESSAGE =
     markdown <<-MARKDOWN
 You modified `spec/factories/` folder; please double-check whether it is necessary.
-  MARKDOWN
+    MARKDOWN
 
   warn(FIXTURE_FILE_MESSAGE, sticky: true)
 end
@@ -417,25 +417,52 @@ if git.added_files.grep(/\.vscode/).any?
   VSCODE_MESSAGE =
     markdown <<-MARKDOWN
 You committed `.vscode/` folder; please remove it.
-  MARKDOWN
+    MARKDOWN
 
   warn(VSCODE_MESSAGE, sticky: true)
 end
 
 # ------------------------------------------------------------------------------
-# 37. RSpec tests should avoid shallow tests.
+# RSpec tests should avoid shallow tests
+# 37. Not writing expectations for the tests.
+# 38. Test expectations do not include matchers, such as comparisons (e.g.,equal(expected_value)),
+#     the status change of objects (e.g.,change(object, :value).by(delta)), error handlings (e.g.,raise_error("message")).
+# 39. In feature tests, expectations only focus on words appearance on the view(e.g.,expect(page).to have_content(word)),
+#     and without otherevidence, such as the new creation of the object, new record in DB.
 # ------------------------------------------------------------------------------
 MODIFIED_FILES.each do |file|
   next unless file =~ /.*_spec\.rb$/
   diff = git.diff_for_file(file).patch
-  num_of_expectations_of_obj_on_page = diff.scan(/expect\(page\).to have/).count
-  next unless num_of_expectations_of_obj_on_page >= 5
-  EXPECT_ON_OBJ_ON_PAGE_MESSAGE =
-    markdown <<-MARKDOWN
+  num_of_tests = diff.scan(/\s*it\s['"]/).count
+  num_of_expect_key_words = diff.scan(/\s*expect\s*\(/).count
+  num_of_expectation_without_machers = diff.scan(/\s*expect\s*[({][0-9a-zA-Z._]*[)}]\s*$/).count
+  num_of_expectations_on_page = diff.scan(/\s*expect\(page\).to have/).count
+  if num_of_expect_key_words < num_of_tests
+    NOT_WRITING_EXPECTATIONS_FOR_TESTS_MESSAGE =
+      markdown <<-MARKDOWN
+One or more of your tests do not have expectations.
+To avoid `shallow tests` -- tests concentrating on irrelevant, unlikely-to-fail conditions -- please write at least one expectation for each test.
+      MARKDOWN
+
+    warn(EXPECT_ON_OBJ_ON_PAGE_MESSAGE, sticky: true)
+    break
+  elsif num_of_expectation_without_machers > 0
+    EXPECTATION_WITHOUT_MATCHERS_MESSAGE =
+      markdown <<-MARKDOWN
+One or more of your test expectations do not have matchers.
+To avoid `shallow tests` -- tests concentrating on irrelevant, unlikely-to-fail conditions -- please include matchers, such as comparisons (e.g., `equal(expected_value)`), the status change of objects (e.g., `change(object, :value).by(delta)`), error handlings (e.g., `raise_error("message")`).
+      MARKDOWN
+
+    warn(EXPECTATION_WITHOUT_MATCHERS_MESSAGE, sticky: true)
+    break
+  elsif num_of_expect_key_words - num_of_expectations_on_page < num_of_tests
+    EXPECT_ON_OBJ_ON_PAGE_MESSAGE =
+      markdown <<-MARKDOWN
 In your tests, there are many expectations of elements on pages, which is good.
 To avoid `shallow tests` -- tests concentrating on irrelevant, unlikely-to-fail conditions -- please write more expectations to validate other things, such as database records, dynamically generated contents.
-    MARKDOWN
+      MARKDOWN
 
-  warn(EXPECT_ON_OBJ_ON_PAGE_MESSAGE, sticky: true)
-  break
+    warn(EXPECT_ON_OBJ_ON_PAGE_MESSAGE, sticky: true)
+    break
+  end
 end

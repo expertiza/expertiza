@@ -1,6 +1,7 @@
 require File.expand_path('../boot', __FILE__)
 require 'net/https'
 require 'rails/all'
+require 'net/https'
 
 
 # Require the gems listed in Gemfile, including any gems

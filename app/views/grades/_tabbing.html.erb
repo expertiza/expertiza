@@ -3,16 +3,19 @@
 <div>
 
   <script>
-  $( function() {
+  $(function() {
     $( "#<%= prefix %>_tabs" ).tabs();
-  } );
+  });
+
+
+
   </script>
 
 <div id="<%= prefix %>_tabs" class="overflow-container">
   <ul>
     <li><a href="#<%= prefix %>_tabs-1">Reviews</a></li>
     <li><a href="#<%= prefix %>_tabs-2">Author Feedback</a></li>
-    <li><a href="#<%= prefix %>_tabs-3">Teammate Reviews</a></li>
+    <li class="tmr_tab"><a href="#<%= prefix %>_tabs-3">Teammate Reviews</a></li>
     <li><a href="#<%= prefix %>_tabs-4">Metareviews</a></li>
     <li><a href="#<%= prefix %>_tabs-5">Statistics</a></li>
   </ul>
@@ -22,7 +25,7 @@
   <div id="<%= prefix %>_tabs-2" class="overflow-container">
    <%= render :partial => 'author_feedback_tab', :locals => {:prefix => prefix, :tscore => tscore } %>
   </div>
-  <div id="<%= prefix %>_tabs-3" class="overflow-container">
+  <div id="<%= prefix %>_tabs-3" class="overflow-container tmr_tab_content">
     <%= render :partial => 'teammate_reviews_tab', :locals => {:prefix => prefix, :tscore => tscore } %> 
   </div>
   <div id="<%= prefix %>_tabs-4" class="overflow-container">

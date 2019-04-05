@@ -50,6 +50,7 @@
           <% team_name_color = get_team_name_color_in_list_submission(team) %>
           <td><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
           <% unless participants.empty? %>
+            <%= link_to 'GitHub Metrics', { controller: 'grades', action: 'view_github_metrics', id: participants.first.id }, target: '_blank' %></td>
             <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %></td>
           <% end %>
         <% end %>
@@ -81,7 +82,7 @@
         </td>
         <td width="10%">
 
-          <%= link_to "History", submission_records_path(team_id: team.id) %>
+          <%= link_to "History", submission_records_path(team_id: team.id) %> 
 
         </td>
       </tr>

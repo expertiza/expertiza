@@ -451,7 +451,7 @@ MODIFIED_FILES.each do |file|
   num_of_tests = added_lines.scan(/\s*it\s['"]/).count
   num_of_expect_key_words = added_lines.scan(/\s*expect\s*\(/).count
   num_of_expectation_without_machers = added_lines.scan(/\s*expect\s*[({][0-9a-zA-Z._]*[)}]\s*$/).count
-  num_of_expectations_on_page = added_lines.scan(/\s*expect\(page\).to have/).count
+  num_of_expectations_on_page = added_lines.scan(/\s*expect\(page\)/).count
   if num_of_expect_key_words < num_of_tests
     NOT_WRITING_EXPECTATIONS_FOR_TESTS_MESSAGE =
       markdown <<-MARKDOWN
@@ -459,7 +459,7 @@ One or more of your tests do not have expectations.
 To avoid `shallow tests` -- tests concentrating on irrelevant, unlikely-to-fail conditions -- please write at least one expectation for each test.
       MARKDOWN
 
-    warn(EXPECT_ON_OBJ_ON_PAGE_MESSAGE, sticky: true)
+    warn(NOT_WRITING_EXPECTATIONS_FOR_TESTS_MESSAGE, sticky: true)
     break
   elsif num_of_expectation_without_machers > 0
     EXPECTATION_WITHOUT_MATCHERS_MESSAGE =

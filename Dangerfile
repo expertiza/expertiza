@@ -8,16 +8,22 @@ ADDED_FILES    = git.added_files
 DELETED_FILES  = git.deleted_files
 MODIFIED_FILES = git.modified_files
 RENAMED_FILES  = git.renamed_files
+TOUCHED_FILES  = ADDED_FILES + DELETED_FILES + MODIFIED_FILES + RENAMED_FILES
 LoC            = git.lines_of_code
 COMMITS        = git.commits
 
 PR_AUTHOR      = github.pr_author
 PR_TITLE       = github.pr_title
 PR_DIFF        = github.pr_diff
-PR_ADDED       = PR_DIFF.split("\n").select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}.join('')
+PR_ADDED       = PR_DIFF
+                 .split("\n")
+                 .select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}
+                 .join('')
 
 def warning_message_of_config_file_change(filename, regex)
-  fail("You changed #{filename}; please double-check whether this is necessary.", sticky: true) if !CURRENT_MAINTAINERS.include? PR_AUTHOR and MODIFIED_FILES.grep(regex).any?
+  if !CURRENT_MAINTAINERS.include? PR_AUTHOR and MODIFIED_FILES.grep(regex).any?
+    fail("You changed #{filename}; please double-check whether this is necessary.", sticky: true)
+  end
 end
 
 # ------------------------------------------------------------------------------
@@ -81,7 +87,7 @@ end
 # ------------------------------------------------------------------------------
 # 3. Your pull request should not touch too many files (more than 30 files).
 # ------------------------------------------------------------------------------
-if ADDED_FILES.size + DELETED_FILES.size + MODIFIED_FILES.size + RENAMED_FILES.size > 30
+if TOUCHED_FILES.size > 30
   BIG_PR_MESSAGE =
     markdown <<-MARKDOWN
 Your pull request touches more than 30 files.
@@ -121,9 +127,9 @@ end
 # 6. Your pull request should not contain "Todo" keyword.
 # ------------------------------------------------------------------------------
 if PR_ADDED.include? "TODO" or
-  PR_ADDED.include? "Todo" or
-  PR_ADDED.include? "todo" or
-  PR_ADDED.include? "toDo"
+   PR_ADDED.include? "Todo" or
+   PR_ADDED.include? "todo" or
+   PR_ADDED.include? "toDo"
   TODO_MESSAGE =
     markdown <<-MARKDOWN
 This pull request contains `TODO` task(s); please fix them.
@@ -172,7 +178,7 @@ end
 # ------------------------------------------------------------------------------
 # 10. You should write tests after making changes to the application.
 # ------------------------------------------------------------------------------
-if MODIFIED_FILES.grep(/app/).any? && MODIFIED_FILES.grep(/spec/).empty?
+if TOUCHED_FILES.grep(/app/).any? and TOUCHED_FILES.grep(/spec/).empty?
   NO_TEST_MESSAGE =
     markdown <<-MARKDOWN
 There are code changes, but no corresponding tests.
@@ -185,9 +191,14 @@ end
 # ------------------------------------------------------------------------------
 # 11. Your pull request should not include skipped/pending/focused test cases.
 # ------------------------------------------------------------------------------
-MODIFIED_FILES.each do |file|
+(ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).each do |file|
   next unless file =~ /.*_spec\.rb$/
-  added_lines = git.diff_for_file(file).patch.split("\n").select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}.join('')
+  added_lines = git
+                .diff_for_file(file)
+                .patch
+                .split("\n")
+                .select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}
+                .join('')
   if added_lines.include? "xdescribe" or
      added_lines.include? "xspecify" or
      added_lines.include? "xexample" or
@@ -209,9 +220,14 @@ end
 # ------------------------------------------------------------------------------
 # 12. Unit tests and integration tests should avoid using "create" keyword.
 # ------------------------------------------------------------------------------
-MODIFIED_FILES.each do |file|
+(ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).each do |file|
   next unless file =~ /spec\/models/ or file =~ /spec\/controllers/
-  added_lines = git.diff_for_file(file).patch.split("\n").select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}.join('')
+  added_lines = git
+                .diff_for_file(file)
+                .patch
+                .split("\n")
+                .select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}
+                .join('')
   next unless added_lines.include? " create(" or added_lines.include? "{create("
   CREATE_MOCK_UP_OBJ_MESSAGE =
     markdown <<-MARKDOWN
@@ -225,9 +241,14 @@ end
 # ------------------------------------------------------------------------------
 # 13. RSpec tests should avoid using "should" keyword.
 # ------------------------------------------------------------------------------
-MODIFIED_FILES.each do |file|
+(ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).each do |file|
   next unless file =~ /.*_spec\.rb$/
-  added_lines = git.diff_for_file(file).patch.split("\n").select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}.join('')
+  added_lines = git
+                .diff_for_file(file)
+                .patch
+                .split("\n")
+                .select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}
+                .join('')
   next unless added_lines.include? ".should"
   NO_SHOULD_SYNTAX_MESSAGE =
     markdown <<-MARKDOWN
@@ -243,7 +264,8 @@ end
 # 14. Your RSpec testing files do not need to require helper files (e.g., rails_helper.rb, spec_helper.rb). 
 # ------------------------------------------------------------------------------
 if !CURRENT_MAINTAINERS.include? PR_AUTHOR and
-  (MODIFIED_FILES.grep(/rails_helper\.rb/).any? or MODIFIED_FILES.grep(/spec_helper\.rb/).any?)
+  ((ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/rails_helper\.rb/).any? or 
+   (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/spec_helper\.rb/).any?)
   TEST_HELPER_FILE_MESSAGE =
     markdown <<-MARKDOWN
 You should not change `rails_helper.rb` or `spec_helper.rb` file; please revert these changes.
@@ -255,14 +277,15 @@ end
 # ------------------------------------------------------------------------------
 # 15. You should avoid committing text files for RSpec tests.
 # ------------------------------------------------------------------------------
-if MODIFIED_FILES.grep(/.*spec.*\.txt/).any? or MODIFIED_FILES.grep(/.*spec.*\.csv/).any?
+if (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/.*spec.*\.txt/).any? or 
+   (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/.*spec.*\.csv/).any?
   warn("You committed text files (`*.txt` or `*.csv`) for RSpec tests; please double-check whether this is necessary.", sticky: true)
 end
 
 # ------------------------------------------------------------------------------
 # 16. Your pull request should not change or add *.md files unless you have a good reason.
 # ------------------------------------------------------------------------------
-if !CURRENT_MAINTAINERS.include? PR_AUTHOR and MODIFIED_FILES.grep(/\.md/).any?
+if !CURRENT_MAINTAINERS.include? PR_AUTHOR and (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/\.md/).any?
   MARKDOWN_CHANGE_MESSAGE =
     markdown <<-MARKDOWN
 You changed MARKDOWN (`*.md`) documents; please double-check whether it is necessary to do so.
@@ -276,7 +299,7 @@ end
 # 17. Your pull request should not change DB schema unless there is new DB migrations.
 # ------------------------------------------------------------------------------
 if !CURRENT_MAINTAINERS.include? PR_AUTHOR and
-  (MODIFIED_FILES.grep(/schema\.rb/).any? or MODIFIED_FILES.grep(/schema\.json/).any?)
+  (MODIFIED_FILES.grep(/schema\.rb/).any? or (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/schema\.json/).any?)
   DB_SCHEMA_CHANGE_MESSAGE =
     markdown <<-MARKDOWN
 You should commit changes to the DB schema (`db/schema.rb`) only if you have created new DB migrations.
@@ -289,7 +312,7 @@ end
 # ------------------------------------------------------------------------------
 # 18. Your pull request should not modify *.yml or *.yml.example file.
 # ------------------------------------------------------------------------------
-if !CURRENT_MAINTAINERS.include? PR_AUTHOR and MODIFIED_FILES.grep(/\.yml/).any?
+if !CURRENT_MAINTAINERS.include? PR_AUTHOR and (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/\.yml/).any?
   YAML_FILE_MESSAGE =
     markdown <<-MARKDOWN
 You changed YAML (`*.yml`) or example (`*.yml.example`) files; please double-check whether this is necessary.
@@ -403,7 +426,7 @@ warning_message_of_config_file_change('setup.sh', /setup\.sh/)
 # ------------------------------------------------------------------------------
 # 34. The PR should not modify vendor folder.
 # ------------------------------------------------------------------------------
-if !CURRENT_MAINTAINERS.include? PR_AUTHOR and MODIFIED_FILES.grep(/vendor/).any?
+if !CURRENT_MAINTAINERS.include? PR_AUTHOR and (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/vendor/).any?
   VENDOR_MESSAGE =
     markdown <<-MARKDOWN
 You modified `vendor` folder, please double-check whether it is necessary.
@@ -415,7 +438,7 @@ end
 # ------------------------------------------------------------------------------
 # 35. You should not modify /spec/factories/ folder.
 # ------------------------------------------------------------------------------
-if !CURRENT_MAINTAINERS.include? PR_AUTHOR and MODIFIED_FILES.grep(/spec\/factories/).any?
+if !CURRENT_MAINTAINERS.include? PR_AUTHOR and (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/spec\/factories/).any?
   FIXTURE_FILE_MESSAGE =
     markdown <<-MARKDOWN
 You modified `spec/factories/` folder; please double-check whether it is necessary.
@@ -447,7 +470,12 @@ end
 # ------------------------------------------------------------------------------
 MODIFIED_FILES.each do |file|
   next unless file =~ /.*_spec\.rb$/
-  added_lines = git.diff_for_file(file).patch.split("\n").select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}.join('')
+  added_lines = git
+                .diff_for_file(file)
+                .patch
+                .split("\n")
+                .select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}
+                .join('')
   num_of_tests = added_lines.scan(/\s*it\s['"]/).count
   num_of_expect_key_words = added_lines.scan(/\s*expect\s*\(/).count
   num_of_expectation_without_machers = added_lines.scan(/\s*expect\s*[({][0-9a-zA-Z._]*[)}]\s*$/).count

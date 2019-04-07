@@ -1,4 +1,32 @@
 Expertiza::Application.routes.draw do
+  get 'grading_histories/index'
+
+  get 'grading_histories/show'
+
+  get 'grading_histories/new'
+
+  get 'grading_histories/create'
+
+  get 'grading_histories/edit'
+
+  get 'grading_histories/update'
+
+  get 'grading_histories/destroy'
+
+  get 'grading_histories_controller/index'
+
+  get 'grading_histories_controller/show'
+
+  get 'grading_histories_controller/new'
+
+  get 'grading_histories_controller/create'
+
+  get 'grading_histories_controller/edit'
+
+  get 'grading_histories_controller/update'
+
+  get 'grading_histories_controller/destroy'
+
   ###
   # Please insert new routes alphabetically!
   ###

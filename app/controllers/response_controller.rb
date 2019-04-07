@@ -139,6 +139,8 @@ class ResponseController < ApplicationController
     set_content
   end
 
+  # Adding a function to integrate suggestion detection algorithm (SDA)
+
   def create
     map_id = params[:id]
     map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form

@@ -135,14 +135,35 @@ class QuestionnairesController < ApplicationController
   end
 
   def update
-    @questionnaire = Questionnaire.find(params[:id])
-    begin
-      @questionnaire.update_attributes(questionnaire_params)
-      flash[:success] = 'The questionnaire has been successfully updated!'
-    rescue StandardError
-      flash[:error] = $ERROR_INFO
+    # If 'Add' or 'Edit/View advice' is clicked, redirect appropriately
+    if params[:add_new_questions]
+      redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]
+    elsif params[:view_advice]
+      redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
+    else
+      @questionnaire = Questionnaire.find(params[:id])
+      begin
+        # Save questionnaire information
+        @questionnaire.update_attributes(questionnaire_params)
+
+        # Save all questions
+        unless params[:question].nil?
+          params[:question].each_pair do |k, v|
+            @question = Question.find(k)
+            # example of 'v' value
+            # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
+            v.each_pair do |key, value|
+              @question.send(key + '=', value) if @question.send(key) != value
+            end
+            @question.save
+          end
+        end
+        flash[:success] = 'The questionnaire has been successfully updated!'
+      rescue StandardError
+        flash[:error] = $ERROR_INFO
+      end
+      redirect_to action: 'edit', id: @questionnaire.id.to_s.to_sym
     end
-    redirect_to edit_questionnaire_path(@questionnaire.id.to_s.to_sym)
   end
 
   # Remove a given questionnaire

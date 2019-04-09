@@ -1,5 +1,5 @@
 <%= error_messages_for 'questionnaire' %>
-<!--Questionnaire part-->
+
 <%= form_for @questionnaire do %>
   <table>
     <tr>
@@ -21,38 +21,33 @@
   </table>
   <% if params[:action] == 'new' %>
     <%= submit_tag 'Create', class: "btn btn-default" %>
-  <% else %>
-    <%= submit_tag 'Update', class: "btn btn-default" %>
   <% end %>
-<% end %>
 
-<!--Question part-->
-<hr/>
-<% if !params[:id].nil? and params[:action] == 'edit' %>
-  <table id="question_actions_table">
-    <tr>
-      <td>
-        <%= form_tag :action => 'add_new_questions', :id => params[:id], :questionnaire_type => params[:model], :private => params[:private] do %>
-         <p class="form-inline"> <%= submit_tag 'Add', class: "btn btn-default"%>
-          <%= text_field 'question', 'total_num', :size => 1, :value => "1", :class => "form-control" %> more 
-          <%= select "question", "type", 
-              {"Criterion" =>"Criterion",
-               "Scale"=>"Scale",
-               "Dropdown"=>"Dropdown",
-               "Checkbox"=>"Checkbox",
-               "TextArea"=>"TextArea",
-               "TextField"=>"TextField",
-               "UploadFile"=>"UploadFile",
-               "SectionHeader"=>"SectionHeader",
-               "TableHeader"=>"TableHeader",
-               "ColumnHeader"=>"ColumnHeader",
-               }, {}, {class: "form-control"} %> question(s)</p>
-        <% end %>
-      </td>
-    </tr>
-  </table>
-  
-  <%= form_tag :action => 'save_all_questions', :id => params[:id],  :questionnaire_type => params[:model], :private => params[:private] do %>
+  <!--Questions part-->
+  <hr/>
+  <% if !params[:id].nil? and params[:action] == 'edit' %>
+    <table id="question_actions_table">
+      <tr>
+        <td>
+          <p class="form-inline"> <%= submit_tag 'Add', name: "add_new_questions", class: "btn btn-default"%>
+            <%= text_field 'new_question', 'total_num', :size => 1, :value => "1", :class => "form-control" %> more
+            <%= select "new_question", "type",
+                {"Criterion" =>"Criterion",
+                 "Scale"=>"Scale",
+                 "Dropdown"=>"Dropdown",
+                 "Checkbox"=>"Checkbox",
+                 "TextArea"=>"TextArea",
+                 "TextField"=>"TextField",
+                 "UploadFile"=>"UploadFile",
+                 "SectionHeader"=>"SectionHeader",
+                 "TableHeader"=>"TableHeader",
+                 "ColumnHeader"=>"ColumnHeader",
+                 }, {}, {class: "form-control"} %> question(s)
+          </p>
+        </td>
+      </tr>
+    </table>
+
     <table id="questions_table">
       <tr>
         <th class="head" align="center" width="30">Action</td>
@@ -75,6 +70,4 @@
         <%= link_to 'Export Questionnaire', :controller=>'export_file',:action=>'start',:model=> 'Question',:id=> @questionnaire.id %>
   <% end %>
 <% end %>
-
 <BR/>
-

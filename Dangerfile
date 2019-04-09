@@ -486,10 +486,10 @@ end
                 .split("\n")
                 .select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}
                 .join('')
-  num_of_tests = added_lines.scan(/\s*it\s*['"]/).count
-  num_of_expect_key_words = added_lines.scan(/\s*expect\s*\(/).count
-  num_of_expectation_without_machers = added_lines.scan(/\s*expect\s*[({][0-9a-zA-Z._:$@]*[)}]\s*$/).count
-  num_of_expectations_on_page = added_lines.scan(/\s*expect\s*\(page\)/).count
+  num_of_tests = added_lines.scan(/^\s*it\s*['"]/).count
+  num_of_expect_key_words = added_lines.scan(/^\s*expect\s*\(/).count
+  num_of_expectation_without_machers = added_lines.scan(/^\s*expect\s*[({][a-zA-Z0-9~`!@#\$%\^&\*_\-\+=\[\]\|\\:;"'<,>\.\?\/ ]*[)}]\s*$/).count
+  num_of_expectations_on_page = added_lines.scan(/^\s*expect\s*\(page\)/).count
   if num_of_expect_key_words < num_of_tests
     NOT_WRITING_EXPECTATIONS_FOR_TESTS_MESSAGE =
       markdown <<-MARKDOWN

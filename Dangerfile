@@ -100,8 +100,16 @@ end
 # ------------------------------------------------------------------------------
 # 4. Your pull request should not have too many duplicated commit messages.
 # ------------------------------------------------------------------------------
+has_many_dup_commit_messages = false
 messages = COMMITS.map(&:message)
-if messages.size - messages.uniq.size >= 5
+messages.each do |msg|
+  if messages.count(msg) >= 5
+    has_many_dup_commit_messages = true
+    break
+  end
+end
+
+if has_many_dup_commit_messages
   DUP_COMMIT_MESSAGE =
     markdown <<-MARKDOWN
 Your pull request has many duplicated commit messages. Please try to `squash` similar commits.
@@ -214,6 +222,7 @@ There are one or more skipped/pending/focused test cases in your pull request. P
       MARKDOWN
 
     warn(TEST_SKIPPED_MESSAGE, sticky: true)
+    break
   end
 end
 
@@ -228,7 +237,7 @@ end
                 .split("\n")
                 .select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}
                 .join('')
-  next unless added_lines.include? " create(" or added_lines.include? "{create("
+  next unless added_lines =~ /create\(/
   CREATE_MOCK_UP_OBJ_MESSAGE =
     markdown <<-MARKDOWN
   Using `create` in unit tests or integration tests may be overkill. Try to use `build` or `double` instead.
@@ -333,10 +342,12 @@ if PR_ADDED.include? "require 'rspec'" or
    PR_ADDED.include? "require 'test_helper'" or
    PR_ADDED.include? "require \"test_helper\"" or
    PR_ADDED.include? "require 'factory_girl_rails'" or
-   PR_ADDED.include? "require \"factory_girl_rails\""
+   PR_ADDED.include? "require \"factory_girl_rails\"" or
+   PR_ADDED.include? "require 'factory_bot_rails'" or
+   PR_ADDED.include? "require \"factory_bot_rails\""
   RSPEC_REQUIRE_MESSAGE =
     markdown <<-MARKDOWN
-You are requiring `rspec` gem or different helper methods in RSpec tests.
+You are requiring `rspec` gem, fixture-related gem(s) or different helper methods in RSpec tests.
 There have already been included, you do not need to require them again. Please remove them.
     MARKDOWN
 
@@ -447,7 +458,6 @@ You modified `spec/factories/` folder; please double-check whether it is necessa
   warn(FIXTURE_FILE_MESSAGE, sticky: true)
 end
 
-# ADDED_FILES
 # ------------------------------------------------------------------------------
 # 36. You should not commit .vscode folder to your pull request.
 # ------------------------------------------------------------------------------
@@ -468,7 +478,7 @@ end
 # 39. In feature tests, expectations only focus on words appearance on the view(e.g.,expect(page).to have_content(word)),
 #     and without otherevidence, such as the new creation of the object, new record in DB.
 # ------------------------------------------------------------------------------
-MODIFIED_FILES.each do |file|
+(ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).each do |file|
   next unless file =~ /.*_spec\.rb$/
   added_lines = git
                 .diff_for_file(file)
@@ -476,10 +486,10 @@ MODIFIED_FILES.each do |file|
                 .split("\n")
                 .select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}
                 .join('')
-  num_of_tests = added_lines.scan(/\s*it\s['"]/).count
+  num_of_tests = added_lines.scan(/\s*it\s*['"]/).count
   num_of_expect_key_words = added_lines.scan(/\s*expect\s*\(/).count
-  num_of_expectation_without_machers = added_lines.scan(/\s*expect\s*[({][0-9a-zA-Z._]*[)}]\s*$/).count
-  num_of_expectations_on_page = added_lines.scan(/\s*expect\(page\)/).count
+  num_of_expectation_without_machers = added_lines.scan(/\s*expect\s*[({][0-9a-zA-Z._:$@]*[)}]\s*$/).count
+  num_of_expectations_on_page = added_lines.scan(/\s*expect\s*\(page\)/).count
   if num_of_expect_key_words < num_of_tests
     NOT_WRITING_EXPECTATIONS_FOR_TESTS_MESSAGE =
       markdown <<-MARKDOWN

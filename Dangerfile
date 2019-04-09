@@ -102,7 +102,7 @@ end
 # ------------------------------------------------------------------------------
 has_many_dup_commit_messages = false
 messages = COMMITS.map(&:message)
-messages.each do |msg|
+messages.uniq.each do |msg|
   if messages.count(msg) >= 5
     has_many_dup_commit_messages = true
     break
@@ -308,7 +308,8 @@ end
 # 17. Your pull request should not change DB schema unless there is new DB migrations.
 # ------------------------------------------------------------------------------
 if !CURRENT_MAINTAINERS.include? PR_AUTHOR and
-  (MODIFIED_FILES.grep(/schema\.rb/).any? or (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/schema\.json/).any?)
+  ((ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/db\/migrate/).empty? and
+  ((MODIFIED_FILES.grep(/schema\.rb/).any? or (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/schema\.json/).any?)))
   DB_SCHEMA_CHANGE_MESSAGE =
     markdown <<-MARKDOWN
 You should commit changes to the DB schema (`db/schema.rb`) only if you have created new DB migrations.
@@ -464,7 +465,7 @@ end
 if ADDED_FILES.grep(/\.vscode/).any?
   VSCODE_MESSAGE =
     markdown <<-MARKDOWN
-You committed `.vscode/` folder; please remove it.
+You committed `.vscode` folder; please remove it.
     MARKDOWN
 
   warn(VSCODE_MESSAGE, sticky: true)
@@ -475,21 +476,23 @@ end
 # 37. Not writing expectations for the tests.
 # 38. Test expectations do not include matchers, such as comparisons (e.g.,equal(expected_value)),
 #     the status change of objects (e.g.,change(object, :value).by(delta)), error handlings (e.g.,raise_error("message")).
-# 39. In feature tests, expectations only focus on words appearance on the view(e.g.,expect(page).to have_content(word)),
+# 39. Including too many wildcard argument matchers (e.g., anything, any_args)
+# 40. In feature tests, expectations only focus on words appearance on the view(e.g.,expect(page).to have_content(word)),
 #     and without otherevidence, such as the new creation of the object, new record in DB.
 # ------------------------------------------------------------------------------
 (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).each do |file|
   next unless file =~ /.*_spec\.rb$/
-  added_lines = git
-                .diff_for_file(file)
-                .patch
-                .split("\n")
-                .select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}
-                .join('')
-  num_of_tests = added_lines.scan(/^\s*it\s*['"]/).count
-  num_of_expect_key_words = added_lines.scan(/^\s*expect\s*\(/).count
-  num_of_expectation_without_machers = added_lines.scan(/^\s*expect\s*[({][a-zA-Z0-9~`!@#\$%\^&\*_\-\+=\[\]\|\\:;"'<,>\.\?\/ ]*[)}]\s*$/).count
-  num_of_expectations_on_page = added_lines.scan(/^\s*expect\s*\(page\)/).count
+  added_lines_arr = git
+                    .diff_for_file(file)
+                    .patch
+                    .split("\n")
+                    .select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}
+  added_lines = added_lines_arr.join('')
+  num_of_tests = added_lines.scan(/\s*it\s*['"]/).count
+  num_of_expect_key_words = added_lines.scan(/\s*expect\s*[\(\{]/).count
+  num_of_expectation_without_machers = added_lines_arr.count{ |loc| loc.scan(/\s*expect\s*[\(\{]/).count > 0 and loc.scan(/\.(to|not_to|to_not)/).count == 0}
+  num_of_wildcard_argument_matchers = PR_ADDED.scan(/\((anything|any_args)\)/).count
+  num_of_expectations_on_page = added_lines.scan(/\s*expect\s*\(page\)/).count
   if num_of_expect_key_words < num_of_tests
     NOT_WRITING_EXPECTATIONS_FOR_TESTS_MESSAGE =
       markdown <<-MARKDOWN
@@ -507,6 +510,15 @@ To avoid `shallow tests` -- tests concentrating on irrelevant, unlikely-to-fail 
       MARKDOWN
 
     warn(EXPECTATION_WITHOUT_MATCHERS_MESSAGE, sticky: true)
+    break
+  elsif num_of_wildcard_argument_matchers >= 5
+    WILDCARD_ARGUMENT_MATCHERS_MESSAGE =
+      markdown <<-MARKDOWN
+There are many wildcard argument matchers (e.g., `anything`, `any_args`) in your tests.
+To avoid `shallow tests` -- tests concentrating on irrelevant, unlikely-to-fail conditions -- please avoid wildcard matchers.
+      MARKDOWN
+
+    warn(WILDCARD_ARGUMENT_MATCHERS_MESSAGE, sticky: true)
     break
   elsif num_of_expect_key_words - num_of_expectations_on_page < num_of_tests
     EXPECT_ON_OBJ_ON_PAGE_MESSAGE =

@@ -14,6 +14,7 @@ describe "peer review testing" do
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: "submission").first, due_at: DateTime.now.in_time_zone + 1.day)
+    create(:assignment_due_date, deadline_type: DeadlineType.where(name: "review").first, due_at: DateTime.now.in_time_zone + 1.day)
   end
 
   def signup_topic

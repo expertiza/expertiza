@@ -164,6 +164,8 @@ module GradesHelper
       }]
     }
 
+    end
+
   def retrieve_questions(questionnaires, assignment_id)
     questions = {}
     questionnaires.each do |questionnaire|
@@ -179,3 +181,4 @@ module GradesHelper
 
   end
 end
+

@@ -59,11 +59,11 @@ th, td {
 				<td>N/A</td>
 			<% elsif question.instance_of? Dropdown or question.instance_of? TextArea %>
 				<td>N/A</td>
-				<td><%= instructor_answer.comments %></td></tr>
+				<td><%=sanitize instructor_answer.comments %></td></tr>
 
 				<tr><td>Your review</td>
 				<td>N/A</td>
-				<td><%= stu_answer.comments %></td>
+				<td><%=sanitize stu_answer.comments %></td>
 			<% elsif question.instance_of? TextField %>
 				<% if (index+1) <= @questions.length-1 %>
 					<% next_question = @questions[index+1] %>
@@ -71,29 +71,29 @@ th, td {
 					<% next_stu_answer = Answer.where(question_id: @questions[index+1].id, response_id: @review_response.id).first %>
 				<% end %>
 				<% if question.break_before == true and !next_question.nil? and next_question.break_before == false %>
-					<td><%= "#{instructor_answer.comments} - #{next_instructor_answer.comments}" %></td>
+					<td><%=sanitize instructor_answer.comments %> - <%=sanitize next_instructor_answer.comments %></td>
 					<td>N/A</td></tr>
 
 					<tr><td>Your review</td>
-					<td><%= "#{stu_answer.comments} - #{next_stu_answer.comments}" %></td>
+					<td><%=sanitize stu_answer.comments %> - <%=sanitize next_stu_answer.comments %></td>
 					<td>N/A</td>
 				<% elsif question.break_before == false or next_question.break_before == false %>
 					<% next %>
 				<% else %>
-					<td><%= instructor_answer.comments %></td>
+					<td><%=sanitize instructor_answer.comments %></td>
 					<td>N/A</td></tr>
 
 					<tr><td>Your review</td>
-					<td><%= stu_answer.comments %></td>
+					<td><%=sanitize stu_answer.comments %></td>
 					<td>N/A</td>
 				<% end %>
 			<% else %>
 				<td class=<%= instructor_css_class %>><%= instructor_answer.answer %></td>
-				<td><%= instructor_answer.comments %></td></tr>
+				<td><%=sanitize instructor_answer.comments %></td></tr>
 
 				<tr><td>Your review</td>
 				<td class=<%= stu_css_class %>><%= stu_answer.answer %></td>
-				<td><%= stu_answer.comments %></td>
+				<td><%=sanitize stu_answer.comments %></td>
 			<% end %>
 		</tr>		
 	</table>

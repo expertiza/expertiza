@@ -158,10 +158,10 @@ module ReviewMappingHelper
           r.avg_vol_in_round_2,
           r.avg_vol_in_round_3 = Response.get_volume_of_review_comments(@assignment.id, r.id)
     end
-    @all_reviewers_overall_avg_vol = @reviewers.inject(0) {|sum, r| sum += r.overall_avg_vol } / @reviewers.length
-    @all_reviewers_avg_vol_in_round_1 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_in_round_1 } / @reviewers.length
-    @all_reviewers_avg_vol_in_round_2 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_in_round_2 } / @reviewers.length
-    @all_reviewers_avg_vol_in_round_3 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_in_round_3 } / @reviewers.length
+    @all_reviewers_overall_avg_vol = @reviewers.inject(0) {|sum, r| sum += r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
+    @all_reviewers_avg_vol_in_round_1 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_in_round_1 } / (@reviewers.blank? ? 1 : @reviewers.length)
+    @all_reviewers_avg_vol_in_round_2 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_in_round_2 } / (@reviewers.blank? ? 1 : @reviewers.length)
+    @all_reviewers_avg_vol_in_round_3 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_in_round_3 } / (@reviewers.blank? ? 1 : @reviewers.length)
     @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 
@@ -355,5 +355,43 @@ module ReviewMappingHelper
                   'c1'
                 end
     css_class
+  end
+
+  class ReviewStrategy
+    attr_accessor :participants, :teams
+
+    def initialize(participants, teams, review_num)
+      @participants = participants
+      @teams = teams
+      @review_num = review_num
+    end
+  end
+
+  class StudentReviewStrategy < ReviewStrategy
+    def reviews_per_team
+      (@participants.size * @review_num * 1.0 / @teams.size).round
+    end
+
+    def reviews_needed
+      @participants.size * @review_num
+    end
+
+    def reviews_per_student
+      @review_num
+    end
+  end
+
+  class TeamReviewStrategy < ReviewStrategy
+    def reviews_per_team
+      @review_num
+    end
+
+    def reviews_needed
+      @teams.size * @review_num
+    end
+
+    def reviews_per_student
+      (@teams.size * @review_num * 1.0 / @participants.size).round
+    end
   end
 end

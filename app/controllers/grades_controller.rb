@@ -5,6 +5,7 @@ class GradesController < ApplicationController
   include PenaltyHelper
   include StudentTaskHelper
   include AssignmentHelper
+  include GradesHelper
 
   def action_allowed?
     case params[:action]
@@ -42,11 +43,11 @@ class GradesController < ApplicationController
       return redirect_to authorize_github_grades_path
     end
     @assignment = Assignment.find(params[:id])
-    @questions = {}
     questionnaires = @assignment.questionnaires
     if @assignment.varying_rubrics_by_round?
-      retrieve_questions questionnaires
+      @questions = retrieve_questions questionnaires, @assignment.id
     else # if this assignment does not have "varying rubric by rounds" feature
+      @questions = {}
       questionnaires.each do |questionnaire|
         @questions[questionnaire.symbol] = questionnaire.questions
       end
@@ -60,27 +61,13 @@ class GradesController < ApplicationController
     @show_reputation = false
   end
 
-  # This method is used to retrieve questions for different review rounds
-  def retrieve_questions(questionnaires)
-    questionnaires.each do |questionnaire|
-      round = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).first.used_in_round
-      questionnaire_symbol = if !round.nil?
-                               (questionnaire.symbol.to_s + round.to_s).to_sym
-                             else
-                               questionnaire.symbol
-                             end
-      @questions[questionnaire_symbol] = questionnaire.questions
-    end
-  end
-
   def view_my_scores
     @participant = AssignmentParticipant.find(params[:id])
     @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
     return if redirect_when_disallowed
     @assignment = @participant.assignment
-    @questions = {} # A hash containing all the questions in all the questionnaires used in this assignment
     questionnaires = @assignment.questionnaires
-    retrieve_questions questionnaires
+    @questions = retrieve_questions questionnaires, @assignment.id
     # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
     @pscore = @participant.scores(@questions)
     make_chart
@@ -101,9 +88,8 @@ class GradesController < ApplicationController
     @assignment = @participant.assignment
     @team = @participant.team
     @team_id = @team.id
-    @questions = {}
     questionnaires = @assignment.questionnaires
-    retrieve_questions questionnaires
+    @questions = retrieve_questions questionnaires, @assignment.id
     @pscore = @participant.scores(@questions)
     @vmlist = []
 
@@ -127,7 +113,7 @@ class GradesController < ApplicationController
       vm.add_questions(vmquestions)
       vm.add_team_members(@team)
       vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
-      vm.get_number_of_comments_greater_than_10_words
+      vm.number_of_comments_greater_than_10_words
       @vmlist << vm
     end
     @current_role_name = current_role_name
@@ -191,10 +177,11 @@ class GradesController < ApplicationController
     @team.comment_for_submission = params[:comment_for_submission]
     begin
       @team.save
+      flash[:success] = 'Grade and comment for submission successfully saved.'
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
-    redirect_to controller: 'assignments', action: 'list_submissions', id: @team.parent_id
+    redirect_to controller: 'grades', action: 'view_team', id: participant.id
   end
 
   def retrieve_pull_request_data(pull_links)

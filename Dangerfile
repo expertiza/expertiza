@@ -132,15 +132,19 @@ This pull request is classed as `Work in Progress`. It cannot be merged right no
 end
 
 # ------------------------------------------------------------------------------
-# 6. Your pull request should not contain "Todo" keyword.
+# 6. Your pull request should not contain "Todo" or "Fixme" keyword.
 # ------------------------------------------------------------------------------
 if PR_ADDED.include? "TODO" or
    PR_ADDED.include? "Todo" or
    PR_ADDED.include? "todo" or
-   PR_ADDED.include? "toDo"
+   PR_ADDED.include? "toDo" or
+   PR_ADDED.include? "FIXME" or
+   PR_ADDED.include? "FixMe" or
+   PR_ADDED.include? "Fixme" or
+   PR_ADDED.include? "fixme"
   TODO_MESSAGE =
     markdown <<-MARKDOWN
-This pull request contains `TODO` task(s); please fix them.
+This pull request contains `TODO` or `FIXME` task(s); please fix them.
     MARKDOWN
 
   warn(TODO_MESSAGE, sticky: true)

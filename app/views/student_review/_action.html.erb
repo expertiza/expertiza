@@ -1,0 +1,15 @@
+<% if @assignment.bidding_review? %>
+  <td>
+    <% form_tag({:controller => "student_review", :action => "set_priority", :id => topic.id, :assignment_id => params[:assignment_id]}, method: :post) do %>
+      <% if @reviewbids.all? {|sb| sb.topic_id != topic_id} %>
+        <% number_field_tag :priority, nil, min: 1, max: @num_of_topics, place_holder: 0 %>
+      <% end %>
+      <% reviewbids.each do |sb| %>
+        <% if sb.topic_id == topic.id %>
+          <%= number_field_tag :priority, sb.priority, min: 1, max: @num_of_topics, place_holder: 0 %>
+          <% break %>
+        <% end %>
+      <% end %>
+      <%= submit_tag 'Set priority', name: nil %>
+    <% end %></td>
+<% end %> 

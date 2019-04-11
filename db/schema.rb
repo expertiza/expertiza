@@ -506,7 +506,7 @@ ActiveRecord::Schema.define(version: 20190404173615) do
   add_index "resubmission_times", ["participant_id"], name: "fk_resubmission_times_participants", using: :btree
 
   create_table "review_bids", force: :cascade do |t|
-    t.integer  "topic_id",   limit: 4
+    t.integer  "team_id",   limit: 4
     t.integer  "participant_id", limit: 4
     t.integer  "priority",   limit: 4
     t.datetime "created_at",           null: false

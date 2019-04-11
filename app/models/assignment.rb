@@ -39,7 +39,10 @@ class Assignment < ActiveRecord::Base
   #  Review Strategy information.
   RS_AUTO_SELECTED = 'Auto-Selected'.freeze
   RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'.freeze
-  REVIEW_STRATEGIES = [RS_AUTO_SELECTED, RS_INSTRUCTOR_SELECTED].freeze
+
+  RS_BIDDING = 'Bidding'.freeze
+  REVIEW_STRATEGIES = [RS_AUTO_SELECTED, RS_INSTRUCTOR_SELECTED, RS_BIDDING].freeze
+
   DEFAULT_MAX_REVIEWERS = 3
   DEFAULT_MAX_OUTSTANDING_REVIEWS = 2
 
@@ -148,6 +151,10 @@ class Assignment < ActiveRecord::Base
     self.review_assignment_strategy == RS_AUTO_SELECTED
   end
   alias is_using_dynamic_reviewer_assignment? dynamic_reviewer_assignment?
+
+  def bidding_review?
+    self.review_assignment_strategy == RS_BIDDING
+  end
 
   def scores(questions)
     scores = {}

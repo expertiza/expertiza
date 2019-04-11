@@ -10,7 +10,9 @@
   <tr id='assignment_review_assignment_strategy_row' class="form-inline">
     <td>
       <%= label_tag('assignment_form[assignment][review_assignment_strategy]', 'Review Strategy:') %>
-      <img src="/assets/info.png" title='- Instructor-Selected: Instructor decides who reviews whom- Auto-Selected: When a student is about to begin a review, Expertiza assigns that student a particular review.'>
+      <img src="/assets/info.png" title='- Instructor-Selected: Instructor decides who reviews whom
+      - Auto-Selected: When a student is about to begin a review, Expertiza assigns that student a particular review.
+      - Bidding: Allow student to "bid" for reviews.'>
       <%= select('assignment_form[assignment]', 'review_assignment_strategy', review_strategy_options,  {:selected => @assignment_form.assignment.review_assignment_strategy, :style => 'margin-left :250px', :class => "form-control width-200"}) %>
       <script>
           jQuery(document).ready(function() {reviewStrategyChanged();});
@@ -87,6 +89,12 @@
               <%= text_field_tag('assignment_form[assignment][num_metareviews_allowed]',  3, size: 1, class: "form-control width-70", :style => 'margin-left :90px') %>
         <%end%>
         </span>
+    </td>
+  </tr>
+
+  <tr id="bidding_opinion" hidden='hidden'>
+    <td>
+      <!-- TODO: Opinions with bidding strategy. -->
     </td>
   </tr>
 

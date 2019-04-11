@@ -363,6 +363,8 @@ resources :institution, except: [:destroy] do
   resources :student_review, only: [] do
     collection do
       get :list
+      get :sign_up_list
+      post :set_priority
     end
   end
 
@@ -486,6 +488,7 @@ resources :institution, except: [:destroy] do
   post '/plagiarism_checker_results/:id' => 'plagiarism_checker_comparison#save_results'
   get 'instructions/home'
   get 'response/', to: 'response#saving'
+  get '/review_bid/run_intelligent_assignment(/:id)', to: 'review_bids#run_intelligent_assignment'
   get ':controller/service.wsdl', action: 'wsdl'
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
   get ':controller(/:action(/:id))(.:format)'

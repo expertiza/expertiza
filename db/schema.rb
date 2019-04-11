@@ -507,7 +507,7 @@ ActiveRecord::Schema.define(version: 20190404173615) do
 
   create_table "review_bids", force: :cascade do |t|
     t.integer  "topic_id",   limit: 4
-    t.integer  "studen_id", limit: 4
+    t.integer  "participant_id", limit: 4
     t.integer  "priority",   limit: 4
     t.datetime "created_at",           null: false
     t.datetime "updated_at",           null: false

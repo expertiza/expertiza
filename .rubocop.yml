@@ -8,6 +8,7 @@ AllCops:
     - 'lib/**/*'
     - 'public/**/*'
     - 'vendor/**/*'
+    - 'Dangerfile'
 Rails:
   Enabled: true
 
@@ -17,7 +18,7 @@ Metrics/ClassLength:
 
 Metrics/MethodLength:
   CountComments: false
-  Max: 100
+  Max: 60
 
 Metrics/LineLength:
   Max: 160

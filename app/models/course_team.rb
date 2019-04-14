@@ -48,6 +48,12 @@ class CourseTeam < Team
     Team.import(row, course_id, options, @course_team)
   end
 
+  def self.import_options
+    {"has_teamname" => [{"true_first" => "File has a team name as first column",
+                         "true_last" => "File has a team name as last column",
+                         "false" => "File does not contain team names"}]}
+  end
+
   # Export to csv
   def self.export(csv, parent_id, options)
     @course_team = prototype

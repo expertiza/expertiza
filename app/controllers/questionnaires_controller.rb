@@ -514,6 +514,7 @@ class QuestionnairesController < ApplicationController
 
   # FIXME: These private methods belong in the Questionnaire model
 
+  # TODO: Remove this
   def export
     @questionnaire = Questionnaire.find(params[:id])
 
@@ -522,14 +523,6 @@ class QuestionnairesController < ApplicationController
     send_data csv_data,
               type: 'text/csv; charset=iso-8859-1; header=present',
               disposition: "attachment; filename=questionnaires.csv"
-  end
-
-  def import
-    @questionnaire = Questionnaire.find(params[:id])
-
-    file = params['csv']
-
-    @questionnaire.questions << QuestionnaireHelper.get_questions_from_csv(@questionnaire, file)
   end
 
   # clones the contents of a questionnaire, including the questions and associated advice

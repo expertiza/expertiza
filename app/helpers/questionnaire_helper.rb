@@ -3,6 +3,8 @@
 # require 'fastercsv'
 # require 'csv'
 
+# TODO: Move all functionality out of this file and delete it
+
 module QuestionnaireHelper
   CSV_QUESTION = 0
   CSV_TYPE = 1
@@ -41,59 +43,6 @@ module QuestionnaireHelper
 
     csv_data
 end
-
-  def self.get_questions_from_csv(questionnaire, file)
-    questions = []
-    custom_rubric = questionnaire.section == "Custom"
-
-    CSV::Reader.parse(file) do |row|
-      unless row.empty?
-        i = 0
-        score = questionnaire.max_question_score
-        q = Question.new
-
-        q_type = QuestionType.new if custom_rubric
-
-        q.true_false = false
-
-        row.each do |cell|
-          case i
-          when CSV_QUESTION
-            q.txt = cell.strip unless cell.nil?
-          when CSV_TYPE
-            unless cell.nil?
-              q.true_false = cell.downcase.strip == Question::TRUE_FALSE.downcase
-              q_type.q_type = cell.strip if custom_rubric
-            end
-          when CSV_PARAM
-            if custom_rubric
-              q_type.parameters = cell.strip if cell
-            end
-          when CSV_WEIGHT
-            q.weight = cell.strip.to_i if cell
-          else
-            if score >= questionnaire.min_question_score and !cell.nil?
-              a = QuestionAdvice.new(score: score, advice: cell.strip) if custom_rubric
-              a = QuestionAdvice.new(score: questionnaire.min_question_score + i - 4, advice: cell.strip)
-              score -= 1
-              q.question_advices << a
-            end
-          end
-
-          i += 1
-        end
-
-        q.save
-
-        q_type.question = q if custom_rubric
-        q_type.save if custom_rubric
-
-        questions << q
-      end
-    end
-
-    questions
-  end
 
   def self.adjust_advice_size(questionnaire, question)
     # now we only support question advices for scored questions

@@ -33,6 +33,18 @@ class SignUpTopic < ActiveRecord::Base
     end
   end
 
+  def self.required_import_fields
+    {"topic_identifier" => "Topic Identifier (required)",
+     "topic_name" => "Topic Name (required)",
+     "max_choosers" => "Max Choosers (required)"}
+  end
+
+  def self.optional_import_fields
+    {"category" => "Category (optional)",
+     "description" => "Description (optional)",
+     "link" => "Link (optional)"}
+  end
+
   # The old method is commented out below.
   #
   # def self.import(columns, session, _id = nil)

@@ -75,6 +75,11 @@ class MetareviewResponseMap < ResponseMap
     end
   end
 
+  def self.import_options
+    {"has_reviewee" => [{"true_first" => "File has a contributor and reviewer as first and second columns"},
+                        {"true_last" => "File has a contributor and reviewer as last and second last columns"}]}
+  end
+
   def email(defn, _participant, assignment)
     defn[:body][:type] = "Metareview"
     reviewee_user = Participant.find(reviewee_id)

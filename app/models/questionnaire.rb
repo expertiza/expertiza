@@ -86,4 +86,55 @@ class Questionnaire < ActiveRecord::Base
     results = Questionnaire.where("id <> ? and name = ? and instructor_id = ?", id, name, instructor_id)
     errors.add(:name, "Questionnaire names must be unique.") if results.present?
   end
+
+  # A row_hash here is really just a question that gets added to the questionnaire
+  #
+  # NOTE: Assuming rows have headers :question, :type, :weight, :param
+  # in that specific order. Also need advice with string score
+  #
+  # TODO: Use test files to ensure this is working
+  def self.import(row_hash, id)
+
+    raise ArgumentError, "row_hash cannot be empty when importing Question objects for Questionnaire" if row_hash.empty?
+    raise ArgumentError, "id cannot be nil when importing Question objects for Questionnaire" if id.nil?
+
+    questionnaire = Questionnaire.find(id)
+    custom_rubric = questionnaire.section == "Custom"
+
+    # Create the question
+    q = Question.new
+    q.true_false = false
+
+    # TODO: Find out about custom rubrics
+    if custom_rubric
+      q_type = QuestionType.new
+      q_type.parameters = row_hash.delete(:param)
+      q_type.q_type = row_hash.delete(:type)
+    else
+      q.true_false = row_hash.delete(:type) == Question::TRUE_FALSE.downcase
+    end
+
+    # TODO: Determine what parameters are required
+    q.txt = row_hash.delete(:question)
+    q.weight = row_hash.delete(:weight)
+
+    # Add question advice
+    row_hash.keys.each do |k|
+      # Check score within range
+      if k.to_i >= questionnaire.min_question_score && k.to_i >= questionnaire.max_question_score
+        a = QuestionAdvice.new(score: k.to_i, advice: row_hash[k])
+        q.question_advices << a
+      end
+    end
+
+    q.save
+
+    if custom_rubric
+      q_type.question = q
+      q_type.save
+    end
+
+    questionnaire.questions << q
+  end
+
 end

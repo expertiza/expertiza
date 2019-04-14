@@ -49,8 +49,12 @@
         <% if @assignment.max_team_size > 1 %>
           <% team_name_color = get_team_name_color_in_list_submission(team) %>
           <td><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
-          <% unless participants.empty? %>
-            <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %></td>
+            <% unless (participants.empty?) %>
+              <% if @assignment.finished? %>
+                <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %></td>
+              <% else %>
+                <%= link_to 'Perform Review', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %></td>
+              <% end %>
           <% end %>
         <% end %>
 

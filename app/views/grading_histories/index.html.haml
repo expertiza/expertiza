@@ -1,2 +1,31 @@
-%h1 GradingHistories#index
-%p Find me in app/views/grading_histories/index.html.haml
+<h1 class="center">Grading Record</h1>
+
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th>Instructor</th>
+    <th>Assignment</th>
+    <th>Grade Receiver</th>
+    <th>Grade</th>
+    <th>Comment</th>
+    <th>Graded At</th>
+  </tr>
+  </thead>
+  <!--This is the main view of the table. This will add table with either hyperlink or the content nased on the operation. -->
+  <tbody>
+  <% @grading_histories.each do |record| %>
+      <tr>
+        <td><%= User.where(id: record.instructor_id).pluck(:fullname).first %></td>
+        <td><%= Assignment.where(id: record.assignment_id).pluck(:name).first %></td>
+        <% if record.grading_type == "Submission" %>
+            <td><%= Team.where(id: record.grade_receiver_id).pluck(:name).first %></td>
+        <% else %>
+            <td><%= User.where(id: record.grade_receiver_id).pluck(:fullname).first %></td>
+        <% end %>
+        <td><%= record.grade %></td>
+        <td><%= record.comment %></td>
+        <td><%= record.created_at %></td>
+      </tr>
+  <% end %>
+  </tbody>
+</table>

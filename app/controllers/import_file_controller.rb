@@ -6,12 +6,48 @@ class ImportFileController < ApplicationController
      'Super-Administrator'].include? current_role_name
   end
 
+  def start
+    @id = params[:id]
+
+    # TODO: Deprecated and should be removed for all imports (then remove error)
+    if params[:expected_fields]
+      raise ArgumentError, "Take out the expected fields for this link!!"
+    end
+
+    @model = params[:model]
+
+    @required_fields = @model.constantize.required_import_fields
+    @optional_fields = @model.constantize.optional_import_fields
+
+    # Get the associated options
+    # TODO: Represent options as dict from class method
+    # @import_options = @model.constantize.send("import_options")
+
+    @title = params[:title]
+  end
+
   def show
     @id = params[:id]
     @model = params[:model]
+
+    # All required fields are selected by default
+    @selected_fields = @model.constantize.required_import_fields
+
+    # Add the chosen optional fields from start
+    @optional_fields = @model.constantize.optional_import_fields
+    @optional_fields.each do |field, display|
+      if params[field] == "true"
+        @selected_fields.store(field, display)
+      end
+    end
+
+    @field_count = @selected_fields.length
+
     @options = params[:options]
     @delimiter = get_delimiter(params)
     @has_header = params[:has_header]
+
+    # TODO: Somehow eliminate this
     if (@model == 'AssignmentTeam'|| @model == 'CourseTeam')
       @has_teamname = params[:has_teamname]
     else
@@ -31,29 +67,12 @@ class ImportFileController < ApplicationController
     end
     if (@model == 'SignUpTopic')
       @optional_count = 0
-      if (params[:category] == 'true')
-        @optional_count += 1
-      end
-      if (params[:description] == 'true')
-        @optional_count += 1
-      end
-      if (params[:link] == 'true')
-        @optional_count += 1
-      end
-    else
-      @optional_count = 0
     end
+
     @current_file = params[:file]
     @current_file_contents = @current_file.read
     @contents_grid = parse_to_grid(@current_file_contents, @delimiter)
     @contents_hash = parse_to_hash(@contents_grid, params[:has_header])
-  end
-
-  def start
-    @id = params[:id]
-    @expected_fields = params[:expected_fields]
-    @model = params[:model]
-    @title = params[:title]
   end
 
   def import
@@ -73,126 +92,54 @@ class ImportFileController < ApplicationController
     redirect_to session[:return_to]
   end
 
-  # def import
-  #   errors = importFile(session, params)
-  #   err_msg = "The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>"
-  #   errors.each do |error|
-  #     err_msg = err_msg + "<li>" + error.to_s + "<br/>"
-  #   end
-  #   err_msg += "</ul>"
-  #   flash[:error] = err_msg unless errors.empty?
-  #   undo_link("The file has been successfully imported.")
-  #   redirect_to session[:return_to]
-  # end
+  # NOTE: Optional columns currently handled with a checkbox in the show that carries into the
+  # import function (after the table appears). Will need to modify for the advice. Should probably
+  # require files to have a header, this will simplify the inclusion of the question advice.
+  #
+  # Also, good way to refactor this in general? Without a header, pass the expected params to the show
+  # view. Update the expected columns view in the start page to reflect the optional params.
 
   def import_from_hash(session, params)
-    if params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
-      contents_hash = eval(params[:contents_hash])
-      @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
-      errors = []
-      begin
-        @header_integrated_body.each do |row_hash|
-          if params[:model] == "AssignmentTeam"
-            teamtype = AssignmentTeam
-          else
-            teamtype = CourseTeam
-          end
+
+    @model = params[:model]
+    contents_hash = eval(params[:contents_hash])
+
+    if params[:has_header] == "true"
+      @header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
+    else
+      # If there is no header, recover the selected fields in the select* params
+      new_header = []
+      params.keys.each do |p|
+        if p.match(/\Aselect/)
+          new_header << p
+        end
+      end
+      @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
+    end
+
+    # Call ::import for each row of the file
+    errors = []
+    begin
+      @header_integrated_body.each do |row_hash|
+
+        # TODO: Eliminate special paths by making consistent ::import functions
+        if @model == "AssignmentTeam" or @model == "CourseTeam"
+          teamtype = @model.constantize
           options = eval(params[:options])
           options[:has_teamname] = params[:has_teamname]
           Team.import(row_hash, params[:id], options, teamtype)
-        end
-      rescue
-        errors << $ERROR_INFO
-      end
-      elsif params[:model] == "ReviewResponseMap"
-        contents_hash = eval(params[:contents_hash])
-        @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
-        errors = []
-        begin
-          @header_integrated_body.each do |row_hash|
-            ReviewResponseMap.import(row_hash,session,params[:id])
-          end
-        rescue
-          errors << $ERROR_INFO
-        end
-    elsif params[:model] == "MetareviewResponseMap"
-      contents_hash = eval(params[:contents_hash])
-      @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
-      errors = []
-      begin
-        @header_integrated_body.each do |row_hash|
-          MetareviewResponseMap.import(row_hash,session,params[:id])
-        end
-      rescue
-        errors << $ERROR_INFO
-      end
-    elsif params[:model] == 'SignUpTopic' || params[:model] == 'SignUpSheet'
-      contents_hash = eval(params[:contents_hash])
-      if params[:has_header] == 'true'
-        @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
-      else
-        if params[:optional_count] == '0'
-          new_header = [params[:select1], params[:select2], params[:select3]]
-          @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
-        elsif params[:optional_count] == '1'
-          new_header = [params[:select1], params[:select2], params[:select3], params[:select4]]
-          @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
-        elsif params[:optional_count] == '2'
-          new_header = [params[:select1], params[:select2], params[:select3], params[:select4], params[:select5]]
-          @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
-        elsif params[:optional_count] == '3'
-          new_header = [params[:select1], params[:select2], params[:select3], params[:select4], params[:select5], params[:select6]]
-          @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
-        end
-      end
-      errors = []
-      begin
-        @header_integrated_body.each do |row_hash|
+        elsif @model == "SignUpTopic" or @model == "SignUpSheet"
           session[:assignment_id] = params[:id]
           Object.const_get(params[:model]).import(row_hash, session, params[:id])
+        else
+          @model.constantize.import(row_hash, session, params[:id])
         end
-      rescue
-        errors << $ERROR_INFO
+
       end
-    elsif params[:model] == 'AssignmentParticipant' || params[:model] == 'CourseParticipant'
-      contents_hash = eval(params[:contents_hash])
-      if params[:has_header] == 'true'
-        @header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
-      else
-        new_header = [params[:select1], params[:select2], params[:select3], params[:select4]]
-        @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
-      end
-      errors = []
-      begin
-        if params[:model] == 'AssignmentParticipant'
-          @header_integrated_body.each do |row_hash|
-            AssignmentParticipant.import(row_hash, session, params[:id])
-          end
-        elsif params[:model] == 'CourseParticipant'
-          @header_integrated_body.each do |row_hash|
-            CourseParticipant.import(row_hash, session, params[:id])
-          end
-        end
-      rescue
-        errors << $ERROR_INFO
-      end
-    else # params[:model] = "User"
-      contents_hash = eval(params[:contents_hash])
-      if params[:has_header] == 'true'
-        @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
-      else
-        new_header = [params[:select1], params[:select2], params[:select3]]
-        @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
-      end
-      errors = []
-      begin
-        @header_integrated_body.each do |row_hash|
-          User.import(row_hash, nil, session)
-        end
-      rescue StandardError
-        errors << $ERROR_INFO
-      end
+    rescue
+      errors << $ERROR_INFO
     end
+
     errors
   end
 
@@ -204,6 +151,7 @@ class ImportFileController < ApplicationController
   # E.G. [ { :name => 'jsmith', :fullname => 'John Smith' , :email => 'jsmith@gmail.com' },
   #        { :name => 'jdoe', :fullname => 'Jane Doe', :email => 'jdoe@gmail.com' } ]
   #
+  # TODO: Eliminate all case statements using import options
   def hash_rows_with_headers(header, body)
     new_body = []
     if params[:model] == "User" or params[:model] == "AssignmentParticipant" or params[:model] == "CourseParticipant" or params[:model] == "SignUpTopic"
@@ -321,7 +269,4 @@ class ImportFileController < ApplicationController
     row
   end
 
-  # def undo_link
-  #  "<a href = #{url_for(:controller => :versions,:action => :revert,:id => Object.const_get(params[:model]).last.versions.last.id)}>undo</a>"
-  # end
 end

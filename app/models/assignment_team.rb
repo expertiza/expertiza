@@ -111,6 +111,20 @@ class AssignmentTeam < Team
     Team.import(row, assignment_id, options, @assignment_team)
   end
 
+  def self.required_import_fields
+    {}
+  end
+
+  def self.optional_import_fields
+    {}
+  end
+
+  def self.import_options
+    {"has_teamname" => [{"true_first" => "File has a team name as first column",
+                         "true_last" => "File has a team name as last column",
+                         "false" => "File does not contain team names"}]}
+  end
+
   # Export the existing teams in a csv file
   def self.export(csv, parent_id, options)
     @assignment_team = prototype

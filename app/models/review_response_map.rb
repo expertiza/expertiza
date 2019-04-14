@@ -68,6 +68,11 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
+  def self.import_options
+    {"has_reviewee" => [{"true_first" => "File has a contributor as first column"},
+                        {"true_last" => "File has a contributor as last column"}]}
+  end
+
   def show_feedback(response)
     return unless self.response.any? and response
     map = FeedbackResponseMap.find_by(reviewed_object_id: response.id)

@@ -2,7 +2,7 @@
 
 development:
   client_key: '39b359b38ddb044c2bd6'
-  client_secret: '4763f11c08c5dee8402170d91d73b772c8fda107'
+  client_secret: '7580c9b7bf772689c08b770a56f231d0493d9f0d'
 
 test:
   client_key: 'qwerty12345'

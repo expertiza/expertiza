@@ -614,4 +614,5 @@ class Assignment < ActiveRecord::Base
   def finished?( topic_id = nil )
     DueDate.get_next_due_date(self.id, topic_id).nil?
   end
+  
 end

@@ -76,4 +76,115 @@ class ReviewBidsController < LotteryController
       )
     end
   end
+
+
+  #E1928: Allow reviewers to bid on what to review
+  # This is an implementation of Gale Shapely algorithm that will be used by the instructors to assign the topics
+  # for reviews to the students
+
+=begin
+The way to call this method
+user_ranks = [{"pid":1,"ranks":[1,2,3]},{"pid":2,"ranks":[3,1,2]},{"pid":3,"ranks":[2,3,1]},{"pid":4,"ranks": [2,1,3]},{"pid":5,"ranks": [1,2,3]}]
+print gale_shapley(user_ranks, 2, 2)
+=end
+
+
+  def gale_shapley(users, user_size, item_size)
+=begin
+    Description
+    -----------
+    Given the users preference towards items, the available slots of each item and
+    maximum number each user can have items, assign items to users according to their preference.
+    -----------
+    Parameters
+    -----------
+    users       :   List[dict]
+        dict format: {"pid": user_id, "ranks": [item_id]} the most interested items go first.
+    user_size   :   int
+    item_size   :   int
+    -----------
+    Return
+    List[dict]
+=end
+
+    item_ranks = {}
+    count_assigned_items = {}
+    users_items = {}
+
+    # construct a user priority list for every item
+    users.each do |user|
+      count = 0
+      user['ranks'].each do item
+        unless item_ranks.include? item
+          item_ranks[item] = []
+        end
+
+        unless users_items.include? user["pid"]
+        users_items[user["pid"]] = []
+        end
+
+      #every item hold a list of priority of users
+      item_ranks[item] << {pid: user["pid"], priority: count+=1}
+
+      end
+    end
+
+    # sort the item ranks by user's priority so that the algorithm can select the most interested users
+    item_ranks.each do |item|
+      #randomize the order of users for fairness
+      item_ranks[item].shuffle
+      item_ranks[item].sort_by{|pid, priority| priority}
+      count_assigned_items[item] = 0
+    end
+
+    #randomize the order of items for fairness
+    items = item_ranks.keys
+    items.shuffle
+
+    # start bidding
+    while true
+      added = 0
+
+      items.each do |item|
+        # select the most interested users
+
+        while item_ranks[item]
+          user = item_ranks[item].pop(0)
+
+          # if item is assigned to a number of users and this number exceeds its limit:
+          # the assignment for this item is finished
+          if count_assigned_items[item] >= item_size
+              break
+          end
+
+          user_id = user["pid"]
+
+          # if user has enough assignment, choose another user with less interest.
+          if len(users_items[user_id]) >= user_size
+              next
+          end
+
+          users_items[user_id] << item
+          count_assigned_items[item]+=1
+          added = 1
+          break
+
+        end
+      end
+
+          unless added
+              break
+          end
+
+    end
+
+    rst = []
+    users_items.each do |item|
+      rst << {pid: user, items: users_items[user]}
+    end
+
+    return rst
+
+
+  end
 end

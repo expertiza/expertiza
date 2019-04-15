@@ -59,7 +59,8 @@ class Answer < ActiveRecord::Base
 
       @questionnaire = Questionnaire.find(@questions[0].questionnaire_id)
 
-      questionnaireData = ScoreView.find_by_sql ["SELECT q1_max_question_score ,SUM(question_weight) as sum_of_weights,SUM(question_weight * s_score) as weighted_score FROM score_views WHERE type in('Criterion', 'Scale') AND q1_id = ? AND s_response_id = ?", @questions[0].questionnaire_id, @response.id]
+      questionnaireData = Question.find_by_sql(["SELECT questionnaire.max_question_score questionnaire_max_question_score, SUM(ques.weight) as sum_of_weights, SUM(ques.weight * ans.answer) as weighted_score FROM questions ques left join questionnaires questionnaire on ques.questionnaire_id = questionnaire.id left join answers ans on ques.id = ans.question_id WHERE ques.type in('Criterion', 'Scale') AND questionnaire.id = ? AND ans.response_id = ?", @questions[0].questionnaire_id, @response.id])
+
       # zhewei: we should check whether weighted_score is nil,
       # which means student did not assign any score before save the peer review.
       # If we do not check here, to_f method will convert nil to 0, at that time, we cannot figure out the reason behind 0 point,
@@ -78,7 +79,7 @@ class Answer < ActiveRecord::Base
           sum_of_weights -= question_weight
         end
       end
-      max_question_score = questionnaireData[0].q1_max_question_score.to_f
+      max_question_score = questionnaireData[0].questionnaire_max_question_score.to_f
       if sum_of_weights > 0 && max_question_score && !weighted_score.nil?
         return (weighted_score / (sum_of_weights * max_question_score)) * 100
       else

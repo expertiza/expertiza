@@ -1,0 +1,167 @@
+<!-- the table creation is changed top accommodate functionality of tablesorter, which requires thead and tbody seperately. Previously, headers were in tbody only -->
+<div class='reviewreport'>
+  <!-- Added headers for tablesorter -->
+
+  <script type='text/javascript'>
+      $(window).load(function () {
+          $("#myTable tbody").sortable().disableSelection();
+      });
+  </script>
+
+  <p> **In "Team reviewed" column text in:</p>
+    <ul style="list-style-type:square">
+  <li><i style="color:red">red</i> indicates that the review is not  completed in any rounds;</li>
+  <li><i style="color:blue">blue</i> indicates that a review is completed in every round and the review grade is not assigned;</li>
+  <li><i style="color:green">green</i> indicates that there is no submitted work to review within the round;</li>
+  <li><i style="color:purple">purple</i> indicates that there is no review for a submitted work within the round;</li>
+  <li><i style="color: #986633">brown</i> indicates that the review grade has been assigned</li>
+</ul>
+  <p>&nbsp;</p>
+  
+  <table id="myTable" class="tbl_heat tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
+    <thead>
+    <tr bgcolor='#CCCCCC'>
+      <!-- class value decides whether the column should be sortable or not  -->
+      <th width="16%" class="sorter-true">Reviewer <span></span></th>
+      <th width="10%" class="sorter-false">Reviews done<span></span></th>
+      <!--Dr.Kidd's course
+      <% if @assignment.instructor_id == 2026 %>
+        <th width = "14%" class="sorter-false">Team reviewed <span></span></th>
+        <th width = "14%" class="sorter-false">Author feedback <span></span></th>
+      <% else %>-->
+        <th width="24%" class="sorter-false">Team reviewed <span></span></th>
+        <!--
+      <% end %>-->
+      <th width="13%" class="sorter-false">Score awarded / Avg. score <span></span></th>
+      <th width="13%" class="sorter-true">Metrics <span></span></th>
+      <th class="sorter-false">Assign grade and write comments <span></span></th>
+    </tr>
+    </thead>
+    <tbody>
+
+    <% sort_reviewer_by_review_volume_desc.each do |r| %>
+      <% @response_maps, @rspan = get_data_for_review_report(@id, r.id, @type) %>
+      <tr>
+        <% if r.id != -1 %>
+          <% user = Participant.find(r.id).user %>
+            <!--reviewer-->
+            <td>
+              <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
+              (<%= user.fullname(session[:ip]) %>)
+            </td>
+            <!--# reviews done-->
+            <td align = 'left'>
+              <% (1..@assignment.num_review_rounds).each do |round| %>
+                <%= instance_variable_get("@review_in_round_" + round.to_s) %>/<%= @rspan %>
+                <%= ', ' unless round == @assignment.num_review_rounds %>
+              <% end %>
+              <%= link_to "summary", {:controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id}, target: :_blank %>
+            </td>
+          <!--Team reviewed / Author feedback-->
+          <td align = 'left'>
+          <% @response_maps.each_with_index do |ri, index| %>
+            <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
+            <% team_name_color = get_team_name_color_in_review_report(ri) %>
+            <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, ri.response, ri.reviewee_id) %>
+              <% if Team.where(id: ri.reviewee_id).length > 0 %>
+                <!--Team reviewed-->
+                <% if index == 0 %>
+                  <div id= <%= team_name_color %>>
+                <% else %>
+                  <div id = <%= team_name_color %> style="border-top: solid; border-width: 1px;">
+                <% end %>
+                    <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
+                    <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>
+                    <!--Hard-coded Dr.Kidd's question in order to display link.-->
+                    <!--later we can create a hyperlink question type to deal with this situation.-->
+                    <%= list_hyperlink_submission(ri.id, 5386) if Assignment.find_by(id: @id.to_i).course.instructor.name == 'Jkidd' %>
+                  </div>
+
+                <!--Author feedback-->
+                <!--Dr.Kidd required to add a "author feedback" column that shows the average score the reviewers received from the authors. In this case, she can see all the data on a single screen.-->
+                <!--Dr.Kidd's course-->
+                <!--
+                <% if @assignment.instructor_id == 2026 %>
+                  <% if index == 0 %>
+                  <div>
+                  <% else %>
+                  <div style="border-top: solid; border-width: 1px;">
+                  <% end %>
+                    <%= calcutate_average_author_feedback_score(@assignment.id, @assignment.max_team_size, ri.id, ri.reviewee_id) %>
+                  </div>
+                <% end %>-->
+              <% end %>
+            <% end %>
+          </td>
+          <!--Score awarded / Avg. score-->
+          <td align='left'>
+            <% @response_maps.each_with_index do |ri, index| %>
+              <% if Team.where(id: ri.reviewee_id).length > 0 %>
+                <% @team = Team.find(ri.reviewee_id) %>
+                <%= render partial: 'team_score', locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: r.id} %>
+              <% end %>
+            <% end %>
+          </td>
+          <!--Metrics-->
+          <td align='left'>
+            <%= display_volume_metric_chart(r) %>
+          </td>
+          <!--Assign grade and write comments-->
+          <td align='left'>
+            <%= form_tag 'save_grade_and_comment_for_reviewer', remote: true do %>
+              <%= hidden_field_tag :participant_id, r.id %>
+              <%= hidden_field_tag :assignment_id, @id %>
+              <%= number_field_tag 'grade_for_reviewer', r.review_grade.try(:grade_for_reviewer), min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %>
+              <br/>
+              <%= text_area_tag 'comment_for_reviewer', r.review_grade.try(:comment_for_reviewer), placeholder: 'Comment', class: "awesome_input", 'data-multiple' => '', 'data-minchars' => "1", :style => 'width: 80%' %>
+              <table class="inline-transparent">
+                <tr>
+                  <td>
+                    <%= image_tag 'text_macro.png', :border => 2, :title => 'Text Macro/Pastebin', :style => 'width: 24px; height:30px', :onclick => 'show_text_macros()' %>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <%= submit_tag 'Save' %>
+                  </td>
+                </tr>
+              </table>
+            <% end %>
+            <%= link_to "Grading History", grading_histories_path(grade_receiver_id: Participant.where(id: r.id).pluck(:user_id).first, participant_id: r.id, grade_type: "Review") %>
+          </td>
+        <%end %>  
+        </tr>
+      <%end %>
+</table>
+
+  <p> **In "Team reviewed" column, text in <i style = "color:red">red</i> indicates that the review is not yet completed; text in <i style = "color:blue">blue</i> indicates that the review grade is not assigned or updated; text in <i style = "color: #986633">brown</i> indicates that the review grade has been assigned.</p>
+</div>
+  <!--Partial for text macro form-->
+ <%= render :partial => '/user_pastebins/save_text_macros'%>
+
+<script>
+    $(function () {
+        /*Function for sorting the table */
+        $("#myTable").tablesorter({
+            sortList: [[0, 0]], //sort First Column by default when page loads
+            widgets: ['zebra'], // Make sure to update the css when column is sorted
+            headers: {
+                4: {
+                    sorter: 'customParser' //custom Parser to parse Metrics data for the custom parser
+                }
+            }
+        });
+    });
+    $.tablesorter.addParser({
+        id: "customParser",                                       //customParser for sorting by volume
+        is: function (stringValue) {
+            return false;
+        },
+        format: function (stringValue) {
+            var stringNumericPart = stringValue.split(" ");         //split the data by spaces
+            var numericValue = parseInt(stringNumericPart[2], 10);   //extract the numeric data
+            return numericValue;
+        },
+        type: 'numeric'
+    });
+</script>

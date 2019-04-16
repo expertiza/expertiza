@@ -13,27 +13,32 @@ module ReviewAssignment
     # Initialize contributor set with all teams participating in this assignment
     contributor_set = Array.new(contributors)
 
-    # Reject contributors that have not selected a topic, or have no submissions
-    contributor_set = reject_by_no_topic_selection_or_no_submission(contributor_set)
+    # If instructor or TA they can review anything
+    if false #should be if instructor
 
-    # Reject contributions of topics whose deadline has passed, or which are not reviewable in the current stage
-    contributor_set = reject_by_deadline(contributor_set)
+      # Reject contributors that have not selected a topic, or have no submissions
+      contributor_set = reject_by_no_topic_selection_or_no_submission(contributor_set)
 
-    # Filter submissions already reviewed by reviewer
-    contributor_set = reject_previously_reviewed_submissions(contributor_set, reviewer)
+      # Reject contributions of topics whose deadline has passed, or which are not reviewable in the current stage
+      contributor_set = reject_by_deadline(contributor_set)
 
-    # Filter submission by reviewer him/her self
-    contributor_set = reject_own_submission(contributor_set, reviewer)
+      # Filter submissions already reviewed by reviewer
+      contributor_set = reject_previously_reviewed_submissions(contributor_set, reviewer)
 
-    # Filter the contributors with the least number of reviews
-    # (using the fact that each contributor is associated with a topic)
-    contributor_set = reject_by_least_reviewed(contributor_set)
+      # Filter submission by reviewer him/her self
+      contributor_set = reject_own_submission(contributor_set, reviewer)
 
-    contributor_set = reject_by_max_reviews_per_submission(contributor_set)
+      # Filter the contributors with the least number of reviews
+      # (using the fact that each contributor is associated with a topic)
+      contributor_set = reject_by_least_reviewed(contributor_set)
 
-    # if this assignment does not allow reviewer to review other artifacts on the same topic,
-    # remove those teams from candidate list.
-    contributor_set = reject_by_same_topic(contributor_set, reviewer) unless self.can_review_same_topic?
+      contributor_set = reject_by_max_reviews_per_submission(contributor_set)
+
+      # if this assignment does not allow reviewer to review other artifacts on the same topic,
+      # remove those teams from candidate list.
+      contributor_set = reject_by_same_topic(contributor_set, reviewer) unless self.can_review_same_topic?
+
+    end
 
     # Add topics for all remaining submissions to a list of available topics for review
     candidate_topics = Set.new

@@ -2,7 +2,10 @@ class ResponseController < ApplicationController
   helper :submitted_content
   helper :file
 
+  require 'net/http'
+
   def action_allowed?
+    get_review_response_metrics
     response = user_id = nil
     action = params[:action]
     if %w[edit delete update view].include?(action)
@@ -140,6 +143,17 @@ class ResponseController < ApplicationController
   end
 
   # Adding a function to integrate suggestion detection algorithm (SDA)
+  def get_review_response_metrics
+    uri = URI.parse('https://peer-review-metrics-nlp.herokuapp.com/metrics/all')
+    http = Net::HTTP.new(uri.hostname, uri.port)
+    req = Net::HTTP::Post.new(uri, initheader = {'Content-Type' =>'application/json'})
+    req.body = {"reviews"=>["some text"],
+                      "metrics"=>["suggestion"]}.to_json
+    http.use_ssl = true
+    res = http.request(req)
+    puts "yyyyyyyyy"
+    puts JSON.parse(res.body)
+  end
 
   def create
     map_id = params[:id]

@@ -38,7 +38,7 @@
     <% @teams.each do |team| %>
       <% @l = @l+1 %>
       <tr>
-        <% topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team) %>
+        <% topic_id, topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team) %>
 
         <!--Topic name-->
         <% if @assignment.topics? %>
@@ -49,12 +49,14 @@
         <% if @assignment.max_team_size > 1 %>
           <% team_name_color = get_team_name_color_in_list_submission(team) %>
           <td><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
-            <% unless (participants.empty?) %>
+            <% unless (participants.empty?)  %>
               <% if @assignment.finished? %>
                 <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %></td>
+              <% elsif true %>
+                <%= link_to 'Add Review', {controller: 'review_mapping', action: 'assign_reviewer_dynamically', assignment_id: @assignment.id, topic_id: topic_id, reviewer_id: current_user }, target: '_blank' %></td>
               <% else %>
-                <%= link_to 'Perform Review', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %></td>
-              <% end %>
+                Your Review: <%= link_to 'View', {controller: 'response', action: 'new', id: 123}, target: '_blank' %> | <%= link_to 'Update', {controller: 'response', action: 'new', id: 123}, target: '_blank' %></td>
+            <% end %>
           <% end %>
         <% end %>
 

@@ -24,6 +24,13 @@ class ReviewMappingController < ApplicationController
     end
   end
 
+  def start_instructor_review
+    user_id = @current_user.id
+    assignment = Assignment.find(params[:assignment_id])
+    team = Team.find_team_for_assignment_and_user(assignment.id, user_id).first
+    redirect_to controller: 'submitted_content', action: 'edit', id: params[:reviewer_id], msg: e.message
+  end
+
   def add_calibration
     participant = AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first rescue nil
     if participant.nil?
@@ -86,6 +93,11 @@ class ReviewMappingController < ApplicationController
     assignment = Assignment.find(params[:assignment_id])
     reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
 
+    #If this is an instructor or TA and they are reviewing an assignment then they may not be a participant yet, we will add them on the fly:
+    if reviewer.nil? and (['Instructor', 'Teaching Assistant', 'Administrator'].include? current_role_name)
+      assignment.add_participant(@current_user.name, false, true, false)
+    end
+
     if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
       flash[:error] = "No topic is selected.  Please go back and select a topic."
     else
@@ -119,6 +131,12 @@ class ReviewMappingController < ApplicationController
     # end
 
     redirect_to controller: 'student_review', action: 'list', id: reviewer.id
+  end
+
+  def assign_reviewer_current_instructor
+    assignment = Assignment.find(params[:assignment_id])
+    assignment.tea
+
   end
 
   # assigns the quiz dynamically to the participant

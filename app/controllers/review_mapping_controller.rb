@@ -96,6 +96,7 @@ class ReviewMappingController < ApplicationController
     #If this is an instructor or TA and they are reviewing an assignment then they may not be a participant yet, we will add them on the fly:
     if reviewer.nil? and (['Instructor', 'Teaching Assistant', 'Administrator'].include? current_role_name)
       assignment.add_participant(@current_user.name, false, true, false)
+      reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
     end
 
     if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?

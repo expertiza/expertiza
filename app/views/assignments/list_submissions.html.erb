@@ -31,7 +31,8 @@
           <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Participant name</th>
         <% end %>  
         <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Links</th> 
-        <th class="sorter-false" style="font-weight: bold; font-size: 15px;"></th>
+
+        <th style="font-weight: bold; font-size: 15px;">History</th>
       </tr>                    
     </thead>
     <% @l = -1 %>
@@ -81,7 +82,9 @@
         </td>
         <td width="10%">
 
-          <%= link_to "History", submission_records_path(team_id: team.id) %>
+          <%= link_to "Submission History", submission_records_path(team_id: team.id) %> <br/>
+          <br/>
+          <%= link_to "Grading History", grading_histories_path(grade_receiver_id: team.id, grade_type: "Submission") %>
 
         </td>
       </tr>

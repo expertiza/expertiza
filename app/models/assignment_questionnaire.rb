@@ -1,6 +1,7 @@
 class AssignmentQuestionnaire < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :questionnaire
+  belongs_to :sign_up_topic
   has_paper_trail
 
   scope :retrieve_questionnaire_for_assignment, lambda {|assignment_id|

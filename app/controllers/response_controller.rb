@@ -72,10 +72,15 @@ class ResponseController < ApplicationController
     # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
     print("\r\nThe params in the create method are: \r\n")
     print(params)
-
+    print("\r\n")
+    
     if is_submitted
       return show_confirmation_page(params)
+    else
+      redirect_to controller: 'response', action: 'save', id: @map.map_id,
+                  return: params[:return], msg: msg, error_msg: params[:error_msg], review: params[:review], save_options: params[:save_options]
     end
+
 
     # map_id = params[:id]
     # map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
@@ -147,11 +152,14 @@ class ResponseController < ApplicationController
     # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
     print("\r\nThe params in the update are: \r\n")
     print(params)
+    print("\r\n")
 
     if is_submitted
       return show_confirmation_page(params)
+    else
+      redirect_to controller: 'response', action: 'save', id: @map.map_id,
+                return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
     end
-
     # # the response to be updated
     # @response = Response.find(params[:id])
     # msg = ""

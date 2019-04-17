@@ -415,7 +415,7 @@
         <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
     <% end %>
     <%= hidden_field_tag('return', @return) %>
-    <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %>
+    <%# <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %> %>
 <% end %>
 
 <!--Check whether there is a UploadFile question.-->

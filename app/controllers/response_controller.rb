@@ -5,7 +5,7 @@ class ResponseController < ApplicationController
   require 'net/http'
 
   def action_allowed?
-    get_review_response_metrics
+    # get_review_response_metrics
     response = user_id = nil
     action = params[:action]
     if %w[edit delete update view].include?(action)
@@ -46,12 +46,73 @@ class ResponseController < ApplicationController
     render json: response
   end
 
-  def delete
-    @response = Response.find(params[:id])
-    # user cannot delete other people's responses. Needs to be authenticated.
-    map_id = @response.map.id
-    @response.delete
-    redirect_to action: 'redirect', id: map_id, return: params[:return], msg: "The response was deleted."
+  def new
+    assign_instance_vars
+    set_content(true)
+    @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
+    # Because of the autosave feature and the javascript that sync if two reviewing windows are opened
+    # The response must be created when the review begin.
+    # So do the answers, otherwise the response object can't find the questionnaire when the user hasn't saved his new review and closed the window.
+    # A new response has to be created when there hasn't been any reviews done for the current round,
+    # or when there has been a submission after the most recent review in this round.
+    team = AssignmentTeam.find(@map.reviewee_id)
+    @response = Response.where(map_id: @map.id, round: @current_round.to_i).order(updated_at: :desc).first
+    if @response.nil? || team.most_recent_submission.updated_at > @response.updated_at
+      @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
+    end
+    questions = sort_questions(@questionnaire.questions)
+    init_answers(questions)
+    render action: 'response'
+  end
+
+  def create
+    map_id = params[:id]
+    map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
+    @map = ResponseMap.find(map_id)
+    if params[:review][:questionnaire_id]
+      @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
+      @round = params[:review][:round]
+    else
+      @round = nil
+    end
+    is_submitted = (params[:isSubmit] == 'Yes')
+    was_submitted = false
+
+    # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
+    print("\r\nThe params are: \r\n")
+    print(params)
+
+    if is_submitted
+      return confirm_user_input
+    end
+
+    # There could be multiple responses per round, when re-submission is enabled for that round.
+    # Hence we need to pick the latest response.
+    @response = Response.where(map_id: @map.id, round: @round.to_i).order(created_at: :desc).first
+    if @response.nil?
+      @response = Response.create(
+        map_id: @map.id,
+        additional_comment: params[:review][:comments],
+        round: @round.to_i,
+        is_submitted: is_submitted
+      )
+    end
+    was_submitted = @response.is_submitted
+    @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
+
+    # ,:version_num=>@version)
+    # Change the order for displaying questions for editing response views.
+    questions = sort_questions(@questionnaire.questions)
+    create_answers(params, questions) if params[:responses]
+    msg = "Your response was successfully saved."
+    error_msg = ""
+    # only notify if is_submitted changes from false to true
+    if (@map.is_a? ReviewResponseMap) && (was_submitted == false && @response.is_submitted) && @response.significant_difference?
+      @response.notify_instructor_on_difference
+      @response.email
+    end
+    redirect_to controller: 'response', action: 'save', id: @map.map_id,
+                return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
   end
 
   # Determining the current phase and check if a review is already existing for this stage.
@@ -77,8 +138,6 @@ class ResponseController < ApplicationController
     render action: 'response'
   end
 
-
-
   # Update the response and answers when student "edit" existing response
   def update
     render nothing: true unless action_allowed?
@@ -89,8 +148,9 @@ class ResponseController < ApplicationController
     # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
     print("\r\nThe params are: \r\n")
     print(params)
+
     if params["isSubmitted"] && params["isSubmitted"] == "Yes"
-      return confirm_review
+      return confirm_user_input
     end
 
     begin
@@ -109,23 +169,12 @@ class ResponseController < ApplicationController
                 return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
   end
 
-  def new
-    assign_instance_vars
-    set_content(true)
-    @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
-    # Because of the autosave feature and the javascript that sync if two reviewing windows are opened
-    # The response must be created when the review begin.
-    # So do the answers, otherwise the response object can't find the questionnaire when the user hasn't saved his new review and closed the window.
-    # A new response has to be created when there hasn't been any reviews done for the current round,
-    # or when there has been a submission after the most recent review in this round.
-    team = AssignmentTeam.find(@map.reviewee_id)
-    @response = Response.where(map_id: @map.id, round: @current_round.to_i).order(updated_at: :desc).first
-    if @response.nil? || team.most_recent_submission.updated_at > @response.updated_at
-      @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
-    end
-    questions = sort_questions(@questionnaire.questions)
-    init_answers(questions)
-    render action: 'response'
+  def delete
+    @response = Response.find(params[:id])
+    # user cannot delete other people's responses. Needs to be authenticated.
+    map_id = @response.map.id
+    @response.delete
+    redirect_to action: 'redirect', id: map_id, return: params[:return], msg: "The response was deleted."
   end
 
   def new_feedback
@@ -160,57 +209,10 @@ class ResponseController < ApplicationController
     http.use_ssl = true
     res = http.request(req)
     # puts "yyyyyyyyy"
-    # puts JSON.parse(res.body)
-  end
 
-  def create
-    map_id = params[:id]
-    map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
-    @map = ResponseMap.find(map_id)
-    if params[:review][:questionnaire_id]
-      @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
-      @round = params[:review][:round]
-    else
-      @round = nil
-    end
-    is_submitted = (params[:isSubmit] == 'Yes')
-    was_submitted = false
-
-    # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
-    print("\r\nThe params are: \r\n")
-    print(params)
-
-    if is_submitted
-      return confirm_review
-    end
-
-    # There could be multiple responses per round, when re-submission is enabled for that round.
-    # Hence we need to pick the latest response.
-    @response = Response.where(map_id: @map.id, round: @round.to_i).order(created_at: :desc).first
-    if @response.nil?
-      @response = Response.create(
-        map_id: @map.id,
-        additional_comment: params[:review][:comments],
-        round: @round.to_i,
-        is_submitted: is_submitted
-      )
-    end
-    was_submitted = @response.is_submitted
-    @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
-
-    # ,:version_num=>@version)
-    # Change the order for displaying questions for editing response views.
-    questions = sort_questions(@questionnaire.questions)
-    create_answers(params, questions) if params[:responses]
-    msg = "Your response was successfully saved."
-    error_msg = ""
-    # only notify if is_submitted changes from false to true
-    if (@map.is_a? ReviewResponseMap) && (was_submitted == false && @response.is_submitted) && @response.significant_difference?
-      @response.notify_instructor_on_difference
-      @response.email
-    end
-    redirect_to controller: 'response', action: 'save', id: @map.map_id,
-                return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
+    api_response = JSON.parse(res.body)
+    print api_response
+    return api_response
   end
 
   def save
@@ -234,10 +236,21 @@ class ResponseController < ApplicationController
     redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
-  def confirm_review
-    print("\r\n Inside the confirm_review method\r\n")
+  def show_confirmation_page
+    @the_params = params
+    render action: "review_confirmation"
+  end
+
+  def confirm_user_input
+    print("\r\n Inside the confirm_user_input method\r\n")
+
+    # TODO: get Answers to feed the API
+
+    # send user review to API for analysis
+    api_response = get_review_response_metrics
+
+    
     redirect_to action: 'review_confirmation'
-    # redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
   def redirect

@@ -85,6 +85,12 @@ class ResponseController < ApplicationController
     # the response to be updated
     @response = Response.find(params[:id])
     msg = ""
+
+    # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
+    if is_submitted
+      confirm_review
+    end
+    
     begin
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
@@ -172,7 +178,7 @@ class ResponseController < ApplicationController
     if is_submitted
       confirm_review
     end
-    
+
     # There could be multiple responses per round, when re-submission is enabled for that round.
     # Hence we need to pick the latest response.
     @response = Response.where(map_id: @map.id, round: @round.to_i).order(created_at: :desc).first

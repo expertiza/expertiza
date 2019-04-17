@@ -167,6 +167,12 @@ class ResponseController < ApplicationController
     end
     is_submitted = (params[:isSubmit] == 'Yes')
     was_submitted = false
+
+    # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
+    if is_submitted
+      confirm_review
+    end
+    
     # There could be multiple responses per round, when re-submission is enabled for that round.
     # Hence we need to pick the latest response.
     @response = Response.where(map_id: @map.id, round: @round.to_i).order(created_at: :desc).first
@@ -214,12 +220,7 @@ class ResponseController < ApplicationController
     end
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Response was successfully saved")
 
-    # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
-    if params["isSubmit"] && params["isSubmit"] == "Yes"
-      confirm_review 
-    else
-      redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
-    end
+    redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
   def confirm_review

@@ -496,7 +496,7 @@ end
   num_of_expect_key_words = added_lines.scan(/\s*expect\s*[\(\{]/).count
   num_of_commented_out_expect_key_words = added_lines.scan(/#\s*expect/).count
   num_of_expectation_without_machers = added_lines_arr.count{ |loc| loc.scan(/\s*expect\s*[\(\{]/).count > 0 and loc.scan(/\.(to|not_to|to_not)/).count == 0}
-  num_of_expectation_not_focus_on_real_value = added_lines_arr.count{ |loc| loc.scan(/\s*expect\s*[\(\{]/).count > 0 and loc.scan(/\.(to|not_to|to_not)\s*(be_nil|be_empty|eq 0|eql 0|equal 0)/) > 0 }
+  num_of_expectation_not_focus_on_real_value = added_lines_arr.count{ |loc| loc.scan(/\s*expect\s*[\(\{]/).count > 0 and loc.scan(/\.(not_to|to_not)\s*(be_nil|be_empty|eq 0|eql 0|equal 0)/).count > 0 }
   num_of_wildcard_argument_matchers = added_lines.scan(/\((anything|any_args)\)/).count
   num_of_expectations_on_page = added_lines.scan(/\s*expect\s*\(page\)/).count
   

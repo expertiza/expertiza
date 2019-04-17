@@ -49,15 +49,17 @@
         <% if @assignment.max_team_size > 1 %>
           <% team_name_color = get_team_name_color_in_list_submission(team) %>
           <td><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
-            <% unless (participants.empty?)  %>
+              <% @participant = AssignmentParticipant.find_by(:parent_id => @assignment.id, :user_id => current_user.id) %>
+              <% @existing_responses = ReviewResponseMap.where(reviewer_id: @participant.id) unless @participant.nil? %>
               <% if @assignment.finished? %>
                 <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %></td>
-              <% elsif true %>
-                <%= link_to 'Add Review', {controller: 'review_mapping', action: 'assign_reviewer_dynamically', assignment_id: @assignment.id, topic_id: topic_id, reviewer_id: current_user }, target: '_blank' %></td>
+              <% elsif @participant.nil? %>
+                <%= link_to 'Add Review (And Participate)', {controller: 'review_mapping', action: 'assign_reviewer_dynamically', assignment_id: @assignment.id, topic_id: topic_id, reviewer_id: current_user }, target: '_blank' %></td>
+              <% elsif @existing_responses.nil? || @existing_responses.get_assessments_for(team).empty? %>
+                <%= link_to "Add Review", {:controller => 'response', :action => 'new', :id => 123} %>
               <% else %>
-                Your Review: <%= link_to 'View', {controller: 'response', action: 'new', id: 123}, target: '_blank' %> | <%= link_to 'Update', {controller: 'response', action: 'new', id: 123}, target: '_blank' %></td>
+                TBD
             <% end %>
-          <% end %>
         <% end %>
 
         <!--Team member(s) / Participant name-->

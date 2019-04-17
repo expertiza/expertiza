@@ -59,7 +59,7 @@ class Answer < ActiveRecord::Base
 
       @questionnaire = Questionnaire.find(@questions[0].questionnaire_id)
 
-      questionnaireData = Question.find_by_sql(["SELECT questionnaire.max_question_score questionnaire_max_question_score, SUM(ques.weight) as sum_of_weights, SUM(ques.weight * ans.answer) as weighted_score FROM questions ques left join questionnaires questionnaire on ques.questionnaire_id = questionnaire.id left join answers ans on ques.id = ans.question_id WHERE ques.type in('Criterion', 'Scale') AND questionnaire.id = ? AND ans.response_id = ?", @questions[0].questionnaire_id, @response.id])
+      questionnaireData = Question.find_by_sql(["SELECT questionnaire.max_question_score as questionnaire_max_question_score, SUM(ques.weight) as sum_of_weights, SUM(ques.weight * ans.answer) as weighted_score FROM questions ques left join questionnaires questionnaire on ques.questionnaire_id = questionnaire.id left join answers ans on ques.id = ans.question_id WHERE ques.type in('Criterion', 'Scale') AND questionnaire.id = ? AND ans.response_id = ?", @questions[0].questionnaire_id, @response.id])
 
       # zhewei: we should check whether weighted_score is nil,
       # which means student did not assign any score before save the peer review.

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181205201208) do
+ActiveRecord::Schema.define(version: 20190415202815) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -532,28 +532,6 @@ ActiveRecord::Schema.define(version: 20181205201208) do
 
   add_index "roles_permissions", ["permission_id"], name: "fk_roles_permission_permission_id", using: :btree
   add_index "roles_permissions", ["role_id"], name: "fk_roles_permission_role_id", using: :btree
-
-  create_table "score_views", id: false, force: :cascade do |t|
-    t.integer  "question_weight",       limit: 4
-    t.string   "type",                  limit: 255
-    t.integer  "q1_id",                 limit: 4,     default: 0
-    t.string   "q1_name",               limit: 64
-    t.integer  "q1_instructor_id",      limit: 4,     default: 0
-    t.boolean  "q1_private",                          default: false
-    t.integer  "q1_min_question_score", limit: 4,     default: 0
-    t.integer  "q1_max_question_score", limit: 4
-    t.datetime "q1_created_at"
-    t.datetime "q1_updated_at"
-    t.string   "q1_type",               limit: 255
-    t.string   "q1_display_type",       limit: 255
-    t.integer  "ques_id",               limit: 4,     default: 0,     null: false
-    t.integer  "ques_questionnaire_id", limit: 4
-    t.integer  "s_id",                  limit: 4,     default: 0
-    t.integer  "s_question_id",         limit: 4,     default: 0
-    t.integer  "s_score",               limit: 4
-    t.text     "s_comments",            limit: 65535
-    t.integer  "s_response_id",         limit: 4
-  end
 
   create_table "sections", force: :cascade do |t|
     t.string   "name",       limit: 255,   null: false

@@ -9,15 +9,15 @@
   </script>
 
   <p> **In "Team reviewed" column text in:</p>
-    <ul style="list-style-type:square">
-  <li><i style="color:red">red</i> indicates that the review is not  completed in any rounds;</li>
-  <li><i style="color:blue">blue</i> indicates that a review is completed in every round and the review grade is not assigned;</li>
-  <li><i style="color:green">green</i> indicates that there is no submitted work to review within the round;</li>
-  <li><i style="color:purple">purple</i> indicates that there is no review for a submitted work within the round;</li>
-  <li><i style="color: #986633">brown</i> indicates that the review grade has been assigned</li>
-</ul>
+  <ul style="list-style-type:square">
+    <li><i style="color:red">red</i> indicates that the review is not  completed in any rounds;</li>
+    <li><i style="color:blue">blue</i> indicates that a review is completed in every round and the review grade is not assigned;</li>
+    <li><i style="color:green">green</i> indicates that there is no submitted work to review within the round;</li>
+    <li><i style="color:purple">purple</i> indicates that there is no review for a submitted work within the round;</li>
+    <li><i style="color: #986633">brown</i> indicates that the review grade has been assigned</li>
+  </ul>
   <p>&nbsp;</p>
-  
+
   <table id="myTable" class="tbl_heat tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
     <thead>
     <tr bgcolor='#CCCCCC'>
@@ -44,38 +44,38 @@
       <tr>
         <% if r.id != -1 %>
           <% user = Participant.find(r.id).user %>
-            <!--reviewer-->
-            <td>
-              <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
-              (<%= user.fullname(session[:ip]) %>)
-            </td>
-            <!--# reviews done-->
-            <td align = 'left'>
-              <% (1..@assignment.num_review_rounds).each do |round| %>
-                <%= instance_variable_get("@review_in_round_" + round.to_s) %>/<%= @rspan %>
-                <%= ', ' unless round == @assignment.num_review_rounds %>
-              <% end %>
-              <%= link_to "summary", {:controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id}, target: :_blank %>
-            </td>
+          <!--reviewer-->
+          <td>
+            <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
+            (<%= user.fullname(session[:ip]) %>)
+          </td>
+          <!--# reviews done-->
+          <td align = 'left'>
+            <% (1..@assignment.num_review_rounds).each do |round| %>
+              <%= instance_variable_get("@review_in_round_" + round.to_s) %>/<%= @rspan %>
+              <%= ', ' unless round == @assignment.num_review_rounds %>
+            <% end %>
+            <%= link_to "summary", {:controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id}, target: :_blank %>
+          </td>
           <!--Team reviewed / Author feedback-->
           <td align = 'left'>
-          <% @response_maps.each_with_index do |ri, index| %>
-            <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
-            <% team_name_color = get_team_name_color_in_review_report(ri) %>
-            <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, ri.response, ri.reviewee_id) %>
+            <% @response_maps.each_with_index do |ri, index| %>
+              <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
+              <% team_name_color = get_team_name_color_in_review_report(ri) %>
+              <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, ri.response, ri.reviewee_id) %>
               <% if Team.where(id: ri.reviewee_id).length > 0 %>
                 <!--Team reviewed-->
                 <% if index == 0 %>
-                  <div id= <%= team_name_color %>>
+                  <div id= <%= team_name_color %>></div>
                 <% else %>
-                  <div id = <%= team_name_color %> style="border-top: solid; border-width: 1px;">
+                  <div style="border-top: solid" id = <%= team_name_color %> >
                 <% end %>
-                    <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
-                    <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>
-                    <!--Hard-coded Dr.Kidd's question in order to display link.-->
-                    <!--later we can create a hyperlink question type to deal with this situation.-->
-                    <%= list_hyperlink_submission(ri.id, 5386) if Assignment.find_by(id: @id.to_i).course.instructor.name == 'Jkidd' %>
-                  </div>
+                <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
+                <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>
+                <!--Hard-coded Dr.Kidd's question in order to display link.-->
+                <!--later we can create a hyperlink question type to deal with this situation.-->
+                <%= list_hyperlink_submission(ri.id, 5386) if Assignment.find_by(id: @id.to_i).course.instructor.name == 'Jkidd' %>
+                </div>
 
                 <!--Author feedback-->
                 <!--Dr.Kidd required to add a "author feedback" column that shows the average score the reviewers received from the authors. In this case, she can see all the data on a single screen.-->
@@ -129,15 +129,15 @@
             <% end %>
             <%= link_to "Grading History", grading_histories_path(grade_receiver_id: Participant.where(id: r.id).pluck(:user_id).first, participant_id: r.id, grade_type: "Review") %>
           </td>
-        <%end %>  
-        </tr>
-      <%end %>
-</table>
+        <%end %>
+      </tr>
+    <%end %>
+    </table>
 
   <p> **In "Team reviewed" column, text in <i style = "color:red">red</i> indicates that the review is not yet completed; text in <i style = "color:blue">blue</i> indicates that the review grade is not assigned or updated; text in <i style = "color: #986633">brown</i> indicates that the review grade has been assigned.</p>
 </div>
-  <!--Partial for text macro form-->
- <%= render :partial => '/user_pastebins/save_text_macros'%>
+<!--Partial for text macro form-->
+<%= render :partial => '/user_pastebins/save_text_macros'%>
 
 <script>
     $(function () {

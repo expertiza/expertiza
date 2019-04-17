@@ -89,8 +89,8 @@ class ResponseController < ApplicationController
     # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
     print("\r\nThe params are: \r\n")
     print(params)
-    if is_submitted
-      confirm_review
+    if params["isSubmitted"] && params["isSubmitted"] == "Yes"
+      return confirm_review
     end
 
     begin
@@ -181,7 +181,7 @@ class ResponseController < ApplicationController
     print(params)
 
     if is_submitted
-      confirm_review
+      return confirm_review
     end
 
     # There could be multiple responses per round, when re-submission is enabled for that round.
@@ -235,6 +235,7 @@ class ResponseController < ApplicationController
   end
 
   def confirm_review
+    print("\r\n Inside the confirm_review method\r\n")
     redirect_to action: 'review_confirmation'
     # redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end

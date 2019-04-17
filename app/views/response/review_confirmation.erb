@@ -33,7 +33,15 @@
     <p class="warn-notice">Once a review has been submitted, you cannot edit it again.</p>
 </div>
 
-<%= button_to "Save Review", action: "save" %>
+<%= button_to "Save Review", action: "save_response" %>
 <%= button_to "Go Back to my Review", :back %>
 
-<%= @the_params %>
+The params
+<br/>
+<%= params %>
+
+<br/>
+
+The  api_response
+<br/>
+<%= @api_response %>

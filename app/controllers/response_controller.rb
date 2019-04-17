@@ -66,53 +66,54 @@ class ResponseController < ApplicationController
   end
 
   def create
-    map_id = params[:id]
-    map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
-    @map = ResponseMap.find(map_id)
-    if params[:review][:questionnaire_id]
-      @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
-      @round = params[:review][:round]
-    else
-      @round = nil
-    end
-    is_submitted = (params[:isSubmit] == 'Yes')
+    is_submitted = (params[:isSubmit] && params[:isSubmit] == 'Yes')
     was_submitted = false
 
     # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
     print("\r\nThe params in the create method are: \r\n")
     print(params)
 
-    # if is_submitted
-    #   return confirm_user_input
+    if is_submitted
+      return show_confirmation_page(params)
+    end
+
+    # map_id = params[:id]
+    # map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
+    # @map = ResponseMap.find(map_id)
+    # if params[:review][:questionnaire_id]
+    #   @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
+    #   @round = params[:review][:round]
+    # else
+    #   @round = nil
     # end
 
-    # There could be multiple responses per round, when re-submission is enabled for that round.
-    # Hence we need to pick the latest response.
-    @response = Response.where(map_id: @map.id, round: @round.to_i).order(created_at: :desc).first
-    if @response.nil?
-      @response = Response.create(
-        map_id: @map.id,
-        additional_comment: params[:review][:comments],
-        round: @round.to_i,
-        is_submitted: is_submitted
-      )
-    end
-    was_submitted = @response.is_submitted
-    @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
+    # # There could be multiple responses per round, when re-submission is enabled for that round.
+    # # Hence we need to pick the latest response.
+    # @response = Response.where(map_id: @map.id, round: @round.to_i).order(created_at: :desc).first
+    # if @response.nil?
+    #   @response = Response.create(
+    #     map_id: @map.id,
+    #     additional_comment: params[:review][:comments],
+    #     round: @round.to_i,
+    #     is_submitted: is_submitted
+    #   )
+    # end
+    # was_submitted = @response.is_submitted
+    # @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
 
-    # ,:version_num=>@version)
-    # Change the order for displaying questions for editing response views.
-    questions = sort_questions(@questionnaire.questions)
-    create_answers(params, questions) if params[:responses]
-    msg = "Your response was successfully saved."
-    error_msg = ""
+    # # ,:version_num=>@version)
+    # # Change the order for displaying questions for editing response views.
+    # questions = sort_questions(@questionnaire.questions)
+    # create_answers(params, questions) if params[:responses]
+    # msg = "Your response was successfully saved."
+    # error_msg = ""
     # only notify if is_submitted changes from false to true
-    if (@map.is_a? ReviewResponseMap) && (was_submitted == false && @response.is_submitted) && @response.significant_difference?
-      @response.notify_instructor_on_difference
-      @response.email
-    end
-    redirect_to controller: 'response', action: 'save', id: @map.map_id,
-                return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
+    # if (@map.is_a? ReviewResponseMap) && (was_submitted == false && @response.is_submitted) && @response.significant_difference?
+    #   @response.notify_instructor_on_difference
+    #   @response.email
+    # end
+    # redirect_to controller: 'response', action: 'save', id: @map.map_id,
+    #             return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
   end
 
   # Determining the current phase and check if a review is already existing for this stage.
@@ -140,33 +141,35 @@ class ResponseController < ApplicationController
 
   # Update the response and answers when student "edit" existing response
   def update
-    render nothing: true unless action_allowed?
-    # the response to be updated
-    @response = Response.find(params[:id])
-    msg = ""
+    render nothing: true unless action_allowed
+    is_submitted = (params[:isSubmit] && params[:isSubmit] == 'Yes')
 
     # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
     print("\r\nThe params in the update are: \r\n")
     print(params)
 
-    # if params["isSubmitted"] && params["isSubmitted"] == "Yes"
-    #   return confirm_user_input
-    # end
-
-    begin
-      @map = @response.map
-      @response.update_attribute('additional_comment', params[:review][:comments])
-      @questionnaire = set_questionnaire
-      questions = sort_questions(@questionnaire.questions)
-      create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
-      @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
-      @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
-    rescue StandardError
-      msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
+    if is_submitted
+      return show_confirmation_page(params)
     end
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
-    redirect_to controller: 'response', action: 'save', id: @map.map_id,
-                return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
+
+    # # the response to be updated
+    # @response = Response.find(params[:id])
+    # msg = ""
+
+    # begin
+    #   @map = @response.map
+    #   @response.update_attribute('additional_comment', params[:review][:comments])
+    #   @questionnaire = set_questionnaire
+    #   questions = sort_questions(@questionnaire.questions)
+    #   create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
+    #   @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
+    #   @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
+    # rescue StandardError
+    #   msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
+    # end
+    # ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
+    # redirect_to controller: 'response', action: 'save', id: @map.map_id,
+    #             return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
   end
 
   def delete
@@ -236,21 +239,26 @@ class ResponseController < ApplicationController
     redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
-  def show_confirmation_page
-    @the_params = params
-    render action: "review_confirmation"
-  end
-
-  def confirm_user_input
-    print("\r\n Inside the confirm_user_input method\r\n")
+  def show_confirmation_page(_params)
+    @the_params = _params
 
     # TODO: get Answers to feed the API
 
     # send user review to API for analysis
-    api_response = get_review_response_metrics
+    @api_response = get_review_response_metrics
 
-    
-    redirect_to action: 'review_confirmation'
+    render action: "review_confirmation"
+  end
+
+  def save_response
+    print("\r\n Inside the save_response method\r\n")
+
+    # handle the http method (create or update) -> params[:action]
+    if params[:action] == "create"
+      # do the create method responsibilities
+    else
+      # do the update method responsibilities
+    end
   end
 
   def redirect

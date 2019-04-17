@@ -213,7 +213,15 @@ class ResponseController < ApplicationController
       end
     end
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Response was successfully saved")
-    redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
+
+    # New change: Instead of immediately redirecting...confirm review first
+    confirm_review
+    # redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
+  end
+
+  def confirm_review  
+    redirect_to action: 'review_confirmation'
+    # redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
   def redirect

@@ -87,10 +87,12 @@ class ResponseController < ApplicationController
     msg = ""
 
     # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
+    print("\r\nThe params are: \r\n")
+    print(params)
     if is_submitted
       confirm_review
     end
-    
+
     begin
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
@@ -175,6 +177,9 @@ class ResponseController < ApplicationController
     was_submitted = false
 
     # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
+    print("\r\nThe params are: \r\n")
+    print(params)
+
     if is_submitted
       confirm_review
     end
@@ -230,8 +235,6 @@ class ResponseController < ApplicationController
   end
 
   def confirm_review
-    print("\r\nIn confirm review! The params are: \r\n")
-    print(params)
     redirect_to action: 'review_confirmation'
     # redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end

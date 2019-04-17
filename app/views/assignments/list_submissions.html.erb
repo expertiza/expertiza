@@ -56,18 +56,15 @@
               <% elsif @participant.nil? ||  @existing_responses.nil? ||  @existing_responses.find_by(:reviewer_id=>@participant.id, :reviewee_id=>team.id).nil? %>
                 <%= link_to 'Add Review', {controller: 'review_mapping', action: 'assign_reviewer_dynamically', assignment_id: @assignment.id, topic_id: topic_id, reviewer_id: current_user } %>
               <% else %>
-
                 <% @sorted_responses = @existing_responses.where(:reviewer_id=>@participant.id, :reviewee_id=>team.id) %>
                 <% @sorted_responses = @sorted_responses.sort_by {|obj| obj.updated_at} # the latest should be at the last%>
                 <% @latest_response = @sorted_responses.last %>
                 <% current_round = @assignment.number_of_current_round(topic_id) %>
                 <% response_saved = true %>
                 <% begin Response.find(@latest_response.map_id) rescue response_saved = false end %>
-                <%=@latest_response.inspect %>Review:
+                Review:
                 <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} if response_saved%>
                 <%= link_to "Update", {:controller => 'response', :action => 'new', :id => @latest_response.id} %>
-
-              <%=@latest_response %>
               <% end %>
             </td>
         <% end %>

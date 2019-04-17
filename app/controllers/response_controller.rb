@@ -79,12 +79,12 @@ class ResponseController < ApplicationController
     was_submitted = false
 
     # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
-    print("\r\nThe params are: \r\n")
+    print("\r\nThe params in the create method are: \r\n")
     print(params)
 
-    if is_submitted
-      return confirm_user_input
-    end
+    # if is_submitted
+    #   return confirm_user_input
+    # end
 
     # There could be multiple responses per round, when re-submission is enabled for that round.
     # Hence we need to pick the latest response.
@@ -146,12 +146,12 @@ class ResponseController < ApplicationController
     msg = ""
 
     # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
-    print("\r\nThe params are: \r\n")
+    print("\r\nThe params in the update are: \r\n")
     print(params)
 
-    if params["isSubmitted"] && params["isSubmitted"] == "Yes"
-      return confirm_user_input
-    end
+    # if params["isSubmitted"] && params["isSubmitted"] == "Yes"
+    #   return confirm_user_input
+    # end
 
     begin
       @map = @response.map

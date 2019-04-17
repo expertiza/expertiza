@@ -215,8 +215,11 @@ class ResponseController < ApplicationController
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Response was successfully saved")
 
     # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
-    confirm_review unless params['isSubmit'] != 'Yes'
-    # redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
+    if params["isSubmit"] == "Yes"
+      confirm_review 
+    else
+      redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
+    end
   end
 
   def confirm_review  

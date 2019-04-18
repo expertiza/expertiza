@@ -1,4 +1,4 @@
-<table width="100%" cellpadding="10">
+able width="100%" cellpadding="10">
   <tr CLASS="head" >
     <% has_signup_sheet = !(SignUpTopic.where(['assignment_id = ?', assignment.id])).first.nil? %>
     <% if has_signup_sheet %>
@@ -187,5 +187,3 @@
   :model=> 'MetareviewResponseMap',
   :id=>assignment.id
 %>
-|
-

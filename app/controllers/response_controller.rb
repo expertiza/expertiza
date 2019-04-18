@@ -220,10 +220,9 @@ class ResponseController < ApplicationController
     http.use_ssl = true
     res = http.request(req)
     # puts "yyyyyyyyy"
+    #print api_response
 
-    api_response = JSON.parse(res.body)
-    print api_response
-    return api_response
+    return JSON.parse(res.body)
   end
 
   def save

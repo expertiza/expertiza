@@ -2,6 +2,8 @@ class ResponseController < ApplicationController
   helper :submitted_content
   helper :file
 
+  include ResponseConstants
+
   def action_allowed?
     response = user_id = nil
     action = params[:action]
@@ -88,6 +90,12 @@ class ResponseController < ApplicationController
       @questionnaire = set_questionnaire
       questions = sort_questions(@questionnaire.questions)
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
+      # if the request passes a param for visibility (consent for review to be used as sample)...
+      # ... with a valid value, update the @response object
+      visibility = params[:visibility]
+      if(!visibility.nil? and (visibility.to_i == _private))
+        @response.update_attribute("visibility",visibility)
+      end
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
     rescue StandardError

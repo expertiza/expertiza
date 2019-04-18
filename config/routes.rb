@@ -1,4 +1,8 @@
 Expertiza::Application.routes.draw do
+  get 'sample_reviews/index'
+
+  get 'sample_reviews/show'
+
   ###
   # Please insert new routes alphabetically!
   ###
@@ -483,6 +487,11 @@ resources :institution, except: [:destroy] do
   get ':page_name', controller: :content_pages, action: :view, method: :get
   post 'impersonate/impersonate', to: 'impersonate#impersonate'
   post '/plagiarism_checker_results/:id' => 'plagiarism_checker_comparison#save_results'
+  post '/sample_reviews/mark_unmark/:id' => 'sample_reviews#update_visibility'
+  get '/sample_reviews/index/:id' => 'sample_reviews#index'
+  get '/sample_reviews/show/:id' => 'sample_reviews#show'
+  get '/similar_assignments/:id' => 'similar_assignments#get'
+  post '/similar_assignments/create/:id' => 'similar_assignments#update'
   get 'instructions/home'
   get 'response/', to: 'response#saving'
   get ':controller/service.wsdl', action: 'wsdl'

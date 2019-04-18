@@ -66,8 +66,18 @@ class ResponseController < ApplicationController
   end
 
   def create
-    is_submitted = (params[:isSubmit] && params[:isSubmit] == 'Yes')
+    is_submitted = params[:isSubmit].present?
     was_submitted = false
+
+    map_id = params[:id]
+    map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
+    @map = ResponseMap.find(map_id)
+    if params[:review][:questionnaire_id]
+      @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
+      @round = params[:review][:round]
+    else
+      @round = nil
+    end
 
     # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
     print("\r\nThe params in the create method are: \r\n")
@@ -81,16 +91,6 @@ class ResponseController < ApplicationController
                   return: params[:return], msg: msg, error_msg: params[:error_msg], review: params[:review], save_options: params[:save_options]
     end
 
-
-    # map_id = params[:id]
-    # map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
-    # @map = ResponseMap.find(map_id)
-    # if params[:review][:questionnaire_id]
-    #   @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
-    #   @round = params[:review][:round]
-    # else
-    #   @round = nil
-    # end
 
     # # There could be multiple responses per round, when re-submission is enabled for that round.
     # # Hence we need to pick the latest response.
@@ -146,8 +146,8 @@ class ResponseController < ApplicationController
 
   # Update the response and answers when student "edit" existing response
   def update
-    render nothing: true unless action_allowed
-    is_submitted = (params[:isSubmit] && params[:isSubmit] == 'Yes')
+    render nothing: true unless action_allowed?
+    is_submitted = params[:isSubmit].present?
 
     # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
     print("\r\nThe params in the update are: \r\n")

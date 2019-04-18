@@ -195,6 +195,7 @@ class ResponseController < ApplicationController
   end
 
   def show_confirmation_page(_params)
+    print("\r\nInside show_confirmation_page(#{_params})\r\n")
     @the_params = _params
 
     # TODO: get Answers to feed the API
@@ -202,6 +203,7 @@ class ResponseController < ApplicationController
     # send user review to API for analysis
     @api_response = get_review_response_metrics
 
+    print("\r\nInside show_confirmation_page about to render view\r\n")
     render action: "review_confirmation"
   end
 

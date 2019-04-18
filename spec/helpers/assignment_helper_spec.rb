@@ -5,49 +5,82 @@ describe AssignmentHelper do
     # name 'final2'
     @assignment = create(:assignment)
     # Factory creates a questionnaire with default:
-    # name 'Test questionnaire'
+    # name 'questionnaire[some number]'
     # type 'ReviewQuestionnaire'
-    @questionnaire1 = create(:questionnaire, id: 1001)
-    @questionnaire2 = create(:questionnaire, id: 1002)
+    @q_round_nil_topic_nil = create(:questionnaire, id: 1001)
+    @q_round_1_topic_nil = create(:questionnaire, id: 1002)
+    @q_round_nil_topic_1 = create(:questionnaire, id: 1003)
+    @q_round_1_topic_1 = create(:questionnaire, id:1004)
     # Factory creates an assignment-questionnaire relationship with default:
     # links together the first assignment found and the first questionnaire found
     # used_in_round nil
-    @assignment_questionnaire1 = create(:assignment_questionnaire, questionnaire: @questionnaire1)
-    @assignment_questionnaire2 = create(:assignment_questionnaire, questionnaire: @questionnaire2, used_in_round: 1)
+    # topic_id nil
+    @aq_round_nil_topic_nil = create(:assignment_questionnaire, questionnaire: @q_round_nil_topic_nil)
+    @aq_round_1_topic_nil = create(:assignment_questionnaire, questionnaire: @q_round_1_topic_nil, used_in_round: 1)
+    @aq_round_nil_topic_1 = create(:assignment_questionnaire, questionnaire: @q_round_nil_topic_1, topic_id: 1)
+    @aq_round_1_topic_1 = create(:assignment_questionnaire, questionnaire: @q_round_1_topic_1, used_in_round: 1, topic_id: 1)
   end
 
+  # Method signature: questionnaire(assignment, questionnaire_type, round_number, topic_id)
   describe "#questionnaire" do
 
     questionnaire_type = "ReviewQuestionnaire"
 
     it "throws exception if assignment argument nil" do
-      expect {questionnaire(nil, questionnaire_type, 1)}.to raise_exception(NoMethodError)
+      expect {questionnaire(nil, questionnaire_type, 1, 1)}.to raise_exception(NoMethodError)
     end
 
-    it "throws exception if type and round arguments nil" do
-      expect {questionnaire(@assignment, nil, nil)}.to raise_exception(TypeError)
+    it "throws exception if all arguments nil except for assignment" do
+      expect {questionnaire(@assignment, nil, nil, nil)}.to raise_exception(TypeError)
     end
 
-    it "returns a questionnaire of the given type if round argument nil" do
-      expect(questionnaire(@assignment, questionnaire_type, nil).id).to eql @questionnaire1.id
+    it "finds by type if round number & topic id not given" do
+      expect(questionnaire(@assignment, questionnaire_type, nil, nil).id).to eql @q_round_nil_topic_nil.id
     end
 
-    it "returns a new questionnaire of the given type if one with the given round does not exist" do
-      returned_questionnaire = questionnaire(@assignment, questionnaire_type, 2)
-      expect(returned_questionnaire.id).not_to eql @questionnaire1.id
-      expect(returned_questionnaire.id).not_to eql @questionnaire2.id
+    it "throws exception if round number & topic id not given, no luck finding by type" do
+      expect {questionnaire(@assignment, "Nonsense", nil, nil)}.to raise_exception(NameError)
     end
 
-    it "returns a questionnaire of the given round if one exists (type argument nil)" do
-      expect(questionnaire(@assignment, nil, 1).id).to eql @questionnaire2.id
+    it "finds by round number alone if round number alone is given" do
+      expect(questionnaire(@assignment, "type_is_ignored", 1, nil).id).to eql @q_round_1_topic_nil.id
     end
 
-    it "returns a questionnaire of the given round if one exists (type argument ignored)" do
-      expect(questionnaire(@assignment, "Nonsense", 1).id).to eql @questionnaire2.id
+    it "creates new questionnaire of given type if round number alone is given, no luck finding by round" do
+      returned_questionnaire = questionnaire(@assignment, questionnaire_type, 2, nil)
+      expect(returned_questionnaire.id).not_to eql @q_round_nil_topic_nil.id
+      expect(returned_questionnaire.id).not_to eql @q_round_1_topic_nil.id
+      expect(returned_questionnaire.id).not_to eql @q_round_nil_topic_1.id
+      expect(returned_questionnaire.id).not_to eql @q_round_1_topic_1.id
+    end
+
+    it "finds by topic id alone if topic id alone is given" do
+      expect(questionnaire(@assignment, "type_is_ignored", nil, 1).id).to eql @q_round_nil_topic_1.id
+    end
+
+    it "creates new questionnaire of given type if topic id alone is given, no luck finding by topic" do
+      returned_questionnaire = questionnaire(@assignment, questionnaire_type, nil, 2)
+      expect(returned_questionnaire.id).not_to eql @q_round_nil_topic_nil.id
+      expect(returned_questionnaire.id).not_to eql @q_round_1_topic_nil.id
+      expect(returned_questionnaire.id).not_to eql @q_round_nil_topic_1.id
+      expect(returned_questionnaire.id).not_to eql @q_round_1_topic_1.id
+    end
+
+    it "finds by round number and topic id if both are given" do
+      expect(questionnaire(@assignment, "type_is_ignored", 1, 1).id).to eql @q_round_1_topic_1.id
+    end
+
+    it "creates new questionnaire of given type if round and topic are given, no luck finding by round and topic" do
+      returned_questionnaire = questionnaire(@assignment, questionnaire_type, 2, 2)
+      expect(returned_questionnaire.id).not_to eql @q_round_nil_topic_nil.id
+      expect(returned_questionnaire.id).not_to eql @q_round_1_topic_nil.id
+      expect(returned_questionnaire.id).not_to eql @q_round_nil_topic_1.id
+      expect(returned_questionnaire.id).not_to eql @q_round_1_topic_1.id
     end
 
   end
 
+  # Method signature: assignment_questionnaire(assignment, questionnaire_type, round_number)
   describe "assignment_questionnaire" do
 
     questionnaire_type = "ReviewQuestionnaire"
@@ -58,32 +91,32 @@ describe AssignmentHelper do
 
     it "creates a new assignment questionnaire if type argument nil" do
       returned_assignment_questionnaire = assignment_questionnaire(@assignment, nil, 1)
-      expect(returned_assignment_questionnaire.id).not_to eql @assignment_questionnaire1.id
-      expect(returned_assignment_questionnaire.id).not_to eql @assignment_questionnaire2.id
+      expect(returned_assignment_questionnaire.id).not_to eql @aq_round_nil_topic_nil.id
+      expect(returned_assignment_questionnaire.id).not_to eql @aq_round_1_topic_nil.id
     end
 
     it "creates a new assignment questionnaire if type and round arguments nil" do
       returned_assignment_questionnaire = assignment_questionnaire(@assignment, nil, nil)
-      expect(returned_assignment_questionnaire.id).not_to eql @assignment_questionnaire1.id
-      expect(returned_assignment_questionnaire.id).not_to eql @assignment_questionnaire2.id
+      expect(returned_assignment_questionnaire.id).not_to eql @aq_round_nil_topic_nil.id
+      expect(returned_assignment_questionnaire.id).not_to eql @aq_round_1_topic_nil.id
     end
 
     it "creates a new assignment questionnaire if no questionnaires of given type exist" do
       returned_assignment_questionnaire = assignment_questionnaire(@assignment, "Nonsense", nil)
-      expect(returned_assignment_questionnaire.id).not_to eql @assignment_questionnaire1.id
-      expect(returned_assignment_questionnaire.id).not_to eql @assignment_questionnaire2.id
+      expect(returned_assignment_questionnaire.id).not_to eql @aq_round_nil_topic_nil.id
+      expect(returned_assignment_questionnaire.id).not_to eql @aq_round_1_topic_nil.id
     end
 
     it "returns an assignment questionnaire for questionnaire of given type if round argument nil" do
-      expect(assignment_questionnaire(@assignment, questionnaire_type, nil).id).to eql @assignment_questionnaire1.id
+      expect(assignment_questionnaire(@assignment, questionnaire_type, nil).id).to eql @aq_round_nil_topic_nil.id
     end
 
     it "returns an assignment questionnaire for questionnaire of given type if questionnaire of the given round does not exist" do
-      expect(assignment_questionnaire(@assignment, questionnaire_type, 2).id).to eql @assignment_questionnaire1.id
+      expect(assignment_questionnaire(@assignment, questionnaire_type, 2).id).to eql @aq_round_nil_topic_nil.id
     end
 
     it "returns an assignment questionnaire for questionnaire of given round if one exists" do
-      expect(assignment_questionnaire(@assignment, questionnaire_type, 1).id).to eql @assignment_questionnaire2.id
+      expect(assignment_questionnaire(@assignment, questionnaire_type, 1).id).to eql @aq_round_1_topic_nil.id
     end
 
   end

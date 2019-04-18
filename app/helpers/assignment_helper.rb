@@ -73,21 +73,27 @@ module AssignmentHelper
   end
 
   # Find a questionnaire for the given assignment
-  # Find by type if round number not given
-  # Find by round number if round number is given
-  # Create new questionnaire of given type if no luck
-  def questionnaire(assignment, questionnaire_type, round_number)
-    # E1450 changes
-    if round_number.nil?
+  # Find by type if round number & topic id not given
+  # Find by round number alone if round number alone is given
+  # Find by topic id alone if topic id alone is given
+  # Find by round number and topic id if both are given
+  # Create new questionnaire of given type if no luck with any of these attempts
+  def questionnaire(assignment, questionnaire_type, round_number = nil, topic_id = nil)
+    if round_number.nil? && topic_id.nil?
+      # Find by type
       questionnaire = assignment.questionnaires.find_by(type: questionnaire_type)
+    elsif topic_id.nil?
+      # Find by round
+      aq = assignment.assignment_questionnaires.find_by(used_in_round: round_number)
+    elsif round_number.nil?
+      # Find by topic
+      aq = assignment.assignment_questionnaires.find_by(topic_id: topic_id)
     else
-      ass_ques = assignment.assignment_questionnaires.find_by(used_in_round: round_number)
-      # make sure the assignment_questionnaire record is not empty
-      unless ass_ques.nil?
-        questionnaire = assignment.questionnaires.find_by(id: ass_ques.questionnaire_id)
-      end
+      # Find by round and topic
+      aq = assignment.assignment_questionnaires.where(used_in_round: round_number, topic_id: topic_id).first
     end
-    # E1450 end
+    # get the questionnaire from the assignment_questionnaire relationship
+    questionnaire = aq.nil? ? questionnaire : assignment.questionnaires.find_by(id: aq.questionnaire_id)
     # couldn't find a questionnaire? create a questionnaire of the given type
     questionnaire.nil? ? Object.const_get(questionnaire_type).new : questionnaire
   end

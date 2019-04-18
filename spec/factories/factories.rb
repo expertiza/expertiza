@@ -379,6 +379,7 @@ FactoryBot.define do
     user_id 1
     questionnaire_weight 100
     used_in_round nil
+    topic_id nil
     dropdown 1
   end
 

@@ -145,8 +145,7 @@ class User < ActiveRecord::Base
     raise ArgumentError, "Only #{row_hash.length} column(s) is(are) found. It must contain at least username, full name, email." if row_hash.length < 3
     user = User.find_by_name(row_hash[:name])
     if user.nil?
-      attributes = ImportFileHelper.define_attributes(row_hash)
-      user = ImportFileHelper.create_new_user(attributes, session)
+      user = get_new_user(get_user_attributes(row_hash), session)
       password = user.reset_password
       MailerHelper.send_mail_to_user(user, "Your Expertiza account has been created.", "user_welcome", password).deliver
     else
@@ -167,6 +166,15 @@ class User < ActiveRecord::Base
       ""
     end
   end
+
+  def self.required_import_fields
+    {}
+  end
+
+  def self.optional_import_fields
+    {}
+  end
+
 
   # locate User based on provided login.
   # If user supplies e-mail or name, the
@@ -299,5 +307,25 @@ class User < ActiveRecord::Base
       users = User.order('name').where("(role_id in (?) or id = ?) and name like ?", role.get_available_roles, user_id, search_filter)
     end
     users
+  end
+
+  private
+
+  def self.get_user_attributes(row_hash)
+    {"role_id" => Role.student.id,
+     "name" => row_hash[:name],
+     "fullname" => row_hash[:fullname],
+     "email" => row_hash[:email],
+     "email_on_submission" => 1,
+     "email_on_review" => 1,
+     "email_on_review_of_review" => 1}
+  end
+
+  def self.get_new_user(attributes, session)
+    user = User.new(attributes)
+    user.parent_id = (session[:user]).id
+    user.timezonepref = User.find(user.parent_id).timezonepref
+    user.save!
+    user
   end
 end

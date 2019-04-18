@@ -8,14 +8,8 @@ class ImportFileController < ApplicationController
 
   def start
     @id = params[:id]
-
-    # TODO: Deprecated and should be removed for all imports (then remove error)
-    if params[:expected_fields]
-      raise ArgumentError, "Take out the expected fields for this link!!"
-    end
-
     @model = params[:model]
-
+    @title = params[:title]
     @required_fields = @model.constantize.required_import_fields
     @optional_fields = @model.constantize.optional_import_fields
 
@@ -23,7 +17,6 @@ class ImportFileController < ApplicationController
     # TODO: Represent options as dict from class method
     # @import_options = @model.constantize.send("import_options")
 
-    @title = params[:title]
   end
 
   def show
@@ -111,7 +104,7 @@ class ImportFileController < ApplicationController
       new_header = []
       params.keys.each do |p|
         if p.match(/\Aselect/)
-          new_header << p
+          new_header << params[p]
         end
       end
       @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])

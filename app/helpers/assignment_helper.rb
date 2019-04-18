@@ -72,28 +72,33 @@ module AssignmentHelper
     end
   end
 
-  def questionnaire(assignment, type, round_number)
+  # Find a questionnaire for the given assignment
+  # Find by type if round number not given
+  # Find by round number if round number is given
+  # Create new questionnaire of given type if no luck
+  def questionnaire(assignment, questionnaire_type, round_number)
     # E1450 changes
     if round_number.nil?
-      questionnaire = assignment.questionnaires.find_by(type: type)
+      questionnaire = assignment.questionnaires.find_by(type: questionnaire_type)
     else
       ass_ques = assignment.assignment_questionnaires.find_by(used_in_round: round_number)
       # make sure the assignment_questionnaire record is not empty
       unless ass_ques.nil?
-        temp_num = ass_ques.questionnaire_id
-        questionnaire = assignment.questionnaires.find_by(id: temp_num)
+        questionnaire = assignment.questionnaires.find_by(id: ass_ques.questionnaire_id)
       end
     end
     # E1450 end
-    questionnaire = Object.const_get(type).new if questionnaire.nil?
-
-    questionnaire
+    # couldn't find a questionnaire? create a questionnaire of the given type
+    questionnaire.nil? ? Object.const_get(questionnaire_type).new : questionnaire
   end
 
-  # number added by E1450
-  def assignment_questionnaire(assignment, type, number)
-    questionnaire = assignment.questionnaires.find_by(type: type)
-
+  # Find an assignment_questionnaire relationship for the given assignment
+  # Find by type if round number not given
+  # Find by round number if round number is given
+  # Create a new assignment_questionnaire if no luck with given type
+  # round_number added by E1450
+  def assignment_questionnaire(assignment, questionnaire_type, round_number)
+    questionnaire = assignment.questionnaires.find_by(type: questionnaire_type)
     if questionnaire.nil?
       default_weight = {}
       default_weight['ReviewQuestionnaire'] = 100
@@ -110,22 +115,19 @@ module AssignmentHelper
                       end
 
       aq = AssignmentQuestionnaire.new
-      aq.questionnaire_weight = default_weight[type]
+      aq.questionnaire_weight = default_weight[questionnaire_type]
       aq.notification_limit = default_limit
       aq.assignment = @assignment
       aq
     else
+      aq_by_type = assignment.assignment_questionnaires.find_by(questionnaire_id: questionnaire.id)
       # E1450 changes
-      if number.nil?
-        assignment.assignment_questionnaires.find_by(questionnaire_id: questionnaire.id)
+      if round_number.nil?
+        aq_by_type
       else
-        assignment_by_usedinround = assignment.assignment_questionnaires.find_by(used_in_round: number)
+        aq_by_used_in_round = assignment.assignment_questionnaires.find_by(used_in_round: round_number)
         # make sure the assignment found by used in round is not empty
-        if assignment_by_usedinround.nil?
-          assignment.assignment_questionnaires.find_by(questionnaire_id: questionnaire.id)
-        else
-          assignment_by_usedinround
-        end
+        aq_by_used_in_round.nil? ? aq_by_type : aq_by_used_in_round
       end
       # E1450 end
     end

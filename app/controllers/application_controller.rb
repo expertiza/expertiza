@@ -16,6 +16,7 @@ class ApplicationController < ActionController::Base
   before_action :set_time_zone
   before_action :authorize
   before_action :filter_utf8
+  before_action :set_locale
 
   def filter_utf8
     remove_non_utf8(params)
@@ -56,6 +57,14 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def set_locale
+    I18n.locale = params[:locale] || I18n.default_locale
+  end
+
+   def default_url_options(options={})
+    {locale: I18n.locale}.merge options
+  end
 
   def current_user
     @current_user ||= session[:user]

@@ -154,7 +154,9 @@ FactoryBot.define do
   end
 
   factory :assignment, class: Assignment do
-    name 'final2'
+    # Help multiple factory-created assignments get unique names
+    # Let the first created assignment have the name 'final2' to avoid breaking some fragile existing tests
+    name { "#{Assignment.last ? ('assignment' + Assignment.last.id + 1) : 'final2'}" }
     directory_path 'final_test'
     submitter_count 0
     course { Course.first || association(:course) }

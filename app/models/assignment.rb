@@ -347,6 +347,28 @@ class Assignment < ActiveRecord::Base
     AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: 2).size >= 1
   end
 
+  # Check if this assignment has rubrics which vary by topic
+  #   returns false for an assignment which has no questionnaires
+  #   returns false for an assignment if it has assignment-questionnaire(s) that have # TODO
+  #     topic_id nil and none with topic_id non-nil
+  #   returns true for an assignment if it has assignment-questionnaire(s) that have # TODO
+  #     topic_id non-nil and none with topic_id nil
+  #   throws exception for an assignment if it has assignment-questionnaire(s) that have # TODO
+  #     topic_id non-nil and nil
+  def varying_rubrics_by_topic?
+    aq_no_topic_id = AssignmentQuestionnaire.where(assignment_id: self.id, topic_id: nil).size >= 1
+    aq_with_topic_id = AssignmentQuestionnaire.where(assignment_id: self.id).where.not(topic_id: nil).size >= 1
+    if !aq_no_topic_id && !aq_with_topic_id
+      false
+    elsif aq_no_topic_id && !aq_with_topic_id
+      false
+    elsif !aq_no_topic_id && aq_with_topic_id
+      true
+    else
+      raise StandardError.new("Assignment with id " + self.id + " has a conflict about whether or not it varies by topic")
+    end
+  end
+
   def link_for_current_stage(topic_id = nil)
     if self.staggered_deadline?
       return nil if topic_id.nil?

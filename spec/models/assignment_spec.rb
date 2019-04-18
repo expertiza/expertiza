@@ -386,6 +386,41 @@ describe Assignment do
     end
   end
 
+  describe '#varying_rubrics_by_topic?' do
+
+    # Assignment Factory creates an assignment with default:
+    #   name 'assignment[some number]'
+    # Assignment_Questionnaire Factory creates an assignment-questionnaire relationship with default:
+    #   links together the first assignment found and the first questionnaire found
+    #   used_in_round nil
+    #   topic_id nil
+
+    it "returns false if assignment has no questionnaires" do
+      assignment_no_questionnaires = create(:assignment)
+      expect(assignment_no_questionnaires.varying_rubrics_by_topic?).to be false
+    end
+
+    it "returns false if assignment has assignment-questionnaire(s) that have topic_id nil and none with topic_id non-nil" do
+      assignment_does_not_vary = create(:assignment)
+      create(:assignment_questionnaire, assignment: assignment_does_not_vary)
+      expect(assignment_does_not_vary.varying_rubrics_by_topic?).to be false
+    end
+
+    it "returns true if assignment has assignment-questionnaire(s) that have topic_id non-nil and none with topic_id nil" do
+      assignment_varies = create(:assignment)
+      create(:assignment_questionnaire, assignment: assignment_varies, topic_id: 1)
+      expect(assignment_varies.varying_rubrics_by_topic?).to be true
+    end
+
+    it "throws exception if assignment has assignment-questionnaire(s) that have topic_id non-nil and nil" do
+      assignment_ambiguous = create(:assignment)
+      create(:assignment_questionnaire, assignment: assignment_ambiguous)
+      create(:assignment_questionnaire, assignment: assignment_ambiguous, topic_id: 1)
+      expect {assignment_ambiguous.varying_rubrics_by_topic?}.to raise_exception(StandardError)
+    end
+
+  end
+
   describe '#link_for_current_stage' do
     context 'when current assignment has staggered deadline and topic id is nil' do
       it 'returns nil' do

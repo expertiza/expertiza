@@ -2,7 +2,7 @@ describe AssignmentHelper do
 
   before(:each) do
     # Factory creates an assignment with default:
-    # name 'final2'
+    # name 'assignment[some number]'
     @assignment = create(:assignment)
     # Factory creates a questionnaire with default:
     # name 'questionnaire[some number]'

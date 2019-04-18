@@ -343,7 +343,8 @@ FactoryBot.define do
   end
 
   factory :questionnaire, class: ReviewQuestionnaire do
-    name 'Test questionnaire'
+    # Help multiple factory-created questionnaires get unique names
+    name { "questionnaire#{Questionnaire.last ? Questionnaire.last.id + 1 : 1}" }
     instructor { Instructor.where(role_id: 1).first || association(:instructor) }
     private 0
     min_question_score 0

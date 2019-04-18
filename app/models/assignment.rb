@@ -409,36 +409,35 @@ class Assignment < ActiveRecord::Base
     due_date.nil? || due_date == 'Finished' ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
   end
 
-  def review_questionnaire_id(round = nil)
-    # Get the round it's in from the next duedates
-    if round.nil?
+  # Find the ID of a review questionnaire for this assignment
+  #   finds by round if round number is given
+  #   finds by type if round number is given, no luck finding by round
+  #   finds by current round if round number not given
+  #   finds by type if round number not given, no luck finding by current round
+  def review_questionnaire_id(round_number = nil)
+    # Get all assignment-questionnaire relationships between this assignment and review questionnaires
+    matching_aqs = AssignmentQuestionnaire.where(assignment_id: self.id).select do |aq|
+      !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == "ReviewQuestionnaire"
+    end
+    # If round not given, get current round from the next due date
+    if round_number.nil?
       next_due_date = DueDate.get_next_due_date(self.id)
-      round = next_due_date.try(:round)
+      round_number = next_due_date.try(:round)
     end
-    # for program 1 like assignment, if same rubric is used in both rounds,
-    # the 'used_in_round' field in 'assignment_questionnaires' will be null,
-    # since one field can only store one integer
-    # if rev_q_ids is empty, Expertiza will try to find questionnaire whose type is 'ReviewQuestionnaire'.
-    rev_q_ids = if round.nil?
-                  AssignmentQuestionnaire.where(assignment_id: self.id)
-                else
-                  AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
-                end
-    if rev_q_ids.empty?
-      AssignmentQuestionnaire.where(assignment_id: self.id).find_each do |aq|
-        rev_q_ids << aq if aq.questionnaire.type == "ReviewQuestionnaire"
+    # Get assignment-questionnaire relationships that apply to the round (if we now have one)
+    # If the assignment's rubric does not vary by round, then used_in_round will be nil
+    if round_number.nil?
+      matching_aqs_by_round = matching_aqs
+    else
+      matching_aqs_by_round = matching_aqs.select do |aq|
+        aq.used_in_round == round_number
       end
     end
-    review_questionnaire_id = nil
-    rev_q_ids.each do |rqid|
-      next if rqid.questionnaire_id.nil?
-      rtype = Questionnaire.find(rqid.questionnaire_id).type
-      if rtype == 'ReviewQuestionnaire'
-        review_questionnaire_id = rqid.questionnaire_id
-        break
-      end
-    end
-    review_questionnaire_id
+    # If filtering by round yielded no results, go back to the set of
+    # reasonable assignment-questionnaire relationships we already had
+    matching_aqs_by_round = matching_aqs_by_round.empty? ? matching_aqs : matching_aqs_by_round
+    # Return the questionnaire id for the first reasonable thing we came up with
+    matching_aqs_by_round.first.questionnaire_id
   end
 
   def self.export_details(csv, parent_id, detail_options)

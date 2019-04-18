@@ -246,7 +246,7 @@ class ResponseController < ApplicationController
       create_answers(params, questions) if params[:responses]
       msg = "Your response was successfully saved."
       error_msg = ""
-      only notify if is_submitted changes from false to true
+      # only notify if is_submitted changes from false to true
       if (@map.is_a? ReviewResponseMap) && (was_submitted == false && @response.is_submitted) && @response.significant_difference?
         @response.notify_instructor_on_difference
         @response.email

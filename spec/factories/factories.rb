@@ -292,9 +292,9 @@ FactoryBot.define do
     due_at DateTime.now.in_time_zone + 1.day
     deadline_type { DeadlineType.first || association(:deadline_type) }
     assignment { Assignment.first || association(:assignment) }
-    submission_allowed_id 3
-    review_allowed_id 3
-    review_of_review_allowed_id 3
+    submission_allowed_id { DeadlineRight.first || association(:deadline_right) }
+    review_allowed_id { DeadlineRight.first || association(:deadline_right) }
+    review_of_review_allowed_id { DeadlineRight.first || association(:deadline_right) }
     round 1
     flag false
     threshold 1

@@ -1,12 +1,12 @@
 describe AssignmentHelper do
 
   before(:each) do
-    # Factory creates an assignment with default:
-    # name 'assignment[some number]'
+    # Assignment Factory creates an assignment with default:
+    #   name 'assignment[some number]'
     @assignment = create(:assignment)
-    # Factory creates a questionnaire with default:
-    # name 'questionnaire[some number]'
-    # type 'ReviewQuestionnaire'
+    # Questionnaire Factory creates a questionnaire with default:
+    #   name 'questionnaire[some number]'
+    #   type 'ReviewQuestionnaire'
     @q_round_nil_topic_nil = create(:questionnaire, id: 1001)
     @q_round_1_topic_nil = create(:questionnaire, id: 1002)
     @q_round_nil_topic_1 = create(:questionnaire, id: 1003)
@@ -17,10 +17,10 @@ describe AssignmentHelper do
       @q_round_nil_topic_1.id,
       @q_round_1_topic_1.id
     ]
-    # Factory creates an assignment-questionnaire relationship with default:
-    # links together the first assignment found and the first questionnaire found
-    # used_in_round nil
-    # topic_id nil
+    # Assignment Questionnaire Factory creates an assignment-questionnaire relationship with default:
+    #   links together the first assignment found and the first questionnaire found
+    #   used_in_round nil
+    #   topic_id nil
     @aq_round_nil_topic_nil = create(:assignment_questionnaire, questionnaire: @q_round_nil_topic_nil)
     @aq_round_1_topic_nil = create(:assignment_questionnaire, questionnaire: @q_round_1_topic_nil, used_in_round: 1)
     @aq_round_nil_topic_1 = create(:assignment_questionnaire, questionnaire: @q_round_nil_topic_1, topic_id: 1)

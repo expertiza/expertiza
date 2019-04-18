@@ -496,11 +496,53 @@ describe Assignment do
   end
 
   describe '#review_questionnaire_id' do
-    it 'returns review_questionnaire_id' do
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 1).and_return([build(:assignment_questionnaire)])
-      allow(Questionnaire).to receive(:find).and_return(build(:questionnaire))
-      expect(assignment.review_questionnaire_id(1)).to eq(1)
+
+    # Assignment Factory creates an assignment with default:
+    #   name 'assignment[some number]'
+    # Questionnaire Factory creates a questionnaire with default:
+    #   name 'questionnaire[some number]'
+    #   type 'ReviewQuestionnaire'
+    # Assignment_Questionnaire Factory creates an assignment-questionnaire relationship with default:
+    #   links together the first assignment found and the first questionnaire found
+    #   used_in_round nil
+    #   topic_id nil
+    # Assignment_Due_Date Factory creates an assignment-duedate relationship with default:
+    # due_at tomorrow
+    # assignment first found
+    # round 1
+
+    it "finds by round if round number is given" do
+      assignment = create(:assignment)
+      questionnaire = create(:questionnaire)
+      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire, used_in_round: 1)
+      expect(assignment.review_questionnaire_id(1)).to eql questionnaire.id
     end
+
+    it "finds by type if round number is given, no luck finding by round" do
+      assignment = create(:assignment)
+      questionnaire_review = create(:questionnaire)
+      create(:questionnaire, type: 'AuthorFeedbackQuestionnaire')
+      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_review, used_in_round: 1)
+      expect(assignment.review_questionnaire_id(2)).to eql questionnaire_review.id
+    end
+
+    it "finds by current round if round number not given" do
+      assignment = create(:assignment)
+      questionnaire = create(:questionnaire)
+      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire, used_in_round: 1)
+      create(:assignment_due_date, assignment: assignment)
+      expect(assignment.review_questionnaire_id).to eql questionnaire.id
+    end
+
+    it "finds by type if round number not given, no luck finding by current round" do
+      assignment = create(:assignment)
+      questionnaire = create(:questionnaire)
+      create(:questionnaire, type: 'AuthorFeedbackQuestionnaire')
+      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire, used_in_round: 2)
+      create(:assignment_due_date, assignment: assignment)
+      expect(assignment.review_questionnaire_id).to eql questionnaire.id
+    end
+
   end
 
   describe 'has correct csv values?' do

@@ -1,4 +1,4 @@
-<h1>Listing late policies</h1>
+<h1>Late policies</h1>
 <% user_role = session[:user].role.name
 is_admin = (user_role == "Administrator" || user_role == "Super-Administrator")
 
@@ -10,12 +10,12 @@ end
 %>
 <table>
   <tr>
-    <th>Penalty Name</th>
-    <th>Penalty Per Unit</th>
-    <th>Penalty Unit</th>
-    <th>Maximum Penalty</th>
+    <th>Penalty name</th>
+    <th>Penalty per unit</th>
+    <th>Penalty unit</th>
+    <th>Maximum penalty</th>
     <% if is_admin %>
-      <th>Instructor Id</th>
+      <th>Instructor ID</th>
     <% end %>
   </tr>
 

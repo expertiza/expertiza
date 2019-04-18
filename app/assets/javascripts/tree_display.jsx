@@ -223,6 +223,14 @@ jQuery(document).ready(function() {
               )
             }
 
+              if(this.props.bidding_review) {
+                  moreContent.push(
+                      <a title="Run Gale Shapley algorithm" href={"/review_bids/gale_shapley/"+(parseInt(this.props.id)/2).toString()}>
+                          <img src="/assets/tree_view/run-lottery.png" />
+                      </a>
+                  )
+              }
+
             if (this.props.allow_suggestions) {
               moreContent.push(
                 <span>

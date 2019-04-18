@@ -41,6 +41,8 @@
       <th width="13%" class="sorter-false">Score awarded / Avg. score <span></span></th>
       <th width="13%" class="sorter-true">Metrics <span></span></th>
       <th class="sorter-false">Assign grade and write comments <span></span></th>
+      <th class="sorter-false">Grading History <span></span></th>
+
     </tr>
     </thead>
     <tbody>
@@ -133,6 +135,9 @@
                 </tr>
               </table>
             <% end %>
+          </td>
+          <td>
+            <%= link_to "Grading History", grading_histories_path(grade_receiver_id: Participant.where(id: r.id).pluck(:user_id).first, participant_id: r.id, grade_type: "Review") %>
           </td>
         <% end %>
       </tr>

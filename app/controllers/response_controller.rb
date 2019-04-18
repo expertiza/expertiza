@@ -69,16 +69,8 @@ class ResponseController < ApplicationController
     is_submitted = params[:isSubmit].present?
     was_submitted = false
 
-    map_id = params[:id]
-    map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
-    @map = ResponseMap.find(map_id)
-    if params[:review][:questionnaire_id]
-      @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
-      @round = params[:review][:round]
-    else
-      @round = nil
-    end
-
+    print("\r\nIsSubmit #{is_submitted}\r\n")
+    
     # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
     print("\r\nThe params in the create method are: \r\n")
     print(params)
@@ -121,6 +113,7 @@ class ResponseController < ApplicationController
     render nothing: true unless action_allowed?
     is_submitted = params[:isSubmit].present?
 
+    print("\r\nIsSubmit #{is_submitted}\r\n")
     # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
     print("\r\nThe params in the update are: \r\n")
     print(params)
@@ -226,6 +219,15 @@ class ResponseController < ApplicationController
 
     case http_method
     when "create"
+      map_id = params[:id]
+      map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
+      @map = ResponseMap.find(map_id)
+      if params[:review][:questionnaire_id]
+        @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
+        @round = params[:review][:round]
+      else
+        @round = nil
+      end
       # There could be multiple responses per round, when re-submission is enabled for that round.
       # Hence we need to pick the latest response.
       @response = Response.where(map_id: @map.id, round: @round.to_i).order(created_at: :desc).first

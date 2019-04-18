@@ -2,25 +2,25 @@
 
 <h1>
   <% if @assignment.spec_location == nil|| @assignment.spec_location.length==0%>
-      Submit or Review work for <%= @assignment.name %>
+    <%=t ".submit_review" %> <%= @assignment.name %>
   <% else %>
-      Submit or Review work for <%= link_to @assignment.name, @assignment.spec_location %>
+    <%=t ".submit_review" %> <%= link_to @assignment.name, @assignment.spec_location %>
   <% end %>
 
 </h1>
 
 <div class="flash_note">
-  Next: Click the activity you wish to perform on the assignment titled: <%= @assignment.name %>
+  <%=t ".next_click" %> <%= @assignment.name %>
 </div>
 <% if @assignment.spec_location && @assignment.spec_location.length > 0 %>
-  <a href="<%= @assignment.spec_location %>" target="new">Assignment Description</a>
+  <a href="<%= @assignment.spec_location %>" target="new"><%=t ".assignment_description" %></a>
 <% end %>
 <ul>
   <%if @topics.size > 0 %>
     <% if @authorization == 'participant' || @authorization == 'submitter' %>
       <li>
         <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.id%>
-        (Sign up for a topic)
+        <%=t ".signup_topic" %>
       </li>
     <% end %>
   <%end%>
@@ -30,7 +30,7 @@ to display the label "Your team" in the student assignment tasks-->
     <% if @authorization == 'participant' %>
       <li>
         <%= link_to 'Your team', view_student_teams_path(student_id: @participant.id) %>
-        (View and manage your team)
+        <%=t ".view_team" %>
       </li>
     <% end %>
   <%end%>
@@ -40,16 +40,16 @@ to display the label "Your team" in the student assignment tasks-->
     <li>
       <% if @topics.size > 0 %>
         <% if @topic_id and @assignment.submission_allowed(@topic_id) %>
-          <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> (Submit and view your work)
+          <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> <%=t ".submit_work" %>
         <% else %>
           <!--if one team do not hold a topic (still in waitlist), they cannot submit their work.-->
-          <font color="gray">Your work</font> (You have to choose a topic first)
+          <font color="gray"><%=t ".your_work" %></font> <%=t ".choose_topic" %>
         <% end %>
       <% else %>
         <% if @assignment.submission_allowed(@topic_id) %>
-          <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> (Submit and view your work)
+          <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> <%=t ".submit_work" %>
         <% else %>
-          <font color="gray">Your work</font> (You are not allowed to submit your work right now)
+          <font color="gray"><%=t ".your_work" %></font> <%=t ".not_allowed" %>
         <% end %>
       <% end %>
     </li>
@@ -69,7 +69,7 @@ to display the label "Your team" in the student assignment tasks-->
       <% else %>
         <font color="gray"><%= @alias_name%></font>
       <% end %>
-      (Give feedback to others on their work)
+      <%=t ".give_feedback" %>
     </li>
   <% end %>
 
@@ -80,9 +80,9 @@ to display the label "Your team" in the student assignment tasks-->
         <% if @assignment.require_quiz and (@assignment.quiz_allowed(@topic_id) or @assignment.get_current_stage(@topic_id) == "Finished") %>
           <%= link_to "Take quizzes", student_quizzes_path(:id => @participant.id) %>
         <% else %>
-          <font color="gray">Take quizzes</font>
+          <font color="gray"><%=t ".take_quizzes" %></font>
         <% end %>
-        (Take quizzes over the work you have read)
+        <%=t ".quizzes_read" %>
       </li>
     <% end %>
   <%end%>
@@ -91,10 +91,10 @@ to display the label "Your team" in the student assignment tasks-->
     <li>
       <!--Only if the assignment supports self-review and students submitted self-review can he or she view scores.-->
       <% if @assignment.is_selfreview_enabled and unsubmitted_self_review?(@participant.id) %>
-        <font color="gray">Your scores</font> (You have to submit self-review under 'Your work' before checking 'Your scores'.)
+        <font color="gray"><%=t ".your_scores" %></font> <%=t ".self_review" %>
       <% else %>
         <%= link_to "Your scores", controller: 'grades', action: 'view_team', id: @participant.id %>
-        (View feedback on your work)  &nbsp;  <%= link_to "Alternate View",  controller: 'grades', action: 'view_my_scores', id: @participant.id %>
+          <%=t ".view_feedback" %>  &nbsp;  <%= link_to "Alternate View",  controller: 'grades', action: 'view_my_scores', id: @participant.id %>
       <% end %>
     </li>
   <% end %>
@@ -104,9 +104,9 @@ to display the label "Your team" in the student assignment tasks-->
 
     <% if @assignment.get_current_stage(@topic_id) == "Complete" %>
       <!-- removed code for survey assignment add in line above && SurveyHelper::is_user_eligible_for_survey?	(@assignment.id, session[:user].id)  -->
-      <li><%= link_to "Take a survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id} %> (This will log you out)</li>
+      <li><%= link_to "Take a survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id} %> <%=t ".log_you_out" %></li>
     <% end %>
-    <li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> (Provide a different handle for this assignment)</li>
+    <li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> <%=t ".different_handle" %></li>
   </ul>
   <br>
 

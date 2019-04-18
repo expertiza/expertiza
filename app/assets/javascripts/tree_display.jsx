@@ -223,7 +223,7 @@ jQuery(document).ready(function() {
               )
             }
 
-            if(this.props.can_review_same_topic) {
+            if(this.props.review_assignment_strategy == 'bidding') {
                 moreContent.push(
                     <a title="Run Gale Shapley algorithm"
                        href={"/review_bids/gale_shapley/" + (parseInt(this.props.id) / 2).toString()}>

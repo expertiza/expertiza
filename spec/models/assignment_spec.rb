@@ -617,6 +617,13 @@ describe Assignment do
       expect(assignment.review_questionnaire_id(3, 2)).to eql questionnaire_1.id
     end
 
+    # MISCELLANEOUS TESTS
+
+    it "returns nil if no review questionnaire id can be found" do
+      assignment = create(:assignment)
+      expect(assignment.review_questionnaire_id(2, 3)).to be_nil
+    end
+
   end
 
   describe 'has correct csv values?' do

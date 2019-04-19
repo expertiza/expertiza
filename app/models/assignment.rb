@@ -349,11 +349,11 @@ class Assignment < ActiveRecord::Base
 
   # Check if this assignment has rubrics which vary by topic
   #   returns false for an assignment which has no questionnaires
-  #   returns false for an assignment if it has assignment-questionnaire(s) that have # TODO
+  #   returns false for an assignment if it has assignment-questionnaire(s) that have
   #     topic_id nil and none with topic_id non-nil
-  #   returns true for an assignment if it has assignment-questionnaire(s) that have # TODO
+  #   returns true for an assignment if it has assignment-questionnaire(s) that have
   #     topic_id non-nil and none with topic_id nil
-  #   throws exception for an assignment if it has assignment-questionnaire(s) that have # TODO
+  #   throws exception for an assignment if it has assignment-questionnaire(s) that have
   #     topic_id non-nil and nil
   def varying_rubrics_by_topic?
     aq_no_topic_id = AssignmentQuestionnaire.where(assignment_id: self.id, topic_id: nil).size >= 1
@@ -414,7 +414,7 @@ class Assignment < ActiveRecord::Base
   #   finds by type if round number is given, no luck finding by round
   #   finds by current round if round number not given
   #   finds by type if round number not given, no luck finding by current round
-  def review_questionnaire_id(round_number = nil)
+  def review_questionnaire_id(round_number = nil, topic_id = nil)
     # Get all assignment-questionnaire relationships between this assignment and review questionnaires
     matching_aqs = AssignmentQuestionnaire.where(assignment_id: self.id).select do |aq|
       !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == "ReviewQuestionnaire"
@@ -424,20 +424,27 @@ class Assignment < ActiveRecord::Base
       next_due_date = DueDate.get_next_due_date(self.id)
       round_number = next_due_date.try(:round)
     end
-    # Get assignment-questionnaire relationships that apply to the round (if we now have one)
+    # Get assignment-questionnaire relationships that apply to the round and topic we care about
     # If the assignment's rubric does not vary by round, then used_in_round will be nil
-    if round_number.nil?
-      matching_aqs_by_round = matching_aqs
-    else
-      matching_aqs_by_round = matching_aqs.select do |aq|
+    # If the assignment's rubric does not vary by topic, then topic_id will be nil
+    filtered_aqs = matching_aqs
+    unless round_number.nil?
+      filtered_aqs = filtered_aqs.select do |aq|
         aq.used_in_round == round_number
+      end
+    end
+    unless topic_id.nil?
+      filtered_aqs = filtered_aqs.select do |aq|
+        aq.topic_id == topic_id
       end
     end
     # If filtering by round yielded no results, go back to the set of
     # reasonable assignment-questionnaire relationships we already had
-    matching_aqs_by_round = matching_aqs_by_round.empty? ? matching_aqs : matching_aqs_by_round
+    if !filtered_aqs || filtered_aqs.empty?
+      filtered_aqs = matching_aqs
+    end
     # Return the questionnaire id for the first reasonable thing we came up with
-    matching_aqs_by_round.first.questionnaire_id
+    filtered_aqs.first.questionnaire_id
   end
 
   def self.export_details(csv, parent_id, detail_options)

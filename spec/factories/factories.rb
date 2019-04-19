@@ -393,6 +393,14 @@ FactoryBot.define do
     calibrate_to 0
   end
 
+  factory :self_review_response_map, class: SelfReviewResponseMap do
+    assignment { Assignment.first || association(:assignment) }
+    reviewer { AssignmentParticipant.first || association(:participant) }
+    reviewee { AssignmentTeam.first || association(:assignment_team) }
+    type 'ReviewResponseMap'
+    calibrate_to 0
+  end
+
   factory :meta_review_response_map, class: MetareviewResponseMap do
     review_mapping { ReviewResponseMap.first || association(:review_response_map) }
     reviewee { AssignmentParticipant.first || association(:participant) }

@@ -310,7 +310,7 @@
 <%= label_tag('assignment_questionnaire[used_in_round]', 'Review rubric varies by round?') %>
 <br>
 <input name="assignment_questionnaire[topic_id]" type="hidden" value="false" />
-<%= check_box_tag('assignment_questionnaire[topic_id]', 'true', @review_vary_by_topic_check) %>
+<%= check_box_tag('assignment_questionnaire[topic_id]', 'true', @review_vary_by_topic_check, :onclick=>"handleCheckReviewVaryByTopic(this)") %>
 <%= label_tag('assignment_questionnaire[topic_id]', 'Review rubric varies by topic?') %>
 
 <div>

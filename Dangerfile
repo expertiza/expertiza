@@ -502,13 +502,13 @@ end
                     .split("\n")
                     .select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}
   added_lines = added_lines_arr.join('')
-  num_of_tests = added_lines.scan(/^\s*it\s*['"]/).count
-  num_of_expect_key_words = added_lines.scan(/^\s*expect\s*(\(|\{|do)/).count
+  num_of_tests = added_lines.scan(/\+\s*(\\t)*\s*it\s*['"]/).count
+  num_of_expect_key_words = added_lines.scan(/\+\s*(\\t)*\s*expect\s*(\(|\{|do)/).count
   num_of_commented_out_expect_key_words = added_lines.scan(/#\s*expect/).count
-  num_of_expectation_without_machers = added_lines_arr.count{ |loc| loc.scan(/^\s*expect\s*[\(\{]/).count > 0 and loc.scan(/\.(to|not_to|to_not)/).count == 0}
-  num_of_expectation_not_focus_on_real_value = added_lines_arr.count{ |loc| loc.scan(/^\s*expect\s*[\(\{]/).count > 0 and loc.scan(/\.(not_to|to_not)\s*(be_nil|be_empty|eq 0|eql 0|equal 0)/).count > 0 }
+  num_of_expectation_without_machers = added_lines_arr.count{ |loc| loc.scan(/^\+\s*(\\t)*\sexpect\s*[\(\{]/).count > 0 and loc.scan(/\.(to|not_to|to_not)/).count == 0}
+  num_of_expectation_not_focus_on_real_value = added_lines_arr.count{ |loc| loc.scan(/^\+\s*(\\t)*\sexpect\s*[\(\{]/).count > 0 and loc.scan(/\.(not_to|to_not)\s*(be_nil|be_empty|eq 0|eql 0|equal 0)/).count > 0 }
   num_of_wildcard_argument_matchers = added_lines.scan(/\((anything|any_args)\)/).count
-  num_of_expectations_on_page = added_lines.scan(/^\s*expect\s*\(page\)/).count
+  num_of_expectations_on_page = added_lines.scan(/\+\s*(\\t)*\sexpect\s*\(page\)/).count
   
   if num_of_wildcard_argument_matchers >= 5
     WILDCARD_ARGUMENT_MATCHERS_MESSAGE =

@@ -100,7 +100,6 @@ class ImportFileController < ApplicationController
   # view. Update the expected columns view in the start page to reflect the optional params.
 
   def import_from_hash(session, params)
-
     @model = params[:model]
     contents_hash = eval(params[:contents_hash])
 
@@ -109,7 +108,7 @@ class ImportFileController < ApplicationController
     else
       # If there is no header, recover the selected fields in the select* params
       new_header = []
-      params.keys.each do |p|
+      params.each_key do |p|
         if p.match(/\Aselect/)
           new_header << p
         end
@@ -121,7 +120,6 @@ class ImportFileController < ApplicationController
     errors = []
     begin
       @header_integrated_body.each do |row_hash|
-
         # TODO: Eliminate special paths by making consistent ::import functions
         if @model == "AssignmentTeam" or @model == "CourseTeam"
           teamtype = @model.constantize
@@ -134,12 +132,10 @@ class ImportFileController < ApplicationController
         else
           @model.constantize.import(row_hash, session, params[:id])
         end
-
       end
     rescue
       errors << $ERROR_INFO
     end
-
     errors
   end
 
@@ -268,5 +264,4 @@ class ImportFileController < ApplicationController
     items.each {|value| row << value.sub("\"", "").sub("\"", "").strip }
     row
   end
-
 end

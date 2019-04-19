@@ -94,7 +94,6 @@ class Questionnaire < ActiveRecord::Base
   #
   # TODO: Use test files to ensure this is working
   def self.import(row_hash, id)
-
     raise ArgumentError, "row_hash cannot be empty when importing Question objects for Questionnaire" if row_hash.empty?
     raise ArgumentError, "id cannot be nil when importing Question objects for Questionnaire" if id.nil?
 
@@ -119,7 +118,7 @@ class Questionnaire < ActiveRecord::Base
     q.weight = row_hash.delete(:weight)
 
     # Add question advice
-    row_hash.keys.each do |k|
+    row_hash.each_key do |k|
       # Check score within range
       if k.to_i >= questionnaire.min_question_score && k.to_i >= questionnaire.max_question_score
         a = QuestionAdvice.new(score: k.to_i, advice: row_hash[k])
@@ -133,8 +132,6 @@ class Questionnaire < ActiveRecord::Base
       q_type.question = q
       q_type.save
     end
-
     questionnaire.questions << q
   end
-
 end

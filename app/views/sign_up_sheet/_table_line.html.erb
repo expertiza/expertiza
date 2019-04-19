@@ -170,47 +170,31 @@
       <td align="center"><%= topic.micropayment %></td>
   <% end %>
 
-
-
-    <% table_id = "topic_questionnaire_table"+i.to_s %>
-  <td>
-  <!--<table id="topic_questionnaire_table">-->
-    <table id = <%=table_id %>>
-      <tr>
-        <script>
-            //page_name = "./assignment/edit.html.erb";
-            <% if @assignment_form.review_vary_by_topic %>
-            <% for t in 1..@assignment_form.assignment.rounds_of_reviews %>
-            addQuestionnaireTableRow1(
-                'ReviewQuestionnaire',
-                <%=t%>,
-                <%=i%>,
-                <%= questionnaire_for_topic(@assignment_form.assignment, 'ReviewQuestionnaire', t).to_json.html_safe %>,
-                <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire', t).to_json.html_safe %>,
-                <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire', t).to_json.html_safe %>
-            );
-            <% end %>
-            <% else %>
-            addQuestionnaireTableRow1(
-                'ReviewQuestionnaire',
-                null,
-                <%=i%>,
-                <%= questionnaire_for_topic(topic, 'ReviewQuestionnaire', nil).to_json.html_safe %>,
-                <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>,
-                <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>
-            );
-            <% end %>
-        </script>
-      </tr>
-    </table>
-
-
-  </td>
-
-
-
-
-
+  <% if @assignment_form.assignment.varying_rubrics_by_topic? %>
+    <% table_id = "topic_questionnaire_table" + i.to_s %>
+    <td>
+      <table id = <%=table_id %>>
+        <tr>
+          <script>
+              //page_name = "./assignment/edit.html.erb";
+              <% if @assignment_form.assignment.varying_rubrics_by_round? %>
+                <% for round in 1..@assignment_form.assignment.rounds_of_reviews %>
+                addQuestionnaireTableRow1('ReviewQuestionnaire', <%= round %>, <%= i %>,
+                    <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire', round, topic.id).to_json.html_safe %>,
+                    <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire', round, topic.id).to_json.html_safe %>,
+                    <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire', round).to_json.html_safe %>);
+                <% end %>
+              <% else %>
+                addQuestionnaireTableRow1('ReviewQuestionnaire', null, <%= i %>,
+                    <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire', nil, nil).to_json.html_safe %>,
+                    <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire', nil, nil).to_json.html_safe %>,
+                    <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire', nil).to_json.html_safe %>);
+              <% end %>
+          </script>
+        </tr>
+      </table>
+    </td>
+  <% end %>
 
   <td align="center"><%= topic.max_choosers %></td>
   <%= render :partial => '/sign_up_sheet/available_slots', :locals => {:topic=>topic} %>

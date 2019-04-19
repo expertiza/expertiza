@@ -17,11 +17,9 @@ class ImportFileController < ApplicationController
     @model = params[:model]
 
     @required_fields = @model.constantize.required_import_fields
-    @optional_fields = @model.constantize.optional_import_fields
+    @optional_fields = @model.constantize.optional_import_fields(@id)
 
-    # Get the associated options
-    # TODO: Represent options as dict from class method
-    # @import_options = @model.constantize.send("import_options")
+    @import_options = @model.constantize.import_options
 
     @title = params[:title]
   end
@@ -34,7 +32,7 @@ class ImportFileController < ApplicationController
     @selected_fields = @model.constantize.required_import_fields
 
     # Add the chosen optional fields from start
-    @optional_fields = @model.constantize.optional_import_fields
+    @optional_fields = @model.constantize.optional_import_fields(@id)
     @optional_fields.each do |field, display|
       if params[field] == "true"
         @selected_fields.store(field, display)
@@ -46,28 +44,6 @@ class ImportFileController < ApplicationController
     @options = params[:options]
     @delimiter = get_delimiter(params)
     @has_header = params[:has_header]
-
-    # TODO: Somehow eliminate this
-    if (@model == 'AssignmentTeam'|| @model == 'CourseTeam')
-      @has_teamname = params[:has_teamname]
-    else
-      @has_teamname = "nil"
-    end
-    if (@model == 'ReviewResponseMap')
-      @has_reviewee = params[:has_reviewee]
-    else
-      @has_reviewee = nil
-    end
-    if (@model == 'MetareviewResponseMap')
-      @has_reviewee = params[:has_reviewee]
-      @has_reviewer = params[:has_reviewer]
-    else
-      @has_reviewee = "nil"
-      @has_reviewer = "nil"
-    end
-    if (@model == 'SignUpTopic')
-      @optional_count = 0
-    end
 
     @current_file = params[:file]
     @current_file_contents = @current_file.read
@@ -98,7 +74,6 @@ class ImportFileController < ApplicationController
   #
   # Also, good way to refactor this in general? Without a header, pass the expected params to the show
   # view. Update the expected columns view in the start page to reflect the optional params.
-
   def import_from_hash(session, params)
 
     @model = params[:model]
@@ -126,7 +101,6 @@ class ImportFileController < ApplicationController
         if @model == "AssignmentTeam" or @model == "CourseTeam"
           teamtype = @model.constantize
           options = eval(params[:options])
-          options[:has_teamname] = params[:has_teamname]
           Team.import(row_hash, params[:id], options, teamtype)
         elsif @model == "SignUpTopic" or @model == "SignUpSheet"
           session[:assignment_id] = params[:id]

@@ -206,6 +206,19 @@ class Team < ActiveRecord::Base
     team.import_team_members(row_hash) unless team_exists && options[:handle_dups] == "ignore"
   end
 
+  def self.required_import_fields
+    {"teamname" => "Team Name",
+     "teammembers" => "Team Members"}
+  end
+
+  def self.optional_import_fields(id=nil)
+    {}
+  end
+
+  def self.import_options
+    {}
+  end
+
   # Handle existence of the duplicate team
   def self.handle_duplicate(team, name, id, handle_dups, teamtype)
     return name if team.nil? # no duplicate

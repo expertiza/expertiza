@@ -93,6 +93,8 @@ class Questionnaire < ActiveRecord::Base
   # in that specific order. Also need advice with string score
   #
   # TODO: Use test files to ensure this is working
+  #
+  # At some point, expecting text, type, sequence, size, and break_before
   def self.import(row_hash, id)
 
     raise ArgumentError, "row_hash cannot be empty when importing Question objects for Questionnaire" if row_hash.empty?
@@ -121,7 +123,7 @@ class Questionnaire < ActiveRecord::Base
     # Add question advice
     row_hash.keys.each do |k|
       # Check score within range
-      if k.to_i >= questionnaire.min_question_score && k.to_i >= questionnaire.max_question_score
+      if k.to_i >= questionnaire.min_question_score && k.to_i <= questionnaire.max_question_score
         a = QuestionAdvice.new(score: k.to_i, advice: row_hash[k])
         q.question_advices << a
       end
@@ -135,6 +137,30 @@ class Questionnaire < ActiveRecord::Base
     end
 
     questionnaire.questions << q
+  end
+
+  def self.required_import_fields
+    {"txt" => "Question text",
+     "type" => "Question type",
+     "sequence" => "Sequence (for order)",
+     "weight" => "Point value"}
+  end
+
+  def self.optional_import_fields(id)
+    ques = Questionnaire.find(id)
+    optional_fields = {"size" => "Size of question",
+     "break_before" => "What is this?"}
+
+    if !ques.nil?
+      for q in  ques.min_question_score..ques.max_question_score do
+        optional_fields["advice_" + q.to_s] = "Advice " + q.to_s
+      end
+    end
+    optional_fields
+  end
+
+  def self.import_options
+    {}
   end
 
 end

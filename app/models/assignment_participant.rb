@@ -209,6 +209,21 @@ class AssignmentParticipant < Participant
     new_part.set_handle
   end
 
+  def self.required_import_fields
+    {"name" => "Name",
+     "fullname" => "Full Name",
+     "email" => "Email",
+     "password" => "Password"}
+  end
+
+  def self.optional_import_fields(id=nil)
+    {}
+  end
+
+  def self.import_options
+    {}
+  end
+
   # grant publishing rights to one or more assignments. Using the supplied private key,
   # digital signatures are generated.
   # reference: http://stuff-things.net/2008/02/05/encrypting-lots-of-sensitive-data-with-ruby-on-rails/

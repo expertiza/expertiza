@@ -11,7 +11,7 @@ describe Answer do
 
   describe "#test get total score" do
     it "returns total score when required conditions are met" do
-      allow(Question).to receive(:find_by_sql).and_return([double( weighted_score: 20, sum_of_weights: 5, questionnaire_max_question_score: 4)])
+      allow(Answer).to receive(:mock_method).and_return({"weighted_score"=> 20, "sum_of_weights"=> 5, "q1_max_question_score"=> 4})
       allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: "1")])
       expect(Answer.get_total_score(response: [response_record], questions: [question1])).to eq 100.0
       # output calculation is (weighted_score / (sum_of_weights * max_question_score)) * 100
@@ -19,25 +19,25 @@ describe Answer do
     end
 
     it "returns total score when one answer is nil for scored question and its weight gets removed from sum_of_weights" do
-      allow(Question).to receive(:find_by_sql).and_return([double( weighted_score: 20, sum_of_weights: 5, questionnaire_max_question_score: 4)])
+      allow(Answer).to receive(:mock_method).and_return({"weighted_score"=> 20, "sum_of_weights"=> 5, "q1_max_question_score"=> 4})
       allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
-      expect(Answer.get_total_score(response: [response_record], questions: [question1])).to be_within(0.01).of(100.0)
+      expect(Answer.get_total_score(response: [response_record], questions: [question1])).to be_within(0.01).of(125.0)
     end
 
     it "returns -1 when answer is nil for scored question which makes sum of weights = 0" do
-      allow(Question).to receive(:find_by_sql).and_return([double( weighted_score: 20, sum_of_weights: 1, questionnaire_max_question_score: 5)])
+      allow(Answer).to receive(:mock_method).and_return({"weighted_score"=> 20, "sum_of_weights"=> 1, "q1_max_question_score"=> 5})
       allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
       expect(Answer.get_total_score(response: [response_record], questions: [question1])).to eq -1.0
     end
 
     it "returns -1 when weighted_score of questionnaireData is nil" do
-      allow(Question).to receive(:find_by_sql).and_return([double( weighted_score: nil, sum_of_weights: 5, questionnaire_max_question_score: 5)])
+      allow(Answer).to receive(:mock_method).and_return({"weighted_score"=> nil, "sum_of_weights"=> 5, "q1_max_question_score"=> 5})
       allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
       expect(Answer.get_total_score(response: [response_record], questions: [question1])).to eq -1.0
     end
 
     xit "checks if submission_valid? is called" do
-      allow(Question).to receive(:find_by_sql).and_return([double( weighted_score: nil, sum_of_weights: 5, questionnaire_max_question_score: 5)])
+      allow(ScoreView).to receive(:find_by_sql).and_return([double("scoreview", weighted_score: nil, sum_of_weights: 5, q1_max_question_score: 5)])
       allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
       expect(Answer).to receive(:submission_valid?)
       Answer.get_total_score(response: [response_record], questions: [question1])
@@ -154,4 +154,3 @@ describe Answer do
     end
   end
 end
-

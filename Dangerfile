@@ -88,13 +88,13 @@ end
 # 3. Your pull request should not touch too many files (more than 30 files).
 # ------------------------------------------------------------------------------
 if TOUCHED_FILES.size > 30
-  BIG_PR_MESSAGE =
+  BIG_PR_MESSAGE2 =
     markdown <<-MARKDOWN
 Your pull request touches more than 30 files.
 Please make sure you did not commit unnecessary changes, such as `node_modules`, `change logs`.
     MARKDOWN
 
-  warn(BIG_PR_MESSAGE, sticky: true)
+  warn(BIG_PR_MESSAGE2, sticky: true)
 end
 
 # ------------------------------------------------------------------------------
@@ -167,13 +167,23 @@ end
 # ------------------------------------------------------------------------------
 # 8. Your pull request should avoid using global variables and/or class variables.
 # ------------------------------------------------------------------------------
-if PR_ADDED =~ /\$[A-Za-z0-9_]+/ or PR_ADDED =~ /@@[A-Za-z0-9_]+/
-  GLOBAL_CLASS_VARIABLE_MESSAGE =
-    markdown <<-MARKDOWN
+(ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).each do |file|
+  next unless file =~ /.*\.rb$/
+  added_lines = git
+                .diff_for_file(file)
+                .patch
+                .split("\n")
+                .select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}
+                .join('')
+  if added_lines =~ /\$[A-Za-z0-9_]+/ or added_lines =~ /@@[A-Za-z0-9_]+/
+    GLOBAL_CLASS_VARIABLE_MESSAGE =
+      markdown <<-MARKDOWN
 You are using global variables (`$`) or class variables (`@@`); please double-check whether this is necessary.
     MARKDOWN
 
-  warn(GLOBAL_CLASS_VARIABLE_MESSAGE, sticky: true)
+    warn(GLOBAL_CLASS_VARIABLE_MESSAGE, sticky: true)
+    break
+  end
 end
 
 # ------------------------------------------------------------------------------
@@ -492,13 +502,13 @@ end
                     .split("\n")
                     .select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}
   added_lines = added_lines_arr.join('')
-  num_of_tests = added_lines.scan(/\s*it\s*['"]/).count
-  num_of_expect_key_words = added_lines.scan(/\s*expect\s*[\(\{]/).count
+  num_of_tests = added_lines.scan(/^\s*it\s*['"]/).count
+  num_of_expect_key_words = added_lines.scan(/^\s*expect\s*(\(|\{|do)/).count
   num_of_commented_out_expect_key_words = added_lines.scan(/#\s*expect/).count
-  num_of_expectation_without_machers = added_lines_arr.count{ |loc| loc.scan(/\s*expect\s*[\(\{]/).count > 0 and loc.scan(/\.(to|not_to|to_not)/).count == 0}
-  num_of_expectation_not_focus_on_real_value = added_lines_arr.count{ |loc| loc.scan(/\s*expect\s*[\(\{]/).count > 0 and loc.scan(/\.(to|not_to|to_not)\s*(be_nil|be_empty|eq 0|eql 0|equal 0)/) > 0 }
+  num_of_expectation_without_machers = added_lines_arr.count{ |loc| loc.scan(/^\s*expect\s*[\(\{]/).count > 0 and loc.scan(/\.(to|not_to|to_not)/).count == 0}
+  num_of_expectation_not_focus_on_real_value = added_lines_arr.count{ |loc| loc.scan(/^\s*expect\s*[\(\{]/).count > 0 and loc.scan(/\.(not_to|to_not)\s*(be_nil|be_empty|eq 0|eql 0|equal 0)/).count > 0 }
   num_of_wildcard_argument_matchers = added_lines.scan(/\((anything|any_args)\)/).count
-  num_of_expectations_on_page = added_lines.scan(/\s*expect\s*\(page\)/).count
+  num_of_expectations_on_page = added_lines.scan(/^\s*expect\s*\(page\)/).count
   
   if num_of_wildcard_argument_matchers >= 5
     WILDCARD_ARGUMENT_MATCHERS_MESSAGE =
@@ -547,3 +557,4 @@ To avoid `shallow tests` -- tests concentrating on irrelevant, unlikely-to-fail 
     break
   end
 end
+

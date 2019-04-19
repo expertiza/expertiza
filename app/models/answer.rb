@@ -48,6 +48,11 @@ class Answer < ActiveRecord::Base
   #  assessment - specifies the assessment for which the total score is being calculated
   #  questions  - specifies the list of questions being evaluated in the assessment
 
+ def self.mock_method args
+ # necessary for rspec testing | otherwise can not stub ActiveRecord::Base.connection.exec_query(sql) while allowing Questionnaire.find() in get_total_score() 
+	return args
+ end
+
   def self.get_total_score(params)
     @response = params[:response].last
     if @response
@@ -59,14 +64,16 @@ class Answer < ActiveRecord::Base
 
       @questionnaire = Questionnaire.find(@questions[0].questionnaire_id)
 
-      questionnaireData = Question.find_by_sql(["SELECT questionnaire.max_question_score as questionnaire_max_question_score, SUM(ques.weight) as sum_of_weights, SUM(ques.weight * ans.answer) as weighted_score FROM questions ques left join questionnaires questionnaire on ques.questionnaire_id = questionnaire.id left join answers ans on ques.id = ans.question_id WHERE ques.type in('Criterion', 'Scale') AND questionnaire.id = ? AND ans.response_id = ?", @questions[0].questionnaire_id, @response.id])
-
+      sql =  "SELECT questionnaire.max_question_score as q1_max_question_score, SUM(ques.weight) as sum_of_weights, SUM(ques.weight * ans.answer) as weighted_score FROM questions ques left join questionnaires questionnaire on ques.questionnaire_id = questionnaire.id left join answers ans on ques.id = ans.question_id WHERE ques.type in('Criterion', 'Scale') AND questionnaire.id = " +  @questions[0].questionnaire_id.to_s + " AND ans.response_id = "+ @response.id.to_s
+      questionnaireData = ActiveRecord::Base.connection.exec_query(sql).first
+      questionnaireData = self.mock_method questionnaireData
+    
       # zhewei: we should check whether weighted_score is nil,
       # which means student did not assign any score before save the peer review.
       # If we do not check here, to_f method will convert nil to 0, at that time, we cannot figure out the reason behind 0 point,
       # whether is reviewer assign all questions 0 or reviewer did not finish any thing and save directly.
-      weighted_score = (questionnaireData[0].weighted_score.to_f unless questionnaireData[0].weighted_score.nil?)
-      sum_of_weights = questionnaireData[0].sum_of_weights.to_f
+      weighted_score = (questionnaireData['weighted_score'].to_f unless questionnaireData['weighted_score'].nil?)
+      sum_of_weights = questionnaireData['sum_of_weights'].to_f
       # Zhewei: we need add questions' weights only their answers are not nil in DB.
       all_answers_for_curr_response = Answer.where(response_id: @response.id)
       all_answers_for_curr_response.each do |answer|
@@ -74,12 +81,13 @@ class Answer < ActiveRecord::Base
         # if a questions is a scored question (criterion or scale), the weight cannot be null.
         # Answer.answer is nil indicates that this scored questions is not filled. Therefore the score of this question is ignored and not counted
         # towards the score for this response.
+	#return question.is_a?(ScoredQuestion)
         if answer.answer.nil? && question.is_a?(ScoredQuestion)
           question_weight = Question.find(answer.question_id).weight
           sum_of_weights -= question_weight
         end
       end
-      max_question_score = questionnaireData[0].questionnaire_max_question_score.to_f
+      max_question_score = questionnaireData['q1_max_question_score'].to_f
       if sum_of_weights > 0 && max_question_score && !weighted_score.nil?
         return (weighted_score / (sum_of_weights * max_question_score)) * 100
       else

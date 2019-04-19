@@ -2,7 +2,7 @@
 require 'active_support/time_with_zone'
 
 class AssignmentForm
-  attr_accessor :assignment, :assignment_questionnaires, :due_dates, :tag_prompt_deployments, :review_vary_by_topic
+  attr_accessor :assignment, :assignment_questionnaires, :due_dates, :tag_prompt_deployments
   attr_accessor :errors
 
   DEFAULT_MAX_TEAM_SIZE = 1
@@ -17,7 +17,6 @@ class AssignmentForm
     @assignment.num_review_of_reviews = @assignment.num_metareviews_allowed
     @assignment_questionnaires = Array(args[:assignment_questionnaires])
     @due_dates = Array(args[:due_dates])
-    @review_vary_by_topic = check_review_vary_by_topic
   end
 
   # create a form object for this assignment_id
@@ -349,14 +348,6 @@ class AssignmentForm
         used_in_round: aq.used_in_round,
         dropdown: aq.dropdown
       )
-    end
-  end
-
-  def check_review_vary_by_topic
-    @assignment_questionnaires.each do |assignment_questionnaire|
-      unless assignment_questionnaire.topic_id.nil?
-        @review_vary_by_topic = true
-      end
     end
   end
 end

@@ -1,6 +1,10 @@
 <th width="5%">Topic #</th>
-<th width="25%">Topic name(s)</th>
-<th width="25%">Questionnaire</th>
+<% if @assignment.varying_rubrics_by_topic? %>
+  <th width="25%">Topic name(s)</th>
+  <th width="25%">Questionnaire</th>
+<% else %>
+    <th width="50%">Topic name(s)</th>
+<% end %>
 <% if @assignment.microtask? %>
   <th width="5%">Micro- payment</th>
 <% end %>

@@ -171,18 +171,4 @@ module AssignmentHelper
     end
   end
 
-  def questionnaire_for_topic(assignment, type, round_number)
-    if round_number.nil?
-      questionnaire = assignment.questionnaires.find_by(type: type)
-    else
-      assignment_questionnaire = assignment.assignment_questionnaires.find_by(used_in_round: round_number)
-      # make sure the assignment_questionnaire record is not empty
-      unless assignment_questionnaire.nil?
-        questionnaire = Questionnaire.find(assignment_questionnaire.questionnaire_id)
-      end
-    end
-    return questionnaire unless questionnaire.nil?
-    Object.const_get(type).new
-  end
-
 end

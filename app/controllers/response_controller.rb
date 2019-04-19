@@ -5,7 +5,6 @@ class ResponseController < ApplicationController
   require 'net/http'
 
   def action_allowed?
-    get_review_response_metrics
     response = user_id = nil
     action = params[:action]
     if %w[edit delete update view].include?(action)
@@ -151,8 +150,7 @@ class ResponseController < ApplicationController
                       "metrics"=>["suggestion"]}.to_json
     http.use_ssl = true
     res = http.request(req)
-    puts "yyyyyyyyy"
-    puts JSON.parse(res.body)
+    # puts JSON.parse(res.body)
   end
 
   def create

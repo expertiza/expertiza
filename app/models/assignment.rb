@@ -444,7 +444,8 @@ class Assignment < ActiveRecord::Base
       filtered_aqs = matching_aqs
     end
     # Return the questionnaire id for the first reasonable thing we came up with
-    filtered_aqs.first.questionnaire_id
+    # (or return nil if nothing reasonable found)
+    filtered_aqs.empty? ? nil : filtered_aqs.first.questionnaire_id
   end
 
   def self.export_details(csv, parent_id, detail_options)

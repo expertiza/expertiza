@@ -1,4 +1,5 @@
 describe ReviewResponseMap do
+
   let(:team) { build(:assignment_team, id: 1, name: 'team no name', assignment: assignment, users: [student], parent_id: 1) }
   let(:team1) { build(:assignment_team, id: 2, name: 'team has name', assignment: assignment, users: [student]) }
   let(:review_response_map) { build(:review_response_map, id: 1, assignment: assignment, reviewer: participant, reviewee: team) }
@@ -29,10 +30,43 @@ describe ReviewResponseMap do
     allow(review_response_map).to receive(:response).and_return(response)
   end
 
-  it '#questionnaire' do
-    allow(assignment).to receive(:review_questionnaire_id).and_return(1)
-    allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire)
-    expect(review_response_map.questionnaire(1)).to eq(questionnaire)
+  describe '#questionnaire' do
+
+    # This method is little more than a wrapper for assignment.review_questionnaire_id()
+    # So it will be tested relatively lightly
+    # We want to know how it responds to the combinations of various arguments it could receive
+    # We want to know how it responds if no questionnaire can be found
+
+    it "returns the correct questionnaire when round number is given" do
+      # create multiple questionnaires and assignment_questionnaires,
+      # for confidence that correct questionnaire is returned
+      assignment = create(:assignment)
+      review_response_map = create(:review_response_map, assignment: assignment)
+      questionnaire_1 = create(:questionnaire)
+      questionnaire_2 = create(:questionnaire)
+      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_1, used_in_round: 1)
+      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_2, used_in_round: 2)
+      expect(review_response_map.questionnaire(2).id).to eql questionnaire_2.id
+    end
+
+    it "returns the correct questionnaire when round number is not given" do
+      # create multiple questionnaires and assignment_questionnaires,
+      # for confidence that correct questionnaire is returned
+      assignment = create(:assignment)
+      review_response_map = create(:review_response_map, assignment: assignment)
+      questionnaire_1 = create(:questionnaire)
+      questionnaire_2 = create(:questionnaire)
+      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_1, used_in_round: 1)
+      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_2, used_in_round: 2)
+      expect(review_response_map.questionnaire().id).to eql questionnaire_1.id
+    end
+
+    it "returns nil when no questionnaire can be found" do
+      assignment = create(:assignment)
+      review_response_map = create(:review_response_map, assignment: assignment)
+      expect(review_response_map.questionnaire(2)).to be_nil
+    end
+
   end
 
   it '#get_title' do

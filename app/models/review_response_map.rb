@@ -3,14 +3,11 @@ class ReviewResponseMap < ResponseMap
   belongs_to :contributor, class_name: 'Team', foreign_key: 'reviewee_id'
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
 
-  # In if this assignment uses "varying rubrics" feature, the sls
-  # "used_in_round" field should not be nil
-  # so find the round # based on current time and the due date times, and use that round # to find corresponding
-  # questionnaire_id from assignment_questionnaires table
-  # otherwise this assignment does not use the "varying rubrics", so in assignment_questionnaires table there should
-  # be only 1 questionnaire with type 'ReviewQuestionnaire'.    -Yang
-  def questionnaire(round = nil)
-    Questionnaire.find_by(id: self.assignment.review_questionnaire_id(round))
+  # Find a review questionnaire associated with this review response map's assignment
+  # For more details please see method description for assignment.review_questionnaire_id()
+  def questionnaire(round_number = nil, topic_id = nil)
+    # Use find_by() instead of find() in case the review questionnaire id is nil
+    Questionnaire.find_by(id: self.assignment.review_questionnaire_id(round_number, topic_id))
   end
 
   def get_title

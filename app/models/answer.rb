@@ -49,8 +49,8 @@ class Answer < ActiveRecord::Base
   #  questions  - specifies the list of questions being evaluated in the assessment
 
  def self.mock_method args
- # necessary for rspec testing | otherwise can not stub ActiveRecord::Base.connection.exec_query(sql) while allowing Questionnaire.find() in get_total_score() 
-	return args
+ # necessary for rspec testing | otherwise can not stub ActiveRecord::Base.connection.exec_query(sql) while allowing Questionnaire.find() in get_total_score()
+    return args
  end
 
   def self.get_total_score(params)
@@ -64,7 +64,7 @@ class Answer < ActiveRecord::Base
 
       @questionnaire = Questionnaire.find(@questions[0].questionnaire_id)
 
-      sql =  "SELECT questionnaire.max_question_score as q1_max_question_score, SUM(ques.weight) as sum_of_weights, SUM(ques.weight * ans.answer) as weighted_score FROM questions ques left join questionnaires questionnaire on ques.questionnaire_id = questionnaire.id left join answers ans on ques.id = ans.question_id WHERE ques.type in('Criterion', 'Scale') AND questionnaire.id = " +  @questions[0].questionnaire_id.to_s + " AND ans.response_id = "+ @response.id.to_s
+      sql =  "SELECT questionnaire.max_question_score as q1_max_question_score, SUM(ques.weight) as sum_of_weights, SUM(ques.weight * ans.answer) as weighted_score FROM questions ques left join questionnaires questionnaire on ques.questionnaire_id = questionnaire.id left join answers ans on ques.id = ans.question_id WHERE ques.type in('Criterion', 'Scale') AND questionnaire.id = " + @questions[0].questionnaire_id.to_s + " AND ans.response_id = " + @response.id.to_s
       questionnaireData = ActiveRecord::Base.connection.exec_query(sql).first
       questionnaireData = self.mock_method questionnaireData
     
@@ -81,7 +81,6 @@ class Answer < ActiveRecord::Base
         # if a questions is a scored question (criterion or scale), the weight cannot be null.
         # Answer.answer is nil indicates that this scored questions is not filled. Therefore the score of this question is ignored and not counted
         # towards the score for this response.
-	#return question.is_a?(ScoredQuestion)
         if answer.answer.nil? && question.is_a?(ScoredQuestion)
           question_weight = Question.find(answer.question_id).weight
           sum_of_weights -= question_weight

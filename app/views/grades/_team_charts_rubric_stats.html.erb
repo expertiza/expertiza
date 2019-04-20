@@ -6,10 +6,21 @@
     // Set a callback to run when the Google Visualization API is loaded.
     google.charts.setOnLoadCallback(drawSingleChart);
 
-    var round_names = [
+    // Grabs valus set in grades_controller#view
+//    var round_names = %= @round_names %>;
+//    var criteria_names = %= @criteria_names %>;
+//    var avg_data = %= @avg_data %>;
+//    var assignment_avg_data = %= @assignment_avg_data %>;
+//    var assignment_names = %= @assignment_names %>;
+//    var assignment_name = %= @assignment_name %>;
+//    var med_data = %= @med_data %>;
+
+
+     var round_names = [
         "Round 1",
         "Round 2"
     ];
+
     var criteria_names = [
         ["Criterion 1",
             "Criterion 2",
@@ -23,18 +34,18 @@
     ];
 
     var avg_data = [
-        [76, 84, 54, 92, 64], // Round 1
-        [64, 92, 78, 54] // Round 2
+        [76, 84, 54, 92, 64],
+        [64, 92, 78, 54]
     ];
 
     var assignment_avg_data = [
         [
-            [74, 86, 56, 98, 66], // Round 1
-            [66, 98, 72, 56] // Round 2
+            [74, 86, 56, 98, 66],
+            [66, 98, 72, 56]
         ],
         [
-            [66, 94, 64, 82, 74], // Round 1
-            [74, 82, 88, 64] // Round 2
+            [66, 94, 64, 82, 74],
+            [74, 82, 88, 64]
         ]
     ];
 
@@ -46,7 +57,6 @@
         [3, 3.5, 2.5, 3.5, 3],
         [3, 3.5, 3, 2.5]
     ];
-
     var source_data = avg_data;
 
     var selected_assignment = 0;

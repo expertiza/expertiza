@@ -237,12 +237,12 @@ module ReviewMappingHelper
         yAxes: [{
           stacked: true,
           id: "bar-y-axis1",
-          barThickness: 10
+          barThickness: 8
         }, {
           display: false,
           stacked: true,
           id: "bar-y-axis2",
-          barThickness: 15,
+          barThickness: 8,
           type: 'category',
           categoryPercentage: 0.8,
           barPercentage: 0.9,
@@ -254,7 +254,7 @@ module ReviewMappingHelper
           stacked: false,
           ticks: {
             beginAtZero: true,
-            stepSize: 50,
+            stepSize: 200,
             max: 400
           }
         }]

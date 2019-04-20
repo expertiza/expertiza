@@ -163,10 +163,9 @@ class ResponseController < ApplicationController
     http = Net::HTTP.new(uri.hostname, uri.port)
     req = Net::HTTP::Post.new(uri, initheader = {'Content-Type' =>'application/json'})
     req.body = {"reviews"=>@all_comments,
-                      "metrics"=>["suggestion"]}.to_json
+                      "metrics"=>["suggestion", "sentiment"]}.to_json
     http.use_ssl = true
     res = http.request(req)
-    print res.body
 
     return JSON.parse(res.body)
   end
@@ -195,20 +194,16 @@ class ResponseController < ApplicationController
   def show_confirmation_page(_params)
     print("\r\nInside show_confirmation_page(#{_params})\r\n")
     @the_params = _params
-    print "AAAAAAHHHHHHHHH"
     @all_comments = []
     @the_params[:responses].each_pair do |k, v|
       comment = v[:comment]
       comment.slice! "<p>"
       comment.slice! "</p>"
-      print comment
+      # print comment
       @all_comments.push(comment)
     end
-    print @all_comments
-    print "ok"
     # send user review to API for analysis
     @api_response = get_review_response_metrics
-
     print("\r\nInside show_confirmation_page about to render view\r\n")
     render action: "review_confirmation"
   end

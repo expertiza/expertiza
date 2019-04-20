@@ -150,7 +150,8 @@ class ResponseController < ApplicationController
                       "metrics"=>["suggestion"]}.to_json
     http.use_ssl = true
     res = http.request(req)
-    # puts JSON.parse(res.body)
+    puts JSON.parse(res.body)
+
   end
 
   def create

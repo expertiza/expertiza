@@ -46,6 +46,11 @@ class Response < ActiveRecord::Base
     sum
   end
 
+  def update_suggestion_chance(suggestion_chance)
+      self.suggestion_chance_percentage = suggestion_chance;
+      self.save!
+  end
+
   def delete
     self.scores.each(&:destroy)
     self.destroy

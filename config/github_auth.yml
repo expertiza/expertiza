@@ -12,4 +12,3 @@ test:
 production:
   client_key: <%= ENV['GITHUB_KEY'] %>
   client_secret: <%= ENV['GITHUB_SECRET'] %>
-  

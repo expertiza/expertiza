@@ -46,7 +46,7 @@
     });
 
     // Server AUTO SAVE: triggers every 60 seconds to save the draft version of the review to database
-    var interval = 60000;
+    var interval = 6000;
     var last_save = new Date();
     // detect how many seconds the userhas been idle
     var idleTime = 0;
@@ -68,11 +68,13 @@
       // ignore saving unless the last save was more than 5s
       if (timeDiff>5 && $('.review_form').length > 0) {
         $('form').attr('data-remote', 'true');
-        $('#save_review').click();
+        //$('#save_review').click();
+        save_review();
         last_save = new Date;
         if ($('input[name=saved]').value = "0")
           $('input[name=saved]').val("1");
-        $('form').removeAttr('data-remote');
+        //$('form').removeAttr('data-remote');
+        console.log($('form').attr('data-remote', 'false'));
       }
 
       $(document).ajaxError(function(event, request, settings) {
@@ -94,23 +96,31 @@
       });
     }
 
-    $('#save_review').click(function(){
+    //$('#save_review').click(function(e){
+      function save_review() {
       $('#save_confirm').html('<span id="tick"> &#10004; </span>&nbsp;Saving review!')
       setTimeout(function(){
         $('#save_confirm').html('')
       }, 5000);
+      }
+    //});
+    $('#save_button').click(function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      var goBackUrl = "../../../student_review/list?id=<%= @map.reviewer.id %>";
+      window.location.href = goBackUrl;
     });
     // JQuery syntax which means: select the element with id='Submit'
     // The element is a submit_tag button
     $('#Submit').click(function(e){
-      if(!confirm('Once a review has been submitted, you cannot edit it again')){
+      //if(!confirm('Once a review has been submitted, you cannot edit it again')){
         e.preventDefault();
         e.stopPropagation();
-        return;
-      }else{
+     // }else{
         jQuery('#isSubmit').val('Yes');
-        window.location.href= "../../../student_review/list?id=<%= @map.reviewer.id %>";
-      }
+        var goBackUrl = "../../../response/review_confirmation";
+        window.location.href = goBackUrl;
+      //}
     });
     // update the values in the form using ajax
     function updateForm(){
@@ -197,24 +207,9 @@
     });
     //overlay to block user entering new info before the form is updated with data from the server
     function displayOverlay(text) {
-      $("<table id='overlay'><tbody><tr><td>" + text + "</td></tr></tbody></table>").css({
-        "position": "fixed",
-        "top": "0px",
-        "left": "0px",
-        "width": "100%",
-        "height": "100%",
-        "background-color": "rgba(0,0,0,.5)",
-        "z-index": "10000",
-        "vertical-align": "middle",
-        "text-align": "center",
-        "color": "#fff",
-        "font-size": "40px",
-        "font-weight": "bold",
-        "cursor": "wait"
-      }).appendTo("body");
     }
     function removeOverlay() {
-      $("#overlay").remove();
+    //  $("#overlay").remove();
     }
 
     //Increment the idle time counter every minute and restart the timer if there is a mouse movement or keypress.
@@ -407,11 +402,11 @@
     <br/>
     <br>
     <div id="save_confirm"></div>
-    <%= submit_tag "Save "+@title, :name => "save", :id => "save_review" %>
+    <%= submit_tag "Save "+@title, :name => "save", :id => "save_button" %>
     <!--#E1600 check title for selfreview to show submit button-->
     <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review')) %>
         <!-- <%= submit_tag "Submit "+@title, :name => "Submit", :id => "Submit" %> -->
-        <%= submit_tag "Submit "+@title, :name => "isSubmit" %>
+        <%= submit_tag "Submit "+@title, :name => "isSubmit", :id=> "Submit" %>
         <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
     <% end %>
     <%= hidden_field_tag('return', @return) %>

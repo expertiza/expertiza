@@ -9,6 +9,10 @@
 <% else %>
 
     <h4>You may perform between <%= @assignment.num_reviews_required %> and <%= @assignment.num_reviews_allowed %> reviews</h4>
+  <h5>
+    <%= link_to "View Sample Reviews", :controller => 'sample_reviews', :action => 'index', :id=>@assignment.id %>
+  </h5>
+
 <% end %>
 <h4>You are required to do <%= @assignment.num_reviews_required %> reviews</h4>
 <h4> Number of reviews left: <%= @assignment.num_reviews_allowed - @num_reviews_completed %></h4>

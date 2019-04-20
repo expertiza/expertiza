@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190420151900) do
+ActiveRecord::Schema.define(version: 20190420215739) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -483,6 +483,8 @@ ActiveRecord::Schema.define(version: 20190420151900) do
     t.integer  "round",                        limit: 4
     t.boolean  "is_submitted",                               default: false
     t.integer  "suggestion_chance_percentage", limit: 4
+    t.float    "suggestion_sentiment_score",   limit: 24
+    t.string   "overall_tone",                 limit: 255
   end
 
   add_index "responses", ["map_id"], name: "fk_response_response_map", using: :btree

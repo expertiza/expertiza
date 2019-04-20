@@ -98,19 +98,39 @@
             <thead>
             <tr>
               <th class="sorter-true">Criterion<span></span></th>
-            
+              <!-- E1927: The reviews need to be sorted by instructor reviews then student reviews -->
+              <% vm.list_of_reviews.each do |review| %>
+                <% if ('User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).role.name.to_s' == 'instructor') %>
+                  <!-- instructors (or higher level users) see reviewer name, students see instructor icon -->
+                  <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
+                    <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>
+                      "  data-toggle="tooltip" data-placement="right" title="Click to see details">
+                      <img class="img_icon" src="/assets/instructor_icon_96.png">
+                    </a>  </th>
+                  <% else %>
+                    <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
+                    <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>
+                      "  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %>
+                    </a>  </th>
+                  <% end %>
+                <% end %>
+              <!-- E1927:  Now, display the student reviews -->
               <% i = 1 %>
               <% vm.list_of_reviews.each do |review| %>
-
+                  <% if ('User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).role.name.to_s' != 'instructor') %>
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
-                  <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
-                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %>
-                      by <%=User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).role.name.to_s %></a>  </th>
-                  <% else %>
+                    <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
+                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>
+                        "  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %>
+                      </a>  </th>
+                    <% else %>
                       <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
-                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
+                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>
+                        "  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %>
+                      </a>  </th>
+                    <% end %>
                   <% end %>
-                  <% i += 1 %>
+              <% i += 1 %>
               <% end %>
 
               <th class="sorter-true" align="right" >

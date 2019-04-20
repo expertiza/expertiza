@@ -62,9 +62,8 @@
                 <% current_round = @assignment.number_of_current_round(topic_id) %>
                 <% response_saved = true %>
                 <% begin Response.find(@latest_response.map_id) rescue response_saved = false end %>
-                Review:
-                <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} if response_saved%>
-                <%= link_to "Update", {:controller => 'response', :action => 'new', :id => @latest_response.id} %>
+                <%= link_to "View Review", {:controller => 'response', :action => 'view', :id => @latest_response.id} if response_saved%>
+                <%= link_to "Update Review", {:controller => 'response', :action => 'new', :id => @latest_response.id} %>
               <% end %>
             </td>
         <% end %>

@@ -5,7 +5,6 @@ class ResponseController < ApplicationController
   require 'net/http'
 
   def action_allowed?
-    # get_review_response_metrics
     response = user_id = nil
     action = params[:action]
     if %w[edit delete update view].include?(action)
@@ -163,12 +162,10 @@ class ResponseController < ApplicationController
     uri = URI.parse('https://peer-review-metrics-nlp.herokuapp.com/metrics/all')
     http = Net::HTTP.new(uri.hostname, uri.port)
     req = Net::HTTP::Post.new(uri, initheader = {'Content-Type' =>'application/json'})
-    req.body = {"reviews"=>["some text"],
-                      "metrics"=>["suggestion"]}.to_json
+    req.body = {"reviews"=>@all_comments,
+                      "metrics"=>["suggestion", "sentiment"]}.to_json
     http.use_ssl = true
     res = http.request(req)
-    # puts "yyyyyyyyy"
-    #print api_response
 
     return JSON.parse(res.body)
   end
@@ -197,12 +194,16 @@ class ResponseController < ApplicationController
   def show_confirmation_page(_params)
     print("\r\nInside show_confirmation_page(#{_params})\r\n")
     @the_params = _params
-
-    # TODO: get Answers to feed the API
-
+    @all_comments = []
+    @the_params[:responses].each_pair do |k, v|
+      comment = v[:comment]
+      comment.slice! "<p>"
+      comment.slice! "</p>"
+      # print comment
+      @all_comments.push(comment)
+    end
     # send user review to API for analysis
     @api_response = get_review_response_metrics
-
     print("\r\nInside show_confirmation_page about to render view\r\n")
     render action: "review_confirmation"
   end

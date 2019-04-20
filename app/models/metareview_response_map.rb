@@ -75,9 +75,18 @@ class MetareviewResponseMap < ResponseMap
     end
   end
 
+  def self.required_import_fields
+    {"reviewee" => "Contributor",
+     "reviewer" => "Reviewer",
+     "metareviewer" => "Metareviewer"}
+  end
+
+  def self.optional_import_fields(id=nil)
+    {}
+  end
+
   def self.import_options
-    {"has_reviewee" => [{"true_first" => "File has a contributor and reviewer as first and second columns"},
-                        {"true_last" => "File has a contributor and reviewer as last and second last columns"}]}
+    {}
   end
 
   def email(defn, _participant, assignment)

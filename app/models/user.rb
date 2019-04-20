@@ -158,6 +158,20 @@ class User < ActiveRecord::Base
 
   end
 
+  def self.required_import_fields
+    {"name" => "Name",
+     "fullname" => "Full Name",
+     "email" => "Email"}
+  end
+
+  def self.optional_import_fields(id=nil)
+    {}
+  end
+
+  def self.import_options
+    {}
+  end
+
   def self.yesorno(elt)
     if elt == true
       "yes"

@@ -68,9 +68,17 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
+  def self.required_import_fields
+    {"reviewee" => "Contributor",
+     "reviewers" => "Reviewers"}
+  end
+
+  def self.optional_import_fields(id=nil)
+    {}
+  end
+
   def self.import_options
-    {"has_reviewee" => [{"true_first" => "File has a contributor as first column"},
-                        {"true_last" => "File has a contributor as last column"}]}
+    {}
   end
 
   def show_feedback(response)

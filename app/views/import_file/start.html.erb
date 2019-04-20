@@ -36,9 +36,8 @@
         <tr><td><br/></td></tr>
 
         <tr>
-          <td><strong>New Optional Columns Display:</strong></td>
+          <td><strong>Optional Fields:</strong></td>
         </tr>
-
         <tr>
           <td>
             <% @optional_fields.each do |opt_back, opt_disp| %>
@@ -52,43 +51,25 @@
         <br/>
         <table>
 
-          <% x = 1 %>
-          <% @import_options.each do |name, options| %>
-
+          <% @import_options.each do |name, info| %>
 
             <tr>
-              <td><strong>Option <%= x %></strong></td>
+              <td><strong><%= info["display"] %></strong></td>
             </tr>
             <tr>
               <td>
-                <% options.each do |param, display| %>
-                  <%= radio_button_tag name, param, true %> <%= display %><br/>
+                <% info["options"].each do |opt, display| %>
+                  <%= radio_button_tag "options[" + name + "]", opt, true %> <%= display %><br/>
                 <% end %>
+                <br/>
               </td>
             </tr>
-
-            <% x += 1 %>
-        <% end %>
+          <% end %>
         </table>
         <br/>
-
       <% end %>
 
     </table>
-
-    <% if @model == 'AssignmentTeam' or @model == 'CourseTeam' %>
-
-        <label for="options[handle_dups]">If a duplicate team name is found in the roster,</label>
-        <select id="options[handle_dups]" name="options[handle_dups]">
-          <option value="ignore">ignore the new team</option>
-          <option value="replace">replace the existing team with the new team</option>
-          <option value="insert">insert any new members into the existing team</option>
-          <option value="rename">rename the new team and import</option>
-        </select>
-
-        <br/>
-
-    <% end %>
 
     <br/>
 
@@ -104,7 +85,7 @@
     <p>
       <strong>NOTE:</strong>
       <br/>
-      The import process expects the following columns:
+      The import allows the following columns:
       <br/>
 
       <tr>

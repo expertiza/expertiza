@@ -34,15 +34,19 @@ class SignUpTopic < ActiveRecord::Base
   end
 
   def self.required_import_fields
-    {"topic_identifier" => "Topic Identifier (required)",
-     "topic_name" => "Topic Name (required)",
-     "max_choosers" => "Max Choosers (required)"}
+    {"topic_identifier" => "Topic Identifier",
+     "topic_name" => "Topic Name",
+     "max_choosers" => "Max Choosers"}
   end
 
-  def self.optional_import_fields
-    {"category" => "Category (optional)",
-     "description" => "Description (optional)",
-     "link" => "Link (optional)"}
+  def self.optional_import_fields(id=nil)
+    {"category" => "Category",
+     "description" => "Description",
+     "link" => "Link"}
+  end
+
+  def self.import_options
+    {}
   end
 
   # The old method is commented out below.

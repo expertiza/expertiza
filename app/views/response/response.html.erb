@@ -100,6 +100,8 @@
         $('#save_confirm').html('')
       }, 5000);
     });
+    // JQuery syntax which means: select the element with id='Submit'
+    // The element is a submit_tag button
     $('#Submit').click(function(e){
       if(!confirm('Once a review has been submitted, you cannot edit it again')){
         e.preventDefault();
@@ -408,11 +410,12 @@
     <%= submit_tag "Save "+@title, :name => "save", :id => "save_review" %>
     <!--#E1600 check title for selfreview to show submit button-->
     <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review')) %>
-        <%= submit_tag "Submit "+@title, :name => "Submit", :id => "Submit" %>
+        <!-- <%= submit_tag "Submit "+@title, :name => "Submit", :id => "Submit" %> -->
+        <%= submit_tag "Submit "+@title, :name => "isSubmit" %>
         <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
     <% end %>
     <%= hidden_field_tag('return', @return) %>
-    <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %>
+    <!-- <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %> -->
 <% end %>
 
 <!--Check whether there is a UploadFile question.-->

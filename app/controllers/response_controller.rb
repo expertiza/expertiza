@@ -186,13 +186,25 @@ class ResponseController < ApplicationController
         AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
       end
     end
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Response was successfully saved")
+    # also save response metric:suggestion_chances
+    response_metrics = get_review_response_metrics
 
+
+    # suggestion_chance = response_metrics["results"][0]["metrics"]["suggestion"]["suggestions_chances"]
+    # puts suggestion_chance.class
+    # puts suggestion_chance.to_s    #debug print
+    # @response = Response.where(map_id: @map.id).first
+    # @response.update_suggestion_chance(suggestion_chance.round)
+    # @response.suggestion_chance_average(@map.reviewed_object_id)
+
+
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Response was successfully saved")
     redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
   def show_confirmation_page(_params)
     print("\r\nInside show_confirmation_page(#{_params})\r\n")
+
     @the_params = _params
     @all_comments = []
     @the_params[:responses].each_pair do |k, v|
@@ -204,6 +216,28 @@ class ResponseController < ApplicationController
     end
     # send user review to API for analysis
     @api_response = get_review_response_metrics
+    @response = Response.find(_params[:id])
+    # save to database
+
+    #compute average for all response fields
+    suggestion_chance = 0
+    #puts @api_response["results"]
+    puts @api_response["results"].size
+    0.upto(@api_response["results"].size - 1) do |i|
+      suggestion_chance += @api_response["results"][i]["metrics"]["suggestion"]["suggestions_chances"]
+    end
+    average_suggestion_chance = suggestion_chance/@api_response["results"].size
+    puts suggestion_chance.to_s    #debug print
+
+    @response.update_suggestion_chance(average_suggestion_chance.to_i)
+    # compute average
+
+    @map = ResponseMap.find(@response.map_id)
+    # below is class avg (suggestion score)for this assignment
+    @response.suggestion_chance_average(@map.reviewed_object_id)
+
+    #display average
+
     print("\r\nInside show_confirmation_page about to render view\r\n")
     render action: "review_confirmation"
   end

@@ -53,7 +53,10 @@
 <% end %>
 
 <% if @type == "ReviewResponseMap" %>
-  <h1> Review report for <%= @assignment.name%> </h1>
+    <div class="col-md-12">
+      <h1 class="col-md-9"> Review report for Final Project (and Design Document) </h1>
+      <h4 align='right'><%= link_to "View Sample Reviews", :controller => 'sample_reviews', :action => 'index', :id=>@assignment.id %></h4>
+    </div>
     <div id="searchbox">
 
       <div id="searchlink">

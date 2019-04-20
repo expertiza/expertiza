@@ -10,7 +10,8 @@
 </style>
 
 <h1>Review Confirmation</h1>
-<p>Below is an analysis on the review you have created. In your review...</p>
+<h2>Your review has not yet been submitted.</h2>
+<p>Below is an analysis of the review you have created. In your review...</p>
 
 <div class="review-confirmation">
 
@@ -33,5 +34,16 @@
     <p class="warn-notice">Once a review has been submitted, you cannot edit it again.</p>
 </div>
 
-<button>Submit</button>
-<button>Back</button>
+<%= button_to "Submit Review", action: "submit_response" %>
+<%= button_to "Go Back", :back %>
+
+The params
+<br/>
+<%= @the_params %>
+
+<br/>
+<br/>
+
+The  api_response
+<br/>
+<%= @api_response %>

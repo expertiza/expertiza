@@ -56,6 +56,49 @@ class GradesController < ApplicationController
     calculate_all_penalties(@assignment.id)
 
     @show_reputation = false
+
+    # Temporarily in here to set up the pipes to have things passed to the view
+    @round_names = [
+        "Round 1",
+        "Round 2"
+    ]
+
+    @criteria_names = [
+        ["Criterion 1",
+         "Criterion 2",
+         "Criterion 3",
+         "Criterion 4",
+         "Criterion 5"],
+        ["Criterion 6",
+         "Criterion 7",
+         "Criterion 8",
+         "Criterion 9"]
+    ]
+
+    @avg_data = [
+        [76, 84, 54, 92, 64],
+        [64, 92, 78, 54]
+    ]
+
+    @assignment_avg_data = [
+        [
+            [74, 86, 56, 98, 66],
+    [66, 98, 72, 56]
+        ],
+        [
+            [66, 94, 64, 82, 74],
+    [74, 82, 88, 64]
+        ]
+    ]
+
+    @assignment_names = ["OSS project/Writing assignment 2", "Final Project Design Document Fall2015"]
+
+    @assignment_name = 'Final Project (and Design Document)'
+
+    @med_data = [
+        [3, 3.5, 2.5, 3.5, 3],
+        [3, 3.5, 3, 2.5]
+    ]
   end
 
   def view_my_scores

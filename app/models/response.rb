@@ -51,6 +51,23 @@ class Response < ActiveRecord::Base
       self.save!
   end
 
+  def suggestion_chance_average(assignment)
+    # this method will compute the suggestion_chances average for all responses for the particular assignment
+    # make a list of responses for a particular assignment
+    responses = []
+    response_map_list = ResponseMap.where(reviewed_object_id: assignment)
+    response_map_list.each do |rm|
+      responses += Response.where(map_id: rm.id)    # get response for
+    end
+    puts responses #debug print
+    #sum up the suggestion chance percentages
+    avg = 0
+    responses.each{|r| avg += r.suggestion_chance_percentage if !r.suggestion_chance_percentage.nil? }
+    #divide by the number of responses
+    avg /= response_map_list.size.to_f
+    #average is returned for suggestion chances
+  end
+
   def delete
     self.scores.each(&:destroy)
     self.destroy

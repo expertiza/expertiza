@@ -215,11 +215,14 @@ class ResponseController < ApplicationController
     end
     # also save response metric:suggestion_chances
     response_metrics = get_review_response_metrics
+
+
     suggestion_chance = response_metrics["results"][0]["metrics"]["suggestion"]["suggestions_chances"]
     puts suggestion_chance.class
     puts suggestion_chance.to_s    #debug print
     @response = Response.where(map_id: @map.id).first
-    @response.update_suggestion_chance (suggestion_chance.round)
+    @response.update_suggestion_chance(suggestion_chance.round)
+    @response.suggestion_chance_average(@map.reviewed_object_id)
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Response was successfully saved")
     redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end

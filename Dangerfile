@@ -212,12 +212,12 @@ end
                 .select{|loc| loc.start_with? '+' and !loc.include? '+++ b'}
                 .join('')
   if added_lines.include? "xdescribe" or
-     added_lines.include? "xspecify" or
-     added_lines.include? "xexample" or
-     added_lines.include? "xit" or
-     added_lines.include? "skip(" or
-     added_lines.include? "skip " or
-     added_lines.include? "pending(" or
+     added_lines.include? "xspecify"  or
+     added_lines.include? "xexample"  or
+     added_lines.include? "xit"       or
+     added_lines.include? "skip("     or
+     added_lines.include? "skip "     or
+     added_lines.include? "pending("  or
      added_lines.include? "fdescribe" or
      added_lines.include? "fit"
     TEST_SKIPPED_MESSAGE =
@@ -276,15 +276,25 @@ end
 # ------------------------------------------------------------------------------
 # 14. Your RSpec testing files do not need to require helper files (e.g., rails_helper.rb, spec_helper.rb). 
 # ------------------------------------------------------------------------------
-if !CURRENT_MAINTAINERS.include? PR_AUTHOR and
-  ((ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/rails_helper\.rb/).any? or 
-   (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/spec_helper\.rb/).any?)
-  TEST_HELPER_FILE_MESSAGE =
-    markdown <<-MARKDOWN
-You should not change `rails_helper.rb` or `spec_helper.rb` file; please revert these changes.
-    MARKDOWN
+if PR_ADDED.include? "require 'rspec'"                or
+   PR_ADDED.include? "require \"rspec\""              or
+   PR_ADDED.include? "require 'spec_helper'"          or
+   PR_ADDED.include? "require \"spec_helper\""        or
+   PR_ADDED.include? "require 'rails_helper'"         or
+   PR_ADDED.include? "require \"rails_helper\""       or
+   PR_ADDED.include? "require 'test_helper'"          or
+   PR_ADDED.include? "require \"test_helper\""        or
+   PR_ADDED.include? "require 'factory_girl_rails'"   or
+   PR_ADDED.include? "require \"factory_girl_rails\"" or
+   PR_ADDED.include? "require 'factory_bot_rails'"    or
+   PR_ADDED.include? "require \"factory_bot_rails\""
+  RSPEC_REQUIRE_MESSAGE =
+  markdown <<-MARKDOWN
+You are requiring `rspec` gem, fixture-related gem(s) or different helper methods in RSpec tests.
+There have already been included, you do not need to require them again. Please remove them.
+   MARKDOWN
 
-  warn(TEST_HELPER_FILE_MESSAGE, sticky: true)
+  warn(RSPEC_REQUIRE_MESSAGE, sticky: true)
 end
 
 # ------------------------------------------------------------------------------
@@ -312,8 +322,8 @@ end
 # 17. Your pull request should not change DB schema unless there is new DB migrations.
 # ------------------------------------------------------------------------------
 if !CURRENT_MAINTAINERS.include? PR_AUTHOR and
-  ((ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/db\/migrate/).empty? and
-  ((MODIFIED_FILES.grep(/schema\.rb/).any? or (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/schema\.json/).any?)))
+  (TOUCHED_FILES.grep(/db\/migrate/).empty? and
+  (MODIFIED_FILES.grep(/schema\.rb/).any? or (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/schema\.json/).any?))
   DB_SCHEMA_CHANGE_MESSAGE =
     markdown <<-MARKDOWN
 You should commit changes to the DB schema (`db/schema.rb`) only if you have created new DB migrations.
@@ -338,25 +348,14 @@ end
 # ------------------------------------------------------------------------------
 # 19. Your pull request should not modify test-related helper files.
 # ------------------------------------------------------------------------------
-if PR_ADDED.include? "require 'rspec'" or
-   PR_ADDED.include? "require \"rspec\"" or
-   PR_ADDED.include? "require 'spec_helper'" or
-   PR_ADDED.include? "require \"spec_helper\"" or
-   PR_ADDED.include? "require 'rails_helper'" or
-   PR_ADDED.include? "require \"rails_helper\"" or
-   PR_ADDED.include? "require 'test_helper'" or
-   PR_ADDED.include? "require \"test_helper\"" or
-   PR_ADDED.include? "require 'factory_girl_rails'" or
-   PR_ADDED.include? "require \"factory_girl_rails\"" or
-   PR_ADDED.include? "require 'factory_bot_rails'" or
-   PR_ADDED.include? "require \"factory_bot_rails\""
-  RSPEC_REQUIRE_MESSAGE =
+if !CURRENT_MAINTAINERS.include? PR_AUTHOR and
+  (MODIFIED_FILES.grep(/rails_helper\.rb/).any? or MODIFIED_FILES.grep(/spec_helper\.rb/).any?)
+  TEST_HELPER_FILE_MESSAGE =
     markdown <<-MARKDOWN
-You are requiring `rspec` gem, fixture-related gem(s) or different helper methods in RSpec tests.
-There have already been included, you do not need to require them again. Please remove them.
+You should not change `rails_helper.rb` or `spec_helper.rb` file; please revert these changes.
     MARKDOWN
 
-  warn(RSPEC_REQUIRE_MESSAGE, sticky: true)
+  warn(TEST_HELPER_FILE_MESSAGE, sticky: true)
 end
 
 # ------------------------------------------------------------------------------
@@ -477,11 +476,12 @@ end
 
 # ------------------------------------------------------------------------------
 # RSpec tests should avoid shallow tests
-# 37. Not writing expectations for the tests.
-# 38. Test expectations do not include matchers, such as comparisons (e.g.,equal(expected_value)),
+# 37. Including too many wildcard argument matchers (e.g., anything, any_args).
+# 38. Not writing/commenting out expectations for the tests.
+# 39. Test expectations do not include matchers, such as comparisons (e.g.,equal(expected_value)),
 #     the status change of objects (e.g.,change(object, :value).by(delta)), error handlings (e.g.,raise_error("message")).
-# 39. Including too many wildcard argument matchers (e.g., anything, any_args)
-# 40. In feature tests, expectations only focus on words appearance on the view(e.g.,expect(page).to have_content(word)),
+# 40. Test expectations only focus on the return value not being nil, empty or not equal to 0 without testing the real value.
+# 41. In feature tests, expectations only focus on words appearance on the view(e.g.,expect(page).to have_content(word)),
 #     and without otherevidence, such as the new creation of the object, new record in DB.
 # ------------------------------------------------------------------------------
 (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).each do |file|
@@ -494,14 +494,26 @@ end
   added_lines = added_lines_arr.join('')
   num_of_tests = added_lines.scan(/\s*it\s*['"]/).count
   num_of_expect_key_words = added_lines.scan(/\s*expect\s*[\(\{]/).count
+  num_of_commented_out_expect_key_words = added_lines.scan(/#\s*expect/).count
   num_of_expectation_without_machers = added_lines_arr.count{ |loc| loc.scan(/\s*expect\s*[\(\{]/).count > 0 and loc.scan(/\.(to|not_to|to_not)/).count == 0}
-  num_of_wildcard_argument_matchers = PR_ADDED.scan(/\((anything|any_args)\)/).count
+  num_of_expectation_not_focus_on_real_value = added_lines_arr.count{ |loc| loc.scan(/\s*expect\s*[\(\{]/).count > 0 and loc.scan(/\.(not_to|to_not)\s*(be_nil|be_empty|eq 0|eql 0|equal 0)/).count > 0 }
+  num_of_wildcard_argument_matchers = added_lines.scan(/\((anything|any_args)\)/).count
   num_of_expectations_on_page = added_lines.scan(/\s*expect\s*\(page\)/).count
-  if num_of_expect_key_words < num_of_tests
+  
+  if num_of_wildcard_argument_matchers >= 5
+    WILDCARD_ARGUMENT_MATCHERS_MESSAGE =
+      markdown <<-MARKDOWN
+There are many wildcard argument matchers (e.g., `anything`, `any_args`) in your tests.
+To avoid `shallow tests` -- tests concentrating on irrelevant, unlikely-to-fail conditions -- please avoid wildcard matchers.
+      MARKDOWN
+
+    warn(WILDCARD_ARGUMENT_MATCHERS_MESSAGE, sticky: true)
+    break
+  elsif num_of_expect_key_words < num_of_tests or num_of_commented_out_expect_key_words > 0
     NOT_WRITING_EXPECTATIONS_FOR_TESTS_MESSAGE =
       markdown <<-MARKDOWN
-One or more of your tests do not have expectations.
-To avoid `shallow tests` -- tests concentrating on irrelevant, unlikely-to-fail conditions -- please write at least one expectation for each test.
+One or more of your tests do not have expectations or you commented out some expectations.
+To avoid `shallow tests` -- tests concentrating on irrelevant, unlikely-to-fail conditions -- please write at least one expectation for each test and do not comment out expectations.
       MARKDOWN
 
     warn(NOT_WRITING_EXPECTATIONS_FOR_TESTS_MESSAGE, sticky: true)
@@ -515,15 +527,15 @@ To avoid `shallow tests` -- tests concentrating on irrelevant, unlikely-to-fail 
 
     warn(EXPECTATION_WITHOUT_MATCHERS_MESSAGE, sticky: true)
     break
-  elsif num_of_wildcard_argument_matchers >= 5
-    WILDCARD_ARGUMENT_MATCHERS_MESSAGE =
+  elsif num_of_expectation_not_focus_on_real_value > 0
+    EXPECTATION_NOT_FOCUS_ON_REAL_VALUE = 
       markdown <<-MARKDOWN
-There are many wildcard argument matchers (e.g., `anything`, `any_args`) in your tests.
-To avoid `shallow tests` -- tests concentrating on irrelevant, unlikely-to-fail conditions -- please avoid wildcard matchers.
+One or more of your test expectations only focus on the return value not being `nil`, `empty` or not equal to `0` without testing the `real` value.
+To avoid `shallow tests` -- tests concentrating on irrelevant, unlikely-to-fail conditions -- please write expectations to test the `real` value.
       MARKDOWN
 
-    warn(WILDCARD_ARGUMENT_MATCHERS_MESSAGE, sticky: true)
-    break
+      warn(EXPECTATION_NOT_FOCUS_ON_REAL_VALUE, sticky: true)
+      break
   elsif num_of_expect_key_words - num_of_expectations_on_page < num_of_tests
     EXPECT_ON_OBJ_ON_PAGE_MESSAGE =
       markdown <<-MARKDOWN

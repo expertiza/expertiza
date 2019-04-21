@@ -1,0 +1,28 @@
+<table id="myTable" class="tbl_heat tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
+  <thead>
+  <tr bgcolor='#CCCCCC'>
+    <!-- class value decides whether the column should be sortable or not  -->
+    <th width="30%" class="sorter-true">Team <span></span></th>
+    <th width="30%" class="sorter-false">Reviewers <span></span></th>
+    <th width="40%" class="sorter-true">Metrics <span></span></th>
+  </tr>
+  </thead>
+  <tbody>
+
+  <%@reviewers.keys.each do |team_name| %>
+  <tr>
+    <td style = "background-color: #f9f9f9">
+      Team Name:<%= team_name %> <br>
+      Team Members:<br>
+        <% members=get_team_members_by_team_name(team_name)%>
+        <% members.each do |member|%>
+          <%=User.find(member.user_id).fullname %><br>
+      <% end %>
+    </td>
+    <td style = "background-color: #f9f9f9">
+      <%= @reviewers[team_name].join(", ")%>
+    </td>
+  </tr>
+  <% end %>
+  </tbody>
+</table>

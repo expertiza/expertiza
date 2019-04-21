@@ -7,6 +7,9 @@
     <option value='ReviewResponseMap' selected>
       Review report
     </option>
+    <option value='ReviewConflictResponseMap' >
+      Review conflict report
+    </option>
     <option value='FeedbackResponseMap' >
       Author feedback report
     </option>
@@ -78,6 +81,8 @@
       <br>
     </div>
 
+<% elsif @type == "ReviewConflictResponseMap" %>
+  <h1> Review conflict report for <%= @assignment.name%> </h1>
 <% elsif @type == "FeedbackResponseMap" %>
   <h1> Author feedback report for <%= @assignment.name%> </h1>
 <% elsif @type == "TeammateReviewResponseMap" %>

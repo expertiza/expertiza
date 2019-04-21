@@ -26,6 +26,16 @@ module ReportFormatterHelper
     @avg_and_ranges = @assignment.compute_avg_and_ranges_hash
   end
 
+  def review_conflict_response_map(params, _session = nil)
+    assign_basics(params)
+    sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(@assignment, @summary_ws_url)
+    @summary = sum.summary
+    @reviewers = sum.reviewers
+    @avg_scores_by_reviewee = sum.avg_scores_by_reviewee
+    @avg_scores_by_round = sum.avg_scores_by_round
+    @avg_scores_by_criterion = sum.avg_scores_by_criterion
+  end
+  
   def feedback_response_map(params, _session = nil)
     assign_basics(params)
     # If review report for feedback is required call feedback_response_report method in feedback_review_response_map model

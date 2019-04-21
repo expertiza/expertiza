@@ -8,13 +8,19 @@
   </tr>
   </thead>
   <tbody>
-  <%@reviewers.keys.each do |team| %>
+
+  <%@reviewers.keys.each do |team_name| %>
   <tr>
     <td style = "background-color: #f9f9f9">
-      <%= team %>
+      Team Name:<%= team_name %> <br>
+      Team Members:<br>
+        <% members=get_team_members_by_team_name(team_name)%>
+        <% members.each do |member|%>
+          <%=User.find(member.user_id).fullname %><br>
+      <% end %>
     </td>
     <td style = "background-color: #f9f9f9">
-      <%= @reviewers[team].join(", ")%>
+      <%= @reviewers[team_name].join(", ")%>
     </td>
   </tr>
   <% end %>

@@ -19,23 +19,23 @@
     }
 }
 </script>
-<h2>Summary Report for assignment: <%= @assignment.name %></h2>
-<h4>Team: <%= @team.name %></h4>
+<h2><%=t ".summary_report"%> <%= @assignment.name %></h2>
+<h4><%=t ".team"%> <%= @team.name %></h4>
 <!--Obtain topic name from assignment helper-->
 <% topic_id, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(@team) %>
 <% if @assignment.topics? %>
-  <h4>Topic: <%= topic_id + '. ' + topic_name %></h4>
+  <h4><%=t ".topic"%> <%= topic_id + '. ' + topic_name %></h4>
 <% end %>
 <!--Obtain only review scores-->
 <% rscore_review = Rscore.new(@pscore,:review) if @pscore[:review] %>
-<h4>Average peer review score: <span class = "c5"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span></h4>
+<h4><%=t ".average_peer_review"%> <span class = "c5"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span></h4>
 <!--Toggle submission-->
-<button onclick="toggleFunction('<%= @participant.id.to_s%>')" class="btn btn-default">Show Submission</button>
+<button onclick="toggleFunction('<%= @participant.id.to_s%>')" class="btn btn-default"><%=t ".show_submission"%></button>
 <div id="<%= @participant.id.to_s%>" style="display:none;">
 <% if @participant.team.hyperlinks.try(:length) %>
   <%= render :partial => 'submitted_content/hyperlink', :locals => {participant: @participant, stage: @stage} %>
   <% else %>
- <b>No Submission</b>
+ <b><%=t ".no_submission"%></b>
 <% end %>
 </div><br><br>
 
@@ -52,7 +52,7 @@
             <table class="table table-striped" >
               <thead>
               <th>#</th>
-              <th>Question</th>
+              <th><%=t ".question"%></th>
               </thead>
               <% count = 0 %>
               <% vm.list_of_rows.each do |row| %>
@@ -73,12 +73,12 @@
                     (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
                 <%end %>
               </h4>
-              <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">toggle question list</span>
+              <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions"><%=t ".toggle_question_list"%></span>
             <% if @assignment.is_answer_tagging_allowed %>
-            <span class="spn_qsttog" id="tag_prompt_toggler" title="">hide tags</span>
+            <span class="spn_qsttog" id="tag_prompt_toggler" title=""><%=t ".hide_tags"%></span>
             <% end %>
-            <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Colors are scaled from poor to excellent in the following order: red, orange, yellow, light-green, dark-green">color legend</span>
-            <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Click a row to see the comments for the respective question. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience.">interaction legend</span>
+            <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Colors are scaled from poor to excellent in the following order: red, orange, yellow, light-green, dark-green"><%=t ".color_legend"%></span>
+            <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Click a row to see the comments for the respective question. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience."><%=t ".interaction_legend"%></span>
 
           </span>
             <!--
@@ -97,7 +97,7 @@
             <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->
             <thead>
             <tr>
-              <th class="sorter-true">Criterion<span></span></th>
+              <th class="sorter-true"><%=t ".criterion"%><span></span></th>
             
               <% i = 1 %>
               <% vm.list_of_reviews.each do |review| %>
@@ -115,7 +115,7 @@
                 Avg<span></span>
               </th>
               <th class="sorter-false">
-                <span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback.">metric-1</span>
+                <span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback."><%=t ".metric1"%></span>
               </th>
 
             </tr>
@@ -162,9 +162,9 @@
                     <div>
                       <table class="table tbl_questlist">
                         <thead>
-                        <th>Review </th>
-                        <th>Score</th>
-                        <th>Comment</th>
+                        <th><%=t ".review"%> </th>
+                        <th><%=t ".score"%></th>
+                        <th><%=t ".comment"%></th>
                         </thead>
                         <% for index in 0 .. row.score_row.length - 1 %>
                             <tr>
@@ -197,8 +197,8 @@
                   <div style="background-color:#A9A9F5;padding:4px;">
                     <table class="table tbl_addlcmt">
                       <thead>
-                      <th>Review</th>
-                      <th >Additional Comments</th>
+                      <th><%=t ".review"%></th>
+                      <th ><%=t ".additional_comments"%></th>
                       </thead>
                       <tbody>
                       <%k = 1%>
@@ -223,17 +223,17 @@
           <span> <%= vm.display_team_members %></span>
           <!-- this elsif terminates the heatgrid code.  -->
         <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
-            <br><div class="alert alert-warning">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>
+            <br><div class="alert alert-warning"><%=t ".no_review_of"%> <%= vm.questionnaire_type %> <%=t ".type_exists"%> </div>
         <% end %>
         <br/>  
     <% end %>
 <% end %>
 <!-- termination of the main outer loop.-->
 
-<h4 style="font-weight:bold;display:inline-block;">Grade and comment for submission</h4><br/>
+<h4 style="font-weight:bold;display:inline-block;"><%=t ".grade_and_comment"%></h4><br/>
 <% if ['Student'].include? current_user.role.name %>
-  Grade: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
-  Comment: <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %>
+  <%=t ".grade"%> <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
+  <%=t ".comment2"%> <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %>
 <% else %>
   <%= form_tag 'save_grade_and_comment_for_submission' do %>
     <%= hidden_field_tag :participant_id, params[:id] %>

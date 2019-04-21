@@ -3,7 +3,7 @@ class SampleReviewsController < ApplicationController
 
   include ResponseConstants
   include SimilarAssignmentsConstants
-  #include SimilarAssignmentsHelper
+  include SimilarAssignmentsHelper
   include SampleReviewsHelper
 
   #Displays review details in Question and Answer format.
@@ -120,7 +120,7 @@ class SampleReviewsController < ApplicationController
         return
       end
       Response.update(@@response_id.to_i, :visibility => visibility)
-      #update_similar_assignment(assignment_id, visibility)
+      update_similar_assignment(assignment_id, visibility)
     rescue StandardError => e
       render json:{"success" => false,"error" => e.message}
     else
@@ -131,7 +131,7 @@ class SampleReviewsController < ApplicationController
   private
   #Updates SimilarAssignment table.
   def update_similar_assignment(assignment_id, visibility)
-    if visibility == approved_as_sample
+    if visibility == _selected
       ids = SimilarAssignment.where(:is_similar_for => assignment_id, :association_intent => intent_review,
                                     :assignment_id => assignment_id).ids
       if ids.empty?
@@ -139,9 +139,9 @@ class SampleReviewsController < ApplicationController
                                   :assignment_id => assignment_id})
       end
     end
-    if visibility == rejected_as_sample or visibility == _private
+    if visibility == _public or visibility == _private
       response_map_ids = ResponseMap.where(:reviewed_object_id => assignment_id).ids
-      response_ids = Response.where(:map_id => response_map_ids, :visibility => approved_as_sample)
+      response_ids = Response.where(:map_id => response_map_ids, :visibility => _selected)
       if response_ids.empty?
         SimilarAssignment.where(:assignment_id => assignment_id).destroy_all
       end

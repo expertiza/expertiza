@@ -1,5 +1,7 @@
 <h2>Reviews for "<%= @assignment.name %>"</h2>
-
+<h5>
+  <%= link_to "View Sample Reviews", :controller => 'sample_reviews', :action => 'index', :id=>@assignment.id %>
+</h5>
 <!-- Added the feature to find the reviews and meta-reviews left for students by E1839 @Rayan Dasoriya -->
 <% if @assignment.num_reviews_allowed.nil? || @assignment.num_reviews_allowed == -1%>
     <h4>Your instructor expects you to do <%= @assignment.num_reviews_required %> reviews. You are not allowed to do any extra reviews. </h4>
@@ -9,9 +11,7 @@
 <% else %>
 
     <h4>You may perform between <%= @assignment.num_reviews_required %> and <%= @assignment.num_reviews_allowed %> reviews</h4>
-  <h5>
-    <%= link_to "View Sample Reviews", :controller => 'sample_reviews', :action => 'index', :id=>@assignment.id %>
-  </h5>
+
 
 <% end %>
 <h4>You are required to do <%= @assignment.num_reviews_required %> reviews</h4>

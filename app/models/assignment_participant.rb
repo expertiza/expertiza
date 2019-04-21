@@ -53,6 +53,7 @@ class AssignmentParticipant < Participant
   def scores(questions)
     scores = {}
     scores[:participant] = self
+    # compute_assignment_score(questions, scores)
     compute_assignment_score(questions, scores)
     scores[:total_score] = self.assignment.compute_total_score(scores)
     # merge scores[review#] (for each round) to score[review]  -Yang
@@ -151,7 +152,13 @@ class AssignmentParticipant < Participant
   def reviews
     # ACS Always get assessments for a team
     # removed check to see if it is a team assignment
-    ReviewResponseMap.get_assessments_for(self.team)
+    # ReviewResponseMap.get_assessments_for(self.team)
+    assignment_check = Assignment.find(self.team.parent_id)
+    if assignment_check.is_selfreview_enabled?
+      ResponseMap.get_assessments_for(self.team, self.id)
+    else
+      ReviewResponseMap.get_assessments_for(self.team)
+    end
   end
 
   def reviews_by_reviewer(reviewer)

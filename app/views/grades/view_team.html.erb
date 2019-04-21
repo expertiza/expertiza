@@ -28,7 +28,13 @@
 <% end %>
 <!--Obtain only review scores-->
 <% rscore_review = Rscore.new(@pscore,:review) if @pscore[:review] %>
+<%= %>
 <h4>Average peer review score: <span class = "c5"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span></h4>
+<%if @current_role_name.eql? "Student"%>
+  <% rscore_review = Rscore.new(@cscore,:review) if @pscore[:review] %>
+  <%= %>
+  <h4>Average Self review score: <span class = "c5"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span></h4>
+<%end %>
 <!--Toggle submission-->
 <button onclick="toggleFunction('<%= @participant.id.to_s%>')" class="btn btn-default">Show Submission</button>
 <div id="<%= @participant.id.to_s%>" style="display:none;">
@@ -101,14 +107,34 @@
             
               <% i = 1 %>
               <% vm.list_of_reviews.each do |review| %>
-                  <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
-                  <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
-                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>  </th>
-                  <% else %>
-                      <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
-                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
-                  <% end %>
-                  <% i += 1 %>
+                <%
+                  review_map = ResponseMap.find(review.map_id)
+                  review_type = nil
+                  if review_map
+                    review_type =  review_map.type
+                  end
+                %>
+                <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
+                <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
+                  <% if review_type == 'ReviewResponseMap' %>
+                    <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details">
+                      <%= "Review " +   i.to_s %>
+                    </a></th>
+                  <%end%>
+                  <% if review_type == 'SelfReviewResponseMap' %>
+                    <th class="sorter-false", bgcolor="aqua"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details">
+                      <%= "Self-Review"%>
+                    </a></th>
+                  <%end%>
+                <% else %>
+                    <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
+                  <% if review_type == 'SelfReviewResponseMap' %>
+                    <th class="sorter-false", bgcolor="aqua"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
+                  <%else %>
+                    <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
+                  <%end%>
+                <% end %>
+                <% i += 1 %>
               <% end %>
 
               <th class="sorter-true" align="right" >
@@ -117,7 +143,9 @@
               <th class="sorter-false">
                 <span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback.">metric-1</span>
               </th>
-
+              <th class="sorter-true" align="right" >
+                Composite Score<span></span>
+              </th>
             </tr>
             </thead>
 
@@ -153,6 +181,13 @@
                   </td>
                   <td  class = 'cf' align="center">
                     <%= row.countofcomments.to_s %>
+                  </td>
+                  <td  class = 'cf' align="center">
+                    <%if @assignment.is_selfreview_enabled and @current_role_name.eql? "Student"%>
+                      <%= row.composite_score_for_row.to_s %>
+                    <%else %>
+                      <%= "Not applicable" %>
+                    <%end %>
                   </td>
                 </tr>
                 <!--loop that creates the collapsed-by-default row, which lists all comments. -->

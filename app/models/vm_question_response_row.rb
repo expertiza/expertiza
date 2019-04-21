@@ -28,16 +28,31 @@ class VmQuestionResponseRow
 
   def average_score_for_row
     row_average_score = 0.0
-    no_of_columns = 0.0 # Counting reviews that are not null
+    # no_of_columns = 0.0 # Counting reviews that are not null
+    @no_of_columns = 0.0 # Counting reviews that are not null
+    @self_review_score_of_row = @score_row[-1].score_value
     @score_row.each do |score|
       if score.score_value.is_a? Numeric
-        no_of_columns += 1
+        @no_of_columns += 1
         row_average_score += score.score_value.to_f
       end
     end
-    unless no_of_columns.zero?
-      row_average_score /= no_of_columns
+    unless @no_of_columns.zero?
+      row_average_score /= @no_of_columns
       row_average_score.round(2)
+    end
+  end
+
+  def composite_score_for_row
+    @total_avg_score = average_score_for_row
+    @peer_total = (@total_avg_score * @no_of_columns) - @self_review_score_of_row
+    @peer_avg = @peer_total / (@no_of_columns - 1)
+    if !@peer_avg.nan?
+      # Apply your formula here
+      composite_score = (100 - (@self_review_score_of_row - @peer_avg).abs) * (@peer_avg / 100)
+      composite_score.round(2)
+    else
+      composite_score = "Not applicable"
     end
   end
 end

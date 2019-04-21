@@ -49,14 +49,38 @@ class VmQuestionResponse
                 else
                   ReviewResponseMap.get_assessments_for(team)
                 end
+      # variable to store self review
+      @store_needed_self_review = nil
+      # find and selected self reviewers based on current user role
+      self_reviews = SelfReviewResponseMap.get_assessments_for(team) # Get all Self Reviews for the team
+      self_reviews.each do |review|
+        self_review_mapping = SelfReviewResponseMap.find(review.map_id) # Find respons maps baed on map id
+        if self_review_mapping && self_review_mapping.present?
+          # if it is a student view show only that particular students self review
+          if participant.id == self_review_mapping.reviewer_id
+            participant = Participant.find(self_review_mapping.reviewer_id)
+            @list_of_reviewers << participant
+            @store_needed_self_review = review
+          end
+        end
+      end
+
       reviews.each do |review|
         review_mapping = ReviewResponseMap.find(review.map_id)
-        if review_mapping.present?
+        if review_mapping && review_mapping.present?
           participant = Participant.find(review_mapping.reviewer_id)
           @list_of_reviewers << participant
         end
       end
-      @list_of_reviews = reviews
+      # @list_of_reviews = reviews
+      # Add all reviews i.e self  + peer , based on the role and type of assignment
+      if !@store_needed_self_review.nil?
+        @list_of_reviews = reviews + [@store_needed_self_review]
+      elsif !@store_needed_self_review.nil?
+        @list_of_reviews = reviews + self_reviews
+      else
+        @list_of_reviews = reviews
+      end
     elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"
       reviews = participant.feedback # feedback reviews
       reviews.each do |review|
@@ -87,6 +111,18 @@ class VmQuestionResponse
 
     reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
+      answers.each do |answer|
+        add_answer(answer)
+      end
+    end
+    # Find all answers based on user role
+    if !@store_needed_self_review.nil?
+      answers = Answer.where(response_id: self_reviews.each {|self_review| self_review.response_id})
+      answers.each do |answer|
+        add_answer(answer)
+      end
+    elsif !@store_needed_self_review.nil?
+      answers = Answer.where(response_id: @store_needed_self_review.response_id)
       answers.each do |answer|
         add_answer(answer)
       end

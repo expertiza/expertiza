@@ -61,7 +61,10 @@
           
   </div>
 </th>
-  
+  <th style="text-align:center;" WIDTH="<%= colwidth %>%">&nbsp;
+    <div class="circle" id="self-review-circle">
+    </div>
+  </th>
 </TR>
 
 <script type="text/javascript">
@@ -71,7 +74,7 @@
   var myCircle = Circles.create({
     id:           '<%= "#{type}-circle" %>',
     radius:       25,
-    value:        <%= @pscore[type.to_sym][:scores][:avg].to_i %>,
+    value: <%= @pscore[type.to_sym][:scores][:avg].to_i %>,
     maxValue:     100,
     width:        7,
     text:         '<%=@pscore[type.to_sym][:scores][:avg].to_i%>',
@@ -85,13 +88,25 @@
   var myCircle = Circles.create({
     id:           'final-circle',
     radius:       35,
-    value:        <%= @pscore[:total_score].to_i %>,
+    value: <%= @pscore[:total_score].to_i %>,
     maxValue:     100,
     width:        15,
     text:         '<%=@pscore[:total_score].to_i==-1? "N/A":@pscore[:total_score].to_i%>',
     colors:       ['#FFEB99', '#FFCC00'],
     duration:       700,
     textClass:      'circles-final'  
+  });
+
+  var myCircle = Circles.create({
+      id:           'self-review-circle',
+      radius:       35,
+      value: <%= @new_derived_scores[:total_score].to_i %>,
+      maxValue:     100,
+      width:        15,
+      text:         '<%=@new_derived_scores[:total_score].to_i==-1? "N/A":@new_derived_scores[:total_score].to_i%>',
+      colors:       ['#99ffa4', '#077512'],
+      duration:       700,
+      textClass:      'circles-final'
   });
 
 </script> 

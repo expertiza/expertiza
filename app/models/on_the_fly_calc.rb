@@ -10,11 +10,10 @@ module OnTheFlyCalc
   def compute_reviews_hash
     @review_scores = {}
     @response_type = 'ReviewResponseMap'
+    @response_maps = ResponseMap.where(reviewed_object_id: self.id, type: @response_type)
     if self.varying_rubrics_by_round?
-      @response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', self.id, @response_type)
       scores_varying_rubrics
     else
-      @response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', self.id, @response_type)
       scores_non_varying_rubrics
     end
     @review_scores
@@ -71,10 +70,8 @@ end
 def scores_varying_rubrics
   rounds = self.rounds_of_reviews
   (1..rounds).each do |round|
-    # TODO E1936 review_questionnaire_id method signature has changed - need to change call to review_questionnaire_id here?
-    review_questionnaire_id = review_questionnaire_id(round)
-    @questions = Question.where('questionnaire_id = ?', review_questionnaire_id)
     @response_maps.each do |response_map|
+      @questions = peer_review_questions_for_team(response_map.reviewee, round)
       reviewer = @review_scores[response_map.reviewer_id]
       @corresponding_response = Response.where('map_id = ?', response_map.id)
       @corresponding_response = @corresponding_response.select {|response| response.round == round } unless @corresponding_response.empty?
@@ -90,10 +87,8 @@ def scores_varying_rubrics
 end
 
 def scores_non_varying_rubrics
-  # TODO E1936 review_questionnaire_id method signature has changed - need to change call to review_questionnaire_id here?
-  review_questionnaire_id = review_questionnaire_id()
-  @questions = Question.where('questionnaire_id = ?', review_questionnaire_id)
   @response_maps.each do |response_map|
+    @questions = peer_review_questions_for_team(response_map.reviewee)
     reviewer = @review_scores[response_map.reviewer_id]
     @corresponding_response = Response.where('map_id = ?', response_map.id)
     @respective_scores = {}

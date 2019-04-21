@@ -1,4 +1,5 @@
 describe OnTheFlyCalc do
+
   let(:on_the_fly_calc) { Class.new { extend OnTheFlyCalc } }
   let(:questionnaire) { create(:questionnaire, id: 1) }
   let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }
@@ -33,8 +34,9 @@ describe OnTheFlyCalc do
     before(:each) do
       allow(Answer).to receive(:get_total_score).and_return(50, 30)
       allow(ResponseMap).to receive(:where).and_return([response_map, response_map2])
+      allow(SignedUpTeam).to receive(:find_by).with(team_id: contributor.id).and_return(signed_up_team)
     end
-    context 'when current assignment varys rubrics by round' do
+    context 'when current assignment varies rubrics by round' do
       it 'scores varying rubrics and returns review scores' do
         allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
         allow(assignment).to receive(:rounds_of_reviews).and_return(1)
@@ -42,7 +44,7 @@ describe OnTheFlyCalc do
       end
     end
     context 'when current assignment does not vary rubrics by round' do
-      it 'scores varying rubrics and returns review scores' do
+      it 'scores rubrics and returns review scores' do
         allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
         allow(DueDate).to receive(:get_next_due_date).with(assignment.id).and_return(double(:DueDate, round: 1))
         expect(assignment.compute_reviews_hash).to eql(1 => {1 => 50}, 2 => {1 => 30})

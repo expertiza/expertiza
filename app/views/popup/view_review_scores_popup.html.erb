@@ -1,16 +1,19 @@
 <h2> Review scores: <%= Participant.find(@reviewer_id).name %> </h2>
 
 <% keys = @review_final_versions.keys %>
-<% keys.each do |key| %>
+<% keys.each_with_index do |key, ind| %>
 
     <h4>Course: <%= Assignment.find(@assignment_id).course.name %></h4>
     <h4> Assignment: <%= Assignment.find(@assignment_id).name %></h4>
     <% roundtitle = key.to_s %>
     <h4><%= roundtitle.titlecase %></h4>
-
     <table class="general" border="1">
       <% questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id]) %>
       <% questions = Question.where(questionnaire_id: questionnaire_id) %>
+      <% if ind > 0 %>
+        <% review_questionnaire_id = Questionnaire.find(@review_final_versions[key][:revision_questionnaire]) %>
+      <% questions += Question.where(questionnaire_id: review_questionnaire_id) unless review_questionnaire_id.nil? %>
+        <% end %>
       <% num_responses = @review_final_versions[key][:response_ids].length %>
       <% responses = @review_final_versions[key][:response_ids] %>
       <% questions.each do |question| %>

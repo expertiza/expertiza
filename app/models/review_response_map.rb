@@ -163,7 +163,18 @@ class ReviewResponseMap < ResponseMap
       where_map[:round] = round unless round.nil?
       responses = Response.where(where_map)
       response_ids << responses.last.id unless responses.empty?
+      responses.each do |response_id|
+        team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id)
+        review_final_versions[symbol][:team] = team
+        review_final_versions[symbol][:revision_questionnaire] = get_revision_planning_questionnaire(team)
+      end
     end
     review_final_versions[symbol][:response_ids] = response_ids
+  end
+
+  def self.get_revision_planning_questionnaire(team)
+    submission_record = SubmissionRecord.where(["team_id = ? and operation = ?", team.id, "Revision Planning"])
+    rev_q_id = submission_record.first.questionnaire_id unless submission_record.nil?
+    rev_q_id
   end
 end

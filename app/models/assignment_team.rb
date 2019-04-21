@@ -104,9 +104,7 @@ class AssignmentTeam < Team
   # REFACTOR BEGIN:: functionality of import,export, handle_duplicate shifted to team.rb
   # Import csv file to form teams directly
   def self.import(row, assignment_id, options)
-    unless Assignment.find_by(id: assignment_id)
-      raise ImportError, "The assignment with the id \"" + assignment_id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
-    end
+    raise ImportError, "The assignment with the id \"" + assignment_id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?" if Assignment.find_by(id: assignment_id).nil?
     @assignment_team = prototype
     Team.import(row, assignment_id, options, @assignment_team)
   end

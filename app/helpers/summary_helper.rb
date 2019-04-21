@@ -41,6 +41,9 @@ module SummaryHelper
       self
     end
 
+    # E1936 team recommends this method be REMOVED
+    #   it does not seem to be used anywhere in Expertiza as of 4/21/19
+    #   aside from in methods which are themselves not used anywhere in Expertiza as of 4/21/19
     # produce summaries for instructor. it merges all feedback given to all reviewees, and summarize them by criterion
     def summarize_reviews_by_criterion(assignment, summary_ws_url)
       # @summary[reviewee][round][question]
@@ -83,6 +86,9 @@ module SummaryHelper
       self
     end
 
+    # E1936 team recommends this method be REMOVED
+    #   it does not seem to be used anywhere in Expertiza as of 4/21/19
+    #   aside from in methods which are themselves not used anywhere in Expertiza as of 4/21/19
     # produce summaries for instructor and students. It sum up the feedback by criterion for each reviewee
     def summarize_reviews_by_reviewees(assignment, summary_ws_url)
       # @summary[reviewee][round][question]
@@ -189,17 +195,26 @@ module SummaryHelper
       comments
     end
 
+    # E1936 team recommends this method be REMOVED
+    #   it does not seem to be used anywhere in Expertiza as of 4/21/19
+    #   aside from in methods which are themselves not used anywhere in Expertiza as of 4/21/19
     def get_questions_by_assignment(assignment)
       rubric = []
       (0..assignment.rounds_of_reviews - 1).each do |round|
         rubric[round] = nil
         if assignment.varying_rubrics_by_round?
           # get rubric id in each round
+          # E1936 team did not update this usage of review_questionnaire_id() to include topic,
+          #   because this method does not seem to be used anywhere in Expertiza
+          #   as noted in method block comment above
           questionnaire_id = assignment.review_questionnaire_id(round + 1)
           # get criteria in the corresponding rubric (each round may use different rubric)
           rubric[round] = Question.where(questionnaire_id: questionnaire_id).order(:seq)
         else
           # if use the same rubric then query only once at the beginning and store them in the rubric[0]
+          # E1936 team did not update this usage of review_questionnaire_id() to include topic,
+          #   because this method does not seem to be used anywhere in Expertiza
+          #   as noted in method block comment above
           questionnaire_id = questionnaire_id.nil? ? assignment.review_questionnaire_id : questionnaire_id
           rubric[0] = rubric[0].nil? ? Question.where(questionnaire_id: questionnaire_id).order(:seq) : rubric[0]
         end

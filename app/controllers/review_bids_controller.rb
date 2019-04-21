@@ -21,6 +21,7 @@ class ReviewBidsController < LotteryController
       # bid_result = JSON.parse(response)["info"]
       flash[:notice] = "You have reached the part to call Gale Shapley"
       bid_result = gale_shapley(users, user_size, item_size)
+      flash[:notice] = "You have ran Gale Shapley"
       response_mappings = run_intelligent_bid(assignment, teams, participants, bid_result)
       create_response_mappings(assignment, response_mappings)
     rescue StandardError => err
@@ -188,7 +189,7 @@ print gale_shapley(user_ranks, 2, 2)
     # It is an array that returns an array of user IDs and the corressponding assigned topics.
     rst = []
     users_items.each do |item|
-      rst << {pid: user, items: users_items[user]}
+      rst << {items: users_items[user], pid: user}
     end
 
     return rst

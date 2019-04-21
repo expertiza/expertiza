@@ -1,4 +1,8 @@
 class PopupController < ApplicationController
+  include ResponseConstants
+  include SimilarAssignmentsConstants
+  #include SimilarAssignmentsHelper
+
   def action_allowed?
     ['Super-Administrator',
      'Administrator',
@@ -55,8 +59,31 @@ class PopupController < ApplicationController
         instance_variable_set('@total_percentage_round_' + round.to_s, total_percentage)
         instance_variable_set('@sum_round_' + round.to_s, response.total_score)
         instance_variable_set('@total_possible_round_' + round.to_s, response.maximum_score)
+        # E-1867 changes start here
+        review_round = round.to_s
+
+        # write 0,1,2,3 as an enum in a separate class and use that here
+        if response.visibility == nil
+          response.visibility = _private
+        end
+        response_visibility = response.visibility
+        instance_variable_set('@sample_button_'+review_round,response_visibility != _private)
+        mark_as_sample = " hide"
+        remove_as_sample = " hide"
+        if response_visibility == _selected
+          remove_as_sample = ""
+        else
+          mark_as_sample = ""
+        end
+        instance_variable_set('@mark_as_sample_' + review_round,mark_as_sample)
+        instance_variable_set('@remove_as_sample_' + review_round, remove_as_sample)
+        # E-1867 changes end here
       end
+      instance_variable_set('@assignment_id',@assignment.id)
     end
+    instance_variable_set('@marked',_selected)
+    #instance_variable_set('@popup_show',(get_similar_assignment_ids(@assignment.id).size > 0 ? "" : "hide"))
+    @page_size = popup_page_size
   end
 
   def participants_popup

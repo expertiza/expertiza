@@ -80,18 +80,18 @@ class GradesController < ApplicationController
         [64, 92, 78, 54]
     ]
 
-    @assignment_avg_data = [
+    @assignment_compare_avg_data = [
         [
             [74, 86, 56, 98, 66],
-    [66, 98, 72, 56]
+            [66, 98, 72, 56]
         ],
         [
             [66, 94, 64, 82, 74],
-    [74, 82, 88, 64]
+            [74, 82, 88, 64]
         ]
     ]
 
-    @assignment_names = ["OSS project/Writing assignment 2", "Final Project Design Document Fall2015"]
+    @assignment_names_to_compare = ["OSS project/Writing assignment 2", "Final Project Design Document Fall2015"]
 
     @assignment_name = 'Final Project (and Design Document)'
 

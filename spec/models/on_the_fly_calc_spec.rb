@@ -8,6 +8,7 @@ describe OnTheFlyCalc do
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
   let(:questionnaire1) { build(:questionnaire, name: "abc", private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234) }
   let(:contributor) { build(:assignment_team, id: 1) }
+  let(:signed_up_team) { build(:signed_up_team, team_id: contributor.id) }
 
   describe '#compute_total_score' do
     context 'when avg score is nil' do
@@ -55,9 +56,10 @@ describe OnTheFlyCalc do
       allow(on_the_fly_calc).to receive(:contributors).and_return([contributor])
       allow(Answer).to receive(:compute_scores).with([], [question1]).and_return(score)
       allow(ReviewResponseMap).to receive(:get_assessments_for).with(contributor).and_return([])
+      allow(SignedUpTeam).to receive(:find_by).with(team_id: contributor.id).and_return(signed_up_team)
       allow(on_the_fly_calc).to receive(:review_questionnaire_id).and_return(1)
     end
-    context 'when current assignment varys rubrics by round' do
+    context 'when current assignment varies rubrics by round' do
       it 'computes avg score and score range for each team in each round and return scores' do
         allow(on_the_fly_calc).to receive(:varying_rubrics_by_round?).and_return(true)
         allow(on_the_fly_calc).to receive(:rounds_of_reviews).and_return(1)

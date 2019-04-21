@@ -223,14 +223,12 @@ jQuery(document).ready(function() {
               )
             }
 
-            if(this.props.review_assignment_strategy == 'Bidding') {
                 moreContent.push(
-                    <a title="Run Gale Shapley algorithm"
-                       href={"/review_bids/gale_shapley/" + (parseInt(this.props.id) / 2).toString()}>
+                    <a title="Run Intelligent assignment for Gale Shapley algorithm"
+                       href={"/review_bids/run_intelligent_assignment/" + (parseInt(this.props.id) / 2).toString()}>
                         <img src="/assets/tree_view/run-lottery.png"/>
                     </a>
                 )
-            }
 
             if (this.props.allow_suggestions) {
               moreContent.push(

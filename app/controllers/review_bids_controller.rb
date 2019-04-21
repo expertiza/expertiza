@@ -10,15 +10,17 @@ class ReviewBidsController < LotteryController
       participant_ranks << {pid: participant.id, ranks: ranks}
     end
     # we have the availability of topics and ranks of users' choices towards submission now.
-    data = {
-      users: participant_ranks,
-      item_size: assignment.max_reviews_per_submission,
-      user_size: assignment.num_reviews_required
-    }
-    url = WEBSERVICE_CONFIG["review_bidding_webservice_url"]
+    # data = {
+      users = participant_ranks
+      item_size = assignment.max_reviews_per_submission
+      user_size = assignment.num_reviews_required
+    # }
+    # url = WEBSERVICE_CONFIG["review_bidding_webservice_url"]
     begin
-      response = RestClient.post url, data.to_json, content_type: :json, accept: :json
-      bid_result = JSON.parse(response)["info"]
+      # response = RestClient.post url, data.to_json, content_type: :json, accept: :json
+      # bid_result = JSON.parse(response)["info"]
+      flash[:notice] = "You have reached the part to call Gale Shapley"
+      bid_result = gale_shapley(users, user_size, item_size)
       response_mappings = run_intelligent_bid(assignment, teams, participants, bid_result)
       create_response_mappings(assignment, response_mappings)
     rescue StandardError => err
@@ -88,6 +90,10 @@ user_ranks = [{"pid":1,"ranks":[1,2,3]},{"pid":2,"ranks":[3,1,2]},{"pid":3,"rank
 print gale_shapley(user_ranks, 2, 2)
 =end
 
+  # The original gale shapley implementation had the following method signature:
+  # def gale_shapley(users, user_size, item_size)
+  # However, we have changed it to:
+  # def gale_shapley(participant_ranks, user_size, item_size)
 
   def gale_shapley(users, user_size, item_size)
 =begin
@@ -178,13 +184,13 @@ print gale_shapley(user_ranks, 2, 2)
 
     end
 
+    # This is a result that is returned from the gsle shapely algorithm
+    # It is an array that returns an array of user IDs and the corressponding assigned topics.
     rst = []
     users_items.each do |item|
       rst << {pid: user, items: users_items[user]}
     end
 
     return rst
-
-
   end
 end

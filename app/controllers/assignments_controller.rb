@@ -304,6 +304,12 @@ class AssignmentsController < ApplicationController
         break
       end
     end
+    @assignment_questionnaires.each do |aq|
+      unless aq.topic_id.nil?
+        @review_vary_by_topic_check = 1
+        break
+      end
+    end
   end
 
   def handle_rubrics_not_assigned_case

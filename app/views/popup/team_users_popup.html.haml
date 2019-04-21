@@ -28,7 +28,7 @@
           %h3{:class=>'col-md-10'} "Reviewed by #{User.find(@reviewer_id).fullname} (Round #{round})"
           %div{:class=>'col-md-2'}
             %button{:class=>'col-md-12 mark-unmark-sample-button '+instance_variable_get('@mark_as_sample_'+round.to_s), :data=>{'visibility':2, 'response_id':instance_variable_get('@response_id_round_' + round.to_s),'round':round} } Mark as Sample
-            %button{:class=>'col-md-12 mark-unmark-sample-button '+instance_variable_get('@remove_as_sample_'+round.to_s), :data=>{'visibility':3, 'response_id':instance_variable_get('@response_id_round_' + round.to_s),'round':round} } Remove as Sample
+            %button{:class=>'col-md-12 mark-unmark-sample-button '+instance_variable_get('@remove_as_sample_'+round.to_s), :data=>{'visibility':1, 'response_id':instance_variable_get('@response_id_round_' + round.to_s),'round':round} } Remove as Sample
             %span{:class=>"hide col-md-12 mark-unmark-sample-result", :id=>"mark_unmark_fail_"+round.to_s}
             %span{:class=>"hide col-md-12 mark-unmark-sample-result success", :id=>"mark_unmark_success_"+round.to_s}
       - else

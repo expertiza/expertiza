@@ -27,6 +27,7 @@ module OnTheFlyCalc
     if self.varying_rubrics_by_round?
       rounds = self.rounds_of_reviews
       (1..rounds).each do |round|
+        # TODO E1936 review_questionnaire_id method signature has changed - need to change call to review_questionnaire_id here?
         review_questionnaire_id = review_questionnaire_id(round)
         questions = Question.where('questionnaire_id = ?', review_questionnaire_id)
         contributors.each do |contributor|
@@ -38,6 +39,7 @@ module OnTheFlyCalc
         end
       end
     else
+      # TODO E1936 review_questionnaire_id method signature has changed - need to change call to review_questionnaire_id here?
       review_questionnaire_id = review_questionnaire_id()
       questions = Question.where('questionnaire_id = ?', review_questionnaire_id)
       contributors.each do |contributor|
@@ -66,6 +68,7 @@ end
 def scores_varying_rubrics
   rounds = self.rounds_of_reviews
   (1..rounds).each do |round|
+    # TODO E1936 review_questionnaire_id method signature has changed - need to change call to review_questionnaire_id here?
     review_questionnaire_id = review_questionnaire_id(round)
     @questions = Question.where('questionnaire_id = ?', review_questionnaire_id)
     @response_maps.each do |response_map|
@@ -84,6 +87,7 @@ def scores_varying_rubrics
 end
 
 def scores_non_varying_rubrics
+  # TODO E1936 review_questionnaire_id method signature has changed - need to change call to review_questionnaire_id here?
   review_questionnaire_id = review_questionnaire_id()
   @questions = Question.where('questionnaire_id = ?', review_questionnaire_id)
   @response_maps.each do |response_map|

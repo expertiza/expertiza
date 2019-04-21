@@ -102,6 +102,7 @@ class Response < ActiveRecord::Base
       # the reason is that for this question type, there is no answer record, and this question is handled by a different form
       map = ResponseMap.find(self.map_id)
       assignment = Participant.find(map.reviewer_id).assignment
+      # TODO E1936 review_questionnaire_id method signature has changed - need to change call to review_questionnaire_id here?
       questionnaire = Questionnaire.find(assignment.review_questionnaire_id)
     end
     questionnaire

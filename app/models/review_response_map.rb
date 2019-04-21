@@ -153,6 +153,7 @@ class ReviewResponseMap < ResponseMap
                ("review round" + round.to_s).to_sym
              end
     review_final_versions[symbol] = {}
+    # TODO E1936 review_questionnaire_id method signature has changed - need to change call to review_questionnaire_id here?
     review_final_versions[symbol][:questionnaire_id] = assignment.review_questionnaire_id(round)
     response_ids = []
     maps.each do |map|

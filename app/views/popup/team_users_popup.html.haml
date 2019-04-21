@@ -1,8 +1,13 @@
-%span{:class => "hide",:id=>"sampleReviewHold",:data=>{"marked":instance_variable_get('@marked')}}
-%span{:class => "hide",:id=>"pageSizeHold"} #{@page_size}
+%span{:class => "hide", :id => "sampleReviewHold", :data => {"marked" :instance_variable_get('@marked')}}
+%span{:class => "hide", :id => "pageSizeHold"}
 %div
-  %h3
-    Members of #{@team.name}
+ %div
+    %h3{:class=>"col-md-9"} Members of #{@team.name}
+    %div{:class=>"col-md-3 link-assignments-head"}
+      %h5{:id=>"link_assignments", :class=>instance_variable_get("@popup_show")}Use as Samples for More Assignments
+      %span{:id=>"link_assignments_error", :class=>"hide"}
+      %span{:id=>"link_assignments_success" ,:class=>"hide"}
+    %br
   %table{:width => "100%"}
     - if @team_users.empty?
       %tr No team members
@@ -33,7 +38,6 @@
             %span{:class=>"hide col-md-12 mark-unmark-sample-result success", :id=>"mark_unmark_success_"+round.to_s}
       - else
         %h3 "Reviewed by #{User.find(@reviewer_id).fullname} (Round #{round})"
-
       %table{:class => "general", :border => "1px solid #ccc"}
         %tr
           %th{:align => "left", :width => "50%"} Question
@@ -71,5 +75,26 @@
           %td= additional_comment.nil? ? 'No Comments' : additional_comment.html_safe
       %hr/
   %br/
+  %div{:class=>"col-md-12 hide popup-container"}
+    %div{:class=>"col-md-3"}
+    %div{:class=>"col-md-6",:id=>"similar_assignments_popup",:data=>{"assignment-id":instance_variable_get("@assignment_id")}}
+
+      %div{:class=>"col-md-12"}
+        %h5{:class=>"col-md-11"}
+          %strong Select the assignments for which you want to mark these reviews as samples:
+        %h5{:class=>"col-md-1"}
+          %a{:href=>"javascript:void(0);", :class=>"closer"}X
+      %div{:class=>"col-md-12 popup-list-container"}
+        %ul
+          %li{:id=>"popup_list_template",:class=>"hide"}
+            %input{:type=>"checkbox"}
+            %span
+        %span{:class=>"popup_more"} More +
+
+      %button{:class=>"col-md-6 submitter"}Submit
+      %button{:class=>"col-md-6 closer"}Cancel
+
+    %div{:class=>"col-md-3"}
   .footer
     = link_to 'Back', :controller=> 'review_mapping', :action=>'response_report', :id=>params[:assignment_id]
+

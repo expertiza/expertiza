@@ -7,19 +7,13 @@
     google.charts.setOnLoadCallback(drawSingleChart);
 
     // Values set in grades_controller#view
-    var round_names = <%= @round_names.inspect.html_safe %>;
-    var criteria_names = <%= @criteria_names.inspect.html_safe %>;
-    var avg_data = <%= @avg_data.inspect.html_safe %>;
-    var avg_data_to_compare = <%= @avg_data_to_compare.inspect.html_safe %>;
-    var assignment_names_to_compare = <%= @assignment_names_to_compare.inspect.html_safe %>;
-    var assignment_name = <%= @assignment_name.html_safe %>;
-    var med_data = <%= @med_data.inspect.html_safe %>;
-
-    var avg_data = [
-        [76, 84, 54, 92, 64],
-        [64, 92, 78, 54]
-    ]
-
+    var round_names = <%= @round_names.to_json.html_safe %>;
+    var criteria_names = <%= @criteria_names.to_json.html_safe %>;
+    var avg_data = <%= @avg_data.to_json.html_safe %>;
+    var avg_data_to_compare = <%= @assignment_avg_data.to_json.html_safe %>;
+    var assignment_names_to_compare = <%= @assignment_names.to_json.html_safe %>;
+    var assignment_name = <%= @assignment_name.to_json.html_safe %>;
+    var med_data = <%= @med_data.to_json.html_safe %>;
 
     var source_data = avg_data;
 
@@ -112,6 +106,7 @@
     // instantiates the column chart, passes in the data and
     // draws it.
     function drawCompareChart() {
+        source_data = avg_data;
         var prefix = "assignment_"+selected_assignment+"_round_"+selected_assignment_round+"_criterion";
         var selected_criteria = buildSelectArray(prefix, criteria_names[selected_assignment_round].length);
 
@@ -160,6 +155,9 @@
     }
 </script>
 
+<!--Assign the controller variable to use a better name-->
+<% @assignment_names_to_compare = @assignment_names %>
+
 <div id="tab_0_selector">Analyze Assignment | <a href="javascript:void(0);" onclick="switchToTab(1); return false;">Compare Assignments</a></div>
 <div id="tab_1_selector" style="display:none"><a href="javascript:void(0);" onclick="switchToTab(0); return false;">Analyze Assignment</a> | Compare Assignments</div>
 
@@ -172,29 +170,19 @@
       <td>
         <div><label>Round:</label></div>
         <div>
-          <%#= select_tag('round_selector', options_for_select(@round_names, @round_names[0]), :onchange => 'toggleRound(this);') %>
-          <select id="round_selector" onchange="toggleRound(this);">-->
-            <option selected="true"><%= @round_names[0] %></option>-->
-            <option><%= @round_names[1] %></option>-->
-          </select>-->
+          <%= select_tag('round_selector', options_for_select(@round_names, @round_names[0]), :onchange => 'toggleRound(this);') %>
         </div>
       </td>
 
       <td>
         <div><label>Criteria:</label></div>
-        <div id="round_0_criteria">
-          <div><label><input id="round_0_criterion_0_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[0][0] %></label></div>
-          <div><label><input id="round_0_criterion_1_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[0][1] %></label></div>
-          <div><label><input id="round_0_criterion_2_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[0][2] %></label></div>
-          <div><label><input id="round_0_criterion_3_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[0][3] %></label></div>
-          <div><label><input id="round_0_criterion_4_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[0][4] %></label></div>
-        </div>
-        <div id="round_1_criteria" style="display:none">
-          <div><label><input id="round_1_criterion_0_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[1][0] %></label></div>
-          <div><label><input id="round_1_criterion_1_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[1][1] %></label></div>
-          <div><label><input id="round_1_criterion_2_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[1][2] %></label></div>
-          <div><label><input id="round_1_criterion_3_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[1][3] %></label></div>
-        </div>
+        <% @criteria_names.each_with_index do |crow, i| %>
+          <div id=<%= "round_#{i}_criteria" %> style=<%= "display:none" unless i.zero? %>>
+            <% crow.each_with_index do |c, j| %>
+              <div><label><input id=<%= "round_#{i}_criterion_#{j}_selector" %> type="checkbox" checked='true' onclick="drawChart();"/><%= c %></label></div>
+            <% end %>
+          </div>
+        <% end %>
       </td>
 
       <td>
@@ -214,44 +202,27 @@
 
       <td>
         <div><label>Assignment:</label></div>
-        <div><select id="assignment_selector" onchange="toggleAssignment(this);">
-          <option selected="true"><%= @assignment_names_to_compare[0] %></option>
-          <option><%= @assignment_names_to_compare[1] %></option>
-        </select></div>
+        <%= select_tag('assignment_selector',
+                       options_for_select(@assignment_names_to_compare, @assignment_names_to_compare[0]),
+                       :onchange => 'toggleAssignment(this);') %>
       </td>
 
       <td>
+        <div><label>Round:</label></div>
         <%= select_tag('round_selector', options_for_select(@round_names, @round_names[0]), :onchange => 'toggleRound(this);') %>
       </td>
 
       <td>
         <div><label>Criteria:</label></div>
-        <div id="assignment_0_round_0_criteria">
-          <div><label><input id="assignment_0_round_0_criterion_0_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[0][0] %></label></div>
-          <div><label><input id="assignment_0_round_0_criterion_1_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[0][1] %></label></div>
-          <div><label><input id="assignment_0_round_0_criterion_2_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[0][2] %></label></div>
-          <div><label><input id="assignment_0_round_0_criterion_3_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[0][3] %></label></div>
-          <div><label><input id="assignment_0_round_0_criterion_4_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[0][4] %></label></div>
-        </div>
-        <div id="assignment_0_round_1_criteria" style="display:none">
-          <div><label><input id="assignment_0_round_1_criterion_0_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[1][0] %></label></div>
-          <div><label><input id="assignment_0_round_1_criterion_1_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[1][1] %></label></div>
-          <div><label><input id="assignment_0_round_1_criterion_2_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[1][2] %></label></div>
-          <div><label><input id="assignment_0_round_1_criterion_3_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[1][3] %></label></div>
-        </div>
-        <div id="assignment_1_round_0_criteria">
-          <div><label><input id="assignment_0_round_0_criterion_0_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[0][0] %></label></div>
-          <div><label><input id="assignment_0_round_0_criterion_1_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[0][1] %></label></div>
-          <div><label><input id="assignment_0_round_0_criterion_2_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[0][2] %></label></div>
-          <div><label><input id="assignment_0_round_0_criterion_3_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[0][3] %></label></div>
-          <div><label><input id="assignment_0_round_0_criterion_4_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[0][4] %></label></div>
-        </div>
-        <div id="assignment_1_round_1_criteria" style="display:none">
-          <div><label><input id="assignment_0_round_1_criterion_0_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[1][0] %></label></div>
-          <div><label><input id="assignment_0_round_1_criterion_1_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[1][1] %></label></div>
-          <div><label><input id="assignment_0_round_1_criterion_2_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[1][2] %></label></div>
-          <div><label><input id="assignment_0_round_1_criterion_3_selector" type="checkbox" checked="true" onclick="drawChart();"/><%= @criteria_names[1][3] %></label></div>
-        </div>
+        <% @assignment_names_to_compare.each_index do |k| %>
+          <% @criteria_names.each_with_index do |crow, i| %>
+            <div id=<%= "assignment_#{k}_round_#{i}_criteria" %> style=<%= "display:none" unless (i.zero? and k.zero?) %>>
+              <% crow.each_with_index do |c, j| %>
+                <div><label><input id=<%= "assignment_#{k}_round_#{i}_criterion_#{j}_selector" %> type="checkbox" checked='true' onclick="drawChart();"/><%= c %></label></div>
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
       </td>
     </tr>
   </table>

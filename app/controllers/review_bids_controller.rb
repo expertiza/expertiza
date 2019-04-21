@@ -118,6 +118,7 @@ print gale_shapley(user_ranks, 2, 2)
     count_assigned_items = {}
     users_items = {}
 
+    flash[:notice] = "Before users"
     # construct a user priority list for every item
     users.each do |user|
       count = 0
@@ -136,6 +137,7 @@ print gale_shapley(user_ranks, 2, 2)
       end
     end
 
+    flash[:notice] = "Before item_ranks"
     # sort the item ranks by user's priority so that the algorithm can select the most interested users
     item_ranks.each do |item|
       #randomize the order of users for fairness
@@ -152,6 +154,7 @@ print gale_shapley(user_ranks, 2, 2)
     while true
       added = 0
 
+      flash[:notice] = "Before items"
       items.each do |item|
         # select the most interested users
 
@@ -188,6 +191,7 @@ print gale_shapley(user_ranks, 2, 2)
     # This is a result that is returned from the gsle shapely algorithm
     # It is an array that returns an array of user IDs and the corressponding assigned topics.
     rst = []
+    flash[:notice] = "Before result items"
     users_items.each do |item|
       rst << {items: users_items[user], pid: user}
     end

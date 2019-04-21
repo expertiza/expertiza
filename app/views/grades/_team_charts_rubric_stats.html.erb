@@ -10,10 +10,16 @@
     var round_names = <%= @round_names.inspect.html_safe %>;
     var criteria_names = <%= @criteria_names.inspect.html_safe %>;
     var avg_data = <%= @avg_data.inspect.html_safe %>;
-    var assignment_compare_avg_data = <%= @assignment_compare_avg_data.inspect.html_safe %>;
+    var avg_data_to_compare = <%= @avg_data_to_compare.inspect.html_safe %>;
     var assignment_names_to_compare = <%= @assignment_names_to_compare.inspect.html_safe %>;
     var assignment_name = <%= @assignment_name.html_safe %>;
     var med_data = <%= @med_data.inspect.html_safe %>;
+
+    var avg_data = [
+        [76, 84, 54, 92, 64],
+        [64, 92, 78, 54]
+    ]
+
 
     var source_data = avg_data;
 
@@ -28,6 +34,7 @@
         }
         return selected;
     }
+
     var selected_round = 0;
     function toggleRound(control) {
         selected_round = control.selectedIndex;
@@ -59,7 +66,6 @@
         drawChart();
     }
 
-
     function toggleMetric(control) {
         var data = [avg_data, med_data];
         source_data = data[control.selectedIndex];
@@ -70,6 +76,7 @@
         selected_assignment = control.selectedIndex;
         renderCompareUI();
     }
+
     // Callback that creates and populates a data table,
     // instantiates the column chart, passes in the data and
     // draws it.
@@ -100,6 +107,7 @@
         var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
         chart.draw(data, options);
     }
+
     // Callback that creates and populates a data table,
     // instantiates the column chart, passes in the data and
     // draws it.
@@ -119,7 +127,7 @@
             }
             var row = [criteria_names[selected_assignment_round][criterion]]
             row.push(source_data[selected_assignment_round][criterion]);
-            row.push(assignment_compare_avg_data[selected_assignment][selected_assignment_round][criterion]);
+            row.push(avg_data_to_compare[selected_assignment][selected_assignment_round][criterion]);
             rows.push(row);
         }
         data.addRows(rows);
@@ -160,12 +168,16 @@
 <div align="center" id="tab_0">
   <table>
     <tr valign="top">
+
       <td>
         <div><label>Round:</label></div>
-        <div><select id="round_selector" onchange="toggleRound(this);">
-          <option selected="true"><%= @round_names[0] %></option>
-          <option><%= @round_names[1] %></option>
-        </select></div>
+        <div>
+          <%#= select_tag('round_selector', options_for_select(@round_names, @round_names[0]), :onchange => 'toggleRound(this);') %>
+          <select id="round_selector" onchange="toggleRound(this);">-->
+            <option selected="true"><%= @round_names[0] %></option>-->
+            <option><%= @round_names[1] %></option>-->
+          </select>-->
+        </div>
       </td>
 
       <td>
@@ -199,22 +211,19 @@
 <div align="center" id="tab_1" style="display:none">
   <table>
     <tr valign="top">
+
       <td>
         <div><label>Assignment:</label></div>
         <div><select id="assignment_selector" onchange="toggleAssignment(this);">
           <option selected="true"><%= @assignment_names_to_compare[0] %></option>
           <option><%= @assignment_names_to_compare[1] %></option>
         </select></div>
-
       </td>
+
       <td>
-        <div><label>Round:</label></div>
-        <div><select id="assignment_round_selector" onchange="toggleAssignmentRound(this);">
-          <option selected="true"><%= @round_names[0] %></option>
-          <option><%= @round_names[1] %></option>
-        </select></div>
-
+        <%= select_tag('round_selector', options_for_select(@round_names, @round_names[0]), :onchange => 'toggleRound(this);') %>
       </td>
+
       <td>
         <div><label>Criteria:</label></div>
         <div id="assignment_0_round_0_criteria">

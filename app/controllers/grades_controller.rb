@@ -80,7 +80,7 @@ class GradesController < ApplicationController
         [64, 92, 78, 54]
     ]
 
-    @assignment_compare_avg_data = [
+    @avg_data_to_compare = [
         [
             [74, 86, 56, 98, 66],
             [66, 98, 72, 56]

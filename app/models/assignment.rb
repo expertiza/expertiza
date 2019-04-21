@@ -420,11 +420,11 @@ class Assignment < ActiveRecord::Base
   end
 
   # Provides an array of all rounds in an assignment, sorted in ascending order
-  def questionnaire_rounds {
+  def questionnaire_rounds
     aqs_with_round = AssignmentQuestionnaire.where(assignment_id: self.id).reject { |q| q.used_in_round.nil? }
     rounds = aqs_with_round.map { |q| q.used_in_round }
     rounds.sort!
-  }
+  end
 
   def self.export_details(csv, parent_id, detail_options)
     return csv unless detail_options.value?('true')

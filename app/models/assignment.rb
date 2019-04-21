@@ -425,6 +425,11 @@ class Assignment < ActiveRecord::Base
     rounds = aqs_with_round.map { |q| q.used_in_round }
     rounds.sort!
   end
+  @@stats = []
+  # Provides an array of round statistics, including normalized averages and median values
+  def review_rounds_statistics
+
+  end
 
   def self.export_details(csv, parent_id, detail_options)
     return csv unless detail_options.value?('true')
@@ -454,6 +459,8 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+
+  
   # This method is used for export detailed contents. - Akshit, Kushagra, Vaibhav
   def self.export_details_fields(detail_options)
     fields = []

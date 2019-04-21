@@ -61,10 +61,13 @@ class Response < ActiveRecord::Base
     end
     puts responses #debug print
     #sum up the suggestion chance percentages
-    avg = 0
+
+    avg = -1
     responses.each{|r| avg += r.suggestion_chance_percentage if !r.suggestion_chance_percentage.nil? }
     #divide by the number of responses
-    avg /= response_map_list.size.to_f
+
+    return (avg / response_map_list.size) if avg > 0
+    avg
     #average is returned for suggestion chances
   end
 

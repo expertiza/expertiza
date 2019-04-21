@@ -3,6 +3,7 @@ describe Response do
   let(:participant2) { build(:participant, id: 2) }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
   let(:team) { build(:assignment_team) }
+  let(:signed_up_team) { build(:signed_up_team, team_id: team.id) }
   let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer]) }
   let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
@@ -108,6 +109,9 @@ describe Response do
   end
 
   describe '#questionnaire_by_answer' do
+    before(:each) do
+      allow(SignedUpTeam).to receive(:find_by).with(team_id: team.id).and_return(signed_up_team)
+    end
     context 'when answer is not nil' do
       it 'returns the questionnaire of the question of current answer' do
         allow(Question).to receive(:find).with(1).and_return(question)
@@ -115,7 +119,6 @@ describe Response do
         expect(response.questionnaire_by_answer(answer)).to eq(questionnaire2)
       end
     end
-
     context 'when answer is nil' do
       it 'returns review questionnaire of current assignment' do
         allow(ResponseMap).to receive(:find).with(1).and_return(review_response_map)

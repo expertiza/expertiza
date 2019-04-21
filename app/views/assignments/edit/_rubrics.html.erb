@@ -285,15 +285,23 @@
         }
     }
 
-  </script>
+    function handleCheckReviewVaryByTopic(checkvalue) {
+        var state = checkvalue.checked;
+        if (state == true) {
+            <% @assignment_form.assignment_questionnaire_vary_by_topic_handler(true) %>
+        } else {
+            <% @assignment_form.assignment_questionnaire_vary_by_topic_handler(false) %>
+        }
+    }
+</script>
 
 <!--Add a review varies by round checkbox. -->
 <input name="assignment_questionnaire[used_in_round]" type="hidden" value="false" />
-<%= check_box_tag('assignment_questionnaire[used_in_round]', 'true', @review_vary_by_round_check, :onclick=>"handleCheckReviewVaryByRound(this)" ) %>
+<%= check_box_tag('assignment_questionnaire[used_in_round]', 'true', @review_vary_by_round_check, :onclick=>"handleCheckReviewVaryByRound(this);") %>
 <%= label_tag('assignment_questionnaire[used_in_round]', 'Review rubric varies by round?') %>
 <br>
 <input name="assignment_questionnaire[topic_id]" type="hidden" value="false" />
-<%= check_box_tag('assignment_questionnaire[topic_id]', 'true', @review_vary_by_topic_check) %>
+<%= check_box_tag('assignment_questionnaire[topic_id]', 'true', @review_vary_by_topic_check, :onclick=>"handleCheckReviewVaryByTopic(this);") %>
 <%= label_tag('assignment_questionnaire[topic_id]', 'Review rubric varies by topic?') %>
 
 <div>

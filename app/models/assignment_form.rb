@@ -346,8 +346,31 @@ class AssignmentForm
         notification_limit: aq.notification_limit,
         questionnaire_weight: aq.questionnaire_weight,
         used_in_round: aq.used_in_round,
-        dropdown: aq.dropdown
+        dropdown: aq.dropdown,
+        topic_id: aq.topic_id
       )
+    end
+  end
+
+  def assignment_questionnaire_vary_by_topic_handler(vary)
+    if vary
+      topics = SignUpTopic.where(assignment_id: @assignment.id)
+      aqs = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
+      topics.each do |topic|
+        aqs.each do |aq|
+          AssignmentQuestionnaire.create(assignment_id: aq.assignment_id, questionnaire_id: aq.questionnaire_id,
+                                         user_id: aq.user_id, notification_limit: aq.notification_limit,
+                                         questionnaire_weight: aq.questionnaire_weight, used_in_round: aq.used_in_round,
+                                         dropdown: aq.dropdown, topic_id: topic.id)
+        end
+      end
+      AssignmentQuestionnaire.destroy_all(["assignment_id = ? AND topic_id = ?", @assignment.id, nil])
+    else
+      AssignmentQuestionnaire.where(assignment_id: @assignment.id).update_all(topic_id: nil)
+      ids = AssignmentQuestionnaire.select("MIN(id) as id").group(:assignment_id, :questionnaire_id, :user_id,
+                                                                  :notification_limit, :questionnaire_weight,
+                                                                  :used_in_round, :dropdown, :topic_id).collect(&:id)
+      AssignmentQuestionnaire.where.not(id: ids).destroy_all
     end
   end
 end

@@ -231,14 +231,26 @@ class Response < ActiveRecord::Base
 						 '</tr></table>'
   end
 
+  def revision_review_questionnaire(answers)
+    review_questionnaire = nil
+    answers.each do |ans|
+      review_questionnaire = Question.find(ans.question_id).questionnaire
+      end
+    review_questionnaire
+  end
+
   def construct_review_response code, self_id, show_tags = nil, current_user = nil
     code += '<table id="review_' + self_id + '" style="display: none;" class="table table-bordered">'
     answers = Answer.where(response_id: self.response_id)
     unless answers.empty?
       questionnaire = self.questionnaire_by_answer(answers.first)
+      review_questionnaire = revision_review_questionnaire(answers)
       questionnaire_max = questionnaire.max_question_score
       questions = questionnaire.questions.sort_by(&:seq)
+      if questionnaire.id != review_questionnaire.id
+        questions += review_questionnaire.questions.sort_by(&:seq) unless review_questionnaire.nil?
       # get the tag settings this questionnaire
+      end
       tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id) : nil
       code = add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments, current_user
     end

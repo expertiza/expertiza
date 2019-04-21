@@ -8,19 +8,30 @@ class QuestionnairesController < ApplicationController
 
   # Check role access for edit questionnaire
   def action_allowed?
+    @questionnaire = Questionnaire.find(params[:id])
     if params[:action] == "edit"
-      @questionnaire = Questionnaire.find(params[:id])
       (['Super-Administrator',
         'Administrator'].include? current_role_name) ||
           ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id))) ||
-          ((['Teaching Assistant'].include? current_role_name) && assign_instructor_id == @questionnaire.try(:instructor_id))
-
+          ((['Teaching Assistant'].include? current_role_name) && assign_instructor_id == @questionnaire.try(:instructor_id)) ||
+          can_student_edit?
     else
       ['Super-Administrator',
        'Administrator',
        'Instructor',
        'Teaching Assistant', 'Student'].include? current_role_name
     end
+  end
+
+  def can_student_edit?
+    if !params[:ppid].nil?
+      @questionnaire = Questionnaire.find(params[:id])
+      @participant_id = params[:ppid]
+      @participant = AssignmentParticipant.find(params[:ppid])
+      @aq = AssignmentQuestionnaire.find_by(user_id: @participant.team.participants.collect{|p| p.user_id})
+      (['Student'].include? current_role_name) && @questionnaire.id == @aq.questionnaire_id
+    end
+    true
   end
 
   # Create a clone of the given questionnaire, copying all associated

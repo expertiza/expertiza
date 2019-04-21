@@ -10,7 +10,7 @@
     <%= render partial: 'submitted_content/self_review', locals: {participant: @participant, stage: @stage, origin: ''} %>
 <% end %>
 <% if @round > 1 && @assignment.can_modify_rubric == true %>
-    <h3>Revision Planning</h3>
+    <h4>&#8226; Revision Planning</h4>
     <% if @questionnaire.nil? %>
 
     <%= link_to 'Begin', controller: :submitted_content, action: :begin_planning, id: @participant_id %>

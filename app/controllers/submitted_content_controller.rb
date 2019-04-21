@@ -168,7 +168,7 @@ class SubmittedContentController < ApplicationController
 
   def begin_planning
     @participant_id = params[:id]
-    @q = Questionnaire.new
+    @revision_questionnaire = Questionnaire.new
 
   end
 
@@ -184,12 +184,20 @@ class SubmittedContentController < ApplicationController
     review_questionnaire.save
     participant_id = params[:id]
     participant = AssignmentParticipant.find(participant_id)
+    team = participant.team
     return unless current_user_id?(participant.user_id)
     aq = AssignmentQuestionnaire.new
     aq.assignment = Assignment.find(participant.parent_id)
     aq.questionnaire = review_questionnaire
     aq.user_id = participant.user_id
     aq.save
+    #Create a submission record for revision planning questionnaire
+    SubmissionRecord.create(team_id: team.id,
+                            content: "Revision Planning",
+                            user: participant.name,
+                            assignment_id: participant.assignment.id,
+                            questionnaire_id: review_questionnaire.id,
+                            operation: "Revision Planning")
     redirect_to controller: 'questionnaires', action: 'edit', id: review_questionnaire.id, ppid: participant_id
   end
 

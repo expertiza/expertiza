@@ -1,11 +1,22 @@
 <%= form_tag url_for(:action => :revision_planning, :id => @participant_id), method: "post"%>
-<%= text_field 'questionnaire', 'name', class: "form-control width-250" %>
+<h3>Revision Planning Questionnaire </h3>
+<br>
 <table>
-  <tr class="form-inline">
-    <td><label for="min_question_score">Min question score:</label>&nbsp;<%= text_field 'questionnaire', 'min_question_score', :size=> 1, :value=>@q.min_question_score ||= 0, :class => "form-control width-40" %>&nbsp;&nbsp;</td>
-    <td><label for="max_question_score">Max question score:</label>&nbsp;<%= text_field 'questionnaire', 'max_question_score', :size=> 1, :value=>@q.max_question_score ||= 5, :class => "form-control width-40" %>&nbsp;&nbsp;</td>
-    <td><label for="questionnaire_private">Is this <%= @q.display_type %> private:</label>&nbsp;<%= select(:questionnaire, :private, [ ['no', false],['yes',  true]], {}, {class: "form-control"})%>
+  <tr>
+    <td valign="top" class="form-inline"><label for="questionnaire_name">Name:</label>
+    <%= text_field 'questionnaire', 'name', class: "form-control width-250" %>
     </td>
   </tr>
 </table>
+<table>
+  <tr class = "form-inline">
+    <td><label for="min_question_score">Min question score:</label>&nbsp;<%= text_field 'questionnaire', 'min_question_score', :size=> 1, :value=>@revision_questionnaire.min_question_score ||= 0, :class => "form-control width-40" %>&nbsp;&nbsp;</td>
+    <td><label for="max_question_score">Max question score:</label>&nbsp;<%= text_field 'questionnaire', 'max_question_score', :size=> 1, :value=>@revision_questionnaire.max_question_score ||= 5, :class => "form-control width-40" %>&nbsp;&nbsp;</td>
+    <td><label for="questionnaire_private">Is this <%= @revision_questionnaire.display_type %> private:</label>&nbsp;<%= select(:questionnaire, :private, [ ['no', false],['yes',  true]], {}, {class: "form-control"})%>
+    </td>
+  </tr>
+</table>
+<br>
 <button>Create</button>
+<br><br>
+<a href="javascript:window.history.back()">Back</a>

@@ -83,14 +83,16 @@ class ResponseController < ApplicationController
     msg = ""
     begin
       @map = @response.map
+      @team = Team.find(@map.reviewee_id)
       @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = set_questionnaire
       questions = sort_questions(@questionnaire.questions)
+      questions += sort_questions(@revision_review_questionnaire.questions) unless @revision_review_questionnaire.nil?
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
-    rescue StandardError
-      msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
+     rescue StandardError
+       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
     redirect_to controller: 'response', action: 'save', id: @map.map_id,
@@ -108,6 +110,7 @@ class ResponseController < ApplicationController
     @response = Response.where(map_id: @map.id, round: @current_round.to_i).first
     @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0) if @response.nil?
     questions = sort_questions(@questionnaire.questions)
+    questions += sort_questions(@revision_review_questionnaire.questions) unless @revision_review_questionnaire.nil?
     init_answers(questions)
     render action: 'response'
   end
@@ -161,7 +164,9 @@ class ResponseController < ApplicationController
 
     # ,:version_num=>@version)
     # Change the order for displaying questions for editing response views.
+    set_revision_review_questionnaire
     questions = sort_questions(@questionnaire.questions)
+    questions += sort_questions(@revision_review_questionnaire.questions) unless @revision_review_questionnaire.nil?
     create_answers(params, questions) if params[:responses]
     msg = "Your response was successfully saved."
     error_msg = ""
@@ -268,6 +273,7 @@ class ResponseController < ApplicationController
   # if false: we figure out which questionnaire to display base on @response object
   # e.g. student click "Edit" or "View"
   def set_content(new_response = false)
+    @team = Team.find(@map.reviewee_id)
     @title = @map.get_title
     if @map.survey?
       @survey_parent = @map.survey_parent
@@ -279,8 +285,18 @@ class ResponseController < ApplicationController
     new_response ? set_questionnaire_for_new_response : set_questionnaire
     set_dropdown_or_scale
     @questions = sort_questions(@questionnaire.questions)
+    @count = 0
+    @questions.each do
+      @count += 1
+    end
+    @total_count = 0
+    @questions += sort_questions(@revision_review_questionnaire.questions) unless @revision_review_questionnaire.nil?
+    @questions.each do
+      @total_count += 1
+    end
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
+
   end
 
   # assigning the instance variables for Edit and New actions
@@ -308,6 +324,7 @@ class ResponseController < ApplicationController
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.number_of_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
+      set_revision_review_questionnaire
     when
       "MetareviewResponseMap",
       "TeammateReviewResponseMap",
@@ -332,8 +349,22 @@ class ResponseController < ApplicationController
   def set_questionnaire
     # if user is not filling a new rubric, the @response object should be available.
     # we can find the questionnaire from the question_id in answers
+    @revision_review_questionnaire = set_revision_review_questionnaire
     answer = @response.scores.first
     @questionnaire = @response.questionnaire_by_answer(answer)
+  end
+
+  def set_revision_review_questionnaire
+    @team = Team.find(@map.reviewee_id)
+    submission_record = SubmissionRecord.where(["team_id = ? and operation = ?", @team.id, "Revision Planning"])
+    if submission_record.first.nil?
+      @revision_review_questionnaire = nil
+    else
+    @revision_review_questionnaire = nil
+    q_id = submission_record.first.questionnaire_id
+    @revision_review_questionnaire = Questionnaire.find(q_id)
+    end
+    @revision_review_questionnaire
   end
 
   def set_dropdown_or_scale

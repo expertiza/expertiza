@@ -14,7 +14,7 @@ class QuestionsController < ApplicationController
     ['Super-Administrator',
      'Administrator',
      'Instructor',
-     'Teaching Assistant'].include? current_role_name
+     'Teaching Assistant', 'Student'].include? current_role_name
   end
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)

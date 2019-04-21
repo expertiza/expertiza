@@ -212,17 +212,27 @@ class ResponseController < ApplicationController
 
     #compute average for all response fields
     suggestion_chance = 0
+    suggestion_sentiment_score = 0
+
     #puts @api_response["results"]
     puts @api_response["results"].size
-    0.upto(@api_response["results"].size - 1) do |i|
+    number_of_responses = @api_response["results"].size
+
+    0.upto(number_of_responses- 1) do |i|
       suggestion_chance += @api_response["results"][i]["metrics"]["suggestion"]["suggestions_chances"]
+      suggestion_sentiment_score += @api_response["results"][i]["metrics"]["sentiment"]["sentiment_score"]
     end
-    average_suggestion_chance = (suggestion_chance/@api_response["results"].size)
+
+    average_suggestion_chance = suggestion_chance/number_of_responses
     average_suggestion_chance = average_suggestion_chance.to_i
-    #puts average_suggestion_chance.to_s    #debug print
+    average_suggestion_sentiment_score = suggestion_sentiment_score/number_of_responses
 
+    puts suggestion_chance.to_s    #debug print
+    puts average_suggestion_sentiment_score.to_s
+
+    @response.update_suggestion_chance(average_suggestion_chance)
+    # compute average
     assignment_suggestion_average = -1;
-
     @response = Response.find_by_id(_params[:id])
     if (@response.nil?)   ##should never happen if we save before submit!
       # we do not have any records on file for the first submitter

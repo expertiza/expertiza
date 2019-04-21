@@ -34,10 +34,8 @@ unless CURRENT_MAINTAINERS.include? PR_AUTHOR
     WELCOME_MESSAGE_COURSE_PROJECT =
       markdown <<-MARKDOWN
 Thanks for the pull request, and welcome! :tada: The Expertiza team is excited to review your changes, and you should hear from us soon.
-
 This repository is being automatically checked for code-quality issues using `Code Climate`.
 You can see results for this analysis in the PR status below. Newly introduced issues should be fixed before a pull request is considered ready to review.
-
 Also, please spend some time looking at the instructions at the top of your course project writeup.
 If you have any questions, please send email to <a href="mailto:expertiza-support@lists.ncsu.edu">expertiza-support@lists.ncsu.edu</a>.
       MARKDOWN
@@ -47,10 +45,8 @@ If you have any questions, please send email to <a href="mailto:expertiza-suppor
     WELCOME_MESSAGE =
       markdown <<-MARKDOWN
 Thanks for the pull request, and welcome! :tada: The Expertiza team is excited to review your changes, and you should hear from us soon.
-
 This repository is being automatically checked for code quality issues using `Code Climate`.
 You can see results for this analysis in the PR status below. Newly introduced issues should be fixed before a pull request is considered ready to review.
-
 If you have any questions, please send email to <a href="mailto:expertiza-support@lists.ncsu.edu">expertiza-support@lists.ncsu.edu</a>.
       MARKDOWN
 
@@ -557,3 +553,4 @@ To avoid `shallow tests` -- tests concentrating on irrelevant, unlikely-to-fail 
     break
   end
 end
+

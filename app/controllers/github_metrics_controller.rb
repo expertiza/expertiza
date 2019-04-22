@@ -7,6 +7,7 @@ class GithubMetricsController < ApplicationController
   include StudentTaskHelper
   include AssignmentHelper
   include GradesHelper
+  include GithubMetricsHelper
 
   def action_allowed?
     case params[:action]

@@ -103,7 +103,7 @@ class GithubMetricsController < ApplicationController
     if session["github_access_token"].nil?
       session["participant_id"] = params[:id]
       session["github_view_type"] = "view_submissions"
-      redirect_to authorize_github_grades_path
+      redirect_to authorize_github_github_metrics_path
       return
     end
 

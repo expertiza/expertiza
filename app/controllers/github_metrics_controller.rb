@@ -1,4 +1,4 @@
-class GradesGithubController < ApplicationController
+class GithubMetricsController < ApplicationController
 
   helper :file
   helper :submitted_content

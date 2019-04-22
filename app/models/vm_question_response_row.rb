@@ -28,7 +28,8 @@ class VmQuestionResponseRow
 
   def average_score_for_row
     row_average_score = 0.0
-    # no_of_columns = 0.0 # Counting reviews that are not null
+    # Changes By Rahul Sethi
+    # Making global so that new function can access them
     @no_of_columns = 0.0 # Counting reviews that are not null
     @self_review_score_of_row = @score_row[-1].score_value
     @score_row.each do |score|
@@ -37,22 +38,18 @@ class VmQuestionResponseRow
         row_average_score += score.score_value.to_f
       end
     end
-    unless @no_of_columns.zero?
-      row_average_score /= @no_of_columns
-      row_average_score.round(2)
-    end
+    return unless @no_of_columns.zero?
+    row_average_score /= @no_of_columns
+    row_average_score.round(2)
+    # Changes End
   end
 
-  def composite_score_for_row
-    @total_avg_score = average_score_for_row
-    @peer_total = (@total_avg_score * @no_of_columns) - @self_review_score_of_row
-    @peer_avg = @peer_total / (@no_of_columns - 1)
-    if !@peer_avg.nan?
-      # Apply your formula here
-      composite_score = (100 - (@self_review_score_of_row - @peer_avg).abs) * (@peer_avg / 100)
-      composite_score.round(2)
-    else
-      composite_score = "Not applicable"
-    end
+  def new_derived_score
+    @self_review_score = ((average_score_for_row * @no_of_columns) - @self_review_score_of_row) / (@no_of_columns - 1)
+    @final_score_after = "Self Review Not Enabled"
+    return unless @self_review_score.nan?
+    deviated_score = (100 - (@self_review_score_of_row - @self_review_score).abs) / 100;
+    @final_score_after = deviated_score * @self_review_score
+    @final_score_after.round(2)
   end
 end

@@ -38,11 +38,6 @@ class GradesController < ApplicationController
   end
 
   def view
-    if session["github_access_token"].nil?
-      session["assignment_id"] = params[:id]
-      session["github_view_type"] = "view_scores"
-      return redirect_to authorize_github_grades_path
-    end
     @assignment = Assignment.find(params[:id])
     questionnaires = @assignment.questionnaires
     if @assignment.varying_rubrics_by_round?

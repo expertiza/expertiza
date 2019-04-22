@@ -347,14 +347,14 @@ class GradesController < ApplicationController
   end
 
   def round_names(scores)
-    (1..scores.length).map { |i| "Round #{i}" }
+    (1..scores.length).map {|i| "Round #{i}" }
   end
 
   def criteria_names(scores)
     index = 0
     array = []
     scores.each do |review_round|
-      array << (1..review_round.criteria_stats.size).map { |i| "Criterion #{index + i}" }
+      array << (1..review_round.criteria_stats.size).map {|i| "Criterion #{index + i}" }
       index += review_round.criteria_stats.size
     end
     array

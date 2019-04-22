@@ -1,4 +1,4 @@
-class Stats
+class CriterionStats
   attr_accessor :mean, :median
 
   def initialize(mean, median)

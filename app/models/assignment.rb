@@ -425,29 +425,25 @@ class Assignment < ActiveRecord::Base
     rounds = aqs_with_round.map { |q| q.used_in_round }
     rounds.sort!
   end
-  @@stats = [
-    ReviewRoundStats.new(
-      CriteriaStats.new([
-                          Stats.new(76, 3),
-                          Stats.new(84,3.5),
-                          Stats.new(54, 2.5),
-                          Stats.new(92, 3.5),
-                          Stats.new(64, 3)
-                        ])
-    ),
-    ReviewRoundStats.new(
-      CriteriaStats.new([
-                          Stats.new(64, 3),
-                          Stats.new(92,3.5),
-                          Stats.new(78, 3),
-                          Stats.new(54, 2.5)
-                        ])
-    )
-  ]
 
   # Provides an array of round statistics, including normalized averages and median values
   def self.review_rounds_statistics
-    @@stats
+    [AssignmentStats.new([
+                           ReviewRoundStats.new([
+                                                  CriterionStats.new(76, 3),
+                                                  CriterionStats.new(84, 3.5),
+                                                  CriterionStats.new(54, 2.5),
+                                                  CriterionStats.new(92, 3.5),
+                                                  CriterionStats.new(64, 3)
+                                                ]),
+                           ReviewRoundStats.new([
+                                                  CriterionStats.new(64, 3),
+                                                  CriterionStats.new(92, 3.5),
+                                                  CriterionStats.new(78, 3),
+                                                  CriterionStats.new(54, 2.5)
+                                                 ])
+                            ])
+    ]
   end
 
   def self.export_details(csv, parent_id, detail_options)

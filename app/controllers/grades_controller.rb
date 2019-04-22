@@ -68,9 +68,11 @@ class GradesController < ApplicationController
     # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
     @pscore = @participant.scores(@questions)
 
-    #Changes by Rahul Sethi
-    @new_derived_scores = @participant.scores(@questions)
-    #Changes End
+    # Changes by Rahul Sethi
+    if @assignment.is_selfreview_enabled?
+      @new_derived_scores = @participant.scores(@questions)
+    end
+    # Changes End
 
     make_chart
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
@@ -95,7 +97,9 @@ class GradesController < ApplicationController
     @pscore = @participant.scores(@questions)
 
     # Changes by Rahul Sethi
-    @new_derived_scores = @participant.scores(@questions)
+    if @assignment.is_selfreview_enabled?
+      @new_derived_scores = @participant.scores(@questions)
+    end
     # Changes End
 
     @vmlist = []

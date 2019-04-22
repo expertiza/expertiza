@@ -8,6 +8,7 @@ tmp/**/*
 vendor/assets/components/
 config/database.yml
 config/google_auth.yml
+config/github_auth.yml
 docker-compose.yml
 config/secrets.yml
 coverage

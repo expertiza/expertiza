@@ -1,4 +1,5 @@
-class GithubMetricsController < ApplicationController
+class GradesGithubController < ApplicationController
+
   helper :file
   helper :submitted_content
   helper :penalty
@@ -15,8 +16,8 @@ class GithubMetricsController < ApplicationController
        'Administrator',
        'Super-Administrator',
        'Student'].include? current_role_name and
-          are_needed_authorizations_present?(params[:id], "reader", "reviewer") and
-          check_self_review_status
+      are_needed_authorizations_present?(params[:id], "reader", "reviewer") and
+      check_self_review_status
     when 'view_team'
       if ['Student'].include? current_role_name # students can only see the head map for their own team
         participant = AssignmentParticipant.find(params[:id])
@@ -127,7 +128,7 @@ class GithubMetricsController < ApplicationController
 
   def get_github_repository_details(hyperlink_data)
     data = {
-        query: "query {
+      query: "query {
         repository(owner: \"" + hyperlink_data["owner_name"] + "\", name: \"" + hyperlink_data["repository_name"] + "\") {
           ref(qualifiedName: \"master\") {
             target {
@@ -242,7 +243,7 @@ class GithubMetricsController < ApplicationController
 
   def get_query(hyperlink_data)
     {
-        query: "query {
+      query: "query {
         repository(owner: \"" + hyperlink_data["owner_name"] + "\", name:\"" + hyperlink_data["repository_name"] + "\") {
           pullRequest(number: " + hyperlink_data["pull_request_number"] + ") {
             number additions deletions changedFiles mergeable merged headRefOid

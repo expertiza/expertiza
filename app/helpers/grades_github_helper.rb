@@ -1,4 +1,4 @@
-module GradesGithubHelper
+module GithubMetricsHelper
 
 	def display_github_metrics(parsed_data, authors, dates)
     data_array = []

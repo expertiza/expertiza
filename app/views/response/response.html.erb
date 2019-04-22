@@ -58,29 +58,29 @@
     //if it's was in the background, don't auto save to avoid conflict
     setInterval(function() {
       if(vis() && $("#autosave_cbx").prop("checked"))
-        executeSave();
+        autoSaveForm();
     }, interval);
 
-
     //click ajax
-    function executeSave(){
+    function autoSaveForm() {
       timeDiff = (new Date().getTime() - last_save.getTime())/1000;
       // ignore saving unless the last save was more than 5s
       if (timeDiff>5 && $('.review_form').length > 0) {
-        $('form').attr('data-remote', 'true');
-        $('#save_review').click();
-        last_save = new Date;
-        if ($('input[name=saved]').value = "0")
-          $('input[name=saved]').val("1");
-        $('form').removeAttr('data-remote');
+        //set save_type param 
+        jQuery('#save_type').val('auto_save'); 
+        sendFormData();
       }
 
+      // a nested event function under autoSaveForm()
       $(document).ajaxError(function(event, request, settings) {
+        console.log("\r\nAn ajax error occured: \r\n"+request);
         if (settings.url.includes("response") && settings.type == "POST")
           $('#save_progress').html('<span id="tick"> &#9940; </span>' + 'Unable to reach the expertiza server. <br>Create a backup of your comments and you may try to login again in a while');
       })
 
+      // a nested event function under autoSaveForm()
       $('form#<%=@modified_object%>').bind('ajax:success', function(evt, data, status, xhr){
+        console.log("\r\nSome kind of AJAX success event as well?\r\n" + data);
         $('#save_progress').html('<span id="tick"> &#10004; </span>' +
             'A draft was saved on ' + last_save.toLocaleString('en-US', {
               weekday: 'short',
@@ -94,32 +94,38 @@
       });
     }
 
-    $('#save_review').click(function(){
+    // send form data to controller using PATCH
+    function sendFormData(){
+      $.ajax({
+        type: "PATCH",
+        url: "../../../response",
+        // form data is in the data: property
+        data: $("#review_form").serialize(),
+        dataType: "script",
+        success: function(data) {
+          console.log("\r\nResponse after submitting data via AJAX :\r\n"+data);
+        }
+      });
+    }
+
+    $('#save_button').click(function(){
+      //set save_type param
+      jQuery('#save_type').val('save_button');
+
+      // show UI label with a timeout
       $('#save_confirm').html('<span id="tick"> &#10004; </span>&nbsp;Saving review!')
       setTimeout(function(){
         $('#save_confirm').html('')
       }, 5000);
     });
-    $('#Submit').click(function(e){
-      //if(!confirm('Once a review has been submitted, you cannot edit it again')){
-        //e.preventDefault();
-       // e.stopPropagation();
-       // return;
-     // }else{
-      //  jQuery('#isSubmit').val('Yes');
-      //  window.location.href= "../../../student_review/list?id=<%= @map.reviewer.id %>";
-     // }
 
-        // save review
-        executeSave();
-
-        // navigate to response confirmation page
-        window.location.href= "../../../response/show_confirmation_page?id=<%= @response.id %>&return=<%= @return %>";
-        
+    $('#submit_button').click(function(e){
+        //set save_type param 
+        jQuery('#save_type').val('submit_button'); 
     });
 
     // update the values in the form using ajax
-    function updateForm(){
+    function setFormValues(){
       //update the additional comments
       $.get("../../../response/json?response_id=<%= @response.id %>", function(data){
         if(data.additional_comment != null) {
@@ -194,10 +200,10 @@
         displayOverlay("Loading");
         // delay one second to let the data saved if the user switch back and forth
         setTimeout(function() {
-          updateForm();
+          setFormValues();
         }, 1000);
       }else if (!vis() && $("#autosave_cbx").prop("checked")){
-        executeSave();
+        autoSaveForm();
         //console.log("Saving before going to background at " + new Date().toLocaleString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }));
       }
     });
@@ -219,6 +225,7 @@
         "cursor": "wait"
       }).appendTo("body");
     }
+
     function removeOverlay() {
       $("#overlay").remove();
     }
@@ -231,60 +238,29 @@
         setTimeout(function(){
           var r = confirm("The window has been idle more than " + maxIdleTime + " minutes. Auto save is disabled. Do you want to enable it again?");
           if (r == true) {
-            updateForm();
+            setFormValues();
             $("#autosave_cbx").prop("checked","true");
           }else
             $("#autosave_cbx").removeProp("checked");
         }, 1000);
       }
     }, interval);
+
     //Zero the idle timer on mouse movement.
     $(this).mousemove(function (e) {
       idleTime = 0;
     });
+
     $(this).keypress(function (e) {
       idleTime = 0;
     });
+
     //restart the counter if it's just checked
     $("#autosave_cbx").change(function (e){
       if($(this).prop("checked"))
         idleTime = 0;
     });
     /// end auto reload
-
-    /*attach event handler to all tinymce editors
-    tinyMCE.on('AddEditor', function(e) {
-      e.editor.on('blur', function (e) {
-        ed = e.target;
-        if (ed.id.includes("comments")){
-          json_review = JSON.stringify({ "review": ed.getContent({format : 'text'}) })
-
-          $.ajax({
-            url: "http://peerlogic.csc.ncsu.edu/sentiment/visualize_sentiment",
-            type: "POST",
-            crossDomain: true,
-            contentType: "application/json",
-            data: json_review,
-            dataType: "html",
-            success: function (response) {
-              var toneAnalysisResult = '<div class="panel panel-default">' +
-                                          '<div class="panel-heading">Tone analysis</div>' +
-                                          '<div class="panel-body">' + response + '</div>' +
-                                        '</div>'
-              if(ed.id.includes("responses"))
-                  $('#' + ed.id.replace("responses", "analysis")).html(toneAnalysisResult);
-              else if(ed.id.includes('review_comments'))
-                  $('#review_comments_analysis').html(toneAnalysisResult);
-            },
-            error: function (xhr, status) {
-              $('#save_progress').html('Unable to reach tone analysis service at the moment')
-            }
-          });
-        }
-      });
-    });
-*/
-
   });
 </script>
 
@@ -342,9 +318,14 @@
 <input type="checkbox" id="autosave_cbx" checked>
 <label id="autosave_cbx_lbl" for="autosave_cbx"></label>
 <div id="save_progress"></div>
-<%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form") do %>
+
+<!-- The response form -->
+<p>The action method is: <%= @next_action %> </p>
+<%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form", :remote: true) do %>
     <%= hidden_field_tag "map_id", @modified_object %>
     <%= hidden_field_tag "saved", (@header == "New") ? 1 : 0 %>
+    <%= hidden_field_tag "save_type", "" %>
+
     <% if @next_action.eql?'update' %>
         <input name="_method" type="hidden" value="put" />
     <%end%>
@@ -414,10 +395,10 @@
     <br/>
     <br>
     <div id="save_confirm"></div>
-    <%= submit_tag "Save "+@title, :name => "save", :id => "save_review" %>
+    <%= submit_tag "Save "+@title, :name => "save", :id => "save_button" %>
     <!--#E1600 check title for selfreview to show submit button-->
     <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review')) %>
-        <%= submit_tag "Confirm "+@title, :name => "Submit", :id => "Submit" %>
+        <%= submit_tag "Submit "+@title, :name => "Submit", :id => "submit_button" %>
         <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
     <% end %>
     <%= hidden_field_tag('return', @return) %>

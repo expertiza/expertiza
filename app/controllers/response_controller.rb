@@ -68,7 +68,6 @@ class ResponseController < ApplicationController
     is_submitted = params[:isSubmit].present?
     was_submitted = false
 
-    print("\r\nIsSubmit #{is_submitted}\r\n")
     
     # NEW Change: when creating (not in db yet) a response Submit is clicked, 
     #instead of immediately redirecting...confirm response first
@@ -106,6 +105,7 @@ class ResponseController < ApplicationController
   def update
     render nothing: true unless action_allowed?
     is_submitted = params[:isSubmit].present?
+    save_type = params[:save_type]
 
     print("\r\nIsSubmit #{is_submitted}\r\n")
     # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
@@ -115,8 +115,22 @@ class ResponseController < ApplicationController
 
     save_response("update")
 
-    if !is_submitted
-       redirect_to controller: 'submitted_content', action: 'edit', id: @map.reviewer.id
+    if save_type
+      case save_type
+      when "submit_button"
+        print("\r\nThe submit button was clicked\r\n")
+        redirect_to controller: 'response', action: 'show_confirmation_page', id: @response.id, return: params[:return]
+      when "save_button"
+        print("\r\nThe submit button was clicked\r\n")
+        redirect_to controller: 'submitted_content', action: 'edit', id: @map.reviewer.id
+      when "auto_save"
+        print("\r\nAuto save occured\r\n")
+      end
+    end
+
+    respond_to do |format|
+      format.html
+      format.js
     end
 
   end

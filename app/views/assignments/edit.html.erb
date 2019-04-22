@@ -73,6 +73,7 @@
           }
         })
         jQuery("#tabs").tabs({
+          // Changing from one tab to another is sort of like a "save" action
           beforeActivate: function (event, ui) {
             var deleteTeam = 0;
             var frm = jQuery("#assignment_form");
@@ -86,6 +87,14 @@
                 url: frm.attr('action'),
                 method: frm.attr('method'),
                 data: frm.serialize(),
+                success: function(data, textStatus, xhr){
+                    // REFRESH the topics tab after changing tabs
+                    // Specifically useful when switching between vary-do-not-vary by topic on the Rubrics tab
+                    // This changes how the Topics tab should appear
+                    // Followed instructions at:
+                    // https://atlwendy.ghost.io/render-a-partial-view-tutorial-for-beginners/
+                    jQuery("#tabs-2").html(data)
+                },
               })
             } else {
               event.preventDefault();

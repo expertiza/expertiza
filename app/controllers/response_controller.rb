@@ -70,7 +70,8 @@ class ResponseController < ApplicationController
 
     print("\r\nIsSubmit #{is_submitted}\r\n")
     
-    # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
+    # NEW Change: when creating (not in db yet) a response Submit is clicked, 
+    #instead of immediately redirecting...confirm response first
     print("\r\nThe params in the create method are: \r\n")
     print(params)
     print("\r\n")
@@ -222,10 +223,15 @@ class ResponseController < ApplicationController
   def save_response(http_method)
     print("\r\n Inside the save_response(#{http_method}) method\r\n")
     
-
     case http_method
     when "create"
+      create_response
+    when "update"
+      update_response
+    end
+  end
 
+  def create_response
       # NEW change: is_submitted is always false for create.
       is_submitted = false
 
@@ -266,7 +272,10 @@ class ResponseController < ApplicationController
       end
       redirect_to controller: 'response', action: 'save', id: @map.map_id,
                   return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
-    when "update"
+
+  end
+
+  def update_response
       # the response to be updated
       @response = Response.find(params[:id])
       @map = @response.map
@@ -285,9 +294,7 @@ class ResponseController < ApplicationController
          save_unconfirmed_response
       end
 
-    end
   end
-
 
   def save_confirmed_response
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
@@ -315,6 +322,7 @@ class ResponseController < ApplicationController
   end
 
   def save
+    # This method redirects to other views
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save

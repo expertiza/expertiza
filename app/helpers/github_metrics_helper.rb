@@ -21,7 +21,6 @@ module GithubMetricsHelper
     horizontal_bar_chart data, chart_options
   end
 
-
   def chart_options
     {
         responsive: true,
@@ -59,4 +58,5 @@ module GithubMetricsHelper
     }
 
   end
+
 end

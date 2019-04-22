@@ -105,7 +105,6 @@ module GradesHelper
     return "underlined" if score.comment.present?
   end
 
-
   def retrieve_questions(questionnaires, assignment_id)
     questions = {}
     questionnaires.each do |questionnaire|

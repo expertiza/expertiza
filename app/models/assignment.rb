@@ -426,7 +426,7 @@ class Assignment < ActiveRecord::Base
     rounds.sort!
   end
   @@stats = [
-    ReviewRoundStats.new([
+    ReviewRoundStats.new(
       CriteriaStats.new([
         Stats.new(76, 3),
         Stats.new(84,3.5),
@@ -434,18 +434,18 @@ class Assignment < ActiveRecord::Base
         Stats.new(92, 3.5),
         Stats.new(64, 3)
       ])
-    ]),
-    ReviewRoundStats.new([
+    ),
+    ReviewRoundStats.new(
       CriteriaStats.new([
         Stats.new(64, 3),
         Stats.new(92,3.5),
         Stats.new(78, 3),
         Stats.new(54, 2.5),
       ])      
-    ])
+    )
   ]
   # Provides an array of round statistics, including normalized averages and median values
-  def review_rounds_statistics
+  def self.review_rounds_statistics
     @@stats
   end
 

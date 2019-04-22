@@ -50,7 +50,7 @@ class GradesController < ApplicationController
     end
 
     @scores = @assignment.scores(@questions)
-    averages = calculate_average_vector(@assignment.scores(@questions))
+    averages = calculate_average_vector(@scores)
     @average_chart = bar_chart(averages, 300, 100, 5)
     @avg_of_avg = mean(averages)
     calculate_all_penalties(@assignment.id)
@@ -58,27 +58,23 @@ class GradesController < ApplicationController
     @show_reputation = false
 
     # Temporarily in here to set up the pipes to have things passed to the view
-    @round_names = [
-      'Round 1',
-      'Round 2'
-    ]
-
-    @criteria_names = [
-      ['Criterion 1',
-       'Criterion 2',
-       'Criterion 3',
-       'Criterion 4',
-       'Criterion 5'],
-      ['Criterion 6',
-       'Criterion 7',
-       'Criterion 8',
-       'Criterion 9']
-    ]
-
+    # scores = Assignment.scores
     @avg_data = [
-      [76, 84, 54, 92, 64],
-      [64, 92, 78, 54]
+        [76, 84, 54, 92, 64],
+        [64, 92, 78, 54]
     ]
+
+    @med_data = [
+        [3, 3.5, 2.5, 3.5, 3],
+        [3, 3.5, 3, 2.5]
+    ]
+    scores = Assignment.review_rounds_statistics
+
+    @assignment_name = @assignment.name
+
+    @round_names = round_names(scores)
+
+    @criteria_names = criteria_names(scores)
 
     @assignment_avg_data = [
       [
@@ -94,13 +90,6 @@ class GradesController < ApplicationController
     @assignment_names = [
       'OSS project/Writing assignment 2',
       'Final Project Design Document Fall2015'
-    ]
-
-    @assignment_name = 'Final Project (and Design Document)'
-
-    @med_data = [
-      [3, 3.5, 2.5, 3.5, 3],
-      [3, 3.5, 3, 2.5]
     ]
   end
 
@@ -355,5 +344,19 @@ class GradesController < ApplicationController
 
   def mean(array)
     array.inject(0) {|sum, x| sum += x } / array.size.to_f
+  end
+
+  def round_names(scores)
+    (1..scores.length).map {|i| "Round #{i}"}
+  end
+
+  def criteria_names(scores)
+    index = 0
+    array = []
+    scores.each do |review_round|
+      array << (1..review_round.criteria_stats.size).map {|i| "Criterion #{index+i}"}
+      index += review_round.criteria_stats.size
+    end
+    array
   end
 end

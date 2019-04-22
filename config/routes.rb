@@ -277,6 +277,7 @@ resources :institution, except: [:destroy] do
       post :custom_create
       get :pending_surveys
       get :json
+      get :show_confirmation_page
     end
   end
 

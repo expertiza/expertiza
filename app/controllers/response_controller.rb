@@ -75,13 +75,7 @@ class ResponseController < ApplicationController
     print(params)
     print("\r\n")
     
-    if is_submitted
-      # when the submit button is clicked
-      show_confirmation_page(params)
-    else
-      # When the save button is clicked
-      save_response('create')
-    end
+    save_response('create')
   end
 
   # Determining the current phase and check if a review is already existing for this stage.
@@ -118,13 +112,12 @@ class ResponseController < ApplicationController
     print(params)
     print("\r\n")
 
-    if is_submitted
-      # when the submit button is clicked
-      show_confirmation_page(params)
-    else
-      # when the save button is clicked
-      save_response("update")
+    save_response("update")
+
+    if !is_submitted
+       redirect_to controller: 'submitted_content', action: 'edit', id: @map.reviewer.id
     end
+
   end
 
   def delete
@@ -170,92 +163,72 @@ class ResponseController < ApplicationController
     return JSON.parse(res.body)
   end
 
-  def save
-    @map = ResponseMap.find(params[:id])
-    @return = params[:return]
-    @map.save
-    participant = Participant.find_by(id: @map.reviewee_id)
-    # E1822: Added logic to insert a student suggested 'Good Teammate' or 'Good Reviewer' badge in the awarded_badges table.
-    if @map.assignment.has_badge?
-      if @map.is_a? TeammateReviewResponseMap and params[:review][:good_teammate_checkbox] == 'on'
-        badge_id = Badge.get_id_from_name('Good Teammate')
-        AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
-      end
-      if @map.is_a? FeedbackResponseMap and params[:review][:good_reviewer_checkbox] == 'on'
-        badge_id = Badge.get_id_from_name('Good Reviewer')
-        AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
-      end
-    end
-    # also save response metric:suggestion_chances
-    response_metrics = get_review_response_metrics
+  def show_confirmation_page
+    print("\r\nInside show_confirmation_page\r\n")
 
+    @response = Response.find(params[:id])
 
-    # suggestion_chance = response_metrics["results"][0]["metrics"]["suggestion"]["suggestions_chances"]
-    # puts suggestion_chance.class
-    # puts suggestion_chance.to_s    #debug print
-    # @response = Response.where(map_id: @map.id).first
-    # @response.update_suggestion_chance(suggestion_chance.round)
-    # @response.suggestion_chance_average(@map.reviewed_object_id)
+    # a response should already exist when viewing this page
+    render nothing:true unless @response
 
-
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Response was successfully saved")
-    redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
-  end
-
-  def show_confirmation_page(_params)
-    print("\r\nInside show_confirmation_page(#{_params})\r\n")
-
-    @the_params = _params
     @all_comments = []
-    @the_params[:responses].each_pair do |k, v|
-      comment = v[:comment]
+
+    # NEW change: since response already saved 
+    # fetch comments from Answer model in db instead
+    answers = Answer.where(response_id: @response.id)
+    answers.each do |a|
+      comment = a.comments
       comment.slice! "<p>"
       comment.slice! "</p>"
       # print comment
       @all_comments.push(comment)
     end
+
+    ##@the_params[:responses].each_pair do |k, v|
+      ##comment = v[:comment]
+      ##comment.slice! "<p>"
+      ##comment.slice! "</p>"
+      # print comment
+      ##@all_comments.push(comment)
+   ## end
+
     # send user review to API for analysis
-    @api_response = get_review_response_metrics
-    @response = Response.find(_params[:id])
-    # save to database
+    ##@api_response = get_review_response_metrics
+    ##@response = Response.find(_params[:id])
 
     #compute average for all response fields
-    suggestion_chance = 0
+    ##suggestion_chance = 0
     #puts @api_response["results"]
-    puts @api_response["results"].size
-    0.upto(@api_response["results"].size - 1) do |i|
-      suggestion_chance += @api_response["results"][i]["metrics"]["suggestion"]["suggestions_chances"]
-    end
-    average_suggestion_chance = suggestion_chance/@api_response["results"].size
-    puts suggestion_chance.to_s    #debug print
+    ##puts @api_response["results"].size
+    ##0.upto(@api_response["results"].size - 1) do |i|
+      ##suggestion_chance += @api_response["results"][i]["metrics"]["suggestion"]["suggestions_chances"]
+    ##end
+    ##average_suggestion_chance = suggestion_chance/@api_response["results"].size
+    ##puts suggestion_chance.to_s    #debug print
 
-    @response.update_suggestion_chance(average_suggestion_chance.to_i)
+    ##@response.update_suggestion_chance(average_suggestion_chance.to_i)
     # compute average
 
-    @map = ResponseMap.find(@response.map_id)
+    ##@map = ResponseMap.find(@response.map_id)
     # below is class avg (suggestion score)for this assignment
-    @response.suggestion_chance_average(@map.reviewed_object_id)
+    ##@response.suggestion_chance_average(@map.reviewed_object_id)
 
     #display average
 
     print("\r\nInside show_confirmation_page about to render view\r\n")
-    render action: "review_confirmation"
-  end
-
-  def submit_response
-    print("\r\n Inside the submit_response method\r\n")
-    # TODO: implement this function
+    render action: "show_confirmation_page"
   end
 
   def save_response(http_method)
     print("\r\n Inside the save_response(#{http_method}) method\r\n")
     
-    # the response to be updated
-    @response = Response.find(params[:id])
-    msg = ""
 
     case http_method
     when "create"
+
+      # NEW change: is_submitted is always false for create.
+      is_submitted = false
+
       map_id = params[:id]
       map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
       @map = ResponseMap.find(map_id)
@@ -276,6 +249,7 @@ class ResponseController < ApplicationController
           is_submitted: is_submitted
         )
       end
+      
       was_submitted = @response.is_submitted
       @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
 
@@ -293,22 +267,83 @@ class ResponseController < ApplicationController
       redirect_to controller: 'response', action: 'save', id: @map.map_id,
                   return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
     when "update"
+      # the response to be updated
+      @response = Response.find(params[:id])
+      @map = @response.map
+      msg = ""
+
+      if params[:isSubmit]
+         save_confirmed_response
+         
+	 # log success
+         ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
+         
+         # redirect to save method...which then redirects again
+         redirect_to controller: 'response', action: 'save', id: @map.map_id,
+                  return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
+      else
+         save_unconfirmed_response
+      end
+
+    end
+  end
+
+
+  def save_confirmed_response
+      @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
+      @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
+  end
+
+  def save_unconfirmed_response
       begin
-        @map = @response.map
+        #@map = @response.map
+
         @response.update_attribute('additional_comment', params[:review][:comments])
+
         @questionnaire = set_questionnaire
+
         questions = sort_questions(@questionnaire.questions)
+
         # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
         create_answers(params, questions) unless params[:responses].nil?
-        @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
-        @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
+
+        ##@response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
+        ##@response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
       rescue StandardError
         msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
       end
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
-      redirect_to controller: 'response', action: 'save', id: @map.map_id,
-                  return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
+  end
+
+  def save
+    @map = ResponseMap.find(params[:id])
+    @return = params[:return]
+    @map.save
+    participant = Participant.find_by(id: @map.reviewee_id)
+    # E1822: Added logic to insert a student suggested 'Good Teammate' or 'Good Reviewer' badge in the awarded_badges table.
+    if @map.assignment.has_badge?
+      if @map.is_a? TeammateReviewResponseMap and params[:review][:good_teammate_checkbox] == 'on'
+        badge_id = Badge.get_id_from_name('Good Teammate')
+        AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
+      end
+      if @map.is_a? FeedbackResponseMap and params[:review][:good_reviewer_checkbox] == 'on'
+        badge_id = Badge.get_id_from_name('Good Reviewer')
+        AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
+      end
     end
+    # also save response metric:suggestion_chances
+    ##response_metrics = get_review_response_metrics
+
+
+    # suggestion_chance = response_metrics["results"][0]["metrics"]["suggestion"]["suggestions_chances"]
+    # puts suggestion_chance.class
+    # puts suggestion_chance.to_s    #debug print
+    # @response = Response.where(map_id: @map.id).first
+    # @response.update_suggestion_chance(suggestion_chance.round)
+    # @response.suggestion_chance_average(@map.reviewed_object_id)
+
+
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Response was successfully saved")
+    redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
   def redirect

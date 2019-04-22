@@ -1,0 +1,81 @@
+<style>
+    .review-confirmation {
+        text-indent: 2%;
+    }
+    .notice {
+        font-weight: bold;
+        color: black;
+        background: #fe2;
+    }
+    .danger-notice {
+        font-weight: bold;
+        color:black;
+    }
+</style>
+
+<% if params && params[:id] && @response && !@response.is_submitted %>
+    
+    <h1>Review Confirmation</h1>
+    <h2>Your review has not yet been submitted.</h2>
+    <p>Below is an analysis of the review you have created. In your review...</p>
+
+    <div class="review-confirmation">
+
+        <div class="suggestions">
+	    <h3>Suggestions</h3>
+	    <p>Are there suggestions? <span class="notice">Yes (10%)</span></p>
+	    <p>What is the class average? <span class="notice">0%</span></p>
+        </div>
+
+        <div class="tone">
+	    <h3>Tone</h3>
+	    <p>Did you strike a positive, negative, or neutral tone? <span class="notice">Neutral</span></p>
+	    <p>What about the class? What is the overall tone for this review round? <span class="notice"S>Positive</span></p>
+        </div>
+
+    </div>
+
+    <h3>Submission</h3>
+    <p class="danger-notice">Once a review has been submitted, you cannot edit it again.</p>
+
+    <%= form_tag(response_path(:id => params[:id]), method: :patch) do %>
+        <%= hidden_field_tag "isSubmit", "Yes" %>
+
+        <%= submit_tag "Submit Review" %>
+	<%  if params[:return] %>
+	    <%= link_to "Back", edit_response_path(:id => params[:id], :return => params[:return]) %>
+	<% else %>
+	    <%= link_to "Back", edit_response_path(:id => params[:id]) %>
+	<% end %>
+    <% end %>
+
+   
+    <br/>
+    <br/>
+    <br/>
+    The params
+    <br/>
+    <%= params %>
+
+    <br/>
+    <br/>
+
+
+    <% if @response %>
+        The  response.is_submitted? <%= @response.is_submitted %>
+    <% end %>
+
+    <br/>
+    <br/>
+
+    <% if @api_response %>
+        The  api_response
+        <br/>
+        <%= @api_response %>
+    <% end %>
+
+<% else %>
+
+    <h3>Cannot resubmit review </h3>
+    <%= link_to "Go to Assignments", list_student_task_index_path %>
+<% end %>

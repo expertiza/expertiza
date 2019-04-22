@@ -66,9 +66,7 @@
       timeDiff = (new Date().getTime() - last_save.getTime())/1000;
       // ignore saving unless the last save was more than 5s
       if (timeDiff>5 && $('.review_form').length > 0) {
-        //set save_type param 
-        jQuery('#save_type').val('auto_save'); 
-        sendFormData();
+	$("#auto_save_button").click();
       }
 
       // a nested event function under autoSaveForm()
@@ -81,6 +79,7 @@
       // a nested event function under autoSaveForm()
       $('form#<%=@modified_object%>').bind('ajax:success', function(evt, data, status, xhr){
         console.log("\r\nSome kind of AJAX success event as well?\r\n" + data);
+
         $('#save_progress').html('<span id="tick"> &#10004; </span>' +
             'A draft was saved on ' + last_save.toLocaleString('en-US', {
               weekday: 'short',
@@ -94,20 +93,6 @@
       });
     }
 
-    // send form data to controller using PATCH
-    function sendFormData(){
-      $.ajax({
-        type: "PATCH",
-        url: "../../../response",
-        // form data is in the data: property
-        data: $("#review_form").serialize(),
-        dataType: "script",
-        success: function(data) {
-          console.log("\r\nResponse after submitting data via AJAX :\r\n"+data);
-        }
-      });
-    }
-
     $('#save_button').click(function(){
       //set save_type param
       jQuery('#save_type').val('save_button');
@@ -117,11 +102,35 @@
       setTimeout(function(){
         $('#save_confirm').html('')
       }, 5000);
+
+
+      // a nested event function for the save_button click function on AJAX success 
+      $('form#<%=@modified_object%>').bind('ajax:success', function(evt, data, status, xhr){
+        console.log("\r\nSome kind of AJAX success event as well?\r\n" + data);
+
+	//navigate to the student review page
+	window.location.href= "<%= edit_submitted_content_path(@map.reviewer.id) %>";
+      });
+
     });
 
-    $('#submit_button').click(function(e){
+    $('#submit_button').click(function(){
         //set save_type param 
-        jQuery('#save_type').val('submit_button'); 
+        jQuery('#save_type').val('submit_button');
+
+      // a nested event function for the submit_button click function on AJAX success 
+      $('form#<%=@modified_object%>').bind('ajax:success', function(evt, data, status, xhr){
+        console.log("\r\nSome kind of AJAX success event as well?\r\n" + data);
+
+	//navigate to the confirmation page
+	window.location.href= "../../../response/show_confirmation_page?id=<%= @response.id %>&return=<%= @return %>";
+      });
+
+    });
+
+    $('#auto_save_button').click(function(){
+        //set save_type param 
+        jQuery('#save_type').val('auto_save_button');
     });
 
     // update the values in the form using ajax
@@ -321,10 +330,11 @@
 
 <!-- The response form -->
 <p>The action method is: <%= @next_action %> </p>
-<%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form", :remote: true) do %>
+<%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form", :remote=> true) do %>
     <%= hidden_field_tag "map_id", @modified_object %>
     <%= hidden_field_tag "saved", (@header == "New") ? 1 : 0 %>
     <%= hidden_field_tag "save_type", "" %>
+    <%= submit_tag "", :id => 'auto_save_button', :style => "display: none;" %>
 
     <% if @next_action.eql?'update' %>
         <input name="_method" type="hidden" value="put" />

@@ -65,9 +65,8 @@ class ResponseController < ApplicationController
   end
 
   def create
-    is_submitted = params[:isSubmit].present?
     was_submitted = false
-
+    save_type = params[:save_type]
     
     # NEW Change: when creating (not in db yet) a response Submit is clicked, 
     #instead of immediately redirecting...confirm response first
@@ -76,6 +75,18 @@ class ResponseController < ApplicationController
     print("\r\n")
     
     save_response('create')
+
+    if save_type
+	case save_type
+	when "submit_button"
+		print("\r\n Submit button pressed\r\n")
+	when "save_button"
+		print("\r\n Save button pressed\r\n")
+	when "auto_save_button"
+		print("\r\n Autosave button pressed\r\n")
+  	end
+    end
+
   end
 
   # Determining the current phase and check if a review is already existing for this stage.
@@ -105,9 +116,8 @@ class ResponseController < ApplicationController
   def update
     render nothing: true unless action_allowed?
     is_submitted = params[:isSubmit].present?
-    save_type = params[:save_type]
+    @save_type = params[:save_type]
 
-    print("\r\nIsSubmit #{is_submitted}\r\n")
     # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
     print("\r\nThe params in the update are: \r\n")
     print(params)
@@ -115,22 +125,8 @@ class ResponseController < ApplicationController
 
     save_response("update")
 
-    if save_type
-      case save_type
-      when "submit_button"
-        print("\r\nThe submit button was clicked\r\n")
-        redirect_to controller: 'response', action: 'show_confirmation_page', id: @response.id, return: params[:return]
-      when "save_button"
-        print("\r\nThe submit button was clicked\r\n")
-        redirect_to controller: 'submitted_content', action: 'edit', id: @map.reviewer.id
-      when "auto_save"
-        print("\r\nAuto save occured\r\n")
-      end
-    end
-
     respond_to do |format|
-      format.html
-      format.js
+       format.js
     end
 
   end
@@ -166,23 +162,24 @@ class ResponseController < ApplicationController
   end
 
   # Adding a function to integrate suggestion detection algorithm (SDA)
-  def get_review_response_metrics(comments_array)
-
-    # make sure comments_array is an []
-    return nil unless (comments_array && comments_array.respond_to?(:to_ary))
-
+  def get_review_response_metrics
     uri = URI.parse('https://peer-review-metrics-nlp.herokuapp.com/metrics/all')
     http = Net::HTTP.new(uri.hostname, uri.port)
     req = Net::HTTP::Post.new(uri, initheader = {'Content-Type' =>'application/json'})
-    req.body = {"reviews"=>comments_array,
+    req.body = {"reviews"=>@all_comments,
                       "metrics"=>["suggestion", "sentiment"]}.to_json
     http.use_ssl = true
-
+    
     begin
       res = http.request(req)
-      return JSON.parse(res.body)
+      if res.code == 200 && res.content_type == "application/json"
+      	return JSON.parse(res.body)
+      else
+	return nil
+      end
     rescue StandardError
       return nil
+    end
 
   end
 
@@ -194,7 +191,7 @@ class ResponseController < ApplicationController
     # a response should already exist when viewing this page
     render nothing:true unless @response
 
-    all_comments = []
+    @all_comments = []
 
     # NEW change: since response already saved 
     # fetch comments from Answer model in db instead
@@ -204,39 +201,33 @@ class ResponseController < ApplicationController
       comment.slice! "<p>"
       comment.slice! "</p>"
       # print comment
-      all_comments.push(comment)
+      @all_comments.push(comment)
     end
-    
+
     # send user review to API for analysis
-    @api_response = get_review_response_metrics(all_comments)
+    @api_response = get_review_response_metrics
 
-    if @api_response == nil
-      flash_error "Unable to retrieve analysis from API for your response"
-    else
-      ##@response = Response.find(_params[:id])
+    #compute average for all response fields
+    ##suggestion_chance = 0
+    #puts @api_response["results"]
+    ##puts @api_response["results"].size
+    ##0.upto(@api_response["results"].size - 1) do |i|
+      ##suggestion_chance += @api_response["results"][i]["metrics"]["suggestion"]["suggestions_chances"]
+    ##end
+    ##average_suggestion_chance = suggestion_chance/@api_response["results"].size
+    ##puts suggestion_chance.to_s    #debug print
 
-      #compute average for all response fields
-      ##suggestion_chance = 0
-      #puts @api_response["results"]
-      ##puts @api_response["results"].size
-      ##0.upto(@api_response["results"].size - 1) do |i|
-        ##suggestion_chance += @api_response["results"][i]["metrics"]["suggestion"]["suggestions_chances"]
-      ##end
-      ##average_suggestion_chance = suggestion_chance/@api_response["results"].size
-      ##puts suggestion_chance.to_s    #debug print
+    ##@response.update_suggestion_chance(average_suggestion_chance.to_i)
+    # compute average
 
-      ##@response.update_suggestion_chance(average_suggestion_chance.to_i)
-      # compute average
+    ##@map = ResponseMap.find(@response.map_id)
+    # below is class avg (suggestion score)for this assignment
+    ##@response.suggestion_chance_average(@map.reviewed_object_id)
 
-      ##@map = ResponseMap.find(@response.map_id)
-      # below is class avg (suggestion score)for this assignment
-      ##@response.suggestion_chance_average(@map.reviewed_object_id)
+    #display average
 
-      #display average
-    end
-
-    print("\r\nInside show_confirmation_page about to render view\r\n")
-    render action: "show_confirmation_page"
+    #print("\r\nInside show_confirmation_page about to render view\r\n")
+    #render action: "show_confirmation_page"
   end
 
   def save_response(http_method)
@@ -441,9 +432,6 @@ class ResponseController < ApplicationController
 
   private
 
-  def flash_error(error_msg)
-    flash[:error] = error_msg
-  end
   # new_response if a flag parameter indicating that if user is requesting a new rubric to fill
   # if true: we figure out which questionnaire to use based on current time and records in assignment_questionnaires table
   # e.g. student click "Begin" or "Update" to start filling out a rubric for others' work

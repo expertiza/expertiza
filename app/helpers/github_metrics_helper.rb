@@ -1,4 +1,4 @@
-module GithubMetricHelper
+module GithubMetricsHelper
   def display_github_metrics(parsed_data, authors, dates)
     data_array = []
     color = %w[red yellow blue gray green magenta]

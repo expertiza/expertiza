@@ -442,8 +442,7 @@ class Assignment < ActiveRecord::Base
                                                   CriterionStats.new(78, 3),
                                                   CriterionStats.new(54, 2.5)
                                                  ])
-                            ])
-    ]
+                            ])]
   end
 
   def self.export_details(csv, parent_id, detail_options)

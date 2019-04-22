@@ -58,17 +58,17 @@ class GradesController < ApplicationController
     @show_reputation = false
 
     # Temporarily in here to set up the pipes to have things passed to the view
-    # scores = Assignment.scores
+    scores = Assignment.review_rounds_statistics[0]
+
     @avg_data = [
-      [76, 84, 54, 92, 64],
-      [64, 92, 78, 54]
+        [76, 84, 54, 92, 64],
+        [64, 92, 78, 54]
     ]
 
     @med_data = [
-      [3, 3.5, 2.5, 3.5, 3],
-      [3, 3.5, 3, 2.5]
+        [3, 3.5, 2.5, 3.5, 3],
+        [3, 3.5, 3, 2.5]
     ]
-    scores = Assignment.review_rounds_statistics
 
     @assignment_name = @assignment.name
 
@@ -347,7 +347,7 @@ class GradesController < ApplicationController
   end
 
   def round_names(scores)
-    (1..scores.length).map {|i| "Round #{i}" }
+    (1..scores.size).map {|i| "Round #{i}" }
   end
 
   def criteria_names(scores)

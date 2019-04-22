@@ -1,0 +1,2 @@
+class GithubMetricsController < ApplicationController
+end

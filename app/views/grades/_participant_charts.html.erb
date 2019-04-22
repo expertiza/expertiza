@@ -67,6 +67,8 @@
   </th>
 </TR>
 
+
+
 <script type="text/javascript">
   <% ['review', 'metareview', 'feedback', 'teammate'].each do |type| %>
   <% if @pscore[type.to_sym] && @pscore[type.to_sym][:scores][:avg]%>
@@ -97,18 +99,19 @@
     textClass:      'circles-final'  
   });
 
-  var myCircle = Circles.create({
-      id:           'self-review-circle',
-      radius:       35,
-      value: <%= @new_derived_scores[:total_score].to_i %>,
-      maxValue:     100,
-      width:        15,
-      text:         '<%=@new_derived_scores[:total_score].to_i==-1? "N/A":@new_derived_scores[:total_score].to_i%>',
-      colors:       ['#99ffa4', '#077512'],
-      duration:       700,
-      textClass:      'circles-final'
-  });
-
+  <%if !@new_derived_scores.nil? %>
+    var myCircle = Circles.create({
+        id:           'self-review-circle',
+        radius:       35,
+        value: <%= @new_derived_scores[:total_score].to_i %>,
+        maxValue:     100,
+        width:        15,
+        text:         '<%=@new_derived_scores[:total_score].to_i==-1? "N/A":@new_derived_scores[:total_score].to_i%>',
+        colors:       ['#99ffa4', '#077512'],
+        duration:       700,
+        textClass:      'circles-final'
+    });
+  <%end %>
 </script> 
 
 <style>

@@ -88,11 +88,8 @@ class ImportFileController < ApplicationController
     errors = []
     begin
       @header_integrated_body.each do |row_hash|
-        # TODO: Eliminate special paths by making consistent ::import functions
-        if @model == "AssignmentTeam" or @model == "CourseTeam"
-          teamtype = @model.constantize
-          options = eval(params[:options])
-          Team.import(row_hash, params[:id], options, teamtype)
+        if @model.constantize.import_options
+          @model.constantize.import(row_hash, session, params[:id], params[:options])
         elsif @model == "SignUpTopic" or @model == "SignUpSheet"
           session[:assignment_id] = params[:id]
           Object.const_get(params[:model]).import(row_hash, session, params[:id])

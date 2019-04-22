@@ -7,7 +7,6 @@ class StudentReviewController < ApplicationController
      'Student'].include? current_role_name and
         ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], "submitter") : true)
   end
-
   def list
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
@@ -72,6 +71,15 @@ class StudentReviewController < ApplicationController
     else
       @bids = my_bids
     end
+    signed_up_topics = []
+    @bids.each do |bid|
+      @review_mappings.each do |user_topic|
+        if user_topic.assignment_id = bid.bid_topic_identifier
+          signed_up_topics << bid
+        end
+      end
+    end
+    @selected_topics = signed_up_topics
   end
 
   # set the priority of review

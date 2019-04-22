@@ -38,9 +38,10 @@ class VmQuestionResponseRow
         row_average_score += score.score_value.to_f
       end
     end
-    return unless @no_of_columns.zero?
-    row_average_score /= @no_of_columns
-    row_average_score.round(2)
+    unless @no_of_columns.zero?
+      row_average_score /= @no_of_columns
+      row_average_score.round(2)
+    end
     # Changes End
   end
 

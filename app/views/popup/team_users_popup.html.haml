@@ -1,5 +1,5 @@
-%span{:class => "hide", :id => "sampleReviewHold", :data => {"marked" :instance_variable_get('@marked')}}
-%span{:class => "hide", :id => "pageSizeHold"}
+%span{:class => "hide",:id=>"sampleReviewHold",:data=>{"marked":instance_variable_get('@marked')}}
+%span{:class => "hide",:id=>"pageSizeHold"} #{@page_size}
 %div
  %div
     %h3{:class=>"col-md-9"} Members of #{@team.name}

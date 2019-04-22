@@ -67,6 +67,14 @@ module ReviewMappingHelper
   end
 
   #
+  # for review conflict report
+  #
+  def get_team_members_by_team_name(team_name)
+    team_id = Team.select(:id).where(name: team_name)
+    TeamsUser.where(team_id: team_id)
+  end
+
+  #
   # gets color according to review and assignment submission status
   #
   def get_team_name_color_in_review_report(response_map)

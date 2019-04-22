@@ -8,20 +8,25 @@
   </tr>
   </thead>
   <tbody>
-  <%@reviewers.keys.each do |team| %>
+  <%@reviewers.keys.each do |team_name| %>
     <tr>
       <td>
-          <%= team %>
+        Team Name: <%= team_name %> <br>
+        Team Members:<br>
+        <% members=get_team_members_by_team_name(team_name)%>
+        <% members.each do |member|%>
+          <%=User.find(member.user_id).fullname %><br>
+        <% end %>
       </td>
       <td>
-        <%question_answers = get_reviews_score_for_team(@id, team) %>
+        <%question_answers = get_reviews_score_for_team(@id, team_name) %>
         <% i = 1 %>
         <% question_answers.each do |question_answer| %>
           <div style="border-top: solid; border-width: 1px;">
             <%= "Round: " + i.to_s %>
             <% question_answer.each do |reviewer, answer| %>
               <div>
-                <%= @reviewers[team.to_s][reviewer.to_s].to_s + ": " + answer.to_s %>
+                <%= @reviewers[team_name.to_s][reviewer.to_s].to_s + ": " + answer.to_s %>
               </div>
             <% end %>
           </div>

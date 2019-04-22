@@ -11,6 +11,32 @@ class GradesController < ApplicationController
   # an assignment. It lists all participants of an assignment and all the reviews they received.
   # It also gives a final score, which is an average of all the reviews and greatest difference
   # in the scores of all the reviews.
+
+  def action_allowed?
+    case params[:action]
+    when 'view_my_scores'
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator',
+       'Student'].include? current_role_name and
+          are_needed_authorizations_present?(params[:id], "reader", "reviewer") and
+          check_self_review_status
+    when 'view_team'
+      if ['Student'].include? current_role_name # students can only see the head map for their own team
+        participant = AssignmentParticipant.find(params[:id])
+        session[:user].id == participant.user_id
+      else
+        true
+      end
+    else
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator'].include? current_role_name
+    end
+  end
+
   def view
     if session["github_access_token"].nil?
       session["assignment_id"] = params[:id]

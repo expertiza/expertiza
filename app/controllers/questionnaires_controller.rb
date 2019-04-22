@@ -28,10 +28,9 @@ class QuestionnairesController < ApplicationController
       @questionnaire = Questionnaire.find(params[:id])
       @participant_id = params[:ppid]
       @participant = AssignmentParticipant.find(params[:ppid])
-      @aq = AssignmentQuestionnaire.find_by(user_id: @participant.team.participants.collect{|p| p.user_id})
-      (['Student'].include? current_role_name) && @questionnaire.id == @aq.questionnaire_id
+      @assignment_questionnaire = AssignmentQuestionnaire.find_by(user_id: @participant.team.participants.collect{|p| p.user_id}) unless @participant.nil?
+      (['Student'].include? current_role_name) && @questionnaire.id == @assignment_questionnaire.questionnaire_id unless @assignment_questionnaire.nil?
     end
-    true
   end
 
   # Create a clone of the given questionnaire, copying all associated

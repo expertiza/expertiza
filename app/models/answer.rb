@@ -122,6 +122,17 @@ class Answer < ActiveRecord::Base
   end
   # end added by ferry, required for the summarization
 
+  def self.answers_by_round_for_reviewee(assignment_id, reviewee_id,round)
+    #get all answers for a reviewee on an assignment for a particular round
+    question_answers = Answer.select("answers.answer, response_maps.reviewer_id")
+                          .joins("join responses on responses.id = answers.response_id")
+                          .joins("join response_maps on responses.map_id = response_maps.id")
+                          .where("response_maps.reviewed_object_id = ? and
+                                           response_maps.reviewee_id = ? and
+                                           responses.round = ?", assignment_id, reviewee_id,round)
+    question_answers
+  end
+
   # start added by ferry for answer tagging
   def get_reviewee_from_answer(answer)
     resp = Response.find(answer.response_id)

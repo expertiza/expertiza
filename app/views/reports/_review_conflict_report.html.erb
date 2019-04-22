@@ -9,14 +9,29 @@
   </thead>
   <tbody>
   <%@reviewers.keys.each do |team| %>
-  <tr>
-    <td style = "background-color: #f9f9f9">
-      <%= team %>
-    </td>
-    <td style = "background-color: #f9f9f9">
-      <%= @reviewers[team].join(", ")%>
-    </td>
-  </tr>
+    <tr>
+      <td>
+          <%= team %>
+      </td>
+      <td>
+        <%question_answers = get_reviews_score_for_team(@id, team) %>
+        <% i = 1 %>
+        <% question_answers.each do |question_answer| %>
+          <div style="border-top: solid; border-width: 1px;">
+            <%= "Round: " + i.to_s %>
+            <% question_answer.each do |reviewer, answer| %>
+              <div>
+                <%= @reviewers[team.to_s][reviewer.to_s].to_s + ": " + answer.to_s %>
+              </div>
+            <% end %>
+          </div>
+          <% i+=1 %>
+        <% end %>
+      </td>
+      <td>
+
+      </td>
+    </tr>
   <% end %>
   </tbody>
 </table>

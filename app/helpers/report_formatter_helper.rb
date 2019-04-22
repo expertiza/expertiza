@@ -26,16 +26,29 @@ module ReportFormatterHelper
     @avg_and_ranges = @assignment.compute_avg_and_ranges_hash
   end
 
+  # review conflict helper
   def review_conflict_response_map(params, _session = nil)
     assign_basics(params)
-    sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(@assignment, @summary_ws_url)
-    @summary = sum.summary
-    @reviewers = sum.reviewers
-    @avg_scores_by_reviewee = sum.avg_scores_by_reviewee
-    @avg_scores_by_round = sum.avg_scores_by_round
-    @avg_scores_by_criterion = sum.avg_scores_by_criterion
+    teams = Team.select(:id, :name).where(parent_id: @id).order(:name)
+    @reviewers = ({})
+    teams.each do |reviewee|
+      @reviewers[reviewee.name] = get_reviewers_name_id_by_reviewee_and_assignment(reviewee, @id)
+    end
   end
-  
+
+  def get_reviewers_name_id_by_reviewee_and_assignment(reviewee, id)
+    temp_reviewers = User.select(" DISTINCT participants.id, users.name")
+                    .joins("JOIN participants ON participants.user_id = users.id")
+                    .joins("JOIN response_maps ON response_maps.reviewer_id = participants.id")
+                    .where("response_maps.reviewee_id = ? and response_maps.reviewed_object_id = ?", reviewee.id, id)
+    reviewers = ({})
+    temp_reviewers.each do |reviewer|
+      # puts reviewer[:id].to_s + " " + reviewer[:name]
+      reviewers[reviewer[:id].to_s] = reviewer[:name]
+    end
+    reviewers
+  end
+
   def feedback_response_map(params, _session = nil)
     assign_basics(params)
     # If review report for feedback is required call feedback_response_report method in feedback_review_response_map model

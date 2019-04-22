@@ -36,6 +36,36 @@ module ReviewMappingHelper
     [response_maps, rspan]
   end
 
+  # review Conflict helper
+  def get_reviews_score_for_team(reviewed_object_id, team_name)
+    reviewee_id = Team.select(:id).where(name: team_name, parent_id: reviewed_object_id)
+    question_answers = []
+    reviewee_id.each do |reviewee|
+      total_rounds = Assignment.find(reviewed_object_id).rounds_of_reviews
+      question_answers = Array.new(total_rounds)
+      (0..total_rounds-1).each do |round|
+        temp_values = Answer.answers_by_round_for_reviewee(reviewed_object_id, reviewee,round+1)
+        question_answers[round] = {}
+        temp_values.each do |temp_value|
+          if question_answers[round].key?(temp_value[:reviewer_id])
+            if temp_value[:answer].nil?
+              question_answers[round][temp_value[:reviewer_id]] += 0
+            else
+              question_answers[round][temp_value[:reviewer_id]] += temp_value[:answer]
+            end
+          else
+            if temp_value[:answer].nil?
+              question_answers[round][temp_value[:reviewer_id]] = 0
+            else
+              question_answers[round][temp_value[:reviewer_id]] = temp_value[:answer]
+            end
+          end
+        end
+      end
+    end
+    question_answers
+  end
+
   #
   # gets color according to review and assignment submission status
   #

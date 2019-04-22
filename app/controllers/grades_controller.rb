@@ -61,13 +61,13 @@ class GradesController < ApplicationController
     scores = Assignment.review_rounds_statistics[0]
 
     @avg_data = [
-        [76, 84, 54, 92, 64],
-        [64, 92, 78, 54]
+      [76, 84, 54, 92, 64],
+      [64, 92, 78, 54]
     ]
 
     @med_data = [
-        [3, 3.5, 2.5, 3.5, 3],
-        [3, 3.5, 3, 2.5]
+      [3, 3.5, 2.5, 3.5, 3],
+      [3, 3.5, 3, 2.5]
     ]
 
     @assignment_name = @assignment.name

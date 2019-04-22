@@ -100,5 +100,4 @@ describe 'Integration tests for viewing grades: ' do
       end
     end
   end
-
 end

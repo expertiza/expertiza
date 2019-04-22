@@ -428,22 +428,23 @@ class Assignment < ActiveRecord::Base
   @@stats = [
     ReviewRoundStats.new(
       CriteriaStats.new([
-        Stats.new(76, 3),
-        Stats.new(84,3.5),
-        Stats.new(54, 2.5),
-        Stats.new(92, 3.5),
-        Stats.new(64, 3)
-      ])
+                          Stats.new(76, 3),
+                          Stats.new(84,3.5),
+                          Stats.new(54, 2.5),
+                          Stats.new(92, 3.5),
+                          Stats.new(64, 3)
+                        ])
     ),
     ReviewRoundStats.new(
       CriteriaStats.new([
-        Stats.new(64, 3),
-        Stats.new(92,3.5),
-        Stats.new(78, 3),
-        Stats.new(54, 2.5),
-      ])      
+                          Stats.new(64, 3),
+                          Stats.new(92,3.5),
+                          Stats.new(78, 3),
+                          Stats.new(54, 2.5)
+                        ])
     )
   ]
+
   # Provides an array of round statistics, including normalized averages and median values
   def self.review_rounds_statistics
     @@stats
@@ -476,8 +477,6 @@ class Assignment < ActiveRecord::Base
       end
     end
   end
-
-
 
   # This method is used for export detailed contents. - Akshit, Kushagra, Vaibhav
   def self.export_details_fields(detail_options)

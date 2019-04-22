@@ -127,6 +127,19 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :github_metrics, only: %i[edit update] do
+    collection do
+      get :view
+      get :view_team
+      get :view_reviewer
+      get :view_my_scores
+      get :instructor_review
+      get :authorize_github
+      post :remove_hyperlink
+      post :save_grade_and_comment_for_submission
+    end
+  end
+
   resources :impersonate, only: [] do
     collection do
       get :start

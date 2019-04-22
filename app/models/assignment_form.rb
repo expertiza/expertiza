@@ -364,7 +364,7 @@ class AssignmentForm
                                          dropdown: aq.dropdown, topic_id: topic.id)
         end
       end
-      AssignmentQuestionnaire.destroy_all(["assignment_id = ? AND topic_id = ?", @assignment.id, nil])
+      AssignmentQuestionnaire.where(assignment_id: @assignment.id, topic_id: nil).destroy_all
     else
       AssignmentQuestionnaire.where(assignment_id: @assignment.id).update_all(topic_id: nil)
       ids = AssignmentQuestionnaire.select("MIN(id) as id").group(:assignment_id, :questionnaire_id, :user_id,

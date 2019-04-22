@@ -62,6 +62,7 @@ class AssignmentsController < ApplicationController
   end
 
   def edit
+    puts('!!!!!!!!!!!!!!!!!!!!!!!EDIT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
     ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Timezone not specified", request) if current_user.timezonepref.nil?
     flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines." if current_user.timezonepref.nil?
     edit_params_setting
@@ -84,6 +85,7 @@ class AssignmentsController < ApplicationController
   end
 
   def update
+    puts('********************UPDATE*****************************************')
     unless params.key?(:assignment_form)
       assignment_form_key_nonexist_case_handler
       return
@@ -371,11 +373,20 @@ class AssignmentsController < ApplicationController
     end
   end
 
+  def convert_to_boolean(expression)
+    expression == 'true'
+  end
+
   def update_feedback_assignment_form_attributes
     if params[:set_pressed][:bool] == 'false'
       flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."
     else
       if @assignment_form.update_attributes(assignment_form_params, current_user)
+        puts @assignment_form.assignment.varying_rubrics_by_topic?
+        unless convert_to_boolean(params['assignment_questionnaire']['vary_by_topic']) == @assignment_form.assignment.varying_rubrics_by_topic?
+          puts 'Perform DB operation'
+          @assignment_form.assignment_questionnaire_vary_by_topic_handler(convert_to_boolean(params['assignment_questionnaire']['vary_by_topic']))
+        end
         flash[:note] = 'The assignment was successfully saved....'
       else
         flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"

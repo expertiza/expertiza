@@ -359,13 +359,17 @@ class Assignment < ActiveRecord::Base
     aq_no_topic_id = AssignmentQuestionnaire.where(assignment_id: self.id, topic_id: nil).size >= 1
     aq_with_topic_id = AssignmentQuestionnaire.where(assignment_id: self.id).where.not(topic_id: nil).size >= 1
     if !aq_no_topic_id && !aq_with_topic_id
-      false
+      puts '--------------------------------------------------------'
+      return false
     elsif aq_no_topic_id && !aq_with_topic_id
-      false
+      puts '&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&'
+      return false
     elsif !aq_no_topic_id && aq_with_topic_id
-      true
+      puts '+++++++++++++++++++++++++++++++++++++++++++++++'
+      return true
     else
-      raise StandardError.new("Assignment with id " + self.id + " has a conflict about whether or not it varies by topic")
+      puts 'NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN'
+      raise StandardError.new("Assignment with id " + self.id.to_s + " has a conflict about whether or not it varies by topic")
     end
   end
 

@@ -1,5 +1,6 @@
 module GithubMetricsHelper
   def display_github_metrics(parsed_data, authors, dates)
+
     data_array = []
     color = %w[red yellow blue gray green magenta]
     i = 0
@@ -15,11 +16,14 @@ module GithubMetricsHelper
     end
 
     data = {
+
         labels: dates,
         datasets: data_array
+
     }
     horizontal_bar_chart data, chart_options
   end
+
 
   def chart_options
     {
@@ -28,11 +32,13 @@ module GithubMetricsHelper
         width: 100,
         height: 100,
         scales: graph_scales
+
     }
   end
 
   def graph_scales
     {
+
         yAxes: [{
                     stacked: true,
                     ticks: {
@@ -60,3 +66,4 @@ module GithubMetricsHelper
   end
 
 end
+

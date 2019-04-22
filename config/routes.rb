@@ -127,7 +127,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :grades_github, only: %i[edit update] do
+  resources :github_metrics, only: %i[edit update] do
     collection do
       get :view
       get :view_team

@@ -47,7 +47,7 @@
 
     /* SECTION: Server AUTO SAVE: triggers every 60 seconds to save the draft version of the review to database */
 
-    var interval = 6000;
+    var interval = 60000;
     var last_save = new Date();
     // detect how many seconds the userhas been idle
     var idleTime = 0;
@@ -255,6 +255,14 @@
       $("form").removeData("remote");
     }
 
+    function showSaveReviewLabel() {
+      // show UI label with a timeout
+      $('#save_confirm').html('<span id="tick"> &#10004; </span>&nbsp;Saving review!');
+      setTimeout(function(){
+        $('#save_confirm').html('')
+      }, 5000);
+    }
+
     // Save button event handler
     $('#save_button').click(function(){
        clearTimers();
@@ -265,11 +273,7 @@
       //set is_submitted param
       jQuery('#is_submitted').val("No");
 
-      // show UI label with a timeout
-      $('#save_confirm').html('<span id="tick"> &#10004; </span>&nbsp;Saving review!');
-      setTimeout(function(){
-        $('#save_confirm').html('')
-      }, 5000);
+      showSaveReviewLabel();
     });
 
     // Submit button event handler
@@ -281,6 +285,8 @@
 
       //set is_submitted param
       jQuery('#is_submitted').val("No");
+
+       showSaveReviewLabel();
     });
 
     // Autosave button (which is hidden) event handler
@@ -291,6 +297,8 @@
 
       //set is_submit param
       jQuery('#is_submit').val("No");
+
+      showSaveReviewLabel();
     });
 
 

@@ -13,6 +13,15 @@
     }
 </style>
 
+<% if flash[:note] %>
+    <div class="flash_note"><%= flash_message :notice %></div>
+<% end %>
+<% if flash[:error] %>
+    <div class="flash_error">
+       <%= flash[:error] %>
+    </div>
+<% end %>
+
 <% if params && params[:id] && @response && !@response.is_submitted %>
     
     <h1>Review Confirmation</h1>
@@ -39,7 +48,7 @@
     <p class="danger-notice">Once a review has been submitted, you cannot edit it again.</p>
 
     <%= form_tag(response_path(:id => params[:id]), method: :patch) do %>
-        <%= hidden_field_tag "isSubmit", "Yes" %>
+        <%= hidden_field_tag "is_submitted", "Yes" %>
 
         <%= submit_tag "Submit Review" %>
 	<%  if params[:return] %>

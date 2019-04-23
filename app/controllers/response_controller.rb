@@ -400,7 +400,7 @@ class ResponseController < ApplicationController
       redirect_to action: 'show_confirmation_page', id: @response.id, return: @return
     else
       print("\r\n Autosave button pressed. Not sure how to NOT redirect\r\n")
-      render :js '' 
+      render action: 'response' 
     end
   end
 

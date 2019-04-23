@@ -349,7 +349,6 @@ class GradesController < ApplicationController
   end
 
   def criteria_names(assignment_stats)
-    index = 0
     array = []
     assignment_stats.review_round_stats.each do |review_round|
       array << (1..review_round.criteria_stats.size).map {|i| "Criterion #{i}" }

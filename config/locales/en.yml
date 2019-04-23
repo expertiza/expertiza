@@ -287,9 +287,14 @@ en:
    student_review:
     list:
       reviews_for: "Reviews for"
-      num_reviews_allowed: "Number of reviews allowed:"
+      your_instructor_expects: "Your instructor expects you to do"
+      you_are_not_allowed: "You are not allowed to do any extra reviews."
+      perform_exactly: "You should perform exactly"
+      may_perform_between_1: "You may perform between"
+      may_perform_between_2: "and"
       required_to_do: "You are required to do"
-      reviews: "reviews"
+      reviews: "reviews."
+      num_reviews_left: "Number of reviews left:"
       note1: "Note: You can't have more than 2 outstanding reviews. You must complete one of your outstanding reviews before selecting another."
       note2_1: "Note: You can't do more than"
       note2_2: "reviews according to assignment policy."
@@ -297,6 +302,8 @@ en:
       metareviews_for: "Metareviews for"
       metareviews_allowed: "Number of Meta-Reviews Allowed:"
       metareviews: "meta-reviews"
+      metareviews_left: "Number of Meta-Reviews left:"
+      back: "Back"
 
      responses:
       view: "View"

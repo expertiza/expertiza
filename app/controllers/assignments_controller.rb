@@ -384,10 +384,11 @@ class AssignmentsController < ApplicationController
     if params[:set_pressed][:bool] == 'false'
       flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."
     else
-      if @assignment_form.update_attributes(assignment_form_params, current_user)
-        unless convert_to_boolean(params['assignment_questionnaire']['vary_by_topic']) == @assignment_form.assignment.varying_rubrics_by_topic?
-          @assignment_form.assignment_questionnaire_vary_by_topic_handler(convert_to_boolean(params['assignment_questionnaire']['vary_by_topic']))
-        end
+      vary_by_topic_desired = convert_to_boolean(params['vary_by_topic'])
+      # Update based on the attributes rec'd in the form
+      # This also updates assignment_questionnaire records, including adding / removing records
+      # as "vary by topic" selection changes
+      if @assignment_form.update_attributes(assignment_form_params, current_user, vary_by_topic_desired)
         flash[:note] = 'The assignment was successfully saved....'
       else
         flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"

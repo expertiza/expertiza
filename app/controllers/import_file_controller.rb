@@ -90,9 +90,6 @@ class ImportFileController < ApplicationController
       @header_integrated_body.each do |row_hash|
         if @model.constantize.import_options
           @model.constantize.import(row_hash, session, params[:id], params[:options])
-        elsif @model == "SignUpTopic" or @model == "SignUpSheet"
-          session[:assignment_id] = params[:id]
-          Object.const_get(params[:model]).import(row_hash, session, params[:id])
         else
           @model.constantize.import(row_hash, session, params[:id])
         end

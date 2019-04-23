@@ -215,6 +215,7 @@ describe AssignmentsController do
         allow(AssignmentQuestionnaire).to receive(:new).with(any_args).and_return(assignment_questionnaire)
         allow(assignment_questionnaire).to receive(:save).and_return(true)
         @params = {
+          vary_by_topic: true,
           id: 1,
           course_id: 1,
           set_pressed: {
@@ -255,7 +256,7 @@ describe AssignmentsController do
           expect(flash[:note]).to eq('The assignment was successfully saved....')
           expect(flash[:error]).to eq("We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. "\
                                       "For now we assume you are in Eastern Time (US & Canada)")
-          expect(response).to redirect_to('/assignments/2/edit')
+          expect(response).to render_template("assignments/edit/_topics")
         end
       end
 
@@ -265,7 +266,7 @@ describe AssignmentsController do
           post :update, @params, session
           expect(flash[:note]).to eq('The assignment was successfully saved....')
           expect(flash[:error]).to be nil
-          expect(response).to redirect_to('/assignments/2/edit')
+          expect(response).to render_template("assignments/edit/_topics")
         end
       end
     end

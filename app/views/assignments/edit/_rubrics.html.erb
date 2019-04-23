@@ -291,9 +291,12 @@
 <%= check_box_tag('assignment_questionnaire[used_in_round]', 'true', @review_vary_by_round_check, :onclick=>"handleCheckReviewVaryByRound(this)") %>
 <%= label_tag('assignment_questionnaire[used_in_round]', 'Review rubric varies by round?') %>
 <br>
-<input name="assignment_questionnaire[vary_by_topic]" type="hidden" value="false" />
-<%= check_box_tag('assignment_questionnaire[vary_by_topic]', 'true', @review_vary_by_topic_check) %>
-<%= label_tag('assignment_questionnaire[vary_by_topic]', 'Review rubric varies by topic?') %>
+<!-- Add a review varies by topic checkbox -->
+<!-- This is not an attribute of assignment or of assignment_questionnaire -->
+<!-- It is just a flag used by the form to allow the controller to make changes to DB records -->
+<input name="vary_by_topic" type="hidden" value="false" />
+<%= check_box_tag('vary_by_topic', 'true', @review_vary_by_topic_check) %>
+<%= label_tag('vary_by_topic', 'Review rubric varies by topic?') %>
 
 <div>
 <table class='exp table table-striped' id='assignment_questionnaire_table' style='padding:20px; font-size: 15px; width: 100%'>

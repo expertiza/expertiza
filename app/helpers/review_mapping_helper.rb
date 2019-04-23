@@ -67,6 +67,33 @@ module ReviewMappingHelper
     end
     question_answers
   end
+	
+  def average_by_round_calculate(question_answer)
+	average=0.0
+	i=0
+	question_answer.each do |reviewer,answer|
+		average+=answer
+		i=i+1
+  	end
+	if i != 0
+		average=average/i
+	end
+	average
+  end
+
+  def std_by_round_calculate(average,question_answer)
+	accum=0.0
+	i=0
+        question_answer.each do |reviewer,answer|
+		accum+=(answer-average)**2
+		i=i+1
+	end
+	if i != 0
+		accum=Math.sqrt(accum/i-1)
+	end 
+	accum
+  end
+		
 
   def get_team_members_by_team_name(team_name)
     team_id = Team.select(:id).where(name: team_name)

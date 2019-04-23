@@ -17,9 +17,7 @@ class SignUpTopic < ActiveRecord::Base
   # end
 
   def self.import(row_hash, session = nil, id)
-    if row_hash.length < 3
-      raise ArgumentError, "The CSV File expects the format: Topic identifier, Topic name, Max choosers, Topic Category (optional), Topic Description (Optional), Topic Link (optional)."
-    end
+    raise ArgumentError, "Record does not contain required items." if row_hash.length < self.required_import_fields.length
     topic = SignUpTopic.where(topic_name: row_hash[:topic_name], assignment_id: id).first
     if topic.nil?
       get_new_sign_up_topic(get_topic_attributes(row_hash), id)

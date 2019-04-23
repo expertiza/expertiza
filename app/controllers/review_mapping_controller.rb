@@ -20,8 +20,12 @@ class ReviewMappingController < ApplicationController
           'assign_quiz_dynamically',
           'start_self_review'
       true
-    else ['Instructor', 'Teaching Assistant', 'Administrator'].include? current_role_name
+    else power_person?
     end
+  end
+
+  def power_person?
+    ['Instructor', 'Teaching Assistant', 'Administrator'].include? current_role_name
   end
 
   def add_calibration
@@ -86,6 +90,12 @@ class ReviewMappingController < ApplicationController
     assignment = Assignment.find(params[:assignment_id])
     reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
 
+    #If this is an instructor or TA and they are reviewing an assignment then they may not be a participant yet, we will add them on the fly:
+    if reviewer.nil? and power_person?
+      assignment.add_participant(@current_user.name, false, true, false)
+      reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
+    end
+
     if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
       flash[:error] = "No topic is selected.  Please go back and select a topic."
     else
@@ -118,7 +128,15 @@ class ReviewMappingController < ApplicationController
     #   flash[:error] = (e.nil?) ? $! : e
     # end
 
-    redirect_to controller: 'student_review', action: 'list', id: reviewer.id
+    redirect_to controller: 'student_review', action: 'list', id: reviewer.id unless power_person?
+    redirect_to controller: 'assignments', action: 'list_submissions', id: assignment.id
+
+  end
+
+  def assign_reviewer_current_instructor
+    assignment = Assignment.find(params[:assignment_id])
+    assignment.tea
+
   end
 
   # assigns the quiz dynamically to the participant

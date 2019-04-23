@@ -57,8 +57,8 @@ class GradesController < ApplicationController
 
     @show_reputation = false
 
-    # Temporarily in here to set up the pipes to have things passed to the view
-    scores = Assignment.review_rounds_statistics[0]
+    # Define instance variables for rubric visualization
+    assignment_stats = @assignment.review_rounds_statistics
 
     @avg_data = [
       [76, 84, 54, 92, 64],
@@ -70,11 +70,9 @@ class GradesController < ApplicationController
       [3, 3.5, 3, 2.5]
     ]
 
-    @assignment_name = @assignment.name
-
-    @round_names = round_names(scores)
-
-    @criteria_names = criteria_names(scores)
+    @assignment_name = assignment_stats[0].name
+    @round_names = round_names(assignment_stats[0])
+    @criteria_names = criteria_names(assignment_stats[0])
 
     @assignment_avg_data = [
       [
@@ -346,16 +344,15 @@ class GradesController < ApplicationController
     array.inject(0) {|sum, x| sum += x } / array.size.to_f
   end
 
-  def round_names(scores)
-    (1..scores.size).map {|i| "Round #{i}" }
+  def round_names(assignment_stats)
+    (1..assignment_stats.size).map {|i| "Round #{i}" }
   end
 
-  def criteria_names(scores)
+  def criteria_names(assignment_stats)
     index = 0
     array = []
-    scores.each do |review_round|
-      array << (1..review_round.criteria_stats.size).map {|i| "Criterion #{index + i}" }
-      index += review_round.criteria_stats.size
+    assignment_stats.review_round_stats.each do |review_round|
+      array << (1..review_round.criteria_stats.size).map {|i| "Criterion #{i}" }
     end
     array
   end

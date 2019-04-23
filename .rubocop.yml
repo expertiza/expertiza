@@ -1,0 +1,103 @@
+AllCops:
+  # Include common Ruby source files.
+  TargetRubyVersion: 2.2.7
+  Exclude:
+    - 'bin/**/*'
+    - 'config/**/*'
+    - 'db/**/*'
+    - 'lib/**/*'
+    - 'public/**/*'
+    - 'vendor/**/*'
+    - 'Dangerfile'
+Rails:
+  Enabled: true
+
+Metrics/ClassLength:
+  CountComments: false
+  Max: 1000
+
+Metrics/MethodLength:
+  CountComments: false
+  Max: 60
+
+Metrics/LineLength:
+  Max: 160
+
+Metrics/ParameterLists:
+  Max: 9
+
+Rails/HttpPositionalArguments:
+  Enabled: false
+
+Rails/ApplicationRecord:
+  Enabled: false
+ 
+# This cop looks for use of the same name as outer local variables for block arguments or block local variables.
+Lint/ShadowingOuterLocalVariable:
+  Enabled: false
+
+# This cop checks for redundant uses of self.
+# If we enable this cop, many necessary selves will be deleted.
+Style/RedundantSelf:
+  Enabled: false
+  
+Style/RedundantBegin:
+  Enabled: false
+
+# Adopt a consistent multi-line method chaining style. 
+# There are two popular styles in the Ruby community, both of which are considered good.
+Layout/DotPosition:
+  Enabled: false
+
+# Single quotes being faster is hardly measurable and only affects parse time.
+# Enforcing double quotes reduces the times where you need to change them
+# when introducing an interpolation. Use single quotes only if their semantics
+# are needed.
+Style/StringLiterals:
+  Enabled: false
+
+Style/HashSyntax:
+  EnforcedStyle: ruby19_no_mixed_keys
+
+# A specialized exception class will take one or more arguments and construct the message from it.
+# So both variants make sense. 
+Style/RaiseArgs:
+  Enabled: false
+
+# This cop checks the indentation of the here document bodies.
+Layout/IndentHeredoc:
+  Enabled: false
+
+# This cop checks the indentation of the right hand side operand in binary operations that span more than one line.
+Layout/MultilineOperationIndentation:
+  Enabled: false
+
+Layout/SpaceInsideBlockBraces:
+  # The space here provides no real gain in readability while consuming
+  # horizontal space that could be used for a better parameter name.
+  # Also {| differentiates better from a hash than { | does.
+  SpaceBeforeBlockParameters: false
+
+# This cop checks for uses of rescue in its modifier form.
+Style/RescueModifier:
+  Enabled: false
+
+# No trailing space differentiates better from the block:
+# foo} means hash, foo } means block.
+Layout/SpaceInsideHashLiteralBraces:
+  EnforcedStyle: no_space
+
+# The and and or keywords are banned. It's just not worth it. Always use && and || instead
+Style/AndOr:
+  Enabled: false
+
+# Enforcing the names of variables? To single letter ones? Just no.
+Style/SingleLineBlockParams:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false 
+
+# Style preference
+Style/MethodDefParentheses:
+  Enabled: false

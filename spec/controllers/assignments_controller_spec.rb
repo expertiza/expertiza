@@ -1,4 +1,5 @@
 describe AssignmentsController do
+
   let(:assignment) do
     build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true, directory_path: 'same path',
                        participants: [build(:participant)], teams: [build(:assignment_team)], course_id: 1)
@@ -9,6 +10,8 @@ describe AssignmentsController do
   let(:instructor2) { build(:instructor, id: 66) }
   let(:ta) { build(:teaching_assistant, id: 8) }
   let(:student) { build(:student) }
+  let(:assignment_questionnaire) { build(:assignment_questionnaire) }
+
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     stub_current_user(instructor, instructor.role.name, instructor.role)
@@ -154,12 +157,12 @@ describe AssignmentsController do
   describe '#edit' do
     context 'when assignment has staggered deadlines' do
       it 'shows an error flash message and renders edit page' do
-        allow(SignUpTopic).to receive(:where).with(assignment_id: '1').and_return([double('SignUpTopic'), double('SignUpTopic')])
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: '1')
-          .and_return([double('AssignmentQuestionnaire', questionnaire_id: 666, used_in_round: 1)])
-        allow(Questionnaire).to receive(:where).with(id: 666).and_return([double('Questionnaire', type: 'ReviewQuestionnaire')])
+        allow(SignUpTopic).to receive(:where).with(assignment_id: assignment.id.to_s).and_return([double('SignUpTopic'), double('SignUpTopic')])
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id.to_s)
+          .and_return([assignment_questionnaire])
+        allow(Questionnaire).to receive(:where).with(id: assignment_questionnaire.questionnaire_id).and_return([double('Questionnaire', type: 'ReviewQuestionnaire')])
         assignment_due_date = build(:assignment_due_date)
-        allow(AssignmentDueDate).to receive(:where).with(parent_id: '1').and_return([assignment_due_date])
+        allow(AssignmentDueDate).to receive(:where).with(parent_id: assignment.id.to_s).and_return([assignment_due_date])
         allow(assignment).to receive(:num_review_rounds).and_return(1)
         params = {id: 1}
         session = {user: instructor}

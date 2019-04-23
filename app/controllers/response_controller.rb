@@ -396,19 +396,19 @@ class ResponseController < ApplicationController
 
     if button_type == "save_button" || (button_type == "submit_button" && is_submitted ) 
       print("\r\nThe id sent is: #{@map.map_id}\r\n")
-      navigate_to_different_page(@map.map_id)
+      navigate_to_different_page
     elsif button_type == "submit_button" && !is_submitted
       redirect_to action: 'show_confirmation_page', id: @response.id, return: @return
     else
       print("\r\n Autosave button pressed. Not sure how to NOT redirect\r\n")
+      render :js '' 
     end
   end
 
-  def navigate_to_different_page(id)
+  def navigate_to_different_page
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
-    # @map = Response.find_by(map_id: params[:id])
-    @map = Response.find_by(map_id: id)
+    @map = Response.find_by(map_id: params[:id])
     if params[:return] == "feedback"
       redirect_to controller: 'grades', action: 'view_my_scores', id: @map.reviewer.id
     elsif params[:return] == "teammate"

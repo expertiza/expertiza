@@ -53,9 +53,8 @@ class MetareviewResponseMap < ResponseMap
   end
 
   def self.import(row_hash, session, id)
-    raise ArgumentError.new("Not enough items. The string should contain: Author, Reviewer, ReviewOfReviewer1 <, ..., ReviewerOfReviewerN>") if row_hash.length < 3
+    raise ArgumentError, "Record does not contain required items." if row_hash.length < self.required_import_fields.length
     row_hash[:metareviewers].each do |row|
-      # ACS Make All contributors as teams
       contributor = AssignmentTeam.where(name: row_hash[:reviewee].to_s, parent_id:  id).first
       raise ImportError, "Contributor, " + row_hash[:reviewee].to_s + ", was not found."  if contributor.nil?
       ruser = User.find_by_name(row_hash[:reviewer].to_s.strip)
@@ -64,13 +63,10 @@ class MetareviewResponseMap < ResponseMap
       muser = User.find_by_name(row.to_s.strip)
       reviewer = AssignmentParticipant.where(user_id: muser.id, parent_id:  id).first
       raise ImportError, "Metareviewer,  #{row.to_s}, for contributor, #{contributor.name}, and reviewee, #{row_hash[:reviewer].to_s }, was not found." if reviewer.nil?
-      # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-      # to treat all assignments as team assignments
+      # ACS: Treat all assignments as team assignments
       reviewmapping = ReviewResponseMap.where(reviewee_id: contributor.id, reviewer_id:  reviewee.id).first
       raise ImportError, "No review mapping was found for contributor, #{contributor.name}, and reviewee, #{row_hash[:reviewer].to_s}." if reviewmapping.nil?
       existing_mappings = MetareviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id: reviewer.id, reviewed_object_id: reviewmapping.map_id)
-      # if no mappings have already been imported for this combination
-      # create it.
       MetareviewResponseMap.create(reviewer_id: reviewer.id, reviewee_id: reviewee.id, reviewed_object_id: reviewmapping.map_id) if existing_mappings.empty?
     end
   end

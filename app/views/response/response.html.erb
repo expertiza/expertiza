@@ -47,7 +47,7 @@
 
     /* SECTION: Server AUTO SAVE: triggers every 60 seconds to save the draft version of the review to database */
 
-    var interval = 60000;
+    var interval = 6000;
     var last_save = new Date();
     // detect how many seconds the userhas been idle
     var idleTime = 0;
@@ -57,7 +57,7 @@
     $('#autosave_cbx_lbl').html("&nbsp;Auto save your response every " + interval / 1000 + " seconds?&nbsp;&nbsp;");
 
     //if it's was in the background, don't auto save to avoid conflict
-    setInterval(function() {
+    var intervalSet = setInterval(function() {
       if(vis() && $("#autosave_cbx").prop("checked")) {
         // send form data to the response controller
         autoSaveForm();
@@ -70,8 +70,10 @@
       timeDiff = (new Date().getTime() - last_save.getTime())/1000;
       // ignore saving unless the last save was more than 5s
       if (timeDiff>5 && $('.review_form').length > 0) {
+//$('form').attr('data-remote', 'true');
         // calls the Autosave button event handler
         $("#auto_save_button").click();
+//$('form').removeAttr('data-remote');
       }
 
       // a nested event function under autoSaveForm()
@@ -237,8 +239,26 @@
 
     /* SECTION: Event handlers for the autosave, save, and submit buttons */
 
+    function clearTimers(){
+       clearInterval(interval);
+       clearInterval(idleInterval);
+       clearInterval(intervalSet);
+    }
+
+    function setAjaxFormSubmit(){
+       $('form').attr('data-remote', 'true');
+    }
+
+    function removeAjaxFormSubmit() {
+      //order matters!
+      $('form').removeAttr('data-remote');
+      $("form").removeData("remote");
+    }
+
     // Save button event handler
     $('#save_button').click(function(){
+       clearTimers();
+       removeAjaxFormSubmit();
       //set button_type param
       jQuery('#button_type').val('save_button');
 
@@ -254,6 +274,8 @@
 
     // Submit button event handler
     $('#submit_button').click(function(){
+      clearTimers();
+      removeAjaxFormSubmit();
       //set button_type param 
       jQuery('#button_type').val('submit_button');
 
@@ -263,15 +285,14 @@
 
     // Autosave button (which is hidden) event handler
     $('#auto_save_button').click(function(){
+       setAjaxFormSubmit();
       //set button_type param 
       jQuery('#button_type').val('auto_save_button');
 
       //set is_submit param
       jQuery('#is_submit').val("No");
-
-      e.preventDefault();
-      e.stopPropagation();
     });
+
 
     /* END OF SECTION */
   });

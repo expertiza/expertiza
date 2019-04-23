@@ -39,13 +39,9 @@ class CourseTeam < Team
     end
   end
 
-  # REFACTOR BEGIN:: functionality of import, export, handle_duplicate shifted to team.rb
-
-  # Import from csv
-  def self.import(row, course_id, options)
+  def self.import(row_hash, session, id, options)
     raise ImportError, "The course with the id \"" + id.to_s + "\" was not found. <a href='/course/new'>Create</a> this course?" if Course.find(course_id).nil?
-    @course_team = prototype
-    Team.import(row, course_id, options, @course_team)
+    Team.import_helper(row_hash, id, options, prototype)
   end
 
   def self.required_import_fields
@@ -69,8 +65,6 @@ class CourseTeam < Team
     @course_team = prototype
     Team.export(csv, parent_id, options, @course_team)
   end
-
-  # REFACTOR END:: functionality of import, export, handle_duplicate shifted to team.rb
 
   # Export the fields of the csv column
   def self.export_fields(options)

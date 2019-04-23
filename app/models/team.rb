@@ -179,11 +179,11 @@ class Team < ActiveRecord::Base
     end
   end
 
-  #  changed to hash by E1776
-  def self.import(row_hash, id, options, teamtype)
-
-    raise ArgumentError, "Not enough fields on this line." if row_hash.empty? || (row_hash[:teammembers].length < 2 && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last")) || (row_hash[:teammembers].empty? && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"))
-    if options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"
+  # Helper for importing CourseTeam and AssignmentTeam objects. Should not be used to import
+  # pure Team objects.
+  def self.import_helper(row_hash, id, options, teamtype)
+    raise ArgumentError, "Include duplicate handling option." if not options.has_key? :handle_dups
+    if row_hash.has_key? :teamname
       name = row_hash[:teamname].to_s
       team = where(["name =? && parent_id =?", name, id]).first
       team_exists = !team.nil?
@@ -204,19 +204,6 @@ class Team < ActiveRecord::Base
     # insert team members into team unless team was pre-existing & we ignore duplicate teams
 
     team.import_team_members(row_hash) unless team_exists && options[:handle_dups] == "ignore"
-  end
-
-  def self.required_import_fields
-    {"teamname" => "Team Name",
-     "teammembers" => "Team Members"}
-  end
-
-  def self.optional_import_fields(id=nil)
-    {}
-  end
-
-  def self.import_options
-    {}
   end
 
   # Handle existence of the duplicate team

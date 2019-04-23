@@ -31,7 +31,7 @@ describe AssignmentForm do
       }
       allow_any_instance_of(AssignmentForm).to receive(:update_assignment).with(attributes[:assignment]).and_return(true)
       allow_any_instance_of(AssignmentForm).to receive(:update_assignment_questionnaires)
-        .with(attributes[:assignment_questionnaire]).and_return(true)
+        .with(attributes[:assignment_questionnaire], false).and_return(true)
       allow_any_instance_of(AssignmentForm).to receive(:update_due_dates).with(attributes[:due_date], user).and_return(true)
       allow_any_instance_of(AssignmentForm).to receive(:add_simicheck_to_delayed_queue).with(attributes[:assignment][:simicheck]).and_return(true)
       allow_any_instance_of(AssignmentForm).to receive(:delete_from_delayed_queue).and_return(true)
@@ -72,6 +72,8 @@ describe AssignmentForm do
         allow(assignment_questionnaire).to receive(:[]).with(:questionnaire_weight).and_return(0)
         allow(assignment_questionnaire2).to receive(:[]).with(:id).and_return(1)
         allow(assignment_questionnaire2).to receive(:[]).with(:questionnaire_weight).and_return(100)
+        allow(assignment_questionnaire).to receive(:topic_id=).with(any_args)
+        allow(assignment_questionnaire2).to receive(:topic_id=).with(any_args)
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([])
         allow(AssignmentQuestionnaire).to receive(:new).with(assignment_questionnaire).and_return(assignment_questionnaire)
         allow(AssignmentQuestionnaire).to receive(:find).with(1).and_return(assignment_questionnaire2)

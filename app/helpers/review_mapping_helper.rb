@@ -39,6 +39,13 @@ module ReviewMappingHelper
   #
   # for review conflict report
   #
+  def get_response_id(reviewer_id, reviewee_id, reviewed_object_id)
+    response_id = ResponseMap.select(:id).where(reviewee_id: reviewee_id, reviewer_id: reviewer_id, reviewed_object_id: reviewed_object_id)
+    response_id[0][:id]
+  end
+  #
+  # for review conflict report
+  #
   def get_reviews_score_for_team(reviewed_object_id, team_name)
     reviewee_id = Team.select(:id).where(name: team_name, parent_id: reviewed_object_id)
     question_answers = []

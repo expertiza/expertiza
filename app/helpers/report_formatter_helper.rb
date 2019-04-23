@@ -30,9 +30,11 @@ module ReportFormatterHelper
   def review_conflict_response_map(params, _session = nil)
     assign_basics(params)
     teams = Team.select(:id, :name).where(parent_id: @id).order(:name)
+    @teams = ({})
     @reviewers = ({})
     teams.each do |reviewee|
       @reviewers[reviewee.name] = get_reviewers_name_id_by_reviewee_and_assignment(reviewee, @id)
+      @teams[reviewee.name] = reviewee.id
     end
   end
 

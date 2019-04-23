@@ -15,7 +15,7 @@
   <%@reviewers.keys.each do |team_name| %>
     <tr>
       <td>
-        Team Name: <%= team_name %> <br>
+        Team Name:<% team_name %><br>
         Team Members:<br>
         <% members=get_team_members_by_team_name(team_name)%>
         <% members.each do |member|%>
@@ -30,7 +30,11 @@
             <%= "Round: " + i.to_s %>
             <% question_answer.each do |reviewer, answer| %>
               <div>
-                <%= @reviewers[team_name.to_s][reviewer.to_s].to_s + ": " + answer.to_s %>
+                <% response_id = get_response_id(reviewer, @teams[team_name], @id) %>
+                <%= link_to "("+@reviewers[team_name.to_s][reviewer.to_s].to_s+")", :controller => 'popup', :action => 'team_users_popup', :id => @teams[team_name], :id2 => response_id, :assignment_id=>@id %>
+                <%= list_review_submissions(reviewer, @teams[team_name], response_id) %>
+                <%= list_hyperlink_submission(response_id, 5386) if Assignment.find_by(id: @id.to_i).course.instructor.name == 'Jkidd' %>
+                <%= ": " + answer.to_s %>
               </div>
             <% end %>
           </div>

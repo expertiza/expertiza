@@ -92,6 +92,54 @@ class ReviewMappingController < ApplicationController
 
     #If this is an instructor or TA and they are reviewing an assignment then they may not be a participant yet, we will add them on the fly:
     if reviewer.nil? and power_person?
+      assignment.add_participant(@current_user.name, false, true, false, true)
+      reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
+    end
+
+    if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
+      flash[:error] = "No topic is selected.  Please go back and select a topic."
+    else
+
+      # begin
+      if assignment.topics? # assignment with topics
+        topic = if params[:topic_id]
+                  SignUpTopic.find(params[:topic_id])
+                else
+                  assignment.candidate_topics_to_review(reviewer).to_a.sample rescue nil
+                end
+        if topic.nil?
+          flash[:error] = "No topics are available to review at this time. Please try later."
+        else
+          assignment.assign_reviewer_dynamically(reviewer, topic)
+        end
+
+      else # assignment without topic -Yang
+        assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
+        assignment_team = assignment_teams.to_a.sample rescue nil
+        if assignment_team.nil?
+          flash[:error] = "No artifacts are available to review at this time. Please try later."
+        else
+          assignment.assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
+        end
+
+      end
+    end
+    # rescue Exception => e
+    #   flash[:error] = (e.nil?) ? $! : e
+    # end
+
+    redirect_to controller: 'student_review', action: 'list', id: reviewer.id unless power_person?
+    redirect_to controller: 'assignments', action: 'list_submissions', id: assignment.id
+
+  end
+
+  #This function allows a TA or instructor to be added as a ReviewerCourseParticipant dynamically
+  def assign_reviewer_only_dynamically
+    assignment = Assignment.find(params[:assignment_id])
+    reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
+
+    #If this is an instructor or TA and they are reviewing an assignment then they may not be a participant yet, we will add them on the fly:
+    if reviewer.nil? and power_person?
       assignment.add_participant(@current_user.name, false, true, false)
       reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
     end

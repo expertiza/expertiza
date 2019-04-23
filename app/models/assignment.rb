@@ -294,7 +294,7 @@ class Assignment < ActiveRecord::Base
   # add a new participant to this assignment
   # manual addition
   # user_name - the user account name of the participant to add
-  def add_participant(user_name, can_submit, can_review, can_take_quiz)
+  def add_participant(user_name, can_submit, can_review, can_take_quiz, review_only = false)
     user = User.find_by(name: user_name)
     if user.nil?
       raise "The user account with the name #{user_name} does not exist. Please <a href='" +
@@ -302,12 +302,22 @@ class Assignment < ActiveRecord::Base
     end
     participant = AssignmentParticipant.find_by(parent_id: self.id, user_id: user.id)
     raise "The user #{user.name} is already a participant." if participant
-    new_part = AssignmentParticipant.create(parent_id: self.id,
-                                            user_id: user.id,
-                                            permission_granted: user.master_permission_granted,
-                                            can_submit: can_submit,
-                                            can_review: can_review,
-                                            can_take_quiz: can_take_quiz)
+
+    if review_only
+      new_part = AssignmentReviewerParticipant.create(parent_id: self.id,
+                                              user_id: user.id,
+                                              permission_granted: user.master_permission_granted,
+                                              can_submit: can_submit,
+                                              can_review: can_review,
+                                              can_take_quiz: can_take_quiz)
+    else
+      new_part = AssignmentParticipant.create(parent_id: self.id,
+                                              user_id: user.id,
+                                              permission_granted: user.master_permission_granted,
+                                              can_submit: can_submit,
+                                              can_review: can_review,
+                                              can_take_quiz: can_take_quiz)
+    end
     new_part.set_handle
   end
 

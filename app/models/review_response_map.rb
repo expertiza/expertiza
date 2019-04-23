@@ -41,6 +41,7 @@ class ReviewResponseMap < ResponseMap
   end
 
   def self.import(row_hash, _session, assignment_id)
+    raise ArgumentError, "Record does not contain required items." if row_hash.length < self.required_import_fields.length
     reviewee_user_name = row_hash[:reviewee].to_s
     reviewee_user = User.find_by(name: reviewee_user_name)
     raise ArgumentError, "Cannot find reviewee user." unless reviewee_user

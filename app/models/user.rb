@@ -142,7 +142,7 @@ class User < ActiveRecord::Base
   end
 
   def self.import(row_hash, session, id = nil)
-    raise ArgumentError, "Only #{row_hash.length} column(s) is(are) found. It must contain at least username, full name, email." if row_hash.length < 3
+    raise ArgumentError, "Record does not contain required items." if row_hash.length < self.required_import_fields.length
     user = User.find_by_name(row_hash[:name])
     if user.nil?
       user = get_new_user(get_user_attributes(row_hash), session)
@@ -155,6 +155,7 @@ class User < ActiveRecord::Base
       user.save
     end
 
+    user
   end
 
   def self.required_import_fields

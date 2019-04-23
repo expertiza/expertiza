@@ -426,23 +426,9 @@ class Assignment < ActiveRecord::Base
     rounds.sort!
   end
 
-  # Provides an array of round statistics, including normalized averages and median values
-  def review_rounds_statistics
-    [AssignmentStats.new([
-                           ReviewRoundStats.new([
-                                                  CriterionStats.new(76, 3),
-                                                  CriterionStats.new(84, 3.5),
-                                                  CriterionStats.new(54, 2.5),
-                                                  CriterionStats.new(92, 3.5),
-                                                  CriterionStats.new(64, 3)
-                                                ]),
-                           ReviewRoundStats.new([
-                                                  CriterionStats.new(64, 3),
-                                                  CriterionStats.new(92, 3.5),
-                                                  CriterionStats.new(78, 3),
-                                                  CriterionStats.new(54, 2.5)
-                                                 ])
-                         ], self.name)]
+  # Provides a structure of round statistics, including normalized averages and median values
+  def stats
+    AssignmentStats.new(self.id)
   end
 
   def self.export_details(csv, parent_id, detail_options)

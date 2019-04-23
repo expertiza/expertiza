@@ -1,11 +1,19 @@
 class ReviewRoundStats
-  attr_accessor :criteria_stats
+  attr_accessor :criteria
 
-  def initialize(criteria_stats)
-    @criteria_stats = criteria_stats
+  def initialize(array_of_criterion)
+    @criteria = array_of_criterion
   end
 
-  def size
-    @criteria_stats.size
+  def means
+    @criteria.map(&:mean)
+  end
+
+  def medians
+    @criteria.map(&:median)
+  end
+
+  def number_of_criteria
+    @criteria.size
   end
 end

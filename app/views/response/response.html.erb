@@ -66,7 +66,7 @@
       timeDiff = (new Date().getTime() - last_save.getTime())/1000;
       // ignore saving unless the last save was more than 5s
       if (timeDiff>5 && $('.review_form').length > 0) {
-	$("#auto_save_button").click();
+        $("#auto_save_button").click();
       }
 
       // a nested event function under autoSaveForm()
@@ -74,7 +74,7 @@
         console.log("\r\nAn ajax error occured: \r\n"+request);
         if (settings.url.includes("response") && settings.type == "POST")
           $('#save_progress').html('<span id="tick"> &#9940; </span>' + 'Unable to reach the expertiza server. <br>Create a backup of your comments and you may try to login again in a while');
-      })
+      });
 
       // a nested event function under autoSaveForm()
       $('form#<%=@modified_object%>').bind('ajax:success', function(evt, data, status, xhr){
@@ -93,44 +93,47 @@
       });
     }
 
+    /* Event handlers for the autosave, save, and submit buttons */
+
+    // Save button event handler
     $('#save_button').click(function(){
       //set save_type param
       jQuery('#save_type').val('save_button');
 
       // show UI label with a timeout
-      $('#save_confirm').html('<span id="tick"> &#10004; </span>&nbsp;Saving review!')
+      $('#save_confirm').html('<span id="tick"> &#10004; </span>&nbsp;Saving review!');
       setTimeout(function(){
         $('#save_confirm').html('')
       }, 5000);
 
-
       // a nested event function for the save_button click function on AJAX success 
-      $('form#<%=@modified_object%>').bind('ajax:success', function(evt, data, status, xhr){
+      /*$('form#<%=@modified_object%>').bind('ajax:success', function(evt, data, status, xhr){
         console.log("\r\nSome kind of AJAX success event as well?\r\n" + data);
-
-	//navigate to the student review page
-	window.location.href= "<%= edit_submitted_content_path(@map.reviewer.id) %>";
-      });
+        
+        //navigate to the student review page
+        window.location.href= "<%= edit_submitted_content_path(@map.reviewer.id) %>";
+      });*/
 
     });
 
+    // Submit button event handler
     $('#submit_button').click(function(){
-        //set save_type param 
-        jQuery('#save_type').val('submit_button');
-
+      //set save_type param 
+      jQuery('#save_type').val('submit_button');
+      
       // a nested event function for the submit_button click function on AJAX success 
-      $('form#<%=@modified_object%>').bind('ajax:success', function(evt, data, status, xhr){
+      /*$('form#<%=@modified_object%>').bind('ajax:success', function(evt, data, status, xhr){
         console.log("\r\nSome kind of AJAX success event as well?\r\n" + data);
 
-	//navigate to the confirmation page
-	window.location.href= "../../../response/show_confirmation_page?id=<%= @response.id %>&return=<%= @return %>";
-      });
-
+        //navigate to the confirmation page
+        window.location.href= "../../../response/show_confirmation_page?id=<%= @response.id %>&return=<%= @return %>";
+      });*/
     });
 
+    // Autosave button event handler
     $('#auto_save_button').click(function(){
-        //set save_type param 
-        jQuery('#save_type').val('auto_save_button');
+      //set save_type param 
+      jQuery('#save_type').val('auto_save_button');
     });
 
     // update the values in the form using ajax
@@ -328,13 +331,14 @@
 <label id="autosave_cbx_lbl" for="autosave_cbx"></label>
 <div id="save_progress"></div>
 
-<!-- The response form -->
-<p>The action method is: <%= @next_action %> </p>
-<%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form", :remote=> true) do %>
+<!-- The response form, @next_action is either 'update' or 'create' -->
+<%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form") do %>
     <%= hidden_field_tag "map_id", @modified_object %>
     <%= hidden_field_tag "saved", (@header == "New") ? 1 : 0 %>
+    <%= hidden_field_tag('return', @return) %>
     <%= hidden_field_tag "save_type", "" %>
-    <%= submit_tag "", :id => 'auto_save_button', :style => "display: none;" %>
+    <!-- hidden button for the auto save -->
+    <%= submit_tag "", :id => 'auto_save_button', :style => "display: none;", :remote => true %>
 
     <% if @next_action.eql?'update' %>
         <input name="_method" type="hidden" value="put" />
@@ -405,13 +409,14 @@
     <br/>
     <br>
     <div id="save_confirm"></div>
+
+    <!-- Form Buttons -->
     <%= submit_tag "Save "+@title, :name => "save", :id => "save_button" %>
     <!--#E1600 check title for selfreview to show submit button-->
     <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review')) %>
         <%= submit_tag "Submit "+@title, :name => "Submit", :id => "submit_button" %>
         <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
     <% end %>
-    <%= hidden_field_tag('return', @return) %>
     <!-- <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %> -->
 <% end %>
 

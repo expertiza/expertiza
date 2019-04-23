@@ -64,27 +64,28 @@ class ResponseController < ApplicationController
     render action: 'response'
   end
 
+  # NEW Change: when creating (not in db yet) a response Submit is clicked, 
+  # instead of immediately redirecting, first confirm the input response
   def create
     was_submitted = false
     save_type = params[:save_type]
     
-    # NEW Change: when creating (not in db yet) a response Submit is clicked, 
-    #instead of immediately redirecting...confirm response first
     print("\r\nThe params in the create method are: \r\n")
     print(params)
     print("\r\n")
     
+    # An AJAX call is made from the response view due to JS implementation
     save_response('create')
 
     if save_type
-	case save_type
-	when "submit_button"
-		print("\r\n Submit button pressed\r\n")
-	when "save_button"
-		print("\r\n Save button pressed\r\n")
-	when "auto_save_button"
-		print("\r\n Autosave button pressed\r\n")
-  	end
+      case save_type
+      when "submit_button"
+        print("\r\n Submit button pressed\r\n")
+      when "save_button"
+        print("\r\n Save button pressed\r\n")
+      when "auto_save_button"
+        print("\r\n Autosave button pressed\r\n")
+      end
     end
 
   end
@@ -123,9 +124,11 @@ class ResponseController < ApplicationController
     print(params)
     print("\r\n")
 
+    # An AJAX call is made from the response view due to JS implementation
     save_response("update")
 
     respond_to do |format|
+       format.html { print "\r\nHTML FORMAT!\r\n" }
        format.js
     end
 
@@ -172,15 +175,14 @@ class ResponseController < ApplicationController
     
     begin
       res = http.request(req)
-      if res.code == 200 && res.content_type == "application/json"
-      	return JSON.parse(res.body)
-      else
-	return nil
+      if (res.code == 200 && res.content_type == "application/json")
+        return JSON.parse(res.body) 
+      else 
+        return nil 
       end
     rescue StandardError
       return nil
     end
-
   end
 
   def show_confirmation_page
@@ -207,25 +209,27 @@ class ResponseController < ApplicationController
     # send user review to API for analysis
     @api_response = get_review_response_metrics
 
-    #compute average for all response fields
-    ##suggestion_chance = 0
-    #puts @api_response["results"]
-    ##puts @api_response["results"].size
-    ##0.upto(@api_response["results"].size - 1) do |i|
-      ##suggestion_chance += @api_response["results"][i]["metrics"]["suggestion"]["suggestions_chances"]
-    ##end
-    ##average_suggestion_chance = suggestion_chance/@api_response["results"].size
-    ##puts suggestion_chance.to_s    #debug print
+    if @api_response
 
-    ##@response.update_suggestion_chance(average_suggestion_chance.to_i)
-    # compute average
+      #compute average for all response fields
+      suggestion_chance = 0
+      puts @api_response["results"]
+      puts @api_response["results"].size
+      0.upto(@api_response["results"].size - 1) do |i|
+        suggestion_chance += @api_response["results"][i]["metrics"]["suggestion"]["suggestions_chances"]
+      end
+      average_suggestion_chance = suggestion_chance/@api_response["results"].size
+      puts suggestion_chance.to_s    #debug print
 
-    ##@map = ResponseMap.find(@response.map_id)
-    # below is class avg (suggestion score)for this assignment
-    ##@response.suggestion_chance_average(@map.reviewed_object_id)
+      @response.update_suggestion_chance(average_suggestion_chance.to_i)
+      # compute average
 
-    #display average
+      @map = ResponseMap.find(@response.map_id)
+      # below is class avg (suggestion score)for this assignment
+      @response.suggestion_chance_average(@map.reviewed_object_id)
 
+      #display average
+    end
     #print("\r\nInside show_confirmation_page about to render view\r\n")
     #render action: "show_confirmation_page"
   end
@@ -294,7 +298,7 @@ class ResponseController < ApplicationController
       if params[:isSubmit]
          save_confirmed_response
          
-	 # log success
+         # log success
          ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
          
          # redirect to save method...which then redirects again
@@ -331,8 +335,8 @@ class ResponseController < ApplicationController
       end
   end
 
+  # This method creates a badge then redirects to other views
   def save
-    # This method redirects to other views
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
@@ -359,12 +363,13 @@ class ResponseController < ApplicationController
     # @response.update_suggestion_chance(suggestion_chance.round)
     # @response.suggestion_chance_average(@map.reviewed_object_id)
 
-
+    print("\r\nThe controller_name variable inside save method is: #{controller_name}\r\n")
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Response was successfully saved")
     redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
   def redirect
+    print("\r\nInside the redirect method. params[:return] = #{params[:return]}\r\n")
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
     @map = Response.find_by(map_id: params[:id])

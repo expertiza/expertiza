@@ -396,7 +396,7 @@ class ResponseController < ApplicationController
 
     if button_type == "save_button" || (button_type == "submit_button" && is_submitted == "Yes") 
       navigate_to_different_page
-    elsif button_type == "submit_button" && !is_submitted 
+    elsif button_type == "submit_button" && is_submitted != "Yes" 
       redirect_to action: 'show_confirmation_page', id: @response.id, return: @return
     else
       print("\r\n Autosave button pressed. Not sure how to NOT redirect\r\n")

@@ -114,6 +114,7 @@
                     </a>  </th>
                   <% end %>
                 <% end %>
+		<% end %>
               <!-- E1927:  Now, display the student reviews -->
               <% i = 1 %>
               <% vm.list_of_reviews.each do |review| %>
@@ -245,7 +246,7 @@
           <% table_count += 1%>
           <span> <%= vm.display_team_members %></span>
           <!-- this elsif terminates the heatgrid code.  -->
-        <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
+        <% elseif vm.questionnaire_type != "ReviewQuestionnaire" %>
             <br><div class="alert alert-warning">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>
         <% end %>
         <br/>  

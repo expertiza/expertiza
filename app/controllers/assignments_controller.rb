@@ -91,12 +91,18 @@ class AssignmentsController < ApplicationController
     retrieve_assignment_form
     handle_current_user_timezonepref_nil
     update_feedback_assignment_form_attributes
-    # REFRESH the topics tab after changing tabs
-    # Specifically useful when switching between vary-do-not-vary by topic on the Rubrics tab
-    # This changes how the Topics tab should appear
-    # Followed instructions at:
-    #https://atlwendy.ghost.io/render-a-partial-view-tutorial-for-beginners/
-    render :partial => "assignments/edit/topics"
+    # What to do next depends on how we got here
+    if params['button'].nil?
+      # REFRESH the topics tab after changing tabs
+      # Specifically useful when switching between vary-do-not-vary by topic on the Rubrics tab
+      # This changes how the Topics tab should appear
+      # Followed instructions at:
+      #https://atlwendy.ghost.io/render-a-partial-view-tutorial-for-beginners/
+      render :partial => "assignments/edit/topics"
+    else
+      # SAVE button was used (do a redirect)
+      redirect_to edit_assignment_path @assignment_form.assignment.id
+    end
   end
 
   def show

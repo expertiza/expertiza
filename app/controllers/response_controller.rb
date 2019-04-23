@@ -277,7 +277,7 @@ class ResponseController < ApplicationController
       @response.email
     end
 
-    create_badge
+    #create_badge
 
     # log save
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, msg)
@@ -395,7 +395,8 @@ class ResponseController < ApplicationController
     is_submitted = params[:is_submitted]
 
     if button_type == "save_button" || (button_type == "submit_button" && is_submitted ) 
-      navigate_to_different_page
+      print("\r\nThe id sent is: #{@map.map_id}\r\n")
+      navigate_to_different_page(@map.map_id)
     elsif button_type == "submit_button" && !is_submitted
       redirect_to action: 'show_confirmation_page', id: @response.id, return: @return
     else
@@ -403,10 +404,11 @@ class ResponseController < ApplicationController
     end
   end
 
-  def navigate_to_different_page
+  def navigate_to_different_page(id)
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
-    @map = Response.find_by(map_id: params[:id])
+    # @map = Response.find_by(map_id: params[:id])
+    @map = Response.find_by(map_id: id)
     if params[:return] == "feedback"
       redirect_to controller: 'grades', action: 'view_my_scores', id: @map.reviewer.id
     elsif params[:return] == "teammate"

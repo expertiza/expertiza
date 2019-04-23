@@ -74,7 +74,8 @@ module ReviewMappingHelper
     end
     question_answers
   end
-	
+
+  #Average for Review Conflict Report
   def average_by_round_calculate(question_answer)
 	average=0.0
 	i=0
@@ -85,7 +86,7 @@ module ReviewMappingHelper
 	if i != 0
 		average=average/i
 	end
-	average
+	average.round(2)
   end
 
   def std_by_round_calculate(average,question_answer)
@@ -98,7 +99,7 @@ module ReviewMappingHelper
 	if i != 0
 		accum=Math.sqrt(accum/i-1)
 	end 
-	accum
+	accum.round(2)
   end
 		
 

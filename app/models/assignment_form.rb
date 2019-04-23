@@ -30,7 +30,7 @@ class AssignmentForm
     assignment_form
   end
 
-  def update(attributes, user)
+  def update(attributes, user, vary_by_topic_desired = false)
     @has_errors = false
     has_late_policy = false
     if attributes[:assignment][:late_policy_id].to_i > 0
@@ -39,7 +39,7 @@ class AssignmentForm
       attributes[:assignment][:late_policy_id] = nil
     end
     update_assignment(attributes[:assignment])
-    update_assignment_questionnaires(attributes[:assignment_questionnaire]) unless @has_errors
+    update_assignment_questionnaires(attributes[:assignment_questionnaire], vary_by_topic_desired) unless @has_errors
     update_due_dates(attributes[:due_date], user) unless @has_errors
     update_assigned_badges(attributes[:badge], attributes[:assignment]) unless @has_errors
     add_simicheck_to_delayed_queue(attributes[:assignment][:simicheck])
@@ -65,23 +65,39 @@ class AssignmentForm
   end
 
   # code to save assignment questionnaires
-  def update_assignment_questionnaires(attributes)
+  def update_assignment_questionnaires(attributes, vary_by_topic_desired = false)
     return false unless attributes
     validate_assignment_questionnaires_weights(attributes)
     @errors = @assignment.errors
     unless @has_errors
-      existing_aqs = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
-      existing_aqs.each(&:delete)
-      attributes.each do |assignment_questionnaire|
-        if assignment_questionnaire[:id].nil? or assignment_questionnaire[:id].blank?
-          aq = AssignmentQuestionnaire.new(assignment_questionnaire)
-          unless aq.save
-            @errors = @assignment.errors.to_s
-            @has_errors = true
+      # Delete existing assignment questionnaires for this assignment
+      AssignmentQuestionnaire.where(assignment_id: @assignment.id).each(&:delete)
+      # Go through all of the AQ attribute objects, creating / updating one or more AQs
+      attributes.each do |assignment_questionnaire_attr|
+        if assignment_questionnaire_attr[:id].nil? or assignment_questionnaire_attr[:id].blank?
+          # Create AQ(s)
+          if vary_by_topic_desired
+            topics = SignUpTopic.where(assignment_id: @assignment.id)
+            topics.each do |topic|
+              aq = AssignmentQuestionnaire.new(assignment_questionnaire_attr)
+              aq.topic_id = topic.id
+              unless aq.save
+                @errors = @assignment.errors.to_s
+                @has_errors = true
+              end
+            end
+          else
+            aq = AssignmentQuestionnaire.new(assignment_questionnaire_attr)
+            aq.topic_id = nil
+            unless aq.save
+              @errors = @assignment.errors.to_s
+              @has_errors = true
+            end
           end
         else
-          aq = AssignmentQuestionnaire.find(assignment_questionnaire[:id])
-          unless aq.update_attributes(assignment_questionnaire)
+          # Update AQ
+          aq = AssignmentQuestionnaire.find(assignment_questionnaire_attr[:id])
+          unless aq.update_attributes(assignment_questionnaire_attr)
             @errors = @assignment.errors.to_s
             @has_errors = true
           end
@@ -352,25 +368,4 @@ class AssignmentForm
     end
   end
 
-  def assignment_questionnaire_vary_by_topic_handler(vary)
-    if vary
-      topics = SignUpTopic.where(assignment_id: @assignment.id)
-      aqs = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
-      topics.each do |topic|
-        aqs.each do |aq|
-          AssignmentQuestionnaire.create(assignment_id: aq.assignment_id, questionnaire_id: aq.questionnaire_id,
-                                         user_id: aq.user_id, notification_limit: aq.notification_limit,
-                                         questionnaire_weight: aq.questionnaire_weight, used_in_round: aq.used_in_round,
-                                         dropdown: aq.dropdown, topic_id: topic.id)
-        end
-      end
-      AssignmentQuestionnaire.where(assignment_id: @assignment.id, topic_id: nil).destroy_all
-    else
-      AssignmentQuestionnaire.where(assignment_id: @assignment.id).update_all(topic_id: nil)
-      ids = AssignmentQuestionnaire.select("MIN(id) as id").group(:assignment_id, :questionnaire_id, :user_id,
-                                                                  :notification_limit, :questionnaire_weight,
-                                                                  :used_in_round, :dropdown, :topic_id).collect(&:id)
-      AssignmentQuestionnaire.where.not(id: ids).destroy_all
-    end
-  end
 end

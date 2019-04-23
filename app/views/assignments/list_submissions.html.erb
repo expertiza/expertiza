@@ -31,14 +31,14 @@
           <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Participant name</th>
         <% end %>  
         <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Links</th> 
-        <th class="sorter-false" style="font-weight: bold; font-size: 15px;"></th>
+        <th class="sorter-false" style="font-weight: bold; font-size: 15px;">Actions</th>
       </tr>                    
     </thead>
     <% @l = -1 %>
     <% @teams.each do |team| %>
       <% @l = @l+1 %>
       <tr>
-        <% topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team) %>
+        <% topic_id, topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team) %>
 
         <!--Topic name-->
         <% if @assignment.topics? %>
@@ -48,12 +48,9 @@
         <!--Team name-->
         <% if @assignment.max_team_size > 1 %>
           <% team_name_color = get_team_name_color_in_list_submission(team) %>
-          <td><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
-          <% unless participants.empty? %>
-            <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %></td>
-          <% end %>
-        <% end %>
+          <td><p style = <%="color:#{team_name_color}"%>><%= team.name %></p></td>
 
+          <% else %>
         <!--Team member(s) / Participant name-->
           <td>
               <% users_for_curr_team.each do |user| %>
@@ -62,6 +59,7 @@
               <% end %>
           </td>
 
+        <% end %>
         <!--Submitted item(s)-->
         <td>
         <!--Display submitted hyperlinks-->
@@ -82,7 +80,15 @@
         <td width="10%">
 
           <%= link_to "History", submission_records_path(team_id: team.id) %>
-
+          <% @participant = AssignmentParticipant.find_by(:parent_id => @assignment.id, :user_id => current_user.id) %>
+          <% @existing_responses = ReviewResponseMap.where(reviewer_id: @participant.id) unless @participant.nil? %>
+          <% if @assignment.finished? %>
+            <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %>
+          <% elsif @participant.nil? ||  @existing_responses.nil? ||  @existing_responses.find_by(:reviewer_id=>@participant.id, :reviewee_id=>team.id).nil? %>
+            <%= link_to 'Add Review', {controller: 'review_mapping', action: 'assign_reviewer_dynamically', assignment_id: @assignment.id, topic_id: topic_id, reviewer_id: current_user } %>
+          <% else %>
+            <%= link_to "Update review", {:controller => 'response', :action => 'new', :id => @latest_response.id} %>
+          <% end %>
         </td>
       </tr>
     <% end %>

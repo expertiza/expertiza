@@ -85,6 +85,7 @@ module AssignmentHelper
     elsif topic_id.nil?
       # Find by round
       aq = assignment.assignment_questionnaires.find_by(used_in_round: round_number)
+      aq = assignment.assignment_questionnaires.find_by(assignment_id: assignment.id) if aq.nil?
     elsif round_number.nil?
       # Find by topic
       aq = assignment.assignment_questionnaires.find_by(topic_id: topic_id)

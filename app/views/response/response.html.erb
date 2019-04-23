@@ -243,7 +243,7 @@
       jQuery('#button_type').val('save_button');
 
       //set is_submitted param
-      jQuery('#is_submitted').val(false);
+      jQuery('#is_submitted').val("No");
 
       // show UI label with a timeout
       $('#save_confirm').html('<span id="tick"> &#10004; </span>&nbsp;Saving review!');
@@ -258,7 +258,7 @@
       jQuery('#button_type').val('submit_button');
 
       //set is_submitted param
-      jQuery('#is_submitted').val(true);
+      jQuery('#is_submitted').val("Yes");
     });
 
     // Autosave button (which is hidden) event handler
@@ -267,7 +267,7 @@
       jQuery('#button_type').val('auto_save_button');
 
       //set is_submit param
-      jQuery('#is_submit').val(false);
+      jQuery('#is_submit').val("No");
     });
 
     /* END OF SECTION */

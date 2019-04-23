@@ -109,7 +109,7 @@ class ResponseController < ApplicationController
   # Update the response and answers when student "edit" existing response
   def update
     render nothing: true unless action_allowed?
-    is_submitted = params[:is_submitted].present?
+    #is_submitted = params[:is_submitted].present?
     button_type = params[:button_type]
 
     # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
@@ -290,11 +290,12 @@ class ResponseController < ApplicationController
   end
 
   def update_response
+    @response = Response.find(params[:id])
     msg = "Your response was submitted: #{@response.is_submitted}"
 
-    if params[:is_submitted]
+    if params[:is_submitted] && params[:is_submitted] == "Yes"
       # only updating the is_submit property
-      update_is_submit_property(true)
+      update_is_submit_property(params[:is_submitted])
 
       #redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
       #  redirect_to controller: 'response', action: 'save', id: @map.map_id,
@@ -309,7 +310,7 @@ class ResponseController < ApplicationController
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, msg, request)
   end
 
-  def update_is_submit_property(is_submitted = false)
+  def update_is_submit_property(is_submitted = "No")
       @response.update_attribute('is_submitted', is_submitted)
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
   end

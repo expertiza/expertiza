@@ -214,6 +214,7 @@ describe AssignmentsController do
         assignment_questionnaire = double('AssignmentQuestionnaire')
         allow(AssignmentQuestionnaire).to receive(:new).with(any_args).and_return(assignment_questionnaire)
         allow(assignment_questionnaire).to receive(:save).and_return(true)
+        allow(assignment_questionnaire).to receive(:topic_id=).with(any_args)
         @params = {
           vary_by_topic: true,
           id: 1,

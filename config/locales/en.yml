@@ -2,15 +2,15 @@
 # See http://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
 
 en:
-  hello: "Hello world"
+# hello: "Hello world"
 
- # This section of keys are for the pages related to Courses
+# This section of keys are for the pages related to Courses
   course:
 
-     edit:
+    edit:
       course_title: "Edit course"
 
-     course:
+    course:
       institute_name: "Institution Name"
       course_name: "Course Name"
       course_directory: "Course Directory"
@@ -19,20 +19,20 @@ en:
       language: "Select language"
       assignment_name: "Assignment Name"
 
-     view_teaching_assistants:
+    view_teaching_assistants:
       teaching_assistants: "Teaching Assistants"
       course: "Course"
       teaching_assistant_name: "Teaching Assistant Name"
 
-     add_individual:
+    add_individual:
       enter_user_login: "Enter a user login:"
       add_ta: "Add TA"
 
-   participant:
+  participant:
     list:
       participants: "Participants:"
 
-   shared_scripts:
+  shared_scripts:
     user_list:
       email: "E-mail on ..."
       permissions: "Permissions ..."
@@ -50,7 +50,7 @@ en:
       handle: "Handle"
       action: "Action"
 
-     add_individual:
+    add_individual:
       enter_login: "Enter a user login:"
       add: "Add"
       participant: "participant"
@@ -58,7 +58,7 @@ en:
       reviewer: "reviewer"
       submitter: "submitter"
 
-   teams:
+  teams:
     list:
       teams_for: "Teams for"
       teams: "Teams"
@@ -66,7 +66,7 @@ en:
       name: "name"
       show_members: "Show all team members"
 
-     new:
+    new:
       create_teams_for: "Create Teams for"
       automatically: "Automatically"
       uses_insofar: "Uses, insofar as possible, the number of members specified when the assignment was created."
@@ -78,7 +78,7 @@ en:
       use_the_teams: "Use the teams that are currently defined for the course."
       team_name: "Team Name"
 
-   assignment:
+  assignment:
     new:
       create_new: "Create New"
       public: "Public"
@@ -91,7 +91,7 @@ en:
       create_button: "Create"
 
 
-     edit:
+    edit:
       general:
         assignment_name: "Assignment name:"
         course: "Course"
@@ -111,7 +111,7 @@ en:
         allow_feedback: "Allow feedback comments to be tagged by the author?"
         available: "Available to students?"
 
-       rubrics:
+      rubrics:
         review_varies: "Review varies by round?"
         questionaire: "Questionaire"
         use_dropdown: "Use dropdown"
@@ -123,7 +123,7 @@ en:
         author_feedback: "Author Feedback"
         review: "Review"
 
-       review_strategy:
+      review_strategy:
         review_strategy: "Review Strategy:"
         review_topic: "Review topic Threshold (k):"
         max_num_reviews: "Maximum number of reviews per submission:"
@@ -136,7 +136,7 @@ en:
         anon_review: "Is Anonymous Review?"
         self_review: "Allow self reviews?"
 
-       due_dates:
+      due_dates:
         num_review_rounds: "Number of review rounds:"
         timezone: "Timezone : "
         meta_deadline: "Use metareview deadline"
@@ -154,11 +154,11 @@ en:
         description_url: "Description URL"
         round: "Round"
 
-       late_policy:
+      late_policy:
         apply_penalty: "Apply penalty policy:"
         late_policty: "New late policty"
 
-       calibration:
+      calibration:
         particpant_name: "Participant name"
         action: "Action"
         submitted_item: "Submitted item(s)"
@@ -183,11 +183,11 @@ en:
       stage_deadline: "Stage Deadline"
       publishing_rights: "Publishing Rights"
 
-     publishing_rights:
+    publishing_rights:
       select_assignment: "Select an assignment from the list or set"
       for_work: "for your work."
 
-     view:
+    view:
       submit_review: "Submit or Review work for"
       next_click: "Next: Click the activity you wish to perform on the assignment titled:"
       assignment_description: "Assignment Description"
@@ -206,7 +206,7 @@ en:
       log_you_out: "(This will log you out)"
       different_handle: "(Provide a different handle for this assignment)"
 
-   sign_up_sheet:
+  sign_up_sheet:
     list:
       signup_sheet: "Signup sheet for"
       assignment_lower: "assignment"
@@ -214,7 +214,7 @@ en:
       waitlisted: "(waitlisted)"
       back: "Back"
 
-     table_header:
+    table_header:
       topic_num: "Topic #"
       topic_name: "Topic name(s)"
       micro_payment: "Micro- payment"
@@ -225,15 +225,15 @@ en:
       actions: "Actions"
       advertise: "Advertise- ment(s)"
 
-     suggested_topic:
+    suggested_topic:
       approved_suggestion: "Your approved suggested topic"
 
-   student_teams:
+  student_teams:
     edit:
       edit_team: "Edit Team"
       team_name: "Team Name:"
 
-     view:
+    view:
       team_info: "Team Information for"
       no_team: "You no longer have a team!"
       name_team: "Name team"
@@ -261,30 +261,30 @@ en:
       ad_for_team: "Advertisement for teammates"
       back: "Back"
 
-   submitted_content:
+  submitted_content:
     edit:
       back: "Back"
 
-     title:
+    title:
       submit_work: "Submit work for"
 
-     self_review:
+    self_review:
       self_review: "Self Review:"
       work_not_submitted: "(Work has not yet been submitted)"
 
-     hyperlink:
+    hyperlink:
       hyperlink_action: "Hyperlink Actions:"
       hide_link: "hide links"
 
-     main:
+    main:
       submit_hyperlink: "Submit a hyperlink:"
       quiz: "Quiz:"
 
-     submitted_files:
+    submitted_files:
       submit_file: "Submit a file:"
       or: "or"
 
-   student_review:
+  student_review:
     list:
       reviews_for: "Reviews for"
       your_instructor_expects: "Your instructor expects you to do"
@@ -305,7 +305,7 @@ en:
       metareviews_left: "Number of Meta-Reviews left:"
       back: "Back"
 
-     responses:
+    responses:
       view: "View"
       edit: "Edit"
       update: "Update"
@@ -315,21 +315,21 @@ en:
       review_done_at: "Review done at --"
       no_previous_available: "No previous versions available"
 
-     set_dynamic_review:
+    set_dynamic_review:
       i_don't_care: "I don't care which topic I review."
       select_topic: "Select a topic below to begin a new review:"
       request_new_submission: "Request a new submission to review"
 
-     set_dynamic_metareview:
+    set_dynamic_metareview:
       request_new_metareview: "Request a new metareview to perform"
 
-   grades:
+  grades:
     view_my_scores:
       score_for: "Score for"
       reputation: "Reputation"
       back: "Back"
 
-     view_team:
+    view_team:
       summary_report: "Summary Report for assignment:"
       team: "Team:"
       topic: "Topic:"
@@ -353,7 +353,7 @@ en:
       grade: "Grade:"
       comment2: "Comment:"
 
-   participants:
+  participants:
     change_handle:
       create_or_change: "Create or Change Handle for Current Assignment"
       your: "Your"

@@ -1,13 +1,13 @@
 hi_IN:
 
- #  hello: "Hello world"
+#  hello: "Hello world"
 
- # This section of keys are for the pages related to Courses
+# This section of keys are for the pages related to Courses
   course:
     edit:
       course_title: "एडिट कोर्स"
 
-     course:
+    course:
       institute_name: "इन्स्टिट्यूशन का नाम"
       course_name: "कोर्स का नाम"
       course_directory: "कोर्स डाइरेक्टरी"
@@ -15,20 +15,20 @@ hi_IN:
       course_info: "कोर्स संबंधी जानकारी"
       language: "भाषा चुनिए"
 
-     view_teaching_assistants:
+    view_teaching_assistants:
       teaching_assistants: "शिक्षण सहायक"
       course: "कोर्स"
       teaching_assistant_name: "शिक्षण सहायक का नाम"
 
-     add_individual:
+    add_individual:
       enter_user_login: "उपयोगकर्ता का लॉगिन दर्ज करें:"
       add_ta: "शिक्षण सहायक को शामिल करना"
 
-   participant:
+  participant:
     list:
       participants: "हिस्सा लेनेवाला"
 
-   shared_scripts:
+  shared_scripts:
     user_list:
       email: "ईमेल ..."
       permissions: "इजाज़त ..."
@@ -46,7 +46,7 @@ hi_IN:
       handle: "संभालना "
       action: "एक्शन"
 
-     add_individual:
+    add_individual:
       enter_login: "उपयोगकर्ता का लॉगिन दर्ज करें:"
       add: "शामिल करना"
       participant: "हिस्सा लेनेवाला"
@@ -54,7 +54,7 @@ hi_IN:
       reviewer: "समीक्षक"
       submitter: "जमाकर्ता का नाम"
 
-   teams:
+  teams:
     list:
       teams_for: "टीम्स फॉर"
       teams: "टीम्स"
@@ -62,7 +62,7 @@ hi_IN:
       name: "नाम"
       show_members: "सभी टीम नंबर दिखाएं"
 
-     new:
+    new:
       create_teams_for: "टीम्स बनाना फॉर"
       automatically: "खुद ब खुद"
       uses_insofar: "जब असाइनमेंट बनाया गया था, निर्दिष्ट किए गए सदस्यों की संख्या का उपयोग करता है."
@@ -74,7 +74,7 @@ hi_IN:
       use_the_teams: "वर्तमान में पाठ्यक्रम के लिए परिभाषित टीमों का प्रयोग करें."
       team_name: "टीम का नाम"
 
-   assignment:
+  assignment:
     new:
       create_new: "नया बनाओ"
       public: "सार्वजनिक"
@@ -86,7 +86,7 @@ hi_IN:
       due_date: "अंतिम तारीख"
       create_button: "बनाना"
 
-     edit:
+    edit:
       general:
         assignment_name: "असाइनमेंट का नाम:"
         course: "कोर्स"
@@ -106,7 +106,7 @@ hi_IN:
         allow_feedback: "क्या उपयोगकर्ता द्वारा टैग की गई प्रतिक्रिया टिप्पणियों की अनुमति होनी चाहिए ?"
         available: "क्या यह छात्रों के लिए उपलब्ध है?"
 
-       rubrics:
+      rubrics:
         review_varies: "क्या समीक्षा दौर से भिन्न होती है?"
         questionaire: "प्रश्नावली"
         use_dropdown: "ड्रॉप डाउन का उपयोग करें"
@@ -118,7 +118,7 @@ hi_IN:
         author_feedback: "लेखक से प्रतिक्रिया"
         review: "समीक्षा"
 
-       review_strategy:
+      review_strategy:
         review_strategy: "समीक्षा रणनीति: "
         review_topic: " समीक्षा विषय सीमा (के):"
         max_num_reviews: "प्रति समीक्षाकर्ता की समीक्षा की अधिकतम संख्या :"
@@ -131,7 +131,7 @@ hi_IN:
         anon_review: "क्या यह एक अनाम समीक्षा है?"
         self_review: "क्या आत्म समीक्षा की अनुमति है?"
 
-       due_dates:
+      due_dates:
         num_review_rounds: "समीक्षा दौर की संख्या :"
         timezone: "समय क्षेत्र: "
         meta_deadline: "मेटारिव्यु की अंतिम तिथि का उपयोग करें "
@@ -149,11 +149,11 @@ hi_IN:
         description_url: "यूआरएल विवरण"
         round: "संख्या"
 
-       late_policy:
+      late_policy:
         apply_penalty: "पेनल्टी पालिसी लागू करें:"
         late_policty: "नई देरी पालिसी"
 
-       calibration:
+      calibration:
         particpant_name: "हिस्सा लेनेवाला का नाम"
         action: "एक्शन"
         submitted_item: "सबमिट की गई वस्तुएं "
@@ -178,11 +178,11 @@ hi_IN:
       stage_deadline: "चरण की अंतिम तिथि"
       publishing_rights: "प्रकाशन अधिकार"
 
-     publishing_rights:
+    publishing_rights:
       select_assignment: "सूची या सेट से असाइनमेंट का चयन करें"
       for_work: "आपके काम के लिए"
 
-     view:
+    view:
       submit_review: "सबमिट करें या काम की समीक्षा करें"
       next_click: "अगला: शीर्षक पर असाइनमेंट पर जिस गतिविधि को आप करना चाहते हैं उसे क्लिक करें:"
       assignment_description: "असाइनमेंट विवरण"
@@ -201,7 +201,7 @@ hi_IN:
       log_you_out: "(यह आपको लॉग आउट कर देगा)"
       different_handle: "(इस असाइनमेंट के लिए एक अलग हैंडल प्रदान करें)"
 
-   sign_up_sheet:
+  sign_up_sheet:
     list:
       signup_sheet: "साइनअप शीट फॉर"
       assignment_lower: "असाइनमेंट"
@@ -209,7 +209,7 @@ hi_IN:
       waitlisted: "(वेटलिस्टेड)"
       back: "वापस पीछे"
 
-     table_header:
+    table_header:
       topic_num: "विषय #"
       topic_name: "विषय का नाम"
       micro_payment: "माइक्रो - पेमेंट "
@@ -220,15 +220,15 @@ hi_IN:
       actions: " एक्शन्स"
       advertise: "अद्वेर्तीसे - मेन्ट(स)"
 
-     suggested_topic:
+    suggested_topic:
       approved_suggestion: "आपका अनुमोदित से सुझाया गया विषय"
 
-   student_teams:
+  student_teams:
     edit:
       edit_team: "टीम संपादित करें"
       team_name: "टीम का नाम:"
 
-     view:
+    view:
       team_info: "टीम की जानकारी"
       no_team: "अब आपके पास कोई टीम नहीं है!"
       name_team: "टीम को नाम दे "
@@ -256,32 +256,32 @@ hi_IN:
       ad_for_team: "टीम के साथी के लिए अद्वेर्तिसेमेन्ट"
       back: "वापस पीछे"
 
-   submitted_content:
+  submitted_content:
     edit:
       back: "वापस पीछे"
 
-     title:
+    title:
       submit_work: " काम जमा करने का कारन "
 
-     self_review:
+    self_review:
       self_review: "स्वयं की समीक्षा:"
       work_not_submitted: "(कार्य अभी तक सबमिट नहीं किया गया है)"
 
-     hyperlink:
+    hyperlink:
       hyperlink_action: "हाइपरलिंक एक्शन्स:"
       hide_link: "लिंक छुपाएं"
 
-     main:
+    main:
       submit_hyperlink: "हाइपरलिंक सबमिट करें:"
       quiz: "Quiz:"
 
-     submitted_files:
+    submitted_files:
       submit_file: "फाइल जमा करें:"
       or: "और"
 
-   student_review:
+  student_review:
     list:
-      reviews_for: "रिव्यु फॉर "
+      reviews_for: "इसके लिए समीक्षाएँ: "
       your_instructor_expects: "आपके प्रशिक्षक आपसे अपेक्षा करते है कि आप करेंगे"
       you_are_not_allowed: "आपको कोई अतिरिक्त समीक्षा करने की अनुमति नहीं है।"
       perform_exactly: "आपको करनी चाहिए ठीक"
@@ -300,7 +300,7 @@ hi_IN:
       metareviews_left: "शेष मेटा - रिव्युस की संख्या:"
       back: "वापस पीछे"
 
-     responses:
+    responses:
       view: "व्यू "
       edit: "एडिट "
       update: "अपडेट"
@@ -310,21 +310,21 @@ hi_IN:
       review_done_at: "इस पर समीक्षा की गई --"
       no_previous_available: "कोई पिछले संस्करण उपलब्ध नहीं है"
 
-     set_dynamic_review:
+    set_dynamic_review:
       i_don't_care: "मुझे परवाह नहीं है कि मैं किस विषय की समीक्षा करता हूं।"
       select_topic: "एक नई समीक्षा शुरू करने के लिए नीचे एक विषय का चयन करें:"
       request_new_submission: "समीक्षा करने के लिए एक नए सबमिशन का अनुरोध करें"
 
-     set_dynamic_metareview:
+    set_dynamic_metareview:
       request_new_metareview: "परफॉर्म करने के लिए एक नए मेटायरव्यू का अनुरोध करें"
 
-   grades:
+  grades:
     view_my_scores:
       score_for: "स्कोर फॉर "
       reputation: "रेपुटेशन"
       back: "वापस पीछे"
 
-     view_team:
+    view_team:
       summary_report: "असाइनमेंट के लिए सारांश रिपोर्ट:"
       team: "टीम:"
       topic: "विषय:"
@@ -348,7 +348,7 @@ hi_IN:
       grade: "ग्रेड:"
       comment2: "टिप्पणी:"
 
-   participants:
+  participants:
     change_handle:
       create_or_change: "वर्तमान असाइनमेंट के लिए हैंडल बनाएं या बदलें"
       your: "आपका"

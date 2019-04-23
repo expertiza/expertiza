@@ -45,7 +45,8 @@
       });
     });
 
-    // Server AUTO SAVE: triggers every 60 seconds to save the draft version of the review to database
+    /* SECTION: Server AUTO SAVE: triggers every 60 seconds to save the draft version of the review to database */
+
     var interval = 60000;
     var last_save = new Date();
     // detect how many seconds the userhas been idle
@@ -57,28 +58,30 @@
 
     //if it's was in the background, don't auto save to avoid conflict
     setInterval(function() {
-      if(vis() && $("#autosave_cbx").prop("checked"))
+      if(vis() && $("#autosave_cbx").prop("checked")) {
+        // send form data to the response controller
         autoSaveForm();
+      }
     }, interval);
 
-    //click ajax
+    // 'click' the hidden auto save button located in the form
+    // which sends form data to the response controller
     function autoSaveForm() {
       timeDiff = (new Date().getTime() - last_save.getTime())/1000;
       // ignore saving unless the last save was more than 5s
       if (timeDiff>5 && $('.review_form').length > 0) {
+        // calls the Autosave button event handler
         $("#auto_save_button").click();
       }
 
       // a nested event function under autoSaveForm()
       $(document).ajaxError(function(event, request, settings) {
-        console.log("\r\nAn ajax error occured: \r\n"+request);
         if (settings.url.includes("response") && settings.type == "POST")
           $('#save_progress').html('<span id="tick"> &#9940; </span>' + 'Unable to reach the expertiza server. <br>Create a backup of your comments and you may try to login again in a while');
       });
 
       // a nested event function under autoSaveForm()
       $('form#<%=@modified_object%>').bind('ajax:success', function(evt, data, status, xhr){
-        console.log("\r\nSome kind of AJAX success event as well?\r\n" + data);
 
         $('#save_progress').html('<span id="tick"> &#10004; </span>' +
             'A draft was saved on ' + last_save.toLocaleString('en-US', {
@@ -92,50 +95,7 @@
               hour12: true }));
       });
     }
-
-    /* Event handlers for the autosave, save, and submit buttons */
-
-    // Save button event handler
-    $('#save_button').click(function(){
-      //set save_type param
-      jQuery('#save_type').val('save_button');
-
-      // show UI label with a timeout
-      $('#save_confirm').html('<span id="tick"> &#10004; </span>&nbsp;Saving review!');
-      setTimeout(function(){
-        $('#save_confirm').html('')
-      }, 5000);
-
-      // a nested event function for the save_button click function on AJAX success 
-      /*$('form#<%=@modified_object%>').bind('ajax:success', function(evt, data, status, xhr){
-        console.log("\r\nSome kind of AJAX success event as well?\r\n" + data);
-        
-        //navigate to the student review page
-        window.location.href= "<%= edit_submitted_content_path(@map.reviewer.id) %>";
-      });*/
-
-    });
-
-    // Submit button event handler
-    $('#submit_button').click(function(){
-      //set save_type param 
-      jQuery('#save_type').val('submit_button');
-      
-      // a nested event function for the submit_button click function on AJAX success 
-      /*$('form#<%=@modified_object%>').bind('ajax:success', function(evt, data, status, xhr){
-        console.log("\r\nSome kind of AJAX success event as well?\r\n" + data);
-
-        //navigate to the confirmation page
-        window.location.href= "../../../response/show_confirmation_page?id=<%= @response.id %>&return=<%= @return %>";
-      });*/
-    });
-
-    // Autosave button event handler
-    $('#auto_save_button').click(function(){
-      //set save_type param 
-      jQuery('#save_type').val('auto_save_button');
-    });
-
+    
     // update the values in the form using ajax
     function setFormValues(){
       //update the additional comments
@@ -272,7 +232,45 @@
       if($(this).prop("checked"))
         idleTime = 0;
     });
-    /// end auto reload
+
+    /* END OF SECTION */
+
+    /* SECTION: Event handlers for the autosave, save, and submit buttons */
+
+    // Save button event handler
+    $('#save_button').click(function(){
+      //set button_type param
+      jQuery('#button_type').val('save_button');
+
+      //set is_submitted param
+      jQuery('#is_submitted').val(false);
+
+      // show UI label with a timeout
+      $('#save_confirm').html('<span id="tick"> &#10004; </span>&nbsp;Saving review!');
+      setTimeout(function(){
+        $('#save_confirm').html('')
+      }, 5000);
+    });
+
+    // Submit button event handler
+    $('#submit_button').click(function(){
+      //set button_type param 
+      jQuery('#button_type').val('submit_button');
+
+      //set is_submitted param
+      jQuery('#is_submitted').val(true);
+    });
+
+    // Autosave button (which is hidden) event handler
+    $('#auto_save_button').click(function(){
+      //set button_type param 
+      jQuery('#button_type').val('auto_save_button');
+
+      //set is_submit param
+      jQuery('#is_submit').val(false);
+    });
+
+    /* END OF SECTION */
   });
 </script>
 
@@ -336,7 +334,8 @@
     <%= hidden_field_tag "map_id", @modified_object %>
     <%= hidden_field_tag "saved", (@header == "New") ? 1 : 0 %>
     <%= hidden_field_tag('return', @return) %>
-    <%= hidden_field_tag "save_type", "" %>
+    <%= hidden_field_tag "button_type", "" %>
+    <%= hidden_field_tag  "is_submitted", :id=>"is_submitted" %>
     <!-- hidden button for the auto save -->
     <%= submit_tag "", :id => 'auto_save_button', :style => "display: none;", :remote => true %>
 
@@ -417,7 +416,6 @@
         <%= submit_tag "Submit "+@title, :name => "Submit", :id => "submit_button" %>
         <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
     <% end %>
-    <!-- <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %> -->
 <% end %>
 
 <!--Check whether there is a UploadFile question.-->

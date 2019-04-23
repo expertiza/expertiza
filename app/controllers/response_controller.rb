@@ -68,25 +68,18 @@ class ResponseController < ApplicationController
   # instead of immediately redirecting, first confirm the input response
   def create
     was_submitted = false
-    save_type = params[:save_type]
+    button_type = params[:button_type]
     
     print("\r\nThe params in the create method are: \r\n")
     print(params)
     print("\r\n")
     
-    # An AJAX call is made from the response view due to JS implementation
-    save_response('create')
+    # save form data to db 
+    save_response("create")
 
-    if save_type
-      case save_type
-      when "submit_button"
-        print("\r\n Submit button pressed\r\n")
-      when "save_button"
-        print("\r\n Save button pressed\r\n")
-      when "auto_save_button"
-        print("\r\n Autosave button pressed\r\n")
-      end
-    end
+    # If save or submit button clicked redirect should occur
+    # If auto save button clicked no redirect should occur
+    redirect(button_type)
 
   end
 
@@ -116,21 +109,20 @@ class ResponseController < ApplicationController
   # Update the response and answers when student "edit" existing response
   def update
     render nothing: true unless action_allowed?
-    is_submitted = params[:isSubmit].present?
-    @save_type = params[:save_type]
+    is_submitted = params[:is_submitted].present?
+    button_type = params[:button_type]
 
     # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
     print("\r\nThe params in the update are: \r\n")
     print(params)
     print("\r\n")
 
-    # An AJAX call is made from the response view due to JS implementation
+    # save form data to db 
     save_response("update")
 
-    respond_to do |format|
-       format.html { print "\r\nHTML FORMAT!\r\n" }
-       format.js
-    end
+    # If save or submit button clicked redirect should occur
+    # If auto save button clicked no redirect should occur
+    redirect(button_type)
 
   end
 
@@ -162,27 +154,6 @@ class ResponseController < ApplicationController
     @response = Response.find(params[:id])
     @map = @response.map
     set_content
-  end
-
-  # Adding a function to integrate suggestion detection algorithm (SDA)
-  def get_review_response_metrics
-    uri = URI.parse('https://peer-review-metrics-nlp.herokuapp.com/metrics/all')
-    http = Net::HTTP.new(uri.hostname, uri.port)
-    req = Net::HTTP::Post.new(uri, initheader = {'Content-Type' =>'application/json'})
-    req.body = {"reviews"=>@all_comments,
-                      "metrics"=>["suggestion", "sentiment"]}.to_json
-    http.use_ssl = true
-    
-    begin
-      res = http.request(req)
-      if (res.code == 200 && res.content_type == "application/json")
-        return JSON.parse(res.body) 
-      else 
-        return nil 
-      end
-    rescue StandardError
-      return nil
-    end
   end
 
   def show_confirmation_page
@@ -234,6 +205,27 @@ class ResponseController < ApplicationController
     #render action: "show_confirmation_page"
   end
 
+  # Adding a function to integrate suggestion detection algorithm (SDA)
+  def get_review_response_metrics
+    uri = URI.parse('https://peer-review-metrics-nlp.herokuapp.com/metrics/all')
+    http = Net::HTTP.new(uri.hostname, uri.port)
+    req = Net::HTTP::Post.new(uri, initheader = {'Content-Type' =>'application/json'})
+    req.body = {"reviews"=>@all_comments,
+                      "metrics"=>["suggestion", "sentiment"]}.to_json
+    http.use_ssl = true
+    
+    begin
+      res = http.request(req)
+      if (res.code == "200" && res.content_type == "application/json")
+        return JSON.parse(res.body) 
+      else
+        return nil 
+      end
+    rescue StandardError
+      return nil
+    end
+  end
+
   def save_response(http_method)
     print("\r\n Inside the save_response(#{http_method}) method\r\n")
     
@@ -246,78 +238,87 @@ class ResponseController < ApplicationController
   end
 
   def create_response
-      # NEW change: is_submitted is always false for create.
-      is_submitted = false
+    # NEW change: is_submitted is always false for create.
+    is_submitted = false
 
-      map_id = params[:id]
-      map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
-      @map = ResponseMap.find(map_id)
-      if params[:review][:questionnaire_id]
-        @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
-        @round = params[:review][:round]
-      else
-        @round = nil
-      end
-      # There could be multiple responses per round, when re-submission is enabled for that round.
-      # Hence we need to pick the latest response.
-      @response = Response.where(map_id: @map.id, round: @round.to_i).order(created_at: :desc).first
-      if @response.nil?
-        @response = Response.create(
-          map_id: @map.id,
-          additional_comment: params[:review][:comments],
-          round: @round.to_i,
-          is_submitted: is_submitted
-        )
-      end
-      
-      was_submitted = @response.is_submitted
-      @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
+    map_id = params[:id]
+    map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
+    @map = ResponseMap.find(map_id)
+    if params[:review][:questionnaire_id]
+      @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
+      @round = params[:review][:round]
+    else
+      @round = nil
+    end
+    # There could be multiple responses per round, when re-submission is enabled for that round.
+    # Hence we need to pick the latest response.
+    @response = Response.where(map_id: @map.id, round: @round.to_i).order(created_at: :desc).first
+    if @response.nil?
+      @response = Response.create(
+        map_id: @map.id,
+        additional_comment: params[:review][:comments],
+        round: @round.to_i,
+        is_submitted: is_submitted
+      )
+    end
+    
+    was_submitted = @response.is_submitted
+    @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
 
-      # ,:version_num=>@version)
-      # Change the order for displaying questions for editing response views.
-      questions = sort_questions(@questionnaire.questions)
-      create_answers(params, questions) if params[:responses]
-      msg = "Your response was successfully saved."
-      error_msg = ""
-      # only notify if is_submitted changes from false to true
-      if (@map.is_a? ReviewResponseMap) && (was_submitted == false && @response.is_submitted) && @response.significant_difference?
-        @response.notify_instructor_on_difference
-        @response.email
-      end
-      redirect_to controller: 'response', action: 'save', id: @map.map_id,
-                  return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
+    # ,:version_num=>@version)
+    # Change the order for displaying questions for editing response views.
+    questions = sort_questions(@questionnaire.questions)
+    create_answers(params, questions) if params[:responses]
+    msg = "Your response was successfully saved."
+    error_msg = ""
+    # only notify if is_submitted changes from false to true
+    if (@map.is_a? ReviewResponseMap) && (was_submitted == false && @response.is_submitted) && @response.significant_difference?
+      @response.notify_instructor_on_difference
+      @response.email
+    end
+
+    create_badge
+
+    # log save
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, msg)
+
+    # redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
+    
+    # redirect_to controller: 'response', action: 'save', id: @map.map_id,
+    #             return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
 
   end
 
   def update_response
-      # the response to be updated
-      @response = Response.find(params[:id])
-      @map = @response.map
-      msg = ""
+    msg = "Your response was submitted: #{@response.is_submitted}"
 
-      if params[:isSubmit]
-         save_confirmed_response
-         
-         # log success
-         ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
-         
-         # redirect to save method...which then redirects again
-         redirect_to controller: 'response', action: 'save', id: @map.map_id,
-                  return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
-      else
-         save_unconfirmed_response
-      end
+    if params[:is_submitted]
+      # only updating the is_submit property
+      update_is_submit_property(true)
 
+      #redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
+      #  redirect_to controller: 'response', action: 'save', id: @map.map_id,
+      #           return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
+    else
+      # save the entire form with is_submit = false
+      msg = save_unconfirmed_response
+      create_badge
+    end
+
+    # log save
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, msg, request)
   end
 
-  def save_confirmed_response
-      @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
+  def update_is_submit_property(is_submitted = false)
+      @response.update_attribute('is_submitted', is_submitted)
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
   end
 
   def save_unconfirmed_response
       begin
-        #@map = @response.map
+        # the response to be updated
+        @response = Response.find(params[:id])
+        @map = @response.map
 
         @response.update_attribute('additional_comment', params[:review][:comments])
 
@@ -328,15 +329,16 @@ class ResponseController < ApplicationController
         # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
         create_answers(params, questions) unless params[:responses].nil?
 
-        ##@response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
-        ##@response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
+        update_is_submit_property(false)
+
+        return "Response successfully saved"
       rescue StandardError
-        msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
+        return "Your response was not saved. Cause:189 #{$ERROR_INFO}"
       end
   end
 
-  # This method creates a badge then redirects to other views
-  def save
+  # This method creates/updates badge
+  def create_badge
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
@@ -352,6 +354,24 @@ class ResponseController < ApplicationController
         AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
       end
     end
+  end
+
+  # def save
+    # @map = ResponseMap.find(params[:id])
+    # @return = params[:return]
+    # @map.save
+    # participant = Participant.find_by(id: @map.reviewee_id)
+    # # E1822: Added logic to insert a student suggested 'Good Teammate' or 'Good Reviewer' badge in the awarded_badges table.
+    # if @map.assignment.has_badge?
+    #   if @map.is_a? TeammateReviewResponseMap and params[:review][:good_teammate_checkbox] == 'on'
+    #     badge_id = Badge.get_id_from_name('Good Teammate')
+    #     AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
+    #   end
+    #   if @map.is_a? FeedbackResponseMap and params[:review][:good_reviewer_checkbox] == 'on'
+    #     badge_id = Badge.get_id_from_name('Good Reviewer')
+    #     AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
+    #   end
+    # end
     # also save response metric:suggestion_chances
     ##response_metrics = get_review_response_metrics
 
@@ -363,13 +383,26 @@ class ResponseController < ApplicationController
     # @response.update_suggestion_chance(suggestion_chance.round)
     # @response.suggestion_chance_average(@map.reviewed_object_id)
 
-    print("\r\nThe controller_name variable inside save method is: #{controller_name}\r\n")
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Response was successfully saved")
-    redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
+    # print("\r\nThe controller_name variable inside save method is: #{controller_name}\r\n")
+    # ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Response was successfully saved")
+    # redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
+  # end
+
+  # button_type: auto_save_button, save_button, or submit_button
+  def redirect(button_type)
+    print("\r\nInside the redirect method. button_type = #{button_type}, params[:return] = #{params[:return]}\r\n")
+    is_submitted = params[:is_submitted]
+
+    if button_type == "save_button" || (button_type == "submit_button" && is_submitted ) 
+      navigate_to_different_page
+    elsif button_type == "submit_button" && !is_submitted
+      redirect_to action: 'show_confirmation_page', id: @response.id, return: @return
+    else
+      print("\r\n Autosave button pressed. Not sure how to NOT redirect\r\n")
+    end
   end
 
-  def redirect
-    print("\r\nInside the redirect method. params[:return] = #{params[:return]}\r\n")
+  def navigate_to_different_page
     flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
     @map = Response.find_by(map_id: params[:id])

@@ -181,15 +181,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  def self.required_import_fields
-    {}
-  end
-
-  def self.optional_import_fields
-    {}
-  end
-
-
   # locate User based on provided login.
   # If user supplies e-mail or name, the
   # helper will try to find that User account.

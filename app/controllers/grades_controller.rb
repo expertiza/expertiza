@@ -66,6 +66,7 @@ class GradesController < ApplicationController
     @assignment_name = assignment_review_stats.name
     @round_names = (1..assignment_review_stats.number_of_rounds).map {|i| "Round #{i}" }
     @criteria_names = criteria_names(assignment_review_stats)
+    @criteria_metrics = assignment_review_stats.metrics
 
     @assignment_avg_data = [
       [

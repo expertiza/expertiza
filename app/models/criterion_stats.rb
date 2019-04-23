@@ -5,4 +5,8 @@ class CriterionStats
     @mean = mean
     @median = median
   end
+
+  def metrics
+    %w[Mean Median]
+  end
 end

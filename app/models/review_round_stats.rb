@@ -16,4 +16,8 @@ class ReviewRoundStats
   def number_of_criteria
     @criteria.size
   end
+
+  def metrics
+    @criteria[0].metrics
+  end
 end

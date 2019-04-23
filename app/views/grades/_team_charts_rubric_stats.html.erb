@@ -187,10 +187,9 @@
 
       <td>
         <div><label>Metric:</label></div>
-        <div><select id="metric_selector" onchange="toggleMetric(this);">
-          <option>Mean</option>
-          <option>Median</option>
-        </select></div>
+        <div>
+          <%= select_tag('metric_selector', options_for_select(@criteria_metrics, @criteria_metrics[0]), :onchange => 'toggleMetric(this);') %>
+        </div>
       </td>
     </tr>
   </table>

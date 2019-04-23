@@ -23,4 +23,8 @@ class AssignmentStats
   def number_of_rounds
     @rounds.size
   end
+
+  def metrics
+    @rounds[0].metrics
+  end
 end

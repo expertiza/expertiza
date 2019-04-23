@@ -36,7 +36,9 @@ module ReviewMappingHelper
     [response_maps, rspan]
   end
 
-  # review Conflict helper
+  #
+  # for review conflict report
+  #
   def get_reviews_score_for_team(reviewed_object_id, team_name)
     reviewee_id = Team.select(:id).where(name: team_name, parent_id: reviewed_object_id)
     question_answers = []
@@ -66,12 +68,19 @@ module ReviewMappingHelper
     question_answers
   end
 
-  #
-  # for review conflict report
-  #
   def get_team_members_by_team_name(team_name)
     team_id = Team.select(:id).where(name: team_name)
     TeamsUser.where(team_id: team_id)
+  end
+
+  def get_max_assignment_review_score_per_round(reviewed_object_id)
+    assignment = Assignment.find(reviewed_object_id)
+    total_rounds = assignment.rounds_of_reviews
+    review_max_scores = Array.new(total_rounds)
+    (0..total_rounds-1).each do |round|
+      review_max_scores[round] = SummaryHelper::Summary.new.get_max_score_of_assignment_per_round(assignment, round)
+       end
+    review_max_scores
   end
 
   #

@@ -8,6 +8,10 @@
   </tr>
   </thead>
   <tbody>
+  max Scores:<% max_scores= get_max_assignment_review_score_per_round(@id) %>
+  <% max_scores.each do |score|%>
+  <%=score %>
+  <% end%>
   <%@reviewers.keys.each do |team_name| %>
     <tr>
       <td>

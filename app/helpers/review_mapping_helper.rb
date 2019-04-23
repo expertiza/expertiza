@@ -103,9 +103,11 @@ module ReviewMappingHelper
   end
 		
 
-  def get_team_members_by_team_name(team_name)
+  def get_team_members_by_team_name(team_name, assignment_id)
     team_id = Team.select(:id).where(name: team_name)
-    TeamsUser.where(team_id: team_id)
+    members = TeamsUser.where(team_id: team_id)
+    participant_id = Participant.select(:id).where(user_id: members[0].user_id, parent_id: assignment_id)
+    [members, participant_id[0][:id]]
   end
 
   def get_max_assignment_review_score_per_round(reviewed_object_id)

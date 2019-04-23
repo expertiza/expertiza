@@ -22,9 +22,7 @@ class SignUpTopic < ActiveRecord::Base
     end
     topic = SignUpTopic.where(topic_name: row_hash[:topic_name], assignment_id: session[:assignment_id]).first
     if topic.nil?
-      attributes = ImportTopicsHelper.define_attributes(row_hash)
-
-      ImportTopicsHelper.create_new_sign_up_topic(attributes, session)
+      get_new_sign_up_topic(get_topic_attributes(row_hash), session)
     else
       topic.max_choosers = row_hash[:max_choosers]
       topic.topic_identifier = row_hash[:topic_identifier]
@@ -180,4 +178,24 @@ class SignUpTopic < ActiveRecord::Base
     topic_display += self.topic_identifier.to_s + ' - '
     topic_display + self.topic_name
   end
+end
+
+private
+
+def get_topic_attributes(row_hash)
+  attributes = {}
+  attributes["topic_identifier"] = row_hash[:topic_identifier].strip
+  attributes["topic_name"] = row_hash[:topic_name].strip
+  attributes["max_choosers"] = row_hash[:max_choosers].strip
+  attributes["category"] = row_hash[:category].strip unless row_hash[:category].nil?
+  attributes["description"] = row_hash[:description].strip unless row_hash[:description].nil?
+  attributes["link"] = row_hash[:link].strip unless row_hash[:link].nil?
+  attributes
+end
+
+def get_new_sign_up_topic(attributes, session)
+  sign_up_topic = SignUpTopic.new(attributes)
+  sign_up_topic.assignment_id = session[:assignment_id]
+  sign_up_topic.save
+  # sign_up_topic
 end

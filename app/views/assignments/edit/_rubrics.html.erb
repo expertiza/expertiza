@@ -227,21 +227,21 @@
         addQuestionnaireTableRow(
             'MetareviewQuestionnaire',
             null,
-            <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
+            <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil, nil).to_json.html_safe %>,
             <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
             <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
         );
         addQuestionnaireTableRow(
             'AuthorFeedbackQuestionnaire',
             null,
-            <%= questionnaire(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire',nil).to_json.html_safe %>,
+            <%= questionnaire(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire',nil, nil).to_json.html_safe %>,
             <%= assignment_questionnaire(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire',nil).to_json.html_safe %>,
             <%= questionnaire_options(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire',nil).to_json.html_safe %>
         );
         addQuestionnaireTableRow(
             'TeammateReviewQuestionnaire',
             null,
-            <%= questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
+            <%= questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil, nil).to_json.html_safe %>,
             <%= assignment_questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
             <%= questionnaire_options(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>
         );
@@ -262,7 +262,7 @@
           addQuestionnaireTableRow(
               'ReviewQuestionnaire',
               <%=i%>,
-              <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire', i).to_json.html_safe %>,
+              <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire', i, nil).to_json.html_safe %>,
               <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire', i).to_json.html_safe %>,
               <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire', i).to_json.html_safe %>
           );
@@ -285,7 +285,7 @@
             addQuestionnaireTableRow(
                 'ReviewQuestionnaire',
                 null,
-                <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire', nil).to_json.html_safe %>,
+                <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire', nil, nil).to_json.html_safe %>,
                 <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire', nil).to_json.html_safe %>,
                 <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire', nil).to_json.html_safe %>
             );
@@ -330,7 +330,7 @@
           addQuestionnaireTableRow(
                   'ReviewQuestionnaire',
                   <%=i%>,
-                  <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',i).to_json.html_safe %>,
+                  <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',i, nil).to_json.html_safe %>,
                   <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',i).to_json.html_safe %>,
                   <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire',i).to_json.html_safe %>
           );
@@ -339,7 +339,7 @@
           addQuestionnaireTableRow(
                   'ReviewQuestionnaire',
                   null,
-                  <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>,
+                  <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',nil, nil).to_json.html_safe %>,
                   <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>,
                   <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>
           );
@@ -349,7 +349,7 @@
             addQuestionnaireTableRow(
                     'MetareviewQuestionnaire',
                     null,
-                    <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
+                    <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil, nil).to_json.html_safe %>,
                     <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
                     <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
             );
@@ -357,7 +357,7 @@
           addQuestionnaireTableRow(
                   'AuthorFeedbackQuestionnaire',
                   null,
-                  <%= questionnaire(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire',nil).to_json.html_safe %>,
+                  <%= questionnaire(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire',nil, nil ).to_json.html_safe %>,
                   <%= assignment_questionnaire(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire',nil).to_json.html_safe %>,
                   <%= questionnaire_options(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire',nil).to_json.html_safe %>
           );
@@ -366,7 +366,7 @@
             addQuestionnaireTableRow(
                     'TeammateReviewQuestionnaire',
                     null,
-                    <%= questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
+                    <%= questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil, nil).to_json.html_safe %>,
                     <%= assignment_questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
                     <%= questionnaire_options(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>
             );
@@ -376,7 +376,7 @@
             addQuestionnaireTableRow(
                     'BookmarkRatingQuestionnaire',
                     null,
-                    <%= questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>,
+                    <%= questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil, nil).to_json.html_safe %>,
                     <%= assignment_questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>,
                     <%= questionnaire_options(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>
             );

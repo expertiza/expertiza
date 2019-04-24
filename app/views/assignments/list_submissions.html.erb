@@ -50,7 +50,7 @@
           <% team_name_color = get_team_name_color_in_list_submission(team) %>
           <td><p style = <%="color:#{team_name_color}"%>><%= team.name %></p></td>
 
-          <% else %>
+        <% end %>
         <!--Team member(s) / Participant name-->
           <td>
               <% users_for_curr_team.each do |user| %>
@@ -59,7 +59,7 @@
               <% end %>
           </td>
 
-        <% end %>
+
         <!--Submitted item(s)-->
         <td>
         <!--Display submitted hyperlinks-->

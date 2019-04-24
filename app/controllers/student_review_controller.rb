@@ -12,6 +12,10 @@ class StudentReviewController < ApplicationController
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
     @assignment = @participant.assignment
+
+    #If this is an instructor/ta only reviewer, redirect them back to the assignmen
+    redirect_to list_submissions_assignments_path(:id => @assignment.id) if @participant.is_a?(AssignmentReviewerParticipant)
+
     # Find the current phase that the assignment is in.
     @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
     @review_phase = @assignment.get_current_stage(@topic_id)

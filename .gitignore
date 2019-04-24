@@ -9,6 +9,7 @@ vendor/assets/components/
 config/database.yml
 docker-compose.yml
 config/secrets.yml
+config/github_auth.yml
 coverage
 app/controllers/auth_controller.rb
 nohup.out

@@ -195,16 +195,23 @@ en:
       view_team: "(View and manage your team)"
       submit_work: "(Submit and view your work)"
       your_work: "Your work"
+      others_work: "Others' work"
+      your_readings: "Your readings"
       choose_topic: "(You have to choose a topic first)"
       not_allowed: "(You are not allowed to submit you work right now)"
       give_feedback: "(Give feedback to others on their work)"
       take_quizzes: "Take quizzes"
       quizzes_read: "(Take quizzes over the work you have read)"
       your_scores: "Your scores"
+      alternate_view: "Alternate View"
       view_feedback: "(View feedback on your work)"
+      suggest_topic: "Suggest a topic"
+      take_survey: "Take a survey"
+      change_handle: "Change your handle"
       self_review: "(You have to submit self-review under 'Your work' before checking 'Your scores'.)"
       log_you_out: "(This will log you out)"
       different_handle: "(Provide a different handle for this assignment)"
+      back: "Back"
 
   sign_up_sheet:
     list:
@@ -279,6 +286,8 @@ en:
     main:
       submit_hyperlink: "Submit a hyperlink:"
       quiz: "Quiz:"
+      view_quiz: "View quiz"
+      edit_quiz: "Edit quiz"
 
     submitted_files:
       submit_file: "Submit a file:"

@@ -19,14 +19,14 @@
               <% if @assignment.get_current_stage(topic) != 'submission'%>
                 <td><%= link_to "Begin",{:controller => 'response', :action => 'new', :id => map.id} %></td>
               <%else%>
-                <td>Begin</td><td> (Work has not yet been submitted)</td>
+                <td><%t".begin"%> %></td><td>  <%=t ".work_not_submit" %>" </td>
               <% end %>
             <% else %>
               <td><%= link_to "Begin", {:controller => 'student_quizzes', :action => 'take_quiz', :map_id => map.id, :assignment_id => @assignment.id} %></td>
             <% end %>
           <% else %>
             <% # Deadline has passed, and the work was not submitted %>
-            <td>Begin</td><td> (Work has not yet been submitted)</td>
+            <td><%t".begin"%></td><td><%=t ".work_not_submit" %></td>
           <% end %>
         </tr>
         <% review_no += 1 %>

@@ -382,6 +382,42 @@ hi_IN:
       additional_comments: "अतिरिक्त प्रतिक्रिया यदि कोई हो"
       no_comments: "कोई प्रतिक्रिया नहीं "
 
+  student_quizzes:
+    index:
+      quiz_for: "इसके लिए प्रश्नोत्तरी है: "
+      assignment_not_support: "यह असाइनमेंट क्विज़ का समर्थन नहीं करता है"
+
+    responses:
+      work_not_submit: " आपका काम अभी तक प्रस्तुत नहीं किया गया है"
+      begin: "शुरू करो"
+
+    set_dynamic_quiz:
+      select_topic: "एक नई प्रश्नोत्तरी लेने के लिए नीचे दिए गए विषय का चयन करें"
+      request_new_quiz: "एक नई प्रश्नोत्तरी के लिए अनुरोध करें"
+
+    finished_quiz:
+      answers: "जवाब"
+      quiz_score: "प्रश्नोत्तरी के लिए अंक"
+      back: "वापस पीछे"
+
+    review_questions:
+      quiz_listings: "सभी प्रश्नोत्तरी इसके लिए :"
+      quiz_create: "यह प्रश्नोत्तरी उनके द्वारा बनाई गई थी: "
+      topic: "विषय :"
+      quiz_taker: "प्रश्नोत्तरी लेने वाला व्यक्ति"
+      quiz_score: "प्रश्नोत्तरी के लिए अंक"
+      avg_score: "प्रश्नोत्तरी लेने वाले के लिए औसत अंक"
+
+    take_quiz:
+      questions: "प्रशन"
+      submit_quiz: "कृपया प्रश्नोत्तरी जमा करें"
+
+
+
+
+
+
+
 
 
  # end of Student Views

@@ -115,4 +115,4 @@ to display the label "Your team" in the student assignment tasks-->
   <%= render 'timeline' %>
   <br/>
   <br/>
-  <a href="javascript:window.history.back()">Back</a>
+  <%= link_to "Back", :controller=>'student_task', :action => 'list' %>

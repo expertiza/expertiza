@@ -7,7 +7,6 @@ log/*.log
 tmp/**/*
 vendor/assets/components/
 config/database.yml
-config/github_auth.yml
 docker-compose.yml
 config/secrets.yml
 coverage

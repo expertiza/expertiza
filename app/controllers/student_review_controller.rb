@@ -71,15 +71,15 @@ class StudentReviewController < ApplicationController
     else
       @bids = my_bids
     end
-    signed_up_review_topics = []
+    signed_up_topics = []
     @bids.each do |bid|
       @review_mappings.each do |user_topic|
         if user_topic.assignment_id = bid.bid_topic_identifier
-          signed_up_review_topics << bid
+          signed_up_topics << bid
         end
       end
     end
-    @selected_topics = signed_up_review_topics
+    @selected_topics = signed_up_topics
   end
 
   # E1928 Allow reviews to bid on what review.
@@ -98,11 +98,11 @@ class StudentReviewController < ApplicationController
       Bid.where(team_id: team_id).destroy_all
     else
       @bids = Bid.where(team_id: team_id)
-      signed_up_review_topics = Bid.where(team_id: team_id).map(&:topic_id)
+      signed_up_topics = Bid.where(team_id: team_id).map(&:topic_id)
       # Remove topics from bids table if the student moves data from Selection table to Topics table
       # This step is necessary to avoid duplicate priorities in Bids table
-      signed_review_up_topics -= params[:topic].map(&:to_i)
-      signed_review_up_topics.each do |topic|
+      signed_up_topics -= params[:topic].map(&:to_i)
+      signed_up_topics.each do |topic|
         Bid.where(topic_id: topic, team_id: team_id).destroy_all
       end
 

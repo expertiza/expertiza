@@ -258,7 +258,7 @@ en:
       from: "From"
       team_name_no_colon: "Team Name"
       reply: "Reply"
-      ad_for_team: "Advertisement for teammates"work_not_submitted
+      ad_for_team: "Advertisement for teammates"
       back: "Back"
 
   submitted_content:
@@ -375,17 +375,17 @@ en:
       warning: "Warning:"
       you_must: "You must have a wiki account named after your handle.  If you do not, please e-mail your instructor or the course staff."
 
-   popup:
-     self_review_popup:
-       no_review_done: " No review has been done yet"
-       reviewer_score: " Reviewer's score "
-       self_review_of: " self review "
-       question: " Question "
-       score: "Score"
-       comments: "Comments"
-       other_reviewer_score: "Reviewer Score (Σ weighted score/Σ weighted available score)"
-       additional_comments: "Additional comments"
-       no_comments: "No comments"
+  popup:
+    self_review_popup:
+      no_review_done: " No review has been done yet"
+      reviewer_score: " Reviewer's score "
+      self_review_of: " self review "
+      question: " Question "
+      score: "Score"
+      comments: "Comments"
+      other_reviewer_score: "Reviewer Score (Σ weighted score/Σ weighted available score)"
+      additional_comments: "Additional comments"
+      no_comments: "No comments"
 
 
 

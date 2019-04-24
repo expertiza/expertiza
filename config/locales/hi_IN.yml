@@ -370,6 +370,19 @@ hi_IN:
       warning: "चेतावनी:"
       you_must: "आपके विकी अकाउंट का नाम आपके हैंडल का नाम होना चाहिए। यदि नहीं हैं, तो कृपया अपने प्रशिक्षक या पाठ्यक्रम के कर्मचारियों को ई-मेल करें।"
 
+  popup:
+    self_review_popup:
+      no_review_done: "अभी तक कोई समीक्षा नहीं की गई है"
+      reviewer_score: "समीक्षक दिया हुआ अंक"
+      self_review_of: "की समीक्षा"
+      question: "प्रश्न"
+      score: "अंक"
+      comments: "प्रतिक्रिया"
+      other_reviewer_score: "समीक्षक के अंक (Σ भारित अंक / Σ भारित उपलब्ध अंक)"
+      additional_comments: "अतिरिक्त प्रतिक्रिया यदि कोई हो"
+      no_comments: "कोई प्रतिक्रिया नहीं "
+
+
 
  # end of Student Views
 

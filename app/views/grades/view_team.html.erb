@@ -101,7 +101,7 @@
             
               <% i = 1 %>
               <% vm.list_of_reviews.each do |review| %>
-                <% if (User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).role.name.to_s == 'Instructor' || User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).role.name.to_s == 'Teaching Assistant') %>
+                <% if Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).is_a?(AssignmentReviewerParticipant)  %>
                 <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous %>
                     <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>

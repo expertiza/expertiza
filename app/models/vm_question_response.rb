@@ -54,8 +54,7 @@ class VmQuestionResponse
       instructor_reviews = []
       student_reviews = []
       reviews.each do |review|
-        role = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).role.name.to_s
-        if role == 'Instructor' || role == 'Teaching Assistant'
+        if Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).is_a?(AssignmentReviewerParticipant)
           instructor_reviews << review
         else
           student_reviews << review

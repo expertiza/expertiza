@@ -1,103 +1,46 @@
+require 'byebug'
+
 include GradeInterfaceHelperSpec
 
 describe 'Integration tests for viewing grades: ' do
-  before(:each, &method(:assignment_setup))
+  context 'when checking grade bar chart' do
+    #setup roles
+    let!(:role1) {create(:role_of_student)}
+    let!(:role2) {create :role_of_instructor}
+    let!(:role3) {create :role_of_administrator}
+    let!(:role4) {create :role_of_superadministrator}
 
-  describe 'When the assignment does not have a rubric' do
-    it 'displays the average of all assignment grades'
-    # login_as("instructor6")
-    # visit '/grades/view?id=1'
-    # expect(page).to have_content('Summary report')
-    #
-    it 'does not display the rubric statistics for this assignment'
-    it 'displays the distribution of all assignment grades'
-  end
+    #add users
+    let!(:user1) {create :instructor}
+    let!(:user2) {2.times {create :student}}
 
-  describe 'When the assignment has a rubric' do
-    it 'displays the average of all assignment grades'
-    it 'displays the distribution of all assignment grades'
-    context 'with only one round' do
-      it 'displays the rubric statistics for the assignment'
-      it 'displays the "Analyze" tab'
-      it 'displays the "Compare" tab as not selectable'
-      it 'displays the mean criteria scores on the graph'
-      it 'displays "Round 1"'
-      it 'does not allow selection of a different round'
-      it 'displays all rubric criteria as selected'
-      it 'displays "Mean" in the stat selection menu'
-      describe 'reactions to rubric statistics' do
-        context 'when median is selected' do
-          it 'displays "Round 1"'
-          it 'displays the median criteria scores on the graph'
-          it 'retains selection of all criteria'
-          it 'displays "Median" in the stat selection menu'
-          describe 'then, when one criterion is deselected' do
-            it 'removes the deselected criterion score from the graph'
-            describe 'then, when mean is selected' do
-              it 'retains the previously selected criteria'
-              it 'displays the selected means on the graph'
-              describe 'then, when more than one criterion is deselected' do
-                it 'removes the deselected criteria from the graph'
-                describe 'then, when all criteria are deselected' do
-                  it 'removes all mean criteria scores from the graph'
-                  describe 'then, when median is selected' do
-                    it 'retains a blank graph'
-                  end
-                end
-              end
-            end
-          end
-        end
+    #add assignments
+    let!(:assignment1) {create :assignment, name: "final123"}
+    let!(:assignment_team1) {create :assignment_team}
+    let!(:team_user1) {create :team_user}
+    let!(:participant1) {create :participant}
+    let!(:review_response_map1) {create :review_response_map}
+
+    let!(:q_aire) {create :questionnaire}
+    let!(:assignment1_q_aire) {create :assignment_questionnaire}
+
+    let!(:questions) {5.times {create :question}}
+    let!(:q_advice) {create :question_advice}
+
+    let!(:data_reponse) {create :response, is_submitted: true}
+
+    let!(:answers1) {5.times do |i|
+      5.times do |ii|
+        create(:answers, question_id: i + 1, answer: 90 + ii)
       end
-    end
-    context 'with more than one round' do
-      it 'displays the rubric statistics for the assignment'
-      it 'displays the "Analyze" tab'
-      it 'displays the "Compare" tab as not selectable'
-      it 'displays the mean criteria scores on the graph'
-      it 'displays "Round 1"'
-      it 'displays "Round 1" in the round selection menu'
-      it 'displays all rubric criteria as selected'
-      it 'displays "Mean" in the stat selection menu'
-      describe 'reactions to rubric statistics' do
-        context 'when a different round is selected' do
-          it 'displays the chosen round in the round selection menu'
-          it 'displays all rubric criteria as selected'
-          it 'displays the mean criteria scores on the graph'
-          describe 'and median is selected' do
-            it 'displays the median criteria scores on the graph'
-            it 'retains selection of all criteria'
-            it 'displays "Median" in the stat selection menu'
-            describe 'then, when one criterion is deselected' do
-              it 'removes the deselected criterion score from the graph'
-            end
-          end
-        end
-      end
+    end}
+
+
+    it 'is visible' do
+      login_as("instructor6")
+      visit view_grades_url(:id => assignment1.id)
+      expect(page).to have_selector('#chart_div', visible: true)
     end
 
-    context 'when more than one assignment has rubrics' do
-      it 'displays the "Analyze" tab'
-      describe 'two assignments with rubrics' do
-        context 'when the criteria are not compatible' do
-          it 'displays the "Compare" tab as not selectable'
-        end
-        context 'when the criteria are compatible' do
-          it 'displays the "Compare" tab as selectable'
-          describe 'then, when the Compare tab is selected' do
-            it 'displays the "Assignment" drop down menu'
-            it 'displays both rubric averages'
-            describe 'then, when a criterion is deselected' do
-              it 'removes the deselected criterion from the graph'
-              describe 'then, when median is selected' do
-                it 'displays the median criteria scores on the graph'
-                it 'retains the previously selected criteria'
-                it 'displays "Median" in the stat selection menu'
-              end
-            end
-          end
-        end
-      end
-    end
   end
 end

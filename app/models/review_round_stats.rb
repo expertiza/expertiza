@@ -1,11 +1,7 @@
 class ReviewRoundStats
-  attr_accessor :criteria_stats
-
-  def initialize(criteria_stats)
-    @criteria_stats = criteria_stats
-  end
-
-  def size
-    @criteria_stats.size
+  attr_accessor :criteria
+  # TODO put real implementation here
+  def initialize(criteria)
+    @criteria = criteria
   end
 end

@@ -71,9 +71,11 @@ class QuestionsController < ApplicationController
   def destroy
     question = Question.find(params[:id])
     questionnaire_id = question.questionnaire_id
+    question_ids=Question.where(questionnaire_id: questionnaire_id).ids
+#   delete_answers(questionnaire_id,question_ids)
     begin
       question.destroy
-      flash[:success] = "You have successfully deleted the question!"
+     flash[:success] = "You have successfully deleted the question!"
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end

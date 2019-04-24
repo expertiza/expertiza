@@ -74,7 +74,7 @@ module AssignmentHelper
 
   # Find a questionnaire for the given assignment
   # Find by type if round number & topic id not given
-  # Find by round number alone if round number alone is given
+  # Find by round number alone if round number alone is given (fallback to find by assignment)
   # Find by topic id alone if topic id alone is given
   # Find by round number and topic id if both are given
   # Create new questionnaire of given type if no luck with any of these attempts
@@ -85,6 +85,12 @@ module AssignmentHelper
     elsif topic_id.nil?
       # Find by round
       aq = assignment.assignment_questionnaires.find_by(used_in_round: round_number)
+      # E1936 change comments:
+      # If "Vary by round" is checked and since it saves DB state while switching the Tabs,
+      # Questionnaire rubric (not --None--) and the weight (total of 0 or 100% for all rounds)
+      # must be placed by default so the user may switch the tabs and it can save DB successfully
+      # Otherwise, DB is not successfully saved and switching to Topics tab,
+      # it still determines assignment as non-vary by round
       aq = assignment.assignment_questionnaires.find_by(assignment_id: assignment.id) if aq.nil?
     elsif round_number.nil?
       # Find by topic

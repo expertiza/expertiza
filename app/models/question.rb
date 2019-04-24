@@ -52,6 +52,15 @@ class Question < ActiveRecord::Base
     end
   end
 
+  def max_score
+    self.questionnaire.max_question_score
+  end
+
+  def min_score
+    self.questionnaire.min_question_score
+  end
+
+
   # Placeholder methods, override in derived classes if required.
   # this method decide what to display if an instructor (etc.) is creating or editing a questionnaire
   def edit

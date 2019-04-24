@@ -86,4 +86,9 @@ class Questionnaire < ActiveRecord::Base
     results = Questionnaire.where("id <> ? and name = ? and instructor_id = ?", id, name, instructor_id)
     errors.add(:name, "Questionnaire names must be unique.") if results.present?
   end
+
+  def question_ids_in_order
+    sorted_questions = self.questions.to_a.sort_by! { |q| q.seq }
+    sorted_questions.map { |q| q.id }
+  end
 end

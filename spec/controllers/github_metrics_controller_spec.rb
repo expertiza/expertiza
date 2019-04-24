@@ -20,6 +20,42 @@
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(Assignment).to receive(:find).with(1).and_return(assignment)
   end
+
+
+
+  describe '#view' do
+    before(:each) do
+      allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
+      allow(Participant).to receive(:where).with(parent_id: 1).and_return([participant])
+      allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+      allow(assignment).to receive(:late_policy_id).and_return(false)
+      allow(assignment).to receive(:calculate_penalty).and_return(false)
+      session["github_access_token"] = "QWERTY"
+    end
+
+    context 'when user hasn\'t logged in to GitHub' do
+      before(:each) do
+        @params = {id: 900}
+        session["github_access_token"] = nil
+      end
+
+      it 'stores the current assignment id and the view action' do
+        get :view, @params
+        expect(session["assignment_id"]).to eq("900")
+        expect(session["github_view_type"]).to eq("view_scores")
+      end
+
+      it 'redirects user to GitHub authorization page' do
+        get :view, @params
+        expect(response).to redirect_to(authorize_github_github_metrics_path)
+      end
+    end
+  end
+
+
+
+
+
  describe '#get_statuses_for_pull_request' do
     before(:each) do
       allow(Net::HTTP).to receive(:get) { "{\"team\":\"rails\", \"players\":\"36\"}" }
@@ -159,7 +195,7 @@
 
       it 'redirects user to GitHub authorization page' do
         get :view_github_metrics, @params
-        expect(response).to redirect_to(authorize_github_grades_path)
+        expect(response).to redirect_to(authorize_github_github_metrics_path)
       end
     end
 
@@ -374,16 +410,16 @@
     end
   end
 
-  describe '#make_github_graphql_request' do
-    before(:each) do
-      session['github_access_token'] = "qwerty"
-    end
+  # describe '#make_github_graphql_request' do
+  #   before(:each) do
+  #     session['github_access_token'] = "qwerty"
+  #   end
 
-    it 'gets data from GitHub api v4(graphql)' do
-      response = controller.make_github_graphql_request("{\"team\":\"rails\",\"players\":\"36\"}")
-      expect(response).to eq("message" => "Bad credentials", "documentation_url" => "https://developer.github.com/v4")
-    end
-  end
+  #   it 'gets data from GitHub api v4(graphql)' do
+  #     response = controller.make_github_graphql_request("{\"team\":\"rails\",\"players\":\"36\"}")
+  #     expect(response).to eq("message" => "Bad credentials", "documentation_url" => "https://developer.github.com/v4")
+  #   end
+  # end
 
   describe 'get_query' do
     before(:each) do

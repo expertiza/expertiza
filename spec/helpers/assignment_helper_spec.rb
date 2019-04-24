@@ -58,9 +58,8 @@ describe AssignmentHelper do
       expect(questionnaire(@assignment, "type_is_ignored", 1, nil).id).to eql @q_round_1_topic_nil.id
     end
 
-    it "creates new questionnaire of given type if round number alone is given, no luck finding by round" do
-      returned_questionnaire = questionnaire(@assignment, questionnaire_type, 2, nil)
-      expect(@questionnaire_ids).not_to include returned_questionnaire.id
+    it "finds by assignment if round number alone is given, no luck finding by round" do
+      expect(questionnaire(@assignment, questionnaire_type, 2, nil).id).to eql @q_round_nil_topic_nil.id
     end
 
     it "finds by topic id alone if topic id alone is given" do

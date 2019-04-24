@@ -61,13 +61,13 @@ class GradesController < ApplicationController
     # Define instance variables for rubric visualization
     stats = AssignmentStats.new(@assignment.id)
 
-    @avg_data = avg_data(stats)
-    @med_data = med_data(stats)
+    @avg_data = mean_data(stats)
+    @med_data = median_data(stats)
+    @metric_names = %w[Mean Median]
 
     @assignment_name = @assignment.name
     @round_names = round_names(stats)
     @criteria_names = criteria_names(stats)
-    @metric_names = metric_names(stats)
 
     @assignment_avg_data = [
       [

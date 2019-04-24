@@ -19,8 +19,4 @@ class ReviewRoundStats
   def number_of_criteria
     @criteria.length
   end
-
-  def metric_names
-    @criteria.first.metric_names
-  end
 end

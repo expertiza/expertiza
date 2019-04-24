@@ -1,9 +1,9 @@
 module AssignmentStatsHelper
-  def avg_data(assignment_stats)
+  def mean_data(assignment_stats)
     assignment_stats.rounds.map(&:means)
   end
 
-  def med_data(assignment_stats)
+  def median_data(assignment_stats)
     assignment_stats.rounds.map(&:medians)
   end
 

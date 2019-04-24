@@ -54,8 +54,4 @@ class AssignmentStats
   def number_of_rounds
     @rounds.length
   end
-
-  def metric_names
-    @rounds.first.metric_names
-  end
 end

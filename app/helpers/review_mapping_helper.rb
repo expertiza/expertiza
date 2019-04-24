@@ -43,9 +43,7 @@ module ReviewMappingHelper
     response_id = ResponseMap.select(:id).where(reviewee_id: reviewee_id, reviewer_id: reviewer_id, reviewed_object_id: reviewed_object_id)
     response_id[0][:id]
   end
-  #
-  # for review conflict report
-  #
+
   def get_reviews_score_for_team(reviewed_object_id, team_name)
     reviewee_id = Team.select(:id).where(name: team_name, parent_id: reviewed_object_id)
     question_answers = []
@@ -118,6 +116,60 @@ module ReviewMappingHelper
       review_max_scores[round] = SummaryHelper::Summary.new.get_max_score_of_assignment_per_round(assignment, round)
        end
     review_max_scores
+  end
+
+  def genearte_score_chart(review_max_score, question_answer)
+    scores = Array.new
+    question_answer.each do |reviewer,answer|
+      scores << ((answer.to_f/review_max_score.to_f)*100).round(2)
+    end
+    labels = (1..scores.length).to_a
+    data = {
+        labels: labels,
+        datasets: [
+            {
+                backgroundColor: "rgba(120,186,251,0.8)",
+                borderWidth: 1,
+                data: scores,
+                yAxisID: "bar-y-axis1"
+            }
+        ]
+    }
+    options = {
+        legend: {
+            display: false,
+        },
+        width: "125",
+        height: "75",
+        scales: {
+            yAxes: [{
+                        stacked: true,
+                        id: "bar-y-axis1",
+                        barThickness: 10
+                    }, {
+                        display: false,
+                        stacked: true,
+                        id: "bar-y-axis2",
+                        barThickness: 15,
+                        type: 'category',
+                        categoryPercentage: 0.8,
+                        barPercentage: 0.9,
+                        gridLines: {
+                            offsetGridLines: true
+                        }
+                    }],
+            xAxes: [{
+                        stacked: false,
+                        ticks: {
+                            beginAtZero: true,
+                            stepSize: 10,
+                            max: 100
+                        }
+                    }]
+        }
+    }
+    horizontal_bar_chart data, options
+
   end
 
   #

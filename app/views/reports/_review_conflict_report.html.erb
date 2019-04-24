@@ -1,3 +1,8 @@
+<div style="color:green">
+  Note: Metrics<br>
+  X- axis represents precentage score of the team<br>
+  Y- axis represents the reviewers <br>
+</div><br><br>
 <table id="myTable" class="tbl_heat tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
   <thead>
   <tr bgcolor='#CCCCCC'>
@@ -8,10 +13,7 @@
   </tr>
   </thead>
   <tbody>
-  max Scores:<% max_scores= get_max_assignment_review_score_per_round(@id) %>
-  <% max_scores.each do |score|%>
-  <%=score %>
-  <% end%>
+  <% max_scores= get_max_assignment_review_score_per_round(@id) %>
   <%@reviewers.keys.each do |team_name| %>
     <tr>
       <td>
@@ -31,24 +33,31 @@
           <div style="border-top: dotted; border-width: 1px; border-top-color:#000000;">
             <strong><%= "Round: " + i.to_s %></strong><br>
 	          <i>Reviewers with scores</i><br>
+            <ol>
             <% question_answer.each do |reviewer, answer| %>
-              <div>
                 <li><% response_id = get_response_id(reviewer, @teams[team_name], @id) %>
                   <%= link_to "("+@reviewers[team_name.to_s][reviewer.to_s].to_s+")", :controller => 'popup', :action => 'team_users_popup', :id => @teams[team_name], :id2 => response_id, :assignment_id=>@id %>
                   <%= list_review_submissions(reviewer, @teams[team_name], response_id) %>
                   <%= list_hyperlink_submission(response_id, 5386) if Assignment.find_by(id: @id.to_i).course.instructor.name == 'Jkidd' %>
                   <%= ": " + answer.to_s %>
 		            </li>
-              </div>
             <% end %>
+            </ol>
           </div>
-          <br><strong>Average Score: </strong><%=  average.to_s %><br>
+          <br>
+          <strong>Max Review Score: </strong><%=max_scores[i-1]%><br>
+          <strong>Average Score: </strong><%=  average.to_s %><br>
           <strong>Standard Deviation: </strong><%=  std.to_s %>
 	        <% i+=1 %>
         <% end %>
       </td>
       <td>
-
+        <% i = 1 %>
+        <% question_answers.each do |question_answer| %>
+          <strong><%= "Round: " + i.to_s %></strong>
+          <%= genearte_score_chart(max_scores[i-1], question_answer) %>
+          <% i+=1 %>
+          <% end%>
       </td>
     </tr>
   <% end %>

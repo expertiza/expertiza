@@ -14,13 +14,13 @@ class CourseParticipant < Participant
 
   # provide import functionality for Course Participants
   # if user does not exist, it will be created and added to this assignment
-  def self.import(row_hash, _row_header = nil, session, id)
-    raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < self.required_import_fields.length
+  def self.import(row_hash, session, id)
+    raise ArgumentError, "The record does not have enough items." if row_hash.length < self.required_import_fields.length
     user = User.find_by(name: row_hash[:name])
     return unless user.nil?
     user = User.import(row_hash, session, nil)
     course = Course.find_by(id)
-    raise ImportError, "The course with the id \"" + id.to_s + "\" was not found." if course.nil?
+    raise ImportError, "The course with id " + id.to_s + " was not found." if course.nil?
     unless CourseParticipant.exists?(user_id: user.id, parent_id: id)
       CourseParticipant.create(user_id: user.id, parent_id: id)
     end

@@ -8,6 +8,7 @@ describe Team do
   let(:user3) { build(:student, id: 3) }
   let(:team) { build(:assignment_team, id: 1, name: 'no team', users: [user]) }
   let(:team_user) { build(:team_user, id: 1, user: user) }
+  let(:assignment_team) { build(:assignment_team) }
   before(:each) do
     allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
   end
@@ -182,38 +183,53 @@ describe Team do
     end
   end
 
-  describe '.import' do
-    context 'when row is empty and has_column_names option is not true' do
+  describe '.import_helper' do
+    let(:options) do
+      {handle_dups: 'ignore'}
+    end
+
+    context 'when no handle duplicates option provided' do
       it 'raises an ArgumentError' do
-        expect { Team.import({}, 1, {has_column_names: 'false'}, AssignmentTeam.new) }
-          .to raise_error(ArgumentError, 'Not enough fields on this line.')
+        expect { Team.import_helper({}, 1, {has_column_names: 'false'}, AssignmentTeam.new) }
+          .to raise_error(ArgumentError, "Include duplicate handling option.")
       end
     end
 
-    # E1776 (Fall 2017)
-    #
-    # The tests below are no longer reflective of the current import that uses row_hash ==> {teammembers: ['name', 'name'], teamname: 'teamname'}.
-    #
-    # context 'when has_column_names option is true' do
-    #   it 'handles duplicated teams and imports team members' do
-    #     allow(Team).to receive(:find_by).with(name: 'no team', parent_id: 1).and_return(team)
-    #     allow_any_instance_of(Team).to receive(:handle_duplicate)
-    #       .with(team, 'no team', 1, 'rename', AssignmentTeam.new).and_return('new team name')
-    #     allow(AssignmentTeam).to receive(:create_team_and_node).with(1).and_return(AssignmentTeam.new)
-    #     allow_any_instance_of(Team).to receive(:import_team_members).with(1, ['no team', 'another field']).and_return(true)
-    #     expect(Team.import(['no team', 'another field'], 1, {has_column_names: 'true'}, AssignmentTeam.new)).to be true
-    #   end
-    # end
-    #
-    # context 'when has_column_names option is not true' do
-    #   it 'generated team name directly and imports team members' do
-    #     allow(Assignment).to receive(:find).with(1).and_return(assignment)
-    #     allow(Team).to receive(:generate_team_name).with('no assgt').and_return('new team name')
-    #     allow(AssignmentTeam).to receive(:create_team_and_node).with(1).and_return(AssignmentTeam.new)
-    #     allow_any_instance_of(Team).to receive(:import_team_members).with(0, ['no team', 'another field']).and_return(true)
-    #     expect(Team.import(['no team', 'another field'], 1, {has_column_names: 'false'}, AssignmentTeam.new)).to be true
-    #   end
-    # end
+    context 'when teamname provided' do
+      let(:row) do
+        {teamname: 'Ruby', teammembers: 'none'}
+      end
+      it 'uses provided teamname' do
+        allow(Team).to receive(:where).with(any_args).and_return(team)
+        allow(team).to receive(:first).and_return(team)
+        allow(team).to receive(:nil?).and_return(false)
+        allow(Team).to receive(:handle_duplicate).and_return("Ruby")
+        allow(team).to receive(:import_team_members).with(any_args).and_return(nil)
+        allow(Object).to receive_message_chain(:const_get, :create_team_and_node).and_return(team)
+        expect(team).to receive(:save) # Expect the object creation in the database
+
+        Team.import_helper(row, 1, options, AssignmentTeam.prototype)
+      end
+    end
+
+    context 'when teamname is not provided' do
+      let(:row) do
+        {teammembers: 'none'}
+      end
+      it 'generates a teamname' do
+        allow(Assignment).to receive(:find).with(any_args).and_return(assignment)
+        allow(Team).to receive(:generate_team_name).with(assignment.name).and_return("Not a team")
+        allow(AssignmentTeam).to receive(:create_team_and_node).with(any_args).and_return(team)
+        allow(Object).to receive_message_chain(:const_get, :create_team_and_node).and_return(team)
+        allow(AssignmentTeam).to receive(:is_a?).with(AssignmentTeam).and_return(true)
+        allow(team).to receive(:import_team_members).with(any_args).and_return(nil)
+        expect(Team).to receive(:generate_team_name).with(assignment.name) # Expect a team name will be generated if not provided
+        expect(team).to receive(:save) # Expect the object creation in the database
+
+        Team.import_helper(row, 1, options, assignment_team)
+      end
+    end
+
   end
 
   describe '.handle_duplicate' do

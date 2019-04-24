@@ -202,7 +202,6 @@ class Team < ActiveRecord::Base
     end
 
     # insert team members into team unless team was pre-existing & we ignore duplicate teams
-
     team.import_team_members(row_hash) unless team_exists && options[:handle_dups] == "ignore"
   end
 

@@ -59,12 +59,12 @@
                 <% for round in 1..@assignment.rounds_of_reviews %>
               addQuestionnaireTableRowInTopics('ReviewQuestionnaire', <%= round %>, <%= i %>,
                     <%= questionnaire(@assignment, 'ReviewQuestionnaire', round, topic.id).to_json.html_safe %>,
-                    <%= questionnaire_options(@assignment, 'ReviewQuestionnaire', round).to_json.html_safe %>);
+                    <%= questionnaire_options('ReviewQuestionnaire').to_json.html_safe %>);
                 <% end %>
               <% else %>
               addQuestionnaireTableRowInTopics('ReviewQuestionnaire', null, <%= i %>,
                     <%= questionnaire(@assignment, 'ReviewQuestionnaire', nil, nil).to_json.html_safe %>,
-                    <%= questionnaire_options(@assignment, 'ReviewQuestionnaire', nil).to_json.html_safe %>);
+                    <%= questionnaire_options('ReviewQuestionnaire').to_json.html_safe %>);
               <% end %>
           </script>
         </tr>

@@ -59,7 +59,7 @@
                     null,
                     <%= questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil, nil ).to_json.html_safe %>,
                     <%= assignment_questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil, nil).to_json.html_safe %>,
-                    <%= questionnaire_options(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>
+                    <%= questionnaire_options('BookmarkRatingQuestionnaire').to_json.html_safe %>
             );
           }
       }

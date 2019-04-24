@@ -33,6 +33,12 @@ describe AssignmentHelper do
     ]
   end
 
+  describe "#questionnaire_options" do
+    it "throws exception if type argument nil" do
+      expect {questionnaire_options(nil)}.to raise_exception(NoMethodError)
+    end
+  end
+
   # Method signature: questionnaire(assignment, questionnaire_type, round_number, topic_id)
   describe "#questionnaire" do
 

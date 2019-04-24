@@ -17,13 +17,17 @@
 
     <div class="suggestions">
         <h3>Suggestions</h3>
-        <p>Are there suggestions? <span>Yes (10%)</span></p>
-        <p>What is the class average? <span>0%</span></p>
+        <p>Are there suggestions? <span> <%= (@avg_suggestion_chance_for_response > 50)? "Yes": "No" %>
+          (<%= @avg_suggestion_chance_for_response%>%)</span></p>
+
+        <p>What is the class average? <span><%=  @assignment_suggestion_average  %>%</span></p>
     </div>
 
     <div class="tone">
         <h3>Tone</h3>
-        <p>Did you strike a positive, negative, or neutral tone? <span>Neutral</span></p>
+        <p>Did you strike a positive, negative, or neutral tone? <span>
+          <%= @sentiment_keyword_for_response%>
+        </span></p>
         <p>What about the class? What is the overall tone for this review round? <span>Positive</span></p>
     </div>
 

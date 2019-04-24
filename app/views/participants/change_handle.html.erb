@@ -13,5 +13,5 @@
 
     <p><em><%=t ".warning"%></em> <%=t ".you_must"%></p>
     <%= submit_tag 'Save' %>
-    <%= link_to "Back", :controller=>'student_task', :action => 'view', :id =>  @participant %>
+    <%= link_to t(".back"), :controller=>'student_task', :action => 'view', :id =>  @participant %>
   <% end %>

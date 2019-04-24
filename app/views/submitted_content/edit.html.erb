@@ -12,4 +12,4 @@
 
 <BR/>
 <BR/>
-<a href="javascript:window.history.back()"><%=t ".back" %></a>
+<%= link_to t(".back"), :controller=>'student_task', :action => 'view', :id =>  @participant %>

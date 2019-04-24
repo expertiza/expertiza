@@ -6,6 +6,7 @@ class GradesController < ApplicationController
   include StudentTaskHelper
   include AssignmentHelper
   include GradesHelper
+  include AssignmentStatsHelper
 
   def action_allowed?
     case params[:action]
@@ -58,7 +59,7 @@ class GradesController < ApplicationController
     @show_reputation = false
 
     # Define instance variables for rubric visualization
-    assignment_stats = @assignment.review_rounds_statistics
+
 
     @avg_data = [
       [76, 84, 54, 92, 64],
@@ -70,9 +71,9 @@ class GradesController < ApplicationController
       [3, 3.5, 3, 2.5]
     ]
 
-    @assignment_name = assignment_stats[0].name
-    @round_names = round_names(assignment_stats[0])
-    @criteria_names = criteria_names(assignment_stats[0])
+    @assignment_name = 'Name'
+    @round_names = round_names(nil)
+    @criteria_names = criteria_names(nil)
 
     @assignment_avg_data = [
       [
@@ -342,17 +343,5 @@ class GradesController < ApplicationController
 
   def mean(array)
     array.inject(0) {|sum, x| sum += x } / array.size.to_f
-  end
-
-  def round_names(assignment_stats)
-    (1..assignment_stats.size).map {|i| "Round #{i}" }
-  end
-
-  def criteria_names(assignment_stats)
-    array = []
-    assignment_stats.review_round_stats.each do |review_round|
-      array << (1..review_round.criteria_stats.size).map {|i| "Criterion #{i}" }
-    end
-    array
   end
 end

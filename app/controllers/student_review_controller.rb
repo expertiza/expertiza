@@ -71,17 +71,18 @@ class StudentReviewController < ApplicationController
     else
       @bids = my_bids
     end
-    signed_up_topics = []
+    signed_up_review_topics = []
     @bids.each do |bid|
       @review_mappings.each do |user_topic|
         if user_topic.assignment_id = bid.bid_topic_identifier
-          signed_up_topics << bid
+          signed_up_review_topics << bid
         end
       end
     end
-    @selected_topics = signed_up_topics
+    @selected_topics = signed_up_review_topics
   end
 
+  # E1928 Allow reviews to bid on what review.
   # set the priority of review
   def set_priority
     @participant = AssignmentParticipant.find(params[:participant_id])
@@ -91,6 +92,20 @@ class StudentReviewController < ApplicationController
     bidding_teams.each do |team|
       ReviewBid.where(team_id: team, participant_id: @participant.id).destroy_all
     end
+
+    if params[:topic].nil?
+      # All topics are deselected by current team
+      Bid.where(team_id: team_id).destroy_all
+    else
+      @bids = Bid.where(team_id: team_id)
+      signed_up_review_topics = Bid.where(team_id: team_id).map(&:topic_id)
+      # Remove topics from bids table if the student moves data from Selection table to Topics table
+      # This step is necessary to avoid duplicate priorities in Bids table
+      signed_review_up_topics -= params[:topic].map(&:to_i)
+      signed_review_up_topics.each do |topic|
+        Bid.where(topic_id: topic, team_id: team_id).destroy_all
+      end
+
     # Refresh with new priority
     params[:topic].each_with_index do |team_id, index|
       bid_existence = ReviewBid.where(team_id: team_id, participant_id: @participant.id)
@@ -101,5 +116,6 @@ class StudentReviewController < ApplicationController
       end
     end
     redirect_to action: 'list', assignment_id: assignment_id
+    end
   end
 end

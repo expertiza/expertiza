@@ -62,12 +62,12 @@ class GradesController < ApplicationController
     stats = AssignmentStats.new(@assignment.id)
 
     @avg_data = avg_data(stats)
-
     @med_data = med_data(stats)
 
-    @assignment_name = 'Name'
+    @assignment_name = @assignment.name
     @round_names = round_names(stats)
     @criteria_names = criteria_names(stats)
+    @metric_names = metric_names(stats)
 
     @assignment_avg_data = [
       [

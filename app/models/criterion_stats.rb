@@ -15,4 +15,8 @@ class CriterionStats
     normalized_mean = (mean - min.to_f)/(max.to_f - min.to_f)
     @mean = normalized_mean * 100
   end
+
+  def metric_names
+    %w[Mean Median]
+  end
 end

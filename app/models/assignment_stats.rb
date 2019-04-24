@@ -1,5 +1,6 @@
 class AssignmentStats
   attr_accessor :rounds, :name
+
   def initialize(assignment_id)
     @name = Assignment.find(assignment_id).name
     # These represent rounds
@@ -48,5 +49,13 @@ class AssignmentStats
     scores_hash.each do |round, criteria_hash|
       @rounds << ReviewRoundStats.new(criteria_hash, question_id_index_hash)
     end
+  end
+
+  def number_of_rounds
+    @rounds.length
+  end
+
+  def metric_names
+    @rounds.first.metric_names
   end
 end

@@ -391,7 +391,7 @@
                         'MetareviewQuestionnaire',
                         null,
                         <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil, nil).to_json.html_safe %>,
-                        <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
+                        <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil, nil).to_json.html_safe %>,
                         <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
                 );
             }
@@ -437,7 +437,7 @@ function removeOrAddMetareview() {
             'MetareviewQuestionnaire',
             null,
             <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil, nil).to_json.html_safe %>,
-            <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
+            <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil, nil).to_json.html_safe %>,
             <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
         );
     }

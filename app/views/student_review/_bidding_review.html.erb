@@ -22,7 +22,7 @@
       <tr><%= render :partial => 'table_header' %></tr>
       <br/><br/>
       <% i=1 %>
-      <tbody id="reviews" data-update-url=<%= "/student_review/set_priority?participant_id=#{participant.id}" %> class="connectedSortable">
+      <tbody id="topics" data-update-url=<%= "/student_review/set_priority?participant_id=#{participant.id}" %> class="connectedSortable">
       <tr class="sort-disabled"><td></td><td></td></tr>
       <% for bid in @bids %>
         <%#= get_intelligent_review_row(bid) %>

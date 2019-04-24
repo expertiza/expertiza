@@ -48,23 +48,23 @@
       <td align="center"><%= topic.micropayment %></td>
   <% end %>
 
-  <% if @assignment_form.assignment.varying_rubrics_by_topic? %>
+  <% if @assignment.varying_rubrics_by_topic? %>
     <% table_id = "topic_questionnaire_table" + i.to_s %>
     <td>
       <table id = <%=table_id %>>
         <tr>
           <script>
               //page_name = "./assignment/edit.html.erb";
-              <% if @assignment_form.assignment.varying_rubrics_by_round? %>
-                <% for round in 1..@assignment_form.assignment.rounds_of_reviews %>
+              <% if @assignment.varying_rubrics_by_round? %>
+                <% for round in 1..@assignment.rounds_of_reviews %>
               addQuestionnaireTableRowInTopics('ReviewQuestionnaire', <%= round %>, <%= i %>,
-                    <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire', round, topic.id).to_json.html_safe %>,
-                    <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire', round).to_json.html_safe %>);
+                    <%= questionnaire(@assignment, 'ReviewQuestionnaire', round, topic.id).to_json.html_safe %>,
+                    <%= questionnaire_options(@assignment, 'ReviewQuestionnaire', round).to_json.html_safe %>);
                 <% end %>
               <% else %>
               addQuestionnaireTableRowInTopics('ReviewQuestionnaire', null, <%= i %>,
-                    <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire', nil, nil).to_json.html_safe %>,
-                    <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire', nil).to_json.html_safe %>);
+                    <%= questionnaire(@assignment, 'ReviewQuestionnaire', nil, nil).to_json.html_safe %>,
+                    <%= questionnaire_options(@assignment, 'ReviewQuestionnaire', nil).to_json.html_safe %>);
               <% end %>
           </script>
         </tr>

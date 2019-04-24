@@ -41,7 +41,7 @@
       <tr class="sort-disabled"><td></td><td></td></tr>
       <% for topic in @bids %>
         <%#= get_intelligent_review_row(topic) %>
-        <tr style= "background-color:<%= get_topic_bg_color(topic, @max_team_size) %>" id="topic_<%= topic.id %>">
+        <tr style= "background-color:<%= get_topic_bg_color_by_review(topic, @max_team_size) %>" id="topic_<%= topic.id %>">
           <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic} %>
         </tr>
         <% i=i+1 %>

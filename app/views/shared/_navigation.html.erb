@@ -21,8 +21,8 @@
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Select language<b class="caret"></b></a>
           <ul class="dropdown-menu">
-            <li><%=link_to_unless_current "English", locale: "en", :params => request.query_parameters %></li>
-            <li><%=link_to_unless_current "Hindi", locale: "hi_IN", :params => request.query_parameters %></li>
+            <li><%=link_to_unless_current "English", locale: "en", :id =>  @participant %></li>
+            <li><%=link_to_unless_current "Hindi", locale: "hi_IN", :id =>  @participant %></li>
           </ul>
         </li>
         <% if current_user %>

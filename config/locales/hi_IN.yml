@@ -179,8 +179,9 @@ hi_IN:
       publishing_rights: "प्रकाशन अधिकार"
 
     publishing_rights:
-      select_assignment: "सूची या सेट से असाइनमेंट का चयन करें"
-      for_work: "आपके काम के लिए"
+      select_assignment: "सूची से असाइनमेंट चुनें या अपने काम के लिए"
+      publishing_rights: "प्रकाशन अधिकार"
+      for_work: "सेट करें।"
 
     view:
       submit_review: "सबमिट करें या काम की समीक्षा करें"
@@ -190,16 +191,23 @@ hi_IN:
       view_team: "(अपनी टीम देखें और प्रबंधित करें)"
       submit_work: "(सबमिट करें और अपना काम देखें)"
       your_work: "आपका काम"
+      others_work: "दूसरों का काम"
+      your_readings: "आपकी रीडिंग"
       choose_topic: "(आपको पहले एक विषय चुनना होगा)"
       not_allowed: "(आपको अभी आपको काम सबमिट करने की अनुमति नहीं है)"
       give_feedback: "(दूसरों को उनके काम पर प्रतिक्रिया दें)"
-      take_quizzes: "प्रश्नोत्तरी ले लो"
+      take_quizzes: "प्रश्नोत्तरी लें"
       quizzes_read: "(आपके द्वारा पढ़े गए काम पर प्रश्नोत्तरी लें)"
       your_scores: "आपके स्कोर"
+      alternate_view: "वैकल्पिक देखें"
       view_feedback: "(अपने काम पर प्रतिक्रिया देखें)"
+      suggest_topic: "नया विषय सुझाएं"
+      take_survey: "एक सर्वेक्षण ले"
+      change_handle: "अपना हैंडल बदलें"
       self_review: "(आपको 'अपने स्कोर' की जांच करने से पहले 'अपने काम' के तहत स्वयं समीक्षा सबमिट करनी होगी।)"
       log_you_out: "(यह आपको लॉग आउट कर देगा)"
       different_handle: "(इस असाइनमेंट के लिए एक अलग हैंडल प्रदान करें)"
+      back: "वापस पीछे"
 
   sign_up_sheet:
     list:
@@ -273,7 +281,9 @@ hi_IN:
 
     main:
       submit_hyperlink: "हाइपरलिंक सबमिट करें:"
-      quiz: "Quiz:"
+      quiz: "प्रश्नोत्तरी:"
+      view_quiz: "प्रश्नोत्तरी देखें"
+      edit_quiz: "प्रश्नोत्तरी बदलें"
 
     submitted_files:
       submit_file: "फाइल जमा करें:"
@@ -369,6 +379,7 @@ hi_IN:
       for_current: "वर्तमान असाइनमेंट के लिए"
       warning: "चेतावनी:"
       you_must: "आपके विकी अकाउंट का नाम आपके हैंडल का नाम होना चाहिए। यदि नहीं हैं, तो कृपया अपने प्रशिक्षक या पाठ्यक्रम के कर्मचारियों को ई-मेल करें।"
+      back: "वापस पीछे"
 
   popup:
     self_review_popup:

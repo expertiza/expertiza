@@ -8,6 +8,7 @@ require 'yaml'
 # the idiomatic ruby method names (without get_)
 
 class AssignmentParticipant < Participant
+  #scope :students, ->{ where('ParticipantType == AssignmentParticipant')}
   belongs_to  :assignment, class_name: 'Assignment', foreign_key: 'parent_id'
   has_many    :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewee_id'
   has_many    :response_maps, foreign_key: 'reviewee_id'

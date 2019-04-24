@@ -167,7 +167,6 @@ class ResponseController < ApplicationController
     req.body = {"reviews"=>@all_comments,
                       "metrics"=>["suggestion", "sentiment"]}.to_json
     http.use_ssl = true
-    
     begin
       res = http.request(req)
       if (res.code == "200" && res.content_type == "application/json")
@@ -188,7 +187,6 @@ class ResponseController < ApplicationController
 
     # a response should already exist when viewing this page
     render nothing:true unless @response
-
     @all_comments = []
 
     # NEW change: since response already saved 
@@ -205,29 +203,56 @@ class ResponseController < ApplicationController
     # send user review to API for analysis
     @api_response = get_review_response_metrics
 
+    #@response = Response.find_by_id(_params[:id])  #should be there if saved first
+
+    #compute average for all response fields in ONE response
+    suggestion_chance = 0
+    suggestion_sentiment_score = 0
+
     if @api_response
-
-      #compute average for all response fields
-      suggestion_chance = 0
-      puts @api_response["results"]
       puts @api_response["results"].size
-      0.upto(@api_response["results"].size - 1) do |i|
+      number_of_responses = @api_response["results"].size
+
+      0.upto(number_of_responses- 1) do |i|
         suggestion_chance += @api_response["results"][i]["metrics"]["suggestion"]["suggestions_chances"]
+        suggestion_sentiment_score += @api_response["results"][i]["metrics"]["sentiment"]["sentiment_score"]
       end
-      average_suggestion_chance = suggestion_chance/@api_response["results"].size
+
+      @avg_suggestion_chance_for_response = suggestion_chance/number_of_responses
+      @avg_suggestion_chance_for_response = @avg_suggestion_chance_for_response.to_i
+      avg_sentiment_score_for_response = suggestion_sentiment_score/number_of_responses
+      @sentiment_keyword_for_response = @response.get_sentiment_text(avg_sentiment_score_for_response) #get text
+
       puts suggestion_chance.to_s    #debug print
+      puts @avg_sentiment_score_for_response.to_s
 
-      @response.update_suggestion_chance(average_suggestion_chance.to_i)
+      @assignment_suggestion_average = -1;
+
       # compute average
-
       @map = ResponseMap.find(@response.map_id)
       # below is class avg (suggestion score)for this assignment
-      @response.suggestion_chance_average(@map.reviewed_object_id)
+      @assignment_suggestion_average = @response.suggestion_chance_average(@map.reviewed_object_id) #pass assignment id
 
+      if (@assignment_suggestion_average < 0)     #if no class average found, display current score as average
+        @assignment_suggestion_average = @avg_suggestion_chance_for_response
+      end
       #display average
+
+      submit_response(@assignment_suggestion_average)      # TODO: find suitable place --save in DB
+      #render action: "review_confirmation"
     end
-    #print("\r\nInside show_confirmation_page about to render view\r\n")
-    #render action: "show_confirmation_page"
+    
+  end
+
+  def submit_response(suggestion_chance = nil)
+    print("\r\n Inside the submit_response method\r\n")
+    # TODO: implement this function
+
+
+    # Added by sushan --update the suggestion score in responses DB once the assignment is submitted
+    # Update the sentiment score as well
+    @response.update_suggestion_chance(suggestion_chance) if !suggestion_chance.nil? # --do this after submission!!
+
   end
 
   def save_response(http_method)

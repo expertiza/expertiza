@@ -517,7 +517,7 @@ describe "assignment function" do
       expect(topics_exist).to be_eql 0
     end
 
-    it "hides topics tab when has topics is un-checked", js:true do
+    it "hides topics tab when has topics is un-checked", js: true do
       click_link 'General'
       uncheck("assignment_has_topics")
       # The below line is used to accept the js confirmation popup

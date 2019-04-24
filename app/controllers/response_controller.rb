@@ -168,6 +168,7 @@ class ResponseController < ApplicationController
     res = http.request(req)
 
     return JSON.parse(res.body)
+
   end
 
   def save
@@ -186,16 +187,6 @@ class ResponseController < ApplicationController
         AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
       end
     end
-    # also save response metric:suggestion_chances
-    response_metrics = get_review_response_metrics
-
-
-    # suggestion_chance = response_metrics["results"][0]["metrics"]["suggestion"]["suggestions_chances"]
-    # puts suggestion_chance.class
-    # puts suggestion_chance.to_s    #debug print
-    # @response = Response.where(map_id: @map.id).first
-    # @response.update_suggestion_chance(suggestion_chance.round)
-    # @response.suggestion_chance_average(@map.reviewed_object_id)
 
 
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Response was successfully saved")
@@ -203,7 +194,6 @@ class ResponseController < ApplicationController
   end
 
   def show_confirmation_page(_params)
-    print("\r\nInside show_confirmation_page(#{_params})\r\n")
 
     @the_params = _params
     @all_comments = []
@@ -216,14 +206,12 @@ class ResponseController < ApplicationController
     end
     # send user review to API for analysis
     @api_response = get_review_response_metrics
-    @response = Response.find(_params[:id])
-    # save to database
+    @response = Response.find_by_id(_params[:id])  #should be there if saved first
 
-    #compute average for all response fields
+    #compute average for all response fields in ONE response
     suggestion_chance = 0
     suggestion_sentiment_score = 0
 
-    #puts @api_response["results"]
     puts @api_response["results"].size
     number_of_responses = @api_response["results"].size
 
@@ -232,29 +220,38 @@ class ResponseController < ApplicationController
       suggestion_sentiment_score += @api_response["results"][i]["metrics"]["sentiment"]["sentiment_score"]
     end
 
-    average_suggestion_chance = suggestion_chance/number_of_responses
-    average_suggestion_sentiment_score = suggestion_sentiment_score/number_of_responses
+    @avg_suggestion_chance_for_response = suggestion_chance/number_of_responses
+    @avg_suggestion_chance_for_response = @avg_suggestion_chance_for_response.to_i
+    avg_sentiment_score_for_response = suggestion_sentiment_score/number_of_responses
+    @sentiment_keyword_for_response = @response.get_sentiment_text(avg_sentiment_score_for_response) #get text
 
     puts suggestion_chance.to_s    #debug print
-    puts average_suggestion_sentiment_score.to_s
+    puts @avg_sentiment_score_for_response.to_s
 
-    @response.update_suggestion_chance(average_suggestion_chance.to_i)
+    @assignment_suggestion_average = -1;
 
     # compute average
-
     @map = ResponseMap.find(@response.map_id)
     # below is class avg (suggestion score)for this assignment
-    @response.suggestion_chance_average(@map.reviewed_object_id)
+    @assignment_suggestion_average = @response.suggestion_chance_average(@map.reviewed_object_id) #pass assignment id
 
+    if (@assignment_suggestion_average < 0)     #if no class average found, display current score as average
+      @assignment_suggestion_average = @avg_suggestion_chance_for_response
+    end
     #display average
 
-    print("\r\nInside show_confirmation_page about to render view\r\n")
+    submit_response(@assignment_suggestion_average)      # TODO: find suitable place --save in DB
     render action: "review_confirmation"
   end
 
-  def submit_response
+  def submit_response(suggestion_chance = nil)
     print("\r\n Inside the submit_response method\r\n")
     # TODO: implement this function
+
+
+    # Added by sushan --update the suggestion score in responses DB once the assignment is submitted
+    # Update the sentiment score as well
+    @response.update_suggestion_chance(suggestion_chance) if !suggestion_chance.nil? # --do this after submission!!
   end
 
   def save_response(http_method)

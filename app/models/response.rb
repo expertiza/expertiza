@@ -53,6 +53,7 @@ class Response < ActiveRecord::Base
 
   def suggestion_chance_average(assignment)
     # this method will compute the suggestion_chances average for all responses for the particular assignment
+    # if no responses exist for particular assignment, return -1 as average suggestion chance
     # make a list of responses for a particular assignment
     responses = []
     response_map_list = ResponseMap.where(reviewed_object_id: assignment)
@@ -61,11 +62,19 @@ class Response < ActiveRecord::Base
     end
     puts responses #debug print
     #sum up the suggestion chance percentages
-    avg = 0
+
+    avg = -1
     responses.each{|r| avg += r.suggestion_chance_percentage if !r.suggestion_chance_percentage.nil? }
     #divide by the number of responses
-    avg /= response_map_list.size.to_f
+
+    return (avg / response_map_list.size) if avg > 0
+    avg
     #average is returned for suggestion chances
+  end
+
+  def get_sentiment_text(avg_sentiment_for_response)
+    #convert average into keyword
+     (avg_sentiment_for_response < -0.3) ? "Negative":(avg_sentiment_for_response > 0.3)?"Positive":"Neutral"
   end
 
   def delete

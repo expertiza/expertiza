@@ -22,7 +22,6 @@
   end
 
 
-
   describe '#view' do
     before(:each) do
       allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
@@ -51,7 +50,6 @@
       end
     end
   end
-
 
 
 
@@ -410,16 +408,16 @@
     end
   end
 
-  # describe '#make_github_graphql_request' do
-  #   before(:each) do
-  #     session['github_access_token'] = "qwerty"
-  #   end
+  describe '#make_github_graphql_request' do
+    before(:each) do
+      session['github_access_token'] = "qwerty"
+    end
 
-  #   it 'gets data from GitHub api v4(graphql)' do
-  #     response = controller.make_github_graphql_request("{\"team\":\"rails\",\"players\":\"36\"}")
-  #     expect(response).to eq("message" => "Bad credentials", "documentation_url" => "https://developer.github.com/v4")
-  #   end
-  # end
+    it 'gets data from GitHub api v4(graphql)' do
+      response = controller.make_github_graphql_request("{\"team\":\"rails\",\"players\":\"36\"}")
+      expect(response).to eq("message" => "Bad credentials", "documentation_url" => "https://developer.github.com/v4")
+    end
+  end
 
   describe 'get_query' do
     before(:each) do

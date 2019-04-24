@@ -49,6 +49,20 @@ class VmQuestionResponse
                 else
                   ReviewResponseMap.get_assessments_for(team)
                 end
+                
+      # sort reviews by instructor first
+      instructor_reviews = []
+      student_reviews = []
+      reviews.each do |review|
+        role = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).role.name.to_s
+        if role == 'Instructor' || role == 'Teaching Assistant'
+          instructor_reviews << review
+        else
+          student_reviews << review
+        end
+      end
+      reviews = instructor_reviews + student_reviews
+
       reviews.each do |review|
         review_mapping = ReviewResponseMap.find(review.map_id)
         if review_mapping.present?

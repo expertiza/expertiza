@@ -17,6 +17,11 @@ class Answer < ActiveRecord::Base
       total_score = 0
       length_of_assessments = assessments.length.to_f
       assessments.each do |assessment|
+        if User.find(Participant.find(ResponseMap.find(Response.find(assessment).map_id).reviewer_id).user_id).role.name.to_s  == 'Instructor'
+          length_of_assessments -= 1
+          next
+        end
+        
         curr_score = get_total_score(response: [assessment], questions: questions)
 
         scores[:max] = curr_score if curr_score > scores[:max]

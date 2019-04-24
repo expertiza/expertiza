@@ -64,24 +64,30 @@ class ResponseController < ApplicationController
     render action: 'response'
   end
 
+  # NEW Change: when creating (not in db yet) a response Submit is clicked, 
+  # instead of immediately redirecting, first confirm the input response
   def create
-    is_submitted = params[:isSubmit].present?
     was_submitted = false
-
-    print("\r\nIsSubmit #{is_submitted}\r\n")
+    save_type = params[:save_type]
     
-    # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
     print("\r\nThe params in the create method are: \r\n")
     print(params)
     print("\r\n")
     
-    if is_submitted
-      # when the submit button is clicked
-      show_confirmation_page(params)
-    else
-      # When the save button is clicked
-      save_response('create')
+    # An AJAX call is made from the response view due to JS implementation
+    save_response('create')
+
+    if save_type
+      case save_type
+      when "submit_button"
+        print("\r\n Submit button pressed\r\n")
+      when "save_button"
+        print("\r\n Save button pressed\r\n")
+      when "auto_save_button"
+        print("\r\n Autosave button pressed\r\n")
+      end
     end
+
   end
 
   # Determining the current phase and check if a review is already existing for this stage.
@@ -111,20 +117,16 @@ class ResponseController < ApplicationController
   def update
     render nothing: true unless action_allowed?
     is_submitted = params[:isSubmit].present?
+    @save_type = params[:save_type]
 
-    print("\r\nIsSubmit #{is_submitted}\r\n")
     # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
     print("\r\nThe params in the update are: \r\n")
     print(params)
     print("\r\n")
 
-    if is_submitted
-      # when the submit button is clicked
-      show_confirmation_page(params)
-    else
-      # when the save button is clicked
-      save_response("update")
-    end
+    # An AJAX call is made from the response view due to JS implementation
+    save_response("update")
+
   end
 
   def delete
@@ -165,83 +167,81 @@ class ResponseController < ApplicationController
     req.body = {"reviews"=>@all_comments,
                       "metrics"=>["suggestion", "sentiment"]}.to_json
     http.use_ssl = true
-    res = http.request(req)
-
-    return JSON.parse(res.body)
-
-  end
-
-  def save
-    @map = ResponseMap.find(params[:id])
-    @return = params[:return]
-    @map.save
-    participant = Participant.find_by(id: @map.reviewee_id)
-    # E1822: Added logic to insert a student suggested 'Good Teammate' or 'Good Reviewer' badge in the awarded_badges table.
-    if @map.assignment.has_badge?
-      if @map.is_a? TeammateReviewResponseMap and params[:review][:good_teammate_checkbox] == 'on'
-        badge_id = Badge.get_id_from_name('Good Teammate')
-        AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
+    begin
+      res = http.request(req)
+      if (res.code == "200" && res.content_type == "application/json")
+        return JSON.parse(res.body) 
+      else 
+        return nil 
       end
-      if @map.is_a? FeedbackResponseMap and params[:review][:good_reviewer_checkbox] == 'on'
-        badge_id = Badge.get_id_from_name('Good Reviewer')
-        AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
-      end
+    rescue StandardError
+      return nil
     end
-
-
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Response was successfully saved")
-    redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
-  def show_confirmation_page(_params)
+  def show_confirmation_page
+    flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
+    flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
 
-    @the_params = _params
+    @response = Response.find(params[:id])
+
+    # a response should already exist when viewing this page
+    render nothing:true unless @response
     @all_comments = []
-    @the_params[:responses].each_pair do |k, v|
-      comment = v[:comment]
+
+    # NEW change: since response already saved 
+    # fetch comments from Answer model in db instead
+    answers = Answer.where(response_id: @response.id)
+    answers.each do |a|
+      comment = a.comments
       comment.slice! "<p>"
       comment.slice! "</p>"
       # print comment
       @all_comments.push(comment)
     end
+
     # send user review to API for analysis
     @api_response = get_review_response_metrics
-    @response = Response.find_by_id(_params[:id])  #should be there if saved first
+
+    #@response = Response.find_by_id(_params[:id])  #should be there if saved first
 
     #compute average for all response fields in ONE response
     suggestion_chance = 0
     suggestion_sentiment_score = 0
 
-    puts @api_response["results"].size
-    number_of_responses = @api_response["results"].size
+    if @api_response
+      puts @api_response["results"].size
+      number_of_responses = @api_response["results"].size
 
-    0.upto(number_of_responses- 1) do |i|
-      suggestion_chance += @api_response["results"][i]["metrics"]["suggestion"]["suggestions_chances"]
-      suggestion_sentiment_score += @api_response["results"][i]["metrics"]["sentiment"]["sentiment_score"]
+      0.upto(number_of_responses- 1) do |i|
+        suggestion_chance += @api_response["results"][i]["metrics"]["suggestion"]["suggestions_chances"]
+        suggestion_sentiment_score += @api_response["results"][i]["metrics"]["sentiment"]["sentiment_score"]
+      end
+
+      @avg_suggestion_chance_for_response = suggestion_chance/number_of_responses
+      @avg_suggestion_chance_for_response = @avg_suggestion_chance_for_response.to_i
+      avg_sentiment_score_for_response = suggestion_sentiment_score/number_of_responses
+      @sentiment_keyword_for_response = @response.get_sentiment_text(avg_sentiment_score_for_response) #get text
+
+      puts suggestion_chance.to_s    #debug print
+      puts @avg_sentiment_score_for_response.to_s
+
+      @assignment_suggestion_average = -1;
+
+      # compute average
+      @map = ResponseMap.find(@response.map_id)
+      # below is class avg (suggestion score)for this assignment
+      @assignment_suggestion_average = @response.suggestion_chance_average(@map.reviewed_object_id) #pass assignment id
+
+      if (@assignment_suggestion_average < 0)     #if no class average found, display current score as average
+        @assignment_suggestion_average = @avg_suggestion_chance_for_response
+      end
+      #display average
+
+      submit_response(@assignment_suggestion_average)      # TODO: find suitable place --save in DB
+      #render action: "review_confirmation"
     end
-
-    @avg_suggestion_chance_for_response = suggestion_chance/number_of_responses
-    @avg_suggestion_chance_for_response = @avg_suggestion_chance_for_response.to_i
-    avg_sentiment_score_for_response = suggestion_sentiment_score/number_of_responses
-    @sentiment_keyword_for_response = @response.get_sentiment_text(avg_sentiment_score_for_response) #get text
-
-    puts suggestion_chance.to_s    #debug print
-    puts @avg_sentiment_score_for_response.to_s
-
-    @assignment_suggestion_average = -1;
-
-    # compute average
-    @map = ResponseMap.find(@response.map_id)
-    # below is class avg (suggestion score)for this assignment
-    @assignment_suggestion_average = @response.suggestion_chance_average(@map.reviewed_object_id) #pass assignment id
-
-    if (@assignment_suggestion_average < 0)     #if no class average found, display current score as average
-      @assignment_suggestion_average = @avg_suggestion_chance_for_response
-    end
-    #display average
-
-    submit_response(@assignment_suggestion_average)      # TODO: find suitable place --save in DB
-    render action: "review_confirmation"
+    
   end
 
   def submit_response(suggestion_chance = nil)
@@ -252,17 +252,24 @@ class ResponseController < ApplicationController
     # Added by sushan --update the suggestion score in responses DB once the assignment is submitted
     # Update the sentiment score as well
     @response.update_suggestion_chance(suggestion_chance) if !suggestion_chance.nil? # --do this after submission!!
+
   end
 
   def save_response(http_method)
     print("\r\n Inside the save_response(#{http_method}) method\r\n")
     
-    # the response to be updated
-    @response = Response.find(params[:id])
-    msg = ""
-
     case http_method
     when "create"
+      create_response
+    when "update"
+      update_response
+    end
+  end
+
+  def create_response
+      # NEW change: is_submitted is always false for create.
+      is_submitted = false
+
       map_id = params[:id]
       map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
       @map = ResponseMap.find(map_id)
@@ -283,6 +290,7 @@ class ResponseController < ApplicationController
           is_submitted: is_submitted
         )
       end
+      
       was_submitted = @response.is_submitted
       @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
 
@@ -297,25 +305,119 @@ class ResponseController < ApplicationController
         @response.notify_instructor_on_difference
         @response.email
       end
-      redirect_to controller: 'response', action: 'save', id: @map.map_id,
+
+      button_type = params[:button_type]
+
+      if button_type == "submit_button"
+         redirect_to action: 'show_confirmation_page', id: @response.id, return: @return, msg: msg
+      else
+         # save button pressed
+         # auto save button will not process redirect/render since it's an AJAX call
+         redirect_to controller: 'response', action: 'save', id: @map.map_id,
                   return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
-    when "update"
+      end
+
+  end
+
+  def update_response
+      # the response to be updated
+      @response = Response.find(params[:id])
+      @map = @response.map
+      msg = ""
+      submit_response_confirmed = params[:is_submitted] && params[:is_submitted] == "Yes"
+      button_type = params[:button_type]
+
+      if submit_response_confirmed
+         # is_submitted is 'Yes' only when submit button in confirmation page is clicked
+         save_confirmed_response
+         
+         msg = "Your response was submitted: #{@response.is_submitted}"
+         params[:msg] = msg
+
+         # log success
+         ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, msg, request)
+         
+         # redirect to save method...which then redirects again
+         redirect_to controller: 'response', action: 'save', id: @map.map_id,
+                  return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
+      elsif button_type && button_type == "submit_button"
+         # is_submitted is 'Yes' only when submit button in confirmation page is clicked
+         save_confirmed_response
+         
+         msg = "Response was successfully saved"
+         #params[:msg] = msg
+
+         # log success
+         ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, msg, request)
+         
+         redirect_to action: 'show_confirmation_page', id: @response.id, return: @return, msg: msg
+      else
+         save_unconfirmed_response
+         msg = "Response was successfully saved"
+         params[:msg] = msg
+         ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, msg)
+ 
+         # redirect to save method...which then redirects again
+         redirect_to controller: 'response', action: 'save', id: @map.map_id,
+                  return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
+      end
+
+  end
+
+  def save_confirmed_response
+      @response.update_attribute('is_submitted', true) if params['is_submitted'] && params['is_submitted'] == 'Yes'
+      @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
+  end
+
+  def save_unconfirmed_response
       begin
-        @map = @response.map
+        #@map = @response.map
+
         @response.update_attribute('additional_comment', params[:review][:comments])
+
         @questionnaire = set_questionnaire
+
         questions = sort_questions(@questionnaire.questions)
+
         # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
         create_answers(params, questions) unless params[:responses].nil?
-        @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
-        @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
+
       rescue StandardError
-        msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
+        params[:error_msg] = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
       end
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
-      redirect_to controller: 'response', action: 'save', id: @map.map_id,
-                  return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
+  end
+
+  # This method creates a badge then redirects to other views
+  def save
+    @map = ResponseMap.find(params[:id])
+    @return = params[:return]
+    @map.save
+    participant = Participant.find_by(id: @map.reviewee_id)
+    # E1822: Added logic to insert a student suggested 'Good Teammate' or 'Good Reviewer' badge in the awarded_badges table.
+    if @map.assignment.has_badge?
+      if @map.is_a? TeammateReviewResponseMap and params[:review][:good_teammate_checkbox] == 'on'
+        badge_id = Badge.get_id_from_name('Good Teammate')
+        AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
+      end
+      if @map.is_a? FeedbackResponseMap and params[:review][:good_reviewer_checkbox] == 'on'
+        badge_id = Badge.get_id_from_name('Good Reviewer')
+        AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
+      end
     end
+    # also save response metric:suggestion_chances
+    ##response_metrics = get_review_response_metrics
+
+
+    # suggestion_chance = response_metrics["results"][0]["metrics"]["suggestion"]["suggestions_chances"]
+    # puts suggestion_chance.class
+    # puts suggestion_chance.to_s    #debug print
+    # @response = Response.where(map_id: @map.id).first
+    # @response.update_suggestion_chance(suggestion_chance.round)
+    # @response.suggestion_chance_average(@map.reviewed_object_id)
+
+    print("\r\nThe controller_name variable inside save method is: #{controller_name}\r\n")
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Response was successfully saved")
+    redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
   def redirect

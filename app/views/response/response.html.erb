@@ -45,7 +45,8 @@
       });
     });
 
-    // Server AUTO SAVE: triggers every 60 seconds to save the draft version of the review to database
+    /* SECTION: Server AUTO SAVE: triggers every 60 seconds to save the draft version of the review to database */
+
     var interval = 60000;
     var last_save = new Date();
     // detect how many seconds the userhas been idle
@@ -56,31 +57,34 @@
     $('#autosave_cbx_lbl').html("&nbsp;Auto save your response every " + interval / 1000 + " seconds?&nbsp;&nbsp;");
 
     //if it's was in the background, don't auto save to avoid conflict
-    setInterval(function() {
-      if(vis() && $("#autosave_cbx").prop("checked"))
-        executeSave();
+    var intervalSet = setInterval(function() {
+      if(vis() && $("#autosave_cbx").prop("checked")) {
+        // send form data to the response controller
+        autoSaveForm();
+      }
     }, interval);
 
-
-    //click ajax
-    function executeSave(){
+    // 'click' the hidden auto save button located in the form
+    // which sends form data to the response controller
+    function autoSaveForm() {
       timeDiff = (new Date().getTime() - last_save.getTime())/1000;
       // ignore saving unless the last save was more than 5s
       if (timeDiff>5 && $('.review_form').length > 0) {
-        $('form').attr('data-remote', 'true');
-        $('#save_review').click();
-        last_save = new Date;
-        if ($('input[name=saved]').value = "0")
-          $('input[name=saved]').val("1");
-        $('form').removeAttr('data-remote');
+//$('form').attr('data-remote', 'true');
+        // calls the Autosave button event handler
+        $("#auto_save_button").click();
+//$('form').removeAttr('data-remote');
       }
 
+      // a nested event function under autoSaveForm()
       $(document).ajaxError(function(event, request, settings) {
         if (settings.url.includes("response") && settings.type == "POST")
           $('#save_progress').html('<span id="tick"> &#9940; </span>' + 'Unable to reach the expertiza server. <br>Create a backup of your comments and you may try to login again in a while');
-      })
+      });
 
+      // a nested event function under autoSaveForm()
       $('form#<%=@modified_object%>').bind('ajax:success', function(evt, data, status, xhr){
+
         $('#save_progress').html('<span id="tick"> &#10004; </span>' +
             'A draft was saved on ' + last_save.toLocaleString('en-US', {
               weekday: 'short',
@@ -93,27 +97,9 @@
               hour12: true }));
       });
     }
-
-    $('#save_review').click(function(){
-      $('#save_confirm').html('<span id="tick"> &#10004; </span>&nbsp;Saving review!')
-      setTimeout(function(){
-        $('#save_confirm').html('')
-      }, 5000);
-    });
-    // JQuery syntax which means: select the element with id='Submit'
-    // The element is a submit_tag button
-    $('#Submit').click(function(e){
-      if(!confirm('Once a review has been submitted, you cannot edit it again')){
-        e.preventDefault();
-        e.stopPropagation();
-        return;
-      }else{
-        jQuery('#isSubmit').val('Yes');
-        window.location.href= "../../../student_review/list?id=<%= @map.reviewer.id %>";
-      }
-    });
+    
     // update the values in the form using ajax
-    function updateForm(){
+    function setFormValues(){
       //update the additional comments
       $.get("../../../response/json?response_id=<%= @response.id %>", function(data){
         if(data.additional_comment != null) {
@@ -188,10 +174,10 @@
         displayOverlay("Loading");
         // delay one second to let the data saved if the user switch back and forth
         setTimeout(function() {
-          updateForm();
+          setFormValues();
         }, 1000);
       }else if (!vis() && $("#autosave_cbx").prop("checked")){
-        executeSave();
+        autoSaveForm();
         //console.log("Saving before going to background at " + new Date().toLocaleString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }));
       }
     });
@@ -213,6 +199,7 @@
         "cursor": "wait"
       }).appendTo("body");
     }
+
     function removeOverlay() {
       $("#overlay").remove();
     }
@@ -225,59 +212,97 @@
         setTimeout(function(){
           var r = confirm("The window has been idle more than " + maxIdleTime + " minutes. Auto save is disabled. Do you want to enable it again?");
           if (r == true) {
-            updateForm();
+            setFormValues();
             $("#autosave_cbx").prop("checked","true");
           }else
             $("#autosave_cbx").removeProp("checked");
         }, 1000);
       }
     }, interval);
+
     //Zero the idle timer on mouse movement.
     $(this).mousemove(function (e) {
       idleTime = 0;
     });
+
     $(this).keypress(function (e) {
       idleTime = 0;
     });
+
     //restart the counter if it's just checked
     $("#autosave_cbx").change(function (e){
       if($(this).prop("checked"))
         idleTime = 0;
     });
-    /// end auto reload
 
-    //attach event handler to all tinymce editors
-    tinyMCE.on('AddEditor', function(e) {
-      e.editor.on('blur', function (e) {
-        ed = e.target;
-        if (ed.id.includes("comments")){
-          json_review = JSON.stringify({ "review": ed.getContent({format : 'text'}) })
+    /* END OF SECTION */
 
-          $.ajax({
-            url: "http://peerlogic.csc.ncsu.edu/sentiment/visualize_sentiment",
-            type: "POST",
-            crossDomain: true,
-            contentType: "application/json",
-            data: json_review,
-            dataType: "html",
-            success: function (response) {
-              var toneAnalysisResult = '<div class="panel panel-default">' +
-                                          '<div class="panel-heading">Tone analysis</div>' +
-                                          '<div class="panel-body">' + response + '</div>' +
-                                        '</div>'
-              if(ed.id.includes("responses"))
-                  $('#' + ed.id.replace("responses", "analysis")).html(toneAnalysisResult);
-              else if(ed.id.includes('review_comments'))
-                  $('#review_comments_analysis').html(toneAnalysisResult);
-            },
-            error: function (xhr, status) {
-              $('#save_progress').html('Unable to reach tone analysis service at the moment')
-            }
-          });
-        }
-      });
+    /* SECTION: Event handlers for the autosave, save, and submit buttons */
+
+    function clearTimers(){
+       clearInterval(interval);
+       clearInterval(idleInterval);
+       clearInterval(intervalSet);
+    }
+
+    function setAjaxFormSubmit(){
+       $('form').attr('data-remote', 'true');
+    }
+
+    function removeAjaxFormSubmit() {
+      //order matters!
+      $('form').removeAttr('data-remote');
+      $("form").removeData("remote");
+    }
+
+    function showSaveReviewLabel() {
+      // show UI label with a timeout
+      $('#save_confirm').html('<span id="tick"> &#10004; </span>&nbsp;Saving review!');
+      setTimeout(function(){
+        $('#save_confirm').html('')
+      }, 5000);
+    }
+
+    // Save button event handler
+    $('#save_button').click(function(){
+       clearTimers();
+       removeAjaxFormSubmit();
+      //set button_type param
+      jQuery('#button_type').val('save_button');
+
+      //set is_submitted param
+      jQuery('#is_submitted').val("No");
+
+      showSaveReviewLabel();
     });
 
+    // Submit button event handler
+    $('#submit_button').click(function(){
+      clearTimers();
+      removeAjaxFormSubmit();
+      //set button_type param 
+      jQuery('#button_type').val('submit_button');
+
+      //set is_submitted param
+      jQuery('#is_submitted').val("No");
+
+       showSaveReviewLabel();
+    });
+
+    // Autosave button (which is hidden) event handler
+    $('#auto_save_button').click(function(){
+       setAjaxFormSubmit();
+      //set button_type param 
+      jQuery('#button_type').val('auto_save_button');
+
+      //set is_submit param
+      jQuery('#is_submit').val("No");
+
+      showSaveReviewLabel();
+    });
+
+
+    /* END OF SECTION */
   });
 </script>
 
@@ -335,9 +360,17 @@
 <input type="checkbox" id="autosave_cbx" checked>
 <label id="autosave_cbx_lbl" for="autosave_cbx"></label>
 <div id="save_progress"></div>
+
+<!-- The response form, @next_action is either 'update' or 'create' -->
 <%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form") do %>
     <%= hidden_field_tag "map_id", @modified_object %>
     <%= hidden_field_tag "saved", (@header == "New") ? 1 : 0 %>
+    <%= hidden_field_tag('return', @return) %>
+    <%= hidden_field_tag "button_type", "" %>
+    <%= hidden_field_tag  "is_submitted", :id=>"is_submitted" %>
+    <!-- hidden button for the auto save -->
+    <%= submit_tag "", :id => 'auto_save_button', :style => "display: none;", :remote => true %>
+
     <% if @next_action.eql?'update' %>
         <input name="_method" type="hidden" value="put" />
     <%end%>
@@ -407,15 +440,14 @@
     <br/>
     <br>
     <div id="save_confirm"></div>
-    <%= submit_tag "Save "+@title, :name => "save", :id => "save_review" %>
+
+    <!-- Form Buttons -->
+    <%= submit_tag "Save "+@title, :name => "save", :id => "save_button" %>
     <!--#E1600 check title for selfreview to show submit button-->
     <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review')) %>
-        <!-- <%= submit_tag "Submit "+@title, :name => "Submit", :id => "Submit" %> -->
-        <%= submit_tag "Submit "+@title, :name => "isSubmit" %>
+        <%= submit_tag "Submit "+@title, :name => "Submit", :id => "submit_button" %>
         <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
     <% end %>
-    <%= hidden_field_tag('return', @return) %>
-    <!-- <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %> -->
 <% end %>
 
 <!--Check whether there is a UploadFile question.-->

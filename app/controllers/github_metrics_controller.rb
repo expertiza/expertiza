@@ -9,15 +9,6 @@ class GithubMetricsController < ApplicationController
   include GradesHelper
   include GithubMetricsHelper
 
-
-  def view
-    if session["github_access_token"].nil?
-      session["assignment_id"] = params[:id]
-      session["github_view_type"] = "view_scores"
-      return redirect_to authorize_github_github_metrics_path
-    end
-  end
-
   def action_allowed?
     ['Instructor',
      'Teaching Assistant',

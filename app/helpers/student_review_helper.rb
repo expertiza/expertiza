@@ -15,8 +15,8 @@ module StudentReviewHelper
   end
 
   def get_topic_bg_color_by_review(topic, max_team_size)
-    red = (400 * (1 - (Math.tanh(2 * [max_team_size.to_f / ReviewBid.where(topic_id: topic.id).count, 1].min - 1) + 1) / 2)).to_i.to_s
-    green = (400 * (Math.tanh(2 * [max_team_size.to_f / ReviewBid.where(topic_id: topic.id).count, 1].min - 1) + 1) / 2).to_i.to_s
+    red = (400 * (1 - (Math.tanh(2 * [max_team_size.to_f / Bid.where(topic_id: topic.id).count, 1].min - 1) + 1) / 2)).to_i.to_s
+    green = (400 * (Math.tanh(2 * [max_team_size.to_f / Bid.where(topic_id: topic.id).count, 1].min - 1) + 1) / 2).to_i.to_s
     'rgb(' + red + ',' + green + ',0)'
   end
 

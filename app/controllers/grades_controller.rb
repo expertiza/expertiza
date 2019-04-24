@@ -59,21 +59,15 @@ class GradesController < ApplicationController
     @show_reputation = false
 
     # Define instance variables for rubric visualization
+    stats = AssignmentStats.new(@assignment.id)
 
+    @avg_data = avg_data(stats)
 
-    @avg_data = [
-      [76, 84, 54, 92, 64],
-      [64, 92, 78, 54]
-    ]
-
-    @med_data = [
-      [3, 3.5, 2.5, 3.5, 3],
-      [3, 3.5, 3, 2.5]
-    ]
+    @med_data = med_data(stats)
 
     @assignment_name = 'Name'
-    @round_names = round_names(nil)
-    @criteria_names = criteria_names(nil)
+    @round_names = round_names(stats)
+    @criteria_names = criteria_names(stats)
 
     @assignment_avg_data = [
       [

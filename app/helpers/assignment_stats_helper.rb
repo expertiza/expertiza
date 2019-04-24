@@ -1,37 +1,44 @@
 module AssignmentStatsHelper
   def avg_data(assignment_stats)
-    [
-      [76, 84,54, 92, 64],
-      [64, 92, 78, 54]
-    ]
+    rounds = []
+    assignment_stats.rounds.each do |r|
+      criteria = []
+      r.criteria.each do |c|
+        criteria << c.mean
+      end
+      rounds << criteria
+    end
+    rounds
   end
+
   def med_data(assignment_stats)
-    [
-      [3, 3.5, 2.5, 3.5, 3],
-      [3, 3.5, 3, 2.5]
-    ]
+    rounds = []
+    assignment_stats.rounds.each do |r|
+      criteria = []
+      r.criteria.each do |c|
+        criteria << c.median
+      end
+      rounds << criteria
+    end
+    rounds
   end
+
   def criteria_names(assignment_stats)
-    [
-      [
-        "Criterion 1",
-        "Criterion 2",
-        "Criterion 3",
-        "Criterion 4",
-        "Criterion 5"
-      ],
-      [
-        "Criterion 1",
-        "Criterion 2",
-        "Criterion 3",
-        "Criterion 4"
-      ]
-    ]
+    rounds = []
+    assignment_stats.rounds.each do |r|
+      criteria = []
+      (1..r.criteria.length).each do |c|
+        criteria << "Criterion #{c}"
+      end
+      rounds << criteria
+    end
+    rounds
   end
   def round_names(assignment_stats)
-    [
-      "Round 1",
-      "Round 2"
-    ]
+    names = []
+    (1..assignment_stats.rounds.length).each do |r|
+      names << "Round #{r}"
+    end
+    names
   end
 end

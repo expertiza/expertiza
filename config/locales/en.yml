@@ -383,6 +383,7 @@ en:
       for_current: "for current assignment"
       warning: "Warning:"
       you_must: "You must have a wiki account named after your handle.  If you do not, please e-mail your instructor or the course staff."
+      back: "Back"
 
   popup:
     self_review_popup:

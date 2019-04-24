@@ -179,8 +179,9 @@ hi_IN:
       publishing_rights: "प्रकाशन अधिकार"
 
     publishing_rights:
-      select_assignment: "सूची या सेट से असाइनमेंट का चयन करें"
-      for_work: "आपके काम के लिए"
+      select_assignment: "सूची से असाइनमेंट चुनें या अपने काम के लिए"
+      publishing_rights: "प्रकाशन अधिकार"
+      for_work: "सेट करें।"
 
     view:
       submit_review: "सबमिट करें या काम की समीक्षा करें"

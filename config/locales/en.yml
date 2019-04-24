@@ -185,6 +185,7 @@ en:
 
     publishing_rights:
       select_assignment: "Select an assignment from the list or set"
+      publishing_rights: "publishing rights"
       for_work: "for your work."
 
     view:

@@ -410,13 +410,19 @@ class Assignment < ActiveRecord::Base
   end
 
   # Find the ID of a review questionnaire for this assignment
-  #   finds by round if round number is given
-  #   finds by type if round number is given, no luck finding by round
-  #   finds by current round if round number not given
-  #   finds by type if round number not given, no luck finding by current round
+  #   finds by round if round number only is given
+  #     fall back to find by type
+  #   finds by current round and topic if topic only is given
+  #     fall back to find by current round
+  #     fall back to find by topic
+  #     fall back to find by type
+  #   finds by round and topic if both are given
+  #     fall back to find by round
+  #     fall back to find by topic
+  #     fall back to find by type
   def review_questionnaire_id(round_number = nil, topic_id = nil)
     # Get all assignment-questionnaire relationships between this assignment and review questionnaires
-    matching_aqs = AssignmentQuestionnaire.where(assignment_id: self.id).select do |aq|
+    aqs_by_type = AssignmentQuestionnaire.where(assignment_id: self.id).select do |aq|
       !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == "ReviewQuestionnaire"
     end
     # If round not given, get current round from the next due date
@@ -424,28 +430,46 @@ class Assignment < ActiveRecord::Base
       next_due_date = DueDate.get_next_due_date(self.id)
       round_number = next_due_date.try(:round)
     end
-    # Get assignment-questionnaire relationships that apply to the round and topic we care about
-    # If the assignment's rubric does not vary by round, then used_in_round will be nil
-    # If the assignment's rubric does not vary by topic, then topic_id will be nil
-    filtered_aqs = matching_aqs
-    unless round_number.nil?
-      filtered_aqs = filtered_aqs.select do |aq|
+    #   finds by round if round number only is given
+    #     fall back to find by type
+    if !round_number.nil? && topic_id.nil?
+      aqs = aqs_by_type.select do |aq|
         aq.used_in_round == round_number
       end
+      aqs = (aqs.nil? || aqs.empty?) ? aqs_by_type : aqs
     end
-    unless topic_id.nil?
-      filtered_aqs = filtered_aqs.select do |aq|
+    #   finds by topic if topic only is given
+    #     fall back to find by type
+    if round_number.nil? && !topic_id.nil?
+      aqs = aqs_by_type.select do |aq|
         aq.topic_id == topic_id
       end
+      aqs = (aqs.nil? || aqs.empty?) ? aqs_by_type : aqs
     end
-    # If filtering by round yielded no results, go back to the set of
-    # reasonable assignment-questionnaire relationships we already had
-    if !filtered_aqs || filtered_aqs.empty?
-      filtered_aqs = matching_aqs
+    #   finds by round and topic if both are given
+    #     fall back to find by round
+    #     fall back to find by topic
+    #     fall back to find by type
+    if !round_number.nil? && !topic_id.nil?
+      aqs = aqs_by_type.select do |aq|
+        aq.used_in_round == round_number && aq.topic_id == topic_id
+      end
+      if aqs.nil? || aqs.empty?
+        aqs = aqs_by_type.select do |aq|
+          aq.used_in_round == round_number
+        end
+      end
+      if aqs.nil? || aqs.empty?
+        aqs = aqs_by_type.select do |aq|
+          aq.topic_id == topic_id
+        end
+      end
+      aqs = (aqs.nil? || aqs.empty?) ? aqs_by_type : aqs
     end
     # Return the questionnaire id for the first reasonable thing we came up with
     # (or return nil if nothing reasonable found)
-    filtered_aqs.empty? ? nil : filtered_aqs.first.questionnaire_id
+    aqs = (aqs.nil? || aqs.empty?) ? aqs_by_type : aqs
+    (aqs.nil? || aqs.empty?) ? nil : aqs.first.questionnaire_id
   end
 
   def self.export_details(csv, parent_id, detail_options)

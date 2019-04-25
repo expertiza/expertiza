@@ -197,7 +197,7 @@ class ResponseController < ApplicationController
       comment.slice! "<p>"
       comment.slice! "</p>"
       # print comment
-      @all_comments.push(comment)
+      @all_comments.push(comment) unless comment.empty?
     end
 
     # send user review to API for analysis
@@ -237,23 +237,13 @@ class ResponseController < ApplicationController
         @assignment_suggestion_average = @avg_suggestion_chance_for_response
       end
       #display average
-
-      submit_response(@assignment_suggestion_average)      # TODO: find suitable place --save in DB
+     # submit_response(@assignment_suggestion_average)  # TODO: find suitable place --save in DB moved
       #render action: "review_confirmation"
     end
     
   end
 
-  def submit_response(suggestion_chance = nil)
-    print("\r\n Inside the submit_response method\r\n")
-    # TODO: implement this function
 
-
-    # Added by sushan --update the suggestion score in responses DB once the assignment is submitted
-    # Update the sentiment score as well
-    @response.update_suggestion_chance(suggestion_chance) if !suggestion_chance.nil? # --do this after submission!!
-
-  end
 
   def save_response(http_method)
     print("\r\n Inside the save_response(#{http_method}) method\r\n")
@@ -342,7 +332,7 @@ class ResponseController < ApplicationController
                   return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
       elsif button_type && button_type == "submit_button"
          # is_submitted is 'Yes' only when submit button in confirmation page is clicked
-         save_confirmed_response
+        save_unconfirmed_response
          
          msg = "Response was successfully saved"
          #params[:msg] = msg
@@ -367,6 +357,7 @@ class ResponseController < ApplicationController
   def save_confirmed_response
       @response.update_attribute('is_submitted', true) if params['is_submitted'] && params['is_submitted'] == 'Yes'
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
+      @response.update_suggestion_chance(params["avg_suggestion_chance_for_response"])
   end
 
   def save_unconfirmed_response

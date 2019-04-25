@@ -52,8 +52,10 @@
     <p class="danger-notice">Once a review has been submitted, you cannot edit it again.</p>
 
     <%= form_tag(response_path(:id => params[:id]), method: :patch) do %>
-        <%= hidden_field_tag "is_submitted", "Yes" %>
-        <%= submit_tag "Submit Review" %>
+    <%= hidden_field_tag "is_submitted", "Yes" %>
+    <%= hidden_field_tag "avg_suggestion_chance_for_response", @avg_suggestion_chance_for_response %>
+
+    <%= submit_tag "Submit Review" %>
         <% if params[:return] %>
             <%= link_to "Back", edit_response_path(:id => params[:id], :return => params[:return]) %>
         <% else %>

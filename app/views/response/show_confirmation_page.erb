@@ -32,7 +32,7 @@
 
         <div class="suggestions">
             <h3>Suggestions</h3>
-            <p>Are there suggestions? <span> <%= (@avg_suggestion_chance_for_response > 50)? "Yes": "No" %>
+            <p>Are there suggestions? <span> <%= (Integer(@avg_suggestion_chance_for_response) > 50)? "Yes": "No" %>
             (<%= @avg_suggestion_chance_for_response%>%)</span></p>
 
             <p>What is the class average? <span><%=  @assignment_suggestion_average  %>%</span></p>

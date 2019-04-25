@@ -86,10 +86,10 @@ class ImportFileController < ApplicationController
     errors = []
     begin
       @header_integrated_body.each do |row_hash|
-        if @model.constantize.import_options
-          @model.constantize.import(row_hash, session, params[:id], params[:options])
-        else
+        if @model.constantize.import_options.empty?
           @model.constantize.import(row_hash, session, params[:id])
+        else
+          @model.constantize.import(row_hash, session, params[:id], params[:options])
         end
       end
     rescue

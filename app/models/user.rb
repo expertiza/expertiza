@@ -145,7 +145,7 @@ class User < ActiveRecord::Base
     raise ArgumentError, "Record does not contain required items." if row_hash.length < self.required_import_fields.length
     user = User.find_by_name(row_hash[:name])
     if user.nil?
-      user = get_new_user(get_user_attributes(row_hash), session)
+      user = get_new_user(row_hash, session)
       password = user.reset_password
       MailerHelper.send_mail_to_user(user, "Your Expertiza account has been created.", "user_welcome", password).deliver
     else
@@ -317,17 +317,15 @@ class User < ActiveRecord::Base
 
   private
 
-  def self.get_user_attributes(row_hash)
-    {"role_id" => Role.student.id,
+  def self.get_new_user(row_hash, session)
+    attributes = {"role_id" => Role.student.id,
      "name" => row_hash[:name],
      "fullname" => row_hash[:fullname],
      "email" => row_hash[:email],
      "email_on_submission" => 1,
      "email_on_review" => 1,
      "email_on_review_of_review" => 1}
-  end
 
-  def self.get_new_user(attributes, session)
     user = User.new(attributes)
     user.parent_id = (session[:user]).id
     user.timezonepref = User.find(user.parent_id).timezonepref

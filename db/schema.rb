@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190420215739) do
+ActiveRecord::Schema.define(version: 20190425194052) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -332,6 +332,11 @@ ActiveRecord::Schema.define(version: 20190420215739) do
   add_index "menu_items", ["content_page_id"], name: "fk_menu_item_content_page_id", using: :btree
   add_index "menu_items", ["controller_action_id"], name: "fk_menu_item_controller_action_id", using: :btree
   add_index "menu_items", ["parent_id"], name: "fk_menu_item_parent_id", using: :btree
+
+  create_table "metrics", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "nodes", force: :cascade do |t|
     t.integer "parent_id",      limit: 4

@@ -235,6 +235,7 @@ hi_IN:
     edit:
       edit_team: "टीम संपादित करें"
       team_name: "टीम का नाम:"
+      back: "वापस पीछे"
 
     view:
       team_info: "टीम की जानकारी"

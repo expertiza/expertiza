@@ -240,6 +240,7 @@ en:
     edit:
       edit_team: "Edit Team"
       team_name: "Team Name:"
+      back: "Back"
 
     view:
       team_info: "Team Information for"

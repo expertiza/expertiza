@@ -9,4 +9,4 @@
   <%= submit_tag "Save" %>
 <% end %>
 <br/>
-<a href="javascript:window.history.back()">Back</a>
+<%= link_to t(".back"), :controller=>'student_task', :action => 'view', :id =>  @participant %>

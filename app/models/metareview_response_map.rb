@@ -55,26 +55,27 @@ class MetareviewResponseMap < ResponseMap
   def self.import(row_hash, session, id)
     raise ArgumentError, "Record does not contain required items." if row_hash.length < self.required_import_fields.length
     row_hash[:metareviewers].each do |row|
-      contributor = AssignmentTeam.where(name: row_hash[:reviewee].to_s, parent_id:  id).first
-      raise ImportError, "Contributor, " + row_hash[:reviewee].to_s + ", was not found."  if contributor.nil?
+      reviewee = AssignmentTeam.where(name: row_hash[:reviewee].to_s, parent_id:  id).first
+      raise ImportError, "Reviewee, " + row_hash[:reviewee].to_s + ", was not found."  if reviewee.nil?
       ruser = User.find_by_name(row_hash[:reviewer].to_s.strip)
-      reviewee = AssignmentParticipant.where(user_id: ruser.id, parent_id:  id).first
-      raise ImportError, "Reviewee,  #{row_hash[:reviewer].to_s}, for contributor, #{contributor.name}, was not found." if reviewee.nil?
+      raise ImportError, "Reviewer #{row_hash[:reviewer]} not found." if ruser.nil?
+      reviewer = AssignmentParticipant.where(user_id: ruser.id, parent_id:  id).first
+      raise ImportError, "Reviewer,  #{row_hash[:reviewer].to_s}, for reviewee, #{reviewee.name}, was not found." if reviewer.nil?
       muser = User.find_by_name(row.to_s.strip)
-      reviewer = AssignmentParticipant.where(user_id: muser.id, parent_id:  id).first
-      raise ImportError, "Metareviewer,  #{row.to_s}, for contributor, #{contributor.name}, and reviewee, #{row_hash[:reviewer].to_s }, was not found." if reviewer.nil?
-      # ACS: Treat all assignments as team assignments
-      reviewmapping = ReviewResponseMap.where(reviewee_id: contributor.id, reviewer_id:  reviewee.id).first
-      raise ImportError, "No review mapping was found for contributor, #{contributor.name}, and reviewee, #{row_hash[:reviewer].to_s}." if reviewmapping.nil?
-      existing_mappings = MetareviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id: reviewer.id, reviewed_object_id: reviewmapping.map_id)
-      MetareviewResponseMap.create(reviewer_id: reviewer.id, reviewee_id: reviewee.id, reviewed_object_id: reviewmapping.map_id) if existing_mappings.empty?
+      raise ImportError, "Metareviewer #{row} not found." if muser.nil?
+      metareviewer = AssignmentParticipant.where(user_id: muser.id, parent_id:  id).first
+      raise ImportError, "Metareviewer,  #{row.to_s}, for reviewee, #{reviewee.name}, and reviewer, #{row_hash[:reviewer].to_s }, was not found." if metareviewer.nil?
+      reviewmapping = ReviewResponseMap.where(reviewee_id: reviewee.id, reviewer_id:  reviewer.id).first
+      raise ImportError, "No review mapping was found for reviewee, #{reviewee.name}, and reviewer, #{row_hash[:reviewer].to_s}." if reviewmapping.nil?
+      existing_mappings = MetareviewResponseMap.where(reviewee_id: reviewer.id, reviewer_id: metareviewer.id, reviewed_object_id: reviewmapping.map_id)
+      MetareviewResponseMap.create(reviewer_id: metareviewer.id, reviewee_id: reviewer.id, reviewed_object_id: reviewmapping.map_id) if existing_mappings.empty?
     end
   end
 
   def self.required_import_fields
     {"reviewee" => "Contributor",
      "reviewer" => "Reviewer",
-     "metareviewer" => "Metareviewer"}
+     "metareviewers" => "Metareviewers"}
   end
 
   def self.optional_import_fields(id=nil)

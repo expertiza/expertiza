@@ -59,6 +59,7 @@ describe ReviewResponseMap do
   end
 
   it '#import' do
+    expect {ReviewResponseMap.import({reviewee: "name"}, nil, 1)}.to raise_error(ArgumentError, "Record does not contain required items.")
     row_hash = {reviewee: "name", reviewers: ["name1"]}
     session = nil
     assignment_id = 1

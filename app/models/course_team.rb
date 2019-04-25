@@ -41,7 +41,7 @@ class CourseTeam < Team
 
   def self.import(row_hash, session, id, options)
     raise ArgumentError, "Record does not contain required items." if row_hash.length < self.required_import_fields.length
-    raise ImportError, "The course with the id \"" + id.to_s + "\" was not found. <a href='/course/new'>Create</a> this course?" if Course.find(course_id).nil?
+    raise ImportError, "The course with the id \"" + id.to_s + "\" was not found. <a href='/course/new'>Create</a> this course?" if Course.find(id).nil?
     Team.import_helper(row_hash, id, options, prototype)
   end
 

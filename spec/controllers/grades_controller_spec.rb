@@ -125,7 +125,7 @@ describe GradesController do
         params = {id: 1}
         session = {user: instructor}
         get :instructor_review, params, session
-        expect(response).to redirect_to('/en/response/edit?return=instructor')
+        expect(response).to redirect_to('/response/edit?return=instructor')
       end
     end
 
@@ -139,7 +139,7 @@ describe GradesController do
         params = {id: 1}
         session = {user: instructor}
         get :instructor_review, params, session
-        expect(response).to redirect_to('/en/response/new?id=1&return=instructor')
+        expect(response).to redirect_to('/response/new?id=1&return=instructor')
       end
     end
   end
@@ -159,7 +159,7 @@ describe GradesController do
         }
         post :update, params
         expect(flash[:note]).to eq("The computed score will be used for #{participant.user.name}.")
-        expect(response).to redirect_to('/en/grades/1/edit')
+        expect(response).to redirect_to('/grades/1/edit')
       end
     end
 
@@ -174,7 +174,7 @@ describe GradesController do
         }
         post :update, params
         expect(flash[:note]).to eq("The computed score will be used for #{participant.user.name}.")
-        expect(response).to redirect_to('/en/grades/1/edit')
+        expect(response).to redirect_to('/grades/1/edit')
       end
     end
   end
@@ -190,7 +190,7 @@ describe GradesController do
       }
       post :save_grade_and_comment_for_submission, params
       expect(flash[:error]).to be nil
-      expect(response).to redirect_to('/en/grades/view_team?id=1')
+      expect(response).to redirect_to('/grades/view_team?id=1')
     end
   end
 end

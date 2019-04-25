@@ -404,6 +404,13 @@ FactoryBot.define do
     round 1
     is_submitted false
   end
+  
+  factory :answers, class: Answer do
+    question { Question.first || association(:question) }
+    answer 95
+    comments "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sit amet mi et diam lobortis facilisis. Donec tristique condimentum luctus. "
+    response { Response.first || association(:response) }
+  end
 
   factory :submission_record, class: SubmissionRecord do
     team_id 666

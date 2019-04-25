@@ -123,6 +123,7 @@ class AuthController < ApplicationController
     session[:assignment_id] = nil
     session[:original_user] = nil
     session[:impersonate] = nil
+    session[:locale] = nil
   end
 
   # clears any identifying info from session

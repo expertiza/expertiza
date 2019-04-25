@@ -11,6 +11,11 @@
 <%= text_field 'course', 'directory_path'  %></p>
 <p><label for="course_info">Course Information</label><br/>
 <%= text_field 'course', 'info'  %></p>
+<p><label for="language">Default Language:</label><br/>
+  <%= select('course','locale', options_for_select([
+                                                           [ "English", "en", :selected => @course.locale == "en"],
+                                                           ["Hindi", "hi_IN", :selected => @course.locale == "hi_IN"]
+                                                        ])) %></p>
 
 <!--[eoform:user]-->
 <br/>

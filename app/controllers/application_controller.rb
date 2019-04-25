@@ -59,8 +59,21 @@ class ApplicationController < ActionController::Base
   private
 
   def set_locale
-    @locale ||= params[:locale] || session[:locale] || I18n.default_locale
-    I18n.locale = session[:locale] = @locale
+    if(logged_in? && current_user_role.student?)
+      @tasks = StudentTask.from_user(current_user)
+      #If no tasks, then possible to have no courses assigned.
+      if !session[:locale] && !@tasks.empty?
+        course_id = @tasks[0].assignment.course_id
+        course = Course.find(course_id)
+        if course.locale?
+          session[:locale] = course.locale
+        end
+      end
+      @locale ||= params[:locale] || session[:locale] || I18n.default_locale
+      I18n.locale = session[:locale] = @locale
+    else
+      I18n.locale = params[:locale] || I18n.default_locale
+    end
   end
 
   def default_url_options(options={})

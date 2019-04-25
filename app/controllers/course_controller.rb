@@ -50,6 +50,7 @@ class CourseController < ApplicationController
     @course.institutions_id = params[:course][:institutions_id]
     @course.directory_path = params[:course][:directory_path]
     @course.info = params[:course][:info]
+    @course.locale = params[:course][:locale]
     @course.private = params[:course][:private].nil? ? false : params[:course][:private]
     @course.save
     undo_link("The course \"#{@course.name}\" has been updated successfully.")
@@ -90,6 +91,7 @@ class CourseController < ApplicationController
     @course.info = params[:course][:info]
     @course.private = params[:course][:private]
     @course.instructor_id = session[:user].id
+    @course.locale = params[:course][:locale]
     begin
       @course.save!
       create_course_node(@course)

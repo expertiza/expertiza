@@ -54,6 +54,7 @@ Expertiza::Application.routes.draw do
       get :list_submissions
       get :delete_delayed_mailer
       get :remove_assignment_from_course
+      get :instant_flash
     end
   end
 

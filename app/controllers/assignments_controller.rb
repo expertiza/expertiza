@@ -195,6 +195,19 @@ class AssignmentsController < ApplicationController
     redirect_to delayed_mailer_assignments_index_path params[:id]
   end
 
+  # Provide a means for a rendering of all flash messages to be requested
+  # This is useful because the assignments page has tabs
+  #   and switching tabs acts like a "save" but does NOT cause a new page load
+  #   so if we want to see via flash messages when something goes wrong,
+  #   we need to ask about it
+  # Doing it this way has a few advantages
+  #   doesn't matter what kind of flash item is set (error, note, notice, etc.)
+  #   doesn't matter what tab we are on (anybody can request this render)
+  #   doesn't matter where the flash item originated, anything can get seen this way
+  def instant_flash
+    render :partial => "shared/flash_messages"
+  end
+
   private
 
   # check whether rubrics are set before save assignment
@@ -405,7 +418,6 @@ class AssignmentsController < ApplicationController
         flash[:note] = 'The assignment was successfully saved....'
       else
         flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
-        flash.now[:notice] = "Cannot display Questionnaires for each topic. Failed to save the assignment: #{@assignment_form.errors.get(:message)}" if vary_by_topic_desired
       end
     end
     ExpertizaLogger.info LoggerMessage.new("", session[:user].name, "The assignment was saved: #{@assignment_form.as_json}", request)

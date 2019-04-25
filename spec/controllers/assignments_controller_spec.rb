@@ -138,7 +138,7 @@ describe AssignmentsController do
         allow_any_instance_of(AssignmentsController).to receive(:undo_link)
           .with('Assignment "test assignment" has been created successfully. ').and_return(true)
         post :create, @params
-        expect(response).to redirect_to('/en/assignments/1/edit')
+        expect(response).to redirect_to('/assignments/1/edit')
       end
     end
 
@@ -187,7 +187,7 @@ describe AssignmentsController do
           session = {user: instructor}
           post :update, params, session
           expect(flash[:note]).to eq('The assignment was successfully saved.')
-          expect(response).to redirect_to('/en/tree_display/list')
+          expect(response).to redirect_to('/tree_display/list')
         end
       end
 
@@ -201,7 +201,7 @@ describe AssignmentsController do
           session = {user: instructor}
           post :update, params, session
           expect(flash[:error]).to eq('Failed to save the assignment: ')
-          expect(response).to redirect_to('/en/assignments/1/edit')
+          expect(response).to redirect_to('/assignments/1/edit')
         end
       end
     end
@@ -252,7 +252,7 @@ describe AssignmentsController do
           expect(flash[:note]).to eq('The assignment was successfully saved....')
           expect(flash[:error]).to eq("We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. "\
                                       "For now we assume you are in Eastern Time (US & Canada)")
-          expect(response).to redirect_to('/en/assignments/2/edit')
+          expect(response).to redirect_to('/assignments/2/edit')
         end
       end
 
@@ -262,7 +262,7 @@ describe AssignmentsController do
           post :update, @params, session
           expect(flash[:note]).to eq('The assignment was successfully saved....')
           expect(flash[:error]).to be nil
-          expect(response).to redirect_to('/en/assignments/2/edit')
+          expect(response).to redirect_to('/assignments/2/edit')
         end
       end
     end
@@ -288,7 +288,7 @@ describe AssignmentsController do
         get :copy, params
         expect(flash[:note]).to be_nil
         expect(flash[:error]).to be_nil
-        expect(response).to redirect_to('/en/assignments/2/edit')
+        expect(response).to redirect_to('/assignments/2/edit')
       end
     end
 
@@ -303,7 +303,7 @@ describe AssignmentsController do
           "for the existing assignment. This will allow student submissions to one assignment to overwrite submissions to the other assignment. "\
           "If you do not want this to happen, change the submission directory in the new copy of the assignment.")
         expect(flash[:error]).to be_nil
-        expect(response).to redirect_to('/en/assignments/2/edit')
+        expect(response).to redirect_to('/assignments/2/edit')
       end
     end
 
@@ -315,7 +315,7 @@ describe AssignmentsController do
         get :copy, params
         expect(flash[:note]).to be_nil
         expect(flash[:error]).to eq('The assignment was not able to be copied. Please check the original assignment for missing information.')
-        expect(response).to redirect_to('/en/tree_display/list')
+        expect(response).to redirect_to('/tree_display/list')
       end
     end
   end
@@ -334,7 +334,7 @@ describe AssignmentsController do
         post :delete, params, session
         expect(flash[:error]).to be nil
         expect(flash[:success]).to eq('The assignment was successfully deleted.')
-        expect(response).to redirect_to('/en/tree_display/list')
+        expect(response).to redirect_to('/tree_display/list')
       end
     end
 
@@ -351,7 +351,7 @@ describe AssignmentsController do
         post :delete, params, session
         expect(flash[:success]).to be nil
         expect(flash[:error]).to eq('You cannot delete this assignment!')
-        expect(response).to redirect_to('/en/tree_display/list')
+        expect(response).to redirect_to('/tree_display/list')
       end
     end
   end

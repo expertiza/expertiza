@@ -165,7 +165,7 @@ describe ResponseController do
         params = {id: 1}
         session = {user: instructor}
         get :new_feedback, params, session
-        expect(response).to redirect_to('response/new?id=2&return=feedback')
+        expect(response).to redirect_to('/response/new?id=2&return=feedback')
       end
     end
 
@@ -235,7 +235,7 @@ describe ResponseController do
       }
       session = {user: instructor}
       post :save, params, session
-      expect(response).to redirect_to('response/redirect?id=1&return=')
+      expect(response).to redirect_to('/response/redirect?id=1&return=')
     end
   end
 

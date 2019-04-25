@@ -427,6 +427,49 @@ en:
       questions: "Questions"
       submit_quiz: "Submit quiz"
 
+  profile:
+    edit:
+      user_profile_info: "User Profile Information"
+      password_msg: "If password field is blank, the password will not be updated"
+      preferred_time_zone: "Preferred time zone "
+      save: "Save"
+
+    handle:
+       handle_prof: "A 'handle' can be used to conceal your username from people who view your wiki pages. If you have a handle,
+                     your wiki account should be named after your handle instead of after your user-ID.  If you do not have a handle,
+                     your Expertiza user-ID will be used instead. A blank entry in the field below will cause the handle to be set back to your Expertiza user-ID."
+       note: "Note: By using this form, you are changing your default handle, which will be used for all future assignments. To change your handle for a specific assignment, select that assignment and choose the Change Handle action."
+
+  users:
+    prefs:
+      email: "E-mail Options"
+      email_option: "Check the boxes representing the times when you want to receive e-mail."
+      email_review: "When someone else reviews my work"
+      email_other_review: "When someone else submits work I am assigned to review"
+      see_review: "When someone else reviews one of my reviews (metareviews my work)"
+      send_mail: "Send me copies of emails sent for assignments"
+
+    password:
+      password_label: "Password: "
+      confirm_password: "Confirm your password: "
+
+    name:
+      name_convention: "Full name (last, first[ middle]):"
+
+    institutions:
+      inst_name: "Institution "
+
+    email:
+      email_add: "E-mail address:"
+
+
+
+
+
+
+
+
+
 
 
 

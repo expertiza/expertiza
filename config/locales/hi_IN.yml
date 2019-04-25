@@ -423,12 +423,38 @@ hi_IN:
       questions: "प्रशन"
       submit_quiz: "कृपया प्रश्नोत्तरी जमा करें"
 
+  profile:
+    edit:
+      user_profile_info: "उपयोगकर्ता के जानकारी"
+      password_msg: "अगर पासवर्ड खाली है, थो वोह अपडेट नहीं होगा "
+      preferred_time_zone: " पसंदीदा समय क्षेत्र "
+      save: "संग्रह क्करें"
 
+    handle:
+      handle_prof: " 'Handle' आपका चुना हुआ नाम अन्य लोगों से छिपाता है. यदि आपके पास 'handle' है, आपका 'Wiki account वोह 'handle' के नॉम होणा चाहीये. अगर 'handle' नही हैं, आपके Expertiza के 'user-id' (चुना हुआ नाम) उपयोग होगा. नीचे के खाली स्तान 'handle' को आपके Expertiza में चुना हुआ नाम में बदल देगा.  "
+      note: "ध्यान दें: इस फ़ॉर्म के माध्यम से आप अपना 'default handle' बदल रहे हैं. अब ये आपके भविष्य के assignments में इस्तेमाल किया जाएगा. यदि आप अपना 'handle' बदलना चाहते हैं एक विशिष्ट assignment के लिय, आप वोह assignment का चुनाव करके 'default handle' में  परिवर्तन लाये "
 
+  users:
+    prefs:
+      email: "E-mail के विकल्प"
+      email_option: " चुनाव कीजिये जब आप E-mail प्राप्त करना चाहते हैं "
+      email_review: "जब कोई और मेरे काम की समीक्षा करता है"
+      email_other_review: "जब कोई दूसरा काम करता है तो मुझे समीक्षा करने का काम सौंपा जाता है"
+      see_review: "जब कोई और मेरी एक समीक्षा करता है"
+      send_mail: "मुझे असाइनमेंट के लिए भेजे गए"
 
+    password:
+      password_label: "पासवर्ड: "
+      confirm_password: "अपने पासवर्ड की पुष्टि करें: "
 
+    name:
+      name_convention: "पूरा नाम (अंतिम , पहला[ मध्य]):"
 
+    institutions:
+      inst_name: "संस्था"
 
+    email:
+      email_add: "E-mail पता:"
 
 
  # end of Student Views

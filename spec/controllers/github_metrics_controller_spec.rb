@@ -454,7 +454,7 @@
 
   describe '#team_statistics' do
     before(:each) do
-      controller.instance_variable_set(:@total_additions, 0)
+      controller.instance_variable_set(:@gitVariable[:total_additions], 0)
       controller.instance_variable_set(:@total_deletions, 0)
       controller.instance_variable_set(:@total_files_changed, 0)
       controller.instance_variable_set(:@total_commits, 0)
@@ -483,7 +483,7 @@
           }
         }
       )
-      expect(controller.instance_variable_get(:@total_additions)).to eq(2)
+      expect(controller.instance_variable_get(:@gitVariable[:total_additions])).to eq(2)
       expect(controller.instance_variable_get(:@total_deletions)).to eq(1)
       expect(controller.instance_variable_get(:@total_files_changed)).to eq(3)
       expect(controller.instance_variable_get(:@total_commits)).to eq(16)
@@ -511,7 +511,7 @@
               }
           }
       )
-      expect(controller.instance_variable_get(:@total_additions)).to eq(2)
+      expect(controller.instance_variable_get(:@gitVariable[:total_additions])).to eq(2)
       expect(controller.instance_variable_get(:@total_deletions)).to eq(1)
       expect(controller.instance_variable_get(:@total_files_changed)).to eq(3)
       expect(controller.instance_variable_get(:@total_commits)).to eq(16)

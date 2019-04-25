@@ -83,14 +83,20 @@ class GithubMetricsController < ApplicationController
     @gitVariable = {
         :head_refs => {},
         :parsed_data => {},
-        :authors =>{}
+        :authors => {},
+
+        :total_additions => 0
+
     }
 
     @head_refs = {}
     @parsed_data = {}
     @authors = {}
+
     @dates = {}
+
     @total_additions = 0
+
     @total_deletions = 0
     @total_commits = 0
     @total_files_changed = 0
@@ -219,7 +225,7 @@ class GithubMetricsController < ApplicationController
   end
 
   def team_statistics(github_data)
-    @total_additions += github_data["data"]["repository"]["pullRequest"]["additions"]
+    @gitVariable[:total_additions] += github_data["data"]["repository"]["pullRequest"]["additions"]
     @total_deletions += github_data["data"]["repository"]["pullRequest"]["deletions"]
     @total_files_changed += github_data["data"]["repository"]["pullRequest"]["changedFiles"]
     @total_commits += github_data["data"]["repository"]["pullRequest"]["commits"]["totalCount"]

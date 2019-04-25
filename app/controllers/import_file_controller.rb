@@ -12,9 +12,7 @@ class ImportFileController < ApplicationController
     @title = params[:title]
     @required_fields = @model.constantize.required_import_fields
     @optional_fields = @model.constantize.optional_import_fields(@id)
-
     @import_options = @model.constantize.import_options
-
   end
 
   def show

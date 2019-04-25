@@ -39,7 +39,7 @@ module ReportFormatterHelper
   end
 
   #Get the reviewers of a particular assignment and particular reviewee for Review Conflict Report
-    def reviewers_name_id_by_reviewee_and_assignment(reviewee, id)
+  def reviewers_name_id_by_reviewee_and_assignment(reviewee, id)
     temp_reviewers = User.select(" DISTINCT participants.id, users.name")
                     .joins("JOIN participants ON participants.user_id = users.id")
                     .joins("JOIN response_maps ON response_maps.reviewer_id = participants.id")

@@ -52,14 +52,14 @@ module ReviewMappingHelper
       question_answers = Array.new(total_rounds)
       (0..total_rounds-1).each do |round|
         temp_values = Answer.answers_by_round_for_reviewee(reviewed_object_id, reviewee,round+1)
-	question_answers[round] = review_score_helper_for_team(round, temp_values)      
-	end
+	      question_answers[round] = review_score_helper_for_team(temp_values)
+	    end
     end
     question_answers
   end
 
   #Get review score for each round of particular team
-  def review_score_helper_for_team(round, temp_values)
+  def review_score_helper_for_team(temp_values)
 	question_answers={}
 	temp_values.each do |temp_value|
           if question_answers.key?(temp_value[:reviewer_id])
@@ -78,6 +78,7 @@ module ReviewMappingHelper
         end
 	question_answers
   end
+
   #Average score of a particular round for Review Conflict Report
   def average_of_round(question_answer)
 	average=0.0
@@ -91,11 +92,12 @@ module ReviewMappingHelper
 	end
 	average.round(2)
   end
+
   #Standard Deviation of a particular round for Review Conflict Report
   def std_of_round(average,question_answer)
 	accum=0.0
 	i=0
-        question_answer.each do |reviewer,answer|
+  question_answer.each do |reviewer,answer|
 		accum+=(answer-average)**2
 		i+=1
 	end

@@ -36,12 +36,11 @@ class AssignmentStats
             criterion_hash[:scores] = c_scores
           end
           c_scores << answer.answer
-          if criterion_hash[:max_score].nil?
-            question = Question.find(answer.question_id)
-            criterion_hash[:question_id] = answer.question_id
-            criterion_hash[:max_score] = question.max_score
-            criterion_hash[:min_score] = question.min_score
-          end
+          next unless criterion_hash[:max_score].nil?
+          question = Question.find(answer.question_id)
+          criterion_hash[:question_id] = answer.question_id
+          criterion_hash[:max_score] = question.max_score
+          criterion_hash[:min_score] = question.min_score
         end
       end
     end

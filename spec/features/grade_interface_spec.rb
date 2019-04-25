@@ -1,8 +1,18 @@
-require 'byebug'
+require 'database_cleaner'
 
-include GradeInterfaceHelperSpec
+describe 'Integration tests for viewing grades: ', js: true do
+  before(:context) do
+    DatabaseCleaner.strategy = :truncation, {:pre_count => true, :reset_ids => true}
+    DatabaseCleaner.start
+  end
 
-describe 'Integration tests for viewing grades: ' do
+  after(:context) do
+    DatabaseCleaner.clean
+
+    DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner.start
+  end
+
   context 'when checking grade bar chart' do
     #setup roles
     let!(:role1) {create(:role_of_student)}
@@ -22,7 +32,7 @@ describe 'Integration tests for viewing grades: ' do
     let!(:review_response_map1) {create :review_response_map}
 
     let!(:q_aire) {create :questionnaire}
-    let!(:assignment1_q_aire) {create :assignment_questionnaire}
+    let!(:assignment1_q_aire) {create :assignment_questionnaire, used_in_round: true}
 
     let!(:questions) {5.times {create :question}}
     let!(:q_advice) {create :question_advice}
@@ -36,9 +46,13 @@ describe 'Integration tests for viewing grades: ' do
     end}
 
 
-    it 'is visible' do
+    it 'is visible', :driver => :selenium_chrome_headless do
+      Capybara.page.driver.browser.manage.window.maximize
+      Capybara.default_max_wait_time = 90
+
       login_as("instructor6")
-      visit view_grades_url(:id => assignment1.id)
+      visit view_grades_path(:id => assignment1.id)
+
       expect(page).to have_selector('#chart_div', visible: true)
     end
 

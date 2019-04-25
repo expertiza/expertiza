@@ -32,7 +32,7 @@ describe ReviewMappingController do
         params = {id: 1, team_id: 1}
         session = {user: build(:instructor, id: 1)}
         get :add_calibration, params, session
-        expect(response).to redirect_to '/response/new?assignment_id=1&id=1&return=assignment_edit'
+        expect(response).to redirect_to '/en/response/new?assignment_id=1&id=1&return=assignment_edit'
       end
     end
 
@@ -49,7 +49,7 @@ describe ReviewMappingController do
         params = {id: 1, team_id: 1}
         session = {user: build(:instructor, id: 1)}
         get :add_calibration, params, session
-        expect(response).to redirect_to '/response/new?assignment_id=1&id=1&return=assignment_edit'
+        expect(response).to redirect_to '/en/response/new?assignment_id=1&id=1&return=assignment_edit'
       end
     end
   end
@@ -69,7 +69,7 @@ describe ReviewMappingController do
       it 'shows an error message and redirects to review_mapping#list_mappings page' do
         allow(TeamsUser).to receive(:exists?).with(team_id: '1', user_id: 1).and_return(true)
         post :add_reviewer, @params
-        expect(response).to redirect_to '/review_mapping/list_mappings?id=1'
+        expect(response).to redirect_to '/en/review_mapping/list_mappings?id=1'
       end
     end
 
@@ -85,7 +85,7 @@ describe ReviewMappingController do
           .with(reviewee_id: '1', reviewer_id: 1).with(no_args).and_return(nil)
         allow(ReviewResponseMap).to receive(:create).with(reviewee_id: '1', reviewer_id: 1, reviewed_object_id: 1).and_return(nil)
         post :add_reviewer, @params
-        expect(response).to redirect_to '/review_mapping/list_mappings?id=1&msg='
+        expect(response).to redirect_to '/en/review_mapping/list_mappings?id=1&msg='
       end
     end
   end
@@ -106,7 +106,7 @@ describe ReviewMappingController do
         }
         post :assign_reviewer_dynamically, params
         expect(flash[:error]).to eq('No topic is selected.  Please go back and select a topic.')
-        expect(response).to redirect_to '/student_review/list?id=1'
+        expect(response).to redirect_to '/en/student_review/list?id=1'
       end
     end
 
@@ -122,7 +122,7 @@ describe ReviewMappingController do
           topic_id: 1
         }
         post :assign_reviewer_dynamically, params
-        expect(response).to redirect_to '/student_review/list?id=1'
+        expect(response).to redirect_to '/en/student_review/list?id=1'
       end
     end
 
@@ -141,7 +141,7 @@ describe ReviewMappingController do
           topic_id: 1
         }
         post :assign_reviewer_dynamically, params
-        expect(response).to redirect_to '/student_review/list?id=1'
+        expect(response).to redirect_to '/en/student_review/list?id=1'
       end
     end
   end
@@ -165,7 +165,7 @@ describe ReviewMappingController do
 
         post :assign_quiz_dynamically, @params
         expect(flash[:error]).to eq('You have already taken that quiz.')
-        expect(response).to redirect_to('/student_quizzes?id=1')
+        expect(response).to redirect_to('/en/student_quizzes?id=1')
       end
     end
 
@@ -177,7 +177,7 @@ describe ReviewMappingController do
         allow_any_instance_of(QuizResponseMap).to receive(:save).and_return(true)
         post :assign_quiz_dynamically, @params
         expect(flash[:error]).to be nil
-        expect(response).to redirect_to('/student_quizzes?id=1')
+        expect(response).to redirect_to('/en/student_quizzes?id=1')
       end
     end
   end
@@ -192,12 +192,12 @@ describe ReviewMappingController do
       allow(User).to receive(:from_params).with(any_args).and_return(user)
       # allow_any_instance_of(ReviewMappingController).to receive(:url_for).with(action: 'add_user_to_assignment', id: 1, user_id: 1).and_return('')
       allow_any_instance_of(ReviewMappingController).to receive(:get_reviewer)
-        .with(user, assignment, 'http://test.host/review_mapping/add_user_to_assignment?id=1&user_id=1')
+        .with(user, assignment, 'http://test.host/en/review_mapping/add_user_to_assignment?id=1&user_id=1')
         .and_return(double('AssignmentParticipant', id: 1, name: 'no one'))
       allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: 1, reviewer_id: 1).and_return([nil])
       params = {id: 1}
       post :add_metareviewer, params
-      expect(response).to redirect_to('/review_mapping/list_mappings?id=1&msg=')
+      expect(response).to redirect_to('/en/review_mapping/list_mappings?id=1&msg=')
     end
   end
 
@@ -211,7 +211,7 @@ describe ReviewMappingController do
         metareviewer_id: 1
       }
       post :assign_metareviewer_dynamically, params
-      expect(response).to redirect_to('/student_review/list?id=1')
+      expect(response).to redirect_to('/en/student_review/list?id=1')
     end
   end
 
@@ -231,7 +231,7 @@ describe ReviewMappingController do
         post :delete_outstanding_reviewers, params
         expect(flash[:success]).to be nil
         expect(flash[:error]).to eq('1 reviewer(s) cannot be deleted because they have already started a review.')
-        expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+        expect(response).to redirect_to('/en/review_mapping/list_mappings?id=1')
       end
     end
 
@@ -248,7 +248,7 @@ describe ReviewMappingController do
         post :delete_outstanding_reviewers, params
         expect(flash[:error]).to be nil
         expect(flash[:success]).to eq('All review mappings for "no one" have been deleted.')
-        expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+        expect(response).to redirect_to('/en/review_mapping/list_mappings?id=1')
       end
     end
   end
@@ -269,9 +269,9 @@ describe ReviewMappingController do
         post :delete_all_metareviewers, params
         expect(flash[:note]).to be nil
         expect(flash[:error]).to eq("A delete action failed:<br/>1 metareviews exist for these mappings. "\
-          "Delete these mappings anyway?&nbsp;<a href='http://test.host/review_mapping/delete_all_metareviewers?force=1&id=1'>Yes</a>&nbsp;|&nbsp;"\
-          "<a href='http://test.host/review_mapping/delete_all_metareviewers?id=1'>No</a><br/>")
-        expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+          "Delete these mappings anyway?&nbsp;<a href='http://test.host/en/review_mapping/delete_all_metareviewers?force=1&id=1'>Yes</a>&nbsp;|&nbsp;"\
+          "<a href='http://test.host/en/review_mapping/delete_all_metareviewers?id=1'>No</a><br/>")
+        expect(response).to redirect_to('/en/review_mapping/list_mappings?id=1')
       end
     end
 
@@ -284,7 +284,7 @@ describe ReviewMappingController do
         post :delete_all_metareviewers, params
         expect(flash[:error]).to be nil
         expect(flash[:note]).to eq('All metareview mappings for contributor "reviewee" and reviewer "reviewer" have been deleted.')
-        expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+        expect(response).to redirect_to('/en/review_mapping/list_mappings?id=1')
       end
     end
   end
@@ -362,7 +362,7 @@ describe ReviewMappingController do
         params = {id: 1}
         post :delete_metareviewer, params
         expect(flash[:note]).to eq('The metareview mapping for reviewee and reviewer has been deleted.')
-        expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+        expect(response).to redirect_to('/en/review_mapping/list_mappings?id=1')
       end
     end
 
@@ -372,7 +372,7 @@ describe ReviewMappingController do
         params = {id: 1}
         post :delete_metareviewer, params
         expect(flash[:error]).to eq("A delete action failed:<br/>Boom<a href='/review_mapping/delete_metareview/1'>Delete this mapping anyway>?")
-        expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+        expect(response).to redirect_to('/en/review_mapping/list_mappings?id=1')
       end
     end
   end
@@ -383,7 +383,7 @@ describe ReviewMappingController do
       allow(metareview_response_map).to receive(:delete).and_return(true)
       params = {id: 1}
       post :delete_metareview, params
-      expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+      expect(response).to redirect_to('/en/review_mapping/list_mappings?id=1')
     end
   end
 
@@ -422,7 +422,7 @@ describe ReviewMappingController do
           }
           post :automatic_review_mapping, params
           expect(flash[:error]).to eq('Please choose either the number of reviews per student or the number of reviewers per team (student).')
-          expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+          expect(response).to redirect_to('/en/review_mapping/list_mappings?id=1')
         end
       end
 
@@ -439,7 +439,7 @@ describe ReviewMappingController do
           }
           post :automatic_review_mapping, params
           expect(flash[:error]).to be nil
-          expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+          expect(response).to redirect_to('/en/review_mapping/list_mappings?id=1')
         end
       end
 
@@ -459,7 +459,7 @@ describe ReviewMappingController do
           }
           post :automatic_review_mapping, params
           expect(flash[:error]).to be nil
-          expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+          expect(response).to redirect_to('/en/review_mapping/list_mappings?id=1')
         end
       end
 
@@ -481,7 +481,7 @@ describe ReviewMappingController do
           expect(flash[:error]).to eq('You cannot set the number of reviews done ' \
                                       'by each student to be greater than or equal to total number of teams ' \
                                       '[or "participants" if it is an individual assignment].')
-          expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+          expect(response).to redirect_to('/en/review_mapping/list_mappings?id=1')
         end
       end
     end
@@ -502,7 +502,7 @@ describe ReviewMappingController do
         }
         post :automatic_review_mapping, params
         expect(flash[:error]).to eq('Please choose either the number of reviews per student or the number of reviewers per team (student), not both.')
-        expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+        expect(response).to redirect_to('/en/review_mapping/list_mappings?id=1')
       end
     end
   end
@@ -519,7 +519,7 @@ describe ReviewMappingController do
       }
       post :automatic_review_mapping_staggered, params
       expect(flash[:note]).to eq('Awesome!')
-      expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+      expect(response).to redirect_to('/en/review_mapping/list_mappings?id=1')
     end
   end
 
@@ -536,7 +536,7 @@ describe ReviewMappingController do
       session = {user: double('User', id: 1)}
       post :save_grade_and_comment_for_reviewer, params, session
       expect(flash[:note]).to be nil
-      expect(response).to redirect_to('/reports/response_report')
+      expect(response).to redirect_to('/en/reports/response_report')
     end
   end
 
@@ -555,7 +555,7 @@ describe ReviewMappingController do
           reviewer_id: 1
         }
         post :start_self_review, params
-        expect(response).to redirect_to('/submitted_content/1/edit')
+        expect(response).to redirect_to('/en/submitted_content/1/edit')
       end
     end
 
@@ -568,7 +568,7 @@ describe ReviewMappingController do
           reviewer_id: 1
         }
         post :start_self_review, params
-        expect(response).to redirect_to('/submitted_content/1/edit?msg=Self+review+already+assigned%21')
+        expect(response).to redirect_to('/en/submitted_content/1/edit?msg=Self+review+already+assigned%21')
       end
     end
   end

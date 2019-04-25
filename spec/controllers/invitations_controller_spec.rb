@@ -48,7 +48,7 @@ describe InvitationsController do
       session = {user: instructor}
       get :accept, params, session
       expect(flash[:error]).to eq 'The team that invited you does not exist anymore.'
-      expect(response).to redirect_to('/student_teams/view')
+      expect(response).to redirect_to('/en/student_teams/view')
     end
   end
 
@@ -59,7 +59,7 @@ describe InvitationsController do
       params = {student_id: student.id, inv_id: 1}
       session = {user: instructor}
       get :decline, params, session
-      expect(response).to redirect_to('/student_teams/view')
+      expect(response).to redirect_to('/en/student_teams/view')
     end
   end
 
@@ -70,7 +70,7 @@ describe InvitationsController do
       params = {inv_id: 1, student_id: student.id}
       session = {user: instructor}
       get :cancel, params, session
-      expect(response).to redirect_to('/student_teams/view')
+      expect(response).to redirect_to('/en/student_teams/view')
     end
   end
 end

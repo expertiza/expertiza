@@ -50,7 +50,7 @@ describe SignUpSheetController do
             }
           }
           post :create, params
-          expect(response).to redirect_to('/assignments/1/edit#tabs-5')
+          expect(response).to redirect_to('/en/assignments/1/edit#tabs-5')
         end
       end
 
@@ -93,7 +93,7 @@ describe SignUpSheetController do
         }
         post :create, params
         expect(SignedUpTeam.first.is_waitlisted).to be false
-        expect(response).to redirect_to('/sign_up_sheet/add_signup_topics_staggered?id=1')
+        expect(response).to redirect_to('/en/sign_up_sheet/add_signup_topics_staggered?id=1')
       end
     end
   end
@@ -105,7 +105,7 @@ describe SignUpSheetController do
           .with("The topic: \"Hello world!\" has been successfully deleted. ").and_return('OK')
         params = {id: 1, assignment_id: 1}
         post :destroy, params
-        expect(response).to redirect_to('/assignments/1/edit#tabs-5')
+        expect(response).to redirect_to('/en/assignments/1/edit#tabs-5')
       end
     end
 
@@ -117,7 +117,7 @@ describe SignUpSheetController do
         params = {id: 1, assignment_id: 1}
         post :destroy, params
         expect(flash[:error]).to eq('The topic could not be deleted.')
-        expect(response).to redirect_to('/assignments/1/edit#tabs-5')
+        expect(response).to redirect_to('/en/assignments/1/edit#tabs-5')
       end
     end
   end
@@ -137,7 +137,7 @@ describe SignUpSheetController do
         params = {id: 1, assignment_id: 1}
         post :update, params
         expect(flash[:error]).to eq('The topic could not be updated.')
-        expect(response).to redirect_to('/assignments/1/edit#tabs-5')
+        expect(response).to redirect_to('/en/assignments/1/edit#tabs-5')
       end
     end
 
@@ -162,7 +162,7 @@ describe SignUpSheetController do
           }
         }
         post :update, params
-        expect(response).to redirect_to('/assignments/1/edit#tabs-5')
+        expect(response).to redirect_to('/en/assignments/1/edit#tabs-5')
       end
     end
   end
@@ -208,7 +208,7 @@ describe SignUpSheetController do
         session = {user: instructor}
         get :sign_up, params, session
         expect(flash[:error]).to eq('You\'ve already signed up for a topic!')
-        expect(response).to redirect_to('/sign_up_sheet/list?id=1')
+        expect(response).to redirect_to('/en/sign_up_sheet/list?id=1')
       end
     end
   end
@@ -222,7 +222,7 @@ describe SignUpSheetController do
         params = {username: 'no name', assignment_id: 1}
         get :signup_as_instructor_action, params
         expect(flash[:error]).to eq('That student does not exist!')
-        expect(response).to redirect_to('/assignments/1/edit')
+        expect(response).to redirect_to('/en/assignments/1/edit')
       end
     end
 
@@ -250,7 +250,7 @@ describe SignUpSheetController do
             }
             get :signup_as_instructor_action, params
             expect(flash[:success]).to eq('You have successfully signed up the student for the topic!')
-            expect(response).to redirect_to('/assignments/1/edit')
+            expect(response).to redirect_to('/en/assignments/1/edit')
           end
         end
 
@@ -267,7 +267,7 @@ describe SignUpSheetController do
             }
             get :signup_as_instructor_action, params
             expect(flash[:error]).to eq('The student has already signed up for a topic!')
-            expect(response).to redirect_to('/assignments/1/edit')
+            expect(response).to redirect_to('/en/assignments/1/edit')
           end
         end
       end
@@ -281,7 +281,7 @@ describe SignUpSheetController do
           }
           get :signup_as_instructor_action, params
           expect(flash[:error]).to eq('The student is not registered for the assignment!')
-          expect(response).to redirect_to('/assignments/1/edit')
+          expect(response).to redirect_to('/en/assignments/1/edit')
         end
       end
     end
@@ -299,7 +299,7 @@ describe SignUpSheetController do
         session = {user: instructor}
         get :delete_signup, params, session
         expect(flash[:error]).to eq('You have already submitted your work, so you are not allowed to drop your topic.')
-        expect(response).to redirect_to('/sign_up_sheet/list?id=1')
+        expect(response).to redirect_to('/en/sign_up_sheet/list?id=1')
       end
     end
 
@@ -313,7 +313,7 @@ describe SignUpSheetController do
         session = {user: instructor}
         get :delete_signup, params, session
         expect(flash[:error]).to eq('You cannot drop your topic after the drop topic deadline!')
-        expect(response).to redirect_to('/sign_up_sheet/list?id=1')
+        expect(response).to redirect_to('/en/sign_up_sheet/list?id=1')
       end
     end
 
@@ -327,7 +327,7 @@ describe SignUpSheetController do
         session = {user: instructor}
         get :delete_signup, params, session
         expect(flash[:success]).to eq('You have successfully dropped your topic!')
-        expect(response).to redirect_to('/sign_up_sheet/list?id=1')
+        expect(response).to redirect_to('/en/sign_up_sheet/list?id=1')
       end
     end
   end
@@ -347,7 +347,7 @@ describe SignUpSheetController do
         session = {user: instructor}
         get :delete_signup_as_instructor, params, session
         expect(flash[:error]).to eq('The student has already submitted their work, so you are not allowed to remove them.')
-        expect(response).to redirect_to('/assignments/1/edit')
+        expect(response).to redirect_to('/en/assignments/1/edit')
       end
     end
 
@@ -361,7 +361,7 @@ describe SignUpSheetController do
         session = {user: instructor}
         get :delete_signup_as_instructor, params, session
         expect(flash[:error]).to eq('You cannot drop a student after the drop topic deadline!')
-        expect(response).to redirect_to('/assignments/1/edit')
+        expect(response).to redirect_to('/en/assignments/1/edit')
       end
     end
 
@@ -375,7 +375,7 @@ describe SignUpSheetController do
         session = {user: instructor}
         get :delete_signup_as_instructor, params, session
         expect(flash[:success]).to eq('You have successfully dropped the student from the topic!')
-        expect(response).to redirect_to('/assignments/1/edit')
+        expect(response).to redirect_to('/en/assignments/1/edit')
       end
     end
   end
@@ -393,7 +393,7 @@ describe SignUpSheetController do
         topic: ['1']
       }
       post :set_priority, params
-      expect(response).to redirect_to('/sign_up_sheet/list?assignment_id=1')
+      expect(response).to redirect_to('/en/sign_up_sheet/list?assignment_id=1')
     end
   end
 
@@ -410,7 +410,7 @@ describe SignUpSheetController do
           due_date: {}
         }
         post :save_topic_deadlines, params
-        expect(response).to redirect_to('/assignments/1/edit')
+        expect(response).to redirect_to('/en/assignments/1/edit')
       end
     end
 
@@ -428,7 +428,7 @@ describe SignUpSheetController do
           due_date: {}
         }
         post :save_topic_deadlines, params
-        expect(response).to redirect_to('/assignments/1/edit')
+        expect(response).to redirect_to('/en/assignments/1/edit')
       end
     end
   end
@@ -459,7 +459,7 @@ describe SignUpSheetController do
       }
       session = {user: instructor}
       get :switch_original_topic_to_approved_suggested_topic, params, session
-      expect(response).to redirect_to('/sign_up_sheet/list?id=1')
+      expect(response).to redirect_to('/en/sign_up_sheet/list?id=1')
     end
   end
 end

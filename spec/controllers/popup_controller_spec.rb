@@ -44,7 +44,7 @@ describe PopupController do
       context 'when tone analysis page is loaded, review tone analysis is calculated' do
         it 'builds a tone analysis report for both the summery and tone analysis pages and returns an array of heat map URLs' do
           result = get :tone_analysis_chart_popup
-          expect(result["Location"]).to eq(test_url + "/") ## Placeholder URL should be returned since GET returns a 302 status redirection error
+          expect(result["Location"]).to eq(test_url + "/en") ## Placeholder URL should be returned since GET returns a 302 status redirection error
         end
       end
     end
@@ -57,7 +57,7 @@ describe PopupController do
       context 'upon selecting summery, the tone analysis for review comments is calculated and applied to the page' do
         it 'builds a tone analysis report and returns the heat map URLs' do
           result = get :build_tone_analysis_report
-          expect(result["Location"]).to eq(test_url + "/") ## Placeholder URL should be returned since GET returns a 302 status redirection error
+          expect(result["Location"]).to eq(test_url + "/en") ## Placeholder URL should be returned since GET returns a 302 status redirection error
         end
       end
     end

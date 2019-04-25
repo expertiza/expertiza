@@ -363,6 +363,24 @@ en:
       grade: "Grade:"
       comment2: "Comment:"
 
+    participant_charts:
+      hide_stats: "hide stats"
+      stats: "Stats"
+
+    participant:
+      show_submission: "show submission"
+
+    participant_title:
+      submitted_work: "Submitted work"
+      reviewing: "Reviewing"
+      author_feedback: "Author Feedback"
+      teammate_review: "Teammate Review"
+      contributor: "Contributor"
+      average: "Average"
+      range: "Range"
+      final_score: "Final Score"
+
+
   participants:
     change_handle:
       create_or_change: "Create or Change Handle for Current Assignment"

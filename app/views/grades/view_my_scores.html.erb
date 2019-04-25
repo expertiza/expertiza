@@ -22,5 +22,5 @@
     <p id = "reputation_score" class = <%= get_css_style_for_lauw_reputation(@participant.Lauw)%> style = "width:60px;"><%= @participant.Lauw %></p>
 <%end%>
 <BR/>
-<a href="javascript:window.history.back()"><%=t ".back"%></a>
+<%= link_to t(".back"), :controller=>'student_task', :action => 'view', :id =>  @participant %>
 

@@ -287,7 +287,7 @@ hi_IN:
 
     submitted_files:
       submit_file: "फाइल जमा करें:"
-      or: "और"
+      or: "या"
 
   student_review:
     list:
@@ -358,6 +358,23 @@ hi_IN:
       grade: "ग्रेड:"
       comment2: "टिप्पणी:"
 
+    participant_charts:
+      hide_stats: "आँकड़े छिपाएँ"
+      stats: "आँकड़े"
+
+    participant:
+      show_submission: "प्रस्तुत काम देखे"
+
+    participant_title:
+      submitted_work: "प्रस्तुत काम"
+      reviewing: "समीक्षा के लिए"
+      author_feedback: "लेखक की प्रतिक्रिया"
+      teammate_review: "टीममेट रिव्यू"
+      contributor: "योगदानकर्ता"
+      average: "औसत"
+      range: "सीमा"
+      final_score: "फाइनल स्कोर"
+
   participants:
     change_handle:
       create_or_change: "वर्तमान असाइनमेंट के लिए हैंडल बनाएं या बदलें"
@@ -396,7 +413,8 @@ hi_IN:
   student_quizzes:
     index:
       quiz_for: "इसके लिए प्रश्नोत्तरी है: "
-      assignment_not_support: "यह असाइनमेंट क्विज़ का समर्थन नहीं करता है"
+      assignment_not_support: "इस असाइनमेंट में अभी प्रश्नोत्तरी नहीं हैं"
+      back: "वापस पीछे"
 
     responses:
       work_not_submit: " आपका काम अभी तक प्रस्तुत नहीं किया गया है"

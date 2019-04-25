@@ -18,12 +18,12 @@
         <% end %>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <% if session[:user].role.student? %>
+        <% if session[:user] != nil && session[:user].role.student? %>
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Select language<b class="caret"></b></a>
             <ul class="dropdown-menu">
-              <li><%=link_to_unless_current "English", locale: "en", :params => request.query_parameters %></li>
-              <li><%=link_to_unless_current "Hindi", locale: "hi_IN", :params => request.query_parameters %></li>
+              <li><%=link_to_unless_current "English", params.merge(locale: "en", only_path: true) %></li>
+              <li><%=link_to_unless_current "Hindi", params.merge(locale: "hi_IN", only_path: true)%></li>
             </ul>
           </li>
         <% end %>

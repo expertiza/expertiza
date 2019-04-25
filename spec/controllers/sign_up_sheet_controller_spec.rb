@@ -50,7 +50,7 @@ describe SignUpSheetController do
             }
           }
           post :create, params
-          expect(response).to redirect_to('/assignments/1/edit#tabs-5')
+          expect(response).to redirect_to('/assignments/1/edit#tabs-2')
         end
       end
 
@@ -105,7 +105,7 @@ describe SignUpSheetController do
           .with("The topic: \"Hello world!\" has been successfully deleted. ").and_return('OK')
         params = {id: 1, assignment_id: 1}
         post :destroy, params
-        expect(response).to redirect_to('/assignments/1/edit#tabs-5')
+        expect(response).to redirect_to('/assignments/1/edit')
       end
     end
 
@@ -117,8 +117,18 @@ describe SignUpSheetController do
         params = {id: 1, assignment_id: 1}
         post :destroy, params
         expect(flash[:error]).to eq('The topic could not be deleted.')
-        expect(response).to redirect_to('/assignments/1/edit#tabs-5')
+        expect(response).to redirect_to('/assignments/1/edit')
       end
+    end
+  end
+
+  describe '#delete_all_topics_for_assignment' do
+    it 'deletes all topics for the assignment and redirects to edit assignment page' do
+      allow(SignUpTopic).to receive(:find).with(assignment_id: '1').and_return(topic)
+      params = {assignment_id: 1}
+      post :delete_all_topics_for_assignment, params
+      expect(flash[:success]).to eq('All topics have been deleted successfully.')
+      expect(response).to redirect_to('/assignments/1/edit')
     end
   end
 
@@ -137,7 +147,7 @@ describe SignUpSheetController do
         params = {id: 1, assignment_id: 1}
         post :update, params
         expect(flash[:error]).to eq('The topic could not be updated.')
-        expect(response).to redirect_to('/assignments/1/edit#tabs-5')
+        expect(response).to redirect_to('/assignments/1/edit#tabs-2')
       end
     end
 
@@ -162,7 +172,7 @@ describe SignUpSheetController do
           }
         }
         post :update, params
-        expect(response).to redirect_to('/assignments/1/edit#tabs-5')
+        expect(response).to redirect_to('/assignments/1/edit#tabs-2')
       end
     end
   end

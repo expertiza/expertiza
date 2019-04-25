@@ -368,6 +368,7 @@ describe QuestionnairesController do
                   question: {total_num: 2,
                              type: 'Dropdown'}}
         post :add_new_questions, params
+
         expect(response).to redirect_to('/en/questionnaires/1/edit')
       end
     end

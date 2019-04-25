@@ -34,11 +34,11 @@ class FeedbackResponseMap < ResponseMap
     # map_id in (select id from response_maps where reviewed_object_id = 722 and type = 'ReviewResponseMap'))
     @review_response_map_ids = ReviewResponseMap.where(["reviewed_object_id = ?", id]).pluck("id")
     teams = AssignmentTeam.where(parent_id: id)
-    @authors = []
+    @gitVariable[:authors] = []
     teams.each do |team|
       team.users.each do |user|
         participant = AssignmentParticipant.where(parent_id: id, user_id: user.id).first
-        @authors << participant
+        @gitVariable[:authors] << participant
       end
     end
 
@@ -68,9 +68,9 @@ class FeedbackResponseMap < ResponseMap
     # @feedback_response_map_ids = ResponseMap.where(["reviewed_object_id IN (?) and type = ?", @all_review_response_ids, type]).pluck("id")
     # @feedback_responses = Response.where(["map_id IN (?)", @feedback_response_map_ids]).pluck("id")
     if Assignment.find(id).varying_rubrics_by_round?
-      return @authors, @all_review_response_ids_round_one, @all_review_response_ids_round_two, @all_review_response_ids_round_three
+      return @gitVariable[:authors], @all_review_response_ids_round_one, @all_review_response_ids_round_two, @all_review_response_ids_round_three
     else
-      return @authors, @all_review_response_ids
+      return @gitVariable[:authors], @all_review_response_ids
     end
   end
 

@@ -309,13 +309,13 @@
 
   describe '#process_github_authors_and_dates' do
     before(:each) do
-      controller.instance_variable_set(:@authors, {})
+      controller.instance_variable_set(:@gitVariable[:authors], {})
       controller.instance_variable_set(:@dates, {})
       controller.instance_variable_set(:@parsed_data, {})
     end
     it 'sets authors and data for GitHub data' do
       controller.process_github_authors_and_dates("author", "date")
-      expect(controller.instance_variable_get(:@authors)).to eq("author" => 1)
+      expect(controller.instance_variable_get(:@gitVariable[:authors])).to eq("author" => 1)
       expect(controller.instance_variable_get(:@dates)).to eq("date" => 1)
       expect(controller.instance_variable_get(:@parsed_data)).to eq("author" => {"date" => 1})
 

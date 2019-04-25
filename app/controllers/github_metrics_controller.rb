@@ -81,7 +81,9 @@ class GithubMetricsController < ApplicationController
     end
 
     @gitVariable = {
-        :head_refs => {}
+        :head_refs => {},
+        :parsed_data => {},
+        :authors =>{}
     }
 
     @head_refs = {}
@@ -107,7 +109,7 @@ class GithubMetricsController < ApplicationController
     retrieve_github_data
     retrieve_check_run_statuses
 
-    @authors = @authors.keys
+    @gitVariable[:authors] = @gitVariable[:authors].keys
     @dates = @dates.keys.sort
   end
 
@@ -160,11 +162,11 @@ class GithubMetricsController < ApplicationController
   end
 
   def process_github_authors_and_dates(author_name, commit_date)
-    @authors[author_name] ||= 1
+    @gitVariable[:authors][author_name] ||= 1
     @dates[commit_date] ||= 1
-    @parsed_data[author_name] ||= {}
-    @parsed_data[author_name][commit_date] = if @parsed_data[author_name][commit_date]
-                                               @parsed_data[author_name][commit_date] + 1
+    @gitVariable[:parsed_data][author_name] ||= {}
+    @gitVariable[:parsed_data][author_name][commit_date] = if @gitVariable[:parsed_data][author_name][commit_date]
+                                                             @gitVariable[:parsed_data][author_name][commit_date] + 1
                                              else
                                                1
                                              end
@@ -209,11 +211,11 @@ class GithubMetricsController < ApplicationController
 
   def organize_commit_dates
     @dates.each_key do |date|
-      @parsed_data.each_value do |commits|
+      @gitVariable[:parsed_data].each_value do |commits|
         commits[date] ||= 0
       end
     end
-    @parsed_data.each {|author, commits| @parsed_data[author] = Hash[commits.sort_by {|date, _commit_count| date }] }
+    @gitVariable[:parsed_data].each {|author, commits| @parsed_data[author] = Hash[commits.sort_by {|date, _commit_count| date }] }
   end
 
   def team_statistics(github_data)

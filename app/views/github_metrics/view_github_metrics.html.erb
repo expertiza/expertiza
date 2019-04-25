@@ -21,10 +21,10 @@
 </div><br><br>
 
 
-<% if @parsed_data && @authors.present? && @dates %>
+<% if @gitVariable[:parsed_data] && @gitVariable[:authors].present? && @dates %>
   <h3>Code frequency</h3>
   <div class="chart-container" style="width: 1000px; height:600px;">
-    <%= display_github_metrics(@parsed_data, @authors, @dates) %>
+    <%= display_github_metrics(@gitVariable[:parsed_data], @gitVariable[:authors], @dates) %>
   </div>
   <h3>Team Statistics</h3>
   <ul>

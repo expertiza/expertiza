@@ -1,12 +1,12 @@
 #This file contains the CLIENT_KEY & CLIENT_SECRET for Google OmniAuth 2.0
 
 development:
-  client_key: 'cd7dfcf45b07f2b18558d'
+  client_key: 'cd7dfcf45b07f2b18558'
   client_secret: '75c264a9cfd49f6ec4370245db5477f37ef401be'
 
 test:
-  client_key: '112233445566'
-  client_secret: '112233445566'
+  client_key: 'qwerty12345'
+  client_secret: 'db117b422bfaa2a4c4038921db2634ce56ceeb09'
 
 # Set these to appropriate values when deploying to production
 production:

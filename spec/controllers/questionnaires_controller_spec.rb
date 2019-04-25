@@ -312,7 +312,7 @@ describe QuestionnairesController do
         allow(@questionnaire1).to receive(:update_attributes).with(any_args).and_return(true)
         post :update, @params_with_question
         expect(flash[:success]).to eq('The questionnaire has been successfully updated!')
-        expect(response).to redirect_to('/questionnaires/1/edit')
+        expect(response).to redirect_to('/en/questionnaires/1/edit')
       end
     end
 
@@ -321,7 +321,7 @@ describe QuestionnairesController do
         params = {id: 1,
                   view_advice: true}
         post :update, params
-        expect(response).to redirect_to('/advice/edit_advice/1')
+        expect(response).to redirect_to('/en/advice/edit_advice/1')
       end
     end
 

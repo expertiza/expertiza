@@ -192,7 +192,7 @@ describe ReviewMappingController do
       allow(User).to receive(:from_params).with(any_args).and_return(user)
       # allow_any_instance_of(ReviewMappingController).to receive(:url_for).with(action: 'add_user_to_assignment', id: 1, user_id: 1).and_return('')
       allow_any_instance_of(ReviewMappingController).to receive(:get_reviewer)
-        .with(user, assignment, 'http://test.host/review_mapping/add_user_to_assignment?id=1&user_id=1')
+        .with(user, assignment, 'http://test.host/en/review_mapping/add_user_to_assignment?id=1&user_id=1')
         .and_return(double('AssignmentParticipant', id: 1, name: 'no one'))
       allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: 1, reviewer_id: 1).and_return([nil])
       params = {id: 1}
@@ -269,8 +269,8 @@ describe ReviewMappingController do
         post :delete_all_metareviewers, params
         expect(flash[:note]).to be nil
         expect(flash[:error]).to eq("A delete action failed:<br/>1 metareviews exist for these mappings. "\
-          "Delete these mappings anyway?&nbsp;<a href='http://test.host/review_mapping/delete_all_metareviewers?force=1&id=1'>Yes</a>&nbsp;|&nbsp;"\
-          "<a href='http://test.host/review_mapping/delete_all_metareviewers?id=1'>No</a><br/>")
+          "Delete these mappings anyway?&nbsp;<a href='http://test.host/en/review_mapping/delete_all_metareviewers?force=1&id=1'>Yes</a>&nbsp;|&nbsp;"\
+          "<a href='http://test.host/en/review_mapping/delete_all_metareviewers?id=1'>No</a><br/>")
         expect(response).to redirect_to('/en/review_mapping/list_mappings?id=1')
       end
     end

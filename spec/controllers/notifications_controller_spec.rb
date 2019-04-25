@@ -1,6 +1,6 @@
 describe NotificationsController do
   it "#run_get_notification" do
     get "run_get_notification"
-    expect(response).to redirect_to('/')
+    expect(response).to redirect_to('/en')
   end
 end

@@ -373,36 +373,6 @@ describe QuestionnairesController do
     end
   end
 
-  describe '#save_all_questions' do
-    context 'when params[:save] is not nil, params[:view_advice] is nil' do
-      it 'redirects to questionnaires#edit page after saving all questions' do
-        allow(Question).to receive(:find).with('1').and_return(question)
-        allow(question).to receive(:save).and_return(true)
-        params = {id: 1,
-                  save: true,
-                  question: {'1' => {seq: 66.0,
-                                     txt: 'WOW',
-                                     weight: 10,
-                                     size: '50,3',
-                                     max_label: 'Strong agree',
-                                     min_label: 'Not agree'}}}
-        post :save_all_questions, params
-        expect(flash[:success]).to eq('All questions has been successfully saved!')
-        expect(response).to redirect_to('/en/questionnaires/1/edit')
-      end
-    end
-
-    context 'when params[:save] is nil, params[:view_advice] is not nil' do
-      it 'redirects to advice#edit_advice page' do
-        params = {id: 1,
-                  view_advice: true,
-                  question: {}}
-        post :save_all_questions, params
-        expect(response).to redirect_to('/en/advice/edit_advice/1')
-      end
-    end
-  end
-
   describe '#view_quiz' do
     it 'renders questionnaires#view_quiz' do
       allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire'))

@@ -62,7 +62,7 @@ describe ResponseController do
       allow(review_response).to receive(:delete).and_return(review_response)
       params = {id: 1}
       post :delete, params
-      expect(response).to redirect_to('/en/response/redirect?id=1&msg=The+response+was+deleted.')
+      expect(response).to redirect_to('/response/redirect?id=1&msg=The+response+was+deleted.')
     end
   end
 
@@ -98,7 +98,7 @@ describe ResponseController do
         }
         session = {user: instructor}
         post :update, params, session
-        expect(response).to redirect_to('/en/response/save?id=1&msg=Your+response+was+not+saved.+Cause%3A189+ERROR%21&review%5Bcomments%5D=some+comments')
+        expect(response).to redirect_to('/response/save?id=1&msg=Your+response+was+not+saved.+Cause%3A189+ERROR%21&review%5Bcomments%5D=some+comments')
       end
     end
 
@@ -123,7 +123,7 @@ describe ResponseController do
         }
         session = {user: instructor}
         post :update, params, session
-        expect(response).to redirect_to('/en/response/save?id=1&msg=&review%5Bcomments%5D=some+comments')
+        expect(response).to redirect_to('/response/save?id=1&msg=&review%5Bcomments%5D=some+comments')
       end
     end
   end
@@ -165,7 +165,7 @@ describe ResponseController do
         params = {id: 1}
         session = {user: instructor}
         get :new_feedback, params, session
-        expect(response).to redirect_to('/en/response/new?id=2&return=feedback')
+        expect(response).to redirect_to('response/new?id=2&return=feedback')
       end
     end
 
@@ -221,7 +221,7 @@ describe ResponseController do
         isSubmit: 'No'
       }
       post :create, params
-      expect(response).to redirect_to('/en/response/save?error_msg=&id=1&msg=Your+response+was+successfully+saved.&review%5Bcomments%5D=no+comment&review%5Bquestionnaire_id%5D=1&review%5Bround%5D=1')
+      expect(response).to redirect_to('/response/save?error_msg=&id=1&msg=Your+response+was+successfully+saved.&review%5Bcomments%5D=no+comment&review%5Bquestionnaire_id%5D=1&review%5Bround%5D=1')
     end
   end
 
@@ -235,7 +235,7 @@ describe ResponseController do
       }
       session = {user: instructor}
       post :save, params, session
-      expect(response).to redirect_to('/en/response/redirect?id=1&return=')
+      expect(response).to redirect_to('response/redirect?id=1&return=')
     end
   end
 
@@ -249,7 +249,7 @@ describe ResponseController do
       it 'redirects to grades#view_my_scores page' do
         @params[:return] = 'feedback'
         get :redirect, @params
-        expect(response).to redirect_to('/en/grades/view_my_scores?id=1')
+        expect(response).to redirect_to('/grades/view_my_scores?id=1')
       end
     end
 
@@ -257,7 +257,7 @@ describe ResponseController do
       it 'redirects to student_teams#view page' do
         @params[:return] = 'teammate'
         get :redirect, @params
-        expect(response).to redirect_to('/en/student_teams/view?student_id=1')
+        expect(response).to redirect_to('/student_teams/view?student_id=1')
       end
     end
 
@@ -265,7 +265,7 @@ describe ResponseController do
       it 'redirects to grades#view page' do
         @params[:return] = 'instructor'
         get :redirect, @params
-        expect(response).to redirect_to('/en/grades/view?id=1')
+        expect(response).to redirect_to('/grades/view?id=1')
       end
     end
 
@@ -273,7 +273,7 @@ describe ResponseController do
       it 'redirects to assignment#edit page' do
         @params[:return] = 'assignment_edit'
         get :redirect, @params
-        expect(response).to redirect_to('/en/assignments/1/edit')
+        expect(response).to redirect_to('/assignments/1/edit')
       end
     end
 
@@ -281,7 +281,7 @@ describe ResponseController do
       it 'redirects to submitted_content#edit page' do
         @params[:return] = 'selfreview'
         get :redirect, @params
-        expect(response).to redirect_to('/en/submitted_content/1/edit')
+        expect(response).to redirect_to('/submitted_content/1/edit')
       end
     end
 
@@ -289,7 +289,7 @@ describe ResponseController do
       it 'redirects to response#pending_surveys page' do
         @params[:return] = 'survey'
         get :redirect, @params
-        expect(response).to redirect_to('/en/response/pending_surveys')
+        expect(response).to redirect_to('/response/pending_surveys')
       end
     end
 
@@ -297,7 +297,7 @@ describe ResponseController do
       it 'redirects to student_review#list page' do
         @params[:return] = 'other'
         get :redirect, @params
-        expect(response).to redirect_to('/en/student_review/list?id=1')
+        expect(response).to redirect_to('/student_review/list?id=1')
       end
     end
   end

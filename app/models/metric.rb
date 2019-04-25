@@ -1,9 +1,9 @@
 class Metric < ActiveRecord::Base
 
 
-  def update_suggestion_chance(suggestion_chance)
-    self.suggestion_chance_percentage = suggestion_chance;
-    self.save!
+  def update_suggestion_chance(response, suggestion_chance)
+    response.suggestion_chance_percentage = suggestion_chance;
+    response.save!
   end
 
   def suggestion_chance_average(assignment)

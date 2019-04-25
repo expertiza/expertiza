@@ -396,7 +396,7 @@ class AssignmentsController < ApplicationController
     if params[:set_pressed][:bool] == 'false'
       flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."
     else
-      vary_by_topic_desired = convert_to_boolean(params['vary_by_topic'])
+      vary_by_topic_desired = convert_to_boolean(params[:vary_by_topic])
       # Update based on the attributes rec'd in the form
       # This also updates assignment_questionnaire records, including adding / removing records
       # as "vary by topic" selection changes
@@ -404,6 +404,7 @@ class AssignmentsController < ApplicationController
         flash[:note] = 'The assignment was successfully saved....'
       else
         flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
+        flash.now[:notice] = "Cannot display Questionnaires for each topic. Failed to save the assignment: #{@assignment_form.errors.get(:message)}" if vary_by_topic_desired
       end
     end
     ExpertizaLogger.info LoggerMessage.new("", session[:user].name, "The assignment was saved: #{@assignment_form.as_json}", request)

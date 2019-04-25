@@ -1,4 +1,4 @@
-<div style="color:green;text-align:adjust">
+<div style="color:green">
   Note: Metrics<br>
   X- axis represents precentage score of the team<br>
   Y- axis represents the reviewers <br>
@@ -7,9 +7,9 @@
   <thead>
   <tr bgcolor='#CCCCCC'>
     <!-- class value decides whether the column should be sortable or not  -->
-    <th width="30%" class="sorter-false">Team <span></span></th>
+    <th width="30%" class="sorter-true">Team <span></span></th>
     <th width="30%" class="sorter-false">Reviewers <span></span></th>
-    <th width="40%" class="sorter-false">Metrics <span></span></th>
+    <th width="40%" class="sorter-true">Metrics <span></span></th>
   </tr>
   </thead>
   <tbody>
@@ -17,9 +17,14 @@
   <%@reviewers.keys.each do |team_name| %>
     <tr>
       <td>
-        <% members = get_team_members_by_team_name(team_name, @id)%>
-        <strong>Team Name: </strong><%= team_name %><br>
-        <strong>Team Members: </strong><br>
+        <% members, participant_id = get_team_members_by_team_name(team_name, @id)%>
+        <strong>Team Name:</strong>
+	<% if !participant_id.nil? %>
+		<%= link_to team_name, controller: 'grades', action: 'view_team', id: participant_id%><br>
+	<% else %>
+		<%= team_name %>
+	<% end %>
+        <strong>Team Members:</strong><br>
         <% members.each do |member|%>
           <%=User.find(member.user_id).fullname %><br>
         <% end %>

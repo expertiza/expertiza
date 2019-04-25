@@ -20,7 +20,7 @@
         <% members = get_team_members_by_team_name(team_name, @id)%>
         <strong>Team Name: </strong><%= team_name %><br>
         <strong>Team Members: </strong><br>
-        <% members.each do |member|%>
+	<% members.each do |member|%>
           <%=User.find(member.user_id).fullname %><br>
         <% end %>
       </td>
@@ -30,17 +30,29 @@
         <% question_answers.each do |question_answer| %>
 	        <% average = average_by_round_calculate(question_answer) %>
 	        <% std = std_by_round_calculate(average,question_answer) %>
+		<% upper_tolerance_limit = (average+(2*std)).round(2) %>
+      		<% lower_tolerance_limit = (average-(2*std)).round(2) %>
           <div style="border-top: dotted; border-width: 1px; border-top-color:#000000;">
             <strong><%= "Round: " + i.to_s %></strong><br>
 	          <i>Reviewers with scores</i><br>
             <ol>
             <% question_answer.each do |reviewer, answer| %>
-                <li><% response_id = get_response_id(reviewer, @teams[team_name], @id) %>
-                  <%= link_to "("+@reviewers[team_name.to_s][reviewer.to_s].to_s+")", :controller => 'popup', :action => 'team_users_popup', :id => @teams[team_name], :id2 => response_id, :assignment_id=>@id %>
-                  <%= list_review_submissions(reviewer, @teams[team_name], response_id) %>
-                  <%= list_hyperlink_submission(response_id, 5386) if Assignment.find_by(id: @id.to_i).course.instructor.name == 'Jkidd' %>
-                  <%= ": " + answer.to_s %>
-		            </li>
+		<% if answer > upper_tolerance_limit or answer < lower_tolerance_limit  %>
+                	<li><% response_id = get_response_id(reviewer, @teams[team_name], @id) %>
+                  	<mark style="background-color:#FFFF00">
+			<%= link_to "("+@reviewers[team_name.to_s][reviewer.to_s].to_s+")", :controller => 'popup', :action => 'team_users_popup', :id => @teams[team_name], :id2 => response_id, :assignment_id=>@id %>
+                  	<%= list_review_submissions(reviewer, @teams[team_name], response_id) %>
+                  	<%= list_hyperlink_submission(response_id, 5386) if Assignment.find_by(id: @id.to_i).course.instructor.name == 'Jkidd' %>
+                  	<%= ": " + answer.to_s %></mark>
+		        </li>
+		<% else %>
+			<li><% response_id = get_response_id(reviewer, @teams[team_name], @id) %>
+                        <%= link_to "("+@reviewers[team_name.to_s][reviewer.to_s].to_s+")", :controller => 'popup', :action => 'team_users_popup', :id => @teams[team_name], :id2 => response_id, :assignment_id=>@id %>
+                        <%= list_review_submissions(reviewer, @teams[team_name], response_id) %>
+                        <%= list_hyperlink_submission(response_id, 5386) if Assignment.find_by(id: @id.to_i).course.instructor.name == 'Jkidd' %>
+                        <%= ": " + answer.to_s %>
+                        </li>
+		<% end %>
             <% end %>
             </ol>
           </div>

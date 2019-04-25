@@ -4,8 +4,9 @@
   <%= render :partial => 'responses', :locals => {:mappings => @quiz_mappings} %>
   <%= render :partial => 'set_dynamic_quiz', :locals => {:assignment => @assignment, :participant => @participant} %>
 <% else %>
-  <p><em> <%=t ".assignment_not_support" %>< %></em></p>
+  <p><em> <%=t ".assignment_not_support" %></em></p>
 <% end %>
 
 <br><br>
-<a href="javascript:window.history.back()">Back</a>
+<%= link_to t(".back"), :controller=>'student_task', :action => 'view', :id =>  @participant %>
+

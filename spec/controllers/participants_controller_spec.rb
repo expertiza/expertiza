@@ -41,7 +41,7 @@ describe ParticipantsController do
       params = {id: 1}
       session = {user: instructor}
       post :destroy, params, session
-      expect(response).to redirect_to('/participants/list?id=1&model=Course')
+      expect(response).to redirect_to('/en/participants/list?id=1&model=Course')
     end
   end
 
@@ -52,7 +52,7 @@ describe ParticipantsController do
       params = {id: 1}
       session = {user: instructor}
       get :delete_assignment_participant, params, session
-      expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+      expect(response).to redirect_to('/en/review_mapping/list_mappings?id=1')
     end
   end
 
@@ -62,7 +62,7 @@ describe ParticipantsController do
       params = {student_id: 1}
       session = {user: instructor}
       get :update_duties, params, session
-      expect(response).to redirect_to('/student_teams/view?student_id=1')
+      expect(response).to redirect_to('/en/student_teams/view?student_id=1')
     end
   end
 
@@ -72,7 +72,7 @@ describe ParticipantsController do
       params = {authorization: 'participant', id: 1}
       session = {user: instructor}
       get :update_authorizations, params, session
-      expect(response).to redirect_to('/participants/list?id=1&model=Assignment')
+      expect(response).to redirect_to('/en/participants/list?id=1&model=Assignment')
     end
   end
 
@@ -113,7 +113,7 @@ describe ParticipantsController do
       session = {user: instructor}
       get :inherit, params, session
       expect(flash[:note]).to eq 'No participants were found to inherit this assignment.'
-      expect(response).to redirect_to('/participants/list?model=Assignment')
+      expect(response).to redirect_to('/en/participants/list?model=Assignment')
     end
   end
 
@@ -124,7 +124,7 @@ describe ParticipantsController do
       session = {user: instructor}
       get :bequeath_all, params, session
       expect(flash[:note]).to eq 'All assignment participants are already part of the course'
-      expect(response).to redirect_to('en/participants/list?model=Assignment')
+      expect(response).to redirect_to('/en/participants/list?model=Assignment')
     end
   end
 end

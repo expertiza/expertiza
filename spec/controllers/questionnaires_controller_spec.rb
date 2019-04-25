@@ -97,7 +97,7 @@ describe QuestionnairesController do
       params = {id: 1}
       session = {user: instructor}
       get :copy, params, session
-      expect(response).to redirect_to('/questionnaires/view?id=2')
+      expect(response).to redirect_to('/en/questionnaires/view?id=2')
       expect(controller.instance_variable_get(:@questionnaire).name).to eq 'Copy of Test questionnaire'
       expect(controller.instance_variable_get(:@questionnaire).private).to eq false
       expect(controller.instance_variable_get(:@questionnaire).min_question_score).to eq 0
@@ -149,7 +149,7 @@ describe QuestionnairesController do
       allow(QuestionnaireNode).to receive(:create).with(parent_id: 1, node_object_id: 1, type: 'QuestionnaireNode').and_return(double('QuestionnaireNode'))
       post :create, params, session
       expect(flash[:success]).to eq('You have successfully created a questionnaire!')
-      expect(response).to redirect_to('/questionnaires/1/edit')
+      expect(response).to redirect_to('/en/questionnaires/1/edit')
       expect(controller.instance_variable_get(:@questionnaire).private).to eq false
       expect(controller.instance_variable_get(:@questionnaire).name).to eq 'test questionnaire'
       expect(controller.instance_variable_get(:@questionnaire).min_question_score).to eq 0
@@ -182,7 +182,7 @@ describe QuestionnairesController do
           allow_any_instance_of(QuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
           post :create_quiz_questionnaire, params
           expect(flash[:note]).to eq('The quiz was successfully created.')
-          expect(response).to redirect_to('/submitted_content/1/edit')
+          expect(response).to redirect_to('/en/submitted_content/1/edit')
           expect(controller.instance_variable_get(:@questionnaire).private).to eq false
           expect(controller.instance_variable_get(:@questionnaire).name).to eq 'Test questionnaire'
           expect(controller.instance_variable_get(:@questionnaire).min_question_score).to eq 0
@@ -208,7 +208,7 @@ describe QuestionnairesController do
           allow_any_instance_of(QuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
           post :create_quiz_questionnaire, params, session
           expect(flash[:note]).to be nil
-          expect(response).to redirect_to('/tree_display/list')
+          expect(response).to redirect_to('/en/tree_display/list')
           expect(controller.instance_variable_get(:@questionnaire).private).to eq false
           expect(controller.instance_variable_get(:@questionnaire).name).to eq 'Test questionnaire'
           expect(controller.instance_variable_get(:@questionnaire).min_question_score).to eq 0
@@ -252,7 +252,7 @@ describe QuestionnairesController do
         session = {user: instructor}
         params = {id: 666}
         get :edit, params, session
-        expect(response).to redirect_to('/')
+        expect(response).to redirect_to('/en')
       end
     end
   end
@@ -277,7 +277,7 @@ describe QuestionnairesController do
         # need complete params hash to handle strong parameters
         post :update, @params
         expect(flash[:success]).to eq 'The questionnaire has been successfully updated!'
-        expect(response).to redirect_to('/questionnaires/1/edit')
+        expect(response).to redirect_to('/en/questionnaires/1/edit')
       end
     end
 
@@ -286,7 +286,7 @@ describe QuestionnairesController do
         allow(@questionnaire1).to receive(:update_attributes).with(any_args).and_raise('This is an error!')
         post :update, @params
         expect(flash[:error].to_s).to eq 'This is an error!'
-        expect(response).to redirect_to('/questionnaires/1/edit')
+        expect(response).to redirect_to('/en/questionnaires/1/edit')
       end
     end
   end
@@ -302,7 +302,7 @@ describe QuestionnairesController do
         params = {id: 1}
         get :delete, params
         expect(flash[:error]).to eq('The assignment <b>test assignment</b> uses this questionnaire. Are sure you want to delete the assignment?')
-        expect(response).to redirect_to('/tree_display/list')
+        expect(response).to redirect_to('/en/tree_display/list')
       end
     end
 
@@ -317,7 +317,7 @@ describe QuestionnairesController do
         params = {id: 1}
         get :delete, params
         expect(flash[:error]).to eq('There are responses based on this rubric, we suggest you do not delete it.')
-        expect(response).to redirect_to('/tree_display/list')
+        expect(response).to redirect_to('/en/tree_display/list')
       end
     end
 
@@ -340,7 +340,7 @@ describe QuestionnairesController do
         params = {id: 1}
         get :delete, params
         expect(flash[:error]).to eq nil
-        expect(response).to redirect_to('/tree_display/list')
+        expect(response).to redirect_to('/en/tree_display/list')
       end
     end
   end
@@ -355,7 +355,7 @@ describe QuestionnairesController do
                   question: {total_num: 2,
                              type: 'Criterion'}}
         post :add_new_questions, params
-        expect(response).to redirect_to('/questionnaires/1/edit')
+        expect(response).to redirect_to('/en/questionnaires/1/edit')
       end
     end
 
@@ -368,7 +368,7 @@ describe QuestionnairesController do
                   question: {total_num: 2,
                              type: 'Dropdown'}}
         post :add_new_questions, params
-        expect(response).to redirect_to('/questionnaires/1/edit')
+        expect(response).to redirect_to('/en/questionnaires/1/edit')
       end
     end
   end
@@ -388,7 +388,7 @@ describe QuestionnairesController do
                                      min_label: 'Not agree'}}}
         post :save_all_questions, params
         expect(flash[:success]).to eq('All questions has been successfully saved!')
-        expect(response).to redirect_to('/questionnaires/1/edit')
+        expect(response).to redirect_to('/en/questionnaires/1/edit')
       end
     end
 
@@ -398,7 +398,7 @@ describe QuestionnairesController do
                   view_advice: true,
                   question: {}}
         post :save_all_questions, params
-        expect(response).to redirect_to('/advice/edit_advice/1')
+        expect(response).to redirect_to('/en/advice/edit_advice/1')
       end
     end
   end
@@ -438,7 +438,7 @@ describe QuestionnairesController do
         allow(AssignmentParticipant).to receive_message_chain(:find, :team).with('1').with(no_args).and_return(nil)
         get :new_quiz, @params
         expect(flash[:error]).to eq('You should create or join a team first.')
-        expect(response).to redirect_to('/submitted_content/view?id=1')
+        expect(response).to redirect_to('/en/submitted_content/view?id=1')
       end
 
       it 'shows error message and redirects to submitted_content#view if current participant have a team w/o topic' do
@@ -448,7 +448,7 @@ describe QuestionnairesController do
         allow(team).to receive(:topic).and_return(nil)
         get :new_quiz, @params
         expect(flash[:error]).to eq('Your team should have a topic.')
-        expect(response).to redirect_to('/submitted_content/view?id=1')
+        expect(response).to redirect_to('/en/submitted_content/view?id=1')
       end
     end
 
@@ -463,7 +463,7 @@ describe QuestionnairesController do
         allow(assignment).to receive(:require_quiz?).and_return(false)
         get :new_quiz, params
         expect(flash[:error]).to eq('This assignment does not support the quizzing feature.')
-        expect(response).to redirect_to('/submitted_content/view?id=1')
+        expect(response).to redirect_to('/en/submitted_content/view?id=1')
       end
     end
   end
@@ -489,7 +489,7 @@ describe QuestionnairesController do
         params = {id: 1, pid: 1}
         get :edit_quiz, params
         expect(flash[:error]).to eq('Your quiz has been taken by some other students, you cannot edit it anymore.')
-        expect(response).to redirect_to('/submitted_content/view?id=1')
+        expect(response).to redirect_to('/en/submitted_content/view?id=1')
       end
     end
   end
@@ -500,7 +500,7 @@ describe QuestionnairesController do
         allow(Questionnaire).to receive(:find).with('1').and_return(nil)
         params = {id: 1, pid: 1}
         post :update_quiz, params
-        expect(response).to redirect_to('/submitted_content/view?id=1')
+        expect(response).to redirect_to('/en/submitted_content/view?id=1')
       end
     end
 
@@ -553,7 +553,7 @@ describe QuestionnairesController do
         allow(qc).to receive(:update_attributes).with(any_args).and_return(true)
         allow(qc_tf).to receive(:update_attributes).with(any_args).and_return(true)
         post :update_quiz, params
-        expect(response).to redirect_to('/submitted_content/view?id=1')
+        expect(response).to redirect_to('/en/submitted_content/view?id=1')
       end
     end
   end

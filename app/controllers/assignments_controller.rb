@@ -89,6 +89,7 @@ class AssignmentsController < ApplicationController
       return
     end
     retrieve_assignment_form
+    assignment_form_assignment_staggered_deadline?
     handle_current_user_timezonepref_nil
     update_feedback_assignment_form_attributes
     # What to do next depends on how we got here
@@ -288,6 +289,7 @@ class AssignmentsController < ApplicationController
   def assignment_form_assignment_staggered_deadline?
     if @assignment_form.assignment.staggered_deadline == true
       @review_rounds = @assignment_form.assignment.num_review_rounds
+      @due_date_all ||= AssignmentDueDate.where(parent_id: @assignment_form.assignment.id)
       @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_SUBMISSION }
       @assignment_review_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_REVIEW }
     end

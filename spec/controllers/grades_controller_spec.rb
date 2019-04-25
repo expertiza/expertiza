@@ -94,7 +94,7 @@ describe GradesController do
     end
   end
 
-  describe '#view_team' do
+  xdescribe '#view_team' do
     it 'renders grades#view_team page' do
       allow(participant).to receive(:team).and_return(team)
       params = {id: 1}

@@ -23,12 +23,12 @@
 
         <div class="suggestions">
             <h3>Suggestions <img src="/assets/lightbulb.png" height="40"></h3>
-          <p><b>Are there suggestions?</b> <span style="<% if Integer(@avg_suggestion_chance_for_response) > 50 %>color:green<% elsif Integer(@avg_suggestion_chance_for_response) == 50 %>color:yellow<% else %>color:red<%end%>">
+          <p><b>Are there suggestions?</b> <span style="<% if Integer(@avg_suggestion_chance_for_response) > 50 %>color:green<% elsif Integer(@avg_suggestion_chance_for_response) == 50 %>color:#ffc519<% else %>color:red<%end%>">
             <%= (Integer(@avg_suggestion_chance_for_response) > 50)? "Yes": "No" %>
             (<%= @avg_suggestion_chance_for_response%>%)</span>
               <img src="/assets/info.png" title='There is a <%= @avg_suggestion_chance_for_response %>% chance that your review contains a suggestion.'></p>
 
-          <p><b>What is the class average?</b><span style="<% if @assignment_suggestion_average > 50 %>color:green<% elif @assignment_suggestion_average == 50 %>color:yellow<% else %>color:red<%end%>">
+          <p><b>What is the class average?</b><span style="<% if @assignment_suggestion_average > 50 %>color:green<% elif @assignment_suggestion_average == 50 %>color:#ffc519<% else %>color:red<%end%>">
             <%=  @assignment_suggestion_average  %>%</span>
               <img src="/assets/info.png" title="On average, the reviews for this assignment by your class had a <%= @assignment_suggestion_average %>% chance of containing a suggestion."></p>
         </div>

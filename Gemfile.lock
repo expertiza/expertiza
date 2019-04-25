@@ -97,7 +97,6 @@ GEM
     bind-it (0.2.7)
       rjb (~> 1.4.3)
     builder (3.2.3)
-    byebug (10.0.2)
     capistrano (3.10.1)
       airbrussh (>= 1.0.0)
       i18n
@@ -123,9 +122,6 @@ GEM
       rack (>= 1.0.0)
       rack-test (>= 0.5.4)
       xpath (>= 2.0, < 4.0)
-    capybara-selenium (0.0.6)
-      capybara
-      selenium-webdriver
     chartjs-ror (3.6.2)
       rails (>= 3.1)
     childprocess (0.8.0)
@@ -593,7 +589,6 @@ DEPENDENCIES
   airbrake
   awesome_nested_set
   bind-it
-  byebug
   capistrano
   capistrano-bundler
   capistrano-db-tasks
@@ -601,7 +596,6 @@ DEPENDENCIES
   capistrano-rails
   capistrano-rvm
   capybara
-  capybara-selenium
   chartjs-ror
   coffee-rails
   coveralls

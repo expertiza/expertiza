@@ -459,7 +459,7 @@ en:
                      your wiki account should be named after your handle instead of after your user-ID.  If you do not have a handle,
                      your Expertiza user-ID will be used instead. A blank entry in the field below will cause the handle to be set back to your Expertiza user-ID."
        note: "Note: By using this form, you are changing your default handle, which will be used for all future assignments. To change your handle for a specific assignment, select that assignment and choose the Change Handle action."
-
+    default_handle: "Default Handle:"
   users:
     prefs:
       email: "E-mail Options"

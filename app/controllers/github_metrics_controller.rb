@@ -16,62 +16,13 @@ class GithubMetricsController < ApplicationController
      'Super-Administrator'].include? current_role_name
   end
 
-  def retrieve_pull_request_data(pull_links)
-    pull_links.each do |hyperlink|
-      submission_hyperlink_tokens = hyperlink.split('/')
-      hyperlink_data = {}
-      hyperlink_data["pull_request_number"] = submission_hyperlink_tokens.pop
-      submission_hyperlink_tokens.pop
-      hyperlink_data["repository_name"] = submission_hyperlink_tokens.pop
-      hyperlink_data["owner_name"] = submission_hyperlink_tokens.pop
-      github_data = get_pull_request_details(hyperlink_data)
-      @head_refs[hyperlink_data["pull_request_number"]] = {
-          head_commit: github_data["data"]["repository"]["pullRequest"]["headRefOid"],
-          owner: hyperlink_data["owner_name"],
-          repository: hyperlink_data["repository_name"]
-      }
-      parse_github_pull_request_data(github_data)
-    end
+  # Authorize to Expertiza to access github data.
+  def authorize_github
+    redirect_to "https://github.com/login/oauth/authorize?client_id=#{GITHUB_CONFIG['client_key']}"
   end
 
-  def retrieve_repository_data(repo_links)
-    repo_links.each do |hyperlink|
-      submission_hyperlink_tokens = hyperlink.split('/')
-      hyperlink_data = {}
-      hyperlink_data["repository_name"] = submission_hyperlink_tokens[4]
-      next if hyperlink_data["repository_name"] == "servo" || hyperlink_data["repository_name"] == "expertiza"
-      hyperlink_data["owner_name"] = submission_hyperlink_tokens[3]
-      github_data = get_github_repository_details(hyperlink_data)
-      parse_github_repository_data(github_data)
-    end
-  end
 
-  def retrieve_github_data
-    team_links = @team.hyperlinks
-    pull_links = team_links.select do |link|
-      link.match(/pull/) && link.match(/github.com/)
-    end
-    if !pull_links.empty?
-      retrieve_pull_request_data(pull_links)
-    else
-      repo_links = team_links.select do |link|
-        link.match(/github.com/)
-      end
-      retrieve_repository_data(repo_links)
-    end
-  end
-
-  def get_statuses_for_pull_request(pr_object)
-    url = "https://api.github.com/repos/" + pr_object[:owner] + "/" + pr_object[:repository] + "/commits/" + pr_object[:head_commit] + "/status"
-    ActiveSupport::JSON.decode(Net::HTTP.get(URI(url)))
-  end
-
-  def retrieve_check_run_statuses
-    @head_refs.each do |pull_number, pr_object|
-      @check_statuses[pull_number] = get_statuses_for_pull_request(pr_object)
-    end
-  end
-
+  # This function is used to show github_metrics information by redirecting to view.
   def view_github_metrics
     if session["github_access_token"].nil?
       session["participant_id"] = params[:id]
@@ -80,6 +31,7 @@ class GithubMetricsController < ApplicationController
       return
     end
 
+    # Variables to store github statistics
     @head_refs = {}
     @parsed_data = {}
     @authors = {}
@@ -99,16 +51,102 @@ class GithubMetricsController < ApplicationController
     @team_id = @team.id
 
     retrieve_github_data
-    retrieve_check_run_statuses
+    retrieve_pull_request_statuses_data
 
     @authors = @authors.keys
     @dates = @dates.keys.sort
   end
 
-  def authorize_github
-    redirect_to "https://github.com/login/oauth/authorize?client_id=#{GITHUB_CONFIG['client_key']}"
+  # Retrieve github data from hyperlinks provided  by teams.
+  # If the hyperlink is a pull request link, call auxiliary function "retrieve_pull_request_data" to get data.
+  # If the hyperlink is a repository link, call auxiliary function "retrieve_repository_data" to get data.
+  # After calling this function, all gtihub statistics will be generated and stored in corresponding variables.
+  def retrieve_github_data
+    team_links = @team.hyperlinks
+    pull_links = team_links.select do |link|
+      link.match(/pull/) && link.match(/github.com/)
+    end
+    if !pull_links.empty?
+      retrieve_pull_request_data(pull_links)
+    else
+      repo_links = team_links.select do |link|
+        link.match(/github.com/)
+      end
+      retrieve_repository_data(repo_links)
+    end
   end
 
+  # This function is used to get github statistics of a team. Statistics includes:
+  # Pull request number
+  # Total number of commits
+  # Number of files changed
+  # Number of files changed
+  # Number of lines of code added
+  # Number of lines of code removed
+  # Number of lines of code changed
+  # Merge statues
+  def get_team_github_statistics(github_data)
+    @total_additions += github_data["data"]["repository"]["pullRequest"]["additions"]
+    @total_deletions += github_data["data"]["repository"]["pullRequest"]["deletions"]
+    @total_files_changed += github_data["data"]["repository"]["pullRequest"]["changedFiles"]
+    @total_commits += github_data["data"]["repository"]["pullRequest"]["commits"]["totalCount"]
+    pull_request_number = github_data["data"]["repository"]["pullRequest"]["number"]
+
+    @merge_status[pull_request_number] = if github_data["data"]["repository"]["pullRequest"]["merged"]
+                                           "MERGED"
+                                         else
+                                           github_data["data"]["repository"]["pullRequest"]["mergeable"]
+                                         end
+  end
+
+  # This function is used to retrieve data for each pull requests status.
+  def retrieve_pull_request_statuses_data
+    @head_refs.each do |pull_number, pr_object|
+      @check_statuses[pull_number] = get_statuses_for_pull_request(pr_object)
+    end
+  end
+
+  # This function is used to get statuses of a pull request. This is an auxiliary function for "retrieve_pull_request_statuses_data"
+  def get_statuses_for_pull_request(pr_object)
+    url = "https://api.github.com/repos/" + pr_object[:owner] + "/" + pr_object[:repository] + "/commits/" + pr_object[:head_commit] + "/status"
+    ActiveSupport::JSON.decode(Net::HTTP.get(URI(url)))
+  end
+
+
+  # This function is used to retrieve github data from a pull request link.
+  def retrieve_pull_request_data(pull_links)
+    pull_links.each do |hyperlink|
+      submission_hyperlink_tokens = hyperlink.split('/')
+      hyperlink_data = {}
+      hyperlink_data["pull_request_number"] = submission_hyperlink_tokens.pop
+      submission_hyperlink_tokens.pop
+      hyperlink_data["repository_name"] = submission_hyperlink_tokens.pop
+      hyperlink_data["owner_name"] = submission_hyperlink_tokens.pop
+      github_data = get_pull_request_details(hyperlink_data)
+      @head_refs[hyperlink_data["pull_request_number"]] = {
+          head_commit: github_data["data"]["repository"]["pullRequest"]["headRefOid"],
+          owner: hyperlink_data["owner_name"],
+          repository: hyperlink_data["repository_name"]
+      }
+      parse_github_pull_request_data(github_data)
+    end
+  end
+
+  # This function is used to retrieve github data from a repository link.
+  def retrieve_repository_data(repo_links)
+    repo_links.each do |hyperlink|
+      submission_hyperlink_tokens = hyperlink.split('/')
+      hyperlink_data = {}
+      hyperlink_data["repository_name"] = submission_hyperlink_tokens[4]
+      next if hyperlink_data["repository_name"] == "servo" || hyperlink_data["repository_name"] == "expertiza"
+      hyperlink_data["owner_name"] = submission_hyperlink_tokens[3]
+      github_data = get_github_repository_details(hyperlink_data)
+      parse_github_repository_data(github_data)
+    end
+  end
+
+
+  # An auxiliary function for "retrieve_repository_data". It is used to get github data from repository links with the help of graphql.
   def get_github_repository_details(hyperlink_data)
     data = {
       query: "query {
@@ -135,13 +173,14 @@ class GithubMetricsController < ApplicationController
     make_github_graphql_request(data)
   end
 
+  # An auxiliary function for "Retrieve_pull_request_data". It is used to get github data from a pull request link.
   def get_pull_request_details(hyperlink_data)
     @has_next_page = true
     @end_cursor = ""
     all_edges = []
     response_data = {}
     while @has_next_page
-      response_data = make_github_graphql_request(get_query(hyperlink_data))
+      response_data = make_github_graphql_request(get_query_for_pull_request_links(hyperlink_data))
       current_commits = response_data["data"]["repository"]["pullRequest"]["commits"]
       current_page_info = current_commits["pageInfo"]
       all_edges.push(*current_commits["edges"])
@@ -153,19 +192,11 @@ class GithubMetricsController < ApplicationController
     response_data
   end
 
-  def process_github_authors_and_dates(author_name, commit_date)
-    @authors[author_name] ||= 1
-    @dates[commit_date] ||= 1
-    @parsed_data[author_name] ||= {}
-    @parsed_data[author_name][commit_date] = if @parsed_data[author_name][commit_date]
-                                               @parsed_data[author_name][commit_date] + 1
-                                             else
-                                               1
-                                             end
-  end
 
+  # An auxiliary function for "Retrieve pull request data". @github_data include data details obtained from "get_pull_request_details" function.
+  # After calling this function,
   def parse_github_pull_request_data(github_data)
-    team_statistics(github_data)
+    get_team_github_statistics(github_data)
     pull_request_object = github_data["data"]["repository"]["pullRequest"]
     commit_objects = pull_request_object["commits"]["edges"]
     commit_objects.each do |commit_object|
@@ -174,9 +205,11 @@ class GithubMetricsController < ApplicationController
       commit_date = commit["committedDate"].to_s
       process_github_authors_and_dates(author_name, commit_date[0, 10])
     end
-    organize_commit_dates
+    organize_commit_dates_in_sorted_order
   end
 
+  # An auxiliary function for "retrieve_repository_data". @github_data include data details obtained from "get_repository_details" function.
+  # After calling this function,
   def parse_github_repository_data(github_data)
     commit_history = github_data["data"]["repository"]["ref"]["target"]["history"]
     commit_objects = commit_history["edges"]
@@ -186,9 +219,10 @@ class GithubMetricsController < ApplicationController
       commit_date = commit_author["date"].to_s
       process_github_authors_and_dates(author_name, commit_date[0, 10])
     end
-    organize_commit_dates
+    organize_commit_dates_in_sorted_order
   end
 
+  # Make github graphql request
   def make_github_graphql_request(data)
     uri = URI.parse("https://api.github.com/graphql")
     http = Net::HTTP.new(uri.host, uri.port)
@@ -201,32 +235,11 @@ class GithubMetricsController < ApplicationController
     ActiveSupport::JSON.decode(response.body.to_s)
   end
 
-  def organize_commit_dates
-    @dates.each_key do |date|
-      @parsed_data.each_value do |commits|
-        commits[date] ||= 0
-      end
-    end
-    @parsed_data.each {|author, commits| @parsed_data[author] = Hash[commits.sort_by {|date, _commit_count| date }] }
-  end
-
-  def team_statistics(github_data)
-    @total_additions += github_data["data"]["repository"]["pullRequest"]["additions"]
-    @total_deletions += github_data["data"]["repository"]["pullRequest"]["deletions"]
-    @total_files_changed += github_data["data"]["repository"]["pullRequest"]["changedFiles"]
-    @total_commits += github_data["data"]["repository"]["pullRequest"]["commits"]["totalCount"]
-    pull_request_number = github_data["data"]["repository"]["pullRequest"]["number"]
-
-    @merge_status[pull_request_number] = if github_data["data"]["repository"]["pullRequest"]["merged"]
-                                           "MERGED"
-                                         else
-                                           github_data["data"]["repository"]["pullRequest"]["mergeable"]
-                                         end
-  end
-
-  def get_query(hyperlink_data)
-    {
-      query: "query {
+  # An auxiliary function for "get_pull_requests_details". This function is used to conduct query for details github commits data
+  # using a pull request link.
+  def get_query_for_pull_request_links(hyperlink_data)
+      {
+          query: "query {
         repository(owner: \"" + hyperlink_data["owner_name"] + "\", name:\"" + hyperlink_data["repository_name"] + "\") {
           pullRequest(number: " + hyperlink_data["pull_request_number"] + ") {
             number additions deletions changedFiles mergeable merged headRefOid
@@ -243,6 +256,28 @@ class GithubMetricsController < ApplicationController
                                 }
                                additions deletions changedFiles committedDate
                         }}}}}}}"
-    }
+      }
+  end
+
+  # An auxiliary function to organize authors and their commit dates. Each author has a list of commit dates.
+  def process_github_authors_and_dates(author_name, commit_date)
+    @authors[author_name] ||= 1
+    @dates[commit_date] ||= 1
+    @parsed_data[author_name] ||= {}
+    @parsed_data[author_name][commit_date] = if @parsed_data[author_name][commit_date]
+                                               @parsed_data[author_name][commit_date] + 1
+                                             else
+                                               1
+                                             end
+  end
+
+  # An auxiliary function. Sort commit dates for each author to make them in order.
+  def organize_commit_dates_in_sorted_order
+    @dates.each_key do |date|
+      @parsed_data.each_value do |commits|
+        commits[date] ||= 0
+      end
+    end
+    @parsed_data.each {|author, commits| @parsed_data[author] = Hash[commits.sort_by {|date, _commit_count| date }] }
   end
 end

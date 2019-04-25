@@ -93,6 +93,9 @@ group :test do
   gem 'rspec-rails'
   gem 'shoulda'
   gem 'byebug'
+  gem 'capybara-selenium'
+  gem 'webdrivers'
+
 end
 
 group :development, :test do

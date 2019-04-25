@@ -16,7 +16,7 @@
 <% if params && params[:id] && @response && !@response.is_submitted %>
     
     <h1>Review Confirmation</h1>
-    <h2>Your review has not yet been submitted.</h2>
+    <h2 style="color:#ffb227">Your review has not yet been submitted.</h2>
     <p>Below is an analysis of the review you have created.</p>
 
     <div class="review-confirmation">
@@ -35,16 +35,15 @@
 
         <div class="tone">
             <h3>Tone <img src="/assets/music_note.png" height="30"></h3>
-          <p><b>Did you strike a positive, negative, or neutral tone?</b> <span style="<% if @sentiment_keyword_for_response == "Positive" %>color:green<% elsif @sentiment_keyword_for_response == "Neutral" %>color:yellow<% else %>color:red<%end%>">
+          <p><b>Did you strike a positive, negative, or neutral tone?</b> <span style="<% if @sentiment_keyword_for_response == "Positive" %>color:green<% elsif @sentiment_keyword_for_response == "Neutral" %>color:#ffc519<% else %>color:red<%end%>">
             <%= @sentiment_keyword_for_response%>
             </span>
-              <img src="/assets/info.png" title="A review with a positive tone is received better, so you are more likely to get feedback."></p>
+              <img src="/assets/info.png" title="This metric is calculated by averaging the detected tone of all comments in your review. A review with a positive tone is received better, so you are more likely to get feedback."></p>
             <p>On average, did the class strike a positive, negative or neutral tone? <span>Positive</span>
               <img src="/assets/info.png" title="On average, the reviews for this assignment by your class had a ____ tone. This class average if found by taking the mode of all review tones."></p>
         </div>
 
     </div>
-
     <h3>Submission</h3>
     <p class="danger-notice">Once a review has been submitted, you cannot edit it again.</p>
 
@@ -59,34 +58,4 @@
 	        <%= link_to "Back", edit_response_path(:id => params[:id]) %>
 	    <% end %>
     <% end %>
-
-   
-    <br/>
-    <br/>
-    <br/>
-    The params
-    <br/>
-    <%= params %>
-
-    <br/>
-    <br/>
-
-
-    <% if @response %>
-        The  response.is_submitted? <%= @response.is_submitted %>
-    <% end %>
-
-    <br/>
-    <br/>
-
-    <% if @api_response %>
-        The  api_response
-        <br/>
-        <%= @api_response %>
-    <% end %>
-
-<% else %>
-
-    <h3>Cannot resubmit review </h3>
-    <%= link_to "Go to Assignments", list_student_task_index_path %>
 <% end %>

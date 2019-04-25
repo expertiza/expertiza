@@ -202,7 +202,7 @@ class GithubMetricsController < ApplicationController
 
 
   # An auxiliary function for "Retrieve pull request data". @github_data include data details obtained from "get_pull_request_details" function.
-  # After calling this function,
+  # After calling this function, github statistic data could be extracted.
   def parse_github_pull_request_data(github_data)
     get_team_github_statistics(github_data)
     pull_request_object = github_data["data"]["repository"]["pullRequest"]
@@ -217,7 +217,6 @@ class GithubMetricsController < ApplicationController
   end
 
   # An auxiliary function for "retrieve_repository_data". @github_data include data details obtained from "get_repository_details" function.
-  # After calling this function,
   def parse_github_repository_data(github_data)
     commit_history = github_data["data"]["repository"]["ref"]["target"]["history"]
     commit_objects = commit_history["edges"]

@@ -329,7 +329,7 @@ FactoryBot.define do
   end
 
   factory :deadline_right, class: DeadlineRight do
-    name  'No'
+    name  'OK'
   end
 
   factory :assignment_node, class: AssignmentNode do

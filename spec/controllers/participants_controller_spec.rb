@@ -124,7 +124,7 @@ describe ParticipantsController do
       session = {user: instructor}
       get :bequeath_all, params, session
       expect(flash[:note]).to eq 'All assignment participants are already part of the course'
-      expect(response).to redirect_to('/participants/list?model=Assignment')
+      expect(response).to redirect_to('en/participants/list?model=Assignment')
     end
   end
 end

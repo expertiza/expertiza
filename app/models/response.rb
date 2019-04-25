@@ -63,13 +63,20 @@ class Response < ActiveRecord::Base
     puts responses #debug print
     #sum up the suggestion chance percentages
 
-    avg = -1
-    responses.each{|r| avg += r.suggestion_chance_percentage if !r.suggestion_chance_percentage.nil? }
-    #divide by the number of responses
+    sum = 0
+    not_nil_count = 0
+    responses.each do |r|
+    if !r.suggestion_chance_percentage.nil?
+        sum += r.suggestion_chance_percentage
+        not_nil_count += 1
+      end
+    end
+    #return average
+     if not_nil_count > 0
+        return sum / not_nil_count
+     end
 
-    return (avg / response_map_list.size) if avg > 0
-    avg
-    #average is returned for suggestion chances
+     return -1
   end
 
   def get_sentiment_text(avg_sentiment_for_response)

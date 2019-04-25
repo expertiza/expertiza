@@ -426,6 +426,26 @@ class Assignment < ActiveRecord::Base
     rounds.sort!
   end
 
+  # Provides an array of all comparable assignments. Those are assignments that are part of the same course
+  # and have assignment questionnaires with matching rounds and questionnaire IDs.
+  def comparable_assignment_ids
+    comparable_assignments = Assignment.where(course_id: self.course_id).reject { |a| a.id == self.id }
+    comparable_assignment_ids = comparable_assignments.map(&:id)
+    # Maps round identifiers to questionnaire IDs in this assignment
+    round_questionnaire_hash = {}
+    aqs_with_round = AssignmentQuestionnaire.where(assignment_id: self.id).reject { |q| q.used_in_round.nil? }
+    aqs_with_round.each { |aq| round_questionnaire_hash[aq.used_in_round] =  aq.questionnaire_id }
+
+    # Find all assignments with the same questionnaires used in the same rounds and get the intersection
+    # with assignments in the same course retrieved above.
+    round_questionnaire_hash.each do |round, questionnaire|
+      matching_aqs = AssignmentQuestionnaire.where(used_in_round: round, questionnaire_id: questionnaire)
+      assignment_ids = matching_aqs.map(&:assignment_id)
+      comparable_assignment_ids &= assignment_ids
+    end
+    comparable_assignment_ids
+  end
+
   def self.export_details(csv, parent_id, detail_options)
     return csv unless detail_options.value?('true')
     @assignment = Assignment.find(parent_id)

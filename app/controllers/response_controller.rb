@@ -322,7 +322,7 @@ class ResponseController < ApplicationController
          # is_submitted is 'Yes' only when submit button in confirmation page is clicked
          save_confirmed_response
          
-         msg = "Your response was submitted: #{@response.is_submitted}"
+         msg = "Your response was submitted"
          params[:msg] = msg
 
          # log success
@@ -356,9 +356,10 @@ class ResponseController < ApplicationController
   end
 
   def save_confirmed_response
+
       @response.update_attribute('is_submitted', true) if params['is_submitted'] && params['is_submitted'] == 'Yes'
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
-      @response.update_suggestion_chance(params["avg_suggestion_chance_for_response"])
+      Metric.new.update_suggestion_chance(@response, params["avg_suggestion_chance_for_response"])
   end
 
   def save_unconfirmed_response

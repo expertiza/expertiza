@@ -5,7 +5,7 @@ class AssignmentStats
     @name = Assignment.find(assignment_id).name
     # These represent rounds
     aqs_with_round = AssignmentQuestionnaire.where(assignment_id: assignment_id).reject {|q| q.used_in_round.nil? }
-    aqs_with_round.sort_by!(&:used_in_round) # { |q| q.used_in_round }
+    aqs_with_round.sort_by!(&:used_in_round)
     # This hash maps question IDs to their zero-indexed positions within their questionnaire
     question_id_index_hash = {}
     aqs_with_round.each do |q|

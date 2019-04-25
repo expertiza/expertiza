@@ -18,8 +18,4 @@ module AssignmentStatsHelper
   def round_names(assignment_stats)
     (1..assignment_stats.number_of_rounds).map {|r| "Round #{r}" }
   end
-
-  def metric_names(assignment_stats)
-    assignment_stats.metric_names
-  end
 end

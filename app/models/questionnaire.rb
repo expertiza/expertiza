@@ -88,7 +88,7 @@ class Questionnaire < ActiveRecord::Base
   end
 
   def question_ids_in_order
-    sorted_questions = self.questions.to_a.sort_by!(&:seq) # {|q| q.seq }
-    sorted_questions.map(&:id) # {|q| q.id }
+    sorted_questions = self.questions.to_a.sort_by!(&:seq)
+    sorted_questions.map(&:id)
   end
 end

@@ -184,6 +184,7 @@ class ResponseController < ApplicationController
     flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
 
     @response = Response.find(params[:id])
+    @metric = Metric.new
 
     # a response should already exist when viewing this page
     render nothing:true unless @response
@@ -221,7 +222,7 @@ class ResponseController < ApplicationController
       @avg_suggestion_chance_for_response = suggestion_chance/number_of_responses
       @avg_suggestion_chance_for_response = @avg_suggestion_chance_for_response.to_i
       avg_sentiment_score_for_response = suggestion_sentiment_score/number_of_responses
-      @sentiment_keyword_for_response = @response.get_sentiment_text(avg_sentiment_score_for_response) #get text
+      @sentiment_keyword_for_response = @metric.get_sentiment_text(avg_sentiment_score_for_response) #get text
 
       puts suggestion_chance.to_s    #debug print
       puts @avg_sentiment_score_for_response.to_s
@@ -231,7 +232,7 @@ class ResponseController < ApplicationController
       # compute average
       @map = ResponseMap.find(@response.map_id)
       # below is class avg (suggestion score)for this assignment
-      @assignment_suggestion_average = @response.suggestion_chance_average(@map.reviewed_object_id) #pass assignment id
+      @assignment_suggestion_average = @metric.suggestion_chance_average(@map.reviewed_object_id) #pass assignment id
 
       if (@assignment_suggestion_average < 0)     #if no class average found, display current score as average
         @assignment_suggestion_average = @avg_suggestion_chance_for_response

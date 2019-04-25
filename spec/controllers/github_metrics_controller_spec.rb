@@ -172,7 +172,7 @@
     it 'gets and stores the statuses associated with head commits of PRs' do
       expect(controller).to receive(:get_statuses_for_pull_request).with("qwerty")
       expect(controller).to receive(:get_statuses_for_pull_request).with("asdfg")
-      controller.retrieve_check_run_statuses
+      controller.retrieve_pull_request_statuses_data
       expect(controller.instance_variable_get(:@check_statuses)).to eq("1234" => "check_status",
                                                                        "5678" => "check_status")
     end
@@ -202,7 +202,7 @@
         session["github_access_token"] = "qwerty"
         allow(controller).to receive(:get_statuses_for_pull_request).and_return("status")
         allow(controller).to receive(:retrieve_github_data)
-        allow(controller).to receive(:retrieve_check_run_statuses)
+        allow(controller).to receive(:retrieve_pull_request_statuses_data)
       end
 
       it 'stores the GitHub access token for later use' do
@@ -216,7 +216,7 @@
       end
 
       it 'calls retrieve_check_run_statuses to retrieve check runs data' do
-        expect(controller).to receive(:retrieve_check_run_statuses)
+        expect(controller).to receive(:retrieve_pull_request_statuses_data)
         get :view_github_metrics, id: '1'
       end
     end
@@ -269,7 +269,7 @@
 
   describe '#get_pull_request_details' do
     before(:each) do
-      allow(controller).to receive(:get_query)
+      allow(controller).to receive(:get_query_for_pull_request_links)
       allow(controller).to receive(:make_github_graphql_request).and_return(
         "data" => {
           "repository" => {
@@ -327,8 +327,8 @@
   describe '#parse_github_pull_request_data' do
     before(:each) do
       allow(controller).to receive(:process_github_authors_and_dates)
-      allow(controller).to receive(:team_statistics)
-      allow(controller).to receive(:organize_commit_dates)
+      allow(controller).to receive(:get_team_github_statistics)
+      allow(controller).to receive(:organize_commit_dates_in_sorted_order)
       @github_data = {
         "data" => {
           "repository" => {
@@ -354,7 +354,7 @@
     end
 
     it 'calls team_statistics' do
-      expect(controller).to receive(:team_statistics).with(@github_data)
+      expect(controller).to receive(:get_team_github_statistics).with(@github_data)
       controller.parse_github_pull_request_data(@github_data)
     end
 
@@ -364,7 +364,7 @@
     end
 
     it 'calls organize_commit_dates' do
-      expect(controller).to receive(:organize_commit_dates)
+      expect(controller).to receive(:organize_commit_dates_in_sorted_order)
       controller.parse_github_pull_request_data(@github_data)
     end
   end
@@ -372,7 +372,7 @@
   describe '#parse_github_repository_data' do
     before(:each) do
       allow(controller).to receive(:process_github_authors_and_dates)
-      allow(controller).to receive(:organize_commit_dates)
+      allow(controller).to receive(:organize_commit_dates_in_sorted_order)
       @github_data = {
         "data" => {
           "repository" => {
@@ -403,7 +403,7 @@
     end
 
     it 'calls organize_commit_dates' do
-      expect(controller).to receive(:organize_commit_dates)
+      expect(controller).to receive(:organize_commit_dates_in_sorted_order)
       controller.parse_github_repository_data(@github_data)
     end
   end
@@ -447,7 +447,7 @@
       hyperlink_data["owner_name"] = "expertiza"
       hyperlink_data["repository_name"] = "expertiza"
       hyperlink_data["pull_request_number"] = "1228"
-      response = controller.get_query(hyperlink_data)
+      response = controller.get_query_for_pull_request_links(hyperlink_data)
       expect(response).to eq(query)
     end
   end
@@ -463,7 +463,7 @@
     end
 
     it 'parses team data from github data for merged pull Request' do
-      controller.team_statistics(
+      controller.get_team_github_statistics(
         "data" => {
           "repository" => {
             "pullRequest" => {
@@ -491,7 +491,7 @@
     end
 
     it 'parses team data from github data for non-merged pull Request' do
-      controller.team_statistics(
+      controller.get_team_github_statistics(
           "data" => {
               "repository" => {
                   "pullRequest" => {
@@ -526,7 +526,7 @@
     end
 
     it 'calls organize_commit_dates to sort parsed commits by dates' do
-      controller.organize_commit_dates
+      controller.organize_commit_dates_in_sorted_order
       expect(controller.instance_variable_get(:@parsed_data)).to eq("abc" => {"2017-04-05" => 2, "2017-04-13" => 2,
                                                                               "2017-04-14" => 2})
     end

@@ -11,11 +11,6 @@ class SignUpTopic < ActiveRecord::Base
   validates :topic_name, :assignment_id, :max_choosers, presence: true
   validates :topic_identifier, length: {maximum: 10}
 
-  # This method is not used anywhere
-  # def get_team_id_from_topic_id(user_id)
-  #  return find_by_sql("select t.id from teams t,teams_users u where t.id=u.team_id and u.user_id = 5");
-  # end
-
   def self.import(row_hash, session = nil, id)
     raise ArgumentError, "Record does not contain required items." if row_hash.length < self.required_import_fields.length
     topic = SignUpTopic.where(topic_name: row_hash[:topic_name], assignment_id: id).first
@@ -174,5 +169,4 @@ def get_new_sign_up_topic(attributes, id)
   sign_up_topic = SignUpTopic.new(attributes)
   sign_up_topic.assignment_id = id
   sign_up_topic.save
-  # sign_up_topic
 end

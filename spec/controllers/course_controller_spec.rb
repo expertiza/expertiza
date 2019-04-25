@@ -44,7 +44,7 @@ describe CourseController do
       params = {id: 1}
       session = {user: instructor}
       post :delete, params, session
-      expect(response).to redirect_to('/tree_display/list')
+      expect(response).to redirect_to('en/tree_display/list')
     end
   end
 

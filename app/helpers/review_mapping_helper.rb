@@ -95,7 +95,7 @@ module ReviewMappingHelper
 		i=i+1
 	end
 	if i != 0
-		accum=Math.sqrt(accum/(i-1))
+		accum=Math.sqrt(accum/i)
 	end 
 	accum.round(2)
   end

@@ -1,4 +1,4 @@
-<style>
+<style xmlns:color="http://www.w3.org/1999/xhtml" xmlns:color="http://www.w3.org/1999/xhtml">
     .review-confirmation {
         text-indent: 2%;
     }
@@ -26,24 +26,30 @@
     
     <h1>Review Confirmation</h1>
     <h2>Your review has not yet been submitted.</h2>
-    <p>Below is an analysis of the review you have created. In your review...</p>
+    <p>Below is an analysis of the review you have created.</p>
 
     <div class="review-confirmation">
 
         <div class="suggestions">
-            <h3>Suggestions</h3>
-            <p>Are there suggestions? <span> <%= (Integer(@avg_suggestion_chance_for_response) > 50)? "Yes": "No" %>
-            (<%= @avg_suggestion_chance_for_response%>%)</span></p>
+            <h3>Suggestions <img src="/assets/lightbulb.png" height="40"></h3>
+          <p><b>Are there suggestions?</b> <span style="<% if Integer(@avg_suggestion_chance_for_response) > 50 %>color:green<% elsif Integer(@avg_suggestion_chance_for_response) == 50 %>color:yellow<% else %>color:red<%end%>">
+            <%= (Integer(@avg_suggestion_chance_for_response) > 50)? "Yes": "No" %>
+            (<%= @avg_suggestion_chance_for_response%>%)</span>
+              <img src="/assets/info.png" title='There is a <%= @avg_suggestion_chance_for_response %>% chance that your review contains a suggestion.'></p>
 
-            <p>What is the class average? <span><%=  @assignment_suggestion_average  %>%</span></p>
+          <p><b>What is the class average?</b><span style="<% if @assignment_suggestion_average > 50 %>color:green<% elif @assignment_suggestion_average == 50 %>color:yellow<% else %>color:red<%end%>">
+            <%=  @assignment_suggestion_average  %>%</span>
+              <img src="/assets/info.png" title="On average, the reviews for this assignment by your class had a <%= @assignment_suggestion_average %>% chance of containing a suggestion."></p>
         </div>
 
         <div class="tone">
-            <h3>Tone</h3>
-            <p>Did you strike a positive, negative, or neutral tone? <span>
+            <h3>Tone <img src="/assets/music_note.png" height="30"></h3>
+          <p><b>Did you strike a positive, negative, or neutral tone?</b> <span style="<% if @sentiment_keyword_for_response == "Positive" %>color:green<% elsif @sentiment_keyword_for_response == "Neutral" %>color:yellow<% else %>color:red<%end%>">
             <%= @sentiment_keyword_for_response%>
-            </span></p>
-            <p>What about the class? What is the overall tone for this review round? <span>Positive</span></p>
+            </span>
+              <img src="/assets/info.png" title="A review with a positive tone is received better, so you are more likely to get feedback."></p>
+            <p>On average, did the class strike a positive, negative or neutral tone? <span>Positive</span>
+              <img src="/assets/info.png" title="On average, the reviews for this assignment by your class had a ____ tone. This class average if found by taking the mode of all review tones."></p>
         </div>
 
     </div>

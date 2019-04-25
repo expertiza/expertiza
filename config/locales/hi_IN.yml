@@ -287,7 +287,7 @@ hi_IN:
 
     submitted_files:
       submit_file: "फाइल जमा करें:"
-      or: "और"
+      or: "या"
 
   student_review:
     list:

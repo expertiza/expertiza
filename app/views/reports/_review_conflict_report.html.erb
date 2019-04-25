@@ -1,23 +1,23 @@
 <div style="color:green;text-align:adjust">
-  Note: Metrics<br>
+  Note: <br>
   X- axis represents precentage score of the team<br>
   Y- axis represents the reviewers <br>
+  Highlighted reviewers are outside the tolerance limit<br>
 </div><br><br>
-<table id="myTable" class="tbl_heat tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
+<table id="myTable" border="1px solid black" margin-top="-9px"  width="100%" cellspacing='0' cellpadding='2' border='0'>
   <thead>
   <tr bgcolor='#CCCCCC'>
     <!-- class value decides whether the column should be sortable or not  -->
-    <th width="30%" class="sorter-false">Team <span></span></th>
-    <th width="30%" class="sorter-false">Reviewers <span></span></th>
-    <th width="40%" class="sorter-false">Metrics <span></span></th>
+    <th width="30%" class="sorter-false" border="1px black solid" style="text-align:center">Team <span></span></th>
+    <th width="70%" class="sorter-false" border="1px black solid" style="text-align:center" >Reviewers/Metrics <span></span></th>
   </tr>
   </thead>
   <tbody>
-  <% max_scores= get_max_assignment_review_score_per_round(@id) %>
+  <% max_scores= max_assignment_review_score_per_round(@id) %>
   <%@reviewers.keys.each do |team_name| %>
     <tr>
-      <td>
-        <% members = get_team_members_by_team_name(team_name, @id)%>
+      <td style="padding-left: 50px;" >
+        <% members = team_members(team_name, @id)%>
         <strong>Team Name: </strong><%= team_name %><br>
         <strong>Team Members: </strong><br>
 	<% members.each do |member|%>
@@ -25,53 +25,9 @@
         <% end %>
       </td>
       <td>
-        <%question_answers = get_reviews_score_for_team(@id, team_name) %>
-        <% i = 1 %>
-        <% question_answers.each do |question_answer| %>
-	        <% average = average_by_round_calculate(question_answer) %>
-	        <% std = std_by_round_calculate(average,question_answer) %>
-		<% upper_tolerance_limit = (average+(2*std)).round(2) %>
-      		<% lower_tolerance_limit = (average-(2*std)).round(2) %>
-          <div style="border-top: dotted; border-width: 1px; border-top-color:#000000;">
-            <strong><%= "Round: " + i.to_s %></strong><br>
-	          <i>Reviewers with scores</i><br>
-            <ol>
-            <% question_answer.each do |reviewer, answer| %>
-		<% if answer > upper_tolerance_limit or answer < lower_tolerance_limit  %>
-                	<li><% response_id = get_response_id(reviewer, @teams[team_name], @id) %>
-                  	<mark style="background-color:#FFFF00">
-			<%= link_to "("+@reviewers[team_name.to_s][reviewer.to_s].to_s+")", :controller => 'popup', :action => 'team_users_popup', :id => @teams[team_name], :id2 => response_id, :assignment_id=>@id %>
-                  	<%= list_review_submissions(reviewer, @teams[team_name], response_id) %>
-                  	<%= list_hyperlink_submission(response_id, 5386) if Assignment.find_by(id: @id.to_i).course.instructor.name == 'Jkidd' %>
-                  	<%= ": " + answer.to_s %></mark>
-		        </li>
-		<% else %>
-			<li><% response_id = get_response_id(reviewer, @teams[team_name], @id) %>
-                        <%= link_to "("+@reviewers[team_name.to_s][reviewer.to_s].to_s+")", :controller => 'popup', :action => 'team_users_popup', :id => @teams[team_name], :id2 => response_id, :assignment_id=>@id %>
-                        <%= list_review_submissions(reviewer, @teams[team_name], response_id) %>
-                        <%= list_hyperlink_submission(response_id, 5386) if Assignment.find_by(id: @id.to_i).course.instructor.name == 'Jkidd' %>
-                        <%= ": " + answer.to_s %>
-                        </li>
-		<% end %>
-            <% end %>
-            </ol>
-          </div>
-          <br>
-          <strong>Max Review Score: </strong><%=max_scores[i-1]%><br>
-          <strong>Average Score: </strong><%=  average.to_s %><br>
-          <strong>Standard Deviation: </strong><%=  std.to_s %>
-	        <% i+=1 %>
-        <% end %>
-      </td>
-      <td>
-        <% i = 1 %>
-        <% question_answers.each do |question_answer| %>
-          <strong><%= "Round: " + i.to_s %></strong>
-          <%= genearte_score_chart(max_scores[i-1], question_answer) %>
-          <% i+=1 %>
-          <% end%>
-      </td>
-    </tr>
+      <%= render 'review_conflict_metric' , team_name: team_name , max_scores: max_scores %>
+  </td>
+  </tr>
   <% end %>
   </tbody>
 </table>

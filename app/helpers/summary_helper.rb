@@ -159,7 +159,8 @@ module SummaryHelper
       question.type.eql?("Checkbox") ? 1 : Questionnaire.where(id: question.questionnaire_id).first.max_question_score
     end
 
-    def get_max_score_of_assignment_per_round(assignment,round)
+    #Get maximum score of the assignment per round for Review Conflict Report
+    def max_score_of_assignment_per_round(assignment,round)
       # get all criteria used in each round
       rubric = get_questions_by_assignment(assignment)
       rubric_questions_used = rubric[assignment.varying_rubrics_by_round? ? round : 0]

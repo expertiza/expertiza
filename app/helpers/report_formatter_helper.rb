@@ -26,26 +26,26 @@ module ReportFormatterHelper
     @avg_and_ranges = @assignment.compute_avg_and_ranges_hash
   end
 
-  # review conflict helper
+  # Create a response map for the reviewers and reviewee as well as the teams and the reviewee_id for Review Conflict Report 
   def review_conflict_response_map(params, _session = nil)
     assign_basics(params)
     teams = Team.select(:id, :name).where(parent_id: @id).order(:name)
     @teams = ({})
     @reviewers = ({})
     teams.each do |reviewee|
-      @reviewers[reviewee.name] = get_reviewers_name_id_by_reviewee_and_assignment(reviewee, @id)
+      @reviewers[reviewee.name] = reviewers_name_id_by_reviewee_and_assignment(reviewee, @id)
       @teams[reviewee.name] = reviewee.id
     end
   end
 
-  def get_reviewers_name_id_by_reviewee_and_assignment(reviewee, id)
+  #Get the reviewers of a particular assignment and particular reviewee for Review Conflict Report
+    def reviewers_name_id_by_reviewee_and_assignment(reviewee, id)
     temp_reviewers = User.select(" DISTINCT participants.id, users.name")
                     .joins("JOIN participants ON participants.user_id = users.id")
                     .joins("JOIN response_maps ON response_maps.reviewer_id = participants.id")
                     .where("response_maps.reviewee_id = ? and response_maps.reviewed_object_id = ?", reviewee.id, id)
     reviewers = ({})
     temp_reviewers.each do |reviewer|
-      # puts reviewer[:id].to_s + " " + reviewer[:name]
       reviewers[reviewer[:id].to_s] = reviewer[:name]
     end
     reviewers

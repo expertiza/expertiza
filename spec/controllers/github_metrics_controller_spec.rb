@@ -69,7 +69,7 @@
 
   describe '#retrieve_pull_request_data' do
     before(:each) do
-      controller.instance_variable_set(:@head_refs, {})
+      controller.instance_variable_set(:@gitVariable[:head_refs], {})
       allow(controller).to receive(:get_pull_request_details).and_return({"data" => {
           "repository" => {
               "pullRequest" => {
@@ -165,7 +165,7 @@
   describe '#retrieve_check_run_statuses' do
     before(:each) do
       allow(controller).to receive(:get_statuses_for_pull_request).and_return("check_status")
-      controller.instance_variable_set(:@head_refs, "1234" => "qwerty", "5678" => "asdfg")
+      controller.instance_variable_set(:@gitVariable[:head_refs], "1234" => "qwerty", "5678" => "asdfg")
       controller.instance_variable_set(:@check_statuses, {})
     end
 
@@ -458,7 +458,7 @@
       controller.instance_variable_set(:@total_deletions, 0)
       controller.instance_variable_set(:@total_files_changed, 0)
       controller.instance_variable_set(:@total_commits, 0)
-      controller.instance_variable_set(:@head_refs, [])
+      controller.instance_variable_set(:@gitVariable[:head_refs], [])
       controller.instance_variable_set(:@merge_status, [])
     end
 

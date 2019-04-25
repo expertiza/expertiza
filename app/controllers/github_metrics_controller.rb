@@ -92,7 +92,7 @@ class GithubMetricsController < ApplicationController
         :merge_status => {},
         :check_statuses => {}
     }
-    
+
 
     @token = session["github_access_token"]
 
@@ -210,7 +210,7 @@ class GithubMetricsController < ApplicationController
         commits[date] ||= 0
       end
     end
-    @gitVariable[:parsed_data].each {|author, commits| @parsed_data[author] = Hash[commits.sort_by {|date, _commit_count| date }] }
+    @gitVariable[:parsed_data].each {|author, commits| @gitVariable[:parsed_data][author] = Hash[commits.sort_by {|date, _commit_count| date }] }
   end
 
   def team_statistics(github_data)

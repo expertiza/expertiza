@@ -444,7 +444,7 @@ en:
 
     take_quiz:
       questions: "Questions"
-      submit_quiz: "Submit quiz"
+      submit_quiz: "Submit Quiz"
 
   profile:
     edit:

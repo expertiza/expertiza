@@ -235,7 +235,7 @@ describe ResponseController do
       }
       session = {user: instructor}
       post :save, params, session
-      expect(response).to redirect_to('response/redirect?id=1&return=')
+      expect(response).to redirect_to('/response/redirect?id=1&return=')
     end
   end
 

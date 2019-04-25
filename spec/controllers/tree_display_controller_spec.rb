@@ -5,19 +5,19 @@ describe TreeDisplayController do
       user = build(:instructor)
       stub_current_user(user, user.role.name, user.role)
       get "list"
-      expect(response).not_to redirect_to('/en/tree_display/list')
+      expect(response).not_to redirect_to('/tree_display/list')
     end
 
     it "should redirect to student_task#list if current user is a student" do
       user = build(:student)
       stub_current_user(user, user.role.name, user.role)
       get "list"
-      expect(response).to redirect_to('/en/student_task/list')
+      expect(response).to redirect_to('/student_task/list')
     end
 
     it "should redirect to login page if current user is nil" do
       get "list"
-      expect(response).to redirect_to('/en/auth/failure')
+      expect(response).to redirect_to('/auth/failure')
     end
   end
 
@@ -26,7 +26,7 @@ describe TreeDisplayController do
       user = build(:student)
       stub_current_user(user, user.role.name, user.role)
       get "confirm_notifications_access"
-      expect(response).to redirect_to('/en/notifications/list')
+      expect(response).to redirect_to('/notifications/list')
     end
   end
 

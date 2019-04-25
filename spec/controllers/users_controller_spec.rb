@@ -24,7 +24,7 @@ describe UsersController do
       stub_current_user(student3, student3.role.name, student3.role)
       allow(controller).to receive(:current_user_role?).and_return("Student")
       get :index
-      expect(response).to redirect_to('/en/tree_display/drill')
+      expect(response).to redirect_to('/tree_display/drill')
     end
 
     it 'renders list if user is instructor' do
@@ -66,7 +66,7 @@ describe UsersController do
         user: {name: 'instructor6'}
       }
       post :show_selection, params, session
-      expect(response).to redirect_to('http://test.host/en/users/list')
+      expect(response).to redirect_to('http://test.host/users/list')
     end
 
     it 'user is not nil and user is available for editing' do
@@ -87,7 +87,7 @@ describe UsersController do
         user: {name: 'instructor6'}
       }
       post :show_selection, params, session
-      expect(response).to redirect_to('http://test.host/en/users/list')
+      expect(response).to redirect_to('http://test.host/users/list')
     end
   end
 
@@ -113,7 +113,7 @@ describe UsersController do
     it 'when params[:id] is nil' do
       @params = {id: nil}
       get :show, @params
-      expect(response).to redirect_to('/en/tree_display/drill')
+      expect(response).to redirect_to('/tree_display/drill')
     end
   end
 
@@ -168,7 +168,7 @@ describe UsersController do
       post :create, params, session
       allow_any_instance_of(User).to receive(:undo_link).with('The user "chenzy@gmail.com" has been successfully created. ').and_return(true)
       expect(flash[:success]).to eq "A new password has been sent to new user's e-mail address."
-      expect(response).to redirect_to('http://test.host/en/users/list')
+      expect(response).to redirect_to('http://test.host/users/list')
     end
 
     it 'save successfully without the same name' do
@@ -198,7 +198,7 @@ describe UsersController do
       post :create, params, session
       allow_any_instance_of(User).to receive(:undo_link).with('The user "instructor6" has been successfully created. ').and_return(true)
       expect(flash[:success]).to eq "A new password has been sent to new user's e-mail address."
-      expect(response).to redirect_to('http://test.host/en/users/list')
+      expect(response).to redirect_to('http://test.host/users/list')
     end
 
     it 'save unsuccessfully' do
@@ -258,7 +258,7 @@ describe UsersController do
       }
       post :create_requested_user_record, params
       expect(flash[:error]).to eq 'The account you are requesting has already existed in Expertiza.'
-      expect(response).to redirect_to('http://test.host/en/users/request_new?role=Student')
+      expect(response).to redirect_to('http://test.host/users/request_new?role=Student')
     end
 
     it 'if requested user is not saved' do
@@ -272,7 +272,7 @@ describe UsersController do
         requested_user: {self_introduction: 'I am good'}
       }
       post :create_requested_user_record, params
-      expect(response).to redirect_to('http://test.host/en/users/request_new?role=Student')
+      expect(response).to redirect_to('http://test.host/users/request_new?role=Student')
     end
 
     it 'if user not exists, requested user is saved and params[:user][:institution_id] is empty' do
@@ -303,7 +303,7 @@ describe UsersController do
       }
       post :create_approved_user, params
       expect(flash[:error]).to eq 'Please Approve or Reject before submitting'
-      expect(response).to redirect_to('http://test.host/en/users/list_pending_requested')
+      expect(response).to redirect_to('http://test.host/users/list_pending_requested')
     end
 
     it 'the input status is Approved' do
@@ -315,7 +315,7 @@ describe UsersController do
       post :create_approved_user, params, session
       allow_any_instance_of(RequestedUser).to receive(:undo_link).with('The user "requester1" has been successfully created. ').and_return(true)
       expect(flash[:success]).to eq "A new password has been sent to new user's e-mail address." or 'The user "requester1" has been successfully updated.'
-      expect(response).to redirect_to('http://test.host/en/users/list_pending_requested')
+      expect(response).to redirect_to('http://test.host/users/list_pending_requested')
     end
 
     it 'the input status is Approved but save fails' do
@@ -327,7 +327,7 @@ describe UsersController do
       }
       post :create_approved_user, params, session
       expect(flash[:success]).to eq 'The user "requester1" has been successfully updated.'
-      expect(response).to redirect_to('http://test.host/en/users/list_pending_requested')
+      expect(response).to redirect_to('http://test.host/users/list_pending_requested')
     end
 
     it 'the input status is Rejected' do
@@ -337,7 +337,7 @@ describe UsersController do
       }
       post :create_approved_user, params
       expect(flash[:success]).to eq 'The user "requester1" has been Rejected.' or 'The user "requester1" has been successfully updated.'
-      expect(response).to redirect_to('http://test.host/en/users/list_pending_requested')
+      expect(response).to redirect_to('http://test.host/users/list_pending_requested')
     end
 
     it 'the input status is Rejected but update_colums fails' do
@@ -349,7 +349,7 @@ describe UsersController do
       post :create_approved_user, params
       expect(flash[:success]).to eq 'The user "requester1" has been successfully updated.'
       expect(flash[:error]).to eq 'Error processing request.'
-      expect(response).to redirect_to('http://test.host/en/users/list_pending_requested')
+      expect(response).to redirect_to('http://test.host/users/list_pending_requested')
     end
   end
 
@@ -370,7 +370,7 @@ describe UsersController do
       allow(student1).to receive(:update_attributes).with(any_args).and_return(true)
       post :update, @params
       expect(flash[:success]).to eq 'The user "lily" has been successfully updated.'
-      expect(response).to redirect_to('/en/users')
+      expect(response).to redirect_to('/users')
     end
     it 'when user is not updated successfully' do
       allow(User).to receive(:find).with('2').and_return(student2)
@@ -395,7 +395,7 @@ describe UsersController do
     end
     it 'when params[:id] is nil' do
       get :keys
-      expect(response).to redirect_to('/en/tree_display/drill')
+      expect(response).to redirect_to('/tree_display/drill')
     end
   end
 end

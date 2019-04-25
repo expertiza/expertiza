@@ -1,4 +1,5 @@
 class AssignmentsController < ApplicationController
+  
   include AssignmentHelper
   autocomplete :user, :name
   before_action :authorize

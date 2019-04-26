@@ -12,9 +12,19 @@
 <p><label for="course_info">Course Information</label><br/>
 <%= text_field 'course', 'info'  %></p>
 <p><label for="language">Default Language:</label><br/>
+  <% if(!@course.nil?)
+       if (@course.locale == "hi_IN")
+         @hindi_locale = true
+       else
+         @en_locale = true
+       end
+     else
+       @en_locale = true
+     end %>
+
   <%= select('course','locale', options_for_select([
-                                                           [ "English", "en", :selected => @course.locale == "en"],
-                                                           ["Hindi", "hi_IN", :selected => @course.locale == "hi_IN"]
+                                                           [ "English", "en", :selected => @en_locale == true ],
+                                                           ["Hindi", "hi_IN", :selected => @hindi_locale == true ]
                                                         ])) %></p>
 
 <!--[eoform:user]-->

@@ -36,17 +36,20 @@ class GradesController < ApplicationController
   # an assignment. It lists all participants of an assignment and all the reviews they received.
   # It also gives a final score, which is an average of all the reviews and greatest difference
   # in the scores of all the reviews.
+  #
+  # Changes by Rahul Sethi
   def derived_final_score(avg_self_review_score, actual_score)
     participant = AssignmentParticipant.find(params[:id])
     maps = ResponseMap.where(reviewee_id: participant.team.id)
     ctr = 0
-    maps.each do |map|
+    maps.each do
       ctr += 1
     end
     final_score_after = (avg_self_review_score + actual_score * (ctr - 1))
-    final_score_after = final_score_after / ctr
+    final_score_after /= ctr
     final_score_after.round(2)
   end
+  # Changes end
 
   def view
     @assignment = Assignment.find(params[:id])

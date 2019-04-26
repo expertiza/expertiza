@@ -14,7 +14,7 @@ class AuthorFeedbackQuestionnaire < Questionnaire
     "feedback".to_sym
   end
 
-  def get_assessments_for(participant, requesting_score)
+  def get_assessments_for(participant, _requesting_score = false)
     participant.feedback
   end
 end

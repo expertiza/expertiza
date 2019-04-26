@@ -7,7 +7,7 @@ class ResponseMap < ActiveRecord::Base
   end
 
   # return latest versions of the responses
-  def self.get_assessments_for(team , user_id = nil)
+  def self.get_assessments_for(team, user_id = nil)
     responses = []
     stime = Time.now
     if team

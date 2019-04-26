@@ -120,7 +120,7 @@ class VmQuestionResponse
     end
 
     # Changes by Rahul Sethi
-    return unless !@self_review_answers.nil?
+    return if @self_review_answers.nil?
     answers = Answer.where(response_id: @self_review_answers.response_id)
     answers.each do |answer|
       add_answer(answer)

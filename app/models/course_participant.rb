@@ -17,8 +17,7 @@ class CourseParticipant < Participant
   def self.import(row_hash, session, id)
     raise ArgumentError, "The record does not have enough items." if row_hash.length < self.required_import_fields.length
     user = User.find_by(name: row_hash[:name])
-    return unless user.nil?
-    user = User.import(row_hash, session, nil)
+    user = User.import(row_hash, session, nil) if user.nil?
     course = Course.find_by(id)
     raise ImportError, "The course with id " + id.to_s + " was not found." if course.nil?
     unless CourseParticipant.exists?(user_id: user.id, parent_id: id)

@@ -95,52 +95,45 @@ class Questionnaire < ActiveRecord::Base
   # TODO: Use test files to ensure this is working
   #
   # At some point, expecting text, type, sequence, size, and break_before
-  def self.import(row_hash, id)
-    raise ArgumentError, "row_hash cannot be empty when importing Question objects for Questionnaire" if row_hash.empty?
-    raise ArgumentError, "id cannot be nil when importing Question objects for Questionnaire" if id.nil?
+  def self.import(row_hash, session = nil, id)
+    raise ArgumentError, "Record does not contain required items." if row_hash.length < self.required_import_fields.length
 
     questionnaire = Questionnaire.find(id)
-    custom_rubric = questionnaire.section == "Custom"
+    raise ImportError, "Questionnaire with provided ID does not exist." if questionnaire.nil?
 
-    # Create the question
+    # Question with required fields
     q = Question.new
-    q.true_false = false
+    q.type = row_hash[:type]
+    q.txt = row_hash[:txt]
+    q.weight = row_hash[:weight].to_i
+    q.seq = row_hash[:seq].to_i
 
-    # TODO: Find out about custom rubrics
-    if custom_rubric
-      q_type = QuestionType.new
-      q_type.parameters = row_hash.delete(:param)
-      q_type.q_type = row_hash.delete(:type)
-    else
-      q.true_false = row_hash.delete(:type) == Question::TRUE_FALSE.downcase
-    end
-
-    # TODO: Determine what parameters are required
-    q.txt = row_hash.delete(:question)
-    q.weight = row_hash.delete(:weight)
+    # Optional fields
+    q.break_before = (row_hash[:break_before] || "true")
+    q.size = row_hash[:size] if row_hash[:size]
 
     # Add question advice
     row_hash.each_key do |k|
       # Check score within range
-      if k.to_i >= questionnaire.min_question_score && k.to_i <= questionnaire.max_question_score
-        a = QuestionAdvice.new(score: k.to_i, advice: row_hash[k])
-        q.question_advices << a
+      k = k.to_s
+      if k.match("advice*")
+        score = k.delete("advice_")
+        if score.to_i >= questionnaire.min_question_score && score.to_i <= questionnaire.max_question_score
+          a = QuestionAdvice.create!(score: k.to_i, advice: row_hash[k])
+          q.question_advices << a
+        end
       end
     end
 
-    q.save
-
-    if custom_rubric
-      q_type.question = q
-      q_type.save
-    end
+    byebug
+    q.save!
     questionnaire.questions << q
   end
 
   def self.required_import_fields
     {"txt" => "Question text",
      "type" => "Question type",
-     "sequence" => "Sequence (for order)",
+     "seq" => "Sequence (for order)",
      "weight" => "Point value"}
   end
 

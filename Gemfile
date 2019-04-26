@@ -92,7 +92,6 @@ group :test do
   gem 'mutant-rspec'
   gem 'rspec-rails'
   gem 'shoulda'
-  gem 'byebug' #TODO: remove before final release
   gem 'webdrivers'
 
 end

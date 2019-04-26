@@ -1,29 +1,17 @@
 jQuery(document).ready(function () {
   // This preloadedImages function is refered from http://jsfiddle.net/slashingweapon/8jAeu/
   // Actually I am not using the values in preloadedImages, but image loading speed is indeed getting faster
-  var preloadedImages = []
+  var preloadedImages = [];
   function preloadImages() {
     for (var idx = 0; idx < arguments.length; idx++) {
-      var oneImage = new Image()
+      var oneImage = new Image();
       oneImage.src = arguments[idx];
       preloadedImages.push(oneImage);
     }
   }
 
   function formatDate(date) {
-    var month = new Array();
-    month[0] = "Jan";
-    month[1] = "Feb";
-    month[2] = "Mar";
-    month[3] = "Apr";
-    month[4] = "May";
-    month[5] = "Jun";
-    month[6] = "Jul";
-    month[7] = "Aug";
-    month[8] = "Sep";
-    month[9] = "Oct";
-    month[10] = "Nov";
-    month[11] = "Dec";
+    var month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
     var hours = date.getHours();
     var minutes = date.getMinutes();
@@ -1044,7 +1032,7 @@ jQuery(document).ready(function () {
           timeFormat: 'HH:mm:ss z',
           controlType: 'select',
           timezoneList: [
-            { value: -000, label: 'GMT' },
+            { value: -0o, label: 'GMT' },
             { value: -300, label: 'Eastern' },
             { value: -360, label: 'Central' },
             { value: -420, label: 'Mountain' },

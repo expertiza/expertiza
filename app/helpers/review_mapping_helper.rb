@@ -136,20 +136,25 @@ module ReviewMappingHelper
         labels: labels,
         datasets: [
             {
-                backgroundColor: "#ff0000",
+                label: "score%",
+                backgroundColor: "rgba(255,99,132,0.8)",
                 borderWidth: 1,
                 data: scores,
+                hoverBackgroundColor: "orange",
                 yAxisID: "bar-y-axis1"
             }
         ]
     }
     options = {
-        legend: {
-            display: false,
-        },
-        width: "125",
-        height: "75",
-        scales: {
+      legend: {
+        position: 'top',
+        labels: {
+          usePointStyle: true
+        }
+      },
+      width: "125",
+      height: "75",
+      scales: {
             yAxes: [{
                         stacked: true,
                         id: "bar-y-axis1",

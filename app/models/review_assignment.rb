@@ -12,10 +12,7 @@ module ReviewAssignment
 
     # Initialize contributor set with all teams participating in this assignment
     contributor_set = Array.new(contributors)
-
-    # If instructor or TA they can review anything
-    if false #should be if instructor
-
+  unless reviewer.is_a?(AssignmentReviewerParticipant)
       # Reject contributors that have not selected a topic, or have no submissions
       contributor_set = reject_by_no_topic_selection_or_no_submission(contributor_set)
 
@@ -37,8 +34,7 @@ module ReviewAssignment
       # if this assignment does not allow reviewer to review other artifacts on the same topic,
       # remove those teams from candidate list.
       contributor_set = reject_by_same_topic(contributor_set, reviewer) unless self.can_review_same_topic?
-
-    end
+end
 
     # Add topics for all remaining submissions to a list of available topics for review
     candidate_topics = Set.new
@@ -179,7 +175,13 @@ module ReviewAssignment
           !contributor.has_submissions?
     end
 
+
+
     raise "There are no more submissions to review on this #{work}." if contributor_set.empty?
+
+    if reviewer.is_a?(AssignmentReviewerParticipant)
+      return contributor_set.sample
+    end
 
     # Reviewer can review each contributor only once
     contributor_set.reject! {|contributor| contributor.reviewed_by?(reviewer) }

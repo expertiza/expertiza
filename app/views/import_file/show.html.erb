@@ -57,7 +57,13 @@
   </table>
 
   <%= hidden_field_tag('contents_hash', @contents_hash) %>
-  <%= hidden_field_tag('options', @options) %>
+
+  <% if @options %>
+    <% @options.each do |key,value| %>
+      <%= hidden_field_tag "options[#{key}]",value %>
+    <% end %>
+  <% end %>
+
   <%= hidden_field_tag('model', @model) %>
   <%= hidden_field_tag('id', @id) %>
   <%= hidden_field_tag('has_header', @has_header) %>

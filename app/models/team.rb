@@ -167,7 +167,7 @@ class Team < ActiveRecord::Base
   def import_team_members(starting_index = 0, row_hash)
     starting_index
     index = 0
-    row_hash[:teammembers].each do |teammember|
+    row_hash[:teammembers].split.each do |teammember|
       next if index < starting_index # not sure this will work, hash is not ordered like array
       user = User.find_by(name: teammember.to_s)
       if user.nil?
@@ -196,7 +196,7 @@ class Team < ActiveRecord::Base
       end
     end
     if name
-      team = Object.const_get(teamtype.to_s).create_team_and_node(id)
+      team = Object.const_get(teamtype.type).create_team_and_node(id)
       team.name = name
       team.save
     end

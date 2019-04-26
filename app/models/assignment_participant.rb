@@ -196,11 +196,11 @@ class AssignmentParticipant < Participant
   def self.import(row_hash, session, id)
     raise ArgumentError, "Record does not contain required items." if row_hash.length < self.required_import_fields.length
     user = User.find_by(name: row_hash[:name])
-    return unless user.nil?
-    user = User.import(row_hash, session, nil)
+    user = User.import(row_hash, session, nil) if user.nil?
     raise ImportError, "The assignment with id #{id} was not found." if Assignment.find(id).nil?
     unless AssignmentParticipant.exists?(user_id: user.id, parent_id: id)
-      AssignmentParticipant.create(user_id: user.id, parent_id: id)
+      new_part = AssignmentParticipant.new(user_id: user.id, parent_id: id)
+      new_part.set_handle
     end
   end
 

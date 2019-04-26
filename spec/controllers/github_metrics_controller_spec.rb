@@ -13,12 +13,14 @@
   let(:review_response_map) { build(:review_response_map, id: 1) }
   let(:assignment_due_date) { build(:assignment_due_date) }
 
+
   before(:each) do
     allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
     allow(participant).to receive(:team).and_return(team)
     stub_current_user(instructor, instructor.role.name, instructor.role)
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(Assignment).to receive(:find).with(1).and_return(assignment)
+
   end
 
 
@@ -69,7 +71,8 @@
 
   describe '#retrieve_pull_request_data' do
     before(:each) do
-      controller.instance_variable_set(:@head_refs, {})
+
+      controller.instance_variable_set(:@gitVariable,:head_refs=> {})
       allow(controller).to receive(:get_pull_request_details).and_return({"data" => {
           "repository" => {
               "pullRequest" => {
@@ -165,15 +168,18 @@
   describe '#retrieve_check_run_statuses' do
     before(:each) do
       allow(controller).to receive(:get_statuses_for_pull_request).and_return("check_status")
-      controller.instance_variable_set(:@head_refs, "1234" => "qwerty", "5678" => "asdfg")
-      controller.instance_variable_set(:@check_statuses, {})
+      controller.instance_variable_set(:@gitVariable,{
+          :head_refs => { "1234" => "qwerty", "5678" => "asdfg"},
+          :check_statuses => {}
+      })
+
     end
 
     it 'gets and stores the statuses associated with head commits of PRs' do
       expect(controller).to receive(:get_statuses_for_pull_request).with("qwerty")
       expect(controller).to receive(:get_statuses_for_pull_request).with("asdfg")
       controller.retrieve_pull_request_statuses_data
-      expect(controller.instance_variable_get(:@check_statuses)).to eq("1234" => "check_status",
+      expect(controller.instance_variable_get(:@gitVariable)[:check_statuses]).to eq("1234" => "check_status",
                                                                        "5678" => "check_status")
     end
   end
@@ -309,18 +315,21 @@
 
   describe '#process_github_authors_and_dates' do
     before(:each) do
-      controller.instance_variable_set(:@authors, {})
-      controller.instance_variable_set(:@dates, {})
-      controller.instance_variable_set(:@parsed_data, {})
+
+      controller.instance_variable_set(:@gitVariable, {
+          :authors=> {},
+          :dates=> {},
+          :parsed_data=> {}
+      })
     end
     it 'sets authors and data for GitHub data' do
       controller.process_github_authors_and_dates("author", "date")
-      expect(controller.instance_variable_get(:@authors)).to eq("author" => 1)
-      expect(controller.instance_variable_get(:@dates)).to eq("date" => 1)
-      expect(controller.instance_variable_get(:@parsed_data)).to eq("author" => {"date" => 1})
+      expect(controller.instance_variable_get(:@gitVariable)[:authors]).to eq("author" => 1)
+      expect(controller.instance_variable_get(:@gitVariable)[:dates]).to eq( "date" => 1)
+      expect(controller.instance_variable_get(:@gitVariable)[:parsed_data]).to eq("author" => {"date" => 1})
 
       controller.process_github_authors_and_dates("author", "date")
-      expect(controller.instance_variable_get(:@parsed_data)).to eq("author" => {"date" => 2})
+      expect(controller.instance_variable_get(:@gitVariable)[:parsed_data]).to eq( "author" => {"date" => 2})
     end
   end
 
@@ -454,12 +463,15 @@
 
   describe '#team_statistics' do
     before(:each) do
-      controller.instance_variable_set(:@total_additions, 0)
-      controller.instance_variable_set(:@total_deletions, 0)
-      controller.instance_variable_set(:@total_files_changed, 0)
-      controller.instance_variable_set(:@total_commits, 0)
-      controller.instance_variable_set(:@head_refs, [])
-      controller.instance_variable_set(:@merge_status, [])
+      controller.instance_variable_set(:@gitVariable, {
+          :total_additions => 0,
+          :total_deletions => 0,
+          :total_commits => 0,
+          :total_files_changed => 0,
+          :head_refs=>[],
+          :merge_status=> []
+      })
+
     end
 
     it 'parses team data from github data for merged pull Request' do
@@ -483,11 +495,11 @@
           }
         }
       )
-      expect(controller.instance_variable_get(:@total_additions)).to eq(2)
-      expect(controller.instance_variable_get(:@total_deletions)).to eq(1)
-      expect(controller.instance_variable_get(:@total_files_changed)).to eq(3)
-      expect(controller.instance_variable_get(:@total_commits)).to eq(16)
-      expect(controller.instance_variable_get(:@merge_status)[8]).to eq("MERGED")
+      expect(controller.instance_variable_get(:@gitVariable)[:total_additions]).to eq(2)
+      expect(controller.instance_variable_get(:@gitVariable)[:total_deletions]).to eq(1)
+      expect(controller.instance_variable_get(:@gitVariable)[:total_files_changed]).to eq(3)
+      expect(controller.instance_variable_get(:@gitVariable)[:total_commits]).to eq(16)
+      expect(controller.instance_variable_get(:@gitVariable)[:merge_status][8]).to eq("MERGED")
     end
 
     it 'parses team data from github data for non-merged pull Request' do
@@ -511,24 +523,27 @@
               }
           }
       )
-      expect(controller.instance_variable_get(:@total_additions)).to eq(2)
-      expect(controller.instance_variable_get(:@total_deletions)).to eq(1)
-      expect(controller.instance_variable_get(:@total_files_changed)).to eq(3)
-      expect(controller.instance_variable_get(:@total_commits)).to eq(16)
-      expect(controller.instance_variable_get(:@merge_status)[8]).to eq(true)
+      expect(controller.instance_variable_get(:@gitVariable)[:total_additions]).to eq(2)
+      expect(controller.instance_variable_get(:@gitVariable)[:total_deletions]).to eq(1)
+      expect(controller.instance_variable_get(:@gitVariable)[:total_files_changed]).to eq(3)
+      expect(controller.instance_variable_get(:@gitVariable)[:total_commits]).to eq(16)
+      expect(controller.instance_variable_get(:@gitVariable)[:merge_status][8]).to eq(true)
     end
   end
 
   describe '#organize_commit_dates' do
     before(:each) do
-      controller.instance_variable_set(:@dates, "2017-04-05" => 1, "2017-04-13" => 1, "2017-04-14" => 1)
-      controller.instance_variable_set(:@parsed_data, "abc" => {"2017-04-14" => 2, "2017-04-13" => 2, "2017-04-05" => 2})
+
+      controller.instance_variable_set(:@gitVariable, {
+          :dates => {"2017-04-05" => 1, "2017-04-13" => 1, "2017-04-14" => 1},
+          :parsed_data => {"abc" => {"2017-04-14" => 2, "2017-04-13" => 2, "2017-04-05" => 2}}
+      })
     end
 
     it 'calls organize_commit_dates to sort parsed commits by dates' do
       controller.organize_commit_dates_in_sorted_order
-      expect(controller.instance_variable_get(:@parsed_data)).to eq("abc" => {"2017-04-05" => 2, "2017-04-13" => 2,
-                                                                              "2017-04-14" => 2})
+      expect(controller.instance_variable_get(:@gitVariable)[:parsed_data]).to eq({"abc" => {"2017-04-05" => 2, "2017-04-13" => 2,
+                                                                              "2017-04-14" => 2}})
     end
   end
 end

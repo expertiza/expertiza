@@ -55,4 +55,20 @@ describe Questionnaire do
       questionnaire.min_question_score = 0
     end
   end
+
+  describe '#question_ids_in_order' do
+    it 'should be sorted' do
+      questions = []
+      questions.push double('Question', :id => 3, :seq => 3)
+      questions.push double('Question', :id => 2, :seq => 2)
+      questions.push double('Question', :id => 1, :seq => 1)
+
+      allow(questionnaire).to receive(:questions).and_return(questions)
+
+      expected_sort = questions.sort_by(&:seq).map(&:id)
+      expect(questionnaire.question_ids_in_order).to eq(expected_sort)
+
+    end
+  end
+
 end

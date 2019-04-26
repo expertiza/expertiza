@@ -13,12 +13,14 @@
   let(:review_response_map) { build(:review_response_map, id: 1) }
   let(:assignment_due_date) { build(:assignment_due_date) }
 
+
   before(:each) do
     allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
     allow(participant).to receive(:team).and_return(team)
     stub_current_user(instructor, instructor.role.name, instructor.role)
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(Assignment).to receive(:find).with(1).and_return(assignment)
+
   end
 
 
@@ -69,6 +71,7 @@
 
   describe '#retrieve_pull_request_data' do
     before(:each) do
+      controller.instance_variable_set(:@gitVariable, {})
       controller.instance_variable_set(:@gitVariable[:head_refs], {})
       allow(controller).to receive(:get_pull_request_details).and_return({"data" => {
           "repository" => {
@@ -165,6 +168,7 @@
   describe '#retrieve_check_run_statuses' do
     before(:each) do
       allow(controller).to receive(:get_statuses_for_pull_request).and_return("check_status")
+      controller.instance_variable_set(:@gitVariable, {})
       controller.instance_variable_set(:@gitVariable[:head_refs], "1234" => "qwerty", "5678" => "asdfg")
       controller.instance_variable_set(:@gitVariable[:check_statuses], {})
     end
@@ -309,6 +313,7 @@
 
   describe '#process_github_authors_and_dates' do
     before(:each) do
+      controller.instance_variable_set(:@gitVariable, {})
       controller.instance_variable_set(:@gitVariable[:authors], {})
       controller.instance_variable_set(:@gitVariable[:dates], {})
       controller.instance_variable_set(:@gitVariable[:parsed_data], {})
@@ -454,6 +459,7 @@
 
   describe '#team_statistics' do
     before(:each) do
+      controller.instance_variable_set(:@gitVariable, {})
       controller.instance_variable_set(:@gitVariable[:total_additions], 0)
       controller.instance_variable_set(:@gitVariable[:total_deletions], 0)
       controller.instance_variable_set(:@gitVariable[:total_files_changed], 0)
@@ -521,6 +527,7 @@
 
   describe '#organize_commit_dates' do
     before(:each) do
+      controller.instance_variable_set(:@gitVariable, {})
       controller.instance_variable_set(:@gitVariable[:dates], "2017-04-05" => 1, "2017-04-13" => 1, "2017-04-14" => 1)
       controller.instance_variable_set(:@gitVariable[:parsed_data], "abc" => {"2017-04-14" => 2, "2017-04-13" => 2, "2017-04-05" => 2})
     end

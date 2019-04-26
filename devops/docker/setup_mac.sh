@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd ..
+cd ../..
 
 DIR=`pwd`
 
@@ -8,7 +8,7 @@ DIR=`pwd`
 bash setup.sh
 
 # Go back to docker folder
-cd $DIR/docker/scrubbed_db
+cd $DIR/devops/docker/scrubbed_db
 
 # Checking the scrubbed_db
 
@@ -22,35 +22,38 @@ else
    echo
    exit 0
 fi
-
 # Untar it
 tar -xzf expertiza_scrubbed_db.sql.tar.gz 
 
 cd $DIR
 
 # Get the docker-compose file
-cp ./docker/docker-compose.yml.example docker-compose.yml
+cp ./devops/docker/docker-compose.yml.example docker-compose.yml
 
 # Get the MYSQL_ROOT_PASSWORD
 read -p "Please enter your MYSQL ROOT PASSWORD: " MYSQL_ROOT_PASSWORD
 
-# Update the password in docker-compose
-sed -i "s/.*MYSQL_ROOT_PASSWORD.*/      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD/" docker-compose.yml
+# Update docker-compose with the MYSQL_ROOT_PASSWORD
+sed -i -dummy "s/.*MYSQL_ROOT_PASSWORD.*/      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD/" docker-compose.yml
 
-cd  $DIR/config
+rm -rf docker-compose.yml-dummy
 
-## Modify config/database.yml
+# Modify config/database.yml
+
+cd $DIR/config
 
 # Update database.yml with the MYSQL_ROOT_PASSWORD
-sed -i "s/.*password.*/  password: $MYSQL_ROOT_PASSWORD/" database.yml
+sed -i -dummy "s/.*password.*/  password: $MYSQL_ROOT_PASSWORD/" database.yml
+rm -rf database.yml-dummy
 
 # Update the database.yml with the scrubbed_db
-sed -i "s/.*host.*/  host: scrubbed_db/" database.yml
+sed -i -dummy "s/.*host.*/  host: scrubbed_db/" database.yml
+rm -rf database.yml-dummy
 
 cd $DIR
 
 # Close any docker containers if any
-sudo docker-compose down
+docker-compose down
 
 # Finally docker-compose up in the background
-sudo docker-compose up  &
+docker-compose up  &

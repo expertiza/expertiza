@@ -5,10 +5,31 @@ class StudentTaskController < ApplicationController
     ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student'].include? current_role_name
   end
 
+  def impersonating_as_admin?
+    original_user = session[:original_user]
+    admin_role_ids = Role.where(name:['Administrator','Super-Administrator']).pluck(:id)
+    admin_role_ids.include? original_user.role_id
+  end
+
+  def impersonating_as_ta?
+    original_user = session[:original_user]
+    ta_role = Role.where(name:['Teaching Assistant']).pluck(:id)
+    ta_role.include? original_user.role_id
+  end
+
   def list
     redirect_to(controller: 'eula', action: 'display') if current_user.is_new_user
     session[:user] = User.find_by(id: current_user.id)
     @student_tasks = StudentTask.from_user current_user
+    if session[:impersonate] && !impersonating_as_admin?
+
+      if impersonating_as_ta?
+        ta_course_ids = TaMapping.where(:ta_id => session[:original_user].id).pluck(:course_id)
+        @student_tasks = @student_tasks.select {|t| ta_course_ids.include?t.assignment.course_id }
+      else
+        @student_tasks = @student_tasks.select {|t| session[:original_user].id == t.assignment.course.instructor_id }
+      end
+    end
     @student_tasks.select! {|t| t.assignment.availability_flag }
 
     # #######Tasks and Notifications##################

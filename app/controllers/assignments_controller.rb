@@ -30,21 +30,23 @@ class AssignmentsController < ApplicationController
     if params[:button]
       if @assignment_form.save
         @assignment_form.create_assignment_node
-        exist_assignment = Assignment.find_by_name(@assignment_form.assignment.name)
+        exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
         assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
-        ques_params = assignment_form_params
-        ques_array = ques_params[:assignment_questionnaire]
-        due_array = ques_params[:due_date]
+        if assignment_form_params[:assignment][:directory_path].blank?
+          assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
+        end
+        ques_array = assignment_form_params[:assignment_questionnaire]
+        due_array = assignment_form_params[:due_date]
         ques_array.each do |cur_questionnaire|
           cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
         end
         due_array.each do |cur_due|
           cur_due[:parent_id] = exist_assignment.id.to_s
         end
-        ques_params[:assignment_questionnaire] = ques_array
-        ques_params[:due_date] = due_array
-        @assignment_form.update(ques_params,current_user)
-        aid = Assignment.find_by_name(@assignment_form.assignment.name).id
+        assignment_form_params[:assignment_questionnaire] = ques_array
+        assignment_form_params[:due_date] = due_array
+        @assignment_form.update(assignment_form_params, current_user)
+        aid = Assignment.find_by(name: @assignment_form.assignment.name).id
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
         redirect_to edit_assignment_path aid
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
@@ -127,28 +129,24 @@ class AssignmentsController < ApplicationController
 
   def delete
     begin
-      @assignment_form = AssignmentForm.create_form_object(params[:id])
-      @user = session[:user]
-      id = @user.get_instructor
-      if id != @assignment_form.assignment.instructor_id
-        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "You are not authorized to delete this assignment.", request)
-        raise "You are not authorized to delete this assignment."
+      assignment_form = AssignmentForm.create_form_object(params[:id])
+      user = session[:user]
+      # Issue 1017 - allow instructor to delete assignment created by TA.
+      # FixA : TA can only delete assignment created by itself.
+      # FixB : Instrucor will be able to delete any assignment belonging to his/her courses.
+      if user.role.name == 'Instructor' or (user.role.name == 'Teaching Assistant' and user.id == assignment_form.assignment.instructor_id)
+        assignment_form.delete(params[:force])
+        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Assignment #{assignment_form.assignment.id} was deleted.", request)
+        flash[:success] = 'The assignment was successfully deleted.'
       else
-        @assignment_form.delete(params[:force])
-        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Assignment #{@assignment_form.assignment.id} was deleted.", request)
-        flash[:success] = "The assignment was successfully deleted."
+        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'You are not authorized to delete this assignment.', request)
+        flash[:error] = 'You are not authorized to delete this assignment.'
       end
     rescue StandardError => e
       flash[:error] = e.message
     end
 
     redirect_to list_tree_display_index_path
-  end
-
-  def index
-    set_up_display_options("ASSIGNMENT")
-    @assignments = super(Assignment)
-    # @assignment_pages, @assignments = paginate :assignments, :per_page => 10
   end
 
   def delayed_mailer
@@ -173,8 +171,10 @@ class AssignmentsController < ApplicationController
   end
 
   def delete_delayed_mailer
-    @delayed_job = DelayedJob.find(params[:delayed_job_id])
-    @delayed_job.delete
+    queue = Sidekiq::Queue.new("mailers")
+    queue.each do |job|
+      job.delete if job.jid == params[:delayed_job_id]
+    end
     redirect_to delayed_mailer_assignments_index_path params[:id]
   end
 
@@ -244,10 +244,9 @@ class AssignmentsController < ApplicationController
 
   # helper methods for edit
   def edit_params_setting
-
     @assignment = Assignment.find(params[:id])
-    @num_submissions_round = @assignment.find_due_dates('submission') == nil ? 0 : @assignment.find_due_dates('submission').count
-    @num_reviews_round = @assignment.find_due_dates('review') == nil ? 0 : @assignment.find_due_dates('review').count
+    @num_submissions_round = @assignment.find_due_dates('submission').nil? ? 0 : @assignment.find_due_dates('submission').count
+    @num_reviews_round = @assignment.find_due_dates('review').nil? ? 0 : @assignment.find_due_dates('review').count
 
     @topics = SignUpTopic.where(assignment_id: params[:id])
     @assignment_form = AssignmentForm.create_form_object(params[:id])
@@ -310,8 +309,11 @@ class AssignmentsController < ApplicationController
     if !empty_rubrics_list.empty? && request.original_fullpath == "/assignments/#{@assignment_form.assignment.id}/edit"
       rubrics_needed = needed_rubrics(empty_rubrics_list)
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Rubrics missing for #{@assignment_form.assignment.name}.", request)
-      flash.now[:error] = "You did not specify all the necessary rubrics. You need " + rubrics_needed +
-          " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>."
+      if flash.now[:error] != "Failed to save the assignment: [\"Total weight of rubrics should add up to either 0 or 100%\"]"
+        flash.now[:error] = "You did not specify all the necessary rubrics. You need " + rubrics_needed +
+            " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics" \
+            " <a id='go_to_tabs2' style='color: blue;'>here</a>."
+      end
     end
   end
 
@@ -350,9 +352,7 @@ class AssignmentsController < ApplicationController
 
     @due_date_info = DueDate.find_each(parent_id: params[:id])
 
-    if params[:metareviewAllowed] == "false"
-      DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all
-    end
+    DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all if params[:metareviewAllowed] == "false"
   end
 
   def handle_current_user_timezonepref_nil

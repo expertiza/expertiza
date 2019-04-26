@@ -547,14 +547,12 @@ describe "assignment function" do
           select "ReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           uncheck('dropdown')
           select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-          fill_in 'assignment_form[assignment_questionnaire][][questionnaire_weight]', with: '50'
           fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', with: '50'
         end
         click_button 'Save'
         sleep 1
         questionnaire = get_questionnaire("ReviewQuestionnaire2").first
         expect(questionnaire).to have_attributes(
-          questionnaire_weight: 50,
           notification_limit: 50
         )
       end
@@ -576,13 +574,11 @@ describe "assignment function" do
           select "AuthorFeedbackQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           uncheck('dropdown')
           select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-          fill_in 'assignment_form[assignment_questionnaire][][questionnaire_weight]', with: '50'
           fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', with: '50'
         end
         click_button 'Save'
         questionnaire = get_questionnaire("AuthorFeedbackQuestionnaire2").first
         expect(questionnaire).to have_attributes(
-          questionnaire_weight: 50,
           notification_limit: 50
         )
       end
@@ -594,13 +590,11 @@ describe "assignment function" do
           select "TeammateReviewQuestionnaire2", from: 'assignment_form[assignment_questionnaire][][questionnaire_id]'
           uncheck('dropdown')
           select "Scale", from: 'assignment_form[assignment_questionnaire][][dropdown]'
-          fill_in 'assignment_form[assignment_questionnaire][][questionnaire_weight]', with: '50'
           fill_in 'assignment_form[assignment_questionnaire][][notification_limit]', with: '50'
         end
         click_button 'Save'
         questionnaire = get_questionnaire("TeammateReviewQuestionnaire2").first
         expect(questionnaire).to have_attributes(
-          questionnaire_weight: 50,
           notification_limit: 50
         )
       end
@@ -656,10 +650,10 @@ describe "assignment function" do
       assignment_id = Assignment.where(name: 'participants Assignment').first.id
       visit "/participants/list?id=#{assignment_id}&model=Assignment"
 
-      fill_in 'user_name', with: student.name
-      choose 'user_role_participant'
+      fill_in 'user_name', with: student.name, match: :first
+      choose 'user_role_participant', match: :first
 
-      expect { click_button 'Add'; sleep(1) }.to change { Participant.count }.by 1
+      expect { click_button 'Add', match: :first; sleep(1) }.to change { Participant.count }.by 1
     end
 
     it "should display newly created assignment" do

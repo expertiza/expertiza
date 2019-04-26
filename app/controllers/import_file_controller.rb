@@ -126,7 +126,7 @@ class ImportFileController < ApplicationController
       rescue
         errors << $ERROR_INFO
       end
-    elsif params[:model] == 'SignUpTopic'
+    elsif params[:model] == 'SignUpTopic' || params[:model] == 'SignUpSheet'
       contents_hash = eval(params[:contents_hash])
       if params[:has_header] == 'true'
         @header_integrated_body = hash_rows_with_headers(contents_hash[:header],contents_hash[:body])
@@ -149,7 +149,7 @@ class ImportFileController < ApplicationController
       begin
         @header_integrated_body.each do |row_hash|
           session[:assignment_id] = params[:id]
-          SignUpTopic.import(row_hash, session, params[:id])
+          Object.const_get(params[:model]).import(row_hash, session, params[:id])
         end
       rescue
         errors << $ERROR_INFO

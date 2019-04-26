@@ -32,28 +32,4 @@ class CourseParticipant < Participant
   def path
     Course.find(self.parent_id).path + self.directory_num.to_s + "/"
   end
-
-  # provide export functionality for Assignment Participants
-  def self.export(csv, parent_id, options)
-    where(parent_id: parent_id).find_each do |part|
-      tcsv = []
-      user = part.user
-      tcsv.push(user.name, user.fullname, user.email) if options["personal_details"] == "true"
-      tcsv.push(user.role.name) if options["role"] == "true"
-      tcsv.push(user.parent.name) if options["parent"] == "true"
-      tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review) if options["email_options"] == "true"
-      tcsv.push(part.handle) if options["handle"] == "true"
-      csv << tcsv
-    end
-  end
-
-  def self.export_fields(options)
-    fields = []
-    fields.push("name", "full name", "email") if options["personal_details"] == "true"
-    fields.push("role") if options["role"] == "true"
-    fields.push("parent") if options["parent"] == "true"
-    fields.push("email on submission", "email on review", "email on metareview") if options["email_options"] == "true"
-    fields.push("handle") if options["handle"] == "true"
-    fields
-  end
 end

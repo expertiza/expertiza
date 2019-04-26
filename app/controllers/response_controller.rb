@@ -57,7 +57,8 @@ class ResponseController < ApplicationController
   # Prepare the parameters when student clicks "Edit"
   def edit
     assign_instance_vars
-    get_all_responses
+    @prev = Response.where(map_id: @map.id)
+    @review_scores = @prev.to_a
     if @prev.present?
       @sorted = @review_scores.sort {|m1, m2| m1.version_num.to_i && m2.version_num.to_i ? m2.version_num.to_i <=> m1.version_num.to_i : (m1.version_num ? -1 : 1) }
       @largest_version_num = @sorted[0]
@@ -101,12 +102,16 @@ class ResponseController < ApplicationController
     assign_instance_vars
     set_content(true)
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
-    # Because of the autosave feature and the javascript that sync if two reviewing windows are openned
+    # Because of the autosave feature and the javascript that sync if two reviewing windows are opened
     # The response must be created when the review begin.
     # So do the answers, otherwise the response object can't find the questionnaire when the user hasn't saved his new review and closed the window.
-    # it's unlikely that the response exists, but in case the user refreshes the browser it might have been created.
-    @response = Response.where(map_id: @map.id, round: @current_round.to_i).first
-    @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0) if @response.nil?
+    # A new response has to be created when there hasn't been any reviews done for the current round,
+    # or when there has been a submission after the most recent review in this round.
+    team = AssignmentTeam.find(@map.reviewee_id)
+    @response = Response.where(map_id: @map.id, round: @current_round.to_i).order(updated_at: :desc).first
+    if @response.nil? || team.most_recent_submission.updated_at > @response.updated_at
+      @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
+    end
     questions = sort_questions(@questionnaire.questions)
     init_answers(questions)
     render action: 'response'
@@ -138,7 +143,6 @@ class ResponseController < ApplicationController
     map_id = params[:id]
     map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
     @map = ResponseMap.find(map_id)
-    get_all_responses
     if params[:review][:questionnaire_id]
       @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
       @round = params[:review][:round]
@@ -147,7 +151,9 @@ class ResponseController < ApplicationController
     end
     is_submitted = (params[:isSubmit] == 'Yes')
     was_submitted = false
-    @response = Response.where(map_id: @map.id, round: @round.to_i).first
+    # There could be multiple responses per round, when re-submission is enabled for that round.
+    # Hence we need to pick the latest response.
+    @response = Response.where(map_id: @map.id, round: @round.to_i).order(created_at: :desc).first
     if @response.nil?
       @response = Response.create(
         map_id: @map.id,
@@ -363,14 +369,5 @@ class ResponseController < ApplicationController
       a = Answer.where(response_id: @response.id, question_id: q.id).first
       Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '') if a.nil?
     end
-  end
-
-  def get_all_responses
-    # get all previous versions of responses for the response map.
-    # I guess if we're in the middle of creating a new response, this would be
-    # all 'previous' responses to this new one (which is not yet saved)?
-    @prev = Response.where(map_id: @map.id)
-    # not sure what this is about
-    @review_scores = @prev.to_a
   end
 end

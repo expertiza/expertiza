@@ -71,18 +71,6 @@ class ResponseMap < ActiveRecord::Base
                                  reviewer_id: metareviewer.id, reviewee_id: reviewer.id)
   end
 
-  def self.delete_mappings(mappings, force = nil)
-    failedCount = 0
-    mappings.each do |mapping|
-      begin
-        mapping.delete(force)
-      rescue StandardError
-        failedCount += 1
-      end
-    end
-    failedCount
-  end
-
   def survey?
     false
   end

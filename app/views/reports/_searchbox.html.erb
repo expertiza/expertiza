@@ -29,10 +29,13 @@
     <option value='SummaryByRevieweeAndCriteria' <%= @type== 'SummaryByRevieweeAndCriteria' ? 'selected' : '' %>>
       Comment summary by reviewee (team)
     </option>
-    <option value='Collusion' <%= @type== 'Collusion' ? 'selected' : '' %>>
+    <!--- Collusion report is not supported yet
+    Refer collusion_cycle.rb for more details
+    <option value='Collusion' >
       Potential collusion report
     </option>
-    <option value='AnswerTaggingReport' <%= @type== 'AnswerTaggingReport' ? 'selected' : '' %>>
+    --->
+    <option value='AnswerTaggingReport' >
       Answer tagging report
     </option>
     <% if @assignment.simicheck > -1 %>

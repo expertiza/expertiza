@@ -105,7 +105,7 @@ class AssignmentTeam < Team
   # Import csv file to form teams directly
   def self.import(row, assignment_id, options)
     unless Assignment.find_by(id: assignment_id)
-      raise ImportError, "The assignment with the id \"" + id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
+      raise ImportError, "The assignment with the id \"" + assignment_id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
     end
     @assignment_team = prototype
     Team.import(row, assignment_id, options, @assignment_team)
@@ -171,7 +171,7 @@ class AssignmentTeam < Team
   def submit_hyperlink(hyperlink)
     hyperlink.strip!
     raise 'The hyperlink cannot be empty!' if hyperlink.empty?
-    hyperlink += 'http://' unless hyperlink.start_with?('http://', 'https://')
+    hyperlink = 'http://' + hyperlink unless hyperlink.start_with?('http://', 'https://')
     # If not a valid URL, it will throw an exception
     response_code = Net::HTTP.get_response(URI(hyperlink))
     raise "HTTP status code: #{response_code}" if response_code =~ /[45][0-9]{2}/
@@ -233,5 +233,11 @@ class AssignmentTeam < Team
 
   def received_any_peer_review?
     ResponseMap.where(reviewee_id: self.id, reviewed_object_id: self.parent_id).any?
+  end
+
+  # Returns the most recent submission of the team
+  def most_recent_submission
+    assignment = Assignment.find(self.parent_id)
+    SubmissionRecord.where(team_id: self.id, assignment_id: assignment.id).order(updated_at: :desc).first
   end
 end

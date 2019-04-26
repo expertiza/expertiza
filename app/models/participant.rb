@@ -72,7 +72,7 @@ class Participant < ActiveRecord::Base
 
   def email(pw, home_page)
     user = User.find_by(id: self.user_id)
-    assignment = Assignment.find_by(id: self.assignment_id)
+    assignment = Assignment.find_by(id: self.assignment.id)
 
     Mailer.sync_message(
       recipients: user.email,
@@ -88,23 +88,8 @@ class Participant < ActiveRecord::Base
   end
 
   # Return scores that this participant for the given questions
-  def scores(questions)
-    scores = {}
-    scores[:participant] = self
-    self.assignment.questionnaires.each do |questionnaire|
-      round = AssignmentQuestionnaire.find_by(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id).used_in_round
-      questionnaire_symbol = if round
-                               (questionnaire.symbol.to_s + round.to_s).to_sym
-                             else
-                               questionnaire.symbol
-                             end
-      scores[questionnaire_symbol] = {}
-      scores[questionnaire_symbol][:assessments] = questionnaire.get_assessments_for(self)
-      scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
-    end
-    scores[:total_score] = assignment.compute_total_score(scores)
-    scores
-  end
+  # Implemented in assignment_participant.rb
+  def scores(questions); end
 
   # Authorizations are paricipant, reader, reviewer, submitter (They are not store in Participant table.)
   # Permissions are can_submit, can_review, can_take_quiz.
@@ -143,5 +128,29 @@ class Participant < ActiveRecord::Base
     participants.each {|p| users << p.user }
     users.sort! {|a, b| a.name.downcase <=> b.name.downcase } # Sort the users based on the name
     participants.sort_by {|p| users.map(&:id).index(p.user_id) }
+  end
+
+  # provide export functionality for Assignment Participants and Course Participants
+  def self.export(csv, parent_id, options)
+    where(parent_id: parent_id).find_each do |part|
+      tcsv = []
+      user = part.user
+      tcsv.push(user.name, user.fullname, user.email) if options["personal_details"] == "true"
+      tcsv.push(user.role.name) if options["role"] == "true"
+      tcsv.push(user.parent.name) if options["parent"] == "true"
+      tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review) if options["email_options"] == "true"
+      tcsv.push(part.handle) if options["handle"] == "true"
+      csv << tcsv
+    end
+  end
+
+  def self.export_fields(options)
+    fields = []
+    fields.push("name", "full name", "email") if options["personal_details"] == "true"
+    fields.push("role") if options["role"] == "true"
+    fields.push("parent") if options["parent"] == "true"
+    fields.push("email on submission", "email on review", "email on metareview") if options["email_options"] == "true"
+    fields.push("handle") if options["handle"] == "true"
+    fields
   end
 end

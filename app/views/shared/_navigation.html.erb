@@ -20,9 +20,8 @@
 
       <ul class="nav navbar-nav navbar-right">
         <% if current_user %>
-            <li class="impersonate-box">
-              <span id="impersonate-user-info">User: <%= current_user.name(session[:ip]) %></span>
-              <% if session[:super_user] %>
+            <% if session[:super_user] %>
+                <li class="impersonate-box">
                   <%= form_for :impersonate, url: '/impersonate/impersonate', html: {id: 'impersonate-form'} do |f| %>
                       <div class="input-group">
                         <%= f.text_field :name, {id: 'inputImpersonateBox', class: 'form-control', placeholder: "impersonate..."} %>
@@ -31,7 +30,16 @@
                         </span>
                       </div>
                   <% end %>
-              <% end %>
+                </li>
+            <% end %>
+            <% if User.anonymized_view?(session[:ip]) %>
+                <li id="anonymized-view">
+                  <%= image_tag "spy.png", height: '40'%>
+                  <span>Anonymized View <a href="/users/set_anonymized_view"><%= image_tag "close.png", height: '20'%></a></span>
+                </li>
+            <% end %>
+            <li id="user-label">
+              <span >User: <%= current_user.name(session[:ip]) %></span>
             </li>
             <li class="divider-vertical"></li>
             <li class="right-most logout-box">

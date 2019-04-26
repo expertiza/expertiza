@@ -1,0 +1,65 @@
+<style>
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th, td {
+    text-align: center;
+  }
+
+  td.topic {
+    display:inline-block;
+    margin-top: -1px;
+    white-space:nowrap;
+    position:relative; /* must be relative */
+    width:250px; /* fit to table cell width */
+    overflow:hidden;
+  }
+</style>
+
+<script>
+    $(function() {
+        /*Function for sorting the table */
+        $(".sortable").tablesorter({
+            sortList: [[0,0]] // sort by Student name
+        });
+    });
+</script>
+
+<table class="table table-striped sortable">
+  <thead>
+    <tr>
+      <th rowspan=2 width="320" class="sorter-true">Students</th>
+      <% @assignments.each do |assignment| %>
+        <th colspan=3 class="sorter-false"> <%= assignment.name %> </th>
+      <% end %>
+      <th colspan=2>Final Grades</th>
+    </tr>
+    <tr>
+      <% (1..@assignments.size).each do %>
+        <th><b>Topic</b></th>
+        <th><b>Peer Score</b></th>
+        <th><b>Instructor Grade</b></th>
+    <% end %>
+      <th class="sorter-true"><b>Total Instructor Grade</b></th>
+    </tr>
+  </thead>
+
+  <% @course_participants.each do |cp|%>
+      <tr>
+          <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
+          <% @assignments.each do |assignment|%>
+              <% topic = format_topic(@topics[cp.id][assignment.id]) %>
+              <td title="<%= topic %>" class="topic topic-tooltip">
+                <%= topic %>
+              </td>
+              <td><%= format_score(@peer_review_scores[cp.id][assignment.id]) %></td>
+              <td><%= format_score(@assignment_grades[cp.id][assignment.id]) %> </td>
+          <% end %>
+
+          <td><%= @final_grades[cp.id] %></td>
+      </tr>
+  <% end %>
+</table>

@@ -15,7 +15,7 @@ class TeammateReviewResponseMap < ResponseMap
   end
 
   def self.teammate_response_report(id)
-    @reviewers = TeammateReviewResponseMap.select("DISTINCT reviewer_id").where("reviewed_object_id = ?", id)
+    TeammateReviewResponseMap.select("DISTINCT reviewer_id").where("reviewed_object_id = ?", id)
   end
 
   # Send Teammate Review Emails

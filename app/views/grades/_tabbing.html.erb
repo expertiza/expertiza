@@ -1,5 +1,6 @@
-<TR <% if prefix %>id='<%= prefix %>_1' style="display:none; background-color: white;"<% end %>>
-<td COLSPAN="10">
+<!--E1877 div added to properly structure UI-->
+<div <% if prefix %>id='<%= prefix %>_1' style="display:none; background-color: white;position: relative;top: 30px;margin-bottom:30px;"<% end %>>
+<div>
 
   <script>
   $( function() {
@@ -31,5 +32,5 @@
     <%= render :partial => 'statistics_tab', :locals => {:prefix => prefix, :tscore => tscore } %>
   </div>
 </div>
-</td>
-</tr>
+</div>
+</div>

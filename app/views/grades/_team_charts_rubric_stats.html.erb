@@ -15,6 +15,8 @@
     var assignment_name = <%= @assignment_name.to_json.html_safe %>;
     var med_data = <%= @med_data.to_json.html_safe %>;
 
+    if (!sessionStorage.round_name) sessionStorage.round_name = round_names[0]
+
     var source_data = avg_data;
 
     var selected_assignment = 0;
@@ -170,7 +172,8 @@
       <td>
         <div><label>Round:</label></div>
         <div>
-          <%= select_tag('round_selector', options_for_select(@round_names, @round_names[0]), :onchange => 'toggleRound(this);') %>
+          <%= select_tag('round_selector', options_for_select(@round_names, @round_names[0]),
+                         :onchange => 'toggleRound(this);', :autocomplete => 'off') %>
         </div>
       </td>
 
@@ -188,7 +191,8 @@
       <td>
         <div><label>Metric:</label></div>
         <div>
-          <%= select_tag('metric_selector', options_for_select(@metric_names, @metric_names[0]), :onchange => 'toggleMetric(this);') %>
+          <%= select_tag('metric_selector', options_for_select(@metric_names, @metric_names[0]),
+                         :onchange => 'toggleMetric(this);', :autocomplete => 'off') %>
         </div>
       </td>
     </tr>
@@ -203,12 +207,13 @@
         <div><label>Assignment:</label></div>
         <%= select_tag('assignment_selector',
                        options_for_select(@assignment_names_to_compare, @assignment_names_to_compare[0]),
-                       :onchange => 'toggleAssignment(this);') %>
+                       :onchange => 'toggleAssignment(this);', :autocomplete => 'off') %>
       </td>
 
       <td>
         <div><label>Round:</label></div>
-        <%= select_tag('round_selector', options_for_select(@round_names, @round_names[0]), :onchange => 'toggleRound(this);') %>
+        <%= select_tag('round_selector', options_for_select(@round_names, @round_names[0]),
+                       :onchange => 'toggleRound(this);', :autocomplete => 'off') %>
       </td>
 
       <td>

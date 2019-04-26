@@ -69,7 +69,7 @@ class GradesController < ApplicationController
     @round_names = round_names(stats)
     @criteria_names = criteria_names(stats)
 
-    comparable_assignment_stats = @assignment.comparable_assignment_ids.map { |id| AssignmentStats.new(id) }
+    comparable_assignment_stats = @assignment.comparable_assignment_ids.map {|id| AssignmentStats.new(id) }
 
     @assignment_avg_data = comparison_mean_data(comparable_assignment_stats)
     @assignment_names = comparison_assignment_names(comparable_assignment_stats)

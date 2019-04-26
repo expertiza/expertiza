@@ -12,7 +12,7 @@ module ReviewAssignment
 
     # Initialize contributor set with all teams participating in this assignment
     contributor_set = Array.new(contributors)
-  unless reviewer.is_a?(StaffParticipant)
+    unless reviewer.is_a?(StaffParticipant)
       # Reject contributors that have not selected a topic, or have no submissions
       contributor_set = reject_by_no_topic_selection_or_no_submission(contributor_set)
 
@@ -34,7 +34,7 @@ module ReviewAssignment
       # if this assignment does not allow reviewer to review other artifacts on the same topic,
       # remove those teams from candidate list.
       contributor_set = reject_by_same_topic(contributor_set, reviewer) unless self.can_review_same_topic?
-end
+    end
 
     # Add topics for all remaining submissions to a list of available topics for review
     candidate_topics = Set.new
@@ -80,19 +80,17 @@ end
     # the contributors are AssignmentTeam objects
     contributor_set = Array.new(contributors)
 
-    # Reject contributors that have no submissions
-    contributor_set.select!(&:has_submissions?)
-
-    # Filter submissions already reviewed by reviewer
-    contributor_set = reject_previously_reviewed_submissions(contributor_set, reviewer)
-
-    # Filter submission by reviewer him/her self
-    contributor_set = reject_own_submission(contributor_set, reviewer)
-
-    # Filter the contributors with the least number of reviews
-    contributor_set = reject_by_least_reviewed(contributor_set)
-
-    contributor_set = reject_by_max_reviews_per_submission(contributor_set)
+    unless reviewer.is_a?(StaffParticipant)
+      # Reject contributors that have no submissions
+      contributor_set.select!(&:has_submissions?)
+      # Filter submissions already reviewed by reviewer
+      contributor_set = reject_previously_reviewed_submissions(contributor_set, reviewer)
+      # Filter submission by reviewer him/her self
+      contributor_set = reject_own_submission(contributor_set, reviewer)
+      # Filter the contributors with the least number of reviews
+      contributor_set = reject_by_least_reviewed(contributor_set)
+      contributor_set = reject_by_max_reviews_per_submission(contributor_set)
+    end
 
     contributor_set
   end
@@ -169,19 +167,19 @@ end
 
     # 1) Only consider contributors that worked on this topic; 2) remove reviewer as contributor
     # 3) remove contributors that have not submitted work yet
-    contributor_set.reject! do |contributor|
-      signed_up_topic(contributor) != topic || # both will be nil for assignments with no signup sheet
-          contributor.includes?(reviewer) ||
-          !contributor.has_submissions?
+
+    if reviewer.is_a?(StaffParticipant)
+        return contributor_set.sample
+    else
+      contributor_set.reject! do |contributor|
+        signed_up_topic(contributor) != topic || # both will be nil for assignments with no signup sheet
+            contributor.includes?(reviewer) ||
+            !contributor.has_submissions?
+      end
     end
-
-
 
     raise "There are no more submissions to review on this #{work}." if contributor_set.empty?
 
-    if reviewer.is_a?(StaffParticipant)
-      return contributor_set.sample
-    end
 
     # Reviewer can review each contributor only once
     contributor_set.reject! {|contributor| contributor.reviewed_by?(reviewer) }

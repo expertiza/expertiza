@@ -959,24 +959,30 @@ jQuery(document).ready(function () {
     render: function () {
       return (
         <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px' }}>
-          <input
-            data-toggle="tooltip" title="Search by words used in questions that belong to the questionnaires"
-            ref="question_text"
-            type="text"
-            className="form-control"
-            placeholder="Text" />
-          <input
-            data-toggle="tooltip" title="Search for questionnaires that are used in the given course"
-            ref="course"
-            type="text"
-            className="form-control"
-            placeholder="Course" />
-          <input
-            data-toggle="tooltip" title="Search for questionnaires that are used in the given assignment"
-            ref="assignment"
-            type="text"
-            className="form-control"
-            placeholder="Assignment" />
+          <div>
+          	  <p> Text</p>
+	          <input
+	            data-toggle="tooltip" title="Search by words used in questions that belong to the questionnaires"
+	            ref="question_text"
+	            type="text"
+	            className="form-control" />
+          </div>
+          <div>
+          	  <p> Course</p>
+	          <input
+	            data-toggle="tooltip" title="Search for questionnaires that are used in the given course"
+	            ref="course"
+	            type="text"
+	            className="form-control" />
+          </div>
+          <div>
+          	  <p> Assignment</p>
+	          <input
+	            data-toggle="tooltip" title="Search for questionnaires that are used in the given assignment"
+	            ref="assignment"
+	            type="text"
+	            className="form-control" />
+          </div>
         </div>
       );
     }
@@ -1054,42 +1060,54 @@ jQuery(document).ready(function () {
     render: function () {
       return (
         <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(6, auto) 1fr', gridGap: '8px' }}>
-          <input
-            data-toggle="tooltip" title="The username of the person who participated in the assignment"
-            ref="participantName"
-            type="text"
-            className="form-control"
-            placeholder="Assignee (Username)" />
-          <input
-            data-toggle="tooltip" title="The name of the person who participated in the assignment"
-            ref="participantFullname"
-            type="text"
-            className="form-control"
-            placeholder="Assignee (Name)" />
-          <input
-            data-toggle="tooltip" title="Search for assignments that are due on or after given date"
-            ref="dueSince"
-            type="text"
-            className="form-control datepick"
-            placeholder="Due Date After" />
-          <input
-            data-toggle="tooltip" title="Search for assignments that are due on or before given date"
-            ref="dueUntil"
-            type="text"
-            className="form-control datepick"
-            placeholder="Due Date Before" />
-          <input
-            data-toggle="tooltip" title="Search for assignments that were created on or after given date"
-            ref="createdSince"
-            type="text"
-            className="form-control datepick"
-            placeholder="Created After" />
-          <input
-            data-toggle="tooltip" title="Search for assignments that were created on or before given date"
-            ref="createdUntil"
-            type="text"
-            className="form-control datepick"
-            placeholder="Created Before" />
+          <div>
+	          <p> Assignee (Username)</p>
+	          <input
+	            data-toggle="tooltip" title="The username of the person who participated in the assignment"
+	            ref="participantName"
+	            type="text"
+	            className="form-control" />
+          </div>
+          <div>
+	          <p> Assignee (Name)</p>
+	          <input
+	            data-toggle="tooltip" title="The name of the person who participated in the assignment"
+	            ref="participantFullname"
+	            type="text"
+	            className="form-control" />
+          </div>
+          <div>
+	          <p> Due Date After</p>
+	          <input
+	            data-toggle="tooltip" title="Search for assignments that are due on or after given date"
+	            ref="dueSince"
+	            type="text"
+	            className="form-control datepick" />
+	      </div>
+          <div>
+	          <p> Due Date Before</p>
+	          <input
+	            data-toggle="tooltip" title="Search for assignments that are due on or before given date"
+	            ref="dueUntil"
+	            type="text"
+	            className="form-control datepick" />
+	      </div>
+          <div>
+	          <p> Created After</p>
+	          <input
+	            data-toggle="tooltip" title="Search for assignments that were created on or after given date"
+	            ref="createdSince"
+	            type="text"
+	            className="form-control datepick" />
+	      </div>
+          <div>
+	          <p> Created Before</p>
+	          <input
+	            data-toggle="tooltip" title="Search for assignments that were created on or before given date"
+	            ref="createdUntil"
+	            type="text"
+	            className="form-control datepick" />
+	      </div>
         </div>
       );
     }

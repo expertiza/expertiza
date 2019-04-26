@@ -201,7 +201,7 @@ class User < ActiveRecord::Base
     userList = User.where("name = ?", shortName)
     userList.first if !userList.nil? && userList.length == 1
   end
-  
+
   def self.find_by_login(login)
     user = User.find_by(email: login)
     if user.nil? #if the user is empty, find one by the shortname
@@ -237,9 +237,7 @@ class User < ActiveRecord::Base
     # generate the new key pair
     new_key = OpenSSL::PKey::RSA.generate(1024)
     self.public_key = new_key.public_key.to_pem
-
     save
-
     # when replacing an existing key, update any digital signatures made previously with the new key
     if replacing_key
       participants = AssignmentParticipant.where(user_id: self.id)
@@ -250,7 +248,7 @@ class User < ActiveRecord::Base
 
     # return the new private key
     new_key.to_pem
-    end
+  end
 
   def initialize(attributes = nil)
     super(attributes)
@@ -261,6 +259,7 @@ class User < ActiveRecord::Base
     @copy_of_emails = false
   end
 
+  #exports ALL of the users' name, role, parent, email, and handle to a CSV file
   def self.export(csv, _parent_id, options)
     users = User.all
     users.each do |user|
@@ -288,6 +287,8 @@ class User < ActiveRecord::Base
     fields
   end
 
+  #returns the user specified by the params
+  #if user doesn't exist, starts account creation process
   def self.from_params(params)
     user = if params[:user_id]
              User.find(params[:user_id])
@@ -301,6 +302,7 @@ class User < ActiveRecord::Base
     user
   end
 
+  #returns true if the student is a teaching assistant
   def teaching_assistant_for?(student)
     return false unless teaching_assistant?
     return false if student.role.name != 'Student'

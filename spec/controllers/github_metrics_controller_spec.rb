@@ -179,7 +179,7 @@
       expect(controller).to receive(:get_statuses_for_pull_request).with("qwerty")
       expect(controller).to receive(:get_statuses_for_pull_request).with("asdfg")
       controller.retrieve_pull_request_statuses_data
-      expect(controller.instance_variable_get(:@gitVariable))[:check_statuses].to eq("1234" => "check_status",
+      expect(controller.instance_variable_get(:@gitVariable)[:check_statuses]).to eq("1234" => "check_status",
                                                                        "5678" => "check_status")
     end
   end

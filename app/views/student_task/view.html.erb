@@ -19,7 +19,7 @@
   <%if @topics.size > 0 %>
     <% if @authorization == 'participant' || @authorization == 'submitter' %>
       <li>
-        <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.id%>
+        <%= link_to t('signup_sheet'), :controller=>'sign_up_sheet', :action => 'list', :id => @participant.id%>
         <%=t ".signup_topic" %>
       </li>
     <% end %>
@@ -29,7 +29,7 @@ to display the label "Your team" in the student assignment tasks-->
   <%if @assignment.max_team_size > 1 %>
     <% if @authorization == 'participant' %>
       <li>
-        <%= link_to 'Your team', view_student_teams_path(student_id: @participant.id) %>
+        <%= link_to t('.your_team'), view_student_teams_path(student_id: @participant.id) %>
         <%=t ".view_team" %>
       </li>
     <% end %>

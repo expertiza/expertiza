@@ -39,15 +39,10 @@ class GradesController < ApplicationController
   #
   # Changes by Rahul Sethi
   def derived_final_score(avg_self_review_score, actual_score)
-    participant = AssignmentParticipant.find(params[:id])
-    maps = ResponseMap.where(reviewee_id: participant.team.id)
-    ctr = 0
-    maps.each do
-      ctr += 1
-    end
-    final_score_after = (avg_self_review_score + actual_score * (ctr - 1))
-    final_score_after /= ctr
-    final_score_after.round(2)
+    sapa_factor = Math.sqrt(avg_self_review_score / actual_score)
+    final_score_after = sapa_factor * actual_score
+    final_report = final_score_after.round(2).to_s + ' (SRC- ' + avg_self_review_score.to_s + ', SAPA: ' + sapa_factor.round(2).to_s + ')'
+    final_report.to_s
   end
   # Changes end
 

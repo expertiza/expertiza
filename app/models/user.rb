@@ -159,9 +159,9 @@ class User < ActiveRecord::Base
     raise ArgumentError, "Only #{row_hash.length} column(s) is(are) found. It must contain at least username, full name, email." if row_hash.length < 3
     user = User.find_by_name(row_hash[:name])
     if user.nil? #set user info because it does exist currently
-      user = self_import_set_user_info(row_hash, session)
+      user = User.self_import_set_user_info(row_hash, session)
     else #import existing user info
-      user = self_import_user_info(user, row_hash, session)
+      user = User.self_import_user_info(user, row_hash, session)
     end
   end
 
@@ -195,7 +195,7 @@ class User < ActiveRecord::Base
   def self.find_by_login(login)
     user = User.find_by(email: login)
     if user.nil? #if the user is empty, find one by the shortname
-      user = find_by_shortname(login)
+      user = User.find_by_shortname(login)
     end
     return user
   end

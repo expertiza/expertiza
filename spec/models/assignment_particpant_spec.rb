@@ -277,8 +277,8 @@ describe AssignmentParticipant do
       end
     end
 
-    context 'when no user is found by provided username' do
-      context 'when the record has required items' do
+    context 'when no user is found by providesername' do
+      context 'when the record has required itemd us' do
         let(:row) do
           {name: 'no one', fullname: 'no one', email: 'name@email.com'}
         end
@@ -301,7 +301,8 @@ describe AssignmentParticipant do
             allow(Assignment).to receive(:find).with(1).and_return(assignment)
             allow(AssignmentParticipant).to receive(:exists?).with(user_id: 1, parent_id: 1).and_return(false)
             expect(User).to receive(:import).with(any_args)
-            expect(AssignmentParticipant).to receive(:create).with(user_id: 1, parent_id: 1)
+            expect(AssignmentParticipant).to receive(:new).with(user_id: 1, parent_id: 1).and_return(participant)
+            expect(participant).to receive(:set_handle)
             AssignmentParticipant.import(row, nil, 1)
           end
         end

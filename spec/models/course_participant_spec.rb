@@ -58,7 +58,6 @@ describe "CourseParticipant" do
 
         context 'when course found and course participant does not exist' do
           it 'creates a new user and participant' do
-
             allow(Course).to receive(:find_by).with(1).and_return(course)
             allow(CourseParticipant).to receive(:exists?).with(user_id: 1, parent_id: 1).and_return(false)
             expect(User).to receive(:import).with(any_args)

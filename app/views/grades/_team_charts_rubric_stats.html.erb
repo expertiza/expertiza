@@ -15,8 +15,6 @@
     var assignment_name = <%= @assignment_name.to_json.html_safe %>;
     var med_data = <%= @med_data.to_json.html_safe %>;
 
-    if (!sessionStorage.round_name) sessionStorage.round_name = round_names[0]
-
     var source_data = avg_data;
 
     var selected_assignment = 0;

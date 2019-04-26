@@ -20,11 +20,11 @@ class ReviewMappingController < ApplicationController
           'assign_quiz_dynamically',
           'start_self_review'
       true
-    else power_person?
+    else staff?
     end
   end
 
-  def power_person?
+  def staff?
     ['Instructor', 'Teaching Assistant', 'Administrator'].include? current_role_name
   end
 
@@ -91,7 +91,7 @@ class ReviewMappingController < ApplicationController
     reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
 
     #If this is an instructor or TA and they are reviewing an assignment then they may not be a participant yet, we will add them on the fly:
-    if reviewer.nil? and power_person?
+    if reviewer.nil? and staff?
       assignment.add_participant(@current_user.name, false, true, false, true)
       reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
     end
@@ -128,10 +128,10 @@ class ReviewMappingController < ApplicationController
     #   flash[:error] = (e.nil?) ? $! : e
     # end
 
-    if power_person?
+    if staff?
       redirect_to controller: 'assignments', action: 'list_submissions', id: assignment.id
     else
-      redirect_to controller: 'student_review', action: 'list', id: reviewer.id unless power_person?
+      redirect_to controller: 'student_review', action: 'list', id: reviewer.id unless staff?
     end
   end
 

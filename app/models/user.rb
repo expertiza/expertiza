@@ -85,10 +85,7 @@ class User < ActiveRecord::Base
         end
       end
     end
-    reg_name = Regexp.new(search_name)
-    # reg_id = Regexp.new(search_id)
-    reg_fname = Regexp.new(search_fname)
-    reg_email = Regexp.new(search_email)
+    reg_name, reg_fname, reg_email = get_user_regex_values(search_name, search_fname, search_email)
     s = user_list.select do |item|
       reg_name.match(item.name) \
       and reg_fname.match(item.fullname) \
@@ -96,6 +93,14 @@ class User < ActiveRecord::Base
     end
     # and reg_id.match(item.id)
     s.uniq
+  end
+
+  def get_user_regex_values(search_name, search_fname, search_email)
+    reg_name = Regexp.new(search_name)
+    # reg_id = Regexp.new(search_id)
+    reg_fname = Regexp.new(search_fname)
+    reg_email = Regexp.new(search_email)
+    return reg_name, reg_fname, reg_email
   end
 
   # Zhewei: anonymized view for demo purposes - 1/3/2018
@@ -153,18 +158,25 @@ class User < ActiveRecord::Base
   def self.import(row_hash, _row_header, session, id = nil)
     raise ArgumentError, "Only #{row_hash.length} column(s) is(are) found. It must contain at least username, full name, email." if row_hash.length < 3
     user = User.find_by_name(row_hash[:name])
-    if user.nil?
-      attributes = ImportFileHelper.define_attributes(row_hash)
-      user = ImportFileHelper.create_new_user(attributes, session)
-      password = user.reset_password
-      MailerHelper.send_mail_to_user(user, "Your Expertiza account has been created.", "user_welcome", password).deliver
-    else
-      user.email = row_hash[:email]
-      user.fullname = row_hash[:fullname]
-      user.parent_id = (session[:user]).id
-      user.save
+    if user.nil? #set user info because it does exist currently
+      user = self_import_set_user_info(row_hash, session)
+    else #import existing user info
+      user = self_import_user_info(user, row_hash, session)
     end
+  end
 
+  def self_import_set_user_info(row_hash, session)
+    attributes = ImportFileHelper.define_attributes(row_hash)
+    user = ImportFileHelper.create_new_user(attributes, session)
+    password = user.reset_password
+    MailerHelper.send_mail_to_user(user, "Your Expertiza account has been created.", "user_welcome", password).deliver
+  end
+
+  def self_import_user_info(user, row_hash, session)
+    user.email = row_hash[:email]
+    user.fullname = row_hash[:fullname]
+    user.parent_id = (session[:user]).id
+    user.save
   end
 
   def self.yesorno(elt)
@@ -182,13 +194,17 @@ class User < ActiveRecord::Base
   # helper will try to find that User account.
   def self.find_by_login(login)
     user = User.find_by(email: login)
-    if user.nil?
-      items = login.split("@")
-      shortName = items[0]
-      userList = User.where("name = ?", shortName)
-      user = userList.first if !userList.nil? && userList.length == 1
+    if user.nil? #if the user is empty, find one by the shortname
+      user = find_by_shortname(login)
     end
-    user
+    return user
+  end
+
+  def find_by_shortname(login)
+    items = login.split("@")
+    shortName = items[0]
+    userList = User.where("name = ?", shortName)
+    userList.first if !userList.nil? && userList.length == 1
   end
 
   def set_instructor(new_assignment)

@@ -101,7 +101,7 @@ describe 'Integration tests for viewing grades: ', js: true do
       2.times do #round
         5.times do |i|
           4.times do |ii|
-            create(:answers, question: Question.find(i + 1), answer: 90 + ii, response: Response.find(response_id))
+            create(:answers, question: Question.find(i + 1), answer: 1 + ii, response: Response.find(response_id))
             response_id += 1
           end
         end

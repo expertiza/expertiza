@@ -489,7 +489,6 @@ ActiveRecord::Schema.define(version: 20190425194052) do
     t.boolean  "is_submitted",                               default: false
     t.integer  "suggestion_chance_percentage", limit: 4
     t.float    "suggestion_sentiment_score",   limit: 24
-    t.string   "overall_tone",                 limit: 255
   end
 
   add_index "responses", ["map_id"], name: "fk_response_response_map", using: :btree

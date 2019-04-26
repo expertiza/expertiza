@@ -68,7 +68,7 @@ class ImportFileController < ApplicationController
   def import_from_hash(session, params)
     @model = params[:model]
     contents_hash = eval(params[:contents_hash])
-
+    
     if params[:has_header] == "true"
       @header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
     else
@@ -105,62 +105,11 @@ class ImportFileController < ApplicationController
   #
   # E.G. [ { :name => 'jsmith', :fullname => 'John Smith' , :email => 'jsmith@gmail.com' },
   #        { :name => 'jdoe', :fullname => 'Jane Doe', :email => 'jdoe@gmail.com' } ]
-  #
-  # TODO: Eliminate all case statements using import options
   def hash_rows_with_headers(header, body)
     new_body = []
-    if params[:model] == "User" or params[:model] == "AssignmentParticipant" or params[:model] == "CourseParticipant" or params[:model] == "SignUpTopic"
-      header.map! { |column_name| column_name.to_sym }
-      body.each do |row|
-        new_body << header.zip(row).to_h
-      end
-    elsif params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
-      header.map! { |column_name| column_name.to_sym }
-      body.each do |row|
-        h = Hash.new()
-        if params[:has_teamname] == "true_first"
-          h[header[0]] = row.shift
-          h[header[1]] = row
-        elsif params[:has_teamname] == "true_last"
-          h[header[1]] = row.pop
-          h[header[0]] = row
-        else
-          h[header[0]] = row
-        end
-        new_body << h
-      end
-    elsif params[:model] == "ReviewResponseMap"
-      header.map! { |column_name| column_name.to_sym }
-      body.each do |row|
-        h = Hash.new()
-        if params[:has_reviewee] == "true_first"
-          h[header[0]] = row.shift
-          h[header[1]] = row
-        elsif params[:has_reviewee] == "true_last"
-          h[header[1]] = row.pop
-          h[header[0]] = row
-        else
-          h[header[0]] = row
-        end
-        new_body << h
-      end
-    elsif params[:model] == "MetareviewResponseMap"
-      header.map! { |column_name| column_name.to_sym }
-      body.each do |row|
-        h = Hash.new()
-        if params[:has_reviewee] == "true_first"
-          h[header[0]] = row.shift
-          h[header[1]] = row.shift
-          h[header[2]] = row
-        elsif params[:has_reviewee] == "true_last"
-          h[header[2]] = row.pop
-          h[header[1]] = row.pop
-          h[header[0]] = row
-        else
-          h[header[0]] = row
-        end
-        new_body << h
-      end
+    header.map! { |column_name| column_name.to_sym }
+    body.each do |row|
+      new_body << header.zip(row).to_h
     end
     new_body
   end

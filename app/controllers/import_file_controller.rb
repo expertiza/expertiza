@@ -18,30 +18,29 @@ class ImportFileController < ApplicationController
   def show
     @id = params[:id]
     @model = params[:model]
+    @has_header = params[:has_header]
+    @options = params[:options]
+    delimiter = get_delimiter(params)
 
     # All required fields are selected by default
     @selected_fields = @model.constantize.required_import_fields
-
     # Add the chosen optional fields from start
-    @optional_fields = @model.constantize.optional_import_fields(@id)
-    @optional_fields.each do |field, display|
+    optional_fields = @model.constantize.optional_import_fields(@id)
+    optional_fields.each do |field, display|
       if params[field] == "true"
         @selected_fields.store(field, display)
       end
     end
-
     @field_count = @selected_fields.length
-    @options = params[:options]
-    @delimiter = get_delimiter(params)
-    @has_header = params[:has_header]
 
+    # Read the file
     @current_file = params[:file]
-    @current_file_contents = @current_file.read
-    @contents_grid = parse_to_grid(@current_file_contents, @delimiter)
-    @contents_hash = parse_to_hash(@contents_grid, params[:has_header])
+    contents_grid = parse_to_grid(@current_file.read, delimiter)
+    @contents_hash = parse_to_hash(contents_grid, params[:has_header])
   end
 
   def import
+    byebug
     errors = import_from_hash(session, params)
     err_msg = "The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>"
     errors.each do |error|
@@ -65,11 +64,11 @@ class ImportFileController < ApplicationController
   # Also, good way to refactor this in general? Without a header, pass the expected params to the show
   # view. Update the expected columns view in the start page to reflect the optional params.
   def import_from_hash(session, params)
-    @model = params[:model]
+    model = params[:model]
     contents_hash = eval(params[:contents_hash])
-    
+
     if params[:has_header] == "true"
-      @header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
+      header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
     else
       # If there is no header, recover the selected fields in the select* params
       new_header = []
@@ -78,17 +77,18 @@ class ImportFileController < ApplicationController
           new_header << params[p]
         end
       end
-      @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
+      header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
     end
 
     # Call ::import for each row of the file
     errors = []
     begin
-      @header_integrated_body.each do |row_hash|
-        if @model.constantize.import_options.empty?
-          @model.constantize.import(row_hash, session, params[:id])
+      header_integrated_body.each do |row_hash|
+        if model.constantize.import_options.empty?
+          byebug
+          model.constantize.import(row_hash, session, params[:id])
         else
-          @model.constantize.import(row_hash, session, params[:id], params[:options])
+          model.constantize.import(row_hash, session, params[:id], params[:options])
         end
       end
     rescue

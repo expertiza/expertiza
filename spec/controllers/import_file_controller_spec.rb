@@ -46,24 +46,36 @@ describe ImportFileController do
       params = {id: 1, model: 'ReviewResponseMap', title: 'Reviewer Mappings'}
       session = {user: instructor}
       get :start, params, session
-      expect(controller.instance_variable_get(:@id)).to be 1
-      expect(controller.instance_variable_get(:@model)).to be 'ReviewResponseMap'
-      expect(controller.instance_variable_get(:@title)).to be 'Reviewer Mappings'
+      expect(controller.instance_variable_get(:@id)).to eq 1.to_s
+      expect(controller.instance_variable_get(:@model)).to eq 'ReviewResponseMap'
+      expect(controller.instance_variable_get(:@title)).to eq 'Reviewer Mappings'
     end
   end
 
   describe '#show' do
+    let(:file) do
+      'user, First Last, email@site.edu'
+    end
+
     it 'expects show to render' do
       params = {id: 1,
                 model: 'User',
-                title: 'User',
                 delim_type: 'comma',
                 has_header: 'false',
-                file: 'user, First Last, email@site.edu'
+                file: file
                 }
       session = {user: instructor}
+      allow(file).to receive(:read).and_return(file)
       get :show, params, session
       expect(response).to render_template(:show)
+      expect(controller.instance_variable_get(:@id)).to eq 1.to_s
+      expect(controller.instance_variable_get(:@model)).to eq "User"
+      expect(controller.instance_variable_get(:@has_header)).to eq "false"
+      expect(controller.instance_variable_get(:@selected_fields)).to be_truthy
+      expect(controller.instance_variable_get(:@field_count)).to eq 3
+      contents_hash = controller.instance_variable_get(:@contents_hash)
+      expect(contents_hash[:header]).to be_nil
+      expect(contents_hash[:body]).to eq [["user", "First Last", "email@site.edu"]]
     end
   end
 end

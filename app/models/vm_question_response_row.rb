@@ -46,11 +46,16 @@ class VmQuestionResponseRow
   end
 
   def new_derived_score
+    # puts('Self Review Score: ' + @self_review_score_of_row.to_s)
+    # puts('Actual Score: ' + average_score_for_row.to_s)
+    @self_review_score_of_row = 4.0
+    puts(@no_of_columns)
     @self_review_score = ((average_score_for_row * @no_of_columns) - @self_review_score_of_row) / (@no_of_columns - 1)
     @final_score_after = "Self Review Not Enabled"
-    return unless @self_review_score.nan?
-    deviated_score = (100 - (@self_review_score_of_row - @self_review_score).abs) / 100;
+    return if @self_review_score.nan?
+    deviated_score = (100 - (@self_review_score_of_row - @self_review_score).abs) / 100
     @final_score_after = deviated_score * @self_review_score
+    # puts('New Derived Score: ' + @final_score_after.to_s)
     @final_score_after.round(2)
   end
 end

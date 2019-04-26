@@ -36,6 +36,18 @@ class GradesController < ApplicationController
   # an assignment. It lists all participants of an assignment and all the reviews they received.
   # It also gives a final score, which is an average of all the reviews and greatest difference
   # in the scores of all the reviews.
+  def derived_final_score(avg_self_review_score, actual_score)
+    participant = AssignmentParticipant.find(params[:id])
+    maps = ResponseMap.where(reviewee_id: participant.team.id)
+    ctr = 0
+    maps.each do |map|
+      ctr += 1
+    end
+    final_score_after = (avg_self_review_score + actual_score * (ctr - 1))
+    final_score_after = final_score_after / ctr
+    final_score_after.round(2)
+  end
+
   def view
     @assignment = Assignment.find(params[:id])
     questionnaires = @assignment.questionnaires
@@ -70,7 +82,8 @@ class GradesController < ApplicationController
 
     # Changes by Rahul Sethi
     if @assignment.is_selfreview_enabled?
-      @new_derived_scores = @participant.scores(@questions)
+      @self_review_scores = @participant.scores(@questions, true)
+      @new_derived_scores = derived_final_score(Rscore.new(@self_review_scores, :review).my_avg, Rscore.new(@pscore, :review).my_avg)
     end
     # Changes End
 
@@ -95,10 +108,10 @@ class GradesController < ApplicationController
     questionnaires = @assignment.questionnaires
     @questions = retrieve_questions questionnaires, @assignment.id
     @pscore = @participant.scores(@questions)
-
     # Changes by Rahul Sethi
     if @assignment.is_selfreview_enabled?
-      @new_derived_scores = @participant.scores(@questions)
+      @self_review_scores = @participant.scores(@questions, true)
+      @new_derived_scores = derived_final_score(Rscore.new(@self_review_scores, :review).my_avg, Rscore.new(@pscore, :review).my_avg)
     end
     # Changes End
 

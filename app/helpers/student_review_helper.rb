@@ -16,7 +16,7 @@ module StudentReviewHelper
 
   def get_intelligent_review_row(bid, max_team_size = 3)
     row_html = ''
-      row_html = '<tr id="topic_' + topic.id.to_s + '" style="background-color:' + get_topic_bg_color_by_review(bid, max_team_size) + '">'
+      row_html = '<tr id="topic_' + bid.id.to_s + '" style="background-color:' + get_topic_bg_color_by_review(bid, max_team_size) + '">'
     row_html.html_safe
   end
 

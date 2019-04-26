@@ -31,7 +31,6 @@ class ImportFileController < ApplicationController
     end
 
     @field_count = @selected_fields.length
-
     @options = params[:options]
     @delimiter = get_delimiter(params)
     @has_header = params[:has_header]
@@ -149,7 +148,6 @@ class ImportFileController < ApplicationController
     end
     contents_grid
   end
-
 
   def get_delimiter(params)
     delim_type = params[:delim_type]

@@ -45,5 +45,4 @@ describe 'CourseTeam' do
       end
     end
   end
-
 end

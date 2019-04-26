@@ -154,7 +154,6 @@ class User < ActiveRecord::Base
       user.parent_id = (session[:user]).id
       user.save
     end
-
     user
   end
 

@@ -87,14 +87,10 @@ class Questionnaire < ActiveRecord::Base
     errors.add(:name, "Questionnaire names must be unique.") if results.present?
   end
 
-  # A row_hash here is really just a question that gets added to the questionnaire
+  # A row_hash here is a question that gets added to the questionnaire
   #
   # NOTE: Assuming rows have headers :question, :type, :weight, :param
   # in that specific order. Also need advice with string score
-  #
-  # TODO: Use test files to ensure this is working
-  #
-  # At some point, expecting text, type, sequence, size, and break_before
   def self.import(row_hash, session = nil, id)
     raise ArgumentError, "Record does not contain required items." if row_hash.length < self.required_import_fields.length
 
@@ -124,8 +120,6 @@ class Questionnaire < ActiveRecord::Base
         end
       end
     end
-
-    byebug
     q.save!
     questionnaire.questions << q
   end
@@ -153,5 +147,4 @@ class Questionnaire < ActiveRecord::Base
   def self.import_options
     {}
   end
-
 end

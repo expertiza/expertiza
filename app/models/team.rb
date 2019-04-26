@@ -200,7 +200,6 @@ class Team < ActiveRecord::Base
       team.name = name
       team.save
     end
-
     # insert team members into team unless team was pre-existing & we ignore duplicate teams
     team.import_team_members(row_hash) unless team_exists && options[:handle_dups] == "ignore"
   end
@@ -255,6 +254,5 @@ class Team < ActiveRecord::Base
     ExpertizaLogger.info LoggerMessage.new('Model:Team', '', "New TeamNode created with teamname #{team_name}")
     team
   end
-
   # REFACTOR END:: class methods import export moved from course_team & assignment_team to here
 end

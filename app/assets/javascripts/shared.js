@@ -10,9 +10,7 @@ function checkForFile() {
 }
 
 function checkForDuplicates(field_count) {
-
     var val_array = [];
-
     for (var i = 1; i <= field_count; i++) {
         var sel = document.getElementById("select" + (i).toString());
         val_array[i] = sel.options[sel.selectedIndex].value;
@@ -20,7 +18,6 @@ function checkForDuplicates(field_count) {
 
     var sorted_val_array = val_array.slice().sort();
     var has_duplicates = false;
-
     for (var i = 0; i < sorted_val_array.length - 1; i++) {
         if (sorted_val_array[i + 1] == sorted_val_array[i]) {
             has_duplicates = true;

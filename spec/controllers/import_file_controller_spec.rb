@@ -38,9 +38,7 @@ describe ImportFileController do
           expect(controller.send(:action_allowed?)).to be false
         end
       end
-
     end
-
   end
 
   describe '#start' do

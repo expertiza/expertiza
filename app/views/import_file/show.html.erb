@@ -13,7 +13,7 @@
       <thead>
       <tr>
 
-        <% (1..@field_count).each do |i| %>
+        <% (0..@field_count).each do |i| %>
           <th style="text-align:center">
             <%= @contents_hash[:header][i].to_s.capitalize %>
           </th>
@@ -60,6 +60,7 @@
   <%= hidden_field_tag('options', @options) %>
   <%= hidden_field_tag('model', @model) %>
   <%= hidden_field_tag('id', @id) %>
+  <%= hidden_field_tag('has_header', @has_header) %>
 
   <div style="text-align:center">
     <% if @has_header == 'true' %>

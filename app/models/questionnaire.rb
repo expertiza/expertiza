@@ -147,7 +147,7 @@ class Questionnaire < ActiveRecord::Base
   def self.optional_import_fields(id)
     ques = Questionnaire.find(id)
     optional_fields = {"size" => "Size of question",
-     "break_before" => "What is this?"}
+     "break_before" => "Break before"}
 
     if !ques.nil?
       for q in  ques.min_question_score..ques.max_question_score do

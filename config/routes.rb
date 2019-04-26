@@ -497,5 +497,8 @@ resources :institution, except: [:destroy] do
   get ':controller/service.wsdl', action: 'wsdl'
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
   get ':controller(/:action(/:id))(.:format)'
+  get 'assignment/reviewer_options/:id' => 'assignments#reviewer_options'
+  get 'assignment/reviewee_options/:a_id/:r_id' => 'assignments#reviewee_options'
+  get 'sample_reviews/add/:a_id/:reviewer_id/:reviewee_id/:curr_assignment_id' => 'sample_reviews#add'
   match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
 end

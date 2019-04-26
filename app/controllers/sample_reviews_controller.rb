@@ -1,5 +1,5 @@
 class SampleReviewsController < ApplicationController
-  skip_before_action :authorize, only: [:update_visibility, :show, :index]
+  skip_before_action :authorize, only: [:update_visibility, :show, :index, :add]
 
   include ResponseConstants
   include SimilarAssignmentsConstants
@@ -42,6 +42,26 @@ class SampleReviewsController < ApplicationController
     @course_assignment_name = get_course_assignment_name(assignment_id)
   end
 
+  def add
+    assignment_id = params[:a_id];
+    reviewer_user_id = params[:reviewer_id];
+    reviewee_team_id = params[:reviewee_id];
+    current_assignment_id = params[:curr_assignment_id];
+
+    response_map_ids = Response.where(visibility: 2).pluck(:map_id)
+    response_maps_with_distinct_reviewer_id =
+        ResponseMap.where('reviewed_object_id IN (?) AND id IN (?) ',assignment_id,response_map_ids).pluck(:reviewer_id)
+
+
+    sample_review = ResponseMap.where('reviewed_object_id IN (?) AND reviewer_id IN (?) AND reviewee_id IN (?)', assignment_id, response_maps_with_distinct_reviewer_id,reviewee_team_id).pluck(:id)
+
+
+    review = Samplereviewmap.create(response_map_id: sample_review[0], assignment_id: current_assignment_id )
+    review.save
+    render json: {"success" => true}
+  end
+
+
   #Displays list of sample reviews.
   def index
     if redirect_anonymous_user?
@@ -54,15 +74,18 @@ class SampleReviewsController < ApplicationController
       page_number = 0
     end
     @page_size = 8
-    # get all assignment ids that are similar
-    similar_assignment_ids = get_similar_assignment_ids(@assignment_id)
+    # get all response map ids that are marked as sample
+    response_map_ids = Samplereviewmap.where(:assignment_id => @assignment_id).pluck(:response_map_id)
 
     @response_ids = []
     # get all Responses that are samples from this colletion of assignments
-    similar_assignment_ids.each do |id|
+    response_map_ids.each do |id|
       _offset = page_number * @page_size
-      ids = Response.joins("INNER JOIN response_maps ON response_maps.id = responses.map_id WHERE visibility=2 AND reviewed_object_id = "+id.to_s+
-                               " ORDER BY responses.created_at LIMIT "+@page_size.to_s+" OFFSET "+_offset.to_s ).ids
+      #ids = Response.joins("INNER JOIN response_maps ON response_maps.id = responses.map_id WHERE status = 2 and " +
+      #                        " ORDER BY responses.created_at LIMIT "+@page_size.to_s+" OFFSET "+_offset.to_s ).ids
+
+      ids = Response.where(" map_id = " + id.to_s + " and visibility = 2" ).ids
+
       @response_ids += ids
     end
     @links = generate_links(@response_ids)
@@ -93,7 +116,7 @@ class SampleReviewsController < ApplicationController
       is_admin = [Role.administrator.id,Role.superadministrator.id].include? current_user.role.id
       if is_admin
         Response.update(@@response_id.to_i, :visibility => visibility)
-        update_similar_assignment(assignment_id, visibility)
+       # update_similar_assignment(assignment_id, visibility)
         render json:{"success" => true}
         return
       end
@@ -120,7 +143,7 @@ class SampleReviewsController < ApplicationController
         return
       end
       Response.update(@@response_id.to_i, :visibility => visibility)
-      update_similar_assignment(assignment_id, visibility)
+     # update_similar_assignment(assignment_id, visibility)
     rescue StandardError => e
       render json:{"success" => false,"error" => e.message}
     else
@@ -139,7 +162,7 @@ class SampleReviewsController < ApplicationController
                                   :assignment_id => assignment_id})
       end
     end
-    if visibility == _public or visibility == _private
+    if visibility == _selected or visibility == _private
       response_map_ids = ResponseMap.where(:reviewed_object_id => assignment_id).ids
       response_ids = Response.where(:map_id => response_map_ids, :visibility => _selected)
       if response_ids.empty?

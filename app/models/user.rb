@@ -58,6 +58,7 @@ class User < ActiveRecord::Base
     false
   end
 
+  #goes up the chain of parents until one of the cases is met
   def recursively_parent_of(user)
     p = user.parent
     return false if p.nil?
@@ -165,6 +166,7 @@ class User < ActiveRecord::Base
     end
   end
 
+  #initial account setup
   def self_import_set_user_info(row_hash, session)
     attributes = ImportFileHelper.define_attributes(row_hash)
     user = ImportFileHelper.create_new_user(attributes, session)
@@ -172,6 +174,7 @@ class User < ActiveRecord::Base
     MailerHelper.send_mail_to_user(user, "Your Expertiza account has been created.", "user_welcome", password).deliver
   end
 
+  #existing account information
   def self.self_import_user_info(user, row_hash, session)
     user.email = row_hash[:email]
     user.fullname = row_hash[:fullname]

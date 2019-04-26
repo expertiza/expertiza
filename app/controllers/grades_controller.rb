@@ -69,21 +69,10 @@ class GradesController < ApplicationController
     @round_names = round_names(stats)
     @criteria_names = criteria_names(stats)
 
-    @assignment_avg_data = [
-      [
-        [74, 86, 56, 98, 66],
-        [66, 98, 72, 56]
-      ],
-      [
-        [66, 94, 64, 82, 74],
-        [74, 82, 88, 64]
-      ]
-    ]
+    comparable_assignment_stats = @assignment.comparable_assignment_ids.map {|id| AssignmentStats.new(id) }
 
-    @assignment_names = [
-      'OSS project/Writing assignment 2',
-      'Final Project Design Document Fall2015'
-    ]
+    @assignment_avg_data = comparison_mean_data(comparable_assignment_stats)
+    @assignment_names = comparison_assignment_names(comparable_assignment_stats)
   end
 
   def view_my_scores

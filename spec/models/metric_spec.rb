@@ -16,19 +16,19 @@ describe Metric do
   describe '#get_sentiment_text' do
     context 'when avg_sentiment_for_response is -0.4' do
       it 'returns Negative' do
-        expect(metric.get_sentiment_text(-0.4)).to eq("Negative")
+        expect(get_sentiment_text(-0.4)).to eq("Negative")
       end
     end
       
     context 'when avg_sentiment_for_response is 0' do
       it 'returns Neutral' do
-        expect(metric.get_sentiment_text(0)).to eq("Neutral")
+        expect(get_sentiment_text(0)).to eq("Neutral")
       end
     end
 
     context 'when avg_sentiment_for_response is 0.4' do
       it 'returns Positive' do
-        expect(metric.get_sentiment_text(0.4)).to eq("Positive")
+        expect(get_sentiment_text(0.4)).to eq("Positive")
       end
     end
   end

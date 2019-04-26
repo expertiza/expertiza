@@ -15,9 +15,7 @@ class Metric < ActiveRecord::Base
     response_map_list.each do |rm|
       responses += Response.where(map_id: rm.id)    # get response for
     end
-    puts responses #debug print
     #sum up the suggestion chance percentages
-
     sum = 0
     not_nil_count = 0
     responses.each do |r|

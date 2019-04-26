@@ -69,24 +69,9 @@ class ResponseController < ApplicationController
   def create
     was_submitted = false
     save_type = params[:save_type]
-    
-    print("\r\nThe params in the create method are: \r\n")
-    print(params)
-    print("\r\n")
-    
+
     # An AJAX call is made from the response view due to JS implementation
     save_response('create')
-
-    if save_type
-      case save_type
-      when "submit_button"
-        print("\r\n Submit button pressed\r\n")
-      when "save_button"
-        print("\r\n Save button pressed\r\n")
-      when "auto_save_button"
-        print("\r\n Autosave button pressed\r\n")
-      end
-    end
 
   end
 
@@ -118,12 +103,6 @@ class ResponseController < ApplicationController
     render nothing: true unless action_allowed?
     is_submitted = params[:isSubmit].present?
     @save_type = params[:save_type]
-
-    # New change: When Submit is clicked, instead of immediately redirecting...confirm review first
-    print("\r\nThe params in the update are: \r\n")
-    print(params)
-    print("\r\n")
-
     # An AJAX call is made from the response view due to JS implementation
     save_response("update")
 
@@ -167,6 +146,7 @@ class ResponseController < ApplicationController
     req.body = {"reviews"=>@all_comments,
                       "metrics"=>["suggestion", "sentiment"]}.to_json
     http.use_ssl = true
+    @all_comments = [""] if @all_comments.empty?
     begin
       res = http.request(req)
       if (res.code == "200" && res.content_type == "application/json")
@@ -197,58 +177,52 @@ class ResponseController < ApplicationController
       comment = a.comments
       comment.slice! "<p>"
       comment.slice! "</p>"
-      # print comment
       @all_comments.push(comment) unless comment.empty?
     end
 
     # send user review to API for analysis
     @api_response = get_review_response_metrics
 
-    #@response = Response.find_by_id(_params[:id])  #should be there if saved first
-
     #compute average for all response fields in ONE response
     suggestion_chance = 0
     suggestion_sentiment_score = 0
 
     if @api_response
-      puts @api_response["results"].size
       number_of_responses = @api_response["results"].size
-
       0.upto(number_of_responses- 1) do |i|
         suggestion_chance += @api_response["results"][i]["metrics"]["suggestion"]["suggestions_chances"]
         suggestion_sentiment_score += @api_response["results"][i]["metrics"]["sentiment"]["sentiment_score"]
       end
-
       @avg_suggestion_chance_for_response = suggestion_chance/number_of_responses
       @avg_suggestion_chance_for_response = @avg_suggestion_chance_for_response.to_i
       avg_sentiment_score_for_response = suggestion_sentiment_score/number_of_responses
       @sentiment_keyword_for_response = @metric.get_sentiment_text(avg_sentiment_score_for_response) #get text
-
-      puts suggestion_chance.to_s    #debug print
-      puts @avg_sentiment_score_for_response.to_s
-
-      @assignment_suggestion_average = -1;
-
-      # compute average
-      @map = ResponseMap.find(@response.map_id)
-      # below is class avg (suggestion score)for this assignment
-      @assignment_suggestion_average = @metric.suggestion_chance_average(@map.reviewed_object_id) #pass assignment id
-
-      if (@assignment_suggestion_average < 0)     #if no class average found, display current score as average
-        @assignment_suggestion_average = @avg_suggestion_chance_for_response
-      end
-      #display average
-     # submit_response(@assignment_suggestion_average)  # TODO: find suitable place --save in DB moved
-      #render action: "review_confirmation"
+    else
+      # no comments were received - API call is not made
+      @avg_suggestion_chance_for_response = 0;
+      @sentiment_keyword_for_response = @metric.get_sentiment_text(0)
     end
+
+    @assignment_suggestion_average = -1;
+    # compute average
+    @map = ResponseMap.find(@response.map_id)
+    # below is class avg (suggestion score)for this assignment
+    @assignment_suggestion_average = @metric.suggestion_chance_average(@map.reviewed_object_id) #pass assignment id
+
+    if (@assignment_suggestion_average < 0)     #if no class average found, display current score as average
+      @assignment_suggestion_average = @avg_suggestion_chance_for_response
+    end
+    #display average
+   # submit_response(@assignment_suggestion_average)  # TODO: find suitable place --save in DB moved
+    #render action: "review_confirmation"
+
+
     
   end
 
 
 
   def save_response(http_method)
-    print("\r\n Inside the save_response(#{http_method}) method\r\n")
-    
     case http_method
     when "create"
       create_response
@@ -397,18 +371,7 @@ class ResponseController < ApplicationController
         AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
       end
     end
-    # also save response metric:suggestion_chances
-    ##response_metrics = get_review_response_metrics
 
-
-    # suggestion_chance = response_metrics["results"][0]["metrics"]["suggestion"]["suggestions_chances"]
-    # puts suggestion_chance.class
-    # puts suggestion_chance.to_s    #debug print
-    # @response = Response.where(map_id: @map.id).first
-    # @response.update_suggestion_chance(suggestion_chance.round)
-    # @response.suggestion_chance_average(@map.reviewed_object_id)
-
-    print("\r\nThe controller_name variable inside save method is: #{controller_name}\r\n")
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Response was successfully saved")
     redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end

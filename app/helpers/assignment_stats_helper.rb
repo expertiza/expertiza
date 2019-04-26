@@ -18,4 +18,16 @@ module AssignmentStatsHelper
   def round_names(assignment_stats)
     (1..assignment_stats.number_of_rounds).map {|r| "Round #{r}" }
   end
+
+  def comparison_mean_data(assignment_stats_array)
+    data = []
+    assignment_stats_array.each do |as|
+      data << as.rounds.map(&:means)
+    end
+    data
+  end
+
+  def comparison_assignment_names(assignment_stats_array)
+    assignment_stats_array.map(&:name)
+  end
 end

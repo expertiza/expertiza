@@ -172,7 +172,7 @@ class User < ActiveRecord::Base
     MailerHelper.send_mail_to_user(user, "Your Expertiza account has been created.", "user_welcome", password).deliver
   end
 
-  def self_import_user_info(user, row_hash, session)
+  def self.self_import_user_info(user, row_hash, session)
     user.email = row_hash[:email]
     user.fullname = row_hash[:fullname]
     user.parent_id = (session[:user]).id

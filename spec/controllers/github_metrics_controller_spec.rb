@@ -179,7 +179,7 @@
       expect(controller).to receive(:get_statuses_for_pull_request).with("qwerty")
       expect(controller).to receive(:get_statuses_for_pull_request).with("asdfg")
       controller.retrieve_pull_request_statuses_data
-      expect(controller.instance_variable_get(:@gitVariable[:check_statuses])).to eq({"1234" => "check_status",
+      expect(controller.instance_variable_get(:@gitVariable)).to eq( :check_statuses =>{"1234" => "check_status",
                                                                        "5678" => "check_status"})
     end
   end
@@ -324,12 +324,12 @@
     end
     it 'sets authors and data for GitHub data' do
       controller.process_github_authors_and_dates("author", "date")
-      expect(controller.instance_variable_get(:@gitVariable[:authors])).to eq("author" => 1)
-      expect(controller.instance_variable_get(:@gitVariable[:dates])).to eq("date" => 1)
-      expect(controller.instance_variable_get(:@gitVariable[:parsed_data])).to eq("author" => {"date" => 1})
+      expect(controller.instance_variable_get(:@gitVariable)).to eq(:authors=>{"author" => 1})
+      expect(controller.instance_variable_get(:@gitVariable)).to eq(:dates =>{"date" => 1})
+      expect(controller.instance_variable_get(:@gitVariable)).to eq(:parsed_data=>{"author" => {"date" => 1}})
 
       controller.process_github_authors_and_dates("author", "date")
-      expect(controller.instance_variable_get(:@gitVariable[:parsed_data])).to eq("author" => {"date" => 2})
+      expect(controller.instance_variable_get(:@gitVariable)).to eq(:parsed_data =>{"author" => {"date" => 2}})
     end
   end
 

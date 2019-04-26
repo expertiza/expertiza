@@ -114,7 +114,7 @@ class ResponseController < ApplicationController
     team = AssignmentTeam.find(@map.reviewee_id)
 
     @response = Response.where(map_id: @map.id, round: @current_round.to_i).order(updated_at: :desc).first
-    abort(@response.inspect)
+
     if @response.nil? || (!team.most_recent_submission.nil? && team.most_recent_submission.updated_at > @response.updated_at)
       @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
     end

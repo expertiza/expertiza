@@ -1032,7 +1032,7 @@ jQuery(document).ready(function () {
           timeFormat: 'HH:mm:ss z',
           controlType: 'select',
           timezoneList: [
-            { value: -0o, label: 'GMT' },
+            { value: -000, label: 'GMT' },
             { value: -300, label: 'Eastern' },
             { value: -360, label: 'Central' },
             { value: -420, label: 'Mountain' },

@@ -188,13 +188,7 @@ class UsersController < ApplicationController
     end
     if requested_user.status == "Approved"
       new_user = User.new
-      new_user.name = requested_user.name
-      new_user.role_id = requested_user.role_id
-      new_user.institution_id = requested_user.institution_id
-      new_user.fullname = requested_user.fullname
-      new_user.email = requested_user.email
-      new_user.parent_id = session[:user].id
-      new_user.timezonepref = User.find_by(id: new_user.parent_id).timezonepref
+      new_user = copy_user_data(new_user, requested_user)
       if new_user.save
         password = new_user.reset_password
         # Mail is sent to the user with a new password
@@ -216,6 +210,17 @@ class UsersController < ApplicationController
       end
     end
     redirect_to action: 'list_pending_requested'
+  end
+
+  def copy_user_data(new_user, requested_user)
+    new_user.name = requested_user.name
+    new_user.role_id = requested_user.role_id
+    new_user.institution_id = requested_user.institution_id
+    new_user.fullname = requested_user.fullname
+    new_user.email = requested_user.email
+    new_user.parent_id = session[:user].id
+    new_user.timezonepref = User.find_by(id: new_user.parent_id).timezonepref
+    return new_user
   end
 
   def edit

@@ -135,7 +135,11 @@ module AssignmentHelper
     teams_users = TeamsUser.where(team_id: team.id)
     topic = SignedUpTeam.where(team_id: team.id).first.try :topic
     topic_identifier = topic.try :topic_identifier
-    topic_id = topic.id.to_s
+    if topic.nil?
+      topic_id = topic_identifier
+    else
+      topic_id = topic.id.to_s
+    end
     topic_name = topic.try :topic_name
     users_for_curr_team = []
     participants = []

@@ -179,8 +179,8 @@
       expect(controller).to receive(:get_statuses_for_pull_request).with("qwerty")
       expect(controller).to receive(:get_statuses_for_pull_request).with("asdfg")
       controller.retrieve_pull_request_statuses_data
-      expect(controller.instance_variable_get(:@gitVariable[:check_statuses])).to eq("1234" => "check_status",
-                                                                       "5678" => "check_status")
+      expect(controller.instance_variable_get(:@gitVariable[:check_statuses])).to eq({"1234" => "check_status",
+                                                                       "5678" => "check_status"})
     end
   end
 
@@ -542,8 +542,8 @@
 
     it 'calls organize_commit_dates to sort parsed commits by dates' do
       controller.organize_commit_dates_in_sorted_order
-      expect(controller.instance_variable_get(:@gitVariable[:parsed_data])).to eq("abc" => {"2017-04-05" => 2, "2017-04-13" => 2,
-                                                                              "2017-04-14" => 2})
+      expect(controller.instance_variable_get(:@gitVariable[:parsed_data])).to eq({"abc" => {"2017-04-05" => 2, "2017-04-13" => 2,
+                                                                              "2017-04-14" => 2}})
     end
   end
 end

@@ -217,7 +217,6 @@ describe User do
           expect(user).to receive(:fullname=).with(row[:fullname])
           expect(user).to receive(:parent_id=).with(6)
           expect(user).to receive(:save)
-
           User.import(row,{user: user}, nil)
         end
       end
@@ -229,7 +228,6 @@ describe User do
           expect(User).to receive(:get_new_user).and_return(user)
           expect(user).to receive(:reset_password)
           expect(MailerHelper).to receive_message_chain(:send_mail_to_user, :deliver)
-
           User.import(row, nil, nil)
         end
       end

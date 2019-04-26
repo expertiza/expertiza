@@ -17,7 +17,6 @@ describe SignUpTopic do
         it 'creates a new signup topic' do
           allow(SignUpTopic).to receive_message_chain(:where, :first).and_return(nil)
           expect(SignUpTopic).to receive(:get_new_sign_up_topic).with(any_args)
-
           SignUpTopic.import(row, nil, 1)
         end
       end
@@ -30,7 +29,6 @@ describe SignUpTopic do
           expect(topic).to receive(:topic_identifier=).with("idn")
           expect(topic).to receive(:max_choosers=).with("3")
           expect(topic).to receive(:save)
-
           SignUpTopic.import(row, nil, 1)
         end
       end

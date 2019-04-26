@@ -458,11 +458,15 @@
 
   describe '#team_statistics' do
     before(:each) do
-
-      controller.instance_variable_set(:@gitVariable, :total_additions=>0)
-      controller.instance_variable_set(:@gitVariable, :total_deletions=> 0)
-      controller.instance_variable_set(:@gitVariable, :total_files_changed=> 0)
-      controller.instance_variable_set(:@gitVariable, :total_commits=> 0)
+      controller.instance_variable_set(:@gitVariable, {
+          :total_additions => 0,
+          :total_deletions => 0,
+          :total_commits => 0,
+          :total_files_changed => 0,
+      })
+      # controller.instance_variable_set(:@gitVariable, :total_deletions=> 0)
+      # controller.instance_variable_set(:@gitVariable, :total_files_changed=> 0)
+      # controller.instance_variable_set(:@gitVariable, :total_commits=> 0)
       controller.instance_variable_set(:@gitVariable, :head_refs=>[])
       controller.instance_variable_set(:@gitVariable, :merge_status=> [])
     end

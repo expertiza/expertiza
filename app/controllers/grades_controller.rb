@@ -36,15 +36,6 @@ class GradesController < ApplicationController
   # an assignment. It lists all participants of an assignment and all the reviews they received.
   # It also gives a final score, which is an average of all the reviews and greatest difference
   # in the scores of all the reviews.
-  #
-  # Changes by Rahul Sethi
-  def derived_final_score(avg_self_review_score, actual_score)
-    sapa_factor = Math.sqrt(avg_self_review_score / actual_score)
-    final_score_after = sapa_factor * actual_score
-    final_report = final_score_after.round(2).to_s + ' (SRC- ' + avg_self_review_score.to_s + ', SAPA: ' + sapa_factor.round(2).to_s + ')'
-    final_report.to_s
-  end
-  # Changes end
 
   def view
     @assignment = Assignment.find(params[:id])
@@ -81,7 +72,11 @@ class GradesController < ApplicationController
     # Changes by Rahul Sethi
     if @assignment.is_selfreview_enabled?
       @self_review_scores = @participant.scores(@questions, true)
-      @new_derived_scores = derived_final_score(Rscore.new(@self_review_scores, :review).my_avg, Rscore.new(@pscore, :review).my_avg)
+      avg_self_review_score = Rscore.new(@self_review_scores, :review).my_avg
+      actual_score = Rscore.new(@pscore, :review).my_avg
+      sapa_factor = Math.sqrt(avg_self_review_score / actual_score)
+      final_score_after = sapa_factor * actual_score
+      @new_derived_scores = final_score_after.round(2).to_s + ' (SRC- ' + avg_self_review_score.to_s + ', SAPA: ' + sapa_factor.round(2).to_s + ')'
     end
     # Changes End
 
@@ -109,7 +104,11 @@ class GradesController < ApplicationController
     # Changes by Rahul Sethi
     if @assignment.is_selfreview_enabled?
       @self_review_scores = @participant.scores(@questions, true)
-      @new_derived_scores = derived_final_score(Rscore.new(@self_review_scores, :review).my_avg, Rscore.new(@pscore, :review).my_avg)
+      avg_self_review_score = Rscore.new(@self_review_scores, :review).my_avg
+      actual_score = Rscore.new(@pscore, :review).my_avg
+      sapa_factor = Math.sqrt(avg_self_review_score / actual_score)
+      final_score_after = sapa_factor * actual_score
+      @new_derived_scores = final_score_after.round(2).to_s + ' (SRC- ' + avg_self_review_score.to_s + ', SAPA: ' + sapa_factor.round(2).to_s + ')'
     end
     # Changes End
 

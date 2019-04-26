@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181205201208) do
+ActiveRecord::Schema.define(version: 20190425090248) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -225,6 +225,7 @@ ActiveRecord::Schema.define(version: 20181205201208) do
     t.datetime "updated_at"
     t.boolean  "private",                       default: false, null: false
     t.integer  "institutions_id", limit: 4
+    t.string   "locale",          limit: 255
   end
 
   add_index "courses", ["instructor_id"], name: "fk_course_users", using: :btree
@@ -715,14 +716,14 @@ ActiveRecord::Schema.define(version: 20181205201208) do
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 
   create_table "track_notifications", force: :cascade do |t|
+    t.integer  "notification_id", limit: 4
     t.integer  "user_id",         limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "notification_id", limit: 4, null: false
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
   end
 
-  add_index "track_notifications", ["notification_id"], name: "notification_id", using: :btree
-  add_index "track_notifications", ["user_id"], name: "user_id", using: :btree
+  add_index "track_notifications", ["notification_id"], name: "index_track_notifications_on_notification_id", using: :btree
+  add_index "track_notifications", ["user_id"], name: "index_track_notifications_on_user_id", using: :btree
 
   create_table "tree_folders", force: :cascade do |t|
     t.string  "name",       limit: 255
@@ -754,10 +755,10 @@ ActiveRecord::Schema.define(version: 20181205201208) do
     t.boolean "is_new_user",                                default: true,  null: false
     t.integer "master_permission_granted", limit: 1,        default: 0
     t.string  "handle",                    limit: 255
-    t.text    "digital_certificate",       limit: 16777215
+    t.text    "digital_certificate",       limit: 65535
     t.string  "persistence_token",         limit: 255
     t.string  "timezonepref",              limit: 255
-    t.text    "public_key",                limit: 16777215
+    t.text    "public_key",                limit: 65535
     t.boolean "copy_of_emails",                             default: false
     t.integer "institution_id",            limit: 4
   end
@@ -816,4 +817,6 @@ ActiveRecord::Schema.define(version: 20181205201208) do
   add_foreign_key "tag_prompt_deployments", "tag_prompts"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
+  add_foreign_key "track_notifications", "notifications"
+  add_foreign_key "track_notifications", "users"
 end

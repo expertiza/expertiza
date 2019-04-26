@@ -192,19 +192,19 @@ class User < ActiveRecord::Base
   # locate User based on provided login.
   # If user supplies e-mail or name, the
   # helper will try to find that User account.
+  def self.find_by_shortname(login)
+    items = login.split("@")
+    shortName = items[0]
+    userList = User.where("name = ?", shortName)
+    userList.first if !userList.nil? && userList.length == 1
+  end
+
   def self.find_by_login(login)
     user = User.find_by(email: login)
     if user.nil? #if the user is empty, find one by the shortname
       user = User.find_by_shortname(login)
     end
     return user
-  end
-
-  def find_by_shortname(login)
-    items = login.split("@")
-    shortName = items[0]
-    userList = User.where("name = ?", shortName)
-    userList.first if !userList.nil? && userList.length == 1
   end
 
   def set_instructor(new_assignment)

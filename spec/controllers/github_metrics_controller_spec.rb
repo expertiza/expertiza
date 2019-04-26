@@ -324,12 +324,12 @@
     end
     it 'sets authors and data for GitHub data' do
       controller.process_github_authors_and_dates("author", "date")
-      expect(controller.instance_variable_get(:@gitVariable)).to eq(:authors=>{"author" => 1})
-      expect(controller.instance_variable_get(:@gitVariable)).to eq(:dates =>{"date" => 1})
-      expect(controller.instance_variable_get(:@gitVariable)).to eq(:parsed_data=>{"author" => {"date" => 1}})
+      expect(controller.instance_variable_get(:@gitVariable)[:authors]).to eq("author" => 1)
+      expect(controller.instance_variable_get(:@gitVariable)[:dates]).to eq( "date" => 1)
+      expect(controller.instance_variable_get(:@gitVariable)[:parsed_data]).to eq("author" => {"date" => 1})
 
       controller.process_github_authors_and_dates("author", "date")
-      expect(controller.instance_variable_get(:@gitVariable)).to eq(:parsed_data =>{"author" => {"date" => 2}})
+      expect(controller.instance_variable_get(:@gitVariable)[:parsed_data]).to eq( "author" => {"date" => 2})
     end
   end
 
@@ -495,11 +495,11 @@
           }
         }
       )
-      expect(controller.instance_variable_get(:@gitVariable[:total_additions])).to eq(2)
-      expect(controller.instance_variable_get(:@gitVariable[:total_deletions])).to eq(1)
-      expect(controller.instance_variable_get(:@gitVariable[:total_files_changed])).to eq(3)
-      expect(controller.instance_variable_get(:@gitVariable[:total_commits])).to eq(16)
-      expect(controller.instance_variable_get(:@gitVariable[:merge_status])[8]).to eq("MERGED")
+      expect(controller.instance_variable_get(:@gitVariable)[:total_additions]).to eq(2)
+      expect(controller.instance_variable_get(:@gitVariable)[:total_deletions]).to eq(1)
+      expect(controller.instance_variable_get(:@gitVariable)[:total_files_changed]).to eq(3)
+      expect(controller.instance_variable_get(:@gitVariable)[:total_commits]).to eq(16)
+      expect(controller.instance_variable_get(:@gitVariable)[:merge_status][8]).to eq("MERGED")
     end
 
     it 'parses team data from github data for non-merged pull Request' do
@@ -523,11 +523,11 @@
               }
           }
       )
-      expect(controller.instance_variable_get(:@gitVariable[:total_additions])).to eq(2)
-      expect(controller.instance_variable_get(:@gitVariable[:total_deletions])).to eq(1)
-      expect(controller.instance_variable_get(:@gitVariable[:total_files_changed])).to eq(3)
-      expect(controller.instance_variable_get(:@gitVariable[:total_commits])).to eq(16)
-      expect(controller.instance_variable_get(:@gitVariable[:merge_status])[8]).to eq(true)
+      expect(controller.instance_variable_get(:@gitVariable)[:total_additions]).to eq(2)
+      expect(controller.instance_variable_get(:@gitVariable)[:total_deletions]).to eq(1)
+      expect(controller.instance_variable_get(:@gitVariable)[:total_files_changed]).to eq(3)
+      expect(controller.instance_variable_get(:@gitVariable)[:total_commits]).to eq(16)
+      expect(controller.instance_variable_get(:@gitVariable)[:merge_status][8]).to eq(true)
     end
   end
 
@@ -542,7 +542,7 @@
 
     it 'calls organize_commit_dates to sort parsed commits by dates' do
       controller.organize_commit_dates_in_sorted_order
-      expect(controller.instance_variable_get(:@gitVariable[:parsed_data])).to eq({"abc" => {"2017-04-05" => 2, "2017-04-13" => 2,
+      expect(controller.instance_variable_get(:@gitVariable)[:parsed_data]).to eq({"abc" => {"2017-04-05" => 2, "2017-04-13" => 2,
                                                                               "2017-04-14" => 2}})
     end
   end

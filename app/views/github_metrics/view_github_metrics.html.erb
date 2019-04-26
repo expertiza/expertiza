@@ -21,32 +21,32 @@
 </div><br><br>
 
 
-<% if @parsed_data && @authors.present? && @dates %>
+<% if @gitVariable[:parsed_data] && @gitVariable[:authors].present? && @gitVariable[:dates] %>
   <h3>Code frequency</h3>
   <div class="chart-container" style="width: 1000px; height:600px;">
-    <%= display_github_metrics(@parsed_data, @authors, @dates) %>
+    <%= display_github_metrics(@gitVariable[:parsed_data], @gitVariable[:authors], @gitVariable[:dates]) %>
   </div>
   <h3>Team Statistics</h3>
   <ul>
-    <li>Total number of commits:<%= @total_commits %></li>
-    <li>Total number of lines added: <%= @total_additions %></li>
-    <li>Total number of lines removed: <%= @total_deletions %></li>
-    <li>Total number of files changed: <%= @total_files_changed %></li>
+    <li>Total number of commits:<%= @gitVariable[:total_commits] %></li>
+    <li>Total number of lines added: <%= @gitVariable[:total_additions] %></li>
+    <li>Total number of lines removed: <%= @gitVariable[:total_deletions] %></li>
+    <li>Total number of files changed: <%= @gitVariable[:total_files_changed] %></li>
     <li>
       <div>Merge statuses:</div>
       <ul>
-        <% @merge_status.each do |k, v| %>
+        <% @gitVariable[:merge_status].each do |k, v| %>
           <li>Pull Request Number <%= k %> has status: <%= v %> </li>
         <% end %>
       </ul>
     </li>
     <li>
       <span>Check Statuses:</span>
-      <% if @check_statuses.empty? %>
+      <% if @gitVariable[:check_statuses].empty? %>
         <span>NA</span>
       <% else %>
         <ul>
-          <% @check_statuses.each do |pull_number, check_status| %>
+          <% @gitVariable[:check_statuses].each do |pull_number, check_status| %>
             <li>
               <div>Pull request: <%= pull_number %></div>
               <div>Overall Status: <span class=<%= status_classes[check_status["state"]] %>><%= check_status["state"] %></span></div>

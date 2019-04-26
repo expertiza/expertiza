@@ -4,7 +4,7 @@
                                "Last rejoined at" => "20%") %>
     <%@l = -1 %>
 
-    <% @authors.each do |r| %>
+    <% @gitVariable[:authors].each do |r| %>
       <% next unless r %>
       <% if @assignment.varying_rubrics_by_round? %>
         <% get_each_round_review_and_feedback_response_map_for_feedback_report(r) %> 
@@ -137,7 +137,7 @@
                   (<%= @reviewee_name %>)
                 </td>
                 <!--Last rejoined at-->
-                <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td></tr><tr>
+                <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td></tr>
               <% end %>
             <% end %>
           <% end %>

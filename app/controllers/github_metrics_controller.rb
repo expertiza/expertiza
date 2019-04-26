@@ -40,16 +40,20 @@ class GithubMetricsController < ApplicationController
     end
 
     # Variables to store github statistics
-    @head_refs = {}
-    @parsed_data = {}
-    @authors = {}
-    @dates = {}
-    @total_additions = 0
-    @total_deletions = 0
-    @total_commits = 0
-    @total_files_changed = 0
-    @merge_status = {}
-    @check_statuses = {}
+    @gitVariable = {
+        :head_refs => {},
+        :parsed_data => {},
+        :authors => {},
+        :dates => {},
+        :total_additions => 0,
+        :total_deletions => 0,
+        :total_commits => 0,
+        :total_files_changed => 0,
+        :merge_status => {},
+        :check_statuses => {}
+    }
+
+    
 
     @token = session["github_access_token"]
 
@@ -61,8 +65,8 @@ class GithubMetricsController < ApplicationController
     retrieve_github_data
     retrieve_pull_request_statuses_data
 
-    @authors = @authors.keys
-    @dates = @dates.keys.sort
+    @gitVariable[:authors] = @gitVariable[:authors].keys
+    @gitVariable[:dates] = @gitVariable[:dates].keys.sort
   end
 
   # Retrieve github data from hyperlinks provided  by teams.
@@ -94,13 +98,13 @@ class GithubMetricsController < ApplicationController
   # Number of lines of code changed
   # Merge statues
   def get_team_github_statistics(github_data)
-    @total_additions += github_data["data"]["repository"]["pullRequest"]["additions"]
-    @total_deletions += github_data["data"]["repository"]["pullRequest"]["deletions"]
-    @total_files_changed += github_data["data"]["repository"]["pullRequest"]["changedFiles"]
-    @total_commits += github_data["data"]["repository"]["pullRequest"]["commits"]["totalCount"]
+    @gitVariable[:total_additions] += github_data["data"]["repository"]["pullRequest"]["additions"]
+    @gitVariable[:total_deletions] += github_data["data"]["repository"]["pullRequest"]["deletions"]
+    @gitVariable[:total_files_changed] += github_data["data"]["repository"]["pullRequest"]["changedFiles"]
+    @gitVariable[:total_commits] += github_data["data"]["repository"]["pullRequest"]["commits"]["totalCount"]
     pull_request_number = github_data["data"]["repository"]["pullRequest"]["number"]
 
-    @merge_status[pull_request_number] = if github_data["data"]["repository"]["pullRequest"]["merged"]
+    @gitVariable[:merge_status][pull_request_number] = if github_data["data"]["repository"]["pullRequest"]["merged"]
                                            "MERGED"
                                          else
                                            github_data["data"]["repository"]["pullRequest"]["mergeable"]
@@ -109,8 +113,8 @@ class GithubMetricsController < ApplicationController
 
   # This function is used to retrieve data for each pull requests status.
   def retrieve_pull_request_statuses_data
-    @head_refs.each do |pull_number, pr_object|
-      @check_statuses[pull_number] = get_statuses_for_pull_request(pr_object)
+    @gitVariable[:head_refs].each do |pull_number, pr_object|
+      @gitVariable[:check_statuses][pull_number] = get_statuses_for_pull_request(pr_object)
     end
   end
 
@@ -131,7 +135,7 @@ class GithubMetricsController < ApplicationController
       hyperlink_data["repository_name"] = submission_hyperlink_tokens.pop
       hyperlink_data["owner_name"] = submission_hyperlink_tokens.pop
       github_data = get_pull_request_details(hyperlink_data)
-      @head_refs[hyperlink_data["pull_request_number"]] = {
+      @gitVariable[:head_refs][hyperlink_data["pull_request_number"]] = {
           head_commit: github_data["data"]["repository"]["pullRequest"]["headRefOid"],
           owner: hyperlink_data["owner_name"],
           repository: hyperlink_data["repository_name"]
@@ -268,11 +272,11 @@ class GithubMetricsController < ApplicationController
 
   # An auxiliary function to organize authors and their commit dates. Each author has a list of commit dates.
   def process_github_authors_and_dates(author_name, commit_date)
-    @authors[author_name] ||= 1
-    @dates[commit_date] ||= 1
-    @parsed_data[author_name] ||= {}
-    @parsed_data[author_name][commit_date] = if @parsed_data[author_name][commit_date]
-                                               @parsed_data[author_name][commit_date] + 1
+    @gitVariable[:authors][author_name] ||= 1
+    @gitVariable[:dates][commit_date] ||= 1
+    @gitVariable[:parsed_data][author_name] ||= {}
+    @gitVariable[:parsed_data][author_name][commit_date] = if @gitVariable[:parsed_data][author_name][commit_date]
+                                               @gitVariable[:parsed_data][author_name][commit_date] + 1
                                              else
                                                1
                                              end
@@ -280,11 +284,11 @@ class GithubMetricsController < ApplicationController
 
   # An auxiliary function. Sort commit dates for each author to make them in order.
   def organize_commit_dates_in_sorted_order
-    @dates.each_key do |date|
-      @parsed_data.each_value do |commits|
+    @gitVariable[:dates].each_key do |date|
+      @gitVariable[:parsed_data].each_value do |commits|
         commits[date] ||= 0
       end
     end
-    @parsed_data.each {|author, commits| @parsed_data[author] = Hash[commits.sort_by {|date, _commit_count| date }] }
+    @gitVariable[:parsed_data].each {|author, commits| @gitVariable[:parsed_data][author] = Hash[commits.sort_by {|date, _commit_count| date }] }
   end
 end

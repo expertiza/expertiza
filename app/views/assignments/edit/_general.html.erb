@@ -132,16 +132,6 @@ function microtaskChanged() {
     </td>
   </tr>
 
-  <% if current_page?(action: 'edit') %>
-  <!--Topics-->
-  <tr>
-    <td style='padding:5px' id='assignment_has_topics_field'>
-      <%= check_box_tag('assignment_has_topics', 'true', @assignment_form.assignment.topics?, {:onChange => 'topicsChanged()'}) %>
-      <%= label_tag('assignment_has_topics', 'Has topics?') %>
-    </td>
-  </tr>
-  <% end %>
-
   <!--staggered_deadline-->
   <tr>
     <td style='padding:5px' id='assignment_staggered_deadline_field'>
@@ -223,46 +213,6 @@ function microtaskChanged() {
 
 
 <script>
-    <% if current_page?(action: 'edit') %>
-    jQuery(document).ready(function () {
-        // This function determines whether the 'Topics' tab must be displayed when the page is re-loaded
-        var checkbox = jQuery('#assignment_has_topics');
-        if (checkbox.is(':checked')) {
-            // If this checkbox is checked, show the 'Topics' tab
-            jQuery("#topics_tab_header").show();
-        } else {
-            // Otherwise, hide topics tab
-            jQuery("#topics_tab_header").hide();
-        }
-    });
-
-    function topicsChanged() {
-        var msg = 'Warning! Un-checking this box will remove all topics that have been created.';
-        var checkbox = jQuery('#assignment_has_topics');
-        if (checkbox.is(':checked')) {
-            // If this box is checked, display the 'Topics' tab
-            jQuery("#topics_tab_header").show();
-        } else {
-            if (confirm(msg)) {
-                // If this box is un-checked, remove all topics and reload page
-                jQuery.ajax({
-                    url: '/sign_up_sheet/delete_all_topics_for_assignment',
-                    method: 'POST',
-                    data: {
-                        assignment_id: <%= @assignment.id %>
-                    },
-                    success: function() {
-                        // After topics are deleted, re-load page
-                        window.location.href = '<%= edit_assignment_path(@assignment.id) %>';
-                    }
-                });
-            } else {
-                checkbox.prop('checked', true);
-            }
-        }
-    }
-    <% end %>
-
     function hasTeamsChanged() {
       var msg = 'Warning! Unchecking this box will hide teams that already exist.';
         var checkbox = jQuery('#team_assignment');

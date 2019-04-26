@@ -258,7 +258,7 @@
                 'TeammateReviewQuestionnaire'].forEach(function(item){
                 removeQuestionnaireTableRow(item);
             });
-          <% for i in 1..@assignment_form.assignment.rounds_of_reviews %>
+          <% 1.upto(@assignment_form.assignment.rounds_of_reviews) do |i| %>
           addQuestionnaireTableRow(
               'ReviewQuestionnaire',
               <%=i%>,

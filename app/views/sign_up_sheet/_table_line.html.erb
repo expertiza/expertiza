@@ -31,7 +31,6 @@
             html += '<td align="center"><input name="assignment_form[topic_questionnaire][][used_in_round]" style="width:30px" type="hidden" value="' +
                 round_no + '"> </td>';
         }
-        //i++;
         questionnaire_table1.last().after(html);
         jQuery('#t_id').val(questionnaire.id).attr('id', '');
     }
@@ -54,9 +53,8 @@
       <table id = <%=table_id %>>
         <tr>
           <script>
-              //page_name = "./assignment/edit.html.erb";
               <% if @assignment.varying_rubrics_by_round? %>
-                <% for round in 1..@assignment.rounds_of_reviews %>
+                <% 1.upto(@assignment.rounds_of_reviews) do |round| %>
               addQuestionnaireTableRowInTopics('ReviewQuestionnaire', <%= round %>, <%= i %>,
                     <%= questionnaire(@assignment, 'ReviewQuestionnaire', round, topic.id).to_json.html_safe %>,
                     <%= questionnaire_options('ReviewQuestionnaire').to_json.html_safe %>);

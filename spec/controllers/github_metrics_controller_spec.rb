@@ -72,7 +72,7 @@
   describe '#retrieve_pull_request_data' do
     before(:each) do
       controller.instance_variable_set(:@gitVariable, {})
-      controller.instance_variable_set(:@gitVariable[:head_refs], {})
+      controller.instance_variable_set(:@gitVariable,:head_refs=> {})
       allow(controller).to receive(:get_pull_request_details).and_return({"data" => {
           "repository" => {
               "pullRequest" => {
@@ -169,8 +169,8 @@
     before(:each) do
       allow(controller).to receive(:get_statuses_for_pull_request).and_return("check_status")
       controller.instance_variable_set(:@gitVariable, {})
-      controller.instance_variable_set(:@gitVariable[:head_refs], "1234" => "qwerty", "5678" => "asdfg")
-      controller.instance_variable_set(:@gitVariable[:check_statuses], {})
+      controller.instance_variable_set(:@gitVariable,:head_refs => { "1234" => "qwerty", "5678" => "asdfg"})
+      controller.instance_variable_set(:@gitVariable,:check_statuses => {})
     end
 
     it 'gets and stores the statuses associated with head commits of PRs' do
@@ -314,9 +314,9 @@
   describe '#process_github_authors_and_dates' do
     before(:each) do
       controller.instance_variable_set(:@gitVariable, {})
-      controller.instance_variable_set(:@gitVariable[:authors], {})
-      controller.instance_variable_set(:@gitVariable[:dates], {})
-      controller.instance_variable_set(:@gitVariable[:parsed_data], {})
+      controller.instance_variable_set(:@gitVariable, :authors=> {})
+      controller.instance_variable_set(:@gitVariable, :dates=> {})
+      controller.instance_variable_set(:@gitVariable, :parsed_data=> {})
     end
     it 'sets authors and data for GitHub data' do
       controller.process_github_authors_and_dates("author", "date")
@@ -460,12 +460,12 @@
   describe '#team_statistics' do
     before(:each) do
       controller.instance_variable_set(:@gitVariable, {})
-      controller.instance_variable_set(:@gitVariable[:total_additions], 0)
-      controller.instance_variable_set(:@gitVariable[:total_deletions], 0)
-      controller.instance_variable_set(:@gitVariable[:total_files_changed], 0)
-      controller.instance_variable_set(:@gitVariable[:total_commits], 0)
-      controller.instance_variable_set(:@gitVariable[:head_refs], [])
-      controller.instance_variable_set(:@gitVariable[:merge_status], [])
+      controller.instance_variable_set(:@gitVariable, :total_additions=>0)
+      controller.instance_variable_set(:@gitVariable, :total_deletions=> 0)
+      controller.instance_variable_set(:@gitVariable, :total_files_changed=> 0)
+      controller.instance_variable_set(:@gitVariable, :total_commits=> 0)
+      controller.instance_variable_set(:@gitVariable, :head_refs=>[])
+      controller.instance_variable_set(:@gitVariable, :merge_status=> [])
     end
 
     it 'parses team data from github data for merged pull Request' do
@@ -528,8 +528,8 @@
   describe '#organize_commit_dates' do
     before(:each) do
       controller.instance_variable_set(:@gitVariable, {})
-      controller.instance_variable_set(:@gitVariable[:dates], "2017-04-05" => 1, "2017-04-13" => 1, "2017-04-14" => 1)
-      controller.instance_variable_set(:@gitVariable[:parsed_data], "abc" => {"2017-04-14" => 2, "2017-04-13" => 2, "2017-04-05" => 2})
+      controller.instance_variable_set(:@gitVariable, :dates => {"2017-04-05" => 1, "2017-04-13" => 1, "2017-04-14" => 1})
+      controller.instance_variable_set(:@gitVariable,:parsed_data => {"abc" => {"2017-04-14" => 2, "2017-04-13" => 2, "2017-04-05" => 2}})
     end
 
     it 'calls organize_commit_dates to sort parsed commits by dates' do

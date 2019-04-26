@@ -54,7 +54,7 @@ class VmQuestionResponse
       instructor_reviews = []
       student_reviews = []
       reviews.each do |review|
-        if Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).is_a?(AssignmentReviewerParticipant)
+        if Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).is_a?(StaffParticipant)
           instructor_reviews << review
         else
           student_reviews << review

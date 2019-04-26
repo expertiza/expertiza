@@ -14,7 +14,7 @@ class StudentReviewController < ApplicationController
     @assignment = @participant.assignment
 
     #If this is an instructor/ta only reviewer, redirect them back to the assignmen
-    redirect_to list_submissions_assignments_path(:id => @assignment.id) if @participant.is_a?(AssignmentReviewerParticipant)
+    redirect_to list_submissions_assignments_path(:id => @assignment.id) if @participant.is_a?(StaffParticipant)
 
     # Find the current phase that the assignment is in.
     @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)

@@ -1,2 +1,0 @@
-class AssignmentReviewerParticipant < AssignmentParticipant
-end

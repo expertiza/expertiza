@@ -1,0 +1,2 @@
+class StaffParticipant < AssignmentParticipant
+end

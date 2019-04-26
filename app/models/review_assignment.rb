@@ -12,7 +12,7 @@ module ReviewAssignment
 
     # Initialize contributor set with all teams participating in this assignment
     contributor_set = Array.new(contributors)
-  unless reviewer.is_a?(AssignmentReviewerParticipant)
+  unless reviewer.is_a?(StaffParticipant)
       # Reject contributors that have not selected a topic, or have no submissions
       contributor_set = reject_by_no_topic_selection_or_no_submission(contributor_set)
 
@@ -179,7 +179,7 @@ end
 
     raise "There are no more submissions to review on this #{work}." if contributor_set.empty?
 
-    if reviewer.is_a?(AssignmentReviewerParticipant)
+    if reviewer.is_a?(StaffParticipant)
       return contributor_set.sample
     end
 

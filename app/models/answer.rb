@@ -17,7 +17,7 @@ class Answer < ActiveRecord::Base
       total_score = 0
       length_of_assessments = assessments.length.to_f
       assessments.each do |assessment|
-        if Participant.find(ResponseMap.find(Response.find(assessment).map_id).reviewer_id).is_a?(AssignmentReviewerParticipant)
+        if Participant.find(ResponseMap.find(Response.find(assessment).map_id).reviewer_id).is_a?(StaffParticipant)
           length_of_assessments -= 1
           next
         end

@@ -304,12 +304,12 @@ class Assignment < ActiveRecord::Base
     raise "The user #{user.name} is already a participant." if participant
 
     if review_only
-      new_part = AssignmentReviewerParticipant.create(parent_id: self.id,
-                                              user_id: user.id,
-                                              permission_granted: user.master_permission_granted,
-                                              can_submit: can_submit,
-                                              can_review: can_review,
-                                              can_take_quiz: can_take_quiz)
+      new_part = StaffParticipant.create(parent_id: self.id,
+                                         user_id: user.id,
+                                         permission_granted: user.master_permission_granted,
+                                         can_submit: can_submit,
+                                         can_review: can_review,
+                                         can_take_quiz: can_take_quiz)
     else
       new_part = AssignmentParticipant.create(parent_id: self.id,
                                               user_id: user.id,

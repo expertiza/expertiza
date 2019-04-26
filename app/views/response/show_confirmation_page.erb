@@ -47,7 +47,7 @@
             <div id="responseBar"></div>
           </div></span></p>
 
-          <p><b>What is the class average?</b><span style="<% if @assignment_suggestion_average > 50 %>color:green<% elif @assignment_suggestion_average == 50 %>color:#ffc519<% else %>color:red<%end%>">
+          <p><b>What is the class average?</b><span style="<% if @assignment_suggestion_average > 50 %>color:green<% elsif @assignment_suggestion_average == 50 %>color:#ffc519<% else %>color:red<%end%>">
             <%=  @assignment_suggestion_average  %>%
             <img src="/assets/info.png" title="On average, the reviews for this assignment by your class had a <%= @assignment_suggestion_average %>% chance of containing a suggestion.">
           <div id="complete">

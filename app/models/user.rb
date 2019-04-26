@@ -85,18 +85,15 @@ class User < ActiveRecord::Base
         end
       end
     end
-
     reg_name = Regexp.new(search_name)
     # reg_id = Regexp.new(search_id)
     reg_fname = Regexp.new(search_fname)
     reg_email = Regexp.new(search_email)
-
     s = user_list.select do |item|
       reg_name.match(item.name) \
       and reg_fname.match(item.fullname) \
       and reg_email.match(item.email)
     end
-
     # and reg_id.match(item.id)
     s.uniq
   end

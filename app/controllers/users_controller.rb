@@ -56,23 +56,17 @@ class UsersController < ApplicationController
     redirect_to :back
   end
 
-  # for displaying the list of users
+  # for displaying the list of users after querying on the parameters supplied by the user.
   def list
     user = session[:user]
-
     search_name = ".*"
     search_fname = ".*"
     search_id = ".*"
     search_email = ".*"
-
     search_name = ".*" + params[:search_name].strip + ".*" if params[:search_name].present?
-
     search_id = ".*" + params[:search_id].strip + ".*" if params[:search_id].present?
-
     search_fname = ".*" + params[:search_fname].strip + ".*" if params[:search_fname].present?
-
     search_email = ".*" + params[:search_email].strip + ".*" if params[:search_email].present?
-
     @users = user.get_user_list search_name, search_id, search_fname, search_email
   end
 
@@ -325,19 +319,15 @@ class UsersController < ApplicationController
   # For filtering the users list with proper search and pagination.
   def paginate_list(users)
     paginate_options = {"1" => 25, "2" => 50, "3" => 100}
-
     # If the above hash does not have a value for the key,
     # it means that we need to show all the users on the page
     #
     # Just a point to remember, when we use pagination, the
     # 'users' variable should be an object, not an array
-
     # The type of condition for the search depends on what the user has selected from the search_by dropdown
     @search_by = params[:search_by]
-
     # search for corresponding users
     # users = User.search_users(role, user_id, letter, @search_by)
-
     # paginate
     users = if paginate_options[@per_page.to_s].nil? # displaying all - no pagination
               User.paginate(page: params[:page], per_page: users.count)

@@ -158,7 +158,11 @@
 <!--Assign the controller variable to use a better name-->
 <% @assignment_names_to_compare = @assignment_names %>
 
-<div id="tab_0_selector">Analyze Assignment | <a href="javascript:void(0);" onclick="switchToTab(1); return false;">Compare Assignments</a></div>
+<% unless @assignment_names_to_compare.length.zero? %>
+  <div id="tab_0_selector">Analyze Assignment | <a href="javascript:void(0);" onclick="switchToTab(1); return false;">Compare Assignments</a></div>
+<% else %>
+  <div id="tab_0_selector">Analyze Assignment | Compare Assignments (none available)</div>
+<% end %>
 <div id="tab_1_selector" style="display:none"><a href="javascript:void(0);" onclick="switchToTab(0); return false;">Analyze Assignment</a> | Compare Assignments</div>
 
 <div id="chart_div"></div>

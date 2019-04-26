@@ -101,6 +101,10 @@ class ResponseController < ApplicationController
   def new
     assign_instance_vars
     set_content(true)
+    if @participant.is_a?(StaffParticipant) and not @force_round.nil?
+      @current_round = @force_round
+    end
+
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
     # Because of the autosave feature and the javascript that sync if two reviewing windows are opened
     # The response must be created when the review begin.
@@ -306,6 +310,7 @@ class ResponseController < ApplicationController
       @feedback = params[:feedback]
       @map = ResponseMap.find(params[:id])
       @modified_object = @map.id
+      @force_round = params[:round]
     end
     @return = params[:return]
   end

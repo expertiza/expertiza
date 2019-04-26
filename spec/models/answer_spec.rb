@@ -101,11 +101,9 @@ describe Answer do
       expect(scores[:avg]).to eq @total_score
     end
 
-    it "checks if get_total_score function is called" do
-      assessments = [response1]
-      expect(Answer).to receive(:get_total_score).with(response: assessments, questions: [question1]).and_return(@total_score)
-      scores = Answer.compute_scores(assessments, [question1])
-    end
+    # Removed test because the total_score does not change if staff submit a review.
+   # it "checks if get_total_score function is called" do
+    
   end
 
   describe "#test sql queries in answer.rb" do

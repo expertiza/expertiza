@@ -1,5 +1,5 @@
 class ScoreView < ActiveRecord::Base
   def readonly?
-    true
+    false
   end
 end

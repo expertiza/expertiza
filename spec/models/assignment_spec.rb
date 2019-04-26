@@ -1,19 +1,19 @@
 describe Assignment do
-  let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
-  let(:instructor) { build(:instructor, id: 6) }
-  let(:student) { build(:student, id: 3, name: 'no one') }
-  let(:review_response_map) { build(:review_response_map, response: [response], reviewer: build(:participant), reviewee: build(:assignment_team)) }
-  let(:teammate_review_response_map) { build(:review_response_map, type: 'TeammateReviewResponseMap') }
-  let(:participant) { build(:participant, id: 1) }
-  let(:question) { double('Question') }
-  let(:team) { build(:assignment_team, id: 1, name: 'no team') }
-  let(:response) { build(:response) }
-  let(:course) { build(:course) }
+  let(:assignment) {build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team])}
+  let(:instructor) {build(:instructor, id: 6)}
+  let(:student) {build(:student, id: 3, name: 'no one')}
+  let(:review_response_map) {build(:review_response_map, response: [response], reviewer: build(:participant), reviewee: build(:assignment_team))}
+  let(:teammate_review_response_map) {build(:review_response_map, type: 'TeammateReviewResponseMap')}
+  let(:participant) {build(:participant, id: 1)}
+  let(:question) {double('Question')}
+  let(:team) {build(:assignment_team, id: 1, name: 'no team')}
+  let(:response) {build(:response)}
+  let(:course) {build(:course)}
   let(:assignment_due_date) do
     build(:assignment_due_date, due_at: '2011-11-11 11:11:11', deadline_name: 'Review',
-                                description_url: 'https://expertiza.ncsu.edu/', round: 1)
+          description_url: 'https://expertiza.ncsu.edu/', round: 1)
   end
-  let(:topic_due_date) { build(:topic_due_date, deadline_name: 'Submission', description_url: 'https://github.com/expertiza/expertiza') }
+  let(:topic_due_date) {build(:topic_due_date, deadline_name: 'Submission', description_url: 'https://github.com/expertiza/expertiza')}
 
   describe '.max_outstanding_reviews' do
     it 'returns 2 by default' do
@@ -73,8 +73,8 @@ describe Assignment do
         assignment.num_reviews_allowed = 1
         assignment.num_reviews_required = 2
         expect(assignment.errors[:message]).to eq []
-        expect { assignment.valid_num_review }.to change { assignment.errors[:message] }.from([])
-                                                                                        .to(['Num of reviews required cannot be greater than number of reviews allowed'])
+        expect {assignment.valid_num_review}.to change {assignment.errors[:message]}.from([])
+                                                    .to(['Num of reviews required cannot be greater than number of reviews allowed'])
       end
     end
 
@@ -84,8 +84,8 @@ describe Assignment do
         assignment.num_metareviews_allowed = 1
         assignment.num_metareviews_required = 2
         expect(assignment.errors[:message]).to eq []
-        expect { assignment.valid_num_review }.to change { assignment.errors[:message] }.from([])
-                                                                                        .to(['Number of Meta-Reviews required cannot be greater than number of meta-reviews allowed'])
+        expect {assignment.valid_num_review}.to change {assignment.errors[:message]}.from([])
+                                                    .to(['Number of Meta-Reviews required cannot be greater than number of meta-reviews allowed'])
       end
     end
   end
@@ -170,7 +170,7 @@ describe Assignment do
       it 'raises an error' do
         assignment.course_id = nil
         assignment.instructor_id = nil
-        expect { assignment.path }.to raise_error('The path cannot be created. The assignment must be associated with either a course or an instructor.')
+        expect {assignment.path}.to raise_error('The path cannot be created. The assignment must be associated with either a course or an instructor.')
       end
     end
 
@@ -248,8 +248,8 @@ describe Assignment do
     context 'when there is at least one review response in current assignment' do
       it 'raises an error messge and current assignment cannot be deleted' do
         allow(review_response_map).to receive(:delete).with(nil)
-                                                      .and_raise('Mysql2::Error: Cannot delete or update a parent row: a foreign key constraint fails')
-        expect { assignment.delete }.to raise_error('There is at least one review response that exists for no assignment.')
+                                          .and_raise('Mysql2::Error: Cannot delete or update a parent row: a foreign key constraint fails')
+        expect {assignment.delete}.to raise_error('There is at least one review response that exists for no assignment.')
       end
     end
 
@@ -257,7 +257,7 @@ describe Assignment do
       it 'raises an error messge and current assignment cannot be deleted' do
         allow(review_response_map).to receive(:delete).with(nil).and_return(true)
         allow(teammate_review_response_map).to receive(:delete).with(nil).and_raise('Something wrong during deletion')
-        expect { assignment.delete }.to raise_error('There is at least one teammate review response that exists for no assignment.')
+        expect {assignment.delete}.to raise_error('There is at least one teammate review response that exists for no assignment.')
       end
     end
 
@@ -297,7 +297,7 @@ describe Assignment do
       it 'raises an error' do
         allow(User).to receive(:find_by).with(name: 'no one').and_return(nil)
         allow_any_instance_of(Assignment).to receive(:url_for).with(controller: 'users', action: 'new').and_return('users/new/1')
-        expect { assignment.add_participant('no one', nil, nil, nil) }.to raise_error(RuntimeError, /a href='users\/new\/1'>create<\/a> the user first/)
+        expect {assignment.add_participant('no one', nil, nil, nil)}.to raise_error(RuntimeError, /a href='users\/new\/1'>create<\/a> the user first/)
       end
     end
 
@@ -305,7 +305,7 @@ describe Assignment do
       it 'raises an error' do
         allow(User).to receive(:find_by).with(name: 'no one').and_return(student)
         allow(AssignmentParticipant).to receive(:find_by).with(parent_id: 1, user_id: 3).and_return(participant)
-        expect { assignment.add_participant('no one', nil, nil, nil) }.to raise_error(RuntimeError, /The user no one is already a participant/)
+        expect {assignment.add_participant('no one', nil, nil, nil)}.to raise_error(RuntimeError, /The user no one is already a participant/)
       end
     end
 
@@ -315,7 +315,7 @@ describe Assignment do
         allow(AssignmentParticipant).to receive(:find_by).with(parent_id: 1, user_id: 3).and_return(nil)
         allow(AssignmentParticipant).to receive(:create).with(parent_id: 1, user_id: 3, permission_granted: 0,
                                                               can_submit: true, can_review: true, can_take_quiz: false).and_return(participant)
-        expect { assignment.add_participant('no one', true, true, false) }.to change { AssignmentParticipant.count }.from(0).to(1)
+        expect {assignment.add_participant('no one', true, true, false)}.to change {AssignmentParticipant.count}.from(0).to(1)
       end
     end
   end
@@ -323,7 +323,7 @@ describe Assignment do
   describe '#create_node' do
     it 'will save node' do
       allow(CourseNode).to receive(:find_by).with(node_object_id: 1).and_return(double('CourseNode', id: 1))
-      expect { assignment.create_node }.to change { AssignmentNode.count }.from(0).to(1)
+      expect {assignment.create_node}.to change {AssignmentNode.count}.from(0).to(1)
       expect(AssignmentNode.first.parent_id).to eq(1)
     end
   end
@@ -346,7 +346,7 @@ describe Assignment do
 
   describe '#current_stage_name' do
     context 'when assignment has staggered deadline' do
-      before(:each) { allow(assignment).to receive(:staggered_deadline?).and_return(true) }
+      before(:each) {allow(assignment).to receive(:staggered_deadline?).and_return(true)}
       context 'topic_id is nil' do
         it 'returns Unknow' do
           expect(assignment.current_stage_name(nil)).to eq('Unknown')
@@ -362,7 +362,7 @@ describe Assignment do
     end
 
     context 'when assignment does not have staggered deadline' do
-      before(:each) { allow(assignment).to receive(:staggered_deadline?).and_return(false) }
+      before(:each) {allow(assignment).to receive(:staggered_deadline?).and_return(false)}
       context "when due date is not equal to 'Finished', due date is not nil and its deadline name is not nil" do
         it 'returns the deadline name of current due date' do
           allow(assignment).to receive(:find_current_stage).with(123).and_return(assignment_due_date)
@@ -395,7 +395,7 @@ describe Assignment do
     end
 
     context 'when current assignment does not have staggered deadline' do
-      before(:each) { allow(assignment).to receive(:staggered_deadline?).and_return(false) }
+      before(:each) {allow(assignment).to receive(:staggered_deadline?).and_return(false)}
       context 'when due date is a TopicDueDate' do
         it 'returns nil' do
           allow(assignment).to receive(:find_current_stage).with(123).and_return(topic_due_date)
@@ -546,4 +546,12 @@ describe Assignment do
       end
     end
   end
+
+  describe '#questionnaire_rounds' do
+    it 'should return rounds for an assignment' do
+      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return(Array.new(3, double('AssignmentQuestionnaire', :used_in_round => 1)))
+      expect(assignment.questionnaire_rounds.size).to eq(3)
+    end
+  end
+
 end

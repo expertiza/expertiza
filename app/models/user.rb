@@ -198,7 +198,7 @@ class User < ActiveRecord::Base
     userList = User.where("name = ?", shortName)
     userList.first if !userList.nil? && userList.length == 1
   end
-
+  
   def self.find_by_login(login)
     user = User.find_by(email: login)
     if user.nil? #if the user is empty, find one by the shortname

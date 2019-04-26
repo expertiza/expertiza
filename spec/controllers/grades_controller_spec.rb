@@ -26,6 +26,7 @@ describe GradesController do
       allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
       allow(Participant).to receive(:where).with(parent_id: 1).and_return([participant])
       allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+      allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_questionnaire])
       allow(assignment).to receive(:late_policy_id).and_return(false)
       allow(assignment).to receive(:calculate_penalty).and_return(false)
     end

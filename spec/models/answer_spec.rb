@@ -1,4 +1,5 @@
 describe Answer do
+  allow(user).to receive(:student?).and_return(true)  
   let(:questionnaire) { create(:questionnaire, id: 1) }
   let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }
   let(:question2) { create(:question, questionnaire: questionnaire, weight: 2, id: 2) }
@@ -7,47 +8,47 @@ describe Answer do
   let!(:answer) { create(:answer, question: question1, response_id: 1) }
 
   describe "# test dependancy between question.rb and answer.rb"
+  
   it { should belong_to(:question) }
 
-# E1927:  These test fail if course staff leave a review since their review do not impact totals.
-#  describe "#test get total score" do
-#    it "returns total score when required conditions are met" do
-      # stub for ScoreView.find_by_sql to revent prevent unit testing sql db queries
-#      allow(ScoreView).to receive(:find_by_sql).and_return([double("scoreview", weighted_score: 20, sum_of_weights: 5, q1_max_question_score: 4)])
-#      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: "1")])
-#      expect(Answer.get_total_score(response: [response_record], questions: [question1])).to eq 100.0
-      # output calculation is (weighted_score / (sum_of_weights * max_question_score)) * 100
-      # 4.0
-#    end
+  describe "#test get total score" do
+    it "returns total score when required conditions are met" do
+     # stub for ScoreView.find_by_sql to revent prevent unit testing sql db queries
+      allow(ScoreView).to receive(:find_by_sql).and_return([double("scoreview", weighted_score: 20, sum_of_weights: 5, q1_max_question_score: 4)])
+      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: "1")])
+      expect(Answer.get_total_score(response: [response_record], questions: [question1])).to eq 100.0
+     # output calculation is (weighted_score / (sum_of_weights * max_question_score)) * 100
+     # 4.0
+    end
 
-#    it "returns total score when one answer is nil for scored question and its weight gets removed from sum_of_weights" do
-#      allow(ScoreView).to receive(:find_by_sql).and_return([double("scoreview", weighted_score: 20, sum_of_weights: 5, q1_max_question_score: 4)])
-#      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
-#      expect(Answer.get_total_score(response: [response_record], questions: [question1])).to be_within(0.01).of(125.0)
-#    end
+    it "returns total score when one answer is nil for scored question and its weight gets removed from sum_of_weights" do
+      allow(ScoreView).to receive(:find_by_sql).and_return([double("scoreview", weighted_score: 20, sum_of_weights: 5, q1_max_question_score: 4)])
+      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
+      expect(Answer.get_total_score(response: [response_record], questions: [question1])).to be_within(0.01).of(125.0)
+    end
 
-#    it "returns -1 when answer is nil for scored question which makes sum of weights = 0" do
-#      allow(ScoreView).to receive(:find_by_sql).and_return([double("scoreview", weighted_score: 20, sum_of_weights: 1, q1_max_question_score: 5)])
-#      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
-#      expect(Answer.get_total_score(response: [response_record], questions: [question1])).to eq -1.0
-#    end
+    it "returns -1 when answer is nil for scored question which makes sum of weights = 0" do
+      allow(ScoreView).to receive(:find_by_sql).and_return([double("scoreview", weighted_score: 20, sum_of_weights: 1, q1_max_question_score: 5)])
+      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
+      expect(Answer.get_total_score(response: [response_record], questions: [question1])).to eq -1.0
+    end
 
- #   it "returns -1 when weighted_score of questionnaireData is nil" do
- #     allow(ScoreView).to receive(:find_by_sql).and_return([double("scoreview", weighted_score: nil, sum_of_weights: 5, q1_max_question_score: 5)])
- #     allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
- #     expect(Answer.get_total_score(response: [response_record], questions: [question1])).to eq -1.0
- #   end
+   it "returns -1 when weighted_score of questionnaireData is nil" do
+     allow(ScoreView).to receive(:find_by_sql).and_return([double("scoreview", weighted_score: nil, sum_of_weights: 5, q1_max_question_score: 5)])
+     allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
+     expect(Answer.get_total_score(response: [response_record], questions: [question1])).to eq -1.0
+   end
 
- #   it "checks if submission_valid? is called" do
- #     allow(ScoreView).to receive(:find_by_sql).and_return([double("scoreview", weighted_score: nil, sum_of_weights: 5, q1_max_question_score: 5)])
- #     allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
- #     expect(Answer).to receive(:submission_valid?)
- #     Answer.get_total_score(response: [response_record], questions: [question1])
- #   end
- # end
+   xit "checks if submission_valid? is called" do
+      allow(ScoreView).to receive(:find_by_sql).and_return([double("scoreview", weighted_score: nil, sum_of_weights: 5, q1_max_question_score: 5)])
+      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
+      expect(Answer).to receive(:submission_valid?)
+      Answer.get_total_score(response: [response_record], questions: [question1])
+    end
+  end
 
   describe "#test compute scores" do
-    let(:response1) { double("respons1") }
+    allow(user).to receive(:student?).and_return(true)
     let(:response2) { double("respons2") }
 
     before(:each) do
@@ -102,12 +103,16 @@ describe Answer do
       expect(scores[:avg]).to eq @total_score
     end
 
-    # E1927: Removed test because the total_score does not change if staff submit a review.
-   # it "checks if get_total_score function is called" do
-    
+   
+    it "checks if get_total_score function is called" do
+      assessments = [response1]
+      expect(Answer).to receive(:get_total_score).with(response: assessments, questions: [question1]).and_return(@total_score)
+      scores = Answer.compute_scores(assessments, [question1])
+    end
   end
 
   describe "#test sql queries in answer.rb" do
+    allow(user).to receive(:student?).and_return(true)
     before(:each) do
       @assignment_id = 1
       @reviewee_id = 1

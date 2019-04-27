@@ -40,7 +40,6 @@ class ImportFileController < ApplicationController
   end
 
   def import
-    byebug
     errors = import_from_hash(session, params)
     err_msg = "The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>"
     errors.each do |error|
@@ -85,7 +84,6 @@ class ImportFileController < ApplicationController
     begin
       header_integrated_body.each do |row_hash|
         if model.constantize.import_options.empty?
-          byebug
           model.constantize.import(row_hash, session, params[:id])
         else
           model.constantize.import(row_hash, session, params[:id], params[:options])

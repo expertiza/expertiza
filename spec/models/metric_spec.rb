@@ -10,7 +10,7 @@ describe Metric do
 
   describe '#suggestion_chance_average' do
     context 'when response suggestion_chance_percentage is nil' do
-      it 'return -1' do
+      it 'returns -1' do
         allow(ResponseMap).to receive(:where).with(:reviewed_object_id: assignment2)).and_return(response_map_list)
         allow(response_map_list).to receive(:where).with(map_id: 2).and_return([response3])
         allow(response3).to receive(:suggestion_chance_percentage).and_return(nil)
@@ -19,7 +19,7 @@ describe Metric do
     end
 
     context 'when response suggestion_chance_percentage is not nil' do
-      it 'return -1' do
+      it 'returns the average suggestion chances' do
           allow(ResponseMap).to receive(:where).with(:reviewed_object_id: assignment1)).and_return(response_map_list)
           allow(response_map_list).to receive(:where).with(map_id: 1).and_return([response1, response2])
           allow(response1).to receive(:suggestion_chance_percentage).and_return(0.3)

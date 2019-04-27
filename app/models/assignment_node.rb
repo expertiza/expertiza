@@ -16,7 +16,6 @@ class AssignmentNode < Node
   #   sortorder: valid strings - asc, desc
   #   user_id: instructor id for assignment
   #   parent_id: course_id if subset
-
   # returns: list of AssignmentNodes based on query
   def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, search = nil)
     if show
@@ -38,8 +37,11 @@ class AssignmentNode < Node
     sortvar ||= 'created_at'
     sortorder ||= 'desc'
     find_conditions = [conditions, values]
+    # Getting the user by user_id
     me = User.find(user_id)
+    # cleaning the parameter code received
     name = search[:name].to_s.strip
+    # saving the parameters into respective variables.
     participant_name = search[:participant_name].to_s.strip
     participant_fullname = search[:participant_fullname].to_s.strip
     due_since = search[:due_since].to_s.strip
@@ -50,27 +52,27 @@ class AssignmentNode < Node
     associations[:assignment] << {participants: :user} if participant_name.present? || participant_fullname.present?
     query = self.includes(associations).where(find_conditions)
     query = query.where('assignments.name LIKE ?', "%#{name}%") if name.present?
-    #due_since parameter supplied by user
+    # due_since parameter supplied by user
     if due_since.present?
       due_since = due_since.to_time.utc.change(hour: 0, min: 0)
       query = query.where('due_dates.due_at >= ?', due_since)
     end
-    #due_until parameter supplied by user
+    # due_until parameter supplied by user
     if due_until.present?
       due_until = due_until.to_time.utc.change(hour: 23, min: 59)
       query = query.where('due_dates.due_at <= ?', due_until)
     end
-    #created parameter supplied by user
+    # created parameter supplied by user
     if created_since.present?
       created_since = created_since.to_time.utc.change(hour: 0, min: 0)
       query = query.where('created_at >= ?', created_since)
     end
-    #created_until parameter supplied by user.
+    # created_until parameter supplied by user.
     if created_until.present?
       created_until = created_until.to_time.utc.change(hour: 23, min: 59)
       query = query.where('created_at <= ?', created_until)
     end
-    #participant_name parameter supplied by user.
+    # participant_name parameter supplied by user.
     if participant_name.present?
       participant_names = User.where('name LIKE ?', "%#{participant_name}%")
                               .select do |user|
@@ -80,7 +82,7 @@ class AssignmentNode < Node
       return [] if participant_names.empty?
       query = query.where(users: {name: participant_names})
     end
-    #participant_fullname parameter supplied by user.
+    # participant_fullname parameter supplied by user.
     if participant_fullname.present?
       participant_names = User.where('fullname LIKE ?', "%#{participant_fullname}%")
                               .select do |user|

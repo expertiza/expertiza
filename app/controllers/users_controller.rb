@@ -59,10 +59,12 @@ class UsersController < ApplicationController
   # for displaying the list of users after querying on the parameters supplied by the user.
   def list
     user = session[:user]
+    #initialising params to default so that is no data is passed by user, these are used.
     search_name = ".*"
     search_fname = ".*"
     search_id = ".*"
     search_email = ".*"
+    #adding the data got from the user
     search_name = ".*" + params[:search_name].strip + ".*" if params[:search_name].present?
     search_id = ".*" + params[:search_id].strip + ".*" if params[:search_id].present?
     search_fname = ".*" + params[:search_fname].strip + ".*" if params[:search_fname].present?

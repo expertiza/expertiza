@@ -130,7 +130,6 @@ module SummaryHelper
             cur_threads << Thread.new do
               summary[reviewee.name][round][q.txt] = summarize_sentences(comments, summary_ws_url) unless comments.empty?
             end
-
             next if text.blank?
             includes_keywords |= comments.any? do |comment|
               comment.include? text
@@ -139,10 +138,12 @@ module SummaryHelper
           self.avg_scores_by_round[reviewee.name][round] = calculate_avg_score_by_round(self.avg_scores_by_criterion[reviewee.name][round], rubric_questions_used)
         end
         self.avg_scores_by_reviewee[reviewee.name] = calculate_avg_score_by_reviewee(self.avg_scores_by_round[reviewee.name], assignment.rounds_of_reviews)
+        #validating the average scores per reviewee
         avg_score = self.avg_scores_by_reviewee[reviewee.name]
         is_valid &= avg_score >= min_score.to_i if min_score.present?
         is_valid &= avg_score <= max_score.to_i if max_score.present?
         is_valid &= includes_keywords if text.present?
+        #concatenating threads if valid.
         if is_valid
           threads.concat cur_threads
         else

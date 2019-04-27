@@ -85,7 +85,9 @@ class User < ActiveRecord::Base
         end
       end
     end
+    # saving the regex values.
     reg_name, reg_fname, reg_email = get_user_regex_values(search_name, search_fname, search_email)
+    # Getting all the users that match the search criteria.
     s = user_list.select do |item|
       reg_name.match(item.name) \
       and reg_fname.match(item.fullname) \
@@ -95,6 +97,7 @@ class User < ActiveRecord::Base
     s.uniq
   end
 
+  # converts to regex values from search parameters.
   def get_user_regex_values(search_name, search_fname, search_email)
     reg_name = Regexp.new(search_name)
     # reg_id = Regexp.new(search_id)

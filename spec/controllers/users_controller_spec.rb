@@ -362,6 +362,15 @@ describe UsersController do
     end
   end
 
+  context "#copy_user_data" do
+    before(:each) do
+      allow(RequestedUser).to receive(:find_by).with(id: "4").and_return(requested_user1)
+      allow(User).to receive(:find_by).with(id: 3).and_return(admin)
+    end
+
+    it ''
+  end
+
   context '#edit' do
     it 'renders users#edit page' do
       allow(User).to receive(:find).with('1').and_return(student1)

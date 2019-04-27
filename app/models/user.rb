@@ -167,11 +167,12 @@ class User < ActiveRecord::Base
   end
 
   #initial account setup
-  def self_import_set_user_info(row_hash, session)
+  def self.self_import_set_user_info(row_hash, session)
     attributes = ImportFileHelper.define_attributes(row_hash)
     user = ImportFileHelper.create_new_user(attributes, session)
     password = user.reset_password
     MailerHelper.send_mail_to_user(user, "Your Expertiza account has been created.", "user_welcome", password).deliver
+    return user
   end
 
   #existing account information

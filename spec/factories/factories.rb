@@ -235,7 +235,6 @@ FactoryBot.define do
     topic_identifier '1'
     micropayment 0
     private_to nil
-    private_to nil
   end
 
   factory :signed_up_team, class: SignedUpTeam do

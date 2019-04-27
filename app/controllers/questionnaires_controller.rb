@@ -109,6 +109,13 @@ class QuestionnairesController < ApplicationController
     redirect_to Questionnaire if @questionnaire.nil?
     session[:return_to] = request.original_url
   end
+	
+  def delete_answers(a,b)
+    for i in b do
+      sql = "DELETE FROM answers WHERE question_id="+i.to_s
+      temp=ActiveRecord::Base.connection.execute(sql)
+    end
+  end
 
   def update
     # If 'Add' or 'Edit/View advice' is clicked, redirect appropriately
@@ -119,7 +126,7 @@ class QuestionnairesController < ApplicationController
 	    question_ids.append(k)
 	  end
      end
-     #delete_answers(params[:id],question_ids)
+     delete_answers(params[:id],question_ids)
      redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]
     elsif params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]

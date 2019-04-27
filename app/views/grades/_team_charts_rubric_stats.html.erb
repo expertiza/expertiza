@@ -1,6 +1,15 @@
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
-
+<script type="text/javascript">
+    // Values set in grades_controller#view
+    var round_names = <%= @round_names.to_json.html_safe %>;
+    var criteria_names = <%= @criteria_names.to_json.html_safe %>;
+    var avg_data = <%= @avg_data.to_json.html_safe %>;
+    var avg_data_to_compare = <%= @assignment_avg_data.to_json.html_safe %>;
+    var assignment_names_to_compare = <%= @assignment_names.to_json.html_safe %>;
+    var assignment_name = <%= @assignment_name.to_json.html_safe %>;
+    var med_data = <%= @med_data.to_json.html_safe %>;
+</script>
 <script type="text/javascript" src="/assets/rubric_stats.js"></script>
 
 <!--Assign the controller variable to use a better name-->

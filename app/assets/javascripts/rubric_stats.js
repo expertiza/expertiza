@@ -4,14 +4,6 @@ google.charts.load('current', {'packages':['corechart']});
 // Set a callback to run when the Google Visualization API is loaded.
 google.charts.setOnLoadCallback(drawSingleChart);
 
-// Values set in grades_controller#view
-var round_names = <%= @round_names.to_json.html_safe %>;
-var criteria_names = <%= @criteria_names.to_json.html_safe %>;
-var avg_data = <%= @avg_data.to_json.html_safe %>;
-var avg_data_to_compare = <%= @assignment_avg_data.to_json.html_safe %>;
-var assignment_names_to_compare = <%= @assignment_names.to_json.html_safe %>;
-var assignment_name = <%= @assignment_name.to_json.html_safe %>;
-var med_data = <%= @med_data.to_json.html_safe %>;
 
 var source_data = avg_data;
 

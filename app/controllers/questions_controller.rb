@@ -66,13 +66,20 @@ class QuestionsController < ApplicationController
     end
   end
 
+  def delete_answers(a,b)
+    for i in b do
+      sql = "DELETE FROM answers WHERE question_id="+i.to_s
+      temp=ActiveRecord::Base.connection.execute(sql)
+    end
+  end
+  
   # Remove question from database and
   # return to list
   def destroy
     question = Question.find(params[:id])
     questionnaire_id = question.questionnaire_id
     question_ids=Question.where(questionnaire_id: questionnaire_id).ids
-#   delete_answers(questionnaire_id,question_ids)
+    delete_answers(questionnaire_id,question_ids)
     begin
       question.destroy
      flash[:success] = "You have successfully deleted the question!"

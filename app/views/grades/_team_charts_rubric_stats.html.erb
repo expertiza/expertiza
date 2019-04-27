@@ -1,6 +1,12 @@
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
 <script type="text/javascript">
+    // Load the Visualization API and the corechart package.
+    google.charts.load('current', {'packages':['corechart']});
+
+    // Set a callback to run when the Google Visualization API is loaded.
+    google.charts.setOnLoadCallback(drawSingleChart);
+
     // Values set in grades_controller#view
     var round_names = <%= @round_names.to_json.html_safe %>;
     var criteria_names = <%= @criteria_names.to_json.html_safe %>;

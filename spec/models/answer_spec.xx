@@ -1,5 +1,4 @@
 describe Answer do
-  allow(user).to receive(:student?).and_return(true)  
   let(:questionnaire) { create(:questionnaire, id: 1) }
   let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }
   let(:question2) { create(:question, questionnaire: questionnaire, weight: 2, id: 2) }
@@ -48,7 +47,6 @@ describe Answer do
   end
 
   describe "#test compute scores" do
-    allow(user).to receive(:student?).and_return(true)
     let(:response2) { double("respons2") }
 
     before(:each) do

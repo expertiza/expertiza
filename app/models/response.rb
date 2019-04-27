@@ -206,6 +206,7 @@ class Response < ActiveRecord::Base
         assignment: assignment,
         conflicting_response_url: base_url + '/response/view?id=' + response_id.to_s,
         summary_url: base_url + '/grades/view_team?id=' + reviewee_participant.id.to_s,
+        review_conflict_report_url: base_url + '/reports/response_report?class=form-inline&id=' + assignment.id.to_s,
         assignment_edit_url: base_url + '/assignments/' + assignment.id.to_s + '/edit'
       }
     ).deliver_now

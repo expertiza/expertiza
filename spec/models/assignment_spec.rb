@@ -546,12 +546,4 @@ describe Assignment do
       end
     end
   end
-
-  describe '#questionnaire_rounds' do
-    it 'should return rounds for an assignment' do
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return(Array.new(3, double('AssignmentQuestionnaire', :used_in_round => 1)))
-      expect(assignment.questionnaire_rounds.size).to eq(3)
-    end
-  end
-
 end

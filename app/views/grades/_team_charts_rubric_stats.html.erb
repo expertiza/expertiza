@@ -15,6 +15,9 @@
     var assignment_names_to_compare = <%= @assignment_names.to_json.html_safe %>;
     var assignment_name = <%= @assignment_name.to_json.html_safe %>;
     var med_data = <%= @med_data.to_json.html_safe %>;
+
+    var source_data = avg_data;
+    var selected_assignment = 0;
 </script>
 <script type="text/javascript" src="/assets/rubric_stats.js"></script>
 

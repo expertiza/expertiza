@@ -5,9 +5,9 @@
 // google.charts.setOnLoadCallback(drawSingleChart);
 //
 
-var source_data = avg_data;
-
-var selected_assignment = 0;
+// var source_data = avg_data;
+//
+// var selected_assignment = 0;
 
 function buildSelectArray(prefix, length) {
     var selected = [];

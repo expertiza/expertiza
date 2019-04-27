@@ -74,7 +74,7 @@ describe ReportsController do
       end
     end
 
-    describe 'review_conflict_response_map' do
+    describe '#review_conflict_response_map' do
       context 'when type is ReviewConflictResponseMap' do
         it 'renders response_report page with corresponding data' do
           allow(Team).to receive(:where).with(parent_id: '1').and_return([integer('id')]).ordered
@@ -89,12 +89,12 @@ describe ReportsController do
       end
     end
 
-    describe "reviewers_name_id_by_reviewee_and_assignment" do
+    describe 'reviewers_name_id_by_reviewee_and_assignment' do
       before(:each) do
         @assignment_id = 1
         @reviewee_id = 1
       end
-      it "returns reviewers name from Answer by reviewee ans assignment id from db which is not empty" do
+      it 'returns reviewers name from Answer by reviewee ans assignment id from db which is not empty' do
         expect(allow(User).to receive(:where).with(@reviewee_id, @assignment_id).and_return([integer('id')])).not_to be_empty
       end
     end

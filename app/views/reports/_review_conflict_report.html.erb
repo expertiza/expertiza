@@ -24,7 +24,7 @@
           <%=User.find(member.user_id).fullname %><br>
         <% end %>
       </td>
-      <td>
+      <td style="padding-left: 10px;" >
       <%= render 'review_conflict_metric' , team_name: team_name , max_scores: max_scores %>
   </td>
   </tr>

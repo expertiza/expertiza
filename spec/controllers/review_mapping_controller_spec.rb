@@ -145,7 +145,7 @@ describe ReviewMappingController do
  #       expect(response).to redirect_to '/student_review/list?id=1'
  #     end
  #   end
-  end
+ # end
 
   describe '#assign_quiz_dynamically' do
     before(:each) do

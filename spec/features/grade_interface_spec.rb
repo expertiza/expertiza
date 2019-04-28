@@ -150,10 +150,7 @@ describe 'Integration tests for viewing grades: ', js: true do
       end
     end
 
-    it 'is visible', :driver => :selenium_chrome_headless do
-      Capybara.page.driver.browser.manage.window.maximize
-      Capybara.default_max_wait_time = 90
-
+    it 'is visible' do
       login_as("instructor6")
       visit view_grades_path(id: assignment1.id)
 

@@ -92,7 +92,6 @@ group :test do
   gem 'mutant-rspec'
   gem 'rspec-rails'
   gem 'shoulda'
-
 end
 
 group :development, :test do

@@ -34,11 +34,11 @@ FactoryBot.define do
   end
 
   factory :admin, class: User do
-    sequence(:name) {|n| "admin#{n}"}
-    role {Role.where(name: 'Administrator').first || association(:role_of_administrator)}
+    sequence(:name) { |n| "admin#{n}" }
+    role { Role.where(name: 'Administrator').first || association(:role_of_administrator) }
     password 'password'
     password_confirmation 'password'
-    sequence(:fullname) {|n| "#{n}, administrator"}
+    sequence(:fullname) { |n| "#{n}, administrator" }
     email 'expertiza@mailinator.com'
     parent_id 1
     private_by_default false
@@ -56,11 +56,11 @@ FactoryBot.define do
   end
 
   factory :superadmin, class: User do
-    sequence(:name) {|n| "superadmin#{n}"}
-    role {Role.where(name: 'Super-Administrator').first || association(:role_of_superadministrator)}
+    sequence(:name) { |n| "superadmin#{n}" }
+    role { Role.where(name: 'Super-Administrator').first || association(:role_of_superadministrator) }
     password 'password'
     password_confirmation 'password'
-    sequence(:fullname) {|n| "#{n}, superadministrator"}
+    sequence(:fullname) { |n| "#{n}, superadministrator" }
     email 'expertiza@mailinator.com'
     parent_id 1
     private_by_default false
@@ -79,11 +79,11 @@ FactoryBot.define do
 
   factory :student, class: User do
     # Zhewei: In order to keep students the same names (2065, 2066, 2064) before each example.
-    sequence(:name) {|n| n = n % 3; "student206#{n + 4}"}
-    role {Role.where(name: 'Student').first || association(:role_of_student)}
+    sequence(:name) { |n| n = n % 3; "student206#{n + 4}" }
+    role { Role.where(name: 'Student').first || association(:role_of_student) }
     password 'password'
     password_confirmation 'password'
-    sequence(:fullname) {|n| n = n % 3; "206#{n + 4}, student"}
+    sequence(:fullname) { |n| n = n % 3; "206#{ n + 4 }, student" }
     email 'expertiza@mailinator.com'
     parent_id 1
     private_by_default false
@@ -102,7 +102,7 @@ FactoryBot.define do
 
   factory :instructor, class: Instructor do
     name 'instructor6'
-    role {Role.where(name: 'Instructor').first || association(:role_of_instructor)}
+    role { Role.where(name: 'Instructor').first || association(:role_of_instructor) }
     password 'password'
     password_confirmation 'password'
     fullname '6, instructor'
@@ -124,7 +124,7 @@ FactoryBot.define do
 
   factory :teaching_assistant, class: Ta do
     name 'teaching_assistant5888'
-    role {Role.where(name: 'Teaching Assistant').first || association(:role_of_teaching_assistant)}
+    role { Role.where(name: 'Teaching Assistant').first || association(:role_of_teaching_assistant) }
     password 'password'
     password_confirmation 'password'
     fullname '5888, teaching assistant'
@@ -145,8 +145,8 @@ FactoryBot.define do
   end
 
   factory :course, class: Course do
-    sequence(:name) {|n| "CSC517, test#{n}"}
-    instructor {Instructor.where(role_id: 1).first || association(:instructor)}
+    sequence(:name) { |n| "CSC517, test#{n}" }
+    instructor { Instructor.where(role_id: 1).first || association(:instructor) }
     directory_path 'csc517/test'
     info 'Object-Oriented Languages and Systems'
     private true
@@ -157,8 +157,8 @@ FactoryBot.define do
     name 'final2'
     directory_path 'final_test'
     submitter_count 0
-    course {Course.first || association(:course)}
-    instructor {Instructor.first || association(:instructor)}
+    course { Course.first || association(:course) }
+    instructor { Instructor.first || association(:instructor) }
     private false
     num_reviews 1
     num_review_of_reviews 1
@@ -197,8 +197,8 @@ FactoryBot.define do
   end
 
   factory :assignment_team, class: AssignmentTeam do
-    sequence(:name) {|n| "team#{n}"}
-    assignment {Assignment.first || association(:assignment)}
+    sequence(:name) { |n| "team#{n}" }
+    assignment { Assignment.first || association(:assignment) }
     type 'AssignmentTeam'
     comments_for_advertisement nil
     advertise_for_partner nil
@@ -208,8 +208,8 @@ FactoryBot.define do
   end
 
   factory :course_team, class: CourseTeam do
-    sequence(:name) {|n| "team#{n}"}
-    course {Course.first || association(:course)}
+    sequence(:name) { |n| "team#{n}" }
+    course { Course.first || association(:course) }
     type 'CourseTeam'
     comments_for_advertisement nil
     advertise_for_partner nil
@@ -219,8 +219,8 @@ FactoryBot.define do
   end
 
   factory :team_user, class: TeamsUser do
-    team {AssignmentTeam.first || association(:assignment_team)}
-    user {User.where(role_id: 2).first || association(:student)}
+    team { AssignmentTeam.first || association(:assignment_team) }
+    user { User.where(role_id: 2).first || association(:student) }
   end
 
   factory :invitation, class: Invitation do
@@ -229,7 +229,7 @@ FactoryBot.define do
 
   factory :topic, class: SignUpTopic do
     topic_name 'Hello world!'
-    assignment {Assignment.first || association(:assignment)}
+    assignment { Assignment.first || association(:assignment) }
     max_choosers 1
     category nil
     topic_identifier '1'
@@ -238,7 +238,7 @@ FactoryBot.define do
   end
 
   factory :signed_up_team, class: SignedUpTeam do
-    topic {SignUpTopic.first || association(:topic)}
+    topic { SignUpTopic.first || association(:topic) }
     team_id 1
     is_waitlisted false
     preference_priority_number nil
@@ -247,7 +247,7 @@ FactoryBot.define do
   factory :participant, class: AssignmentParticipant do
     can_submit true
     can_review true
-    assignment {Assignment.first || association(:assignment)}
+    assignment { Assignment.first || association(:assignment) }
     association :user, factory: :student
     submitted_at nil
     permission_granted nil
@@ -264,7 +264,7 @@ FactoryBot.define do
   factory :course_participant, class: CourseParticipant do
     can_submit true
     can_review true
-    course {Course.first || association(:course)}
+    course { Course.first || association(:course) }
     association :user, factory: :student
     submitted_at nil
     permission_granted nil
@@ -279,7 +279,7 @@ FactoryBot.define do
   end
 
   factory :review_grade, class: ReviewGrade do
-    participant {Participant.first || association(:participant)}
+    participant { Participant.first || association(:participant) }
     grade_for_reviewer 100
     comment_for_reviewer 'Good job!'
     review_graded_at '2011-11-11 11:11:11'
@@ -288,8 +288,8 @@ FactoryBot.define do
 
   factory :assignment_due_date, class: AssignmentDueDate do
     due_at DateTime.now.in_time_zone + 1.day
-    deadline_type {DeadlineType.first || association(:deadline_type)}
-    assignment {Assignment.first || association(:assignment)}
+    deadline_type { DeadlineType.first || association(:deadline_type) }
+    assignment { Assignment.first || association(:assignment) }
     submission_allowed_id 3
     review_allowed_id 3
     review_of_review_allowed_id 3
@@ -306,8 +306,8 @@ FactoryBot.define do
 
   factory :topic_due_date, class: TopicDueDate do
     due_at DateTime.now.in_time_zone + 1.day
-    deadline_type {DeadlineType.first || association(:deadline_type)}
-    topic {SignUpTopic.first || association(:topic)}
+    deadline_type { DeadlineType.first || association(:deadline_type) }
+    topic { SignUpTopic.first || association(:topic) }
     submission_allowed_id 3
     review_allowed_id 3
     review_of_review_allowed_id 3
@@ -331,20 +331,20 @@ FactoryBot.define do
   end
 
   factory :assignment_node, class: AssignmentNode do
-    assignment {Assignment.first || association(:assignment)}
+    assignment { Assignment.first || association(:assignment) }
     node_object_id 1
     type 'AssignmentNode'
   end
 
   factory :course_node, class: CourseNode do
-    course {Course.first || association(:course)}
+    course { Course.first || association(:course) }
     node_object_id 1
     type 'CourseNode'
   end
 
   factory :questionnaire, class: ReviewQuestionnaire do
     name 'Test questionnaire'
-    instructor {Instructor.where(role_id: 1).first || association(:instructor)}
+    instructor { Instructor.where(role_id: 1).first || association(:instructor) }
     private 0
     min_question_score 0
     max_question_score 5
@@ -356,7 +356,7 @@ FactoryBot.define do
   factory :question, class: Criterion do
     txt 'Test question:'
     weight 1
-    questionnaire {Questionnaire.first || association(:questionnaire)}
+    questionnaire { Questionnaire.first || association(:questionnaire) }
     seq 1.00
     type 'Criterion'
     size '70,1'
@@ -367,14 +367,14 @@ FactoryBot.define do
   end
 
   factory :question_advice, class: QuestionAdvice do
-    question {Question.first || association(:question)}
+    question { Question.first || association(:question) }
     score 5
     advice 'LGTM'
   end
 
   factory :assignment_questionnaire, class: AssignmentQuestionnaire do
-    assignment {Assignment.first || association(:assignment)}
-    questionnaire {ReviewQuestionnaire.first || association(:questionnaire)}
+    assignment { Assignment.first || association(:assignment) }
+    questionnaire { ReviewQuestionnaire.first || association(:questionnaire) }
     user_id 1
     questionnaire_weight 100
     used_in_round nil
@@ -382,23 +382,23 @@ FactoryBot.define do
   end
 
   factory :review_response_map, class: ReviewResponseMap do
-    assignment {Assignment.first || association(:assignment)}
-    reviewer {AssignmentParticipant.first || association(:participant)}
-    reviewee {AssignmentTeam.first || association(:assignment_team)}
+    assignment { Assignment.first || association(:assignment) }
+    reviewer { AssignmentParticipant.first || association(:participant) }
+    reviewee { AssignmentTeam.first || association(:assignment_team) }
     type 'ReviewResponseMap'
     calibrate_to 0
   end
 
   factory :meta_review_response_map, class: MetareviewResponseMap do
-    review_mapping {ReviewResponseMap.first || association(:review_response_map)}
-    reviewee {AssignmentParticipant.first || association(:participant)}
+    review_mapping { ReviewResponseMap.first || association(:review_response_map) }
+    reviewee { AssignmentParticipant.first || association(:participant) }
     reviewer_id 1
     type 'MetareviewResponseMap'
     calibrate_to 0
   end
 
   factory :response, class: Response do
-    response_map {ReviewResponseMap.first || association(:review_response_map)}
+    response_map { ReviewResponseMap.first || association(:review_response_map) }
     additional_comment nil
     version_num nil
     round 1
@@ -406,10 +406,10 @@ FactoryBot.define do
   end
 
   factory :answers, class: Answer do
-    question {Question.first || association(:question)}
+    question { Question.first || association(:question) }
     answer 95
     comments "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris sit amet mi et diam lobortis facilisis. Donec tristique condimentum luctus. "
-    response {Response.first || association(:response)}
+    response { Response.first || association(:response) }
   end
 
   factory :submission_record, class: SubmissionRecord do
@@ -437,14 +437,14 @@ FactoryBot.define do
   end
 
   factory :assignment_badge, class: AssignmentBadge do
-    badge {Badge.first || association(:badge)}
-    assignment {Assignment.first || association(:assignment)}
+    badge { Badge.first || association(:badge) }
+    assignment { Assignment.first || association(:assignment) }
     threshold 95
   end
 
   factory :awarded_badge, class: AwardedBadge do
-    badge {Badge.first || association(:badge)}
-    participant {AssignmentParticipant.first || association(:participant)}
+    badge { Badge.first || association(:badge) }
+    participant { AssignmentParticipant.first || association(:participant) }
   end
 
   factory :score_view, class: ScoreView do

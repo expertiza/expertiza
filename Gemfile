@@ -92,7 +92,6 @@ group :test do
   gem 'mutant-rspec'
   gem 'rspec-rails'
   gem 'shoulda'
-  # gem 'webdrivers'
 
 end
 

@@ -1,27 +1,14 @@
-require 'database_cleaner'
 
 describe 'Integration tests for viewing grades: ', js: true do
-  before(:context) do
-    DatabaseCleaner.strategy = :truncation, {:pre_count => true, :reset_ids => true}
-    DatabaseCleaner.start
-  end
-
-  after(:context) do
-    DatabaseCleaner.clean
-
-    DatabaseCleaner.strategy = :transaction
-    DatabaseCleaner.start
-  end
-
   context 'when checking grade bar chart' do
-    #setup roles
-    let!(:role1) {create(:role_of_student)}
-    let!(:role2) {create :role_of_instructor}
-    let!(:role3) {create :role_of_administrator}
-    let!(:role4) {create :role_of_superadministrator}
+    # setup roles
+    let!(:role1) { create(:role_of_student) }
+    let!(:role2) { create :role_of_instructor }
+    let!(:role3) { create :role_of_administrator }
+    let!(:role4) { create :role_of_superadministrator }
 
-    #add users
-    let!(:user1) {create :instructor}
+    # add users
+    let!(:user1) { create :instructor }
     let!(:user2) {4.times do |i|
       create :student, name: "user#{i + 1}"
     end
@@ -32,17 +19,15 @@ describe 'Integration tests for viewing grades: ', js: true do
       rights.each {|right| create :deadline_right, name: right}
     }
 
+    # add assignments 1
+    let!(:assignment1) { create :assignment, name: "final123" }
+    let!(:assignment_team1) { 2.times {create :assignment_team} }
+    let!(:assignment_due_date1) { create :assignment_due_date }
 
-    #add assignments 1
-    let!(:assignment1) {create :assignment, name: "final123"}
-    let!(:assignment_team1) {2.times {create :assignment_team}}
-    let!(:assignment_due_date1) {create :assignment_due_date}
-
-    #add assignments 1
-    let!(:assignment2) {create :assignment, name: "final456"}
-    let!(:assignment_team2) {2.times {create :assignment_team}}
-    let!(:assignment_due_date2) {create(:assignment_due_date, assignment: assignment2)}
-
+    # add assignments 1
+    let!(:assignment2) { create :assignment, name: "final456" }
+    let!(:assignment_team2) { 2.times {create :assignment_team} }
+    let!(:assignment_due_date2) { create(:assignment_due_date, assignment: assignment2) }
 
     # add users to teams
     let!(:team_user1) {
@@ -52,19 +37,21 @@ describe 'Integration tests for viewing grades: ', js: true do
           create(:team_user, team: Team.find(team_id + 1), user: User.find(user_id))
           user_id += 1
         end
-      end}
+      end
+    }
 
-    #add participants
+    # add participants
     let!(:participant1) {
       2.times do |assignment_id|
         user_id = 2
         4.times do
-          create :participant, user_id: user_id, assignment: Assignment.find(assignment_id +1)
+          create :participant, user_id: user_id, assignment: Assignment.find(assignment_id + 1)
           user_id += 1
         end
-      end}
+      end
+    }
 
-    #add response_maps
+    # add response_maps
     let!(:review_response_map1) {
       (1..2).each do |assignment_id|
         participant_id = 4
@@ -74,61 +61,64 @@ describe 'Integration tests for viewing grades: ', js: true do
             participant_id -= 1
           end
         end
-      end}
-
-    #questionnaires/reviews
-    let!(:q_aire) {
-      2.times {|i| create(:questionnaire, name: "Test questionnarie#{i + 1}")}
+      end
     }
-    #assignment_questionnaires
+
+    # questionnaires/reviews
+    let!(:q_aire) {
+      2.times {|i| create(:questionnaire, name: "Test questionnarie#{i + 1}") }
+    }
+    # assignment_questionnaires
     let!(:assignment1_q_aire) {
       (1..2).each do |assignment_id|
-        (1..2).each {|round| create(:assignment_questionnaire, used_in_round: round, assignment: Assignment.find(assignment_id))}
+        (1..2).each {|round| create(:assignment_questionnaire, used_in_round: round, assignment: Assignment.find(assignment_id)) }
       end
     }
 
     let!(:questions) {5.times {create :question}}
 
-    #qustionnaire/teammate
-    let!(:t_aire) {create(:questionnaire, name: "Temmate questionnarie", display_type: "TeammateReview", type: "TeammateReviewQuestionnaire")}
-    let!(:assignment1_tq_aire) {create(:assignment_questionnaire, questionnaire: t_aire)}
-    let!(:teammate_questions) {5.times {create :question, questionnaire: t_aire}}
+    # qustionnaire/teammate
+    let!(:t_aire) { create(:questionnaire, name: "Temmate questionnarie", display_type: "TeammateReview", type: "TeammateReviewQuestionnaire") }
+    let!(:assignment1_tq_aire) { create(:assignment_questionnaire, questionnaire: t_aire) }
+    let!(:teammate_questions) { 5.times {create :question, questionnaire: t_aire} }
 
-    #add question_advice
-    let!(:q_advice) {create :question_advice}
+    # add question_advice
+    let!(:q_advice) { create :question_advice }
 
-    #add responses
+    # add responses
     let!(:data_reponse) {
-      (1..2).each do #assignments
+      2.times do # assignments
         response_review_index = 1
         (1..2).each do |round|
-          (1..4).each do # number of users seeded
+          4.times do # number of users seeded
             create :response, is_submitted: true, response_map: ReviewResponseMap.find(response_review_index), round: round
             response_review_index += 1
           end
         end
-      end}
+      end
+    }
 
-    #answers
+    # answers
     let!(:answers1) {
-      (1..2).each do #assignments
+      2.times do # assignments
         response_id = 0
-        (1..2).each do #round
-          (1..4).each do |ii| # number of users seeded
+        2.times do # round
+          (1..4).each do |seeded_user|
             response_id += 1
-            (1..5).each do |i| #number of questions
-              create(:answers, question: Question.find(i), answer: ii, response: Response.find(response_id))
+            (1..5).each do |question_number|
+              create(:answers, question: Question.find(question_number), answer: seeded_user, response: Response.find(response_id))
 
             end
           end
         end
-      end}
+      end
+    }
 
-    #ScoreView
+    # ScoreView
     let!(:score_view1) {
       index = 1
-      (1..2).each do #assignments
-        2.times do |round|
+      2.times do # assignments
+        2.times do # round
           5.times do |question_id|
             4.times do
               create(:score_view,
@@ -154,7 +144,8 @@ describe 'Integration tests for viewing grades: ', js: true do
             end
           end
         end
-      end}
+      end
+    }
 
     it 'is visible', :driver => :selenium_chrome_headless do
       Capybara.page.driver.browser.manage.window.maximize

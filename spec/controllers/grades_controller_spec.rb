@@ -186,9 +186,9 @@ describe GradesController do
       session = {user: instructor}
       team = participant.team
       allow(GradingHistory).to receive(:create).with(instructor_id: session[:user].id,
-                                                     assignment_id: participant.assignment.id,
+                                                     assignment_id: 1,
                                                      grading_type: "Submission",
-                                                     grade_receiver_id: team.id,
+                                                     grade_receiver_id: 2,
                                                      grade: 100,
                                                      comment: 'comment')
       params = {
@@ -196,7 +196,7 @@ describe GradesController do
         grade_for_submission: 100,
         comment_for_submission: 'comment'
       }
-      post :save_grade_and_comment_for_submission, params
+      post :save_grade_and_comment_for_submission, params, session
       expect(flash[:error]).to be nil
       expect(response).to redirect_to('/grades/view_team?id=1')
     end

@@ -2,9 +2,9 @@ describe Checkbox do
   #let!(:checkbox) { Checkbox.new id: 10, type: "Checkbox", seq: 1.0, txt: "test txt", weight: 11 }
   let!(:answer) { Answer.new answer: 1 }
   let!(:checkbox) {build(:question, id:1, txt: "test txt")}
-  let!(:checkbox) {build(:question, id:2, txt: "test txt")}
-  let!(:checkbox) {build(:question, id:3, txt: "test txt")}
-  let!(:checkbox) {build(:question, id:4, txt: "test txt")}
+  let!(:checkbox2) {build(:question, id:2, txt: "test txt")}
+  let!(:checkbox3) {build(:question, id:3, txt: "test txt")}
+  let!(:checkbox4) {build(:question, id:4, txt: "test txt")}
   #let!(:checkbox1) { Checkbox.create(id: 1, type: 'Checkbox', seq: 2.0, txt: 'test txt2', weight: 11) }
   #let!(:checkbox2) { Checkbox.create(id: 2, type: 'Checkbox', seq: 3.0, txt: 'test txt3', weight: 12) }
   #let!(:checkbox3) { Checkbox.create(id: 3, type: 'Checkbox', seq: 4.0, txt: 'test txt4', weight: 13) }

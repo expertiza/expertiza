@@ -34,11 +34,11 @@ FactoryBot.define do
   end
 
   factory :admin, class: User do
-    sequence(:name) { |n| "admin#{n}" }
+    sequence(:name) {|n| "admin#{n}" }
     role { Role.where(name: 'Administrator').first || association(:role_of_administrator) }
     password 'password'
     password_confirmation 'password'
-    sequence(:fullname) { |n| "#{n}, administrator" }
+    sequence(:fullname) {|n| "#{n}, administrator" }
     email 'expertiza@mailinator.com'
     parent_id 1
     private_by_default false
@@ -56,11 +56,11 @@ FactoryBot.define do
   end
 
   factory :superadmin, class: User do
-    sequence(:name) { |n| "superadmin#{n}" }
+    sequence(:name) {|n| "superadmin#{n}" }
     role { Role.where(name: 'Super-Administrator').first || association(:role_of_superadministrator) }
     password 'password'
     password_confirmation 'password'
-    sequence(:fullname) { |n| "#{n}, superadministrator" }
+    sequence(:fullname) {|n| "#{n}, superadministrator" }
     email 'expertiza@mailinator.com'
     parent_id 1
     private_by_default false
@@ -79,11 +79,11 @@ FactoryBot.define do
 
   factory :student, class: User do
     # Zhewei: In order to keep students the same names (2065, 2066, 2064) before each example.
-    sequence(:name) { |n| n = n % 3; "student206#{n + 4}" }
+    sequence(:name) {|n| n = n % 3; "student206#{n + 4}" }
     role { Role.where(name: 'Student').first || association(:role_of_student) }
     password 'password'
     password_confirmation 'password'
-    sequence(:fullname) { |n| n = n % 3; "206#{ n + 4 }, student" }
+    sequence(:fullname) {|n| n = n % 3; "206#{n + 4}, student" }
     email 'expertiza@mailinator.com'
     parent_id 1
     private_by_default false
@@ -145,7 +145,7 @@ FactoryBot.define do
   end
 
   factory :course, class: Course do
-    sequence(:name) { |n| "CSC517, test#{n}" }
+    sequence(:name) {|n| "CSC517, test#{n}" }
     instructor { Instructor.where(role_id: 1).first || association(:instructor) }
     directory_path 'csc517/test'
     info 'Object-Oriented Languages and Systems'
@@ -197,7 +197,7 @@ FactoryBot.define do
   end
 
   factory :assignment_team, class: AssignmentTeam do
-    sequence(:name) { |n| "team#{n}" }
+    sequence(:name) {|n| "team#{n}" }
     assignment { Assignment.first || association(:assignment) }
     type 'AssignmentTeam'
     comments_for_advertisement nil
@@ -208,7 +208,7 @@ FactoryBot.define do
   end
 
   factory :course_team, class: CourseTeam do
-    sequence(:name) { |n| "team#{n}" }
+    sequence(:name) {|n| "team#{n}" }
     course { Course.first || association(:course) }
     type 'CourseTeam'
     comments_for_advertisement nil

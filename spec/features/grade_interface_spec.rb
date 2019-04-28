@@ -59,7 +59,8 @@ describe 'Integration tests for viewing grades: ', js: true do
         (1..2).each do |team_id|
           2.times do
             create :review_response_map, reviewee: AssignmentTeam.find(team_id),
-                   reviewer: AssignmentParticipant.find(participant_id), assignment: Assignment.find(assignment_id)
+                                         reviewer: AssignmentParticipant.find(participant_id),
+                                         assignment: Assignment.find(assignment_id)
             participant_id -= 1
           end
         end

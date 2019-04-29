@@ -79,10 +79,10 @@ class QuestionsController < ApplicationController
     question = Question.find(params[:id])
     questionnaire_id = question.questionnaire_id
     question_ids=Question.where(questionnaire_id: questionnaire_id).ids
-    delete_answers(questionnaire_id,question_ids)
+    delete_answers2(questionnaire_id,question_ids)
     begin
       question.destroy
-     flash[:success] = "You have successfully deleted the question!"
+      flash[:success] = "You have successfully deleted the question!"
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
@@ -94,4 +94,28 @@ class QuestionsController < ApplicationController
     types = Question.distinct.pluck(:type)
     render json: types.to_a
   end
+
+# Beginning of new method for OODD project 4
+  def  delete_answers2(questionnaire_id,question_ids)
+    i=0
+    response_ids=[]
+    while i<question_ids.length()
+      response_ids=response_ids+Answer.where(question_id: question_ids[i]).select("response_id")
+      i=i+1
+    end
+    response_ids=response_ids.uniq
+    i=0
+    user_id_to_answers={}
+    while i<response_ids.length()
+      response_map_id=Response.where(id: response_ids[i]).select("map_id")
+      reviewer_id=Response_map.where(id: response_map_id).select("reviewer_id")
+      answers_per_user=Answer.where(response_id: response_ids[i]).ids
+      user_id_to_answers[reviewer_id]=answers_per_user
+      i=i+1
+    end
+    return user_id_to_answers
+# call mailing function
+# delete_and_mail(user_id_to_answers)	
+  end
+  
 end

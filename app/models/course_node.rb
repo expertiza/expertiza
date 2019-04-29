@@ -18,9 +18,12 @@ class CourseNode < Node
   def self.get(sortvar = 'name', _sortorder = 'desc', user_id = nil, show = nil, _parent_id = nil, _search = nil)
     sortvar = 'created_at'
     if Course.column_names.include? sortvar
-      self.includes(:course).where([get_course_query_conditions(show, user_id), get_courses_managed_by_user(user_id)])
-          .order("courses.#{sortvar} desc")
+      query = self.includes(:course).where([get_course_query_conditions(show, user_id), get_courses_managed_by_user(user_id)])
+                  .order("courses.#{sortvar} desc")
     end
+    name = _search[:name].to_s.strip
+    query = query.where('courses.name LIKE ?', "%#{name}%") if name.present?
+    query
   end
 
   # get the query conditions for a public course

@@ -948,6 +948,33 @@ jQuery(document).ready(function () {
     }
   })
 
+  var CoursesSearchBar = React.createClass({
+    handleSearch: function () {
+      this.props.onSearchClick({
+        name: this.refs.nameInput.getDOMNode().value,
+      });
+    },
+    render: function () {
+      return (
+        <div>
+          <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px', alignItems: 'center' }}>
+            <input
+              data-toggle="tooltip" title="The title of the course"
+              ref="nameInput"
+              type="text"
+              className="form-control"
+              placeholder="Name" />
+            <button type="button"
+              className="btn btn-primary"
+              onClick={this.handleSearch}>
+              Search
+            </button>
+          </div>
+        </div>
+      );
+    }
+  })
+
   var QuestionnairesAdvancedSearchBar = React.createClass({
     getInputValues: function () {
       return {
@@ -1225,7 +1252,9 @@ jQuery(document).ready(function () {
 
       switch (this.props.dataType) {
         case 'course':
-          searchBar = ''
+          searchBar = <CoursesSearchBar
+            onSearchClick={this.handleSearchClick}
+            dataType={this.props.dataType} />
           break;
         case 'assignment':
           searchBar = <AssignmentSearchBar

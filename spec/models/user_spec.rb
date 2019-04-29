@@ -272,23 +272,23 @@ describe User do
   describe '.self_import_set_user_info' do
     it 'updates an existing user with info from import file' do
       create(:student, name: 'abc')
-      row = {name: 'abc', fullname: 'test, test', email: 'test@gmail.com'}
-      allow(user).to receive(:id).and_return(6)
+      row = {name: 'abcd', fullname: 'test, test', email: 'test@gmail.com'}
+      allow(user).to receive(:id).and_return(1)
       User.self_import_set_user_info(row, {user: user})
-      updated_user = User.find_by(name: 'abc')
+      updated_user = User.find_by(name: 'abcd')
       expect(updated_user.email).to eq 'test@gmail.com'
       expect(updated_user.fullname).to eq 'test, test'
-      expect(updated_user.parent_id).to eq 6
+      expect(updated_user.parent_id).to eq 1
     end
   end
 
-  describe '.self_import_set_user_info' do
+  describe '.self_import_user_info' do
     it 'expects user information to be nil' do
       create(:student, name: 'abc')
       row = {name: 'abc', fullname: 'test, test', email: 'test@gmail.com'}
       allow(user).to receive(:id).and_return(6)
       updated_user = User.find_by(name: '')
-      User.self_import_user_info(nil, row, {user: user})
+      User.self_import_user_info(user, row, {user: user})
       expect(updated_user.email).to eq nil
       expect(updated_user.fullname).to eq nil
       expect(updated_user.parent_id).to eq nil
@@ -297,14 +297,14 @@ describe User do
     it 'sets user info to given values' do
       create(:student, name: 'abc')
       row = {name: 'abc', fullname: 'test, test', email: 'test@gmail.com'}
-      allow(user).to receive(:id).and_return(6)
-      User.self_import_user_info(nil, row, {user: user})
-      allow(User).to receive(row[:email]).and_return(email_user)
-      allow(User).to receive(row[:fullname]).and_return(fullname_user)
-      allow(User).to receive((session[:user]).id).and_return(id_user)
-      expect(email_user.email).to eq 'test@gmail.com'
-      expect(fullname_user.fullname).to eq 'test, test'
-      expect(id_user.parent_id).to eq '6'
+      allow(user).to receive(:id).and_return(1)
+      User.self_import_user_info(user, row, {user: user})
+      #allow(User).to receive(row[:email]).and_return(user)
+      #allow(User).to receive(row[:fullname]).and_return(user)
+      #allow(User).to receive((session[:user]).id).and_return(user)
+      expect(user.email).to eq 'test@gmail.com'
+      expect(user.fullname).to eq 'test, test'
+      expect(user.parent_id).to eq 1
     end
   end
 

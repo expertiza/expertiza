@@ -4,30 +4,35 @@
     <%= form_tag({controller: 'versions', action: 'search'}, method: 'get') do %>
         <table>
           <tr>
-            <td><%= label_tag(:type, 'ID:') %></td>
-            <td><%= number_field_tag(:id) %></td>
-            <td><%= label_tag(:user, "User:") %></td>
-            <td><%= select("post", "user_id",
-                    if current_user_role?.name == 'Super-Administrator'
-                        (User.all.collect {|u| [ u.name(session[:ip]), u.id ] }.insert(0, ['Any', 0]))
-                    else
-                        (User.where("id = #{current_user.id}").collect {|u| [ u.name(session[:ip]), u.id ] })
-                    end,
-                    ) %></td>
-          </tr>
-          <tr>
-            <td><%= label_tag(:item, "Type:") %></td>
-            <td><%= select("post", "item_type",
-                         Version.uniq.pluck(:item_type) << 'Any') %></td>
-            <td><%= label_tag(:before, "Start Date:") %></td>
-            <td><%= text_field_tag :start_time, Date.today.beginning_of_day.strftime("%Y-%m-%d %H:%M"), class: 'datetimeklass' %></td>
+            <td><%= label_tag(:whodunnit, "User:") %></td>
+            <td><%= text_field_tag :whodunnit, params[:whodunnit] %></td>
           </tr>
           <tr>
             <td><%= label_tag(:event, "Event:") %></td>
-            <td><%= select("post", "event",
-                         Version.uniq.pluck(:event) << 'Any') %></td>
+            <td><%= if params[:post].nil?
+                        select("post", "event",
+                         Version.uniq.pluck(:event) << 'Any') 
+                    else
+                        select("post", "event",
+                         Version.uniq.pluck(:event) << 'Any', selected: params[:post][:event])
+                    end
+                      %></td>
+            <td><%= label_tag(:before, "Start Date:") %></td>
+            <td><%= text_field_tag :start_time, params[:start_time], class: 'datetimeklass' %></td>
+          </tr>
+          <tr>
+            <td><%= label_tag(:item, "Type:") %></td>
+            <td><%= if params[:post].nil?
+                        select("post", "item_type",
+                         Version.uniq.pluck(:item_type) << 'Any') 
+                    else
+                        select("post", "item_type",
+                         Version.uniq.pluck(:item_type) << 'Any', selected: params[:post][:item_type]) 
+                    end
+                      %></td>
+            
             <td><%= label_tag(:after, "End Date:") %></td>
-            <td><%= text_field_tag :end_time, Time.now.strftime("%Y-%m-%d %H:%M"), class: 'datetimeklass' %></td>
+            <td><%= text_field_tag :end_time, params[:end_time], class: 'datetimeklass' %></td>
           </tr>
         </table>
         <br/>
@@ -51,23 +56,39 @@ jQuery('.datetimeklass').datetimepicker({
             ]
         });
 </script>
-<%= render :partial => 'versions/pagination' %>
 
-<div>
-  <table>
-    <tr><th class="head">ID</th><th class="head">Type</th><th class="head">Item ID</th><th class="head">Event</th><th class="head">User</th><th class="head">Created</th></tr>
-    <% for version in @versions %>
-        <tr>
-          <td><%= link_to version.id, :action => 'show', :id => version.id %></td>
-          <td><%= version.item_type %></td>
-          <td><%= version.item_id %></td>
-          <td><%= version.event %></td>
-          <td><%= version.whodunnit %></td>
-          <td><%= version.created_at %></td>
-        </tr>
-    <% end -%>
-  </table>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <%= render :partial => 'versions/pagination' %>
+    <style type="text/css">
+    .tg  {border-collapse:collapse;border-spacing:0;}
+    .tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+    .tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+    .tg .tg-0lax{text-align:left;vertical-align:top}
+    </style>
+    <table class="tg">
+    <tr>
+      <th class="head">Log Record<img src="/assets/info.png" title='The order of creation'></th>
+      <th class="head">User<img src="/assets/info.png" title='Who did it?'></th>
+      <th class="head">Event<img src="/assets/info.png" title='What happened?'></th>
+      <th class="head">Type<img src="/assets/info.png" title='The type of logs'></th>
+      <th class="head">Name<img src="/assets/info.png" title='The name of logs'></th>
+      <th class="head">Item ID<img src="/assets/info.png" title='The order of creation for this particular type'></th>
+      <th class="head">Created<img src="/assets/info.png" title='When did it happen?'></th>
+    </tr>
+        <% for version in @versions %>
+            <tr>
+              <td><%= link_to version.id, :action => 'show', :id => version.id %></td>
+              <td><%= version.whodunnit %></td>
+              <td><%= version.event %></td>
+              <td><%= version.item_type %></td>
+              <td><%= if (['Assignment','Course','Participant','Questionnaire','Team','TeamsUser','User'].include?(version.item_type) and (version.item_type.constantize.find_by(id: version.item_id).class != NilClass))
+              version.item_type.constantize.find_by(id: version.item_id).name
+            end %></td>
+              <td><%= version.item_id %></td>
+              <td><%= local_time(version.created_at) %></td>
+            </tr>
+        <% end -%>
+    </table>
+  </div>
 </div>
-<hr/>
-<%= render :partial => 'versions/pagination' %>
-<hr/>

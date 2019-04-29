@@ -72,6 +72,7 @@ gem 'tinymce-rails'
 gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
+gem 'local_time'
 
 group :development do
   gem 'daemons'

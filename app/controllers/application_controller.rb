@@ -16,6 +16,7 @@ class ApplicationController < ActionController::Base
   before_action :set_time_zone
   before_action :authorize
   before_action :filter_utf8
+  before_action :set_paper_trail_whodunnit
 
   def filter_utf8
     remove_non_utf8(params)
@@ -38,7 +39,7 @@ class ApplicationController < ActionController::Base
   helper_method :current_user_role?
 
   def user_for_paper_trail
-    session[:user].try :id if session[:user]
+    session[:user].try :name if session[:user]
   end
 
   def undo_link(message)

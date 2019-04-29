@@ -112,8 +112,9 @@ class QuestionsController < ApplicationController
     response_ids.each do |response|
       response_map_id=Response.where(id: response).select("map_id")
       reviewer_id=Response_map.where(id: response_map_id).select("reviewer_id")
+      user_email = User.where(id: reviewer_id).select("email")
       answers_per_user=Answer.where(response_id: response).ids
-      user_id_to_answers[reviewer_id]=answers_per_user
+      user_id_to_answers[user_email]=answers_per_user
     end
     # while i<response_ids.length()
     #   response_map_id=Response.where(id: response_ids[i]).select("map_id")

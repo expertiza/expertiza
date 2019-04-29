@@ -97,22 +97,31 @@ class QuestionsController < ApplicationController
 
 # Beginning of new method for OODD project 4
   def  delete_answers2(questionnaire_id,question_ids)
-    i=0
+    # i=0
     response_ids=[]
-    while i<question_ids.length()
-      response_ids=response_ids+Answer.where(question_id: question_ids[i]).select("response_id")
-      i=i+1
+    question_ids.each do |question|
+      response_ids=response_ids+Answer.where(question_id: question).select("response_id")
     end
+    # while i<question_ids.length()
+    #   response_ids=response_ids+Answer.where(question_id: question_ids[i]).select("response_id")
+    #   i=i+1
+    # end
     response_ids=response_ids.uniq
-    i=0
+    # i=0
     user_id_to_answers={}
-    while i<response_ids.length()
-      response_map_id=Response.where(id: response_ids[i]).select("map_id")
+    response_ids.each do |response|
+      response_map_id=Response.where(id: response).select("map_id")
       reviewer_id=Response_map.where(id: response_map_id).select("reviewer_id")
-      answers_per_user=Answer.where(response_id: response_ids[i]).ids
+      answers_per_user=Answer.where(response_id: response).ids
       user_id_to_answers[reviewer_id]=answers_per_user
-      i=i+1
     end
+    # while i<response_ids.length()
+    #   response_map_id=Response.where(id: response_ids[i]).select("map_id")
+    #   reviewer_id=Response_map.where(id: response_map_id).select("reviewer_id")
+    #   answers_per_user=Answer.where(response_id: response_ids[i]).ids
+    #   user_id_to_answers[reviewer_id]=answers_per_user
+    #   i=i+1
+    # end
     return user_id_to_answers
 # call mailing function
 # delete_and_mail(user_id_to_answers)	

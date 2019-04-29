@@ -2,13 +2,14 @@
   $(document).ready(() => {
     const $toggleButton = $('#search_toggle_button');
     const $advancedSearchForm = $('#advance_search_form');
-    var isAdvancedSearchVisible = false;
+    var isAdvancedSearchVisible = true;
     toggleAdvancedSearch(isAdvancedSearchVisible);
     $toggleButton.click(() => {
       isAdvancedSearchVisible = !isAdvancedSearchVisible;
       toggleAdvancedSearch(isAdvancedSearchVisible);
     });
     function toggleAdvancedSearch(isAdvancedSearchVisible) {
+      $advancedSearchForm.find('input').each(function () { $(this).val('') });
       if (isAdvancedSearchVisible) {
         $advancedSearchForm.show();
         $toggleButton.text('Hide Advanced Search');

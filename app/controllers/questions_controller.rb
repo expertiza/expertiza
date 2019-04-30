@@ -66,10 +66,15 @@ class QuestionsController < ApplicationController
     end
   end
 
-  def delete_answers(a,b)
-    for i in b do
-      sql = "DELETE FROM answers WHERE question_id="+i.to_s
-      temp=ActiveRecord::Base.connection.execute(sql)
+  def delete_answers(response_id)
+    response = Answer.where(response_id: response_id)
+    response.each do |answer|
+      begin
+        answer.destroy
+        flash[:success] = "You have successfully deleted the answer!"
+      rescue StandardError
+        flash[:error] = $ERROR_INFO
+      end
     end
   end
   
@@ -79,7 +84,7 @@ class QuestionsController < ApplicationController
     question = Question.find(params[:id])
     questionnaire_id = question.questionnaire_id
     question_ids=Question.where(questionnaire_id: questionnaire_id).ids
-    delete_answers2(questionnaire_id,question_ids)
+    get_answers(questionnaire_id,question_ids)
     begin
       question.destroy
       flash[:success] = "You have successfully deleted the question!"
@@ -96,36 +101,46 @@ class QuestionsController < ApplicationController
   end
 
 # Beginning of new method for OODD project 4
-  def  delete_answers2(questionnaire_id,question_ids)
-    # i=0
+  def get_answers(questionnaire_id,question_ids)
     response_ids=[]
     question_ids.each do |question|
-      response_ids=response_ids+Answer.where(question_id: question).select("response_id")
+      response_ids=response_ids+Answer.where(question_id: question).pluck("response_id")
     end
-    # while i<question_ids.length()
-    #   response_ids=response_ids+Answer.where(question_id: question_ids[i]).select("response_id")
-    #   i=i+1
-    # end
     response_ids=response_ids.uniq
-    # i=0
     user_id_to_answers={}
     response_ids.each do |response|
-      response_map_id=Response.where(id: response).select("map_id")
-      reviewer_id=Response_map.where(id: response_map_id).select("reviewer_id")
-      user_email = User.where(id: reviewer_id).select("email")
-      answers_per_user=Answer.where(response_id: response).ids
-      user_id_to_answers[user_email]=answers_per_user
+      response_map_id = Response.where(id: response).pluck("map_id")
+      reviewer_id = ResponseMap.where(id: response_map_id).pluck("reviewer_id", "reviewed_object_id")
+      assignment_name = Assignment.where(id: reviewer_id[1]).pluck("name")
+      user_details = User.where(id: reviewer_id[0]).pluck("email", "name")
+      answers_per_user = Answer.where(response_id: response).pluck("comments")
+      user_id_to_answers[user_details[0]] = [answers_per_user, response, user_details[1], assignment_name]
     end
-    # while i<response_ids.length()
-    #   response_map_id=Response.where(id: response_ids[i]).select("map_id")
-    #   reviewer_id=Response_map.where(id: response_map_id).select("reviewer_id")
-    #   answers_per_user=Answer.where(response_id: response_ids[i]).ids
-    #   user_id_to_answers[reviewer_id]=answers_per_user
-    #   i=i+1
-    # end
-    return user_id_to_answers
-# call mailing function
-# delete_and_mail(user_id_to_answers)	
+
+    # Mail the answers to each user and if successfull, delete the answers
+    user_id_to_answers.each do |email, answers|
+      if review_mailer(email, answers[0], answers[2])
+        delete_answers(answers[1])
+      end
+    end
   end
-  
+
+  def review_mailer(email, answers, name, assignment_name)
+    begin
+      Mailer.notify_review_rubric_change(
+        to: email,
+        subject: 'Expertiza Notification: The review rubric has been changed, please re-attempt the review',
+        body: {
+          name: name,
+          assignment_name: assignment_name,
+          answers: answers
+        }
+        ).deliver_now
+      true
+    rescue StandardError
+      flash[:error] = $ERROR_INFO
+      false
+    end
+  end
+
 end

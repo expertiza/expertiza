@@ -82,4 +82,13 @@ class Mailer < ActionMailer::Base
     mail(subject: defn[:subject],
          to: defn[:to])
   end
+  def notify_review_rubric_change(defn)
+    @body =defn[:body]
+    @answers = @body[:answers]
+    @name = @body[:name]
+    @assignment_name = @body[:assignment_name]
+    defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
+    mail(subject: defn[:subject],
+         to: defn[:to])
+  end
 end

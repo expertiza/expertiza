@@ -140,5 +140,6 @@ class AuthController < ApplicationController
     session[:assignment_id] = assignment_id
     session[:original_user] = nil
     session[:impersonate] = nil
+    session[:locale] = nil
   end
 end

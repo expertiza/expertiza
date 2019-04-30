@@ -61,22 +61,46 @@ class ApplicationController < ActionController::Base
   def set_locale
     # Only students with course having language set should have session[:locale] set
     if(logged_in? && current_user_role? && current_user_role.student?)
-      @tasks = StudentTask.from_user(current_user)
-      # If no tasks, then possible to have no courses assigned.
-      if !session[:locale] && !@tasks.empty?
-        # check for assignments with no courses. Not setting session if no course found.
-        if @tasks[0].assignment.course_id?
-          course_id = @tasks[0].assignment.course_id
-          course = Course.find(course_id)
-          if course.locale?
-            session[:locale] = course.locale
-          end
-        end
-      end
+      # Set the session[:locale] for student
+      set_new_locale_for_student
+      # If params is set, means that language was requested. Reset it.
       @locale ||= params[:locale] || session[:locale] || I18n.default_locale
       I18n.locale = session[:locale] = @locale
     else
       I18n.locale = params[:locale] || I18n.default_locale
+    end
+  end
+
+  def set_new_locale_for_student
+    # Check student task view and set locale accordingly
+    if !params[:id].nil? || !params[:student_id].nil?
+      participant_id = params[:id] || params[:student_id]
+      participant = AssignmentParticipant.find(participant_id)
+      assignment = participant.assignment
+      if !assignment.course.nil?
+        new_locale = assignment.course.locale
+        if !new_locale.nil?
+          session[:locale] = new_locale
+        else
+          session[:locale] = I18n.default_locale
+        end
+      else
+        session[:locale] = I18n.default_locale
+      end
+    else # Set locale to best default possible to all other student pages
+      courseParticipants = CourseParticipant.where(user_id: current_user.id)
+      courseParticipantsLocales = courseParticipants.map { |cp| cp.course.locale}
+      # If no tasks, then possible to have no courses assigned.
+      if courseParticipantsLocales.uniq.length == 1 #&& !@tasks.empty?
+        course = courseParticipants.first.course
+        if course.locale?
+          session[:locale] = course.locale
+        else
+          session[:locale] = I18n.default_locale
+        end
+      else
+        session[:locale] = I18n.default_locale
+      end
     end
   end
 

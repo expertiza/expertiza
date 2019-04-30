@@ -242,7 +242,7 @@ describe 'Instructor', js: true do
   end
   # Verify that an instructor can see all quiz questions,
   # answers, and scores on the review questions page.
-  it 'can view quiz questions and scores' do
+  xit 'can view quiz questions and scores' do
     login_as @instructor.name
     visit "/student_quizzes/review_questions?id=#{@assignment.id}&type=Assignment"
     student = all("tr > td")[0]

@@ -37,36 +37,6 @@ describe "Integration tests for instructor interface" do
     end
   end
 
-  describe "View Submision Grading History" do
-    it 'should display submission grading history' do
-      login_as("instructor6")
-      visit '/grades/view_team?id=31971'
-      fill_in "instructor_id", with: ''
-      fill_in "assignment_id", with: ''
-      fill_in "grading_type", with: ''
-      fill_in "grade_receiver_id", with: ''
-      fill_in "grade", with: ''
-      fill_in "comment", with: 'public submission comment for test'
-      click_button "Save"
-      expect(GradingHistory.where(comment: "public submission comment for test")).to exist
-    end
-  end
-
-  describe "View Review Grading History" do
-    it 'should display review grading history' do
-      login_as("instructor6")
-      visit '/grades/view_team?id=31971'
-      fill_in "instructor_id", with: ''
-      fill_in "assignment_id", with: ''
-      fill_in "grading_type", with: ''
-      fill_in "grade_receiver_id", with: ''
-      fill_in "grade", with: ''
-      fill_in "comment", with: 'public review comment for test'
-      click_button "Save"
-      expect(GradingHistory.where(comment:"public review comment for test")).to exist
-    end
-  end
-
   describe "View Publishing Rights" do
     it 'should display teams for assignment without topic' do
       login_as("instructor6")

@@ -22,11 +22,7 @@
       <tr>
         <% (1..@field_count).each do |i| %>
           <th>
-            <select name="select<%=i%>" id="select<%=i%>" class="form-control" style="background-color:lightgrey">
-              <% @selected_fields.each do |name, disp_name| %>
-                <option value="<%=name%>"><%= disp_name %></option>
-              <% end %>
-            </select>
+            <%= select_tag("select#{i}", options_for_select(@selected_fields.invert, @selected_fields.keys[i-1])) %>
           </th>
         <% end %>
       </tr>

@@ -75,7 +75,7 @@ class ApplicationController < ActionController::Base
   end
 
   def set_new_locale_for_student
-    # Check student task view and set locale accordingly
+    # Check student task view and set locale accordingly.
     if !params[:id].nil? || !params[:student_id].nil?
       participant_id = params[:id] || params[:student_id]
       participant = AssignmentParticipant.find_by(id: participant_id)

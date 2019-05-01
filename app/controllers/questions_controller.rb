@@ -65,18 +65,6 @@ class QuestionsController < ApplicationController
       render action: 'edit'
     end
   end
-
-  def delete_answers(response_id)
-    response = Answer.where(response_id: response_id)
-    response.each do |answer|
-      begin
-        answer.destroy
-        flash[:success] = "You have successfully deleted the answer!"
-      rescue StandardError
-        flash[:error] = $ERROR_INFO
-      end
-    end
-  end
   
   # Remove question from database and
   # return to list
@@ -84,7 +72,12 @@ class QuestionsController < ApplicationController
     question = Question.find(params[:id])
     questionnaire_id = question.questionnaire_id
     question_ids=Question.where(questionnaire_id: questionnaire_id).ids
-    get_answers(questionnaire_id,question_ids)
+    # Fetch the Answers for the Questionnaire, delete and send them to User
+    begin
+      AnswerHelper.get_answers(questionnaire_id,question_ids)
+    rescue StandardError
+      flash[:error] = $ERROR_INFO
+    end
     begin
       question.destroy
       flash[:success] = "You have successfully deleted the question!"
@@ -98,49 +91,6 @@ class QuestionsController < ApplicationController
   def types
     types = Question.distinct.pluck(:type)
     render json: types.to_a
-  end
-
-# Beginning of new method for OODD project 4
-  def get_answers(questionnaire_id,question_ids)
-    response_ids=[]
-    question_ids.each do |question|
-      response_ids=response_ids+Answer.where(question_id: question).pluck("response_id")
-    end
-    response_ids=response_ids.uniq
-    user_id_to_answers={}
-    response_ids.each do |response|
-      response_map_id = Response.where(id: response).pluck("map_id")
-      reviewer_id = ResponseMap.where(id: response_map_id).pluck("reviewer_id", "reviewed_object_id")
-      assignment_name = Assignment.where(id: reviewer_id[1]).pluck("name")
-      user_details = User.where(id: reviewer_id[0]).pluck("email", "name")
-      answers_per_user = Answer.where(response_id: response).pluck("comments")
-      user_id_to_answers[user_details[0]] = [answers_per_user, response, user_details[1], assignment_name]
-    end
-
-    # Mail the answers to each user and if successfull, delete the answers
-    user_id_to_answers.each do |email, answers|
-      if review_mailer(email, answers[0], answers[2])
-        delete_answers(answers[1])
-      end
-    end
-  end
-
-  def review_mailer(email, answers, name, assignment_name)
-    begin
-      Mailer.notify_review_rubric_change(
-        to: email,
-        subject: 'Expertiza Notification: The review rubric has been changed, please re-attempt the review',
-        body: {
-          name: name,
-          assignment_name: assignment_name,
-          answers: answers
-        }
-        ).deliver_now
-      true
-    rescue StandardError
-      flash[:error] = $ERROR_INFO
-      false
-    end
   end
 
 end

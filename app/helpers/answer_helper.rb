@@ -14,14 +14,14 @@ module AnswerHelper
       assignment_name = Assignment.where(id: reviewer_id[0][1]).pluck(:name)
       user_details = User.where(id: reviewer_id[0][0]).pluck(:email, :name)
       answers_per_user = Answer.where(response_id: response).pluck(:comments)
-      user_id_to_answers[user_details[0][0]] = [answers_per_user, response, user_details[0][1], assignment_name] unless user_details.empty?
+      user_id_to_answers[response] = [user_details[0][0], answers_per_user, user_details[0][1], assignment_name] unless user_details.empty?
 		end
 
     # Mail the answers to each user and if successfull, delete the answers
     begin
-	    user_id_to_answers.each do |email, answers|
-	      if self.review_mailer(email, answers[0], answers[2], answers[3])
-	        self.delete_answers(answers[1])
+	    user_id_to_answers.each do |response, answers|
+	      if self.review_mailer(answers[0], answers[1], answers[2], answers[3])
+	        self.delete_answers(response)
 	      end
 	    end
 	  rescue StandardError

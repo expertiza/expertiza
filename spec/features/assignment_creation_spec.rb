@@ -442,6 +442,7 @@ describe "assignment function" do
       assignment = create(:assignment, name: 'public assignment for test')
       login_as("instructor6")
       visit "/assignments/#{assignment.id}/edit"
+      check("assignment_has_topics")
       click_link 'Topics'
     end
 
@@ -514,6 +515,16 @@ describe "assignment function" do
 
       topics_exist = SignUpTopic.where(assignment_id: assignment.id).count
       expect(topics_exist).to be_eql 0
+    end
+
+    it "hides topics tab when has topics is un-checked", js: true do
+      click_link 'General'
+      uncheck("assignment_has_topics")
+      # The below line is used to accept the js confirmation popup
+      page.driver.browser.switch_to.alert.accept
+      # Wait for topics to be removed and page to re-load
+      sleep 3
+      expect(page).not_to have_link('Topics')
     end
   end
 

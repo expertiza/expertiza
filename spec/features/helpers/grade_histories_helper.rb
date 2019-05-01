@@ -1,7 +1,5 @@
 module GradeHistoriesHelperSpec
   def assignment_setup
-    # create assignment and topic
-
     create(:assignment, name: "Assignment1684", directory_path: "Assignment1684")
     create_list(:participant, 3)
     create(:topic, topic_name: "Topic")

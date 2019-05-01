@@ -139,6 +139,7 @@ class QuestionnairesController < ApplicationController
       # Fetch the Answers for the Questionnaire, delete and send them to User
       begin
         AnswerHelper.get_answers(params[:id],question_ids)
+        flash[:success] = "You have successfully deleted all the answers corresponding to this Questionnaire!"
       rescue StandardError
         flash[:error] = $ERROR_INFO
       end

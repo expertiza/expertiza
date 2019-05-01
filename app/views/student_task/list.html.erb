@@ -40,7 +40,7 @@
 
     <span>&nbsp; &raquo;
       <%= link_to student_task.assignment.name + " " + student_task.current_stage, :controller => controller, :action => action, :id => participant.id %>
-      (<%= student_task.relative_deadline %> left)
+      (<%= student_task.relative_deadline %> <%=t ".left" %>)
     </span><br/>
   <% end %>
 

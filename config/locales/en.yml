@@ -182,6 +182,7 @@ en:
       badges: "Badges"
       stage_deadline: "Stage Deadline"
       publishing_rights: "Publishing Rights"
+      left: "left"
 
     publishing_rights:
       select_assignment: "Select an assignment from the list or set"

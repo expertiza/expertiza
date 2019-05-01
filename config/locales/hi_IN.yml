@@ -177,6 +177,7 @@ hi_IN:
       badges: "बैज"
       stage_deadline: "चरण की अंतिम तिथि"
       publishing_rights: "प्रकाशन अधिकार"
+      left: "बाकी"
 
     publishing_rights:
       select_assignment: "सूची से असाइनमेंट चुनें या अपने काम के लिए"
@@ -479,6 +480,50 @@ hi_IN:
     email:
       email_add: "ईमेल पता:"
 
+  datetime:
+    distance_in_words:
+      about_x_hours:
+        one: "करीब 1 घंटा"
+        other: "करीब %{count} घंटे"
+      about_x_months:
+        one: "करीब 1 महीना"
+        other: "करीब %{count} महीने"
+      about_x_years:
+        one: "करीब 1 साल"
+        other: "करीब %{count} साल"
+      almost_x_years:
+        one: "करीब 1 साल"
+        other: "करीब %{count} साल"
+      half_a_minute: "आधा मिनट"
+      less_than_x_minutes:
+        zero: "0 मिनट से कम"
+        one: "1 मिनट से कम"
+        other: "%{count} मिनट से कम"
+      less_than_x_seconds:
+        zero: "0 सेकंड से कम"
+        one: "1 सेकंड से कम"
+        other: "%{count} सेकंड से कम"
+      over_x_years:
+        one: "1 साल से अधिक"
+        other: "%{count} साल से अधिक"
+      x_days:
+        one: "1 दिन"
+        other: "%{count} दिन"
+      x_hours:
+        one: "1 घंटा"
+        other: "%{count} घंटे"
+      x_minutes:
+        one: "1 मिनट"
+        other: "%{count} मिनट"
+      x_months:
+        one: "1 महीना"
+        other: "%{count} महीने"
+      x_years:
+        one: "1 साल"
+        other: "%{count} साल"
+      x_seconds:
+        one: "1 सेकंड"
+        other: "%{count} सेकंड"
 
  # end of Student Views
 

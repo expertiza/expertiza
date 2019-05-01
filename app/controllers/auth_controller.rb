@@ -124,6 +124,7 @@ class AuthController < ApplicationController
     session[:original_user] = nil
     session[:impersonate] = nil
     session[:locale] = nil
+    session[:user_locale] = nil
   end
 
   # clears any identifying info from session
@@ -141,5 +142,6 @@ class AuthController < ApplicationController
     session[:original_user] = nil
     session[:impersonate] = nil
     session[:locale] = nil
+    session[:user_locale] = nil
   end
 end

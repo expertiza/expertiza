@@ -61,13 +61,16 @@ class ApplicationController < ActionController::Base
   def set_locale
     # Only students with course having language set should have session[:locale] set
     if(logged_in? && current_user_role? && current_user_role.student?)
-      # Set the session[:locale] for student
-      set_new_locale_for_student
       # If params is set, means that language was requested. Reset it.
-      @locale ||= params[:locale] || session[:locale] || I18n.default_locale
+      if !params[:locale].nil?
+        session[:user_locale] = params[:locale]
+      elsif session[:user_locale].nil? # Set the session[:locale] for student
+        set_new_locale_for_student
+      end
+      @locale ||= session[:user_locale] || session[:locale] || I18n.default_locale
       I18n.locale = session[:locale] = @locale
     else
-      I18n.locale = params[:locale] || I18n.default_locale
+      I18n.locale = I18n.default_locale
     end
   end
 
@@ -75,7 +78,12 @@ class ApplicationController < ActionController::Base
     # Check student task view and set locale accordingly
     if !params[:id].nil? || !params[:student_id].nil?
       participant_id = params[:id] || params[:student_id]
-      participant = AssignmentParticipant.find(participant_id)
+      participant = AssignmentParticipant.find_by(id: participant_id)
+      # If id or student_id not correct, revert to default locale based on courses.
+      if participant.nil?
+        session[:locale] = find_locale_from_courses
+        return
+      end
       assignment = participant.assignment
       if !assignment.course.nil?
         new_locale = assignment.course.locale
@@ -88,19 +96,23 @@ class ApplicationController < ActionController::Base
         session[:locale] = I18n.default_locale
       end
     else # Set locale to best default possible to all other student pages
-      courseParticipants = CourseParticipant.where(user_id: current_user.id)
-      courseParticipantsLocales = courseParticipants.map { |cp| cp.course.locale}
-      # If no tasks, then possible to have no courses assigned.
-      if courseParticipantsLocales.uniq.length == 1 #&& !@tasks.empty?
-        course = courseParticipants.first.course
-        if course.locale?
-          session[:locale] = course.locale
-        else
-          session[:locale] = I18n.default_locale
-        end
+      session[:locale] = find_locale_from_courses
+    end
+  end
+
+  def find_locale_from_courses
+    courseParticipants = CourseParticipant.where(user_id: current_user.id)
+    courseParticipantsLocales = courseParticipants.map { |cp| cp.course.locale}
+    # If no tasks, then possible to have no courses assigned.
+    if courseParticipantsLocales.uniq.length == 1 #&& !@tasks.empty?
+      course = courseParticipants.first.course
+      if course.locale?
+        return course.locale
       else
-        session[:locale] = I18n.default_locale
+        return I18n.default_locale
       end
+    else
+      return I18n.default_locale
     end
   end
 

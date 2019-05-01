@@ -33,12 +33,9 @@ describe "Feature Tests to check the grade audit trail: " do
       fill_in "comment_for_submission", with: 'second comment'
       click_button 'Save'
       visit '/grading_histories?grade_receiver_id=1&grade_type=Submission'
-
-      table = page.all('#theTable tr')
+      table = page.all('table tr')
       expect(table[0]).to have_content?("second comment")
       expect(table[1]).to_have_content?("first comment")
-
-
     end
 
   end

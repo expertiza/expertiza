@@ -184,11 +184,11 @@ class TreeDisplayController < ApplicationController
     res
   end
 
-  def update_fnode_children(fnode, tmp_res, search)
+  def update_fnode_children(fnode, tmp_res, filter)
     # fnode is short for foldernode which is the parent node
     # ch_nodes are childrens
     # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
-    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil, search)
+    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil, filter)
     tmp_res[fnode.get_name] = ch_nodes
   end
 

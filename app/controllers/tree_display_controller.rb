@@ -195,11 +195,11 @@ class TreeDisplayController < ApplicationController
   # initialize parent node and update child nodes for it
   def initialize_fnode_update_children(params, node, tmp_res)
     fnode = (params[:reactParams][:nodeType]).constantize.new
-    search = params[:reactParams][:search] || {}
+    filter = params[:reactParams][:filter] || {}
     node.each do |a|
       fnode[a[0]] = a[1]
     end
-    update_fnode_children(fnode, tmp_res, search)
+    update_fnode_children(fnode, tmp_res, filter)
   end
 
   # for child nodes
@@ -301,9 +301,9 @@ class TreeDisplayController < ApplicationController
 
   def get_tmp_res(params, child_nodes)
     fnode = (params[:reactParams2][:nodeType]).constantize.new
-    search = params[:reactParams2][:search] || {}
+    filter = params[:reactParams2][:filter] || {}
     initialize_fnode_2(fnode, child_nodes)
-    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil, search)
+    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil, filter)
     res_node_for_child_2(ch_nodes)
   end
 

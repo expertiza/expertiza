@@ -5,7 +5,7 @@ require 'rest_client'
 # required by autosummary
 module SummaryHelper
   class Summary
-    attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion, :search
+    attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion, :filter
 
     def summarize_reviews_by_reviewee(questions, assignment, r_id, summary_ws_url)
       self.summary = ({})

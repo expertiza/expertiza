@@ -159,7 +159,7 @@ class TreeDisplayController < ApplicationController
   # by marking private to be true in that case
   #
   # this also ensures that instructors (who are not ta) would have update_in_ta_course_listing
-  # not changing the private value if he/she is not TA which was set to true for all courses before filtering
+  # not changing the private value if he/she is not TA which was set to true for all courses before \ing
   # in update_tmp_obj in courses_assignments_obj
   #
   # below objects/variable names were part of the project as before and
@@ -195,7 +195,7 @@ class TreeDisplayController < ApplicationController
   # initialize parent node and update child nodes for it
   def initialize_fnode_update_children(params, node, tmp_res)
     fnode = (params[:reactParams][:nodeType]).constantize.new
-    filter = params[:reactParams][:filter] || {}
+    filter = params[:reactParams][:search] || {}
     node.each do |a|
       fnode[a[0]] = a[1]
     end
@@ -301,7 +301,7 @@ class TreeDisplayController < ApplicationController
 
   def get_tmp_res(params, child_nodes)
     fnode = (params[:reactParams2][:nodeType]).constantize.new
-    filter = params[:reactParams2][:filter] || {}
+    filter = params[:reactParams2][:search] || {}
     initialize_fnode_2(fnode, child_nodes)
     ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil, filter)
     res_node_for_child_2(ch_nodes)

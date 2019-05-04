@@ -73,8 +73,6 @@ class StudentReviewController < ApplicationController
     end
     signed_up_topics = []
     @bids.each do |bid|
-      @review_mappings.each do |user_topic|
-        if user_topic.assignment_id = bid.bid_topic_identifier
           signed_up_topics << bid
         end
       end

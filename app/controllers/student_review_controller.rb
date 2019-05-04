@@ -75,14 +75,11 @@ class StudentReviewController < ApplicationController
     @bids.each do |bid|
           signed_up_topics << bid
         end
-      end
-    end
     # signed_up_topics &= @bids
     # @bids -= signed_up_topics
     @selected_topics = signed_up_topics
 
   end
-
 
 
   # E1928 Allow reviews to bid on what review.

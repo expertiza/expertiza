@@ -58,31 +58,47 @@ class StudentReviewController < ApplicationController
   # the review strategy is "bidding"
   def topic_list
     # get the participant that's the reviewer for the assignment
-    @participant = AssignmentParticipant.find(params[:id])
-    my_bids = ReviewBid.get_bids_by_participant(@participant)
-    @bids = []
-    my_teams = TeamsUser.where(user_id: @participant.user_id).map(&:team_id)
-    # if self-review is not allowed
-    if !@assignment.is_selfreview_enabled
-      my_bids.each do |bid|
-        next if my_teams.include?(bid.team_id)
-        @bids << bid
-      end
-    else
-      @bids = my_bids
-    end
+    # @participant = AssignmentParticipant.find(params[:id])
+    # my_bids = ReviewBid.get_bids_by_participant(@participant)
+    # @bids = []
+    # my_teams = TeamsUser.where(user_id: @participant.user_id).map(&:team_id)
+    # # if self-review is not allowed
+    # if !@assignment.is_selfreview_enabled
+    #   my_bids.each do |bid|
+    #     next if my_teams.include?(bid.team_id)
+    #     @bids << bid
+    #   end
+    # else
+    #   @bids = my_bids
+    # end
+    # signed_up_topics = []
+    # @bids.each do |bid|
+    #   @review_mappings.each do |user_topic|
+    #     if user_topic.assignment_id = bid.bid_topic_identifier
+    #       signed_up_topics << bid
+    #     end
+    #   end
+    # end
+    # signed_up_topics &= @bids
+    # @bids -= signed_up_topics
+    # @selected_topics = signed_up_topics
+  @participant = AssignmentParticipant.find(params[:id])
+  @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
+  team_id = @participant.team.try(:id)
+
+
+  if @assignment.is_intelligent
+    @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
     signed_up_topics = []
     @bids.each do |bid|
-      @review_mappings.each do |user_topic|
-        if user_topic.assignment_id = bid.bid_topic_identifier
-          signed_up_topics << bid
-        end
-      end
+      sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
+      signed_up_topics << sign_up_topic if sign_up_topic
     end
-    signed_up_topics &= @bids
-    @bids -= signed_up_topics
+    signed_up_topics &= @sign_up_topics
+    @sign_up_topics -= signed_up_topics
     @selected_topics = signed_up_topics
 
+  end
   end
 
   # E1928 Allow reviews to bid on what review.

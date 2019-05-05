@@ -26,7 +26,6 @@
       <tr class="sort-disabled"><td></td><td></td></tr>
       <% for bid in @bids %>
         <%= get_intelligent_review_row(bid) %>
-<!--        <tr style="background-color:rgb(47,352,0)" id="topic_<%#= bid.team_id %>">-->
         <%= render :partial => 'table_line', :locals => {:i=>i, :bid=>bid} %>
         </tr>
         <% i=i+1 %>

@@ -15,10 +15,10 @@ jQuery ->
     update: ->
       $.post($(this).data('update-url'), $(this).sortable('serialize'))
   
-  $("#reviews").sortable
-    cursor: 'move',
-    opacity: 0.65,
-    tolerance: 'pointer'
-    items: ">*:not(.sort-disabled)"
-    update: ->
-      $.post($(this).data('update-url'), $(this).sortable('serialize'))
+#  $("#reviews").sortable
+#    cursor: 'move',
+#    opacity: 0.65,
+#    tolerance: 'pointer'
+#    items: ">*:not(.sort-disabled)"
+#    update: ->
+#      $.post($(this).data('update-url'), $(this).sortable('serialize'))

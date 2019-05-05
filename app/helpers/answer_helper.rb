@@ -1,7 +1,11 @@
 #E1924 Spring 2019 Addition
 
 module AnswerHelper
-	def self.get_answers(questionnaire_id,question_ids)
+
+  #Function will serve 2 purposes
+  #One - Identify the existing responses for the modified questionnaire in the database 	
+  #Two - Mail the response to the user and delete the object in the database
+  def self.delete_existing_responses(questionnaire_id,question_ids)
     response_ids=[]
     question_ids.each do |question|
       response_ids=response_ids+Answer.where(question_id: question).pluck("response_id")
@@ -17,7 +21,7 @@ module AnswerHelper
       user_id_to_answers[response] = [user_details[0][0], answers_per_user, user_details[0][1], assignment_name] unless user_details.empty?
 		end
 
-    # Mail the answers to each user and if successfull, delete the answers
+    # Second part of the function that mails the answers to each user and if successfull, delete the answers
     begin
 	    user_id_to_answers.each do |response, answers|
 	      if self.review_mailer(answers[0], answers[1], answers[2], answers[3])
@@ -29,6 +33,7 @@ module AnswerHelper
     end
   end
 
+  #Mail the existing response in the databse to the reviewer 
   def self.review_mailer(email, answers, name, assignment_name)
     begin
       Mailer.notify_review_rubric_change(
@@ -47,6 +52,7 @@ module AnswerHelper
     end
   end
 
+  #Delete the answers to the modified questionnaire
   def self.delete_answers(response_id)
     response = Answer.where(response_id: response_id)
     response.each do |answer|

@@ -74,7 +74,7 @@ class QuestionsController < ApplicationController
     question_ids=Question.where(questionnaire_id: questionnaire_id).ids
     # Fetch the Answers for the Questionnaire, delete and send them to User
     begin
-      AnswerHelper.get_answers(questionnaire_id,question_ids)
+      AnswerHelper.delete_existing_responses(questionnaire_id,question_ids)
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end

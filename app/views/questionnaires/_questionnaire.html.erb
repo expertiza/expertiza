@@ -29,7 +29,8 @@
     <table id="question_actions_table">
       <tr>
         <td>
-          <p class="form-inline"> <%= submit_tag 'Add', confirm: "All current responses will be void. Are you sure you want to continue", name: "add_new_questions", class: "btn btn-default"%>
+          <p class="form-inline"> <%= submit_tag 'Add', confirm: "All existing reviews for the questionnaire would be deleted. Are you sure you want to continue?", name: "add_new_questions", 
+class: "btn btn-default"%>
             <%= text_field 'new_question', 'total_num', :size => 1, :value => "1", :class => "form-control" %> more
             <%= select "new_question", "type",
                 {"Criterion" =>"Criterion",

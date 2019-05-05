@@ -7,10 +7,10 @@
     <th>Assignment</th>
     <th>Grade Receiver</th>
     <th>Grade</th>
-    <th>Comment</th>
+    <th width="25%">Comment</th>
     <th>Graded At</th>
   </tr>
-  </thead>
+  s
   <!--This is the main view of the table. This will add table with either hyperlink or the content nased on the operation. -->
   <tbody>
   <% @grading_histories.each do |record| %>
@@ -23,7 +23,7 @@
             <td><%= User.where(id: record.grade_receiver_id).pluck(:fullname).first %></td>
         <% end %>
         <td><%= record.grade %></td>
-        <td><%= record.comment %></td>
+        <td width="25%"><%= record.comment %></td>
         <td><%= record.created_at %></td>
       </tr>
   <% end %>

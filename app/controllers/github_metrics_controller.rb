@@ -101,10 +101,10 @@ class GithubMetricsController < ApplicationController
     pull_request_number = github_data["data"]["repository"]["pullRequest"]["number"]
 
     @gitVariable[:merge_status][pull_request_number] = if github_data["data"]["repository"]["pullRequest"]["merged"]
-                                           "MERGED"
-                                         else
-                                           github_data["data"]["repository"]["pullRequest"]["mergeable"]
-                                         end
+                                                          "MERGED"
+                                                       else
+                                                          github_data["data"]["repository"]["pullRequest"]["mergeable"]
+                                                       end
   end
 
   # This function is used to retrieve data for each pull requests status.

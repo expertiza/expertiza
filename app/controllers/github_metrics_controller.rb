@@ -39,16 +39,16 @@ class GithubMetricsController < ApplicationController
 
     # Variables to store github statistics
     @gitVariable = {
-        :head_refs => {},
-        :parsed_data => {},
-        :authors => {},
-        :dates => {},
-        :total_additions => 0,
-        :total_deletions => 0,
-        :total_commits => 0,
-        :total_files_changed => 0,
-        :merge_status => {},
-        :check_statuses => {}
+                     :head_refs => {},
+                     :parsed_data => {},
+                     :authors => {},
+                     :dates => {},
+                     :total_additions => 0,
+                     :total_deletions => 0,
+                     :total_commits => 0,
+                     :total_files_changed => 0,
+                     :merge_status => {},
+                     :check_statuses => {}
     }
 
     @token = session["github_access_token"]
@@ -241,25 +241,23 @@ class GithubMetricsController < ApplicationController
   # An auxiliary function for "get_pull_requests_details". This function is used to conduct query for details github commits data
   # using a pull request link.
   def get_query_for_pull_request_links(hyperlink_data)
-      {
-          query: "query {
-        repository(owner: \"" + hyperlink_data["owner_name"] + "\", name:\"" + hyperlink_data["repository_name"] + "\") {
-          pullRequest(number: " + hyperlink_data["pull_request_number"] + ") {
-            number additions deletions changedFiles mergeable merged headRefOid
-              commits(first:100, after:" + @end_cursor + "){
-                totalCount
-                  pageInfo{
-                    hasNextPage startCursor endCursor
-                    }
-                      edges{
-                        node{
-                          id  commit{
-                                author{
-                                  name
-                                }
+    query: "query {
+      repository(owner: \"" + hyperlink_data["owner_name"] + "\", name:\"" + hyperlink_data["repository_name"] + "\") {
+        pullRequest(number: " + hyperlink_data["pull_request_number"] + ") {
+          number additions deletions changedFiles mergeable merged headRefOid
+            commits(first:100, after:" + @end_cursor + "){
+              totalCount
+                pageInfo{
+                  hasNextPage startCursor endCursor
+                  }
+                  edges{
+                    node{
+                      id  commit{
+                        author{
+                                 name
+                               }
                                additions deletions changedFiles committedDate
                         }}}}}}}"
-      }
   end
 
   # An auxiliary function to organize authors and their commit dates. Each author has a list of commit dates.

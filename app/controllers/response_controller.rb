@@ -82,7 +82,7 @@ class ResponseController < ApplicationController
     is_submitted = params[:isSubmit].present?
     @save_type = params[:save_type]
     # An AJAX call can be made from the response view due to JS implementation
-    save_response("update")
+    save_form("update")
   end
 
   def new
@@ -132,7 +132,7 @@ class ResponseController < ApplicationController
     was_submitted = false
     save_type = params[:save_type]
     # An AJAX call can made from the response view due to JS implementation
-    save_response('create')
+    save_form('create')
   end
 
   def save
@@ -298,16 +298,16 @@ class ResponseController < ApplicationController
     end
   end
   
-  def save_response(http_method)
+  def save_form(http_method)
     case http_method
     when "create"
-      create_response
+      save_new_response_and_answers
     when "update"
-      update_response
+      update_existing_response_and_answers
     end
   end
   
-  def create_response
+  def save_new_response_and_answers
     # NEW change: is_submitted is always false for create.
     is_submitted = false
 
@@ -348,7 +348,6 @@ class ResponseController < ApplicationController
     end
 
     button_type = params[:button_type]
-
     if button_type == "submit_button"
       redirect_to action: 'show_confirmation_page', id: @response.id, return: @return, msg: msg
     else
@@ -359,7 +358,7 @@ class ResponseController < ApplicationController
     end
   end
 
-  def update_response
+  def update_existing_response_and_answers
     # the response to be updated
     @response = Response.find(params[:id])
     @map = @response.map
@@ -369,7 +368,7 @@ class ResponseController < ApplicationController
 
     if submit_response_confirmed
       # is_submitted is 'Yes' only when submit button in confirmation page is clicked
-      save_confirmed_response
+      set_form_view_only
       msg = "Your response was submitted"
       params[:msg] = msg
       # log success
@@ -379,13 +378,13 @@ class ResponseController < ApplicationController
               return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
     elsif button_type && button_type == "submit_button"
       # is_submitted is 'Yes' only when submit button in confirmation page is clicked
-      save_unconfirmed_response
+      save_unconfirmed_form
       msg = "Response was successfully saved"
       # log success
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, msg, request)
       redirect_to action: 'show_confirmation_page', id: @response.id, return: @return, msg: msg
     else
-      save_unconfirmed_response
+      save_unconfirmed_form
       msg = "Response was successfully saved"
       params[:msg] = msg
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, msg)
@@ -395,13 +394,13 @@ class ResponseController < ApplicationController
       end
   end
   
-  def save_confirmed_response
+  def set_form_view_only
     @response.update_attribute('is_submitted', true) if params['is_submitted'] && params['is_submitted'] == 'Yes'
     @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
     Metric.new.update_suggestion_chance(@response, params["avg_suggestion_chance_for_response"])
   end
   
-  def save_unconfirmed_response
+  def save_unconfirmed_form
     begin
       #@map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])

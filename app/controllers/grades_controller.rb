@@ -7,11 +7,6 @@ class GradesController < ApplicationController
   include AssignmentHelper
   include GradesHelper
 
-  # the view grading report provides the instructor with an overall view of all the grades for
-  # an assignment. It lists all participants of an assignment and all the reviews they received.
-  # It also gives a final score, which is an average of all the reviews and greatest difference
-  # in the scores of all the reviews.
-
   def action_allowed?
     case params[:action]
     when 'view_my_scores'
@@ -37,6 +32,10 @@ class GradesController < ApplicationController
     end
   end
 
+  # the view grading report provides the instructor with an overall view of all the grades for
+  # an assignment. It lists all participants of an assignment and all the reviews they received.
+  # It also gives a final score, which is an average of all the reviews and greatest difference
+  # in the scores of all the reviews.
   def view
     @assignment = Assignment.find(params[:id])
     questionnaires = @assignment.questionnaires

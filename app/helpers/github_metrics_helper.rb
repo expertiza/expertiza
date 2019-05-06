@@ -33,28 +33,30 @@ module GithubMetricsHelper
 
   def graph_scales
     {
-        yAxes: [{
-                  stacked: true,
-                  ticks: {
-                    beginAtZero: true
-                  },
-                  barThickness: 30,
-                  scaleLabel: {
-                    display: true,
-                    labelString: 'Submission timeline'
-                  }
-      }],
-        xAxes: [{
-                  stacked: true,
-                  ticks: {
-                    beginAtZero: true
-                  },
-                  barThickness: 30,
-                  scaleLabel: {
-                      display: true,
-                      labelString: '# of Commits'
-                  }
-                }]
+      yAxes: [{
+              stacked: true,
+              ticks: {
+                beginAtZero: true
+              },
+              barThickness: 30,
+              scaleLabel: {
+                display: true,
+                labelString: 'Submission timeline'
+              }
+             }
+        ],
+      xAxes: [{
+              stacked: true,
+              ticks: {
+                beginAtZero: true
+              },
+              barThickness: 30,
+              scaleLabel: {
+                  display: true,
+                  labelString: '# of Commits'
+              }
+              }
+             ]
     }
   end
 end

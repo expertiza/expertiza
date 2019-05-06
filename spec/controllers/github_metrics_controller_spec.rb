@@ -13,7 +13,6 @@
   let(:review_response_map) { build(:review_response_map, id: 1) }
   let(:assignment_due_date) { build(:assignment_due_date) }
 
-
   before(:each) do
     allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
     allow(participant).to receive(:team).and_return(team)
@@ -22,7 +21,6 @@
     allow(Assignment).to receive(:find).with(1).and_return(assignment)
 
   end
-
 
   describe '#view' do
     before(:each) do
@@ -52,9 +50,6 @@
       end
     end
   end
-
-
-
 
  describe '#get_statuses_for_pull_request' do
     before(:each) do
@@ -172,7 +167,6 @@
           :head_refs => { "1234" => "qwerty", "5678" => "asdfg"},
           :check_statuses => {}
       })
-
     end
 
     it 'gets and stores the statuses associated with head commits of PRs' do

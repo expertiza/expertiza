@@ -39,16 +39,16 @@ class GithubMetricsController < ApplicationController
 
     # Variables to store github statistics
     @gitVariable = {
-        :head_refs => {},
-        :parsed_data => {},
-        :authors => {},
-        :dates => {},
-        :total_additions => 0,
-        :total_deletions => 0,
-        :total_commits => 0,
-        :total_files_changed => 0,
-        :merge_status => {},
-        :check_statuses => {}
+                     :head_refs => {},
+                     :parsed_data => {},
+                     :authors => {},
+                     :dates => {},
+                     :total_additions => 0,
+                     :total_deletions => 0,
+                     :total_commits => 0,
+                     :total_files_changed => 0,
+                     :merge_status => {},
+                     :check_statuses => {}
     }
 
     @token = session["github_access_token"]

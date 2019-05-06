@@ -52,7 +52,6 @@ class GithubMetricsController < ApplicationController
     }
 
     @token = session["github_access_token"]
-
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
     @team = @participant.team
@@ -101,9 +100,9 @@ class GithubMetricsController < ApplicationController
     pull_request_number = github_data["data"]["repository"]["pullRequest"]["number"]
 
     @gitVariable[:merge_status][pull_request_number] = if github_data["data"]["repository"]["pullRequest"]["merged"]
-                                                          "MERGED"
+                                                         "MERGED"
                                                        else
-                                                          github_data["data"]["repository"]["pullRequest"]["mergeable"]
+                                                         github_data["data"]["repository"]["pullRequest"]["mergeable"]
                                                        end
   end
 
@@ -269,9 +268,9 @@ class GithubMetricsController < ApplicationController
     @gitVariable[:dates][commit_date] ||= 1
     @gitVariable[:parsed_data][author_name] ||= {}
     @gitVariable[:parsed_data][author_name][commit_date] = if @gitVariable[:parsed_data][author_name][commit_date]
-                                                              @gitVariable[:parsed_data][author_name][commit_date] + 1
+                                                             @gitVariable[:parsed_data][author_name][commit_date] + 1
                                                            else
-                                                              1
+                                                             1
                                                            end
   end
 

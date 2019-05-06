@@ -1,5 +1,4 @@
 class GithubMetricsController < ApplicationController
-
   helper :file
   helper :submitted_content
   helper :penalty
@@ -29,7 +28,6 @@ class GithubMetricsController < ApplicationController
     redirect_to "https://github.com/login/oauth/authorize?client_id=#{GITHUB_CONFIG['client_key']}"
   end
 
-
   # This function is used to show github_metrics information by redirecting to view.
   def view_github_metrics
     if session["github_access_token"].nil?
@@ -52,8 +50,6 @@ class GithubMetricsController < ApplicationController
         :merge_status => {},
         :check_statuses => {}
     }
-
-    
 
     @token = session["github_access_token"]
 
@@ -123,7 +119,6 @@ class GithubMetricsController < ApplicationController
     url = "https://api.github.com/repos/" + pr_object[:owner] + "/" + pr_object[:repository] + "/commits/" + pr_object[:head_commit] + "/status"
     ActiveSupport::JSON.decode(Net::HTTP.get(URI(url)))
   end
-
 
   # This function is used to retrieve github data from a pull request link.
   def retrieve_pull_request_data(pull_links)
@@ -204,7 +199,6 @@ class GithubMetricsController < ApplicationController
     response_data
   end
 
-
   # An auxiliary function for "Retrieve pull request data". @github_data include data details obtained from "get_pull_request_details" function.
   # After calling this function, github statistic data could be extracted.
   def parse_github_pull_request_data(github_data)
@@ -276,10 +270,10 @@ class GithubMetricsController < ApplicationController
     @gitVariable[:dates][commit_date] ||= 1
     @gitVariable[:parsed_data][author_name] ||= {}
     @gitVariable[:parsed_data][author_name][commit_date] = if @gitVariable[:parsed_data][author_name][commit_date]
-                                               @gitVariable[:parsed_data][author_name][commit_date] + 1
-                                             else
-                                               1
-                                             end
+                                                              @gitVariable[:parsed_data][author_name][commit_date] + 1
+                                                           else
+                                                              1
+                                                           end
   end
 
   # An auxiliary function. Sort commit dates for each author to make them in order.

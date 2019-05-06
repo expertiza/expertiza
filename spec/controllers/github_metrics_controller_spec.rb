@@ -67,7 +67,7 @@
           repository: 'expertiza',
           head_commit: 'qwerty123'})).to eq("team" => "rails", "players" => "36")
     end
-  end
+ end
 
   describe '#retrieve_pull_request_data' do
     before(:each) do
@@ -76,7 +76,7 @@
       allow(controller).to receive(:get_pull_request_details).and_return({"data" => {
           "repository" => {
               "pullRequest" => {
-                  "headRefOid" => "qwerty123"
+                 "headRefOid" => "qwerty123"
               }
           }
       }})
@@ -168,7 +168,7 @@
   describe '#retrieve_check_run_statuses' do
     before(:each) do
       allow(controller).to receive(:get_statuses_for_pull_request).and_return("check_status")
-      controller.instance_variable_set(:@gitVariable,{
+      controller.instance_variable_set(:@gitVariable, {
           :head_refs => { "1234" => "qwerty", "5678" => "asdfg"},
           :check_statuses => {}
       })
@@ -316,16 +316,18 @@
   describe '#process_github_authors_and_dates' do
     before(:each) do
 
-      controller.instance_variable_set(:@gitVariable, {
-          :authors=> {},
-          :dates=> {},
-          :parsed_data=> {}
-      })
+      controller.instance_variable_set(
+        :@gitVariable, {
+        :authors=> {},
+        :dates=> {},
+        :parsed_data=> {}
+        }
+      )
     end
     it 'sets authors and data for GitHub data' do
       controller.process_github_authors_and_dates("author", "date")
       expect(controller.instance_variable_get(:@gitVariable)[:authors]).to eq("author" => 1)
-      expect(controller.instance_variable_get(:@gitVariable)[:dates]).to eq( "date" => 1)
+      expect(controller.instance_variable_get(:@gitVariable)[:dates]).to eq("date" => 1)
       expect(controller.instance_variable_get(:@gitVariable)[:parsed_data]).to eq("author" => {"date" => 1})
 
       controller.process_github_authors_and_dates("author", "date")
@@ -463,14 +465,16 @@
 
   describe '#team_statistics' do
     before(:each) do
-      controller.instance_variable_set(:@gitVariable, {
+      controller.instance_variable_set(:@gitVariable, 
+          {
           :total_additions => 0,
           :total_deletions => 0,
           :total_commits => 0,
           :total_files_changed => 0,
           :head_refs=>[],
           :merge_status=> []
-      })
+          }
+      )
 
     end
 
@@ -506,15 +510,15 @@
       controller.get_team_github_statistics(
           "data" => {
               "repository" => {
-                  "pullRequest" => {
-                      "number" => 8,
-                      "additions" => 2,
-                      "deletions" => 1,
-                      "changedFiles" => 3,
-                      "mergeable" => true,
-                      "merged" => false,
-                      "headRefOid" => "123abc",
-                      "commits" => {
+                  "pullRequest" => {                     
+                     "number" => 8,
+                     "additions" => 2,
+                     "deletions" => 1,
+                     "changedFiles" => 3,
+                     "mergeable" => true,
+                     "merged" => false,
+                     "headRefOid" => "123abc",
+                     "commits" => {
                           "totalCount" => 16,
                           "pageInfo" => {},
                           "edges" => []

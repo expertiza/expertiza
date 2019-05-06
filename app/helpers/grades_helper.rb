@@ -117,7 +117,5 @@ module GradesHelper
       questions[questionnaire_symbol] = questionnaire.questions
     end
     questions
-
   end
 end
-

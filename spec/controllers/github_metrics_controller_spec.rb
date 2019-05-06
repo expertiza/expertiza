@@ -1,17 +1,17 @@
- describe GithubMetricsController do
-  let(:review_response) { build(:response) }
-  let(:assignment) { build(:assignment, id: 1, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
-  let(:assignment_questionnaire) { build(:assignment_questionnaire, used_in_round: 1, assignment: assignment) }
-  let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
-  let(:participant2) { build(:participant, id: 2, assignment: assignment, user_id: 1) }
-  let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
-  let(:admin) { build(:admin) }
-  let(:instructor) { build(:instructor, id: 6) }
-  let(:question) { build(:question) }
-  let(:team) { build(:assignment_team, id: 1, assignment: assignment, users: [instructor]) }
-  let(:student) { build(:student) }
-  let(:review_response_map) { build(:review_response_map, id: 1) }
-  let(:assignment_due_date) { build(:assignment_due_date) }
+describe GithubMetricsController do
+  let(:review_response) {build(:response)}
+  let(:assignment) {build(:assignment, id: 1, questionnaires: [review_questionnaire], is_penalty_calculated: true)}
+  let(:assignment_questionnaire) {build(:assignment_questionnaire, used_in_round: 1, assignment: assignment)}
+  let(:participant) {build(:participant, id: 1, assignment: assignment, user_id: 1)}
+  let(:participant2) {build(:participant, id: 2, assignment: assignment, user_id: 1)}
+  let(:review_questionnaire) {build(:questionnaire, id: 1, questions: [question])}
+  let(:admin) {build(:admin)}
+  let(:instructor) {build(:instructor, id: 6)}
+  let(:question) {build(:question)}
+  let(:team) {build(:assignment_team, id: 1, assignment: assignment, users: [instructor])}
+  let(:student) {build(:student)}
+  let(:review_response_map) {build(:review_response_map, id: 1)}
+  let(:assignment_due_date) {build(:assignment_due_date)}
 
   before(:each) do
     allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
@@ -51,9 +51,9 @@
     end
   end
 
- describe '#get_statuses_for_pull_request' do
+  describe '#get_statuses_for_pull_request' do
     before(:each) do
-      allow(Net::HTTP).to receive(:get) { "{\"team\":\"rails\", \"players\":\"36\"}" }
+      allow(Net::HTTP).to receive(:get) {"{\"team\":\"rails\", \"players\":\"36\"}"}
     end
 
     it 'makes a call to the GitHub API to get status of the head commit passed' do
@@ -64,12 +64,12 @@
                                                       })
       ).to eq("team" => "rails", "players" => "36")
     end
- end
+  end
 
   describe '#retrieve_pull_request_data' do
     before(:each) do
 
-      controller.instance_variable_set(:@gitVariable,:head_refs=> {})
+      controller.instance_variable_set(:@gitVariable, :head_refs => {})
       allow(controller).to receive(:get_pull_request_details).and_return({
                                                                              "data" => {
                                                                                  "repository" => {
@@ -103,10 +103,8 @@
               }
           }
       }}).twice
-      controller.retrieve_pull_request_data([
-                                                "https://github.com/expertiza/expertiza/pull/1261",
-                                                "https://github.com/Shantanu/mamaMiya/pull/1293"
-                                            ])
+      controller.retrieve_pull_request_data(["https://github.com/expertiza/expertiza/pull/1261",
+                                             "https://github.com/Shantanu/mamaMiya/pull/1293"])
     end
   end
 
@@ -121,12 +119,10 @@
                                                                          "owner_name" => "Shantanu")
       expect(controller).to receive(:get_github_repository_details).with("repository_name" => "OODD",
                                                                          "owner_name" => "Edward")
-      controller.retrieve_repository_data([
-                                              "https://github.com/Shantanu/website",
-                                              "https://github.com/Edward/OODD",
-                                              "https://github.com/expertiza/expertiza",
-                                              "https://github.com/Shantanu/expertiza]"
-                                          ])
+      controller.retrieve_repository_data(["https://github.com/Shantanu/website",
+                                           "https://github.com/Edward/OODD",
+                                           "https://github.com/expertiza/expertiza",
+                                           "https://github.com/Shantanu/expertiza]"])
     end
 
     it 'calls parse_github_data_repo on each of the PR details' do
@@ -144,10 +140,8 @@
     context 'when pull request links have been submitted' do
       before(:each) do
         teams_mock = double
-        allow(teams_mock).to receive(:hyperlinks).and_return([
-                                                                 "https://github.com/Shantanu/website",
-                                                                 "https://github.com/Shantanu/website/pull/1123"
-                                                             ])
+        allow(teams_mock).to receive(:hyperlinks).and_return(["https://github.com/Shantanu/website",
+                                                              "https://github.com/Shantanu/website/pull/1123"])
         controller.instance_variable_set(:@team, teams_mock)
       end
 
@@ -160,18 +154,14 @@
     context 'when pull request links have not been submitted' do
       before(:each) do
         teams_mock = double
-        allow(teams_mock).to receive(:hyperlinks).and_return([
-                                                                 "https://github.com/Shantanu/website",
-                                                                 "https://github.com/expertiza/expertiza"
-                                                             ])
+        allow(teams_mock).to receive(:hyperlinks).and_return(["https://github.com/Shantanu/website",
+                                                              "https://github.com/expertiza/expertiza"])
         controller.instance_variable_set(:@team, teams_mock)
       end
 
       it 'retrieves repo details ' do
-        expect(controller).to receive(:retrieve_repository_data).with([
-                                                                          "https://github.com/Shantanu/website",
-                                                                          "https://github.com/expertiza/expertiza"
-                                                                      ])
+        expect(controller).to receive(:retrieve_repository_data).with(["https://github.com/Shantanu/website",
+                                                                       "https://github.com/expertiza/expertiza"])
         controller.retrieve_github_data
       end
     end
@@ -181,7 +171,7 @@
     before(:each) do
       allow(controller).to receive(:get_statuses_for_pull_request).and_return("check_status")
       controller.instance_variable_set(:@gitVariable, {
-          :head_refs => { "1234" => "qwerty", "5678" => "asdfg"},
+          :head_refs => {"1234" => "qwerty", "5678" => "asdfg"},
           :check_statuses => {}
       })
     end
@@ -190,10 +180,8 @@
       expect(controller).to receive(:get_statuses_for_pull_request).with("qwerty")
       expect(controller).to receive(:get_statuses_for_pull_request).with("asdfg")
       controller.retrieve_pull_request_statuses_data
-      expect(controller.instance_variable_get(:@gitVariable)[:check_statuses]).to eq(
-                                                                                      "1234" => "check_status",
-                                                                                      "5678" => "check_status"
-                                                                                  )
+      expect(controller.instance_variable_get(:@gitVariable)[:check_statuses]).to eq("1234" => "check_status",
+                                                                                     "5678" => "check_status")
     end
   end
 
@@ -255,12 +243,12 @@
 
     it 'gets  make_github_graphql_request with query for repository' do
       hyperlink_data = {
-        "owner_name" => "Shantanu",
-        "repository_name" => "expertiza"
+          "owner_name" => "Shantanu",
+          "repository_name" => "expertiza"
       }
 
       expect(controller).to receive(:make_github_graphql_request).with(
-        query:       "query {
+          query: "query {
         repository(owner: \"" + hyperlink_data["owner_name"] + "\", name: \"" + hyperlink_data["repository_name"] + "\") {
           ref(qualifiedName: \"master\") {
             target {
@@ -290,39 +278,33 @@
     before(:each) do
       allow(controller).to receive(:get_query_for_pull_request_links)
       allow(controller).to receive(:make_github_graphql_request).and_return(
-        "data" => {
-          "repository" => {
-            "pullRequest" => {
-              "commits" => {
-                "edges" => [],
-                "pageInfo" => {
-                  "hasNextPage" => false,
-                  "endCursor" => "qwerty"
-                }
+          "data" => {
+              "repository" => {
+                  "pullRequest" => {
+                      "commits" => {
+                          "edges" => [],
+                          "pageInfo" => {"hasNextPage" => false, "endCursor" => "qwerty"}
+                      }
+                  }
               }
-            }
           }
-        }
       )
     end
 
     it 'gets pull request data for link passed' do
       data = controller.get_pull_request_details("https://github.com/expertiza/expertiza")
       expect(data).to eq(
-        "data" => {
-          "repository" => {
-            "pullRequest" => {
-              "commits" => {
-                "edges" => [],
-                "pageInfo" => {
-                  "hasNextPage" => false,
-                  "endCursor" => "qwerty"
-                }
-              }
-            }
-          }
-        }
-      )
+                          "data" => {
+                              "repository" => {
+                                  "pullRequest" => {
+                                      "commits" => {
+                                          "edges" => [],
+                                          "pageInfo" => {"hasNextPage" => false, "endCursor" => "qwerty"}
+                                      }
+                                  }
+                              }
+                          }
+                      )
     end
   end
 
@@ -330,11 +312,11 @@
     before(:each) do
 
       controller.instance_variable_set(
-        :@gitVariable, {
-        :authors=> {},
-        :dates=> {},
-        :parsed_data=> {}
-        }
+          :@gitVariable, {
+          :authors => {},
+          :dates => {},
+          :parsed_data => {}
+      }
       )
     end
     it 'sets authors and data for GitHub data' do
@@ -344,7 +326,7 @@
       expect(controller.instance_variable_get(:@gitVariable)[:parsed_data]).to eq("author" => {"date" => 1})
 
       controller.process_github_authors_and_dates("author", "date")
-      expect(controller.instance_variable_get(:@gitVariable)[:parsed_data]).to eq( "author" => {"date" => 2})
+      expect(controller.instance_variable_get(:@gitVariable)[:parsed_data]).to eq("author" => {"date" => 2})
     end
   end
 
@@ -354,26 +336,24 @@
       allow(controller).to receive(:get_team_github_statistics)
       allow(controller).to receive(:organize_commit_dates_in_sorted_order)
       @github_data = {
-        "data" => {
-          "repository" => {
-            "pullRequest" => {
-              "commits" => {
-                "edges" => [
-                  {
-                    "node" => {
-                      "commit" => {
-                        "author" => {
-                          "name" => "Shantanu"
-                        },
-                        "committedDate" => "2018-12-1013:45"
+          "data" => {
+              "repository" => {
+                  "pullRequest" => {
+                      "commits" => {
+                          "edges" => [
+                              {
+                                  "node" => {
+                                      "commit" => {
+                                          "author" => {"name" => "Shantanu"},
+                                          "committedDate" => "2018-12-1013:45"
+                                      }
+                                  }
+                              }
+                          ]
                       }
-                    }
                   }
-                ]
               }
-            }
           }
-        }
       }
     end
 
@@ -398,26 +378,24 @@
       allow(controller).to receive(:process_github_authors_and_dates)
       allow(controller).to receive(:organize_commit_dates_in_sorted_order)
       @github_data = {
-        "data" => {
-          "repository" => {
-            "ref" => {
-              "target" => {
-                "history" => {
-                  "edges" => [
-                    {
-                      "node" => {
-                        "author" => {
-                          "name" => "Shantanu",
-                          "date" => "2018-12-1013:45"
-                        }
+          "data" => {
+              "repository" => {
+                  "ref" => {
+                      "target" => {
+                          "history" => {
+                              "edges" => [
+                                  {
+                                      "node" => {
+                                          "author" => {"name" => "Shantanu",
+                                                       "date" => "2018-12-1013:45"}
+                                      }
+                                  }
+                              ]
+                          }
                       }
-                    }
-                  ]
-                }
+                  }
               }
-            }
           }
-        }
       }
     end
 
@@ -449,7 +427,7 @@
     end
     it 'constructs the graphql query' do
       query = {
-        query:   "query {
+          query: "query {
         repository(owner: \"expertiza\", name:\"expertiza\") {
           pullRequest(number: 1228) {
             number additions deletions changedFiles mergeable merged headRefOid
@@ -478,39 +456,39 @@
 
   describe '#team_statistics' do
     before(:each) do
-      controller.instance_variable_set(:@gitVariable, 
-          {
-          :total_additions => 0,
-          :total_deletions => 0,
-          :total_commits => 0,
-          :total_files_changed => 0,
-          :head_refs=>[],
-          :merge_status=> []
-          }
+      controller.instance_variable_set(:@gitVariable,
+                                       {
+                                           :total_additions => 0,
+                                           :total_deletions => 0,
+                                           :total_commits => 0,
+                                           :total_files_changed => 0,
+                                           :head_refs => [],
+                                           :merge_status => []
+                                       }
       )
 
     end
 
     it 'parses team data from github data for merged pull Request' do
       controller.get_team_github_statistics(
-        "data" => {
-          "repository" => {
-            "pullRequest" => {
-              "number" => 8,
-              "additions" => 2,
-              "deletions" => 1,
-              "changedFiles" => 3,
-              "mergeable" => "UNKNOWN",
-              "merged" => true,
-              "headRefOid" => "123abc",
-              "commits" => {
-                "totalCount" => 16,
-                "pageInfo" => {},
-                "edges" => []
+          "data" => {
+              "repository" => {
+                  "pullRequest" => {
+                      "number" => 8,
+                      "additions" => 2,
+                      "deletions" => 1,
+                      "changedFiles" => 3,
+                      "mergeable" => "UNKNOWN",
+                      "merged" => true,
+                      "headRefOid" => "123abc",
+                      "commits" => {
+                          "totalCount" => 16,
+                          "pageInfo" => {},
+                          "edges" => []
+                      }
+                  }
               }
-            }
           }
-        }
       )
       expect(controller.instance_variable_get(:@gitVariable)[:total_additions]).to eq(2)
       expect(controller.instance_variable_get(:@gitVariable)[:total_deletions]).to eq(1)
@@ -523,15 +501,15 @@
       controller.get_team_github_statistics(
           "data" => {
               "repository" => {
-                  "pullRequest" => {                     
-                     "number" => 8,
-                     "additions" => 2,
-                     "deletions" => 1,
-                     "changedFiles" => 3,
-                     "mergeable" => true,
-                     "merged" => false,
-                     "headRefOid" => "123abc",
-                     "commits" => {
+                  "pullRequest" => {
+                      "number" => 8,
+                      "additions" => 2,
+                      "deletions" => 1,
+                      "changedFiles" => 3,
+                      "mergeable" => true,
+                      "merged" => false,
+                      "headRefOid" => "123abc",
+                      "commits" => {
                           "totalCount" => 16,
                           "pageInfo" => {},
                           "edges" => []
@@ -560,11 +538,9 @@
     it 'calls organize_commit_dates to sort parsed commits by dates' do
       controller.organize_commit_dates_in_sorted_order
       expect(controller.instance_variable_get(:@gitVariable)[:parsed_data]).to eq({
-                                                                                      "abc" => {
-                                                                                          "2017-04-05" => 2,
-                                                                                          "2017-04-13" => 2,
-                                                                                          "2017-04-14" => 2
-                                                                                      }
+                                                                                      "abc" => {"2017-04-05" => 2,
+                                                                                                "2017-04-13" => 2,
+                                                                                                "2017-04-14" => 2}
                                                                                   })
     end
   end

@@ -152,7 +152,6 @@ class GithubMetricsController < ApplicationController
     end
   end
 
-
   # An auxiliary function for "retrieve_repository_data". It is used to get github data from repository links with the help of graphql.
   def get_github_repository_details(hyperlink_data)
     data = {

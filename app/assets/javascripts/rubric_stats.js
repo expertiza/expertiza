@@ -101,7 +101,7 @@ function drawCompareChart() {
             continue;
         }
         var row = [criteria_names[selected_assignment_round][criterion]];
-        row.push(source_data[selected_assignment_round][criterion]);
+        row.push(avg_data[selected_assignment_round][criterion]);
         row.push(avg_data_to_compare[selected_assignment][selected_assignment_round][criterion]);
         rows.push(row);
     }

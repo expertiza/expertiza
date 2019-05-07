@@ -81,7 +81,7 @@
       <td id='pad_9'>
         <div><label>Round:</label></div>
         <%= select_tag('round_selector', options_for_select(@round_names, @round_names[0]),
-                       :onchange => 'toggleRound(this);', :autocomplete => 'off') %>
+                       :onchange => 'toggleAssignmentRound(this);', :autocomplete => 'off') %>
       </td>
 
       <td id='pad_9'>

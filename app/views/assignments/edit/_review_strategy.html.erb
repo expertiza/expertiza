@@ -160,7 +160,7 @@
   </tr>
 
   <tr>
-    <td style='padding:5px'><%= select('SampleReviewer', 'assignment_id', assignment_options(@assignment_form.assignment.instructor), {:onchange => 'setReviewer()'}) %></td>
+    <td style='padding:5px'><%= select('SampleReviewer', 'assignment_id', get_assignment_options(@assignment_form.assignment.instructor), {:onchange => 'setReviewer()'}) %></td>
     <td style='padding:5px'><%= select('SampleReviewer', 'reviewer_id', ['Reviewer', nil], {:onchange => 'setReviewee()'}) %></td>
     <td style='padding:5px'><%= select('SampleReviewer', 'reviewee_id', ['Reviewee', nil], {:class => "form-control", :style => 'width: 250px'}) %></td>
     <td style='width:125px'><button id = add, type = "button" , onclick = "addSampleReview()">Add</button></td>

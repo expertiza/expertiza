@@ -30,7 +30,7 @@ module AssignmentHelper
   end
 
   #E1933 : fetches all the assignment
-  def assignment_options(instructor)
+  def get_assignment_options(instructor)
     if session[:user].role.name == 'Teaching Assistant'
       courses = []
       ta = Ta.find(session[:user].id)

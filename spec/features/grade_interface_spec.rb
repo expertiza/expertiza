@@ -31,7 +31,7 @@ describe 'Integration tests for viewing grades:', js: true do
     let!(:assignment_due_date2) { create(:assignment_due_date, assignment: assignment2) }
 
     # add assignment 3
-    let!(:assignment3) { create :assignment, id: 2, name: "final789" }
+    let!(:assignment3) { create :assignment, id: 3, name: "final789" }
     let!(:assignment_team3) { 2.times { create :assignment_team } }
     let!(:assignment_due_date3) { create(:assignment_due_date, assignment: assignment3) }
 

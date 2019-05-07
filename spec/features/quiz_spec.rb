@@ -118,7 +118,7 @@ describe 'Student can create quizzes and edit them', js: true do
     expect(page).to have_content 'Please make sure every question has text for all options'
   end
 
-  xit 'should have error message if the correct answer(s) have not been provided' do
+  it 'should have error message if the correct answer(s) have not been provided' do
     login_and_create_quiz
     fill_in 'questionnaire_name', with: 'Quiz for test'
     fill_in 'text_area', with: 'Test Question 1'
@@ -242,7 +242,7 @@ describe 'Instructor', js: true do
   end
   # Verify that an instructor can see all quiz questions,
   # answers, and scores on the review questions page.
-  xit 'can view quiz questions and scores' do
+  it 'can view quiz questions and scores' do
     login_as @instructor.name
     visit "/student_quizzes/review_questions?id=#{@assignment.id}&type=Assignment"
     student = all("tr > td")[0]

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190212081147) do
+ActiveRecord::Schema.define(version: 20190218031251) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -756,12 +756,13 @@ ActiveRecord::Schema.define(version: 20190212081147) do
   end
 
   create_table "team_nominations", force: :cascade do |t|
-    t.integer  "team_id",      limit: 4
-    t.integer  "badge_id",     limit: 4
-    t.string   "status",       limit: 255
-    t.integer  "nominator_id", limit: 4
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.integer  "team_id",       limit: 4
+    t.integer  "badge_id",      limit: 4
+    t.string   "status",        limit: 255
+    t.integer  "nominator_id",  limit: 4
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.integer  "assignment_id", limit: 4
   end
 
   create_table "teams", force: :cascade do |t|

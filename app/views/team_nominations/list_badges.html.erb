@@ -1,4 +1,4 @@
-<h1>Badges</h1>
+<h1>Badges for <%= @assignment.name %></h1>
 <%if !@error%>
   <%= form_tag url_for(action: 'nominate'), method: "post"%>
   <div id="nominating">
@@ -10,7 +10,7 @@
   <%= hidden_field_tag(:team_id, @team_id) %>
 
   <div id="badge" class="largewidth">
-    <button id="myBtn" class="btn btn-primary">Nominate</button>
+    <button id="myBtn" class="btn btn-primary">Submit</button>
   </div>
 <%end%>
 <br/><br/>

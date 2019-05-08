@@ -5,12 +5,20 @@
             sortRestart    : true
         });
 
-        $('.checkbox_nomination').click(function(data){
-            if(!this.checked) {
-                var id = "deleted_" + this.id;
-                $('#placeholder_deleted_' + this.id).html('<input type="hidden" id="' + id + '" name="' + id + '"></input>');
-            }else
-                $('#placeholder_deleted_' + this.id).html('')
+        $('.button').click(function(){
+            if($(this).hasClass("nominate")) {
+                let id = "deleted_nomination_" + this.id;
+                $('#placeholder_deleted_nomination_' + this.id).html('<input type="hidden" id="' + id + '" name="' + id + '"></input>');
+                $('#placeholder_nomination_' + this.id).html('');
+                $(this).prop('class', "btn btn-primary button btn-block cancel");
+                $(this).html("Nominate");
+            } else {
+                let id = "nomination_" + this.id;
+                $('#placeholder_nomination_' + this.id).html('<input type="hidden" id="' + id + '" name="' + id + '"></input>');
+                $('#placeholder_deleted_nomination' + this.id).html('');
+                $(this).prop('class', "btn btn-danger button btn-block nominate");
+                $(this).html("Cancel Nomination");
+            }
         });
 
     });
@@ -19,23 +27,36 @@
 <div id="nominating">
   <table class="tablesorter table table-striped">
     <tbody>
-    <% if @course_badges.count > 0
-         @course_badges.each do |course_badge| %>
+    <% if @course_badges.count > 0 %>
+      <% @course_badges.each do |course_badge| %>
+        <% if @is_checked[@team_id][course_badge.badge.id].eql?(true) && @disable_checkbox[@team_id][course_badge.badge.id].eql?(true) %>
+          <% label = "This badge has already been awarded"
+             action = 2 %>
+        <%elsif(@is_checked[@team_id][course_badge.badge.id].eql?(true))%>
+          <% label = "Cancel Nomination"
+             _class = "btn-danger nominate "
+             action = 1 %>
+        <%else %>
+          <% label = "Nominate"
+             _class = "btn-primary cancel "
+             action = 0 %>
+        <%end %>
         <tr>
-          <td style="width:12.5%">
+          <td style="width:10%">
             <div>
               <img src="<%= course_badge.badge.image_url%>" width="25" height="25"/>
             </div>
             <%= course_badge.badge.name %>
           </td>
-          <td>
-            <%= check_box_tag "nomination_" + @team_id.to_s + "_" + course_badge.badge.id.to_s,
-                              @is_checked[@team_id][course_badge.badge.id].eql?(true) ? "nominated" : "",
-                              @is_checked[@team_id][course_badge.badge.id].eql?(true),
-                              :disabled => @disable_checkbox[@team_id][course_badge.badge.id].eql?(true),
-                              :class => 'checkbox_nomination' %>
-            <div id='<%= "placeholder_deleted_nomination_" + @team_id.to_s + "_" + course_badge.badge.id.to_s %>'></div>
+          <td style="width:10%">
+            <%if action!= 2  %>
+              <%= button_tag label, type: "button", id: @team_id.to_s + "_" + course_badge.badge.id.to_s, disabled: @disable_checkbox[@team_id][course_badge.badge.id].eql?(true), class: _class + "btn button btn-block" %>
+            <%else %>
+              <%=label %>
+            <%end %>
           </td>
+          <td><div id='<%= "placeholder_nomination_" + @team_id.to_s + "_" + course_badge.badge.id.to_s %>'></div></td>
+          <td><div id='<%= "placeholder_deleted_nomination_" + @team_id.to_s + "_" + course_badge.badge.id.to_s %>'></div></td>
         </tr>
       <% end %>
     <% end %>

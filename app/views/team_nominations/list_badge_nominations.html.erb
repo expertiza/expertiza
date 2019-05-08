@@ -1,0 +1,88 @@
+<script>
+    $(function(){
+        $('.button').click(function(){
+            var id = this.id.split("_");
+            $('#approval_status_' + id[2]).html('<input type="hidden" id="' + this.id + '" name="' + this.id + '"></input>');
+            if(id[1] == ("approve")) {
+                $(this).prop('class','btn btn-success button');
+                $('#nomination_disapprove_' + id[2]).prop('class','btn btn-primary button');
+                $('#nomination_disapprove_' + id[2]).prop("disabled",false);
+            } else {
+                $(this).prop('class','btn btn-danger button');
+                $('#nomination_approve_' + id[2]).prop('class','btn btn-primary button');
+                $('#nomination_approve_' + id[2]).prop("disabled",false);
+            }
+            $(this).prop("disabled",true);
+        });
+    });
+</script>
+
+<h1>Team Nominations for <%=@course_name %></h1>
+<%= form_tag url_for(action: 'approve'), method: "post"%>
+<div id="badge_nominations">
+  <table class="tablesorter table table-striped">
+    <thead class="thead-light" align="center">
+      <th>Team</th>
+      <th>Badge</th>
+      <th>Nominated By</th>
+      <th>Assignment</th>
+      <th>Submitted Work</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @nominations.each do |nomination| %>
+      <% if nomination[:id].instance_of? Array %>
+        <% id = nomination[:id][0].to_s %>
+      <%else %>
+        <% id = nomination[:id].to_s %>
+      <%end %>
+      <% nominator_names = "" %>
+      <% if nomination[:nominator_name].instance_of? Array %>
+        <% nomination[:nominator_name].each do |name| %>
+          <% nominator_names += name + ", " %>
+        <%end %>
+        <%nominator_names = nominator_names[0..-3] %>
+      <%else %>
+        <% nominator_names = nomination[:nominator_name] %>
+      <%end %>
+
+      <tr>
+        <td style="width:10%"><%=nomination[:team_name]%></td>
+        <td style="width:15%"><div><img src="<%=nomination[:badge_image_url]%>" width="25" height="25"/></div><%= nomination[:badge_name]%></td>
+        <td style="width:15%"><%=nominator_names %></td>
+        <td><%=nomination[:assignment_name]%></td>
+        <td>
+          <%links = nomination[:submitted_links].split(' ') %>
+          <%files = nomination[:team].files(nomination[:team].path.to_s + "") %>
+          <%participant = TeamsUser.where(team_id: nomination[:team_id]).first.name %>
+          <ul>
+            <%links.each do |link| %>
+              <% next if link == "---" || link == '-' %>
+              <li><%= link_to link, link %></li>
+            <%end %>
+
+            <% files.each do |file|%>
+              <li><%=link_to File.basename(file), {:controller => :submitted_content,:action => :download, :download => File.basename(file), "current_folder[name]" => File.dirname(file) } %></li>
+            <%end %>
+          </ul>
+        </td>
+        <td>
+          <%= button_tag "Approve", id: "nomination_approve_" + id.to_s, disabled: false, class: "btn btn-primary button"%></td>
+        <td>
+          <%=button_tag "Disapprove", id: "nomination_disapprove_" + id.to_s, disabled: false, class: "btn btn-primary button"%>
+          <div id='<%= "approval_status_" + id.to_s %>'></div>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+<div id="badge" class="largewidth" style="text-align: center;">
+  <% if @nominations.count == 0 %>
+    <h1>No pending items</h1>
+  <%else %>
+    <button id="myBtn" class="btn btn-primary">Submit</button>
+  <%end %>
+</div>
+<br/><br/>
+<%= link_to "Back", {:controller => :course, :action => :edit, :id => @course_id} %>

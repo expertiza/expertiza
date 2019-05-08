@@ -477,6 +477,10 @@ resources :institution, except: [:destroy] do
     collection do
       get :list_badges
       post :nominate
+      post :cancel_nomination
+      get :list_badge_nominations
+      post :disapprove
+      post :approve
     end
   end
 

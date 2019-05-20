@@ -1,9 +1,9 @@
 <script type="text/javascript">
-    function addQuestionnaireTableRow(questionnaire_type,round_no,questionnaire, assignment_questionnaire, questionnaire_options) {
+    function addQuestionnaireTableRow(questionnaire_type, round_no, questionnaire, assignment_questionnaire, questionnaire_options) {
         var questionnaire_table = jQuery('#assignment_questionnaire_table>tbody>tr');
         var row_id = 'questionnaire_table_' + questionnaire_type;
-        var i = 0;
-        var html;
+        var i;
+        var html = '';
 
         html += '<tr id="' + row_id + '">' +
         '<input name="assignment_form[assignment_questionnaire][][assignment_id]" type="hidden" value="';
@@ -12,7 +12,7 @@
 
 
         //Rubric name
-        if (round_no ==null) {
+        if (round_no == null) {
             html += '<td><label for="questionnaire_id">' + questionnaire.display_type + ':</label></td>';
         }
         else {
@@ -39,13 +39,21 @@
           }
         html += '</select></td>';
         //Weight
-        html += '<td align="center"><input name="assignment_form[assignment_questionnaire][][questionnaire_weight]" style="width:40px" type="text" value="' + assignment_questionnaire.questionnaire_weight + '">% </td>' +
-        '<td align="center"><input name="assignment_form[assignment_questionnaire][][notification_limit]" style="width:40px" type="text" value="' + assignment_questionnaire.notification_limit + '">% </td>';
-        //Notification Limit 
-        if (round_no ==null) {
-             html += '<td align="center"><input name="assignment_form[assignment_questionnaire][][used_in_round]" style="width:30px" type="hidden" value=" "' + '"> </td>';
+        if (round_no == null || round_no == 1) {
+            html += '<td align="center"><input name="assignment_form[assignment_questionnaire][][questionnaire_weight]" style="width:40px" type="text" value="' +
+                assignment_questionnaire.questionnaire_weight + '">% </td>' +
+                '<td align="center"><input name="assignment_form[assignment_questionnaire][][notification_limit]" style="width:40px" type="text" value="' +
+                assignment_questionnaire.notification_limit + '">% </td>';
+        } else {
+            html += '<td align="center"><input name="assignment_form[assignment_questionnaire][][questionnaire_weight]" style="width:40px" type="text" value="' +
+                0 + '">% </td>' +
+                '<td align="center"><input name="assignment_form[assignment_questionnaire][][notification_limit]" style="width:40px" type="text" value="' +
+                assignment_questionnaire.notification_limit + '">% </td>';
         }
-        else{
+        //Notification Limit 
+        if (round_no == null) {
+             html += '<td align="center"><input name="assignment_form[assignment_questionnaire][][used_in_round]" style="width:30px" type="hidden" value=" "' + '"> </td>';
+        } else {
              html += '<td align="center"><input name="assignment_form[assignment_questionnaire][][used_in_round]" style="width:30px" type="hidden" value="' + round_no + '"> </td>';
         }
         //insert menu for adding & selecting tag prompts
@@ -214,100 +222,91 @@
           metareview.style.display = "none";
         }
     }
+
+    function addRubricsTableRows() {
+        addQuestionnaireTableRow(
+            'MetareviewQuestionnaire',
+            null,
+            <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil,nil).to_json.html_safe %>,
+            <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil,nil).to_json.html_safe %>,
+            <%= questionnaire_options('MetareviewQuestionnaire').to_json.html_safe %>
+        );
+        addQuestionnaireTableRow(
+            'AuthorFeedbackQuestionnaire',
+            null,
+            <%= questionnaire(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire',nil, nil).to_json.html_safe %>,
+            <%= assignment_questionnaire(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire',nil,nil).to_json.html_safe %>,
+            <%= questionnaire_options('AuthorFeedbackQuestionnaire').to_json.html_safe %>
+        );
+        addQuestionnaireTableRow(
+            'TeammateReviewQuestionnaire',
+            null,
+            <%= questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil, nil).to_json.html_safe %>,
+            <%= assignment_questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil,nil).to_json.html_safe %>,
+            <%= questionnaire_options('TeammateReviewQuestionnaire').to_json.html_safe %>
+        );
+    }
     //zhewei: varying rubric by round still not add 'BookmarkRatingQuestionnaire' yet.
-    function handleCheckReviewVary(checkvalue) {
+    function handleCheckReviewVaryByRound(checkvalue) {
         var state = checkvalue.checked;
         var round_count = <%= @assignment_form.assignment.rounds_of_reviews%>;
-        if (state == true && round_count >1){
-            //Make it display by rounds
-          //Make it display by rounds
-          ['ReviewQuestionnaire',
-            'MetareviewQuestionnaire',
-            'AuthorFeedbackQuestionnaire',
-            'TeammateReviewQuestionnaire'].forEach(function(item){
-            removeQuestionnaireTableRow(item);
-          });
-            <% for i in 1..@assignment_form.assignment.rounds_of_reviews %>
+        if (state == true && round_count > 1){
+          //Make it display by round
+            ['ReviewQuestionnaire',
+                'MetareviewQuestionnaire',
+                'AuthorFeedbackQuestionnaire',
+                'TeammateReviewQuestionnaire'].forEach(function(item){
+                removeQuestionnaireTableRow(item);
+            });
+          <% 1.upto(@assignment_form.assignment.rounds_of_reviews) do |i| %>
+          addQuestionnaireTableRow(
+              'ReviewQuestionnaire',
+              <%=i%>,
+              <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire', i, nil).to_json.html_safe %>,
+              <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire', i, nil).to_json.html_safe %>,
+              <%= questionnaire_options('ReviewQuestionnaire').to_json.html_safe %>
+          );
+          <% end %>
+          addRubricsTableRows();
+          <%@avoidrepeatsign=1%>;
+        }
+        if (state == false && round_count > 1) {
+            //Make it display as usual
+            ['ReviewQuestionnaire',
+                'MetareviewQuestionnaire',
+                'AuthorFeedbackQuestionnaire',
+                'TeammateReviewQuestionnaire'].forEach(function (item) {
+                if (item === 'ReviewQuestionnaire')
+                    for (i = 1; i <= round_count + 1; i++) {
+                        removeQuestionnaireTableRow(item);
+                    }
+                else removeQuestionnaireTableRow(item);
+            });
             addQuestionnaireTableRow(
                 'ReviewQuestionnaire',
-                <%=i%>,
-                <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',i).to_json.html_safe %>,
-                <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',i).to_json.html_safe %>,
-                <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire',i).to_json.html_safe %>
+                null,
+                <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire', nil, nil).to_json.html_safe %>,
+                <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire', nil, nil).to_json.html_safe %>,
+                <%= questionnaire_options('ReviewQuestionnaire').to_json.html_safe %>
             );
-            <% end %>
-            addQuestionnaireTableRow(
-                    'MetareviewQuestionnaire',
-                    null,
-                    <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
-                    <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
-                    <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
-            );
-            addQuestionnaireTableRow(
-                    'AuthorFeedbackQuestionnaire',
-                    null,
-                    <%= questionnaire(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire',nil).to_json.html_safe %>,
-                    <%= assignment_questionnaire(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire',nil).to_json.html_safe %>,
-                    <%= questionnaire_options(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire',nil).to_json.html_safe %>
-            );
-            addQuestionnaireTableRow(
-                    'TeammateReviewQuestionnaire',
-                    null,
-                    <%= questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
-                    <%= assignment_questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
-                    <%= questionnaire_options(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>
-            );
-            <%@avoidrepeatsign=1%>;
+            addRubricsTableRows();
+            initTagPrompts();
         }
-        if (state == false && round_count>1){
-            //Make it display as usual
-          ['ReviewQuestionnaire',
-            'MetareviewQuestionnaire',
-            'AuthorFeedbackQuestionnaire',
-            'TeammateReviewQuestionnaire'].forEach(function(item){
-            if(item==='ReviewQuestionnaire')
-              for (i=1;i<=round_count+1;i++) {
-                removeQuestionnaireTableRow(item);
-              }else
-                removeQuestionnaireTableRow(item);
-          });
-            addQuestionnaireTableRow(
-                    'ReviewQuestionnaire',
-                    null,
-                    <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>,
-                    <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>,
-                    <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>
-            );
-            addQuestionnaireTableRow(
-                    'MetareviewQuestionnaire',
-                    null,
-                    <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
-                    <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
-                    <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
-            );
-            addQuestionnaireTableRow(
-                    'AuthorFeedbackQuestionnaire',
-                    null,
-                    <%= questionnaire(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire',nil).to_json.html_safe %>,
-                    <%= assignment_questionnaire(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire',nil).to_json.html_safe %>,
-                    <%= questionnaire_options(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire',nil).to_json.html_safe %>
-            );
-            addQuestionnaireTableRow(
-                    'TeammateReviewQuestionnaire',
-                    null,
-                    <%= questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
-                    <%= assignment_questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
-                    <%= questionnaire_options(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>
-            );
-        }
-      initTagPrompts();
     }
-  </script>
+</script>
 
 <!--Add a review varies by round checkbox. -->
 <input name="assignment_questionnaire[used_in_round]" type="hidden" value="false" />
-<%= check_box_tag('assignment_questionnaire[used_in_round]', 'true', @reviewvarycheck,:onclick=>"handleCheckReviewVary(this)" ) %>
+<%= check_box_tag('assignment_questionnaire[used_in_round]', 'true', @review_vary_by_round_check, :onclick=>"handleCheckReviewVaryByRound(this)") %>
 <%= label_tag('assignment_questionnaire[used_in_round]', 'Review rubric varies by round?') %>
+<br>
+<!-- Add a review varies by topic checkbox -->
+<!-- This is not an attribute of assignment or of assignment_questionnaire -->
+<!-- It is just a flag used by the form to allow the controller to make changes to DB records -->
+<input name="vary_by_topic" type="hidden" value="false" />
+<%= check_box_tag('vary_by_topic', 'true', @review_vary_by_topic_check) %>
+<%= label_tag('vary_by_topic', 'Review rubric varies by topic?') %>
+
 <div>
 <table class='exp table table-striped' id='assignment_questionnaire_table' style='padding:20px; font-size: 15px; width: 100%'>
   <tr class='heading'>
@@ -326,23 +325,23 @@
   </tr>
   <script>
       jQuery(document).ready(function () {
-          <% if @reviewvarycheck%>
+          <% if @review_vary_by_round_check%>
           <% for i in 1..@assignment_form.assignment.rounds_of_reviews %>
           addQuestionnaireTableRow(
                   'ReviewQuestionnaire',
                   <%=i%>,
-                  <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',i).to_json.html_safe %>,
-                  <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',i).to_json.html_safe %>,
-                  <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire',i).to_json.html_safe %>
+                  <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',i, nil).to_json.html_safe %>,
+                  <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',i, nil).to_json.html_safe %>,
+                  <%= questionnaire_options('ReviewQuestionnaire').to_json.html_safe %>
           );
           <% end %>
           <% else %>
           addQuestionnaireTableRow(
                   'ReviewQuestionnaire',
                   null,
-                  <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>,
-                  <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>,
-                  <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>
+                  <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',nil, nil).to_json.html_safe %>,
+                  <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',nil, nil).to_json.html_safe %>,
+                  <%= questionnaire_options('ReviewQuestionnaire').to_json.html_safe %>
           );
           <% end %>
           var metareview_allowed_checkbox = jQuery('#metareviewAllowed');
@@ -350,26 +349,26 @@
             addQuestionnaireTableRow(
                     'MetareviewQuestionnaire',
                     null,
-                    <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
-                    <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
-                    <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
+                    <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil, nil).to_json.html_safe %>,
+                    <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil, nil).to_json.html_safe %>,
+                    <%= questionnaire_options('MetareviewQuestionnaire').to_json.html_safe %>
             );
           }
           addQuestionnaireTableRow(
                   'AuthorFeedbackQuestionnaire',
                   null,
-                  <%= questionnaire(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire',nil).to_json.html_safe %>,
-                  <%= assignment_questionnaire(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire',nil).to_json.html_safe %>,
-                  <%= questionnaire_options(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire',nil).to_json.html_safe %>
+                  <%= questionnaire(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire',nil, nil ).to_json.html_safe %>,
+                  <%= assignment_questionnaire(@assignment_form.assignment, 'AuthorFeedbackQuestionnaire',nil, nil).to_json.html_safe %>,
+                  <%= questionnaire_options('AuthorFeedbackQuestionnaire').to_json.html_safe %>
           );
           var team_assignment_checkbox = jQuery('#team_assignment');
           if (team_assignment_checkbox.is(':checked')) {
             addQuestionnaireTableRow(
                     'TeammateReviewQuestionnaire',
                     null,
-                    <%= questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
-                    <%= assignment_questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
-                    <%= questionnaire_options(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>
+                    <%= questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil, nil).to_json.html_safe %>,
+                    <%= assignment_questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil, nil).to_json.html_safe %>,
+                    <%= questionnaire_options('TeammateReviewQuestionnaire').to_json.html_safe %>
             );
           }
           var bookmark_checkbox = jQuery('#assignment_form_assignment_use_bookmark');
@@ -377,9 +376,9 @@
             addQuestionnaireTableRow(
                     'BookmarkRatingQuestionnaire',
                     null,
-                    <%= questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>,
-                    <%= assignment_questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>,
-                    <%= questionnaire_options(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>
+                    <%= questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil, nil).to_json.html_safe %>,
+                    <%= assignment_questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil, nil).to_json.html_safe %>,
+                    <%= questionnaire_options('BookmarkRatingQuestionnaire').to_json.html_safe %>
             );
           }
       });

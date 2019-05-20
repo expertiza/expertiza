@@ -347,6 +347,28 @@ class Assignment < ActiveRecord::Base
     AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: 2).size >= 1
   end
 
+  # Check if this assignment has rubrics which vary by topic
+  #   returns false for an assignment which has no questionnaires
+  #   returns false for an assignment if it has assignment-questionnaire(s) that have
+  #     topic_id nil and none with topic_id non-nil
+  #   returns true for an assignment if it has assignment-questionnaire(s) that have
+  #     topic_id non-nil and none with topic_id nil
+  #   throws exception for an assignment if it has assignment-questionnaire(s) that have
+  #     topic_id non-nil and nil
+  def varying_rubrics_by_topic?
+    aq_no_topic_id = AssignmentQuestionnaire.where(assignment_id: self.id, topic_id: nil).size >= 1
+    aq_with_topic_id = AssignmentQuestionnaire.where(assignment_id: self.id).where.not(topic_id: nil).size >= 1
+    if !aq_no_topic_id && !aq_with_topic_id
+      return false
+    elsif aq_no_topic_id && !aq_with_topic_id
+      return false
+    elsif !aq_no_topic_id && aq_with_topic_id
+      return true
+    else
+      raise StandardError.new("Assignment with id " + self.id.to_s + " has a conflict about whether or not it varies by topic")
+    end
+  end
+
   def link_for_current_stage(topic_id = nil)
     if self.staggered_deadline?
       return nil if topic_id.nil?
@@ -387,36 +409,67 @@ class Assignment < ActiveRecord::Base
     due_date.nil? || due_date == 'Finished' ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
   end
 
-  def review_questionnaire_id(round = nil)
-    # Get the round it's in from the next duedates
-    if round.nil?
+  # Find the ID of a review questionnaire for this assignment
+  #   finds by round if round number only is given
+  #     fall back to find by type
+  #   finds by current round and topic if topic only is given
+  #     fall back to find by current round
+  #     fall back to find by topic
+  #     fall back to find by type
+  #   finds by round and topic if both are given
+  #     fall back to find by round
+  #     fall back to find by topic
+  #     fall back to find by type
+  def review_questionnaire_id(round_number = nil, topic_id = nil)
+    # Get all assignment-questionnaire relationships between this assignment and review questionnaires
+    aqs_by_type = AssignmentQuestionnaire.where(assignment_id: self.id).select do |aq|
+      !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == "ReviewQuestionnaire"
+    end
+    # If round not given, get current round from the next due date
+    if round_number.nil?
       next_due_date = DueDate.get_next_due_date(self.id)
-      round = next_due_date.try(:round)
+      round_number = next_due_date.try(:round)
     end
-    # for program 1 like assignment, if same rubric is used in both rounds,
-    # the 'used_in_round' field in 'assignment_questionnaires' will be null,
-    # since one field can only store one integer
-    # if rev_q_ids is empty, Expertiza will try to find questionnaire whose type is 'ReviewQuestionnaire'.
-    rev_q_ids = if round.nil?
-                  AssignmentQuestionnaire.where(assignment_id: self.id)
-                else
-                  AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
-                end
-    if rev_q_ids.empty?
-      AssignmentQuestionnaire.where(assignment_id: self.id).find_each do |aq|
-        rev_q_ids << aq if aq.questionnaire.type == "ReviewQuestionnaire"
+    #   finds by round if round number only is given
+    #     fall back to find by type
+    if !round_number.nil? && topic_id.nil?
+      aqs = aqs_by_type.select do |aq|
+        aq.used_in_round == round_number
       end
+      aqs = (aqs.nil? || aqs.empty?) ? aqs_by_type : aqs
     end
-    review_questionnaire_id = nil
-    rev_q_ids.each do |rqid|
-      next if rqid.questionnaire_id.nil?
-      rtype = Questionnaire.find(rqid.questionnaire_id).type
-      if rtype == 'ReviewQuestionnaire'
-        review_questionnaire_id = rqid.questionnaire_id
-        break
+    #   finds by topic if topic only is given
+    #     fall back to find by type
+    if round_number.nil? && !topic_id.nil?
+      aqs = aqs_by_type.select do |aq|
+        aq.topic_id == topic_id
       end
+      aqs = (aqs.nil? || aqs.empty?) ? aqs_by_type : aqs
     end
-    review_questionnaire_id
+    #   finds by round and topic if both are given
+    #     fall back to find by round
+    #     fall back to find by topic
+    #     fall back to find by type
+    if !round_number.nil? && !topic_id.nil?
+      aqs = aqs_by_type.select do |aq|
+        aq.used_in_round == round_number && aq.topic_id == topic_id
+      end
+      if aqs.nil? || aqs.empty?
+        aqs = aqs_by_type.select do |aq|
+          aq.used_in_round == round_number
+        end
+      end
+      if aqs.nil? || aqs.empty?
+        aqs = aqs_by_type.select do |aq|
+          aq.topic_id == topic_id
+        end
+      end
+      aqs = (aqs.nil? || aqs.empty?) ? aqs_by_type : aqs
+    end
+    # Return the questionnaire id for the first reasonable thing we came up with
+    # (or return nil if nothing reasonable found)
+    aqs = (aqs.nil? || aqs.empty?) ? aqs_by_type : aqs
+    (aqs.nil? || aqs.empty?) ? nil : aqs.first.questionnaire_id
   end
 
   def self.export_details(csv, parent_id, detail_options)

@@ -41,12 +41,14 @@ describe ReportsController do
       stub_const('WEBSERVICE_CONFIG', 'summary_webservice_url' => 'expertiza.ncsu.edu')
     end
 
+    # E1936 team recommends this method be REMOVED (it does not seem to be used anywhere in Expertiza as of 4/21/19)
     describe 'summary_by_reviewee_and_criteria' do
       context 'when type is SummaryByRevieweeAndCriteria' do
         it_should_behave_like "summary_report"
       end
     end
 
+    # E1936 team recommends this method be REMOVED (it does not seem to be used anywhere in Expertiza as of 4/21/19)
     describe 'summary_by_criteria' do
       context 'when type is SummaryByCriteria' do
         it_should_behave_like "summary_report"

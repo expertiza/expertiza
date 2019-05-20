@@ -154,7 +154,9 @@ FactoryBot.define do
   end
 
   factory :assignment, class: Assignment do
-    name 'final2'
+    # Help multiple factory-created assignments get unique names
+    # Let the first created assignment have the name 'final2' to avoid breaking some fragile existing tests
+    name { "#{Assignment.last ? ('assignment' + (Assignment.last.id + 1).to_s) : 'final2'}" }
     directory_path 'final_test'
     submitter_count 0
     course { Course.first || association(:course) }
@@ -290,9 +292,9 @@ FactoryBot.define do
     due_at DateTime.now.in_time_zone + 1.day
     deadline_type { DeadlineType.first || association(:deadline_type) }
     assignment { Assignment.first || association(:assignment) }
-    submission_allowed_id 3
-    review_allowed_id 3
-    review_of_review_allowed_id 3
+    submission_allowed_id { DeadlineRight.first.nil? ? association(:deadline_right).id : DeadlineRight.first.id }
+    review_allowed_id { DeadlineRight.first.nil? ? association(:deadline_right).id : DeadlineRight.first.id  }
+    review_of_review_allowed_id { DeadlineRight.first.nil? ? association(:deadline_right).id : DeadlineRight.first.id  }
     round 1
     flag false
     threshold 1
@@ -327,7 +329,7 @@ FactoryBot.define do
   end
 
   factory :deadline_right, class: DeadlineRight do
-    name  'No'
+    name  'OK'
   end
 
   factory :assignment_node, class: AssignmentNode do
@@ -343,7 +345,8 @@ FactoryBot.define do
   end
 
   factory :questionnaire, class: ReviewQuestionnaire do
-    name 'Test questionnaire'
+    # Help multiple factory-created questionnaires get unique names
+    name { "questionnaire#{Questionnaire.last ? Questionnaire.last.id + 1 : 1}" }
     instructor { Instructor.where(role_id: 1).first || association(:instructor) }
     private 0
     min_question_score 0
@@ -378,10 +381,19 @@ FactoryBot.define do
     user_id 1
     questionnaire_weight 100
     used_in_round nil
+    topic_id nil
     dropdown 1
   end
 
   factory :review_response_map, class: ReviewResponseMap do
+    assignment { Assignment.first || association(:assignment) }
+    reviewer { AssignmentParticipant.first || association(:participant) }
+    reviewee { AssignmentTeam.first || association(:assignment_team) }
+    type 'ReviewResponseMap'
+    calibrate_to 0
+  end
+
+  factory :self_review_response_map, class: SelfReviewResponseMap do
     assignment { Assignment.first || association(:assignment) }
     reviewer { AssignmentParticipant.first || association(:participant) }
     reviewee { AssignmentTeam.first || association(:assignment_team) }

@@ -1,4 +1,5 @@
 describe ResponseController do
+
   let(:assignment) { build(:assignment, instructor_id: 6) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
@@ -10,18 +11,18 @@ describe ResponseController do
   let(:assignment_questionnaire) { build(:assignment_questionnaire) }
   let(:answer) { double('Answer') }
   let(:assignment_due_date) { build(:assignment_due_date) }
-<<<<<<< HEAD
-=======
   let(:assignment_team) { build(:assignment_team, id: 1) }
   let(:signed_up_team) { build(:signed_up_team, team_id: assignment_team.id) }
   let(:assignment_form) { AssignmentForm.new }
->>>>>>> belld19233-beta
+  let(:assignment_team) { build(:assignment_team, id: 1) }
+  let(:signed_up_team) { build(:signed_up_team, team_id: assignment_team.id) }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     stub_current_user(instructor, instructor.role.name, instructor.role)
     allow(Response).to receive(:find).with('1').and_return(review_response)
     allow(review_response).to receive(:map).and_return(review_response_map)
+    allow(SignedUpTeam).to receive(:find_by).with(team_id: assignment_team.id).and_return(signed_up_team)
   end
 
   describe '#action_allowed?' do

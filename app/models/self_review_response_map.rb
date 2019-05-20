@@ -5,8 +5,17 @@ class SelfReviewResponseMap < ResponseMap
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
 
   # Find a review questionnaire associated with this self-review response map's assignment
+  # For more details please see method description for assignment.review_questionnaire_id()
   def questionnaire(round_number = nil, topic_id = nil)
-    Questionnaire.find(self.assignment.review_questionnaire_id(round_number, topic_id))
+    # Override arguments if they are non-sensical
+    unless self.assignment.varying_rubrics_by_round?
+      round_number = nil
+    end
+    unless self.assignment.varying_rubrics_by_topic?
+      topic_id = nil
+    end
+    # Use find_by() instead of find() in case the review questionnaire id is nil
+    Questionnaire.find_by(id: self.assignment.review_questionnaire_id(round_number, topic_id))
   end
 
   # This method helps to find contributor - here Team ID

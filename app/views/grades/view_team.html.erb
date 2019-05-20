@@ -92,11 +92,11 @@
 
                 fix comment end
               -->
-        <div class="overflow-container">
+        <div class="hide-scrollbar">
           <table id="scoresTable<%= vm.round.to_s  %>" class="scoresTable tbl_heat tablesorter">
             <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->
             <thead>
-            <tr>
+            <tr class="hide-scrollbar">
               <th class="sorter-true">Criterion<span></span></th>
             
               <% i = 1 %>

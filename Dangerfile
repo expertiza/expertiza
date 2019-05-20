@@ -486,7 +486,7 @@ end
 
 # ------------------------------------------------------------------------------
 # RSpec tests should avoid shallow tests
-# 37. Including too many wildcard argument matchers (e.g., anything, any_args).
+# 37. Including greater than or equal to five wildcard argument matchers (e.g., anything, any_args).
 # 38. Not writing/commenting out expectations for the tests.
 # 39. Test expectations do not include matchers, such as comparisons (e.g.,equal(expected_value)),
 #     the status change of objects (e.g.,change(object, :value).by(delta)), error handlings (e.g.,raise_error("message")).

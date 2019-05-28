@@ -1,5 +1,4 @@
 describe Assignment do
-
   let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 3, name: 'no one') }
@@ -387,41 +386,6 @@ describe Assignment do
     end
   end
 
-  describe '#varying_rubrics_by_topic?' do
-
-    # Assignment Factory creates an assignment with default:
-    #   name 'assignment[some number]'
-    # Assignment_Questionnaire Factory creates an assignment-questionnaire relationship with default:
-    #   links together the first assignment found and the first questionnaire found
-    #   used_in_round nil
-    #   topic_id nil
-
-    it "returns false if assignment has no questionnaires" do
-      assignment_no_questionnaires = create(:assignment)
-      expect(assignment_no_questionnaires.varying_rubrics_by_topic?).to be false
-    end
-
-    it "returns false if assignment has assignment-questionnaire(s) that have topic_id nil and none with topic_id non-nil" do
-      assignment_does_not_vary = create(:assignment)
-      create(:assignment_questionnaire, assignment: assignment_does_not_vary)
-      expect(assignment_does_not_vary.varying_rubrics_by_topic?).to be false
-    end
-
-    it "returns true if assignment has assignment-questionnaire(s) that have topic_id non-nil and none with topic_id nil" do
-      assignment_varies = create(:assignment)
-      create(:assignment_questionnaire, assignment: assignment_varies, topic_id: 1)
-      expect(assignment_varies.varying_rubrics_by_topic?).to be true
-    end
-
-    it "throws exception if assignment has assignment-questionnaire(s) that have topic_id non-nil and nil" do
-      assignment_ambiguous = create(:assignment)
-      create(:assignment_questionnaire, assignment: assignment_ambiguous)
-      create(:assignment_questionnaire, assignment: assignment_ambiguous, topic_id: 1)
-      expect {assignment_ambiguous.varying_rubrics_by_topic?}.to raise_exception(StandardError)
-    end
-
-  end
-
   describe '#link_for_current_stage' do
     context 'when current assignment has staggered deadline and topic id is nil' do
       it 'returns nil' do
@@ -497,162 +461,11 @@ describe Assignment do
   end
 
   describe '#review_questionnaire_id' do
-
-    # Assignment Factory creates an assignment with default:
-    #   name 'assignment[some number]'
-    # Questionnaire Factory creates a questionnaire with default:
-    #   name 'questionnaire[some number]'
-    #   type 'ReviewQuestionnaire'
-    # Assignment_Questionnaire Factory creates an assignment-questionnaire relationship with default:
-    #   links together the first assignment found and the first questionnaire found
-    #   used_in_round nil
-    #   topic_id nil
-    # Assignment_Due_Date Factory creates an assignment-duedate relationship with default:
-    # due_at tomorrow
-    # assignment first found
-    # round 1
-
-    # TESTS FOR FINDING BY ROUND
-
-    it "finds by round if round number only is given" do
-      # create multiple questionnaires and assignment_questionnaires,
-      # for confidence that correct questionnaire is returned
-      assignment = create(:assignment)
-      questionnaire_1 = create(:questionnaire)
-      questionnaire_2 = create(:questionnaire)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_1, used_in_round: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_2, used_in_round: 2)
-      expect(assignment.review_questionnaire_id(2, nil)).to eql questionnaire_2.id
+    it 'returns review_questionnaire_id' do
+      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 1).and_return([build(:assignment_questionnaire)])
+      allow(Questionnaire).to receive(:find).and_return(build(:questionnaire))
+      expect(assignment.review_questionnaire_id(1)).to eq(1)
     end
-
-    it "finds by round if round number only is given (fall back to find by type)" do
-      # create multiple questionnaires and assignment_questionnaires,
-      # for confidence that correct questionnaire is returned
-      assignment = create(:assignment)
-      questionnaire_1 = create(:questionnaire)
-      questionnaire_2 = create(:questionnaire)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_1, used_in_round: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_2, used_in_round: 2)
-      expect(assignment.review_questionnaire_id(3, nil)).to eql questionnaire_1.id
-    end
-
-    it "finds by current round if round number not given" do
-      # create multiple questionnaires and assignment_questionnaires,
-      # for confidence that correct questionnaire is returned
-      assignment = create(:assignment)
-      questionnaire_1 = create(:questionnaire)
-      questionnaire_2 = create(:questionnaire)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_1, used_in_round: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_2, used_in_round: 2)
-      create(:assignment_due_date, assignment: assignment, round: 2)
-      expect(assignment.review_questionnaire_id(nil, nil)).to eql questionnaire_2.id
-    end
-
-    it "finds by current round if round number not given (fall back to find by type)" do
-      # create multiple questionnaires and assignment_questionnaires,
-      # for confidence that correct questionnaire is returned
-      assignment = create(:assignment)
-      questionnaire_1 = create(:questionnaire)
-      questionnaire_2 = create(:questionnaire)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_1, used_in_round: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_2, used_in_round: 2)
-      create(:assignment_due_date, assignment: assignment, round: 3)
-      expect(assignment.review_questionnaire_id(nil, nil)).to eql questionnaire_1.id
-    end
-
-    # TESTS FOR FINDING BY TOPIC
-
-    it "finds by topic if topic only is given" do
-      # create multiple questionnaires and assignment_questionnaires,
-      # for confidence that correct questionnaire is returned
-      assignment = create(:assignment)
-      questionnaire_1 = create(:questionnaire)
-      questionnaire_2 = create(:questionnaire)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_1, topic_id: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_2, topic_id: 2)
-      expect(assignment.review_questionnaire_id(nil, 2)).to eql questionnaire_2.id
-    end
-
-    it "finds by topic if topic only is given (fall back to find by type)" do
-      # create multiple questionnaires and assignment_questionnaires,
-      # for confidence that correct questionnaire is returned
-      assignment = create(:assignment)
-      questionnaire_1 = create(:questionnaire)
-      questionnaire_2 = create(:questionnaire)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_1, topic_id: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_2, topic_id: 2)
-      expect(assignment.review_questionnaire_id(nil, 3)).to eql questionnaire_1.id
-    end
-
-    # TESTS FOR FINDING BY ROUND AND TOPIC
-
-    it "finds by round and topic if both are given" do
-      # create multiple questionnaires and assignment_questionnaires,
-      # for confidence that correct questionnaire is returned
-      assignment = create(:assignment)
-      questionnaire_1 = create(:questionnaire)
-      questionnaire_2 = create(:questionnaire)
-      questionnaire_3 = create(:questionnaire)
-      questionnaire_4 = create(:questionnaire)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_1, used_in_round: 1, topic_id: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_2, used_in_round: 1, topic_id: 2)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_3, used_in_round: 2, topic_id: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_4, used_in_round: 2, topic_id: 2)
-      expect(assignment.review_questionnaire_id(2, 2)).to eql questionnaire_4.id
-    end
-
-    it "finds by round and topic if both are given (fall back to find by round)" do
-      # create multiple questionnaires and assignment_questionnaires,
-      # for confidence that correct questionnaire is returned
-      assignment = create(:assignment)
-      questionnaire_1 = create(:questionnaire)
-      questionnaire_2 = create(:questionnaire)
-      questionnaire_3 = create(:questionnaire)
-      questionnaire_4 = create(:questionnaire)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_1, used_in_round: 1, topic_id: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_2, used_in_round: 1, topic_id: 2)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_3, used_in_round: 2, topic_id: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_4, used_in_round: 2, topic_id: 2)
-      expect(assignment.review_questionnaire_id(2, 3)).to eql questionnaire_3.id
-    end
-
-    it "finds by round and topic if both are given (fall back to find by topic)" do
-      # create multiple questionnaires and assignment_questionnaires,
-      # for confidence that correct questionnaire is returned
-      assignment = create(:assignment)
-      questionnaire_1 = create(:questionnaire)
-      questionnaire_2 = create(:questionnaire)
-      questionnaire_3 = create(:questionnaire)
-      questionnaire_4 = create(:questionnaire)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_1, used_in_round: 1, topic_id: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_2, used_in_round: 1, topic_id: 2)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_3, used_in_round: 2, topic_id: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_4, used_in_round: 2, topic_id: 2)
-      expect(assignment.review_questionnaire_id(3, 2)).to eql questionnaire_2.id
-    end
-
-    it "finds by round and topic if both are given (fall back to find by type)" do
-      # create multiple questionnaires and assignment_questionnaires,
-      # for confidence that correct questionnaire is returned
-      assignment = create(:assignment)
-      questionnaire_1 = create(:questionnaire)
-      questionnaire_2 = create(:questionnaire)
-      questionnaire_3 = create(:questionnaire)
-      questionnaire_4 = create(:questionnaire)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_1, used_in_round: 1, topic_id: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_2, used_in_round: 1, topic_id: 2)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_3, used_in_round: 2, topic_id: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_4, used_in_round: 2, topic_id: 2)
-      expect(assignment.review_questionnaire_id(3, 3)).to eql questionnaire_1.id
-    end
-
-    # MISCELLANEOUS TESTS
-
-    it "returns nil if no review questionnaire id can be found" do
-      assignment = create(:assignment)
-      expect(assignment.review_questionnaire_id(2, 3)).to be_nil
-    end
-
   end
 
   describe 'has correct csv values?' do

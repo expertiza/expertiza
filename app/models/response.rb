@@ -102,9 +102,7 @@ class Response < ActiveRecord::Base
       # the reason is that for this question type, there is no answer record, and this question is handled by a different form
       map = ResponseMap.find(self.map_id)
       assignment = Participant.find(map.reviewer_id).assignment
-      topic_id = SignedUpTeam.find_by(team_id: map.reviewee_id).topic_id
-      # Can leave round_number nil, because assignment.review_questionnaire_id will get current round from the next due date
-      questionnaire = Questionnaire.find(assignment.review_questionnaire_id(nil, topic_id))
+      questionnaire = Questionnaire.find(assignment.review_questionnaire_id)
     end
     questionnaire
   end

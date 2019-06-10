@@ -57,7 +57,9 @@ describe AssignmentParticipant do
     end
     context 'when assignment is not varying rubric by round and not an microtask' do
       it 'calculates scores that this participant has been given' do
-        allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
+        assignment.vary_by_round = 0
+        # Below method is no longer needed. The assignment.vary_by_round is used instead
+        # allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
         expect(participant.scores(review1: [question]).inspect).to eq("{:participant=>#<AssignmentParticipant id: 1, can_submit: true, can_review: true, "\
           "user_id: 2, parent_id: 1, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, "\
           "type: \"AssignmentParticipant\", handle: \"handle\", time_stamp: nil, digital_signature: nil, duty: nil, "\
@@ -69,7 +71,8 @@ describe AssignmentParticipant do
 
     context 'when assignment is varying rubric by round but not an microtask' do
       it 'calculates scores that this participant has been given' do
-        allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
+        # Below method is no longer needed. The assignment.vary_by_round is used instead
+        # allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
         allow(assignment).to receive(:num_review_rounds).and_return(1)
         expect(participant.scores(review1: [question]).inspect).to eq("{:participant=>#<AssignmentParticipant id: 1, can_submit: true, can_review: true, "\
           "user_id: 2, parent_id: 1, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, "\
@@ -83,7 +86,8 @@ describe AssignmentParticipant do
 
     context 'when assignment is not varying rubric by round but an microtask' do
       it 'calculates scores that this participant has been given' do
-        allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
+        # Below method is no longer needed. The assignment.vary_by_round is used instead
+        # allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
         assignment.microtask = true
         allow(SignUpTopic).to receive(:find_by).with(assignment_id: 1).and_return(double('SignUpTopic', micropayment: 66))
         expect(participant.scores(review1: [question]).inspect).to eq("{:participant=>#<AssignmentParticipant id: 1, can_submit: true, can_review: true, "\

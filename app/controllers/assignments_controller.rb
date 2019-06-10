@@ -72,7 +72,6 @@ class AssignmentsController < ApplicationController
       adjust_timezone_when_due_date_present(dd)
       break if validate_due_date
     end
-    check_assignment_questionnaires_usage
     @due_date_all = update_nil_dd_deadline_name(@due_date_all)
     @due_date_all = update_nil_dd_description_url(@due_date_all)
     # only when instructor does not assign rubrics and in assignment edit page will show this error message.
@@ -284,8 +283,6 @@ class AssignmentsController < ApplicationController
 
     @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
     @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
-    @review_vary_by_round_check = false
-    @review_vary_by_topic_check = false
     @due_date_nameurl_not_empty = false
     @due_date_nameurl_not_empty_checkbox = false
     @metareview_allowed = false
@@ -326,21 +323,6 @@ class AssignmentsController < ApplicationController
   def validate_due_date
     @due_date_nameurl_not_empty && @due_date_nameurl_not_empty_checkbox &&
       (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
-  end
-
-  def check_assignment_questionnaires_usage
-    @assignment_questionnaires.each do |aq|
-      unless aq.used_in_round.nil?
-        @review_vary_by_round_check = 1
-        break
-      end
-    end
-    @assignment_questionnaires.each do |aq|
-      unless aq.topic_id.nil?
-        @review_vary_by_topic_check = 1
-        break
-      end
-    end
   end
 
   def handle_rubrics_not_assigned_case
@@ -402,19 +384,11 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  def convert_to_boolean(expression)
-    expression == 'true'
-  end
-
   def update_feedback_assignment_form_attributes
     if params[:set_pressed][:bool] == 'false'
       flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."
     else
-      vary_by_topic_desired = convert_to_boolean(params[:vary_by_topic])
-      # Update based on the attributes rec'd in the form
-      # This also updates assignment_questionnaire records, including adding / removing records
-      # as "vary by topic" selection changes
-      if @assignment_form.update_attributes(assignment_form_params, current_user, vary_by_topic_desired)
+      if @assignment_form.update_attributes(assignment_form_params, current_user)
         flash[:note] = 'The assignment was successfully saved....'
       else
         flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"

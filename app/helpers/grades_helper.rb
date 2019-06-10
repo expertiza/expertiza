@@ -72,7 +72,7 @@ module GradesHelper
     # loop through each questionnaire, and populate the view model for all data necessary
     # to render the html tables.
     questionnaires.each do |questionnaire|
-      @round = if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
+      @round = if @assignment.vary_by_round && questionnaire.type == "ReviewQuestionnaire"
                  AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).used_in_round
                else
                  nil
@@ -82,7 +82,7 @@ module GradesHelper
       questions = questionnaire.questions
       vm.add_questions(questions)
       vm.add_team_members(@team)
-      vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
+      vm.add_reviews(@participant, @team, @assignment.vary_by_round)
       vm.number_of_comments_greater_than_10_words
       @vmlist << vm
     end

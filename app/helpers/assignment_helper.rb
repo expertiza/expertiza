@@ -47,7 +47,7 @@ module AssignmentHelper
     review_strategy_options
   end
 
-  # retrive or create a due_date
+  # retrieve or create a due_date
   # use in views/assignment/edit.html.erb
   # Be careful it is a tricky method, for types other than "submission" and "review",
   # the parameter "round" should always be 0; for "submission" and "review" if you want
@@ -69,89 +69,6 @@ module AssignmentHelper
       due_date
     else
       due_dates[round]
-    end
-  end
-
-  # Find a questionnaire for the given assignment
-  # Find by type if round number & topic id not given
-  # Find by round number alone if round number alone is given (fallback to find by assignment)
-  # Find by topic id alone if topic id alone is given
-  # Find by round number and topic id if both are given
-  # Create new questionnaire of given type if no luck with any of these attempts
-  def questionnaire(assignment, questionnaire_type, round_number = nil, topic_id = nil)
-    if round_number.nil? && topic_id.nil?
-      # Find by type
-      questionnaire = assignment.questionnaires.find_by(type: questionnaire_type)
-    elsif topic_id.nil?
-      # Find by round
-      aq = assignment.assignment_questionnaires.find_by(used_in_round: round_number)
-      # E1936 change comments:
-      # If "Vary by round" is checked and since it saves DB state while switching the Tabs,
-      # Questionnaire rubric (not --None--) and the weight (total of 0 or 100% for all rounds)
-      # must be placed by default so the user may switch the tabs and it can save DB successfully
-      # Otherwise, DB is not successfully saved and switching to Topics tab,
-      # it still determines assignment as non-vary by round
-      aq = assignment.assignment_questionnaires.find_by(assignment_id: assignment.id) if aq.nil?
-    elsif round_number.nil?
-      # Find by topic
-      aq = assignment.assignment_questionnaires.find_by(topic_id: topic_id)
-    else
-      # Find by round and topic
-      aq = assignment.assignment_questionnaires.where(used_in_round: round_number, topic_id: topic_id).first
-    end
-    # get the questionnaire from the assignment_questionnaire relationship
-    questionnaire = aq.nil? ? questionnaire : assignment.questionnaires.find_by(id: aq.questionnaire_id)
-    # couldn't find a questionnaire? create a questionnaire of the given type
-    questionnaire.nil? ? Object.const_get(questionnaire_type).new : questionnaire
-  end
-
-  # Find an assignment_questionnaire relationship for the given assignment
-  # Find by type if round number & topic id not given
-  #   Create a new assignment_questionnaire if no luck with given type
-  # Otherwise
-  #   Find by round number alone if round number alone is given
-  #   Find by topic id alone if topic id alone is given
-  #   Find by round number and topic id if both are given
-  #   Find by type if no luck with given round / topic
-  def assignment_questionnaire(assignment, questionnaire_type, round_number = nil, topic_id = nil)
-    q_by_type = assignment.questionnaires.find_by(type: questionnaire_type)
-    if q_by_type.nil?
-      # Create a new assignment_questionnaire if no luck with given type
-      default_weight = {}
-      default_weight['ReviewQuestionnaire'] = 100
-      default_weight['MetareviewQuestionnaire'] = 0
-      default_weight['AuthorFeedbackQuestionnaire'] = 0
-      default_weight['TeammateReviewQuestionnaire'] = 0
-      default_weight['BookmarkRatingQuestionnaire'] = 0
-      default_aq = AssignmentQuestionnaire.where(user_id: assignment.instructor_id, assignment_id: nil, questionnaire_id: nil).first
-      default_limit = if default_aq.nil?
-                        15
-                      else
-                        default_aq.notification_limit
-                      end
-
-      aq = AssignmentQuestionnaire.new
-      aq.questionnaire_weight = default_weight[questionnaire_type]
-      aq.notification_limit = default_limit
-      aq.assignment = @assignment
-      aq
-    else
-      # No need to create a new assignment_questionnaire, should already have one
-      aq_by_type = assignment.assignment_questionnaires.find_by(questionnaire_id: q_by_type.id)
-      if round_number.nil? && topic_id.nil?
-        # Find by type
-        aq = aq_by_type
-      elsif topic_id.nil?
-        # Find by round
-        aq = assignment.assignment_questionnaires.find_by(used_in_round: round_number)
-      elsif round_number.nil?
-        # Find by topic
-        aq = assignment.assignment_questionnaires.find_by(topic_id: topic_id)
-      else
-        # Find by round and topic
-        aq = assignment.assignment_questionnaires.where(used_in_round: round_number, topic_id: topic_id).first
-      end
-      aq.nil? ? aq_by_type : aq
     end
   end
 

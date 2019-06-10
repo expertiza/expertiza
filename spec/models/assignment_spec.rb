@@ -141,7 +141,8 @@ describe Assignment do
     context 'when assignment is varying rubric by round assignment' do
       it 'calculates scores in each round of each team in current assignment' do
         allow(participant).to receive(:scores).with(review1: [question]).and_return(98)
-        allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
+        # Below method is no longer needed. The assignment.vary_by_round is used instead
+        # allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
         allow(assignment).to receive(:num_review_rounds).and_return(1)
         allow(ReviewResponseMap).to receive(:get_responses_for_team_round).with(team, 1).and_return([response])
         allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
@@ -155,7 +156,8 @@ describe Assignment do
     context 'when assignment is not varying rubric by round assignment' do
       it 'calculates scores of each team in current assignment' do
         allow(participant).to receive(:scores).with(review: [question]).and_return(98)
-        allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
+        # Below method is no longer needed. The assignment.vary_by_round is used instead
+        # allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
         allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([response])
         allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
         expect(assignment.scores(review: [question]).inspect).to eq("{:participants=>{:\"1\"=>98}, :teams=>{:\"0\"=>{:team=>#<AssignmentTeam id: 1, "\
@@ -378,48 +380,6 @@ describe Assignment do
       assignment = build(:assignment, microtask: true)
       expect(assignment.microtask?).to be true
     end
-  end
-
-  describe '#varying_rubrics_by_round?' do
-    it 'returns true if the number of 2nd round questionnaire(s) is larger or equal 1' do
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([double('AssignmentQuestionnaire')])
-      expect(assignment.varying_rubrics_by_round?).to be true
-    end
-  end
-
-  describe '#varying_rubrics_by_topic?' do
-
-    # Assignment Factory creates an assignment with default:
-    #   name 'assignment[some number]'
-    # Assignment_Questionnaire Factory creates an assignment-questionnaire relationship with default:
-    #   links together the first assignment found and the first questionnaire found
-    #   used_in_round nil
-    #   topic_id nil
-
-    it "returns false if assignment has no questionnaires" do
-      assignment_no_questionnaires = create(:assignment)
-      expect(assignment_no_questionnaires.varying_rubrics_by_topic?).to be false
-    end
-
-    it "returns false if assignment has assignment-questionnaire(s) that have topic_id nil and none with topic_id non-nil" do
-      assignment_does_not_vary = create(:assignment)
-      create(:assignment_questionnaire, assignment: assignment_does_not_vary)
-      expect(assignment_does_not_vary.varying_rubrics_by_topic?).to be false
-    end
-
-    it "returns true if assignment has assignment-questionnaire(s) that have topic_id non-nil and none with topic_id nil" do
-      assignment_varies = create(:assignment)
-      create(:assignment_questionnaire, assignment: assignment_varies, topic_id: 1)
-      expect(assignment_varies.varying_rubrics_by_topic?).to be true
-    end
-
-    it "throws exception if assignment has assignment-questionnaire(s) that have topic_id non-nil and nil" do
-      assignment_ambiguous = create(:assignment)
-      create(:assignment_questionnaire, assignment: assignment_ambiguous)
-      create(:assignment_questionnaire, assignment: assignment_ambiguous, topic_id: 1)
-      expect {assignment_ambiguous.varying_rubrics_by_topic?}.to raise_exception(StandardError)
-    end
-
   end
 
   describe '#link_for_current_stage' do

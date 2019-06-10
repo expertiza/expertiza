@@ -80,7 +80,8 @@ describe ReportsController do
       context 'when type is FeedbackResponseMap' do
         context 'when assignment has varying_rubrics_by_round feature' do
           it 'renders response_report page with corresponding data' do
-            allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
+            # Below method is no longer needed. The assignment.vary_by_round is used instead
+            # allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
             allow(FeedbackResponseMap).to receive(:feedback_response_report)
               .with('1', 'FeedbackResponseMap').and_return([participant, participant1], [1, 2], [3, 4], [])
             params = {
@@ -94,7 +95,8 @@ describe ReportsController do
 
         context 'when assignment does not have varying_rubrics_by_round feature' do
           it 'renders response_report page with corresponding data' do
-            allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
+            # Below method is no longer needed. The assignment.vary_by_round is used instead
+            # allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
             allow(FeedbackResponseMap).to receive(:feedback_response_report)
               .with('1', 'FeedbackResponseMap').and_return([participant, participant1], [1, 2, 3, 4])
             params = {

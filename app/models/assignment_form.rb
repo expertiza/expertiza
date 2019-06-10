@@ -30,7 +30,7 @@ class AssignmentForm
     assignment_form
   end
 
-  def update(attributes, user, vary_by_topic_desired = false)
+  def update(attributes, user)
     @has_errors = false
     has_late_policy = false
     if attributes[:assignment][:late_policy_id].to_i > 0
@@ -39,7 +39,8 @@ class AssignmentForm
       attributes[:assignment][:late_policy_id] = nil
     end
     update_assignment(attributes[:assignment])
-    update_assignment_questionnaires(attributes[:assignment_questionnaire], vary_by_topic_desired) unless @has_errors
+    update_assignment_questionnaires(attributes[:assignment_questionnaire]) unless @has_errors
+    update_assignment_questionnaires(attributes[:topic_questionnaire]) unless @has_errors || attributes[:assignment][:vary_by_topic] == 'false'
     update_due_dates(attributes[:due_date], user) unless @has_errors
     update_assigned_badges(attributes[:badge], attributes[:assignment]) unless @has_errors
     add_simicheck_to_delayed_queue(attributes[:assignment][:simicheck])
@@ -64,40 +65,28 @@ class AssignmentForm
     @assignment.num_reviews = @assignment.num_reviews_allowed
   end
 
-  # code to save assignment questionnaires
-  def update_assignment_questionnaires(attributes, vary_by_topic_desired = false)
-    return false unless attributes
-    validate_assignment_questionnaires_weights(attributes)
-    @errors = @assignment.errors
+  # code to save assignment questionnaires updated in the Rubrics and Topics tabs
+  def update_assignment_questionnaires(attributes)
+    return unless attributes
+    if attributes[0].key?(:questionnaire_weight)
+      validate_assignment_questionnaires_weights(attributes)
+      @errors = @assignment.errors
+      topic_id = nil
+    end
     unless @has_errors
-      # Delete existing assignment questionnaires for this assignment
-      AssignmentQuestionnaire.where(assignment_id: @assignment.id).each(&:delete)
-      # Go through all of the AQ attribute objects, creating / updating one or more AQs
-      attributes.each do |assignment_questionnaire_attr|
-        if assignment_questionnaire_attr[:id].nil? or assignment_questionnaire_attr[:id].blank?
-          # Create AQ(s)
-          if vary_by_topic_desired
-            topics = SignUpTopic.where(assignment_id: @assignment.id)
-            topics.each do |topic|
-              aq = AssignmentQuestionnaire.new(assignment_questionnaire_attr)
-              aq.topic_id = topic.id
-              unless aq.save
-                @errors = @assignment.errors.to_s
-                @has_errors = true
-              end
-            end
-          else
-            aq = AssignmentQuestionnaire.new(assignment_questionnaire_attr)
-            aq.topic_id = nil
+      # Update AQ if found, otherwise create new entry
+      attributes.each do |attr|
+        unless attr[:questionnaire_id].blank?
+          questionnaire_type = Questionnaire.find(attr[:questionnaire_id]).type
+          topic_id = attr[:topic_id] if attr.key?(:topic_id)
+          aq = assignment_questionnaire(questionnaire_type, attr[:used_in_round], topic_id)
+          if aq.id.nil?
             unless aq.save
               @errors = @assignment.errors.to_s
               @has_errors = true
             end
           end
-        else
-          # Update AQ
-          aq = AssignmentQuestionnaire.find(assignment_questionnaire_attr[:id])
-          unless aq.update_attributes(assignment_questionnaire_attr)
+          unless aq.update_attributes(attr)
             @errors = @assignment.errors.to_s
             @has_errors = true
           end
@@ -204,6 +193,44 @@ class AssignmentForm
       next unless deadline_type == "team_formation" and @assignment.team_assignment?
       add_delayed_job(@assignment, "drop_one_member_topics", due_date, min_left)
     end
+  end
+
+  # Find an AQ based on the given values
+  def assignment_questionnaire(questionnaire_type, round_number, topic_id)
+    round_number = nil if round_number.blank?
+    topic_id = nil if topic_id.blank?
+    # Get all AQs for the assignment and specified round number and topic
+    assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number, topic_id: topic_id)
+    assignment_questionnaires.each do |aq|
+      # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
+      return aq if Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+    end
+    # Create a new AQ if it was not found based on the attributes
+    default_weight = {}
+    default_weight['ReviewQuestionnaire'] = 100
+    default_weight['MetareviewQuestionnaire'] = 0
+    default_weight['AuthorFeedbackQuestionnaire'] = 0
+    default_weight['TeammateReviewQuestionnaire'] = 0
+    default_weight['BookmarkRatingQuestionnaire'] = 0
+    default_aq = AssignmentQuestionnaire.where(user_id: @assignment.instructor_id, assignment_id: nil, questionnaire_id: nil).first
+    default_limit = if default_aq.nil?
+                      15
+                    else
+                      default_aq.notification_limit
+                    end
+
+    aq = AssignmentQuestionnaire.new
+    aq.questionnaire_weight = default_weight[questionnaire_type]
+    aq.notification_limit = default_limit
+    aq.assignment = @assignment
+    aq
+  end
+
+  # Find a questionnaire for the given AQ
+  def questionnaire(assignment_questionnaire, questionnaire_type)
+    questionnaire = Questionnaire.find_by(id: assignment_questionnaire.questionnaire_id)
+    return questionnaire if questionnaire
+    Object.const_get(questionnaire_type).new
   end
 
   def get_time_diff_btw_due_date_and_now(due_date)
@@ -366,6 +393,14 @@ class AssignmentForm
         topic_id: aq.topic_id
       )
     end
+  end
+
+  private
+  def assignment_questionnaire_id_specified?(attributes)
+    attributes.each do |assignment_questionnaire_attr|
+      return true unless assignment_questionnaire_attr[:id].nil? or assignment_questionnaire_attr[:id].blank?
+    end
+    return false
   end
 
 end

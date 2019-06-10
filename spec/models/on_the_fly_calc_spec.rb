@@ -38,14 +38,16 @@ describe OnTheFlyCalc do
     end
     context 'when current assignment varies rubrics by round' do
       it 'scores varying rubrics and returns review scores' do
-        allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
+        # Below method is no longer needed. The assignment.vary_by_round is used instead
+        # allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
         allow(assignment).to receive(:rounds_of_reviews).and_return(1)
         expect(assignment.compute_reviews_hash).to eql({})
       end
     end
     context 'when current assignment does not vary rubrics by round' do
       it 'scores rubrics and returns review scores' do
-        allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
+        # Below method is no longer needed. The assignment.vary_by_round is used instead
+        # allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
         allow(DueDate).to receive(:get_next_due_date).with(assignment.id).and_return(double(:DueDate, round: 1))
         expect(assignment.compute_reviews_hash).to eql(1 => {1 => 50}, 2 => {1 => 30})
       end
@@ -63,14 +65,16 @@ describe OnTheFlyCalc do
     end
     context 'when current assignment varies rubrics by round' do
       it 'computes avg score and score range for each team in each round and return scores' do
-        allow(on_the_fly_calc).to receive(:varying_rubrics_by_round?).and_return(true)
+        # Below method is no longer needed. The assignment.vary_by_round is used instead
+        # allow(on_the_fly_calc).to receive(:varying_rubrics_by_round?).and_return(true)
         allow(on_the_fly_calc).to receive(:rounds_of_reviews).and_return(1)
         expect(on_the_fly_calc.compute_avg_and_ranges_hash).to eq(1 => {1 => {min: 50.0, max: 50.0, avg: 50.0}})
       end
     end
     context 'when current assignment does not vary rubrics by round' do
       it 'computes avg score and score range for each team and return scores' do
-        allow(on_the_fly_calc).to receive(:varying_rubrics_by_round?).and_return(false)
+        # Below method is no longer needed. The assignment.vary_by_round is used instead
+        # allow(on_the_fly_calc).to receive(:varying_rubrics_by_round?).and_return(false)
         expect(on_the_fly_calc.compute_avg_and_ranges_hash).to eq(1 => {min: 50.0, max: 50.0, avg: 50.0})
       end
     end

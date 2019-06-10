@@ -3,7 +3,7 @@
 <!--saying that this report is not available for assignments where rubrics vary by topic-->
 <!--This message is set as the flash message from popup_controller.rb-->
 <% assignment = Assignment.find(@assignment_id) %>
-<% if !assignment.varying_rubrics_by_topic? %>
+<% if !assignment.vary_by_topic %>
 
   <h2> Review scores: <%= Participant.find(@reviewer_id).name %> </h2>
 

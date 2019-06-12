@@ -1,0 +1,10 @@
+<!-- This partial returns what to display if an instructor (etc.) is viewing a questionnaire -->
+<TD align="left"><%= @question.txt %></TD>
+<TD align="left"><%= @question.type %></TD>
+<td align="center"><%= @question.weight.to_s %></TD>
+<% if !@question.max_label.nil? && !@question.min_label.nil? %>
+    <TD align="center"><%= ' (' + @question.min_label + ') ' + @question.questionnaire.min_question_score.to_s +
+                               ' to ' + @question.questionnaire.max_question_score.to_s + ' (' + @question.max_label + ') ' %></TD>
+  <% else %>
+    <TD align="center"><%= @question.questionnaire.min_question_score.to_s + ' to ' + @question.questionnaire.max_question_score.to_s %></TD>
+<% end %>

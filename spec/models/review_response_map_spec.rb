@@ -25,6 +25,7 @@ describe ReviewResponseMap do
   let(:student) { build(:student, id: 1, name: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
   let(:student1) { build(:student, id: 2, name: "name1", fullname: 'no one', email: 'expertiza@mailinator.com') }
   let(:questionnaire) { Questionnaire.new(id: 1, type: 'ReviewQuestionnaire') }
+  let(:deadline_type) { build(:deadline_type, id: 1) }
 
   before(:each) do
     allow(review_response_map).to receive(:response).and_return(response)
@@ -36,63 +37,191 @@ describe ReviewResponseMap do
     # So it will be tested relatively lightly
     # We want to know how it responds to the combinations of various arguments it could receive
     # We want to know how it responds if no questionnaire can be found
-
-    it "returns the correct questionnaire when round given, topic given" do
-      # create multiple questionnaires and assignment_questionnaires,
-      # for confidence that correct questionnaire is returned
-      assignment = create(:assignment)
-      review_response_map = create(:review_response_map, assignment: assignment)
-      questionnaire_1 = create(:questionnaire)
-      questionnaire_2 = create(:questionnaire)
-      questionnaire_3 = create(:questionnaire)
-      questionnaire_4 = create(:questionnaire)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_1, used_in_round: 1, topic_id: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_2, used_in_round: 1, topic_id: 2)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_3, used_in_round: 2, topic_id: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_4, used_in_round: 2, topic_id: 2)
-      expect(review_response_map.questionnaire(2, 2).id).to eql questionnaire_4.id
+    before(:each) do
+      @assignment = create(:assignment)
+      @review_response_map = create(:review_response_map, assignment: @assignment)
+      @questionnaire1 = create(:questionnaire, type: 'ReviewQuestionnaire')
+      @questionnaire2 = create(:questionnaire, type: 'MetareviewQuestionnaire')
+      @questionnaire3 = create(:questionnaire, type: 'AuthorFeedbackQuestionnaire')
+      @questionnaire4 = create(:questionnaire, type: 'TeammateReviewQuestionnaire')
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire2, used_in_round: nil, topic_id: nil)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire3, used_in_round: nil, topic_id: nil)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire4, used_in_round: nil, topic_id: nil)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire2, used_in_round: 1, topic_id: nil)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire2, used_in_round: 2, topic_id: nil)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire2, used_in_round: 3, topic_id: nil)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire2, used_in_round: 4, topic_id: nil)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire3, used_in_round: 1, topic_id: nil)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire3, used_in_round: 2, topic_id: nil)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire3, used_in_round: 3, topic_id: nil)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire3, used_in_round: 4, topic_id: nil)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire4, used_in_round: 1, topic_id: nil)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire4, used_in_round: 2, topic_id: nil)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire4, used_in_round: 3, topic_id: nil)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire4, used_in_round: 4, topic_id: nil)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire2, used_in_round: nil, topic_id: 1)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire2, used_in_round: nil, topic_id: 2)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire2, used_in_round: nil, topic_id: 3)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire2, used_in_round: nil, topic_id: 4)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire3, used_in_round: nil, topic_id: 1)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire3, used_in_round: nil, topic_id: 2)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire3, used_in_round: nil, topic_id: 3)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire3, used_in_round: nil, topic_id: 4)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire4, used_in_round: nil, topic_id: 1)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire4, used_in_round: nil, topic_id: 2)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire4, used_in_round: nil, topic_id: 3)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire4, used_in_round: nil, topic_id: 4)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire2, used_in_round: 1, topic_id: 1)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire3, used_in_round: 1, topic_id: 2)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire4, used_in_round: 1, topic_id: 3)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire2, used_in_round: 1, topic_id: 4)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire3, used_in_round: 2, topic_id: 1)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire4, used_in_round: 2, topic_id: 2)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire2, used_in_round: 2, topic_id: 3)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire3, used_in_round: 2, topic_id: 4)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire4, used_in_round: 3, topic_id: 1)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire2, used_in_round: 3, topic_id: 2)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire3, used_in_round: 3, topic_id: 3)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire4, used_in_round: 3, topic_id: 4)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire2, used_in_round: 4, topic_id: 1)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire3, used_in_round: 4, topic_id: 2)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire4, used_in_round: 4, topic_id: 3)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire2, used_in_round: 4, topic_id: 4)
     end
 
-    it "returns the correct questionnaire when round not given, topic given" do
-      # create multiple questionnaires and assignment_questionnaires,
-      # for confidence that correct questionnaire is returned
-      assignment = create(:assignment)
-      review_response_map = create(:review_response_map, assignment: assignment)
-      questionnaire_1 = create(:questionnaire)
-      questionnaire_2 = create(:questionnaire)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_1, topic_id: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_2, topic_id: 2)
-      expect(review_response_map.questionnaire(nil, 2).id).to eql questionnaire_2.id
+    it 'returns correct questionnaire found by used_in_round and topic_id when both are given and assignment varies by both' do
+      allow(@assignment).to receive(:vary_by_round).and_return(true)
+      allow(@assignment).to receive(:vary_by_topic).and_return(true)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 1, topic_id: 1)
+      expect(@review_response_map.questionnaire(1, 1)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 1, topic_id: 2)
+      expect(@review_response_map.questionnaire(1, 2)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 1, topic_id: 3)
+      expect(@review_response_map.questionnaire(1, 3)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 1, topic_id: 4)
+      expect(@review_response_map.questionnaire(1, 4)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 2, topic_id: 1)
+      expect(@review_response_map.questionnaire(2, 1)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 2, topic_id: 2)
+      expect(@review_response_map.questionnaire(2, 2)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 2, topic_id: 3)
+      expect(@review_response_map.questionnaire(2, 3)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 2, topic_id: 4)
+      expect(@review_response_map.questionnaire(2, 4)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 3, topic_id: 1)
+      expect(@review_response_map.questionnaire(3, 1)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 3, topic_id: 2)
+      expect(@review_response_map.questionnaire(3, 2)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 3, topic_id: 3)
+      expect(@review_response_map.questionnaire(3, 3)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 3, topic_id: 4)
+      expect(@review_response_map.questionnaire(3, 4)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 4, topic_id: 1)
+      expect(@review_response_map.questionnaire(4, 1)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 4, topic_id: 2)
+      expect(@review_response_map.questionnaire(4, 2)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 4, topic_id: 3)
+      expect(@review_response_map.questionnaire(4, 3)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 4, topic_id: 4)
+      expect(@review_response_map.questionnaire(4, 4)).to eq @questionnaire1
     end
 
-    it "returns the correct questionnaire when round given, topic not given" do
-      # create multiple questionnaires and assignment_questionnaires,
-      # for confidence that correct questionnaire is returned
-      assignment = create(:assignment)
-      review_response_map = create(:review_response_map, assignment: assignment)
-      questionnaire_1 = create(:questionnaire)
-      questionnaire_2 = create(:questionnaire)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_1, used_in_round: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_2, used_in_round: 2)
-      expect(review_response_map.questionnaire(2, nil).id).to eql questionnaire_2.id
+    it 'returns correct questionnaire found by used_in_round when used_in_round only is given but assignment varies by both round and topic' do
+      allow(@assignment).to receive(:vary_by_round).and_return(true)
+      allow(@assignment).to receive(:vary_by_topic).and_return(true)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 1, topic_id: nil)
+      expect(@review_response_map.questionnaire(1, nil)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 2, topic_id: nil)
+      expect(@review_response_map.questionnaire(2, nil)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 3, topic_id: nil)
+      expect(@review_response_map.questionnaire(3, nil)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 4, topic_id: nil)
+      expect(@review_response_map.questionnaire(4, nil)).to eq @questionnaire1
     end
 
-    it "returns the correct questionnaire when round number not given, topic not given" do
-      # create multiple questionnaires and assignment_questionnaires,
-      # for confidence that correct questionnaire is returned
-      assignment = create(:assignment)
-      review_response_map = create(:review_response_map, assignment: assignment)
-      questionnaire_1 = create(:questionnaire)
-      questionnaire_2 = create(:questionnaire)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_1, used_in_round: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_2, used_in_round: 2)
-      expect(review_response_map.questionnaire(nil, nil).id).to eql questionnaire_1.id
+    it 'returns correct questionnaire found by used_in_round when both used_in_round and topic_id are given but assignment varies only by round' do
+      allow(@assignment).to receive(:vary_by_round).and_return(true)
+      allow(@assignment).to receive(:vary_by_topic).and_return(false)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 1, topic_id: nil)
+      expect(@review_response_map.questionnaire(1, anything)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 2, topic_id: nil)
+      expect(@review_response_map.questionnaire(2, anything)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 3, topic_id: nil)
+      expect(@review_response_map.questionnaire(3, anything)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 4, topic_id: nil)
+      expect(@review_response_map.questionnaire(4, anything)).to eq @questionnaire1
     end
 
-    it "returns nil when no questionnaire can be found" do
-      assignment = create(:assignment)
-      review_response_map = create(:review_response_map, assignment: assignment)
-      expect(review_response_map.questionnaire(2, nil)).to be_nil
+    it 'returns correct questionnaire found by topic_id when topic_id only is given and there is no current round used in the due date and assignment varies by both round and topic' do
+      allow(@assignment).to receive(:vary_by_round).and_return(true)
+      allow(@assignment).to receive(:vary_by_topic).and_return(true)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: nil, topic_id: 1)
+      expect(@review_response_map.questionnaire(nil, 1)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: nil, topic_id: 2)
+      expect(@review_response_map.questionnaire(nil, 2)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: nil, topic_id: 3)
+      expect(@review_response_map.questionnaire(nil, 3)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: nil, topic_id: 4)
+      expect(@review_response_map.questionnaire(nil, 4)).to eq @questionnaire1
+    end
+
+    it 'returns correct questionnaire found by topic_id when both used_in_round and topic_id are given and there is no current round used in the due date but assignment varies only by topic' do
+      allow(@assignment).to receive(:vary_by_round).and_return(false)
+      allow(@assignment).to receive(:vary_by_topic).and_return(true)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: nil, topic_id: 1)
+      expect(@review_response_map.questionnaire(anything, 1)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: nil, topic_id: 2)
+      expect(@review_response_map.questionnaire(anything, 2)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: nil, topic_id: 3)
+      expect(@review_response_map.questionnaire(anything, 3)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: nil, topic_id: 4)
+      expect(@review_response_map.questionnaire(anything, 4)).to eq @questionnaire1
+    end
+
+    it 'returns correct questionnaire found by current round used in the due date when neither used_in_round nor topic_id are not given, but assignment varies only by round' do
+      allow(@assignment).to receive(:vary_by_round).and_return(true)
+      allow(@assignment).to receive(:vary_by_topic).and_return(false)
+      create(:assignment_due_date, assignment: @assignment, round: 2)
+      allow(DeadlineType).to receive(:find_by).with(name: 'review').and_return(deadline_type)
+      allow(DeadlineType).to receive(:find_by).with(name: 'submission').and_return(deadline_type)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 2, topic_id: nil)
+      expect(@review_response_map.questionnaire(nil, anything)).to eq @questionnaire1
+    end
+
+    it 'returns correct questionnaire found by current round used in the due date when topic_id only is given, but assignment varies by both round and topic' do
+      allow(@assignment).to receive(:vary_by_round).and_return(true)
+      allow(@assignment).to receive(:vary_by_topic).and_return(true)
+      create(:assignment_due_date, assignment: @assignment, round: 2)
+      allow(DeadlineType).to receive(:find_by).with(name: 'review').and_return(deadline_type)
+      allow(DeadlineType).to receive(:find_by).with(name: 'submission').and_return(deadline_type)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 2, topic_id: 1)
+      expect(@review_response_map.questionnaire(nil, 1)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 2, topic_id: 2)
+      expect(@review_response_map.questionnaire(nil, 2)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 2, topic_id: 3)
+      expect(@review_response_map.questionnaire(nil, 3)).to eq @questionnaire1
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: 2, topic_id: 4)
+      expect(@review_response_map.questionnaire(nil, 4)).to eq @questionnaire1
+    end
+
+    it 'returns correct questionnaire found by type when neither used_in_round nor topic_id are given and assignment does not vary by either round or topic' do
+      allow(@assignment).to receive(:vary_by_round).and_return(false)
+      allow(@assignment).to receive(:vary_by_topic).and_return(false)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: nil, topic_id: nil)
+      expect(@review_response_map.questionnaire(nil, nil)).to eq @questionnaire1
+    end
+
+    it 'returns correct questionnaire found by type when both used_in_round and topic_id are given but assignment does not vary by either round or topic' do
+      allow(@assignment).to receive(:vary_by_round).and_return(false)
+      allow(@assignment).to receive(:vary_by_topic).and_return(false)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: @questionnaire1, used_in_round: nil, topic_id: nil)
+      expect(@review_response_map.questionnaire(anything, anything)).to eq @questionnaire1
+    end
+
+    it 'should not return nil or result in any error since all possible AQs and questionnaires must be accessible via Active Record' do
+      # All below cases are not possible for a given DB state
+      #expect(self_review_response_map.questionnaire(5, anything)).to eq nil
+      #expect(self_review_response_map.questionnaire(anything, 5)).to eq nil
     end
 
   end

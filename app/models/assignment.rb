@@ -383,66 +383,18 @@ class Assignment < ActiveRecord::Base
   end
 
   # Find the ID of a review questionnaire for this assignment
-  #   finds by round if round number only is given
-  #     fall back to find by type
-  #   finds by current round and topic if topic only is given
-  #     fall back to find by current round
-  #     fall back to find by topic
-  #     fall back to find by type
-  #   finds by round and topic if both are given
-  #     fall back to find by round
-  #     fall back to find by topic
-  #     fall back to find by type
   def review_questionnaire_id(round_number = nil, topic_id = nil)
-    # Get all assignment-questionnaire relationships between this assignment and review questionnaires
-    aqs_by_type = AssignmentQuestionnaire.where(assignment_id: self.id).select do |aq|
-      !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == "ReviewQuestionnaire"
-    end
-    # If round not given, get current round from the next due date
-    if round_number.nil?
+    round_number = nil unless self.vary_by_round
+    topic_id = nil unless self.vary_by_topic
+    # If round is not given, but assignment varies by round try to retrieve current round from the next due date
+    if round_number.nil? && self.vary_by_round
       next_due_date = DueDate.get_next_due_date(self.id)
       round_number = next_due_date.try(:round)
     end
-    #   finds by round if round number only is given
-    #     fall back to find by type
-    if !round_number.nil? && topic_id.nil?
-      aqs = aqs_by_type.select do |aq|
-        aq.used_in_round == round_number
-      end
-      aqs = (aqs.nil? || aqs.empty?) ? aqs_by_type : aqs
-    end
-    #   finds by topic if topic only is given
-    #     fall back to find by type
-    if round_number.nil? && !topic_id.nil?
-      aqs = aqs_by_type.select do |aq|
-        aq.topic_id == topic_id
-      end
-      aqs = (aqs.nil? || aqs.empty?) ? aqs_by_type : aqs
-    end
-    #   finds by round and topic if both are given
-    #     fall back to find by round
-    #     fall back to find by topic
-    #     fall back to find by type
-    if !round_number.nil? && !topic_id.nil?
-      aqs = aqs_by_type.select do |aq|
-        aq.used_in_round == round_number && aq.topic_id == topic_id
-      end
-      if aqs.nil? || aqs.empty?
-        aqs = aqs_by_type.select do |aq|
-          aq.used_in_round == round_number
-        end
-      end
-      if aqs.nil? || aqs.empty?
-        aqs = aqs_by_type.select do |aq|
-          aq.topic_id == topic_id
-        end
-      end
-      aqs = (aqs.nil? || aqs.empty?) ? aqs_by_type : aqs
-    end
-    # Return the questionnaire id for the first reasonable thing we came up with
-    # (or return nil if nothing reasonable found)
-    aqs = (aqs.nil? || aqs.empty?) ? aqs_by_type : aqs
-    (aqs.nil? || aqs.empty?) ? nil : aqs.first.questionnaire_id
+    # Create assignment_form that we can use to retrieve AQ with all the same attributes and questionnaire based on AQ
+    assignment_form = AssignmentForm.create_form_object(self.id)
+    assignment_questionnaire = assignment_form.assignment_questionnaire('ReviewQuestionnaire', round_number, topic_id)
+    assignment_form.questionnaire(assignment_questionnaire, 'ReviewQuestionnaire').id
   end
 
   def self.export_details(csv, parent_id, detail_options)

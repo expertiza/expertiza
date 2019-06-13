@@ -70,7 +70,7 @@ class AssignmentForm
     return unless attributes
     if attributes[0].key?(:questionnaire_weight)
       validate_assignment_questionnaires_weights(attributes)
-      @errors = @assignment.errors
+      @errors = @assignment.errors.to_s
       topic_id = nil
     end
     unless @has_errors
@@ -84,6 +84,7 @@ class AssignmentForm
             unless aq.save
               @errors = @assignment.errors.to_s
               @has_errors = true
+              next
             end
           end
           unless aq.update_attributes(attr)
@@ -213,7 +214,7 @@ class AssignmentForm
     default_weight['TeammateReviewQuestionnaire'] = 0
     default_weight['BookmarkRatingQuestionnaire'] = 0
     default_aq = AssignmentQuestionnaire.where(user_id: @assignment.instructor_id, assignment_id: nil, questionnaire_id: nil).first
-    default_limit = if default_aq.nil?
+    default_limit = if default_aq.blank?
                       15
                     else
                       default_aq.notification_limit
@@ -393,14 +394,6 @@ class AssignmentForm
         topic_id: aq.topic_id
       )
     end
-  end
-
-  private
-  def assignment_questionnaire_id_specified?(attributes)
-    attributes.each do |assignment_questionnaire_attr|
-      return true unless assignment_questionnaire_attr[:id].nil? or assignment_questionnaire_attr[:id].blank?
-    end
-    return false
   end
 
 end

@@ -4,9 +4,7 @@ class ReviewResponseMap < ResponseMap
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
 
   # Find a review questionnaire associated with this review response map's assignment
-  def questionnaire(round_number, topic_id)
-    round_number = nil unless self.assignment.vary_by_round
-    topic_id = nil unless self.assignment.vary_by_topic
+  def questionnaire(round_number = nil, topic_id = nil)
     Questionnaire.find(self.assignment.review_questionnaire_id(round_number, topic_id))
   end
 

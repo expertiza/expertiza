@@ -67,7 +67,7 @@ class AssignmentForm
 
   # code to save assignment questionnaires updated in the Rubrics and Topics tabs
   def update_assignment_questionnaires(attributes)
-    return unless attributes
+    return if attributes.nil? || attributes.empty?
     if attributes[0].key?(:questionnaire_weight)
       validate_assignment_questionnaires_weights(attributes)
       @errors = @assignment.errors.to_s
@@ -204,7 +204,7 @@ class AssignmentForm
     assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number, topic_id: topic_id)
     assignment_questionnaires.each do |aq|
       # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-      return aq if Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+      return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
     end
     # Create a new AQ if it was not found based on the attributes
     default_weight = {}
@@ -227,10 +227,11 @@ class AssignmentForm
     aq
   end
 
-  # Find a questionnaire for the given AQ
+  # Find a questionnaire for the given AQ and questionnaire type
   def questionnaire(assignment_questionnaire, questionnaire_type)
+    return Object.const_get(questionnaire_type).new if assignment_questionnaire.nil?
     questionnaire = Questionnaire.find_by(id: assignment_questionnaire.questionnaire_id)
-    return questionnaire if questionnaire
+    return questionnaire unless questionnaire.nil?
     Object.const_get(questionnaire_type).new
   end
 

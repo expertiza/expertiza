@@ -41,14 +41,12 @@ describe ReportsController do
       stub_const('WEBSERVICE_CONFIG', 'summary_webservice_url' => 'expertiza.ncsu.edu')
     end
 
-    # E1936 team recommends this method be REMOVED (it does not seem to be used anywhere in Expertiza as of 4/21/19)
     describe 'summary_by_reviewee_and_criteria' do
       context 'when type is SummaryByRevieweeAndCriteria' do
         it_should_behave_like "summary_report"
       end
     end
 
-    # E1936 team recommends this method be REMOVED (it does not seem to be used anywhere in Expertiza as of 4/21/19)
     describe 'summary_by_criteria' do
       context 'when type is SummaryByCriteria' do
         it_should_behave_like "summary_report"
@@ -78,10 +76,9 @@ describe ReportsController do
 
     describe 'feedback_response_map' do
       context 'when type is FeedbackResponseMap' do
-        context 'when assignment has varying_rubrics_by_round feature' do
+        context 'when assignment varies rubrics by round' do
           it 'renders response_report page with corresponding data' do
-            # Below method is no longer needed. The assignment.vary_by_round is used instead
-            # allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
+            allow(assignment).to receive(:vary_by_round).and_return(true)
             allow(FeedbackResponseMap).to receive(:feedback_response_report)
               .with('1', 'FeedbackResponseMap').and_return([participant, participant1], [1, 2], [3, 4], [])
             params = {
@@ -93,10 +90,9 @@ describe ReportsController do
           end
         end
 
-        context 'when assignment does not have varying_rubrics_by_round feature' do
+        context 'when assignment does not vary rubrics by round' do
           it 'renders response_report page with corresponding data' do
-            # Below method is no longer needed. The assignment.vary_by_round is used instead
-            # allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
+            allow(assignment).to receive(:vary_by_round).and_return(false)
             allow(FeedbackResponseMap).to receive(:feedback_response_report)
               .with('1', 'FeedbackResponseMap').and_return([participant, participant1], [1, 2, 3, 4])
             params = {

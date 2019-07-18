@@ -1,7 +1,7 @@
 class ReviewResponseMap < ResponseMap
-  belongs_to :reviewee, class_name: 'Team', foreign_key: 'reviewee_id'
-  belongs_to :contributor, class_name: 'Team', foreign_key: 'reviewee_id'
-  belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
+  belongs_to :reviewee, class_name: 'Team', foreign_key: 'reviewee_id', inverse_of: false
+  belongs_to :contributor, class_name: 'Team', foreign_key: 'reviewee_id', inverse_of: false
+  belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id', inverse_of: false
 
   # Find a review questionnaire associated with this review response map's assignment
   # For more details please see method description for assignment.review_questionnaire_id()

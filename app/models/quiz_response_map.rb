@@ -1,9 +1,9 @@
 class QuizResponseMap < ResponseMap
-  belongs_to :reviewee, class_name: 'Participant', foreign_key: 'reviewee_id'
-  belongs_to :contributor, class_name: 'Participant', foreign_key: 'reviewee_id'
-  belongs_to :quiz_questionnaire, class_name: 'QuizQuestionnaire', foreign_key: 'reviewed_object_id'
-  belongs_to :assignment, class_name: 'Assignment'
-  has_many :quiz_responses, foreign_key: :map_id
+  belongs_to :reviewee, class_name: 'Participant', foreign_key: 'reviewee_id', inverse_of: false
+  belongs_to :contributor, class_name: 'Participant', foreign_key: 'reviewee_id', inverse_of: false
+  belongs_to :quiz_questionnaire, class_name: 'QuizQuestionnaire', foreign_key: 'reviewed_object_id', inverse_of: false
+  belongs_to :assignment, class_name: 'Assignment', inverse_of: false
+  has_many :quiz_responses, foreign_key: :map_id, dependent: :destroy, inverse_of: false
 
   def questionnaire
     self.quiz_questionnaire
@@ -30,13 +30,9 @@ class QuizResponseMap < ResponseMap
     return 'N/A' if response_id.nil? # this quiz has not been taken yet
 
     questions.each do |question|
-      score = Answer.where(response_id: response_id, question_id: question.id).first
-      if score.nil?
-        # The quiz has been taken but not all the answers are stored correctly.
-        return 'N/A'
-      else
-        quiz_score += score.answer
-      end
+      score = Answer.find_by(response_id: response_id, question_id: question.id)
+      return 'N/A' if score.nil?
+      quiz_score += score.answer
     end
 
     question_count = questions.length

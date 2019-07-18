@@ -121,11 +121,6 @@ class PopupController < ApplicationController
     @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@reviewer_id)
     @reviews = []
 
-    assignment = Assignment.find(@assignment_id)
-    if assignment.varying_rubrics_by_topic?
-      flash.now[:error] = "This report is not implemented for assignments where the rubric varies by topic."
-    end
-
     # Builds tone analysis report and heatmap when instructor/admin/superadmin clicks on the "View Review Report" Icon for an assignment.
     build_tone_analysis_report
     build_tone_analysis_heatmap

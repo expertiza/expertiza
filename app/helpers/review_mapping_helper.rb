@@ -1,25 +1,10 @@
 module ReviewMappingHelper
   def create_report_table_header(headers = {})
-    table_header = "<div class = 'reviewreport'>\
-                    <table width='100% cellspacing='0' cellpadding='2' border='0' class='table table-striped'>\
-                    <tr bgcolor='#CCCCCC'>"
-    headers.each do |header, percentage|
-      table_header += if percentage
-                        "<th width = #{percentage}>\
-                        #{header.humanize}\
-                                        </th>"
-                      else
-                        "<th>\
-                        #{header.humanize}\
-                                        </th>"
-                      end
-    end
-    table_header += "</tr>"
-    table_header.html_safe
+    render partial: 'report_table_header', locals: {headers: headers}
   end
 
   #
-  # for review report
+  # gets the response map data such as reviewer id, reviewd object id and type for the review report
   #
   def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
     rspan = 0
@@ -37,9 +22,9 @@ module ReviewMappingHelper
   end
 
   #
-  # gets color according to review and assignment submission status
+  # gets the team name's color according to review and assignment submission status
   #
-  def get_team_name_color_in_review_report(response_map)
+  def get_team_colour(response_map)
     assignment_created = @assignment.created_at
     assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
     if Response.exists?(map_id: response_map.id)
@@ -69,7 +54,7 @@ module ReviewMappingHelper
     end
   end
 
-  # checks if a review was submitted in every round
+  # checks if a review was submitted in every round and gives the total responses count
   def response_for_each_round?(response_map)
     num_responses = 0
     total_num_rounds = @assignment.num_review_rounds
@@ -91,7 +76,7 @@ module ReviewMappingHelper
     !subm_created_at.try(:first).try(:created_at).nil?
   end
 
-  # returns submitted hyperlink
+  # returns hyperlink of the assignment that has been submitted on the due date
   def submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
     submission_due_date = assignment_due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
     subm_hyperlink = SubmissionRecord.where(team_id: response_map.reviewee_id, operation: 'Submit Hyperlink')
@@ -114,6 +99,7 @@ module ReviewMappingHelper
     (link_updated_at < submission_due_date) && (link_updated_at > submission_due_last_round)
   end
 
+  # For assignments with 1 team member, the following method returns user's fullname else it returns "team name" that a particular reviewee belongs to.
   def get_team_reviewed_link_name(max_team_size, response, reviewee_id)
     team_reviewed_link_name = if max_team_size == 1
                                 TeamsUser.where(team_id: reviewee_id).first.user.fullname
@@ -124,15 +110,17 @@ module ReviewMappingHelper
     team_reviewed_link_name
   end
 
-  def get_current_round_for_review_report(reviewer_id)
-    user_id = Participant.find(reviewer_id).user.id
-    topic_id = SignedUpTeam.topic_id(@assignment.id, user_id)
-    @assignment.number_of_current_round(topic_id)
-    @assignment.num_review_rounds if @assignment.get_current_stage(topic_id) == "Finished" || @assignment.get_current_stage(topic_id) == "metareview"
-  end
+  # if the current stage is "submission" or "review", function returns the current round number otherwise,
+  # if the current stage is "Finished" or "metareview", function returns the number of rounds of review completed.
+  # def get_current_round(reviewer_id)
+  #   user_id = Participant.find(reviewer_id).user.id
+  #   topic_id = SignedUpTeam.topic_id(@assignment.id, user_id)
+  #   @assignment.number_of_current_round(topic_id)
+  #   @assignment.num_review_rounds if @assignment.get_current_stage(topic_id) == "Finished" || @assignment.get_current_stage(topic_id) == "metareview"
+  # end
 
-  # varying rubric by round
-  def get_each_round_score_awarded_for_review_report(reviewer_id, team_id)
+  # gets the review score awarded based on each round of the review
+  def get_awarded_review_score(reviewer_id, team_id)
     (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----') }
     (1..@assignment.num_review_rounds).each do |round|
       if @review_scores[reviewer_id] && @review_scores[reviewer_id][round] && @review_scores[reviewer_id][round][team_id] && @review_scores[reviewer_id][round][team_id] != -1.0
@@ -141,7 +129,8 @@ module ReviewMappingHelper
     end
   end
 
-  def get_min_max_avg_value_for_review_report(round, team_id)
+  # gets minimum, maximum and average value for all the reviews
+  def get_review_metrics(round, team_id)
     %i[max min avg].each {|metric| instance_variable_set('@' + metric.to_s, '-----') }
     if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? {|k| @avg_and_ranges[team_id][round].key? k }
       %i[max min avg].each do |metric|
@@ -151,6 +140,7 @@ module ReviewMappingHelper
     end
   end
 
+  # sorts the reviewers by the average volume of reviews in each round, in descending order
   def sort_reviewer_by_review_volume_desc
     @reviewers.each do |r|
       r.overall_avg_vol,
@@ -165,6 +155,7 @@ module ReviewMappingHelper
     @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 
+  # displays the average scores in round 1, 2 and 3
   def display_volume_metric(overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3)
     metric = "Avg. Volume: #{overall_avg_vol} <br/> ("
     metric += "1st: " + avg_vol_in_round_1.to_s if avg_vol_in_round_1 > 0
@@ -174,6 +165,7 @@ module ReviewMappingHelper
     metric.html_safe
   end
 
+  # moves data of reviews in each round from a current round
   def initialize_chart_elements(reviewer)
     round = 0
     labels = []
@@ -203,6 +195,7 @@ module ReviewMappingHelper
     [labels, reviewer_data, all_reviewers_data]
   end
 
+  # The data of all the reviews is displayed in the form of a bar chart
   def display_volume_metric_chart(reviewer)
     labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
     data = {
@@ -305,12 +298,8 @@ module ReviewMappingHelper
     html.html_safe
   end
 
-  #
-  # for author feedback report
-  #
-  #
-  # varying rubric by round
-  def get_each_round_review_and_feedback_response_map_for_feedback_report(author)
+  # gets review and feedback responses for all rounds for the feedback report
+  def get_each_review_and_feedback_response_map(author)
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     # Calculate how many responses one team received from each round
     # It is the feedback number each team member should make
@@ -329,7 +318,8 @@ module ReviewMappingHelper
     @rspan_round_three = @review_responses_round_three.nil? ? 0 : @review_responses_round_three.length
   end
 
-  def get_certain_round_review_and_feedback_response_map_for_feedback_report(author)
+  # gets review and feedback responses for a certain round for the feedback report
+  def get_certain_review_and_feedback_response_map(author)
     @feedback_response_maps = FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?", @all_review_response_ids, author.id])
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     @review_response_map_ids = ReviewResponseMap.where(["reviewed_object_id = ? and reviewee_id = ?", @id, @team_id]).pluck("id")
@@ -342,18 +332,12 @@ module ReviewMappingHelper
   #
   def get_css_style_for_calibration_report(diff)
     # diff - difference between stu's answer and instructor's answer
-    css_class = case diff.abs
-                when 0
-                  'c5'
-                when 1
-                  'c4'
-                when 2
-                  'c3'
-                when 3
-                  'c2'
-                else
-                  'c1'
-                end
+    dict = {0 => 'c5',1 => 'c4',2 => 'c3',3 => 'c2'}
+    if dict.key?(diff.abs)
+      css_class = dict[diff.abs]
+    else
+      css_class = 'c1'
+    end
     css_class
   end
 

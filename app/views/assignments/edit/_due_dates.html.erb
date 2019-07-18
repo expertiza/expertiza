@@ -390,9 +390,9 @@
                 addQuestionnaireTableRow(
                         'MetareviewQuestionnaire',
                         null,
-                        <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil, nil).to_json.html_safe %>,
-                        <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil, nil).to_json.html_safe %>,
-                        <%= questionnaire_options('MetareviewQuestionnaire').to_json.html_safe %>
+                        <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
+                        <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
+                        <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
                 );
             }
 
@@ -436,9 +436,9 @@ function removeOrAddMetareview() {
         addQuestionnaireTableRow(
             'MetareviewQuestionnaire',
             null,
-            <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil, nil).to_json.html_safe %>,
-            <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil, nil).to_json.html_safe %>,
-            <%= questionnaire_options('MetareviewQuestionnaire').to_json.html_safe %>
+            <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
+            <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
+            <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
         );
     }
     <%@metareview_allowed_checkbox=true%>
@@ -512,7 +512,7 @@ function addDaysOrMonth(mul, type) {
 
 <input name="metareviewAllowed" type="hidden" value="false" />
 <%= check_box_tag('metareviewAllowed', 'true', @metareview_allowed,:onclick=>"removeOrAddMetareview()" ) %>
-<%= label_tag('metareviewAllowed', 'Use metareview deadline') %><br/>
+<%= label_tag('metareviewAllowed', 'Use meta-review deadline') %><br/>
 <div id="date_updater_div">
                                                     <button type="button" id="show_date_updater" class="btn btn-default" style="margin-bottom: 20px;">Show/Hide Date Updater</button>
                                                     <div id="date_updater_inner">

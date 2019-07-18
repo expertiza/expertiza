@@ -3,11 +3,14 @@ class ReviewResponseMap < ResponseMap
   belongs_to :contributor, class_name: 'Team', foreign_key: 'reviewee_id', inverse_of: false
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id', inverse_of: false
 
-  # Find a review questionnaire associated with this review response map's assignment
-  # For more details please see method description for assignment.review_questionnaire_id()
-  def questionnaire(round_number = nil, topic_id = nil)
-    # Use find_by() instead of find() in case the review questionnaire id is nil
-    Questionnaire.find_by(id: self.assignment.review_questionnaire_id(round_number, topic_id))
+  # In if this assignment uses "varying rubrics" feature, the sls
+  # "used_in_round" field should not be nil
+  # so find the round # based on current time and the due date times, and use that round # to find corresponding
+  # questionnaire_id from assignment_questionnaires table
+  # otherwise this assignment does not use the "varying rubrics", so in assignment_questionnaires table there should
+  # be only 1 questionnaire with type 'ReviewQuestionnaire'.    -Yang
+  def questionnaire(round = nil)
+    Questionnaire.find_by(id: self.assignment.review_questionnaire_id(round))
   end
 
   def get_title
@@ -96,7 +99,7 @@ class ReviewResponseMap < ResponseMap
     responses
   end
 
-  # wrap latest version of responses in each response map, together with the questionnaire_id
+  # wrap lastest version of responses in each response map, together withe the questionnaire_id
   # will be used to display the reviewer summary
   def self.final_versions_from_reviewer(reviewer_id)
     maps = ReviewResponseMap.where(reviewer_id: reviewer_id)
@@ -153,13 +156,6 @@ class ReviewResponseMap < ResponseMap
                ("review round" + round.to_s).to_sym
              end
     review_final_versions[symbol] = {}
-    # TODO E1936 (future work)
-    # review_questionnaire_id method signature has changed
-    # need to change call to review_questionnaire_id here
-    # cannot do this as part of this project's scope
-    # the structure of the output (assumes only 1 questionnaire per round) has to change
-    # and this change has to bubble all the way up to tone analysis, heatmaps, and review scores pop-up
-    # this is a vary-by-topic redesign project all on its own
     review_final_versions[symbol][:questionnaire_id] = assignment.review_questionnaire_id(round)
     response_ids = []
     maps.each do |map|

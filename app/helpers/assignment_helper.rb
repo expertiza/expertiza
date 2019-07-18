@@ -30,8 +30,8 @@ module AssignmentHelper
   end
 
   # round=0 added by E1450
-  def questionnaire_options(type)
-    questionnaires = Questionnaire.where(['private = 0 or instructor_id = ?', session[:user].id]).order('name')
+  def questionnaire_options(assignment, type, _round = 0)
+    questionnaires = Questionnaire.where(['private = 0 or instructor_id = ?', assignment.instructor_id]).order('name')
     options = []
     questionnaires.select {|x| x.type == type }.each do |questionnaire|
       options << [questionnaire.name, questionnaire.id]
@@ -72,57 +72,36 @@ module AssignmentHelper
     end
   end
 
-  # Find a questionnaire for the given assignment
-  # Find by type if round number & topic id not given
-  # Find by round number alone if round number alone is given (fallback to find by assignment)
-  # Find by topic id alone if topic id alone is given
-  # Find by round number and topic id if both are given
-  # Create new questionnaire of given type if no luck with any of these attempts
-  def questionnaire(assignment, questionnaire_type, round_number = nil, topic_id = nil)
-    if round_number.nil? && topic_id.nil?
-      # Find by type
-      questionnaire = assignment.questionnaires.find_by(type: questionnaire_type)
-    elsif topic_id.nil?
-      # Find by round
-      aq = assignment.assignment_questionnaires.find_by(used_in_round: round_number)
-      # E1936 change comments:
-      # If "Vary by round" is checked and since it saves DB state while switching the Tabs,
-      # Questionnaire rubric (not --None--) and the weight (total of 0 or 100% for all rounds)
-      # must be placed by default so the user may switch the tabs and it can save DB successfully
-      # Otherwise, DB is not successfully saved and switching to Topics tab,
-      # it still determines assignment as non-vary by round
-      aq = assignment.assignment_questionnaires.find_by(assignment_id: assignment.id) if aq.nil?
-    elsif round_number.nil?
-      # Find by topic
-      aq = assignment.assignment_questionnaires.find_by(topic_id: topic_id)
+  def questionnaire(assignment, type, round_number)
+    # E1450 changes
+    if round_number.nil?
+      questionnaire = assignment.questionnaires.find_by(type: type)
     else
-      # Find by round and topic
-      aq = assignment.assignment_questionnaires.where(used_in_round: round_number, topic_id: topic_id).first
+      ass_ques = assignment.assignment_questionnaires.find_by(used_in_round: round_number)
+      # make sure the assignment_questionnaire record is not empty
+      unless ass_ques.nil?
+        temp_num = ass_ques.questionnaire_id
+        questionnaire = assignment.questionnaires.find_by(id: temp_num)
+      end
     end
-    # get the questionnaire from the assignment_questionnaire relationship
-    questionnaire = aq.nil? ? questionnaire : assignment.questionnaires.find_by(id: aq.questionnaire_id)
-    # couldn't find a questionnaire? create a questionnaire of the given type
-    questionnaire.nil? ? Object.const_get(questionnaire_type).new : questionnaire
+    # E1450 end
+    questionnaire = Object.const_get(type).new if questionnaire.nil?
+
+    questionnaire
   end
 
-  # Find an assignment_questionnaire relationship for the given assignment
-  # Find by type if round number & topic id not given
-  #   Create a new assignment_questionnaire if no luck with given type
-  # Otherwise
-  #   Find by round number alone if round number alone is given
-  #   Find by topic id alone if topic id alone is given
-  #   Find by round number and topic id if both are given
-  #   Find by type if no luck with given round / topic
-  def assignment_questionnaire(assignment, questionnaire_type, round_number = nil, topic_id = nil)
-    q_by_type = assignment.questionnaires.find_by(type: questionnaire_type)
-    if q_by_type.nil?
-      # Create a new assignment_questionnaire if no luck with given type
+  # number added by E1450
+  def assignment_questionnaire(assignment, type, number)
+    questionnaire = assignment.questionnaires.find_by(type: type)
+
+    if questionnaire.nil?
       default_weight = {}
       default_weight['ReviewQuestionnaire'] = 100
       default_weight['MetareviewQuestionnaire'] = 0
       default_weight['AuthorFeedbackQuestionnaire'] = 0
       default_weight['TeammateReviewQuestionnaire'] = 0
       default_weight['BookmarkRatingQuestionnaire'] = 0
+
       default_aq = AssignmentQuestionnaire.where(user_id: assignment.instructor_id, assignment_id: nil, questionnaire_id: nil).first
       default_limit = if default_aq.nil?
                         15
@@ -131,27 +110,24 @@ module AssignmentHelper
                       end
 
       aq = AssignmentQuestionnaire.new
-      aq.questionnaire_weight = default_weight[questionnaire_type]
+      aq.questionnaire_weight = default_weight[type]
       aq.notification_limit = default_limit
       aq.assignment = @assignment
       aq
     else
-      # No need to create a new assignment_questionnaire, should already have one
-      aq_by_type = assignment.assignment_questionnaires.find_by(questionnaire_id: q_by_type.id)
-      if round_number.nil? && topic_id.nil?
-        # Find by type
-        aq = aq_by_type
-      elsif topic_id.nil?
-        # Find by round
-        aq = assignment.assignment_questionnaires.find_by(used_in_round: round_number)
-      elsif round_number.nil?
-        # Find by topic
-        aq = assignment.assignment_questionnaires.find_by(topic_id: topic_id)
+      # E1450 changes
+      if number.nil?
+        assignment.assignment_questionnaires.find_by(questionnaire_id: questionnaire.id)
       else
-        # Find by round and topic
-        aq = assignment.assignment_questionnaires.where(used_in_round: round_number, topic_id: topic_id).first
+        assignment_by_usedinround = assignment.assignment_questionnaires.find_by(used_in_round: number)
+        # make sure the assignment found by used in round is not empty
+        if assignment_by_usedinround.nil?
+          assignment.assignment_questionnaires.find_by(questionnaire_id: questionnaire.id)
+        else
+          assignment_by_usedinround
+        end
       end
-      aq.nil? ? aq_by_type : aq
+      # E1450 end
     end
   end
 
@@ -177,5 +153,4 @@ module AssignmentHelper
       '#0984e3' # submission grade is not assigned yet.
     end
   end
-
 end

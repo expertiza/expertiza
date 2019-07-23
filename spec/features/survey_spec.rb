@@ -60,8 +60,8 @@ describe "Survey questionnaire tests for instructor interface" do
 
     # adding some questions for the deployed survey
     visit '/questionnaires/' + survey_questionnaire_1.id.to_s + '/edit'
-    fill_in('new_question_total_num', with: '1')
-    select('Criterion', from: 'new_question_type')
+    fill_in('question_total_num', with: '1')
+    select('Criterion', from: 'question_type')
     click_button "Add"
     expect(page).to have_content('Remove')
 

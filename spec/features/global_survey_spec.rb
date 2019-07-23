@@ -57,8 +57,8 @@ describe "Global Survey questionnaire tests for instructor interface" do
 
     # adding some questions for the deployed survey
     visit '/questionnaires/' + survey_questionnaire.id.to_s + '/edit'
-    fill_in('new_question_total_num', with: '1')
-    select('Criterion', from: 'new_question_type')
+    fill_in('question_total_num', with: '1')
+    select('Criterion', from: 'question_type')
     click_button "Add"
     expect(page).to have_content('Remove')
     fill_in "Edit question content here", with: "Test question 1"
@@ -71,8 +71,8 @@ describe "Global Survey questionnaire tests for instructor interface" do
     deploy_global_survey(@next_day, @next_to_next_day, survey_name)
     survey_questionnaire = Questionnaire.where(name: survey_name).first
     visit '/questionnaires/' + survey_questionnaire.id.to_s + '/edit'
-    fill_in('new_question_total_num', with: '1')
-    select('Criterion', from: 'new_question_type')
+    fill_in('question_total_num', with: '1')
+    select('Criterion', from: 'question_type')
     click_button "Add"
     expect(page).to have_content('Remove')
     fill_in "Edit question content here", with: "Test question 1"

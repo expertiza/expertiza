@@ -66,7 +66,7 @@ describe "Survey questionnaire tests for instructor interface" do
 
     fill_in "Edit question content here", with: "Test question 1"
     click_button "Save assignment survey questionnaire"
-    expect(page).to have_content('The questionnaire has been successfully updated!')
+    expect(page).to have_content('All questions have been successfully saved!')
 
     survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_1.id).first
     question = Question.find_by_sql(\

@@ -203,7 +203,7 @@ class QuestionnairesController < ApplicationController
     @questionnaire.private = !@questionnaire.private
     @questionnaire.save
     @access = @questionnaire.private == true ? "private" : "public"
-    undo_link("the questionnaire \"#{@questionnaire.name}\" has been successfully made #{@access}. ")
+    undo_link("The questionnaire \"#{@questionnaire.name}\" has been successfully made #{@access}. ")
     redirect_to controller: 'tree_display', action: 'list'
   end
 

@@ -245,7 +245,7 @@ class QuestionnairesController < ApplicationController
           end
 
           @question.save
-          flash[:success] = 'All questions has been successfully saved!'
+          flash[:success] = 'All questions have been successfully saved!'
         end
       end
     rescue StandardError

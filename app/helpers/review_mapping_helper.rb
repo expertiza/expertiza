@@ -209,53 +209,34 @@ module ReviewMappingHelper
       labels: labels,
       datasets: [
         {
-          label: 'vol.',
-          backgroundColor: "rgba(255,99,132,0.8)",
-          borderWidth: 1,
-          data: reviewer_data,
-          yAxisID: "bar-y-axis1"
+            backgroundColor: "rgba(255,99,132,0.4)",
+            data: reviewer_data,
+            borderWidth: 1
         },
         {
-          label: 'avg. vol.',
-          backgroundColor: "rgba(255,206,86,0.8)",
-          borderWidth: 1,
-          data: all_reviewers_data,
-          yAxisID: "bar-y-axis2"
+            backgroundColor: "rgba(139,0,0 ,1 )",
+            data: all_reviewers_data,
+            borderWidth: 1
         }
       ]
     }
     options = {
       legend: {
-        position: 'top',
-        labels: {
-          usePointStyle: true
-        }
+        display: false
       },
       width: "200",
       height: "125",
       scales: {
         yAxes: [{
-          stacked: true,
-          id: "bar-y-axis1",
+          stacked: false,
           barThickness: 10
-        }, {
-          display: false,
-          stacked: true,
-          id: "bar-y-axis2",
-          barThickness: 15,
-          type: 'category',
-          categoryPercentage: 0.8,
-          barPercentage: 0.9,
-          gridLines: {
-            offsetGridLines: true
-          }
         }],
         xAxes: [{
           stacked: false,
           ticks: {
             beginAtZero: true,
-            stepSize: 50,
-            max: 400
+            stepSize: 100,
+            max: 500
           }
         }]
       }

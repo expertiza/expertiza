@@ -160,36 +160,11 @@ describe QuestionnairesController do
     end
   end
 
-  describe '#create_quiz_questionnaire, #create_questionnaire and #save' do
+  describe '#create_questionnaire and #save' do
     context 'when quiz is valid' do
       before(:each) do
         # create_quiz_questionnaire
         allow_any_instance_of(QuestionnairesController).to receive(:valid_quiz).and_return('valid')
-      end
-      context 'when questionnaire type is QuizQuestionnaire' do
-        it 'redirects to submitted_content#edit page' do
-          params = {aid: 1,
-                    pid: 1,
-                    questionnaire: {name: 'Test questionnaire',
-                                    type: 'QuizQuestionnaire'}}
-          # create_questionnaire
-          participant = double('Participant')
-          allow(Participant).to receive(:find).with('1').and_return(participant)
-          allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', id: 6))
-          allow_any_instance_of(QuestionnairesController).to receive(:save_choices).with(1).and_return(true)
-          # save
-          allow_any_instance_of(QuestionnairesController).to receive(:save_questions).with(1).and_return(true)
-          allow_any_instance_of(QuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
-          post :create_quiz_questionnaire, params
-          expect(flash[:note]).to eq('The quiz was successfully created.')
-          expect(response).to redirect_to('/submitted_content/1/edit')
-          expect(controller.instance_variable_get(:@questionnaire).private).to eq false
-          expect(controller.instance_variable_get(:@questionnaire).name).to eq 'Test questionnaire'
-          expect(controller.instance_variable_get(:@questionnaire).min_question_score).to eq 0
-          expect(controller.instance_variable_get(:@questionnaire).max_question_score).to eq 1
-          expect(controller.instance_variable_get(:@questionnaire).type).to eq 'QuizQuestionnaire'
-          expect(controller.instance_variable_get(:@questionnaire).instructor_id).to eq 6
-        end
       end
 
       context 'when questionnaire type is not QuizQuestionnaire' do
@@ -206,7 +181,7 @@ describe QuestionnairesController do
           allow(TreeFolder).to receive(:find_by).with(name: 'Review').and_return(double('TreeFolder', id: 1))
           allow(FolderNode).to receive(:find_by).with(node_object_id: 1).and_return(double('FolderNode'))
           allow_any_instance_of(QuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
-          post :create_quiz_questionnaire, params, session
+          post :create_questionnaire, params, session
           expect(flash[:note]).to be nil
           expect(response).to redirect_to('/tree_display/list')
           expect(controller.instance_variable_get(:@questionnaire).private).to eq false
@@ -216,21 +191,6 @@ describe QuestionnairesController do
           expect(controller.instance_variable_get(:@questionnaire).type).to eq 'ReviewQuestionnaire'
           expect(controller.instance_variable_get(:@questionnaire).instructor_id).to eq 6
         end
-      end
-    end
-
-    context 'when quiz is invalid and questionnaire type is QuizQuestionnaire' do
-      it 'redirects to submitted_content#edit page' do
-        params = {aid: 1,
-                  pid: 1,
-                  questionnaire: {name: 'test questionnaire',
-                                  type: 'QuizQuestionnaire'}}
-        # create_quiz_questionnaire
-        allow_any_instance_of(QuestionnairesController).to receive(:valid_quiz).and_return('Please select a correct answer for all questions')
-        request.env['HTTP_REFERER'] = 'www.google.com'
-        post :create_quiz_questionnaire, params
-        expect(flash[:error]).to eq('Please select a correct answer for all questions')
-        expect(response).to redirect_to('www.google.com')
       end
     end
   end
@@ -639,6 +599,36 @@ describe QuestionnairesController do
       q3 = build(:question, id: 3, type: 'MultipleChoiceCheckbox')
       allow(Question).to receive(:where).with(questionnaire_id: 1).and_return([q1, q2, q3])
       expect { controller.send(:save_choices, 1) }.to change { QuizQuestionChoice.count }.from(0).to(10)
+    end
+  end
+
+  describe '#save_all_questions' do
+    context 'when params[:save] is not nil, params[:view_advice] is nil' do
+      it 'redirects to questionnaires#edit page after saving all questions' do
+        allow(Question).to receive(:find).with('1').and_return(question)
+        allow(question).to receive(:save).and_return(true)
+        params = {id: 1,
+                  save: true,
+                  question: {'1' => {seq: 66.0,
+                                     txt: 'WOW',
+                                     weight: 10,
+                                     size: '50,3',
+                                     max_label: 'Strong agree',
+                                     min_label: 'Not agree'}}}
+        post :save_all_questions, params
+        expect(flash[:success]).to eq('All questions has been successfully saved!')
+        expect(response).to redirect_to('/questionnaires/1/edit')
+      end
+    end
+
+    context 'when params[:save] is nil, params[:view_advice] is not nil' do
+      it 'redirects to advice#edit_advice page' do
+        params = {id: 1,
+                  view_advice: true,
+                  question: {}}
+        post :save_all_questions, params
+        expect(response).to redirect_to('/advice/edit_advice/1')
+      end
     end
   end
 end

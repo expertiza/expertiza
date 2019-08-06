@@ -393,7 +393,7 @@ describe QuestionnairesController do
                                      max_label: 'Strong agree',
                                      min_label: 'Not agree'}}}
         post :save_all_questions, params
-        expect(flash[:success]).to eq('All questions has been successfully saved!')
+        expect(flash[:success]).to eq('All questions have been successfully saved!')
         expect(response).to redirect_to('/questionnaires/1/edit')
       end
     end

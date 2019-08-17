@@ -18,10 +18,8 @@ module ReviewMappingHelper
     table_header.html_safe
   end
 
-  #
-  # for review report
-  #
-  def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
+  # sending data to be displayed on review report
+  def data_for_review_report(reviewed_object_id, reviewer_id, type)
     rspan = 0
     (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@review_in_round_" + round.to_s, 0) }
 
@@ -30,16 +28,19 @@ module ReviewMappingHelper
       rspan += 1 if Team.exists?(id: ri.reviewee_id)
       responses = ri.response
       (1..@assignment.num_review_rounds).each do |round|
-        instance_variable_set("@review_in_round_" + round.to_s, instance_variable_get("@review_in_round_" + round.to_s) + 1) if responses.exists?(round: round)
+        instance_variable_set("@review_in_round_#{round}", instance_variable_get("@review_in_round_" + round.to_s) + 1) if responses.exists?(round: round)
       end
     end
     [response_maps, rspan]
   end
 
-  #
   # gets color according to review and assignment submission status
-  #
-  def get_team_name_color_in_review_report(response_map)
+  # brown: the review grade has been assigned
+  # blue: review is completed in every round and the review grade is not assigned
+  # purple: there is no review for a submitted work within the round
+  # green: there is no submitted work to review within the round
+  # red: review is not completed in any rounds
+  def color_legend_for_review_status(response_map)
     assignment_created = @assignment.created_at
     assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
     if Response.exists?(map_id: response_map.id)
@@ -57,7 +58,7 @@ module ReviewMappingHelper
             if link.nil? or (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
               color.push 'green'
             else
-              link_updated_at = get_link_updated_at(link)
+              link_updated_at = link_updated_at(link)
               color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
             end
           end
@@ -79,7 +80,7 @@ module ReviewMappingHelper
     num_responses == total_num_rounds
   end
 
-  # checks if a work was submitted within a given round
+  # checks if an assignment was submitted within the due date
   def submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
     submission_due_date = assignment_due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
     submission = SubmissionRecord.where(team_id: response_map.reviewee_id, operation: ['Submit File', 'Submit Hyperlink'])
@@ -101,7 +102,7 @@ module ReviewMappingHelper
 
   # returns last modified header date
   # only checks certain links (wiki)
-  def get_link_updated_at(link)
+  def link_updated_at(link)
     uri = URI(link)
     res = Net::HTTP.get_response(uri)['last-modified']
     res.to_time
@@ -114,43 +115,39 @@ module ReviewMappingHelper
     (link_updated_at < submission_due_date) && (link_updated_at > submission_due_last_round)
   end
 
-  def get_team_reviewed_link_name(max_team_size, response, reviewee_id)
+  # returns team name if there is more than one person in the team else returns the student's name
+  def team_reviewed_link_name(max_team_size, response, reviewee_id)
     team_reviewed_link_name = if max_team_size == 1
                                 TeamsUser.where(team_id: reviewee_id).first.user.fullname
                               else
                                 Team.find(reviewee_id).name
                               end
-    team_reviewed_link_name = "(" + team_reviewed_link_name + ")" if !response.empty? and !response.last.is_submitted?
+    team_reviewed_link_name = "(#{team_reviewed_link_name})" if !response.empty? and !response.last.is_submitted?
     team_reviewed_link_name
   end
 
-  def get_current_round_for_review_report(reviewer_id)
-    user_id = Participant.find(reviewer_id).user.id
-    topic_id = SignedUpTeam.topic_id(@assignment.id, user_id)
-    @assignment.number_of_current_round(topic_id)
-    @assignment.num_review_rounds if @assignment.get_current_stage(topic_id) == "Finished" || @assignment.get_current_stage(topic_id) == "metareview"
-  end
-
   # varying rubric by round
-  def get_each_round_score_awarded_for_review_report(reviewer_id, team_id)
-    (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----') }
+  def each_round_score_for_review_report(reviewer_id, team_id)
+    (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@score_awarded_round_#{round}", '-----') }
     (1..@assignment.num_review_rounds).each do |round|
       if @review_scores[reviewer_id] && @review_scores[reviewer_id][round] && @review_scores[reviewer_id][round][team_id] && @review_scores[reviewer_id][round][team_id] != -1.0
-        instance_variable_set("@score_awarded_round_" + round.to_s, @review_scores[reviewer_id][round][team_id].inspect + '%')
+        instance_variable_set("@score_awarded_round_#{round}", @review_scores[reviewer_id][round][team_id].inspect + '%')
       end
     end
   end
 
-  def get_min_max_avg_value_for_review_report(round, team_id)
-    %i[max min avg].each {|metric| instance_variable_set('@' + metric.to_s, '-----') }
+  # get minimum, maximum and average value for review report
+  def value_for_review_report(round, team_id)
+    %i[max min avg].each {|metric| instance_variable_set("@#{metric}", "-----") }
     if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? {|k| @avg_and_ranges[team_id][round].key? k }
       %i[max min avg].each do |metric|
         metric_value = @avg_and_ranges[team_id][round][metric].nil? ? '-----' : @avg_and_ranges[team_id][round][metric].round(0).to_s + '%'
-        instance_variable_set('@' + metric.to_s, metric_value)
+        instance_variable_set("@#{metric}", metric_value)
       end
     end
   end
 
+  # sorts by volume in descending order
   def sort_reviewer_by_review_volume_desc
     @reviewers.each do |r|
       r.overall_avg_vol,
@@ -159,106 +156,71 @@ module ReviewMappingHelper
           r.avg_vol_in_round_3 = Response.get_volume_of_review_comments(@assignment.id, r.id)
     end
     @all_reviewers_overall_avg_vol = @reviewers.inject(0) {|sum, r| sum += r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @all_reviewers_avg_vol_in_round_1 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_in_round_1 } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @all_reviewers_avg_vol_in_round_2 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_in_round_2 } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @all_reviewers_avg_vol_in_round_3 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_in_round_3 } / (@reviewers.blank? ? 1 : @reviewers.length)
+
+    (1..@assignment.num_review_rounds).each do |round_num|
+      instance_variable_set("@all_reviewers_avg_vol_in_round_#{round_num}", @reviewers.inject(0) {|sum, r| sum += eval("r.avg_vol_in_round_#{round_num}") } / (@reviewers.blank? ? 1 : @reviewers.length))
+    end
     @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 
-  def display_volume_metric(overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3)
-    metric = "Avg. Volume: #{overall_avg_vol} <br/> ("
-    metric += "1st: " + avg_vol_in_round_1.to_s if avg_vol_in_round_1 > 0
-    metric += ", 2nd: " + avg_vol_in_round_2.to_s if avg_vol_in_round_2 > 0
-    metric += ", 3rd: " + avg_vol_in_round_3.to_s if avg_vol_in_round_3 > 0
-    metric += ")"
-    metric.html_safe
-  end
-
+  # assigns values to elements that are used to construct the bar graph in display_metric_chart function
   def initialize_chart_elements(reviewer)
-    round = 0
+    #round = 0
     labels = []
     reviewer_data = []
     all_reviewers_data = []
-    if @all_reviewers_avg_vol_in_round_1 > 0
-      round += 1
-      labels.push '1st'
-      reviewer_data.push reviewer.avg_vol_in_round_1
-      all_reviewers_data.push @all_reviewers_avg_vol_in_round_1
+
+    (1..@assignment.num_review_rounds).each do |round_num|
+      #round += 1
+      labels.push round_num.to_s
+      reviewer_data.push eval("reviewer.avg_vol_in_round_#{round_num}")
+      all_reviewers_data.push instance_variable_get("@all_reviewers_avg_vol_in_round_#{round_num}")
     end
-    if @all_reviewers_avg_vol_in_round_2 > 0
-      round += 1
-      labels.push '2nd'
-      reviewer_data.push reviewer.avg_vol_in_round_2
-      all_reviewers_data.push @all_reviewers_avg_vol_in_round_2
-    end
-    if @all_reviewers_avg_vol_in_round_3 > 0
-      round += 1
-      labels.push '3rd'
-      reviewer_data.push reviewer.avg_vol_in_round_3
-      all_reviewers_data.push @all_reviewers_avg_vol_in_round_3
-    end
+
     labels.push 'Total'
     reviewer_data.push reviewer.overall_avg_vol
     all_reviewers_data.push @all_reviewers_overall_avg_vol
     [labels, reviewer_data, all_reviewers_data]
   end
 
-  def display_volume_metric_chart(reviewer)
+  # Constructs the bar graph for metrics column
+  def display_metric_chart(reviewer)
     labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
     data = {
-      labels: labels,
-      datasets: [
-        {
-          label: 'vol.',
-          backgroundColor: "rgba(255,99,132,0.8)",
-          borderWidth: 1,
-          data: reviewer_data,
-          yAxisID: "bar-y-axis1"
-        },
-        {
-          label: 'avg. vol.',
-          backgroundColor: "rgba(255,206,86,0.8)",
-          borderWidth: 1,
-          data: all_reviewers_data,
-          yAxisID: "bar-y-axis2"
-        }
-      ]
+        labels: labels,
+        datasets: [
+            {
+                backgroundColor: "rgba(255,99,132,0.4)",
+                data: reviewer_data,
+                borderWidth: 1
+            },
+            {
+                backgroundColor: "rgba(139,0,0 ,1 )",
+                data: all_reviewers_data,
+                borderWidth: 1
+            }
+        ]
     }
     options = {
-      legend: {
-        position: 'top',
-        labels: {
-          usePointStyle: true
+        legend: {
+            display: false
+        },
+        width: "200",
+        height: "125",
+        scales: {
+            yAxes: [{
+                        stacked: false,
+                        barThickness: 10
+                    }],
+            xAxes: [{
+                        stacked: false,
+                        ticks: {
+                            beginAtZero: true,
+                            stepSize: 100,
+                            max: 500
+                        }
+                    }]
         }
-      },
-      width: "200",
-      height: "125",
-      scales: {
-        yAxes: [{
-          stacked: true,
-          id: "bar-y-axis1",
-          barThickness: 10
-        }, {
-          display: false,
-          stacked: true,
-          id: "bar-y-axis2",
-          barThickness: 15,
-          type: 'category',
-          categoryPercentage: 0.8,
-          barPercentage: 0.9,
-          gridLines: {
-            offsetGridLines: true
-          }
-        }],
-        xAxes: [{
-          stacked: false,
-          ticks: {
-            beginAtZero: true,
-            stepSize: 50,
-            max: 400
-          }
-        }]
-      }
     }
     horizontal_bar_chart data, options
   end
@@ -268,7 +230,7 @@ module ReviewMappingHelper
     team = AssignmentTeam.find(reviewee_team_id)
     html = ''
     if !team.nil? and !participant.nil?
-      review_submissions_path = team.path + "_review" + "/" + response_map_id.to_s
+      review_submissions_path = "#{team.path}_review/#{response_map_id}"
       files = team.submitted_files(review_submissions_path)
       html += display_review_files_directory_tree(participant, files) if files.present?
     end
@@ -310,7 +272,7 @@ module ReviewMappingHelper
   #
   #
   # varying rubric by round
-  def get_each_round_review_and_feedback_response_map_for_feedback_report(author)
+  def each_round_review_and_feedback_response_map_for_feedback_report(author)
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     # Calculate how many responses one team received from each round
     # It is the feedback number each team member should make
@@ -329,7 +291,7 @@ module ReviewMappingHelper
     @rspan_round_three = @review_responses_round_three.nil? ? 0 : @review_responses_round_three.length
   end
 
-  def get_certain_round_review_and_feedback_response_map_for_feedback_report(author)
+  def certain_round_review_and_feedback_response_map_for_feedback_report(author)
     @feedback_response_maps = FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?", @all_review_response_ids, author.id])
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     @review_response_map_ids = ReviewResponseMap.where(["reviewed_object_id = ? and reviewee_id = ?", @id, @team_id]).pluck("id")
@@ -340,19 +302,19 @@ module ReviewMappingHelper
   #
   # for calibration report
   #
-  def get_css_style_for_calibration_report(diff)
+  def css_style_for_calibration_report(diff)
     # diff - difference between stu's answer and instructor's answer
     css_class = case diff.abs
-                when 0
-                  'c5'
-                when 1
-                  'c4'
-                when 2
-                  'c3'
-                when 3
-                  'c2'
-                else
-                  'c1'
+                  when 0
+                    'c5'
+                  when 1
+                    'c4'
+                  when 2
+                    'c3'
+                  when 3
+                    'c2'
+                  else
+                    'c1'
                 end
     css_class
   end
@@ -395,3 +357,4 @@ module ReviewMappingHelper
     end
   end
 end
+

@@ -2,6 +2,7 @@
 <div class='reviewreport'>
   <!-- Added headers for tablesorter -->
 
+  <link rel="stylesheet" type="text/css"  href="/assets/legend.css">
   <script type='text/javascript'>
       $(window).load(function () {
           $("#myTable tbody").sortable().disableSelection();
@@ -39,14 +40,20 @@
       <th width="10%" class="sorter-false">Reviews done<span></span></th>
       <th width="24%" class="sorter-false">Team reviewed <span></span></th>
       <th width="13%" class="sorter-false">Score awarded / Avg. score <span></span></th>
-      <th width="13%" class="sorter-true">Metrics <span></span></th>
+      <th width="13%" class="sorter-true"> <div style="display: inline-block; float: left; padding-top: 1em">Metrics </div>
+        <div class='legend-scale'  style="display: inline-block; float: right">
+          <ul class='legend-labels'>
+            <li><span style='background:#ff6384;'></span>Vol.</li>
+            <li><span style='background:#8B0000;'></span>Avg.vol</li>
+          </ul>
+        </div></th>
       <th class="sorter-false">Assign grade and write comments <span></span></th>
     </tr>
     </thead>
     <tbody>
 
     <% sort_reviewer_by_review_volume_desc.each do |r| %>
-      <% @response_maps, @rspan = get_data_for_review_report(@id, r.id, @type) %>
+      <% @response_maps, @rspan = data_for_review_report(@id, r.id, @type) %>
       <tr>
         <% if r.id != -1 %>
           <% user = Participant.find(r.id).user %>
@@ -67,8 +74,8 @@
           <td align = 'left'>
           <% @response_maps.each_with_index do |ri, index| %>
             <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
-            <% team_name_color = get_team_name_color_in_review_report(ri) %>
-            <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, ri.response, ri.reviewee_id) %>
+            <% team_name_color = color_legend_for_review_status(ri) %>
+            <% team_reviewed_link_name = team_reviewed_link_name(@assignment.max_team_size, ri.response, ri.reviewee_id) %>
               <% if Team.where(id: ri.reviewee_id).length > 0 %>
                 <!--Team reviewed-->
                 <% if index == 0 %>
@@ -110,7 +117,7 @@
           </td>
           <!--Metrics-->
           <td align='left'>
-            <%= display_volume_metric_chart(r) %>
+            <%= display_metric_chart(r) %>
           </td>
           <!--Assign grade and write comments-->
           <td align='left'>

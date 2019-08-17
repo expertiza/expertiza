@@ -1,0 +1,27 @@
+.legend-scale ul {
+    margin: 0;
+    margin-bottom: 5px;
+    padding: 0;
+    clear: both;
+    float: right;
+    list-style: none;
+}
+
+.legend-scale ul li {
+    font-size: 80%;
+    list-style: none;
+    margin-left: 0;
+    line-height: 18px;
+    margin-bottom: 2px;
+}
+
+.legend-labels li span {
+    display: block;
+    float: left;
+    height: 16px;
+    clear: both;
+    width: 30px;
+    margin-right: 5px;
+    margin-left: 0;
+    border: 1px solid #999;
+}

@@ -25,7 +25,7 @@ class ResponseController < ApplicationController
 
   def view_allowed?(map, user_id)
     assignment = map.reviewer.assignment # if it is a review response map, all the members of reviewee team should be able to view the response
-    if map.is_a? ReviewResponseMap
+    if map.is_kind_of? ResponseMap
       reviewee_team = AssignmentTeam.find(map.reviewee_id)
       return current_user_id?(user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' ||
         (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) ||

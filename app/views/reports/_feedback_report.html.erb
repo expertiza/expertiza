@@ -7,9 +7,9 @@
     <% @authors.each do |r| %>
       <% next unless r %>
       <% if @assignment.varying_rubrics_by_round? %>
-        <% get_each_round_review_and_feedback_response_map_for_feedback_report(r) %> 
+        <% get_each_review_and_feedback_response_map(r) %>
       <% else %>
-        <% get_certain_round_review_and_feedback_response_map_for_feedback_report(r) %>      
+        <% get_certain_review_and_feedback_response_map(r) %>
       <% end %>
 
       <% @first_col_identifier = true %>

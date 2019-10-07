@@ -1,10 +1,10 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.2.7.1'
+gem 'rails', '~> 4.2.11.1'
 
 ## Gems in Alphabetical Order
 gem 'activerecord-session_store'
-gem 'activesupport', '~> 4.2.7.1'
+gem 'activesupport', '~> 4.2.11.1'
 gem 'airbrake'
 gem 'awesome_nested_set'
 gem 'bind-it'
@@ -96,7 +96,6 @@ end
 
 group :development, :test do
   gem 'capybara'
-  gem 'parallel_tests'
   gem 'selenium-webdriver'
   gem 'simplecov', require: false
 end

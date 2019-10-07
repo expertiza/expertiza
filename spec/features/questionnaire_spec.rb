@@ -69,7 +69,7 @@ describe "Questionnaire tests for instructor interface" do
         load_question q_type
         expect(page).to have_content('Remove')
         click_button "Save review questionnaire"
-        expect(page).to have_content('All questions has been successfully saved!')
+        expect(page).to have_content('All questions have been successfully saved!')
       end
     end
   end
@@ -77,7 +77,7 @@ describe "Questionnaire tests for instructor interface" do
   def edit_created_question
     first("textarea[placeholder='Edit question content here']").set "Question edit"
     click_button "Save review questionnaire"
-    expect(page).to have_content('All questions has been successfully saved!')
+    expect(page).to have_content('All questions have been successfully saved!')
     expect(page).to have_content('Question edit')
   end
 

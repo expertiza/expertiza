@@ -108,7 +108,6 @@ describe "Airbrake expection errors" do
     click_button('Save review questionnaire')
     expect { page }.not_to raise_error
     expect(page).to have_current_path("/questionnaires/#{questionnaire.id}/edit")
-    expect(page).to have_content("undefined method `each_pair' for nil:NilClass")
   end
 end
 

@@ -39,6 +39,16 @@
                 :action => 'new',
                 :id => params[:id]%> |
 
+    <%= link_to 'Delete select topics',
+                :controller => 'sign_up_sheet',
+                :action => 'delete',
+                :id => params[:id]%> |
+
+    <%= link_to 'Select all',
+                :controller => 'sign_up_sheet',
+                :action => 'new',
+                :id => params[:id]%> |
+
     <%= link_to 'Import topics',
                 :controller=>'import_file',
                 :action=>'start',

@@ -44,7 +44,7 @@
                 :action => 'delete',
                 :id => params[:id]%> |
 
-    <a id="select all " onclick="checkAll()">Select all</a> |
+    <input type="checkbox" onClick="selectAll(this)" /> Select all  |
 
     <%= link_to 'Import topics',
                 :controller=>'import_file',

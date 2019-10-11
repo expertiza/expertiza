@@ -53,14 +53,10 @@ function toggleSingleTeamAndMember(i) {
     }
 }
 
-function checkAll() {
-    var checkboxes = document.getElementsByName('query_mySelectBox'),
-        val = null;
-    for (var i = 0; i < checkboxes.length; i++) {
-        if (checkboxes[i].type == 'checkbox') {
-            if (val === null) val = checkboxes[i].checked;
-            checkboxes[i].checked = val;
-        }
+function selectAll(source) {
+    checkboxes = document.getElementsByName('mySelectBox');
+    for (var i = 0, n = checkboxes.length; i < n; i++) {
+        checkboxes[i].checked = source.checked;
     }
 }
 

@@ -116,6 +116,10 @@ class UsersController < ApplicationController
     # if the user name already exists, register the user by email address
     check = User.find_by(name: params[:user][:name])
     params[:user][:name] = params[:user][:email] unless check.nil?
+    if params[:user][:institution_id].empty?
+      institution = Institution.find_or_create_by(name: params[:institution][:name])
+      params[:user][:institution_id] = institution.id
+    end
     @user = User.new(user_params)
     @user.institution_id = params[:user][:institution_id]
     # record the person who created this new user

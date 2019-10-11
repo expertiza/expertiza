@@ -44,10 +44,7 @@
                 :action => 'delete',
                 :id => params[:id]%> |
 
-    <%= link_to 'Select all',
-                :controller => 'sign_up_sheet',
-                :action => 'new',
-                :id => params[:id]%> |
+    <a id="select all " onclick="checkAll()">Select all</a> |
 
     <%= link_to 'Import topics',
                 :controller=>'import_file',

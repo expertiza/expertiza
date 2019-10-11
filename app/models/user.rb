@@ -47,7 +47,7 @@ class User < ActiveRecord::Base
   def get_available_users(name)
     lesser_roles = role.get_parents
     all_users = User.all(conditions: ['name LIKE ?', "#{name}%"], limit: 20) # higher limit, since we're filtering
-    visible_users = all_users.select {|user| lesser_roles.include? user.role }
+    visible_users = all_users.select { |user| lesser_roles.include? user.role }
     visible_users[0, 10] # the first 10
   end
 
@@ -106,6 +106,16 @@ class User < ActiveRecord::Base
 
   def first_name(ip_address = nil)
     User.anonymized_view?(ip_address) ? self.role.name : fullname.try(:[], /,.+/).try(:[], /\w+/) || ''
+  end
+
+  def institution(ip_address = nil)
+    if User.anonymized_view?(ip_address)
+      self.role.name + ', ' + self.id.to_s
+    else
+      if self[:role_id] == 2
+        self[:institution_id].nil? ? "" : Institution.find(self[:institution_id]).name
+      end
+    end
   end
 
   def email(ip_address = nil)
@@ -192,11 +202,16 @@ class User < ActiveRecord::Base
 
   def instructor_id
     case role.name
-    when 'Super-Administrator' then id
-    when 'Administrator' then id
-    when 'Instructor' then id
-    when 'Teaching Assistant' then Ta.get_my_instructor(id)
-    else raise NotImplementedError, "for role #{role.name}"
+    when 'Super-Administrator' then
+      id
+    when 'Administrator' then
+      id
+    when 'Instructor' then
+      id
+    when 'Teaching Assistant' then
+      Ta.get_my_instructor(id)
+    else
+      raise NotImplementedError, "for role #{role.name}"
     end
   end
 
@@ -222,7 +237,7 @@ class User < ActiveRecord::Base
 
     # return the new private key
     new_key.to_pem
-    end
+  end
 
   def initialize(attributes = nil)
     super(attributes)

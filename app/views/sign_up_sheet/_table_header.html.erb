@@ -1,9 +1,9 @@
 <th width="5%">Topic #</th>
+<th width="5%">Select?</th>
 <th width="50%">Topic name(s)</th>
 <% if @assignment.microtask? %>
   <th width="5%">Micro- payment</th>
 <% end %>
-<th width="5%">Select?</th>
 <% if not @assignment.is_intelligent or  ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? current_user_role?.name %>
   <th width="5%">Num. of slots</th>
   <th width="5%">Available slots</th>

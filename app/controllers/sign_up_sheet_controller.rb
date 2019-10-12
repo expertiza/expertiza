@@ -116,6 +116,22 @@ class SignUpSheetController < ApplicationController
     end
   end
 
+  # This deletes all selected topics
+  def delete_all_selected_topics
+    load_all_selected_topics
+    @stopics.each(&:destroy)
+    flash[:success] = "All selected topics have been deleted successfully."
+    respond_to do |format|
+      format.html { redirect_to edit_assignment_path(params[:a_id]) + "#tabs-2" }
+      format.js {}
+    end
+  end
+
+  # This get all selected topics
+  def load_all_selected_topics
+    @stopics = SignUpTopic.where(assignment_id: params[:a_id], topic_identifier: params[:idents])
+  end
+
   # This displays a page that lists all the available topics for an assignment.
   # Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
   # Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics can have different deadlines.

@@ -1,4 +1,4 @@
-<td><%= topic.topic_identifier %></td>
+<td id='ident'><%= topic.topic_identifier %></td>
 <td><input type="checkbox" name="mySelectBox"></td>
 <td><%= render :partial => '/sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>
 <% if not @assignment.is_intelligent or ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].

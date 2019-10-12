@@ -39,10 +39,7 @@
                 :action => 'new',
                 :id => params[:id]%> |
 
-    <%= link_to 'Delete select topics',
-                :controller => 'sign_up_sheet',
-                :action => 'delete',
-                :id => params[:id]%> |
+    <input type="button" value="Delete select topics" onclick="deleteTopics()" />|
 
     <input type="checkbox" onClick="selectAll(this)" /> Select all  |
 
@@ -71,3 +68,30 @@
                 :expected_fields => 'Topic identifier, User Name1, User Name2, ...' %>|
 
 <% end %>
+
+<script>
+function deleteTopics() {
+    var msg = 'Are you sure? It will destroy all selected topics';
+    if (confirm(msg)) {
+        var identifiers = []
+        $("#Table1 input[type=checkbox]:checked").each(function() {
+            var ient = $(this).closest('tr').find('#ident').text();
+            identifiers.push(ient);
+        });
+        jQuery.ajax({
+            url: '/sign_up_sheet/delete_all_selected_topics',
+            method: 'POST',
+            data: {
+                idents: identifiers,
+                a_id: <%= @assignment.id %>
+            },
+            success: function() {
+
+                location.reload();
+            }
+        });
+    } else {
+        window.location.href = '<%= edit_assignment_path(@assignment.id) + "#tabs-2" %>';
+    }
+}
+</script>

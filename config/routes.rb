@@ -337,6 +337,7 @@ resources :institution, except: [:destroy] do
       get :intelligent_save
       get :signup_as_instructor
       post :delete_all_topics_for_assignment
+      post :delete_all_selected_topics
       post :signup_as_instructor_action
       post :set_priority
       post :save_topic_deadlines

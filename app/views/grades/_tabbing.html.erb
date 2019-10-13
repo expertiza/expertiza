@@ -1,5 +1,6 @@
-<TR <% if prefix %>id='<%= prefix %>_1' style="display:none; background-color: white;"<% end %>>
-<td COLSPAN="10">
+<!--E1877 div added to properly structure UI-->
+<div <% if prefix %>id='<%= prefix %>_1' style="display:none; background-color: white;position: relative;top: 30px;margin-bottom:30px;"<% end %>>
+<div>
 
   <script>
   $( function() {
@@ -7,7 +8,7 @@
   } );
   </script>
 
-<div id="<%= prefix %>_tabs" class="overflow-container">
+<div id="<%= prefix %>_tabs" class="hide-scrollbar">
   <ul>
     <li><a href="#<%= prefix %>_tabs-1">Reviews</a></li>
     <li><a href="#<%= prefix %>_tabs-2">Author Feedback</a></li>
@@ -15,21 +16,21 @@
     <li><a href="#<%= prefix %>_tabs-4">Metareviews</a></li>
     <li><a href="#<%= prefix %>_tabs-5">Statistics</a></li>
   </ul>
-  <div id="<%= prefix %>_tabs-1" class="overflow-container">
+  <div id="<%= prefix %>_tabs-1" class="hide-scrollbar">
     <%= render :partial => 'reviews_tab', :locals => {:prefix => prefix, :tscore => tscore } %>  
   </div>
-  <div id="<%= prefix %>_tabs-2" class="overflow-container">
+  <div id="<%= prefix %>_tabs-2" class="hide-scrollbar">
    <%= render :partial => 'author_feedback_tab', :locals => {:prefix => prefix, :tscore => tscore } %>
   </div>
-  <div id="<%= prefix %>_tabs-3" class="overflow-container">
+  <div id="<%= prefix %>_tabs-3" class="hide-scrollbar">
     <%= render :partial => 'teammate_reviews_tab', :locals => {:prefix => prefix, :tscore => tscore } %> 
   </div>
-  <div id="<%= prefix %>_tabs-4" class="overflow-container">
+  <div id="<%= prefix %>_tabs-4" class="hide-scrollbar">
     <%= render :partial => 'metareviews_tab', :locals => {:prefix => prefix, :tscore => tscore } %>
   </div>
-  <div id="<%= prefix %>_tabs-5" class="overflow-container">
+  <div id="<%= prefix %>_tabs-5" class="hide-scrollbar">
     <%= render :partial => 'statistics_tab', :locals => {:prefix => prefix, :tscore => tscore } %>
   </div>
 </div>
-</td>
-</tr>
+</div>
+</div>

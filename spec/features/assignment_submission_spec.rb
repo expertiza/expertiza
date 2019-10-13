@@ -37,6 +37,7 @@ describe "assignment submisstion test" do
   end
 
   it "should not submit invalid link" do
+    skip('the error depends on the dns server. For spectrum network provider, invalid url will redirect to http://www.dnsrsearch.com')
     signup_topic
     # invalid format url1
     fill_in 'submission', with: "wolfpack"

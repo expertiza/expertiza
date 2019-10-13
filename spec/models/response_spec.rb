@@ -37,7 +37,7 @@ describe Response do
         allow(question).to receive(:view_completed_question).with(1, answer, 5, nil, nil).and_return('Question HTML code')
         expect(response.display_as_html('Instructor end', 0)).to eq("<h4><B>Review 0</B></h4><B>Reviewer: </B>no one (no name)&nbsp;&nbsp;&nbsp;"\
           "<a href=\"#\" name= \"review_Instructor end_1Link\" onClick=\"toggleElement('review_Instructor end_1','review');return false;\">"\
-          "show review</a><BR/><table id=\"review_Instructor end_1\" style=\"display: none;\" class=\"table table-bordered\">"\
+          "hide review</a><BR/><table id=\"review_Instructor end_1\" class=\"table table-bordered\">"\
           "<tr class=\"warning\"><td>Question HTML code</td></tr><tr><td><b>Additional Comment: </b></td></tr></table>")
       end
     end
@@ -49,8 +49,8 @@ describe Response do
         allow(question2).to receive(:view_completed_question).with(1, answer).and_return('Question HTML code')
         expect(response.display_as_html(nil, 0)).to eq("<table width=\"100%\"><tr><td align=\"left\" width=\"70%\"><b>Review 0</b>"\
           "&nbsp;&nbsp;&nbsp;<a href=\"#\" name= \"review_1Link\" onClick=\"toggleElement('review_1','review');return false;\">"\
-          "show review</a></td><td align=\"left\"><b>Last Reviewed:</b><span>Not available</span></td></tr></table><table id=\"review_1\""\
-          " style=\"display: none;\" class=\"table table-bordered\"><tr class=\"warning\"><td>Question HTML code</td></tr><tr><td><b>"\
+          "hide review</a></td><td align=\"left\"><b>Last Reviewed:</b><span>Not available</span></td></tr></table><table id=\"review_1\""\
+          " class=\"table table-bordered\"><tr class=\"warning\"><td>Question HTML code</td></tr><tr><td><b>"\
           "Additional Comment: </b></td></tr></table>")
       end
     end

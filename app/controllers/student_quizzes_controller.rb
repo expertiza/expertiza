@@ -44,7 +44,7 @@ class StudentQuizzesController < ApplicationController
   end
 
   # the way 'answers' table store the results of quiz
-  def calculate_score map, response
+  def calculate_score(map, response)
     questionnaire = Questionnaire.find(map.reviewed_object_id)
     scores = []
     valid = true
@@ -63,11 +63,7 @@ class StudentQuizzesController < ApplicationController
               score += 1 if choice.eql? correct.txt
             end
           end
-          score = if score == correct_answers.count && score == params[question.id.to_s].count
-                    1
-                  else
-                    0
-                  end
+          score = score == correct_answers.count && score == params[question.id.to_s].count ? 1 : 0
           # for MultipleChoiceCheckbox, score =1 means the quiz taker have done this question correctly, not just make select this choice correctly.
           params[question.id.to_s].each do |choice|
             new_score = Answer.new comments: choice, question_id: question.id, response_id: response.id, answer: score
@@ -78,11 +74,7 @@ class StudentQuizzesController < ApplicationController
         end
       else # TrueFalse and MultipleChoiceRadio
         correct_answer = correct_answers.first
-        score = if correct_answer.txt == params[question.id.to_s]
-                  1
-                else
-                  0
-                end
+        score = correct_answer.txt == params[question.id.to_s] ? 1 : 0
         new_score = Answer.new comments: params[question.id.to_s], question_id: question.id, response_id: response.id, answer: score
         valid = false if new_score.nil? || new_score.comments.nil? || new_score.comments.empty?
         scores.push(new_score)

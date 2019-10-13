@@ -5,11 +5,12 @@
       <%- # ACS Have metareviews done for all teams   -%>
       <%- # removed code that handles team and individual assignments differently   -%>
       <% if map.type.to_s == "MetareviewResponseMap" %>
-          <% review_mapping = ResponseMap.find(map.reviewed_object_id) %>
-          <% participant = AssignmentTeam.get_first_member(review_mapping.reviewee_id) %>
+          <% review_mapping = ResponseMap.find_by(id: map.reviewed_object_id) %>
+          <% team = AssignmentTeam.find_by(id: review_mapping.reviewee_id) %>
       <% else %>
-          <% participant = AssignmentTeam.get_first_member(map.reviewee_id) %>
+          <% team = AssignmentTeam.find(map.reviewee_id) %>
       <% end %>
+      <% participant = team.participants.first %>
 
       <% if participant %>
           <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
@@ -57,12 +58,15 @@
                     </td>
 
                     <% if @assignment.get_current_stage(topic_id) != "Finished" %>
-                      <%- # show the link as edit when latest review is done in current deadline   -%>
-                      <%- # show link as update when latest review is done in different deadline than current phase   -%>
+                      <%- # show the link as 'Edit' when latest review is done in current round -%>
+                      <%- # show link as 'Update' when latest review is done in different round or there has been a new submission in current round -%>
                       <% if (last_response_round == current_round)%>
+                        <% latest_submission = team.most_recent_submission %>
                         <td>
                           <% if (!@latest_response.is_submitted) %>
                               <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
+                          <% elsif @latest_response.updated_at < latest_submission.updated_at %>
+                              <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
                           <%end%>
                         </td>
                       <% else %>

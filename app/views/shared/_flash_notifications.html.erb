@@ -10,10 +10,10 @@
         <table style="width: 100%">
           <tbody class="flash_notification alert alert-success">
             <tr style="border-style: none none solid none; border-width: 1px;">
-              <td><b><%= notification.subject.upcase %></b></td>
+              <td><b><%= sanitize notification.subject.upcase %></b></td>
               <td><%= link_to image_tag("/assets/tree_view/delete-icon-24.png", border: 0, height: '16', width: '16', align: 'right'), track_notifications_path(id: notification.id), {class: 'dock-item'} %> </td>
             </tr>
-            <tr><td><%= notification.description %></td><td></td></tr>
+            <tr><td><%= sanitize notification.description.html_safe %></td><td></td></tr>
           </tbody>
         </table>
       <% end %>

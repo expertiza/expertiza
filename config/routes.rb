@@ -1,7 +1,11 @@
+
 Expertiza::Application.routes.draw do
   ###
   # Please insert new routes alphabetically!
   ###
+  require 'sidekiq/web'
+  mount Sidekiq::Web => '/sidekiq'
+
   resources :admin, only: [] do
     collection do
       get :list_super_administrators
@@ -37,10 +41,8 @@ Expertiza::Application.routes.draw do
 
   resources :assessment360, only: [] do
     collection do
-      # get :one_course_all_assignments
+      get :course_student_grade_summary
       get :all_students_all_reviews
-      # get :one_student_all_reviews
-      # get :one_assignment_all_students
     end
   end
 
@@ -109,9 +111,20 @@ Expertiza::Application.routes.draw do
       get :export
       post :export
       post :exportdetails
+      post :export_advices
+      put :exporttags
+      post :exporttags
     end
   end
 
+  put '/tags.csv', to: 'export_file#export_tags'
+
+  resources :export_tags, only: [] do
+    collection do
+      put :exporttags
+      post :exporttags
+    end
+  end
   resources :grades, only: %i[edit update] do
     collection do
       get :view
@@ -218,21 +231,27 @@ resources :institution, except: [:destroy] do
       get :set_publish_permission
     end
   end
-
+#Nitin - removed quiz related routes from questionnaires controller
   resources :questionnaires, only: %i[new create edit update] do
     collection do
       get :copy
-      get :list
-      post :list_questionnaires
-      get :new_quiz
       get :select_questionnaire_type
       post :select_questionnaire_type
       get :toggle_access
-      get :view
-      post :create_quiz_questionnaire
-      post :update_quiz
+      get :view  
       post :add_new_questions
       post :save_all_questions
+    end
+  end
+
+#Nitin - Created new routes for quiz_questionnaire
+  resources :quiz_questionnaire, only: %i[new create edit update] do
+    collection do
+      get :new_quiz
+      post :create_quiz_questionnaire
+      get :edit_quiz
+      post :update_quiz
+      
     end
   end
 
@@ -244,11 +263,18 @@ resources :institution, except: [:destroy] do
   resources :assignment_survey_questionnaires, controller: :questionnaires
   resources :global_survey_questionnaires, controller: :questionnaires
   resources :course_survey_questionnaires, controller: :questionnaires
-  resources :bookmarkrating_questionnaires, controller: :questionnaires
+  resources :bookmark_rating_questionnaires, controller: :questionnaires
 
   resources :questions do
     collection do
       get :types
+    end
+  end
+
+  resources :reports, only: [] do
+    collection do
+      post :response_report
+      get :response_report
     end
   end
 
@@ -264,11 +290,10 @@ resources :institution, except: [:destroy] do
       get :new_feedback
       get :view
       get :remove_hyperlink
-      get :saving
-      get :redirection
+      get :save
+      get :redirect
       get :show_calibration_results_for_student
       post :custom_create
-      get :pending_surveys
       get :json
     end
   end
@@ -288,8 +313,8 @@ resources :institution, except: [:destroy] do
       get :delete_reviewer
       get :distribution
       get :list_mappings
-      get :response_report
-      post :response_report
+      # post :response_report
+      # get :response_report
       get :select_metareviewer
       get :select_reviewer
       get :select_mapping
@@ -329,6 +354,7 @@ resources :institution, except: [:destroy] do
       get :intelligent_sign_up
       get :intelligent_save
       get :signup_as_instructor
+      post :delete_all_topics_for_assignment
       post :signup_as_instructor_action
       post :set_priority
       post :save_topic_deadlines
@@ -404,6 +430,7 @@ resources :institution, except: [:destroy] do
     collection do
       get :list
       get :reminder_thread
+      get :pending_surveys
     end
   end
 
@@ -460,10 +487,9 @@ resources :institution, except: [:destroy] do
 
   resources :user_pastebins
 
-  resources :versions, only: %i[index show destroy] do
+  resources :versions, only: %i[index show] do
     collection do
       get :search
-      delete '', action: :destroy_all
     end
   end
 

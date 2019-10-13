@@ -381,16 +381,6 @@ describe UsersController do
     end
   end
 
-  context '#destroy' do
-    it 'when user is not deleted successfully' do
-      allow(User).to receive(:find).with('2').and_return(student2)
-      @params = {id: 2}
-      get :destroy, @params
-      expect(flash[:error]).not_to be_nil
-      expect(response).to redirect_to('/users/list')
-    end
-  end
-
   context '#keys' do
     before(:each) do
       stub_current_user(student1, student1.role.name, student1.role)

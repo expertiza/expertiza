@@ -6,24 +6,16 @@ class AssignmentsController < ApplicationController
   def action_allowed?
     if %w[edit update list_submissions].include? params[:action]
       assignment = Assignment.find(params[:id])
-      ['Super-Administrator', 'Administrator'].include? current_role_name or
-      assignment.instructor_id == current_user.try(:id) or
-      TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) or
-      assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id)
+      (%w[Super-Administrator Administrator].include? current_role_name) ||
+      (assignment.instructor_id == current_user.try(:id)) ||
+      TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) ||
+      (assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id))
     else
       ['Super-Administrator',
        'Administrator',
        'Instructor',
        'Teaching Assistant'].include? current_role_name
     end
-  end
-
-  # change access permission from public to private or vice versa
-  def toggle_access
-    assignment = Assignment.find(params[:id])
-    assignment.private = !assignment.private
-    assignment.save
-    redirect_to list_tree_display_index_path
   end
 
   def new
@@ -36,31 +28,33 @@ class AssignmentsController < ApplicationController
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
     if params[:button]
-        if @assignment_form.save
-          @assignment_form.create_assignment_node
-          existAssignment = Assignment.find_by_name(@assignment_form.assignment.name)
-          assignment_form_params[:assignment][:id] = existAssignment.id.to_s
-          quesparams = assignment_form_params
-          questArray = quesparams[:assignment_questionnaire]
-          dueArray = quesparams[:due_date]
-          questArray.each do |curquestionnaire|
-            curquestionnaire[:assignment_id] = existAssignment.id.to_s
-          end
-          dueArray.each do |curDue|
-            curDue[:parent_id] = existAssignment.id.to_s
-          end
-          quesparams[:assignment_questionnaire] = questArray
-          quesparams[:due_date] = dueArray
-          @assignment_form.update(quesparams,current_user)
-          aid = Assignment.find_by_name(@assignment_form.assignment.name).id
-          ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
-          redirect_to edit_assignment_path aid
-          undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
-          return
-        else
-          flash.now[:error] = "Failed to create assignment"
-          render 'new'
+      if @assignment_form.save
+        @assignment_form.create_assignment_node
+        exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
+        assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
+        if assignment_form_params[:assignment][:directory_path].blank?
+          assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
         end
+        ques_array = assignment_form_params[:assignment_questionnaire]
+        due_array = assignment_form_params[:due_date]
+        ques_array.each do |cur_questionnaire|
+          cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
+        end
+        due_array.each do |cur_due|
+          cur_due[:parent_id] = exist_assignment.id.to_s
+        end
+        assignment_form_params[:assignment_questionnaire] = ques_array
+        assignment_form_params[:due_date] = due_array
+        @assignment_form.update(assignment_form_params, current_user)
+        aid = Assignment.find_by(name: @assignment_form.assignment.name).id
+        ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
+        redirect_to edit_assignment_path aid
+        undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
+        return
+      else
+        flash.now[:error] = "Failed to create assignment"
+        render 'new'
+      end
     else
       render 'new'
       undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
@@ -73,7 +67,7 @@ class AssignmentsController < ApplicationController
     edit_params_setting
     assignment_form_assignment_staggered_deadline?
     @due_date_all.each do |dd|
-      check_due_date_nameurl_notempty(dd)
+      check_due_date_nameurl_not_empty(dd)
       adjust_timezone_when_due_date_present(dd)
       break if validate_due_date
     end
@@ -135,28 +129,24 @@ class AssignmentsController < ApplicationController
 
   def delete
     begin
-      @assignment_form = AssignmentForm.create_form_object(params[:id])
-      @user = session[:user]
-      id = @user.get_instructor
-      if id != @assignment_form.assignment.instructor_id
-        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "You are not authorized to delete this assignment.", request)
-        raise "You are not authorized to delete this assignment."
+      assignment_form = AssignmentForm.create_form_object(params[:id])
+      user = session[:user]
+      # Issue 1017 - allow instructor to delete assignment created by TA.
+      # FixA : TA can only delete assignment created by itself.
+      # FixB : Instrucor will be able to delete any assignment belonging to his/her courses.
+      if user.role.name == 'Instructor' or (user.role.name == 'Teaching Assistant' and user.id == assignment_form.assignment.instructor_id)
+        assignment_form.delete(params[:force])
+        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Assignment #{assignment_form.assignment.id} was deleted.", request)
+        flash[:success] = 'The assignment was successfully deleted.'
       else
-        @assignment_form.delete(params[:force])
-        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Assignment #{@assignment_form.assignment.id} was deleted.", request)
-        flash[:success] = "The assignment was successfully deleted."
+        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'You are not authorized to delete this assignment.', request)
+        flash[:error] = 'You are not authorized to delete this assignment.'
       end
     rescue StandardError => e
       flash[:error] = e.message
     end
 
     redirect_to list_tree_display_index_path
-  end
-
-  def index
-    set_up_display_options("ASSIGNMENT")
-    @assignments = super(Assignment)
-    # @assignment_pages, @assignments = paginate :assignments, :per_page => 10
   end
 
   def delayed_mailer
@@ -181,8 +171,10 @@ class AssignmentsController < ApplicationController
   end
 
   def delete_delayed_mailer
-    @delayed_job = DelayedJob.find(params[:delayed_job_id])
-    @delayed_job.delete
+    queue = Sidekiq::Queue.new("mailers")
+    queue.each do |job|
+      job.delete if job.jid == params[:delayed_job_id]
+    end
     redirect_to delayed_mailer_assignments_index_path params[:id]
   end
 
@@ -200,23 +192,22 @@ class AssignmentsController < ApplicationController
         rubric == Questionnaire.where(id: aq.questionnaire_id).first.type.to_s
       end
     end
-    rubrics_list.delete("TeammateReviewQuestionnaire") if @assignment_form.assignment.max_team_size == 1
-    rubrics_list.delete("MetareviewQuestionnaire") unless @metareview_allowed
-    rubrics_list.delete("BookmarkRatingQuestionnaire") unless @assignment_form.assignment.use_bookmark
+    rubrics_list.delete('TeammateReviewQuestionnaire') if @assignment_form.assignment.max_team_size == 1
+    rubrics_list.delete('MetareviewQuestionnaire') unless @metareview_allowed
+    rubrics_list.delete('BookmarkRatingQuestionnaire') unless @assignment_form.assignment.use_bookmark
     rubrics_list
   end
 
   def needed_rubrics(empty_rubrics_list)
-    needed_rub = "<b>["
+    needed_rub = '<b>['
     empty_rubrics_list.each do |item|
-      needed_rub += item[0...-13] + ", "
+      needed_rub += item[0...-13] + ', '
     end
     needed_rub = needed_rub[0...-2]
-    needed_rub += "] </b>"
-    needed_rub
+    needed_rub += '] </b>'
   end
 
-  def due_date_nameurl_notempty?(dd)
+  def due_date_nameurl_not_empty?(dd)
     dd.deadline_name.present? || dd.description_url.present?
   end
 
@@ -253,10 +244,9 @@ class AssignmentsController < ApplicationController
 
   # helper methods for edit
   def edit_params_setting
-
     @assignment = Assignment.find(params[:id])
-    @num_submissions_round = @assignment.find_due_dates('submission') == nil ? 0 : @assignment.find_due_dates('submission').count
-    @num_reviews_round = @assignment.find_due_dates('review') == nil ? 0 : @assignment.find_due_dates('review').count
+    @num_submissions_round = @assignment.find_due_dates('submission').nil? ? 0 : @assignment.find_due_dates('submission').count
+    @num_reviews_round = @assignment.find_due_dates('review').nil? ? 0 : @assignment.find_due_dates('review').count
 
     @topics = SignUpTopic.where(assignment_id: params[:id])
     @assignment_form = AssignmentForm.create_form_object(params[:id])
@@ -265,8 +255,8 @@ class AssignmentsController < ApplicationController
     @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
     @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
     @reviewvarycheck = false
-    @due_date_nameurl_notempty = false
-    @due_date_nameurl_notempty_checkbox = false
+    @due_date_nameurl_not_empty = false
+    @due_date_nameurl_not_empty_checkbox = false
     @metareview_allowed = false
     @metareview_allowed_checkbox = false
     @signup_allowed = false
@@ -282,15 +272,15 @@ class AssignmentsController < ApplicationController
   def assignment_form_assignment_staggered_deadline?
     if @assignment_form.assignment.staggered_deadline == true
       @review_rounds = @assignment_form.assignment.num_review_rounds
-      @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEALINE_TYPE_SUBMISSION }
-      @assignment_review_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEALINE_TYPE_REVIEW }
+      @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_SUBMISSION }
+      @assignment_review_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_REVIEW }
     end
     @assignment_form.assignment.staggered_deadline == true
   end
 
-  def check_due_date_nameurl_notempty(dd)
-    @due_date_nameurl_notempty = due_date_nameurl_notempty?(dd)
-    @due_date_nameurl_notempty_checkbox = @due_date_nameurl_notempty
+  def check_due_date_nameurl_not_empty(dd)
+    @due_date_nameurl_not_empty = due_date_nameurl_not_empty?(dd)
+    @due_date_nameurl_not_empty_checkbox = @due_date_nameurl_not_empty
     @metareview_allowed = meta_review_allowed?(dd)
     @drop_topic_allowed = drop_topic_allowed?(dd)
     @signup_allowed = signup_allowed?(dd)
@@ -302,7 +292,7 @@ class AssignmentsController < ApplicationController
   end
 
   def validate_due_date
-    @due_date_nameurl_notempty && @due_date_nameurl_notempty_checkbox &&
+    @due_date_nameurl_not_empty && @due_date_nameurl_not_empty_checkbox &&
       (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
   end
 
@@ -319,8 +309,11 @@ class AssignmentsController < ApplicationController
     if !empty_rubrics_list.empty? && request.original_fullpath == "/assignments/#{@assignment_form.assignment.id}/edit"
       rubrics_needed = needed_rubrics(empty_rubrics_list)
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Rubrics missing for #{@assignment_form.assignment.name}.", request)
-      flash.now[:error] = "You did not specify all the necessary rubrics. You need " + rubrics_needed +
-          " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics <a id='go_to_tabs2' style='color: blue;'>here</a>."
+      if flash.now[:error] != "Failed to save the assignment: [\"Total weight of rubrics should add up to either 0 or 100%\"]"
+        flash.now[:error] = "You did not specify all the necessary rubrics. You need " + rubrics_needed +
+            " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics" \
+            " <a id='go_to_tabs2' style='color: blue;'>here</a>."
+      end
     end
   end
 
@@ -359,9 +352,7 @@ class AssignmentsController < ApplicationController
 
     @due_date_info = DueDate.find_each(parent_id: params[:id])
 
-    if params[:metareviewAllowed] == "false"
-      DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all
-    end
+    DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all if params[:metareviewAllowed] == "false"
   end
 
   def handle_current_user_timezonepref_nil

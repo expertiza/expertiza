@@ -227,15 +227,15 @@
             'TeammateReviewQuestionnaire'].forEach(function(item){
             removeQuestionnaireTableRow(item);
           });
-            for (i = 1; i <= round_count; i++) {
-                addQuestionnaireTableRow(
-                        'ReviewQuestionnaire',
-                        i,
-                        <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>,
-                        <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>,
-                        <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire',nil).to_json.html_safe %>
-                );
-            }
+            <% for i in 1..@assignment_form.assignment.rounds_of_reviews %>
+            addQuestionnaireTableRow(
+                'ReviewQuestionnaire',
+                <%=i%>,
+                <%= questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',i).to_json.html_safe %>,
+                <%= assignment_questionnaire(@assignment_form.assignment, 'ReviewQuestionnaire',i).to_json.html_safe %>,
+                <%= questionnaire_options(@assignment_form.assignment, 'ReviewQuestionnaire',i).to_json.html_safe %>
+            );
+            <% end %>
             addQuestionnaireTableRow(
                     'MetareviewQuestionnaire',
                     null,

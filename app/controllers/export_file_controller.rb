@@ -6,19 +6,12 @@ class ExportFileController < ApplicationController
      'Super-Administrator'].include? current_role_name
   end
 
+  # Assign titles to model for display
   def start
     @model = params[:model]
-    if @model == 'Assignment'
-      @title = 'Grades'
-    elsif @model == 'CourseParticipant'
-      @title = 'Course Participants'
-    elsif @model == 'AssignmentTeam'
-      @title = 'Teams'
-    elsif @model == 'CourseTeam'
-      @title = 'Teams'
-    elsif @model == 'User'
-      @title = 'Users'
-    end
+    titles = {"Assignment" => "Grades", "CourseParticipant" => "Course Participants", "AssignmentTeam" => "Teams",
+              "CourseTeam" => "Teams", "User" => "Users", "Question" => "Questions"}
+    @title = titles[@model]
     @id = params[:id]
   end
 
@@ -84,4 +77,44 @@ class ExportFileController < ApplicationController
               type: 'text/csv; charset=iso-8859-1; header=present',
               disposition: "attachment; filename=#{filename}"
   end
+
+  # Export question advice data to CSV file
+  def export_advices
+    @delim_type = params[:delim_type]
+    filename, delimiter = find_delim_filename(@delim_type, params[:other_char])
+
+    allowed_models = ['Question']
+    advice_model = 'QuestionAdvice'
+
+    csv_data = CSV.generate(col_sep: delimiter) do |csv|
+      if allowed_models.include? params[:model]
+        csv << Object.const_get(advice_model).export_fields(params[:options])
+        Object.const_get(advice_model).export(csv, params[:id], params[:options])
+      end
+    end
+
+    send_data csv_data,
+              type: 'text/csv; charset=iso-8859-1; header=present',
+              disposition: "attachment; filename=#{filename}"
+  end
+
+  def export_tags
+    @user_ids = User.where("name IN (?)", params[:names])
+    @students = AnswerTag.select('answers.*, answer_tags.*').joins(:answer).where("answer_tags.answer_id = answers.id and answer_tags.user_id IN (?)", @user_ids.pluck(:id))
+    attributes = %w[user_id tag_prompt_deployment_id comments value]
+
+    csv_data = CSV.generate(col_sep: ",") do |csv|
+      csv << attributes
+      @students.each do |item|
+        csv << item.attributes.values_at(*attributes)
+      end
+    end
+    filename = "Tags"
+
+    send_data csv_data,
+              type: 'text/csv; charset=iso-8859-1; header=present',
+              disposition: "attachment; filename=#{filename}.csv"
+
+  end
 end
+

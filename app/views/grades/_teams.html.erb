@@ -21,12 +21,18 @@
 	<% col_range_th_span_value = 4 %>
 <% end %>
 
-<!-- TEAMS --> 
+<!-- TEAMS -->
+
 <% index = 0 %>
+<!--E1877: thead added to the row-->
+<thead>
 <%= render :partial => 'team_title', :locals => {:prefix => nil, 
 	 :col_outer_th_span_value => col_outer_th_span_value,
 	 :col_avg_th_span_value => col_avg_th_span_value,
 	 :col_range_th_span_value => col_range_th_span_value}  %>
+</thead>
+<!--E1877: tbody tag added to the table structure-->
+<tbody>
 <% for index in 0 .. @scores[:teams].length - 1 %>   
      <%= render :partial => 'grades/team',
                 :locals => {:prefix => 'team'+index.to_s,
@@ -34,6 +40,7 @@
                             :col_outer_th_span_value => col_outer_th_span_value,
                             :col_avg_th_span_value => col_avg_th_span_value,
 			    			:col_range_th_span_value => col_range_th_span_value}  %>    
-  <% end %> 
+  <% end %>
+</tbody>
 <!-- END TEAMS --> 
 

@@ -25,9 +25,9 @@
         <%if Question.find(s.question_id).is_a?(ScoredQuestion) %>
           <td align = 'center'> <%= s.answer %>/<%= @maxscore %></td>
         <%else%>
-          <td align = 'center'> <%= s.answer %></td>
+          <td align = 'center'> <%= sanitize s.answer %></td>
         <%end%>
-        <td align = 'left'> <%= s.comments %> </td>
+        <td align = 'left'> <%= sanitize s.comments %> </td>
       </tr>
     <%end%>
     <tr>
@@ -44,7 +44,7 @@
         <%if @response.additional_comment.nil? %>
           <td> No Comments </td>
         <%else%>
-          <td> <%= @response.additional_comment %> </td>
+          <td> <%= sanitize @response.additional_comment %> </td>
         <%end%>
       </tr>
     </table>

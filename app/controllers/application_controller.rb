@@ -15,6 +15,11 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   before_action :set_time_zone
   before_action :authorize
+  before_action :filter_utf8
+
+  def filter_utf8
+    remove_non_utf8(params)
+  end
 
   def self.verify(_args); end
 
@@ -37,22 +42,17 @@ class ApplicationController < ActionController::Base
   end
 
   def undo_link(message)
-    @version = Version.where('whodunnit = ?', session[:user].id).last
-    if @version.try(:created_at) && Time.now - @version.created_at < 5.0
-      @link_name = params[:redo] == "true" ? "redo" : "undo"
-      message += "<a href = #{url_for(controller: :versions, action: :revert, id: @version.id, redo: !params[:redo])}>#{@link_name}</a>"
-    end
+    version = Version.where('whodunnit = ?', session[:user].id).last
+    return unless version.try(:created_at) && Time.now.in_time_zone - version.created_at < 5.0
+    link_name = params[:redo] == 'true' ? 'redo' : 'undo'
+    message + "<a href = #{url_for(controller: :versions, action: :revert, id: version.id, redo: !params[:redo])}>#{link_name}</a>"
   end
 
   def are_needed_authorizations_present?(id, *authorizations)
-    @participant = Participant.find_by(id: id)
-    return false if @participant.nil?
-    authorization = Participant.get_authorization(@participant.can_submit, @participant.can_review, @participant.can_take_quiz)
-    if authorizations.include? authorization
-      return false
-    else
-      return true
-    end
+    participant = Participant.find_by(id: id)
+    return false if participant.nil?
+    authorization = Participant.get_authorization(participant.can_submit, participant.can_review, participant.can_take_quiz)
+    !authorizations.include?(authorization)
   end
 
   private
@@ -60,11 +60,13 @@ class ApplicationController < ActionController::Base
   def current_user
     @current_user ||= session[:user]
   end
+
   helper_method :current_user
 
   def current_user_role
     current_user.role
   end
+
   alias current_user_role? current_user_role
 
   def logged_in?
@@ -94,22 +96,32 @@ class ApplicationController < ActionController::Base
 
   def is_available(user, owner_id)
     user.id == owner_id ||
-      user.admin? ||
-      user.super_admin?
+        user.admin? ||
+        user.super_admin?
   end
 
   def record_not_found
     redirect_to controller: :tree_display, action: :list
   end
 
-  protected
-
-  def set_up_display_options(object_type)
-    # Create a set that will be used to populate the dropbox when a user lists a set of objects (assgts., questionnaires, etc.)
-    # Get the Instructor::QUESTIONNAIRE constant
-    @display_options ||= eval "#{current_user_role.class}::#{object_type}"
+  def remove_non_utf8(hash)
+    # remove non-utf8 chars from hash
+    hash.each_pair do |_key, value|
+      if value.is_a?(Hash)
+        remove_non_utf8(value)
+      elsif value.is_a?(String)
+        encode_opts = {
+          invalid: :replace,
+          undef: :replace,
+          replace: ''
+        }
+        value.encode!(Encoding.find('UTF-8'), encode_opts)
+      end
+    end
   end
 
+  protected
+  
   # Use this method to validate the current user in order to avoid allowing users
   # to see unauthorized data.
   # Ex: return unless current_user_id?(params[:user_id])
@@ -121,7 +133,7 @@ class ApplicationController < ActionController::Base
     if reason
       redirect_to "/denied?reason=#{reason}"
     else
-      redirect_to "/denied"
+      redirect_to '/denied'
     end
   end
 end

@@ -262,20 +262,24 @@ describe ReviewMappingController do
 
     context 'when failed times are bigger than 0' do
       it 'shows an error flash message and redirects to review_mapping#list_mappings page' do
-        allow(ResponseMap).to receive(:delete_mappings).with(@metareview_response_maps, true).and_return(5)
+        @metareview_response_maps.each do |metareview_response_map|
+          allow(metareview_response_map).to receive(:delete).with(true).and_raise('Boom')
+        end
         params = {id: 1, force: true}
         post :delete_all_metareviewers, params
         expect(flash[:note]).to be nil
-        expect(flash[:error]).to eq("A delete action failed:<br/>5 metareviews exist for these mappings. "\
+        expect(flash[:error]).to eq("A delete action failed:<br/>1 metareviews exist for these mappings. "\
           "Delete these mappings anyway?&nbsp;<a href='http://test.host/review_mapping/delete_all_metareviewers?force=1&id=1'>Yes</a>&nbsp;|&nbsp;"\
-          "<a href='http://test.host/review_mapping/delete_all_metareviewers?id=1'>No</a><BR/>")
+          "<a href='http://test.host/review_mapping/delete_all_metareviewers?id=1'>No</a><br/>")
         expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
       end
     end
 
     context 'when failed time is equal to 0' do
       it 'shows a note flash message and redirects to review_mapping#list_mappings page' do
-        allow(ResponseMap).to receive(:delete_mappings).with(@metareview_response_maps, true).and_return(0)
+        @metareview_response_maps.each do |metareview_response_map|
+          allow(metareview_response_map).to receive(:delete).with(true)
+        end
         params = {id: 1, force: true}
         post :delete_all_metareviewers, params
         expect(flash[:error]).to be nil
@@ -458,6 +462,28 @@ describe ReviewMappingController do
           expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
         end
       end
+
+      context 'when student review num is greater than or equal to team size' do
+        it 'throws error stating that student review number cannot be greather than or equal to team size' do
+          allow(ReviewResponseMap).to receive(:where)
+            .with(reviewed_object_id: 1, calibrate_to: 1)
+            .and_return([double('ReviewResponseMap', reviewee_id: 2)])
+          allow(AssignmentTeam).to receive(:find).with(2).and_return(team)
+          params = {
+            id: 1,
+            max_team_size: 1,
+            num_reviews_per_student: 45,
+            num_reviews_per_submission: 0,
+            num_calibrated_artifacts: 0,
+            num_uncalibrated_artifacts: 0
+          }
+          post :automatic_review_mapping, params
+          expect(flash[:error]).to eq('You cannot set the number of reviews done ' \
+                                      'by each student to be greater than or equal to total number of teams ' \
+                                      '[or "participants" if it is an individual assignment].')
+          expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+        end
+      end
     end
 
     context 'when teams is empty, max team size is 1 and when review params are not 0' do
@@ -497,141 +523,8 @@ describe ReviewMappingController do
     end
   end
 
-  describe 'response_report' do
-    before(:each) do
-      stub_const('WEBSERVICE_CONFIG', 'summary_webservice_url' => 'expertiza.ncsu.edu')
-    end
-
-    context 'when type is SummaryByRevieweeAndCriteria' do
-      it 'renders response_report page with corresponding data' do
-        allow(SummaryHelper::Summary).to receive_message_chain(:new, :summarize_reviews_by_reviewees)
-          .with(no_args).with(assignment, 'expertiza.ncsu.edu')
-          .and_return(double('Summary', summary: 'awesome!', reviewers: [participant, participant1],
-                                        avg_scores_by_reviewee: 95, avg_scores_by_round: 92, avg_scores_by_criterion: 94))
-        params = {
-          id: 1,
-          report: {type: 'SummaryByRevieweeAndCriteria'}
-        }
-        get :response_report, params
-        expect(response).to render_template(:response_report)
-      end
-    end
-
-    context 'when type is SummaryByCriteria' do
-      it 'renders response_report page with corresponding data' do
-        allow(SummaryHelper::Summary).to receive_message_chain(:new, :summarize_reviews_by_criterion)
-          .with(no_args).with(assignment, 'expertiza.ncsu.edu')
-          .and_return(double('Summary', summary: 'awesome!', reviewers: [participant, participant1],
-                                        avg_scores_by_reviewee: 95, avg_scores_by_round: 92, avg_scores_by_criterion: 94))
-        params = {
-          id: 1,
-          report: {type: 'SummaryByCriteria'}
-        }
-        get :response_report, params
-        expect(response).to render_template(:response_report)
-      end
-    end
-
-    context 'when type is ReviewResponseMap' do
-      it 'renders response_report page with corresponding data' do
-        allow(ReviewResponseMap).to receive(:review_response_report).with('1', assignment, 'ReviewResponseMap', 'no one')
-                                                                    .and_return([participant, participant1])
-        allow(assignment).to receive(:compute_reviews_hash).and_return('1' => 'good')
-        allow(assignment).to receive(:compute_avg_and_ranges_hash).and_return(avg: 94, range: [90, 99])
-        params = {
-          id: 1,
-          report: {type: 'ReviewResponseMap'},
-          user: 'no one'
-        }
-        get :response_report, params
-        expect(response).to render_template(:response_report)
-      end
-    end
-
-    context 'when type is FeedbackResponseMap' do
-      context 'when assignment has varying_rubrics_by_round feature' do
-        it 'renders response_report page with corresponding data' do
-          allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
-          allow(FeedbackResponseMap).to receive(:feedback_response_report).with('1', 'FeedbackResponseMap')
-                                                                          .and_return([participant, participant1], [1, 2], [3, 4], [])
-          params = {
-            id: 1,
-            report: {type: 'FeedbackResponseMap'}
-          }
-          get :response_report, params
-          expect(response).to render_template(:response_report)
-        end
-      end
-
-      context 'when assignment does not have varying_rubrics_by_round feature' do
-        it 'renders response_report page with corresponding data' do
-          allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
-          allow(FeedbackResponseMap).to receive(:feedback_response_report).with('1', 'FeedbackResponseMap')
-                                                                          .and_return([participant, participant1], [1, 2, 3, 4])
-          params = {
-            id: 1,
-            report: {type: 'FeedbackResponseMap'}
-          }
-          get :response_report, params
-          expect(response).to render_template(:response_report)
-        end
-      end
-    end
-
-    context 'when type is TeammateReviewResponseMap' do
-      it 'renders response_report page with corresponding data' do
-        allow(TeammateReviewResponseMap).to receive(:teammate_response_report).with('1').and_return([participant, participant2])
-        params = {
-          id: 1,
-          report: {type: 'TeammateReviewResponseMap'}
-        }
-        get :response_report, params
-        expect(response).to render_template(:response_report)
-      end
-    end
-
-    context 'when type is Calibration and participant variable is nil' do
-      it 'renders response_report page with corresponding data' do
-        allow(AssignmentParticipant).to receive(:where).with(parent_id: '1', user_id: 3).and_return([nil])
-        allow(AssignmentParticipant).to receive(:create)
-          .with(parent_id: '1', user_id: 3, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle').and_return(participant)
-        allow(ReviewQuestionnaire).to receive(:select).with('id').and_return([1, 2, 3])
-        assignment_questionnaire = double('AssignmentQuestionnaire')
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: '1', questionnaire_id: [1, 2, 3])
-                                                         .and_return([assignment_questionnaire])
-        allow(assignment_questionnaire).to receive_message_chain(:questionnaire, :questions).and_return([double('Question', type: 'Criterion')])
-        allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: '1', calibrate_to: 1).and_return([review_response_map])
-        allow(ReviewResponseMap).to receive_message_chain(:select, :where).with('id').with(reviewed_object_id: '1', calibrate_to: 0)
-                                                                          .and_return([1, 2])
-        allow(Response).to receive(:where).with(map_id: [1, 2]).and_return([double('response')])
-        params = {
-          id: 1,
-          report: {type: 'Calibration'}
-        }
-        session = {user: user}
-        get :response_report, params, session
-        expect(response).to render_template(:response_report)
-      end
-    end
-
-    context 'when type is PlagiarismCheckerReport' do
-      it 'renders response_report page with corresponding data' do
-        allow(PlagiarismCheckerAssignmentSubmission).to receive_message_chain(:where, :pluck).with(assignment_id: '1').with(:id)
-                                                                                             .and_return([double('PlagiarismCheckerAssignmentSubmission', id: 1)])
-        allow(PlagiarismCheckerAssignmentSubmission).to receive(:where).with(plagiarism_checker_assignment_submission_id: 1)
-                                                                       .and_return([double('PlagiarismCheckerAssignmentSubmission')])
-        params = {
-          id: 1,
-          report: {type: 'PlagiarismCheckerReport'}
-        }
-        get :response_report, params
-        expect(response).to render_template(:response_report)
-      end
-    end
-  end
-
   describe '#save_grade_and_comment_for_reviewer' do
-    it 'redirects to review_mapping#response_report page' do
+    it 'redirects to reports#response_report page' do
       review_grade = build(:review_grade)
       allow(ReviewGrade).to receive(:find_by).with(participant_id: '1').and_return(review_grade)
       allow(review_grade).to receive(:save).and_return(true)
@@ -643,16 +536,13 @@ describe ReviewMappingController do
       session = {user: double('User', id: 1)}
       post :save_grade_and_comment_for_reviewer, params, session
       expect(flash[:note]).to be nil
-      expect(response).to redirect_to('/review_mapping/response_report')
+      expect(response).to redirect_to('/reports/response_report')
     end
   end
 
   describe '#start_self_review' do
     before(:each) do
-      allow(TeamsUser).to receive(:find_by_sql).with(
-        ["SELECT t.id as t_id FROM teams_users u, teams t WHERE u.team_id = t.id and t.parent_id = ? and user_id = ?", 1, '1']
-      )
-                                               .and_return([double('TeamsUser', t_id: 1)])
+      allow(Team).to receive(:find_team_for_assignment_and_user).with(1, '1').and_return([double('Team', id: 1)])
     end
 
     context 'when self review response map does not exist' do

@@ -155,4 +155,26 @@ class SignUpSheet < ActiveRecord::Base
       [duedate_rev, duedate_subm]
     end
   end
+
+  def self.import(row_hash, session, _id = nil)
+    raise 'Not enough items: expect 2 or more columns: Topic Identifier, User Name 1, User Name 2, ...' if row_hash.length < 2
+
+    imported_topic = SignUpTopic.where(topic_identifier: row_hash[:topic_identifier], assignment_id: session[:assignment_id]).first
+
+    raise ImportError, "Topic, " + row_hash[:topic_identifier].to_s + ", was not found." if  imported_topic.nil?
+
+    params = 1
+    while row_hash.length > params
+      index = 'user_name_' + params.to_s
+
+      user = User.find_by(name: row_hash[index.to_sym].to_s)
+      raise ImportError, "The user, " + row_hash[index.to_sym].to_s.strip + ", was not found." if user.nil?
+
+      participant = AssignmentParticipant.where(parent_id: session[:assignment_id], user_id: user.id).first
+      raise ImportError, "The user, " + row_hash[index.to_sym].to_s.strip + ", not present in the assignment." if participant.nil?
+
+      signup_team(session[:assignment_id], user.id, imported_topic.id)
+      params += 1
+    end
+  end
 end

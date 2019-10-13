@@ -10,7 +10,6 @@ class User < ActiveRecord::Base
   has_many :assignments, through: :participants
   has_many :teams_users, dependent: :destroy
   has_many :teams, through: :teams_users
-  has_many :bids, dependent: :destroy
   has_many :sent_invitations, class_name: 'Invitation', foreign_key: 'from_id', dependent: :destroy
   has_many :received_invitations, class_name: 'Invitation', foreign_key: 'to_id', dependent: :destroy
   has_many :children, class_name: 'User', foreign_key: 'parent_id'
@@ -19,6 +18,7 @@ class User < ActiveRecord::Base
   belongs_to :role
   validates :name, presence: true
   validates :name, uniqueness: true
+  validates :name, format: {without: /\s/}
 
   validates :email, presence: {message: "can't be blank"}
   validates :email, format: {with: /\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\z/i, allow_blank: true}

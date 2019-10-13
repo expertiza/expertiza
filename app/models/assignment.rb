@@ -355,7 +355,7 @@ class Assignment < ActiveRecord::Base
     if due_date.nil? or due_date == 'Finished' or due_date.is_a?(TopicDueDate)
       return nil
     else
-      return due_date.description_url
+      due_date.description_url
     end
   end
 

@@ -2,6 +2,8 @@
 
 <%= form_tag :action => 'create' do %>
   <%= render :partial => 'course' %>
+    <p><%= check_box_tag('course[private]', 'true',  !@private.to_i.zero?) %>
+      <%= label_tag('toggle_access_setting', 'Private course') %></p>
   <%= submit_tag "Create" %>
   <%= hidden_field_tag 'course[private]', @private %>
 

@@ -61,7 +61,7 @@ describe "Course Survey questionnaire tests for instructor interface" do
     expect(page).to have_content('Remove')
     fill_in "Edit question content here", with: "Test question 1"
     click_button "Save course survey questionnaire"
-    expect(page).to have_content('All questions has been successfully saved!')
+    expect(page).to have_content('All questions have been successfully saved!')
   end
 
   it "is able to delete question from a course survey" do
@@ -75,7 +75,7 @@ describe "Course Survey questionnaire tests for instructor interface" do
     expect(page).to have_content('Remove')
     fill_in "Edit question content here", with: "Test question 1"
     click_button "Save course survey questionnaire"
-    expect(page).to have_content('All questions has been successfully saved!')
+    expect(page).to have_content('All questions have been successfully saved!')
     question = Question.find_by_sql("select * from questions where questionnaire_id = " + survey_questionnaire.id.to_s)
     click_link('Remove')
     expect(page).to have_content("You have successfully deleted the question!")

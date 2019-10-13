@@ -69,7 +69,10 @@
             collapseObj(obj, atag);
   	  }
   	  else {
-  	    obj.style.display = '';
+				obj.style.display = '';
+				//E1877: changes made to adjust width of expandables
+				var offsets = obj.getBoundingClientRect();
+				obj.style.width="calc(100vw - 103px)";
   	  	atag.innerHTML = '<img src="/assets/collapse.png">';
             header.style.backgroundColor = '#a90201';
             header.style.color = "#ffffff";

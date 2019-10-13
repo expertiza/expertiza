@@ -69,7 +69,9 @@ describe AssignmentForm do
       let(:attributes) { [assignment_questionnaire, assignment_questionnaire2] }
       before(:each) do
         allow(assignment_questionnaire).to receive(:[]).with(:id).and_return(nil)
+        allow(assignment_questionnaire).to receive(:[]).with(:questionnaire_weight).and_return(0)
         allow(assignment_questionnaire2).to receive(:[]).with(:id).and_return(1)
+        allow(assignment_questionnaire2).to receive(:[]).with(:questionnaire_weight).and_return(100)
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([])
         allow(AssignmentQuestionnaire).to receive(:new).with(assignment_questionnaire).and_return(assignment_questionnaire)
         allow(AssignmentQuestionnaire).to receive(:find).with(1).and_return(assignment_questionnaire2)
@@ -90,6 +92,16 @@ describe AssignmentForm do
           allow(assignment_questionnaire2).to receive(:update_attributes).with(assignment_questionnaire2).and_return(true)
           expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
           expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
+        end
+      end
+
+      context 'when both save and update_attributes method do not work with wrong rubrics weights' do
+        it 'changes @has_errors value to true and returns nil' do
+          allow(assignment_questionnaire).to receive(:save).and_return(true)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(assignment_questionnaire2).and_return(true)
+          allow(assignment_questionnaire2).to receive(:[]).with(:questionnaire_weight).and_return(12)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(nil)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
         end
       end
     end
@@ -138,30 +150,36 @@ describe AssignmentForm do
     before(:each) do
       allow(AssignmentDueDate).to receive(:where).with(parent_id: 1).and_return([due_date])
       allow_any_instance_of(AssignmentForm).to receive(:find_min_from_now).with(any_args).and_return(666)
-      allow_any_instance_of(AssignmentForm).to receive(:change_item_type).with(any_args).and_return('Succeed!')
       allow(due_date).to receive(:update_attribute).with(:delayed_job_id, any_args).and_return('Succeed!')
+      Sidekiq::Testing.inline!
     end
 
     context 'when the deadline type is review' do
       it 'adds two delayed jobs and changes the # of DelayedJob by 2' do
         allow(DeadlineType).to receive(:find).with(1).and_return(double('DeadlineType', name: 'review'))
-        expect { assignment_form.add_to_delayed_queue }.to change { DelayedJob.count }.by(2)
+        Sidekiq::Testing.fake!
+        Sidekiq::RetrySet.new.clear
+        Sidekiq::ScheduledSet.new.clear
+        Sidekiq::Stats.new.reset
+        Sidekiq::DeadSet.new.clear
+        queue = Sidekiq::Queues["mailers"]
+        puts queue.size
+        expect { assignment_form.add_to_delayed_queue }.to change { queue.size }.by(2)
       end
     end
 
     context 'when the deadline type is team formation and current assignment is team-based assignment' do
       it 'adds a delayed job and changes the # of DelayedJob by 2' do
         allow(DeadlineType).to receive(:find).with(1).and_return(double('DeadlineType', name: 'team_formation'))
-        expect { assignment_form.add_to_delayed_queue }.to change { DelayedJob.count }.by(2)
+        Sidekiq::Testing.fake!
+        Sidekiq::RetrySet.new.clear
+        Sidekiq::ScheduledSet.new.clear
+        Sidekiq::Stats.new.reset
+        Sidekiq::DeadSet.new.clear
+        queue = Sidekiq::Queues["mailers"]
+        puts queue.size
+        expect { assignment_form.add_to_delayed_queue }.to change { queue.size }.by(2)
       end
-    end
-  end
-
-  describe '#change_item_type' do
-    it 'changes the item_type displayes in the log' do
-      allow(Version).to receive(:find_by).with(item_type: 'Delayed::Backend::ActiveRecord::Job', item_id: 1)
-                                         .and_return(Version.new(item_type: 'some type', item_id: 1, event: 'create'))
-      expect(assignment_form.change_item_type(1)).to be true
     end
   end
 

@@ -75,21 +75,10 @@ jQuery(document).ready(function() {
               action={"/questionnaires/new"}
               method="GET">
               <input type="hidden" name="model" value={this.props.parent_name+"Questionnaire"} />
-              <input type="hidden" name="private" value={0} />
-              <button type="submit"
-                      className="btn btn-primary questionnaire-button">
-                      New public item
-              </button>
-            </form>
-            <form
-              style={formStyle}
-              action={"/questionnaires/new"}
-              method="GET">
-              <input type="hidden" name="model" value={this.props.parent_name+"Questionnaire"} />
               <input type="hidden" name="private" value={1} />
               <button type="submit"
                       className="btn btn-primary questionnaire-button">
-                      New private item
+                  <b>+</b>
               </button>
             </form>
           </span>
@@ -133,7 +122,7 @@ jQuery(document).ready(function() {
                 <a title="Create teams" href={"/teams/list?id="+(parseInt(this.props.id)/2).toString()+"&type=Course"}>
                   <img src="/assets/tree_view/create-teams-24.png" />
                 </a>
-                <a title="360 degree assessment dashboad" href={"/assessment360/one_course_all_assignments?course_id="+(parseInt(this.props.id)/2).toString()}>
+                <a title="View grade summary by student" href={"/assessment360/course_student_grade_summary?course_id="+(parseInt(this.props.id)/2).toString()}>
                   <img src="/assets/tree_view/360-dashboard-24.png" />
                 </a>
                 <a title="Assign survey" href={"/survey_deployment/new?id="+(parseInt(this.props.id)/2).toString()+"&type=CourseSurveyDeployment"}>
@@ -217,7 +206,7 @@ jQuery(document).ready(function() {
                 <a title="View scores" href={"/grades/view?id="+(parseInt(this.props.id)/2).toString()}>
                   <img src="/assets/tree_view/view-scores-24.png" />
                 </a>
-                <a title="View review report" href={"/review_mapping/response_report?id="+(parseInt(this.props.id)/2).toString()}>
+                <a title="View reports" href={"/reports/response_report?id="+(parseInt(this.props.id)/2).toString()}>
                   <img src="/assets/tree_view/view-review-report-24.png" />
                 </a>
               <a title="View survey responses" href={"/survey_response/view_responses?id="+(parseInt(this.props.id)/2).toString()}>
@@ -686,7 +675,7 @@ jQuery(document).ready(function() {
               <input type="hidden" name="private" value={this.props.private ? 1 : 0} />
               <button type="submit"
                       className="btn btn-primary pull-right new-button">
-                      New {this.props.private ? "private" : "public"} {this.props.dataType}
+                     <b>+</b>
               </button>
             </form>
           )
@@ -1078,10 +1067,6 @@ jQuery(document).ready(function() {
           <NewItemButton
             dataType={this.props.dataType}
             private={true}
-          />
-          <NewItemButton
-            dataType={this.props.dataType}
-            private={false}
           />
           <ContentTable
             data={this.state.tableData}

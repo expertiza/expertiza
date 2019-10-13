@@ -51,7 +51,7 @@ module ReviewAssignment
     # If this is an assignment with quiz required
     if self.require_quiz?
       signups = SignedUpTeam.where(team_id: team.id)
-      for signup in signups do
+      signups.each do |signup|
         signuptopic = SignUpTopic.find(signup.topic_id)
         if signuptopic.assignment_id == self.id
           contributors_signup_topic = signuptopic
@@ -61,10 +61,9 @@ module ReviewAssignment
     end
 
     # Look for the topic_id where the team_id equals the contributor id (contributor is a team)
-    unless SignedUpTeam.where(team_id: team.id, is_waitlisted: 0).empty?
-      topic_id = SignedUpTeam.where(team_id: team.id, is_waitlisted: 0).first.topic_id
-      SignUpTopic.find(topic_id)
-    end
+    return if SignedUpTeam.where(team_id: team.id, is_waitlisted: 0).empty?
+    topic_id = SignedUpTeam.find_by(team_id: team.id, is_waitlisted: 0).topic_id
+    SignUpTopic.find(topic_id)
   end
 
   def assign_reviewer_dynamically(reviewer, topic)
@@ -111,12 +110,11 @@ module ReviewAssignment
     contributor = contributor_set.min_by {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count }
     min_reviews = contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count rescue 0
     contributor_set.reject! {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count > min_reviews + review_topic_threshold }
-
     contributor_set
   end
 
   def reject_by_max_reviews_per_submission(contributor_set)
-    contributor_set.reject! {|contributor| contributor.review_mappings.reject {|review_mapping| review_mapping.response.nil? }.count >= max_reviews_per_submission }
+    contributor_set.reject! {|contributor| contributor.responses.reject {|response| !response.is_submitted }.count >= max_reviews_per_submission }
     contributor_set
   end
 

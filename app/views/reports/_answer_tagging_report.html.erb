@@ -1,0 +1,92 @@
+<script>
+  $(function () {
+    /*Function for sorting the table */
+    $(".sortable").tablesorter({
+      sortList: [[0,0]] //sort First Column by default when page loads
+    });
+  });
+
+  /*Function to create tabs of the rubric-tag_prompt pairs */
+  $( function() {
+    $( "#tabs" ).tabs();
+  } );
+</script>
+
+<% if @questionnaire_tagging_report.nil? or @questionnaire_tagging_report.count < 1 %>
+      <h1 align="center">No answer tags are found for this assignment</h1>
+<% else %>
+    <div class="text-center">
+      <h1>Tagging report for assignment "<%= @assignment.name %>"</h1>
+    </div>
+
+    <div class= "chart-table" id="tabs">
+      <ul>
+      <% @questionnaire_tagging_report.each do |tag_dep, report_lines| %>
+        <li><a href="#tab-<%= tag_dep.id %>" id="tabmenu_<%= tag_dep.id %>"><%= tag_dep.questionnaire.name + " (" + tag_dep.tag_prompt.prompt + ")" %></a></li>
+      <% end %>
+        <li><a href="#tab-summary" id="tabmenu_summary">Report tags done by each user</a></li>
+      </ul>
+      <% @questionnaire_tagging_report.each do |tag_dep, report_lines| %>
+        <p>
+        <div id="tab-<%= tag_dep.id %>">
+          <h4  align="center">Tagging Report for questionnaire "<%= tag_dep.questionnaire.name %>" and Tag "<%= tag_dep.tag_prompt.prompt %>"</h4>
+          <table class="table table-striped sortable">
+            <thead>
+            <tr>
+              <th class="sorter-true">Username</th>
+              <th class="sorter-true">Name</th>
+              <th class="sorter-true">Percentage of answers tagged</th>
+              <th class="sorter-true"># answers tagged</th>
+              <th class="sorter-true"># answers not tagged</th>
+              <th class="sorter-true"># taggable answers<img src='/assets/info.png' title='As set up in the assignment setting, the authors can only tag answers of <%= tag_dep.question_type %> question type that are more than <%= tag_dep.answer_length_threshold %> character(s).'/></th>
+            </tr>
+            </thead>
+            <% report_lines.each do |report_line| %>
+                <tr>
+                  <td><%= report_line.user.name(session[:ip]) %></td>
+                  <td><%= report_line.user.fullname(session[:ip]) %></td>
+                  <td><%= report_line.percentage.to_s %>%</td>
+                  <td><%= report_line.no_tagged.to_s %></td>
+                  <td><%= report_line.no_not_tagged.to_s %></td>
+                  <td><%= report_line.no_tagable %></td>
+                </tr>
+            <% end %>
+          </table>
+        </div>
+        </p>
+      <% end %>
+      <p>
+      <%= form_tag('/tags.csv', method: 'put',:id => 'tst') do %>
+      <div id="tab-summary">
+        <h4  align="center">Summary for each user</h4>
+        <table class="table table-striped sortable">
+          <thead>
+          <tr>
+            <th class="sorter-true">Username</th>
+            <th class="sorter-true">Name</th>
+            <th class="sorter-true">Percentage of tags done</th>
+            <th class="sorter-true"># tags done</th>
+            <th class="sorter-true"># tags not done</th>
+            <th class="sorter-true"># possible tags to do<img src='/assets/info.png' title='Number of answers that fulfil the prerequisite setup for each tags (Answer of certain question types and has a length of greater than the threshold).'/></th>
+            <th>Tags export</th>
+          </tr>
+          </thead>
+
+          <% @user_tagging_report.each do |key, val| %>
+              <tr>
+                <td><%= val.user.name(session[:ip]) %></td>
+                <td><%= val.user.fullname(session[:ip]) %></td>
+                <td><%= val.percentage.to_s %>%</td>
+                <td><%= val.no_tagged.to_s %></td>
+                <td><%= val.no_not_tagged.to_s %></td>
+                <td><%= val.no_tagable %></td>
+                <td><%= check_box_tag 'names[]', val.user.name(session[:ip]), true %></td>
+              </tr>
+          <% end %>
+        </table>
+      </div>
+      <%= submit_tag "Export",:value => 'Export' ,:form => 'tst',method: 'put' %>
+      <% end %>
+      </p>
+    </div>
+<% end %>

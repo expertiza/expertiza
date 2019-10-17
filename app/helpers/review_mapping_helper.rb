@@ -43,7 +43,7 @@ module ReviewMappingHelper
               color.push 'green'
             else
               link_updated_at = get_link_updated_at(link)
-              color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
+              color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green' 
             end
           end
         end

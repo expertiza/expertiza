@@ -1,6 +1,6 @@
 class QuizQuestionnaireController < QuestionnairesController
   # View a quiz questionnaire
-  def view_quiz
+  def view
     @questionnaire = Questionnaire.find(params[:id])
     @participant = Participant.find(params[:pid]) # creating an instance variable since it needs to be sent to submitted_content/edit
     render :view
@@ -8,7 +8,7 @@ class QuizQuestionnaireController < QuestionnairesController
 
   # define a new quiz questionnaire
   # method invoked by the view
-  def new_quiz
+  def new
     valid_request = true
     @assignment_id = params[:aid] # creating an instance variable to hold the assignment id
     @participant_id = params[:pid] # creating an instance variable to hold the participant id
@@ -38,7 +38,7 @@ class QuizQuestionnaireController < QuestionnairesController
   end
 
   # seperate method for creating a quiz questionnaire because of differences in permission
-  def create_quiz_questionnaire
+  def create
     valid = valid_quiz
     if valid.eql?("valid")
       @questionnaire = Object.const_get(params[:questionnaire][:type]).new(questionnaire_params)
@@ -63,7 +63,7 @@ class QuizQuestionnaireController < QuestionnairesController
   end
 
   # edit a quiz questionnaire
-  def edit_quiz
+  def edit
     @questionnaire = Questionnaire.find(params[:id])
     if !@questionnaire.taken_by_anyone?
       render :'questionnaires/edit'
@@ -74,7 +74,7 @@ class QuizQuestionnaireController < QuestionnairesController
   end
 
   # save an updated quiz questionnaire to the database
-  def update_quiz
+  def update
     @questionnaire = Questionnaire.find(params[:id])
     if @questionnaire.nil?
       redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
@@ -110,7 +110,7 @@ class QuizQuestionnaireController < QuestionnairesController
     redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
   end
 
-  def valid_quiz
+  def valid
     num_questions = Assignment.find(params[:aid]).num_quiz_questions
     valid = "valid"
 

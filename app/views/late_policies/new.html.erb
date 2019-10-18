@@ -1,7 +1,21 @@
 <h1>New late policy</h1>
 
 <%= form_for @late_policy, :url => { :action => "create" } do |f| %>
-  <%= error_messages_for @late_policy %>
+
+ <% if @late_policy.errors.any? %>
+  <div id="error_explanation">
+    <h2>
+      <%= pluralize(@late_policy.errors.count, "error") %>
+      prohibited this post from being saved:
+    </h2>
+
+    <ul>
+    <% @late_policy.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+    </ul>
+  </div>
+<% end %>
 
   <p>
   <label for="late_policy_name">Late policy name:</label><label style="color: #ff0000;">*</label><br/>

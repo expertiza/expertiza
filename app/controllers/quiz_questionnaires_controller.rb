@@ -1,4 +1,4 @@
-class QuizQuestionnaireController < QuestionnairesController
+class QuizQuestionnairesController < QuestionnairesController
   # View a quiz questionnaire
   def view
     @questionnaire = Questionnaire.find(params[:id])
@@ -110,7 +110,7 @@ class QuizQuestionnaireController < QuestionnairesController
     redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
   end
 
-  def valid
+  def valid_quiz
     num_questions = Assignment.find(params[:aid]).num_quiz_questions
     valid = "valid"
 

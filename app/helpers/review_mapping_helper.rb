@@ -39,7 +39,7 @@ module ReviewMappingHelper
       'red'
     end
   end
-  # TODO: change name of function and add meaningfull comment
+  # TODO: change name of function & add meaningfull comment
   def obtain_team_colour(response_map)
     color = []
     (1..@assignment.num_review_rounds).each do |round|

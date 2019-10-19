@@ -58,8 +58,8 @@ describe "Questionnaire tests for instructor interface" do
 
   def load_question question_type
     load_questionnaire
-    fill_in('new_question_total_num', with: '1')
-    select(question_type, from: 'new_question_type')
+    fill_in('question_total_num', with: '1')
+    select(question_type, from: 'question_type')
     click_button "Add"
   end
 
@@ -69,7 +69,7 @@ describe "Questionnaire tests for instructor interface" do
         load_question q_type
         expect(page).to have_content('Remove')
         click_button "Save review questionnaire"
-        expect(page).to have_content('The questionnaire has been successfully updated!')
+        expect(page).to have_content('All questions have been successfully saved!')
       end
     end
   end
@@ -77,7 +77,7 @@ describe "Questionnaire tests for instructor interface" do
   def edit_created_question
     first("textarea[placeholder='Edit question content here']").set "Question edit"
     click_button "Save review questionnaire"
-    expect(page).to have_content('The questionnaire has been successfully updated!')
+    expect(page).to have_content('All questions have been successfully saved!')
     expect(page).to have_content('Question edit')
   end
 

@@ -97,4 +97,24 @@ class ExportFileController < ApplicationController
               type: 'text/csv; charset=iso-8859-1; header=present',
               disposition: "attachment; filename=#{filename}"
   end
+
+  def export_tags
+    @user_ids = User.where("name IN (?)", params[:names])
+    @students = AnswerTag.select('answers.*, answer_tags.*').joins(:answer).where("answer_tags.answer_id = answers.id and answer_tags.user_id IN (?)", @user_ids.pluck(:id))
+    attributes = %w[user_id tag_prompt_deployment_id comments value]
+
+    csv_data = CSV.generate(col_sep: ",") do |csv|
+      csv << attributes
+      @students.each do |item|
+        csv << item.attributes.values_at(*attributes)
+      end
+    end
+    filename = "Tags"
+
+    send_data csv_data,
+              type: 'text/csv; charset=iso-8859-1; header=present',
+              disposition: "attachment; filename=#{filename}.csv"
+
+  end
 end
+

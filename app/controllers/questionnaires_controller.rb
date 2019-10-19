@@ -13,7 +13,7 @@ class QuestionnairesController < ApplicationController
       (['Super-Administrator',
         'Administrator'].include? current_role_name) ||
           ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id))) ||
-          ((['Teaching Assistant'].include? current_role_name) && assign_instructor_id == @questionnaire.try(:instructor_id))
+          ((['Teaching Assistant'].include? current_role_name) && session[:user].instructor_id == @questionnaire.try(:instructor_id))
 
     else
       ['Super-Administrator',
@@ -26,11 +26,18 @@ class QuestionnairesController < ApplicationController
   # Create a clone of the given questionnaire, copying all associated
   # questions. The name and creator are updated.
   def copy
-    orig_questionnaire = Questionnaire.find(params[:id])
-    questions = Question.where(questionnaire_id: params[:id])
-    @questionnaire = orig_questionnaire.dup
-    @questionnaire.instructor_id = session[:user].instructor_id ## Why was TA-specific code removed here?  See Project E713.
-    copy_questionnaire_details(questions, orig_questionnaire)
+    begin
+      instructor_id = session[:user].instructor_id
+      @questionnaire = Questionnaire.copy_questionnaire_details(params, instructor_id)
+      p_folder = TreeFolder.find_by(name: @questionnaire.display_type)
+      parent = FolderNode.find_by(node_object_id: p_folder.id)
+      QuestionnaireNode.find_or_create_by(parent_id: parent.id, node_object_id: @questionnaire.id)
+      undo_link("Copy of questionnaire #{@questionnaire.name} has been created successfully.")
+      redirect_to controller: 'questionnaires', action: 'view', id: @questionnaire.id
+    rescue StandardError
+      flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.' + $ERROR_INFO.to_s
+      redirect_to action: 'list', controller: 'tree_display'
+    end
   end
 
   def view
@@ -66,17 +73,9 @@ class QuestionnairesController < ApplicationController
         @questionnaire.type = params[:questionnaire][:type]
         # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
         # In the future, we need to write migration files to make them consistency.
-        case display_type
-        when 'AuthorFeedback'
-          display_type = 'Author%Feedback'
-        when 'CourseSurvey'
-          display_type = 'Course%Survey'
-        when 'TeammateReview'
-          display_type = 'Teammate%Review'
-        when 'GlobalSurvey'
-          display_type = 'Global%Survey'
-        when 'AssignmentSurvey'
-          display_type = 'Assignment%Survey'
+        # E1903 : We are not sure of other type of cases, so have added a if statement. If there are only 5 cases, remove the if statement
+        if %w[AuthorFeedback CourseSurvey TeammateReview GlobalSurvey AssignmentSurvey].include?(display_type)
+          display_type = (display_type.split /(?=[A-Z])/).join("%")
         end
         @questionnaire.display_type = display_type
         @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
@@ -95,24 +94,8 @@ class QuestionnairesController < ApplicationController
 
   def create_questionnaire
     @questionnaire = Object.const_get(params[:questionnaire][:type]).new(questionnaire_params)
-
-    # TODO: check for Quiz Questionnaire?
-    if @questionnaire.type == "QuizQuestionnaire" # checking if it is a quiz questionnaire
-      participant_id = params[:pid] # creating a local variable to send as parameter to submitted content if it is a quiz questionnaire
-      @questionnaire.min_question_score = 0
-      @questionnaire.max_question_score = 1
-      author_team = AssignmentTeam.team(Participant.find(participant_id))
-
-      @questionnaire.instructor_id = author_team.id # for a team assignment, set the instructor id to the team_id
-
-      @successful_create = true
-      save
-
-      save_choices @questionnaire.id
-
-      flash[:note] = "The quiz was successfully created." if @successful_create
-      redirect_to controller: 'submitted_content', action: 'edit', id: participant_id
-    else # if it is not a quiz questionnaire
+    # Create Quiz content has been moved to Quiz Questionnaire Controller
+    if @questionnaire.type != "QuizQuestionnaire" # checking if it is a quiz questionnaire
       @questionnaire.instructor_id = Ta.get_my_instructor(session[:user].id) if session[:user].role.name == "Teaching Assistant"
       save
 
@@ -196,7 +179,7 @@ class QuestionnairesController < ApplicationController
     @questionnaire.private = !@questionnaire.private
     @questionnaire.save
     @access = @questionnaire.private == true ? "private" : "public"
-    undo_link("the questionnaire \"#{@questionnaire.name}\" has been successfully made #{@access}. ")
+    undo_link("The questionnaire \"#{@questionnaire.name}\" has been successfully made #{@access}. ")
     redirect_to controller: 'tree_display', action: 'list'
   end
 
@@ -221,160 +204,35 @@ class QuestionnairesController < ApplicationController
         flash[:error] = $ERROR_INFO
       end
     end
-    redirect_to action: 'edit', id: questionnaire_id
+    redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
   end
 
-  #=========================================================================================================
-  # Separate methods for quiz questionnaire
-  #=========================================================================================================
-  # View a quiz questionnaire
-  def view_quiz
-    @questionnaire = Questionnaire.find(params[:id])
-    @participant = Participant.find(params[:pid]) # creating an instance variable since it needs to be sent to submitted_content/edit
-    render :view
-  end
-
-  # define a new quiz questionnaire
-  # method invoked by the view
-  def new_quiz
-    valid_request = true
-    @assignment_id = params[:aid] # creating an instance variable to hold the assignment id
-    @participant_id = params[:pid] # creating an instance variable to hold the participant id
-    assignment = Assignment.find(@assignment_id)
-    if !assignment.require_quiz? # flash error if this assignment does not require quiz
-      flash[:error] = "This assignment does not support the quizzing feature."
-      valid_request = false
-    else
-      team = AssignmentParticipant.find(@participant_id).team
-
-      if team.nil? # flash error if this current participant does not have a team
-        flash[:error] = "You should create or join a team first."
-        valid_request = false
-      else
-        if assignment.topics? && team.topic.nil? # flash error if this assignment has topic but current team does not have a topic
-          flash[:error] = "Your team should have a topic."
-          valid_request = false
-        end
-      end
-    end
-
-    if valid_request && Questionnaire::QUESTIONNAIRE_TYPES.include?(params[:model])
-      @questionnaire = Object.const_get(params[:model]).new
-      @questionnaire.private = params[:private]
-      @questionnaire.min_question_score = 0
-      @questionnaire.max_question_score = 1
-
-      render :new_quiz
-    else
-      redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
-    end
-  end
-
-  # seperate method for creating a quiz questionnaire because of differences in permission
-  def create_quiz_questionnaire
-    valid = valid_quiz
-    if valid.eql?("valid")
-      create_questionnaire
-    else
-      flash[:error] = valid.to_s
-      redirect_to :back
-    end
-  end
-
-  # edit a quiz questionnaire
-  def edit_quiz
-    @questionnaire = Questionnaire.find(params[:id])
-    if !@questionnaire.taken_by_anyone?
-      render :edit
-    else
-      flash[:error] = "Your quiz has been taken by some other students, you cannot edit it anymore."
-      redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
-    end
-  end
-
-  # save an updated quiz questionnaire to the database
-  def update_quiz
-    @questionnaire = Questionnaire.find(params[:id])
-    if @questionnaire.nil?
-      redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
-      return
-    end
-    if params['save'] && params[:question].try(:keys)
-      @questionnaire.update_attributes(questionnaire_params)
-
-      params[:question].keys.each do |qid|
-        @question = Question.find(qid)
-        @question.txt = params[:question][qid.to_sym][:txt]
-        @question.save
-
-        @quiz_question_choices = QuizQuestionChoice.where(question_id: qid)
-        i = 1
-        @quiz_question_choices.each do |quiz_question_choice|
-          if @question.type == "MultipleChoiceCheckbox"
-            if params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s]
-              quiz_question_choice.update_attributes(iscorrect: params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:iscorrect], txt: params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:txt])
-            else
-              quiz_question_choice.update_attributes(iscorrect: '0', txt: params[:quiz_question_choices][quiz_question_choice.id.to_s][:txt])
-            end
-          end
-          if @question.type == "MultipleChoiceRadio"
-            if params[:quiz_question_choices][@question.id.to_s][@question.type][:correctindex] == i.to_s
-              quiz_question_choice.update_attributes(iscorrect: '1', txt: params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:txt])
-            else
-              quiz_question_choice.update_attributes(iscorrect: '0', txt: params[:quiz_question_choices][@question.id.to_s][@question.type][i.to_s][:txt])
-            end
-          end
-          if @question.type == "TrueFalse"
-            if params[:quiz_question_choices][@question.id.to_s][@question.type][1.to_s][:iscorrect] == "True" # the statement is correct
-              if quiz_question_choice.txt == "True"
-                quiz_question_choice.update_attributes(iscorrect: '1') # the statement is correct so "True" is the right answer
-              else
-                quiz_question_choice.update_attributes(iscorrect: '0')
-              end
-            else # the statement is not correct
-              if quiz_question_choice.txt == "True"
-                quiz_question_choice.update_attributes(iscorrect: '0')
-              else
-                quiz_question_choice.update_attributes(iscorrect: '1') # the statement is not correct so "False" is the right answer
-              end
-            end
+  # Zhewei: This method is used to save all questions in current questionnaire.
+  def save_all_questions
+    questionnaire_id = params[:id]
+    begin
+      if params[:save]
+        params[:question].each_pair do |k, v|
+          @question = Question.find(k)
+          # example of 'v' value
+          # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
+          v.each_pair do |key, value|
+            @question.send(key + '=', value) if @question.send(key) != value
           end
 
-          i += 1
+          @question.save
+          flash[:success] = 'All questions have been successfully saved!'
         end
       end
+    rescue StandardError
+      flash[:error] = $ERROR_INFO
     end
-    redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
-  end
 
-  def valid_quiz
-    num_quiz_questions = Assignment.find(params[:aid]).num_quiz_questions
-    valid = "valid"
-
-    (1..num_quiz_questions).each do |i|
-      if params[:questionnaire][:name] == ""
-        # questionnaire name is not specified
-        valid = "Please specify quiz name (please do not use your name or id)."
-        break
-      elsif !params.key?(:question_type) || !params[:question_type].key?(i.to_s) || params[:question_type][i.to_s][:type].nil?
-        # A type isnt selected for a question
-        valid = "Please select a type for each question"
-        break
-      else
-        @new_question = Object.const_get(params[:question_type][i.to_s][:type]).create(txt: '', type: params[:question_type][i.to_s][:type], break_before: true)
-        @new_question.update_attributes(txt: params[:new_question][i.to_s])
-        type = params[:question_type][i.to_s][:type]
-        choice_info = params[:new_choices][i.to_s][type] # choice info for one question of its type
-        if choice_info.nil?
-          valid = "Please select a correct answer for all questions"
-          break
-        else
-          valid = @new_question.isvalid(choice_info)
-          break if valid != "valid"
-        end
-      end
+    if params[:view_advice]
+      redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
+    elsif !questionnaire_id.nil?
+      redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
     end
-    valid
   end
 
   private
@@ -454,54 +312,6 @@ class QuestionnairesController < ApplicationController
     end
   end
 
-  # method to save the choices associated with a question in a quiz to the database
-  # only for quiz questionnaire
-  def save_choices(questionnaire_id)
-    return unless params[:new_question] or params[:new_choices]
-    questions = Question.where(questionnaire_id: questionnaire_id)
-    question_num = 1
-
-    questions.each do |question|
-      q_type = params[:question_type][question_num.to_s][:type]
-      params[:new_choices][question_num.to_s][q_type].keys.each do |choice_key|
-        score = if params[:new_choices][question_num.to_s][q_type][choice_key]["weight"] == 1.to_s
-                  1
-                else
-                  0
-                end
-        if q_type == "MultipleChoiceCheckbox"
-          q = if params[:new_choices][question_num.to_s][q_type][choice_key][:iscorrect] == 1.to_s
-                QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
-              else
-                QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
-              end
-          q.save
-        elsif q_type == "TrueFalse"
-          if params[:new_choices][question_num.to_s][q_type][1.to_s][:iscorrect] == choice_key
-            q = QuizQuestionChoice.new(txt: "True", iscorrect: "true", question_id: question.id)
-            q.save
-            q = QuizQuestionChoice.new(txt: "False", iscorrect: "false", question_id: question.id)
-            q.save
-          else
-            q = QuizQuestionChoice.new(txt: "True", iscorrect: "false", question_id: question.id)
-            q.save
-            q = QuizQuestionChoice.new(txt: "False", iscorrect: "true", question_id: question.id)
-            q.save
-          end
-        else
-          q = if params[:new_choices][question_num.to_s][q_type][1.to_s][:iscorrect] == choice_key
-                QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
-              else
-                QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
-              end
-          q.save
-        end
-      end
-      question_num += 1
-      question.weight = 1
-    end
-  end
-
   def questionnaire_params
     params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score,
                                           :max_question_score, :type, :display_type, :instruction_loc)
@@ -513,63 +323,4 @@ class QuestionnairesController < ApplicationController
   end
 
   # FIXME: These private methods belong in the Questionnaire model
-
-  def export
-    @questionnaire = Questionnaire.find(params[:id])
-
-    csv_data = QuestionnaireHelper.create_questionnaire_csv @questionnaire, session[:user].name
-
-    send_data csv_data,
-              type: 'text/csv; charset=iso-8859-1; header=present',
-              disposition: "attachment; filename=questionnaires.csv"
-  end
-
-  def import
-    @questionnaire = Questionnaire.find(params[:id])
-
-    file = params['csv']
-
-    @questionnaire.questions << QuestionnaireHelper.get_questions_from_csv(@questionnaire, file)
-  end
-
-  # clones the contents of a questionnaire, including the questions and associated advice
-  def copy_questionnaire_details(questions, orig_questionnaire)
-    @questionnaire.instructor_id = assign_instructor_id
-    @questionnaire.name = 'Copy of ' + orig_questionnaire.name
-    begin
-      @questionnaire.created_at = Time.now
-      @questionnaire.save!
-      questions.each do |question|
-        new_question = question.dup
-        new_question.questionnaire_id = @questionnaire.id
-        new_question.size = '50,3' if (new_question.is_a? Criterion or new_question.is_a? TextResponse) and new_question.size.nil?
-        new_question.save!
-        advices = QuestionAdvice.where(question_id: question.id)
-        next if advices.empty?
-        advices.each do |advice|
-          new_advice = advice.dup
-          new_advice.question_id = new_question.id
-          new_advice.save!
-        end
-      end
-
-      p_folder = TreeFolder.find_by(name: @questionnaire.display_type)
-      parent = FolderNode.find_by(node_object_id: p_folder.id)
-      QuestionnaireNode.find_or_create_by(parent_id: parent.id, node_object_id: @questionnaire.id)
-      undo_link("Copy of questionnaire #{orig_questionnaire.name} has been created successfully.")
-      redirect_to controller: 'questionnaires', action: 'view', id: @questionnaire.id
-    rescue StandardError
-      flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.' + $ERROR_INFO
-      redirect_to action: 'list', controller: 'tree_display'
-    end
-  end
-
-  def assign_instructor_id
-    # if the user to copy the questionnaire is a TA, the instructor should be the owner instead of the TA
-    if session[:user].role.name != "Teaching Assistant"
-      session[:user].id
-    else # for TA we need to get his instructor id and by default add it to his course for which he is the TA
-      Ta.get_my_instructor(session[:user].id)
-    end
-  end
 end

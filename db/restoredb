@@ -1,4 +1,4 @@
-mysqladmin -u root drop -f expertiza_development
-mysqladmin -u root create expertiza_development
-gunzip -c $1 | mysql -u root expertiza_development
+mysqladmin --user=root --password=ubuntu drop -f expertiza_development
+mysqladmin --user=root --password=ubuntu create expertiza_development
+gunzip -c $1 | mysql --user=root --password=ubuntu expertiza_development
 

@@ -16,6 +16,10 @@
   <% headers["Participant name"] = "18%" %>
 <% end %>                              
 <% headers["Submitted item(s)"] = nil %>
+
+<!--E1970: Added missing header (assignment name) -->
+<h1><%= @assignment.name %></h1>
+
 <!--E1877: table id changed -->
 <table id ="submissionsTable" class="table table-striped" style="margin-top: 50px">
     <thead>

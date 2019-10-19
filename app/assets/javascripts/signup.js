@@ -54,8 +54,8 @@ function toggleSingleTeamAndMember(i) {
 }
 
 function selectAll(source) {
-    checkboxes = document.getElementsByName('mySelectBox');
-    for (var i = 0, n = checkboxes.length; i < n; i++) {
+    checkboxes = document.getElementsByName('Selected-Box');
+    for (var i = 0; i < checkboxes.length; i++) {
         checkboxes[i].checked = source.checked;
     }
 }

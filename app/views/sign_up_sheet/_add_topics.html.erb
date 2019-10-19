@@ -83,7 +83,7 @@ function deleteTopics() {
             method: 'POST',
             data: {
                 idents: identifiers,
-                a_id: <%= @assignment.id %>
+                assignment_id: <%= @assignment.id %>
             },
             success: function() {
 

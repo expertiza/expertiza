@@ -132,6 +132,16 @@ describe SignUpSheetController do
     end
   end
 
+  describe '#delete_all_selected_topics' do
+    it 'delete_all_selected_topics and redirects to edit assignment page' do
+      allow(SignUpTopic).to receive(:find).with(assignment_id: '834',topic_identifier: ['E1732']).and_return(topic)
+      params = {assignment_id: 834, idents: ['E1732']}
+      post :delete_all_selected_topics, params
+      expect(flash[:success]).to eq('All selected topics have been deleted successfully.')
+      expect(response).to redirect_to('/assignments/834/edit#tabs-2')
+    end
+  end
+
   describe '#edit' do
     it 'renders sign_up_sheet#edit page' do
       params = {id: 1}

@@ -85,9 +85,14 @@ class ReviewMappingController < ApplicationController
   def assign_reviewer_dynamically
     assignment = Assignment.find(params[:assignment_id])
     reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
-
-    if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
-      flash[:error] = "No topic is selected.  Please go back and select a topic."
+   
+    @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.id)
+    if @review_mappings.size >= assignment.num_reviews_allowed
+      flash[:notice] = "You cannot do more than " + assignment.num_reviews_allowed.to_s + " reviews based on assignment policy"
+      #redirect_to controller: 'student_review', action: 'list', id: reviewer.id
+    else
+        if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
+        flash[:error] = "No topic is selected.  Please go back and select a topic."
     else
 
       # begin
@@ -117,7 +122,7 @@ class ReviewMappingController < ApplicationController
     # rescue Exception => e
     #   flash[:error] = (e.nil?) ? $! : e
     # end
-
+    end
     redirect_to controller: 'student_review', action: 'list', id: reviewer.id
   end
 

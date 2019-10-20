@@ -19,6 +19,6 @@ end %>
         <% } %>
       </select>
     </td>
-    <td><%= link_to 'New late policy', :controller => 'late_policies', :action => 'new' %></td>
+    <td><%= link_to 'New late policy', :controller => 'late_policies', :action => 'new', :id => params[:id] %></td>
   </tr>
 </table>

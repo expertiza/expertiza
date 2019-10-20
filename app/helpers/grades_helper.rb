@@ -60,7 +60,8 @@ module GradesHelper
   end
 
   def view_heatgrid(participant_id, type)
-    # get participant, team, questionnaires for assignment.
+    # ISSUE-1967
+	# get participant, team, questionnaires for assignment.
     @participant = AssignmentParticipant.find(participant_id)
     @assignment = @participant.assignment
     @team = @participant.team

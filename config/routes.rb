@@ -339,7 +339,7 @@ resources :institution, except: [:destroy] do
     end
   end
 
-  resources :sign_up_sheet, except: %i[index show] do
+  resources :signup_sheet, except: %i[index show] do
     collection do
       get :signup
       get :delete_signup

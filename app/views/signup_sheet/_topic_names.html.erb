@@ -1,4 +1,4 @@
-<!--Only in assignment#edit page, topic name has link on it. In students' sign_up_sheet page, topic name should be plain text.-->
+<!--Only in assignment#edit page, topic name has link on it. In students' signup_sheet page, topic name should be plain text.-->
 <% if params[:controller] == "assignments" and params[:action] == "edit"%>
   <a href="#<%= i %>" onClick="toggleSingleTeamAndMember(<%= i %>)">
     <span class="inline" id="<%= i %>_show"><%= topic.topic_name %> </span>

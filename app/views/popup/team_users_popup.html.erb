@@ -1,6 +1,6 @@
 <div>
   <h3>
-    Members of #{@team.name}
+    Members of <%= @team.name %>
   </h3>
   <table width="100%">
     <% if @team_users.empty? %>
@@ -9,7 +9,7 @@
       <% @team_users.each do |t| %>
         <tr>
           <td>
-            \- #{User.find(t.user_id).fullname}
+            <%= User.find(t.user_id).fullname %>
           </td>
         </tr>
       <% end %>
@@ -47,7 +47,7 @@
             <% if answer.question.is_a?(ScoredQuestion) %>
               <td align="center">
                 <%= answer.answer %>
-                \/#{instance_variable_get('@max_score_round_' + round.to_s)}
+                /<%= instance_variable_get('@max_score_round_' + round.to_s) %>
               </td>
             <% elsif answer.question.is_a?(Checkbox) %>
               <td align="center">
@@ -67,10 +67,10 @@
           <th>Reviewer Score (Σ weighted score/Σ weighted available score)</th>
           <td align="center">
             <%= instance_variable_get('@sum_round_' + round.to_s) %>
-            \/#{instance_variable_get('@total_possible_round_' + round.to_s)}
+            /<%= instance_variable_get('@total_possible_round_' + round.to_s)%>
           </td>
           <td align="left">
-            \= #{instance_variable_get('@total_percentage_round_' + round.to_s)}
+            <%= instance_variable_get('@total_percentage_round_' + round.to_s) %>
           </td>
         </tr>
       </table>

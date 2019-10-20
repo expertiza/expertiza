@@ -21,7 +21,7 @@ describe "peer review testing" do
     user = User.find_by(name: "student2064")
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
-    visit '/sign_up_sheet/sign_up?id=1&topic_id=1' # signup topic
+    visit '/signup_sheet/sign_up?id=1&topic_id=1' # signup topic
     visit '/student_task/list'
     click_link "TestAssignment"
     click_link "Your work"
@@ -76,7 +76,7 @@ describe "peer review testing" do
     user = User.find_by(name: "student2065")
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
-    visit '/sign_up_sheet/sign_up?id=1&topic_id=1'
+    visit '/signup_sheet/sign_up?id=1&topic_id=1'
     visit '/student_task/list'
     click_link "TestAssignment"
     click_link "Others' work"
@@ -90,7 +90,7 @@ describe "peer review testing" do
     user = User.find_by(name: "student2065")
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
-    visit '/sign_up_sheet/sign_up?id=1&topic_id=1'
+    visit '/signup_sheet/sign_up?id=1&topic_id=1'
     visit '/student_task/list'
     click_link "TestAssignment"
     click_link "Others' work"

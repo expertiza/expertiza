@@ -20,7 +20,7 @@ describe "assignment submisstion test" do
     user = User.find_by(name: "student2064")
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
-    visit '/sign_up_sheet/sign_up?id=1&topic_id=1' # signup topic
+    visit '/signup_sheet/sign_up?id=1&topic_id=1' # signup topic
     visit '/student_task/list'
     click_link "Assignment1684"
     click_link "Your work"

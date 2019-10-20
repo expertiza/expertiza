@@ -2,7 +2,7 @@
   <h3>
     Members of <%= @team.name %>
   </h3>
-  <table width="100%">
+  <table class="table table-striped grades" class="width: 100%">
     <% if @team_users.empty? %>
       <tr>No team members</tr>
     <% else %>
@@ -33,49 +33,49 @@
       <h3>
         <%= "Reviewed by #{User.find(@reviewer_id).fullname} (Round #{round})" %>
       </h3>
-      <table border="1px solid #ccc" class="general">
-        <tr>
-          <th align="left" width="50%">Question</th>
-          <th width="5%">Score</th>
-          <th width="45%">Comments</th>
-        </tr>
-        <% instance_variable_get('@scores_round_' + round.to_s).each do |answer| %>
-          <tr>
-            <td align="left">
-              <%= answer.question.txt %>
-            </td>
-            <% if answer.question.is_a?(ScoredQuestion) %>
-              <td align="center">
-                <%= answer.answer %>
-                /<%= instance_variable_get('@max_score_round_' + round.to_s) %>
-              </td>
-            <% elsif answer.question.is_a?(Checkbox) %>
-              <td align="center">
-                <%= answer.answer==0 ? image_tag("delete_icon.png"): image_tag("Check-icon.png") %>
-              </td>
-            <% else %>
-              <td align="center">
-                <%= answer.answer %>
-              </td>
-            <% end %>
-            <td align="left">
-              <%= answer.comments %>
-            </td>
-          </tr>
-        <% end %>
-        <tr>
-          <th>Reviewer Score (Σ weighted score/Σ weighted available score)</th>
-          <td align="center">
-            <%= instance_variable_get('@sum_round_' + round.to_s) %>
-            /<%= instance_variable_get('@total_possible_round_' + round.to_s)%>
+      <table class="table table-striped grades">
+      <% instance_variable_get('@scores_round_' + round.to_s).each do |answer| %>
+      <tr>
+        <th colspan="2">
+          <%= answer.question.seq.to_i %>
+          <%= '. ' %>
+          <%= answer.question.txt %>
+          <%= '[Max points: '%>
+          <%= instance_variable_get('@max_score_round_' + round.to_s) %>
+          <%= ']'%>
+        </th>
+      </tr>
+      
+      <tr>
+        <% if answer.question.is_a?(ScoredQuestion) %>
+          <td align="left" width="5%">
+            <%= answer.answer %>
           </td>
-          <td align="left">
+        <% elsif answer.question.is_a?(Checkbox) %>
+          <td align="left" width="5%>
+            <%= answer.answer==0 ? image_tag("delete_icon.png"): image_tag("Check-icon.png") %>
+          </td>
+        <% end %>
+          <td align="left" width="95%">
+            <%= answer.comments %>
+          </td>
+      </tr>
+    <% end %>
+        </tr>
+        <tr>
+          <th colspan="2">Reviewer Score (Σ weighted score/Σ weighted available score)</th>
+          <tr>
+          <td align="left" width="5%">
+            <%= instance_variable_get('@sum_round_' + round.to_s) %>/<%= instance_variable_get('@total_possible_round_' + round.to_s)%>
+          </td>
+          <td align="left" width="95%">
             <%= instance_variable_get('@total_percentage_round_' + round.to_s) %>
           </td>
+          </tr>
         </tr>
       </table>
-      <br/>
-      <table class="general" width="100%">
+
+      <table class="table table-striped grades" class="width: 100%">
         <tr>
           <th>Additional Comment</th>
         </tr>

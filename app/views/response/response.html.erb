@@ -52,6 +52,9 @@
     var idleTime = 0;
     //threshold to turn off the autosave
     var maxIdleTime = 30;
+    var startDate = new Date();
+    var elapsedTime = 0;
+    var windowOnLoad = 0;
 
     $('#autosave_cbx_lbl').html("&nbsp;Auto save your response every " + interval / 1000 + " seconds?&nbsp;&nbsp;");
 
@@ -60,7 +63,91 @@
       if(vis() && $("#autosave_cbx").prop("checked"))
         executeSave();
     }, interval);
+  
+    /*$(window).focus(function() {
+        startDate = new Date();
+        console.log(elapsedTime);
+        console.log('Focus');
+    });
 
+    $(window).blur(function() {
+        endDate = new Date();
+        elapsedTime += endDate.getTime() - startDate.getTime();
+        console.log(elapsedTime);
+        console.log('Blur');
+    });
+	*/
+	
+	/*$(window).on("beforeunload",function() {
+      	$.ajax({
+            url: "../../../response/trackreviewtime",
+            type: "POST",
+            crossDomain: false,
+            data: elapsedTime
+            success: function (response) {
+              console.log('successfully sent to controller')
+            },
+            error: function (xhr, status) {
+              console.log('Error in sending response to controller')
+            }
+          });
+        
+    	});*/
+
+	$(window).bind("beforeunload",function() {
+        endDate = new Date();
+        elapsedTime += endDate.getTime() - startDate.getTime();
+        console.log(elapsedTime);
+	console.log(endDate.getTime())
+        console.log('Unload');
+	$.ajax({
+            url: "../../../response/track_review_time",
+            type: "POST",
+            crossDomain: false,
+            data: {time:elapsedTime},
+            success: function () {
+              console.log('successfully sent to controller')
+            },
+            error: function () {
+              console.log('Error in sending response to controller')
+            }
+          });
+        });
+	
+	document.addEventListener("visibilitychange", function() {
+	if(document.visibilityState == 'visible' && windowOnLoad == 0){
+	startDate = new Date();
+	console.log(startDate);
+	windowOnLoad = 1;
+	}
+	if(document.visibilityState == 'visible' && windowOnLoad == 1){
+	startDate = new Date();
+	}
+	console.log('visible')
+	});
+
+	document.addEventListener("visibilitychange", function() {
+	if(document.visibilityState == 'hidden'){
+	endDate = new Date();
+	elapsedTime = elapsedTime + (endDate.getTime() - startDate.getTime());
+	console.log('hidden');
+	console.log(endDate.getTime());	
+	console.log(elapsedTime);
+	/*$.ajax({
+            url: "../../../response/track_review_time",
+            type: "POST",
+            crossDomain: false,
+            data: {time:elapsedTime},
+            success: function () {
+              console.log('successfully sent to controller')
+            },
+            error: function () {
+              console.log('Error in sending response to controller')
+            }
+          });
+        */
+	}
+	});
 
     //click ajax
     function executeSave(){

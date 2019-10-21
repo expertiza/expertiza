@@ -77,6 +77,8 @@ class GradesController < ApplicationController
     @summary = sum.summary
     @avg_scores_by_round = sum.avg_scores_by_round
     @avg_scores_by_criterion = sum.avg_scores_by_criterion
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "#{session[:user].name} viewed his grade in alternate view", request)
+
   end
 
   # method for alternative view
@@ -89,7 +91,7 @@ class GradesController < ApplicationController
     @questions = retrieve_questions questionnaires, @assignment.id
     @pscore = @participant.scores(@questions)
     @vmlist = []
-
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "#{session[:user].name} viewed his grade",request)
     # loop through each questionnaire, and populate the view model for all data necessary
     # to render the html tables.
     counter_for_same_rubric = 0

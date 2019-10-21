@@ -259,6 +259,8 @@ resources :institution, except: [:destroy] do
     end
   end
 
+post 'response/track_review_time', to: 'response#track_review_time'
+
   resources :reputation_web_service, only: [] do
     collection do
       get :client
@@ -275,6 +277,7 @@ resources :institution, except: [:destroy] do
       get :redirect
       get :show_calibration_results_for_student
       post :custom_create
+      #post :trackreviewtime
       get :pending_surveys
       get :json
     end
@@ -484,10 +487,12 @@ resources :institution, except: [:destroy] do
   get ':page_name', controller: :content_pages, action: :view, method: :get
   post 'impersonate/impersonate', to: 'impersonate#impersonate'
   post '/plagiarism_checker_results/:id' => 'plagiarism_checker_comparison#save_results'
+  #post 'response/track_review_time', to: 'response#track_review_time'
   get 'instructions/home'
   get 'response/', to: 'response#saving'
   get ':controller/service.wsdl', action: 'wsdl'
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
   get ':controller(/:action(/:id))(.:format)'
+  
   match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
 end

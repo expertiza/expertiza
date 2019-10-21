@@ -107,6 +107,7 @@ class StudentTeamsController < ApplicationController
   end
 
   def advertise_for_partners
+    ExpetizaLogger.info LoggerMessage.new(controller_name,session[:user].name, 'Advertise for partners sent',request)
     Team.update_all advertise_for_partner: true, id: params[:team_id]
   end
 
@@ -119,6 +120,7 @@ class StudentTeamsController < ApplicationController
     # remove the record from teams_users table
     team_user = TeamsUser.where(team_id: params[:team_id], user_id: student.user_id)
     remove_team_user(team_user)
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Left the team')
     # if your old team does not have any members, delete the entry for the team
     if TeamsUser.where(team_id: params[:team_id]).empty?
       old_team = AssignmentTeam.find params[:team_id]
@@ -155,7 +157,7 @@ class StudentTeamsController < ApplicationController
     return false unless team_user
     team_user.destroy_all
     undo_link "The user \"#{team_user.name}\" has been successfully removed from the team."
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'User removed a participant from the team', request)
+    #ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'User removed a participant from the team', request)
   end
 
   def team_created_successfully(current_team = nil)

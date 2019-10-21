@@ -54,7 +54,7 @@ class SignUpSheet < ActiveRecord::Base
     if !slotAvailable?(topic_id)
       sign_up.is_waitlisted = true
       result = true if sign_up.save
-      ExpertizaLogger.info LoggerMessage.new('SignUpSheet', '', "Sign up sheet created for waitlisted with teamId #{team_id}")
+      ExpertizaLogger.info LoggerMessage.new('SignUpSheet', '', "Sign up sheet created for waitlisted with teamId #{team_id} and topicId #{topic_id}")
     else
       # if slot exist, then confirm the topic for the user and delete all the waitlist for this user
       result = cancel_all_wailists(assignment_id, sign_up, team_id, topic_id, user_id)
@@ -82,6 +82,8 @@ class SignUpSheet < ActiveRecord::Base
       SignedUpTeam.create(topic_id: topic_id, team_id: team_id, is_waitlisted: 0, preference_priority_number: nil)
       ExpertizaLogger.info LoggerMessage.new('SignUpSheet', user_id, "Sign up sheet created with teamId #{team_id}")
     else
+      id = TeamsUser.team_id(assignment_id, user_id)
+      ExpertizaLogger.info LoggerMessage.new('SignUpSheet', user_id, "teamId #{id} has been put on waitlist for the topicID #{topic_id}")
       sign_up.is_waitlisted = true
     end
     [team_id, topic_id]

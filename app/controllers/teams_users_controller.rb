@@ -65,6 +65,8 @@ class TeamsUsersController < ApplicationController
     @user = User.find(@teams_user.user_id)
     @teams_user.destroy
     undo_link("The team user \"#{@user.name}\" has been successfully removed. ")
+    #ExpertizaLogger.info LoggerMessage.new('Left a team',@user.id,"The team user #{@user.name} has left the team")
+    ExpertizaLogger.info LoggerMessage.new(controller_name,session[:user].name,"#{@user.name} was removed from the team #{@teams_user.team_id}")	
     redirect_to controller: 'teams', action: 'list', id: parent_id
   end
 

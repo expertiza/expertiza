@@ -2,6 +2,8 @@ class ResponseController < ApplicationController
   helper :submitted_content
   helper :file
 
+ 
+
   def action_allowed?
     response = user_id = nil
     action = params[:action]
@@ -36,6 +38,11 @@ class ResponseController < ApplicationController
     end
   end
 
+  def track_review_time
+    @time = params[:time]
+    ExpertizaLogger.info LoggerMessage.new(controller_name,session[:user].name,"Printing the value of elapsed time checkkkkkk #{@time}",request)
+    render plain: "OK"
+  end
   # GET /response/json?response_id=xx
   def json
     response_id = params[:response_id] if params.key?(:response_id)
@@ -88,6 +95,7 @@ class ResponseController < ApplicationController
       @questionnaire = set_questionnaire
       questions = sort_questions(@questionnaire.questions)
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Last answer object was created", request)
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
     rescue StandardError
@@ -110,6 +118,7 @@ class ResponseController < ApplicationController
     @response = Response.where(map_id: @map.id, round: @current_round.to_i).order(updated_at: :desc).first
     if @response.nil? || AssignmentTeam.find(@map.reviewee_id).most_recent_submission.updated_at > @response.updated_at
       @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
+      ExpertizaLogger.info LoggerMessage.new(controller_name,session[:user].name,"Response object created at time",request)
     end
     questions = sort_questions(@questionnaire.questions)
     init_answers(questions)
@@ -358,7 +367,7 @@ class ResponseController < ApplicationController
       score = Answer.where(response_id: @response.id, question_id: questions[k.to_i].id).first
       score ||= Answer.create(response_id: @response.id, question_id: questions[k.to_i].id, answer: v[:score], comments: v[:comment])
       score.update_attribute('answer', v[:score])
-      score.update_attribute('comments', v[:comment])
+      score.update_attribute('comments', v[:comment])	
     end
   end
 

@@ -47,15 +47,13 @@
       </tr>
       
       <tr>
-        <% if answer.question.is_a?(ScoredQuestion) %>
-          <td align="left" width="5%">
-            <%= answer.answer %>
-          </td>
-        <% elsif answer.question.is_a?(Checkbox) %>
-          <td align="left" width="5%>
-            <%= answer.answer==0 ? image_tag("delete_icon.png"): image_tag("Check-icon.png") %>
-          </td>
-        <% end %>
+        <td align="left" width="5%">
+          <% if answer.question.is_a?(ScoredQuestion) %>
+            <%= answer.answer %>  
+          <% elsif answer.question.is_a?(Checkbox) %>
+            <%= answer.answer==0 ? image_tag("delete_icon.png"): image_tag("Check-icon.png") %>  
+          <% end %>
+        </td>
           <td align="left" width="95%">
             <%= answer.comments %>
           </td>

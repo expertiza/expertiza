@@ -266,6 +266,8 @@ describe 'AssignmentTeam' do
         team.submit_hyperlink("www.ncsu.edu  ")
       end
     end
+
+    context "when submit a hyperlink "
   end
 
   describe "#remove_hyperlink" do

@@ -175,6 +175,7 @@ describe ReviewResponseMap do
         .to change { ActionMailer::Base.deliveries.count }.by 1
   end
 
+  #E 1961
   it '#email should not send email when email on review attribute is disabled' do
     reviewer_id = 1
     allow(Participant).to receive(:find).with(1).and_return(participant)

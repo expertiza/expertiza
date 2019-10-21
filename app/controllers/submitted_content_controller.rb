@@ -57,6 +57,24 @@ class SubmittedContentController < ApplicationController
       end
       ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The link has been successfully submitted.', request)
       undo_link("The link has been successfully submitted.")
+
+      # E1941 Fall 19
+      if !@participant.is_in_first_round?
+        @participant.reviewers.each do |reviewer|
+          map = ReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', reviewer.id, @participant.team.id]).first
+          responses = Response.where(:map_id => map.id)
+          responses = responses.sort_by { |obj| obj.updated_at }
+
+          # the latest response will be the last
+          latest_response = responses.last
+
+          # we need to pass the id of lastest_response in the URL mentioned in the mail.
+          # this will open the correct /response/edit?id=#{latest_response.id} page for the reviewer when (s)he clicks on it.
+          Mailer.delayed_message(bcc: [User.find(reviewer.user_id).email],
+                                 subject: "You have a new submission to review",
+                                 body: "Please visit https://expertiza.ncsu.edu/response/edit?id=#{latest_response.id} and proceed to peer reviews.").deliver_now
+        end
+      end
     end
     redirect_to action: 'edit', id: @participant.id
   end

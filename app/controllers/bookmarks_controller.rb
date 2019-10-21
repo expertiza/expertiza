@@ -23,11 +23,11 @@ class BookmarksController < ApplicationController
     params[:url] = params[:url].gsub!(/http:\/\//, "") if params[:url].start_with?('http://')
     params[:url] = params[:url].gsub!(/https:\/\//, "") if params[:url].start_with?('https://')
     begin
-      Bookmark.create(url: params[:url], title: params[:title], description: params[:description], user_id: session[:user].id, topic_id: params[:topic_id])
+      Bookmark.create!(url: params[:url], title: params[:title], description: params[:description], user_id: session[:user].id, topic_id: params[:topic_id])
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Your bookmark has been successfully created!', request)
       flash[:success] = 'Your bookmark has been successfully created!'
     rescue StandardError
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, $ERROR_INFO, request)
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, $ERROR_INFO.to_s, request)
       flash[:error] = $ERROR_INFO
     end
     redirect_to action: 'list', id: params[:topic_id]
@@ -39,9 +39,14 @@ class BookmarksController < ApplicationController
 
   def update
     @bookmark = Bookmark.find(params[:id])
-    @bookmark.update_attributes(url: params[:bookmark][:url], title: params[:bookmark][:title], description: params[:bookmark][:description])
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Your bookmark has been successfully updated!', request)
-    flash[:success] = 'Your bookmark has been successfully updated!'
+    begin
+      @bookmark.update_attributes!(url: params[:bookmark][:url], title: params[:bookmark][:title], description: params[:bookmark][:description])
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Your bookmark has been successfully updated!', request)
+      flash[:success] = 'Your bookmark has been successfully updated!'
+    rescue StandardError
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, $ERROR_INFO.to_s, request)
+      flash[:error] = 'Bookmark could not be updated: ' + $ERROR_INFO.to_s
+    end
     redirect_to action: 'list', id: @bookmark.topic_id
   end
 

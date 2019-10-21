@@ -48,6 +48,12 @@ function microtaskChanged() {
 <td style='padding:5px'><%= select('assignment_form[assignment]', 'course_id', course_options(@assignment_form.assignment.instructor), {:selected => @assignment_form.assignment.course_id}, {:class => "form-control", :style => 'width: 250px'}) %></td>
 </tr>
 
+<tr><div class="form-inline">
+<td style='padding:5px'><%= label_tag('assignment_form[assignment][directory_path]', 'Submission directory:') %></td>
+<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, :style => 'width:250px', class: 'form-control', :readonly => true) %> (Note: Directory name will always be auto generated)
+<img src="/assets/info.png" title='- DO NOT change this filed for an on-going assignment. This may cause lost of student submitted file.'>
+</td></div>
+</tr>
 
 <tr>
 <td style='padding:5px'><%= label_tag('assignment_form[assignment][spec_location]', 'Description URL: ') %></td>

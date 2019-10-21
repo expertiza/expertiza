@@ -296,17 +296,17 @@ class ReviewMappingController < ApplicationController
         teams << team
       end
     end
-    student_review_num = params[:num_reviews_per_student].to_i
+    num_reviews_per_student = params[:num_reviews_per_student].to_i
     submission_review_num = params[:num_reviews_per_submission].to_i
     calibrated_artifacts_num = params[:num_calibrated_artifacts].to_i
     uncalibrated_artifacts_num = params[:num_uncalibrated_artifacts].to_i
     if calibrated_artifacts_num.zero? and uncalibrated_artifacts_num.zero?
       # check for exit paths first
-      if student_review_num == 0 and submission_review_num == 0
+      if num_reviews_per_student == 0 and submission_review_num == 0
         flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
-      elsif student_review_num != 0 and submission_review_num != 0
+      elsif num_reviews_per_student != 0 and submission_review_num != 0
         flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
-      elsif student_review_num >= teams.size
+      elsif num_reviews_per_student >= teams.size
         # Exception detection: If instructor want to assign too many reviews done
         # by each student, there will be an error msg.
         flash[:error] = 'You cannot set the number of reviews done ' \
@@ -314,7 +314,7 @@ class ReviewMappingController < ApplicationController
                          '[or "participants" if it is an individual assignment].'
       else
         # REVIEW: mapping strategy
-        automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num, submission_review_num)
+        automatic_review_mapping_strategy(assignment_id, participants, teams, num_reviews_per_student, submission_review_num)
       end
     else
       teams_with_calibrated_artifacts = []

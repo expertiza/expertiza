@@ -280,6 +280,25 @@ class ReviewMappingController < ApplicationController
     @items = AssignmentTeam.where(parent_id: @assignment.id)
     @items.sort_by(&:name)
   end
+ 
+  # Helper Method to check num_reviews_per_student and num_reviews_per_submission arguments passed in by params hash.
+  def check_num_reviews_args(num_reviews_per_student, num_reviews_per_submission)
+    has_error_not_raised = true
+    # check for exit paths first
+    if num_reviews_per_student == 0 and num_reviews_per_submission == 0
+      flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
+      has_error_not_raised = false
+    elsif num_reviews_per_student != 0 and num_reviews_per_submission != 0
+      flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
+      has_error_not_raised = false
+    elsif num_reviews_per_student >= teams.size
+      # Exception detection: If instructor want to assign too many reviews done
+      # by each student, there will be an error msg.
+      flash[:error] = 'You cannot set the number of reviews done ' \
+                       'by each student to be greater than or equal to total number of teams ' \
+                       '[or "participants" if it is an individual assignment].'
+      has_error_not_raised = false
+  end
 
   def automatic_review_mapping
     assignment_id = params[:id].to_i
@@ -301,21 +320,10 @@ class ReviewMappingController < ApplicationController
     num_calibrated_artifacts = params[:num_calibrated_artifacts].to_i
     num_uncalibrated_artifacts = params[:num_uncalibrated_artifacts].to_i
     if num_calibrated_artifacts.zero? and num_uncalibrated_artifacts.zero?
-      # check for exit paths first
-      if num_reviews_per_student == 0 and num_reviews_per_submission == 0
-        flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
-      elsif num_reviews_per_student != 0 and num_reviews_per_submission != 0
-        flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
-      elsif num_reviews_per_student >= teams.size
-        # Exception detection: If instructor want to assign too many reviews done
-        # by each student, there will be an error msg.
-        flash[:error] = 'You cannot set the number of reviews done ' \
-                         'by each student to be greater than or equal to total number of teams ' \
-                         '[or "participants" if it is an individual assignment].'
-      else
-        # REVIEW: mapping strategy
-        automatic_review_mapping_strategy(assignment_id, participants, teams, num_reviews_per_student, num_reviews_per_submission)
-      end
+        if check_num_reviews_args(num_reviews_per_student, num_reviews_per_submission)
+          # REVIEW: mapping strategy
+          automatic_review_mapping_strategy(assignment_id, participants, teams, num_reviews_per_student, num_reviews_per_submission) 
+        end
     else
       teams_with_calibrated_artifacts = []
       teams_with_uncalibrated_artifacts = []

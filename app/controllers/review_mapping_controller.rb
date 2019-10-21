@@ -297,10 +297,10 @@ class ReviewMappingController < ApplicationController
       end
     end
     num_reviews_per_student = params[:num_reviews_per_student].to_i         #Number of sumbissions that can be reviewed by a single student
-    num_reviews_per_submission = params[:num_reviews_per_submission].to_i   #Toal number of reviews that can be performed on a single submission (or equivalently, number of students that can review the same submission)
-    calibrated_artifacts_num = params[:num_calibrated_artifacts].to_i
-    uncalibrated_artifacts_num = params[:num_uncalibrated_artifacts].to_i
-    if calibrated_artifacts_num.zero? and uncalibrated_artifacts_num.zero?
+    num_reviews_per_submission = params[:num_reviews_per_submission].to_i   #Toal number of reviews that can be performed on a single submission (or equivalently, number of students that can review the same submiss)
+    num_calibrated_artifacts = params[:num_calibrated_artifacts].to_i
+    num_uncalibrated_artifacts = params[:num_uncalibrated_artifacts].to_i
+    if num_calibrated_artifacts.zero? and num_uncalibrated_artifacts.zero?
       # check for exit paths first
       if num_reviews_per_student == 0 and num_reviews_per_submission == 0
         flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
@@ -324,11 +324,11 @@ class ReviewMappingController < ApplicationController
       end
       teams_with_uncalibrated_artifacts = teams - teams_with_calibrated_artifacts
       # REVIEW: mapping strategy
-      automatic_review_mapping_strategy(assignment_id, participants, teams_with_calibrated_artifacts.shuffle!, calibrated_artifacts_num, 0)
+      automatic_review_mapping_strategy(assignment_id, participants, teams_with_calibrated_artifacts.shuffle!, num_calibrated_artifacts, 0)
       # REVIEW: mapping strategy
       # since after first mapping, participants (delete_at) will be nil
       participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.select(&:can_review).shuffle!
-      automatic_review_mapping_strategy(assignment_id, participants, teams_with_uncalibrated_artifacts.shuffle!, uncalibrated_artifacts_num, 0)
+      automatic_review_mapping_strategy(assignment_id, participants, teams_with_uncalibrated_artifacts.shuffle!, num_uncalibrated_artifacts, 0)
     end
     redirect_to action: 'list_mappings', id: assignment_id
   end

@@ -28,31 +28,50 @@ class AssignmentsController < ApplicationController
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
     if params[:button]
-      if @assignment_form.save
-        @assignment_form.create_assignment_node
-        exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
-        assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
-        if assignment_form_params[:assignment][:directory_path].blank?
-          assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
+      safe_filename = @assignment_form.assignment.name.tr('\\', "/") #new
+      safe_filename = FileHelper.sanitize_filename(safe_filename) # new
+      assignment_form_params[:assignment][:directory_path] = File.split(safe_filename).last.tr(" ", '_') #new
+      exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
+      exist_directory = Assignment.find_by(directory_path: assignment_form_params[:assignment][:directory_path], course_id: @assignment_form.assignment.course_id)
+      if !exist_assignment and !exist_directory
+        if @assignment_form.save
+          @assignment_form.create_assignment_node
+          current_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
+          assignment_form_params[:assignment][:id] = current_assignment.id.to_s
+          # exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
+          # assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
+          # if !exist_assignment
+          #if assignment_form_params[:assignment][:directory_path].blank?
+           # assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
+          #end
+          ques_array = assignment_form_params[:assignment_questionnaire]
+          due_array = assignment_form_params[:due_date]
+          ques_array.each do |cur_questionnaire|
+            #cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
+            cur_questionnaire[:assignment_id] = current_assignment.id.to_s
+          end
+          due_array.each do |cur_due|
+            #cur_due[:parent_id] = exist_assignment.id.to_s
+            cur_due[:parent_id] = current_assignment.id.to_s
+          end
+          assignment_form_params[:assignment_questionnaire] = ques_array
+          assignment_form_params[:due_date] = due_array
+          @assignment_form.update(assignment_form_params, current_user)
+          aid = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id).id
+          ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
+          redirect_to edit_assignment_path aid
+          undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
+          return
+          #else
+           # flash.now[:error] = "Kindly enter a different assignment name"
+            #render 'new'
+          #end
+        else
+          flash.now[:error] = "Failed to create assignment"
+          render 'new'
         end
-        ques_array = assignment_form_params[:assignment_questionnaire]
-        due_array = assignment_form_params[:due_date]
-        ques_array.each do |cur_questionnaire|
-          cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
-        end
-        due_array.each do |cur_due|
-          cur_due[:parent_id] = exist_assignment.id.to_s
-        end
-        assignment_form_params[:assignment_questionnaire] = ques_array
-        assignment_form_params[:due_date] = due_array
-        @assignment_form.update(assignment_form_params, current_user)
-        aid = Assignment.find_by(name: @assignment_form.assignment.name).id
-        ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
-        redirect_to edit_assignment_path aid
-        undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
-        return
       else
-        flash.now[:error] = "Failed to create assignment"
+        flash.now[:error] = "This assignment/directory already exists in the selected course. Kindly rename the assignment."
         render 'new'
       end
     else
@@ -76,7 +95,7 @@ class AssignmentsController < ApplicationController
     @due_date_all = update_nil_dd_description_url(@due_date_all)
     # only when instructor does not assign rubrics and in assignment edit page will show this error message.
     handle_rubrics_not_assigned_case
-    handle_assignment_directory_path_nonexist_case_and_answer_tagging
+    handle_answer_tagging
     # assigned badges will hold all the badges that have been assigned to an assignment
     # added it to display the assigned badges while creating a badge in the assignments page
     @assigned_badges = @assignment_form.assignment.badges
@@ -317,11 +336,11 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  def handle_assignment_directory_path_nonexist_case_and_answer_tagging
-    if @assignment_form.assignment.directory_path.blank?
-      flash.now[:error] = "You did not specify your submission directory."
-      ExpertizaLogger.error LoggerMessage.new(controller_name, "", "Submission directory not specified", request)
-    end
+  def handle_answer_tagging
+    #if @assignment_form.assignment.directory_path.blank?
+    #  flash.now[:error] = "You did not specify your submission directory."
+    #  ExpertizaLogger.error LoggerMessage.new(controller_name, "", "Submission directory not specified", request)
+    #end
     @assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id]) if @assignment_form.assignment.is_answer_tagging_allowed
   end
 

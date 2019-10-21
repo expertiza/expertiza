@@ -37,26 +37,31 @@
       <% instance_variable_get('@scores_round_' + round.to_s).each do |answer| %>
       <tr>
         <th colspan="2">
-          <%= answer.question.seq.to_i %>
-          <%= '. ' %>
-          <%= answer.question.txt %>
-          <%= '[Max points: '%>
-          <%= instance_variable_get('@max_score_round_' + round.to_s) %>
-          <%= ']'%>
+          <% if answer.question.is_a?(ScoredQuestion) %>
+            <%= answer.question.seq.to_i %>
+            <%= '. ' %>
+            <%= answer.question.txt %>
+            <%= '[Max points: '%>
+            <%= instance_variable_get('@max_score_round_' + round.to_s) %>
+            <%= ']'%>
+          <% elsif answer.question.is_a?(Checkbox) %>
+            <%= answer.question.seq.to_i %>
+            <%= '.' %>&nbsp;
+            <%= answer.answer==0 ? image_tag("delete_icon.png"): image_tag("Check-icon.png") %>
+            <%= answer.question.txt %>
+          <% end %>
         </th>
       </tr>
-      
+  
       <tr>
-        <td align="left" width="5%">
-          <% if answer.question.is_a?(ScoredQuestion) %>
+        <% if answer.question.is_a?(ScoredQuestion) %>
+          <td align="left" width="5%">
             <%= answer.answer %>  
-          <% elsif answer.question.is_a?(Checkbox) %>
-            <%= answer.answer==0 ? image_tag("delete_icon.png"): image_tag("Check-icon.png") %>  
-          <% end %>
-        </td>
+          </td>
           <td align="left" width="95%">
             <%= answer.comments %>
           </td>
+        <% end %>
       </tr>
     <% end %>
         </tr>

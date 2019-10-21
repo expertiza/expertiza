@@ -296,15 +296,15 @@ class ReviewMappingController < ApplicationController
         teams << team
       end
     end
-    num_reviews_per_student = params[:num_reviews_per_student].to_i
-    submission_review_num = params[:num_reviews_per_submission].to_i
+    num_reviews_per_student = params[:num_reviews_per_student].to_i         #Number of sumbissions that can be reviewed by a single student
+    num_reviews_per_submission = params[:num_reviews_per_submission].to_i   #Toal number of reviews that can be performed on a single submission (or equivalently, number of students that can review the same submission)
     calibrated_artifacts_num = params[:num_calibrated_artifacts].to_i
     uncalibrated_artifacts_num = params[:num_uncalibrated_artifacts].to_i
     if calibrated_artifacts_num.zero? and uncalibrated_artifacts_num.zero?
       # check for exit paths first
-      if num_reviews_per_student == 0 and submission_review_num == 0
+      if num_reviews_per_student == 0 and num_reviews_per_submission == 0
         flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
-      elsif num_reviews_per_student != 0 and submission_review_num != 0
+      elsif num_reviews_per_student != 0 and num_reviews_per_submission != 0
         flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
       elsif num_reviews_per_student >= teams.size
         # Exception detection: If instructor want to assign too many reviews done
@@ -314,7 +314,7 @@ class ReviewMappingController < ApplicationController
                          '[or "participants" if it is an individual assignment].'
       else
         # REVIEW: mapping strategy
-        automatic_review_mapping_strategy(assignment_id, participants, teams, num_reviews_per_student, submission_review_num)
+        automatic_review_mapping_strategy(assignment_id, participants, teams, num_reviews_per_student, num_reviews_per_submission)
       end
     else
       teams_with_calibrated_artifacts = []
@@ -445,7 +445,7 @@ class ReviewMappingController < ApplicationController
   end
 
 
-  ## Helper Method for generating a random participant which is to be used in peer_review_strategy method. 
+  ## Helper Method for generating a random participant which is to be used in peer_review_strategy method.
   def gen_random_participant_id(iterator, participants_hash, num_participants, participants)
     if iterator.zero?
         rand_num = rand(0..num_participants - 1)
@@ -469,7 +469,7 @@ class ReviewMappingController < ApplicationController
                end
     end
     return rand_num
-  end 
+  end
 
   def peer_review_strategy(assignment_id, review_strategy, participants_hash)
     teams = review_strategy.teams
@@ -494,7 +494,7 @@ class ReviewMappingController < ApplicationController
 
           # generate random number
           rand_num = gen_random_participant_id(iterator, participants_hash, num_participants, participants)
-          
+
           # prohibit one student to review his/her own artifact
           next if TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id)
 

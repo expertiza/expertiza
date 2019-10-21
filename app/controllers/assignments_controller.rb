@@ -38,20 +38,12 @@ class AssignmentsController < ApplicationController
           @assignment_form.create_assignment_node
           current_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
           assignment_form_params[:assignment][:id] = current_assignment.id.to_s
-          # exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
-          # assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
-          # if !exist_assignment
-          #if assignment_form_params[:assignment][:directory_path].blank?
-           # assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
-          #end
           ques_array = assignment_form_params[:assignment_questionnaire]
           due_array = assignment_form_params[:due_date]
           ques_array.each do |cur_questionnaire|
-            #cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
             cur_questionnaire[:assignment_id] = current_assignment.id.to_s
           end
           due_array.each do |cur_due|
-            #cur_due[:parent_id] = exist_assignment.id.to_s
             cur_due[:parent_id] = current_assignment.id.to_s
           end
           assignment_form_params[:assignment_questionnaire] = ques_array
@@ -62,10 +54,6 @@ class AssignmentsController < ApplicationController
           redirect_to edit_assignment_path aid
           undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
           return
-          #else
-           # flash.now[:error] = "Kindly enter a different assignment name"
-            #render 'new'
-          #end
         else
           flash.now[:error] = "Failed to create assignment"
           render 'new'
@@ -337,10 +325,6 @@ class AssignmentsController < ApplicationController
   end
 
   def handle_answer_tagging
-    #if @assignment_form.assignment.directory_path.blank?
-    #  flash.now[:error] = "You did not specify your submission directory."
-    #  ExpertizaLogger.error LoggerMessage.new(controller_name, "", "Submission directory not specified", request)
-    #end
     @assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id]) if @assignment_form.assignment.is_answer_tagging_allowed
   end
 

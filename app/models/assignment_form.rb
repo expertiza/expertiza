@@ -346,7 +346,9 @@ class AssignmentForm
         notification_limit: aq.notification_limit,
         questionnaire_weight: aq.questionnaire_weight,
         used_in_round: aq.used_in_round,
-        dropdown: aq.dropdown
+        dropdown: aq.dropdown,
+        # E1970 Fix issue #1213
+        use_dropdown_instead: aq.use_dropdown_instead
       )
     end
   end

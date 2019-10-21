@@ -27,7 +27,13 @@
         }
         html += '</select></td>';
         //Use dropdown instead
-        html += '<td align="center"><input type="checkbox" name="dropdown" id="dropdown" value="true"></td>';
+        // E1970 fix issue #1312
+        if (assignment_questionnaire.use_dropdown_instead){
+          html += '<td align="center"><input type="checkbox" name="assignment_form[assignment_questionnaire][][use_dropdown_instead]" id="dropdown" value="true" checked ></td>';
+        }
+        else{
+          html += '<td align="center"><input type="checkbox" name="assignment_form[assignment_questionnaire][][use_dropdown_instead]" id="dropdown" value="true"></td>';
+        }
         //Scored question display type (Dropdown or Scale)
         html += '<td align="center"><select id="scored_question_display_type", name="assignment_form[assignment_questionnaire][][dropdown]" class="form-control">';
           if (assignment_questionnaire.dropdown == true) {

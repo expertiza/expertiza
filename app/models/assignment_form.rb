@@ -327,8 +327,8 @@ class AssignmentForm
       new_assign.create_node
       new_assign_id = new_assign.id
       # also copy topics from old assignment
-      topics = SignUpTopic.where(assignment_id: old_assign.id)
       if copytopics == 'Y'
+        topics = SignUpTopic.where(assignment_id: old_assign.id)
         topics.each do |topic|
           SignUpTopic.create(topic_name: topic.topic_name, assignment_id: new_assign_id, max_choosers: topic.max_choosers, category: topic.category, topic_identifier: topic.topic_identifier, micropayment: topic.micropayment)
         end

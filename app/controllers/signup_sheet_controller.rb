@@ -89,15 +89,8 @@ class SignupSheetController < ApplicationController
   def update
     @topic = SignUpTopic.find(params[:id])
     if @topic
-      # @topic.topic_identifier = params[:topic][:topic_identifier]
       update_max_choosers @topic
       updated_max_choosers = @topic.max_choosers
-      # @topic.category = params[:topic][:category]
-      # @topic.topic_name = params[:topic][:topic_name]
-      # @topic.micropayment = params[:topic][:micropayment]
-      # @topic.description = params[:topic][:description]
-      # @topic.link = params[:topic][:link]
-      # @topic.save
       @topic.update_attributes(topic_identifier: params[:topic][:topic_identifier], max_choosers: updated_max_choosers, category: params[:topic][:category], topic_name: params[:topic][:topic_name], micropayment: params[:topic][:micropayment], description: params[:topic][:description], link: params[:topic][:link])
       undo_link("The topic: \"#{@topic.topic_name}\" has been successfully updated. ")
     else
@@ -224,9 +217,12 @@ class SignupSheetController < ApplicationController
     redirect_to action: 'list', id: params[:id]
   end
 
-  # routes to new page to specficy student
+  # routes to new page to specific student
   def signup_as_instructor; end
 
+  # This method finds the user from the username present in the params. If the student does not exist, returns "does not exist" message, else it checks
+  # whether it exists as a participant and signs it up for the topic, else displays the message "already signed up" and "not registered for the assignment"
+  # At the end, it redirects to the edit action of the assignments controller.
   def signup_as_instructor_action
     user = User.find_by(name: params[:username])
     if user.nil? # validate invalid user

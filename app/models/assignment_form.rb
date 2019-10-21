@@ -310,7 +310,7 @@ class AssignmentForm
   end
 
   # Copies the inputted assignment into new one and returns the new assignment id
-  def self.copy(assignment_id, user)
+  def self.copy(assignment_id, copytopics, user)
     Assignment.record_timestamps = false
     old_assign = Assignment.find(assignment_id)
     new_assign = old_assign.dup
@@ -328,8 +328,10 @@ class AssignmentForm
       new_assign_id = new_assign.id
       # also copy topics from old assignment
       topics = SignUpTopic.where(assignment_id: old_assign.id)
-      topics.each do |topic|
-        SignUpTopic.create(topic_name: topic.topic_name, assignment_id: new_assign_id, max_choosers: topic.max_choosers, category: topic.category, topic_identifier: topic.topic_identifier, micropayment: topic.micropayment)
+      if copytopics == 'Y'
+        topics.each do |topic|
+          SignUpTopic.create(topic_name: topic.topic_name, assignment_id: new_assign_id, max_choosers: topic.max_choosers, category: topic.category, topic_identifier: topic.topic_identifier, micropayment: topic.micropayment)
+        end
       end
     else
       new_assign_id = nil
@@ -340,14 +342,15 @@ class AssignmentForm
   def self.copy_assignment_questionnaire(old_assign, new_assign, user)
     old_assign.assignment_questionnaires.each do |aq|
       AssignmentQuestionnaire.create(
-        assignment_id: new_assign.id,
-        questionnaire_id: aq.questionnaire_id,
-        user_id: user.id,
-        notification_limit: aq.notification_limit,
-        questionnaire_weight: aq.questionnaire_weight,
-        used_in_round: aq.used_in_round,
-        dropdown: aq.dropdown
+          assignment_id: new_assign.id,
+          questionnaire_id: aq.questionnaire_id,
+          user_id: user.id,
+          notification_limit: aq.notification_limit,
+          questionnaire_weight: aq.questionnaire_weight,
+          used_in_round: aq.used_in_round,
+          dropdown: aq.dropdown
       )
     end
   end
 end
+

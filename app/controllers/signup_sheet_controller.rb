@@ -231,7 +231,7 @@ class SignupSheetController < ApplicationController
       if AssignmentParticipant.exists? user_id: user.id, parent_id: params[:assignment_id] and SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
         flash[:success] = "You have successfully signed up the student for the topic!"
         ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor signed up student for topic: ' + params[:topic_id].to_s)
-      elsif AssignmentParticipant.exists? user_id: user.id, parent_id: params[:assignment_id] and !SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
+      elsif AssignmentParticipant.exists? user_id: user.id, parent_id: params[:assignment_id]
         flash[:error] = "The student has already signed up for a topic!"
         ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor is signing up a student who already has a topic')
       else

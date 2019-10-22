@@ -134,11 +134,8 @@ module ReviewMappingHelper
 		x.each {|metric| instance_variable_set('@' + metric.to_s, '-----') }
 	end
 
-	def calculate_metrics(x)
-		 x.each do |metric|
-        metric_value = @avg_and_ranges[team_id][round][metric].nil? ? '-----' : @avg_and_ranges[team_id][round][metric].round(0).to_s + '%'
-        instance_variable_set('@' + metric.to_s, metric_value)
-      end
+	def calculate_metric_value(metric, round, team_id)
+        return @avg_and_ranges[team_id][round][metric].nil? ? '-----' : @avg_and_ranges[team_id][round][metric].round(0).to_s + '%'
 	end
 
   # gets minimum, maximum and average value for all the reviews
@@ -146,6 +143,9 @@ module ReviewMappingHelper
     set_metrics(%i[max min avg])
     if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? {|k| @avg_and_ranges[team_id][round].key? k }
     	calculate_metrics(%i[max min avg])
+			%i[max min avg].each do |metric|
+        instance_variable_set('@' + metric.to_s, calculate_metric_value(metric, round, team_id))
+			end
     end
   end
 

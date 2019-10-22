@@ -112,15 +112,13 @@ class AssignmentsController < ApplicationController
   end
 
   def copy#Issue #1341 - Might require to modify below code
-    print ('copy function')
-    print (params[:id])
-    print (params[:copytopics])
     @user = current_user
     session[:copy_flag] = true
     # check new assignment submission directory and old assignment submission directory
     old_assign = Assignment.find(params[:id])
     new_assign_id = AssignmentForm.copy(params[:id], params[:copytopics], @user)
     if new_assign_id
+      flash[:success] = 'The assignment was successfully Copied.'
       new_assign = Assignment.find(new_assign_id)
       if old_assign.directory_path == new_assign.directory_path
         flash[:note] = "Warning: The submission directory for the copy of this assignment will be the same as the submission directory "\

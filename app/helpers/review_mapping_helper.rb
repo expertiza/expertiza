@@ -120,10 +120,12 @@ module ReviewMappingHelper
   # end
 
   # gets the review score awarded based on each round of the review
+
   def get_awarded_review_score(reviewer_id, team_id) 
-    (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----') }
-    (1..@assignment.num_review_rounds).each do |round|
-      if @review_scores.dig(reviewer_id, round, team_id) && @review_scores[reviewer_id][round][team_id] != -1.0
+		num_rounds = @assignment.num_review_rounds
+    (1..num_rounds).each {|round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----') }
+    (1..num_rounds).each do |round|
+      if @review_scores.dig(reviewer_id, round, team_id) != nil && @review_scores[reviewer_id][round][team_id] != -1.0
          instance_variable_set("@score_awarded_round_" + round.to_s, @review_scores[reviewer_id][round][team_id].inspect + '%')
       end
     end

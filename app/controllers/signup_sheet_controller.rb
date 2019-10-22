@@ -239,18 +239,6 @@ class SignupSheetController < ApplicationController
         flash[:error] = "The student is not registered for the assignment!"
         ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'The student is not registered for the assignment: ' << user.id)
       end
-      # if AssignmentParticipant.exists? user_id: user.id, parent_id: params[:assignment_id]
-      #   if SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
-      #     flash[:success] = "You have successfully signed up the student for the topic!"
-      #     ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor signed up student for topic: ' + params[:topic_id].to_s)
-      #   else
-      #     flash[:error] = "The student has already signed up for a topic!"
-      #     ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor is signing up a student who already has a topic')
-      #   end
-      # else
-      #   flash[:error] = "The student is not registered for the assignment!"
-      #   ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'The student is not registered for the assignment: ' << user.id)
-      # end
     end
     redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
   end

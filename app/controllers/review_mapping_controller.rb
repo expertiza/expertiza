@@ -282,7 +282,7 @@ class ReviewMappingController < ApplicationController
   end
  
   # Helper Method to check num_reviews_per_student and num_reviews_per_submission arguments passed in by params hash.
-  def check_num_reviews_args(num_reviews_per_student, num_reviews_per_submission)
+  def check_num_reviews_args(num_reviews_per_student, num_reviews_per_submission, teams)
     has_error_not_raised = true
     # check for exit paths first
     if num_reviews_per_student == 0 and num_reviews_per_submission == 0
@@ -298,6 +298,7 @@ class ReviewMappingController < ApplicationController
                        'by each student to be greater than or equal to total number of teams ' \
                        '[or "participants" if it is an individual assignment].'
       has_error_not_raised = false
+    end
   end
 
   def automatic_review_mapping
@@ -320,10 +321,10 @@ class ReviewMappingController < ApplicationController
     num_calibrated_artifacts = params[:num_calibrated_artifacts].to_i
     num_uncalibrated_artifacts = params[:num_uncalibrated_artifacts].to_i
     if num_calibrated_artifacts.zero? and num_uncalibrated_artifacts.zero?
-        if check_num_reviews_args(num_reviews_per_student, num_reviews_per_submission)
-          # REVIEW: mapping strategy
-          automatic_review_mapping_strategy(assignment_id, participants, teams, num_reviews_per_student, num_reviews_per_submission) 
-        end
+      if check_num_reviews_args(num_reviews_per_student, num_reviews_per_submission, teams)
+        # REVIEW: mapping strategy
+        automatic_review_mapping_strategy(assignment_id, participants, teams, num_reviews_per_student, num_reviews_per_submission) 
+      end
     else
       teams_with_calibrated_artifacts = []
       teams_with_uncalibrated_artifacts = []

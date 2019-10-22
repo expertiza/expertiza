@@ -265,7 +265,7 @@ class UsersController < ApplicationController
   end
 
   def roles_for_request_sign_up
-    roles_can_be_requested_online = ["Instructor", "Teaching Assistant"]
+    roles_can_be_requested_online = ["Instructor"]
     @all_roles = Role.where(name: roles_can_be_requested_online)
   end
 

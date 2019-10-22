@@ -307,7 +307,7 @@ describe SignupSheetController do
         allow(assignment).to receive(:instructor).and_return(instructor)
         params = {id: 1}
         session = {user: instructor}
-        get :delete_signup, params, session
+        get :delete_sign_up, params, session
         expect(flash[:error]).to eq('You have already submitted your work, so you are not allowed to drop your topic.')
         expect(response).to redirect_to('/signup_sheet/list?id=1')
       end
@@ -321,7 +321,7 @@ describe SignupSheetController do
         allow(team).to receive(:hyperlinks).and_return([])
         params = {id: 1}
         session = {user: instructor}
-        get :delete_signup, params, session
+        get :delete_sign_up, params, session
         expect(flash[:error]).to eq('You cannot drop your topic after the drop topic deadline!')
         expect(response).to redirect_to('/signup_sheet/list?id=1')
       end
@@ -335,7 +335,7 @@ describe SignupSheetController do
         allow(team).to receive(:t_id).and_return(1)
         params = {id: 1, topic_id: 1}
         session = {user: instructor}
-        get :delete_signup, params, session
+        get :delete_sign_up, params, session
         expect(flash[:success]).to eq('You have successfully dropped your topic!')
         expect(response).to redirect_to('/signup_sheet/list?id=1')
       end

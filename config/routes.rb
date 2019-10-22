@@ -342,10 +342,10 @@ resources :institution, except: [:destroy] do
   resources :signup_sheet, except: %i[index show] do
     collection do
       get :signup
-      get :delete_signup
+      get :delete_sign_up
       get :add_signup_topics
       get :add_signup_topics_staggered
-      get :delete_signup
+      get :delete_sign_up
       get :get_signup_topics
       get :signup_topics
       get :signup

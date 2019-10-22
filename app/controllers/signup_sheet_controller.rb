@@ -255,7 +255,7 @@ class SignupSheetController < ApplicationController
   end
 
   # this function is used to delete a previous signup
-  def delete_signup
+  def delete_sign_up
     participant = AssignmentParticipant.find(params[:id])
     assignment = participant.assignment
     drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)

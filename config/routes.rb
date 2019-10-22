@@ -66,21 +66,21 @@ Expertiza::Application.routes.draw do
 
   resources :bookmarks, except: %i[index show] do
     collection do
-      get :list
+      get :get_signup_topics
       post :save_bookmark_rating_score
     end
   end
 
   resources :content_pages do
     collection do
-      get :list
+      get :get_signup_topics
       get ':page_name', action: :view
     end
   end
 
   resources :controller_actions do
     collection do
-      get :list
+      get :get_signup_topics
       post ':id', action: :update
       get :new_for
     end
@@ -156,7 +156,7 @@ Expertiza::Application.routes.draw do
 
 resources :institution, except: [:destroy] do
     collection do
-      get :list
+      get :get_signup_topics
       post ':id', action: :update
     end
   end
@@ -184,7 +184,7 @@ resources :institution, except: [:destroy] do
       get :move_up
       get :new_for
       get :link
-      get :list
+      get :get_signup_topics
     end
   end
 
@@ -196,7 +196,7 @@ resources :institution, except: [:destroy] do
       post :add
       get :auto_complete_for_user_name
       get :delete_assignment_participant
-      get :list
+      get :get_signup_topics
       get :change_handle
       get :inherit
       get :bequeath_all
@@ -334,7 +334,7 @@ resources :institution, except: [:destroy] do
 
   resources :roles do
     collection do
-      get :list
+      get :get_signup_topics
       post ':id', action: :update
     end
   end
@@ -346,16 +346,16 @@ resources :institution, except: [:destroy] do
       get :add_signup_topics
       get :add_signup_topics_staggered
       get :delete_signup
-      get :list
+      get :get_signup_topics
       get :signup_topics
       get :signup
       get :sign_up
       get :team_details
       get :intelligent_sign_up
       get :intelligent_save
-      get :signup_as_instructor
+      get :sign_up_as_instructor
       post :delete_all_topics_for_assignment
-      post :signup_as_instructor_action
+      post :sign_up_as_instructor_action
       post :set_priority
       post :save_topic_deadlines
     end
@@ -363,7 +363,7 @@ resources :institution, except: [:destroy] do
 
   resources :site_controllers do
     collection do
-      get :list
+      get :get_signup_topics
       get :new_called
     end
   end
@@ -380,13 +380,13 @@ resources :institution, except: [:destroy] do
 
   resources :student_review, only: [] do
     collection do
-      get :list
+      get :get_signup_topics
     end
   end
 
   resources :student_task, only: [] do
     collection do
-      get :list
+      get :get_signup_topics
       get :view
       get '/*other', to: redirect('/student_task/list')
     end
@@ -419,7 +419,7 @@ resources :institution, except: [:destroy] do
 
   resources :suggestion, only: %i[show new create] do
     collection do
-      get :list
+      get :get_signup_topics
       post :submit
       post :student_submit
       post :update_suggestion
@@ -428,7 +428,7 @@ resources :institution, except: [:destroy] do
 
   resources :survey_deployment, only: %i[new create] do
     collection do
-      get :list
+      get :get_signup_topics
       get :reminder_thread
       get :pending_surveys
     end
@@ -436,13 +436,13 @@ resources :institution, except: [:destroy] do
 
   resources :system_settings do
     collection do
-      get :list
+      get :get_signup_topics
     end
   end
 
   resources :teams, only: %i[new create edit update] do
     collection do
-      get :list
+      get :get_signup_topics
       # post ':id', action: :create_teams
       post :create_teams
       post :inherit
@@ -451,7 +451,7 @@ resources :institution, except: [:destroy] do
 
   resources :teams_users, only: %i[new create] do
     collection do
-      post :list
+      post :get_signup_topics
     end
   end
 
@@ -461,7 +461,7 @@ resources :institution, except: [:destroy] do
   resources :tree_display, only: [] do
     collection do
       get :action
-      post :list
+      post :get_signup_topics
       post :children_node_ng
       post :children_node_2_ng
       post :bridge_to_is_available
@@ -472,8 +472,8 @@ resources :institution, except: [:destroy] do
 
   resources :users, constraints: {id: /\d+/} do
     collection do
-      get :list
-      post :list
+      get :get_signup_topics
+      post :get_signup_topics
       get :list_pending_requested
       post ':id', action: :update
       get :show_selection

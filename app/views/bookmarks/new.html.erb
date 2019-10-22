@@ -13,7 +13,7 @@
     </p>
     <p>
       <td> <%= submit_tag "Add new bookmark" %> |
-      <%= link_to 'Back', :controller=> 'signup_sheet', :action=>'list', :assignment_id => @topic.assignment_id %></td>
+      <%= link_to 'Back', :controller=> 'signup_sheet', :action=> 'get_signup_topics', :assignment_id => @topic.assignment_id %></td>
     </p>
   <% end %>
 

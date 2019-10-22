@@ -1,7 +1,7 @@
 class ContentPagesController < ApplicationController
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[destroy create update],
-         redirect_to: {action: :list}
+         redirect_to: {action: :get_signup_topics}
 
   def action_allowed?
     case params[:action]

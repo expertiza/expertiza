@@ -74,7 +74,7 @@ function submitAction(container_id, action_url){
               <input id="<%= definition[:action] %>"
               name="<%= definition[:action] %>"
               value="<%= definition[:name] %>" type="radio"
-              onClick="submitAction('tableForm', '<%= url_for(:controller => definition[:controller], :action => definition[:action], :id => element.id,:edit => nil, :list => nil) %>');"/>
+              onClick="submitAction('tableForm', '<%= url_for(:controller => definition[:controller], :action => definition[:action], :id => element.id,:edit => nil, :get_signup_topics => nil) %>');"/>
               <% if definition[:hidden] %>
                 <%= hidden_field_tag(definition[:hidden][:name], definition[:hidden][:id]) %>
               <% end %>
@@ -88,7 +88,7 @@ function submitAction(container_id, action_url){
 </DIV>
 <% if delete_options[:enabled] %>
   <a href="" onClick="return markAllRows('tableForm');">Check All</a> | <a href="" onClick="return unMarkAllRows('tableForm');">Uncheck All</a>
-  <br/>With selected: <a href="" onClick="submitAction('tableForm','<%= url_for(:controller => delete_options[:controller], :action => 'delete_selected', :edit => nil, :list => nil) %>')">Delete</a>
+  <br/>With selected: <a href="" onClick="submitAction('tableForm','<%= url_for(:controller => delete_options[:controller], :action => 'delete_selected', :edit => nil, :get_signup_topics => nil) %>')">Delete</a>
 <% end %>
 <% end %>
 <% end %>

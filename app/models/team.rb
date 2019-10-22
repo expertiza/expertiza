@@ -180,6 +180,7 @@ class Team < ActiveRecord::Base
   end
 
   #  changed to hash by E1776
+  # E1938: Changed options[:handle_dups] to options["handle_dups"] due to faulty handling
   def self.import(row_hash, id, options, teamtype)
 
     raise ArgumentError, "Not enough fields on this line." if row_hash.empty? || (row_hash[:teammembers].length < 2 && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last")) || (row_hash[:teammembers].empty? && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"))
@@ -187,7 +188,7 @@ class Team < ActiveRecord::Base
       name = row_hash[:teamname].to_s
       team = where(["name =? && parent_id =?", name, id]).first
       team_exists = !team.nil?
-      name = handle_duplicate(team, name, id, options[:handle_dups], teamtype)
+      name = handle_duplicate(team, name, id, options["handle_dups"], teamtype)
     else
       if teamtype.is_a?(CourseTeam)
         name = self.generate_team_name(Course.find(id).name)
@@ -203,7 +204,7 @@ class Team < ActiveRecord::Base
 
     # insert team members into team unless team was pre-existing & we ignore duplicate teams
 
-    team.import_team_members(row_hash) unless team_exists && options[:handle_dups] == "ignore"
+    team.import_team_members(row_hash) unless team_exists && options["handle_dups"] == "ignore"
   end
 
   # Handle existence of the duplicate team
@@ -211,11 +212,20 @@ class Team < ActiveRecord::Base
     return name if team.nil? # no duplicate
     return nil if handle_dups == "ignore" # ignore: do not create the new team
     if handle_dups == "rename" # rename: rename new team
-      if teamtype.is_a?(CourseTeam)
+      if teamtype.is_a?(CourseTeam.class)
         return self.generate_team_name(Course.find(id).name)
-      elsif  teamtype.is_a?(AssignmentTeam)
+      elsif  teamtype.is_a?(AssignmentTeam.class)
         return self.generate_team_name(Assignment.find(id).name)
       end
+    end
+    # E1938: Added handling for renaming old team when conflict arises
+    if handle_dups == "rename_existing"
+      if teamtype.is_a?(CourseTeam.class)
+        team.update(name: self.generate_team_name(Course.find(id).name))
+      elsif  teamtype.is_a?(AssignmentTeam.class)
+        team.update(name: self.generate_team_name(Assignment.find(id).name))
+      end
+      return name
     end
     if handle_dups == "replace" # replace: delete old team
       team.delete

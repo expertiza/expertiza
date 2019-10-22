@@ -35,7 +35,7 @@
       </h3>
       <table class="table table-striped grades">
       <% instance_variable_get('@scores_round_' + round.to_s).each do |answer| %>
-      <tr>
+      <tr class="warning">
         <th colspan="2">
           <% if answer.question.is_a?(ScoredQuestion) %>
             <%= answer.question.seq.to_i %>
@@ -53,7 +53,7 @@
         </th>
       </tr>
   
-      <tr>
+      <tr class="info">
         <% if answer.question.is_a?(ScoredQuestion) %>
           <td align="left" width="5%">
             <div class="c<%= answer.answer %>" style="width:30px; height:30px; border-radius:50%; font-size:15px; color:black; line-height:30px; text-align:center;"><%= answer.answer %></div>

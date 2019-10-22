@@ -116,7 +116,7 @@ describe SignupSheetController do
           .with("The topic: \"Hello world!\" has been successfully deleted. ").and_return('OK')
         params = {id: 1, assignment_id: 1}
         post :destroy, params
-        expect(flash[:error]).to eq('The topic could not be deleted.')
+        expect(flash[:error]).to eq('The topic to be deleted does not exist. ')
         expect(response).to redirect_to('/assignments/1/edit')
       end
     end

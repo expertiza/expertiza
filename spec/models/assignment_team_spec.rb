@@ -10,6 +10,20 @@ describe 'AssignmentTeam' do
   let(:topic) { build(:topic, id: 1, topic_name: "New Topic") }
   let(:signedupteam) { build(:signed_up_team) }
 
+
+  # let(:assignment1 ) { build(:assignment, id: 2, name: 'Test Assgt', rounds_of_reviews: 1) }
+  # let(:student2) { build(:student, id: 4, name: "name2", fullname: 'no one', email: 'expertiza@mailinator.com') }
+  # let(:team2) { build(:assignment_team, id: 3, name: 'team has name', assignment: assignment, users: [student2]) }
+  # let(:review_response_map2) { build(:review_response_map, id: 3, assignment: assignment, reviewer: participant, reviewee: team2) }
+  # let(:participant2) { build(:participant, id: 3, parent_id: 1, user: student2) }
+  # let(:participant) { build(:participant, id: 1, parent_id: 1, user: student) }
+  # let(:feedback) { FeedbackResponseMap.new(id: 1, reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 1) }
+  # let(:questionnaire) { Questionnaire.new(id: 1, type: 'ReviewQuestionnaire') }
+  # let(:metareview_response_map) { build(:meta_review_response_map, reviewed_object_id: 1) }
+  # let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt', rounds_of_reviews: 2) }
+  # let(:assignment1) { build(:assignment, id: 2, name: 'Test Assgt', rounds_of_reviews: 1) }
+
+
   describe "#hyperlinks" do
     context "when current teams submitted hyperlinks" do
       it "returns the hyperlinks submitted by the team" do
@@ -267,7 +281,12 @@ describe 'AssignmentTeam' do
       end
     end
 
-    context "when submit a hyperlink "
+     context '#When a partciptant resubmit a hyperlink' do
+       it "send emails to all reviewers" do
+         allow(team).to receive(:hyperlinks).and_return(["https://expertiza.ncsu.edu"])
+         expect { team.submit_hyperlink("https://github.com/wangdavid84/expertiza/wiki") }.to change { ActionMailer::Base.deliveries.count }.by 1
+       end
+    end
   end
 
   describe "#remove_hyperlink" do

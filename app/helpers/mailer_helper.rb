@@ -12,6 +12,19 @@ module MailerHelper
     })
   end
 
+  def self.send_mail_to_reviewer(user, subject, partial_name, message)
+    Mailer.new_review_request_message ({
+        to: user.email,
+        subject: subject,
+        body: {
+            user: user,
+            first_name: ApplicationHelper.get_user_first_name(user),
+            message: message,
+            partial_name: partial_name
+        }
+    })
+  end
+
   def self.send_mail_to_all_super_users(super_user, user, subject)
     Mailer.request_user_message ({
       to: super_user.email,

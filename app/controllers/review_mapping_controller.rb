@@ -92,7 +92,7 @@ class ReviewMappingController < ApplicationController
     else
       if @review_mappings.size >= assignment.num_reviews_allowed
         flash[:notice] = "You cannot do more than " + assignment.num_reviews_allowed.to_s + " reviews based on assignment policy"
-        # redirect_to controller: 'student_review', action: 'list', id: reviewer.id
+        redirect_to controller: 'student_review', action: 'list', id: reviewer.id
     else
 
       # begin

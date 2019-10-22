@@ -101,7 +101,7 @@ class ApplicationController < ActionController::Base
   end
 
   def record_not_found
-    redirect_to controller: :tree_display, action: :get_signup_topics
+    redirect_to controller: :tree_display, action: :list
   end
 
   def remove_non_utf8(hash)

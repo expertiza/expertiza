@@ -192,7 +192,7 @@ describe SignupSheetController do
         allow(SignUpTopic).to receive(:find_by).with(id: 1).and_return(topic)
         params = {id: 1}
         session = {user: instructor}
-        get :get_signup_topics, params, session
+        get :list, params, session
         expect(controller.instance_variable_get(:@bids).size).to eq(1)
         expect(controller.instance_variable_get(:@sign_up_topics)).to be_empty
         expect(response).to render_template('signup_sheet/intelligent_topic_selection')
@@ -204,8 +204,8 @@ describe SignupSheetController do
         allow(Bid).to receive(:where).with(team_id: 1).and_return([double('Bid', topic_id: 1)])
         allow(SignUpTopic).to receive(:find_by).with(1).and_return(topic)
         params = {id: 1}
-        get :get_signup_topics, params
-        expect(response).to render_template(:get_signup_topics)
+        get :list, params
+        expect(response).to render_template(:list)
       end
     end
   end
@@ -230,7 +230,7 @@ describe SignupSheetController do
         allow(User).to receive(:find).with(8).and_return(student)
         allow(Team).to receive(:find).with(1).and_return(team)
         params = {username: 'no name', assignment_id: 1}
-        get :sign_up_as_instructor_action, params
+        get :signup_as_instructor_action, params
         expect(flash[:error]).to eq('That student does not exist!')
         expect(response).to redirect_to('/assignments/1/edit')
       end
@@ -258,7 +258,7 @@ describe SignupSheetController do
               assignment_id: 1,
               topic_id: 1
             }
-            get :sign_up_as_instructor_action, params
+            get :signup_as_instructor_action, params
             expect(flash[:success]).to eq('You have successfully signed up the student for the topic!')
             expect(response).to redirect_to('/assignments/1/edit')
           end
@@ -275,7 +275,7 @@ describe SignupSheetController do
               username: 'no name',
               assignment_id: 1
             }
-            get :sign_up_as_instructor_action, params
+            get :signup_as_instructor_action, params
             expect(flash[:error]).to eq('The student has already signed up for a topic!')
             expect(response).to redirect_to('/assignments/1/edit')
           end
@@ -289,7 +289,7 @@ describe SignupSheetController do
             username: 'no name',
             assignment_id: 1
           }
-          get :sign_up_as_instructor_action, params
+          get :signup_as_instructor_action, params
           expect(flash[:error]).to eq('The student is not registered for the assignment!')
           expect(response).to redirect_to('/assignments/1/edit')
         end
@@ -307,7 +307,7 @@ describe SignupSheetController do
         allow(assignment).to receive(:instructor).and_return(instructor)
         params = {id: 1}
         session = {user: instructor}
-        get :delete_sign_up, params, session
+        get :delete_signup, params, session
         expect(flash[:error]).to eq('You have already submitted your work, so you are not allowed to drop your topic.')
         expect(response).to redirect_to('/signup_sheet/list?id=1')
       end
@@ -321,7 +321,7 @@ describe SignupSheetController do
         allow(team).to receive(:hyperlinks).and_return([])
         params = {id: 1}
         session = {user: instructor}
-        get :delete_sign_up, params, session
+        get :delete_signup, params, session
         expect(flash[:error]).to eq('You cannot drop your topic after the drop topic deadline!')
         expect(response).to redirect_to('/signup_sheet/list?id=1')
       end
@@ -335,7 +335,7 @@ describe SignupSheetController do
         allow(team).to receive(:t_id).and_return(1)
         params = {id: 1, topic_id: 1}
         session = {user: instructor}
-        get :delete_sign_up, params, session
+        get :delete_signup, params, session
         expect(flash[:success]).to eq('You have successfully dropped your topic!')
         expect(response).to redirect_to('/signup_sheet/list?id=1')
       end
@@ -355,7 +355,7 @@ describe SignupSheetController do
         allow(assignment).to receive(:instructor).and_return(instructor)
         params = {id: 1}
         session = {user: instructor}
-        get :delete_sign_up_as_instructor, params, session
+        get :delete_signup_as_instructor, params, session
         expect(flash[:error]).to eq('The student has already submitted their work, so you are not allowed to remove them.')
         expect(response).to redirect_to('/assignments/1/edit')
       end
@@ -369,7 +369,7 @@ describe SignupSheetController do
         allow(team).to receive(:hyperlinks).and_return([])
         params = {id: 1}
         session = {user: instructor}
-        get :delete_sign_up_as_instructor, params, session
+        get :delete_signup_as_instructor, params, session
         expect(flash[:error]).to eq('You cannot drop a student after the drop topic deadline!')
         expect(response).to redirect_to('/assignments/1/edit')
       end
@@ -383,7 +383,7 @@ describe SignupSheetController do
         allow(team).to receive(:t_id).and_return(1)
         params = {id: 1, topic_id: 1}
         session = {user: instructor}
-        get :delete_sign_up_as_instructor, params, session
+        get :delete_signup_as_instructor, params, session
         expect(flash[:success]).to eq('You have successfully dropped the student from the topic!')
         expect(response).to redirect_to('/assignments/1/edit')
       end
@@ -449,8 +449,8 @@ describe SignupSheetController do
       allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([double('TeamsUser', user_id: 1)])
       allow(User).to receive(:find).with(1).and_return(student)
       params = {assignment_id: 1, id: 1}
-      get :show_team_details, params
-      expect(response).to render_template(:show_team_details)
+      get :show_team, params
+      expect(response).to render_template(:show_team)
     end
   end
 

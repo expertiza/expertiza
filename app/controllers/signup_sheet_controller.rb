@@ -37,7 +37,7 @@ class SignupSheetController < ApplicationController
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[destroy create update],
-         redirect_to: {action: :get_signup_topics}
+         redirect_to: {action: :list}
 
   # Prepares the form for adding a new topic. Used in conjunction with create
   def new
@@ -115,7 +115,7 @@ class SignupSheetController < ApplicationController
   # Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
   # Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics can have different deadlines.
   def add_signup_topics
-    retrieve_signup_topics(params[:id])
+    load_add_signup_topics(params[:id])
     SignUpSheet.add_signup_topic(params[:id])
   end
 
@@ -124,7 +124,7 @@ class SignupSheetController < ApplicationController
   end
 
   # retrieves all the data associated with the given assignment. Includes all topics,
-  def retrieve_signup_topics(assignment_id)
+  def load_add_signup_topics(assignment_id)
     @id = assignment_id
     @sign_up_topics = SignUpTopic.where('assignment_id = ?', assignment_id)
     @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
@@ -150,7 +150,7 @@ class SignupSheetController < ApplicationController
 
   # simple function that redirects ti the /add_signup_topics or the /add_signup_topics_staggered page depending on assignment type
   # staggered means that different topics can have different deadlines.
-  def redirect_to_signup(assignment_id)
+  def redirect_to_sign_up(assignment_id)
     assignment = Assignment.find(assignment_id)
     assignment.staggered_deadline == true ? (redirect_to action: 'add_signup_topics_staggered', id: assignment_id) : (redirect_to action: 'add_signup_topics', id: assignment_id)
   end
@@ -162,7 +162,7 @@ class SignupSheetController < ApplicationController
     redirect_to controller: 'assignments', action: 'edit', id: assignment_id
   end
 
-  def get_signup_topics
+  def list
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
     @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
@@ -218,12 +218,12 @@ class SignupSheetController < ApplicationController
   end
 
   # routes to new page to specific student
-  def sign_up_as_instructor; end
+  def signup_as_instructor; end
 
   # This method finds the user from the username present in the params. If the student does not exist, returns "does not exist" message, else it checks
   # whether it exists as a participant and signs it up for the topic, else displays the message "already signed up" and "not registered for the assignment"
   # At the end, it redirects to the edit action of the assignments controller.
-  def sign_up_as_instructor_action
+  def signup_as_instructor_action
     user = User.find_by(name: params[:username])
     if user.nil? # validate invalid user
       flash[:error] = "That student does not exist!"
@@ -255,7 +255,7 @@ class SignupSheetController < ApplicationController
   end
 
   # this function is used to delete a previous signup
-  def delete_sign_up
+  def delete_signup
     participant = AssignmentParticipant.find(params[:id])
     assignment = participant.assignment
     drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
@@ -270,14 +270,14 @@ class SignupSheetController < ApplicationController
       flash[:error] = "You cannot drop your topic after the drop topic deadline!"
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Dropping topic for ended work: ' + params[:topic_id].to_s)
     else
-      delete_sign_up_for_topic(assignment.id, params[:topic_id], session[:user].id)
+      delete_signup_for_topic(assignment.id, params[:topic_id], session[:user].id)
       flash[:success] = "You have successfully dropped your topic!"
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].id, 'Student has dropped the topic: ' + params[:topic_id].to_s)
     end
     redirect_to action: 'list', id: params[:id]
   end
 
-  def delete_sign_up_as_instructor
+  def delete_signup_as_instructor
     # find participant using assignment using team and topic ids
     team = Team.find(params[:id])
     assignment = Assignment.find(team.parent_id)
@@ -291,7 +291,7 @@ class SignupSheetController < ApplicationController
       flash[:error] = "You cannot drop a student after the drop topic deadline!"
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for ended work: ' + params[:topic_id].to_s)
     else
-      delete_sign_up_for_topic(assignment.id, params[:topic_id], participant.user_id)
+      delete_signup_for_topic(assignment.id, params[:topic_id], participant.user_id)
       flash[:success] = "You have successfully dropped the student from the topic!"
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Student has been dropped from the topic: ' + params[:topic_id].to_s)
     end
@@ -386,9 +386,9 @@ class SignupSheetController < ApplicationController
   end
 
   # This method is called when a student click on the trumpet icon. So this is a bad method name. --Yang
-  def show_team_details
+  def show_team
     if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
-      @results = get_ad_info(assignment.id, topic.id)
+      @results = ad_info(assignment.id, topic.id)
       @results.each do |result|
         result.keys.each do |key|
           @current_team_name = result[key] if key.equal? :name
@@ -450,7 +450,7 @@ class SignupSheetController < ApplicationController
     topic.category = params[:topic][:category]
     # topic.assignment_id = params[:id]
     topic.save
-    redirect_to_signup params[:id]
+    redirect_to_sign_up params[:id]
   end
 
   def update_max_choosers(topic)
@@ -472,7 +472,7 @@ class SignupSheetController < ApplicationController
 
   # get info related to the ad for partners so that it can be displayed when an assignment_participant
   # clicks to see ads related to a topic
-  def get_ad_info(_assignment_id, topic_id)
+  def ad_info(_assignment_id, topic_id)
     # List that contains individual result object
     @result_list = []
     # Get the results
@@ -494,7 +494,7 @@ class SignupSheetController < ApplicationController
     @result_list
   end
 
-  def delete_sign_up_for_topic(assignment_id, topic_id, user_id)
+  def delete_signup_for_topic(assignment_id, topic_id, user_id)
     SignUpTopic.reassign_topic(user_id, assignment_id, topic_id)
   end
 end

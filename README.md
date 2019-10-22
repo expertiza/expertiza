@@ -1,4 +1,3 @@
-E1956, There is no shortcut to get free review points: Review Assignment Bug
 Expertiza
 =========
 

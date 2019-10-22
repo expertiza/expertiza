@@ -32,7 +32,7 @@ class TeamsUsersController < ApplicationController
 
     if team.is_a?(AssignmentTeam)
       assignment = Assignment.find(team.parent_id)
-      if AssignmentParticipant.find_by(user_id: user.id, assignment_id: assignment.id).nil?
+      if AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id).nil?
         urlAssignmentParticipantList = url_for controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment', authorization: 'participant'
         flash[:error] = "\"#{user.name}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
       else

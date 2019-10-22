@@ -1,5 +1,3 @@
-require 'rspec'
-
 describe 'ImportUsers' do
   before do
     # Do nothing

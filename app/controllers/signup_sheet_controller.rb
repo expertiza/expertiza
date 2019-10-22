@@ -131,7 +131,8 @@ class SignupSheetController < ApplicationController
     # to treat all assignments as team assignments
     # Though called participants, @participants are actually records in signed_up_teams table, which
     # is a mapping table between teams and topics (waitlisted recored are also counted)
-    @participants = SignedUpTeam.find_team_participants(assignment_id, session[:ip])
+    ip = session[:ip]
+    @participants = SignedUpTeam.find_team_participants(@id, ip)
   end
 
   def set_values_for_new_topic
@@ -233,18 +234,6 @@ class SignupSheetController < ApplicationController
         flash[:error] = "The student is not registered for the assignment!"
         ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'The student is not registered for the assignment: ' << user.id)
       end
-      # if AssignmentParticipant.exists? user_id: user.id, parent_id: params[:assignment_id]
-      #   if SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
-      #     flash[:success] = "You have successfully signed up the student for the topic!"
-      #     ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor signed up student for topic: ' + params[:topic_id].to_s)
-      #   else
-      #     flash[:error] = "The student has already signed up for a topic!"
-      #     ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor is signing up a student who already has a topic')
-      #   end
-      # else
-      #   flash[:error] = "The student is not registered for the assignment!"
-      #   ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'The student is not registered for the assignment: ' << user.id)
-      # end
     end
     redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
   end
@@ -383,7 +372,7 @@ class SignupSheetController < ApplicationController
   # This method is called when a student click on the trumpet icon. So this is a bad method name. --Yang
   def show_team
     if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
-      @results = ad_info(assignment.id, topic.id)
+      @results = get_ad_info(assignment.id, topic.id)
       @results.each do |result|
         result.keys.each do |key|
           @current_team_name = result[key] if key.equal? :name
@@ -467,7 +456,7 @@ class SignupSheetController < ApplicationController
 
   # get info related to the ad for partners so that it can be displayed when an assignment_participant
   # clicks to see ads related to a topic
-  def ad_info(_assignment_id, topic_id)
+  def get_ad_info(_assignment_id, topic_id)
     # List that contains individual result object
     @result_list = []
     # Get the results

@@ -467,10 +467,10 @@ class ReviewMappingController < ApplicationController
           participants_with_min_assigned_reviews << participants.index(participant) if participants_hash[participant.id] == min_value
         end
     # if participants_with_min_assigned_reviews is blank
-    if_condition_1 = participants_with_min_assigned_reviews.empty?
+    no_particpants = participants_with_min_assigned_reviews.empty?
     # or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
-    if_condition_2 = (participants_with_min_assigned_reviews.size == 1 and TeamsUser.exists?(team_id: team.id, user_id: participants[participants_with_min_assigned_reviews[0]].user_id))
-    rand_num = if if_condition_1 or if_condition_2
+    participant_is_owner = (participants_with_min_assigned_reviews.size == 1 and TeamsUser.exists?(team_id: team.id, user_id: participants[participants_with_min_assigned_reviews[0]].user_id))
+    rand_num = if no_particpants or participant_is_owner
                  # use original method to get random number
                  rand(0..num_participants - 1)
                else

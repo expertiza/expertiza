@@ -1,3 +1,16 @@
+<script type="text/javascript">
+  toggle_tag_prompt = function() {
+    $('.tag_prompt_container').toggle();
+  };
+  $( document ).ready(function() {
+    $('#tag_prompt_toggler').click(function () {
+      if ($('#tag_prompt_toggler').text() == "hide tags")
+        $('#tag_prompt_toggler').text("show tags")
+      else
+        $('#tag_prompt_toggler').text("hide tags")
+    });
+  });
+</script>
 <% if rscore and rscore[:assessments].length > 0 %>
     <% count = 0 %>
     <!--Zhewei: If this assignment supports varying rubrics by round, Expertiza will display all-round reviews. -->

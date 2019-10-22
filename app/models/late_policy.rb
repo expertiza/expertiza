@@ -1,7 +1,8 @@
 class LatePolicy < ActiveRecord::Base
   belongs_to :user
 
-  has_many :assignments
+  # has_many :assignments
+  has_many :assignments, dependent: :nullify
 
   validates :policy_name, presence: true
   validates :instructor_id, presence: true
@@ -14,6 +15,8 @@ class LatePolicy < ActiveRecord::Base
   validates :penalty_per_unit, numericality: {greater_than: 0}
 
   validates :policy_name, format: {with: /\A[A-Za-z0-9][A-Za-z0-9\s'._-]+\z/i}
+
+  attr_accessible :penalty_per_unit, :max_penalty, :penalty_unit, :times_used, :policy_name
 
   # method to check whether the policy name given as a parameter already exists under the current instructor id
   # it return true if there's another policy with the same name under current instructor else false
@@ -39,11 +42,14 @@ class LatePolicy < ActiveRecord::Base
       @penalties = calculate_penalty(pen.participant_id)
       @total_penalty = (@penalties[:submission] + @penalties[:review] + @penalties[:meta_review])
       if pen.deadline_type_id.to_i == 1
-        pen.update_attribute(:penalty_points, @penalties[:submission])
+        # pen.update_attribute(:penalty_points, @penalties[:submission])
+        pen.update(penalty_points: @penalties[:submission])
       elsif pen.deadline_type_id.to_i == 2
-        pen.update_attribute(:penalty_points, @penalties[:review])
+        # pen.update_attribute(:penalty_points, @penalties[:review])
+        pen.update(penalty_points: @penalties[:review])
       elsif pen.deadline_type_id.to_i == 5
-        pen.update_attribute(:penalty_points, @penalties[:meta_review])
+        # pen.update_attribute(:penalty_points, @penalties[:meta_review])
+        pen.update(penalty_points: @penalties[:meta_review])
       end
     end
   end

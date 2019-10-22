@@ -69,7 +69,7 @@ class SignupSheetController < ApplicationController
       @topic.destroy
       undo_link("The topic: \"#{@topic.topic_name}\" has been successfully deleted. ")
     else
-      flash[:error] = "The topic could not be deleted."
+      flash[:error] = "The topic to be deleted does not exist. "
     end
     # Akshay - redirect to topics tab if there are still any topics left, otherwise redirect to
     # assignment's edit page

@@ -10,11 +10,13 @@ class BookmarksController < ApplicationController
   end
 
   def list
+    @participant = Participant.where(user_id: session[:user].id).first
     @bookmarks = Bookmark.where(topic_id: params[:id])
     @topic = SignUpTopic.find(params[:id])
   end
 
   def new
+    @participant = Participant.where(user_id: session[:user].id).first
     @topic = SignUpTopic.find(params[:id])
     @bookmark = Bookmark.new
   end

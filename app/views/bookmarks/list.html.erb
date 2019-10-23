@@ -71,7 +71,7 @@
 <br />
 
 <%= link_to 'New bookmark', :action => 'new', :id => @topic.id %> |
-<%= link_to 'Back', :controller=> 'sign_up_sheet', :action=>'list', :assignment_id => @topic.assignment_id %>
+<%= link_to 'Back', :controller=> 'sign_up_sheet', :action=>'list', :id => @participant.id, :assignment_id => @topic.assignment_id %>
 
 <script>
   var bookmark_ids = <%=@bookmark_ids%>;

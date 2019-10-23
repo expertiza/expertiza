@@ -277,7 +277,7 @@ class SignupSheetController < ApplicationController
     redirect_to controller: 'assignments', action: 'edit', id: assignment.id
   end
 
-  # common code between delete_signup and delete_singup_as_instructor
+  # common code between delete_signup and delete_singup_as_instructor, satisfying the DRY principle
   def get_status(status_for, participant, assignment, drop_topic_deadline)
     if !participant.team.submitted_files.empty? or !participant.team.hyperlinks.empty?
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for already submitted work: ' + params[:topic_id].to_s)

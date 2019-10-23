@@ -30,7 +30,7 @@ class BookmarksController < ApplicationController
       flash[:success] = 'Your bookmark has been successfully created!'
     rescue StandardError
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, $ERROR_INFO.to_s, request)
-      flash[:error] = $ERROR_INFO
+      flash[:error] = 'Bookmark could not be created: ' + $ERROR_INFO.to_s
     end
     redirect_to action: 'list', id: params[:topic_id]
   end

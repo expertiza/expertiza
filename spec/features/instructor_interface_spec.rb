@@ -74,10 +74,10 @@ describe "Integration tests for instructor interface" do
   # end
 
   describe "View assignment scores" do
-    it 'is able to view scores' do
-      login_as("instructor6")
-      visit '/grades/view?id=1'
-      expect(page).to have_content('Summary report')
-    end
+  it 'is able to view scores' do
+    login_as("instructor6")
+    visit '/grades/view?id=1'
+    expect(page).to have_content('Summary report')
   end
+end
 end

@@ -185,16 +185,17 @@ class QuizQuestionnairesController < QuestionnairesController
 
     questions.each do |question|
       q_type = params[:question_type][question_num.to_s][:type]
-      params[:new_choices][question_num.to_s][q_type].each_key do |choice_key|
+      q_choices = params[:new_choices][question_num.to_s][q_type]
+      q_choices.each_key do |choice_key|
         if q_type == "MultipleChoiceCheckbox"
-          q = if params[:new_choices][question_num.to_s][q_type][choice_key][:iscorrect] == 1.to_s
-                QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
+          q = if q_choices[choice_key][:iscorrect] == 1.to_s
+                QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "true", question_id: question.id)
               else
-                QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
+                QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "false", question_id: question.id)
               end
           q.save
         elsif q_type == "TrueFalse"
-          if params[:new_choices][question_num.to_s][q_type][1.to_s][:iscorrect] == choice_key
+          if q_choices[1.to_s][:iscorrect] == choice_key
             q = QuizQuestionChoice.new(txt: "True", iscorrect: "true", question_id: question.id)
             q.save
             q = QuizQuestionChoice.new(txt: "False", iscorrect: "false", question_id: question.id)
@@ -206,10 +207,10 @@ class QuizQuestionnairesController < QuestionnairesController
             q.save
           end
         else
-          q = if params[:new_choices][question_num.to_s][q_type][1.to_s][:iscorrect] == choice_key
-                QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "true", question_id: question.id)
+          q = if q_choices[1.to_s][:iscorrect] == choice_key
+                QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "true", question_id: question.id)
               else
-                QuizQuestionChoice.new(txt: params[:new_choices][question_num.to_s][q_type][choice_key][:txt], iscorrect: "false", question_id: question.id)
+                QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "false", question_id: question.id)
               end
           q.save
         end

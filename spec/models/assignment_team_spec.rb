@@ -280,13 +280,6 @@ describe 'AssignmentTeam' do
         team.submit_hyperlink("www.ncsu.edu  ")
       end
     end
-
-     context '#When a partciptant resubmit a hyperlink' do
-       it "send emails to all reviewers" do
-         allow(team).to receive(:hyperlinks).and_return(["https://expertiza.ncsu.edu"])
-         expect { team.submit_hyperlink("https://github.com/wangdavid84/expertiza/wiki") }.to change { ActionMailer::Base.deliveries.count }.by 1
-       end
-    end
   end
 
   describe "#remove_hyperlink" do

@@ -8,15 +8,15 @@
         <td>Check the boxes representing the times when you want to receive e-mail.
           <tr>
             <td><label for="user_email_on_review">When someone else <strong>reviews</strong> my work</label></td>
-            <td><%= check_box 'user', 'email_on_review', {},  true, false  %></td>
+            <td><%= check_box 'user', 'email_on_review'  %></td>
           </tr>
           <tr>
             <td><label for="user_email_on_submission">When someone else <strong>submits</strong> work I am assigned to review</label></td>
-            <td><%= check_box 'user', 'email_on_submission', {}, true, false  %></td>
+            <td><%= check_box 'user', 'email_on_submission'  %></td>
           </tr>
           <tr>
             <td><label for="user_email_on_review_of_review">When someone else reviews one of my reviews (<strong>metareviews</strong> my work)</label></td>
-            <td><%= check_box 'user', 'email_on_review_of_review', {}, true, false %></td>
+            <td><%= check_box 'user', 'email_on_review_of_review' %></td>
           </tr>
           <% if @user.role_id == 2 %>
             <tr>

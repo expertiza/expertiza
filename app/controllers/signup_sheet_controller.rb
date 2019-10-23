@@ -283,14 +283,16 @@ class SignupSheetController < ApplicationController
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for already submitted work: ' + params[:topic_id].to_s)
       if status_for == "student"
         return {:type => "error", :message => "You have already submitted your work, so you are not allowed to drop your topic."}
-      else
+      end
+      if status_for == "instructor"
         return {:type => "error", :message => "The student has already submitted their work, so you are not allowed to remove them."}
       end
     elsif !drop_topic_deadline.nil? and Time.now > drop_topic_deadline.due_at
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for ended work: ' + params[:topic_id].to_s)
       if status_for == "student"
         return {:type => "error", :message => "You cannot drop your topic after the drop topic deadline!"}
-      else
+      end
+      if status_for == "instructor"
         return {:type => "error", :message => "You cannot drop a student after the drop topic deadline!"}
       end
     else
@@ -298,7 +300,8 @@ class SignupSheetController < ApplicationController
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Student has been dropped from the topic: ' + params[:topic_id].to_s)
       if status_for == "student"
         return {:type => "success", :message => "You have successfully dropped your topic!"}
-      else
+      end
+      if status_for == "instructor"
         return {:type => "success", :message => "You have successfully dropped the student from the topic!"}
       end
     end

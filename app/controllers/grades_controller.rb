@@ -15,8 +15,8 @@ class GradesController < ApplicationController
        'Administrator',
        'Super-Administrator',
        'Student'].include? current_role_name and
-      are_needed_authorizations_present?(params[:id], "reader", "reviewer") and
-      check_self_review_status
+          are_needed_authorizations_present?(params[:id], "reader", "reviewer") and
+          check_self_review_status
     when 'view_team'
       if ['Student'].include? current_role_name # students can only see the head map for their own team
         participant = AssignmentParticipant.find(params[:id])
@@ -39,7 +39,6 @@ class GradesController < ApplicationController
   def view
     @assignment = Assignment.find(params[:id])
     questionnaires = @assignment.questionnaires
-
     if @assignment.varying_rubrics_by_round?
       @questions = retrieve_questions questionnaires, @assignment.id
     else # if this assignment does not have "varying rubric by rounds" feature
@@ -54,7 +53,6 @@ class GradesController < ApplicationController
     @average_chart = bar_chart(averages, 300, 100, 5)
     @avg_of_avg = mean(averages)
     calculate_all_penalties(@assignment.id)
-
     @show_reputation = false
   end
 

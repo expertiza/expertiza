@@ -331,6 +331,9 @@ GEM
     omniauth (1.8.1)
       hashie (>= 3.4.6, < 3.6.0)
       rack (>= 1.6.2, < 3)
+    omniauth-github (1.1.2)
+      omniauth (~> 1.0)
+      omniauth-oauth2 (~> 1.1)
     omniauth-google-oauth2 (0.2.10)
       addressable (~> 2.3)
       jwt (~> 1.0)
@@ -624,6 +627,7 @@ DEPENDENCIES
   mutant-rspec
   mysql2
   nokogiri
+  omniauth-github
   omniauth-google-oauth2
   open-uri-cached
   paper_trail
@@ -668,4 +672,4 @@ DEPENDENCIES
   zip-zip
 
 BUNDLED WITH
-   1.16.2
+   1.16.6

@@ -27,7 +27,7 @@ class QuizQuestionnairesController < QuestionnairesController
       end
     end
     if valid_request && Questionnaire::QUESTIONNAIRE_TYPES.include?(params[:model])
-      @questionnaire = Object.const_get(params[:model]).new
+      @questionnaire = QuizQuestionnaire.new
       @questionnaire.private = params[:private]
       @questionnaire.min_question_score = 0
       @questionnaire.max_question_score = 1
@@ -41,7 +41,7 @@ class QuizQuestionnairesController < QuestionnairesController
   def create
     valid = valid_quiz
     if valid.eql?("valid")
-      @questionnaire = Object.const_get(params[:questionnaire][:type]).new(questionnaire_params)
+      @questionnaire = QuizQuestionnaire.new(questionnaire_params)
       participant_id = params[:pid] # creating a local variable to send as parameter to submitted content if it is a quiz questionnaire
       @questionnaire.min_question_score = 0
       @questionnaire.max_question_score = 1

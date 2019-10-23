@@ -53,11 +53,7 @@ class SignupSheetController < ApplicationController
   # that every assignment will have only one signup sheet
   def create
     topic = SignUpTopic.where(topic_name: params[:topic][:topic_name], assignment_id: params[:id]).first
-    if topic.nil?
-      setup_new_topic
-    else
-      update_existing_topic topic
-    end
+    call_create_or_update(topic)
   end
 
   # This method is used to delete signup topics
@@ -108,6 +104,15 @@ class SignupSheetController < ApplicationController
     respond_to do |format|
       format.html { redirect_to edit_assignment_path(params[:assignment_id]) }
       format.js {}
+    end
+  end
+
+  # This method appropriately calls the create topic or update existing topic method
+  def call_create_or_update(topic)
+    if topic.nil?
+      setup_new_topic
+    else
+      update_existing_topic topic
     end
   end
 

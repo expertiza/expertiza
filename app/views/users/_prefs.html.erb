@@ -21,7 +21,7 @@
           <% if @user.role_id == 2 %>
             <tr>
               <td><label for="copy_of_emails">Send me copies of emails sent for assigments</label></td>
-              <td><%= check_box 'user', 'copy_of_emails', {}, true, false %></td>
+              <td><%= check_box 'user', 'copy_of_emails' %></td>
             </tr>
           <% end %>
   </table>

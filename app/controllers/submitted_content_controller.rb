@@ -78,8 +78,16 @@ class SubmittedContentController < ApplicationController
         # this will open the correct /response/edit?id=#{latest_response.id} page for the reviewer when (s)he clicks on it.
 
         user = User.find(reviewer.user_id)
+        instructor = User.find(user.parent_id)
+        bcc_mail_address = ""
+        if instructor.copy_of_emails?
+          bcc_mail_address = instructor.email
+        else
+          # do noting
+        end
         if user.email_on_submission?
           MailerHelper.send_mail_to_reviewer(user,
+                                             bcc_mail_address,
                                              "You have a new submission to review",
                                              "update",
                                              "Please visit https://expertiza.ncsu.edu/response/edit?id=#{latest_response.id} and proceed to peer reviews.").deliver

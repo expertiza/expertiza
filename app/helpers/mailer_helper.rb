@@ -12,9 +12,10 @@ module MailerHelper
     })
   end
 
-  def self.send_mail_to_reviewer(user, subject, partial_name, note)
+  def self.send_mail_to_reviewer(user, bcc_mail_address, subject, partial_name, note)
     Mailer.new_review_request_message ({
         to: user.email,
+        bcc: bcc_mail_address,
         subject: subject,
         body: {
             user: user,

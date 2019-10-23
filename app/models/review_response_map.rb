@@ -126,7 +126,7 @@ class ReviewResponseMap < ResponseMap
     # @review_scores[reviewer_id][round][reviewee_id] = score for assignments using vary_rubric_by_rounds feature
   end
 
-  def email(defn, _participant, assignment)
+  def email(defn, assignment)
     defn[:body][:type] = "Peer Review"
     AssignmentTeam.find(reviewee_id).users.each do |user|
       if user.email_on_review?

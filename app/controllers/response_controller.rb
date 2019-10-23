@@ -102,9 +102,8 @@ class ResponseController < ApplicationController
   # E1961
   # send email to user that new peer review is entered or revised
   def send_email_to_reviewee(map)
-    participant = Participant.find(map.reviewer_id)
-    defn = {body: {type: "Peer Review", obj_name: "Test Assgt", partial_name: "new_submission"} }
-    map.email(defn, participant, Assignment.find(Participant.find(map.reviewer_id).parent_id))
+    defn = {body: {type: "Peer Review", partial_name: "new_submission"} }
+    map.email(defn, Assignment.find(Participant.find(map.reviewer_id).parent_id))
   end
 
   def new

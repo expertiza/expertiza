@@ -206,7 +206,7 @@ class QuizQuestionnairesController < QuestionnairesController
             q = QuizQuestionChoice.new(txt: "False", iscorrect: "true", question_id: question.id)
             q.save
           end
-        else
+        else # MultipleChoiceRadio
           q = if q_choices[1.to_s][:iscorrect] == choice_key
                 QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "true", question_id: question.id)
               else

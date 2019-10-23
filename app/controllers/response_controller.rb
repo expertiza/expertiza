@@ -90,12 +90,21 @@ class ResponseController < ApplicationController
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
+      send_email_to_reviewee(@map)
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
     redirect_to controller: 'response', action: 'save', id: @map.map_id,
                 return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
+  end
+
+  # E1961
+  # send email to user that new peer review is entered or revised
+  def send_email_to_reviewee(map)
+    participant = Participant.find(map.reviewer_id)
+    defn = {body: {type: "Peer Review", obj_name: "Test Assgt", partial_name: "new_submission"} }
+    map.email(defn, participant, Assignment.find(Participant.find(map.reviewer_id).parent_id))
   end
 
   def new
@@ -163,7 +172,7 @@ class ResponseController < ApplicationController
     end
     was_submitted = @response.is_submitted
     @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
-
+    send_email_to_reviewee(@map)
     # ,:version_num=>@version)
     # Change the order for displaying questions for editing response views.
     questions = sort_questions(@questionnaire.questions)

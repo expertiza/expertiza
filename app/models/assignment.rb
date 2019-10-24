@@ -220,7 +220,7 @@ class Assignment < ActiveRecord::Base
   # The permissions of TopicDueDate is the same as AssignmentDueDate.
   # Here, column is usually something like 'review_allowed_id'
   def check_condition(column, topic_id = nil)
-    next_due_date = DueDate.get_next_due_date(self.id, topic_id)
+    next_due_date = next_due_date(self.id, topic_id)
     return false if next_due_date.nil?
     right_id = next_due_date.send column
     right = DeadlineRight.find(right_id)
@@ -321,10 +321,11 @@ class Assignment < ActiveRecord::Base
   # if current  stage is submission or review, find the round number
   # otherwise, return 0
   def number_of_current_round(topic_id)
-    next_due_date = DueDate.get_next_due_date(self.id, topic_id)
+    next_due_date = next_due_date(self.id, topic_id)
     return 0 if next_due_date.nil?
     next_due_date.round ||= 0
   end
+
 
   # For varying rubric feature
   def current_stage_name(topic_id = nil)
@@ -360,7 +361,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def stage_deadline(topic_id = nil)
-    return 'Unknown' if topic_id.nil? and self.staggered_deadline?
+    return 'Unknown' if topic_missing?(topic_id)
     due_date = find_current_stage(topic_id)
     due_date.nil? || due_date == 'Finished' ? due_date : due_date.due_at.to_s
   end
@@ -375,14 +376,14 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_current_stage(topic_id = nil)
-    next_due_date = DueDate.get_next_due_date(self.id, topic_id)
+    next_due_date = next_due_date(self.id, topic_id)
     return 'Finished' if next_due_date.nil?
     next_due_date
   end
 
   # Zhewei: this method is almost the same as 'stage_deadline'
   def get_current_stage(topic_id = nil)
-    return 'Unknown' if topic_id.nil? and self.staggered_deadline?
+    return 'Unknown' if topic_missing?(topic_id)
     due_date = find_current_stage(topic_id)
     due_date.nil? || due_date == 'Finished' ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
   end
@@ -390,7 +391,7 @@ class Assignment < ActiveRecord::Base
   def review_questionnaire_id(round = nil)
     # Get the round it's in from the next duedates
     if round.nil?
-      next_due_date = DueDate.get_next_due_date(self.id)
+      next_due_date = next_due_date(self.id)
       round = next_due_date.try(:round)
     end
     # for program 1 like assignment, if same rubric is used in both rounds,
@@ -608,5 +609,19 @@ class Assignment < ActiveRecord::Base
 
   def find_due_dates(type)
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: type).id }
+  end
+
+  private
+
+  def next_due_date(topic_id)
+    DueDate.get_next_due_date(self.id, topic_id)
+  end
+
+  def finished?(topic_id)
+    return next_due_date(topic_id).nil?
+  end
+
+  def topic_missing?( topic_id = nil)
+    topic_id.nil? and self.staggered_deadline?
   end
 end

@@ -5,7 +5,7 @@
     <%= collection_select 'user', 'role_id', @all_roles, :id, :name, {:selected => @rolename.id} %></p>
 
   <%= render :partial => 'user', :locals => { :new_user => true , :request_user =>false} %>
-  <%= submit_tag "Create" %>
+  <%= submit_tag "Create", data: { confirm: "Are you sure?" } %>
 <% end %>
 
 <%= link_to 'Back', :action => 'list' %>

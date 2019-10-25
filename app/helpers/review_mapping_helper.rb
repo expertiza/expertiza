@@ -149,7 +149,6 @@ module ReviewMappingHelper
     end
   end
 
-
   # sorts the reviewers by the average volume of reviews in each round, in descending order
   def sort_reviewer_by_review_volume_desc
     @reviewers.each do |r|

@@ -28,10 +28,6 @@ class AssignmentsController < ApplicationController
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
     if params[:button]
-      #safe_filename = @assignment_form.assignment.name.tr('\\', "/") #new
-      #safe_filename = FileHelper.sanitize_filename(safe_filename) # new
-      #assignment_form_params[:assignment][:directory_path] = File.split(safe_filename).last.tr(" ", '_') #new
-      assignment_form_params[:assignment][:directory_path] = refineDirectoryName(@assignment_form.assignment.name)
       exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
       exist_directory = Assignment.find_by(directory_path: assignment_form_params[:assignment][:directory_path], course_id: @assignment_form.assignment.course_id)
       if !exist_assignment and !exist_directory
@@ -60,7 +56,11 @@ class AssignmentsController < ApplicationController
           render 'new'
         end
       else
-        flash.now[:error] = "This assignment/directory already exists in the selected course. Kindly rename the assignment."
+        if exist_assignment
+          flash.now[:error] = "Assignment name already exists in the selected course. Kindly rename the assignment."
+        else
+          flash.now[:error] = "Directory name already exists in the selected course. Kindly rename the directory."
+        end
         render 'new'
       end
     else
@@ -379,12 +379,6 @@ class AssignmentsController < ApplicationController
       end
     end
     ExpertizaLogger.info LoggerMessage.new("", session[:user].name, "The assignment was saved: #{@assignment_form.as_json}", request)
-  end
-
-  def refineDirectoryName(original_name)
-    safe_filename = original_name.tr('\\', "/") #new
-    safe_filename = FileHelper.sanitize_filename(safe_filename)
-    directory_name = File.split(safe_filename).last.tr(" ", '_')
   end
 
   def assignment_form_params

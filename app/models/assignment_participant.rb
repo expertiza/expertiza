@@ -196,9 +196,8 @@ class AssignmentParticipant < Participant
   # if user does not exist, it will be created and added to this assignment
 
   def self.import(row_hash, _row_header = nil, session, id)
-    raise ImportError, "The assignment with id \"#{id}\" was not found." if Assignment.find(id).nil?
-
     raise ArgumentError, "No user id has been specified." if row_hash.empty?
+    raise ImportError, "The assignment with id \"#{id}\" was not found." if Assignment.find(id).nil?
     user = User.find_by(name: row_hash[:name])
     if user.nil?
       raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 4

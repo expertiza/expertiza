@@ -33,27 +33,34 @@ module ReviewMappingHelper
       elsif response_for_each_round?(response_map)
         'blue'
       else
-        color = []
-        (1..@assignment.num_review_rounds).each do |round|
-          if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
-            color.push 'purple'
-          else
-            link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
-            if link.nil? or (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
-              color.push 'green'
-            else
-              link_updated_at = get_link_updated_at(link)
-              color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
-            end
-          end
-        end
-        color[-1]
+        obtain_team_colour(response_map,assignment_created,assignment_due_dates)
       end
     else
       'red'
     end
   end
-
+  # loops through the number of assignment review rounds and obains the team colour
+  def obtain_team_colour(response_map, assignment_created, assignment_due_dates)
+    color = []
+    (1..@assignment.num_review_rounds).each do |round|
+      check_submission_state(response_map, assignment_created, assignment_due_dates, round)
+    end
+    color[-1]
+  end
+  # checks the submission state within each round and assigns team colour
+  def check_submission_state(response_map, assignment_created, assignment_due_dates, round)
+    if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
+      color.push 'purple'
+    else
+      link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
+      if link.nil? or (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
+        color.push 'green'
+      else
+        link_updated_at = get_link_updated_at(link)
+        color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green' 
+      end
+    end
+  end
   # checks if a review was submitted in every round and gives the total responses count
   def response_for_each_round?(response_map)
     num_responses = 0
@@ -132,8 +139,7 @@ module ReviewMappingHelper
     end
   end
 
-
- # gets minimum, maximum and average value for all the reviews
+# gets minimum, maximum and average value for all the reviews
   def get_review_metrics(round, team_id)
     %i[max min avg].each {|metric| instance_variable_set('@' + metric.to_s, '-----') }
     if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? {|k| @avg_and_ranges[team_id][round].key? k }
@@ -337,11 +343,11 @@ module ReviewMappingHelper
   def get_css_style_for_calibration_report(diff)
     # diff - difference between stu's answer and instructor's answer
     dict = {0 => 'c5', 1 => 'c4', 2 => 'c3', 3 => 'c2'}
-    if dict.key?(diff.abs)
-      css_class = dict[diff.abs]
-    else
-      css_class = 'c1'
-    end
+    css_class = if dict.key?(diff.abs)
+                  dict[diff.abs]
+                else
+                  css_class = 'c1'
+                end
     css_class
   end
 
@@ -383,5 +389,3 @@ module ReviewMappingHelper
     end
   end
 end
-
-

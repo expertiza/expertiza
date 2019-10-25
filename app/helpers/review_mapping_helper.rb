@@ -140,15 +140,18 @@ module ReviewMappingHelper
   end
 
 # gets minimum, maximum and average value for all the reviews
-  def get_review_metrics(round, team_id)
-    %i[max min avg].each {|metric| instance_variable_set('@' + metric.to_s, '-----') }
-    if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? {|k| @avg_and_ranges[team_id][round].key? k }
-      %i[max min avg].each do |metric|
-        metric_value = @avg_and_ranges[team_id][round][metric].nil? ? '-----' : @avg_and_ranges[team_id][round][metric].round(0).to_s + '%'
-        instance_variable_set('@' + metric.to_s, metric_value)
+ def get_review_metrics(round, team_id)
+    ['max', 'min', 'avg'].each {|metric| instance_variable_set('@' + metric, '-----') }
+    x = @avg_and_ranges.dig(team_id, round)
+    if x != nil && ['max', 'min', 'avg'].all? {|k| x.key? k }
+      ['max', 'min', 'avg'].each do |metric|
+	average_metric = @avg_and_ranges.dig(team_id, round, metric)
+        metric_value = average_metric.nil? ? '-----' : average_metric.round(0).to_s + '%'
+        instance_variable_set('@' + metric, metric_value)
       end
     end
   end
+
 
   # sorts the reviewers by the average volume of reviews in each round, in descending order
   def sort_reviewer_by_review_volume_desc

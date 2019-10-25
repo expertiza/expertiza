@@ -33,27 +33,34 @@ module ReviewMappingHelper
       elsif response_for_each_round?(response_map)
         'blue'
       else
-        color = []
-        (1..@assignment.num_review_rounds).each do |round|
-          if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
-            color.push 'purple'
-          else
-            link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
-            if link.nil? or (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
-              color.push 'green'
-            else
-              link_updated_at = get_link_updated_at(link)
-              color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
-            end
-          end
-        end
-        color[-1]
+        obtain_team_colour(response_map,assignment_created,assignment_due_dates)
       end
     else
       'red'
     end
   end
-
+  # loops through the number of assignment review rounds and obains the team colour
+  def obtain_team_colour(response_map, assignment_created, assignment_due_dates)
+    color = []
+    (1..@assignment.num_review_rounds).each do |round|
+      check_submission_state(response_map, assignment_created, assignment_due_dates, round)
+    end
+    color[-1]
+  end
+  # checks the submission state within each round and assigns team colour
+  def check_submission_state(response_map, assignment_created, assignment_due_dates, round)
+    if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
+      color.push 'purple'
+    else
+      link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
+      if link.nil? or (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
+        color.push 'green'
+      else
+        link_updated_at = get_link_updated_at(link)
+        color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green' 
+      end
+    end
+  end
   # checks if a review was submitted in every round and gives the total responses count
   def response_for_each_round?(response_map)
     num_responses = 0
@@ -300,25 +307,26 @@ module ReviewMappingHelper
 
   # gets review and feedback responses for all rounds for the feedback report
   def get_each_review_and_feedback_response_map(author)
-    # intial commit
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     # Calculate how many responses one team received from each round
     # It is the feedback number each team member should make
     @review_response_map_ids = ReviewResponseMap.where(["reviewed_object_id = ? and reviewee_id = ?", @id, @team_id]).pluck("id")
-    {1 => 'one', 2 => 'two', 3 => 'three'}.each do |key, round_num|
-      response_condition = Response.where(["map_id IN (?) and round = ?", @review_response_map_ids, key])
-      instance_variable_set('@review_responses_round_' + round_num, response_condition)
-      # Calculate feedback response map records
-      instance_variable_condition = instance_variable_get('@all_review_response_ids_round_' + round_num)
-      feedback_response_condition = FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?", instance_variable_condition, author.id])
-      instance_variable_set('@feedback_response_maps_round_' + round_num, feedback_response_condition)
-    end
+    feedback_response_map_record(author)
     # rspan means the all peer reviews one student received, including unfinished one
     @rspan_round_one = @review_responses_round_one.length
     @rspan_round_two = @review_responses_round_two.length
     @rspan_round_three = @review_responses_round_three.nil? ? 0 : @review_responses_round_three.length
   end
-
+  def feedback_response_map_record(author)
+    {1 => 'one', 2 => 'two', 3 => 'three'}.each do |key, round_num|
+      instance_variable_set('@review_responses_round_' + round_num,
+                            Response.where(["map_id IN (?) and round = ?", @review_response_map_ids, key]))
+      # Calculate feedback response map records
+      instance_variable_set('@feedback_response_maps_round_' + round_num,
+                            FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?",
+                                                      instance_variable_get('@all_review_response_ids_round_' + round_num), author.id]))
+    end
+  end
   # gets review and feedback responses for a certain round for the feedback report
   def get_certain_review_and_feedback_response_map(author)
     @feedback_response_maps = FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?", @all_review_response_ids, author.id])

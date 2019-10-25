@@ -17,9 +17,11 @@
     <hr/>
 <% end %>
 
-<% file_url = nil %>
-<%= @response.display_as_html(nil, nil, file_url) %>
-<br/>
+<TR %>_reviews" style="display:none; background-color: white;">
+    <TD COLSPAN="10">
+    <%= render :partial=>'grades/tabbed_reviews', :locals => {:prefix => 'user', :participant => @participant, :rscore => @pscore[:review]} %>
+    </TD>
+</TR>
 
 <!--Check whether there is a UploadFile question.-->
 <%if @map.instance_of?(ReviewResponseMap)%>

@@ -122,32 +122,25 @@ module ReviewMappingHelper
   # gets the review score awarded based on each round of the review
 
   def get_awarded_review_score(reviewer_id, team_id) 
-		num_rounds = @assignment.num_review_rounds
+	num_rounds = @assignment.num_review_rounds
     (1..num_rounds).each {|round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----') }
     (1..num_rounds).each do |round|
-      if @review_scores.dig(reviewer_id, round, team_id) != nil && @review_scores[reviewer_id][round][team_id] != -1.0
-         instance_variable_set("@score_awarded_round_" + round.to_s, @review_scores[reviewer_id][round][team_id].inspect + '%')
+	  teamID = @review_scores.dig(reviewer_id, round, team_id)
+      if teamID != nil && teamID != -1.0
+         instance_variable_set("@score_awarded_round_" + round.to_s, teamID.inspect + '%')
       end
     end
   end
 
 
-	def set_metrics(x)
-		x.each {|metric| instance_variable_set('@' + metric.to_s, '-----') }
-	end
-
-	def calculate_metric_value(metric, round, team_id)
-        return @avg_and_ranges[team_id][round][metric].nil? ? '-----' : @avg_and_ranges[team_id][round][metric].round(0).to_s + '%'
-	end
-
-  # gets minimum, maximum and average value for all the reviews
+ # gets minimum, maximum and average value for all the reviews
   def get_review_metrics(round, team_id)
-    set_metrics(%i[max min avg])
+    %i[max min avg].each {|metric| instance_variable_set('@' + metric.to_s, '-----') }
     if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? {|k| @avg_and_ranges[team_id][round].key? k }
-    	calculate_metrics(%i[max min avg])
-			%i[max min avg].each do |metric|
-        instance_variable_set('@' + metric.to_s, calculate_metric_value(metric, round, team_id))
-			end
+      %i[max min avg].each do |metric|
+        metric_value = @avg_and_ranges[team_id][round][metric].nil? ? '-----' : @avg_and_ranges[team_id][round][metric].round(0).to_s + '%'
+        instance_variable_set('@' + metric.to_s, metric_value)
+      end
     end
   end
 

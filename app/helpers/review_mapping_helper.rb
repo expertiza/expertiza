@@ -316,20 +316,22 @@ module ReviewMappingHelper
     # Calculate how many responses one team received from each round
     # It is the feedback number each team member should make
     @review_response_map_ids = ReviewResponseMap.where(["reviewed_object_id = ? and reviewee_id = ?", @id, @team_id]).pluck("id")
+    feedback_response_map_record(author)
+    # rspan means the all peer reviews one student received, including unfinished one
+    @rspan_round_one = @review_responses_round_one.length
+    @rspan_round_two = @review_responses_round_two.length
+    @rspan_round_three = @review_responses_round_three.nil? ? 0 : @review_responses_round_three.length
+  end
+  def feedback_response_map_record(author)
     {1 => 'one', 2 => 'two', 3 => 'three'}.each do |key, round_num|
       instance_variable_set('@review_responses_round_' + round_num,
                             Response.where(["map_id IN (?) and round = ?", @review_response_map_ids, key]))
       # Calculate feedback response map records
       instance_variable_set('@feedback_response_maps_round_' + round_num,
                             FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?",
-                                                       instance_variable_get('@all_review_response_ids_round_' + round_num), author.id]))
+                                                      instance_variable_get('@all_review_response_ids_round_' + round_num), author.id]))
     end
-    # rspan means the all peer reviews one student received, including unfinished one
-    @rspan_round_one = @review_responses_round_one.length
-    @rspan_round_two = @review_responses_round_two.length
-    @rspan_round_three = @review_responses_round_three.nil? ? 0 : @review_responses_round_three.length
   end
-
   # gets review and feedback responses for a certain round for the feedback report
   def get_certain_review_and_feedback_response_map(author)
     @feedback_response_maps = FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?", @all_review_response_ids, author.id])

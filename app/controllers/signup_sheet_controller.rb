@@ -37,7 +37,7 @@ class SignupSheetController < ApplicationController
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[destroy create update],
-         redirect_to: {action: :list_topics}
+         redirect_to: {action: :list}
 
   # Prepares the form for adding a new topic. Used in conjunction with create
   def new
@@ -163,7 +163,10 @@ class SignupSheetController < ApplicationController
     redirect_to controller: 'assignments', action: 'edit', id: assignment_id
   end
 
-  def list_topics
+
+  #
+  #this returns a list of topics which are available for assignment
+  def list
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
     @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
@@ -191,6 +194,7 @@ class SignupSheetController < ApplicationController
     @drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 6)
     @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id)
 
+    #find all assignments whose deadline has not passed
     unless @assignment.due_dates.find_by(deadline_type_id: 1).nil?
       @show_actions = false if !@assignment.staggered_deadline? and @assignment.due_dates.find_by(deadline_type_id: 1).due_at < Time.now
 

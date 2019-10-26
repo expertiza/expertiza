@@ -389,5 +389,3 @@ module ReviewMappingHelper
     end
   end
 end
-
-# ..

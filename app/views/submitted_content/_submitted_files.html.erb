@@ -17,14 +17,25 @@
 <% end %>
 <br/><br/>
 
+
+
+
+
+<!--///////////////////////-->
+
+
+
+
 <% if (files.length > 0 or stage != "Finished")  %>
   <% if same_team_flag && stage != "Finished" %>
     <h4>&#8226; Submit a file:</h4>
     <%= form_tag({:controller=>'submitted_content',:action=>'submit_file',:id => participant.id, :origin => origin ||= nil, :response_map_id => response_map_id ||= nil},{:method => 'post', :enctype => "multipart/form-data", :onSubmit => "return checkIfFileExists(uploaded_file.value,1);"}) do %>
-      <!--<input type="checkbox" name="unzip" value=""/> Unzip submission-->
+<!--      <input type="checkbox" name="unzip" value=""/> Unzip submission-->
       <div class="form-group">
-        <input type="file" id="uploaded_file" name="uploaded_file" size=40 />
-      </div>
+
+  <input type="file" id="uploaded_file" name="uploaded_file" size=40 onchange = "ValidateSingleInput(this);"/>
+
+</div>
       <%= submit_tag 'Upload file', class: 'btn btn-default' %>
       <br/><br/>
     <% end %>
@@ -51,3 +62,41 @@
 <% else %>
 <!--No files have been submitted.-->
 <% end %>
+
+
+
+<script>
+    var _validFileExtensions = ["pdf", "jpg", "jpeg", "tar", "zip", "png", "7z", "odt", "docx"];
+    function ValidateSingleInput(oInput) {
+        var maxfilesize = 5*1024 * 1024;  // 5 Mb
+        var filesize    = oInput.files[0].size;
+        if (oInput.type == "file") {
+            var sFileName = oInput.value;
+            if(filesize>maxfilesize){
+                alert("The maximum upload file size is 5MB!");
+                oInput.value = "";
+                return false;
+            }
+
+            if (sFileName.length > 0) {
+                var blnValid = false;
+                for (var j = 0; j < _validFileExtensions.length; j++) {
+                    var sCurExtension = _validFileExtensions[j];
+                    if (sFileName.substr(sFileName.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
+                        blnValid = true;
+                        break;
+                    }
+                }
+
+                if (!blnValid) {
+                    // alert(sFileName + " is invalid, allowed file types are: " + _validFileExtensions.join(", "));
+                    alert("Allowed file types are: " + _validFileExtensions.join(", "));
+
+                    oInput.value = "";
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+</script>

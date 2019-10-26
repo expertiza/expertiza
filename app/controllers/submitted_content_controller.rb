@@ -82,10 +82,36 @@ class SubmittedContentController < ApplicationController
     redirect_to action: action, id: @participant.id
   end
 
+
+
+
+  # ////////////////////
+
+
+
+
   def submit_file
     participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(participant.user_id)
     file = params[:uploaded_file]
+
+
+
+    if(file.size>5*1024*1024)
+      flash[:error] = 'File Size must smaller than 5MB!'
+      redirect_to action: 'edit', id: participant.id
+    end
+    type=file.original_filename.split('.')
+    if %w(pdf jpg jpeg tar zip png 7z odt docx).include? type[1].downcase==false
+      flash[:error] = 'File type error!'
+      redirect_to action: 'edit', id: participant.id
+    end
+
+
+    # puts type[1]
+
+
+
     participant.team.set_student_directory_num
     @current_folder = DisplayOption.new
     @current_folder.name = "/"

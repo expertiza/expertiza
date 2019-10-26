@@ -480,6 +480,19 @@ resources :institution, except: [:destroy] do
       get :auto_complete_for_user_name
       get :set_anonymized_view
       get :keys
+    end
+  end
+
+  resources :account_request, constraints: {id: /\d+/} do
+    collection do
+      get :list
+      post :list
+      get :list_pending_requested
+      post ':id', action: :update
+      get :show_selection
+      get :auto_complete_for_user_name
+      get :set_anonymized_view
+      get :keys
       post :create_requested_user_record
       post :create_approved_user
     end

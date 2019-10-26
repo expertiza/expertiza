@@ -1,0 +1,2 @@
+class AccountRequest < User
+end

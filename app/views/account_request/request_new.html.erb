@@ -4,7 +4,7 @@
   <p><label for="role_id"><b>Role</b></label><br/>
     <label>Instructor</label><br/>
 
-  <%= render :partial => 'user', :locals => { :new_user => true, :request_user => true } %>
+  <%= render :partial => 'users/user', :locals => { :new_user => true, :request_user => true } %>
   <%= submit_tag "Request" %>
 <% end %>
 

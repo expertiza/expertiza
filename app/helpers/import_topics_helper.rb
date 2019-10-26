@@ -38,7 +38,17 @@ module ImportTopicsHelper
   def self.create_new_sign_up_topic(attributes, session)
     sign_up_topic = SignUpTopic.new(attributes)
     sign_up_topic.assignment_id = session[:assignment_id]
-    sign_up_topic.save
-    # sign_up_topic
+    sign_up_topic.save!
+    sign_up_topic.id
   end
+
+
+  def self.assign_team_topic(topic_id, assigned_team)
+    attributes = {}
+    attributes["topic_id"] = topic_id
+    attributes["team_id"] = assigned_team
+    assign_team = SignedUpTeam.new(attributes)
+    assign_team.save!
+  end
+
 end

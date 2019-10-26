@@ -40,6 +40,9 @@ class ImportFileController < ApplicationController
       if (params[:link] == 'true')
         @optional_count += 1
       end
+      if (params[:assigned_team] == 'true')
+        @optional_count += 1
+      end
     else
       @optional_count = 0
     end
@@ -142,6 +145,9 @@ class ImportFileController < ApplicationController
           @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
         elsif params[:optional_count] == '3'
           new_header = [params[:select1], params[:select2], params[:select3], params[:select4], params[:select5], params[:select6]]
+          @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
+        elsif params[:optional_count] == '4'
+          new_header = [params[:select1], params[:select2], params[:select3], params[:select4], params[:select5], params[:select6], params[:select7]]
           @header_integrated_body = hash_rows_with_headers(new_header,contents_hash[:body])
         end
       end

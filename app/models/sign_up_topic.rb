@@ -18,18 +18,31 @@ class SignUpTopic < ActiveRecord::Base
 
   def self.import(row_hash, session, _id = nil)
     if row_hash.length < 3
-      raise ArgumentError, "The CSV File expects the format: Topic identifier, Topic name, Max choosers, Topic Category (optional), Topic Description (Optional), Topic Link (optional)."
+      raise ArgumentError, "The CSV File expects the format: Topic identifier, Topic name, Max choosers, Topic Category (optional), Topic Description (Optional), Topic Link (optional), Assigned Team Name (optional)."
     end
     topic = SignUpTopic.where(topic_name: row_hash[:topic_name], assignment_id: session[:assignment_id]).first
     if topic.nil?
       attributes = ImportTopicsHelper.define_attributes(row_hash)
-
-      ImportTopicsHelper.create_new_sign_up_topic(attributes, session)
+      topic_new_id = ImportTopicsHelper.create_new_sign_up_topic(attributes, session)
+      unless row_hash[:assigned_team].nil?
+          team = Team.where(name: row_hash[:assigned_team]).first
+          ImportTopicsHelper.assign_team_topic(topic_new_id, team.id)
+      end
     else
       topic.max_choosers = row_hash[:max_choosers]
       topic.topic_identifier = row_hash[:topic_identifier]
       # topic.assignment_id = session[:assignment_id]
       topic.save
+      unless row_hash[:assigned_team].nil?
+        team = Team.where(name: row_hash[:assigned_team]).first
+        newteam = SignedUpTeam.where(topic_id: topic.id, team_id: team.id).first
+        if newteam.nil?
+          ImportTopicsHelper.assign_team_topic(topic.id, team.id)
+        else
+          newteam.team_id = team.id
+          newteam.save
+        end
+      end
     end
   end
 

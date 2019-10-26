@@ -26,7 +26,10 @@
                         '&nbsp&nbsp|&nbsp&nbsp' +
                         'Topic Description <em>(optional)</em>' +
                         '&nbsp&nbsp|&nbsp&nbsp' +
-                        'Topic Link <em>(optional)</em>'
+                        'Topic Link <em>(optional)</em>' +
+                        '&nbsp&nbsp|&nbsp&nbsp' +
+                        'Assigned Team <em>(optional)</em>'
+                        
                 },
                 :confirm => "You are adding topics to this assignment.  Students will now have to select a topic before they submit their work.",
                 :topic => @topics,
@@ -54,7 +57,9 @@
                     '&nbsp&nbsp|&nbsp&nbsp' +
                     'Topic Description <em>(optional)</em>' +
                     '&nbsp&nbsp|&nbsp&nbsp' +
-                    'Topic Link <em>(optional)</em>' %> |
+                    'Topic Link <em>(optional)</em>' +
+                    '&nbsp&nbsp|&nbsp&nbsp' +
+                    'Assigned Team <em>(optional)</em>' %> |
 
     <%= link_to 'Import sign up sheet',
                 :controller=>'import_file',

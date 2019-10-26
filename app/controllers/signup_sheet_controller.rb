@@ -37,7 +37,7 @@ class SignupSheetController < ApplicationController
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[destroy create update],
-         redirect_to: {action: :list}
+         redirect_to: {action: :list_topics}
 
   # Prepares the form for adding a new topic. Used in conjunction with create
   def new
@@ -163,7 +163,7 @@ class SignupSheetController < ApplicationController
     redirect_to controller: 'assignments', action: 'edit', id: assignment_id
   end
 
-  def list
+  def list_topics
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
     @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)

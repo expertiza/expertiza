@@ -58,7 +58,7 @@
       <tr class="info">
         <% if answer.question.is_a?(ScoredQuestion) %>
           <td align="left" width="5%">
-            <div class="c<%= answer.answer %>" style="width:30px; height:30px; border-radius:50%; font-size:15px; color:black; line-height:30px; text-align:center;"><%= answer.answer %></div>
+            <div class="c<%= answer.answer %> grade-circle"><%= answer.answer %></div>
           </td>
           <td align="left" width="95%">
             <%= answer.comments %>

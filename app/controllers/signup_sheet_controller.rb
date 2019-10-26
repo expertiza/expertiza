@@ -120,12 +120,12 @@ class SignupSheetController < ApplicationController
   # Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
   # Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics can have different deadlines.
   def add_signup_topics
-    load_add_signup_topics(params[:id])
+    retrieve_signup_topics(params[:id])
     SignUpSheet.add_signup_topic(params[:id])
   end
 
   # retrieves all the data associated with the given assignment. Includes all topics,
-  def load_add_signup_topics(assignment_id)
+  def retrieve_signup_topics(assignment_id)
     @id = assignment_id
     @sign_up_topics = SignUpTopic.where('assignment_id = ?', assignment_id)
     @slots_filled = SignUpTopic.find_slots_filled(assignment_id)

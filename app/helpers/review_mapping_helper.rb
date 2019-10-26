@@ -133,7 +133,7 @@ module ReviewMappingHelper
  def get_review_metrics(round, team_id)
     ['max', 'min', 'avg'].each {|metric| instance_variable_set('@' + metric, '-----') }
     x = @avg_and_ranges.dig(team_id, round)
-    if x != nil && %i[max min avg].all? {|k| x.key? k }
+    if x && %i[max min avg].all? {|k| x.key? k }
       ['max', 'min', 'avg'].each do |metric|
 	average_metric = @avg_and_ranges.dig(team_id, round, metric)
         metric_value = average_metric.nil? ? '-----' : average_metric.round(0).to_s + '%'

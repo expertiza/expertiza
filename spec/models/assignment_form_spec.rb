@@ -310,13 +310,13 @@ describe AssignmentForm do
   end
 
   describe '.copy' do
-    it 'copies the original assignment to a new one and returns the new assignment_id' do
+    it 'copies the original assignment to a new one and returns the new assignment_id when copy topic equals YES' do
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       allow_any_instance_of(AssignmentForm).to receive(:copy_assignment_questionnaire).with(any_args).and_return('OK!')
       allow(AssignmentDueDate).to receive(:copy).with(1, any_args).and_return('OK!')
       allow_any_instance_of(Assignment).to receive(:create_node).and_return('OK!')
       allow(SignUpTopic).to receive(:where).with(assignment_id: 1).and_return([build(:topic)])
-      expect(AssignmentForm.copy(1, build(:instructor))).to eq(2)
+      expect(AssignmentForm.copy(1,'Y',build(:instructor))).to eq(2)
     end
   end
 end

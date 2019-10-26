@@ -82,7 +82,7 @@ describe ParticipantsController do
       allow(Assignment).to receive(:find).with('1').and_return(assignment)
       params = {model: 'Assignment', authorization: 'participant', id: 1}
       session = {user: instructor}
-      get :list, params, session
+      get :list_topics, params, session
       expect(controller.instance_variable_get(:@participants)).to be_empty
     end
   end

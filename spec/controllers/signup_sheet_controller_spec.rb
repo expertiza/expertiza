@@ -192,7 +192,7 @@ describe SignupSheetController do
         allow(SignUpTopic).to receive(:find_by).with(id: 1).and_return(topic)
         params = {id: 1}
         session = {user: instructor}
-        get :list, params, session
+        get :list_topics, params, session
         expect(controller.instance_variable_get(:@bids).size).to eq(1)
         expect(controller.instance_variable_get(:@sign_up_topics)).to be_empty
         expect(response).to render_template('signup_sheet/intelligent_topic_selection')
@@ -204,8 +204,8 @@ describe SignupSheetController do
         allow(Bid).to receive(:where).with(team_id: 1).and_return([double('Bid', topic_id: 1)])
         allow(SignUpTopic).to receive(:find_by).with(1).and_return(topic)
         params = {id: 1}
-        get :list, params
-        expect(response).to render_template(:list)
+        get :list_topics, params
+        expect(response).to render_template(:list_topics)
       end
     end
   end

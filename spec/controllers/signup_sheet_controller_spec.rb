@@ -449,8 +449,8 @@ describe SignupSheetController do
       allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([double('TeamsUser', user_id: 1)])
       allow(User).to receive(:find).with(1).and_return(student)
       params = {assignment_id: 1, id: 1}
-      get :show_team, params
-      expect(response).to render_template(:show_team)
+      get :show_team_members, params
+      expect(response).to render_template(:show_team_members)
     end
   end
 

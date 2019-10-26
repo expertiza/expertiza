@@ -395,7 +395,7 @@ class SignupSheetController < ApplicationController
   end
 
   # This method is called when a student click on the trumpet icon. So this is a bad method name. --Yang
-  def show_team
+  def show_team_members
     if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
       @results = get_ad_info(assignment.id, topic.id)
       @results.each do |result|

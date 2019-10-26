@@ -168,6 +168,13 @@ class GradesController < ApplicationController
   end
 
   def save_grade_and_comment_for_submission
+    @participant = AssignmentParticipant.find_by(id: params[:participant_id])
+    @assignment = @participant.assignment
+    if TaMapping.where(ta_id:current_user.id,course_id:@assignment.course.id).empty?&&current_user.role.name !='Instructor'
+      flash[:error] = 'Unauthorized action!'
+      redirect_to controller: 'grades', action: 'view_team', id: participant.id
+    else
+
     participant = AssignmentParticipant.find_by(id: params[:participant_id])
     @team = participant.team
     @team.grade_for_submission = params[:grade_for_submission]
@@ -179,6 +186,7 @@ class GradesController < ApplicationController
       flash[:error] = $ERROR_INFO
     end
     redirect_to controller: 'grades', action: 'view_team', id: participant.id
+    end
   end
 
   private

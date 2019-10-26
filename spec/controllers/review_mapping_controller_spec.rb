@@ -116,7 +116,9 @@ describe ReviewMappingController do
         topic = double('SignUpTopic')
         allow(SignUpTopic).to receive(:find).with('1').and_return(topic)
         allow(assignment).to receive(:assign_reviewer_dynamically).with(participant, topic).and_return(true)
-        params = {
+        allow(ReviewResponseMap).to receive(:reviewer_id).with(1).and_return(0)
+	allow(assignment).to receive(:num_reviews_allowed).and_return(1)
+	params = {
           assignment_id: 1,
           reviewer_id: 1,
           topic_id: 1
@@ -135,7 +137,9 @@ describe ReviewMappingController do
         allow(assignment).to receive(:candidate_assignment_teams_to_review).with(participant).and_return(teams)
         allow(teams).to receive_message_chain(:to_a, :sample).and_return(team2)
         allow(assignment).to receive(:assign_reviewer_dynamically_no_topic).with(participant, team2).and_return(true)
-        params = {
+        allow(ReviewResponseMap).to receive(:reviewer_id).with(1).and_return(0)
+        allow(assignment).to receive(:num_reviews_allowed).and_return(1)
+	params = {
           assignment_id: 1,
           reviewer_id: 1,
           topic_id: 1

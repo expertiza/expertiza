@@ -234,7 +234,16 @@ describe Team do
         it 'returns new team name' do
           allow(Course).to receive(:find).with(1).and_return(double('Course', name: 'no course'))
           allow(Team).to receive(:generate_team_name).with('no course').and_return('new team name')
-          expect(Team.handle_duplicate(team, 'no name', 1, 'rename', CourseTeam.new)).to eq('new team name')
+          expect(Team.handle_duplicate(team, 'no name', 1, 'rename', CourseTeam)).to eq('new team name')
+        end
+      end
+
+      # New team name should remain the same, the old one gets updated
+      context 'when handle_dups option is rename_existing' do
+        it 'returns new team name' do
+          allow(Course).to receive(:find).with(1).and_return(double('Course', name: 'course 1'))
+          allow(Team).to receive(:generate_team_name).with('course 1').and_return('new name of team')
+          expect(Team.handle_duplicate(team, 'no name', 1, 'rename_existing', CourseTeam)).to eq('no name')
         end
       end
 

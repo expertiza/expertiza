@@ -1,3 +1,13 @@
+let app_variables = {
+  currentUserId: null
+};
+
+window.addEventListener('load', e => {
+  let treeDisplayDiv = document.querySelector('#tree_display');
+  if (treeDisplayDiv) {
+    app_variables.currentUserId = document.querySelector('#tree_display').dataset.userId;
+  }
+});
 jQuery(document).ready(function() {
   // This preloadedImages function is refered from http://jsfiddle.net/slashingweapon/8jAeu/
   // Actually I am not using the values in preloadedImages, but image loading speed is indeed getting faster
@@ -91,9 +101,15 @@ jQuery(document).ready(function() {
           newNodeType = this.props.nodeType + "s"
         }
         if (this.props.is_available || newNodeType == 'questionnaires') {
+          if (app_variables.currentUserId == null || this.props.instructor_id == app_variables.currentUserId) {
+            moreContent.push(
+              <span>
+                <a title="Edit" href={"/"+newNodeType+"/"+(parseInt(this.props.id)/2).toString()+"/edit"}><img src="/assets/tree_view/edit-icon-24.png" /></a>
+              </span>
+            );  
+          }
           moreContent.push(
             <span>
-              <a title="Edit" href={"/"+newNodeType+"/"+(parseInt(this.props.id)/2).toString()+"/edit"}><img src="/assets/tree_view/edit-icon-24.png" /></a>
               <a title="Delete" href={"/tree_display/confirm?id="+(parseInt(this.props.id)/2).toString()+"&nodeType="+newNodeType}><img src="/assets/tree_view/delete-icon-24.png" /></a>
             </span>
           )
@@ -263,6 +279,7 @@ jQuery(document).ready(function() {
 
   var SimpleTableRow = React.createClass({
     render: function () {
+      console.log(this.props.instructor_id, 'i_id')
       var creation_date;
       var updated_date;
       var colWidthArray = ["30%", "0%", "0%", "0%", "25%", "25%", "20%"]
@@ -289,6 +306,7 @@ jQuery(document).ready(function() {
             if(typeof this.props.institution !== 'undefined' && this.props.institution.length != 0){
               institution_name = this.props.institution[0].name
             }
+            console.log('a', this.props)
             return (
                 <tr id={this.props.id}>
                     <td width={colWidthArray[0]}>{this.props.name}</td>
@@ -310,6 +328,7 @@ jQuery(document).ready(function() {
                             allow_suggestions={this.props.allow_suggestions}
                             has_topic={this.props.has_topic}
                             id={id}
+                            instructor_id = {this.props.instructor_id}
                         />
                     </td>
                 </tr>
@@ -336,6 +355,7 @@ jQuery(document).ready(function() {
                             allow_suggestions={this.props.allow_suggestions}
                             has_topic={this.props.has_topic}
                             id={id}
+                            instructor_id = {this.props.instructor_id}
                         />
                     </td>
                 </tr>
@@ -346,6 +366,7 @@ jQuery(document).ready(function() {
 
   var SimpleTable = React.createClass({
     render: function() {
+      console.log(this.props, "bharat");
       var _rows = []
       var _this = this
       var colWidthArray = ["30%", "0%", "0%", "0%", "25%", "25%", "20%"]
@@ -381,6 +402,7 @@ jQuery(document).ready(function() {
                       require_quiz={entry.require_quiz}
                       has_topic={entry.has_topic}
                       dataType={_this.props.dataType}
+                      instructor_id={entry.instructor_id}
                   />)
               })
           }
@@ -402,6 +424,7 @@ jQuery(document).ready(function() {
                       require_quiz={entry.require_quiz}
                       has_topic={entry.has_topic}
                       dataType={_this.props.dataType}
+                      instructor_id={entry.instructor_id}
                   />)
               })
           }

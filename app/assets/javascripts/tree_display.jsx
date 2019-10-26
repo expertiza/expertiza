@@ -464,6 +464,22 @@ jQuery(document).ready(function() {
         expanded: false
       }
     },
+      componentDidMount: function() {
+          rubBuffer = ["Review", "Metareview", "Author Feedback", "Teammate Review", "Assignment Survey", "Global Survey", "Course Survey"];
+
+          selMenuItem = document.getElementById("tree_display").getAttribute("data-menu-item");
+          selMenuItemInd = rubBuffer.indexOf(selMenuItem);
+
+          if(rubBuffer[selMenuItemInd] === this.props.name) {
+              if (selMenuItemInd !== -1) {
+                  this.setState({
+                      expanded: true
+                  }, function () {
+                      this.props.rowClicked(this.props.id, true, this.props.newParams)
+                  })
+              }
+          }
+      },
     handleClick: function(event) {
         //alert('click');
 

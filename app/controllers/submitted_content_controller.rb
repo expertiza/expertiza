@@ -80,7 +80,7 @@ class SubmittedContentController < ApplicationController
         user = User.find(reviewer.user_id)
         instructor = User.find(user.parent_id)
         bcc_mail_address = ""
-        if instructor.copy_of_emails?
+        if instructor.copy_of_emails == true && user.email_on_submission == true
           bcc_mail_address = instructor.email
         else
           # do noting

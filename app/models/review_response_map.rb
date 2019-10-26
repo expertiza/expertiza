@@ -129,7 +129,13 @@ class ReviewResponseMap < ResponseMap
   def email(defn, assignment)
     defn[:body][:type] = "Peer Review"
     AssignmentTeam.find(reviewee_id).users.each do |user|
+      instructor = User.find(user.parent_id)
+      bcc_mail_address = ""
+      if instructor.copy_of_emails == true && user.email_on_review == true
+        bcc_mail_address = instructor.email
+      end
       if user.email_on_review?
+        defn[:bcc] = bcc_mail_address
         defn[:body][:obj_name] = assignment.name
         defn[:body][:first_name] = User.find(user.id).fullname
         defn[:to] = User.find(user.id).email

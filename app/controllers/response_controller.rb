@@ -99,13 +99,6 @@ class ResponseController < ApplicationController
                 return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
   end
 
-  # E1961
-  # send email to user that new peer review is entered or revised
-  def send_email_to_reviewee(map)
-    defn = {body: {type: "Peer Review", partial_name: "new_submission"} }
-    map.email(defn, Assignment.find(Participant.find(map.reviewer_id).parent_id))
-  end
-
   def new
     assign_instance_vars
     set_content(true)
@@ -170,8 +163,11 @@ class ResponseController < ApplicationController
       )
     end
     was_submitted = @response.is_submitted
+
+    if was_submitted == true
+      send_email_to_reviewee(@map)
+    end
     @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
-    send_email_to_reviewee(@map)
     # ,:version_num=>@version)
     # Change the order for displaying questions for editing response views.
     questions = sort_questions(@questionnaire.questions)
@@ -185,6 +181,13 @@ class ResponseController < ApplicationController
     end
     redirect_to controller: 'response', action: 'save', id: @map.map_id,
                 return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
+  end
+
+  # E1961
+  # send email to user that new peer review is entered or revised
+  def send_email_to_reviewee(map)
+    defn = {body: {type: "Peer Review", partial_name: "new_submission"} }
+    map.email(defn, Assignment.find(Participant.find(map.reviewer_id).parent_id))
   end
 
   def save

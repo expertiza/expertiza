@@ -28,11 +28,13 @@ class AssignmentsController < ApplicationController
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
     if params[:button]
+      # Do not create an assignment if the assignment name or directory name already present in the course
       exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
       exist_directory = Assignment.find_by(directory_path: assignment_form_params[:assignment][:directory_path], course_id: @assignment_form.assignment.course_id)
       if !exist_assignment and !exist_directory
         if @assignment_form.save
           @assignment_form.create_assignment_node
+          # Get the details of the assignment which is saved in current_assignment
           current_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
           assignment_form_params[:assignment][:id] = current_assignment.id.to_s
           ques_array = assignment_form_params[:assignment_questionnaire]
@@ -84,7 +86,7 @@ class AssignmentsController < ApplicationController
     @due_date_all = update_nil_dd_description_url(@due_date_all)
     # only when instructor does not assign rubrics and in assignment edit page will show this error message.
     handle_rubrics_not_assigned_case
-    handle_answer_tagging
+    handle_assignment_directory_path_nonexist_case_and_answer_tagging
     # assigned badges will hold all the badges that have been assigned to an assignment
     # added it to display the assigned badges while creating a badge in the assignments page
     @assigned_badges = @assignment_form.assignment.badges
@@ -325,7 +327,11 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  def handle_answer_tagging
+  def handle_assignment_directory_path_nonexist_case_and_answer_tagging
+    if @assignment_form.assignment.directory_path.blank?
+      flash.now[:error] = "You did not specify your submission directory."
+      ExpertizaLogger.error LoggerMessage.new(controller_name, "", "Submission directory not specified", request)
+    end
     @assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id]) if @assignment_form.assignment.is_answer_tagging_allowed
   end
 

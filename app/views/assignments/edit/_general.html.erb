@@ -26,10 +26,10 @@ function microtaskChanged() {
   }
 }
 
-$(function() {                                       // <== Doc Ready
-    $("#name_field").change(function() {                  // When the email is changed
+$(function() {
+    $("#name_field").change(function() {
         filename = $( "#name_field" ).val().replace(/ /g,"_").replace(/[/\\?%*:|"<>/$&!#%^@]/g, '');;
-        $('#directory_field').val(filename);                  // copy it over to the mail
+        $('#directory_field').val(filename);
     });
 });
 
@@ -57,7 +57,7 @@ $(function() {                                       // <== Doc Ready
 
 <tr><div class="form-inline">
 <td style='padding:5px'><%= label_tag('assignment_form[assignment][directory_path]', 'Submission directory:') %></td>
-<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, required: true, :id => 'directory_field', :style => 'width:250px', class: 'form-control') %> (Note: Directory name is auto generated. You can change it if you find the need to.)
+<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, required: true, :id => 'directory_field', :style => 'width:250px', class: 'form-control') %> (Note: Directory name is auto-generated from Assignment Name. You can change it if you wish to.)
 <img src="/assets/info.png" title='- DO NOT change this filed for an on-going assignment. This may cause lost of student submitted file.'>
 </td></div>
 </tr>

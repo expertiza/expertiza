@@ -68,6 +68,7 @@ Expertiza::Application.routes.draw do
     collection do
       get :list
       post :save_bookmark_rating_score
+      post :new_bookmark_review
     end
   end
 

@@ -67,9 +67,7 @@ class StudentTaskController < ApplicationController
                   else
                     ReviewResponseMap.get_assessments_for(team)
                   end
-        reviews.each do |review|
-          @total_tags++
-        end
+        @total_tags += reviews.length
         deployments = TagPromptDeployment.where(questionnaire: questionnaire)
         deploymnets.each do |deployment|
           @completed_tags += AnswerTag.where("tag_prompt_deployment_id = ? AND user_id = ? AND value != ?",
@@ -77,6 +75,7 @@ class StudentTaskController < ApplicationController
         end
       end
     end
+  end
     
     @total_tags.select! {|tag| tag.tag_prompt.control_type.downcase != "checkbox"}
   end

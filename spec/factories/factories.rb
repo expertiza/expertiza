@@ -413,7 +413,7 @@ FactoryBot.define do
     created_at Time.now
   end
 
-  factory :requested_user, class: RequestedUser do
+  factory :requested_user, class: AccountRequest do
     name 'requester1'
     role_id 2
     fullname 'requester, requester'

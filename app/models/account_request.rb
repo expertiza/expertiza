@@ -1,2 +1,0 @@
-class AccountRequest < User
-end

@@ -474,7 +474,6 @@ resources :institution, except: [:destroy] do
     collection do
       get :list
       post :list
-      get :list_pending_requested
       post ':id', action: :update
       get :show_selection
       get :auto_complete_for_user_name

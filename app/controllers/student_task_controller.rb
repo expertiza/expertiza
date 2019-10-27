@@ -69,7 +69,8 @@ class StudentTaskController < ApplicationController
     @total_tags = 0
     answers.each do |answer|
       if !answer.comments.nil? and answer.comments != ""
-        tags = deployments.find_all {|tag| tag.question_type == answer.question.type}
+        tags = deployments.find_all {|tag| tag.question_type == answer.question.type and 
+                                     tag.tag_prompt.control_type.downcase != "checkbox"}
         @total_tags += tags.count
       end
     end

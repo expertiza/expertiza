@@ -99,7 +99,7 @@ to display the label "Your team" in the student assignment tasks-->
       <% end %>
     </li>
     <li>
-      Number of tags left: <%= "#{@completed_tags}/#{total_tags}" %>
+      Number of tags left: <%= "#{@completed_tags.count}/#{@total_tags.count}" %>
     </li>
   <% end %>
     <%if @can_provide_suggestions == true %>

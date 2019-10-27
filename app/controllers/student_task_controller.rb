@@ -58,10 +58,9 @@ class StudentTaskController < ApplicationController
     
     #THE FOLLOWING CODE IS ADDED FOR THE TAG COUNT FEATURE
     questionnaires = @assignment.questionnaires
-    @questions = retrieve_questions questionnaires, @assignment.id
     @total_tags = []
     questionnaires.each do |questionnaire|
-      if questionnaire_type == "ReviewQuestionnaire"
+      if questionnaire.type == "ReviewQuestionnaire"
         @total_tags += TagPromptDeployment.where("questionnaire_id = ? AND assignment_id = ?", questionnaire.id, @assignment.id)
       end
     end

@@ -56,10 +56,15 @@ class StudentTaskController < ApplicationController
     # Timeline feature
     @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
     #Tag count feature:
-    @completed_answer_tags = Array.new
-    @total_answer_tags = TagPromptDeployment.where(assignment_id: @assignment)
-    @total_answer_tags.each do |x|
-      @completed_answer_tags += AnswerTag.where("tag_prompt_deployment_id = ? AND user_id = ? AND value != ?", x, @participant.user_id, 0)
+    @questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
+    @review_maps = if @assignment.varying_rubrics_by_round?
+                ReviewResponseMap.get_responses_for_team_round(@team, @round)
+              else
+                ReviewResponseMap.get_assessments_for(@team)
+              end
+    @reviews = []
+    @review_maps.each do |map|
+      @reviews << map.respnse
     end
   end
 

@@ -96,7 +96,6 @@ to display the label "Your team" in the student assignment tasks-->
       <% else %>
         <%= link_to "Your scores", controller: 'grades', action: 'view_team', id: @participant.id %>
         (View feedback on your work)  &nbsp;  <%= link_to "Alternate View",  controller: 'grades', action: 'view_my_scores', id: @participant.id %>
-        <%= "#{@completed_answer_tags.length}/#{@total_answer_tags.length} tags completed" %>
       <% end %>
     </li>
   <% end %>
@@ -111,6 +110,14 @@ to display the label "Your team" in the student assignment tasks-->
     <li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> (Provide a different handle for this assignment)</li>
   </ul>
   <br>
+  
+  <h2> DEBUG TABLE </h2>
+  <table>
+    <th> <td> Reviews </td> </th>
+    <% @reviews.each do |review| %>
+      <tr> <td> <%= review %> </td> </tr>
+    <% end %>
+  </table>
 
   <br/>
   <br/>

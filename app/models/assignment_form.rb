@@ -1,4 +1,3 @@
-
 require 'active_support/time_with_zone'
 
 class AssignmentForm
@@ -353,4 +352,3 @@ class AssignmentForm
     end
   end
 end
-

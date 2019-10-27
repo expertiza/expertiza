@@ -67,7 +67,7 @@ class StudentTaskController < ApplicationController
         questions = Question.where(questionnaire: questionnaire)
         questions = questions.select {|question| deployments.any? {|deployment| deployment.question_type == question.type}}
         answers = []
-        question.each {|question| answers += Answer.where(question: question)}
+        questions.each {|question| answers += Answer.where(question: question)}
         @total_tags += answers.count
         deployments.each do |deployment|
           @completed_tags += AnswerTag.where("tag_prompt_deployment_id = ? AND user_id = ? AND value != ?",

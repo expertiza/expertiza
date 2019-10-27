@@ -8,22 +8,18 @@ describe 'add TA', js: true do
   it "check if the courses are sorted alphabetically" do
     driver = Selenium::WebDriver.for :firefox
     driver.get("http://localhost:3000/")
-    driver.find_element(:id, "login_name").send_keys("instructor6")
+    driver.find_element(:id, "login_name").send_keys("super_administrator2")
     driver.find_element(:id, "login_password").send_keys("password")
     driver.find_element(:name, "commit").click()
     driver.get("http://localhost:3000/course/new?private=1")
     institutions_eles = driver.find_element(:id, "course_institutions_id")
-    all_options = institutions_eles.find_elements(:tag_name, 'option')
-    require 'pp'
-    current = all_options[0].text
-    pp all_options.size
+    options = institutions_eles.find_elements(:tag_name, 'option')
     result = true
-    all_options.each do |option|
-      if (option.text.downcase! <=> current.downcase!) < 0
+    for x in 0..options.size-2
+      if (options[x].text.downcase <=> options[x+1].text.downcase) > 0
         result = false
         break
       end
-      current = option.text
     end
     expect(result).to be(true)
   end

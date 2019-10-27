@@ -279,7 +279,6 @@ jQuery(document).ready(function() {
 
   var SimpleTableRow = React.createClass({
     render: function () {
-      console.log(this.props.instructor_id, 'i_id')
       var creation_date;
       var updated_date;
       var colWidthArray = ["30%", "0%", "0%", "0%", "25%", "25%", "20%"]
@@ -306,7 +305,6 @@ jQuery(document).ready(function() {
             if(typeof this.props.institution !== 'undefined' && this.props.institution.length != 0){
               institution_name = this.props.institution[0].name
             }
-            console.log('a', this.props)
             return (
                 <tr id={this.props.id}>
                     <td width={colWidthArray[0]}>{this.props.name}</td>
@@ -366,7 +364,6 @@ jQuery(document).ready(function() {
 
   var SimpleTable = React.createClass({
     render: function() {
-      console.log(this.props, "bharat");
       var _rows = []
       var _this = this
       var colWidthArray = ["30%", "0%", "0%", "0%", "25%", "25%", "20%"]

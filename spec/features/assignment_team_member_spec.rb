@@ -9,7 +9,7 @@ describe "add assignment team member test" do
 
   describe "#add_participant" do
 
-    # Might as well test small flags for creation here
+    # to test adding a assignment participant to an assignment team that exist and not full
     it "is able to add a member to an assignment team" do
       login_as('instructor6')
       assignment = Assignment.first

@@ -1,4 +1,18 @@
 class QuizQuestionnairesController < QuestionnairesController
+
+  #Quiz questionnaire edit option to be allowed for student
+  def action_allowed?
+    if params[:action] == "edit"
+      @questionnaire = Questionnaire.find(params[:id])
+      (['Super-Administrator', 'Administrator'].include? current_role_name) ||
+      (['Student'].include? current_role_name)
+    else
+      ['Super-Administrator',
+       'Administrator',
+       'Instructor',
+       'Teaching Assistant', 'Student'].include? current_role_name
+    end
+  end
   # View a quiz questionnaire
   def view
     @questionnaire = Questionnaire.find(params[:id])
@@ -121,6 +135,7 @@ class QuizQuestionnairesController < QuestionnairesController
         # A type isnt selected for a question
         valid = "Please select a type for each question"
       else
+        # The question type is dynamic, so this is necessary
         @new_question = Object.const_get(params[:question_type][i.to_s][:type]).create(txt: '', type: params[:question_type][i.to_s][:type], break_before: true)
         @new_question.update_attributes(txt: params[:new_question][i.to_s])
         type = params[:question_type][i.to_s][:type]

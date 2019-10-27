@@ -62,7 +62,7 @@ class StudentTaskController < ApplicationController
     @completed_tags = 0
     maps = ResponseMap.where(reviewed_object_id: @assignment, reviewee_id: @participant.team.id)
     responses = []
-    maps.each {|map| responses = Response.where(map_id: map)}
+    maps.each {|map| responses += Response.where(map_id: map)}
     answers = []
     deployments = TagPromptDeployment.where(assignment_id: @assignment)
     responses.each {|response| answers += Answer.where(response_id: response)}

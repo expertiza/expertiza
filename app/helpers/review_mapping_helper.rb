@@ -25,8 +25,11 @@ module ReviewMappingHelper
   # gets the team name's color according to review and assignment submission status
   #
   def get_team_colour(response_map)
+    # Storing redundantly computed value in a variable
     assignment_created = @assignment.created_at
+    # Storing redundantly computed value in a variable
     assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
+    # Returning colour based on conditions
     if Response.exists?(map_id: response_map.id)
       if !response_map.try(:reviewer).try(:review_grade).nil?
         'brown'
@@ -129,11 +132,16 @@ module ReviewMappingHelper
   # gets the review score awarded based on each round of the review
 
   def get_awarded_review_score(reviewer_id, team_id) 
+        # Storing redundantly computed value in num_rounds variable
 	num_rounds = @assignment.num_review_rounds
+    # Setting values of instance variables
     (1..num_rounds).each {|round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----') }
+    # Iterating through list
     (1..num_rounds).each do |round|
-	  teamID = @review_scores.dig(reviewer_id, round, team_id)
-      if teamID != nil && teamID != -1.0
+	 # Setting values of instance variables
+         teamID = @review_scores.dig(reviewer_id, round, team_id)
+       # Changing values of instance variable based on below condition
+       if teamID != nil && teamID != -1.0
          instance_variable_set("@score_awarded_round_" + round.to_s, teamID.inspect + '%')
       end
     end
@@ -141,10 +149,15 @@ module ReviewMappingHelper
 
   # gets minimum, maximum and average value for all the reviews
  def get_review_metrics(round, team_id)
+    # Setting values of instance variables
     ['max', 'min', 'avg'].each {|metric| instance_variable_set('@' + metric, '-----') }
+    # Fetching value of @avg_and_ranges[team_id][round] 
     x = @avg_and_ranges.dig(team_id, round)
+
     if x && %i[max min avg].all? {|k| x.key? k }
+      # Iterating though the list
       ['max', 'min', 'avg'].each do |metric|
+        # setting values of variables based on certain conditions
 	average_metric = @avg_and_ranges.dig(team_id, round, metric)
         metric_value = average_metric.nil? ? '-----' : average_metric.round(0).to_s + '%'
         instance_variable_set('@' + metric, metric_value)
@@ -322,6 +335,7 @@ module ReviewMappingHelper
     @rspan_round_two = @review_responses_round_two.length
     @rspan_round_three = @review_responses_round_three.nil? ? 0 : @review_responses_round_three.length
   end
+  # This function sets the values of instance variable
   def feedback_response_map_record(author)
     {1 => 'one', 2 => 'two', 3 => 'three'}.each do |key, round_num|
       instance_variable_set('@review_responses_round_' + round_num,
@@ -334,6 +348,7 @@ module ReviewMappingHelper
   end
   # gets review and feedback responses for a certain round for the feedback report
   def get_certain_review_and_feedback_response_map(author)
+    # Setting values of instance variables
     @feedback_response_maps = FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?", @all_review_response_ids, author.id])
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     @review_response_map_ids = ReviewResponseMap.where(["reviewed_object_id = ? and reviewee_id = ?", @id, @team_id]).pluck("id")

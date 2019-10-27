@@ -74,7 +74,7 @@ class StudentTaskController < ApplicationController
       end
     end
     @completed_tags = []
-    answers.each {|answer| @completed_tags += AnswerTag.where("response_id = ? AND user_id = ? AND value != ?",
+    answers.each {|answer| @completed_tags += AnswerTag.where("answer_id = ? AND user_id = ? AND value != ?",
                          answer, @participant.user_id, 0)}
     @completed_tags = @completed_tags.count
   end

@@ -72,7 +72,7 @@ class StudentTaskController < ApplicationController
         answers = []
         reviews.each {|response| answers += Answer.where(response: response)}
         answers.each do |answer|
-          if answer.comments.nil? or answer.comments ==""
+          if !answer.comments.nil? and answer.comments != ""
             tags = deployments.find_all {|tag| tag.question_type == answer.question.type}
             @total_tags += tags.count
           end

@@ -1,9 +1,9 @@
-<h1 align="center"> Do you want to copy the topics from the old assignment? </h1>
-<table align="center">
-  <tr align="center"><tr></tr><tr></tr>
-  <td align="center" width="120px" style="font-size: xx-large">
-<%= link_to 'Yes', :controller => :assignments, :action => :copy, :id => @assignment_id, :copytopics => 'Y' %>
-<%= link_to 'No', :controller => :assignments, :action => :copy, :id => @assignment_id, :copytopics => 'N' %>
-  </td>
-  </tr>
-</table>
+<%= form_tag(:controller => :assignments, :action => :copy, :id => @assignment_id) do%>
+  <%= radio_button_tag(:copyoption, "copyWithoutTopics") %>
+  <%= label_tag(:copyoption_topics, "copy without topics") %>
+  <%= radio_button_tag(:copyoption, "copyWithTopics") %>
+  <%= label_tag(:copyoption_topics, "copy with topics") %>
+  <%= radio_button_tag(:copyoption, "copyWithTopicsTeams") %>
+  <%= label_tag(:copyoption_topics_teams, "copy with topics and teams") %>
+  <%= submit_tag("Create") %>
+<% end %>

@@ -112,12 +112,11 @@ class AssignmentsController < ApplicationController
   end
 
   def copy
-    #Issue #1341 - Might require to modify below code
     @user = current_user
     session[:copy_flag] = true
     # check new assignment submission directory and old assignment submission directory
     old_assign = Assignment.find(params[:id])
-    new_assign_id = AssignmentForm.copy(params[:id], params[:copytopics], @user)
+    new_assign_id = AssignmentForm.copy(params[:id], params[:copyoption], @user)
     if new_assign_id
       flash[:success] = 'The assignment was successfully Copied.'
       new_assign = Assignment.find(new_assign_id)

@@ -309,7 +309,7 @@ class AssignmentForm
   end
 
   # Copies the inputted assignment into new one and returns the new assignment id
-  def self.copy(assignment_id, copytopics, user)
+  def self.copy(assignment_id, copyoption, user)
     Assignment.record_timestamps = false
     old_assign = Assignment.find(assignment_id)
     new_assign = old_assign.dup
@@ -319,17 +319,27 @@ class AssignmentForm
     new_assign.update_attribute('updated_at', Time.now)
     new_assign.update_attribute('directory_path', new_assign.directory_path + '_copy') if new_assign.directory_path.present?
     new_assign.copy_flag = true
-    if new_assign.save
+    if new_assign.save!
       Assignment.record_timestamps = true
       copy_assignment_questionnaire(old_assign, new_assign, user)
       AssignmentDueDate.copy(old_assign.id, new_assign.id)
       new_assign.create_node
       new_assign_id = new_assign.id
       # also copy topics from old assignment
-      if copytopics == 'Y'
+
+      if copyoption != 'copyWithoutTopics'
         topics = SignUpTopic.where(assignment_id: old_assign.id)
         topics.each do |topic|
-          SignUpTopic.create(topic_name: topic.topic_name, assignment_id: new_assign_id, max_choosers: topic.max_choosers, category: topic.category, topic_identifier: topic.topic_identifier, micropayment: topic.micropayment)
+          newSignUpTopic = SignUpTopic.create(topic_name: topic.topic_name, assignment_id: new_assign_id, max_choosers: topic.max_choosers, category: topic.category, topic_identifier: topic.topic_identifier, micropayment: topic.micropayment)
+
+          if copyoption == 'copyWithTopicsTeams'
+            oldSignedUpTeams = SignedUpTeam.where(topic_id: topic.id)
+            oldSignedUpTeams.each do |oldSignedUpTeam|
+              newSignedUpTeam = oldSignedUpTeam.dup
+              newSignedUpTeam.update_attribute('topic_id', newSignUpTopic.id)
+              newSignedUpTeam.save
+            end
+          end
         end
       end
     else

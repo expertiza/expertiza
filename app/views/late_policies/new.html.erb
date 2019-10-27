@@ -4,16 +4,7 @@
 
  <% if @late_policy.errors.any? %>
   <div id="error_explanation">
-    <h2>
-      <%= pluralize(@late_policy.errors.count, "error") %>
-      prohibited this post from being saved:
-    </h2>
-
-    <ul>
-    <% @late_policy.errors.full_messages.each do |msg| %>
-      <li><%= msg %></li>
-    <% end %>
-    </ul>
+	<% flash[:error] = @late_policy.errors.full_messages.join("<br/>").html_safe %>
   </div>
 <% end %>
 

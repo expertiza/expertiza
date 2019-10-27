@@ -55,16 +55,21 @@ class StudentTaskController < ApplicationController
     @topics = SignUpTopic.where(assignment_id: @assignment.id)
     # Timeline feature
     @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
-    #Tag count feature:
-    @questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
-    @review_maps = if @assignment.varying_rubrics_by_round?
-                ReviewResponseMap.get_responses_for_team_round(@team, @round)
-              else
-                ReviewResponseMap.get_assessments_for(@team)
-              end
-    @reviews = []
-    @review_maps.each do |map|
-      @reviews << map.respnse
+    
+    #THE FOLLOWING CODE IS ADDED FOR THE TAG COUNT FEATURE
+    questionnaires = @assignment.questionnaires
+    @questions = retrieve_questions questionnaires, @assignment.id
+    @total_tags = []
+    questionnaires.each do |questionnaire|
+      if questionnaire_type == "ReviewQuestionnaire"
+        @total_tags += TagPromptDeployment.where("questionnaire_id = ? AND assignment_id = ?", questionnaire.id, @assignment.id)
+      end
+    end
+    @total_tags.select! {|tag| tag.tag_prompt.control_type.downcase != "checkbox"}
+    @completed_tags = []
+    @total_tags.each do |x|
+      @completed_tags += AnswerTag.where("tag_prompt_deployment_id = ? AND user_id = ? AND value != ?",
+                         x, @participant.user_id, 0)
     end
   end
 

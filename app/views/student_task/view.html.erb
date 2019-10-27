@@ -98,6 +98,9 @@ to display the label "Your team" in the student assignment tasks-->
         (View feedback on your work)  &nbsp;  <%= link_to "Alternate View",  controller: 'grades', action: 'view_my_scores', id: @participant.id %>
       <% end %>
     </li>
+    <li>
+      Number of tags left: <%= "#{@completed_tags}/#{total_tags}" %>
+    </li>
   <% end %>
     <%if @can_provide_suggestions == true %>
       <li><%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
@@ -108,16 +111,7 @@ to display the label "Your team" in the student assignment tasks-->
       <li><%= link_to "Take a survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id} %> (This will log you out)</li>
     <% end %>
     <li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> (Provide a different handle for this assignment)</li>
-  </ul>
-  <br>
-  
-  <h2> DEBUG TABLE </h2>
-  <table>
-    <th> <td> Reviews </td> </th>
-    <% @reviews.each do |review| %>
-      <tr> <td> <%= review %> </td> </tr>
-    <% end %>
-  </table>
+</ul>
 
   <br/>
   <br/>

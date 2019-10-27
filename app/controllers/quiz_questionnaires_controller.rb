@@ -96,27 +96,17 @@ class QuizQuestionnairesController < QuestionnairesController
     end
     if params['save'] && params[:question].try(:keys)
       @questionnaire.update_attributes(questionnaire_params)
-
       params[:question].each_key do |qid|
         @question = Question.find(qid)
         @question.txt = params[:question][qid.to_sym][:txt]
         @question.save
-
         @quiz_question_choices = QuizQuestionChoice.where(question_id: qid)
         question_index = 1
         @quiz_question_choices.each do |question_choice|
           # Call to private method to handle  Multile Choice Questions
           multiple_choice_checkbox(question_choice, question_index) if @question.type == "MultipleChoiceCheckbox"
           multiple_choice_radio(question_choice, question_index) if @question.type == "MultipleChoiceRadio"
-          if @question.type == "TrueFalse"
-            if params[:quiz_question_choices][@question.id.to_s][@question.type][1.to_s][:iscorrect] == "True" # the statement is correct
-              question_choice.txt == "True" ? question_choice.update_attributes(iscorrect: '1') : question_choice.update_attributes(iscorrect: '0')
-              # the statement is correct so "True" is the right answer
-            else # the statement is not correct
-              question_choice.txt == "True" ? question_choice.update_attributes(iscorrect: '0') : question_choice.update_attributes(iscorrect: '1')
-              # the statement is not correct so "False" is the right answer
-            end
-          end
+          true_false_choice(question_choice) if @question.type == "TrueFalse"
           question_index += 1
         end
       end
@@ -166,6 +156,16 @@ class QuizQuestionnairesController < QuestionnairesController
       question_choice.update_attributes(iscorrect: '1', txt: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:txt])
     else
       question_choice.update_attributes(iscorrect: '0', txt: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:txt])
+    end
+  end
+
+  def true_false_choice(question_choice)
+    if params[:quiz_question_choices][@question.id.to_s][@question.type][1.to_s][:iscorrect] == "True" # the statement is correct
+      question_choice.txt == "True" ? question_choice.update_attributes(iscorrect: '1') : question_choice.update_attributes(iscorrect: '0')
+      # the statement is correct so "True" is the right answer
+    else # the statement is not correct
+      question_choice.txt == "True" ? question_choice.update_attributes(iscorrect: '0') : question_choice.update_attributes(iscorrect: '1')
+      # the statement is not correct so "False" is the right answer
     end
   end
 

@@ -294,14 +294,14 @@ class ReviewMappingController < ApplicationController
         teams << team
       end
     end
-    num_reviews_student = params[:num_reviews_per_student].to_i         #Number of sumbissions that can be reviewed by a single student
+    num_reviews_per_student = params[:num_reviews_per_student].to_i         #Number of sumbissions that can be reviewed by a single student
     num_reviews_per_submission = params[:num_reviews_per_submission].to_i   #Toal number of reviews that can be performed on a single submission (or equivalently, number of students that can review the same submiss)
     num_calibrated_artifacts = params[:num_calibrated_artifacts].to_i 
     num_uncalibrated_artifacts = params[:num_uncalibrated_artifacts].to_i
     if num_calibrated_artifacts.zero? and num_uncalibrated_artifacts.zero?
-      if check_num_reviews_args(num_reviews_student, num_reviews_per_submission, teams)
+      if check_num_reviews_args(num_reviews_per_student, num_reviews_per_submission, teams)
         # REVIEW: mapping strategy
-        automatic_review_mapping_strategy(assignment_id, participants, teams, num_reviews_student, num_reviews_per_submission) 
+        automatic_review_mapping_strategy(assignment_id, participants, teams, num_reviews_per_student, num_reviews_per_submission) 
       end
     else
       teams_with_calibrated_artifacts = []

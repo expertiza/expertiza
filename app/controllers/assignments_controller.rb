@@ -111,7 +111,8 @@ class AssignmentsController < ApplicationController
     @assignment_id = params[:id]
   end
 
-  def copy#Issue #1341 - Might require to modify below code
+  def copy
+    #Issue #1341 - Might require to modify below code
     @user = current_user
     session[:copy_flag] = true
     # check new assignment submission directory and old assignment submission directory

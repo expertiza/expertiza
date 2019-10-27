@@ -316,7 +316,7 @@ describe AssignmentForm do
       allow(AssignmentDueDate).to receive(:copy).with(1, any_args).and_return('OK!')
       allow_any_instance_of(Assignment).to receive(:create_node).and_return('OK!')
       allow(SignUpTopic).to receive(:where).with(assignment_id: 1).and_return([build(:topic)])
-      expect(AssignmentForm.copy(1,'Y',build(:instructor))).to eq(2)
+      expect(AssignmentForm.copy(1, 'Y', build(:instructor))).to eq(2)
     end
   end
 end

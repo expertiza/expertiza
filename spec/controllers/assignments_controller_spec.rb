@@ -294,7 +294,7 @@ describe AssignmentsController do
 
     context 'when new assignment directory is same as old' do
       it 'should show an error and redirect to assignments#edit page' do
-        allow(AssignmentForm).to receive(:copy).with('1', instructor).and_return(2)
+        allow(AssignmentForm).to receive(:copy).with('1', nil, instructor).and_return(2)
         allow(Assignment).to receive(:find).with(2).and_return(new_assignment2)
         params = {id: 1}
         session = {user: instructor}

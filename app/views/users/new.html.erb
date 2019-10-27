@@ -5,6 +5,7 @@
     <%= collection_select 'user', 'role_id', @all_roles, :id, :name, {:selected => @rolename.id} %></p>
 
   <%= render :partial => 'user', :locals => {:new_user => true, :request_user => false} %>
+  <p style="color: red; font-weight: bold">* Please Make Sure All Information is Correct</p>
   <%= submit_tag "Create" %>
 <% end %>
 

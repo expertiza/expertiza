@@ -91,7 +91,7 @@ class UsersController < ApplicationController
       get_role
       # obtain number of assignments participated
       @assignment_participant_num = 0
-      AssignmentParticipant.where(user_id: @user.id).each {|_participant| @assignment_participant_num += 1 }
+      AssignmentParticipant.where(user_id: @user.id).each { |_participant| @assignment_participant_num += 1 }
       # judge whether this user become reviewer or reviewee
       @maps = ResponseMap.where('reviewee_id = ? or reviewer_id = ?', params[:id], params[:id])
       # count the number of users in DB
@@ -141,7 +141,8 @@ class UsersController < ApplicationController
       redirect_to action: 'list'
     else
       foreign
-      render action: 'new'
+      flash[:error] = "Create Instructor Error!"
+      redirect_to '/admin/list_instructors'
     end
   end
 
@@ -301,7 +302,7 @@ class UsersController < ApplicationController
 
   def requested_user_params
     params.require(:user).permit(:name, :role_id, :fullname, :institution_id, :email)
-          .merge(self_introduction: params[:requested_user][:self_introduction])
+        .merge(self_introduction: params[:requested_user][:self_introduction])
   end
 
   def get_role

@@ -1,7 +1,7 @@
 class BookmarksController < ApplicationController
   def action_allowed?
     case params[:action]
-    when 'list', 'new', 'create', 'bookmark_rating', 'new_bookmark_review'
+    when 'list', 'new', 'create', 'bookmark_rating', 'new_bookmark_review', 'save_bookmark_rating_score'
       current_role_name.eql? 'Student'
     when 'edit', 'update', 'destroy'
       # edit, update, delete bookmarks can only be done by owner
@@ -52,6 +52,26 @@ class BookmarksController < ApplicationController
     redirect_to action: 'list', id: @bookmark.topic_id
   end
 
+  def average_based_on_rubric(bookmark)
+    if bookmark.nil?
+      0
+    else
+      assignment = SignUpTopic.find(bookmark.topic_id).assignment
+      questions = assignment.questionnaires.where(type: 'BookmarkRatingQuestionnaire').flat_map(&:questions)
+      responses = BookmarkRatingResponseMap.where(
+          reviewed_object_id: assignment.id,
+          reviewee_id: bookmark.id
+      ).flat_map {|r| Response.where(map_id: r.id) }
+      scores = Answer.compute_scores(responses, questions)
+      if scores[:avg].nil?
+        0
+      else
+        (scores[:avg] * 5.0 / 100.0).round(2)
+      end
+    end
+  end
+
+
   def destroy
     @bookmark = Bookmark.find(params[:id])
     @bookmark.destroy
@@ -101,6 +121,6 @@ class BookmarksController < ApplicationController
         reviewee_id: bookmark.id
     )
   end
-
+  helper_method :average_based_on_rubric
   helper_method :get_bookmark_rating_response_map
 end

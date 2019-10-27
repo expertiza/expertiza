@@ -27,22 +27,27 @@
           <% sum += bookmark_rating.rating %>
         <% end %>
         <td>
-          <% if @bookmark_ratings.size > 0 %>
-            <%= (sum * 1.0 / @bookmark_ratings.size).round(1) %>
+          <% if @has_dropdown %>
+            <% if @bookmark_ratings.size > 0 %>
+              <%= (sum * 1.0 / @bookmark_ratings.size).round(1) %>
+            <% else %>
+              <%= '-' %>
+            <% end %>
           <% else %>
-            <%= '-' %>
+            <!-- Compute average rating based on rubrics -->
+            <% avg = average_based_on_rubric(bookmark) %>
+            <%= avg == 0 ? '-' : avg %>
           <% end %>
         </td>
         <td>
-          <% if BookmarkRating.exists?(bookmark_id: bookmark.id, user_id: session[:user].id) %>
-            <% rating = BookmarkRating.where(bookmark_id: bookmark.id, user_id: session[:user].id).first.rating.to_s %>
-          <% else %>
-            <% rating = "0" %>
-          <% end %>
-          <!--If instructor choose to use dropdown, Expertiza will not redirect to this page. Otherwise, we will use this page to do bookmark rating (rubric).-->
-          <!-- Only allow to rate a bookmark which is not uploaded by the current user -->
+         <!-- Only allow to rate a bookmark which is not uploaded by the current user -->
           <% if bookmark.user.id != current_user.id %>
             <% if @has_dropdown %>
+              <% if BookmarkRating.exists?(bookmark_id: bookmark.id, user_id: session[:user].id) %>
+                <% rating = BookmarkRating.where(bookmark_id: bookmark.id, user_id: session[:user].id).first.rating.to_s %>
+              <% else %>
+                <% rating = "0" %>
+              <% end %>
               <%= form_tag :action => "save_bookmark_rating_score", :id => bookmark.id do %>
                 <% params[:rating] = rating %>
                 <select id=<%= bookmark.id %> name="rating" style="font-size: 10px">

@@ -60,7 +60,11 @@ class StudentTaskController < ApplicationController
     questionnaires = @assignment.questionnaires
     @total_tags = 0
     @completed_tags = 0
-    maps = ResponseMap.where(reviewed_object_id: @assignment, reviewee_id: @participant.team.id)
+    if @team.nil?
+      maps = []
+    else
+      maps = ResponseMap.where(reviewed_object_id: @assignment, reviewee_id: @team.id)
+    end
     responses = []
     maps.each {|map| responses += Response.where(map_id: map)}
     answers = []

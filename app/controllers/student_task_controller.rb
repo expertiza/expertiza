@@ -64,12 +64,17 @@ class StudentTaskController < ApplicationController
       if questionnaire.type == "ReviewQuestionnaire"
         deployments = TagPromptDeployment.where(questionnaire: questionnaire)
         deployments = deployments.select {|tag| tag.tag_prompt.control_type.downcase != "checkbox"}
-        questions = Question.where(questionnaire: questionnaire)
-        questions = questions.select {|question| deployments.any? {|deployment| deployment.question_type == question.type}}
+        reviews = if @assignment.varying_rubrics_by_round?
+                    ReviewResponseMap.get_responses_for_team_round(@participant.team, @round)
+                  else
+                    ReviewResponseMap.get_assessments_for(@participant.team)
+                  end
         answers = []
-        questions.each {|question| answers += Answer.where(question: question)}
-        answers.each {|answer| puts answer.comments}
-        @total_tags += answers.count
+        reviews.each {|response| answers += Answer.where(response: response)}
+        answers.each do |answer|
+          tags = deployments.find_all {|tag| tag.question_type == answer.question.type}
+          @total_tags += tags.count
+        end
         deployments.each do |deployment|
           @completed_tags += AnswerTag.where("tag_prompt_deployment_id = ? AND user_id = ? AND value != ?",
                          deployment, @participant.user_id, 0).count

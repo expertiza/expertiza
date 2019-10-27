@@ -60,29 +60,23 @@ class StudentTaskController < ApplicationController
     questionnaires = @assignment.questionnaires
     @total_tags = 0
     @completed_tags = 0
-    questionnaires.each do |questionnaire|
-      if questionnaire.type == "ReviewQuestionnaire"
-        deployments = TagPromptDeployment.where(questionnaire: questionnaire)
-        deployments = deployments.select {|tag| tag.tag_prompt.control_type.downcase != "checkbox"}
-        reviews = if @assignment.varying_rubrics_by_round?
-                    ReviewResponseMap.get_responses_for_team_round(@participant.team, @round)
-                  else
-                    ReviewResponseMap.get_assessments_for(@participant.team)
-                  end
-        answers = []
-        reviews.each {|response| answers += Answer.where(response: response)}
-        answers.each do |answer|
-          if !answer.comments.nil? and answer.comments != ""
-            tags = deployments.find_all {|tag| tag.question_type == answer.question.type}
-            @total_tags += tags.count
-          end
-        end
-        deployments.each do |deployment|
-          @completed_tags += AnswerTag.where("tag_prompt_deployment_id = ? AND user_id = ? AND value != ?",
-                         deployment, @participant.user_id, 0).count
-        end
+    maps = ResponseMap.where(reviewed_object_id: @assignment, reviewee_id: @participant.team.id)
+    responses = []
+    maps.each {|map| responses = Response.where(map_id: map)}
+    answers = []
+    deployments = TagPromptDeployment.where(assignment_id: @assignment)
+    responses.each {|response| answers += Answer.where(response_id: response)}
+    @total_tags = 0
+    answers.each do |answer|
+      if !answer.comments.nil? and answer.comments != ""
+        tags = deployments.find_all {|tag| tag.question_type == answer.question.type}
+        @total_tags += tags.count
       end
     end
+    @completed_tags = []
+    answers.each {|answer| @completed_tags += AnswerTag.where("response_id = ? AND user_id = ? AND value != ?",
+                         answer, @participant.user_id, 0)}
+    @completed_tags = @completed_tags.count
   end
 
   def others_work

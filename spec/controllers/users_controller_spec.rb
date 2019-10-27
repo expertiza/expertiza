@@ -1,20 +1,20 @@
 describe UsersController do
   let(:admin) { build(:admin, id: 3) }
-  let(:super_admin) {build (:superadmin)}
+  let(:super_admin) { build (:superadmin) }
   let(:instructor) { build(:instructor, id: 2) }
   let(:student1) { build(:student, id: 1, name: :lily) }
   let(:student2) { build(:student) }
   let(:student3) { build(:student, id: 10, role_id: 1, parent_id: nil) }
   let(:student4) { build(:student, id: 20, role_id: 4) }
   let(:student5) { build(:student, role_id: 4, parent_id: 3) }
-  let(:student6) { build(:student, role_id: nil, name: :lilith)}
+  let(:student6) { build(:student, role_id: nil, name: :lilith) }
 
-  let(:institution1) {build(:institution, id: 1)}
-  let(:requested_user1) {RequestedUser.new id: 4, name: 'requester1', role_id: 2, fullname: 're, requester1', 
-    institution_id: 1, email: 'requester1@test.com', status: nil, self_introduction: 'no one'}
-  let(:superadmin) {build(:superadmin)}
-  let(:assignment) {build(:assignment, id: 1, name: "test_assignment", instructor_id: 2, 
-    participants: [build(:participant, id: 1, user_id: 1, assignment: assignment)], course_id: 1)}
+  let(:institution1) { build(:institution, id: 1) }
+  let(:requested_user1) { RequestedUser.new id: 4, name: 'requester1', role_id: 2, fullname: 're, requester1',
+                                            institution_id: 1, email: 'requester1@test.com', status: nil, self_introduction: 'no one' }
+  let(:superadmin) { build(:superadmin) }
+  let(:assignment) { build(:assignment, id: 1, name: "test_assignment", instructor_id: 2,
+                           participants: [build(:participant, id: 1, user_id: 1, assignment: assignment)], course_id: 1) }
   before(:each) do
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
@@ -63,7 +63,7 @@ describe UsersController do
       allow(User).to receive(:find_by).with(name: 'instructor6').and_return(nil)
       session = {user: admin}
       params = {
-        user: {name: 'instructor6'}
+          user: {name: 'instructor6'}
       }
       post :show_selection, params, session
       expect(response).to redirect_to('http://test.host/users/list')
@@ -73,7 +73,7 @@ describe UsersController do
       allow(User).to receive(:find_by).with(name: 'instructor6').and_return(student3)
       session = {user: student4}
       params = {
-        user: {name: 'instructor6'}
+          user: {name: 'instructor6'}
       }
       get :show_selection, params
       expect(response).to render_template(:show)
@@ -84,7 +84,7 @@ describe UsersController do
       allow(Role).to receive(:find).with(4).and_return(student5)
       session = {user: student3}
       params = {
-        user: {name: 'instructor6'}
+          user: {name: 'instructor6'}
       }
       post :show_selection, params, session
       expect(response).to redirect_to('http://test.host/users/list')
@@ -144,26 +144,26 @@ describe UsersController do
       allow(User).to receive(:find_by).with(name: 'lily').and_return(student1)
       session = {user: admin}
       params = {
-        user: {name: 'lily',
-               crypted_password: 'password',
-               role_id: 2,
-               password_salt: 1,
-               fullname: '6, instructor',
-               email: 'chenzy@gmail.com',
-               parent_id: 1,
-               private_by_default: false,
-               mru_directory_path: nil,
-               email_on_review: true,
-               email_on_submission: true,
-               email_on_review_of_review: true,
-               is_new_user: false,
-               master_permission_granted: 0,
-               handle: 'handle',
-               digital_certificate: nil,
-               timezonepref: 'Eastern Time (US & Canada)',
-               public_key: nil,
-               copy_of_emails: nil,
-               institution_id: 1}
+          user: {name: 'lily',
+                 crypted_password: 'password',
+                 role_id: 2,
+                 password_salt: 1,
+                 fullname: '6, instructor',
+                 email: 'chenzy@gmail.com',
+                 parent_id: 1,
+                 private_by_default: false,
+                 mru_directory_path: nil,
+                 email_on_review: true,
+                 email_on_submission: true,
+                 email_on_review_of_review: true,
+                 is_new_user: false,
+                 master_permission_granted: 0,
+                 handle: 'handle',
+                 digital_certificate: nil,
+                 timezonepref: 'Eastern Time (US & Canada)',
+                 public_key: nil,
+                 copy_of_emails: nil,
+                 institution_id: 1}
       }
       post :create, params, session
       allow_any_instance_of(User).to receive(:undo_link).with('The user "chenzy@gmail.com" has been successfully created. ').and_return(true)
@@ -174,26 +174,26 @@ describe UsersController do
     it 'save successfully without the same name' do
       session = {user: admin}
       params = {
-        user: {name: 'instructor6',
-               crypted_password: 'password',
-               role_id: 2,
-               password_salt: 1,
-               fullname: '6, instructor',
-               email: 'chenzy@gmail.com',
-               parent_id: 1,
-               private_by_default: false,
-               mru_directory_path: nil,
-               email_on_review: true,
-               email_on_submission: true,
-               email_on_review_of_review: true,
-               is_new_user: false,
-               master_permission_granted: 0,
-               handle: 'handle',
-               digital_certificate: nil,
-               timezonepref: 'Eastern Time (US & Canada)',
-               public_key: nil,
-               copy_of_emails: nil,
-               institution_id: 1}
+          user: {name: 'instructor6',
+                 crypted_password: 'password',
+                 role_id: 2,
+                 password_salt: 1,
+                 fullname: '6, instructor',
+                 email: 'chenzy@gmail.com',
+                 parent_id: 1,
+                 private_by_default: false,
+                 mru_directory_path: nil,
+                 email_on_review: true,
+                 email_on_submission: true,
+                 email_on_review_of_review: true,
+                 is_new_user: false,
+                 master_permission_granted: 0,
+                 handle: 'handle',
+                 digital_certificate: nil,
+                 timezonepref: 'Eastern Time (US & Canada)',
+                 public_key: nil,
+                 copy_of_emails: nil,
+                 institution_id: 1}
       }
       post :create, params, session
       allow_any_instance_of(User).to receive(:undo_link).with('The user "instructor6" has been successfully created. ').and_return(true)
@@ -205,41 +205,65 @@ describe UsersController do
       expect_any_instance_of(User).to receive(:save).and_return(false)
       session = {user: admin}
       params = {
-        user: {name: 'instructor6',
-               crypted_password: 'password',
-               role_id: 2,
-               password_salt: 1,
-               fullname: '6, instructor',
-               email: 'chenzy@gmail.com',
-               parent_id: 1,
-               private_by_default: false,
-               mru_directory_path: nil,
-               email_on_review: true,
-               email_on_submission: true,
-               email_on_review_of_review: true,
-               is_new_user: false,
-               master_permission_granted: 0,
-               handle: 'handle',
-               digital_certificate: nil,
-               timezonepref: 'Eastern Time (US & Canada)',
-               public_key: nil,
-               copy_of_emails: nil,
-               institution_id: 1}
+          user: {name: 'instructor6',
+                 crypted_password: 'password',
+                 role_id: 2,
+                 password_salt: 1,
+                 fullname: '6, instructor',
+                 email: 'chenzy@gmail.com',
+                 parent_id: 1,
+                 private_by_default: false,
+                 mru_directory_path: nil,
+                 email_on_review: true,
+                 email_on_submission: true,
+                 email_on_review_of_review: true,
+                 is_new_user: false,
+                 master_permission_granted: 0,
+                 handle: 'handle',
+                 digital_certificate: nil,
+                 timezonepref: 'Eastern Time (US & Canada)',
+                 public_key: nil,
+                 copy_of_emails: nil,
+                 institution_id: 1}
       }
       post :create, params, session
       expect(response).to render_template(:new)
+    end
+
+    it 'save successfully with a new institution' do
+      driver = Selenium::WebDriver.for :firefox
+      driver.get("http://localhost:3000/")
+      driver.find_element(:id, "login_name").send_keys("super_administrator2")
+      driver.find_element(:id, "login_password").send_keys("password")
+      driver.find_element(:name, "commit").click()
+      driver.get("http://localhost:3000/users/new?utf8=%E2%9C%93&role=Instructor&commit=New+Instructor")
+      driver.find_element(:id, "user_name").send_keys("yzhu48")
+      driver.find_element(:id, "user_fullname").send_keys("yzhu48")
+      driver.find_element(:id, "user_email").send_keys("yzhu48@ncsu.com")
+      driver.find_element(:id, "user_password").send_keys("111111")
+      driver.find_element(:id, "user_password_confirmation").send_keys("111111")
+
+      institutionMenu = driver.find_element(:id, 'user_institution_id')
+      option = Selenium::WebDriver::Support::Select.new(institutionMenu)
+      option.select_by(:text, 'Other')
+
+      driver.find_element(:id, "institution_name").send_keys("yzhu48")
+
+      driver.find_element(:name, "commit").click()
+      # ('http://localhost:3000/users/list')
+      expect(response.status).to eq(200)
     end
   end
 
   context "#create_requested_user_record" do
     it 'if user not exists and requested user is saved' do
       params = {
-        user: {name: 'instructor6',
-               role_id: 2,
-               fullname: '6, instructor',
-               institution_id: 1,
-               email: 'chenzy@gmail.com'},
-        requested_user: {self_introduction: 'I am good'}
+          user: {name: 'instructor6',
+                 role_id: 2,
+                 fullname: '6, instructor',
+                 institution_id: 1,
+                 email: 'chenzy@gmail.com'},
+          requested_user: {self_introduction: 'I am good'}
       }
       post :create_requested_user_record, params # session
       expect(flash[:success]).to eq 'User signup for "instructor6" has been successfully requested.'
@@ -249,12 +273,12 @@ describe UsersController do
     it 'if user exists' do
       allow(User).to receive(:find_by).with(name: 'instructor6').and_return(instructor)
       params = {
-        user: {name: 'instructor6',
-               role_id: 2,
-               fullname: '6, instructor',
-               institution_id: 1,
-               email: 'chenzy@gmail.com'},
-        requested_user: {self_introduction: 'I am good'}
+          user: {name: 'instructor6',
+                 role_id: 2,
+                 fullname: '6, instructor',
+                 institution_id: 1,
+                 email: 'chenzy@gmail.com'},
+          requested_user: {self_introduction: 'I am good'}
       }
       post :create_requested_user_record, params
       expect(flash[:error]).to eq 'The account you are requesting has already existed in Expertiza.'
@@ -264,12 +288,12 @@ describe UsersController do
     it 'if requested user is not saved' do
       expect_any_instance_of(RequestedUser).to receive(:save).and_return(false)
       params = {
-        user: {name: 'instructor6',
-               role_id: 2,
-               fullname: '6, instructor',
-               institution_id: 1,
-               email: 'chenzy@gmail.com'},
-        requested_user: {self_introduction: 'I am good'}
+          user: {name: 'instructor6',
+                 role_id: 2,
+                 fullname: '6, instructor',
+                 institution_id: 1,
+                 email: 'chenzy@gmail.com'},
+          requested_user: {self_introduction: 'I am good'}
       }
       post :create_requested_user_record, params
       expect(response).to redirect_to('http://test.host/users/request_new?role=Student')
@@ -277,13 +301,13 @@ describe UsersController do
 
     it 'if user not exists, requested user is saved and params[:user][:institution_id] is empty' do
       params = {
-        user: {name: 'instructor6',
-               role_id: 2,
-               fullname: '6, instructor',
-               institution_id: [],
-               email: 'chenzy@gmail.com'},
-        requested_user: {self_introduction: 'I am good'},
-        institution: {name: 'google'}
+          user: {name: 'instructor6',
+                 role_id: 2,
+                 fullname: '6, instructor',
+                 institution_id: [],
+                 email: 'chenzy@gmail.com'},
+          requested_user: {self_introduction: 'I am good'},
+          institution: {name: 'google'}
       }
       post :create_requested_user_record, params
       expect(response).to redirect_to('http://test.host/instructions/home')
@@ -298,8 +322,8 @@ describe UsersController do
 
     it 'the input status is nil and original status is nil' do
       params = {
-        id: 4,
-        status: nil
+          id: 4,
+          status: nil
       }
       post :create_approved_user, params
       expect(flash[:error]).to eq 'Please Approve or Reject before submitting'
@@ -309,8 +333,8 @@ describe UsersController do
     it 'the input status is Approved' do
       session = {user: admin}
       params = {
-        id: 4,
-        status: 'Approved'
+          id: 4,
+          status: 'Approved'
       }
       post :create_approved_user, params, session
       allow_any_instance_of(RequestedUser).to receive(:undo_link).with('The user "requester1" has been successfully created. ').and_return(true)
@@ -322,8 +346,8 @@ describe UsersController do
       expect_any_instance_of(User).to receive(:save).and_return(false)
       session = {user: admin}
       params = {
-        id: 4,
-        status: 'Approved'
+          id: 4,
+          status: 'Approved'
       }
       post :create_approved_user, params, session
       expect(flash[:success]).to eq 'The user "requester1" has been successfully updated.'
@@ -332,8 +356,8 @@ describe UsersController do
 
     it 'the input status is Rejected' do
       params = {
-        id: 4,
-        status: 'Rejected'
+          id: 4,
+          status: 'Rejected'
       }
       post :create_approved_user, params
       expect(flash[:success]).to eq 'The user "requester1" has been Rejected.' or 'The user "requester1" has been successfully updated.'
@@ -343,8 +367,8 @@ describe UsersController do
     it 'the input status is Rejected but update_colums fails' do
       expect_any_instance_of(RequestedUser).to receive(:update_columns).and_return(false)
       params = {
-        id: 4,
-        status: 'Rejected'
+          id: 4,
+          status: 'Rejected'
       }
       post :create_approved_user, params
       expect(flash[:success]).to eq 'The user "requester1" has been successfully updated.'

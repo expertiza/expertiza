@@ -59,20 +59,20 @@ class StudentTaskController < ApplicationController
     #THE FOLLOWING CODE IS ADDED FOR THE TAG COUNT FEATURE
     questionnaires = @assignment.questionnaires
     @total_tags = 0
-    @completed_tags = []
+    @completed_tags = 0
     questionnaires.each do |questionnaire|
-      if questionnaire_type == "ReviewQuestionnaire"
+      if questionnaire.type == "ReviewQuestionnaire"
         reviews = if @assignment.varying_rubrics_by_round?
-                    ReviewResponseMap.get_responses_for_team_round(team, @round)
+                    ReviewResponseMap.get_responses_for_team_round(@participant.team, @round)
                   else
-                    ReviewResponseMap.get_assessments_for(team)
+                    ReviewResponseMap.get_assessments_for(@participant.team)
                   end
         @total_tags += reviews.length
         deployments = TagPromptDeployment.where(questionnaire: questionnaire)
-        deployments.select! {|tag| tag.tag_prompt.control_type.downcase != "checkbox"}
-        deploymnets.each do |deployment|
+        deployments = deployments.select {|tag| tag.tag_prompt.control_type.downcase != "checkbox"}
+        deployments.each do |deployment|
           @completed_tags += AnswerTag.where("tag_prompt_deployment_id = ? AND user_id = ? AND value != ?",
-                         x, @participant.user_id, 0).count
+                         deployment, @participant.user_id, 0).count
         end
       end
     end

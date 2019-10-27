@@ -2,7 +2,7 @@
 
 <%= form_tag :action => 'create_requested_user_record' do %>
   <p><label for="role_id"><b>Role</b></label><br/>
-    <label>Instructor</label><br/>
+    <%= collection_select 'user', 'role_id', @all_roles.where({name: "Instructor"}), :id, :name, {:selected => @rolename.id} %></p>
 
   <%= render :partial => 'users/user', :locals => { :new_user => true, :request_user => true } %>
   <%= submit_tag "Request" %>

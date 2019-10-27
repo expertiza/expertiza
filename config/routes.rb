@@ -300,7 +300,6 @@ resources :institution, except: [:destroy] do
       get :select_metareviewer
       get :select_reviewer
       get :select_mapping
-      post :assign_quiz_dynamically
       get :assign_reviewer_dynamically
       post :assign_reviewer_dynamically
       get :assign_metareviewer_dynamically
@@ -313,6 +312,13 @@ resources :institution, except: [:destroy] do
       get :unsubmit_review
     end
   end
+
+
+  resources :assign_quiz, only: [] do
+    collection do
+      post :assign_quiz_dynamically
+    end
+  end 
 
   resources :roles do
     collection do

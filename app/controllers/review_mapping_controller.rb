@@ -9,10 +9,8 @@ class ReviewMappingController < ApplicationController
 
   @@time_create_last_review_mapping_record = nil
 
-
-
   def choose_case(action_in_params)
-    if ['add_dynamic_reviewer','show_available_submissions','assign_reviewer_dynamically','assign_metareviewer_dynamically','assign_quiz_dynamically','start_self_review'].include? action_in_params
+    if ['add_dynamic_reviewer','show_available_submissions','assign_reviewer_dynamically','assign_metareviewer_dynamically','start_self_review'].include? action_in_params
       return true
     else ['Instructor', 'Teaching Assistant', 'Administrator'].include? current_role_name
     end
@@ -23,7 +21,6 @@ class ReviewMappingController < ApplicationController
     # case params[:action]
     return choose_case(params[:action])
   end
-
 
   def add_calibration
     participant = AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first rescue nil
@@ -120,26 +117,6 @@ class ReviewMappingController < ApplicationController
     # end
 
     redirect_to controller: 'student_review', action: 'list', id: reviewer.id
-  end
-
-  # assigns the quiz dynamically to the participant
-  def assign_quiz_dynamically
-    begin
-      assignment = Assignment.find(params[:assignment_id])
-      reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
-      if ResponseMap.where(reviewed_object_id: params[:questionnaire_id], reviewer_id: params[:participant_id]).first
-        flash[:error] = "You have already taken that quiz."
-      else
-        @map = QuizResponseMap.new
-        @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
-        @map.reviewer_id = params[:participant_id]
-        @map.reviewed_object_id = Questionnaire.find_by(instructor_id: @map.reviewee_id).id
-        @map.save
-      end
-    rescue StandardError => e
-      flash[:alert] = e.nil? ? $ERROR_INFO : e
-    end
-    redirect_to student_quizzes_path(id: reviewer.id)
   end
 
   def add_metareviewer
@@ -319,7 +296,7 @@ class ReviewMappingController < ApplicationController
     end
     num_reviews_student = params[:num_reviews_per_student].to_i         #Number of sumbissions that can be reviewed by a single student
     num_reviews_per_submission = params[:num_reviews_per_submission].to_i   #Toal number of reviews that can be performed on a single submission (or equivalently, number of students that can review the same submiss)
-    num_calibrated_artifacts = params[:num_calibrated_artifacts].to_i
+    num_calibrated_artifacts = params[:num_calibrated_artifacts].to_i 
     num_uncalibrated_artifacts = params[:num_uncalibrated_artifacts].to_i
     if num_calibrated_artifacts.zero? and num_uncalibrated_artifacts.zero?
       if check_num_reviews_args(num_reviews_student, num_reviews_per_submission, teams)

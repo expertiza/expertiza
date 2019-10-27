@@ -90,7 +90,7 @@ class ResponseController < ApplicationController
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
-      send_email_to_reviewee(@map)
+      send_email_to_reviewee(@map) if params['isSubmit'] && params['isSubmit'] == 'Yes'
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
@@ -167,8 +167,9 @@ class ResponseController < ApplicationController
     if was_submitted == true
       send_email_to_reviewee(@map)
     end
-    @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
-    # ,:version_num=>@version)
+    if is_submitted == true
+      @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
+    end
     # Change the order for displaying questions for editing response views.
     questions = sort_questions(@questionnaire.questions)
     create_answers(params, questions) if params[:responses]

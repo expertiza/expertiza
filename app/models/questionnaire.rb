@@ -5,7 +5,7 @@ class Questionnaire < ActiveRecord::Base
   belongs_to :instructor # the creator of this questionnaire
   has_many :assignment_questionnaires, dependent: :destroy
   has_many :assignments, through: :assignment_questionnaires
-  has_one :questionnaire_node, foreign_key: 'node_object_id', dependent: :destroy
+  has_one :questionnaire_node, foreign_key: 'node_object_id', dependent: :destroy, inverse_of: :questionnaire
 
   validate :validate_questionnaire
   validates :name, presence: true
@@ -14,20 +14,20 @@ class Questionnaire < ActiveRecord::Base
   DEFAULT_MIN_QUESTION_SCORE = 0  # The lowest score that a reviewer can assign to any questionnaire question
   DEFAULT_MAX_QUESTION_SCORE = 5  # The highest score that a reviewer can assign to any questionnaire question
   DEFAULT_QUESTIONNAIRE_URL = "http://www.courses.ncsu.edu/csc517".freeze
-  QUESTIONNAIRE_TYPES = ['ReviewQuestionnaire',	
-                         'MetareviewQuestionnaire',	
-                         'Author FeedbackQuestionnaire',	
-                         'AuthorFeedbackQuestionnaire',	
-                         'Teammate ReviewQuestionnaire',	
-                         'TeammateReviewQuestionnaire',	
-                         'SurveyQuestionnaire',	
-                         'AssignmentSurveyQuestionnaire',	
-                         'Assignment SurveyQuestionnaire',	
-                         'Global SurveyQuestionnaire',	
-                         'GlobalSurveyQuestionnaire',	
-                         'Course SurveyQuestionnaire',	
-                         'CourseSurveyQuestionnaire',	
-                         'BookmarkratingQuestionnaire',	
+  QUESTIONNAIRE_TYPES = ['ReviewQuestionnaire',
+                         'MetareviewQuestionnaire',
+                         'Author FeedbackQuestionnaire',
+                         'AuthorFeedbackQuestionnaire',
+                         'Teammate ReviewQuestionnaire',
+                         'TeammateReviewQuestionnaire',
+                         'SurveyQuestionnaire',
+                         'AssignmentSurveyQuestionnaire',
+                         'Assignment SurveyQuestionnaire',
+                         'Global SurveyQuestionnaire',
+                         'GlobalSurveyQuestionnaire',
+                         'Course SurveyQuestionnaire',
+                         'CourseSurveyQuestionnaire',
+                         'BookmarkratingQuestionnaire',
                          'QuizQuestionnaire'].freeze
   has_paper_trail
 
@@ -77,6 +77,31 @@ class Questionnaire < ActiveRecord::Base
                            .where('questionnaires.id = ?', self.id)
     results[0].max_score
   end
+
+  # clones the contents of a questionnaire, including the questions and associated advice
+  def self.copy_questionnaire_details(params, instructor_id)
+    orig_questionnaire = Questionnaire.find(params[:id])
+    questions = Question.where(questionnaire_id: params[:id])
+    questionnaire = orig_questionnaire.dup
+    questionnaire.instructor_id = instructor_id
+    questionnaire.name = 'Copy of ' + orig_questionnaire.name
+    questionnaire.created_at = Time.zone.now
+    questionnaire.save!
+    questions.each do |question|
+      new_question = question.dup
+      new_question.questionnaire_id = questionnaire.id
+      new_question.size = '50,3' if (new_question.is_a? Criterion or new_question.is_a? TextResponse) and new_question.size.nil?
+      new_question.save!
+      advices = QuestionAdvice.where(question_id: question.id)
+      next if advices.empty?
+      advices.each do |advice|
+        new_advice = advice.dup
+        new_advice.question_id = new_question.id
+        new_advice.save!
+      end
+    end
+    questionnaire
+  end  
 
   # validate the entries for this questionnaire
   def validate_questionnaire

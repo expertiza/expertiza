@@ -288,7 +288,8 @@ class ResponseController < ApplicationController
       "FeedbackResponseMap",
       "CourseSurveyResponseMap",
       "AssignmentSurveyResponseMap",
-      "GlobalSurveyResponseMap"
+      "GlobalSurveyResponseMap",
+      "BookmarkRatingResponseMap"
       @questionnaire = @map.questionnaire
     end
   end

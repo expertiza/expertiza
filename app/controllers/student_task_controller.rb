@@ -62,14 +62,13 @@ class StudentTaskController < ApplicationController
     @completed_tags = 0
     questionnaires.each do |questionnaire|
       if questionnaire.type == "ReviewQuestionnaire"
-        reviews = if @assignment.varying_rubrics_by_round?
-                    ReviewResponseMap.get_responses_for_team_round(@participant.team, @round)
-                  else
-                    ReviewResponseMap.get_assessments_for(@participant.team)
-                  end
-        @total_tags += reviews.length
         deployments = TagPromptDeployment.where(questionnaire: questionnaire)
         deployments = deployments.select {|tag| tag.tag_prompt.control_type.downcase != "checkbox"}
+        questions = Question.where(questionnaire: questionnaire)
+        questions = questions.select {|question| deployments.any? {|deployment| deployment.question_type == question.type}}
+        answers = []
+        question.each {|question| answers += Answer.where(question: question)}
+        @total_tags += answers.count
         deployments.each do |deployment|
           @completed_tags += AnswerTag.where("tag_prompt_deployment_id = ? AND user_id = ? AND value != ?",
                          deployment, @participant.user_id, 0).count

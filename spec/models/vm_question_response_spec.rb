@@ -76,7 +76,7 @@ describe VmQuestionResponse  do
       it 'adds reviews' do
         response = VmQuestionResponse.new(author_feedback_questionnaire, assignment, 1)
         #allow(participant).to receive(:feedback).and_return(reviews)
-        allow(FeedbackResponseMap).to receive(:where).with(reviewer_id: 3).and_return(double('FeedbackResponseMap', reviewee_id: 4,map_id: 1))
+        allow(FeedbackResponseMap).to receive(:where).with(reviewer_id: 3).and_return(double(reviewee_id: 4, map_id: 1))
         allow(Participant).to receive(:find_by).with(id: 4).and_return(reviwee)
 	      allow(Response).to receive(:where).with(map_id: 1).and_return(response)
 	      response.add_reviews(participant, team, false)

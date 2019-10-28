@@ -1,4 +1,4 @@
-class ReviewMappingController < ApplicationController
+class ReviewResponseMapController < ApplicationController
   autocomplete :user, :name
   def add_calibration
     participant = AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first rescue nil

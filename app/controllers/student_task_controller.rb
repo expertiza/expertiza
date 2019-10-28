@@ -58,28 +58,40 @@ class StudentTaskController < ApplicationController
     
     #THE FOLLOWING CODE IS ADDED FOR THE TAG COUNT FEATURE
     questionnaires = @assignment.questionnaires
-    @total_tags = 0
-    @completed_tags = 0
+    vmlist = []
     questionnaires.each do |questionnaire|
-      if questionnaire.type == "ReviewQuestionnaire"
-        deployments = TagPromptDeployment.where(questionnaire: questionnaire)
-        deployments = deployments.select {|tag| tag.tag_prompt.control_type.downcase != "checkbox"}
-        reviews = if @assignment.varying_rubrics_by_round?
-                    ReviewResponseMap.get_responses_for_team_round(@participant.team, @round)
-                  else
-                    ReviewResponseMap.get_assessments_for(@participant.team)
-                  end
-        answers = []
-        reviews.each {|response| answers += Answer.where(response: response)}
-        answers.each do |answer|
-          if !answer.comments.nil? and answer.comments != ""
-            tags = deployments.find_all {|tag| tag.question_type == answer.question.type}
-            @total_tags += tags.count
-          end
+      @round = nil
+      if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
+        questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
+        if questionnaires.count > 1
+          @round = questionnaires[counter_for_same_rubric].used_in_round
+          counter_for_same_rubric += 1
+        else
+          @round = questionnaires[0].used_in_round
+          counter_for_same_rubric = 0
         end
-        deployments.each do |deployment|
-          @completed_tags += AnswerTag.where("tag_prompt_deployment_id = ? AND user_id = ? AND value != ?",
-                         deployment, @participant.user_id, 0).count
+      end
+      vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
+      vmquestions = questionnaire.questions
+      vm.add_questions(vmquestions)
+      vm.add_team_members(@team)
+      vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
+      vm.number_of_comments_greater_than_10_words
+      vmlist << vm
+    end
+    @completed_tags = 0
+    @total_tags = 0
+    vmlist.each do |vm|
+      vm.list_of_rows.each do |r|
+        r.score_row.each do |row|
+          vm_prompts = row.vm_prompts.select {|prompt| prompt.tag_dep.tag_prompt.control_type.downcase != "checkbox"}
+          @total_tags += vm_prompts.count
+          vm_prompts.each do |vm_prompt|
+            answer_tag = AnswerTag.where(tag_prompt_deployment_id: vm_prompt.tag_dep, user_id: @participant.user_id, answer: vm_prompt.answer).first
+            if !answer_tag.nil? and answer_tag.value != "0"
+              @completed_tags += 1
+            end
+          end
         end
       end
     end

@@ -28,6 +28,7 @@ class ReportsController < ApplicationController
     fields
   end
 
+  #extended functionality.
   def self.export_details(csv, parent_id, detail_options)
     return csv unless detail_options
   end

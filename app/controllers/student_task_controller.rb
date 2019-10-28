@@ -88,7 +88,7 @@ class StudentTaskController < ApplicationController
           @total_tags += vm_prompts.count
           vm_prompts.each do |vm_prompt|
             answer = AnswerTag.where(tag_prompt_deployment_id: vm_prompt.tag_dep).first
-            if !answer.nil and answer.value != 0
+            if !answer.nil? and answer.value != 0
               @completed_tags += 1
             end
           end

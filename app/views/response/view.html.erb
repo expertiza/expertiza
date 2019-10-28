@@ -17,11 +17,18 @@
     <hr/>
 <% end %>
 
-<TR style="display:none; background-color: white;">
-    <TD COLSPAN="10">
-    <%= render :partial=>'grades/tabbed_reviews', :locals => {:prefix => 'user', :participant => @participant, :rscore => @pscore[:review], :reviewer => @reviewer, :round => @round} %>
-    </TD>
-</TR>
+
+<% if controller.action_name != "view2" %>
+    <% file_url = nil %>
+    <%= @response.display_as_html(nil, nil, file_url) %>
+    <br/>
+<% else %>
+    <TR style="display:none; background-color: white;">
+        <TD COLSPAN="10">
+        <%= render :partial=>'grades/tabbed_reviews', :locals => {:prefix => 'user', :participant => @participant, :rscore => @pscore[:review], :reviewer => @reviewer, :round => @round} %>
+        </TD>
+    </TR>
+<% end %>
 
 <!--Check whether there is a UploadFile question.-->
 <%if @map.instance_of?(ReviewResponseMap)%>

@@ -134,9 +134,15 @@ class ResponseController < ApplicationController
   def view
     @response = Response.find(params[:id])
     @map = @response.map
-    @round = params[:round]
     set_content
   end
+  #view response2 for instructor-end
+  def view2
+    @response = Response.find(params[:id])
+    @map = @response.map
+    set_content2
+    render "response/view"
+  end  
 
   def create
     map_id = params[:id]
@@ -249,13 +255,16 @@ class ResponseController < ApplicationController
     else
       @assignment = @map.assignment
     end
-    @reviewer = @map.reviewer
+    @participant = @map.reviewer
     @contributor = @map.contributor
     new_response ? set_questionnaire_for_new_response : set_questionnaire
     set_dropdown_or_scale
     @questions = sort_questions(@questionnaire.questions)
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
+  end
+  def set_content2(new_response = false)
+    @contributor = @map.contributor
     members = TeamsUser.where(team_id: params[:team])
     @user = members.first
     @participant = AssignmentParticipant.where(user_id: @user.user_id, parent_id: params[:assignment]).first
@@ -264,7 +273,9 @@ class ResponseController < ApplicationController
     @questions = retrieve_questions questionnaires, @assignment.id
     # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
     @pscore = @participant.scores(@questions)
-  end
+    @reviewer = @map.reviewer
+    @round = params[:round]
+  end  
   def retrieve_questions(questionnaires, assignment_id)
     questions = {}
     questionnaires.each do |questionnaire|

@@ -167,10 +167,18 @@ class QuestionnairesController < ApplicationController
 
   # Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions
-    questionnaire_id = params[:id] unless params[:id].nil?
-    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
-    ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
-      question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
+    num_of_existed_questions = Questionnaire.find(params[:id]).questions.size
+    question_nums =params[:question][:total_num].to_i
+    total_question_nums = ((num_of_existed_questions + 1)..(num_of_existed_questions + question_nums))
+
+    total_question_nums.each do |i|
+      question = Object.const_get(params[:question][:type]).create(
+          txt: '',
+          questionnaire_id: params[:id],
+          seq: i,
+          type: params[:question][:type],
+          break_before: true
+      )
       if question.is_a? ScoredQuestion
         question.weight = MAXIMUM_QUESTION_SCORE
         question.min_label = QUESTION_MIN_LABEL
@@ -185,12 +193,11 @@ class QuestionnairesController < ApplicationController
         flash[:error] = $ERROR_INFO
       end
     end
-    redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+    redirect_to edit_questionnaire_path(params[:id].to_sym)
   end
 
   # Zhewei: This method is used to save all questions in current questionnaire.
   def save_all_questions
-    questionnaire_id = params[:id]
     begin
       if params[:save]
         params[:question].each_pair do |k, v|
@@ -211,8 +218,8 @@ class QuestionnairesController < ApplicationController
 
     if params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
-    elsif !questionnaire_id.nil?
-      redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+    elsif params[:id].present?
+      redirect_to edit_questionnaire_path(params[:id])
     end
   end
 
@@ -222,7 +229,7 @@ class QuestionnairesController < ApplicationController
   def save
     @questionnaire.save!
 
-    save_questions @questionnaire.id if !@questionnaire.id.nil? and @questionnaire.id > 0
+    save_questions
     # We do not create node for quiz questionnaires
     if @questionnaire.type != "QuizQuestionnaire"
       p_folder = TreeFolder.find_by(name: @questionnaire.display_type)
@@ -233,14 +240,14 @@ class QuestionnairesController < ApplicationController
   end
 
   # save questions that have been added to a questionnaire
-  def save_new_questions(questionnaire_id)
+  def save_new_questions
     if params[:new_question]
       # The new_question array contains all the new questions
       # that should be saved to the database
       params[:new_question].keys.each do |question_key|
         q = Question.new
         q.txt = params[:new_question][question_key]
-        q.questionnaire_id = questionnaire_id
+        q.questionnaire_id = @questionnaire.id
         q.type = params[:question_type][question_key][:type]
         q.seq = question_key.to_i
         if @questionnaire.type == "QuizQuestionnaire"
@@ -252,10 +259,9 @@ class QuestionnairesController < ApplicationController
   end
 
   # delete questions from a questionnaire
-  # @param [Object] questionnaire_id
-  def delete_questions(questionnaire_id)
+  def delete_questions
     # Deletes any questions that, as a result of the edit, are no longer in the questionnaire
-    questions = Question.where("questionnaire_id = ?", questionnaire_id)
+    questions = Question.where("questionnaire_id = ?", @questionnaire.id)
     @deleted_questions = []
     questions.each do |question|
       should_delete = true
@@ -274,10 +280,9 @@ class QuestionnairesController < ApplicationController
   end
 
   # Handles questions whose wording changed as a result of the edit
-  # @param [Object] questionnaire_id
-  def save_questions(questionnaire_id)
-    delete_questions questionnaire_id
-    save_new_questions questionnaire_id
+  def save_questions
+    delete_questions
+    save_new_questions
 
     if params[:question]
       params[:question].keys.each do |question_key|

@@ -157,13 +157,13 @@ class QuizQuestionnaireController < QuestionnairesController
   def save
     @questionnaire.save!
 
-    save_questions @questionnaire.id if !@questionnaire.id.nil? and @questionnaire.id > 0
+    save_questions
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
   end
 
-  def save_questions(questionnaire_id)
-    delete_questions questionnaire_id
-    save_new_questions questionnaire_id
+  def save_questions
+    delete_questions
+    save_new_questions
     if params[:question]
       params[:question].each_key do |question_key|
         if params[:question][question_key][:txt].strip.empty?

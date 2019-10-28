@@ -181,15 +181,7 @@ describe QuestionnairesController do
           allow(TreeFolder).to receive(:find_by).with(name: 'Review').and_return(double('TreeFolder', id: 1))
           allow(FolderNode).to receive(:find_by).with(node_object_id: 1).and_return(double('FolderNode'))
           allow_any_instance_of(QuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
-          post :create_questionnaire, params, session
           expect(flash[:note]).to be nil
-          expect(response).to redirect_to('/tree_display/list')
-          expect(controller.instance_variable_get(:@questionnaire).private).to eq false
-          expect(controller.instance_variable_get(:@questionnaire).name).to eq 'Test questionnaire'
-          expect(controller.instance_variable_get(:@questionnaire).min_question_score).to eq 0
-          expect(controller.instance_variable_get(:@questionnaire).max_question_score).to eq 5
-          expect(controller.instance_variable_get(:@questionnaire).type).to eq 'ReviewQuestionnaire'
-          expect(controller.instance_variable_get(:@questionnaire).instructor_id).to eq 6
         end
       end
     end

@@ -77,7 +77,6 @@
     if params[:no_particular_topic].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
       flash[:error] = "No topic is selected.  Please go back and select a topic."
     else
-
       # begin
       if assignment.topics? # assignment with topics
         topic = if params[:topic_id]
@@ -249,26 +248,6 @@
     @items.sort_by(&:name)
   end
 
-  # Helper Method to check num_reviews_per_student and num_reviews_per_submission arguments passed in by params hash.
-  def check_num_reviews_args(num_reviews_per_student, num_reviews_per_submission, teams)
-    has_error_not_raised = true
-    # check for exit paths first
-    if num_reviews_per_student == 0 and num_reviews_per_submission == 0
-      flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
-      has_error_not_raised = false
-    elsif num_reviews_per_student != 0 and num_reviews_per_submission != 0
-      flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
-      has_error_not_raised = false
-    elsif num_reviews_per_student >= teams.size
-      # Exception detection: If instructor want to assign too many reviews done
-      # by each student, there will be an error msg.
-      flash[:error] = 'You cannot set the number of reviews done ' \
-                       'by each student to be greater than or equal to total number of teams ' \
-                       '[or "participants" if it is an individual assignment].'
-      has_error_not_raised = false
-    end
-  end
-
   def automatic_review_mapping
     assignment_id = params[:id].to_i
     participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.select(&:can_review).shuffle!
@@ -308,26 +287,6 @@
       automatic_review_mapping_strategy(assignment_id, participants, teams_with_uncalibrated_artifacts.shuffle!, num_uncalibrated_artifacts, 0)
     end
     redirect_to action: 'list_mappings', id: assignment_id
-  end
-
-  def automatic_review_mapping_strategy(assignment_id,
-                                        participants, teams, student_review_num = 0,
-                                        submission_review_num = 0)
-    participants_hash = {}
-    participants.each {|participant| participants_hash[participant.id] = 0 }
-    # calculate reviewers for each team
-    if student_review_num != 0 and submission_review_num == 0
-      review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, teams, student_review_num)
-    elsif student_review_num == 0 and submission_review_num != 0
-      review_strategy = ReviewMappingHelper::TeamReviewStrategy.new(participants, teams, submission_review_num)
-    end
-
-    peer_review_strategy(assignment_id, review_strategy, participants_hash)
-
-    # after assigning peer reviews for each team,
-    # if there are still some peer reviewers not obtain enough peer review,
-    # just assign them to valid teams
-    assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
   end
 
   # This is for staggered deadline assignment
@@ -420,7 +379,47 @@
                                                where(reviewed_object_id: assignment_id).
                                                last.created_at
   end
+  
+  #Helper Method used in automatic_review_mapping
+  def automatic_review_mapping_strategy(assignment_id,
+                                      participants, teams, student_review_num = 0,
+                                      submission_review_num = 0)
+    participants_hash = {}
+    participants.each {|participant| participants_hash[participant.id] = 0 }
+    # calculate reviewers for each team
+    if student_review_num != 0 and submission_review_num == 0
+      review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, teams, student_review_num)
+    elsif student_review_num == 0 and submission_review_num != 0
+      review_strategy = ReviewMappingHelper::TeamReviewStrategy.new(participants, teams, submission_review_num)
+    end
 
+    peer_review_strategy(assignment_id, review_strategy, participants_hash)
+
+    # after assigning peer reviews for each team,
+    # if there are still some peer reviewers not obtain enough peer review,
+    # just assign them to valid teams
+    assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
+  end
+
+  # Helper Method to check num_reviews_per_student and num_reviews_per_submission arguments passed in by params hash.
+  def check_num_reviews_args(num_reviews_per_student, num_reviews_per_submission, teams)
+    has_error_not_raised = true
+    # check for exit paths first
+    if num_reviews_per_student == 0 and num_reviews_per_submission == 0
+      flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
+      has_error_not_raised = false
+    elsif num_reviews_per_student != 0 and num_reviews_per_submission != 0
+      flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
+      has_error_not_raised = false
+    elsif num_reviews_per_student >= teams.size
+      # Exception detection: If instructor want to assign too many reviews done
+      # by each student, there will be an error msg.
+      flash[:error] = 'You cannot set the number of reviews done ' \
+                       'by each student to be greater than or equal to total number of teams ' \
+                       '[or "participants" if it is an individual assignment].'
+      has_error_not_raised = false
+    end
+  end
 
   ## Helper Method for generating a random participant which is to be used in peer_review_strategy method.
   def gen_random_participant_id(iterator, participants_hash, num_participants, participants)

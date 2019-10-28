@@ -292,7 +292,9 @@ class UsersController < ApplicationController
                                  :timezonepref,
                                  :public_key,
                                  :copy_of_emails,
-                                 :institution_id)
+                                 :institution_id,
+                                 :preference_home_flag,
+                                 :preference_edit_flag)
   end
 
   def requested_user_params

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181205201208) do
+ActiveRecord::Schema.define(version: 20191028210443) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -630,7 +630,6 @@ ActiveRecord::Schema.define(version: 20181205201208) do
     t.string  "status",            limit: 255
     t.string  "unityID",           limit: 255
     t.string  "signup_preference", limit: 255
-    t.string  "feedback",          limit: 255
   end
 
   create_table "survey_deployments", force: :cascade do |t|
@@ -761,6 +760,8 @@ ActiveRecord::Schema.define(version: 20181205201208) do
     t.text    "public_key",                limit: 16777215
     t.boolean "copy_of_emails",                             default: false
     t.integer "institution_id",            limit: 4
+    t.boolean "preference_home_flag",                       default: true
+    t.boolean "preference_edit_flag",                       default: true
   end
 
   add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree

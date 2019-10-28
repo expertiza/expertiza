@@ -11,7 +11,11 @@ class ProfileController < ApplicationController
   def update
     params.permit!
     @user = session[:user]
-
+    # @username = session[:user].fullname
+    # @prefernece = session[:user].preference_home_flag
+    # if (session[:user].preference_home_flag)
+    #   flash[:success] = 'Able to get'
+    # end
     unless params[:assignment_questionnaire].nil? or params[:assignment_questionnaire][:notification_limit].blank?
       aq = AssignmentQuestionnaire.where(['user_id = ? and assignment_id is null and questionnaire_id is null', @user.id]).first
       aq.update_attribute('notification_limit', params[:assignment_questionnaire][:notification_limit])
@@ -50,6 +54,8 @@ class ProfileController < ApplicationController
                                  :timezonepref,
                                  :public_key,
                                  :copy_of_emails,
-                                 :institution_id)
+                                 :institution_id,
+                                 :preference_home_flag,
+                                 :preference_edit_flag)
   end
 end

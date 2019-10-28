@@ -52,26 +52,6 @@ class BookmarksController < ApplicationController
     redirect_to action: 'list', id: @bookmark.topic_id
   end
 
-  def average_based_on_rubric(bookmark)
-    if bookmark.nil?
-      0
-    else
-      assignment = SignUpTopic.find(bookmark.topic_id).assignment
-      questions = assignment.questionnaires.where(type: 'BookmarkRatingQuestionnaire').flat_map(&:questions)
-      responses = BookmarkRatingResponseMap.where(
-          reviewed_object_id: assignment.id,
-          reviewee_id: bookmark.id
-      ).flat_map {|r| Response.where(map_id: r.id) }
-      scores = Answer.compute_scores(responses, questions)
-      if scores[:avg].nil?
-        0
-      else
-        (scores[:avg] * 5.0 / 100.0).round(2)
-      end
-    end
-  end
-
-
   def destroy
     @bookmark = Bookmark.find(params[:id])
     @bookmark.destroy
@@ -100,27 +80,17 @@ class BookmarksController < ApplicationController
     topic = SignUpTopic.find(bookmark.topic_id)
     assignment_participant = AssignmentParticipant.find_by(user_id: current_user.id)
     response_map = BookmarkRatingResponseMap.where(
-        reviewed_object_id: topic.assignment.id,
-        reviewer_id: assignment_participant.id,
-        reviewee_id: bookmark.id
+      reviewed_object_id: topic.assignment.id,
+      reviewer_id: assignment_participant.id,
+      reviewee_id: bookmark.id
     ).first
     if response_map.nil?
       response_map = BookmarkRatingResponseMap.create(
-          reviewed_object_id: topic.assignment.id,
-          reviewer_id: assignment_participant.id,
-          reviewee_id: bookmark.id
+        reviewed_object_id: topic.assignment.id,
+        reviewer_id: assignment_participant.id,
+        reviewee_id: bookmark.id
       )
     end
     redirect_to new_response_url(id: response_map.id, return: 'bookmark')
   end
-
-  def get_bookmark_rating_response_map(bookmark)
-    BookmarkRatingResponseMap.find_by(
-        reviewed_object_id: SignUpTopic.find(bookmark.topic_id).assignment.id,
-        reviewer_id: AssignmentParticipant.find_by(user_id: current_user.id).id,
-        reviewee_id: bookmark.id
-    )
-  end
-  helper_method :average_based_on_rubric
-  helper_method :get_bookmark_rating_response_map
 end

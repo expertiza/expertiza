@@ -35,7 +35,7 @@
             <% end %>
           <% else %>
             <!-- Compute average rating based on rubrics -->
-            <% avg = average_based_on_rubric(bookmark) %>
+            <% avg = BookmarkRating.average_based_on_rubric(bookmark) %>
             <%= avg == 0 ? '-' : avg %>
           <% end %>
         </td>
@@ -69,7 +69,7 @@
               <% end %>
             <% else %>
               <!-- This will be used to show the rubric -->
-              <% bookmark_rating_response_map = get_bookmark_rating_response_map(bookmark) %>
+              <% bookmark_rating_response_map = BookmarkRating.get_bookmark_rating_response_map(bookmark, current_user) %>
               <% if bookmark_rating_response_map.nil? || bookmark_rating_response_map.response.size == 0 %>
                 <%= link_to "Begin", :action => "new_bookmark_review", :id => bookmark.id %>
               <% else %>

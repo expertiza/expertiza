@@ -18,7 +18,7 @@ class SignUpTopic < ActiveRecord::Base
 
   def self.import(row_hash, session, _id = nil)
     if row_hash.length < 3
-      raise ArgumentError, "The CSV File expects the format: Topic identifier, Topic name, Max choosers, Topic Category (optional), Topic Description (Optional), Topic Link (optional), Assigned Team Name (optional)."
+      raise ArgumentError, "The CSV File expects the format: Topic identifier, Topic name, Max choosers, Topic Category (optional), Topic Description (Optional), Topic Link (optional), Teams Assigned(optional)."
     end
     topic = SignUpTopic.where(topic_name: row_hash[:topic_name], assignment_id: session[:assignment_id]).first
     if topic.nil?

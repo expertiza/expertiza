@@ -18,8 +18,9 @@ describe ReviewMappingController do
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
-    instructor = build(:instructor)
-    stub_current_user(instructor, instructor.role.name, instructor.role)
+    @instructor = build(:instructor, id: 1)
+    # instructor = build(:instructor)
+    stub_current_user(@instructor, @instructor.role.name, @instructor.role)
   end
 
   describe '#add_calibration' do
@@ -30,7 +31,7 @@ describe ReviewMappingController do
         allow(ReviewResponseMap).to receive_message_chain(:where, :first)
           .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', calibrate_to: true).with(no_args).and_return(review_response_map)
         params = {id: 1, team_id: 1}
-        session = {user: build(:instructor, id: 1)}
+        session = {user: @instructor}
         get :add_calibration, params, session
         expect(response).to redirect_to '/response/new?assignment_id=1&id=1&return=assignment_edit'
       end
@@ -47,7 +48,7 @@ describe ReviewMappingController do
         allow(ReviewResponseMap).to receive(:create)
           .with(reviewed_object_id: '1', reviewer_id: 1, reviewee_id: '1', calibrate_to: true).and_return(review_response_map)
         params = {id: 1, team_id: 1}
-        session = {user: build(:instructor, id: 1)}
+        session = {user: @instructor}
         get :add_calibration, params, session
         expect(response).to redirect_to '/response/new?assignment_id=1&id=1&return=assignment_edit'
       end

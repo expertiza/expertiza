@@ -188,11 +188,12 @@ class ReviewMappingController < ApplicationController
   @@time_create_last_review_mapping_record = nil
 
   def choose_case(action_in_params)
-    if ['add_dynamic_reviewer','show_available_submissions','assign_reviewer_dynamically','assign_metareviewer_dynamically','start_self_review'].include? action_in_params
+    if ['add_dynamic_reviewer', 'show_available_submissions', 'assign_reviewer_dynamically', 'assign_metareviewer_dynamically', 'start_self_review'].include? action_in_params
       return true
     else ['Instructor', 'Teaching Assistant', 'Administrator'].include? current_role_name
     end
   end
+
   # E1600
   # start_self_review is a method that is invoked by a student user so it should be allowed accordingly
   def action_allowed?
@@ -441,8 +442,8 @@ class ReviewMappingController < ApplicationController
         teams << team
       end
     end
-    num_reviews_per_student = params[:num_reviews_per_student].to_i         #Number of sumbissions that can be reviewed by a single student
-    num_reviews_per_submission = params[:num_reviews_per_submission].to_i   #Toal number of reviews that can be performed on a single submission (or equivalently, number of students that can review the same submiss)
+    num_reviews_per_student = params[:num_reviews_per_student].to_i         # Number of sumbissions that can be reviewed by a single student
+    num_reviews_per_submission = params[:num_reviews_per_submission].to_i   # Toal number of reviews that can be performed on a single submission (or equivalently, number of students that can review the same submiss)
     num_calibrated_artifacts = params[:num_calibrated_artifacts].to_i
     num_uncalibrated_artifacts = params[:num_uncalibrated_artifacts].to_i
     if num_calibrated_artifacts.zero? and num_uncalibrated_artifacts.zero?
@@ -515,4 +516,182 @@ class ReviewMappingController < ApplicationController
       redirect_to controller: 'submitted_content', action: 'edit', id: params[:reviewer_id], msg: e.message
     end
   end
+<<<<<<< HEAD
+
+  private
+
+  def assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
+    if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0)
+                        .where("created_at > :time",
+                               time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
+
+      participants_with_insufficient_review_num = []
+      participants_hash.each do |participant_id, review_num|
+        participants_with_insufficient_review_num << participant_id if review_num < review_strategy.reviews_per_student
+      end
+      unsorted_teams_hash = {}
+
+      ReviewResponseMap.where(reviewed_object_id: assignment_id,
+                              calibrate_to: 0).each do |response_map|
+        if unsorted_teams_hash.key? response_map.reviewee_id
+          unsorted_teams_hash[response_map.reviewee_id] += 1
+        else
+          unsorted_teams_hash[response_map.reviewee_id] = 1
+        end
+      end
+      teams_hash = unsorted_teams_hash.sort_by {|_, v| v }.to_h
+
+      participants_with_insufficient_review_num.each do |participant_id|
+        teams_hash.each_key do |team_id, _num_review_received|
+          next if TeamsUser.exists?(team_id: team_id,
+                                    user_id: Participant.find(participant_id).user_id)
+
+          ReviewResponseMap.where(reviewee_id: team_id, reviewer_id: participant_id,
+                                  reviewed_object_id: assignment_id).first_or_create
+
+          teams_hash[team_id] += 1
+          teams_hash = teams_hash.sort_by {|_, v| v }.to_h
+          break
+        end
+      end
+    end
+    @@time_create_last_review_mapping_record = ReviewResponseMap.
+                                               where(reviewed_object_id: assignment_id).
+                                               last.created_at
+  end
+  
+  #Helper Method used in automatic_review_mapping
+  def automatic_review_mapping_strategy(assignment_id,
+                                      participants, teams, student_review_num = 0,
+                                      submission_review_num = 0)
+    participants_hash = {}
+    participants.each {|participant| participants_hash[participant.id] = 0 }
+    # calculate reviewers for each team
+    if student_review_num != 0 and submission_review_num == 0
+      review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, teams, student_review_num)
+    elsif student_review_num == 0 and submission_review_num != 0
+      review_strategy = ReviewMappingHelper::TeamReviewStrategy.new(participants, teams, submission_review_num)
+    end
+
+    peer_review_strategy(assignment_id, review_strategy, participants_hash)
+
+    # after assigning peer reviews for each team,
+    # if there are still some peer reviewers not obtain enough peer review,
+    # just assign them to valid teams
+    assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
+  end
+
+  # Helper Method to check num_reviews_per_student and num_reviews_per_submission arguments passed in by params hash.
+  def check_num_reviews_args(num_reviews_per_student, num_reviews_per_submission, teams)
+    has_error_not_raised = true
+    # check for exit paths first
+    if num_reviews_per_student == 0 and num_reviews_per_submission == 0
+      flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
+      has_error_not_raised = false
+    elsif num_reviews_per_student != 0 and num_reviews_per_submission != 0
+      flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
+      has_error_not_raised = false
+    elsif num_reviews_per_student >= teams.size
+      # Exception detection: If instructor want to assign too many reviews done
+      # by each student, there will be an error msg.
+      flash[:error] = 'You cannot set the number of reviews done ' \
+                       'by each student to be greater than or equal to total number of teams ' \
+                       '[or "participants" if it is an individual assignment].'
+      has_error_not_raised = false
+    end
+  end
+
+  # Helper Method for generating a random participant which is to be used in peer_review_strategy method.
+  def gen_random_participant_id(iterator, participants_hash, num_participants, participants)
+    if iterator.zero?
+      rand_num = rand(0..num_participants - 1)
+    else
+      min_value = participants_hash.values.min
+      # get the temp array including indices of participants, each participant has minimum review number in hash table.
+      participants_with_min_assigned_reviews = []
+      participants.each do |participant|
+        participants_with_min_assigned_reviews << participants.index(participant) if participants_hash[participant.id] == min_value
+      end
+      # if participants_with_min_assigned_reviews is blank
+      no_particpants = participants_with_min_assigned_reviews.empty?
+      # or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
+      participant_is_owner = (participants_with_min_assigned_reviews.size == 1 and TeamsUser.exists?(team_id: team.id, user_id: participants[participants_with_min_assigned_reviews[0]].user_id))
+      rand_num = if no_particpants or participant_is_owner
+                    # use original method to get random number
+                    rand(0..num_participants - 1)
+                 else
+                    # rand_num should be the position of this participant in original array
+                    participants_with_min_assigned_reviews[rand(0..participants_with_min_assigned_reviews.size - 1)]
+                 end
+    end
+    return rand_num
+  end
+
+  def peer_review_strategy(assignment_id, review_strategy, participants_hash)
+    teams = review_strategy.teams
+    participants = review_strategy.participants
+    num_participants = participants.size
+
+    iterator = 0
+    teams.each do |team|
+      selected_participants = []
+      if !team.equal? teams.last
+        # need to even out the # of reviews for teams
+        while selected_participants.size < review_strategy.reviews_per_team
+          num_participants_this_team = TeamsUser.where(team_id: team.id).size
+          # If there are some submitters or reviewers in this team, they are not treated as normal participants.
+          # They should be removed from 'num_participants_this_team'
+          TeamsUser.where(team_id: team.id).each do |team_user|
+            temp_participant = Participant.where(user_id: team_user.user_id, parent_id: assignment_id).first
+            num_participants_this_team -= 1 if temp_participant.can_review == false or temp_participant.can_submit == false
+          end
+          # if all outstanding participants are already in selected_participants, just break the loop.
+          break if selected_participants.size == participants.size - num_participants_this_team
+
+          # generate random number
+          rand_num = gen_random_participant_id(iterator, participants_hash, num_participants, participants)
+
+          # prohibit one student to review his/her own artifact
+          next if TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id)
+
+          if_condition_1 = (participants_hash[participants[rand_num].id] < review_strategy.reviews_per_student)
+          if_condition_2 = (!selected_participants.include? participants[rand_num].id)
+          if if_condition_1 and if_condition_2
+            # selected_participants cannot include duplicate num
+            selected_participants << participants[rand_num].id
+            participants_hash[participants[rand_num].id] += 1
+          end
+          # remove students who have already been assigned enough num of reviews out of participants array
+          participants.each do |participant|
+            if participants_hash[participant.id] == review_strategy.reviews_per_student
+              participants.delete_at(rand_num)
+              num_participants -= 1
+            end
+          end
+        end
+      else
+        # REVIEW: num for last team can be different from other teams.
+        # prohibit one student to review his/her own artifact and selected_participants cannot include duplicate num
+        participants.each do |participant|
+          # avoid last team receives too many peer reviews
+          if !TeamsUser.exists?(team_id: team.id, user_id: participant.user_id) and selected_participants.size < review_strategy.reviews_per_team
+            selected_participants << participant.id
+            participants_hash[participant.id] += 1
+          end
+        end
+      end
+
+      begin
+        selected_participants.each {|index| ReviewResponseMap.where(reviewee_id: team.id, reviewer_id: index, reviewed_object_id: assignment_id).first_or_create }
+      rescue StandardError
+        flash[:error] = "Automatic assignment of reviewer failed."
+      end
+      iterator += 1
+    end
+  end
 end
+
+# This comment is a test for creating a new pull request.
+=======
+end
+>>>>>>> da0d28db3ed180c370fbae5d98a24a17dc3e297f

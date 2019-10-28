@@ -274,8 +274,8 @@ describe AssignmentParticipant do
       context 'when the record has less than 4 items' do
         it 'raises an ArgumentError' do
           row = {name: 'no one', fullname: 'no one', email: 'no_one@email.com'}
-          expect { AssignmentParticipant.import(row, nil, nil, nil) }.to raise_error('The record containing no one does not have enough items.')
           expect(ImportFileHelper).not_to receive(:create_new_user)
+          expect { AssignmentParticipant.import(row, nil, nil, nil) }.to raise_error('The record containing no one does not have enough items.')
         end
       end
 
@@ -295,8 +295,8 @@ describe AssignmentParticipant do
         context 'when certain assignment cannot be found' do
           it 'creates a new user based on import information and raises an ImportError' do
             allow(Assignment).to receive(:find).with(1).and_return(nil)
+            expect(ImportFileHelper).to receive(:create_new_user)
             expect { AssignmentParticipant.import(row, nil, {}, 1) }.to raise_error('The assignment with id "1" was not found.')
-            expect(ImportFileHelper).not_to receive(:create_new_user)
           end
         end
 
@@ -306,8 +306,8 @@ describe AssignmentParticipant do
             allow(AssignmentParticipant).to receive(:exists?).with(user_id: 1, parent_id: 1).and_return(false)
             allow(AssignmentParticipant).to receive(:create).with(user_id: 1, parent_id: 1).and_return(participant)
             allow(participant).to receive(:set_handle).and_return('handle')
+            expect(ImportFileHelper).to receive(:create_new_user)
             expect(AssignmentParticipant.import(row, nil, {}, 1)).to be_truthy
-            expect(ImportFileHelper).not_to receive(:create_new_user)
           end
         end
       end

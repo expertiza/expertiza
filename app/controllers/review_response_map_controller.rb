@@ -1,5 +1,27 @@
 class ReviewResponseMapController < ApplicationController
   autocomplete :user, :name
+  # use_google_charts
+  require 'gchart'
+  # helper :dynamic_review_assignment
+  helper :submitted_content
+  # including the following helper to refactor the code in response_report function
+  # include ReportFormatterHelper
+
+  @@time_create_last_review_mapping_record = nil
+
+  def choose_case(action_in_params)
+    if ['add_dynamic_reviewer','show_available_submissions','assign_reviewer_dynamically','assign_metareviewer_dynamically','start_self_review'].include? action_in_params
+      return true
+    else ['Instructor', 'Teaching Assistant', 'Administrator'].include? current_role_name
+    end
+  end
+  # E1600
+  # start_self_review is a method that is invoked by a student user so it should be allowed accordingly
+  def action_allowed?
+    # case params[:action]
+    return choose_case(params[:action])
+  end
+
   def add_calibration
     participant = AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first rescue nil
     if participant.nil?

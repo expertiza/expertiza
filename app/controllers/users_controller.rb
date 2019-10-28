@@ -60,7 +60,7 @@ class UsersController < ApplicationController
   def list
     user = session[:user]
     #paginate_list is called with the
-    @users = user.get_user_list
+    @users = paginate_list(user.get_user_list)
   end
 
   #for displaying users which are being searched for editing purposes after checking authorization
@@ -237,7 +237,7 @@ class UsersController < ApplicationController
 
     # The type of condition for the search depends on what the user has selected from the search_by dropdown
     @search_by = params[:search_by]
-
+    @per_page = 3
     # search for corresponding users
     # users = User.search_users(role, user_id, letter, @search_by)
 

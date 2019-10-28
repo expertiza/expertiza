@@ -77,7 +77,6 @@
     if params[:no_particular_topic].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
       flash[:error] = "No topic is selected.  Please go back and select a topic."
     else
-
       # begin
       if assignment.topics? # assignment with topics
         topic = if params[:topic_id]

@@ -232,11 +232,11 @@ describe UsersController do
 
     it 'save successfully with a new institution' do
       driver = Selenium::WebDriver.for :firefox
-      driver.get("http://localhost:3000/")
+      driver.get("http://127.0.0.1:3000/")
       driver.find_element(:id, "login_name").send_keys("super_administrator2")
       driver.find_element(:id, "login_password").send_keys("password")
       driver.find_element(:name, "commit").click()
-      driver.get("http://localhost:3000/users/new?utf8=%E2%9C%93&role=Instructor&commit=New+Instructor")
+      driver.get("http://127.0.0.1:3000/users/new?utf8=%E2%9C%93&role=Instructor&commit=New+Instructor")
       driver.find_element(:id, "user_name").send_keys("yzhu48")
       driver.find_element(:id, "user_fullname").send_keys("yzhu48")
       driver.find_element(:id, "user_email").send_keys("yzhu48@ncsu.com")
@@ -250,7 +250,7 @@ describe UsersController do
       driver.find_element(:id, "institution_name").send_keys("yzhu48")
 
       driver.find_element(:name, "commit").click()
-      # ('http://localhost:3000/users/list')
+      # ('http://127.0.0.1:3000/users/list')
       expect(response.status).to eq(200)
     end
   end

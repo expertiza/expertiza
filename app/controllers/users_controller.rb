@@ -59,13 +59,16 @@ class UsersController < ApplicationController
   # for displaying the list of users
   def list
     user = session[:user]
+    #paginate_list is called with the
     @users = user.get_user_list
   end
 
-  def show_selection
+  #for displaying users which are being searched for editing purposes after checking authorization
+  def show_if_authorized
     @user = User.find_by(name: params[:user][:name])
     if !@user.nil?
-      get_role
+      role
+      #check whether current user is authorized to edit the user being searched, call show if true
       if @role.parent_id.nil? || @role.parent_id < session[:user].role_id || @user.id == session[:user].id
         render action: 'show'
       else
@@ -83,7 +86,7 @@ class UsersController < ApplicationController
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
       @user = User.find(params[:id])
-      get_role
+      role
       # obtain number of assignments participated
       @assignment_participant_num = 0
       AssignmentParticipant.where(user_id: @user.id).each {|_participant| @assignment_participant_num += 1 }
@@ -132,7 +135,7 @@ class UsersController < ApplicationController
 
   def edit
     @user = User.find(params[:id])
-    get_role
+    role
     foreign
   end
 
@@ -210,7 +213,8 @@ class UsersController < ApplicationController
                                  :institution_id)
   end
 
-  def get_role
+  #to find the role of a given user object and set the @role accordingly
+  def role
     if @user && @user.role_id
       @role = Role.find(@user.role_id)
     elsif @user

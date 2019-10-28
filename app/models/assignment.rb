@@ -611,14 +611,14 @@ class Assignment < ActiveRecord::Base
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: type).id }
   end
 
+  def finished?(topic_id)
+    return next_due_date(topic_id).nil?
+  end
+
   private
 
   def next_due_date(topic_id)
     DueDate.get_next_due_date( self.id,topic_id)
-  end
-
-  def finished?(topic_id)
-    return next_due_date(topic_id).nil?
   end
 
   def topic_missing?( topic_id = nil)

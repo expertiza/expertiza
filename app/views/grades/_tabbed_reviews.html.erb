@@ -23,6 +23,7 @@
     <% end %>
 
     <% rounds.each do |round| %>
+        <% next if round.to_s != @round.to_s %>
         <h3>Round <%= round %></h3>
         <% if controller.action_name != "view_my_scores"%>
             <a href="#" name= <%= participant.id.to_s + '_' + round.to_s + "Link" %> onClick="toggleElement('<%= participant.id.to_s + '_' + round.to_s %>','round <%= round.to_s%> reviews');return false;">show round <%= round.to_s%> reviews</a>

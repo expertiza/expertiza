@@ -319,7 +319,7 @@ class AssignmentForm
     new_assign.update_attribute('updated_at', Time.now)
     new_assign.update_attribute('directory_path', new_assign.directory_path + '_copy') if new_assign.directory_path.present?
     new_assign.copy_flag = true
-    if new_assign.save!
+    if new_assign.save
       Assignment.record_timestamps = true
       copy_assignment_questionnaire(old_assign, new_assign, user)
       AssignmentDueDate.copy(old_assign.id, new_assign.id)

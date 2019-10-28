@@ -275,6 +275,7 @@ describe AssignmentsController do
     end
   end
 
+  
   describe '#copy' do
     let(:new_assignment) { build(:assignment, id: 2, name: 'new assignment', directory_path: 'different path') }
     let(:new_assignment2) { build(:assignment, id: 2, name: 'new assignment', directory_path: 'same path') }
@@ -293,8 +294,8 @@ describe AssignmentsController do
     end
 
     context 'when new assignment directory is same as old' do
-      it 'should show an error and redirect to assignments#edit page' do
-        allow(AssignmentForm).to receive(:copy).with('1', nil, instructor).and_return(2)
+      it 'should show an error and redirect to assignments#checktopicscopy page' do
+        allow(AssignmentForm).to receive(:copy).with("1", nil, instructor).and_return(2)
         allow(Assignment).to receive(:find).with(2).and_return(new_assignment2)
         params = {id: 1}
         session = {user: instructor}
@@ -306,19 +307,8 @@ describe AssignmentsController do
         expect(response).to redirect_to('/assignments/2/edit')
       end
     end
-
-    context 'when new assignment id does not fetch successfully' do
-      it 'shows an error flash message and redirects to assignments#edit page' do
-        allow(assignment).to receive(:dup).and_return(new_assignment)
-        allow(new_assignment).to receive(:save).and_return(false)
-        params = {id: 1}
-        get :copy, params
-        expect(flash[:note]).to be_nil
-        expect(flash[:error]).to eq('The assignment was not able to be copied. Please check the original assignment for missing information.')
-        expect(response).to redirect_to('/tree_display/list')
-      end
-    end
   end
+
 
   describe '#delete' do
     context 'when assignment is deleted successfully' do

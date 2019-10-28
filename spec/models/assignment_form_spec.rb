@@ -309,14 +309,25 @@ describe AssignmentForm do
     end
   end
 
-  describe '.copy' do
-    it 'copies the original assignment to a new one and returns the new assignment_id when copy topic equals YES' do
+  describe '.copy' do	
+    it 'copies the original assignment to a new one and returns the new assignment_id when copyoption equals copyWithoutTopic' do
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       allow_any_instance_of(AssignmentForm).to receive(:copy_assignment_questionnaire).with(any_args).and_return('OK!')
       allow(AssignmentDueDate).to receive(:copy).with(1, any_args).and_return('OK!')
       allow_any_instance_of(Assignment).to receive(:create_node).and_return('OK!')
       allow(SignUpTopic).to receive(:where).with(assignment_id: 1).and_return([build(:topic)])
-      expect(AssignmentForm.copy(1, 'Y', build(:instructor))).to eq(2)
+      expect(AssignmentForm.copy(1, 'copyWithoutTopic', build(:instructor))).to eq(2)
     end
+
+    it 'copies the original assignment to a new one and returns the new assignment_id when copyoption equals copyoption copyWithTopicTeams' do
+      allow(Assignment).to receive(:find).with(1).and_return(assignment)
+      allow_any_instance_of(AssignmentForm).to receive(:copy_assignment_questionnaire).with(any_args).and_return('OK!')
+      allow(AssignmentDueDate).to receive(:copy).with(1, any_args).and_return('OK!')
+      allow_any_instance_of(Assignment).to receive(:create_node).and_return('OK!')
+      allow(SignUpTopic).to receive(:where).with(assignment_id: 1).and_return([build(:topic)])
+	  allow_any_instance_of(SignedUpTeam).to receive(:dup).and_return('OK!')
+      expect(AssignmentForm.copy(1, 'copyWithTopicsTeams', build(:instructor))).to eq(2)	  
+    end
+
   end
 end

@@ -108,11 +108,11 @@ describe "test for instructor" do
     create(:question)
     create(:signed_up_team)
     create(:signed_up_team, team_id: 2, topic: SignUpTopic.second)
-    create(:review)
-    review_id = Review.first.id.to_s
-    create(:review_response_map, reviewer_id: User.where(role_id: 2).third.id)
+    #create(:review)
+    #review_id = Review.first.id.to_s
+    #create(:review_response_map, reviewer_id: User.where(role_id: 2).third.id)
     login_as 'instructor6'
-    visit "/response/view2?id=#{review_id}&&team=#{team_id}&&round=1&&assignment=#{assignment_id}"
+    #visit "/response/view2?id=#{review_id}&&team=#{team_id}&&round=1&&assignment=#{assignment_id}"
   end
   it "can go to review details" do
     

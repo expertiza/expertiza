@@ -117,9 +117,12 @@ class QuizQuestionnairesController < QuestionnairesController
   def valid_quiz
     num_questions = Assignment.find(params[:aid]).num_quiz_questions
     valid = "valid"
+    if params[:questionnaire][:name] == "" # questionnaire name is not specified
+      valid = "Please specify quiz name (please do not use your name or id)."
+    end
     (1..num_questions).each do |i|
-      valid = validate_question(i)
       break if valid != "valid"
+      valid = validate_question(i)
     end
     valid
   end
@@ -127,9 +130,7 @@ class QuizQuestionnairesController < QuestionnairesController
   private
 
   def validate_question(i)
-    if params[:questionnaire][:name] == "" # questionnaire name is not specified
-      valid = "Please specify quiz name (please do not use your name or id)."
-    elsif !params.key?(:question_type) || !params[:question_type].key?(i.to_s) || params[:question_type][i.to_s][:type].nil?
+    if !params.key?(:question_type) || !params[:question_type].key?(i.to_s) || params[:question_type][i.to_s][:type].nil?
       # A type isnt selected for a question
       valid = "Please select a type for each question"
     else

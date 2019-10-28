@@ -14,8 +14,8 @@ module StudentTaskHelper
   end
 
   def check_reviewable_topics(assignment)
-    # varun196's previous fix for issue 1211
-    return assignment.can_review(nil) if !assignment.topics?
+    # This statement is meant to include reviews that overlap with submission windows
+    return true if !assignment.topics? and assignment.get_current_stage == "review"
     sign_up_topics = SignUpTopic.where(assignment_id: assignment.id)
     sign_up_topics.each {|topic| return true if assignment.can_review(topic.id) }
     false

@@ -6,15 +6,26 @@ class QuestionnairesController < ApplicationController
 
   before_action :authorize
 
+  #Declaring Constants values
+  MINIMUM_QUESTION_SCORE = 0 
+  MAXIMUM_QUESTION_SCORE = 1
+  QUESTION_MAX_LABEL = 'Strongly agree'
+  QUESTION_MIN_LABEL = 'Strongly disagree'
+  CRITERION_QUESTION_SIZE = '50, 3'
+  DROPDOWN_SCALE = '0|1|2|3|4|5'
+  TEXT_AREA_SIZE = '60, 5'
+  TEXT_FIELD_SIZE = '30'
+
   # Check role access for edit questionnaire
   def action_allowed?
     if params[:action] == "edit"
       @questionnaire = Questionnaire.find(params[:id])
       (['Super-Administrator',
         'Administrator'].include? current_role_name) ||
-          ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id))) ||
-          ((['Teaching Assistant'].include? current_role_name) && session[:user].instructor_id == @questionnaire.try(:instructor_id))
-
+          ((['Instructor'].include? current_role_name) && 
+            current_user_id?(@questionnaire.try(:instructor_id))) ||
+          ((['Teaching Assistant'].include? current_role_name) && 
+            session[:user].instructor_id == @questionnaire.try(:instructor_id))
     else
       ['Super-Administrator',
        'Administrator',
@@ -35,7 +46,8 @@ class QuestionnairesController < ApplicationController
       undo_link("Copy of questionnaire #{@questionnaire.name} has been created successfully.")
       redirect_to controller: 'questionnaires', action: 'view', id: @questionnaire.id
     rescue StandardError
-      flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.' + $ERROR_INFO.to_s
+      flash[:error] = 'The questionnaire was not able to be copied.'\
+        ' Please check the original course for missing information.' + $ERROR_INFO.to_s
       redirect_to action: 'list', controller: 'tree_display'
     end
   end
@@ -53,42 +65,19 @@ class QuestionnairesController < ApplicationController
   end
 
   def create
-    if params[:questionnaire][:name].blank?
-      flash[:error] = 'A rubric or survey must have a title.'
-      redirect_to controller: 'questionnaires', action: 'new', model: params[:questionnaire][:type], private: params[:questionnaire][:private]
-    else
-      questionnaire_private = params[:questionnaire][:private] == 'true'
-      display_type = params[:questionnaire][:type].split('Questionnaire')[0]
-      begin
-        @questionnaire = Object.const_get(params[:questionnaire][:type]).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
-      rescue StandardError
-        flash[:error] = $ERROR_INFO
-      end
-      begin
-        @questionnaire.private = questionnaire_private
-        @questionnaire.name = params[:questionnaire][:name]
-        @questionnaire.instructor_id = session[:user].id
-        @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
-        @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
-        @questionnaire.type = params[:questionnaire][:type]
-        # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
-        # In the future, we need to write migration files to make them consistency.
-        # E1903 : We are not sure of other type of cases, so have added a if statement. If there are only 5 cases, remove the if statement
-        if %w[AuthorFeedback CourseSurvey TeammateReview GlobalSurvey AssignmentSurvey].include?(display_type)
-          display_type = (display_type.split /(?=[A-Z])/).join("%")
-        end
-        @questionnaire.display_type = display_type
-        @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
-        @questionnaire.save
-        # Create node
-        tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
-        parent = FolderNode.find_by(node_object_id: tree_folder.id)
-        QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')
-        flash[:success] = 'You have successfully created a questionnaire!'
-      rescue StandardError
-        flash[:error] = $ERROR_INFO
-      end
+    # if questionnaire has name create new questionnaire
+    # Create questionnaire node for new questionnaire
+    if questionnaire_has_name? 
+    # Calling create_new_questionnnaire_obj method from questionnaire Model  
+      @questionnaire = Questionnaire.create_new_questionnaire_obj(params, session)
+      flash[:success] = 'You have successfully created a questionnaire!'
       redirect_to controller: 'questionnaires', action: 'edit', id: @questionnaire.id
+    else
+      flash[:error] = 'A rubric or survey must have a title.'
+      redirect_to controller: 'questionnaires',
+        action: 'new',
+        model: params[:questionnaire][:type],
+        private: params[:questionnaire][:private]
     end
   end
 
@@ -157,13 +146,6 @@ class QuestionnairesController < ApplicationController
         questions.each do |question|
           raise "There are responses based on this rubric, we suggest you do not delete it." unless question.answers.empty?
         end
-        questions.each do |question|
-          advices = question.question_advices
-          advices.each(&:delete)
-          question.delete
-        end
-        questionnaire_node = @questionnaire.questionnaire_node
-        questionnaire_node.delete
         @questionnaire.delete
         undo_link("The questionnaire \"#{name}\" has been successfully deleted.")
       rescue StandardError => e
@@ -190,14 +172,13 @@ class QuestionnairesController < ApplicationController
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
       if question.is_a? ScoredQuestion
-        question.weight = 1
-        question.max_label = 'Strongly agree'
-        question.min_label = 'Strongly disagree'
+        question.weight = MAXIMUM_QUESTION_SCORE
+        question.min_label = QUESTION_MIN_LABEL
+        question.max_label = QUESTION_MAX_LABEL
       end
-      question.size = '50, 3' if question.is_a? Criterion
-      question.alternatives = '0|1|2|3|4|5' if question.is_a? Dropdown
-      question.size = '60, 5' if question.is_a? TextArea
-      question.size = '30' if question.is_a? TextField
+      
+      question.alternatives = DROPDOWN_SCALE if question.is_a? Dropdown
+      question.size = question_size(question)
       begin
         question.save
       rescue StandardError
@@ -320,6 +301,20 @@ class QuestionnairesController < ApplicationController
   def question_params
     params.require(:question).permit(:txt, :weight, :questionnaire_id, :seq, :type, :size,
                                      :alternatives, :break_before, :max_label, :min_label)
+  end
+
+  def question_size(question)
+    if question.is_a? Criterion
+    CRITERION_QUESTION_SIZE
+    elsif question.is_a? TextArea
+    TEXT_AREA_SIZE
+    elsif question.is_a? TextField
+    TEXT_FIELD_SIZE
+    end
+  end
+
+  def questionnaire_has_name?
+    params[:questionnaire][:name].present?
   end
 
   # FIXME: These private methods belong in the Questionnaire model

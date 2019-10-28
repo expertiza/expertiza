@@ -117,31 +117,35 @@ class QuizQuestionnairesController < QuestionnairesController
   def valid_quiz
     num_questions = Assignment.find(params[:aid]).num_quiz_questions
     valid = "valid"
-
     (1..num_questions).each do |i|
-      if params[:questionnaire][:name] == "" # questionnaire name is not specified
-        valid = "Please specify quiz name (please do not use your name or id)."
-      elsif !params.key?(:question_type) || !params[:question_type].key?(i.to_s) || params[:question_type][i.to_s][:type].nil?
-        # A type isnt selected for a question
-        valid = "Please select a type for each question"
-      else
-        # The question type is dynamic, so this is necessary
-        @new_question = Object.const_get(params[:question_type][i.to_s][:type]).create(txt: '', type: params[:question_type][i.to_s][:type], break_before: true)
-        @new_question.update_attributes(txt: params[:new_question][i.to_s])
-        type = params[:question_type][i.to_s][:type]
-        choice_info = params[:new_choices][i.to_s][type] # choice info for one question of its type
-        valid = if choice_info.nil?
-                  "Please select a correct answer for all questions"
-                else
-                  @new_question.isvalid(choice_info)
-                end
-      end
+      valid = validate_question(i)
       break if valid != "valid"
     end
     valid
   end
 
   private
+
+  def validate_question(i)
+    if params[:questionnaire][:name] == "" # questionnaire name is not specified
+      valid = "Please specify quiz name (please do not use your name or id)."
+    elsif !params.key?(:question_type) || !params[:question_type].key?(i.to_s) || params[:question_type][i.to_s][:type].nil?
+      # A type isnt selected for a question
+      valid = "Please select a type for each question"
+    else
+      # The question type is dynamic, so const_get is necessary
+      type = params[:question_type][i.to_s][:type]
+      @new_question = Object.const_get(type).create(txt: '', type: type, break_before: true)
+      @new_question.update_attributes(txt: params[:new_question][i.to_s])
+      choice_info = params[:new_choices][i.to_s][type] # choice info for one question of its type
+      valid = if choice_info.nil?
+                "Please select a correct answer for all questions"
+              else
+                @new_question.isvalid(choice_info)
+              end
+    end
+    valid
+  end
 
   def multiple_choice_checkbox(question_choice, question_index)
     if params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s]

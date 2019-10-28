@@ -30,7 +30,6 @@
   <li><i style="color: #986633">brown</i> indicates that the review grade has been assigned</li>
 </ul>
   <p>&nbsp;</p>
-  
   <table id="myTable" class="tbl_heat tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
     <thead>
     <tr bgcolor='#CCCCCC'>
@@ -52,8 +51,8 @@
           <% user = Participant.find(r.id).user %>
             <!--reviewer-->
             <td>
-              <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
-              (<%= user.fullname(session[:ip]) %>)
+              <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post, :class => "runityID" %>
+              (<span class="rname"><%= user.fullname(session[:ip]) %></span>)
             </td>
             <!--# reviews done-->
             <td align = 'left'>
@@ -171,3 +170,43 @@
     });
 </script>
 
+<script>
+	function exportTableToCSV(filename) {
+		var csv = [];
+		var rows = document.querySelector("table#myTable").rows;
+		var row = [];
+		row = setHeaderForCSV();
+		csv.push(row.join(","));
+		
+		for (var i = 1; i < rows.length; i++) {
+			var row = [];
+			
+			reviewer_name = "\"" + rows[i].querySelector("td span.rname").innerHTML + "\"";
+			reviewer_unityid = rows[i].querySelector("td a.runityID").innerHTML;
+			reviewer_emailid = reviewer_unityid + "@ncsu.edu";
+			reviewer_grade = rows[i].querySelector("input#grade_for_reviewer").value;
+			reviewer_comment = "\"" + rows[i].querySelector("textarea#comment_for_reviewer").innerHTML.replace(/"/g,"\'") + "\"";
+			
+			row.push(reviewer_name);
+			row.push(reviewer_unityid);
+			row.push(reviewer_emailid);
+			row.push(reviewer_grade);
+			row.push(reviewer_comment);
+			
+			csv.push(row.join(","));        
+		}
+
+		// Call Download CSV file function here
+	}
+	
+	function setHeaderForCSV() {
+		var row = [];
+		row.push("Name");
+		row.push("UnityID");
+		row.push("EmailID");
+		row.push("Grade");
+		row.push("Comment");
+		
+		return row;
+	}
+</script>

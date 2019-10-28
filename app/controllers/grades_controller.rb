@@ -89,6 +89,8 @@ class GradesController < ApplicationController
     @questions = retrieve_questions questionnaires, @assignment.id
     @pscore = @participant.scores(@questions)
     @vmlist = []
+    @total_tags = 0
+    @answered_tags = 0
 
     # loop through each questionnaire, and populate the view model for all data necessary
     # to render the html tables.
@@ -112,6 +114,23 @@ class GradesController < ApplicationController
       vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
       vm.number_of_comments_greater_than_10_words
       @vmlist << vm
+
+      @completed_tags = 0
+      @total_tags = 0
+      @vmlist.each do |vm|
+        vm.list_of_rows.each do |r|
+          r.score_row.each do |row|
+            vm_prompts = row.vm_prompts.select {|prompt| prompt.tag_dep.tag_prompt.control_type.downcase != "checkbox"}
+            @total_tags += vm_prompts.count
+            vm_prompts.each do |vm_prompt|
+              answer_tag = AnswerTag.where(tag_prompt_deployment_id: vm_prompt.tag_dep, user_id: @participant.user_id, answer: vm_prompt.answer).first
+              if !answer_tag.nil? and answer_tag.value != "0"
+                @completed_tags += 1
+              end
+            end
+          end
+        end
+      end
     end
     @current_role_name = current_role_name
   end

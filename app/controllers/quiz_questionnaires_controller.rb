@@ -180,7 +180,7 @@ class QuizQuestionnairesController < QuestionnairesController
     end
   end
 
-  def create_checkbox(question, choice_key, question_num, q_type, q_choices)
+  def create_checkbox(question, choice_key, q_choices)
     q = if q_choices[choice_key][:iscorrect] == 1.to_s
           QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "true", question_id: question.id)
         else
@@ -189,7 +189,7 @@ class QuizQuestionnairesController < QuestionnairesController
     q.save
   end
 
-  def create_radio(question, choice_key, question_num, q_type, q_choices)
+  def create_radio(question, choice_key, q_choices)
     q = if q_choices[1.to_s][:iscorrect] == choice_key
           QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "true", question_id: question.id)
         else
@@ -198,7 +198,7 @@ class QuizQuestionnairesController < QuestionnairesController
     q.save
   end
 
-  def create_truefalse(question, choice_key, question_num, q_type, q_choices)
+  def create_truefalse(question, choice_key, q_choices)
     if q_choices[1.to_s][:iscorrect] == choice_key
       q = QuizQuestionChoice.new(txt: "True", iscorrect: "true", question_id: question.id)
       q.save
@@ -246,11 +246,11 @@ class QuizQuestionnairesController < QuestionnairesController
       q_choices = params[:new_choices][question_num.to_s][q_type]
       q_choices.each_key do |choice_key|
         if q_type == "MultipleChoiceCheckbox"
-          create_checkbox(question, choice_key, question_num, q_type, q_choices)
+          create_checkbox(question, choice_key, q_choices)
         elsif q_type == "TrueFalse"
-          create_truefalse(question, choice_key, question_num, q_type, q_choices)
+          create_truefalse(question, choice_key, q_choices)
         else # MultipleChoiceRadio
-          create_radio(question, choice_key, question_num, q_type, q_choices)
+          create_radio(question, choice_key, q_choices)
         end
       end
       question_num += 1

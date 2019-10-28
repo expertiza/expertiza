@@ -31,14 +31,7 @@ class QuizQuestionnairesController < QuestionnairesController
       flash[:error] = "This assignment does not support the quizzing feature."
       valid_request = false
     else
-      team = AssignmentParticipant.find(@participant_id).team
-      if team.nil? # flash error if this current participant does not have a team
-        flash[:error] = "You should create or join a team first."
-        valid_request = false
-      elsif assignment.topics? && team.topic.nil? # flash error if this assignment has topic but current team does not have a topic
-        flash[:error] = "Your team should have a topic."
-        valid_request = false
-      end
+      valid_request = team_check(@participant_id, assignment)
     end
     if valid_request && Questionnaire::QUESTIONNAIRE_TYPES.include?(params[:model])
       @questionnaire = QuizQuestionnaire.new
@@ -51,9 +44,9 @@ class QuizQuestionnairesController < QuestionnairesController
     end
   end
 
-  # seperate method for creating a quiz questionnaire because of differences in permission
+  # create quiz questionnaire
   def create
-    valid = valid_quiz
+    valid = validate_quiz
     if valid.eql?("valid")
       @questionnaire = QuizQuestionnaire.new(questionnaire_params)
       participant_id = params[:pid] # creating a local variable to send as parameter to submitted content if it is a quiz questionnaire
@@ -114,7 +107,7 @@ class QuizQuestionnairesController < QuestionnairesController
     redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
   end
 
-  def valid_quiz
+  def validate_quiz
     num_questions = Assignment.find(params[:aid]).num_quiz_questions
     valid = "valid"
     if params[:questionnaire][:name] == "" # questionnaire name is not specified
@@ -129,9 +122,22 @@ class QuizQuestionnairesController < QuestionnairesController
 
   private
 
+  def team_check(participant_id, assignment)
+    valid_request = true
+    team = AssignmentParticipant.find(participant_id).team
+    if team.nil? # flash error if this current participant does not have a team
+      flash[:error] = "You should create or join a team first."
+      valid_request = false
+    elsif assignment.topics? && team.topic.nil? # flash error if this assignment has topic but current team does not have a topic
+      flash[:error] = "Your team should have a topic."
+      valid_request = false
+    end
+    valid_request
+  end
+
   def validate_question(i)
     if !params.key?(:question_type) || !params[:question_type].key?(i.to_s) || params[:question_type][i.to_s][:type].nil?
-      # A type isnt selected for a question
+      # A type isn't selected for a question
       valid = "Please select a type for each question"
     else
       # The question type is dynamic, so const_get is necessary
@@ -203,6 +209,8 @@ class QuizQuestionnairesController < QuestionnairesController
       q.save
       q = QuizQuestionChoice.new(txt: "False", iscorrect: "true", question_id: question.id)
       q.save
+    end
+  end
 
   def save
     @questionnaire.save!

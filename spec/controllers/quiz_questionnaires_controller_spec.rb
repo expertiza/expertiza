@@ -29,7 +29,7 @@ describe QuizQuestionnairesController do
       it 'returns message (Please specify quiz name (please do not use your name or id).)' do
         controller.params = {aid: 1,
                              questionnaire: {name: ''}}
-        expect(controller.valid_quiz).to eq('Please specify quiz name (please do not use your name or id).')
+        expect(controller.validate_quiz).to eq('Please specify quiz name (please do not use your name or id).')
       end
     end
 # describe '#create_quiz_questionnaire, #create_questionnaire and #save' do
@@ -110,7 +110,7 @@ describe QuizQuestionnairesController do
     context 'when quiz is valid' do
       before(:each) do
         # create_quiz_questionnaire
-        allow_any_instance_of(QuizQuestionnairesController).to receive(:valid_quiz).and_return('valid')
+        allow_any_instance_of(QuizQuestionnairesController).to receive(:validate_quiz).and_return('valid')
       end
       context 'when questionnaire type is QuizQuestionnaire' do
         it 'redirects to submitted_content#edit page' do
@@ -144,7 +144,7 @@ describe QuizQuestionnairesController do
                   questionnaire: {name: 'test questionnaire',
                                   type: 'QuizQuestionnaire'}}
         # create_quiz_questionnaire
-        allow_any_instance_of(QuizQuestionnairesController).to receive(:valid_quiz).and_return('Please select a correct answer for all questions')
+        allow_any_instance_of(QuizQuestionnairesController).to receive(:validate_quiz).and_return('Please select a correct answer for all questions')
         request.env['HTTP_REFERER'] = 'www.google.com'
         post :create, params
         expect(flash[:error]).to eq('Please select a correct answer for all questions')
@@ -314,7 +314,7 @@ describe QuizQuestionnairesController do
       it 'returns message (Please select a type for each question)' do
         controller.params = {aid: 1,
                              questionnaire: {name: 'test questionnaire'}}
-        expect(controller.valid_quiz).to eq('Please select a type for each question')
+        expect(controller.validate_quiz).to eq('Please select a type for each question')
       end
     end
 
@@ -325,7 +325,7 @@ describe QuizQuestionnairesController do
                              question_type: {'1' => {type: 'TrueFalse'}},
                              new_question: {'1' => {iscorrect: 'True'}},
                              new_choices: {'1' => {}}}
-        expect(controller.valid_quiz).to eq('Please select a correct answer for all questions')
+        expect(controller.validate_quiz).to eq('Please select a correct answer for all questions')
       end
     end
 
@@ -339,7 +339,7 @@ describe QuizQuestionnairesController do
         question = build(:question, type: 'TrueFalse')
         allow(TrueFalse).to receive(:create).with(txt: '', type: 'TrueFalse', break_before: true).and_return(question)
         allow(question).to receive(:isvalid).with('sth').and_return('valid')
-        expect(controller.valid_quiz).to eq('valid')
+        expect(controller.validate_quiz).to eq('valid')
       end
     end
   end

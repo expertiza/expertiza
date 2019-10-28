@@ -274,7 +274,7 @@ describe AssignmentsController do
       expect(response).to render_template(:show)
     end
   end
-  
+
   describe '#copy' do
     let(:new_assignment) { build(:assignment, id: 2, name: 'new assignment', directory_path: 'different path') }
     let(:new_assignment2) { build(:assignment, id: 2, name: 'new assignment', directory_path: 'same path') }

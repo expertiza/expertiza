@@ -350,15 +350,15 @@ class AssignmentForm
 
   def self.copy_assignment_questionnaire(old_assign, new_assign, user)
     old_assign.assignment_questionnaires.each do |aq|
-      AssignmentQuestionnaire.create(
-		assignment_id: new_assign.id,
-		questionnaire_id: aq.questionnaire_id,
-		user_id: user.id,
-		notification_limit: aq.notification_limit,
-		questionnaire_weight: aq.questionnaire_weight,
-		used_in_round: aq.used_in_round,
-		dropdown: aq.dropdown
-      )
+        AssignmentQuestionnaire.create(
+            assignment_id: new_assign.id,
+            questionnaire_id: aq.questionnaire_id,
+            user_id: user.id,
+            notification_limit: aq.notification_limit,
+            questionnaire_weight: aq.questionnaire_weight,
+            used_in_round: aq.used_in_round,
+            dropdown: aq.dropdown
+        )
     end
   end
 end

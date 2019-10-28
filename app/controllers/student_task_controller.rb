@@ -87,7 +87,8 @@ class StudentTaskController < ApplicationController
           vm_prompts = row.vm_prompts.select {|prompt| prompt.tag_dep.tag_prompt.control_type.downcase != "checkbox"}
           @total_tags += vm_prompts.count
           vm_prompts.each do |vm_prompt|
-            if vm_prompt.answer != 0
+            answer = AnswerTag.where(tag_prompt_deployment_id: vm_prompt.tag_dep).first
+            if !answer.nil and answer.value != 0
               @completed_tags += 1
             end
           end

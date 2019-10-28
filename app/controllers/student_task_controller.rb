@@ -80,12 +80,15 @@ class StudentTaskController < ApplicationController
     end
     @completed_tags = []
     answers.each {|answer| 
-    @completed_tags += AnswerTag.where("answer_id = ? AND user_id = ? AND value != ?",
-                         answer, @participant.user_id, 0)
+      new_tags = AnswerTag.where("answer_id = ? AND user_id = ? AND value != ?",
+                 answer, @participant.user_id, 0)
+      @completed_tags += new_tags
       map = answer.response.map
       puts "reviewer: #{map.reviewer.name} reviewee: #{map.reviewee.name}"
       puts 'answer:'
-      puts answer.comments
+      puts "tags:"
+      new_tags.each {|tag| print "#{tag.value} "}
+      puts
     }
     @completed_tags = @completed_tags.count
   end

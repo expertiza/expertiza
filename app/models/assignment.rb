@@ -391,7 +391,7 @@ class Assignment < ActiveRecord::Base
   def review_questionnaire_id(round = nil)
     # Get the round it's in from the next duedates
     if round.nil?
-      next_due_date = next_due_date(self.id)
+      next_due_date = DueDate.get_next_due_date( self.id)
       round = next_due_date.try(:round)
     end
     # for program 1 like assignment, if same rubric is used in both rounds,

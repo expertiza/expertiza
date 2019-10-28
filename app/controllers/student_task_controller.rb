@@ -84,6 +84,8 @@ class StudentTaskController < ApplicationController
                          answer, @participant.user_id, 0)
       map = answer.response.map
       puts "reviewer: #{map.reviewer.name} reviewee: #{map.reviewee.name}"
+      puts 'answer:'
+      puts answer.comments
     }
     @completed_tags = @completed_tags.count
   end

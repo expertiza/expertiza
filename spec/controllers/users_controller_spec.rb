@@ -231,27 +231,37 @@ describe UsersController do
     end
 
     it 'save successfully with a new institution' do
-      driver = Selenium::WebDriver.for :firefox
-      driver.get("http://127.0.0.1:3000/")
-      driver.find_element(:id, "login_name").send_keys("super_administrator2")
-      driver.find_element(:id, "login_password").send_keys("password")
-      driver.find_element(:name, "commit").click()
-      driver.get("http://127.0.0.1:3000/users/new?utf8=%E2%9C%93&role=Instructor&commit=New+Instructor")
-      driver.find_element(:id, "user_name").send_keys("yzhu48")
-      driver.find_element(:id, "user_fullname").send_keys("yzhu48")
-      driver.find_element(:id, "user_email").send_keys("yzhu48@ncsu.com")
-      driver.find_element(:id, "user_password").send_keys("111111")
-      driver.find_element(:id, "user_password_confirmation").send_keys("111111")
-
-      institution_menu = driver.find_element(:id, 'user_institution_id')
-      option = Selenium::WebDriver::Support::Select.new(institution_menu)
-      option.select_by(:text, 'Other')
-
-      driver.find_element(:id, "institution_name").send_keys("yzhu48")
-
-      driver.find_element(:name, "commit").click()
-      # ('http://127.0.0.1:3000/users/list')
-      expect(response.status).to eq(200)
+      session = {user: admin}
+      params = {
+          user: {name: 'instructor6',
+                 crypted_password: 'password',
+                 role_id: 2,
+                 password_salt: 1,
+                 fullname: '6, instructor',
+                 email: 'yzhu48@ncsu.edu',
+                 parent_id: 1,
+                 private_by_default: false,
+                 mru_directory_path: nil,
+                 email_on_review: true,
+                 email_on_submission: true,
+                 email_on_review_of_review: true,
+                 is_new_user: false,
+                 master_permission_granted: 0,
+                 handle: 'handle',
+                 digital_certificate: nil,
+                 timezonepref: 'Eastern Time (US & Canada)',
+                 public_key: nil,
+                 copy_of_emails: nil,
+                 institution_id: 666,
+                 institution: {
+                     name: 'yzhu48'
+                 }
+          }
+      }
+      post :create, params, session
+      allow_any_instance_of(User).to receive(:undo_link).with('The user "instructor6" has been successfully created. ').and_return(true)
+      expect(flash[:success]).to eq "A new password has been sent to new user's e-mail address."
+      expect(response).to redirect_to('http://test.host/users/list')
     end
   end
 

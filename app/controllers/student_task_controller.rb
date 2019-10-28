@@ -58,41 +58,42 @@ class StudentTaskController < ApplicationController
     
     #THE FOLLOWING CODE IS ADDED FOR THE TAG COUNT FEATURE
     questionnaires = @assignment.questionnaires
-    @total_tags = 0
-    @completed_tags = 0
-    if @team.nil?
-      maps = []
-    else
-      maps = ResponseMap.where(reviewed_object_id: @assignment, reviewee_id: @team.id)
+    vmlist = []
+    questionnaires.each do |questionnaire|
+      @round = nil
+      if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
+        questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
+        if questionnaires.count > 1
+          @round = questionnaires[counter_for_same_rubric].used_in_round
+          counter_for_same_rubric += 1
+        else
+          @round = questionnaires[0].used_in_round
+          counter_for_same_rubric = 0
+        end
+      end
+      vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
+      vmquestions = questionnaire.questions
+      vm.add_questions(vmquestions)
+      vm.add_team_members(@team)
+      vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
+      vm.number_of_comments_greater_than_10_words
+      vmlist << vm
     end
-    responses = []
-    maps.each {|map| responses += Response.where(map_id: map)}
-    answers = []
-    deployments = TagPromptDeployment.where(assignment_id: @assignment)
-    responses.each {|response| answers += Answer.where(response_id: response)}
+    @completed_tags = 0
     @total_tags = 0
-    answers.each do |answer|
-      if !answer.comments.nil? and answer.comments != ""
-        tags = deployments.find_all {|tag| tag.question_type == answer.question.type and 
-                                     tag.tag_prompt.control_type.downcase != "checkbox"}
-        @total_tags += tags.count
+    vmlist.each do |vm|
+      vm.list_of_rows.each do |r|
+        r.score_row.each do |row|
+          vm_prompts = row.vm_prompts.select {|prompt| prompt.tag_dep.tag_prompt.control_type.downcase != "checkbox"}
+          @total_tags += vm_prompts.count
+          vm_prompts.each do |vm_prompt|
+            if vm_prompt.answer != 0
+              @completed_tags += 1
+            end
+          end
+        end
       end
     end
-    @completed_tags = []
-    answers.each {|answer| 
-      new_tags = AnswerTag.where("answer_id = ? AND user_id = ? AND value != ?",
-                 answer, @participant.user_id, 0)
-      @completed_tags += new_tags
-      map = answer.response.map
-      puts "reviewer: #{map.reviewer.name} reviewee: #{map.reviewee.name}"
-      puts 'answer:'
-      puts "tags:"
-      new_tags.each {|tag| print "#{tag.value} "}
-      puts
-    }
-    puts 'FINAL TAGS:'
-    @completed_tags.each {|tag| print "#{tag.value} "}
-    @completed_tags = @completed_tags.count
   end
 
   def others_work

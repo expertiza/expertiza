@@ -9,6 +9,7 @@ describe QuizQuestionnairesController do
   let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:instructor2) { build(:instructor, id: 66) }
+  let(:student) { build(:student, id: 8609) }
   let(:ta) { build(:teaching_assistant, id: 8) }
   before(:each) do
     allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
@@ -225,6 +226,7 @@ describe QuizQuestionnairesController do
 
     context 'when current questionnaire is not taken by anyone' do
       it 'renders questionnaires#edit page' do
+        stub_current_user(student, student.role.name, student.role) #action only permitted for Student role
         allow(@questionnaire).to receive(:taken_by_anyone?).and_return(false)
         params = {id: 1}
         get :edit, params
@@ -234,6 +236,7 @@ describe QuizQuestionnairesController do
 
     context 'when current questionnaire has been taken by someone' do
       it 'shows flash[:error] message and redirects to submitted_content#view page' do
+        stub_current_user(student, student.role.name, student.role)  #action only permitted for Student role
         allow(@questionnaire).to receive(:taken_by_anyone?).and_return(true)
         params = {id: 1, pid: 1}
         get :edit, params

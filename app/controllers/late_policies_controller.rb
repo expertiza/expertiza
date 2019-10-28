@@ -68,7 +68,7 @@ class LatePoliciesController < ApplicationController
       begin
         @late_policy.save!
         flash[:success] = "The penalty policy was successfully created."
-        redirect_to action: 'index'
+        redirect_to action: 'index', id: params[:late_policy][:assign_id]
       rescue StandardError
         render :new
       end

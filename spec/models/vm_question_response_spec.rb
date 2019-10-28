@@ -1,5 +1,4 @@
-require 'rails_helper'
-Rspec.describe VmQuestionResponse  do
+describe VmQuestionResponse  do
   let(:review_questionnaire) { build(:questionnaire) }
   let(:author_feedback_questionnaire) { AuthorFeedbackQuestionnaire.new }
   let(:teammate_review_questionnaire) { TeammateReviewQuestionnaire.new }
@@ -78,8 +77,8 @@ Rspec.describe VmQuestionResponse  do
         #allow(participant).to receive(:feedback).and_return(reviews)
         allow(FeedbackResponseMap).to receive(:where).with(id: 1).and_return(double('FeedbackResponseMap', reviewer_id: 1))
         allow(Participant).to recieve(:find).with(1).and_return(participant)
-	allow(Response).to recieve(:where).with(id: 1).and_return(response)
-	response.add_reviews(participant, team, false)
+	      allow(Response).to recieve(:where).with(id: 1).and_return(response)
+	      response.add_reviews(participant, team, false)
         expect(response.list_of_reviews.size).to eq(1)
         expect(response.list_of_reviewers.size).to eq(1)
         expect(response.list_of_reviews.first.map_id).to eq(1)

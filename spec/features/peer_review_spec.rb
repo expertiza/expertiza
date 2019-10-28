@@ -1,5 +1,3 @@
-include InstructorInterfaceHelperSpec
-
 describe "peer review testing" do
   before(:each) do
     create(:assignment, name: "TestAssignment", directory_path: 'test_assignment')
@@ -163,26 +161,20 @@ describe "review path testing" do
     path_description = description_list.join(' -> ')
     path_description.concat(" -> Request a new submission to review -> Begin")
     it "user can take path #{path_description} to begin a review" do
-      puts "Participant id: #{@participant3.id}"
-      puts "Testing that user can take path #{path_description} to begin a review"
       login_as(@student3.name)
       test_path.each do |path_step|
         where_to_go = path_step[0]
         expected_text = path_step[1]
         if where_to_go.include? '/' #if user navigates to page using direct url
-          puts "Visiting #{where_to_go}"
           visit where_to_go
         else #if user navigates to page by normal means
-          puts "Clicking #{where_to_go}"
           click_on(where_to_go)
         end
         expect(page).to have_content expected_text
       end
       choose "topic_id"
-      puts "Clicking Request a new submission to review"
       click_on("Request a new submission to review")
       expect(page).to have_content "Begin"
-      puts "Clicking Begin\n\n"
       click_on("Begin")
       expect(page).to have_content "New Review for ReviewTestAssignment"
     end

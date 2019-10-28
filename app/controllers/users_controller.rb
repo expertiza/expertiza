@@ -60,7 +60,8 @@ class UsersController < ApplicationController
   def list
     user = session[:user]
     #paginate_list is called with the
-    @users = paginate_list(user.get_user_list)
+    @users = user.get_user_list
+    @paginated_users = paginate_list(@users)
   end
 
   #for displaying users which are being searched for editing purposes after checking authorization

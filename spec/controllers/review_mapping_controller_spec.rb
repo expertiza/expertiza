@@ -18,10 +18,10 @@ describe ReviewMappingController do
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
-    instructor = build(:instructor)
-    stub_current_user(instructor, instructor.role.name, instructor.role)
+    @instructor = build(:instructor, id: 1)
+    # instructor = build(:instructor)
+    stub_current_user(@instructor, @instructor.role.name, @instructor.role)
   end
-
 
   describe '#add_reviewer and #get_reviewer' do
     before(:each) do

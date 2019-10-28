@@ -22,7 +22,10 @@ class Response < ActiveRecord::Base
     # It doesn't seem necessary to print out the rubric type in the case of
     # a ReviewResponseMap.
     identifier += "<h3>Feedback from author</h3>" if self.map.type.to_s == 'FeedbackResponseMap'
-    if prefix # has prefix means view_score page in instructor end
+    if prefix == "instructor"
+      self_id = self.id.to_s
+      code = construct_instructor2_html identifier, self_id, count
+    elsif prefix # has prefix means view_score page in instructor end
       self_id = prefix + '_' + self.id.to_s
       code = construct_instructor_html identifier, self_id, count
     else # in student end
@@ -222,6 +225,17 @@ class Response < ActiveRecord::Base
            "'review_" + self_id + "','review'" + ');return false;">hide review</a><BR/>'
   end
 
+  def construct_instructor2_html identifier, self_id, count
+    identifier += '<table width="100%">'\
+						 '<tr>'\
+						 '<td align="left" width="70%"><b>Review ' + '</b>&nbsp;&nbsp;&nbsp;'\
+						 '<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' + "'review_" + self_id + "','review'" + ');return false;">hide review</a>'\
+						 '</td>'\
+						 '<td align="left"><b>Last Reviewed:</b>'\
+						 "<span>#{(self.updated_at.nil? ? 'Not available' : self.updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span></td>"\
+						 '</tr></table>'
+  end
+  
   def construct_student_html identifier, self_id, count
     identifier += '<table width="100%">'\
 						 '<tr>'\

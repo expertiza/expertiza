@@ -24,9 +24,11 @@
 
     <% rounds.each do |round| %>
         <% next if round.to_s != @round.to_s %>
-        <h3>Round <%= round %></h3>
-        <% if controller.action_name != "view_my_scores"%>
-            <a href="#" name= <%= participant.id.to_s + '_' + round.to_s + "Link" %> onClick="toggleElement('<%= participant.id.to_s + '_' + round.to_s %>','round <%= round.to_s%> reviews');return false;">show round <%= round.to_s%> reviews</a>
+        <% if controller.action_name != "view2"%>
+            <h3>Round <%= round %></h3>
+            <% if controller.action_name != "view_my_scores" %>
+                <a href="#" name= <%= participant.id.to_s + '_' + round.to_s + "Link" %> onClick="toggleElement('<%= participant.id.to_s + '_' + round.to_s %>','round <%= round.to_s%> reviews');return false;">show round <%= round.to_s%> reviews</a>
+            <% end %>
         <% end %>
         <% if @assignment.is_answer_tagging_allowed %>
             <span class="spn_qsttog" id="tag_prompt_toggler" title="Click to display/hide tags" onclick="toggle_tag_prompt()">hide tags</span>
@@ -37,6 +39,7 @@
                 <% review_feedback = nil %>
                 <% count = count + 1 %>
                 <% prefix = nil %>
+                <% prefix = "instructor" if controller.action_name == "view2" %>
 
                 <!--<%= review.display_as_html(nil, count, nil, true) %><BR/>-->
                 <!--change code in order to compat to multi-round review-->

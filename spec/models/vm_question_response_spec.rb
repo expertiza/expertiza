@@ -78,8 +78,8 @@ describe VmQuestionResponse  do
         #allow(participant).to receive(:feedback).and_return(reviews)
         allow(FeedbackResponseMap).to receive(:where).with(reviewer_id: 3).and_return([double(id: 1, reviewee_id: 4)])
         allow(Participant).to receive(:find_by).with(id: 4).and_return(reviwee)
-	allow(Response).to receive(:where).with(map_id: 1).and_return(response).order('updated_at').last
-	response.add_reviews(participant, team, false)
+	      allow(Response).to receive_message_chain(:where, :order).with(map_id: 1).and_return([response])
+	      response.add_reviews(participant, team, false)
         expect(response.list_of_reviews.size).to eq(1)
         expect(response.list_of_reviewers.size).to eq(1)
         expect(response.list_of_reviews.first.map_id).to eq(1)

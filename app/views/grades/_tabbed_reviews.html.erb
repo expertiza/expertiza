@@ -23,7 +23,9 @@
     <% end %>
 
     <% rounds.each do |round| %>
+        <% if controller.action_name == "view2"%>
         <% next if round.to_s != @round.to_s %>
+        <% end %>
         <% if controller.action_name != "view2"%>
             <h3>Round <%= round %></h3>
             <% if controller.action_name != "view_my_scores" %>
@@ -33,8 +35,13 @@
         <% if @assignment.is_answer_tagging_allowed %>
             <span class="spn_qsttog" id="tag_prompt_toggler" title="Click to display/hide tags" onclick="toggle_tag_prompt()">hide tags</span>
         <% end %>
+        <% if controller.action_name != "view2"%>
         <table class="table table-striped" id=<%= participant.id.to_s + '_' + round.to_s %> <%= style="display: none;" if controller.action_name != "view_my_scores"%>>
+        <% end %>
             <% rscore[:assessments].select{|response| response.round == round}.reverse.uniq{|response| response.map_id}.sort_by{|response| response.map_id}.each_with_index do |review, index| %>
+                <% if controller.action_name == "view2"%>
+                <% next if review.reviewer != @reviewer || count > 0 %>
+                <% end %>
                 <tr><td>
                 <% review_feedback = nil %>
                 <% count = count + 1 %>
@@ -72,7 +79,9 @@
                 </td></tr>
                 <% end %>
             <% end %>
+        <% if controller.action_name != "view2"%>    
         </table><hr>
+        <% end %>
     <% end %>
 <% else %>
     <i>No reviews have been completed for this user's submissions.</i>

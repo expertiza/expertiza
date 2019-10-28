@@ -274,7 +274,6 @@ describe AssignmentsController do
       expect(response).to render_template(:show)
     end
   end
-
   
   describe '#copy' do
     let(:new_assignment) { build(:assignment, id: 2, name: 'new assignment', directory_path: 'different path') }
@@ -308,7 +307,6 @@ describe AssignmentsController do
       end
     end
   end
-
 
   describe '#delete' do
     context 'when assignment is deleted successfully' do

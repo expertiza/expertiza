@@ -1,4 +1,4 @@
-class ReviewMappingController < ApplicationController
+  class ReviewMappingController < ApplicationController
   autocomplete :user, :name
   # use_google_charts
   require 'gchart'
@@ -20,16 +20,6 @@ class ReviewMappingController < ApplicationController
   def action_allowed?
     # case params[:action]
     return choose_case(params[:action])
-  end
-
-  def add_calibration
-    participant = AssignmentParticipant.where(parent_id: params[:id], user_id: session[:user].id).first rescue nil
-    if participant.nil?
-      participant = AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
-    end
-    map = ReviewResponseMap.where(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true).first rescue nil
-    map = ReviewResponseMap.create(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true) if map.nil?
-    redirect_to controller: 'response', action: 'new', id: map.id, assignment_id: params[:id], return: 'assignment_edit'
   end
 
   def select_reviewer
@@ -258,7 +248,7 @@ class ReviewMappingController < ApplicationController
     @items = AssignmentTeam.where(parent_id: @assignment.id)
     @items.sort_by(&:name)
   end
- 
+
   # Helper Method to check num_reviews_per_student and num_reviews_per_submission arguments passed in by params hash.
   def check_num_reviews_args(num_reviews_per_student, num_reviews_per_submission, teams)
     has_error_not_raised = true
@@ -296,12 +286,12 @@ class ReviewMappingController < ApplicationController
     end
     num_reviews_per_student = params[:num_reviews_per_student].to_i         #Number of sumbissions that can be reviewed by a single student
     num_reviews_per_submission = params[:num_reviews_per_submission].to_i   #Toal number of reviews that can be performed on a single submission (or equivalently, number of students that can review the same submiss)
-    num_calibrated_artifacts = params[:num_calibrated_artifacts].to_i 
+    num_calibrated_artifacts = params[:num_calibrated_artifacts].to_i
     num_uncalibrated_artifacts = params[:num_uncalibrated_artifacts].to_i
     if num_calibrated_artifacts.zero? and num_uncalibrated_artifacts.zero?
       if check_num_reviews_args(num_reviews_per_student, num_reviews_per_submission, teams)
         # REVIEW: mapping strategy
-        automatic_review_mapping_strategy(assignment_id, participants, teams, num_reviews_per_student, num_reviews_per_submission) 
+        automatic_review_mapping_strategy(assignment_id, participants, teams, num_reviews_per_student, num_reviews_per_submission)
       end
     else
       teams_with_calibrated_artifacts = []

@@ -31,7 +31,7 @@
     @mapping = ResponseMap.find(params[:id])
   end
 
-  def add_reviewer
+  def assign_reviewer_manually
     assignment = Assignment.find(params[:id])
     topic_id = params[:topic_id]
     user_id = User.where(name: params[:user][:name]).first.id

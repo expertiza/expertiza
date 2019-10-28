@@ -282,6 +282,7 @@ class TreeDisplayController < ApplicationController
         res2 = {
           "nodeinfo" => child,
           "name" => child.get_name,
+          "instructor_id" => child.get_instructor_id,
           "key" => params[:reactParams2][:key],
           "type" => node_type,
           "private" => child.get_private,

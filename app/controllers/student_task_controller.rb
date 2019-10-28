@@ -90,6 +90,8 @@ class StudentTaskController < ApplicationController
       new_tags.each {|tag| print "#{tag.value} "}
       puts
     }
+    puts 'FINAL TAGS:'
+    @completed_tags.each {|tag| print "#{tag.value} "}
     @completed_tags = @completed_tags.count
   end
 

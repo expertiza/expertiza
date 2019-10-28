@@ -120,7 +120,7 @@
               <th class="sorter-false" align="right" >
                 <span  data-toggle="tooltip" data-placement="right" title="A count of Tags, for the respective round. The purpose of this is to represent how many tags has been answered.">Tags </span>
                 <br>
-                <span><%= @completed_tags %> / <%= @total_tags %></span>
+                <span><%= @completed_tags_array[vm.round.to_i - 1] %> / <%= @total_tags_array[vm.round.to_i - 1] %></span>
               </th>
 
             </tr>

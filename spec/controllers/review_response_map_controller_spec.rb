@@ -1,5 +1,5 @@
 require 'rails_helper'
-describe ReviewMappingController do
+describe ReviewResponseMapController do
   let(:assignment) { double('Assignment', id: 1) }
   let(:review_response_map) do
     double('ReviewResponseMap', id: 1, map_id: 1, assignment: assignment,

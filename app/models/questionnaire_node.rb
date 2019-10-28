@@ -32,12 +32,16 @@ class QuestionnaireNode < Node
     end
     sortvar = 'name' if sortvar.nil? or sortvar == 'directory_path'
     sortorder = 'ASC' if sortorder.nil?
-    self.includes(:questionnaire).where([conditions, values]).order("questionnaires.#{sortvar} #{sortorder}") if Questionnaire.column_names.include? sortvar and
-        %w[ASC DESC asc desc].include? sortorder
+    (self.includes(:questionnaire).where([conditions, values]).order("questionnaires.#{sortvar} #{sortorder}") if Questionnaire.column_names.include? sortvar and
+        %w[ASC DESC asc desc].include? sortorder)
   end
 
   def get_name
     Questionnaire.find_by(id: self.node_object_id).try(:name)
+  end
+
+  def get_instructor_id
+    Questionnaire.find_by(id: self.node_object_id).try(:instructor_id)
   end
 
   def get_private

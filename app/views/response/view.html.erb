@@ -19,7 +19,7 @@
 
 <TR style="display:none; background-color: white;">
     <TD COLSPAN="10">
-    <%= render :partial=>'grades/tabbed_reviews', :locals => {:prefix => 'user', :participant => @participant, :rscore => @pscore[:review]} %>
+    <%= render :partial=>'grades/tabbed_reviews', :locals => {:prefix => 'user', :participant => @participant, :rscore => @pscore[:review], :reviewer => @reviewer, :round => @round} %>
     </TD>
 </TR>
 

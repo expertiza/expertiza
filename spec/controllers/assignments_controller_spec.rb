@@ -1,6 +1,6 @@
 describe AssignmentsController do
   let(:assignment) do
-    build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true, directory_path: 'same path',
+    build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true, directory_path: 'test_assignment',
                        participants: [build(:participant)], teams: [build(:assignment_team)], course_id: 1)
   end
   let(:assignment_form) { double('AssignmentForm', assignment: assignment) }
@@ -109,7 +109,7 @@ describe AssignmentsController do
             max_team_size: 1,
             id: 1,
             name: 'test assignment',
-            directory_path: '/test',
+            directory_path: 'test_assignment',
             spec_location: '',
             private: false,
             show_teammate_reviews: false,
@@ -128,7 +128,9 @@ describe AssignmentsController do
       }
     end
     context 'when assignment_form is saved successfully' do
-      it 'redirects to assignment#edit page' do
+      it 'redirects to new assignment creation page' do
+        allow(Assignment).to receive(:find_by).with(name: 'test assignment',course_id: 1).and_return(assignment)
+        allow(Assignment).to receive(:find_by).with(directory_path: 'test_assignment',course_id: 1).and_return(assignment)
         allow(assignment_form).to receive(:assignment).and_return(assignment)
         allow(assignment_form).to receive(:save).and_return(true)
         allow(assignment_form).to receive(:update).with(any_args).and_return(true)
@@ -138,7 +140,20 @@ describe AssignmentsController do
         allow_any_instance_of(AssignmentsController).to receive(:undo_link)
           .with('Assignment "test assignment" has been created successfully. ').and_return(true)
         post :create, @params
-        expect(response).to redirect_to('/assignments/1/edit')
+        expect(response).to render_template(:new)
+      end
+    end
+
+    context 'when assignment_form is not saved successfully due to same assignment/auto generated directory exists' do
+      it 'renders assignment#new page' do
+        allow(Assignment).to receive(:find_by).with(name: 'test assignment',course_id: 1).and_return(assignment)
+        allow(Assignment).to receive(:find_by).with(directory_path: 'test_assignment',course_id: 1).and_return(assignment)
+        post :create, @params
+        expect(flash.now[:error]).to eq("This assignment/directory already exists in the selected course. Kindly rename the assignment.")
+
+        expect(response).to render_template(:new)
+
+
       end
     end
 
@@ -277,7 +292,7 @@ describe AssignmentsController do
 
   describe '#copy' do
     let(:new_assignment) { build(:assignment, id: 2, name: 'new assignment', directory_path: 'different path') }
-    let(:new_assignment2) { build(:assignment, id: 2, name: 'new assignment', directory_path: 'same path') }
+    let(:new_assignment2) { build(:assignment, id: 2, name: 'new assignment', directory_path: 'test_assignment') }
 
     context 'when new assignment id fetches successfully' do
       it 'redirects to assignments#edit page' do

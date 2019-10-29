@@ -20,5 +20,6 @@ describe "View users" do
     login_as('super_administrator2')
     visit "/users/list"
     expect(page.has_content?("Institution")).to eq(true)
+
   end
 end

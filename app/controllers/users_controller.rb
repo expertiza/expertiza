@@ -142,7 +142,7 @@ class UsersController < ApplicationController
     else
       foreign
       flash[:error] = "Create Instructor Error!"
-      redirect_to '/admin/list_instructors'
+      render action: 'new'
     end
   end
 

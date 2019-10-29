@@ -81,7 +81,6 @@ describe VmQuestionResponse  do
 	      response.add_reviews(participant, team, false)
         expect(response.list_of_reviews.size).to eq(0)
         expect(response.list_of_reviewers.size).to eq(1)
-        expect(response.list_of_reviews.first.id).to eq(1)
         expect(response.list_of_reviewers.first).to eq(reviwee)
       end
     end

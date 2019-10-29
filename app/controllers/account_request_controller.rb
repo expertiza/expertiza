@@ -90,6 +90,10 @@ class AccountRequestController < ApplicationController
     requested_user.status = 'Under Review'
     # The super admin receives a mail about a new user request with the user name
     user_existed = User.find_by(name: requested_user.name) or User.find_by(name: requested_user.email)
+    # default to instructor role
+    if requested_user.role_id == nil
+      requested_user.role_id = Role.where(:name => "Instructor")[0].id
+    end
     requested_user_saved = requested_user.save
     if !user_existed and requested_user_saved
       super_users = User.joins(:role).where('roles.name = ?', 'Super-Administrator')

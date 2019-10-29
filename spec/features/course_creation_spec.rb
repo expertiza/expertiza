@@ -1,27 +1,23 @@
 describe 'add TA', js: true do
   before(:each) do
+    @instructor = create(:instructor)
+    create(:institution, name: 'D')
+    create(:institution, name: 'A')
+    create(:institution, name: 'C')
+    create(:institution, name: 'B')
     @course = create(:course, name: 'TA course')
     ta_role = Role.create(name: "Teaching Assistant")
     ta_role.save
   end
 
   it "check if the courses are sorted alphabetically" do
-    driver = Selenium::WebDriver.for :firefox
-    driver.get("http://127.0.0.1:3000/")
-    driver.find_element(:id, "login_name").send_keys("super_administrator2")
-    driver.find_element(:id, "login_password").send_keys("password")
-    driver.find_element(:name, "commit").click()
-    driver.get("http://127.0.0.1:3000/course/new?private=1")
-    institutions_eles = driver.find_element(:id, "course_institutions_id")
-    options = institutions_eles.find_elements(:tag_name, 'option')
-    result = true
-    for x in 0..options.size-2
-      if (options[x].text.downcase <=> options[x+1].text.downcase) > 0
-        result = false
-        break
-      end
-    end
-    expect(result).to be(true)
+    create(:superadmin, name: 'super_administrator2')
+    login_as('super_administrator2')
+    visit "/course/new?private=1"
+    expect(page.find(:xpath, "//*[@id=\"course_institutions_id\"]/option[1]").text).to eq("A")
+    expect(page.find(:xpath, "//*[@id=\"course_institutions_id\"]/option[2]").text).to eq("B")
+    expect(page.find(:xpath, "//*[@id=\"course_institutions_id\"]/option[3]").text).to eq("C")
+    expect(page.find(:xpath, "//*[@id=\"course_institutions_id\"]/option[4]").text).to eq("D")
   end
 
   it "check to see if TA can be added and removed" do

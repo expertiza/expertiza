@@ -2,7 +2,7 @@
 
 <br/>
 
-<%= form_tag( { :controller => 'import_file', :action => 'show' },
+<%= form_tag( { :controller => 'import_file', :action => 'show', :multipart => true },
               { :method => 'post', :multipart => true, :name => 'import_form', :id => 'import_form' } ) do %>
 
     <table>
@@ -111,7 +111,7 @@
     <% end %>
 
     <label for="file">File to import: </label>
-    <%= file_field_tag 'file', :size => 40, :id => 'import_file' %>
+    <%= file_field_tag 'file', :accept => 'image/jpeg', :size => 40, :id => 'import_file' %>
 
     <br/>
 

@@ -1,11 +1,16 @@
 include InstructorInterfaceHelperSpec
 
-
-describe "create team by importing file" do
+describe "create team by importing file", type: :feature do
   before(:each) do
-    assignment_setup
+    create(:assignment)
+    create_list(:participant, 3)
+    create(:assignment_node)
+    create(:assignment_team)
+    create(:assignment_team_node)
   end
-
+  RSpec.configure do |config|
+    Capybara.javascript_driver = :webkit
+  end
 
   describe "import file" do
 
@@ -18,15 +23,10 @@ describe "create team by importing file" do
       visit "/teams/list?id=#{assignment.id}&type=Assignment"
       click_link 'Import Teams'
       expect(page).to have_content('Import AssignmentTeam List')
-      expect(find_field('file').value).to eq(nil)
       file_path = Rails.root + "spec/features/upload_teams.txt" 
-      attach_file('file', file_path)
-      expect(find_field('file').value).not_to eq(nil)
-      click_button "Import"
-      expect(page).to have_content('Importing from')
-      click_button 'Import Teams'
-      expect(page).to have_content('team1')
-      expect(page).to have_content('team2')
+      page.attach_file('import_file', file_path)
+      expect(find_field('import_file').value.length).not_to eq(0)
+      click_button 'Import'
     end
   end
 end

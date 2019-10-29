@@ -1,15 +1,12 @@
 include InstructorInterfaceHelperSpec
 
-describe "create team by importing file", type: :feature do
+describe "create team by importing file" do
   before(:each) do
     create(:assignment)
     create_list(:participant, 3)
     create(:assignment_node)
     create(:assignment_team)
     create(:assignment_team_node)
-  end
-  RSpec.configure do |config|
-    Capybara.javascript_driver = :webkit
   end
 
   describe "import file" do

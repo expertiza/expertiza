@@ -263,4 +263,24 @@ class AssignmentParticipant < Participant
     end
     stage
   end
+
+  # E1941 Fall 19
+  def is_in_first_round?
+    topic_id = SignedUpTeam.topic_id(self.parent_id, self.user_id)
+    assigment = Assignment.find(self.parent_id)
+    round = assigment.number_of_current_round(topic_id)
+    if round == 1 || round == 0
+      return true
+    else
+      return false
+    end
+  end
+
+  # if current  stage is submission or review, find the round number
+  # otherwise, return 0
+  # def number_of_current_round(topic_id)
+  #   next_due_date = DueDate.get_next_due_date(self.id, topic_id)
+  #   return 0 if next_due_date.nil?
+  #   next_due_date.round ||= 0
+  # end
 end

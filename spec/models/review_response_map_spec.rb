@@ -1,6 +1,7 @@
 describe ReviewResponseMap do
   let(:team) { build(:assignment_team, id: 1, name: 'team no name', assignment: assignment, users: [student], parent_id: 1) }
   let(:team1) { build(:assignment_team, id: 2, name: 'team has name', assignment: assignment, users: [student]) }
+  let(:team2) { build(:assignment_team, id: 3, name: 'team has name', assignment: assignment, users: [student2]) }
   let(:review_response_map) { build(:review_response_map, id: 1, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:review_response_map1) do
     build :review_response_map,
@@ -12,17 +13,21 @@ describe ReviewResponseMap do
           response: [response],
           calibrate_to: 0
   end
+  let(:review_response_map2) { build(:review_response_map, id: 3, assignment: assignment, reviewer: participant, reviewee: team2) }
   let(:feedback) { FeedbackResponseMap.new(id: 1, reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 1) }
   let(:participant) { build(:participant, id: 1, parent_id: 1, user: student) }
   let(:participant1) { build(:participant, id: 2, parent_id: 2, user: student1) }
+  let(:participant2) { build(:participant, id: 3, parent_id: 1, user: student2) }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt', rounds_of_reviews: 2) }
   let(:assignment1) { build(:assignment, id: 2, name: 'Test Assgt', rounds_of_reviews: 1) }
   let(:response) { build(:response, id: 1, map_id: 1, round: 1, response_map: review_response_map,  is_submitted: true) }
+  let(:response3) { build(:response, id: 4, map_id: 1, round: 1, response_map: review_response_map,  is_submitted: true) }
   let(:response1) { build(:response, id: 2, map_id: 1, round: 2, response_map: review_response_map) }
   let(:response2) { build(:response, id: 3, map_id: 1, round: nil, response_map: review_response_map, is_submitted: true) }
   let(:metareview_response_map) { build(:meta_review_response_map, reviewed_object_id: 1) }
   let(:student) { build(:student, id: 1, name: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
   let(:student1) { build(:student, id: 2, name: "name1", fullname: 'no one', email: 'expertiza@mailinator.com') }
+  let(:student2) { build(:student, id: 3, name: "name2", fullname: 'no one', email: 'expertiza@mailinator.com', email_on_review: false) }
   let(:questionnaire) { Questionnaire.new(id: 1, type: 'ReviewQuestionnaire') }
 
   before(:each) do
@@ -83,8 +88,8 @@ describe ReviewResponseMap do
     ### when reviewer user is a participant in this assignment.
     allow(AssignmentParticipant).to receive(:find_by).with(user_id: 2, parent_id: 1).and_return(participant1)
     allow(ReviewResponseMap).to receive(:find_or_create_by)
-      .with(reviewed_object_id: 1, reviewer_id: 2, reviewee_id: 1, calibrate_to: false)
-      .and_return(review_response_map)
+                                    .with(reviewed_object_id: 1, reviewer_id: 2, reviewee_id: 1, calibrate_to: false)
+                                    .and_return(review_response_map)
     expect(ReviewResponseMap.import(row_hash, session, 1)).to eq(["name1"])
     # when reviewee_team = nil
     allow(AssignmentTeam).to receive(:team).with(participant).and_return(nil)
@@ -95,7 +100,7 @@ describe ReviewResponseMap do
     allow(User).to receive(:find_by).with(name: "name1").and_return(student1)
     allow(AssignmentParticipant).to receive(:find_by).with(user_id: 2, parent_id: 1).and_return(participant1)
     allow(ReviewResponseMap).to receive(:find_or_create_by)
-      .with(reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 1, calibrate_to: false).and_return(review_response_map)
+                                    .with(reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 1, calibrate_to: false).and_return(review_response_map)
     expect(ReviewResponseMap.import(row_hash, session, 1)).to eq(["name1"])
   end
 
@@ -135,7 +140,7 @@ describe ReviewResponseMap do
     allow(Response).to receive(:where).with(map_id: 1, round: 2).and_return([response1])
     allow(assignment).to receive(:review_questionnaire_id).with(2).and_return(1)
     expect(ReviewResponseMap.final_versions_from_reviewer(1))
-      .to eq("review round1": {questionnaire_id: 1, response_ids: [1]}, "review round2": {questionnaire_id: 1, response_ids: [2]})
+        .to eq("review round1": {questionnaire_id: 1, response_ids: [1]}, "review round2": {questionnaire_id: 1, response_ids: [2]})
   end
 
   it '#review_response_report' do
@@ -167,7 +172,21 @@ describe ReviewResponseMap do
     review_response_map.reviewee_id = 1
     defn = {body: {type: "Peer Review", obj_name: "Test Assgt", first_name: "no one", partial_name: "new_submission"}, to: "expertiza@mailinator.com"}
     expect { review_response_map.email(defn, participant, Assignment.find(Participant.find(reviewer_id).parent_id)) }
-      .to change { ActionMailer::Base.deliveries.count }.by 1
+        .to change { ActionMailer::Base.deliveries.count }.by 1
+  end
+
+  #E 1961
+  it '#email should not send email when email on review attribute is disabled' do
+    reviewer_id = 1
+    allow(Participant).to receive(:find).with(1).and_return(participant)
+    allow(Assignment).to receive(:find).with(1).and_return(assignment)
+    allow(AssignmentTeam).to receive(:find).with(3).and_return(team2)
+    allow(AssignmentTeam).to receive(:users).and_return(student2)
+    allow(User).to receive(:find).with(3).and_return(student2)
+    review_response_map2.reviewee_id = 3
+    defn = {body: {type: "Peer Review", obj_name: "Test Assgt", first_name: "no one", partial_name: "new_submission"}, to: "expertiza@mailinator.com"}
+    expect { review_response_map2.email(defn, participant, Assignment.find(Participant.find(reviewer_id).parent_id)) }
+        .to change { ActionMailer::Base.deliveries.count }.by 0
   end
 
   it '#prepare_final_review_versions' do
@@ -184,7 +203,7 @@ describe ReviewResponseMap do
     current_assignment = Assignment.find(Participant.find(reviewer_id).parent_id)
     meta_review_response_maps = MetareviewResponseMap.where(reviewed_object_id: 1)
     expect(ReviewResponseMap.prepare_final_review_versions(current_assignment, meta_review_response_maps))
-      .to eq("review round1": {questionnaire_id: 1, response_ids: [1]}, "review round2": {questionnaire_id: 1, response_ids: [2]})
+        .to eq("review round1": {questionnaire_id: 1, response_ids: [1]}, "review round2": {questionnaire_id: 1, response_ids: [2]})
     # when round = nil
     reviewer_id = 2
     allow(Participant).to receive(:find).with(2).and_return(participant1)
@@ -195,7 +214,7 @@ describe ReviewResponseMap do
     current_assignment = Assignment.find(Participant.find(reviewer_id).parent_id)
     meta_review_response_maps = MetareviewResponseMap.where(reviewed_object_id: 1)
     expect(ReviewResponseMap.prepare_final_review_versions(current_assignment, meta_review_response_maps))
-      .to eq(review: {questionnaire_id: nil, response_ids: [3]})
+        .to eq(review: {questionnaire_id: nil, response_ids: [3]})
   end
 
   it '#prepare_review_response' do

@@ -8,9 +8,15 @@ describe SignUpTopic do
     end
 
     context 'when record is not empty' do
-      row = {topic_identifier: 'identifier', topic_name: 'name', max_choosers: 'chooser', category: 'category', description: 'description', link: 'link'}
-      session = {assignment_id: 1}
-      attributes = {topic_identifier: 'identifier', topic_name: 'name', max_choosers: 'chooser', category: 'category', description: 'description', link: 'link'}
+      let(:row) do
+        {topic_identifier: 'identifier', topic_name: 'name', max_choosers: 'chooser', category: 'category', description: 'description', link: 'link'}
+      end
+      let(:session) do
+        {assignment_id: 1}
+      end
+      let(:attributes) do
+        {topic_identifier: 'identifier', topic_name: 'name', max_choosers: 'chooser', category: 'category', description: 'description', link: 'link'}
+      end
 
       context 'when the topic is not found' do
         it 'creates a new sign up topic' do

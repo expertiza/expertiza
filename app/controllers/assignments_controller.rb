@@ -58,11 +58,7 @@ class AssignmentsController < ApplicationController
           render 'new'
         end
       else
-        if exist_assignment
-          flash.now[:error] = "Assignment name already exists in the selected course. Kindly rename the assignment."
-        else
-          flash.now[:error] = "Directory name already exists in the selected course. Kindly rename the directory."
-        end
+        flash.now[:error] = "This assignment/directory already exists in the selected course. Kindly rename."
         render 'new'
       end
     else

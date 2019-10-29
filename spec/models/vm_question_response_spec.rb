@@ -76,9 +76,8 @@ describe VmQuestionResponse  do
       it 'adds reviews' do
         response = VmQuestionResponse.new(author_feedback_questionnaire, assignment, 1)
         #allow(participant).to receive(:feedback).and_return(reviews)
-        allow(FeedbackResponseMap).to receive(:where).with(reviewer_id: 3).and_return([double(id: 1, reviewee_id: 4, response_id: 1)])
+        allow(FeedbackResponseMap).to receive(:where).with(reviewer_id: 3).and_return([double(id: 1, reviewer_id: 3, reviewee_id: 4, response_id: 1)])
         allow(Participant).to receive(:find_by).with(id: 4).and_return(reviwee)
-        allow(Participant).to receive(:find_by).with(id: 3).and_return(participant)
         allow(Response).to receive_message_chain(:where, :order, :last).and_return(response)
 	      response.add_reviews(participant, team, false)
         expect(response.list_of_reviews.size).to eq(1)

@@ -9,6 +9,35 @@ Expertiza
 
 Expertiza is a web application where students can submit and peer-review learning objects (articles, code, web sites, etc). It is used in select courses at NC State and by professors at several other colleges and universities.
 
+#### Topic: E1964 - Export review scores for projects
+
+### Team Members:
+	
+  * Yash Thakkar
+  * Pururaj Dave
+  * Maharshi Parekh
+  
+  Github repository link: 	https://github.com/pururaj1908/expertiza <br>
+  Github pull request link:	https://github.com/expertiza/expertiza/pull/1562 <br>
+  Expertiza Wiki link:		http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_E1964._Export_review_scores_for_projects
+
+### Synopsis:
+
+This project aims to easily export details and grades of all the reviewers that have reviewed a particular assignment.<br>
+This feature is only available for instructors, not students.
+
+### Steps to follow:
+	
+   1. Log into expertiza as instructor with credentials:
+		 <br><em>username: 'instructor6'<br>
+		 password: 'password'</em><br>
+   2. Load all assignments. (Manage -> Assignments)<br>
+   3. Click on 'View Reports' button.<br>
+   4. Choose 'Review Report' from the dropdown and click 'View'.<br>
+   5. You can now export the grade and comments of the reviewers along with their details, i.e, name, unity ID and email.<br>
+   6. The file will be downloaded.<br>
+   Test cases include checking for the basic html views and checking for empty csv file creation.
+
 Setup
 -----
 

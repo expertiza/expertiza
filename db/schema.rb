@@ -630,6 +630,7 @@ ActiveRecord::Schema.define(version: 20181205201208) do
     t.string  "status",            limit: 255
     t.string  "unityID",           limit: 255
     t.string  "signup_preference", limit: 255
+    t.string  "feedback",          limit: 255
   end
 
   create_table "survey_deployments", force: :cascade do |t|

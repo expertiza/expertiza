@@ -6,7 +6,6 @@ module ImportTopicsHelper
     attributes = {}
     if !row_hash[:description].nil? and !row_hash[:description].ascii_only?
       row_hash[:description] = self.trim_non_ascii(row_hash[:description])
-      puts row_hash[:description]
     end
     attributes["topic_identifier"] = row_hash[:topic_identifier].strip
     attributes["topic_name"] = row_hash[:topic_name].strip

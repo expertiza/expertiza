@@ -98,4 +98,20 @@ describe "peer review testing" do
     click_button "Request a new submission to review"
     expect(page).to have_content "No previous versions available"
   end
+
+  it "is able to reivew when submissions overlap with review window" do
+    create(:assignment_due_date, deadline_type: DeadlineType.where(name: "submission").first, due_at: DateTime.now.in_time_zone + 1.day)
+    create(:assignment_due_date, deadline_type: DeadlineType.where(name: "review").first, due_at: DateTime.now.in_time_zone + 4.day)
+    submit_to_topic
+    user = User.find_by(name: "student2065")
+    stub_current_user(user, user.role.name, user.role)
+    visit '/student_task/list'
+    visit '/sign_up_sheet/sign_up?id=1&topic_id=1'
+    visit '/student_task/list'
+    click_link "TestAssignment"
+    click_link "Others' work"
+    find(:css, "#i_dont_care").set(true)
+    click_button "Request a new submission to review"
+    expect(page).to have_content "No previous versions available"
+  end
 end

@@ -59,12 +59,13 @@ class UsersController < ApplicationController
   # for displaying the list of users
   def list
     user = session[:user]
-    #paginate_list is called with the
     @users = user.get_user_list
+    # paginate_list is called with the entire list of users
+    # @paginated_users can be used to display set number of users per page
     @paginated_users = paginate_list(@users)
   end
 
-  #for displaying users which are being searched for editing purposes after checking authorization
+  # for displaying users which are being searched for editing purposes after checking whether current user is authorized to do so
   def show_if_authorized
     @user = User.find_by(name: params[:user][:name])
     if !@user.nil?

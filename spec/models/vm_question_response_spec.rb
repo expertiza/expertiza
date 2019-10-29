@@ -74,7 +74,7 @@ describe VmQuestionResponse  do
 
     context 'when intitialized with a author feedback questionnaire' do
       it 'adds reviews' do
-        response = double(response_id: 1)
+        response = VmQuestionResponse.new(author_feedback_questionnaire, assignment, 1)
         #allow(participant).to receive(:feedback).and_return(reviews)
         allow(FeedbackResponseMap).to receive(:where).with(reviewer_id: 3).and_return([double(id: 1, reviewer_id: 3, reviewee_id: 4, response_id: 1)])
         allow(Participant).to receive(:find_by).with(id: 4).and_return(reviwee)

@@ -179,6 +179,7 @@ describe GradesController do
     end
   end
 
+  # modify existing Rspec test to fit implementation
   describe '#save_grade_and_comment_for_submission' do
     it 'saves grade and comment for submission and refreshes the grades#view_team page' do
       allow(AssignmentParticipant).to receive(:find_by).with(id: '1').and_return(participant)
@@ -194,6 +195,5 @@ describe GradesController do
       expect(response).to redirect_to('/grades/view_team?id=1')
     end
   end
-
 
 end

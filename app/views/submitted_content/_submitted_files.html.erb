@@ -34,7 +34,7 @@
       <div class="form-group">
 
   <input type="file" id="uploaded_file" name="uploaded_file" size=40 onchange = "ValidateSingleInput(this);"/>
-
+  <!-- when file field is changed, the onchange function ValidateSingleInput is triggered -->
 </div>
       <%= submit_tag 'Upload file', class: 'btn btn-default' %>
       <br/><br/>
@@ -64,7 +64,7 @@
 <% end %>
 
 
-
+<!-- checking file type & size by using javascript -->
 <script>
     var _validFileExtensions = ["pdf", "jpg", "jpeg", "tar", "zip", "png", "7z", "odt", "docx"];
     function ValidateSingleInput(oInput) {

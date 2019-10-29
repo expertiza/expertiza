@@ -232,9 +232,10 @@
 
 <h4 style="font-weight:bold;display:inline-block;">Grade and comment for submission</h4><br/>
 
-<%# if @assignment.instructor_id != current_user.id %>
 
 <%if TaMapping.where(ta_id:current_user.id,course_id:@assignment.course.id).empty?&&current_user.role.name !='Instructor' %>
+    <!--  if cannot find TA's id attach to this course, he/she could not grade for this course's assignment -->
+
   Grade: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
   Comment: <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %>
 <% else %>

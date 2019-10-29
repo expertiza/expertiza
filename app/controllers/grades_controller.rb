@@ -173,6 +173,7 @@ class GradesController < ApplicationController
     if TaMapping.where(ta_id:current_user.id,course_id:@assignment.course.id).empty?&&current_user.role.name !='Instructor'
       flash[:error] = 'Unauthorized action!'
       redirect_to controller: 'grades', action: 'view_team', id: participant.id
+      # if cannot find TA's id attach to this course, he/she could not grade for this course's assignment
     else
 
     participant = AssignmentParticipant.find_by(id: params[:participant_id])

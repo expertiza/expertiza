@@ -95,7 +95,7 @@ class SubmittedContentController < ApplicationController
     return unless current_user_id?(participant.user_id)
     file = params[:uploaded_file]
 
-
+    #checking file's params to verify file type and size 
 
     if(file.size>5*1024*1024)
       flash[:error] = 'File Size must smaller than 5MB!'
@@ -106,11 +106,6 @@ class SubmittedContentController < ApplicationController
       flash[:error] = 'File type error!'
       redirect_to action: 'edit', id: participant.id
     end
-
-
-    # puts type[1]
-
-
 
     participant.team.set_student_directory_num
     @current_folder = DisplayOption.new

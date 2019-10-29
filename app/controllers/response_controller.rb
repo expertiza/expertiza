@@ -136,11 +136,11 @@ class ResponseController < ApplicationController
     @map = @response.map
     set_content
   end
-  #view response2 for instructor-end
-  def view2
+  #view response for instructor-end
+  def view_instructor
     @response = Response.find(params[:id])
     @map = @response.map
-    set_content2
+    set_content_instructor
     render "response/view"
   end  
 
@@ -263,7 +263,7 @@ class ResponseController < ApplicationController
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
   end
-  def set_content2(new_response = false)
+  def set_content_instructor(new_response = false)
     @contributor = @map.contributor
     members = TeamsUser.where(team_id: params[:team])
     @user = members.first

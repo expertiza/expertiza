@@ -24,7 +24,7 @@ class Response < ActiveRecord::Base
     identifier += "<h3>Feedback from author</h3>" if self.map.type.to_s == 'FeedbackResponseMap'
     if prefix == "instructor"
       self_id = self.id.to_s
-      code = construct_instructor2_html identifier, self_id, count
+      code = construct_instructor_html_helper identifier, self_id, count
     elsif prefix # has prefix means view_score page in instructor end
       self_id = prefix + '_' + self.id.to_s
       code = construct_instructor_html identifier, self_id, count
@@ -225,7 +225,7 @@ class Response < ActiveRecord::Base
            "'review_" + self_id + "','review'" + ');return false;">hide review</a><BR/>'
   end
 
-  def construct_instructor2_html identifier, self_id, count
+  def construct_instructor_html_helper identifier, self_id, count
     identifier += '<table width="100%">'\
 						 '<tr>'\
 						 '<td align="left" width="70%"><b>Review ' + '</b>&nbsp;&nbsp;&nbsp;'\

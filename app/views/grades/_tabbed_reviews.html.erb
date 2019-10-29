@@ -23,10 +23,10 @@
     <% end %>
 
     <% rounds.each do |round| %>
-        <% if controller.action_name == "view2"%>
+        <% if controller.action_name == "view_instructor"%>
         <% next if round.to_s != @round.to_s %>
         <% end %>
-        <% if controller.action_name != "view2"%>
+        <% if controller.action_name != "view_instructor"%>
             <h3>Round <%= round %></h3>
             <% if controller.action_name != "view_my_scores" %>
                 <a href="#" name= <%= participant.id.to_s + '_' + round.to_s + "Link" %> onClick="toggleElement('<%= participant.id.to_s + '_' + round.to_s %>','round <%= round.to_s%> reviews');return false;">show round <%= round.to_s%> reviews</a>
@@ -35,18 +35,18 @@
         <% if @assignment.is_answer_tagging_allowed %>
             <span class="spn_qsttog" id="tag_prompt_toggler" title="Click to display/hide tags" onclick="toggle_tag_prompt()">hide tags</span>
         <% end %>
-        <% if controller.action_name != "view2"%>
+        <% if controller.action_name != "view_instructor"%>
         <table class="table table-striped" id=<%= participant.id.to_s + '_' + round.to_s %> <%= style="display: none;" if controller.action_name != "view_my_scores"%>>
         <% end %>
             <% rscore[:assessments].select{|response| response.round == round}.reverse.uniq{|response| response.map_id}.sort_by{|response| response.map_id}.each_with_index do |review, index| %>
-                <% if controller.action_name == "view2"%>
+                <% if controller.action_name == "view_instructor"%>
                 <% next if review.reviewer != @reviewer || count > 0 %>
                 <% end %>
                 <tr><td>
                 <% review_feedback = nil %>
                 <% count = count + 1 %>
                 <% prefix = nil %>
-                <% prefix = "instructor" if controller.action_name == "view2" %>
+                <% prefix = "instructor" if controller.action_name == "view_instructor" %>
 
                 <!--<%= review.display_as_html(nil, count, nil, true) %><BR/>-->
                 <!--change code in order to compat to multi-round review-->
@@ -79,7 +79,7 @@
                 </td></tr>
                 <% end %>
             <% end %>
-        <% if controller.action_name != "view2"%>    
+        <% if controller.action_name != "view_instructor"%>    
         </table><hr>
         <% end %>
     <% end %>

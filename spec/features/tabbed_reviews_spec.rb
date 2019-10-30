@@ -136,7 +136,7 @@ describe "test for instructor" do
       create(:signed_up_team)
       
       create(:signed_up_team, team_id: 2, topic: SignUpTopic.second)
-    visit "response/view2?id=#{questionnaire_id}&&team=1&&round=1&&assignment=#{assignment_id}"
+    visit "response/view_instructor?id=#{questionnaire_id}&&team=1&&round=1&&assignment=#{assignment_id}"
   end
 
   it "can go to review details" do

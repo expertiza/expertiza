@@ -98,3 +98,51 @@ RSpec.describe ReviewMappingHelper, :type => :helper do
     end
   end
 end
+
+describe "review report html test cases" do
+  before(:each) do
+    create(:instructor)
+    create(:assignment, course: nil, name: 'Test Assignment')
+    assignment_id = Assignment.where(name: 'Test Assignment')[0].id
+    @options = {'name' => 'true', 'unity_id' => 'true',
+                                  'email' => 'true', 'grade' => 'true',
+                                  'comment' => 'true'}
+    login_as 'instructor6'
+    visit "/reports/response_report?id=#{assignment_id}"
+    page.select("Review report", :from => "report[type]")
+    click_button "View"
+  end
+
+  it "can display review metrics" do
+    expect(page).to have_content('Metrics')
+  end
+
+  it "can display review grades of each round" do
+    expect(page).to have_content('Score awarded')
+  end
+
+  it "can display reviews done" do
+    expect(page).to have_content('Reviews done')
+  end
+
+  it "can display Reviewer" do
+    expect(page).to have_content('Reviewer')
+  end
+
+  it "can display team reviewed" do
+    expect(page).to have_content('Team reviewed')
+  end
+
+  def generated_csv(t_assignment, t_options)
+      delimiter = ','
+      CSV.generate(col_sep: delimiter) do |csv|
+        csv << ReportsController.export_details_fields(t_options)
+        ReportsController.export_details(csv, t_assignment, false)
+      end
+    end
+
+  it "can create an empty csv with just headers" do
+    expected_csv = File.read('spec/features/review_report_details/review_report_no_data_csv.txt')
+      expect(generated_csv(true, @options)).to eq(expected_csv)
+  end
+end

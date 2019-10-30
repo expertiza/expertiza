@@ -17,4 +17,19 @@ class ReportsController < ApplicationController
     send(@type.underscore, params, session)
     @user_pastebins = UserPastebin.get_current_user_pastebin current_user
   end
+
+  def self.export_details_fields(detail_options)
+    fields = []
+    fields << 'Name' if detail_options['name'] == 'true'
+    fields << 'UnityID' if detail_options['unity_id'] == 'true'
+    fields << 'EmailID' if detail_options['email'] == 'true'
+    fields << 'Grade' if detail_options['grade'] == 'true'
+    fields << 'Comment' if detail_options['comment'] == 'true'
+    fields
+  end
+
+  #extended functionality.
+  def self.export_details(csv, parent_id, detail_options)
+    return csv unless detail_options
+  end
 end

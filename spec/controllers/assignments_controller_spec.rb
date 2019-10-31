@@ -129,8 +129,8 @@ describe AssignmentsController do
     end
     context 'when assignment_form is saved successfully' do
       it 'redirects to new assignment creation page' do
-        allow(Assignment).to receive(:find_by).with(name: 'test assignment',course_id: 1).and_return(assignment)
-        allow(Assignment).to receive(:find_by).with(directory_path: 'test_assignment',course_id: 1).and_return(assignment)
+        allow(Assignment).to receive(:find_by).with(name: 'test assignment', course_id: 1).and_return(assignment)
+        allow(Assignment).to receive(:find_by).with(directory_path: 'test_assignment', course_id: 1).and_return(assignment)
         allow(assignment_form).to receive(:assignment).and_return(assignment)
         allow(assignment_form).to receive(:save).and_return(true)
         allow(assignment_form).to receive(:update).with(any_args).and_return(true)
@@ -146,8 +146,8 @@ describe AssignmentsController do
 
     context 'when assignment_form is not saved successfully due to same assignment/auto generated directory exists' do
       it 'renders assignment#new page' do
-        allow(Assignment).to receive(:find_by).with(name: 'test assignment',course_id: 1).and_return(assignment)
-        allow(Assignment).to receive(:find_by).with(directory_path: 'test_assignment',course_id: 1).and_return(assignment)
+        allow(Assignment).to receive(:find_by).with(name: 'test assignment', course_id: 1).and_return(assignment)
+        allow(Assignment).to receive(:find_by).with(directory_path: 'test_assignment', course_id: 1).and_return(assignment)
         post :create, @params
         expect(flash.now[:error]).to eq("This assignment/directory already exists in the selected course. Kindly rename.")
 

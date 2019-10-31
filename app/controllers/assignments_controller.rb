@@ -151,7 +151,6 @@ class AssignmentsController < ApplicationController
     rescue StandardError => e
       flash[:error] = e.message
     end
-
     redirect_to list_tree_display_index_path
   end
 

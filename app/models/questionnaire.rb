@@ -142,8 +142,11 @@ class Questionnaire < ActiveRecord::Base
     # This method is used to create Treenode for newly created questionnaire
     def create_questionnaire_node(questionnaire)
       tree_folder = TreeFolder.where(['name like ?', questionnaire.display_type]).first
-      parent = FolderNode.find_by(node_object_id: tree_folder.id)
-      QuestionnaireNode.create(parent_id: parent.id, node_object_id: questionnaire.id, type: 'QuestionnaireNode')
+
+      if tree_folder.present?
+        parent = FolderNode.find_by(node_object_id: tree_folder.id)
+        QuestionnaireNode.create(parent_id: parent.id, node_object_id: questionnaire.id, type: 'QuestionnaireNode')
+      end
     end
     
     # Displaying the newly created questionnaire

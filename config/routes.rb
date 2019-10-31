@@ -1,6 +1,6 @@
 Expertiza::Application.routes.draw do
   ###
-  # Please insert new routes alphabetically!
+  # Please insert new routes alphabetically
   ###
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'

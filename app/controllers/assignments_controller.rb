@@ -34,7 +34,6 @@ class AssignmentsController < ApplicationController
       if !exist_assignment and !exist_directory
         if @assignment_form.save
           @assignment_form.create_assignment_node
-          # Get the details of the assignment which is saved in current_assignment
           current_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
           assignment_form_params[:assignment][:id] = current_assignment.id.to_s
           ques_array = assignment_form_params[:assignment_questionnaire]

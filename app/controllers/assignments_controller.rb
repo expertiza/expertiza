@@ -61,9 +61,6 @@ class AssignmentsController < ApplicationController
         flash.now[:error] = "This assignment/directory already exists in the selected course. Kindly rename."
         render 'new'
       end
-    else
-      render 'new'
-      undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
     end
   end
 

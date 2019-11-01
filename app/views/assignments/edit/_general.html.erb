@@ -26,12 +26,12 @@ function microtaskChanged() {
   }
 }
 
-$(function() {
+<!--$(function() {
     $("#name_field").change(function() {
         filename = $( "#name_field" ).val().replace(/ /g,"_").replace(/[/\\?%*:|"<>/$&!#%^@]/g, '');;
         $('#directory_field').val(filename);
     });
-});
+});-->
 
 </script>
 
@@ -47,7 +47,7 @@ $(function() {
 
 <tr>
 <td style='padding:5px'><%= label_tag('assignment_form[assignment][name]', 'Assignment name:') %></td>
-<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][name]', @assignment_form.assignment.name, :style => 'width:250px', required: true, :id => 'name_field', class: 'form-control') %></td>
+<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][name]', @assignment_form.assignment.name, :style => 'width:250px', required: true, class: 'form-control') %></td>
 </tr>
 
 <tr>

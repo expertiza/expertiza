@@ -150,10 +150,7 @@ describe AssignmentsController do
         allow(Assignment).to receive(:find_by).with(directory_path: 'test_assignment', course_id: 1).and_return(assignment)
         post :create, @params
         expect(flash.now[:error]).to eq("This assignment/directory already exists in the selected course. Kindly rename.")
-
         expect(response).to render_template(:new)
-
-
       end
     end
 

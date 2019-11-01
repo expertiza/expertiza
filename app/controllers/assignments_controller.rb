@@ -32,8 +32,7 @@ class AssignmentsController < ApplicationController
       exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
       dir_path = assignment_form_params[:assignment][:directory_path]
       exist_directory = Assignment.find_by(directory_path: dir_path, course_id: @assignment_form.assignment.course_id)
-      flag_should_save = !exist_assignment and !exist_directory
-      if flag_should_save
+      if !exist_assignment and !exist_directory
         if @assignment_form.save
           @assignment_form.create_assignment_node
           current_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)

@@ -6,7 +6,7 @@ module AssignmentHelper
       ta = Ta.find(session[:user].id)
       ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id) }
       # If a TA created some courses before, s/he can still add new assignments to these courses.
-      #assigments =
+    
       #courses << Course.where(instructor_id: instructor.id)
       courses.flatten!
     # Administrator and Super-Administrator can see all courses

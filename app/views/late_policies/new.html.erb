@@ -4,7 +4,7 @@
 
  <% if @late_policy.errors.any? %>
   <div id="error_explanation">
-	<% flash[:error] = @late_policy.errors.full_messages.join("<br/>").html_safe %>
+	<% flash.now[:error] = @late_policy.errors.full_messages.join("<br/>").html_safe %>
   </div>
 <% end %>
 

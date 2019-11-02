@@ -2,8 +2,8 @@ describe LatePolicy do
 	let(:policy) do
 		LatePolicy.new penalty_per_unit: 10.0, max_penalty: 30, penalty_unit: "Day", times_used: 0, instructor_id: 6, policy_name: 'rspectest'
 	end
-
-	describe '#penalty_per_unit' do
+	#validaes penalty per unit field
+	describe 'validate penalty_per_unit' do
 		it 'returns the penalty_per_unit' do
 			expect(policy.penalty_per_unit).to eq(10.0)
 		end
@@ -19,7 +19,8 @@ describe LatePolicy do
     		end
 	end
 	
-	describe '#max_penalty' do
+	#validates max_penalty field
+	describe 'validate max_penalty' do
 		it 'returns the max_penalty' do
 			expect(policy.max_penalty).to eq(30)
 		end
@@ -33,7 +34,8 @@ describe LatePolicy do
     		end
 	end
 	
-	describe '#penalty_unit' do
+	#validates penalty unit field
+	describe 'validate penalty_unit' do
 		it 'returns the penalty_unit' do
 			expect(policy.penalty_unit).to eq('Day')
 		end
@@ -43,13 +45,14 @@ describe LatePolicy do
     		end
 	end
 
-	describe '#times_used' do
+	describe 'validate times_used backgorund field' do
 		it 'returns times_used' do
 			expect(policy.times_used).to eq(0)
 		end
 	end
 	
-	describe '#policy_name' do
+	#validates policy_name field
+	describe 'validate policy_name' do
 		it 'returns the policy name' do
 			expect(policy.policy_name).to eq('rspectest')
 		end

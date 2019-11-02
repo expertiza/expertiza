@@ -2,6 +2,7 @@
 
 <%= form_for @late_policy, :url => { :action => "create" } do |f| %>
 
+<%-# Logic for handling validations -%>
  <% if @late_policy.errors.any? %>
   <div id="error_explanation">
 	<% flash[:error] = @late_policy.errors.full_messages.join("<br/>").html_safe %>

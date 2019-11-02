@@ -332,10 +332,10 @@ class Assignment < ActiveRecord::Base
     if self.staggered_deadline?
       return (topic_id.nil? ? 'Unknown' : get_current_stage(topic_id))
     end
-    due_date = find_current_stage(topic_id)
+    due_date = next_due_date(topic_id)
 
     unless self.staggered_deadline?
-      if due_date != 'Finished' && !due_date.nil? && !due_date.deadline_name.nil?
+      if finished?(topic_id) && !due_date.deadline_name.nil?
         return due_date.deadline_name
       else
         return get_current_stage(topic_id)
@@ -352,8 +352,8 @@ class Assignment < ActiveRecord::Base
     if self.staggered_deadline?
       return nil if topic_id.nil?
     end
-    due_date = find_current_stage(topic_id)
-    if due_date.nil? or due_date == 'Finished' or due_date.is_a?(TopicDueDate)
+    due_date = next_due_date(topic_id)
+    if finished?(topic_id) or due_date.is_a?(TopicDueDate)
       return nil
     else
       due_date.description_url
@@ -362,8 +362,8 @@ class Assignment < ActiveRecord::Base
 
   def stage_deadline(topic_id = nil)
     return 'Unknown' if topic_missing?(topic_id)
-    due_date = find_current_stage(topic_id)
-    due_date.nil? || due_date == 'Finished' ? due_date : due_date.due_at.to_s
+    due_date = next_due_date(topic_id)
+    finished?(topic_id) ? due_date : due_date.due_at.to_s
   end
 
   def num_review_rounds
@@ -375,17 +375,11 @@ class Assignment < ActiveRecord::Base
     rounds
   end
 
-  def find_current_stage(topic_id = nil)
-    next_due_date = next_due_date(topic_id)
-    return 'Finished' if next_due_date.nil?
-    next_due_date
-  end
-
   # Zhewei: this method is almost the same as 'stage_deadline'
   def get_current_stage(topic_id = nil)
     return 'Unknown' if topic_missing?(topic_id)
-    due_date = find_current_stage(topic_id)
-    due_date.nil? || due_date == 'Finished' ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
+    due_date = next_due_date(topic_id)
+    finished?(topic_id) ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
   end
 
   def review_questionnaire_id(round = nil)
@@ -611,11 +605,13 @@ class Assignment < ActiveRecord::Base
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: type).id }
   end
 
+
+
+  private
+
   def finished?(topic_id)
     return next_due_date(topic_id).nil?
   end
-
-  private
 
   def next_due_date(topic_id)
     DueDate.get_next_due_date( self.id,topic_id)

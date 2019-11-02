@@ -33,7 +33,7 @@ class LatePoliciesController < ApplicationController
     @penalty_policy = LatePolicy.find(params[:id])
     respond_to do |format|
       format.html # show.html.erb
-      format.xml  { render xml: @penalty_policy }
+      format.xml  { render xml: @penalty_policyx}
     end
   end
 
@@ -68,7 +68,7 @@ class LatePoliciesController < ApplicationController
       begin
         @late_policy.save!
         flash[:success] = "The penalty policy was successfully created."
-        redirect_to action: 'index', id: params[:late_policy][:assign_id]
+	redirect_to action: 'index'       
       rescue StandardError
         render :new
       end

@@ -91,6 +91,7 @@ class AssignmentsController < ApplicationController
     retrieve_assignment_form
     handle_current_user_timezonepref_nil
     update_feedback_assignment_form_attributes
+    session[:assignment_id] = @assignment_form.assignment.id
     redirect_to edit_assignment_path @assignment_form.assignment.id
   end
 

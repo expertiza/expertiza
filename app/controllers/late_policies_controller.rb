@@ -63,19 +63,16 @@ class LatePoliciesController < ApplicationController
       same_policy_name = true
     end
     if !invalid_penalty_per_unit && !same_policy_name
-      p "In If loop"
       @late_policy = LatePolicy.new(late_policy_params)
       @late_policy.instructor_id = instructor_id
       begin
         @late_policy.save!
         flash[:success] = "The penalty policy was successfully created."
-        redirect_to action: 'index', id: params[:late_policy][:assign_id]
+	redirect_to action: 'index'       
       rescue StandardError
-	p "In Standard Error"
         render :new
       end
     else
-      p "In else Loop"
       redirect_to action: 'new'
     end
   end

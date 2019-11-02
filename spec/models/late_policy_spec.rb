@@ -62,13 +62,3 @@ describe LatePolicy do
     		end
 	end
 end
-
-
-
-
-
-
-
-
-
-

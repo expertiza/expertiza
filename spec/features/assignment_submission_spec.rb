@@ -29,6 +29,9 @@ describe "assignment submisstion test" do
   end
 
   it "is able to submit a single valid link" do
+    dueDate=DueDate.new
+    expect(DueDate).to receive(:where).and_return(dueDate)
+    expect(dueDate).to receive(:maximum).and_return(DateTime.now)
     signup_topic
     fill_in 'submission', with: "https://www.ncsu.edu"
     click_on 'Upload link'
@@ -48,6 +51,9 @@ describe "assignment submisstion test" do
   end
 
   it "is able to submit multiple valid links" do
+    dueDate=DueDate.new
+    expect(DueDate).to receive(:where).and_return(dueDate)
+    expect(dueDate).to receive(:maximum).and_return(DateTime.now)
     signup_topic
     fill_in 'submission', with: "https://www.ncsu.edu"
     click_on 'Upload link'
@@ -74,6 +80,9 @@ describe "assignment submisstion test" do
   end
 
   it "submit empty link" do
+    dueDate=DueDate.new
+    expect(DueDate).to receive(:where).and_return(dueDate)
+    expect(dueDate).to receive(:maximum).and_return(DateTime.now)
     signup_topic
     # hyperlink is empty
     fill_in 'submission', with: ""

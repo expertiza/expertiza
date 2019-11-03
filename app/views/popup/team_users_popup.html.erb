@@ -2,9 +2,10 @@
   <h3>
     Members of <%= @team.name %>
   </h3>
+  # add style for table
   <table class="table table-striped grades" class="width: 100%">
     <% if @team_users.empty? %>
-      <tr>No team members</tr>
+      <tr> No team members </tr>
     <% else %>
       <% @team_users.each do |t| %>
         <tr>
@@ -14,6 +15,7 @@
         </tr>
       <% end %>
     <% end %>
+  # edge case, in case that no reviewer has done review yet
   </table>
   <% (1..@assignment.num_review_rounds).each do |round| %>
     <% next if instance_variable_get('@response_round_' + round.to_s).nil? %>
@@ -33,6 +35,9 @@
       <h3>
         <%= "Reviewed by #{User.find(@reviewer_id).fullname} (Round #{round})" %>
       </h3>
+      # table of review question, score and answer
+      # use "index" to show the sequence of review's question
+      # question on the first line
       <table class="table table-striped grades">
       <% index = 1 %>
       <% instance_variable_get('@scores_round_' + round.to_s).each do |answer| %>
@@ -54,7 +59,7 @@
           <% end %>
         </th>
       </tr>
-  
+    # score in 5% left of second line, answer in 95% right of second line
       <tr class="info">
         <% if answer.question.is_a?(ScoredQuestion) %>
           <td align="left" width="5%">
@@ -66,6 +71,7 @@
         <% end %>
       </tr>
     <% end %>
+    # calculate the overall score
         </tr>
         <tr class="warning">
           <th colspan="2">Reviewer Score (Σ weighted score/Σ weighted available score)</th>

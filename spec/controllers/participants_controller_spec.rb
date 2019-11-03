@@ -76,6 +76,23 @@ describe ParticipantsController do
     end
   end
 
+  describe '#update_authorizations_2' do
+  it 'updates the authorizations for the participant to make them reviewer' do
+    allow(Participant).to receive(:find).with('1').and_return(participant)
+    params = {authorization: 'reviewer', id: 1}
+    session = {user: instructor}
+    get :update_authorizations, params, session
+    # if can_submit == false and can_review == true and can_take_quiz == false
+    # can check the flash message
+    expect(flash[:success]).to eq 'The role of the selected participants has been successfully updated.'
+    expect(participant.can_review).to eq(true)
+    expect(participant.can_submit).to eq(false)
+    expect(participant.can_take_quiz).to eq(false)
+  end
+  end
+
+
+
   describe '#list' do
     it 'lists the participants' do
       allow(AssignmentNode).to receive(:find_by).with(node_object_id: '1').and_return(assignment_node)
@@ -86,6 +103,7 @@ describe ParticipantsController do
       expect(controller.instance_variable_get(:@participants)).to be_empty
     end
   end
+
 
   describe '#add' do
     it 'adds a participant' do

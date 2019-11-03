@@ -294,6 +294,7 @@ describe AssignmentParticipant do
         context 'when certain assignment cannot be found' do
           it 'creates a new user based on import information and raises an ImportError' do
             allow(Assignment).to receive(:find).with(1).and_return(nil)
+            allow(MailerHelper).to receive(:send_mail_to_user).and_return(true)
             expect { AssignmentParticipant.import(row, nil, {}, 1) }.to raise_error('The assignment with id "1" was not found.')
           end
         end

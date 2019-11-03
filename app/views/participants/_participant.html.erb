@@ -27,7 +27,7 @@
   <% end %>
   <!-- E726 Fall2012 Changes End -->
 
-  <td>
+  <td align="left">
     <%= form_tag :controller=>'participants', :action=>'update_authorizations', :id => participant.id do %>
         <% params[:authorization] = authorization %>
         <select class="form-control" id=<%=participant.user_id%> name="authorization" style="font-size:15px">

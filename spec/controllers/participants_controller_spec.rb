@@ -76,7 +76,7 @@ describe ParticipantsController do
     end
   end
 
-  describe '#update_authorizations_2' do
+  describe '#validate_authorizations' do
   it 'updates the authorizations for the participant to make them reviewer' do
     allow(Participant).to receive(:find).with('1').and_return(participant)
     params = {authorization: 'reviewer', id: 1}

@@ -306,6 +306,27 @@ describe AssignmentsController do
         expect(response).to redirect_to('/assignments/2/edit')
       end
     end
+	
+	context 'when new assignment is not able to be copied' do
+      it 'should show an error and redirect to assignments#tree display page' do	  
+		allow(AssignmentForm).to receive(:copy).with("1", nil, instructor).and_return(false)
+        allow(Assignment).to receive(:find).with(2).and_return(false)
+        params = {id: 1}
+        get :copy, params
+        expect(flash[:note]).to be_nil
+        expect(flash[:error]).to eq('The assignment was not able to be copied. Please check the original assignment for missing information.')
+        expect(response).to redirect_to('/tree_display/list')
+      end
+    end
+  end
+  
+  describe '#checktopicscopy' do
+	it 'renders checktopicscopy page' do
+		allow(Assignment).to receive(:find).with(1).and_return(true)
+		params = {id: 1}
+		get :checktopicscopy, params
+		expect(response).to render_template(:checktopicscopy)
+	end
   end
 
   describe '#delete' do

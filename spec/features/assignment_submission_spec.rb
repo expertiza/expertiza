@@ -57,8 +57,14 @@ describe "assignment submisstion test" do
     signup_topic
     fill_in 'submission', with: "https://www.ncsu.edu"
     click_on 'Upload link'
+    dueDate1=DueDate.new
+    expect(DueDate).to receive(:where).and_return(dueDate1)
+    expect(dueDate1).to receive(:maximum).and_return(DateTime.now)
     fill_in 'submission', with: "https://www.google.com"
     click_on 'Upload link'
+    dueDate2=DueDate.new
+    expect(DueDate).to receive(:where).and_return(dueDate2)
+    expect(dueDate2).to receive(:maximum).and_return(DateTime.now)
     fill_in 'submission', with: "https://bing.com"
     click_on 'Upload link'
     expect(page).to have_content "https://www.ncsu.edu"
@@ -89,6 +95,9 @@ describe "assignment submisstion test" do
     click_on 'Upload link'
     expect(page).to have_content "The URL or URI is invalid. Reason: The hyperlink cannot be empty!"
     # hyperlink is "http://"
+    dueDate1=DueDate.new
+    expect(DueDate).to receive(:where).and_return(dueDate1)
+    expect(dueDate1).to receive(:maximum).and_return(DateTime.now)
     fill_in 'submission', with: "http://"
     click_on 'Upload link'
     expect(page).to have_content "The URL or URI is invalid."

@@ -203,7 +203,7 @@ class AssignmentParticipant < Participant
     attributes = ImportFileHelper.define_attributes(row_hash)
     user = ImportFileHelper.create_new_user(attributes, session)
 
-    password = user.reset_password
+    password = "temporaryPassword"
     MailerHelper.send_mail_to_user(user, "Your Expertiza account has been created.", "user_welcome", password).deliver
 
     raise ImportError, "The assignment with id \"#{id}\" was not found." if Assignment.find(id).nil?

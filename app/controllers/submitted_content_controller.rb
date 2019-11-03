@@ -57,8 +57,35 @@ class SubmittedContentController < ApplicationController
       end
       ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The link has been successfully submitted.', request)
       undo_link("The link has been successfully submitted.")
+
+      # get current date and time
+      cur_date = Time.now
+      # get the last due date for the review
+      max_due_date = DueDate.where(parent_id: @participant.assignment.id,deadline_type_id: 2).maximum("due_at")
+
+      # send mail only if the last due date has not passed
+      if cur_date <= max_due_date
+        email_submission_reviewers(@participant)
+      end
     end
     redirect_to action: 'edit', id: @participant.id
+  end
+
+  def email_submission_reviewers(participant)
+    if participant.reviewers.length != 0
+      participant.reviewers.each do |reviewer|
+        rev_res_map = ReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', reviewer.id, participant.team.id]).first
+        all_responses = Response.where(:map_id => rev_res_map.id).order("updated_at DESC").first
+
+        user = User.find(reviewer.user_id)
+
+        if user.email_on_submission?
+          MailerHelper.submission_mail_to_reviewr(user,
+                                             "New submission available to review.",
+                                             "update").deliver
+        end
+      end
+    end
   end
 
   # Note: This is not used yet in the view until we all decide to do so

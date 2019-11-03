@@ -304,6 +304,7 @@ describe AssignmentParticipant do
             allow(AssignmentParticipant).to receive(:exists?).with(user_id: 1, parent_id: 1).and_return(false)
             allow(AssignmentParticipant).to receive(:create).with(user_id: 1, parent_id: 1).and_return(participant)
             allow(participant).to receive(:set_handle).and_return('handle')
+            allow(MailerHelper).to receive(:send_mail_to_user).and_return(true)
             expect(AssignmentParticipant.import(row, nil, {}, 1)).to be_truthy
           end
         end

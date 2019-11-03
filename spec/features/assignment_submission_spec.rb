@@ -14,6 +14,8 @@ describe "assignment submisstion test" do
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: "submission").first, due_at: DateTime.now.in_time_zone + 1.day)
+
+
   end
 
   def signup_topic
@@ -59,6 +61,9 @@ describe "assignment submisstion test" do
   end
 
   it "should not submit duplicated link" do
+    dueDate=DueDate.new
+    expect(DueDate).to receive(:where).and_return(dueDate)
+    expect(dueDate).to receive(:maximum).and_return(DateTime.now)
     signup_topic
     fill_in 'submission', with: "https://google.com"
     click_on 'Upload link'

@@ -14,8 +14,6 @@ class BookmarksController < ApplicationController
     @bookmarks = Bookmark.where(topic_id: params[:id])
     @topic = SignUpTopic.find(params[:id])
     bookmark_rating_questionnaire = @topic.assignment.questionnaires.where(type: 'BookmarkRatingQuestionnaire')
-    puts bookmark_rating_questionnaire[0].nil?
-    puts "hello"
     if bookmark_rating_questionnaire[0].nil?
       @has_dropdown = true
     else

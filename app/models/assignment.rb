@@ -335,7 +335,7 @@ class Assignment < ActiveRecord::Base
     due_date = next_due_date(topic_id)
 
     unless self.staggered_deadline?
-      if finished?(topic_id) && !due_date.deadline_name.nil?
+      if !due_date.nil? && !finished?(topic_id) && !due_date.deadline_name.nil?
         return due_date.deadline_name
       else
         return get_current_stage(topic_id)
@@ -353,7 +353,7 @@ class Assignment < ActiveRecord::Base
       return nil if topic_id.nil?
     end
     due_date = next_due_date(topic_id)
-    if finished?(topic_id) or due_date.is_a?(TopicDueDate)
+    if finished?(topic_id) or due_date.nil? or due_date.is_a?(TopicDueDate)
       return nil
     else
       due_date.description_url
@@ -363,7 +363,7 @@ class Assignment < ActiveRecord::Base
   def stage_deadline(topic_id = nil)
     return 'Unknown' if topic_missing?(topic_id)
     due_date = next_due_date(topic_id)
-    finished?(topic_id) ? due_date : due_date.due_at.to_s
+    due_date.nil? || finished?(topic_id) ? due_date : due_date.due_at.to_s
   end
 
   def num_review_rounds
@@ -379,7 +379,7 @@ class Assignment < ActiveRecord::Base
   def get_current_stage(topic_id = nil)
     return 'Unknown' if topic_missing?(topic_id)
     due_date = next_due_date(topic_id)
-    finished?(topic_id) ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
+    due_date.nil? || finished?(topic_id) ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
   end
 
   def review_questionnaire_id(round = nil)

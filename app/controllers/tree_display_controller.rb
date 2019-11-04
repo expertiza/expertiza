@@ -7,9 +7,11 @@ class TreeDisplayController < ApplicationController
   end
 
   # refactored method to provide direct access to parameters
+  # added an argument prevTab for sending the respective tab to be highlighted on homepage
   def goto_controller(name_parameter, prevTab)
     node_object = TreeFolder.find_by(name: name_parameter)
     session[:root] = FolderNode.find_by(node_object_id: node_object.id).id
+    # if we have to highlight a tab, we store this arg. to the last_open_tab elements of session
     if(prevTab!=nil)
       session[:last_open_tab] = prevTab
     end
@@ -21,6 +23,7 @@ class TreeDisplayController < ApplicationController
     @node_type = params[:nodeType]
   end
 
+  # for all of the methods below, we send the respective tab to be highlighted (Courses:1, Assignments:2, Questionnaires:3)
   # direct access to questionnaires
   def goto_questionnaires
     goto_controller('Questionnaires','3')

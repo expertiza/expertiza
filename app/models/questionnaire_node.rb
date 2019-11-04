@@ -40,6 +40,9 @@ class QuestionnaireNode < Node
     Questionnaire.find_by(id: self.node_object_id).try(:name)
   end
 
+  # this method return instructor id associated with a questionnaire
+  # expects no arguments
+  # returns int
   def get_instructor_id
     Questionnaire.find_by(id: self.node_object_id).try(:instructor_id)
   end

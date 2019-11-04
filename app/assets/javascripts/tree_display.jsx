@@ -1,11 +1,19 @@
+// initialize a global object available throughout the application
+// can be useful on different pages
 let app_variables = {
   currentUserId: null
 };
 
+// execute the grabbing of user id after the page is fully loaded
+// helps to make sure that the react component is rendered for sure
+// also avoid hindering the rendering steps
 window.addEventListener('load', e => {
+  // grab the data attribute
   let treeDisplayDiv = document.querySelector('#tree_display');
+  // check if the html element is present requested in the query above
   if (treeDisplayDiv) {
-    app_variables.currentUserId = document.querySelector('#tree_display').dataset.userId;
+    // set the userid for the current user
+    app_variables.currentUserId = treeDisplayDiv.dataset.userId;
   }
 });
 jQuery(document).ready(function() {
@@ -101,6 +109,9 @@ jQuery(document).ready(function() {
           newNodeType = this.props.nodeType + "s"
         }
         if (this.props.is_available || newNodeType == 'questionnaires') {
+          // check if the user id exists
+          // check if the current user id matches the user/instructor id associated with a questionnaire/survey
+          // show edit button only for the items which are associated to that user
           if (app_variables.currentUserId == null || this.props.instructor_id == app_variables.currentUserId) {
             moreContent.push(
               <span>

@@ -282,7 +282,7 @@ class TreeDisplayController < ApplicationController
         res2 = {
           "nodeinfo" => child,
           "name" => child.get_name,
-          "instructor_id" => child.get_instructor_id,
+          "instructor_id" => child.get_instructor_id, # add instructor id to the payload to make it available in the frontend
           "key" => params[:reactParams2][:key],
           "type" => node_type,
           "private" => child.get_private,

@@ -202,7 +202,7 @@ class AssignmentParticipant < Participant
       raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 4
       attributes = ImportFileHelper.define_attributes(row_hash)
       user = ImportFileHelper.create_new_user(attributes, session)
-      password = user.reset_password
+      #password = user.reset_password
       MailerHelper.send_mail_to_user(user, "Your Expertiza account has been created.", "user_welcome", password).deliver
     end
     raise ImportError, "The assignment with id \"#{id}\" was not found." if Assignment.find(id).nil?

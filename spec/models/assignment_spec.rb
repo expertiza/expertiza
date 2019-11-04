@@ -348,15 +348,15 @@ describe Assignment do
     context 'when assignment has staggered deadline' do
       before(:each) { allow(assignment).to receive(:staggered_deadline?).and_return(true) }
       context 'topic_id is nil' do
-        it 'returns Unknow' do
+        it 'returns Unknown' do
           expect(assignment.current_stage_name(nil)).to eq('Unknown')
         end
       end
 
       context 'topic_id is not nil' do
         it 'returns Submission' do
-          allow(assignment).to receive(:get_current_stage_name).with(123).and_return('Submission')
-          expect(assignment.current_stage_name(123)).to eq('Submission')
+          allow(assignment).to receive(:get_current_stage_name).with(123).and_return('Finished')
+          expect(assignment.current_stage_name(123)).to eq('Finished')
         end
       end
     end

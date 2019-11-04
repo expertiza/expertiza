@@ -453,4 +453,40 @@ FactoryBot.define do
     id 1
     name 'fake_site'
   end
+  factory :bookmark, class: Bookmark do
+    id 1
+    url 'test.com'
+    title 'Test'
+    description 'This is a test topic'
+    user_id '42'
+    topic_id '1'
+    created_at '2018-10-24 21:18:19'
+    updated_at '2018-10-24 21:18:19'
+  end
+  factory :bookmarkrating, class: BookmarkRating do
+    id 1
+    bookmark_id 1
+    user_id '42'
+    rating '4'
+    created_at '2018-10-24 21:18:19'
+    updated_at '2018-10-24 21:18:19'
+  end
+
+  factory :participant_review, class: AssignmentParticipant do
+    id '42'
+    can_submit true
+    can_review true
+    assignment { Assignment.first || association(:assignment) }
+    association :user, factory: :student
+    submitted_at nil
+    permission_granted nil
+    penalty_accumulated 0
+    grade nil
+    type "AssignmentParticipant"
+    handle "handle"
+    time_stamp nil
+    digital_signature nil
+    duty nil
+    can_take_quiz true
+  end
 end

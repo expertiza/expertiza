@@ -496,13 +496,17 @@ jQuery(document).ready(function() {
       }
     },
       componentDidMount: function() {
-          rubBuffer = ["Review", "Metareview", "Author Feedback", "Teammate Review", "Assignment Survey", "Global Survey", "Course Survey"];
+        // this buffer holds the title for all of the rubric types under the Questionnaire tab
+          rubricBuffer = ["Review", "Metareview", "Author Feedback", "Teammate Review", "Assignment Survey", "Global Survey", "Course Survey"];
 
-          selMenuItem = document.getElementById("tree_display").getAttribute("data-menu-item");
-          selMenuItemInd = rubBuffer.indexOf(selMenuItem);
+       //selectedMenuItem then takes the clicked rubric from the panel under questionnaire
+       //selectedMenuItemIndex finds the corresponding index of the click rubric from the above buffer
+          selectedMenuItem = document.getElementById("tree_display").getAttribute("data-menu-item");
+          selectedMenuItemIndex = rubricBuffer.indexOf(selectedMenuItem);
 
-          if (selMenuItemInd !== -1) {
-          if(rubBuffer[selMenuItemInd] === this.props.name) {
+          if (selectedMenuItemIndex !== -1) {
+          if(rubricBuffer[selectedMenuItemIndex] === this.props.name) {
+              //if the name matches, expand the rubric panel by setting this property to true
                   this.setState({
                       expanded: true
                   }, function () {

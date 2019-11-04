@@ -13,6 +13,11 @@ describe Bookmark do
       bookmark.url = 'www.google.com'
       expect(bookmark).to be_valid
     end
+    it 'Validates format of url' do
+      expect(bookmark).to be_valid
+      bookmark.url = 'testing'
+      expect(bookmark).not_to be_valid
+    end
   end
   describe '#title' do
     it 'Validate presence of title which cannot be blank' do

@@ -146,13 +146,14 @@ describe BookmarksController do
     end
   end
 
-  # context '#new_bookmark_review' do
-  #   it 'when Bookmark Rating is updated successfully' do
-  #     allow(Bookmark).to receive(:find).with("1").and_return(bookmark)
-  #     allow(AssignmentParticipant).to receive(:find_by).with(user_id: 42).and_return(participant_review)
-  #     @params = {id: 1}
-  #     get :new_bookmark_review, @params, session
-  #     expect(response).to redirect_to('http://test.host/response/new?id=' + @params[:id].to_s + '&return=bookmark')
-  #   end
-  # end
+  context '#new_bookmark_review' do
+    it 'when Bookmark Rating is updated successfully' do
+      allow(Bookmark).to receive(:find).with("1").and_return(bookmark)
+      allow(SignUpTopic).to receive(:find).with(bookmark.topic_id).and_return(topic)
+      allow(AssignmentParticipant).to receive(:find_by).with(user_id: 42).and_return(participant_review)
+      @params = {id: 1}
+      get :new_bookmark_review, @params, session
+      expect(response).to redirect_to('http://test.host/response/new?id=' + @params[:id].to_s + '&return=bookmark')
+    end
+  end
 end

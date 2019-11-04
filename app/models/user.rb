@@ -126,7 +126,7 @@ class User < ActiveRecord::Base
 
   # Function which has a MailerHelper which sends the mail welcome email to the user after signing up
   def email_welcome
-    MailerHelper.send_mail_to_user(self, "Your Expertiza password has been created", "user_welcome", password).deliver
+    MailerHelper.send_mail_to_user(self, "Your Expertiza password has been created", "user_welcome", password)
   end
 
   def valid_password?(password)
@@ -148,7 +148,7 @@ class User < ActiveRecord::Base
       attributes = ImportFileHelper.define_attributes(row_hash)
       user = ImportFileHelper.create_new_user(attributes, session)
       password = user.reset_password
-      #MailerHelper.send_mail_to_user(user, "Your Expertiza account has been created.", "user_welcome", password).deliver
+      MailerHelper.send_mail_to_user(user, "Your Expertiza account has been created.", "user_welcome", password).deliver
     else
       user.email = row_hash[:email]
       user.fullname = row_hash[:fullname]

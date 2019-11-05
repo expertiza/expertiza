@@ -75,15 +75,12 @@ describe VmQuestionResponse  do
     context 'when intitialized with a author feedback questionnaire' do
       it 'adds reviews' do
         response = VmQuestionResponse.new(author_feedback_questionnaire, assignment, 1)
-        #allow(participant).to receive(:feedback).and_return(reviews)
         allow(FeedbackResponseMap).to receive(:where).with(reviewer_id: 3).and_return([double(id: 1, reviewer_id: 3, reviewee_id: 4, response_id: 1)])
-        # allow(Participant).to receive(:find_by).with(id: 4).and_return(reviewee)
-	      response.add_reviews(participant, team, false)
+        response.add_reviews(participant, team, false)
         expect(response.list_of_reviews.size).to eq(0)
         expect(response.list_of_reviewers.size).to eq(1)
-        # expect(response.list_of_reviewers.first).to eq(reviewee)
-      end
-    end
+        end
+     end
 
     context 'when intitialized with a teammate review questionnaire' do
       it 'adds reviews' do

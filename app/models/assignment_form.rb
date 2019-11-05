@@ -330,14 +330,14 @@ class AssignmentForm
       if copyoption != 'copyWithoutTopics'
         topics = SignUpTopic.where(assignment_id: old_assign.id)
         topics.each do |topic|
-          newSignUpTopic = SignUpTopic.create(topic_name: topic.topic_name, assignment_id: new_assign_id, max_choosers: topic.max_choosers, category: topic.category, topic_identifier: topic.topic_identifier, micropayment: topic.micropayment)
+          new_sign_up_topic = SignUpTopic.create(topic_name: topic.topic_name, assignment_id: new_assign_id, max_choosers: topic.max_choosers, category: topic.category, topic_identifier: topic.topic_identifier, micropayment: topic.micropayment)
 
           if copyoption == 'copyWithTopicsTeams'
-            oldSignedUpTeams = SignedUpTeam.where(topic_id: topic.id)
-            oldSignedUpTeams.each do |oldSignedUpTeam|
-              newSignedUpTeam = oldSignedUpTeam.dup
-              newSignedUpTeam.update_attribute('topic_id', newSignUpTopic.id)
-              newSignedUpTeam.save
+            old_signed_up_teams = SignedUpTeam.where(topic_id: topic.id)
+            old_signed_up_teams.each do |old_signed_up_team|
+              new_signed_up_team = old_signed_up_team.dup
+              new_signed_up_team.update_attribute('topic_id', new_sign_up_topic.id)
+              new_signed_up_team.save
             end
           end
         end
@@ -357,7 +357,8 @@ class AssignmentForm
         notification_limit: aq.notification_limit,
         questionnaire_weight: aq.questionnaire_weight,
         used_in_round: aq.used_in_round,
-      dropdown: aq.dropdown)
+        dropdown: aq.dropdown
+      )
     end
   end
 end

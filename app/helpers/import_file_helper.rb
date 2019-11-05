@@ -11,7 +11,7 @@ module ImportFileHelper
     attributes["email_on_submission"] = 1
     attributes["email_on_review"] = 1
     attributes["email_on_review_of_review"] = 1
-    attributes["handle"] = row_hash[:fullname]
+    attributes["handle"] = row_hash[:name]
     attributes
   end
 

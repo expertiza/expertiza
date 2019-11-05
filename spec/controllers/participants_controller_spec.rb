@@ -77,6 +77,7 @@ describe ParticipantsController do
   end
 
   describe '#validate_authorizations' do
+
   it 'updates the authorizations for the participant to make them reviewer' do
     allow(Participant).to receive(:find).with('1').and_return(participant)
     params = {authorization: 'reviewer', id: 1}
@@ -89,6 +90,19 @@ describe ParticipantsController do
     expect(participant.can_submit).to eq(false)
     expect(participant.can_take_quiz).to eq(false)
   end
+
+  #Test for case where we encounter an error in update_attributes method
+  it ' throws an exception while validating authorizations' do
+    allow(Participant).to receive(:find).with('1').and_return(participant)
+    allow(participant).to receive(:update_attributes).and_raise(StandardError)
+    params = {authorization: 'reviewer', id: 1}
+    session = {user: instructor}
+    get :update_authorizations, params, session
+    # if can_submit == false and can_review == true and can_take_quiz == false
+    # can check the flash message
+    expect(flash[:error]).to eq 'The update action failed.'
+  end
+
   end
 
 

@@ -118,10 +118,13 @@ class SignUpSheetController < ApplicationController
 
   # This deletes all selected topics
   def delete_all_selected_topics
+  # get all selected topics
     load_all_selected_topics
+  # delete those topics
     @stopics.each(&:destroy)
     flash[:success] = "All selected topics have been deleted successfully."
     respond_to do |format|
+  # redirect to the edit page
       format.html { redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2" }
       format.js {}
     end

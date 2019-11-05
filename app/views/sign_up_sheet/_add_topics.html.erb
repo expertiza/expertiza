@@ -70,14 +70,17 @@
 <% end %>
 
 <script>
+// This function shows the massage, then calls the delete_all_selected_topics function in sign_up_sheet_controller
 function deleteTopics() {
     var msg = 'Are you sure? It will delete all the selected topics!';
     if (confirm(msg)) {
         var identifiers = []
+        //find the identifiers
         $("#TopicTable input[type=checkbox]:checked").each(function() {
             var ient = $(this).closest('tr').find('#topicIdentifier').text();
             identifiers.push(ient);
         });
+        // call the method, pass the data
         jQuery.ajax({
             url: '/sign_up_sheet/delete_all_selected_topics',
             method: 'POST',
@@ -91,6 +94,7 @@ function deleteTopics() {
             }
         });
     } else {
+        //if not confirmed, just go back to the edit page.
         window.location.href = '<%= edit_assignment_path(@assignment.id) + "#tabs-2" %>';
     }
 }

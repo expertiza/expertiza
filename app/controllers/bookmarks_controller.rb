@@ -81,6 +81,8 @@ class BookmarksController < ApplicationController
     redirect_to action: 'list', id: @bookmark.topic_id
   end
 
+  # Saves the responses to the bookmark review questionnaire.
+  # If a previous response exists it updates it.
   def new_bookmark_review
     bookmark = Bookmark.find(params[:id])
     topic = SignUpTopic.find(bookmark.topic_id)

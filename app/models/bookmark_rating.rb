@@ -2,6 +2,7 @@ class BookmarkRating < ActiveRecord::Base
   belongs_to :bookmark
   belongs_to :user
 
+  # Calculates the rating of a bookmark when review type is a rubric and not a dropdown
   def self.average_based_on_rubric(bookmark)
     if bookmark.nil?
       0
@@ -20,7 +21,7 @@ class BookmarkRating < ActiveRecord::Base
       end
     end
   end
-
+  # fetches the previously added responses to rate a bookmark
   def self.get_bookmark_rating_response_map(bookmark, current_user)
     BookmarkRatingResponseMap.find_by(
       reviewed_object_id: SignUpTopic.find(bookmark.topic_id).assignment.id,

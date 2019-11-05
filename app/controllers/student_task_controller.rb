@@ -57,10 +57,15 @@ class StudentTaskController < ApplicationController
     @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
     
     #THE FOLLOWING CODE IS ADDED FOR THE TAG COUNT FEATURE
+    #This code is meant to help display the total number of tags completed by this user for this
+    #assignment.
+    #Get all questionnaires for the assignment
     questionnaires = @assignment.questionnaires
+    #vmlist holds all VmQuestionResponses for this assignment
     vmlist = []
     questionnaires.each do |questionnaire|
       @round = nil
+      #This code does not make sense but was borrowed from GradesController.view_team which worked
       if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
         questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
         if questionnaires.count > 1
@@ -71,6 +76,7 @@ class StudentTaskController < ApplicationController
           counter_for_same_rubric = 0
         end
       end
+      #A VmQuestionResponse helps count the number of tags the user has done/should do.
       vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
       vmquestions = questionnaire.questions
       vm.add_questions(vmquestions)
@@ -79,15 +85,24 @@ class StudentTaskController < ApplicationController
       vm.number_of_comments_greater_than_10_words
       vmlist << vm
     end
+    #completed_tags holds the number of tags this user has completed
     @completed_tags = 0
+    #total tags holds the number of tags which it is possible to fill out for this user for this assignment
     @total_tags = 0
     vmlist.each do |vm|
+      #Each row corresponds to a row of tags to complete
       vm.list_of_rows.each do |r|
         r.score_row.each do |row|
+          #Checkboxes can be left empty and they will still be "completed" tags. That's why this type
+          #of tag is ignored
           vm_prompts = row.vm_prompts.select {|prompt| prompt.tag_dep.tag_prompt.control_type.downcase != "checkbox"}
+          #Increment by the number of tag prompts it is possible to fill out for this row
           @total_tags += vm_prompts.count
+          #For each tag it is possible to do
           vm_prompts.each do |vm_prompt|
+            #Grab the answer the user has given for this tag
             answer_tag = AnswerTag.where(tag_prompt_deployment_id: vm_prompt.tag_dep, user_id: @participant.user_id, answer: vm_prompt.answer).first
+            #For non-checkbox answer tags, 0 indicates the user has not completed this tag
             if !answer_tag.nil? and answer_tag.value != "0"
               @completed_tags += 1
             end

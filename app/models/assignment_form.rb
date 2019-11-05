@@ -331,13 +331,13 @@ class AssignmentForm
         topics = SignUpTopic.where(assignment_id: old_assign.id)
         topics.each do |topic|
           new_sign_up_topic = SignUpTopic.create(
-		                        topic_name: topic.topic_name,
-								assignment_id: new_assign_id,
-								max_choosers: topic.max_choosers,
-								category: topic.category,
-								topic_identifier: topic.topic_identifier,
-								micropayment: topic.micropayment
-							  )
+                                topic_name: topic.topic_name,
+                                assignment_id: new_assign_id,
+                                max_choosers: topic.max_choosers,
+                                category: topic.category,
+                                topic_identifier: topic.topic_identifier,
+                                micropayment: topic.micropayment
+                              )
 
           if copyoption == 'copyWithTopicsTeams'
             old_signed_up_teams = SignedUpTeam.where(topic_id: topic.id)

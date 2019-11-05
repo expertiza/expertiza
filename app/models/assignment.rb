@@ -330,7 +330,7 @@ class Assignment < ActiveRecord::Base
   # For varying rubric feature
   def current_stage_name(topic_id = nil)
     if self.staggered_deadline?
-      return (topic_id.nil? ? 'Unknown' : get_current_stage(topic_id))
+      return (topic_id.nil? ? 'Unknown' : get_current_stage_name(topic_id))
     end
     due_date = next_due_date(topic_id)
     if(due_date.nil?)
@@ -341,7 +341,7 @@ class Assignment < ActiveRecord::Base
       if !due_date.nil? && !finished?(topic_id) && !due_date.deadline_name.nil?
         return due_date.deadline_name
       else
-        return get_current_stage(topic_id)
+        return get_current_stage_name(topic_id)
       end
     end
   end
@@ -382,7 +382,7 @@ class Assignment < ActiveRecord::Base
   end
 
   # Zhewei: this method is almost the same as 'stage_deadline'
-  def get_current_stage(topic_id = nil)
+  def get_current_stage_name(topic_id = nil)
     return 'Unknown' if topic_missing?(topic_id)
     due_date = next_due_date(topic_id)
     due_date.nil? || finished?(topic_id) ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name

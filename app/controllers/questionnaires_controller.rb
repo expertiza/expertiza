@@ -7,11 +7,11 @@ class QuestionnairesController < ApplicationController
   before_action :authorize
 
   #Declaring Constants values
-  MINIMUM_QUESTION_SCORE = 0 
-  MAXIMUM_QUESTION_SCORE = 1
+  QUESTION_MIN_SCORE = 0
+  QUESTION_MAX_SCORE = 1
   QUESTION_MAX_LABEL = 'Strongly agree'
   QUESTION_MIN_LABEL = 'Strongly disagree'
-  CRITERION_QUESTION_SIZE = '50, 3'
+  QUESTION_CRITERION_SIZE = '50, 3'
   DROPDOWN_SCALE = '0|1|2|3|4|5'
   TEXT_AREA_SIZE = '60, 5'
   TEXT_FIELD_SIZE = '30'
@@ -169,7 +169,7 @@ class QuestionnairesController < ApplicationController
           break_before: true
       )
       if question.is_a? ScoredQuestion
-        question.weight = MAXIMUM_QUESTION_SCORE
+        question.weight = QUESTION_MAX_SCORE
         question.min_label = QUESTION_MIN_LABEL
         question.max_label = QUESTION_MAX_LABEL
       end
@@ -299,7 +299,7 @@ class QuestionnairesController < ApplicationController
 
   def question_size(question)
     if question.is_a? Criterion
-    CRITERION_QUESTION_SIZE
+    QUESTION_CRITERION_SIZE
     elsif question.is_a? TextArea
     TEXT_AREA_SIZE
     elsif question.is_a? TextField

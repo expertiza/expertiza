@@ -29,8 +29,8 @@ class QuizQuestionnaireController < QuestionnairesController
     if valid_request && Questionnaire::QUESTIONNAIRE_TYPES.include?(params[:model])
       @questionnaire = Object.const_get(params[:model]).new
       @questionnaire.private = params[:private]
-      @questionnaire.min_question_score = MINIMUM_QUESTION_SCORE
-      @questionnaire.max_question_score = MAXIMUM_QUESTION_SCORE
+      @questionnaire.min_question_score = QUESTION_MIN_SCORE
+      @questionnaire.max_question_score = QUESTION_MAX_SCORE
       render 'questionnaires/new_quiz'
     else
       redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
@@ -43,8 +43,8 @@ class QuizQuestionnaireController < QuestionnairesController
     if valid.eql?("valid")
       @questionnaire = Object.const_get(params[:questionnaire][:type]).new(questionnaire_params)
       participant_id = params[:pid] # creating a local variable to send as parameter to submitted content if it is a quiz questionnaire
-      @questionnaire.min_question_score = MINIMUM_QUESTION_SCORE
-      @questionnaire.max_question_score = MAXIMUM_QUESTION_SCORE
+      @questionnaire.min_question_score = QUESTION_MIN_SCORE
+      @questionnaire.max_question_score = QUESTION_MAX_SCORE
       author_team = AssignmentTeam.team(Participant.find(participant_id))
 
       @questionnaire.instructor_id = author_team.id # for a team assignment, set the instructor id to the team_id

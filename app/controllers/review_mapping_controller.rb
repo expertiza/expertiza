@@ -85,47 +85,64 @@ class ReviewMappingController < ApplicationController
   def assign_reviewer_dynamically
     assignment = Assignment.find(params[:assignment_id])
     reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
-   
-    @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.id)
+
     if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
       flash[:error] = "No topic is selected.  Please go back and select a topic."
     else
-      if @review_mappings.size >= assignment.num_reviews_allowed
-        flash[:notice] = "You cannot do more than " + assignment.num_reviews_allowed.to_s + " reviews based on assignment policy"
-        
+      if is_review_allowed?(assignment, reviewer)
+        if check_outstanding_reviews?(assignment, reviewer)
+          # begin
+          if assignment.topics? # assignment with topics
+            topic = if params[:topic_id]
+                      SignUpTopic.find(params[:topic_id])
+                    else
+                      assignment.candidate_topics_to_review(reviewer).to_a.sample rescue nil
+                    end
+            if topic.nil?
+              flash[:error] = "No topics are available to review at this time. Please try later."
+            else
+              assignment.assign_reviewer_dynamically(reviewer, topic)
+            end
+
+          else # assignment without topic -Yang
+            assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
+            assignment_team = assignment_teams.to_a.sample rescue nil
+            if assignment_team.nil?
+              flash[:error] = "No artifacts are available to review at this time. Please try later."
+            else
+              assignment.assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
+            end
+          end
+        end
       else
-
-      # begin
-      if assignment.topics? # assignment with topics
-        topic = if params[:topic_id]
-                  SignUpTopic.find(params[:topic_id])
-                else
-                  assignment.candidate_topics_to_review(reviewer).to_a.sample rescue nil
-                end
-        if topic.nil?
-          flash[:error] = "No topics are available to review at this time. Please try later."
-        else
-          assignment.assign_reviewer_dynamically(reviewer, topic)
-        end
-
-      else # assignment without topic -Yang
-        assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
-        assignment_team = assignment_teams.to_a.sample rescue nil
-        if assignment_team.nil?
-          flash[:error] = "No artifacts are available to review at this time. Please try later."
-        else
-          assignment.assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
-        end
-
+        flash[:notice] = "You cannot do more than " + assignment.num_reviews_allowed.to_s + " reviews based on assignment policy"
       end
-    end
-    # rescue Exception => e
-    #   flash[:error] = (e.nil?) ? $! : e
-    # end
+      # rescue Exception => e
+      #   flash[:error] = (e.nil?) ? $! : e
+      # end
     end
     redirect_to controller: 'student_review', action: 'list', id: reviewer.id
   end
 
+  def is_review_allowed?(assignment, reviewer)
+    @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id:  assignment.id)
+    assignment.num_reviews_allowed > @review_mappings.size
+  end
+
+  def check_outstanding_reviews?(assignment, reviewer)
+    @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
+    @num_reviews_total = @review_mappings.size
+    if @num_reviews_total == 0
+      true
+    else
+      @num_reviews_completed = 0
+      @review_mappings.each do |map|
+        @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
+      end
+      @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed
+      @num_reviews_in_progress < Assignment.max_outstanding_reviews
+    end
+  end
   # assigns the quiz dynamically to the participant
   def assign_quiz_dynamically
     begin

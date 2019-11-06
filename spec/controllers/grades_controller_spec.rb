@@ -16,7 +16,7 @@ describe GradesController do
 
   before(:each) do
     allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
-    allow(TaMapping).to receive(:where).with(id:'1', course_id:"1").and_return(tamapping)
+    allow(TaMapping).to receive(:where).with(id: '1', course_id: "1").and_return(tamapping)
     allow(participant).to receive(:team).and_return(team)
     stub_current_user(instructor, instructor.role.name, instructor.role)
     allow(Assignment).to receive(:find).with('1').and_return(assignment)

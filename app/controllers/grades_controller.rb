@@ -170,11 +170,14 @@ class GradesController < ApplicationController
   def save_grade_and_comment_for_submission
     @participant = AssignmentParticipant.find_by(id: params[:participant_id])
     @assignment = @participant.assignment
+    # Check in TaMapping table to find out whether the TA is teaching for this class
+    # TaMapping maps TA_id associates with course_id
     if TaMapping.where(ta_id: current_user.id, course_id: @assignment.course.id) == nil && current_user.role.name != 'Instructor'
-      flash[:error] = 'Unauthorized action!'
-      redirect_to controller: 'grades', action: 'view_team', id: participant.id
       # if cannot find TA's id attach to this course, he/she could not grade for this course's assignment
+      flash[:error] = 'Unauthorized action!'
+      redirect_to controller: 'grades', action: 'view_team', id: participant.id   
     else
+      # if find TA's id attach to this course or the current user is Instructor, he/she could grade for this course's assignment
       participant = AssignmentParticipant.find_by(id: params[:participant_id])
       @team = participant.team
       @team.grade_for_submission = params[:grade_for_submission]

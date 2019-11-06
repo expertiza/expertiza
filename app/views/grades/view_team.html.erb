@@ -117,11 +117,12 @@
               <th class="sorter-false">
                 <span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback.">metric-1</span>
               </th>
+              <!-- The following code is added for -->
+              <!--  http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_E1953._Tagging_report_for_student -->
+              <!-- See app/controllers/grades_controller#view_team -->
               <th class="sorter-false" align="right" >
-                <span  data-toggle="tooltip" data-placement="right" title="A count of Tags, for the respective round. The purpose of this is to represent how many tags has been answered.">Reviews Tagged </span>
-                <!-- The following code is added for -->
-                <!--  http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_E1953._Tagging_report_for_student -->
-                <!-- See app/controllers/grades_controller#view_team -->
+                <span  data-toggle="tooltip" data-placement="right" title="A count of Tags, for the respective round. The purpose of this is to represent how many tags has been answered.">Tags Completed </span>
+                
                 <br>
                 <span id="tag_counts_<%= vm.round.to_i %>"><%= @completed_tags_array[vm.round.to_i - 1] %> </span> <span> / <%= @total_tags_array[vm.round.to_i - 1] %></span>
               </th>

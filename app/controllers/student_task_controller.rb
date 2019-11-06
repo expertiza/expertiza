@@ -57,6 +57,7 @@ class StudentTaskController < ApplicationController
     @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
     
     #THE FOLLOWING CODE IS ADDED FOR THE TAG COUNT FEATURE
+    #http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_E1953._Tagging_report_for_student
     #This code is meant to help display the total number of tags completed by this user for this
     #assignment.
     #Get all questionnaires for the assignment

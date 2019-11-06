@@ -210,7 +210,7 @@ class AssignmentParticipant < Participant
       user = ImportFileHelper.create_new_user(attributes, session)
 
     end
-    raise ImportError, "The assignment with id \"#{id}\" was not found." if Assignment.find(id).nil
+    raise ImportError, "The assignment with id \"#{id}\" was not found." if Assignment.find(id).nil?
 
     #if user is already added to the assignment then return.
     return if AssignmentParticipant.exists?(user_id: user.id, parent_id: id)

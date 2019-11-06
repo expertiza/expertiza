@@ -42,13 +42,15 @@ toggleLabel = function(range) {
 update_tag_count = function(tag_prompt, round_number) {
     //This is the new value of the tag
     var val = tag_prompt.value;
+    console.log("val: " + val);
     //This is the current tag count for the round this tag is in
-    var current_count = parseInt($('#tag_counts_' + round_number).innerHTML)
+    var current_count = $('#tag_counts_' + (round_number - 1)).innerHTML;
+    console.log("current_count: " + current_count);
     if(val == 0) {
       //The user has reset the value of this tag. Decrement the tag count
-      $('#tag_counts_' + round_number).innerHTML = current_count - 1
+      $('#tag_counts_' + round_number).innerHTML = current_count - 1;
     } else {
       //The user has set the value of this tag to something meaningful. Increment the count
-      $('#tag_counts_' + round_number).innerHTML = current_count + 1
+      $('#tag_counts_' + round_number).innerHTML = current_count + 1;
     }
 }

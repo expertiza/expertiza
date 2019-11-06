@@ -271,6 +271,7 @@ class UsersController < ApplicationController
 
   private
 
+  # we added two new flags preference_home_flag and preference_edit_flag for profile page to make user choose where he wants to see the options.
   def user_params
     params.require(:user).permit(:name,
                                  :crypted_password,

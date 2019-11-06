@@ -11,6 +11,7 @@ class ProfileController < ApplicationController
   def update
     params.permit!
     @user = session[:user]
+    # we tried to check weather we are able to fetch the home flag from the front end.
     # @username = session[:user].fullname
     # @prefernece = session[:user].preference_home_flag
     # if (session[:user].preference_home_flag)
@@ -32,7 +33,7 @@ class ProfileController < ApplicationController
   end
 
   private
-
+# we added two new flags preference_home_flag and preference_edit_flag for profile page to make user choose where he wants to see the options.
   def user_params
     params.require(:user).permit(:name,
                                  :crypted_password,

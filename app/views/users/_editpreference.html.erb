@@ -1,3 +1,4 @@
+<%#created two checkboxes where the user can select where he wants to make the assignment operations visible %>
 <% request_user ||= false %>
 <%if !request_user%>
     <div>
@@ -6,7 +7,6 @@
           <th align='left'>Where do you want to see actions?</th>
         </tr>
         <tr>
-          <!--<td><label for="user_preference_home_flag">On the homepage</label></td>-->
           <td><%= label_tag('user[preference_home_flag]', 'On the homepage')%></td>
           <td><%= check_box 'user', 'preference_home_flag', {},  true, false  %></td>
         </tr>

@@ -44,6 +44,7 @@ update_tag_count = function(tag_prompt, round_number) {
     var val = tag_prompt.value;
     console.log("val: " + val);
     //This is the current tag count for the round this tag is in
+    console.log("div id: " + '#tag_counts_' + (round_number));
     var current_count = $('#tag_counts_' + (round_number)).innerHTML;
     console.log("current_count: " + current_count);
     if(val == 0) {

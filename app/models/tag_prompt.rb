@@ -62,6 +62,9 @@ class TagPrompt < ActiveRecord::Base
     assignment = tag_prompt_deployment.assignment
     questionnaire = tag_prompt_deployment.questionnaire
     round_number = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: questionnaire.id).used_in_round
+    if round_number == nil
+      round_number = 0
+    end
 
     # change the color of the label based on its value
     if value.to_i < 0

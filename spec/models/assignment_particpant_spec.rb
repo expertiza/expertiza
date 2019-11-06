@@ -278,6 +278,23 @@ describe AssignmentParticipant do
         end
       end
 
+      context 'when new user needs to be created' do
+        let(:row) do
+          {name: 'no one', fullname: 'no one', email: 'name@email.com', role:'user_role_name', parent: 'user_parent_name'}
+        end
+        let(:attributes) do
+          {role_id: 1, name: 'no one', fullname: 'no one', email: 'name@email.com', email_on_submission: 'name@email.com',
+           email_on_review: 'name@email.com', email_on_review_of_review: 'name@email.com'}
+        end
+        it 'create the user and number of mails sent should be 1' do
+          ActionMailer::Base.deliveries.clear
+          allow(ImportFileHelper).to receive(:define_attributes).with(row).and_return(attributes)
+          allow(Assignment).to receive(:find).with(1).and_return(assignment)
+          allow(User).to receive(:exists?).with(name: 'no one').and_return(false)
+          expect(AssignmentParticipant.import(row, nil, {}, 1)).to change { ActionMailer::Base.deliveries.count }.by(1)
+        end
+      end
+
       context 'when the record has more than 4 items' do
         let(:row) do
           {name: 'no one', fullname: 'no one', email: 'name@email.com', role:'user_role_name', parent: 'user_parent_name'}
@@ -305,14 +322,6 @@ describe AssignmentParticipant do
             allow(AssignmentParticipant).to receive(:create).with(user_id: 1, parent_id: 1).and_return(participant)
             allow(participant).to receive(:set_handle).and_return('handle')
             expect(AssignmentParticipant.import(row, nil, {}, 1)).to be_truthy
-          end
-        end
-        context 'when user with given user_name is not present in the system' do
-          it 'create the user and number of mails sent should be 1' do
-            ActionMailer::Base.deliveries.clear
-            allow(Assignment).to receive(:find).with(1).and_return(assignment)
-            allow(User).to receive(:exists?).with(name: 'no one').and_return(false)
-            expect(AssignmentParticipant.import(row, nil, {}, 1)).to change { ActionMailer::Base.deliveries.count }.by(1)
           end
         end
       end

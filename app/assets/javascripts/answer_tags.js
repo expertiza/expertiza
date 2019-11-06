@@ -39,13 +39,19 @@ toggleLabel = function(range) {
  * E1953 
  * http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_E1953._Tagging_report_for_student
  */
-update_tag_count = function(old_value, new_value, round_number) {
+update_tag_count = function(tag_prompt, round_number) {
+    //Get the previous value of this tag prompt from an HTML attribute
+    var old_value = tag_prompt.data-prev_value
+    //This is the new value of the tag prompt
+    var new_value = tag_prompt.value
+    //Store the new value back into the HTML attribute
+    tag_prompt.data-prev_value = new_value
     //This is the current tag count for the round this tag is in
     var current_count = parseInt(document.getElementById('tag_counts_' + (round_number)).innerHTML);
-    if(old_value != 0 && new_value == 0) {
+    if(old_value != "0" && new_value == "0") {
       //The user has reset the value of this tag. Decrement the tag count
       document.getElementById('tag_counts_' + round_number).innerHTML = current_count - 1;
-    } else if(old_value == 0 && new_value != 0){
+    } else if(old_value == "0" && new_value != "0"){
       //The user has set the value of this tag to something meaningful. Increment the count
       document.getElementById('tag_counts_' + round_number).innerHTML = current_count + 1;
     }

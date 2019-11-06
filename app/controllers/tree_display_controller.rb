@@ -24,7 +24,7 @@ class TreeDisplayController < ApplicationController
   end
 
   # for all of the methods below, we send the respective tab to be highlighted (Courses:1, Assignments:2, Questionnaires:3)
-  # direct access to questionnaires
+  # direct access to the questionnaires
   def goto_questionnaires
     goto_controller('Questionnaires','3')
   end

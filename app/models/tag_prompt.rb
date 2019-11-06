@@ -59,7 +59,9 @@ class TagPrompt < ActiveRecord::Base
     no_text_class = "toggle-false-msg"
     yes_text_class = "toggle-true-msg"
     #For E1953. The number of the round this tag prompt was used in
-    round_number = answer.response.round
+    assignment = tag_prompt_deployment.assignment
+    questionnaire = tag_prompt_deployment.questionnaire
+    round_number = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: questionnaire.id).used_in_round
 
     # change the color of the label based on its value
     if value.to_i < 0

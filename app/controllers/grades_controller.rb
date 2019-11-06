@@ -176,14 +176,13 @@ class GradesController < ApplicationController
     @assignment = @participant.assignment
     tm = TaMapping.where(ta_id: current_user.id, course_id: @assignment.course.id)
     if tm.nil? && current_user.role.name != 'Instructor'
-      redirect_to controller: 'grades', action: 'view_team', id: participant.id
+      redirect_to controller: 'grades', action: 'view_team', id: @participant.id
     else
-      participant = AssignmentParticipant.find_by(id: params[:participant_id])
-      @team = participant.team
+      @team = @participant.team
       @team.grade_for_submission = params[:grade_for_submission]
       @team.comment_for_submission = params[:comment_for_submission]
       @team.save 
-      redirect_to controller: 'grades', action: 'view_team', id: participant.id
+      redirect_to controller: 'grades', action: 'view_team', id: @participant.id
     end
   end
 

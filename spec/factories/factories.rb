@@ -34,8 +34,8 @@ FactoryBot.define do
   end
 
   factory :tamapping, class: TaMapping do
-    ta_id '1'
-    course_id '1'
+    ta_id 6
+    course_id 1
   end
 
   factory :admin, class: User do

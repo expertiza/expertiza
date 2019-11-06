@@ -188,8 +188,9 @@ describe GradesController do
       it 'saves grade and comment for submission and refreshes the grades#view_team page' do
         allow(AssignmentParticipant).to receive(:find_by).with(id: '1').and_return(participant)
         allow(participant).to receive(:team).and_return(build(:assignment_team, id: 2, parent_id: 8))
-        allow(TaMapping).to receive(:where).with(id:'1', course_id:"1").and_return(tamapping)
+        allow(TaMapping).to receive(:where).with(ta_id: 6, course_id: 1).and_return(tamapping)
         params = {
+          ta_id: 6,
           participant_id: 1,
           course_id:1,
           grade_for_submission: 100,
@@ -206,8 +207,9 @@ describe GradesController do
       it 'saves grade and comment for submission and refreshes the grades#view_team page' do
         allow(AssignmentParticipant).to receive(:find_by).with(id: '1').and_return(participant)
         allow(participant).to receive(:team).and_return(build(:assignment_team, id: 2, parent_id: 8))
-        allow(TaMapping).to receive(:where).with(id:'1', course_id:"1").and_return(nil)
+        allow(TaMapping).to receive(:where).with(ta_id: 6, course_id:1).and_return(nil)
         params = {
+          ta_id: 6,
           participant_id: 1,
           course_id: 1,
           grade_for_submission: 100,

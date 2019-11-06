@@ -2,10 +2,6 @@ FactoryBot.define do
   factory :institution, class: Institution do
     name 'North Carolina State University'
   end
-  factory :tamapping, class: TaMapping do
-    ta_id 1
-    course_id 1
-  end
 
   factory :role_of_administrator, class: Role do
     name 'Administrator'
@@ -35,6 +31,11 @@ FactoryBot.define do
     name 'Teaching Assistant'
     parent_id nil
     description ''
+  end
+
+  factory :tamapping, class: TaMapping do
+    ta_id '1'
+    course_id '1'
   end
 
   factory :admin, class: User do

@@ -41,7 +41,7 @@ toggleLabel = function(range) {
  */
 update_tag_count = function(tag_prompt, round_number) {
     //Get the previous value of this tag prompt from an HTML attribute
-    var old_value = tag_prompt.data-prev_value
+    var old_value = tag_prompt.attr(data-prev_value)
     //This is the new value of the tag prompt
     var new_value = tag_prompt.value
     //Store the new value back into the HTML attribute

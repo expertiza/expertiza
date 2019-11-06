@@ -175,7 +175,6 @@ class GradesController < ApplicationController
       redirect_to controller: 'grades', action: 'view_team', id: participant.id
       # if cannot find TA's id attach to this course, he/she could not grade for this course's assignment
     else
-
       participant = AssignmentParticipant.find_by(id: params[:participant_id])
       @team = participant.team
       @team.grade_for_submission = params[:grade_for_submission]

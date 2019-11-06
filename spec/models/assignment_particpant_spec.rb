@@ -309,6 +309,7 @@ describe AssignmentParticipant do
         end
         context 'when user with given user_name is not present in the system' do
           it 'create the user and number of mails sent should be 1' do
+            ActionMailer::Base.deliveries.clear
             allow(Assignment).to receive(:find).with(1).and_return(assignment)
             allow(User).to receive(:exists?).with(name: 'no one').and_return(false)
             expect(AssignmentParticipant.import(row, nil, {}, 1)).to change { ActionMailer::Base.deliveries.count }.by(1)

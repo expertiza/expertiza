@@ -172,7 +172,8 @@ class GradesController < ApplicationController
     @assignment = @participant.assignment
     # Check in TaMapping table to find out whether the TA is teaching for this class
     # TaMapping maps TA_id associates with course_id
-    if TaMapping.where(ta_id: current_user.id, course_id: @assignment.course.id) == nil && current_user.role.name != 'Instructor'
+    tm=TaMapping.where(ta_id: current_user.id, course_id: @assignment.course.id)
+    if tm.nil? && current_user.role.name != 'Instructor'
       # if cannot find TA's id attach to this course, he/she could not grade for this course's assignment
       flash[:error] = 'Unauthorized action!'
       redirect_to controller: 'grades', action: 'view_team', id: participant.id   

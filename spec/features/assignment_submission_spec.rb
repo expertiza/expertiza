@@ -93,6 +93,7 @@ describe "assignment submisstion test" do
     expect(File.read(file_upload_path)).to have_content "valid_assignment_file: This is a .txt file to test assignment submission."
   end
 
+  # a .txt file is of valid types so it should be submitted success
   it "is able to submit multiple valid files" do
     signup_topic
     # upload file1
@@ -139,19 +140,4 @@ describe "assignment submisstion test" do
     expect(File).to exist(file_upload_path)
     expect(File.read(file_upload_path)).to have_content "This is the updated file."
   end
-
-    # a .txt file is of valid types so it should be submitted success
-  it "is able to submit valid type of file" do
-    signup_topic
-    file_path = Rails.root + "spec/features/assignment_submission_txts/valid_assignment_file.txt"
-    attach_file('uploaded_file', file_path)
-    click_on 'Upload file'
-    expect(page).to have_content "valid_assignment_file.txt"
-
-    # check content of the uploaded file
-    file_upload_path = Rails.root + "pg_data/instructor6/csc517/test/Assignment1684/0/valid_assignment_file.txt"
-    expect(File).to exist(file_upload_path)
-    expect(File.read(file_upload_path)).to have_content "valid_assignment_file: This is a .txt file to test assignment submission."
-  end
-
 end

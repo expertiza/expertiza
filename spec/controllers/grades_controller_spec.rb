@@ -12,6 +12,7 @@ describe GradesController do
   let(:student) { build(:student) }
   let(:review_response_map) { build(:review_response_map, id: 1) }
   let(:assignment_due_date) { build(:assignment_due_date) }
+  let(:tamapping) { build(:tamapping) }
 
   before(:each) do
     allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
@@ -190,6 +191,7 @@ describe GradesController do
         allow(TaMapping).to receive(:where).with(id:'1',course_id:"1").and_return(tamapping)
         params = {
           participant_id: 1,
+          course_id:1,
           grade_for_submission: 100,
           comment_for_submission: 'comment'
         }
@@ -201,16 +203,17 @@ describe GradesController do
     # test invalid situation when TA is grade the assignment which he plays a student role in this course
     context 'when TA grade the assignment for course he plays a studnet' do
       it 'saves grade and comment for submission and refreshes the grades#view_team page' do
-        allow(AssignmentParticipant).to receive(:find_by).with(id: '1').and_return(participant)
+        allow(AssignmentParticipant).to receive(:find_by).with(id: '2').and_return(participant)
         allow(participant).to receive(:team).and_return(build(:assignment_team, id: 2, parent_id: 8))
-        allow(TaMapping).to receive(:where).with(id:'2',course_id:"1").and_return(null)
+        allow(TaMapping).to receive(:where?).with(id:'1',course_id:"2").and_return()
         params = {
-          participant_id: 2,
+          participant_id: 1,
+          course_id: 2,
           grade_for_submission: 100,
           comment_for_submission: 'comment'
         }
         post :save_grade_and_comment_for_submission, params
-        expect(flash[:error]).to be 'Unauthorized action!'
+        expect(flash[:error]).to eq("Unauthorized action!")
         expect(response).to redirect_to('/grades/view_team?id=1')
       end
     end

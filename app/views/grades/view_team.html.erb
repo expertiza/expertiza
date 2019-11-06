@@ -119,8 +119,11 @@
               </th>
               <th class="sorter-false" align="right" >
                 <span  data-toggle="tooltip" data-placement="right" title="A count of Tags, for the respective round. The purpose of this is to represent how many tags has been answered.">Reviews Tagged </span>
+                <!-- The following code is added for -->
+                <!--  http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_E1953._Tagging_report_for_student -->
+                <!-- See app/controllers/grades_controller#view_team -->
                 <br>
-                <span><%= @completed_tags_array[vm.round.to_i - 1] %> / <%= @total_tags_array[vm.round.to_i - 1] %></span>
+                <span id="tag_counts_<%= vm.round.to_i %>"><%= @completed_tags_array[vm.round.to_i - 1] %> </span> <span> / <%= @total_tags_array[vm.round.to_i - 1] %></span>
               </th>
 
             </tr>

@@ -58,6 +58,28 @@ class TagPrompt < ActiveRecord::Base
     control_id = "tag_prompt_" + element_id
     no_text_class = "toggle-false-msg"
     yes_text_class = "toggle-true-msg"
+    
+    #For E1953.
+    #The old value of this tag
+    
+    puts "========================================================================"
+    puts stored_tags.to_s
+    puts "========================================================================"
+    
+    if stored_tags.nil? || stored_tags.empty?
+      old_value = 0
+    else
+      old_value = stored_tags.last.value
+    end
+    #The assignment which contains this prompt
+    assignment = tag_prompt_deployment.assignment
+    #The quesionnaire which contains this prompt
+    questionnaire = tag_prompt_deployment.questionnaire
+    #The number of the round this tag prompt was used in
+    round_number = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: questionnaire.id).used_in_round
+    if round_number == nil
+      round_number = 0
+    end
 
     # change the color of the label based on its value
     if value.to_i < 0
@@ -69,7 +91,14 @@ class TagPrompt < ActiveRecord::Base
     html += '<div class="toggle-container tag_prompt_container" title="' + self.desc.to_s + '">'
     html += ' <div class="' + no_text_class + '" id="no_text_' + element_id + '">No</div>'
     html += ' <div class="range-field" style=" width:60px">'
-    html += '   <input type="range" name="tag_checkboxes[]" id="' + control_id + '" min="-1" class="rangeAll" max="1" value="' + value + '" onLoad="toggleLabel(this)" onChange="toggleLabel(this); save_tag(' + answer.id.to_s + ', ' + tag_prompt_deployment.id.to_s + ', ' + control_id + ');"></input>'
+    html += '   <input type="range" name="tag_checkboxes[]" id="' + control_id + '" min="-1" class="rangeAll" max="1" value="' + value + '"' +
+    #Added for E1953. Stores the previous value of this range in an attribute for use in the javascript function
+    'data-prev_value="' + old_value.to_s + '" ' +
+    'onLoad="toggleLabel(this);" onChange="toggleLabel(this); '  +
+    #The following code was added for http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_E1953._Tagging_report_for_student
+    #See assets/javascripts/answer_tags.js#update_tag_count for details
+    'update_tag_count(this, ' + round_number.to_s + '); ' +
+    'save_tag(' + answer.id.to_s + ', ' + tag_prompt_deployment.id.to_s + ', ' + control_id + ');"></input>'
     html += ' </div>'
     html += ' <div class="' + yes_text_class + '" id="yes_text_' + element_id + '">Yes</div>'
     html += ' <div class="toggle-caption">' + self.prompt.to_s + '</div>'

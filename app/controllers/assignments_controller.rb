@@ -32,8 +32,7 @@ class AssignmentsController < ApplicationController
       exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
       dir_path = assignment_form_params[:assignment][:directory_path]
       exist_directory = Assignment.find_by(directory_path: dir_path, course_id: @assignment_form.assignment.course_id)
-      if !exist_assignment and !exist_directory
-        if @assignment_form.save
+      if (!exist_assignment and !exist_directory) and @assignment_form.save
           @assignment_form.create_assignment_node
           current_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
           assignment_form_params[:assignment][:id] = current_assignment.id.to_s
@@ -53,12 +52,8 @@ class AssignmentsController < ApplicationController
           redirect_to edit_assignment_path aid
           undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
           return
-        else
-          flash.now[:error] = "Failed to create assignment"
-          render 'new'
-        end
       else
-        flash.now[:error] = "This assignment/directory already exists in the selected course. Kindly rename."
+        flash.now[:error] = "Failed to create an assignment. May be since the assignment/directory already exists in the selected course. Kindly rename."
         render 'new'
       end
     else

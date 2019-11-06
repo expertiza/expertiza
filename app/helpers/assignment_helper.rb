@@ -4,7 +4,7 @@ module AssignmentHelper
     if session[:user].role.name == 'Teaching Assistant'
       courses = []
       ta = Ta.find(session[:user].id)
-      #the course corresponding to each TA will be added to the dropdown
+      #the course corresponding to each TA will be added to the dropdown.
       ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id) }
       courses.flatten!
     # Administrator and Super-Administrator can see all courses

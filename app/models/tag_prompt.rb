@@ -69,7 +69,7 @@ class TagPrompt < ActiveRecord::Base
     if stored_tags.nil? || stored_tags.empty?
       old_value = 0
     else
-      old_value = stored_tags.last
+      old_value = stored_tags.last.value
     end
     #The assignment which contains this prompt
     assignment = tag_prompt_deployment.assignment
@@ -93,7 +93,7 @@ class TagPrompt < ActiveRecord::Base
     html += ' <div class="range-field" style=" width:60px">'
     html += '   <input type="range" name="tag_checkboxes[]" id="' + control_id + '" min="-1" class="rangeAll" max="1" value="' + value + '"' +
     #Added for E1953. Stores the previous value of this range in an attribute for use in the javascript function
-    'data-prev_value="' + old_value + '" ' +
+    'data-prev_value="' + old_value.to_s + '" ' +
     'onLoad="toggleLabel(this);" onChange="toggleLabel(this); '  +
     #The following code was added for http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_E1953._Tagging_report_for_student
     #See assets/javascripts/answer_tags.js#update_tag_count for details

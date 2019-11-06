@@ -286,10 +286,17 @@ describe AssignmentParticipant do
           {role_id: 1, name: 'no one', fullname: 'no one', email: 'name@email.com', email_on_submission: 'name@email.com',
            email_on_review: 'name@email.com', email_on_review_of_review: 'name@email.com'}
         end
+        let(:test_user) do
+          {name: 'abc', email: 'abcbbc@gmail.com'}
+        end
         it 'create the user and number of mails sent should be 1' do
           ActionMailer::Base.deliveries.clear
           allow(ImportFileHelper).to receive(:define_attributes).with(row).and_return(attributes)
-          allow(ImportFileHelper).to receive(:create_new_user).with(attributes, {}).and_return(User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789')
+          allow(ImportFileHelper).to receive(:create_new_user) do
+            test_user = User.new(name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com')
+            test_user.save!
+          end
+          #allow(ImportFileHelper).to receive(:create_new_user).with(attributes, {}).and_return()
           allow(Assignment).to receive(:find).with(1).and_return(assignment)
           allow(User).to receive(:exists?).with(name: 'no one').and_return(false)
           allow(participant).to receive(:set_handle).and_return('handle')

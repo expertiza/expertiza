@@ -61,11 +61,6 @@ class TagPrompt < ActiveRecord::Base
     
     #For E1953.
     #The old value of this tag
-    
-    puts "========================================================================"
-    puts stored_tags.to_s
-    puts "========================================================================"
-    
     if stored_tags.nil? || stored_tags.empty?
       old_value = 0
     else

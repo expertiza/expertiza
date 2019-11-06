@@ -82,27 +82,17 @@ class SubmittedContentController < ApplicationController
     redirect_to action: action, id: @participant.id
   end
 
-
-
-
-  # ////////////////////
-
-
-
-
   def submit_file
     participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(participant.user_id)
     file = params[:uploaded_file]
-
-    #checking file's params to verify file type and size 
-
-    if(file.size>5*1024*1024)
+    # checking file's params to verify file type and size 
+    if (file.size > 5 * 1024 * 1024)
       flash[:error] = 'File Size must smaller than 5MB!'
       redirect_to action: 'edit', id: participant.id
     end
-    type=file.original_filename.split('.')
-    if %w(pdf jpg jpeg tar zip png 7z odt docx).include? type[1].downcase==false
+    type = file.original_filename.split('.')
+    if %w(pdf jpg jpeg tar zip png 7z odt docx).include? type[1].downcase == false
       flash[:error] = 'File type error!'
       redirect_to action: 'edit', id: participant.id
     end
@@ -112,9 +102,9 @@ class SubmittedContentController < ApplicationController
     @current_folder.name = "/"
     @current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name]) if params[:current_folder]
     curr_directory = if params[:origin] == 'review'
-                       participant.review_file_path(params[:response_map_id]).to_s + @current_folder.name
+                      participant.review_file_path(params[:response_map_id]).to_s + @current_folder.name
                      else
-                       participant.team.path.to_s + @current_folder.name
+                      participant.team.path.to_s + @current_folder.name
                      end
     FileUtils.mkdir_p(curr_directory) unless File.exist? curr_directory
     safe_filename = file.original_filename.tr('\\', "/")

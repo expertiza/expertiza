@@ -33,6 +33,11 @@ FactoryBot.define do
     description ''
   end
 
+  factory :tamapping, class: TaMapping do
+    ta_id 6
+    course_id 1
+  end
+
   factory :admin, class: User do
     sequence(:name) {|n| "admin#{n}" }
     role { Role.where(name: 'Administrator').first || association(:role_of_administrator) }

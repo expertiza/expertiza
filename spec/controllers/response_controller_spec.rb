@@ -10,6 +10,7 @@ describe ResponseController do
   let(:assignment_questionnaire) { build(:assignment_questionnaire) }
   let(:answer) { double('Answer') }
   let(:assignment_due_date) { build(:assignment_due_date) }
+  let(:bookmark) { build(:bookmark) }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -290,6 +291,15 @@ describe ResponseController do
         @params[:return] = 'survey'
         get :redirect, @params
         expect(response).to redirect_to('/survey_deployment/pending_surveys')
+      end
+    end
+
+    context 'when params[:return] is bookmark' do
+      it 'redirects to bookmarks#list page' do
+        allow(Bookmark).to receive(:find).with(1).and_return(bookmark)
+        @params[:return] = 'bookmark'
+        get :redirect, @params
+        expect(response).to redirect_to('/bookmarks/list?id=1')
       end
     end
 

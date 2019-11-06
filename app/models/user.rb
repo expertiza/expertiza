@@ -126,6 +126,7 @@ class User < ActiveRecord::Base
 
   # Function which has a MailerHelper which sends the mail welcome email to the user after signing up
   def email_welcome
+    #this will send an account creation notification to user via email.
     MailerHelper.send_mail_to_user(self, "Your Expertiza account and password has been created", "user_welcome", password).deliver_now
   end
 
@@ -147,7 +148,7 @@ class User < ActiveRecord::Base
     if user.nil?
       attributes = ImportFileHelper.define_attributes(row_hash)
       user = ImportFileHelper.create_new_user(attributes, session)
-      password = user.reset_password
+      #password = user.reset_password
       #MailerHelper.send_mail_to_user(user, "Your Expertiza account has been created.", "user_welcome", password).deliver
     else
       user.email = row_hash[:email]

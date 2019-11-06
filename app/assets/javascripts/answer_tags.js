@@ -39,15 +39,13 @@ toggleLabel = function(range) {
  * E1953 
  * http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_E1953._Tagging_report_for_student
  */
-update_tag_count = function(tag_prompt, round_number) {
-    //This is the new value of the tag
-    var val = tag_prompt.value;
+update_tag_count = function(old_value, new_value, round_number) {
     //This is the current tag count for the round this tag is in
     var current_count = parseInt(document.getElementById('tag_counts_' + (round_number)).innerHTML);
-    if(val == 0) {
+    if(old_value != 0 && new_value == 0) {
       //The user has reset the value of this tag. Decrement the tag count
       document.getElementById('tag_counts_' + round_number).innerHTML = current_count - 1;
-    } else {
+    } else if(old_value == 0 && new_value != 0){
       //The user has set the value of this tag to something meaningful. Increment the count
       document.getElementById('tag_counts_' + round_number).innerHTML = current_count + 1;
     }

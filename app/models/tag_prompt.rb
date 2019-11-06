@@ -88,7 +88,7 @@ class TagPrompt < ActiveRecord::Base
     html += '   <input type="range" name="tag_checkboxes[]" id="' + control_id + '" min="-1" class="rangeAll" max="1" value="' + value + '" onLoad="toggleLabel(this)" onChange="toggleLabel(this);' 
     #The following code was added for http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_E1953._Tagging_report_for_student
     #See assets/javascripts/answer_tags.js#update_tag_count for details
-    'update_tag_count(this, ' + round_number.to_s + ');' +
+    'update_tag_count(' + old_value + 'this.value, ' + round_number.to_s + ');' +
     'save_tag(' + answer.id.to_s + ', ' + tag_prompt_deployment.id.to_s + ', ' + control_id + ');"></input>'
     html += ' </div>'
     html += ' <div class="' + yes_text_class + '" id="yes_text_' + element_id + '">Yes</div>'

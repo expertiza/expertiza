@@ -86,12 +86,13 @@ class SubmittedContentController < ApplicationController
     participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(participant.user_id)
     file = params[:uploaded_file]
-    # checking file's params to verify file type and size 5MB=5 * 1024 * 1024
+    # checking file's params to verify file size 5MB=5 * 1024 * 1024
     if file.size > 5 * 1024 * 1024
       flash[:error] = 'File Size must smaller than 5MB!'
       redirect_to action: 'edit', id: participant.id
     end
     type = file.original_filename.split('.')
+    # checking file's type to verify file type must be one of pdf jpg jpeg tar zip png 7z odt docx
     if %w[pdf jpg jpeg tar zip png 7z odt docx].include? type[1].downcase == false
       flash[:error] = 'File type error!'
       redirect_to action: 'edit', id: participant.id

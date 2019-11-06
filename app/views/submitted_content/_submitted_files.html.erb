@@ -17,15 +17,6 @@
 <% end %>
 <br/><br/>
 
-
-
-
-
-<!--///////////////////////-->
-
-
-
-
 <% if (files.length > 0 or stage != "Finished")  %>
   <% if same_team_flag && stage != "Finished" %>
     <h4>&#8226; Submit a file:</h4>
@@ -63,7 +54,6 @@
 <!--No files have been submitted.-->
 <% end %>
 
-
 <!-- checking file type & size by using javascript -->
 <script>
     var _validFileExtensions = ["pdf", "jpg", "jpeg", "tar", "zip", "png", "7z", "odt", "docx"];
@@ -77,7 +67,6 @@
                 oInput.value = "";
                 return false;
             }
-
             if (sFileName.length > 0) {
                 var blnValid = false;
                 for (var j = 0; j < _validFileExtensions.length; j++) {
@@ -87,15 +76,13 @@
                         break;
                     }
                 }
-
-                if (!blnValid) {
-                    // alert(sFileName + " is invalid, allowed file types are: " + _validFileExtensions.join(", "));
-                    alert("Allowed file types are: " + _validFileExtensions.join(", "));
-
-                    oInput.value = "";
-                    return false;
-                }
+            if (!blnValid) {
+                // alert(sFileName + " is invalid, allowed file types are: " + _validFileExtensions.join(", "));
+                alert("Allowed file types are: " + _validFileExtensions.join(", "));
+                oInput.value = "";
+                return false;
             }
+          }
         }
         return true;
     }

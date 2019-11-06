@@ -33,3 +33,22 @@ toggleLabel = function(range) {
         $('#' + yes_text_id).attr('class', 'toggle-true-msg textActive');
     }
 }
+
+/**
+ * Updates the tag count on the page when a tag is changed
+ * E1953 
+ * http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_E1953._Tagging_report_for_student
+ */
+update_tag_count = function(tag_prompt, round_number) {
+    //This is the new value of the tag
+    var val = tag_prompt.value;
+    //This is the current tag count for the round this tag is in
+    var current_count = parseInt($('#tag_counts_' + round_number).innerHTML)
+    if(val == 0) {
+      //The user has reset the value of this tag. Decrement the tag count
+      $('#tag_counts_' + round_number).innerHTML = current_count - 1
+    } else {
+      //The user has set the value of this tag to something meaningful. Increment the count
+      $('#tag_counts_' + round_number).innerHTML = current_count + 1
+    }
+}

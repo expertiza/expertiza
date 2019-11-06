@@ -61,9 +61,15 @@ class TagPrompt < ActiveRecord::Base
     
     #For E1953.
     #The old value of this tag
-    old_value = AnswerTag.find_by(tag_prompt_deployment_id: tag_prompt_deployment.id).value
-    if old_value.nil?
+    
+    puts "========================================================================"
+    puts stored_tags.to_s
+    puts "========================================================================"
+    
+    if stored_tags.nil? || stored_tags.empty?
       old_value = 0
+    else
+      old_value = stored_tags.last
     end
     #The assignment which contains this prompt
     assignment = tag_prompt_deployment.assignment

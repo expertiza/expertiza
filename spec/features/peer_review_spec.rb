@@ -135,15 +135,19 @@ describe "review path testing" do
     create(:question)
   end
 
-  #participant id is 3 for student3
+  #This is a list of lists of lists. The test below will iterate through this list to generate test cases.
+  #Each element of normal_test_paths is a list describing the user flow that the below test will simulate.
+  #Each element of each user flow list is itself a 2-element list. The first element contains either the button/link 
+  #for the test to click, or the link for the test to visit. The second element is some text that should be displayed
+  #on the web page that results from the action described by the first element.
   normal_test_paths = [
     [["Student_task","Select an assignment"] ,["ReviewTestAssignment","Others' work"], ["Others' work",'Reviews for "ReviewTestAssignment"']],
     [["Contact Us","Welcome!"], ["Student_task","Select an assignment"], ["ReviewTestAssignment","Others' work"], ["Others' work",'Reviews for "ReviewTestAssignment"']],
     [["Home","Welcome!"], ["Student_task","Select an assignment"], ["ReviewTestAssignment","Others' work"], ["Others' work",'Reviews for "ReviewTestAssignment"']],
     [["Profile","User Profile Information"], ["Student_task","Select an assignment"], ["ReviewTestAssignment","Others' work"], ["Others' work",'Reviews for "ReviewTestAssignment"']],
     [["Student_task","Select an assignment"], ["/student_task/view?id=3","Others' work"], ["Others' work",'Reviews for "ReviewTestAssignment"']],
-    [["Contact Us","Welcome!"], ["/student_task/view?id=3","Others' work"], ["Others' work",'Reviews for "ReviewTestAssignment"']],
-    [["Home","Welcome!"], ["/student_task/view?id=3","Others' work"], ["Others' work",'Reviews for "ReviewTestAssignment"']],
+    [["Contact Us","Welcome!"], ["/student_task/view?id=3","Others' work"], ["Others' work",'Reviews for "ReviewTestAssignment"']], #participant id is 3 for student3
+    [["Home","Welcome!"], ["/student_task/view?id=3","Others' work"], ["Others' work",'Reviews for "ReviewTestAssignment"']], 
     [["Profile","User Profile Information"], ["/student_task/view?id=3","Others' work"], ["Others' work",'Reviews for "ReviewTestAssignment"']],
     [["Student_task","Select an assignment"], ["/student_review/list?id=3",'Reviews for "ReviewTestAssignment"']],
     [["Contact Us","Welcome!"], ["/student_review/list?id=3",'Reviews for "ReviewTestAssignment"']],
@@ -153,16 +157,17 @@ describe "review path testing" do
         ["Others' work",'Reviews for "ReviewTestAssignment"']],
   ]
 
-  normal_test_paths.each do |test_path| #loop to generate a test for every entry in test_paths. This will also ensure DB is reset between tests.
+  normal_test_paths.each do |test_path| #loop to generate a test for every entry in normal_test_paths. This will also ensure DB is reset between tests.
     description_list = []
     test_path.each do |path_step|
       description_list.append(path_step[0])
     end
+    #create path description do be displayed when tests run
     path_description = description_list.join(' -> ')
     path_description.concat(" -> Request a new submission to review -> Begin")
     it "user can take path #{path_description} to begin a review" do
-      login_as(@student3.name)
-      test_path.each do |path_step|
+      login_as(@student3.name) #log in as a student user
+      test_path.each do |path_step| #go through user flow path up until "Request a new submission to review" button
         where_to_go = path_step[0]
         expected_text = path_step[1]
         if where_to_go.include? '/' #if user navigates to page using direct url

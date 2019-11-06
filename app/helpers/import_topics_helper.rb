@@ -15,14 +15,6 @@ module ImportTopicsHelper
     attributes["link"] = row_hash[:link].strip unless row_hash[:link].nil?
     attributes
   end
-  
-  #The trim_non_ascii method takes a string input and replaces all ascii characters occuring in the string with a whitespace
-  def self.trim_non_ascii(string)
-    string.split('').each do |char|
-      !char.ascii_only? ? string.tr!(char, ' ') : nil
-    end
-    string.gsub!(/\s+/, ' ')
-  end
 
   # The old method is commented out below.
   # The define_attributes and define_attributes_extra methods were merged.
@@ -61,5 +53,13 @@ module ImportTopicsHelper
     assign_team = SignedUpTeam.new(attributes)
     assign_team.save!
   end
-
+  
+    #The trim_non_ascii method takes a string input and replaces all ascii characters occuring in the string with a whitespace
+  private  
+  def self.trim_non_ascii(string)
+    string.split('').each do |char|
+      !char.ascii_only? ? string.tr!(char, ' ') : nil
+    end
+    string.gsub!(/\s+/, ' ')
+  end
 end

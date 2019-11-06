@@ -17,4 +17,14 @@ class BookmarkRatingQuestionnaire < Questionnaire
   def get_assessments_for(participant)
     participant.bookmark_reviews
   end
+
+  # method to check if a dropdown is used for rating bookmarks
+  def self.has_dropdown?(topic)
+    bookmark_rating_questionnaire = topic.assignment.questionnaires.where(type: 'BookmarkRatingQuestionnaire')
+    if bookmark_rating_questionnaire[0].nil?
+      true
+    else
+      false
+    end
+  end
 end

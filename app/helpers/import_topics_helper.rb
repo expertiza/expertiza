@@ -4,7 +4,7 @@ module ImportTopicsHelper
 
   def self.define_attributes(row_hash)
     attributes = {}
-    if !row_hash[:description].nil? and !row_hash[:description].ascii_only?
+    if !row_hash[:description].nil? and !row_hash[:description].ascii_only? #check for non ascii occurrences in the description field
       row_hash[:description] = self.trim_non_ascii(row_hash[:description])
     end
     attributes["topic_identifier"] = row_hash[:topic_identifier].strip
@@ -15,7 +15,8 @@ module ImportTopicsHelper
     attributes["link"] = row_hash[:link].strip unless row_hash[:link].nil?
     attributes
   end
-
+  
+  #The trim_non_ascii method takes a string input and replaces all ascii characters occuring in the string with a whitespace
   def self.trim_non_ascii(string)
     string.split('').each do |char|
       !char.ascii_only? ? string.tr!(char, ' ') : nil

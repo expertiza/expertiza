@@ -289,6 +289,7 @@ describe AssignmentParticipant do
         it 'create the user and number of mails sent should be 1' do
           ActionMailer::Base.deliveries.clear
           allow(ImportFileHelper).to receive(:define_attributes).with(row).and_return(attributes)
+          allow(ImportFileHelper).to receive(:create_new_user).with(attributes, {}).and_return(User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789')
           allow(Assignment).to receive(:find).with(1).and_return(assignment)
           allow(User).to receive(:exists?).with(name: 'no one').and_return(false)
           expect(AssignmentParticipant.import(row, nil, {}, 1)).to change { ActionMailer::Base.deliveries.count }.by(1)

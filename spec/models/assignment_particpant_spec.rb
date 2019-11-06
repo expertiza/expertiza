@@ -295,7 +295,7 @@ describe AssignmentParticipant do
           allow(participant).to receive(:set_handle).and_return('handle')
           allow(AssignmentParticipant).to receive(:create).and_return(participant)
           allow(AssignmentParticipant).to receive(:set_handle)
-          expect(AssignmentParticipant.import(row, nil, {}, 1)).to change { ActionMailer::Base.deliveries.count }.by(1)
+          expect{(AssignmentParticipant.import(row, nil, {}, 1))}.to change { ActionMailer::Base.deliveries.count }.by(1)
         end
       end
 

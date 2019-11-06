@@ -65,7 +65,7 @@ to display the label "Your team" in the student assignment tasks-->
       <% end %>
       <!--Zhewei: professor mentioned that a submission is reviewable if the submission is in a stage where reviews can be done. It does not depend on the stage of the topic the reviewer is writing on-->
       <!--Akshay: Fix Issue 1218 - this link is disabled if assignment does not require any peer reviews-->
-      <% if review_deadline?(@assignment) and (check_reviewable_topics(@assignment) or @assignment.metareview_allowed(nil) or @assignment.swathi(@topic_id) == "Finished") %>
+      <% if review_deadline?(@assignment) and (check_reviewable_topics(@assignment) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@topic_id) == "Finished") %>
         <%= link_to "#{@alias_name}",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
       <% else %>
         <font color="gray"><%= @alias_name%></font>
@@ -78,7 +78,7 @@ to display the label "Your team" in the student assignment tasks-->
   <%if @assignment.require_quiz%>
     <% if @authorization == 'participant' or @can_take_quiz == true %>
       <li>
-        <% if @assignment.require_quiz and (@assignment.quiz_allowed(@topic_id) or @assignment.swathi(@topic_id) == "Finished") %>
+        <% if @assignment.require_quiz and (@assignment.quiz_allowed(@topic_id) or @assignment.get_current_stage(@topic_id) == "Finished") %>
           <%= link_to "Take quizzes", student_quizzes_path(:id => @participant.id) %>
         <% else %>
           <font color="gray">Take quizzes</font>
@@ -103,7 +103,7 @@ to display the label "Your team" in the student assignment tasks-->
       <li><%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
     <% end %>
 
-    <% if @assignment.swathi(@topic_id) == "Complete" %>
+    <% if @assignment.get_current_stage(@topic_id) == "Complete" %>
       <!-- removed code for survey assignment add in line above && SurveyHelper::is_user_eligible_for_survey?	(@assignment.id, session[:user].id)  -->
       <li><%= link_to "Take a survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id} %> (This will log you out)</li>
     <% end %>

@@ -77,14 +77,13 @@ describe ParticipantsController do
   end
 
   describe '#validate_authorizations' do
-
+  #Test case for successful update of participant to reviewer, checks the success flash message
   it 'updates the authorizations for the participant to make them reviewer' do
     allow(Participant).to receive(:find).with('1').and_return(participant)
     params = {authorization: 'reviewer', id: 1}
     session = {user: instructor}
     get :update_authorizations, params, session
     # if can_submit == false and can_review == true and can_take_quiz == false
-    # can check the flash message
     expect(flash[:success]).to eq 'The role of the selected participants has been successfully updated.'
     expect(participant.can_review).to eq(true)
     expect(participant.can_submit).to eq(false)

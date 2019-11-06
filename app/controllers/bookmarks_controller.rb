@@ -96,7 +96,7 @@ class BookmarksController < ApplicationController
     redirect_to new_response_url(id: response_map.id, return: 'bookmark')
   end
 
-  # method to check if a dropdown is used for rating bookmarks
+  # checks if a dropdown is used for rating bookmarks
   def has_dropdown?(topic)
     bookmark_rating_questionnaire = topic.assignment.questionnaires.where(type: 'BookmarkRatingQuestionnaire')
     if bookmark_rating_questionnaire[0].nil?

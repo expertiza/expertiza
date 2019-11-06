@@ -27,7 +27,6 @@
           <% sum += bookmark_rating.rating %>
         <% end %>
         <td>
-          <% if BookmarkRatingQuestionnaire.has_dropdown?(@topic) %>
           <% if has_dropdown?(@topic) %>
             <% if @bookmark_ratings.size > 0 %>
               <%= (sum * 1.0 / @bookmark_ratings.size).round(1) %>

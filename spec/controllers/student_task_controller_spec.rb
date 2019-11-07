@@ -38,10 +38,14 @@ describe StudentTaskController do
   #This method so far, only tests functionality added in E1953
   describe '#view' do
     before(:each) do
+      allow(StudentTask).to receive(:from_participant_id).with(id: 1).and_return(participant)
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
       allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(assignment_questionnaire)
       allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
       allow(review_questionnaire).to receive(:used_in_round).and_return(0)
+    end
+    it "reports zero required tags correctly"
+      params = {id: 1}
     end
   end
 end

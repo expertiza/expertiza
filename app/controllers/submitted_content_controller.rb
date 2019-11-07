@@ -71,6 +71,7 @@ class SubmittedContentController < ApplicationController
     redirect_to action: 'edit', id: @participant.id
   end
 
+  
   def email_submission_reviewers(participant)
     # Checking if the work has been reviewed by anyone
     if participant.reviewers.length != 0

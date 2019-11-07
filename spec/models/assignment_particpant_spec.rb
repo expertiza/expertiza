@@ -294,9 +294,9 @@ describe AssignmentParticipant do
           allow(ImportFileHelper).to receive(:define_attributes).with(row).and_return(attributes)
           allow(ImportFileHelper).to receive(:create_new_user) do
             test_user = User.new(name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com')
-            temp_user.id = 123
+            test_user.id = 123
             test_user.save!
-            return temp_user
+            return test_user
           end
           #allow(ImportFileHelper).to receive(:create_new_user).with(attributes, {}).and_return()
           allow(Assignment).to receive(:find).with(1).and_return(assignment)

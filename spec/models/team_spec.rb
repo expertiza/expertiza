@@ -230,6 +230,14 @@ describe Team do
         end
       end
 
+      context 'when handle_dups option is rename with assignment team' do
+        it 'returns new team name' do
+          allow(Assignment).to receive(:find).with(1).and_return(double('Assignment', name: 'no assignment'))
+          allow(Team).to receive(:generate_team_name).and_return('new team name')
+          expect(Team.handle_duplicate(team, 'no name', 1, 'rename', AssignmentTeam)).to eq('new team name')
+        end
+      end
+
       context 'when handle_dups option is rename' do
         it 'returns new team name' do
           allow(Course).to receive(:find).with(1).and_return(double('Course', name: 'no course'))
@@ -246,6 +254,15 @@ describe Team do
           expect(Team.handle_duplicate(team, 'no name', 1, 'rename_existing', CourseTeam)).to eq('no name')
         end
       end
+
+      
+      context 'when handle_dups option is rename_existing for assignment team' do
+       it 'returns new team name' do
+         allow(Assignment).to receive(:find).with(1).and_return(double('Assignment', name: 'assignment 1'))
+         allow(Team).to receive(:generate_team_name).and_return('new name of team')
+         expect(Team.handle_duplicate(team, 'no name', 1, 'rename_existing', AssignmentTeam)).to eq('no name')
+       end
+     end
 
       context 'when handle_dups option is replace' do
         it 'deletes the old team' do

@@ -40,7 +40,7 @@
           <% end %>
         </td>
         <td>
-         <!-- Only allow to rate a bookmark which is not uploaded by the current user -->
+         <!-- Only allow user to rate a bookmark which is not uploaded by the current user -->
           <% if bookmark.user.id != current_user.id %>
             <% if has_dropdown?(@topic) %>
               <% if BookmarkRating.exists?(bookmark_id: bookmark.id, user_id: session[:user].id) %>

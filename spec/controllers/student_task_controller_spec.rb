@@ -14,7 +14,7 @@ describe StudentTaskController do
   let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question1, question2]) }
   let(:student) { build(:student) }
   let(:team) { build(:assignment_team, id: 1, assignment: assignment, users: [student]) }
-  let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1, team: team) }
+  let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
   let(:review_response_map) { build(:review_response_map, id: 1) }
   let(:assignment_due_date) { build(:assignment_due_date) }
   
@@ -44,8 +44,11 @@ describe StudentTaskController do
       allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
       allow(review_questionnaire).to receive(:used_in_round).and_return(0)
     end
-    it "reports zero required tags correctly"
+    it "reports zero required tags correctly" do
       params = {id: 1}
+      get :view, params
+      expect(assigns(:completed_tags)).to eq(0)
+      expect(assigns(:total_tags)).to eq(0)
     end
   end
 end

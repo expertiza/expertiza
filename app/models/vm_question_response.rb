@@ -91,7 +91,7 @@ class VmQuestionResponse
         @list_of_reviews << review
       end
     end
-
+    puts reviews.inspect
     reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|

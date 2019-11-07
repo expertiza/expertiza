@@ -4,6 +4,7 @@ require 'rails_helper'
 #http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_E1953._Tagging_report_for_student
 describe StudentTaskController do
   #Copied from grades_controller_spec.rb
+  
   let(:review_response) { build(:response) }
   let(:assignment) { build(:assignment, id: 1, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
   let(:assignment_questionnaire) { build(:assignment_questionnaire, used_in_round: 1, assignment: assignment) }
@@ -12,9 +13,11 @@ describe StudentTaskController do
   let(:question2) { build(:question, id: 2, type: "normal") }
   
   let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question1, question2], type: "ReviewQuestionnaire") }
-  let(:student) { build(:student) }
+  let(:student) { build(:student, id: 1) }
+  let(:instructor) { build(:instructor, id: 6) }
   let(:team) { build(:assignment_team, id: 1, assignment: assignment, users: [student]) }
   let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
+  let(:student_task) { StudentTask.new(participant: participant, assignment: assignment,) }
   let(:review_response_map) { build(:review_response_map, id: 1) }
   let(:assignment_due_date) { build(:assignment_due_date) }
   
@@ -38,7 +41,12 @@ describe StudentTaskController do
   #This method so far, only tests functionality added in E1953
   describe '#view' do
     before(:each) do
-      allow(StudentTask).to receive(:from_participant_id).with(id: 1).and_return(participant)
+      #Login as a user
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      
+      allow(StudentTask).to receive(:from_participant_id).with(1).and_return(student_task)
+      
+      allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
       
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
       allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(assignment_questionnaire)
@@ -48,12 +56,16 @@ describe StudentTaskController do
       
       allow(review_questionnaire).to receive(:used_in_round).and_return(0)
     end
-    it "reports zero required tags correctly" do
-      params = {id: 1}
-      get :view, params
-      expect(assigns(:participant)).to eq(participant)
-      expect(assigns(:completed_tags)).to eq(0)
-      expect(assigns(:total_tags)).to eq(0)
+    context 'does a context help' do
+      it "reports zero required tags correctly" do
+        params = {id: 1}
+        expect(controller).to receive(:view)
+        get :view, params
+        expect(response).to have_http_status(200)
+        expect(controller.instance_variable_get(:@participant)).to eq(participant)
+        expect(assigns(:@completed_tags)).to eq(0)
+        expect(assigns(:@total_tags)).to eq(0)
+      end
     end
   end
 end

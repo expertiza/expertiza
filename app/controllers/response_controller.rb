@@ -263,6 +263,7 @@ class ResponseController < ApplicationController
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
   end
+  # set content when as instructor
   def set_content_instructor(new_response = false)
     @contributor = @map.contributor
     members = TeamsUser.where(team_id: params[:team])
@@ -275,7 +276,8 @@ class ResponseController < ApplicationController
     @pscore = @participant.scores(@questions)
     @reviewer = @map.reviewer
     @round = params[:round]
-  end  
+  end 
+  # Retrieve questions for this questionnaires. 
   def retrieve_questions(questionnaires, assignment_id)
     questions = {}
     questionnaires.each do |questionnaire|

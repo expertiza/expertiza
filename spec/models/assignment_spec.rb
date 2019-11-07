@@ -355,7 +355,7 @@ describe Assignment do
 
       context 'topic_id is not nil' do
         it 'returns Submission' do
-          allow(assignment).to receive(:get_current_stage_name).with(123).and_return('Finished')
+          allow(assignment).to receive(:swathi).with(123).and_return('Finished')
           expect(assignment.current_stage_name(123)).to eq('Finished')
         end
       end
@@ -386,34 +386,21 @@ describe Assignment do
     end
   end
 
-=begin
-  describe '#link_for_current_stage' do
-    context 'when current assignment has staggered deadline and topic id is nil' do
-      it 'returns nil' do
-        allow(assignment).to receive(:staggered_deadline?).and_return(true)
-        expect(assignment.link_for_current_stage(nil)).to eq(nil)
+  describe '#finished?' do
+    context 'when assignment next due date is nil' do
+      it 'returns True' do
+        allow(DueDate).to receive(:get_next_due_date).with(1, 123).and_return(nil)
+        expect(assignment.finished?(123)).to eq(true)
       end
     end
-
-
-    context 'when current assignment does not have staggered deadline' do
-      before(:each) { allow(assignment).to receive(:staggered_deadline?).and_return(false) }
-      context 'when due date is a TopicDueDate' do
-        it 'returns nil' do
-          allow(assignment).to receive(:find_current_stage).with(123).and_return(topic_due_date)
-          expect(assignment.link_for_current_stage(123)).to eq(nil)
-        end
-      end
-
-      context 'when due_date is not nil, not finished and is not a TopicDueDate' do
-        it 'returns description url of current due date' do
-          allow(assignment).to receive(:find_current_stage).with(123).and_return(assignment_due_date)
-          expect(assignment.link_for_current_stage(123)).to eq('https://expertiza.ncsu.edu/')
-        end
+    context 'when there is a next due date' do
+      it 'returns False' do
+        allow(DueDate).to receive(:get_next_due_date).with(1,123).and_return('2021-11-11 11:11:11')
+        expect(assignment.finished?(123)).to eq(false)
       end
     end
   end
-=end
+
   describe '#stage_deadline' do
     context 'when topic id is nil and current assignment has staggered deadline' do
       it 'returns Unknown' do

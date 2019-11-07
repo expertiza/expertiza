@@ -602,17 +602,19 @@ class Assignment < ActiveRecord::Base
   end
 
 
-
-  private
-
+  #calls the next_due_date method and returns true if the next_due_date is nil
   def finished?(topic_id)
     return next_due_date(topic_id).nil?
   end
 
+  private
+
+  #returns the next_due_date by calling the get_next_due_date method on DueDate
   def next_due_date(topic_id)
     DueDate.get_next_due_date( self.id,topic_id)
   end
 
+  #check if the topic is missing in case of staggered deadline
   def topic_missing?( topic_id = nil)
     topic_id.nil? and self.staggered_deadline?
   end

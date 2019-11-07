@@ -11,7 +11,7 @@ describe StudentTaskController do
   let(:question1) { build(:question, id: 1, type: "normal") }
   let(:question2) { build(:question, id: 2, type: "normal") }
   
-  let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question1, question2]) }
+  let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question1, question2], type: "ReviewQuestionnaire") }
   let(:student) { build(:student) }
   let(:team) { build(:assignment_team, id: 1, assignment: assignment, users: [student]) }
   let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
@@ -39,14 +39,19 @@ describe StudentTaskController do
   describe '#view' do
     before(:each) do
       allow(StudentTask).to receive(:from_participant_id).with(id: 1).and_return(participant)
+      
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
       allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(assignment_questionnaire)
+      
       allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
+      allow(assignment).to receive(:varying_rubrics_by_round).and_return(false)
+      
       allow(review_questionnaire).to receive(:used_in_round).and_return(0)
     end
     it "reports zero required tags correctly" do
       params = {id: 1}
       get :view, params
+      expect(assigns(:participant)).to eq(participant)
       expect(assigns(:completed_tags)).to eq(0)
       expect(assigns(:total_tags)).to eq(0)
     end

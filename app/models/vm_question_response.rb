@@ -91,6 +91,7 @@ class VmQuestionResponse
         @list_of_reviewers << participant
         @list_of_reviews << review
       end
+    end
     reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|

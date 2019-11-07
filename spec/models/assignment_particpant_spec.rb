@@ -296,7 +296,6 @@ describe AssignmentParticipant do
             test_user = User.new(name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com')
             test_user.id = 123
             test_user.save!
-            test_user
           end
           #allow(ImportFileHelper).to receive(:create_new_user).with(attributes, {}).and_return()
           allow(Assignment).to receive(:find).with(1).and_return(assignment)

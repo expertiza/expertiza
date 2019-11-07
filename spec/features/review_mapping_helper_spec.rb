@@ -1,4 +1,5 @@
 require 'rspec'
+require 'capybara'
 
 describe 'Tests Review report' do
   before(:each) do
@@ -99,20 +100,22 @@ RSpec.describe ReviewMappingHelper, :type => :helper do
   end
 end
 
+# Test cases for Review Reports
 describe "review report html test cases" do
   before(:each) do
     create(:instructor)
     create(:assignment, course: nil, name: 'Test Assignment')
-    assignment_id = Assignment.where(name: 'Test Assignment')[0].id
+    @assignment_id = Assignment.where(name: 'Test Assignment')[0].id
     @options = {'name' => 'true', 'unity_id' => 'true',
                                   'email' => 'true', 'grade' => 'true',
                                   'comment' => 'true'}
     login_as 'instructor6'
-    visit "/reports/response_report?id=#{assignment_id}"
+    visit "/reports/response_report?id=#{@assignment_id}"
     page.select("Review report", :from => "report[type]")
     click_button "View"
   end
 
+  # basic UI element checks whether elements are being rendered or not.
   it "can display review metrics" do
     expect(page).to have_content('Metrics')
   end
@@ -133,16 +136,23 @@ describe "review report html test cases" do
     expect(page).to have_content('Team reviewed')
   end
 
-  def generated_csv(t_assignment, t_options)
-      delimiter = ','
-      CSV.generate(col_sep: delimiter) do |csv|
-        csv << ReportsController.export_details_fields(t_options)
-        ReportsController.export_details(csv, t_assignment, false)
-      end
-    end
+  it "has Export Reviews button" do
+    expect(page).to have_button('Export Review Scores To CSV File')
+  end
 
+  # test to check whether a blank CSV with headers is being created or not.
   it "can create an empty csv with just headers" do
     expected_csv = File.read('spec/features/review_report_details/review_report_no_data_csv.txt')
-      expect(generated_csv(true, @options)).to eq(expected_csv)
+    expect(generated_csv(true, @options)).to eq(expected_csv)
   end
+
+  # function to generate a simple CSV with headers.
+  def generated_csv(t_assignment, t_options)
+    delimiter = ','
+    CSV.generate(col_sep: delimiter) do |csv|
+      csv << ReportsController.export_details_fields(t_options)
+      ReportsController.export_details(csv, t_assignment, false)
+    end
+  end
+
 end

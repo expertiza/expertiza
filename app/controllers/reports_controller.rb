@@ -18,6 +18,7 @@ class ReportsController < ApplicationController
     @user_pastebins = UserPastebin.get_current_user_pastebin current_user
   end
 
+  # function to export specific headers to the csv
   def self.export_details_fields(detail_options)
     fields = []
     fields << 'Name' if detail_options['name'] == 'true'
@@ -28,7 +29,7 @@ class ReportsController < ApplicationController
     fields
   end
 
-  #extended functionality.
+  # function to check for detail_options and return the correct csv
   def self.export_details(csv, parent_id, detail_options)
     return csv unless detail_options
   end

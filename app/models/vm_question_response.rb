@@ -69,8 +69,8 @@ class VmQuestionResponse
         if response
           reviews << response
           @list_of_reviews << response
-          @list_of_reviewers << participant
         end 
+        @list_of_reviewers << participant
       end
     elsif @questionnaire_type == "TeammateReviewQuestionnaire"
       reviews = participant.teammate_reviews

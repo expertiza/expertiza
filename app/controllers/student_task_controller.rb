@@ -2,6 +2,7 @@ class StudentTaskController < ApplicationController
   helper :submitted_content
 
   def action_allowed?
+    puts 'PARAMS: ' + params[:id]
     ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student'].include? current_role_name
   end
 
@@ -49,6 +50,7 @@ class StudentTaskController < ApplicationController
     @can_take_quiz = @participant.can_take_quiz
     @authorization = Participant.get_authorization(@can_submit, @can_review, @can_take_quiz)
     @team = @participant.team
+    puts "TEAM"
     denied unless current_user_id?(@participant.user_id)
     @assignment = @participant.assignment
     @can_provide_suggestions = @assignment.allow_suggestions
@@ -56,7 +58,7 @@ class StudentTaskController < ApplicationController
     @topics = SignUpTopic.where(assignment_id: @assignment.id)
     # Timeline feature
     @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
-    
+    puts "END OF VARS"
     #THE FOLLOWING CODE IS ADDED FOR THE TAG COUNT FEATURE
     #http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_E1953._Tagging_report_for_student
     #This code is meant to help display the total number of tags completed by this user for this
@@ -96,12 +98,14 @@ class StudentTaskController < ApplicationController
     @total_tags = 0
     vmlist.each do |vm|
       #Each row corresponds to a row of tags to complete
+      puts "vm.list_of_rows: " + vm.list_of_rows.to_s
       vm.list_of_rows.each do |r|
         r.score_row.each do |row|
           #Checkboxes can be left empty and they will still be "completed" tags. That's why this type
           #of tag is ignored
           vm_prompts = row.vm_prompts.select {|prompt| prompt.tag_dep.tag_prompt.control_type.downcase != "checkbox"}
           #Increment by the number of tag prompts it is possible to fill out for this row
+          puts "vm_prompts: " + vm_prompts.to_s
           @total_tags += vm_prompts.count
           #For each tag it is possible to do
           vm_prompts.each do |vm_prompt|
@@ -115,6 +119,7 @@ class StudentTaskController < ApplicationController
         end
       end
     end
+    puts "END OF METHOD"
   end
 
   def others_work

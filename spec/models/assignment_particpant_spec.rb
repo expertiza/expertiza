@@ -280,15 +280,15 @@ describe AssignmentParticipant do
 
       context 'check whether user is present or not' do
         let(:row) do
-          {name: 'no one', fullname: 'no one', email: 'name@email.com', role:'user_role_name', parent: 'user_parent_name'}
+          {name: 'no one', fullname: 'abc ', email: 'name@email.com', role:'user_role_name', parent: 'user_parent_name'}
         end
         let(:attributes) do
-          {role_id: 1, name: 'no one', fullname: 'no one', email: 'name@email.com', email_on_submission: 'name@email.com',
+          {role_id: 1, name: 'abc', fullname: 'no one', email: 'name@email.com', email_on_submission: 'name@email.com',
            email_on_review: 'name@email.com', email_on_review_of_review: 'name@email.com'}
         end
-        #let(:test_user) do
-        #  {name: 'abc', email: 'abcbbc@gmail.com'}
-        #end
+        let(:test_user) do
+          {name: 'abc', email: 'name@email.com'}
+        end
         it 'create the user and number of mails sent should be 1' do
           ActionMailer::Base.deliveries.clear
           allow(ImportFileHelper).to receive(:define_attributes).with(row).and_return(attributes)

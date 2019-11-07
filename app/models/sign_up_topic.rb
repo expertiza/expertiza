@@ -33,13 +33,13 @@ class SignUpTopic < ActiveRecord::Base
       topic.topic_identifier = row_hash[:topic_identifier]
       # topic.assignment_id = session[:assignment_id]
       topic.save
-      unless row_hash[:assigned_team].nil?
-        team = Team.where(name: row_hash[:assigned_team]).first
-        newteam = SignedUpTeam.where(topic_id: topic.id, team_id: team.id).first
+      unless row_hash[:assigned_team].nil? #Check if the team is assigned to the topic
+        team = Team.where(name: row_hash[:assigned_team]).first #Get the team id from team name
+        newteam = SignedUpTeam.where(topic_id: topic.id, team_id: team.id).first  #Existing topic
         if newteam.nil?
-          ImportTopicsHelper.assign_team_topic(topic.id, team.id)
+          ImportTopicsHelper.assign_team_topic(topic.id, team.id) #Call helper method to assign the team to topic
         else
-          newteam.team_id = team.id
+          newteam.team_id = team.id  #Team mapping for existing topic
           newteam.save
         end
       end

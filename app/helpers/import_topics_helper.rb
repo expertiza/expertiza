@@ -45,7 +45,7 @@ module ImportTopicsHelper
     sign_up_topic.id
   end
 
-
+  #The assign_team_topic takes topic_id and assigned_team id and creates a new row in the SignedupTeam table
   def self.assign_team_topic(topic_id, assigned_team)
     attributes = {}
     attributes["topic_id"] = topic_id
@@ -54,7 +54,7 @@ module ImportTopicsHelper
     assign_team.save!
   end
   
-    #The trim_non_ascii method takes a string input and replaces all ascii characters occuring in the string with a whitespace
+  #The trim_non_ascii method takes a string input and replaces all ascii characters occuring in the string with a whitespace
   private  
   def self.trim_non_ascii(string)
     string.split('').each do |char|

@@ -278,7 +278,7 @@ describe AssignmentParticipant do
         end
       end
 
-      context 'check whether user is present or not' do
+      context 'when new user needs to be created' do
         let(:row) do
           {name: 'no one', fullname: 'no one', email: 'name@email.com', role:'user_role_name', parent: 'user_parent_name'}
         end
@@ -287,7 +287,7 @@ describe AssignmentParticipant do
            email_on_review: 'name@email.com', email_on_review_of_review: 'name@email.com'}
         end
         let(:test_user) do
-          {name: 'abc', email: 'name@email.com'}
+          {name: 'abc', email: 'abcbbc@gmail.com'}
         end
         it 'create the user and number of mails sent should be 1' do
           ActionMailer::Base.deliveries.clear

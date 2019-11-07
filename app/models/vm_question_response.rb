@@ -63,6 +63,7 @@ class VmQuestionResponse
       feedbacks = FeedbackResponseMap.where(reviewer_id: participant.id) 
       feedbacks.each do |feedback|
         #finding the participant ids for each reviewee of feedback
+        #participant is really reviewee here.
         participant = Participant.find_by(id: feedback.reviewee_id)
         #finding the all the responses for the feedback
         response = Response.where(map_id: feedback.id).order('updated_at').last
@@ -90,7 +91,6 @@ class VmQuestionResponse
         @list_of_reviewers << participant
         @list_of_reviews << review
       end
-     puts reviews.inspects
     reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|

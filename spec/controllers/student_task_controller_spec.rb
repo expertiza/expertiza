@@ -4,20 +4,23 @@ describe StudentTaskController do
   #Copied from grades_controller_spec.rb
   
   let(:review_response) { build(:response, id: 1) }
+  let(:review_response_map) {ReviewResponseMap.new(id: 1, map_id: 1, assignment: assignment,
+                                reviewer: reviewer, reviewee: participant)}
   let(:assignment) { build(:assignment, id: 1, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
   let(:assignment_questionnaire) { build(:assignment_questionnaire, used_in_round: 1, assignment: assignment) }
   #Multiple questions for proper testing of tags
   let(:question1) { build(:question, id: 1, type: "normal") }
   let(:question2) { build(:question, id: 2, type: "normal") }
   
-  let(:answer1) { build(:answer, id: 1, question_id: 1)}
-  let(:answer2) { build(:answer, id: 2, question_id: 2)}
+  let(:answer1) { build(:answer, id: 1, question_id: 1, comments: "This is a rather large set of comments to allow for proper counting")}
+  let(:answer2) { build(:answer, id: 2, question_id: 2, comments: "This is a rather large set of comments to allow for proper counting")}
   
   let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question1, question2], type: "ReviewQuestionnaire") }
   let(:student) { build(:student, id: 1) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:team) { build(:assignment_team, id: 1, assignment: assignment, users: [student]) }
   let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
+  let(:reviewer) { build(:participant, id: 2, assignment: assignment, user_id: 2) }
   let(:student_task) { StudentTask.new(participant: participant, assignment: assignment,) }
   let(:review_response_map) { build(:review_response_map, id: 1) }
   let(:assignment_due_date) { build(:assignment_due_date) }
@@ -45,8 +48,6 @@ describe StudentTaskController do
       #Login as a user
       stub_current_user(instructor, instructor.role.name, instructor.role)
       
-      allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: 1, user_id: 1, answer: 1).and_return([])
-      
       allow(StudentTask).to receive(:from_participant_id).with("1").and_return(student_task)
       
       allow(AssignmentParticipant).to receive(:find).with("1").and_return(participant)
@@ -73,20 +74,56 @@ describe StudentTaskController do
       allow(review_questionnaire).to receive(:used_in_round).and_return(0)
       
       allow(TagPrompt).to receive(:find).with(1).and_return(tag_prompt1)
-      allow(TagPrompt).to receive(:find).with(1).and_return(tag_prompt2)
-      allow(TagPrompt).to receive(:find).with(1).and_return(tag_prompt3)
-      allow(TagPrompt).to receive(:find).with(1).and_return(tag_prompt4)
+      allow(TagPrompt).to receive(:find).with(2).and_return(tag_prompt2)
+      allow(TagPrompt).to receive(:find).with(3).and_return(tag_prompt3)
+      allow(TagPrompt).to receive(:find).with(4).and_return(tag_prompt4)
       
       allow(TagPromptDeployment).to receive(:where).with(questionnaire_id: 1, assignment_id: 1).and_return([deployment1, deployment2, deployment3, deployment4])
+      
+      allow(deployment1).to receive(:answer_length_threshold).and_return(0)
+      allow(deployment2).to receive(:answer_length_threshold).and_return(0)
+      allow(deployment3).to receive(:answer_length_threshold).and_return(0)
+      allow(deployment4).to receive(:answer_length_threshold).and_return(0)
+      
+      allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([review_response_map])
+      
+      allow(review_response_map).to receive(:response_id).and_return(1)
     end
-    context 'does a context help' do
-      it "reports zero required tags correctly" do
+    context 'When counting tags' do
+      it "reports zero completed tags correctly" do
+        allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: deployment1, user_id: 1, answer: answer2).and_return([])
+        allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: deployment2, user_id: 1, answer: answer2).and_return([])
+        allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: deployment3, user_id: 1, answer: answer2).and_return([])
+        allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: deployment4, user_id: 1, answer: answer2).and_return([])
+        
+        allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: deployment1, user_id: 1, answer: answer1).and_return([])
+        allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: deployment2, user_id: 1, answer: answer1).and_return([])
+        allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: deployment3, user_id: 1, answer: answer1).and_return([])
+        allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: deployment4, user_id: 1, answer: answer1).and_return([])
         params = {id: 1}
         get :view, params
-        # expect(response).to have_http_status(302)
-        # expect(response).to render_template(:view)
         expect(controller.instance_variable_get(:@participant)).to eq(participant)
         expect(assigns(:completed_tags)).to eq(0)
+        expect(assigns(:total_tags)).to eq(6)
+      end
+      
+      it "reports some completed tags correctly" do
+        answer_tags = [AnswerTag.new(value: 0), AnswerTag.new(value: 1), AnswerTag.new(value: -1), AnswerTag.new(value: 1),
+                       AnswerTag.new(value: 1), AnswerTag.new(value: 1), AnswerTag.new(value: -1), AnswerTag.new(value: 0),]
+        
+        allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: deployment1, user_id: 1, answer: answer2).and_return([answer_tags[0]])
+        allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: deployment2, user_id: 1, answer: answer2).and_return([answer_tags[1]])
+        allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: deployment3, user_id: 1, answer: answer2).and_return([answer_tags[2]])
+        allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: deployment4, user_id: 1, answer: answer2).and_return([answer_tags[3]])
+        
+        allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: deployment1, user_id: 1, answer: answer1).and_return([answer_tags[4]])
+        allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: deployment2, user_id: 1, answer: answer1).and_return([answer_tags[5]])
+        allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: deployment3, user_id: 1, answer: answer1).and_return([answer_tags[6]])
+        allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: deployment4, user_id: 1, answer: answer1).and_return([answer_tags[7]])
+        params = {id: 1}
+        get :view, params
+        expect(controller.instance_variable_get(:@participant)).to eq(participant)
+        expect(assigns(:completed_tags)).to eq(5)
         expect(assigns(:total_tags)).to eq(6)
       end
     end

@@ -58,7 +58,6 @@ class Mailer < ActionMailer::Base
   def notify_reviewer_for_new_submission(defn)
     @partial_name = defn[:body][:partial_name]
     @user = defn[:body][:user]
-    #@first_name = defn[:body][:first_name]
     @message = defn[:body][:message]
     mail(subject: defn[:subject],
          to: defn[:to])

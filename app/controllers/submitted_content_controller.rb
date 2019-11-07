@@ -72,11 +72,14 @@ class SubmittedContentController < ApplicationController
   end
 
   def email_submission_reviewers(participant)
+    # Checking if the work has been reviewed by anyone
     if participant.reviewers.length != 0
+      # Iterating over every reviewer to send the mails
       participant.reviewers.each do |reviewer|
         rev_res_map = ReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', reviewer.id, participant.team.id]).first
         all_responses = Response.where(:map_id => rev_res_map.id).order("updated_at DESC").first
 
+        # Finding the user's email id
         user = User.find(reviewer.user_id)
 
         if user.email_on_submission?

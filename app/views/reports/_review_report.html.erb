@@ -54,9 +54,11 @@
         <% if r.id != -1 %>
           <% user = Participant.find(r.id).user %>
             <!--reviewer-->
+			
+			<!-- added class attribute and span tag to extract full name and unityID of the user for scraping (Used in export to CSV functionality) -->
             <td>
-              <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post, :class => "runityID" %>
-              (<span class="rname"><%= user.fullname(session[:ip]) %></span>)
+              <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post, :class => "user_unityID" %>
+              (<span class="user_name"><%= user.fullname(session[:ip]) %></span>)
             </td>
             <!--# reviews done-->
             <td align = 'left'>
@@ -176,32 +178,35 @@
 </script>
 
 <script>
-function downloadCSV(csv, filename) {
-var csvFile;
-var downloadLink;
+	function downloadCSV(csv, filename) {
+		var csvFile;
+		var downloadLink;
 
-// CSV file
-csvFile = new Blob([csv], {type: "text/csv"});
+		// CSV file
+		csvFile = new Blob([csv], {type: "text/csv"});
 
-// Download link
-downloadLink = document.createElement("a");
+		// Download link
+		downloadLink = document.createElement("a");
 
-// File name
-downloadLink.download = filename;
+		// File name
+		downloadLink.download = filename;
 
-// Create a link to the file
-downloadLink.href = window.URL.createObjectURL(csvFile);
+		// Create a link to the file
+		downloadLink.href = window.URL.createObjectURL(csvFile);
 
-// Hide download link
-downloadLink.style.display = "none";
+		// Hide download link
+		downloadLink.style.display = "none";
 
-// Add the link to DOM
-document.body.appendChild(downloadLink);
+		// Add the link to DOM
+		document.body.appendChild(downloadLink);
 
-// Click download link
-downloadLink.click();
-}
-	function exportTableToCSV(filename) {
+		// Click download link
+		downloadLink.click();
+	}
+	
+	// Method to extract review report fields data from HTML Table and convert the data into CSV format.
+	// Currently, it will extract and store data for 'Full Name, Unity ID, Email ID, Grade and Comment' fields into CSV file 
+	function exportTableToCSV(filename) {  	
 		var csv = [];
 		var rows = document.querySelector("table#myTable").rows;
 		var row = [];
@@ -211,8 +216,8 @@ downloadLink.click();
 		for (var i = 1; i < rows.length; i++) {
 			var row = [];
 			
-			reviewer_name = "\"" + rows[i].querySelector("td span.rname").innerHTML + "\"";
-			reviewer_unityid = rows[i].querySelector("td a.runityID").innerHTML;
+			reviewer_name = "\"" + rows[i].querySelector("td span.user_name").innerHTML + "\"";
+			reviewer_unityid = rows[i].querySelector("td a.user_unityID").innerHTML;
 			reviewer_emailid = reviewer_unityid + "@ncsu.edu";
 			reviewer_grade = rows[i].querySelector("input#grade_for_reviewer").value;
 			reviewer_comment = "\"" + rows[i].querySelector("textarea#comment_for_reviewer").innerHTML.replace(/"/g,"\'") + "\"";
@@ -223,13 +228,14 @@ downloadLink.click();
 			row.push(reviewer_grade);
 			row.push(reviewer_comment);
 			
-      csv.push(row.join(","));
+			csv.push(row.join(","));
               
 		}
 	
-    downloadCSV(csv.join("\n"), filename);
+		downloadCSV(csv.join("\n"), filename);
 	}
 	
+	// Method to set names of header columns in Exported CSV file
 	function setHeaderForCSV() {
 		var row = [];
 		row.push("Name");

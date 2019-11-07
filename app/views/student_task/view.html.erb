@@ -96,7 +96,10 @@ to display the label "Your team" in the student assignment tasks-->
       <% else %>
         <%= link_to "Your scores", controller: 'grades', action: 'view_team', id: @participant.id %>
         (View feedback on your work)  &nbsp;  
-        (You have tagged <%= "#{@completed_tags}/#{@total_tags}" %> reviews)
+        <!-- The following was added for E1973: -->
+        <!-- http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_E1953._Tagging_report_for_student -->
+        <!-- See app/controllers/StudentTaskController#view -->
+        (You have completed <%= "#{@completed_tags}/#{@total_tags}" %> possible tags)
         <%= link_to "Alternate View",  controller: 'grades', action: 'view_my_scores', id: @participant.id %>
       <% end %>
     </li>

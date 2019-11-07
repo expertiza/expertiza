@@ -89,6 +89,7 @@ class GradesController < ApplicationController
     @questions = retrieve_questions questionnaires, @assignment.id
     @pscore = @participant.scores(@questions)
     @vmlist = []
+    #E1953
     @total_tags_array =[]
     @completed_tags_array =[]
 
@@ -96,8 +97,10 @@ class GradesController < ApplicationController
     # to render the html tables.
     counter_for_same_rubric = 0
     questionnaires.each do |questionnaire|
+      #E1953
       @completed_tags = 0
       @total_tags = 0
+      
       @round = nil
       if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
         questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
@@ -118,17 +121,22 @@ class GradesController < ApplicationController
       @vmlist << vm
 
 
-
+      #The following was added for E1953:
+      #http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_E1953._Tagging_report_for_student
       @vmlist.each do |vm|
         if vm.round == @round
           vm.list_of_rows.each do |r|
             r.score_row.each do |row|
+              #Every prompt that is not a checkbox is included in the answer tag count
               vm_prompts = row.vm_prompts.select {|prompt| prompt.tag_dep.tag_prompt.control_type.downcase != "checkbox"}
               if vm_prompts.count > 0
+                #The total tags it is possible to complete for this row
                 @total_tags += vm_prompts.count
                 vm_prompts.each do |vm_prompt|
+                  #If this tag prompt has been changed before, the value lives here:
                   answer_tag = AnswerTag.where(tag_prompt_deployment_id: vm_prompt.tag_dep, user_id: @participant.user_id, answer: vm_prompt.answer).first
                   if !answer_tag.nil? and answer_tag.value != "0"
+                    #If the tag exists and is not some neutral value, it has been completed
                     @completed_tags += 1
                   end
                 end
@@ -137,7 +145,9 @@ class GradesController < ApplicationController
           end
         end
       end
+      #Each element in this array corresponds to the total tag count for each round
       @total_tags_array.append(@total_tags)
+      #Each element in this array corresponds to the completed tag count for each round
       @completed_tags_array.append(@completed_tags)
     end
     @current_role_name = current_role_name

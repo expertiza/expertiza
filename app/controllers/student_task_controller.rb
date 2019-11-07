@@ -55,35 +55,38 @@ class StudentTaskController < ApplicationController
     @topics = SignUpTopic.where(assignment_id: @assignment.id)
     # Timeline feature
     @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
-    
     #THE FOLLOWING CODE IS ADDED FOR THE TAG COUNT FEATURE
+    #http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_E1953._Tagging_report_for_student
     #This code is meant to help display the total number of tags completed by this user for this
     #assignment.
     #Get all questionnaires for the assignment
     questionnaires = @assignment.questionnaires
     #vmlist holds all VmQuestionResponses for this assignment
     vmlist = []
-    questionnaires.each do |questionnaire|
-      @round = nil
-      #This code does not make sense but was borrowed from GradesController.view_team which worked
-      if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
-        questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
-        if questionnaires.count > 1
-          @round = questionnaires[counter_for_same_rubric].used_in_round
-          counter_for_same_rubric += 1
-        else
-          @round = questionnaires[0].used_in_round
-          counter_for_same_rubric = 0
+    #Fixes a bug where students without submissions crash this page
+    if !@team.nil?
+      questionnaires.each do |questionnaire|
+        @round = nil
+        #This code does not make sense but was borrowed from GradesController.view_team which worked
+        if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
+          questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
+          if questionnaires.count > 1
+            @round = questionnaires[counter_for_same_rubric].used_in_round
+            counter_for_same_rubric += 1
+          else
+            @round = questionnaires[0].used_in_round
+            counter_for_same_rubric = 0
+          end
         end
+        #A VmQuestionResponse helps count the number of tags the user has done/should do.
+        vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
+        vmquestions = questionnaire.questions
+        vm.add_questions(vmquestions)
+        vm.add_team_members(@team)
+        vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
+        vm.number_of_comments_greater_than_10_words
+        vmlist << vm
       end
-      #A VmQuestionResponse helps count the number of tags the user has done/should do.
-      vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
-      vmquestions = questionnaire.questions
-      vm.add_questions(vmquestions)
-      vm.add_team_members(@team)
-      vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
-      vm.number_of_comments_greater_than_10_words
-      vmlist << vm
     end
     #completed_tags holds the number of tags this user has completed
     @completed_tags = 0

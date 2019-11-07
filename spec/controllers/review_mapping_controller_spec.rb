@@ -148,6 +148,88 @@ describe ReviewMappingController do
         expect(response).to redirect_to '/student_review/list?id=1'
       end
     end
+
+    context 'when number of reviews are less than the assignment policy' do
+      it 'redirects to student review page' do
+        allow(assignment).to receive(:topics?).and_return(true)
+        topic = double('SignUpTopic')
+        allow(SignUpTopic).to receive(:find).with('1').and_return(topic)
+        allow(ReviewResponseMap).to receive(:where).with(reviewer_id: 1, reviewed_object_id: 1 )
+                                  .and_return([])
+        allow(assignment).to receive(:assign_reviewer_dynamically).with(participant, topic).and_return(true)
+        allow(assignment).to receive(:num_reviews_allowed).and_return(1)
+        params = {
+            assignment_id: 1,
+            reviewer_id: 1,
+            topic_id: 1
+        }
+        post :assign_reviewer_dynamically, params
+        expect(response).to redirect_to '/student_review/list?id=1'
+      end
+    end
+
+    context 'when number of reviews are greater than the assignment policy' do
+      it 'shows a flash error and redirects to student review page' do
+        allow(assignment).to receive(:topics?).and_return(true)
+        topic = double('SignUpTopic')
+        allow(SignUpTopic).to receive(:find).with('1').and_return(topic)
+        allow(ReviewResponseMap).to receive(:where).with(reviewer_id: 1, reviewed_object_id: 1 )
+                                        .and_return([1,2,3])
+        allow(assignment).to receive(:assign_reviewer_dynamically).with(participant, topic).and_return(true)
+        allow(assignment).to receive(:num_reviews_allowed).and_return(1)
+        params = {
+            assignment_id: 1,
+            reviewer_id: 1,
+            topic_id: 1
+        }
+        post :assign_reviewer_dynamically, params
+        expect(response).to redirect_to '/student_review/list?id=1'
+        expect(flash[:error]).to be_present
+      end
+    end
+
+    context 'when user has outstanding reviews less than assignment policy'  do
+      it 'redirects to student review page' do
+        allow(assignment).to receive(:topics?).and_return(true)
+        topic = double('SignUpTopic')
+        allow(SignUpTopic).to receive(:find).with('1').and_return(topic)
+        allow(ReviewResponseMap).to receive(:where).with(reviewer_id: 1, reviewed_object_id: 1 )
+                                        .and_return(:review_response_map)
+        allow(assignment).to receive(:assign_reviewer_dynamically).with(participant, topic).and_return(true)
+        allow(assignment).to receive(:num_reviews_allowed).and_return(1)
+        allow(assignment).to receive(:max_outstanding_reviews).and_return(0)
+
+        params = {
+            assignment_id: 1,
+            reviewer_id: 1,
+            topic_id: 1
+        }
+        post :assign_reviewer_dynamically, params
+        expect(response).to redirect_to '/student_review/list?id=1'
+      end
+    end
+
+    context 'when user has outstanding reviews greater than assignment policy'  do
+      it 'redirects to student review page and shows flash error' do
+        allow(assignment).to receive(:topics?).and_return(true)
+        topic = double('SignUpTopic')
+        allow(SignUpTopic).to receive(:find).with('1').and_return(topic)
+        allow(ReviewResponseMap).to receive(:where).with(reviewer_id: 1, reviewed_object_id: 1 )
+                                        .and_return(:review_response_map)
+        allow(assignment).to receive(:assign_reviewer_dynamically).with(participant, topic).and_return(true)
+        allow(assignment).to receive(:num_reviews_allowed).and_return(1)
+        allow(assignment).to receive(:max_outstanding_reviews).and_return(3)
+
+        params = {
+            assignment_id: 1,
+            reviewer_id: 1,
+            topic_id: 1
+        }
+        post :assign_reviewer_dynamically, params
+        expect(flash[:error]).to be_present
+        expect(response).to redirect_to '/student_review/list?id=1'
+      end
+    end
   end
 
   describe '#assign_quiz_dynamically' do

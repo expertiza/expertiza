@@ -7,6 +7,10 @@ class GradesController < ApplicationController
   include AssignmentHelper
   include GradesHelper
 
+  after_action only: [:save_grade_and_comment_for_submission] do
+    log_action(@log_map, @log_message)
+  end
+
   def action_allowed?
     case params[:action]
     when 'view_my_scores'
@@ -15,8 +19,8 @@ class GradesController < ApplicationController
        'Administrator',
        'Super-Administrator',
        'Student'].include? current_role_name and
-      are_needed_authorizations_present?(params[:id], "reader", "reviewer") and
-      check_self_review_status
+          are_needed_authorizations_present?(params[:id], "reader", "reviewer") and
+          check_self_review_status
     when 'view_team'
       if ['Student'].include? current_role_name # students can only see the head map for their own team
         participant = AssignmentParticipant.find(params[:id])
@@ -181,6 +185,16 @@ class GradesController < ApplicationController
                             comment: @team.comment_for_submission)
       @team.save
 
+      @log_map = {
+          :instructorid =>  session[:user].id.to_s,
+          :assignment_id =>  participant.assignment.id.to_s ,
+          :grading_type => :Submission ,
+          :grade_receiver_id =>  @team.id.to_s ,
+          :grade =>  @team.grade_for_submission.to_s}
+      @log_message = "Grade and comment for team successfully saved"
+
+
+
       flash[:success] = 'Grade and comment for submission successfully saved.'
     rescue StandardError
       flash[:error] = $ERROR_INFO
@@ -242,10 +256,10 @@ class GradesController < ApplicationController
 
   def assign_all_penalties(participant, penalties)
     @all_penalties[participant.id] = {
-      submission: penalties[:submission],
-      review: penalties[:review],
-      meta_review: penalties[:meta_review],
-      total_penalty: @total_penalty
+        submission: penalties[:submission],
+        review: penalties[:review],
+        meta_review: penalties[:meta_review],
+        total_penalty: @total_penalty
     }
   end
 

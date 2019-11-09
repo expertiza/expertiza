@@ -55,6 +55,11 @@ class ApplicationController < ActionController::Base
     !authorizations.include?(authorization)
   end
 
+  def log_action(log_map, message)
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name,
+                                           message, request, log_map)
+  end
+  
   private
 
   def current_user
@@ -136,4 +141,5 @@ class ApplicationController < ActionController::Base
       redirect_to '/denied'
     end
   end
+
 end

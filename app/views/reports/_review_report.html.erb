@@ -1,5 +1,5 @@
 <!-- the table creation is changed top accommodate functionality of tablesorter, which requires thead and tbody seperately. Previously, headers were in tbody only -->
-<div class='reviewreport'>
+<div class='reviewreport' xmlns:border-width="http://www.w3.org/1999/xhtml">
   <!-- Added headers for tablesorter -->
 
   <script type='text/javascript'>
@@ -119,7 +119,7 @@
               <%= hidden_field_tag :assignment_id, @id %>
               <%= number_field_tag 'grade_for_reviewer', r.review_grade.try(:grade_for_reviewer), min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade' %>
               <br/>
-              <%= text_area_tag 'comment_for_reviewer', r.review_grade.try(:comment_for_reviewer), placeholder: 'Comment', class: "awesome_input", 'data-multiple' => '', 'data-minchars' => "1" %>
+              <%= text_area_tag 'comment_for_reviewer', r.review_grade.try(:comment_for_reviewer), placeholder: 'Comment', class: "awesome_input", 'data-multiple' => '', 'data-minchars' => "1", :style => 'width: 80%' %>
               <table class="inline-transparent">
                 <tr>
                   <td>
@@ -133,11 +133,13 @@
                 </tr>
               </table>
             <% end %>
+            <%= link_to "Grading History", grading_histories_path(grade_receiver_id: Participant.where(id: r.id).pluck(:user_id).first, participant_id: r.id, grade_type: "Review") %>
           </td>
         <% end %>
       </tr>
     <% end %>
     </table>
+  <p> **In "Team reviewed" column, text in <i style = "color:red">red</i> indicates that the review is not yet completed; text in <i style = "color:blue">blue</i> indicates that the review grade is not assigned or updated; text in <i style = "color: #986633">brown</i> indicates that the review grade has been assigned.</p>
  </div>
 <!--Partial for text macro form-->
 <%= render :partial => '/user_pastebins/save_text_macros' %>

@@ -126,6 +126,8 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :grading_histories, only: [:index]
+
   resources :impersonate, only: [] do
     collection do
       get :start

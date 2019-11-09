@@ -1,0 +1,2 @@
+class ReviewGradingHistory
+end

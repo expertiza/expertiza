@@ -376,7 +376,7 @@ class ReviewMappingController < ApplicationController
                             grade: params[:grade_for_reviewer],
                             comment: params[:comment_for_reviewer])
       review_grade.save!
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name,
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].id,
                                              "instructor_id: " + session[:user].id.to_s +
                                                  ", assignment_id: " + params[:assignment_id].to_s +
                                                  ", grading_type: Review" +

@@ -4,10 +4,10 @@ class ExpertizaLogFormatter < Logger::Formatter
   def call(s, ts, pg, msg)
     if msg.is_a?(LoggerMessage)
       formatted_msg = ""
-      if msg.log_map
-        formatted_msg = format_log_map(msg.log_map)
-      end
-      "TST=[#{ts}] SVT=[#{s}] PNM=[#{pg}] OIP=[#{msg.oip}] RID=[#{msg.req_id}] CTR=[#{msg.generator}] UID=[#{msg.unity_id}] MSG=[#{filter(msg.message)}]#{formatted_msg}\n"
+      formatted_msg = format_log_map(msg.log_map) if msg.log_map
+
+      "TST=[#{ts}] SVT=[#{s}] PNM=[#{pg}] OIP=[#{msg.oip}] RID=[#{msg.req_id}] CTR=[#{msg.generator}]
+      UID=[#{msg.unity_id}] MSG=[#{filter(msg.message)}]#{formatted_msg}\n"
     else
       "TST=[#{ts}] SVT=[#{s}] PNM=[#{pg}] OIP=[] RID=[] CTR=[] UID=[] MSG=[#{filter(msg)}]\n"
     end

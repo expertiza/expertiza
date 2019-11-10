@@ -184,17 +184,13 @@ class GradesController < ApplicationController
                             grade: @team.grade_for_submission,
                             comment: @team.comment_for_submission)
       @team.save
-
       @log_map = {
           :instructorid =>  session[:user].id.to_s,
-          :assignment_id =>  participant.assignment.id.to_s ,
-          :grading_type => :Submission ,
-          :grade_receiver_id =>  @team.id.to_s ,
+          :assignment_id =>  participant.assignment.id.to_s,
+          :grading_type => :Submission,
+          :grade_receiver_id =>  @team.id.to_s,
           :grade =>  @team.grade_for_submission.to_s}
       @log_message = "Grade and comment for team successfully saved"
-
-
-
       flash[:success] = 'Grade and comment for submission successfully saved.'
     rescue StandardError
       flash[:error] = $ERROR_INFO

@@ -6,17 +6,13 @@ class GradingHistoriesController < ApplicationController
     check_type(params[:grade_type])
     if @assignment.instructor_id == current_user.id
       true
-    elsif TaMapping.exists?(ta_id: current_user.id, course_id: @assignment.course_id) &&
-        (TaMapping.where(course_id: @assignment.course_id).include? TaMapping.where(ta_id: current_user.id, course_id: @assignment.course_id).first)
+    elsif TaMapping.exists?(ta_id: current_user.id, course_id: @assignment.course_id)
       true
     elsif @assignment.course_id && Course.find(@assignment.course_id).instructor_id == current_user.id
       true
     end
   end
-  
 
-
-  # GET /grading_histories
   def index
     @grading_histories = GradingHistory.where(grade_receiver_id: params[:grade_receiver_id], grading_type: params[:grade_type]).reverse_order
   end

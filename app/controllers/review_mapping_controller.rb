@@ -381,11 +381,9 @@ class ReviewMappingController < ApplicationController
                                                  ", assignment_id: " + params[:assignment_id].to_s +
                                                  ", grading_type: Review" +
                                                  ", grade_receiver_id: " + Participant.find(params[:participant_id]).user_id.to_s +
-                                                 ", grade: " + params[:grade_for_reviewer].to_s+
+                                                 ", grade: " + params[:grade_for_reviewer].to_s +
                                                  ", comment_for_reviewer: " + params[:comment_for_reviewer].to_s +
                                                  ". Grade and comment for reviewer successfully saved.", request)
-
-
       flash[:success] = 'Grade and comment for reviewer successfully saved.'
     rescue StandardError
       flash[:error] = $ERROR_INFO
@@ -422,8 +420,8 @@ class ReviewMappingController < ApplicationController
 
   def assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
     if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0)
-           .where("created_at > :time",
-                  time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
+                        .where("created_at > :time",
+                        time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
 
       participants_with_insufficient_review_num = []
       participants_hash.each do |participant_id, review_num|
@@ -456,8 +454,8 @@ class ReviewMappingController < ApplicationController
       end
     end
     @@time_create_last_review_mapping_record = ReviewResponseMap.
-        where(reviewed_object_id: assignment_id).
-        last.created_at
+                                               where(reviewed_object_id: assignment_id).
+                                               last.created_at
   end
 
   def peer_review_strategy(assignment_id, review_strategy, participants_hash)

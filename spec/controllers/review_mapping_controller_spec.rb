@@ -528,7 +528,7 @@ describe ReviewMappingController do
       review_grade = build(:review_grade)
       allow(ReviewGrade).to receive(:find_by).with(participant_id: '1').and_return(review_grade)
       allow(review_grade).to receive(:save).and_return(true)
-      session = {user: double('User', id: 1)}
+      session = {user: double('User', id: 1, name: "instructor6")}
 
       allow(GradingHistory).to receive(:create).with(instructor_id: session[:user].id,
                                                      assignment_id: '1',
@@ -544,7 +544,7 @@ describe ReviewMappingController do
       }
       post :save_grade_and_comment_for_reviewer, params, session
       expect(flash[:note]).to be nil
-      expect(response).to redirect_to('/review_mapping/response_report?id=1')
+      expect(response).to redirect_to('/reports/response_report?id=1')
     end
   end
 

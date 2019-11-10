@@ -47,8 +47,7 @@ class AssignmentsController < ApplicationController
         assignment_form_params[:due_date] = due_array
         @assignment_form.update(assignment_form_params, current_user)
         aid = Assignment.find_by(name: @assignment_form.assignment.name).id
-        ExpertizaLogger.info "New log"
-        ExpertizaLogger.info "Assignmentsssssss created: #{@assignment_form.as_json}"
+        ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
         redirect_to edit_assignment_path aid
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
         return

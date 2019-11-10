@@ -107,7 +107,7 @@ class StudentTeamsController < ApplicationController
   end
 
   def advertise_for_partners
-    ExpetizaLogger.info LoggerMessage.new(controller_name,session[:user].name, 'Advertise for partners sent',request)
+    ExpetizaLogger.info LoggerMessage.new(controller_name,session[:user].name, 'Advertisement for partners sent',request)
     Team.update_all advertise_for_partner: true, id: params[:team_id]
   end
 

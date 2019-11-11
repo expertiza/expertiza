@@ -27,6 +27,7 @@
   <% end %>
   <!-- E726 Fall2012 Changes End -->
 
+  <!-- Aligning the column to the left keeping it similar to the entire page -->
   <td align="left">
     <%= form_tag :controller=>'participants', :action=>'update_authorizations', :id => participant.id do %>
         <% params[:authorization] = authorization %>
@@ -53,6 +54,7 @@
                   <% end -%>
                   >submitter</option>
         </select>
+        <!-- Change to display the Submit button -->
         <%= button_tag "Submit", {:id=>'button'+participant.user_id.to_s,:style=>"font-size:15px; opacity:1;", :class => "btn btn-md btn-default" } %>
     <% end %>
   </td>

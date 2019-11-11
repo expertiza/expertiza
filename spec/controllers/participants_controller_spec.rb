@@ -77,7 +77,7 @@ describe ParticipantsController do
   end
 
   describe '#validate_authorizations' do
-  #Test case for successful update of participant to reviewer, expects the success flash message
+  #Test case for successful update of participant to reviewer, expects the success flash message after role is updated.
   it 'updates the authorizations for the participant to make them reviewer' do
     allow(Participant).to receive(:find).with('1').and_return(participant)
     params = {authorization: 'reviewer', id: 1}

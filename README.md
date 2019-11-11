@@ -1,3 +1,13 @@
+Topic
+=====
+CSC/ECE 517 Fall 2019 - E1990. Integrate suggestion detection algorithm <br>
+Team Name: Pizzamas <br>
+Team Members:
+ - Maharshi Parekh
+ - Pururaj Dave
+ - Roshani Narasimhan
+ - Yash Thakkar
+
 Expertiza
 =========
 

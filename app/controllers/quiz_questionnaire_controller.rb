@@ -6,7 +6,7 @@ class QuizQuestionnaireController < QuestionnairesController
     render :view
   end
 
-  # define a new quiz questionnaire
+  # define a new quiz  questionnaire
   # method invoked by the view
   def new_quiz
     valid_request = true

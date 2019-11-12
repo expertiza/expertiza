@@ -181,6 +181,7 @@ class Team < ActiveRecord::Base
 
   #  changed to hash by E1776
   #  E1938: Changed options[:handle_dups] to options["handle_dups"] due to faulty handling
+  #  E1938: Fixed checking of teamtype to based on how object was populated in import_file_controller.rb
   def self.import(row_hash, id, options, teamtype)
 
     raise ArgumentError, "Not enough fields on this line." if row_hash.empty? || (row_hash[:teammembers].length < 2 && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last")) || (row_hash[:teammembers].empty? && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"))
@@ -208,6 +209,7 @@ class Team < ActiveRecord::Base
   end
 
   # Handle existence of the duplicate team
+  # E1938: Fixed checking of teamtype to based on how object was populated in import_file_controller.rb
   def self.handle_duplicate(team, name, id, handle_dups, teamtype)
     return name if team.nil? # no duplicate
     return nil if handle_dups == "ignore" # ignore: do not create the new team

@@ -295,6 +295,8 @@ resources :institution, except: [:destroy] do
       get :delete_reviewer
       get :distribution
       get :list_mappings
+      # post :response_report
+      # get :response_report
       get :select_metareviewer
       get :select_reviewer
       get :select_mapping

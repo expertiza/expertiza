@@ -9,6 +9,44 @@
       $('.tag_prompt_container').toggle();
     });
   });
+	var startDate = new Date();
+        var elapsedTime = 0;
+	$(window).bind("beforeunload",function() {
+        endDate = new Date();
+        elapsedTime += endDate.getTime() - startDate.getTime();
+        console.log(elapsedTime);
+	console.log(endDate.getTime())
+        console.log('Unload');
+        var id = "<%= params[:id] %>"
+        console.log(id)
+	$.ajax({
+            url: "../../../grades/track_review_time",
+            type: "POST",
+            crossDomain: false,
+            data: {time:elapsedTime,id:id},
+            success: function () {
+              console.log('successfully sent to controller')
+            },
+            error: function () {
+              console.log('Error in sending response to controller')
+            }
+          });
+        });
+	
+	document.addEventListener("visibilitychange", function() {
+	if(document.visibilityState == 'visible'){
+	startDate = new Date();
+	console.log(startDate);
+	console.log('visible');
+	}
+	if(document.visibilityState == 'hidden'){
+	endDate = new Date();
+	elapsedTime = elapsedTime + (endDate.getTime() - startDate.getTime());
+	console.log('hidden');
+	console.log(endDate.getTime());	
+	console.log(elapsedTime);
+	}
+	})
 
   function toggleFunction(elementId) {
     var target = document.getElementById(elementId);

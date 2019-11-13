@@ -259,8 +259,6 @@ resources :institution, except: [:destroy] do
     end
   end
 
-post 'response/track_review_time', to: 'response#track_review_time'
-
   resources :reputation_web_service, only: [] do
     collection do
       get :client
@@ -277,7 +275,6 @@ post 'response/track_review_time', to: 'response#track_review_time'
       get :redirect
       get :show_calibration_results_for_student
       post :custom_create
-      #post :trackreviewtime
       get :pending_surveys
       get :json
     end
@@ -298,8 +295,6 @@ post 'response/track_review_time', to: 'response#track_review_time'
       get :delete_reviewer
       get :distribution
       get :list_mappings
-      # post :response_report
-      # get :response_report
       get :select_metareviewer
       get :select_reviewer
       get :select_mapping
@@ -487,7 +482,8 @@ post 'response/track_review_time', to: 'response#track_review_time'
   get ':page_name', controller: :content_pages, action: :view, method: :get
   post 'impersonate/impersonate', to: 'impersonate#impersonate'
   post '/plagiarism_checker_results/:id' => 'plagiarism_checker_comparison#save_results'
-  #post 'response/track_review_time', to: 'response#track_review_time'
+  post 'response/track_review_time', to: 'response#track_review_time'
+  post 'grades/track_review_time', to: 'grades#track_review_time'
   get 'instructions/home'
   get 'response/', to: 'response#saving'
   get ':controller/service.wsdl', action: 'wsdl'

@@ -36,16 +36,6 @@ class ResponseController < ApplicationController
     end
   end
 
-  def track_review_time
-    @time = params[:time]
-    @id = params[:id]
-    response = Response.find(@id)
-    @reviewer_id = response.map.reviewer.user_id
-    @reviewee_id = response.map.reviewee.id
-    ExpertizaLogger.info LoggerMessage.new(controller_name,session[:user].name,"Reviewer id #{@reviewer_id} reviewed for reviewee id #{@reviewee_id} for #{@time} ms",request)
-    render plain: "OK"
-  end
-
   # GET /response/json?response_id=xx
   def json
     response_id = params[:response_id] if params.key?(:response_id)
@@ -125,6 +115,20 @@ class ResponseController < ApplicationController
     init_answers(questions)
     render action: 'response'
   end
+
+ def track_review_time
+    @time = params[:time]
+    @id = params[:id]
+    if Response.where(id: @id).nil? == 'false'
+    response = Response.find(@id)
+    @reviewer_id = response.map.reviewer.user_id
+    @reviewee_id = response.map.reviewee.id
+    ExpertizaLogger.info LoggerMessage.new(controller_name,session[:user].name,"Reviewer id #{@reviewer_id} reviewed for reviewee id #{@reviewee_id} for #{@time} ms",request)
+    end
+    render plain: "OK"
+  end
+
+
 
   def new_feedback
     review = Response.find(params[:id]) unless params[:id].nil?

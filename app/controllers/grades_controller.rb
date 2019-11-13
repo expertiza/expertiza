@@ -24,6 +24,12 @@ class GradesController < ApplicationController
       else
         true
       end
+    when 'track_review_time'
+    ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator',
+        'Student'].include? current_role_name
     else
       ['Instructor',
        'Teaching Assistant',
@@ -80,6 +86,15 @@ class GradesController < ApplicationController
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "#{session[:user].name} viewed his grade in alternate view", request)
 
   end
+
+  def track_review_time
+    @time = params[:time]
+    @id = params[:id]
+    @time = (@time.to_f)/60000
+    ExpertizaLogger.info LoggerMessage.new(controller_name,session[:user].name," User #{session[:user].name} spent #{'%0.2f'% @time} minutes to review his review grade",request)
+    render plain: "OK"
+  end
+
 
   # method for alternative view
   def view_team

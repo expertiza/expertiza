@@ -108,10 +108,12 @@ class User < ActiveRecord::Base
     User.anonymized_view?(ip_address) ? self.role.name : fullname.try(:[], /,.+/).try(:[], /\w+/) || ''
   end
 
+  # get the user's institution
   def institution(ip_address = nil)
     if User.anonymized_view?(ip_address)
       self.role.name + ', ' + self.id.to_s
     else
+      # check whether this user is an instructor and has an affiliated institution
       if self[:role_id] == 2
         self[:institution_id].nil? ? "" : Institution.find(self[:institution_id]).name
       end

@@ -1,4 +1,6 @@
 describe 'add TA', js: true do
+  # add 4 courses called D, A, C, B
+  # after this block, there should be 4 courses and the order in the dropdown list is D-A-C-B
   before(:each) do
     @instructor = create(:instructor)
     create(:institution, name: 'D')
@@ -10,6 +12,7 @@ describe 'add TA', js: true do
     ta_role.save
   end
 
+  # the original order is D-A-C-B, after sorting, we expect A-B-C-D
   it "check if the courses are sorted alphabetically" do
     create(:superadmin, name: 'super_administrator2')
     login_as('super_administrator2')

@@ -149,7 +149,7 @@ describe UsersController do
                  role_id: 2,
                  password_salt: 1,
                  fullname: '6, instructor',
-                 email: 'chenzy@gmail.com',
+                 email: 'test@gmail.com',
                  parent_id: 1,
                  private_by_default: false,
                  mru_directory_path: nil,
@@ -166,7 +166,7 @@ describe UsersController do
                  institution_id: 1}
       }
       post :create, params, session
-      allow_any_instance_of(User).to receive(:undo_link).with('The user "chenzy@gmail.com" has been successfully created. ').and_return(true)
+      allow_any_instance_of(User).to receive(:undo_link).with('The user "test@gmail.com" has been successfully created. ').and_return(true)
       expect(flash[:success]).to eq "A new password has been sent to new user's e-mail address."
       expect(response).to redirect_to('http://test.host/users/list')
     end
@@ -179,7 +179,7 @@ describe UsersController do
                  role_id: 2,
                  password_salt: 1,
                  fullname: '6, instructor',
-                 email: 'chenzy@gmail.com',
+                 email: 'test@gmail.com',
                  parent_id: 1,
                  private_by_default: false,
                  mru_directory_path: nil,
@@ -210,7 +210,7 @@ describe UsersController do
                  role_id: 2,
                  password_salt: 1,
                  fullname: '6, instructor',
-                 email: 'chenzy@gmail.com',
+                 email: 'test@gmail.com',
                  parent_id: 1,
                  private_by_default: false,
                  mru_directory_path: nil,
@@ -230,6 +230,7 @@ describe UsersController do
       expect(response).to render_template(:new)
     end
 
+
     it 'save successfully with a new institution' do
       session = {user: admin}
       params = {
@@ -238,7 +239,7 @@ describe UsersController do
                  role_id: 2,
                  password_salt: 1,
                  fullname: '6, instructor',
-                 email: 'yzhu48@ncsu.edu',
+                 email: 'test@ncsu.edu',
                  parent_id: 1,
                  private_by_default: false,
                  mru_directory_path: nil,
@@ -254,7 +255,7 @@ describe UsersController do
                  copy_of_emails: nil,
                  institution_id: 666,
                  institution: {
-                     name: 'yzhu48'
+                     name: 'a new institution'
                  }
           }
       }
@@ -272,7 +273,7 @@ describe UsersController do
                  role_id: 2,
                  fullname: '6, instructor',
                  institution_id: 1,
-                 email: 'chenzy@gmail.com'},
+                 email: 'test@gmail.com'},
           requested_user: {self_introduction: 'I am good'}
       }
       post :create_requested_user_record, params # session
@@ -287,7 +288,7 @@ describe UsersController do
                  role_id: 2,
                  fullname: '6, instructor',
                  institution_id: 1,
-                 email: 'chenzy@gmail.com'},
+                 email: 'test@gmail.com'},
           requested_user: {self_introduction: 'I am good'}
       }
       post :create_requested_user_record, params
@@ -302,7 +303,7 @@ describe UsersController do
                  role_id: 2,
                  fullname: '6, instructor',
                  institution_id: 1,
-                 email: 'chenzy@gmail.com'},
+                 email: 'test@gmail.com'},
           requested_user: {self_introduction: 'I am good'}
       }
       post :create_requested_user_record, params
@@ -315,7 +316,7 @@ describe UsersController do
                  role_id: 2,
                  fullname: '6, instructor',
                  institution_id: [],
-                 email: 'chenzy@gmail.com'},
+                 email: 'test@gmail.com'},
           requested_user: {self_introduction: 'I am good'},
           institution: {name: 'google'}
       }

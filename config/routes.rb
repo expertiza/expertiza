@@ -1,6 +1,6 @@
 
 Expertiza::Application.routes.draw do
-  resources :response_trials
+  resources :response_times
   ###
   # Please insert new routes alphabetically!
   ###

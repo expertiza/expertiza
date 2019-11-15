@@ -6,4 +6,69 @@
     <div id="files" style="display:none">
       <%= display_directory_tree(participant, @files, true) %>
     </div>
+    <script type="text/javascript">
+    var supported_file_type = ["pdf", "txt", "doc", "ppt", "png", "jpg"];
+      function ISODateString(date){
+        function pad(num){return num<10? '0'+num: num;}
+        return date.getUTCFullYear()+'-'
+                  + pad(date.getUTCMonth()+1) + '-'
+                  + pad(date.getUTCDate()) + ' '
+                  + pad(date.getUTCHours()) + ':'
+                  + pad(date.getUTCMinutes()) + ':'
+                  + pad(date.getUTCSeconds());
+      }
+      $(document).ready(function(){
+        $(".fileLink").click(function(event){
+          event.preventDefault();
+          var dir_name = $(this).attr("current_folder[name]");
+          var file_name = $(this).attr("download");
+          var file_name_extension = file_name.split(".").pop();
+          startTime(<%= map_id %>, <%= round %>, file_name);
+          
+          if ($.inArray(file_name_extension, supported_file_type)>=0){
+            alert("Open file "+ file_name + " in new window to view it online.");
+            var window_handler = window.open(dir_name+'/'+file_name, "_blank");
+            var link_timer = setInterval(checkWindowStatus, 1000);
+          } else {
+            // var window_handler = window.open(file_name);
+            alert("Download file "+file_name + " to view it locally.");
+            window.location.href = dir_name+'/'+file_name;
+          }
+          function startTime(map_id, round, link) {
+            var t = new Date();
+            $.ajax({
+              type: "POST",
+              url: '/response_times/record_start_time',
+              data: $.param({response_time:{map_id: map_id, round: round, link: link, start_at: ISODateString(t)}})
+            });
+          }
+          function endTime(link){
+            var t = new Date();
+            $.ajax({
+              type: 'POST',
+              dataType: 'json',
+              async: false,
+              url: '/response_times/record_end_time',
+              data: $.param({
+                response_time: {map_id: <%= map_id %>, round: <%= round %>, link: link, end_at: ISODateString(t)}
+                }),
+              /*success: function(json){
+                var links = JSON.parse(JSON.stringigy(json));
+                for (lk in links)
+                  console.log(lk+" review time is complete!");
+              }*/
+              failure: function(){
+                console.log("review time failed to save!");
+              }
+            });
+          }
+          function checkWindowStatus(){
+            if (window_handler.closed){
+              endTime(file_name);
+              clearInterval(link_timer);
+            }
+          }
+        })
+      });
+    </script>
 <% end %>

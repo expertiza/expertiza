@@ -327,6 +327,30 @@ module ReviewMappingHelper
     @rspan = @review_responses.length
   end
 
+  def get_time_spent_on_review_for_certain_team_for_each_round(map_id)
+    (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@time_spent_round_" + round.to_s,0) }
+    (1..@assignment.num_review_rounds).each do |round|
+      sum_time = 0
+      @response_times = ResponseTime.where(map_id: map_id, round: round)
+      @response_times.each do |link_time|
+        #start_time = link_time.start_at.nil?? 0: link_time.start_at
+        #end_time = link_time.end_at.nil?? 0: link_time.end_at
+        if link_time.start_at.nil? || link_time.end_at.nil?
+          individual_time = 0
+        else
+          start_time = link_time.start_at
+          end_time = link_time.end_at
+          individual_time = (end_time.to_i - start_time.to_i)/60.0
+        end
+        individual_time = individual_time<0? 0: individual_time
+        sum_time = individual_time + sum_time
+      end
+      if sum_time > 0
+        instance_variable_set("@time_spent_round_" + round.to_s, sum_time.inspect)
+      end
+    end
+  end
+  
   #
   # for calibration report
   #

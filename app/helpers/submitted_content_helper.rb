@@ -29,6 +29,7 @@ module SubmittedContentHelper
                                               :id => participant.id,
                                               :download => File.basename(file),
                                               "current_folder[name]" => File.dirname(file)
+          ret += link_to File.basename(file), {:controller => 'submitted_content', :action => 'download',:id => participant.id, :download => File.basename(file), "current_folder[name]" => File.dirname(file)}, :class => "fileLink", :download => File.basename(file).to_s
         end
         ret += "\n   </td>\n   <td valign = top>\n"
         ret += File.size(file).to_s

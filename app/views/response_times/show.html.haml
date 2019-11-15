@@ -1,0 +1,21 @@
+%p#notice= notice
+
+%p
+  %b Map:
+  = @response_time.map_id
+%p
+  %b Link:
+  = @response_time.link
+%p
+  %b Round:
+  = @response_time.round
+%p
+  %b Start at:
+  = @response_time.start_at
+%p
+  %b End at:
+  = @response_time.end_at
+
+= link_to 'Edit', edit_response_time_path(@response_time)
+\|
+= link_to 'Back', response_times_path

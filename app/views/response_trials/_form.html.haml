@@ -1,0 +1,10 @@
+= form_for @response_trial do |f|
+  - if @response_trial.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@response_trial.errors.count, "error")} prohibited this response_trial from being saved:"
+      %ul
+        - @response_trial.errors.full_messages.each do |message|
+          %li= message
+
+  .actions
+    = f.submit 'Save'

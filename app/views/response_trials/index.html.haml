@@ -1,0 +1,19 @@
+%h1 Listing response_trials
+
+%table
+  %thead
+    %tr
+      %th
+      %th
+      %th
+
+  %tbody
+    - @response_trials.each do |response_trial|
+      %tr
+        %td= link_to 'Show', response_trial
+        %td= link_to 'Edit', edit_response_trial_path(response_trial)
+        %td= link_to 'Destroy', response_trial, method: :delete, data: { confirm: 'Are you sure?' }
+
+%br
+
+= link_to 'New Response trial', new_response_trial_path

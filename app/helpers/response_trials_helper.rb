@@ -1,0 +1,2 @@
+module ResponseTrialsHelper
+end

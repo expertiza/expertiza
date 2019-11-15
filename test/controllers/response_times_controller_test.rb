@@ -18,7 +18,7 @@ class ResponseTimesControllerTest < ActionController::TestCase
 
   test "should create response_time" do
     assert_difference('ResponseTime.count') do
-      post :create, response_time: {  }
+      post :create, response_time: { end_at: @response_time.end_at, link: @response_time.link, map_id: @response_time.map_id, round: @response_time.round, start_at: @response_time.start_at }
     end
 
     assert_redirected_to response_time_path(assigns(:response_time))
@@ -35,7 +35,7 @@ class ResponseTimesControllerTest < ActionController::TestCase
   end
 
   test "should update response_time" do
-    patch :update, id: @response_time, response_time: {  }
+    patch :update, id: @response_time, response_time: { end_at: @response_time.end_at, link: @response_time.link, map_id: @response_time.map_id, round: @response_time.round, start_at: @response_time.start_at }
     assert_redirected_to response_time_path(assigns(:response_time))
   end
 

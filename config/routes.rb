@@ -1,6 +1,6 @@
 
 Expertiza::Application.routes.draw do
-  resources :response_times
+
   ###
   # Please insert new routes alphabetically!
   ###
@@ -296,6 +296,16 @@ resources :institution, except: [:destroy] do
       get :show_calibration_results_for_student
       post :custom_create
       get :json
+    end
+  end
+
+  resources :response_times do
+    collection do
+      post :record_start_time
+      post :record_end_time
+      post :mark_end_time
+      get :record_start_time
+      get :record_end_time
     end
   end
 

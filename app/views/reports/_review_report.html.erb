@@ -1,7 +1,7 @@
 <!-- the table creation is changed top accommodate functionality of tablesorter, which requires thead and tbody seperately. Previously, headers were in tbody only -->
 <div class='reviewreport'>
   <!-- Added headers for tablesorter -->
-
+  <link rel="stylesheet" type="text/css"  href="/assets/legend.css">
   <script type='text/javascript'>
       $(window).load(function () {
           $("#myTable tbody").sortable().disableSelection();
@@ -39,7 +39,13 @@
       <th width="10%" class="sorter-false">Reviews done<span></span></th>
       <th width="24%" class="sorter-false">Team reviewed <span></span></th>
       <th width="13%" class="sorter-false">Score awarded / Avg. score <span></span></th>
-      <th width="13%" class="sorter-true">Metrics <span></span></th>
+      <th width="17%" class="sorter-true"> <div style="display: inline-block; float: right; padding-top: 1em">Metrics </div>
+        <div class='legend-scale'  style="display: inline-block; float: right">
+          <ul class='legend-labels'>
+            <li><span style='background:#ffa9af;'></span>Vol.</li>
+            <li><span style='background:#8B0000;'></span>Avg.vol</li>
+          </ul>
+        </div></th>
       <th class="sorter-false">Assign grade and write comments <span></span></th>
     </tr>
     </thead>

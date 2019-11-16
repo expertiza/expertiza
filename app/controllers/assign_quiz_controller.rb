@@ -1,5 +1,6 @@
 class AssignQuizController < ApplicationController
-  
+  # E1944: assign_quiz_dynamically was originally included in review_mapping_controller. 
+  # But as the name suggests, assigning a quiz dynamically to a participant has nothing to do with Review_mapping. 
   def choose_case(action_in_params)
     if ['assign_quiz_dynamically'].include? action_in_params
       return true
@@ -12,7 +13,8 @@ class AssignQuizController < ApplicationController
     return choose_case(params[:action])
   end
 
-  # assigns the quiz dynamically to the participant
+  # assigns the quiz dynamically to the participant. A Quiz/Questionnaire is stored in the Assignment Table itself. 
+  # Check if the user has already taken the quiz, otherwise get the response and store in the QuizResponseMap table. 
   def assign_quiz_dynamically
     begin
       assignment = Assignment.find(params[:assignment_id])

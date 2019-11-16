@@ -1,4 +1,4 @@
-#Helper/Internal Methods used in ReviewMappingController are defined here.
+#E1944 Helper/Internal Methods used in ReviewMappingController are defined here.
 module Helper_methods
 
   def assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
@@ -62,7 +62,7 @@ module Helper_methods
     assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
   end
 
-  # Helper Method to check num_reviews_per_student and num_reviews_per_submission arguments passed in by params hash.
+  # E1944: Helper Method to check num_reviews_per_student and num_reviews_per_submission arguments passed in by params hash.
   def check_num_reviews_args(num_reviews_per_student, num_reviews_per_submission, teams)
     has_error_not_raised = true
     # check for exit paths first
@@ -82,7 +82,7 @@ module Helper_methods
     end
   end
 
-  ## Helper Method for generating a random participant which is to be used in peer_review_strategy method.
+  ## E1944: Helper Method for generating a random participant which is to be used in peer_review_strategy method.
   def gen_random_participant_id(iterator, participants_hash, num_participants, participants)
     if iterator.zero?
         rand_num = rand(0..num_participants - 1)
@@ -172,7 +172,7 @@ module Helper_methods
   end
 end 
 
-#ReviewMappingController, Methods from the module Helper_methods are mixed into this. 
+#E1944: ReviewMappingController, Methods from the module Helper_methods are mixed into this. 
 class ReviewMappingController < ApplicationController
 
   include Helper_methods

@@ -1,3 +1,5 @@
+#add_calibration is a method that changes the attribute of a ReviewResponseMap and has little to do with Review Mapping.
+#So it is now put in a separate controller named ReviewResponseMapController.
 class ReviewResponseMapController < ApplicationController
   autocomplete :user, :name
   # use_google_charts

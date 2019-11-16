@@ -41,9 +41,7 @@ class UsersController < ApplicationController
     render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
 
-  #
   # for anonymized view for demo purposes
-  #
   def set_anonymized_view
     anonymized_view_starter_ips = $redis.get('anonymized_view_starter_ips') || ''
     session[:ip] = request.remote_ip

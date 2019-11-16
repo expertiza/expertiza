@@ -475,7 +475,6 @@ resources :institution, except: [:destroy] do
       get :list
       post :list
       post ':id', action: :update
-      get :show_selection
       post :show_if_authorized
       get :auto_complete_for_user_name
       get :set_anonymized_view

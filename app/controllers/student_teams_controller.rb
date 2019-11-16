@@ -1,6 +1,10 @@
 class StudentTeamsController < ApplicationController
   autocomplete :user, :name
 
+after_filter ->(param="advertise_for_partners"){log param}, :only => :advertise_for_partners
+after_filter ->(param="remove_participant"){log param}, :only => :remove_participant
+after_filter ->(param="team_created_successfully"){log param}, :only => :team_created_successfully
+
   def team
     @team ||= AssignmentTeam.find params[:team_id]
   end
@@ -107,7 +111,6 @@ class StudentTeamsController < ApplicationController
   end
 
   def advertise_for_partners
-    ExpetizaLogger.info LoggerMessage.new(controller_name,session[:user].name, 'Advertisement for partners sent',request)
     Team.update_all advertise_for_partner: true, id: params[:team_id]
   end
 
@@ -120,7 +123,6 @@ class StudentTeamsController < ApplicationController
     # remove the record from teams_users table
     team_user = TeamsUser.where(team_id: params[:team_id], user_id: student.user_id)
     remove_team_user(team_user)
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Left the team')
     # if your old team does not have any members, delete the entry for the team
     if TeamsUser.where(team_id: params[:team_id]).empty?
       old_team = AssignmentTeam.find params[:team_id]
@@ -166,11 +168,22 @@ class StudentTeamsController < ApplicationController
     else
       undo_link "The team \"#{team.name}\" has been successfully updated."
     end
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'The team has been successfully created.', request)
   end
 
   def review
     @assignment = Assignment.find params[:assignment_id]
     redirect_to view_questionnaires_path id: @assignment.questionnaires.find_by(type: 'AuthorFeedbackQuestionnaire').id
+  end
+
+  def log(message)
+   if(message == "advertise_for_partners")
+   ExpertizaLogger.info LoggerMessage.new(controller_name,session[:user].name, 'Advertisement for partners sent',request)
+   end
+   if(message == "remove_participant")
+   ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Left the team')
+   end
+   if(message == "team_created_successfully")
+   ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'The team has been successfully created.', request)
+   end
   end
 end

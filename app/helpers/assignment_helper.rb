@@ -5,11 +5,11 @@ module AssignmentHelper
       ta = Ta.find(session[:user].id)
       ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id) }
       # If a TA created some courses before, s/he can still add new assignments to these courses.
-      # courses << Course.where(instructor_id: instructor.id)
-      # courses.flatten!
+      # E1976 issue #1430 the TA should not access a course s/he is not belong to.
       ta_ids = []
       ta_ids << Instructor.get_my_tas(session[:user].id)
       ta_ids.flatten!
+      # find the TA and course mapping, add course which the TA assigned to to the course list.
       ta_ids.each do |ta_id|
         ta = Ta.find(ta_id)
         ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id) }
@@ -36,9 +36,10 @@ module AssignmentHelper
       set_courses_options(courses)
     end
   end
-
+  # E1976 set the courses option for creating an assignment.
   def set_courses_options(courses)
       options = []
+      # the options can be nil which meaning the assignment can belong to no class.
       options << ['-----------', nil]
       courses.each do |course|
       options << [course.name, course.id]

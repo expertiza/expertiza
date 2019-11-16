@@ -5,11 +5,24 @@ module AssignmentHelper
       ta = Ta.find(session[:user].id)
       ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id) }
       # If a TA created some courses before, s/he can still add new assignments to these courses.
-      courses << Course.where(instructor_id: instructor.id)
-      courses.flatten!
+      # courses << Course.where(instructor_id: instructor.id)
+      # courses.flatten!
+      ta_ids = []
+      ta_ids << Instructor.get_my_tas(session[:user].id)
+      ta_ids.flatten!
+      ta_ids.each do |ta_id|
+        ta = Ta.find(ta_id)
+        ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id) }
+      end
+      options = []
+      courses.each do |course|
+        options << [course.name, course.id]
+      end
+      options.uniq.sort
     # Administrator and Super-Administrator can see all courses
     elsif session[:user].role.name == 'Administrator' or session[:user].role.name == 'Super-Administrator'
       courses = Course.all
+      set_courses_options(courses)
     elsif session[:user].role.name == 'Instructor'
       courses = Course.where(instructor_id: instructor.id)
       # instructor can see courses his/her TAs created
@@ -20,13 +33,17 @@ module AssignmentHelper
         ta = Ta.find(ta_id)
         ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id) }
       end
+      set_courses_options(courses)
     end
-    options = []
-    options << ['-----------', nil]
-    courses.each do |course|
+  end
+
+  def set_courses_options(courses)
+      options = []
+      options << ['-----------', nil]
+      courses.each do |course|
       options << [course.name, course.id]
-    end
-    options.uniq.sort
+      end
+      options.uniq.sort
   end
 
   # round=0 added by E1450

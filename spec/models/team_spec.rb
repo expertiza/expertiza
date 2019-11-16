@@ -190,6 +190,8 @@ describe Team do
       end
     end
 
+    #Add tests to handle duplicates in various ways, in .import method and handle_duplicates method
+
     context 'when there are duplicates in new teams with existing teams' do
       let(:row) do
         {teammembers: %w(member1 member2), teamname: 'name'}
@@ -324,10 +326,10 @@ describe Team do
           allow(Team).to receive(:generate_team_name).with('no assignment').and_return('new team name')
           allow(team).to receive(:name=).with('new team name')
           allow(team).to receive(:save)
-          expect(team).to receive(:name=).with('new team name').exactly(2).times
-          expect(team).to receive(:save).exactly(2).times
-          expect(Team.handle_duplicate(team, 'no name', 1, 'replace_existing', CourseTeam.new)).to be nil
-          expect(Team.handle_duplicate(team, 'no name', 1, 'replace_existing', AssignmentTeam.new)).to be nil
+          expect(team).not_to receive(:name=).with('new team name').exactly(2).times
+          expect(team).not_to receive(:save).exactly(2).times
+          expect(Team.handle_duplicate(team, 'no name', 1, 'replace_existing', CourseTeam.new)).not_to be nil
+          expect(Team.handle_duplicate(team, 'no name', 1, 'replace_existing', AssignmentTeam.new)).not_to be nil
         end
       end
     end

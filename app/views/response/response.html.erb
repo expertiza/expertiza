@@ -26,6 +26,16 @@
 
   jQuery(document).ready(function() {
 
+    window.onblur=function(){
+      document.title='not focused';
+    }
+
+    window.onfocus=function(){
+      document.title='focused';
+    }
+    document.onblur=window.onblur;
+    document.onfocus=window.onfocus;
+
     //use barrating for dropdown
     $('.review-rating').each(function(index, el) {
       var $El;

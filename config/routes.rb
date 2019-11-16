@@ -476,6 +476,7 @@ resources :institution, except: [:destroy] do
       post :list
       post ':id', action: :update
       get :show_selection
+      post :show_if_authorized
       get :auto_complete_for_user_name
       get :set_anonymized_view
       get :keys
@@ -488,7 +489,6 @@ resources :institution, except: [:destroy] do
       post :list
       get :list_pending_requested
       post ':id', action: :update
-      post :show_if_authorized
       get :auto_complete_for_user_name
       get :set_anonymized_view
       get :keys

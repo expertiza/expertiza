@@ -12,15 +12,6 @@
       <th align = "right"> User id:</th>
       <td> <%= @user.name(session[:ip]) %></td>
     </tr>
-  <!--    <tr>
-      <th align = "right"> email:</th>
-      <td> <%= @user.email(session[:ip]) %></td>
-    </tr>
-    <tr>-->
-      <th align = "right"> Handle:</th>
-      <td> <%= @user.handle %></td>
-    </tr>
-
 
   </table>
 
@@ -28,7 +19,7 @@
 
 <% def get_link_round_review_time(map_id, round, link) %>
     <% sum_time = 0 %>
-    <% links = ResponseTime.where(map_id: map_id, round: round, link: link) %>
+    <% links = SubmissionViewingEvent.where(map_id: map_id, round: round, link: link) %>
     <% links.each do |link_time| %>
         <% if link_time.end_at.nil? || link_time.start_at.nil? %>
             <% individual_time = 0 %>
@@ -41,17 +32,17 @@
     <% sum_time %>
 <% end %>
 
-<div id="responsetime">
+<div id="submissionviewingevent">
   <% reviewee_list = Array.new %>
   <% total_time_list = Array.new %>
   <% timeHash = Hash.new %>
-  <h3> Response time details</h3>
+  <h3>Review submission viewing time details</h3>
   <a id = "details" class= "show" onclick="showDetails()">show details</a>
   <div id="chartContainer" style="height: 300px; width: 100%; display: none; "></div>
   <div>
     <table width="100%">
       <tr>
-        <th align="right">Reviewee id </th>
+        <th align="right">Reviewed Team</th>
         <th align="right">Total Time (mins)</th>  
         <th align="right">Round </th>
         <th align="right">Links</th>
@@ -67,36 +58,37 @@
         <% map_total_time = 0 %>
         <% (1..@number_of_rounds).each do |each_round| %>  <!-- for rounds-->
           <% @per_round_time = Array.new %>
-          <% @responsetime_match = ResponseTime.where(map_id: map.id, round:each_round)%>
+          <% @submissionviewingevent_match = SubmissionViewingEvent.where(map_id: map.id, round:each_round)%>
           <% @reviewed_object_id = map.reviewed_object_id %>
           <% @reviewee_id = map.reviewee_id %>
           <% link_list = Array.new %>
           <% @count = 0 %>   <!--- To print revieweeId only once-->
           <% @dummy = "      " %>    <!---Empty string as a placeholder-->
-          <% @responsetime_match.each do |responsetime_entry| %>
-            <% if link_list.include?(responsetime_entry.link) %><!-- only unique links per round-->
+          <% @submissionviewingevent_match.each do |submissionviewingevent_entry| %>
+            <% if link_list.include?(submissionviewingevent_entry.link) %><!-- only unique links per round-->
             <% else %>
-                <% link_list.push(responsetime_entry.link) %>
+                <% link_list.push(submissionviewingevent_entry.link) %>
                 <tr>
                 <% if @count == 0 %>  <!--- print revieweeId,time, round only for the first row-->
-                  <td><%= @reviewee_id %></td>
-                  <td id="<%= reviewee_count.to_s %>"></td>
-                  <td><%= responsetime_entry.round %></td>
+                  <% team = Team.find(@reviewee_id) %>
+                  <td><%= team.name %></td>
+                  <td id="<%= reviewee_count.to_s %>" align="center"></td>
+                  <td align="center"><%= submissionviewingevent_entry.round %></td>
                 <% else %>        <!--- Else print dummy-->
                   <td><%= @dummy %></td>  
                   <td><%= @dummy %></td>
                   <td><%= " "%></td>
                 <%end%>
-                <td><%= responsetime_entry.link %></td>
-                <% individual_link_time = get_link_round_review_time(responsetime_entry.map_id,responsetime_entry.round,responsetime_entry.link) %>
+                <td><%= submissionviewingevent_entry.link %></td>
+                <% individual_link_time = get_link_round_review_time(submissionviewingevent_entry.map_id,submissionviewingevent_entry.round,submissionviewingevent_entry.link) %>
                 <% map_total_time = map_total_time + individual_link_time %>
                  <% each_link_detail = Array.new %>
-                 <% each_link_detail << responsetime_entry.link %>
+                 <% each_link_detail << submissionviewingevent_entry.link %>
                  <% each_link_detail << individual_link_time %>
                  <% @per_round_time << each_link_detail %>
                 <td align="center"><%= sprintf("%.2f",individual_link_time) %></td>
                 <% if @count == 0 %>
-                <td><a onclick="drawChart(<%= @reviewee_id.to_s %>,<%= each_round.to_s %>)">Pie Chart </a></td>
+                <td><a onclick="drawChart(<%= @reviewee_id.to_s %>,<%= each_round.to_s %>)">Pie chart view </a></td>
                 <% else %> 
                 <td><%= " "%></td>
                 <%end%>
@@ -124,7 +116,7 @@
     for(each=0;each<totalTimeList.length;each++){
       // var eachId = each.toString();  
       // document.getElementById(eachId).innerHTML = totalTimeList[each];  
-      $("#responsetime table #"+each).html(totalTimeList[each]);
+      $("#submissionviewingevent table #"+each).html(totalTimeList[each]);
     }       
   });  
   function showDetails(){
@@ -178,4 +170,4 @@
     $(".canvasjs-chart-credit").css("display","none");//To remove the water mark from the chart
   }
 </script>
-</div>
+</div> 

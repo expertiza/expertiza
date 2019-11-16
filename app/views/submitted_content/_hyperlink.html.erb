@@ -26,130 +26,119 @@
             <input type="radio" id='chk_links' name='chk_links' value="<%= index %>"/>
           <% end %>
         <% end %>
-        <% if local_assigns[:response_check] %>
+        <% if local_assigns[:submission_check] %>
           <a href="<%= link %>" class="review_link"><%= link %></a>
         <% else %>
           <a href="<%= link %>" target="_blank"><%= link %></a>
         <% end %>
-          <br/>
+        <br/>
       <% end %>
       <% } %>
     </ul>
   </div>
-  <% if local_assigns[:response_check] %>
-  <script type="text/javascript">
-    function ISODateString(date){
-      function pad(num){return num<10? '0'+num: num;}
-      return date.getUTCFullYear()+'-'
-                + pad(date.getUTCMonth()+1) + '-'
-                + pad(date.getUTCDate()) + ' '
-                + pad(date.getUTCHours()) + ':'
-                + pad(date.getUTCMinutes()) + ':'
-                + pad(date.getUTCSeconds());
-    }
-    $(document).ready(function(){
-      var map_id = <%= @map.id %>;
-      var round = <%= @current_round %>;
-      // var current_window_timer = null;
-      var time_out_interval = 500; // in milliseconds
-      var linksToUpdate = {};
-      var windowsToClose = new Array();
-      // startTimer();
-      function timeoutAction(timeout_flag){
-        if (timeout_flag) {
-          markEndTime();
-          while (windowsToClose!=null && windowsToClose.length>0){
-            windowsToClose.shift().close();
-          }
-        }
-        restart_link_timing_flag = $("#restart_link_timing_flag").val()=='true';
-        if (restart_link_timing_flag) {
-          for (link in linksToUpdate) {
-            if (linksToUpdate[link]) {
-              startTime(map_id, round, link);
+  <% if local_assigns[:submission_check] %>
+    <script type="text/javascript">
+      function ISODateString(date){
+        function pad(num){return num<10? '0'+num: num;}
+        return date.getUTCFullYear()+'-'
+                  + pad(date.getUTCMonth()+1) + '-'
+                  + pad(date.getUTCDate()) + ' '
+                  + pad(date.getUTCHours()) + ':'
+                  + pad(date.getUTCMinutes()) + ':'
+                  + pad(date.getUTCSeconds());
+      }
+      $(document).ready(function(){
+        var map_id = <%= @map.id %>;
+        var round = <%= @current_round %>;
+        var time_out_interval = 500; // in milliseconds
+        var linksToUpdate = {};
+        var windowsToClose = new Array();
+        function timeoutAction(timeout_flag){
+          if (timeout_flag) {
+            markEndTime();
+            while (windowsToClose!=null && windowsToClose.length>0){
+              windowsToClose.shift().close();
             }
           }
-          $("#restart_link_timing_flag").val('false');
-        }
-      }
-      // function resetTimer() {
-      //   clearTimeout(current_window_timer);
-      //   current_window_timer = setTimeout(timeoutAction, time_out_interval);
-      // }
-      // function startTimer() {
-      //   resetTimer();
-      //   $(this).bind("click", resetTimer());
-      //   $(this).bind("mousemove", resetTimer());
-      // }
-      function startTime(map_id, round, link) {
-        var t = new Date();
-        $.ajax({
-          type: "POST",
-          url: '/response_times/record_start_time',
-          data: $.param({response_time:{map_id: map_id, round: round, link: link, start_at: ISODateString(t)}})
-        });
-      }
-      function markEndTime() {
-        var  t = new Date();
-        $.ajax({
-          type: 'POST',
-          dataType: 'json',
-          async: false,
-          url: '/response_times/mark_end_time',
-          data: $.param({
-            response_time: {map_id: map_id, round: round, end_at: ISODateString(t)}
-            }),
-          success: function(json){
-            var links = JSON.parse(JSON.stringify(json));
-            for (lk in links)
-              console.log(lk+" review time is complete!");
-          },
-          error: function(json){
-            console.log("review time failed to save!");
+          restart_link_timing_flag = $("#restart_link_timing_flag").val()=='true';
+          if (restart_link_timing_flag) {
+            for (link in linksToUpdate) {
+              if (linksToUpdate[link]) {
+                startTime(map_id, round, link);
+              }
+            }
+            $("#restart_link_timing_flag").val('false');
           }
-        });
-      }
-      $("#url a.review_link").click(function linkAction(event){
-        event.preventDefault();
-        var link_handler = $(this); // current link
-        var address = link_handler.attr("href"); // url address of the current link
-        var window_handler = window.open(address); // open link in new window/tag
-        windowsToClose.push(window_handler);
-        $("#restart_link_timing_flag").val('false');
-        startTime(map_id, round, address);
-        linksToUpdate[address] = true;
-        var link_timer = setInterval(checkWindowStatus, time_out_interval); // check window open/close every second
-        function endTime(link){
+        }
+        function startTime(map_id, round, link) {
           var t = new Date();
+          $.ajax({
+            type: "POST",
+            url: '/submission_viewing_events/record_start_time',
+            data: $.param({submission_viewing_event:{map_id: map_id, round: round, link: link, start_at: ISODateString(t)}})
+          });
+        }
+        function markEndTime() {
+          var  t = new Date();
           $.ajax({
             type: 'POST',
             dataType: 'json',
             async: false,
-            url: '/response_times/record_end_time',
+            url: '/submission_viewing_events/mark_end_time',
             data: $.param({
-              response_time: {map_id: map_id, round: round, link: link, end_at: ISODateString(t)}
+              submission_viewing_event: {map_id: map_id, round: round, end_at: ISODateString(t)}
               }),
-            /*success: function(json){
-              var links = JSON.parse(JSON.stringigy(json));
+            success: function(json){
+              var links = JSON.parse(JSON.stringify(json));
               for (lk in links)
                 console.log(lk+" review time is complete!");
-            }*/
-            failure: function(){
+            },
+            error: function(json){
               console.log("review time failed to save!");
             }
           });
         }
-        function checkWindowStatus(){
-          timeout_flag = $('#timeout_flag').val()=='true';
-          if (window_handler.closed){
-            endTime(address);
-            linksToUpdate[address] = false;
-            clearInterval(link_timer);
+        $("#url a.review_link").click(function linkAction(event){
+          event.preventDefault();
+          var link_handler = $(this); // current link
+          var address = link_handler.attr("href"); // url address of the current link
+          var window_handler = window.open(address); // open link in new window/tag
+          windowsToClose.push(window_handler);
+          $("#restart_link_timing_flag").val('false');
+          startTime(map_id, round, address);
+          linksToUpdate[address] = true;
+          var link_timer = setInterval(checkWindowStatus, time_out_interval); // check window open/close every second
+          function endTime(link){
+            var t = new Date();
+            $.ajax({
+              type: 'POST',
+              dataType: 'json',
+              async: false,
+              url: '/submission_viewing_events/record_end_time',
+              data: $.param({
+                submission_viewing_event: {map_id: map_id, round: round, link: link, end_at: ISODateString(t)}
+                }),
+              /*success: function(json){
+                var links = JSON.parse(JSON.stringigy(json));
+                for (lk in links)
+                  console.log(lk+" review time is complete!");
+              }*/
+              failure: function(){
+                console.log("review time failed to save!");
+              }
+            });
           }
-          timeoutAction(timeout_flag);
-        }
+          function checkWindowStatus(){
+            timeout_flag = $('#timeout_flag').val()=='true';
+            if (window_handler.closed){
+              endTime(address);
+              linksToUpdate[address] = false;
+              clearInterval(link_timer);
+            }
+            timeoutAction(timeout_flag);
+          }
+        });
       });
-    });
-  </script>
+    </script>
   <% end %>
 <% end %>

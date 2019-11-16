@@ -53,7 +53,6 @@
           <% user = Participant.find(r.id).user %>
             <!--reviewer-->
             <td>
-              <!--%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %-->
               <%= link_to user.name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id=>@id %>
               (<%= user.fullname(session[:ip]) %>)
             </td>

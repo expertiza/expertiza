@@ -309,16 +309,16 @@
             <% end %>
         <% end %>
 
-        <% @response_check = true %>
+        <% @submission_check = true %>
         <%= hidden_field_tag :timeout_flag, :id => 'timeout_flag', :value => 'false' %>
         <%= hidden_field_tag :restart_link_timing_flag, :id => 'restart_link_timing_flag', :value => 'false' %>
         <%= hidden_field_tag :restart_file_timing_flag, :id => 'restart_file_timing_flag', :value => 'false' %>
         <%if @assignment.teams?%>
             <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-            <%= render :partial => 'submitted_content/main', :locals => {:reviewee_participant => @contributor.participants.first,:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(topic_id), :map_id => @map.id, :response_check => @response_check, :round => @current_round} %>
+            <%= render :partial => 'submitted_content/main', :locals => {:reviewee_participant => @contributor.participants.first,:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(topic_id), :map_id => @map.id, :submission_check => @submission_check, :round => @current_round} %>
         <%else%>
             <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-            <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage => @assignment.get_current_stage(topic_id), :map_id => @map.id, :response_check => @response_check, :round => @current_round} %>
+            <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage => @assignment.get_current_stage(topic_id), :map_id => @map.id, :submission_check => @submission_check, :round => @current_round} %>
         <%end%>
         <hr/>
     <% end %>
@@ -436,33 +436,53 @@
 <%= @map.show_feedback(@response) %>
 <a href="javascript:window.history.back()">Back</a>
 <div id="dialog-message" style="word-wrap: normal"></div>
-<% if @response_check %>
+<% if @submission_check %>
   <script type="text/javascript">
     $(document).ready(function(){
       var map_id = <%= @map.id %>;
       var round = <%= @current_round %>;
       var current_window_timer = null;
-      var time_out_interval = 10000; // in milliseconds
+      var auto_window_timer = null;
+      var time_out_interval = 120000; // in milliseconds, checkout end time when not interaction on review page
+      var time_period = 30000; // automaticall record end time every minunte
+      var timer_flag = false;
       startTimer();
+      resetTimer();
+      autoTimer();
       function timeoutAction(){
-        // window.focus();
+        window.focus();
+        timer_flag = false;
         markEndTime();
         if(confirm("Are you still reviewing your submissions? Press OK to continue")){
           startTimer();
+          resetTimer();
         } else {
           clearTimeout(current_window_timer);
+          clearInterval(auto_window_timer);
           $("#timeout_flag").val("true");
           //markEndTime();
           alert("The page has not been interacted for a long time, and will close reference windows and go back!");
           window.history.back();
         }
       }
+      function autoTimer(){
+        clearInterval(auto_window_timer);
+        auto_window_timer = setInterval(autoRecordTime, time_period);
+      }
+      function autoRecordTime(){
+        markEndTime();
+        if (timer_flag == true){
+          startTimer();
+        }
+      }
       function resetTimer() {
         clearTimeout(current_window_timer);
         current_window_timer = setTimeout(timeoutAction, time_out_interval);
+        timer_flag = true;
       }
       function startTimer() {
-        resetTimer();
+        // resetTimer();
+        // autoTimer();
         $("#timeout_flag").val("false");
         $("#restart_file_timing_flag").val("true");
         $("#restart_link_timing_flag").val("true");
@@ -480,9 +500,9 @@
           type: 'POST',
           dataType: 'json',
           async: false,
-          url: '/response_times/mark_end_time',
+          url: '/submission_viewing_events/mark_end_time',
           data: $.param({
-            response_time: {map_id: map_id, round: round, end_at: ISODateString(t)}
+            submission_viewing_event: {map_id: map_id, round: round, end_at: ISODateString(t)}
             }),
           success: function(json){
             var links = JSON.parse(JSON.stringify(json));
@@ -499,4 +519,4 @@
       });
     });
   </script>
-<% end %>
+<% end %> 

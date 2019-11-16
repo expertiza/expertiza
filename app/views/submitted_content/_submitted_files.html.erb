@@ -48,7 +48,8 @@
       </table>
     <% end %>
   <% end %>
-  <% if local_assigns[:response_check] %>
+  
+  <% if local_assigns[:submission_check] %>
     <script type="text/javascript">
       var supported_file_type = ["pdf", "txt", "doc", "ppt", "png", "jpg"];
       function ISODateString(date){
@@ -97,8 +98,8 @@
           var t = new Date();
           $.ajax({
             type: "POST",
-            url: '/response_times/record_start_time',
-            data: $.param({response_time:{map_id: map_id, round: round, link: link, start_at: ISODateString(t)}})
+            url: '/submission_viewing_events/record_start_time',
+            data: $.param({submission_viewing_event:{map_id: map_id, round: round, link: link, start_at: ISODateString(t)}})
           });
         }
         function markEndTime() {
@@ -107,9 +108,9 @@
             type: 'POST',
             dataType: 'json',
             async: false,
-            url: '/response_times/mark_end_time',
+            url: '/submission_viewing_events/mark_end_time',
             data: $.param({
-              response_time: {map_id: map_id, round: round, end_at: ISODateString(t)}
+              submission_viewing_event: {map_id: map_id, round: round, end_at: ISODateString(t)}
               }),
             success: function(json){
               var files = JSON.parse(JSON.stringify(json));
@@ -150,9 +151,9 @@
               type: 'POST',
               dataType: 'json',
               async: false,
-              url: '/response_times/record_end_time',
+              url: '/submission_viewing_events/record_end_time',
               data: $.param({
-                response_time: {map_id: map_id, round: round, link: link, end_at: ISODateString(t)}
+                submission_viewing_event: {map_id: map_id, round: round, link: link, end_at: ISODateString(t)}
                 }),
               /*success: function(json){
                 var links = JSON.parse(JSON.stringigy(json));
@@ -179,4 +180,4 @@
   <% end %>
 <% else %>
 <!--No files have been submitted.-->
-<% end %>
+<% end %> 

@@ -299,16 +299,6 @@ resources :institution, except: [:destroy] do
     end
   end
 
-  resources :response_times do
-    collection do
-      post :record_start_time
-      post :record_end_time
-      post :mark_end_time
-      get :record_start_time
-      get :record_end_time
-    end
-  end
-
   resources :review_mapping, only: [] do
     collection do
       post :add_metareviewer
@@ -427,6 +417,16 @@ resources :institution, except: [:destroy] do
   end
 
   resources :submission_records, only: [:index]
+
+  resources :submission_viewing_events do
+    collection do
+      post :record_start_time
+      post :record_end_time
+      post :mark_end_time
+      get :record_start_time
+      get :record_end_time
+    end
+  end
 
   resources :suggestion, only: %i[show new create] do
     collection do

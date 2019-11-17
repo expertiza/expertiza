@@ -136,6 +136,7 @@ class Participant < ActiveRecord::Base
       tcsv.push(user.role.name) if options["role"] == "true"
       tcsv.push(user.parent.name) if options["parent"] == "true"
       tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review) if options["email_options"] == "true"
+      tcsv.push(user.action_enable) if options["action_enable"] == "true"
       tcsv.push(part.handle) if options["handle"] == "true"
       csv << tcsv
     end

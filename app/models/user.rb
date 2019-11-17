@@ -231,6 +231,7 @@ class User < ActiveRecord::Base
     @email_on_submission = true
     @email_on_review_of_review = true
     @copy_of_emails = false
+    @action_enable = true
   end
 
   def self.export(csv, _parent_id, options)
@@ -241,6 +242,7 @@ class User < ActiveRecord::Base
       tcsv.push(user.role.name) if options["role"] == "true"
       tcsv.push(user.parent.name) if options["parent"] == "true"
       tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails) if options["email_options"] == "true"
+      tcsv.push(user.action_enable) if options["action_enable"] == "true"
       tcsv.push(user.handle) if options["handle"] == "true"
       csv << tcsv
     end

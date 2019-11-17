@@ -163,7 +163,8 @@ describe UsersController do
                timezonepref: 'Eastern Time (US & Canada)',
                public_key: nil,
                copy_of_emails: nil,
-               institution_id: 1}
+               institution_id: 1,
+               action_enable: nil}
       }
       post :create, params, session
       allow_any_instance_of(User).to receive(:undo_link).with('The user "chenzy@gmail.com" has been successfully created. ').and_return(true)
@@ -193,7 +194,8 @@ describe UsersController do
                timezonepref: 'Eastern Time (US & Canada)',
                public_key: nil,
                copy_of_emails: nil,
-               institution_id: 1}
+               institution_id: 1,
+               action_enable: nil}
       }
       post :create, params, session
       allow_any_instance_of(User).to receive(:undo_link).with('The user "instructor6" has been successfully created. ').and_return(true)
@@ -224,7 +226,8 @@ describe UsersController do
                timezonepref: 'Eastern Time (US & Canada)',
                public_key: nil,
                copy_of_emails: nil,
-               institution_id: 1}
+               institution_id: 1,
+               action_enable: nil}
       }
       post :create, params, session
       expect(response).to render_template(:new)

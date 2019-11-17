@@ -53,6 +53,7 @@ FactoryBot.define do
     timezonepref nil
     public_key nil
     copy_of_emails  false
+    action_enable true
   end
 
   factory :superadmin, class: User do
@@ -75,6 +76,7 @@ FactoryBot.define do
     timezonepref nil
     public_key nil
     copy_of_emails  false
+    action_enable true
   end
 
   factory :student, class: User do
@@ -98,6 +100,7 @@ FactoryBot.define do
     timezonepref 'Eastern Time (US & Canada)'
     public_key nil
     copy_of_emails false
+    action_enable true
   end
 
   factory :instructor, class: Instructor do
@@ -120,6 +123,7 @@ FactoryBot.define do
     timezonepref 'Eastern Time (US & Canada)'
     public_key nil
     copy_of_emails false
+    action_enable true
   end
 
   factory :teaching_assistant, class: Ta do
@@ -142,6 +146,7 @@ FactoryBot.define do
     timezonepref 'Eastern Time (US & Canada)'
     public_key nil
     copy_of_emails  false
+    action_enable true
   end
 
   factory :course, class: Course do

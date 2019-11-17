@@ -59,6 +59,7 @@ class SignupSheetController < ApplicationController
   # This method is used to delete signup topics
   # Renaming delete method to destroy for rails 4 compatible
   # E1943. Fixed the flash message when the topic does not exist.
+  
   def destroy
     @topic = SignUpTopic.find(params[:id])
     assignment = Assignment.find(params[:assignment_id])

@@ -34,6 +34,9 @@
         <th class="sorter-false" style="font-weight: bold; font-size: 15px;"></th>
       </tr>                    
     </thead>
+  <%= puts "----------Trying to check due date --------" %>
+  <%= puts AssignmentDueDate.where(@) %>
+  <%= puts "---------------------" %>
     <% @l = -1 %>
     <% @teams.each do |team| %>
       <% @l = @l+1 %>

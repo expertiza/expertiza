@@ -100,6 +100,10 @@ class ApplicationController < ActionController::Base
         user.super_admin?
   end
 
+  def is_enable(user, owner_id)
+    user.id == owner_id && user.action_enable?
+  end
+
   def record_not_found
     redirect_to controller: :tree_display, action: :list
   end

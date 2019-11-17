@@ -91,12 +91,15 @@ jQuery(document).ready(function() {
           newNodeType = this.props.nodeType + "s"
         }
         if (this.props.is_available || newNodeType == 'questionnaires') {
-          moreContent.push(
-            <span>
-              <a title="Edit" href={"/"+newNodeType+"/"+(parseInt(this.props.id)/2).toString()+"/edit"}><img src="/assets/tree_view/edit-icon-24.png" /></a>
-              <a title="Delete" href={"/tree_display/confirm?id="+(parseInt(this.props.id)/2).toString()+"&nodeType="+newNodeType}><img src="/assets/tree_view/delete-icon-24.png" /></a>
+              moreContent.push(
+                  <span>
+              <a title="Edit" href={"/" + newNodeType + "/" + (parseInt(this.props.id) / 2).toString() + "/edit"}><img
+                  src="/assets/tree_view/edit-icon-24.png"/></a>
+              <a title="Delete"
+                 href={"/tree_display/confirm?id=" + (parseInt(this.props.id) / 2).toString() + "&nodeType=" + newNodeType}><img
+                  src="/assets/tree_view/delete-icon-24.png"/></a>
             </span>
-          )
+              )
         }
         moreContent.push(
           <span>
@@ -157,7 +160,7 @@ jQuery(document).ready(function() {
               </span>
             )
           }
-          if (this.props.is_available) {
+          if (this.props.is_available && this.props.is_enable) {
             moreContent.push(
               <span>
                 <a title="Add participants" href={"/participants/list?id="+(parseInt(this.props.id)/2).toString()+"&model=Assignment"}>
@@ -303,6 +306,7 @@ jQuery(document).ready(function() {
                             parent_name={this.props.name}
                             private={this.props.private}
                             is_available={this.props.is_available}
+                            is_enable={this.props.is_enable}
                             course_id={this.props.course_id}
                             max_team_size={this.props.max_team_size}
                             is_intelligent={this.props.is_intelligent}
@@ -329,6 +333,7 @@ jQuery(document).ready(function() {
                             parent_name={this.props.name}
                             private={this.props.private}
                             is_available={this.props.is_available}
+                            is_enable={this.props.is_enable}
                             course_id={this.props.course_id}
                             max_team_size={this.props.max_team_size}
                             is_intelligent={this.props.is_intelligent}
@@ -523,6 +528,7 @@ jQuery(document).ready(function() {
                           parent_name={this.props.name}
                           private={this.props.private}
                           is_available={this.props.is_available}
+                          is_enable={this.props.is_enable}
                           course_id={this.props.course_id}
                           max_team_size={this.props.max_team_size}
                           is_intelligent={this.props.is_intelligent}
@@ -550,6 +556,7 @@ jQuery(document).ready(function() {
                           parent_name={this.props.name}
                           private={this.props.private}
                           is_available={this.props.is_available}
+                          is_enable={this.props.is_enable}
                           course_id={this.props.course_id}
                           max_team_size={this.props.max_team_size}
                           is_intelligent={this.props.is_intelligent}
@@ -793,6 +800,7 @@ jQuery(document).ready(function() {
                       updated_date={entry.updated_date}
                       actions={entry.actions}
                       is_available={entry.is_available}
+                      is_enable={entry.is_enable}
                       course_id={entry.course_id}
                       max_team_size={entry.max_team_size}
                       is_intelligent={entry.is_intelligent}
@@ -836,6 +844,7 @@ jQuery(document).ready(function() {
                               updated_date={entry.updated_date}
                               actions={entry.actions}
                               is_available={entry.is_available}
+                              is_enable={entry.is_enable}
                               course_id={entry.course_id}
                               max_team_size={entry.max_team_size}
                               is_intelligent={entry.is_intelligent}
@@ -876,6 +885,7 @@ jQuery(document).ready(function() {
                               updated_date={entry.updated_date}
                               actions={entry.actions}
                               is_available={entry.is_available}
+                              is_enable={entry.is_enable}
                               course_id={entry.course_id}
                               max_team_size={entry.max_team_size}
                               is_intelligent={entry.is_intelligent}

@@ -122,6 +122,10 @@ class TreeDisplayController < ApplicationController
         Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
   end
 
+  def action_is_enable(tmp_object, instructor_id, node)
+    tmp_object["is_enable"] = is_enable(session[:user], instructor_id)
+  end
+
   # updating instructor value for tmp_object
   def update_instructor(tmp_object, instructor_id)
     tmp_object["instructor_id"] = instructor_id
@@ -148,6 +152,7 @@ class TreeDisplayController < ApplicationController
     update_in_ta_course_listing(instructor_id, node, tmp_object)
     update_instructor(tmp_object, instructor_id)
     update_is_available(tmp_object, instructor_id, node)
+    action_is_enable(tmp_object, instructor_id, node)
     assignments_method(node, tmp_object) if node_type == "Assignments"
   end
 

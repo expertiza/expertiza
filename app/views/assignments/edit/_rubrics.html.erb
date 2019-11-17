@@ -28,9 +28,11 @@
         html += '</select></td>';
         //Use dropdown instead
         // E1970 fix issue #1312
+        // When DB has this checkbox saved as checked, display it as checked
         if (assignment_questionnaire.use_dropdown_instead){
           html += '<td align="center"><input type="checkbox" name="assignment_form[assignment_questionnaire][][use_dropdown_instead]" id="dropdown" value="true" checked ></td>';
         }
+        // When DB not has this saved or has this checkbox saved as unchecked, display it as unchecked
         else{
           html += '<td align="center"><input type="checkbox" name="assignment_form[assignment_questionnaire][][use_dropdown_instead]" id="dropdown" value="true"></td>';
         }

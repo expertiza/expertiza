@@ -1,3 +1,4 @@
+schema.rb
 dump.rdb
 .bundle
 db/*.sqlite3

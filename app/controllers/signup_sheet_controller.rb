@@ -58,6 +58,7 @@ class SignupSheetController < ApplicationController
 
   # This method is used to delete signup topics
   # Renaming delete method to destroy for rails 4 compatible
+  # E1943. Fixed the flash message when the topic does not exist.
   def destroy
     @topic = SignUpTopic.find(params[:id])
     assignment = Assignment.find(params[:assignment_id])
@@ -82,6 +83,7 @@ class SignupSheetController < ApplicationController
   end
 
   # updates the database tables to reflect the new values for the assignment. Used in conjuntion with edit
+  # E1943. Refactored variables and added the update_attributes call.
   def update
     @topic = SignUpTopic.find(params[:id])
     if @topic
@@ -107,7 +109,7 @@ class SignupSheetController < ApplicationController
     end
   end
 
-  # This method appropriately calls the create topic or update existing topic method
+  # E1943. This method appropriately calls the create topic or update existing topic method.
   def call_create_or_update(topic)
     if topic.nil?
       setup_new_topic
@@ -119,12 +121,14 @@ class SignupSheetController < ApplicationController
   # This displays a page that lists all the available topics for an assignment.
   # Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
   # Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics can have different deadlines.
+  # 1943. Deleted the add_signup_topics_staggered method as it simply just called the method below.
   def add_signup_topics
     retrieve_signup_topics(params[:id])
     SignUpSheet.add_signup_topic(params[:id])
   end
 
   # retrieves all the data associated with the given assignment. Includes all topics,
+  # 1943. Renamed load_add_signup_topics tp retrieve_signup_topics.
   def retrieve_signup_topics(assignment_id)
     @id = assignment_id
     @sign_up_topics = SignUpTopic.where('assignment_id = ?', assignment_id)
@@ -164,7 +168,7 @@ class SignupSheetController < ApplicationController
   end
 
 
-  #
+  # 1943. Provided comments.
   #this returns a list of topics which are available for assignment
   def list
     @participant = AssignmentParticipant.find(params[:id].to_i)
@@ -228,6 +232,7 @@ class SignupSheetController < ApplicationController
   # This method finds the user from the username present in the params. If the student does not exist, returns "does not exist" message, else it checks
   # whether it exists as a participant and signs it up for the topic, else displays the message "already signed up" and "not registered for the assignment"
   # At the end, it redirects to the edit action of the assignments controller.
+  #1943. Refactored the if-else ladder.
   def signup_as_instructor_action
     user = User.find_by(name: params[:username])
     if user.nil? # validate invalid user
@@ -248,6 +253,7 @@ class SignupSheetController < ApplicationController
   end
 
   # this function is used to delete a previous signup
+  #1943. Refactored the common code in delete_signup and delete_signup_as_instructor.
   def delete_signup
     participant = AssignmentParticipant.find(params[:id])
     assignment = participant.assignment
@@ -281,7 +287,7 @@ class SignupSheetController < ApplicationController
     redirect_to controller: 'assignments', action: 'edit', id: assignment.id
   end
 
-  # common code between delete_signup and delete_singup_as_instructor, satisfying the DRY principle
+  # 1943. common code between delete_signup and delete_singup_as_instructor, satisfying the DRY principle.
   def get_status(status_for, participant, assignment, drop_topic_deadline)
     if !participant.team.submitted_files.empty? or !participant.team.hyperlinks.empty?
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for already submitted work: ' + params[:topic_id].to_s)

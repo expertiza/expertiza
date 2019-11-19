@@ -27,14 +27,23 @@
   jQuery(document).ready(function() {
 
     window.onblur=function(){
-      document.title='not focused';
+      checkFocus();
     }
 
     window.onfocus=function(){
       document.title='focused';
     }
-    document.onblur=window.onblur;
-    document.onfocus=window.onfocus;
+
+    function checkFocus() {
+	if(document.activeElement == document.getElementsByTagName("iframe")[0]) {
+	  document.title='focused';
+	} else {
+	  document.title='not focused';
+	}
+    }
+
+    //document.onblur=window.onblur;
+    //document.onfocus=window.onfocus;
 
     //use barrating for dropdown
     $('.review-rating').each(function(index, el) {
@@ -351,7 +360,7 @@
     <%= hidden_field_tag "map_id", @modified_object %>
     <%= hidden_field_tag "saved", (@header == "New") ? 1 : 0 %>
     <% if @next_action.eql?'update' %>
-        <input name="_method" type="hidden" value="put" />
+        <input name="_method" type="hidden" value="put"/>
     <%end%>
     <table width="100%">
       <tr>

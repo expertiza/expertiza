@@ -1,6 +1,4 @@
-<% request_user ||= false %>
-<%if !request_user%>
-  <div>
+ <div>
 <!-- E1976   add action enable at instructor profile page-->
     <table class="table borderless">
       <% if @user.role_id == 2 %>
@@ -9,10 +7,9 @@
         <tr>
           <td>Check the boxes representing that whether to see assignment actions on the homepage or on a tab associated with each assignment.
         <tr>
-          <td><label for="action_enables">I want to view the assignment <strong>Actions</strong> on homepage</label></td>
-          <td><%= check_box 'user', 'action_enable'%></td>
+          <td><label for="action_enable">I want to view the assignment <strong>Actions</strong> on homepage</label></td>
+          <td><%= check_box 'user', 'action_enable', {}%></td>
         </tr>
       <% end %>
     </table>
   </div>
-<% end %>

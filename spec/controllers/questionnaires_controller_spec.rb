@@ -335,6 +335,18 @@ describe QuestionnairesController do
         expect(response).to redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]
       end
     end
+
+    context 'when params[:add_new_questions] is not nil' do
+      it 'redirects to questionnaire#add_new_questions' do
+        params = {id: 1,
+                  add_new_questions: true,
+                  new_question: {total_num: 2,
+                                 type: 'TextArea'}}
+        post :update, params
+        expect(flash[:success]).to eq('You have successfully deleted all the answers corresponding to this Questionnaire!')
+        expect(response).to redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]
+      end
+    end
   end
 
   describe '#delete' do

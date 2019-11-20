@@ -130,7 +130,20 @@ class QuestionnairesController < ApplicationController
   def update
     # If 'Add' or 'Edit/View advice' is clicked, redirect appropriately
     if params[:add_new_questions]
-      redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]
+      question_ids=[]
+      unless params[:question].nil?
+        params[:question].each_pair do |k, v|
+          question_ids.append(k)
+        end
+      end
+      # Fetch the Answers for the Questionnaire, delete and send them to User
+      begin
+        AnswerHelper.delete_existing_responses(params[:id],question_ids)
+        flash[:success] = "You have successfully added a new question. The existing reviews for the questionnaire have been deleted!"
+      rescue StandardError
+        flash[:error] = $ERROR_INFO
+      end
+     redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]
     elsif params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     else

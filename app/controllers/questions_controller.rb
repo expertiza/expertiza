@@ -65,12 +65,19 @@ class QuestionsController < ApplicationController
       render action: 'edit'
     end
   end
-
+  
   # Remove question from database and
   # return to list
   def destroy
     question = Question.find(params[:id])
     questionnaire_id = question.questionnaire_id
+    question_ids=Question.where(questionnaire_id: questionnaire_id).ids
+    # Fetch the Answers for the Questionnaire, delete and send them to User
+    begin
+      AnswerHelper.delete_existing_responses(questionnaire_id,question_ids)
+    rescue StandardError
+      flash[:error] = $ERROR_INFO
+    end
     begin
       question.destroy
       flash[:success] = "You have successfully deleted the question!"
@@ -85,4 +92,5 @@ class QuestionsController < ApplicationController
     types = Question.distinct.pluck(:type)
     render json: types.to_a
   end
+
 end

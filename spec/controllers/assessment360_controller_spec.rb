@@ -5,13 +5,26 @@ describe Assessment360Controller do
   let(:administrator) { build(:admin, id: 6) }
   let(:superadmin) { build(:superadmin, id: 6) }
   let(:course) { double('Course', instructor_id: 6, path: '/cscs', name: 'abc', id: 1) }
-  let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true, teams: [build(:assignment_team)]) }
+  let(:assignment) do
+    build(:assignment,
+          id: 1,
+          instructor_id: 6,
+          due_dates: [due_date],
+          microtask: true,
+          staggered_deadline: true,
+          teams: [build(:assignment_team)])
+  end
   let(:assignment_list) { [assignment] }
   let(:due_date) { build(:assignment_due_date, deadline_type_id: 1) }
   let(:course_participant) { build(:course_participant, user_id: 1) }
   let(:student1) { build(:student, id: 1, name: :lily) }
-  let(:assignment_with_participants) {build(:assignment, id: 1, name: "test_assignment", instructor_id: 2,
-                                            participants: [build(:participant, id: 1, user_id: 1, assignment: assignment)], course_id: 1)}
+  let(:assignment_with_participants) do
+    build(:assignment,
+          id: 1,
+          name: "test_assignment",
+          instructor_id: 2,
+          participants: [build(:participant, id: 1, user_id: 1, assignment: assignment)], course_id: 1)
+  end
   let(:assignment_with_participants_list) { [assignment_with_participants] }
   let(:empty_teammate_review) { [] }
   let(:empty_meta_review) { [] }
@@ -23,7 +36,7 @@ describe Assessment360Controller do
   let(:signed_up_team) { build(:signed_up_team, team: team, topic: topic) }
   let(:team) { build(:assignment_team, id: 1, assignment: assignment) }
   let(:team_with_grade) { build(:assignment_team, id: 1, assignment: assignment, grade_for_submission: 95) }
-  let(:participant) { build(:participant)}
+  let(:participant) { build(:participant) }
   let(:scores) {}
   let(:topic) { build(:topic) }
 
@@ -83,7 +96,7 @@ describe Assessment360Controller do
       it 'redirects to back and flashes error as there are no participants' do
         allow(course).to receive(:assignments).and_return(assignment_list)
         allow(assignment_list).to receive(:reject).and_return(assignment_list)
-        allow(course).to receive(:get_participants).and_return([]) #no participants
+        allow(course).to receive(:get_participants).and_return([]) # no participants
         params = {course_id: 1}
         session = {user: instructor}
         get :all_students_all_reviews, params, session
@@ -95,7 +108,7 @@ describe Assessment360Controller do
       it 'has participants, next assignment participant does not exist, and avoids divide by zero' do
         allow(course).to receive(:assignments).and_return(assignment_list)
         allow(assignment_list).to receive(:reject).and_return(assignment_list)
-        allow(course).to receive(:get_participants).and_return([course_participant]) #has participants
+        allow(course).to receive(:get_participants).and_return([course_participant]) # has participants
         allow(StudentTask).to receive(:teamed_students).with(course_participant.user).and_return(student1)
         params = {course_id: 1}
         session = {user: instructor}
@@ -112,9 +125,9 @@ describe Assessment360Controller do
       it 'has participants, next assignment participant exists, but there are no reviews' do
         allow(course).to receive(:assignments).and_return(assignment_with_participants_list)
         allow(assignment_with_participants_list).to receive(:reject).and_return(assignment_with_participants_list)
-        allow(course).to receive(:get_participants).and_return([course_participant]) #has participants
+        allow(course).to receive(:get_participants).and_return([course_participant]) # has participants
         allow(StudentTask).to receive(:teamed_students).with(course_participant.user).and_return(student1)
-        allow(assignment_with_participants.participants).to receive(:find_by).with({:user_id=>course_participant.user_id}).and_return(course_participant)
+        allow(assignment_with_participants.participants).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
         allow(course_participant).to receive(:teammate_reviews).and_return(empty_teammate_review)
         allow(course_participant).to receive(:metareviews).and_return(empty_meta_review)
         params = {course_id: 1}
@@ -132,9 +145,9 @@ describe Assessment360Controller do
       it 'has participants, next assignment participant exists, but there are reviews' do
         allow(course).to receive(:assignments).and_return(assignment_with_participants_list)
         allow(assignment_with_participants_list).to receive(:reject).and_return(assignment_with_participants_list)
-        allow(course).to receive(:get_participants).and_return([course_participant]) #has participants
+        allow(course).to receive(:get_participants).and_return([course_participant]) # has participants
         allow(StudentTask).to receive(:teamed_students).with(course_participant.user).and_return(student1)
-        allow(assignment_with_participants.participants).to receive(:find_by).with({:user_id=>course_participant.user_id}).and_return(course_participant)
+        allow(assignment_with_participants.participants).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
         allow(course_participant).to receive(:teammate_reviews).and_return(teammate_review)
         allow(course_participant).to receive(:metareviews).and_return(meta_review)
         params = {course_id: 1}
@@ -176,7 +189,7 @@ describe Assessment360Controller do
       it 'redirects to back and flashes error as there are no participants' do
         allow(course).to receive(:assignments).and_return([assignment])
         allow(assignment).to receive(:reject).and_return(assignment)
-        allow(course).to receive(:get_participants).and_return([]) #no participants
+        allow(course).to receive(:get_participants).and_return([]) # no participants
         params = {course_id: 1}
         session = {user: instructor}
         get :course_student_grade_summary, params, session
@@ -188,7 +201,7 @@ describe Assessment360Controller do
       it 'has participants, next assignment participant does not exist' do
         allow(course).to receive(:assignments).and_return(assignment_with_participants_list)
         allow(assignment_with_participants_list).to receive(:reject).and_return(assignment_with_participants_list)
-        allow(course).to receive(:get_participants).and_return([course_participant]) #has participants
+        allow(course).to receive(:get_participants).and_return([course_participant]) # has participants
         allow(assignment_list).to receive(:reject).and_return(assignment_list)
         params = {course_id: 1}
         session = {user: instructor}
@@ -201,11 +214,11 @@ describe Assessment360Controller do
       it 'has participants, next assignment participant exists, but no team id exists' do
         allow(course).to receive(:assignments).and_return(assignment_with_participants_list)
         allow(assignment_with_participants_list).to receive(:reject).and_return(assignment_with_participants_list)
-        allow(course).to receive(:get_participants).and_return([course_participant]) #has participants
+        allow(course).to receive(:get_participants).and_return([course_participant]) # has participants
         allow(assignment_list).to receive(:reject).and_return(assignment_list)
-        allow(assignment_with_participants.participants).to receive(:find_by).with({:user_id=>course_participant.user_id}).and_return(course_participant)
+        allow(assignment_with_participants.participants).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
         allow(signed_up_team).to receive(:topic_id).with(assignment.id, course_participant.user_id).and_return(1)
-        allow(SignUpTopic).to receive(:find_by).with({:id=>nil}).and_return(topic)
+        allow(SignUpTopic).to receive(:find_by).with(id: nil).and_return(topic)
         params = {course_id: 1}
         session = {user: instructor}
         get :course_student_grade_summary, params, session
@@ -225,14 +238,14 @@ describe Assessment360Controller do
       it 'has participants, next assignment participant exists, but team id exists and maps are nil' do
         allow(course).to receive(:assignments).and_return(assignment_with_participants_list)
         allow(assignment_with_participants_list).to receive(:reject).and_return(assignment_with_participants_list)
-        allow(course).to receive(:get_participants).and_return([course_participant]) #has participants
+        allow(course).to receive(:get_participants).and_return([course_participant]) # has participants
         allow(assignment_list).to receive(:reject).and_return(assignment_list)
-        allow(assignment_with_participants.participants).to receive(:find_by).with({:user_id=>course_participant.user_id}).and_return(course_participant)
+        allow(assignment_with_participants.participants).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
         allow(SignedUpTeam).to receive(:topic_id).with(assignment.id, course_participant.user_id).and_return(1)
-        allow(SignUpTopic).to receive(:find_by).with({:id=>1}).and_return(topic)
+        allow(SignUpTopic).to receive(:find_by).with(id: 1).and_return(topic)
         allow(TeamsUser).to receive(:team_id).with(assignment.id, course_participant.user_id).and_return(1)
         allow(Team).to receive(:find).with(1).and_return(team)
-        allow(AssignmentParticipant).to receive(:find_by).with(:user_id=>course_participant.user_id, :parent_id=>assignment.id).and_return(course_participant)
+        allow(AssignmentParticipant).to receive(:find_by).with(user_id: course_participant.user_id, parent_id: assignment.id).and_return(course_participant)
         params = {course_id: 1}
         session = {user: instructor}
         get :course_student_grade_summary, params, session
@@ -252,15 +265,15 @@ describe Assessment360Controller do
       it 'has participants, next assignment participant exists, but team id exists and maps are not nil' do
         allow(course).to receive(:assignments).and_return(assignment_with_participants_list)
         allow(assignment_with_participants_list).to receive(:reject).and_return(assignment_with_participants_list)
-        allow(course).to receive(:get_participants).and_return([course_participant]) #has participants
+        allow(course).to receive(:get_participants).and_return([course_participant]) # has participants
         allow(assignment_list).to receive(:reject).and_return(assignment_list)
-        allow(assignment_with_participants.participants).to receive(:find_by).with({:user_id=>course_participant.user_id}).and_return(course_participant)
+        allow(assignment_with_participants.participants).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
         allow(SignedUpTeam).to receive(:topic_id).with(assignment.id, course_participant.user_id).and_return(1)
-        allow(SignUpTopic).to receive(:find_by).with({:id=>1}).and_return(topic)
+        allow(SignUpTopic).to receive(:find_by).with(id: 1).and_return(topic)
         allow(TeamsUser).to receive(:team_id).with(assignment.id, course_participant.user_id).and_return(1)
         allow(Team).to receive(:find).with(1).and_return(team_with_grade)
-        allow(AssignmentParticipant).to receive(:find_by).with(:user_id=>course_participant.user_id, :parent_id=>assignment.id).and_return(course_participant)
-        allow(course_participant).to receive(:scores).with({}).and_return({:review => {:scores => {:avg => 90}}})
+        allow(AssignmentParticipant).to receive(:find_by).with(user_id: course_participant.user_id, parent_id: assignment.id).and_return(course_participant)
+        allow(course_participant).to receive(:scores).with({}).and_return(review: {scores: {avg: 90}})
         params = {course_id: 1}
         session = {user: instructor}
         get :course_student_grade_summary, params, session
@@ -279,4 +292,3 @@ describe Assessment360Controller do
     end
   end
 end
-

@@ -9,8 +9,14 @@ class GithubMetricsController < ApplicationController
   include GithubMetricsHelper
 
   def view
-    if session["github_access_token"].nil?
-      session["assignment_id"] = params[:id]
+    session["github_base"] = parse_hostname AssignmentParticipant.find(params[:id]).team.hyperlinks[0]
+    session["github_tokens"] = nil
+    if session["github_tokens"].nil?
+      session["github_tokens"] = Hash.new
+    end
+    if session["github_tokens"][session["github_base"]].nil?
+      session["participant_id"] = params[:id]
+      session["github_view_type"] = "view_scores"
       session["github_view_type"] = "view_scores"
       return redirect_to authorize_github_github_metrics_path
     end
@@ -25,12 +31,21 @@ class GithubMetricsController < ApplicationController
 
   # Authorize to Expertiza to access github data.
   def authorize_github
-    redirect_to "https://github.com/login/oauth/authorize?client_id=#{GITHUB_CONFIG['client_key']}"
+    if session["github_base"] == "github.com"
+      redirect_to "https://github.com/login/oauth/authorize?client_id=#{GITHUB_CONFIG['client_key']}"
+    else
+      redirect_to "https://#{session["github_base"]}/login/oauth/authorize?client_id=#{GITHUB_CONFIG['enterprise_client_key']}"
+    end
   end
 
   # This function is used to show github_metrics information by redirecting to view.
   def view_github_metrics
-    if session["github_access_token"].nil?
+    session["github_base"] = parse_hostname AssignmentParticipant.find(params[:id]).team.hyperlinks[0]
+    #session["github_tokens"] = nil
+    if session["github_tokens"].nil?
+      session["github_tokens"] = Hash.new
+    end
+    if session["github_tokens"][session["github_base"]].nil?
       session["participant_id"] = params[:id]
       session["github_view_type"] = "view_submissions"
       redirect_to authorize_github_github_metrics_path
@@ -48,20 +63,26 @@ class GithubMetricsController < ApplicationController
                      :total_commits => 0,
                      :total_files_changed => 0,
                      :merge_status => {},
-                     :check_statuses => {}
+                     :check_statuses => {},
+                     :commits => []
     }
 
-    @token = session["github_access_token"]
+    #@token = session["github_access_token"]
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
     @team = @participant.team
     @team_id = @team.id
+    @submission = parse_hostname(@team.hyperlinks[0])
 
     retrieve_github_data
     retrieve_pull_request_statuses_data
 
     @gitVariable[:authors] = @gitVariable[:authors].keys
     @gitVariable[:dates] = @gitVariable[:dates].keys.sort
+  end
+
+  def parse_hostname(url)
+    return URI.parse(url).host
   end
 
   # Retrieve github data from hyperlinks provided  by teams.
@@ -71,13 +92,13 @@ class GithubMetricsController < ApplicationController
   def retrieve_github_data
     team_links = @team.hyperlinks
     pull_links = team_links.select do |link|
-      link.match(/pull/) && link.match(/github.com/)
+      link.match(/pull/) && link.match(/github/)
     end
     if !pull_links.empty?
       retrieve_pull_request_data(pull_links)
     else
       repo_links = team_links.select do |link|
-        link.match(/github.com/)
+        link.match(/github/)
       end
       retrieve_repository_data(repo_links)
     end
@@ -115,7 +136,7 @@ class GithubMetricsController < ApplicationController
 
   # This function is used to get statuses of a pull request. This is an auxiliary function for "retrieve_pull_request_statuses_data"
   def get_statuses_for_pull_request(pr_object)
-    url = "https://api.github.com/repos/" + pr_object[:owner] + "/" + pr_object[:repository] + "/commits/" + pr_object[:head_commit] + "/status"
+    url = "https://api.#{session["github_base"]}/repos/" + pr_object[:owner] + "/" + pr_object[:repository] + "/commits/" + pr_object[:head_commit] + "/status"
     ActiveSupport::JSON.decode(Net::HTTP.get(URI(url)))
   end
 
@@ -186,6 +207,7 @@ class GithubMetricsController < ApplicationController
     response_data = {}
     while @has_next_page
       response_data = make_github_graphql_request(get_query_for_pull_request_links(hyperlink_data))
+      session["debugger"] = response_data
       current_commits = response_data["data"]["repository"]["pullRequest"]["commits"]
       current_page_info = current_commits["pageInfo"]
       all_edges.push(*current_commits["edges"])
@@ -205,9 +227,11 @@ class GithubMetricsController < ApplicationController
     commit_objects = pull_request_object["commits"]["edges"]
     commit_objects.each do |commit_object|
       commit = commit_object["node"]["commit"]
-      author_name = commit["author"]["name"]
+      @gitVariable[:commits].push(commit)
+      #author_name = commit["author"]["name"]
+      author_email = commit["author"]["email"]
       commit_date = commit["committedDate"].to_s
-      process_github_authors_and_dates(author_name, commit_date[0, 10])
+      process_github_authors_and_dates(author_email, commit_date[0, 10])
     end
     organize_commit_dates_in_sorted_order
   end
@@ -227,11 +251,11 @@ class GithubMetricsController < ApplicationController
 
   # Make github graphql request
   def make_github_graphql_request(data)
-    uri = URI.parse("https://api.github.com/graphql")
+    uri = URI.parse("https://api.#{session["github_base"]}/graphql")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-    request = Net::HTTP::Post.new(uri.path, 'Authorization' => 'Bearer' + ' ' + session["github_access_token"])
+    request = Net::HTTP::Post.new(uri.path, 'Authorization' => 'Bearer' + ' ' + session["github_tokens"][session["github_base"]])
     request.body = data.to_json
     http.request(request)
     response = http.request(request)
@@ -244,11 +268,12 @@ class GithubMetricsController < ApplicationController
     {
 
 
-        query: "query {
-          repository(owner: \"" + hyperlink_data["owner_name"] + "\", name:\"" + hyperlink_data["repository_name"] + "\") {
-            pullRequest(number: " + hyperlink_data["pull_request_number"] + ") {
+        query: <<~HEREDOC
+        query {
+          repository(owner: "#{hyperlink_data['owner_name']}", name:"#{hyperlink_data['repository_name']}") {
+            pullRequest(number: #{hyperlink_data['pull_request_number']}) {
               number additions deletions changedFiles mergeable merged headRefOid
-                commits(first:100, after:" + @end_cursor + "){
+                commits(first:100, after:"#{@end_cursor}"){
                   totalCount
                     pageInfo{
                       hasNextPage startCursor endCursor
@@ -257,10 +282,11 @@ class GithubMetricsController < ApplicationController
                         node{
                           id  commit{
                             author{
-                                    name
+                                    name email
                                   }
-                                  additions deletions changedFiles committedDate
-                            }}}}}}}"
+                                  additions deletions changedFiles committedDate url
+                            }}}}}}}
+        HEREDOC
     }
   end
 

@@ -6,7 +6,8 @@ Expertiza
 [![Maintainability](https://api.codeclimate.com/v1/badges/f3a41f16c2b6e45aa9d4/maintainability)](https://codeclimate.com/github/expertiza/expertiza/maintainability)
 
 #### E1980. Sort instructor reports by name, ID, score, etc.
-Mentor: @yashad
+Mentor:Yashad Trivedi(ytrivedi@ncsu.edu)
+@Yashad
 
 #### Peer review system
 

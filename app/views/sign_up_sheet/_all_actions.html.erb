@@ -43,7 +43,18 @@
             <% end %>
             <%= submit_tag  'Set priority', name: nil  %>
             <% end %></td>
-          <% elsif (@signup_topic_deadline.nil? || (Time.now < @signup_topic_deadline.due_at)) && 
+
+          # Comments toward issue#1008, add by fall 2019 E1976 team.
+          # Reference from http://wiki.expertiza.ncsu.edu/index.php/E1863_Issues_related_to_assignment_creation#Issue_.231008_-_Issue_related_to_staggered_deadline.
+          # For an assignment, different topics might have different deadlines.
+          # So, the deadline for each topic needs to be checked on an individual basis.
+          # Deadlines for individual topics are stored in a table called due_dates with the parent_id as the identifier of the particular topic in place of the assignment identifier.
+          # A logic for getting the due dates of individual topics for staggered deadline assignments is found in the method check_topic_due_date_value in the module SignUpSheetHelper.
+          # In the old version, if the sign up deadline of the the assignment is earlier that the submission deadline for a topic, that topic is not available for taking.
+          # This bug is fixed by adding a complex if sentence. The reason of merge fail is lack of comments.
+          # Change the above piece of code to allow signing up staggered assignment topics bases on the topic deadline and not on the assignment sign up deadline.
+
+          <% elsif (@signup_topic_deadline.nil? || (Time.now < @signup_topic_deadline.due_at)) &&
           (!@assignment.staggered_deadline? || get_topic_deadline([@assignment.due_dates.find_by(deadline_type_id: 1)], topic.id).nil? ||  (Time.now < get_topic_deadline([@assignment.due_dates.find_by(deadline_type_id: 1)], topic.id))) %>
               <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'sign_up', :id=>params[:id],:topic_id => topic.id, :assignment_id => params[:assignment_id] %></td>
           <% end %>

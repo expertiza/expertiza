@@ -25,6 +25,8 @@
   })();
 
   jQuery(document).ready(function() {
+    var map_id = <%= @map.id %>;
+    var round = <%= @current_round %>;
 
     window.onblur=function(){
       checkFocus();
@@ -32,18 +34,61 @@
 
     window.onfocus=function(){
       document.title='focused';
+      startTime(map_id, round, "Expertiza Review");
     }
 
-    function checkFocus() {
-	if(document.activeElement == document.getElementsByTagName("iframe")[0]) {
-	  document.title='focused';
-	} else {
-	  document.title='not focused';
-	}
+// Only Targets First iFrame and is therefore useless.
+//    function checkFocus() {
+//	if(document.activeElement == document.getElementsByTagName("iframe")[0]) {
+//	  document.title='focused';
+//	  startTime(map_id, round, "Expertiza Review");
+//	} else {
+//	  document.title='not focused';
+//        endTime("Expertiza Review");
+//	}
+//    }
+
+     function checkFocus() {
+        if(document.activeElement instanceof HTMLIFrameElement) {
+            document.title='focused';
+            startTime(map_id, round, "Expertiza Review");
+        } else {
+            document.title='not focused';
+            endTime("Expertiza Review");
+        }
     }
 
     //document.onblur=window.onblur;
     //document.onfocus=window.onfocus;
+
+    function startTime(map_id, round, link) {
+          var t = new Date();
+          $.ajax({
+            type: "POST",
+            url: '/submission_viewing_events/record_start_time',
+            data: $.param({submission_viewing_event:{map_id: map_id, round: round, link: link, start_at: ISODateString(t)}})
+          });
+        }
+    function endTime(link){
+            var t = new Date();
+            $.ajax({
+              type: 'POST',
+              dataType: 'json',
+              async: false,
+              url: '/submission_viewing_events/record_end_time',
+              data: $.param({
+                submission_viewing_event: {map_id: map_id, round: round, link: link, end_at: ISODateString(t)}
+                }),
+              /*success: function(json){
+                var links = JSON.parse(JSON.stringigy(json));
+                for (lk in links)
+                  console.log(lk+" review time is complete!");
+              }*/
+              failure: function(){
+                console.log("review time failed to save!");
+              }
+            });
+          }
 
     //use barrating for dropdown
     $('.review-rating').each(function(index, el) {

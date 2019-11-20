@@ -47,6 +47,10 @@ class AssignmentsController < ApplicationController
         assignment_form_params[:due_date] = due_array
         @assignment_form.update(assignment_form_params, current_user)
         aid = Assignment.find_by(name: @assignment_form.assignment.name).id
+ #create link for joining the conference
+        if params[:is_conference]
+          conference_assignment_joining_link
+        end
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
         redirect_to edit_assignment_path aid
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
@@ -375,6 +379,11 @@ class AssignmentsController < ApplicationController
       end
     end
     ExpertizaLogger.info LoggerMessage.new("", session[:user].name, "The assignment was saved: #{@assignment_form.as_json}", request)
+  end
+
+ #This method will be called when we have assignment which is a conference and link to join the assignment
+  def conference_assignment_joining_link
+    # call new controller here
   end
 
   def assignment_form_params

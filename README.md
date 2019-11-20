@@ -7,7 +7,6 @@ Expertiza
 
 #### E1980. Sort instructor reports by name, ID, score, etc.
 Mentor:Yashad Trivedi(ytrivedi@ncsu.edu)
-@Yashad
 
 #### Peer review system
 

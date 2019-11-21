@@ -45,13 +45,14 @@
     </thead>
     <tbody>
 
-    <% sort_reviewer_by_review_volume_desc.each do |r| %>
+    <% sort_reviewer_by_review_volume_desc.each_with_index do |r, index| %>
       <% @response_maps, @rspan = get_data_for_review_report(@id, r.id, @type) %>
       <tr>
         <% if r.id != -1 %>
           <% user = Participant.find(r.id).user %>
             <!--reviewer-->
             <td>
+              <%= index + 1 %>.
               <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
               (<%= user.fullname(session[:ip]) %>)
             </td>

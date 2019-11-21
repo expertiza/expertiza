@@ -59,6 +59,7 @@
       </span>
     </td>
   </tr>
+  <% if @metareview_allowed %>
   <tr>
     <td>
       <%= check_box_tag('meta_review', 'true', true, {:onChange => 'hasMetaReviewChanged()'}) %>
@@ -89,6 +90,7 @@
         </span>
     </td>
   </tr>
+ <%end%>
 
   <tr id="instructor_selected_review_mapping_mechanism" hidden='hidden'>
     <td>

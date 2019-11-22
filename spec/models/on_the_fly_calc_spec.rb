@@ -37,7 +37,7 @@ describe OnTheFlyCalc do
       it 'scores varying rubrics and returns review scores' do
         allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
         allow(assignment).to receive(:rounds_of_reviews).and_return(1)
-        expect(assignment.compute_reviews_hash).to eql({})
+        expect(assignment.compute_reviews_hash).to eql({1=>{1=>{1=>50}}, 2=>{1=>{1=>30}}})
       end
     end
     context 'when current assignment does not vary rubrics by round' do

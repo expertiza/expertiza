@@ -78,6 +78,7 @@ def scores_varying_rubrics
       reviewer = {} if reviewer.nil?
       reviewer[round] = {} if reviewer[round].nil?
       reviewer[round] = @respective_scores
+      @review_scores[response_map.reviewer_id] = reviewer
     end
   end
 end

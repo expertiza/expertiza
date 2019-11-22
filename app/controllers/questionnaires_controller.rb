@@ -136,12 +136,16 @@ class QuestionnairesController < ApplicationController
           question_ids.append(k)
         end
       end
-      # Fetch the Answers for the Questionnaire, delete and send them to User
-      begin
-        AnswerHelper.delete_existing_responses(params[:id],question_ids)
-        flash[:success] = "You have successfully added a new question. The existing reviews for the questionnaire have been deleted!"
-      rescue StandardError
-        flash[:error] = $ERROR_INFO
+      if AnswerHelper.in_active_period(params[:id]):
+        # Fetch the Answers for the Questionnaire, delete and send them to User
+        begin
+          AnswerHelper.delete_existing_responses(params[:id],question_ids)
+          flash[:success] = "You have successfully added a new question. The existing reviews for the questionnaire have been deleted!"
+        rescue StandardError
+          flash[:error] = $ERROR_INFO
+        end
+      else
+        flash[:success] = "You have successfully added a new question."
       end
      redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]
     elsif params[:view_advice]

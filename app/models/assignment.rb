@@ -609,4 +609,8 @@ class Assignment < ActiveRecord::Base
   def find_due_dates(type)
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: type).id }
   end
+
+  def find_review_due_date(round)
+    self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: "review").id && due_date.round == round }
+  end
 end

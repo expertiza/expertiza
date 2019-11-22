@@ -64,4 +64,17 @@ module AnswerHelper
       end
     end
   end
+
+  def in_active_period(questionnaire_id):
+    assignment = AssignmentQuestionnaire.where(questionnaire_id: questionnaire_id).order("created_at").last
+    round_number = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: questionnaire_id).used_in_round
+    review_due_date = assignment.find_review_due_date(round_number)
+    start_date = assignment.due_dates.max_by {|o| o[:review_due_date]}
+    time_now = DateTime.now
+    if start_date.due_at < time_now && review_due_date.due_at > time_now:
+      true
+    else
+      false
+    end
+  end
  end

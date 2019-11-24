@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-
+<h1>Report for <%=@assignment.name %></h1>
 <%= form_tag :action => 'response_report', :id => @id, :class => "form-inline" do %>
   <table>
     <tr>
@@ -77,7 +77,7 @@
       </div>
       <br>
     </div>
-
+<%=@type %>
 <% elsif @type == "FeedbackResponseMap" %>
   <h1> Author feedback report for <%= @assignment.name%> </h1>
 <% elsif @type == "TeammateReviewResponseMap" %>

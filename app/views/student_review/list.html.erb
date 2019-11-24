@@ -1,4 +1,7 @@
 <h2>Reviews for "<%= @assignment.name %>"</h2>
+<h5>
+  <%= link_to "View Sample Reviews", :controller => 'sample_reviews', :action => 'index', :id=>@assignment.id %>
+</h5>
 
 <!-- Added the feature to find the reviews and meta-reviews left for students by E1839 @Rayan Dasoriya -->
 <% if @assignment.num_reviews_allowed.nil? || @assignment.num_reviews_allowed == -1%>

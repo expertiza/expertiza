@@ -2,6 +2,8 @@ class ResponseController < ApplicationController
   helper :submitted_content
   helper :file
 
+  include ResponseConstants
+
   def action_allowed?
     response = user_id = nil
     action = params[:action]
@@ -87,6 +89,12 @@ class ResponseController < ApplicationController
       @questionnaire = set_questionnaire
       questions = sort_questions(@questionnaire.questions)
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
+      # if the request passes a param for visibility (consent for review to be used as sample)...
+      # ... with a valid value, update the @response object
+      visibility = params[:visibility]
+      if(!visibility.nil? and (visibility.to_i == _private))
+        @response.update_attribute("visibility",visibility)
+      end
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
     rescue StandardError
@@ -232,6 +240,40 @@ class ResponseController < ApplicationController
     @review_questionnaire_ids = ReviewQuestionnaire.select("id")
     @assignment_questionnaire = AssignmentQuestionnaire.where(["assignment_id = ? and questionnaire_id IN (?)", @assignment.id, @review_questionnaire_ids]).first
     @questions = @assignment_questionnaire.questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }
+  end
+
+	# This method should be moved to survey_deployment_contoller.rb
+  def pending_surveys
+    unless session[:user] # Check for a valid user
+      redirect_to '/'
+      return
+    end
+
+    # Get all the course survey deployments for this user
+    @surveys = []
+    [CourseParticipant, AssignmentParticipant].each do |participant_type|
+      # Get all the participant(course or assignment) entries for this user
+      participants = participant_type.where(user_id: session[:user].id)
+      next unless participants
+      participants.each do |p|
+        survey_deployment_type = (participant_type == CourseParticipant ? CourseSurveyDeployment : AssignmentSurveyDeployment)
+        survey_deployments = survey_deployment_type.where(parent_id: p.parent_id)
+        next unless survey_deployments
+        survey_deployments.each do |survey_deployment|
+          next unless survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
+          @surveys <<
+              [
+                'survey' => Questionnaire.find(survey_deployment.questionnaire_id),
+                'survey_deployment_id' => survey_deployment.id,
+                'start_date' => survey_deployment.start_date,
+                'end_date' => survey_deployment.end_date,
+                'parent_id' => p.parent_id,
+                'participant_id' => p.id,
+                'global_survey_id' => survey_deployment.global_survey_id
+              ]
+        end
+      end
+    end
   end
 
   private

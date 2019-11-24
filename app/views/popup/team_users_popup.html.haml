@@ -1,3 +1,7 @@
+%span{:class => "hide",:id=>"sampleReviewHold",:data=>{"marked":instance_variable_get('@marked')}}
+%span{:class => "hide",:id=>"pageSizeHold"} #{@page_size}
+
+
 %div
   %h3
     Members of #{@team.name}
@@ -21,6 +25,16 @@
         %td{:align => "center"} --
       %br/
     - else
+      - if instance_variable_get('@sample_button_'+round.to_s)
+        %div{:class=>'col-md-12 mark-delete-sample '+'round'+round.to_s}
+          %h3{:class=>'col-md-10'} "Reviewed by #{User.find(@reviewer_id).fullname} (Round #{round})"
+          %div{:class=>'col-md-2'}
+            %button{:class=>'col-md-12 mark-unmark-sample-button '+instance_variable_get('@mark_as_sample_'+round.to_s), :data=>{'visibility':2, 'response_id':instance_variable_get('@response_id_round_' + round.to_s),'round':round} } Mark as Sample
+            %button{:class=>'col-md-12 mark-unmark-sample-button '+instance_variable_get('@remove_as_sample_'+round.to_s), :data=>{'visibility':1, 'response_id':instance_variable_get('@response_id_round_' + round.to_s),'round':round} } Remove as Sample
+            %span{:class=>"hide col-md-12 mark-unmark-sample-result", :id=>"mark_unmark_fail_"+round.to_s}
+            %span{:class=>"hide col-md-12 mark-unmark-sample-result success", :id=>"mark_unmark_success_"+round.to_s}
+      - else
+
       %h3= "Reviewed by #{User.find(@reviewer_id).fullname} (Round #{round})"
       %table{:class => "general", :border => "1px solid #ccc"}
         %tr
@@ -59,5 +73,27 @@
           %td= additional_comment.nil? ? 'No Comments' : additional_comment.html_safe
       %hr/
   %br/
+	
+	%div{:class=>"col-md-12 hide popup-container"}
+    %div{:class=>"col-md-3"}
+    %div{:class=>"col-md-6",:id=>"similar_assignments_popup",:data=>{"assignment-id":instance_variable_get("@assignment_id")}}
+
+      %div{:class=>"col-md-12"}
+        %h5{:class=>"col-md-11"}
+          %strong Select the assignments for which you want to mark these reviews as samples:
+        %h5{:class=>"col-md-1"}
+          %a{:href=>"javascript:void(0);", :class=>"closer"}X
+      %div{:class=>"col-md-12 popup-list-container"}
+        %ul
+          %li{:id=>"popup_list_template",:class=>"hide"}
+            %input{:type=>"checkbox"}
+            %span
+        %span{:class=>"popup_more"} More +
+
+      %button{:class=>"col-md-6 submitter"}Submit
+      %button{:class=>"col-md-6 closer"}Cancel
+
+    %div{:class=>"col-md-3"}
+
   .footer
     = link_to 'Back', :controller=> 'review_mapping', :action=>'response_report', :id=>params[:assignment_id]

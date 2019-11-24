@@ -3,6 +3,10 @@ Expertiza::Application.routes.draw do
   ###
   # Please insert new routes alphabetically!
   ###
+	get 'sample_reviews/index'
+
+  get 'sample_reviews/show'
+
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
 
@@ -503,10 +507,18 @@ resources :institution, except: [:destroy] do
   get ':page_name', controller: :content_pages, action: :view, method: :get
   post 'impersonate/impersonate', to: 'impersonate#impersonate'
   post '/plagiarism_checker_results/:id' => 'plagiarism_checker_comparison#save_results'
+	post '/sample_reviews/mark_unmark/:id' => 'sample_reviews#update_visibility'
+  get '/sample_reviews/index/:id' => 'sample_reviews#index'
+  get '/sample_reviews/show/:id' => 'sample_reviews#show'
+  get '/similar_assignments/:id' => 'similar_assignments#get'
+  post '/similar_assignments/create/:id' => 'similar_assignments#update'
   get 'instructions/home'
   get 'response/', to: 'response#saving'
   get ':controller/service.wsdl', action: 'wsdl'
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
   get ':controller(/:action(/:id))(.:format)'
+	get 'assignment/reviewer_options/:id' => 'assignments#reviewer_options'
+  get 'assignment/reviewee_options/:a_id/:r_id' => 'assignments#reviewee_options'
+  get 'sample_reviews/add/:a_id/:reviewer_id/:reviewee_id/:curr_assignment_id' => 'sample_reviews#add'
   match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
 end

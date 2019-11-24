@@ -5,6 +5,8 @@ class TeamsUsersController < ApplicationController
      'Administrator'].include? current_role_name
   end
 
+after_filter ->(param="delete"){log param}, :only => :delete
+
   def auto_complete_for_user_name
     team = Team.find(session[:team_id])
     @users = team.get_possible_team_members(params[:user][:name])
@@ -65,10 +67,9 @@ class TeamsUsersController < ApplicationController
     @user = User.find(@teams_user.user_id)
     @teams_user.destroy
     undo_link("The team user \"#{@user.name}\" has been successfully removed. ")
-    #ExpertizaLogger.info LoggerMessage.new('Left a team',@user.id,"The team user #{@user.name} has left the team")
-    ExpertizaLogger.info LoggerMessage.new(controller_name,session[:user].name,"#{@user.name} was removed from the team #{@teams_user.team_id}")	
     redirect_to controller: 'teams', action: 'list', id: parent_id
   end
+
 
   def delete_selected
     params[:item].each do |item_id|
@@ -78,4 +79,11 @@ class TeamsUsersController < ApplicationController
 
     redirect_to action: 'list', id: params[:id]
   end
+
+ def log(method_name)
+    if(method_name == "delete")
+    ExpertizaLogger.info LoggerMessage.new(controller_name,session[:user].name,"#{@user.name} was removed from the team #{@teams_user.team_id}")
+    end
+ end
+
 end

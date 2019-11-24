@@ -104,6 +104,33 @@ describe "assignment function" do
       )
     end
 
+    it "is able to create public assignment with same name" do
+
+      login_as("instructor6")
+
+      visit "/course/new?private=1"
+
+      fill_in 'course_name', with: 'course_test_1'
+      click_button 'Create'
+
+      visit "assignments/new?private=1"
+      fill_in 'assignment_form_assignment_name', with: 'public assignment for test'
+      select('course_test_1', from: 'assignment_form_assignment_course_id')
+      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      fill_in 'assignment_form_assignment_spec_location', with: 'testLocation'
+      find_link('Rubrics').click
+      click_button 'Create'
+      expect(page).to have_content('Editing Assignment: public assignment for test')
+      assignment = Assignment.where(name: 'public assignment for test').first
+      expect(assignment).to have_attributes(
+                                name: 'public assignment for test',
+                                course_id: Course.find_by(name: 'course_test_1').id,
+                                directory_path: 'testDirectory',
+                                spec_location: 'testLocation'
+                            )
+
+    end
+
     it "is able to create with teams" do
       login_as("instructor6")
       visit '/assignments/new?private=1'

@@ -16,6 +16,7 @@
           <li><a href="#tabs-7" id="Badges">Badges</a></li>
         <% end %>
         <% if @user.role.instructor? && !@user.action_enable? %>
+          <!--issue#1384, "other stuff" should be renamed to "Etc.", add by team E1976.-->
           <li><a href="#tabs-8" id="Other">Etc.</a></li>
         <% elsif @user.role.ta? %>
           <% if !@user_parent.action_enable? %>

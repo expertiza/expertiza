@@ -4,12 +4,13 @@
                                "Last rejoined at" => "20%") %>
     <%@l = -1 %>
 
+
     <% @authors.each do |r| %>
       <% next unless r %>
       <% if @assignment.varying_rubrics_by_round? %>
-        <% get_each_review_and_feedback_response_map(r) %>
+        <% get_each_round_review_and_feedback_response_map_for_feedback_report(r) %> 
       <% else %>
-        <% get_certain_review_and_feedback_response_map(r) %>
+        <% get_certain_round_review_and_feedback_response_map_for_feedback_report(r) %>      
       <% end %>
 
       <% @first_col_identifier = true %>
@@ -137,7 +138,7 @@
                   (<%= @reviewee_name %>)
                 </td>
                 <!--Last rejoined at-->
-                <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td></tr><tr>
+                <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td></tr>
               <% end %>
             <% end %>
           <% end %>

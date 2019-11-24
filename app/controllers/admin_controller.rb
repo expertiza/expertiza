@@ -1,5 +1,4 @@
 class AdminController < ApplicationController
-  ##H
   def action_allowed?
     case params[:action]
     when 'list_instructors'

@@ -410,19 +410,20 @@ describe "assignment function" do
     end
 
     ##### test reviews visible to all other reviewers ######
-    '''it "should edit review visible to all other reviewers" do
-      fill_assignment_form
-      check "assignment_form_assignment_reviews_visible_to_all"
-      click_button 'Save'
-      assignment = Assignment.where(name: 'edit assignment for test').first
-      expect(assignment).to have_attributes(
-        name: 'edit assignment for test',
-        course_id: Course.find_by(name: 'Course 2').id,
-        directory_path: 'testDirectory1',
-        spec_location: 'testLocation1'
-      )
-    end'''
-
+    #begin 
+     # it "should edit review visible to all other reviewers" do
+     # fill_assignment_form
+      #check "assignment_form_assignment_reviews_visible_to_all"
+      #click_button 'Save'
+      #assignment = Assignment.where(name: 'edit assignment for test').first
+      #expect(assignment).to have_attributes(
+      #  name: 'edit assignment for test',
+       # course_id: Course.find_by(name: 'Course 2').id,
+       # directory_path: 'testDirectory1',
+        #spec_location: 'testLocation1'
+      #)
+    #end
+    
     it "check if checking calibration shows the tab" do
       uncheck 'assignment_form_assignment_is_calibrated'
       click_button 'Save'

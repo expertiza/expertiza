@@ -100,8 +100,10 @@ class ApplicationController < ActionController::Base
         user.super_admin?
   end
 
-  # teaching assistant is controlled by their teaching stuff, like instructor
-  # comment with issue#1384, add by team E1976
+  # teaching assistant is controlled by their teaching stuff, the instructor.
+  # if instructor choose show action options in the homepage, then related ta will see all action option in assignment page
+  # if instructor choose to view actions in assignment edit page with "Etc." button, then related ta should view actions in assignment edit page with "Etc." too.
+  # comments with issue#1384, add by team E1976
   def is_enable(user, owner_id)
     if user.role.instructor?
       user.id == owner_id && user.action_enable?

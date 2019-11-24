@@ -15,8 +15,12 @@
         <% if @assignment_form.assignment.has_badge? %>
           <li><a href="#tabs-7" id="Badges">Badges</a></li>
         <% end %>
-        <% if !@user.action_enable? %>
+        <% if @user.role.instructor? && !@user.action_enable? %>
           <li><a href="#tabs-8" id="Other">Etc.</a></li>
+        <% elsif @user.role.ta? %>
+          <% if !@user_parent.action_enable? %>
+            <li><a href="#tabs-8" id="Other">Etc.</a></li>
+          <% end %>
         <%end %>
       </ul>
       <div id="tabs-1">
@@ -82,11 +86,17 @@
           If instructor doesn't press that "Action Options" button or cancel that action,
           then in the assignment edit page the instructor can view the "Etc." button.-->
       <!--Comments with issue#1354, add by E1976 team.-->
-      <% if !@user.action_enable? %>
+      <% if @user.role.instructor?  && !@user.action_enable? %>
         <div id="tabs-8">
           <%= render 'assignments/edit/other' %>
         </div>
-      <% end %>
+      <% elsif @user.role.ta? %>
+        <% if !@user_parent.action_enable? %>
+          <div id="tabs-8">
+            <%= render 'assignments/edit/other' %>
+          </div>
+        <% end %>
+      <%end %>
       <div style="margin-bottom: 20px">
       <%= button_tag "Save", :id => 'submit_btn', class: 'btn btn-md btn-default', :style => "margin-left: 20px;" %> | <%= render :partial => '/shared_scripts/back' %>
       </div>

@@ -100,8 +100,15 @@ class ApplicationController < ActionController::Base
         user.super_admin?
   end
 
+  # teaching assistant is controlled by their teaching stuff, like instructor
+  # comment with issue#1384, add by team E1976
   def is_enable(user, owner_id)
-    user.id == owner_id && user.action_enable?
+    if user.role.instructor?
+      user.id == owner_id && user.action_enable?
+    elsif user.role.ta?
+      user_parent = User.find_by(id: user.parent_id)
+      user.parent_id == owner_id && user_parent.action_enable?
+    end
   end
 
   def record_not_found

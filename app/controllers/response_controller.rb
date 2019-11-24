@@ -2,6 +2,9 @@ class ResponseController < ApplicationController
   helper :submitted_content
   helper :file
 
+after_filter ->(param="update"){log param}, :only => :update
+after_filter ->(param="save"){log param}, :only => :save
+
   def action_allowed?
     response = user_id = nil
     action = params[:action]
@@ -93,7 +96,6 @@ class ResponseController < ApplicationController
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
     redirect_to controller: 'response', action: 'save', id: @map.map_id,
                 return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
   end
@@ -115,6 +117,14 @@ class ResponseController < ApplicationController
     init_answers(questions)
     render action: 'response'
   end
+
+  def track_review_time
+    @time = (params[:time].to_f)/60000
+    @id = params[:id]
+    @name = params[:name]
+    ExpertizaLogger.info LoggerMessage.new(controller_name,session[:user].name,"Reviewer #{session[:user].name} reviewed for #{'%0.2f'% @time} minutes}",request)
+    render plain: "OK"
+   end
 
   def new_feedback
     review = Response.find(params[:id]) unless params[:id].nil?
@@ -195,7 +205,6 @@ class ResponseController < ApplicationController
         AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
       end
     end
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Response was successfully saved")
     redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
@@ -367,6 +376,15 @@ class ResponseController < ApplicationController
       # it's unlikely that these answers exist, but in case the user refresh the browser some might have been inserted.
       a = Answer.where(response_id: @response.id, question_id: q.id).first
       Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '') if a.nil?
+    end
+  end
+
+  def log(method_name)
+    case method_name
+    when "update"
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
+    when "save"
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Response was successfully saved")
     end
   end
 end

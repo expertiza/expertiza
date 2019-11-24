@@ -1,6 +1,8 @@
 class TeamsController < ApplicationController
   autocomplete :user, :name
 
+after_filter ->(param="create_teams"){log param}, :only => :create_teams
+
   def action_allowed?
     ['Instructor',
      'Teaching Assistant',
@@ -13,7 +15,6 @@ class TeamsController < ApplicationController
     parent = Object.const_get(session[:team_type]).find(params[:id])
     Team.randomize_all_by_parent(parent, session[:team_type], params[:team_size].to_i)
     undo_link("Random teams have been successfully created.")
-    ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Random teams have been successfully created', request)
     redirect_to action: 'list', id: parent.id
   end
 
@@ -126,4 +127,12 @@ class TeamsController < ApplicationController
     end
     redirect_to controller: 'teams', action: 'list', id: assignment.id
   end
+
+  def log(method_name)
+    case method_name
+    when "create_teams"
+    ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Random teams have been successfully created', request)
+    end
+  end
+
 end

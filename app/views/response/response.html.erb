@@ -52,6 +52,10 @@
     var idleTime = 0;
     //threshold to turn off the autosave
     var maxIdleTime = 30;
+    var startDate = new Date();
+    var elapsedTime = 0;
+    var windowOnLoad = 0;
+    var method_name = "";
 
     $('#autosave_cbx_lbl').html("&nbsp;Auto save your response every " + interval / 1000 + " seconds?&nbsp;&nbsp;");
 
@@ -60,7 +64,45 @@
       if(vis() && $("#autosave_cbx").prop("checked"))
         executeSave();
     }, interval);
-
+  
+	$(window).bind("beforeunload",function() {
+        endDate = new Date();
+        elapsedTime += endDate.getTime() - startDate.getTime();
+        console.log(elapsedTime);
+	console.log(endDate.getTime())
+        console.log('Unload');
+        var id = "<%= params[:id] %>"
+        method_name = "<%=params[:action]%>"
+        console.log(id)
+        console.log(method_name)
+	$.ajax({
+            url: "../../../response/track_review_time",
+            type: "POST",
+            crossDomain: false,
+            data: {time:elapsedTime,id:id,name:method_name},
+            success: function () {
+              console.log('successfully sent to controller')
+            },
+            error: function () {
+              console.log('Error in sending response to controller')
+            }
+          });
+        });
+	
+	document.addEventListener("visibilitychange", function() {
+	if(document.visibilityState == 'visible'){
+	startDate = new Date();
+	console.log(startDate);
+	console.log('visible');
+	}
+	if(document.visibilityState == 'hidden'){
+	endDate = new Date();
+	elapsedTime = elapsedTime + (endDate.getTime() - startDate.getTime());
+	console.log('hidden');
+	console.log(endDate.getTime());	
+	console.log(elapsedTime);
+	}
+	})
 
     //click ajax
     function executeSave(){

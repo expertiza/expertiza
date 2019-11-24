@@ -54,7 +54,7 @@ class SignUpSheet < ActiveRecord::Base
     if !slotAvailable?(topic_id)
       sign_up.is_waitlisted = true
       result = true if sign_up.save
-      ExpertizaLogger.info LoggerMessage.new('SignUpSheet', '', "Sign up sheet created for waitlisted with teamId #{team_id} and topicId #{topic_id}")
+      ExpertizaLogger.info LoggerMessage.new('SignUpSheet', '', "Sign up sheet created for waitlisted topic #{topic_id} for teamId #{team_id}")
     else
       # if slot exist, then confirm the topic for the user and delete all the waitlist for this user
       result = cancel_all_wailists(assignment_id, sign_up, team_id, topic_id, user_id)

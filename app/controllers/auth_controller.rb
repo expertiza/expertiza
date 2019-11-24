@@ -5,6 +5,9 @@ class AuthController < ApplicationController
   verify method: :post, only: %i[login logout],
          redirect_to: {action: :list}
 
+  after_filter ->(param="logout"){log param}, :only => :logout
+  
+  
   def action_allowed?
     case params[:action]
     when 'login', 'logout', 'login_failed', 'google_login'
@@ -58,7 +61,6 @@ class AuthController < ApplicationController
   end
 
   def logout
-    ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Logging out!', request)
     AuthController.logout(session)
     redirect_to '/'
   end
@@ -140,4 +142,12 @@ class AuthController < ApplicationController
     session[:original_user] = nil
     session[:impersonate] = nil
   end
+ 
+  def log(method_name)
+    case method_name
+    when "logout"
+    ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Logging out!', request)
+    end
+  end
+
 end

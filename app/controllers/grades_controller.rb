@@ -7,6 +7,9 @@ class GradesController < ApplicationController
   include AssignmentHelper
   include GradesHelper
 
+after_filter ->(param="view_my_scores"){log param}, :only => :view_my_scores
+
+
   def action_allowed?
     case params[:action]
     when 'view_my_scores'
@@ -83,15 +86,13 @@ class GradesController < ApplicationController
     @summary = sum.summary
     @avg_scores_by_round = sum.avg_scores_by_round
     @avg_scores_by_criterion = sum.avg_scores_by_criterion
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "#{session[:user].name} viewed his grade in alternate view", request)
-
   end
 
   def track_review_time
     @time = params[:time]
     @id = params[:id]
     @time = (@time.to_f)/60000
-    ExpertizaLogger.info LoggerMessage.new(controller_name,session[:user].name," User #{session[:user].name} spent #{'%0.2f'% @time} minutes to review his review grade",request)
+    ExpertizaLogger.info LoggerMessage.new(controller_name,session[:user].name," User #{session[:user].name} spent #{'%0.2f'% @time} minutes to review his review grade}",request)
     render plain: "OK"
   end
 
@@ -327,4 +328,11 @@ class GradesController < ApplicationController
   def mean(array)
     array.inject(0) {|sum, x| sum += x } / array.size.to_f
   end
+
+ def log(method_name)
+ if(method_name == "view_my_scores")
+ ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "#{session[:user].name} viewed his grade in alternate view", request)
+ end
+ end
+
 end

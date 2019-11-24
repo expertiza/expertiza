@@ -264,7 +264,7 @@ class SignUpSheetController < ApplicationController
     else
       delete_signup_for_topic(assignment.id, params[:topic_id], session[:user].id)
       flash[:success] = "You have successfully dropped your topic!"
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].id, 'Student has dropped the topic: ' + params[:topic_id].to_s)
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].id, 'Student '+session[:user].id.to_s + ' has dropped the topic: ' + params[:topic_id].to_s)
     end
     redirect_to action: 'list', id: params[:id]
   end

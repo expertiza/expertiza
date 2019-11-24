@@ -5,6 +5,11 @@ class InvitationsController < ApplicationController
     ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student'].include? current_role_name
   end
 
+  after_filter ->(param="accept"){log param}, :only => :accept
+  after_filter ->(param="decline"){log param}, :only => :decline
+  after_filter ->(param="cancel"){log param}, :only => :cancel
+  after_filter ->(param="create_utility"){log param}, :only => :create_utility
+
   def new
     @invitation = Invitation.new
   end
@@ -41,10 +46,8 @@ class InvitationsController < ApplicationController
 
   def accept
     # Accept the invite and check whether the add was successful
-    accepted = Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, @student.parent_id)
-    flash[:error] = 'The system failed to add you to the team that invited you.' unless accepted
-
-    ExpertizaLogger.info "Accepting Invitation #{params[:inv_id]}: #{accepted}"
+    @accepted = Invitation.accept_invite(params[:team_id], @inv.from_id, @inv.to_id, @student.parent_id)
+    flash[:error] = 'The system failed to add you to the team that invited you.' unless @accepted
     redirect_to view_student_teams_path student_id: params[:student_id]
   end
 
@@ -54,13 +57,11 @@ class InvitationsController < ApplicationController
     @inv.reply_status = 'D'
     @inv.save
     student = Participant.find(params[:student_id])
-    ExpertizaLogger.info "Declined invitation #{params[:inv_id]} sent by #{@inv.from_id}"
     redirect_to view_student_teams_path student_id: student.id
   end
 
   def cancel
     Invitation.find(params[:inv_id]).destroy
-    ExpertizaLogger.info "Successfully retracted invitation #{params[:inv_id]}"
     redirect_to view_student_teams_path student_id: params[:student_id]
   end
 
@@ -71,7 +72,6 @@ class InvitationsController < ApplicationController
     @invitation.assignment_id = @student.parent_id
     @invitation.reply_status = 'W'
     @invitation.save
-    ExpertizaLogger.info LoggerMessage.new(controller_name, @student.name, "Successfully invited student #{@user.id}", request)
   end
 
   def check_user_before_invitation
@@ -145,4 +145,20 @@ class InvitationsController < ApplicationController
     # Remove the users previous team since they are accepting an invite for possibly a new team.
     TeamsUser.remove_team(@student.user_id, params[:team_id])
   end
+
+ def log(method_name)
+    case method_name
+    when "accept"
+    ExpertizaLogger.info "Accepting Invitation #{params[:inv_id]}: #{@accepted}"
+    when "decline"
+    ExpertizaLogger.info "Declined invitation #{params[:inv_id]} sent by #{@inv.from_id}"
+    when "cancel"
+    ExpertizaLogger.info "Successfully retracted invitation #{params[:inv_id]}"
+    when "create_utility"
+    ExpertizaLogger.info LoggerMessage.new(controller_name, @student.name, "Successfully invited student #{@user.id}", request)
+    end
+ end
+
+
+
 end

@@ -159,7 +159,6 @@ after_filter ->(param="team_created_successfully"){log param}, :only => :team_cr
     return false unless team_user
     team_user.destroy_all
     undo_link "The user \"#{team_user.name}\" has been successfully removed from the team."
-    #ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'User removed a participant from the team', request)
   end
 
   def team_created_successfully(current_team = nil)

@@ -2,7 +2,6 @@ class ProfileController < ApplicationController
   def action_allowed?
     current_user
   end
-  # to do, a controller method to control the actions tab
   def edit
     @user = session[:user]
     @assignment_questionnaire = AssignmentQuestionnaire.where('user_id = ? and assignment_id is null and questionnaire_id is null', @user.id).first

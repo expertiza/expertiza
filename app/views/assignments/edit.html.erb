@@ -18,7 +18,16 @@
 
         <!--issue#1384, "other stuff" tab should be renamed to “Etc.”-->
 
-        <li><a href="#tabs-8" id="Other">Etc.</a></li>
+        <!--Use user@.action_enable to control whether the "Etc." show in Assignment edit page.
+          When Instructor press the "Action Options" button in the profile page,
+          which means instructor wants to view the assignment Actions on homepage.
+          Then in the assignment edit page can not view the "Etc." button.
+          If instructor doesn't press that "Action Options" button or cancel that action,
+          then in the assignment edit page the instructor can view the "Etc." button.-->
+        <!--Comments with issue#1354, add by E1976 team.-->
+        <% if !@user.action_enable? %>
+          <li><a href="#tabs-8" id="Other">Etc.</a></li>
+        <%end %>
       </ul>
       <div id="tabs-1">
         <%= render 'assignments/edit/general' %>
@@ -76,9 +85,18 @@
           <%= render 'assignments/edit/badges' %>
         </div>
       <% end %>
-      <div id="tabs-8">
-        <%= render 'assignments/edit/other' %>
-      </div>
+      <!--Use user@.action_enable to control whether the "Etc." show in Assignment edit page.
+          When Instructor press the "Action Options" button in the profile page,
+          which means instructor wants to view the assignment Actions on homepage.
+          Then in the assignment edit page can not view the "Etc." button.
+          If instructor doesn't press that "Action Options" button or cancel that action,
+          then in the assignment edit page the instructor can view the "Etc." button.-->
+      <!--Comments with issue#1354, add by E1976 team.-->
+      <% if !@user.action_enable? %>
+        <div id="tabs-8">
+          <%= render 'assignments/edit/other' %>
+        </div>
+      <% end %>
       <div style="margin-bottom: 20px">
       <%= button_tag "Save", :id => 'submit_btn', class: 'btn btn-md btn-default', :style => "margin-left: 20px;" %> | <%= render :partial => '/shared_scripts/back' %>
       </div>

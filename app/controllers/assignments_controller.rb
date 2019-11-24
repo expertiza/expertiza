@@ -27,6 +27,7 @@ class AssignmentsController < ApplicationController
 
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
+    @user = current_user
     if params[:button]
       if @assignment_form.save
         @assignment_form.create_assignment_node
@@ -62,6 +63,7 @@ class AssignmentsController < ApplicationController
   end
 
   def edit
+    @user = current_user
     ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Timezone not specified", request) if current_user.timezonepref.nil?
     flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines." if current_user.timezonepref.nil?
     edit_params_setting

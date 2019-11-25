@@ -8,7 +8,7 @@
 # There is information here: https://api.rubyonrails.org/v5.2.3/classes/ActiveRecord/Locking/Pessimistic.html
 class Lock < ActiveRecord::Base
   #The resource being locked can be any class
-  belongs_to :lockable, foreign_key: 'lockable_id', polymorphic: true, inverse_of: false
+  belongs_to :lockable, polymorphic: true
   belongs_to :user, class_name: 'User', foreign_key: 'user_id', inverse_of: false
   # How many minutes of inactivity before this lock is released?
   validates :timeout_period, presence: true
@@ -24,9 +24,9 @@ class Lock < ActiveRecord::Base
     end
     # lockable_id is a special id just for this class since it has polymorphic resources
     # Also use an actual database lock to prevent race conditions
-    lock = find_by(lockable_id: lockable.lockable_id, user_id: user.id)
+    lock = find_by(lockable: lockable, user: user)
     if lock.nil?
-      return create_lock(lockable, user.id)
+      return create_lock(lockable, user)
     end
     # We need to put an actual database lock on this object to prevent concurrent acquisition of this object
     # If two users were to request a lock at the same time, they might otherwise be able to acquire this lock simultaneously
@@ -34,12 +34,12 @@ class Lock < ActiveRecord::Base
       # If the timeout period is up, the lock is fair game
       if lock.created_at + timeout_period.minutes <= DateTime.now
         lock.destroy
-        return create_lock(lockable, user.id)
+        return create_lock(lockable, user)
       end
       # Your last chance on acquiring the lock is if you already own it
       if(lock.user_id == user.id)
         lock.destroy
-        return create_lock(lockable, user.id)
+        return create_lock(lockable, user)
       end
     end
     # Return nil because a lock could not be obtained on the resource
@@ -70,10 +70,10 @@ class Lock < ActiveRecord::Base
   # Just a little helper method to help keep this code DRY
   # If for some reason, the lock had trouble being created, returns nil because there is no
   # lock on the object
-  def self.create_lock(lockable, user_id)
+  def self.create_lock(lockable, user)
     # This could be a potential location for a race condition; however, based on what I've read,
     # if two users make calls to create, one will get the object and the other will get nil.
-    if Lock.create(lockable: lockable, user_id: user_id).nil?
+    if Lock.create(lockable: lockable, user: user).nil?
       return nil
     end
     return lockable

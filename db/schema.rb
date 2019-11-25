@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181205201208) do
+ActiveRecord::Schema.define(version: 20191124025300) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -315,6 +315,17 @@ ActiveRecord::Schema.define(version: 20181205201208) do
   end
 
   add_index "late_policies", ["instructor_id"], name: "fk_instructor_id", using: :btree
+
+  create_table "locks", force: :cascade do |t|
+    t.integer  "timeout_period", limit: 4
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "user_id",        limit: 4
+    t.integer  "lockable_id",    limit: 4
+    t.string   "lockable_type",  limit: 255
+  end
+
+  add_index "locks", ["user_id"], name: "fk_rails_426f571216", using: :btree
 
   create_table "markup_styles", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
@@ -798,6 +809,7 @@ ActiveRecord::Schema.define(version: 20181205201208) do
   add_foreign_key "invitations", "users", column: "from_id", name: "fk_invitationfrom_users"
   add_foreign_key "invitations", "users", column: "to_id", name: "fk_invitationto_users"
   add_foreign_key "late_policies", "users", column: "instructor_id", name: "fk_instructor_id"
+  add_foreign_key "locks", "users"
   add_foreign_key "participants", "users", name: "fk_participant_users"
   add_foreign_key "plagiarism_checker_assignment_submissions", "assignments"
   add_foreign_key "plagiarism_checker_comparisons", "plagiarism_checker_assignment_submissions"

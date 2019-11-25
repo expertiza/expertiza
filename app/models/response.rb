@@ -2,10 +2,11 @@ require 'analytic/response_analytic'
 require 'lingua/en/readability'
 
 class Response < ActiveRecord::Base
+  # Added for E1973. A team review will have a lock on it so only one user at a time may edit it.
+  include Lockable
   include ResponseAnalytic
   belongs_to :response_map, class_name: 'ResponseMap', foreign_key: 'map_id', inverse_of: false
-  # Added for E1973. A team review will have a lock on it so only one user at a time may edit it.
-  has_one :lock, class_name: 'Lock', as: :resource, dependent: :destroy, inverse_of: false
+  
   has_many :scores, class_name: 'Answer', foreign_key: 'response_id', dependent: :destroy, inverse_of: false
   # TODO: change metareview_response_map relationship to belongs_to
   has_many :metareview_response_maps, class_name: 'MetareviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy, inverse_of: false

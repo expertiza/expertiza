@@ -134,7 +134,8 @@
 
                   <!-- actual cells with scores and colored background. -->
                   <% row.score_row.each do |score| %>
-                      <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%= strip_tags(score.comment).html_safe%>">
+                      <% score_comment = score.comment.nil? ? '' : score.comment %> <!-- changing nil to null string to avoid Null Pointer Exception -->
+                      <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%= strip_tags(score_comment).html_safe%>">
                         <span class="<%=  underlined?(score) %>"><%= score.score_value.to_s %></span>
                       </td>
                   <% end %>

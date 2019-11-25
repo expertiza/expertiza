@@ -132,6 +132,23 @@ function microtaskChanged() {
     </td>
   </tr>
 
+  <!--Conference-->
+  <tr>
+    <td style='padding:5px' id='assignment_is_conference_field'>
+      <input name="assignment_form[assignment][is_conference]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][is_conference]', 'true', @assignment_form.assignment.is_conference) %>
+      <%= label_tag('assignment_form[assignment][is_conference]', 'Is this assignment for conference?') %>
+    </td>
+  </tr>
+  <% if current_page?(action: 'edit') %>
+  <tr>
+    <% if @assignment_form.assignment.is_conference %>
+        <p style="color: #721c24"> Link to join this conference is <%="https://expertiza.ncsu.edu/users/request_new?role=Instructor" %> </p>
+      <% end %>
+  </tr>
+  <% end %>
+
+
   <% if current_page?(action: 'edit') %>
   <!--Topics-->
   <tr>

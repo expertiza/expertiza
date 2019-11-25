@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181205201208) do
+ActiveRecord::Schema.define(version: 20191120205744) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -112,6 +112,7 @@ ActiveRecord::Schema.define(version: 20181205201208) do
     t.boolean  "is_answer_tagging_allowed"
     t.boolean  "has_badge"
     t.boolean  "allow_selecting_additional_reviews_after_1st_round"
+    t.boolean  "is_conference",                                                    default: false
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree

@@ -20,17 +20,24 @@ class SubmissionViewingEventsController < ApplicationController
     # create new response time record for current link
     submission_viewing_event = SubmissionViewingEvent.new(submission_viewing_event_params)
     submission_viewing_event.save
+    params[:submission_viewing_event][:link] = nil
+    params[:submission_viewing_event][:end_at] = ISODateString(t)
+    record_end_time()
     render nothing: true
   end
 
   # record time when link or file window is closed
   def record_end_time
     data = params.require(:submission_viewing_event)
-    submission_viewing_event_records = SubmissionViewingEvent.where(map_id: data[:map_id], round: data[:round], link: data[:link])
+    if data[:link].nil?
+      submission_viewing_event_records = SubmissionViewingEvent.where(map_id: data[:map_id], round: data[:round], end_at: nil).where.not(link: "Expertiza Review")
+    else
+      submission_viewing_event_records = SubmissionViewingEvent.where(map_id: data[:map_id], round: data[:round], link: data[:link])
+    end
     submission_viewing_event_records.each do |time_record|
       if time_record.end_at.nil?
         time_record.update_attribute('end_at', data[:end_at])
-        break
+        # break
       end
     end
     respond_to do |format|

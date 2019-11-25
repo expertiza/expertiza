@@ -27,7 +27,8 @@
   jQuery(document).ready(function() {
     var map_id = <%= @map.id %>;
     var round = <%= @current_round %>;
-
+    startTime(map_id, round, "Expertiza Review");
+    
     window.onblur=function(){
       checkFocus();
     }
@@ -48,10 +49,17 @@
 //	}
 //    }
 
-     function checkFocus() {
+      function checkFocus() {
         if(document.activeElement instanceof HTMLIFrameElement) {
             document.title='focused';
             startTime(map_id, round, "Expertiza Review");
+              $.ajax({
+              type: "POST",
+              dataType: 'json',
+              async: false,
+              url: '/submission_viewing_events/record_end_time',
+              data: $.param({submission_viewing_event:{map_id: map_id, round: round, end_at: ISODateString(t)}})
+              });
         } else {
             document.title='not focused';
             endTime("Expertiza Review");
@@ -76,8 +84,7 @@
               dataType: 'json',
               async: false,
               url: '/submission_viewing_events/record_end_time',
-              data: $.param({
-                submission_viewing_event: {map_id: map_id, round: round, link: link, end_at: ISODateString(t)}
+              data: $.param({submission_viewing_event: {map_id: map_id, round: round, link: link, end_at: ISODateString(t)}
                 }),
               /*success: function(json){
                 var links = JSON.parse(JSON.stringigy(json));

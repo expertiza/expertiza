@@ -143,7 +143,7 @@ function microtaskChanged() {
   <% if current_page?(action: 'edit') %>
   <tr>
     <% if @assignment_form.assignment.is_conference %>
-        <p style="color: #721c24"> Link to join this conference is <%=@assignment_form.assignment.name %> </p>
+        <p style="color: #721c24"> Link to join this conference is <%="https://expertiza.ncsu.edu/users/request_new?role=Instructor" %> </p>
       <% end %>
   </tr>
   <% end %>

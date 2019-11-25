@@ -383,7 +383,7 @@ class AssignmentsController < ApplicationController
 
  #This method will be called when we have assignment which is a conference and link to join the assignment
   def conference_assignment_joining_link
-    # call new controller here
+   "https://expertiza.ncsu.edu/user"
   end
 
   def assignment_form_params

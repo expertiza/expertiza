@@ -82,7 +82,7 @@
             $.ajax({
               type: 'POST',
               dataType: 'json',
-              async: false,
+              async: true,
               url: '/submission_viewing_events/record_end_time',
               data: $.param({submission_viewing_event: {map_id: map_id, round: round, link: link, end_at: ISODateString(t)}
                 }),

@@ -47,7 +47,7 @@
                   + pad(date.getUTCMinutes()) + ':'
                   + pad(date.getUTCSeconds());
       }
-      $(document).ready(function(){
+      $(document).ready(function(){	    
         var map_id = <%= @map.id %>;
         var round = <%= @current_round %>;
         var time_out_interval = 500; // in milliseconds
@@ -59,6 +59,12 @@
         $("#url a.review_link").on("auxclick", function(e) {
           e.preventDefault();
         });
+		window.onbeforeunload = function(){
+		  markEndTime();
+		  while (windowsToClose!=null && windowsToClose.length>0){
+            windowsToClose.shift().close();
+          }
+		}
         function timeoutAction(timeout_flag){
           if (timeout_flag) {
             markEndTime();

@@ -37,8 +37,22 @@
   <% total_time_list = Array.new %>
   <% timeHash = Hash.new %>
   <h3>Review submission viewing time details</h3>
-  <a id = "details" class= "show" onclick="showDetails()">show details</a>
-  <div id="chartContainer" style="height: 300px; width: 100%; display: none; "></div>
+  <!--a id = "details" class= "show" onclick="showDetails()">show details</a-->
+  <div class="modal fade" id="chartModal" role="dialog">
+    <div class="modal-dialog">   
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Time Distribution</h4>
+        </div>
+        <div class="modal-body">
+           <div id="chartContainer" style="height: 360px; width: 100%;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--div id="chartContainer" style="height: 300px; width: 100%; display: none; "></div-->
   <div>
     <table width="100%">
       <tr>
@@ -88,7 +102,8 @@
                  <% @per_round_time << each_link_detail %>
                 <td align="center"><%= sprintf("%.2f",individual_link_time) %></td>
                 <% if @count == 0 %>
-                <td><a onclick="drawChart(<%= @reviewee_id.to_s %>,<%= each_round.to_s %>)">Pie chart view </a></td>
+                <td><a onclick="drawChart(<%= @reviewee_id.to_s %>,<%= each_round.to_s %>)" data-toggle="modal" data-target="#chartModal">Pie chart view </a>
+                </td>
                 <% else %> 
                 <td><%= " "%></td>
                 <%end%>
@@ -166,8 +181,10 @@
       }
       ]
     });
+    $('#chartModal').on('shown.bs.modal',function(){
     chart.render();
     $(".canvasjs-chart-credit").css("display","none");//To remove the water mark from the chart
+    });
   }
 </script>
 </div> 

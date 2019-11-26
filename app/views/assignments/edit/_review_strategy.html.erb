@@ -139,6 +139,15 @@
     </td>
   </tr>
 
+  <tr>
+    <td>
+      <!--Add a allow studuent-generated questionnaires checkbox. -->
+      <input name="assignment_form[assignment][is_supplementary_review_enabled]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][is_supplementary_review_enabled]', 'true', @assignment_form.assignment.is_supplementary_review_enabled) %>
+      <%= label_tag('assignment_form[assignment][is_supplementary_review_enabled]', 'Allow student-generated questions added to rubric?') %>
+    </td>
+  </tr>
+
   <!--#E1870-->
   <% if @assignment_form.assignment.rounds_of_reviews > 1 %>
     <tr>

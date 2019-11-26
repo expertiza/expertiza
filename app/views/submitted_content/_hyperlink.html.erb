@@ -98,6 +98,12 @@
             }
           });
         }
+        $("#url a.review_link").bind('cut copy', function(e) {
+          e.preventDefault();
+        });
+        $("#url a.review_link").on("contextmenu", function(e) {
+          return false;
+        });
         $("#url a.review_link").click(function linkAction(event){
           event.preventDefault();
           var link_handler = $(this); // current link

@@ -68,7 +68,7 @@
                                       <td align='center'><p style="color: <%= col_color %>"><%= answer.answer %></p></td>
                                   <% end %>
                                   <!--Comments-->
-                                  <td align='left'><p style="color: <%= col_color %>" width="7%"><%= answer.comments.html_safe unless answer.comments.nil? %></p></td>
+                                  <td align='left'><p style="color: <%= col_color %>;width: 100%"><%= answer.comments.html_safe unless answer.comments.nil? %></p></td>
                               <% else %>
                                   <td>N/A</td>
                                   <td>N/A</td>
@@ -84,18 +84,20 @@
           <% end %>
       <% end %>
       <tr>
-        <th align='left' style="background-color:#DDDDBB"> Reviewee</th>
         <th align='left' colspan="2" style="background-color:#DDDDBB"> Additional Comment</th>
       </tr>
+      <tr>
+        <td colspan="3" style="padding: 0px;">
+          <table width="100%">
+            <tr>
+              <% responses.each do |response_id| %>
+                  <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
+                    <td colspan="2"> <%=sanitize Response.find(response_id).additional_comment %> </td>
+              <% end %>
+            </tr>
+          </table>
+      </tr>
 
-      <% responses.each do |response_id| %>
-          <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
-          <tr>
-            <td> <%= team.name(session[:ip]) %> </td>
-            <td colspan="2"> <%=sanitize Response.find(response_id).additional_comment %> </td>
-          </tr>
-      <% end %>
-    </table>
 
 <% end #loop for keys %>
 <br/>

@@ -12,9 +12,10 @@
     <%= f.hidden_field :participant_id, value: participant.id %>
     </br>
   <% end %>
-
+  
   <a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;">hide links</a><br/>
   <div id="url" style="user-select: none">
+    <p><b>Note:</b> You can only open one of each link at a time.</p>
     <ul>
       <% participant.team.hyperlinks.each_with_index {
         |link, index| %>
@@ -110,10 +111,15 @@
             }
           });
         }
-        $("#url a.review_link").click(function linkAction(event){
+        $("#url a.review_link").click(function linkAction(event){		  
           event.preventDefault();
           var link_handler = $(this); // current link
-          var address = link_handler.attr("href"); // url address of the current link
+          var address = link_handler.attr("href"); // url address of the current link		  
+		  if(address in linksToUpdate){
+		    if(linksToUpdate[address]==true){
+			  return; //if the address in already present in the array, prevent the user from opening it again
+			}
+		  }
           var window_handler = window.open(address); // open link in new window/tag
           windowsToClose.push(window_handler);
           $("#restart_link_timing_flag").val('false');

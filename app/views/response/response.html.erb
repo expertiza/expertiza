@@ -37,38 +37,15 @@
       document.title='focused';
       startTime(map_id, round, "Expertiza Review");
     }
-
-// Only Targets First iFrame and is therefore useless.
-//    function checkFocus() {
-//	if(document.activeElement == document.getElementsByTagName("iframe")[0]) {
-//	  document.title='focused';
-//	  startTime(map_id, round, "Expertiza Review");
-//	} else {
-//	  document.title='not focused';
-//        endTime("Expertiza Review");
-//	}
-//    }
-
-      function checkFocus() {
-        if(document.activeElement instanceof HTMLIFrameElement) {
-            document.title='focused';
-            startTime(map_id, round, "Expertiza Review");
-              $.ajax({
-              type: "POST",
-              dataType: 'json',
-              async: false,
-              url: '/submission_viewing_events/record_end_time',
-              data: $.param({submission_viewing_event:{map_id: map_id, round: round, end_at: ISODateString(t)}})
-              });
-        } else {
-            document.title='not focused';
-            endTime("Expertiza Review");
-        }
+    function checkFocus() {
+      if(document.activeElement instanceof HTMLIFrameElement) {
+          document.title='focused';
+          startTime(map_id, round, "Expertiza Review");
+      } else {
+          document.title='not focused';
+          endTime("Expertiza Review");
+      }
     }
-
-    //document.onblur=window.onblur;
-    //document.onfocus=window.onfocus;
-
     function startTime(map_id, round, link) {
           var t = new Date();
           $.ajax({

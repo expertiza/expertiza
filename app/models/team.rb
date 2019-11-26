@@ -11,6 +11,18 @@ class Team < ActiveRecord::Base
     joins(:teams_users).where("teams.parent_id = ? AND teams_users.user_id = ?", assignment_id, user_id)
   }
 
+  # check if in anonymized view
+  def self.anonymized_view?(ip_address = nil)
+    anonymized_view_starter_ips = $redis.get('anonymized_view_starter_ips') || ''
+    return true if ip_address and anonymized_view_starter_ips.include? ip_address
+    false
+  end
+
+  # turn anonymize team name if current session in anonymized view
+  def name(ip_address = nil)
+    Team.anonymized_view?(ip_address) ? 'Team' + ' ' + self.id.to_s : self[:name]
+  end
+
   # Get the participants of the given team
   def participants
     users.where(parent_id: parent_id || current_user_id).flat_map(&:participants)

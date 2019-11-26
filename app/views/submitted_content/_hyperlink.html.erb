@@ -14,7 +14,7 @@
   <% end %>
 
   <a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;">hide links</a><br/>
-  <div id="url" style="">
+  <div id="url" style="user-select: none">
     <ul>
       <% participant.team.hyperlinks.each_with_index {
         |link, index| %>
@@ -53,6 +53,12 @@
         var time_out_interval = 500; // in milliseconds
         var linksToUpdate = {};
         var windowsToClose = new Array();
+        $("#url a.review_link").on("contextmenu", function() {
+          return false;
+        });
+        $("#url a.review_link").on("auxclick", function(e) {
+          e.preventDefault();
+        });
         function timeoutAction(timeout_flag){
           if (timeout_flag) {
             markEndTime();
@@ -98,12 +104,6 @@
             }
           });
         }
-        $("#url a.review_link").bind('cut copy', function(e) {
-          e.preventDefault();
-        });
-        $("#url a.review_link").on("contextmenu", function(e) {
-          return false;
-        });
         $("#url a.review_link").click(function linkAction(event){
           event.preventDefault();
           var link_handler = $(this); // current link

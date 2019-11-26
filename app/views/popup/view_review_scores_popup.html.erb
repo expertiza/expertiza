@@ -13,6 +13,9 @@
       <% questions = Question.where(questionnaire_id: questionnaire_id) %>
       <% num_responses = @review_final_versions[key][:response_ids].length %>
       <% responses = @review_final_versions[key][:response_ids] %>
+<!--      set column length of responses-->
+      <% col_percent = 100/num_responses%>
+      <% col_percent_comment = 100/num_responses - 1%>
       <td colspan="3" style="padding: 0px;">
         <table width="100%">
           <tr>
@@ -65,10 +68,10 @@
                                         <p style="color: <%= col_color %>"><%= answer.answer == 0 ? image_tag("delete_icon.png") : image_tag("Check-icon.png") %></p>
                                       </td>
                                   <% else %>
-                                      <td align='center'><p style="color: <%= col_color %>"><%= answer.answer %></p></td>
+                                      <td align='center' width="1%"><p style="color: <%= col_color %>"><%= answer.answer %></p></td>
                                   <% end %>
                                   <!--Comments-->
-                                  <td align='left'><p style="color: <%= col_color %>;width: 100%"><%= answer.comments.html_safe unless answer.comments.nil? %></p></td>
+                                  <td align='left' width="<%= col_percent_comment %>%"><p style="color: <%= col_color %>;width: 100%"><%= answer.comments.html_safe unless answer.comments.nil? %></p></td>
                               <% else %>
                                   <td>N/A</td>
                                   <td>N/A</td>
@@ -92,7 +95,7 @@
             <tr>
               <% responses.each do |response_id| %>
                   <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
-                    <td colspan="2"> <%=sanitize Response.find(response_id).additional_comment %> </td>
+                    <td colspan="2" width="<%= col_percent %>%"> <%=sanitize Response.find(response_id).additional_comment %> </td>
               <% end %>
             </tr>
           </table>

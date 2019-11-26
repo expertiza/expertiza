@@ -35,12 +35,12 @@
     <thead>
     <tr bgcolor='#CCCCCC'>
       <!-- class value decides whether the column should be sortable or not  -->
-      <th width="20 px">Reviewer <span></span></th>
-      <th width="20 px">Reviews done<span></span></th>
-      <th>Team reviewed <span></span></th>
-      <th>Score awarded / Avg. score <span></span></th>
-      <th>Metrics <span></span></th>
-      <th>Assign grade and write comments <span></span></th>
+      <th width="10 px">Reviewer<span></span></th>
+      <th width="10 px">Reviews done<span></span></th>
+      <th width="10 px">Team reviewed<span></span></th>
+      <th>Score awarded / Avg. score<span></span></th>
+      <th width="30%">Metrics <span></span></th>
+      <th width="30%">Assign grade and write comments<span></span></th>
     </tr>
     </thead>
     <tbody>
@@ -54,7 +54,6 @@
             <td>
               <%= index + 1 %>.
               <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
-              (<%= user.fullname(session[:ip]) %>)
             </td>
             <!--# reviews done-->
             <td align = 'left'>

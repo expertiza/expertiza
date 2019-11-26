@@ -82,7 +82,7 @@
             $.ajax({
               type: 'POST',
               dataType: 'json',
-              async: true,
+              async: false,
               url: '/submission_viewing_events/record_end_time',
               data: $.param({submission_viewing_event: {map_id: map_id, round: round, link: link, end_at: ISODateString(t)}
                 }),
@@ -405,7 +405,7 @@
     <%= render :partial => 'review', :locals => {:versions => @responses_versions} %>
 <% end %>
 <h2>Directions for the reviewer</h2>
-<input type="checkbox" id="autosave_cbx" checked>
+<input type="checkbox" id="autosave_cbx" unchecked>
 <label id="autosave_cbx_lbl" for="autosave_cbx"></label>
 <div id="save_progress"></div>
 <%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form") do %>

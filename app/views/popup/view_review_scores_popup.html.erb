@@ -37,7 +37,7 @@
                       <table width="100%">
                         <tr>
                           <!-- question -->
-                          <th style="background-color:#DDDDBB" width="50%">[Question]<%= question.txt %></th>
+                          <th style="background-color:#DDDDBB" width="50%"><%= question.txt %></th>
                           <!-- checkbox -->
                           <% responses.each do |response_id| %>
                               <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
@@ -50,7 +50,7 @@
                   </tr>
               <% else %>
                   <tr>
-                    <th colspan="3" style="background-color:#DDDDBB" > [Question]<%= question.txt %></th>
+                    <th colspan="3" style="background-color:#DDDDBB" > <%= question.txt %></th>
                   </tr>
                   <!-- show review summary for non-checkbox question -->
                   <tr>

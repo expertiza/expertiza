@@ -190,7 +190,7 @@ class QuestionnairesController < ApplicationController
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
       if question.is_a? ScoredQuestion
-        question.weight = 1
+        question.weight = params[:question][:weight]
         question.max_label = 'Strongly agree'
         question.min_label = 'Strongly disagree'
       end

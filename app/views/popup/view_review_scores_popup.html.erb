@@ -16,6 +16,7 @@
 <!--      set column length of responses-->
       <% col_percent = 100/num_responses%>
       <% col_percent_comment = 100/num_responses - 1%>
+      <!-- show the team which did the review -->
       <td colspan="3" style="padding: 0px;">
         <table width="100%">
           <tr>
@@ -30,6 +31,7 @@
       <% questions.each do |question| %>
           <% if !question.is_a?(QuestionnaireHeader) && num_responses > 0 %>
               <% if question.instance_of? Checkbox %>
+                  <!-- Show review summary of checkbox question -->
                   <tr>
                     <td colspan="3" style="padding: 0px;">
                       <table width="100%">
@@ -50,7 +52,7 @@
                   <tr>
                     <th colspan="3" style="background-color:#DDDDBB" > [Question]<%= question.txt %></th>
                   </tr>
-                  <!-- Only assign these column headers if the question isn't a checkbox question -->
+                  <!-- show review summary for non-checkbox question -->
                   <tr>
                     <td colspan="3" style="padding: 0px;">
                       <table width="100%">
@@ -86,7 +88,7 @@
                   </tr>
               <% end %>
           <% else %>
-              <% next%>
+              <% next %>
           <% end %>
       <% end %>
       <tr>

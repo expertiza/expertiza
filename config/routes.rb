@@ -1,3 +1,4 @@
+
 Expertiza::Application.routes.draw do
   ###
   # Please insert new routes alphabetically!
@@ -111,9 +112,19 @@ Expertiza::Application.routes.draw do
       post :export
       post :exportdetails
       post :export_advices
+      put :exporttags
+      post :exporttags
     end
   end
 
+  put '/tags.csv', to: 'export_file#export_tags'
+
+  resources :export_tags, only: [] do
+    collection do
+      put :exporttags
+      post :exporttags
+    end
+  end
   resources :grades, only: %i[edit update] do
     collection do
       get :view
@@ -220,19 +231,27 @@ resources :institution, except: [:destroy] do
       get :set_publish_permission
     end
   end
-
+#Nitin - removed quiz related routes from questionnaires controller
   resources :questionnaires, only: %i[new create edit update] do
     collection do
       get :copy
-      get :new_quiz
       get :select_questionnaire_type
       post :select_questionnaire_type
       get :toggle_access
-      get :view
-      post :create_quiz_questionnaire
-      post :update_quiz
+      get :view  
       post :add_new_questions
       post :save_all_questions
+    end
+  end
+
+#Nitin - Created new routes for quiz_questionnaire
+  resources :quiz_questionnaire, only: %i[new create edit update] do
+    collection do
+      get :new_quiz
+      post :create_quiz_questionnaire
+      get :edit_quiz
+      post :update_quiz
+      
     end
   end
 
@@ -275,7 +294,6 @@ resources :institution, except: [:destroy] do
       get :redirect
       get :show_calibration_results_for_student
       post :custom_create
-      get :pending_surveys
       get :json
     end
   end
@@ -412,6 +430,7 @@ resources :institution, except: [:destroy] do
     collection do
       get :list
       get :reminder_thread
+      get :pending_surveys
     end
   end
 

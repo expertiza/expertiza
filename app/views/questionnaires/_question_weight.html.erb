@@ -1,0 +1,17 @@
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var ques_type = $("#question_type")[0].value;
+        checkQuestionType();
+    });
+
+    function checkQuestionType() {
+        ques_type = $("#question_type")[0].value;
+        if (ques_type == 'Scale' || ques_type == 'Criterion') {
+            $("#new_question_weight").show();
+        } else {
+            $("#new_question_weight").hide();
+        }
+    }
+
+</script>

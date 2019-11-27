@@ -28,25 +28,30 @@
   <li><i style="color:green">green</i> indicates that there is no submitted work to review within the round;</li>
   <li><i style="color:purple">purple</i> indicates that there is no review for a submitted work within the round;</li>
   <li><i style="color: #986633">brown</i> indicates that the review grade has been assigned</li>
-</ul>
+      <%= controller.controller_name %>
+    </ul>
   <p>&nbsp;</p>
   
   <table id="myTable" class="tbl_heat tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
     <thead>
     <tr bgcolor='#CCCCCC'>
       <!-- class value decides whether the column should be sortable or not  -->
-      <th width="16%" class="sorter-true">Reviewer <span></span></th>
+      <th width="15%" class="sorter-true">Reviewer <span></span></th>
       <th width="10%" class="sorter-false">Reviews done<span></span></th>
-      <th width="24%" class="sorter-false">Team reviewed <span></span></th>
+      <th width="10%" class="sorter-false">Team reviewed <span></span></th>
       <th width="13%" class="sorter-false">Score awarded / Avg. score <span></span></th>
-      <th width="17%" class="sorter-true"> <div style="display: inline-block; float: right; padding-top: 1em">Metrics </div>
+      <th width="24%" class="sorter-true"> <div style="display: inline-block; float: left; padding-top: 1em" >Metrics </div>
         <div class='legend-scale'  style="display: inline-block; float: right">
           <ul class='legend-labels'>
             <li><span style='background:#ffa9af;'></span>Vol.</li>
             <li><span style='background:#8B0000;'></span>Avg.vol</li>
+            <li><span style='background:#3FB28E;'></span>Suggestion Percentage</li>
+            <li><span style='background:#52819D;'></span>Avg. Suggestion Percentage</li>
           </ul>
         </div></th>
-      <th class="sorter-false">Assign grade and write comments <span></span></th>
+
+
+      <th width="28%" class="sorter-false">Assign grade and write comments <span></span></th>
     </tr>
     </thead>
     <tbody>
@@ -117,6 +122,7 @@
           <!--Metrics-->
           <td align='left'>
             <%= display_volume_metric_chart(r) %>
+            <%= display_suggestion_metric_chart(r) %>
           </td>
           <!--Assign grade and write comments-->
           <td align='left'>

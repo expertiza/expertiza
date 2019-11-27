@@ -218,7 +218,7 @@ module ReviewMappingHelper
             display: false
         },
         width: "200",
-        height: "125",
+        height: "75", #decreased the width of space around the bar
         scales: {
             yAxes: [{
                         stacked: false,
@@ -233,6 +233,47 @@ module ReviewMappingHelper
                         }
                     }]
       }
+    }
+    horizontal_bar_chart data, options
+  end
+
+  def display_suggestion_metric_chart(reviewer)
+    labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
+    data = {
+        labels: labels,
+        datasets: [
+            {
+                backgroundColor: "rgba(63,178,142,0.6)", #CHANGED THIS
+                data: reviewer_data,
+                borderWidth: 1
+            },
+            {
+                backgroundColor: "rgba(82,129,157,1 )", #CHANGED THIS
+                data: all_reviewers_data,
+                borderWidth: 1
+            }
+        ]
+    }
+    options = {
+        legend: {
+            display: false
+        },
+        width: "200",
+        height: "75", #CHANGED THIS
+        scales: {
+            yAxes: [{
+                        stacked: false,
+                        barThickness: 10
+                    }],
+            xAxes: [{
+                        stacked: false,
+                        ticks: {
+                            beginAtZero: true,
+                            stepSize: 100, #change to 10
+                            max: 500 #change to 100
+                        }
+                    }]
+        }
     }
     horizontal_bar_chart data, options
   end

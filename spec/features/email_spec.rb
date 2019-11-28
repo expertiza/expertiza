@@ -20,7 +20,7 @@ describe 'send email to new user', type: :feature do
     test_user.id = 123
     test_user.save!
     mail = ActionMailer::Base.deliveries.last
-    expect(mail.subject).to eq('Your Expertiza password has been created')
+    expect(mail.subject).to eq('Your Expertiza account and password has been created')
   end
 
   context 'when user will be created using import file' do
@@ -41,7 +41,7 @@ describe 'send email to new user', type: :feature do
         test_user
       end
       allow(User).to receive(:exists?).with(name: 'username').and_return(false)
-      expect{(User.import(row, nil, {},1))}.to change{ActionMailer::Base.deliveries.count}.by(2)
+      expect{(User.import(row, nil, {},1))}.to change{ActionMailer::Base.deliveries.count}.by(1)
     end
   end
 end

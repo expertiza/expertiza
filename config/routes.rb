@@ -244,6 +244,19 @@ resources :institution, except: [:destroy] do
     end
   end
 
+  #Add route courresponding to supplementary_review_questionnaire controller
+  resources :supplementary_review_questionnaires, only: %i[new create edit update] do
+    collection do
+      get :copy
+      get :select_questionnaire_type
+      post :select_questionnaire_type
+      get :toggle_access
+      get :view  
+      post :add_new_questions
+      post :save_all_questions
+    end
+  end
+
 #Nitin - Created new routes for quiz_questionnaire
   resources :quiz_questionnaire, only: %i[new create edit update] do
     collection do

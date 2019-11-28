@@ -1,11 +1,11 @@
 <% get_time_spent_on_review_for_certain_team_for_each_round(map_id) %>
-<td bgcolor=<%= bgcolor %> align='left' >
+<!--td bgcolor=<%= bgcolor %> align='left' -->
   <% (1..@assignment.num_review_rounds).each do |round| %>
       <% if ((instance_variable_get("@time_spent_round_" + round.to_s)).to_f) > 0  %>
-          <%= sprintf("%.2f",instance_variable_get("@time_spent_round_" + round.to_s)) %>
-      <% else %>
+        <%=link_to sprintf("%.2f",instance_variable_get("@time_spent_round_" + round.to_s)), :controller => 'popup', :action => 'reviewer_details_popup', :id => id, :assignment_id=>@id %>
+        <%else%>
           ---
       <% end %>
     <%= ', ' unless round == @assignment.num_review_rounds %>
   <%end%>
-</td>
+<!--/td-->

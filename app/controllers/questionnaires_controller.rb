@@ -256,14 +256,16 @@ class QuestionnairesController < ApplicationController
     if params[:new_question]
       # The new_question array contains all the new questions
       # that should be saved to the database
-      params[:new_question].keys.each do |question_key|
+      params[:new_question].keys.each_with_index do |question_key, index|
         q = Question.new
         q.txt = params[:new_question][question_key]
         q.questionnaire_id = questionnaire_id
         q.type = params[:question_type][question_key][:type]
         q.seq = question_key.to_i
         if @questionnaire.type == "QuizQuestionnaire"
-          q.weight = 1 # setting the weight to 1 for quiz questionnaire since the model validates this field
+          # using the weights user inputs when creating quiz
+          weight_key = "question_#{index + 1}"
+          q.weight = params[:question_weights][weight_key.to_sym]
         end
         q.save unless q.txt.strip.empty?
       end

@@ -282,6 +282,16 @@ development:
         parent_id: 2
         site_controller_id:
         url: "/credits"
+      50: &24 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 15
+        id: 50
+        label: Anonymized view
+        name: anonymized_view
+        parent:
+        parent_id: 37
+        site_controller_id: 35
+        url: "/users/set_anonymized_view"
     by_name:
       home: *1
       student_task: *2
@@ -289,6 +299,7 @@ development:
       profile: *4
       contact_us: *5
       credits: *7
+      anonymized_view: *24
     crumbs:
     - 1
     root: &8 !ruby/object:Menu::Node
@@ -299,6 +310,7 @@ development:
       - 30
       - 27
       - 2
+      - 50
     selected:
       1: *1
     vector:
@@ -495,6 +507,7 @@ test:
       - 5
       - 6
       - 7
+      - 50
     by_id:
       1: &1 !ruby/object:Menu::Node
         parent:
@@ -548,12 +561,23 @@ test:
         controller_action_id:
         content_page_id: 8
         url: "/credits"
+      50: &24 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 15
+        id: 50
+        label: Anonymized view
+        name: anonymized_view
+        parent:
+        parent_id: 37
+        site_controller_id: 35
+        url: "/users/set_anonymized_view"
     by_name:
       home: *1
       student_task: *2
       profile: *3
       contact_us: *4
       credits: *6
+      anonymized_view: *24
     selected:
       1: *1
     vector:
@@ -845,6 +869,16 @@ production:
         parent_id: 2
         site_controller_id:
         url: "/credits"
+      50: &24 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 15
+        id: 50
+        label: Anonymized view
+        name: anonymized_view
+        parent:
+        parent_id: 37
+        site_controller_id: 35
+        url: "/users/set_anonymized_view"
     by_name:
       home: *1
       student_task: *2
@@ -852,6 +886,7 @@ production:
       profile: *4
       contact_us: *5
       credits: *7
+      anonymized_view: *24
     crumbs:
     - 1
     root: &8 !ruby/object:Menu::Node
@@ -862,6 +897,7 @@ production:
       - 30
       - 27
       - 2
+      - 50
     selected:
       1: *1
     vector:

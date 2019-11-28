@@ -17,6 +17,12 @@ class UsersController < ApplicationController
       true
     when 'keys'
       current_role_name.eql? 'Student'
+    when 'set_anonymized_view'
+      ['Super-Administrator',
+       'Administrator',
+       'Instructor',
+       'Student',
+       'Teaching Assistant'].include? current_role_name  
     else
       ['Super-Administrator',
        'Administrator',

@@ -18,28 +18,26 @@ class Lock < ActiveRecord::Base
   # Return the resource if it's available or nil if it is not
   # Automatically handles creating/destroying locks and timeout periods
   # However, once a user is done with a lock, it is their responsibility to destroy it by using Lock.unlock
-  def self.lock(lockable, user)
+  def self.get_lock(lockable, user, timeout)
     if(lockable.nil? || user.nil?)
       return nil
     end
-    # lockable_id is a special id just for this class since it has polymorphic resources
-    # Also use an actual database lock to prevent race conditions
-    lock = find_by(lockable: lockable, user: user)
+    lock = find_by(lockable: lockable)
     if lock.nil?
-      return create_lock(lockable, user)
+      return create_lock(lockable, user, timeout)
     end
     # We need to put an actual database lock on this object to prevent concurrent acquisition of this object
     # If two users were to request a lock at the same time, they might otherwise be able to acquire this lock simultaneously
     lock.with_lock do
       # If the timeout period is up, the lock is fair game
-      if lock.created_at + timeout_period.minutes <= DateTime.now
+      if lock.created_at + lock.timeout_period.minutes <= DateTime.now
         lock.destroy
-        return create_lock(lockable, user)
+        return create_lock(lockable, user, timeout)
       end
       # Your last chance on acquiring the lock is if you already own it
       if(lock.user_id == user.id)
         lock.destroy
-        return create_lock(lockable, user)
+        return create_lock(lockable, user, timeout)
       end
     end
     # Return nil because a lock could not be obtained on the resource
@@ -51,16 +49,27 @@ class Lock < ActiveRecord::Base
   # user has locked, modified, and unlocked the resource, I do NOT want to modify the resource
   # even though it may be unlocked. This method should always be checked before any database
   # changes are made.
+  # It should be noted that this will return true even after the timeout period has passed.
+  # Since this method is for doing safety checks, if no one else has acquired the lock, it's okay to
+  # make edits.
+  # This method will also renew the timeout period on the lock to avoid race conditions
   def self.lock_between?(lockable, user)
-    return !find_by(lockable_id: lockable.id, user_id: user.id).nil?
+    lock = find_by(lockable_id: lockable.id, user_id: user.id)
+    if lock.nil?
+      return false
+    else
+      lock.destroy
+      create_lock(lockable, user, lock.timeout_period)
+      return true
+    end
   end
   
   #Destroys the lock on the given resource by the given user (if it exists)
-  def self.unlock(lockable, user)
+  def self.release_lock(lockable, user)
     if lockable.nil? || user.nil?
       return
     end
-    lock = find_by(lockable_id: lockable.lockable_id, user_id: user.id)
+    lock = find_by(lockable: lockable, user: user)
     if !lock.nil?
       lock.destroy
     end
@@ -70,12 +79,15 @@ class Lock < ActiveRecord::Base
   # Just a little helper method to help keep this code DRY
   # If for some reason, the lock had trouble being created, returns nil because there is no
   # lock on the object
-  def self.create_lock(lockable, user)
-    # This could be a potential location for a race condition; however, based on what I've read,
-    # if two users make calls to create, one will get the object and the other will get nil.
-    if Lock.create(lockable: lockable, user: user).nil?
-      return nil
+  def self.create_lock(lockable, user, timeout)
+    # This method is still a potential location for a race condition.
+    # Unfortunately, database locks can't be created for nonexistant entries.
+    # This was the way I found online avoid the race condition but I'm not sure exactly how it works
+    transaction do
+      lock = Lock.new(lockable: lockable, user: user, timeout_period: timeout)
+      lock.save!
+      return lockable
     end
-    return lockable
+    return nil
   end
 end

@@ -1,3 +1,4 @@
+#testing
 class User < ActiveRecord::Base
   acts_as_authentic do |config|
     config.validates_uniqueness_of_email_field_options = {if: -> { false }} # Don't validate email uniqueness
@@ -126,7 +127,7 @@ class User < ActiveRecord::Base
 
   # Function which has a MailerHelper which sends the mail welcome email to the user after signing up
   def email_welcome
-    MailerHelper.send_mail_to_user(self, "Your Expertiza password has been created", "user_welcome", password)
+    MailerHelper.send_mail_to_user(self, "Your Expertiza password has been created", "user_welcome", password).deliver_now
   end
 
   def valid_password?(password)

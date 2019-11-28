@@ -5,6 +5,9 @@
 
   </div>
 
+  <div id="question_weight_<%= i %>">
+    Add question weight <%= text_field "question_weights", "question_#{i}", :size => 1, :value => "1"%>
+  </div>
   <div id="radio_buttons<%= i %>" style="display: none;">
     <%= radio_button("new_choices[#{i}][MultipleChoiceRadio][1]",:iscorrect, '1') %> <%= text_field "new_choices[#{i}][MultipleChoiceRadio][1]", :txt, size: 50 %> <br>
     <%= radio_button("new_choices[#{i}][MultipleChoiceRadio][1]",:iscorrect, '2') %> <%= text_field "new_choices[#{i}][MultipleChoiceRadio][2]", :txt, size: 50 %> <br>

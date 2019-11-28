@@ -119,7 +119,7 @@ class QuestionnairesController < ApplicationController
           question_ids.append(k)
         end
       end
-      if AnswerHelper.in_active_period(params[:id]):
+      if AnswerHelper.in_active_period(params[:id])
         # Fetch the Answers for the Questionnaire, delete and send them to User
         begin
           AnswerHelper.delete_existing_responses(params[:id],question_ids)

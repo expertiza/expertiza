@@ -264,9 +264,6 @@ class Response < ActiveRecord::Base
         code += if question.instance_of? Criterion
                   #Answer Tags are enabled only for Criterion questions at the moment.
                   question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments, current_user) || ''
-                elsif question.instance_of? Cake
-                  #Added this to replicate criterion questions at the moment. -->to be removed
-                  question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments, current_user) || ''
                 elsif question.instance_of? Scale
                   question.view_completed_question(count, answer, questionnaire_max) || ''
                 else

@@ -610,7 +610,16 @@ class Assignment < ActiveRecord::Base
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: type).id }
   end
 
-  def find_review_due_date(round)
-    self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: "review").id && due_date.round == round }
+  def find_review_period(round)
+    # If round is nil, it means the same questionnaire is used for every round. Thus, we return all periods.
+    # If round is not nil, we return only the period of that round.
+    if round.nil?
+      start_dates = self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: "submission").id }
+      end_dates = self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: "review").id }
+    else
+      start_dates = self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: "submission").id && due_date.round == round }
+      end_dates = self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: "review").id && due_date.round == round }
+    end
+    return start_dates, end_dates
   end
 end

@@ -5,7 +5,7 @@ module AnswerHelper
   #Function will serve 2 purposes
   #One - Identify the existing responses for the modified questionnaire in the database 	
   #Two - Mail the response to the user and delete the object in the database
-  def self.delete_existing_responses(questionnaire_id,question_ids)
+  def self.delete_existing_responses(question_ids)
     response_ids=[]
     question_ids.each do |question|
       response_ids=response_ids+Answer.where(question_id: question).pluck("response_id")
@@ -24,9 +24,7 @@ module AnswerHelper
     # Second part of the function that mails the answers to each user and if successfull, delete the answers
     begin
 	    user_id_to_answers.each do |response, answers|
-	      if self.review_mailer(answers[0], answers[1], answers[2], answers[3])
-	        self.delete_answers(response)
-	      end
+	      self.delete_answers(response) if self.review_mailer(answers[0], answers[1], answers[2], answers[3])
 	    end
 	  rescue StandardError
       raise $ERROR_INFO
@@ -65,16 +63,17 @@ module AnswerHelper
     end
   end
 
-  def in_active_period(questionnaire_id)
-    assignment = AssignmentQuestionnaire.where(questionnaire_id: questionnaire_id).order("created_at").last
-    round_number = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: questionnaire_id).used_in_round
-    review_due_date = assignment.find_review_due_date(round_number)
-    start_date = assignment.due_dates.max_by {|o| o[:review_due_date]}
-    time_now = DateTime.now
-    if start_date.due_at < time_now && review_due_date.due_at > time_now
-      true
-    else
+  def self.in_active_period(questionnaire_id)
+    assignment, round_number = AssignmentQuestionnaire.get_latest_assignment(questionnaire_id)
+    unless assignment.nil?
+      start_dates, end_dates = assignment.find_review_period(round_number)
+      time_now = Time.zone.now
+      # There can be multiple possible review periods: If round_number is nil, all rounds of reviews use the same questionnaire.
+      # If it is in any of the possible review period now, return true.
+      start_dates.zip(end_dates).each do |start_date, end_date|
+        return true if start_date.due_at < time_now && end_date.due_at > time_now
+      end
       false
     end
   end
- end
+end

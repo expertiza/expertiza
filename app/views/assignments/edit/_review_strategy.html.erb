@@ -59,10 +59,36 @@
       </span>
     </td>
   </tr>
-  <% if @metareview_allowed %>
-  <tr>
+  <script>
+
+      $(document).ready(function () {
+          hasMetaReviewChanged();
+      });
+      $(window).on('storage', onStorageEvent);
+      function onStorageEvent(storageEvent) {
+          if (storageEvent.originalEvent) {
+              if(storageEvent.originalEvent.newValue == "show"){
+                  var x = document.getElementById("meta");
+                  var y = document.getElementById("assignment_review_topic_threshold_row");
+                  x.style.display='';
+                  y.style.display='';
+              }
+              else {
+                  var x = document.getElementById("meta");
+                  var y = document.getElementById("assignment_review_topic_threshold_row");
+                  x.style.display='none';
+                  y.style.display='none';
+                  $('#meta_review').prop('checked', false);
+                  hasMetaReviewChanged();
+              }
+          }
+      };
+
+  </script>
+
+  <tr id="meta" style="display:none">
     <td>
-      <%= check_box_tag('meta_review', 'true', true, {:onChange => 'hasMetaReviewChanged()'}) %>
+      <%= check_box_tag('meta_review', 'true', false, {:onChange => 'hasMetaReviewChanged()'}) %>
       <%= label_tag('meta_review', 'Has Meta-review Limit?') %>  
       <img src="/assets/info.png" title='You can set if a particular submission can have a Meta-review or not.'>
     </td>
@@ -90,7 +116,6 @@
         </span>
     </td>
   </tr>
- <%end%>
 
   <tr id="instructor_selected_review_mapping_mechanism" hidden='hidden'>
     <td>

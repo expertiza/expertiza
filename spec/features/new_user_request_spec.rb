@@ -83,7 +83,7 @@ describe 'new user request' do
         expect(page).to have_content('requester1')
         # the size of mailing queue changes by 1
         expect(ActionMailer::Base.deliveries.count).to eq(1)
-        expect(ActionMailer::Base.deliveries.first.subject).to eq("Your Expertiza account and password have been created.")
+        expect(ActionMailer::Base.deliveries.first.subject).to eq("Your Expertiza account and password has been created")
         expect(ActionMailer::Base.deliveries.first.to).to eq(["expertiza.development@gmail.com"])
       end
 

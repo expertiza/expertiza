@@ -1,10 +1,30 @@
-<%= create_report_table_header("Reviewer" => "16%",
-                               "# teammate reviews done" => "14%",
-                               "Teammate reviewed" => "20%",
-                               "Last reviewed at" => "20%") %>
+<script>
+   $(function () {
+     /*E: 1980Function for sorting the table */
+     $("#teammateReviewTable").tablesorter({
+        dateFormat : "mmddyyyy", //E1980: set the default date format
+       sortList: [[0,0]] // E1980: sort First Column by default when page loads
+     });
+   });
+ </script>
+
+<!--E1877: table teammateReviewTable modified-->
+<div class = 'reviewreport'>
+<table id= "teammateReviewTable" cellspacing='0' cellpadding='2' border=0 class="table table-striped">
+<thead>
+<!--E1877: "sorter-true" included to sort the table using each attribute-->
+ <tr bgcolor='#CCCCCC'>
+ <th class="sorter-true" >Reviewer</th>
+ <th class="sorter-true" ># teammate reviews done</th>
+ <th class="sorter-false" >Teammate reviewed</th>
+ <th class="sorter-true"  >Last reviewed at</th>
+ </tr>
+</thead>
+
     <%@l = -1 %>
 
     <% @reviewers.each do |r| %>
+       <% @cntResponse = 0%>
       <% @teammate_review_response_maps = ResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and type = ?", @id, r.reviewer_id, @type]) %>
       <% @user = User.find(Participant.find(r.reviewer_id).user_id) %>
       <% @team_id = TeamsUser.team_id(@id.to_i, @user.id) %>
@@ -27,11 +47,11 @@
         <%if Participant.exists?(id: r.reviewer_id) %>
           <% @reviewer_name = @user.fullname(session[:ip]) %>
           <!--Reviewer-->
-          <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan %>>
+          <td bgcolor=<%= @bgcolor %>>
             <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id => @id%>
           </td>
           <!--# teammate reviews done-->
-          <td bgcolor=<%= @bgcolor %>  align = "left" rowspan= <%= @rspan %>>
+          <td bgcolor=<%= @bgcolor %>  align = "left" >
             <% if @team_member_count == 1 %>
               <%= '--' %>
             <% else %>
@@ -46,17 +66,34 @@
             <% if !@teammate_review_response.blank? %>
               <% @reviewee = rm.reviewee.user %>
                 <!--Teammate reviewed-->
-                <td id = "green" bgcolor=<%= @bgcolor %> align = 'left' colspan=1>
+                <td id = "green" bgcolor=<%= @bgcolor %> align = 'left'>
                   <%= link_to @reviewee.name(session[:ip]), impersonate_impersonate_path(:user => {:name => @reviewee.name}), :method => :post, :title => "Click here to impersonate this user" %>
                   (<%= @reviewee.fullname(session[:ip]) %>)
                 </td>
                 <!--Last reviewed at-->
                 <td bgcolor=<%= @bgcolor %> align = 'left'>
                   <%= @teammate_review_response.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
-                </td></tr><tr>
-            <% else %>
-              <!-- Teammate reviewed-->
-              <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left' colspan=1>
+                </td>
+
+		<%if @cntResponse < @rspan-1 %>
+                 	 </tr>
+	    	 	 <tr>
+		  	 <td bgcolor=<%= @bgcolor %> style="visibility: collapse;" >
+               			 <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id => @id%>
+               	  	 </td>
+                   	 <!--# teammate reviews done-->
+             	    	<td bgcolor=<%= @bgcolor %>  align = "left" style="visibility: collapse;" >
+              			 <% if @team_member_count == 1 %>
+               				<%= '--' %>
+            			 <% else %>
+             				 <%= @count %>/<%= @rspan %>
+           			 <% end %>
+         	   	 </td>
+				<% @cntResponse=@cntResponse+1  %>
+			<%end%>
+            	<% else %>
+              	<!-- Teammate reviewed-->
+              <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left'>
                 <% if @team_member_count == 1 %>
                   <%= 'N/A' %>
                 <% else %>
@@ -66,8 +103,24 @@
                 <% end %>
               </td>
               <!--Last reviewed at-->
-              <td bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left'>No</td></tr><tr>
+              <td bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left'>No</td>
             <% end %>
+		<%if @cntResponse < @rspan-1 %>
+                 </tr>
+                 <tr>
+                  <td bgcolor=<%= @bgcolor %> style="visibility: collapse;" >
+                         <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id => @id%>
+                   </td>
+                    <!--# teammate reviews done-->
+                    <td bgcolor=<%= @bgcolor %>  align = "left" style="visibility: collapse;" >
+                         <% if @team_member_count == 1 %>
+                                <%= '--' %>
+                         <% else %>
+                                 <%= @count %>/<%= @rspan %>
+                         <% end %>
+                    </td>
+                        <% @cntResponse=@cntResponse+1  %>
+                <%end%>
           <% end %>
           </tr>
         <% end %>

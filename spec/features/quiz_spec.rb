@@ -42,6 +42,13 @@ def create_choices
   ]
 end
 
+def create_choices_for_weighted_questionnaire(ques_id)
+  [
+    create(:quiz_question_choice, question: @question, txt: 'True' + ques_id, iscorrect: 1),
+    create(:quiz_question_choice, question: @question, txt: 'False' + ques_id)
+  ]
+end
+
 def fill_in_quiz
   fill_in 'questionnaire_name', with: 'Quiz for test'
   fill_in 'text_area', with: 'Test Question 1'
@@ -213,6 +220,14 @@ def setup_questionnaire
   @question = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1', quiz_question_choices: choices
 end
 
+def setup_weighted_questionnaire
+  @questionnaire = create :quiz_questionnaire, instructor_id: @team1.id
+  choices_one = create_choices_for_weighted_questionnaire("1")
+  choices_two = create_choices_for_weighted_questionnaire("2")
+  @question1 = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1', quiz_question_choices: choices_one, type: "TrueFalse"
+  @question2 = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 2', quiz_question_choices: choices_two, type: "TrueFalse"
+end
+
 def setup_responses
   @response_map = create :quiz_response_map, quiz_questionnaire: @questionnaire, reviewer: @participant2, reviewee_id: @team1.id
   @response = create :quiz_response, response_map: @response_map
@@ -304,6 +319,33 @@ describe 'Student reviewers can take the quizzes', js: true do
     find(:css, "input[value='Answer 1']").click
     click_on 'Submit Quiz'
     expect(page).to have_content('Quiz score: 100.0%')
+  end
+end
+
+describe 'Grading of quizzes takes weights into consideration', js: true do
+  before :each do
+    @instructor = create(:instructor)
+    @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 2
+    create_assignment_due_date
+    create_student1
+    make_team
+    setup_weighted_questionnaire
+    create_student2
+    @response_map = create :quiz_response_map, quiz_questionnaire: @questionnaire, reviewer: @participant2, reviewee_id: @team1.id
+  end
+
+  it 'can take quiz' do
+    login_as @student2.name
+    click_link @assignment.name
+    click_link 'Take quizzes'
+    expect(page).to have_link('Begin')
+    click_link 'Begin'
+    expect(page).to have_content('Questions')
+    find(:css, "input[value='True1']").click
+    find(:css, "input[value='False2']").click
+    sleep 60
+    click_on 'Submit Quiz'
+    expect(page).to have_content('Quiz score: 50.0%')
   end
 end
 

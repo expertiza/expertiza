@@ -108,7 +108,18 @@ class ResponseController < ApplicationController
     # A new response has to be created when there hasn't been any reviews done for the current round,
     # or when there has been a submission after the most recent review in this round.
     @response = Response.where(map_id: @map.id, round: @current_round.to_i).order(updated_at: :desc).first
-    if @response.nil? || AssignmentTeam.find(@map.reviewee_id).most_recent_submission.updated_at > @response.updated_at
+    
+    # Assignment team will be nil for Meta Reviews.
+    # Hence rescuing from exception and assigning local variable to nil
+    begin
+      assignment_team = AssignmentTeam.find(@map.reviewee_id)
+    rescue
+      assignment_team = nil
+    end
+
+    # Assignment team will be nil for Meta Reviews. Hence checking for nil before checking updated_at
+    # Since check for nil is added functionality is preserved
+    if @response.nil? || (!assignment_team.nil? && assignment_team.most_recent_submission.updated_at > @response.updated_at)
       @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
     end
     questions = sort_questions(@questionnaire.questions)

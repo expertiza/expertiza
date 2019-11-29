@@ -224,8 +224,8 @@ def setup_weighted_questionnaire
   @questionnaire = create :quiz_questionnaire, instructor_id: @team1.id
   choices_one = create_choices_for_weighted_questionnaire("1")
   choices_two = create_choices_for_weighted_questionnaire("2")
-  @question1 = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1', quiz_question_choices: choices_one, type: "TrueFalse"
-  @question2 = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 2', quiz_question_choices: choices_two, type: "TrueFalse"
+  @question1 = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1', weight: 4, quiz_question_choices: choices_one, type: "TrueFalse"
+  @question2 = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 2', weight: 6, quiz_question_choices: choices_two, type: "TrueFalse"
 end
 
 def setup_responses
@@ -343,9 +343,8 @@ describe 'Grading of quizzes takes weights into consideration', js: true do
     expect(page).to have_content('Questions')
     find(:css, "input[value='True1']").click
     find(:css, "input[value='False2']").click
-    sleep 60
     click_on 'Submit Quiz'
-    expect(page).to have_content('Quiz score: 50.0%')
+    expect(page).to have_content('Quiz score: 40.0%')
   end
 end
 

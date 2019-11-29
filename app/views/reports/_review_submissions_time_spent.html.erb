@@ -58,10 +58,11 @@
               <% @per_round_time << each_link_detail %>                 
         <% if ((instance_variable_get("@time_spent_round_" + each_round.to_s)).to_f) > 0 and @count==0 %>
           <a onclick="drawChart(<%= @reviewee_id.to_s %>,<%= each_round.to_s %>)" data-toggle="modal" data-target="#chartModal"%><%=sprintf("%.2f",instance_variable_get("@time_spent_round_" + each_round.to_s))%></a>
+          <%= ', ' unless each_round == @number_of_rounds %>
         <%else%>
           ---
         <%end%>
-        <%= ', ' unless each_round == @number_of_rounds %>
+        
         <%end%>            
             <% @count=@count+1 %>
           <%end %>   <!-- end for link-->

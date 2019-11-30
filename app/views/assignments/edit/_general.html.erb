@@ -142,18 +142,15 @@ function microtaskChanged() {
   </tr>
   <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
   <script type="text/javascript">
-       new Clipboard('.btn');
+       new Clipboard('button');
   </script>
-  <% if current_page?(action: 'edit') %>
   <tr>
     <% if @assignment_form.assignment.is_conference %>
-      <p> </p>
-      <div id = "link" style="color: #721c24"><%="https://expertiza.ncsu.edu/users/request_new?role=Instructor"%>
-        <button class="btn" data-clipboard-target=#link>Copy to Clipboard</button>
-      </div>
+      <div>Link to join assignment: </div>
+      <p id = "link" style="color: #721c24"><%="https://expertiza.ncsu.edu/users/request_new?role=Instructor"%></p>
+      <button class="button" data-clipboard-target=#link>Copy</button>
     <% end %>
   </tr>
-  <% end %>
 
   <% if current_page?(action: 'edit') %>
   <!--Topics-->

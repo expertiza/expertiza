@@ -65,7 +65,7 @@
                         <td>
                           <% if (!@latest_response.is_submitted) %>
                               <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
-                          <% elsif @latest_response.updated_at < latest_submission.updated_at %>
+                          <% elsif !latest_submission.nil? && @latest_response.updated_at < latest_submission.updated_at %>
                               <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
                           <%end%>
                         </td>

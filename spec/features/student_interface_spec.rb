@@ -1,8 +1,6 @@
 include InstructorInterfaceHelperSpec
 
 describe "Integration tests for student interface" do
-  let(:student2064) { build(:student, id: 10, role_id: 1, parent_id: nil) }
-
   describe "Student login" do
     it "with valid username and password" do
       student = create(:student)

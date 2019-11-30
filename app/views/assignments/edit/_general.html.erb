@@ -140,18 +140,20 @@ function microtaskChanged() {
       <%= label_tag('assignment_form[assignment][is_conference]', 'Is this assignment for conference?') %>
     </td>
   </tr>
+  <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+  <script type="text/javascript">
+       new Clipboard('.btn');
+  </script>
   <% if current_page?(action: 'edit') %>
   <tr>
     <% if @assignment_form.assignment.is_conference %>
-        <p >  </p>
-        <textarea id = "bar" style="color: #721c24">Link to join this conference is <%="https://expertiza.ncsu.edu/users/request_new?role=Instructor" %>.</textarea>
-      <button class="clipboard-btn" data-clipboard-action="copy" data-clipboard-target="#bar">
-        Copy to clipboard
-      </button>
+      <p> </p>
+      <div id = "link" style="color: #721c24"><%="https://expertiza.ncsu.edu/users/request_new?role=Instructor"%>
+        <button class="btn" data-clipboard-target=#link>Copy to Clipboard</button>
+      </div>
     <% end %>
   </tr>
   <% end %>
-
 
   <% if current_page?(action: 'edit') %>
   <!--Topics-->

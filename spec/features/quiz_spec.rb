@@ -42,11 +42,27 @@ def create_choices
   ]
 end
 
-def create_choices_for_weighted_questionnaire(ques_id)
-  [
-    create(:quiz_question_choice, question: @question, txt: 'True' + ques_id, iscorrect: 1),
-    create(:quiz_question_choice, question: @question, txt: 'False' + ques_id)
-  ]
+def create_choices_for_weighted_questionnaire(ques_id, type)
+  if type == "TrueFalse"
+    [
+      create(:quiz_question_choice, question: @question, txt: 'True_' + ques_id, iscorrect: 1),
+      create(:quiz_question_choice, question: @question, txt: 'False_' + ques_id)
+    ]
+  elsif type == "MultipleChoiceRadio"
+    [
+      create(:quiz_question_choice, question: @question, txt: 'Answer1_' + ques_id, iscorrect: 1),
+      create(:quiz_question_choice, question: @question, txt: 'Answer2_' + ques_id),
+      create(:quiz_question_choice, question: @question, txt: 'Answer3_' + ques_id),
+      create(:quiz_question_choice, question: @question, txt: 'Answer4_' + ques_id)
+    ]
+  else
+    [
+      create(:quiz_question_choice, question: @question, txt: 'Answer1_' + ques_id, iscorrect: 1),
+      create(:quiz_question_choice, question: @question, txt: 'Answer2_' + ques_id),
+      create(:quiz_question_choice, question: @question, txt: 'Answer3_' + ques_id, iscorrect: 1),
+      create(:quiz_question_choice, question: @question, txt: 'Answer4_' + ques_id)
+    ]
+  end
 end
 
 def fill_in_quiz
@@ -222,10 +238,14 @@ end
 
 def setup_weighted_questionnaire
   @questionnaire = create :quiz_questionnaire, instructor_id: @team1.id
-  choices_one = create_choices_for_weighted_questionnaire("1")
-  choices_two = create_choices_for_weighted_questionnaire("2")
-  @question1 = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1', weight: 4, quiz_question_choices: choices_one, type: "TrueFalse"
-  @question2 = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 2', weight: 6, quiz_question_choices: choices_two, type: "TrueFalse"
+  choices_one = create_choices_for_weighted_questionnaire("1", "TrueFalse")
+  @question1 = create :quiz_question, questionnaire: @questionnaire, txt: 'Sample True/False Question 1?', weight: 4, quiz_question_choices: choices_one, type: "TrueFalse"
+  choices_two = create_choices_for_weighted_questionnaire("2", "TrueFalse")
+  @question2 = create :quiz_question, questionnaire: @questionnaire, txt: 'Sample True/False Question 2', weight: 2, quiz_question_choices: choices_two, type: "TrueFalse"
+  choices_three = create_choices_for_weighted_questionnaire("3", "MultipleChoiceRadio")
+  @question3 = create :quiz_question, questionnaire: @questionnaire, txt: 'Sample MultipleChoiceRadio Question 3', weight: 6, quiz_question_choices: choices_three, type: "MultipleChoiceRadio"
+  choices_four = create_choices_for_weighted_questionnaire("4", "MultipleChoiceCheckbox")
+  @question4 = create :quiz_question, questionnaire: @questionnaire, txt: 'Sample MultipleChoiceCheckbox Question 3', weight: 8, quiz_question_choices: choices_four, type: "MultipleChoiceCheckbox"
 end
 
 def setup_responses
@@ -341,10 +361,13 @@ describe 'Grading of quizzes takes weights into consideration', js: true do
     expect(page).to have_link('Begin')
     click_link 'Begin'
     expect(page).to have_content('Questions')
-    find(:css, "input[value='True1']").click
-    find(:css, "input[value='False2']").click
+    find(:css, "input[value='True_1']").click
+    find(:css, "input[value='False_2']").click
+    find(:css, "input[value='Answer2_3']").click
+    find(:css, "input[value='Answer1_4']").click
+    find(:css, "input[value='Answer3_4']").click
     click_on 'Submit Quiz'
-    expect(page).to have_content('Quiz score: 40.0%')
+    expect(page).to have_content('Quiz score: 60.0%')
   end
 end
 

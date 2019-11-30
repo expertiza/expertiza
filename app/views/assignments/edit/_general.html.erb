@@ -143,8 +143,12 @@ function microtaskChanged() {
   <% if current_page?(action: 'edit') %>
   <tr>
     <% if @assignment_form.assignment.is_conference %>
-        <p style="color: #721c24"> Link to join this conference is <%="https://expertiza.ncsu.edu/users/request_new?role=Instructor" %> </p>
-      <% end %>
+        <p >  </p>
+        <textarea id = "bar" style="color: #721c24">Link to join this conference is <%="https://expertiza.ncsu.edu/users/request_new?role=Instructor" %>.</textarea>
+      <button class="clipboard-btn" data-clipboard-action="copy" data-clipboard-target="#bar">
+        Copy to clipboard
+      </button>
+    <% end %>
   </tr>
   <% end %>
 

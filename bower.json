@@ -31,7 +31,6 @@
     "highcharts": "latest",
     "js-grid": "latest",
     "jquery-colorbox": "latest",
-    "jquery-bar-rating": "latest",
-    "d3": "latest"
+    "jquery-bar-rating": "latest"
   }
 }

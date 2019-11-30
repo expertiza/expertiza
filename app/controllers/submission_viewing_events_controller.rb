@@ -21,7 +21,7 @@ class SubmissionViewingEventsController < ApplicationController
     submission_viewing_event = SubmissionViewingEvent.new(submission_viewing_event_params)
     submission_viewing_event.save
     params[:submission_viewing_event][:link] = nil
-    params[:submission_viewing_event][:end_at] = ISODateString(t)
+    params[:submission_viewing_event][:end_at] = params[:submission_viewing_event][:start_at]
     record_end_time()
     render nothing: true
   end

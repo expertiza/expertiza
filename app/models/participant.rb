@@ -104,6 +104,10 @@ class Participant < ActiveRecord::Base
     when 'submitter'
       can_review = false
       can_take_quiz = false
+    when 'mentor'
+      can_review = false
+      can_take_quiz = false
+      can_submit = false
     end
     {can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz}
   end
@@ -114,6 +118,7 @@ class Participant < ActiveRecord::Base
     authorization = 'reader' if can_submit == false and can_review == true and can_take_quiz == true
     authorization = 'submitter' if can_submit == true and can_review == false and can_take_quiz == false
     authorization = 'reviewer' if can_submit == false and can_review == true and can_take_quiz == false
+    authorization = 'mentor' if can_submit == false and can_review == false and can_take_quiz == false
     authorization
   end
 

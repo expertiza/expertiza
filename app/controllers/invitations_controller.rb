@@ -74,11 +74,72 @@ class InvitationsController < ApplicationController
     ExpertizaLogger.info LoggerMessage.new(controller_name, @student.name, "Successfully invited student #{@user.id}", request)
   end
 
+  def user_params
+    params.require(:user).permit(:name,
+                                 :crypted_password,
+                                 :role_id,
+                                 :password_salt,
+                                 :fullname,
+                                 :email,
+                                 :parent_id,
+                                 :private_by_default,
+                                 :mru_directory_path,
+                                 :email_on_review,
+                                 :email_on_submission,
+                                 :email_on_review_of_review,
+                                 :is_new_user,
+                                 :master_permission_granted,
+                                 :handle,
+                                 :digital_certificate,
+                                 :persistence_token,
+                                 :timezonepref,
+                                 :public_key,
+                                 :copy_of_emails,
+                                 :institution_id)
+  end
+
+  # define a handle for a new participant
+  def set_handle
+    self.handle = if self.user.handle.nil? or self.user.handle == ""
+                    self.user.name
+                  elsif AssignmentParticipant.exists?(parent_id: self.assignment.id, handle: self.user.handle)
+                    self.user.name
+                  else
+                    self.user.handle
+                  end
+    self.save!
+  end
+
   def check_user_before_invitation
     # user is the student you are inviting to your team
     @user = User.find_by(name: params[:user][:name].strip)
     # student has information about the participant
     @student = AssignmentParticipant.find(params[:student_id])
+    @assignment = Assignment.find(@student.parent_id)
+
+    if @assignment.is_conference
+      unless @user
+        check = User.find_by(name: params[:user][:name])
+        params[:user][:name] = params[:user][:email] unless check.nil?
+        @newuser = User.new(user_params)
+        #@user.institution_id = 1
+        @newuser.email = params[:user][:name]
+        # record the person who created this new user
+        @newuser.parent_id = session[:user].id
+        @newuser.role_id = 1
+        # set the user's timezone to its parent's
+        #@newuser.timezonepref = User.find(@user.parent_id).timezonepref
+        if @newuser.save
+          #flash[:error] = "User Created Successfully "
+          @user = User.find_by(email: @newuser.email)
+
+          password = @user.reset_password
+          MailerHelper.send_mail_to_user(@user, "Your Expertiza account has been created.", "user_conference", password).deliver
+        end
+        #redirect_to view_student_teams_path student_id: @student.id
+        #return
+      end
+    end
 
     return unless current_user_id?(@student.user_id)
 
@@ -92,12 +153,23 @@ class InvitationsController < ApplicationController
   end
 
   def check_participant_before_invitation
+    @assignment = Assignment.find(@student.parent_id)
     @participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', @user.id, @student.parent_id).first
     # check if the user is a participant of the assignment
     unless @participant
-      flash[:error] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
-      redirect_to view_student_teams_path student_id: @student.id
-      return
+      if @assignment.is_conference
+        new_part = AssignmentParticipant.create(parent_id: @assignment.id,
+                                                user_id: @user.id,
+                                                permission_granted: @user.master_permission_granted,
+                                                can_submit: 1,
+                                                can_review: 1,
+                                                can_take_quiz: 1)
+        new_part.set_handle
+      else
+        flash[:error] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
+        redirect_to view_student_teams_path student_id: @student.id
+        return
+      end
     end
     check_team_before_invitation
   end

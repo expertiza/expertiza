@@ -136,6 +136,7 @@ module AssignmentHelper
     topic = SignedUpTeam.where(team_id: team.id).first.try :topic
     topic_identifier = topic.try :topic_identifier
     topic_name = topic.try :topic_name
+    topic_id = topic.try :id
     users_for_curr_team = []
     participants = []
     teams_users.each do |teams_user|
@@ -143,7 +144,7 @@ module AssignmentHelper
       users_for_curr_team << user
       participants << Participant.where(["parent_id = ? AND user_id = ?", @assignment.id, user.id]).first
     end
-    [topic_identifier ||= "", topic_name ||= "", users_for_curr_team, participants]
+    [topic_id, topic_identifier ||= "", topic_name ||= "", users_for_curr_team, participants]
   end
 
   def get_team_name_color_in_list_submission(team)

@@ -10,14 +10,14 @@ class Role < ActiveRecord::Base
   validates :name, uniqueness: true
 
   attr_accessor :cache
-  attr_reader :student, :ta, :instructor, :administrator, :superadministrator
+  attr_reader :mentor, :student, :ta, :instructor, :administrator, :superadministrator
 
   def cache
     @cache = {}
     unless self.nil?
-      @cache[:credentials] = CACHED_ROLES[self.id][:credentials]
-      @cache[:menu] = CACHED_ROLES[self.id][:menu]
-    end
+        @cache[:credentials] = CACHED_ROLES[self.id][:credentials]
+        @cache[:menu] = CACHED_ROLES[self.id][:menu]
+      end
     @cache
   end
 
@@ -25,8 +25,16 @@ class Role < ActiveRecord::Base
     Role.find_or_create_by(name: params)
   end
 
-  def self.student
-    @@student_role ||= find_by name: 'Student'
+  def self.mentor
+    @@mentor_role ||= find_by name: 'Mentor'
+  end
+
+  def mentor?
+    name['Mentor']
+  end
+
+  def self.mentor
+    @@mentor_role ||= find_by name: 'Mentor'
   end
 
   def student?
@@ -99,11 +107,13 @@ class Role < ActiveRecord::Base
 
     current = self.parent_id
     while current
+      print("cur="+current.to_s+"\n")
       role = Role.find(current)
       next unless role
       unless ids.index(role.id)
         ids << role.id
         current = role.parent_id
+
       end
     end
     ids
@@ -137,6 +147,7 @@ class Role < ActiveRecord::Base
   # determine if the current role has all the privileges of the parameter role
   def hasAllPrivilegesOf(target_role)
     privileges = {}
+    privileges["Mentor"]=0
     privileges["Student"] = 1
     privileges["Teaching Assistant"] = 2
     privileges["Instructor"] = 3

@@ -81,13 +81,17 @@ describe "Integration tests for instructor interface" do
     end
   end
 
+  # Add Rspec test for Issue 1384,  by team 1976, fall 2019.
+  # Login as instructor6, go to the profile page, then uncheck the "Action enable" button, click "save".
+  # Then in the homepage of assignment, the instructor should not see buttons except "Edit, Delete, Copy, Remove"
+  # At the same time, the test should pass.
   describe "edit profile" do
     it "is able to change the icons" do
 
       login_as("instructor6")
       visit "/profile/edit"
 
-      uncheck("action_enable")
+      uncheck("user_action_enable")
       click_button 'Save'
       visit "/tree_display/list"
       click_link 'Assignments'

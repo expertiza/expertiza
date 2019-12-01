@@ -1,7 +1,7 @@
  <div>
 <!-- E1976   add action enable at instructor profile page-->
     <table class="table borderless">
-      <% if @user.role_id == 2 %>
+      <%# if @user.role_id == 2 %>
         <tr>
           <th align='left'>Action options</th>
         <tr>
@@ -10,6 +10,6 @@
           <td><label for="action_enable">I want to view the assignment <strong>Actions</strong> on homepage</label></td>
           <td><%= check_box 'user', 'action_enable', {}%></td>
         </tr>
-      <% end %>
+      <%# end %>
     </table>
   </div>

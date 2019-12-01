@@ -33,7 +33,7 @@ class User < ActiveRecord::Base
   scope :instructors, -> { where role_id: Role.instructor }
   scope :tas, -> { where role_id: Role.ta }
   scope :students, -> { where role_id: Role.student }
-
+  scope :mentors, -> { where role_id: Role.mentor }
   has_paper_trail
 
   def salt_first?
@@ -119,7 +119,7 @@ class User < ActiveRecord::Base
   delegate :admin?, to: :role
 
   delegate :student?, to: :role
-
+  delegate :mentor?, to: :role
   def creator_of?(user)
     self == user.creator
   end

@@ -70,9 +70,9 @@ class ImpersonateController < ApplicationController
           # E1991 : check whether instructor is currently in anonymized view
           if User.anonymized_view?(session[:ip])
             # get real name when instructor is in anonymized view
-            user = User.real_user_from_anonymized_name(params[:user][:name])
+            user = User.real_user_from_anonymized_name(params[:impersonate][:name])
           else         
-            user = User.find_by(name: params[:user][:name])
+            user = User.find_by(name: params[:impersonate][:name])
           end
           if user
             unless original_user.can_impersonate? user
@@ -108,6 +108,7 @@ class ImpersonateController < ApplicationController
       redirect_to action: AuthHelper.get_home_action(session[:user]),
                   controller: AuthHelper.get_home_controller(session[:user])
     rescue Exception => e
+      print e.backtrace.inspect
       flash[:error] = e.message
       redirect_to :back
     end

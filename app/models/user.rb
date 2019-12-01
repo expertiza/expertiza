@@ -90,7 +90,6 @@ class User < ActiveRecord::Base
   end
 
   # Zhewei: anonymized view for demo purposes - 1/3/2018
-  # E1991
   def self.anonymized_view?(ip_address = nil)
     anonymized_view_starter_ips = $redis.get('anonymized_view_starter_ips') || ''
     return true if ip_address and anonymized_view_starter_ips.include? ip_address

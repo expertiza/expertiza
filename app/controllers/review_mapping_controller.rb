@@ -29,8 +29,8 @@ class ReviewMappingController < ApplicationController
     if participant.nil?
       participant = AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
     end
-    map = ReviewResponseMap.where(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true).first rescue nil
-    map = ReviewResponseMap.create(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true) if map.nil?
+    map = ReviewResponseMap.where(reviewed_object_id: params[:id], reviewer_id: participant.get_reviewer.id, reviewee_id: params[:team_id], calibrate_to: true).first rescue nil
+    map = ReviewResponseMap.create(reviewed_object_id: params[:id], reviewer_id: participant.get_reviewer.id, reviewee_id: params[:team_id], calibrate_to: true) if map.nil?
     redirect_to controller: 'response', action: 'new', id: map.id, assignment_id: params[:id], return: 'assignment_edit'
   end
 
@@ -174,7 +174,7 @@ class ReviewMappingController < ApplicationController
     begin
       reviewer = AssignmentParticipant.where(user_id: user.id, parent_id: assignment.id).first
       raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue." if reviewer.nil?
-      reviewer
+      reviewer.get_reviewer
     rescue StandardError => e
       flash[:error] = e.message
     end
@@ -227,7 +227,7 @@ class ReviewMappingController < ApplicationController
   def unsubmit_review
     @response = Response.where(map_id: params[:id]).last
     review_response_map = ReviewResponseMap.find_by(id: params[:id])
-    reviewer = review_response_map.reviewer.name
+    reviewer = review_response_map.reviewer.get_reviewer.name
     reviewee = review_response_map.reviewee.name
     if @response.update_attribute('is_submitted', false)
       flash.now[:success] = "The review by \"" + reviewer + "\" for \"" + reviewee + "\" has been unsubmitted."
@@ -430,7 +430,8 @@ class ReviewMappingController < ApplicationController
           next if TeamsUser.exists?(team_id: team_id,
                                     user_id: Participant.find(participant_id).user_id)
 
-          ReviewResponseMap.where(reviewee_id: team_id, reviewer_id: participant_id,
+          participant = AssignmentParticipant.find(participant_id)
+          ReviewResponseMap.where(reviewee_id: team_id, reviewer_id: participant.get_reviewer.id,
                                   reviewed_object_id: assignment_id).first_or_create
 
           teams_hash[team_id] += 1

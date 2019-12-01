@@ -39,8 +39,12 @@ class PopupController < ApplicationController
 
     # id2 is a response_map id
     unless params[:id2].nil?
-      participant_id = ResponseMap.find(params[:id2]).reviewer_id
-      @reviewer_id = Participant.find(participant_id).user_id
+      reviewer_id = ResponseMap.find(params[:id2]).reviewer_id
+      if @assignment.reviewer_is_team
+        @reviewer_id = Participant.find(reviewer_id).user_id
+      else
+        @reviewer_id = reviewer_id
+      end
       # get the last response in each round from response_map id
       (1..@assignment.num_review_rounds).each do |round|
         response = Response.where(map_id: params[:id2], round: round).last
@@ -75,7 +79,11 @@ class PopupController < ApplicationController
     else
       @reviewid = Response.find_by(map_id: params[:id2]).id
       @pid = ResponseMap.find(params[:id2]).reviewer_id
-      @reviewer_id = Participant.find(@pid).user_id
+      if not @assignment.reviewer_is_team
+        @reviewer_id = Participant.find(@pid).user_id
+      else
+        @reviewer_id = Team.find(@pid)
+      end
       # @reviewer_id = ReviewMapping.find(params[:id2]).reviewer_id
       @assignment_id = ResponseMap.find(params[:id2]).reviewed_object_id
       @assignment = Assignment.find(@assignment_id)
@@ -108,7 +116,7 @@ class PopupController < ApplicationController
   def tone_analysis_chart_popup
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
-    @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@reviewer_id)
+    @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@assignment_id, @reviewer_id)
 
     # Builds tone analysis report and heatmap when instructor/admin/superadmin clicks on the "Tone analysis chart button" link for an assignment.
     build_tone_analysis_report
@@ -118,7 +126,7 @@ class PopupController < ApplicationController
   def view_review_scores_popup
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
-    @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@reviewer_id)
+    @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@assignment_id, @reviewer_id)
     @reviews = []
 
     # Builds tone analysis report and heatmap when instructor/admin/superadmin clicks on the "View Review Report" Icon for an assignment.

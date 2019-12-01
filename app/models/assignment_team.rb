@@ -41,13 +41,18 @@ class AssignmentTeam < Team
   def assign_reviewer(reviewer)
     assignment = Assignment.find(self.parent_id)
     raise "The assignment cannot be found." if assignment.nil?
-    ReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
+    ReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.get_reviewer.id, reviewed_object_id: assignment.id)
+  end
+
+  # If a team is being treated as a reviewer of an assignment, then they are the reviewer
+  def get_reviewer
+    return self
   end
 
   # Evaluates whether any contribution by this team was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object
   def reviewed_by?(reviewer)
-    ReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', self.id, reviewer.id, assignment.id).count > 0
+    ReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', self.id, reviewer.get_reviewer.id, assignment.id).count > 0
   end
 
   # Topic picked by the team for the assignment
@@ -240,4 +245,21 @@ class AssignmentTeam < Team
     assignment = Assignment.find(self.parent_id)
     SubmissionRecord.where(team_id: self.id, assignment_id: assignment.id).order(updated_at: :desc).first
   end
+
+  # this method assumes that the team is the reviewer
+  # looks at which of the team's participants are the currently logged in user, given the user id
+  def get_logged_in_reviewer_id(current_user_id)
+    self.participants.each do |participant|
+      if participant.user.id == current_user_id
+        return participant.id
+      end
+    end
+    return nil
+  end
+
+  # determines if the team contains a participant who is currently logged in
+  def current_user_is_reviewer?(current_user_id)
+    return get_logged_in_reviewer_id(current_user_id) != nil
+  end
+
 end

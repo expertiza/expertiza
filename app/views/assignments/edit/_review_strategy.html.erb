@@ -131,6 +131,16 @@
   </tr>
 
   <tr>
+    <td id='reviewer_is_team'>
+      <input name="assignment_form[assignment][reviewer_is_team]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][reviewer_is_team]', 'true', @assignment_form.assignment.reviewer_is_team) %>
+      <%= label_tag('assignment_form[assignment][reviewer_is_team]', 'Is Review done by Teams?') %>
+      <img src="/assets/info.png" title='You can select whether the reviews should be done by individual students or teams'>
+    </td>
+  </tr>
+
+
+  <tr>
     <td id='assignment_is_selfreview_enabled'>
       <input name="assignment_form[assignment][is_selfreview_enabled]" type="hidden" value="false"/>
       <%= check_box_tag('assignment_form[assignment][is_selfreview_enabled]', 'true', @assignment_form.assignment.is_selfreview_enabled) %>

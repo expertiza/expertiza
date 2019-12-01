@@ -12,10 +12,10 @@ class ResponseController < ApplicationController
     case action
     when 'edit' # If response has been submitted, no further editing allowed
       return false if response.is_submitted
-      return current_user_id?(user_id)
+      return current_user_is_reviewer?(response.map, user_id)
       # Deny access to anyone except reviewer & author's team
     when 'delete', 'update'
-      return current_user_id?(user_id)
+      return current_user_is_reviewer?(response.map, user_id)
     when 'view'
       return view_allowed?(response.map, user_id)
     else
@@ -23,15 +23,19 @@ class ResponseController < ApplicationController
     end
   end
 
+  def current_user_is_reviewer?(map, reviewer_id)
+    return map.get_reviewer.current_user_is_reviewer? current_user.try(:id)
+  end
+
   def view_allowed?(map, user_id)
     assignment = map.reviewer.assignment # if it is a review response map, all the members of reviewee team should be able to view the response
     if map.is_a? ReviewResponseMap
       reviewee_team = AssignmentTeam.find(map.reviewee_id)
-      return current_user_id?(user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' ||
+      return current_user_is_reviewer?(map, user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' ||
         (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) ||
           (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
     else
-      current_user_id?(user_id)
+      current_user_is_reviewer?(map, user_id)
     end
   end
 
@@ -218,7 +222,10 @@ class ResponseController < ApplicationController
     when "survey"
       redirect_to controller: 'survey_deployment', action: 'pending_surveys'
     else
-      redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
+      # if reviewer is team, then we have to get the id of the participant from the team
+      # the id in reviewer_id is of an AssignmentTeam
+      reviewer_id = @map.response_map.get_reviewer.get_logged_in_reviewer_id(current_user.try(:id))
+      redirect_to controller: 'student_review', action: 'list', id: reviewer_id
     end
   end
 

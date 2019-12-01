@@ -108,7 +108,6 @@ class ImpersonateController < ApplicationController
       redirect_to action: AuthHelper.get_home_action(session[:user]),
                   controller: AuthHelper.get_home_controller(session[:user])
     rescue Exception => e
-      print e.backtrace.inspect
       flash[:error] = e.message
       redirect_to :back
     end

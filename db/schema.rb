@@ -112,6 +112,7 @@ ActiveRecord::Schema.define(version: 20191124025300) do
     t.boolean  "is_answer_tagging_allowed"
     t.boolean  "has_badge"
     t.boolean  "allow_selecting_additional_reviews_after_1st_round"
+    t.boolean  "reviewer_is_team"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -481,6 +482,7 @@ ActiveRecord::Schema.define(version: 20191124025300) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "calibrate_to",                   default: false
+    t.boolean  "reviewer_is_team"
   end
 
   add_index "response_maps", ["reviewer_id"], name: "fk_response_map_reviewer", using: :btree

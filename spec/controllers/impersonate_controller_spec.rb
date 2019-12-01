@@ -37,6 +37,7 @@ describe ImpersonateController do
             expect(session[:super_user]).to eq instructor
             expect(session[:user]).to eq student7
             expect(session[:original_user]).to eq instructor
+            expect(session[:impersonate]).to be true
         end
 
         it 'instructor redirects to student home page after impersonating a student' do
@@ -61,6 +62,7 @@ describe ImpersonateController do
             expect(session[:super_user]).to eq instructor
             expect(session[:user]).to eq student7
             expect(session[:original_user]).to eq instructor
+            expect(session[:impersonate]).to be true
         end
     end
 end

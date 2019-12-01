@@ -2,7 +2,8 @@ class AssignmentsController < ApplicationController
   include AssignmentHelper
   autocomplete :user, :name
   before_action :authorize
-
+  helper_method :is_instructor_a_participant?
+  
   def action_allowed?
     if %w[edit update list_submissions].include? params[:action]
       assignment = Assignment.find(params[:id])

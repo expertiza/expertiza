@@ -80,4 +80,18 @@ describe "Integration tests for instructor interface" do
       expect(page).to have_content('Summary report')
     end
   end
+
+  describe "edit profile" do
+    it "is able to change the icons" do
+
+      login_as("instructor6")
+      visit "/profile/edit"
+
+      uncheck("action_enable")
+      click_button 'Save'
+      visit "/tree_display/list"
+      click_link 'Assignments'
+      expect(page).to have_no_css("img[src*='assets/tree_view/add-participant-24.png']")
+    end
+  end
 end

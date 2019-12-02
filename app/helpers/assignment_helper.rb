@@ -29,6 +29,83 @@ module AssignmentHelper
     options.uniq.sort
   end
 
+  #E1933 : fetches all the assignment
+  def get_assignment_options(instructor)
+    if session[:user].role.name == 'Teaching Assistant'
+      courses = []
+      ta = Ta.find(session[:user].id)
+      ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id) }
+      # If a TA created some courses before, s/he can still add new assignments to these courses.
+      courses << Course.where(instructor_id: instructor.id)
+      courses.flatten!
+      # Administrator and Super-Administrator can see all courses
+    elsif session[:user].role.name == 'Administrator' or session[:user].role.name == 'Super-Administrator'
+      courses = Course.all
+    elsif session[:user].role.name == 'Instructor'
+      courses = Course.where(instructor_id: instructor.id)
+      # instructor can see courses his/her TAs created
+      ta_ids = []
+      ta_ids << Instructor.get_my_tas(session[:user].id)
+      ta_ids.flatten!
+      ta_ids.each do |ta_id|
+        ta = Ta.find(ta_id)
+        ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id) }
+      end
+    end
+
+    options = []
+    courses.each do |course|
+      options << course.id
+    end
+
+    assignments = Assignment.where("course_id IN (?)" , options )
+    options = []
+    options << ['-----------', nil]
+    assignments.each do |assignment|
+      options << [assignment.name,assignment.id]
+    end
+    options.uniq.sort
+  end
+
+  #E1933: Fetches all the reviewers whose reviews are approved by the instructor for a particular assignment
+  def reviewer_options
+    assignment_id = params[:id].to_i
+    response_map_ids = Response.where(visibility: 2).pluck(:map_id)
+    response_maps_with_distinct_reviewer_id =
+        ResponseMap.where('reviewed_object_id IN (?) AND id IN (?) ',assignment_id,response_map_ids).pluck(:reviewer_id)
+    user_id = Participant.where('id IN (?)',response_maps_with_distinct_reviewer_id ).pluck(:user_id)
+    selected_user = User.where('id IN (?)', user_id)
+    options = []
+    selected_user.each do |user|
+      options << [user.name,user.id]
+    end
+    options.uniq.sort
+
+    render json: {"success" => true, "option" => options}
+  end
+
+  #E1933: Fetches all the reviewees for a particular reviewer
+  def reviewee_options
+
+    user_id = params[:r_id].to_i
+    assignment_id = params[:a_id].to_i
+    response_map_ids = Response.where(visibility: 2).pluck(:map_id)
+
+    reviewer_id = Participant.where('user_id in (?)', user_id).pluck(:id)
+    response_maps_with_distinct_reviewee_id =
+        ResponseMap.where('reviewer_id IN (?) and reviewed_object_id IN (?) and id IN (?)', reviewer_id,assignment_id,response_map_ids).pluck(:reviewee_id)
+    teams = Team.where('id IN (?)', response_maps_with_distinct_reviewee_id )
+
+    options = []
+
+    teams.each do |team|
+      options << [team.name,team.id]
+    end
+    options.uniq.sort
+
+    render json: {"success" => true, "option" => options}
+  end
+
   # round=0 added by E1450
   def questionnaire_options(assignment, type, _round = 0)
     questionnaires = Questionnaire.where(['private = 0 or instructor_id = ?', assignment.instructor_id]).order('name')
@@ -153,4 +230,5 @@ module AssignmentHelper
       '#0984e3' # submission grade is not assigned yet.
     end
   end
-end
+  end
+

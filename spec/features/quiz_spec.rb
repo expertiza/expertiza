@@ -236,6 +236,7 @@ def setup_questionnaire
   @question = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1', quiz_question_choices: choices
 end
 
+# creates quiz questionnaire and assigns weights to questions
 def setup_weighted_questionnaire
   @questionnaire = create :quiz_questionnaire, instructor_id: @team1.id
   choices_one = create_choices_for_weighted_questionnaire("1", "TrueFalse")
@@ -252,6 +253,32 @@ def setup_responses
   @response_map = create :quiz_response_map, quiz_questionnaire: @questionnaire, reviewer: @participant2, reviewee_id: @team1.id
   @response = create :quiz_response, response_map: @response_map
   create :answer, question: @question, response_id: @response.id, answer: 1
+  create :score_view, q1_id: @questionnaire.id, s_question_id: @question.id, question_weight: 1, s_score: 1, s_response_id: @response.id
+end
+
+# this creates answers using factories so that grading of quizzes can be tested
+def setup_answers
+  create :answer, question: @question1, response_id: @response.id, answer: 1, comments: "True_1"
+  create :answer, question: @question2, response_id: @response.id, answer: 0, comments: "False_2"
+  create :answer, question: @question3, response_id: @response.id, answer: 0, comments: "Answer2_3"
+  create :answer, question: @question4, response_id: @response.id, answer: 1, comments: "Answer1_4"
+  create :answer, question: @question4, response_id: @response.id, answer: 1, comments: "Answer3_4"
+end
+
+# this creates score views using factories so that weighted score for quiz can be calculated
+def setup_score_views
+  create :score_view, q1_id: @questionnaire.id, s_question_id: @question1.id, question_weight: 4, s_score: 1, s_response_id: @response.id, s_comments: "True_1"
+  create :score_view, q1_id: @questionnaire.id, s_question_id: @question2.id, question_weight: 2, s_score: 0, s_response_id: @response.id, s_comments: "False_2"
+  create :score_view, q1_id: @questionnaire.id, s_question_id: @question3.id, question_weight: 6, s_score: 0, s_response_id: @response.id, s_comments: "Answer2_3"
+  create :score_view, q1_id: @questionnaire.id, s_question_id: @question4.id, question_weight: 8, s_score: 1, s_response_id: @response.id, s_comments: "Answer1_4"
+  create :score_view, q1_id: @questionnaire.id, s_question_id: @question4.id, question_weight: 8, s_score: 1, s_response_id: @response.id, s_comments: "Answer3_4"
+end
+
+# this creates the set up for grading of a weighted quiz questionnaire
+def setup_graded_responses
+  @response = create :quiz_response, response_map: @response_map
+  setup_answers
+  setup_score_views
 end
 
 def init_instructor_tests
@@ -337,15 +364,22 @@ describe 'Student reviewers can take the quizzes', js: true do
     click_link 'Begin'
     expect(page).to have_content('Questions')
     find(:css, "input[value='Answer 1']").click
+    # setting up data using factories to calculate grade
+    @response = create :quiz_response, response_map: @response_map
+    create :answer, question: @question, response_id: @response.id, answer: 1
+    create :score_view, q1_id: @questionnaire.id, s_question_id: @question.id, question_weight: 1, s_score: 1, s_response_id: @response.id
     click_on 'Submit Quiz'
     expect(page).to have_content('Quiz score: 100.0%')
   end
 end
 
+# this creates the necessary set up so that a student reviewer can take a quiz
+# and checks if weights set up during the quiz creation are taken into
+# consideration when grading the quiz
 describe 'Grading of quizzes takes weights into consideration', js: true do
   before :each do
     @instructor = create(:instructor)
-    @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 2
+    @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 4
     create_assignment_due_date
     create_student1
     make_team
@@ -366,6 +400,7 @@ describe 'Grading of quizzes takes weights into consideration', js: true do
     find(:css, "input[value='Answer2_3']").click
     find(:css, "input[value='Answer1_4']").click
     find(:css, "input[value='Answer3_4']").click
+    setup_graded_responses
     click_on 'Submit Quiz'
     expect(page).to have_content('Quiz score: 60.0%')
   end

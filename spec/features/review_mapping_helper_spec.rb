@@ -59,6 +59,22 @@ describe "Test Author feedback report" do
   end
 end
 
+describe "Test assignment review report" do
+  before(:each) do
+    create(:instructor)
+    create(:assignment, course: nil, name: 'Test Assignment')
+    assignment_id = Assignment.where(name: 'Test Assignment')[0].id
+    login_as 'instructor6'
+    visit "/reports/response_report?id=#{assignment_id}"
+    click_button "View"
+  end
+
+  it 'should contain Average Author feedback' do
+    create(:review_response_map)
+    expect(page).to have_content('Average Author feedback')
+  end
+end
+
 describe "Test Teammate Review report" do
   before(:each) do
     create(:instructor)

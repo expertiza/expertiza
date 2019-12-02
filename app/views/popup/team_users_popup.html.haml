@@ -27,9 +27,7 @@
         %td{:align => "center"} --
       %br/
     - else
-      <h1> outside </h1>
       - if instance_variable_get('@sample_button_'+round.to_s)
-        <h1> inside </h1>
         %div{:class=>'col-md-12 mark-delete-sample '+'round'+round.to_s}
           %h3{:class=>'col-md-10'} "Reviewed by #{User.find(@reviewer_id).fullname} (Round #{round})"
           %div{:class=>'col-md-2'}

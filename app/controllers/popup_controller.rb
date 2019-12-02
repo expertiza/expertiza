@@ -1,7 +1,7 @@
 class PopupController < ApplicationController
   include ResponseConstants
   include SimilarAssignmentsConstants
-  #include SimilarAssignmentsHelper
+  include SimilarAssignmentsHelper
 
   def action_allowed?
     ['Super-Administrator',

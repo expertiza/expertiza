@@ -241,6 +241,7 @@ resources :institution, except: [:destroy] do
       get :view  
       post :add_new_questions
       post :save_all_questions
+      post :create_supplmentary_review_questionnaire
     end
   end
 
@@ -277,6 +278,7 @@ resources :institution, except: [:destroy] do
   resources :global_survey_questionnaires, controller: :questionnaires
   resources :course_survey_questionnaires, controller: :questionnaires
   resources :bookmark_rating_questionnaires, controller: :questionnaires
+  resources :supplementary_review_questionnaire, controller: :questionnaires
 
   resources :questions do
     collection do

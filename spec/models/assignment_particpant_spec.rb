@@ -77,7 +77,7 @@ describe AssignmentParticipant do
           "can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, :review1=>{:assessments=>[#<Response id: nil, map_id: 1, "\
           "additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, round: 1, is_submitted: false, visibility: nil>], "\
           ":scores=>{:max=>95, :min=>88, :avg=>90}}, :total_score=>100, :review=>{:assessments=>[#<Response id: nil, map_id: 1, additional_comment: nil, "\
-          "created_at: nil, updated_at: nil, version_num: nil, round: 1, is_submitted: false>], :scores=>{:max=>95, :min=>88, :avg=>90.0}}}")
+          "created_at: nil, updated_at: nil, version_num: nil, round: 1, is_submitted: false, visibility: nil>], :scores=>{:max=>95, :min=>88, :avg=>90.0}}}")
       end
     end
 
@@ -89,7 +89,7 @@ describe AssignmentParticipant do
         expect(participant.scores(review1: [question]).inspect).to eq("{:participant=>#<AssignmentParticipant id: 1, can_submit: true, can_review: true, "\
           "user_id: 2, parent_id: 1, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, type: \"AssignmentParticipant\", "\
           "handle: \"handle\", time_stamp: nil, digital_signature: nil, duty: nil, can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, "\
-          ":review1=>{:assessments=>[#<Response id: nil, map_id: 1, additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, round: 1, "\
+          ":review1=>{:assessments=>[#<Response id: nil, map_id: 1, additional_comment: nil, created_at: nil, updated_at: nil, round: 1, "\
           "is_submitted: false, visibility: nil>], :scores=>{:max=>95, :min=>88, :avg=>90}}, :total_score=>100, :max_pts_available=>66}")
       end
     end

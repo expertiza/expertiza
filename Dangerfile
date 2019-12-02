@@ -98,22 +98,22 @@ Please make sure you did not commit unnecessary changes, such as `node_modules`,
 end
 
 # ------------------------------------------------------------------------------
-# 4. Your pull request should not have too many duplicated commit message.
+# 4. Your pull request should not have too many duplicated commit messages.
 # ------------------------------------------------------------------------------
-has_many_dup_commit_message = false
-message = COMMITS.map(&:message)
-message.uniq.each do |msg|
-  if message.count(msg) >= 5
-    has_many_dup_commit_message = true
+has_many_dup_commit_messages = false
+messages = COMMITS.map(&:message)
+messages.uniq.each do |msg|
+  if messages.count(msg) >= 5
+    has_many_dup_commit_messages = true
     break
   end
 end
 
-if has_many_dup_commit_message
+if has_many_dup_commit_messages
   DUP_COMMIT_MESSAGE =
     markdown <<-MARKDOWN
-Your pull request has many duplicated commit message. Please try to `squash` similar commits.
-And using meaningful commit message later.
+Your pull request has many duplicated commit messages. Please try to `squash` similar commits.
+And using meaningful commit messages later.
     MARKDOWN
 
   warn(DUP_COMMIT_MESSAGE, sticky: true)
@@ -189,7 +189,7 @@ end
 # ------------------------------------------------------------------------------
 # 9. Your pull request should avoid keeping debugging code.
 # ------------------------------------------------------------------------------
-if PR_ADDED.include? "message " or
+if PR_ADDED.include? "puts " or
    PR_ADDED.include? "print " or
    PR_ADDED.include? "binding.pry" or
    PR_ADDED.include? "debugger;" or
@@ -557,4 +557,3 @@ To avoid `shallow tests` -- tests concentrating on irrelevant, unlikely-to-fail 
     break
   end
 end
-

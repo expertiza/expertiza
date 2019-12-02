@@ -28,7 +28,7 @@ class ResponseController < ApplicationController
     if map.is_a? ReviewResponseMap
       reviewee_team = AssignmentTeam.find(map.reviewee_id)
       return current_user_id?(user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' ||
-        (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) ||
+          (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) ||
           (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
     else
       current_user_id?(user_id)
@@ -165,10 +165,10 @@ class ResponseController < ApplicationController
     @response = Response.where(map_id: @map.id, round: @round.to_i).order(created_at: :desc).first
     if @response.nil?
       @response = Response.create(
-        map_id: @map.id,
-        additional_comment: params[:review][:comments],
-        round: @round.to_i,
-        is_submitted: is_submitted
+          map_id: @map.id,
+          additional_comment: params[:review][:comments],
+          round: @round.to_i,
+          is_submitted: is_submitted
       )
     end
     was_submitted = @response.is_submitted
@@ -180,6 +180,7 @@ class ResponseController < ApplicationController
     unless @supplementary_review_questionnaire.nil?
       supplementary_review_questions = sort_questions(@supplementary_review_quesionnaire.questions)
       questions += supplementary_review_questions
+      print("ok!!!!!!!!")
     end
     create_answers(params, questions) if params[:responses]
     msg = "Your response was successfully saved."
@@ -300,16 +301,17 @@ class ResponseController < ApplicationController
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.number_of_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
+      @supplementary_review_questionnaire_id = Team.get_supplementary_review_questionnaire_id_of_team(@contributor.id)
       unless @supplementary_review_questionnaire_id.nil?
         @supplementary_review_questionnaire = Questionnaire.find(@supplementary_review_questionnaire_id)
       end
     when
-      "MetareviewResponseMap",
-      "TeammateReviewResponseMap",
-      "FeedbackResponseMap",
-      "CourseSurveyResponseMap",
-      "AssignmentSurveyResponseMap",
-      "GlobalSurveyResponseMap"
+    "MetareviewResponseMap",
+        "TeammateReviewResponseMap",
+        "FeedbackResponseMap",
+        "CourseSurveyResponseMap",
+        "AssignmentSurveyResponseMap",
+        "GlobalSurveyResponseMap"
       @questionnaire = @map.questionnaire
     end
   end
@@ -318,8 +320,8 @@ class ResponseController < ApplicationController
     @review_scores = []
     @questions.each do |question|
       @review_scores << Answer.where(
-        response_id: @response.id,
-        question_id:  question.id
+          response_id: @response.id,
+          question_id:  question.id
       ).first
     end
   end
@@ -337,7 +339,7 @@ class ResponseController < ApplicationController
   def set_dropdown_or_scale
     use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.try(:id),
                                                  questionnaire_id: @questionnaire.try(:id))
-                                          .first.try(:dropdown)
+                       .first.try(:dropdown)
     @dropdown_or_scale = (use_dropdown ? 'dropdown' : 'scale')
   end
 
@@ -363,4 +365,3 @@ class ResponseController < ApplicationController
     end
   end
 end
-

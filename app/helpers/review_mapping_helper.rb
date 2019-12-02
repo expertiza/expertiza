@@ -270,17 +270,34 @@ module ReviewMappingHelper
 
   # Zhewei - 2017-02-27
   # This is for all Dr.Kidd's courses
+  # E1979: Completion/Progress view changes
   def calcutate_average_author_feedback_score(assignment_id, max_team_size, response_map_id, reviewee_id)
     review_response = ResponseMap.where(id: response_map_id).try(:first).try(:response).try(:last)
     author_feedback_avg_score = "-- / --"
     unless review_response.nil?
-      user = TeamsUser.where(team_id: reviewee_id).try(:first).try(:user) if max_team_size == 1
-      author = Participant.where(parent_id: assignment_id, user_id: user.id).try(:first) unless user.nil?
-      feedback_response = ResponseMap.where(reviewed_object_id: review_response.id, reviewer_id: author.id).try(:first).try(:response).try(:last) unless author.nil?
-      author_feedback_avg_score = feedback_response.nil? ? "-- / --" : "#{feedback_response.total_score} / #{feedback_response.maximum_score}"
+      # Total score of author feedback given by all team members. 
+      author_feedback_total_score = 0
+      # Max score of author feedback
+      author_feedback_max_score =  0
+      # Number of author feedback given by all team members. 
+      author_feedback_count = 0
+      # For each user in teamsUser find author feedback score.
+      TeamsUser.where(team_id: reviewee_id).try(:each) do |teamsUser|
+        user = teamsUser.try(:user)
+        author = Participant.where(parent_id: assignment_id, user_id: user.id).try(:first) unless user.nil?
+        feedback_response = ResponseMap.where(reviewed_object_id: review_response.id, reviewer_id: author.id).try(:first).try(:response).try(:last) unless author.nil?
+        unless feedback_response.nil?
+          author_feedback_total_score += feedback_response.total_score
+          author_feedback_max_score = feedback_response.maximum_score
+          author_feedback_count +=1
+        end  
+      end
+      # return "-- / --" if no author feedback, otherwise return avg_score
+      author_feedback_avg_score = author_feedback_count == 0 ? "-- / --" : "#{author_feedback_total_score/author_feedback_count} / #{author_feedback_max_score}"
     end
     author_feedback_avg_score
   end
+  #E1979 Changes end
 
   # Zhewei - 2016-10-20
   # This is for Dr.Kidd's assignment (806)

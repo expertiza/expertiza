@@ -6,7 +6,7 @@ class QuestionnaireNode < Node
     "questionnaires"
   end
 
-  def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, _search = nil)
+  def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, search = nil)
     conditions = if show
                    if User.find(user_id).role.name != "Teaching Assistant"
                      'questionnaires.instructor_id = ?'
@@ -32,6 +32,32 @@ class QuestionnaireNode < Node
       name.gsub!(/[^\w]/, '')
       conditions += " and questionnaires.type = \"#{name}\""
     end
+
+    name = search[:name].to_s.strip
+    course_name = search[:course].to_s.strip
+    assignment_name = search[:assignment].to_s.strip
+    question_text = search[:question_text].to_s.strip
+
+    if course_name.present?
+      course = Course.find_by('name LIKE ?', "%#{course_name}%")
+      instructor_id = course.instructor_id
+      conditions += " and questionnaires.instructor_id = \"#{instructor_id}\""
+    end
+
+    conditions += " and questionnaires.name LIKE \"%#{name}%\"" if name.present?
+
+    if question_text.present?
+      matching_questionnaires = Question.where('txt LIKE ?', "%#{question_text}%")
+      ids = matching_questionnaires.map(&:questionnaire_id)
+      conditions += " and questionnaires.id in (#{ids.join(',')})"
+    end
+
+    matching_assignments = Assignment.where('name LIKE ?', "%#{assignment_name}%")
+    matching_questionnaires = AssignmentQuestionnaire.where('assignment_id in (?)', matching_assignments.ids)
+    questionnaire_ids = matching_questionnaires.map(&:questionnaire_id)
+    conditions += " and questionnaires.id in (#{questionnaire_ids.join(',')})"
+
+    
     sortvar = 'name' if sortvar.nil? or sortvar == 'directory_path'
     sortorder = 'ASC' if sortorder.nil?
     if Questionnaire.column_names.include? sortvar and %w[ASC DESC asc desc].include? sortorder

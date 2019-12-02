@@ -311,13 +311,16 @@ module ReviewMappingHelper
 	#compute average for all response fields in ONE response
     suggestion_chance = 0
     
-    if api_response
-      number_of_responses = api_response["results"].size
-      0.upto(number_of_responses- 1) do |i|
-        suggestion_chance += api_response["results"][i]["metrics"]["suggestion"]["suggestions_chances"]
-      end
+    # if api_response
+    #   number_of_responses = api_response["results"].size
+    #   0.upto(number_of_responses- 1) do |i|
+    #     suggestion_chance += api_response["results"][i]["metrics"]["suggestion"]["suggestions_chances"]
+    #   end
+    # end
+    0.upto(comments.length-1) do |i|
+      suggestion_chance+=rand(10).to_i
+    end
 	  return suggestion_chance
-	end
   end
 
 

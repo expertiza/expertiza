@@ -142,7 +142,7 @@
   <tr>
     <td id='assignment_is_self_teammate_review_enabled'>
       <input name="assignment_form[assignment][is_self_teammate_review_enabled]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][is_self_teammate_review_enabled]', 'true', @assignment_form.assignment.is_self_teammate_review_enabled) %>
+      <%= check_box_tag('assignment_form[assignment][is_self_teammate_review_enabled]', 'true', @assignment_form.assignment.is_self_teammate_review_enabled, {:onChange => 'hasSelfTeammateReviewChanged()'})%>
       <%= label_tag('assignment_form[assignment][is_self_teammate_review_enabled]', 'Allow Self Teammate Reviews?') %>
       <img src="/assets/info.png" title='Select if you want a person to review him/herself as a teammate'>
     </td>
@@ -182,6 +182,17 @@
         } else {
             meta_reviews_allowed_field.attr('hidden', true);
             jQuery('#assignment_form_assignment_num_metareviews_allowed').val('-1');
+        }
+    }
+
+    function hasSelfTeammateReviewChanged() {
+        var checkbox = jQuery('#assignment_form_assignment_is_self_teammate_review_enabled');
+        if (checkbox.is(':checked')) {
+            var r = confirm("Enabling self reviews after creating the assignment can cause inconsistencies. Are you sure you want to enable it?")
+            if(r == true)
+                checkbox.prop("checked","true");
+            else
+                checkbox.prop("checked","false");
         }
     }
 </script>

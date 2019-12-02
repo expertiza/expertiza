@@ -137,7 +137,7 @@ function microtaskChanged() {
     <td style='padding:5px' id='assignment_is_conference_field'>
       <input name="assignment_form[assignment][is_conference]" type="hidden" value="false"/>
       <%= check_box_tag('assignment_form[assignment][is_conference]', 'true', @assignment_form.assignment.is_conference) %>
-      <%= label_tag('assignment_form[assignment][is_conference]', 'Is this assignment for conference?') %>
+      <%= label_tag('assignment_form[assignment][is_conference]', 'Will this assignment be used to review papers for conference?') %>
     </td>
   </tr>
   <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>

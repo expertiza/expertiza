@@ -80,6 +80,30 @@ describe "review mapping" do
     expect(page).to have_content "All review mappings for \"#{@team1.name}\" have been deleted"
   end
 
+  it "can show summary" do
+    participant_reviewer = create :participant, assignment: @assignment
+    participant_reviewer2 = create :participant, assignment: @assignment
+    login_as("instructor6")
+    visit "/review_mapping/list_mappings?id=#{@assignment.id}"
+
+    # add_reviewer
+    first(:link, 'add reviewer').click
+    add_reviewer(participant_reviewer.user.name)
+    expect(page).to have_content participant_reviewer.user.name
+
+    # add_meta_reviewer
+    first(:link, 'add reviewer').click
+    add_reviewer(participant_reviewer.user.name)
+    click_link('add metareviewer')
+    add_matareviewer(participant_reviewer2.user.name)
+    expect(page).to have_content participant_reviewer2.user.name
+
+    visit "/reports/response_report?id=#{@assignment.id}"
+    click_button "View"
+
+    expect(page).to have_content('summary')
+  end
+
   it "show error when assign both 2" do
     skip('skip test on automated review mapping, too time consuming')
     login_and_assign_reviewer("instructor6", @assignment.id, 2, 2)

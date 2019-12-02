@@ -24,6 +24,7 @@ function microtaskChanged() {
   } else {
 
   }
+
 }
 
 </script>
@@ -134,10 +135,10 @@ function microtaskChanged() {
 
   <!--Conference-->
   <tr>
-    <td style='padding:5px' id='assignment_is_conference_field'>
+    <td style='padding:5px' id='assignment_is_conference_field' colspan="2">
       <input name="assignment_form[assignment][is_conference]" type="hidden" value="false"/>
       <%= check_box_tag('assignment_form[assignment][is_conference]', 'true', @assignment_form.assignment.is_conference) %>
-      <%= label_tag('assignment_form[assignment][is_conference]', 'Will this assignment be used to review papers for conference?') %>
+      <%= label_tag('assignment_form[assignment][is_conference]','Will this assignment be used to review papers for conference?') %>
     </td>
   </tr>
   <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
@@ -145,10 +146,14 @@ function microtaskChanged() {
        new Clipboard('button');
   </script>
   <tr>
-    <% if @assignment_form.assignment.is_conference %>
-      <div>Link to join assignment: </div>
-      <p id = "link" style="color: #721c24"><%="https://expertiza.ncsu.edu/users/request_new?role=Instructor"%></p>
-      <button class="button" data-clipboard-target=#link>Copy</button>
+    <% if current_page?(action: 'edit') %>
+      <% if @assignment_form.assignment.is_conference %>
+        <%  url = url_for controller: 'users', action: 'new',role: 'Student', assignment_id: @assignment.id %>
+        <div>Link to join assignment:
+          <span id = "link" style="color: #5d0a0a"><a href=<%=url%>><%=url%></a></span>
+          <span> <button class="button" data-clipboard-target=#link>Copy to Clipboard</button></span>
+        </div>
+      <% end %>
     <% end %>
   </tr>
 
@@ -180,7 +185,7 @@ function microtaskChanged() {
   </tr>
 
   <tr>
-    <td style='padding:5px' id='assignment_review_visible_to_all_field'>
+    <td style='padding:5px' id='assignment_review_visible_to_all_field' >
       <input name="assignment_form[assignment][reviews_visible_to_all]" type="hidden" value="false"/>
       <%= check_box_tag('assignment_form[assignment][reviews_visible_to_all]', 'true', @assignment_form.assignment.reviews_visible_to_all) %>
       <%= label_tag('assignment_form[assignment][reviews_visible_to_all]', 'Reviews visible to all other reviewers?') %>

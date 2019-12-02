@@ -72,6 +72,7 @@ gem 'tinymce-rails'
 gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
+gem 'clipboard-rails'
 
 group :development do
   gem 'daemons'

@@ -84,8 +84,8 @@ class ReviewMappingController < ApplicationController
   # and is used for instructor assigning reviewers in instructor-selected assignment.
   def assign_reviewer_dynamically
     assignment = Assignment.find(params[:assignment_id])
-    reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
-
+    participant = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
+    reviewer = participant.get_reviewer
     if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
       flash[:error] = "No topic is selected.  Please go back and select a topic."
     else
@@ -118,7 +118,7 @@ class ReviewMappingController < ApplicationController
     #   flash[:error] = (e.nil?) ? $! : e
     # end
 
-    redirect_to controller: 'student_review', action: 'list', id: reviewer.id
+    redirect_to controller: 'student_review', action: 'list', id: participant.id
   end
 
   # assigns the quiz dynamically to the participant

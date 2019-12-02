@@ -236,6 +236,90 @@ module ReviewMappingHelper
     }
     horizontal_bar_chart data, options
   end
+  
+  def get_avg_suggestions_per_round(assignment_id, round_id, type)
+	scores = 0
+	avg_score = 0
+	@reviewers.each do |r|
+		response_maps = ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", assignment_id, r.id, type])
+		score = get_suggestion_per_student_per_round(response_maps,round_id)
+		scores += score
+	end
+	
+	avg_score = scores/@reviewers.length unless @reviewers.empty?
+	return avg_score
+  end
+  
+  def get_suggestion_per_student_per_round(response_maps, round_id)
+	
+	all_comments = []
+	
+	response_maps.each do |rm|
+		response = Response.where(map_id: rm.id, round: round_id).order(created_at: desc).first
+		comments = get_response_answers_as_suggestion_parameter(response.id)
+		all_comments += comments unless comments.empty?
+	end	
+	
+	score = get_response_score_from_suggestion_metrics(all_comments)
+	
+	return score
+	
+  end
+
+  def get_response_answers_as_suggestion_parameter(response_id)
+  
+	# fetch comments from Answer model
+    answers = Answer.where(response_id: response_id)
+    
+	all_comments_per_review = []
+	
+	answers.each do |a|
+      comment = a.comments
+      comment.slice! "<p>"
+      comment.slice! "</p>"
+      all_comments_per_review.push(comment) unless comment.empty?
+    end
+	
+	return all_comments_per_review
+	
+  end
+  
+  def get_review_suggestion_metrics(comments)
+    uri = URI.parse('https://peer-review-metrics-nlp.herokuapp.com/metrics/all')
+    http = Net::HTTP.new(uri.hostname, uri.port)
+    req = Net::HTTP::Post.new(uri, initheader = {'Content-Type' =>'application/json'})
+    req.body = {"reviews"=>comments,
+                      "metrics"=>["suggestion"]}.to_json
+    http.use_ssl = true
+    comments = [""] if comments.empty?
+    begin
+      res = http.request(req)
+      if (res.code == "200" && res.content_type == "application/json")
+        return JSON.parse(res.body) 
+      else 
+        return nil 
+      end
+    rescue StandardError
+      return nil
+    end
+  end
+  
+  def get_response_score_from_suggestion_metrics(comments)
+  
+	# send user review to API for analysis
+    api_response = get_review_suggestion_metrics(comments)
+	#compute average for all response fields in ONE response
+    suggestion_chance = 0
+    
+    if api_response
+      number_of_responses = api_response["results"].size
+      0.upto(number_of_responses- 1) do |i|
+        suggestion_chance += api_response["results"][i]["metrics"]["suggestion"]["suggestions_chances"]
+      end
+	  return suggestion_chance
+	end
+  end
+
 
   def display_suggestion_metric_chart(reviewer)
     labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
@@ -277,7 +361,7 @@ module ReviewMappingHelper
     }
     horizontal_bar_chart data, options
   end
-
+  
   def list_review_submissions(participant_id, reviewee_team_id, response_map_id)
     participant = Participant.find(participant_id)
     team = AssignmentTeam.find(reviewee_team_id)

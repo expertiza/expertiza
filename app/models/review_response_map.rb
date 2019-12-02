@@ -2,6 +2,14 @@ class ReviewResponseMap < ResponseMap
   belongs_to :reviewee, class_name: 'Team', foreign_key: 'reviewee_id', inverse_of: false
   belongs_to :contributor, class_name: 'Team', foreign_key: 'reviewee_id', inverse_of: false
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id', inverse_of: false
+  
+  # Added for E1973:
+  # http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_Project_E1973._Team_Based_Reviewing
+  # ReviewResponseMap was created in so many places, I thought it best to add this here as a catch-all
+  def after_initialize
+    # If an assignment supports team reviews, it is marked in each mapping
+    reviewer_is_team = assignment.reviewer_is_team
+  end
 
   # In if this assignment uses "varying rubrics" feature, the sls
   # "used_in_round" field should not be nil

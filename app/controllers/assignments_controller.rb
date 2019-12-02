@@ -365,8 +365,11 @@ class AssignmentsController < ApplicationController
   end
 
   def update_feedback_assignment_form_attributes
+    num_responses = ReviewResponseMap.where(assignment: @assignment_form.assignment).count
     if params[:set_pressed][:bool] == 'false'
       flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."
+    elsif params[:assignment_form][:assignment][:reviewer_is_team] != @assignment_form.assignment.reviewer_is_team && num_responses > 0
+      flash[:error] = "You cannot change whether reviewers are teams if reviews have already been completed."
     else
       if @assignment_form.update_attributes(assignment_form_params, current_user)
         flash[:note] = 'The assignment was successfully saved....'

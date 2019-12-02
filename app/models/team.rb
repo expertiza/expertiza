@@ -57,6 +57,13 @@ class Team < ActiveRecord::Base
     (curr_team_size >= max_team_members)
   end
 
+  def half?
+    return false if self.parent_id.nil?
+    max_team_members = Assignment.find(self.parent_id).max_team_size
+    curr_team_size = Team.size(self.id)
+    (curr_team_size*2 >= max_team_members)
+  end
+
   # Add member to the team, changed to hash by E1776
   def add_member(user, _assignment_id = nil)
     raise "The user #{user.name} is already a member of the team #{self.name}" if user?(user)
@@ -67,6 +74,12 @@ class Team < ActiveRecord::Base
       parent = TeamNode.find_by(node_object_id: self.id)
       TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
       add_participant(self.parent_id, user)
+      ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{self.id}")
+    end
+    if half?
+      mentor = Participant.where(['can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', 0, 0, 0, self.parent_id]).first
+      new_mentor = TeamsUser.create(user_id: mentor.user_id, team_id: self.id)
+      TeamUserNode.create(parent_id: parent.id, node_object_id: new_mentor.id)
       ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{self.id}")
     end
     can_add_member

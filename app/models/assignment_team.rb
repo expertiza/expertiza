@@ -16,7 +16,7 @@ class AssignmentTeam < Team
   # Hopefully, this logic applies if there are other situations where reviewer.user_id was called
   # EDIT: A situation was found which differs slightly. If the current user is on the team, we want to
   # return that instead for instances where the code uses the current user.
-  def user_id
+  def user_id (current_user)
     if users.include? current_user
       current_user.id
     end

@@ -218,7 +218,7 @@ module ReviewMappingHelper
             display: false
         },
         width: "200",
-        height: "75", #decreased the width of space around the bar
+        height: "50", #decreased the width of space around the bar
         scales: {
             yAxes: [{
                         stacked: false,
@@ -343,7 +343,7 @@ module ReviewMappingHelper
             display: false
         },
         width: "200",
-        height: "75", #CHANGED THIS
+        height: "50", #decreased the width space around the bar
         scales: {
             yAxes: [{
                         stacked: false,

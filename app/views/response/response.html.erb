@@ -95,13 +95,15 @@
     }
 
     $('#save_review').click(function(){
-      $('#save_confirm').html('<span id="tick"> &#10004; </span>&nbsp;Saving review!')
-      setTimeout(function(){
-        $('#save_confirm').html('')
-      }, 5000);
+        if(!confirm('Saving suggestion to be changed')) {  //Change this to have a function call
+            $('#save_confirm').html('<span id="tick"> &#10004; </span>&nbsp;Saving review!')
+            setTimeout(function () {
+                $('#save_confirm').html('')
+            }, 5000);
+        }
     });
     $('#Submit').click(function(e){
-      if(!confirm('Once a review has been submitted, you cannot edit it again')){
+      if(!confirm('Submitting suggestion to be changed \n\n Once a review has been submitted, you cannot edit it again')){ //Change this to have a function call
         e.preventDefault();
         e.stopPropagation();
         return;

@@ -5,7 +5,7 @@ require 'rest_client'
 # required by autosummary
 module SummaryHelper
   class Summary
-    attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion
+    attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion, :search
 
     def summarize_reviews_by_reviewee(questions, assignment, r_id, summary_ws_url)
       self.summary = ({})
@@ -84,7 +84,7 @@ module SummaryHelper
     end
 
     # produce summaries for instructor and students. It sum up the feedback by criterion for each reviewee
-    def summarize_reviews_by_reviewees(assignment, summary_ws_url)
+    def summarize_reviews_by_reviewees(assignment, summary_ws_url, search)
       # @summary[reviewee][round][question]
       # @reviewers[team][reviewer]
       # @avg_scores_by_reviewee[team]
@@ -101,9 +101,20 @@ module SummaryHelper
       rubric = get_questions_by_assignment(assignment)
 
       # get all teams in this assignment
-      teams = Team.select(:id, :name).where(parent_id: assignment.id).order(:name)
+      team_filter = search[:team].to_s.strip
+      min_score = search[:min_score].to_s.strip
+      max_score = search[:max_score].to_s.strip
+      text = search[:text].to_s.strip
+
+      query = Team
+      query = query.where('name LIKE ?', "%#{team_filter}%") if team_filter.present?
+      teams = query.select(:id, :name).where(parent_id: assignment.id).order(:name)
 
       teams.each do |reviewee|
+        is_valid = true
+        includes_keywords = false
+
+        cur_threads = []
         self.summary[reviewee.name] = []
         self.avg_scores_by_reviewee[reviewee.name] = 0.0
         self.avg_scores_by_round[reviewee.name] = []
@@ -138,13 +149,33 @@ module SummaryHelper
             # summarize the comments by calling the summarization Web Service
 
             # since it'll do a lot of request, do this in seperate threads
-            threads << Thread.new do
+            cur_threads << Thread.new do
               summary[reviewee.name][round][q.txt] = summarize_sentences(comments, summary_ws_url) unless comments.empty?
+            end
+            next if text.blank?
+            includes_keywords |= comments.any? do |comment|
+              comment.include? text
             end
           end
           self.avg_scores_by_round[reviewee.name][round] = calculate_avg_score_by_round(self.avg_scores_by_criterion[reviewee.name][round], rubric_questions_used)
         end
         self.avg_scores_by_reviewee[reviewee.name] = calculate_avg_score_by_reviewee(self.avg_scores_by_round[reviewee.name], assignment.rounds_of_reviews)
+
+        avg_score = self.avg_scores_by_reviewee[reviewee.name]
+
+        is_valid &= avg_score >= min_score.to_i if min_score.present?
+        is_valid &= avg_score <= max_score.to_i if max_score.present?
+        is_valid &= includes_keywords if text.present?
+
+        if is_valid
+          threads.concat cur_threads
+        else
+          self.summary.delete(reviewee.name)
+          self.avg_scores_by_reviewee.delete(reviewee.name)
+          self.avg_scores_by_round.delete(reviewee.name)
+          self.avg_scores_by_criterion.delete(reviewee.name)
+          self.reviewers.delete(reviewee.name)
+        end
       end
 
       # Wait for all threads to end

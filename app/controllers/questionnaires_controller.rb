@@ -263,7 +263,7 @@ class QuestionnairesController < ApplicationController
         q.type = params[:question_type][question_key][:type]
         q.seq = question_key.to_i
         if @questionnaire.type == "QuizQuestionnaire"
-          # using the weights user inputs when creating quiz
+          # using the weight user enters when creating quiz
           weight_key = "question_#{index + 1}"
           q.weight = params[:question_weights][weight_key.to_sym]
         end

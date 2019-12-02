@@ -184,21 +184,22 @@ class TreeDisplayController < ApplicationController
     res
   end
 
-  def update_fnode_children(fnode, tmp_res)
+  def update_fnode_children(fnode, tmp_res, search)
     # fnode is short for foldernode which is the parent node
     # ch_nodes are childrens
     # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
-    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
+    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil, search)
     tmp_res[fnode.get_name] = ch_nodes
   end
 
   # initialize parent node and update child nodes for it
   def initialize_fnode_update_children(params, node, tmp_res)
     fnode = (params[:reactParams][:nodeType]).constantize.new
+    search = params[:reactParams][:search] || {}
     node.each do |a|
       fnode[a[0]] = a[1]
     end
-    update_fnode_children(fnode, tmp_res)
+    update_fnode_children(fnode, tmp_res, search)
   end
 
   # for child nodes
@@ -300,8 +301,9 @@ class TreeDisplayController < ApplicationController
 
   def get_tmp_res(params, child_nodes)
     fnode = (params[:reactParams2][:nodeType]).constantize.new
+    search = params[:reactParams2][:search] || {}
     initialize_fnode_2(fnode, child_nodes)
-    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
+    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil, search)
     res_node_for_child_2(ch_nodes)
   end
 

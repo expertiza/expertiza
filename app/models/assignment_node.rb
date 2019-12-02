@@ -18,7 +18,8 @@ class AssignmentNode < Node
   #   parent_id: course_id if subset
 
   # returns: list of AssignmentNodes based on query
-  def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, _search = nil)
+
+  def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, search = nil)
     if show
       conditions = if User.find(user_id).role.name != "Teaching Assistant"
                      'assignments.instructor_id = ?'
@@ -38,7 +39,65 @@ class AssignmentNode < Node
     sortvar ||= 'created_at'
     sortorder ||= 'desc'
     find_conditions = [conditions, values]
-    self.includes(:assignment).where(find_conditions).order("assignments.#{sortvar} #{sortorder}")
+    me = User.find(user_id)
+
+    name = search[:name].to_s.strip
+    participant_name = search[:participant_name].to_s.strip
+    participant_fullname = search[:participant_fullname].to_s.strip
+    due_since = search[:due_since].to_s.strip
+    due_until = search[:due_until].to_s.strip
+    created_since = search[:created_since].to_s.strip
+    created_until = search[:created_until].to_s.strip
+
+    associations = {assignment: [:due_dates]}
+
+    associations[:assignment] << {participants: :user} if participant_name.present? || participant_fullname.present?
+
+    query = self.includes(associations).where(find_conditions)
+
+    query = query.where('assignments.name LIKE ?', "%#{name}%") if name.present?
+
+    if due_since.present?
+      due_since = due_since.to_time.utc.change(hour: 0, min: 0)
+      query = query.where('due_dates.due_at >= ?', due_since)
+    end
+
+    if due_until.present?
+      due_until = due_until.to_time.utc.change(hour: 23, min: 59)
+      query = query.where('due_dates.due_at <= ?', due_until)
+    end
+
+    if created_since.present?
+      created_since = created_since.to_time.utc.change(hour: 0, min: 0)
+      query = query.where('created_at >= ?', created_since)
+    end
+
+    if created_until.present?
+      created_until = created_until.to_time.utc.change(hour: 23, min: 59)
+      query = query.where('created_at <= ?', created_until)
+    end
+
+    if participant_name.present?
+      participant_names = User.where('name LIKE ?', "%#{participant_name}%")
+                              .select do |user|
+        me.can_impersonate? user
+      end
+                              .map(&:name)
+      return [] if participant_names.empty?
+      query = query.where(users: {name: participant_names})
+    end
+
+    if participant_fullname.present?
+      participant_names = User.where('fullname LIKE ?', "%#{participant_fullname}%")
+                              .select do |user|
+        me.can_impersonate? user
+      end
+                              .map(&:name)
+      return [] if participant_names.empty?
+      query = query.where(users: {name: participant_names})
+    end
+
+    query.order("assignments.#{sortvar} #{sortorder}")
   end
 
   # Indicates that this object is always a leaf

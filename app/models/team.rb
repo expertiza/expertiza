@@ -261,9 +261,7 @@ class Team < ActiveRecord::Base
   # Find the supplementary review questionnaire id of the team
   def self.get_supplementary_review_questionnaire_id_of_team(team_id)
     team = Team.find(team_id)
-    if team.blank?
-      nil
-    else
+    unless team.blank?
       team.supplementary_review_questionnaire_id
     end
   end

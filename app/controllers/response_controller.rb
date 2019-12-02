@@ -72,7 +72,7 @@ class ResponseController < ApplicationController
     @supplementary_review_questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
-    @questionnaire = set_questionnaire
+    set_questionnaire
     render action: 'response'
   end
 
@@ -89,8 +89,8 @@ class ResponseController < ApplicationController
       @response.update_attribute('additional_comment', params[:review][:comments])
       set_questionnaire
       questions = sort_questions(@questionnaire.questions)
-      supplementary_review_questions = sort_questions(@supplementary_review_questionnaire.questions)
       unless @supplementary_review_questionnaire.nil?
+        supplementary_review_questions = sort_questions(@supplementary_review_questionnaire.questions)
         questions += supplementary_review_questions
       end
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
@@ -152,8 +152,8 @@ class ResponseController < ApplicationController
       @questionnaire = Questionnaire.find(params[:review][:questionnaire_id])
       @round = params[:review][:round]
       @supplementary_review_questionnaire_id = Team.get_supplementary_review_questionnaire_id_of_team(@map.reviewee_id)
-      unless @supplementary_review_questionaire_id.nil?
-        @supplementary_review_questionnaire = Questionnaire.find(@suplementary_review_questionnaire_id)
+      unless @supplementary_review_questionnaire_id.nil?
+        @supplementary_review_questionnaire = Questionnaire.find(@supplementary_review_questionnaire_id)
       end
     else
       @round = nil
@@ -178,9 +178,8 @@ class ResponseController < ApplicationController
     # Change the order for displaying questions for editing response views.
     questions = sort_questions(@questionnaire.questions)
     unless @supplementary_review_questionnaire.nil?
-      supplementary_review_questions = sort_questions(@supplementary_review_quesionnaire.questions)
+      supplementary_review_questions = sort_questions(@supplementary_review_questionnaire.questions)
       questions += supplementary_review_questions
-      print("ok!!!!!!!!")
     end
     create_answers(params, questions) if params[:responses]
     msg = "Your response was successfully saved."
@@ -305,8 +304,7 @@ class ResponseController < ApplicationController
       unless @supplementary_review_questionnaire_id.nil?
         @supplementary_review_questionnaire = Questionnaire.find(@supplementary_review_questionnaire_id)
       end
-    when
-    "MetareviewResponseMap",
+    when "MetareviewResponseMap",
         "TeammateReviewResponseMap",
         "FeedbackResponseMap",
         "CourseSurveyResponseMap",
@@ -331,8 +329,10 @@ class ResponseController < ApplicationController
     # we can find the questionnaire from the question_id in answers
     answer = @response.scores.first
     @questionnaire = @response.questionnaire_by_answer(answer)
-    supplementary_review_answer = @response.scores.last
-    @supplementary_review_questionnaire = @response.questionnaire_by_answer(supplementary_review_answer)
+    @supplementary_review_questionnaire_id = Team.get_supplementary_review_questionnaire_id_of_team(@map.contributor.id)
+    unless @supplementary_review_questionnaire_id.nil?
+      @supplementary_review_questionnaire = Questionnaire.find(@supplementary_review_questionnaire_id)
+    end
   end
 
   # checks if the questionnaire is nil and opens drop down or rating accordingly

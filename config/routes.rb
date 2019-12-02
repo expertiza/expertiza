@@ -187,6 +187,12 @@ resources :institution, except: [:destroy] do
       get :list
     end
   end
+  
+  resources :lock do
+    collection do
+      post :release_lock
+    end
+  end
 
   resources :notifications
 

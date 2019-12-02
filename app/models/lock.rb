@@ -13,6 +13,9 @@ class Lock < ActiveRecord::Base
   # How many minutes of inactivity before this lock is released?
   validates :timeout_period, presence: true
   
+  # For E1973, we're just going to use the default timeout period of 20 minutes.
+  DEFAULT_TIMEOUT = 20
+  
   # Requests a lock on the given resource for the given user
   # Since resources can be of any class, the class name for the resource must be provided
   # Return the resource if it's available or nil if it is not
@@ -65,13 +68,13 @@ class Lock < ActiveRecord::Base
   end
   
   #Destroys the lock on the given resource by the given user (if it exists)
-  def self.release_lock(lockable, user)
-    if lockable.nil? || user.nil?
+  def self.release_lock(lockable)
+    if lockable.nil?
       return
     end
-    lock = find_by(lockable: lockable, user: user)
+    lock = find_by(lockable: lockable)
     if !lock.nil?
-      lock.destroy
+      Lock.where(lockable: lockable).destroy_all
     end
   end
   

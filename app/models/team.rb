@@ -11,16 +11,6 @@ class Team < ActiveRecord::Base
     joins(:teams_users).where("teams.parent_id = ? AND teams_users.user_id = ?", assignment_id, user_id)
   }
   
-  # Added for E1973, Team reviews.
-  # Some methods prompt a reviewer for a user id. This method just returns the user id of the first user in the team
-  # This is a very hacky way to deal with very complex functionality but the reasoning is this:
-  # The reason this is being added is to give ReviewAssignment#reject_own_submission a way to reject the submission
-  # Of the reviewer. If there are team reviews, there must be team submissions, so any team member's user id will do.
-  # Hopefully, this logic applies if there are other situations where reviewer.user_id was called
-  def user_id
-    users.first.id
-  end
-
   # Get the participants of the given team
   def participants
     users.where(parent_id: parent_id || current_user_id).flat_map(&:participants)

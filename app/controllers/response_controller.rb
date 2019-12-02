@@ -47,9 +47,17 @@ class ResponseController < ApplicationController
   end
 
   def delete
+    #The locking was added for E1973, team-based reviewing. See lock.rb for details
     @response = Response.find(params[:id])
+    @map = @response.map
+    @response = Lock.get_lock(@response, current_user, Lock::DEFAULT_TIMEOUT)
+    if @response.nil?
+      response_lock_action
+      return
+    end
     # user cannot delete other people's responses. Needs to be authenticated.
     map_id = @response.map.id
+    # The lock will be automatically destroyed when the response is destroyed
     @response.delete
     redirect_to action: 'redirect', id: map_id, return: params[:return], msg: "The response was deleted."
   end
@@ -65,6 +73,13 @@ class ResponseController < ApplicationController
     if @prev.present?
       @sorted = @review_scores.sort {|m1, m2| m1.version_num.to_i && m2.version_num.to_i ? m2.version_num.to_i <=> m1.version_num.to_i : (m1.version_num ? -1 : 1) }
       @largest_version_num = @sorted[0]
+    end
+    #Added for E1973, team-based reviewing
+    @map = @response.map
+    @response = Lock.get_lock(@response, current_user, Lock::DEFAULT_TIMEOUT)
+    if @response.nil?
+      response_lock_action
+      return
     end
     @modified_object = @response.response_id
     # set more handy variables for the view
@@ -83,7 +98,12 @@ class ResponseController < ApplicationController
   def update
     render nothing: true unless action_allowed?
     # the response to be updated
+    # Locking functionality added for E1973, team-based reviewing
     @response = Response.find(params[:id])
+    if !Lock.lock_between?(@response, current_user)
+      response_lock_action
+      return
+    end
     msg = ""
     begin
       @map = @response.map
@@ -242,6 +262,13 @@ class ResponseController < ApplicationController
   end
 
   private
+  
+  # Added for E1973, team-based reviewing:
+  # http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_Project_E1973._Team_Based_Reviewing
+  # This action gets taken if the response is locked and cannot be edit right now
+  def response_lock_action
+    redirect_to action: 'redirect', id: @map.map_id, return: 'locked', error_msg: 'Another user is modifying this response or has modified this response. Try again later.'
+  end
 
   # new_response if a flag parameter indicating that if user is requesting a new rubric to fill
   # if true: we figure out which questionnaire to use based on current time and records in assignment_questionnaires table

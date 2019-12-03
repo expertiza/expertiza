@@ -206,19 +206,20 @@ module ReviewMappingHelper
           backgroundColor: "rgba(255,99,132,0.8)",
           borderWidth: 1,
           data: reviewer_data,
-          yAxisID: "bar-y-axis1"
+          xAxisID: "bar-x-axis1"
         },
         {
           label: 'avg. vol.',
           backgroundColor: "rgba(255,206,86,0.8)",
           borderWidth: 1,
           data: all_reviewers_data,
-          yAxisID: "bar-y-axis2"
+          xAxisID: "bar-x-axis2"
         }
       ]
     }
     options = {
       legend: {
+        display: false,
         position: 'top',
         labels: {
           usePointStyle: true
@@ -227,30 +228,25 @@ module ReviewMappingHelper
       width: "200",
       height: "125",
       scales: {
-        yAxes: [{
-          stacked: true,
-          id: "bar-y-axis1",
-          barThickness: 10
+        xAxes: [{
+          id: "bar-x-axis1",
+          position: 'bottom',
+          ticks: {
+              beginAtZero: true,
+              stepSize: 50,
+              max: 400
+          }
         }, {
+          id: "bar-x-axis2",
           display: false,
-          stacked: true,
-          id: "bar-y-axis2",
-          barThickness: 15,
-          type: 'category',
-          categoryPercentage: 0.8,
-          barPercentage: 0.9,
-          gridLines: {
-            offsetGridLines: true
+          type: 'linear',
+          position: 'top',
+          ticks: {
+              beginAtZero: true,
+              stepSize: 50,
+              max: 400
           }
         }],
-        xAxes: [{
-          stacked: false,
-          ticks: {
-            beginAtZero: true,
-            stepSize: 50,
-            max: 400
-          }
-        }]
       }
     }
     horizontal_bar_chart data, options

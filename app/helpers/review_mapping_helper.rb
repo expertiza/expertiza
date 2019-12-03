@@ -225,12 +225,13 @@ module ReviewMappingHelper
           usePointStyle: true
         }
       },
-      width: "200",
-      height: "125",
+      width: "175",
+      height: "100",
       scales: {
         xAxes: [{
           id: "bar-x-axis1",
           position: 'bottom',
+          barThickness: 5,
           ticks: {
             beginAtZero: true,
             stepSize: 50,
@@ -241,6 +242,7 @@ module ReviewMappingHelper
           display: false,
           type: 'linear',
           position: 'top',
+          barThickness: 5,
           ticks: {
             beginAtZero: true,
             stepSize: 50,

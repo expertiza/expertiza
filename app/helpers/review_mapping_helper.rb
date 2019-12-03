@@ -232,9 +232,9 @@ module ReviewMappingHelper
           id: "bar-x-axis1",
           position: 'bottom',
           ticks: {
-              beginAtZero: true,
-              stepSize: 50,
-              max: 400
+            beginAtZero: true,
+            stepSize: 50,
+            max: 400
           }
         }, {
           id: "bar-x-axis2",
@@ -242,9 +242,9 @@ module ReviewMappingHelper
           type: 'linear',
           position: 'top',
           ticks: {
-              beginAtZero: true,
-              stepSize: 50,
-              max: 400
+            beginAtZero: true,
+            stepSize: 50,
+            max: 400
           }
         }],
       }

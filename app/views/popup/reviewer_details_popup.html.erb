@@ -17,9 +17,14 @@
 
 </div>
 
-<% def get_link_round_review_time_all_links(map_id, round) %>
+<% def get_link_round_review_time_all_links(map_id, round,only_expertiza_time=false) %>
   <% sum_time = 0 %>
-  <% links = SubmissionViewingEvent.where(map_id: map_id, round: round) %>
+
+  <%if only_expertiza_time%>
+    <% links = SubmissionViewingEvent.where(map_id: map_id, round: round, link: 'Expertiza Review') %>   
+  <%else%>
+    <% links = SubmissionViewingEvent.where(map_id: map_id, round: round).where.not(link: 'Expertiza Review') %>
+  <%end%>
 
   <% links_to_remove = [] %>
   <% links.each do |link_outer| %> <!-- identify which links to remove from analysis -->
@@ -58,12 +63,12 @@
   <% open_start_edges = 0 %>
   <% sorted_link_edges_array.each_with_index  do |current_edge, index| %>
     <% sorted_link_edges_array.drop(index+1).each do |further_edge| %>
-      <% if current_edge["type"]=="start" %>
+      <% if current_edge["edge_type"]=="start" %>
         <% open_start_edges +=1 %>
-      <% elsif current_edge["type"]=="end" %>
+      <% elsif current_edge["edge_type"]=="end" %>
         <% open_start_edges -=1 %>
       <% end %>
-      <% if current_edge["type"]=="end" && further_edge["type"]=="start" %>
+      <% if current_edge["edge_type"]=="end" && further_edge["edge_type"]=="start" %>
         <% if open_start_edges == 0 %>
           <% break %>
         <% end %>
@@ -129,15 +134,18 @@
       <% @response_maps.each do |map| %>  <!-- for reviewee-->
         <% map_total_time = 0 %>
         <% (1..@number_of_rounds).each do |each_round| %>  <!-- for rounds-->
+          <%link_total_time  = get_link_round_review_time_all_links(map.id,each_round)%>
+          <%expertiza_total_time = get_link_round_review_time_all_links(map.id,each_round, true)%>
+          <%total_time = link_total_time + expertiza_total_time%>
           <% @per_round_time = Array.new %>
           <% @submissionviewingevent_match = SubmissionViewingEvent.where(map_id: map.id, round:each_round)%>
           <% @reviewed_object_id = map.reviewed_object_id %>
           <% @reviewee_id = map.reviewee_id %>
           <% link_list = Array.new %>
-          <% @count = 0 %>   <!--- To print revieweeId only once-->
-          <% @dummy = "      " %>    <!---Empty string as a placeholder-->
+          <% @count = 0 %>   
+          <% @dummy = "      " %>    
           <% @submissionviewingevent_match.each do |submissionviewingevent_entry| %>
-            <% if link_list.include?(submissionviewingevent_entry.link) %><!-- only unique links per round-->
+            <% if link_list.include?(submissionviewingevent_entry.link) %>
             <% else %>
                 <% link_list.push(submissionviewingevent_entry.link) %>
                 <tr>
@@ -151,14 +159,14 @@
                   <td><%= @dummy %></td>
                   <td><%= " "%></td>
                 <%end%>
-                <td><%= submissionviewingevent_entry.link %></td>
+                <!--<td><%= submissionviewingevent_entry.link %></td>
                 <% individual_link_time = get_link_round_review_time(submissionviewingevent_entry.map_id,submissionviewingevent_entry.round,submissionviewingevent_entry.link) %>
                 <% map_total_time = map_total_time + individual_link_time %>
                  <% each_link_detail = Array.new %>
                  <% each_link_detail << submissionviewingevent_entry.link %>
                  <% each_link_detail << individual_link_time %>
                  <% @per_round_time << each_link_detail %>
-                <td align="center"><%= sprintf("%.2f",individual_link_time) %></td>
+                <td align="center"><%= sprintf("%.2f",individual_link_time) %></td>-->
                 <% if @count == 0 %>
                 <td><a onclick="drawChart(<%= @reviewee_id.to_s %>,<%= each_round.to_s %>)" data-toggle="modal" data-target="#chartModal">Pie chart view </a>
                 </td>

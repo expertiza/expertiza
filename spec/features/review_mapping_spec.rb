@@ -107,8 +107,6 @@ describe "review mapping" do
   it "should calculate number of reviews correctly" do
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: "submission").first, due_at: DateTime.now.in_time_zone + 1.day)
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: "review").first, due_at: DateTime.now.in_time_zone + 1.day)
-    participant_reviewer = create :participant, assignment: @assignment
-    participant_reviewer2 = create :participant, assignment: @assignment
     login_as("instructor6")
     visit "/review_mapping/list_mappings?id=#{@assignment.id}"
 
@@ -122,6 +120,25 @@ describe "review mapping" do
     click_button "View"
 
     expect(page).to have_content('0/2')
+  end
+
+  it "can show length of reviews", js: true do
+    create(:assignment_due_date, deadline_type: DeadlineType.where(name: "submission").first, due_at: DateTime.now.in_time_zone + 1.day)
+    create(:assignment_due_date, deadline_type: DeadlineType.where(name: "review").first, due_at: DateTime.now.in_time_zone + 1.day)
+    login_as("instructor6")
+    visit "/review_mapping/list_mappings?id=#{@assignment.id}"
+
+    # assign 2 reviews to student 4
+    visit "/review_mapping/select_reviewer?contributor_id=1&id=1"
+    add_reviewer("student4")
+    visit "/review_mapping/select_reviewer?contributor_id=3&id=1"
+    add_reviewer("student4")
+
+    visit "/reports/response_report?id=#{@assignment.id}"
+    click_button "View"
+
+    # it should find there is a chart in the view that shows the review length
+    expect(page).to have_selector("#chart-0")
   end
 
   it "show error when assign both 2" do

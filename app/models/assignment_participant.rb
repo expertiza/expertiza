@@ -263,4 +263,16 @@ class AssignmentParticipant < Participant
     end
     stage
   end
+
+  def is_in_first_round?
+    topic_id = SignedUpTeam.topic_id(self.parent_id, self.user_id)
+    assigment = Assignment.find(self.parent_id)
+    round = assigment.number_of_current_round(topic_id)
+    if round == 1 || round == 0
+      return true
+    else
+      return false
+    end
+  end
+
 end

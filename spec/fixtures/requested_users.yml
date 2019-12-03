@@ -1,0 +1,8 @@
+requesteduser1:
+  id: 1
+  name: 'abcd'
+  fullname: 'full name'
+  email: 'abcd@mailinator.com'
+  role_id: 1
+  institution_id: 1
+  status: 'Approved'

@@ -34,18 +34,7 @@
                   <!-- Show review summary of checkbox question -->
                   <tr>
                     <td colspan="3" style="padding: 0px;">
-                      <table width="100%">
-                        <tr>
-                          <!-- question -->
-                          <th style="background-color:#DDDDBB" width="50%"><%= question.txt %></th>
-                          <!-- checkbox -->
-                          <% responses.each do |response_id| %>
-                              <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
-                              <td style="float:left" align="center" width="<%= col_percent %>%">
-                                <p><%= answer.answer == 0 ? image_tag("delete_icon.png") : image_tag("Check-icon.png") %></p></td>
-                          <% end %>
-                        </tr>
-                      </table>
+                      <%= render :partial => 'checkbox_question_review', :locals => {:question => question, :responses => responses, :col_percent => col_percent} %>
                     </td>
                   </tr>
               <% else %>
@@ -55,35 +44,7 @@
                   <!-- show review summary for non-checkbox question -->
                   <tr>
                     <td colspan="3" style="padding: 0px;">
-                      <table width="100%">
-                        <tr>
-                          <% responses.each do|response_id| %>
-                              <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
-                              <% if !answer.nil? %><% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
-                                  <% response_map = ReviewResponseMap.where(reviewed_object_id: @assignment_id,
-                                                                            reviewer_id: @reviewer_id,
-                                                                            reviewee_id: team.id).last %>
-                                  <% response_update_at = response_map.try(:response).try(:last).try(:updated_at) %>
-                                  <% review_graded_at = ReviewGrade.find_by(participant_id: @reviewer_id).try(:review_graded_at) %>
-                                  <% col_color = 'black' %>
-                                  <% col_color = 'blue' if review_graded_at && response_update_at && response_update_at > review_graded_at %>
-                                  <!--Score-->
-                                  <% if question.instance_of? Checkbox %>
-                                      <td align='center'>
-                                        <p style="color: <%= col_color %>"><%= answer.answer == 0 ? image_tag("delete_icon.png") : image_tag("Check-icon.png") %></p>
-                                      </td>
-                                  <% else %>
-                                      <td align='center' width="1%"><p style="color: <%= col_color %>"><%= answer.answer %></p></td>
-                                  <% end %>
-                                  <!--Comments-->
-                                  <td align='left' width="<%= col_percent_comment %>%"><p style="color: <%= col_color %>;width: 100%"><%= answer.comments.html_safe unless answer.comments.nil? %></p></td>
-                              <% else %>
-                                  <td>N/A</td>
-                                  <td>N/A</td>
-                              <% end %>
-                          <% end %>
-                        </tr>
-                      </table>
+                      <%= render :partial => 'non_checkbox_question_review', :locals => {:question => question, :responses => responses, :col_percent => col_percent} %>
                     </td>
                   </tr>
               <% end %>

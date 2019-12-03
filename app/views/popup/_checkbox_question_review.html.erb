@@ -1,0 +1,12 @@
+<table width="100%">
+  <tr>
+    <!-- question -->
+    <th style="background-color:#DDDDBB" width="50%"><%= question.txt %></th>
+    <!-- checkbox -->
+    <% responses.each do |response_id| %>
+        <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
+        <td style="float:left" align="center" width="<%= col_percent %>%">
+          <p><%= answer.answer == 0 ? image_tag("delete_icon.png") : image_tag("Check-icon.png") %></p></td>
+    <% end %>
+  </tr>
+</table>

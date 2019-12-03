@@ -64,6 +64,18 @@ class Team < ActiveRecord::Base
     (curr_team_size*2 >= max_team_members)
   end
 
+  def dont_have_mentor?
+    no_mentor = true
+    members = TeamsUser.where(team_id: self.id)
+    members.each do |member|
+      if Participant.where(['user_id = ? and can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', member.user_id ,0, 0, 0, self.parent_id]).count > 0
+        no_mentor = false
+      end
+    end
+    (no_mentor)
+  end
+
+
   # Add member to the team, changed to hash by E1776
   def add_member(user, _assignment_id = nil)
     raise "The user #{user.name} is already a member of the team #{self.name}" if user?(user)
@@ -76,7 +88,7 @@ class Team < ActiveRecord::Base
       add_participant(self.parent_id, user)
       ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{self.id}")
     end
-    if half?
+    if half? && dont_have_mentor?
       mentor = Participant.where(['can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', 0, 0, 0, self.parent_id]).first
       new_mentor = TeamsUser.create(user_id: mentor.user_id, team_id: self.id)
       TeamUserNode.create(parent_id: parent.id, node_object_id: new_mentor.id)
@@ -87,6 +99,20 @@ class Team < ActiveRecord::Base
 
   # Define the size of the team,
   def self.size(team_id)
+    #team_no_mentor = true
+    #check_team = Team.where(id: team_id)
+    #members = TeamsUser.where(team_id: team_id)
+    #members.each do |member|
+    #  if Participant.where(['user_id = ? and can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', member.user_id ,0, 0, 0, check_team.select(:parent_id)]).count > 0
+    #    team_no_mentor = false
+    #  end
+    #end
+    #if team_no_mentor
+    #  team_size = TeamsUser.where(team_id: team_id).count
+    #else
+    #  team_size = TeamsUser.where(team_id: team_id).count - 1
+    #end
+    #team_size
     TeamsUser.where(team_id: team_id).count
   end
 

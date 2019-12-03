@@ -131,8 +131,9 @@
       <% @response_maps = ResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: @id)  %>
       <% @number_of_rounds = Assignment.find(@id).rounds_of_reviews %>
       <% reviewee_count = 0 %>
+	  <% round_count = 0 %>
       <% @response_maps.each do |map| %>  <!-- for reviewee-->
-        <% map_total_time = 0 %>
+       <% map_total_time = 0 %>
         <% (1..@number_of_rounds).each do |each_round| %>  <!-- for rounds-->
           <%link_total_time  = get_link_round_review_time_all_links(map.id,each_round)%>
           <%expertiza_total_time = get_link_round_review_time_all_links(map.id,each_round, true)%>
@@ -142,8 +143,9 @@
           <% @reviewed_object_id = map.reviewed_object_id %>
           <% @reviewee_id = map.reviewee_id %>
           <% link_list = Array.new %>
-          <% @count = 0 %>   
-          <% @dummy = "      " %>    
+          <% @count = 0 %>   <!--- To print revieweeId only once-->
+          <% @dummy = "      " %>    <!---Empty string as a placeholder-->
+		  <% map_total_time = 0 %>
           <% @submissionviewingevent_match.each do |submissionviewingevent_entry| %>
             <% if link_list.include?(submissionviewingevent_entry.link) %>
             <% else %>
@@ -152,8 +154,51 @@
                 <% if @count == 0 %>  <!--- print revieweeId,time, round only for the first row-->
                   <% team = Team.find(@reviewee_id) %>
                   <td><%= team.name %></td>
-                  <td id="<%= reviewee_count.to_s %>" align="center"></td>
+                  <td align="center">
+					<% if total_time > 0 %>
+					  <%seconds = total_time % 60%>
+					  <%minutes = (total_time / 60) % 60%>
+					  <%hours = total_time / (60 * 60)%>					  
+						  <% if hours.to_i>0 %>
+							<%=format("%02d h %02d m %02d s", hours, minutes, seconds)%>
+						  <% elsif minutes.to_i>0 %>
+							<%=format("%02d m %02d s", minutes, seconds)%>
+						  <% else %>
+							<%=format("%02d s", seconds)%>
+						  <% end %>
+					<% end %>
+				  </td>
                   <td align="center"><%= submissionviewingevent_entry.round %></td>
+				  <td> Expertiza </td>
+				  <td> <% if expertiza_total_time > 0 %>
+					  <%seconds = expertiza_total_time % 60%>
+					  <%minutes = (expertiza_total_time / 60) % 60%>
+					  <%hours = expertiza_total_time / (60 * 60)%>					  
+						  <% if hours.to_i>0 %>
+							<%=format("%02d h %02d m %02d s", hours, minutes, seconds)%>
+						  <% elsif minutes.to_i>0 %>
+							<%=format("%02d m %02d s", minutes, seconds)%>
+						  <% else %>
+							<%=format("%02d s", seconds)%>
+						  <% end %>
+					<% end %></td>
+				<% elsif @count==1 %>        <!--- Else print dummy-->
+                  <td><%= @dummy %></td>  
+                  <td><%= @dummy %></td>
+                  <td><%= @dummy %></td>
+                  <td> Links </td>
+				  <td> <% if link_total_time > 0 %>
+					  <%seconds = link_total_time % 60%>
+					  <%minutes = (link_total_time / 60) % 60%>
+					  <%hours = link_total_time / (60 * 60)%>					  
+						  <% if hours.to_i>0 %>
+							<%=format("%02d h %02d m %02d s", hours, minutes, seconds)%>
+						  <% elsif minutes.to_i>0 %>
+							<%=format("%02d m %02d s", minutes, seconds)%>
+						  <% else %>
+							<%=format("%02d s", seconds)%>
+						  <% end %>
+					<% end %></td>
                 <% else %>        <!--- Else print dummy-->
                   <td><%= @dummy %></td>  
                   <td><%= @dummy %></td>
@@ -161,6 +206,7 @@
                 <%end%>
                 <!--<td><%= submissionviewingevent_entry.link %></td>
                 <% individual_link_time = get_link_round_review_time(submissionviewingevent_entry.map_id,submissionviewingevent_entry.round,submissionviewingevent_entry.link) %>
+
                 <% map_total_time = map_total_time + individual_link_time %>
                  <% each_link_detail = Array.new %>
                  <% each_link_detail << submissionviewingevent_entry.link %>
@@ -177,10 +223,11 @@
             <% end %>
             <% @count=@count+1 %>
           <%end %>   <!-- end for link-->
-        <% timeHash[(@reviewee_id.to_s).concat(each_round.to_s)] = @per_round_time %>  
+        <% timeHash[(@reviewee_id.to_s).concat(each_round.to_s)] = @per_round_time %>
+        <% round_count = round_count+1%>
+		<% total_time_list << map_total_time.round(2) %>
         <% end%>    <!-- end for round-->
         <% reviewee_list << @reviewee_id %>
-        <% total_time_list << map_total_time.round(2) %>
         <% reviewee_count = reviewee_count+1%>
       <% end %>  <!-- end for reviewee-->
     <% end %>   <!-- end for reviewer-->
@@ -195,10 +242,26 @@
     timeReportHash = <%= timeHash.to_json.to_s.html_safe %>;
     totalTimeList = <%= total_time_list%>
     for(each=0;each<totalTimeList.length;each++){
-      // var eachId = each.toString();  
-      // document.getElementById(eachId).innerHTML = totalTimeList[each];  
-      $("#submissionviewingevent table #"+each).html(totalTimeList[each]);
-    }       
+      // var eachId = each.toString();
+      // document.getElementById(eachId).innerHTML = totalTimeList[each];
+	  var time  = totalTimeList[each]*60;
+	  if (time > 0){
+          seconds = time % 60;
+          minutes = (time / 60) % 60;
+          hours = time / (60 * 60);
+		  seconds = Math.floor(seconds);
+		  minutes = Math.floor(minutes);
+		  hours = Math.floor(hours);
+             if(hours.to_i>0){
+			    $("#submissionviewingevent table #"+each).html(hours+" h "+ minutes +" m " + seconds + " s");
+              }else if(minutes.to_i>0){
+			    $("#submissionviewingevent table #"+each).html(minutes +" m " + seconds + " s");
+              }else{
+			    $("#submissionviewingevent table #"+each).html(seconds + " s");
+			  }
+	  }
+      // $("#submissionviewingevent table #"+each).html(totalTimeList[each]);
+    }
   });  
   function showDetails(){
     if(showDetailsEnabled){

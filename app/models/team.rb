@@ -112,7 +112,7 @@ class Team < ActiveRecord::Base
         members_name+=members[i].fullname+"("+User.find(members[i].user_id).email+"), "
       end
       members_name += members[members.size-3].fullname +"("+User.find(members[members.size-3].user_id).email+") "
-      members_name += "and "+members[members.size-2].fullname + "("+User.find(members[members.size-2].user_id).email+")."
+      members_name += "and "+members[members.size-2].ƒfullname + "("+User.find(members[members.size-2].user_id).email+")."
     end
 
 
@@ -125,7 +125,7 @@ class Team < ActiveRecord::Base
     members = TeamsUser.where(team_id: self.id)
     mentor_info=mentor.fullname + "("+User.find(mentor.user_id).email+")."
     members.each do |member|
-      if members.user_id != mentor.user_id
+      if member.user_id != mentor.user_id
         Mailer.delayed_message(bcc: [User.find(member.user_id).email],
                                subject: "Team Mentor Reminder",
                                body: "Your team: "+self.name+" will be mentored by " + mentor_info ).deliver_now

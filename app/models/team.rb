@@ -93,9 +93,47 @@ class Team < ActiveRecord::Base
       new_mentor = TeamsUser.create(user_id: mentor.user_id, team_id: self.id)
       TeamUserNode.create(parent_id: parent.id, node_object_id: new_mentor.id)
       ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{self.id}")
+
+      # Email notification
+      email_mentor(mentor)
+      email_team_members(mentor)
+
     end
     can_add_member
   end
+
+  def email_mentor(mentor)
+    members = TeamsUser.where(team_id: self.id)
+    members_name=""
+    if members.size==2
+      members_name=members[0].fullname+"("+User.find(members[0].user_id).email+")."
+    else
+      for i in 0..members.size-4 do
+        members_name+=members[i].fullname+"("+User.find(members[i].user_id).email+"), "
+      end
+      members_name += members[members.size-3].fullname +"("+User.find(members[members.size-3].user_id).email+") "
+      members_name += "and "+members[members.size-2].fullname + "("+User.find(members[members.size-2].user_id).email+")."
+    end
+
+
+    Mailer.delayed_message(bcc: [User.find(mentor.user_id).email],
+                             subject: "Mentoring Team Reminder",
+                             body: "You have been assigned to team: " + self.name + " with team member: "+members_name).deliver_now
+  end
+
+  def email_team_members(mentor)
+    members = TeamsUser.where(team_id: self.id)
+    mentor_info=mentor.fullname + "("+User.find(mentor.user_id).email+")."
+    members.each do |member|
+      if members.user_id != mentor.user_id
+        Mailer.delayed_message(bcc: [User.find(member.user_id).email],
+                               subject: "Team Mentor Reminder",
+                               body: "Your team: "+self.name+" will be mentored by " + mentor_info ).deliver_now
+      end
+    end
+  end
+
+
 
   # Define the size of the team,
   def self.size(team_id)

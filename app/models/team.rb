@@ -89,7 +89,8 @@ class Team < ActiveRecord::Base
       ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{self.id}")
     end
     if half? && dont_have_mentor?
-      mentor = Participant.where(['can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', 0, 0, 0, self.parent_id]).first
+      # mentor = Participant.where(['can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', 0, 0, 0, self.parent_id]).first
+      mentor=assign_mentor
       new_mentor = TeamsUser.create(user_id: mentor.user_id, team_id: self.id)
       TeamUserNode.create(parent_id: parent.id, node_object_id: new_mentor.id)
       ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{self.id}")
@@ -100,6 +101,22 @@ class Team < ActiveRecord::Base
 
     end
     can_add_member
+  end
+
+  def assign_mentor
+    mentors = Participant.where(['can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', 0, 0, 0, self.parent_id])
+    target=0xffff
+    mentor_assigned=mentors.first
+    mentors.each do |mentor|
+      num=TeamsUser.where(user_id: mentor.user_id,).count
+      print(" count="+num.to_s+"\n")
+      if num<target
+        mentor_assigned=mentor
+        target=num
+      end
+    end
+    print(mentor_assigned.name)
+    mentor_assigned
   end
 
   def email_mentor(mentor)

@@ -17,7 +17,7 @@
 
 </div>
 
-<% def get_link_round_review_time_all_links %>
+<% def get_link_round_review_time_all_links(map_id, round) %>
   <% sum_time = 0 %>
   <% links = SubmissionViewingEvent.where(map_id: map_id, round: round) %>
 

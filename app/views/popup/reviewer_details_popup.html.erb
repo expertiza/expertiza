@@ -17,6 +17,64 @@
 
 </div>
 
+<% def get_link_round_review_time_all_links %>
+  <% sum_time = 0 %>
+  <% links = SubmissionViewingEvent.where(map_id: map_id, round: round) %>
+
+  <% links_to_remove = [] %>
+  <% links.each do |link_outer| %> <!-- identify which links to remove from analysis -->
+    <% start_time = link_outer.start_at %>
+    <% end_time = link_outer.end_at %>
+    <!-- now, iterate over all other links -->
+    <% links.each do |link_inner| %>
+      <% if link_inner == link_outer %>
+        <% next %> <!-- continue statement -->
+      <% end %>
+      <% if link_inner.start_at >= link_outer.start_at && link_inner.end_at <= link_outer.end_at %>
+        <% unless links_to_remove.include?(link_inner) %> <!-- don't add link if its already in the array -->
+          <% links_to_remove << link_inner %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+  <% links_to_remove.each do |link_to_remove| %> <!-- remove superfluous links from analysis -->
+    <% links.delete(link_to_remove) %>
+  <% end %>
+
+  <% link_edges_array = [] %>
+  <% links.each do |each_link| %> <!-- create array of link "edges" and sort by time -->
+    <% link_edges_array << {"link"=>each_link.link, "edge_type"=>"start", "time"=>each_link.start_at} %>
+    <% link_edges_array << {"link"=>each_link.link, "edge_type"=>"end", "time"=>each_link.end_at} %>
+  <% end %>
+  <% sorted_link_edges_array = link_edges_array.sort_by{ |k| k["time"] } %>
+
+  <!-- 
+    go through each edge and construct durations. Add durations to create total time.
+    to ensure "dead time" between edges aren't counted, make sure that if an "end" edge time is 
+    recorded,the next edge is a "start" edge, and there are no "open" start edges, then do not
+    record that "dead" duration
+  -->
+  <% sum_time = 0 %>
+  <% open_start_edges = 0 %>
+  <% sorted_link_edges_array.each_with_index  do |current_edge, index| %>
+    <% sorted_link_edges_array.drop(index+1).each do |further_edge| %>
+      <% if current_edge["type"]=="start" %>
+        <% open_start_edges +=1 %>
+      <% elsif current_edge["type"]=="end" %>
+        <% open_start_edges -=1 %>
+      <% end %>
+      <% if current_edge["type"]=="end" && further_edge["type"]=="start" %>
+        <% if open_start_edges == 0 %>
+          <% break %>
+        <% end %>
+      <% end %>
+      <% sum_time += (further_edge["time"] - current_edge["time"]) %>
+      <% break %>
+    <% end %>
+  <% end %>
+  <% sum_time %>
+<% end %>
+
 <% def get_link_round_review_time(map_id, round, link) %>
     <% sum_time = 0 %>
     <% links = SubmissionViewingEvent.where(map_id: map_id, round: round, link: link) %>

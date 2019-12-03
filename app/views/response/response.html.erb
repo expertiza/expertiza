@@ -27,25 +27,19 @@
   jQuery(document).ready(function() {
     var map_id = <%= @map.id %>;
     var round = <%= @current_round %>;
-    startTime(map_id, round, "Expertiza Review");
     
-    window.onblur=function(){
-      checkFocus();
-    }
-
-    window.onfocus=function(){
-      document.title='focused';
-      startTime(map_id, round, "Expertiza Review");
-    }
-    function checkFocus() {
-      if(document.activeElement instanceof HTMLIFrameElement) {
-          document.title='focused';
-          startTime(map_id, round, "Expertiza Review");
-      } else {
-          document.title='not focused';
-          endTime("Expertiza Review");
+    setInterval(function checkFocus() {
+      if (checkFocus.prev == document.hasFocus()) {
+        return;
       }
-    }
+      if (document.hasFocus()) {
+        startTime(map_id, round, "Expertiza Review");
+      } else {
+        endTime("Expertiza Review");
+      }
+      checkFocus.prev = document.hasFocus();
+    }, 50);
+   
     function startTime(map_id, round, link) {
           var t = new Date();
           $.ajax({

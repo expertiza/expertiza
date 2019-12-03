@@ -44,7 +44,7 @@
                   <!-- show review summary for non-checkbox question -->
                   <tr>
                     <td colspan="3" style="padding: 0px;">
-                      <%= render :partial => 'non_checkbox_question_review', :locals => {:question => question, :responses => responses, :col_percent => col_percent} %>
+                      <%= render :partial => 'non_checkbox_question_review', :locals => {:question => question, :responses => responses, :col_percent => col_percent, :col_percent_comment => col_percent_comment} %>
                     </td>
                   </tr>
               <% end %>

@@ -64,6 +64,33 @@ module ReportFormatterHelper
   def answer_tagging_report(params, _session = nil)
     assign_basics(params)
     tag_prompt_deployments = TagPromptDeployment.where(assignment_id: @id)
+
+    # tag_prompt_deployment_ids = []
+    # tag_prompt_deployments.each do |tag_prompt_deployment| 
+    #   tag_prompt_deployment_id = tag_prompt_deployment.id
+    #   if tag_prompt_deployment_id not in tag_prompt_deployment_ids
+    #     tag_prompt_deployment_ids.append(tag_prompt_deployment_ids)
+
+    # questionnaire_ids = tag_prompt_deployments.select(:questionnaire_id).uniq
+
+    # questionnaire_ids.each do |questionnaire_id|
+    #   questionnaire_specific_tag_prompt_deployments = tag_prompt_deployments.where(questionnaire_id: questionnaire_id)
+    #   tag_prompt_deployment_ids = questionnaire_specific_tag_prompt_deployments.select(:id).uniq
+    #   answer_tags = []
+    #   tag_prompt_deployment_ids.each do |tag_prompt_deployment_id|
+    #     answer_tags += AnswerTag.where(tag_prompt_deployment_id: tag_prompt_deployment_id)
+    # taggers = answer_tags.select(:id).uniq
+    # taggers.each do |tagger|
+    #   tags = AnswerTag.where(user_id: tagger)
+    #   tag_updated_times = tags.map(&:updated_at)
+    #   tag_updated_times.sort_by{|time_string| Time.parse(time_string)}.reverse
+    #   number_of_updated_time = tag_updated_times.length
+    #   tag_update_intervals = []
+    #   for i in 1..number_of_updated_time do
+    #     tag_update_intervals.append(tag_updated_times[i] - tag_updated_times[i-1])
+    #   end
+
+
     @questionnaire_tagging_report = {}
     @user_tagging_report = {}
     tag_prompt_deployments.each do |tag_dep|
@@ -97,12 +124,16 @@ module ReportFormatterHelper
 
   def user_summary_report(line)
     if @user_tagging_report[line.user.name].nil?
-      @user_tagging_report[line.user.name] = VmUserAnswerTagging.new(line.user, line.percentage, line.no_tagged, line.no_not_tagged, line.no_tagable)
+      # E1993 Adding extra filed of interval array into data structure
+
+      @user_tagging_report[line.user.name] = VmUserAnswerTagging.new(line.user, line.percentage, line.no_tagged, line.no_not_tagged, line.no_tagable, line.tag_update_intervals)
     else
       @user_tagging_report[line.user.name].no_tagged += line.no_tagged
       @user_tagging_report[line.user.name].no_not_tagged += line.no_not_tagged
       @user_tagging_report[line.user.name].no_tagable += line.no_tagable
       @user_tagging_report[line.user.name].percentage = calculate_formatted_percentage(line)
+      @user_tagging_report[line.user.name].tag_update_intervals = line.tag_update_intervals
+      # E1993 interval array doesn't gets updated by new records in TagPromptDeployment, it's once computed and final (when you generate a new report)
     end
   end
 

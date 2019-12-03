@@ -10,7 +10,7 @@ describe UsersController do
   let(:student6) { build(:student, role_id: nil, name: :lilith)}
 
   let(:institution1) {build(:institution, id: 1)}
-  let(:requested_user1) {build(:requested_user, id: 4, status: nil)}
+  let(:requested_user1) {create(:requested_user, id: 4, status: nil)}
   #let(:requested_user1) {RequestedUser.new id: 4, name: 'requester1', role_id: 2, fullname: 're, requester1',
   #  institution_id: 1, email: 'requester1@test.com', status: nil, self_introduction: 'no one'}
   let(:superadmin) {build(:superadmin)}

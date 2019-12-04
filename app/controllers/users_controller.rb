@@ -56,23 +56,34 @@ class UsersController < ApplicationController
     redirect_to :back
   end
 
-  # for displaying the list of users
+  # Populates the list of users to be displayed on the UI.
   def list
     user = session[:user]
-    search_name = ".*"
+
+    # Retrieves the search by user names, full names and or email; all criterias that are available
+    search_uname, search_fname, search_email = search_parameters
+
+    # Passes the above received search criterias to the User model to populate the list accordingly.
+    @users = user.get_user_list search_uname, search_fname, search_email
+  end
+
+  # Modularized the code to pass the search parameters, if found in the search textboxes, to the list method that
+  # generates the list of users to be displayed on the UI
+  def search_parameters
+    search_uname = ".*"
     search_fname = ".*"
-    search_id = ".*"
     search_email = ".*"
 
-    search_name = ".*" + params[:search_name].strip + ".*" if params[:search_name].present?
+    # Appends the user name to the search criteria, if found in the username text box
+    search_uname = ".*" + params[:search_name].strip + ".*" if params[:search_name].present?
 
-    search_id = ".*" + params[:search_id].strip + ".*" if params[:search_id].present?
-
+    # Appends the full name to the search criteria, if found in the name text box
     search_fname = ".*" + params[:search_fname].strip + ".*" if params[:search_fname].present?
 
+    # Appends the email to the search criteria, if found in the email text box
     search_email = ".*" + params[:search_email].strip + ".*" if params[:search_email].present?
 
-    @users = user.get_user_list search_name, search_id, search_fname, search_email
+    [search_uname, search_fname, search_email]
   end
 
   def list_pending_requested

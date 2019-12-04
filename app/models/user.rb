@@ -66,7 +66,9 @@ class User < ActiveRecord::Base
     self.recursively_parent_of(p)
   end
 
-  def get_user_list(search_name = '', search_id = '', search_fname = '', search_email = '')
+  # This method populates the model with the data corresponding to the search criteria. If the search criteria is empty
+  # all users based on their role are fetched and sent to the View to render.
+  def get_user_list(search_uname = '', search_id = '', search_fname = '', search_email = '')
     user_list = []
     # If the user is a super admin, fetch all users
     user_list = SuperAdministrator.get_user_list if self.role.super_admin?
@@ -86,19 +88,26 @@ class User < ActiveRecord::Base
       end
     end
 
-    reg_name = Regexp.new(search_name)
-    # reg_id = Regexp.new(search_id)
-    reg_fname = Regexp.new(search_fname)
-    reg_email = Regexp.new(search_email)
+    # Generates a regular expression for the searched username to compare it in the user list
+    regex_uname = Regexp.new(search_uname)
 
-    s = user_list.select do |item|
-      reg_name.match(item.name) \
-      and reg_fname.match(item.fullname) \
-      and reg_email.match(item.email)
+    # Generates a regular expression for the searched full name to compare it in the user list
+    regex_fname = Regexp.new(search_fname)
+
+    # Generates a regular expression for the searched email to compare it in the user list
+    regex_email = Regexp.new(search_email)
+
+    # Selects the users based on the regular expressions generated for username, full name & email searched by the user
+    # Combines all the search criteria with an and operator and returns the results satisfying all the
+    # specified conditions.
+    selected_users = user_list.select do |item|
+      regex_uname.match(item.name) \
+      and regex_fname.match(item.fullname) \
+      and regex_email.match(item.email)
     end
 
-    # and reg_id.match(item.id)
-    s.uniq
+    # Returns the unique users in the selected list of users
+    selected_users.uniq
   end
 
   # Zhewei: anonymized view for demo purposes - 1/3/2018

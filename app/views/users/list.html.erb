@@ -1,25 +1,3 @@
-<script>
-    $(document).ready(() => {
-        const $toggleButton = $('#search_toggle_button');
-        const $advancedSearchForm = $('#advance_search_form');
-        var isAdvancedSearchVisible = false;
-        toggleAdvancedSearch(isAdvancedSearchVisible);
-        $toggleButton.click(() => {
-            isAdvancedSearchVisible = !isAdvancedSearchVisible;
-            toggleAdvancedSearch(isAdvancedSearchVisible);
-        });
-        function toggleAdvancedSearch(isAdvancedSearchVisible) {
-            if (isAdvancedSearchVisible) {
-                $advancedSearchForm.show();
-                $toggleButton.text('Hide Advanced Search');
-            } else {
-                $advancedSearchForm.hide();
-                $toggleButton.text('Advanced Search');
-            }
-        }
-    });
-</script>
-
 <h1>Manage users</h1>
 
 <br/>
@@ -29,16 +7,7 @@
 <% end %>
 
 <%= form_tag :action => 'list', :paginate_show => '1', :num_users => @per_page do %>
-  <div style="margin: 8px auto; display: grid; grid-template-columns: repeat(3, auto) 1fr; grid-gap: 8px; align-items: center">
-    <%= label_tag :search_name, 'Username:' %><%= text_field_tag(:search_name,params[:search_name]) %>
-    <%= submit_tag("Search") %>
-    <a id="search_toggle_button"></a>
-  </div>
-
-  <div id="advance_search_form" style="margin-bottom: 8px; display: grid; grid-template-columns: repeat(4, auto) 1fr; grid-gap: 8px; align-items: center">
-    <%= label_tag :search_full_name, 'Name: ' %><%= text_field_tag(:search_fname,params[:search_fname]) %>
-    <%= label_tag :search_email, 'Email: ' %><%= text_field_tag(:search_email,params[:search_email]) %>
-  </div>
+  <%= render :partial => 'search' %>
 <% end %>
 
 <%= render :partial => 'links' %>
@@ -48,7 +17,7 @@
     <tr><th colspan=5></th><th colspan=3 class="head">E-mail on ...</th></tr>
     <tr><th class="head">Name</th><th class="head">Full Name</th><th class="head">Email Address</th><th class="head">Role</th><th class="head">Parent</th><th class="head">Review</th><th class="head">Submission</th><th class="head">Metareview</th></tr>
     <% for user in @users %>
-      <% if ((params[:show] != 'true' && !user.name(session[:ip]).include?("_hidden")) || params[:show] == 'true')%>
+      <% if (params[:show] != 'true' && !user.name(session[:ip]).include?("_hidden")) || params[:show] == 'true'%>
         <tr class="exp">
           <td><%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %></td>
           <td><%= link_to user.fullname(session[:ip]), :controller=> 'users', :action => 'show', :id => user.id %></td>

@@ -4,7 +4,7 @@ class Answer < ActiveRecord::Base
   include ScoreAnalytic
   belongs_to :question
   belongs_to :response
-  validates :valid_total_cake_score
+  validate :valid_total_cake_score
 
   # Computes the total score for a *list of assessments*
   # parameters
@@ -131,9 +131,6 @@ class Answer < ActiveRecord::Base
   end
   # end added by ferry for answer tagging
 
-
-  private
-
   def valid_total_cake_score
     question_type = Question.select(:question_type)
                         .joins("joins answers on answers.question_id = questions.id")
@@ -147,27 +144,33 @@ class Answer < ActiveRecord::Base
   # this method gets the review answers for other team members for the question
   def get_total_score_for_question(answer_id)
 
+    # get the assignment for the currently answered question
+    assignment_id = ResponseMap.select(:reviewed_object_id)
+                        .joins("join responses on responses.map_id = response_maps.id")
+                        .joins("join answers on responses.id = answers.response_id")
+                        .where("answers.id = ?", answer_id)
+
     # get the reviewer's team id for the currently answered question
-    team_id = Team.select(:team_id)
-                  .joins("join team_users on team_users.team_id = team.id")
-                  .joins("join participants on participants.user_id = team_users.user_id")
+    team_id = Team.select(:id)
+                  .joins("join teams_users on teams_users.team_id = teams.id")
+                  .joins("join participants on participants.user_id = teams_users.user_id")
                   .joins("join response_maps on participants.id = response_maps.reviewer_id
 and participants.parent_id = response_maps.reviewed_object_id")
                   .joins("join responses on responses.map_id = response_maps.id")
-                  .joins("answers on responses.id = answers.response_id")
-                  .where("answers.id = ?", answer_id)
+                  .joins("join answers on responses.id = answers.response_id")
+                  .where("answers.id = ? and teams.parent_id in (?)", answer_id, assignment_id)
 
     # get the reviewer's team members for the currently answered question
     team_members = Participant.select(:id)
-                       .joins("joins team_users on team_users.user_id = participants.user_id")
-                       .joins("joins teams on teams.id = team_users.team_id")
-                       .where("teams.id = ?", team_id)
+                       .joins("join teams_users on teams_users.user_id = participants.user_id")
+                       .joins("join teams on teams.id = teams_users.team_id")
+                       .where("teams.id in (?)", team_id)
 
     # get the reviewer's ratings for his team members
     answers_for_team_members = Answer.select(:answer)
                                    .joins("join responses on responses.id = answers.response_id")
                                    .joins("join response_maps on responses.map_id = response_maps.id")
-                                   .where("response_maps.reviewee_id in (?)", team_members)
+                                   .where("response_maps.reviewee_id in (?) and response_maps.reviewed_object_id = (?) ", team_members, assignment_id)
 
     calculate_total_score(answers_for_team_members)
   end

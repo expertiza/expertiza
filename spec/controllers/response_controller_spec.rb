@@ -1,7 +1,8 @@
 describe ResponseController do
-  let(:instructor) { create(:instructor_user, id: 7) }
+  let(:instructor) { create(:instructor, id: 6) }
   let(:assignment) { create(:assignment, id: 1, instructor: instructor) }
-  let(:participant) { create(:participant, id: 2, user_id: 6, parent_id: 7, assignment: assignment) }
+  let(:test_user) { create(:test_user, id: 10 )}
+  let(:participant) { create(:participant, id: 2, user_id: 10, parent_id: 6, assignment: assignment) }
   let(:review_response) { create(:response, id: 1, map_id: 1) }
   let(:review_response_round1) { build(:response, id: 1, map_id: 1, round: 1, is_submitted: 0) }
   let(:review_response_map) { create(:review_response_map, id: 1, reviewer: participant) }

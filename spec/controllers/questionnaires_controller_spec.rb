@@ -325,6 +325,8 @@ describe QuestionnairesController do
                   add_new_questions: true,
                   new_question: {total_num: 2,
                                  type: 'TextArea'}}
+        allow(AnswerHelper).to receive(:in_active_period).with('3').and_return(true)
+        allow(AnswerHelper).to receive(:delete_existing_responses).with('3')
         post :update, params
         expect(flash[:success]).to eq('You have successfully added a new question. The existing reviews for the questionnaire have been deleted!')
         expect(response).to redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]
@@ -334,9 +336,11 @@ describe QuestionnairesController do
     context 'when params[:add_new_questions] is not nil and the change is out of the period.' do
       it 'redirects to questionnaire#add_new_questions' do
         params = {id: 4,
-                  add_new_questions: true,
+                  add_new_questions: true,  
                   new_question: {total_num: 2,
                                  type: 'TextArea'}}
+        allow(AnswerHelper).to receive(:in_active_period).with('4').and_return(false)
+        allow(AnswerHelper).to receive(:delete_existing_responses).with('4')
         post :update, params
         expect(flash[:success]).to eq('You have successfully added a new question.')
         expect(response).to redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]

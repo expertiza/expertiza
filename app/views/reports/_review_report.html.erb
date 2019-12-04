@@ -18,7 +18,36 @@
 <!-- the table creation is changed top accommodate functionality of tablesorter, which requires thead and tbody seperately. Previously, headers were in tbody only -->
 <div class='reviewreport'>
   <!-- Added headers for tablesorter -->
-  <div id="dialog" title="Success">Grade and comment for reviewer successfully saved.</div>
+
+  <script type='text/javascript'>
+      $(window).load(function () {
+          $("#myTable tbody").sortable().disableSelection();
+          $("#dialog").dialog({
+            autoOpen: false,
+            modal: true,
+            show: "blind",
+            hide: "blind",
+            buttons: {
+              Ok: function() {
+                $(this).dialog("close");
+              }
+            }
+          });
+      });
+  </script>
+              <!--ISSUE  E1980 -->
+  <style>
+        table,tr {
+                border: 1px solid black;
+                }
+
+        th,td {
+                padding: 0px 2px 0px 2px;
+                border: 1px black solid;
+              }
+  </style>
+ 
+ <div id="dialog" title="Success">Grade and comment for reviewer successfully saved.</div>
 
   <p> **In "Team reviewed" column text in:</p>
     <ul style="list-style-type:square">
@@ -34,12 +63,12 @@
     <thead>
     <tr bgcolor='#CCCCCC'>
       <!-- class value decides whether the column should be sortable or not  -->
-      <th width="16%" class="sorter-true">Reviewer <span></span></th>
-      <th width="10%" class="sorter-true">Reviews done<span></span></th>
-      <th width="24%" class="sorter-true">Team reviewed <span></span></th>
-      <th width="13%" class="sorter-true">Score awarded / Avg. score <span></span></th>
-      <th width="13%" class="sorter-true">Metrics <span></span></th>
-      <th class="sorter-false">Assign grade and write comments <span></span></th>
+      <th width="16%" class="sorter-true">Reviewer <span class="glyphicon glyphicon-sort" data-reactid=".0.1.0.$table2.3.0.0.2.1"></span></th>
+      <th width="10%" class="sorter-true">Reviews done<span class="glyphicon glyphicon-sort" data-reactid=".0.1.0.$table2.3.0.0.2.1"></span></th>
+      <th width="24%" class="sorter-true">Team reviewed<span class="glyphicon glyphicon-sort" data-reactid=".0.1.0.$table2.3.0.0.2.1"></span></th>
+      <th width="13%" class="sorter-true">Score awarded / Avg. score<span class="glyphicon glyphicon-sort" data-reactid=".0.1.0.$table2.3.0.0.2.1"></span></th>
+      <th width="13%" class="sorter-true">Metrics<span class="glyphicon glyphicon-sort" data-reactid=".0.1.0.$table2.3.0.0.2.1"></span></th>
+      <th class="sorter-false">Assign grade and write comments</th>
     </tr>
     </thead>
     <tbody>

@@ -227,6 +227,7 @@ FactoryBot.define do
     reply_status 'W'
   end
 
+
   factory :topic, class: SignUpTopic do
     topic_name 'Hello world!'
     assignment { Assignment.first || association(:assignment) }

@@ -1,11 +1,10 @@
 describe ResponseController do
-  let(:instructor) { create(:instructor_user, id: 6) }
-  let(:assignment) { create(:assignment, id: 1, instructor: instructor) }
-  let(:test_user) { create(:test_user, id: 10 )}
-  let(:participant) { create(:participant, id: 2, user_id: 10, parent_id: 6, assignment: assignment) }
-  let(:review_response) { create(:response, id: 1, map_id: 1) }
+  let(:assignment) { build(:assignment, instructor_id: 6) }
+  let(:instructor) { build(:instructor, id: 6) }
+  let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
+  let(:review_response) { build(:response, id: 1, map_id: 1) }
   let(:review_response_round1) { build(:response, id: 1, map_id: 1, round: 1, is_submitted: 0) }
-  let(:review_response_map) { create(:review_response_map, id: 1, reviewer: participant) }
+  let(:review_response_map) { build(:review_response_map, id: 1, reviewer: participant) }
   let(:questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
   let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
   let(:assignment_questionnaire) { build(:assignment_questionnaire) }
@@ -92,10 +91,10 @@ describe ResponseController do
       it 'raise an error and redirects to response#save page' do
         allow(review_response).to receive(:update_attribute).with('additional_comment', 'some comments').and_raise('ERROR!')
         params = {
-          id: 1,
-          review: {
-            comments: 'some comments'
-          }
+            id: 1,
+            review: {
+                comments: 'some comments'
+            }
         }
         session = {user: instructor}
         post :update, params, session
@@ -113,14 +112,14 @@ describe ResponseController do
         allow(Answer).to receive(:create).with(response_id: 1, question_id: 1, answer: '98', comments: 'LGTM').and_return(answer)
         allow(answer).to receive(:update_attribute).with(any_args).and_return('OK!')
         params = {
-          id: 1,
-          review: {
-            comments: 'some comments'
-          },
-          responses: {
-            '0' => {score: 98, comment: 'LGTM'}
-          },
-          isSubmit: 'No'
+            id: 1,
+            review: {
+                comments: 'some comments'
+            },
+            responses: {
+                '0' => {score: 98, comment: 'LGTM'}
+            },
+            isSubmit: 'No'
         }
         session = {user: instructor}
         post :update, params, session
@@ -146,9 +145,9 @@ describe ResponseController do
       allow(Questionnaire).to receive(:questions).and_return(question)
       allow(Answer).to receive(:create).and_return(answer)
       params = {
-        id: 1,
-        feedback: '',
-        return: ''
+          id: 1,
+          feedback: '',
+          return: ''
       }
       get :new, params
       expect(controller.instance_variable_get(:@dropdown_or_scale)).to eq('dropdown')
@@ -210,16 +209,16 @@ describe ResponseController do
       allow(answer).to receive(:update_attribute).with(any_args).and_return('OK!')
       allow_any_instance_of(Response).to receive(:email).and_return('OK!')
       params = {
-        id: 1,
-        review: {
-          questionnaire_id: '1',
-          round: 1,
-          comments: 'no comment'
-        },
-        responses: {
-          '0' => {score: 98, comment: 'LGTM'}
-        },
-        isSubmit: 'No'
+          id: 1,
+          review: {
+              questionnaire_id: '1',
+              round: 1,
+              comments: 'no comment'
+          },
+          responses: {
+              '0' => {score: 98, comment: 'LGTM'}
+          },
+          isSubmit: 'No'
       }
       post :create, params
       expect(response).to redirect_to('/response/save?error_msg=&id=1&msg=Your+response+was+successfully+saved.&review%5Bcomments%5D=no+comment&review%5Bquestionnaire_id%5D=1&review%5Bround%5D=1')
@@ -231,8 +230,8 @@ describe ResponseController do
       allow(ResponseMap).to receive(:find).with('1').and_return(review_response_map)
       allow(review_response_map).to receive(:save).and_return(review_response_map)
       params = {
-        id: 1,
-        return: ''
+          id: 1,
+          return: ''
       }
       session = {user: instructor}
       post :save, params, session
@@ -287,10 +286,10 @@ describe ResponseController do
     end
 
     context 'when params[:return] is survey' do
-      it 'redirects to survey_deployment#pending_surveys page' do
+      it 'redirects to response#pending_surveys page' do
         @params[:return] = 'survey'
         get :redirect, @params
-        expect(response).to redirect_to('/survey_deployment/pending_surveys')
+        expect(response).to redirect_to('/response/pending_surveys')
       end
     end
 
@@ -303,9 +302,32 @@ describe ResponseController do
     end
   end
 
-  # describe '#json' do
-  #  allow(Response).to receive(:find).with(response_id: 1).and_return([review_response])
-  #  allow(response).to receive(:response_id).and_return(1)
-  #  expect(response).to respond_with_content_type(:json)
-  # end
+  describe '#pending_surveys' do
+    context 'when session[:user] is nil' do
+      it 'redirects to root path (/)' do
+        params = {}
+        session = {}
+        get :pending_surveys, params, session
+        expect(response).to redirect_to('/')
+      end
+    end
+
+    context 'when session[:user] is not nil' do
+      it 'renders pending_surveys page' do
+        allow(CourseParticipant).to receive(:where).with(user_id: 6).and_return([double('CourseParticipant', id: 8, parent_id: 1)])
+        allow(AssignmentParticipant).to receive(:where).with(user_id: 6).and_return([participant])
+        survey_deployment = double('SurveyDeployment', id: 1, questionnaire_id: 1, global_survey_id: 1,
+                                   start_date: DateTime.now.in_time_zone - 1.day, end_date: DateTime.now.in_time_zone + 1.day)
+        allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire)
+        allow(CourseSurveyDeployment).to receive(:where).with(parent_id: 1).and_return([survey_deployment])
+        participant.parent_id = 1
+        allow(AssignmentSurveyDeployment).to receive(:where).with(parent_id: 1).and_return([survey_deployment])
+        params = {}
+        session = {user: instructor}
+        get :pending_surveys, params, session
+        expect(controller.instance_variable_get(:@surveys).size).to eq(2)
+        expect(response).to render_template(:pending_surveys)
+      end
+    end
+  end
 end

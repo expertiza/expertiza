@@ -63,7 +63,7 @@ module AnswerHelper
     end
   end
 
-  def in_active_period(questionnaire_id)
+  def self.in_active_period(questionnaire_id)
     assignment, round_number = AssignmentQuestionnaire.get_latest_assignment(questionnaire_id)
     unless assignment.nil?
       start_dates, end_dates = assignment.find_review_period(round_number)

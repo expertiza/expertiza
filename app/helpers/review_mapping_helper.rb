@@ -269,7 +269,9 @@ module ReviewMappingHelper
     # if someone did not do any tagging in 30 seconds, then ignore this interval
     threshold = 30
     intervals = intervals.select{|v| v < threshold}
-    interval_mean = intervals.reduce(:+) / intervals.size.to_f
+    if not intervals.empty?
+      interval_mean = intervals.reduce(:+) / intervals.size.to_f
+    end
     data = {
       labels: [*1..intervals.length],
       datasets: [
@@ -278,10 +280,12 @@ module ReviewMappingHelper
           data: intervals,
           label: "time intervals"
         },
-        {
-          data: Array.new(intervals.length, interval_mean),
-          label: "Mean time spent"
-        }
+        if not intervals.empty?
+          {
+            data: Array.new(intervals.length, interval_mean),
+            label: "Mean time spent"
+          }
+        end
       ]
     }
     options = {

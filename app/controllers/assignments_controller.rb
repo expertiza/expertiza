@@ -93,8 +93,8 @@ class AssignmentsController < ApplicationController
     retrieve_assignment_form
     handle_current_user_timezonepref_nil
     update_feedback_assignment_form_attributes
-    # Adds the instructor as particpant if the "Add yourself as participant?" checkbox is selected during editing
-    # Removes the instructor as particpant if the "Add yourself as participant?" checkbox is unselected during editing (Provided it was selected during creation)
+    # Adds the instructor as participant if the "Add yourself as participant?" checkbox is selected during editing
+    # Removes the instructor as participant if the "Add yourself as participant?" checkbox is unselected during editing (Provided it was selected during creation)
     add_instructor_as_participant(@assignment_form.assignment.id.to_s)
     redirect_to edit_assignment_path @assignment_form.assignment.id
   end

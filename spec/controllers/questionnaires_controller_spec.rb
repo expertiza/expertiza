@@ -340,7 +340,6 @@ describe QuestionnairesController do
                   new_question: {total_num: 2,
                                  type: 'TextArea'}}
         allow(AnswerHelper).to receive(:in_active_period).with('4').and_return(false)
-        allow(AnswerHelper).to receive(:delete_existing_responses).with('4')
         post :update, params
         expect(flash[:success]).to eq('You have successfully added a new question.')
         expect(response).to redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]

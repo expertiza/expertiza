@@ -1,5 +1,5 @@
 describe ResponseController do
-  let(:instructor) { create(:instructor, id: 6) }
+  let(:instructor) { create(:instructor_user, id: 6) }
   let(:assignment) { create(:assignment, id: 1, instructor: instructor) }
   let(:test_user) { create(:test_user, id: 10 )}
   let(:participant) { create(:participant, id: 2, user_id: 10, parent_id: 6, assignment: assignment) }

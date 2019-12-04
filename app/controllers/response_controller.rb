@@ -218,6 +218,8 @@ class ResponseController < ApplicationController
       redirect_to controller: 'submitted_content', action: 'edit', id: @map.response_map.reviewer_id
     when "survey"
       redirect_to controller: 'survey_deployment', action: 'pending_surveys'
+    when "ta_review"
+      redirect_to controller: 'assignments', action: 'list_submissions', id: @map.response_map.assignment.id
     else
       redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
     end

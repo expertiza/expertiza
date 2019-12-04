@@ -51,39 +51,43 @@
           <% team_name_color = get_team_name_color_in_list_submission(team) %>
           <td><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
           <% unless participants.empty? %>
-            <% reviewer = Participant.find_by(:parent_id => @assignment.id, :user_id => session[:user].id)%>
-            <% @existing_responses = Response.where(:map_id => ReviewResponseMap.find_by(:reviewed_object_id => @assignment.id, :reviewer_id => reviewer.id, :reviewee_id => team.id).id ) %>
             <% if @assignment.get_current_stage() == "Finished" %>
-              <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %>
-            <% elsif @assignment.get_current_stage() == "review" && @existing_responses.empty? %>
-              <% ReviewResponseMap.create(reviewee_id: team.id, reviewer_id: reviewer.id, reviewed_object_id: @assignment.id) %>
-              <% map = ReviewResponseMap.find_by(reviewee_id: team.id, reviewer_id: reviewer.id, reviewed_object_id: @assignment.id) %>
-              <%= link_to 'Begin Review', { controller: 'response', action: 'new', :id => map.id } %><br>
-            <% else %>
-              <% map1 = ReviewResponseMap.find_by(reviewee_id: team.id, reviewer_id: reviewer.id, reviewed_object_id: @assignment.id) %>
-              <% @sorted_responses = Array.new %>
-              <% @sorted_responses = Response.where(:map_id => map1.id) %>
-              <% #for element in @prev %>
-                <% #@sorted_responses << element %>
-              <% #end %>
-              <% @sorted_responses = @sorted_responses.sort_by {|obj| obj.updated_at} # the latest should be at the last %>
-              <% @latest_response = @sorted_responses.last %>
-              <%if @latest_response.round.nil?%>
-                  <% last_response_round = AssignmentDueDate.done_in_assignment_round(@assignment.id, @latest_response) %>
-              <%else%>
-                  <% last_response_round = @latest_response.round %>
-              <%end%>
-              <% current_round = @assignment.number_of_current_round(topic_id) %>
-              <%= link_to "View Review", {:controller => 'response', :action => 'view', :id => @latest_response.id} %><br>
-              <% if last_response_round == current_round %>
-              <% latest_submission = team.most_recent_submission %>
-                <% if !@latest_response.is_submitted %>
-                  <%= link_to "Edit Review", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
-                <% elsif !latest_submission.nil? && @latest_response.updated_at < latest_submission.updated_at %>
-                  <%= link_to "Update Review", {:controller => 'response', :action => 'new', :id => map1.id} %>
-                <%end%>
-              <% else %>
-                <%= link_to "Update Review", {:controller => 'response', :action => 'new', :id => map1.id} %>
+              <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %><br>
+            <% end %>
+            <% reviewer = Participant.find_by(:parent_id => @assignment.id, :user_id => session[:user].id)%>
+            <% if !reviewer.nil? %>
+              <% @mapping = ReviewResponseMap.find_by(:reviewed_object_id => @assignment.id, :reviewer_id => reviewer.id, :reviewee_id => team.id) %>
+              <% if @assignment.get_current_stage() == "review" && @mapping.nil? %>
+                <% ReviewResponseMap.create(reviewee_id: team.id, reviewer_id: reviewer.id, reviewed_object_id: @assignment.id) %>
+                <% map = ReviewResponseMap.find_by(reviewee_id: team.id, reviewer_id: reviewer.id, reviewed_object_id: @assignment.id) %>
+                <%= link_to 'Begin Review', { controller: 'response', action: 'new', :id => map.id, :return => "ta_review" } %><br>
+              <% elsif @assignment.get_current_stage() == "review" ||  @assignment.get_current_stage() == "Finished" %>
+                <% map1 = ReviewResponseMap.find_by(reviewee_id: team.id, reviewer_id: reviewer.id, reviewed_object_id: @assignment.id) %>
+                <% @sorted_responses = Array.new %>
+                <% @sorted_responses = Response.where(:map_id => map1.id) %>
+                <% if @sorted_responses.empty?%>
+                  <%= link_to 'Begin Review', { controller: 'response', action: 'new', :id => map1.id, :return => "ta_review" } %><br>
+                <% else %>
+                  <% @sorted_responses = @sorted_responses.sort_by {|obj| obj.updated_at} # the latest should be at the last %>
+                  <% @latest_response = @sorted_responses.last %>
+                  <%if @latest_response.round.nil?%>
+                      <% last_response_round = AssignmentDueDate.done_in_assignment_round(@assignment.id, @latest_response) %>
+                  <%else%>
+                      <% last_response_round = @latest_response.round %>
+                  <%end%>
+                  <% current_round = @assignment.number_of_current_round(topic_id) %>
+                  <%= link_to "View Review", {:controller => 'response', :action => 'view', :id => @latest_response.id} %><br>
+                  <% if last_response_round == current_round %>
+                  <% latest_submission = team.most_recent_submission %>
+                    <% if !@latest_response.is_submitted %>
+                      <%= link_to "Edit Review", {:controller => 'response', :action => 'edit', :id => @latest_response.id, :return => "ta_review" } %>
+                    <% else %>
+                      <%= link_to "Update Review", {:controller => 'response', :action => 'new', :id => map1.id, :return => "ta_review" } %>
+                    <%end%>
+                  <% else %>
+                    <%= link_to "Update Review", {:controller => 'response', :action => 'new', :id => map1.id, :return => "ta_review" } %>
+                  <% end %>
+                <% end %>
               <% end %>
             <% end %>
           <% end %>

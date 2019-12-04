@@ -22,7 +22,7 @@
 <h2>Summary Report for assignment: <%= @assignment.name %></h2>
 <h4>Team: <%= @team.name %></h4>
 <!--Obtain topic name from assignment helper-->
-<% topic_id, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(@team) %>
+<% topic_id_num, topic_id, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(@team) %>
 <% if @assignment.topics? %>
   <h4>Topic: <%= topic_id + '. ' + topic_name %></h4>
 <% end %>

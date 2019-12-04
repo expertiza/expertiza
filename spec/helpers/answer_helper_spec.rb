@@ -3,9 +3,9 @@ describe AnswerHelper do
         @assignment1 = double('Assignment', id: 1)
         allow(Assignment).to receive(:find).with('1').and_return(@assignment1)
         @questionnaire1 = double('Questionnaire', id: 1)
-        allow(Questionnaire).to receive(:find).with('3').and_return(@questionnaire1)
+        allow(Questionnaire).to receive(:find).with('1').and_return(@questionnaire1)
         @questionnaire2 = double('Questionnaire', id: 2)
-        allow(Questionnaire).to receive(:find).with('4').and_return(@questionnaire2)
+        allow(Questionnaire).to receive(:find).with('2').and_return(@questionnaire2)
         @duedate1 = double('Duedate', id: 1, due_at: '2019-11-30 23:30:12', deadline_type_id: 1, parent_id: 1, round: 1)
         allow(DueDate).to receive(:find).with('1').and_return(@duedate1)
         @duedate2 = double('Duedate', id: 2, due_at: '2019-12-30 23:30:12', deadline_type_id: 2, parent_id: 1, round: 1)
@@ -22,37 +22,33 @@ describe AnswerHelper do
 
     describe '#delete_existing_responses' do
       it 'renders questionnaires#view page' do
-        allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
-        params = {id: 1}
-        get :view, params
-        expect(response).to render_template(:view)
+
       end
     end
 
     describe '#review_mailer' do
       it 'renders questionnaires#view page' do
-        allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
-        params = {id: 1}
-        get :view, params
-        expect(response).to render_template(:view)
+
+
       end
     end
 
     describe '#delete_answers' do
       it 'renders questionnaires#view page' do
-        allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
-        params = {id: 1}
-        get :view, params
-        expect(response).to render_template(:view)
+
       end
     end
 
     describe '#in_active_period' do
-      it 'renders questionnaires#view page' do
-        allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
-        params = {id: 1}
-        get :view, params
-        expect(response).to render_template(:view)
+      it 'returns true when the current time is in active period' do
+        allow(AssignmentQuestionnaire).to receive(:in_active_period).with('1').and_return(@assignment1,'1')
+        @result1 = in_active_period(1)
+        expect(@result1).to eql(true)
+      end
+      it 'returns false when the current time is not in active period' do
+        allow(AssignmentQuestionnaire).to receive(:in_active_period).with('2').and_return(@assignment1,'2')
+        @result2 = in_active_period(2)
+        expect(@result2).to eql(false)
       end
     end
 end

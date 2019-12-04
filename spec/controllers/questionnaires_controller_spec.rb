@@ -10,12 +10,13 @@ describe QuestionnairesController do
   let(:instructor) { build(:instructor, id: 6) }
   let(:instructor2) { build(:instructor, id: 66) }
   let(:ta) { build(:teaching_assistant, id: 8) }
-  let(:assignment_questionnaire) {build(:assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 1, used_in_round: 1)}
-  let(:due_date) {build(:due_date, id: 1, due_at: '2019-11-30 23:30:12', deadline_type_id: 1, parent_id: 1, round: 1)}
-  let(:due_date) {build(:due_date, id: 1, due_at: '2019-12-30 23:30:12', deadline_type_id: 2, parent_id: 1, round: 1)}
-  let(:assignment_questionnaire) {build(:assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 2, used_in_round: 2)}
-  let(:due_date) {build(:due_date, id: 1, due_at: '2020-01-30 23:30:12', deadline_type_id: 1, parent_id: 1, round: 2)}
-  let(:due_date) {build(:due_date, id: 1, due_at: '2020-02-30 23:30:12', deadline_type_id: 2, parent_id: 1, round: 2)}
+  let(:assignment) { build(:assignment, id: 1) }
+  let(:assignment_questionnaire1) {build(:assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 1, used_in_round: 1)}
+  let(:due_date1) {build(:due_date, id: 1, due_at: '2019-11-30 23:30:12', deadline_type_id: 1, parent_id: 1, round: 1)}
+  let(:due_date2) {build(:due_date, id: 2, due_at: '2019-12-30 23:30:12', deadline_type_id: 2, parent_id: 1, round: 1)}
+  let(:assignment_questionnaire2) {build(:assignment_questionnaire, id: 2, assignment_id: 1, questionnaire_id: 2, used_in_round: 2)}
+  let(:due_date3) {build(:due_date, id: 3, due_at: '2020-01-30 23:30:12', deadline_type_id: 1, parent_id: 1, round: 2)}
+  let(:due_date4) {build(:due_date, id: 4, due_at: '2020-02-30 23:30:12', deadline_type_id: 2, parent_id: 1, round: 2)}
 
   before(:each) do
     allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)

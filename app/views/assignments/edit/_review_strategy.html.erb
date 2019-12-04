@@ -139,6 +139,15 @@
     </td>
   </tr>
 
+  <tr>
+    <td>
+      <input name='add_instructor' type="hidden" value="false"/>
+      <%= check_box_tag('add_instructor', value = "1", checked = is_instructor_a_participant?)%>
+      <%= label_tag('add_instructor', 'Add yourself as a participant?') %>
+      <img src="/assets/info.png" title='If you add yourself as a participant then you will be able to perform reviews of students for this assignment'>
+    </td>
+  </tr>
+
   <!--#E1870-->
   <% if @assignment_form.assignment.rounds_of_reviews > 1 %>
     <tr>

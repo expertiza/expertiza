@@ -18,8 +18,19 @@
           });
       });
   </script>
+              <!--ISSUE  E1980 -->
+  <style>
+        table,tr {
+                border: 1px solid black;
+                }
 
-  <div id="dialog" title="Success">Grade and comment for reviewer successfully saved.</div>
+        th,td {
+                padding: 0px 2px 0px 2px;
+                border: 1px black solid;
+              }
+  </style>
+ 
+ <div id="dialog" title="Success">Grade and comment for reviewer successfully saved.</div>
 
   <p> **In "Team reviewed" column text in:</p>
     <ul style="list-style-type:square">
@@ -31,16 +42,16 @@
 </ul>
   <p>&nbsp;</p>
   
-  <table id="myTable" class="tbl_heat tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
+  <table id="myTable" class="tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
     <thead>
     <tr bgcolor='#CCCCCC'>
       <!-- class value decides whether the column should be sortable or not  -->
-      <th width="16%" class="sorter-true">Reviewer <span></span></th>
-      <th width="10%" class="sorter-true">Reviews done<span></span></th>
-      <th width="24%" class="sorter-true">Team reviewed <span></span></th>
-      <th width="13%" class="sorter-true">Score awarded / Avg. score <span></span></th>
-      <th width="13%" class="sorter-true">Metrics <span></span></th>
-      <th class="sorter-false">Assign grade and write comments <span></span></th>
+      <th width="16%" class="sorter-true">Reviewer <span class="glyphicon glyphicon-sort" data-reactid=".0.1.0.$table2.3.0.0.2.1"></span></th>
+      <th width="10%" class="sorter-true">Reviews done<span class="glyphicon glyphicon-sort" data-reactid=".0.1.0.$table2.3.0.0.2.1"></span></th>
+      <th width="24%" class="sorter-true">Team reviewed<span class="glyphicon glyphicon-sort" data-reactid=".0.1.0.$table2.3.0.0.2.1"></span></th>
+      <th width="13%" class="sorter-true">Score awarded / Avg. score<span class="glyphicon glyphicon-sort" data-reactid=".0.1.0.$table2.3.0.0.2.1"></span></th>
+      <th width="13%" class="sorter-true">Metrics<span class="glyphicon glyphicon-sort" data-reactid=".0.1.0.$table2.3.0.0.2.1"></span></th>
+      <th class="sorter-false">Assign grade and write comments</th>
     </tr>
     </thead>
     <tbody>

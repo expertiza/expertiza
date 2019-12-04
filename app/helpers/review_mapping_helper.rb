@@ -263,6 +263,44 @@ module ReviewMappingHelper
     horizontal_bar_chart data, options
   end
 
+  def display_tagging_interval_chart(intervals)
+    threshold = 30
+    intervals = intervals.select{|v| v < threshold}
+    interval_mean = intervals.reduce(:+) / intervals.size.to_f
+    data = {
+      labels: [*1..intervals.length],
+      datasets: [
+        {
+          backgroundColor: "rgba(255,99,132,0.8)",
+          data: intervals,
+          label: "time intervals"
+        },
+        {
+          data: Array.new(intervals.length, interval_mean),
+          label: "Mean time spent"
+        }
+      ]
+    }
+    options = {
+      width: "200",
+      height: "125",
+      scales: {
+        yAxes: [{
+          stacked: false,
+          ticks: {
+                beginAtZero: true
+            }
+        }],
+        xAxes: [{
+          stacked: false
+        }]
+      }
+    }
+    line_chart data, options
+  end
+
+
+
   def list_review_submissions(participant_id, reviewee_team_id, response_map_id)
     participant = Participant.find(participant_id)
     team = AssignmentTeam.find(reviewee_team_id)

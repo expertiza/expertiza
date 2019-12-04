@@ -109,11 +109,11 @@ class ResponseController < ApplicationController
     # or when there has been a submission after the most recent review in this round.
     @response = Response.where(map_id: @map.id, round: @current_round.to_i).order(updated_at: :desc).first
     
-    # Assignment team will be nil for Meta Reviews.
+    # Assignment team will be nil for Meta Reviews.s
     # Hence rescuing from exception and assigning local variable to nil
     begin
       assignment_team = AssignmentTeam.find(@map.reviewee_id)
-    rescue
+    rescue ActiveRecord::RecordNotFound => e
       assignment_team = nil
     end
 

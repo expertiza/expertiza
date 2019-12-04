@@ -1,11 +1,12 @@
 <script>
+
     $.tablesorter.addParser({
         id: "eudate",
-        is: function(s) {
+        is: function (s) {
             return false;
         },
-        format: function(s,table) {
-            s = s.replace(/\-/g,"/");
+        format: function (s, table) {
+            s = s.replace(/\-/g, "/");
             s = s.replace(/(\d{1,2})[\/\.](\d{1,2})[\/\.](\d{4})/, "$3/$1/$2");
             s = s.split(" ")[0];
             $('#test').html(s);
@@ -13,30 +14,42 @@
         },
         type: "numeric"
     });
-    $(function () {
-     /*E: 1980Function for sorting the table */
 
-     $("#teammateReviewTable").tablesorter({
-        dateFormat : "mm/dd/yyyy", //E1980: set the default date format
-         headers: {
-            3:{sorter:'eudate'}
-         },
-       sortList: [[0,0]] // E1980: sort First Column by default when page loads
-     });
-   });
- </script>
+    $(function () {
+        /*E: 1980Function for sorting the table */
+        $("#teammateReviewTable").tablesorter({
+            dateFormat: "mmddyyyy", //E1980: set the default date format
+            dateFormat: "mm/dd/yyyy", //E1980: set the default date format
+            headers: {
+                3: {sorter: 'eudate'}
+            },
+            sortList: [[0, 0]] // E1980: sort First Column by default when page loads
+        });
+    });
+    function changeVisibilityToVisible() {
+        $('.changeVisibility').css({"visibility": "visible"});
+    }
+
+    function changeVisibilityToCollapse() {
+        $('.changeVisibility').css({"visibility": "collapse"});
+    }
+</script>
+<style>
+  .changeVisibility{
+    visibility: collapse;
+  }
+</style>
 
 <!--E1877: table teammateReviewTable modified-->
 <div class = 'reviewreport'>
-  <div id="test"></div>
 <table id= "teammateReviewTable" cellspacing='0' cellpadding='2' border=0 class="table table-striped">
 <thead>
 <!--E1877: "sorter-true" included to sort the table using each attribute-->
  <tr bgcolor='#CCCCCC'>
- <th class="sorter-true" >Reviewer</th>
- <th class="sorter-true" ># teammate reviews done</th>
- <th class="sorter-false" >Teammate reviewed</th>
- <th class="sorter-true"  >Last reviewed at</th>
+ <th class="sorter-true" onclick="changeVisibilityToCollapse()">Reviewer</th>
+ <th class="sorter-true" onclick="changeVisibilityToCollapse()"># teammate reviews done</th>
+ <th class="sorter-true" onclick="changeVisibilityToVisible()">Teammate reviewed</th>
+ <th class="sorter-true" onclick="changeVisibilityToVisible()">Last reviewed at</th>
  </tr>
 </thead>
 
@@ -97,11 +110,11 @@
 		<%if @cntResponse < @rspan-1 %>
                  	 </tr>
 	    	 	 <tr>
-		  	 <td bgcolor=<%= @bgcolor %> style="visibility: collapse;" >
+		  	 <td class = "changeVisibility" bgcolor=<%= @bgcolor %>>
                			 <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id => @id%>
                	  	 </td>
                    	 <!--# teammate reviews done-->
-             	    	<td bgcolor=<%= @bgcolor %>  align = "left" style="visibility: collapse;" >
+             	    	<td bgcolor=<%= @bgcolor %>  align = "left" class = "changeVisibility" >
               			 <% if @team_member_count == 1 %>
                				<%= '--' %>
             			 <% else %>
@@ -127,11 +140,11 @@
 		<%if @cntResponse < @rspan-1 %>
                  </tr>
                  <tr>
-                  <td bgcolor=<%= @bgcolor %> style="visibility: collapse;" >
+                  <td class = "changeVisibility" bgcolor=<%= @bgcolor %>>
                          <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id => @id%>
                    </td>
                     <!--# teammate reviews done-->
-                    <td bgcolor=<%= @bgcolor %>  align = "left" style="visibility: collapse;" >
+                    <td bgcolor=<%= @bgcolor %>  align = "left" class = "changeVisibility" >
                          <% if @team_member_count == 1 %>
                                 <%= '--' %>
                          <% else %>

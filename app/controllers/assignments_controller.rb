@@ -2,7 +2,7 @@ class AssignmentsController < ApplicationController
   include AssignmentHelper
   autocomplete :user, :name
   before_action :authorize
-  helper_method :is_instructor_a_participant?
+  helper_method :is_instructor_a_participant?      # Allows this method to be accessible from Assignment view
   
   def action_allowed?
     if %w[edit update list_submissions].include? params[:action]
@@ -47,7 +47,7 @@ class AssignmentsController < ApplicationController
         assignment_form_params[:assignment_questionnaire] = ques_array
         assignment_form_params[:due_date] = due_array
         @assignment_form.update(assignment_form_params, current_user)
-        add_instructor_as_participant(exist_assignment.id.to_s)     #Calls a method which checks if the instructor wants to add himself as a participant to the newly created assignment
+        add_instructor_as_participant(exist_assignment.id.to_s)     #Calls a method which checks if the instructor wants to add himself as a participant to the currently created assignment
         aid = Assignment.find_by(name: @assignment_form.assignment.name).id
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
         redirect_to edit_assignment_path aid
@@ -93,6 +93,8 @@ class AssignmentsController < ApplicationController
     retrieve_assignment_form
     handle_current_user_timezonepref_nil
     update_feedback_assignment_form_attributes
+    # Adds the instructor as particpant if the "Add yourself as participant?" checkbox is selected during editing
+    # Removes the instructor as particpant if the "Add yourself as participant?" checkbox is unselected during editing (Provided it was selected during creation)
     add_instructor_as_participant(@assignment_form.assignment.id.to_s)
     redirect_to edit_assignment_path @assignment_form.assignment.id
   end
@@ -380,6 +382,9 @@ class AssignmentsController < ApplicationController
     ExpertizaLogger.info LoggerMessage.new("", session[:user].name, "The assignment was saved: #{@assignment_form.as_json}", request)
   end
 
+  # Checks if the "Add yourself as particpant" checkbox is selected for the currently created/edited assignment
+  # If it is selected during creation or editing, then the instructor is added as a particpant to the newly created assignment
+  # Also, if the option is unselected during editing, then the instructor is removed as a particpant
   def add_instructor_as_participant(assignment_id)
     if params[:add_instructor] == 'false' and is_instructor_a_participant? == true
       delete_instructor_as_participant(assignment_id,session[:user].id)
@@ -389,10 +394,10 @@ class AssignmentsController < ApplicationController
     end
   end
 
+  # Returns true if the instructor is already a participant for the assignment, else returns false
   def is_instructor_a_participant?
     instructor_id = session[:user].id
     assignment_id = @assignment_form.assignment.id.to_s
-
     if assignment_id != nil
       @is_instructor_a_participant = Participant.where(user_id: instructor_id , parent_id: assignment_id)
       if @is_instructor_a_participant.present?
@@ -402,6 +407,7 @@ class AssignmentsController < ApplicationController
     return false
   end
 
+  # method which removes instructor as a participant for the assignment
   def delete_instructor_as_participant(assignment_id , instructor_id)
     Participant.where(user_id: instructor_id , parent_id: assignment_id).destroy_all
   end

@@ -9,26 +9,26 @@ class GradesController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'view_my_scores'
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator',
-       'Student'].include? current_role_name and
-      are_needed_authorizations_present?(params[:id], "reader", "reviewer") and
-      check_self_review_status
-    when 'view_team'
-      if ['Student'].include? current_role_name # students can only see the head map for their own team
-        participant = AssignmentParticipant.find(params[:id])
-        session[:user].id == participant.user_id
+      when 'view_my_scores'
+        ['Instructor',
+         'Teaching Assistant',
+         'Administrator',
+         'Super-Administrator',
+         'Student'].include? current_role_name and
+            are_needed_authorizations_present?(params[:id], "reader", "reviewer") and
+            check_self_review_status
+      when 'view_team'
+        if ['Student'].include? current_role_name # students can only see the head map for their own team
+          participant = AssignmentParticipant.find(params[:id])
+          session[:user].id == participant.user_id
+        else
+          true
+        end
       else
-        true
-      end
-    else
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator'].include? current_role_name
+        ['Instructor',
+         'Teaching Assistant',
+         'Administrator',
+         'Super-Administrator'].include? current_role_name
     end
   end
 
@@ -36,6 +36,7 @@ class GradesController < ApplicationController
   # an assignment. It lists all participants of an assignment and all the reviews they received.
   # It also gives a final score, which is an average of all the reviews and greatest difference
   # in the scores of all the reviews.
+
   def view
     @assignment = Assignment.find(params[:id])
     questionnaires = @assignment.questionnaires
@@ -67,6 +68,18 @@ class GradesController < ApplicationController
     @questions = retrieve_questions questionnaires, @assignment.id
     # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
     @pscore = @participant.scores(@questions)
+
+    # Changes for E1984. Improve self-review  Link peer review & self-review to derive grades
+    if @assignment.is_selfreview_enabled?
+      @self_review_scores = @participant.scores(@questions, true)
+      avg_self_review_score = Rscore.new(@self_review_scores, :review).my_avg
+      actual_score = Rscore.new(@pscore, :review).my_avg
+      sapa_factor = Math.sqrt(avg_self_review_score / actual_score)
+      final_score_after = sapa_factor * actual_score
+      @new_derived_scores = final_score_after.round(2).to_s + ' (SRC- ' + avg_self_review_score.to_s + ', SAPA: ' + sapa_factor.round(2).to_s + ')'
+    end
+    # Changes End
+
     make_chart
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
     @stage = @participant.assignment.get_current_stage(@topic_id)
@@ -88,6 +101,18 @@ class GradesController < ApplicationController
     questionnaires = @assignment.questionnaires
     @questions = retrieve_questions questionnaires, @assignment.id
     @pscore = @participant.scores(@questions)
+    # Changes for E1984. Improve self-review  Link peer review & self-review to derive grades
+    if @assignment.is_selfreview_enabled?
+      @self_review_scores = @participant.scores(@questions, true)
+      avg_self_review_score = Rscore.new(@self_review_scores, :review).my_avg || 0
+      actual_score = Rscore.new(@pscore, :review).my_avg || 0
+      impact_factor = 10
+      self_score = 1 - ((actual_score-avg_self_review_score).abs/100)
+      composite_final_score = actual_score + (impact_factor * self_score)
+      @new_derived_scores = composite_final_score.round(2).to_s + '(Includes Bonus Points: Self Score * Impact Factor = '+ self_score.round(2).to_s + '* 10)'
+    end
+    # Changes End
+
     @vmlist = []
 
     # loop through each questionnaire, and populate the view model for all data necessary
@@ -235,10 +260,10 @@ class GradesController < ApplicationController
 
   def assign_all_penalties(participant, penalties)
     @all_penalties[participant.id] = {
-      submission: penalties[:submission],
-      review: penalties[:review],
-      meta_review: penalties[:meta_review],
-      total_penalty: @total_penalty
+        submission: penalties[:submission],
+        review: penalties[:review],
+        meta_review: penalties[:meta_review],
+        total_penalty: @total_penalty
     }
   end
 

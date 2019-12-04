@@ -15,18 +15,18 @@ class SignUpSheetController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator',
-       'Student'].include? current_role_name and
-      ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer") : true)
-    else
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator'].include? current_role_name
+      when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
+        ['Instructor',
+         'Teaching Assistant',
+         'Administrator',
+         'Super-Administrator',
+         'Student'].include? current_role_name and
+            ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer") : true)
+      else
+        ['Instructor',
+         'Teaching Assistant',
+         'Administrator',
+         'Super-Administrator'].include? current_role_name
     end
   end
 
@@ -64,20 +64,14 @@ class SignUpSheetController < ApplicationController
   # Renaming delete method to destroy for rails 4 compatible
   def destroy
     @topic = SignUpTopic.find(params[:id])
-    assignment = Assignment.find(params[:assignment_id])
     if @topic
       @topic.destroy
       undo_link("The topic: \"#{@topic.topic_name}\" has been successfully deleted. ")
     else
       flash[:error] = "The topic could not be deleted."
     end
-    # Akshay - redirect to topics tab if there are still any topics left, otherwise redirect to
-    # assignment's edit page
-    if assignment.topics?
-      redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
-    else
-      redirect_to edit_assignment_path(params[:assignment_id])
-    end
+    # changing the redirection url to topics tab in edit assignment view.
+    redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
   end
 
   # prepares the page. shows the form which can be used to enter new values for the different properties of an assignment
@@ -101,19 +95,8 @@ class SignUpSheetController < ApplicationController
     else
       flash[:error] = "The topic could not be updated."
     end
-    # Akshay - correctly changing the redirection url to topics tab in edit assignment view.
-    redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
-  end
-
-  # This deletes all topics for the given assignment
-  def delete_all_topics_for_assignment
-    topics = SignUpTopic.where(assignment_id: params[:assignment_id])
-    topics.each(&:destroy)
-    flash[:success] = "All topics have been deleted successfully."
-    respond_to do |format|
-      format.html { redirect_to edit_assignment_path(params[:assignment_id]) }
-      format.js {}
-    end
+    # changing the redirection url to topics tab in edit assignment view.
+    redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
   end
 
   # This displays a page that lists all the available topics for an assignment.
@@ -345,30 +328,30 @@ class SignUpSheetController < ApplicationController
           topic_due_date = TopicDueDate.where(parent_id: topic.id, deadline_type_id: deadline_type_id, round: i).first rescue nil
           if topic_due_date.nil? # create a new record
             TopicDueDate.create(
-              due_at:                      instance_variable_get('@topic_' + deadline_type + '_due_date'),
-              deadline_type_id:            deadline_type_id,
-              parent_id:                   topic.id,
-              submission_allowed_id:       instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].submission_allowed_id,
-              review_allowed_id:           instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_allowed_id,
-              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id,
-              round:                       i,
-              flag:                        instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].flag,
-              threshold:                   instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].threshold,
-              delayed_job_id:              instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].delayed_job_id,
-              deadline_name:               instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].deadline_name,
-              description_url:             instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].description_url,
-              quiz_allowed_id:             instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].quiz_allowed_id,
-              teammate_review_allowed_id:  instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].teammate_review_allowed_id,
-              type:                       'TopicDueDate'
+                due_at:                      instance_variable_get('@topic_' + deadline_type + '_due_date'),
+                deadline_type_id:            deadline_type_id,
+                parent_id:                   topic.id,
+                submission_allowed_id:       instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].submission_allowed_id,
+                review_allowed_id:           instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_allowed_id,
+                review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id,
+                round:                       i,
+                flag:                        instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].flag,
+                threshold:                   instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].threshold,
+                delayed_job_id:              instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].delayed_job_id,
+                deadline_name:               instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].deadline_name,
+                description_url:             instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].description_url,
+                quiz_allowed_id:             instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].quiz_allowed_id,
+                teammate_review_allowed_id:  instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].teammate_review_allowed_id,
+                type:                       'TopicDueDate'
             )
           else # update an existed record
             topic_due_date.update_attributes(
-              due_at:                      instance_variable_get('@topic_' + deadline_type + '_due_date'),
-              submission_allowed_id:       instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].submission_allowed_id,
-              review_allowed_id:           instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_allowed_id,
-              review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id,
-              quiz_allowed_id:             instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].quiz_allowed_id,
-              teammate_review_allowed_id:  instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].teammate_review_allowed_id
+                due_at:                      instance_variable_get('@topic_' + deadline_type + '_due_date'),
+                submission_allowed_id:       instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].submission_allowed_id,
+                review_allowed_id:           instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_allowed_id,
+                review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].review_of_review_allowed_id,
+                quiz_allowed_id:             instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].quiz_allowed_id,
+                teammate_review_allowed_id:  instance_variable_get('@assignment_' + deadline_type + '_due_dates')[i - 1].teammate_review_allowed_id
             )
           end
         end
@@ -429,8 +412,7 @@ class SignUpSheetController < ApplicationController
     end
     if @sign_up_topic.save
       undo_link "The topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. "
-      # Akshay - correctly changing the redirection url to topics tab in edit assignment view.
-      redirect_to edit_assignment_path(@sign_up_topic.assignment_id) + "#tabs-2"
+      redirect_to edit_assignment_path(@sign_up_topic.assignment_id) + "#tabs-5"
     else
       render action: 'new', id: params[:id]
     end

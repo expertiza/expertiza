@@ -49,14 +49,41 @@ class VmQuestionResponse
                 else
                   ReviewResponseMap.get_assessments_for(team)
                 end
+
+      # Changes for E1984 Improve self-review  Link peer review & self-review to derive grades
+      @self_review_answers = nil
+      # review_map = SelfReviewResponseMap.get_assessments_for(team)
+      review_map = if vary
+                     ReviewResponseMap.get_responses_for_team_round(team, @round)
+                   else
+                     ReviewResponseMap.get_assessments_for(team)
+                   end
+      review_map.each do |review|
+        next unless SelfReviewResponseMap.exists?(review.map_id)
+        mapping = SelfReviewResponseMap.find(review.map_id)
+        next unless mapping && mapping.present?
+        next unless participant.id == mapping.reviewer_id
+        participant = Participant.find(mapping.reviewer_id)
+        @list_of_reviewers << participant
+        @self_review_answers = review
+      end
+      # Changes End
+
       reviews.each do |review|
         review_mapping = ReviewResponseMap.find(review.map_id)
-        if review_mapping.present?
+        if review_mapping && review_mapping.present?
           participant = Participant.find(review_mapping.reviewer_id)
           @list_of_reviewers << participant
         end
       end
-      @list_of_reviews = reviews
+
+      # Changes by E1984. Improve self-review  Link peer review & self-review to derive grades
+      @list_of_reviews = if !@self_review_answers.nil?
+                           reviews + [@self_review_answers]
+                         else
+                           reviews
+                         end
+      # Changes End
     elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"
       reviews = participant.feedback # feedback reviews
       reviews.each do |review|
@@ -91,6 +118,14 @@ class VmQuestionResponse
         add_answer(answer)
       end
     end
+
+    # Changes by Rahul Sethi
+    return if @self_review_answers.nil?
+    answers = Answer.where(response_id: @self_review_answers.response_id)
+    answers.each do |answer|
+      add_answer(answer)
+    end
+    # Changes End
   end
 
   def display_team_members

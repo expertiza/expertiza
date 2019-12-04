@@ -14,7 +14,7 @@ class TeammateReviewQuestionnaire < Questionnaire
     "teammate".to_sym
   end
 
-  def get_assessments_for(participant)
+  def get_assessments_for(participant, _requesting_score = false)
     participant.teammate_reviews
   end
 end

@@ -74,25 +74,26 @@
           <h4 class="modal-title" align="center">Time Distribution</h4>
         </div>
         <div class="modal-body">
-           <div id="chartContainer" style="height: 360px; width: 100%;"></div>
-        </div>
-        <div>
-        <table>
-          <tbody>
-            <tr>
-              <td>Expertiza Review</td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>Other Links</td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>Total Time</td>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
+          <div id="chartContainer" style="height: 360px; width: 100%;"></div>
+          <div id="table">
+            <table>
+              <tbody>
+                <tr>
+                  <td>Expertiza Review</td>
+                  <td id="expertiza"></td>
+                </tr>
+                <tr>
+                  <td>Other Links</td>
+                  <td id="links"></td>
+                </tr>
+                <tr>
+                  <td>Total Time</td>
+                  <td id="total_object_time"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <br style="clear:both;"/>
         </div>
       </div>
     </div>
@@ -160,9 +161,19 @@
       $("#submissionviewingevent table #"+each).html(totalTimeList[each]);
     }       
   }); 
+  function calculateTime(time){
+    var seconds = time % 60;
+    var minutes = (time / 60) % 60;
+    var hours = time / 3600;
+    var final_time = 0;
+    if (parseInt(hours) > 0) {
+    final_time = Math.floor(hours).toString().concat(' h ').concat(Math.floor(minutes).toString().concat(' m ')).concat(Math.floor(seconds).toString().concat(' s'))}
+    else if (parseInt(minutes) > 0) {final_time = Math.floor(minutes).toString().concat(' m ').concat(Math.floor(seconds).toString()).concat(' s');}
+    else {var final_time = seconds.toString().concat(' s')}
+    return final_time;
+  }
   function drawChart(reviewee_id,round){
       var allLinks = timeReportHash[(reviewee_id.toString()).concat(round.toString())];
-      console.log(allLinks);
       var dataArray=[];  // Data to be passed to chart
       var sum_time = 0.0;
       for(i=0;i<allLinks.length;i++){
@@ -172,6 +183,11 @@
         dataPoint["label"] = link_name.slice(0,50)+(link_name.length>30? "...":"");
         dataArray.push(dataPoint);
       }
+      var expertiza_time = 0;
+      var link_time = calculateTime(allLinks[1][1]);
+      document.getElementById('expertiza').innerHTML=calculateTime(allLinks[0][1]);
+      document.getElementById('links').innerHTML=link_time;
+      document.getElementById('total_object_time').innerHTML=allLinks[0][1]+allLinks[1][1]; 
     
     var chart = new CanvasJS.Chart("chartContainer",
     { 

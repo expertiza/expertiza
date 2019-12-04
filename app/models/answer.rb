@@ -131,7 +131,7 @@ class Answer < ActiveRecord::Base
   end
   # end added by ferry for answer tagging
 
-  def valid_total_cake_score
+  def self.valid_total_cake_score
     question_type = Question.select(:question_type)
                         .joins("joins answers on answers.question_id = questions.id")
                         .where("answers.question_id = ?", self[:question_id])
@@ -142,7 +142,7 @@ class Answer < ActiveRecord::Base
   end
 
   # this method gets the review answers for other team members for the question
-  def get_total_score_for_question(answer_id)
+  def self.get_total_score_for_question(answer_id)
 
     # get the assignment for the currently answered question
     assignment_id = ResponseMap.select(:reviewed_object_id)
@@ -176,7 +176,7 @@ and participants.parent_id = response_maps.reviewed_object_id")
   end
 
   # sums up the answer ratings for the given answers
-  def calculate_total_score(question_answers)
+  def self.calculate_total_score(question_answers)
 
     question_score = 0.0
     question_answers.each do |ans|

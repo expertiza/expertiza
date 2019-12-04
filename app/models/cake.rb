@@ -35,7 +35,12 @@ class Cake < ScoredQuestion
       cols = self.size.split(',')[0]
       rows = self.size.split(',')[1]
     end
-
+    current_score = Answer.get_total_score_for_question(answer[:id])
+    if(!current_score.nil?)
+      current_score = current_score.to_s
+    else
+      current_score = 0.to_s
+    end
     html = '<table> <tbody> <tr><td>'
     html += '<label for="responses_' + count.to_s + '"">' + self.txt + '&nbsp;&nbsp;</label>'
     html += '<input class="form-control" id="responses_'+count.to_s+'" min="0" name="responses['+count.to_s+'][score]"'
@@ -43,7 +48,7 @@ class Cake < ScoredQuestion
     html += 'type="number" size = 30> '
     html += '</td></tr></tbody></table>'
     html += '<td width="10%"></td></tr></table>'
-    html += '<p>Total contribution so far:____% </p>'  #display total
+    html += '<p>Total contribution so far: ' + current_score + '% </p>'  #display total
       html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments"' \
         ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
       html += answer.comments unless answer.nil?

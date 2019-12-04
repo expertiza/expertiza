@@ -41,14 +41,13 @@ describe AnswerHelper do
 
     describe '#in_active_period' do
       it 'returns true when the current time is in active period' do
-        allow(AssignmentQuestionnaire).to receive(:in_active_period).with('1').and_return(@assignment1,'1')
-        @result1 = in_active_period(1)
-        expect(@result1).to eql(true)
+        allow(AssignmentQuestionnaire).to receive(:get_latest_assignment).with(1).and_return([@assignment1, 1])
+        allow(@assignment1).to receive(:find_review_period).with(1).and_return([[@duedate1], [@duedate2]])
+        expect(AnswerHelper.in_active_period(1)).to eql(true)
       end
       it 'returns false when the current time is not in active period' do
-        allow(AssignmentQuestionnaire).to receive(:in_active_period).with('2').and_return(@assignment1,'2')
-        @result2 = in_active_period(2)
-        expect(@result2).to eql(false)
+        allow(AssignmentQuestionnaire).to receive(:get_latest_assignment).with('2').and_return(@assignment1, 2)
+        expect(AnswerHelper.in_active_period(2)).to eql(false)
       end
     end
 end

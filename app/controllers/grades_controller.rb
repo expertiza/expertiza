@@ -70,13 +70,22 @@ class GradesController < ApplicationController
     @pscore = @participant.scores(@questions)
 
     # Changes for E1984. Improve self-review  Link peer review & self-review to derive grades
+    # if @assignment.is_selfreview_enabled?
+      # @self_review_scores = @participant.scores(@questions, true)
+      # avg_self_review_score = Rscore.new(@self_review_scores, :review).my_avg
+      # actual_score = Rscore.new(@pscore, :review).my_avg
+      # sapa_factor = Math.sqrt(avg_self_review_score / actual_score)
+      # final_score_after = sapa_factor * actual_score
+      # @new_derived_scores = final_score_after.round(2).to_s + ' (SRC- ' + avg_self_review_score.to_s + ', SAPA: ' + sapa_factor.round(2).to_s + ')'
+    # end
     if @assignment.is_selfreview_enabled?
       @self_review_scores = @participant.scores(@questions, true)
-      avg_self_review_score = Rscore.new(@self_review_scores, :review).my_avg
-      actual_score = Rscore.new(@pscore, :review).my_avg
-      sapa_factor = Math.sqrt(avg_self_review_score / actual_score)
-      final_score_after = sapa_factor * actual_score
-      @new_derived_scores = final_score_after.round(2).to_s + ' (SRC- ' + avg_self_review_score.to_s + ', SAPA: ' + sapa_factor.round(2).to_s + ')'
+      avg_self_review_score = Rscore.new(@self_review_scores, :review).my_avg || 0
+      actual_score = Rscore.new(@pscore, :review).my_avg || 0
+      impact_factor = 10
+      self_score = 1 - ((actual_score-avg_self_review_score).abs/100)
+      composite_final_score = actual_score + (impact_factor * self_score)
+      @new_derived_scores = composite_final_score.round(2).to_s + '(Includes Bonus Points: Self Score * Impact Factor = '+ self_score.round(2).to_s + '* 10)'
     end
     # Changes End
 

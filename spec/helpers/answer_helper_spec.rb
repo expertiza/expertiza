@@ -18,7 +18,9 @@ describe AnswerHelper do
         allow(AssignmentQuestionnaire).to receive(:find).with('1').and_return(@assignment_questionnaire1)
         @assignment_questionnaire2 = double('AssignmentQuestionnaire', id: 2, assignment_id: 1, questionnaire_id: 2, used_in_round: 2)
         allow(AssignmentQuestionnaire).to receive(:find).with('2').and_return(@assignment_questionnaire2)               
-    end
+        @answer1 = double('Answer', response_id: 1)
+        allow(Answer).to receive(:find).with('1').and_return(@answer1)
+      end
 
     describe '#delete_existing_responses' do
       it 'renders questionnaires#view page' do
@@ -35,7 +37,9 @@ describe AnswerHelper do
 
     describe '#delete_answers' do
       it 'renders questionnaires#view page' do
-
+        allow(Answer).to receive(:Where).with(@answer1.response_id).and_return(@answer1)
+        @result = AnswerHelper.delete_answers(@answer1.response_id)
+        expect(@result).to eql([])
       end
     end
 

@@ -46,7 +46,8 @@ describe AnswerHelper do
         expect(AnswerHelper.in_active_period(1)).to eql(true)
       end
       it 'returns false when the current time is not in active period' do
-        allow(AssignmentQuestionnaire).to receive(:get_latest_assignment).with('2').and_return(@assignment1, 2)
+        allow(AssignmentQuestionnaire).to receive(:get_latest_assignment).with(2).and_return([@assignment1, 2])
+        allow(@assignment1).to receive(:find_review_period).with(2).and_return([[@duedate3], [@duedate4]])
         expect(AnswerHelper.in_active_period(2)).to eql(false)
       end
     end

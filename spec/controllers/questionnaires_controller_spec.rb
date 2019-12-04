@@ -10,6 +10,13 @@ describe QuestionnairesController do
   let(:instructor) { build(:instructor, id: 6) }
   let(:instructor2) { build(:instructor, id: 66) }
   let(:ta) { build(:teaching_assistant, id: 8) }
+  let(:assignment_questionnaire) {build(:assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 1, used_in_round: 1)}
+  let(:due_date) {build(:due_date, id: 1, due_at: '2019-11-30 23:30:12', deadline_type_id: 1, parent_id: 1, round: 1)}
+  let(:due_date) {build(:due_date, id: 1, due_at: '2019-12-30 23:30:12', deadline_type_id: 2, parent_id: 1, round: 1)}
+  let(:assignment_questionnaire) {build(:assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 2, used_in_round: 2)}
+  let(:due_date) {build(:due_date, id: 1, due_at: '2020-01-30 23:30:12', deadline_type_id: 1, parent_id: 1, round: 2)}
+  let(:due_date) {build(:due_date, id: 1, due_at: '2020-02-30 23:30:12', deadline_type_id: 2, parent_id: 1, round: 2)}
+
   before(:each) do
     allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
     stub_current_user(instructor, instructor.role.name, instructor.role)
@@ -221,6 +228,8 @@ describe QuestionnairesController do
     before(:each) do
       @questionnaire1 = double('Questionnaire', id: 1)
       allow(Questionnaire).to receive(:find).with('1').and_return(@questionnaire1)
+      @questionnaire2 = double('Questionnaire', id: 2)
+      allow(Questionnaire).to receive(:find).with('2').and_return(@questionnaire2)
       @params = {id: 1,
                  questionnaire: {name: 'test questionnaire',
                                  instructor_id: 6,
@@ -244,7 +253,7 @@ describe QuestionnairesController do
                                                   weight: 10,
                                                   size: '50,3',
                                                   max_label: 'Strong agree',
-                                                  min_label: 'Not agree'}}}
+                                                  min_label: 'Not agree'}}}         
     end
     context 'successfully updates the attributes of questionnaire' do
       it 'redirects to questionnaires#edit page after updating' do
@@ -296,14 +305,26 @@ describe QuestionnairesController do
       end
     end
 
-    context 'when params[:add_new_questions] is not nil' do
+    context 'when params[:add_new_questions] is not nil and the change is in the period.' do
       it 'redirects to questionnaire#add_new_questions' do
         params = {id: 1,
                   add_new_questions: true,
                   new_question: {total_num: 2,
                                  type: 'TextArea'}}
         post :update, params
-        expect(flash[:success]).to eq('You have successfully deleted all the answers corresponding to this Questionnaire!')
+        expect(flash[:success]).to eq('You have successfully added a new question. The existing reviews for the questionnaire have been deleted!')
+        expect(response).to redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]
+      end
+    end
+
+    context 'when params[:add_new_questions] is not nil and the change is out of the period.' do
+      it 'redirects to questionnaire#add_new_questions' do
+        params = {id: 2,
+                  add_new_questions: true,
+                  new_question: {total_num: 2,
+                                 type: 'TextArea'}}
+        post :update, params
+        expect(flash[:success]).to eq('You have successfully added a new question.')
         expect(response).to redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]
       end
     end

@@ -190,9 +190,9 @@
         if (checkbox.is(':checked')) {
             var r = confirm("Enabling self reviews after creating the assignment can cause inconsistencies. Are you sure you want to enable it?")
             if(r == true)
-                checkbox.prop("checked","true");
+                checkbox.prop("checked",true);
             else
-                checkbox.prop("checked","false");
+                checkbox.prop("checked",false);
         }
     }
 </script>

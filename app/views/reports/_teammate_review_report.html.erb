@@ -1,8 +1,26 @@
 <script>
-   $(function () {
+    $.tablesorter.addParser({
+        id: "eudate",
+        is: function(s) {
+            return false;
+        },
+        format: function(s,table) {
+            s = s.replace(/\-/g,"/");
+            s = s.replace(/(\d{1,2})[\/\.](\d{1,2})[\/\.](\d{4})/, "$3/$1/$2");
+            s = s.split(" ")[0];
+            $('#test').html(s);
+            return $.tablesorter.formatFloat(new Date(s).getTime());
+        },
+        type: "numeric"
+    });
+    $(function () {
      /*E: 1980Function for sorting the table */
+
      $("#teammateReviewTable").tablesorter({
-        dateFormat : "mmddyyyy", //E1980: set the default date format
+        dateFormat : "mm/dd/yyyy", //E1980: set the default date format
+         headers: {
+            3:{sorter:'eudate'}
+         },
        sortList: [[0,0]] // E1980: sort First Column by default when page loads
      });
    });
@@ -10,6 +28,7 @@
 
 <!--E1877: table teammateReviewTable modified-->
 <div class = 'reviewreport'>
+  <div id="test"></div>
 <table id= "teammateReviewTable" cellspacing='0' cellpadding='2' border=0 class="table table-striped">
 <thead>
 <!--E1877: "sorter-true" included to sort the table using each attribute-->

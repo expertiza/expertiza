@@ -453,4 +453,33 @@ FactoryBot.define do
     id 1
     name 'fake_site'
   end
+
+  factory :test_user, class: User do
+    name 'username'
+    fullname 'full name'
+    email 'abc@mailinator.com'
+  end
+
+  factory :instructor_user, class: User do
+    name 'instructor6'
+    role { Role.where(name: 'Instructor').first || association(:role_of_instructor) }
+    password 'password'
+    password_confirmation 'password'
+    fullname '6, instructor'
+    email 'expertiza@mailinator.com'
+    parent_id 1
+    private_by_default  false
+    mru_directory_path  nil
+    email_on_review true
+    email_on_submission true
+    email_on_review_of_review true
+    is_new_user false
+    master_permission_granted 0
+    handle 'handle'
+    digital_certificate nil
+    timezonepref 'Eastern Time (US & Canada)'
+    public_key nil
+    copy_of_emails true
+  end
+
 end

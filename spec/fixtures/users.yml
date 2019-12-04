@@ -1,0 +1,13 @@
+user1:
+  id: 1
+  name: 'uvasani'
+  fullname: 'Urvish Vasani'
+  email: "uvasani@ncsu.edu"
+  role_id: 2
+  timezonepref: 'Eastern Time (US & Canada)'
+
+user2:
+  id: 2
+  name: 'vpshah'
+  fullname: 'Vishva Shah'
+  email: 'vpshah@ncsu.edu'

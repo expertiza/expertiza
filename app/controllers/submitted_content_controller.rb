@@ -57,8 +57,41 @@ class SubmittedContentController < ApplicationController
       end
       ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The link has been successfully submitted.', request)
       undo_link("The link has been successfully submitted.")
+      email_all_reviewers(@participant)
     end
     redirect_to action: 'edit', id: @participant.id
+  end
+
+  def email_all_reviewers(participant)
+    if participant.reviewers != []
+      participant.reviewers.each do |reviewer|
+        map = ReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', reviewer.id, participant.team.id]).first
+        responses = Response.where(:map_id => map.id)
+        responses = responses.sort_by { |obj| obj.updated_at }
+
+        # the latest response will be the last
+        latest_response = responses.last
+
+        # we need to pass the id of lastest_response in the URL mentioned in the mail.
+        # this will open the correct /response/edit?id=#{latest_response.id} page for the reviewer when (s)he clicks on it.
+
+        user = User.find(reviewer.user_id)
+        instructor = User.find(user.parent_id)
+        bcc_mail_address = ""
+        if instructor.copy_of_emails == true && user.email_on_submission == true
+          bcc_mail_address = instructor.email
+        else
+          # do noting
+        end
+        if user.email_on_submission?
+          MailerHelper.send_mail_to_reviewer(user,
+                                             bcc_mail_address,
+                                             "You have a new submission to review",
+                                             "update",
+                                             "Please visit https://expertiza.ncsu.edu/response/edit?id=#{latest_response.id} and proceed to peer reviews.").deliver
+        end
+      end
+    end
   end
 
   # Note: This is not used yet in the view until we all decide to do so
@@ -83,17 +116,17 @@ class SubmittedContentController < ApplicationController
   end
 
   def submit_file
-    participant = AssignmentParticipant.find(params[:id])
-    return unless current_user_id?(participant.user_id)
+    @participant = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(@participant.user_id)
     file = params[:uploaded_file]
-    participant.team.set_student_directory_num
+    @participant.team.set_student_directory_num
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
     @current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name]) if params[:current_folder]
     curr_directory = if params[:origin] == 'review'
-                       participant.review_file_path(params[:response_map_id]).to_s + @current_folder.name
+                       @participant.review_file_path(params[:response_map_id]).to_s + @current_folder.name
                      else
-                       participant.team.path.to_s + @current_folder.name
+                       @participant.team.path.to_s + @current_folder.name
                      end
     FileUtils.mkdir_p(curr_directory) unless File.exist? curr_directory
     safe_filename = file.original_filename.tr('\\', "/")
@@ -103,21 +136,22 @@ class SubmittedContentController < ApplicationController
     if params['unzip']
       SubmittedContentHelper.unzip_file(full_filename, curr_directory, true) if get_file_type(safe_filename) == "zip"
     end
-    assignment = Assignment.find(participant.parent_id)
-    team = participant.team
+    assignment = Assignment.find(@participant.parent_id)
+    team = @participant.team
     SubmissionRecord.create(team_id: team.id,
                             content: full_filename,
-                            user: participant.name,
+                            user: @participant.name,
                             assignment_id: assignment.id,
                             operation: "Submit File")
     ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The file has been submitted.', request)
+    email_all_reviewers(@participant)
     # send message to reviewers when submission has been updated
     # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
-    participant.assignment.email(participant.id) rescue nil
+    @participant.assignment.email(@participant.id) rescue nil
     if params[:origin] == 'review'
       redirect_to :back
     else
-      redirect_to action: 'edit', id: participant.id
+      redirect_to action: 'edit', id: @participant.id
     end
   end
 

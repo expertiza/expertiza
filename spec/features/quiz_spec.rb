@@ -312,13 +312,14 @@ describe 'Instructor', js: true do
     expect(student).to have_text(@student2.fullname)
     expect(score).to have_text('100.0')
     expect(page).to have_text('Average score for quiz takers: 100.0 ')
+    expect(page).to have_text('1')
     expect(page).to have_text(@question.txt)
     expect(page).to have_text("Question Type: MultipleChoiceRadio")
     expect(page).to have_text('Answer 1')
     expect(page).to have_text('Answer 2')
     expect(page).to have_text('Answer 3')
     expect(page).to have_text('Answer 4')
-    correct = find(".student_quizzes > b:nth-child(11)")
+    correct = find(".student_quizzes > b:nth-child(12)")
     expect(correct).to have_text('Answer 1')
   end
 end

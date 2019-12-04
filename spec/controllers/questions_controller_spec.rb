@@ -8,3 +8,4 @@ describe QuestionsController do
       end
     end
   end
+end

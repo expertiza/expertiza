@@ -2,9 +2,9 @@ describe AnswerHelper do
     before(:each) do
         @assignment1 = double('Assignment', id: 1)
         allow(Assignment).to receive(:find).with('1').and_return(@assignment1)
-        @questionnaire3 = double('Questionnaire', id: 1)
+        @questionnaire1 = double('Questionnaire', id: 1)
         allow(Questionnaire).to receive(:find).with('3').and_return(@questionnaire3)
-        @questionnaire4 = double('Questionnaire', id: 2)
+        @questionnaire2 = double('Questionnaire', id: 2)
         allow(Questionnaire).to receive(:find).with('4').and_return(@questionnaire4)
         @duedate1 = double('Duedate', id: 1, due_at: '2019-11-30 23:30:12', deadline_type_id: 1, parent_id: 1, round: 1)
         allow(DueDate).to receive(:find).with('1').and_return(@duedate1)
@@ -55,3 +55,4 @@ describe AnswerHelper do
         expect(response).to render_template(:view)
       end
     end
+end

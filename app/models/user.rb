@@ -68,7 +68,7 @@ class User < ActiveRecord::Base
 
   # This method populates the model with the data corresponding to the search criteria. If the search criteria is empty
   # all users based on their role are fetched and sent to the View to render.
-  def get_user_list(search_uname = '', search_id = '', search_fname = '', search_email = '')
+  def get_user_list(search_uname = '', search_fname = '', search_email = '')
     user_list = []
     # If the user is a super admin, fetch all users
     user_list = SuperAdministrator.get_user_list if self.role.super_admin?

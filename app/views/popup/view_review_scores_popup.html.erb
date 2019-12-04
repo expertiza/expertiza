@@ -17,55 +17,55 @@
       <% col_percent = 100/num_responses%>
       <% col_percent_comment = 100/num_responses - 1%>
       <!-- show the team which did the review -->
-      <td colspan="3" style="padding: 0px;">
-        <table width="100%">
-          <tr>
-            <% responses.each do |response_id| %>
-                <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
-                <td><%= team.name(session[:ip]) %></td>
-            <% end %>
-          </tr>
-        </table>
-      </td>
+      <tr>
+        <th colspan="3" style="background-color:#DDDDBB" width="<%= col_percent %>%" >[question] </th>
+        <td colspan="3" style="padding: 0px;" width="(100-<%= col_percent %>)%">
+          <table width="100%">
+            <tr>
+              <% responses.each do |response_id| %>
+                  <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
+                  <td width="<%= col_percent %>%" align="center"><%= team.name(session[:ip]) %></td>
+              <% end %>
+            </tr>
+          </table>
+        </td>
+
+      </tr>
+
 
       <% questions.each do |question| %>
           <% if !question.is_a?(QuestionnaireHeader) && num_responses > 0 %>
-              <% if question.instance_of? Checkbox %>
-                  <!-- Show review summary of checkbox question -->
-                  <tr>
-                    <td colspan="3" style="padding: 0px;">
-                      <%= render :partial => 'checkbox_question_review', :locals => {:question => question, :responses => responses, :col_percent => col_percent} %>
+              <tr>
+                <th colspan="3" style="background-color:#DDDDBB" width="<%= col_percent %>%" > <%= question.txt %></th>
+                <% if question.instance_of? Checkbox %>
+                    <!-- Show review summary of checkbox question -->
+                    <td colspan="3" style="padding: 0px;" width="100-<%= col_percent %>%">
+                      <%= render :partial => 'checkbox_question_review', :locals => {:question => question, :responses => responses} %>
                     </td>
-                  </tr>
-              <% else %>
-                  <tr>
-                    <th colspan="3" style="background-color:#DDDDBB" > <%= question.txt %></th>
-                  </tr>
-                  <!-- show review summary for non-checkbox question -->
-                  <tr>
-                    <td colspan="3" style="padding: 0px;">
+                <% else %>
+                    <!-- show review summary for non-checkbox question -->
+                    <td colspan="3" style="padding: 0px;" width="100-<%= col_percent %>%">
                       <%= render :partial => 'non_checkbox_question_review', :locals => {:question => question, :responses => responses, :col_percent => col_percent, :col_percent_comment => col_percent_comment} %>
                     </td>
-                  </tr>
-              <% end %>
+                <% end %>
+              </tr>
           <% else %>
               <% next %>
           <% end %>
       <% end %>
       <tr>
-        <th align='left' colspan="2" style="background-color:#DDDDBB"> Additional Comment</th>
-      </tr>
-      <tr>
-        <td colspan="3" style="padding: 0px;">
+        <th align='left' colspan="3" style="background-color:#DDDDBB" width="<%= col_percent %>%"> Additional Comment</th>
+        <td colspan="3" style="padding: 0px;" width="100-<%= col_percent %>%">
           <table width="100%">
             <tr>
               <% responses.each do |response_id| %>
                   <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
-                    <td colspan="2" width="<%= col_percent %>%"> <%=sanitize Response.find(response_id).additional_comment %> </td>
+                  <td width="<%= col_percent %>%"> <%=sanitize Response.find(response_id).additional_comment %> </td>
               <% end %>
             </tr>
           </table>
       </tr>
+
     </table>
 
 <% end #loop for keys %>

@@ -263,7 +263,10 @@ module ReviewMappingHelper
     horizontal_bar_chart data, options
   end
 
+
+# E1993 Gnerate chart for review tagging time intervals
   def display_tagging_interval_chart(intervals)
+    # if someone did not do any tagging in 30 seconds, then ignore this interval
     threshold = 30
     intervals = intervals.select{|v| v < threshold}
     interval_mean = intervals.reduce(:+) / intervals.size.to_f

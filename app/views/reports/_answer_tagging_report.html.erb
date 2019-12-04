@@ -49,6 +49,7 @@
                   <td><%= report_line.percentage.to_s %>%</td>
                   <td><%= report_line.no_tagged.to_s %></td>
                   <td><%= report_line.no_not_tagged.to_s %></td>
+                  <!-- E1993 Call chart plotting function from review_mapping_helper -->
                   <td align='left'>
                     <%= display_tagging_interval_chart(report_line.tag_update_intervals) %>
                   </td>

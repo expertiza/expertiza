@@ -5,7 +5,7 @@ class VmUserAnswerTagging
     @no_tagged = no_tagged
     @no_not_tagged = no_not_tagged
     @no_tagable = no_tagable
-    # E1993 Adding interval 
+    # E1993 Adding interval to be passed for graph plotting
     @tag_update_intervals = tag_update_intervals
   end
 

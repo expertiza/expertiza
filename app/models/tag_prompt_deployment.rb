@@ -60,9 +60,6 @@ class TagPromptDeployment < ActiveRecord::Base
           for i in 1..(number_of_updated_time -1) do
             tag_update_intervals.append(tag_updated_times[i] - tag_updated_times[i-1])
           end
-          # tag_update_intervals_as_text = tag_update_intervals.join(',')
-          # convert this back to array with tag_update_intervals_as_text.split(',')
-
 
           percentage = answers.count == 0 ? "-" : format("%.1f", tags.count.to_f / answers.count * 100)
           not_tagged_answers = answers.where.not(id: tagged_answers_ids)

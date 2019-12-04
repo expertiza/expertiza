@@ -1,20 +1,3 @@
-<script type='text/javascript'>
-        $(window).load(function () {
-            $("#myTable tbody").sortable().disableSelection();
-            $("#dialog").dialog({
-                autoOpen: false,
-                modal: true,
-                show: "blind",
-                hide: "blind",
-                buttons: {
-                    Ok: function() {
-                        $(this).dialog("close");
-                    }
-                }
-            });
-        });
-</script>
-
 <!-- the table creation is changed top accommodate functionality of tablesorter, which requires thead and tbody seperately. Previously, headers were in tbody only -->
 <div class='reviewreport'>
   <!-- Added headers for tablesorter -->
@@ -35,19 +18,21 @@
           });
       });
   </script>
-              <!--ISSUE  E1980 -->
-  <style>
+
+<style>
         table,tr {
                 border: 1px solid black;
                 }
 
-        th,td {
+        th,td{
                 padding: 0px 2px 0px 2px;
                 border: 1px black solid;
-              }
+       }
+
   </style>
- 
- <div id="dialog" title="Success">Grade and comment for reviewer successfully saved.</div>
+
+
+  <div id="dialog" title="Success">Grade and comment for reviewer successfully saved.</div>
 
   <p> **In "Team reviewed" column text in:</p>
     <ul style="list-style-type:square">
@@ -59,16 +44,16 @@
 </ul>
   <p>&nbsp;</p>
   
-  <table id="reviewReport" class="tbl_heat tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
+  <table id="reviewReport" class="tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
     <thead>
     <tr bgcolor='#CCCCCC'>
       <!-- class value decides whether the column should be sortable or not  -->
-      <th width="16%" class="sorter-true">Reviewer <span class="glyphicon glyphicon-sort" data-reactid=".0.1.0.$table2.3.0.0.2.1"></span></th>
+      <th width="16%" class="sorter-true">Reviewer<span class="glyphicon glyphicon-sort" data-reactid=".0.1.0.$table2.3.0.0.2.1"></span></th>
       <th width="10%" class="sorter-true">Reviews done<span class="glyphicon glyphicon-sort" data-reactid=".0.1.0.$table2.3.0.0.2.1"></span></th>
       <th width="24%" class="sorter-true">Team reviewed<span class="glyphicon glyphicon-sort" data-reactid=".0.1.0.$table2.3.0.0.2.1"></span></th>
       <th width="13%" class="sorter-true">Score awarded / Avg. score<span class="glyphicon glyphicon-sort" data-reactid=".0.1.0.$table2.3.0.0.2.1"></span></th>
       <th width="13%" class="sorter-true">Metrics<span class="glyphicon glyphicon-sort" data-reactid=".0.1.0.$table2.3.0.0.2.1"></span></th>
-      <th class="sorter-false">Assign grade and write comments</th>
+      <th class="sorter-false">Assign grade and write comments <span></span></th>
     </tr>
     </thead>
     <tbody>
@@ -108,7 +93,7 @@
                     <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>
                     <!--Hard-coded Dr.Kidd's question in order to display link.-->
                     <!--later we can create a hyperlink question type to deal with this situation.-->
-                    <%= list_hyperlink_submission(ri.id, 5386) if Assignment.find_by(id: @id.to_i).try(:course).try(:instructor).try(:name) == 'Jkidd' %>
+                    <%= list_hyperlink_submission(ri.id, 5386) if Assignment.find_by(id: @id.to_i).course.instructor.name == 'Jkidd' %>
                   </div>
 
                 <!--Author feedback-->
@@ -169,19 +154,8 @@
  </div>
 <!--Partial for text macro form-->
 <%= render :partial => '/user_pastebins/save_text_macros' %>
+
 <script>
-    $(function () {
-        /*Function for sorting the table */
-        $("#myTable").tablesorter({
-            sortList: [[0, 0]], //sort First Column by default when page loads
-            widgets: ['zebra'], // Make sure to update the css when column is sorted
-            headers: {
-                4: {
-                    sorter: 'customParser' //custom Parser to parse Metrics data for the custom parser
-                }
-            }
-        });
-    });
     $.tablesorter.addParser({
         id: "customParser",                                       //customParser for sorting by volume
         is: function (stringValue) {
@@ -194,5 +168,17 @@
         },
         type: 'numeric'
     });
-</script>
+    $(function () {
+        /*Function for sorting the table */
+        $("#reviewReport").tablesorter({
+            sortList: [[0, 0]], //sort First Column by default when page loads
+            widgets: ['zebra'], // Make sure to update the css when column is sorted
+            headers: {
+                4: {
+                    sorter: 'customParser' //custom Parser to parse Metrics data for the custom parser
+                }
+            }
+        });
+    });
 
+</script>

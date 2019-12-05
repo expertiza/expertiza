@@ -345,13 +345,14 @@ class UsersController < ApplicationController
       @user = User.new(user_params)
       # parent id for a conference user will be conference assignment instructor id
       @user.parent_id = Assignment.find(params[:user][:assignment]).instructor.id
+      @assignment_name = Assignment.find(params[:user][:assignment]).name
       # set the user's timezone to its parent's
       @user.timezonepref = User.find(@user.parent_id).timezonepref
       # set default value for institute
       @user.institution_id = nil
       if @user.save
         password = @user.reset_password # the password is reset
-        prepared_mail = MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password)
+        prepared_mail = MailerHelper.send_mail_to_coauthor(@user, "Your Expertiza account and password have been created.", "author_conference_invitation", password, @assignment_name)
         prepared_mail.deliver
         flash[:success] = "A new password has been sent to new user's e-mail address."
       else

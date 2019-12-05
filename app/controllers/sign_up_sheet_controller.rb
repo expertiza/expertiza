@@ -476,7 +476,7 @@ class SignUpSheetController < ApplicationController
       resultMap = {}
       resultMap[:team_id] = team.id
       resultMap[:comments_for_advertisement] = team.comments_for_advertisement
-      resultMap[:name] = team.name(session[:ip])
+      resultMap[:name] = team.name
       resultMap[:assignment_id] = topic.assignment_id
       resultMap[:advertise_for_partner] = team.advertise_for_partner
 

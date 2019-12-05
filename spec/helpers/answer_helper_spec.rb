@@ -74,5 +74,10 @@ describe AnswerHelper do
       allow(@assignment1).to receive(:find_review_period).with(2).and_return([[@duedate3], [@duedate4]])
       expect(AnswerHelper.in_active_period(2)).to eql(false)
     end
+    it 'returns true when the current time is in any active period (multiple periods when round number is nil)' do
+      allow(AssignmentQuestionnaire).to receive(:get_latest_assignment).with(1).and_return([@assignment1, nil])
+      allow(@assignment1).to receive(:find_review_period).with(nil).and_return([[@duedate1, @duedate3], [@duedate2, @duedate4]])
+      expect(AnswerHelper.in_active_period(1)).to eql(true)
+    end
   end
 end

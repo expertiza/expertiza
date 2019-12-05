@@ -84,7 +84,7 @@
                     <%= list_hyperlink_submission(ri.id, 5386) if Assignment.find_by(id: @id.to_i).try(:course).try(:instructor).try(:name) == 'Jkidd' %>
                     
                     <!-- To show response_maps.id, need to remove after finished-->
-                    <%= ri.id %>
+                    <!-- <%= ri.id %> -->
                     <!-- TODO: only list comments, need to regex links in comments-->
                     <!-- <%= list_comments(ri.id)%> -->
                   </div>

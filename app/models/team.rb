@@ -132,40 +132,47 @@ class Team < ActiveRecord::Base
   def email_mentor(mentor)
     members = TeamsUser.where(team_id: self.id)
     members_name=""
-    if members.size==2
-      members_name=members[0].fullname+"("+User.find(members[0].user_id).email+")."
-    else
-      for i in 0..members.size-4 do
-        members_name+=members[i].fullname+"("+User.find(members[i].user_id).email+"), "
-      end
-      members_name += (members[members.size-3].fullname + "("+User.find(members[members.size-3].user_id).email+") ")
-      print(members_name+"\n")
-      members_name += ("and "+members[members.size-2].fullname + "("+User.find(members[members.size-2].user_id).email+").")
+    for i in 0..members.size-2 do
+      members_name += " "+ members[i].fullname+", "+User.find(members[i].user_id).email+"<br>"
     end
 
-
     Mailer.delayed_message(bcc: [User.find(mentor.user_id).email],
-                             subject: "Mentoring Team Reminder",
-                             body: "You have been assigned to team: " + self.name + " with team member: "+members_name).deliver_now
+                             subject: "[Expertiza]: New Team Assignment",
+                             body: "You have been assigned as a mentor to team " + self.name + "<br>Current member:<br>"+members_name).deliver_now
   end
 
   def email_team_members(mentor)
     members = TeamsUser.where(team_id: self.id)
+    members_name = ""
+    for i in 0..members.size-2 do
+      members_name += " " + members[i].fullname+", "+User.find(members[i].user_id).email+"<br>"
+    end
     mentor_info=mentor.fullname + "("+User.find(mentor.user_id).email+")."
     members.each do |member|
       if member.user_id != mentor.user_id
         Mailer.delayed_message(bcc: [User.find(member.user_id).email],
-                               subject: "Team Mentor Reminder",
-                               body: "Your team: "+self.name+" will be mentored by " + mentor_info ).deliver_now
+                               subject: "[Expertiza]: New Mentor Assignment",
+                               body: mentor_info+"has been assigned as your mentor for assignment "+ Assignment.find(self.parent_id).name+"<br>Current member:<br>"+members_name).deliver_now
       end
     end
   end
 
   def email_single_team_member(member,mentor)
+    members = TeamsUser.where(team_id: self.id)
+    members_name = ""
+    for i in 0..members.size-1 do
+      if members[i].user_id !=  mentor.user_id
+        members_name += " " + members[i].fullname+", "+User.find(members[i].user_id).email+"<br>"
+      end
+    end
     mentor_info=mentor.fullname + "("+User.find(mentor.user_id).email+")."
-    Mailer.delayed_message(bcc: [member.email],
-                           subject: "Team Mentor Reminder",
-                           body: "Your team: "+self.name+" will be mentored by " + mentor_info ).deliver_now
+    members.each do |member|
+      if member.user_id != mentor.user_id
+        Mailer.delayed_message(bcc: [User.find(member.user_id).email],
+                               subject: "[Expertiza]: New Mentor Assignment",
+                               body: mentor_info+"has been assigned as your mentor for assignment"+ Assignment.find(self.parent_id).name+"<br>Current member:<br>"+members_name).deliver_now
+      end
+    end
   end
 
   # Define the size of the team,

@@ -19,7 +19,8 @@ class UsersController < ApplicationController
       if params[:user][:assignment].nil?
         check_role
       else
-        true
+        params[:assignment_id] = params[:user][:assignment]
+        return is_valid_conference_assignment?
       end
     when 'create_requested_user_record'
       true
@@ -110,6 +111,9 @@ class UsersController < ApplicationController
       params[:user] = current_user
       add_conference_user_as_participant and return
       # redirect_to get_redirect_url_link and return
+    elsif current_user && is_valid_conference_assignment?
+      flash[:error] = "Your current role does not allow you to join this assignment. Please log in as Student and retry to join."
+      redirect_to get_redirect_url_link and return
     else
       @user = User.new
       @rolename = Role.find_by(name: params[:role])
@@ -341,7 +345,7 @@ class UsersController < ApplicationController
         redirect_to request.referrer
         return false
       end
-      params[:user][:name] = params[:user][:email]
+      params[:user][:name] = params[:user][:email] unless !params[:user][:name].nil? and !params[:user][:name].empty?
       @user = User.new(user_params)
       # parent id for a conference user will be conference assignment instructor id
       @user.parent_id = Assignment.find(params[:user][:assignment]).instructor.id

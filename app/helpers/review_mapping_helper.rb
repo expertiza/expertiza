@@ -311,9 +311,21 @@ module ReviewMappingHelper
     answer_with_link = Answer.where(response_id: curr_response.id, question_id: question_id).first if curr_response
     comments = answer_with_link.try(:comments)
     html = ''
-    html += display_hyperlink_in_peer_review_question(comments) if comments.present? and comments.start_with?('http')
-    html.html_safe
+    html += display_hyperlink_in_peer_review_question(comments) if comments.scan(/(https?:\/\/([-\w\.]+)+(:\d+)?(\/([\w\/_\.]*(\?\S+)?)?)?)/)
+    html
   end
+
+  def list_comments(response_map_id)
+    response = Response.where(map_id: response_map_id)
+    # response_map_id: 129689  response.ids:[95234 95517]
+    Answer.where(response_id: response.ids).try(:each) do |ans|
+      comments = ''
+      comments += ans.try(:comments)
+      # print ans.try(:comments)
+    end 
+    comments   
+  end
+
 
   # gets review and feedback responses for all rounds for the feedback report
   def get_each_review_and_feedback_response_map(author)

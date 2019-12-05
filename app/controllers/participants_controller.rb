@@ -1,4 +1,4 @@
- class ParticipantsController < ApplicationController
+class ParticipantsController < ApplicationController
   autocomplete :user, :name
 
   def action_allowed?

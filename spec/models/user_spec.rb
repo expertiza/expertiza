@@ -430,6 +430,7 @@ describe User do
       expect(student.name).not_to eq "Student " + student.id.to_s
     end
 
+    # this test case is applicable to impersonate mode
     it 'returns correct real name from anonymized name' do
       student = create(:student)
       expect(student.name).not_to eq "Student " + student.id.to_s

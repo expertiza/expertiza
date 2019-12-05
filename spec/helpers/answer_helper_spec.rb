@@ -57,9 +57,9 @@ describe AnswerHelper do
 
   describe '#delete_answers' do
     it 'renders questionnaires#view page' do
-      allow(Answer).to receive(:Where).with(@answer1.response_id).and_return(@answer1)
-      @result = AnswerHelper.delete_answers(@answer1.response_id)
-      expect(@result).to eql([])
+      allow(Answer).to receive(:where).with(response_id: @answer1.response_id).and_return([@answer1])
+      expect(@answer1).to receive(:destroy)
+      AnswerHelper.delete_answers(@answer1.response_id)
     end
   end
 

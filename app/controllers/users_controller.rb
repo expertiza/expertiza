@@ -13,15 +13,21 @@ class UsersController < ApplicationController
        'Administrator'].include? current_role_name
     when 'request_new'
       true
+    when 'new'
+      is_valid_conference_assignment?
+    when 'create'
+      if params[:user][:assignment].nil?
+        check_role
+      else
+        params[:assignment_id] = params[:user][:assignment]
+        return is_valid_conference_assignment?
+      end
     when 'create_requested_user_record'
       true
     when 'keys'
       current_role_name.eql? 'Student'
     else
-      ['Super-Administrator',
-       'Administrator',
-       'Instructor',
-       'Teaching Assistant'].include? current_role_name
+      check_role
     end
   end
 
@@ -100,9 +106,19 @@ class UsersController < ApplicationController
   end
 
   def new
-    @user = User.new
-    @rolename = Role.find_by(name: params[:role])
-    foreign
+    if current_user && current_role_name == "Student"
+      @user = current_user
+      params[:user] = current_user
+      add_conference_user_as_participant and return
+      # redirect_to get_redirect_url_link and return
+    elsif current_user && is_valid_conference_assignment?
+      flash[:error] = "Your current role does not allow you to join this assignment. Please log in as Student and retry to join."
+      redirect_to get_redirect_url_link and return
+    else
+      @user = User.new
+      @rolename = Role.find_by(name: params[:role])
+      foreign
+    end
   end
 
   def request_new
@@ -113,31 +129,12 @@ class UsersController < ApplicationController
   end
 
   def create
-    # if the user name already exists, register the user by email address
-    check = User.find_by(name: params[:user][:name])
-    params[:user][:name] = params[:user][:email] unless check.nil?
-    @user = User.new(user_params)
-    @user.institution_id = params[:user][:institution_id]
-    # record the person who created this new user
-    @user.parent_id = session[:user].id
-    # set the user's timezone to its parent's
-    @user.timezonepref = User.find(@user.parent_id).timezonepref
-    if @user.save
-      password = @user.reset_password # the password is reset
-      prepared_mail = MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password)
-      prepared_mail.deliver
-      flash[:success] = "A new password has been sent to new user's e-mail address."
-      # Instructor and Administrator users need to have a default set for their notifications
-      # the creation of an AssignmentQuestionnaire object with only the User ID field populated
-      # ensures that these users have a default value of 15% for notifications.
-      # TAs and Students do not need a default. TAs inherit the default from the instructor,
-      # Students do not have any checks for this information.
-      AssignmentQuestionnaire.create(user_id: @user.id) if @user.role.name == "Instructor" or @user.role.name == "Administrator"
-      undo_link("The user \"#{@user.name}\" has been successfully created. ")
-      redirect_to action: 'list'
+    if params[:user][:assignment].nil?
+      create_normal_user
     else
-      foreign
-      render action: 'new'
+      if create_conference_user
+        add_conference_user_as_participant
+      end
     end
   end
 
@@ -260,7 +257,11 @@ class UsersController < ApplicationController
   protected
 
   def foreign
-    role = Role.find(session[:user].role_id)
+    if params[:assignment_id].nil?
+      role = Role.find(session[:user].role_id)
+    else
+      role = Role.find_by_name('Student')
+    end
     @all_roles = Role.where('id in (?) or id = ?', role.get_available_roles, role.id)
   end
 
@@ -331,6 +332,111 @@ class UsersController < ApplicationController
               User.paginate(page: params[:page], per_page: paginate_options[@per_page.to_s])
             end
     users
+  end
+
+  def create_conference_user
+    #check if user is already present with given username in system
+    existing_user = User.find_by(name: params[:user][:name])
+    # existing_user = User.where('name = ? and email = ?', params[:user][:name], params[:user][:email]).first
+    # if user exist then add user as participant to assignment else create account and then add as participant
+    if existing_user.nil?
+      if (params[:user][:name].nil? or params[:user][:name].empty?)and !User.find_by(name: params[:user][:email]).nil?
+        flash[:error] = "A user with username of this email already exists, Please provide a unique username to continue."
+        redirect_to request.referrer
+        return false
+      end
+      params[:user][:name] = params[:user][:email] unless !params[:user][:name].nil? and !params[:user][:name].empty?
+      @user = User.new(user_params)
+      # parent id for a conference user will be conference assignment instructor id
+      @user.parent_id = Assignment.find(params[:user][:assignment]).instructor.id
+      @assignment_name = Assignment.find(params[:user][:assignment]).name
+      # set the user's timezone to its parent's
+      @user.timezonepref = User.find(@user.parent_id).timezonepref
+      # set default value for institute
+      @user.institution_id = nil
+      if @user.save
+        password = @user.reset_password # the password is reset
+        prepared_mail = MailerHelper.send_mail_to_coauthor(@user, "Your Expertiza account and password have been created.", "author_conference_invitation", password, @assignment_name)
+        prepared_mail.deliver
+        flash[:success] = "A new password has been sent to new user's e-mail address."
+      else
+        raise "Error occurred while creating expertiza account."
+      end
+    else
+      @user = existing_user
+    end
+  end
+
+  def create_normal_user
+    # if the user name already exists, register the user by email address
+    check = User.find_by(name: params[:user][:name])
+    params[:user][:name] = params[:user][:email] unless check.nil?
+    @user = User.new(user_params)
+    @user.institution_id = params[:user][:institution_id]
+    # record the person who created this new user
+    @user.parent_id = session[:user].id
+    # set the user's timezone to its parent's
+    @user.timezonepref = User.find(@user.parent_id).timezonepref
+    if @user.save
+      password = @user.reset_password # the password is reset
+      prepared_mail = MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password)
+      prepared_mail.deliver
+      flash[:success] = "A new password has been sent to new user's e-mail address."
+      # Instructor and Administrator users need to have a default set for their notifications
+      # the creation of an AssignmentQuestionnaire object with only the User ID field populated
+      # ensures that these users have a default value of 15% for notifications.
+      # TAs and Students do not need a default. TAs inherit the default from the instructor,
+      # Students do not have any checks for this information.
+      AssignmentQuestionnaire.create(user_id: @user.id) if @user.role.name == "Instructor" or @user.role.name == "Administrator"
+      undo_link("The user \"#{@user.name}\" has been successfully created. ")
+      redirect_to action: 'list'
+    else
+      foreign
+      render action: 'new'
+    end
+  end
+
+  def add_conference_user_as_participant
+    @participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', @user.id, @assignment.id).first
+    if @participant.nil?
+      participant = AssignmentParticipant.create(parent_id: @assignment.id, user_id: @user.id,
+                                 permission_granted: @user.master_permission_granted,
+                                 can_submit: 1,
+                                 can_review: 1,
+                                 can_take_quiz: 1
+      )
+      participant.set_handle
+    end
+    flash[:success] = "You are added as an Author for assignment."
+    redirect_to get_redirect_url_link
+  end
+
+  def get_redirect_url_link
+    if current_user && current_role_name == "Student"
+      return '/student_task/list'
+    else
+      return '/'
+    end
+  end
+
+  def is_valid_conference_assignment?
+    if !params[:assignment_id].nil?
+      @assignment = Assignment.find_by_id(params[:assignment_id])
+      if !@assignment.nil? and @assignment.is_conference
+        true
+      else
+        false
+      end
+    else
+      check_role
+   end
+  end
+
+  def check_role
+    ['Super-Administrator',
+     'Administrator',
+     'Instructor',
+     'Teaching Assistant'].include? current_role_name
   end
 
   # generate the undo link

@@ -124,7 +124,7 @@
          <table style="width:80%" align="center" >
            <tr>
             <td>
-              Enter user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
+              Enter user login<% if @student.assignment.is_conference %>/email<%end %>: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
               <input type='submit' value='Invite'/>
             </td>
            </tr>

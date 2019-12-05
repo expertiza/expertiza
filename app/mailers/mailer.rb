@@ -20,6 +20,22 @@ class Mailer < ActionMailer::Base
          bcc: defn[:bcc])
   end
 
+  def generic_message(defn)
+    @partial_name = defn[:body][:partial_name]
+    @user = defn[:body][:user]
+    @first_name = defn[:body][:first_name]
+    @password = defn[:body][:password]
+    @new_pct = defn[:body][:new_pct]
+    @avg_pct = defn[:body][:avg_pct]
+    @assignment = defn[:body][:assignment]
+    @author_name = defn[:body][:author_name]
+
+    defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
+    mail(subject: defn[:subject],
+         to: defn[:to],
+         bcc: defn[:bcc])
+  end
+
   def request_user_message(defn)
     @user = defn[:body][:user]
     @super_user = defn[:body][:super_user]

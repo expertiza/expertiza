@@ -23,4 +23,18 @@ module MailerHelper
       }
     })
   end
+
+  def self.send_mail_to_coauthor(user, subject, partial_name, password, author_name)
+    Mailer.generic_message ({
+        to: user.email,
+        subject: subject,
+        body: {
+            user: user,
+            password: password,
+            first_name: ApplicationHelper.get_user_first_name(user),
+            partial_name: partial_name,
+            author_name: author_name
+        }
+    })
+  end
 end

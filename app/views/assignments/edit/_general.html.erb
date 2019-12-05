@@ -148,10 +148,9 @@ function microtaskChanged() {
   <tr>
     <% if current_page?(action: 'edit') %>
       <% if @assignment_form.assignment.is_conference %>
-        <%  url = url_for controller: 'users', action: 'new',role: 'Student', assignment_id: @assignment.id %>
+        <%  url = polymorphic_url :user, action: 'new',role: 'Student', assignment_id: @assignment.id %>
         <div>Link to join assignment:
-          <span id = "link" style="color: #5d0a0a"><a href=<%=url%>><%=url%></a></span>
-          <span> <button class="button" data-clipboard-target=#link>Copy to Clipboard</button></span>
+          <span id = "link" style="color: #5d0a0a"><%=url%></a></span>
         </div>
       <% end %>
     <% end %>

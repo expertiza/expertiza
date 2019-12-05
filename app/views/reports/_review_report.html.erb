@@ -27,7 +27,9 @@
   <li><i style="color:blue">blue</i> indicates that a review is completed in every round and the review grade is not assigned;</li>
   <li><i style="color:green">green</i> indicates that there is no submitted work to review within the round;</li>
   <li><i style="color:purple">purple</i> indicates that there is no review for a submitted work within the round;</li>
-  <li><i style="color: #986633">brown</i> indicates that the review grade has been assigned</li>
+  <li><i style="color: #986633">brown</i> indicates that the review grade has been assigned;</li>
+	<li><i style="color: #ff6600">orange border</i> indicates that the review can be marked or unmarked as sample</li>
+	
 </ul>
   <p>&nbsp;</p>
   
@@ -71,11 +73,15 @@
             <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, ri.response, ri.reviewee_id) %>
               <% if Team.where(id: ri.reviewee_id).length > 0 %>
                 <!--Team reviewed-->
-                <% if index == 0 %>
-                  <div id= <%= team_name_color %>>
-                <% else %>
-                  <div id = <%= team_name_color %> style="border-top: solid; border-width: 1px;">
-                <% end %>
+								<% if check_visibility_status(ri) %>
+									<div id = <%= team_name_color %> style="border: solid; border-width: 2px; border-color: #FF6600;">
+								<% else %>
+                	<% if index == 0 %>
+                  	<div id= <%= team_name_color %>>
+                	<% else %>
+                  	<div id = <%= team_name_color %> style="border-top: solid; border-width: 1px;">
+                	<% end %>
+								<% end %>
                     <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
                     <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>
                     <!--Hard-coded Dr.Kidd's question in order to display link.-->

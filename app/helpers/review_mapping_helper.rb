@@ -27,8 +27,9 @@ module ReviewMappingHelper
   def get_team_colour(response_map)
     assignment_created = @assignment.created_at
     assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
+		
     if Response.exists?(map_id: response_map.id)
-      if !response_map.try(:reviewer).try(:review_grade).nil?
+			if !response_map.try(:reviewer).try(:review_grade).nil?
         'brown'
       elsif response_for_each_round?(response_map)
         'blue'
@@ -53,6 +54,17 @@ module ReviewMappingHelper
       'red'
     end
   end
+
+	#checks if the visibility column in respose table has value 1 or 2 for the corresponding map_id
+	def check_visibility_status(response_map)
+		if Response.exists?(map_id: response_map.id, visibility: 1)
+			return true
+		elsif Response.exists?(map_id: response_map.id, visibility: 2)
+			return true
+		end
+		return false
+	end
+
 
   # checks if a review was submitted in every round and gives the total responses count
   def response_for_each_round?(response_map)

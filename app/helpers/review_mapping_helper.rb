@@ -311,8 +311,8 @@ module ReviewMappingHelper
     answer_with_link = Answer.where(response_id: curr_response.id, question_id: question_id).first if curr_response
     comments = answer_with_link.try(:comments)
     html = ''
-    html += display_hyperlink_in_peer_review_question(comments) if comments.scan(/(https?:\/\/([-\w\.]+)+(:\d+)?(\/([\w\/_\.]*(\?\S+)?)?)?)/)
-    html
+    html += display_hyperlink_in_peer_review_question(comments) if comments.present? and comments.start_with?('http')
+    html.html_safe
   end
 
   def list_comments(response_map_id)

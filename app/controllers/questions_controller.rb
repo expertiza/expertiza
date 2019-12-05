@@ -72,11 +72,13 @@ class QuestionsController < ApplicationController
     question = Question.find(params[:id])
     questionnaire_id = question.questionnaire_id
     question_ids=Question.where(questionnaire_id: questionnaire_id).ids
-    # Fetch the Answers for the Questionnaire, delete and send them to User
-    begin
-      AnswerHelper.delete_existing_responses(questionnaire_id,question_ids)
-    rescue StandardError
-      flash[:error] = $ERROR_INFO
+    if AnswerHelper.in_active_period(params[:id])
+      # Fetch the Answers for the Questionnaire, delete and send them to User
+      begin
+        AnswerHelper.delete_existing_responses(questionnaire_id,question_ids)
+      rescue StandardError
+        flash[:error] = $ERROR_INFO
+      end
     end
     begin
       question.destroy

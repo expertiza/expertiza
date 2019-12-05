@@ -122,7 +122,7 @@ class InvitationsController < ApplicationController
         check = User.find_by(name: params[:user][:name])
         params[:user][:name] = params[:user][:email] unless check.nil?
         @newuser = User.new(user_params)
-        #@user.institution_id = 1
+        @user.institution_id = nil
         @newuser.email = params[:user][:name]
         # record the person who created this new user
         @newuser.parent_id = session[:user].id
@@ -134,7 +134,7 @@ class InvitationsController < ApplicationController
           @user = User.find_by(email: @newuser.email)
 
           password = @user.reset_password
-          MailerHelper.send_mail_to_user(@user, "Your Expertiza account has been created.", "user_conference", password).deliver
+          MailerHelper.send_mail_to_user(@user, "Your Expertiza account has been created.", "user_conference_invitation", password).deliver
         end
         #redirect_to view_student_teams_path student_id: @student.id
         #return

@@ -122,7 +122,7 @@ class InvitationsController < ApplicationController
         check = User.find_by(name: params[:user][:name])
         params[:user][:name] = params[:user][:email] unless check.nil?
         @newuser = User.new(user_params)
-        @user.institution_id = nil
+        @user.institution_id =nil
         @newuser.email = params[:user][:name]
         # record the person who created this new user
         @newuser.parent_id = session[:user].id

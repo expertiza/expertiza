@@ -122,8 +122,7 @@ describe AssignmentsController do
             availability_flag: true,
             reputation_algorithm: 'Lauw',
             simicheck: -1,
-            simicheck_threshold: 100,
-            add_instructor: 1
+            simicheck_threshold: 100
           }
         }
       }
@@ -133,7 +132,6 @@ describe AssignmentsController do
         allow(assignment_form).to receive(:assignment).and_return(assignment)
         allow(assignment_form).to receive(:save).and_return(true)
         allow(assignment_form).to receive(:update).with(any_args).and_return(true)
-        allow(assignment_form).to receive(:add_instructor_as_participant).with(any_args).and_return(true)
         allow(assignment_form).to receive(:create_assignment_node).and_return(double('node'))
         allow(assignment).to receive(:id).and_return(1)
         allow(Assignment).to receive(:find_by).with(name: 'test assignment').and_return(assignment)
@@ -186,7 +184,6 @@ describe AssignmentsController do
             id: 1,
             course_id: 1
           }
-          allow(assignment_form).to receive(:add_instructor_as_participant).with(any_args).and_return(true)
           session = {user: instructor}
           post :update, params, session
           expect(flash[:note]).to eq('The assignment was successfully saved.')
@@ -358,11 +355,4 @@ describe AssignmentsController do
       end
     end
   end
-
-  context 'when "Add yourself as a participant?" checkbox is selected' do
-    it 'calls add_instructor_as_participant which in turn calls add Participant method of Participant controller' do
-      allow(assignment_form).to receive(:add_participant).with(any_args).and_return(true)
-    end
-  end
-
 end

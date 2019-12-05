@@ -8,7 +8,7 @@
     <%= collection_select 'user', 'role_id', @all_roles, :id, :name, {:selected => @rolename.id} %></p>
 
   <%= render :partial => 'user', :locals => { :new_user => true , :request_user =>false} %>
-  <% if @assignment.nil? %>
+  <% if @assignment.nil? || !@assignment.is_conference?%>
     <%= submit_tag "Create" %>
   <% else%>
     <%= submit_tag "Join Conference" %>

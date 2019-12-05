@@ -121,8 +121,9 @@ class UsersController < ApplicationController
     if params[:user][:assignment].nil?
       create_normal_user
     else
-      create_conference_user
-      add_conference_user_as_participant
+      if create_conference_user
+        add_conference_user_as_participant
+      end
     end
   end
 
@@ -323,20 +324,24 @@ class UsersController < ApplicationController
   end
 
   def create_conference_user
-    #check if user is already present with given email and username in system
-    existing_user = User.where('name = ? and email = ?', params[:user][:name], params[:user][:email]).first
+    #check if user is already present with given username in system
+    existing_user = User.find_by(name: params[:user][:name])
+    # existing_user = User.where('name = ? and email = ?', params[:user][:name], params[:user][:email]).first
     # if user exist then add user as participant to assignment else create account and then add as participant
     if existing_user.nil?
-      #check if user is already present with given username in system
-      check = User.find_by(name: params[:user][:name])
-      params[:user][:name] = params[:user][:email] unless check.nil?
+      if (params[:user][:name].nil? or params[:user][:name].empty?)and !User.find_by(name: params[:user][:email]).nil?
+        flash[:error] = "A user with username of this email already exists, Please provide a unique username to continue."
+        redirect_to request.referrer
+        return false
+      end
+      params[:user][:name] = params[:user][:email]
       @user = User.new(user_params)
       # parent id for a conference user will be conference assignment instructor id
       @user.parent_id = Assignment.find(params[:user][:assignment]).instructor.id
       # set the user's timezone to its parent's
       @user.timezonepref = User.find(@user.parent_id).timezonepref
       # set default value for institute
-      @user.institution_id = 1
+      @user.institution_id = nil
       if @user.save
         password = @user.reset_password # the password is reset
         prepared_mail = MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password)

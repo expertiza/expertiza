@@ -86,10 +86,11 @@
                     <!-- To show response_maps.id, need to remove after finished-->
                     <!-- <%= ri.id %> -->
                     <!-- TODO: only list comments, need to regex links in comments-->
-                    <!-- <%= list_comments(ri.id)%> -->
+                    <!-- <%= urls = list_comments(ri.id)%> -->
                   </div>
-                  <div style="border-top: solid; border-width: 1px;">
-                      <a href="http://www.google.com" target="_blank">Link1 </a> </div>
+                <% urls.each do |url| %>
+                  <%= link_to url.to_s, url %>
+                <% end %>>
                       
                 <% end %>
             <% end %>

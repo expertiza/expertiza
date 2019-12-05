@@ -209,6 +209,7 @@ module SummaryHelper
     end
 
     # E1991 : Adding anonymized view condition for report generation logic
+    # We will now pass session wherever name method of user object is called
     def get_reviewers_by_reviewee_and_assignment(reviewee, assignment_id, session)
       reviewers = User.select(" DISTINCT users.name, users.id")
                       .joins("JOIN participants ON participants.user_id = users.id")

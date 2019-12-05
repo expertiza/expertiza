@@ -7,6 +7,7 @@ describe InvitationsController do
   let(:invitation) { build(:invitation) }
   let(:participant) { build(:participant, id: 1) }
   let(:assignment) { build(:assignment, id: 2, is_conference: 1, max_team_size:100) }
+  let(:assignment2) { build(:assignment, id: 2, is_conference: 0, max_team_size:100) }
   let(:teamUser) { build(:team_user, id:3) }
   let(:team) { build(:team, id: 3) }
   describe '#action_allowed?' do
@@ -73,6 +74,24 @@ describe InvitationsController do
       session = {user: student1}
       expect{post :create, params, session}.to change(Invitation, :count).by(1).and change(User, :count).by(1)
     end
+
+    it 'invitation and user not added for new user for normal assignment' do
+      params = {
+          user: {name: 'testuser@gmail.com',
+                 email: 'testuser@gmail.com',
+                },
+          student_id: 1,
+          team_id: 1
+      }
+      allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
+      allow(Assignment).to receive(:find).with(1).and_return(assignment2)
+      allow(TeamsUser).to receive(:find).with("1").and_return(teamUser)
+      allow(Team).to receive(:find).with("1").and_return(team)
+      session = {user: student1}
+      expect{post :create, params, session}.to change(Invitation, :count).by(0).and change(User, :count).by(0)
+      expect(flash[:error]).to eq 'The user "testuser@gmail.com" does not exist. Please make sure the name entered is correct.'
+    end
+
   end
 
   describe '#create' do

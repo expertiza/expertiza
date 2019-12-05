@@ -1,7 +1,7 @@
 <H1>Team Members for <%= @assignment.name %></H1>
 
 
-<H3>Team Name: <%= @team.name %></H3>
+<H3>Team Name: <%= @team.name(session[:ip]) %></H3>
 
 <%
     column_definitions = Array.new

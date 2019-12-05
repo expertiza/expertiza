@@ -256,6 +256,14 @@ class Team < ActiveRecord::Base
     ExpertizaLogger.info LoggerMessage.new('Model:Team', '', "New TeamNode created with teamname #{team_name}")
     team
   end
+  
+  def name(ip_address = nil)
+    if User.anonymized_view?(ip_address)
+      team_name = "Anonymized_Team_#{self[:id]}"
+    else
+      self[:name]
+    end
+  end
 
   # REFACTOR END:: class methods import export moved from course_team & assignment_team to here
 end

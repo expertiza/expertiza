@@ -105,9 +105,16 @@ class UsersController < ApplicationController
   end
 
   def new
-    @user = User.new
-    @rolename = Role.find_by(name: params[:role])
-    foreign
+    if current_user && current_role_name == "Student"
+      @user = current_user
+      params[:user] = current_user
+      add_conference_user_as_participant and return
+      # redirect_to get_redirect_url_link and return
+    else
+      @user = User.new
+      @rolename = Role.find_by(name: params[:role])
+      foreign
+    end
   end
 
   def request_new
@@ -385,9 +392,9 @@ class UsersController < ApplicationController
   end
 
   def add_conference_user_as_participant
-    @participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', @user.id, params[:user][:assignment]).first
+    @participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', @user.id, @assignment.id).first
     if @participant.nil?
-      participant = AssignmentParticipant.create(parent_id: params[:user][:assignment], user_id: @user.id,
+      participant = AssignmentParticipant.create(parent_id: @assignment.id, user_id: @user.id,
                                  permission_granted: @user.master_permission_granted,
                                  can_submit: 1,
                                  can_review: 1,

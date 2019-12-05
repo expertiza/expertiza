@@ -57,14 +57,6 @@
               url: '/submission_viewing_events/record_end_time',
               data: $.param({submission_viewing_event: {map_id: map_id, round: round, link: link, end_at: ISODateString(t)}
                 }),
-              /*success: function(json){
-                var links = JSON.parse(JSON.stringigy(json));
-                for (lk in links)
-                  console.log(lk+" review time is complete!");
-              }
-              failure: function(){
-                console.log("review time failed to save!");
-              }*/
             });
           }
 
@@ -232,7 +224,6 @@
         }, 1000);
       }else if (!vis() && $("#autosave_cbx").prop("checked")){
         executeSave();
-        //console.log("Saving before going to background at " + new Date().toLocaleString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }));
       }
     });
     //overlay to block user entering new info before the form is updated with data from the server
@@ -546,14 +537,6 @@
           data: $.param({
             submission_viewing_event: {map_id: map_id, round: round, end_at: ISODateString(t)}
             }),
-          /*success: function(json){
-            var links = JSON.parse(JSON.stringify(json));
-            for (lk in links)
-              console.log(lk+" review time is complete!");
-          },
-          error: function(json){
-            console.log("review time failed to save!");
-          }*/
         });
       }
       $(":submit").click(function(){

@@ -112,14 +112,6 @@
             data: $.param({
               submission_viewing_event: {map_id: map_id, round: round, end_at: ISODateString(t)}
               }),
-            /*success: function(json){
-              var files = JSON.parse(JSON.stringify(json));
-              for (fl in files)
-                console.log(fl+" review time is complete!");
-            },
-            error: function(json){
-              console.log("review time failed to save!");
-            }*/
           });
         }
         $("#1_myDiv #file_table a.fileLink").click(function(event){
@@ -155,14 +147,6 @@
               data: $.param({
                 submission_viewing_event: {map_id: map_id, round: round, link: link, end_at: ISODateString(t)}
                 }),
-              /*success: function(json){
-                var links = JSON.parse(JSON.stringigy(json));
-                for (lk in links)
-                  console.log(lk+" review time is complete!");
-              }
-              failure: function(){
-                console.log("review time failed to save!");
-              }*/
             });
           }
           function checkWindowStatus() {

@@ -1,7 +1,7 @@
 module ReportFormatterHelper
   def summary_by_reviewee_and_criteria(params, _session = nil)
     assign_basics(params)
-    sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(@assignment, @summary_ws_url)
+    sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(@assignment, @summary_ws_url, _session)
     @summary = sum.summary
     @reviewers = sum.reviewers
     @avg_scores_by_reviewee = sum.avg_scores_by_reviewee

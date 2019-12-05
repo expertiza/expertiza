@@ -51,40 +51,50 @@
           <% team_name_color = get_team_name_color_in_list_submission(team) %>
           <td><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
           <% unless participants.empty? %>
+            <!-- Display "Assign Grade" link after final deadline of assignment has passed -->
             <% if @assignment.get_current_stage() == "Finished" %>
               <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %><br>
             <% end %>
+            <!-- Checking if logged in user (instructor/TA) is participant in assignment -->
             <% reviewer = Participant.find_by(:parent_id => @assignment.id, :user_id => session[:user].id)%>
+            <!-- Reviewing options are available only to "participants" of assignment -->
+            <!-- So only if reviewer is not nil, following applicable links will be displayed -->
             <% if !reviewer.nil? %>
+              <!-- Checking if instructor/TA has been mapped to current team -->
               <% @mapping = ReviewResponseMap.find_by(:reviewed_object_id => @assignment.id, :reviewer_id => reviewer.id, :reviewee_id => team.id) %>
-              <% if @assignment.get_current_stage() == "review" && @mapping.nil? %>
+              <!-- If mapping is nil, a response cannot be created. So user should be able to "Begin Review" during any review stage, or after deadline has passed -->
+              <% if @mapping.nil? && (@assignment.get_current_stage() == "review" || @assignment.get_current_stage() == "Finished")  %>
                 <% ReviewResponseMap.create(reviewee_id: team.id, reviewer_id: reviewer.id, reviewed_object_id: @assignment.id) %>
                 <% map = ReviewResponseMap.find_by(reviewee_id: team.id, reviewer_id: reviewer.id, reviewed_object_id: @assignment.id) %>
                 <%= link_to 'Begin Review', { controller: 'response', action: 'new', :id => map.id, :return => "ta_review" } %><br>
+              <!-- Any time during review or after deadline, user is given the flexibility to begin, edit or update their review -->
               <% elsif @assignment.get_current_stage() == "review" ||  @assignment.get_current_stage() == "Finished" %>
                 <% map1 = ReviewResponseMap.find_by(reviewee_id: team.id, reviewer_id: reviewer.id, reviewed_object_id: @assignment.id) %>
                 <% @sorted_responses = Array.new %>
                 <% @sorted_responses = Response.where(:map_id => map1.id) %>
+                <!-- This means that mapping is created, but user never began the review. Hence linking to "Begin Review" -->
                 <% if @sorted_responses.empty?%>
                   <%= link_to 'Begin Review', { controller: 'response', action: 'new', :id => map1.id, :return => "ta_review" } %><br>
                 <% else %>
+                  <!-- There is at least more than one response. Hence we obtain latest response of them all. -->
                   <% @sorted_responses = @sorted_responses.sort_by {|obj| obj.updated_at} # the latest should be at the last %>
                   <% @latest_response = @sorted_responses.last %>
-                  <%if @latest_response.round.nil?%>
+                  <%if @latest_response.round.nil?%>        <!-- Getting current round as last response round in unavailable -->
                       <% last_response_round = AssignmentDueDate.done_in_assignment_round(@assignment.id, @latest_response) %>
-                  <%else%>
+                  <%else%>                                  <!-- Getting round in which the last response was given -->
                       <% last_response_round = @latest_response.round %>
                   <%end%>
                   <% current_round = @assignment.number_of_current_round(topic_id) %>
+                  <!-- Always displaying "View Review" link for latest response, as long as at least one response exists -->
                   <%= link_to "View Review", {:controller => 'response', :action => 'view', :id => @latest_response.id} %><br>
                   <% if last_response_round == current_round %>
                   <% latest_submission = team.most_recent_submission %>
-                    <% if !@latest_response.is_submitted %>
+                    <% if !@latest_response.is_submitted %>               <!-- Allow to "Edit" review which has not been submitted yet -->
                       <%= link_to "Edit Review", {:controller => 'response', :action => 'edit', :id => @latest_response.id, :return => "ta_review" } %>
-                    <% else %>
+                    <% else %>                                            <!-- Allow to "Update" review if team has updated their submission -->
                       <%= link_to "Update Review", {:controller => 'response', :action => 'new', :id => map1.id, :return => "ta_review" } %>
                     <%end%>
-                  <% else %>
+                  <% else %>                                              <!-- Allow to "Update" review when round changes -->
                     <%= link_to "Update Review", {:controller => 'response', :action => 'new', :id => map1.id, :return => "ta_review" } %>
                   <% end %>
                 <% end %>

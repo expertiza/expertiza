@@ -118,11 +118,6 @@ class UsersController < ApplicationController
   end
 
   def create
-    # if the user name already exists, register the user by email address
-    check = User.find_by(name: params[:user][:name])
-    params[:user][:name] = params[:user][:email] unless check.nil?
-    @user = User.new(user_params)
-    @user.institution_id = params[:user][:institution_id]
     if params[:user][:assignment].nil?
       create_normal_user
     else
@@ -328,10 +323,14 @@ class UsersController < ApplicationController
   end
 
   def create_conference_user
-    #check if user is already present in system with given email or not
-    existing_user = User.find_by(email: params[:user][:email])
+    #check if user is already present with given email and username in system
+    existing_user = User.where('name = ? and email = ?', params[:user][:name], params[:user][:email]).first
     # if user exist then add user as participant to assignment else create account and then add as participant
     if existing_user.nil?
+      #check if user is already present with given username in system
+      check = User.find_by(name: params[:user][:name])
+      params[:user][:name] = params[:user][:email] unless check.nil?
+      @user = User.new(user_params)
       # parent id for a conference user will be conference assignment instructor id
       @user.parent_id = Assignment.find(params[:user][:assignment]).instructor.id
       # set the user's timezone to its parent's
@@ -348,11 +347,15 @@ class UsersController < ApplicationController
       end
     else
       @user = existing_user
-      flash[:success] = "You are added as an Author for assignment."
     end
   end
 
   def create_normal_user
+    # if the user name already exists, register the user by email address
+    check = User.find_by(name: params[:user][:name])
+    params[:user][:name] = params[:user][:email] unless check.nil?
+    @user = User.new(user_params)
+    @user.institution_id = params[:user][:institution_id]
     # record the person who created this new user
     @user.parent_id = session[:user].id
     # set the user's timezone to its parent's
@@ -387,7 +390,16 @@ class UsersController < ApplicationController
       )
       participant.set_handle
     end
-    redirect_to '/'
+    flash[:success] = "You are added as an Author for assignment."
+    redirect_to get_redirect_url_link
+  end
+
+  def get_redirect_url_link
+    if current_user && current_role_name == "Student"
+      return '/student_task/list'
+    else
+      return '/'
+    end
   end
 
   def is_valid_conference_assignment?

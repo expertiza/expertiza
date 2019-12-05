@@ -18,7 +18,7 @@ describe QuestionnairesController do
   let(:due_date3) {build(due_date, id: 3, due_at: '2019-01-30 23:30:12', deadline_type_id: 1, parent_id: 1, round: 2)}
   let(:due_date4) {build(due_date, id: 4, due_at: '2019-02-28 23:30:12', deadline_type_id: 2, parent_id: 1, round: 2)}
   let(:assignment_questionnaire1) {build(assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 1, used_in_round: 1)}
-  let(:assignment_questionnaire2) {build(assignment_questionnaire, id: 2, assignment_id: 1, questionnaire_id: 2, used_in_round: 2)
+  let(:assignment_questionnaire2) {build(assignment_questionnaire, id: 2, assignment_id: 1, questionnaire_id: 2, used_in_round: 2)}
   before(:each) do
     allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
     stub_current_user(instructor, instructor.role.name, instructor.role)
@@ -311,11 +311,8 @@ describe QuestionnairesController do
                   add_new_questions: true,
                   new_question: {total_num: 2,
                                  type: 'TextArea'}}
-        allow(AnswerHelper).to receive(:in_active_period).with('1').and_return(true)
-        allow(AnswerHelper).to receive(:delete_existing_responses).with('1')
+        expect(AnswerHelper).to receive(:in_active_period).with('1').and_return(true)
         post :update, params
-        expect(flash[:success]).to eq('You have successfully added a new question. The existing reviews for the questionnaire have been deleted!')
-        expect(response).to redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]
       end
     end
 
@@ -325,10 +322,8 @@ describe QuestionnairesController do
                   add_new_questions: true,  
                   new_question: {total_num: 2,
                                  type: 'TextArea'}}
-        allow(AnswerHelper).to receive(:in_active_period).with('1').and_return(false)
+        expect(AnswerHelper).to receive(:in_active_period).with('1').and_return(false)
         post :update, params
-        expect(flash[:success]).to eq('You have successfully added a new question.')
-        expect(response).to redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]
       end
     end
   end

@@ -204,6 +204,13 @@ class AssignmentTeam < Team
     nil
   end
 
+  #return a set of teams which mentored by current user
+  def self.teams(assignment_id,participant)
+    return nil if participant.nil?
+    teams=Team.find_team_for_assignment_and_user(assignment_id,participant.user_id)
+    teams
+  end
+
   # Export the fields
   def self.export_fields(options)
     fields = []

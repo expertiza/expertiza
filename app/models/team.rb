@@ -124,7 +124,6 @@ class Team < ActiveRecord::Base
         tmp=TeamsUser.where(user_id: mentor.user_id,team_id: team.id).count
         num+=tmp
       end
-
       if num<target
         mentor_assigned=mentor
         target=num
@@ -169,7 +168,7 @@ class Team < ActiveRecord::Base
       end
     end
     mentor_info=mentor.fullname + "("+User.find(mentor.user_id).email+") "
-    Mailer.delayed_message(bcc: [User.find(member.user_id).email],
+    Mailer.delayed_message(bcc: [member.email],
                            subject: "[Expertiza]: New Mentor Assignment",
                            body: mentor_info+"has been assigned as your mentor for assignment"+ Assignment.find(self.parent_id).name+"<br>Current member:<br>"+members_name).deliver_now
   end

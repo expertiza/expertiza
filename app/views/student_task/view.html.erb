@@ -17,7 +17,7 @@
 <% end %>
 <ul>
   <%if @topics.size > 0 %>
-    <% if @authorization == 'participant' || @authorization == 'submitter' %>
+    <% if @authorization == 'participant' %>
       <li>
         <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.id%>
         (Sign up for a topic)
@@ -36,7 +36,7 @@ to display the label "Your team" in the student assignment tasks-->
   <%end%>
 
   <!--Your work-->
-  <% if @authorization == 'participant' or @authorization == 'mentor' or @can_submit == true %>
+  <% if @authorization == 'participant'or @can_submit == true %>
     <li>
       <% if @topics.size > 0 %>
         <% if @topic_id and @assignment.submission_allowed(@topic_id) %>

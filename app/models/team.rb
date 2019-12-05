@@ -120,10 +120,8 @@ class Team < ActiveRecord::Base
     mentors.each do |mentor|
       num=0
       teams = Team.where(parent_id: self.parent_id)
-      print("\nteam nums="+teams.size.to_s+"\n")
       teams.each do |team|
         tmp=TeamsUser.where(user_id: mentor.user_id,team_id: team.id).count
-        print("\ntmp="+tmp.to_s+"\n")
         num+=tmp
       end
 
@@ -141,7 +139,6 @@ class Team < ActiveRecord::Base
     for i in 0..members.size-2 do
       members_name += " "+ members[i].fullname+", "+User.find(members[i].user_id).email+"<br>"
     end
-
     Mailer.delayed_message(bcc: [User.find(mentor.user_id).email],
                              subject: "[Expertiza]: New Team Assignment",
                              body: "You have been assigned as a mentor to team " + self.name + "<br>Current member:<br>"+members_name).deliver_now
@@ -175,8 +172,6 @@ class Team < ActiveRecord::Base
     Mailer.delayed_message(bcc: [User.find(member.user_id).email],
                            subject: "[Expertiza]: New Mentor Assignment",
                            body: mentor_info+"has been assigned as your mentor for assignment"+ Assignment.find(self.parent_id).name+"<br>Current member:<br>"+members_name).deliver_now
-
-    end
   end
 
   # Define the size of the team,

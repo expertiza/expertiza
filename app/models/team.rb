@@ -97,21 +97,19 @@ class Team < ActiveRecord::Base
           email_single_team_member(user,mentor)
         end
       end
+
+    else if half? && dont_have_mentor?
+          # mentor = Participant.where(['can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', 0, 0, 0, self.parent_id]).first
+          mentor=assign_mentor
+          new_mentor = TeamsUser.create(user_id: mentor.user_id, team_id: self.id)
+          TeamUserNode.create(parent_id: parent.id, node_object_id: new_mentor.id)
+          ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{self.id}")
+
+          # Email notification
+          email_mentor(mentor)
+          email_team_members(mentor)
+         end
     end
-
-    if half? && dont_have_mentor?
-      # mentor = Participant.where(['can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', 0, 0, 0, self.parent_id]).first
-      mentor=assign_mentor
-      new_mentor = TeamsUser.create(user_id: mentor.user_id, team_id: self.id)
-      TeamUserNode.create(parent_id: parent.id, node_object_id: new_mentor.id)
-      ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{self.id}")
-
-      # Email notification
-      email_mentor(mentor)
-      email_team_members(mentor)
-
-    end
-
     can_add_member
   end
 
@@ -120,7 +118,15 @@ class Team < ActiveRecord::Base
     target=0xffff
     mentor_assigned=mentors.first
     mentors.each do |mentor|
-      num=TeamsUser.where(user_id: mentor.user_id).count
+      num=0
+      teams = Team.where(parent_id: self.parent_id)
+      print("\nteam nums="+teams.size.to_s+"\n")
+      teams.each do |team|
+        tmp=TeamsUser.where(user_id: mentor.user_id,team_id: team.id).count
+        print("\ntmp="+tmp.to_s+"\n")
+        num+=tmp
+      end
+
       if num<target
         mentor_assigned=mentor
         target=num
@@ -147,7 +153,7 @@ class Team < ActiveRecord::Base
     for i in 0..members.size-2 do
       members_name += " " + members[i].fullname+", "+User.find(members[i].user_id).email+"<br>"
     end
-    mentor_info=mentor.fullname + "("+User.find(mentor.user_id).email+")."
+    mentor_info=mentor.fullname + "("+User.find(mentor.user_id).email+") "
     members.each do |member|
       if member.user_id != mentor.user_id
         Mailer.delayed_message(bcc: [User.find(member.user_id).email],
@@ -165,13 +171,11 @@ class Team < ActiveRecord::Base
         members_name += " " + members[i].fullname+", "+User.find(members[i].user_id).email+"<br>"
       end
     end
-    mentor_info=mentor.fullname + "("+User.find(mentor.user_id).email+")."
-    members.each do |member|
-      if member.user_id != mentor.user_id
-        Mailer.delayed_message(bcc: [User.find(member.user_id).email],
-                               subject: "[Expertiza]: New Mentor Assignment",
-                               body: mentor_info+"has been assigned as your mentor for assignment"+ Assignment.find(self.parent_id).name+"<br>Current member:<br>"+members_name).deliver_now
-      end
+    mentor_info=mentor.fullname + "("+User.find(mentor.user_id).email+") "
+    Mailer.delayed_message(bcc: [User.find(member.user_id).email],
+                           subject: "[Expertiza]: New Mentor Assignment",
+                           body: mentor_info+"has been assigned as your mentor for assignment"+ Assignment.find(self.parent_id).name+"<br>Current member:<br>"+members_name).deliver_now
+
     end
   end
 

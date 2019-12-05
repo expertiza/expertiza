@@ -27,7 +27,7 @@
 <!--ACS Here we need to know the size of the team to decide whether or not
 to display the label "Your team" in the student assignment tasks-->
   <%if @assignment.max_team_size > 1 %>
-    <% if @authorization == 'participant' %>
+    <% if @authorization == 'participant' || @authorization == 'mentor'%>
       <li>
         <%= link_to 'Your team', view_student_teams_path(student_id: @participant.id) %>
         (View and manage your team)
@@ -36,7 +36,7 @@ to display the label "Your team" in the student assignment tasks-->
   <%end%>
 
   <!--Your work-->
-  <% if @authorization == 'participant' or @can_submit == true %>
+  <% if @authorization == 'participant' or @authorization == 'mentor' or @can_submit == true %>
     <li>
       <% if @topics.size > 0 %>
         <% if @topic_id and @assignment.submission_allowed(@topic_id) %>

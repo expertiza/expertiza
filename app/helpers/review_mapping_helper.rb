@@ -321,11 +321,20 @@ module ReviewMappingHelper
     response = Response.where(map_id: response_map_id)
     # response_map_id: 129689  response.ids:[95234 95517]
     Answer.where(response_id: response.ids).try(:each) do |ans|
-      comments = ''
-      comments += ans.try(:comments)
+      @comments = ''
+      @comments += ans.try(:comments)
       # print ans.try(:comments)
-    end 
-    comments   
+    end
+    urls = []
+    # get every words in the comment
+    words = @comments.split(" ")
+    words.each do |element|
+      # see if it starts with http or https
+      if element =~ /https?:\/\/[\S]+/
+        urls.append(element)
+      end
+    end
+    urls
   end
 
 

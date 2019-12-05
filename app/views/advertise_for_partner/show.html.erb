@@ -5,7 +5,7 @@
   You don't have a team yet!
 <% else %>
 
-  <b>Team Name: </b><%= @student.team.name %>
+  <b>Team Name: </b><%= @student.team.name(session[:ip]) %>
 
 <%= link_to "Edit name",
   edit_student_teams_path(team_id: @student.team.id, student_id: @student.id) %>

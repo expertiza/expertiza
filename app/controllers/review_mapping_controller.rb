@@ -194,7 +194,7 @@ class ReviewMappingController < ApplicationController
     if num_remain_review_response_maps > 0
       flash[:error] = "#{num_remain_review_response_maps} reviewer(s) cannot be deleted because they have already started a review."
     else
-      flash[:success] = "All review mappings for \"#{team.name}\" have been deleted."
+      flash[:success] = "All review mappings for \"#{team.name(session[:ip])}\" have been deleted."
     end
     redirect_to action: 'list_mappings', id: assignment.id
   end

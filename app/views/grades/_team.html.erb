@@ -8,12 +8,12 @@
   <td>
       <% topic_id = tscore[:team].topic %>
       <% if topic_id %>
-        <%= tscore[:team].name + ' (' + SignUpTopic.find(topic_id).topic_identifier + ')' %>
+        <%= tscore[:team].name(session[:ip]) + ' (' + SignUpTopic.find(topic_id).topic_identifier + ')' %>
       <% else %>
         <% if @assignment.max_team_size == 1 %>
           <%= tscore[:team].users.first.name(session[:ip]) + ' (' + tscore[:team].users.first.fullname(session[:ip]) + ')' rescue '' %>
         <% else %>
-          <%= tscore[:team].name %> |
+          <%= tscore[:team].name(session[:ip]) %> |
           <% for index in 0..tscore[:team].users.length - 2 %>
             <%= tscore[:team].users[index].name(session[:ip]) %>,
           <% end %>

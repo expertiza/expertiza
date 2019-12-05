@@ -613,12 +613,18 @@ class Assignment < ActiveRecord::Base
   def find_review_period(round)
     # If round is nil, it means the same questionnaire is used for every round. Thus, we return all periods.
     # If round is not nil, we return only the period of that round.
+    start_dates = []
+    end_dates = []
     if round.nil?
-      start_dates = self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: "submission").id }
-      end_dates = self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: "review").id }
+      round = 1
+      while self.due_dates.exists?(round: round)
+        start_dates << self.due_dates.where(deadline_type_id: DeadlineType.find_by(name: "submission").id, round: round).order("id").last
+        end_dates << self.due_dates.where(deadline_type_id: DeadlineType.find_by(name: "submission").id, round: round).order("id").last
+        round += 1
+      end
     else
-      start_dates = self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: "submission").id && due_date.round == round }
-      end_dates = self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: "review").id && due_date.round == round }
+      start_dates << self.due_dates.where(deadline_type_id: DeadlineType.find_by(name: "submission").id, round: round).order("id").last
+      end_dates << self.due_dates.where(deadline_type_id: DeadlineType.find_by(name: "review").id, round: round).order("id").last
     end
     return start_dates, end_dates
   end

@@ -263,7 +263,7 @@ class Team < ActiveRecord::Base
   # existing logic of User model.
   def name(ip_address = nil)
     if User.anonymized_view?(ip_address)
-      team_name = "Team_#{self[:id]}"
+      team_name = "Anonymized_Team_#{self[:id]}"
     else
       self[:name]
     end

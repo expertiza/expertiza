@@ -88,6 +88,17 @@ class Team < ActiveRecord::Base
       add_participant(self.parent_id, user)
       ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{self.id}")
     end
+
+    if half? && !dont_have_mentor?
+      members = TeamsUser.where(team_id: self.id)
+      members.each do |member|
+        if Participant.where(['user_id = ? and can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', member.user_id ,0, 0, 0, self.parent_id]).count > 0
+          mentor=member
+          email_single_team_member(user,mentor)
+        end
+      end
+    end
+
     if half? && dont_have_mentor?
       # mentor = Participant.where(['can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', 0, 0, 0, self.parent_id]).first
       mentor=assign_mentor
@@ -100,6 +111,7 @@ class Team < ActiveRecord::Base
       email_team_members(mentor)
 
     end
+
     can_add_member
   end
 
@@ -108,14 +120,12 @@ class Team < ActiveRecord::Base
     target=0xffff
     mentor_assigned=mentors.first
     mentors.each do |mentor|
-      num=TeamsUser.where(user_id: mentor.user_id,).count
-      print(" count="+num.to_s+"\n")
+      num=TeamsUser.where(user_id: mentor.user_id).count
       if num<target
         mentor_assigned=mentor
         target=num
       end
     end
-    print(mentor_assigned.name)
     mentor_assigned
   end
 
@@ -128,8 +138,9 @@ class Team < ActiveRecord::Base
       for i in 0..members.size-4 do
         members_name+=members[i].fullname+"("+User.find(members[i].user_id).email+"), "
       end
-      members_name += members[members.size-3].fullname +"("+User.find(members[members.size-3].user_id).email+") "
-      members_name += "and "+members[members.size-2].fullname + "("+User.find(members[members.size-2].user_id).email+")."
+      members_name += (members[members.size-3].fullname + "("+User.find(members[members.size-3].user_id).email+") ")
+      print(members_name+"\n")
+      members_name += ("and "+members[members.size-2].fullname + "("+User.find(members[members.size-2].user_id).email+").")
     end
 
 
@@ -150,7 +161,12 @@ class Team < ActiveRecord::Base
     end
   end
 
-
+  def email_single_team_member(member,mentor)
+    mentor_info=mentor.fullname + "("+User.find(mentor.user_id).email+")."
+    Mailer.delayed_message(bcc: [member.email],
+                           subject: "Team Mentor Reminder",
+                           body: "Your team: "+self.name+" will be mentored by " + mentor_info ).deliver_now
+  end
 
   # Define the size of the team,
   def self.size(team_id)

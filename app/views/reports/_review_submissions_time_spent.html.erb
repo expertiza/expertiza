@@ -107,8 +107,8 @@
           <%link_total_time  = get_link_round_review_time_all_links(map.id,each_round)%>
           <%expertiza_total_time = get_link_round_review_time_all_links(map.id,each_round, true)%>
           <%total_time = link_total_time + expertiza_total_time%>
-          <%object_start_time = Response.find_by(map_id: map.id, round: each_round).created_at%>
-          <%object_end_time = Response.find_by(map_id: map.id, round: each_round).updated_at%>
+          <%object_start_time = Response.find_by(map_id: map.id).created_at%>
+          <%object_end_time = Response.find_by(map_id: map.id).updated_at%>
           <%total_object_time = (object_end_time - object_start_time).to_i%>
           <% @per_round_time = Array.new %>
           <% @reviewed_object_id = map.reviewed_object_id %>

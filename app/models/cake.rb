@@ -35,9 +35,9 @@ class Cake < ScoredQuestion
       cols = self.size.split(',')[0]
       rows = self.size.split(',')[1]
     end
-    current_score = Answer.get_total_score_for_question(answer[:id])
-    if(!current_score.nil?)
-      current_score = current_score.to_s
+    ans = Answer.where(id: answer[:id]).first
+    if !ans.nil?
+      current_score = ans.get_total_score_for_question(answer[:id]).to_s
     else
       current_score = 0.to_s
     end

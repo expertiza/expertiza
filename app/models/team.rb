@@ -257,9 +257,13 @@ class Team < ActiveRecord::Base
     team
   end
   
+  # E1991 : This method allows us to generate
+  # team names based on whether anonymized view
+  # is set or not. The logic is similar to 
+  # existing logic of User model.
   def name(ip_address = nil)
     if User.anonymized_view?(ip_address)
-      team_name = "Anonymized_Team_#{self[:id]}"
+      team_name = "Team_#{self[:id]}"
     else
       self[:name]
     end

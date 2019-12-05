@@ -36,9 +36,22 @@ describe AnswerHelper do
   end
 
   describe '#review_mailer' do
-    it 'renders questionnaires#view page' do
-
-
+    it 'calls method in Mailer to send emails' do
+      @email = "aaa@ncsu.edu"
+      @answers = "answers"
+      @name = "name"
+      @assignment_name = "assignment_name"
+      allow(Mailer).to receive(:notify_review_rubric_change).with(
+        to: @email,
+        subject: 'Expertiza Notification: The review rubric has been changed, please re-attempt the review',
+        body: {
+            name: @name,
+            assignment_name: @assignment_name,
+            answers: @answers
+        }).and_return(@mail)
+      allow(@mail).to receive(:deliver_now)
+      expect(Mailer).to receive(:notify_review_rubric_change).once
+      AnswerHelper.review_mailer(@email, @answers, @name, @assignment_name)
     end
   end
 

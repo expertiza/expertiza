@@ -512,17 +512,17 @@ function addDaysOrMonth(mul, type) {
 
 <input name="metareviewAllowed" type="hidden" value="false" />
 <%= check_box_tag('metareviewAllowed', 'true', @metareview_allowed,:onclick=>"removeOrAddMetareview()" ) %>
-<%= label_tag('metareviewAllowed', 'Use meta-review deadline') %><br/>
+<%= label_tag('metareviewAllowed', 'Use meta-review deadline') %><br/><br/>
 <div id="date_updater_div">
-                                                    <button type="button" id="show_date_updater" class="btn btn-default" style="margin-bottom: 20px;">Show/Hide Date Updater</button>
-                                                    <div id="date_updater_inner">
+                                                    <button type="button" id="show_date_updater" class="btn btn-default" style="margin-bottom: 20px; margin-right: 10px; float: left">Show/Hide Date Updater</button>
+</div>
+<img style="margin-left: 30px" src="/assets/info.png" title='Enter the number of days by which you want to prepone/postpone the deadline. Then select rows using the checkbox provided under Use Date Updater column. Then use +/- to change the Date and Time.   '>
+                                                    <div id="date_updater_inner" style="float: left; margin-left: 40px">
 
                                                         <%= label_tag('Days') %>
                                                             <button type="button" id="addDays_btn" class="btn btn-default">+</button>
-								<input id="days" type="number" name="quantity" min="0" value="0" style="width:50px">
+								<input id="days" type="number" name="quantity" min="0" value="1" style="width:50px">
                                                                 <button type="button" id="subDays_btn" class="btn btn-default">-</button>
-
-                                                </div>
 												</div>
 <table class='exp table table-striped' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden; font-size: 15px'>
 

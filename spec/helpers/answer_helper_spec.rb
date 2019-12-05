@@ -1,7 +1,7 @@
 describe AnswerHelper do
   let(:answer1) {Answer.new(id: 1, question_id: 1, response_id: 3) }
   let(:answer2) {Answer.new(id: 2, question_id: 4, response_id: 5) }
-
+  let(:answer) { build(:answer) }
   before(:each) do
       @assignment1 = double('Assignment', id: 1)
       allow(Assignment).to receive(:find).with('1').and_return(@assignment1)
@@ -21,10 +21,7 @@ describe AnswerHelper do
       allow(AssignmentQuestionnaire).to receive(:find).with('1').and_return(@assignment_questionnaire1)
       @assignment_questionnaire2 = double('AssignmentQuestionnaire', id: 2, assignment_id: 1, questionnaire_id: 2, used_in_round: 2)
       allow(AssignmentQuestionnaire).to receive(:find).with('2').and_return(@assignment_questionnaire2)               
-      @answer1 = double('Answer', id: 1, response_id: 1)
-      allow(Answer).to receive(:find).with('1').and_return(@answer1)
-      @answer2 = double('Answer', id: 2, question_id: 4, response_id: 5)
-      allow(Answer).to receive(:find).with('2').and_return(@answer2)
+      @answer3 = create(:answer, id: 3)
     end
 
   describe '#delete_existing_responses' do
@@ -32,6 +29,7 @@ describe AnswerHelper do
       # allow(Answer).to receive(:Where).with(@answer2.question_id).and_return(@answer2.response_id)
       # expect(AnswerHelper).to receive(:delete_answers).with(@answer2.response_id)
       # AnswerHelper.delete_existing_responses([@answer2.response_id])
+      # expect(AnswerHelper).to receive(:delete_answers).with()
     end
   end
 
@@ -56,10 +54,9 @@ describe AnswerHelper do
   end
 
   describe '#delete_answers' do
-    it 'renders questionnaires#view page' do
-      allow(Answer).to receive(:where).with(response_id: @answer1.response_id).and_return([@answer1])
-      expect(@answer1).to receive(:destroy)
-      AnswerHelper.delete_answers(@answer1.response_id)
+    it 'deletes the answers corresponding to the provided answer ids' do
+      AnswerHelper.delete_answers(@answer3.response_id)
+      expect(Answer.exists?(response_id: @answer3.response_id)).to eql(false)
     end
   end
 

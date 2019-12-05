@@ -110,6 +110,9 @@ class UsersController < ApplicationController
       params[:user] = current_user
       add_conference_user_as_participant and return
       # redirect_to get_redirect_url_link and return
+    elsif current_user && is_valid_conference_assignment?
+      flash[:error] = "Your current role does not allow you to join this assignment. Please log in as Student and retry to join."
+      redirect_to get_redirect_url_link and return
     else
       @user = User.new
       @rolename = Role.find_by(name: params[:role])

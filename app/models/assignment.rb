@@ -619,7 +619,7 @@ class Assignment < ActiveRecord::Base
       round = 1
       while self.due_dates.exists?(round: round)
         start_dates << self.due_dates.where(deadline_type_id: DeadlineType.find_by(name: "submission").id, round: round).order("id").last
-        end_dates << self.due_dates.where(deadline_type_id: DeadlineType.find_by(name: "submission").id, round: round).order("id").last
+        end_dates << self.due_dates.where(deadline_type_id: DeadlineType.find_by(name: "review").id, round: round).order("id").last
         round += 1
       end
     else

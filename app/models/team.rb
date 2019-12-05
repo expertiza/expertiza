@@ -61,7 +61,7 @@ class Team < ActiveRecord::Base
     return false if self.parent_id.nil?
     max_team_members = Assignment.find(self.parent_id).max_team_size
     curr_team_size = Team.size(self.id)
-    (curr_team_size*2 >= max_team_members)
+    (curr_team_size*2 > max_team_members)
   end
 
   def dont_have_mentor?
@@ -129,7 +129,7 @@ class Team < ActiveRecord::Base
         members_name+=members[i].fullname+"("+User.find(members[i].user_id).email+"), "
       end
       members_name += members[members.size-3].fullname +"("+User.find(members[members.size-3].user_id).email+") "
-      members_name += "and "+members[members.size-2].ƒfullname + "("+User.find(members[members.size-2].user_id).email+")."
+      members_name += "and "+members[members.size-2].fullname + "("+User.find(members[members.size-2].user_id).email+")."
     end
 
 

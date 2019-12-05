@@ -315,6 +315,8 @@ module ReviewMappingHelper
     html.html_safe
   end
 
+  # E1979: Completion/Progress view changes
+  # list all comments for each review map
   def list_comments(response_map_id)
     response = Response.where(map_id: response_map_id)
     # response_map_id: 129689  response.ids:[95234 95517]

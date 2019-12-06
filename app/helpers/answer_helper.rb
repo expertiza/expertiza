@@ -64,18 +64,19 @@ module AnswerHelper
       end
     end
   end
- end
 
- def self.has_questionnaire_in_period(assignment_id)
-  assignment, rounds = AssignmentQuestionnaire.get_rounds(assignment_id)
-  rounds.each do |round_number|
-      start_dates, end_dates = assignment.find_review_period(round_number)
-      time_now = Time.zone.now
-      # There can be multiple possible review periods: If round_number is nil, all rounds of reviews use the same questionnaire.
-      # If it is in any of the possible review period now, return true.
-      start_dates.zip(end_dates).each do |start_date, end_date|
-        return true if start_date.due_at < time_now && end_date.due_at > time_now
-      end
+  def self.has_questionnaire_in_period(assignment_id)
+    assignment, rounds = AssignmentQuestionnaire.get_rounds(assignment_id)
+    rounds.each do |round_number|
+        start_dates, end_dates = assignment.find_review_period(round_number)
+        time_now = Time.zone.now
+        # There can be multiple possible review periods: If round_number is nil, all rounds of reviews use the same questionnaire.
+        # If it is in any of the possible review period now, return true.
+        start_dates.zip(end_dates).each do |start_date, end_date|
+          return true if start_date.due_at < time_now && end_date.due_at > time_now
+        end
+    end
+    false
   end
-  false
+
 end

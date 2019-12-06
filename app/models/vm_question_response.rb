@@ -53,6 +53,7 @@ class VmQuestionResponse
       # Changes for E1984 Improve self-review  Link peer review & self-review to derive grades
       @self_review_answers = nil
       # review_map = SelfReviewResponseMap.get_assessments_for(team)
+      # review_map will include self_review responses iff rubrics does not vary by review rounds
       review_map = if vary
                      ReviewResponseMap.get_responses_for_team_round(team, @round)
                    else

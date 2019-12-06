@@ -154,6 +154,7 @@ class AssignmentParticipant < Participant
     # ReviewResponseMap.get_assessments_for(self.team)
     # E1984. Improve self-review  Link peer review & self-review to derive grades
     current_assignment = Assignment.find(self.team.parent_id)
+    #requesting_score will be by default false, if this method is called with requesting_score as true then get the self assessment score
     if requesting_score && current_assignment.is_selfreview_enabled?
       ResponseMap.get_assessments_for(self.team, self.id)
     else

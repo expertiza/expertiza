@@ -15,6 +15,7 @@ class ResponseMap < ActiveRecord::Base
       @sort_to = []
 
       # Changes for E1984. Improve self-review  Link peer review & self-review to derive grades
+      # user_id is by defalt nil, if this method is called with user_id as not nil, then get assessment for self work
       maps = if user_id.nil?
                where(reviewee_id: team.id)
              else
@@ -25,7 +26,7 @@ class ResponseMap < ActiveRecord::Base
         next if map.response.empty?
         @all_resp = Response.where(map_id: map.map_id).last
         # Changes for E1984. Improve self-review  Link peer review & self-review to derive grades
-
+        # map can be self review or peer review
         if map.type.eql?('ReviewResponseMap') || map.type.eql?("SelfReviewResponseMap")
           # If its ReviewResponseMap then only consider those response which are submitted.
           @array_sort << @all_resp if @all_resp.is_submitted

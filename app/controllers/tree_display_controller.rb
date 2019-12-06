@@ -210,7 +210,7 @@ class TreeDisplayController < ApplicationController
       child_nodes.each do |node|
         initialize_fnode_update_children(params, node, tmp_res)
       end
-    rescue 
+    rescue
     end
     res = res_node_for_child(tmp_res)
     res['Assignments'] = res['Assignments'].sort_by {|x| [x['instructor'], -1 * x['creation_date'].to_i] } if res.key?('Assignments')

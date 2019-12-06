@@ -159,12 +159,6 @@ describe Team do
         expect(Team.size(1)).to eq(1)
       end
     end
-
-    context 'when mentor is added' do
-      it 'returns the size does not contain mentor' do
-        expect(Team.size(2)).to eq(2)
-      end
-    end
   end
 
   describe '#copy_members' do

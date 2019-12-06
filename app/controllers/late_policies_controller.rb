@@ -83,12 +83,11 @@ class LatePoliciesController < ApplicationController
   def update
     @penalty_policy = LatePolicy.find(params[:id])
     invalid_penalty_per_unit = params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i
-    flash[:error] = "The maximum penalty cannot be less than penalty per unit." if invalid_penalty_per_unit
     same_policy_name = false
     # if name has changed then only check for this
     if params[:late_policy][:policy_name] != @penalty_policy.policy_name
       if same_policy_name == LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
-        flash[:error] = "The policy could not be updated because a policy with the same name already exists."
+        same_policy_name = true
       end
     end
     if !same_policy_name && !invalid_penalty_per_unit

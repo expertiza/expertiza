@@ -21,8 +21,8 @@ describe AnswerHelper do
       allow(AssignmentQuestionnaire).to receive(:find).with('1').and_return(@assignment_questionnaire1)
       @assignment_questionnaire2 = double('AssignmentQuestionnaire', id: 2, assignment_id: 1, questionnaire_id: 2, used_in_round: 2)
       allow(AssignmentQuestionnaire).to receive(:find).with('2').and_return(@assignment_questionnaire2)               
-      
-      @answer3 = create(:answer, id: 3, response_id: )
+      response = create(:response, id: 1)
+      @answer3 = create(:answer, id: 3, response_id: response.id)
     end
 
   describe '#review_mailer' do

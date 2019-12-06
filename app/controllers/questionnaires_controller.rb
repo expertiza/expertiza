@@ -111,27 +111,8 @@ class QuestionnairesController < ApplicationController
   end
 
   def update
-    # If 'Add' or 'Edit/View advice' is clicked, redirect appropriately
-    if params[:add_new_questions]
-      question_ids=[]
-      unless params[:question].nil?
-        params[:question].each_pair do |k, v|
-          question_ids.append(k)
-        end
-      end
-      if AnswerHelper.in_active_period(params[:id])
-        # Fetch the Answers for the Questionnaire, delete and send them to User
-        begin
-          AnswerHelper.delete_existing_responses(question_ids)
-          flash[:success] = "You have successfully added a new question. The existing reviews for the questionnaire have been deleted!"
-        rescue StandardError
-          flash[:error] = $ERROR_INFO
-        end
-      else
-        flash[:success] = "You have successfully added a new question."
-      end
-     redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]
-    elsif params[:view_advice]
+    # If 'Edit/View advice' is clicked, redirect appropriately
+    if params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     else
       @questionnaire = Questionnaire.find(params[:id])
@@ -202,10 +183,21 @@ class QuestionnairesController < ApplicationController
 
   # Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions
-    questionnaire_id = params[:id] unless params[:id].nil?
-    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
+    question_ids = Questionnaire.find(params[:id]).questions.ids
+    if AnswerHelper.in_active_period(params[:id])
+      # Fetch the Answers for the Questionnaire, delete and send them to User
+      begin
+        AnswerHelper.delete_existing_responses(question_ids, params[:id])
+        flash[:success] = "You have successfully added a new question. The existing reviews for the questionnaire have been deleted!"
+      rescue StandardError
+        flash[:error] = $ERROR_INFO
+      end
+    else
+      flash[:success] = "You have successfully added a new question."
+    end
+    num_of_existed_questions = Questionnaire.find(params[:id]).questions.size
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
-      question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
+      question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: params[:id], seq: i, type: params[:question][:type], break_before: true)
       if question.is_a? ScoredQuestion
         question.weight = 1
         question.max_label = 'Strongly agree'
@@ -221,7 +213,7 @@ class QuestionnairesController < ApplicationController
         flash[:error] = $ERROR_INFO
       end
     end
-    redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+    redirect_to edit_questionnaire_path(params[:id].to_sym)
   end
 
   # Zhewei: This method is used to save all questions in current questionnaire.

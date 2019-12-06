@@ -194,28 +194,71 @@ RSpec.feature 'User account creation', type: :feature do
       expect { click_on('Submit') }.to change{ActionMailer::Base.deliveries.count}.by(0)
     end
   end
-
+=begin
   describe 'User account creation by importing CSV file from user page' do
-    it 'for each new user created, email notification should be sent' do
+    it 'for each new user created, email notification should be sent', js: true do
       ActionMailer::Base.deliveries.clear
-      visit('/')
+      visit '/'
       login_as 'admin_user'
       visit("/users/list")
       click_on("Import Users",:match => :first)
       expect(find_field('delim_type_comma')).to be_checked
       expect(find_field('has_header_false')).to be_checked
       #expect(page).to have_selector "Choose File"
-      page.attach_file("import_file", Rails.root + "spec/features/CSV_files_user/import_users.csv")
+      page.attach_file('import_file', Rails.root + "spec/features/CSV_files_user/demo_user.csv")
       #find('form input[type = "file"]').set("spec/features/CSV_files_user/import_users.csv")
+      expect(page).to have_content('demo_user.csv')
       click_on('Import')
-      expect(page).to have_content('Importing from')
+
       #expect { click_button('Import Participants') }.to change{ActionMailer::Base.deliveries.count}.by(1)
+    end
+  end
+=end
+end
+=begin
+RSpec.feature 'Email notification to author on review submission' do
+  context 'add review' do
+    scenario 'users created' do
+      create(:instructor)
+      create(:assignment, course: nil, name: 'Test Assignment')
+      create_list(:participant, 3)
+      create(:deadline_type, name: "submission")
+      create(:deadline_type, name: "review")
+      create(:deadline_right)
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+      create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now.in_time_zone + 1.day)
+      create(:topic)
+      create(:topic, topic_name: "TestReview")
+      create(:team_user, user: User.where(role_id: 2).first)
+      create(:team_user, user: User.where(role_id: 2).second)
+      create(:assignment_team)
+      create(:team_user, user: User.where(role_id: 2).third, team: AssignmentTeam.second)
+      create(:signed_up_team)
+      create(:signed_up_team, team_id: 2, topic: SignUpTopic.second)
+      create(:assignment_questionnaire)
+      create(:question)
+      login_as('student2064')
+      expect(page).to have_content "User: student2064"
+      visit('/student_task/list')
+      expect(page).to have_content "Test Assignment"
+      click_link "Test Assignment"
+      expect(page).to have_content "Submit or Review work for Test Assignment"
+      expect(page).to have_content "Others' work"
+      click_link "Others' work"
+      expect(page).to have_content 'Reviews for "Test Assignment"'
+      choose "topic_id"
+      click_button "Request a new submission to review"
+      click_link "Begin"
+      fill_in "responses[0][comment]", with: "Test review"
+      select 5, from: "responses[0][score]"
+      click_button "Submit Review"
+      expect(page).to have_content "Your response was successfully saved."
     end
   end
 end
 
-
-
+=end
 =begin
 describe 'scenario 3' do
 

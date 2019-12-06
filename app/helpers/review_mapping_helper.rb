@@ -327,8 +327,10 @@ module ReviewMappingHelper
   end
 
 
+  #This function obtains the data and the labels to build the bar graph representing the suggestion metric - this function is similar to display_volume_metric_chart
   def display_suggestion_metric_chart(reviewer)
     labels2, reviewer_data2, all_reviewers_data2 = initialize_suggestion_chart_elements(reviewer)
+    #dataset for the bar graph
     data2 = {
         labels: labels2,
         datasets: [
@@ -344,6 +346,7 @@ module ReviewMappingHelper
             }
         ]
     }
+    #options for legends axes
     options = {
         legend: {
             display: false
@@ -368,24 +371,30 @@ module ReviewMappingHelper
     horizontal_bar_chart data2, options
   end
 
+  #Create the suggestion metrics and calculate the averages for each reviewer - this function is similar to initialize_chart_elements
   def initialize_suggestion_chart_elements(reviewer)
     round = 0
     labels = []
     reviewer_s_data = []
     all_reviewers_s_data = []
 
+    #Average number of suggestions computed for each round of reviews - for a particular reviewer
     @all_reviewers_avg_suggestion_in_round_1=avg_num_suggestions_per_round(@assignment.id,1,@type)
     @all_reviewers_avg_suggestion_in_round_2=avg_num_suggestions_per_round(@assignment.id,2,@type)
     @all_reviewers_avg_suggestion_in_round_3=avg_num_suggestions_per_round(@assignment.id,3,@type)
+    #Average number of suggestions over all rounds of reviews - for a particular reviewer
     @all_reviewers_overall_avg_suggestion=0
 
-
+    #create a response map to be passed to the function num_suggestions_per_student_per_round
     res = ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", @assignment.id, reviewer.id, @type])
     rounds=0
     overall_avg_vol=0
+
+    # if round 1 has reviews
     if @all_reviewers_avg_suggestion_in_round_1 > 0
       round += 1
       labels.push '1st'
+      # calculate number of suggestions for round 1
       suggestions_by_reviewer_round_1=num_suggestions_per_student_per_round(res,1)
       reviewer_s_data.push suggestions_by_reviewer_round_1
       all_reviewers_s_data.push @all_reviewers_avg_suggestion_in_round_1
@@ -393,9 +402,12 @@ module ReviewMappingHelper
       @all_reviewers_overall_avg_suggestion+=@all_reviewers_avg_suggestion_in_round_1
       rounds+=1
     end
+
+    # if round 2 has reviews
     if @all_reviewers_avg_suggestion_in_round_2 > 0
       round += 1
       labels.push '2nd'
+      # calculate number of suggestions for round 2
       suggestions_by_reviewer_round_2=num_suggestions_per_student_per_round(res,2)
       reviewer_s_data.push suggestions_by_reviewer_round_2
       all_reviewers_s_data.push @all_reviewers_avg_suggestion_in_round_2
@@ -403,9 +415,12 @@ module ReviewMappingHelper
       @all_reviewers_overall_avg_suggestion+=@all_reviewers_avg_suggestion_in_round_2
       rounds+=1
     end
+
+    # if round 3 has reviews
     if @all_reviewers_avg_suggestion_in_round_3 > 0
       round += 1
       labels.push '3rd'
+      # calculate number of suggestions for round 3
       suggestions_by_reviewer_round_3=num_suggestions_per_student_per_round(res,3)
       reviewer_s_data.push suggestions_by_reviewer_round_3
       all_reviewers_s_data.push @all_reviewers_avg_suggestion_in_round_3
@@ -414,6 +429,8 @@ module ReviewMappingHelper
       rounds+=1
     end
     labels.push 'Total'
+
+    #compute overall average across rounds
     if rounds>0
       overall_avg_vol=overall_avg_vol/rounds
       reviewer_s_data.push overall_avg_vol

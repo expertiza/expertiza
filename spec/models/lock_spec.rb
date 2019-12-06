@@ -64,13 +64,13 @@ describe Lock do
     it 'Should allow different users to acquire a lock which was formerly unavailable' do
       expect(Lock.get_lock(@response, @smyoder, 10)).to eq(@response)
       expect(Lock.get_lock(@response, @smyoder1, 10)).to be_nil
-      Lock.release_lock(@response, @smyoder)
+      Lock.release_lock(@response)
       expect(Lock.get_lock(@response, @smyoder1, 10)).to eq(@response)
       expect(Lock.get_lock(@response, @smyoder, 10)).to be_nil
     end
     
     it 'Should not throw errors when releasing locks that don\'t exist' do
-      Lock.release_lock(@response, @smyoder)
+      Lock.release_lock(@response)
       #No error should be thrown
     end
   end
@@ -92,7 +92,7 @@ describe Lock do
       expect(Lock.lock_between?(@response, @smyoder)).to be true
       expect(Lock.get_lock(@response, @smyoder1, 0)).to eq(@response)
       expect(Lock.lock_between?(@response, @smyoder)).to be false
-      Lock.release_lock(@response, @smyoder1)
+      Lock.release_lock(@response)
       expect(Lock.lock_between?(@response, @smyoder)).to be false
     end
   end

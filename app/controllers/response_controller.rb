@@ -80,7 +80,6 @@ class ResponseController < ApplicationController
     render nothing: true unless action_allowed?
     # the response to be updated
     @response = Response.find(params[:id])
-    @current_round = @response.round
     msg = ""
     begin
       @map = @response.map
@@ -264,7 +263,6 @@ class ResponseController < ApplicationController
       @header = 'Edit'
       @next_action = 'update'
       @response = Response.find(params[:id])
-      @current_round = @response.round
       @map = @response.map
       @contributor = @map.contributor
     when 'new'

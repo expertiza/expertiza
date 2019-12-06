@@ -53,7 +53,7 @@
           <% user = Participant.find(r.id).user %>
             <!--reviewer-->
             <td>
-              <%= link_to user.name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id=>@id %>
+              <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
               (<%= user.fullname(session[:ip]) %>)
             </td>
             <!--# reviews done-->
@@ -66,10 +66,10 @@
             </td>
           <!--Team reviewed / Author feedback-->
           <td align = 'left'>
-            <% @response_maps.each_with_index do |ri, index| %>
-              <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
-              <% team_name_color = get_team_colour(ri) %>
-              <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, ri.response, ri.reviewee_id) %>
+          <% @response_maps.each_with_index do |ri, index| %>
+            <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
+            <% team_name_color = get_team_colour(ri) %>
+            <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, ri.response, ri.reviewee_id) %>
               <% if Team.where(id: ri.reviewee_id).length > 0 %>
                 <!--Team reviewed-->
                 <% if index == 0 %>

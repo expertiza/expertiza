@@ -325,7 +325,14 @@ module ReviewMappingHelper
     end
 	  return suggestion_score
   end
-
+#gives number of suggestion per team per student
+  def num_suggestions_reviewer(responses)
+    comments=""
+    responses.each_pair do |k,v|
+      comments+=v[:comment]
+    end
+    num_suggestions_for_responses_by_a_reviewer(comments)
+  end
 
   #This function obtains the data and the labels to build the bar graph representing the suggestion metric - this function is similar to display_volume_metric_chart
   def display_suggestion_metric_chart(reviewer)

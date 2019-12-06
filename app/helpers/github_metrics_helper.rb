@@ -1,3 +1,4 @@
+require 'securerandom'
 module GithubMetricsHelper
   def display_github_metrics(gitVariable, graph_type, timeline_type)
     parsed_data = gitVariable[:parsed_data]
@@ -31,8 +32,6 @@ module GithubMetricsHelper
       end
 
       data_array = []
-      color = %w[#4dc9f6 #f67019 #f53794 #537bc4 #acc236 #166a8f #00a950 #58595b #8549ba]
-      i = 0
       authors.each do |author|
         no_of_commits_data = []
         no_of_lines_added_data = []
@@ -46,33 +45,23 @@ module GithubMetricsHelper
 
         data_object = {}
         data_object['label'] = author
-        data_object['data'] = no_of_commits_data
-        data_object['backgroundColor'] = color[i]
+        data_object['backgroundColor'] = GithubMetricsHelper.color_hex()
         data_object['borderWidth'] = 1
-        data_object['stack'] = 1
-        data_array.push(data_object) if graph_type == GithubMetric::graph_types['Commit Metrics'].to_s
-        i += 1
-        i = 0 if i > 8
-
-        data_object = {}
-        data_object['label'] = author
-        data_object['data'] = no_of_lines_added_data
-        data_object['backgroundColor'] = color[i]
-        data_object['borderWidth'] = 1
-        data_object['stack'] = 2
-        data_array.push(data_object) if graph_type == GithubMetric::graph_types['Lines Added Metrics'].to_s
-        i += 1
-        i = 0 if i > 8
-
-        data_object = {}
-        data_object['label'] = author
-        data_object['data'] = no_of_lines_deleted_data
-        data_object['backgroundColor'] = color[i]
-        data_object['borderWidth'] = 1
-        data_object['stack'] = 3
-        data_array.push(data_object) if graph_type == GithubMetric::graph_types['Lines Deleted Metrics'].to_s
-        i += 1
-        i = 0 if i > 8
+        case graph_type
+        when GithubMetric::graph_types['Commit Metrics'].to_s
+          data_object['data'] = no_of_commits_data
+          data_object['stack'] = 1
+        when GithubMetric::graph_types['Lines Added Metrics'].to_s
+          data_object['data'] = no_of_lines_added_data
+          data_object['stack'] = 2
+        when GithubMetric::graph_types['Lines Deleted Metrics'].to_s
+          data_object['data'] = no_of_lines_deleted_data
+          data_object['stack'] = 3
+        else
+          data_object['data'] = no_of_commits_data
+          data_object['stack'] = 1
+        end
+        data_array.push(data_object)
       end
       data = {
         labels: dates_to_week,
@@ -101,8 +90,6 @@ module GithubMetricsHelper
         end
       end
       data_array = []
-      color = %w[#4dc9f6 #f67019 #f53794 #537bc4 #acc236 #166a8f #00a950 #58595b #8549ba]
-      i = 0
       dates_to_week.each do |week|
         no_of_commits_data = []
         no_of_lines_added_data = []
@@ -115,34 +102,24 @@ module GithubMetricsHelper
         end
 
         data_object = {}
-        data_object['label'] = week
-        data_object['data'] = no_of_commits_data
-        data_object['backgroundColor'] = color[i]
+        data_object['label'] = 'Week:' + week
+        data_object['backgroundColor'] = GithubMetricsHelper.color_hex()
         data_object['borderWidth'] = 1
-        data_object['stack'] = 1
-        data_array.push(data_object) if graph_type == GithubMetric::graph_types['Commit Metrics'].to_s
-        i += 1
-        i = 0 if i > 8
-
-        data_object = {}
-        data_object['label'] = week
-        data_object['data'] = no_of_lines_added_data
-        data_object['backgroundColor'] = color[i]
-        data_object['borderWidth'] = 1
-        data_object['stack'] = 2
-        data_array.push(data_object) if graph_type == GithubMetric::graph_types['Lines Added Metrics'].to_s
-        i += 1
-        i = 0 if i > 8
-
-        data_object = {}
-        data_object['label'] = week
-        data_object['data'] = no_of_lines_deleted_data
-        data_object['backgroundColor'] = color[i]
-        data_object['borderWidth'] = 1
-        data_object['stack'] = 3
-        data_array.push(data_object) if graph_type == GithubMetric::graph_types['Lines Deleted Metrics'].to_s
-        i += 1
-        i = 0 if i > 8
+        case graph_type
+        when GithubMetric::graph_types['Commit Metrics'].to_s
+          data_object['data'] = no_of_commits_data
+          data_object['stack'] = 1
+        when GithubMetric::graph_types['Lines Added Metrics'].to_s
+          data_object['data'] = no_of_lines_added_data
+          data_object['stack'] = 2
+        when GithubMetric::graph_types['Lines Deleted Metrics'].to_s
+          data_object['data'] = no_of_lines_deleted_data
+          data_object['stack'] = 3
+        else
+          data_object['data'] = no_of_commits_data
+          data_object['stack'] = 1
+        end
+        data_array.push(data_object)
       end
 
       data = {
@@ -150,7 +127,7 @@ module GithubMetricsHelper
         datasets: data_array
       }
     end
-    bar_chart data, chart_options
+    horizontal_bar_chart data, chart_options
   end
 
   def chart_options
@@ -181,9 +158,11 @@ module GithubMetricsHelper
         {
           stacked: true,
           ticks: {
-            beginAtZero: true
+            beginAtZero: true,
+            maxRotation: 90,
+            minRotation: 0
           },
-          barThickness: 30,
+          barThickness: 60,
           scaleLabel: {
             display: true
           }
@@ -210,6 +189,11 @@ module GithubMetricsHelper
       github_metrics_summary[commit["author"]["email"]][:changedFiles] += commit["changedFiles"]
     end
     github_metrics_summary
+  end
+  def self.color_hex(options = {})
+    default = { red: rand(255), green: rand(255), blue: rand(255) }
+    options = default.merge(options)
+    '#%X%X%X' % options.values
   end
 end
 

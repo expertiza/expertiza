@@ -69,8 +69,10 @@ class ResponseController < ApplicationController
     @questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
-    @supplementary_review_questions.each do |question|
-      @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
+    unless @supplementary_review_questionnaire.nil?
+      @supplementary_review_questions.each do |question|
+        @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
+      end
     end
     set_questionnaire
     render action: 'response'

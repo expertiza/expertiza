@@ -218,7 +218,7 @@ module ReviewMappingHelper
             display: false
         },
         width: "200",
-        height: "50", #decreased the width of space around the bar
+        height: "75", #decreased the width of space around the bar
         scales: {
             yAxes: [{
                         stacked: false,
@@ -236,55 +236,54 @@ module ReviewMappingHelper
     }
     horizontal_bar_chart data, options
   end
-  
-  def get_avg_suggestions_per_round(assignment_id, round_id, type)
+
+  # This function computes the average number of suggestions per round of an assignment, across all the reviewers.
+  def avg_num_suggestions_per_round(assignment_id, round_id, type)
 	scores = 0
 	avg_score = 0
+  #compute average across all reviewers' suggestion scores
 	@reviewers.each do |r|
 		response_maps = ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", assignment_id, r.id, type])
-		score = get_suggestion_per_student_per_round(response_maps,round_id)
+		score = num_suggestions_per_student_per_round(response_maps,round_id)
 		scores += score
 	end
-	
 	avg_score = scores/@reviewers.length unless @reviewers.empty?
 	return avg_score
   end
-  
-  def get_suggestion_per_student_per_round(response_maps, round_id)
-	
+
+  # This function computes the number of suggestions per round of an assignment for a particular reviewer.
+  def num_suggestions_per_student_per_round(response_maps, round_id)
 	all_comments = []
-	
+  #computes the concatenation of comments provided by the reviewer(across one round), for all teams.
 	response_maps.each do |rm|
-		response = Response.where(map_id: rm.id, round: round_id).order(created_at: desc).first
-		comments = get_response_answers_as_suggestion_parameter(response.id)
-		all_comments += comments unless comments.empty?
-	end	
-	
-	score = get_response_score_from_suggestion_metrics(all_comments)
-	
+		response = Response.where(map_id: rm.id, round: round_id).order(created_at: :desc).first #desc
+    if response
+		  comments = comments_in_current_response(response.id)
+		  all_comments += comments unless comments.empty?
+    end
+	end
+	score = num_suggestions_for_responses_by_a_reviewer(all_comments)
 	return score
 	
   end
 
-  def get_response_answers_as_suggestion_parameter(response_id)
-  
-	# fetch comments from Answer model
-    answers = Answer.where(response_id: response_id)
-    
+  #This function returns the concatenation of comments provided by the reviewer for one team.
+  def comments_in_current_response(response_id)
+  answers = Answer.where(response_id: response_id)
 	all_comments_per_review = []
-	
+  #Fetching all comments in an answer separated by the paragraph tag
 	answers.each do |a|
       comment = a.comments
       comment.slice! "<p>"
       comment.slice! "</p>"
       all_comments_per_review.push(comment) unless comment.empty?
     end
-	
 	return all_comments_per_review
 	
   end
-  
-  def get_review_suggestion_metrics(comments)
+=begin
+  #This is the function, which should be making a call to the API and returns a response if it is valid. When the API starts working, one could use this function.
+  def retrieve_review_suggestion_metrics(comments)
     uri = URI.parse('https://peer-review-metrics-nlp.herokuapp.com/metrics/all')
     http = Net::HTTP.new(uri.hostname, uri.port)
     req = Net::HTTP::Post.new(uri, initheader = {'Content-Type' =>'application/json'})
@@ -303,40 +302,44 @@ module ReviewMappingHelper
       return nil
     end
   end
-  
-  def get_response_score_from_suggestion_metrics(comments)
-  
-	# send user review to API for analysis
-    api_response = get_review_suggestion_metrics(comments)
+=end
+
+  #This function makes a call to the function which makes a call to the API, with all the comments provided by a student for one round of review.
+  # It returns the number of suggestions provided by a reviewer.
+  def num_suggestions_for_responses_by_a_reviewer(comments)
+	#send user review to API for analysis
+  #api_response = retrieve_review_suggestion_metrics(comments) #uncomment this call when the API starts working
 	#compute average for all response fields in ONE response
-    suggestion_chance = 0
-    
+    suggestion_score = 0
+    #uncomment the code below when the API starts working
     # if api_response
     #   number_of_responses = api_response["results"].size
     #   0.upto(number_of_responses- 1) do |i|
     #     suggestion_chance += api_response["results"][i]["metrics"]["suggestion"]["suggestions_chances"]
     #   end
     # end
+
+    #response received from the call to the API is simulated using a random number generator
     0.upto(comments.length-1) do |i|
-      suggestion_chance+=rand(10).to_i
+      suggestion_score+=rand(10).to_i
     end
-	  return suggestion_chance
+	  return suggestion_score
   end
 
 
   def display_suggestion_metric_chart(reviewer)
-    labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
-    data = {
-        labels: labels,
+    labels2, reviewer_data2, all_reviewers_data2 = initialize_suggestion_chart_elements(reviewer)
+    data2 = {
+        labels: labels2,
         datasets: [
             {
-                backgroundColor: "rgba(63,178,142,0.6)", #CHANGED THIS
-                data: reviewer_data,
+                backgroundColor: "rgba(63,178,142,0.6)",
+                data: reviewer_data2,
                 borderWidth: 1
             },
             {
-                backgroundColor: "rgba(82,129,157,1 )", #CHANGED THIS
-                data: all_reviewers_data,
+                backgroundColor: "rgba(82,129,157,1 )",
+                data: all_reviewers_data2,
                 borderWidth: 1
             }
         ]
@@ -346,7 +349,7 @@ module ReviewMappingHelper
             display: false
         },
         width: "200",
-        height: "50", #decreased the width space around the bar
+        height: "75", #decreased the width space around the bar
         scales: {
             yAxes: [{
                         stacked: false,
@@ -356,13 +359,68 @@ module ReviewMappingHelper
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
-                            stepSize: 100, #change to 10
-                            max: 500 #change to 100
+                            stepSize: 30,
+                            max: 150
                         }
                     }]
         }
     }
-    horizontal_bar_chart data, options
+    horizontal_bar_chart data2, options
+  end
+
+  def initialize_suggestion_chart_elements(reviewer)
+    round = 0
+    labels = []
+    reviewer_s_data = []
+    all_reviewers_s_data = []
+
+    @all_reviewers_avg_suggestion_in_round_1=avg_num_suggestions_per_round(@assignment.id,1,@type)
+    @all_reviewers_avg_suggestion_in_round_2=avg_num_suggestions_per_round(@assignment.id,2,@type)
+    @all_reviewers_avg_suggestion_in_round_3=avg_num_suggestions_per_round(@assignment.id,3,@type)
+    @all_reviewers_overall_avg_suggestion=0
+
+
+    res = ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", @assignment.id, reviewer.id, @type])
+    rounds=0
+    overall_avg_vol=0
+    if @all_reviewers_avg_suggestion_in_round_1 > 0
+      round += 1
+      labels.push '1st'
+      suggestions_by_reviewer_round_1=num_suggestions_per_student_per_round(res,1)
+      reviewer_s_data.push suggestions_by_reviewer_round_1
+      all_reviewers_s_data.push @all_reviewers_avg_suggestion_in_round_1
+      overall_avg_vol+=suggestions_by_reviewer_round_1
+      @all_reviewers_overall_avg_suggestion+=@all_reviewers_avg_suggestion_in_round_1
+      rounds+=1
+    end
+    if @all_reviewers_avg_suggestion_in_round_2 > 0
+      round += 1
+      labels.push '2nd'
+      suggestions_by_reviewer_round_2=num_suggestions_per_student_per_round(res,2)
+      reviewer_s_data.push suggestions_by_reviewer_round_2
+      all_reviewers_s_data.push @all_reviewers_avg_suggestion_in_round_2
+      overall_avg_vol+=suggestions_by_reviewer_round_2
+      @all_reviewers_overall_avg_suggestion+=@all_reviewers_avg_suggestion_in_round_2
+      rounds+=1
+    end
+    if @all_reviewers_avg_suggestion_in_round_3 > 0
+      round += 1
+      labels.push '3rd'
+      suggestions_by_reviewer_round_3=num_suggestions_per_student_per_round(res,3)
+      reviewer_s_data.push suggestions_by_reviewer_round_3
+      all_reviewers_s_data.push @all_reviewers_avg_suggestion_in_round_3
+      overall_avg_vol+=suggestions_by_reviewer_round_3
+      @all_reviewers_overall_avg_suggestion+=@all_reviewers_avg_suggestion_in_round_3
+      rounds+=1
+    end
+    labels.push 'Total'
+    if rounds>0
+      overall_avg_vol=overall_avg_vol/rounds
+      reviewer_s_data.push overall_avg_vol
+      @all_reviewers_overall_avg_suggestion=@all_reviewers_overall_avg_suggestion/rounds
+      all_reviewers_s_data.push @all_reviewers_overall_avg_suggestion
+    end
+    [labels, reviewer_s_data, all_reviewers_s_data]
   end
   
   def list_review_submissions(participant_id, reviewee_team_id, response_map_id)

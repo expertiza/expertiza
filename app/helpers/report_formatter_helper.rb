@@ -1,6 +1,7 @@
 module ReportFormatterHelper
   def summary_by_reviewee_and_criteria(params, _session = nil)
     assign_basics(params)
+    search = params[:report][:search] || {}
     sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(@assignment, @summary_ws_url, search)
     @summary = sum.summary
     @reviewers = sum.reviewers

@@ -194,6 +194,7 @@ FactoryBot.define do
     is_calibrated false
     has_badge false
     allow_selecting_additional_reviews_after_1st_round false
+    is_supplementary_review_enabled true
   end
 
   factory :assignment_team, class: AssignmentTeam do

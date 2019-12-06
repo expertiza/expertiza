@@ -3,7 +3,6 @@ describe "Supplementary Review Questionnaire", js: true do
         create(:assignment, name: "TestAssignment", directory_path: "TestAssignment")
         create_list(:participant, 3)
         create(:topic, topic_name: "TestTopic")
-        create(:assignment_node)
         create(:deadline_type, name: "submission")
         create(:deadline_type, name: "review")
         create(:deadline_type, name: "metareview")
@@ -13,18 +12,7 @@ describe "Supplementary Review Questionnaire", js: true do
         create(:deadline_right)
         create(:deadline_right, name: 'Late')
         create(:deadline_right, name: 'OK')
-        create(:assignment_due_date, due_at: (DateTime.now.in_time_zone.in_time_zone + 1))
-        create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: (DateTime.now.in_time_zone.in_time_zone + 5))
-        create(:topic)
-        create(:topic, topic_name: "TestReview")
-        create(:team_user, user: User.where(role_id: 2).first)
-        create(:team_user, user: User.where(role_id: 2).second)
-        create(:assignment_team)
-        create(:team_user, user: User.where(role_id: 2).third, team: AssignmentTeam.second)
-        create(:signed_up_team)
-        create(:signed_up_team, team_id: 2, topic: SignUpTopic.second)
-        create(:assignment_questionnaire)
-        create(:question)
+        create(:assignment_due_date, deadline_type: DeadlineType.where(name: "submission").first, due_at: DateTime.now.in_time_zone + 1.day)
         (1..3).each do |i|
           create(:course, name: "Course #{i}")
         end
@@ -43,14 +31,8 @@ describe "Supplementary Review Questionnaire", js: true do
         visit '/sign_up_sheet/sign_up?id=1&topic_id=1' # signup topic
         visit '/student_task/list'
         click_link "TestAssignment"
+        expect(page).to have_content("Your work")
         click_link "Your work"
-      end
-    
-      def submit_to_topic
-        signup_topic
-        fill_in 'submission', with: "https://www.ncsu.edu"
-        click_on 'Upload link'
-        expect(page).to have_content "https://www.ncsu.edu"
       end
 
     it "can create assignment with supplementary review questoinnaire" do
@@ -95,14 +77,7 @@ describe "Supplementary Review Questionnaire", js: true do
     end
 
     it "can add supplementary review questions" do
-        submit_to_topic
-        user = User.find_by(name: "student2065")
-        stub_current_user(user, user.role.name, user.role)
-        visit '/student_task/list'
-        visit '/sign_up_sheet/sign_up?id=1&topic_id=1'
-        visit '/student_task/list'
-        click_link 'Your work'
-
+        signup_topic
         click_link 'Create/Edit Supplementary Review Questionnaire'
         expect(page).to have_content("Edit Review")
     end

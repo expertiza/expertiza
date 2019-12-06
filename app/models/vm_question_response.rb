@@ -56,7 +56,7 @@ class VmQuestionResponse
       review_map = if vary
                      ReviewResponseMap.get_responses_for_team_round(team, @round)
                    else
-                     ReviewResponseMap.get_assessments_for(team)
+                     SelfReviewResponseMap.get_assessments_for(team)
                    end
       review_map.each do |review|
         next unless SelfReviewResponseMap.exists?(review.map_id)
@@ -119,7 +119,7 @@ class VmQuestionResponse
       end
     end
 
-    # Changes by Rahul Sethi
+    # Changes for E1984 Improve self-review  Link peer review & self-review to derive grades
     return if @self_review_answers.nil?
     answers = Answer.where(response_id: @self_review_answers.response_id)
     answers.each do |answer|

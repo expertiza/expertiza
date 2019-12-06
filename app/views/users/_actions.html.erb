@@ -1,4 +1,5 @@
  <div>
+   <% if @user.role.instructor? %>
 <!-- E1976   add action enable at instructor profile page-->
     <table class="table borderless">
         <tr>
@@ -10,4 +11,5 @@
           <td><%= check_box 'user', 'action_enable', {}%></td>
         </tr>
     </table>
+   <% end %>
   </div>

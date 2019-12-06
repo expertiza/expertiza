@@ -316,9 +316,10 @@ module ReviewMappingHelper
   end
 
   # E1979: Completion/Progress view changes
-  # list all comments for each review map
-  def list_comments(response_map_id)
+  # list all urls in comments for each review map
+  def list_url_in_comments(response_map_id)
     response = Response.where(map_id: response_map_id)
+    # find all comments in each repsonse
     Answer.where(response_id: response.ids).try(:each) do |ans|
       @comments = ''
       @comments += ans.try(:comments)

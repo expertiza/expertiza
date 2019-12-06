@@ -17,16 +17,16 @@ class SignUpSheetController < ApplicationController
     case params[:action]
     when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
       ['Instructor',
-        'Teaching Assistant',
-        'Administrator',
-        'Super-Administrator',
-        'Student'].include? current_role_name and
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator',
+       'Student'].include? current_role_name and
       ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer") : true)
     else
       ['Instructor',
-        'Teaching Assistant',
-        'Administrator',
-        'Super-Administrator'].include? current_role_name
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator'].include? current_role_name
     end
   end
 

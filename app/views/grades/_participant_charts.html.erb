@@ -1,15 +1,15 @@
 <% if has_team_and_metareview?[:true_num] == 2 %>
-    <!--100 = 19 + 8 * 9 + 9-->
-    <% namecolwidth = 19 %>
-    <% colwidth = 9 %>
+  <!--100 = 19 + 8 * 9 + 9-->
+  <% namecolwidth = 19 %>
+  <% colwidth = 9 %>
 <% elsif has_team_and_metareview?[:true_num] == 1 %>
-    <!--100 = 16 + 6 * 12 + 12-->
-    <% namecolwidth = 16 %>
-    <% colwidth = 12 %>
+  <!--100 = 16 + 6 * 12 + 12-->
+  <% namecolwidth = 16 %>
+  <% colwidth = 12 %>
 <% else %>
-    <!--100 = 16 + 4 * 18 + 18-->
-    <% namecolwidth = 10 %>
-    <% colwidth = 18 %>
+  <!--100 = 16 + 4 * 18 + 18-->
+  <% namecolwidth = 10 %>
+  <% colwidth = 18 %>
 <% end %>
 
 <a href="#" name='score-chartLink' onClick="toggleElement('score-chart', 'stats');return false;">hide stats</a>

@@ -378,7 +378,6 @@ describe QuestionnairesController do
     context 'when add_new_questions is called and the change is not in the period.' do
       it 'AnswerHelper.in_active_period should be called to check if this change is in the period.' do
         params = {id: 1,
-                  add_new_questions: true,
                   new_question: {total_num: 2,
                                  type: 'TextArea'}}
         allow(AnswerHelper).to receive(:in_active_period).with('1').and_return(false)
@@ -390,7 +389,6 @@ describe QuestionnairesController do
     context 'when add_new_questions is called and the change is in the period.' do
       it 'AnswerHelper.delete_existing_responses should be called to check if this change is in the period.' do
         params = {id: 1,
-                  add_new_questions: true,
                   new_question: {total_num: 2,
                                  type: 'TextArea'}}
         allow(AnswerHelper).to receive(:in_active_period).with('1').and_return(true)

@@ -323,6 +323,9 @@ module ReviewMappingHelper
       @comments = ''
       @comments += ans.try(:comments)
     end
+    if @comments.nil?
+      return @comments
+    end
     urls = []
     # get every words in the comment
     words = @comments.split(" ")

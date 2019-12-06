@@ -84,9 +84,12 @@
                     <!-- TODO: only list comments, need to regex links in comments-->
                     <% urls = list_comments(ri.id)%>
                   </div>
-                   <% urls.each_with_index do |url| %>
-                     <%= link_to url.to_s, url %>
-                   <% end %>
+                  <% if !urls.nil? %>
+                    <% urls.each_with_index do |url| %>
+                      <%= link_to url.to_s, url %>
+                     <% end %>
+                  <% end %>
+
                 <% end %>
             <% end %>
           </td>

@@ -96,7 +96,6 @@ end
 
 group :development, :test do
   gem 'capybara'
-  gem 'parallel_tests'
   gem 'selenium-webdriver'
   gem 'simplecov', require: false
 end

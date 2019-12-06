@@ -284,7 +284,7 @@ Even in test descriptions, please avoid using `should`.
 end
 
 # ------------------------------------------------------------------------------
-# 14. Your RSpec testing files do not need to require helper files (e.g., rails_helper.rb, spec_helper.rb). 
+# 14. Your RSpec testing files do not need to require helper files (e.g., rails_helper.rb, spec_helper.rb).
 # ------------------------------------------------------------------------------
 if PR_ADDED.include? "require 'rspec'"                or
    PR_ADDED.include? "require \"rspec\""              or
@@ -310,7 +310,7 @@ end
 # ------------------------------------------------------------------------------
 # 15. You should avoid committing text files for RSpec tests.
 # ------------------------------------------------------------------------------
-if (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/.*spec.*\.txt/).any? or 
+if (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/.*spec.*\.txt/).any? or
    (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/.*spec.*\.csv/).any?
   warn("You committed text files (`*.txt` or `*.csv`) for RSpec tests; please double-check whether this is necessary.", sticky: true)
 end
@@ -486,7 +486,7 @@ end
 
 # ------------------------------------------------------------------------------
 # RSpec tests should avoid shallow tests
-# 37. Including too many wildcard argument matchers (e.g., anything, any_args).
+# 37. Including greater than or equal to five wildcard argument matchers (e.g., anything, any_args).
 # 38. Not writing/commenting out expectations for the tests.
 # 39. Test expectations do not include matchers, such as comparisons (e.g.,equal(expected_value)),
 #     the status change of objects (e.g.,change(object, :value).by(delta)), error handlings (e.g.,raise_error("message")).
@@ -509,7 +509,7 @@ end
   num_of_expectation_not_focus_on_real_value = added_lines_arr.count{ |loc| loc.scan(/^\+\s*expect\s*[\(\{]/).count > 0 and loc.scan(/\.(not_to|to_not)\s*(be_nil|be_empty|eq 0|eql 0|equal 0)/).count > 0 }
   num_of_wildcard_argument_matchers = added_lines.scan(/\((anything|any_args)\)/).count
   num_of_expectations_on_page = added_lines.scan(/\+\s*expect\s*\(page\)/).count
-  
+
   if num_of_wildcard_argument_matchers >= 5
     WILDCARD_ARGUMENT_MATCHERS_MESSAGE =
       markdown <<-MARKDOWN
@@ -538,7 +538,7 @@ To avoid `shallow tests` -- tests concentrating on irrelevant, unlikely-to-fail 
     warn(EXPECTATION_WITHOUT_MATCHERS_MESSAGE, sticky: true)
     break
   elsif num_of_expectation_not_focus_on_real_value > 0
-    EXPECTATION_NOT_FOCUS_ON_REAL_VALUE = 
+    EXPECTATION_NOT_FOCUS_ON_REAL_VALUE =
       markdown <<-MARKDOWN
 One or more of your test expectations only focus on the return value not being `nil`, `empty` or not equal to `0` without testing the `real` value.
 To avoid `shallow tests` -- tests concentrating on irrelevant, unlikely-to-fail conditions -- please write expectations to test the `real` value.

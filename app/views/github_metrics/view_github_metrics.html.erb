@@ -49,7 +49,7 @@
     <% github_metrics_summary = student_level_github_metrics_summary(@gitVariable[:commits], @gitVariable[:authors]) %>
     Show
     <%= select("graph","selector", GithubMetric::graph_types, {:selected=> @graph_type }) %>
-    Grouped
+    group by
     <%= select("timeline","selector", GithubMetric::timeline_types, {:selected=> @timeline_type }) %>
     <%= hidden_field_tag 'participant_id', params[:id] %>
     <button type="button" class="pull-right" data-toggle="modal" data-target="#myModal">Summary</button>
@@ -92,7 +92,7 @@
 
 
     <div class="chart-container" style="width: 1000px; height:600px;">
-      <%= display_github_metrics(@gitVariable, @graph_type, @timeline_type) %>
+      <%= display_github_metrics(@gitVariable, @graph_type, @timeline_type, @due_date) %>
     </div>
 
     <script>

@@ -1,4 +1,4 @@
 class GithubMetric < ActiveRecord::Base
-  enum graph_types: ['Commit Metrics','Lines Added Metrics','Lines Deleted Metrics']
-  enum timeline_types: ['By Week', 'By Student']
+  enum graph_types: ['number of commits','lines added','lines deleted']
+  enum timeline_types: ['week', 'student']
 end

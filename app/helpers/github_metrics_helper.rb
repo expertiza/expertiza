@@ -1,15 +1,23 @@
 require 'securerandom'
 module GithubMetricsHelper
-  def display_github_metrics(gitVariable, graph_type, timeline_type)
+  def display_github_metrics(gitVariable, graph_type, timeline_type, due_date)
     parsed_data = gitVariable[:parsed_data]
     authors = gitVariable[:authors]
     dates = gitVariable[:dates]
     dates_to_week = Set[]
+
+    submission_week = if ['Unknown', 'Finished'].include? due_date
+                        nil
+                      else
+                        DateTime.parse(due_date).strftime('%V')
+                      end
+
     dates.each do |date|
       dates_to_week.add(DateTime.parse(date).strftime('%V'))
     end
-
-    if timeline_type == GithubMetric::timeline_types['By Week'].to_s
+    @y_axis_label = ''
+    if timeline_type == GithubMetric::timeline_types['week'].to_s
+      @y_axis_label = 'Weeks to submission'
       dates_to_week = dates_to_week.sort
       parsed_data_by_week = {}
       parsed_data.each do |author_email, commit_hash|
@@ -32,6 +40,8 @@ module GithubMetricsHelper
       end
 
       data_array = []
+      color = %w[#ed1c1c99 #ffea0099 #00ff0899 #00e5ff99 #ff007799 #0d00ff99 #7d4a5699 #77c9c899]
+      i = 0
       authors.each do |author|
         no_of_commits_data = []
         no_of_lines_added_data = []
@@ -45,24 +55,30 @@ module GithubMetricsHelper
 
         data_object = {}
         data_object['label'] = author
-        data_object['backgroundColor'] = GithubMetricsHelper.color_hex()
+        data_object['backgroundColor'] = color[i]
         data_object['borderWidth'] = 1
         case graph_type
-        when GithubMetric::graph_types['Commit Metrics'].to_s
+        when GithubMetric::graph_types['number of commits'].to_s
           data_object['data'] = no_of_commits_data
           data_object['stack'] = 1
-        when GithubMetric::graph_types['Lines Added Metrics'].to_s
+        when GithubMetric::graph_types['lines added'].to_s
           data_object['data'] = no_of_lines_added_data
           data_object['stack'] = 2
-        when GithubMetric::graph_types['Lines Deleted Metrics'].to_s
+        when GithubMetric::graph_types['lines deleted'].to_s
           data_object['data'] = no_of_lines_deleted_data
           data_object['stack'] = 3
         else
-          data_object['data'] = no_of_commits_data
-          data_object['stack'] = 1
+          #do nothing
         end
         data_array.push(data_object)
+        i += 1
+        i = 0 if i > 7
       end
+
+      if submission_week.present?
+        dates_to_week = dates_to_week.map { |week| submission_week.to_i - week.to_i }
+      end
+
       data = {
         labels: dates_to_week,
         datasets: data_array
@@ -90,6 +106,8 @@ module GithubMetricsHelper
         end
       end
       data_array = []
+      color = %w[red yellow blue gray green magenta]
+      i = 0
       dates_to_week.each do |week|
         no_of_commits_data = []
         no_of_lines_added_data = []
@@ -103,23 +121,24 @@ module GithubMetricsHelper
 
         data_object = {}
         data_object['label'] = 'Week:' + week
-        data_object['backgroundColor'] = GithubMetricsHelper.color_hex()
+        data_object['backgroundColor'] = color[i]
         data_object['borderWidth'] = 1
         case graph_type
-        when GithubMetric::graph_types['Commit Metrics'].to_s
+        when GithubMetric::graph_types['number of commits'].to_s
           data_object['data'] = no_of_commits_data
           data_object['stack'] = 1
-        when GithubMetric::graph_types['Lines Added Metrics'].to_s
+        when GithubMetric::graph_types['lines added'].to_s
           data_object['data'] = no_of_lines_added_data
           data_object['stack'] = 2
-        when GithubMetric::graph_types['Lines Deleted Metrics'].to_s
+        when GithubMetric::graph_types['lines deleted'].to_s
           data_object['data'] = no_of_lines_deleted_data
           data_object['stack'] = 3
         else
-          data_object['data'] = no_of_commits_data
-          data_object['stack'] = 1
+          #do nothing
         end
         data_array.push(data_object)
+        i += 1
+        i = 0 if i > 7
       end
 
       data = {
@@ -150,7 +169,8 @@ module GithubMetricsHelper
           },
           barThickness: 30,
           scaleLabel: {
-            display: true
+            display: true,
+            labelString: @y_axis_label
           }
         }
       ],
@@ -158,13 +178,12 @@ module GithubMetricsHelper
         {
           stacked: true,
           ticks: {
-            beginAtZero: true,
-            maxRotation: 90,
-            minRotation: 0
+            beginAtZero: true
           },
           barThickness: 60,
           scaleLabel: {
-            display: true
+            display: true,
+            labelString: 'Count'
           }
         }
       ]

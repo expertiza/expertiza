@@ -8,6 +8,8 @@ class GithubMetricsController < ApplicationController
   include GradesHelper
   include GithubMetricsHelper
 
+  before_action :initialize_graph_type, only: [:view_github_metrics]
+
   def view
     session["github_base"] = parse_hostname AssignmentParticipant.find(params[:id]).team.hyperlinks[0]
     session["github_tokens"] = nil
@@ -40,8 +42,6 @@ class GithubMetricsController < ApplicationController
 
   # This function is used to show github_metrics information by redirecting to view.
   def view_github_metrics
-    @graph_type = params[:graphType] || '0'
-    @timeline_type = params[:timelineType] || '1'
     session["github_base"] = parse_hostname AssignmentParticipant.find(params[:id]).team.hyperlinks[0]
     #session["github_tokens"] = nil
     if session["github_tokens"].nil?
@@ -71,6 +71,10 @@ class GithubMetricsController < ApplicationController
 
     #@token = session["github_access_token"]
     @participant = AssignmentParticipant.find(params[:id])
+
+    topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
+    @due_date = @participant.assignment.stage_deadline(topic_id)
+
     @assignment = @participant.assignment
     @team = @participant.team
     @team_id = @team.id
@@ -324,5 +328,12 @@ class GithubMetricsController < ApplicationController
       |author, commits|
       @gitVariable[:parsed_data][author] = Hash[commits.sort_by {|date, _commit_count| date }]
     }
+  end
+
+  private
+
+  def initialize_graph_type
+    @graph_type = params[:graphType] || '0'
+    @timeline_type = params[:timelineType] || '1'
   end
 end

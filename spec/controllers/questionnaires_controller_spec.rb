@@ -394,7 +394,7 @@ describe QuestionnairesController do
                   new_question: {total_num: 2,
                                  type: 'TextArea'}}
         allow(AnswerHelper).to receive(:in_active_period).with('1').and_return(true)
-        expect(AnswerHelper).to receive(:delete_existing_responses).with([])
+        expect(AnswerHelper).to receive(:delete_existing_responses).with([], '1')
         post :add_new_questions, params
       end
     end

@@ -27,6 +27,9 @@
 <!--Question part-->
 <hr/>
 <% if !params[:id].nil? and params[:action] == 'edit' %>
+  <% if AnswerHelper.in_active_period(params[:id]) %>
+    It's the reviewing period now. All existing reviews for the questionnaire <b>will be deleted</b> if you ADD or REMOVE a question.
+  <% end %>
   <table id="question_actions_table">
     <tr>
       <td>

@@ -2,6 +2,7 @@ module ReportFormatterHelper
   def summary_by_reviewee_and_criteria(params, _session = nil)
     assign_basics(params)
     # E1991 : pass extra session variable to address anonymized view
+    # note that this is already passed from parent method in _session
     sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(@assignment, @summary_ws_url, _session)
     @summary = sum.summary
     @reviewers = sum.reviewers

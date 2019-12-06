@@ -77,7 +77,11 @@
         <%= render 'assignments/edit/other' %>
       </div>
       <div style="margin-bottom: 20px">
-      <%= button_tag "Save", :id => 'submit_btn', class: 'btn btn-md btn-default', :style => "margin-left: 20px;" %> | <%= render :partial => '/shared_scripts/back' %>
+      <%= button_tag "Save",
+             :id => 'submit_btn', 
+             class: 'btn btn-md btn-default', 
+            confirm: AnswerHelper.has_questionnaire_in_period(params[:id]) ? "All existing reviews for the questionnaire would be deleted. Are you sure you want to continue?" : nil, 
+            :style => "margin-left: 20px;" %> | <%= render :partial => '/shared_scripts/back' %>
       </div>
     </div>
     <script>

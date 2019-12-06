@@ -88,6 +88,25 @@ class AssignmentsController < ApplicationController
       assignment_form_key_nonexist_case_handler
       return
     end
+
+    question_ids=[]
+    records = AssignmentQuestionnaire.where(assignment_id:params[:id])
+    records.each do |record|
+      questions = Question.where(questionnaire_id:record.questionnaire_id)
+      questions.each do |question|
+        question_ids.push(question.id)
+      end
+    end
+
+    if AnswerHelper.has_questionnaire_in_period(params[:id])
+      begin
+        AnswerHelper.delete_existing_responses(question_ids)
+        flash[:success] = "You have successfully added a new question. The existing reviews for the questionnaire have been deleted!"
+        rescue StandardError
+        flash[:error] = $ERROR_INFO
+      end
+    end#MARK, delete only when review be changed.
+
     retrieve_assignment_form
     handle_current_user_timezonepref_nil
     update_feedback_assignment_form_attributes

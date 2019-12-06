@@ -69,7 +69,7 @@
                   console.log(lk+" review time is complete!");
               }*/
               failure: function(){
-                console.log("review time failed to save!");
+                // console.log("review time failed to save!");
               }
             });
           }
@@ -555,10 +555,10 @@
           success: function(json){
             var links = JSON.parse(JSON.stringify(json));
             for (lk in links)
-              console.log(lk+" review time is complete!");
+              // console.log(lk+" review time is complete!");
           },
           error: function(json){
-            console.log("review time failed to save!");
+            // console.log("review time failed to save!");
           }
         });
       }

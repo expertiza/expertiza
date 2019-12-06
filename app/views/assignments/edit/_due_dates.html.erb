@@ -2,14 +2,14 @@
     jQuery(document).ready(function() {
     jQuery("#set_rounds").click(function () {
         changeReviewRounds();
-        jQuery("#set_pressed_bool").val(true)
-        console.log(jQuery("#set_pressed_bool").val())
+        jQuery("#set_pressed_bool").val(true)g
+        // console.log(jQuery("#set_pressed_bool").val())
         event.preventDefault(); // Prevent link from following its href
     });
 
     jQuery("#assignment_form_assignment_rounds_of_reviews").change(function(){
         jQuery("#set_pressed_bool").val(false)
-        console.log(jQuery("#set_pressed_bool").val())
+        // console.log(jQuery("#set_pressed_bool").val())
     });
 
 
@@ -84,7 +84,7 @@
                 previous_element = jQuery('#submission_round_' + round_no);
             }
             else {
-                console.log('error: addDueDateTableElement');
+                // console.log('error: addDueDateTableElement');
             }
             element_id = deadline_type + '_round_' + round_no;
             if (jQuery('#' + element_id).length != 0) {

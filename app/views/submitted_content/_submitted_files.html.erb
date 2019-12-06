@@ -115,10 +115,10 @@
             success: function(json){
               var files = JSON.parse(JSON.stringify(json));
               for (fl in files)
-                console.log(fl+" review time is complete!");
+                // console.log(fl+" review time is complete!");
             },
             error: function(json){
-              console.log("review time failed to save!");
+              // console.log("review time failed to save!");
             }
           });
         }
@@ -161,7 +161,7 @@
                   console.log(lk+" review time is complete!");
               }*/
               failure: function(){
-                console.log("review time failed to save!");
+                // console.log("review time failed to save!");
               }
             });
           }

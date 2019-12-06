@@ -290,7 +290,7 @@ module ReviewMappingHelper
           author_feedback_total_score += feedback_response.total_score
           author_feedback_max_score = feedback_response.maximum_score
           author_feedback_count +=1
-        end  
+        end
       end
       # return "-- / --" if no author feedback, otherwise return avg_score
       author_feedback_avg_score = author_feedback_count == 0 ? "-- / --" : "#{author_feedback_total_score/author_feedback_count} / #{author_feedback_max_score}"
@@ -319,11 +319,9 @@ module ReviewMappingHelper
   # list all comments for each review map
   def list_comments(response_map_id)
     response = Response.where(map_id: response_map_id)
-    # response_map_id: 129689  response.ids:[95234 95517]
     Answer.where(response_id: response.ids).try(:each) do |ans|
       @comments = ''
       @comments += ans.try(:comments)
-      # print ans.try(:comments)
     end
     urls = []
     # get every words in the comment

@@ -103,12 +103,18 @@
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
                       <% if done_by_staff_participant?(review) %>
-                    <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + done_by_staff_participant?( review ).to_s %></a> <img class="img_icon" src="/assets/images/spy.png"> </th>
+                    <!-- Add icon to signal review was done by staff_participant -->
+                        <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s  %></a> <img data-toggle="tooltip" data-placement="right" title="Icon indicates this review was done by course staff" class="img_icon" src="/assets/staff.png"> </th>
+                      <% else %>
+                        <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>  </th>
                       <% end %>
-                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + done_by_staff_participant?( review ).to_s %></a>  </th>
                   <% else %>
                       <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
-                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a> </th>
+                      <% if done_by_staff_participant?(review) %>
+                        <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a><img data-toggle="tooltip" data-placement="right" title="Icon indicates this review was done by course staff" class="img_icon" src="/assets/staff.png"> </th>
+                      <% else %>
+                        <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a> </th>
+                      <% end %>
                   <% end %>
                   <% i += 1 %>
               <% end %>

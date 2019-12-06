@@ -90,9 +90,17 @@ module GradesHelper
     render "grades/view_heatgrid.html.erb"
   end
 
+  # Determines if a review was completed by a staff participant (either a TA or an instructor)
+  # Called in view_team.html to determine if a review should be marked as reviewed by course staff.
   def done_by_staff_participant?( review )
-    #user_name = Response.find( review.id ) #.map_id).reviewer_id).user_id).fullname(session[:ip]).to_s
     role = Role.find(User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).role_id).name
+    return (role == "Instructor") || (role == "Teaching Assistant")
+  end
+
+  # Determines if given participant is a staff participant (either a TA or an instructor)
+  # Called in views/response/view.html.erb to determine if a review should be marked as reviewed by course staff.
+  def is_course_staff?( participant )
+    role = Role.find(User.find(Participant.find(participant.id).user_id).role_id).name
     return (role == "Instructor") || (role == "Teaching Assistant")
   end
 

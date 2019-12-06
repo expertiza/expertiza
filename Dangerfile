@@ -509,7 +509,7 @@ end
   num_of_expectation_not_focus_on_real_value = added_lines_arr.count{ |loc| loc.scan(/^\+\s*expect\s*[\(\{]/).count > 0 and loc.scan(/\.(not_to|to_not)\s*(be_nil|be_empty|eq 0|eql 0|equal 0)/).count > 0 }
   num_of_wildcard_argument_matchers = added_lines.scan(/\((anything|any_args)\)/).count
   num_of_expectations_on_page = added_lines.scan(/\+\s*expect\s*\(page\)/).count
-
+  
   if num_of_wildcard_argument_matchers >= 5
     WILDCARD_ARGUMENT_MATCHERS_MESSAGE =
       markdown <<-MARKDOWN
@@ -538,7 +538,7 @@ To avoid `shallow tests` -- tests concentrating on irrelevant, unlikely-to-fail 
     warn(EXPECTATION_WITHOUT_MATCHERS_MESSAGE, sticky: true)
     break
   elsif num_of_expectation_not_focus_on_real_value > 0
-    EXPECTATION_NOT_FOCUS_ON_REAL_VALUE = 
+    EXPECTATION_NOT_FOCUS_ON_REAL_VALUE =
       markdown <<-MARKDOWN
 One or more of your test expectations only focus on the return value not being `nil`, `empty` or not equal to `0` without testing the `real` value.
 To avoid `shallow tests` -- tests concentrating on irrelevant, unlikely-to-fail conditions -- please write expectations to test the `real` value.

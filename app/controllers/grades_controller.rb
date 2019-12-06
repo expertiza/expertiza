@@ -279,10 +279,10 @@ class GradesController < ApplicationController
 
   def assign_all_penalties(participant, penalties)
     @all_penalties[participant.id] = {
-        submission: penalties[:submission],
-        review: penalties[:review],
-        meta_review: penalties[:meta_review],
-        total_penalty: @total_penalty
+      submission: penalties[:submission],
+      review: penalties[:review],
+      meta_review: penalties[:meta_review],
+      total_penalty: @total_penalty
     }
   end
 

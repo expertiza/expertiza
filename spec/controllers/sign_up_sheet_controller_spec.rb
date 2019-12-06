@@ -37,17 +37,17 @@ describe SignUpSheetController do
         it 'sets up a new topic and redirects to assignment#edit page' do
           allow(SignUpTopic).to receive(:where).with(topic_name: 'Hello world!', assignment_id: '1').and_return([nil])
           allow_any_instance_of(SignUpSheetController).to receive(:undo_link)
-                                                              .with("The topic: \"Hello world!\" has been created successfully. ").and_return('OK')
+            .with("The topic: \"Hello world!\" has been created successfully. ").and_return('OK')
           allow(topic).to receive(:save).and_return('OK')
           params = {
-              id: 1,
-              topic: {
-                  topic_identifier: 1,
-                  topic_name: 'Hello world!',
-                  max_choosers: 1,
-                  category: '',
-                  micropayment: 1
-              }
+            id: 1,
+            topic: {
+              topic_identifier: 1,
+              topic_name: 'Hello world!',
+              max_choosers: 1,
+              category: '',
+              micropayment: 1
+            }
           }
           post :create, params
           expect(response).to redirect_to('/assignments/1/edit#tabs-5')
@@ -58,16 +58,16 @@ describe SignUpSheetController do
         it 'sets up a new topic and renders sign_up_sheet#new page' do
           allow(SignUpTopic).to receive(:where).with(topic_name: 'Hello world!', assignment_id: '1').and_return([nil])
           allow_any_instance_of(SignUpSheetController).to receive(:undo_link)
-                                                              .with("The topic: \"Hello world!\" has been created successfully. ").and_return('OK')
+            .with("The topic: \"Hello world!\" has been created successfully. ").and_return('OK')
           allow(topic).to receive(:save).and_return('OK')
           params = {
-              id: 1,
-              topic: {
-                  topic_identifier: 1,
-                  topic_name: 'Hello world!',
-                  category: '',
-                  micropayment: 1
-              }
+            id: 1,
+            topic: {
+              topic_identifier: 1,
+              topic_name: 'Hello world!',
+              category: '',
+              micropayment: 1
+            }
           }
           post :create, params
           expect(response).to render_template(:new)
@@ -82,14 +82,14 @@ describe SignUpSheetController do
         allow(Team).to receive(:find).with(2).and_return(team)
         allow(SignUpTopic).to receive(:find_waitlisted_topics).with(1, 2).and_return(nil)
         params = {
-            id: 1,
-            topic: {
-                topic_identifier: 666,
-                topic_name: 'Hello world!',
-                max_choosers: 2,
-                category: '666',
-                micropayment: 1
-            }
+          id: 1,
+          topic: {
+            topic_identifier: 666,
+            topic_name: 'Hello world!',
+            max_choosers: 2,
+            category: '666',
+            micropayment: 1
+          }
         }
         post :create, params
         expect(SignedUpTeam.first.is_waitlisted).to be false
@@ -102,7 +102,7 @@ describe SignUpSheetController do
     context 'when topic can be found' do
       it 'redirects to assignment#edit page' do
         allow_any_instance_of(SignUpSheetController).to receive(:undo_link)
-                                                            .with("The topic: \"Hello world!\" has been successfully deleted. ").and_return('OK')
+          .with("The topic: \"Hello world!\" has been successfully deleted. ").and_return('OK')
         params = {id: 1, assignment_id: 1}
         post :destroy, params
         expect(response).to redirect_to('/assignments/1/edit#tabs-5')
@@ -113,7 +113,7 @@ describe SignUpSheetController do
       it 'shows an error flash message and redirects to assignment#edit page' do
         allow(SignUpTopic).to receive(:find).with('1').and_return(nil)
         allow_any_instance_of(SignUpSheetController).to receive(:undo_link)
-                                                            .with("The topic: \"Hello world!\" has been successfully deleted. ").and_return('OK')
+          .with("The topic: \"Hello world!\" has been successfully deleted. ").and_return('OK')
         params = {id: 1, assignment_id: 1}
         post :destroy, params
         expect(flash[:error]).to eq('The topic could not be deleted.')
@@ -149,17 +149,17 @@ describe SignUpSheetController do
         allow(Team).to receive(:find).with(2).and_return(team)
         allow(SignUpTopic).to receive(:find_waitlisted_topics).with(1, 2).and_return(nil)
         allow_any_instance_of(SignUpSheetController).to receive(:undo_link)
-                                                            .with("The topic: \"Hello world!\" has been successfully updated. ").and_return('OK')
+          .with("The topic: \"Hello world!\" has been successfully updated. ").and_return('OK')
         params = {
-            id: 2,
-            assignment_id: 1,
-            topic: {
-                topic_identifier: 666,
-                topic_name: 'Hello world!',
-                max_choosers: 2,
-                category: '666',
-                micropayment: 1
-            }
+          id: 2,
+          assignment_id: 1,
+          topic: {
+            topic_identifier: 666,
+            topic_name: 'Hello world!',
+            max_choosers: 2,
+            category: '666',
+            micropayment: 1
+          }
         }
         post :update, params
         expect(response).to redirect_to('/assignments/1/edit#tabs-5')
@@ -244,9 +244,9 @@ describe SignUpSheetController do
             allow(SignedUpTeam).to receive(:topic_id).with('1', 8).and_return(1)
             allow_any_instance_of(SignedUpTeam).to receive(:save).and_return(team)
             params = {
-                username: 'no name',
-                assignment_id: 1,
-                topic_id: 1
+              username: 'no name',
+              assignment_id: 1,
+              topic_id: 1
             }
             get :signup_as_instructor_action, params
             expect(flash[:success]).to eq('You have successfully signed up the student for the topic!')
@@ -262,8 +262,8 @@ describe SignUpSheetController do
             allow(TeamsUser).to receive(:create).with(user_id: 8, team_id: 1).and_return(double('TeamsUser', id: 1))
             allow(TeamUserNode).to receive(:create).with(parent_id: 1, node_object_id: 1).and_return(double('TeamUserNode', id: 1))
             params = {
-                username: 'no name',
-                assignment_id: 1
+              username: 'no name',
+              assignment_id: 1
             }
             get :signup_as_instructor_action, params
             expect(flash[:error]).to eq('The student has already signed up for a topic!')
@@ -276,8 +276,8 @@ describe SignUpSheetController do
         it 'shows a flash error message and redirects to assignment#edit page' do
           allow(AssignmentParticipant).to receive(:exists?).with(user_id: 8, parent_id: '1').and_return(false)
           params = {
-              username: 'no name',
-              assignment_id: 1
+            username: 'no name',
+            assignment_id: 1
           }
           get :signup_as_instructor_action, params
           expect(flash[:error]).to eq('The student is not registered for the assignment!')
@@ -388,9 +388,9 @@ describe SignUpSheetController do
       allow(Bid).to receive(:where).with(topic_id: '1', team_id: 1).and_return([bid])
       allow_any_instance_of(Array).to receive(:update_all).with(priority: 1).and_return([bid])
       params = {
-          participant_id: 1,
-          assignment_id: 1,
-          topic: ['1']
+        participant_id: 1,
+        assignment_id: 1,
+        topic: ['1']
       }
       post :set_priority, params
       expect(response).to redirect_to('/sign_up_sheet/list?assignment_id=1')
@@ -406,8 +406,8 @@ describe SignUpSheetController do
         allow(DeadlineType).to receive(:find_by_name).with(any_args).and_return(double('DeadlineType', id: 1))
         allow(TopicDueDate).to receive(:create).with(any_args).and_return(double('TopicDueDate'))
         params = {
-            assignment_id: 1,
-            due_date: {}
+          assignment_id: 1,
+          due_date: {}
         }
         post :save_topic_deadlines, params
         expect(response).to redirect_to('/assignments/1/edit')
@@ -424,8 +424,8 @@ describe SignUpSheetController do
         allow(TopicDueDate).to receive(:where).with(parent_id: 1, deadline_type_id: 1, round: 1).and_return([topic_due_date])
         allow(topic_due_date).to receive(:update_attributes).with(any_args).and_return(topic_due_date)
         params = {
-            assignment_id: 1,
-            due_date: {}
+          assignment_id: 1,
+          due_date: {}
         }
         post :save_topic_deadlines, params
         expect(response).to redirect_to('/assignments/1/edit')
@@ -454,8 +454,8 @@ describe SignUpSheetController do
       allow(SignedUpTeam).to receive(:where).with(topic_id: 1, is_waitlisted: 1).and_return([signed_up_team])
       allow(SignUpSheet).to receive(:signup_team).with(1, 8, 1).and_return('OK!')
       params = {
-          id: 1,
-          topic_id: 1
+        id: 1,
+        topic_id: 1
       }
       session = {user: instructor}
       get :switch_original_topic_to_approved_suggested_topic, params, session

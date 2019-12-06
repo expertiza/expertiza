@@ -70,14 +70,14 @@ describe "assignment function" do
       click_button 'Create'
       assignment = Assignment.where(name: 'public assignment for test').first
       expect(assignment).to have_attributes(
-                                name: 'public assignment for test',
-                                course_id: Course.find_by(name: 'Course 2').id,
-                                directory_path: 'testDirectory',
-                                spec_location: 'testLocation',
-                                microtask: true,
-                                is_calibrated: true,
-                                availability_flag: false
-                            )
+        name: 'public assignment for test',
+        course_id: Course.find_by(name: 'Course 2').id,
+        directory_path: 'testDirectory',
+        spec_location: 'testLocation',
+        microtask: true,
+        is_calibrated: true,
+        availability_flag: false
+      )
     end
 
     it "is able to create a private assignment" do
@@ -97,11 +97,11 @@ describe "assignment function" do
       click_button 'Create'
       assignment = Assignment.where(name: 'private assignment for test').first
       expect(assignment).to have_attributes(
-                                name: 'private assignment for test',
-                                course_id: Course.find_by(name: 'Course 2').id,
-                                directory_path: 'testDirectory',
-                                spec_location: 'testLocation'
-                            )
+        name: 'private assignment for test',
+        course_id: Course.find_by(name: 'Course 2').id,
+        directory_path: 'testDirectory',
+        spec_location: 'testLocation'
+      )
     end
 
     it "is able to create with teams" do
@@ -119,9 +119,9 @@ describe "assignment function" do
 
       assignment = Assignment.where(name: 'private assignment for test').first
       expect(assignment).to have_attributes(
-                                max_team_size: 3,
-                                show_teammate_reviews: true
-                            )
+        max_team_size: 3,
+        show_teammate_reviews: true
+      )
     end
     # instructor can check "has quiz" box and set the number of quiz questions
     it "is able to create with quiz" do
@@ -138,9 +138,9 @@ describe "assignment function" do
 
       assignment = Assignment.where(name: 'private assignment for test').first
       expect(assignment).to have_attributes(
-                                num_quiz_questions: 3,
-                                require_quiz: true
-                            )
+        num_quiz_questions: 3,
+        require_quiz: true
+      )
     end
 
     it "is able to create with staggered deadline" do
@@ -164,8 +164,8 @@ describe "assignment function" do
       assignment = Assignment.where(name: 'private assignment for test').first
       pending(%(not sure what's broken here but the error is: #ActionController::RoutingError: No route matches [GET] "/assets/staggered_deadline_assignment_graph/graph_1.jpg"))
       expect(assignment).to have_attributes(
-                                staggered_deadline: true
-                            )
+        staggered_deadline: true
+      )
     end
 
     ## should be able to create with review visible to all reviewres
@@ -182,11 +182,11 @@ describe "assignment function" do
       # click_button 'Create'
       assignment = Assignment.where(name: 'private assignment for test').first
       expect(assignment).to have_attributes(
-                                name: 'private assignment for test',
-                                course_id: Course.find_by(name: 'Course 2').id,
-                                directory_path: 'testDirectory',
-                                spec_location: 'testLocation'
-                            )
+        name: 'private assignment for test',
+        course_id: Course.find_by(name: 'Course 2').id,
+        directory_path: 'testDirectory',
+        spec_location: 'testLocation'
+      )
     end
 
     it "is able to create public micro-task assignment" do
@@ -201,8 +201,8 @@ describe "assignment function" do
 
       assignment = Assignment.where(name: 'public assignment for test').first
       expect(assignment).to have_attributes(
-                                microtask: true
-                            )
+        microtask: true
+      )
     end
     it "is able to create calibrated public assignment" do
       login_as("instructor6")
@@ -216,8 +216,8 @@ describe "assignment function" do
 
       assignment = Assignment.where(name: 'public assignment for test').first
       expect(assignment).to have_attributes(
-                                is_calibrated: true
-                            )
+        is_calibrated: true
+      )
     end
     it "is able show tab review strategy" do
       login_as("instructor6")
@@ -259,14 +259,14 @@ describe "assignment function" do
       submission_due_date = DueDate.find(1)
       review_due_date = DueDate.find(2)
       expect(submission_due_date).to have_attributes(
-                                         deadline_type_id: submission_type_id,
-                                         type: 'AssignmentDueDate'
-                                     )
+        deadline_type_id: submission_type_id,
+        type: 'AssignmentDueDate'
+      )
 
       expect(review_due_date).to have_attributes(
-                                     deadline_type_id: review_type_id,
-                                     type: 'AssignmentDueDate'
-                                 )
+        deadline_type_id: review_type_id,
+        type: 'AssignmentDueDate'
+      )
     end
 
     it "is able show tab rubrics" do
@@ -306,10 +306,10 @@ describe "assignment function" do
       click_button 'Create'
       assignment = Assignment.where(name: 'public assignment for test').first
       expect(assignment).to have_attributes(
-                                review_assignment_strategy: 'Auto-Selected',
-                                review_topic_threshold: 3,
-                                max_reviews_per_submission: 10
-                            )
+        review_assignment_strategy: 'Auto-Selected',
+        review_topic_threshold: 3,
+        max_reviews_per_submission: 10
+      )
     end
   end
 
@@ -336,14 +336,14 @@ describe "assignment function" do
       submission_due_date = DueDate.find(1)
       review_due_date = DueDate.find(2)
       expect(submission_due_date).to have_attributes(
-                                         deadline_type_id: submission_type_id,
-                                         type: 'AssignmentDueDate'
-                                     )
+        deadline_type_id: submission_type_id,
+        type: 'AssignmentDueDate'
+      )
 
       expect(review_due_date).to have_attributes(
-                                     deadline_type_id: review_type_id,
-                                     type: 'AssignmentDueDate'
-                                 )
+        deadline_type_id: review_type_id,
+        type: 'AssignmentDueDate'
+      )
     end
   end
   # adding test for general tab
@@ -367,13 +367,13 @@ describe "assignment function" do
       click_button 'Save'
       assignment = Assignment.where(name: 'edit assignment for test').first
       expect(assignment).to have_attributes(
-                                name: 'edit assignment for test',
-                                course_id: Course.find_by(name: 'Course 2').id,
-                                directory_path: 'testDirectory1',
-                                spec_location: 'testLocation1',
-                                microtask: true,
-                                is_calibrated: true
-                            )
+        name: 'edit assignment for test',
+        course_id: Course.find_by(name: 'Course 2').id,
+        directory_path: 'testDirectory1',
+        spec_location: 'testLocation1',
+        microtask: true,
+        is_calibrated: true
+      )
     end
 
     it "should edit quiz number available to students" do
@@ -384,13 +384,13 @@ describe "assignment function" do
       click_button 'Save'
       assignment = Assignment.where(name: 'edit assignment for test').first
       expect(assignment).to have_attributes(
-                                name: 'edit assignment for test',
-                                course_id: Course.find_by(name: 'Course 2').id,
-                                directory_path: 'testDirectory1',
-                                spec_location: 'testLocation1',
-                                num_quiz_questions: 5,
-                                require_quiz: true
-                            )
+        name: 'edit assignment for test',
+        course_id: Course.find_by(name: 'Course 2').id,
+        directory_path: 'testDirectory1',
+        spec_location: 'testLocation1',
+        num_quiz_questions: 5,
+        require_quiz: true
+      )
     end
 
     it "should edit number of members per team " do
@@ -400,13 +400,13 @@ describe "assignment function" do
       click_button 'Save'
       assignment = Assignment.where(name: 'edit assignment for test').first
       expect(assignment).to have_attributes(
-                                name: 'edit assignment for test',
-                                course_id: Course.find_by(name: 'Course 2').id,
-                                directory_path: 'testDirectory1',
-                                spec_location: 'testLocation1',
-                                max_team_size: 5,
-                                show_teammate_reviews: true
-                            )
+        name: 'edit assignment for test',
+        course_id: Course.find_by(name: 'Course 2').id,
+        directory_path: 'testDirectory1',
+        spec_location: 'testLocation1',
+        max_team_size: 5,
+        show_teammate_reviews: true
+      )
     end
 
     ##### test reviews visible to all other reviewers ######
@@ -416,11 +416,11 @@ describe "assignment function" do
       click_button 'Save'
       assignment = Assignment.where(name: 'edit assignment for test').first
       expect(assignment).to have_attributes(
-                                name: 'edit assignment for test',
-                                course_id: Course.find_by(name: 'Course 2').id,
-                                directory_path: 'testDirectory1',
-                                spec_location: 'testLocation1'
-                            )
+        name: 'edit assignment for test',
+        course_id: Course.find_by(name: 'Course 2').id,
+        directory_path: 'testDirectory1',
+        spec_location: 'testLocation1'
+      )
     end
 
     it "check if checking calibration shows the tab" do
@@ -454,12 +454,12 @@ describe "assignment function" do
       click_button 'submit_btn'
       assignment = Assignment.where(name: 'public assignment for test').first
       expect(assignment).to have_attributes(
-                                allow_suggestions: true,
-                                is_intelligent: true,
-                                can_review_same_topic: true,
-                                can_choose_topic_to_review: true,
-                                use_bookmark: true
-                            )
+        allow_suggestions: true,
+        is_intelligent: true,
+        can_review_same_topic: true,
+        can_choose_topic_to_review: true,
+        use_bookmark: true
+      )
     end
 
     it "can edit topics properties - unCheck" do
@@ -471,12 +471,12 @@ describe "assignment function" do
       click_button 'submit_btn'
       assignment = Assignment.where(name: 'public assignment for test').first
       expect(assignment).to have_attributes(
-                                allow_suggestions: false,
-                                is_intelligent: false,
-                                can_review_same_topic: false,
-                                can_choose_topic_to_review: false,
-                                use_bookmark: false
-                            )
+        allow_suggestions: false,
+        is_intelligent: false,
+        can_review_same_topic: false,
+        can_choose_topic_to_review: false,
+        use_bookmark: false
+      )
     end
 
     it "Add new topic" do
@@ -490,12 +490,12 @@ describe "assignment function" do
 
       sign_up_topics = SignUpTopic.where(topic_name: 'Test').first
       expect(sign_up_topics).to have_attributes(
-                                    topic_name: 'Test',
-                                    assignment_id: 1,
-                                    max_choosers: 2,
-                                    topic_identifier: '1',
-                                    category: 'Test Category'
-                                )
+        topic_name: 'Test',
+        assignment_id: 1,
+        max_choosers: 2,
+        topic_identifier: '1',
+        category: 'Test Category'
+      )
     end
 
     it "Delete existing topic", js: true do
@@ -553,8 +553,8 @@ describe "assignment function" do
         sleep 1
         questionnaire = get_questionnaire("ReviewQuestionnaire2").first
         expect(questionnaire).to have_attributes(
-                                     notification_limit: 50
-                                 )
+          notification_limit: 50
+        )
       end
 
       it "should update scored question dropdown" do
@@ -579,8 +579,8 @@ describe "assignment function" do
         click_button 'Save'
         questionnaire = get_questionnaire("AuthorFeedbackQuestionnaire2").first
         expect(questionnaire).to have_attributes(
-                                     notification_limit: 50
-                                 )
+          notification_limit: 50
+        )
       end
 
       ##
@@ -595,8 +595,8 @@ describe "assignment function" do
         click_button 'Save'
         questionnaire = get_questionnaire("TeammateReviewQuestionnaire2").first
         expect(questionnaire).to have_attributes(
-                                     notification_limit: 50
-                                 )
+          notification_limit: 50
+        )
       end
     end
   end
@@ -618,10 +618,10 @@ describe "assignment function" do
       click_button 'Save'
       assignment = Assignment.where(name: 'public assignment for test').first
       expect(assignment).to have_attributes(
-                                review_assignment_strategy: 'Auto-Selected',
-                                review_topic_threshold: 3,
-                                max_reviews_per_submission: 10
-                            )
+        review_assignment_strategy: 'Auto-Selected',
+        review_topic_threshold: 3,
+        max_reviews_per_submission: 10
+      )
     end
 
     # instructor assign reviews will happen only one time, so the data will not be store in DB.
@@ -693,14 +693,14 @@ describe "assignment function" do
       submission_due_date = DueDate.find(1)
       review_due_date = DueDate.find(2)
       expect(submission_due_date).to have_attributes(
-                                         deadline_type_id: submission_type_id,
-                                         type: 'AssignmentDueDate'
-                                     )
+        deadline_type_id: submission_type_id,
+        type: 'AssignmentDueDate'
+      )
 
       expect(review_due_date).to have_attributes(
-                                     deadline_type_id: review_type_id,
-                                     type: 'AssignmentDueDate'
-                                 )
+        deadline_type_id: review_type_id,
+        type: 'AssignmentDueDate'
+      )
     end
   end
 
@@ -720,7 +720,7 @@ describe "assignment function" do
 
     assignment_row = Assignment.where(name: 'Test Assignment')[0]
     expect(assignment_row).to have_attributes(
-                                  course_id: course_id
-                              )
+      course_id: course_id
+    )
   end
 end

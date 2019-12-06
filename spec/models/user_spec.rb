@@ -10,19 +10,23 @@ describe User do
     it 'returns the name of the user' do
       expect(user.name).to eq('abc')
     end
+
     it 'Validate presence of name which cannot be blank' do
       expect(user).to be_valid
       user.name = '  '
       expect(user).not_to be_valid
     end
+
     it 'Validate that name is always unique' do
       expect(user1).to validate_uniqueness_of(:name)
     end
+
     it 'Validate that the name does not contain white spaces' do
       expect(user).to be_valid
       user.name = 'abc def'
       expect(user).not_to be_valid
     end
+
   end
 
   describe '#fullname' do
@@ -65,6 +69,7 @@ describe User do
       user.email = 'a@x.com'
       expect(user).to be_valid
     end
+
   end
 
   describe '#salt_first?' do
@@ -159,6 +164,62 @@ describe User do
       it 'fetches all users in his/her course/assignment' do
         allow(user).to receive_message_chain("role.instructor?") { true }
         expect(user.get_user_list).to eq([user1, user2])
+      end
+    end
+
+    context 'when current user is super admin and search by user name' do
+      it 'fetches all users with abc' do
+        allow(user).to receive_message_chain("role.super_admin?") { true }
+        expect(user.get_user_list("abc", "", "", "")).to eq([user1, user2])
+      end
+    end
+
+    context 'when current user is super admin and search by user name is empty' do
+      it 'fetches all users with abc' do
+        allow(user).to receive_message_chain("role.super_admin?") { true }
+        expect(user.get_user_list("xyz", "", "", "")).to eq([])
+      end
+    end
+
+    context 'when current user is super admin and search by user email' do
+      it 'fetches all users with email abcbbe@gmail.com' do
+        allow(user).to receive_message_chain("role.super_admin?") { true }
+        expect(user.get_user_list("", "", "", "abcbbe@gmail.com")).to eq([user2])
+      end
+    end
+
+    context 'when current user is super admin and search by user email is empty' do
+      it 'fetches all users with email xyz@gmail.com' do
+        allow(user).to receive_message_chain("role.super_admin?") { true }
+        expect(user.get_user_list("", "", "", "xyz@gmail.com")).to eq([])
+      end
+    end
+
+    context 'when current user is super admin and search by user email by substring' do
+      it 'fetches all users with email *b*' do
+        allow(user).to receive_message_chain("role.super_admin?") { true }
+        expect(user.get_user_list("", "", "", "b")).to eq([user1, user2])
+      end
+    end
+
+    context 'when current user is super admin and search by user full name' do
+      it 'fetches all users with bbc' do
+        allow(user).to receive_message_chain("role.super_admin?") { true }
+        expect(user.get_user_list("", "", "bbc", "")).to eq([user1, user2])
+      end
+    end
+
+    context 'when current user is super admin and search by user full name is empty' do
+      it 'fetches all users with xyz' do
+        allow(user).to receive_message_chain("role.super_admin?") { true }
+        expect(user.get_user_list("", "", "xyz", "")).to eq([])
+      end
+    end
+
+    context 'when current user is super admin and search by user name and email' do
+      it 'fetches all users with xyz' do
+        allow(user).to receive_message_chain("role.super_admin?") { true }
+        expect(user.get_user_list("abc", "", "", "abcbbe@gmail.com")).to eq([user2])
       end
     end
 
@@ -321,7 +382,7 @@ describe User do
   describe '.export_fields' do
     it 'exports all information setting in options' do
       expect(User.export_fields('personal_details' => 'true', 'role' => 'true', 'parent' => 'true', 'email_options' => 'true', 'handle' => 'true'))
-        .to eq(['name', 'full name', 'email', 'role', 'parent', 'email on submission', 'email on review', 'email on metareview', 'handle'])
+          .to eq(['name', 'full name', 'email', 'role', 'parent', 'email on submission', 'email on review', 'email on metareview', 'handle'])
     end
 
     it 'exports only personal_details' do

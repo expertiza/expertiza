@@ -1,10 +1,12 @@
 module GithubMetricsHelper
+  # parses the data from git api to show the chart
   def display_github_metrics(gitVariable, graph_type, timeline_type, due_date)
     @parsed_data = gitVariable[:parsed_data]
     @authors = gitVariable[:authors]
     dates = gitVariable[:dates]
     @dates_to_week = Set[]
     @y_axis_label = ''
+    # get the first submission date week
     @submission_week = if ['Unknown', 'Finished'].include? due_date
                         nil
                       else
@@ -14,7 +16,7 @@ module GithubMetricsHelper
     dates.each do |date|
       @dates_to_week.add(DateTime.parse(date).strftime('%V'))
     end
-    
+
     if timeline_type == GithubMetric::timeline_types['week'].to_s
       data_array = get_commits_data_group_by_week(graph_type)
 
@@ -96,10 +98,13 @@ module GithubMetricsHelper
 
   private
 
+  # This function will return commits data by week for each author
   def get_commits_data_group_by_week(graph_type)
     @y_axis_label = 'Weeks to submission'
     @dates_to_week = @dates_to_week.sort
     parsed_data_by_week = {}
+
+    # for author calculate the number of commits, additions and deletions by week
     @parsed_data.each do |author_email, commit_hash|
       week_commits = {}
       @dates_to_week.each do |key|
@@ -109,6 +114,7 @@ module GithubMetricsHelper
           deletions: 0
         }
       end
+
       commit_hash.each do |date, commit_object|
         week_number = DateTime.parse(date).strftime('%V')
         week_commits[week_number][:commits] += commit_object[:commits]
@@ -147,7 +153,7 @@ module GithubMetricsHelper
     data_array
   end
 
-
+  # This function will return commits data by author for each week
   def get_commits_data_group_by_student(graph_type)
     parsed_data_by_week = {}
     @dates_to_week = @dates_to_week.sort
@@ -162,6 +168,8 @@ module GithubMetricsHelper
       end
       parsed_data_by_week[week] = week_data
     end
+
+    # for every week calculate the number of commits, additions and deletions by author
     @parsed_data.each do |author_email, commit_hash|
       commit_hash.each do |date, commit_object|
         week = DateTime.parse(date).strftime('%V')
@@ -194,6 +202,7 @@ module GithubMetricsHelper
     data_array
   end
 
+  #stack is for group bar chart
   def initialize_data_object(graph_type)
     data_object = {}
     data_object['borderWidth'] = 1

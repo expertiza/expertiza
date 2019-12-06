@@ -88,6 +88,36 @@ describe Team do
     end
   end
 
+  describe '#half?' do
+    context 'when the parent_id of current team is nil' do
+      it 'returns false' do
+        team.parent_id = nil
+        expect(team.half?).to be false
+      end
+    end
+
+    context 'when the parent_id of current team is not nil' do
+      before(:each) do
+        allow(Assignment).to receive(:find).with(1).and_return(assignment)
+      end
+      context 'when the current team size x2 is bigger than to max team members' do
+        it 'returns true' do
+          # the max team size is set to 3 in factories.rb
+          # 2 should be enough to trigger
+          allow(Team).to receive(:size).and_return(2)
+          expect(team.half?).to be true
+        end
+      end
+
+      context 'when the current team size is smaller than or equal max team members' do
+        it 'returns false' do
+          allow(Team).to receive(:size).and_return(1)
+          expect(team.half?).to be false
+        end
+      end
+    end
+  end
+
   describe '#add_member' do
     context 'when parameterized user has already joined in current team' do
       it 'raise an error' do

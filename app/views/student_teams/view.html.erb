@@ -1,6 +1,7 @@
 <h1>Team Information for <%= @student.assignment.name %></h1>
-<!--present all teams-->
+<!--present all teams instead of just present one-->
 <%@student.teams.each do |team| %>
+<!--  use new 'teams' method for participant to get all teams-->
 <% if team == nil %>
   You no longer have a team!
   <h3>Name team</h3>

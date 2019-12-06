@@ -192,7 +192,7 @@ class AssignmentParticipant < Participant
     AssignmentTeam.team(self)
   end
 
-  #get a set of teams which mentored by current user
+  #new method get a set of teams which mentored by current user
   def teams
     AssignmentTeam.teams(self.parent_id,self)
   end

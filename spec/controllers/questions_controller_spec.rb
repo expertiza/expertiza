@@ -1,9 +1,7 @@
 describe QuestionsController do
-  let(:questionnaire) {build(:questionnaire, id: 1)}
-  let(:question) {build(:question, id: 1, questionnaire_id: 1)}
   before(:each) do
     @questionnaire = create(:questionnaire, id: 1)
-    @question = create(:question, id: 1, @questionnaire_id: 1)
+    @question = create(:question, id: 1, questionnaire_id: @questionnaire.id)
   end
 
   describe '#destroy' do
@@ -16,6 +14,7 @@ describe QuestionsController do
 
       it 'AnswerHelper.in_active_period should be called to check if this change is in the period.' do
         params = {id: 1}
+        p Question.find(1)
         expect(AnswerHelper).to receive(:in_active_period).with(@questionnaire.id)
         post :destroy,params
       end

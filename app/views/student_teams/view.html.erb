@@ -1,5 +1,15 @@
 <h1>Team Information for <%= @student.assignment.name %></h1>
 <!--present all teams instead of just present one-->
+<% if @student.teams.size == 0 %>
+  You no longer have a team!
+  <h3>Name team</h3>
+  <%= form_tag :controller => 'student_teams', :action => 'create' do %>
+    <%= hidden_field_tag 'student_id', @student.id %>
+    <label for="team_name">Team name:</label>&nbsp;
+    <%= text_field 'team', 'name' %>
+    <%= submit_tag "Name team" %>
+  <% end %>
+  <%end %>
 <%@student.teams.each do |team| %>
 <!--  use new 'teams' method for participant to get all teams-->
 <% if team == nil %>

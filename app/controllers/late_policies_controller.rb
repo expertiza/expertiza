@@ -62,15 +62,19 @@ class LatePoliciesController < ApplicationController
       flash[:error] = "A policy with the same name already exists."
       same_policy_name = true
     end
-    if !invalid_penalty_per_unit && !same_policy_name
+    if params[:late_policy][:max_penalty].to_i>=50
+      flash[:error] = "Maximum penalty cannot be greater than or equal to 50"
+      invalid_max_penalty = true;
+    end
+    if !invalid_penalty_per_unit && !same_policy_name && !invalid_max_penalty
       @late_policy = LatePolicy.new(late_policy_params)
       @late_policy.instructor_id = instructor_id
       begin
         @late_policy.save!
-        flash[:notice] = "The penalty policy was successfully created."
+        flash[:notice] = "The late policy was successfully created."
         redirect_to action: 'index'
       rescue StandardError
-        flash[:error] = "The following error occurred while saving the penalty policy: "
+        flash[:error] = "The following error occurred while saving the late policy: "
         redirect_to action: 'new'
       end
     else
@@ -98,7 +102,7 @@ class LatePoliciesController < ApplicationController
         flash[:notice] = "The late policy was successfully updated."
         redirect_to action: 'index'
       rescue StandardError
-        flash[:error] = "The following error occurred while updating the penalty policy: "
+        flash[:error] = "The following error occurred while updating the late policy: "
         redirect_to action: 'edit', id: params[:id]
       end
     elsif invalid_penalty_per_unit

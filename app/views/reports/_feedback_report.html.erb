@@ -34,7 +34,6 @@
 
     <%@l = -1 %>
 
-
     <% @authors.each do |r| %>
       <% next unless r %>
       <% if @assignment.varying_rubrics_by_round? %>
@@ -154,7 +153,6 @@
                 </tr>
                 <tr>
                   <td class = changeVisibility>
-
                         <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id => @id %>
                   </td>
                     <!--# teammate reviews done-->
@@ -169,6 +167,8 @@
           <% end %>
         <% end %>
       <% else %>
+      <% @totalreviews = @review_responses.count #ISSUE1980%>
+      <%@totalIteration = 0 %>
           <% @count = 0 %>
           <% @feedback_response_maps.each {|rm| @count += 1 if Response.exists? map_id: rm.id} %>
           <% @l = @l+1 %>
@@ -184,6 +184,10 @@
             <td bgcolor=<%= @bgcolor %>  align="left">
               <%= @count %>/<%= @rspan %>
             </td>
+          <%if @review_responses.count == 0 %>
+            <td>--</td>
+            <td>--</td>
+              <%end %>
           <% end %>
           <% @review_responses.each do |rr| %>
             <!--'FeedbackResponseMap' alias as 'frm' -->
@@ -197,6 +201,20 @@
              		 </td>
              		 <!--Last rejoined at-->
                         <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td>
+          <%if @totalIteration < @totalreviews-1 %>
+            </tr>
+            <tr>
+              <td bgcolor=<%= @bgcolor %> class = changeVisibility>
+              <% @reviewer_name = r.user.fullname(session[:ip]) %>
+              <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id => @id %>
+              </td>
+              <td bgcolor=<%= @bgcolor %>  align="left">
+                <%= @count %>/<%= @rspan %>
+              </td>
+              <% @totalIteration=@totalIteration+1  %>
+          <%else%>
+            </tr>
+          <%end%>
              <% else %>
                    <% @reviewee_name = Participant.find(@frm.reviewee_id).user.fullname(session[:ip]) %>
                    <% if Response.exists?(map_id: @frm.id) %>

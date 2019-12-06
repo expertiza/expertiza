@@ -28,11 +28,17 @@
     var map_id = <%= @map.id %>;
     var round = <%= @current_round %>;
     
+    // This interval ensures that we are constantly checking whether or not the user is focusing
+    // on the report or on another tab/application. Polling is an inefficient method, but since
+    // Expertiza text boxes are generated as iFrames it is one of the easiest, consistent methods.
     setInterval(function checkFocus() {
+      // If the document isn't losing focus to itself (iFrame to iFrame, window to iFrame, etc)
       if (checkFocus.prev == document.hasFocus()) {
         return;
       }
       if (document.hasFocus()) {
+        // starTime is a function written in E1791 - it creates an entry in the database that
+        // is identified by a "link" which we just call "Expertiza Review."
         startTime(map_id, round, "Expertiza Review");
       } else {
         endTime("Expertiza Review");

@@ -92,7 +92,6 @@
               </tbody>
             </table>
           </div>
-          <br style="clear:both;"/>
         </div>
       </div>
     </div>
@@ -107,9 +106,15 @@
           <%link_total_time  = get_link_round_review_time_all_links(map.id,each_round)%>
           <%expertiza_total_time = get_link_round_review_time_all_links(map.id,each_round, true)%>
           <%total_time = link_total_time + expertiza_total_time%>
-          <%object_start_time = Response.find_by(map_id: map.id, round: each_round).created_at%>
-          <%object_end_time = Response.find_by(map_id: map.id, round: each_round).updated_at%>
-          <%total_object_time = (object_end_time - object_start_time).to_i%>
+          <%response_object = Response.find_by(map_id: map.id, round: each_round)%>
+          <%object_start_time=0%>
+          <%object_end_time=0%>
+          <%total_object_time=0%>
+          <%if !response_object.nil?%>
+            <%object_start_time = response_object.created_at%>
+            <%object_end_time = response_object.updated_at%>
+            <%total_object_time = (object_end_time - object_start_time).to_i%>
+          <%end%>
           <% @per_round_time = Array.new %>
           <% @reviewed_object_id = map.reviewed_object_id %>
           <% @reviewee_id = map.reviewee_id %>
@@ -162,10 +167,8 @@
     timeReportHash = <%= timeHash.to_json.to_s.html_safe %>;
     totalTimeList = <%= total_time_list%>;
     for(each=0;each<totalTimeList.length;each++){
-      // var eachId = each.toString();  
-      // document.getElementById(eachId).innerHTML = totalTimeList[each];  
       $("#submissionviewingevent table #"+each).html(totalTimeList[each]);
-    }       
+    }
   }); 
   function calculateTime(time){
     var seconds = time % 60;
@@ -173,6 +176,7 @@
     var hours = (time / (60*60)) %24;
     var days = time / (60*60*24);
     var final_time = 0;
+    if (time ==0){final_time = "Review hasn't been submitted."; return final_time;}
     if(parseInt(days)>0){
       final_time = Math.floor(days).toString().concat(' d ').concat(Math.floor(hours).toString().concat(' h ')).concat(Math.floor(minutes).toString().concat(' m ')).concat(Math.floor(seconds).toString().concat(' s'))}
     else if (parseInt(hours) > 0) {
@@ -180,7 +184,7 @@
     else if (parseInt(minutes) > 0) {
       final_time = Math.floor(minutes).toString().concat(' m ').concat(Math.floor(seconds).toString()).concat(' s');}
     else {
-      var final_time = seconds.toString().concat(' s')}
+      final_time = seconds.toString().concat(' s')}
     return final_time;
   }
   function drawChart(reviewee_id,round){

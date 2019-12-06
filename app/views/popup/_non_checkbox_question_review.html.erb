@@ -10,16 +10,8 @@
             <% review_graded_at = ReviewGrade.find_by(participant_id: @reviewer_id).try(:review_graded_at) %>
             <% col_color = 'black' %>
             <% col_color = 'blue' if review_graded_at && response_update_at && response_update_at > review_graded_at %>
-            <!--Score-->
-            <% if question.instance_of? Checkbox %>
-                <td align='center'>
-                  <p style="color: <%= col_color %>"><%= answer.answer == 0 ? image_tag("delete_icon.png") : image_tag("Check-icon.png") %></p>
-                </td>
-            <% else %>
-                <td align='center' width="1%"><p style="color: <%= col_color %>"><%= answer.answer %></p></td>
-            <% end %>
             <!--Comments-->
-            <td align='left' width="<%= col_percent_comment %>%"><p style="color: <%= col_color %>;width: 100%"><%= answer.comments.html_safe unless answer.comments.nil? %></p></td>
+            <td align='left' width="<%= col_percent %>%"><div class="c<%= answer.answer %> grade-circle"><%= answer.answer %></div><p style="color: <%= col_color %>;width: 100%"><%= answer.comments.html_safe unless answer.comments.nil? %></p></td>
         <% else %>
             <td>N/A</td>
         <% end %>

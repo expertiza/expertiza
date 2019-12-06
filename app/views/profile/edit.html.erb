@@ -10,6 +10,8 @@
   <%= render :partial => 'users/email' %>
   <%= render :partial => 'users/institutions' %>
   <%= render :partial => 'users/prefs' %>
+  <!-- issue#1384 Comments add by E1976 -->
+  <!-- Only the instructor can access the profile "Action Options" -->
   <% if @user.role.instructor? %>
     <%= render :partial => 'users/actions' %>
   <% end %>

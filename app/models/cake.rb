@@ -27,7 +27,7 @@ class Cake < ScoredQuestion
     safe_join(["<TR>".html_safe, "</TR>".html_safe], html.html_safe)
   end
 
-  def complete(count, answer = nil)
+  def complete(count, answer = nil, total_score)
     if self.size.nil?
       cols = '70'
       rows = '1'
@@ -35,25 +35,27 @@ class Cake < ScoredQuestion
       cols = self.size.split(',')[0]
       rows = self.size.split(',')[1]
     end
-    current_score = Answer.get_total_score_for_question(answer[:id])
-    if(!current_score.nil?)
-      current_score = current_score
-    else
-      current_score = 0
-    end
     html = '<table> <tbody> <tr><td>'
     html += '<label for="responses_' + count.to_s + '"">' + self.txt + '&nbsp;&nbsp;</label>'
-    html += '<input class="form-control" id="responses_'+count.to_s+'" min="0" name="responses['+count.to_s+'][score]"'
-    html += 'value="'+answer.answer.to_s+'"' unless answer.nil?
-    html += 'type="number" size = 30> '
+    html += '<input class="form-control" id="responses_' + count.to_s + '" min="0" name="responses[' + count.to_s + '][score]"'
+    html += 'value="' + answer.answer.to_s + '"' unless answer.nil?
+    html += 'type="number" size = 30 onchange="validateScore(this.value,' + total_score + ',this.id)"> '
     html += '</td></tr></tbody></table>'
     html += '<td width="10%"></td></tr></table>'
-    html += '<p>Total contribution so far: ' + current_score.to_s + '% </p>'  #display total
-    html += '<p>Remaining allocation limit: ' + (100 - current_score).to_s + '% </p>'  #display remaining allocation
+    html += '<p>Total contribution so far (excluding current review): ' + total_score + '% </p>' #display total
     html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments"' \
         ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
     html += answer.comments unless answer.nil?
     html += '</textarea>'
+    html += '<script> function validateScore(val, total_score,id) {
+              var int_val = parseInt(val);
+              var int_total_score = parseInt(total_score);
+              if (int_val+int_total_score>100)
+              {
+              alert("Total contribution cannot exceed 100, current total: " + (int_val+int_total_score));
+              document.getElementById(id).value = 0
+              }
+            }</script>'
     safe_join(["".html_safe, "".html_safe], html.html_safe)
   end
 

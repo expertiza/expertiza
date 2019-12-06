@@ -19,7 +19,6 @@
     stub_current_user(instructor, instructor.role.name, instructor.role)
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(Assignment).to receive(:find).with(1).and_return(assignment)
-
   end
 
   describe '#view' do
@@ -204,9 +203,12 @@
     context 'when user has logged in to GitHub' do
       before(:each) do
         session["github_access_token"] = "qwerty"
+        session["github_tokens"] = {}
+        session["github_tokens"]["www.expertiza.ncsu.edu"] = "qwerty"
         allow(controller).to receive(:get_statuses_for_pull_request).and_return("status")
         allow(controller).to receive(:retrieve_github_data)
         allow(controller).to receive(:retrieve_pull_request_statuses_data)
+        allow(SignedUpTeam).to receive(:topic_id).and_return('1')
       end
 
       it 'stores the GitHub access token for later use' do
@@ -221,6 +223,11 @@
 
       it 'calls retrieve_check_run_statuses to retrieve check runs data' do
         expect(controller).to receive(:retrieve_pull_request_statuses_data)
+        get :view_github_metrics, id: '1'
+      end
+
+      it 'calls get_due_date_for_assignment to retrieve due date' do
+        expect(controller).to receive(:get_due_date_for_assignment)
         get :view_github_metrics, id: '1'
       end
     end

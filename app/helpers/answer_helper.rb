@@ -73,7 +73,7 @@ module AnswerHelper
       start_dates.zip(end_dates).each do |start_date, end_date|
         return true if start_date.due_at < time_now && end_date.due_at > time_now
       end
-      false
     end
+    false
   end
 end

@@ -305,24 +305,43 @@ describe QuestionnairesController do
       end
     end
 
+<<<<<<< HEAD
     context 'when params[:add_new_questions] is not nil and the change is in the period.' do
       it 'redirects to questionnaire#add_new_questions' do
+=======
+    context 'when params[:add_new_questions] is not nil.' do
+      it 'AnswerHelper.in_active_period should be called to check if this change is in the period.' do
+>>>>>>> c7c1eed673b427afade8436f1a54276d6afd751d
         params = {id: 1,
                   add_new_questions: true,
                   new_question: {total_num: 2,
                                  type: 'TextArea'}}
+<<<<<<< HEAD
         expect(AnswerHelper).to receive(:in_active_period).with('1').and_return(true)
+=======
+        expect(AnswerHelper).to receive(:in_active_period).with('1')
+>>>>>>> c7c1eed673b427afade8436f1a54276d6afd751d
         post :update, params
       end
     end
 
+<<<<<<< HEAD
     context 'when params[:add_new_questions] is not nil and the change is out of the period.' do
       it 'redirects to questionnaire#add_new_questions' do
+=======
+    context 'when params[:add_new_questions] is not nil and the change is in the period.' do
+      it 'AnswerHelper.delete_existing_responses should be called to check if this change is in the period.' do
+>>>>>>> c7c1eed673b427afade8436f1a54276d6afd751d
         params = {id: 1,
                   add_new_questions: true,  
                   new_question: {total_num: 2,
                                  type: 'TextArea'}}
+<<<<<<< HEAD
         expect(AnswerHelper).to receive(:in_active_period).with('1').and_return(false)
+=======
+        allow(AnswerHelper).to receive(:in_active_period).with('1').and_return(true)
+        expect(AnswerHelper).to receive(:delete_existing_responses).with([])
+>>>>>>> c7c1eed673b427afade8436f1a54276d6afd751d
         post :update, params
       end
     end

@@ -293,40 +293,6 @@ describe QuestionnairesController do
         expect(response).to redirect_to('/advice/edit_advice/1')
       end
     end
-
-    context 'when params[:add_new_questions] is not nil' do
-      it 'redirects to questionnaire#add_new_questions' do
-        params = {id: 1,
-                  add_new_questions: true,
-                  new_question: {total_num: 2,
-                                 type: 'Criterion'}}
-        post :update, params
-        expect(response).to redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]
-      end
-    end
-
-    context 'when params[:add_new_questions] is not nil.' do
-      it 'AnswerHelper.in_active_period should be called to check if this change is in the period.' do
-        params = {id: 1,
-                  add_new_questions: true,
-                  new_question: {total_num: 2,
-                                 type: 'TextArea'}}
-        expect(AnswerHelper).to receive(:in_active_period).with('1')
-        post :update, params
-      end
-    end
-
-    context 'when params[:add_new_questions] is not nil and the change is in the period.' do
-      it 'AnswerHelper.delete_existing_responses should be called to check if this change is in the period.' do
-        params = {id: 1,
-                  add_new_questions: true,  
-                  new_question: {total_num: 2,
-                                 type: 'TextArea'}}
-        allow(AnswerHelper).to receive(:in_active_period).with('1').and_return(true)
-        expect(AnswerHelper).to receive(:delete_existing_responses).with([])
-        post :update, params
-      end
-    end
   end
 
   describe '#delete' do
@@ -407,6 +373,29 @@ describe QuestionnairesController do
                              type: 'Dropdown'}}
         post :add_new_questions, params
         expect(response).to redirect_to('/questionnaires/1/edit')
+      end
+    end
+
+    context 'when add_new_questions is called' do
+      it 'AnswerHelper.in_active_period should be called to check if this change is in the period.' do
+        params = {id: 1,
+                  add_new_questions: true,
+                  new_question: {total_num: 2,
+                                 type: 'TextArea'}}
+        expect(AnswerHelper).to receive(:in_active_period).with('1')
+        post :add_new_questions, params
+      end
+    end
+
+    context 'when add_new_questions is called and the change is in the period.' do
+      it 'AnswerHelper.delete_existing_responses should be called to check if this change is in the period.' do
+        params = {id: 1,
+                  add_new_questions: true,
+                  new_question: {total_num: 2,
+                                 type: 'TextArea'}}
+        allow(AnswerHelper).to receive(:in_active_period).with('1').and_return(true)
+        expect(AnswerHelper).to receive(:delete_existing_responses).with([])
+        post :add_new_questions, params
       end
     end
   end

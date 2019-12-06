@@ -50,10 +50,10 @@ class AssignmentParticipant < Participant
 
   # Return scores that this participant has been given
   # methods extracted from scores method: merge_scores, topic_total_scores, calculate_scores
-  def scores(questions)
+  def scores(questions, requesting_score = false)
     scores = {}
     scores[:participant] = self
-    compute_assignment_score(questions, scores)
+    compute_assignment_score(questions, scores, requesting_score)
     scores[:total_score] = self.assignment.compute_total_score(scores)
     # merge scores[review#] (for each round) to score[review]  -Yang
     merge_scores(scores) if self.assignment.varying_rubrics_by_round?
@@ -76,7 +76,7 @@ class AssignmentParticipant < Participant
     calculate_scores(scores)
   end
 
-  def compute_assignment_score(questions, scores)
+  def compute_assignment_score(questions, scores, requesting_score = false)
     self.assignment.questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.find_by(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id).used_in_round
       # create symbol for "varying rubrics" feature -Yang
@@ -89,7 +89,7 @@ class AssignmentParticipant < Participant
       scores[questionnaire_symbol] = {}
 
       scores[questionnaire_symbol][:assessments] = if round.nil?
-                                                     questionnaire.get_assessments_for(self)
+                                                     questionnaire.get_assessments_for(self, requesting_score)
                                                    else
                                                      questionnaire.get_assessments_round_for(self, round)
                                                    end
@@ -148,10 +148,19 @@ class AssignmentParticipant < Participant
     FeedbackResponseMap.get_assessments_for(self)
   end
 
-  def reviews
+  def reviews(requesting_score = false)
     # ACS Always get assessments for a team
     # removed check to see if it is a team assignment
-    ReviewResponseMap.get_assessments_for(self.team)
+    # ReviewResponseMap.get_assessments_for(self.team)
+    # E1984. Improve self-review  Link peer review & self-review to derive grades
+    current_assignment = Assignment.find(self.team.parent_id)
+    #requesting_score will be by default false, if this method is called with requesting_score as true then get the self assessment score
+    if requesting_score && current_assignment.is_selfreview_enabled?
+      ResponseMap.get_assessments_for(self.team, self.id)
+    else
+      ReviewResponseMap.get_assessments_for(self.team)
+    end
+    # Changes End
   end
 
   def reviews_by_reviewer(reviewer)

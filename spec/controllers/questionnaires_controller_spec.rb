@@ -355,6 +355,7 @@ describe QuestionnairesController do
       @question = create(:question, weight: 1, questionnaire: @questionnaire, max_label: '', min_label: '', size: 1, alternatives: '')
       allow(@question).to receive(:save).and_return(true)
     end
+
     context 'when adding ScoredQuestion' do
       it 'redirects to questionnaires#edit page after adding new questions' do
         params = {id: 1,
@@ -377,22 +378,23 @@ describe QuestionnairesController do
 
     context 'when add_new_questions is called and the change is not in the period.' do
       it 'AnswerHelper.in_active_period should be called to check if this change is in the period.' do
-        params = {id: 1,
-                  new_question: {total_num: 2,
-                                 type: 'TextArea'}}
         allow(AnswerHelper).to receive(:in_active_period).with('1').and_return(false)
         expect(AnswerHelper).to receive(:in_active_period).with('1')
+        params = {id: 1,
+                  question: {total_num: 2,
+                             type: 'Criterion'}}
         post :add_new_questions, params
       end
     end
 
     context 'when add_new_questions is called and the change is in the period.' do
       it 'AnswerHelper.delete_existing_responses should be called to check if this change is in the period.' do
-        params = {id: 1,
-                  new_question: {total_num: 2,
-                                 type: 'TextArea'}}
         allow(AnswerHelper).to receive(:in_active_period).with('1').and_return(true)
+        allow(AnswerHelper).to receive(:delete_existing_responses).with([], '1')
         expect(AnswerHelper).to receive(:delete_existing_responses).with([], '1')
+        params = {id: 1,
+                  question: {total_num: 2,
+                             type: 'Criterion'}}
         post :add_new_questions, params
       end
     end

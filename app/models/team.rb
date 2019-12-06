@@ -87,28 +87,27 @@ class Team < ActiveRecord::Base
       TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
       add_participant(self.parent_id, user)
       ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{self.id}")
-    end
 
-    if half? && !dont_have_mentor?
-      members = TeamsUser.where(team_id: self.id)
-      members.each do |member|
-        if Participant.where(['user_id = ? and can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', member.user_id ,0, 0, 0, self.parent_id]).count > 0
-          mentor=member
-          email_single_team_member(user,mentor)
+      if half? && !dont_have_mentor?
+        members = TeamsUser.where(team_id: self.id)
+        members.each do |member|
+          if Participant.where(['user_id = ? and can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', member.user_id ,0, 0, 0, self.parent_id]).count > 0
+            mentor=member
+            email_single_team_member(user,mentor)
+          end
         end
+
+      else if half? && dont_have_mentor?
+            mentor=assign_mentor
+            new_mentor = TeamsUser.create(user_id: mentor.user_id, team_id: self.id)
+            TeamUserNode.create(parent_id: parent.id, node_object_id: new_mentor.id)
+            ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{self.id}")
+
+            # Email notification
+            email_mentor(mentor)
+            email_team_members(mentor)
+           end
       end
-
-    else if half? && dont_have_mentor?
-          # mentor = Participant.where(['can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', 0, 0, 0, self.parent_id]).first
-          mentor=assign_mentor
-          new_mentor = TeamsUser.create(user_id: mentor.user_id, team_id: self.id)
-          TeamUserNode.create(parent_id: parent.id, node_object_id: new_mentor.id)
-          ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{self.id}")
-
-          # Email notification
-          email_mentor(mentor)
-          email_team_members(mentor)
-         end
     end
     can_add_member
   end

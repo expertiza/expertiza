@@ -3,10 +3,13 @@ describe Team do
   let(:participant) { build(:participant, user_id: 1) }
   let(:participant2) { build(:participant, user_id: 2) }
   let(:participant3) { build(:participant, user_id: 3) }
+  let(:mentor) { build(:mentor,user_id: 4) }
   let(:user) { build(:student, id: 1, name: 'no name', fullname: 'no one', participants: [participant]) }
   let(:user2) { build(:student, id: 2) }
   let(:user3) { build(:student, id: 3) }
   let(:team) { build(:assignment_team, id: 1, name: 'no team', users: [user]) }
+  let(:team2) { build(:assignment_team, id: 2, name: 'team with mentor', users: [user,user2]) }
+  let(:team3) { build(:assignment_team, id: 2, name: 'team with mentor', users: [user,user2,user3]) }
   let(:team_user) { build(:team_user, id: 1, user: user) }
   before(:each) do
     allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
@@ -136,12 +139,31 @@ describe Team do
           expect(team.add_member(user)).to be true
         end
       end
+
+      context 'when current team is full' do
+        it 'cannot accept new member' do
+          allow_any_instance_of(Team).to receive(:user?).with(user).and_return(false)
+          allow_any_instance_of(Team).to receive(:full?).and_return(true)
+          allow(TeamsUser).to receive(:create).with(user_id: 1, team_id: 1).and_return(team_user)
+          allow(TeamNode).to receive(:find_by).with(node_object_id: 1).and_return(double('TeamNode', id: 1))
+          allow_any_instance_of(Team).to receive(:add_participant).with(1, user).and_return(double('Participant'))
+          expect(team3.add_member(user)).to be false
+        end
+      end
     end
   end
 
   describe '.size' do
-    it 'returns the size of current team' do
-      expect(Team.size(1)).to eq(1)
+    context 'when mentor is not added' do
+      it 'returns the size of current team' do
+        expect(Team.size(1)).to eq(1)
+      end
+    end
+
+    context 'when mentor is added' do
+      it 'returns the size does not contain mentor' do
+        expect(Team.size(2)).to eq(2)
+      end
     end
   end
 

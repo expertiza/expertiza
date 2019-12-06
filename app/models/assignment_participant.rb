@@ -195,7 +195,6 @@ class AssignmentParticipant < Participant
   #get a set of teams which mentored by current user
   def teams
     AssignmentTeam.teams(self.parent_id,self)
-
   end
   # provide import functionality for Assignment Participants
   # if user does not exist, it will be created and added to this assignment

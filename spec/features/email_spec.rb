@@ -196,7 +196,7 @@ RSpec.feature 'User account creation', type: :feature do
       expect { click_on('Submit') }.to change{ActionMailer::Base.deliveries.count}.by(0)
     end
   end
-=begin
+
   describe 'User account creation by importing CSV file from user page' do
     it 'for each new user created, email notification should be sent', js: true do
       ActionMailer::Base.deliveries.clear
@@ -209,13 +209,12 @@ RSpec.feature 'User account creation', type: :feature do
       #expect(page).to have_selector "Choose File"
       page.attach_file('import_file', Rails.root + "spec/features/CSV_files_user/demo_user.csv")
       #find('form input[type = "file"]').set("spec/features/CSV_files_user/import_users.csv")
-      expect(page).to have_content('demo_user.csv')
       click_on('Import')
-
+      expect(page).to have_content('Importing from')
       #expect { click_button('Import Participants') }.to change{ActionMailer::Base.deliveries.count}.by(1)
     end
   end
-=end
+
 end
 =begin
 RSpec.feature 'Email notification to author on review submission' do

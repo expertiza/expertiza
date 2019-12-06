@@ -27,7 +27,7 @@ class Cake < ScoredQuestion
     safe_join(["<TR>".html_safe, "</TR>".html_safe], html.html_safe)
   end
 
-  def complete(count, answer = nil)
+  def complete(count, answer = nil, total_score)
     if self.size.nil?
       cols = '70'
       rows = '1'
@@ -35,24 +35,27 @@ class Cake < ScoredQuestion
       cols = self.size.split(',')[0]
       rows = self.size.split(',')[1]
     end
-    current_score = Answer.get_total_score_for_question(answer[:id])
-    if(!current_score.nil?)
-      current_score = current_score.to_s
-    else
-      current_score = 0.to_s
-    end
     html = '<table> <tbody> <tr><td>'
     html += '<label for="responses_' + count.to_s + '"">' + self.txt + '&nbsp;&nbsp;</label>'
-    html += '<input class="form-control" id="responses_'+count.to_s+'" min="0" name="responses['+count.to_s+'][score]"'
-    html += 'value="'+answer.answer.to_s+'"' unless answer.nil?
-    html += 'type="number" size = 30> '
+    html += '<input class="form-control" id="responses_' + count.to_s + '" min="0" name="responses[' + count.to_s + '][score]"'
+    html += 'value="' + answer.answer.to_s + '"' unless answer.nil?
+    html += 'type="number" size = 30 onchange="validateScore(this.value,' + total_score + ',this.id)"> '
     html += '</td></tr></tbody></table>'
     html += '<td width="10%"></td></tr></table>'
-    html += '<p>Total contribution so far: ' + current_score + '% </p>'  #display total
-      html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments"' \
+    html += '<p>Total contribution so far (excluding current review): ' + total_score + '% </p>' #display total
+    html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments"' \
         ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
-      html += answer.comments unless answer.nil?
-      html += '</textarea>'
+    html += answer.comments unless answer.nil?
+    html += '</textarea>'
+    html += '<script> function validateScore(val, total_score,id) {
+              var int_val = parseInt(val);
+              var int_total_score = parseInt(total_score);
+              if (int_val+int_total_score>100)
+              {
+              alert("Total contribution cannot exceed 100, current total: " + (int_val+int_total_score));
+              document.getElementById(id).value = 0
+              }
+            }</script>'
     safe_join(["".html_safe, "".html_safe], html.html_safe)
   end
 
@@ -66,6 +69,35 @@ class Cake < ScoredQuestion
     html += '</div>'
     html += '<b>Comments:</b>' + answer.comments.to_s
     safe_join(["".html_safe, "".html_safe], html.html_safe)
+  end
+
+  def get_total_score_for_question(question_id, participant_id, assignment_id, reviewee_id)
+    # get the reviewer's team id for the currently answered question
+    team_id = Team.select(:id).joins("join teams_users on teams_users.team_id = teams.id").joins("join participants on participants.user_id = teams_users.user_id").where("participants.id = ? and teams.parent_id in (?)", participant_id, assignment_id).first
+    if team_id
+      team_id = team_id.id
+    end
+
+    # get the reviewer's team members for the currently answered question
+    team_members = Participant.select(:id).joins("join teams_users on teams_users.user_id = participants.user_id").where("teams_users.team_id in (?) and participants.parent_id in (?)", team_id, assignment_id).ids
+
+    # get the reviewer's ratings for his team members
+    answers_for_team_members = Answer.select(:answer).joins("join responses on responses.id = answers.response_id").joins("join response_maps on responses.map_id = response_maps.id").joins("join questions on questions.id = answers.question_id").where("response_maps.reviewee_id in (?) and response_maps.reviewed_object_id = (?)
+and answer is not null and response_maps.reviewer_id in (?) and answers.question_id in (?) and response_maps.reviewee_id not in (?)", team_members, assignment_id, participant_id, question_id, reviewee_id).to_a
+
+    calculate_total_score(answers_for_team_members)
+  end
+
+  # sums up the answer ratings for the given answers
+  def calculate_total_score(question_answers)
+    question_score = 0.0
+    question_answers.each do |ans|
+      # calculate score per question
+      unless ans.answer.nil?
+        question_score += ans.answer
+      end
+    end
+    question_score
   end
 
 end

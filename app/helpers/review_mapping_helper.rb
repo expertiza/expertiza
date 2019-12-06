@@ -102,6 +102,7 @@ module ReviewMappingHelper
   # For assignments with 1 team member, the following method returns user's fullname else it returns "team name" that a particular reviewee belongs to.
   def get_team_reviewed_link_name(max_team_size, response, reviewee_id)
     team_reviewed_link_name = if max_team_size == 1
+                                # E1991 : check anonymized view here
                                 TeamsUser.where(team_id: reviewee_id).first.user.fullname(session[:ip])
                               else
                                 Team.find(reviewee_id).name(session[:ip])

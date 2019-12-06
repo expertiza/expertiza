@@ -9,7 +9,7 @@ describe Team do
   let(:user3) { build(:student, id: 3) }
   let(:team) { build(:assignment_team, id: 1, name: 'no team', users: [user]) }
   let(:team2) { build(:assignment_team, id: 2, name: 'team with mentor', users: [user,user2]) }
-  let(:team3) { build(:assignment_team, id: 2, name: 'team with mentor', users: [user,user2,user3]) }
+  let(:team3) { build(:assignment_team, id: 3, name: 'full team', users: [user,user2,user3]) }
   let(:team_user) { build(:team_user, id: 1, user: user) }
   before(:each) do
     allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])

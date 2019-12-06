@@ -90,6 +90,12 @@ module GradesHelper
     render "grades/view_heatgrid.html.erb"
   end
 
+  def done_by_staff_participant?( review )
+    #user_name = Response.find( review.id ) #.map_id).reviewer_id).user_id).fullname(session[:ip]).to_s
+    role = Role.find(User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).role_id).name
+    return (role == "Instructor") || (role == "Teaching Assistant")
+  end
+
   def type_and_max(row)
     question = Question.find(row.question_id)
     if question.type == "Checkbox"

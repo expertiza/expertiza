@@ -300,7 +300,7 @@ class GithubMetricsController < ApplicationController
     @gitVariable[:authors][author_name] ||= 1
     @gitVariable[:dates][commit_date] ||= 1
     @gitVariable[:parsed_data][author_name] ||= {}
-    @gitVariable[:parsed_data][author_name][commit_date] = {
+    @gitVariable[:parsed_data][author_name][commit_date] ||= {
       commits:0,
       additions:0,
       deletions:0

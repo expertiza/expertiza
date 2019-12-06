@@ -8,7 +8,7 @@
   let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:question) { build(:question) }
-  let(:team) { build(:assignment_team, id: 1, assignment: assignment, users: [instructor]) }
+  let(:team) { build(:assignment_team, id: 1, assignment: assignment, users: [instructor], submitted_hyperlinks: "---\n- https://www.expertiza.ncsu.edu") }
   let(:student) { build(:student) }
   let(:review_response_map) { build(:review_response_map, id: 1) }
   let(:assignment_due_date) { build(:assignment_due_date) }
@@ -186,6 +186,8 @@
       before(:each) do
         @params = {id: 900}
         session["github_access_token"] = nil
+        session["github_tokens"] = {}
+        session["github_base"] = nil
       end
 
       it 'stores the current participant id and the view action' do
@@ -213,7 +215,7 @@
 
       it 'stores the GitHub access token for later use' do
         get :view_github_metrics, id: '1'
-        expect(controller.instance_variable_get(:@token)).to eq("qwerty")
+        expect(controller.instance_variable_get(:@token)).to eq(nil)
       end
 
       it 'calls retrieve_github_data to retrieve data from GitHub' do
@@ -236,7 +238,7 @@
   describe '#authorize_github' do
     it 'redirects the user to GitHub authorization page' do
       get :authorize_github
-      expect(response).to redirect_to("https://github.com/login/oauth/authorize?client_id=qwerty12345")
+      expect(response).to redirect_to("https:///login/oauth/authorize?client_id=")
     end
   end
 
@@ -333,10 +335,10 @@
       controller.process_github_authors_and_dates("author", "date")
       expect(controller.instance_variable_get(:@gitVariable)[:authors]).to eq("author" => 1)
       expect(controller.instance_variable_get(:@gitVariable)[:dates]).to eq("date" => 1)
-      expect(controller.instance_variable_get(:@gitVariable)[:parsed_data]).to eq("author" => {"date" => 1})
+      expect(controller.instance_variable_get(:@gitVariable)[:parsed_data]).to eq("author" => {"date" => {:commits=>1, :additions=>0, :deletions=>0}})
 
       controller.process_github_authors_and_dates("author", "date")
-      expect(controller.instance_variable_get(:@gitVariable)[:parsed_data]).to eq( "author" => {"date" => 2})
+      expect(controller.instance_variable_get(:@gitVariable)[:parsed_data]).to eq( "author" => {"date" => {:commits=>2, :additions=>0, :deletions=>0}})
     end
   end
 
@@ -375,7 +377,7 @@
     end
 
     it 'calls process_github_authors_and_dates for each commit object of GitHub data passed in' do
-      expect(controller).to receive(:process_github_authors_and_dates).with("Shantanu", "2018-12-10")
+      expect(controller).to receive(:process_github_authors_and_dates).with(nil, "2018-12-10", nil, nil)
       controller.parse_github_pull_request_data(@github_data)
     end
 
@@ -441,23 +443,25 @@
     end
     it 'constructs the graphql query' do
       query = {
-        query:   "query {
-        repository(owner: \"expertiza\", name:\"expertiza\") {
-          pullRequest(number: 1228) {
-            number additions deletions changedFiles mergeable merged headRefOid
-              commits(first:100, after:){
-                totalCount
-                  pageInfo{
-                    hasNextPage startCursor endCursor
-                    }
-                      edges{
-                        node{
-                          id  commit{
-                                author{
-                                  name
-                                }
-                               additions deletions changedFiles committedDate
-                        }}}}}}}"
+        query: <<~HEREDOC
+          query {
+            repository(owner: \"expertiza\", name:\"expertiza\") {
+              pullRequest(number: 1228) {
+                number additions deletions changedFiles mergeable merged headRefOid
+                  commits(first:100, after:"#{@end_cursor}"){
+                    totalCount
+                      pageInfo{
+                        hasNextPage startCursor endCursor
+                        }
+                        edges{
+                          node{
+                            id  commit{
+                              author{
+                                      name email
+                                    }
+                                    additions deletions changedFiles committedDate url
+                              }}}}}}}
+          HEREDOC
       }
       hyperlink_data = {}
       hyperlink_data["owner_name"] = "expertiza"

@@ -84,7 +84,7 @@ class GradesController < ApplicationController
       if @assignment.varying_rubrics_by_round?
         @new_derived_scores = actual_score.round(2)
       else
-        @new_derived_scores = "#{composite_final_score.round(2)} (Includes Bonus Points (Self Score * Impact Factor): #{calculate_self_score(actual_score, avg_self_review_score).round(2)} * 10)"
+        @new_derived_scores = "#{composite_final_score.round(2)} (Includes bonus points (self score * impact factor): #{calculate_self_score(actual_score, avg_self_review_score).round(2)} * 10)"
       end
     end
     # Changes End
@@ -138,7 +138,7 @@ class GradesController < ApplicationController
       if @assignment.varying_rubrics_by_round?
         @new_derived_scores = actual_score.round(2)
       else
-        @new_derived_scores = "#{composite_final_score.round(2)} (Includes Bonus Points (Self Score * Impact Factor): #{calculate_self_score(actual_score, avg_self_review_score).round(2)} * 10)"
+        @new_derived_scores = "#{composite_final_score.round(2)} (Includes bonus points (self score * impact factor): #{calculate_self_score(actual_score, avg_self_review_score).round(2)} * 10)"
       end
     end
     # Changes End

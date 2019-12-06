@@ -91,13 +91,6 @@ describe "review mapping" do
     add_reviewer(participant_reviewer.user.name)
     expect(page).to have_content participant_reviewer.user.name
 
-    # add_meta_reviewer
-    first(:link, 'add reviewer').click
-    add_reviewer(participant_reviewer.user.name)
-    click_link('add metareviewer')
-    add_matareviewer(participant_reviewer2.user.name)
-    expect(page).to have_content participant_reviewer2.user.name
-
     visit "/reports/response_report?id=#{@assignment.id}"
     click_button "View"
 

@@ -97,6 +97,10 @@ class AssignmentParticipant < Participant
     end
   end
 
+  # E1973, dummy method to match the functionality of AssignmentTeam
+  def set_current_user(current_user)
+  end
+
   def merge_scores(scores)
     review_sym = "review".to_sym
     scores[review_sym] = {}

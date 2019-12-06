@@ -104,6 +104,10 @@ class ReviewMappingController < ApplicationController
         end
 
       else # assignment without topic -Yang
+
+        # E1973 - set the current user in case it is needed by the reviewer. Teams need to know
+        # the current user's id in order to return it for privilege access purposes
+        reviewer.set_current_user(current_user)
         assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
         assignment_team = assignment_teams.to_a.sample rescue nil
         if assignment_team.nil?

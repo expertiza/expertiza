@@ -241,7 +241,6 @@ resources :institution, except: [:destroy] do
       get :view  
       post :add_new_questions
       post :save_all_questions
-      post :create_supplmentary_review_questionnaire
     end
   end
 

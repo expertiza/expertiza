@@ -71,14 +71,11 @@ class GithubMetricsController < ApplicationController
 
     #@token = session["github_access_token"]
     @participant = AssignmentParticipant.find(params[:id])
-
-    topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
-    @due_date = @participant.assignment.stage_deadline(topic_id)
-
     @assignment = @participant.assignment
     @team = @participant.team
     @team_id = @team.id
     @submission = parse_hostname(@team.hyperlinks[0])
+    @due_date = get_due_date_for_assignment
 
     retrieve_github_data
     retrieve_pull_request_statuses_data
@@ -335,5 +332,16 @@ class GithubMetricsController < ApplicationController
   def initialize_graph_type
     @graph_type = params[:graphType] || '0'
     @timeline_type = params[:timelineType] || '1'
+  end
+
+  def get_due_date_for_assignment
+    @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
+    if @assignment.staggered_deadline?
+      due_date = TopicDueDate.find_by(parent_id: @topic_id)
+    else
+      due_date = AssignmentDueDate.find_by(parent_id: @assignment.id)
+    end
+
+    due_date.present? ? due_date.due_at.to_s : 'Unknown'
   end
 end

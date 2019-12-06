@@ -1,4 +1,3 @@
-require 'securerandom'
 module GithubMetricsHelper
   def display_github_metrics(gitVariable, graph_type, timeline_type, due_date)
     parsed_data = gitVariable[:parsed_data]
@@ -208,11 +207,6 @@ module GithubMetricsHelper
       github_metrics_summary[commit["author"]["email"]][:changedFiles] += commit["changedFiles"]
     end
     github_metrics_summary
-  end
-  def self.color_hex(options = {})
-    default = { red: rand(255), green: rand(255), blue: rand(255) }
-    options = default.merge(options)
-    '#%X%X%X' % options.values
   end
 end
 

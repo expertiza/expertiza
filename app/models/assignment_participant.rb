@@ -176,7 +176,7 @@ class AssignmentParticipant < Participant
 
   # checks if this assignment participant is the currently logged on user, given their user id
   def current_user_is_reviewer?(current_user_id)
-    return self.user_id == current_user_id
+    return user_id == current_user_id
   end
 
   def quizzes_taken

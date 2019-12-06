@@ -50,11 +50,14 @@ class ResponseController < ApplicationController
     #The locking was added for E1973, team-based reviewing. See lock.rb for details
     @response = Response.find(params[:id])
     @map = @response.map
-    @response = Lock.get_lock(@response, current_user, Lock::DEFAULT_TIMEOUT)
-    if @response.nil?
-      response_lock_action
-      return
+    if @map.reviewer_is_team
+      @response = Lock.get_lock(@response, current_user, Lock::DEFAULT_TIMEOUT)
+      if @response.nil?
+        response_lock_action
+        return
+      end
     end
+    
     # user cannot delete other people's responses. Needs to be authenticated.
     map_id = @response.map.id
     # The lock will be automatically destroyed when the response is destroyed
@@ -76,11 +79,14 @@ class ResponseController < ApplicationController
     end
     #Added for E1973, team-based reviewing
     @map = @response.map
-    @response = Lock.get_lock(@response, current_user, Lock::DEFAULT_TIMEOUT)
-    if @response.nil?
-      response_lock_action
-      return
+    if @map.reviewer_is_team
+      @response = Lock.get_lock(@response, current_user, Lock::DEFAULT_TIMEOUT)
+      if @response.nil?
+        response_lock_action
+        return
+      end
     end
+    
     @modified_object = @response.response_id
     # set more handy variables for the view
     set_content
@@ -97,16 +103,17 @@ class ResponseController < ApplicationController
   # Update the response and answers when student "edit" existing response
   def update
     render nothing: true unless action_allowed?
-    # the response to be updated
-    # Locking functionality added for E1973, team-based reviewing
-    @response = Response.find(params[:id])
-    if !Lock.lock_between?(@response, current_user)
-      response_lock_action
-      return
-    end
+    
     msg = ""
     begin
+      # the response to be updated
+      # Locking functionality added for E1973, team-based reviewing
+      @response = Response.find(params[:id])
       @map = @response.map
+      if @map.reviewer_is_team && !Lock.lock_between?(@response, current_user)
+        response_lock_action
+        return
+      end
       @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = set_questionnaire
       questions = sort_questions(@questionnaire.questions)

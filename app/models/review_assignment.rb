@@ -74,7 +74,7 @@ module ReviewAssignment
   end
 
   # This method is only for the assignments without topics
-  def candidate_assignment_teams_to_review(reviewer)
+  def candidate_assignment_teams_to_review(reviewer, current_user)
     # the contributors are AssignmentTeam objects
     contributor_set = Array.new(contributors)
 
@@ -85,7 +85,7 @@ module ReviewAssignment
     contributor_set = reject_previously_reviewed_submissions(contributor_set, reviewer)
 
     # Filter submission by reviewer him/her self
-    contributor_set = reject_own_submission(contributor_set, reviewer)
+    contributor_set = reject_own_submission(contributor_set, reviewer, current_user)
 
     # Filter the contributors with the least number of reviews
     contributor_set = reject_by_least_reviewed(contributor_set)
@@ -135,8 +135,8 @@ module ReviewAssignment
     contributor_set
   end
 
-  def reject_own_submission(contributor_set, reviewer)
-    contributor_set.reject! {|contributor| contributor.user?(User.find(reviewer.user_id)) }
+  def reject_own_submission(contributor_set, reviewer, current_user)
+    contributor_set.reject! {|contributor| contributor.user?(User.find(reviewer.user_id(current_user))) }
     contributor_set
   end
 

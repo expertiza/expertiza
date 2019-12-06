@@ -109,7 +109,7 @@ class ReviewResponseMap < ResponseMap
 
   # returns the reviewer of the response, either a participant or a team
   def get_reviewer
-    return ReviewResponseMap.get_reviewer_with_id(self.assignment.id, self.reviewer_id)
+    return ReviewResponseMap.get_reviewer_with_id(assignment.id, reviewer_id)
   end
 
   # gets the reviewer of the response, given the assignment and the reviewer id

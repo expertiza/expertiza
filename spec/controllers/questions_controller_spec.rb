@@ -1,5 +1,10 @@
 describe QuestionsController do
+  let(:questionnaire) {build(:questionnaire, id: 1)}
   let(:question) {build(:question, id: 1, questionnaire_id: 1)}
+  before(:each) do
+    @questionnaire = create(:questionnaire, id: 1)
+    @question = create(:question, id: 1, @questionnaire_id: 1)
+  end
 
   describe '#destroy' do
     context 'success' do
@@ -8,20 +13,13 @@ describe QuestionsController do
         # post :destroy,params
         # expect(flash[:success]).to eq("You have successfully deleted the question!")
       end
-    end
 
-    context 'when params[:add_new_questions] is not nil.' do
       it 'AnswerHelper.in_active_period should be called to check if this change is in the period.' do
         params = {id: 1}
-        Question.where(questionnaire_id: questionnaire_id).ids
-        allow(Question).to receive(:find).with('1').and_return(question)
-        allow(Question).to receive(:where).with('1').and_return([question])
-        expect(AnswerHelper).to receive(:in_active_period).with('1')
+        expect(AnswerHelper).to receive(:in_active_period).with(@questionnaire.id)
         post :destroy,params
       end
-    end
-
-    context 'when params[:add_new_questions] is not nil and the change is in the period.' do
+  
       it 'AnswerHelper.delete_existing_responses should be called to check if this change is in the period.' do
         # params = {id: 1}
         # allow(AnswerHelper).to receive(:in_active_period).with('1').and_return(true)

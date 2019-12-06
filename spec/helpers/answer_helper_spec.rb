@@ -25,15 +25,6 @@ describe AnswerHelper do
       @answer3 = create(:answer, id: 3, response_id: )
     end
 
-  describe '#delete_existing_responses' do
-    it 'renders questionnaires#view page' do
-      # allow(Answer).to receive(:Where).with(@answer2.question_id).and_return(@answer2.response_id)
-      # expect(AnswerHelper).to receive(:delete_answers).with(@answer2.response_id)
-      # AnswerHelper.delete_existing_responses([@answer2.response_id])
-      # expect(AnswerHelper).to receive(:delete_answers).with()
-    end
-  end
-
   describe '#review_mailer' do
     it 'calls method in Mailer to send emails' do
       @email = "aaa@ncsu.edu"

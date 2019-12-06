@@ -350,11 +350,13 @@ describe QuestionnairesController do
   end
 
   describe '#add_new_questions' do
+    before(:each) do
+      @questionnaire = create(:questionnaire)
+      @question = create(:question, weight: 1, questionnaire: @questionnaire, max_label: '', min_label: '', size: 1, alternatives: '')
+      allow(@question).to receive(:save).and_return(true)
+    end
     context 'when adding ScoredQuestion' do
       it 'redirects to questionnaires#edit page after adding new questions' do
-        question = double('Criterion', weight: 1, max_label: '', min_label: '', size: '', alternatives: '')
-        allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', id: 1, questions: [question]))
-        allow(question).to receive(:save).and_return(true)
         params = {id: 1,
                   question: {total_num: 2,
                              type: 'Criterion'}}
@@ -365,9 +367,6 @@ describe QuestionnairesController do
 
     context 'when adding unScoredQuestion' do
       it 'redirects to questionnaires#edit page after adding new questions' do
-        question = double('Dropdown', size: '', alternatives: '')
-        allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', id: 1, questions: [question]))
-        allow(question).to receive(:save).and_return(true)
         params = {id: 1,
                   question: {total_num: 2,
                              type: 'Dropdown'}}
@@ -376,12 +375,13 @@ describe QuestionnairesController do
       end
     end
 
-    context 'when add_new_questions is called' do
+    context 'when add_new_questions is called and the change is not in the period.' do
       it 'AnswerHelper.in_active_period should be called to check if this change is in the period.' do
         params = {id: 1,
                   add_new_questions: true,
                   new_question: {total_num: 2,
                                  type: 'TextArea'}}
+        allow(AnswerHelper).to receive(:in_active_period).with('1').and_return(false)
         expect(AnswerHelper).to receive(:in_active_period).with('1')
         post :add_new_questions, params
       end

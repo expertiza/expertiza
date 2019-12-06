@@ -105,7 +105,7 @@ module ReviewMappingHelper
                                 TeamsUser.where(team_id: reviewee_id).first.user.fullname
                               else
                                 # E1991 : check anonymized view here
-                                Team.find(reviewee_id).name(session[:ip])
+                                Team.find(reviewee_id).name
                               end
     team_reviewed_link_name = "(" + team_reviewed_link_name + ")" if !response.empty? and !response.last.is_submitted?
     team_reviewed_link_name

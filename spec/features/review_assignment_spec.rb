@@ -109,121 +109,166 @@ describe "peer review testing" do
     expect(page).to have_content "No previous versions available"
   end
 
-  it "shows student suggestion score for saving review", :js=>true do
-    submit_to_topic
-    user = User.find_by(name: "student2066")
-    stub_current_user(user,user.role.name,user.role)
-    visit '/student_task/list'
-    visit '/sign_up_sheet/sign_up?id=1&topic_id=1'
-    visit '/student_task/list'
-    click_link "TestAssignment"
-    click_link "Others' work"
-    find(:css, "#i_dont_care").set(true)
-    click_button "Request a new submission to review"
-    click_link "Begin"
-    click_button "Save Review"
-    wait = Selenium::WebDriver::Wait.new(:timeout => 30)
-    wait.until {
-      begin
-        text = page.driver.browser.switch_to.alert.text
-        ans = text.split('.')
-        what=ans[1].split()
-        expect(what[-1].to_i).to be_a_kind_of(Integer)
-        content = "Your review suggestion score is " + what[-1]
-        expect(text).to have_content content
-        true
-      rescue Selenium::WebDriver::Error::NoAlertPresentError
-        false
-      end
-    }
-    page.driver.browser.switch_to.alert.accept
-  end
+  describe "review suggestion score testing" do
+    before(:each) do
+      submit_to_topic
+      user = User.find_by(name: "student2066")
+      stub_current_user(user,user.role.name,user.role)
+      visit '/student_task/list'
+      visit '/sign_up_sheet/sign_up?id=1&topic_id=1'
+      visit '/student_task/list'
+      click_link "TestAssignment"
+      click_link "Others' work"
+      find(:css, "#i_dont_care").set(true)
+      click_button "Request a new submission to review"
+      click_link "Begin"
+    end
 
-  it "shows student suggestion score for submitting review", :js=>true do
-    submit_to_topic
-    user = User.find_by(name: "student2066")
-    stub_current_user(user,user.role.name,user.role)
-    visit '/student_task/list'
-    visit '/sign_up_sheet/sign_up?id=1&topic_id=1'
-    visit '/student_task/list'
-    click_link "TestAssignment"
-    click_link "Others' work"
-    find(:css, "#i_dont_care").set(true)
-    click_button "Request a new submission to review"
-    click_link "Begin"
-    click_button "Submit Review"
-    wait = Selenium::WebDriver::Wait.new(:timeout => 30)
-    wait.until {
-      begin
-        text = page.driver.browser.switch_to.alert.text
-        expect(text).to have_content "Once a review has been submitted, you cannot edit it again"
-        ans = text.split('.')
-        what=ans[1].split()
-        expect(what[-1].to_i).to be_a_kind_of(Integer)
-        content = "Your review suggestion score is " + what[-1]
-        expect(text).to have_content content
-        true
-      rescue Selenium::WebDriver::Error::NoAlertPresentError
-        false
-      end
-    }
-    page.driver.browser.switch_to.alert.accept
-  end
+    it "shows student suggestion score when saving review", :js=>true do
+      click_button "Save Review"
+      wait = Selenium::WebDriver::Wait.new(:timeout => 30)
+      wait.until {
+        begin
+          text = page.driver.browser.switch_to.alert.text
+          ans = text.split('.')
+          what=ans[1].split()
+          expect(what[-1].to_i).to be_a_kind_of(Integer)
+          content = "Your review suggestion score is " + what[-1]
+          expect(text).to have_content content
+          true
+        rescue Selenium::WebDriver::Error::NoAlertPresentError
+          false
+        end
+      }
+      page.driver.browser.switch_to.alert.accept
+    end
 
-  it "shows valid student suggestion score when saving review", :js=>true do
-    submit_to_topic
-    user = User.find_by(name: "student2066")
-    stub_current_user(user,user.role.name,user.role)
-    visit '/student_task/list'
-    visit '/sign_up_sheet/sign_up?id=1&topic_id=1'
-    visit '/student_task/list'
-    click_link "TestAssignment"
-    click_link "Others' work"
-    find(:css, "#i_dont_care").set(true)
-    click_button "Request a new submission to review"
-    click_link "Begin"
-    click_button "Save Review"
-    wait = Selenium::WebDriver::Wait.new(:timeout => 30)
-    wait.until {
-      begin
-        text = page.driver.browser.switch_to.alert.text
-        ans = text.split('.')
-        what=ans[1].split()
-        expect(what[-1].to_i).to be_between(0,10)
-        true
-      rescue Selenium::WebDriver::Error::NoAlertPresentError
-        false
-      end
-    }
-    page.driver.browser.switch_to.alert.accept
-  end
+    it "shows average suggestion score when saving review", :js=>true do
+      click_button "Save Review"
+      wait = Selenium::WebDriver::Wait.new(:timeout => 30)
+      wait.until {
+        begin
+          text = page.driver.browser.switch_to.alert.text
+          ans = text.split('.')
+          what=ans[0].split()
+          expect(what[-1].to_i).to be_a_kind_of(Integer)
+          content = "Average class suggestion score is " + what[-1]
+          expect(text).to have_content content
+          true
+        rescue Selenium::WebDriver::Error::NoAlertPresentError
+          false
+        end
+      }
+      page.driver.browser.switch_to.alert.accept
+    end
 
-  it "shows valid student suggestion score when submitting review", :js=>true do
-    submit_to_topic
-    user = User.find_by(name: "student2066")
-    stub_current_user(user,user.role.name,user.role)
-    visit '/student_task/list'
-    visit '/sign_up_sheet/sign_up?id=1&topic_id=1'
-    visit '/student_task/list'
-    click_link "TestAssignment"
-    click_link "Others' work"
-    find(:css, "#i_dont_care").set(true)
-    click_button "Request a new submission to review"
-    click_link "Begin"
-    click_button "Submit Review"
-    wait = Selenium::WebDriver::Wait.new(:timeout => 30)
-    wait.until {
-      begin
-        text = page.driver.browser.switch_to.alert.text
-        ans = text.split('.')
-        what=ans[1].split()
-        expect(what[-1].to_i).to be_between(0,10)
-        true
-      rescue Selenium::WebDriver::Error::NoAlertPresentError
-        false
-      end
-    }
-    page.driver.browser.switch_to.alert.accept
-  end
+    it "shows student suggestion score when submitting review", :js=>true do
+      click_button "Submit Review"
+      wait = Selenium::WebDriver::Wait.new(:timeout => 30)
+      wait.until {
+        begin
+          text = page.driver.browser.switch_to.alert.text
+          expect(text).to have_content "Once a review has been submitted, you cannot edit it again"
+          ans = text.split('.')
+          what=ans[1].split()
+          expect(what[-1].to_i).to be_a_kind_of(Integer)
+          content = "Your review suggestion score is " + what[-1]
+          expect(text).to have_content content
+          true
+        rescue Selenium::WebDriver::Error::NoAlertPresentError
+          false
+        end
+      }
+      page.driver.browser.switch_to.alert.accept
+    end
 
+    it "shows average suggestion score when submitting review", :js=>true do
+      click_button "Submit Review"
+      wait = Selenium::WebDriver::Wait.new(:timeout => 30)
+      wait.until {
+        begin
+          text = page.driver.browser.switch_to.alert.text
+          expect(text).to have_content "Once a review has been submitted, you cannot edit it again"
+          ans = text.split('.')
+          what=ans[0].split()
+          expect(what[-1].to_i).to be_a_kind_of(Integer)
+          content = "Average class suggestion score is " + what[-1]
+          expect(text).to have_content content
+          true
+        rescue Selenium::WebDriver::Error::NoAlertPresentError
+          false
+        end
+      }
+      page.driver.browser.switch_to.alert.accept
+    end
+
+    it "shows valid student suggestion score when saving review", :js=>true do
+      click_button "Save Review"
+      wait = Selenium::WebDriver::Wait.new(:timeout => 30)
+      wait.until {
+        begin
+          text = page.driver.browser.switch_to.alert.text
+          ans = text.split('.')
+          what=ans[1].split()
+          expect(what[-1].to_i).to be_between(0,10)
+          true
+        rescue Selenium::WebDriver::Error::NoAlertPresentError
+          false
+        end
+      }
+      page.driver.browser.switch_to.alert.accept
+    end
+
+    it "shows valid average suggestion score when saving review", :js=>true do
+      click_button "Save Review"
+      wait = Selenium::WebDriver::Wait.new(:timeout => 30)
+      wait.until {
+        begin
+          text = page.driver.browser.switch_to.alert.text
+          ans = text.split('.')
+          what=ans[0].split()
+          expect(what[-1].to_i).to be_between(0,10)
+          true
+        rescue Selenium::WebDriver::Error::NoAlertPresentError
+          false
+        end
+      }
+      page.driver.browser.switch_to.alert.accept
+    end
+
+    it "shows valid student suggestion score when submitting review", :js=>true do
+      click_button "Submit Review"
+      wait = Selenium::WebDriver::Wait.new(:timeout => 30)
+      wait.until {
+        begin
+          text = page.driver.browser.switch_to.alert.text
+          ans = text.split('.')
+          what=ans[1].split()
+          expect(what[-1].to_i).to be_between(0,10)
+          true
+        rescue Selenium::WebDriver::Error::NoAlertPresentError
+          false
+        end
+      }
+      page.driver.browser.switch_to.alert.accept
+    end
+
+    it "shows valid average suggestion score when submitting review", :js=>true do
+      click_button "Submit Review"
+      wait = Selenium::WebDriver::Wait.new(:timeout => 30)
+      wait.until {
+        begin
+          text = page.driver.browser.switch_to.alert.text
+          ans = text.split('.')
+          what=ans[0].split()
+          expect(what[-1].to_i).to be_between(0,10)
+          true
+        rescue Selenium::WebDriver::Error::NoAlertPresentError
+          false
+        end
+      }
+      page.driver.browser.switch_to.alert.accept
+    end
+
+  end
 end

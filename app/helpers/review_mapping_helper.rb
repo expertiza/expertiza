@@ -241,13 +241,20 @@ module ReviewMappingHelper
   def avg_num_suggestions_per_round(assignment_id, round_id, type)
 	scores = 0
 	avg_score = 0
-  #compute average across all reviewers' suggestion scores
-	@reviewers.each do |r|
+	#compute average across all reviewers' suggestion scores
+	reviewers = nil;
+	if @reviewers
+		reviewers = @reviewers;	
+	else
+		reviewers = AssignmentParticipant.where(parent_id: assignment_id)
+	end
+	
+	reviewers.each do |r|
 		response_maps = ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", assignment_id, r.id, type])
 		score = num_suggestions_per_student_per_round(response_maps,round_id)
 		scores += score
 	end
-	avg_score = scores/@reviewers.length unless @reviewers.empty?
+	avg_score = scores/reviewers.length unless reviewers.empty?	
 	return avg_score
   end
 
@@ -327,11 +334,15 @@ module ReviewMappingHelper
   end
 #gives number of suggestion per team per student
   def num_suggestions_reviewer(responses)
-    comments=""
-    responses.each_pair do |k,v|
-      comments+=v[:comment]
-    end
-    num_suggestions_for_responses_by_a_reviewer(comments)
+	if responses
+		comments=""
+		responses.each_pair do |k,v|
+		  comments+=v[:comment]
+		end
+		num_suggestions_for_responses_by_a_reviewer(comments)
+	else
+		return 0;
+	end
   end
 
   #This function obtains the data and the labels to build the bar graph representing the suggestion metric - this function is similar to display_volume_metric_chart

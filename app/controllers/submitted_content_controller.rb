@@ -57,6 +57,7 @@ class SubmittedContentController < ApplicationController
       end
       ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The link has been successfully submitted.', request)
       undo_link("The link has been successfully submitted.")
+      #this method will notify all the reviewers about the new submitted work
       email_all_reviewers(@participant)
     end
     redirect_to action: 'edit', id: @participant.id
@@ -68,27 +69,18 @@ class SubmittedContentController < ApplicationController
         map = ReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', reviewer.id, participant.team.id]).first
         responses = Response.where(:map_id => map.id)
         responses = responses.sort_by { |obj| obj.updated_at }
-
-        # the latest response will be the last
+        #id of the last responce will be sent in the link to the reviewers
         latest_response = responses.last
-
-        # we need to pass the id of lastest_response in the URL mentioned in the mail.
-        # this will open the correct /response/edit?id=#{latest_response.id} page for the reviewer when (s)he clicks on it.
 
         user = User.find(reviewer.user_id)
         instructor = User.find(user.parent_id)
         bcc_mail_address = ""
+        #if instructor has enabled copy of email, then instructor will be added to the bcc for the mail
         if instructor.copy_of_emails == true && user.email_on_submission == true
           bcc_mail_address = instructor.email
-        else
-          # do noting
         end
         if user.email_on_submission?
-          MailerHelper.send_mail_to_reviewer(user,
-                                             bcc_mail_address,
-                                             "You have a new submission to review",
-                                             "update",
-                                             "Please visit https://expertiza.ncsu.edu/response/edit?id=#{latest_response.id} and proceed to peer reviews.").deliver
+          MailerHelper.send_mail_to_reviewer(user, bcc_mail_address,"You have a new submission to review","update","Please visit https://expertiza.ncsu.edu/response/edit?id=#{latest_response.id} and proceed to peer reviews.").deliver_now
         end
       end
     end
@@ -144,6 +136,7 @@ class SubmittedContentController < ApplicationController
                             assignment_id: assignment.id,
                             operation: "Submit File")
     ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The file has been submitted.', request)
+    #on changing the previously submitted file, the reviewers will be notified
     email_all_reviewers(@participant)
     # send message to reviewers when submission has been updated
     # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.

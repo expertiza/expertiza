@@ -1,4 +1,3 @@
-#testing
 class User < ActiveRecord::Base
   acts_as_authentic do |config|
     config.validates_uniqueness_of_email_field_options = {if: -> { false }} # Don't validate email uniqueness
@@ -148,8 +147,6 @@ class User < ActiveRecord::Base
     if user.nil?
       attributes = ImportFileHelper.define_attributes(row_hash)
       user = ImportFileHelper.create_new_user(attributes, session)
-      #password = user.reset_password
-      #MailerHelper.send_mail_to_user(user, "Your Expertiza account has been created.", "user_welcome", password).deliver
     else
       user.email = row_hash[:email]
       user.fullname = row_hash[:fullname]

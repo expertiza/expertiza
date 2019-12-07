@@ -365,6 +365,8 @@ class AssignmentsController < ApplicationController
   end
 
   def update_feedback_assignment_form_attributes
+    # E1973 - numResponses pertains to how many review responses students have made on an assignment
+    # we cannot change if the assignment has teams as reviewers if students have submitted them
     num_responses = ReviewResponseMap.where(assignment: @assignment_form.assignment).count
     if params[:set_pressed][:bool] == 'false'
       flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."

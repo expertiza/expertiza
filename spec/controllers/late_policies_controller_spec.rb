@@ -20,6 +20,14 @@ describe LatePoliciesController do
   end
 
   describe "GET #show" do
+    before(:each) do
+      latePolicy = LatePolicy.new
+      latePolicy.policy_name="Policy2"
+      latePolicy.max_penalty=40
+      latePolicy.penalty_per_unit=30
+      latePolicy.instructor_id=6
+      allow(LatePolicy).to receive(:find).with("1").and_return(latePolicy)
+    end
     context 'when show is called' do
       it "routes to show page" do
         params = {
@@ -27,6 +35,26 @@ describe LatePoliciesController do
         }
         get :show,params
         expect(get: "late_policies/1").to route_to("late_policies#show",id:"1")
+      end
+    end
+  end
+
+  describe "GET #edit" do
+    before(:each) do
+      latePolicy = LatePolicy.new
+      latePolicy.policy_name="Policy2"
+      latePolicy.max_penalty=40
+      latePolicy.penalty_per_unit=30
+      latePolicy.instructor_id=6
+      allow(LatePolicy).to receive(:find).with("1").and_return(latePolicy)
+    end
+    context 'when edit is called' do
+      it "returns Late policy object" do
+        params = {
+            id: 1
+        }
+        get :edit,params
+        expect(assigns(:penalty_policy).policy_name).to eq("Policy2")
       end
     end
   end
@@ -70,6 +98,25 @@ describe LatePoliciesController do
         }
         post :create,params
         expect(flash[:error]).to eq("The maximum penalty cannot be less than penalty per unit.")
+        expect(response).to redirect_to('/late_policies/new')
+      end
+    end
+
+    context 'when maximum penalty is greater than 100' do
+      before(:each) do
+        latePolicy = LatePolicy.new
+        allow(latePolicy).to receive(:check_policy_with_same_name).with(any_args).and_return(false)
+      end
+      it "throws a flash error " do
+        params = {
+            late_policy: {
+                max_penalty: 101,
+                penalty_per_unit: 30,
+                policy_name: "Policy1"
+            }
+        }
+        post :create,params
+        expect(flash[:error]).to eq("Maximum penalty cannot be greater than or equal to 100")
         expect(response).to redirect_to('/late_policies/new')
       end
     end

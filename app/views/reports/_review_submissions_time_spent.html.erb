@@ -177,7 +177,6 @@
     var hours = (time / (60*60)) % 24;
     var days = time / (60*60*24);
     var final_time = 0;
-    if (time ==0){final_time = "Review hasn't been submitted."; return final_time;}
     if(parseInt(days)>0){
       final_time = Math.floor(days).toString().concat(' d ').concat(Math.floor(hours).toString().concat(' h ')).concat(Math.floor(minutes).toString().concat(' m ')).concat(Math.floor(seconds).toString().concat(' s'))}
     else if (parseInt(hours) > 0) {

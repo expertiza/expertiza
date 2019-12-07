@@ -3,27 +3,27 @@
 # For this project, it was only necessary that responses be locked. If you plan on using Lock for another model,
 # You should add cases for that model to this test.
 describe Lock do
+  #Locks interact with the database. Since we want to check database values, we need to use the database
   before(:each) do
     # I was unable to use regular create! calls for user.
     # I think this might be because the writers of user.rb overrode User.initialize
-    @smyoder = User.new
-    @smyoder.name = 'smyoder'
-    @smyoder.email = 'smyoder@ncsu.edu'
+    @smyoder = User.new(name: 'smyoder', email: 'smyoder@ncsu.edu')
     @smyoder.save!
     
-    @smyoder1 = User.new
-    @smyoder1.name = 'smyoder1'
-    @smyoder1.email = 'smyoder1@ncsu.edu'
+    @smyoder1 = User.new(name: 'smyoder1', email: 'smyoder1@ncsu.edu')
     @smyoder1.save!
     @response = Response.create!(round: 1)
   end
   
+  # We don't want to pollute the database
   after(:each) do
     @smyoder.destroy!
     @smyoder1.destroy!
     @response.destroy!
   end
   
+  # This just ensures that locks have the correct dependencies
+  # If another model is added to be locked someday, it may be useful to add more tests here
   it 'Should be able to be created for a user and a response and be destroyed when one of those is destroyed' do
     lock = Lock.create!(user: @smyoder, lockable: @response, timeout_period: 10)
     expect(Lock.find_by(user: @smyoder, lockable: @response)).to eq(lock)
@@ -35,6 +35,7 @@ describe Lock do
     expect(Lock.find_by(user: @smyoder1, lockable: @response)).to be_nil
   end
   
+  #
   describe '#get_lock' do
     it 'Should create new locks when a user requests them' do
       # smyoder should have a lock on the response for 10 minutes

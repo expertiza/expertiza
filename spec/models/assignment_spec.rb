@@ -10,9 +10,8 @@ describe Assignment do
   let(:response) { build(:response) }
   let(:course) { build(:course) }
   let(:assignment_due_date) do
-    build(:assignment_due_date, due_at: '2011-11-11 11:11:11', deadline_name: 'Review',
-          description_url: 'https://expertiza.ncsu.edu/', round: 1)
-    end
+    build(:assignment_due_date, due_at: '2011-11-11 11:11:11', deadline_name: 'Review', description_url: 'https://expertiza.ncsu.edu/', round: 1)
+  end
 
   let(:topic_due_date) { build(:topic_due_date, deadline_name: 'Submission', description_url: 'https://github.com/expertiza/expertiza') }
 
@@ -89,8 +88,7 @@ describe Assignment do
         assignment.num_reviews_allowed = 1
         assignment.num_reviews_required = 2
         expect(assignment.errors[:message]).to eq []
-        expect { assignment.valid_num_review }.to change { assignment.errors[:message] }.from([])
-                                                      .to(['Num of reviews required cannot be greater than number of reviews allowed'])
+        expect { assignment.valid_num_review }.to change { assignment.errors[:message] }.from([]).to(['Num of reviews required cannot be greater than number of reviews allowed'])
       end
     end
 
@@ -100,8 +98,7 @@ describe Assignment do
         assignment.num_metareviews_allowed = 1
         assignment.num_metareviews_required = 2
         expect(assignment.errors[:message]).to eq []
-        expect { assignment.valid_num_review }.to change { assignment.errors[:message] }.from([])
-                                                      .to(['Number of Meta-Reviews required cannot be greater than number of meta-reviews allowed'])
+        expect { assignment.valid_num_review }.to change { assignment.errors[:message] }.from([]).to(['Number of Meta-Reviews required cannot be greater than number of meta-reviews allowed'])
       end
     end
   end
@@ -263,8 +260,7 @@ describe Assignment do
     end
     context 'when there is at least one review response in current assignment' do
       it 'raises an error messge and current assignment cannot be deleted' do
-        allow(review_response_map).to receive(:delete).with(nil)
-                                          .and_raise('Mysql2::Error: Cannot delete or update a parent row: a foreign key constraint fails')
+        allow(review_response_map).to receive(:delete).with(nil).and_raise('Mysql2::Error: Cannot delete or update a parent row: a foreign key constraint fails')
         expect { assignment.delete }.to raise_error('There is at least one review response that exists for no assignment.')
       end
     end

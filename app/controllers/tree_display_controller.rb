@@ -210,7 +210,6 @@ class TreeDisplayController < ApplicationController
       child_nodes.each do |node|
         initialize_fnode_update_children(params, node, tmp_res)
       end
-      flash[:error] = "Invalid child nodes in the TreeList"
     rescue
     end
     res = res_node_for_child(tmp_res)

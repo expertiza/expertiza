@@ -64,9 +64,9 @@
 
 
        	<% ['one', 'two', 'three'].each do |round| %>
-	<% @roundCount = instance_variable_get("@rspan_round_#{round}") %>
-             <% @totalreviews = @roundCount  #ISSUE1980%>
-            <% @totalIteration=0 ## ISSSUE-1980%>
+	<% @round_count = instance_variable_get("@rspan_round_#{round}") %>
+             <% @totalreviews = @round_count  #ISSUE1980%>
+            <% @total_iteration=0 ## ISSSUE-1980%>
         
             <% @reviewer_name = r.user.fullname(session[:ip]) %>
 
@@ -113,7 +113,7 @@
              			 </td>
              				 <!--Last rejoined at-->
              			 <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td>
-        <%if @totalIteration < @totalreviews-1  %>
+        <%if @total_iteration < @totalreviews-1  %>
                 </tr>
                 <tr>
                   <td class = changeVisibility>
@@ -122,7 +122,7 @@
                     <!--# teammate reviews done-->
                 <td bgcolor=<%= @bgcolor %>  align="left" >
                         <%= @count_certain_round %>/<%= @rspan_certain_round %></td>
-                 <% @totalIteration=@totalIteration+1  %>
+                 <% @total_iteration=@total_iteration+1  %>
 	<%else%>
               </tr>
 <% end %>
@@ -149,7 +149,7 @@
                 <!--Last rejoined at-->
                         <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td>
               <% end %>
-        <%if @totalIteration < @totalreviews-1  %>
+        <%if @total_iteration < @totalreviews-1  %>
                 </tr>
                 <tr>
                   <td class = changeVisibility>
@@ -158,7 +158,7 @@
                     <!--# teammate reviews done-->
                 <td bgcolor=<%= @bgcolor %>  align="left">
                         <%= @count_certain_round %>/<%= @rspan_certain_round %></td>
-                 <% @totalIteration=@totalIteration+1  %>
+                 <% @total_iteration=@total_iteration+1  %>
                 <%else%>
               </tr>
 	      <%end%>
@@ -168,7 +168,7 @@
         <% end %>
       <% else %>
       <% @totalreviews = @review_responses.count #ISSUE1980%>
-      <%@totalIteration = 0 %>
+      <%@total_iteration = 0 %>
           <% @count = 0 %>
           <% @feedback_response_maps.each {|rm| @count += 1 if Response.exists? map_id: rm.id} %>
           <% @l = @l+1 %>
@@ -201,7 +201,7 @@
              		 </td>
              		 <!--Last rejoined at-->
                         <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td>
-          <%if @totalIteration < @totalreviews-1 %>
+          <%if @total_iteration < @totalreviews-1 %>
             </tr>
             <tr>
               <td bgcolor=<%= @bgcolor %> class = changeVisibility>
@@ -211,7 +211,7 @@
               <td bgcolor=<%= @bgcolor %>  align="left">
                 <%= @count %>/<%= @rspan %>
               </td>
-              <% @totalIteration=@totalIteration+1  %>
+              <% @total_iteration=@total_iteration+1  %>
           <%else%>
             </tr>
           <%end%>
@@ -238,7 +238,7 @@
                 	<td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td>
                   <% end %>
 
-<%if @totalIteration < @totalreviews-1 %>
+<%if @total_iteration < @totalreviews-1 %>
 </tr>
 <tr>
 <td bgcolor=<%= @bgcolor %> class = changeVisibility>
@@ -248,7 +248,7 @@
 <td bgcolor=<%= @bgcolor %>  align="left">
               <%= @count %>/<%= @rspan %>
             </td>
-<% @totalIteration=@totalIteration+1  %>
+<% @total_iteration=@total_iteration+1  %>
                 <%else%>
               </tr>
 <%end%>

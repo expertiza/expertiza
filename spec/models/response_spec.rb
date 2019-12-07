@@ -17,6 +17,20 @@ describe Response do
     allow(response).to receive(:map).and_return(review_response_map)
   end
 
+  describe "#score" do
+    it 'search the review by score' do
+      expect(questionnaire.max_question_score).to eq(5)
+      expect(questionnaire.max_question_score).to_not eq(6)
+    end
+  end
+
+
+  describe "#comment_length" do
+    it 'search by text comment length' do
+      expect(answer.comments.length).to eq(11)
+    end
+  end
+
   describe '#response_id' do
     it 'returns the id of current response' do
       expect(response.response_id).to eq(1)
@@ -134,7 +148,7 @@ describe Response do
       allow(assignment).to receive(:num_review_rounds).and_return(2)
       allow(Question).to receive(:get_all_questions_with_comments_available).with(1).and_return([1, 2])
       allow(ReviewResponseMap).to receive_message_chain(:where, :find_each).with(reviewed_object_id: 1, reviewer_id: 1)
-        .with(no_args).and_yield(review_response_map)
+                                      .with(no_args).and_yield(review_response_map)
       response1 = double('Response', round: 1, additional_comment: '')
       response2 = double('Response', round: 2, additional_comment: 'LGTM')
       allow(review_response_map).to receive(:response).and_return([response1, response2])
@@ -147,7 +161,7 @@ describe Response do
   describe '.get_volume_of_review_comments' do
     it 'returns volumes of review comments in each round' do
       allow(Response).to receive(:concatenate_all_review_comments).with(1, 1)
-                                                                  .and_return(["Answer textAnswer textLGTM", 2, "Answer text", 1, "Answer textLGTM", 1, "", 0])
+                             .and_return(["Answer textAnswer textLGTM", 2, "Answer text", 1, "Answer textLGTM", 1, "", 0])
       expect(Response.get_volume_of_review_comments(1, 1)).to eq([1, 2, 2, 0])
     end
   end
@@ -172,7 +186,7 @@ describe Response do
           allow(response).to receive(:maximum_score).and_return(100)
           allow(response).to receive(:questionnaire_by_answer).with(answer).and_return(questionnaire)
           allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
-                                                             .and_return(double('AssignmentQuestionnaire', notification_limit: 5.0))
+                                                .and_return(double('AssignmentQuestionnaire', notification_limit: 5.0))
           expect(response.significant_difference?).to be true
         end
       end

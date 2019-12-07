@@ -49,7 +49,6 @@ describe "peer review testing" do
   it "fills in a single textbox and saves" do
     # Load questionnaire with generic setup
     load_questionnaire
-
     # Fill in a textbox and a dropdown
     fill_in "responses[0][comment]", with: "HelloWorld"
     select 5, from: "responses[0][score]"

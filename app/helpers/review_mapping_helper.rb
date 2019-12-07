@@ -405,7 +405,6 @@ module ReviewMappingHelper
 
     #create a response map to be passed to the function num_suggestions_per_student_per_round
     res = ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", @assignment.id, reviewer.id, @type])
-    rounds=0
     overall_avg_vol=0
 
     # if round 1 has reviews
@@ -413,12 +412,11 @@ module ReviewMappingHelper
       round += 1
       labels.push '1st'
       # calculate number of suggestions for round 1
-      suggestions_by_reviewer_round_1=num_suggestions_per_student_per_round(res,1)
+      suggestions_by_reviewer_round_1=num_suggestions_per_student_per_round(res,round)
       reviewer_s_data.push suggestions_by_reviewer_round_1
       all_reviewers_s_data.push @all_reviewers_avg_suggestion_in_round_1
       overall_avg_vol+=suggestions_by_reviewer_round_1
       @all_reviewers_overall_avg_suggestion+=@all_reviewers_avg_suggestion_in_round_1
-      rounds+=1
     end
 
     # if round 2 has reviews
@@ -426,12 +424,11 @@ module ReviewMappingHelper
       round += 1
       labels.push '2nd'
       # calculate number of suggestions for round 2
-      suggestions_by_reviewer_round_2=num_suggestions_per_student_per_round(res,2)
+      suggestions_by_reviewer_round_2=num_suggestions_per_student_per_round(res,round)
       reviewer_s_data.push suggestions_by_reviewer_round_2
       all_reviewers_s_data.push @all_reviewers_avg_suggestion_in_round_2
       overall_avg_vol+=suggestions_by_reviewer_round_2
       @all_reviewers_overall_avg_suggestion+=@all_reviewers_avg_suggestion_in_round_2
-      rounds+=1
     end
 
     # if round 3 has reviews
@@ -439,20 +436,19 @@ module ReviewMappingHelper
       round += 1
       labels.push '3rd'
       # calculate number of suggestions for round 3
-      suggestions_by_reviewer_round_3=num_suggestions_per_student_per_round(res,3)
+      suggestions_by_reviewer_round_3=num_suggestions_per_student_per_round(res,round)
       reviewer_s_data.push suggestions_by_reviewer_round_3
       all_reviewers_s_data.push @all_reviewers_avg_suggestion_in_round_3
       overall_avg_vol+=suggestions_by_reviewer_round_3
       @all_reviewers_overall_avg_suggestion+=@all_reviewers_avg_suggestion_in_round_3
-      rounds+=1
     end
     labels.push 'Total'
 
     #compute overall average across rounds
-    if rounds>0
-      overall_avg_vol=overall_avg_vol/rounds
+    if round>0
+      overall_avg_vol=overall_avg_vol/round
       reviewer_s_data.push overall_avg_vol
-      @all_reviewers_overall_avg_suggestion=@all_reviewers_overall_avg_suggestion/rounds
+      @all_reviewers_overall_avg_suggestion=@all_reviewers_overall_avg_suggestion/round
       all_reviewers_s_data.push @all_reviewers_overall_avg_suggestion
     end
     [labels, reviewer_s_data, all_reviewers_s_data]

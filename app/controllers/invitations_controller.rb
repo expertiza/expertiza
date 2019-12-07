@@ -1,3 +1,4 @@
+include ConferenceHelper
 class InvitationsController < ApplicationController
   before_action :check_user_before_invitation, only: [:create]
   before_action :check_team_before_accept, only: [:accept]
@@ -74,41 +75,8 @@ class InvitationsController < ApplicationController
     ExpertizaLogger.info LoggerMessage.new(controller_name, @student.name, "Successfully invited student #{@user.id}", request)
   end
 
-  def user_params
-    params.require(:user).permit(:name,
-                                 :crypted_password,
-                                 :role_id,
-                                 :password_salt,
-                                 :fullname,
-                                 :email,
-                                 :parent_id,
-                                 :private_by_default,
-                                 :mru_directory_path,
-                                 :email_on_review,
-                                 :email_on_submission,
-                                 :email_on_review_of_review,
-                                 :is_new_user,
-                                 :master_permission_granted,
-                                 :handle,
-                                 :digital_certificate,
-                                 :persistence_token,
-                                 :timezonepref,
-                                 :public_key,
-                                 :copy_of_emails,
-                                 :institution_id)
-  end
 
-  # define a handle for a new participant
-  def set_handle
-    self.handle = if self.user.handle.nil? or self.user.handle == ""
-                    self.user.name
-                  elsif AssignmentParticipant.exists?(parent_id: self.assignment.id, handle: self.user.handle)
-                    self.user.name
-                  else
-                    self.user.handle
-                  end
-    self.save!
-  end
+
 
   def check_user_before_invitation
     # user is the student you are inviting to your team
@@ -119,25 +87,7 @@ class InvitationsController < ApplicationController
 
     if @assignment.is_conference
       unless @user
-        check = User.find_by(name: params[:user][:name])
-        params[:user][:name] = params[:user][:email] unless check.nil?
-        @newuser = User.new(user_params)
-        @newuser.institution_id =nil
-        @newuser.email = params[:user][:name]
-        # record the person who created this new user
-        @newuser.parent_id = session[:user].id
-        @newuser.role_id = 1
-        # set the user's timezone to its parent's
-        #@newuser.timezonepref = User.find(@user.parent_id).timezonepref
-        if @newuser.save
-          #flash[:error] = "User Created Successfully "
-          @user = User.find_by(email: @newuser.email)
-
-          password = @user.reset_password
-          MailerHelper.send_mail_to_coauthor(@user, "Your Expertiza account has been created.", "user_conference_invitation", password,current_user.name).deliver
-        end
-        #redirect_to view_student_teams_path student_id: @student.id
-        #return
+        @user =  create_coauthor
       end
     end
 
@@ -158,13 +108,7 @@ class InvitationsController < ApplicationController
     # check if the user is a participant of the assignment
     unless @participant
       if @assignment.is_conference
-        new_part = AssignmentParticipant.create(parent_id: @assignment.id,
-                                                user_id: @user.id,
-                                                permission_granted: @user.master_permission_granted,
-                                                can_submit: 1,
-                                                can_review: 1,
-                                                can_take_quiz: 1)
-        new_part.set_handle
+        add_participant_coauthor
       else
         flash[:error] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
         redirect_to view_student_teams_path student_id: @student.id

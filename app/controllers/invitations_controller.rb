@@ -86,9 +86,7 @@ class InvitationsController < ApplicationController
     @assignment = Assignment.find(@student.parent_id)
 
     if @assignment.is_conference
-      unless @user
-        @user =  create_coauthor
-      end
+        @user =  create_coauthor unless @user
     end
 
     return unless current_user_id?(@student.user_id)

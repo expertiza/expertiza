@@ -23,7 +23,7 @@ describe Response do
       expect(questionnaire.max_question_score).to_not eq(6)
     end
   end
-  
+
   describe "#comment_length" do
     it 'search by text comment length' do
       expect(answer.comments.length).to eq(11)

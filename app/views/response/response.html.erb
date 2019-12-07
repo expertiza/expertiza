@@ -164,7 +164,7 @@
         // function to show the scores on save.
         function save_suggestion_score_popup(stud_score,avg_score)
         {
-          if(!confirm('Average class suggestion score is ' + avg_score + '. \n Your review suggestion score is ' +
+          if(!confirm('Class average number of suggestions ' + avg_score + '. \n Student\'s number of review suggestions is ' +
                     stud_score))
             {
               e.preventDefault();
@@ -176,7 +176,7 @@
         // function to show the scores on submit.
         function submit_suggestion_score_popup(stud_score,avg_score)
         {
-            if(!confirm('Average class suggestion score is ' + avg_score + '. \n Your review suggestion score is ' +
+            if(!confirm('Class average number of suggestions ' + avg_score + '. \n Student\'s number of review suggestions is ' +
                 stud_score + ".\n\nOnce a review has been submitted, you cannot edit it again. \n Clicking 'Cancel' will still save your review."))
             {
                 e.preventDefault();

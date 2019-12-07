@@ -328,7 +328,7 @@ module ReviewMappingHelper
 
     #response received from the call to the API is simulated using a random number generator
     0.upto(comments.length-1) do |i|
-      suggestion_score+=rand(10).to_i
+      suggestion_score+=rand(5).to_i
     end
 	  return suggestion_score
   end

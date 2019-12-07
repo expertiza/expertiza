@@ -133,7 +133,7 @@ describe "peer review testing" do
           ans = text.split('.')
           what=ans[1].split()
           expect(what[-1].to_i).to be_a_kind_of(Integer)
-          content = "Your review suggestion score is " + what[-1]
+          content = "Student's number of review suggestions is " + what[-1]
           expect(text).to have_content content
           true
         rescue Selenium::WebDriver::Error::NoAlertPresentError
@@ -152,7 +152,7 @@ describe "peer review testing" do
           ans = text.split('.')
           what=ans[0].split()
           expect(what[-1].to_i).to be_a_kind_of(Integer)
-          content = "Average class suggestion score is " + what[-1]
+          content = "Class average number of suggestions " + what[-1]
           expect(text).to have_content content
           true
         rescue Selenium::WebDriver::Error::NoAlertPresentError
@@ -172,7 +172,7 @@ describe "peer review testing" do
           ans = text.split('.')
           what=ans[1].split()
           expect(what[-1].to_i).to be_a_kind_of(Integer)
-          content = "Your review suggestion score is " + what[-1]
+          content = "Student's number of review suggestions is " + what[-1]
           expect(text).to have_content content
           true
         rescue Selenium::WebDriver::Error::NoAlertPresentError
@@ -192,7 +192,7 @@ describe "peer review testing" do
           ans = text.split('.')
           what=ans[0].split()
           expect(what[-1].to_i).to be_a_kind_of(Integer)
-          content = "Average class suggestion score is " + what[-1]
+          content = "Class average number of suggestions " + what[-1]
           expect(text).to have_content content
           true
         rescue Selenium::WebDriver::Error::NoAlertPresentError

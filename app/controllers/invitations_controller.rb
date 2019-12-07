@@ -105,6 +105,7 @@ class InvitationsController < ApplicationController
     @participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', @user.id, @student.parent_id).first
     # check if the user is a participant of the assignment
     unless @participant
+      #check if assignment is of conference type
       if @assignment.is_conference
         add_participant_coauthor
       else

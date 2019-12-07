@@ -66,6 +66,12 @@ RSpec.configure do |config|
     stub_current_user(user, user.role.name, user.role)
   end
 
+  def login_as_other_user(user_name)
+    user =  User.find_by(name: user_name)
+    stub_current_user(user, user.role.name, user.role)
+    click_link "Home"
+  end
+
   def stub_current_user(current_user, current_role_name = 'Student', current_role)
     allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(current_user)
     allow_any_instance_of(ApplicationController).to receive(:current_role_name).and_return(current_role_name)

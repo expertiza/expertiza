@@ -101,16 +101,22 @@ module SummaryHelper
       rubric = get_questions_by_assignment(assignment)
 
       # get all teams in this assignment
+      # Added team_filter which is used to filter the query further based on search params
       team_filter = search[:team].to_s.strip
+
+      # Added min_score, max_score and text filters which will be applied to filter the query output further
       min_score = search[:min_score].to_s.strip
       max_score = search[:max_score].to_s.strip
       text = search[:text].to_s.strip
 
+      # Advanced Search: Query updated based on team_filter for team name
       query = Team
       query = query.where('name LIKE ?', "%#{team_filter}%") if team_filter.present?
       teams = query.select(:id, :name).where(parent_id: assignment.id).order(:name)
 
       teams.each do |reviewee|
+
+        # is_valid is for min and max score filtering. includes_keywords is for text filter
         is_valid = true
         includes_keywords = false
 
@@ -163,10 +169,12 @@ module SummaryHelper
 
         avg_score = self.avg_scores_by_reviewee[reviewee.name]
 
+        # Validity checks for filtering based on min, max scores and if output contains keywords mentioned in text
         is_valid &= avg_score >= min_score.to_i if min_score.present?
         is_valid &= avg_score <= max_score.to_i if max_score.present?
         is_valid &= includes_keywords if text.present?
 
+        # Adding to threads only if it is valid, if not deleting scores, summary and reviewers from self
         if is_valid
           threads.concat cur_threads
         else

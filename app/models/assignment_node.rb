@@ -41,6 +41,7 @@ class AssignmentNode < Node
     find_conditions = [conditions, values]
     me = User.find(user_id)
 
+    # Creating the variables by pulling values from the search param
     name = search[:name].to_s.strip
     participant_name = search[:participant_name].to_s.strip
     participant_fullname = search[:participant_fullname].to_s.strip
@@ -57,6 +58,7 @@ class AssignmentNode < Node
 
     query = query.where('assignments.name LIKE ?', "%#{name}%") if name.present?
 
+    # Checking if the search criteria are present or not. Based on this, modifying the query
     if due_since.present?
       due_since = due_since.to_time.utc.change(hour: 0, min: 0)
       query = query.where('due_dates.due_at >= ?', due_since)
@@ -77,6 +79,7 @@ class AssignmentNode < Node
       query = query.where('created_at <= ?', created_until)
     end
 
+    # Additional check for if user can impersonate here
     if participant_name.present?
       participant_names = User.where('name LIKE ?', "%#{participant_name}%")
                               .select do |user|
@@ -97,6 +100,7 @@ class AssignmentNode < Node
       query = query.where(users: {name: participant_names})
     end
 
+    # Reordering the query based on assignment's sort order
     query.order("assignments.#{sortvar} #{sortorder}")
   end
 

@@ -60,7 +60,7 @@ class UsersController < ApplicationController
   def list
     user = session[:user]
 
-    # Retrieves the search by user names, full names and or email; all criterias that are available
+    # Retrieves the search by user names, full names and or email; all criteria that are available
     search_uname, search_fname, search_email = search_parameters
 
     # Passes the above received search criterias to the User model to populate the list accordingly.

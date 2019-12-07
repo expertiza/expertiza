@@ -33,11 +33,13 @@ class QuestionnaireNode < Node
       conditions += " and questionnaires.type = \"#{name}\""
     end
 
+    # Creating the variables by pulling values from the search param
     name = search[:name].to_s.strip
     course_name = search[:course].to_s.strip
     assignment_name = search[:assignment].to_s.strip
     question_text = search[:question_text].to_s.strip
 
+    # Checking if the search criteria are present or not. Based on this, modifying the query
     if course_name.present?
       course = Course.find_by('name LIKE ?', "%#{course_name}%")
       instructor_id = course.instructor_id
@@ -52,6 +54,7 @@ class QuestionnaireNode < Node
       conditions += " and questionnaires.id in (#{ids.join(',')})"
     end
 
+    # Fetching the matching assignments from Assignment and AssignmentQuestionnaire tables based on name
     matching_assignments = Assignment.where('name LIKE ?', "%#{assignment_name}%")
     matching_questionnaires = AssignmentQuestionnaire.where('assignment_id in (?)', matching_assignments.ids)
     questionnaire_ids = matching_questionnaires.map(&:questionnaire_id)

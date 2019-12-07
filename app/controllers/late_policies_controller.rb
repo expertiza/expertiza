@@ -71,7 +71,7 @@ class LatePoliciesController < ApplicationController
       @late_policy.instructor_id = instructor_id
       begin
         @late_policy.save!
-        flash[:notice] = "The late policy was successfully created."
+        flash[:note] = "The late policy was successfully created."
         redirect_to action: 'index'
       rescue StandardError
         flash[:error] = "The following error occurred while saving the late policy: "
@@ -99,7 +99,7 @@ class LatePoliciesController < ApplicationController
         @penalty_policy.update_attributes(late_policy_params)
         @penalty_policy.save!
         LatePolicy.update_calculated_penalty_objects(@penalty_policy)
-        flash[:notice] = "The late policy was successfully updated."
+        flash[:note] = "The late policy was successfully updated."
         redirect_to action: 'index'
       rescue StandardError
         flash[:error] = "The following error occurred while updating the late policy: "

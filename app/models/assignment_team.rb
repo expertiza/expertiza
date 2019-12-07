@@ -17,11 +17,16 @@ class AssignmentTeam < Team
   # EDIT: A situation was found which differs slightly. If the current user is on the team, we want to
   # return that instead for instances where the code uses the current user.
   def user_id
-    current_user = session[:user]
-    if users.include? current_user
-      current_user.id
+    if @current_user != nil and users.include? @current_user
+      @current_user.id
     end
     users.first.id
+  end
+
+  # E1973
+  # stores the current user so that we can check them when returning the user_id
+  def set_current_user(current_user)
+    @current_user = current_user
   end
 
   # Whether this team includes a given participant or not

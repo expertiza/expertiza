@@ -75,7 +75,7 @@
         <div class="modal-body">
           <div id="chartContainer" style="height: 360px; width: 100%;"></div>
           <div id="table" align="center">
-            <table>
+            <table><!--table to expertiza, link, and response object time-->
               <tbody>
                 <tr>
                   <td>Active Time - Expertiza</td>
@@ -96,7 +96,7 @@
       </div>
     </div>
   </div>
-      <% @response_maps = ResponseMap.where(reviewer_id: id, reviewed_object_id: @id, reviewee_id: reviewee_id)  %>
+      <% @response_maps = ResponseMap.where(reviewer_id: id, reviewed_object_id: @id, reviewee_id: reviewee_id)  %><!-- all responses for current reviewee-->
       <% @number_of_rounds = Assignment.find(@id).rounds_of_reviews %>
       <% reviewee_count = 0 %>
       <% @response_maps.each do |map| %>  <!-- for reviewee-->
@@ -110,7 +110,7 @@
           <%object_start_time=0%>
           <%object_end_time=0%>
           <%total_object_time=0%>
-          <%if !response_object.nil?%>
+          <%if !response_object.nil?%><!--calculate response object time only if it exists else it will be displayed as No submission-->
             <%object_start_time = response_object.created_at%>
             <%object_end_time = response_object.updated_at%>
             <%total_object_time = (object_end_time - object_start_time).to_i%>
@@ -132,7 +132,7 @@
           <% @per_round_time << each_link_detail %> 
           <% timeHash[(@reviewee_id.to_s).concat(each_round.to_s)] = @per_round_time %>  
          
-          <% if total_time > 0 %>
+          <% if total_time > 0 %><!--display time in readable format - h m s depending on how much time was spent-->
             <%seconds = total_time % 60%>
             <%minutes = (total_time / 60) % 60%>
             <%hours = total_time / (60 * 60)%>
@@ -170,10 +170,11 @@
       $("#submissionviewingevent table #"+each).html(totalTimeList[each]);
     }
   }); 
+  //function to parse time(in  seconds) to readable format
   function calculateTime(time){
     var seconds = time % 60;
     var minutes = (time / 60) % 60;
-    var hours = (time / (60*60)) %24;
+    var hours = (time / (60*60)) % 24;
     var days = time / (60*60*24);
     var final_time = 0;
     if (time ==0){final_time = "Review hasn't been submitted."; return final_time;}

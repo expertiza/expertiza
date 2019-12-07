@@ -55,8 +55,6 @@
         var time_out_interval = 500; // in milliseconds
         var linksToUpdate = {};
         var windowsToClose = new Array();
-        <!-- Disable the ability to right-click or middle-click on urls.
-             This is because link tracking starts "on-click" and users need to click urls. -->
         $("#url a.review_link").on("contextmenu", function() {
           return false;
         });

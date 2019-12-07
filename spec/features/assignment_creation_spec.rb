@@ -761,4 +761,6 @@ describe "assignment function" do
       course_id: course_id
     )
   end
+
 end
+

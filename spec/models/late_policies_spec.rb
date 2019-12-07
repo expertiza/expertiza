@@ -1,6 +1,7 @@
 describe 'late policies' do
   subject { LatePolicy.create(:id => 1, :policy_name => 'Policy Name', :instructor_id => 4, :max_penalty => 30, :penalty_per_unit => 10, :penalty_unit => 5) }
 
+
   it "is valid with valid attributes" do
     subject.instructor_id = 4
     expect(subject).to be_valid
@@ -45,7 +46,11 @@ describe 'late policies' do
     context "when name is same and instructor is same" do
       before :each do
         latePolicy = LatePolicy.new
-        allow(latePolicy).to receive(:where).with({policy_name: 'Policy Name', instructor_id: 4}).and_return([double("LatePolicy", policy_name: 'Policy Name', instructor_id: 4)])
+        latePolicy.policy_name="Policy Name"
+        latePolicy.max_penalty=40
+        latePolicy.penalty_per_unit=30
+        latePolicy.instructor_id=4
+        allow(LatePolicy).to receive(:where).with(any_args).and_return([latePolicy])
       end
       it "should return true" do
         expect(LatePolicy.check_policy_with_same_name('Policy Name', 4)).eql? true
@@ -54,15 +59,15 @@ describe 'late policies' do
     context "when name is different and instructor is same" do
       before :each do
         latePolicy = LatePolicy.new
-        allow(latePolicy).to receive(:where).with({policy_name: 'Policy Name', instructor_id: 4}).and_return([double("LatePolicy", policy_name: 'Policy Name', instructor_id: 4)])
+        latePolicy.policy_name="Policy Name"
+        latePolicy.max_penalty=40
+        latePolicy.penalty_per_unit=30
+        latePolicy.instructor_id=4
+        allow(LatePolicy).to receive(:where).with({policy_name: 'Policy Name'}).and_return([latePolicy])
       end
       it "should return false" do
-        expect(LatePolicy.check_policy_with_same_name('New Policy Name', 4)).eql? false
+        expect(LatePolicy.check_policy_with_same_name('Policy Name', 4)).eql? false
       end
     end
-  end
-
-  describe "#update_calculated_penalty_objects" do
-    context ""
   end
 end

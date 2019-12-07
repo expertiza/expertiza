@@ -10,8 +10,10 @@ class QuestionnairesController < ApplicationController
   def action_allowed?
     if params[:action] == "edit"
       @questionnaire = Questionnaire.find(params[:id])
-      if @questionnaire.type == "SupplementaryReviewQuestionnaire"
-        return ['Student'].include? current_role_name
+      unless @questionnaire.nil?
+        if @questionnaire.type == "SupplementaryReviewQuestionnaire"
+          return ['Student'].include? current_role_name
+        end
       end
       (['Super-Administrator',
         'Administrator'].include? current_role_name) ||

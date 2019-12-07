@@ -24,13 +24,12 @@ describe QuestionnairesController do
     let(:questionnaire) { build(:questionnaire, id: 1) }
     let(:instructor) { build(:instructor, id: 1) }
     let(:ta) { build(:teaching_assistant, id: 10, parent_id: 66) }
-    let(:student) {build(:student, id: 1)}
-    context 'when params action is edit or update and role current user is not student' do
+    context 'when params action is edit or update' do
       before(:each) do
         controller.params = {id: '1', action: 'edit'}
         controller.request.session[:user] = instructor
       end
-      
+
       context 'when the role name of current user is super admin or admin' do
         it 'allows certain action' do
           check_access(admin).to be true
@@ -70,14 +69,6 @@ describe QuestionnairesController do
           check_access(instructor2).to be false
         end
       end
-    end
-    context 'when params action is edit or update and role current user is student and questionnaire is Supplementary Review Questionnaire' do
-
-      it 'allows certain action' do
-        questionnaire = create(:questionnaire, type: "SupplementaryReviewQuestionnaire")
-        check_access(student).to be true
-      end
-
     end
     context 'when params action is not edit and update' do
       before(:each) do
@@ -207,7 +198,7 @@ describe QuestionnairesController do
   describe '#edit' do
     context 'when @questionnaire is not nil' do
       it 'renders the questionnaires#edit page' do
-        allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', instructor_id: 6))
+        allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', instructor_id: 6, type: 'ReviewQuestionnaire'))
         session = {user: instructor}
         params = {id: 1}
         get :edit, params, session

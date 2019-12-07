@@ -62,8 +62,8 @@ class LatePoliciesController < ApplicationController
       flash[:error] = "A policy with the same name already exists."
       same_policy_name = true
     end
-    if params[:late_policy][:max_penalty].to_i>=50
-      flash[:error] = "Maximum penalty cannot be greater than or equal to 50"
+    if params[:late_policy][:max_penalty].to_i>=100
+      flash[:error] = "Maximum penalty cannot be greater than or equal to 100"
       invalid_max_penalty = true;
     end
     if !invalid_penalty_per_unit && !same_policy_name && !invalid_max_penalty

@@ -107,12 +107,12 @@ class ReviewResponseMap < ResponseMap
     responses
   end
 
-  # returns the reviewer of the response, either a participant or a team
+  #E-1973 - returns the reviewer of the response, either a participant or a team
   def get_reviewer
     return ReviewResponseMap.get_reviewer_with_id(assignment.id, reviewer_id)
   end
 
-  # gets the reviewer of the response, given the assignment and the reviewer id
+  # E-1973 - gets the reviewer of the response, given the assignment and the reviewer id
   # the assignment is used to determine if the reviewer is a participant or a team
   def self.get_reviewer_with_id(assignment_id, reviewer_id)
     assignment = Assignment.find(assignment_id)
@@ -141,7 +141,7 @@ class ReviewResponseMap < ResponseMap
       response_maps_with_distinct_participant_id.each do |reviewer_id_from_response_map|
         @reviewers << ReviewResponseMap.get_reviewer_with_id(assignment.id, reviewer_id_from_response_map.reviewer_id)
       end
-      # not sure how to polymorphize this cleanly
+      # we sort the reviewer by name here, using whichever class it is an instance of
       if not assignment.reviewer_is_team
         @reviewers = Participant.sort_by_name(@reviewers)
       else
@@ -150,6 +150,7 @@ class ReviewResponseMap < ResponseMap
     else
       # This is a search, so find reviewers by user's full name
       user_ids = User.select("DISTINCT id").where('fullname LIKE ?', '%' + review_user[:fullname] + '%')
+      #E1973 - we use a separate query depending on if the reviewer is a team or participant
       if not assignment.reviewer_is_team
         @reviewers = AssignmentParticipant.where('user_id IN (?) and parent_id = ?', user_ids, assignment.id)
       else

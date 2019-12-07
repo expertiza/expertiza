@@ -39,6 +39,10 @@ class PopupController < ApplicationController
 
     # id2 is a response_map id
     unless params[:id2].nil?
+      # E1973 - we set the reviewer id either to the student's user id or the current reviewer id
+      # This results from reviewers being either assignment participants or assignment teams.
+      # If the reviewer is a participant, the id is currently the id of the assignment participant.
+      # However, we want their user_id. This is not possible for teams, so we just return the current id
       reviewer_id = ResponseMap.find(params[:id2]).reviewer_id
       if @assignment.reviewer_is_team
         @reviewer_id = Participant.find(reviewer_id).user_id
@@ -79,6 +83,8 @@ class PopupController < ApplicationController
     else
       @reviewid = Response.find_by(map_id: params[:id2]).id
       @pid = ResponseMap.find(params[:id2]).reviewer_id
+      # E-1973 we either pass the id of the team or the user, depending
+      # on if reviewers are teams
       if not @assignment.reviewer_is_team
         @reviewer_id = Participant.find(@pid).user_id
       else

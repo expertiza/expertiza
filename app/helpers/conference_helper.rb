@@ -29,15 +29,18 @@ module ConferenceHelper
 
   #Function to add co-author as participant in conference type assignment
   def add_participant_coauthor
-    new_part = AssignmentParticipant.create(parent_id: @assignment.id,
-                                            user_id: @user.id,
-                                            permission_granted: @user.master_permission_granted,
-                                            can_submit: 1,
-                                            can_review: 1,
-                                            can_take_quiz: 1)
-
+    @participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', @user.id, @assignment.id).first
+    if @participant.nil?
+      new_participant = AssignmentParticipant.create(parent_id: @assignment.id,
+                                              user_id: @user.id,
+                                              permission_granted: @user.master_permission_granted,
+                                              can_submit: 1,
+                                              can_review: 1,
+                                              can_take_quiz: 1)
+      new_participant.set_handle
+    end
     #set_handle from assignment controller is called
-    new_part.set_handle
+
   end
 
   #User parameters for creating co-author, we require only minimum set of parameters.

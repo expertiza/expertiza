@@ -1,5 +1,5 @@
 require 'will_paginate/array'
-
+include ConferenceHelper
 class UsersController < ApplicationController
   autocomplete :user, :name
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
@@ -13,6 +13,8 @@ class UsersController < ApplicationController
        'Administrator'].include? current_role_name
     when 'request_new'
       true
+    #added new and create method to support user creation
+    # via conference url or by instructor based on valid params & roles
     when 'new'
       is_valid_conference_assignment? or check_role
     when 'create'
@@ -256,6 +258,8 @@ class UsersController < ApplicationController
   protected
 
   def foreign
+    #if user creation call is for conference user then only possible role is Student
+    # else  get all the roles types which logged in user can create as new user.
     if params[:assignment_id].nil?
       role = Role.find(session[:user].role_id)
     else
@@ -348,16 +352,13 @@ class UsersController < ApplicationController
       @user = User.new(user_params)
       # parent id for a conference user will be conference assignment instructor id
       @user.parent_id = Assignment.find(params[:user][:assignment]).instructor.id
-      @assignment_name = Assignment.find(params[:user][:assignment]).name
+      @assignment = Assignment.find(params[:user][:assignment])
       # set the user's timezone to its parent's
       @user.timezonepref = User.find(@user.parent_id).timezonepref
       # set default value for institute
       @user.institution_id = nil
       if @user.save
-        password = @user.reset_password # the password is reset
-        prepared_mail = MailerHelper.send_mail_to_coauthor(@user, "Your Expertiza account and password have been created.", "author_conference_invitation", password, @assignment_name)
-        prepared_mail.deliver
-        flash[:success] = "A new password has been sent to new user's e-mail address."
+        send_mail_to_new_user
       else
         raise "Error occurred while creating expertiza account."
       end
@@ -377,10 +378,7 @@ class UsersController < ApplicationController
     # set the user's timezone to its parent's
     @user.timezonepref = User.find(@user.parent_id).timezonepref
     if @user.save
-      password = @user.reset_password # the password is reset
-      prepared_mail = MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password)
-      prepared_mail.deliver
-      flash[:success] = "A new password has been sent to new user's e-mail address."
+      send_mail_to_new_user
       # Instructor and Administrator users need to have a default set for their notifications
       # the creation of an AssignmentQuestionnaire object with only the User ID field populated
       # ensures that these users have a default value of 15% for notifications.
@@ -395,22 +393,22 @@ class UsersController < ApplicationController
     end
   end
 
+  def send_mail_to_new_user
+    password = @user.reset_password # the password is reset
+    prepared_mail = MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password)
+    prepared_mail.deliver
+    flash[:success] = "A new password has been sent to new user's e-mail address. "
+  end
+
   def add_conference_user_as_participant
-    @participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', @user.id, @assignment.id).first
-    if @participant.nil?
-      participant = AssignmentParticipant.create(parent_id: @assignment.id, user_id: @user.id,
-                                 permission_granted: @user.master_permission_granted,
-                                 can_submit: 1,
-                                 can_review: 1,
-                                 can_take_quiz: 1
-      )
-      participant.set_handle
-    end
-    flash[:success] = "You are added as an Author for assignment."
+    add_participant_coauthor
+    flash[:success] = "You are added as an Author for assignment " + @assignment.name
     redirect_to get_redirect_url_link
   end
 
   def get_redirect_url_link
+    #if conference user is already logged in the redirect to Student_task list page
+    # else redirect to login page.
     if current_user && current_role_name == "Student"
       return '/student_task/list'
     else
@@ -419,6 +417,7 @@ class UsersController < ApplicationController
   end
 
   def is_valid_conference_assignment?
+    #if assignment id is present in url the check if it's a valid conference assignment.
     if !params[:assignment_id].nil?
       @assignment = Assignment.find_by_id(params[:assignment_id])
       if !@assignment.nil? and @assignment.is_conference

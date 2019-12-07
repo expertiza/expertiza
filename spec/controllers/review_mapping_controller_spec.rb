@@ -134,6 +134,7 @@ describe ReviewMappingController do
     context 'when assignment does not have topics' do
       it 'runs another algorithms and redirects to student_review#list page' do
         allow(assignment).to receive(:topics?).and_return(false)
+        allow(participant).to receive(:set_current_user)
         team1 = double('AssignmentTeam')
         team2 = double('AssignmentTeam')
         teams = [team1, team2]

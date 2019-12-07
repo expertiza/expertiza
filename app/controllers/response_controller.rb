@@ -23,6 +23,8 @@ class ResponseController < ApplicationController
     end
   end
 
+  # E-1973 - helper method to check if the current user is the reviewer
+  # if the reviewer is an assignment team, we have to check if the current user is on the team
   def current_user_is_reviewer?(map, reviewer_id)
     return map.get_reviewer.current_user_is_reviewer? current_user.try(:id)
   end

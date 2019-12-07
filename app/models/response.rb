@@ -104,6 +104,7 @@ class Response < ActiveRecord::Base
       # there is small possibility that the answers is empty: when the questionnaire only have 1 question and it is a upload file question
       # the reason is that for this question type, there is no answer record, and this question is handled by a different form
       map = ResponseMap.find(self.map_id)
+      # E-1973 either get the assignment from the participant or the map itself
       if map.is_a? ReviewResponseMap
         assignment = map.assignment
       else

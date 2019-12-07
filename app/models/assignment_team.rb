@@ -65,7 +65,7 @@ class AssignmentTeam < Team
     ReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.get_reviewer.id, reviewed_object_id: assignment.id, reviewer_is_team: assignment.reviewer_is_team)
   end
 
-  # If a team is being treated as a reviewer of an assignment, then they are the reviewer
+  # E-1973 If a team is being treated as a reviewer of an assignment, then they are the reviewer
   def get_reviewer
     return self
   end
@@ -267,8 +267,9 @@ class AssignmentTeam < Team
     SubmissionRecord.where(team_id: self.id, assignment_id: assignment.id).order(updated_at: :desc).first
   end
 
-  # this method assumes that the team is the reviewer
-  # looks at which of the team's participants are the currently logged in user, given the user id
+  # E-1973 gets the participant id of the currently logged in user, given their user id
+  # this method assumes that the team is the reviewer since it would be called on
+  # AssignmentParticipant otherwise
   def get_logged_in_reviewer_id(current_user_id)
     self.participants.each do |participant|
       if participant.user.id == current_user_id

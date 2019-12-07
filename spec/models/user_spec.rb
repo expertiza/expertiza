@@ -7,7 +7,6 @@ describe User do
   let(:user1) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
   let(:user2) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbe@gmail.com', password: '123456789', password_confirmation: '123456789' }
 
-
   describe '#name' do
     it 'search by the name of an existing user' do
       expect(user.name).to eq('abc')
@@ -29,7 +28,7 @@ describe User do
       expect(user).not_to be_valid
     end
 
-    #search by an invalid user name
+    # search by an invalid user name
     it 'search by the first name of a non existing  user' do
       expect(user.name).to_not eq('ghi')
     end
@@ -40,7 +39,7 @@ describe User do
       expect(user.fullname).to eq('abc xyz')
     end
 
-    #full name of a user cannot be blank
+    # full name of a user cannot be blank
     it 'Validates presence of full name' do
       expect(user).to be_valid
       user.fullname = '  '
@@ -53,17 +52,17 @@ describe User do
       expect(user.email).to eq('abcxyz@gmail.com')
     end
 
-    #searching by an invalid email
+    # searching by an invalid email
     it 'search by the email of a non existing user' do
       expect(user.email).to_not eq('cdef@gmail.com')
     end
 
-    #searching by a partial string and successful
+    # searching by a partial string and successful
     it 'search email by a substring successful' do
       expect(user.email).to include('a')
     end
 
-    #searching by a partial string unsuccessful
+    # searching by a partial string unsuccessful
     it 'search email by substring unsuccessful' do
       expect(user.email).to_not include('cdef')
     end
@@ -415,8 +414,7 @@ describe User do
 
   describe '.export_fields' do
     it 'exports all information setting in options' do
-      expect(User.export_fields('personal_details' => 'true', 'role' => 'true', 'parent' => 'true', 'email_options' => 'true', 'handle' => 'true'))
-          .to eq(['name', 'full name', 'email', 'role', 'parent', 'email on submission', 'email on review', 'email on metareview', 'handle'])
+      expect(User.export_fields('personal_details' => 'true', 'role' => 'true', 'parent' => 'true', 'email_options' => 'true', 'handle' => 'true')).to eq(['name', 'full name', 'email', 'role', 'parent', 'email on submission', 'email on review', 'email on metareview', 'handle'])
     end
 
     it 'exports only personal_details' do

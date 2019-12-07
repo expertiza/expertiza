@@ -1,5 +1,5 @@
 describe ResponseController do
-  let(:assignment) { build(:assignment, instructor_id: 6) }
+  let(:assignment) { build(:assignment, instructor_id: 6, id: 1) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
   let(:review_response) { build(:response, id: 1, map_id: 1) }
@@ -10,15 +10,29 @@ describe ResponseController do
   let(:assignment_questionnaire) { build(:assignment_questionnaire) }
   let(:answer) { double('Answer') }
   let(:assignment_due_date) { build(:assignment_due_date) }
+  #E1973, team reviews
+  let(:team_response) { build(:response, id: 2, map_id: 2) }
+  let(:team_response_map) { build(:review_response_map, id: 2, reviewer: participant, reviewer_is_team: true) }
+  let(:team_questionnaire) {build(:questionnaire, id: 2)}
+  let(:team_assignment) {build(:assignment, id: 2)}
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(Assignment).to receive(:find).with(1).and_return(assignment)
+    
+    allow(Assignment).to receive(:find).with('2').and_return(team_assignment)
+    allow(Assignment).to receive(:find).with(2).and_return(team_assignment)
+    
     stub_current_user(instructor, instructor.role.name, instructor.role)
     allow(Response).to receive(:find).with('1').and_return(review_response)
     allow(Response).to receive(:find).with(1).and_return(review_response)
+    
+    allow(Response).to receive(:find).with('2').and_return(team_response)
+    allow(Response).to receive(:find).with(2).and_return(team_response)
+    
     allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
     allow(review_response).to receive(:map).and_return(review_response_map)
+    allow(team_response).to receive(:map).and_return(team_response_map)
   end
 
   describe '#action_allowed?' do
@@ -67,6 +81,14 @@ describe ResponseController do
       post :delete, params
       expect(response).to redirect_to('/response/redirect?id=1&msg=The+response+was+deleted.')
     end
+    
+    it 'Redirects away if another user has a lock on the resource' do
+      allow(team_response).to receive(:delete).and_return(team_response)
+      allow(Lock).to receive(:get_lock).and_return(nil)
+      params = {id: 2}
+      post :delete, params
+      expect(response).not_to redirect_to('/response/redirect?id=2&msg=The+response+was+deleted.')
+    end
   end
 
   describe '#edit' do
@@ -87,6 +109,13 @@ describe ResponseController do
       expect(controller.instance_variable_get(:@max)).to eq(5)
       expect(response).to render_template(:response)
     end
+    
+    it 'does not render the page if the user does not have a lock on the response' do
+      allow(Lock).to receive(:get_lock).and_return(nil)
+      params = {id: 2, return: 'assignment_edit'}
+      get :edit, params
+      expect(response).not_to render_template(:response)
+    end
   end
 
   describe '#update' do
@@ -103,13 +132,33 @@ describe ResponseController do
         post :update, params, session
         expect(response).to redirect_to('/response/save?id=1&msg=Your+response+was+not+saved.+Cause%3A189+ERROR%21&review%5Bcomments%5D=some+comments')
       end
+      
+      it 'Does not allow a user to update a response if a lock exists on the response' do
+        allow(ResponseMap).to receive(:find).with(2).and_return(team_response_map)
+        allow(Lock).to receive(:get_lock).and_return(nil)
+        params = {
+          id: 2,
+          review: {
+            comments: 'some comments'
+          },
+          responses: {
+            '0' => {score: 98, comment: 'LGTM'}
+          },
+          isSubmit: 'No'
+        }
+        session = {user: instructor}
+        post :update, params, session
+        expect(response).not_to redirect_to('/response/save?id=1&msg=&review%5Bcomments%5D=some+comments')
+      end
     end
 
     context 'when response is updated successfully' do
       it 'redirects to response#save page' do
         allow(ResponseMap).to receive(:find).with(1).and_return(review_response_map)
         allow(review_response_map).to receive(:reviewer_id).and_return(1)
+        allow(review_response_map).to receive(:assignment).and_return(assignment)
         allow(Participant).to receive(:find).with(1).and_return(participant)
+        allow(participant).to receive(:assignment).and_return(assignment)
         allow(assignment).to receive(:review_questionnaire_id).and_return(1)
         allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire)
         allow(Answer).to receive(:create).with(response_id: 1, question_id: 1, answer: '98', comments: 'LGTM').and_return(answer)

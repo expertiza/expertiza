@@ -46,7 +46,6 @@ class AssignmentNode < Node
 
     query = self.includes(associations).where(find_conditions)
     query = query.where('assignments.name LIKE ?', "%#{name}%") if name.present?
-
     query = paramChecker(search, query, user_id)
 
     # Reordering the query based on assignment's sort order
@@ -55,15 +54,12 @@ class AssignmentNode < Node
 
   # Creating the variables by pulling values from the search param
   def paramChecker(search, query, user_id)
-    me = User.find(user_id)
-    participant_name = search[:participant_name].to_s.strip
-    participant_fullname = search[:participant_fullname].to_s.strip
     due_since = search[:due_since].to_s.strip
     due_until = search[:due_until].to_s.strip
     created_since = search[:created_since].to_s.strip
     created_until = search[:created_until].to_s.strip
-    # Checking if the search criteria are present or not. Based on this, modifying the query
 
+    # Checking if the search criteria are present or not. Based on this, modifying the query
     if due_since.present?
       due_since = due_since.to_time.utc.change(hour: 0, min: 0)
       query = query.where('due_dates.due_at >= ?', due_since)
@@ -84,6 +80,15 @@ class AssignmentNode < Node
       query = query.where('created_at <= ?', created_until)
     end
 
+    query = updateNameForQuery(search, query)
+    return query
+  end
+
+  # Updating the participant's name and full name for the get query
+  def updateNameForQuery(search, query)
+    me = User.find(user_id)
+    participant_name = search[:participant_name].to_s.strip
+    participant_fullname = search[:participant_fullname].to_s.strip
     # Additional check for if user can impersonate here
     if participant_name.present?
       participant_names = User.where('name LIKE ?', "%#{participant_name}%")

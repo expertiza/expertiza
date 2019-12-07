@@ -1,3 +1,4 @@
+require 'user'
 describe User do
   let(:user) do
     User.new name: 'abc', fullname: 'abc xyz', email: 'abcxyz@gmail.com', password: '12345678', password_confirmation: '12345678',
@@ -6,8 +7,9 @@ describe User do
   let(:user1) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
   let(:user2) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbe@gmail.com', password: '123456789', password_confirmation: '123456789' }
 
+
   describe '#name' do
-    it 'returns the name of the user' do
+    it 'search by the name of an existing user' do
       expect(user.name).to eq('abc')
     end
 
@@ -27,17 +29,43 @@ describe User do
       expect(user).not_to be_valid
     end
 
+    #search by an invalid user name
+    it 'search by the first name of a non existing  user' do
+      expect(user.name).to_not eq('ghi')
+    end
   end
 
   describe '#fullname' do
     it 'returns the full name of the user' do
       expect(user.fullname).to eq('abc xyz')
     end
+
+    #full name of a user cannot be blank
+    it 'Validates presence of full name' do
+      expect(user).to be_valid
+      user.fullname = '  '
+      expect(user).not_to be_valid
+    end
   end
 
   describe '#email' do
-    it 'returns the email of the user' do
+    it 'search by the email of an existing user' do
       expect(user.email).to eq('abcxyz@gmail.com')
+    end
+
+    #searching by an invalid email
+    it 'search by the email of a non existing user' do
+      expect(user.email).to_not eq('cdef@gmail.com')
+    end
+
+    #searching by a partial string and successful
+    it 'search email by a substring successful' do
+      expect(user.email).to include('a')
+    end
+
+    #searching by a partial string unsuccessful
+    it 'search email by substring unsuccessful' do
+      expect(user.email).to_not include('cdef')
     end
 
     it 'Validate presence of email which cannot be blank' do
@@ -69,7 +97,13 @@ describe User do
       user.email = 'a@x.com'
       expect(user).to be_valid
     end
+  end
 
+  describe '#name_and_#email' do
+    it 'validate the name and email' do
+      expect(user.name).to eq('abc')
+      expect(user.email).to eq('abcxyz@gmail.com')
+    end
   end
 
   describe '#salt_first?' do
@@ -170,56 +204,56 @@ describe User do
     context 'when current user is super admin and search by user name' do
       it 'fetches all users with abc' do
         allow(user).to receive_message_chain("role.super_admin?") { true }
-        expect(user.get_user_list("abc", "", "", "")).to eq([user1, user2])
+        expect(user.get_user_list("abc", "", "")).to eq([user1, user2])
       end
     end
 
     context 'when current user is super admin and search by user name is empty' do
       it 'fetches all users with abc' do
         allow(user).to receive_message_chain("role.super_admin?") { true }
-        expect(user.get_user_list("xyz", "", "", "")).to eq([])
+        expect(user.get_user_list("xyz", "", "")).to eq([])
       end
     end
 
     context 'when current user is super admin and search by user email' do
       it 'fetches all users with email abcbbe@gmail.com' do
         allow(user).to receive_message_chain("role.super_admin?") { true }
-        expect(user.get_user_list("", "", "", "abcbbe@gmail.com")).to eq([user2])
+        expect(user.get_user_list("", "", "abcbbe@gmail.com")).to eq([user2])
       end
     end
 
     context 'when current user is super admin and search by user email is empty' do
       it 'fetches all users with email xyz@gmail.com' do
         allow(user).to receive_message_chain("role.super_admin?") { true }
-        expect(user.get_user_list("", "", "", "xyz@gmail.com")).to eq([])
+        expect(user.get_user_list("", "", "xyz@gmail.com")).to eq([])
       end
     end
 
     context 'when current user is super admin and search by user email by substring' do
       it 'fetches all users with email *b*' do
         allow(user).to receive_message_chain("role.super_admin?") { true }
-        expect(user.get_user_list("", "", "", "b")).to eq([user1, user2])
+        expect(user.get_user_list("", "", "b")).to eq([user1, user2])
       end
     end
 
     context 'when current user is super admin and search by user full name' do
       it 'fetches all users with bbc' do
         allow(user).to receive_message_chain("role.super_admin?") { true }
-        expect(user.get_user_list("", "", "bbc", "")).to eq([user1, user2])
+        expect(user.get_user_list("", "bbc", "")).to eq([user1, user2])
       end
     end
 
     context 'when current user is super admin and search by user full name is empty' do
       it 'fetches all users with xyz' do
         allow(user).to receive_message_chain("role.super_admin?") { true }
-        expect(user.get_user_list("", "", "xyz", "")).to eq([])
+        expect(user.get_user_list("", "", "xyz")).to eq([])
       end
     end
 
     context 'when current user is super admin and search by user name and email' do
       it 'fetches all users with xyz' do
         allow(user).to receive_message_chain("role.super_admin?") { true }
-        expect(user.get_user_list("abc", "", "", "abcbbe@gmail.com")).to eq([user2])
+        expect(user.get_user_list("abc", "", "abcbbe@gmail.com")).to eq([user2])
       end
     end
 

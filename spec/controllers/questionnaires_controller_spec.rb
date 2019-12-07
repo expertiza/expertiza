@@ -198,7 +198,7 @@ describe QuestionnairesController do
   describe '#edit' do
     context 'when @questionnaire is not nil' do
       it 'renders the questionnaires#edit page' do
-        allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', instructor_id: 6))
+        allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', instructor_id: 6, type: 'ReviewQuestionnaire'))
         session = {user: instructor}
         params = {id: 1}
         get :edit, params, session

@@ -85,11 +85,6 @@ module SummaryHelper
 
     # produce summaries for instructor and students. It sum up the feedback by criterion for each reviewee
     def summarize_reviews_by_reviewees(assignment, summary_ws_url, search)
-      # @summary[reviewee][round][question]
-      # @reviewers[team][reviewer]
-      # @avg_scores_by_reviewee[team]
-      # @avg_score_round[reviewee][round]
-      # @avg_scores_by_criterion[reviewee][round][criterion]
       self.summary = ({})
       self.avg_scores_by_reviewee = ({})
       self.avg_scores_by_round = ({})
@@ -115,7 +110,6 @@ module SummaryHelper
       teams = query.select(:id, :name).where(parent_id: assignment.id).order(:name)
 
       teams.each do |reviewee|
-
         # is_valid is for min and max score filtering. includes_keywords is for text filter
         is_valid = true
         includes_keywords = false

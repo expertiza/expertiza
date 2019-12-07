@@ -39,26 +39,31 @@ class AssignmentNode < Node
     sortvar ||= 'created_at'
     sortorder ||= 'desc'
     find_conditions = [conditions, values]
-    me = User.find(user_id)
 
-    # Creating the variables by pulling values from the search param
     name = search[:name].to_s.strip
+    associations = {assignment: [:due_dates]}
+    associations[:assignment] << {participants: :user} if participant_name.present? || participant_fullname.present?
+
+    query = self.includes(associations).where(find_conditions)
+    query = query.where('assignments.name LIKE ?', "%#{name}%") if name.present?
+
+    query = paramChecker(search, query, user_id)
+
+    # Reordering the query based on assignment's sort order
+    query.order("assignments.#{sortvar} #{sortorder}")
+  end
+
+  # Creating the variables by pulling values from the search param
+  def paramChecker(search, query, user_id)
+    me = User.find(user_id)
     participant_name = search[:participant_name].to_s.strip
     participant_fullname = search[:participant_fullname].to_s.strip
     due_since = search[:due_since].to_s.strip
     due_until = search[:due_until].to_s.strip
     created_since = search[:created_since].to_s.strip
     created_until = search[:created_until].to_s.strip
-
-    associations = {assignment: [:due_dates]}
-
-    associations[:assignment] << {participants: :user} if participant_name.present? || participant_fullname.present?
-
-    query = self.includes(associations).where(find_conditions)
-
-    query = query.where('assignments.name LIKE ?', "%#{name}%") if name.present?
-
     # Checking if the search criteria are present or not. Based on this, modifying the query
+
     if due_since.present?
       due_since = due_since.to_time.utc.change(hour: 0, min: 0)
       query = query.where('due_dates.due_at >= ?', due_since)
@@ -99,9 +104,7 @@ class AssignmentNode < Node
       return [] if participant_names.empty?
       query = query.where(users: {name: participant_names})
     end
-
-    # Reordering the query based on assignment's sort order
-    query.order("assignments.#{sortvar} #{sortorder}")
+    query
   end
 
   # Indicates that this object is always a leaf

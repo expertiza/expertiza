@@ -1,6 +1,11 @@
 module GithubMetricsHelper
   # parses the data from git api to show the chart
   def display_github_metrics(gitVariable, graph_type, timeline_type, due_date)
+    data = get_chart_data(gitVariable, graph_type, timeline_type, due_date)
+    horizontal_bar_chart data, chart_options
+  end
+
+  def get_chart_data(gitVariable, graph_type, timeline_type, due_date)
     @parsed_data = gitVariable[:parsed_data]
     @authors = gitVariable[:authors]
     dates = gitVariable[:dates]
@@ -20,19 +25,18 @@ module GithubMetricsHelper
     if timeline_type == GithubMetric::timeline_types['week'].to_s
       data_array = get_commits_data_group_by_week(graph_type)
 
-      data = {
+      {
         labels: @dates_to_week,
         datasets: data_array
       }
     else
       data_array = get_commits_data_group_by_student(graph_type)
 
-      data = {
+      {
         labels: @authors,
         datasets: data_array
       }
     end
-    horizontal_bar_chart data, chart_options
   end
 
   def chart_options

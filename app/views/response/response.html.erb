@@ -25,7 +25,7 @@
     })();
 
     jQuery(document).ready(function() {
-        
+
         //use barrating for dropdown
         $('.review-rating').each(function(index, el) {
             var $El;
@@ -94,99 +94,120 @@
             });
         }
 
-        $('#save_review').click(function(){
-			fetch_suggestion_score_and_display_popup();
-			
-			$('#save_confirm').html('<span id="tick"> &#10004; </span>&nbsp;Saving review!')
-                setTimeout(function(){
-                    $('#save_confirm').html('')
-                }, 5000); 	
+        $('#save_review').click(function(e){
+            // function call to get/calculate the suggestion score and display it in an alertbox
+            // when saving the review.
+            fetch_suggestion_score_and_display_alert(1);
+            $('#save_confirm').html('<span id="tick"> &#10004; </span>&nbsp;Saving review!')
+            setTimeout(function(){
+                $('#save_confirm').html('')
+            }, 5000);
         });
-		
         $('#Submit').click(function(e){
-			fetch_suggestion_score_and_display_popup();
-			
-			if(!confirm('Once a review has been submitted, you cannot edit it again')){
-			e.preventDefault();
-			e.stopPropagation();
-			return;
-            }else{
+            // function call to get/calculate the suggestion score and display it in an alertbox
+            // when submitting your review.
+            fetch_suggestion_score_and_display_alert(2);
+        });
+
+        // function that calls the web service to fetch the suggestion score for a student's review.
+        // if the web service responds with an error, then we generate a random number and show it
+        // to the student.
+        function fetch_suggestion_score_and_display_alert(val)
+        {
+            var all_comments = getReviewComments();
+            if (all_comments != [])
+            {
+              var json_review_comments = {"reviews":all_comments,"metrics":["suggestion"]}
+              $.ajax({
+                  // ajax call to the url with the data as json object.
+                  url: "https://peer-review-metrics-nlp.herokuapp.com/metrics/all",
+                  type: "POST",
+                  crossDomain: true,
+                  contentType: "application/json",
+                  data: json_review_comments,
+
+                  // show the response if response is successful.
+                  success: function (response) {
+                      let stud_score = 0, avg_score=0;
+                      var num_responses = response["results"].size;
+                      for (var i = 0; i < num_responses; i++){
+                          stud_score += response["results"][i]["metrics"]["suggestion"]["suggestions_chances"];
+                      }
+                      if(val == 1){
+                          save_suggestion_score_popup(stud_score,avg_score);
+                      }else{
+                          submit_suggestion_score_popup(stud_score,avg_score);
+                      }
+                  },
+
+                  // if response is error, then show random number to student.
+                  error: function (xhr, status) {
+                      debugger;
+                      let stud_score = 0;
+                      let avg_score= <%= avg_num_suggestions_per_round(@map.assignment.id,@response.round,"ReviewResponseMap")%>;
+                      var num_comments = all_comments.length;
+                      for (var i = 0; i < num_comments; i++){
+                          stud_score += Math.floor((Math.random() * 5));
+                      }
+                      if(val == 1){
+                          // function call that shows the stud_score and avg_score in alertbox.
+                          save_suggestion_score_popup(stud_score,avg_score);
+                      }else{
+                          // function call that shows the stud_score and avg_score in alertbox.
+                          submit_suggestion_score_popup(stud_score,avg_score);
+                      }
+                  }
+              });
+            }
+        }
+
+        // function to show the scores on save.
+        function save_suggestion_score_popup(stud_score,avg_score)
+        {
+          if(!confirm('Average class suggestion score is ' + avg_score + '. \n Your review suggestion score is ' +
+                    stud_score))
+            {
+              e.preventDefault();
+              e.stopPropagation();
+              return;
+            }
+        }
+
+        // function to show the scores on submit.
+        function submit_suggestion_score_popup(stud_score,avg_score)
+        {
+            if(!confirm('Average class suggestion score is ' + avg_score + '. \n Your review suggestion score is ' +
+                stud_score + ".\n\nOnce a review has been submitted, you cannot edit it again. \n Clicking 'Cancel' will still save your review."))
+            {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
+            else{
                 jQuery('#isSubmit').val('Yes');
                 window.location.href= "../../../student_review/list?id=<%= @map.reviewer.id %>";
             }
-        });
-		
-		function fetch_suggestion_score_and_display_popup()
-		{
-				var all_comments = getReviewComments();
-				if (all_comments != [])
-				{
-					var json_review_comments = {"reviews":all_comments,"metrics":["suggestion"]}
-					$.ajax({
-                        url: "https://peer-review-metrics-nlp.herokuapp.com/metrics/all",
-                        type: "POST",
-                        crossDomain: true,
-                        contentType: "application/json",
-                        data: json_review_comments,
-        
-                        success: function (response) {
-							let stud_score = 0, avg_score=0;
-                            var num_responses = response["results"].size;
-							for (var i = 0; i < num_responses; i++)
-							{
-								stud_score += response["results"][i]["metrics"]["suggestion"]["suggestions_chances"]; 
-							}
-							suggestion_score_popup(stud_score,avg_score);
-									
-                        },
-                        error: function (xhr, status) {
-							debugger;
-							let stud_score = 0;
-							let avg_score= <%= avg_num_suggestions_per_round(@map.assignment.id,@response.round,"ReviewResponseMap")%>;
-							
-							var num_comments = all_comments.length;
-							for (var i = 0; i < num_comments; i++)
-							{
-								stud_score += Math.floor((Math.random() * 5));
-							}	
-							
-                            suggestion_score_popup(stud_score,avg_score);
-                        }
-					});
-				}
-		}	
-		
-		function suggestion_score_popup(stud_score,avg_score)
-		{
-			if(!confirm('Average class suggestion score is ' + avg_score + '. \n Your review suggestion score is ' +
-                stud_score))
-				{
-					e.preventDefault();
-					e.stopPropagation();
-					return;
-				}
-		}
-		
-		function getReviewComments()
-		{
-			var num_comments = document.getElementsByTagName("textarea").length;
-			var all_comments = [];
-			var comment = "";
-			for (var i = 0; i < num_comments; i++)
-			{
-				comment = document.getElementsByTagName("textarea")[i].innerText;
-				if (comment != "")
-				{
-					comment = comment.replace("<p>","");
-					comment = comment.replace("</p>","");
-					comment = comment.trim();
-					all_comments.push(comment);
-				}		
-			}
-			return all_comments;
-		
-		}
-		
+        }
+
+        // function that retrieves the comments entered in the review.
+        function getReviewComments()
+        {
+          var num_comments = document.getElementsByTagName("textarea").length;
+          var all_comments = [];
+          var comment = "";
+          for (var i = 0; i < num_comments; i++)
+          {
+            comment = document.getElementsByTagName("textarea")[i].innerText;
+            if (comment != "")
+            {
+              comment = comment.replace("<p>","");
+              comment = comment.replace("</p>","");
+              comment = comment.trim();
+              all_comments.push(comment);
+            }
+          }
+          return all_comments;
+        }
         // update the values in the form using ajax
         function updateForm(){
             //update the additional comments
@@ -353,9 +374,7 @@
             });
         });
 
-    });
-	
- 	
+  });
 </script>
 
 <% if @map.survey? %>
@@ -496,17 +515,17 @@
 
 <!--Check whether there is a UploadFile question.-->
 <%@questions.each do |question| %>
-  <% if question.instance_of? UploadFile %>
-    <!--params[:origin] means from where do the files upload-->
-    <!--If the files uploaded from submitted_work (students hand in assignment), params[:origin] will be nil-->
-    <!--If the files uploaded from peer review, params[:origin] will be 'review'-->
-    <% if params[:action] == 'new' %>
-      <% response_map_id = params[:id] %>
-    <% elsif params[:action] == 'edit' %>
-      <% response_map_id = Response.find(params[:id]).response_map.id %>
+    <% if question.instance_of? UploadFile %>
+        <!--params[:origin] means from where do the files upload-->
+        <!--If the files uploaded from submitted_work (students hand in assignment), params[:origin] will be nil-->
+        <!--If the files uploaded from peer review, params[:origin] will be 'review'-->
+        <% if params[:action] == 'new' %>
+            <% response_map_id = params[:id] %>
+        <% elsif params[:action] == 'edit' %>
+            <% response_map_id = Response.find(params[:id]).response_map.id %>
+        <% end %>
+        <%= render partial: 'submitted_content/submitted_files', locals: {participant: @participant, stage: @stage, origin: 'review', response_map_id: response_map_id} %>
     <% end %>
-    <%= render partial: 'submitted_content/submitted_files', locals: {participant: @participant, stage: @stage, origin: 'review', response_map_id: response_map_id} %>
-  <% end %>
 <% end %>
 <%= @map.show_feedback(@response) %>
 <a href="javascript:window.history.back()">Back</a>

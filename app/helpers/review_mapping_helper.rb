@@ -244,17 +244,17 @@ module ReviewMappingHelper
 	#compute average across all reviewers' suggestion scores
 	reviewers = nil;
 	if @reviewers
-		reviewers = @reviewers;	
+		reviewers = @reviewers;
 	else
 		reviewers = AssignmentParticipant.where(parent_id: assignment_id)
 	end
-	
+
 	reviewers.each do |r|
 		response_maps = ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", assignment_id, r.id, type])
 		score = num_suggestions_per_student_per_round(response_maps,round_id)
 		scores += score
 	end
-	avg_score = scores/reviewers.length unless reviewers.empty?	
+	avg_score = scores/reviewers.length unless reviewers.empty?
 	return avg_score
   end
 

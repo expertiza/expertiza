@@ -29,6 +29,14 @@ describe 'Tests Review report' do
   it "can display team reviewed" do
     expect(page).to have_content('Team reviewed')
   end
+
+  it "has legend for metrics" do
+    expect(page).to have_content('Vol.')
+    expect(page).to have_content('Avg.vol')
+    expect(page).to have_content('Number of suggestions')
+    expect(page).to have_content('Class avg. number of suggestions')
+  end
+
 end
 
 describe "Test Author feedback report" do

@@ -9,7 +9,14 @@ class AdvertiseForPartnerController < ApplicationController
     team = AssignmentTeam.find_by(id: params[:id])
     team.update_attributes(advertise_for_partner: true, comments_for_advertisement: params[:comments_for_advertisement])
     participant = AssignmentParticipant.find_by(parent_id: team.assignment.id, user_id: session[:user].id)
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Your advertisement has been successfully created.', request)
+    @log_map = {
+          :student_name =>  session[:user].name,
+          :team_id => team.name,
+          :assignment_id => team.assignment.id,
+          :assignment_name => team.assignment.name
+          }
+      @log_message = "Your advertisement has been successfully created."
+    ExpertizaLogger.info LoggerMessage.new(controller_name,session[:user].name,@log_message,request,@log_map)
     redirect_to view_student_teams_path student_id: participant.id
   end
 
@@ -27,7 +34,14 @@ class AdvertiseForPartnerController < ApplicationController
       flash[:error] = 'An error occurred and your advertisement was not updated!'
       render action: 'edit'
     else
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Your advertisement has been successfully updated.', request)
+      @log_map = {
+          :student_name =>  session[:user].name,
+          :team_id => @team.name,
+          :assignment_id => @team.assignment.id,
+          :assignment_name => @team.assignment.name
+          }
+      @log_message = "Your advertisement has been successfully updated."
+      ExpertizaLogger.info LoggerMessage.new(controller_name,session[:user].name,@log_message,request,@log_map)
       flash[:success] = 'Your advertisement was successfully updated!'
       redirect_to view_student_teams_path student_id: participant.id
     end

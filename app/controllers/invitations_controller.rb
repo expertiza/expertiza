@@ -149,7 +149,14 @@ class InvitationsController < ApplicationController
  def log(method_name)
     case method_name
     when "accept"
-    ExpertizaLogger.info "Accepting Invitation #{params[:inv_id]}: #{@accepted}"
+    @log_map = {
+          :student_name =>  session[:user].name,
+          :assignment_id => @inv.assignment_id,
+          :from_id => @inv.from_id,
+	  :to_id => @inv.to_id
+          }
+      @log_message = "Accepting invitation"
+    ExpertizaLogger.info LoggerMessage.new(controller_name,session[:user].name,@log_message,request,@log_map)
     when "decline"
     ExpertizaLogger.info "Declined invitation #{params[:inv_id]} sent by #{@inv.from_id}"
     when "cancel"

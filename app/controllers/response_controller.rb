@@ -122,7 +122,12 @@ after_filter ->(param="save"){log param}, :only => :save
     @time = (params[:time].to_f)/60000
     @id = params[:id]
     @name = params[:name]
-    ExpertizaLogger.info LoggerMessage.new(controller_name,session[:user].name,"Reviewer #{session[:user].name} reviewed for #{'%0.2f'% @time} minutes}",request)
+    @log_map = {
+          :student_name =>  session[:user].name,
+          :review_time => @time,
+          }
+      @log_message = "Student reviewed successfully"
+    ExpertizaLogger.info LoggerMessage.new(controller_name,session[:user].name,@log_message,request,@log_map)
     render plain: "OK"
    end
 

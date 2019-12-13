@@ -1,0 +1,2 @@
+module ReviewBiddingHelper
+end

@@ -8,20 +8,6 @@ class GithubMetricsController < ApplicationController
   include GradesHelper
   include GithubMetricsHelper
 
-  def view
-    session["github_base"] = parse_hostname AssignmentParticipant.find(params[:id]).team.hyperlinks[0]
-    session["github_tokens"] = nil
-    if session["github_tokens"].nil?
-      session["github_tokens"] = Hash.new
-    end
-    if session["github_tokens"][session["github_base"]].nil?
-      session["participant_id"] = params[:id]
-      session["github_view_type"] = "view_scores"
-      session["github_view_type"] = "view_scores"
-      return redirect_to authorize_github_github_metrics_path
-    end
-  end
-
   def action_allowed?
     ['Instructor',
      'Teaching Assistant',
@@ -34,24 +20,12 @@ class GithubMetricsController < ApplicationController
     if session["github_base"] == "github.com"
       redirect_to "https://github.com/login/oauth/authorize?client_id=#{GITHUB_CONFIG['client_key']}"
     else
-      redirect_to "https://#{session["github_base"]}/login/oauth/authorize?client_id=#{GITHUB_CONFIG['enterprise_client_key']}"
+      redirect_to "https://#{GITHUB_CONFIG['enterprise_domain']}/login/oauth/authorize?client_id=#{GITHUB_CONFIG['enterprise_client_key']}"
     end
   end
 
   # This function is used to show github_metrics information by redirecting to view.
   def view_github_metrics
-    session["github_base"] = parse_hostname AssignmentParticipant.find(params[:id]).team.hyperlinks[0]
-    #session["github_tokens"] = nil
-    if session["github_tokens"].nil?
-      session["github_tokens"] = Hash.new
-    end
-    if session["github_tokens"][session["github_base"]].nil?
-      session["participant_id"] = params[:id]
-      session["github_view_type"] = "view_submissions"
-      redirect_to authorize_github_github_metrics_path
-      return
-    end
-
     # Variables to store github statistics
     @gitVariable = {
                      :head_refs => {},
@@ -66,13 +40,30 @@ class GithubMetricsController < ApplicationController
                      :check_statuses => {},
                      :commits => []
     }
-
-    #@token = session["github_access_token"]
+    
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
     @team = @participant.team
     @team_id = @team.id
-    @submission = parse_hostname(@team.hyperlinks[0])
+
+    git_links = github_links(@team.hyperlinks)
+    if git_links.any?
+      @submission = git_links.first
+    else
+      return
+      # Exit early here because there is no GitHub submission.
+    end
+    base = parse_hostname(@submission)
+    session["github_base"] = base
+    if session["github_tokens"].nil?
+      session["github_tokens"] = Hash.new
+    end
+    if session["github_tokens"][base].nil?
+      session["participant_id"] = params[:id]
+      session["github_view_type"] = "view_submissions"
+      redirect_to authorize_github_github_metrics_path
+      return
+    end
 
     retrieve_github_data
     retrieve_pull_request_statuses_data
@@ -81,7 +72,14 @@ class GithubMetricsController < ApplicationController
     @gitVariable[:dates] = @gitVariable[:dates].keys.sort
   end
 
+  def github_links(links)
+    return links.select do | entry |
+      entry.match(/github/)
+    end
+  end
+
   def parse_hostname(url)
+    ExpertizaLogger.info LoggerMessage.new("", "", url)
     return URI.parse(url).host
   end
 

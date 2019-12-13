@@ -53,8 +53,7 @@ class AuthController < ApplicationController
   end
 
   def github_login
-    #session["github_access_token"] = env['omniauth.auth']["credentials"]["token"]
-    session["github_tokens"][session["github_base"]] = env['omniauth.auth']["credentials"]["token"]
+    session["github_tokens"]["github.com"] = env['omniauth.auth']["credentials"]["token"]
     if session["github_view_type"] == "view_submissions"
       redirect_to controller: 'github_metrics', action: 'view_github_metrics', id: session["participant_id"]
     elsif session["github_view_type"] == "view_scores"
@@ -63,9 +62,7 @@ class AuthController < ApplicationController
   end
 
   def github_enterprise_login
-    #session["github_access_token"] = env['omniauth.auth']["credentials"]["token"]
-    #session["github_access_token"] = params[:code]#env['omniauth.auth']["credentials"]["token"]
-    session["github_tokens"][session["github_base"]] = env['omniauth.auth']["credentials"]["token"]
+    session["github_tokens"][GITHUB_CONFIG['enterprise_domain']] = env['omniauth.auth']["credentials"]["token"]
     if session["github_view_type"] == "view_submissions"
       redirect_to controller: 'github_metrics', action: 'view_github_metrics', id: session["participant_id"]
     elsif session["github_view_type"] == "view_scores"

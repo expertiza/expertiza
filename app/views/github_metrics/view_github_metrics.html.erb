@@ -20,29 +20,29 @@
   <% end %>
 </div><br><br>
 
-
 <% if @gitVariable[:parsed_data] && @gitVariable[:authors].present? && @gitVariable[:dates] %>
   <div>
+		<button onclick="toggleFunction('mapmembers')" class="btn btn-default">Remap Git Users</button>
+		<div id="mapmembers" style="display:none;">
 		<h3>Team Members</h3>
-		<ul>
 			<% @gitVariable[:check_statuses].each do |pull_number, check_status| %>
 			<% end %>
-			<% participants.each do | p |  %>
-  		  <li>
-					<%= p.name(session[:ip]) %>, <%= p.user.email %>
-					<fieldset>
-						<legend>Match emails</legend>
-						<% @gitVariable[:authors].each do | email | %>
-						<div>
-					    <input type="checkbox">
-							<label><%= email %></label>
-						</div>
-					 <% end %>
-				</li>
-			<% end %>
-			<%= @gitVariable[:authors] %>
-		</ul>
-		<div id="root"></div>
+			<form>
+				<% @gitVariable[:authors].each do | email | %>
+				<div class="input-group">
+			<strong><%= email %></strong>
+			<% participants.each do | p | %>
+			<div class="radio">
+				<label>
+					<input type="radio" name="<%= email %>" value="<%= p.name(session[:ip]) %>" <%= should_check(email, p.name(session[:ip])) %>>
+					<%= p.name(session[:ip]) %>(<%= p.user.email %>)
+				</label>
+			</div>
+					<% end %>
+					</div>
+				<% end %>
+				<button type="submit" class="btn btn-default">Submit</button>
+			</form>
 	</div>
 	<div>
 		<h3>Code frequency</h3>
@@ -98,6 +98,7 @@
 	<table class="table table-striped">
 		<thead>
 			<tr>
+				<th>Student</th>
 				<th>Name</th>
 				<th>Email</th>
 				<th>Additions</th>
@@ -109,6 +110,7 @@
 		<tbody>
 			<% @gitVariable[:commits].each do |commit| %>
 			<tr>
+				<td><%= params[commit["author"]["email"]] %></td>
 				<td><%= commit["author"]["name"] %></td>
 				<td><%= commit["author"]["email"] %></td>
 				<td><%= commit["additions"] %></td>

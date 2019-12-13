@@ -25,7 +25,7 @@
 		<button onclick="toggleFunction('mapmembers')" class="btn btn-default">Remap Git Users</button>
 		<div id="mapmembers" style="display:none;">
 		<h3>Team Members</h3>
-			<% @gitVariable[:check_statuses].each do |pull_number, check_status| %>
+    <% @gitVariable[:check_statuses].each do |pull_number, check_status| %>
 			<% end %>
 			<form>
 				<% @gitVariable[:authors].each do | email | %>
@@ -43,33 +43,131 @@
 				<% end %>
 				<button type="submit" class="btn btn-default">Submit</button>
 			</form>
-	</div>
-	<div>
-		<h3>Code frequency</h3>
-		<div class="chart-container" style="width: 1000px; height:600px;">
-			<%= display_github_metrics(@gitVariable[:parsed_data], @gitVariable[:authors], @gitVariable[:dates]) %>
-		</div>
-	</div>
-	<div>
-		<h3>Team Statistics</h3>
-		<ul>
-			<li>Total number of commits:<%= @gitVariable[:total_commits] %></li>
-			<li>Total number of lines added: <%= @gitVariable[:total_additions] %></li>
-			<li>Total number of lines removed: <%= @gitVariable[:total_deletions] %></li>
-			<li>Total number of files changed: <%= @gitVariable[:total_files_changed] %></li>
-			<li>
-				<div>Merge statuses:</div>
-				<ul>
-					<% @gitVariable[:merge_status].each do |k, v| %>
+  </div>
+  <div>
+    <h3>Code frequency</h3>
+    <% github_metrics_summary = student_level_github_metrics_summary(@gitVariable[:commits], @gitVariable[:authors]) %>
+    Show
+    <%= select("graph","selector", GithubMetric::graph_types, {:selected=> @graph_type }) %>
+    group by
+    <%= select("timeline","selector", GithubMetric::timeline_types, {:selected=> @timeline_type }) %>
+    <%= hidden_field_tag 'participant_id', params[:id] %>
+    <button type="button" class="pull-right" data-toggle="modal" data-target="#myModal">Summary</button>
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">Github Metrics Details</h4>
+            </div>
+            <div class="modal-body">
+              <table id="github-metrics-summary-table" class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th onclick="sortTable(1)">Commits<i class="fa fa-fw fa-sort"></i></th>
+                    <th onclick="sortTable(2)">Additions<i class="fa fa-fw fa-sort"></i></th>
+                    <th onclick="sortTable(3)">Deletions<i class="fa fa-fw fa-sort"></i></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% github_metrics_summary.each do |author_email, commit_data| %>
+                  <tr>
+                    <td><%= author_email %></td>
+                    <td><%= commit_data[:commits] %></td>
+                    <td><%= commit_data[:additions] %></td>
+                    <td><%= commit_data[:deletions] %></td>
+                  </tr>
+                  <%end%>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+    </div>
+
+
+    <div class="chart-container" style="width: 1000px; height:600px;">
+      <%= display_github_metrics(@gitVariable, @graph_type, @timeline_type, @due_date) %>
+    </div>
+
+    <script>
+      function sortTable(n) {
+        var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+        table = document.getElementById("github-metrics-summary-table");
+        switching = true;
+        dir = "asc";
+        while (switching) {
+          switching = false;
+          rows = table.rows;
+          for (i = 1; i < (rows.length - 1); i++) {
+            shouldSwitch = false;
+            x = rows[i].getElementsByTagName("TD")[n];
+            y = rows[i + 1].getElementsByTagName("TD")[n];
+            if (dir == "asc") {
+              if (parseInt(x.innerHTML.toLowerCase()) > parseInt(y.innerHTML.toLowerCase())) {
+                shouldSwitch = true;
+                break;
+              }
+            } else if (dir == "desc") {
+              if (parseInt(x.innerHTML.toLowerCase()) < parseInt(y.innerHTML.toLowerCase())) {
+                shouldSwitch = true;
+                break;
+              }
+            }
+          }
+          if (shouldSwitch) {
+            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+            switchcount ++;
+          } else {
+            if (switchcount == 0 && dir == "asc") {
+              dir = "desc";
+              switching = true;
+            }
+          }
+        }
+      }
+      $(document).ready(function(){
+        $('#graph_selector').on('change', function(){
+          var participant_id = $('#participant_id').val()
+          var graphType = $('#graph_selector').val();
+          var timelineType = $('#timeline_selector').val();
+          window.location.href = `/github_metrics/view_github_metrics/${participant_id}?graphType=${graphType}&timelineType=${timelineType}`
+        })
+        $('#timeline_selector').on('change', function(){
+          var participant_id = $('#participant_id').val()
+          var graphType = $('#graph_selector').val();
+          var timelineType = $('#timeline_selector').val();
+          window.location.href = `/github_metrics/view_github_metrics/${participant_id}?graphType=${graphType}&timelineType=${timelineType}`
+        })
+      })
+    </script>
+  </div>
+  <div>
+    <h3>Team Statistics</h3>
+    <ul>
+      <li>Total number of commits:<%= @gitVariable[:total_commits] %></li>
+      <li>Total number of lines added: <%= @gitVariable[:total_additions] %></li>
+      <li>Total number of lines removed: <%= @gitVariable[:total_deletions] %></li>
+      <li>Total number of files changed: <%= @gitVariable[:total_files_changed] %></li>
+      <li>
+        <div>Merge statuses:</div>
+        <ul>
+          <% @gitVariable[:merge_status].each do |k, v| %>
           <li>Pull Request Number <%= k %> has status: <%= v %> </li>
-					<% end %>
-				</ul>
-			</li>
-			<li>
-				<span>Check Statuses:</span>
-				<% if @gitVariable[:check_statuses].empty? %>
+          <% end %>
+        </ul>
+      </li>
+      <li>
+        <span>Check Statuses:</span>
+        <% if @gitVariable[:check_statuses].empty? %>
         <span>NA</span>
-				<% else %>
+        <% else %>
         <ul>
           <% @gitVariable[:check_statuses].each do |pull_number, check_status| %>
           <li>

@@ -8,6 +8,23 @@ class GithubMetricsController < ApplicationController
   include GradesHelper
   include GithubMetricsHelper
 
+  # before_action :initialize_graph_type, only: [:view_github_metrics]
+
+  # def view
+  #   session["github_base"] = parse_hostname AssignmentParticipant.find(params[:id]).team.hyperlinks[0]
+  #   session["github_tokens"] = nil
+  #   if session["github_tokens"].nil?
+  #     session["github_tokens"] = Hash.new
+  #   end
+  #   if session["github_tokens"][session["github_base"]].nil?
+  #     session["participant_id"] = params[:id]
+  #     session["github_view_type"] = "view_scores"
+  #     session["github_view_type"] = "view_scores"
+  #     return redirect_to authorize_github_github_metrics_path
+  #   end
+  # end
+
+
   def action_allowed?
     ['Instructor',
      'Teaching Assistant',
@@ -64,6 +81,8 @@ class GithubMetricsController < ApplicationController
       redirect_to authorize_github_github_metrics_path
       return
     end
+    #@submission = parse_hostname(@team.hyperlinks[0])
+    @due_date = get_due_date_for_assignment
 
     retrieve_github_data
     retrieve_pull_request_statuses_data
@@ -229,7 +248,9 @@ class GithubMetricsController < ApplicationController
       #author_name = commit["author"]["name"]
       author_email = commit["author"]["email"]
       commit_date = commit["committedDate"].to_s
-      process_github_authors_and_dates(author_email, commit_date[0, 10])
+      additions = commit["additions"]
+      deletions = commit["deletions"]
+      process_github_authors_and_dates(author_email, commit_date[0, 10], additions, deletions)
     end
     organize_commit_dates_in_sorted_order
   end
@@ -289,24 +310,53 @@ class GithubMetricsController < ApplicationController
   end
 
   # An auxiliary function to organize authors and their commit dates. Each author has a list of commit dates.
-  def process_github_authors_and_dates(author_name, commit_date)
+  def process_github_authors_and_dates(author_name, commit_date, additions=0, deletions=0)
     @gitVariable[:authors][author_name] ||= 1
     @gitVariable[:dates][commit_date] ||= 1
     @gitVariable[:parsed_data][author_name] ||= {}
-    @gitVariable[:parsed_data][author_name][commit_date] = if @gitVariable[:parsed_data][author_name][commit_date]
-                                                             @gitVariable[:parsed_data][author_name][commit_date] + 1
-                                                           else
-                                                             1
-                                                           end
+    @gitVariable[:parsed_data][author_name][commit_date] ||= {
+      commits:0,
+      additions:0,
+      deletions:0
+    }
+    @gitVariable[:parsed_data][author_name][commit_date][:commits] += 1
+    @gitVariable[:parsed_data][author_name][commit_date][:additions] += additions
+    @gitVariable[:parsed_data][author_name][commit_date][:deletions] += deletions
   end
 
   # An auxiliary function. Sort commit dates for each author to make them in order.
   def organize_commit_dates_in_sorted_order
     @gitVariable[:dates].each_key do |date|
       @gitVariable[:parsed_data].each_value do |commits|
-        commits[date] ||= 0
+        commits[date] ||= {
+          commits:0,
+          additions:0,
+          deletions:0
+        }
       end
     end
-    @gitVariable[:parsed_data].each {|author, commits| @gitVariable[:parsed_data][author] = Hash[commits.sort_by {|date, _commit_count| date }] }
+    @gitVariable[:parsed_data].each {
+      |author, commits|
+      @gitVariable[:parsed_data][author] = Hash[commits.sort_by {|date, _commit_count| date }]
+    }
   end
+
+  private
+
+  def initialize_graph_type
+    @graph_type = params[:graphType] || '0'
+    @timeline_type = params[:timelineType] || '1'
+  end
+
+  def get_due_date_for_assignment
+    @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
+    if @assignment.staggered_deadline?
+      due_date = TopicDueDate.find_by(parent_id: @topic_id)
+    else
+      due_date = AssignmentDueDate.find_by(parent_id: @assignment.id)
+    end
+
+    due_date.present? ? due_date.due_at.to_s : 'Unknown'
+  end
+  
 end

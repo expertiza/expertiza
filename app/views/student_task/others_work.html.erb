@@ -61,6 +61,9 @@
            end %></ul>
        </tr>
      <%end%>
+       <%= link_to "Review Bid",:controller=>'sign_up_sheet', :action => 'review_bid', :id => @participant.id%>
    </table>
+
    <BR/>
+
    <%= link_to "Back", :controller=>'student_task', :action => 'view', :id => @participant.id %>

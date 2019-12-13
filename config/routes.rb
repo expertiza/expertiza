@@ -324,6 +324,7 @@ resources :institution, except: [:destroy] do
   resources :sign_up_sheet, except: %i[index show] do
     collection do
       get :signup
+      get :review_bid
       get :delete_signup
       get :add_signup_topics
       get :add_signup_topics_staggered

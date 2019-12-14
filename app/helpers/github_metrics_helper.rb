@@ -46,10 +46,10 @@ module GithubMetricsHelper
     @y_axis_label = ''
     # get the first submission date week
     @submission_week = if ['Unknown', 'Finished'].include? due_date
-                        nil
-                      else
-                        DateTime.parse(due_date).strftime('%V')
-                      end
+                         nil
+                       else
+                         DateTime.parse(due_date).strftime('%V')
+                       end
 
     dates.each do |date|
       @dates_to_week.add(DateTime.parse(date).strftime('%V'))
@@ -150,8 +150,6 @@ module GithubMetricsHelper
   def remap_authors(emails)
     return emails.map { | e | remap_author(e) }
   end
-      
-end
 
   private
 

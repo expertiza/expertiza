@@ -16,9 +16,13 @@
   <a href="<%= @assignment.spec_location %>" target="new">Assignment Description</a>
 <% end %>
 <ul>
+  <%#= link_to "Review bid",{:controller => 'review_bidding', :action => 'review_bid', :id => @participant.id} %>
+  <%= link_to "Review bid",{:controller => 'review_bidding', :action => 'review_bid', :id => @participant.id} %>
   <%if @topics.size > 0 %>
     <% if @authorization == 'participant' || @authorization == 'submitter' %>
       <li>
+
+
         <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.id%>
         (Sign up for a topic)
       </li>

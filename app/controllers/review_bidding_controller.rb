@@ -1,8 +1,49 @@
 class ReviewBiddingController < ApplicationController
-
   require 'rgl/adjacency'
   require 'rgl/dot'
   require 'rgl/topsort'
+  require "net/http"
+  require "uri"
+  require "json"
+
+  def run_assignment
+    assignment_id = params[:id]
+    reviewers = AssignmentParticipant.where(parent_id: assignment_id).ids
+    topics = SignUpTopic.where(assignment_id: assignment_id).ids
+    reviewer_preferences_map = Hash.new
+    for reviewer in reviewers do
+      reviewer_user_id = Participant.where(id: reviewer).pluck(:user_id).first
+      reviewer_team_id = TeamsUser.where(:user_id => reviewer_user_id).pluck(:team_id).first
+      reviewer_self_topic = SignedUpTeam.where(:team_id => reviewer_team_id).pluck(:topic_id).first
+      preferences = {'priority':  [], 'time': [], 'tid':  [], 'otid': reviewer_self_topic}
+      bids = ReviewBid.where(participant_id: reviewer)
+      for bid in bids do
+        preferences['priority'] << bid.priority
+        preferences['time'] << bid.updated_at
+        preferences['tid'] << bid.sign_up_topic_id
+      end
+      reviewer_preferences_map[reviewer] = preferences
+    end
+    assigned_topics_map = get_assigned_topics(reviewer_preferences_map,topics)
+    for reviewer in reviewers do
+      assigned_topics = assigned_topics_map[reviewer]
+      for topic in assigned_topics do
+        assigned_reviewee = SignedUpTeam.where(topic_id: topic).pluck(:team_id)
+        ReviewResponseMap.create({reviewed_object_id: assignment_id, reviewer_id: reviewer, reviewee_id: assigned_reviewee, type: "ReviewResponseMap"})
+      end
+    end
+  end
+
+  def get_assigned_topics(reviewer_preferences_map,topics)
+    json_header_hash = {"users": reviewer_preferences_map, "tids": topics}
+    json_header = json_header_hash.to_json
+    uri = URI.parse("http:flask-service-address-here")
+    http = Net::HTTP.new(uri.host, uri.port)
+    request = Net::HTTP::Post.new(uri.path, {'Content-Type' => 'application/json'})
+    request.body = json_header
+    response = http.request(request)
+    return JSON.parse(response)
+  end
 
   def action_allowed?
     case params[:action]

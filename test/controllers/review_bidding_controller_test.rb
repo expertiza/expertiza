@@ -11,8 +11,7 @@
 #   let(:due_date) { build(:assignment_due_date, deadline_type_id: 1) }
 #   let(:due_date2) { build(:assignment_due_date, deadline_type_id: 2) }
 #   # let(:bid) { Bid.new(topic_id: 1, priority: 1) }
-#   let(:bid) { ReviewBid.new(topic_id: 1, priority: 1) }
-#
+#   let(:bid) { ReviewBid.new(sign_up_topic_id: 1, priority: 1) }
 #
 #   before(:each) do
 #     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -24,12 +23,15 @@
 #     allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
 #     allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
 #   end
+#
 #   describe '#set_priority' do
+#     include RSpec::Rails::ControllerExampleGroup
 #     it 'sets priority of review bidding topic' do
 #       allow(participant).to receive(:team).and_return(team)
-#       allow(Bid).to receive(:where).with(team_id: 1).and_return([bid])
-#       allow(Bid).to receive_message_chain(:where, :map).with(team_id: 1).with(no_args).and_return([1])
-#       allow(Bid).to receive(:where).with(topic_id: '1', team_id: 1).and_return([bid])
+#       allow(Bid).to receive(sign_up_topic_id:1,user_id:null).and_return([bid])
+#       # allow(Bid).to receive(:where).with(team_id: 1).and_return([bid])
+#       # allow(Bid).to receive_message_chain(:where, :map).with(team_id: 1).with(no_args).and_return([1])
+#       # allow(Bid).to receive(:where).with(topic_id: '1', team_id: 1).and_return([bid])
 #       allow_any_instance_of(Array).to receive(:update_all).with(priority: 1).and_return([bid])
 #       params = {
 #           participant_id: 1,
@@ -40,37 +42,37 @@
 #       expect(response)
 #     end
 #   end
-#   describe '#review_bid' do
-#     before(:each) do
-#       allow(SignUpTopic).to receive(:find_slots_filled).with(1).and_return([topic])
-#       allow(SignUpTopic).to receive(:find_slots_waitlisted).with(1).and_return([])
-#       allow(SignUpTopic).to receive(:where).with(assignment_id: 1, private_to: nil).and_return([topic])
-#       allow(participant).to receive(:team).and_return(team)
-#     end
-#
-#     context 'when current assignment is intelligent assignment and has submission duedate (deadline_type_id 1)' do
-#       it 'renders sign_up_sheet#intelligent_topic_selection page' do
-#         assignment.is_intelligent = true
-#         allow(Bid).to receive_message_chain(:where, :order).with(team_id: 1).with(:priority).and_return([double('Bid', topic_id: 1)])
-#         allow(SignUpTopic).to receive(:find_by).with(id: 1).and_return(topic)
-#         params = {id: 1}
-#         session = {user: instructor}
-#         get :list, params, session
-#         expect(controller.instance_variable_get(:@bids).size).to eq(1)
-#         expect(controller.instance_variable_get(:@sign_up_topics)).to be_empty
-#         expect(response).to render_template('sign_up_sheet/intelligent_topic_selection')
-#       end
-#     end
-#
-#     context 'when current assignment is not intelligent assignment and has submission duedate (deadline_type_id 1)' do
-#       it 'renders sign_up_sheet#list page' do
-#         allow(Bid).to receive(:where).with(team_id: 1).and_return([double('Bid', topic_id: 1)])
-#         allow(SignUpTopic).to receive(:find_by).with(1).and_return(topic)
-#         params = {id: 1}
-#         get :list, params
-#         expect(response).to render_template(:list)
-#       end
-#     end
-#   end
+#   # describe '#review_bid' do
+#   #   before(:each) do
+#   #     allow(SignUpTopic).to receive(:find_slots_filled).with(1).and_return([topic])
+#   #     allow(SignUpTopic).to receive(:find_slots_waitlisted).with(1).and_return([])
+#   #     allow(SignUpTopic).to receive(:where).with(assignment_id: 1, private_to: nil).and_return([topic])
+#   #     allow(participant).to receive(:team).and_return(team)
+#   #   end
+#   #
+#   #   context 'when current assignment is intelligent assignment and has submission duedate (deadline_type_id 1)' do
+#   #     it 'renders sign_up_sheet#intelligent_topic_selection page' do
+#   #       assignment.is_intelligent = true
+#   #       allow(Bid).to receive_message_chain(:where, :order).with(team_id: 1).with(:priority).and_return([double('Bid', topic_id: 1)])
+#   #       allow(SignUpTopic).to receive(:find_by).with(id: 1).and_return(topic)
+#   #       params = {id: 1}
+#   #       session = {user: instructor}
+#   #       get :list, params, session
+#   #       expect(controller.instance_variable_get(:@bids).size).to eq(1)
+#   #       expect(controller.instance_variable_get(:@sign_up_topics)).to be_empty
+#   #       expect(response).to render_template('sign_up_sheet/intelligent_topic_selection')
+#   #     end
+#   #   end
+#   #
+#   #   context 'when current assignment is not intelligent assignment and has submission duedate (deadline_type_id 1)' do
+#   #     it 'renders sign_up_sheet#list page' do
+#   #       allow(Bid).to receive(:where).with(team_id: 1).and_return([double('Bid', topic_id: 1)])
+#   #       allow(SignUpTopic).to receive(:find_by).with(1).and_return(topic)
+#   #       params = {id: 1}
+#   #       get :list, params
+#   #       expect(response).to render_template(:list)
+#   #     end
+#   #   end
+#   # end
 #
 # end

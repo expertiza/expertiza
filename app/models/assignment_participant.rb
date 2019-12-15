@@ -78,6 +78,8 @@ class AssignmentParticipant < Participant
   end
 
   def weighted_scores_exist(scores)
+    #This method checks if the round has a weight assigned to it#
+    #A more appropriate place for this method is the assignment_team class and needs to be moved in the future#
     scores[:is_weighted] = true
     scores.each do |score|
       if score[0]["review"]

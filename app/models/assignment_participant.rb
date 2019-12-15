@@ -54,6 +54,7 @@ class AssignmentParticipant < Participant
     scores = {}
     scores[:participant] = self
     compute_assignment_score(questions, scores)
+    weighted_scores_exist(scores)
     scores[:total_score] = self.assignment.compute_total_score(scores)
     # merge scores[review#] (for each round) to score[review]  -Yang
     merge_scores(scores) if self.assignment.varying_rubrics_by_round?
@@ -76,9 +77,25 @@ class AssignmentParticipant < Participant
     calculate_scores(scores)
   end
 
+  def weighted_scores_exist(scores)
+    scores[:is_weighted] = true
+    scores.each do |score|
+      if score[0]["review"]
+        is_weighted = score[1][:is_weighted]
+        is_completed = score[1][:assessments].any?
+        if is_completed and !is_weighted
+          scores[:is_weighted] = false
+        end
+      end
+    end
+    scores
+  end
+
   def compute_assignment_score(questions, scores)
     self.assignment.questionnaires.each do |questionnaire|
-      round = AssignmentQuestionnaire.find_by(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id).used_in_round
+      q = AssignmentQuestionnaire.find_by(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id)
+      round = q.used_in_round
+      weight = q.questionnaire_weight
       # create symbol for "varying rubrics" feature -Yang
       questionnaire_symbol = if round.nil?
                                questionnaire.symbol
@@ -87,7 +104,7 @@ class AssignmentParticipant < Participant
                              end
 
       scores[questionnaire_symbol] = {}
-
+      scores[questionnaire_symbol][:is_weighted] = weight>0 ? true : false
       scores[questionnaire_symbol][:assessments] = if round.nil?
                                                      questionnaire.get_assessments_for(self)
                                                    else

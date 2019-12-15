@@ -28,7 +28,7 @@
 <% end %>
 <!--Obtain only review scores-->
 <% rscore_review = Rscore.new(@pscore,:review) if @pscore[:review] %>
-<h4>Average peer review score: <span class = "c5"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span></h4>
+<h4>Average peer review score: <span class = "<%= @pscore[:is_weighted] ? 'c5' : 'c0' %>"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span></h4>
 <!--Toggle submission-->
 <button onclick="toggleFunction('<%= @participant.id.to_s%>')" class="btn btn-default">Show Submission</button>
 <div id="<%= @participant.id.to_s%>" style="display:none;">
@@ -98,7 +98,7 @@
             <thead>
             <tr class="hide-scrollbar">
               <th class="sorter-true">Criterion<span></span></th>
-            
+
               <% i = 1 %>
               <% vm.list_of_reviews.each do |review| %>
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
@@ -225,7 +225,7 @@
         <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
             <br><div class="alert alert-warning">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>
         <% end %>
-        <br/>  
+        <br/>
     <% end %>
 <% end %>
 <!-- termination of the main outer loop.-->

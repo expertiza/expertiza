@@ -21,7 +21,12 @@ class ReviewBiddingController < ApplicationController
     end
   end
 
-
+  #This method is responsible for getting the sign-up topics present in the current assignment so that
+  # we can display in the topics   # table on the left side.Also, we will make sure that the topics on
+  # the left side will not contain the topic the user has worked on.  # Then we retrieve the bids made
+  # by the user for reviews from the review_bids model based on the participant id and the assignment
+  # in which the participant works on.We make sure that the topics which the user has bid is not
+  # displayed in the topics table.
   def review_bid
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
@@ -75,19 +80,21 @@ class ReviewBiddingController < ApplicationController
     redirect_to controller: 'tree_display', action: 'list'
   end
 
+  #This method is hit when we try to drag and drop the topics from the topics ->selections table
+  # as well as selections to topics table.Also, if we juggle the topics in the selections table,
+  # then also the the tablelist coffee file is invoked.We are making sure that we we move the topics
+  # from the selection table to topics table, those records are deleted from the review_bids model.
+  # Also, we create records if the bid never existed.
   def set_priority
     participant = AssignmentParticipant.find_by(id: params[:participant_id])
     assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
     team_id = participant.team.try(:id)
     if params[:topic].nil?
-      # All topics are deselected by current team
       ReviewBid.where(participant_id: params[:participant_id]).destroy_all
     else
       @bids = ReviewBid.where(participant_id: params[:participant_id])
       signed_up_topics = ReviewBid.where(participant_id: params[:participant_id]).map(&:sign_up_topic_id)
       puts signed_up_topics
-      # Remove topics from bids table if the student moves data from Selection table to Topics table
-      # This step is necessary to avoid duplicate priorities in Bids table
       signed_up_topics -= params[:topic].map(&:to_i)
       signed_up_topics.each do |topic|
         ReviewBid.where(sign_up_topic_id: topic, participant_id: params[:participant_id]).destroy_all

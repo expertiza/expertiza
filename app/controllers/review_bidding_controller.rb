@@ -121,7 +121,8 @@ class ReviewBiddingController < ApplicationController
     # Topics          :   The topic_ids of all the topics in the assignment.
     #
     # =end
-    json_like_bidding_hash = {"users": reviewer_preferences_map, "tids": topics}
+    json_like_bidding_hash = {"users": bidding_data, "tids": topics}
+    puts(json_like_bidding_hash)
     uri = URI.parse(WEBSERVICE_CONFIG["review_bidding_webservice_url"])
     http = Net::HTTP.new(uri.host, uri.port)
     request = Net::HTTP::Post.new(uri.path, {'Content-Type' => 'application/json'})

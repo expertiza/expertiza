@@ -5,6 +5,7 @@ development:
   topic_bidding_webservice_url: 'http://127.0.0.1:5000/merge_teams'
   heatmap_webservice_url: 'http://peerlogic.csc.ncsu.edu/reviewsentiment/configure'
   sentiment_webservice_url: 'http://peerlogic.csc.ncsu.edu/sentiment/'
+  review_bidding_webservice_url: 'http://156.46.17.220:8080/match'
 
 test:
   metareview_webservice_url: 'http://peerlogic.csc.ncsu.edu/metareview/metareviewgenerator/'
@@ -13,7 +14,7 @@ test:
   topic_bidding_webservice_url: 'http://127.0.0.1:5000/merge_teams'
   heatmap_webservice_url: 'http://peerlogic.csc.ncsu.edu/reviewsentiment/configure'
   sentiment_webservice_url: 'http://peerlogic.csc.ncsu.edu/sentiment/'
-
+  review_bidding_webservice_url: 'http://156.46.17.220:8080/match'
 
 
 production:

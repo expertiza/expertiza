@@ -122,7 +122,7 @@ class ReviewBiddingController < ApplicationController
 
     =end
     json_like_bidding_hash = {"users": reviewer_preferences_map, "tids": topics}
-    uri = URI.parse("http:flask-service-address-here")
+    uri = URI.parse(WEBSERVICE_CONFIG["review_bidding_webservice_url"])
     http = Net::HTTP.new(uri.host, uri.port)
     request = Net::HTTP::Post.new(uri.path, {'Content-Type' => 'application/json'})
     request.body = json_like_bidding_hash.to_json

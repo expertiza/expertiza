@@ -44,6 +44,14 @@ module SignUpSheetHelper
     row_html.html_safe
   end
 
+  def get_intelligent_topic_row_reviewbid(topic)
+    row_html = ''
+
+
+
+    row_html.html_safe
+  end
+
   # Compute background colour for a topic with respect to maximum team size.
   def get_topic_bg_color(topic, max_team_size)
     red = (400 * (1 - (Math.tanh(2 * [max_team_size.to_f / Bid.where(topic_id: topic.id).count, 1].min - 1) + 1) / 2)).to_i.to_s

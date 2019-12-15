@@ -1,7 +1,9 @@
 class ReviewBiddingController < ApplicationController
+
   require 'rgl/adjacency'
   require 'rgl/dot'
   require 'rgl/topsort'
+<<<<<<< HEAD
   require "net/http"
   require "uri"
   require "json"
@@ -128,6 +130,8 @@ class ReviewBiddingController < ApplicationController
     response = http.request(request)
     return JSON.parse(response.body)
   end
+=======
+>>>>>>> 3114430ca70aebb86edd8996af0a1ee10ce9e04f
 
   def assign_matched_topics(assignment_id,reviewers,matched_topics)
     =begin
@@ -159,7 +163,7 @@ class ReviewBiddingController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'review_bid', 'set_priority'
+    when 'review_bid', 'set_priority','get_quartiles'
       ['Instructor',
        'Teaching Assistant',
        'Administrator',
@@ -178,46 +182,23 @@ class ReviewBiddingController < ApplicationController
   def review_bid
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
-    @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
-    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
-    @show_actions = true
-    @priority = 0
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
-    @max_team_size = @assignment.max_team_size
     team_id = @participant.team.try(:id)
-
-    if @assignment.is_intelligent
-      @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
-      signed_up_topics = []
+    my_topic = SignedUpTeam.where(team_id: team_id).pluck(:topic_id).first
+    @sign_up_topics -= SignUpTopic.where(assignment_id: @assignment.id, id: my_topic)
+    @max_team_size = @assignment.max_team_size
+    @selected_topics =nil
+    @bids = team_id.nil? ? [] : ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id).order(:priority)
+    signed_up_topics = []
       @bids.each do |bid|
-        sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
+        sign_up_topic = SignUpTopic.find_by(id: bid.sign_up_topic_id)
         signed_up_topics << sign_up_topic if sign_up_topic
       end
       signed_up_topics &= @sign_up_topics
       @sign_up_topics -= signed_up_topics
       @bids = signed_up_topics
-    end
-
-    @num_of_topics = @sign_up_topics.size
-    @signup_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 7)
-    @drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 6)
-    @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id)
-
-    unless @assignment.due_dates.find_by(deadline_type_id: 1).nil?
-      @show_actions = false if !@assignment.staggered_deadline? and @assignment.due_dates.find_by(deadline_type_id: 1).due_at < Time.now
-
-      # Find whether the user has signed up for any topics; if so the user won't be able to
-      # sign up again unless the former was a waitlisted topic
-      # if team assignment, then team id needs to be passed as parameter else the user's id
-      users_team = SignedUpTeam.find_team_users(@assignment.id, session[:user].id)
-      @selected_topics = if users_team.empty?
-                           nil
-                         else
-                           # TODO: fix this; cant use 0
-                           SignedUpTeam.find_user_signup_topics(@assignment.id, users_team[0].t_id)
-                         end
-    end
-    render 'sign_up_sheet/intelligent_topic_selection' and return if @assignment.is_intelligent
+      @num_of_topics = @sign_up_topics.size
+      render 'sign_up_sheet/review_bid'
   end
 
   def run_intelligent_assignment
@@ -255,33 +236,45 @@ class ReviewBiddingController < ApplicationController
     participant = AssignmentParticipant.find_by(id: params[:participant_id])
     assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
     team_id = participant.team.try(:id)
-    unless team_id
-      # Zhewei: team lazy initialization
-      SignUpSheet.signup_team(assignment_id, participant.user.id)
-      team_id = participant.team.try(:id)
-    end
     if params[:topic].nil?
       # All topics are deselected by current team
-      Bid.where(team_id: team_id).destroy_all
+      ReviewBid.where(participant_id: params[:participant_id]).destroy_all
     else
-      @bids = Bid.where(team_id: team_id)
-      signed_up_topics = Bid.where(team_id: team_id).map(&:topic_id)
+      @bids = ReviewBid.where(participant_id: params[:participant_id])
+      signed_up_topics = ReviewBid.where(participant_id: params[:participant_id]).map(&:sign_up_topic_id)
+      puts signed_up_topics
       # Remove topics from bids table if the student moves data from Selection table to Topics table
       # This step is necessary to avoid duplicate priorities in Bids table
       signed_up_topics -= params[:topic].map(&:to_i)
       signed_up_topics.each do |topic|
-        Bid.where(topic_id: topic, team_id: team_id).destroy_all
+        ReviewBid.where(sign_up_topic_id: topic, participant_id: params[:participant_id]).destroy_all
       end
       params[:topic].each_with_index do |topic_id, index|
-        bid_existence = Bid.where(topic_id: topic_id, team_id: team_id)
+        bid_existence = ReviewBid.where(sign_up_topic_id: topic_id, participant_id: params[:participant_id])
         if bid_existence.empty?
-          Bid.create(topic_id: topic_id, team_id: team_id, priority: index + 1)
+          ReviewBid.create(priority: index + 1,sign_up_topic_id: topic_id, participant_id: params[:participant_id],assignment_id: assignment_id)
         else
-          Bid.where(topic_id: topic_id, team_id: team_id).update_all(priority: index + 1)
+          ReviewBid.where(sign_up_topic_id: topic_id, participant_id: params[:participant_id]).update_all(priority: index + 1)
         end
       end
     end
-    redirect_to action: 'list', assignment_id: params[:assignment_id]
   end
 
+  def get_quartiles(topic_id)
+    assignment_id = SignUpTopic.where(id: topic_id).pluck(:assignment_id).first
+    num_reviews_allowed = Assignment.where(id: assignment_id).pluck(:num_reviews_allowed).first
+    num_participants_in_assignment = AssignmentParticipant.where(parent_id: assignment_id).length
+    num_topics_in_assignment = SignUpTopic.where(assignment_id: assignment_id).length
+    num_choosers_this_topic = ReviewBid.where(sign_up_topic_id: topic_id).length
+    avg_reviews_per_topic = (num_participants_in_assignment*num_reviews_allowed)/num_topics_in_assignment
+
+    if num_choosers_this_topic < avg_reviews_per_topic/3
+      return 'rgb(124,252,0)'
+    elsif num_choosers_this_topic > avg_reviews_per_topic/3 and num_choosers_this_topic < avg_reviews_per_topic/2
+      return 'rgb(255,255,0)'
+    else
+      return 'rgb(255,99,71)'
+    end
+  end
+  helper_method :get_quartiles
 end

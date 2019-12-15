@@ -320,6 +320,12 @@ resources :institution, except: [:destroy] do
       post ':id', action: :update
     end
   end
+resources :review_bidding,except: %i[index show] do
+  collection do
+    get :review_bid
+    post :set_priority
+    end
+end
 
   resources :sign_up_sheet, except: %i[index show] do
     collection do
@@ -478,6 +484,8 @@ resources :institution, except: [:destroy] do
   root to: 'content_pages#view', page_name: 'home'
   post :login, to: 'auth#login'
   post :logout, to: 'auth#logout'
+  get '/review_bidding/review_bid/:id(.:format)' => 'review_bidding#review_bid'
+  post '/review_bidding/set_priority' => 'review_bidding#set_priority'
   get 'auth/:provider/callback', to: 'auth#google_login'
   get 'auth/failure', to: 'content_pages#view'
   get '/auth/*path', to: redirect('/')

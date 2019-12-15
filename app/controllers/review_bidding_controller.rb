@@ -66,46 +66,52 @@ class ReviewBiddingController < ApplicationController
   def review_bid
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
-    @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
-    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
-    @show_actions = true
-    @priority = 0
-    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
-    @max_team_size = @assignment.max_team_size
+    # @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
+    # @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
+    # @show_actions = true
+    # @priority = 0
+    #@sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     team_id = @participant.team.try(:id)
-
-    if @assignment.is_intelligent
-      @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
+    puts 'teamid------------'
+    puts team_id
+    my_topic = ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id).select(:topic_id)
+    @sign_up_topics = SignUpTopic.where(["assignment_id = ? and id != ?", @assignment.id.to_s, my_topic.to_s])
+    @max_team_size = @assignment.max_team_size
+    @selected_topics =nil
+    # if @assignment.is_intelligent
+      @bids = team_id.nil? ? [] : ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id).order(:priority)
       signed_up_topics = []
       @bids.each do |bid|
-        sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
+        sign_up_topic = SignUpTopic.find_by(id: bid.sign_up_topic_id)
         signed_up_topics << sign_up_topic if sign_up_topic
       end
       signed_up_topics &= @sign_up_topics
       @sign_up_topics -= signed_up_topics
       @bids = signed_up_topics
-    end
 
+
+    #
     @num_of_topics = @sign_up_topics.size
-    @signup_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 7)
-    @drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 6)
-    @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id)
+    # @signup_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 7)
+    # @drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 6)
+    # @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id)
+    #
+    # unless @assignment.due_dates.find_by(deadline_type_id: 1).nil?
+    #   @show_actions = false if !@assignment.staggered_deadline? and @assignment.due_dates.find_by(deadline_type_id: 1).due_at < Time.now
+    #
+    #   # Find whether the user has signed up for any topics; if so the user won't be able to
+    #   # sign up again unless the former was a waitlisted topic
+    #   # if team assignment, then team id needs to be passed as parameter else the user's id
+    #   users_team = SignedUpTeam.find_team_users(@assignment.id, session[:user].id)
+    #   @selected_topics = if users_team.empty?
+    #                        nil
+    #                      else
+    #                        # TODO: fix this; cant use 0
+    #                        SignedUpTeam.find_user_signup_topics(@assignment.id, users_team[0].t_id)
+    #                      end
+    # end
+    render 'sign_up_sheet/review_bid' #and return if @assignment.is_intelligent
 
-    unless @assignment.due_dates.find_by(deadline_type_id: 1).nil?
-      @show_actions = false if !@assignment.staggered_deadline? and @assignment.due_dates.find_by(deadline_type_id: 1).due_at < Time.now
-
-      # Find whether the user has signed up for any topics; if so the user won't be able to
-      # sign up again unless the former was a waitlisted topic
-      # if team assignment, then team id needs to be passed as parameter else the user's id
-      users_team = SignedUpTeam.find_team_users(@assignment.id, session[:user].id)
-      @selected_topics = if users_team.empty?
-                           nil
-                         else
-                           # TODO: fix this; cant use 0
-                           SignedUpTeam.find_user_signup_topics(@assignment.id, users_team[0].t_id)
-                         end
-    end
-    render 'sign_up_sheet/intelligent_topic_selection' and return if @assignment.is_intelligent
   end
 
   def run_intelligent_assignment
@@ -141,35 +147,32 @@ class ReviewBiddingController < ApplicationController
 
   def set_priority
     participant = AssignmentParticipant.find_by(id: params[:participant_id])
+    puts 'test ----------------'
+    puts params.inspect
     assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
     team_id = participant.team.try(:id)
-    unless team_id
-      # Zhewei: team lazy initialization
-      SignUpSheet.signup_team(assignment_id, participant.user.id)
-      team_id = participant.team.try(:id)
-    end
     if params[:topic].nil?
       # All topics are deselected by current team
-      Bid.where(team_id: team_id).destroy_all
+      ReviewBid.where(participant_id: params[:participant_id]).destroy_all
     else
-      @bids = Bid.where(team_id: team_id)
-      signed_up_topics = Bid.where(team_id: team_id).map(&:topic_id)
+      @bids = ReviewBid.where(participant_id: params[:participant_id])
+      signed_up_topics = ReviewBid.where(participant_id: params[:participant_id]).map(&:sign_up_topic_id)
       # Remove topics from bids table if the student moves data from Selection table to Topics table
       # This step is necessary to avoid duplicate priorities in Bids table
       signed_up_topics -= params[:topic].map(&:to_i)
       signed_up_topics.each do |topic|
-        Bid.where(topic_id: topic, team_id: team_id).destroy_all
+        ReviewBid.where(topic_id: topic, team_id: team_id).destroy_all
       end
       params[:topic].each_with_index do |topic_id, index|
-        bid_existence = Bid.where(topic_id: topic_id, team_id: team_id)
+        bid_existence = ReviewBid.where(sign_up_topic_id: topic_id, participant_id: params[:participant_id])
         if bid_existence.empty?
-          Bid.create(topic_id: topic_id, team_id: team_id, priority: index + 1)
+          ReviewBid.create(priority: index + 1,sign_up_topic_id: topic_id, participant_id: params[:participant_id],assignment_id: assignment_id)
         else
-          Bid.where(topic_id: topic_id, team_id: team_id).update_all(priority: index + 1)
+          ReviewBid.where(sign_up_topic_id: topic_id, participant_id: params[:participant_id]).update_all(priority: index + 1)
         end
       end
     end
-    redirect_to action: 'list', assignment_id: params[:assignment_id]
+    # redirect_to action: 'sign_up_sheet/list', assignment_id: params[:assignment_id]
   end
 
 end

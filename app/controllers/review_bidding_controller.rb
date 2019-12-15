@@ -42,7 +42,7 @@ class ReviewBiddingController < ApplicationController
     request = Net::HTTP::Post.new(uri.path, {'Content-Type' => 'application/json'})
     request.body = json_header
     response = http.request(request)
-    return JSON.parse(response)
+    return JSON.parse(response.body)
   end
 
   def action_allowed?

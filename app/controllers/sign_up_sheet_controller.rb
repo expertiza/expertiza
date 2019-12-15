@@ -209,8 +209,7 @@ class SignUpSheetController < ApplicationController
                            SignedUpTeam.find_user_signup_topics(@assignment.id, users_team[0].t_id)
                          end
     end
-    render 'sign_up_sheet/intelligent_topic_selection'
-    # and return if @assignment.is_intelligent
+    render 'sign_up_sheet/intelligent_topic_selection' and return if @assignment.is_intelligent
   end
 
   def sign_up

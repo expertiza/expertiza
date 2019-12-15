@@ -1,4 +1,5 @@
 class ReviewBiddingController < ApplicationController
+
   require 'rgl/adjacency'
   require 'rgl/dot'
   require 'rgl/topsort'
@@ -6,48 +7,160 @@ class ReviewBiddingController < ApplicationController
   require "uri"
   require "json"
 
-  def run_assignment
+  def assign
+    =begin
+
+    Assigns topics to reviewers according to the topics they have bid for.
+
+    This method is supposed to be invoked when an Instructor wants to assign
+    topics to the reviewers after the bidding is completed.
+
+    PARAMETERS
+
+    ----------
+
+    params[:id]   :   The id of the assignment for which the
+                      Instructor wants to perform review-topic-matching.
+
+    =end
     assignment_id = params[:id]
     reviewers = AssignmentParticipant.where(parent_id: assignment_id).ids
     topics = SignUpTopic.where(assignment_id: assignment_id).ids
-    reviewer_preferences_map = Hash.new
-    for reviewer in reviewers do
-      reviewer_user_id = Participant.where(id: reviewer).pluck(:user_id).first
-      reviewer_team_id = TeamsUser.where(:user_id => reviewer_user_id).pluck(:team_id).first
-      reviewer_self_topic = SignedUpTeam.where(:team_id => reviewer_team_id).pluck(:topic_id).first
-      preferences = {'priority':  [], 'time': [], 'tid':  [], 'otid': reviewer_self_topic}
-      bids = ReviewBid.where(participant_id: reviewer)
-      for bid in bids do
-        preferences['priority'] << bid.priority
-        preferences['time'] << bid.updated_at
-        preferences['tid'] << bid.sign_up_topic_id
-      end
-      reviewer_preferences_map[reviewer] = preferences
-    end
-    assigned_topics_map = get_assigned_topics(reviewer_preferences_map,topics)
-    for reviewer in reviewers do
-      assigned_topics = assigned_topics_map[reviewer]
-      for topic in assigned_topics do
-        assigned_reviewee = SignedUpTeam.where(topic_id: topic).pluck(:team_id)
-        ReviewResponseMap.create({reviewed_object_id: assignment_id, reviewer_id: reviewer, reviewee_id: assigned_reviewee, type: "ReviewResponseMap"})
-      end
-    end
+    bidding_data = assignment_bidding_data(assignment_id,reviewers)
+    matched_topics = reviewer_topic_matching(bidding_data,topics)
+    assign_matched_topics(assignment_id,reviewers,matched_topics)
   end
 
-  def get_assigned_topics(reviewer_preferences_map,topics)
-    json_header_hash = {"users": reviewer_preferences_map, "tids": topics}
-    json_header = json_header_hash.to_json
-    uri = URI.parse("http:flask-service-address-here")
+  def assignment_bidding_data(assignment_id,reviewers)
+    =begin
+
+    Returns a Hash that contains all the necessary bidding data of an
+    assignment.
+
+    PARAMETERS
+
+    ----------
+
+    assignment_id   :   The id of the assignment whose bidding data
+                        is required.
+
+    reviewers       :   The list of participant_ids of all the reviewers in the
+                        assingment.
+
+    =end
+    bidding_data = Hash.new
+    for reviewer in reviewers do
+      bidding_data[reviewer] = reviewer_bidding_data(reviewer)
+    end
+    return bidding_data
+  end
+
+  def reviewer_bidding_data(reviewer)
+    =begin
+
+    Returns a Hash that contains the necessary bidding data of a particular
+    reviewer.
+
+    PARAMETERS
+
+    ----------
+
+    reviewer    :   The participant_id of the reviewer.
+
+    NOTE: Since a participant_id is associated with a unique assignment, the
+          method does not require assignment_id as an argument.
+
+    =end
+    self_topic = reviewer_self_topic(reviewer)
+    bidding_data = {'priority':  [], 'time': [], 'tid':  [], 'otid': self_topic}
+    bids = ReviewBid.where(participant_id: reviewer)
+    for bid in bids do
+      bidding_data['priority'] << bid.priority
+      bidding_data['time'] << bid.updated_at
+      bidding_data['tid'] << bid.sign_up_topic_id
+    end
+    return bidding_data
+  end
+
+  def reviewer_self_topic(reviewer)
+    =begin
+
+    Return the topic_id of the topic on which the reviewer is working in the
+    assignment.
+
+    PARAMETERS
+
+    ----------
+
+    reviewer    :   The participant_id of the reviewer.
+
+    NOTE: Since a participant_id is associated with a unique assignment, the
+          method does not require assignment_id as an argument.
+
+    =end
+    user_id = Participant.where(id: reviewer).pluck(:user_id).first
+    team_id = TeamsUser.where(:user_id => user_id).pluck(:team_id).first
+    self_topic = SignedUpTeam.where(:team_id => self_topic).pluck(:topic_id).first
+    return self_topic
+  end
+
+  def reviewer_topic_matching(bidding_data,topics)
+    =begin
+
+    Returns a Hash in which the keys are the participant_ids of the reviewers
+    and the values are the lists of topic_ids of topics assigned to the
+    corresponding reviewers.
+
+    PARAMETERS
+
+    ----------
+
+    bidding_data    :   A Hash that contains all the necessary bidding data of
+                        the assignment.
+
+    Topics          :   The topic_ids of all the topics in the assignment.
+
+    =end
+    json_like_bidding_hash = {"users": reviewer_preferences_map, "tids": topics}
+    uri = URI.parse(WEBSERVICE_CONFIG["review_bidding_webservice_url"])
     http = Net::HTTP.new(uri.host, uri.port)
     request = Net::HTTP::Post.new(uri.path, {'Content-Type' => 'application/json'})
-    request.body = json_header
+    request.body = json_like_bidding_hash.to_json
     response = http.request(request)
     return JSON.parse(response.body)
   end
 
+  def assign_matched_topics(assignment_id,reviewers,matched_topics)
+    =begin
+
+    Assign each reviewer the topics with which they were matched.
+
+    PARAMETERS
+
+    ----------
+
+    assignment_id   :   The id of the assignment.
+
+    reviewers       :   The participant_ids of all the reviewers in the
+                        assignment.
+
+    matched_topics  :   A Hash in which the keys are the participant_ids of the
+                        reviewers and the values are the lists of topic_ids of
+                        topics assigned to the corresponding reviewers.
+
+    =end
+    for reviewer in reviewers do
+      reviewer_matched_topics = matched_topics[reviewer]
+      for topic in reviewer_matched_topics do
+        matched_reviewee = SignedUpTeam.where(topic_id: topic).pluck(:team_id)
+        ReviewResponseMap.create({reviewed_object_id: assignment_id, reviewer_id: reviewer, reviewee_id: matched_reviewee, type: "ReviewResponseMap"})
+      end
+    end
+  end
+
   def action_allowed?
     case params[:action]
-    when 'review_bid', 'set_priority'
+    when 'review_bid', 'set_priority','get_quartiles'
       ['Instructor',
        'Teaching Assistant',
        'Administrator',
@@ -66,21 +179,14 @@ class ReviewBiddingController < ApplicationController
   def review_bid
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
-    # @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
-    # @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
-    # @show_actions = true
-    # @priority = 0
-    #@sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
+    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     team_id = @participant.team.try(:id)
-    puts 'teamid------------'
-    puts team_id
-    my_topic = ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id).select(:topic_id)
-    @sign_up_topics = SignUpTopic.where(["assignment_id = ? and id != ?", @assignment.id.to_s, my_topic.to_s])
+    my_topic = SignedUpTeam.where(team_id: team_id).pluck(:topic_id).first
+    @sign_up_topics -= SignUpTopic.where(assignment_id: @assignment.id, id: my_topic)
     @max_team_size = @assignment.max_team_size
     @selected_topics =nil
-    # if @assignment.is_intelligent
-      @bids = team_id.nil? ? [] : ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id).order(:priority)
-      signed_up_topics = []
+    @bids = team_id.nil? ? [] : ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id).order(:priority)
+    signed_up_topics = []
       @bids.each do |bid|
         sign_up_topic = SignUpTopic.find_by(id: bid.sign_up_topic_id)
         signed_up_topics << sign_up_topic if sign_up_topic
@@ -88,30 +194,8 @@ class ReviewBiddingController < ApplicationController
       signed_up_topics &= @sign_up_topics
       @sign_up_topics -= signed_up_topics
       @bids = signed_up_topics
-
-
-    #
-    @num_of_topics = @sign_up_topics.size
-    # @signup_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 7)
-    # @drop_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 6)
-    # @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id)
-    #
-    # unless @assignment.due_dates.find_by(deadline_type_id: 1).nil?
-    #   @show_actions = false if !@assignment.staggered_deadline? and @assignment.due_dates.find_by(deadline_type_id: 1).due_at < Time.now
-    #
-    #   # Find whether the user has signed up for any topics; if so the user won't be able to
-    #   # sign up again unless the former was a waitlisted topic
-    #   # if team assignment, then team id needs to be passed as parameter else the user's id
-    #   users_team = SignedUpTeam.find_team_users(@assignment.id, session[:user].id)
-    #   @selected_topics = if users_team.empty?
-    #                        nil
-    #                      else
-    #                        # TODO: fix this; cant use 0
-    #                        SignedUpTeam.find_user_signup_topics(@assignment.id, users_team[0].t_id)
-    #                      end
-    # end
-    render 'sign_up_sheet/review_bid' #and return if @assignment.is_intelligent
-
+      @num_of_topics = @sign_up_topics.size
+      render 'sign_up_sheet/review_bid'
   end
 
   def run_intelligent_assignment
@@ -147,8 +231,6 @@ class ReviewBiddingController < ApplicationController
 
   def set_priority
     participant = AssignmentParticipant.find_by(id: params[:participant_id])
-    puts 'test ----------------'
-    puts params.inspect
     assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
     team_id = participant.team.try(:id)
     if params[:topic].nil?
@@ -157,11 +239,12 @@ class ReviewBiddingController < ApplicationController
     else
       @bids = ReviewBid.where(participant_id: params[:participant_id])
       signed_up_topics = ReviewBid.where(participant_id: params[:participant_id]).map(&:sign_up_topic_id)
+      puts signed_up_topics
       # Remove topics from bids table if the student moves data from Selection table to Topics table
       # This step is necessary to avoid duplicate priorities in Bids table
       signed_up_topics -= params[:topic].map(&:to_i)
       signed_up_topics.each do |topic|
-        ReviewBid.where(topic_id: topic, team_id: team_id).destroy_all
+        ReviewBid.where(sign_up_topic_id: topic, participant_id: params[:participant_id]).destroy_all
       end
       params[:topic].each_with_index do |topic_id, index|
         bid_existence = ReviewBid.where(sign_up_topic_id: topic_id, participant_id: params[:participant_id])
@@ -172,7 +255,23 @@ class ReviewBiddingController < ApplicationController
         end
       end
     end
-    # redirect_to action: 'sign_up_sheet/list', assignment_id: params[:assignment_id]
   end
 
+  def get_quartiles(topic_id)
+    assignment_id = SignUpTopic.where(id: topic_id).pluck(:assignment_id).first
+    num_reviews_allowed = Assignment.where(id: assignment_id).pluck(:num_reviews_allowed).first
+    num_participants_in_assignment = AssignmentParticipant.where(parent_id: assignment_id).length
+    num_topics_in_assignment = SignUpTopic.where(assignment_id: assignment_id).length
+    num_choosers_this_topic = ReviewBid.where(sign_up_topic_id: topic_id).length
+    avg_reviews_per_topic = (num_participants_in_assignment*num_reviews_allowed)/num_topics_in_assignment
+
+    if num_choosers_this_topic < avg_reviews_per_topic/3
+      return 'rgb(124,252,0)'
+    elsif num_choosers_this_topic > avg_reviews_per_topic/3 and num_choosers_this_topic < avg_reviews_per_topic/2
+      return 'rgb(255,255,0)'
+    else
+      return 'rgb(255,99,71)'
+    end
+  end
+  helper_method :get_quartiles
 end

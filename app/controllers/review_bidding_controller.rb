@@ -6,43 +6,155 @@ class ReviewBiddingController < ApplicationController
   require "uri"
   require "json"
 
-  def run_assignment
+  def assign
+    =begin
+
+    Assigns topics to reviewers according to the topics they have bid for.
+
+    This method is supposed to be invoked when an Instructor wants to assign
+    topics to the reviewers after the bidding is completed.
+
+    PARAMETERS
+
+    ----------
+
+    params[:id]   :   The id of the assignment for which the
+                      Instructor wants to perform review-topic-matching.
+
+    =end
     assignment_id = params[:id]
     reviewers = AssignmentParticipant.where(parent_id: assignment_id).ids
     topics = SignUpTopic.where(assignment_id: assignment_id).ids
-    reviewer_preferences_map = Hash.new
-    for reviewer in reviewers do
-      reviewer_user_id = Participant.where(id: reviewer).pluck(:user_id).first
-      reviewer_team_id = TeamsUser.where(:user_id => reviewer_user_id).pluck(:team_id).first
-      reviewer_self_topic = SignedUpTeam.where(:team_id => reviewer_team_id).pluck(:topic_id).first
-      preferences = {'priority':  [], 'time': [], 'tid':  [], 'otid': reviewer_self_topic}
-      bids = ReviewBid.where(participant_id: reviewer)
-      for bid in bids do
-        preferences['priority'] << bid.priority
-        preferences['time'] << bid.updated_at
-        preferences['tid'] << bid.sign_up_topic_id
-      end
-      reviewer_preferences_map[reviewer] = preferences
-    end
-    assigned_topics_map = get_assigned_topics(reviewer_preferences_map,topics)
-    for reviewer in reviewers do
-      assigned_topics = assigned_topics_map[reviewer]
-      for topic in assigned_topics do
-        assigned_reviewee = SignedUpTeam.where(topic_id: topic).pluck(:team_id)
-        ReviewResponseMap.create({reviewed_object_id: assignment_id, reviewer_id: reviewer, reviewee_id: assigned_reviewee, type: "ReviewResponseMap"})
-      end
-    end
+    bidding_data = assignment_bidding_data(assignment_id,reviewers)
+    matched_topics = reviewer_topic_matching(bidding_data,topics)
+    assign_matched_topics(assignment_id,reviewers,matched_topics)
   end
 
-  def get_assigned_topics(reviewer_preferences_map,topics)
-    json_header_hash = {"users": reviewer_preferences_map, "tids": topics}
-    json_header = json_header_hash.to_json
+  def assignment_bidding_data(assignment_id,reviewers)
+    =begin
+
+    Returns a Hash that contains all the necessary bidding data of an
+    assignment.
+
+    PARAMETERS
+
+    ----------
+
+    assignment_id   :   The id of the assignment whose bidding data
+                        is required.
+
+    reviewers       :   The list of participant_ids of all the reviewers in the
+                        assingment.
+
+    =end
+    bidding_data = Hash.new
+    for reviewer in reviewers do
+      bidding_data[reviewer] = reviewer_bidding_data(reviewer)
+    end
+    return bidding_data
+  end
+
+  def reviewer_bidding_data(reviewer)
+    =begin
+
+    Returns a Hash that contains the necessary bidding data of a particular
+    reviewer.
+
+    PARAMETERS
+
+    ----------
+
+    reviewer    :   The participant_id of the reviewer.
+
+    NOTE: Since a participant_id is associated with a unique assignment, the
+          method does not require assignment_id as an argument.
+
+    =end
+    self_topic = reviewer_self_topic(reviewer)
+    bidding_data = {'priority':  [], 'time': [], 'tid':  [], 'otid': self_topic}
+    bids = ReviewBid.where(participant_id: reviewer)
+    for bid in bids do
+      bidding_data['priority'] << bid.priority
+      bidding_data['time'] << bid.updated_at
+      bidding_data['tid'] << bid.sign_up_topic_id
+    end
+    return bidding_data
+  end
+
+  def reviewer_self_topic(reviewer)
+    =begin
+
+    Return the topic_id of the topic on which the reviewer is working in the
+    assignment.
+
+    PARAMETERS
+
+    ----------
+
+    reviewer    :   The participant_id of the reviewer.
+
+    NOTE: Since a participant_id is associated with a unique assignment, the
+          method does not require assignment_id as an argument.
+
+    =end
+    user_id = Participant.where(id: reviewer).pluck(:user_id).first
+    team_id = TeamsUser.where(:user_id => user_id).pluck(:team_id).first
+    self_topic = SignedUpTeam.where(:team_id => self_topic).pluck(:topic_id).first
+    return self_topic
+  end
+
+  def reviewer_topic_matching(bidding_data,topics)
+    =begin
+
+    Returns a Hash in which the keys are the participant_ids of the reviewers
+    and the values are the lists of topic_ids of topics assigned to the
+    corresponding reviewers.
+
+    PARAMETERS
+
+    ----------
+
+    bidding_data    :   A Hash that contains all the necessary bidding data of
+                        the assignment.
+
+    Topics          :   The topic_ids of all the topics in the assignment.
+
+    =end
+    json_like_bidding_hash = {"users": reviewer_preferences_map, "tids": topics}
     uri = URI.parse("http:flask-service-address-here")
     http = Net::HTTP.new(uri.host, uri.port)
     request = Net::HTTP::Post.new(uri.path, {'Content-Type' => 'application/json'})
-    request.body = json_header
+    request.body = json_like_bidding_hash.to_json
     response = http.request(request)
     return JSON.parse(response.body)
+  end
+
+  def assign_matched_topics(assignment_id,reviewers,matched_topics)
+    =begin
+
+    Assign each reviewer the topics with which they were matched.
+
+    PARAMETERS
+
+    ----------
+
+    assignment_id   :   The id of the assignment.
+
+    reviewers       :   The participant_ids of all the reviewers in the
+                        assignment.
+
+    matched_topics  :   A Hash in which the keys are the participant_ids of the
+                        reviewers and the values are the lists of topic_ids of
+                        topics assigned to the corresponding reviewers.
+
+    =end
+    for reviewer in reviewers do
+      reviewer_matched_topics = matched_topics[reviewer]
+      for topic in reviewer_matched_topics do
+        matched_reviewee = SignedUpTeam.where(topic_id: topic).pluck(:team_id)
+        ReviewResponseMap.create({reviewed_object_id: assignment_id, reviewer_id: reviewer, reviewee_id: matched_reviewee, type: "ReviewResponseMap"})
+      end
+    end
   end
 
   def action_allowed?

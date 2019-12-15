@@ -3,7 +3,6 @@ class ReviewBiddingController < ApplicationController
   require 'rgl/adjacency'
   require 'rgl/dot'
   require 'rgl/topsort'
-<<<<<<< HEAD
   require "net/http"
   require "uri"
   require "json"
@@ -130,8 +129,6 @@ class ReviewBiddingController < ApplicationController
     response = http.request(request)
     return JSON.parse(response.body)
   end
-=======
->>>>>>> 3114430ca70aebb86edd8996af0a1ee10ce9e04f
 
   def assign_matched_topics(assignment_id,reviewers,matched_topics)
     =begin

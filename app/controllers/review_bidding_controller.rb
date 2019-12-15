@@ -239,7 +239,6 @@ class ReviewBiddingController < ApplicationController
     else
       @bids = ReviewBid.where(participant_id: params[:participant_id])
       signed_up_topics = ReviewBid.where(participant_id: params[:participant_id]).map(&:sign_up_topic_id)
-      puts signed_up_topics
       # Remove topics from bids table if the student moves data from Selection table to Topics table
       # This step is necessary to avoid duplicate priorities in Bids table
       signed_up_topics -= params[:topic].map(&:to_i)

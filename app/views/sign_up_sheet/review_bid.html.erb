@@ -16,9 +16,7 @@
       <tbody id="topics"  class="connectedSortable">
       <tr class="sort-disabled"><td></td><td></td></tr>
       <% for topic in @sign_up_topics %>
-        <%= get_intelligent_topic_row(topic, @selected_topics, @max_team_size) %>
-        <% is_suggested_topic = false %>
-        <tr id="topic_<%= topic.id %>">
+        <tr style="background-color:<%=get_quartiles(topic) %>" id="topic_<%= topic.id %>">
           <td><%= topic.topic_identifier %></td>
           <td><span class="inline" id="<%= i %>_show"><%= topic.topic_name %> </span></td>
         </tr>

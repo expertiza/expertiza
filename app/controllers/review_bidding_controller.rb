@@ -31,22 +31,24 @@ class ReviewBiddingController < ApplicationController
     # @priority = 0
     #@sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     team_id = @participant.team.try(:id)
-    my_topic = SignedUpTeam.where(team_id: team_id).select(:topic_id)
+    puts 'teamid------------'
+    puts team_id
+    my_topic = ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id).select(:topic_id)
     @sign_up_topics = SignUpTopic.where(["assignment_id = ? and id != ?", @assignment.id.to_s, my_topic.to_s])
     @max_team_size = @assignment.max_team_size
-
     @selected_topics =nil
     # if @assignment.is_intelligent
-      @bids = team_id.nil? ? [] : ReviewBid.where(participant_id: team_id).order(:priority)
-      # signed_up_topics = []
-      # @bids.each do |bid|
-      #   sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
-      #   signed_up_topics << sign_up_topic if sign_up_topic
-      # end
-      # signed_up_topics &= @sign_up_topics
-      # @sign_up_topics -= signed_up_topics
-      # @bids = signed_up_topics
-    # end
+      @bids = team_id.nil? ? [] : ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id).order(:priority)
+      signed_up_topics = []
+      @bids.each do |bid|
+        sign_up_topic = SignUpTopic.find_by(id: bid.sign_up_topic_id)
+        signed_up_topics << sign_up_topic if sign_up_topic
+      end
+      signed_up_topics &= @sign_up_topics
+      @sign_up_topics -= signed_up_topics
+      @bids = signed_up_topics
+
+
     #
     @num_of_topics = @sign_up_topics.size
     # @signup_topic_deadline = @assignment.due_dates.find_by(deadline_type_id: 7)
@@ -68,7 +70,7 @@ class ReviewBiddingController < ApplicationController
     #                      end
     # end
     render 'sign_up_sheet/review_bid' #and return if @assignment.is_intelligent
-    
+
   end
 
   def run_intelligent_assignment
@@ -104,30 +106,32 @@ class ReviewBiddingController < ApplicationController
 
   def set_priority
     participant = AssignmentParticipant.find_by(id: params[:participant_id])
-    # assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
-    # team_id = participant.team.try(:id)
-    # if params[:topic].nil?
-    #   # All topics are deselected by current team
-    #   ReviewBid.where(participant_id: params[:participant_id]).destroy_all
-    # else
-    #   @bids = ReviewBid.where(participant_id: params[:participant_id])
-    #   signed_up_topics = ReviewBid.where(participant_id: params[:participant_id]).map(&:topic_id)
-    #   # Remove topics from bids table if the student moves data from Selection table to Topics table
-    #   # This step is necessary to avoid duplicate priorities in Bids table
-    #   signed_up_topics -= params[:topic].map(&:to_i)
-    #   signed_up_topics.each do |topic|
-    #     ReviewBid.where(topic_id: topic, team_id: team_id).destroy_all
-    #   end
-    #   params[:topic].each_with_index do |topic_id, index|
-    #     bid_existence = Bid.where(sign_up_topic_id: topic_id, participant_id: params[:participant_id])
-    #     if bid_existence.empty?
-    #       ReviewBid.create(priority: index + 1,sign_up_topic_id: topic_id, participant_id: params[:participant_id],assignment_id: assignment_id)
-    #     else
-    #       ReviewBid.where(sign_up_topic_id: topic_id, participant_id: params[:participant_id]).update_all(priority: index + 1)
-    #     end
-    #   end
-    # end
-    redirect_to action: 'sign_up_sheet/list', assignment_id: params[:assignment_id]
+    puts 'test ----------------'
+    puts params.inspect
+    assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
+    team_id = participant.team.try(:id)
+    if params[:topic].nil?
+      # All topics are deselected by current team
+      ReviewBid.where(participant_id: params[:participant_id]).destroy_all
+    else
+      @bids = ReviewBid.where(participant_id: params[:participant_id])
+      signed_up_topics = ReviewBid.where(participant_id: params[:participant_id]).map(&:sign_up_topic_id)
+      # Remove topics from bids table if the student moves data from Selection table to Topics table
+      # This step is necessary to avoid duplicate priorities in Bids table
+      signed_up_topics -= params[:topic].map(&:to_i)
+      signed_up_topics.each do |topic|
+        ReviewBid.where(topic_id: topic, team_id: team_id).destroy_all
+      end
+      params[:topic].each_with_index do |topic_id, index|
+        bid_existence = ReviewBid.where(sign_up_topic_id: topic_id, participant_id: params[:participant_id])
+        if bid_existence.empty?
+          ReviewBid.create(priority: index + 1,sign_up_topic_id: topic_id, participant_id: params[:participant_id],assignment_id: assignment_id)
+        else
+          ReviewBid.where(sign_up_topic_id: topic_id, participant_id: params[:participant_id]).update_all(priority: index + 1)
+        end
+      end
+    end
+    # redirect_to action: 'sign_up_sheet/list', assignment_id: params[:assignment_id]
   end
 
 end

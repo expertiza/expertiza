@@ -320,7 +320,7 @@ resources :institution, except: [:destroy] do
       post ':id', action: :update
     end
   end
-resources :review_bidding do
+resources :review_bidding,except: %i[index show] do
   collection do
     get :review_bid
     post :set_priority

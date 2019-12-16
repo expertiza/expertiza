@@ -152,11 +152,13 @@
                   // if response is error, then show random number to student.
                   error: function (xhr, status) {
                       let stud_score = 0;
-                      let avg_score= <%= avg_num_suggestions_per_round(@map.assignment.id,@response.round,"ReviewResponseMap")%>;
+                      let avg_score = <%= avg_num_suggestions_per_round(@map.assignment.id,@response.round,@map.type) %>;
+
                       var num_comments = all_comments.length;
                       for (var i = 0; i < num_comments; i++){
                           stud_score += Math.floor((Math.random() * 5));
                       }
+                      stud_score = Math.round(stud_score/num_comments);
                       if(val == 1){
                           // function call that shows the stud_score and avg_score in alertbox.
                           save_suggestion_score_popup(stud_score,avg_score,e);
@@ -172,8 +174,7 @@
         // function to show the scores on save.
         function save_suggestion_score_popup(stud_score,avg_score,e)
         {
-          if(!confirm('Average class suggestion score for this round is: ' + avg_score + '. \n Your suggestion score for this review is: ' +
-                    stud_score))
+          if(!confirm('Average class suggestion score for this round is: ' + avg_score + '. \n Your suggestion score for this review is: ' + stud_score))
             {
               e.preventDefault();
               e.stopPropagation();

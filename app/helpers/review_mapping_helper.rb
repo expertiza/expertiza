@@ -243,7 +243,7 @@ module ReviewMappingHelper
 	avg_score = 0
 	#compute average across all reviewers' suggestion scores
 	reviewers = nil;
-	if @reviewers
+  if @reviewers
 		reviewers = @reviewers;
 	else
 		reviewers = AssignmentParticipant.where(parent_id: assignment_id)
@@ -253,8 +253,8 @@ module ReviewMappingHelper
 		response_maps = ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", assignment_id, r.id, type])
 		score = num_suggestions_per_student_per_round(response_maps,round_id)
 		scores += score
-	end
-	avg_score = scores/reviewers.length unless reviewers.empty?
+  end
+  avg_score = (scores/reviewers.length).ceil() unless reviewers.empty?
 	return avg_score
   end
 
@@ -266,11 +266,11 @@ module ReviewMappingHelper
 		response = Response.where(map_id: rm.id, round: round_id).order(created_at: :desc).first #desc
     if response
 		  comments = comments_in_current_response(response.id)
-		  all_comments += comments unless comments.empty?
+      all_comments += comments unless comments.empty?
     end
-	end
-	score = num_suggestions_for_responses_by_a_reviewer(all_comments)
-	return score
+  end
+  score = num_suggestions_for_responses_by_a_reviewer(all_comments)
+  return score
 	
   end
 
@@ -327,10 +327,14 @@ module ReviewMappingHelper
     # end
 
     #response received from the call to the API is simulated using a random number generator
-    0.upto(comments.length-1) do |i|
-      suggestion_score+=rand(10).to_i
+    if !comments.empty?
+      0.upto(comments.length-1) do |i|
+        suggestion_score+=rand(10).to_i
+      end
+      return (suggestion_score/comments.length).ceil()
+    else
+      return suggestion_score
     end
-	  return suggestion_score
   end
 #gives number of suggestion per team per student
   def num_suggestions_reviewer(responses)

@@ -95,7 +95,7 @@ class ResponseController < ApplicationController
     end
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
     redirect_to controller: 'response', action: 'save', id: @map.map_id,
-                responses: params[:responses], return: params[:return], msg: msg, review: params[:review],
+                return: params[:return], msg: msg, review: params[:review],
                 save_options: params[:save_options]
   end
 

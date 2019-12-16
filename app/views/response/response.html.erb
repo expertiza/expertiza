@@ -97,22 +97,31 @@
         $('#save_review').click(function(e){
             // function call to get/calculate the suggestion score and display it in an alertbox
             // when saving the review.
-            fetch_suggestion_score_and_display_alert(1);
+            e.preventDefault();
+
+            jQuery('#isSubmit').val('No');
+            fetch_suggestion_score_and_display_alert(1,e);
             $('#save_confirm').html('<span id="tick"> &#10004; </span>&nbsp;Saving review!')
             setTimeout(function(){
                 $('#save_confirm').html('')
             }, 5000);
+
         });
         $('#Submit').click(function(e){
             // function call to get/calculate the suggestion score and display it in an alertbox
             // when submitting your review.
-            fetch_suggestion_score_and_display_alert(2);
+            e.preventDefault();
+            e.stopPropagation();
+
+            jQuery('#isSubmit').val('Yes');
+            fetch_suggestion_score_and_display_alert(2,e);
+            //jQuery('form').submit();
         });
 
         // function that calls the web service to fetch the suggestion score for a student's review.
         // if the web service responds with an error, then we generate a random number and show it
         // to the student.
-        function fetch_suggestion_score_and_display_alert(val)
+        function fetch_suggestion_score_and_display_alert(val,e)
         {
             var all_comments = getReviewComments();
             if (all_comments != [])
@@ -134,15 +143,14 @@
                           stud_score += response["results"][i]["metrics"]["suggestion"]["suggestions_chances"];
                       }
                       if(val == 1){
-                          save_suggestion_score_popup(stud_score,avg_score);
+                          save_suggestion_score_popup(stud_score,avg_score,e);
                       }else{
-                          submit_suggestion_score_popup(stud_score,avg_score);
+                          submit_suggestion_score_popup(stud_score,avg_score,e);
                       }
                   },
 
                   // if response is error, then show random number to student.
                   error: function (xhr, status) {
-                      debugger;
                       let stud_score = 0;
                       let avg_score= <%= avg_num_suggestions_per_round(@map.assignment.id,@response.round,"ReviewResponseMap")%>;
                       var num_comments = all_comments.length;
@@ -151,10 +159,10 @@
                       }
                       if(val == 1){
                           // function call that shows the stud_score and avg_score in alertbox.
-                          save_suggestion_score_popup(stud_score,avg_score);
+                          save_suggestion_score_popup(stud_score,avg_score,e);
                       }else{
                           // function call that shows the stud_score and avg_score in alertbox.
-                          submit_suggestion_score_popup(stud_score,avg_score);
+                          submit_suggestion_score_popup(stud_score,avg_score,e);
                       }
                   }
               });
@@ -162,30 +170,34 @@
         }
 
         // function to show the scores on save.
-        function save_suggestion_score_popup(stud_score,avg_score)
+        function save_suggestion_score_popup(stud_score,avg_score,e)
         {
-          if(!confirm('Average class suggestion score is ' + avg_score + '. \n Your review suggestion score is ' +
+          if(!confirm('Average class suggestion score for this round is: ' + avg_score + '. \n Your suggestion score for this review is: ' +
                     stud_score))
             {
               e.preventDefault();
               e.stopPropagation();
               return;
             }
+          else{
+              jQuery('form').submit();
+
+          }
         }
 
         // function to show the scores on submit.
-        function submit_suggestion_score_popup(stud_score,avg_score)
+        function submit_suggestion_score_popup(stud_score,avg_score,e)
         {
-            if(!confirm('Average class suggestion score is ' + avg_score + '. \n Your review suggestion score is ' +
-                stud_score + ".\n\nOnce a review has been submitted, you cannot edit it again. \n Clicking 'Cancel' will still save your review."))
+            if(!confirm('Average class suggestion score for this round is: ' + avg_score + '. \n Your suggestion score for this review is: ' +
+                stud_score + ".\n\nOnce a review has been submitted, you cannot edit it again."))
             {
                 e.preventDefault();
                 e.stopPropagation();
                 return;
             }
             else{
-                jQuery('#isSubmit').val('Yes');
-                window.location.href= "../../../student_review/list?id=<%= @map.reviewer.id %>";
+                jQuery('form').submit();
+                //window.location.href= "../../../student_review/list?id=<%= @map.reviewer.id %>";
             }
         }
 

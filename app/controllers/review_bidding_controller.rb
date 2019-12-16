@@ -24,11 +24,22 @@ class ReviewBiddingController < ApplicationController
     #
     # =end
     assignment_id = params[:id]
-    reviewers = AssignmentParticipant.where(parent_id: assignment_id).ids
+    reviewers = assignment_reviewers(assignment_id)
     topics = SignUpTopic.where(assignment_id: assignment_id).ids
     bidding_data = assignment_bidding_data(assignment_id,reviewers)
     matched_topics = reviewer_topic_matching(bidding_data,topics)
     assign_matched_topics(assignment_id,reviewers,matched_topics)
+    redirect_to :back
+  end
+
+  def assignment_reviewers(assignment_id)
+    reviewers = AssignmentParticipant.where(parent_id: assignment_id).ids
+    for reviewer in reviewers do
+      if(reviewer_self_topic(reviewer,assignment_id)==nil)
+        reviewers = reviewers - [reviewer]
+      end
+    end
+    return reviewers
   end
 
   def assignment_bidding_data(assignment_id,reviewers)
@@ -50,12 +61,12 @@ class ReviewBiddingController < ApplicationController
     # =end
     bidding_data = Hash.new
     for reviewer in reviewers do
-      bidding_data[reviewer] = reviewer_bidding_data(reviewer)
+      bidding_data[reviewer] = reviewer_bidding_data(reviewer,assignment_id)
     end
     return bidding_data
   end
 
-  def reviewer_bidding_data(reviewer)
+  def reviewer_bidding_data(reviewer,assignment_id)
     # =begin
     #
     # Returns a Hash that contains the necessary bidding data of a particular
@@ -71,18 +82,19 @@ class ReviewBiddingController < ApplicationController
     #       method does not require assignment_id as an argument.
     #
     # =end
-    self_topic = reviewer_self_topic(reviewer)
-    bidding_data = {'priority':  [], 'time': [], 'tid':  [], 'otid': self_topic}
+    self_topic = reviewer_self_topic(reviewer,assignment_id)
+    bidding_data = {'priority' => [], 'time' => [], 'tid' =>  [], 'otid' => self_topic}
     bids = ReviewBid.where(participant_id: reviewer)
     for bid in bids do
       bidding_data['priority'] << bid.priority
-      bidding_data['time'] << bid.updated_at
+      # bidding_data['time'] << bid.updated_at
+      bidding_data['time'] << 1
       bidding_data['tid'] << bid.sign_up_topic_id
     end
     return bidding_data
   end
 
-  def reviewer_self_topic(reviewer)
+  def reviewer_self_topic(reviewer,assignment_id)
     # =begin
     #
     # Return the topic_id of the topic on which the reviewer is working in the
@@ -99,9 +111,13 @@ class ReviewBiddingController < ApplicationController
     #
     # =end
     user_id = Participant.where(id: reviewer).pluck(:user_id).first
-    team_id = TeamsUser.where(:user_id => user_id).pluck(:team_id).first
-    self_topic = SignedUpTeam.where(:team_id => self_topic).pluck(:topic_id).first
-    return self_topic
+    puts(reviewer.to_s+'\n')
+    puts(user_id.to_s+'\n')
+    self_topic = ActiveRecord::Base.connection.execute("SELECT ST.topic_id FROM teams T, teams_users TU,signed_up_teams ST where TU.team_id=T.id and T.parent_id="+assignment_id.to_s+" and TU.user_id="+user_id.to_s+" and ST.team_id=TU.team_id;").first
+    if self_topic==nil
+      return self_topic
+    end
+    return self_topic.first
   end
 
   def reviewer_topic_matching(bidding_data,topics)
@@ -122,7 +138,9 @@ class ReviewBiddingController < ApplicationController
     #
     # =end
     json_like_bidding_hash = {"users": bidding_data, "tids": topics}
+    puts('####################')
     puts(json_like_bidding_hash)
+    puts('####################')
     uri = URI.parse(WEBSERVICE_CONFIG["review_bidding_webservice_url"])
     http = Net::HTTP.new(uri.host, uri.port)
     request = Net::HTTP::Post.new(uri.path, {'Content-Type' => 'application/json'})

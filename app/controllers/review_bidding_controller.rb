@@ -306,12 +306,6 @@ class ReviewBiddingController < ApplicationController
     end
   end
 
-  # Helper Method to check if service has already been run by the instructor
-  def check_if_response_maps_present(assignment_id)
-    ReviewResponseMap.where(reviewed_object_id: assignment_id).any?
-  end 
-  helper_method :check_if_response_maps_present
-
   def get_quartiles(topic_id)
     assignment_id = SignUpTopic.where(id: topic_id).pluck(:assignment_id).first
     num_reviews_allowed = Assignment.where(id: assignment_id).pluck(:num_reviews_allowed).first

@@ -46,7 +46,7 @@ describe AssignmentParticipant do
     end
   end
 
-  describe '#scores' do
+  describe '#scores when questionnaire_weight is 100 and is weighted is true' do
     before(:each) do
       allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
                                                          .and_return(double('AssignmentQuestionnaire', used_in_round: 1, questionnaire_weight: 100))
@@ -80,6 +80,42 @@ describe AssignmentParticipant do
           "created_at: nil, updated_at: nil, version_num: nil, round: 1, is_submitted: false>], :scores=>{:max=>95, :min=>88, :avg=>90.0}}}")
       end
     end
+  end
+
+  describe '#scores when questionnaire_weight is zero and is weighted is false' do
+    before(:each) do
+      allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
+                                                          .and_return(double('AssignmentQuestionnaire', used_in_round: 1, questionnaire_weight: 0))
+      allow(review_questionnaire).to receive(:symbol).and_return(:review)
+      allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([response])
+      allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
+      allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
+    end
+    context 'when assignment is not varying rubric by round and not an microtask' do
+      it 'calculates scores that this participant has been given' do
+        allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
+        expect(participant.scores(review1: [question]).inspect).to eq("{:participant=>#<AssignmentParticipant id: 1, can_submit: true, can_review: true, "\
+          "user_id: 2, parent_id: 1, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, "\
+          "type: \"AssignmentParticipant\", handle: \"handle\", time_stamp: nil, digital_signature: nil, duty: nil, "\
+          "can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, :review1=>{:is_weighted=>false, :assessments=>[#<Response id: nil, map_id: 1, "\
+          "additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, round: 1, is_submitted: false>], "\
+          ":scores=>{:max=>95, :min=>88, :avg=>90}}, :is_weighted=>false, :total_score=>100}")
+      end
+    end
+
+    context 'when assignment is varying rubric by round but not an microtask' do
+      it 'calculates scores that this participant has been given' do
+        allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
+        allow(assignment).to receive(:num_review_rounds).and_return(1)
+        expect(participant.scores(review1: [question]).inspect).to eq("{:participant=>#<AssignmentParticipant id: 1, can_submit: true, can_review: true, "\
+          "user_id: 2, parent_id: 1, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, "\
+          "type: \"AssignmentParticipant\", handle: \"handle\", time_stamp: nil, digital_signature: nil, duty: nil, "\
+          "can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, :review1=>{:is_weighted=>false, :assessments=>[#<Response id: nil, map_id: 1, "\
+          "additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, round: 1, is_submitted: false>], "\
+          ":scores=>{:max=>95, :min=>88, :avg=>90}}, :is_weighted=>false, :total_score=>100, :review=>{:assessments=>[#<Response id: nil, map_id: 1, additional_comment: nil, "\
+          "created_at: nil, updated_at: nil, version_num: nil, round: 1, is_submitted: false>], :scores=>{:max=>95, :min=>88, :avg=>90.0}}}")
+      end
+    end
 
     context 'when assignment is not varying rubric by round but an microtask' do
       it 'calculates scores that this participant has been given' do
@@ -89,11 +125,12 @@ describe AssignmentParticipant do
         expect(participant.scores(review1: [question]).inspect).to eq("{:participant=>#<AssignmentParticipant id: 1, can_submit: true, can_review: true, "\
           "user_id: 2, parent_id: 1, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, type: \"AssignmentParticipant\", "\
           "handle: \"handle\", time_stamp: nil, digital_signature: nil, duty: nil, can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, "\
-          ":review1=>{:is_weighted=>true, :assessments=>[#<Response id: nil, map_id: 1, additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, round: 1, "\
-          "is_submitted: false>], :scores=>{:max=>95, :min=>88, :avg=>90}}, :is_weighted=>true, :total_score=>100, :max_pts_available=>66}")
+          ":review1=>{:is_weighted=>false, :assessments=>[#<Response id: nil, map_id: 1, additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, round: 1, "\
+          "is_submitted: false>], :scores=>{:max=>95, :min=>88, :avg=>90}}, :is_weighted=>false, :total_score=>100, :max_pts_available=>66}")
       end
     end
   end
+  
 
   describe '#compute_assignment_score' do
     before(:each) do

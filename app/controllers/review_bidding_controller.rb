@@ -169,10 +169,14 @@ class ReviewBiddingController < ApplicationController
     #
     # =end
     for reviewer in reviewers do
-      reviewer_matched_topics = matched_topics[reviewer]
+      reviewer_matched_topics = matched_topics[reviewer.to_s]
       for topic in reviewer_matched_topics do
-        matched_reviewee = SignedUpTeam.where(topic_id: topic).pluck(:team_id)
-        ReviewResponseMap.create({reviewed_object_id: assignment_id, reviewer_id: reviewer, reviewee_id: matched_reviewee, type: "ReviewResponseMap"})
+        # puts(topic)
+        # puts(topic.class)
+        matched_reviewee = SignedUpTeam.where(topic_id: topic).pluck(:team_id).first
+        if(matched_reviewee != nil)
+          ReviewResponseMap.create({:reviewed_object_id => assignment_id, :reviewer_id => reviewer, :reviewee_id => matched_reviewee, :type => "ReviewResponseMap"})
+        end
       end
     end
   end

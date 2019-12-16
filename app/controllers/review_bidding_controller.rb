@@ -240,12 +240,12 @@ class ReviewBiddingController < ApplicationController
   # from the selection table to topics table, those records are deleted from the review_bids model.
   # Also, we create records if the bid never existed.
   def set_priority
-    participant = AssignmentParticipant.find_by(id: params[:participant_id])
-    assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
-    team_id = participant.team.try(:id)
     if params[:topic].nil?
       ReviewBid.where(participant_id: params[:participant_id]).destroy_all
     else
+      participant = AssignmentParticipant.find_by(id: params[:participant_id])
+      assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
+      team_id = participant.team.try(:id)
       @bids = ReviewBid.where(participant_id: params[:participant_id])
       signed_up_topics = ReviewBid.where(participant_id: params[:participant_id]).map(&:sign_up_topic_id)
       signed_up_topics -= params[:topic].map(&:to_i)

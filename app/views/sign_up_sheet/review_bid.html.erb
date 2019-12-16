@@ -34,7 +34,7 @@
       <tbody id="selections" class="connectedSortable" data-update-url=<%= "/review_bidding/set_priority?participant_id=#{@participant.id}" %>>
       <tr class="sort-disabled"><td></td><td></td></tr>
       <% for topic in @bids %>
-        <tr style="background-color:<%=get_quartiles(topic) %>" id="topic_<%= topic.id %>">
+        <tr style="background-color:<%=get_quartiles(topic.id) %>" id="topic_<%= topic.id %>">
           <td><%= topic.topic_identifier %></td>
           <td><span class="inline" id="<%= i %>_show"><%= topic.topic_name %> </span></td>
         </tr>

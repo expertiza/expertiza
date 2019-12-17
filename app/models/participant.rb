@@ -67,6 +67,14 @@ class Participant < ActiveRecord::Base
     can_review
   end
 
+  def able_to_submit
+    can_submit
+  end
+
+  def able_to_take_quiz
+    can_take_quiz
+  end
+
   def email(pw, home_page)
     user = User.find_by(id: self.user_id)
     assignment = Assignment.find_by(id: self.assignment.id)

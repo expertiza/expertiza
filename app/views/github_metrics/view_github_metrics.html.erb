@@ -1,5 +1,5 @@
 <script type="text/javascript" src="/assets/view_team_in_grades.js"></script>
-<script type="text/javascript" src="/assets/view_github_metrics.js"></script>
+<!--<script type="text/javascript" src="/assets/view_github_metrics.js"></script>-->
 <% status_classes = {"failure" => "failed", "success" => "passed"} %>
 <h2>GitHub Metrics for assignment: <%= @assignment.name %></h2>
 <h4>Team: <%= @team.name %></h4>
@@ -7,7 +7,7 @@
 <!--Obtain topic name from assignment helper-->
 <% topic_id, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(@team) %>
 <% if @assignment.topics? %>
-  <h4>Topic: <%= topic_id + '. ' + topic_name %></h4>
+    <h4>Topic: <%= topic_id + '. ' + topic_name %></h4>
 <% end %>
 
 <!--Toggle submission-->
@@ -91,62 +91,23 @@
     </div>
 
 
-    <div class="chart-container" style="width: 1000px; height:600px;">
+    <!--<div class="chart-container" style="width: 1000px; height:600px;">
       <%= display_github_metrics(@gitVariable, @graph_type, @timeline_type, @due_date) %>
-    </div>
+    </div>-->
+
+    <canvas id="charter" style="width: 1000px; height: 600px;"></canvas>
 
     <script>
-      function sortTable(n) {
-        var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-        table = document.getElementById("github-metrics-summary-table");
-        switching = true;
-        dir = "asc";
-        while (switching) {
-          switching = false;
-          rows = table.rows;
-          for (i = 1; i < (rows.length - 1); i++) {
-            shouldSwitch = false;
-            x = rows[i].getElementsByTagName("TD")[n];
-            y = rows[i + 1].getElementsByTagName("TD")[n];
-            if (dir == "asc") {
-              if (parseInt(x.innerHTML.toLowerCase()) > parseInt(y.innerHTML.toLowerCase())) {
-                shouldSwitch = true;
-                break;
-              }
-            } else if (dir == "desc") {
-              if (parseInt(x.innerHTML.toLowerCase()) < parseInt(y.innerHTML.toLowerCase())) {
-                shouldSwitch = true;
-                break;
-              }
-            }
-          }
-          if (shouldSwitch) {
-            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-            switching = true;
-            switchcount ++;
-          } else {
-            if (switchcount == 0 && dir == "asc") {
-              dir = "desc";
-              switching = true;
-            }
-          }
-        }
+      var gitVar = "<%= pop_data %>";
+      function decodeHtml(html) {
+	  var txt = document.createElement("textarea");
+	  txt.innerHTML = html;
+	  return txt.value;
       }
-      $(document).ready(function(){
-        $('#graph_selector').on('change', function(){
-          var participant_id = $('#participant_id').val()
-          var graphType = $('#graph_selector').val();
-          var timelineType = $('#timeline_selector').val();
-          window.location.href = `/github_metrics/view_github_metrics/${participant_id}?graphType=${graphType}&timelineType=${timelineType}`
-        })
-        $('#timeline_selector').on('change', function(){
-          var participant_id = $('#participant_id').val()
-          var graphType = $('#graph_selector').val();
-          var timelineType = $('#timeline_selector').val();
-          window.location.href = `/github_metrics/view_github_metrics/${participant_id}?graphType=${graphType}&timelineType=${timelineType}`
-        })
-      })
+      var decoded = decodeHtml(gitVar);
+      var gitData = JSON.parse(decoded);
     </script>
+
   </div>
   <div>
     <h3>Team Statistics</h3>

@@ -1,36 +1,4 @@
 module GithubMetricsHelper
-  # def display_github_metrics(parsed_data, authors, dates)
-  #   data_array = []
-  #   color = %w[red yellow blue gray green magenta]
-  #   i = 0
-  #   mapped_data = {}
-  #   authors.each do |author|
-  #     mapped_author = remap_author(author)
-  #     if mapped_data.include? mapped_author
-  #       mapped_data[mapped_author] = [mapped_data[mapped_author], parsed_data[author].values].transpose.map {|x| x.reduce(:+)}
-  #     else
-  #       mapped_data[mapped_author] = parsed_data[author].values
-  #     end
-  #   end
-  #   remap_authors(authors).uniq.each do |m_author|
-  #     data_object = {}
-  #     #m_author = remap_author(author)
-  #     data_object['label'] = m_author
-  #     #data_object['data'] = parsed_data[author].values
-  #     data_object['data'] = mapped_data[m_author]
-  #     data_object['backgroundColor'] = color[i]
-  #     data_object['borderWidth'] = 1
-  #     data_array.push(data_object)
-  #     i += 1
-  #     i = 0 if i > 5
-  #   end
-
-  #   data = {
-  #     labels: dates,
-  #     datasets: data_array
-  #   }
-  # end
-
   # parses the data from git api to show the chart
   def display_github_metrics(gitVariable, graph_type, timeline_type, due_date)
     data = get_chart_data(gitVariable, graph_type, timeline_type, due_date)
@@ -180,44 +148,7 @@ module GithubMetricsHelper
       parsed_data_by_week[author_email] = week_commits
     end
 
-    data_array = []
-    index = 0
-    @authors.each do |author|
-      @no_of_commits_data = []
-      @no_of_lines_added_data = []
-      @no_of_lines_deleted_data = []
-
-      parsed_data_by_week[author].each do |key, commit_object|
-        @no_of_commits_data << commit_object[:commits]
-        @no_of_lines_added_data << commit_object[:additions]
-        @no_of_lines_deleted_data << commit_object[:deletions]
-      end
-
-      if @graph_type == '3'
-        normalize_cumulative_data
-        ['0','1','2'].each do |graph_type|
-          data_object = initialize_data_object(graph_type)
-          data_object['label'] = author
-          data_object['backgroundColor'] = color[index]
-          data_array.push(data_object)
-          index += 1
-        end
-        index = 0
-      else
-        data_object = initialize_data_object(@graph_type)
-        data_object['label'] = author
-        data_object['backgroundColor'] = color[index]
-        data_array.push(data_object)
-        index += 1
-        index = 0 if index > 7
-      end
-    end
-
-    if @submission_week.present?
-      @dates_to_week = @dates_to_week.map { |week| @submission_week.to_i - week.to_i }
-    end
-
-    data_array
+    return parsed_data_by_week
   end
 
   # This function will return commits data by author for each week
@@ -320,5 +251,11 @@ module GithubMetricsHelper
     @no_of_commits_data = @no_of_commits_data.map {|x| (x*10)/commit_obj_max_count[:commits]}
     @no_of_lines_added_data = @no_of_lines_added_data.map {|x| (x*10)/commit_obj_max_count[:additions]}
     @no_of_lines_deleted_data = @no_of_lines_deleted_data.map {|x| (x*10)/commit_obj_max_count[:deletions]}
+  end
+
+  def pop_data
+    pageData = {}
+    pageData = get_commits_data_group_by_week
+    return pageData.to_json
   end
 end

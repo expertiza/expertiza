@@ -1,7 +1,7 @@
 describe "peer review testing" do
   before(:each) do
     create(:assignment, name: "TestAssignment", directory_path: 'test_assignment')
-    create_list(:participant, 4)
+    create_list(:participant, 3)
     create(:assignment_node)
     create(:deadline_type, name: "submission")
     create(:deadline_type, name: "review")

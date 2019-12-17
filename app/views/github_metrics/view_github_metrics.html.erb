@@ -27,7 +27,7 @@
 		<h3>Team Members</h3>
     <% @gitVariable[:check_statuses].each do |pull_number, check_status| %>
 			<% end %>
-			<form>
+			<form id="gitmap">
 				<% @gitVariable[:authors].each do | email | %>
 				<div class="input-group">
 			<strong><%= email %></strong>
@@ -41,7 +41,6 @@
 					<% end %>
 					</div>
 				<% end %>
-				<button type="submit" class="btn btn-default">Submit</button>
 			</form>
   </div>
   <div>

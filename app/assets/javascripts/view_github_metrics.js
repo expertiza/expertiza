@@ -57,7 +57,36 @@ var group = ["by_week", "by_student"];
 var colors = ['#ed1c1c', '#ffea00', '#00ff08', '#00e5ff', '#ff0077', '#0d00ff', '#7d4a56', '#77c9c8'];
 var labels = []
 
+function process_gitdata(gitData) {
+    var serialized = $('#gitmap').serialize().replace(/%40/g, "@").split("&").map(function (s) {
+	return s.split('=');
+    });
+    var dic = {};
+    serialized.forEach(function (a) {
+	dic[a[0]] = a[1];
+    });
+    var newData = {};
+    Object.keys(gitData).forEach(function (key) {
+	if (key in dic) {
+	    if (dic[key] in newData) {
+		// sum them
+		Object.keys(newData[dic[key]]).forEach(function (k) {
+		    Object.keys(newData[dic[key]][k]).forEach(function (j) {
+			newData[dic[key]][k][j] += gitData[key][k][j];
+		    });
+		});
+	    } else {
+		newData[dic[key]] = gitData[key];
+	    }
+	} else {
+	    newData[key] = gitData[key];
+	}
+    });
+    return newData;
+}
+
 function generate_data(gitData, group, variable) {
+    gitData = process_gitdata(gitData);
     datasets = [];
     labels = [];
     if (group === "by_week") {
@@ -76,7 +105,6 @@ function generate_data(gitData, group, variable) {
     } else if (group === "by_student") {
 	var weeks = Object.values(gitData).map(function (v, i) { return Object.keys(v); }).flat();
 	weeks.unique().forEach(function(week, index) {
-	    console.log(week);
 	    var set = {};
 	    set.label = week;
 	    set.data = [];
@@ -88,7 +116,6 @@ function generate_data(gitData, group, variable) {
 	});
 	// labels = weeks.unique();
 	labels = Object.keys(gitData);
-	console.log(datasets);
     }
 };
 
@@ -125,6 +152,7 @@ window.onload = function() {
 
 $(document).ready(function(){
     function handle_graph_change() {
+	console.log("chnage");
 	var participant_id = $('#participant_id').val()
 	var graphType = $('#graph_selector').val();
 	var timelineType = $('#timeline_selector').val();
@@ -133,4 +161,5 @@ $(document).ready(function(){
     }
     $('#graph_selector').on('change', handle_graph_change);
     $('#timeline_selector').on('change', handle_graph_change);
+    $('#gitmap').on('change', handle_graph_change);
 })

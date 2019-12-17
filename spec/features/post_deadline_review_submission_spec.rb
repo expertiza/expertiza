@@ -1,5 +1,4 @@
-include InstructorInterfaceHelperSpec
-describe 'assignment review after deadline' do
+describe 'assignment review and submission after deadlines' do
 
   before(:each) do
     # create assignment and topic
@@ -51,7 +50,6 @@ describe 'assignment review after deadline' do
 
   it "should not allow submission after deadline" do
 
-    #login_as("student2065")
     user = User.find_by(name: "student2064")
     stub_current_user(user, user.role.name, user.role)
 
@@ -63,12 +61,6 @@ describe 'assignment review after deadline' do
 
     # the page will not have link to content "Your work"
     expect{click_link "Your work"}.to raise_error(Capybara::ElementNotFound)
-
-  end
-
-  it "should only use submitted response from review_response_map for score calculation" do
-    @a_team = create(:assignment_team)
-    expect(ReviewResponseMap.get_assessments_for(@a_team)).to eq([])
 
   end
 

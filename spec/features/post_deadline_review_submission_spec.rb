@@ -27,28 +27,27 @@ describe 'assignment review after deadline' do
 
   end
 
-  #-it "should not be able to review work after deadline" do
+  it "should not be able to review work after deadline" do
 
 
     # The spec is written to reproduce following bug. "Others' work" link open after deadline passed
 
-    # user = User.find_by(name: "student2065")
-    # stub_current_user(user, user.role.name, user.role)
-    #-login_as("student2067")
-    #-visit '/student_task/view?id=3'
+    user = User.find_by(name: "student2065")
+    stub_current_user(user, user.role.name, user.role)
+    visit '/student_task/view?id=3'
 
     # the page should have content, but after deadline passes it is displayed as gray
     # but there should not be any link attached to it
-    #-expect(page).to have_content "Others' work"
+    expect(page).to have_content "Others' work"
 
     # this is the bug, even after deadline has passed, the link is still present
     # the ui comment in file views/student_task/view.html.erb says
     # <!--Akshay: Fix Issue 1218 - this link is disabled if assignment does not require any peer reviews-->
     # But the link seems to be open even after deadline passed.
     # Screenshot attached as part of wiki for E1975, Fall 2019
-    #-expect(page).to have_link("Others' work", "/student_review/list?id=1")
+    expect(page).to have_link("Others' work", "/student_review/list?id=1")
 
-  #-end
+  end
 
   it "should not allow submission after deadline" do
 

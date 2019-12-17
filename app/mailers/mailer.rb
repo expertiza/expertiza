@@ -28,7 +28,7 @@ class Mailer < ActionMailer::Base
     @new_pct = defn[:body][:new_pct]
     @avg_pct = defn[:body][:avg_pct]
     @assignment = defn[:body][:assignment]
-    @author_name = defn[:body][:author_name]
+    @conference_variable = defn[:body][:conference_variable]
 
     defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
     mail(subject: defn[:subject],

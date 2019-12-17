@@ -2,6 +2,7 @@ describe UsersController do
   let(:admin) { build(:admin, id: 3) }
   let(:super_admin) {build (:superadmin)}
   let(:instructor) { build(:instructor, id: 2) }
+  let(:instructor1) { build(:instructor, id: 2, timezonepref: 'Eastern Time (US & Canada)') }
   let(:student1) { build(:student, id: 1, name: :lily) }
   let(:student2) { build(:student) }
   let(:student3) { build(:student, id: 10, role_id: 1, parent_id: nil) }
@@ -15,6 +16,8 @@ describe UsersController do
   let(:superadmin) {build(:superadmin)}
   let(:assignment) {build(:assignment, id: 1, name: "test_assignment", instructor_id: 2, 
     participants: [build(:participant, id: 1, user_id: 1, assignment: assignment)], course_id: 1)}
+  let(:assignment1) { build(:assignment, id: 2, is_conference: 1, max_team_size:100) }
+
   before(:each) do
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
@@ -199,6 +202,21 @@ describe UsersController do
       allow_any_instance_of(User).to receive(:undo_link).with('The user "instructor6" has been successfully created. ').and_return(true)
       expect(flash[:success]).to eq "A new password has been sent to new user's e-mail address. "
       expect(response).to redirect_to('http://test.host/users/list')
+    end
+
+    it 'save successfully for new Author' do
+      params = {
+          user: {name: 'lily',
+                 role_id: 2,
+                 email: 'chenzy@gmail.com',
+                 assignment: '2'
+                 }
+      }
+      allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)
+      allow(Assignment).to receive(:find).with('2').and_return(assignment1)
+      allow(User).to receive(:find).with(1).and_return(instructor1)
+      post :create, params
+      expect(flash[:success]).to eq "You are added as an Author for assignment final2"
     end
 
     it 'save unsuccessfully' do

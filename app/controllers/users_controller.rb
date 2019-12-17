@@ -348,20 +348,7 @@ class UsersController < ApplicationController
         redirect_to request.referrer
         return false
       end
-      params[:user][:name] = params[:user][:email] unless !params[:user][:name].nil? and !params[:user][:name].empty?
-      @user = User.new(user_params)
-      # parent id for a conference user will be conference assignment instructor id
-      @user.parent_id = Assignment.find(params[:user][:assignment]).instructor.id
-      @assignment = Assignment.find(params[:user][:assignment])
-      # set the user's timezone to its parent's
-      @user.timezonepref = User.find(@user.parent_id).timezonepref
-      # set default value for institute
-      @user.institution_id = nil
-      if @user.save
-        send_mail_to_new_user
-      else
-        raise "Error occurred while creating expertiza account."
-      end
+      create_author
     else
       @user = existing_user
     end

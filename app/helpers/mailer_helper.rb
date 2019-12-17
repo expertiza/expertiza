@@ -24,7 +24,7 @@ module MailerHelper
     })
   end
 
-  def self.send_mail_to_coauthor(user, subject, partial_name, password, author_name)
+  def self.send_mail_for_conference_user(user, subject, partial_name, password, conference_variable)
     Mailer.generic_message ({
         to: user.email,
         subject: subject,
@@ -33,8 +33,10 @@ module MailerHelper
             password: password,
             first_name: ApplicationHelper.get_user_first_name(user),
             partial_name: partial_name,
-            author_name: author_name
+            conference_variable: conference_variable
         }
     })
   end
+
+
 end

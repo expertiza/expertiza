@@ -1,4 +1,4 @@
-<% if @assignment.nil?%>
+<% if  @assignment.nil? || !@assignment.is_conference?%>
   <h1>New User</h1>
 <% else %>
   <h1>Conference User</h1>

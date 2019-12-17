@@ -1,5 +1,25 @@
 module ConferenceHelper
 
+  def create_author
+    params[:user][:name] = params[:user][:email] unless !params[:user][:name].nil? and !params[:user][:name].empty?
+    @user = User.new(user_params)
+    # parent id for a conference user will be conference assignment instructor id
+    @user.parent_id = Assignment.find(params[:user][:assignment]).instructor.id
+    @assignment = Assignment.find(params[:user][:assignment])
+    # set the user's timezone to its parent's
+    @user.timezonepref = User.find(@user.parent_id).timezonepref
+    # set default value for institute
+    @user.institution_id = nil
+    if @user.save
+      password = @user.reset_password # the password is reset
+      prepared_mail = MailerHelper.send_mail_for_conference_user(@user, "Your Expertiza account and password have been created.", "author_conference_invitation", password, @assignment.name)
+      prepared_mail.deliver
+      flash[:success] = "A new password has been sent to new user's e-mail address."
+    else
+      raise "Error occurred while creating expertiza account."
+    end
+  end
+
   #Function to create co-author for conference type assignment
   def create_coauthor
     check = User.find_by(name: params[:user][:name])
@@ -22,7 +42,7 @@ module ConferenceHelper
       password = @user.reset_password
 
       #Mail to be sent to co-author once the user has been created. New partial is used as content for email is different from normal user
-      MailerHelper.send_mail_to_coauthor(@user, "Your Expertiza account has been created.", "user_conference_invitation", password,current_user.name).deliver
+      MailerHelper.send_mail_for_conference_user(@user, "Your Expertiza account has been created.", "user_conference_invitation", password,current_user.name).deliver
       return @user
     end
   end
@@ -37,6 +57,8 @@ module ConferenceHelper
                                               can_submit: 1,
                                               can_review: 1,
                                               can_take_quiz: 1)
+
+
       new_participant.set_handle
     end
     #set_handle from assignment controller is called

@@ -156,7 +156,6 @@
 	<table class="table table-striped">
 		<thead>
 			<tr>
-				<th>Student</th>
 				<th>Name</th>
 				<th>Email</th>
 				<th>Additions</th>
@@ -168,7 +167,6 @@
 		<tbody>
 			<% @gitVariable[:commits].each do |commit| %>
 			<tr>
-				<td><%= params[commit["author"]["email"]] %></td>
 				<td><%= commit["author"]["name"] %></td>
 				<td><%= commit["author"]["email"] %></td>
 				<td><%= commit["additions"] %></td>

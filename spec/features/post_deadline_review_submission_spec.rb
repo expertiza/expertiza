@@ -52,7 +52,9 @@ describe 'assignment review after deadline' do
 
   it "should not allow submission after deadline" do
 
-    login_as("student2065")
+    #login_as("student2065")
+    user = User.find_by(name: "student2065")
+    stub_current_user(user, user.role.name, user.role)
 
     # goto student_task page, which has link to "Your work"
     visit '/student_task/view?id=1'

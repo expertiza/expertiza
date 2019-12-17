@@ -35,7 +35,7 @@ describe 'assignment review after deadline' do
     # user = User.find_by(name: "student2065")
     # stub_current_user(user, user.role.name, user.role)
     login_as("student2065")
-    visit '/root/student_task/view?id=1'
+    visit '/student_task/view?id=1'
 
     # the page should have content, but after deadline passes it is displayed as gray
     # but there should not be any link attached to it

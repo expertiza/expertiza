@@ -1,3 +1,4 @@
+include InstructorInterfaceHelperSpec
 describe 'assignment review after deadline' do
 
   before(:each) do
@@ -31,8 +32,9 @@ describe 'assignment review after deadline' do
 
     # The spec is written to reproduce following bug. "Others' work" link open after deadline passed
 
-    user = User.find_by(name: "student2065")
-    stub_current_user(user, user.role.name, user.role)
+    # user = User.find_by(name: "student2065")
+    # stub_current_user(user, user.role.name, user.role)
+    login_as("student2065")
     visit '/root/student_task/view?id=1'
 
     # the page should have content, but after deadline passes it is displayed as gray

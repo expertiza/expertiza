@@ -56,7 +56,7 @@ describe 'assignment review after deadline' do
     stub_current_user(user, user.role.name, user.role)
 
     # goto student_task page, which has link to "Your work"
-    visit '/student_task/view?id=1'
+    visit '/student_task/view?id=2'
 
     # the page will have text "Your work" but will be grayed
     expect(page).to have_content "Your work"

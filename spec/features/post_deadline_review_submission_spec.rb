@@ -34,8 +34,8 @@ describe 'assignment review after deadline' do
 
     # user = User.find_by(name: "student2065")
     # stub_current_user(user, user.role.name, user.role)
-    login_as("student2066")
-    visit '/student_task/view?id=1'
+    login_as("student2067")
+    visit '/student_task/view?id=3'
 
     # the page should have content, but after deadline passes it is displayed as gray
     # but there should not be any link attached to it
@@ -52,7 +52,7 @@ describe 'assignment review after deadline' do
 
   it "should not allow submission after deadline" do
 
-    user = User.find_by(name: "student2066")
+    user = User.find_by(name: "student2065")
     stub_current_user(user, user.role.name, user.role)
 
     # goto student_task page, which has link to "Your work"

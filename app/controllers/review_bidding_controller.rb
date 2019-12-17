@@ -126,8 +126,8 @@ class ReviewBiddingController < ApplicationController
     bids = ReviewBid.where(participant_id: reviewer)
     for bid in bids do
       bidding_data['priority'] << bid.priority
-      # bidding_data['time'] << bid.updated_at
-      bidding_data['time'] << 1
+      time_since_update = Time.now() - Time.parse(bid.updated_at)
+      bidding_data['time'] << time_since_update
       bidding_data['tid'] << bid.sign_up_topic_id
     end
     return bidding_data
@@ -148,8 +148,6 @@ class ReviewBiddingController < ApplicationController
           method does not require assignment_id as an argument.
 =end
     user_id = Participant.where(id: reviewer).pluck(:user_id).first
-    puts(reviewer.to_s+'\n')
-    puts(user_id.to_s+'\n')
     self_topic = ActiveRecord::Base.connection.execute("SELECT ST.topic_id FROM teams T, teams_users TU,signed_up_teams ST where TU.team_id=T.id and T.parent_id="+assignment_id.to_s+" and TU.user_id="+user_id.to_s+" and ST.team_id=TU.team_id;").first
     if self_topic==nil
       return self_topic
@@ -202,8 +200,6 @@ class ReviewBiddingController < ApplicationController
     for reviewer in reviewers do
       reviewer_matched_topics = matched_topics[reviewer.to_s]
       for topic in reviewer_matched_topics do
-        # puts(topic)
-        # puts(topic.class)
         matched_reviewee = SignedUpTeam.where(topic_id: topic).pluck(:team_id).first
         if(matched_reviewee != nil)
           ReviewResponseMap.create({:reviewed_object_id => assignment_id, :reviewer_id => reviewer, :reviewee_id => matched_reviewee, :type => "ReviewResponseMap"})

@@ -1,11 +1,25 @@
 class ReviewBiddingController < ApplicationController
 
-  require 'rgl/adjacency'
-  require 'rgl/dot'
-  require 'rgl/topsort'
   require "net/http"
   require "uri"
   require "json"
+
+  def action_allowed?
+    case params[:action]
+    when 'review_bid', 'set_priority','get_quartiles'
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator',
+       'Student'].include? current_role_name and
+      ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer") : true)
+    else
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator'].include? current_role_name
+    end
+  end
 
   def assign
 =begin
@@ -160,9 +174,6 @@ class ReviewBiddingController < ApplicationController
 =end
     num_reviews_allowed = Assignment.where(id:assignment_id).pluck(:num_reviews_allowed).first
     json_like_bidding_hash = {"users": bidding_data, "tids": topics, "q_S": num_reviews_allowed}
-    puts('####################')
-    puts(json_like_bidding_hash)
-    puts('####################')
     uri = URI.parse(WEBSERVICE_CONFIG["review_bidding_webservice_url"])
     http = Net::HTTP.new(uri.host, uri.port)
     request = Net::HTTP::Post.new(uri.path, {'Content-Type' => 'application/json'})
@@ -201,22 +212,7 @@ class ReviewBiddingController < ApplicationController
     end
   end
 
-  def action_allowed?
-    case params[:action]
-    when 'review_bid', 'set_priority','get_quartiles'
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator',
-       'Student'].include? current_role_name and
-      ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer") : true)
-    else
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator'].include? current_role_name
-    end
-  end
+  
 
   #This method is responsible for getting the sign-up topics present in the current assignment so that
   # we can display in the topics   # table on the left side.Also, we will make sure that the topics on
@@ -244,37 +240,6 @@ class ReviewBiddingController < ApplicationController
       @bids = signed_up_topics
       @num_of_topics = @sign_up_topics.size
       render 'sign_up_sheet/review_bid'
-  end
-
-  def run_intelligent_assignment
-    priority_info = []
-    assignment = Assignment.find_by(id: params[:id])
-    topics = assignment.sign_up_topics
-    teams = assignment.teams
-    teams.each do |team|
-      # Exclude any teams already signed up
-      next if SignedUpTeam.where(team_id: team.id, is_waitlisted: 0).any?
-      # Grab student id and list of bids
-      bids = []
-      topics.each do |topic|
-        bid_record = Bid.find_by(team_id: team.id, topic_id: topic.id)
-        bids << (bid_record.nil? ? 0 : bid_record.priority ||= 0)
-      end
-      team.users.each {|user| priority_info << {pid: user.id, ranks: bids} if bids.uniq != [0] }
-    end
-    bidding_data = {users: priority_info, max_team_size: assignment.max_team_size}
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Bidding data for assignment #{assignment.name}: #{bidding_data}", request)
-    url = WEBSERVICE_CONFIG["topic_bidding_webservice_url"]
-    begin
-      response = RestClient.post url, bidding_data.to_json, content_type: :json, accept: :json
-      teams = JSON.parse(response)["teams"]
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Team formation info for assignment #{assignment.name}: #{teams}", request)
-      create_new_teams_for_bidding_response(teams, assignment, priority_info)
-      match_new_teams_to_topics(assignment)
-    rescue StandardError => e
-      flash[:error] = e.message
-    end
-    redirect_to controller: 'tree_display', action: 'list'
   end
 
   #This method is hit when we try to drag and drop the topics from the topics ->selections table
@@ -306,6 +271,7 @@ class ReviewBiddingController < ApplicationController
     end
   end
 
+  # This Method gives out the color for a particular topic based on 
   def get_quartiles(topic_id)
     assignment_id = SignUpTopic.where(id: topic_id).pluck(:assignment_id).first
     num_reviews_allowed = Assignment.where(id: assignment_id).pluck(:num_reviews_allowed).first
@@ -316,7 +282,7 @@ class ReviewBiddingController < ApplicationController
 
     if num_choosers_this_topic < avg_reviews_per_topic/2
       return 'rgb(124,252,0)'
-    elsif num_choosers_this_topic > avg_reviews_per_topic/2 and num_choosers_this_topic < (3/4)*avg_reviews_per_topic
+    elsif num_choosers_this_topic > avg_reviews_per_topic/2 and num_choosers_this_topic < avg_reviews_per_topic
       return 'rgb(255,255,0)'
     else
       return 'rgb(255,99,71)'

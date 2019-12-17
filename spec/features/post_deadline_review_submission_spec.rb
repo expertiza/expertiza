@@ -52,7 +52,7 @@ describe 'assignment review after deadline' do
 
   it "should not allow submission after deadline" do
 
-    login_as("student_2065")
+    login_as("student2065")
 
     # goto student_task page, which has link to "Your work"
     visit '/student_task/view?id=1'

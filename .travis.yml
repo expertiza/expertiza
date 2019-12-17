@@ -5,9 +5,9 @@ env:
     - secure: fpBhnY1Y4U0qx/BOFyO8OaS5gBPlF9Y8mFONF7WkphqbEJytlfIunbLFpQ1CX/9rDo1+96g0TDJUMx3bs4AnsgGEt16oSLOiRhKfyMcdsVRJry8a0PZMtYaEpBReyPv0Va0V7VTy1hFzLKTkmxKoIoYgNY0msocRypl/K6CF7l8=
   matrix:
     - TESTFOLDER=features
-    - TESTFOLDER=models
-    - TESTFOLDER=controllers
-    - TESTFOLDER=helpers
+    #- TESTFOLDER=models
+    #- TESTFOLDER=controllers
+    #- TESTFOLDER=helpers
 language: ruby
 dist: trusty
 cache:

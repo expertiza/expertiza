@@ -8,31 +8,39 @@ class ReviewBiddingController < ApplicationController
   require "json"
 
   def assign
-    # =begin
-    #
-    # Assigns topics to reviewers according to the topics they have bid for.
-    #
-    # This method is supposed to be invoked when an Instructor wants to assign
-    # topics to the reviewers after the bidding is completed.
-    #
-    # PARAMETERS
-    #
-    # ----------
-    #
-    # params[:id]   :   The id of the assignment for which the
-    #                   Instructor wants to perform review-topic-matching.
-    #
-    # =end
+=begin
+    Assigns topics to reviewers according to the topics they have bid for.
+
+    This method is supposed to be invoked when an Instructor wants to assign
+    topics to the reviewers after the bidding is completed.
+
+    PARAMETERS
+
+    ----------
+
+    params[:id]   :   The id of the assignment for which the
+                      Instructor wants to perform review-topic-matching.
+=end
     assignment_id = params[:id]
     reviewers = assignment_reviewers(assignment_id)
     topics = SignUpTopic.where(assignment_id: assignment_id).ids
     bidding_data = assignment_bidding_data(assignment_id,reviewers)
-    matched_topics = reviewer_topic_matching(bidding_data,topics)
+    matched_topics = reviewer_topic_matching(bidding_data,topics,assignment_id)
     assign_matched_topics(assignment_id,reviewers,matched_topics)
     redirect_to :back
   end
 
   def assignment_reviewers(assignment_id)
+=begin
+    Returns the participant_ids of the reviewers who have a topic assigned to
+    them in a given assignment.
+
+    PARAMETERS
+
+    ----------
+
+    assignment_id   :   The id of the assignment whose reviewers are required.
+=end
     reviewers = AssignmentParticipant.where(parent_id: assignment_id).ids
     for reviewer in reviewers do
       if(reviewer_self_topic(reviewer,assignment_id)==nil)
@@ -43,22 +51,31 @@ class ReviewBiddingController < ApplicationController
   end
 
   def assignment_bidding_data(assignment_id,reviewers)
-    # =begin
-    #
-    # Returns a Hash that contains all the necessary bidding data of an
-    # assignment.
-    #
-    # PARAMETERS
-    #
-    # ----------
-    #
-    # assignment_id   :   The id of the assignment whose bidding data
-    #                     is required.
-    #
-    # reviewers       :   The list of participant_ids of all the reviewers in the
-    #                     assingment.
-    #
-    # =end
+=begin
+    Returns a Hash that contains all the necessary bidding data of an
+    assignment in the following format:
+
+    {reviewer_1  =>  reviewer_1_bidding_data,
+     reviewer_2  =>  reviewer_2_bidding_data,
+     .
+     .
+     reviewer_n  =>  reviewer_n_bidding_data,
+    }
+
+    where reviewer_i is the participant_id of a reviewer and
+    reviewer_i_bidding_data is the hash containing the bidding data of that
+    reviewer.
+
+    PARAMETERS
+
+    ----------
+
+    assignment_id   :   The id of the assignment whose bidding data
+                        is required.
+
+    reviewers       :   The list of participant_ids of all the reviewers in the
+                        assingment.
+=end
     bidding_data = Hash.new
     for reviewer in reviewers do
       bidding_data[reviewer] = reviewer_bidding_data(reviewer,assignment_id)
@@ -67,21 +84,29 @@ class ReviewBiddingController < ApplicationController
   end
 
   def reviewer_bidding_data(reviewer,assignment_id)
-    # =begin
-    #
-    # Returns a Hash that contains the necessary bidding data of a particular
-    # reviewer.
-    #
-    # PARAMETERS
-    #
-    # ----------
-    #
-    # reviewer    :   The participant_id of the reviewer.
-    #
-    # NOTE: Since a participant_id is associated with a unique assignment, the
-    #       method does not require assignment_id as an argument.
-    #
-    # =end
+=begin
+    Returns a Hash that contains the necessary bidding data of a particular
+    reviewer in the following format:
+
+    {priority  =>  [p1, p2, p3, ..., pm],
+     time      =>  [t1, t2, t3, ..., tm],
+     tid       =>  [T1, T2, T3, ..., Tm],
+     otid      =>  [ST]
+    }
+
+    where Ti is the topic_id of a topic, pi is the priority of topic Ti set by
+    the reviewer, ti is the time at which the bid for topic Ti was last updated
+    and ST is the self_topic of the reviewer.
+
+    PARAMETERS
+
+    ----------
+
+    reviewer    :   The participant_id of the reviewer.
+
+    NOTE: Since a participant_id is associated with a unique assignment, the
+          method does not require assignment_id as an argument.
+=end
     self_topic = reviewer_self_topic(reviewer,assignment_id)
     bidding_data = {'priority' => [], 'time' => [], 'tid' =>  [], 'otid' => self_topic}
     bids = ReviewBid.where(participant_id: reviewer)
@@ -95,21 +120,19 @@ class ReviewBiddingController < ApplicationController
   end
 
   def reviewer_self_topic(reviewer,assignment_id)
-    # =begin
-    #
-    # Return the topic_id of the topic on which the reviewer is working in the
-    # assignment.
-    #
-    # PARAMETERS
-    #
-    # ----------
-    #
-    # reviewer    :   The participant_id of the reviewer.
-    #
-    # NOTE: Since a participant_id is associated with a unique assignment, the
-    #       method does not require assignment_id as an argument.
-    #
-    # =end
+=begin
+    Return the topic_id of the topic on which the reviewer is working in the
+    assignment.
+
+    PARAMETERS
+
+    ----------
+
+    reviewer    :   The participant_id of the reviewer.
+
+    NOTE: Since a participant_id is associated with a unique assignment, the
+          method does not require assignment_id as an argument.
+=end
     user_id = Participant.where(id: reviewer).pluck(:user_id).first
     puts(reviewer.to_s+'\n')
     puts(user_id.to_s+'\n')
@@ -120,24 +143,23 @@ class ReviewBiddingController < ApplicationController
     return self_topic.first
   end
 
-  def reviewer_topic_matching(bidding_data,topics)
-    # =begin
-    #
-    # Returns a Hash in which the keys are the participant_ids of the reviewers
-    # and the values are the lists of topic_ids of topics assigned to the
-    # corresponding reviewers.
-    #
-    # PARAMETERS
-    #
-    # ----------
-    #
-    # bidding_data    :   A Hash that contains all the necessary bidding data of
-    #                     the assignment.
-    #
-    # Topics          :   The topic_ids of all the topics in the assignment.
-    #
-    # =end
-    json_like_bidding_hash = {"users": bidding_data, "tids": topics}
+  def reviewer_topic_matching(bidding_data,topics,assignment_id)
+=begin
+    Returns a Hash in which the keys are the participant_ids of the reviewers
+    and the values are the lists of topic_ids of topics assigned to the
+    corresponding reviewers.
+
+    PARAMETERS
+
+    ----------
+
+    bidding_data    :   A Hash that contains all the necessary bidding data of
+                        the assignment.
+
+    Topics          :   The topic_ids of all the topics in the assignment.
+=end
+    num_reviews_allowed = Assignment.where(id:assignment_id).pluck(:num_reviews_allowed).first
+    json_like_bidding_hash = {"users": bidding_data, "tids": topics, "q_S": num_reviews_allowed}
     puts('####################')
     puts(json_like_bidding_hash)
     puts('####################')
@@ -150,24 +172,22 @@ class ReviewBiddingController < ApplicationController
   end
 
   def assign_matched_topics(assignment_id,reviewers,matched_topics)
-    # =begin
-    #
-    # Assign each reviewer the topics with which they were matched.
-    #
-    # PARAMETERS
-    #
-    # ----------
-    #
-    # assignment_id   :   The id of the assignment.
-    #
-    # reviewers       :   The participant_ids of all the reviewers in the
-    #                     assignment.
-    #
-    # matched_topics  :   A Hash in which the keys are the participant_ids of the
-    #                     reviewers and the values are the lists of topic_ids of
-    #                     topics assigned to the corresponding reviewers.
-    #
-    # =end
+=begin
+    Assign each reviewer the topics with which they were matched.
+
+    PARAMETERS
+
+    ----------
+
+    assignment_id   :   The id of the assignment.
+
+    reviewers       :   The participant_ids of all the reviewers in the
+                        assignment.
+
+    matched_topics  :   A Hash in which the keys are the participant_ids of the
+                        reviewers and the values are the lists of topic_ids of
+                        topics assigned to the corresponding reviewers.
+=end
     for reviewer in reviewers do
       reviewer_matched_topics = matched_topics[reviewer.to_s]
       for topic in reviewer_matched_topics do
@@ -294,9 +314,9 @@ class ReviewBiddingController < ApplicationController
     num_choosers_this_topic = ReviewBid.where(sign_up_topic_id: topic_id).length
     avg_reviews_per_topic = (num_participants_in_assignment*num_reviews_allowed)/num_topics_in_assignment
 
-    if num_choosers_this_topic < avg_reviews_per_topic/3
+    if num_choosers_this_topic < avg_reviews_per_topic/2
       return 'rgb(124,252,0)'
-    elsif num_choosers_this_topic > avg_reviews_per_topic/3 and num_choosers_this_topic < avg_reviews_per_topic/2
+    elsif num_choosers_this_topic > avg_reviews_per_topic/2 and num_choosers_this_topic < (3/4)*avg_reviews_per_topic
       return 'rgb(255,255,0)'
     else
       return 'rgb(255,99,71)'

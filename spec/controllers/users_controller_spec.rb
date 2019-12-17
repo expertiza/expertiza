@@ -275,7 +275,7 @@ describe UsersController do
     end
   end
 
-  context "in" do
+  context "#create_requested_user_record" do
     it 'if user not exists and requested user is saved' do
       params = {
         user: {name: 'instructor6',

@@ -19,6 +19,11 @@ describe 'assignment review after deadline' do
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: "submission").first, due_at: DateTime.now.in_time_zone - 1.day)
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: "review").first, due_at: DateTime.now.in_time_zone - 1.day)
 
+    create(:assignment_team, id: 1)
+
+    create(:response)
+    create(:review_response_map)
+
   end
 
   it "should not be able to review work after deadline" do
@@ -59,7 +64,9 @@ describe 'assignment review after deadline' do
 
   end
 
-  it "should create new response when editing review" do
+  it "should only use submitted response from review_response_map for score calculation" do
+    @a_team = create(:assignment_team)
+    expect(ReviewResponseMap.get_assessments_for(@a_team)).to eq([])
 
   end
 

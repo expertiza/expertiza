@@ -98,7 +98,7 @@ class Team < ActiveRecord::Base
           members.each do |member|
             if Participant.where(['user_id = ? and can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', member.user_id ,0, 0, 0, self.parent_id]).count > 0
               mentor=member
-              email_single_team_member(user,mentor)
+              Mailer.notify_single_team_member(user,mentor,self)
             end
           end
 
@@ -110,8 +110,8 @@ class Team < ActiveRecord::Base
               ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{self.id}")
 
               # Email notification
-              email_mentor(mentor)
-              email_team_members(mentor)
+              Mailer.notify_mentor(mentor,self)
+              Mailer.notify_team_members(mentor,self)
              end
         end
       end
@@ -119,7 +119,8 @@ class Team < ActiveRecord::Base
     can_add_member
   end
 
-  # Assign mentor with lowest team number he/she mentored
+
+  # Assign mentor with lowest number of teams he/she mentored
   def assign_mentor
     # find all mentor of this assignment
     mentors = Participant.where(['can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', 0, 0, 0, self.parent_id])
@@ -140,51 +141,6 @@ class Team < ActiveRecord::Base
       end
     end
     mentor_assigned
-  end
-
-  # email mentor about team info(names+emails)
-  def email_mentor(mentor)
-    members = TeamsUser.where(team_id: self.id)
-    members_name=""
-    for i in 0..members.size-2 do
-      members_name += " "+ members[i].fullname+", "+User.find(members[i].user_id).email+"<br>"
-    end
-    Mailer.delayed_message(bcc: [User.find(mentor.user_id).email],
-                             subject: "[Expertiza]: New Team Assignment",
-                             body: "You have been assigned as a mentor to team " + self.name + "<br>Current member:<br>"+members_name).deliver_now
-  end
-
-  # email all current team members about mentor and team member info
-  def email_team_members(mentor)
-    members = TeamsUser.where(team_id: self.id)
-    members_name = ""
-    # i=size-1 does not count since it will be the mentor not student
-    for i in 0..members.size-2 do
-      members_name += " " + members[i].fullname+", "+User.find(members[i].user_id).email+"<br>"
-    end
-    mentor_info=mentor.fullname + "("+User.find(mentor.user_id).email+") "
-    members.each do |member|
-      if member.user_id != mentor.user_id
-        Mailer.delayed_message(bcc: [User.find(member.user_id).email],
-                               subject: "[Expertiza]: New Mentor Assignment",
-                               body: mentor_info+"has been assigned as your mentor for assignment "+ Assignment.find(self.parent_id).name+"<br>Current member:<br>"+members_name).deliver_now
-      end
-    end
-  end
-
-  # Only email new added member about mentor and team info
-  def email_single_team_member(member,mentor)
-    members = TeamsUser.where(team_id: self.id)
-    members_name = ""
-    for i in 0..members.size-1 do
-      if members[i].user_id !=  mentor.user_id
-        members_name += " " + members[i].fullname+", "+User.find(members[i].user_id).email+"<br>"
-      end
-    end
-    mentor_info=mentor.fullname + "("+User.find(mentor.user_id).email+") "
-    Mailer.delayed_message(bcc: [member.email],
-                           subject: "[Expertiza]: New Mentor Assignment",
-                           body: mentor_info+"has been assigned as your mentor for assignment"+ Assignment.find(self.parent_id).name+"<br>Current member:<br>"+members_name).deliver_now
   end
 
   # Define the size of the team

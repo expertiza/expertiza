@@ -2,7 +2,7 @@ describe "assignment submisstion test" do
   before(:each) do
     # create assignment and topic
     create(:assignment, name: "Assignment1684", directory_path: "Assignment1684")
-    create_list(:participant, 3)
+    create_list(:participant, 4)
     create(:topic, topic_name: "Topic")
     create(:deadline_type, name: "submission")
     create(:deadline_type, name: "review")

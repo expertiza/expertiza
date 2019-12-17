@@ -154,8 +154,6 @@ class ReviewBiddingController < ApplicationController
           method does not require assignment_id as an argument.
 =end
     user_id = Participant.where(id: reviewer).pluck(:user_id).first
-    puts(reviewer.to_s+'\n')
-    puts(user_id.to_s+'\n')
     self_topic = ActiveRecord::Base.connection.execute("SELECT ST.topic_id FROM teams T, teams_users TU,signed_up_teams ST where TU.team_id=T.id and T.parent_id="+assignment_id.to_s+" and TU.user_id="+user_id.to_s+" and ST.team_id=TU.team_id;").first
     if self_topic==nil
       return self_topic
@@ -220,7 +218,7 @@ class ReviewBiddingController < ApplicationController
 
   
 
-  #This method is responsible for getting the sign-up topics present in the current assignment so that
+  # This method is responsible for getting the sign-up topics present in the current assignment so that
   # we can display in the topics   # table on the left side.Also, we will make sure that the topics on
   # the left side will not contain the topic the user has worked on.  # Then we retrieve the bids made
   # by the user for reviews from the review_bids model based on the participant id and the assignment
@@ -248,7 +246,7 @@ class ReviewBiddingController < ApplicationController
       render 'sign_up_sheet/review_bid'
   end
 
-  #This method is hit when we try to drag and drop the topics from the topics ->selections table
+  # This method is hit when we try to drag and drop the topics from the topics ->selections table
   # as well as selections to topics table.Also, if we juggle the topics in the selections table,
   # then also the the tablelist coffee file is invoked.We are making sure that we we move the topics
   # from the selection table to topics table, those records are deleted from the review_bids model.

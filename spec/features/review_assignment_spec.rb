@@ -2,7 +2,7 @@ describe "peer review testing" do
   before(:each) do
     # create assignment and topic
     create(:assignment, name: "TestAssignment", directory_path: "TestAssignment")
-    create_list(:participant, 4)
+    create_list(:participant, 3)
     create(:topic, topic_name: "TestTopic")
     create(:deadline_type, name: "submission")
     create(:deadline_type, name: "review")

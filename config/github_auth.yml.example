@@ -3,6 +3,9 @@
 development:
   client_key: '112233445566'
   client_secret: '112233445566'
+  enterprise_domain: 'github.ncsu.edu'
+  enterprise_client_key: '665544332211'
+  enterprise_client_secret: '665544332211'
 
 test:
   client_key: '112233445566'

@@ -52,11 +52,11 @@ describe 'assignment review after deadline' do
   it "should not allow submission after deadline" do
 
     #login_as("student2065")
-    user = User.find_by(name: "student2066")
+    user = User.find_by(name: "student2064")
     stub_current_user(user, user.role.name, user.role)
 
     # goto student_task page, which has link to "Your work"
-    visit '/student_task/view?id=4'
+    visit '/student_task/view?id=1'
 
     # the page will have text "Your work" but will be grayed
     expect(page).to have_content "Your work"

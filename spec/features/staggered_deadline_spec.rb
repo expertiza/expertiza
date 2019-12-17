@@ -8,7 +8,7 @@ describe "Staggered deadline test" do
            staggered_deadline: true,
            max_team_size: 1,
            allow_selecting_additional_reviews_after_1st_round: true)
-    create_list(:participant, 4)
+    create_list(:participant, 3)
     create(:topic, topic_name: "Topic_1")
     create(:topic, topic_name: "Topic_2")
     create(:topic, topic_name: "Topic_3")

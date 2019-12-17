@@ -1,5 +1,6 @@
 module ConferenceHelper
 
+  #Function to create Author for conference type assignment
   def create_author
     params[:user][:name] = params[:user][:email] unless !params[:user][:name].nil? and !params[:user][:name].empty?
     @user = User.new(user_params)
@@ -12,6 +13,7 @@ module ConferenceHelper
     @user.institution_id = nil
     if @user.save
       password = @user.reset_password # the password is reset
+      #Mail to be sent to Author once the user has been created. New partial is used as content for email is different from normal user
       prepared_mail = MailerHelper.send_mail_for_conference_user(@user, "Your Expertiza account and password have been created.", "author_conference_invitation", password, @assignment.name)
       prepared_mail.deliver
       flash[:success] = "A new password has been sent to new user's e-mail address."
@@ -47,8 +49,9 @@ module ConferenceHelper
     end
   end
 
-  #Function to add co-author as participant in conference type assignment
+  #Function to add Author/co-author as participant in conference type assignment
   def add_participant_coauthor
+    # Check if Assignment Participant already exists
     @participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', @user.id, @assignment.id).first
     if @participant.nil?
       new_participant = AssignmentParticipant.create(parent_id: @assignment.id,

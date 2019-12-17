@@ -133,6 +133,7 @@ class UsersController < ApplicationController
     if params[:user][:assignment].nil?
       create_normal_user
     else
+      # Check if user needs to be created as author for conference type assignment and add author to assignment
       if create_conference_user
         add_conference_user_as_participant
       end
@@ -338,7 +339,7 @@ class UsersController < ApplicationController
   end
 
   def create_conference_user
-    #check if user is already present with given username in system
+    # check if user is already present with given username in system
     existing_user = User.find_by(name: params[:user][:name])
     # existing_user = User.where('name = ? and email = ?', params[:user][:name], params[:user][:email]).first
     # if user exist then add user as participant to assignment else create account and then add as participant
@@ -348,6 +349,7 @@ class UsersController < ApplicationController
         redirect_to request.referrer
         return false
       end
+      # Create author called from Conference Helper
       create_author
     else
       @user = existing_user
@@ -388,6 +390,7 @@ class UsersController < ApplicationController
   end
 
   def add_conference_user_as_participant
+    # Author added as participant, function written in Conference Helper
     add_participant_coauthor
     flash[:success] = "You are added as an Author for assignment " + @assignment.name
     redirect_to get_redirect_url_link

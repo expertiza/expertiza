@@ -1,4 +1,10 @@
+
+#E1986: Allow Reviewers to bid on what to review/
 class ReviewBiddingController < ApplicationController
+
+  # This Controller was to created to facilitate the bidding functionality for reviews. 
+  # review_bid, set_priority, get_quatiles methods are used to handle the UI, and storing the bids inside the DB.
+  # assign is the entry point for invoking the web service, getting the results and storing in them in the ResponseMap table.
 
   require "net/http"
   require "uri"
@@ -126,8 +132,8 @@ class ReviewBiddingController < ApplicationController
     bids = ReviewBid.where(participant_id: reviewer)
     for bid in bids do
       bidding_data['priority'] << bid.priority
-      time_since_update = Time.now() - Time.parse(bid.updated_at)
-      bidding_data['time'] << time_since_update
+      # bidding_data['time'] << bid.updated_at
+      bidding_data['time'] << 1
       bidding_data['tid'] << bid.sign_up_topic_id
     end
     return bidding_data
@@ -148,6 +154,8 @@ class ReviewBiddingController < ApplicationController
           method does not require assignment_id as an argument.
 =end
     user_id = Participant.where(id: reviewer).pluck(:user_id).first
+    puts(reviewer.to_s+'\n')
+    puts(user_id.to_s+'\n')
     self_topic = ActiveRecord::Base.connection.execute("SELECT ST.topic_id FROM teams T, teams_users TU,signed_up_teams ST where TU.team_id=T.id and T.parent_id="+assignment_id.to_s+" and TU.user_id="+user_id.to_s+" and ST.team_id=TU.team_id;").first
     if self_topic==nil
       return self_topic
@@ -200,6 +208,8 @@ class ReviewBiddingController < ApplicationController
     for reviewer in reviewers do
       reviewer_matched_topics = matched_topics[reviewer.to_s]
       for topic in reviewer_matched_topics do
+        # puts(topic)
+        # puts(topic.class)
         matched_reviewee = SignedUpTeam.where(topic_id: topic).pluck(:team_id).first
         if(matched_reviewee != nil)
           ReviewResponseMap.create({:reviewed_object_id => assignment_id, :reviewer_id => reviewer, :reviewee_id => matched_reviewee, :type => "ReviewResponseMap"})
@@ -267,7 +277,7 @@ class ReviewBiddingController < ApplicationController
     end
   end
 
-  # This Method gives out the color for a particular topic based on 
+  # This Method gives out the color for a particular topic based on the number of choosers for a particular topic. Check wiki for more information.
   def get_quartiles(topic_id)
     assignment_id = SignUpTopic.where(id: topic_id).pluck(:assignment_id).first
     num_reviews_allowed = Assignment.where(id: assignment_id).pluck(:num_reviews_allowed).first

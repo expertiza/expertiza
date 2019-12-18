@@ -28,7 +28,7 @@ class ResponseController < ApplicationController
     if map.is_a? ReviewResponseMap
       reviewee_team = AssignmentTeam.find(map.reviewee_id)
       return current_user_id?(user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' ||
-          (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) ||
+        (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) ||
           (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
     else
       current_user_id?(user_id)
@@ -156,10 +156,10 @@ class ResponseController < ApplicationController
     @response = Response.where(map_id: @map.id, round: @round.to_i).order(created_at: :desc).first
     if @response.nil?
       @response = Response.create(
-          map_id: @map.id,
-          additional_comment: params[:review][:comments],
-          round: @round.to_i,
-          is_submitted: is_submitted
+        map_id: @map.id,
+        additional_comment: params[:review][:comments],
+        round: @round.to_i,
+        is_submitted: is_submitted
       )
     end
     was_submitted = @response.is_submitted
@@ -285,12 +285,12 @@ class ResponseController < ApplicationController
       @current_round = @assignment.number_of_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
     when
-    "MetareviewResponseMap",
-        "TeammateReviewResponseMap",
-        "FeedbackResponseMap",
-        "CourseSurveyResponseMap",
-        "AssignmentSurveyResponseMap",
-        "GlobalSurveyResponseMap"
+      "MetareviewResponseMap",
+      "TeammateReviewResponseMap",
+      "FeedbackResponseMap",
+      "CourseSurveyResponseMap",
+      "AssignmentSurveyResponseMap",
+      "GlobalSurveyResponseMap"
       @questionnaire = @map.questionnaire
     end
   end
@@ -299,8 +299,8 @@ class ResponseController < ApplicationController
     @review_scores = []
     @questions.each do |question|
       @review_scores << Answer.where(
-          response_id: @response.id,
-          question_id:  question.id
+        response_id: @response.id,
+        question_id:  question.id
       ).first
     end
   end
@@ -316,7 +316,7 @@ class ResponseController < ApplicationController
   def set_dropdown_or_scale
     use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.try(:id),
                                                  questionnaire_id: @questionnaire.try(:id))
-                       .first.try(:dropdown)
+                                          .first.try(:dropdown)
     @dropdown_or_scale = (use_dropdown ? 'dropdown' : 'scale')
   end
 
@@ -341,7 +341,7 @@ class ResponseController < ApplicationController
       Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '') if a.nil?
     end
   end
-
+  
   def calculate_total_score
     @total_score = Hash.new
     @questions.each do |question|

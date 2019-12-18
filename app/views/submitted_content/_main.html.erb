@@ -37,3 +37,12 @@
     <% end %>
   <% end %>
 <% end %>
+
+  <!-- If the instructor allows the team to create supplementary review questionnaire, the link is give below -->
+<!-- can't use create method for supplementary_review_questionnaire controller because of the create method will redirect to a path like /?id=1 -->
+<% if stage != "Finished" and controller.controller_name == 'submitted_content' and @can_submit %>
+  <% if @assignment.is_supplementary_review_enabled %>
+  <%= link_to  "Create/Edit Supplementary Review Questionnaire", {:controller => "supplementary_review_questionnaires", :action => "create_supplementary_review_questionnaire", :id => participant.id } %>    
+  <% end %>
+<% end %>
+  

@@ -6,7 +6,7 @@ describe Team do
   let(:user) { build(:student, id: 1, name: 'no name', fullname: 'no one', participants: [participant]) }
   let(:user2) { build(:student, id: 2) }
   let(:user3) { build(:student, id: 3) }
-  let(:team) { build(:assignment_team, id: 1, name: 'no team', users: [user]) }
+  let(:team) { build(:assignment_team, id: 1, name: 'no team', users: [user], supplementary_review_questionnaire_id: 1) }
   let(:team_user) { build(:team_user, id: 1, user: user) }
   before(:each) do
     allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
@@ -253,6 +253,13 @@ describe Team do
       allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team])
       allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
       expect(Team.export([], 1, {team_name: 'false'}, AssignmentTeam.new)).to eq([["no team", "no name"]])
+    end
+  end
+
+  describe '.get_supplementary_review_questionnaire_id_of_team' do
+    it 'return supplementary_review_questionnaire_id of team' do
+      allow(Team).to receive(:find).with(1).and_return(team)
+      expect(Team.get_supplementary_review_questionnaire_id_of_team(1)).to eq(1)
     end
   end
 end

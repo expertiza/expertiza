@@ -64,7 +64,7 @@ class GradesController < ApplicationController
     return if redirect_when_disallowed
     @assignment = @participant.assignment
     questionnaires = @assignment.questionnaires
-    @questions = retrieve_questions questionnaires, @assignment.id
+    @questions = retrieve_questions questionnaires, @assignment.id, @team_id
     # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
     @pscore = @participant.scores(@questions)
     make_chart
@@ -86,7 +86,7 @@ class GradesController < ApplicationController
     @team = @participant.team
     @team_id = @team.id
     questionnaires = @assignment.questionnaires
-    @questions = retrieve_questions questionnaires, @assignment.id
+    @questions = retrieve_questions questionnaires, @assignment.id, @team_id
     @pscore = @participant.scores(@questions)
     @vmlist = []
 
@@ -107,6 +107,17 @@ class GradesController < ApplicationController
       end
       vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
       vmquestions = questionnaire.questions
+
+      # add supplementary questions
+      supplementary_review_questionnaire_id = Team.get_supplementary_review_questionnaire_id_of_team(@team_id)
+      unless supplementary_review_questionnaire_id.nil?
+        supplementary_review_questionnaire = Questionnaire.find(supplementary_review_questionnaire_id)
+        unless supplementary_review_questionnaire.nil?
+          supplementary_review_questions = supplementary_review_questionnaire.questions
+          vmquestions += supplementary_review_questions
+        end
+      end
+
       vm.add_questions(vmquestions)
       vm.add_team_members(@team)
       vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)

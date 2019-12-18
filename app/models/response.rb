@@ -240,6 +240,14 @@ class Response < ActiveRecord::Base
       questionnaire = self.questionnaire_by_answer(answers.first)
       questionnaire_max = questionnaire.max_question_score
       questions = questionnaire.questions.sort_by(&:seq)
+      unless self.map.nil? || self.map.contributor.nil? 
+        supplementary_review_questionnaire_id = Team.get_supplementary_review_questionnaire_id_of_team(self.map.contributor.id)
+      end
+      unless supplementary_review_questionnaire_id.nil?
+        supplementary_review_questionnaire = Questionnaire.find(supplementary_review_questionnaire_id)
+        supplementary_review_questions = supplementary_review_questionnaire.questions.sort_by(&:seq)
+        questions += supplementary_review_questions
+      end
       # get the tag settings this questionnaire
       tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id) : nil
       code = add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments, current_user
@@ -277,3 +285,4 @@ class Response < ActiveRecord::Base
     code
   end
 end
+

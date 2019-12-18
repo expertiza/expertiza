@@ -160,8 +160,9 @@ class Assessment360Controller < ApplicationController
   # The peer review score is taken from the questions for the assignment
   def find_peer_review_score(user_id, assignment_id)
     participant = AssignmentParticipant.find_by(user_id: user_id, parent_id: assignment_id)
+    team_id = TeamsUser.team_id(participant.parent_id, participant.user_id)
     assignment = participant.assignment
-    questions = retrieve_questions assignment.questionnaires, assignment_id
+    questions = retrieve_questions assignment.questionnaires, assignment_id, team_id 
 
     participant.scores(questions)
   end

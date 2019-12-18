@@ -37,12 +37,15 @@ class Cake < ScoredQuestion
     end
     html = '<table> <tbody> <tr><td>'
     html += '<label for="responses_' + count.to_s + '"">' + self.txt + '&nbsp;&nbsp;</label>'
-    html += '<input class="form-control" id="responses_' + count.to_s + '" min="0" name="responses[' + count.to_s + '][score]"'
+    html += '<br/>'
+    html += '<div class="block-cake">'
+    html += '<input class="form-control-cake" id="responses_' + count.to_s + '" min="0" name="responses[' + count.to_s + '][score]"'
     html += 'value="' + answer.answer.to_s + '"' unless answer.nil?
     html += 'type="number" size = 30 onchange="validateScore(this.value,' + total_score + ',this.id,\''+view_type.to_s+'\')"> '
+    html += '<p style = "padding: 10px">Total contribution so far (excluding current review): ' + total_score + '% </p>' #display total
+    html += '</div>'
     html += '</td></tr></tbody></table>'
     html += '<td width="10%"></td></tr></table>'
-    html += '<p>Total contribution so far (excluding current review): ' + total_score + '% </p>' #display total
     html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments"' \
         ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
     html += answer.comments unless answer.nil?
@@ -54,7 +57,7 @@ class Cake < ScoredQuestion
               {
                 if (int_val+int_total_score>100)
                   {
-                    alert("Total contribution cannot exceed 100, current total: " + (int_val+int_total_score));
+                    alert("Total contribution cannot exceed 100, current total: " + (int_val+int_total_score));
                     document.getElementById(id).value = 0
                   }
               }
@@ -62,7 +65,7 @@ class Cake < ScoredQuestion
                {
                   if (int_val > 100)
                   {
-                    alert("Total contribution cannot exceed 100, current total: " + (int_val));
+                    alert("Total contribution cannot exceed 100, current total: " + (int_val));
                     document.getElementById(id).value = 0
                   }
                 }

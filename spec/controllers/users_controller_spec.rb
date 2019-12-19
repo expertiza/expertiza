@@ -9,7 +9,7 @@ describe UsersController do
   let(:student4) { build(:student, id: 20, role_id: 4) }
   let(:student5) { build(:student, role_id: 4, parent_id: 3) }
   let(:student6) { build(:student, role_id: nil, name: :lilith)}
-
+  let(:participant) { build(:participant, id: 1) }
   let(:institution1) {build(:institution, id: 1)}
   let(:requested_user1) {RequestedUser.new id: 4, name: 'requester1', role_id: 2, fullname: 're, requester1', 
     institution_id: 1, email: 'requester1@test.com', status: nil, self_introduction: 'no one'}
@@ -128,6 +128,17 @@ describe UsersController do
       get :new, params, session
       expect(response).to render_template(:new)
     end
+
+    it 'saves successfully for logged in user as Author' do
+      params = {assignment_id:2}
+      session = {user: student1}
+      stub_current_user(student1, student1.role.name, student1.role)
+      allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)
+      allow(AssignmentParticipant).to receive(:create).with(any_args).and_return(participant)
+      post :new, params,session
+      expect(flash[:success]).to eq "You are added as an Author for assignment final2"
+      expect(response).to redirect_to('http://test.host/student_task/list')
+    end
   end
 
   context "#request new" do
@@ -219,6 +230,21 @@ describe UsersController do
       expect(flash[:success]).to eq "You are added as an Author for assignment final2"
     end
 
+    it 'save successfully for existing user as Author' do
+      params = {
+          user: {name: 'lily',
+                 assignment: '2'
+          }
+      }
+      allow(User).to receive(:find_by).with(name: 'lily').and_return(student1)
+      allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)
+      allow(Assignment).to receive(:find).with('2').and_return(assignment1)
+      allow(AssignmentParticipant).to receive(:create).with(any_args).and_return(participant)
+      allow(User).to receive(:find).with(1).and_return(instructor1)
+      post :create, params
+      expect(flash[:success]).to eq "You are added as an Author for assignment final2"
+    end
+
     it 'save unsuccessfully' do
       expect_any_instance_of(User).to receive(:save).and_return(false)
       session = {user: admin}
@@ -249,7 +275,7 @@ describe UsersController do
     end
   end
 
-  context "in" do
+  context "#create_requested_user_record" do
     it 'if user not exists and requested user is saved' do
       params = {
         user: {name: 'instructor6',

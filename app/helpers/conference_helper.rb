@@ -65,6 +65,7 @@ module ConferenceHelper
       new_participant.set_handle
     end
     #set_handle from assignment controller is called
+
   end
 
   #User parameters for creating co-author, we require only minimum set of parameters.

@@ -39,7 +39,7 @@ module ReviewMappingHelper
   #
   # gets color according to review and assignment submission status
   #
-  def get_team_name_color_in_review_report(response_map)
+  def get_team_color(response_map)
     assignment_created = @assignment.created_at
     assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
     if Response.exists?(map_id: response_map.id)
@@ -132,7 +132,7 @@ module ReviewMappingHelper
   end
 
   # varying rubric by round
-  def get_each_round_score_awarded_for_review_report(reviewer_id, team_id)
+  def get_awarded_review_score(reviewer_id, team_id)
     (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----') }
     (1..@assignment.num_review_rounds).each do |round|
       if @review_scores[reviewer_id] && @review_scores[reviewer_id][round] && @review_scores[reviewer_id][round][team_id] && @review_scores[reviewer_id][round][team_id] != -1.0
@@ -141,7 +141,7 @@ module ReviewMappingHelper
     end
   end
 
-  def get_min_max_avg_value_for_review_report(round, team_id)
+  def get_review_matrix(round, team_id)
     %i[max min avg].each {|metric| instance_variable_set('@' + metric.to_s, '-----') }
     if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? {|k| @avg_and_ranges[team_id][round].key? k }
       %i[max min avg].each do |metric|
@@ -329,7 +329,7 @@ module ReviewMappingHelper
     @rspan_round_three = @review_responses_round_three.nil? ? 0 : @review_responses_round_three.length
   end
 
-  def get_certain_round_review_and_feedback_response_map_for_feedback_report(author)
+  def get_certain_round_review_and_feedback_response_map(author)
     @feedback_response_maps = FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?", @all_review_response_ids, author.id])
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     @review_response_map_ids = ReviewResponseMap.where(["reviewed_object_id = ? and reviewee_id = ?", @id, @team_id]).pluck("id")

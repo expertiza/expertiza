@@ -13,6 +13,7 @@ describe ReviewMappingController do
   let(:participant1) { double('AssignmentParticipant', id: 2, can_review: true, user: double('User', id: 2)) }
   let(:user) { double('User', id: 3) }
   let(:participant2) { double('AssignmentParticipant', id: 3, can_review: true, user: user) }
+  let(:participant3) { double('Participant', user_id: 1, parent_id: '1', can_review: true) }
   let(:team) { double('AssignmentTeam', name: 'no one') }
   let(:team1) { double('AssignmentTeam', name: 'no one1') }
 
@@ -81,11 +82,13 @@ describe ReviewMappingController do
         allow(User).to receive(:from_params).with(any_args).and_return(user)
         allow(AssignmentParticipant).to receive(:where).with(user_id: 1, parent_id: 1)
                                                        .and_return([double('AssignmentParticipant', id: 1, name: 'no one')])
+        allow(Participant).to receive_message_chain(:where, :first)
+          .with(parent_id: '1', user_id: 1).with(no_args).and_return(participant3)
         allow(ReviewResponseMap).to receive_message_chain(:where, :first)
           .with(reviewee_id: '1', reviewer_id: 1).with(no_args).and_return(nil)
         allow(ReviewResponseMap).to receive(:create).with(reviewee_id: '1', reviewer_id: 1, reviewed_object_id: 1).and_return(nil)
         post :add_reviewer, @params
-        expect(response).to redirect_to '/review_mapping/list_mappings?id=1&msg='
+        expect(response).to redirect_to '/review_mapping/list_mappings?id=1'
       end
     end
   end

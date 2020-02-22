@@ -227,7 +227,7 @@ describe "assignment function" do
       fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
 
       find_link('ReviewStrategy').click
-      expect(page).to have_content("Review Strategy")
+      expect(page).to have_content("Review strategy")
     end
 
     it "is able show tab due deadlines" do

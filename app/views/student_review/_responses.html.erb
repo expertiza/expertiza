@@ -63,8 +63,11 @@
                       <% if last_response_round == current_round%>
 
                         <td>
+                          <%- # If review is not submitted (is still being edited), show an 'Edit' link. -%>
                           <% if !@latest_response.is_submitted %>
                               <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
+
+                          <%- # If the submission has been updated since it was last reviewed, show an 'Update' link-%>
                           <% elsif @latest_response.updated_at < latest_submission.updated_at %>
                               <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
                           <%end%>
@@ -78,8 +81,9 @@
             <% elsif @assignment.get_current_stage(topic_id) != "Complete" && @assignment.can_review(topic_id) && latest_submission%>
                 <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
                 <td>&nbsp;&nbsp;</td>
+
+            <%- # If the team being reviewed has not submitted yet -%>
             <% else %>
-<!--                <td>Begin</td>-->
                 <td> Work has not yet been submitted for Review
                 <%= review_no  %></td>
             <% end %>

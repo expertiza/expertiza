@@ -148,7 +148,7 @@ class QuestionnairesController < ApplicationController
             v.each_pair do |key, value|
               @question.send(key + '=', value) if @question.send(key) != value
             end
-            @question.save
+            @question.save!
           end
         end
         flash[:success] = 'The questionnaire has been successfully updated!'

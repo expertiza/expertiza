@@ -269,7 +269,6 @@ module SummaryHelper
     end
   end
 
-  module_function
 end
 
 # end required by autosummary

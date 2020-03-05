@@ -159,6 +159,7 @@ module SummaryHelper
     end
 
     def summarize_sentences(comments, summary_ws_url)
+      summary = ""
       param = {sentences: comments}
       # call web service
       begin
@@ -168,6 +169,7 @@ module SummaryHelper
         ps = PragmaticSegmenter::Segmenter.new(text: summary)
         return ps.segment
       rescue StandardError => err
+        summary = [err.message]
       end
     end
 

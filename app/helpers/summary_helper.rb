@@ -13,7 +13,7 @@ module SummaryHelper
       self.avg_scores_by_criterion = ({})
 
       # get all answers for each question and send them to summarization WS
-      questions.keys.each do |round|
+      questions.each_key do |round|
         self.summary[round.to_s] = {}
         self.avg_scores_by_criterion[round.to_s] = {}
         self.avg_scores_by_round[round.to_s] = 0.0

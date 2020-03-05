@@ -3,7 +3,7 @@ class AssignmentsController < ApplicationController
   autocomplete :user, :name
   before_action :authorize
 
-  # Inital Commit - Team_1234
+  # Initial Commit - Team_1234
   def action_allowed?
     if %w[edit update list_submissions].include? params[:action]
       assignment = Assignment.find(params[:id])

@@ -159,7 +159,6 @@ module SummaryHelper
     end
 
     def summarize_sentences(comments, summary_ws_url)
-      summary = ""
       param = {sentences: comments}
       # call web service
       begin

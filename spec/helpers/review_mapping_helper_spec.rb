@@ -124,4 +124,8 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
+  describe 'submitted_within_round?' do
+
+  end
+
 end

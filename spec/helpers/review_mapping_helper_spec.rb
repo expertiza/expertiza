@@ -124,4 +124,33 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
+  describe 'response_for_each_round' do
+    before(:each) do
+      @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2)
+    end
+
+    it 'should return false if the number of responses does not equal the total number of rounds' do
+      response_map = create(:review_response_map)
+      create(:response, response_map: response_map, round: 1)
+
+      result = response_for_each_round?(response_map)
+      expect(result).to be(false)
+    end
+
+    it 'should return true if the number of responses equals the total number of rounds' do
+      response_map = create(:review_response_map)
+      create(:response, response_map: response_map, round: 1)
+      create(:response, response_map: response_map, round: 2)
+
+      result = response_for_each_round?(response_map)
+      expect(result).to be(true)
+    end
+
+  end
+
 end

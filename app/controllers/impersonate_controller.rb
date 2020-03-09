@@ -21,6 +21,8 @@ class ImpersonateController < ApplicationController
     flash[:error] = "This page doesn't take any query string." unless request.GET.empty?
   end
 
+
+  # Method to be refactored
   def impersonate
     if params[:user]
       message = "No user exists with the name '#{params[:user][:name]}'."

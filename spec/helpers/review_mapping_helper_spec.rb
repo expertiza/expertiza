@@ -125,6 +125,9 @@ describe ReviewMappingHelper, type: :helper do
   end
 
   describe 'submitted_within_round?' do
+    before(:each) do
+      @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
+    end
 
   end
 

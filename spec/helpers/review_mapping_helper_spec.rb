@@ -122,7 +122,39 @@ describe ReviewMappingHelper, type: :helper do
       expect(colour).to eq('purple')
     end
   end
+  
+  describe 'link_updated_since_last?' do
+    before(:each) do
+      @round = 2
 
+      assignment = create(:assignment, name: 'link_updated_since_last_test', created_at: DateTime.now.in_time_zone - 13.day)
+      reviewer = create(:participant, review_grade: nil)
+      reviewee = create(:assignment_team, assignment: assignment)
+      response_map = create(:review_response_map, reviewer: reviewer, reviewee: reviewee)
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+      create(:assignment_due_date, round: 1, due_at: DateTime.now.in_time_zone + 1.day)
+      create(:assignment_due_date, round: 2, due_at: DateTime.now.in_time_zone + 5.day)
+      @due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
+    end
+
+    it 'should return false if submission link was not updated between the last round and the current one' do
+      link_updated_at = DateTime.now.in_time_zone - 3.day
+
+      result = link_updated_since_last?(@round, @due_dates, link_updated_at)
+      expect(result).to eq(false)
+    end
+
+    it 'should return true if submission link was updated between the last round and the current one' do
+      link_updated_at = DateTime.now.in_time_zone + 3.day
+
+      result = link_updated_since_last?(@round, @due_dates, link_updated_at)
+      expect(result).to eq(true)
+    end
+    
+  end
+  
   describe 'response_for_each_round?' do
     before(:each) do
       @assignment = create(:assignment, name: 'response_for_each_round_test', created_at: DateTime.now.in_time_zone - 13.day)

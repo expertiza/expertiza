@@ -5,7 +5,7 @@ describe ReviewMappingHelper, type: :helper do
 
   describe 'get_team_colour' do
     before(:each) do
-      @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
+      @assignment = create(:assignment, name: 'get_team_colour_test', created_at: DateTime.now.in_time_zone - 13.day)
     end
 
     it 'should return \'red\' if response_map does not exist in Responses' do
@@ -110,9 +110,8 @@ describe ReviewMappingHelper, type: :helper do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')
-      create(:assignment_team, assignment: @assignment)
       reviewer = create(:participant, review_grade: nil)
-      reviewee = create(:assignment_team)
+      reviewee = create(:assignment_team, assignment: @assignment)
       response_map = create(:review_response_map, reviewer: reviewer, reviewee: reviewee)
       create(:submission_record, assignment_id: @assignment.id, team_id: reviewee.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 7.day)
       create(:response, response_map: response_map)
@@ -126,7 +125,7 @@ describe ReviewMappingHelper, type: :helper do
 
   describe 'response_for_each_round?' do
     before(:each) do
-      @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
+      @assignment = create(:assignment, name: 'response_for_each_round_test', created_at: DateTime.now.in_time_zone - 13.day)
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')
@@ -148,6 +147,44 @@ describe ReviewMappingHelper, type: :helper do
       create(:response, response_map: response_map, round: 2)
 
       result = response_for_each_round?(response_map)
+      expect(result).to be(true)
+    end
+
+  end
+  
+  describe 'submitted_within_round?' do
+    before(:each) do
+      @round = 1
+
+      assignment = create(:assignment, name: 'submitted_within_round_test', created_at: DateTime.now.in_time_zone - 13.day)
+      @assignment_created = assignment.created_at
+
+      reviewer = create(:participant, review_grade: nil)
+      reviewee = create(:assignment_team, assignment: assignment)
+      @response_map = create(:review_response_map, reviewer: reviewer, reviewee: reviewee)
+
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+      create(:assignment_due_date, assignment: assignment, parent_id: assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 5.day)
+      @assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
+
+      @submission = create(:submission_record, assignment_id: assignment.id, team_id: reviewee.id, operation: 'Submit Hyperlink')
+    end
+
+    it 'should return false if the submission was made outside of the submission window for the given round' do
+      @submission.created_at = DateTime.now.in_time_zone + 7.day
+      @submission.save
+
+      result = submitted_within_round?(@round, @response_map, @assignment_created, @assignment_due_dates)
+      expect(result).to be(false)
+    end
+
+    it 'should return true if the submission was made within the submission window for the given round' do
+      @submission.created_at = DateTime.now.in_time_zone - 7.day
+      @submission.save
+
+      result = submitted_within_round?(@round, @response_map, @assignment_created, @assignment_due_dates)
       expect(result).to be(true)
     end
 

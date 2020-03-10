@@ -144,11 +144,19 @@ describe ReviewMappingHelper, type: :helper do
     end
 
     it 'should return false if the submission was made outside of the submission window for the given round' do
-      @submission.created_at = DateTime.now.in_time_zone + 5.day
+      @submission.created_at = DateTime.now.in_time_zone + 7.day
       @submission.save
 
       result = submitted_within_round?(@round, @response_map, @assignment_created, @assignment_due_dates)
       expect(result).to be(false)
+    end
+
+    it 'should return true if the submission was made within the submission window for the given round' do
+      @submission.created_at = DateTime.now.in_time_zone - 7.day
+      @submission.save
+
+      result = submitted_within_round?(@round, @response_map, @assignment_created, @assignment_due_dates)
+      expect(result).to be(true)
     end
 
   end

@@ -20,7 +20,7 @@ module ReviewMappingHelper
     end
     [response_maps, rspan]
   end
-
+  
   #
   # gets the team name's color according to review and assignment submission status
   #
@@ -53,7 +53,7 @@ module ReviewMappingHelper
       'red'
     end
   end
-
+  
   # checks if a review was submitted in every round and gives the total responses count
   def response_for_each_round?(response_map)
     num_responses = 0
@@ -199,59 +199,59 @@ module ReviewMappingHelper
   def display_volume_metric_chart(reviewer)
     labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
     data = {
-      labels: labels,
-      datasets: [
-        {
-          label: 'vol.',
-          backgroundColor: "rgba(255,99,132,0.8)",
-          borderWidth: 1,
-          data: reviewer_data,
-          yAxisID: "bar-y-axis1"
-        },
-        {
-          label: 'avg. vol.',
-          backgroundColor: "rgba(255,206,86,0.8)",
-          borderWidth: 1,
-          data: all_reviewers_data,
-          yAxisID: "bar-y-axis2"
-        }
-      ]
+        labels: labels,
+        datasets: [
+            {
+                label: 'vol.',
+                backgroundColor: "rgba(255,99,132,0.8)",
+                borderWidth: 1,
+                data: reviewer_data,
+                yAxisID: "bar-y-axis1"
+            },
+            {
+                label: 'avg. vol.',
+                backgroundColor: "rgba(255,206,86,0.8)",
+                borderWidth: 1,
+                data: all_reviewers_data,
+                yAxisID: "bar-y-axis2"
+            }
+        ]
     }
     options = {
-      legend: {
-        position: 'top',
-        labels: {
-          usePointStyle: true
+        legend: {
+            position: 'top',
+            labels: {
+                usePointStyle: true
+            }
+        },
+        width: "200",
+        height: "125",
+        scales: {
+            yAxes: [{
+                        stacked: true,
+                        id: "bar-y-axis1",
+                        barThickness: 10
+                    }, {
+                        display: false,
+                        stacked: true,
+                        id: "bar-y-axis2",
+                        barThickness: 15,
+                        type: 'category',
+                        categoryPercentage: 0.8,
+                        barPercentage: 0.9,
+                        gridLines: {
+                            offsetGridLines: true
+                        }
+                    }],
+            xAxes: [{
+                        stacked: false,
+                        ticks: {
+                            beginAtZero: true,
+                            stepSize: 50,
+                            max: 400
+                        }
+                    }]
         }
-      },
-      width: "200",
-      height: "125",
-      scales: {
-        yAxes: [{
-          stacked: true,
-          id: "bar-y-axis1",
-          barThickness: 10
-        }, {
-          display: false,
-          stacked: true,
-          id: "bar-y-axis2",
-          barThickness: 15,
-          type: 'category',
-          categoryPercentage: 0.8,
-          barPercentage: 0.9,
-          gridLines: {
-            offsetGridLines: true
-          }
-        }],
-        xAxes: [{
-          stacked: false,
-          ticks: {
-            beginAtZero: true,
-            stepSize: 50,
-            max: 400
-          }
-        }]
-      }
     }
     horizontal_bar_chart data, options
   end
@@ -304,6 +304,14 @@ module ReviewMappingHelper
     # Calculate how many responses one team received from each round
     # It is the feedback number each team member should make
     @review_response_map_ids = ReviewResponseMap.where(["reviewed_object_id = ? and reviewee_id = ?", @id, @team_id]).pluck("id")
+    feedback_response_map_record(author)
+    # rspan means the all peer reviews one student received, including unfinished one
+    @rspan_round_one = @review_responses_round_one.length
+    @rspan_round_two = @review_responses_round_two.length
+    @rspan_round_three = @review_responses_round_three.nil? ? 0 : @review_responses_round_three.length
+  end
+  # This function sets the values of instance variable
+  def feedback_response_map_record(author)
     {1 => 'one', 2 => 'two', 3 => 'three'}.each do |key, round_num|
       instance_variable_set('@review_responses_round_' + round_num,
                             Response.where(["map_id IN (?) and round = ?", @review_response_map_ids, key]))
@@ -312,10 +320,6 @@ module ReviewMappingHelper
                             FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?",
                                                        instance_variable_get('@all_review_response_ids_round_' + round_num), author.id]))
     end
-    # rspan means the all peer reviews one student received, including unfinished one
-    @rspan_round_one = @review_responses_round_one.length
-    @rspan_round_two = @review_responses_round_two.length
-    @rspan_round_three = @review_responses_round_three.nil? ? 0 : @review_responses_round_three.length
   end
 
   # gets review and feedback responses for a certain round for the feedback report

@@ -140,11 +140,18 @@ describe ReviewMappingHelper, type: :helper do
       @due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
     end
 
-    it 'should return false if submission link was updated between the last round and the current one' do
+    it 'should return false if submission link was not updated between the last round and the current one' do
       link_updated_at = DateTime.now.in_time_zone - 3.day
 
       result = link_updated_since_last?(@round, @due_dates, link_updated_at)
       expect(result).to eq(false)
+    end
+
+    it 'should return true if submission link was updated between the last round and the current one' do
+      link_updated_at = DateTime.now.in_time_zone + 3.day
+
+      result = link_updated_since_last?(@round, @due_dates, link_updated_at)
+      expect(result).to eq(true)
     end
   end
 

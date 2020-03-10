@@ -106,9 +106,6 @@ module ReviewMappingHelper
   def link_updated_since_last?(round, due_dates, link_updated_at)
     submission_due_date = due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
     submission_due_last_round = due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
-    puts "First Due Date: #{submission_due_date}"
-    puts "Link Updated: #{link_updated_at}"
-    puts "Last Due Date: #{submission_due_last_round}"
     (link_updated_at < submission_due_date) && (link_updated_at > submission_due_last_round)
   end
 

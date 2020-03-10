@@ -124,4 +124,8 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
+  describe 'link_updated_since_last?' do
+
+  end
+
 end

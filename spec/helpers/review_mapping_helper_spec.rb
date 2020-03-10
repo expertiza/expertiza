@@ -125,7 +125,16 @@ describe ReviewMappingHelper, type: :helper do
   end
 
   describe 'link_updated_since_last?' do
+    before(:each) do
+      @round = 1
 
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+      create(:assignment_due_date, round: 1, due_at: DateTime.now.in_time_zone + 1.day)
+      create(:assignment_due_date, round: 2, due_at: DateTime.now.in_time_zone + 5.day)
+      @assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
+    end
   end
 
 end

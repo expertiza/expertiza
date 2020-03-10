@@ -286,10 +286,10 @@ describe ResponseController do
     end
 
     context 'when params[:return] is survey' do
-      it 'redirects to response#pending_surveys page' do
+      it 'redirects to survey_deployment#pending_surveys page' do
         @params[:return] = 'survey'
         get :redirect, @params
-        expect(response).to redirect_to('/response/pending_surveys')
+        expect(response).to redirect_to('/survey_deployment/pending_surveys')
       end
     end
 
@@ -302,32 +302,9 @@ describe ResponseController do
     end
   end
 
-  describe '#pending_surveys' do
-    context 'when session[:user] is nil' do
-      it 'redirects to root path (/)' do
-        params = {}
-        session = {}
-        get :pending_surveys, params, session
-        expect(response).to redirect_to('/')
-      end
-    end
-
-    context 'when session[:user] is not nil' do
-      it 'renders pending_surveys page' do
-        allow(CourseParticipant).to receive(:where).with(user_id: 6).and_return([double('CourseParticipant', id: 8, parent_id: 1)])
-        allow(AssignmentParticipant).to receive(:where).with(user_id: 6).and_return([participant])
-        survey_deployment = double('SurveyDeployment', id: 1, questionnaire_id: 1, global_survey_id: 1,
-                                                       start_date: DateTime.now.in_time_zone - 1.day, end_date: DateTime.now.in_time_zone + 1.day)
-        allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire)
-        allow(CourseSurveyDeployment).to receive(:where).with(parent_id: 1).and_return([survey_deployment])
-        participant.parent_id = 1
-        allow(AssignmentSurveyDeployment).to receive(:where).with(parent_id: 1).and_return([survey_deployment])
-        params = {}
-        session = {user: instructor}
-        get :pending_surveys, params, session
-        expect(controller.instance_variable_get(:@surveys).size).to eq(2)
-        expect(response).to render_template(:pending_surveys)
-      end
-    end
-  end
+  # describe '#json' do
+  #  allow(Response).to receive(:find).with(response_id: 1).and_return([review_response])
+  #  allow(response).to receive(:response_id).and_return(1)
+  #  expect(response).to respond_with_content_type(:json)
+  # end
 end

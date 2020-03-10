@@ -57,13 +57,13 @@ describe "Global Survey questionnaire tests for instructor interface" do
 
     # adding some questions for the deployed survey
     visit '/questionnaires/' + survey_questionnaire.id.to_s + '/edit'
-    fill_in('new_question_total_num', with: '1')
-    select('Criterion', from: 'new_question_type')
+    fill_in('question_total_num', with: '1')
+    select('Criterion', from: 'question_type')
     click_button "Add"
     expect(page).to have_content('Remove')
     fill_in "Edit question content here", with: "Test question 1"
     click_button "Save course survey questionnaire"
-    expect(page).to have_content('The questionnaire has been successfully updated!')
+    expect(page).to have_content('All questions have been successfully saved!')
   end
 
   it "is able to delete question from a global survey" do
@@ -71,13 +71,13 @@ describe "Global Survey questionnaire tests for instructor interface" do
     deploy_global_survey(@next_day, @next_to_next_day, survey_name)
     survey_questionnaire = Questionnaire.where(name: survey_name).first
     visit '/questionnaires/' + survey_questionnaire.id.to_s + '/edit'
-    fill_in('new_question_total_num', with: '1')
-    select('Criterion', from: 'new_question_type')
+    fill_in('question_total_num', with: '1')
+    select('Criterion', from: 'question_type')
     click_button "Add"
     expect(page).to have_content('Remove')
     fill_in "Edit question content here", with: "Test question 1"
     click_button "Save course survey questionnaire"
-    expect(page).to have_content('The questionnaire has been successfully updated!')
+    expect(page).to have_content('All questions have been successfully saved!')
     question = Question.find_by_sql("select * from questions where questionnaire_id = " + survey_questionnaire.id.to_s)
     click_link('Remove')
     expect(page).to have_content("You have successfully deleted the question!")

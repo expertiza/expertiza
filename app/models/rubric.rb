@@ -17,4 +17,4 @@ class Rubric < Questionnaire
   def update_mapping
     redirect_to action: 'list', type_id: type_id
   end
-  end
+end

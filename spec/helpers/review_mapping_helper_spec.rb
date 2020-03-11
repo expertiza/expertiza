@@ -278,9 +278,28 @@ describe ReviewMappingHelper, type: :helper do
       create(:response, response_map: response_map, is_submitted: false)
       team_reviewed_link_name = get_team_reviewed_link_name(1,response_map.response,reviewee.id)
 
-      p team_reviewed_link_name
       expect(team_reviewed_link_name).to eq "(" + TeamsUser.where(team_id: reviewee.id).first.user.fullname + ")"
 
+    end
+
+    it 'should return the team name if team consists of more than one person and last response is submitted' do
+      reviewee = create(:assignment_team, assignment: @assignment, name: "test_team")
+
+      response_map = create(:review_response_map)
+      create(:response, response_map: response_map, is_submitted: true)
+      team_reviewed_link_name = get_team_reviewed_link_name(3,response_map.response,reviewee.id)
+
+      expect(team_reviewed_link_name).to eq reviewee.name
+    end
+
+    it 'should return the team name if team consists of more than one person and last response is not submitted' do
+      reviewee = create(:assignment_team, assignment: @assignment, name: "test_team")
+
+      response_map = create(:review_response_map)
+      create(:response, response_map: response_map, is_submitted: false)
+      team_reviewed_link_name = get_team_reviewed_link_name(3,response_map.response,reviewee.id)
+
+      expect(team_reviewed_link_name).to eq "(" + reviewee.name + ")"
     end
 
   end

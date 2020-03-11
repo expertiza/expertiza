@@ -245,4 +245,29 @@ describe ReviewMappingHelper, type: :helper do
 
     end
 
+
+  describe 'get_team_reviewed_link_name' do
+    before(:each) do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+      @assignment = create(:assignment, name: 'get_team_reviewed_link_name_test', created_at: DateTime.now.in_time_zone - 13.day)
+
+    end
+
+    it 'should return the full name of the user if team consists of one person and last response is submitted' do
+      user = create(:student)
+      reviewee = create(:assignment_team, assignment: @assignment)
+      create(:team_user, user: user, team: reviewee)
+
+      response_map = create(:review_response_map)
+      create(:response, response_map: response_map, is_submitted: true)
+      team_reviewed_link_name = get_team_reviewed_link_name(1,response_map.response,reviewee.id)
+
+      expect(team_reviewed_link_name).to eq TeamsUser.where(team_id: reviewee.id).first.user.fullname
+
+    end
+
+  end
+
   end

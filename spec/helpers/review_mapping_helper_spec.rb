@@ -292,7 +292,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(team_reviewed_link_name).to eq reviewee.name
     end
 
-    it 'should return the team name if team consists of more than one person and last response is not submitted' do
+    it 'should return the team name in brackets if team consists of more than one person and last response is not submitted' do
       reviewee = create(:assignment_team, assignment: @assignment, name: "test_team")
 
       response_map = create(:review_response_map)

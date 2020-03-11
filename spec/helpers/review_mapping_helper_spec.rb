@@ -222,4 +222,27 @@ describe ReviewMappingHelper, type: :helper do
 
   end
 
-end
+  describe 'get_data_for_review_report' do
+    before(:each) do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+      @assignment = create(:assignment, name: 'get_data_for_review_report_test', created_at: DateTime.now.in_time_zone - 13.day)
+      @reviewer = create(:participant, review_grade: nil)
+      @type = 'ReviewResponseMap'
+    end
+
+    it 'should return the correct number of response maps' do
+      reviewee1 = create(:assignment_team, assignment: @assignment)
+      reviewee2 = create(:assignment_team, assignment: @assignment)
+      @response_map = create(:review_response_map, reviewer: @reviewer, reviewee: reviewee1, type: @type)
+      @response_map = create(:review_response_map, reviewer: @reviewer, reviewee: reviewee2, type: @type)
+
+      response_maps, rspan = get_data_for_review_report(@assignment.id,@reviewer.id,@type)
+      expect(response_maps.length).to be(2)
+      expect(rspan).to be(2)
+    end
+
+    end
+
+  end

@@ -268,6 +268,21 @@ describe ReviewMappingHelper, type: :helper do
 
     end
 
+
+    it 'should return the full name of the user in brackets if team consists of one person and last response is not submitted' do
+      user = create(:student)
+      reviewee = create(:assignment_team, assignment: @assignment)
+      create(:team_user, user: user, team: reviewee)
+
+      response_map = create(:review_response_map)
+      create(:response, response_map: response_map, is_submitted: false)
+      team_reviewed_link_name = get_team_reviewed_link_name(1,response_map.response,reviewee.id)
+
+      p team_reviewed_link_name
+      expect(team_reviewed_link_name).to eq "(" + TeamsUser.where(team_id: reviewee.id).first.user.fullname + ")"
+
+    end
+
   end
 
   end

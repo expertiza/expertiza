@@ -20,8 +20,32 @@ class ImpersonateController < ApplicationController
   def start
     flash[:error] = "This page doesn't take any query string." unless request.GET.empty?
   end
+ 
 
-
+#method to clear the session 
+  def clear_session
+    original_user = session[:super_user] || session[:user]
+    user = User.find_by(name: params[:user][:name])
+    if params[:impersonate].nil?
+      	  AuthController.clear_user_info(session, nil)
+          session[:original_user] = original_user
+          session[:impersonate] = true
+          session[:user] = user
+    else 
+	if !params[:impersonate][:name].empty?
+	    AuthController.clear_user_info(session, nil)
+            session[:user] = user
+            session[:impersonate] =  true
+            session[:original_user] = original_user
+	else
+	    AuthController.clear_user_info(session, nil)
+            session[:user] = session[:super_user]
+            user = session[:user]
+            session[:super_user] = nil
+	end
+     end
+  end
+   
   # Method to be refactored
   def impersonate
     if params[:user]
@@ -46,10 +70,11 @@ class ImpersonateController < ApplicationController
             return
           end
           session[:super_user] = session[:user] if session[:super_user].nil?
-          AuthController.clear_user_info(session, nil)
-          session[:original_user] = original_user
-          session[:impersonate] = true
-          session[:user] = user
+          #AuthController.clear_user_info(session, nil)
+          #session[:original_user] = original_user
+          #session[:impersonate] = true
+          #session[:user] = user
+	  clear_session
         else
           flash[:error] = message
           redirect_back
@@ -70,10 +95,11 @@ class ImpersonateController < ApplicationController
               redirect_back
               return
             end
-            AuthController.clear_user_info(session, nil)
-            session[:user] = user
-            session[:impersonate] =  true
-            session[:original_user] = original_user
+            #AuthController.clear_user_info(session, nil)
+            #session[:user] = user
+            #session[:impersonate] =  true
+            #session[:original_user] = original_user
+	    clear_session
           else
             flash[:error] = message
             redirect_back
@@ -82,10 +108,11 @@ class ImpersonateController < ApplicationController
           # Revert to original account
         else
           if !session[:super_user].nil?
-            AuthController.clear_user_info(session, nil)
-            session[:user] = session[:super_user]
-            user = session[:user]
-            session[:super_user] = nil
+            #AuthController.clear_user_info(session, nil)
+            #session[:user] = session[:super_user]
+            #user = session[:user]
+            #session[:super_user] = nil
+	    clear_session
           else
             flash[:error] = "No original account was found. Please close your browser and start a new session."
             redirect_back

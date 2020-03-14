@@ -27,6 +27,7 @@ class ImpersonateController < ApplicationController
     original_user = session[:super_user] || session[:user]
     user = User.find_by(name: params[:user][:name])
     if params[:impersonate].nil?
+	  
       	  AuthController.clear_user_info(session, nil)
           session[:original_user] = original_user
           session[:impersonate] = true
@@ -45,6 +46,16 @@ class ImpersonateController < ApplicationController
 	end
      end
   end
+
+#checking if special character 
+  def check_if_spl_char
+    if warn_for_special_chars(params[:user][:name], "Username")
+          redirect_back
+          return
+    end
+  end
+
+    
    
   # Method to be refactored
   def impersonate
@@ -57,11 +68,10 @@ class ImpersonateController < ApplicationController
       original_user = session[:super_user] || session[:user]
       # Impersonate using form on /impersonate/start
       if params[:impersonate].nil?
+
         # check if special chars /\?<>|&$# are used to avoid html tags or system command
-        if warn_for_special_chars(params[:user][:name], "Username")
-          redirect_back
-          return
-        end
+        check_if_spl_char
+
         user = User.find_by(name: params[:user][:name])
         if user
           unless original_user.can_impersonate? user
@@ -70,10 +80,6 @@ class ImpersonateController < ApplicationController
             return
           end
           session[:super_user] = session[:user] if session[:super_user].nil?
-          #AuthController.clear_user_info(session, nil)
-          #session[:original_user] = original_user
-          #session[:impersonate] = true
-          #session[:user] = user
 	  clear_session
         else
           flash[:error] = message
@@ -84,10 +90,8 @@ class ImpersonateController < ApplicationController
         # Impersonate a new account
         if !params[:impersonate][:name].empty?
           # check if special chars /\?<>|&$# are used to avoid html tags or system command
-          if warn_for_special_chars(params[:impersonate][:name], "Username")
-            redirect_back
-            return
-          end
+          check_if_spl_char
+
           user = User.find_by(name: params[:impersonate][:name])
           if user
             unless original_user.can_impersonate? user
@@ -95,10 +99,6 @@ class ImpersonateController < ApplicationController
               redirect_back
               return
             end
-            #AuthController.clear_user_info(session, nil)
-            #session[:user] = user
-            #session[:impersonate] =  true
-            #session[:original_user] = original_user
 	    clear_session
           else
             flash[:error] = message
@@ -108,10 +108,6 @@ class ImpersonateController < ApplicationController
           # Revert to original account
         else
           if !session[:super_user].nil?
-            #AuthController.clear_user_info(session, nil)
-            #session[:user] = session[:super_user]
-            #user = session[:user]
-            #session[:super_user] = nil
 	    clear_session
           else
             flash[:error] = "No original account was found. Please close your browser and start a new session."

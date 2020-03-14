@@ -1122,14 +1122,7 @@ jQuery(document).ready(function() {
           activeTab: data
         })
       })
-      jQuery.get("/tree_display/folder_node_ng_getter", function(data) {
-        jQuery.post("/tree_display/children_node_ng",
-          {
-            reactParams: {
-              child_nodes: data,
-              nodeType: 'FolderNode'
-            }
-          }, function(data2, status) {
+        jQuery.get("/tree_display/get_folder_contents", function(data2, status) {
             jQuery.each(data2, function(nodeType, outerNode) {
               jQuery.each(outerNode, function(i, node) {
                 var newParams = {
@@ -1156,8 +1149,6 @@ jQuery(document).ready(function() {
             }
           },
           'json')
-      })
-      
     },
     handleTabChange: function(tabIndex) {
       jQuery.get("/tree_display/set_session_last_open_tab?tab="+tabIndex.toString())

@@ -461,7 +461,7 @@ resources :institution, except: [:destroy] do
   resources :tree_display, only: [] do
     collection do
       post :list
-      post :children_node_ng
+      get :get_folder_contents
       post :children_node_2_ng
       get :session_last_open_tab
       get :set_session_last_open_tab

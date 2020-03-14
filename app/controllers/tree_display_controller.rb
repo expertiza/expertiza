@@ -39,13 +39,6 @@ class TreeDisplayController < ApplicationController
     redirect_to controller: :notifications, action: :list if current_user.try(:student?)
   end
 
-  # renders FolderNode json
-  def folder_node_ng_getter
-    respond_to do |format|
-      format.html { render json: FolderNode.get }
-    end
-  end
-
   # finding out child_nodes from params
   def child_nodes_from_params(child_nodes)
     if child_nodes.is_a? String and !child_nodes.empty?
@@ -67,6 +60,8 @@ class TreeDisplayController < ApplicationController
     )
   end
 
+  # Separates out courses based on if he/she is the TA for the course passed by marking private
+  # to be true in that case
   def update_in_ta_course_listing(instructor_id, node, tmp_object)
     tmp_object["private"] = true if session[:user].role.ta? == 'Teaching Assistant' &&
         Ta.get_my_instructors(session[:user].id).include?(instructor_id) &&
@@ -78,7 +73,9 @@ class TreeDisplayController < ApplicationController
         Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
   end
 
-  # updating instructor value for tmp_object
+  # Ensures that instructors (who are not ta) would have update_in_ta_course_listing not changing
+  # the private value if he/she is not TA which was set to true for all courses before filtering
+  # in update_tmp_obj in courses_assignments_obj
   def update_instructor(tmp_object, instructor_id)
     tmp_object["instructor_id"] = instructor_id
     tmp_object["instructor"] = nil
@@ -106,69 +103,54 @@ class TreeDisplayController < ApplicationController
     update_is_available(tmp_object, instructor_id, node)
     assignments_method(node, tmp_object) if node_type == "Assignments"
   end
-
-  # getting result nodes for child
-  # Changes to this method were done as part of E1788_OSS_project_Maroon_Heatmap_fixes
-  #
-  # courses_assignments_obj method makes a call to update_in_ta_course_listing which
-  # separates out courses based on if he/she is the TA for the course passed
-  # by marking private to be true in that case
-  #
-  # this also ensures that instructors (who are not ta) would have update_in_ta_course_listing
-  # not changing the private value if he/she is not TA which was set to true for all courses before filtering
-  # in update_tmp_obj in courses_assignments_obj
-  #
-  # below objects/variable names were part of the project as before and
-  # refactoring could have affected other functionalities too, so it was avoided in this fix
-  #
-  # fix comment end
-  #
-  def res_node_for_child(tmp_res)
-    res = {}
-    tmp_res.each_key do |node_type|
-      res[node_type] = []
-      tmp_res[node_type].each do |node|
-        tmp_object = {
-          "nodeinfo" => node,
-          "name" => node.get_name,
-          "type" => node.type
-        }
-        courses_assignments_obj(node_type, tmp_object, node) if %w[Courses Assignments].include? node_type
-        res[node_type] << tmp_object
+  
+  # Creates a json object that can be displayed by the UI
+  def serialize_to_json(folder_type, node)
+    json = {
+      "nodeinfo" => node,
+      "name" => node.get_name,
+      "type" => node.type
+    }
+    
+    if folder_type == "Courses" or folder_type == "Assignments"
+      json.merge! ({
+        "directory" => node.get_directory,
+        "creation_date" => node.get_creation_date,
+        "updated_date" => node.get_modified_date,
+        "institution" => Institution.where(id: node.retrieve_institution_id),
+        "private" => node.get_instructor_id == session[:user].id
+      })
+      instructor_id = node.get_instructor_id
+      update_in_ta_course_listing(instructor_id, node, json)
+      update_instructor(json, instructor_id)
+      update_is_available(json, instructor_id, node)
+      assignments_method(node, json) if folder_type == "Assignments"
+    end
+    
+    return json
+  end
+  
+  # Returns the contents of each top level folder as a json object.
+  def get_folder_contents
+    # Get all child nodes associated with a top level folder that the logged in user is authorized
+    # to view. Top level folders include Questionaires, Courses, and Assignments.
+    folders = {}
+    FolderNode.get.each do |folder_node|
+      child_nodes = folder_node.get_children(nil, nil, session[:user].id, nil, nil)
+       # Serialize the contents of each node so it can be displayed on the UI
+      contents = []
+      child_nodes.each do |node|
+        contents.push(serialize_folder_to_json(folder_node.get_name, node))
       end
+      
+      # Store contents according to the root level folder.
+      folders[folder_node.get_name] = contents
     end
-    res
-  end
-
-  def update_fnode_children(fnode, tmp_res)
-    # fnode is short for foldernode which is the parent node
-    # ch_nodes are childrens
-    # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
-    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
-    tmp_res[fnode.get_name] = ch_nodes
-  end
-
-  # initialize parent node and update child nodes for it
-  def initialize_fnode_update_children(params, node, tmp_res)
-    fnode = (params[:reactParams][:nodeType]).constantize.new
-    node.each do |a|
-      fnode[a[0]] = a[1]
-    end
-    update_fnode_children(fnode, tmp_res)
-  end
-
-  # for child nodes
-  def children_node_ng
-    flash[:error] = "Invalid JSON in the TreeList" unless json_valid? params[:reactParams][:child_nodes]
-    child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
-    tmp_res = {}
-    child_nodes.each do |node|
-      initialize_fnode_update_children(params, node, tmp_res)
-    end
-    res = res_node_for_child(tmp_res)
-    res['Assignments'] = res['Assignments'].sort_by {|x| [x['instructor'], -1 * x['creation_date'].to_i] } if res.key?('Assignments')
+    
+    # Sort assignments by ?
+    folders['Assignments'] = folders['Assignments'].sort_by {|x| [x['instructor'], -1 * x['creation_date'].to_i] }
     respond_to do |format|
-      format.html { render json: res }
+      format.html { render json: folders }
     end
   end
 
@@ -283,7 +265,7 @@ class TreeDisplayController < ApplicationController
   end
   
   # Creates a json object that can be displayed by the UI
-  def serialize_to_json(folder_type, node)
+  def serialize_folder_to_json(folder_type, node)
     json = {
       "nodeinfo" => node,
       "name" => node.get_name,

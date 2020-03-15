@@ -181,12 +181,6 @@ class TreeDisplayController < ApplicationController
     end
   end
 
-  def bridge_to_is_available
-    user = session[:user]
-    owner_id = params[:owner_id]
-    is_available(user, owner_id)
-  end
-
   # gets and renders last open tab from session
   def session_last_open_tab
     res = session[:last_open_tab]

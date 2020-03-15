@@ -460,11 +460,9 @@ resources :institution, except: [:destroy] do
 
   resources :tree_display, only: [] do
     collection do
-      get :action
       post :list
       post :children_node_ng
       post :children_node_2_ng
-      post :bridge_to_is_available
       get :session_last_open_tab
       get :set_session_last_open_tab
     end

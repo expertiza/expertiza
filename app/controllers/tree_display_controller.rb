@@ -28,8 +28,8 @@ class TreeDisplayController < ApplicationController
   def goto_bookmarkrating_rubrics() goto_controller('Bookmarkrating') end
   def goto_assignments() goto_controller('Assignments') end
 
-  # called when the display is requested
-  # ajbudlon, July 3rd 2008
+  # Called by /tree_display/list
+  # Redirects to proper page if user is not an instructor or TA.
   def list
     redirect_to controller: :content_pages, action: :view if current_user.nil?
     redirect_to controller: :student_task, action: :list if current_user.try(:student?)

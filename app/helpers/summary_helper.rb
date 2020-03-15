@@ -169,6 +169,7 @@ module SummaryHelper
         ps = PragmaticSegmenter::Segmenter.new(text: summary)
         return ps.segment
       rescue StandardError => err
+	puts "Standard Error: #{err.inspect}"
       end
     end
 
@@ -266,7 +267,6 @@ module SummaryHelper
       sum_scores.round(2)
     end
   end
-
 end
 
 # end required by autosummary

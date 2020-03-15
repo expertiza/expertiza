@@ -316,6 +316,10 @@ describe ReviewMappingHelper, type: :helper do
 
     end
 
+    describe 'reviews_needed' do
+
+    end
+
   end
 
   describe ReviewMappingHelper::TeamReviewStrategy do
@@ -328,6 +332,10 @@ describe ReviewMappingHelper, type: :helper do
 
         expect(reviews).to be(3)
       end
+
+    end
+
+    describe 'reviews_needed' do
 
     end
 

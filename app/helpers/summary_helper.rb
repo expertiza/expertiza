@@ -179,8 +179,7 @@ module SummaryHelper
       question_answers.each do |ans|
         unless ans.comments.nil?
           ans.comments.gsub!(/[.?!]/, '\1|')
-          sentences = ans.comments.split('|')
-          sentences.map!(&:strip)
+          sentences = ans.comments.split('|').map!(&:strip)
         end
         # add the comment to an array to be converted as a json request
         comments.concat(sentences) unless sentences.nil?

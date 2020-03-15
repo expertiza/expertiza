@@ -46,8 +46,9 @@ module SummaryHelper
       # @summary[reviewee][round][question]
       # @avg_score_round[reviewee][round]
       # @avg_scores_by_criterion[reviewee][round][criterion]
-      nround, threads = assignment.rounds_of_reviews, []
-      self.summary = self.avg_scores_by_criterion =  self.avg_scores_by_round = Array.new(nround)
+      nround = assignment.rounds_of_reviews
+      threads = []
+      self.summary = self.avg_scores_by_criterion = self.avg_scores_by_round = Array.new(nround)
       rubric = get_questions_by_assignment(assignment)
 
       (0..nround - 1).each do |round|
@@ -101,8 +102,9 @@ module SummaryHelper
       teams = Team.select(:id, :name).where(parent_id: assignment.id).order(:name)
 
       teams.each do |reviewee|
-        self.summary[reviewee.name], self.avg_scores_by_reviewee[reviewee.name] = [], 0.0
-        self.avg_scores_by_round[reviewee.name], self.avg_scores_by_criterion[reviewee.name] = [], []
+        self.summary[reviewee.name] = []
+        self.avg_scores_by_reviewee[reviewee.name] = 0.0
+        self.avg_scores_by_round[reviewee.name] = self.avg_scores_by_criterion[reviewee.name] = []
 
         # get the name of reviewers for display only
         self.reviewers[reviewee.name] = get_reviewers_by_reviewee_and_assignment(reviewee, assignment.id)

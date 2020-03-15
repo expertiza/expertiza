@@ -316,6 +316,16 @@ describe ReviewMappingHelper, type: :helper do
 
     end
 
+    describe 'reviews_needed' do
+      it 'should return the total number of reviews needed for the assignment' do
+        strategy = ReviewMappingHelper::StudentReviewStrategy.new(Array.new(20), Array.new(5), 3)
+
+        reviews = strategy.reviews_needed
+
+        expect(reviews).to be(60)
+      end
+    end
+
   end
 
   describe ReviewMappingHelper::TeamReviewStrategy do
@@ -329,6 +339,16 @@ describe ReviewMappingHelper, type: :helper do
         expect(reviews).to be(3)
       end
 
+    end
+
+    describe 'reviews_needed' do
+      it 'should return the total number of reviews needed for the assigment' do
+        strategy = ReviewMappingHelper::TeamReviewStrategy.new(Array.new(20), Array.new(5), 3)
+
+        reviews = strategy.reviews_needed
+
+        expect(reviews).to be(15)
+      end
     end
 
   end

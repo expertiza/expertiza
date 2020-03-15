@@ -287,4 +287,8 @@ describe ReviewMappingHelper, type: :helper do
 
   end
 
+  describe 'reviews_per_team' do
+
   end
+
+end

@@ -11,66 +11,22 @@ class TreeDisplayController < ApplicationController
     @node_type = params[:nodeType]
   end
 
-  # refactored method to provide direct access to parameters
   def goto_controller(name_parameter)
     node_object = TreeFolder.find_by(name: name_parameter)
     session[:root] = FolderNode.find_by(node_object_id: node_object.id).id
     redirect_to controller: 'tree_display', action: 'list'
   end
-
-  # direct access to questionnaires
-  def goto_questionnaires
-    goto_controller('Questionnaires')
-  end
-
-  # direct access to review rubrics
-  def goto_review_rubrics
-    goto_controller('Review')
-  end
-
-  # direct access to metareview rubrics
-  def goto_metareview_rubrics
-    goto_controller('Metareview')
-  end
-
-  # direct access to teammate review rubrics
-  def goto_teammatereview_rubrics
-    goto_controller('Teammate Review')
-  end
-
-  # direct access to author feedbacks
-  def goto_author_feedbacks
-    goto_controller('Author Feedback')
-  end
-
-  # direct access to global survey
-  def goto_global_survey
-    goto_controller('Global Survey')
-  end
-
-  # direct access to surveys
-  def goto_surveys
-    goto_controller('Assignment Survey')
-  end
-
-  # direct access to course surveys
-  def goto_course_surveys
-    goto_controller('Course Survey')
-  end
-
-  # direct access to courses
-  def goto_courses
-    goto_controller('Courses')
-  end
-
-  def goto_bookmarkrating_rubrics
-    goto_controller('Bookmarkrating')
-  end
-
-  # direct access to assignments
-  def goto_assignments
-    goto_controller('Assignments')
-  end
+  def goto_questionnaires() goto_controller('Questionnaires') end
+  def goto_review_rubrics() goto_controller('Review') end
+  def goto_metareview_rubrics() goto_controller('Metareview') end
+  def goto_teammatereview_rubrics() goto_controller('Teammate Review') end
+  def goto_author_feedbacks() goto_controller('Author Feedback') end
+  def goto_global_survey() goto_controller('Global Survey') end
+  def goto_surveys() goto_controller('Assignment Survey') end
+  def goto_course_surveys() goto_controller('Course Survey') end
+  def goto_courses() goto_controller('Courses') end
+  def goto_bookmarkrating_rubrics() goto_controller('Bookmarkrating') end
+  def goto_assignments() goto_controller('Assignments') end
 
   # called when the display is requested
   # ajbudlon, July 3rd 2008

@@ -328,6 +328,13 @@ describe ReviewMappingHelper, type: :helper do
     end
 
     describe 'reviews_per_student' do
+      it 'should return the number of reviews each student is expected to do' do
+        strategy = ReviewMappingHelper::StudentReviewStrategy.new(Array.new(20), Array.new(5), 3)
+
+        reviews = strategy.reviews_per_student
+
+        expect(reviews).to be(3)
+      end
 
     end
 
@@ -358,6 +365,29 @@ describe ReviewMappingHelper, type: :helper do
     end
 
     describe 'reviews_per_student' do
+      it 'should return the number of reviews each team is expected to do' do
+        strategy = ReviewMappingHelper::TeamReviewStrategy.new(Array.new(5), Array.new(5), 3)
+
+        reviews = strategy.reviews_per_student
+
+        expect(reviews).to be(3)
+      end
+
+      it 'should round the number of reviews up to the nearest integer (if decimal is >= .5)' do
+        strategy = ReviewMappingHelper::TeamReviewStrategy.new(Array.new(5), Array.new(6), 3)
+
+        reviews = strategy.reviews_per_student
+
+        expect(reviews).to be(4)
+      end
+
+      it 'should round the number of reviews down to the nearest integer (if decimal is < .5)' do
+        strategy = ReviewMappingHelper::TeamReviewStrategy.new(Array.new(5), Array.new(4), 3)
+
+        reviews = strategy.reviews_per_student
+
+        expect(reviews).to be(2)
+      end
 
     end
 

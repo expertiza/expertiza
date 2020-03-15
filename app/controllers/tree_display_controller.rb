@@ -122,15 +122,6 @@ class TreeDisplayController < ApplicationController
   end
   
   private
-  # finding out child_nodes from params
-  def child_nodes_from_params(child_nodes)
-    if child_nodes.is_a? String and !child_nodes.empty?
-      JSON.parse(child_nodes)
-    else
-      child_nodes
-    end
-  end
-  
   # getting all attributes of assignment node
   def assignments_method(node, tmp_object)
     tmp_object.merge!(
@@ -212,39 +203,6 @@ class TreeDisplayController < ApplicationController
     return json
   end
   
-  # getting result nodes for child
-  # Changes to this method were done as part of E1788_OSS_project_Maroon_Heatmap_fixes
-  #
-  # courses_assignments_obj method makes a call to update_in_ta_course_listing which
-  # separates out courses based on if he/she is the TA for the course passed
-  # by marking private to be true in that case
-  #
-  # this also ensures that instructors (who are not ta) would have update_in_ta_course_listing
-  # not changing the private value if he/she is not TA which was set to true for all courses before filtering
-  # in update_tmp_obj in courses_assignments_obj
-  #
-  # below objects/variable names were part of the project as before and
-  # refactoring could have affected other functionalities too, so it was avoided in this fix
-  #
-  # fix comment end
-  #
-  def res_node_for_child(tmp_res)
-    res = {}
-    tmp_res.each_key do |node_type|
-      res[node_type] = []
-      tmp_res[node_type].each do |node|
-        tmp_object = {
-          "nodeinfo" => node,
-          "name" => node.get_name,
-          "type" => node.type
-        }
-        courses_assignments_obj(node_type, tmp_object, node) if %w[Courses Assignments].include? node_type
-        res[node_type] << tmp_object
-      end
-    end
-    res
-  end
-
   # Creates a json object that can be displayed by the UI
   def serialize_to_json(node)
     json = {

@@ -64,7 +64,7 @@ class TreeDisplayController < ApplicationController
   end
 
   # Returns the contents of the Courses and Questionaire subfolders
-  def children_node_2_ng
+  def get_sub_folder_contents
     # Convert the object received in parameters to a FolderNode object.
     #TODO: If the object passed in by params were stored as a FolderNode it
     #      would be easier to process by this method.

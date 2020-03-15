@@ -730,7 +730,7 @@ jQuery(document).ready(function() {
         });
         if(this.props.dataType!='assignment') {
             _this = this;
-            jQuery.post('/tree_display/children_node_2_ng',
+            jQuery.get('/tree_display/get_sub_folder_contents',
                 {
                     reactParams2: newParams
                 },

@@ -462,7 +462,7 @@ resources :institution, except: [:destroy] do
     collection do
       post :list
       get :get_folder_contents
-      post :children_node_2_ng
+      get :get_sub_folder_contents
       get :session_last_open_tab
       get :set_session_last_open_tab
     end

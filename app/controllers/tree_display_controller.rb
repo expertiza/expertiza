@@ -6,16 +6,16 @@ class TreeDisplayController < ApplicationController
     true
   end
 
+  def confirm
+    @id = params[:id]
+    @node_type = params[:nodeType]
+  end
+
   # refactored method to provide direct access to parameters
   def goto_controller(name_parameter)
     node_object = TreeFolder.find_by(name: name_parameter)
     session[:root] = FolderNode.find_by(node_object_id: node_object.id).id
     redirect_to controller: 'tree_display', action: 'list'
-  end
-
-  def confirm
-    @id = params[:id]
-    @node_type = params[:nodeType]
   end
 
   # direct access to questionnaires

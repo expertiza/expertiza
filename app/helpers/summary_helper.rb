@@ -177,10 +177,7 @@ module SummaryHelper
       # strore answers of each question in an array to be converted into json
       comments = []
       question_answers.each do |ans|
-        unless ans.comments.nil?
-          ans.comments.gsub!(/[.?!]/, '\1|')
-          sentences = ans.comments.split('|').map!(&:strip)
-        end
+        sentences = ans.comments.gsub!(/[.?!]/, '\1|').split('|').map!(&:strip) unless ans.comments.nil?
         # add the comment to an array to be converted as a json request
         comments.concat(sentences) unless sentences.nil?
       end

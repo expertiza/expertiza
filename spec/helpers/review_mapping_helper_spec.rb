@@ -324,6 +324,11 @@ describe ReviewMappingHelper, type: :helper do
 
         expect(reviews).to be(60)
       end
+
+    end
+
+    describe 'reviews_per_student' do
+
     end
 
   end
@@ -349,6 +354,11 @@ describe ReviewMappingHelper, type: :helper do
 
         expect(reviews).to be(15)
       end
+
+    end
+
+    describe 'reviews_per_student' do
+
     end
 
   end

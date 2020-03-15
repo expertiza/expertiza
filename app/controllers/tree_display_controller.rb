@@ -222,25 +222,15 @@ class TreeDisplayController < ApplicationController
     return json
   end
 
-  # check if nodetype is coursenode
-  def course_node_for_current_ta?(ta_mappings, node)
-    ta_mappings.find {|ta_mapping| return true if ta_mapping.course_id == node.node_object_id }
-    false
-  end
-
-  # check if nodetype is assignmentnode
-  def assignment_node_for_current_ta?(ta_mappings, node)
-    course_id = Assignment.find(node.node_object_id).course_id
-    ta_mappings.each {|ta_mapping| return true if ta_mapping.course_id == course_id }
-    false
-  end
-
   # check if user is ta for current course
   def ta_for_current_course?(node)
-    ta_mappings = TaMapping.where(ta_id: session[:user].id)
-    return course_node_for_current_ta?(ta_mappings, node) if node.is_a? CourseNode
-    return assignment_node_for_current_ta?(ta_mappings, node) if node.is_a? AssignmentNode
-    false
+    if node.is_a? AssignmentNode or node.is_a? CourseNode
+      ta_mappings = TaMapping.where(ta_id: session[:user].id)
+      course_id = node.is_a? CourseNode ? node.node_object_id : Assignment.find(node.node_object_id).course_id
+      ta_mappings.any? { |ta_mapping| ta_mapping.course_id == course_id }
+    else
+      false
+    end
   end
 
   # check if current user is ta for instructor

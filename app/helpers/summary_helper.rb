@@ -1,6 +1,7 @@
 # require for webservice calls
 require 'json'
 require 'rest_client'
+require 'logger'
 
 # required by autosummary
 module SummaryHelper
@@ -160,6 +161,8 @@ module SummaryHelper
     end
 
     def summarize_sentences(comments, summary_ws_url)
+      logger = Logger.new(STDOUT)
+      logger.level = Logger::WARN
       param = {sentences: comments}
       # call web service
       begin
@@ -169,7 +172,7 @@ module SummaryHelper
         ps = PragmaticSegmenter::Segmenter.new(text: summary)
         return ps.segment
       rescue StandardError => err
-	puts "Standard Error: #{err.inspect}"
+        logger.warn "Standard Error: #{err.inspect}"
       end
     end
 

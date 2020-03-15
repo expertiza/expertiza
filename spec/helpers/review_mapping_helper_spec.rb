@@ -15,14 +15,6 @@ describe ReviewMappingHelper, type: :helper do
       expect(colour).to eq('red')
     end
 
-    it 'should not return \'red\' if response_map exists in Responses' do
-      response_map = create(:review_response_map)
-      create(:response, response_map: response_map)
-
-      colour = get_team_colour(response_map)
-      expect(colour).not_to eq('red')
-    end
-
     it 'should return \'brown\' if reviewer (and its review_grade) both exist' do
       review_grade = create(:review_grade)
       reviewer = create(:participant, review_grade: review_grade)
@@ -31,15 +23,6 @@ describe ReviewMappingHelper, type: :helper do
 
       colour = get_team_colour(response_map)
       expect(colour).to eq('brown')
-    end
-
-    it 'should not return \'brown\' if review_grade is nil' do
-      reviewer = create(:participant, review_grade: nil)
-      response_map = create(:review_response_map, reviewer: reviewer)
-      create(:response, response_map: response_map)
-
-      colour = get_team_colour(response_map)
-      expect(colour).not_to eq('brown')
     end
 
     it 'should not return \'blue\' if a review was not submitted in each round' do
@@ -222,4 +205,86 @@ describe ReviewMappingHelper, type: :helper do
 
   end
 
-end
+  describe 'get_data_for_review_report' do
+    before(:each) do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+      @assignment = create(:assignment, name: 'get_data_for_review_report_test', created_at: DateTime.now.in_time_zone - 13.day)
+      @reviewer = create(:participant, review_grade: nil)
+      @type = 'ReviewResponseMap'
+    end
+
+    it 'should return the correct number of response maps' do
+      reviewee1 = create(:assignment_team, assignment: @assignment)
+      reviewee2 = create(:assignment_team, assignment: @assignment)
+      @response_map = create(:review_response_map, reviewer: @reviewer, reviewee: reviewee1, type: @type)
+      @response_map = create(:review_response_map, reviewer: @reviewer, reviewee: reviewee2, type: @type)
+
+      response_maps, rspan = get_data_for_review_report(@assignment.id,@reviewer.id,@type)
+      expect(response_maps.length).to be(2)
+      expect(rspan).to be(2)
+    end
+
+    end
+
+
+  describe 'get_team_reviewed_link_name' do
+    before(:each) do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+      @assignment = create(:assignment, name: 'get_team_reviewed_link_name_test', created_at: DateTime.now.in_time_zone - 13.day)
+
+    end
+
+    it 'should return the full name of the user if team consists of one person and last response is submitted' do
+      user = create(:student)
+      reviewee = create(:assignment_team, assignment: @assignment)
+      create(:team_user, user: user, team: reviewee)
+
+      response_map = create(:review_response_map)
+      create(:response, response_map: response_map, is_submitted: true)
+      team_reviewed_link_name = get_team_reviewed_link_name(1,response_map.response,reviewee.id)
+
+      expect(team_reviewed_link_name).to eq TeamsUser.where(team_id: reviewee.id).first.user.fullname
+
+    end
+
+
+    it 'should return the full name of the user in brackets if team consists of one person and last response is not submitted' do
+      user = create(:student)
+      reviewee = create(:assignment_team, assignment: @assignment)
+      create(:team_user, user: user, team: reviewee)
+
+      response_map = create(:review_response_map)
+      create(:response, response_map: response_map, is_submitted: false)
+      team_reviewed_link_name = get_team_reviewed_link_name(1,response_map.response,reviewee.id)
+
+      expect(team_reviewed_link_name).to eq "(" + TeamsUser.where(team_id: reviewee.id).first.user.fullname + ")"
+
+    end
+
+    it 'should return the team name if team consists of more than one person and last response is submitted' do
+      reviewee = create(:assignment_team, assignment: @assignment, name: "test_team")
+
+      response_map = create(:review_response_map)
+      create(:response, response_map: response_map, is_submitted: true)
+      team_reviewed_link_name = get_team_reviewed_link_name(3,response_map.response,reviewee.id)
+
+      expect(team_reviewed_link_name).to eq reviewee.name
+    end
+
+    it 'should return the team name in brackets if team consists of more than one person and last response is not submitted' do
+      reviewee = create(:assignment_team, assignment: @assignment, name: "test_team")
+
+      response_map = create(:review_response_map)
+      create(:response, response_map: response_map, is_submitted: false)
+      team_reviewed_link_name = get_team_reviewed_link_name(3,response_map.response,reviewee.id)
+
+      expect(team_reviewed_link_name).to eq "(" + reviewee.name + ")"
+    end
+
+  end
+
+  end

@@ -172,9 +172,151 @@ class TreeDisplayController < ApplicationController
     end
   end
 
+  # for child nodes
+  def children_node_2_ng
+    child_nodes = child_nodes_from_params(params[:reactParams2][:child_nodes])
+    res = get_tmp_res(params, child_nodes)
+    respond_to do |format|
+      format.html { render json: res }
+    end
+  end
+
+  def bridge_to_is_available
+    user = session[:user]
+    owner_id = params[:owner_id]
+    is_available(user, owner_id)
+  end
+
+  # gets and renders last open tab from session
+  def session_last_open_tab
+    res = session[:last_open_tab]
+    respond_to do |format|
+      format.html { render json: res }
+    end
+  end
+
+  # sets the last open tab from params
+  def set_session_last_open_tab
+    session[:last_open_tab] = params[:tab]
+    res = session[:last_open_tab]
+    respond_to do |format|
+      format.html { render json: res }
+    end
+  end
+
+  def drill
+    session[:root] = params[:root]
+    redirect_to controller: 'tree_display', action: 'list'
+  end
+
+  def filter
+    qid = 'filter+'
+    search = params[:filter_string]
+    filter_node = params[:filternode]
+    if filter_node == 'QAN'
+      qid = filter_node_is_qan(search, qid)
+    elsif filter_node == 'ACN'
+      session[:root] = 2
+      qid << search
+    end
+    qid
+  end
+  
+  private
+  # finding out child_nodes from params
+  def child_nodes_from_params(child_nodes)
+    if child_nodes.is_a? String and !child_nodes.empty?
+      JSON.parse(child_nodes)
+    else
+      child_nodes
+    end
+  end
+  
+  # getting all attributes of assignment node
+  def assignments_method(node, tmp_object)
+    tmp_object.merge!(
+      "course_id" => node.get_course_id,
+      "max_team_size" => node.get_max_team_size,
+      "is_intelligent" => node.get_is_intelligent,
+      "require_quiz" => node.get_require_quiz,
+      "allow_suggestions" => node.get_allow_suggestions,
+      "has_topic" => SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first ? true : false
+    )
+  end
+  
+  # Separates out courses based on if he/she is the TA for the course passed by marking private
+  # to be true in that case
+  def update_in_ta_course_listing(instructor_id, node, tmp_object)
+    tmp_object["private"] = true if session[:user].role.ta? == 'Teaching Assistant' &&
+        Ta.get_my_instructors(session[:user].id).include?(instructor_id) &&
+        ta_for_current_course?(node)
+  end
+
+  def update_is_available(tmp_object, instructor_id, node)
+    tmp_object["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role.ta? &&
+        Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
+  end
+
+  # Ensures that instructors (who are not ta) would have update_in_ta_course_listing not changing
+  # the private value if he/she is not TA which was set to true for all courses before filtering
+  # in update_tmp_obj in courses_assignments_obj
+  def update_instructor(tmp_object, instructor_id)
+    tmp_object["instructor_id"] = instructor_id
+    tmp_object["instructor"] = nil
+    tmp_object["instructor"] = User.find(instructor_id).name(session[:ip]) if instructor_id
+  end
+
+  def update_tmp_obj(tmp_object, node)
+    tmp = {
+      "directory" => node.get_directory,
+      "creation_date" => node.get_creation_date,
+      "updated_date" => node.get_modified_date,
+      "institution" => Institution.where(id: node.retrieve_institution_id),
+      "private" => node.get_instructor_id == session[:user].id
+    }
+    tmp_object.merge!(tmp)
+  end
+
+  def courses_assignments_obj(node_type, tmp_object, node)
+    update_tmp_obj(tmp_object, node)
+    # tmpObject["private"] = node.get_private
+    instructor_id = node.get_instructor_id
+    ## if current user's role is TA for a course, then that course will be listed under his course listing.
+    update_in_ta_course_listing(instructor_id, node, tmp_object)
+    update_instructor(tmp_object, instructor_id)
+    update_is_available(tmp_object, instructor_id, node)
+    assignments_method(node, tmp_object) if node_type == "Assignments"
+  end
+  
+  # Creates a json object that can be displayed by the UI
+  def serialize_to_json(folder_type, node)
+    json = {
+      "nodeinfo" => node,
+      "name" => node.get_name,
+      "type" => node.type
+    }
+    
+    if folder_type == "Courses" or folder_type == "Assignments"
+      json.merge! ({
+        "directory" => node.get_directory,
+        "creation_date" => node.get_creation_date,
+        "updated_date" => node.get_modified_date,
+        "institution" => Institution.where(id: node.retrieve_institution_id),
+        "private" => node.get_instructor_id == session[:user].id
+      })
+      instructor_id = node.get_instructor_id
+      update_in_ta_course_listing(instructor_id, node, json)
+      update_instructor(json, instructor_id)
+      update_is_available(json, instructor_id, node)
+      assignments_method(node, json) if folder_type == "Assignments"
+    end
+    
+    return json
+  end
+
   # check if nodetype is coursenode
   def course_node_for_current_ta?(ta_mappings, node)
-    ta_mappings.each {|ta_mapping| return true if ta_mapping.course_id == node.node_object_id }
+    ta_mappings.find {|ta_mapping| return true if ta_mapping.course_id == node.node_object_id }
     false
   end
 
@@ -227,7 +369,6 @@ class TreeDisplayController < ApplicationController
   # getting result nodes for child2. res[] contains all the resultant nodes.
   def res_node_for_child_2(ch_nodes)
     res = []
-
     if ch_nodes
       ch_nodes.each do |child|
         node_type = child.type
@@ -260,44 +401,7 @@ class TreeDisplayController < ApplicationController
     ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
     res_node_for_child_2(ch_nodes)
   end
-
-  # for child nodes
-  def children_node_2_ng
-    child_nodes = child_nodes_from_params(params[:reactParams2][:child_nodes])
-    res = get_tmp_res(params, child_nodes)
-    respond_to do |format|
-      format.html { render json: res }
-    end
-  end
-
-  def bridge_to_is_available
-    user = session[:user]
-    owner_id = params[:owner_id]
-    is_available(user, owner_id)
-  end
-
-  # gets and renders last open tab from session
-  def session_last_open_tab
-    res = session[:last_open_tab]
-    respond_to do |format|
-      format.html { render json: res }
-    end
-  end
-
-  # sets the last open tab from params
-  def set_session_last_open_tab
-    session[:last_open_tab] = params[:tab]
-    res = session[:last_open_tab]
-    respond_to do |format|
-      format.html { render json: res }
-    end
-  end
-
-  def drill
-    session[:root] = params[:root]
-    redirect_to controller: 'tree_display', action: 'list'
-  end
-
+  
   # if filter node is 'QAN', get the corresponding assignment questionnaires
   def filter_node_is_qan(search, qid)
     assignment = Assignment.find_by(name: search)
@@ -307,19 +411,6 @@ class TreeDisplayController < ApplicationController
         assignment_questionnaires.each {|q| qid << "#{q.questionnaire_id}+" }
         session[:root] = 1
       end
-    end
-    qid
-  end
-
-  def filter
-    qid = 'filter+'
-    search = params[:filter_string]
-    filter_node = params[:filternode]
-    if filter_node == 'QAN'
-      qid = filter_node_is_qan(search, qid)
-    elsif filter_node == 'ACN'
-      session[:root] = 2
-      qid << search
     end
     qid
   end

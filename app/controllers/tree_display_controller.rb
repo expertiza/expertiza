@@ -78,12 +78,26 @@ class TreeDisplayController < ApplicationController
     end
   end
 
-  # for child nodes
+  # Returns the contents of the Courses and Questionaire subfolders
   def children_node_2_ng
-    child_nodes = child_nodes_from_params(params[:reactParams2][:child_nodes])
-    res = get_tmp_res(params, child_nodes)
+    # Convert the object received in parameters to a FolderNode object.
+    #TODO: If the object passed in by params were stored as a FolderNode it
+    #      would be easier to process by this method.
+    folder_node = (params[:reactParams2][:nodeType]).constantize.new
+    params[:reactParams2][:child_nodes].each do |key, value|
+      folder_node[key] = value
+    end
+    
+    # Get all of the children in the sub-folder.
+    child_nodes = folder_node.get_children(nil, nil, session[:user].id, nil, nil)
+    # Serialize the contents of each node so it can be displayed on the UI
+    contents = []
+    child_nodes.each do |node|
+      contents.push(serialize_to_json(node))
+    end
+    
     respond_to do |format|
-      format.html { render json: res }
+      format.html { render json: contents }
     end
   end
 
@@ -221,6 +235,29 @@ class TreeDisplayController < ApplicationController
     res
   end
 
+  # Creates a json object that can be displayed by the UI
+  def serialize_to_json(node)
+    json = {
+      "nodeinfo" => node,
+      "name" => node.get_name,
+      "type" => node.type,
+      "key" => params[:reactParams2][:key],
+      "private" => node.get_private,
+      "creation_date" => node.get_creation_date,
+      "updated_date" => node.get_modified_date
+    }
+    
+    if node.type == "Courses" or node.type == "Assignments"
+      json["directory"] = node.get_directory
+      instructor_id = node.get_instructor_id
+      update_instructor(json, instructor_id)
+      update_is_available_2(json, instructor_id, node)
+      assignments_method(node, json) if node.type == "Assignments"
+    end
+    
+    return json
+  end
+
   # check if nodetype is coursenode
   def course_node_for_current_ta?(ta_mappings, node)
     ta_mappings.find {|ta_mapping| return true if ta_mapping.course_id == node.node_object_id }
@@ -264,51 +301,6 @@ class TreeDisplayController < ApplicationController
         is_user_instructor?(instructor_id)
   end
 
-  # attaches assignment nodes to course node of instructor
-  def coursenode_assignmentnode(res2, child)
-    res2["directory"] = child.get_directory
-    instructor_id = child.get_instructor_id
-    update_instructor(res2, instructor_id)
-    update_is_available_2(res2, instructor_id, child)
-    assignments_method(child, res2) if child.type == "AssignmentNode"
-  end
-
-  # getting result nodes for child2. res[] contains all the resultant nodes.
-  def res_node_for_child_2(ch_nodes)
-    res = []
-    if ch_nodes
-      ch_nodes.each do |child|
-        node_type = child.type
-        res2 = {
-          "nodeinfo" => child,
-          "name" => child.get_name,
-          "key" => params[:reactParams2][:key],
-          "type" => node_type,
-          "private" => child.get_private,
-          "creation_date" => child.get_creation_date,
-          "updated_date" => child.get_modified_date
-        }
-        coursenode_assignmentnode(res2, child) if %w[CourseNode AssignmentNode].include? node_type
-        res << res2
-      end
-    end
-    res
-  end
-
-  # initialising folder node 2
-  def initialize_fnode_2(fnode, child_nodes)
-    child_nodes.each do |key, value|
-      fnode[key] = value
-    end
-  end
-
-  def get_tmp_res(params, child_nodes)
-    fnode = (params[:reactParams2][:nodeType]).constantize.new
-    initialize_fnode_2(fnode, child_nodes)
-    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
-    res_node_for_child_2(ch_nodes)
-  end
-  
   # if filter node is 'QAN', get the corresponding assignment questionnaires
   def filter_node_is_qan(search, qid)
     assignment = Assignment.find_by(name: search)

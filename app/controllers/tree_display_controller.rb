@@ -38,43 +38,28 @@ class TreeDisplayController < ApplicationController
   def confirm_notifications_access
     redirect_to controller: :notifications, action: :list if current_user.try(:student?)
   end
-
-  # renders FolderNode json
-  def folder_node_ng_getter
+  
+  # Returns the contents of each top level folder as a json object.
+  def get_folder_contents
+    # Get all child nodes associated with a top level folder that the logged in user is authorized
+    # to view. Top level folders include Questionaires, Courses, and Assignments.
+    folders = {}
+    FolderNode.get.each do |folder_node|
+      child_nodes = folder_node.get_children(nil, nil, session[:user].id, nil, nil)
+       # Serialize the contents of each node so it can be displayed on the UI
+      contents = []
+      child_nodes.each do |node|
+        contents.push(serialize_folder_to_json(folder_node.get_name, node))
+      end
+      
+      # Store contents according to the root level folder.
+      folders[folder_node.get_name] = contents
+    end
+    
+    # Sort assignments by ?
+    folders['Assignments'] = folders['Assignments'].sort_by {|x| [x['instructor'], -1 * x['creation_date'].to_i] }
     respond_to do |format|
-      format.html { render json: FolderNode.get }
-    end
-  end
-
-  def update_fnode_children(fnode, tmp_res)
-    # fnode is short for foldernode which is the parent node
-    # ch_nodes are childrens
-    # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
-    ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
-    tmp_res[fnode.get_name] = ch_nodes
-  end
-
-  # initialize parent node and update child nodes for it
-  def initialize_fnode_update_children(params, node, tmp_res)
-    fnode = (params[:reactParams][:nodeType]).constantize.new
-    node.each do |a|
-      fnode[a[0]] = a[1]
-    end
-    update_fnode_children(fnode, tmp_res)
-  end
-
-  # for child nodes
-  def children_node_ng
-    flash[:error] = "Invalid JSON in the TreeList" unless json_valid? params[:reactParams][:child_nodes]
-    child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
-    tmp_res = {}
-    child_nodes.each do |node|
-      initialize_fnode_update_children(params, node, tmp_res)
-    end
-    res = res_node_for_child(tmp_res)
-    res['Assignments'] = res['Assignments'].sort_by {|x| [x['instructor'], -1 * x['creation_date'].to_i] } if res.key?('Assignments')
-    respond_to do |format|
-      format.html { render json: res }
+      format.html { render json: folders }
     end
   end
 
@@ -200,6 +185,31 @@ class TreeDisplayController < ApplicationController
     update_instructor(tmp_object, instructor_id)
     update_is_available(tmp_object, instructor_id, node)
     assignments_method(node, tmp_object) if node_type == "Assignments"
+  end
+  
+  # Creates a json object that can be displayed by the UI
+  def serialize_folder_to_json(folder_type, node)
+    json = {
+      "nodeinfo" => node,
+      "name" => node.get_name,
+      "type" => node.type
+    }
+    
+    if folder_type == "Courses" or folder_type == "Assignments"
+      json.merge! ({
+        "directory" => node.get_directory,
+        "creation_date" => node.get_creation_date,
+        "updated_date" => node.get_modified_date,
+        "institution" => Institution.where(id: node.retrieve_institution_id),
+        "private" => node.get_instructor_id == session[:user].id
+      })
+      instructor_id = node.get_instructor_id
+      update_in_ta_course_listing(instructor_id, node, json)
+      update_instructor(json, instructor_id)
+      update_is_available(json, instructor_id, node)
+      assignments_method(node, json) if folder_type == "Assignments"
+    end
+    return json
   end
   
   # getting result nodes for child

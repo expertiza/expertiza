@@ -35,10 +35,6 @@ class TreeDisplayController < ApplicationController
     redirect_to controller: :student_task, action: :list if current_user.try(:student?)
   end
 
-  def confirm_notifications_access
-    redirect_to controller: :notifications, action: :list if current_user.try(:student?)
-  end
-  
   # Returns the contents of each top level folder as a json object.
   def get_folder_contents
     # Get all child nodes associated with a top level folder that the logged in user is authorized

@@ -15,14 +15,6 @@ describe ReviewMappingHelper, type: :helper do
       expect(colour).to eq('red')
     end
 
-    it 'should not return \'red\' if response_map exists in Responses' do
-      response_map = create(:review_response_map)
-      create(:response, response_map: response_map)
-
-      colour = get_team_colour(response_map)
-      expect(colour).not_to eq('red')
-    end
-
     it 'should return \'brown\' if reviewer (and its review_grade) both exist' do
       review_grade = create(:review_grade)
       reviewer = create(:participant, review_grade: review_grade)
@@ -31,15 +23,6 @@ describe ReviewMappingHelper, type: :helper do
 
       colour = get_team_colour(response_map)
       expect(colour).to eq('brown')
-    end
-
-    it 'should not return \'brown\' if review_grade is nil' do
-      reviewer = create(:participant, review_grade: nil)
-      response_map = create(:review_response_map, reviewer: reviewer)
-      create(:response, response_map: response_map)
-
-      colour = get_team_colour(response_map)
-      expect(colour).not_to eq('brown')
     end
 
     it 'should not return \'blue\' if a review was not submitted in each round' do

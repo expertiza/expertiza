@@ -20,9 +20,9 @@ module SummaryHelper
       self.avg_scores_by_round[round.to_s] = 0.0
     end
 
-    def init_vars_summarize_reviews_by_reviewee_round_ques(round,q)
+    def init_vars_summarize_reviews_by_reviewee_round_ques(round, q)
       self.summary[round.to_s][q.txt] = ""
-      self.avg_scores_by_criterion[round.to_s][q.txt] = 0.0 
+      self.avg_scores_by_criterion[round.to_s][q.txt] = 0.0
     end
 
     def summarize_reviews_by_reviewee(questions, assignment, r_id, summary_ws_url)
@@ -30,9 +30,7 @@ module SummaryHelper
 
       # get all answers for each question and send them to summarization WS
       questions.each_key do |round|
-
         init_vars_summarize_reviews_by_reviewee_round(round)
-
         questions[round].each do |q|
           next if q.type.eql?("SectionHeader")
           init_vars_summarize_reviews_by_reviewee_round_ques(round, q)
@@ -48,14 +46,13 @@ module SummaryHelper
         self.avg_scores_by_round[round.to_s] = calculate_avg_score_by_round(self.avg_scores_by_criterion[round.to_s], questions[round])
       end
     end
-
-
+    
     def init_vars_summarize_reviews_by_criterion(nround)
       self.summary = Array.new(nround)
       self.avg_scores_by_criterion = Array.new(nround)
       self.avg_scores_by_round = Array.new(nround)
     end
-
+    
     def init_vars_summarize_reviews_by_criterion_round(round)
       self.avg_scores_by_round[round] = 0.0
       self.summary[round] = {}
@@ -106,14 +103,14 @@ module SummaryHelper
       self.avg_scores_by_criterion = ({})
       self.reviewers = ({})
     end
-  
+
     def init_vars_summarize_reviews_by_reviewees_team(reviewee)
       self.summary[reviewee.name] = []
       self.avg_scores_by_reviewee[reviewee.name] = 0.0
       self.avg_scores_by_round[reviewee.name] = []
       self.avg_scores_by_criterion[reviewee.name] = []
     end
-   
+ 
     def init_vars_summarize_reviews_by_reviewees_team_round(reviewee, round)
       self.summary[reviewee.name][round] = {}
       self.avg_scores_by_round[reviewee.name][round] = 0.0

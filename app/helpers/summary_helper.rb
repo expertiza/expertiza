@@ -260,8 +260,7 @@ module SummaryHelper
     end
 
     def calculate_avg_score_by_round(avg_scores_by_criterion, criteria)
-      round_score = 0.0
-      sum_weight = 0
+      round_score = sum_weight = 0.0
       criteria.each do |q|
         # include this score in the average round score if the weight is valid & q is criterion
         if !q.weight.nil? and q.weight > 0 and q.type.eql?("Criterion")

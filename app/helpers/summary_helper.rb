@@ -156,7 +156,7 @@ module SummaryHelper
           rubric_questions_used.each do |q|
             next if q.type.eql?("SectionHeader")
             summary[reviewee.name][round][q.txt] = ""
-            
+
             # get all answers to this question
             question_answers = Answer.answers_by_question_for_reviewee_in_round(assignment.id, reviewee.id, q.id, round + 1)
             # get max score of this rubric
@@ -237,10 +237,18 @@ module SummaryHelper
       reviewers.map(&:name)
     end
 
+    def get_question_score_by_criterion(question_score, valid_answer_counter, q_max_score)
+      if valid_answer_counter > 0 and q_max_score > 0
+        # convert the score in percentage
+        question_score /= (valid_answer_counter * q_max_score)
+        question_score = question_score.round(2) * 100
+      end
+      question_score
+    end
+
     def calculate_avg_score_by_criterion(question_answers, q_max_score)
       # get score and summary of answers for each question
       # only include divide the valid_answer_sum with the number of valid answers
-
       valid_answer_counter = 0
       question_score = 0.0
       question_answers.each do |ans|
@@ -250,13 +258,12 @@ module SummaryHelper
           valid_answer_counter += 1
         end
       end
+      question_score = get_question_score_by_criterion(question_score, valid_answer_counter, q_max_score)
+    end
 
-      if valid_answer_counter > 0 and q_max_score > 0
-        # convert the score in percentage
-        question_score /= (valid_answer_counter * q_max_score)
-        question_score = question_score.round(2) * 100
-      end
-      question_score
+    def get_round_score(round_score, sum_weight)
+      round_score /= sum_weight if sum_weight > 0 and round_score > 0
+      round_score
     end
     
     def calculate_round_score(avg_scores_by_criterion, criteria)
@@ -268,10 +275,9 @@ module SummaryHelper
           sum_weight += q.weight
         end
       end
-      round_score /= sum_weight if sum_weight > 0 and round_score > 0
-      round_score
+      round_score = get_round_score(round_score, sum_weight)
     end
-      
+
     def calculate_avg_score_by_round(avg_scores_by_criterion, criteria)
       round_score = calculate_round_score(avg_scores_by_criterion, criteria)
       round_score.round(2)

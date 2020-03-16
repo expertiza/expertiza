@@ -156,8 +156,7 @@ module SummaryHelper
           rubric_questions_used.each do |q|
             next if q.type.eql?("SectionHeader")
             summary[reviewee.name][round][q.txt] = ""
-            self.avg_scores_by_criterion[reviewee.name][round][q.txt] = 0.0
-
+            
             # get all answers to this question
             question_answers = Answer.answers_by_question_for_reviewee_in_round(assignment.id, reviewee.id, q.id, round + 1)
             # get max score of this rubric

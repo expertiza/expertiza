@@ -82,7 +82,7 @@ module SummaryHelper
     end
 
     # initialize variables of summarize_reviews_by_reviewees
-    def init_vars_summarize_reviews_by_reviewees()
+    def init_vars_summarize_reviews_by_reviewees
       self.summary = ({})
       self.avg_scores_by_reviewee = ({})
       self.avg_scores_by_round = ({})
@@ -97,7 +97,7 @@ module SummaryHelper
       # @avg_scores_by_reviewee[team]
       # @avg_score_round[reviewee][round]
       # @avg_scores_by_criterion[reviewee][round][criterion]
-      init_vars_summarize_reviews_by_reviewees()
+      init_vars_summarize_reviews_by_reviewees
       threads = []
 
       # get all criteria used in each round

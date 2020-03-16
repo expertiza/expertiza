@@ -7,8 +7,8 @@ require 'logger'
 module SummaryHelper
   class Summary
     attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion
-    
-     def init_vars_summarize_reviews_by_reviewee
+
+    def init_vars_summarize_reviews_by_reviewee
       self.summary = ({})
       self.avg_scores_by_round = ({})
       self.avg_scores_by_criterion = ({})
@@ -35,13 +35,9 @@ module SummaryHelper
 
         questions[round].each do |q|
           next if q.type.eql?("SectionHeader")
-
-          init_vars_summarize_reviews_by_reviewee_round_ques(round,q)
-
+          init_vars_summarize_reviews_by_reviewee_round_ques(round, q)
           question_answers = Answer.answers_by_question_for_reviewee(assignment.id, r_id, q.id)
-
           max_score = get_max_score_for_question(q)
-
           comments = break_up_comments_to_sentences(question_answers)
 
           # get the avg scores for this question
@@ -110,15 +106,15 @@ module SummaryHelper
       self.avg_scores_by_criterion = ({})
       self.reviewers = ({})
     end
-    
+  
     def init_vars_summarize_reviews_by_reviewees_team(reviewee)
       self.summary[reviewee.name] = []
       self.avg_scores_by_reviewee[reviewee.name] = 0.0
       self.avg_scores_by_round[reviewee.name] = []
       self.avg_scores_by_criterion[reviewee.name] = []
     end
-     
-    def init_vars_summarize_reviews_by_reviewees_team_round(reviewee, round)     
+   
+    def init_vars_summarize_reviews_by_reviewees_team_round(reviewee, round)
       self.summary[reviewee.name][round] = {}
       self.avg_scores_by_round[reviewee.name][round] = 0.0
       self.avg_scores_by_criterion[reviewee.name][round] = {}
@@ -148,11 +144,9 @@ module SummaryHelper
       teams = Team.select(:id, :name).where(parent_id: assignment.id).order(:name)
 
       teams.each do |reviewee|
-        
         init_vars_summarize_reviews_by_reviewees_team(reviewee)
         # get the name of reviewers for display only
         self.reviewers[reviewee.name] = get_reviewers_by_reviewee_and_assignment(reviewee, assignment.id)
-
         # get answers of each reviewer by rubric
         (0..assignment.rounds_of_reviews - 1).each do |round|
           init_vars_summarize_reviews_by_reviewees_team_round(reviewee, round)
@@ -169,13 +163,11 @@ module SummaryHelper
             question_answers = Answer.answers_by_question_for_reviewee_in_round(assignment.id, reviewee.id, q.id, round + 1)
             # get max score of this rubric
             q_max_score = get_max_score_for_question(q)
-
             comments = break_up_comments_to_sentences(question_answers)
             # get score and summary of answers for each question
             self.avg_scores_by_criterion[reviewee.name][round][q.txt] = calculate_avg_score_by_criterion(question_answers, q_max_score)
 
             # summarize the comments by calling the summarization Web Service
-
             # since it'll do a lot of request, do this in seperate threads
             threads << Thread.new do
               summary[reviewee.name][round][q.txt] = summarize_sentences(comments, summary_ws_url) unless comments.empty?
@@ -186,7 +178,6 @@ module SummaryHelper
         end
         self.avg_scores_by_reviewee[reviewee.name] = calculate_avg_score_by_reviewee(self.avg_scores_by_round[reviewee.name], assignment.rounds_of_reviews)
       end
-
       # Wait for all threads to end
       end_threads(threads)
     end
@@ -267,14 +258,12 @@ module SummaryHelper
         question_score /= (valid_answer_counter * q_max_score)
         question_score = question_score.round(2) * 100
       end
-
       question_score
     end
 
     def calculate_avg_score_by_round(avg_scores_by_criterion, criteria)
       round_score = 0.0
       sum_weight = 0
-
       criteria.each do |q|
         # include this score in the average round score if the weight is valid & q is criterion
         if !q.weight.nil? and q.weight > 0 and q.type.eql?("Criterion")
@@ -297,7 +286,6 @@ module SummaryHelper
 
       # calculate avg score per reviewee
       sum_scores /= nround if nround > 0 and sum_scores > 0
-
       sum_scores.round(2)
     end
   end

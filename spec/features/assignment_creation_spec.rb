@@ -622,7 +622,10 @@ describe "participants", js: true do
 		fill_in 'user_name', with: student.name, match: :first
 		choose 'user_role_participant', match: :first
 
-		expect { click_button 'Add', match: :first; sleep(1) }.to change { Participant.count }.by 1
+		expect { 
+			click_button 'Add', match: :first
+			sleep(1) 
+		}.to change { Participant.count }.by 1
 	end
 
 	it "should display newly created assignment" do

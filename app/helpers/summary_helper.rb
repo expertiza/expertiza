@@ -258,8 +258,8 @@ module SummaryHelper
       end
       question_score
     end
-
-    def calculate_avg_score_by_round(avg_scores_by_criterion, criteria)
+    
+    def calculate_round_score(avg_scores_by_criterion, criteria)
       round_score = sum_weight = 0.0
       criteria.each do |q|
         # include this score in the average round score if the weight is valid & q is criterion
@@ -268,15 +268,17 @@ module SummaryHelper
           sum_weight += q.weight
         end
       end
-
       round_score /= sum_weight if sum_weight > 0 and round_score > 0
-
+      round_score
+    end
+      
+    def calculate_avg_score_by_round(avg_scores_by_criterion, criteria)
+      round_score = calculate_round_score(avg_scores_by_criterion, criteria)
       round_score.round(2)
     end
 
     def calculate_avg_score_by_reviewee(avg_scores_by_round, nround)
       sum_scores = 0.0
-
       avg_scores_by_round.each do |score|
         sum_scores += score
       end

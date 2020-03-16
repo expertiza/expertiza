@@ -45,6 +45,7 @@ module SummaryHelper
         end
         self.avg_scores_by_round[round.to_s] = calculate_avg_score_by_round(self.avg_scores_by_criterion[round.to_s], questions[round])
       end
+      self
     end
 
     def init_vars_summarize_reviews_by_criterion(nround)
@@ -93,6 +94,7 @@ module SummaryHelper
         end
         self.avg_scores_by_round[round] = calculate_avg_score_by_round(avg_scores_by_criterion[round], questions_used_in_round)
       end
+      self
     end
 
     # initialize variables of summarize_reviews_by_reviewees

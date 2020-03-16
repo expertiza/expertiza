@@ -85,15 +85,7 @@ class ImpersonateController < ApplicationController
     flash[:error] = message
     redirect_back
     return
-  end 
-
-   
-
- 
-
-
-
-    
+  end     
    
   # Method to be refactored
   def impersonate
@@ -139,8 +131,8 @@ class ImpersonateController < ApplicationController
       end
       # Navigate to user's home location
       AuthController.set_current_role(user.role_id, session)
-      redirect_to action: AuthHelper.get_home_action(session[:user]),
-                  controller: AuthHelper.get_home_controller(session[:user])
+      #redirect_to action: AuthHelper.get_home_action(session[:user]),
+                  #controller: AuthHelper.get_home_controller(session[:user])
     
     end
   end

@@ -22,12 +22,11 @@ class ImpersonateController < ApplicationController
   end
  
 
-#method to clear the session 
+  # method to clear the session 
   def clear_session
     original_user = session[:super_user] || session[:user]
     user = User.find_by(name: params[:user][:name])
-    if params[:impersonate].nil?
-	  
+    if params[:impersonate].nil?	  
       	  AuthController.clear_user_info(session, nil)
           session[:original_user] = original_user
           session[:impersonate] = true
@@ -47,46 +46,75 @@ class ImpersonateController < ApplicationController
      end
   end
 
-#checking if special character 
+  # checking if special character 
   def check_if_spl_char
     if warn_for_special_chars(params[:user][:name], "Username")
           redirect_back
           return
     end
   end
+ 
+  # When specified user cannot be impersonated
+  def checkif_user_impersonateable 
+    original_user = session[:super_user] || session[:user]
+    if params[:impersonate].nil?
+           user = User.find_by(name: params[:user][:name])
+    else 
+           if !params[:impersonate][:name].empty?
+              user = User.find_by(name: params[:impersonate][:name])
+           end
+    end
+    unless original_user.can_impersonate? user
+          flash[:error] = "You cannot impersonate #{params[:user][:name]}."
+          redirect_back
+          return
+    end
+  end 
+
+  # Function to display appropriate error messages 
+  def display_error_msg 
+    if params[:impersonate].nil?
+           message = "No user exists with the name '#{params[:user][:name]}'."
+    else
+           if !params[:impersonate][:name].empty?
+              message = "No user exists with the name '#{params[:impersonate][:name]}'."
+           else
+              message = "No original account was found. Please close your browser and start a new session."
+           end 
+    end 
+    flash[:error] = message
+    redirect_back
+    return
+  end 
+
+   
+
+ 
+
+
 
     
    
   # Method to be refactored
   def impersonate
-    if params[:user]
-      message = "No user exists with the name '#{params[:user][:name]}'."
-    elsif params[:impersonate]
-      message = "No user exists with the name '#{params[:impersonate][:name]}'."
-    end
-    begin
+      begin
       original_user = session[:super_user] || session[:user]
+
       # Impersonate using form on /impersonate/start
       if params[:impersonate].nil?
-
         # check if special chars /\?<>|&$# are used to avoid html tags or system command
         check_if_spl_char
 
         user = User.find_by(name: params[:user][:name])
         if user
-          unless original_user.can_impersonate? user
-            flash[:error] = "You cannot impersonate #{params[:user][:name]}."
-            redirect_back
-            return
-          end
+          checkif_user_impersonateable 
           session[:super_user] = session[:user] if session[:super_user].nil?
 	  clear_session
         else
-          flash[:error] = message
-          redirect_back
-          return
+          display_error_msg
         end
       else
+
         # Impersonate a new account
         if !params[:impersonate][:name].empty?
           # check if special chars /\?<>|&$# are used to avoid html tags or system command
@@ -94,25 +122,18 @@ class ImpersonateController < ApplicationController
 
           user = User.find_by(name: params[:impersonate][:name])
           if user
-            unless original_user.can_impersonate? user
-              flash[:error] = "You cannot impersonate #{params[:user][:name]}."
-              redirect_back
-              return
-            end
+            checkif_user_impersonateable 
 	    clear_session
           else
-            flash[:error] = message
-            redirect_back
-            return
+            display_error_msg
           end
+
           # Revert to original account
         else
           if !session[:super_user].nil?
 	    clear_session
           else
-            flash[:error] = "No original account was found. Please close your browser and start a new session."
-            redirect_back
-            return
+            display_error_msg
           end
         end
       end
@@ -120,9 +141,7 @@ class ImpersonateController < ApplicationController
       AuthController.set_current_role(user.role_id, session)
       redirect_to action: AuthHelper.get_home_action(session[:user]),
                   controller: AuthHelper.get_home_controller(session[:user])
-    rescue Exception => e
-      flash[:error] = e.message
-      redirect_to :back
+    
     end
   end
 end

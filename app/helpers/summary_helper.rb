@@ -7,23 +7,36 @@ require 'logger'
 module SummaryHelper
   class Summary
     attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion
-
-    def summarize_reviews_by_reviewee(questions, assignment, r_id, summary_ws_url)
+    
+     def init_vars_summarize_reviews_by_reviewee
       self.summary = ({})
       self.avg_scores_by_round = ({})
       self.avg_scores_by_criterion = ({})
+    end
+
+    def init_vars_summarize_reviews_by_reviewee_round(round)
+      self.summary[round.to_s] = {}
+      self.avg_scores_by_criterion[round.to_s] = {}
+      self.avg_scores_by_round[round.to_s] = 0.0
+    end
+
+    def init_vars_summarize_reviews_by_reviewee_round_ques(round,q)
+      self.summary[round.to_s][q.txt] = ""
+      self.avg_scores_by_criterion[round.to_s][q.txt] = 0.0 
+    end
+
+    def summarize_reviews_by_reviewee(questions, assignment, r_id, summary_ws_url)
+      init_vars_summarize_reviews_by_reviewee
 
       # get all answers for each question and send them to summarization WS
       questions.each_key do |round|
-        self.summary[round.to_s] = {}
-        self.avg_scores_by_criterion[round.to_s] = {}
-        self.avg_scores_by_round[round.to_s] = 0.0
+
+        init_vars_summarize_reviews_by_reviewee_round(round)
 
         questions[round].each do |q|
           next if q.type.eql?("SectionHeader")
 
-          self.summary[round.to_s][q.txt] = ""
-          self.avg_scores_by_criterion[round.to_s][q.txt] = 0.0
+          init_vars_summarize_reviews_by_reviewee_round_ques(round,q)
 
           question_answers = Answer.answers_by_question_for_reviewee(assignment.id, r_id, q.id)
 
@@ -38,7 +51,19 @@ module SummaryHelper
         end
         self.avg_scores_by_round[round.to_s] = calculate_avg_score_by_round(self.avg_scores_by_criterion[round.to_s], questions[round])
       end
-      self
+    end
+
+
+    def init_vars_summarize_reviews_by_criterion(nround)
+      self.summary = Array.new(nround)
+      self.avg_scores_by_criterion = Array.new(nround)
+      self.avg_scores_by_round = Array.new(nround)
+    end
+
+    def init_vars_summarize_reviews_by_criterion_round(round)
+      self.avg_scores_by_round[round] = 0.0
+      self.summary[round] = {}
+      self.avg_scores_by_criterion[round] = {}
     end
 
     # produce summaries for instructor. it merges all feedback given to all reviewees, and summarize them by criterion
@@ -48,14 +73,11 @@ module SummaryHelper
       # @avg_scores_by_criterion[reviewee][round][criterion]
       nround = assignment.rounds_of_reviews
       threads = []
-      self.summary = self.avg_scores_by_criterion = self.avg_scores_by_round = Array.new(nround)
+      init_vars_summarize_reviews_by_criterion(nround)
       rubric = get_questions_by_assignment(assignment)
 
       (0..nround - 1).each do |round|
-        self.avg_scores_by_round[round] = 0.0
-        self.summary[round] = {}
-        self.avg_scores_by_criterion[round] = {}
-
+        init_vars_summarize_reviews_by_criterion_round(round)
         questions_used_in_round = rubric[assignment.varying_rubrics_by_round? ? round : 0]
         # get answers of each question in the rubric
         questions_used_in_round.each do |question|
@@ -78,7 +100,6 @@ module SummaryHelper
         end
         self.avg_scores_by_round[round] = calculate_avg_score_by_round(avg_scores_by_criterion[round], questions_used_in_round)
       end
-      self
     end
 
     # initialize variables of summarize_reviews_by_reviewees
@@ -88,6 +109,19 @@ module SummaryHelper
       self.avg_scores_by_round = ({})
       self.avg_scores_by_criterion = ({})
       self.reviewers = ({})
+    end
+    
+    def init_vars_summarize_reviews_by_reviewees_team(reviewee)
+      self.summary[reviewee.name] = []
+      self.avg_scores_by_reviewee[reviewee.name] = 0.0
+      self.avg_scores_by_round[reviewee.name] = []
+      self.avg_scores_by_criterion[reviewee.name] = []
+    end
+     
+    def init_vars_summarize_reviews_by_reviewees_team_round(reviewee, round)     
+      self.summary[reviewee.name][round] = {}
+      self.avg_scores_by_round[reviewee.name][round] = 0.0
+      self.avg_scores_by_criterion[reviewee.name][round] = {}
     end
 
     # end threads
@@ -114,18 +148,14 @@ module SummaryHelper
       teams = Team.select(:id, :name).where(parent_id: assignment.id).order(:name)
 
       teams.each do |reviewee|
-        self.summary[reviewee.name] = []
-        self.avg_scores_by_reviewee[reviewee.name] = 0.0
-        self.avg_scores_by_round[reviewee.name] = self.avg_scores_by_criterion[reviewee.name] = []
-
+        
+        init_vars_summarize_reviews_by_reviewees_team(reviewee)
         # get the name of reviewers for display only
         self.reviewers[reviewee.name] = get_reviewers_by_reviewee_and_assignment(reviewee, assignment.id)
 
         # get answers of each reviewer by rubric
         (0..assignment.rounds_of_reviews - 1).each do |round|
-          self.summary[reviewee.name][round] = {}
-          self.avg_scores_by_round[reviewee.name][round] = 0.0
-          self.avg_scores_by_criterion[reviewee.name][round] = {}
+          init_vars_summarize_reviews_by_reviewees_team_round(reviewee, round)
 
           # iterate each round and get answers
           # if use the same rubric, only use rubric[0]

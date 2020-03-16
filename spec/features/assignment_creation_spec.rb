@@ -32,6 +32,15 @@ def fill_assignment_form
   fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
 end
 
+def private_assignment_creation_setup
+  login_as("instructor6")
+  visit '/assignments/new?private=1'
+
+  fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
+  select('Course 2', from: 'assignment_form_assignment_course_id')
+  fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+end
+
 describe "assignment function" do
   before(:each) do
     create(:deadline_type, name: "submission")
@@ -81,12 +90,7 @@ describe "assignment function" do
     end
 
     it "is able to create with teams" do
-      login_as("instructor6")
-      visit '/assignments/new?private=1'
-
-      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      private_assignment_creation_setup()
       check("team_assignment")
       check("assignment_form_assignment_show_teammate_reviews")
       fill_in 'assignment_form_assignment_max_team_size', with: 3
@@ -101,12 +105,7 @@ describe "assignment function" do
     end
     # instructor can check "has quiz" box and set the number of quiz questions
     it "is able to create with quiz" do
-      login_as("instructor6")
-      visit '/assignments/new?private=1'
-
-      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      private_assignment_creation_setup()
       check("assignment_form_assignment_require_quiz")
       click_button 'Create'
       fill_in 'assignment_form_assignment_num_quiz_questions', with: 3
@@ -121,12 +120,7 @@ describe "assignment function" do
 
     it "is able to create with staggered deadline" do
       skip('skip test on staggered deadline temporarily')
-      login_as("instructor6")
-      visit '/assignments/new?private=1'
-
-      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      private_assignment_creation_setup()
       begin
         check("assignment_form_assignment_staggered_deadline")
       rescue StandardError
@@ -146,11 +140,7 @@ describe "assignment function" do
 
     ## should be able to create with review visible to all reviewres
     it "is able to create with review visible to all reviewers" do
-      login_as("instructor6")
-      visit '/assignments/new?private=1'
-      fill_in 'assignment_form_assignment_name', with: 'private assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      private_assignment_creation_setup()
       fill_in 'assignment_form_assignment_spec_location', with: 'testLocation'
       check('assignment_form_assignment_reviews_visible_to_all')
       click_button 'Create'
@@ -166,12 +156,7 @@ describe "assignment function" do
     end
 
     it "is able to create public micro-task assignment" do
-      login_as("instructor6")
-      visit '/assignments/new?private=0'
-
-      fill_in 'assignment_form_assignment_name', with: 'public assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      private_assignment_creation_setup()
       check('assignment_form_assignment_microtask')
       click_button 'Create'
 
@@ -181,12 +166,7 @@ describe "assignment function" do
       )
     end
     it "is able to create calibrated public assignment" do
-      login_as("instructor6")
-      visit '/assignments/new?private=0'
-
-      fill_in 'assignment_form_assignment_name', with: 'public assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      private_assignment_creation_setup()
       check("assignment_form_assignment_is_calibrated")
       click_button 'Create'
 
@@ -196,11 +176,7 @@ describe "assignment function" do
       )
     end
     it "is able show tab review strategy" do
-      login_as("instructor6")
-      visit '/assignments/new?private=0'
-      fill_in 'assignment_form_assignment_name', with: 'public assignment for test'
-      select('Course 2', from: 'assignment_form_assignment_course_id')
-      fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
+      private_assignment_creation_setup()
 
       find_link('ReviewStrategy').click
       expect(page).to have_content("Review strategy")

@@ -90,6 +90,13 @@ module SummaryHelper
       self.reviewers = ({})
     end
 
+    # end threads
+    def end_threads(threads)
+      threads.each do |t|
+        t.join if t != Thread.current
+      end
+    end
+
     # produce summaries for instructor and students. It sum up the feedback by criterion for each reviewee
     def summarize_reviews_by_reviewees(assignment, summary_ws_url)
       # @summary[reviewee][round][question]
@@ -151,11 +158,7 @@ module SummaryHelper
       end
 
       # Wait for all threads to end
-      threads.each do |t|
-        t.join if t != Thread.current
-      end
-
-      self
+      end_threads(threads)
     end
 
     def get_max_score_for_question(question)

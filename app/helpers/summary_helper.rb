@@ -6,16 +6,18 @@ require 'logger'
 # required by autosummary
 module SummaryHelper
   class Summary
-    attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion, :assignment
+    attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion, :r_id
 
-    def summarize_reviews_by_reviewee_questions(questions, round, r_id, summary_ws_url)
-      self.summary[round.to_s] = self.avg_scores_by_criterion[round.to_s] = {}
+    def summarize_reviews_by_reviewee_questions(questions, round, assignment, summary_ws_url)
+      self.summary[round.to_s] = {}
+      self.avg_scores_by_criterion[round.to_s] = {}
       self.avg_scores_by_round[round.to_s] = 0.0
+      r_id = self.r_id
       questions[round].each do |q|
         next if q.type.eql?("SectionHeader")
         self.summary[round.to_s][q.txt] = ""
         self.avg_scores_by_criterion[round.to_s][q.txt] = 0.0
-        question_answers = Answer.answers_by_question_for_reviewee(self.assignment.id, r_id, q.id)
+        question_answers = Answer.answers_by_question_for_reviewee(assignment.id, r_id, q.id)
         max_score = get_max_score_for_question(q)
         comments = break_up_comments_to_sentences(question_answers)
         # get the avg scores for this question
@@ -27,11 +29,11 @@ module SummaryHelper
  
     def summarize_reviews_by_reviewee(questions, assignment, r_id, summary_ws_url)
       self.summary = self.avg_scores_by_round = self.avg_scores_by_criterion = ({})
-      self.assignment = assignment
+      self.r_id = r_id
 
       # get all answers for each question and send them to summarization WS
       questions.each_key do |round|
-        summarize_reviews_by_reviewee_questions(questions, round, r_id, summary_ws_url)
+        summarize_reviews_by_reviewee_questions(questions, round, assignment, summary_ws_url)
         self.avg_scores_by_round[round.to_s] = calculate_avg_score_by_round(self.avg_scores_by_criterion[round.to_s], questions[round])
       end
       self

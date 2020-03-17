@@ -61,7 +61,7 @@ module SummaryHelper
       end_threads(threads)
     end
 
-    def summarize_reviews_by_criterion_round(assignment, round, threads)
+    def summarize_reviews_by_criterion_round(assignment, round, threads, rubric)
       self.avg_scores_by_round[round] = 0.0
       self.summary[round] = self.avg_scores_by_criterion[round] = {}
       questions_used_in_round = rubric[assignment.varying_rubrics_by_round? ? round : 0]
@@ -83,7 +83,7 @@ module SummaryHelper
       self.summary_ws_url = summary_ws_url
       rubric = get_questions_by_assignment(assignment)
       (0..nround - 1).each do |round|
-        summarize_reviews_by_criterion_round(assignment, round, threads)
+        summarize_reviews_by_criterion_round(assignment, round, threads, rubric)
       end
       self
     end

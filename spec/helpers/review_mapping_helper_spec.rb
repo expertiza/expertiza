@@ -461,4 +461,49 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
+
+  describe 'calcutate_average_author_feedback_score' do
+    before(:each) do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+
+      @assignment = create(:assignment, name: 'get_awarded_review_score_test', created_at: DateTime.now.in_time_zone - 13.day)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
+
+      user = create(:student)
+      @reviewee = create(:assignment_team, assignment: @assignment)
+      create(:team_user, user: user, team: @reviewee)
+      reviewer = create(:participant, assignment: @assignment, user: user)
+
+      @response_map = create(:review_response_map, reviewer: reviewer, reviewee: @reviewee, assignment: @assignment)
+
+
+      questionnaire_1 = create(:questionnaire, min_question_score: 0, max_question_score: 5)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: questionnaire_1, used_in_round: 1)
+      question_1 = create(:question, questionnaire: questionnaire_1)
+      question_2 = create(:question, questionnaire: questionnaire_1)
+
+      response_1 = create(:response, response_map: @response_map, round: 1)
+
+      create(:answer, question: question_1, response: response_1, answer: 2)
+      create(:answer, question: question_2, response: response_1, answer: 4 )
+
+    end
+
+    it 'returns the average author feedback score if maximum team size is equal to 1' do
+      max_team_size = 1
+      author_feedback_avg_score = calcutate_average_author_feedback_score(@assignment.id, max_team_size, @response_map.id, @reviewee.id)
+      expect(author_feedback_avg_score).to eq "6 / 10"
+    end
+
+    it 'returns empty response if maximum team size is not 1' do
+      max_team_size = 3
+      author_feedback_avg_score = calcutate_average_author_feedback_score(@assignment.id, max_team_size, @response_map.id, @reviewee.id)
+      expect(author_feedback_avg_score).to eq "-- / --"
+    end
+
+    end
+
+
 end

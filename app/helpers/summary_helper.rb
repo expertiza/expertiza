@@ -6,10 +6,9 @@ require 'logger'
 # required by autosummary
 module SummaryHelper
   class Summary
-    attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion, :r_id
+    attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion
 
-    def summarize_reviews_by_reviewee_questions(questions, round, assignment, summary_ws_url)
-      r_id = self.r_id
+    def summarize_reviews_by_reviewee_questions(questions, round, assignment, r_id, summary_ws_url)
       questions[round].each do |q|
         next if q.type.eql?("SectionHeader")
         
@@ -38,7 +37,7 @@ module SummaryHelper
         self.summary[round.to_s] = {}
         self.avg_scores_by_criterion[round.to_s] = {}
         self.avg_scores_by_round[round.to_s] = 0.0
-        summarize_reviews_by_reviewee_questions(questions, round, assignment, summary_ws_url)
+        summarize_reviews_by_reviewee_questions(questions, round, assignment, r_id, summary_ws_url)
         self.avg_scores_by_round[round.to_s] = calculate_avg_score_by_round(self.avg_scores_by_criterion[round.to_s], questions[round])
       end
       self

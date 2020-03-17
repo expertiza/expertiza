@@ -8,32 +8,32 @@ module SummaryHelper
   class Summary
     attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion
 
-    def init_vars_summarize_reviews_by_reviewee
-      self.summary = ({})
-      self.avg_scores_by_round = ({})
-      self.avg_scores_by_criterion = ({})
+    def init_vars_summarize_reviews_by_reviewee(round = nil, q = nil)
+      if round.nil? and q.nil?
+        self.summary = ({})
+        self.avg_scores_by_round = ({})
+        self.avg_scores_by_criterion = ({})
+      elsif not round.nil?
+        if q.nil?
+          self.summary[round.to_s] = {}
+          self.avg_scores_by_criterion[round.to_s] = {}
+          self.avg_scores_by_round[round.to_s] = 0.0
+        else
+          self.summary[round.to_s][q.txt] = ""
+          self.avg_scores_by_criterion[round.to_s][q.txt] = 0.0
+        end
+      end
     end
-
-    def init_vars_summarize_reviews_by_reviewee_round(round)
-      self.summary[round.to_s] = {}
-      self.avg_scores_by_criterion[round.to_s] = {}
-      self.avg_scores_by_round[round.to_s] = 0.0
-    end
-
-    def init_vars_summarize_reviews_by_reviewee_round_ques(round, q)
-      self.summary[round.to_s][q.txt] = ""
-      self.avg_scores_by_criterion[round.to_s][q.txt] = 0.0
-    end
-
+    
     def summarize_reviews_by_reviewee(questions, assignment, r_id, summary_ws_url)
       init_vars_summarize_reviews_by_reviewee
 
       # get all answers for each question and send them to summarization WS
       questions.each_key do |round|
-        init_vars_summarize_reviews_by_reviewee_round(round)
+        init_vars_summarize_reviews_by_reviewee(round)
         questions[round].each do |q|
           next if q.type.eql?("SectionHeader")
-          init_vars_summarize_reviews_by_reviewee_round_ques(round, q)
+          init_vars_summarize_reviews_by_reviewee(round, q)
           question_answers = Answer.answers_by_question_for_reviewee(assignment.id, r_id, q.id)
           max_score = get_max_score_for_question(q)
           comments = break_up_comments_to_sentences(question_answers)
@@ -265,7 +265,7 @@ module SummaryHelper
       round_score /= sum_weight if sum_weight > 0 and round_score > 0
       round_score
     end
-    
+
     def calculate_round_score(avg_scores_by_criterion, criteria)
       round_score = sum_weight = 0.0
       criteria.each do |q|

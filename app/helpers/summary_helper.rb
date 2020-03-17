@@ -67,7 +67,7 @@ module SummaryHelper
       questions_used_in_round = rubric[assignment.varying_rubrics_by_round? ? round : 0]
       # get answers of each question in the rubric
       questions_used_in_round.each do |question|
-        summarize_reviews_by_criterion_question(assignment, self.summary_ws_url, round, question)
+        summarize_reviews_by_criterion_question(assignment, round, question, threads)
       end
       self.avg_scores_by_round[round] = calculate_avg_score_by_round(self.avg_scores_by_criterion[round], questions_used_in_round)
     end

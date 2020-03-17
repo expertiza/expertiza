@@ -60,7 +60,7 @@ class Assignment < ActiveRecord::Base
     self.is_calibrated
   end
 
-  def self.set_courses_to_assignment(user)
+  def self.assign_courses_to_assignment(user)
     @courses = Course.where(instructor_id: user.id).order(:name)
   end
 
@@ -587,8 +587,8 @@ class Assignment < ActiveRecord::Base
   def self.export_individual_data_fields(review_type, score_name)
     if pscore[review_type]
       tcsv.push(pscore[review_type][:scores][:max], pscore[review_type][:scores][:min], pscore[review_type][:scores][:avg])
-    else
-      tcsv.push('---', '---', '---') if options[score_name]
+    elsif options[score_name]
+      tcsv.push('---', '---', '---')
     end
   end
 

@@ -30,8 +30,7 @@ module SummaryHelper
 
     def summarize_reviews_by_reviewee(questions, assignment, r_id, summary_ws_url)
       self.summary = self.avg_scores_by_round = self.avg_scores_by_criterion = ({})
-      self.r_id = r_id
-
+      
       # get all answers for each question and send them to summarization WS
       questions.each_key do |round|
         self.summary[round.to_s] = {}

@@ -184,7 +184,7 @@ class ResponseController < ApplicationController
     @map.save
     participant = Participant.find_by(id: @map.reviewee_id)
     # E1822: Added logic to insert a student suggested 'Good Teammate' or 'Good Reviewer' badge in the awarded_badges table.
-    if @map.assignment.has_badge?
+    if @map.assignment.badge?
       if @map.is_a? TeammateReviewResponseMap and params[:review][:good_teammate_checkbox] == 'on'
         badge_id = Badge.get_id_from_name('Good Teammate')
         AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create

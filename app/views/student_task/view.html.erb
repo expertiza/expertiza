@@ -22,13 +22,12 @@
         <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.id%>
         (Sign up for a topic)
       </li>
+      <li>
+        <%= link_to "View bookmarks", :controller=>'bookmarks', :action=> 'list', :id => @topic_id %>
+        (View bookmarks others have submitted for your topic)
+      </li>
     <% end %>
   <%end%>
-
-  <li>
-    <%= link_to "View bookmarks", :controller=>'bookmarks', :action=> 'list', :id => @topic_id %>
-    (View bookmarks others have submitted for your topic)
-  </li>
 
 <!--ACS Here we need to know the size of the team to decide whether or not
 to display the label "Your team" in the student assignment tasks-->

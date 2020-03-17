@@ -360,7 +360,8 @@ class AssignmentsController < ApplicationController
     if current_user.timezonepref.nil?
       parent_id = current_user.parent_id
       parent_timezone = User.find(parent_id).timezonepref
-      flash[:error] = "We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. For now we assume you are in " + parent_timezone
+      flash[:error] = "We strongly suggest that instructors specify their preferred timezone to"\
+          " guarantee the correct display time. For now we assume you are in " + parent_timezone
       current_user.timezonepref = parent_timezone
     end
   end

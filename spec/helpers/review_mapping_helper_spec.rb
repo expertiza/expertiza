@@ -414,7 +414,7 @@ describe ReviewMappingHelper, type: :helper do
 
       @response_map_1 = create(:review_response_map, reviewer: @reviewer_1, reviewee: reviewee, assignment: @assignment)
       @response_map_2 = create(:review_response_map, reviewer: @reviewer_2, reviewee: reviewee, assignment: @assignment)
-      @response_map_3 = create(:review_response_map, reviewer: @reviewer_3, reviewee: reviewee, assignment: @as
+      @response_map_3 = create(:review_response_map, reviewer: @reviewer_3, reviewee: reviewee, assignment: @assignment)
 
     end
 

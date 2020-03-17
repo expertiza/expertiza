@@ -11,20 +11,7 @@ jQuery(document).ready(function() {
   }
 
   function formatDate(date) {
-    var month = new Array();
-    month[0] = "Jan";
-    month[1] = "Feb";
-    month[2] = "Mar";
-    month[3] = "Apr";
-    month[4] = "May";
-    month[5] = "Jun";
-    month[6] = "Jul";
-    month[7] = "Aug";
-    month[8] = "Sep";
-    month[9] = "Oct";
-    month[10] = "Nov";
-    month[11] = "Dec";
-
+    var month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     var hours = date.getHours();
     var minutes = date.getMinutes();
     var ampm = hours >= 12 ? 'PM' : 'AM';
@@ -233,7 +220,7 @@ jQuery(document).ready(function() {
               )
             }
             // if ends
-            
+
             if (this.props.has_topic) {
                 // Moved content out of this to the block outside this containing "if" statement
             }
@@ -651,7 +638,7 @@ jQuery(document).ready(function() {
                   onChange={this.handleChange}>
              {" Include others' items"}
            </input>
-         </span> 
+         </span>
       )
     }
   })
@@ -725,7 +712,7 @@ jQuery(document).ready(function() {
     },
     handleExpandClick: function(id, expanded,newParams) {
       if (expanded) {
-        this.setState({ 
+        this.setState({
           expandedRow: this.state.expandedRow.concat([id])
         });
         if(this.props.dataType!='assignment') {
@@ -1147,7 +1134,7 @@ jQuery(document).ready(function() {
                   newParams["nodeType"] = 'FolderNode'
                   node["newParams"]=newParams;
                 }
-              }) 
+              })
             })
             if (data2) {
               _this.setState({
@@ -1157,7 +1144,7 @@ jQuery(document).ready(function() {
           },
           'json')
       })
-      
+
     },
     handleTabChange: function(tabIndex) {
       jQuery.get("/tree_display/set_session_last_open_tab?tab="+tabIndex.toString())

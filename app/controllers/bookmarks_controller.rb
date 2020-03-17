@@ -1,7 +1,9 @@
 class BookmarksController < ApplicationController
   def action_allowed?
     case params[:action]
-    when 'list', 'new', 'create', 'bookmark_rating', 'save_bookmark_rating_score'
+    when 'list'
+      current_role_name =~ /^(Student|Instructor|Teaching Assistant)$/
+    when 'new', 'create', 'bookmark_rating', 'save_bookmark_rating_score'
       current_role_name.eql? 'Student'
     when 'edit', 'update', 'destroy'
       # edit, update, delete bookmarks can only be done by owner

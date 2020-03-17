@@ -6,48 +6,75 @@ require 'logger'
 # required by autosummary
 module SummaryHelper
   class Summary
-    attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion
-    
+    attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion, :summary_ws_url
+
+    def summarize_reviews_by_reviewee_questions(questions, round, assignment, r_id)
+      questions[round].each do |q|
+        next if q.type.eql?("SectionHeader")
+
+        self.summary[round.to_s][q.txt] = ""
+        self.avg_scores_by_criterion[round.to_s][q.txt] = 0.0
+
+        question_answers = Answer.answers_by_question_for_reviewee(assignment.id, r_id, q.id)
+
+        max_score = get_max_score_for_question(q)
+ 
+        comments = break_up_comments_to_sentences(question_answers)
+ 
+        # get the avg scores for this question
+        self.avg_scores_by_criterion[round.to_s][q.txt] = calculate_avg_score_by_criterion(question_answers, max_score)
+        # get the summary of answers to this question
+        self.summary[round.to_s][q.txt] = summarize_sentences(comments, self.summary_ws_url)
+      end
+    end
+
     def summarize_reviews_by_reviewee(questions, assignment, r_id, summary_ws_url)
       self.summary = self.avg_scores_by_round = self.avg_scores_by_criterion = ({})
-      
+      self.summary_ws_url = summary_ws_url
+
       # get all answers for each question and send them to summarization WS
       questions.each_key do |round|
         self.summary[round.to_s] = {}
         self.avg_scores_by_criterion[round.to_s] = {}
         self.avg_scores_by_round[round.to_s] = 0.0
-        questions[round].each do |q|
-          next if q.type.eql?("SectionHeader")
-        
-          self.summary[round.to_s][q.txt] = ""
-          self.avg_scores_by_criterion[round.to_s][q.txt] = 0.0
-
-          question_answers = Answer.answers_by_question_for_reviewee(assignment.id, r_id, q.id)
-
-          max_score = get_max_score_for_question(q)
-
-          comments = break_up_comments_to_sentences(question_answers)
-  
-          # get the avg scores for this question
-          self.avg_scores_by_criterion[round.to_s][q.txt] = calculate_avg_score_by_criterion(question_answers, max_score)
-          # get the summary of answers to this question
-          self.summary[round.to_s][q.txt] = summarize_sentences(comments, summary_ws_url)
-        end
+        summarize_reviews_by_reviewee_questions(questions, round, assignment, r_id)
         self.avg_scores_by_round[round.to_s] = calculate_avg_score_by_round(self.avg_scores_by_criterion[round.to_s], questions[round])
       end
       self
     end
 
-    def init_vars_summarize_reviews_by_criterion(nround)
-      self.summary = Array.new(nround)
-      self.avg_scores_by_criterion = Array.new(nround)
-      self.avg_scores_by_round = Array.new(nround)
+    # end threads
+    def end_threads(threads)
+      threads.each do |t|
+        t.join if t != Thread.current
+      end
     end
 
-    def init_vars_summarize_reviews_by_criterion_round(round)
+    def summarize_reviews_by_criterion_question(assignment, round, question, threads)
+      next if question.type.eql?("SectionHeader")
+      answers_questions = Answer.answers_by_question(assignment.id, question.id)
+
+      max_score = get_max_score_for_question(question)
+      # process each question in a seperate thread
+      threads << Thread.new do
+        comments = break_up_comments_to_sentences(answers_questions)
+        # store each avg in a hashmap and use the question as the key
+        self.avg_scores_by_criterion[round][question.txt] = calculate_avg_score_by_criterion(answers_questions, max_score)
+        self.summary[round][question.txt] = summarize_sentences(comments, self.summary_ws_url) unless comments.empty?
+      end
+      # Wait for all threads to end
+      end_threads(threads)
+    end
+
+    def summarize_reviews_by_criterion_round(assignment, round, threads)
       self.avg_scores_by_round[round] = 0.0
-      self.summary[round] = {}
-      self.avg_scores_by_criterion[round] = {}
+      self.summary[round] = self.avg_scores_by_criterion[round] = {}
+      questions_used_in_round = rubric[assignment.varying_rubrics_by_round? ? round : 0]
+      # get answers of each question in the rubric
+      questions_used_in_round.each do |question|
+        summarize_reviews_by_criterion_question(assignment, self.summary_ws_url, round, question)
+      end
+      self.avg_scores_by_round[round] = calculate_avg_score_by_round(self.avg_scores_by_criterion[round], questions_used_in_round)
     end
 
     # produce summaries for instructor. it merges all feedback given to all reviewees, and summarize them by criterion
@@ -57,32 +84,11 @@ module SummaryHelper
       # @avg_scores_by_criterion[reviewee][round][criterion]
       nround = assignment.rounds_of_reviews
       threads = []
-      init_vars_summarize_reviews_by_criterion(nround)
+      self.summary = self.avg_scores_by_criterion = self.avg_scores_by_round = Array.new(nround)
+      self.summary_ws_url = summary_ws_url
       rubric = get_questions_by_assignment(assignment)
-
       (0..nround - 1).each do |round|
-        init_vars_summarize_reviews_by_criterion_round(round)
-        questions_used_in_round = rubric[assignment.varying_rubrics_by_round? ? round : 0]
-        # get answers of each question in the rubric
-        questions_used_in_round.each do |question|
-          next if question.type.eql?("SectionHeader")
-          answers_questions = Answer.answers_by_question(assignment.id, question.id)
-
-          max_score = get_max_score_for_question(question)
-          # process each question in a seperate thread
-          threads << Thread.new do
-            comments = break_up_comments_to_sentences(answers_questions)
-            # store each avg in a hashmap and use the question as the key
-            self.avg_scores_by_criterion[round][question.txt] = calculate_avg_score_by_criterion(answers_questions, max_score)
-            self.summary[round][question.txt] = summarize_sentences(comments, summary_ws_url) unless comments.empty?
-          end
-          # Wait for all threads to end
-          threads.each do |t|
-            # Wait for the thread to finish if it isn't this thread (i.e. the main thread).
-            t.join if t != Thread.current
-          end
-        end
-        self.avg_scores_by_round[round] = calculate_avg_score_by_round(avg_scores_by_criterion[round], questions_used_in_round)
+        summarize_reviews_by_criterion_round(assignment, round, threads)
       end
       self
     end
@@ -107,13 +113,6 @@ module SummaryHelper
       self.summary[reviewee.name][round] = {}
       self.avg_scores_by_round[reviewee.name][round] = 0.0
       self.avg_scores_by_criterion[reviewee.name][round] = {}
-    end
-
-    # end threads
-    def end_threads(threads)
-      threads.each do |t|
-        t.join if t != Thread.current
-      end
     end
 
     # produce summaries for instructor and students. It sum up the feedback by criterion for each reviewee

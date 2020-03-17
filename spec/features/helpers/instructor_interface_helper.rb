@@ -1,5 +1,5 @@
-module InstructorInterfaceHelperSpec
-  def set_deadline_type
+module InstructorInterfaceHelper
+  def self.set_deadline_type
     create(:deadline_type, name: "submission")
     create(:deadline_type, name: "review")
     create(:deadline_type, name: "metareview")
@@ -8,18 +8,18 @@ module InstructorInterfaceHelperSpec
     create(:deadline_type, name: "team_formation")
   end
 
-  def set_deadline_right
+  def self.set_deadline_right
     create(:deadline_right)
     create(:deadline_right, name: 'Late')
     create(:deadline_right, name: 'OK')
   end
 
-  def set_assignment_due_date
+  def self.set_assignment_due_date
     create(:assignment_due_date)
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: 'review').first, due_at: Time.now.in_time_zone + 1.day)
   end
 
-  def assignment_setup
+  def self.assignment_setup
     create(:assignment)
     create_list(:participant, 3)
     create(:assignment_node)
@@ -28,13 +28,13 @@ module InstructorInterfaceHelperSpec
     set_assignment_due_date
   end
 
-  def course_setup
+  def self.course_setup
     create(:course)
     create_list(:participant, 3)
     create(:course_node)
   end
 
-  def import_topics(filepath)
+  def self.import_topics(filepath)
     login_as("instructor6")
     visit '/assignments/1/edit'
     click_link "Topics"
@@ -45,7 +45,7 @@ module InstructorInterfaceHelperSpec
     click_link "Topics"
   end
 
-  def expect_page_content_to_have(content, has_content)
+  def self.expect_page_content_to_have(content, has_content)
     content.each do |content_element|
       if has_content
         expect(page).to have_content(content_element)
@@ -55,7 +55,7 @@ module InstructorInterfaceHelperSpec
     end
   end
 
-  def validate_login_and_page_content(filepath, content, has_content)
+  def self.validate_login_and_page_content(filepath, content, has_content)
     import_topics(filepath)
     expect_page_content_to_have(content, has_content)
   end

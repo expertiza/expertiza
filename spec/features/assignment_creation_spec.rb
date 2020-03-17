@@ -1,5 +1,3 @@
-include InstructorInterfaceHelperSpec
-
 def questionnaire_options(assignment, type, _round = 0)
 	questionnaires = Questionnaire.where(['private = 0 or instructor_id = ?', assignment.instructor_id]).order('name')
 	options = []
@@ -44,8 +42,15 @@ def private_assignment_creation_setup
 end
 
 def create_deadline_types
-	set_deadline_type
-	set_deadline_right
+	create(:deadline_type, name: "submission")
+	create(:deadline_type, name: "review")
+	create(:deadline_type, name: "metareview")
+	create(:deadline_type, name: "drop_topic")
+	create(:deadline_type, name: "signup")
+	create(:deadline_type, name: "team_formation")
+	create(:deadline_right)
+	create(:deadline_right, name: 'Late')
+	create(:deadline_right, name: 'OK')
 end
 
 describe "assignment creation page", js: true do

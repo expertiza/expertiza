@@ -197,18 +197,15 @@ module SummaryHelper
 
     def get_questions_by_assignment(assignment)
       rubric = []
-      if assignment.varying_rubrics_by_round?
-      	(0..assignment.rounds_of_reviews - 1).each do |round|
-       	  rubric[round] = nil
-          # get rubric id in each round
-          questionnaire_id = assignment.review_questionnaire_id(round + 1)
+      (0..assignment.rounds_of_reviews - 1).each do |round|
+        rubric[round] = nil
+        if assignment.varying_rubrics_by_round?
           # get criteria in the corresponding rubric (each round may use different rubric)
-          rubric[round] = Question.where(questionnaire_id: questionnaire_id).order(:seq)
+          rubric[round] = Question.where(questionnaire_id: assignment.review_questionnaire_id(round + 1)).order(:seq)
+        else
+          # if use the same rubric then query only once at the beginning and store them in the rubric[0]
+          rubric[0] = rubric[0].nil? ? Question.where(questionnaire_id: assignment.review_questionnaire_id).order(:seq) : rubric[0]
         end
-      else
-        # if use the same rubric then query only once at the beginning and store them in the rubric[0]
-        questionnaire_id = assignment.review_questionnaire_id
-        rubric[0] = Question.where(questionnaire_id: questionnaire_id).order(:seq)
       end
       rubric
     end

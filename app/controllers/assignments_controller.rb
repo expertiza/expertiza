@@ -368,12 +368,10 @@ class AssignmentsController < ApplicationController
   def update_feedback_assignment_form_attributes
     if params[:set_pressed][:bool] == 'false'
       flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."
-    else
-      if @assignment_form.update_attributes(assignment_form_params, current_user)
+    elsif @assignment_form.update_attributes(assignment_form_params, current_user)
         flash[:note] = 'The assignment was successfully saved....'
-      else
+    else
         flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
-      end
     end
     ExpertizaLogger.info LoggerMessage.new("", session[:user].name, "The assignment was saved: #{@assignment_form.as_json}", request)
   end

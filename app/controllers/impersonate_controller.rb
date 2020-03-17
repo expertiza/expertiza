@@ -26,25 +26,32 @@ class ImpersonateController < ApplicationController
   def clear_session
     original_user = session[:super_user] || session[:user]
     user = User.find_by(name: params[:user][:name])
-    if params[:impersonate].nil?	  
+    #AuthController.clear_user_info(session, nil)
+
+    if params[:impersonate].nil?
+          #user = User.find_by(name: params[:user][:name])
+          session[:super_user] = session[:user] if session[:super_user].nil?
       	  AuthController.clear_user_info(session, nil)
           session[:original_user] = original_user
           session[:impersonate] = true
           session[:user] = user
-    else 
-	if !params[:impersonate][:name].empty?
+    else
+          user = User.find_by(name: params[:impersonate][:name])
+          if !params[:impersonate][:name].empty?
+            #user = User.find_by(name: params[:impersonate][:name])
 	    AuthController.clear_user_info(session, nil)
             session[:user] = user
             session[:impersonate] =  true
             session[:original_user] = original_user
-	else
+          else
+            #user = User.find_by(name: params[:impersonate][:name])
 	    AuthController.clear_user_info(session, nil)
             session[:user] = session[:super_user]
             user = session[:user]
             session[:super_user] = nil
-	end
-     end
-  end
+          end
+    end
+   end
 
   # checking if special character 
   def check_if_spl_char
@@ -100,7 +107,7 @@ class ImpersonateController < ApplicationController
         user = User.find_by(name: params[:user][:name])
         if user
           checkif_user_impersonateable 
-          session[:super_user] = session[:user] if session[:super_user].nil?
+          #session[:super_user] = session[:user] if session[:super_user].nil?
 	  clear_session
         else
           display_error_msg
@@ -131,8 +138,7 @@ class ImpersonateController < ApplicationController
       end
       # Navigate to user's home location
       AuthController.set_current_role(user.role_id, session)
-      #redirect_to action: AuthHelper.get_home_action(session[:user]),
-                  #controller: AuthHelper.get_home_controller(session[:user])
+      redirect_to action: AuthHelper.get_home_action(session[:user]),controller: AuthHelper.get_home_controller(session[:user])
     
     end
   end

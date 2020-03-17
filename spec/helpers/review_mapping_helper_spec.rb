@@ -405,28 +405,49 @@ describe ReviewMappingHelper, type: :helper do
 
       questionnaire_1 = create(:questionnaire)
       create(:assignment_questionnaire, assignment: @assignment, questionnaire: questionnaire_1, used_in_round: 1)
-      question_1 = create(:question, questionnaire: questionnaire_1)
+      @question_1 = create(:question, questionnaire: questionnaire_1)
 
       @reviewer_1 = create(:participant, review_grade: nil)
       @reviewer_2 = create(:participant, review_grade: nil)
       @reviewer_3 = create(:participant, review_grade: nil)
       reviewee = create(:assignment_team)
 
-      response_map_1 = create(:review_response_map, reviewer: @reviewer_1, reviewee: reviewee, assignment: @assignment)
-      response_map_2 = create(:review_response_map, reviewer: @reviewer_2, reviewee: reviewee, assignment: @assignment)
-      response_map_3 = create(:review_response_map, reviewer: @reviewer_3, reviewee: reviewee, assignment: @assignment)
-
-      response_1 = create(:response, response_map: response_map_1, round: 1, additional_comment: "Abc")
-      response_2 = create(:response, response_map: response_map_2, round: 1, additional_comment: "Abcde")
-      response_3 = create(:response, response_map: response_map_3, round: 1, additional_comment: "Abcde")
-
-      create(:answer, question: question_1, response: response_1, comments: "Is this it?")
-      create(:answer, question: question_1, response: response_2, comments: "I dont think this is it?")
-      create(:answer, question: question_1, response: response_3, comments: "This may be it?")
+      @response_map_1 = create(:review_response_map, reviewer: @reviewer_1, reviewee: reviewee, assignment: @assignment)
+      @response_map_2 = create(:review_response_map, reviewer: @reviewer_2, reviewee: reviewee, assignment: @assignment)
+      @response_map_3 = create(:review_response_map, reviewer: @reviewer_3, reviewee: reviewee, assignment: @as
 
     end
 
-    it 'should sort the reviewers by review volume when additional comment is provided in the answer' do
+    it 'should sort the reviewers by review volume when additional comment is provided in all responses' do
+      response_1 = create(:response, response_map: @response_map_1, round: 1, additional_comment: "Abc")
+      response_2 = create(:response, response_map: @response_map_2, round: 1, additional_comment: "Abcde")
+      response_3 = create(:response, response_map: @response_map_3, round: 1, additional_comment: "Abcde")
+
+      create(:answer, question: @question_1, response: response_1, comments: "Is this it?")
+      create(:answer, question: @question_1, response: response_2, comments: "I dont think this is it?")
+      create(:answer, question: @question_1, response: response_3, comments: "This may be it?")
+
+      @reviewers = []
+      @reviewers << Participant.find(@reviewer_1.id)
+      @reviewers << Participant.find(@reviewer_2.id)
+      @reviewers << Participant.find(@reviewer_3.id)
+
+      sort_reviewer_by_review_volume_desc()
+      expect(@reviewers[0]).to eq @reviewer_2
+      expect(@reviewers[1]).to eq @reviewer_3
+      expect(@reviewers[2]).to eq @reviewer_1
+
+    end
+
+    it 'should sort the reviewers by review volume when additional comment is not provided in any/some response' do
+      response_1 = create(:response, response_map: @response_map_1, round: 1)
+      response_2 = create(:response, response_map: @response_map_2, round: 1)
+      response_3 = create(:response, response_map: @response_map_3, round: 1)
+
+      create(:answer, question: @question_1, response: response_1, comments: "Is this it?")
+      create(:answer, question: @question_1, response: response_2, comments: "I dont think this is it?")
+      create(:answer, question: @question_1, response: response_3, comments: "This may be it?")
+
       @reviewers = []
       @reviewers << Participant.find(@reviewer_1.id)
       @reviewers << Participant.find(@reviewer_2.id)

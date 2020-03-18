@@ -25,6 +25,10 @@ module SummaryHelper
     end
 
     def summarize_reviews_by_reviewee_round(round, assignment)
+      logger = Logger.new(STDOUT)
+      logger.level = Logger::INFO
+      logger.info "round: #{round.to_s}"
+      logger.info "q.txt: #{self.q.txt}"
       self.summary[round.to_s][self.q.txt] = ""
       self.avg_scores_by_criterion[round.to_s][self.q.txt] = 0.0
       question_answers = Answer.answers_by_question_for_reviewee(assignment.id, self.r_id, self.q.id)

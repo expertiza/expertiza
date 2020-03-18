@@ -24,8 +24,7 @@ module SummaryHelper
       self
     end
 
-    def summarize_reviews_by_reviewee_round(questions, round, assignment, q)
-      next if q.type.eql?("SectionHeader")
+    def summarize_reviews_by_reviewee_round(round, assignment, q)
       self.summary[round.to_s][q.txt] = ""
       self.avg_scores_by_criterion[round.to_s][q.txt] = 0.0
       question_answers = Answer.answers_by_question_for_reviewee(assignment.id, self.r_id, q.id)
@@ -39,7 +38,8 @@ module SummaryHelper
 
     def summarize_reviews_by_reviewee_questions(questions, round, assignment)
       questions[round].each do |q|
-        summarize_reviews_by_reviewee_round(questions, round, assignment, q)
+        next if q.type.eql?("SectionHeader")
+        summarize_reviews_by_reviewee_round(round, assignment, q)
       end
     end
 
@@ -51,7 +51,6 @@ module SummaryHelper
     end
 
     def summarize_reviews_by_criterion_question(assignment, round, question, threads)
-      next if question.type.eql?("SectionHeader")
       answers_questions = Answer.answers_by_question(assignment.id, question.id)
 
       max_score = get_max_score_for_question(question)
@@ -72,6 +71,7 @@ module SummaryHelper
       questions_used_in_round = rubric[assignment.varying_rubrics_by_round? ? round : 0]
       # get answers of each question in the rubric
       questions_used_in_round.each do |question|
+        next if question.type.eql?("SectionHeader")
         summarize_reviews_by_criterion_question(assignment, round, question, threads)
       end
       self.avg_scores_by_round[round] = calculate_avg_score_by_round(self.avg_scores_by_criterion[round], questions_used_in_round)

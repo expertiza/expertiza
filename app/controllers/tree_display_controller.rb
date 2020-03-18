@@ -247,9 +247,10 @@ class TreeDisplayController < ApplicationController
   # check if current user is instructor
   def is_user_instructor?(instructor_id)
     # ta created the course, current user is the instructor of this ta.
-    instructor_ids = []
-    TaMapping.where(ta_id: instructor_id).each {|mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
-    session[:user].role_id == 2 and instructor_ids.include? session[:user].id
+    if session[:user].role_id == 2
+      TaMapping.where(ta_id: instructor_id).each {|mapping| return true if Course.find(mapping.course_id).instructor_id == session[:user].id}
+    end
+    false
   end
 
   def update_is_available_2(res2, instructor_id, child)
@@ -260,12 +261,12 @@ class TreeDisplayController < ApplicationController
   end
 
   # attaches assignment nodes to course node of instructor
-  def coursenode_assignmentnode(tmp_object, child)
+  def coursenode_assignmentnode(res2, child)
     res2["directory"] = child.get_directory
     instructor_id = child.get_instructor_id
-    update_instructor(tmp_object, instructor_id)
-    update_is_available_2(tmp_object, instructor_id, child)
-    assignments_method(child, tmp_object) if child.type == "AssignmentNode"
+    update_instructor(res2, instructor_id)
+    update_is_available_2(res2, instructor_id, child)
+    assignments_method(child, res2) if child.type == "AssignmentNode"
   end
 
   # getting result nodes for child2. res[] contains all the resultant nodes.

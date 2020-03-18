@@ -24,27 +24,18 @@ module SummaryHelper
       self
     end
 
-    def summarize_reviews_by_reviewee_round(round, assignment)
-      logger = Logger.new(STDOUT)
-      logger.level = Logger::INFO
-      logger.info "round: #{round}"
-      logger.info "q.txt: #{self.q.txt}"
-      self.summary[round.to_s][self.q.txt] = ""
-      self.avg_scores_by_criterion[round.to_s][self.q.txt] = 0.0
-      question_answers = Answer.answers_by_question_for_reviewee(assignment.id, self.r_id, self.q.id)
-      max_score = get_max_score_for_question(self.q)
-      comments = break_up_comments_to_sentences(question_answers)
-      # get the avg scores for this question
-      self.avg_scores_by_criterion[round.to_s][self.q.txt] = calculate_avg_score_by_criterion(question_answers, max_score)
-      # get the summary of answers to this question
-      self.summary[round.to_s][self.q.txt] = summarize_sentences(comments, self.summary_ws_url)
-    end
-
     def summarize_reviews_by_reviewee_questions(questions, round, assignment)
       questions[round].each do |q|
         next if q.type.eql?("SectionHeader")
-        self.q = q unless q.txt.nil?
-        summarize_reviews_by_reviewee_round(round, assignment)
+        self.summary[round.to_s][self.q.txt] = ""
+        self.avg_scores_by_criterion[round.to_s][self.q.txt] = 0.0
+        question_answers = Answer.answers_by_question_for_reviewee(assignment.id, self.r_id, self.q.id)
+        max_score = get_max_score_for_question(self.q)
+        comments = break_up_comments_to_sentences(question_answers)
+        # get the avg scores for this question
+        self.avg_scores_by_criterion[round.to_s][self.q.txt] = calculate_avg_score_by_criterion(question_answers, max_score)
+        # get the summary of answers to this question
+        self.summary[round.to_s][self.q.txt] = summarize_sentences(comments, self.summary_ws_url)
       end
     end
 

@@ -11,12 +11,12 @@ module SummaryHelper
     def summarize_reviews_by_reviewee(questions, assignment, r_id, summary_ws_url)
       self.summary = self.avg_scores_by_round = self.avg_scores_by_criterion = ({})
       self.summary_ws_url = summary_ws_url
-      
+ 
       # get all answers for each question and send them to summarization WS
       questions.each_key do |round|
         self.summary[round.to_s] = {}
         self.avg_scores_by_criterion[round.to_s] = {}
-        self.avg_scores_by_round[round.to_s] = 0.0
+        # self.avg_scores_by_round[round.to_s] = 0.0
         summarize_reviews_by_reviewee_questions(questions, round, assignment, r_id)
         self.avg_scores_by_round[round.to_s] = calculate_avg_score_by_round(self.avg_scores_by_criterion[round.to_s], questions[round])
       end
@@ -26,8 +26,8 @@ module SummaryHelper
     def summarize_reviews_by_reviewee_questions(questions, round, assignment, r_id)
       questions[round].each do |q|
         next if q.type.eql?("SectionHeader")
-        self.summary[round.to_s][q.txt] = ""
-        self.avg_scores_by_criterion[round.to_s][q.txt] = 0.0
+        # self.summary[round.to_s][q.txt] = ""
+        # self.avg_scores_by_criterion[round.to_s][q.txt] = 0.0
         question_answers = Answer.answers_by_question_for_reviewee(assignment.id, r_id, q.id)
         max_score = get_max_score_for_question(q)
         comments = break_up_comments_to_sentences(question_answers)

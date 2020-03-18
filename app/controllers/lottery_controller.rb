@@ -56,7 +56,7 @@ class LotteryController < ApplicationController
         bids << bid_record.priority if bid_record.try(:priority)
       end
       # Grab student id and list of bids
-      team.users.each {|user| user_bidding_info << { pid: user.id, ranks: bids }} if bids.uniq != [0]
+      team.users.each {|user| user_bidding_info << {pid: user.id, ranks: bids} } if bids.uniq != [0]
     end
     user_bidding_info
   end

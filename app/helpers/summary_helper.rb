@@ -19,23 +19,23 @@ module SummaryHelper
         self.summary[round.to_s] = {}
         self.avg_scores_by_criterion[round.to_s] = {}
         self.avg_scores_by_round[round.to_s] = 0.0
+        questions[round].each do |q|
+          next if q.type.eql?("SectionHeader")
 
-        summarize_reviews_by_reviewee_assign(assignment, r_id, questions, round)
+          summarize_reviews_by_reviewee_assign(assignment, r_id, questions, round)
+        end
         self.avg_scores_by_round[round.to_s] = calculate_avg_score_by_round(self.avg_scores_by_criterion[round.to_s], questions[round])
       end
       self
     end
 
     def summarize_reviews_by_reviewee_assign(assignment, r_id, questions, round)
-      questions[round].each do |q|
-        next if q.type.eql?("SectionHeader")
-        question_answers = Answer.answers_by_question_for_reviewee(assignment.id, r_id, q.id)
+      question_answers = Answer.answers_by_question_for_reviewee(assignment.id, r_id, q.id)
 
-        # get the avg scores for this question
-        self.avg_scores_by_criterion[round.to_s][q.txt] = calculate_avg_score_by_criterion(question_answers, get_max_score_for_question(q))
-        # get the summary of answers to this question
-        self.summary[round.to_s][q.txt] = summarize_sentences(break_up_comments_to_sentences(question_answers), self.summary_ws_url)
-      end
+      # get the avg scores for this question
+      self.avg_scores_by_criterion[round.to_s][q.txt] = calculate_avg_score_by_criterion(question_answers, get_max_score_for_question(q))
+      # get the summary of answers to this question
+      self.summary[round.to_s][q.txt] = summarize_sentences(break_up_comments_to_sentences(question_answers), self.summary_ws_url)
     end
 
     def end_threads(threads)

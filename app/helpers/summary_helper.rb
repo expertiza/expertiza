@@ -15,26 +15,22 @@ module SummaryHelper
 
       # get all answers for each question and send them to summarization WS
       questions.each_key do |round|
-        self.summary[round.to_s] = {}
-        self.avg_scores_by_criterion[round.to_s] = {}
-        self.avg_scores_by_round[round.to_s] = 0.0
+        # self.summary[round.to_s] = {}
+        # self.avg_scores_by_criterion[round.to_s] = {}
+        # self.avg_scores_by_round[round.to_s] = 0.0
 
         questions[round].each do |q|
           next if q.type.eql?("SectionHeader")
 
-          self.summary[round.to_s][q.txt] = ""
-          self.avg_scores_by_criterion[round.to_s][q.txt] = 0.0
+          # self.summary[round.to_s][q.txt] = ""
+          # self.avg_scores_by_criterion[round.to_s][q.txt] = 0.0
 
           question_answers = Answer.answers_by_question_for_reviewee(assignment.id, r_id, q.id)
 
-          max_score = get_max_score_for_question(q)
-
-          comments = break_up_comments_to_sentences(question_answers)
-
           # get the avg scores for this question
-          self.avg_scores_by_criterion[round.to_s][q.txt] = calculate_avg_score_by_criterion(question_answers, max_score)
+          self.avg_scores_by_criterion[round.to_s][q.txt] = calculate_avg_score_by_criterion(question_answers, get_max_score_for_question(q))
           # get the summary of answers to this question
-          self.summary[round.to_s][q.txt] = summarize_sentences(comments, summary_ws_url)
+          self.summary[round.to_s][q.txt] = summarize_sentences(break_up_comments_to_sentences(question_answers), summary_ws_url)
         end
         self.avg_scores_by_round[round.to_s] = calculate_avg_score_by_round(self.avg_scores_by_criterion[round.to_s], questions[round])
       end
@@ -78,10 +74,9 @@ module SummaryHelper
 
       # process each question in a seperate thread
       threads << Thread.new do
-        comments = break_up_comments_to_sentences(answers_questions)
         # store each avg in a hashmap and use the question as the key
         self.avg_scores_by_criterion[round][question.txt] = calculate_avg_score_by_criterion(answers_questions, get_max_score_for_question(question))
-        self.summary[round][question.txt] = summarize_sentences(comments, summary_ws_url) unless comments.empty?
+        self.summary[round][question.txt] = summarize_sentences(break_up_comments_to_sentences(answers_questions), summary_ws_url)
       end
       # Wait for all threads to end
       end_threads(threads)

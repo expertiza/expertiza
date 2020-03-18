@@ -14,9 +14,13 @@ module SummaryHelper
       # get all answers for each question and send them to summarization WS
       questions.each_key do |round|
         self.summary[round.to_s] = self.avg_scores_by_criterion[round.to_s] = {}
+        self.avg_scores_by_round[round.to_s] = 0.0
 
         questions[round].each do |q|
           next if q.type.eql?("SectionHeader")
+
+          self.summary[round.to_s][q.txt] = ""
+          self.avg_scores_by_criterion[round.to_s][q.txt] = 0.0
 
           question_answers = Answer.answers_by_question_for_reviewee(assignment.id, r_id, q.id)
 
@@ -32,6 +36,13 @@ module SummaryHelper
         self.avg_scores_by_round[round.to_s] = calculate_avg_score_by_round(self.avg_scores_by_criterion[round.to_s], questions[round])
       end
       self
+    end
+
+    def end_threads(threads)
+      threads.each do |t|
+        # Wait for the thread to finish if it isn't this thread (i.e. the main thread).
+        t.join if t != Thread.current
+      end
     end
 
     # produce summaries for instructor. it merges all feedback given to all reviewees, and summarize them by criterion
@@ -64,10 +75,7 @@ module SummaryHelper
             self.summary[round][question.txt] = summarize_sentences(comments, summary_ws_url) unless comments.empty?
           end
           # Wait for all threads to end
-          threads.each do |t|
-            # Wait for the thread to finish if it isn't this thread (i.e. the main thread).
-            t.join if t != Thread.current
-          end
+          end_threads(threads)
         end
         self.avg_scores_by_round[round] = calculate_avg_score_by_round(avg_scores_by_criterion[round], questions_used_in_round)
       end
@@ -139,9 +147,7 @@ module SummaryHelper
       end
 
       # Wait for all threads to end
-      threads.each do |t|
-        t.join if t != Thread.current
-      end
+      end_threads(threads)
 
       self
     end
@@ -170,7 +176,7 @@ module SummaryHelper
       sentences = ans.comments.gsub!(/[.?!]/, '\1|').split('|').map!(&:strip) unless ans.comments.nil?
       sentences
     end
-    
+
     def break_up_comments_to_sentences(question_answers)
       # strore answers of each question in an array to be converted into json
       comments = []

@@ -24,27 +24,28 @@ class ImpersonateController < ApplicationController
 
   # method to clear the session 
   def clear_session
-    original_user = session[:super_user] || session[:user]
-    user = User.find_by(name: params[:user][:name])
+    #original_user = session[:super_user] || session[:user]
+    #user = User.find_by(name: params[:user][:name])
     #AuthController.clear_user_info(session, nil)
 
     if params[:impersonate].nil?
-          #user = User.find_by(name: params[:user][:name])
+          user = User.find_by(name: params[:user][:name])
           session[:super_user] = session[:user] if session[:super_user].nil?
       	  AuthController.clear_user_info(session, nil)
-          session[:original_user] = original_user
+          session[:original_user] = @original_user
           session[:impersonate] = true
           session[:user] = user
     else
-          user = User.find_by(name: params[:impersonate][:name])
+          
           if !params[:impersonate][:name].empty?
+	    user = User.find_by(name: params[:impersonate][:name])
             #user = User.find_by(name: params[:impersonate][:name])
 	    AuthController.clear_user_info(session, nil)
             session[:user] = user
             session[:impersonate] =  true
-            session[:original_user] = original_user
+            session[:original_user] = @original_user
           else
-            #user = User.find_by(name: params[:impersonate][:name])
+            user = User.find_by(name: params[:user][:name])
 	    AuthController.clear_user_info(session, nil)
             session[:user] = session[:super_user]
             user = session[:user]
@@ -63,41 +64,50 @@ class ImpersonateController < ApplicationController
  
   # When specified user cannot be impersonated
   def checkif_user_impersonateable 
-    original_user = session[:super_user] || session[:user]
+    #original_user = session[:super_user] || session[:user]
     if params[:impersonate].nil?
            user = User.find_by(name: params[:user][:name])
+          if @original_user.can_impersonate? user
+            flash[:error] = "You cannot impersonate #{params[:user][:name]}."
+            redirect_back
+            return
+	  end
     else 
            if !params[:impersonate][:name].empty?
               user = User.find_by(name: params[:impersonate][:name])
            end
     end
-    unless original_user.can_impersonate? user
-          flash[:error] = "You cannot impersonate #{params[:user][:name]}."
-          redirect_back
-          return
-    end
+
   end 
 
   # Function to display appropriate error messages 
   def display_error_msg 
     if params[:impersonate].nil?
-           message = "No user exists with the name '#{params[:user][:name]}'."
+           @message = "You cannot impersonate '#{params[:user][:name]}'."
     else
            if !params[:impersonate][:name].empty?
-              message = "No user exists with the name '#{params[:impersonate][:name]}'."
+              @message = "You cannot impersonate '#{params[:impersonate][:name]}'."
            else
-              message = "No original account was found. Please close your browser and start a new session."
+              @message = "No original account was found. Please close your browser and start a new session."
            end 
-    end 
-    flash[:error] = message
-    redirect_back
-    return
+    end
+    rescue Exception => e
+      flash[:error] = e.message
+      redirect_to :back 
+  end
+  def find_name_validity
+  if params[:user]
+      @message = "No user exists with the name '#{params[:user][:name]}'."
+    elsif params[:impersonate]
+      @message = "No user exists with the name '#{params[:impersonate][:name]}'."
+    end
   end     
    
   # Method to be refactored
   def impersonate
+      find_name_validity
       begin
-      original_user = session[:super_user] || session[:user]
+      @original_user = session[:super_user] || session[:user]
 
       # Impersonate using form on /impersonate/start
       if params[:impersonate].nil?
@@ -107,7 +117,7 @@ class ImpersonateController < ApplicationController
         user = User.find_by(name: params[:user][:name])
         if user
           checkif_user_impersonateable 
-          #session[:super_user] = session[:user] if session[:super_user].nil?
+          session[:super_user] = session[:user] if session[:super_user].nil?
 	  clear_session
         else
           display_error_msg
@@ -130,7 +140,10 @@ class ImpersonateController < ApplicationController
           # Revert to original account
         else
           if !session[:super_user].nil?
-	    clear_session
+	    AuthController.clear_user_info(session, nil)
+            session[:user] = session[:super_user]
+            user = session[:user]
+            session[:super_user] = nil
           else
             display_error_msg
           end
@@ -138,8 +151,12 @@ class ImpersonateController < ApplicationController
       end
       # Navigate to user's home location
       AuthController.set_current_role(user.role_id, session)
-      redirect_to action: AuthHelper.get_home_action(session[:user]),controller: AuthHelper.get_home_controller(session[:user])
-    
+      redirect_to action: AuthHelper.get_home_action(session[:user]),
+		controller: AuthHelper.get_home_controller(session[:user])
+    rescue Exception => e
+      flash[:error] = @message
+      redirect_to :back
+
     end
   end
 end

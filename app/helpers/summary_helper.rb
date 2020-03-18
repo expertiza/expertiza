@@ -15,9 +15,9 @@ module SummaryHelper
 
       # get all answers for each question and send them to summarization WS
       questions.each_key do |round|
-        # self.summary[round.to_s] = {}
-        # self.avg_scores_by_criterion[round.to_s] = {}
-        # self.avg_scores_by_round[round.to_s] = 0.0
+        self.summary[round.to_s] = {}
+        self.avg_scores_by_criterion[round.to_s] = {}
+        self.avg_scores_by_round[round.to_s] = 0.0
 
         questions[round].each do |q|
           next if q.type.eql?("SectionHeader")

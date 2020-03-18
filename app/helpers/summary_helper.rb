@@ -7,7 +7,23 @@ require 'logger'
 module SummaryHelper
   class Summary
     attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion, :summary_ws_url, :r_id
- 
+
+    def summarize_reviews_by_reviewee(questions, assignment, r_id, summary_ws_url)
+      self.summary = self.avg_scores_by_round = self.avg_scores_by_criterion = ({})
+      self.summary_ws_url = summary_ws_url
+      self.r_id = r_id
+
+      # get all answers for each question and send them to summarization WS
+      questions.each_key do |round|
+        self.summary[round.to_s] = {}
+        self.avg_scores_by_criterion[round.to_s] = {}
+        self.avg_scores_by_round[round.to_s] = 0.0
+        summarize_reviews_by_reviewee_questions(questions, round, assignment)
+        self.avg_scores_by_round[round.to_s] = calculate_avg_score_by_round(self.avg_scores_by_criterion[round.to_s], questions[round])
+      end
+      self
+    end
+
     def summarize_reviews_by_reviewee_round(questions, round, assignment, q)
       next if q.type.eql?("SectionHeader")
       self.summary[round.to_s][q.txt] = ""
@@ -25,22 +41,6 @@ module SummaryHelper
       questions[round].each do |q|
         summarize_reviews_by_reviewee_round(questions, round, assignment, q)
       end
-    end
-
-    def summarize_reviews_by_reviewee(questions, assignment, r_id, summary_ws_url)
-      self.summary = self.avg_scores_by_round = self.avg_scores_by_criterion = ({})
-      self.summary_ws_url = summary_ws_url
-      self.r_id = r_id
-
-      # get all answers for each question and send them to summarization WS
-      questions.each_key do |round|
-        self.summary[round.to_s] = {}
-        self.avg_scores_by_criterion[round.to_s] = {}
-        self.avg_scores_by_round[round.to_s] = 0.0
-        summarize_reviews_by_reviewee_questions(questions, round, assignment)
-        self.avg_scores_by_round[round.to_s] = calculate_avg_score_by_round(self.avg_scores_by_criterion[round.to_s], questions[round])
-      end
-      self
     end
 
     # end threads
@@ -112,7 +112,7 @@ module SummaryHelper
       teams.each do |reviewee|
         self.summary[reviewee.name] = self.avg_scores_by_round[reviewee.name] = self.avg_scores_by_criterion[reviewee.name] = []
         self.avg_scores_by_reviewee[reviewee.name] = 0.0
-      
+
         # get the name of reviewers for display only
         self.reviewers[reviewee.name] = get_reviewers_by_reviewee_and_assignment(reviewee, assignment.id)
         # get answers of each reviewer by rubric

@@ -16,7 +16,7 @@ class LotteryController < ApplicationController
     teams = assignment.teams
 
     user_bidding_info = construct_user_bidding_info(assignment.sign_up_topics, teams)
-    bidding_data = { users: user_bidding_info, max_team_size: assignment.max_team_size }
+    bidding_data = {users: user_bidding_info, max_team_size: assignment.max_team_size}
     log("Bidding data for assignment #{assignment.name}: #{bidding_data}")
 
     begin
@@ -48,7 +48,7 @@ class LotteryController < ApplicationController
   def construct_user_bidding_info(sign_up_topics, teams)
     user_bidding_info = []
     # Exclude any teams already signed up
-    teams_not_signing_up = teams.reject{ |team| SignedUpTeam.where(team_id: team.id, is_waitlisted: 0).any? }
+    teams_not_signing_up = teams.reject {|team| SignedUpTeam.where(team_id: team.id, is_waitlisted: 0).any? }
     teams_not_signing_up.each do |team|
       bids = [0]
       sign_up_topics.each do |topic|
@@ -56,7 +56,7 @@ class LotteryController < ApplicationController
         bids << bid_record.priority if bid_record.try(:priority)
       end
       # Grab student id and list of bids
-      team.users.each { |user| user_bidding_info << { pid: user.id, ranks: bids } } if bids.uniq != [0]
+      team.users.each {|user| user_bidding_info << { pid: user.id, ranks: bids }} if bids.uniq != [0]
     end
     user_bidding_info
   end
@@ -69,10 +69,10 @@ class LotteryController < ApplicationController
       topic_bids = []
       sign_up_topics.each do |topic|
         bid = Bid.find_by(team_id: team.id, topic_id: topic.id)
-        topic_bids << { topic_id: topic.id, priority: bid.priority } if bid
+        topic_bids << {topic_id: topic.id, priority: bid.priority} if bid
       end
-      topic_bids.sort! { |bid| bid[:priority] }
-      team_bidding_info << { team_id: team.id, bids: topic_bids }
+      topic_bids.sort! {|bid| bid[:priority] }
+      team_bidding_info << {team_id: team.id, bids: topic_bids}
     end
     team_bidding_info
   end
@@ -128,9 +128,9 @@ class LotteryController < ApplicationController
     #   3: [2, 3, 1],
     #   4: [2, 0, 1]
     # }
-    bidding_matrix = Hash.new( [] )
-    current_team_members_info = user_bidding_info.select{ |info| user_ids.include? info[:pid] }
-    current_team_members_info.map{ |info| info[:ranks] }.each do |bids|
+    bidding_matrix = Hash.new([])
+    current_team_members_info = user_bidding_info.select {|info| user_ids.include? info[:pid] }
+    current_team_members_info.map {|info| info[:ranks] }.each do |bids|
       sign_up_topics.each_with_index do |topic, index|
         bidding_matrix[topic.id] << bids[index]
       end
@@ -146,9 +146,9 @@ class LotteryController < ApplicationController
     bidding_matrix_summary = []
     bidding_matrix.each do |topic_id, value|
       # Exclude topics that no one bidded
-      bidding_matrix_summary << [value.count { |i| i != 0 }, value.inject(:+), topic_id] unless value.inject(:+).zero?
+      bidding_matrix_summary << [value.count {|i| i != 0 }, value.inject(:+), topic_id] unless value.inject(:+).zero?
     end
-    bidding_matrix_summary.sort! { |b1, b2| [b2[0], b1[1]] <=> [b1[0], b2[1]] }
+    bidding_matrix_summary.sort! {|b1, b2| [b2[0], b1[1]] <=> [b1[0], b2[1]] }
     # Result of sorting first element descendingly and second element ascendingly.
     # We want the topic with most people bidded and lowest sum of priorities at the top.
     # [

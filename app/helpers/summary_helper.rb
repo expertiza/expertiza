@@ -69,7 +69,7 @@ module SummaryHelper
         next if question.type.eql?("SectionHeader")
         summarize_reviews_by_criterion_question(assignment, round, question, threads)
       end
-      self.avg_scores_by_round[round] = calculate_avg_score_by_round(self.avg_scores_by_criterion[round], questions_used_in_round)
+      self.avg_scores_by_round[round] = calculate_avg_score_by_round(avg_scores_by_criterion[round], questions_used_in_round)
     end
 
     # produce summaries for instructor. it merges all feedback given to all reviewees, and summarize them by criterion

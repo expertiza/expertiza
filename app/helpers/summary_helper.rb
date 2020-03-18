@@ -57,9 +57,9 @@ module SummaryHelper
       rubric = get_questions_by_assignment(assignment)
 
       (0..assignment.rounds_of_reviews - 1).each do |round|
-        self.avg_scores_by_round[round] = 0.0
-        self.summary[round] = {}
-        self.avg_scores_by_criterion[round] = {}
+        # self.avg_scores_by_round[round] = 0.0
+        # self.summary[round] = {}
+        # self.avg_scores_by_criterion[round] = {}
 
         questions_used_in_round = rubric[assignment.varying_rubrics_by_round? ? round : 0]
         questions_used_in_round.each do |question|

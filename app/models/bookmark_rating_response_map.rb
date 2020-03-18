@@ -3,7 +3,7 @@ class BookmarkRatingResponseMap < ResponseMap
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
 
   def questionnaire
-    self.assignment.questionnaires.find_by(type: 'BookmarkRatingResponseMap')
+    self.assignment.questionnaires.find_by(type: 'BookmarkRatingQuestionnaire')
   end
 
   def contributor

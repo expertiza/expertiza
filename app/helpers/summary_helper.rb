@@ -64,23 +64,27 @@ module SummaryHelper
 
         questions_used_in_round = rubric[assignment.varying_rubrics_by_round? ? round : 0]
         # get answers of each question in the rubric
-        questions_used_in_round.each do |question|
-          next if question.type.eql?("SectionHeader")
-          answers_questions = Answer.answers_by_question(assignment.id, question.id)
-
-          # process each question in a seperate thread
-          threads << Thread.new do
-            comments = break_up_comments_to_sentences(answers_questions)
-            # store each avg in a hashmap and use the question as the key
-            self.avg_scores_by_criterion[round][question.txt] = calculate_avg_score_by_criterion(answers_questions, get_max_score_for_question(question))
-            self.summary[round][question.txt] = summarize_sentences(comments, summary_ws_url) unless comments.empty?
-          end
-          # Wait for all threads to end
-          end_threads(threads)
-        end
+        summarize_reviews_by_criterion_questions(assignment, summary_ws_url, round, questions_used_in_round, threads)
         self.avg_scores_by_round[round] = calculate_avg_score_by_round(avg_scores_by_criterion[round], questions_used_in_round)
       end
       self
+    end
+
+    def summarize_reviews_by_criterion_questions(assignment, summary_ws_url, round, questions_used_in_round, threads)
+      questions_used_in_round.each do |question|
+        next if question.type.eql?("SectionHeader")
+        answers_questions = Answer.answers_by_question(assignment.id, question.id)
+
+        # process each question in a seperate thread
+        threads << Thread.new do
+          comments = break_up_comments_to_sentences(answers_questions)
+          # store each avg in a hashmap and use the question as the key
+          self.avg_scores_by_criterion[round][question.txt] = calculate_avg_score_by_criterion(answers_questions, get_max_score_for_question(question))
+          self.summary[round][question.txt] = summarize_sentences(comments, summary_ws_url) unless comments.empty?
+        end
+        # Wait for all threads to end
+        end_threads(threads)
+      end
     end
 
     # produce summaries for instructor and students. It sum up the feedback by criterion for each reviewee

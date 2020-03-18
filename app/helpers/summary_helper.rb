@@ -43,7 +43,7 @@ module SummaryHelper
     def summarize_reviews_by_reviewee_questions(questions, round, assignment)
       questions[round].each do |q|
         next if q.type.eql?("SectionHeader")
-        self.q = q
+        self.q = q unless q.txt.nil?
         summarize_reviews_by_reviewee_round(round, assignment)
       end
     end

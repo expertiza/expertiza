@@ -260,12 +260,12 @@ class TreeDisplayController < ApplicationController
   end
 
   # attaches assignment nodes to course node of instructor
-  def coursenode_assignmentnode(res2, child)
+  def coursenode_assignmentnode(tmp_object, child)
     res2["directory"] = child.get_directory
     instructor_id = child.get_instructor_id
-    update_instructor(res2, instructor_id)
-    update_is_available_2(res2, instructor_id, child)
-    assignments_method(child, res2) if child.type == "AssignmentNode"
+    update_instructor(tmp_object, instructor_id)
+    update_is_available_2(tmp_object, instructor_id, child)
+    assignments_method(child, tmp_object) if child.type == "AssignmentNode"
   end
 
   # getting result nodes for child2. res[] contains all the resultant nodes.
@@ -275,7 +275,7 @@ class TreeDisplayController < ApplicationController
     if ch_nodes
       ch_nodes.each do |child|
         node_type = child.type
-        res2 = {
+        tmp_object = {
           "nodeinfo" => child,
           "name" => child.get_name,
           "key" => params[:reactParams2][:key],
@@ -284,8 +284,8 @@ class TreeDisplayController < ApplicationController
           "creation_date" => child.get_creation_date,
           "updated_date" => child.get_modified_date
         }
-        coursenode_assignmentnode(res2, child) if %w[CourseNode AssignmentNode].include? node_type
-        res << res2
+        coursenode_assignmentnode(tmp_object, child) if %w[CourseNode AssignmentNode].include? node_type
+        res << tmp_object
       end
     end
     res

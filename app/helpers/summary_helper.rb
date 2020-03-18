@@ -173,11 +173,16 @@ module SummaryHelper
       end
     end
 
+    def get_sentences(ans)
+      sentences = ans.comments.gsub!(/[.?!]/, '\1|').split('|').map!(&:strip) unless ans.comments.nil?
+      sentences
+    end
+    
     def break_up_comments_to_sentences(question_answers)
       # strore answers of each question in an array to be converted into json
       comments = []
       question_answers.each do |ans|
-        sentences = ans.comments.gsub!(/[.?!]/, '\1|').split('|').map!(&:strip) unless ans.comments.nil?
+        sentences = get_sentences(ans)
         # add the comment to an array to be converted as a json request
         comments.concat(sentences) unless sentences.nil?
       end

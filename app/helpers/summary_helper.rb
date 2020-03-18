@@ -53,12 +53,11 @@ module SummaryHelper
       # @summary[reviewee][round][question]
       # @avg_score_round[reviewee][round]
       # @avg_scores_by_criterion[reviewee][round][criterion]
-      nround = assignment.rounds_of_reviews
       threads = []
-      self.summary = self.avg_scores_by_criterion = self.avg_scores_by_round = Array.new(nround)
+      self.summary = self.avg_scores_by_criterion = self.avg_scores_by_round = Array.new(assignment.rounds_of_reviews)
       rubric = get_questions_by_assignment(assignment)
 
-      (0..nround - 1).each do |round|
+      (0..assignment.rounds_of_reviews - 1).each do |round|
         self.avg_scores_by_round[round] = 0.0
         self.summary[round] = {}
         self.avg_scores_by_criterion[round] = {}
@@ -69,12 +68,11 @@ module SummaryHelper
           next if question.type.eql?("SectionHeader")
           answers_questions = Answer.answers_by_question(assignment.id, question.id)
 
-          max_score = get_max_score_for_question(question)
           # process each question in a seperate thread
           threads << Thread.new do
             comments = break_up_comments_to_sentences(answers_questions)
             # store each avg in a hashmap and use the question as the key
-            self.avg_scores_by_criterion[round][question.txt] = calculate_avg_score_by_criterion(answers_questions, max_score)
+            self.avg_scores_by_criterion[round][question.txt] = calculate_avg_score_by_criterion(answers_questions, get_max_score_for_question(question))
             self.summary[round][question.txt] = summarize_sentences(comments, summary_ws_url) unless comments.empty?
           end
           # Wait for all threads to end

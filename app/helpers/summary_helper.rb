@@ -9,21 +9,14 @@ module SummaryHelper
     attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion
 
     def summarize_reviews_by_reviewee(questions, assignment, r_id, summary_ws_url)
-      self.summary = ({})
-      self.avg_scores_by_round = ({})
-      self.avg_scores_by_criterion = ({})
+      self.summary = self.avg_scores_by_round = self.avg_scores_by_criterion = ({})
 
       # get all answers for each question and send them to summarization WS
       questions.each_key do |round|
-        self.summary[round.to_s] = {}
-        self.avg_scores_by_criterion[round.to_s] = {}
-        self.avg_scores_by_round[round.to_s] = 0.0
+        self.summary[round.to_s] = self.avg_scores_by_criterion[round.to_s] = {}
 
         questions[round].each do |q|
           next if q.type.eql?("SectionHeader")
-
-          self.summary[round.to_s][q.txt] = ""
-          self.avg_scores_by_criterion[round.to_s][q.txt] = 0.0
 
           question_answers = Answer.answers_by_question_for_reviewee(assignment.id, r_id, q.id)
 

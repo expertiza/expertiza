@@ -14,7 +14,8 @@
 	    <th class="head">Description</th>
 	    <th class="head">Avg. rating</th>
 	    <th class="head">Your rating</th>
-	    <% if !Bookmark.where(user_id: session[:user].id).blank? %>
+      <th class="head">Review</th>
+      <% if !Bookmark.where(user_id: session[:user].id).blank? %>
 	    	<th class="head" colspan='2'>Action</th>
 	    <% end %>
 	  </tr>
@@ -70,9 +71,23 @@
             <%= '-' %>
           <% end %>
 	      </td>
+        <td>
+          <% assignment_participant = AssignmentParticipant.find_by(user_id: session[:user].id) %>
+          <% map = BookmarkRatingResponseMap.where(reviewed_object_id: @topic.assignment.id, reviewer_id: assignment_participant.id, reviewee_id: bookmark.id).first %>
+          <% if map.nil? %>
+            <% map = BookmarkRatingResponseMap.create(reviewed_object_id: @topic.assignment.id, reviewer_id: assignment_participant.id, reviewee_id: bookmark.id) %>
+          <% end %>
+          <% review = map.response.last %>
+          <% if review.nil? %>
+            <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :return => "bookmark"} %>
+          <% else %>
+            <%= link_to "View", {:controller => 'response', :action => 'view', :id => review.id} %>
+            <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "bookmark"} %>
+        <% end %>
+        </td>
 	      <% if bookmark.user_id == session[:user].id %>
-	      	<td><%= link_to 'Edit', :action => 'edit', :id => bookmark.id %></td>
-	        <td><%= link_to 'Destroy', bookmark, :confirm => "Delete bookmark \"#{bookmark.title}\"?", :method => :delete %></td>
+	      	<td><%= link_to 'Edit Bookmark', :action => 'edit', :id => bookmark.id %></td>
+	        <td><%= link_to 'Destroy Bookmark', bookmark, :confirm => "Delete bookmark \"#{bookmark.title}\"?", :method => :delete %></td>
 	      <% end %>
 	    </tr>
 	  <% end %>

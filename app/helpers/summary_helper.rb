@@ -22,14 +22,14 @@ module SummaryHelper
         questions[round].each do |q|
           next if q.type.eql?("SectionHeader")
 
-          summarize_reviews_by_reviewee_assign(assignment, r_id, questions, round)
+          summarize_reviews_by_reviewee_assign(assignment, r_id, q, round)
         end
         self.avg_scores_by_round[round.to_s] = calculate_avg_score_by_round(self.avg_scores_by_criterion[round.to_s], questions[round])
       end
       self
     end
 
-    def summarize_reviews_by_reviewee_assign(assignment, r_id, questions, round)
+    def summarize_reviews_by_reviewee_assign(assignment, r_id, q, round)
       question_answers = Answer.answers_by_question_for_reviewee(assignment.id, r_id, q.id)
 
       # get the avg scores for this question

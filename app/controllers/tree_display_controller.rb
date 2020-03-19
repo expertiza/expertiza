@@ -166,17 +166,6 @@ class TreeDisplayController < ApplicationController
     }
     tmp_object.merge!(tmp)
   end
-
-  def courses_assignments_obj(node_type, tmp_object, node)
-    update_tmp_obj(tmp_object, node)
-    # tmpObject["private"] = node.get_private
-    instructor_id = node.get_instructor_id
-    ## if current user's role is TA for a course, then that course will be listed under his course listing.
-    update_in_ta_course_listing(instructor_id, node, tmp_object)
-    update_instructor(tmp_object, instructor_id)
-    update_is_available(tmp_object, instructor_id, node)
-    assignments_method(node, tmp_object) if node_type == "Assignments"
-  end
   
   # Creates a json object that can be displayed by the UI
   def serialize_folder_to_json(folder_type, node)

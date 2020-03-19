@@ -155,17 +155,6 @@ class TreeDisplayController < ApplicationController
     tmp_object["instructor"] = nil
     tmp_object["instructor"] = User.find(instructor_id).name(session[:ip]) if instructor_id
   end
-
-  def update_tmp_obj(tmp_object, node)
-    tmp = {
-      "directory" => node.get_directory,
-      "creation_date" => node.get_creation_date,
-      "updated_date" => node.get_modified_date,
-      "institution" => Institution.where(id: node.retrieve_institution_id),
-      "private" => node.get_instructor_id == session[:user].id
-    }
-    tmp_object.merge!(tmp)
-  end
   
   # Creates a json object that can be displayed by the UI
   def serialize_folder_to_json(folder_type, node)
@@ -175,8 +164,14 @@ class TreeDisplayController < ApplicationController
       "type" => node.type
     }
     
-    if folder_type == "Courses" or folder_type == "Assignments"
-      update_tmp_obj(json, node)
+    if folder_type == "Courses" or folder_type == "Assignments" # WBA - can we make this assumption? Are folder_type and node.type the same?
+      json.merge! ({
+        "directory" => node.get_directory,
+        "creation_date" => node.get_creation_date,
+        "updated_date" => node.get_modified_date,
+        "institution" => Institution.where(id: node.retrieve_institution_id),
+        "private" => node.get_instructor_id == session[:user].id
+      })
       instructor_id = node.get_instructor_id
       update_in_ta_course_listing(instructor_id, node, json)
       update_instructor(json, instructor_id)

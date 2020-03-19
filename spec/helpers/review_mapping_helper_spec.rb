@@ -503,7 +503,95 @@ describe ReviewMappingHelper, type: :helper do
       expect(author_feedback_avg_score).to eq "-- / --"
     end
 
+  end
+
+  describe 'initialize_chart_elements' do
+    before(:each) do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+
+      @assignment = create(:assignment, name: 'get_awarded_review_score_test', created_at: DateTime.now.in_time_zone - 13.day)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 3)
+
+      questionnaire_1 = create(:questionnaire)
+      questionnaire_2 = create(:questionnaire)
+      questionnaire_3 = create(:questionnaire)
+
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: questionnaire_1, used_in_round: 1)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: questionnaire_2, used_in_round: 2)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: questionnaire_3, used_in_round: 3)
+
+      question_1_1 = create(:question, questionnaire: questionnaire_1)
+      question_1_2 = create(:question, questionnaire: questionnaire_1)
+
+      question_2_1 = create(:question, questionnaire: questionnaire_2)
+      question_2_2 = create(:question, questionnaire: questionnaire_2)
+
+      question_3_1 = create(:question, questionnaire: questionnaire_3)
+      question_3_2 = create(:question, questionnaire: questionnaire_3)
+
+      @reviewer_1 = create(:participant, review_grade: nil)
+      @reviewer_2 = create(:participant, review_grade: nil)
+
+      reviewee = create(:assignment_team)
+
+      @response_map_1 = create(:review_response_map, reviewer: @reviewer_1, reviewee: reviewee, assignment: @assignment)
+      @response_map_2 = create(:review_response_map, reviewer: @reviewer_2, reviewee: reviewee, assignment: @assignment)
+
+      response_1_1 = create(:response, response_map: @response_map_1, round: 1, additional_comment: "Some Comment")
+      response_1_2 = create(:response, response_map: @response_map_1, round: 2, additional_comment: "Some Comment")
+      response_1_3 = create(:response, response_map: @response_map_1, round: 3, additional_comment: "Some Comment")
+
+      response_2_1 = create(:response, response_map: @response_map_2, round: 1, additional_comment: "Some Comment")
+      response_2_2 = create(:response, response_map: @response_map_2, round: 2, additional_comment: "Some Comment")
+      response_2_3 = create(:response, response_map: @response_map_2, round: 3, additional_comment: "Some Comment")
+
+      create(:answer, question: question_1_1, response: response_1_1, comments: "Lebron is the goat ")
+      create(:answer, question: question_1_2, response: response_1_1, comments: "He can gaurd 1 to 5 ")
+      create(:answer, question: question_2_1, response: response_1_2, comments: "Elite ball handler ")
+      create(:answer, question: question_2_2, response: response_1_2, comments: "Elite Scorer ")
+      create(:answer, question: question_3_1, response: response_1_3, comments: "DPOY runner up ")
+      create(:answer, question: question_3_2, response: response_1_3, comments: "Most complete player ever ")
+
+      create(:answer, question: question_1_1, response: response_2_1, comments: "MJ is the goat no question ")
+      create(:answer, question: question_1_2, response: response_2_1, comments: "Greatest scorer of all time ")
+      create(:answer, question: question_2_1, response: response_2_2, comments: "Top 5 defenders ever ")
+      create(:answer, question: question_2_2, response: response_2_2, comments: "Averaged 30 plus in the playoffs ")
+      create(:answer, question: question_3_1, response: response_2_3, comments: "Insane finals record ")
+      create(:answer, question: question_3_2, response: response_2_3, comments: "Six time Finals MVP ")
     end
 
+    it 'Should initialize the chart elements (reviewer variables) with the correct response volumes' do
+
+      @reviewers = []
+      @reviewers << Participant.find(@reviewer_1.id)
+      @reviewers << Participant.find(@reviewer_2.id)
+
+      sort_reviewer_by_review_volume_desc()
+
+      return_array_0 = []
+      return_array_1 = []
+
+      return_array_0 = initialize_chart_elements(@reviewers[0])
+      return_array_1 = initialize_chart_elements(@reviewers[1])
+
+      labels_0 = return_array_0[0]
+      labels_1 = return_array_1[0]
+      reviewer_data_0 = return_array_0[1]
+      reviewer_data_1 = return_array_1[1]
+      all_reviewers_data_0 = return_array_0[2]
+      all_reviewers_data_1 = return_array_1[2]
+
+      expect(all_reviewers_data_0).to match_array all_reviewers_data_1
+      expect(labels_0).to match_array ["1st", "2nd", "3rd", "Total"]
+      expect(labels_1).to match_array ["1st", "2nd", "3rd", "Total"]
+      expect(reviewer_data_0).to match_array [13, 10, 9, 10]
+      expect(reviewer_data_1).to match_array [10, 7, 9, 8]
+
+    end
+  end
 
 end

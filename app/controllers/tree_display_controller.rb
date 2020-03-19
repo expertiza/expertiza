@@ -187,13 +187,7 @@ class TreeDisplayController < ApplicationController
     }
     
     if folder_type == "Courses" or folder_type == "Assignments"
-      json.merge! ({
-        "directory" => node.get_directory,
-        "creation_date" => node.get_creation_date,
-        "updated_date" => node.get_modified_date,
-        "institution" => Institution.where(id: node.retrieve_institution_id),
-        "private" => node.get_instructor_id == session[:user].id
-      })
+      update_tmp_obj(json, node)
       instructor_id = node.get_instructor_id
       update_in_ta_course_listing(instructor_id, node, json)
       update_instructor(json, instructor_id)

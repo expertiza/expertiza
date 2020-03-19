@@ -30,28 +30,7 @@ class AssignmentsController < ApplicationController
     @assignment_form = AssignmentForm.new(assignment_form_params)
     if params[:button]
       if @assignment_form.save
-        @assignment_form.create_assignment_node
-        exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
-        assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
-        if assignment_form_params[:assignment][:directory_path].blank?
-          assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
-        end
-        ques_array = assignment_form_params[:assignment_questionnaire]
-        due_array = assignment_form_params[:due_date]
-        ques_array.each do |cur_questionnaire|
-          cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
-        end
-        due_array.each do |cur_due|
-          cur_due[:parent_id] = exist_assignment.id.to_s
-        end
-        assignment_form_params[:assignment_questionnaire] = ques_array
-        assignment_form_params[:due_date] = due_array
-        @assignment_form.update(assignment_form_params, current_user)
-        aid = Assignment.find_by(name: @assignment_form.assignment.name).id
-        ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
-        redirect_to edit_assignment_path aid
-        undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
-        return
+        handle_assignment_form_save
       else
         flash.now[:error] = "Failed to create assignment"
         render 'new'
@@ -60,6 +39,42 @@ class AssignmentsController < ApplicationController
       render 'new'
       undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
     end
+  end
+
+  def handle_assignment_form_save
+    @assignment_form.create_assignment_node
+    exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
+    update_assignment_form(exist_assignment)
+    aid = Assignment.find_by(name: @assignment_form.assignment.name).id
+    ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
+    redirect_to edit_assignment_path aid
+    undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
+    return
+  end
+
+  def update_assignment_form(exist_assignment)
+    assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
+    handle_assignment_directory_path_nonexist(assignment_form_params)
+    assignment_form_params[:assignment_questionnaire] = update_assignment_questionnaire(assignment_form_params, exist_assignment)
+    assignment_form_params[:due_date] = update_assignment_due_date(assignment_form_params, exist_assignment)
+    @assignment_form.update(assignment_form_params, current_user)
+  end
+
+  def handle_assignment_directory_path_nonexist(assignment_form_params)
+    assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}" \
+    if assignment_form_params[:assignment][:directory_path].blank?
+  end
+
+  def update_assignment_questionnaire(assignment_form_params, exist_assignment)
+    ques_array = assignment_form_params[:assignment_questionnaire]
+    ques_array.each {|cur_questionnaire| cur_questionnaire[:assignment_id] = exist_assignment.id.to_s }
+    ques_array
+  end
+
+  def update_assignment_due_date(assignment_form_params, exist_assignment)
+    due_array = assignment_form_params[:due_date]
+    due_array.each {|cur_due| cur_due[:parent_id] = exist_assignment.id.to_s }
+    due_array
   end
 
   def edit
@@ -370,9 +385,9 @@ class AssignmentsController < ApplicationController
     if params[:set_pressed][:bool] == 'false'
       flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."
     elsif @assignment_form.update_attributes(assignment_form_params, current_user)
-        flash[:note] = 'The assignment was successfully saved....'
+      flash[:note] = 'The assignment was successfully saved....'
     else
-        flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
+      flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
     end
     ExpertizaLogger.info LoggerMessage.new("", session[:user].name, "The assignment was saved: #{@assignment_form.as_json}", request)
   end

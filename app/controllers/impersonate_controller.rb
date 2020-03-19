@@ -1,3 +1,4 @@
+
 class ImpersonateController < ApplicationController
   include SecurityHelper
 
@@ -69,8 +70,8 @@ class ImpersonateController < ApplicationController
            user = User.find_by(name: params[:user][:name])
           if @original_user.can_impersonate? user
             flash[:error] = "You cannot impersonate #{params[:user][:name]}."
-            redirect_back
-            return
+            #redirect_back
+            #return
 	  end
     else 
            if !params[:impersonate][:name].empty?
@@ -81,31 +82,33 @@ class ImpersonateController < ApplicationController
   end 
 
   # Function to display appropriate error messages 
-  def display_error_msg 
-    if params[:impersonate].nil?
+  def display_error_msg
+    if params[:user]
+      @message = "No user exists with the name '#{params[:user][:name]}'."
+    elsif params[:impersonate]
+      @message = "No user exists with the name '#{params[:impersonate][:name]}'."
+    
+    else	 
+      if params[:impersonate].nil?
            @message = "You cannot impersonate '#{params[:user][:name]}'."
-    else
+      else
            if !params[:impersonate][:name].empty?
               @message = "You cannot impersonate '#{params[:impersonate][:name]}'."
            else
               @message = "No original account was found. Please close your browser and start a new session."
            end 
+       end
     end
     rescue Exception => e
-      flash[:error] = e.message
-      redirect_to :back 
+      flash[:error] = @message
+      redirect_to :back
+
   end
-  def find_name_validity
-  if params[:user]
-      @message = "No user exists with the name '#{params[:user][:name]}'."
-    elsif params[:impersonate]
-      @message = "No user exists with the name '#{params[:impersonate][:name]}'."
-    end
-  end     
+    
    
   # Method to be refactored
   def impersonate
-      find_name_validity
+      display_error_msg
       begin
       @original_user = session[:super_user] || session[:user]
 

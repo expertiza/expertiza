@@ -11,23 +11,26 @@ class TreeDisplayController < ApplicationController
     @node_type = params[:nodeType]
   end
 
+  # The goto_ methods listed below are used to traverse the menu system. It is hard to tell exactly
+  # where they are called from, but at least some (if not all) are necessary.
+  # These functions feel like they have potential to be moved to another controller.
   def goto_controller(name_parameter)
     node_object = TreeFolder.find_by(name: name_parameter)
     session[:root] = FolderNode.find_by(node_object_id: node_object.id).id
     redirect_to controller: 'tree_display', action: 'list'
   end
 
-  def goto_questionnaires() goto_controller('Questionnaires') end
-  def goto_review_rubrics() goto_controller('Review') end
-  def goto_metareview_rubrics() goto_controller('Metareview') end
-  def goto_teammatereview_rubrics() goto_controller('Teammate Review') end
-  def goto_author_feedbacks() goto_controller('Author Feedback') end
-  def goto_global_survey() goto_controller('Global Survey') end
-  def goto_surveys() goto_controller('Assignment Survey') end
-  def goto_course_surveys() goto_controller('Course Survey') end
-  def goto_courses() goto_controller('Courses') end
-  def goto_bookmarkrating_rubrics() goto_controller('Bookmarkrating') end
-  def goto_assignments() goto_controller('Assignments') end
+  def goto_questionnaires; goto_controller('Questionnaires') end
+  def goto_review_rubrics; goto_controller('Review') end
+  def goto_metareview_rubrics; goto_controller('Metareview') end
+  def goto_teammatereview_rubrics; goto_controller('Teammate Review') end
+  def goto_author_feedbacks; goto_controller('Author Feedback') end
+  def goto_global_survey; goto_controller('Global Survey') end
+  def goto_surveys; goto_controller('Assignment Survey') end
+  def goto_course_surveys; goto_controller('Course Survey') end
+  def goto_courses; goto_controller('Courses') end
+  def goto_bookmarkrating_rubrics; goto_controller('Bookmarkrating') end
+  def goto_assignments; goto_controller('Assignments') end
 
   # Called by /tree_display/list
   # Redirects to proper page if user is not an instructor or TA.

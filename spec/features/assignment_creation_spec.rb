@@ -1,5 +1,7 @@
+require_relative 'helpers/assignment_creation_helper'
+
 describe "assignment creation page", js: true do
-	include './helpers/assignment_creation_helper.rb'
+	include AssignmentCreationHelper
 	before(:each) do
 		create_deadline_types()
 		(1..3).each do |i|
@@ -196,6 +198,7 @@ end
 
 # instructor can set in which deadline can student reviewers take the quizzes
 describe "deadlines", js: true do
+	include AssignmentCreationHelper
 	before(:each) do
 		create_deadline_types()
 		@assignment = create(:assignment, name: 'public assignment for test')
@@ -230,6 +233,7 @@ describe "deadlines", js: true do
 end
 # adding test for general tab
 describe "general tab", js: true do
+	include AssignmentCreationHelper
 	before(:each) do
 		create_deadline_types()
 		(1..3).each do |i|
@@ -318,6 +322,7 @@ describe "general tab", js: true do
 end
 
 describe "topics tab", js: true do
+	include AssignmentCreationHelper
 	before(:each) do
 		create_deadline_types()
 		(1..3).each do |i|
@@ -414,6 +419,7 @@ end
 
 # Begin rubric tab
 describe "rubrics tab", js: true do
+	include AssignmentCreationHelper
 	before(:each) do
 		create_deadline_types()
 		@assignment = create(:assignment)
@@ -499,6 +505,7 @@ end
 
 # Begin review strategy tab
 describe "review strategy tab", js: true do
+	include AssignmentCreationHelper
 	before(:each) do
 		create_deadline_types()
 		create(:assignment, name: 'public assignment for test')
@@ -535,6 +542,7 @@ end
 
 # Begin participant testing
 describe "participants", js: true do
+	include AssignmentCreationHelper
 	before(:each) do
 		create_deadline_types()
 		create(:course)
@@ -565,6 +573,7 @@ describe "participants", js: true do
 end
 # Begin Due Date tab
 describe "Due dates tab", js: true do
+	include AssignmentCreationHelper
 	before(:each) do
 		create_deadline_types()
 		@assignment = create(:assignment, name: 'public assignment for test')
@@ -607,6 +616,7 @@ describe "Due dates tab", js: true do
 end
 
 describe "adding to course", js: true do
+	include AssignmentCreationHelper
 	before(:each) do
 		create_deadline_types()
 	end

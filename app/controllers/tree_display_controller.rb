@@ -16,6 +16,7 @@ class TreeDisplayController < ApplicationController
     session[:root] = FolderNode.find_by(node_object_id: node_object.id).id
     redirect_to controller: 'tree_display', action: 'list'
   end
+
   def goto_questionnaires() goto_controller('Questionnaires') end
   def goto_review_rubrics() goto_controller('Review') end
   def goto_metareview_rubrics() goto_controller('Metareview') end
@@ -239,7 +240,7 @@ class TreeDisplayController < ApplicationController
     session[:user].role_id == 6 and
         Ta.get_my_instructors(session[:user].id).include?(instructor_id) and ta_for_current_course?(child)
   end
-
+  
   # check if current user is instructor
   def is_user_instructor?(instructor_id)
     # ta created the course, current user is the instructor of this ta.
@@ -261,7 +262,7 @@ class TreeDisplayController < ApplicationController
     if assignment
       assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment.id)
       if assignment_questionnaires
-        assignment_questionnaires.each {|q| qid << "#{q.questionnaire_id}+" }
+        assignment_questionnaires.each { |q| qid << "#{q.questionnaire_id}+" }
         session[:root] = 1
       end
     end

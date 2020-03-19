@@ -112,9 +112,9 @@ class TreeDisplayController < ApplicationController
     qid = 'filter+'
     search = params[:filter_string]
     filter_node = params[:filternode]
-    if filter_node == 'QAN'
+    if filter_node == 'QAN'                       # Questionaire Assignment Name
       qid = filter_node_is_qan(search, qid)
-    elsif filter_node == 'ACN'
+    elsif filter_node == 'ACN'                    # Assignment Course Name
       session[:root] = 2
       qid << search
     end

@@ -11,6 +11,12 @@
   </p>
   <p>
     <%= f.submit 'Update' %> |
-	<%= link_to 'Back', :action => 'list', :id => @bookmark.topic_id %>
+    <%= link_to 'Back', '#', :onclick => 'pageBack()' %>
   </p>
 <% end %>
+
+<script>
+    function pageBack() {
+        history.back()
+    }
+</script>

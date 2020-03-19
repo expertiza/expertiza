@@ -1,5 +1,5 @@
 describe "assignment creation page", js: true do
-	include AssignmentCreationHelper
+	include './helpers/assignment_creation_helper.rb'
 	before(:each) do
 		create_deadline_types()
 		(1..3).each do |i|

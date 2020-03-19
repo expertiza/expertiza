@@ -78,7 +78,7 @@ class TreeDisplayController < ApplicationController
     # Serialize the contents of each node so it can be displayed on the UI
     contents = []
     child_nodes.each do |node|
-      contents.push(serialize_to_json(node))
+      contents.push(serialize_sub_folder_to_json(node))
     end
     
     respond_to do |format|
@@ -204,7 +204,7 @@ class TreeDisplayController < ApplicationController
   end
   
   # Creates a json object that can be displayed by the UI
-  def serialize_to_json(node)
+  def serialize_sub_folder_to_json(node)
     json = {
       "nodeinfo" => node,
       "name" => node.get_name,

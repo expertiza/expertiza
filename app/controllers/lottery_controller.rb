@@ -48,8 +48,8 @@ class LotteryController < ApplicationController
   def construct_user_bidding_info(sign_up_topics, teams)
     user_bidding_info = []
     # Exclude any teams already signed up
-    teams_not_signing_up = teams.reject {|team| SignedUpTeam.where(team_id: team.id, is_waitlisted: 0).any? }
-    teams_not_signing_up.each do |team|
+    teams_not_signed_up = teams.reject {|team| SignedUpTeam.where(team_id: team.id, is_waitlisted: 0).any? }
+    teams_not_signed_up.each do |team|
       bids = [0]
       sign_up_topics.each do |topic|
         bid_record = Bid.find_by(team_id: team.id, topic_id: topic.id)
@@ -84,7 +84,7 @@ class LotteryController < ApplicationController
       team_node = TeamNode.create(parent_id: assignment.id, node_object_id: new_team.id)
 
       user_ids.each do |user_id|
-        remove_current_user(assignment.id, user_id)
+        remove_user_from_previous_team(assignment.id, user_id)
 
         # Create new team_user and team_user node
         new_team_user = TeamsUser.create(user_id: user_id, team_id: new_team.id)
@@ -95,13 +95,13 @@ class LotteryController < ApplicationController
         # some team has multiple 1st priority, multiply 2nd priority, ....
         # these multiple identical priorities come from different previous teams
         # [Future work]: we need to find a better way to merge bids that came from different previous teams
-        merge_bids_from_different_previous_teams(assignment, new_team.id, user_ids, user_bidding_info)
+        merge_bids_from_different_previous_teams(assignment.sign_up_topics, new_team.id, user_ids, user_bidding_info)
       end
     end
   end
 
   # Destroy current team_user and team_user node if exists
-  def remove_current_user(assignment_id, user_id)
+  def remove_user_from_previous_team(assignment_id, user_id)
     team_user = TeamsUser.where("user_id == ? AND team.parent_id == ? ", user_id, assignment_id)
     team_user.team_user_node.destroy rescue nil
     team_user.destroy rescue nil
@@ -117,9 +117,7 @@ class LotteryController < ApplicationController
     end
   end
 
-  def merge_bids_from_different_previous_teams(assignment, team_id, user_ids, user_bidding_info)
-    sign_up_topics = assignment.sign_up_topics
-
+  def merge_bids_from_different_previous_teams(sign_up_topics, team_id, user_ids, user_bidding_info)
     # Select data from `user_bidding_info` variable that only related to team members in current team and transpose it.
     # For example, below matrix shows 4 topics (key) and corresponding priorities given by 3 team members (value).
     # {
@@ -187,7 +185,7 @@ class LotteryController < ApplicationController
       return
     end
     # Getting signup topics with max_choosers > 0
-    sign_up_topics = SignUpTopic.where('assignment_id = ? and max_choosers > 0', assignment.id)
+    sign_up_topics = SignUpTopic.where('assignment_id = ? AND max_choosers > 0', assignment.id)
     unassigned_teams = assignment.teams.reload.select do |t|
       SignedUpTeam.where(team_id: t.id, is_waitlisted: 0).blank? and Bid.where(team_id: t.id).any?
     end

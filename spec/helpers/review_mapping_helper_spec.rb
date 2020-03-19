@@ -205,6 +205,25 @@ describe ReviewMappingHelper, type: :helper do
 
   end
 
+
+  describe 'get_link_updated_at' do
+
+    it 'should return true if site was updated' do
+      link = 'https://www.google.com'
+      time_updated = get_link_updated_at(link)
+      expect(time_updated).to be_a_kind_of(time)
+    end
+
+    it 'should return false if site is not valid'do
+      link = 'not a site'
+      time_updated = get_link_updated_at(link)
+      expect(time_updated).to be_a_kind_of(time)
+    end
+
+
+
+  end
+
   describe 'get_data_for_review_report' do
     before(:each) do
       create(:deadline_right, name: 'No')

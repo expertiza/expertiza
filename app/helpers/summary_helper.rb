@@ -210,7 +210,7 @@ module SummaryHelper
     def calculate_avg_score_by_criterion(question_answers, q_max_score)
       # get score and summary of answers for each question
       # only include divide the valid_answer_sum with the number of valid answers
- 
+
       valid_answer_counter = 0
       question_score = 0.0
       question_answers.each do |ans|
@@ -220,13 +220,13 @@ module SummaryHelper
           valid_answer_counter += 1
         end
       end
- 
+
       if valid_answer_counter > 0 and q_max_score > 0
         # convert the score in percentage
         question_score /= (valid_answer_counter * q_max_score)
         question_score = question_score.round(2) * 100
       end
- 
+
       question_score
     end
 

@@ -8,40 +8,40 @@
 </style>
 
 <div class = "exp">
-	<table>
-	  <tr>
-	    <th class="head">Title</th>
-	    <th class="head">Description</th>
-	    <th class="head">Avg. rating</th>
-	    <th class="head">Your rating</th>
+  <table>
+    <tr>
+      <th class="head">Title</th>
+      <th class="head">Description</th>
+      <th class="head">Avg. rating</th>
+      <th class="head">Your rating</th>
       <th class="head">Review</th>
       <% if !Bookmark.where(user_id: session[:user].id).blank? %>
-	    	<th class="head" colspan='2'>Action</th>
-	    <% end %>
-	  </tr>
-	  <% @bookmark_ids = Array.new %>
-	  <% @bookmarks.each {|bookmark| @bookmark_ids << bookmark.id} %>
-	  <% @bookmarks.each do |bookmark| %>
-	    <tr>
-	      <td><a href=<%= "http://#{bookmark.url}"%> target='_blank'><%=bookmark.title %></td>
-	      <!--Set maximum length of bookmark description and keep description in one line.-->
-	      <td><%=truncate(bookmark.description, length: 100) %></td>
-	      <!--Average rating score-->
-	  	  <% @bookmark_ratings = BookmarkRating.where(bookmark_id: bookmark.id) %>
-	  	  <!--Self rated bookmark should not be counted in average rating.-->
-	  	  <% @bookmark_ratings.to_a.reject! {|bookmark_rating| bookmark_rating.user_id == Bookmark.find(bookmark_rating.bookmark_id).user_id} %>
-	  	  <% sum = 0 %>
-	  	  <% @bookmark_ratings.each do |bookmark_rating| %>
-	  	  	<% sum += bookmark_rating.rating %>
-	  	  <% end %>
-	  	  <td>
-	  	  	<% if @bookmark_ratings.size > 0 %>
-	  	  		<%= (sum * 1.0 / @bookmark_ratings.size).round(1) %>
-	  	  	<% else %>
-	  	  		<%= '-' %>
-	  	  	<% end %>
-	  	  </td>
-	      <td>
+        <th class="head" colspan='2'>Action</th>
+      <% end %>
+    </tr>
+    <% @bookmark_ids = Array.new %>
+    <% @bookmarks.each {|bookmark| @bookmark_ids << bookmark.id} %>
+    <% @bookmarks.each do |bookmark| %>
+      <tr>
+        <td><a href=<%= "http://#{bookmark.url}"%> target='_blank'><%=bookmark.title %></td>
+        <!--Set maximum length of bookmark description and keep description in one line.-->
+        <td><%=truncate(bookmark.description, length: 100) %></td>
+        <!--Average rating score-->
+        <% @bookmark_ratings = BookmarkRating.where(bookmark_id: bookmark.id) %>
+        <!--Self rated bookmark should not be counted in average rating.-->
+        <% @bookmark_ratings.to_a.reject! {|bookmark_rating| bookmark_rating.user_id == Bookmark.find(bookmark_rating.bookmark_id).user_id} %>
+        <% sum = 0 %>
+        <% @bookmark_ratings.each do |bookmark_rating| %>
+          <% sum += bookmark_rating.rating %>
+        <% end %>
+        <td>
+          <% if @bookmark_ratings.size > 0 %>
+            <%= (sum * 1.0 / @bookmark_ratings.size).round(1) %>
+          <% else %>
+            <%= '-' %>
+          <% end %>
+        </td>
+        <td>
           <% unless session[:user].id == bookmark.user_id %>
             <% if BookmarkRating.exists?(bookmark_id: bookmark.id, user_id: session[:user].id) %>
               <% rating = BookmarkRating.where(bookmark_id: bookmark.id, user_id: session[:user].id).first.rating.to_s %>
@@ -55,8 +55,8 @@
               <select id=<%= bookmark.id %> name="rating" style="font-size:10px">
                 <% (0..5).each do |i| %>
                   <option value=<%= i.to_s %>
-                    <% if params[:rating] == i.to_s -%>
-                      selected
+                            <% if params[:rating] == i.to_s -%>
+                              selected
                     <% end -%>
                   ><%= i.to_s %></option>
                 <% end %>
@@ -70,46 +70,44 @@
           <% else %>
             <%= '-' %>
           <% end %>
-	      </td>
-        <td>
-          <% assignment_participant = AssignmentParticipant.find_by(user_id: session[:user].id) %>
-          <% map = BookmarkRatingResponseMap.where(reviewed_object_id: @topic.assignment.id, reviewer_id: assignment_participant.id, reviewee_id: bookmark.id).first %>
-          <% if map.nil? %>
-            <% map = BookmarkRatingResponseMap.create(reviewed_object_id: @topic.assignment.id, reviewer_id: assignment_participant.id, reviewee_id: bookmark.id) %>
-          <% end %>
-          <% review = map.response.last %>
-          <% if review.nil? %>
-            <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :return => "bookmark"} %>
-          <% else %>
-            <%= link_to "View", {:controller => 'response', :action => 'view', :id => review.id} %>
-            <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "bookmark"} %>
-        <% end %>
         </td>
-	      <% if bookmark.user_id == session[:user].id %>
-	      	<td><%= link_to 'Edit Bookmark', :action => 'edit', :id => bookmark.id %></td>
-	        <td><%= link_to 'Destroy Bookmark', bookmark, :confirm => "Delete bookmark \"#{bookmark.title}\"?", :method => :delete %></td>
-	      <% end %>
-	    </tr>
-	  <% end %>
-	</table>
+        <td>
+          <% unless bookmark.user_id == session[:user].id %>
+            <% assignment_participant = AssignmentParticipant.find_by(user_id: session[:user].id) %>
+            <% map = BookmarkRatingResponseMap.where(reviewed_object_id: @topic.assignment.id, reviewer_id: assignment_participant.id, reviewee_id: bookmark.id).first %>
+            <% if map.nil? %>
+              <% map = BookmarkRatingResponseMap.create(reviewed_object_id: @topic.assignment.id, reviewer_id: assignment_participant.id, reviewee_id: bookmark.id) %>
+            <% end %>
+            <% review = map.response.last %>
+            <% if review.nil? %>
+              <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :return => "bookmark"} %>
+            <% else %>
+              <%= link_to "View", {:controller => 'response', :action => 'view', :id => review.id} %>
+              <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "bookmark"} %>
+            <% end %>
+          <% else %>
+            <%= '-' %>
+          <% end %>
+        </td>
+        <% if bookmark.user_id == session[:user].id %>
+          <td><%= link_to 'Edit Bookmark', :action => 'edit', :id => bookmark.id %></td>
+          <td><%= link_to 'Destroy Bookmark', bookmark, :confirm => "Delete bookmark \"#{bookmark.title}\"?", :method => :delete %></td>
+        <% end %>
+      </tr>
+    <% end %>
+  </table>
 </div>
 
 <br />
 
 <%= link_to 'New bookmark', :action => 'new', :id => @topic.id %> |
-<%= link_to 'Back', '#', :onclick => 'pageBack()' %>
-
-
+<%= link_to 'Back', :controller=> 'sign_up_sheet', :action=>'list', :assignment_id => @topic.assignment_id %>
 
 <script>
-  var bookmark_ids = <%=@bookmark_ids%>;
-  bookmark_ids.forEach(function(bookmark_id){
-    $('#'.concat(bookmark_id.toString())).change(function(){
-      $('#button'.concat(bookmark_id.toString())).show();
+    var bookmark_ids = <%=@bookmark_ids%>;
+    bookmark_ids.forEach(function(bookmark_id){
+        $('#'.concat(bookmark_id.toString())).change(function(){
+            $('#button'.concat(bookmark_id.toString())).show();
+        });
     });
-  });
-
-  function pageBack() {
-  	history.back()
-	}
 </script>

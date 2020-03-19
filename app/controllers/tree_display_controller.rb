@@ -53,10 +53,13 @@ class TreeDisplayController < ApplicationController
       folders[folder_node.get_name] = contents
     end
     
-    # Sort assignments by ?
-    folders['Assignments'] = folders['Assignments'].sort_by {|x| [x['instructor'], -1 * x['creation_date'].to_i] }
-    respond_to do |format|
-      format.html { render json: folders }
+    # Sort assignments by instructor and creation date.
+    folders['Assignments'] = folders['Assignments'].sort_by do |assignment| 
+      [assignment['instructor'], -1 * assignment['creation_date'].to_i] 
+    end
+
+    respond_to do |format| 
+      format.html { render json: folders } 
     end
   end
 

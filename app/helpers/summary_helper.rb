@@ -239,7 +239,9 @@ module SummaryHelper
           sum_weight += q.weight
         end
       end
+
       round_score /= sum_weight if sum_weight > 0 and round_score > 0
+      round_score
     end
 
     def calculate_avg_score_by_round(avg_scores_by_criterion, criteria)

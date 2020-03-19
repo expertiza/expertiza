@@ -1,58 +1,4 @@
-def questionnaire_options(assignment, type, _round = 0)
-	questionnaires = Questionnaire.where(['private = 0 or instructor_id = ?', assignment.instructor_id]).order('name')
-	options = []
-	questionnaires.select {|x| x.type == type }.each do |questionnaire|
-		options << [questionnaire.name, questionnaire.id]
-	end
-	options
-end
-
-def get_questionnaire(finder_var = nil)
-	if finder_var.nil?
-		AssignmentQuestionnaire.find_by(assignment_id: @assignment.id)
-	else
-		AssignmentQuestionnaire.where(assignment_id: @assignment.id).where(questionnaire_id: get_selected_id(finder_var))
-	end
-end
-
-def get_selected_id(finder_var)
-	if finder_var == "ReviewQuestionnaire2"
-		ReviewQuestionnaire.find_by(name: finder_var).id
-	elsif finder_var == "AuthorFeedbackQuestionnaire2"
-		AuthorFeedbackQuestionnaire.find_by(name: finder_var).id
-	elsif finder_var == "TeammateReviewQuestionnaire2"
-		TeammateReviewQuestionnaire.find_by(name: finder_var).id
-	end
-end
-
-def fill_assignment_form
-	fill_in 'assignment_form_assignment_name', with: 'edit assignment for test'
-	select('Course 2', from: 'assignment_form_assignment_course_id')
-	fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory1'
-	fill_in 'assignment_form_assignment_spec_location', with: 'testLocation1'
-end
-
-def assignment_creation_setup(privacy,name)
-	login_as("instructor6")
-	new_assignment_url = "/assignments/new?private=#{privacy}"
-	visit new_assignment_url
-
-	fill_in 'assignment_form_assignment_name', with: name
-	select('Course 2', from: 'assignment_form_assignment_course_id')
-	fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
-end
-
-def create_deadline_types
-	create(:deadline_type, name: "submission")
-	create(:deadline_type, name: "review")
-	create(:deadline_type, name: "metareview")
-	create(:deadline_type, name: "drop_topic")
-	create(:deadline_type, name: "signup")
-	create(:deadline_type, name: "team_formation")
-	create(:deadline_right)
-	create(:deadline_right, name: 'Late')
-	create(:deadline_right, name: 'OK')
-end
+require './assignmentCreationHelpers'
 
 describe "assignment creation page", js: true do
 	before(:each) do
@@ -104,6 +50,7 @@ describe "assignment creation page", js: true do
 			show_teammate_reviews: true
 		)
 	end
+	
 	# instructor can check "has quiz" box and set the number of quiz questions
 	it "is able to create with quiz" do
 		assignment_creation_setup(1,'private assignment for test')
@@ -166,6 +113,7 @@ describe "assignment creation page", js: true do
 			microtask: true
 		)
 	end
+	
 	it "is able to create calibrated public assignment" do
 		assignment_creation_setup(0,'public assignment for test')
 		check("assignment_form_assignment_is_calibrated")
@@ -176,6 +124,7 @@ describe "assignment creation page", js: true do
 			is_calibrated: true
 		)
 	end
+	
 	it "is able show tab review strategy" do
 		assignment_creation_setup(1,'private assignment for test')
 
@@ -189,6 +138,7 @@ describe "assignment creation page", js: true do
 		find_link('Due date').click
 		expect(page).to have_content("Deadline type")
 	end
+	
 	it "set the deadline for an assignment review" do
 		assignment_creation_setup(0,'public assignment for test')
 		click_link 'Due date'

@@ -7,6 +7,8 @@
   }
 </style>
 
+<span class=”glyphicon glyphicon-star”></span>
+
 <div class = "exp">
   <table>
     <tr>
@@ -52,12 +54,17 @@
             <% link_to 'Rate', :action => 'bookmark_rating', :id => bookmark.id %>
             <%= form_tag :action => "save_bookmark_rating_score", :id => bookmark.id do %>
               <% params[:rating] = rating %>
+              <% @ratingTrim = 5 - rating.to_i %>
+              <% rating.to_i.times do  %>
+                <span class="glyphicon glyphicon-star"></span>
+              <% end %>
+              <% @ratingTrim.times do  %>
+                <span class="glyphicon glyphicon-star-empty"></span>
+              <% end %></br>
               <select id=<%= bookmark.id %> name="rating" style="font-size:10px">
+                <option value="default" selected>-</option>
                 <% (0..5).each do |i| %>
                   <option value=<%= i.to_s %>
-                            <% if params[:rating] == i.to_s -%>
-                              selected
-                    <% end -%>
                   ><%= i.to_s %></option>
                 <% end %>
               </select>

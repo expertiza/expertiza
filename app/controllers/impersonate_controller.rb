@@ -75,7 +75,7 @@ class ImpersonateController < ApplicationController
 
 
   # Function to display appropriate error messages 
-  def display_error_msg
+   def display_error_msg
     if params[:user]
       @message = "No user exists with the name '#{params[:user][:name]}'."
     elsif params[:impersonate]
@@ -96,8 +96,7 @@ class ImpersonateController < ApplicationController
       flash[:error] = @message
       redirect_to :back
 
-  end
-    
+  end    
    
   # Method to be refactored
   def impersonate
@@ -115,8 +114,8 @@ class ImpersonateController < ApplicationController
         else
           display_error_msg
         end
-      else
 
+      else
         # Impersonate a new account
         if !params[:impersonate][:name].empty?
           #check if special chars /\?<>|&$# are used to avoid html tags or system command
@@ -129,7 +128,7 @@ class ImpersonateController < ApplicationController
             display_error_msg
           end
 
-          # Revert to original account
+        # Revert to original account
         else
           if !session[:super_user].nil?
 	    AuthController.clear_user_info(session, nil)
@@ -145,10 +144,9 @@ class ImpersonateController < ApplicationController
       AuthController.set_current_role(user.role_id, session)
       redirect_to action: AuthHelper.get_home_action(session[:user]),
 		controller: AuthHelper.get_home_controller(session[:user])
-    rescue Exception => e
-      flash[:error] = @message
-      redirect_to :back
-
-    end
+      rescue Exception => e
+       flash[:error] = @message
+       redirect_to :back
+      end
   end
 end

@@ -194,7 +194,7 @@ class TreeDisplayController < ApplicationController
   def ta_for_current_course?(node)
     if node.is_a? AssignmentNode or node.is_a? CourseNode
       ta_mappings = TaMapping.where(ta_id: session[:user].id)
-      course_id = node.is_a? CourseNode ? node.node_object_id : Assignment.find(node.node_object_id).course_id
+      course_id = node.is_a?(CourseNode) ? node.node_object_id : Assignment.find(node.node_object_id).course_id
       ta_mappings.any? { |ta_mapping| ta_mapping.course_id == course_id }
     else
       false

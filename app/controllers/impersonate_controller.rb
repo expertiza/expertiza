@@ -62,7 +62,7 @@ class ImpersonateController < ApplicationController
     #original_user = session[:super_user] || session[:user]
     if params[:impersonate].nil?
           user = User.find_by(name: params[:user][:name])
-          unless @original_user.can_impersonate? user
+          if !@original_user.can_impersonate? user
             flash[:error] = "You cannot impersonate #{params[:user][:name]}."
             #redirect_back
             #return

@@ -67,27 +67,27 @@ class ImpersonateController < ApplicationController
             clear_session
 	  end
     else 
-           if !params[:impersonate][:name].empty?
-              user = User.find_by(name: params[:impersonate][:name])
-           end
+          if !params[:impersonate][:name].empty?
+            user = User.find_by(name: params[:impersonate][:name])
+          end
     end
   end 
 
 
   # Function to display appropriate error messages 
-   def display_error_msg
+  def display_error_msg
     if params[:user]
-      @message = "No user exists with the name '#{params[:user][:name]}'."
+          @message = "No user exists with the name '#{params[:user][:name]}'."
     elsif params[:impersonate]
-      @message = "No user exists with the name '#{params[:impersonate][:name]}'."
+          @message = "No user exists with the name '#{params[:impersonate][:name]}'."
     
     else	 
-      if params[:impersonate].nil?
-           @message = "You cannot impersonate '#{params[:user][:name]}'."
-      else
-           if !params[:impersonate][:name].empty?
+          if params[:impersonate].nil?
+            @message = "You cannot impersonate '#{params[:user][:name]}'."
+          else
+            if !params[:impersonate][:name].empty?
               @message = "You cannot impersonate '#{params[:impersonate][:name]}'."
-           else
+            else
               @message = "No original account was found. Please close your browser and start a new session."
            end 
        end
@@ -100,53 +100,53 @@ class ImpersonateController < ApplicationController
    
   # Method to be refactored
   def impersonate
-      display_error_msg
-      begin
-      @original_user = session[:super_user] || session[:user]
+    display_error_msg
+    begin
+    @original_user = session[:super_user] || session[:user]
 
-      #Impersonate using form on /impersonate/start
-      if params[:impersonate].nil?
+    #Impersonate using form on /impersonate/start
+    if params[:impersonate].nil?
+      #check if special chars /\?<>|&$# are used to avoid html tags or system command
+      check_if_spl_char
+      user = User.find_by(name: params[:user][:name])
+      if user
+        checkif_user_impersonateable
+      else
+        display_error_msg
+      end
+
+    else
+      # Impersonate a new account
+      if !params[:impersonate][:name].empty?
         #check if special chars /\?<>|&$# are used to avoid html tags or system command
         check_if_spl_char
-        user = User.find_by(name: params[:user][:name])
-        if user
-          checkif_user_impersonateable
+        user = User.find_by(name: params[:impersonate][:name])
+        if user 
+          checkif_user_impersonateable 
+          clear_session
         else
           display_error_msg
         end
 
+      # Revert to original account
       else
-        # Impersonate a new account
-        if !params[:impersonate][:name].empty?
-          #check if special chars /\?<>|&$# are used to avoid html tags or system command
-          check_if_spl_char
-          user = User.find_by(name: params[:impersonate][:name])
-          if user 
-            checkif_user_impersonateable 
-	    clear_session
-          else
-            display_error_msg
-          end
-
-        # Revert to original account
+        if !session[:super_user].nil?
+	  AuthController.clear_user_info(session, nil)
+          session[:user] = session[:super_user]
+          user = session[:user]
+          session[:super_user] = nil
         else
-          if !session[:super_user].nil?
-	    AuthController.clear_user_info(session, nil)
-            session[:user] = session[:super_user]
-            user = session[:user]
-            session[:super_user] = nil
-          else
-            display_error_msg
-          end
+          display_error_msg
         end
       end
-      # Navigate to user's home location
-      AuthController.set_current_role(user.role_id, session)
-      redirect_to action: AuthHelper.get_home_action(session[:user]),
+    end
+    # Navigate to user's home location
+    AuthController.set_current_role(user.role_id, session)
+    redirect_to action: AuthHelper.get_home_action(session[:user]),
 		controller: AuthHelper.get_home_controller(session[:user])
-      rescue Exception => e
-       flash[:error] = @message
-       redirect_to :back
-      end
+    rescue Exception => e
+     flash[:error] = @message
+     redirect_to :back
+    end
   end
 end

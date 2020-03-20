@@ -14,7 +14,7 @@ describe "Assignment creation topics tab", js: true do
 		click_link 'Topics'
 	end
 
-	it "can edit topics properties - Check" do
+	it "can edit topics properties" do
 		check("assignment_form_assignment_allow_suggestions")
 		check("assignment_form_assignment_is_intelligent")
 		check("assignment_form_assignment_can_review_same_topic")
@@ -31,7 +31,7 @@ describe "Assignment creation topics tab", js: true do
 		)
 	end
 
-	it "can edit topics properties - unCheck" do
+	it "procedes without topics properties" do
 		uncheck("assignment_form_assignment_allow_suggestions")
 		uncheck("assignment_form_assignment_is_intelligent")
 		uncheck("assignment_form_assignment_can_review_same_topic")
@@ -48,7 +48,7 @@ describe "Assignment creation topics tab", js: true do
 		)
 	end
 
-	it "Add new topic" do
+	it "can create new topics" do
 		click_link 'New topic'
 		click_button 'OK'
 		fill_in 'topic_topic_identifier', with: '1'
@@ -67,7 +67,7 @@ describe "Assignment creation topics tab", js: true do
 		)
 	end
 
-	it "Delete existing topic", js: true do
+	it "can delete existing topic", js: true do
 		click_link 'Due date'
 		fill_in 'assignment_form_assignment_rounds_of_reviews', with: '1'
 		click_button 'set_rounds'

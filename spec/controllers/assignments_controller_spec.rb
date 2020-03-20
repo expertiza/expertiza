@@ -355,4 +355,39 @@ describe AssignmentsController do
       end
     end
   end
+
+  describe '#remove_assignment_from_course' do
+    context 'when assignment is removed from course successfully' do
+      it 'removes assignment and redirects to tree_display#list page' do
+        assignment_form = AssignmentForm.new
+        allow(AssignmentForm).to receive(:new).and_return(assignment_form)
+        allow(assignment_form).to receive(:remove_assignment_from_course).with('true')
+        params = {
+            id: 1,
+            force: 'true'
+        }
+        session = {user: instructor}
+        post :delete, params, session
+        expect(flash[:error]).to be nil
+        expect(response).to redirect_to('/tree_display/list')
+      end
+    end
+  end
+
+  describe '#list_submissions' do
+    context 'when submissions are listed successfully' do
+      it 'gets list of submissions' do
+        assignment_form = AssignmentForm.new
+        allow(AssignmentForm).to receive(:new).and_return(assignment_form)
+        allow(assignment_form).to receive(:list_submissions).with('true')
+        params = {
+            id: 1,
+            force: 'true'
+        }
+        session = {user: instructor}
+        post :get, params, session
+        expect(flash[:error]).to be nil
+      end
+    end
+  end
 end

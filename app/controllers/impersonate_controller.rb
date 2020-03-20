@@ -69,6 +69,7 @@ class ImpersonateController < ApplicationController
     else 
           if !params[:impersonate][:name].empty?
             user = User.find_by(name: params[:impersonate][:name])
+	    clear_session
           end
     end
   end 
@@ -96,7 +97,19 @@ class ImpersonateController < ApplicationController
       flash[:error] = @message
       redirect_to :back
 
-  end    
+  end 
+ 
+  # Main operation 
+  def main_operation(user)
+     if user
+      checkif_user_impersonateable
+     else
+      display_error_msg
+     end
+  end
+
+ 
+   
    
   # Method to be refactored
   def impersonate
@@ -109,11 +122,12 @@ class ImpersonateController < ApplicationController
       #check if special chars /\?<>|&$# are used to avoid html tags or system command
       check_if_spl_char
       user = User.find_by(name: params[:user][:name])
-      if user
-        checkif_user_impersonateable
-      else
-        display_error_msg
-      end
+      #if user
+        #checkif_user_impersonateable
+      #else
+        #display_error_msg
+      #end
+      main_operation(user)
 
     else
       # Impersonate a new account
@@ -121,12 +135,13 @@ class ImpersonateController < ApplicationController
         #check if special chars /\?<>|&$# are used to avoid html tags or system command
         check_if_spl_char
         user = User.find_by(name: params[:impersonate][:name])
-        if user 
-          checkif_user_impersonateable 
-          clear_session
-        else
+        #if user 
+          #checkif_user_impersonateable 
+          #clear_session
+        #else
           display_error_msg
-        end
+        #end
+      main_operation(user)
 
       # Revert to original account
       else

@@ -676,4 +676,49 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
+  describe 'feedback_response_map_record' do
+    before(:each) do
+      @reviewer = create(:participant)
+      @response_map_1 = create(:review_response_map, reviewer: @reviewer)
+      @response_map_2 = create(:review_response_map, reviewer: @reviewer)
+      @response_map_3 = create(:review_response_map, reviewer: @reviewer)
+      @response_1 = create(:response, response_map: @response_map_1, round: 1)
+      @response_2 = create(:response, response_map: @response_map_2, round: 2)
+      @response_3 = create(:response, response_map: @response_map_3, round: 3)
+      FeedbackResponseMap.create(reviewed_object_id: @response_1.id, reviewer_id: @reviewer.id)
+      FeedbackResponseMap.create(reviewed_object_id: @response_2.id, reviewer_id: @reviewer.id)
+      FeedbackResponseMap.create(reviewed_object_id: @response_3.id, reviewer_id: @reviewer.id)
+      @review_response_map_ids = [@response_map_1.id, @response_map_2.id, @response_map_3.id]
+      @all_review_response_ids_round_one = [@response_map_1.id]
+      @all_review_response_ids_round_two = [@response_map_2.id]
+      @all_review_response_ids_round_three = [@response_map_3.id]
+      feedback_response_map_record(@reviewer)
+    end
+
+    it 'should return the id of the response_map associated with round 1' do
+      expect(@review_responses_round_one.first.id).to eq(@response_map_1.id)
+    end
+
+    it 'should return the id of the response_map associated with round 2' do
+      expect(@review_responses_round_two.first.id).to eq(@response_map_2.id)
+    end
+
+    it 'should return the id of the response_map associated with round 3' do
+      expect(@review_responses_round_three.first.id).to eq(@response_map_3.id)
+    end
+
+    it 'should return the id of the response_map associated with the feedback given in round 1' do
+      expect(@feedback_response_maps_round_one.first.reviewed_object_id).to eq(@response_map_1.id)
+    end
+
+    it 'should return the id of the response_map associated with the feedback given in round 3' do
+      expect(@feedback_response_maps_round_two.first.reviewed_object_id).to eq(@response_map_2.id)
+    end
+
+    it 'should return the id of the response_map associated with the feedback given in round 3' do
+      expect(@feedback_response_maps_round_three.first.reviewed_object_id).to eq(@response_map_3.id)
+    end
+
+  end
+
 end

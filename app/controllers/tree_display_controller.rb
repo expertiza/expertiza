@@ -32,7 +32,6 @@ class TreeDisplayController < ApplicationController
   def goto_bookmarkrating_rubrics; goto_controller('Bookmarkrating') end
   def goto_assignments; goto_controller('Assignments') end
 
-  # Called by /tree_display/list
   # Redirects to proper page if user is not an instructor or TA.
   def list
     redirect_to controller: :content_pages, action: :view if current_user.nil?
@@ -89,7 +88,7 @@ class TreeDisplayController < ApplicationController
     end
   end
 
-  # gets and renders last open tab from session
+  # Gets and renders last open tab from session
   def session_last_open_tab
     res = session[:last_open_tab]
     respond_to do |format|
@@ -97,7 +96,7 @@ class TreeDisplayController < ApplicationController
     end
   end
 
-  # sets the last open tab from params
+  # Sets the last open tab from params
   def set_session_last_open_tab
     session[:last_open_tab] = params[:tab]
     res = session[:last_open_tab]
@@ -125,9 +124,9 @@ class TreeDisplayController < ApplicationController
   end
   
   private
-  # getting all attributes of assignment node
-  def assignments_method(node, tmp_object)
-    tmp_object.merge!(
+  # Add assignment attributes to json
+  def serialize_assignment_to_json(node, json)
+    json.merge!(
       "course_id" => node.get_course_id,
       "max_team_size" => node.get_max_team_size,
       "is_intelligent" => node.get_is_intelligent,

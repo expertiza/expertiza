@@ -122,11 +122,6 @@ class ImpersonateController < ApplicationController
       #check if special chars /\?<>|&$# are used to avoid html tags or system command
       check_if_spl_char
       user = User.find_by(name: params[:user][:name])
-      #if user
-        #checkif_user_impersonateable
-      #else
-        #display_error_msg
-      #end
       main_operation(user)
 
     else
@@ -135,13 +130,7 @@ class ImpersonateController < ApplicationController
         #check if special chars /\?<>|&$# are used to avoid html tags or system command
         check_if_spl_char
         user = User.find_by(name: params[:impersonate][:name])
-        #if user 
-          #checkif_user_impersonateable 
-          #clear_session
-        #else
-          display_error_msg
-        #end
-      main_operation(user)
+        main_operation(user)
 
       # Revert to original account
       else

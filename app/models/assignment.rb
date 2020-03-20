@@ -149,6 +149,31 @@ class Assignment < ActiveRecord::Base
   end
   alias is_using_dynamic_reviewer_assignment? dynamic_reviewer_assignment?
 
+  # merge the grades from multiple rounds Jasmine: compute avg, max, min scores
+  def merge_grades_by_rounds(grades_by_rounds, num_of_assesments, total_score)
+    team_scores = {}
+    if !num_of_assesments
+      team_scores[:avg] = nil
+      team_scores[:max] = 0
+      team_scores[:min] = 0
+      return team_scores
+    end
+
+    team_scores[:avg] = total_score/num_of_assesments
+    team_scores[:max] = -999_999_999
+    team_scores[:min] = 999_999_999
+    (1..self.num_review_rounds).each do |i|
+      round_sym = ("review" + i.to_s).to_sym
+      if !grades_by_rounds[round_sym][:max].nil? && team_scores[:max] < grades_by_rounds[round_sym][:max]
+        team_scores[:max] = grades_by_rounds[round_sym][:max]
+      end
+      if !grades_by_rounds[round_sym][:min].nil? && team_scores[:min] > grades_by_rounds[round_sym][:min]
+        team_scores[:min] = grades_by_rounds[round_sym][:min]
+      end
+    end
+    team_scores
+  end
+
   def scores(questions)
     scores = {}
     scores[:participants] = {}
@@ -171,27 +196,7 @@ class Assignment < ActiveRecord::Base
           total_num_of_assessments += assessments.size
           total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f unless grades_by_rounds[round_sym][:avg].nil?
         end
-        # merge the grades from multiple rounds
-        scores[:teams][index.to_s.to_sym][:scores] = {}
-        scores[:teams][index.to_s.to_sym][:scores][:max] = -999_999_999
-        scores[:teams][index.to_s.to_sym][:scores][:min] = 999_999_999
-        scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
-        (1..self.num_review_rounds).each do |i|
-          round_sym = ("review" + i.to_s).to_sym
-          if !grades_by_rounds[round_sym][:max].nil? && scores[:teams][index.to_s.to_sym][:scores][:max] < grades_by_rounds[round_sym][:max]
-            scores[:teams][index.to_s.to_sym][:scores][:max] = grades_by_rounds[round_sym][:max]
-          end
-          if !grades_by_rounds[round_sym][:min].nil? && scores[:teams][index.to_s.to_sym][:scores][:min] > grades_by_rounds[round_sym][:min]
-            scores[:teams][index.to_s.to_sym][:scores][:min] = grades_by_rounds[round_sym][:min]
-          end
-        end
-        if total_num_of_assessments != 0
-          scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score / total_num_of_assessments
-        else
-          scores[:teams][index.to_s.to_sym][:scores][:avg] = nil
-          scores[:teams][index.to_s.to_sym][:scores][:max] = 0
-          scores[:teams][index.to_s.to_sym][:scores][:min] = 0
-        end
+        scores[:teams][index.to_s.to_sym][:scores] = merge_grades_by_rounds(grades_by_rounds, total_num_of_assessments, total_score)
       else
         assessments = ReviewResponseMap.get_assessments_for(team)
         scores[:teams][index.to_s.to_sym][:scores] = Answer.compute_scores(assessments, questions[:review])

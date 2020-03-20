@@ -670,8 +670,7 @@ describe ReviewMappingHelper, type: :helper do
 
   describe 'feedback_response_map_record' do
     before(:each) do
-      review_grade = create(:review_grade)
-      @reviewer = create(:participant, review_grade: review_grade)
+      @reviewer = create(:participant)
       @response_map_1 = create(:review_response_map, reviewer: @reviewer)
       @response_map_2 = create(:review_response_map, reviewer: @reviewer)
       @response_map_3 = create(:review_response_map, reviewer: @reviewer)

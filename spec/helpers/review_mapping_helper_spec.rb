@@ -108,7 +108,7 @@ describe ReviewMappingHelper, type: :helper do
 
   describe 'obtain_team_colour' do
     before(:each) do
-      @assignment = create(:assignment, name: 'obtain_team_colour_test', num_review_rounds: 3, created_at: DateTime.now.in_time_zone - 13.day)
+      @assignment = create(:assignment, name: 'obtain_team_colour_test', num_reviews: 3, created_at: DateTime.now.in_time_zone - 13.day)
 
     end
     it 'should return \'purple\' if last review was submitted within the round' do

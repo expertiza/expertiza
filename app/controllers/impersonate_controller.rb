@@ -24,10 +24,6 @@ class ImpersonateController < ApplicationController
 
   # method to clear the session 
   def clear_session
-    #original_user = session[:super_user] || session[:user]
-    #user = User.find_by(name: params[:user][:name])
-    #AuthController.clear_user_info(session, nil)
-
     if params[:impersonate].nil?
           user = User.find_by(name: params[:user][:name])
           session[:super_user] = session[:user] if session[:super_user].nil?
@@ -36,7 +32,6 @@ class ImpersonateController < ApplicationController
           session[:impersonate] = true
           session[:user] = user
     else
-          
           if !params[:impersonate][:name].empty?
 	    user = User.find_by(name: params[:impersonate][:name])
             #user = User.find_by(name: params[:impersonate][:name])
@@ -67,7 +62,7 @@ class ImpersonateController < ApplicationController
     #original_user = session[:super_user] || session[:user]
     if params[:impersonate].nil?
            user = User.find_by(name: params[:user][:name])
-          if @original_user.can_impersonate? user
+          if !@original_user.can_impersonate? user
             flash[:error] = "You cannot impersonate #{params[:user][:name]}."
             #redirect_back
             #return
@@ -77,8 +72,8 @@ class ImpersonateController < ApplicationController
               user = User.find_by(name: params[:impersonate][:name])
            end
     end
-
   end 
+
 
   # Function to display appropriate error messages 
   def display_error_msg

@@ -279,6 +279,14 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
+  describe 'get_link_updated_at' do
+    it 'should return true if site was updated' do
+      link = 'https://wiki.archlinux.org/'
+      time_updated = get_link_updated_at(link)
+      expect(time_updated).to be_a_kind_of(Time)
+    end
+  end
+
   describe 'get_data_for_review_report' do
     before(:each) do
       create(:deadline_right, name: 'No')

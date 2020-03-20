@@ -34,7 +34,6 @@ class ImpersonateController < ApplicationController
     else
           if !params[:impersonate][:name].empty?
 	    user = User.find_by(name: params[:impersonate][:name])
-            #user = User.find_by(name: params[:impersonate][:name])
 	    AuthController.clear_user_info(session, nil)
             session[:user] = user
             session[:impersonate] =  true
@@ -59,13 +58,13 @@ class ImpersonateController < ApplicationController
  
   # When specified user cannot be impersonated
   def checkif_user_impersonateable 
-    #original_user = session[:super_user] || session[:user]
     if params[:impersonate].nil?
           user = User.find_by(name: params[:user][:name])
           if !@original_user.can_impersonate? user
             flash[:error] = "You cannot impersonate #{params[:user][:name]}."
-            #redirect_back
-            #return
+	    #return 
+          else 
+            clear_session
 	  end
     else 
            if !params[:impersonate][:name].empty?
@@ -106,18 +105,13 @@ class ImpersonateController < ApplicationController
       begin
       @original_user = session[:super_user] || session[:user]
 
-      # Impersonate using form on /impersonate/start
+      #Impersonate using form on /impersonate/start
       if params[:impersonate].nil?
-        # check if special chars /\?<>|&$# are used to avoid html tags or system command
+        #check if special chars /\?<>|&$# are used to avoid html tags or system command
         check_if_spl_char
-
         user = User.find_by(name: params[:user][:name])
         if user
-          checkif_user_impersonateable 
-          if @original_user.can_impersonate? user
-            session[:super_user] = session[:user] if session[:super_user].nil?
-	    clear_session
-          end
+          checkif_user_impersonateable
         else
           display_error_msg
         end
@@ -125,11 +119,10 @@ class ImpersonateController < ApplicationController
 
         # Impersonate a new account
         if !params[:impersonate][:name].empty?
-          # check if special chars /\?<>|&$# are used to avoid html tags or system command
+          #check if special chars /\?<>|&$# are used to avoid html tags or system command
           check_if_spl_char
-
           user = User.find_by(name: params[:impersonate][:name])
-          if user
+          if user 
             checkif_user_impersonateable 
 	    clear_session
           else

@@ -154,7 +154,7 @@ class TreeDisplayController < ApplicationController
         "institution" => Institution.where(id: node.retrieve_institution_id),
         "private" => node.get_instructor_id == session[:user].id
       })
-      update_is_available(json, instructor_id, node)
+      update_is_available(json, node.get_instructor_id, node)
       json["instructor_id"] = node.get_instructor_id
       json["instructor"] = User.find(node.get_instructor_id).name(session[:ip])
       if folder_type == "Assignments"
@@ -179,7 +179,7 @@ class TreeDisplayController < ApplicationController
     
     if node.type == "Courses" or node.type == "Assignments"
       json["directory"] = node.get_directory
-      update_is_available_2(json, instructor_id, node)
+      update_is_available_2(json, node.get_instructor_id, node)
       json["instructor_id"] = node.get_instructor_id
       json["instructor"] = User.find(node.get_instructor_id).name(session[:ip])
       if folder_type == "Assignments"

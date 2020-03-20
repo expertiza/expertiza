@@ -105,7 +105,48 @@ describe ReviewMappingHelper, type: :helper do
       expect(colour).to eq('purple')
     end
   end
-  
+
+  describe 'obtain_team_colour' do
+    before(:each) do
+      @assignment = create(:assignment, name: 'obtain_team_colour_test', num_reviews: 3, created_at: DateTime.now.in_time_zone - 13.day)
+
+    end
+    it 'should return \'purple\' if last review was submitted within the round' do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+      reviewer = create(:participant, review_grade: nil)
+      reviewee = create(:assignment_team, assignment: @assignment)
+      response_map = create(:review_response_map, reviewer: reviewer, reviewee: reviewee)
+      create(:submission_record, assignment_id: @assignment.id, team_id: reviewee.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 7.day)
+      create(:response, response_map: response_map)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 5.day)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone + 6.day)
+
+      assignment_created = @assignment.created_at
+      assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
+      colour = obtain_team_colour(response_map,assignment_created,assignment_due_dates)
+      expect(colour).to eq('purple')
+
+    end
+    it 'should return \'green\' if the submission link does not exist' do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+      reviewer = create(:participant, review_grade: nil)
+      response_map = create(:review_response_map, reviewer: reviewer)
+      create(:response, response_map: response_map)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2)
+
+      assignment_created = @assignment.created_at
+      assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
+      colour = obtain_team_colour(response_map,assignment_created,assignment_due_dates)
+      expect(colour).to eq('green')
+    end
+
+  end
+
   describe 'link_updated_since_last?' do
     before(:each) do
       @round = 2

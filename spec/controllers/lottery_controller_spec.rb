@@ -1,6 +1,17 @@
 include AssignmentHelper
+require 'pp'
 
 describe LotteryController do
+  let(:assignment) {build(:assignment, id: 1)}
+  let(:student) {build(:student)}
+  let(:ta) {build(:teaching_assistant)}
+  let(:instructor) {build(:instructor)}
+  let(:admin) {build(:admin)}
+  let(:topic1) {build(:topic, assignment: assignment)}
+  let(:topic2) {build(:topic, assignment: assignment)}
+  let(:assignment_team1) {build(:assignment_team, assignment: assignment)}
+  let(:assignment_team2) {build(:assignment_team, assignment: assignment)}
+  
   describe "#run_intelligent_assignmnent" do
     it "webservice call should be successful" do
       dat = double("data")
@@ -51,4 +62,52 @@ describe LotteryController do
       expect(unassignedteam.sort_by).to eq(sortedteam)
     end
   end
+
+  # Starting to write my own tests
+  describe "#action_allowed?" do
+    it "allows Instructors, Teaching Assistants, Administrators to run the bid" do
+      user = instructor
+      stub_current_user(user, user.role.name, user.role)
+      expect(controller.action_allowed?).to be true
+      user = admin
+      stub_current_user(user, user.role.name, user.role)
+      expect(controller.action_allowed?).to be true
+      user = ta
+      stub_current_user(user, user.role.name, user.role)
+      expect(controller.action_allowed?).to be true
+      user = student
+      stub_current_user(user, user.role.name, user.role)
+      expect(controller.action_allowed?).to be false
+    end
+  end
+
+  describe "#construct_user_bidding_info" do
+    it "generate user bidding infomation hash" do
+      assignment.teams << assignment_team1
+      assignment.teams << assignment_team2
+      assignment.sign_up_topics << topic1
+      assignment.sign_up_topics << topic2
+      teams = assignment.teams
+      sign_up_topics = assignment.sign_up_topics
+      test = SignedUpTeam.where(team_id: teams[0].id, is_waitlisted: 0).any?
+      user_bidding_info = controller.send(:construct_user_bidding_info, sign_up_topics, teams)
+      expect(user_bidding_info).to eq([])
+    end
+  end
+
+  describe "#run_intelligent_assignment" do
+    it "should redirect to list action in tree_display controller" do
+      allow(Assignment).to receive(:find_by).with(id: 1).and_return(assignment)
+      params = {id: 1}
+      get :run_intelligent_assignment, params
+#      expect(response).to redirect_to('/tree_display/list')
+    end
+  end
+
+ # describe "#log" do
+  #  it "prints a log message through ExpertizaLogger" do
+   #   expect(controller.send(:log, "hello").to receive(ExpertizaLogger.info))
+   # end
+ # end
+
 end

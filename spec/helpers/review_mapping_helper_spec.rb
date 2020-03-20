@@ -105,7 +105,54 @@ describe ReviewMappingHelper, type: :helper do
       expect(colour).to eq('purple')
     end
   end
-  
+
+
+  describe 'check_submission_state' do
+    before(:each) do
+      @assignment = create(:assignment, name: 'get_team_colour_test', created_at: DateTime.now.in_time_zone - 13.day)
+    end
+
+    it 'should return \'purple\' if the was submitted within the round' do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+      reviewer = create(:participant, review_grade: nil)
+      reviewee = create(:assignment_team, assignment: @assignment)
+      response_map = create(:review_response_map, reviewer: reviewer, reviewee: reviewee)
+      create(:submission_record, assignment_id: @assignment.id, team_id: reviewee.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 7.day)
+      create(:response, response_map: response_map)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 5.day)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone + 6.day)
+
+      assignment_created = @assignment.created_at
+      assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
+      round = 2
+      colour = check_submission_state(response_map, assignment_created, assignment_due_dates, round)
+      expect(colour).to eq('purple')
+    end
+
+  it 'should return \'green\' if the submission link does not exist' do
+    create(:deadline_right, name: 'No')
+    create(:deadline_right, name: 'Late')
+    create(:deadline_right, name: 'OK')
+    reviewer = create(:participant, review_grade: nil)
+    response_map = create(:review_response_map, reviewer: reviewer)
+    create(:response, response_map: response_map)
+    create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
+    create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2)
+
+    assignment_created = @assignment.created_at
+    assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
+    round = 2
+    colour = check_submission_state(response_map, assignment_created, assignment_due_dates, round)
+    expect(colour).to eq('green')
+  end
+
+
+
+end
+
+
   describe 'link_updated_since_last?' do
     before(:each) do
       @round = 2
@@ -228,7 +275,6 @@ describe ReviewMappingHelper, type: :helper do
 
     end
 
-
   describe 'get_team_reviewed_link_name' do
     before(:each) do
       create(:deadline_right, name: 'No')
@@ -287,4 +333,110 @@ describe ReviewMappingHelper, type: :helper do
 
   end
 
+  describe ReviewMappingHelper::StudentReviewStrategy do
+
+    describe 'reviews_per_team' do
+      it 'should return the number of reviews expected from each team' do
+        strategy = ReviewMappingHelper::StudentReviewStrategy.new(Array.new(20), Array.new(5), 3)
+
+        reviews = strategy.reviews_per_team
+
+        expect(reviews).to be(12)
+      end
+
+      it 'should round the number of reviews up to the nearest integer (if decimal is >= .5)' do
+        strategy = ReviewMappingHelper::StudentReviewStrategy.new(Array.new(21), Array.new(5), 3)
+
+        reviews = strategy.reviews_per_team
+
+        expect(reviews).to be(13)
+      end
+
+      it 'should round the number of reviews down to the nearest integer (if decimal is < .5)' do
+        strategy = ReviewMappingHelper::StudentReviewStrategy.new(Array.new(19), Array.new(5), 3)
+
+        reviews = strategy.reviews_per_team
+
+        expect(reviews).to be(11)
+      end
+
+    end
+
+    describe 'reviews_needed' do
+      it 'should return the total number of reviews needed for the assignment' do
+        strategy = ReviewMappingHelper::StudentReviewStrategy.new(Array.new(20), Array.new(5), 3)
+
+        reviews = strategy.reviews_needed
+
+        expect(reviews).to be(60)
+      end
+
+    end
+
+    describe 'reviews_per_student' do
+      it 'should return the number of reviews each student is expected to do' do
+        strategy = ReviewMappingHelper::StudentReviewStrategy.new(Array.new(20), Array.new(5), 3)
+
+        reviews = strategy.reviews_per_student
+
+        expect(reviews).to be(3)
+      end
+
+    end
+
   end
+
+  describe ReviewMappingHelper::TeamReviewStrategy do
+
+    describe 'reviews_per_team' do
+      it 'should return the number of reviews expected from each team' do
+        strategy = ReviewMappingHelper::TeamReviewStrategy.new(Array.new(20), Array.new(5), 3)
+
+        reviews = strategy.reviews_per_team
+
+        expect(reviews).to be(3)
+      end
+
+    end
+
+    describe 'reviews_needed' do
+      it 'should return the total number of reviews needed for the assigment' do
+        strategy = ReviewMappingHelper::TeamReviewStrategy.new(Array.new(20), Array.new(5), 3)
+
+        reviews = strategy.reviews_needed
+
+        expect(reviews).to be(15)
+      end
+
+    end
+
+    describe 'reviews_per_student' do
+      it 'should return the number of reviews each team is expected to do' do
+        strategy = ReviewMappingHelper::TeamReviewStrategy.new(Array.new(5), Array.new(5), 3)
+
+        reviews = strategy.reviews_per_student
+
+        expect(reviews).to be(3)
+      end
+
+      it 'should round the number of reviews up to the nearest integer (if decimal is >= .5)' do
+        strategy = ReviewMappingHelper::TeamReviewStrategy.new(Array.new(5), Array.new(6), 3)
+
+        reviews = strategy.reviews_per_student
+
+        expect(reviews).to be(4)
+      end
+
+      it 'should round the number of reviews down to the nearest integer (if decimal is < .5)' do
+        strategy = ReviewMappingHelper::TeamReviewStrategy.new(Array.new(5), Array.new(4), 3)
+
+        reviews = strategy.reviews_per_student
+
+        expect(reviews).to be(2)
+      end
+
+    end
+
+  end
+
+end

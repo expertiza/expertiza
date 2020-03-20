@@ -25,7 +25,7 @@ describe "assignment creation due dates", js: true do
     click_button 'Save'
     late_policy_id = LatePolicy.where(policy_name: "testlatepolicy")[0].id
     assignment = Assignment.where(name: 'public assignment for test').first
-    expect(assignment).to have_attribgutes(
+    expect(assignment).to have_attributes(
                               late_policy_id: late_policy_id
                           )
   end

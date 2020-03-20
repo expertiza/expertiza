@@ -246,6 +246,39 @@ describe ReviewMappingHelper, type: :helper do
 
   end
 
+  describe 'submitted_hyperlink' do
+    before(:each) do
+      @round = 1
+      assignment = create(:assignment, name: 'submitted_within_round_test', created_at: DateTime.now.in_time_zone - 13.day)
+      @assignment_created = assignment.created_at
+      reviewer = create(:participant, review_grade: nil)
+      reviewee = create(:assignment_team, assignment: assignment)
+      @response_map = create(:review_response_map, reviewer: reviewer, reviewee: reviewee)
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+      create(:assignment_due_date, assignment: assignment, parent_id: assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 5.day)
+      @assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
+      @submission = create(:submission_record, assignment_id: assignment.id, team_id: reviewee.id, operation: 'Submit Hyperlink')
+    end
+
+    it 'should return nil if the hyperlink doesnt exist' do
+      @submission.created_at = DateTime.now.in_time_zone - 7.day
+      @submission.content = nil
+      @submission.save
+      hyper_link = submitted_hyperlink(@round, @response_map, @assignment_created, @assignment_due_dates)
+      expect(hyper_link).to eq(nil)
+    end
+
+    it 'should return hyperlink if it was submitted' do
+      @submission.created_at = DateTime.now.in_time_zone - 7.day
+      @submission.content = 'www.test.com'
+      @submission.save
+      hyper_link = submitted_hyperlink(@round, @response_map, @assignment_created, @assignment_due_dates)
+      expect(hyper_link).to eq('www.test.com')
+    end
+  end
+
   describe 'get_data_for_review_report' do
     before(:each) do
       create(:deadline_right, name: 'No')

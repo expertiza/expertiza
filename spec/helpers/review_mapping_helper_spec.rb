@@ -668,4 +668,8 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
+  describe 'feedback_response_map_record' do
+
+  end
+
 end

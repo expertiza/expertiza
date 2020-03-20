@@ -56,8 +56,10 @@ class TreeDisplayController < ApplicationController
     end
     
     # Sort assignments by instructor and creation date.
-    folders['Assignments'] = folders['Assignments'].sort_by do |assignment| 
-      [assignment['instructor'], -1 * assignment['creation_date'].to_i] 
+    if folders['Assignments']
+      folders['Assignments'] = folders['Assignments'].sort_by do |assignment| 
+        [assignment['instructor'], -1 * assignment['creation_date'].to_i] 
+      end
     end
 
     respond_to do |format| 

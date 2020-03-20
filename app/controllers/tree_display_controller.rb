@@ -112,19 +112,6 @@ class TreeDisplayController < ApplicationController
     redirect_to controller: 'tree_display', action: 'list'
   end
 
-  def filter
-    qid = 'filter+'
-    search = params[:filter_string]
-    filter_node = params[:filternode]
-    if filter_node == 'QAN'                       # Questionaire Assignment Name
-      qid = filter_node_is_qan(search, qid)
-    elsif filter_node == 'ACN'                    # Assignment Course Name
-      session[:root] = 2
-      qid << search
-    end
-    qid
-  end
-  
   private
   # Add assignment attributes to json
   def serialize_assignment_to_json(node, json)
@@ -236,16 +223,4 @@ class TreeDisplayController < ApplicationController
         is_user_instructor?(instructor_id)
   end
 
-  # if filter node is 'QAN', get the corresponding assignment questionnaires
-  def filter_node_is_qan(search, qid)
-    assignment = Assignment.find_by(name: search)
-    if assignment
-      assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment.id)
-      if assignment_questionnaires
-        assignment_questionnaires.each { |q| qid << "#{q.questionnaire_id}+" }
-        session[:root] = 1
-      end
-    end
-    qid
-  end
 end

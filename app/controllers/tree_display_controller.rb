@@ -151,15 +151,6 @@ class TreeDisplayController < ApplicationController
         Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
   end
 
-  # Ensures that instructors (who are not ta) would have update_in_ta_course_listing not changing
-  # the private value if he/she is not TA which was set to true for all courses before filtering
-  # in update_tmp_obj in courses_assignments_obj
-  def update_instructor(tmp_object, instructor_id)
-    tmp_object["instructor_id"] = instructor_id
-    tmp_object["instructor"] = nil
-    tmp_object["instructor"] = User.find(instructor_id).name(session[:ip]) if instructor_id
-  end
-  
   # Creates a json object that can be displayed by the UI
   def serialize_folder_to_json(folder_type, node)
     json = {
@@ -168,7 +159,7 @@ class TreeDisplayController < ApplicationController
       "type" => node.type
     }
     
-    if folder_type == "Courses" or folder_type == "Assignments" # WBA - can we make this assumption? Are folder_type and node.type the same?
+    if folder_type == "Courses" or folder_type == "Assignments"
       json.merge! ({
         "directory" => node.get_directory,
         "creation_date" => node.get_creation_date,
@@ -176,12 +167,14 @@ class TreeDisplayController < ApplicationController
         "institution" => Institution.where(id: node.retrieve_institution_id),
         "private" => node.get_instructor_id == session[:user].id
       })
-      instructor_id = node.get_instructor_id
-      update_in_ta_course_listing(instructor_id, node, json)
-      update_instructor(json, instructor_id)
       update_is_available(json, instructor_id, node)
-      assignments_method(node, json) if folder_type == "Assignments"
+      json["instructor_id"] = node.get_instructor_id
+      json["instructor"] = User.find(node.get_instructor_id).name(session[:ip])
+      if folder_type == "Assignments"
+        serialize_assignment_to_json(node, json)
+      end
     end
+    
     return json
   end
   
@@ -199,10 +192,12 @@ class TreeDisplayController < ApplicationController
     
     if node.type == "Courses" or node.type == "Assignments"
       json["directory"] = node.get_directory
-      instructor_id = node.get_instructor_id
-      update_instructor(json, instructor_id)
       update_is_available_2(json, instructor_id, node)
-      assignments_method(node, json) if node.type == "Assignments"
+      json["instructor_id"] = node.get_instructor_id
+      json["instructor"] = User.find(node.get_instructor_id).name(session[:ip])
+      if folder_type == "Assignments"
+        serialize_assignment_to_json(node, json)
+      end
     end
     
     return json

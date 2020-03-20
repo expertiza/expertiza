@@ -114,8 +114,10 @@ class ImpersonateController < ApplicationController
         user = User.find_by(name: params[:user][:name])
         if user
           checkif_user_impersonateable 
-          session[:super_user] = session[:user] if session[:super_user].nil?
-	  clear_session
+          if @original_user.can_impersonate? user
+            session[:super_user] = session[:user] if session[:super_user].nil?
+	    clear_session
+          end
         else
           display_error_msg
         end

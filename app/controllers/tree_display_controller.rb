@@ -156,7 +156,7 @@ class TreeDisplayController < ApplicationController
       })
       update_is_available(json, node.get_instructor_id, node)
       json["instructor_id"] = node.get_instructor_id
-      json["instructor"] = User.find(node.get_instructor_id).name(session[:ip])
+      json["instructor"] = node.get_instructor_id ? User.find(node.get_instructor_id).name(session[:ip]) : nil
       if folder_type == "Assignments"
         serialize_assignment_to_json(node, json)
       end
@@ -181,7 +181,7 @@ class TreeDisplayController < ApplicationController
       json["directory"] = node.get_directory
       update_is_available_2(json, node.get_instructor_id, node)
       json["instructor_id"] = node.get_instructor_id
-      json["instructor"] = User.find(node.get_instructor_id).name(session[:ip])
+      json["instructor"] = node.get_instructor_id ? User.find(node.get_instructor_id).name(session[:ip]) : nil
       if folder_type == "Assignments"
         serialize_assignment_to_json(node, json)
       end

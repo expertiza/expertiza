@@ -29,6 +29,7 @@ module SummaryHelper
       self
     end
 
+    # get average scores and summary for each question
     def summarize_reviews_by_reviewee_assign(assignment, r_id, q, round)
       question_answers = Answer.answers_by_question_for_reviewee(assignment.id, r_id, q.id)
 
@@ -38,6 +39,7 @@ module SummaryHelper
       self.summary[round.to_s][q.txt] = summarize_sentences(break_up_comments_to_sentences(question_answers), self.summary_ws_url)
     end
 
+    # Wait for threads to end
     def end_threads(threads)
       threads.each do |t|
         # Wait for the thread to finish if it isn't this thread (i.e. the main thread).

@@ -94,7 +94,6 @@ module SummaryHelper
       self.avg_scores_by_criterion = ({})
       self.reviewers = ({})
       self.summary_ws_url = summary_ws_url
-      threads = []
 
       # get all criteria used in each round
       rubric = get_questions_by_assignment(assignment)
@@ -120,13 +119,11 @@ module SummaryHelper
         self.avg_scores_by_reviewee[reviewee.name] = calculate_avg_score_by_reviewee(self.avg_scores_by_round[reviewee.name], assignment.rounds_of_reviews)
       end
 
-      # Wait for all threads to end
-      end_threads(threads)
-
       self
     end
 
     def summarize_by_rounds(assignment, reviewee, round, rubric)
+      threads = []
       # iterate each round and get answers
       # if use the same rubric, only use rubric[0]
       rubric_questions_used = rubric[assignment.varying_rubrics_by_round? ? round : 0]
@@ -148,6 +145,8 @@ module SummaryHelper
       end
       avg_scores_by_round = calculate_avg_score_by_round(self.avg_scores_by_criterion[reviewee.name][round], rubric_questions_used)
       self.avg_scores_by_round[reviewee.name][round] = avg_scores_by_round
+      # Wait for all threads to end
+      end_threads(threads)
     end
 
     def get_max_score_for_question(question)

@@ -331,13 +331,12 @@ class Assignment < ActiveRecord::Base
     if self.staggered_deadline?
       return (topic_id.nil? ? 'Unknown' : get_current_stage(topic_id))
     end
-    due_date = find_current_stage(topic_id)
 
-      if due_date != 'Finished' && !due_date.nil? && !due_date.deadline_name.nil?
-        return due_date.deadline_name unless self.staggered_deadline?
-      else
-        return get_current_stage(topic_id) unless self.staggered_deadline?
-      end
+    due_date = find_current_stage(topic_id)
+    if due_date != 'Finished' && !due_date.nil? && !due_date.deadline_name.nil?
+      return due_date.deadline_name
+    end
+    get_current_stage(topic_id)
   end
 
   # check if this assignment has multiple review phases with different review rubrics

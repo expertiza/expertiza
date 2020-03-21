@@ -676,6 +676,76 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
+  describe 'get_each_review_and_feedback_response_map'do
+
+    before(:each) do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+
+      @assignment = create(:assignment, name: 'get_awarded_review_score_test', created_at: DateTime.now.in_time_zone - 13.day)
+      @id = @assignment.id
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 3)
+
+      user = create(:student)
+      @reviewee = create(:assignment_team, assignment: @assignment)
+      create(:team_user, user: user, team: @reviewee)
+      @reviewer = create(:participant, assignment: @assignment, user: user)
+
+      @response_map_1 = create(:review_response_map, reviewer: @reviewer)
+      @response_map_2 = create(:review_response_map, reviewer: @reviewer)
+      @response_map_3 = create(:review_response_map, reviewer: @reviewer)
+
+      @review_response_map_list = []
+      @review_response_map_list << @response_map_1.id
+      @review_response_map_list << @response_map_2.id
+      @review_response_map_list << @response_map_3.id
+
+      @response_1 = create(:response, response_map: @response_map_1, round: 1)
+      @response_2 = create(:response, response_map: @response_map_2, round: 2)
+      @response_3 = create(:response, response_map: @response_map_3, round: 3)
+
+      @response_list = []
+      @response_list << @response_1
+      @response_list << @response_2
+      @response_list << @response_3
+
+      feedback_response_map1 = FeedbackResponseMap.create(reviewed_object_id: @response_1.id, reviewer_id: @reviewer.id)
+      feedback_response_map2 = FeedbackResponseMap.create(reviewed_object_id: @response_2.id, reviewer_id: @reviewer.id)
+      feedback_response_map3 = FeedbackResponseMap.create(reviewed_object_id: @response_3.id, reviewer_id: @reviewer.id)
+
+      @feedback_response_map_list = []
+      @feedback_response_map_list << feedback_response_map1
+      @feedback_response_map_list << feedback_response_map2
+      @feedback_response_map_list << feedback_response_map3
+
+
+      @all_review_response_ids = [@response_1.id, @response_2.id, @response_3.id]
+      get_each_review_and_feedback_response_map(@reviewer)
+    end
+
+    it 'should return response corresponding to first response' do
+      expect(@response_1.length).to eq @rspan_round_one
+    end
+    it 'should return response corresponding to second response' do
+      expect(@response_2.length).to eq @rspan_round_two
+    end
+    it 'should return response corresponding to third response' do
+      expect(@response_3.length).to eq @rspan_round_three
+    end
+    it 'should return 0 for nil round 3 response' do
+      @response_3 = nil
+      expect(@response_3.length).to eq @rspan_round_three
+    end
+
+
+
+
+
+  end
+
   describe 'feedback_response_map_record' do
     before(:each) do
       @reviewer = create(:participant)

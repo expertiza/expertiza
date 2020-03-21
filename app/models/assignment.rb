@@ -9,6 +9,7 @@ class Assignment < ActiveRecord::Base
   include ReviewAssignment
   include QuizAssignment
   include OnTheFlyCalc
+  include AssignmentHelper
   has_paper_trail
 
   # When an assignment is created, it needs to
@@ -173,26 +174,7 @@ class Assignment < ActiveRecord::Base
           total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f unless grades_by_rounds[round_sym][:avg].nil?
         end
         # merge the grades from multiple rounds
-        scores[:teams][index.to_s.to_sym][:scores] = {}
-        scores[:teams][index.to_s.to_sym][:scores][:max] = -999_999_999
-        scores[:teams][index.to_s.to_sym][:scores][:min] = 999_999_999
-        scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
-        (1..self.num_review_rounds).each do |i|
-          round_sym = ("review" + i.to_s).to_sym
-          if !grades_by_rounds[round_sym][:max].nil? && scores[:teams][index.to_s.to_sym][:scores][:max] < grades_by_rounds[round_sym][:max]
-            scores[:teams][index.to_s.to_sym][:scores][:max] = grades_by_rounds[round_sym][:max]
-          end
-          if !grades_by_rounds[round_sym][:min].nil? && scores[:teams][index.to_s.to_sym][:scores][:min] > grades_by_rounds[round_sym][:min]
-            scores[:teams][index.to_s.to_sym][:scores][:min] = grades_by_rounds[round_sym][:min]
-          end
-        end
-        if total_num_of_assessments != 0
-          scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score / total_num_of_assessments
-        else
-          scores[:teams][index.to_s.to_sym][:scores][:avg] = nil
-          scores[:teams][index.to_s.to_sym][:scores][:max] = 0
-          scores[:teams][index.to_s.to_sym][:scores][:min] = 0
-        end
+        scores[:teams][index.to_s.to_sym][:scores] = merge_grades_by_rounds(grades_by_rounds, total_num_of_assessments, total_score)
       else
         assessments = ReviewResponseMap.get_assessments_for(team)
         scores[:teams][index.to_s.to_sym][:scores] = Answer.compute_scores(assessments, questions[:review])

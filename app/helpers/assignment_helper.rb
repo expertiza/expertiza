@@ -153,4 +153,24 @@ module AssignmentHelper
       '#0984e3' # submission grade is not assigned yet.
     end
   end
+
+  # merge the grades from multiple rounds Jasmine:extracted from scores method in assignment.rb (for OSS Project E2009)
+  def merge_grades_by_rounds(grades_by_rounds, num_of_assessments, total_score)
+    team_scores = {:max => 0, :min => 0, :avg => nil}
+    return team_scores if !num_of_assessments
+
+    team_scores[:max] = -999_999_999
+    team_scores[:min] = 999_999_999
+    team_scores[:avg] = total_score/num_of_assessments
+    (1..self.num_review_rounds).each do |i|
+      round_sym = ("review" + i.to_s).to_sym
+      if !grades_by_rounds[round_sym][:max].nil? && team_scores[:max] < grades_by_rounds[round_sym][:max]
+        team_scores[:max] = grades_by_rounds[round_sym][:max]
+      end
+      if !grades_by_rounds[round_sym][:min].nil? && team_scores[:min] > grades_by_rounds[round_sym][:min]
+        team_scores[:min] = grades_by_rounds[round_sym][:min]
+      end
+    end
+    team_scores
+  end
 end

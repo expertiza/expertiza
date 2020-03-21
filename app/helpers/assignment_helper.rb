@@ -177,4 +177,8 @@ module AssignmentHelper
   def staggered_and_no_topic?(topic_id)
     self.staggered_deadline? and topic_id.nil?
   end
+
+  def num_reviews_greater?(reviews_required, reviews_allowed)
+    reviews_allowed && reviews_allowed != -1 && reviews_required > reviews_allowed
+  end
 end

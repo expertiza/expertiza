@@ -108,7 +108,7 @@ module SummaryHelper
 
       self
     end
-    
+
     def summarize_reviews_by_teams(assignment, reviewee, rubric)
       self.summary[reviewee.name] = []
       self.avg_scores_by_reviewee[reviewee.name] = 0.0

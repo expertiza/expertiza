@@ -18,6 +18,7 @@
       <% if !Bookmark.where(user_id: session[:user].id).blank? %>
         <th class="head" colspan='2'>Action</th>
       <% end %>
+      <th></th>
     </tr>
     <% @bookmark_ids = Array.new %>
     <% @bookmarks.each {|bookmark| @bookmark_ids << bookmark.id} %>
@@ -42,7 +43,7 @@
           <% end %>
         </td>
         <td>
-          <% unless session[:user].id == bookmark.user_id %>
+          <% if session[:user].id != bookmark.user_id %>
             <% if BookmarkRating.exists?(bookmark_id: bookmark.id, user_id: session[:user].id) %>
               <% rating = BookmarkRating.where(bookmark_id: bookmark.id, user_id: session[:user].id).first.rating.to_s %>
             <% else %>
@@ -72,7 +73,7 @@
           <% end %>
         </td>
         <td>
-          <% unless bookmark.user_id == session[:user].id %>
+          <% if bookmark.user_id != session[:user].id %>
             <% assignment_participant = AssignmentParticipant.find_by(user_id: session[:user].id) %>
             <% map = BookmarkRatingResponseMap.where(reviewed_object_id: @topic.assignment.id, reviewer_id: assignment_participant.id, reviewee_id: bookmark.id).first %>
             <% if map.nil? %>
@@ -92,6 +93,9 @@
         <% if bookmark.user_id == session[:user].id %>
           <td><%= link_to 'Edit Bookmark', :action => 'edit', :id => bookmark.id %></td>
           <td><%= link_to 'Destroy Bookmark', bookmark, :confirm => "Delete bookmark \"#{bookmark.title}\"?", :method => :delete %></td>
+        <% end %>
+        <% if ['Instructor'].include? @current_role_name %>
+          <td><%= link_to "See Reviews", {:controller => 'reports', :action => 'response_report', :id => BookmarkRatingResponseMap.where(reviewed_object_id: @topic.assignment.id)} %></td>
         <% end %>
       </tr>
     <% end %>

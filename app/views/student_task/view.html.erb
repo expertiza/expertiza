@@ -23,8 +23,11 @@
         (Sign up for a topic)
       </li>
       <li>
-        <%= link_to "View bookmarks", :controller=>'bookmarks', :action=> 'list', :id => @topic_id %>
-        (View bookmarks others have submitted for your topic)
+        <% if @topic_id and @assignment.submission_allowed(@topic_id) %>
+          <%= link_to "View bookmarks", :controller=>'bookmarks', :action=> 'list', :id => @topic_id %> (View bookmarks others have submitted for your topic)
+        <% else %>
+          <font color="gray">View bookmarks</font> (You have to choose a topic first)
+        <% end %>
       </li>
     <% end %>
   <%end%>

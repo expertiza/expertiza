@@ -102,24 +102,28 @@ module SummaryHelper
       teams = Team.select(:id, :name).where(parent_id: assignment.id).order(:name)
 
       teams.each do |reviewee|
-        self.summary[reviewee.name] = []
-        self.avg_scores_by_reviewee[reviewee.name] = 0.0
-        self.avg_scores_by_round[reviewee.name] = self.avg_scores_by_criterion[reviewee.name] = []
-
-        # get the name of reviewers for display only
-        self.reviewers[reviewee.name] = get_reviewers_by_reviewee_and_assignment(reviewee, assignment.id)
-
-        # get answers of each reviewer by rubric
-        (0..assignment.rounds_of_reviews - 1).each do |round|
-          self.summary[reviewee.name][round] = {}
-          self.avg_scores_by_round[reviewee.name][round] = 0.0
-          self.avg_scores_by_criterion[reviewee.name][round] = {}
-          summarize_by_rounds(assignment, reviewee, round, rubric)
-        end
+        summarize_reviews_by_teams(assignment, reviewee, rubric)
         self.avg_scores_by_reviewee[reviewee.name] = calculate_avg_score_by_reviewee(self.avg_scores_by_round[reviewee.name], assignment.rounds_of_reviews)
       end
 
       self
+    end
+    
+    def summarize_reviews_by_teams(assignment, reviewee, rubric)
+      self.summary[reviewee.name] = []
+      self.avg_scores_by_reviewee[reviewee.name] = 0.0
+      self.avg_scores_by_round[reviewee.name] = self.avg_scores_by_criterion[reviewee.name] = []
+
+      # get the name of reviewers for display only
+      self.reviewers[reviewee.name] = get_reviewers_by_reviewee_and_assignment(reviewee, assignment.id)
+
+      # get answers of each reviewer by rubric
+      (0..assignment.rounds_of_reviews - 1).each do |round|
+        self.summary[reviewee.name][round] = {}
+        self.avg_scores_by_round[reviewee.name][round] = 0.0
+        self.avg_scores_by_criterion[reviewee.name][round] = {}
+        summarize_by_rounds(assignment, reviewee, round, rubric)
+      end
     end
 
     def summarize_by_rounds(assignment, reviewee, round, rubric)

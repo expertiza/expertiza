@@ -18,7 +18,6 @@
       <% if !Bookmark.where(user_id: session[:user].id).blank? %>
         <th class="head" colspan='2'>Action</th>
       <% end %>
-      <th></th>
     </tr>
     <% @bookmark_ids = Array.new %>
     <% @bookmarks.each {|bookmark| @bookmark_ids << bookmark.id} %>
@@ -93,9 +92,6 @@
         <% if bookmark.user_id == session[:user].id %>
           <td><%= link_to 'Edit Bookmark', :action => 'edit', :id => bookmark.id %></td>
           <td><%= link_to 'Destroy Bookmark', bookmark, :confirm => "Delete bookmark \"#{bookmark.title}\"?", :method => :delete %></td>
-        <% end %>
-        <% if ['Instructor'].include? @current_role_name %>
-          <td><%= link_to "See Reviews", {:controller => 'reports', :action => 'response_report', :id => BookmarkRatingResponseMap.where(reviewed_object_id: @topic.assignment.id)} %></td>
         <% end %>
       </tr>
     <% end %>

@@ -9,7 +9,6 @@ class BookmarksController < ApplicationController
       # edit, update, delete bookmarks can only be done by owner
       current_role_name.eql? 'Student' and Bookmark.find(params[:id].to_i).user_id == session[:user].id
     end
-    @current_role_name = current_role_name
   end
 
   def list

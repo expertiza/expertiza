@@ -38,18 +38,10 @@
 
 <br/>
 <script type="text/javascript">
-jQuery('.datetimeklass').datetimepicker({
-            dateFormat: 'yy/mm/dd',
-            timeFormat: 'HH:mm:ss z',
-            controlType: 'select',
-            timezoneList: [
-                { value: -000, label: 'GMT'},
-                { value: -300, label: 'Eastern'},
-                { value: -360, label: 'Central' },
-                { value: -420, label: 'Mountain' },
-                { value: -480, label: 'Pacific' }
-            ]
-        });
+    jQuery('.datetimeklass').datetimepicker({
+        format: 'YYYY/MM/DD HH:mm z',
+        sideBySide: true
+    });
 </script>
 <%= render :partial => 'versions/pagination' %>
 

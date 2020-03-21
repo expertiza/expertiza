@@ -131,6 +131,26 @@ describe LotteryController do
     end
   end
 
+  describe "#remove_user_from_previous_team" do
+    it "should return the team without the removed user" do
+      @user_id = team_user3.id
+      @assignment_id = assignment_team1.id
+      result = controller.send(:remove_user_from_previous_team,@user_id,@assignment_id)
+      expect(@team_users.count).to eq(2)
+      expect(@team_users.include?(team_user3)).to be false
+      expect(@team_users.include?(team_user1).to be true
+      expect(@team_users.include?(team_user2).to be true
+    end
+  end
+
+  describe "#remove_empty_teams" do
+    it "should reduce the number of teams by the number of empty teams in the assignment" do
+      @assignment_number = 1
+      result = controller.send(:remove_empty_teams,@assignment_number)
+
+    end
+  end
+
   describe "#merge_bids_from_different_previous_teams" do
     before :each do
       @sign_up_topics = @sign_up_topics

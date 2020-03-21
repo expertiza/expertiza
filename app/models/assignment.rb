@@ -158,7 +158,6 @@ class Assignment < ActiveRecord::Base
     end
     index = 0
     self.teams.each do |team|
-      #scores[:teams][index.to_s.to_sym] = {}
       scores[:teams][index.to_s.to_sym] = {:team => team, :scores => {}}
       if self.varying_rubrics_by_round?
         grades_by_rounds = {}
@@ -326,15 +325,13 @@ class Assignment < ActiveRecord::Base
   end
 
   def link_for_current_stage(topic_id = nil)
-    if self.staggered_deadline?
-      return nil if topic_id.nil?
-    end
+    return nil if (self.staggered_deadline? && topic_id.nil?)
+
     due_date = find_current_stage(topic_id)
     if due_date.nil? or due_date == 'Finished' or due_date.is_a?(TopicDueDate)
       return nil
-    else
-      due_date.description_url
     end
+    due_date.description_url
   end
 
   def stage_deadline(topic_id = nil)

@@ -153,7 +153,7 @@ describe TreeDisplayController do
       # create ta-course mapping for the student
       ta_mapping = TaMapping.new
       ta_mapping.ta_id = User.where(role_id: student.role_id).first.id
-      ta_mapping.course_id = Course.find(@course1.id).id
+      ta_mapping.course_id = @course1.id
       ta_mapping.save!
 
       params = FolderNode.all
@@ -168,7 +168,7 @@ describe TreeDisplayController do
       # create ta-course mapping
       ta_mapping = TaMapping.new
       ta_mapping.ta_id = User.where(role_id: @ta.role_id).first.id
-      ta_mapping.course_id = Course.find(@course1.id).id
+      ta_mapping.course_id = @course1.id
       ta_mapping.save!
 
       # make sure it's the current user
@@ -221,7 +221,7 @@ describe TreeDisplayController do
       # create a ta mapping for the other existing course (other than in which he is ta of)
       ta_mapping = TaMapping.new
       ta_mapping.ta_id = User.where(role_id: @ta.role_id).first.id
-      ta_mapping.course_id = Course.find(@course1.id).id
+      ta_mapping.course_id = @course1.id
       ta_mapping.save!
 
       # make sure it's the current user
@@ -254,7 +254,7 @@ describe TreeDisplayController do
       # create a ta mapping for the same course he is ta of
       ta_mapping = TaMapping.new
       ta_mapping.ta_id = User.where(role_id: @ta.role_id).first.id
-      ta_mapping.course_id = Course.find(@course1.id).id
+      ta_mapping.course_id = @course1.id
       ta_mapping.save!
 
       # make sure it's the current user

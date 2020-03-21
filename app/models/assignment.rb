@@ -554,7 +554,6 @@ class Assignment < ActiveRecord::Base
     (0..@scores[:teams].length - 1).each do |index|
       team = @scores[:teams][index.to_s.to_sym]
       first_participant = team[:team].participants[0] unless team[:team].participants[0].nil?
-      pscore = @scores[:participants][first_participant.id.to_s.to_sym]
       tcsv = []
       tcsv << team[:team].name
       names_of_participants = ''

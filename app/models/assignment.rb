@@ -152,16 +152,14 @@ class Assignment < ActiveRecord::Base
   alias is_using_dynamic_reviewer_assignment? dynamic_reviewer_assignment?
 
   def scores(questions)
-    scores = {}
-    scores[:participants] = {}
+    scores = {:participants => {}, :teams => {}}
     self.participants.each do |participant|
       scores[:participants][participant.id.to_s.to_sym] = participant.scores(questions)
     end
-    scores[:teams] = {}
     index = 0
     self.teams.each do |team|
-      scores[:teams][index.to_s.to_sym] = {}
-      scores[:teams][index.to_s.to_sym][:team] = team
+      #scores[:teams][index.to_s.to_sym] = {}
+      scores[:teams][index.to_s.to_sym] = {:team => team, :scores => {}}
       if self.varying_rubrics_by_round?
         grades_by_rounds = {}
         total_score = 0

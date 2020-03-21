@@ -689,9 +689,9 @@ describe ReviewMappingHelper, type: :helper do
       FeedbackResponseMap.create(reviewed_object_id: @response_2.id, reviewer_id: @reviewer.id)
       FeedbackResponseMap.create(reviewed_object_id: @response_3.id, reviewer_id: @reviewer.id)
       @review_response_map_ids = [@response_map_1.id, @response_map_2.id, @response_map_3.id]
-      @all_review_response_ids_round_one = [@response_map_1.id]
-      @all_review_response_ids_round_two = [@response_map_2.id]
-      @all_review_response_ids_round_three = [@response_map_3.id]
+      @all_review_response_ids_round_one = [@response_1.id]
+      @all_review_response_ids_round_two = [@response_2.id]
+      @all_review_response_ids_round_three = [@response_3.id]
       feedback_response_map_record(@reviewer)
     end
 
@@ -708,15 +708,15 @@ describe ReviewMappingHelper, type: :helper do
     end
 
     it 'should return the id of the response_map associated with the feedback given in round 1' do
-      expect(@feedback_response_maps_round_one.first.reviewed_object_id).to eq(@response_map_1.id)
+      expect(@feedback_response_maps_round_one.first.reviewed_object_id).to eq(@response_1.id)
     end
 
     it 'should return the id of the response_map associated with the feedback given in round 3' do
-      expect(@feedback_response_maps_round_two.first.reviewed_object_id).to eq(@response_map_2.id)
+      expect(@feedback_response_maps_round_two.first.reviewed_object_id).to eq(@response_2.id)
     end
 
     it 'should return the id of the response_map associated with the feedback given in round 3' do
-      expect(@feedback_response_maps_round_three.first.reviewed_object_id).to eq(@response_map_3.id)
+      expect(@feedback_response_maps_round_three.first.reviewed_object_id).to eq(@response_3.id)
     end
 
   end

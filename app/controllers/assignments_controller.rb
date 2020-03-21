@@ -202,16 +202,28 @@ class AssignmentsController < ApplicationController
                       MetareviewQuestionnaire AuthorFeedbackQuestionnaire
                       TeammateReviewQuestionnaire BookmarkRatingQuestionnaire]
     @assignment_questionnaires.each do |aq|
-      next if aq.questionnaire_id.nil?
-
-      rubrics_list.reject! do |rubric|
-        rubric == Questionnaire.where(id: aq.questionnaire_id).first.type.to_s
-      end
+      remove_existing_questionnaire(rubrics_list, aq)
     end
+
+    remove_invalid_questionnaires(rubrics_list)
+    rubrics_list
+  end
+
+  # Removes questionnaire types from the rubric list that are already on the assignment
+  def remove_existing_questionnaire(rubrics_list, aq)
+    return if aq.questionnaire_id.nil?
+
+    rubrics_list.reject! do |rubric|
+      rubric == Questionnaire.where(id: aq.questionnaire_id).first.type.to_s
+    end
+  end
+
+  # Removes questionnaire types from the rubric list that shouldn't be there
+  # e.g. remove teammate review questionnaire if the maximum team size is one person (there are no teammates)
+  def remove_invalid_questionnaires(rubrics_list)
     rubrics_list.delete('TeammateReviewQuestionnaire') if @assignment_form.assignment.max_team_size == 1
     rubrics_list.delete('MetareviewQuestionnaire') unless @metareview_allowed
     rubrics_list.delete('BookmarkRatingQuestionnaire') unless @assignment_form.assignment.use_bookmark
-    rubrics_list
   end
 
   def needed_rubrics(empty_rubrics_list)

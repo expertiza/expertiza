@@ -63,25 +63,17 @@ class Criterion < ScoredQuestion
       advice_total_length += question_advice.advice.length if question_advice.advice && question_advice.advice != ""
     end
 
+    #Sahil: Check this out
     if !question_advices.empty? and advice_total_length > 0
-      html += '<a id="showAdivce_' + self.id.to_s + '" onclick="showAdvice(' + self.id.to_s + ')">Show advice</a>'
-      html += '<script>'
-      html += 'function showAdvice(i){'
-      html += 'var element = document.getElementById("showAdivce_" + i.toString());'
+      html += '<a id="showAdvice_' + self.id.to_s + '" onclick="showAdvice(' + self.id.to_s + ')">Show advice</a><script>'
+      html += 'function showAdvice(i){var element = document.getElementById("showAdivce_" + i.toString());'
       html += 'var show = element.innerHTML == "Hide advice";'
-      html += 'if (show){'
-      html += 'element.innerHTML="Show advice";'
-      html += '}else{'
-      html += 'element.innerHTML="Hide advice";}'
-      html += 'toggleAdvice(i);}'
+      html += 'if (show){element.innerHTML="Show advice";}'
+      html += 'else{element.innerHTML="Hide advice";}toggleAdvice(i);}'
 
-      html += 'function toggleAdvice(i) {'
-      html += 'var elem = document.getElementById(i.toString() + "_myDiv");'
-      html += 'if (elem.style.display == "none") {'
-      html += 'elem.style.display = "";'
-      html += '} else {'
-      html += 'elem.style.display = "none";}}'
-      html += '</script>'
+      html += 'function toggleAdvice(i) {var elem = document.getElementById(i.toString() + "_myDiv");'
+      html += 'if (elem.style.display == "none") {elem.style.display = "";}'
+      html += 'else {elem.style.display = "none";}}</script>'
 
       html += '<div id="' + self.id.to_s + '_myDiv" style="display: none;">'
       # [2015-10-26] Zhewei:
@@ -90,13 +82,10 @@ class Criterion < ScoredQuestion
       # clicking on the link caused the dropbox to be filled in with the corresponding number
       question_advices.reverse.each_with_index do |question_advice, index|
         html += '<a id="changeScore_>' + self.id.to_s + '" onclick="changeScore(' + count.to_s + ',' + index.to_s + ')">'
-        html += (self.questionnaire.max_question_score - index).to_s + ' - ' + question_advice.advice + '</a><br/>'
-        html += '<script>'
-        html += 'function changeScore(i, j) {'
-        html += 'var elem = jQuery("#responses_" + i.toString() + "_score");'
+        html += (self.questionnaire.max_question_score - index).to_s + ' - ' + question_advice.advice + '</a><br/><script>'
+        html += 'function changeScore(i, j) {var elem = jQuery("#responses_" + i.toString() + "_score");'
         html += 'var opts = elem.children("option").length;'
-        html += 'elem.val((' + self.questionnaire.max_question_score.to_s + ' - j).toString());}'
-        html += '</script>'
+        html += 'elem.val((' + self.questionnaire.max_question_score.to_s + ' - j).toString());}</script>'
       end
       html += '</div>'
     end
@@ -104,66 +93,47 @@ class Criterion < ScoredQuestion
     if dropdown_or_scale == 'dropdown'
       current_value = ""
       current_value += 'data-current-rating =' + answer.answer.to_s if !answer.nil?
-      html += '<div><select id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" class="review-rating" ' + current_value + '>'
-      html += "<option value = ''>--</option>"
-      questionnaire_min.upto(questionnaire_max).each do |j|
-        html += if !answer.nil? and j == answer.answer
-                  '<option value=' + j.to_s + ' selected="selected">'
-                else
-                  '<option value=' + j.to_s + '>'
-                end
 
-        html += j.to_s
-        if j == questionnaire_min
-          html += "-" + self.min_label if self.min_label.present?
-        elsif j == questionnaire_max
-          html += "-" + self.max_label if self.max_label.present?
-        end
+      #Sahil: Check this out
+      html += '<div><select id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" class="review-rating" ' + current_value + '>' + "<option value = ''>--</option>" + '<option value='
+      questionnaire_min.upto(questionnaire_max).each do |j|
+        html += j.to_s if !answer.nil? and j == answer.answer + ' selected="selected"'  '>'        
+        html += j.to_s + "-"
+        html += self.min_label if self.min_label.present? and j == questionnaire_min
+        html += self.max_label if self.max_label.present? and j == questionnaire_max
         html += "</option>"
       end
-      html += "</select></div><br><br>"
-      html += '<textarea' + ' id="responses_' + count.to_s + '_comments"' \
+      html += '</select></div><br><br><textarea' + ' id="responses_' + count.to_s + '_comments"' \
        ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
-      html += answer.comments unless answer.nil?
-      html += '</textarea></td>'
+      html += answer.comments unless answer.nil? + '</textarea></td>'
     elsif dropdown_or_scale == 'scale'
       html += '<input id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" type="hidden"'
-      html += 'value="' + answer.answer.to_s + '"' unless answer.nil?
-      html += '>'
+      html += 'value="' + answer.answer.to_s + '"' unless answer.nil? + '><table><tr><td width="10%"></td>'
 
-      html += '<table>'
-      html += '<tr><td width="10%"></td>'
       (questionnaire_min..questionnaire_max).each do |j|
         html += '<td width="10%"><label>' + j.to_s + '</label></td>'
       end
-      html += '<td width="10%"></td></tr><tr>'
+      html += '<td width="10%"></td></tr><tr><td width="10%">'
 
-      html += if !self.min_label.nil?
-                '<td width="10%">' + self.min_label + '</td>'
-              else
-                '<td width="10%"></td>'
-              end
+      #Sahil: Check this out
+
+      html += self.min_label if !self.min_label.nil? + '</td>'
+
       (questionnaire_min..questionnaire_max).each do |j|
         html += '<td width="10%"><input type="radio" id="' + j.to_s + '" value="' + j.to_s + '" name="Radio_' + self.id.to_s + '"'
-        html += 'checked="checked"' if (!answer.nil? and answer.answer == j) or (answer.nil? and questionnaire_min == j)
-        html += '></td>'
+        html += 'checked="checked"' if (!answer.nil? and answer.answer == j) or (answer.nil? and questionnaire_min == j) + '></td>'
       end
-      html += '<script>jQuery("input[name=Radio_' + self.id.to_s + ']:radio").change(function() {'
-      html += 'var response_score = jQuery("#responses_' + count.to_s + '_score");'
+      html += '<script>jQuery("input[name=Radio_' + self.id.to_s + ']:radio").change(function() {var response_score = jQuery("#responses_' + count.to_s + '_score");'
       html += 'var checked_value = jQuery("input[name=Radio_' + self.id.to_s + ']:checked").val();'
-      html += 'response_score.val(checked_value);});</script>'
+      html += 'response_score.val(checked_value);});</script><td width="10%">'
 
-      html += if !self.max_label.nil?
-                '<td width="10%">' + self.max_label + '</td>'
-              else
-                '<td width="10%"></td>'
-              end
+      #Sahil: Check this out
 
-      html += '<td width="10%"></td></tr></table>'
+      html += self.max_label if !self.max_label.nil? + '</td><td width="10%"></td></tr></table>'
+
       html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments"' \
         ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
-      html += answer.comments unless answer.nil?
-      html += '</textarea>'
+      html += answer.comments unless answer.nil? + '</textarea>'
 
     end
     safe_join(["".html_safe, "".html_safe], html.html_safe)

@@ -36,6 +36,7 @@ class Assignment < ActiveRecord::Base
   validate :valid_num_review
 
   REVIEW_QUESTIONNAIRES = {author_feedback: 0, metareview: 1, review: 2, teammate_review: 3}.freeze
+  EXPORT_FIELDS={'team_id'=>'Team ID / Author ID', 'team_name'=>'Reviewee (Team / Student Name)','reviewer'=>'Reviewer','question'=>'Question / Criterion','question_id'=>'Question ID','comment_id'=>'Answer / Comment ID','comments'=>'Answer / Comment','score'=>'Score' }.freeze
   #  Review Strategy information.
   RS_AUTO_SELECTED = 'Auto-Selected'.freeze
   RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'.freeze
@@ -448,14 +449,9 @@ class Assignment < ActiveRecord::Base
   # This method is used for export detailed contents. - Akshit, Kushagra, Vaibhav
   def self.export_details_fields(detail_options)
     fields = []
-    fields << 'Team ID / Author ID' if detail_options['team_id'] == 'true'
-    fields << 'Reviewee (Team / Student Name)' if detail_options['team_name'] == 'true'
-    fields << 'Reviewer' if detail_options['reviewer'] == 'true'
-    fields << 'Question / Criterion' if detail_options['question'] == 'true'
-    fields << 'Question ID' if detail_options['question_id'] == 'true'
-    fields << 'Answer / Comment ID' if detail_options['comment_id'] == 'true'
-    fields << 'Answer / Comment' if detail_options['comments'] == 'true'
-    fields << 'Score' if detail_options['score'] == 'true'
+    EXPORT_FIELDS.each do |key, value|
+      fields << value if detail_options[key]=='true'
+    end
     fields
   end
 

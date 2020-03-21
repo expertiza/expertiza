@@ -325,7 +325,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def link_for_current_stage(topic_id = nil)
-    return nil if (self.staggered_deadline? && topic_id.nil?)
+    return nil if staggered_and_no_topic?(topic_id)
 
     due_date = find_current_stage(topic_id)
     if due_date.nil? or due_date == 'Finished' or due_date.is_a?(TopicDueDate)
@@ -335,7 +335,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def stage_deadline(topic_id = nil)
-    return 'Unknown' if topic_id.nil? and self.staggered_deadline?
+    return 'Unknown' if staggered_and_no_topic?(topic_id)
     due_date = find_current_stage(topic_id)
     due_date.nil? || due_date == 'Finished' ? due_date : due_date.due_at.to_s
   end
@@ -357,7 +357,7 @@ class Assignment < ActiveRecord::Base
 
   # Zhewei: this method is almost the same as 'stage_deadline'
   def get_current_stage(topic_id = nil)
-    return 'Unknown' if topic_id.nil? and self.staggered_deadline?
+    return 'Unknown' if staggered_and_no_topic?(topic_id)
     due_date = find_current_stage(topic_id)
     due_date.nil? || due_date == 'Finished' ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
   end

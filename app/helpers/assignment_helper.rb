@@ -173,4 +173,8 @@ module AssignmentHelper
     end
     team_scores
   end
+
+  def staggered_and_no_topic?(topic_id)
+    self.staggered_deadline? and topic_id.nil?
+  end
 end

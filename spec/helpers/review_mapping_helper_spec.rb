@@ -705,44 +705,47 @@ describe ReviewMappingHelper, type: :helper do
 
       @response_1 = create(:response, response_map: @response_map_1, round: 1)
       @response_2 = create(:response, response_map: @response_map_2, round: 2)
-      @response_3 = create(:response, response_map: @response_map_3, round: 3)
 
       @response_list = []
       @response_list << @response_1
       @response_list << @response_2
-      @response_list << @response_3
 
       feedback_response_map1 = FeedbackResponseMap.create(reviewed_object_id: @response_1.id, reviewer_id: @reviewer.id)
       feedback_response_map2 = FeedbackResponseMap.create(reviewed_object_id: @response_2.id, reviewer_id: @reviewer.id)
-      feedback_response_map3 = FeedbackResponseMap.create(reviewed_object_id: @response_3.id, reviewer_id: @reviewer.id)
 
       @feedback_response_map_list = []
       @feedback_response_map_list << feedback_response_map1
       @feedback_response_map_list << feedback_response_map2
-      @feedback_response_map_list << feedback_response_map3
 
 
-      @all_review_response_ids = [@response_1.id, @response_2.id, @response_3.id]
+      @all_review_response_ids = [@response_1.id, @response_2.id]
+    end
+
+    it 'should return amount of responses given in round 1' do
       get_each_review_and_feedback_response_map(@reviewer)
-    end
 
-    it 'should return response corresponding to first response' do
-      expect(@response_1.length).to eq @rspan_round_one
+      expect(@rspan_round_one).to eq 1
     end
-    it 'should return response corresponding to second response' do
-      expect(@response_2.length).to eq @rspan_round_two
+    it 'should return amount of responses given in round 2' do
+      get_each_review_and_feedback_response_map(@reviewer)
+
+      expect(@rspan_round_two).to eq 1
     end
-    it 'should return response corresponding to third response' do
-      expect(@response_3.length).to eq @rspan_round_three
+    it 'should return amount of responses given in round 3' do
+      @response_3 = create(:response, response_map: @response_map_3, round: 3)
+      @response_list << @response_3
+      feedback_response_map3 = FeedbackResponseMap.create(reviewed_object_id: @response_3.id, reviewer_id: @reviewer.id)
+      @feedback_response_map_list << feedback_response_map3
+      @all_review_response_ids << @response_3.id
+      get_each_review_and_feedback_response_map(@reviewer)
+
+      expect(@rspan_round_three).to eq 1
     end
     it 'should return 0 for nil round 3 response' do
-      @response_3 = nil
-      expect(@response_3.length).to eq @rspan_round_three
+      get_each_review_and_feedback_response_map(@reviewer)
+
+      expect(@rspan_round_three).to eq 0
     end
-
-
-
-
 
   end
 

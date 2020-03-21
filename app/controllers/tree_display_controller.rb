@@ -113,6 +113,7 @@ class TreeDisplayController < ApplicationController
   end
 
   private
+
   # Add assignment attributes to json
   def serialize_assignment_to_json(node, json)
     json.merge!(

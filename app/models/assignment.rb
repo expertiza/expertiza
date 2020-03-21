@@ -16,8 +16,8 @@ class Assignment < ActiveRecord::Base
   # then Rails will "automatically' set the type field to the value that
   # designates an assignment of the appropriate type.
   belongs_to :course
-  belongs_to :instructor, class_name: 'User'
-  has_one :assignment_node, foreign_key: 'node_object_id', dependent: :destroy
+  belongs_to :instructor, class_name: 'User',inverse_of: :assignments
+  has_one :assignment_node, foreign_key: 'node_object_id', dependent: :destroy, inverse_of: :assignment
   has_many :participants, class_name: 'AssignmentParticipant', foreign_key: 'parent_id', dependent: :destroy
   has_many :users, through: :participants
   has_many :due_dates, class_name: 'AssignmentDueDate', foreign_key: 'parent_id', dependent: :destroy
@@ -333,13 +333,11 @@ class Assignment < ActiveRecord::Base
     end
     due_date = find_current_stage(topic_id)
 
-    unless self.staggered_deadline?
       if due_date != 'Finished' && !due_date.nil? && !due_date.deadline_name.nil?
-        return due_date.deadline_name
+        return due_date.deadline_name unless self.staggered_deadline?
       else
-        return get_current_stage(topic_id)
+        return get_current_stage(topic_id) unless self.staggered_deadline?
       end
-    end
   end
 
   # check if this assignment has multiple review phases with different review rubrics

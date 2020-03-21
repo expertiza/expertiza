@@ -145,9 +145,15 @@ describe LotteryController do
 
   describe "#remove_empty_teams" do
     it "should reduce the number of teams by the number of empty teams in the assignment" do
-      @assignment_number = 1
-      result = controller.send(:remove_empty_teams,@assignment_number)
+      @assignment_number = assignment
+      @assignment_number.teams[0].team_users = []
+      expect(controller.send(:remove_empty_teams,@assignment_number)).to change(@assignment_number.teams.count).by(1)
+    end
+  end
 
+  describe "#assign_available_slots" do
+    it "should" do
+      
     end
   end
 

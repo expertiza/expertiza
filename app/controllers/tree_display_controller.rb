@@ -11,9 +11,9 @@ class TreeDisplayController < ApplicationController
     @node_type = params[:nodeType]
   end
 
-  # The goto_ methods listed below are used to traverse the menu system. It is hard to tell exactly
-  # where they are called from, but at least some (if not all) are necessary.
-  # These functions feel like they have potential to be moved to another controller.
+  # The goto_ methods listed below are used to traverse the menu system. It is 
+  # hard to tell exactly where they are called from, but at least some (if not all) 
+  # are necessary. These functions may be better suited for another controller.
   def goto_controller(name_parameter)
     node_object = TreeFolder.find_by(name: name_parameter)
     session[:root] = FolderNode.find_by(node_object_id: node_object.id).id

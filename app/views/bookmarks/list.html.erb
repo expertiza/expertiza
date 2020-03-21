@@ -35,11 +35,13 @@
           <% sum += bookmark_rating.rating %>
         <% end %>
         <td>
-          <% if @bookmark_ratings.size > 0 %>
-            <%= (sum * 1.0 / @bookmark_ratings.size).round(1) %>
-          <% else %>
-            <%= '-' %>
-          <% end %>
+            <!-- total average rating -->
+            <% totalAvg = total_average_score(bookmark) %>
+            <% if totalAvg != 0 %>
+              <%= totalAvg %>
+            <% else %>
+              <%= '-' %>
+            <% end %>
         </td>
         <td>
           <% if session[:user].id != bookmark.user_id %>
@@ -52,15 +54,13 @@
             <% link_to 'Rate', :action => 'bookmark_rating', :id => bookmark.id %>
             <%= form_tag :action => "save_bookmark_rating_score", :id => bookmark.id do %>
               <% params[:rating] = rating %>
-              <select id=<%= bookmark.id %> name="rating" style="font-size:10px">
-                <% (0..5).each do |i| %>
-                  <option value=<%= i.to_s %>
-                            <% if params[:rating] == i.to_s -%>
-                              selected
-                    <% end -%>
-                  ><%= i.to_s %></option>
-                <% end %>
-              </select>
+              <!-- specific average score per user for a rubric -->
+              <% specAvg = specific_average_score(bookmark) %>
+              <% if specAvg != 0 %>
+                <%= specAvg %>
+              <% else %>
+                <%= '-' %>
+              <% end %>
               <% if BookmarkRating.where(bookmark_id: bookmark.id, user_id: session[:user].id).first.blank? %>
                 <%= button_tag "Rate", {:id=>'button'+bookmark.id.to_s,:style=>"font-size:10px; display:none;"} %>
               <% else %>

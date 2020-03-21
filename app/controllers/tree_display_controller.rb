@@ -124,19 +124,6 @@ class TreeDisplayController < ApplicationController
       "has_topic" => SignUpTopic.where(['assignment_id = ?', node.node_object_id]).first ? true : false
     )
   end
-  
-  # Separates out courses based on if he/she is the TA for the course passed by marking private
-  # to be true in that case
-  def update_in_ta_course_listing(instructor_id, node, tmp_object)
-    tmp_object["private"] = true if session[:user].role.ta? == 'Teaching Assistant' &&
-        Ta.get_my_instructors(session[:user].id).include?(instructor_id) &&
-        ta_for_current_course?(node)
-  end
-
-  def update_is_available(tmp_object, instructor_id, node)
-    tmp_object["is_available"] = is_available(session[:user], instructor_id) || (session[:user].role.ta? &&
-        Ta.get_my_instructors(session[:user].id).include?(instructor_id) && ta_for_current_course?(node))
-  end
 
   # Creates a json object that can be displayed by the UI
   def serialize_folder_to_json(folder_type, node)
@@ -188,39 +175,6 @@ class TreeDisplayController < ApplicationController
     end
     
     return json
-  end
-
-  # check if user is ta for current course
-  def ta_for_current_course?(node)
-    if node.is_a? AssignmentNode or node.is_a? CourseNode
-      ta_mappings = TaMapping.where(ta_id: session[:user].id)
-      course_id = node.is_a?(CourseNode) ? node.node_object_id : Assignment.find(node.node_object_id).course_id
-      ta_mappings.any? { |ta_mapping| ta_mapping.course_id == course_id }
-    else
-      false
-    end
-  end
-
-  # check if current user is ta for instructor
-  def is_user_ta?(instructor_id, child)
-    # instructor created the course, current user is the ta of this course.
-    session[:user].role_id == 6 and
-        Ta.get_my_instructors(session[:user].id).include?(instructor_id) and ta_for_current_course?(child)
-  end
-  
-  # check if current user is instructor
-  def is_user_instructor?(instructor_id)
-    # ta created the course, current user is the instructor of this ta.
-    instructor_ids = []
-    TaMapping.where(ta_id: instructor_id).each {|mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
-    session[:user].role_id == 2 and instructor_ids.include? session[:user].id
-  end
-
-  def update_is_available_2(res2, instructor_id, child)
-    # current user is the instructor (role can be admin/instructor/ta) of this course. is_available_condition1
-    res2["is_available"] = is_available(session[:user], instructor_id) ||
-        is_user_ta?(instructor_id, child) ||
-        is_user_instructor?(instructor_id)
   end
 
   # Checks if the user is the instructor for the course or assignment node provided.

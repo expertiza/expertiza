@@ -50,12 +50,12 @@ class LotteryController < ApplicationController
     # Exclude any teams already signed up
     teams_not_signed_up = teams.reject {|team| SignedUpTeam.where(team_id: team.id, is_waitlisted: 0).any? }
     teams_not_signed_up.each do |team|
-      bids = [0]
+      # Grab student id and list of bids
+      bids = []
       sign_up_topics.each do |topic|
         bid_record = Bid.find_by(team_id: team.id, topic_id: topic.id)
-        bids << bid_record.priority if bid_record.try(:priority)
+        bids << (bid_record.nil? ? 0 : bid_record.priority ||= 0)
       end
-      # Grab student id and list of bids
       team.users.each {|user| user_bidding_info << {pid: user.id, ranks: bids} } if bids.uniq != [0]
     end
     user_bidding_info
@@ -126,13 +126,14 @@ class LotteryController < ApplicationController
     #   3: [2, 3, 1],
     #   4: [2, 0, 1]
     # }
-    bidding_matrix = Hash.new([])
+    bidding_matrix = Hash.new { |hash, key| hash[key] = [] }
     current_team_members_info = user_bidding_info.select {|info| user_ids.include? info[:pid] }
     current_team_members_info.map {|info| info[:ranks] }.each do |bids|
       sign_up_topics.each_with_index do |topic, index|
         bidding_matrix[topic.id] << bids[index]
       end
     end
+
     # Below is the structure of matrix summary
     # The first value is the number of nonzero item, the second value is the sum of priorities, the third value of the topic_id.
     # [
@@ -197,7 +198,7 @@ class LotteryController < ApplicationController
     # maybe we can use timestamps in this case
     unassigned_teams.sort! do |t1, t2|
       [TeamsUser.where(team_id: t2.id).size, Bid.where(team_id: t1.id).size] <=>
-      [TeamsUser.where(team_id: t1.id).size, Bid.where(team_id: t2.id).size]
+          [TeamsUser.where(team_id: t1.id).size, Bid.where(team_id: t2.id).size]
     end
 
     team_bids = construct_team_bidding_info(unassigned_teams, sign_up_topics)

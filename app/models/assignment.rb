@@ -18,16 +18,16 @@ class Assignment < ActiveRecord::Base
   belongs_to :course
   belongs_to :instructor, class_name: 'User',inverse_of: :assignments
   has_one :assignment_node, foreign_key: 'node_object_id', dependent: :destroy, inverse_of: :assignment
-  has_many :participants, class_name: 'AssignmentParticipant', foreign_key: 'parent_id', dependent: :destroy
-  has_many :users, through: :participants
-  has_many :due_dates, class_name: 'AssignmentDueDate', foreign_key: 'parent_id', dependent: :destroy
-  has_many :teams, class_name: 'AssignmentTeam', foreign_key: 'parent_id', dependent: :destroy
-  has_many :invitations, class_name: 'Invitation', foreign_key: 'assignment_id', dependent: :destroy
+  has_many :participants, class_name: 'AssignmentParticipant', foreign_key: 'parent_id', dependent: :destroy, inverse_of: :assignment
+  has_many :users, through: :participants, inverse_of: :assignment
+  has_many :due_dates, class_name: 'AssignmentDueDate', foreign_key: 'parent_id', dependent: :destroy, inverse_of: :assignment
+  has_many :teams, class_name: 'AssignmentTeam', foreign_key: 'parent_id', dependent: :destroy, inverse_of: :assignment
+  has_many :invitations, class_name: 'Invitation', foreign_key: 'assignment_id', dependent: :destroy, inverse_of: :assignment
   has_many :assignment_questionnaires, dependent: :destroy
   has_many :questionnaires, through: :assignment_questionnaires
-  has_many :sign_up_topics, foreign_key: 'assignment_id', dependent: :destroy
-  has_many :response_maps, foreign_key: 'reviewed_object_id', dependent: :destroy
-  has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy
+  has_many :sign_up_topics, foreign_key: 'assignment_id', dependent: :destroy, inverse_of: :assignment
+  has_many :response_maps, foreign_key: 'reviewed_object_id', dependent: :destroy, inverse_of: :assignment
+  has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy, inverse_of: :assignment
   has_many :plagiarism_checker_assignment_submissions, dependent: :destroy
   has_many :assignment_badges, dependent: :destroy
   has_many :badges, through: :assignment_badges

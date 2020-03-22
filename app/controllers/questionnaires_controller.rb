@@ -227,9 +227,7 @@ class QuestionnairesController < ApplicationController
         q.questionnaire_id = questionnaire_id
         q.type = params[:question_type][question_key][:type]
         q.seq = question_key.to_i
-        if @questionnaire.type == "QuizQuestionnaire"
-          q.weight = 1 # setting the weight to 1 for quiz questionnaire since the model validates this field
-        end
+        q.weight = 1 # setting the weight to 1 for quiz questionnaire since the model validates this field
         q.save unless q.txt.strip.empty?
       end
     end

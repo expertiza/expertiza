@@ -54,9 +54,9 @@ class LotteryController < ApplicationController
       bids = []
       sign_up_topics.each do |topic|
         bid_record = Bid.find_by(team_id: team.id, topic_id: topic.id)
-        bids << bid_record.try(:priority) ? 0 : bid_record.priority
+        bids << bid_record.try(:priority) |= 0
       end
-      team.users.each {|user| user_bidding_info << {pid: user.id, ranks: bids} } if bids.uniq != [0]
+      team.users.each {|user| user_bidding_info << {pid: user.id, ranks: bids} } unless bids.uniq == [0]
     end
     user_bidding_info
   end

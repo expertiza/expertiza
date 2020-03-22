@@ -102,7 +102,7 @@ class LotteryController < ApplicationController
 
   # Destroy current team_user and team_user node if exists
   def remove_user_from_previous_team(assignment_id, user_id)
-    team_user = TeamsUser.all.select{|team_user| team_user.user_id == user_id and team_user.team.parent_id == assignment_id}[0]
+    team_user = TeamsUser.all.select {|team_user| team_user.user_id == user_id and team_user.team.parent_id == assignment_id }[0]
     team_user.team_user_node.destroy rescue nil
     team_user.destroy rescue nil
   end

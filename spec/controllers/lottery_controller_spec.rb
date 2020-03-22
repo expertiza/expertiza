@@ -4,7 +4,7 @@ require 'pp'
 describe LotteryController do
   let(:assignment) do
     build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true,
-          participants: [ build(:participant)], directory_path: 'same path', teams: [], course_id: 1)
+    participants: [build(:participant)], directory_path: 'same path', teams: [], course_id: 1)
   end
   let(:student) { build(:student) }
   let(:ta) { build(:teaching_assistant) }
@@ -126,7 +126,7 @@ describe LotteryController do
       allow(controller).to receive(:params).and_return(params)
       allow(controller).to receive(:log)
       allow(controller).to receive(:flash).and_return({})
-      expect(controller).to receive(:redirect_to).with(:controller => 'tree_display', :action => "list")
+      expect(controller).to receive(:redirect_to).with(controller: 'tree_display', action: "list")
 
       controller.run_intelligent_assignment
     end

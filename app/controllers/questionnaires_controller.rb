@@ -6,6 +6,16 @@ class QuestionnairesController < ApplicationController
 
   before_action :authorize
 
+  ## Constants
+  # add_new_questions
+  LABEL_AGREE = 'Strongly agree' # label for scored question if agree
+  LABEL_DISAGREE = 'Strongly disagree' # label for scored question if disagree
+  WEIGHT = 1  # question weight
+  SIZE_CRITERION = '50, 3' # size of the question box if it's a criterion
+  SIZE_ALT_DROPDOWN = '0|1|2|3|4|5' # alternative to size if question is a dropdown
+  SIZE_TXT_AREA = '60, 5' # size of question box if text area
+  SIZE_TXT_FIELD = '30' # size of question box if text field
+
   # Check role access for edit questionnaire
   def action_allowed?
     if params[:action] == "edit"
@@ -159,17 +169,18 @@ class QuestionnairesController < ApplicationController
     questionnaire_id = params[:id] unless params[:id].nil?
     num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
-      question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id,
-                                                                   seq: i, type: params[:question][:type], break_before: true)
+      question_type = params[:question][:type] unless params[:question][:type].nil?
+      question = Object.const_get(question_type).create(txt: '', questionnaire_id: questionnaire_id,
+                                                        seq: i, type: question_type, break_before: true)
       if question.is_a? ScoredQuestion
-        question.weight = 1
-        question.max_label = 'Strongly agree'
-        question.min_label = 'Strongly disagree'
+        question.weight = WEIGHT
+        question.max_label = LABEL_AGREE
+        question.min_label = LABEL_DISAGREE
       end
-      question.size = '50, 3' if question.is_a? Criterion
-      question.alternatives = '0|1|2|3|4|5' if question.is_a? Dropdown
-      question.size = '60, 5' if question.is_a? TextArea
-      question.size = '30' if question.is_a? TextField
+      question.size = SIZE_CRITERION if question.is_a? Criterion
+      question.alternatives = SIZE_ALT_DROPDOWN if question.is_a? Dropdown
+      question.size = SIZE_TXT_AREA if question.is_a? TextArea
+      question.size = SIZE_TXT_FIELD if question.is_a? TextField
       begin
         question.save
       rescue StandardError
@@ -227,7 +238,7 @@ class QuestionnairesController < ApplicationController
         q.questionnaire_id = questionnaire_id
         q.type = params[:question_type][question_key][:type]
         q.seq = question_key.to_i
-        q.weight = 1 # setting the weight to 1 for quiz questionnaire since the model validates this field
+        q.weight = WEIGHT # setting the weight to 1 for quiz questionnaire since the model validates this field
         q.save unless q.txt.strip.empty?
       end
     end

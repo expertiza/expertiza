@@ -81,9 +81,9 @@ class Assignment < ActiveRecord::Base
 
   def valid_num_review
     self.num_reviews = self.num_reviews_allowed
-    if self.num_reviews_allowed && self.num_reviews_allowed != -1 && self.num_reviews_allowed < self.num_reviews_required
+    if num_reviews_greater?(self.num_reviews_required, self.num_reviews_allowed)
       self.errors.add(:message, "Num of reviews required cannot be greater than number of reviews allowed")
-    elsif self.num_metareviews_allowed && self.num_metareviews_allowed != -1 && self.num_metareviews_allowed < self.num_metareviews_required
+    elsif num_reviews_greater?(self.num_metareviews_required, self.num_metareviews_allowed)
       self.errors.add(:message, "Number of Meta-Reviews required cannot be greater than number of meta-reviews allowed")
     end
   end
@@ -329,7 +329,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def link_for_current_stage(topic_id = nil)
-    return nil if (self.staggered_deadline? && topic_id.nil?)
+    return nil if staggered_and_no_topic?(topic_id)
 
     due_date = find_current_stage(topic_id)
     if due_date.nil? or due_date == 'Finished' or due_date.is_a?(TopicDueDate)
@@ -339,7 +339,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def stage_deadline(topic_id = nil)
-    return 'Unknown' if topic_id.nil? and self.staggered_deadline?
+    return 'Unknown' if staggered_and_no_topic?(topic_id)
     due_date = find_current_stage(topic_id)
     due_date.nil? || due_date == 'Finished' ? due_date : due_date.due_at.to_s
   end
@@ -361,7 +361,7 @@ class Assignment < ActiveRecord::Base
 
   # Zhewei: this method is almost the same as 'stage_deadline'
   def get_current_stage(topic_id = nil)
-    return 'Unknown' if topic_id.nil? and self.staggered_deadline?
+    return 'Unknown' if staggered_and_no_topic?(topic_id)
     due_date = find_current_stage(topic_id)
     due_date.nil? || due_date == 'Finished' ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
   end

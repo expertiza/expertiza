@@ -57,14 +57,14 @@ class Assessment360Controller < ApplicationController
                                                    @meta_review_info_per_stu)
       end
       # calculate average grade for each student on all assignments in this course
-      review_info_per_student(cp,@teammate_review_info_per_stu, @teammate_review)
-      review_info_per_student(cp,@meta_review_info_per_stu, @meta_review)
+      review_info_per_student(cp, @teammate_review_info_per_stu, @teammate_review)
+      review_info_per_student(cp, @meta_review_info_per_stu, @meta_review)
     end
     # avoid divide by zero error
-    avoid_divide_by_zero_error(@assignments,@overall_teammate_review_count,@overall_meta_review_count)
+    avoid_divide_by_zero_error(@assignments, @overall_teammate_review_count, @overall_meta_review_count)
   end
 
-  def avoid_divide_by_zero_error (assignments,overall_teammate_review_count,overall_meta_review_count)  
+  def avoid_divide_by_zero_error (assignments, overall_teammate_review_count, overall_meta_review_count)  
     assignments.each do |assignment|
       temp_count = overall_teammate_review_count[assignment.id]
       overall_review_count_hash = 1 if temp_count.nil? or temp_count.zero?
@@ -73,8 +73,7 @@ class Assessment360Controller < ApplicationController
     end
   end
 
-
-  def review_info_per_student(cp,review_info_per_stu,review)
+  def review_info_per_student(cp, review_info_per_stu, review)
     if review_info_per_stu[1] > 0
       temp_avg_grade = review_info_per_stu[0] * 1.0 / review_info_per_stu[1]
       review[cp.id][:avg_grade_for_assgt] = temp_avg_grade.round.to_s + '%'
@@ -117,11 +116,11 @@ class Assessment360Controller < ApplicationController
     end
   end
 
-  def assignment_grade_summary(cp,assignment_id, user_id)
+  def assignment_grade_summary(cp, assignment_id, user_id)
     # A topic exists if a team signed up for a topic, which can be found via the user and the assignment
     topic_id = SignedUpTeam.topic_id(assignment_id, user_id)
     @topics[cp.id][assignment_id] = SignUpTopic.find_by(id: topic_id)
-        # Instructor grade is stored in the team model, which is found by finding the user's team for the assignment
+    # Instructor grade is stored in the team model, which is found by finding the user's team for the assignment
     team_id = TeamsUser.team_id(assignment_id, user_id)
     team = Team.find(team_id)
     @assignment_grades[cp.id][assignment_id] = team[:grade_for_submission]

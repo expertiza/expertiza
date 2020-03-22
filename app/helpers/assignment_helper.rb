@@ -174,11 +174,31 @@ module AssignmentHelper
     team_scores
   end
 
+  #returns true if assignment has staggered deadline and topic_id is nil
   def staggered_and_no_topic?(topic_id)
     self.staggered_deadline? and topic_id.nil?
   end
 
+  #returns true if reviews required is greater than reviews allowed
   def num_reviews_greater?(reviews_required, reviews_allowed)
     reviews_allowed && reviews_allowed != -1 && reviews_required > reviews_allowed
+  end
+
+  # for program 1 like assignment, if same rubric is used in both rounds,
+  # the 'used_in_round' field in 'assignment_questionnaires' will be null,
+  # since one field can only store one integer
+  # if rev_q_ids is empty, Expertiza will try to find questionnaire whose type is 'ReviewQuestionnaire'.
+  def get_questionnaire_ids(round)
+    rev_q_ids = if round.nil?
+                  AssignmentQuestionnaire.where(assignment_id: self.id)
+                else
+                  AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
+                end
+    if rev_q_ids.empty?
+      AssignmentQuestionnaire.where(assignment_id: self.id).find_each do |aq|
+        rev_q_ids << aq if aq.questionnaire.type == "ReviewQuestionnaire"
+      end
+    end
+    rev_q_ids
   end
 end

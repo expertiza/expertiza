@@ -105,8 +105,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(colour).to eq('purple')
     end
   end
-
-
+  
   describe 'check_submission_state' do
     before(:each) do
       @assignment = create(:assignment, name: 'get_team_colour_test', created_at: DateTime.now.in_time_zone - 13.day)

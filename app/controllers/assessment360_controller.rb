@@ -23,7 +23,7 @@ class Assessment360Controller < ApplicationController
     # for course
     # eg. @overall_teammate_review_grades = {assgt_id1: 100, assgt_id2: 178, ...}
     # @overall_teammate_review_count = {assgt_id1: 1, assgt_id2: 2, ...}
-    %w[teammate meta].each do |type| 
+    %w[teammate meta].each do |type|
       instance_variable_set("@overall_#{type}_review_grades", {})
       instance_variable_set("@overall_#{type}_review_count", {})
     end
@@ -64,7 +64,7 @@ class Assessment360Controller < ApplicationController
     avoid_divide_by_zero_error(@assignments, @overall_teammate_review_count, @overall_meta_review_count)
   end
 
-  def avoid_divide_by_zero_error (assignments, overall_teammate_review_count, overall_meta_review_count)  
+  def avoid_divide_by_zero_error(assignments, overall_teammate_review_count, overall_meta_review_count)
     assignments.each do |assignment|
       temp_count = overall_teammate_review_count[assignment.id]
       overall_review_count_hash = 1 if temp_count.nil? or temp_count.zero?
@@ -89,12 +89,10 @@ class Assessment360Controller < ApplicationController
     @assignment_grades = {}
     @peer_review_scores = {}
     @final_grades = {}
-    
     course = Course.find(params[:course_id])
     @assignments = course.assignments.reject(&:is_calibrated).reject {|a| a.participants.empty? }
     @course_participants = course.get_participants
     inspect_course_participants(@course_participants)
-    
     @course_participants.each do |cp|
       @topics[cp.id] = {}
       @assignment_grades[cp.id] = {}
@@ -106,10 +104,10 @@ class Assessment360Controller < ApplicationController
         assignment_participant = assignment.participants.find_by(user_id: user_id)
         next if assignment.participants.find_by(user_id: user_id).nil?
         next if TeamsUser.team_id(assignment_id, user_id).nil?
-        assignment_grade_summary(cp,assignment_id, user_id)
+        assignment_grade_summary(cp, assignment_id, user_id)
 
         peer_review_score = find_peer_review_score(user_id, assignment_id)
-        unless peer_review_score.dig(:review,:scores,:avg).nil?
+        unless peer_review_score.dig(:review, :scores, :avg).nil?
           @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
         end
       end

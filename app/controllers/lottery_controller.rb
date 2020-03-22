@@ -54,7 +54,7 @@ class LotteryController < ApplicationController
       bids = []
       sign_up_topics.each do |topic|
         bid_record = Bid.find_by(team_id: team.id, topic_id: topic.id)
-        bids << (bid_record.nil? ? 0 : bid_record.priority ||= 0)
+        bids << bid_record.try(:priority) ? 0 : bid_record.priority
       end
       team.users.each {|user| user_bidding_info << {pid: user.id, ranks: bids} } if bids.uniq != [0]
     end
@@ -102,12 +102,9 @@ class LotteryController < ApplicationController
 
   # Destroy current team_user and team_user node if exists
   def remove_user_from_previous_team(assignment_id, user_id)
-    TeamsUser.where(user_id: user_id).each do |team_user|
-      next unless team_user.team.parent_id == assignment_id
-      team_user.team_user_node.destroy rescue nil
-      team_user.destroy rescue nil
-      break
-    end
+    team_user = TeamsUser.all.select {|team_user| team_user.user_id == user_id and team_user.team.parent_id == assignment_id }[0]
+    team_user.team_user_node.destroy rescue nil
+    team_user.destroy rescue nil
   end
 
   # Destroy teams which team members have been destroyed in create_new_teams_for_bidding_response
@@ -129,7 +126,7 @@ class LotteryController < ApplicationController
     #   3: [2, 3, 1],
     #   4: [2, 0, 1]
     # }
-    bidding_matrix = Hash.new { |hash, key| hash[key] = [] }
+    bidding_matrix = Hash.new {|hash, key| hash[key] = [] }
     current_team_members_info = user_bidding_info.select {|info| user_ids.include? info[:pid] }
     current_team_members_info.map {|info| info[:ranks] }.each do |bids|
       sign_up_topics.each_with_index do |topic, index|

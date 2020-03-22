@@ -2,30 +2,33 @@ include AssignmentHelper
 require 'pp'
 
 describe LotteryController do
-  #let(:assignment) {build(:assignment, id: 3, name: 'test assignment', instructor_id: 6, staggered_deadline: true, participants: [build(:participant)], directory_path: 'same path', teams: [], course_id: 1, is_intelligent: true)}
+  #let(:assignment) do
+  #  build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true,
+  #  participants: [build(:participant)], directory_path: 'same path', teams: [], course_id: 1)
+  #end
   let(:assignment) {build(:assignment, id: 3, is_intelligent: true)}
-  let(:assignment2) {build(:assignment, id:4)}
-  let(:ta) {build(:teaching_assistant)}
-  let(:instructor) {build(:instructor)}
-  let(:admin) {build(:admin)}
+  let(:student) { build(:student) }
+  let(:ta) { build(:teaching_assistant) }
+  let(:instructor) { build(:instructor) }
+  let(:admin) { build(:admin) }
 
-  let(:student1) {create(:student)}
-  let(:student2) {create(:student)}
-  let(:student3) {create(:student)}
+  let(:student1) { create(:student) }
+  let(:student2) { create(:student) }
+  let(:student3) { create(:student) }
 
-  let(:topic1) {build(:topic, assignment: assignment, id: 1)}
-  let(:topic2) {build(:topic, assignment: assignment, id: 2)}
-  let(:topic3) {build(:topic, assignment: assignment, id: 3)}
-  let(:topic4) {build(:topic, assignment: assignment, id: 4)}
+  let(:topic1) { build(:topic, assignment: assignment, id: 1) }
+  let(:topic2) { build(:topic, assignment: assignment, id: 2) }
+  let(:topic3) { build(:topic, assignment: assignment, id: 3) }
+  let(:topic4) { build(:topic, assignment: assignment, id: 4) }
 
-  let(:assignment_team1) {build(:assignment_team, assignment: assignment, id: 1, parent_id: assignment.id)}
-  let(:assignment_team2) {build(:assignment_team, assignment: assignment, id: 2, parent_id: assignment.id)}
-  let(:assignment_team3) {build(:assignment_team, assignment: assignment, id: 3)}
-  let(:assignment_team4) {build(:assignment_team, assignment: assignment, id: 4)}
+  let(:assignment_team1) { build(:assignment_team, assignment: assignment, id: 1, parent_id: assignment.id) }
+  let(:assignment_team2) { build(:assignment_team, assignment: assignment, id: 2, parent_id: assignment.id) }
+  let(:assignment_team3) { build(:assignment_team, assignment: assignment, id: 3) }
+  let(:assignment_team4) { build(:assignment_team, assignment: assignment, id: 4) }
 
-  let(:team_user1) {build(:team_user, team: assignment_team1, user: build(:student, id: 1), id: 1)}
-  let(:team_user2) {build(:team_user, team: assignment_team1, user: build(:student, id: 2), id: 2)}
-  let(:team_user3) {build(:team_user, team: assignment_team1, user: build(:student, id: 3), id: 3)}
+  let(:team_user1) { build(:team_user, team: assignment_team1, user: build(:student, id: 1), id: 1) }
+  let(:team_user2) { build(:team_user, team: assignment_team1, user: build(:student, id: 2), id: 2) }
+  let(:team_user3) { build(:team_user, team: assignment_team1, user: build(:student, id: 3), id: 3) }
 
   before :each do
     assignment.teams << assignment_team1
@@ -115,8 +118,8 @@ describe LotteryController do
   end
 
   describe "#construct_user_bidding_info" do
-    it "generate user bidding infomation hash" do
-      test = SignedUpTeam.where(team_id: @teams[0].id, is_waitlisted: 0).any?
+    it "generate user bidding information hash" do
+      SignedUpTeam.where(team_id: @teams[0].id, is_waitlisted: 0).any?
       user_bidding_info = controller.send(:construct_user_bidding_info, @sign_up_topics, @teams)
       expect(user_bidding_info).to eq([])
     end
@@ -213,7 +216,6 @@ describe LotteryController do
 
   describe "#assign_available_slots" do
     it "should" do
-      
     end
   end
 
@@ -221,20 +223,19 @@ describe LotteryController do
     before :each do
       @sign_up_topics = @sign_up_topics
       @team_id = assignment_team1.id
-      @user_ids = @team_users.map{|user| user.id}
+      @user_ids = @team_users.map(&:id)
       @user_bidding_info = [{pid: team_user1.id, ranks: [1, 0, 2, 2]},
-                           {pid: team_user2.id, ranks: [2, 1, 3, 0]},
-                           {pid: team_user3.id, ranks: [3, 2, 1, 1]}]
+                            {pid: team_user2.id, ranks: [2, 1, 3, 0]},
+                            {pid: team_user3.id, ranks: [3, 2, 1, 1]}]
     end
     it "should create bids objects of the newly-merged team on each sign-up topics" do
       expect(Bid.count).to eq(0)
-      result = controller.send(:merge_bids_from_different_previous_teams, @sign_up_topics, @team_id, @user_ids, @user_bidding_info)
+      controller.send(:merge_bids_from_different_previous_teams, @sign_up_topics, @team_id, @user_ids, @user_bidding_info)
       expect(Bid.count).to eq(4)
       expect(Bid.find_by(topic_id: 1, team_id: 1).priority).to eq(1)
       expect(Bid.find_by(topic_id: 2, team_id: 1).priority).to eq(3)
       expect(Bid.find_by(topic_id: 3, team_id: 1).priority).to eq(2)
       expect(Bid.find_by(topic_id: 4, team_id: 1).priority).to eq(4)
     end
-
   end
 end

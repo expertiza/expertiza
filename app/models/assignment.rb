@@ -528,9 +528,11 @@ class Assignment < ActiveRecord::Base
 
   def self.export_data_fields(options)
     if options['team_score'] == 'true'
-      team[:scores] ?
-        tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg]) :
+      if team[:scores]
+        tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg])
+      else
         tcsv.push('---', '---', '---')
+      end 
     end
     review_hype_mapping_hash = {review: 'submitted_score',
                                 metareview: 'metareview_score',

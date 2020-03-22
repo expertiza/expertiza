@@ -13,7 +13,7 @@ class Assessment360Controller < ApplicationController
   # This data is used to compute the metareview and teammate review scores.
   def all_students_all_reviews
     course = Course.find(params[:course_id])
-    @assignments = course.assignments.reject(&:is_calibrated).reject {|a| a.participants.empty? }
+    @assignments = course.assignments.reject(&:is_calibrated).reject { |a| a.participants.empty? }
     @course_participants = course.get_participants
     inspect_course_participants(@course_participants)
     # hashes for view
@@ -27,11 +27,10 @@ class Assessment360Controller < ApplicationController
       instance_variable_set("@overall_#{type}_review_grades", {})
       instance_variable_set("@overall_#{type}_review_count", {})
     end
-    
     @course_participants.each do |cp|
       # for each assignment
       # [aggregrate_review_grades_per_stu, review_count_per_stu] --> [0, 0]
-      %w[teammate meta].each {|type| instance_variable_set("@#{type}_review_info_per_stu", [0, 0]) }
+      %w[teammate meta].each { |type| instance_variable_set("@#{type}_review_info_per_stu", [0, 0]) }
       students_teamed = StudentTask.teamed_students(cp.user)
       @teamed_count[cp.id] = students_teamed[course.id].try(:size).to_i
       @assignments.each do |assignment|
@@ -57,14 +56,14 @@ class Assessment360Controller < ApplicationController
                                                    @meta_review_info_per_stu)
       end
       # calculate average grade for each student on all assignments in this course
-      review_info_per_student(cp,@teammate_review_info_per_stu, @teammate_review)
-      review_info_per_student(cp,@meta_review_info_per_stu, @meta_review)
+      review_info_per_student(cp, @teammate_review_info_per_stu, @teammate_review)
+      review_info_per_student(cp, @meta_review_info_per_stu, @meta_review)
     end
     # avoid divide by zero error
     avoid_divide_by_zero_error(@assignments,@overall_teammate_review_count,@overall_meta_review_count)
   end
 
-  def avoid_divide_by_zero_error (assignments,overall_teammate_review_count,overall_meta_review_count)  
+  def avoid_divide_by_zero_error(assignments, overall_teammate_review_count, overall_meta_review_count)  
     assignments.each do |assignment|
       temp_count = overall_teammate_review_count[assignment.id]
       overall_review_count_hash = 1 if temp_count.nil? or temp_count.zero?
@@ -73,8 +72,7 @@ class Assessment360Controller < ApplicationController
     end
   end
 
-
-  def review_info_per_student(cp,review_info_per_stu,review)
+  def review_info_per_student(cp, review_info_per_stu, review)
     if review_info_per_stu[1] > 0
       temp_avg_grade = review_info_per_stu[0] * 1.0 / review_info_per_stu[1]
       review[cp.id][:avg_grade_for_assgt] = temp_avg_grade.round.to_s + '%'
@@ -90,12 +88,10 @@ class Assessment360Controller < ApplicationController
     @assignment_grades = {}
     @peer_review_scores = {}
     @final_grades = {}
-
     course = Course.find(params[:course_id])
-    @assignments = course.assignments.reject(&:is_calibrated).reject {|a| a.participants.empty? }
+    @assignments = course.assignments.reject(&:is_calibrated).reject { |a| a.participants.empty? }
     @course_participants = course.get_participants
     inspect_course_participants(@course_participants)
-    
     @course_participants.each do |cp|
       @topics[cp.id] = {}
       @assignment_grades[cp.id] = {}
@@ -110,26 +106,23 @@ class Assessment360Controller < ApplicationController
         assignment_grade_summary(cp,assignment_id, user_id)
 
         peer_review_score = find_peer_review_score(user_id, assignment_id)
-        unless peer_review_score.dig(:review,:scores,:avg).nil?
+        unless peer_review_score.dig(:review, :scores, :avg).nil?
           @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
         end
       end
     end
   end
 
-
-
-  def assignment_grade_summary(cp,assignment_id, user_id)
+  def assignment_grade_summary(cp, assignment_id, user_id)
     # A topic exists if a team signed up for a topic, which can be found via the user and the assignment
     topic_id = SignedUpTeam.topic_id(assignment_id, user_id)
     @topics[cp.id][assignment_id] = SignUpTopic.find_by(id: topic_id)
-        # Instructor grade is stored in the team model, which is found by finding the user's team for the assignment
+    # Instructor grade is stored in the team model, which is found by finding the user's team for the assignment
     team_id = TeamsUser.team_id(assignment_id, user_id)
     team = Team.find(team_id)
     @assignment_grades[cp.id][assignment_id] = team[:grade_for_submission]
-    unless @assignment_grades[cp.id][assignment_id].nil?
-      @final_grades[cp.id] += @assignment_grades[cp.id][assignment_id]
-    end
+    return if @assignment_grades[cp.id][assignment_id].nil?
+    @final_grades[cp.id] += @assignment_grades[cp.id][assignment_id]
   end
 
   def inspect_course_participants(course_participants)
@@ -150,7 +143,7 @@ class Assessment360Controller < ApplicationController
     overall_review_count_hash[assignment.id] = 0 unless overall_review_count_hash.key?(assignment.id)
     grades = 0
     if reviews.count > 0
-      reviews.each {|review| grades += review.average_score.to_i }
+      reviews.each { |review| grades += review.average_score.to_i }
       avg_grades = (grades * 1.0 / reviews.count).round
       hash_per_stu[course_participant.id][assignment.id] = avg_grades.to_s + '%'
     end

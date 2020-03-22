@@ -126,30 +126,29 @@ class QuestionnairesController < ApplicationController
   # Remove a given questionnaire
   def delete
     @questionnaire = Questionnaire.find(params[:id])
-    if @questionnaire
-      begin
-        name = @questionnaire.name
-        # if this rubric is used by some assignment, flash error
-        unless @questionnaire.assignments.empty?
-          raise "The assignment <b>#{@questionnaire.assignments.first.try(:name)}</b> uses this questionnaire. Are sure you want to delete the assignment?"
-        end
-        questions = @questionnaire.questions
-        # if this rubric had some answers, flash error
-        questions.each do |question|
-          raise "There are responses based on this rubric, we suggest you do not delete it." unless question.answers.empty?
-        end
-        questions.each do |question|
-          advices = question.question_advices
-          advices.each(&:delete)
-          question.delete
-        end
-        questionnaire_node = @questionnaire.questionnaire_node
-        questionnaire_node.delete
-        @questionnaire.delete
-        undo_link("The questionnaire \"#{name}\" has been successfully deleted.")
-      rescue StandardError => e
-        flash[:error] = e.message
+    return unless @questionnaire
+    begin
+      name = @questionnaire.name
+      # if this rubric is used by some assignment, flash error
+      unless @questionnaire.assignments.empty?
+        raise "The assignment <b>#{@questionnaire.assignments.first.try(:name)}</b> uses this questionnaire. Are sure you want to delete the assignment?"
       end
+      questions = @questionnaire.questions
+      # if this rubric had some answers, flash error
+      questions.each do |question|
+        raise "There are responses based on this rubric, we suggest you do not delete it." unless question.answers.empty?
+      end
+      questions.each do |question|
+        advices = question.question_advices
+        advices.each(&:delete)
+        question.delete
+      end
+      questionnaire_node = @questionnaire.questionnaire_node
+      questionnaire_node.delete
+      @questionnaire.delete
+      undo_link("The questionnaire \"#{name}\" has been successfully deleted.")
+    rescue StandardError => e
+      flash[:error] = e.message
     end
     redirect_to action: 'list', controller: 'tree_display'
   end
@@ -229,18 +228,17 @@ class QuestionnairesController < ApplicationController
 
   # save questions that have been added to a questionnaire
   def save_new_questions(questionnaire_id)
-    if params[:new_question]
-      # The new_question array contains all the new questions
-      # that should be saved to the database
-      params[:new_question].each_key do |question_key|
-        q = Question.new
-        q.txt = params[:new_question][question_key]
-        q.questionnaire_id = questionnaire_id
-        q.type = params[:question_type][question_key][:type]
-        q.seq = question_key.to_i
-        q.weight = WEIGHT # setting the weight to 1 for quiz questionnaire since the model validates this field
-        q.save unless q.txt.strip.empty?
-      end
+    return unless params[:new_question]
+    # The new_question array contains all the new questions
+    # that should be saved to the database
+    params[:new_question].each_key do |question_key|
+      q = Question.new
+      q.txt = params[:new_question][question_key]
+      q.questionnaire_id = questionnaire_id
+      q.type = params[:question_type][question_key][:type]
+      q.seq = question_key.to_i
+      q.weight = WEIGHT # setting the weight to 1 for quiz questionnaire since the model validates this field
+      q.save unless q.txt.strip.empty?
     end
   end
 
@@ -271,17 +269,15 @@ class QuestionnairesController < ApplicationController
   def save_questions(questionnaire_id)
     delete_questions questionnaire_id
     save_new_questions questionnaire_id
-
-    if params[:question]
-      params[:question].each_key do |question_key|
-        if params[:question][question_key][:txt].strip.empty?
-          # question text is empty, delete the question
-          Question.delete(question_key)
-        else
-          # Update existing question.
-          question = Question.find(question_key)
-          Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
-        end
+    return unless params[:question]
+    params[:question].each_key do |question_key|
+      if params[:question][question_key][:txt].strip.empty?
+        # question text is empty, delete the question
+        Question.delete(question_key)
+      else
+        # Update existing question.
+        question = Question.find(question_key)
+        Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
       end
     end
   end

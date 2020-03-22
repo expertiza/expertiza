@@ -19,11 +19,11 @@ class Assignment < ActiveRecord::Base
   belongs_to :course
   belongs_to :instructor, class_name: 'User',inverse_of: :assignments
   has_one :assignment_node, foreign_key: 'node_object_id', dependent: :destroy, inverse_of: :assignment
-  has_many :participants, class_name: 'AssignmentParticipant', foreign_key: 'parent_id', dependent: :destroy, inverse_of: :assignment
+  has_many :participants, class_name: 'AssignmentParticipant', foreign_key: 'parent_id', dependent: :destroy
   has_many :users, through: :participants, inverse_of: :assignment
   has_many :due_dates, class_name: 'AssignmentDueDate', foreign_key: 'parent_id', dependent: :destroy, inverse_of: :assignment
   has_many :teams, class_name: 'AssignmentTeam', foreign_key: 'parent_id', dependent: :destroy, inverse_of: :assignment
-  has_many :invitations, class_name: 'Invitation', foreign_key: 'assignment_id', dependent: :destroy, inverse_of: :assignment
+  has_many :invitations, class_name: 'Invitation', foreign_key: 'assignment_id', dependent: :destroy#, inverse_of: :assignment
   has_many :assignment_questionnaires, dependent: :destroy
   has_many :questionnaires, through: :assignment_questionnaires
   has_many :sign_up_topics, foreign_key: 'assignment_id', dependent: :destroy, inverse_of: :assignment
@@ -37,7 +37,8 @@ class Assignment < ActiveRecord::Base
   validate :valid_num_review
 
   REVIEW_QUESTIONNAIRES = {author_feedback: 0, metareview: 1, review: 2, teammate_review: 3}.freeze
-  EXPORT_FIELDS={'team_id'=>'Team ID / Author ID', 'team_name'=>'Reviewee (Team / Student Name)','reviewer'=>'Reviewer','question'=>'Question / Criterion','question_id'=>'Question ID','comment_id'=>'Answer / Comment ID','comments'=>'Answer / Comment','score'=>'Score' }.freeze
+  EXPORT_FIELDS={team_id:'Team ID / Author ID', team_name:'Reviewee (Team / Student Name)',reviewer:'Reviewer',question:'Question / Criterion',question_id:'Question ID',comment_id:'Answer / Comment ID',comments:'Answer / Comment',score:'Score' }.freeze
+  DELETE_INSTANCES=['invitations','teams','participants','due_dates','assignment_questionnaires']
   #  Review Strategy information.
   RS_AUTO_SELECTED = 'Auto-Selected'.freeze
   RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'.freeze
@@ -242,11 +243,14 @@ class Assignment < ActiveRecord::Base
       raise "There is at least one teammate review response that exists for #{self.name}."
     end
 
-    self.invitations.each(&:destroy)
-    self.teams.each(&:delete)
-    self.participants.each(&:delete)
-    self.due_dates.each(&:destroy)
-    self.assignment_questionnaires.each(&:destroy)
+    DELETE_INSTANCES.each do |instance|
+      self.instance_eval(instance).each(&:destroy)
+    end
+    #self.invitations.each(&:destroy)
+    #self.teams.each(&:delete)
+    #self.participants.each(&:delete)
+    #self.due_dates.each(&:destroy)
+    #self.assignment_questionnaires.each(&:destroy)
 
     # The size of an empty directory is 2
     # Delete the directory if it is empty
@@ -426,7 +430,7 @@ class Assignment < ActiveRecord::Base
   def self.export_details_fields(detail_options)
     fields = []
     EXPORT_FIELDS.each do |key, value|
-      fields << value if detail_options[key]=='true'
+      fields << value if detail_options[key.to_s]=='true'
     end
     fields
   end

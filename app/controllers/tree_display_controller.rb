@@ -251,12 +251,9 @@ class TreeDisplayController < ApplicationController
   # check if current user is instructor
   def is_user_instructor?(instructor_id)
     # ta created the course, current user is the instructor of this ta.
-    if session[:user].role_id == 2
-      instructor_ids = []
-      TaMapping.where(ta_id: instructor_id).each {|mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
-      return session[:user].role_id == 2 and instructor_ids.include? session[:user].id
-    end
-    false
+    instructor_ids = []
+    TaMapping.where(ta_id: instructor_id).each {|mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
+    session[:user].role_id == 2 and instructor_ids.include? session[:user].id
   end
 
   def update_is_available_2(res_nested, instructor_id, child)

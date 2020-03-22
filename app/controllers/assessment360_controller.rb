@@ -13,7 +13,7 @@ class Assessment360Controller < ApplicationController
   # This data is used to compute the metareview and teammate review scores.
   def all_students_all_reviews
     course = Course.find(params[:course_id])
-    @assignments = course.assignments.reject(&:is_calibrated).reject { |a| a.participants.empty? }
+    @assignments = course.assignments.reject(&:is_calibrated).reject {|a| a.participants.empty? }
     @course_participants = course.get_participants
     inspect_course_participants(@course_participants)
     # hashes for view
@@ -177,4 +177,3 @@ class Assessment360Controller < ApplicationController
   helper_method :format_score
   helper_method :format_topic
 end
-

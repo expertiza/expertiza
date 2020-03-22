@@ -124,17 +124,15 @@ class AssignmentsController < ApplicationController
   end
 
   def copy
-    @user = current_user
     session[:copy_flag] = true
     # check new assignment submission directory and old assignment submission directory
-    old_assign = Assignment.find(params[:id])
-    new_assign_id = AssignmentForm.copy(params[:id], @user)
-    if new_assign_id && old_assign.directory_path == Assignment.find(new_assign_id).directory_path
+    new_assign_id = AssignmentForm.copy(params[:id], current_user)
+    if new_assign_id
+      if check_same_directory?(params[:id], new_assign_id)
         flash[:note] = "Warning: The submission directory for the copy of this assignment will be the same as the submission directory "\
           "for the existing assignment. This will allow student submissions to one assignment to overwrite submissions to the other assignment. "\
           "If you do not want this to happen, change the submission directory in the new copy of the assignment."
-        redirect_to edit_assignment_path new_assign_id
-    elsif new_assign_id
+      end
       redirect_to edit_assignment_path new_assign_id
     else
       flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
@@ -194,7 +192,6 @@ class AssignmentsController < ApplicationController
   end
 
   private
-
   # check whether rubrics are set before save assignment
   def empty_rubrics_list
     rubrics_list = %w[ReviewQuestionnaire
@@ -267,6 +264,11 @@ class AssignmentsController < ApplicationController
     end
 
     due_date_all
+  end
+
+  # helper methods for copy
+  def check_same_directory?(old_id, new_id)
+    Assignment.find(old_id).directory_path == Assignment.find(new_id).directory_path
   end
 
   # helper methods for edit

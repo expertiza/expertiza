@@ -18,6 +18,10 @@ class TreeDisplayController < ApplicationController
     @node_type = params[:nodeType]
   end
 
+  # The goto_* methods are not necessary and
+  # could be simplified with goto_controller(name_parameter).
+  # However, they are called outside of the files in our scope and we did not modify them for now.
+
   # direct access to questionnaires
   def goto_questionnaires
     goto_controller('Questionnaires')
@@ -250,11 +254,10 @@ class TreeDisplayController < ApplicationController
     instructor_ids = []
     TaMapping.where(ta_id: instructor_id).each {|mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
     session[:user].role_id == 2 and instructor_ids.include? session[:user].id
-    
-    #if session[:user].role_id == 2
-    #  TaMapping.where(ta_id: instructor_id).each {|mapping| return true if Course.find(mapping.course_id).instructor_id == session[:user].id }
-    #end
-    #false
+    # if session[:user].role_id == 2
+    #   TaMapping.where(ta_id: instructor_id).each {|mapping| return true if Course.find(mapping.course_id).instructor_id == session[:user].id }
+    # end
+    # false
   end
 
   def update_is_available_2(res_nested, instructor_id, child)

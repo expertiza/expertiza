@@ -124,9 +124,9 @@ class AssignmentsController < ApplicationController
   end
 
   def copy
-    session[:copy_flag] = true
+    update_copy_session
     # check new assignment submission directory and old assignment submission directory
-    new_assign_id = AssignmentForm.copy(params[:id], current_user)
+    new_assign_id = AssignmentForm.copy(params[:id], @user)
     if new_assign_id
       if check_same_directory?(params[:id], new_assign_id)
         flash[:note] = "Warning: The submission directory for the copy of this assignment will be the same as the submission directory "\
@@ -269,6 +269,11 @@ class AssignmentsController < ApplicationController
   # helper methods for copy
   def check_same_directory?(old_id, new_id)
     Assignment.find(old_id).directory_path == Assignment.find(new_id).directory_path
+  end
+
+  def update_copy_session
+    @user = current_user
+    session[:copy_flag] = true
   end
 
   # helper methods for edit

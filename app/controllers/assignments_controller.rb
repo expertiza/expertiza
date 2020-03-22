@@ -78,15 +78,10 @@ class AssignmentsController < ApplicationController
   end
 
   def edit
-    ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Timezone not specified", request) if current_user.timezonepref.nil?
-    flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines." if current_user.timezonepref.nil?
+    user_timezone_specified
     edit_params_setting
     assignment_form_assignment_staggered_deadline?
-    @due_date_all.each do |dd|
-      check_due_date_nameurl_not_empty(dd)
-      adjust_timezone_when_due_date_present(dd)
-      break if validate_due_date
-    end
+    update_due_date
     check_assignment_questionnaires_usage
     @due_date_all = update_nil_dd_deadline_name(@due_date_all)
     @due_date_all = update_nil_dd_description_url(@due_date_all)
@@ -95,8 +90,7 @@ class AssignmentsController < ApplicationController
     handle_assignment_directory_path_nonexist_case_and_answer_tagging
     # assigned badges will hold all the badges that have been assigned to an assignment
     # added it to display the assigned badges while creating a badge in the assignments page
-    @assigned_badges = @assignment_form.assignment.badges
-    @badges = Badge.all
+    update_assignment_badges
   end
 
   def update
@@ -357,6 +351,29 @@ class AssignmentsController < ApplicationController
       ExpertizaLogger.error LoggerMessage.new(controller_name, "", "Submission directory not specified", request)
     end
     @assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id]) if @assignment_form.assignment.is_answer_tagging_allowed
+  end
+
+  def update_due_date
+    @due_date_all.each do |dd|
+      check_due_date_nameurl_not_empty(dd)
+      adjust_timezone_when_due_date_present(dd)
+      break if validate_due_date
+    end
+  end
+
+  def update_assignment_badges
+    @assigned_badges = @assignment_form.assignment.badges
+    @badges = Badge.all
+  end
+
+  def handle_missing_assignment_details
+    handle_rubrics_not_assigned_case
+    handle_assignment_directory_path_nonexist_case_and_answer_tagging
+  end
+
+  def user_timezone_specified
+    ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Timezone not specified", request) if current_user.timezonepref.nil?
+    flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines." if current_user.timezonepref.nil?
   end
 
   # helper methods for update

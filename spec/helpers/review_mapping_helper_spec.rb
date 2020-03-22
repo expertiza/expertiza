@@ -865,4 +865,44 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
+  describe 'get_awarded_review_score' do
+    before(:each) do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+
+      @assignment = create(:assignment, name: 'get_awarded_review_score_test', created_at: DateTime.now.in_time_zone - 13.day)
+
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 3)
+
+      reviewer_id = 1
+      rounds = [1,2,3]
+      team_id = 5
+      scores = {1=>10, 2=>20, 3=>30}
+      scores_hash = {}
+
+      rounds.each {|x| scores_hash[x] = {}}
+      rounds.each {|x| scores_hash[x][team_id] = scores[x]}
+      @review_scores = {reviewer_id => scores_hash}
+      get_awarded_review_score(reviewer_id, team_id)
+
+    end
+
+
+    it 'should return the review scores by the reviewer in round 1 to the team chosen' do
+      expect(@score_awarded_round_1).to eq "10%"
+    end
+
+    it 'should return the review scores by the reviewer in round 2 to the team chosen' do
+      expect(@score_awarded_round_2).to eq "20%"
+    end
+
+    it 'should return the review scores by the reviewer in round 3 to the team chosen' do
+      expect(@score_awarded_round_3).to eq "30%"
+    end
+  end
+
+
 end

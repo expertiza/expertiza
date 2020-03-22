@@ -97,7 +97,7 @@ class Criterion < ScoredQuestion
       #Sahil: Check this out
       html += '<div><select id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" class="review-rating" ' + current_value + '>' + "<option value = ''>--</option>" + '<option value='
       questionnaire_min.upto(questionnaire_max).each do |j|
-        html += j.to_s if !answer.nil? and j == answer.answer + ' selected="selected"'  '>'        
+        html += j.to_s + 'selected="selected"' if !answer.nil? and j == answer.answer + '>'
         html += j.to_s + "-"
         html += self.min_label if self.min_label.present? and j == questionnaire_min
         html += self.max_label if self.max_label.present? and j == questionnaire_max

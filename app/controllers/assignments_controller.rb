@@ -3,7 +3,6 @@ class AssignmentsController < ApplicationController
   autocomplete :user, :name
   before_action :authorize
 
-  # Initial Commit - Team_1234
   def action_allowed?
     if %w[edit update list_submissions].include? params[:action]
       assignment = Assignment.find(params[:id])
@@ -41,6 +40,7 @@ class AssignmentsController < ApplicationController
     end
   end
 
+  # helper method for create: to handle when assignment form is saved
   def handle_assignment_form_save
     @assignment_form.create_assignment_node
     exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
@@ -52,6 +52,7 @@ class AssignmentsController < ApplicationController
     return
   end
 
+  # updates assignment form with changes in assignment questionnaire and due date
   def update_assignment_form(exist_assignment)
     assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
     handle_assignment_directory_path_nonexist(assignment_form_params)
@@ -60,17 +61,20 @@ class AssignmentsController < ApplicationController
     @assignment_form.update(assignment_form_params, current_user)
   end
 
+  # helper method for update_assignment_form
   def handle_assignment_directory_path_nonexist(assignment_form_params)
     assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}" \
     if assignment_form_params[:assignment][:directory_path].blank?
   end
 
+  # helper method for update_assignment_form: update assignment form with questionnaire array
   def update_assignment_questionnaire(assignment_form_params, exist_assignment)
     ques_array = assignment_form_params[:assignment_questionnaire]
     ques_array.each {|cur_questionnaire| cur_questionnaire[:assignment_id] = exist_assignment.id.to_s }
     ques_array
   end
 
+  # helper method for update_assignment_form: update assignment form with due dates array
   def update_assignment_due_date(assignment_form_params, exist_assignment)
     due_array = assignment_form_params[:due_date]
     due_array.each {|cur_due| cur_due[:parent_id] = exist_assignment.id.to_s }

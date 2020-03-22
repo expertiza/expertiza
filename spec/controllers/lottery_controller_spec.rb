@@ -2,18 +2,16 @@ include AssignmentHelper
 require 'pp'
 
 describe LotteryController do
-  let(:assignment) {build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true,
-                          participants: [build(:participant)], directory_path: 'same path', teams: [], course_id: 1, is_intelligent: true)}
-  let(:assignment2) {build(:assignment, id:2)}
-  let(:student) {build(:student)}
+  #let(:assignment) {build(:assignment, id: 3, name: 'test assignment', instructor_id: 6, staggered_deadline: true, participants: [build(:participant)], directory_path: 'same path', teams: [], course_id: 1, is_intelligent: true)}
+  let(:assignment) {build(:assignment, id: 3, is_intelligent: true)}
+  let(:assignment2) {build(:assignment, id:4)}
   let(:ta) {build(:teaching_assistant)}
   let(:instructor) {build(:instructor)}
   let(:admin) {build(:admin)}
 
-  let(:student1) {build(:student)}
-  let(:student2) {build(:student)}
-  let(:student3) {build(:student)}
-  let(:student5) {build(:student)}
+  let(:student1) {create(:student)}
+  let(:student2) {create(:student)}
+  let(:student3) {create(:student)}
 
   let(:topic1) {build(:topic, assignment: assignment, id: 1)}
   let(:topic2) {build(:topic, assignment: assignment, id: 2)}
@@ -76,14 +74,14 @@ describe LotteryController do
     end
   end
 
-  describe "#create_new_teams_for_bidding_response" do
-    it "should create team and return teamid" do
-      assignment = double("Assignment")
-      team = double("team")
-      allow(team).to receive(:create_new_teams_for_bidding_response).with(assignment).and_return(:teamid)
-      expect(team.create_new_teams_for_bidding_response(assignment)).to eq(:teamid)
-    end
-  end
+#  describe "#create_new_teams_for_bidding_response" do
+#    it "should create team and return teamid" do
+#      assignment = double("Assignment")
+#      team = double("team")
+#      allow(team).to receive(:create_new_teams_for_bidding_response).with(assignment).and_return(:teamid)
+#      expect(team.create_new_teams_for_bidding_response(assignment)).to eq(:teamid)
+#    end
+#  end
 
   describe "#auto_merge_teams" do
     it "sorts the unassigned teams" do
@@ -110,7 +108,7 @@ describe LotteryController do
       user = ta
       stub_current_user(user, user.role.name, user.role)
       expect(controller.action_allowed?).to be true
-      user = student
+      user = student1
       stub_current_user(user, user.role.name, user.role)
       expect(controller.action_allowed?).to be false
     end
@@ -127,17 +125,19 @@ describe LotteryController do
   describe "#create_new_teams_for_bidding_response" do
     it "create new Assignment Teams" do
       user_bidding_info = []
-      teams = [[student1.id, student2.id], [student3.id, student5.id]]
+      teams = [[student1.id, student2.id], [student3.id]]
       expect(AssignmentTeam.count).to eq(0)
       expect(TeamNode.count).to eq(0)
       expect(TeamsUser.count).to eq(0)
       expect(TeamUserNode.count).to eq(0)
+      pp teams
       controller.send(:create_new_teams_for_bidding_response, teams, assignment, user_bidding_info)
+      pp teams
       #expect {create(:AssignmentTeam)}.to change(AssignmentTeam, :count).by(2)
       expect(AssignmentTeam.count).to eq(2)
       expect(TeamNode.count).to eq(2)
-      expect(TeamsUser.count).to eq(4)
-      expect(TeamUserNode.count).to eq(4)
+      expect(TeamsUser.count).to eq(3)
+      expect(TeamUserNode.count).to eq(3)
     end
   end
 
@@ -147,6 +147,7 @@ describe LotteryController do
       allow(controller).to receive(:params).and_return(params)
       allow(controller).to receive(:log)
       allow(controller).to receive(:flash).and_return({})
+      allow(Assignment).to receive(:find_by).with(id: 3).and_return(assignment)
       expect(controller).to receive(:redirect_to).with({:controller => 'tree_display', :action => "list"})
 
       controller.run_intelligent_assignment

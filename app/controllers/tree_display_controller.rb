@@ -247,26 +247,30 @@ class TreeDisplayController < ApplicationController
   # check if current user is instructor
   def is_user_instructor?(instructor_id)
     # ta created the course, current user is the instructor of this ta.
-    if session[:user].role_id == 2
-      TaMapping.where(ta_id: instructor_id).each {|mapping| return true if Course.find(mapping.course_id).instructor_id == session[:user].id}
-    end
-    false
+    instructor_ids = []
+    TaMapping.where(ta_id: instructor_id).each {|mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
+    session[:user].role_id == 2 and instructor_ids.include? session[:user].id
+    
+    #if session[:user].role_id == 2
+    #  TaMapping.where(ta_id: instructor_id).each {|mapping| return true if Course.find(mapping.course_id).instructor_id == session[:user].id }
+    #end
+    #false
   end
 
-  def update_is_available_2(res2, instructor_id, child)
+  def update_is_available_2(res_nested, instructor_id, child)
     # current user is the instructor (role can be admin/instructor/ta) of this course. is_available_condition1
-    res2["is_available"] = is_available(session[:user], instructor_id) ||
+    res_nested["is_available"] = is_available(session[:user], instructor_id) ||
         is_user_ta?(instructor_id, child) ||
         is_user_instructor?(instructor_id)
   end
 
   # attaches assignment nodes to course node of instructor
-  def coursenode_assignmentnode(res2, child)
-    res2["directory"] = child.get_directory
+  def coursenode_assignmentnode(res_nested, child)
+    res_nested["directory"] = child.get_directory
     instructor_id = child.get_instructor_id
-    update_instructor(res2, instructor_id)
-    update_is_available_2(res2, instructor_id, child)
-    assignments_method(child, res2) if child.type == "AssignmentNode"
+    update_instructor(res_nested, instructor_id)
+    update_is_available_2(res_nested, instructor_id, child)
+    assignments_method(child, res_nested) if child.type == "AssignmentNode"
   end
 
   # getting result nodes for child2. res[] contains all the resultant nodes.

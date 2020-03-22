@@ -108,19 +108,38 @@ class AssignmentsController < ApplicationController
     file_path
   end
 
-  def copy
+  def copyT
     @user = current_user
     session[:copy_flag] = true
     # check new assignment submission directory and old assignment submission directory
     old_assign = Assignment.find(params[:id])
     new_assign_id = AssignmentForm.copy(params[:id], @user)
     if new_assign_id
-      new_assign = Assignment.find(new_assign_id)
-      if old_assign.directory_path == new_assign.directory_path
+      #new_assign = Assignment.find(new_assign_id)
+      if old_assign.directory_path == Assignment.find(new_assign_id).directory_path
         flash[:note] = "Warning: The submission directory for the copy of this assignment will be the same as the submission directory "\
           "for the existing assignment. This will allow student submissions to one assignment to overwrite submissions to the other assignment. "\
           "If you do not want this to happen, change the submission directory in the new copy of the assignment."
       end
+      redirect_to edit_assignment_path new_assign_id
+    else
+      flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'
+      redirect_to list_tree_display_index_path
+    end
+  end
+
+  def copy
+    @user = current_user
+    session[:copy_flag] = true
+    # check new assignment submission directory and old assignment submission directory
+    old_assign = Assignment.find(params[:id])
+    new_assign_id = AssignmentForm.copy(params[:id], @user)
+    if new_assign_id && old_assign.directory_path == Assignment.find(new_assign_id).directory_path
+        flash[:note] = "Warning: The submission directory for the copy of this assignment will be the same as the submission directory "\
+          "for the existing assignment. This will allow student submissions to one assignment to overwrite submissions to the other assignment. "\
+          "If you do not want this to happen, change the submission directory in the new copy of the assignment."
+        redirect_to edit_assignment_path new_assign_id
+    elsif new_assign_id
       redirect_to edit_assignment_path new_assign_id
     else
       flash[:error] = 'The assignment was not able to be copied. Please check the original assignment for missing information.'

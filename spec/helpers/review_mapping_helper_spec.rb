@@ -106,6 +106,47 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
+  describe 'obtain_team_colour' do
+    before(:each) do
+      @assignment = create(:assignment, name: 'obtain_team_colour_test', num_reviews: 3, created_at: DateTime.now.in_time_zone - 13.day)
+
+    end
+    it 'should return \'purple\' if last review was submitted within the round' do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+      reviewer = create(:participant, review_grade: nil)
+      reviewee = create(:assignment_team, assignment: @assignment)
+      response_map = create(:review_response_map, reviewer: reviewer, reviewee: reviewee)
+      create(:submission_record, assignment_id: @assignment.id, team_id: reviewee.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 7.day)
+      create(:response, response_map: response_map)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 5.day)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone + 6.day)
+
+      assignment_created = @assignment.created_at
+      assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
+      colour = obtain_team_colour(response_map,assignment_created,assignment_due_dates)
+      expect(colour).to eq('purple')
+
+    end
+    it 'should return \'green\' if the submission link does not exist' do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+      reviewer = create(:participant, review_grade: nil)
+      response_map = create(:review_response_map, reviewer: reviewer)
+      create(:response, response_map: response_map)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2)
+
+      assignment_created = @assignment.created_at
+      assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
+      colour = obtain_team_colour(response_map,assignment_created,assignment_due_dates)
+      expect(colour).to eq('green')
+    end
+
+  end
+
   describe 'link_updated_since_last?' do
     before(:each) do
       @round = 2
@@ -203,6 +244,47 @@ describe ReviewMappingHelper, type: :helper do
       expect(result).to be(true)
     end
 
+  end
+
+  describe 'submitted_hyperlink' do
+    before(:each) do
+      @round = 1
+      assignment = create(:assignment, name: 'submitted_within_round_test', created_at: DateTime.now.in_time_zone - 13.day)
+      @assignment_created = assignment.created_at
+      reviewer = create(:participant, review_grade: nil)
+      reviewee = create(:assignment_team, assignment: assignment)
+      @response_map = create(:review_response_map, reviewer: reviewer, reviewee: reviewee)
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+      create(:assignment_due_date, assignment: assignment, parent_id: assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 5.day)
+      @assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
+      @submission = create(:submission_record, assignment_id: assignment.id, team_id: reviewee.id, operation: 'Submit Hyperlink')
+    end
+
+    it 'should return nil if the hyperlink doesnt exist' do
+      @submission.created_at = DateTime.now.in_time_zone - 7.day
+      @submission.content = nil
+      @submission.save
+      hyper_link = submitted_hyperlink(@round, @response_map, @assignment_created, @assignment_due_dates)
+      expect(hyper_link).to eq(nil)
+    end
+
+    it 'should return hyperlink if it was submitted' do
+      @submission.created_at = DateTime.now.in_time_zone - 7.day
+      @submission.content = 'www.test.com'
+      @submission.save
+      hyper_link = submitted_hyperlink(@round, @response_map, @assignment_created, @assignment_due_dates)
+      expect(hyper_link).to eq('www.test.com')
+    end
+  end
+
+  describe 'get_link_updated_at' do
+    it 'should return true if site was updated' do
+      link = 'https://wiki.archlinux.org/'
+      time_updated = get_link_updated_at(link)
+      expect(time_updated).to be_a_kind_of(Time)
+    end
   end
 
   describe 'get_data_for_review_report' do
@@ -392,6 +474,7 @@ describe ReviewMappingHelper, type: :helper do
 
   end
 
+
   describe 'check_submission_state' do
     before(:each) do
       @assignment = create(:assignment, name: 'get_team_colour_test', created_at: DateTime.now.in_time_zone - 13.day)
@@ -434,4 +517,395 @@ describe ReviewMappingHelper, type: :helper do
     end
     
   end
+
+
+  describe 'sort_reviewer_by_review_volume_desc' do
+    before(:each) do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+
+      @assignment = create(:assignment, name: 'get_awarded_review_score_test', created_at: DateTime.now.in_time_zone - 13.day)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
+
+      questionnaire_1 = create(:questionnaire)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: questionnaire_1, used_in_round: 1)
+      @question_1 = create(:question, questionnaire: questionnaire_1)
+
+      @reviewer_1 = create(:participant, review_grade: nil)
+      @reviewer_2 = create(:participant, review_grade: nil)
+      @reviewer_3 = create(:participant, review_grade: nil)
+      reviewee = create(:assignment_team)
+
+      @response_map_1 = create(:review_response_map, reviewer: @reviewer_1, reviewee: reviewee, assignment: @assignment)
+      @response_map_2 = create(:review_response_map, reviewer: @reviewer_2, reviewee: reviewee, assignment: @assignment)
+      @response_map_3 = create(:review_response_map, reviewer: @reviewer_3, reviewee: reviewee, assignment: @assignment)
+
+    end
+
+    it 'should sort the reviewers by review volume when additional comment is provided in all responses' do
+      response_1 = create(:response, response_map: @response_map_1, round: 1, additional_comment: "Abc")
+      response_2 = create(:response, response_map: @response_map_2, round: 1, additional_comment: "Abcde")
+      response_3 = create(:response, response_map: @response_map_3, round: 1, additional_comment: "Abcde")
+
+      create(:answer, question: @question_1, response: response_1, comments: "Is this it?")
+      create(:answer, question: @question_1, response: response_2, comments: "I dont think this is it?")
+      create(:answer, question: @question_1, response: response_3, comments: "This may be it?")
+
+      @reviewers = []
+      @reviewers << Participant.find(@reviewer_1.id)
+      @reviewers << Participant.find(@reviewer_2.id)
+      @reviewers << Participant.find(@reviewer_3.id)
+
+      sort_reviewer_by_review_volume_desc()
+      expect(@reviewers[0]).to eq @reviewer_2
+      expect(@reviewers[1]).to eq @reviewer_3
+      expect(@reviewers[2]).to eq @reviewer_1
+
+    end
+
+    it 'should sort the reviewers by review volume when additional comment is not provided in any/some response' do
+      response_1 = create(:response, response_map: @response_map_1, round: 1)
+      response_2 = create(:response, response_map: @response_map_2, round: 1)
+      response_3 = create(:response, response_map: @response_map_3, round: 1)
+
+      create(:answer, question: @question_1, response: response_1, comments: "Is this it?")
+      create(:answer, question: @question_1, response: response_2, comments: "I dont think this is it?")
+      create(:answer, question: @question_1, response: response_3, comments: "This may be it?")
+
+      @reviewers = []
+      @reviewers << Participant.find(@reviewer_1.id)
+      @reviewers << Participant.find(@reviewer_2.id)
+      @reviewers << Participant.find(@reviewer_3.id)
+
+      sort_reviewer_by_review_volume_desc()
+      expect(@reviewers[0]).to eq @reviewer_2
+      expect(@reviewers[1]).to eq @reviewer_3
+      expect(@reviewers[2]).to eq @reviewer_1
+
+    end
+  end
+
+
+  describe 'calcutate_average_author_feedback_score' do
+    before(:each) do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+
+      @assignment = create(:assignment, name: 'get_awarded_review_score_test', created_at: DateTime.now.in_time_zone - 13.day)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
+
+      user = create(:student)
+      @reviewee = create(:assignment_team, assignment: @assignment)
+      create(:team_user, user: user, team: @reviewee)
+      reviewer = create(:participant, assignment: @assignment, user: user)
+
+      @response_map = create(:review_response_map, reviewer: reviewer, reviewee: @reviewee, assignment: @assignment)
+
+
+      questionnaire_1 = create(:questionnaire, min_question_score: 0, max_question_score: 5)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: questionnaire_1, used_in_round: 1)
+      question_1 = create(:question, questionnaire: questionnaire_1)
+      question_2 = create(:question, questionnaire: questionnaire_1)
+
+      response_1 = create(:response, response_map: @response_map, round: 1)
+
+      create(:answer, question: question_1, response: response_1, answer: 2)
+      create(:answer, question: question_2, response: response_1, answer: 4 )
+
+    end
+
+    it 'returns the average author feedback score if maximum team size is equal to 1' do
+      max_team_size = 1
+      author_feedback_avg_score = calcutate_average_author_feedback_score(@assignment.id, max_team_size, @response_map.id, @reviewee.id)
+      expect(author_feedback_avg_score).to eq "6 / 10"
+    end
+
+    it 'returns empty response if maximum team size is not 1' do
+      max_team_size = 3
+      author_feedback_avg_score = calcutate_average_author_feedback_score(@assignment.id, max_team_size, @response_map.id, @reviewee.id)
+      expect(author_feedback_avg_score).to eq "-- / --"
+    end
+
+  end
+
+  describe 'initialize_chart_elements' do
+    before(:each) do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+
+      @assignment = create(:assignment, name: 'get_awarded_review_score_test', created_at: DateTime.now.in_time_zone - 13.day)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 3)
+
+      questionnaire_1 = create(:questionnaire)
+      questionnaire_2 = create(:questionnaire)
+      questionnaire_3 = create(:questionnaire)
+
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: questionnaire_1, used_in_round: 1)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: questionnaire_2, used_in_round: 2)
+      create(:assignment_questionnaire, assignment: @assignment, questionnaire: questionnaire_3, used_in_round: 3)
+
+      question_1_1 = create(:question, questionnaire: questionnaire_1)
+      question_1_2 = create(:question, questionnaire: questionnaire_1)
+
+      question_2_1 = create(:question, questionnaire: questionnaire_2)
+      question_2_2 = create(:question, questionnaire: questionnaire_2)
+
+      question_3_1 = create(:question, questionnaire: questionnaire_3)
+      question_3_2 = create(:question, questionnaire: questionnaire_3)
+
+      @reviewer_1 = create(:participant, review_grade: nil)
+      @reviewer_2 = create(:participant, review_grade: nil)
+
+      reviewee = create(:assignment_team)
+
+      @response_map_1 = create(:review_response_map, reviewer: @reviewer_1, reviewee: reviewee, assignment: @assignment)
+      @response_map_2 = create(:review_response_map, reviewer: @reviewer_2, reviewee: reviewee, assignment: @assignment)
+
+      response_1_1 = create(:response, response_map: @response_map_1, round: 1, additional_comment: "Some Comment")
+      response_1_2 = create(:response, response_map: @response_map_1, round: 2, additional_comment: "Some Comment")
+      response_1_3 = create(:response, response_map: @response_map_1, round: 3, additional_comment: "Some Comment")
+
+      response_2_1 = create(:response, response_map: @response_map_2, round: 1, additional_comment: "Some Comment")
+      response_2_2 = create(:response, response_map: @response_map_2, round: 2, additional_comment: "Some Comment")
+      response_2_3 = create(:response, response_map: @response_map_2, round: 3, additional_comment: "Some Comment")
+
+      create(:answer, question: question_1_1, response: response_1_1, comments: "Lebron is the goat ")
+      create(:answer, question: question_1_2, response: response_1_1, comments: "He can gaurd 1 to 5 ")
+      create(:answer, question: question_2_1, response: response_1_2, comments: "Elite ball handler ")
+      create(:answer, question: question_2_2, response: response_1_2, comments: "Elite Scorer ")
+      create(:answer, question: question_3_1, response: response_1_3, comments: "DPOY runner up ")
+      create(:answer, question: question_3_2, response: response_1_3, comments: "Most complete player ever ")
+
+      create(:answer, question: question_1_1, response: response_2_1, comments: "MJ is the goat no question ")
+      create(:answer, question: question_1_2, response: response_2_1, comments: "Greatest scorer of all time ")
+      create(:answer, question: question_2_1, response: response_2_2, comments: "Top 5 defenders ever ")
+      create(:answer, question: question_2_2, response: response_2_2, comments: "Averaged 30 plus in the playoffs ")
+      create(:answer, question: question_3_1, response: response_2_3, comments: "Insane finals record ")
+      create(:answer, question: question_3_2, response: response_2_3, comments: "Six time Finals MVP ")
+    end
+
+    it 'Should initialize the chart elements (reviewer variables) with the correct response volumes' do
+
+      @reviewers = []
+      @reviewers << Participant.find(@reviewer_1.id)
+      @reviewers << Participant.find(@reviewer_2.id)
+
+      sort_reviewer_by_review_volume_desc()
+
+      return_array_0 = []
+      return_array_1 = []
+
+      return_array_0 = initialize_chart_elements(@reviewers[0])
+      return_array_1 = initialize_chart_elements(@reviewers[1])
+
+      labels_0 = return_array_0[0]
+      labels_1 = return_array_1[0]
+      reviewer_data_0 = return_array_0[1]
+      reviewer_data_1 = return_array_1[1]
+      all_reviewers_data_0 = return_array_0[2]
+      all_reviewers_data_1 = return_array_1[2]
+
+      expect(all_reviewers_data_0).to match_array all_reviewers_data_1
+      expect(labels_0).to match_array ["1st", "2nd", "3rd", "Total"]
+      expect(labels_1).to match_array ["1st", "2nd", "3rd", "Total"]
+      expect(reviewer_data_0).to match_array [13, 10, 9, 10]
+      expect(reviewer_data_1).to match_array [10, 7, 9, 8]
+
+    end
+  end
+
+  describe 'get_each_review_and_feedback_response_map'do
+
+    before(:each) do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+
+      @assignment = create(:assignment, name: 'get_awarded_review_score_test', created_at: DateTime.now.in_time_zone - 13.day)
+      @id = @assignment.id
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 3)
+
+      user = create(:student)
+      @reviewee = create(:assignment_team, assignment: @assignment)
+      create(:team_user, user: user, team: @reviewee)
+      @reviewer = create(:participant, assignment: @assignment, user: user)
+
+      @response_map_1 = create(:review_response_map, reviewer: @reviewer)
+      @response_map_2 = create(:review_response_map, reviewer: @reviewer)
+      @response_map_3 = create(:review_response_map, reviewer: @reviewer)
+
+      @review_response_map_list = []
+      @review_response_map_list << @response_map_1.id
+      @review_response_map_list << @response_map_2.id
+      @review_response_map_list << @response_map_3.id
+
+      @response_1 = create(:response, response_map: @response_map_1, round: 1)
+      @response_2 = create(:response, response_map: @response_map_2, round: 2)
+
+      @response_list = []
+      @response_list << @response_1
+      @response_list << @response_2
+
+      feedback_response_map1 = FeedbackResponseMap.create(reviewed_object_id: @response_1.id, reviewer_id: @reviewer.id)
+      feedback_response_map2 = FeedbackResponseMap.create(reviewed_object_id: @response_2.id, reviewer_id: @reviewer.id)
+
+      @feedback_response_map_list = []
+      @feedback_response_map_list << feedback_response_map1
+      @feedback_response_map_list << feedback_response_map2
+
+
+      @all_review_response_ids = [@response_1.id, @response_2.id]
+    end
+
+    it 'should return amount of responses given in round 1' do
+      get_each_review_and_feedback_response_map(@reviewer)
+
+      expect(@rspan_round_one).to eq 1
+    end
+    it 'should return amount of responses given in round 2' do
+      get_each_review_and_feedback_response_map(@reviewer)
+
+      expect(@rspan_round_two).to eq 1
+    end
+    it 'should return amount of responses given in round 3' do
+      @response_3 = create(:response, response_map: @response_map_3, round: 3)
+      @response_list << @response_3
+      feedback_response_map3 = FeedbackResponseMap.create(reviewed_object_id: @response_3.id, reviewer_id: @reviewer.id)
+      @feedback_response_map_list << feedback_response_map3
+      @all_review_response_ids << @response_3.id
+      get_each_review_and_feedback_response_map(@reviewer)
+
+      expect(@rspan_round_three).to eq 1
+    end
+    it 'should return 0 for nil round 3 response' do
+      get_each_review_and_feedback_response_map(@reviewer)
+
+      expect(@rspan_round_three).to eq 0
+    end
+
+  end
+
+  describe 'feedback_response_map_record' do
+    before(:each) do
+      @reviewer = create(:participant)
+      @response_map_1 = create(:review_response_map, reviewer: @reviewer)
+      @response_map_2 = create(:review_response_map, reviewer: @reviewer)
+      @response_map_3 = create(:review_response_map, reviewer: @reviewer)
+      @response_1 = create(:response, response_map: @response_map_1, round: 1)
+      @response_2 = create(:response, response_map: @response_map_2, round: 2)
+      @response_3 = create(:response, response_map: @response_map_3, round: 3)
+      FeedbackResponseMap.create(reviewed_object_id: @response_1.id, reviewer_id: @reviewer.id)
+      FeedbackResponseMap.create(reviewed_object_id: @response_2.id, reviewer_id: @reviewer.id)
+      FeedbackResponseMap.create(reviewed_object_id: @response_3.id, reviewer_id: @reviewer.id)
+      @review_response_map_ids = [@response_map_1.id, @response_map_2.id, @response_map_3.id]
+      @all_review_response_ids_round_one = [@response_1.id]
+      @all_review_response_ids_round_two = [@response_2.id]
+      @all_review_response_ids_round_three = [@response_3.id]
+      feedback_response_map_record(@reviewer)
+    end
+
+    it 'should return the id of the response_map associated with round 1' do
+      expect(@review_responses_round_one.first.id).to eq(@response_map_1.id)
+    end
+
+    it 'should return the id of the response_map associated with round 2' do
+      expect(@review_responses_round_two.first.id).to eq(@response_map_2.id)
+    end
+
+    it 'should return the id of the response_map associated with round 3' do
+      expect(@review_responses_round_three.first.id).to eq(@response_map_3.id)
+    end
+
+    it 'should return the id of the response_map associated with the feedback given in round 1' do
+      expect(@feedback_response_maps_round_one.first.reviewed_object_id).to eq(@response_1.id)
+    end
+
+    it 'should return the id of the response_map associated with the feedback given in round 3' do
+      expect(@feedback_response_maps_round_two.first.reviewed_object_id).to eq(@response_2.id)
+    end
+
+    it 'should return the id of the response_map associated with the feedback given in round 3' do
+      expect(@feedback_response_maps_round_three.first.reviewed_object_id).to eq(@response_3.id)
+    end
+
+  end
+
+  describe 'get_certain_review_and_feedback_response_map' do
+    before(:each) do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+
+      @assignment = create(:assignment, name: 'get_awarded_review_score_test', created_at: DateTime.now.in_time_zone - 13.day)
+      @id = @assignment.id
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 3)
+
+      user = create(:student)
+      @reviewee = create(:assignment_team, assignment: @assignment)
+      create(:team_user, user: user, team: @reviewee)
+      @reviewer = create(:participant, assignment: @assignment, user: user)
+
+      @response_map_1 = create(:review_response_map, reviewer: @reviewer)
+      @response_map_2 = create(:review_response_map, reviewer: @reviewer)
+      @response_map_3 = create(:review_response_map, reviewer: @reviewer)
+
+      @review_response_map_list = []
+      @review_response_map_list << @response_map_1.id
+      @review_response_map_list << @response_map_2.id
+      @review_response_map_list << @response_map_3.id
+
+      @response_1 = create(:response, response_map: @response_map_1, round: 1)
+      @response_2 = create(:response, response_map: @response_map_2, round: 2)
+      @response_3 = create(:response, response_map: @response_map_3, round: 3)
+
+      @response_list = []
+      @response_list << @response_1
+      @response_list << @response_2
+      @response_list << @response_3
+
+      feedback_response_map1 = FeedbackResponseMap.create(reviewed_object_id: @response_1.id, reviewer_id: @reviewer.id)
+      feedback_response_map2 = FeedbackResponseMap.create(reviewed_object_id: @response_2.id, reviewer_id: @reviewer.id)
+      feedback_response_map3 = FeedbackResponseMap.create(reviewed_object_id: @response_3.id, reviewer_id: @reviewer.id)
+
+      @feedback_response_map_list = []
+      @feedback_response_map_list << feedback_response_map1
+      @feedback_response_map_list << feedback_response_map2
+      @feedback_response_map_list << feedback_response_map3
+
+
+      @all_review_response_ids = [@response_1.id, @response_2.id, @response_3.id]
+      get_certain_review_and_feedback_response_map(@reviewer)
+    end
+
+    it 'should return all the feedback response maps assosiated with the reviewer' do
+      expect(@feedback_response_map_list).to match_array @feedback_response_maps
+    end
+
+    it 'should return the team_id of the reviewee' do
+      expect(@reviewee.id).to eq @team_id
+    end
+
+    it 'should return the review_response map ids of the reviewee for the assignment' do
+      expect(@review_response_map_list).to match_array @review_response_map_ids
+    end
+
+
+    it 'should return the responses corresponding to the response map ids for the assignment' do
+      expect(@response_list).to match_array @review_responses
+    end
+
+    it 'should return the number of responses corresponding to the response map ids for the assignment' do
+      expect(@response_list.length).to eq @rspan
+    end
+  end
+
 end

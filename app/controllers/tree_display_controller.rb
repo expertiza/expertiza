@@ -206,6 +206,9 @@ class TreeDisplayController < ApplicationController
     flash[:error] = "Invalid JSON in the TreeList" unless json_valid? params[:reactParams][:child_nodes]
     child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
     tmp_res = {}
+    if !child_nodes.is_Array?
+      child_nodes = [child_nodes]
+    end
     child_nodes.each do |node|
       initialize_fnode_update_children(params, node, tmp_res)
     end

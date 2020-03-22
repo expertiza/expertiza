@@ -366,11 +366,6 @@ class AssignmentsController < ApplicationController
     @badges = Badge.all
   end
 
-  def handle_missing_assignment_details
-    handle_rubrics_not_assigned_case
-    handle_assignment_directory_path_nonexist_case_and_answer_tagging
-  end
-
   def user_timezone_specified
     ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Timezone not specified", request) if current_user.timezonepref.nil?
     flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines." if current_user.timezonepref.nil?

@@ -3,6 +3,7 @@
 ### We have spent a lot of time on refactoring this file, PLEASE consult with Expertiza development team before putting code in.
 ###
 ###
+
 class Assignment < ActiveRecord::Base
   require 'analytic/assignment_analytic'
   include AssignmentAnalytic
@@ -11,7 +12,6 @@ class Assignment < ActiveRecord::Base
   include OnTheFlyCalc
   include AssignmentHelper
   has_paper_trail
-
   # When an assignment is created, it needs to
   # be created as an instance of a subclass of the Assignment (model) class;
   # then Rails will "automatically' set the type field to the value that
@@ -186,7 +186,7 @@ class Assignment < ActiveRecord::Base
     if self.course_id.nil? && self.instructor_id.nil?
       raise 'The path cannot be created. The assignment must be associated with either a course or an instructor.'
     end
-    path_text = ""
+    
     path_text = if !self.course_id.nil? && self.course_id > 0
                   Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(self.instructor[:name]) + '/' +
                     FileHelper.clean_path(self.course.directory_path) + '/'

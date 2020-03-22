@@ -2,12 +2,8 @@ include AssignmentHelper
 require 'pp'
 
 describe LotteryController do
-  #let(:assignment) do
-  #  build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true,
-  #  participants: [build(:participant)], directory_path: 'same path', teams: [], course_id: 1)
-  #end
-  let(:assignment) {build(:assignment, id: 3, is_intelligent: true)}
-  let(:student) { build(:student) }
+  let(:assignment) { create(:assignment, is_intelligent: true) }
+  let(:assignment2) { build(:assignment) }
   let(:ta) { build(:teaching_assistant) }
   let(:instructor) { build(:instructor) }
   let(:admin) { build(:admin) }
@@ -21,21 +17,16 @@ describe LotteryController do
   let(:topic3) { build(:topic, assignment: assignment, id: 3) }
   let(:topic4) { build(:topic, assignment: assignment, id: 4) }
 
-  let(:assignment_team1) { build(:assignment_team, assignment: assignment, id: 1, parent_id: assignment.id) }
-  let(:assignment_team2) { build(:assignment_team, assignment: assignment, id: 2, parent_id: assignment.id) }
-  let(:assignment_team3) { build(:assignment_team, assignment: assignment, id: 3) }
-  let(:assignment_team4) { build(:assignment_team, assignment: assignment, id: 4) }
+  let(:assignment_team1) { create(:assignment_team, parent_id: assignment.id) }
+  let(:assignment_team2) { create(:assignment_team, parent_id: assignment.id) }
+  let(:assignment_team3) { create(:assignment_team, parent_id: assignment.id) }
+  let(:assignment_team4) { create(:assignment_team, parent_id: assignment.id) }
 
-  let(:team_user1) { build(:team_user, team: assignment_team1, user: build(:student, id: 1), id: 1) }
-  let(:team_user2) { build(:team_user, team: assignment_team1, user: build(:student, id: 2), id: 2) }
-  let(:team_user3) { build(:team_user, team: assignment_team1, user: build(:student, id: 3), id: 3) }
+  let(:team_user1) { build(:team_user, team_id: assignment_team1.id, user_id: student1.id, id: 1) }
+  let(:team_user2) { build(:team_user, team_id: assignment_team1.id, user_id: student2.id, id: 2) }
+  let(:team_user3) { build(:team_user, team_id: assignment_team1.id, user_id: student3.id, id: 3) }
 
   before :each do
-    assignment.teams << assignment_team1
-    assignment.teams << assignment_team2
-    assignment.teams << assignment_team3
-    assignment.teams << assignment_team4
-
     assignment.sign_up_topics << topic1
     assignment.sign_up_topics << topic2
     assignment.sign_up_topics << topic3
@@ -129,7 +120,9 @@ describe LotteryController do
     it "create new Assignment Teams" do
       user_bidding_info = []
       teams = [[student1.id, student2.id], [student3.id]]
-      expect(AssignmentTeam.count).to eq(0)
+      pp AssignmentTeam.all
+      pp AssignmentTeam.first.assignment
+      expect(AssignmentTeam.count).to eq(1)
       expect(TeamNode.count).to eq(0)
       expect(TeamsUser.count).to eq(0)
       expect(TeamUserNode.count).to eq(0)
@@ -137,7 +130,7 @@ describe LotteryController do
       controller.send(:create_new_teams_for_bidding_response, teams, assignment, user_bidding_info)
       pp teams
       #expect {create(:AssignmentTeam)}.to change(AssignmentTeam, :count).by(2)
-      expect(AssignmentTeam.count).to eq(2)
+      expect(AssignmentTeam.count).to eq(3)
       expect(TeamNode.count).to eq(2)
       expect(TeamsUser.count).to eq(3)
       expect(TeamUserNode.count).to eq(3)
@@ -150,7 +143,7 @@ describe LotteryController do
       allow(controller).to receive(:params).and_return(params)
       allow(controller).to receive(:log)
       allow(controller).to receive(:flash).and_return({})
-      allow(Assignment).to receive(:find_by).with(id: 3).and_return(assignment)
+      allow(Assignment).to receive(:find_by).with(id: assignment.id).and_return(assignment)
       expect(controller).to receive(:redirect_to).with({:controller => 'tree_display', :action => "list"})
 
       controller.run_intelligent_assignment
@@ -206,6 +199,7 @@ describe LotteryController do
       end
       it "should reduce the number of teams by the number of empty teams in the assignment" do
         number_of_teams = AssignmentTeam.count
+        pp "This is inside remove_empty_teams" + number_of_teams.to_s
         number_of_teams_in_assignment = Assignment.find(@assignment.id).teams.count
         controller.send(:remove_empty_teams, @assignment)
         expect(AssignmentTeam.count).to eq(number_of_teams - 1)

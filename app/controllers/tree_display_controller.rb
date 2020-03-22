@@ -255,13 +255,8 @@ class TreeDisplayController < ApplicationController
       instructor_ids = []
       TaMapping.where(ta_id: instructor_id).each {|mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
       return session[:user].role_id == 2 and instructor_ids.include? session[:user].id
-    else
-      return false
     end
-    # if session[:user].role_id == 2
-    #   TaMapping.where(ta_id: instructor_id).each {|mapping| return true if Course.find(mapping.course_id).instructor_id == session[:user].id }
-    # end
-    # false
+    false
   end
 
   def update_is_available_2(res_nested, instructor_id, child)

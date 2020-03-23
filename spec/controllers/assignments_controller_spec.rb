@@ -385,7 +385,7 @@ describe AssignmentsController do
             force: 'true'
         }
         session = {user: instructor}
-        post :get, params, session
+        get :list_submissions, params, session
         expect(flash[:error]).to be nil
       end
     end

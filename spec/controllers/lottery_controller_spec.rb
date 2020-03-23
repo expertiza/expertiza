@@ -157,7 +157,7 @@ describe LotteryController do
     it "should generate team bidding info hash based on newly created teams" do
       unassigned_teams = [assignment_team1, assignment_team2]
       sign_up_topics = [topic1, topic2]
-      team_bidding_info = controller.send(:construct_team_bidding_info, unassigned_teams, sign_up_topics)
+      team_bidding_info = controller.send(:construct_teams_bidding_info, unassigned_teams, sign_up_topics)
       expect(team_bidding_info.size).to eq(2)
     end
   end

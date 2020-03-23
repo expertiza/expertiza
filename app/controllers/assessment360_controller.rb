@@ -27,7 +27,6 @@ class Assessment360Controller < ApplicationController
       instance_variable_set("@overall_#{type}_review_grades", {})
       instance_variable_set("@overall_#{type}_review_count", {})
     end
-    
     @course_participants.each do |cp|
       # for each assignment
       # [aggregrate_review_grades_per_stu, review_count_per_stu] --> [0, 0]
@@ -107,9 +106,8 @@ class Assessment360Controller < ApplicationController
         assignment_grade_summary(cp, assignment_id, user_id)
 
         peer_review_score = find_peer_review_score(user_id, assignment_id)
-        unless peer_review_score.dig(:review, :scores, :avg).nil?
-          @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
-        end
+        return if peer_review_score.dig(:review, :scores, :avg).nil?
+        @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
       end
     end
   end
@@ -122,9 +120,8 @@ class Assessment360Controller < ApplicationController
     team_id = TeamsUser.team_id(assignment_id, user_id)
     team = Team.find(team_id)
     @assignment_grades[cp.id][assignment_id] = team[:grade_for_submission]
-    unless @assignment_grades[cp.id][assignment_id].nil?
-      @final_grades[cp.id] += @assignment_grades[cp.id][assignment_id]
-    end
+    return if @assignment_grades[cp.id][assignment_id].nil?
+    @final_grades[cp.id] += @assignment_grades[cp.id][assignment_id]
   end
 
   def inspect_course_participants(course_participants)
@@ -179,4 +176,3 @@ class Assessment360Controller < ApplicationController
   helper_method :format_score
   helper_method :format_topic
 end
-

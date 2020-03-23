@@ -228,17 +228,18 @@ class Assignment < ActiveRecord::Base
     check_condition('review_of_review_allowed_id', topic_id)
   end
 
+
+
   def delete(force = nil)
+
     begin
-      maps = ReviewResponseMap.where(reviewed_object_id: self.id)
-      maps.each {|map| map.delete(force) }
+      review_type(ReviewResponseMap,force)
     rescue StandardError
       raise "There is at least one review response that exists for #{self.name}."
     end
 
     begin
-      maps = TeammateReviewResponseMap.where(reviewed_object_id: self.id)
-      maps.each {|map| map.delete(force) }
+      review_type(TeammateReviewResponseMap,force)
     rescue StandardError
       raise "There is at least one teammate review response that exists for #{self.name}."
     end
@@ -532,7 +533,7 @@ class Assignment < ActiveRecord::Base
         tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg])
       else
         tcsv.push('---', '---', '---')
-      end 
+      end
     end
     review_hype_mapping_hash = {review: 'submitted_score',
                                 metareview: 'metareview_score',

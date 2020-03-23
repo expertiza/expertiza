@@ -201,4 +201,12 @@ module AssignmentHelper
     end
     rev_q_ids
   end
+
+  def review_type (responsemap_type,force)
+    maps = responsemap_type.where(reviewed_object_id: self.id)
+    maps.each {|map| map.delete(force) }
+  end
+
+
+
 end

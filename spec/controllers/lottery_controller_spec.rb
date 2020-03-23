@@ -12,10 +12,10 @@ describe LotteryController do
   let(:student2) { create(:student) }
   let(:student3) { create(:student) }
 
-  let(:topic1) { build(:topic, assignment: assignment, id: 1) }
-  let(:topic2) { build(:topic, assignment: assignment, id: 2) }
-  let(:topic3) { build(:topic, assignment: assignment, id: 3) }
-  let(:topic4) { build(:topic, assignment: assignment, id: 4) }
+  let(:topic1) { create(:topic, assignment_id: assignment.id) }
+  let(:topic2) { create(:topic, assignment_id: assignment.id) }
+  let(:topic3) { create(:topic, assignment_id: assignment.id) }
+  let(:topic4) { create(:topic, assignment_id: assignment.id) }
 
   let(:assignment_team1) { create(:assignment_team, parent_id: assignment.id) }
   let(:assignment_team2) { create(:assignment_team, parent_id: assignment.id) }
@@ -27,10 +27,19 @@ describe LotteryController do
   let(:team_user3) { build(:team_user, team_id: assignment_team1.id, user_id: student3.id, id: 3) }
 
   before :each do
-    assignment.sign_up_topics << topic1
-    assignment.sign_up_topics << topic2
-    assignment.sign_up_topics << topic3
-    assignment.sign_up_topics << topic4
+    assignment_team1.save
+    assignment_team2.save
+    assignment_team3.save
+    assignment_team4.save
+
+    team_user1.save
+    team_user2.save
+    team_user3.save
+
+    topic1.save
+    topic2.save
+    topic3.save
+    topic4.save
 
     @team_users = []
     @team_users << team_user1 << team_user2 << team_user3
@@ -110,7 +119,6 @@ describe LotteryController do
 
   describe "#construct_user_bidding_info" do
     it "generate user bidding information hash" do
-      SignedUpTeam.where(team_id: @teams[0].id, is_waitlisted: 0).any?
       user_bidding_info = controller.send(:construct_user_bidding_info, @sign_up_topics, @teams)
       expect(user_bidding_info).to eq([])
     end
@@ -120,17 +128,12 @@ describe LotteryController do
     it "create new Assignment Teams" do
       user_bidding_info = []
       teams = [[student1.id, student2.id], [student3.id]]
-      pp AssignmentTeam.all
-      pp AssignmentTeam.first.assignment
-      expect(AssignmentTeam.count).to eq(1)
+      expect(AssignmentTeam.count).to eq(4)
       expect(TeamNode.count).to eq(0)
-      expect(TeamsUser.count).to eq(0)
+      expect(TeamsUser.count).to eq(3)
       expect(TeamUserNode.count).to eq(0)
-      pp teams
       controller.send(:create_new_teams_for_bidding_response, teams, assignment, user_bidding_info)
-      pp teams
-      #expect {create(:AssignmentTeam)}.to change(AssignmentTeam, :count).by(2)
-      expect(AssignmentTeam.count).to eq(3)
+      expect(AssignmentTeam.count).to eq(6)
       expect(TeamNode.count).to eq(2)
       expect(TeamsUser.count).to eq(3)
       expect(TeamUserNode.count).to eq(3)
@@ -199,7 +202,6 @@ describe LotteryController do
       end
       it "should reduce the number of teams by the number of empty teams in the assignment" do
         number_of_teams = AssignmentTeam.count
-        pp "This is inside remove_empty_teams" + number_of_teams.to_s
         number_of_teams_in_assignment = Assignment.find(@assignment.id).teams.count
         controller.send(:remove_empty_teams, @assignment)
         expect(AssignmentTeam.count).to eq(number_of_teams - 1)

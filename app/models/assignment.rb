@@ -152,6 +152,7 @@ class Assignment < ActiveRecord::Base
   end
   alias is_using_dynamic_reviewer_assignment? dynamic_reviewer_assignment?
 
+  #Computes and returns the scores of assignment for participants and teams
   def scores(questions)
     scores = {:participants => {}, :teams => {}}
     self.participants.each do |participant|
@@ -161,16 +162,7 @@ class Assignment < ActiveRecord::Base
     self.teams.each do |team|
       scores[:teams][index.to_s.to_sym] = {:team => team, :scores => {}}
       if self.varying_rubrics_by_round?
-        grades_by_rounds = {}
-        total_score = 0
-        total_num_of_assessments = 0 # calculate grades for each rounds
-        (1..self.num_review_rounds).each do |i|
-          assessments = ReviewResponseMap.get_responses_for_team_round(team, i)
-          round_sym = ("review" + i.to_s).to_sym
-          grades_by_rounds[round_sym] = Answer.compute_scores(assessments, questions[round_sym])
-          total_num_of_assessments += assessments.size
-          total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f unless grades_by_rounds[round_sym][:avg].nil?
-        end
+        grades_by_rounds, total_num_of_assessments, total_score = compute_grades_by_rounds(questions, team)
         # merge the grades from multiple rounds
         scores[:teams][index.to_s.to_sym][:scores] = merge_grades_by_rounds(grades_by_rounds, total_num_of_assessments, total_score)
       else

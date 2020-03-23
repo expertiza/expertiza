@@ -51,7 +51,7 @@ class ImpersonateController < ApplicationController
   # checking if special character 
   def check_if_spl_char
     if warn_for_special_chars(params[:user][:name], "Username")
-          redirect_back
+          redirect_back 
           return
     end
   end
@@ -61,8 +61,10 @@ class ImpersonateController < ApplicationController
     if params[:impersonate].nil?
           user = User.find_by(name: params[:user][:name])
           if !@original_user.can_impersonate? user
-            flash[:error] = "You cannot impersonate #{params[:user][:name]}."
-	    #return 
+            @message = "You cannot impersonate '#{params[:user][:name]}'."	    
+            temp
+	    AuthController.clear_user_info(session, nil)
+	    
           else 
             clear_session
 	  end
@@ -95,7 +97,7 @@ class ImpersonateController < ApplicationController
     end
     rescue Exception => e
       flash[:error] = @message
-      redirect_to :back
+      redirect_back 
 
   end 
  
@@ -104,7 +106,7 @@ class ImpersonateController < ApplicationController
      if user
       checkif_user_impersonateable
      else
-      display_error_msg
+      #display_error_msg
      end
   end
 
@@ -150,7 +152,7 @@ class ImpersonateController < ApplicationController
 		controller: AuthHelper.get_home_controller(session[:user])
     rescue Exception => e
      flash[:error] = @message
-     redirect_to :back
+     redirect_back 
     end
   end
 end

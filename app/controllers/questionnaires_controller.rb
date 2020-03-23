@@ -7,7 +7,7 @@ class QuestionnairesController < ApplicationController
   before_action :authorize
 
   ## Constants
-  # add_new_questions
+  # Add_new_questions
   LABEL_AGREE = 'Strongly agree' # label for scored question if agree
   LABEL_DISAGREE = 'Strongly disagree' # label for scored question if disagree
   WEIGHT = 1  # question weight
@@ -107,7 +107,7 @@ class QuestionnairesController < ApplicationController
         unless params[:question].nil?
           params[:question].each_pair do |k, v|
             @question = Question.find(k)
-            # example of 'v' value
+            # Example of 'v' value
             # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
             v.each_pair do |key, value|
               @question.send(key + '=', value) if @question.send(key) != value
@@ -129,12 +129,12 @@ class QuestionnairesController < ApplicationController
     return unless @questionnaire
     begin
       name = @questionnaire.name
-      # if this rubric is used by some assignment, flash error
+      # If this rubric is used by some assignment, flash error
       unless @questionnaire.assignments.empty?
         raise "The assignment <b>#{@questionnaire.assignments.first.try(:name)}</b> uses this questionnaire. Are sure you want to delete the assignment?"
       end
       questions = @questionnaire.questions
-      # if this rubric had some answers, flash error
+      # If this rubric had some answers, flash error
       questions.each do |question|
         raise "There are responses based on this rubric, we suggest you do not delete it." unless question.answers.empty?
       end
@@ -196,7 +196,7 @@ class QuestionnairesController < ApplicationController
       if params[:save]
         params[:question].each_pair do |k, v|
           @question = Question.find(k)
-          # example of 'v' value
+          # Example of 'v' value
           # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
           v.each_pair do |key, value|
             @question.send(key + '=', value) if @question.send(key) != value
@@ -219,14 +219,14 @@ class QuestionnairesController < ApplicationController
 
   private
 
-  # save questionnaire object after create or edit
+  # Save questionnaire object after create or edit
   def save
     @questionnaire.save!
     save_questions @questionnaire.id if !@questionnaire.id.nil? and @questionnaire.id > 0
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
   end
 
-  # save questions that have been added to a questionnaire
+  # Save questions that have been added to a questionnaire
   def save_new_questions(questionnaire_id)
     return unless params[:new_question]
     # The new_question array contains all the new questions
@@ -237,12 +237,12 @@ class QuestionnairesController < ApplicationController
       q.questionnaire_id = questionnaire_id
       q.type = params[:question_type][question_key][:type]
       q.seq = question_key.to_i
-      q.weight = WEIGHT # setting the weight to 1 for quiz questionnaire since the model validates this field
+      q.weight = WEIGHT # Setting the weight to 1 for quiz questionnaire since the model validates this field
       q.save unless q.txt.strip.empty?
     end
   end
 
-  # delete questions from a questionnaire
+  # Delete questions from a questionnaire
   # @param [Object] questionnaire_id
   def delete_questions(questionnaire_id)
     # Deletes any questions that, as a result of the edit, are no longer in the questionnaire
@@ -258,7 +258,7 @@ class QuestionnairesController < ApplicationController
 
       next unless should_delete
       question.question_advices.each(&:destroy)
-      # keep track of the deleted questions
+      # Keep track of the deleted questions
       @deleted_questions.push(question)
       question.destroy
     end
@@ -272,7 +272,7 @@ class QuestionnairesController < ApplicationController
     return unless params[:question]
     params[:question].each_key do |question_key|
       if params[:question][question_key][:txt].strip.empty?
-        # question text is empty, delete the question
+        # Question text is empty, delete the question
         Question.delete(question_key)
       else
         # Update existing question.
@@ -291,8 +291,8 @@ class QuestionnairesController < ApplicationController
     @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
     @questionnaire.type = params[:questionnaire][:type]
     # Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
-    # In the future, we need to write migration files to make them consistency.
-    # E1903 : We are not sure of other type of cases, so have added a if statement. If there are only 5 cases, remove the if statement
+    # In the future, consider migrating files to maintain consistency.
+    # If statement is used to check display type cases. If there are only 5 cases, remove the if statement
     if %w[AuthorFeedback CourseSurvey TeammateReview GlobalSurvey AssignmentSurvey].include?(display_type)
       display_type = (display_type.split /(?=[A-Z])/).join("%")
     end

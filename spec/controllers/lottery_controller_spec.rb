@@ -77,15 +77,6 @@ describe LotteryController do
     end
   end
 
-#  describe "#create_new_teams_for_bidding_response" do
-#    it "should create team and return teamid" do
-#      assignment = double("Assignment")
-#      team = double("team")
-#      allow(team).to receive(:create_new_teams_for_bidding_response).with(assignment).and_return(:teamid)
-#      expect(team.create_new_teams_for_bidding_response(assignment)).to eq(:teamid)
-#    end
-#  end
-
   describe "#auto_merge_teams" do
     it "sorts the unassigned teams" do
       assignment = double("Assignment")
@@ -99,7 +90,6 @@ describe LotteryController do
     end
   end
 
-  # Starting to write my own tests
   describe "#action_allowed?" do
     it "allows Instructors, Teaching Assistants, Administrators to run the bid" do
       user = instructor

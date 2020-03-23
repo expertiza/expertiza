@@ -154,6 +154,22 @@ module AssignmentHelper
     end
   end
 
+  #Method extracted from scores method in assignment.rb This method computes and returns grades by rounds and
+  #total_num_of_assessments and total_score when the assignment has varying rubrics by round
+  def compute_grades_by_rounds(questions, team)
+    grades_by_rounds = {}
+    total_score = 0
+    total_num_of_assessments = 0 # calculate grades for each rounds
+    (1..self.num_review_rounds).each do |i|
+      assessments = ReviewResponseMap.get_responses_for_team_round(team, i)
+      round_sym = ("review" + i.to_s).to_sym
+      grades_by_rounds[round_sym] = Answer.compute_scores(assessments, questions[round_sym])
+      total_num_of_assessments += assessments.size
+      total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f unless grades_by_rounds[round_sym][:avg].nil?
+    end
+    return grades_by_rounds, total_num_of_assessments, total_score
+  end
+
   # merge the grades from multiple rounds Jasmine:extracted from scores method in assignment.rb (for OSS Project E2009)
   def merge_grades_by_rounds(grades_by_rounds, num_of_assessments, total_score)
     team_scores = {:max => 0, :min => 0, :avg => nil}

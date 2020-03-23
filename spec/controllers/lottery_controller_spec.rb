@@ -86,15 +86,6 @@ describe LotteryController do
     end
   end
 
-#  describe "#create_new_teams_for_bidding_response" do
-#    it "should create team and return teamid" do
-#      assignment = double("Assignment")
-#      team = double("team")
-#      allow(team).to receive(:create_new_teams_for_bidding_response).with(assignment).and_return(:teamid)
-#      expect(team.create_new_teams_for_bidding_response(assignment)).to eq(:teamid)
-#    end
-#  end
-
   describe "#auto_merge_teams" do
     it "sorts the unassigned teams" do
       assignment = double("Assignment")
@@ -137,12 +128,12 @@ describe LotteryController do
     end
     it "generate users bidding information hash" do
       users_bidding_info = controller.send(:construct_users_bidding_info, @sign_up_topics, @teams)
-      expect(users_bidding_info).to eq([{:pid=>student1.id, :ranks=>[1, 0, 0, 3]},
-                                        {:pid=>student2.id, :ranks=>[1, 0, 0, 3]},
-                                        {:pid=>student3.id, :ranks=>[1, 0, 0, 3]},
-                                        {:pid=>student4.id, :ranks=>[0, 2, 0, 1]},
-                                        {:pid=>student5.id, :ranks=>[0, 0, 0, 5]},
-                                        {:pid=>student6.id, :ranks=>[0, 0, 0, 5]}])
+      expect(users_bidding_info).to eq([{pid: student1.id, ranks: [1, 0, 0, 3]},
+                                        {pid: student2.id, ranks: [1, 0, 0, 3]},
+                                        {pid: student3.id, ranks: [1, 0, 0, 3]},
+                                        {pid: student4.id, ranks: [0, 2, 0, 1]},
+                                        {pid: student5.id, ranks: [0, 0, 0, 5]},
+                                        {pid: student6.id, ranks: [0, 0, 0, 5]}])
     end
   end
 
@@ -169,7 +160,7 @@ describe LotteryController do
       allow(controller).to receive(:log)
       allow(controller).to receive(:flash).and_return({})
       allow(Assignment).to receive(:find_by).with(id: assignment.id).and_return(assignment)
-      expect(controller).to receive(:redirect_to).with({:controller => 'tree_display', :action => "list"})
+      expect(controller).to receive(:redirect_to).with(controller: 'tree_display', action: "list")
 
       controller.run_intelligent_assignment
     end
@@ -190,8 +181,8 @@ describe LotteryController do
       controller.send(:match_new_teams_to_topics, assignment2)
       expect(assignment2.is_intelligent).to eq(false)
       expect(assignment.is_intelligent).to eq(true)
-      bid1 = Bid.create(team_id: assignment_team1.id, topic_id: topic1.id)
-      bid2 = Bid.create(team_id: assignment_team2.id, topic_id: topic2.id)
+      Bid.create(team_id: assignment_team1.id, topic_id: topic1.id)
+      Bid.create(team_id: assignment_team2.id, topic_id: topic2.id)
       controller.send(:match_new_teams_to_topics, assignment)
       expect(assignment.is_intelligent).to eq(false)
     end

@@ -45,6 +45,7 @@ class Criterion < ScoredQuestion
     safe_join(["<TR>".html_safe, "</TR>".html_safe], html.html_safe)
   end
 
+  # Reduced the number of lines. Removed some redundant if-else statements, and combined some HTML concatenations.
   def complete(count, answer = nil, questionnaire_min, questionnaire_max, dropdown_or_scale)
     if self.size.nil?
       cols = '70'
@@ -63,17 +64,14 @@ class Criterion < ScoredQuestion
       advice_total_length += question_advice.advice.length if question_advice.advice && question_advice.advice != ""
     end
 
-    #Sahil: Check this out
     if !question_advices.empty? and advice_total_length > 0
       html += '<a id="showAdvice_' + self.id.to_s + '" onclick="showAdvice(' + self.id.to_s + ')">Show advice</a><script>'
       html += 'function showAdvice(i){var element = document.getElementById("showAdivce_" + i.toString());'
       html += 'var show = element.innerHTML == "Hide advice";'
-      html += 'if (show){element.innerHTML="Show advice";}'
-      html += 'else{element.innerHTML="Hide advice";}toggleAdvice(i);}'
+      html += 'if (show){element.innerHTML="Show advice";} else{element.innerHTML="Hide advice";}toggleAdvice(i);}'
 
       html += 'function toggleAdvice(i) {var elem = document.getElementById(i.toString() + "_myDiv");'
-      html += 'if (elem.style.display == "none") {elem.style.display = "";}'
-      html += 'else {elem.style.display = "none";}}</script>'
+      html += 'if (elem.style.display == "none") {elem.style.display = "";} else {elem.style.display = "none";}}</script>'
 
       html += '<div id="' + self.id.to_s + '_myDiv" style="display: none;">'
       # [2015-10-26] Zhewei:
@@ -94,14 +92,12 @@ class Criterion < ScoredQuestion
       current_value = ""
       current_value += 'data-current-rating =' + answer.answer.to_s if !answer.nil?
 
-      #Sahil: Check this out
       html += '<div><select id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" class="review-rating" ' + current_value + '>' + "<option value = ''>--</option>" + '<option value='
       questionnaire_min.upto(questionnaire_max).each do |j|
-        html += j.to_s if !answer.nil? and j == answer.answer + ' selected="selected"'  '>'        
+        html += j.to_s + 'selected="selected"' if !answer.nil? and j == answer.answer + '>'        
         html += j.to_s + "-"
-        html += self.min_label if self.min_label.present? and j == questionnaire_min
-        html += self.max_label if self.max_label.present? and j == questionnaire_max
-        html += "</option>"
+        html += self.min_label if self.min_label.present? and j == questionnaire_min + "</option>"
+        html += self.max_label if self.max_label.present? and j == questionnaire_max + "</option>"
       end
       html += '</select></div><br><br><textarea' + ' id="responses_' + count.to_s + '_comments"' \
        ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
@@ -113,11 +109,7 @@ class Criterion < ScoredQuestion
       (questionnaire_min..questionnaire_max).each do |j|
         html += '<td width="10%"><label>' + j.to_s + '</label></td>'
       end
-      html += '<td width="10%"></td></tr><tr><td width="10%">'
-
-      #Sahil: Check this out
-
-      html += self.min_label if !self.min_label.nil? + '</td>'
+      html += '<td width="10%"></td></tr><tr><td width="10%">' + self.min_label if !self.min_label.nil? + '</td>'
 
       (questionnaire_min..questionnaire_max).each do |j|
         html += '<td width="10%"><input type="radio" id="' + j.to_s + '" value="' + j.to_s + '" name="Radio_' + self.id.to_s + '"'
@@ -127,14 +119,10 @@ class Criterion < ScoredQuestion
       html += 'var checked_value = jQuery("input[name=Radio_' + self.id.to_s + ']:checked").val();'
       html += 'response_score.val(checked_value);});</script><td width="10%">'
 
-      #Sahil: Check this out
-
       html += self.max_label if !self.max_label.nil? + '</td><td width="10%"></td></tr></table>'
-
       html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments"' \
         ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
       html += answer.comments unless answer.nil? + '</textarea>'
-
     end
     safe_join(["".html_safe, "".html_safe], html.html_safe)
   end
@@ -145,6 +133,7 @@ class Criterion < ScoredQuestion
 
     score = answer && !answer.answer.nil? ? answer.answer.to_s : "-"
     score_percent = score != "-" ? answer.answer * 1.0 / questionnaire_max : 0
+
 
     score_color = if score_percent > 0.8
                     "c5"
@@ -162,6 +151,7 @@ class Criterion < ScoredQuestion
     html += '<div class="' + score_color + '" style="width:30px; height:30px;' \
       ' border-radius:50%; font-size:15px; color:black; line-height:30px; text-align:center;">'
     html += score + '</div></td>'
+
     if answer && !answer.comments.nil?
       html += '<td style="padding-left:10px"><br>' + answer.comments.html_safe + '</td>'
       #### start code to show tag prompts ####

@@ -106,7 +106,7 @@ class Assessment360Controller < ApplicationController
         assignment_grade_summary(cp, assignment_id, user_id)
 
         peer_review_score = find_peer_review_score(user_id, assignment_id)
-        return if peer_review_score.dig(:review, :scores, :avg).nil?
+        next if peer_review_score.dig(:review, :scores, :avg).nil?
         @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
       end
     end

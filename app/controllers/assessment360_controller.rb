@@ -74,7 +74,7 @@ class Assessment360Controller < ApplicationController
 
   # Calculate the overall average review grade that a student has gotten from their teammate(s) and instructor(s)
   def avg_review_calc_per_student(cp, review_info_per_stu, review)
-    # Check to see if the student has been given a review 
+    # check to see if the student has been given a review 
     if review_info_per_stu[1] > 0
       temp_avg_grade = review_info_per_stu[0] * 1.0 / review_info_per_stu[1]
       review[cp.id][:avg_grade_for_assgt] = temp_avg_grade.round.to_s + '%'
@@ -103,10 +103,11 @@ class Assessment360Controller < ApplicationController
         user_id = cp.user_id
         assignment_id = assignment.id
         assignment_participant = assignment.participants.find_by(user_id: user_id)
-        # Break out of the loop if there are no participants in the assignment
+        # break out of the loop if there are no participants in the assignment
         next if assignment.participants.find_by(user_id: user_id).nil?
-        # Break out of the loop if the participant has no team
+        # break out of the loop if the participant has no team
         next if TeamsUser.team_id(assignment_id, user_id).nil?
+        # pull information about the student's grades for particular assignment
         assignment_grade_summary(cp, assignment_id)
 
         peer_review_score = find_peer_review_score(user_id, assignment_id)
@@ -118,10 +119,10 @@ class Assessment360Controller < ApplicationController
 
   def assignment_grade_summary(cp, assignment_id)
     user_id = cp.user_id
-    # A topic exists if a team signed up for a topic, which can be found via the user and the assignment
+    # topic exists if a team signed up for a topic, which can be found via the user and the assignment
     topic_id = SignedUpTeam.topic_id(assignment_id, user_id)
     @topics[cp.id][assignment_id] = SignUpTopic.find_by(id: topic_id)
-    # Instructor grade is stored in the team model, which is found by finding the user's team for the assignment
+    # instructor grade is stored in the team model, which is found by finding the user's team for the assignment
     team_id = TeamsUser.team_id(assignment_id, user_id)
     team = Team.find(team_id)
     @assignment_grades[cp.id][assignment_id] = team[:grade_for_submission]
@@ -136,6 +137,9 @@ class Assessment360Controller < ApplicationController
     end
   end
 
+  # The function populates the hash value for all students for all the reviews that they have gotten.
+  # I.e., Teammate and Meta for each of the assignments that they have taken
+  # This value is then used to display the overall teammate_review and meta_review grade in the view 
   def populate_hash_for_all_students_all_reviews(assignment,
                                                  course_participant,
                                                  reviews,
@@ -143,14 +147,18 @@ class Assessment360Controller < ApplicationController
                                                  overall_review_grade_hash,
                                                  overall_review_count_hash,
                                                  review_info_per_stu)
+    # If a student has not taken an assignment or if they have not received any grade for the same,
+    # assign it as 0 instead of leaving it blank. This helps in easier calculation of overall grade 
     overall_review_grade_hash[assignment.id] = 0 unless overall_review_grade_hash.key?(assignment.id)
     overall_review_count_hash[assignment.id] = 0 unless overall_review_count_hash.key?(assignment.id)
     grades = 0
+    # Check if they person has gotten any review for the assignment
     if reviews.count > 0
       reviews.each {|review| grades += review.average_score.to_i }
       avg_grades = (grades * 1.0 / reviews.count).round
       hash_per_stu[course_participant.id][assignment.id] = avg_grades.to_s + '%'
     end
+    # Calculate sum of averages to get student's overall grade 
     if avg_grades and grades > 0
       # for each assignment
       review_info_per_stu[0] += avg_grades

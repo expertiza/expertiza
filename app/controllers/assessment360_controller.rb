@@ -74,7 +74,7 @@ class Assessment360Controller < ApplicationController
 
   # Calculate the overall average review grade that a student has gotten from their teammate(s) and instructor(s)
   def avg_review_calc_per_student(cp, review_info_per_stu, review)
-    # check to see if the student has been given a review 
+    # check to see if the student has been given a review
     if review_info_per_stu[1] > 0
       temp_avg_grade = review_info_per_stu[0] * 1.0 / review_info_per_stu[1]
       review[cp.id][:avg_grade_for_assgt] = temp_avg_grade.round.to_s + '%'
@@ -139,7 +139,7 @@ class Assessment360Controller < ApplicationController
 
   # The function populates the hash value for all students for all the reviews that they have gotten.
   # I.e., Teammate and Meta for each of the assignments that they have taken
-  # This value is then used to display the overall teammate_review and meta_review grade in the view 
+  # This value is then used to display the overall teammate_review and meta_review grade in the view
   def populate_hash_for_all_students_all_reviews(assignment,
                                                  course_participant,
                                                  reviews,
@@ -148,7 +148,7 @@ class Assessment360Controller < ApplicationController
                                                  overall_review_count_hash,
                                                  review_info_per_stu)
     # If a student has not taken an assignment or if they have not received any grade for the same,
-    # assign it as 0 instead of leaving it blank. This helps in easier calculation of overall grade 
+    # assign it as 0 instead of leaving it blank. This helps in easier calculation of overall grade
     overall_review_grade_hash[assignment.id] = 0 unless overall_review_grade_hash.key?(assignment.id)
     overall_review_count_hash[assignment.id] = 0 unless overall_review_count_hash.key?(assignment.id)
     grades = 0
@@ -158,7 +158,7 @@ class Assessment360Controller < ApplicationController
       avg_grades = (grades * 1.0 / reviews.count).round
       hash_per_stu[course_participant.id][assignment.id] = avg_grades.to_s + '%'
     end
-    # Calculate sum of averages to get student's overall grade 
+    # Calculate sum of averages to get student's overall grade
     if avg_grades and grades > 0
       # for each assignment
       review_info_per_stu[0] += avg_grades

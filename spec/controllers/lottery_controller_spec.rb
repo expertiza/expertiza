@@ -8,9 +8,12 @@ describe LotteryController do
   let(:instructor) { build(:instructor) }
   let(:admin) { build(:admin) }
 
-  let(:student1) { create(:student) }
-  let(:student2) { create(:student) }
-  let(:student3) { create(:student) }
+  let(:student1) { create(:student, name: "student1") }
+  let(:student2) { create(:student, name: "student2") }
+  let(:student3) { create(:student, name: "student3") }
+  let(:student4) { create(:student, name: "student4") }
+  let(:student5) { create(:student, name: "student5") }
+  let(:student6) { create(:student, name: "student6") }
 
   let(:topic1) { create(:topic, assignment_id: assignment.id) }
   let(:topic2) { create(:topic, assignment_id: assignment.id) }
@@ -22,9 +25,12 @@ describe LotteryController do
   let(:assignment_team3) { create(:assignment_team, parent_id: assignment.id) }
   let(:assignment_team4) { create(:assignment_team, parent_id: assignment.id) }
 
-  let(:team_user1) { build(:team_user, team_id: assignment_team1.id, user_id: student1.id, id: 1) }
-  let(:team_user2) { build(:team_user, team_id: assignment_team1.id, user_id: student2.id, id: 2) }
-  let(:team_user3) { build(:team_user, team_id: assignment_team1.id, user_id: student3.id, id: 3) }
+  let(:team_user1) { create(:team_user, team_id: assignment_team1.id, user_id: student1.id, id: 1) }
+  let(:team_user2) { create(:team_user, team_id: assignment_team1.id, user_id: student2.id, id: 2) }
+  let(:team_user3) { create(:team_user, team_id: assignment_team1.id, user_id: student3.id, id: 3) }
+  let(:team_user4) { create(:team_user, team_id: assignment_team2.id, user_id: student4.id, id: 4) }
+  let(:team_user5) { create(:team_user, team_id: assignment_team3.id, user_id: student5.id, id: 5) }
+  let(:team_user6) { create(:team_user, team_id: assignment_team3.id, user_id: student6.id, id: 6) }
 
   before :each do
     assignment_team1.save
@@ -35,6 +41,9 @@ describe LotteryController do
     team_user1.save
     team_user2.save
     team_user3.save
+    team_user4.save
+    team_user5.save
+    team_user6.save
 
     topic1.save
     topic2.save
@@ -107,10 +116,23 @@ describe LotteryController do
     end
   end
 
-  describe "#construct_user_bidding_info" do
-    it "generate user bidding information hash" do
+  describe "#construct_users_bidding_info" do
+    before :each do
+      @bid1 = create(:bid, topic_id: topic1.id, team_id: assignment_team1.id, priority: 1)
+      @bid2 = create(:bid, topic_id: topic2.id, team_id: assignment_team2.id, priority: 2)
+      @bid3 = create(:bid, topic_id: topic4.id, team_id: assignment_team2.id, priority: 1)
+      @bid3 = create(:bid, topic_id: topic3.id, team_id: assignment_team2.id, priority: nil)
+      @bid4 = create(:bid, topic_id: topic4.id, team_id: assignment_team3.id, priority: 5)
+      @bid5 = create(:bid, topic_id: topic4.id, team_id: assignment_team1.id, priority: 3)
+    end
+    it "generate users bidding information hash" do
       users_bidding_info = controller.send(:construct_users_bidding_info, @sign_up_topics, @teams)
-      expect(users_bidding_info).to eq([])
+      expect(users_bidding_info).to eq([{pid: student1.id, ranks: [1, 0, 0, 3]},
+                                        {pid: student2.id, ranks: [1, 0, 0, 3]},
+                                        {pid: student3.id, ranks: [1, 0, 0, 3]},
+                                        {pid: student4.id, ranks: [0, 2, 0, 1]},
+                                        {pid: student5.id, ranks: [0, 0, 0, 5]},
+                                        {pid: student6.id, ranks: [0, 0, 0, 5]}])
     end
   end
 
@@ -120,12 +142,12 @@ describe LotteryController do
       teams = [[student1.id, student2.id], [student3.id]]
       expect(AssignmentTeam.count).to eq(4)
       expect(TeamNode.count).to eq(0)
-      expect(TeamsUser.count).to eq(3)
+      expect(TeamsUser.count).to eq(6)
       expect(TeamUserNode.count).to eq(0)
       controller.send(:create_new_teams_for_bidding_response, teams, assignment, user_bidding_info)
       expect(AssignmentTeam.count).to eq(6)
       expect(TeamNode.count).to eq(2)
-      expect(TeamsUser.count).to eq(3)
+      expect(TeamsUser.count).to eq(6)
       expect(TeamUserNode.count).to eq(3)
     end
   end
@@ -137,18 +159,18 @@ describe LotteryController do
       allow(controller).to receive(:log)
       allow(controller).to receive(:flash).and_return({})
       allow(Assignment).to receive(:find_by).with(id: assignment.id).and_return(assignment)
-      expect(controller).to receive(:redirect_to).with({:controller => 'tree_display', :action => "list"})
+      expect(controller).to receive(:redirect_to).with(controller: 'tree_display', action: "list")
 
       controller.run_intelligent_assignment
     end
   end
 
-  describe "#construct_team_bidding_info" do
-    it "should generate team bidding info hash based on newly created teams" do
+  describe "#construct_teams_bidding_info" do
+    it "should generate teams bidding info hash based on newly created teams" do
       unassigned_teams = [assignment_team1, assignment_team2]
       sign_up_topics = [topic1, topic2]
-      team_bidding_info = controller.send(:construct_teams_bidding_info, unassigned_teams, sign_up_topics)
-      expect(team_bidding_info.size).to eq(2)
+      teams_bidding_info = controller.send(:construct_teams_bidding_info, unassigned_teams, sign_up_topics)
+      expect(teams_bidding_info.size).to eq(2)
     end
   end
 
@@ -158,8 +180,8 @@ describe LotteryController do
       controller.send(:match_new_teams_to_topics, assignment2)
       expect(assignment2.is_intelligent).to eq(false)
       expect(assignment.is_intelligent).to eq(true)
-      bid1 = Bid.create(team_id: assignment_team1.id, topic_id: topic1.id)
-      bid2 = Bid.create(team_id: assignment_team2.id, topic_id: topic2.id)
+      Bid.create(team_id: assignment_team1.id, topic_id: topic1.id)
+      Bid.create(team_id: assignment_team2.id, topic_id: topic2.id)
       controller.send(:match_new_teams_to_topics, assignment)
       expect(assignment.is_intelligent).to eq(false)
     end

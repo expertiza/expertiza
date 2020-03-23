@@ -460,4 +460,10 @@ FactoryBot.define do
     assignment_id 1
     max_choosers 4
   end
+
+  factory :bid, class: Bid do
+    topic_id 1
+    team_id 1
+    priority 1
+  end
 end

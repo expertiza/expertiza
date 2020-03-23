@@ -54,7 +54,8 @@ class LotteryController < ApplicationController
       bids = []
       sign_up_topics.each do |topic|
         bid_record = Bid.find_by(team_id: team.id, topic_id: topic.id)
-        bids << (bid_record.nil? ? 0 : bid_record.priority ||= 0)
+        bids << (bid_record.try(:priority) || 0)
+        # bids << (bid_record.nil? ? 0 : bid_record.priority ||= 0)
       end
       team.users.each {|user| users_bidding_info << {pid: user.id, ranks: bids} } unless bids.uniq == [0]
     end
@@ -102,7 +103,7 @@ class LotteryController < ApplicationController
 
   # Destroy current team_user and team_user node if exists
   def remove_user_from_previous_team(assignment_id, user_id)
-    team_user = TeamsUser.where(user_id: user_id).find{|team_user| team_user.team.parent_id == assignment_id }
+    team_user = TeamsUser.where(user_id: user_id).find {|team_user| team_user.team.parent_id == assignment_id }
     team_user.team_user_node.destroy rescue nil
     team_user.destroy rescue nil
   end

@@ -2,10 +2,6 @@ include AssignmentHelper
 require 'pp'
 
 describe LotteryController do
-  #let(:assignment) do
-  #  build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true,
-  #  participants: [build(:participant)], directory_path: 'same path', teams: [], course_id: 1)
-  #end
   let(:assignment) {build(:assignment, id: 3, is_intelligent: true)}
   let(:student) { build(:student) }
   let(:ta) { build(:teaching_assistant) }

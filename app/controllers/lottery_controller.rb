@@ -12,7 +12,7 @@ class LotteryController < ApplicationController
   # This method is to send request to web service and use k-means and students' bidding data to build teams automatically.
   # rubocop:disable Metrics/AbcSize
   def run_intelligent_assignment
-    assignment = Assignment.find_by(id: params[:id])
+    assignment = Assignment.find(params[:id])
     teams = assignment.teams
 
     users_bidding_info = construct_users_bidding_info(assignment.sign_up_topics, teams)
@@ -170,7 +170,7 @@ class LotteryController < ApplicationController
     teams_bidding_info.each do |tb|
       tb[:bids].each do |bid|
         num_of_signed_up_teams = SignedUpTeam.where(topic_id: bid[:topic_id]).count
-        max_choosers = SignUpTopic.find_by(id: bid[:topic_id]).try(:max_choosers)
+        max_choosers = SignUpTopic.find(bid[:topic_id]).try(:max_choosers)
         if num_of_signed_up_teams < max_choosers
           SignedUpTeam.create(team_id: tb[:team_id], topic_id: bid[:topic_id])
           break

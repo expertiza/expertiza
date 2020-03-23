@@ -50,6 +50,20 @@ describe LotteryController do
     topic3.save
     topic4.save
 
+    create(:bid, topic_id: topic1.id, team_id: assignment_team1.id, priority: 1)
+    create(:bid, topic_id: topic2.id, team_id: assignment_team2.id, priority: 2)
+    create(:bid, topic_id: topic4.id, team_id: assignment_team2.id, priority: 1)
+    create(:bid, topic_id: topic3.id, team_id: assignment_team2.id, priority: nil)
+    create(:bid, topic_id: topic4.id, team_id: assignment_team3.id, priority: 5)
+    create(:bid, topic_id: topic4.id, team_id: assignment_team1.id, priority: 3)
+
+    @expected_users_bidding_info = [{pid: student1.id, ranks: [1, 0, 0, 3]},
+                                    {pid: student2.id, ranks: [1, 0, 0, 3]},
+                                    {pid: student3.id, ranks: [1, 0, 0, 3]},
+                                    {pid: student4.id, ranks: [0, 2, 0, 1]},
+                                    {pid: student5.id, ranks: [0, 0, 0, 5]},
+                                    {pid: student6.id, ranks: [0, 0, 0, 5]}]
+
     @team_users = []
     @team_users << team_user1 << team_user2 << team_user3
 
@@ -118,22 +132,9 @@ describe LotteryController do
   end
 
   describe "#construct_users_bidding_info" do
-    before :each do
-      @bid1 = create(:bid, topic_id: topic1.id, team_id: assignment_team1.id, priority: 1)
-      @bid2 = create(:bid, topic_id: topic2.id, team_id: assignment_team2.id, priority: 2)
-      @bid3 = create(:bid, topic_id: topic4.id, team_id: assignment_team2.id, priority: 1)
-      @bid3 = create(:bid, topic_id: topic3.id, team_id: assignment_team2.id, priority: nil)
-      @bid4 = create(:bid, topic_id: topic4.id, team_id: assignment_team3.id, priority: 5)
-      @bid5 = create(:bid, topic_id: topic4.id, team_id: assignment_team1.id, priority: 3)
-    end
     it "generate users bidding information hash" do
       users_bidding_info = controller.send(:construct_users_bidding_info, @sign_up_topics, @teams)
-      expect(users_bidding_info).to eq([{pid: student1.id, ranks: [1, 0, 0, 3]},
-                                        {pid: student2.id, ranks: [1, 0, 0, 3]},
-                                        {pid: student3.id, ranks: [1, 0, 0, 3]},
-                                        {pid: student4.id, ranks: [0, 2, 0, 1]},
-                                        {pid: student5.id, ranks: [0, 0, 0, 5]},
-                                        {pid: student6.id, ranks: [0, 0, 0, 5]}])
+      expect(users_bidding_info).to eq(@expected_users_bidding_info)
     end
   end
 
@@ -176,6 +177,11 @@ describe LotteryController do
   end
 
   describe "#match_new_teams_to_topics" do
+    before :each do
+      bid = Bid.find_by(topic_id: topic3.id, team_id: assignment_team2.id)
+      bid.priority = 0
+      bid.save
+    end
     it "assigns topics to teams" do
       expect(assignment2.is_intelligent).to eq(false)
       controller.send(:match_new_teams_to_topics, assignment2)
@@ -246,13 +252,14 @@ describe LotteryController do
                             {pid: team_user3.id, ranks: [3, 2, 1, 1]}]
     end
     it "should create bids objects of the newly-merged team on each sign-up topics" do
-      expect(Bid.count).to eq(0)
+      bid_count = Bid.count
       controller.send(:merge_bids_from_different_previous_teams, @sign_up_topics, @team_id, @user_ids, @user_bidding_info)
-      expect(Bid.count).to eq(4)
-      expect(Bid.find_by(topic_id: 1, team_id: 1).priority).to eq(1)
-      expect(Bid.find_by(topic_id: 2, team_id: 1).priority).to eq(3)
-      expect(Bid.find_by(topic_id: 3, team_id: 1).priority).to eq(2)
-      expect(Bid.find_by(topic_id: 4, team_id: 1).priority).to eq(4)
+      expect(Bid.count).to eq(bid_count + 4)
+      expect(Bid.find_by(topic_id: 1, team_id: 1, priority: 1)).to_not be nil
+      expect(Bid.find_by(topic_id: 2, team_id: 1, priority: 3)).to_not be nil
+      expect(Bid.find_by(topic_id: 3, team_id: 1, priority: 2)).to_not be nil
+      expect(Bid.find_by(topic_id: 4, team_id: 1, priority: 4)).to_not be nil
+      expect(Bid.find_by(topic_id: 1, team_id: 1, priority: 2)).to be nil
     end
   end
 end

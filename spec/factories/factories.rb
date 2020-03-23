@@ -454,4 +454,10 @@ FactoryBot.define do
     id 1
     name 'fake_site'
   end
+
+  factory :sign_up_topic, class: SignUpTopic do
+    id 1
+    assignment_id 1
+    max_choosers 4
+  end
 end

@@ -182,7 +182,7 @@ class Criterion < ScoredQuestion
       end
       #### end code to show tag prompts ####
     end
-    html += '#</tr></table>'
+    html += '</tr></table>'
     safe_join(["".html_safe, "".html_safe], html.html_safe)
   end
 end

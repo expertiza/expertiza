@@ -15,7 +15,7 @@ class Assessment360Controller < ApplicationController
     course = Course.find(params[:course_id])
     @assignments = course.assignments.reject(&:is_calibrated).reject {|a| a.participants.empty? }
     @course_participants = course.get_participants
-    inspect_course_participants(@course_participants)
+    insure_existence_of(@course_participants)
     # hashes for view
     @meta_review = {}
     @teammate_review = {}
@@ -60,10 +60,10 @@ class Assessment360Controller < ApplicationController
       review_info_per_student(cp, @meta_review_info_per_stu, @meta_review)
     end
     # avoid divide by zero error
-    avoid_divide_by_zero_error(@assignments, @overall_teammate_review_count, @overall_meta_review_count)
+    overall_review_count(@assignments, @overall_teammate_review_count, @overall_meta_review_count)
   end
 
-  def avoid_divide_by_zero_error(assignments, overall_teammate_review_count, overall_meta_review_count)
+  def overall_review_count(assignments, overall_teammate_review_count, overall_meta_review_count)
     assignments.each do |assignment|
       temp_count = overall_teammate_review_count[assignment.id]
       overall_review_count_hash = 1 if temp_count.nil? or temp_count.zero?
@@ -91,7 +91,7 @@ class Assessment360Controller < ApplicationController
     course = Course.find(params[:course_id])
     @assignments = course.assignments.reject(&:is_calibrated).reject {|a| a.participants.empty? }
     @course_participants = course.get_participants
-    inspect_course_participants(@course_participants)
+    insure_existence_of(@course_participants)
     @course_participants.each do |cp|
       @topics[cp.id] = {}
       @assignment_grades[cp.id] = {}
@@ -124,7 +124,7 @@ class Assessment360Controller < ApplicationController
     @final_grades[cp.id] += @assignment_grades[cp.id][assignment_id]
   end
 
-  def inspect_course_participants(course_participants)
+  def insure_existence_of(course_participants)
     if course_participants.empty?
       flash[:error] = "There is no course participant in course #{course.name}"
       redirect_to(:back)

@@ -63,8 +63,6 @@ class TreeDisplayController < ApplicationController
   # Returns the contents of the Courses and Questionaire subfolders
   def get_sub_folder_contents
     # Convert the object received in parameters to a FolderNode object.
-    #TODO: If the object passed in by params were stored as a FolderNode it
-    #      would be easier to process by this method.
     folder_node = (params[:reactParams2][:nodeType]).constantize.new
     params[:reactParams2][:child_nodes].each do |key, value|
       folder_node[key] = value

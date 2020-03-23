@@ -106,7 +106,7 @@ class ImpersonateController < ApplicationController
      if user
       checkif_user_impersonateable
      else
-      #display_error_msg
+      display_error_msg
      end
   end
 

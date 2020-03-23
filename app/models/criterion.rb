@@ -132,7 +132,11 @@ class Criterion < ScoredQuestion
     html = '<b>' + count.to_s + ". " + self.txt + ' [Max points: ' + questionnaire_max.to_s + "]</b>"
 
     score = answer && !answer.answer.nil? ? answer.answer.to_s : "-"
-    score_percent = score != "-" ? answer.answer * 1.0 / questionnaire_max : 0
+    score_percent = if score != "-"
+                      answer.answer * 1.0 / questionnaire_max
+                    else
+                      0
+                    end
 
 
     score_color = if score_percent > 0.8
@@ -147,13 +151,17 @@ class Criterion < ScoredQuestion
                     "c1"
                   end
 
-    html += '<table cellpadding="5"><tr><td>'
+    html += '<table cellpadding="5">'
+    html += '<tr>'
+    html += '<td>'
     html += '<div class="' + score_color + '" style="width:30px; height:30px;' \
       ' border-radius:50%; font-size:15px; color:black; line-height:30px; text-align:center;">'
     html += score + '</div></td>'
 
     if answer && !answer.comments.nil?
-      html += '<td style="padding-left:10px"><br>' + answer.comments.html_safe + '</td>'
+      html += '<td style="padding-left:10px">'
+      html += '<br>' + answer.comments.html_safe
+      html += '</td>'
       #### start code to show tag prompts ####
       unless tag_prompt_deployments.nil?
         # show check boxes for answer tagging

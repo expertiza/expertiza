@@ -61,7 +61,7 @@ class AssignmentsController < ApplicationController
     @assignment_form.update(assignment_form_params, current_user)
   end
 
-  # helper method for update_assignment_form
+  # helper method for update_assignment_form to handle non existent directory path
   def handle_assignment_directory_path_nonexist(assignment_form_params)
     assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}" \
     if assignment_form_params[:assignment][:directory_path].blank?

@@ -211,7 +211,15 @@ describe LotteryController do
   end
 
   describe "#assign_available_slots" do
-    it "should" do
+    before :each do
+      @sign_up_topic = create(:sign_up_topic, topic_name: "test_topic", assignment_id: assignment.id, max_choosers: 4)
+      @topic_bids1 = [{topic_id: @sign_up_topic.id, priority: 1}]
+      @team_bids = [{team_id: assignment_team1.id, bids: @topic_bids1}]
+    end
+    it "should assign topic to team of biggest size" do
+      number_of_signed_up_teams = SignedUpTeam.count
+      controller.send(:assign_available_slots, @team_bids)
+      expect(SignedUpTeam.count).to eq(number_of_signed_up_teams + 1)
     end
   end
 

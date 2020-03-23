@@ -113,7 +113,6 @@ describe LotteryController do
     end
   end
 
-  # Starting to write my own tests
   describe "#action_allowed?" do
     it "allows Instructors, Teaching Assistants, Administrators to run the bid" do
       user = instructor

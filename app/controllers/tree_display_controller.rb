@@ -40,7 +40,7 @@ class TreeDisplayController < ApplicationController
 
   # direct access to bookmark review rubrics
   def goto_bookmark_reviews
-    goto_controller('Bookmark Review')
+    goto_controller('Bookmark Rating')
   end
 
   # direct access to author feedbacks

@@ -367,7 +367,7 @@ describe AssignmentsController do
             force: 'true'
         }
         session = {user: instructor}
-        post :delete, params, session
+        post :remove_assignment_from_course, params, session
         expect(flash[:error]).to be nil
         expect(response).to redirect_to('/tree_display/list')
       end

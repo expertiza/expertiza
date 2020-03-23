@@ -362,8 +362,12 @@ describe AssignmentsController do
         assignment_form = AssignmentForm.new
         allow(AssignmentForm).to receive(:new).and_return(assignment_form)
         allow(assignment_form).to receive(:remove_assignment_from_course).with('true')
-        
-        get :remove_assignment_from_course
+        params = {
+            id: 1,
+            force: 'true'
+        }
+        session = {user: instructor}
+        post :delete, params, session
         expect(flash[:error]).to be nil
         expect(response).to redirect_to('/tree_display/list')
       end

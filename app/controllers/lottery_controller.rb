@@ -56,7 +56,7 @@ class LotteryController < ApplicationController
         bid_record = Bid.find_by(team_id: team.id, topic_id: topic.id)
         bids << (bid_record.nil? ? 0 : bid_record.priority ||= 0)
       end
-      team.users.each {|user| user_bidding_info << {pid: user.id, ranks: bids} } if bids.uniq != [0]
+      team.users.each {|user| user_bidding_info << {pid: user.id, ranks: bids} } unless bids.uniq == [0]
     end
     user_bidding_info
   end
@@ -90,7 +90,7 @@ class LotteryController < ApplicationController
         new_team_user = TeamsUser.create(user_id: user_id, team_id: new_team.id)
         TeamUserNode.create(parent_id: team_node.id, node_object_id: new_team_user.id)
 
-        # Create new bids for team based on `bidding_data` variable for each team member
+        # Create new bids for team based on `ranks` variable for each team member
         # Currently, it is possible (already proved by db records) that
         # some team has multiple 1st priority, multiply 2nd priority, ....
         # these multiple identical priorities come from different previous teams

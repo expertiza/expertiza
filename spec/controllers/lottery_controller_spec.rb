@@ -115,7 +115,7 @@ describe LotteryController do
   describe "#construct_user_bidding_info" do
     it "generate user bidding information hash" do
       SignedUpTeam.where(team_id: @teams[0].id, is_waitlisted: 0).any?
-      user_bidding_info = controller.send(:construct_user_bidding_info, @sign_up_topics, @teams)
+      user_bidding_info = controller.send(:construct_users_bidding_info, @sign_up_topics, @teams)
       expect(user_bidding_info).to eq([])
     end
   end

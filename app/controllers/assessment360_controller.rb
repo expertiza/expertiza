@@ -56,8 +56,8 @@ class Assessment360Controller < ApplicationController
                                                    @meta_review_info_per_stu)
       end
       # calculate average grade for each student on all assignments in this course
-      review_info_per_student(cp, @teammate_review_info_per_stu, @teammate_review)
-      review_info_per_student(cp, @meta_review_info_per_stu, @meta_review)
+      avg_review_calc_per_student(cp, @teammate_review_info_per_stu, @teammate_review)
+      avg_review_calc_per_student(cp, @meta_review_info_per_stu, @meta_review)
     end
     # avoid divide by zero error
     overall_review_count(@assignments, @overall_teammate_review_count, @overall_meta_review_count)
@@ -72,7 +72,9 @@ class Assessment360Controller < ApplicationController
     end
   end
 
-  def review_info_per_student(cp, review_info_per_stu, review)
+  # Calculate the overall average review grade that a student has gotten from their teammate(s) and instructor(s)
+  def avg_review_calc_per_student(cp, review_info_per_stu, review)
+    # Check to see if the student has been given a review 
     if review_info_per_stu[1] > 0
       temp_avg_grade = review_info_per_stu[0] * 1.0 / review_info_per_stu[1]
       review[cp.id][:avg_grade_for_assgt] = temp_avg_grade.round.to_s + '%'

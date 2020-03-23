@@ -103,9 +103,11 @@ class Assessment360Controller < ApplicationController
         user_id = cp.user_id
         assignment_id = assignment.id
         assignment_participant = assignment.participants.find_by(user_id: user_id)
+        # Break out of the loop if there are no participants in the assignment
         next if assignment.participants.find_by(user_id: user_id).nil?
+        # Break out of the loop if the participant has no team
         next if TeamsUser.team_id(assignment_id, user_id).nil?
-        assignment_grade_summary(cp, assignment_id, user_id)
+        assignment_grade_summary(cp, assignment_id)
 
         peer_review_score = find_peer_review_score(user_id, assignment_id)
         next if peer_review_score.dig(:review, :scores, :avg).nil?
@@ -114,7 +116,8 @@ class Assessment360Controller < ApplicationController
     end
   end
 
-  def assignment_grade_summary(cp, assignment_id, user_id)
+  def assignment_grade_summary(cp, assignment_id)
+    user_id = cp.user_id
     # A topic exists if a team signed up for a topic, which can be found via the user and the assignment
     topic_id = SignedUpTeam.topic_id(assignment_id, user_id)
     @topics[cp.id][assignment_id] = SignUpTopic.find_by(id: topic_id)

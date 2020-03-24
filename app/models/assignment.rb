@@ -420,21 +420,21 @@ class Assignment < ActiveRecord::Base
 
   # Generates a single row based on the detail_options selected
   def self.csv_row(detail_options, answer)
-    tcsv = []
+    teams_csv = []
     @response = Response.find(answer.response_id)
     map = ResponseMap.find(@response.map_id)
     @reviewee = Team.find_by id: map.reviewee_id
     @reviewee = Participant.find(map.reviewee_id).user if @reviewee.nil?
     reviewer = Participant.find(map.reviewer_id).user
-    tcsv << handle_nil(@reviewee.id) if detail_options['team_id'] == 'true'
-    tcsv << handle_nil(@reviewee.name) if detail_options['team_name'] == 'true'
-    tcsv << handle_nil(reviewer.name) if detail_options['reviewer'] == 'true'
-    tcsv << handle_nil(answer.question.txt) if detail_options['question'] == 'true'
-    tcsv << handle_nil(answer.question.id) if detail_options['question_id'] == 'true'
-    tcsv << handle_nil(answer.id) if detail_options['comment_id'] == 'true'
-    tcsv << handle_nil(answer.comments) if detail_options['comments'] == 'true'
-    tcsv << handle_nil(answer.answer) if detail_options['score'] == 'true'
-    tcsv
+    teams_csv << handle_nil(@reviewee.id) if detail_options['team_id'] == 'true'
+    teams_csv << handle_nil(@reviewee.name) if detail_options['team_name'] == 'true'
+    teams_csv << handle_nil(reviewer.name) if detail_options['reviewer'] == 'true'
+    teams_csv << handle_nil(answer.question.txt) if detail_options['question'] == 'true'
+    teams_csv << handle_nil(answer.question.id) if detail_options['question_id'] == 'true'
+    teams_csv << handle_nil(answer.id) if detail_options['comment_id'] == 'true'
+    teams_csv << handle_nil(answer.comments) if detail_options['comments'] == 'true'
+    teams_csv << handle_nil(answer.answer) if detail_options['score'] == 'true'
+    teams_csv
   end
 
   # Populate answers will review information
@@ -506,25 +506,25 @@ class Assignment < ActiveRecord::Base
     (0..@scores[:teams].length - 1).each do |index|
       team = @scores[:teams][index.to_s.to_sym]
       first_participant = team[:team].participants[0] unless team[:team].participants[0].nil?
-      tcsv = []
-      tcsv << team[:team].name
+      teams_csv = []
+      teams_csv << team[:team].name
       names_of_participants = ''
       team[:team].participants.each do |p|
         names_of_participants += p.fullname
         names_of_participants += '; ' unless p == team[:team].participants.last
       end
-      tcsv << names_of_participants
+      teams_csv << names_of_participants
       export_data_fields(options)
-      csv << tcsv
+      csv << teams_csv
     end
   end
 
   def self.export_data_fields(options)
     if options['team_score'] == 'true'
       if team[:scores]
-        tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg])
+        teams_csv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg])
       else
-        tcsv.push('---', '---', '---')
+        teams_csv.push('---', '---', '---')
       end
     end
     review_hype_mapping_hash = {review: 'submitted_score',
@@ -534,14 +534,14 @@ class Assignment < ActiveRecord::Base
     review_hype_mapping_hash.each do |review_type, score_name|
       export_individual_data_fields(review_type, score_name)
     end
-    tcsv.push(pscore[:total_score])
+    teams_csv.push(pscore[:total_score])
   end
 
   def self.export_individual_data_fields(review_type, score_name)
     if pscore[review_type]
-      tcsv.push(pscore[review_type][:scores][:max], pscore[review_type][:scores][:min], pscore[review_type][:scores][:avg])
+      teams_csv.push(pscore[review_type][:scores][:max], pscore[review_type][:scores][:min], pscore[review_type][:scores][:avg])
     elsif options[score_name]
-      tcsv.push('---', '---', '---')
+      teams_csv.push('---', '---', '---')
     end
   end
 

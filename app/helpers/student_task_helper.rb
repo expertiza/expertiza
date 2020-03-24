@@ -5,7 +5,7 @@ module StudentTaskHelper
        participant.try(:review_grade).try(:comment_for_reviewer).nil?
       result = "N/A"
     else
-      info = "Score: " + participant.try(:review_grade).try(:grade_for_reviewer).to_s + "/100\n"
+      info = "Score: " + participant.try(:review_grade).try(:grade_for_reviewer).to_s + "/40\n"
       info += "Comment: " + participant.try(:review_grade).try(:comment_for_reviewer).to_s
       info = truncate(info, length: 1500, omission: '...')
       result = "<img src = '/assets/info.png' title = '" + info + "'>"
@@ -36,5 +36,9 @@ module StudentTaskHelper
       end
     end
     info.html_safe
+  end
+
+  def review_deadline?(assignment)
+    assignment.find_due_dates('review').present?
   end
 end

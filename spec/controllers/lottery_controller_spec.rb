@@ -70,20 +70,6 @@ describe LotteryController do
     @sign_up_topics = assignment.sign_up_topics
   end
 
-#  describe "#run_intelligent_assignmnent" do
-#    it "webservice call should be successful" do
-#      dat = double("data")
-#      rest = double("RestClient")
-#      result = RestClient.get 'http://www.google.com', content_type: :json, accept: :json
-#      expect(result.code).to eq(200)
-#    end
-
- #   it "should return json response" do
- #     result = RestClient.get 'https://www.google.com', content_type: :json, accept: :json
- #     expect(result.header['Content-Type']).to include 'application/json' rescue result
- #   end
- # end
-
   describe "#action_allowed?" do
     it "allows Instructors, Teaching Assistants, Administrators to run the bid" do
       user = instructor
@@ -201,7 +187,7 @@ describe LotteryController do
 
   describe "#assign_available_slots" do
     before :each do
-      @sign_up_topic = create(:sign_up_topic, topic_name: "test_topic", assignment_id: assignment.id, max_choosers: 4)
+      @sign_up_topic = topic1
       @topic_bids1 = [{topic_id: @sign_up_topic.id, priority: 1}]
       @team_bids = [{team_id: assignment_team1.id, bids: @topic_bids1}]
     end

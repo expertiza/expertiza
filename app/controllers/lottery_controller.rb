@@ -13,7 +13,7 @@ class LotteryController < ApplicationController
   # to build teams automatically.
   # The webservice tries to create teams with sizes close to the max team size
   # allowed by the assignment by potentially combining existing smaller teams
-  # that have similar bidding info/priorities associated with the assignment's signup topics. 
+  # that have similar bidding info/priorities associated with the assignment's signup topics.
   #
   # rubocop:disable Metrics/AbcSize
   def run_intelligent_assignment

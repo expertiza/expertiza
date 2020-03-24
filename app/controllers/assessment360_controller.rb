@@ -109,9 +109,8 @@ class Assessment360Controller < ApplicationController
         next if TeamsUser.team_id(assignment_id, user_id).nil?
         # pull information about the student's grades for particular assignment
         assignment_grade_summary(cp, assignment_id)
-
         peer_review_score = find_peer_review_score(user_id, assignment_id)
-        next if peer_review_score.dig(:review, :scores, :avg).nil?
+        next if (peer_review_score[:review] && peer_review_score[:review][:scores] && peer_review_score[:review][:scores][:avg]).nil?
         @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
       end
     end
@@ -174,7 +173,6 @@ class Assessment360Controller < ApplicationController
     participant = AssignmentParticipant.find_by(user_id: user_id, parent_id: assignment_id)
     assignment = participant.assignment
     questions = retrieve_questions assignment.questionnaires, assignment_id
-
     participant.scores(questions)
   end
 

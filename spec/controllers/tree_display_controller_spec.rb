@@ -65,6 +65,8 @@ describe TreeDisplayController do
 
     it "returns a list of course objects(private) as json" do
       params = FolderNode.all
+      @course.private = true
+      @course.save
       get :get_folder_contents, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @instructor
       expect(response.body).to match /csc517\/test/
     end

@@ -1,5 +1,4 @@
 include AssignmentHelper
-require 'pp'
 
 describe LotteryController do
   let(:assignment) { create(:assignment, is_intelligent: true) }
@@ -71,47 +70,19 @@ describe LotteryController do
     @sign_up_topics = assignment.sign_up_topics
   end
 
-  describe "#run_intelligent_assignmnent" do
-    it "webservice call should be successful" do
-      dat = double("data")
-      rest = double("RestClient")
-      result = RestClient.get 'http://www.google.com', content_type: :json, accept: :json
-      expect(result.code).to eq(200)
-    end
+#  describe "#run_intelligent_assignmnent" do
+#    it "webservice call should be successful" do
+#      dat = double("data")
+#      rest = double("RestClient")
+#      result = RestClient.get 'http://www.google.com', content_type: :json, accept: :json
+#      expect(result.code).to eq(200)
+#    end
 
-    it "should return json response" do
-      result = RestClient.get 'https://www.google.com', content_type: :json, accept: :json
-      expect(result.header['Content-Type']).to include 'application/json' rescue result
-    end
-  end
-
-  describe "#run_intelligent_bid" do
-    it "should do intelligent assignment" do
-      assignment = double("Assignment")
-      allow(assignment).to receive(:is_intelligent) { 1 }
-      expect(assignment.is_intelligent).to eq(1)
-    end
-
-    it "should exit gracefully when assignment not intelligent" do
-      assignment = double("Assignment")
-      allow(assignment).to receive(:is_intelligent) { 0 }
-      expect(assignment.is_intelligent).to eq(0)
-      redirect_to(controller: 'tree_display')
-    end
-  end
-
-  describe "#auto_merge_teams" do
-    it "sorts the unassigned teams" do
-      assignment = double("Assignment")
-      team = double("team")
-      unassignedteam = double("team")
-      sortedteam = double("team")
-      allow(team).to receive(:where).with(assignment).and_return(unassignedteam)
-      allow(unassignedteam).to receive(:sort_by).and_return(sortedteam)
-      expect(team.where(assignment)).to eq(unassignedteam)
-      expect(unassignedteam.sort_by).to eq(sortedteam)
-    end
-  end
+ #   it "should return json response" do
+ #     result = RestClient.get 'https://www.google.com', content_type: :json, accept: :json
+ #     expect(result.header['Content-Type']).to include 'application/json' rescue result
+ #   end
+ # end
 
   describe "#action_allowed?" do
     it "allows Instructors, Teaching Assistants, Administrators to run the bid" do
@@ -157,7 +128,7 @@ describe LotteryController do
     it "should redirect to list action in tree_display controller" do
       params = ActionController::Parameters.new(id: assignment.id)
       allow(controller).to receive(:params).and_return(params)
-      allow(controller).to receive(:log)
+      session[:user] = instructor
       allow(controller).to receive(:flash).and_return({})
       allow(Assignment).to receive(:find_by).with(id: assignment.id).and_return(assignment)
       expect(controller).to receive(:redirect_to).with(controller: 'tree_display', action: "list")

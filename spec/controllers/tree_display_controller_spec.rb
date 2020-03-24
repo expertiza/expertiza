@@ -27,22 +27,6 @@ describe TreeDisplayController do
     end
   end
 
-  describe "#populate_rows" do
-    let(:dbl) { double }
-    before { expect(dbl).to receive(:populate_rows).with(Hash, String) }
-    it "passes when the arguments match" do
-      dbl.populate_rows({}, "")
-    end
-  end
-
-  describe "#populate_1_row" do
-    let(:dbl) { double }
-    before { expect(dbl).to receive(:populate_1_row).with(Node) }
-    it "passes when the arguments match" do
-      dbl.populate_1_row(Node.new)
-    end
-  end
-
   describe "#drill" do
     it "redirect to list action" do
       get "drill", root: 1

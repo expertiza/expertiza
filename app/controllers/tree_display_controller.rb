@@ -2,10 +2,12 @@ class TreeDisplayController < ApplicationController
   helper :application
   include SecurityHelper
 
+  # Checks controller permissions
   def action_allowed?
     true
   end
 
+  # Confirm when user attempts to delete a node.
   def confirm
     @id = params[:id]
     @node_type = params[:nodeType]
@@ -98,6 +100,7 @@ class TreeDisplayController < ApplicationController
     end
   end
 
+  # Gets root 'level' of tree and redirects to the list action
   def drill
     session[:root] = params[:root]
     redirect_to controller: 'tree_display', action: 'list'

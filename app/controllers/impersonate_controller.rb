@@ -90,8 +90,8 @@ class ImpersonateController < ApplicationController
               @message = "You cannot impersonate '#{params[:impersonate][:name]}'."
             else
               @message = "No original account was found. Please close your browser and start a new session."
-           end 
-       end
+            end 
+          end
     end
     rescue Exception => e
       flash[:error] = @message
@@ -101,11 +101,11 @@ class ImpersonateController < ApplicationController
  
   # Main operation 
   def main_operation(user)
-     if user
-      checkif_user_impersonateable
-     else
-      display_error_msg
-     end
+    if user
+     checkif_user_impersonateable
+    else
+     display_error_msg
+    end
   end
 
  
@@ -119,30 +119,30 @@ class ImpersonateController < ApplicationController
 
     #Impersonate using form on /impersonate/start
     if params[:impersonate].nil?
-      #check if special chars /\?<>|&$# are used to avoid html tags or system command
-      check_if_spl_char
-      user = User.find_by(name: params[:user][:name])
-      main_operation(user)
+     #check if special chars /\?<>|&$# are used to avoid html tags or system command
+     check_if_spl_char
+     user = User.find_by(name: params[:user][:name])
+     main_operation(user)
 
     else
-      # Impersonate a new account
-      if !params[:impersonate][:name].empty?
-        #check if special chars /\?<>|&$# are used to avoid html tags or system command
-        check_if_spl_char
-        user = User.find_by(name: params[:impersonate][:name])
-        main_operation(user)
+     # Impersonate a new account
+     if !params[:impersonate][:name].empty?
+       #check if special chars /\?<>|&$# are used to avoid html tags or system command
+       check_if_spl_char
+       user = User.find_by(name: params[:impersonate][:name])
+       main_operation(user)
 
       # Revert to original account
-      else
-        if !session[:super_user].nil?
-	  AuthController.clear_user_info(session, nil)
-          session[:user] = session[:super_user]
-          user = session[:user]
-          session[:super_user] = nil
-        else
-          display_error_msg
-        end
-      end
+     else
+       if !session[:super_user].nil?
+	 AuthController.clear_user_info(session, nil)
+         session[:user] = session[:super_user]
+         user = session[:user]
+         session[:super_user] = nil
+       else
+         display_error_msg
+       end
+     end
     end
     # Navigate to user's home location
     AuthController.set_current_role(user.role_id, session)

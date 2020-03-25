@@ -92,9 +92,10 @@ class Criterion < ScoredQuestion
       current_value = ""
       current_value += 'data-current-rating =' + answer.answer.to_s if !answer.nil?
 
-      html += '<div><select id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" class="review-rating" ' + current_value + '>' + "<option value = ''>--</option>" + '<option value='
+      html += '<div><select id="responses_' + count.to_s + '_score" name="responses[' + count.to_s
+      html += '][score]" class="review-rating" ' + current_value + '>' + "<option value = ''>--</option>" + '<option value='
       questionnaire_min.upto(questionnaire_max).each do |j|
-        html += j.to_s + 'selected="selected"' if !answer.nil? and j == answer.answer + '>'        
+        html += j.to_s + 'selected="selected"' if !answer.nil? and j == answer.answer + '>'
         html += j.to_s + "-"
         html += self.min_label if self.min_label.present? and j == questionnaire_min + "</option>"
         html += self.max_label if self.max_label.present? and j == questionnaire_max + "</option>"
@@ -115,7 +116,8 @@ class Criterion < ScoredQuestion
         html += '<td width="10%"><input type="radio" id="' + j.to_s + '" value="' + j.to_s + '" name="Radio_' + self.id.to_s + '"'
         html += 'checked="checked"' if (!answer.nil? and answer.answer == j) or (answer.nil? and questionnaire_min == j) + '></td>'
       end
-      html += '<script>jQuery("input[name=Radio_' + self.id.to_s + ']:radio").change(function() {var response_score = jQuery("#responses_' + count.to_s + '_score");'
+      html += '<script>jQuery("input[name=Radio_' + self.id.to_s
+      html += ']:radio").change(function() {var response_score = jQuery("#responses_' + count.to_s + '_score");'
       html += 'var checked_value = jQuery("input[name=Radio_' + self.id.to_s + ']:checked").val();'
       html += 'response_score.val(checked_value);});</script><td width="10%">'
 

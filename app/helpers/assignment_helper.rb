@@ -173,7 +173,9 @@ module AssignmentHelper
   # merge the grades from multiple rounds Jasmine:extracted from scores method in assignment.rb (for OSS Project E2009)
   def merge_grades_by_rounds(grades_by_rounds, num_of_assessments, total_score)
     team_scores = {:max => 0, :min => 0, :avg => nil}
-    return team_scores if !num_of_assessments
+    if num_of_assessments == 0
+      return team_scores
+    end
 
     team_scores[:max] = -999_999_999
     team_scores[:min] = 999_999_999

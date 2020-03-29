@@ -212,9 +212,27 @@ class QuestionnairesController < ApplicationController
   # Save questionnaire object after create or edit
   def save
     @questionnaire.save!
-    # Check that questionnaire ID is valid before saving
+    # Check that questionnaire ID is valid before saving questions
     save_questions @questionnaire.id if !@questionnaire.id.nil? and @questionnaire.id > 0
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
+  end
+
+  # Handles questions whose wording changed as a result of the edit
+  # @param [Object] questionnaire_id
+  def save_questions(questionnaire_id)
+    delete_questions questionnaire_id
+    save_new_questions questionnaire_id
+    return unless params[:question]
+    params[:question].each_key do |question_key|
+      if params[:question][question_key][:txt].strip.empty?
+        # Question text is empty, delete the question
+        Question.delete(question_key)
+      else
+        # Update existing question.
+        question = Question.find(question_key)
+        Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
+      end
+    end
   end
 
   # Save questions that have been added to a questionnaire
@@ -230,6 +248,18 @@ class QuestionnairesController < ApplicationController
       q.seq = question_key.to_i
       q.weight = WEIGHT # Setting the weight to 1 for quiz questionnaire since the model validates this field
       q.save unless q.txt.strip.empty?
+    end
+  end
+
+  # Save all questions in updated params[:question] hash
+  def save_question_hash(params)
+    params[:question].each_pair do |k, v|
+      @question = Question.find(k)
+      v.each_pair do |key, value|
+        @question.send(key + '=', value) if @question.send(key) != value
+      end
+      @question.save
+      flash[:success] = 'All questions have been successfully saved!'
     end
   end
 
@@ -252,35 +282,6 @@ class QuestionnairesController < ApplicationController
       # Keep track of the deleted questions
       @deleted_questions.push(question)
       question.destroy
-    end
-  end
-
-  # Handles questions whose wording changed as a result of the edit
-  # @param [Object] questionnaire_id
-  def save_questions(questionnaire_id)
-    delete_questions questionnaire_id
-    save_new_questions questionnaire_id
-    return unless params[:question]
-    params[:question].each_key do |question_key|
-      if params[:question][question_key][:txt].strip.empty?
-        # Question text is empty, delete the question
-        Question.delete(question_key)
-      else
-        # Update existing question.
-        question = Question.find(question_key)
-        Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
-      end
-    end
-  end
-
-  def save_question_hash(params)
-    params[:question].each_pair do |k, v|
-      @question = Question.find(k)
-      v.each_pair do |key, value|
-        @question.send(key + '=', value) if @question.send(key) != value
-      end
-      @question.save
-      flash[:success] = 'All questions have been successfully saved!'
     end
   end
 

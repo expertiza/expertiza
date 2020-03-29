@@ -445,7 +445,6 @@ resources :institution, except: [:destroy] do
       post :list
       post :children_node_ng
       post :children_node_2_ng
-      post :bridge_to_is_available
       get :session_last_open_tab
       get :set_session_last_open_tab
     end

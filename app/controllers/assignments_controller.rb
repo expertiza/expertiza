@@ -55,23 +55,23 @@ class AssignmentsController < ApplicationController
   # updates assignment form with changes in assignment questionnaire and due date
   def update_assignment_form(exist_assignment)
     assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
-    handle_assignment_directory_path_nonexist(assignment_form_params)
+    handle_assignment_directory_path_nonexistent(assignment_form_params)
     assignment_form_params[:assignment_questionnaire] = update_assignment_questionnaire(assignment_form_params, exist_assignment)
     assignment_form_params[:due_date] = update_assignment_due_date(assignment_form_params, exist_assignment)
     @assignment_form.update(assignment_form_params, current_user)
   end
-
+  
   # helper method for update_assignment_form to handle non existent directory path
-  def handle_assignment_directory_path_nonexist(assignment_form_params)
+  def handle_assignment_directory_path_nonexistent(assignment_form_params)
     assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}" \
     if assignment_form_params[:assignment][:directory_path].blank?
   end
 
   # helper method for update_assignment_form: update assignment form with questionnaire array
   def update_assignment_questionnaire(assignment_form_params, exist_assignment)
-    ques_array = assignment_form_params[:assignment_questionnaire]
-    ques_array.each {|cur_questionnaire| cur_questionnaire[:assignment_id] = exist_assignment.id.to_s }
-    ques_array
+    questionnaire_array = assignment_form_params[:assignment_questionnaire]
+    questionnaire_array.each {|cur_questionnaire| cur_questionnaire[:assignment_id] = exist_assignment.id.to_s }
+    questionnaire_array
   end
 
   # helper method for update_assignment_form: update assignment form with due dates array

@@ -7,7 +7,6 @@ class QuestionnairesController < ApplicationController
   before_action :authorize
 
   ## Constants
-  # Add_new_questions
   LABEL_AGREE = 'Strongly agree' # label for scored question if agree
   LABEL_DISAGREE = 'Strongly disagree' # label for scored question if disagree
   WEIGHT = 1  # question weight
@@ -50,10 +49,12 @@ class QuestionnairesController < ApplicationController
     end
   end
 
+  # View a given questionnaire provided an ID
   def view
     @questionnaire = Questionnaire.find(params[:id])
   end
 
+  # Renders form suitable for creating a new questionnaire
   def new
     begin
       @questionnaire = Object.const_get(params[:model].split.join).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model]
@@ -62,6 +63,7 @@ class QuestionnairesController < ApplicationController
     end
   end
 
+  # Save a new questionnaire to the database
   def create
     if params[:questionnaire][:name].blank?
       flash[:error] = 'A rubric or survey must have a title.'
@@ -84,13 +86,14 @@ class QuestionnairesController < ApplicationController
     end
   end
 
-  # Edit a questionnaire
+  # Renders form suitable for editing an existing questionnaire
   def edit
     @questionnaire = Questionnaire.find(params[:id])
     redirect_to Questionnaire if @questionnaire.nil?
     session[:return_to] = request.original_url
   end
 
+  # Save an edited questionnaire to the database
   def update
     # If 'Add' or 'Edit/View advice' is clicked, redirect appropriately
     if params[:add_new_questions]
@@ -107,8 +110,6 @@ class QuestionnairesController < ApplicationController
         unless params[:question].nil?
           params[:question].each_pair do |k, v|
             @question = Question.find(k)
-            # Example of 'v' value
-            # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
             v.each_pair do |key, value|
               @question.send(key + '=', value) if @question.send(key) != value
             end
@@ -123,7 +124,7 @@ class QuestionnairesController < ApplicationController
     end
   end
 
-  # Remove a given questionnaire
+  # Remove a given questionnaire from the database provided its ID
   def delete
     @questionnaire = Questionnaire.find(params[:id])
     return unless @questionnaire
@@ -222,6 +223,7 @@ class QuestionnairesController < ApplicationController
   # Save questionnaire object after create or edit
   def save
     @questionnaire.save!
+    # Check that questionnaire ID is valid
     save_questions @questionnaire.id if !@questionnaire.id.nil? and @questionnaire.id > 0
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
   end
@@ -305,11 +307,13 @@ class QuestionnairesController < ApplicationController
     QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')
   end
 
+  # Ensures that required parameters are present for questionnaire
   def questionnaire_params
     params.require(:questionnaire).permit(:name, :instructor_id, :private, :min_question_score,
                                           :max_question_score, :type, :display_type, :instruction_loc)
   end
 
+  # Ensures that required parameters are present for questions
   def question_params
     params.require(:question).permit(:txt, :weight, :questionnaire_id, :seq, :type, :size,
                                      :alternatives, :break_before, :max_label, :min_label)

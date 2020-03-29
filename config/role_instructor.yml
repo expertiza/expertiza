@@ -479,7 +479,7 @@ development:
         controller_action_id: 64
         id: 52
         label: Bookmark Reviews
-        name: manage/questionnaires/bookmark reviews
+        name: manage/questionnaires/bookmark rating rubrics
         parent:
         parent_id: 38
         site_controller_id: 38
@@ -507,7 +507,7 @@ development:
       manage/questionnaires/global survey: *21
       manage/questionnaires/assignment surveys: *22
       manage/questionnaires/course surveys: *23
-      manage/questionnaires/bookmark reviews: *38
+      manage/questionnaires/bookmark rating rubrics: *38
       anonymized_view: *24
     crumbs:
     - 1
@@ -958,7 +958,7 @@ test:
         controller_action_id: 64
         id: 52
         label: Bookmark Reviews
-        name: manage/questionnaires/bookmark reviews
+        name: manage/questionnaires/bookmark rating rubrics
         parent:
         parent_id: 38
         site_controller_id: 38
@@ -985,7 +985,7 @@ test:
       manage/questionnaires/global survey: *20
       manage/questionnaires/assignment surveys: *21
       manage/questionnaires/course course: *22
-      manage/questionnaires/bookmark reviews: *38
+      manage/questionnaires/bookmark rating rubrics: *38
     selected:
       1: *1
     vector:
@@ -1474,7 +1474,7 @@ production:
         controller_action_id: 64
         id: 52
         label: Bookmark Reviews
-        name: manage/questionnaires/bookmark reviews
+        name: manage/questionnaires/bookmark rating rubrics
         parent:
         parent_id: 38
         site_controller_id: 38
@@ -1502,7 +1502,7 @@ production:
       manage/questionnaires/global survey: *21
       manage/questionnaires/assignment surveys: *22
       manage/questionnaires/course surveys: *23
-      manage/questionnaires/bookmark reviews: *38
+      manage/questionnaires/bookmark rating rubrics: *38
       anonymized_view: *24
     crumbs:
     - 1

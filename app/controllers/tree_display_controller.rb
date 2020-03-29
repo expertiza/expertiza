@@ -313,8 +313,8 @@ class TreeDisplayController < ApplicationController
     res_node_for_child_2(ch_nodes)
   end
 
-  # for child nodes
-  def children_node_2_ng
+  # for nested child nodes
+  def children_node_ng_nested
     child_nodes = child_nodes_from_params(params[:reactParams2][:child_nodes])
     res = get_tmp_res(params, child_nodes)
     respond_to do |format|

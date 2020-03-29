@@ -717,7 +717,7 @@ jQuery(document).ready(function() {
         });
         if(this.props.dataType!='assignment') {
             _this = this;
-            jQuery.post('/tree_display/children_node_2_ng',
+            jQuery.post('/tree_display/children_node_ng_nested',
                 {
                     reactParams2: newParams
                 },

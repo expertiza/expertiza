@@ -86,7 +86,7 @@ describe TreeDisplayController do
   end
   it { is_expected.to respond_to(:folder_node_ng_getter) }
   it { is_expected.to respond_to(:children_node_ng) }
-  it { is_expected.to respond_to(:children_node_2_ng) }
+  it { is_expected.to respond_to(:children_node_ng_nested) }
 
   describe "GET #session_last_open_tab" do
     it "returns HTTP status 200" do
@@ -332,7 +332,7 @@ describe TreeDisplayController do
       expect(output.length).to eq 2
 
       new_params = Node.find_by!(node_object_id: @course1.id)
-      post :children_node_2_ng, {reactParams2: {child_nodes: new_params.to_json, nodeType: "CourseNode"}}, user: @ta
+      post :children_node_ng_nested, {reactParams2: {child_nodes: new_params.to_json, nodeType: "CourseNode"}}, user: @ta
       output = JSON.parse(response.body)
       expect(output.length).to eq 2
     end

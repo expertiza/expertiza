@@ -3,6 +3,8 @@
 <table>
   <%= form_tag :action => "create" do %>
     <%= hidden_field_tag("topic_id", @topic.id) %>
+
+    <!-- :required attribute checks to see if title, url, and description are all present -->
     <p>
       <%= label_tag 'Title' %><br/>
       <%= text_field_tag :title, params[:title], :required => true %><br/><br/>

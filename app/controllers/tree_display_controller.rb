@@ -299,8 +299,8 @@ class TreeDisplayController < ApplicationController
     res
   end
 
-  # initialising folder node 2
-  def initialize_fnode_2(fnode, child_nodes)
+  # initialising folder nested node
+  def initialize_fnode_nested(fnode, child_nodes)
     child_nodes.each do |key, value|
       fnode[key] = value
     end
@@ -308,7 +308,7 @@ class TreeDisplayController < ApplicationController
 
   def get_tmp_res(params, child_nodes)
     fnode = (params[:reactParams2][:nodeType]).constantize.new
-    initialize_fnode_2(fnode, child_nodes)
+    initialize_fnode_nested(fnode, child_nodes)
     ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
     res_node_for_child_nested(ch_nodes)
   end

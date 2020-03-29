@@ -110,13 +110,7 @@ class QuestionnairesController < ApplicationController
 
         # Save all questions
         unless params[:question].nil?
-          params[:question].each_pair do |k, v|
-            @question = Question.find(k)
-            v.each_pair do |key, value|
-              @question.send(key + '=', value) if @question.send(key) != value
-            end
-            @question.save
-          end
+          save_question_hash(params)
         end
         flash[:success] = 'The questionnaire has been successfully updated!'
       rescue StandardError
@@ -199,16 +193,7 @@ class QuestionnairesController < ApplicationController
     questionnaire_id = params[:id]
     begin
       if params[:save]
-        # Save all questions
-        params[:question].each_pair do |k, v|
-          @question = Question.find(k)
-          v.each_pair do |key, value|
-            @question.send(key + '=', value) if @question.send(key) != value
-          end
-
-          @question.save
-          flash[:success] = 'All questions have been successfully saved!'
-        end
+        save_question_hash(params)
       end
     rescue StandardError
       flash[:error] = $ERROR_INFO
@@ -285,6 +270,17 @@ class QuestionnairesController < ApplicationController
         question = Question.find(question_key)
         Rails.logger.info(question.errors.messages.inspect) unless question.update_attributes(params[:question][question_key])
       end
+    end
+  end
+
+  def save_question_hash(params)
+    params[:question].each_pair do |k, v|
+      @question = Question.find(k)
+      v.each_pair do |key, value|
+        @question.send(key + '=', value) if @question.send(key) != value
+      end
+      @question.save
+      flash[:success] = 'All questions have been successfully saved!'
     end
   end
 

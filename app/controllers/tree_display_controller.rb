@@ -191,7 +191,6 @@ class TreeDisplayController < ApplicationController
   def update_fnode_children(fnode, tmp_res)
     # fnode is short for foldernode which is the parent node
     # ch_nodes are childrens
-    # cnode = fnode.get_children("created_at", "desc", 2, nil, nil)
     ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
     tmp_res[fnode.get_name] = ch_nodes
   end
@@ -205,7 +204,7 @@ class TreeDisplayController < ApplicationController
     update_fnode_children(fnode, tmp_res)
   end
 
-  # for child nodes
+  # process the information for child nodes
   def children_node_ng
     flash[:error] = "Invalid JSON in the TreeList" unless json_valid? params[:reactParams][:child_nodes]
     child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
@@ -254,10 +253,6 @@ class TreeDisplayController < ApplicationController
     instructor_ids = []
     TaMapping.where(ta_id: instructor_id).each {|mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
     session[:user].role_id == 2 and instructor_ids.include? session[:user].id
-    # if session[:user].role_id == 2
-    #   TaMapping.where(ta_id: instructor_id).each {|mapping| return true if Course.find(mapping.course_id).instructor_id == session[:user].id }
-    # end
-    # false
   end
 
   def update_is_available_instructor(res_nested, instructor_id, child)
@@ -276,7 +271,7 @@ class TreeDisplayController < ApplicationController
     assignments_method(child, res_nested) if child.type == "AssignmentNode"
   end
 
-  # getting result nodes for child2. res[] contains all the resultant nodes.
+  # getting result nodes for nested child. res[] contains all the resultant nodes.
   def res_node_for_child_nested(ch_nodes)
     res = []
 
@@ -313,7 +308,7 @@ class TreeDisplayController < ApplicationController
     res_node_for_child_nested(ch_nodes)
   end
 
-  # for nested child nodes
+  # process the information for nested child nodes
   def children_node_ng_nested
     child_nodes = child_nodes_from_params(params[:reactParams2][:child_nodes])
     res = get_tmp_res(params, child_nodes)

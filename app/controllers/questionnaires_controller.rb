@@ -65,6 +65,7 @@ class QuestionnairesController < ApplicationController
 
   # Save a new questionnaire to the database
   def create
+    # Check if title is provided
     if params[:questionnaire][:name].blank?
       flash[:error] = 'A rubric or survey must have a title.'
       redirect_to controller: 'questionnaires', action: 'new', model: params[:questionnaire][:type], private: params[:questionnaire][:private]
@@ -72,6 +73,7 @@ class QuestionnairesController < ApplicationController
       questionnaire_private = params[:questionnaire][:private] == 'true'
       display_type = params[:questionnaire][:type].split('Questionnaire')[0]
       begin
+        # Attempt to save the questionnaire
         @questionnaire = Object.const_get(params[:questionnaire][:type]).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
       rescue StandardError
         flash[:error] = $ERROR_INFO
@@ -139,6 +141,7 @@ class QuestionnairesController < ApplicationController
       questions.each do |question|
         raise "There are responses based on this rubric, we suggest you do not delete it." unless question.answers.empty?
       end
+      # Delete questions before removing node
       questions.each do |question|
         advices = question.question_advices
         advices.each(&:delete)
@@ -168,6 +171,7 @@ class QuestionnairesController < ApplicationController
   def add_new_questions
     questionnaire_id = params[:id] unless params[:id].nil?
     num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
+    # For each new question in questionnaire, set attributes and save object
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
       question_type = params[:question][:type] unless params[:question][:type].nil?
       question = Object.const_get(question_type).create(txt: '', questionnaire_id: questionnaire_id,
@@ -195,10 +199,9 @@ class QuestionnairesController < ApplicationController
     questionnaire_id = params[:id]
     begin
       if params[:save]
+        # Save all questions
         params[:question].each_pair do |k, v|
           @question = Question.find(k)
-          # Example of 'v' value
-          # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
           v.each_pair do |key, value|
             @question.send(key + '=', value) if @question.send(key) != value
           end
@@ -211,6 +214,7 @@ class QuestionnairesController < ApplicationController
       flash[:error] = $ERROR_INFO
     end
 
+    # If Edit or View advice is clicked, redirect appropriately
     if params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     elsif !questionnaire_id.nil?
@@ -223,7 +227,7 @@ class QuestionnairesController < ApplicationController
   # Save questionnaire object after create or edit
   def save
     @questionnaire.save!
-    # Check that questionnaire ID is valid
+    # Check that questionnaire ID is valid before saving
     save_questions @questionnaire.id if !@questionnaire.id.nil? and @questionnaire.id > 0
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
   end

@@ -277,7 +277,7 @@ class TreeDisplayController < ApplicationController
   end
 
   # getting result nodes for child2. res[] contains all the resultant nodes.
-  def res_node_for_child_2(ch_nodes)
+  def res_node_for_child_nested(ch_nodes)
     res = []
 
     if ch_nodes
@@ -310,7 +310,7 @@ class TreeDisplayController < ApplicationController
     fnode = (params[:reactParams2][:nodeType]).constantize.new
     initialize_fnode_2(fnode, child_nodes)
     ch_nodes = fnode.get_children(nil, nil, session[:user].id, nil, nil)
-    res_node_for_child_2(ch_nodes)
+    res_node_for_child_nested(ch_nodes)
   end
 
   # for nested child nodes

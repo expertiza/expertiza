@@ -133,26 +133,25 @@ class TreeDisplayController < ApplicationController
     tmp_object["instructor"] = User.find(instructor_id).name(session[:ip]) if instructor_id
   end
 
-  def update_tmp_obj(tmp_object, node)
-    tmp = {
+  def update_assignment_info(assignment_obj, node)
+    obj = {
       "directory" => node.get_directory,
       "creation_date" => node.get_creation_date,
       "updated_date" => node.get_modified_date,
       "institution" => Institution.where(id: node.retrieve_institution_id),
       "private" => node.get_instructor_id == session[:user].id
     }
-    tmp_object.merge!(tmp)
+    assignment_obj.merge!(obj)
   end
 
-  def courses_assignments_obj(node_type, tmp_object, node)
-    update_tmp_obj(tmp_object, node)
-    # tmpObject["private"] = node.get_private
+  def courses_assignments_obj(node_type, assignment_obj, node)
+    update_assignment_info(assignment_obj, node)
     instructor_id = node.get_instructor_id
     ## if current user's role is TA for a course, then that course will be listed under his course listing.
-    update_in_ta_course_listing(instructor_id, node, tmp_object)
-    update_instructor(tmp_object, instructor_id)
-    update_is_available_owner_ta(tmp_object, instructor_id, node)
-    assignments_method(node, tmp_object) if node_type == "Assignments"
+    update_in_ta_course_listing(instructor_id, node, assignment_obj)
+    update_instructor(assignment_obj, instructor_id)
+    update_is_available_owner_ta(assignment_obj, instructor_id, node)
+    assignments_method(node, assignment_obj) if node_type == "Assignments"
   end
 
   # getting result nodes for child
@@ -164,7 +163,7 @@ class TreeDisplayController < ApplicationController
   #
   # this also ensures that instructors (who are not ta) would have update_in_ta_course_listing
   # not changing the private value if he/she is not TA which was set to true for all courses before filtering
-  # in update_tmp_obj in courses_assignments_obj
+  # in update_assignment_info in courses_assignments_obj
   #
   # below objects/variable names were part of the project as before and
   # refactoring could have affected other functionalities too, so it was avoided in this fix

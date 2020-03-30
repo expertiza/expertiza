@@ -36,7 +36,7 @@
           <% sum += bookmark_rating.rating %>
         <% end %>
         <td>
-            <!-- total average rating -->
+            <!-- total average rating used for 'Avg. rating' -->
             <% totalAvg = total_average_score(bookmark) %>
             <% if totalAvg != 0 %>
               <%= totalAvg %>
@@ -55,7 +55,7 @@
             <% link_to 'Rate', :action => 'bookmark_rating', :id => bookmark.id %>
             <%= form_tag :action => "save_bookmark_rating_score", :id => bookmark.id do %>
               <% params[:rating] = rating %>
-              <!-- specific average score per user for a rubric -->
+              <!-- specific average rating used for 'Your rating' -->
               <% specAvg = specific_average_score(bookmark) %>
               <% if specAvg != 0 %>
                 <%= specAvg %>
@@ -73,7 +73,9 @@
           <% end %>
         </td>
         <td>
-          <!-- badge -->
+          <!-- badge rewards for bookmarks -->
+          <!-- full star denotes presence of badge -->
+          <!-- empty star denotes absence of badge -->
           <% if totalAvg.to_f > 3 %>
             <span class="glyphicon glyphicon-star"></span>
           <% else %>

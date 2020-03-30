@@ -1,6 +1,7 @@
 <h1>Editing bookmark</h1>
 
 <%= form_for @bookmark, :action => 'update' do |f| %>
+  <!-- :required attribute checks to see if title, url, and description are all present -->
   <p>
     <%= label_tag 'Title' %><br/>
     <%= f.text_field :title, :required => true %><br/><br/>

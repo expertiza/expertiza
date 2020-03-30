@@ -338,7 +338,7 @@ class Assignment < ActiveRecord::Base
     due_date = find_current_stage(topic_id)
 
     unless self.staggered_deadline?
-      if finished?(topic_id) && !due_date.nil? && !due_date.deadline_name.nil?
+      if !finished?(topic_id) && !due_date.nil? && !due_date.deadline_name.nil?
         return due_date.deadline_name
       else
         return get_current_stage(topic_id)

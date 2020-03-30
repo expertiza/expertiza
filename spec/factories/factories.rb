@@ -453,4 +453,10 @@ FactoryBot.define do
     id 1
     name 'fake_site'
   end
+
+  factory :bid, class: Bid do
+    topic_id 1
+    team_id 1
+    priority 1
+  end
 end

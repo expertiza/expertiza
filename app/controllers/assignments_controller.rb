@@ -29,7 +29,8 @@ class AssignmentsController < ApplicationController
     @assignment_form = AssignmentForm.new(assignment_form_params)
     if params[:button]
       if @assignment_form.save
-        handle_assignment_form_save
+        @assignment_form.create_assignment_node
+        assignment_form_save_handler
       else
         flash.now[:error] = "Failed to create assignment"
         render 'new'
@@ -38,47 +39,6 @@ class AssignmentsController < ApplicationController
       render 'new'
       undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
     end
-  end
-
-  # helper method for create: to handle when assignment form is saved
-  def handle_assignment_form_save
-    @assignment_form.create_assignment_node
-    exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
-    update_assignment_form(exist_assignment)
-    aid = Assignment.find_by(name: @assignment_form.assignment.name).id
-    ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
-    redirect_to edit_assignment_path aid
-    undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
-    return
-  end
-
-  # updates assignment form with changes in assignment questionnaire and due date
-  def update_assignment_form(exist_assignment)
-    assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
-    handle_assignment_directory_path_nonexist(assignment_form_params)
-    assignment_form_params[:assignment_questionnaire] = update_assignment_questionnaire(assignment_form_params, exist_assignment)
-    assignment_form_params[:due_date] = update_assignment_due_date(assignment_form_params, exist_assignment)
-    @assignment_form.update(assignment_form_params, current_user)
-  end
-
-  # helper method for update_assignment_form to handle non existent directory path
-  def handle_assignment_directory_path_nonexist(assignment_form_params)
-    assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}" \
-    if assignment_form_params[:assignment][:directory_path].blank?
-  end
-
-  # helper method for update_assignment_form: update assignment form with questionnaire array
-  def update_assignment_questionnaire(assignment_form_params, exist_assignment)
-    ques_array = assignment_form_params[:assignment_questionnaire]
-    ques_array.each {|cur_questionnaire| cur_questionnaire[:assignment_id] = exist_assignment.id.to_s }
-    ques_array
-  end
-
-  # helper method for update_assignment_form: update assignment form with due dates array
-  def update_assignment_due_date(assignment_form_params, exist_assignment)
-    due_array = assignment_form_params[:due_date]
-    due_array.each {|cur_due| cur_due[:parent_id] = exist_assignment.id.to_s }
-    due_array
   end
 
   def edit
@@ -262,6 +222,36 @@ class AssignmentsController < ApplicationController
     end
 
     due_date_all
+  end
+
+  # helper methods for create
+  # handle assignment form saved condition
+  def assignment_form_save_handler
+    exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
+    assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
+    handle_assignment_directory_path_nonexistent
+    update_assignment_form(exist_assignment)
+    aid = Assignment.find_by(name: @assignment_form.assignment.name).id
+    ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
+    redirect_to edit_assignment_path aid
+    undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
+  end
+
+  # update_assignment_form_params to handle non existent directory path
+  def handle_assignment_directory_path_nonexistent
+    assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}" \
+    if assignment_form_params[:assignment][:directory_path].blank?
+  end
+
+  # update assignment_form with assignment_questionnaire and due_date
+  def update_assignment_form(exist_assignment)
+    questionnaire_array = assignment_form_params[:assignment_questionnaire]
+    questionnaire_array.each {|cur_questionnaire| cur_questionnaire[:assignment_id] = exist_assignment.id.to_s }
+    assignment_form_params[:assignment_questionnaire]
+    due_array = assignment_form_params[:due_date]
+    due_array.each {|cur_due| cur_due[:parent_id] = exist_assignment.id.to_s }
+    assignment_form_params[:due_date]
+    @assignment_form.update(assignment_form_params, current_user)
   end
 
   # helper methods for copy

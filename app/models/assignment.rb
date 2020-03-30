@@ -220,7 +220,7 @@ class Assignment < ActiveRecord::Base
   # The permissions of TopicDueDate is the same as AssignmentDueDate.
   # Here, column is usually something like 'review_allowed_id'
   def check_condition(column, topic_id = nil)
-    next_due_date = DueDate.get_next_due_date(self.id, topic_id)
+    next_due_date = next_due_date(topic_id)
     return false if next_due_date.nil?
     right_id = next_due_date.send column
     right = DeadlineRight.find(right_id)
@@ -321,7 +321,7 @@ class Assignment < ActiveRecord::Base
   # if current  stage is submission or review, find the round number
   # otherwise, return 0
   def number_of_current_round(topic_id)
-    next_due_date = DueDate.get_next_due_date(self.id, topic_id)
+    next_due_date = next_due_date(topic_id)
     return 0 if next_due_date.nil?
     next_due_date.round ||= 0
   end
@@ -360,7 +360,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def stage_deadline(topic_id = nil)
-    return 'Unknown' if topic_id.nil? and self.staggered_deadline?
+    return 'Unknown' if topic_missing?(topic_id)
     due_date = find_current_stage(topic_id)
     due_date.nil? || due_date == 'Finished' ? due_date : due_date.due_at.to_s
   end
@@ -375,14 +375,14 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_current_stage(topic_id = nil)
-    next_due_date = DueDate.get_next_due_date(self.id, topic_id)
+    next_due_date = next_due_date(topic_id)
     return 'Finished' if next_due_date.nil?
     next_due_date
   end
 
   # Zhewei: this method is almost the same as 'stage_deadline'
   def get_current_stage(topic_id = nil)
-    return 'Unknown' if topic_id.nil? and self.staggered_deadline?
+    return 'Unknown' if topic_missing?(topic_id)
     due_date = find_current_stage(topic_id)
     due_date.nil? || due_date == 'Finished' ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
   end
@@ -590,6 +590,16 @@ class Assignment < ActiveRecord::Base
     else
       tcsv.push('---', '---', '---') if options[score_name]
     end
+  end
+
+  # Function to check if topic id is null when its a staggered assignment, to prevent redundancy
+  def topic_missing?(topic_id = nil)
+    topic_id.nil? and self.staggered_deadline?
+  end
+
+  # returns the next due date
+  def next_due_date(topic_id = nil)
+    DueDate.get_next_due_date(self.id, topic_id)
   end
 
   # This method is used for export contents of grade#view.  -Zhewei

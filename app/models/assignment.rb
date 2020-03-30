@@ -332,7 +332,9 @@ class Assignment < ActiveRecord::Base
 
   # For varying rubric feature
   def current_stage_name(topic_id = nil)
-    return (topic_missing?(topic_id) ? UNKNOWN_CONST : get_current_stage(topic_id))
+    if self.staggered_deadline?
+      return (topic_id.nil? ? UNKNOWN_CONST : get_current_stage(topic_id))
+    end
     due_date = find_current_stage(topic_id)
 
     unless self.staggered_deadline?

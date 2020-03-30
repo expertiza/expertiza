@@ -478,7 +478,7 @@ development:
         content_page_id:
         controller_action_id: 64
         id: 52
-        label: Bookmark Reviews
+        label: Bookmark Rating rubrics
         name: manage/questionnaires/bookmark rating rubrics
         parent:
         parent_id: 38
@@ -957,7 +957,7 @@ test:
         content_page_id:
         controller_action_id: 64
         id: 52
-        label: Bookmark Reviews
+        label: Bookmark Rating rubrics
         name: manage/questionnaires/bookmark rating rubrics
         parent:
         parent_id: 38
@@ -1473,7 +1473,7 @@ production:
         content_page_id:
         controller_action_id: 64
         id: 52
-        label: Bookmark Reviews
+        label: Bookmark Rating rubrics
         name: manage/questionnaires/bookmark rating rubrics
         parent:
         parent_id: 38

@@ -112,5 +112,17 @@ describe LotteryController do
         expect(TeamsUser.find_by(user_id: @team_user1.user_id)).to eq @team_user1
       end
     end
+    describe "#remove_empty_teams" do
+      before :each do
+        @assignment_team2 = create(:assignment_team, assignment: @assignment, teams_users: [])
+      end
+      it "should reduce the number of teams by the number of empty teams in the assignment" do
+        number_of_teams = AssignmentTeam.count
+        number_of_teams_in_assignment = Assignment.find(@assignment.id).teams.count
+        controller.send(:remove_empty_teams, @assignment)
+        expect(AssignmentTeam.count).to eq(number_of_teams - 1)
+        expect(Assignment.find(@assignment.id).teams.count).to_not eq(number_of_teams_in_assignment)
+      end
+    end
   end
 end

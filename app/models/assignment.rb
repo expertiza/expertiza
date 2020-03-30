@@ -388,7 +388,7 @@ class Assignment < ActiveRecord::Base
   def get_current_stage(topic_id = nil)
     return UNKNOWN_CONST if topic_missing?(topic_id)
     due_date = find_current_stage(topic_id)
-    due_date.nil? || finished?(topic_id) ? FINISHED_CONST : DeadlineType.find(due_date.deadline_type_id).name
+    due_date.nil? || due_date == FINISHED_CONST ? FINISHED_CONST : DeadlineType.find(due_date.deadline_type_id).name
   end
 
   def review_questionnaire_id(round = nil)

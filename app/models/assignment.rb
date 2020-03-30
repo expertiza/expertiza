@@ -42,6 +42,8 @@ class Assignment < ActiveRecord::Base
   REVIEW_STRATEGIES = [RS_AUTO_SELECTED, RS_INSTRUCTOR_SELECTED].freeze
   DEFAULT_MAX_REVIEWERS = 3
   DEFAULT_MAX_OUTSTANDING_REVIEWS = 2
+
+  # Constants for common fields, to reduce complexity if change is needed
   FINISHED_CONST = 'Finished'
   UNKNOWN_CONST = 'Unknown'
 
@@ -330,9 +332,7 @@ class Assignment < ActiveRecord::Base
 
   # For varying rubric feature
   def current_stage_name(topic_id = nil)
-    if self.staggered_deadline?
-      return (topic_id.nil? ? UNKNOWN_CONST : get_current_stage(topic_id))
-    end
+    return (topic_missing?(topic_id) ? UNKNOWN_CONST : get_current_stage(topic_id))
     due_date = find_current_stage(topic_id)
 
     unless self.staggered_deadline?

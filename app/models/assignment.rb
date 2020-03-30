@@ -356,7 +356,7 @@ class Assignment < ActiveRecord::Base
       return nil if topic_id.nil?
     end
     due_date = find_current_stage(topic_id)
-    if due_date.nil? or finished?(topic_id) or due_date.is_a?(TopicDueDate)
+    if due_date.nil? or due_date == FINISHED_CONST or due_date.is_a?(TopicDueDate)
       return nil
     else
       due_date.description_url

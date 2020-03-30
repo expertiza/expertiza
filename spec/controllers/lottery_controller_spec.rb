@@ -90,4 +90,27 @@ describe LotteryController do
       expect(Bid.find_by(topic_id: 1, team_id: 1, priority: 2)).to be nil
     end
   end
+
+  describe "remove" do
+    before :each do
+      @assignment = create(:assignment, name: "remove_user_from_previous_team")
+      @assignment_team = create(:assignment_team, assignment: @assignment)
+      @team_user1 = create(:team_user, team: @assignment_team, user: create(:student, name: "team_user1"))
+      @team_user2 = create(:team_user, team: @assignment_team, user: create(:student, name: "team_user2"))
+      @team_user3 = create(:team_user, team: @assignment_team, user: create(:student, name: "team_user3"))
+    end
+    describe "#remove_user_from_previous_team" do
+      it "should return the team without the removed user" do
+        user_id = @team_user3.user_id
+        assignment_id = @assignment.id
+        number_of_team_users = TeamsUser.count
+        controller.send(:remove_user_from_previous_team, assignment_id, user_id)
+
+        expect(TeamsUser.count).to eq(number_of_team_users - 1)
+        expect(TeamsUser.find_by(user_id: @team_user3.user_id)).to be nil
+        expect(TeamsUser.find_by(user_id: @team_user2.user_id)).to eq @team_user2
+        expect(TeamsUser.find_by(user_id: @team_user1.user_id)).to eq @team_user1
+      end
+    end
+  end
 end

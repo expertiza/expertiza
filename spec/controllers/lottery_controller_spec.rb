@@ -1,42 +1,73 @@
 include AssignmentHelper
 
 describe LotteryController do
-  describe "#run_intelligent_assignmnent" do
-    it "webservice call should be successful" do
-      dat = double("data")
-      rest = double("RestClient")
-      result = RestClient.get 'http://www.google.com', content_type: :json, accept: :json
-      expect(result.code).to eq(200)
-    end
+  let(:assignment) { create(:assignment, is_intelligent: true) }
+  let(:assignment2) { build(:assignment) }
+  let(:ta) { build(:teaching_assistant) }
+  let(:instructor) { build(:instructor) }
+  let(:admin) { build(:admin) }
 
-    it "should return json response" do
-      result = RestClient.get 'https://www.google.com', content_type: :json, accept: :json
-      expect(result.header['Content-Type']).to include 'application/json' rescue result
-    end
-  end
+  let(:student1) { create(:student, name: "student1") }
+  let(:student2) { create(:student, name: "student2") }
+  let(:student3) { create(:student, name: "student3") }
+  let(:student4) { create(:student, name: "student4") }
+  let(:student5) { create(:student, name: "student5") }
+  let(:student6) { create(:student, name: "student6") }
 
-  describe "#run_intelligent_bid" do
-    it "should do intelligent assignment" do
-      assignment = double("Assignment")
-      allow(assignment).to receive(:is_intelligent) { 1 }
-      expect(assignment.is_intelligent).to eq(1)
-    end
+  let(:topic1) { create(:topic, assignment_id: assignment.id) }
+  let(:topic2) { create(:topic, assignment_id: assignment.id) }
+  let(:topic3) { create(:topic, assignment_id: assignment.id) }
+  let(:topic4) { create(:topic, assignment_id: assignment.id) }
 
-    it "should exit gracefully when assignment not intelligent" do
-      assignment = double("Assignment")
-      allow(assignment).to receive(:is_intelligent) { 0 }
-      expect(assignment.is_intelligent).to eq(0)
-      redirect_to(controller: 'tree_display')
-    end
-  end
+  let(:assignment_team1) { create(:assignment_team, parent_id: assignment.id) }
+  let(:assignment_team2) { create(:assignment_team, parent_id: assignment.id) }
+  let(:assignment_team3) { create(:assignment_team, parent_id: assignment.id) }
+  let(:assignment_team4) { create(:assignment_team, parent_id: assignment.id) }
 
-  describe "#create_new_teams_for_bidding_response" do
-    it "should create team and return teamid" do
-      assignment = double("Assignment")
-      team = double("team")
-      allow(team).to receive(:create_new_teams_for_bidding_response).with(assignment).and_return(:teamid)
-      expect(team.create_new_teams_for_bidding_response(assignment)).to eq(:teamid)
-    end
+  let(:team_user1) { create(:team_user, team_id: assignment_team1.id, user_id: student1.id, id: 1) }
+  let(:team_user2) { create(:team_user, team_id: assignment_team1.id, user_id: student2.id, id: 2) }
+  let(:team_user3) { create(:team_user, team_id: assignment_team1.id, user_id: student3.id, id: 3) }
+  let(:team_user4) { create(:team_user, team_id: assignment_team2.id, user_id: student4.id, id: 4) }
+  let(:team_user5) { create(:team_user, team_id: assignment_team3.id, user_id: student5.id, id: 5) }
+  let(:team_user6) { create(:team_user, team_id: assignment_team3.id, user_id: student6.id, id: 6) }
+
+  before :each do
+    assignment_team1.save
+    assignment_team2.save
+    assignment_team3.save
+    assignment_team4.save
+
+    team_user1.save
+    team_user2.save
+    team_user3.save
+    team_user4.save
+    team_user5.save
+    team_user6.save
+
+    topic1.save
+    topic2.save
+    topic3.save
+    topic4.save
+
+    create(:bid, topic_id: topic1.id, team_id: assignment_team1.id, priority: 1)
+    create(:bid, topic_id: topic2.id, team_id: assignment_team2.id, priority: 2)
+    create(:bid, topic_id: topic4.id, team_id: assignment_team2.id, priority: 1)
+    create(:bid, topic_id: topic3.id, team_id: assignment_team2.id, priority: nil)
+    create(:bid, topic_id: topic4.id, team_id: assignment_team3.id, priority: 5)
+    create(:bid, topic_id: topic4.id, team_id: assignment_team1.id, priority: 3)
+
+    @expected_users_bidding_info = [{pid: student1.id, ranks: [1, 0, 0, 3]},
+                                    {pid: student2.id, ranks: [1, 0, 0, 3]},
+                                    {pid: student3.id, ranks: [1, 0, 0, 3]},
+                                    {pid: student4.id, ranks: [0, 2, 0, 1]},
+                                    {pid: student5.id, ranks: [0, 0, 0, 5]},
+                                    {pid: student6.id, ranks: [0, 0, 0, 5]}]
+
+    @team_users = []
+    @team_users << team_user1 << team_user2 << team_user3
+
+    @teams = assignment.teams
+    @sign_up_topics = assignment.sign_up_topics
   end
 
   describe "remove" do
@@ -90,16 +121,24 @@ describe LotteryController do
     end
   end
 
-  describe "#auto_merge_teams" do
-    it "sorts the unassigned teams" do
-      assignment = double("Assignment")
-      team = double("team")
-      unassignedteam = double("team")
-      sortedteam = double("team")
-      allow(team).to receive(:where).with(assignment).and_return(unassignedteam)
-      allow(unassignedteam).to receive(:sort_by).and_return(sortedteam)
-      expect(team.where(assignment)).to eq(unassignedteam)
-      expect(unassignedteam.sort_by).to eq(sortedteam)
+  describe "#merge_bids_from_different_previous_teams" do
+    before :each do
+      @sign_up_topics = @sign_up_topics
+      @team_id = assignment_team1.id
+      @user_ids = @team_users.map(&:id)
+      @user_bidding_info = [{pid: team_user1.id, ranks: [1, 0, 2, 2]},
+                            {pid: team_user2.id, ranks: [2, 1, 3, 0]},
+                            {pid: team_user3.id, ranks: [3, 2, 1, 1]}]
+    end
+    it "should create bids objects of the newly-merged team on each sign-up topics" do
+      bid_count = Bid.count
+      controller.send(:merge_bids_from_different_previous_teams, @sign_up_topics, @team_id, @user_ids, @user_bidding_info)
+      expect(Bid.count).to eq(bid_count + 4)
+      expect(Bid.find_by(topic_id: 1, team_id: 1, priority: 1)).to_not be nil
+      expect(Bid.find_by(topic_id: 2, team_id: 1, priority: 3)).to_not be nil
+      expect(Bid.find_by(topic_id: 3, team_id: 1, priority: 2)).to_not be nil
+      expect(Bid.find_by(topic_id: 4, team_id: 1, priority: 4)).to_not be nil
+      expect(Bid.find_by(topic_id: 1, team_id: 1, priority: 2)).to be nil
     end
   end
 end

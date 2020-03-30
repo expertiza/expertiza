@@ -352,9 +352,9 @@ class Assignment < ActiveRecord::Base
       round = next_due_date.try(:round)
     end
 
-    rev_q_ids = get_questionnaire_ids(round)
+    rev_questionnaire_ids = get_questionnaire_ids(round)
     review_questionnaire_id = nil
-    rev_q_ids.each do |rqid|
+    rev_questionnaire_ids.each do |rqid|
       next if rqid.questionnaire_id.nil?
       rtype = Questionnaire.find(rqid.questionnaire_id).type
       if rtype == 'ReviewQuestionnaire'
@@ -607,17 +607,17 @@ class Assignment < ActiveRecord::Base
   # since one field can only store one integer
   # if rev_q_ids is empty, Expertiza will try to find questionnaire whose type is 'ReviewQuestionnaire'.
   def get_questionnaire_ids(round)
-    rev_q_ids = if round.nil?
+    questionnaire_ids = if round.nil?
                   AssignmentQuestionnaire.where(assignment_id: self.id)
                 else
                   AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
                 end
-    if rev_q_ids.empty?
+    if questionnaire_ids.empty?
       AssignmentQuestionnaire.where(assignment_id: self.id).find_each do |aq|
-        rev_q_ids << aq if aq.questionnaire.type == "ReviewQuestionnaire"
+        questionnaire_ids << aq if aq.questionnaire.type == "ReviewQuestionnaire"
       end
     end
-    rev_q_ids
+    questionnaire_ids
   end
 
   def delete_review_response(responsemap_type,force)

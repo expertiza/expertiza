@@ -11,7 +11,7 @@ describe Assignment do
   let(:course) { build(:course) }
   let(:assignment_due_date) do
     build(:assignment_due_date, due_at: '2011-11-11 11:11:11', deadline_name: 'Review',
-                                description_url: 'https://expertiza.ncsu.edu/', round: 1,deadline_type_id: 1)
+                                description_url: 'https://expertiza.ncsu.edu/', round: 1, deadline_type_id: 1)
   end
   let(:topic_due_date) { build(:topic_due_date, deadline_name: 'Submission', description_url: 'https://github.com/expertiza/expertiza') }
 
@@ -358,7 +358,6 @@ describe Assignment do
     end
   end
 
-
   describe '#stage_deadline' do
     context 'when topic id is nil and current assignment has staggered deadline' do
       it 'returns Unknown' do
@@ -387,28 +386,28 @@ describe Assignment do
 
   describe '#current_stage_name' do
       context 'when topic id is nil and current assignment has staggered deadline' do
-           it 'returns Unknown' do
-              allow(assignment).to receive(:topic_missing?).and_return(true)
-              expect(assignment.current_stage_name).to eq('Unknown')
-           end
-       end
+        it 'returns Unknown' do
+          allow(assignment).to receive(:topic_missing?).and_return(true)
+          expect(assignment.current_stage_name).to eq('Unknown')
+        end
+      end
 
       context 'when current assignment does not have staggered deadline' do
           context 'when due date is nil' do
-              it 'returns Finished' do
-                  allow(assignment).to receive(:finished?).with(123).and_return(true)
-                  expect(assignment.current_stage_name(123)).to eq('Finished')
-              end
+            it 'returns Finished' do
+              allow(assignment).to receive(:finished?).with(123).and_return(true)
+              expect(assignment.current_stage_name(123)).to eq('Finished')
+            end
           end
 
           context 'when due date is not nil and due date is not equal to Finished' do
               it 'returns current stage name' do
-                  allow(assignment).to receive(:finished?).with(123).and_return(false)
-                  allow(assignment).to receive(:topic_missing?).with(123).and_return(false)
-                  allow(assignment).to receive(:next_due_date).with(123).and_return(assignment_due_date)
-                  deadline = create(:deadline_type, id: 1, name:"Review")
-                  allow(DeadlineType).to receive(:find).with(1).and_return(deadline)
-                  expect(assignment.current_stage_name(123)).to eq('Review')
+                allow(assignment).to receive(:finished?).with(123).and_return(false)
+                allow(assignment).to receive(:topic_missing?).with(123).and_return(false)
+                allow(assignment).to receive(:next_due_date).with(123).and_return(assignment_due_date)
+                deadline = create(:deadline_type, id: 1, name:"Review")
+                allow(DeadlineType).to receive(:find).with(1).and_return(deadline)
+                expect(assignment.current_stage_name(123)).to eq('Review')
               end
           end
       end
@@ -520,7 +519,7 @@ describe Assignment do
   describe '#finished?' do
     context 'when there is a next due date' do
       it 'returns False' do
-        allow(DueDate).to receive(:get_next_due_date).with(1,123).and_return('2021-11-11 11:11:11')
+        allow(DueDate).to receive(:get_next_due_date).with(1, 123).and_return('2021-11-11 11:11:11')
         expect(assignment.finished?(123)).to eq(false)
       end
     end

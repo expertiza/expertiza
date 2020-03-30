@@ -145,52 +145,6 @@ class Criterion < ScoredQuestion
     html += '</textarea>'    
   end
 
-  # def scale_criterion_question_first(count, answer = nil, questionnaire_min, questionnaire_max)
-  #   html = '<input id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" type="hidden"'
-  #   html += 'value="' + answer.answer.to_s + '"' if (answer && !answer.answer.nil?)
-  #   html += '><table><tr><td width="10%"></td>'
-
-  #   (questionnaire_min..questionnaire_max).each do |j|
-  #     html += '<td width="10%"><label>' + j.to_s + '</label></td>'
-  #   end
-
-  #   html += '<td width="10%"></td></tr><tr><td width="10%">' 
-  #   html += self.min_label if self.min_label.present?
-  #   html += '</td>'
-  # end
-
-  # def scale_criterion_question_second(count, answer = nil, questionnaire_min, questionnaire_max)
-  #   html = ""
-  #   (questionnaire_min..questionnaire_max).each do |j|
-  #     html += '<td width="10%"><input type="radio" id="' + j.to_s + '" value="' + j.to_s + '" name="Radio_' + self.id.to_s + '"'
-  #     html += 'checked="checked"' if (answer && answer.answer == j) or (answer.nil? && questionnaire_min == j)
-  #     html += '></td>'
-  #   end
-  #   html
-  # end
-
-  # def scale_criterion_question_third(count, answer = nil, questionnaire_min, questionnaire_max)
-  #   unless self.size.present?
-  #     cols = '70'
-  #     rows = '1'
-  #   else
-  #    cols = self.size.split(',')[0]
-  #    rows = self.size.split(',')[1]
-  #   end
-  #   html = ""
-  #   html += '<script>jQuery("input[name=Radio_' + self.id.to_s + ']:radio").change(function() {'
-  #   html += 'var response_score = jQuery("#responses_' + count.to_s + '_score");'
-  #   html += 'var checked_value = jQuery("input[name=Radio_' + self.id.to_s + ']:checked").val();'
-  #   html += 'response_score.val(checked_value);});</script><td width="10%">'
-
-  #   html += self.max_label if self.max_label.present?
-  #   html += '</td><td width="10%"></td></tr></table>'
-  #   html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments"' \
-  #     ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
-  #   html += answer.comments if (answer && !answer.comments.nil?) 
-  #   html += '</textarea>' 
-  # end
-
   # This method returns what to display if a student is viewing a filled-out questionnaire
   def view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments = nil, current_user = nil)
     html = '<b>' + count.to_s + ". " + self.txt + ' [Max points: ' + questionnaire_max.to_s + "]</b>"

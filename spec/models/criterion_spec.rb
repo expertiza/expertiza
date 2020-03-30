@@ -73,23 +73,6 @@ describe "criterion" do
     end
   end
 
-  # describe "#loop_in_dropdown_criterion_question" do
-  #   it "returns the html without answer" do
-  #     html = criterion.loop_in_dropdown_criterion_question(nil,0,5).to_s
-  #     expect(html).to eq("<option value=0>0</option><option value=1>1</option><option value=2>2</option><option value=3>3</option><option value=4>4</option><option value=5>5</option>")
-  #   end
-
-  #   it "returns the html with answer.answer between questionnaire min and max" do
-  #     html = criterion.loop_in_dropdown_criterion_question(answer_comments,0,5).to_s
-  #     expect(html).to eq("<option value=0>0</option><option value=1>1</option><option value=2>2</option><option value=3 selected=\"selected\">3</option><option value=4>4</option><option value=5>5</option>")
-  #   end
-
-  #   it "returns the html with comments answer outside questionnaire min and max" do
-  #     html = criterion.loop_in_dropdown_criterion_question(answer_no_comments,0,5).to_s
-  #     expect(html).to eq("<option value=0>0</option><option value=1>1</option><option value=2>2</option><option value=3>3</option><option value=4>4</option><option value=5>5</option>")
-  #   end
-  # end
-
   describe "#scale_criterion_question" do
     it "returns the html without answer" do
       html = criterion.scale_criterion_question(0, nil, 0, 5).to_s
@@ -106,58 +89,7 @@ describe "criterion" do
       expect(html).to eq("<input id=\"responses_0_score\" name=\"responses[0][score]\" type=\"hidden\"value=\"3\"><table><tr><td width=\"10%\"></td><td width=\"10%\"><label>0</label></td><td width=\"10%\"><label>1</label></td><td width=\"10%\"><label>2</label></td><td width=\"10%\"><label>3</label></td><td width=\"10%\"><label>4</label></td><td width=\"10%\"><label>5</label></td><td width=\"10%\"></td></tr><tr><td width=\"10%\"></td><td width=\"10%\"><input type=\"radio\" id=\"0\" value=\"0\" name=\"Radio_1\"></td><td width=\"10%\"><input type=\"radio\" id=\"1\" value=\"1\" name=\"Radio_1\"></td><td width=\"10%\"><input type=\"radio\" id=\"2\" value=\"2\" name=\"Radio_1\"></td><td width=\"10%\"><input type=\"radio\" id=\"3\" value=\"3\" name=\"Radio_1\"checked=\"checked\"></td><td width=\"10%\"><input type=\"radio\" id=\"4\" value=\"4\" name=\"Radio_1\"></td><td width=\"10%\"><input type=\"radio\" id=\"5\" value=\"5\" name=\"Radio_1\"></td><script>jQuery(\"input[name=Radio_1]:radio\").change(function() {var response_score = jQuery(\"#responses_0_score\");var checked_value = jQuery(\"input[name=Radio_1]:checked\").val();response_score.val(checked_value);});</script><td width=\"10%\"></td><td width=\"10%\"></td></tr></table><textarea cols=70 rows=1 id=\"responses_0_comments\" name=\"responses[0][comment]\" class=\"tinymce\">text comments</textarea>")
     end
   end
-
-  # describe "#scale_criterion_question_first" do
-  #   it "returns the html without answer" do
-  #     html = criterion.scale_criterion_question_first(0, nil, 0, 5).to_s
-  #     expect(html).to eq("<input id=\"responses_0_score\" name=\"responses[0][score]\" type=\"hidden\"><table><tr><td width=\"10%\"></td><td width=\"10%\"><label>0</label></td><td width=\"10%\"><label>1</label></td><td width=\"10%\"><label>2</label></td><td width=\"10%\"><label>3</label></td><td width=\"10%\"><label>4</label></td><td width=\"10%\"><label>5</label></td><td width=\"10%\"></td></tr><tr><td width=\"10%\"></td>")
-  #   end
-
-  #   it "returns the html with no comments answer and answer.answer outside questionnaire min and max" do
-  #     html = criterion.scale_criterion_question_first(0, answer_no_comments, 0, 5).to_s
-  #     expect(html).to eq("<input id=\"responses_0_score\" name=\"responses[0][score]\" type=\"hidden\"value=\"8\"><table><tr><td width=\"10%\"></td><td width=\"10%\"><label>0</label></td><td width=\"10%\"><label>1</label></td><td width=\"10%\"><label>2</label></td><td width=\"10%\"><label>3</label></td><td width=\"10%\"><label>4</label></td><td width=\"10%\"><label>5</label></td><td width=\"10%\"></td></tr><tr><td width=\"10%\"></td>")
-  #   end
-
-  #   it "returns the html with comments answer and answer.answer between questionnaire min and max" do
-  #     html = criterion.scale_criterion_question_first(0, answer_comments, 0, 5).to_s
-  #     expect(html).to eq("<input id=\"responses_0_score\" name=\"responses[0][score]\" type=\"hidden\"value=\"3\"><table><tr><td width=\"10%\"></td><td width=\"10%\"><label>0</label></td><td width=\"10%\"><label>1</label></td><td width=\"10%\"><label>2</label></td><td width=\"10%\"><label>3</label></td><td width=\"10%\"><label>4</label></td><td width=\"10%\"><label>5</label></td><td width=\"10%\"></td></tr><tr><td width=\"10%\"></td>")
-  #   end
-  # end
-
-  # describe "#scale_criterion_question_second" do
-  #   it "returns the html without answer" do
-  #     html = criterion.scale_criterion_question_second(0, nil, 0, 5).to_s
-  #     expect(html).to eq("<td width=\"10%\"><input type=\"radio\" id=\"0\" value=\"0\" name=\"Radio_1\"checked=\"checked\"></td><td width=\"10%\"><input type=\"radio\" id=\"1\" value=\"1\" name=\"Radio_1\"></td><td width=\"10%\"><input type=\"radio\" id=\"2\" value=\"2\" name=\"Radio_1\"></td><td width=\"10%\"><input type=\"radio\" id=\"3\" value=\"3\" name=\"Radio_1\"></td><td width=\"10%\"><input type=\"radio\" id=\"4\" value=\"4\" name=\"Radio_1\"></td><td width=\"10%\"><input type=\"radio\" id=\"5\" value=\"5\" name=\"Radio_1\"></td>")
-  #   end
-
-  #   it "returns the html with no comments answer and answer.answer outside questionnaire min and max" do
-  #     html = criterion.scale_criterion_question_second(0, answer_no_comments, 0, 5).to_s
-  #     expect(html).to eq("<td width=\"10%\"><input type=\"radio\" id=\"0\" value=\"0\" name=\"Radio_1\"></td><td width=\"10%\"><input type=\"radio\" id=\"1\" value=\"1\" name=\"Radio_1\"></td><td width=\"10%\"><input type=\"radio\" id=\"2\" value=\"2\" name=\"Radio_1\"></td><td width=\"10%\"><input type=\"radio\" id=\"3\" value=\"3\" name=\"Radio_1\"></td><td width=\"10%\"><input type=\"radio\" id=\"4\" value=\"4\" name=\"Radio_1\"></td><td width=\"10%\"><input type=\"radio\" id=\"5\" value=\"5\" name=\"Radio_1\"></td>")
-  #   end
-
-  #   it "returns the html with comments answer and answer.answer between questionnaire min and max" do
-  #     html = criterion.scale_criterion_question_second(0, answer_comments, 0, 5).to_s
-  #     expect(html).to eq("<td width=\"10%\"><input type=\"radio\" id=\"0\" value=\"0\" name=\"Radio_1\"></td><td width=\"10%\"><input type=\"radio\" id=\"1\" value=\"1\" name=\"Radio_1\"></td><td width=\"10%\"><input type=\"radio\" id=\"2\" value=\"2\" name=\"Radio_1\"></td><td width=\"10%\"><input type=\"radio\" id=\"3\" value=\"3\" name=\"Radio_1\"checked=\"checked\"></td><td width=\"10%\"><input type=\"radio\" id=\"4\" value=\"4\" name=\"Radio_1\"></td><td width=\"10%\"><input type=\"radio\" id=\"5\" value=\"5\" name=\"Radio_1\"></td>")
-  #   end
-  # end
-
-  # describe "#scale_criterion_question_third" do
-  #   it "returns the html without answer" do
-  #     html = criterion.scale_criterion_question_third(0, nil, 0, 5).to_s
-  #     expect(html).to eq("<script>jQuery(\"input[name=Radio_1]:radio\").change(function() {var response_score = jQuery(\"#responses_0_score\");var checked_value = jQuery(\"input[name=Radio_1]:checked\").val();response_score.val(checked_value);});</script><td width=\"10%\"></td><td width=\"10%\"></td></tr></table><textarea cols=70 rows=1 id=\"responses_0_comments\" name=\"responses[0][comment]\" class=\"tinymce\"></textarea>")
-  #   end
-
-  #   it "returns the html with no comments answer and answer.answer outside questionnaire min and max" do
-  #     html = criterion.scale_criterion_question_third(0, answer_no_comments, 0, 5).to_s
-  #     expect(html).to eq("<script>jQuery(\"input[name=Radio_1]:radio\").change(function() {var response_score = jQuery(\"#responses_0_score\");var checked_value = jQuery(\"input[name=Radio_1]:checked\").val();response_score.val(checked_value);});</script><td width=\"10%\"></td><td width=\"10%\"></td></tr></table><textarea cols=70 rows=1 id=\"responses_0_comments\" name=\"responses[0][comment]\" class=\"tinymce\"></textarea>")
-  #   end
-
-  #   it "returns the html with comments answer and answer.answer between questionnaire min and max" do
-  #     html = criterion.scale_criterion_question_third(0, answer_comments, 0, 5).to_s
-  #     expect(html).to eq("<script>jQuery(\"input[name=Radio_1]:radio\").change(function() {var response_score = jQuery(\"#responses_0_score\");var checked_value = jQuery(\"input[name=Radio_1]:checked\").val();response_score.val(checked_value);});</script><td width=\"10%\"></td><td width=\"10%\"></td></tr></table><textarea cols=70 rows=1 id=\"responses_0_comments\" name=\"responses[0][comment]\" class=\"tinymce\">text comments</textarea>")
-  #   end
-  # end
-
+  
   describe "#view_completed_question" do
     it "returns the html " do
       html = criterion.view_completed_question(0, answer_no_comments, 5).to_s

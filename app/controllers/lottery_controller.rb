@@ -50,13 +50,13 @@ class LotteryController < ApplicationController
     # Exclude any teams already signed up
     teams_not_signed_up = teams.reject {|team| SignedUpTeam.where(team_id: team.id, is_waitlisted: 0).any? }
     teams_not_signed_up.each do |team|
-      bids = [0]
+      # Grab student id and list of bids
+      bids = []
       sign_up_topics.each do |topic|
         bid_record = Bid.find_by(team_id: team.id, topic_id: topic.id)
-        bids << bid_record.priority if bid_record.try(:priority)
+        bids << bid_record.try(:priority) |= 0
       end
-      # Grab student id and list of bids
-      team.users.each {|user| user_bidding_info << {pid: user.id, ranks: bids} } if bids.uniq != [0]
+      team.users.each {|user| user_bidding_info << {pid: user.id, ranks: bids} } unless bids.uniq == [0]
     end
     user_bidding_info
   end
@@ -102,7 +102,7 @@ class LotteryController < ApplicationController
 
   # Destroy current team_user and team_user node if exists
   def remove_user_from_previous_team(assignment_id, user_id)
-    team_user = TeamsUser.where("user_id == ? AND team.parent_id == ? ", user_id, assignment_id)
+    team_user = TeamsUser.all.select {|team_user| team_user.user_id == user_id and team_user.team.parent_id == assignment_id }[0]
     team_user.team_user_node.destroy rescue nil
     team_user.destroy rescue nil
   end
@@ -126,13 +126,14 @@ class LotteryController < ApplicationController
     #   3: [2, 3, 1],
     #   4: [2, 0, 1]
     # }
-    bidding_matrix = Hash.new([])
+    bidding_matrix = Hash.new {|hash, key| hash[key] = [] }
     current_team_members_info = user_bidding_info.select {|info| user_ids.include? info[:pid] }
     current_team_members_info.map {|info| info[:ranks] }.each do |bids|
       sign_up_topics.each_with_index do |topic, index|
         bidding_matrix[topic.id] << bids[index]
       end
     end
+
     # Below is the structure of matrix summary
     # The first value is the number of nonzero item, the second value is the sum of priorities, the third value of the topic_id.
     # [

@@ -37,8 +37,7 @@ class Assignment < ActiveRecord::Base
   validate :valid_num_review
 
   REVIEW_QUESTIONNAIRES = {author_feedback: 0, metareview: 1, review: 2, teammate_review: 3}.freeze
-  EXPORT_FIELDS={team_id:'Team ID / Author ID', team_name:'Reviewee (Team / Student Name)',reviewer:'Reviewer',question:'Question / Criterion',question_id:'Question ID',comment_id:'Answer / Comment ID',comments:'Answer / Comment',score:'Score' }.freeze
-  DELETE_INSTANCES=['invitations','teams','participants','due_dates','assignment_questionnaires']
+
   #  Review Strategy information.
   RS_AUTO_SELECTED = 'Auto-Selected'.freeze
   RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'.freeze
@@ -221,7 +220,8 @@ class Assignment < ActiveRecord::Base
   end
 
 
-
+  DELETE_INSTANCES=['invitations','teams','participants','due_dates','assignment_questionnaires']
+  
   def delete(force = nil)
 
     begin
@@ -236,14 +236,10 @@ class Assignment < ActiveRecord::Base
       raise "There is at least one teammate review response that exists for #{self.name}."
     end
 
+    # destroy instances of invitations, teams, particiapnts, etfc, refactored by Rajan, Jasmine, Sreenidhi 3/30/2020
     DELETE_INSTANCES.each do |instance|
       self.instance_eval(instance).each(&:destroy)
     end
-    #self.invitations.each(&:destroy)
-    #self.teams.each(&:delete)
-    #self.participants.each(&:delete)
-    #self.due_dates.each(&:destroy)
-    #self.assignment_questionnaires.each(&:destroy)
 
     # The size of an empty directory is 2
     # Delete the directory if it is empty
@@ -404,10 +400,11 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  # This method is used for export detailed contents. - Akshit, Kushagra, Vaibhav
+  # This method was refactored to reduce complexity, additional fields could now be added to the list - Rajan, Jasmine, Sreenidhi
+  EXPORT_DETAIL_FIELDS={team_id:'Team ID / Author ID', team_name:'Reviewee (Team / Student Name)',reviewer:'Reviewer',question:'Question / Criterion',question_id:'Question ID',comment_id:'Answer / Comment ID',comments:'Answer / Comment',score:'Score' }.freeze
   def self.export_details_fields(detail_options)
     fields = []
-    EXPORT_FIELDS.each do |key, value|
+    EXPORT_DETAIL_FIELDS.each do |key, value|
       fields << value if detail_options[key.to_s]=='true'
     end
     fields
@@ -546,15 +543,18 @@ class Assignment < ActiveRecord::Base
   end
 
   # This method is used for export contents of grade#view.  -Zhewei
+  EXPORT_FIELDS={team_score:['Team Max','Team Min','Team Avg'], submitted_score:['Submitted Max','Submitted Min','Submitted Avg'],metareview_score:['Metareview Max','Metareview Min','Metareview Avg'],author_feedback_score:['Author Feedback Max, Author Feedback Min, Author Feedback Avg'],teammate_review_score:['Teammate Review Max', 'Teammate Review Min', 'Teammate Review Avg']}.freeze
   def self.export_fields(options)
     fields = []
     fields << 'Team Name'
     fields << 'Team Member(s)'
-    fields.push('Team Max', 'Team Min', 'Team Avg') if options['team_score'] == 'true'
-    fields.push('Submitted Max', 'Submitted Min', 'Submitted Avg') if options['submitted_score']
-    fields.push('Metareview Max', 'Metareview Min', 'Metareview Avg') if options['metareview_score']
-    fields.push('Author Feedback Max', 'Author Feedback Min', 'Author Feedback Avg') if options['author_feedback_score']
-    fields.push('Teammate Review Max', 'Teammate Review Min', 'Teammate Review Avg') if options['teammate_review_score']
+    EXPORT_FIELDS.each do |key, value|
+      if options[key.to_s]=='true'
+        value.each do |f|
+          fields.push(f)
+        end
+      end
+    end
     fields.push('Final Score')
     fields
   end

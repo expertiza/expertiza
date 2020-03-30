@@ -338,7 +338,7 @@ class Assignment < ActiveRecord::Base
     due_date = find_current_stage(topic_id)
 
     unless self.staggered_deadline?
-      if due_date != FINISHED_CONST && !due_date.nil? && !due_date.deadline_name.nil?
+      if finished?(topic_id) && !due_date.nil? && !due_date.deadline_name.nil?
         return due_date.deadline_name
       else
         return get_current_stage(topic_id)
@@ -356,7 +356,7 @@ class Assignment < ActiveRecord::Base
       return nil if topic_id.nil?
     end
     due_date = find_current_stage(topic_id)
-    if due_date.nil? or due_date == FINISHED_CONST or due_date.is_a?(TopicDueDate)
+    if due_date.nil? or finished?(topic_id) or due_date.is_a?(TopicDueDate)
       return nil
     else
       due_date.description_url
@@ -366,7 +366,7 @@ class Assignment < ActiveRecord::Base
   def stage_deadline(topic_id = nil)
     return UNKNOWN_CONST if topic_missing?(topic_id)
     due_date = find_current_stage(topic_id)
-    due_date.nil? || due_date == FINISHED_CONST ? due_date : due_date.due_at.to_s
+    due_date.nil? || finished?(topic_id) ? due_date : due_date.due_at.to_s
   end
 
   def num_review_rounds
@@ -388,7 +388,7 @@ class Assignment < ActiveRecord::Base
   def get_current_stage(topic_id = nil)
     return UNKNOWN_CONST if topic_missing?(topic_id)
     due_date = find_current_stage(topic_id)
-    due_date.nil? || due_date == FINISHED_CONST ? FINISHED_CONST : DeadlineType.find(due_date.deadline_type_id).name
+    due_date.nil? || finished?(topic_id) ? FINISHED_CONST : DeadlineType.find(due_date.deadline_type_id).name
   end
 
   def review_questionnaire_id(round = nil)
@@ -595,6 +595,12 @@ class Assignment < ActiveRecord::Base
       tcsv.push('---', '---', '---') if options[score_name]
     end
   end
+
+  # New function to check if the assignment is finished
+  def finished?(topic_id = nil)
+    next_due_date(topic_id).nil?
+  end
+
 
   # Function to check if topic id is null when its a staggered assignment, to prevent redundancy
   def topic_missing?(topic_id = nil)

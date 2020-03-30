@@ -44,8 +44,8 @@ class Assignment < ActiveRecord::Base
   DEFAULT_MAX_OUTSTANDING_REVIEWS = 2
 
   # Constants for common fields, to reduce complexity if change is needed
-  FINISHED_CONST = 'Finished'
-  UNKNOWN_CONST = 'Unknown'
+  FINISHED_CONST = 'Finished'.freeze
+  UNKNOWN_CONST = 'Unknown'.freeze
 
   def self.max_outstanding_reviews
     DEFAULT_MAX_OUTSTANDING_REVIEWS

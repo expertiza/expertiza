@@ -10,7 +10,6 @@ class Assignment < ActiveRecord::Base
   include ReviewAssignment
   include QuizAssignment
   include OnTheFlyCalc
-  include AssignmentHelper
   has_paper_trail
   # When an assignment is created, it needs to
   # be created as an instance of a subclass of the Assignment (model) class;
@@ -163,7 +162,6 @@ class Assignment < ActiveRecord::Base
       scores[:teams][index.to_s.to_sym] = {:team => team, :scores => {}}
       if self.varying_rubrics_by_round?
         grades_by_rounds, total_num_of_assessments, total_score = compute_grades_by_rounds(questions, team)
-        # merge the grades from multiple rounds
         scores[:teams][index.to_s.to_sym][:scores] = merge_grades_by_rounds(grades_by_rounds, total_num_of_assessments, total_score)
       else
         assessments = ReviewResponseMap.get_assessments_for(team)
@@ -186,7 +184,6 @@ class Assignment < ActiveRecord::Base
                   Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(self.instructor[:name]) + '/'
                 end
     path_text += FileHelper.clean_path(self.directory_path)
-    path_text
   end
 
   # Check whether review, metareview, etc.. is allowed
@@ -220,18 +217,15 @@ class Assignment < ActiveRecord::Base
     check_condition('review_of_review_allowed_id', topic_id)
   end
 
-
-
   def delete(force = nil)
-
     begin
-      review_type(ReviewResponseMap,force)
+      delete_review_response(ReviewResponseMap,force)
     rescue StandardError
       raise "There is at least one review response that exists for #{self.name}."
     end
 
     begin
-      review_type(TeammateReviewResponseMap,force)
+      delete_review_response(TeammateReviewResponseMap,force)
     rescue StandardError
       raise "There is at least one teammate review response that exists for #{self.name}."
     end
@@ -239,11 +233,6 @@ class Assignment < ActiveRecord::Base
     DELETE_INSTANCES.each do |instance|
       self.instance_eval(instance).each(&:destroy)
     end
-    #self.invitations.each(&:destroy)
-    #self.teams.each(&:delete)
-    #self.participants.each(&:delete)
-    #self.due_dates.each(&:destroy)
-    #self.assignment_questionnaires.each(&:destroy)
 
     # The size of an empty directory is 2
     # Delete the directory if it is empty
@@ -631,7 +620,7 @@ class Assignment < ActiveRecord::Base
     rev_q_ids
   end
 
-  def review_type (responsemap_type,force)
+  def delete_review_response(responsemap_type,force)
     maps = responsemap_type.where(reviewed_object_id: self.id)
     maps.each {|map| map.delete(force) }
   end

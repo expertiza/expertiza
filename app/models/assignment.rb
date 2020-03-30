@@ -42,6 +42,8 @@ class Assignment < ActiveRecord::Base
   REVIEW_STRATEGIES = [RS_AUTO_SELECTED, RS_INSTRUCTOR_SELECTED].freeze
   DEFAULT_MAX_REVIEWERS = 3
   DEFAULT_MAX_OUTSTANDING_REVIEWS = 2
+  FINISHED_CONST = 'Finished'
+  UNKNOWN_CONST = 'Unknown'
 
   def self.max_outstanding_reviews
     DEFAULT_MAX_OUTSTANDING_REVIEWS
@@ -329,12 +331,12 @@ class Assignment < ActiveRecord::Base
   # For varying rubric feature
   def current_stage_name(topic_id = nil)
     if self.staggered_deadline?
-      return (topic_id.nil? ? 'Unknown' : get_current_stage(topic_id))
+      return (topic_id.nil? ? UNKNOWN_CONST : get_current_stage(topic_id))
     end
     due_date = find_current_stage(topic_id)
 
     unless self.staggered_deadline?
-      if due_date != 'Finished' && !due_date.nil? && !due_date.deadline_name.nil?
+      if due_date != FINISHED_CONST && !due_date.nil? && !due_date.deadline_name.nil?
         return due_date.deadline_name
       else
         return get_current_stage(topic_id)
@@ -352,7 +354,7 @@ class Assignment < ActiveRecord::Base
       return nil if topic_id.nil?
     end
     due_date = find_current_stage(topic_id)
-    if due_date.nil? or due_date == 'Finished' or due_date.is_a?(TopicDueDate)
+    if due_date.nil? or due_date == FINISHED_CONST or due_date.is_a?(TopicDueDate)
       return nil
     else
       due_date.description_url
@@ -360,9 +362,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def stage_deadline(topic_id = nil)
-    return 'Unknown' if topic_missing?(topic_id)
+    return UNKNOWN_CONST if topic_missing?(topic_id)
     due_date = find_current_stage(topic_id)
-    due_date.nil? || due_date == 'Finished' ? due_date : due_date.due_at.to_s
+    due_date.nil? || due_date == FINISHED_CONST ? due_date : due_date.due_at.to_s
   end
 
   def num_review_rounds
@@ -376,15 +378,15 @@ class Assignment < ActiveRecord::Base
 
   def find_current_stage(topic_id = nil)
     next_due_date = next_due_date(topic_id)
-    return 'Finished' if next_due_date.nil?
+    return FINISHED_CONST if next_due_date.nil?
     next_due_date
   end
 
   # Zhewei: this method is almost the same as 'stage_deadline'
   def get_current_stage(topic_id = nil)
-    return 'Unknown' if topic_missing?(topic_id)
+    return UNKNOWN_CONST if topic_missing?(topic_id)
     due_date = find_current_stage(topic_id)
-    due_date.nil? || due_date == 'Finished' ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
+    due_date.nil? || due_date == FINISHED_CONST ? FINISHED_CONST : DeadlineType.find(due_date.deadline_type_id).name
   end
 
   def review_questionnaire_id(round = nil)

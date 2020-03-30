@@ -362,7 +362,7 @@ describe Assignment do
     end
 
     context 'when assignment does not have staggered deadline' do
-      before(:each) { allow(assignment).to receive(:staggered_deadline?).and_return(false) }
+      before(:each) { allow(assignment).to receive(:topic_missing?).and_return(false) }
       context "when due date is not equal to 'Finished', due date is not nil and its deadline name is not nil" do
         it 'returns the deadline name of current due date' do
           allow(assignment).to receive(:find_current_stage).with(123).and_return(assignment_due_date)

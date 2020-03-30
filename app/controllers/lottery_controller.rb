@@ -9,24 +9,28 @@ class LotteryController < ApplicationController
      'Administrator'].include? current_role_name
   end
 
-  # This method is to send request to web service and use k-means and students' bidding data to build teams automatically.
+  # This method sends a request to a web service that uses k-means and students' bidding data
+  # to build teams automatically.
+  # The webservice tries to create teams with sizes close to the max team size
+  # allowed by the assignment by potentially combining existing smaller teams
+  # that have similar bidding info/priorities associated with the assignment's signup topics.
+  #
   # rubocop:disable Metrics/AbcSize
   def run_intelligent_assignment
-    assignment = Assignment.find_by(id: params[:id])
+    assignment = Assignment.find(params[:id])
     teams = assignment.teams
 
-    user_bidding_info = construct_user_bidding_info(assignment.sign_up_topics, teams)
-    bidding_data = {users: user_bidding_info, max_team_size: assignment.max_team_size}
-    log("Bidding data for assignment #{assignment.name}: #{bidding_data}")
+    users_bidding_info = construct_users_bidding_info(assignment.sign_up_topics, teams)
+    bidding_data = {users: users_bidding_info, max_team_size: assignment.max_team_size}
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Bidding data for assignment #{assignment.name}: #{bidding_data}", request)
 
     begin
       url = WEBSERVICE_CONFIG["topic_bidding_webservice_url"]
       response = RestClient.post url, bidding_data.to_json, content_type: :json, accept: :json
       # Structure of teams variable: [[user_id1, user_id2], [user_id3, user_id4]]
       teams = JSON.parse(response)["teams"]
-      log("Team formation info for assignment #{assignment.name}: #{teams}")
-
-      create_new_teams_for_bidding_response(teams, assignment, user_bidding_info)
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Team formation info for assignment #{assignment.name}: #{teams}", request)
+      create_new_teams_for_bidding_response(teams, assignment, users_bidding_info)
       remove_empty_teams(assignment)
       match_new_teams_to_topics(assignment)
     rescue StandardError => e
@@ -38,15 +42,11 @@ class LotteryController < ApplicationController
 
   private
 
-  # Put generated data to ExpertizaLogger.info
-  def log(message)
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, message, request)
-  end
-
-  # Generate user bidding infomation hash based on students who haven't signed up yet
-  # Structure of user_bidding_info variable: [{user_id1, bids_1}, {user_id2, bids_2}]
-  def construct_user_bidding_info(sign_up_topics, teams)
-    user_bidding_info = []
+  # Generate user bidding information hash based on students who haven't signed up yet
+  # This associates a list of bids corresponding to sign_up_topics to a user
+  # Structure of users_bidding_info variable: [{user_id1, bids_1}, {user_id2, bids_2}]
+  def construct_users_bidding_info(sign_up_topics, teams)
+    users_bidding_info = []
     # Exclude any teams already signed up
     teams_not_signed_up = teams.reject {|team| SignedUpTeam.where(team_id: team.id, is_waitlisted: 0).any? }
     teams_not_signed_up.each do |team|
@@ -54,17 +54,17 @@ class LotteryController < ApplicationController
       bids = []
       sign_up_topics.each do |topic|
         bid_record = Bid.find_by(team_id: team.id, topic_id: topic.id)
-        bids << bid_record.try(:priority) |= 0
+        bids << (bid_record.try(:priority) || 0)
       end
-      team.users.each {|user| user_bidding_info << {pid: user.id, ranks: bids} } unless bids.uniq == [0]
+      team.users.each {|user| users_bidding_info << {pid: user.id, ranks: bids} } unless bids.uniq == [0]
     end
-    user_bidding_info
+    users_bidding_info
   end
 
   # Generate team bidding infomation hash based on newly-created teams
   # Structure of team_bidding_info variable: [{team_id1, bids_1}, {team_id2, bids_2}]
-  def construct_team_bidding_info(unassigned_teams, sign_up_topics)
-    team_bidding_info = []
+  def construct_teams_bidding_info(unassigned_teams, sign_up_topics)
+    teams_bidding_info = []
     unassigned_teams.each do |team|
       topic_bids = []
       sign_up_topics.each do |topic|
@@ -72,12 +72,17 @@ class LotteryController < ApplicationController
         topic_bids << {topic_id: topic.id, priority: bid.priority} if bid
       end
       topic_bids.sort! {|bid| bid[:priority] }
-      team_bidding_info << {team_id: team.id, bids: topic_bids}
+      teams_bidding_info << {team_id: team.id, bids: topic_bids}
     end
-    team_bidding_info
+    teams_bidding_info
   end
 
-  def create_new_teams_for_bidding_response(teams, assignment, user_bidding_info)
+  # This method creates new AssignmentTeam objects based on the list of teams
+  # received from the webservice
+  # It also creates the corresponding TeamNode and TeamsUsers and TeamUserNode
+  # for each user in the new team while removing the users from any previous old
+  # teams
+  def create_new_teams_for_bidding_response(teams, assignment, users_bidding_info)
     teams.each do |user_ids|
       # Create new team and team node
       new_team = AssignmentTeam.create(name: 'Team_' + rand(10_000).to_s, parent_id: assignment.id)
@@ -90,24 +95,19 @@ class LotteryController < ApplicationController
         new_team_user = TeamsUser.create(user_id: user_id, team_id: new_team.id)
         TeamUserNode.create(parent_id: team_node.id, node_object_id: new_team_user.id)
 
-        # Create new bids for team based on `bidding_data` variable for each team member
-        # Currently, it is possible (already proved by db records) that
-        # some team has multiple 1st priority, multiply 2nd priority, ....
-        # these multiple identical priorities come from different previous teams
-        # [Future work]: we need to find a better way to merge bids that came from different previous teams
-        merge_bids_from_different_previous_teams(assignment.sign_up_topics, new_team.id, user_ids, user_bidding_info)
+        merge_bids_from_different_previous_teams(assignment.sign_up_topics, new_team.id, user_ids, users_bidding_info)
       end
     end
   end
 
-  # Destroy current team_user and team_user node if exists
+  # Removes the specified user from any team of the specified assignment
   def remove_user_from_previous_team(assignment_id, user_id)
-    team_user = TeamsUser.all.select {|team_user| team_user.user_id == user_id and team_user.team.parent_id == assignment_id }[0]
+    team_user = TeamsUser.where(user_id: user_id).find {|team_user| team_user.team.parent_id == assignment_id }
     team_user.team_user_node.destroy rescue nil
     team_user.destroy rescue nil
   end
 
-  # Destroy teams which team members have been destroyed in create_new_teams_for_bidding_response
+  # Destroy teams which no longer contain any team members
   def remove_empty_teams(assignment)
     assignment.teams.reload.each do |team|
       if team.teams_users.empty?
@@ -117,8 +117,16 @@ class LotteryController < ApplicationController
     end
   end
 
-  def merge_bids_from_different_previous_teams(sign_up_topics, team_id, user_ids, user_bidding_info)
-    # Select data from `user_bidding_info` variable that only related to team members in current team and transpose it.
+  # Create new bids for team based on `ranks` variable for each team member
+  # Currently, it is possible (already proved by db records) that
+  # some teams have multiple 1st priority, multiply 2nd priority.
+  # these multiple identical priorities come from different
+  # previous teams
+  # [Future work]: we need to find a better way to merge bids
+  # that came from different previous teams
+  #
+  def merge_bids_from_different_previous_teams(sign_up_topics, team_id, user_ids, users_bidding_info)
+    # Select data from `users_bidding_info` variable that only related to team members in current team and transpose it.
     # For example, below matrix shows 4 topics (key) and corresponding priorities given by 3 team members (value).
     # {
     #   1: [1, 2, 3],
@@ -127,7 +135,7 @@ class LotteryController < ApplicationController
     #   4: [2, 0, 1]
     # }
     bidding_matrix = Hash.new {|hash, key| hash[key] = [] }
-    current_team_members_info = user_bidding_info.select {|info| user_ids.include? info[:pid] }
+    current_team_members_info = users_bidding_info.select {|info| user_ids.include? info[:pid] }
     current_team_members_info.map {|info| info[:ranks] }.each do |bids|
       sign_up_topics.each_with_index do |topic, index|
         bidding_matrix[topic.id] << bids[index]
@@ -163,13 +171,13 @@ class LotteryController < ApplicationController
   end
 
   # If certain topic has available slot(s),
-  # the team with biggest size get its first-priority topic
+  # the team with biggest size and most bids get its first-priority topic
   # then break the loop to next team
-  def assign_available_slots(team_bids)
-    team_bids.each do |tb|
+  def assign_available_slots(teams_bidding_info)
+    teams_bidding_info.each do |tb|
       tb[:bids].each do |bid|
         num_of_signed_up_teams = SignedUpTeam.where(topic_id: bid[:topic_id]).count
-        max_choosers = SignUpTopic.find_by(id: bid[:topic_id]).try(:max_choosers)
+        max_choosers = SignUpTopic.find(bid[:topic_id]).try(:max_choosers)
         if num_of_signed_up_teams < max_choosers
           SignedUpTeam.create(team_id: tb[:team_id], topic_id: bid[:topic_id])
           break
@@ -201,8 +209,8 @@ class LotteryController < ApplicationController
           [TeamsUser.where(team_id: t1.id).size, Bid.where(team_id: t2.id).size]
     end
 
-    team_bids = construct_team_bidding_info(unassigned_teams, sign_up_topics)
-    assign_available_slots(team_bids)
+    teams_bidding_info = construct_teams_bidding_info(unassigned_teams, sign_up_topics)
+    assign_available_slots(teams_bidding_info)
 
     # Remove is_intelligent property from assignment so that it can revert to the default signup state
     assignment.update_attributes(:is_intelligent => false)

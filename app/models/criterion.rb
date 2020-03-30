@@ -35,7 +35,7 @@ class Criterion < ScoredQuestion
     html += '<TD align="left">' + self.type + '</TD>'
     html += '<td align="center">' + self.weight.to_s + '</TD>'
     questionnaire = self.questionnaire
-    if self.max_label.present? && self.min_label.present?
+    if !self.max_label.nil? && !self.min_label.nil?
       html += '<TD align="center"> (' + self.min_label + ') ' + questionnaire.min_question_score.to_s
       html += ' to ' + questionnaire.max_question_score.to_s + ' (' + self.max_label + ')</TD>'
     else
@@ -70,10 +70,8 @@ class Criterion < ScoredQuestion
     html += 'function showAdvice(i){var element = document.getElementById("showAdivce_" + i.toString());'
     html += 'var show = element.innerHTML == "Hide advice";'
     html += 'if (show){element.innerHTML="Show advice";} else{element.innerHTML="Hide advice";}toggleAdvice(i);}'
-
     html += 'function toggleAdvice(i) {var elem = document.getElementById(i.toString() + "_myDiv");'
     html += 'if (elem.style.display == "none") {elem.style.display = "";} else {elem.style.display = "none";}}</script>'
-
     html += '<div id="' + self.id.to_s + '_myDiv" style="display: none;">'
     # [2015-10-26] Zhewei:
     # best to order advices high to low, e.g., 5 to 1
@@ -91,12 +89,12 @@ class Criterion < ScoredQuestion
 
   def dropdown_criterion_question(count, answer = nil, questionnaire_min, questionnaire_max)
     current_value = "" 
-    current_value += 'data-current-rating =' + answer.answer.to_s if (answer && !answer.answer.nil?)
-    html = '<div><select id="responses_' + count.to_s + '_score" name="responses[' + count.to_s
-    html += '][score]" class="review-rating" ' + current_value + '>' + "<option value = ''>--</option>"
+    current_value += 'data-current-rating =' + answer.answer.to_s unless answer.nil?
+    html = '<div><select id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" class="review-rating" ' + current_value + '>'
+    html += "<option value = ''>--</option>"
     questionnaire_min.upto(questionnaire_max).each do |j|
       html += '<option value=' + j.to_s
-      html += ' selected="selected"' if answer && j == answer.answer
+      html += ' selected="selected"' if !answer.nil? && j == answer.answer
       html += '>'
       html += j.to_s
       html += "-" + self.min_label if self.min_label.present? && j == questionnaire_min
@@ -106,26 +104,12 @@ class Criterion < ScoredQuestion
 
     html += '</select></div><br><br><textarea' + ' id="responses_' + count.to_s + '_comments"'
     html += ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
-    html += answer.comments if answer && !answer.comments.nil?
+    html += answer.comments if !answer.nil? && !answer.comments.nil?
     html += '</textarea></td>'
   end
 
-  # def loop_in_dropdown_criterion_question(answer = nil, questionnaire_min, questionnaire_max)
-  #   html = ""
-  #   questionnaire_min.upto(questionnaire_max).each do |j|
-  #     html += '<option value=' + j.to_s
-  #     html += ' selected="selected"' if answer && j == answer.answer
-  #     html += '>'
-  #     html += j.to_s
-  #     html += "-" + self.min_label if self.min_label.present? && j == questionnaire_min
-  #     html += "-" + self.max_label if self.max_label.present? && j == questionnaire_max
-  #     html += "</option>"
-  #   end
-  #   html
-  # end
-
   def scale_criterion_question(count, answer = nil, questionnaire_min, questionnaire_max)
-    unless self.size.present?
+    if self.size.nil? || !self.size.present?
       cols = '70'
       rows = '1'
     else
@@ -133,7 +117,7 @@ class Criterion < ScoredQuestion
      rows = self.size.split(',')[1]
     end
     html = '<input id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" type="hidden"'
-    html += 'value="' + answer.answer.to_s + '"' if answer && !answer.answer.nil?
+    html += 'value="' + answer.answer.to_s + '"' unless answer.nil?
     html += '><table><tr><td width="10%"></td>'
 
     (questionnaire_min..questionnaire_max).each do |j|
@@ -141,24 +125,23 @@ class Criterion < ScoredQuestion
     end
 
     html += '<td width="10%"></td></tr><tr><td width="10%">'
-    html += self.min_label if self.min_label.present?
+    html += self.min_label unless self.min_label.nil?
     html += '</td>'
 
     (questionnaire_min..questionnaire_max).each do |j|
       html += '<td width="10%"><input type="radio" id="' + j.to_s + '" value="' + j.to_s + '" name="Radio_' + self.id.to_s + '"'
-      html += 'checked="checked"' if (answer && answer.answer == j) or (answer.nil? && questionnaire_min == j)
+      html += 'checked="checked"' if (!answer.nil? && answer.answer == j) or (answer.nil? && questionnaire_min == j)
       html += '></td>'
     end
     html += '<script>jQuery("input[name=Radio_' + self.id.to_s + ']:radio").change(function() {'
     html += 'var response_score = jQuery("#responses_' + count.to_s + '_score");'
     html += 'var checked_value = jQuery("input[name=Radio_' + self.id.to_s + ']:checked").val();'
     html += 'response_score.val(checked_value);});</script><td width="10%">'
-
-    html += self.max_label if self.max_label.present?
+    html += self.max_label unless self.max_label.nil?
     html += '</td><td width="10%"></td></tr></table>'
     html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments"' \
       ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
-    html += answer.comments if answer && !answer.comments.nil?
+    html += answer.comments if !answer.nil? && !answer.comments.nil?
     html += '</textarea>'    
   end
 

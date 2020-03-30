@@ -74,6 +74,7 @@ class BookmarksController < ApplicationController
     redirect_to action: 'list', id: @bookmark.topic_id
   end
 
+  # calculate average questionnaire score for 'Your rating' for specific bookmark
   def specific_average_score(bookmark)
     if bookmark.nil?
       return '-'
@@ -93,6 +94,7 @@ class BookmarksController < ApplicationController
     end
   end
 
+  # calculate average questionnaire score for 'Avg. rating' for specific bookmark
   def total_average_score(bookmark)
     if bookmark.nil?
       return '-'

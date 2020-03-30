@@ -84,7 +84,7 @@
           <% end %>
         </td>
         <td>
-          <!--Users can only add/edit/view review other users' bookmarks.-->
+          <!--Users can only review bookmarks that they did not add, and can only view/edit their own reviews.-->
           <% if bookmark.user_id != session[:user].id %>
             <% assignment_participant = AssignmentParticipant.find_by(user_id: session[:user].id) %>
             <% map = BookmarkRatingResponseMap.where(reviewed_object_id: @topic.assignment.id, reviewer_id: assignment_participant.id, reviewee_id: bookmark.id).first %>
@@ -102,7 +102,7 @@
             <%= '-' %>
           <% end %>
         </td>
-        <!--Editing/destroying bookmarks is available to the reviewing user, the reviewing user's team, and the instructor.-->
+        <!--Editing/destroying bookmarks is available to the user who added the bookmark, that user's team, and the instructor.-->
         <% is_teammate = false %>
         <% team = SignedUpTeam.find_by(topic_id: @topic.id) rescue nil %>
         <% if team %>

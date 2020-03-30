@@ -270,6 +270,21 @@ describe QuestionnairesController do
                                  type: 'ReviewQuestionnaire',
                                  display_type: 'Review',
                                  instructor_loc: ''}}
+      @params_with_question = {id: 1,
+                               questionnaire: {name: 'test questionnaire',
+                                               instructor_id: 6,
+                                               private: 0,
+                                               min_question_score: 0,
+                                               max_question_score: 5,
+                                               type: 'ReviewQuestionnaire',
+                                               display_type: 'Review',
+                                               instructor_loc: ''},
+                               question: {'1' => {seq: 66.0,
+                                                  txt: 'WOW',
+                                                  weight: 10,
+                                                  size: '50,3',
+                                                  max_label: 'Strong agree',
+                                                  min_label: 'Not agree'}}}
     end
     context 'successfully updates the attributes of questionnaire' do
       it 'redirects to questionnaires#edit page after updating' do
@@ -287,6 +302,37 @@ describe QuestionnairesController do
         post :update, @params
         expect(flash[:error].to_s).to eq 'This is an error!'
         expect(response).to redirect_to('/questionnaires/1/edit')
+      end
+    end
+
+    context 'successfully updates the questions in a questionnaire' do
+      it 'redirects to questionnaires#edit page after saving all questions' do
+        allow(Question).to receive(:find).with('1').and_return(question)
+        allow(question).to receive(:save).and_return(true)
+        allow(@questionnaire1).to receive(:update_attributes).with(any_args).and_return(true)
+        post :update, @params_with_question
+        expect(flash[:success]).to eq('The questionnaire has been successfully updated!')
+        expect(response).to redirect_to('/questionnaires/1/edit')
+      end
+    end
+
+    context 'when params[:view_advice] is not nil' do
+      it 'redirects to advice#edit_advice page' do
+        params = {id: 1,
+                  view_advice: true}
+        post :update, params
+        expect(response).to redirect_to('/advice/edit_advice/1')
+      end
+    end
+
+    context 'when params[:add_new_questions] is not nil' do
+      it 'redirects to questionnaire#add_new_questions' do
+        params = {id: 1,
+                  add_new_questions: true,
+                  new_question: {total_num: 2,
+                                 type: 'Criterion'}}
+        post :update, params
+        expect(response).to redirect_to action: 'add_new_questions', id: params[:id], question: params[:new_question]
       end
     end
   end
@@ -369,36 +415,6 @@ describe QuestionnairesController do
                              type: 'Dropdown'}}
         post :add_new_questions, params
         expect(response).to redirect_to('/questionnaires/1/edit')
-      end
-    end
-  end
-
-  describe '#save_all_questions' do
-    context 'when params[:save] is not nil, params[:view_advice] is nil' do
-      it 'redirects to questionnaires#edit page after saving all questions' do
-        allow(Question).to receive(:find).with('1').and_return(question)
-        allow(question).to receive(:save).and_return(true)
-        params = {id: 1,
-                  save: true,
-                  question: {'1' => {seq: 66.0,
-                                     txt: 'WOW',
-                                     weight: 10,
-                                     size: '50,3',
-                                     max_label: 'Strong agree',
-                                     min_label: 'Not agree'}}}
-        post :save_all_questions, params
-        expect(flash[:success]).to eq('All questions has been successfully saved!')
-        expect(response).to redirect_to('/questionnaires/1/edit')
-      end
-    end
-
-    context 'when params[:save] is nil, params[:view_advice] is not nil' do
-      it 'redirects to advice#edit_advice page' do
-        params = {id: 1,
-                  view_advice: true,
-                  question: {}}
-        post :save_all_questions, params
-        expect(response).to redirect_to('/advice/edit_advice/1')
       end
     end
   end

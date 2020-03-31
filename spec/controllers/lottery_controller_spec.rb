@@ -24,7 +24,7 @@ describe LotteryController do
   let(:team_user3) { create(:team_user, team_id: assignment_team1.id, user_id: student3.id, id: 3) }
   let(:team_user4) { create(:team_user, team_id: assignment_team2.id, user_id: student4.id, id: 4) }
   let(:team_user5) { create(:team_user, team_id: assignment_team3.id, user_id: student5.id, id: 5) }
-  let(:team_user6) { create(:team_user, team_id: assignment_team4.id, user_id: student6.id, id: 6) }
+  let(:team_user6) { create(:team_user, team_id: assignment_team3.id, user_id: student6.id, id: 6) }
 
   before :each do
     assignment_team1.save
@@ -55,7 +55,8 @@ describe LotteryController do
                                     {pid: student2.id, ranks: [1, 0, 0, 3]},
                                     {pid: student3.id, ranks: [1, 0, 0, 3]},
                                     {pid: student4.id, ranks: [0, 2, 0, 1]},
-                                    {pid: student5.id, ranks: [0, 0, 0, 5]}]
+                                    {pid: student5.id, ranks: [0, 0, 0, 5]},
+                                    {pid: student6.id, ranks: [0, 0, 0, 5]}]
   end
 
   describe "#action_allowed?" do
@@ -105,11 +106,24 @@ describe LotteryController do
       allow(controller).to receive(:params).and_return(params)
       allow(controller).to receive(:redirect_to).with(controller: 'tree_display', action: "list")
     end
-    it "should not set any error message in the flash" do
-      expect(controller).not_to receive("flash[:error]")
+    context "with valid assignment id" do
+      it "should not set any error message in the flash" do
+        expect(controller).not_to receive("flash[:error]")
+      end
+      it "should redirect to list action in tree_display controller" do
+        expect(controller).to receive(:redirect_to).with(controller: 'tree_display', action: "list")
+      end
     end
-    it "should redirect to list action in tree_display controller" do
-      expect(controller).to receive(:redirect_to).with(controller: 'tree_display', action: "list")
+    context "with no participants" do
+      before :each do
+        allow(controller).to receive(:construct_users_bidding_info).and_return([])
+      end
+      it "should not set any error message in the flash" do
+        expect(controller).not_to receive("flash[:error]")
+      end
+      it "should redirect to list action in tree_display controller" do
+        expect(controller).to receive(:redirect_to).with(controller: 'tree_display', action: "list")
+      end
     end
     after :each do
       controller.run_intelligent_assignment
@@ -127,6 +141,10 @@ describe LotteryController do
 
   describe "#match_new_teams_to_topics" do
     context "to intelligent assignment" do
+      before :each do
+        Bid.create(team_id: assignment_team1.id, topic_id: topic1.id)
+        Bid.create(team_id: assignment_team2.id, topic_id: topic2.id)
+      end
       it "assigns topics to teams" do
         expect(controller).to receive(:assign_available_slots)
         controller.send(:match_new_teams_to_topics, assignment)
@@ -137,8 +155,10 @@ describe LotteryController do
       end
     end
     context "to unintelligent assignment" do
-      it "outputs an error message to flash" do
+      before :each do
         controller.send(:match_new_teams_to_topics, assignment_2)
+      end
+      it "outputs an error message to flash" do
         expect(flash[:error]).to eq("This action is not allowed. The assignment #{assignment_2.name} does not enable intelligent assignments.")
       end
     end
@@ -146,6 +166,8 @@ describe LotteryController do
 
   describe "#merge_bids_from_different_previous_teams" do
     before :each do
+      @sign_up_topics = @sign_up_topics
+      @team_id = assignment_team1.id
       @user_ids = [team_user1.id, team_user2.id, team_user3.id]
       @user_bidding_info = [{pid: team_user1.id, ranks: [1, 0, 2, 2]},
                             {pid: team_user2.id, ranks: [2, 1, 3, 0]},
@@ -153,7 +175,7 @@ describe LotteryController do
     end
     it "should create bids objects of the newly-merged team on each sign-up topics" do
       bid_count = Bid.count
-      controller.send(:merge_bids_from_different_previous_teams, @sign_up_topics, assignment_team1.id, @user_ids, @user_bidding_info)
+      controller.send(:merge_bids_from_different_previous_teams, @sign_up_topics, @team_id, @user_ids, @user_bidding_info)
       expect(Bid.count).to eq(bid_count + 4)
       expect(Bid.find_by(topic_id: 1, team_id: 1, priority: 1)).to_not be nil
       expect(Bid.find_by(topic_id: 2, team_id: 1, priority: 3)).to_not be nil
@@ -175,7 +197,6 @@ describe LotteryController do
       it "should return the team without the removed user" do
         number_of_team_users = TeamsUser.count
         controller.send(:remove_user_from_previous_team, @assignment.id, @team_user3.user_id)
-
         expect(TeamsUser.count).to eq(number_of_team_users - 1)
         expect(TeamsUser.find_by(user_id: @team_user3.user_id)).to be nil
         expect(TeamsUser.find_by(user_id: @team_user2.user_id)).to eq @team_user2
@@ -184,7 +205,7 @@ describe LotteryController do
     end
     describe "#remove_empty_teams" do
       it "should reduce the number of teams by the number of empty teams in the assignment" do
-        create(:assignment_team, assignment: @assignment, teams_users: [])
+        @assignment_team2 = create(:assignment_team, assignment: @assignment, teams_users: [])
         number_of_teams = AssignmentTeam.count
         number_of_teams_in_assignment = Assignment.find(@assignment.id).teams.count
         controller.send(:remove_empty_teams, @assignment)

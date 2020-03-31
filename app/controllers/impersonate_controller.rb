@@ -21,9 +21,9 @@ class ImpersonateController < ApplicationController
     flash[:error] = "This page doesn't take any query string." unless request.GET.empty?
   end 
 
-  # method to overwrite the session details that are corresponding to the user or one being impersonated 
+  # Method to overwrite the session details that are corresponding to the user or one being impersonated 
   def overwrite_session
-    #if not impersonatable, then original user's session remains
+    # If not impersonatable, then original user's session remains
     if params[:impersonate].nil?
       user = User.find_by(name: params[:user][:name])
       session[:super_user] = session[:user] if session[:super_user].nil?
@@ -32,8 +32,7 @@ class ImpersonateController < ApplicationController
       session[:impersonate] = true
       session[:user] = user
     else
-    #if some user is to be impersonated, their session details are overwritten onto the current to impersonate	
-
+      # If some user is to be impersonated, their session details are overwritten onto the current to impersonate	
       if !params[:impersonate][:name].empty?
 	user = User.find_by(name: params[:impersonate][:name])
 	AuthController.clear_user_info(session, nil)
@@ -50,7 +49,7 @@ class ImpersonateController < ApplicationController
     end
    end
 
-  # checking if special characters are present in the username provided, only alphanumeric should be used
+  # Checking if special characters are present in the username provided, only alphanumeric should be used
   def check_if_special_char
     if warn_for_special_chars(params[:user][:name], "Username")
       redirect_back
@@ -111,13 +110,13 @@ class ImpersonateController < ApplicationController
   # Main operation, method used to break the functions in impersonate controller and bring out 2 functionalities at same level, 
   # checking if user impersonateable, if not throw corresponding error message 
   def impersonate
-    #initial check to see if the username exists	
+    # Initial check to see if the username exists	
     display_error_msg
     begin
     @original_user = session[:super_user] || session[:user]
-    #Impersonate using form on /impersonate/start, based on the username provided, this method looks to see if that's possible by calling the do_main_operation method
+    # Impersonate using form on /impersonate/start, based on the username provided, this method looks to see if that's possible by calling the do_main_operation method
     if params[:impersonate].nil?
-      #check if special chars /\?<>|&$# are used to avoid html tags or system command
+      # Check if special chars /\?<>|&$# are used to avoid html tags or system command
       check_if_special_char
       user = User.find_by(name: params[:user][:name])
       do_main_operation(user)

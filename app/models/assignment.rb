@@ -212,15 +212,18 @@ class Assignment < ActiveRecord::Base
 
 
   DELETE_INSTANCES=['invitations','teams','participants','due_dates','assignment_questionnaires']
-  
+  #Deletes all instances created as part of assignment and finally destroys itself.
   def delete(force = nil)
     begin
-      delete_review_response(ReviewResponseMap,force)
+      maps = ReviewResponseMap.where(reviewed_object_id: self.id)
+      maps.each {|map| map.delete(force) }
     rescue StandardError
       raise "There is at least one review response that exists for #{self.name}."
     end
+
     begin
-      delete_review_response(TeammateReviewResponseMap,force)
+      maps = TeammateReviewResponseMap.where(reviewed_object_id: self.id)
+      maps.each {|map| map.delete(force) }
     rescue StandardError
       raise "There is at least one teammate review response that exists for #{self.name}."
     end
@@ -621,10 +624,5 @@ class Assignment < ActiveRecord::Base
       reviewers.member?(reviewer) ? reviewers[reviewer] += 1 : reviewers[reviewer] = 1
     end
     reviewers = reviewers.sort_by {|a| a[1]}
-  end
-
-  def delete_review_response(responsemap_type,force)
-    maps = responsemap_type.where(reviewed_object_id: self.id)
-    maps.each {|map| map.delete(force) }
   end
 end

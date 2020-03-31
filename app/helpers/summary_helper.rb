@@ -8,7 +8,7 @@ module SummaryHelper
   class Summary
     attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion, :summary_ws_url
 
-    def summarize_reviews_by_reviewee(questions, assignment, r_id, summary_ws_url)
+    def summarize_reviews_by_reviewee(questions, assignment, reviewee_id, summary_ws_url)
       self.summary = ({})
       self.avg_scores_by_round = ({})
       self.avg_scores_by_criterion = ({})
@@ -19,9 +19,9 @@ module SummaryHelper
         self.summary[round.to_s] = {}
         self.avg_scores_by_criterion[round.to_s] = {}
         self.avg_scores_by_round[round.to_s] = 0.0
-        questions[round].each do |q|
-          next if q.type.eql?("SectionHeader")
-          summarize_reviews_by_reviewee_question(assignment, r_id, q, round)
+        questions[round].each do |question|
+          next if question.type.eql?("SectionHeader")
+          summarize_reviews_by_reviewee_question(assignment, reviewee_id, question, round)
         end
         self.avg_scores_by_round[round.to_s] = calculate_avg_score_by_round(self.avg_scores_by_criterion[round.to_s], questions[round])
       end
@@ -29,13 +29,13 @@ module SummaryHelper
     end
 
     # get average scores and summary for each question
-    def summarize_reviews_by_reviewee_question(assignment, r_id, q, round)
-      question_answers = Answer.answers_by_question_for_reviewee(assignment.id, r_id, q.id)
+    def summarize_reviews_by_reviewee_question(assignment, reviewee_id, question, round)
+      question_answers = Answer.answers_by_question_for_reviewee(assignment.id, reviewee_id, question.id)
 
       # get the avg scores for this question
-      self.avg_scores_by_criterion[round.to_s][q.txt] = calculate_avg_score_by_criterion(question_answers, get_max_score_for_question(q))
+      self.avg_scores_by_criterion[round.to_s][question.txt] = calculate_avg_score_by_criterion(question_answers, get_max_score_for_question(question))
       # get the summary of answers to this question
-      self.summary[round.to_s][q.txt] = summarize_sentences(break_up_comments_to_sentences(question_answers), self.summary_ws_url)
+      self.summary[round.to_s][question.txt] = summarize_sentences(break_up_comments_to_sentences(question_answers), self.summary_ws_url)
     end
 
     # Wait for threads to end

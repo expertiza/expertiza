@@ -87,6 +87,13 @@ describe LotteryController do
     end
   end
 
+  describe "#construct_users_bidding_info" do
+    it "generate users bidding information hash" do
+      users_bidding_info = controller.send(:construct_users_bidding_info, @sign_up_topics, @teams)
+      expect(users_bidding_info).to eq(@expected_users_bidding_info)
+    end
+  end
+
   describe "#merge_bids_from_different_previous_teams" do
     before :each do
       @sign_up_topics = @sign_up_topics

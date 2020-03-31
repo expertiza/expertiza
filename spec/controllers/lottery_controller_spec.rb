@@ -140,27 +140,32 @@ describe LotteryController do
   end
 
   describe "#match_new_teams_to_topics" do
-    before :each do
-      bid = Bid.find_by(topic_id: topic3.id, team_id: assignment_team2.id)
-      bid.priority = 0
-      bid.save
+    context "to intelligent assignment" do
+      before :each do
+        Bid.create(team_id: assignment_team1.id, topic_id: topic1.id)
+        Bid.create(team_id: assignment_team2.id, topic_id: topic2.id)
+      end
+      it "assigns topics to teams" do
+        expect(controller).to receive(:assign_available_slots)
+        controller.send(:match_new_teams_to_topics, assignment)
+      end
+      it "sets the assignment to unintelligent" do
+        controller.send(:match_new_teams_to_topics, assignment)
+        expect(assignment.is_intelligent).to eq(false)
+      end
     end
-    it "assigns topics to teams" do
-      expect(assignment_2.is_intelligent).to eq(false)
-      controller.send(:match_new_teams_to_topics, assignment_2)
-      expect(assignment_2.is_intelligent).to eq(false)
-      expect(assignment.is_intelligent).to eq(true)
-      Bid.create(team_id: assignment_team1.id, topic_id: topic1.id)
-      Bid.create(team_id: assignment_team2.id, topic_id: topic2.id)
-      controller.send(:match_new_teams_to_topics, assignment)
-      expect(assignment.is_intelligent).to eq(false)
+    context "to unintelligent assignment" do
+      before :each do
+        controller.send(:match_new_teams_to_topics, assignment_2)
+      end
+      it "outputs an error message to flash" do
+        expect(flash[:error]).to eq("This action is not allowed. The assignment #{assignment_2.name} does not enable intelligent assignments.")
+      end
     end
   end
 
   describe "#merge_bids_from_different_previous_teams" do
     before :each do
-      @sign_up_topics = @sign_up_topics
-      @team_id = assignment_team1.id
       @user_ids = [team_user1.id, team_user2.id, team_user3.id]
       @user_bidding_info = [{pid: team_user1.id, ranks: [1, 0, 2, 2]},
                             {pid: team_user2.id, ranks: [2, 1, 3, 0]},
@@ -168,7 +173,7 @@ describe LotteryController do
     end
     it "should create bids objects of the newly-merged team on each sign-up topics" do
       bid_count = Bid.count
-      controller.send(:merge_bids_from_different_previous_teams, @sign_up_topics, @team_id, @user_ids, @user_bidding_info)
+      controller.send(:merge_bids_from_different_previous_teams, @sign_up_topics, assignment_team1.id, @user_ids, @user_bidding_info)
       expect(Bid.count).to eq(bid_count + 4)
       expect(Bid.find_by(topic_id: 1, team_id: 1, priority: 1)).to_not be nil
       expect(Bid.find_by(topic_id: 2, team_id: 1, priority: 3)).to_not be nil
@@ -186,13 +191,10 @@ describe LotteryController do
       @team_user2 = create(:team_user, team: @assignment_team, user: create(:student, name: "team_user2"))
       @team_user3 = create(:team_user, team: @assignment_team, user: create(:student, name: "team_user3"))
     end
-
     describe "#remove_user_from_previous_team" do
       it "should return the team without the removed user" do
-        user_id = @team_user3.user_id
-        assignment_id = @assignment.id
         number_of_team_users = TeamsUser.count
-        controller.send(:remove_user_from_previous_team, assignment_id, user_id)
+        controller.send(:remove_user_from_previous_team, @assignment.id, @team_user3.user_id)
 
         expect(TeamsUser.count).to eq(number_of_team_users - 1)
         expect(TeamsUser.find_by(user_id: @team_user3.user_id)).to be nil
@@ -200,12 +202,9 @@ describe LotteryController do
         expect(TeamsUser.find_by(user_id: @team_user1.user_id)).to eq @team_user1
       end
     end
-
     describe "#remove_empty_teams" do
-      before :each do
-        @assignment_team2 = create(:assignment_team, assignment: @assignment, teams_users: [])
-      end
       it "should reduce the number of teams by the number of empty teams in the assignment" do
+        create(:assignment_team, assignment: @assignment, teams_users: [])
         number_of_teams = AssignmentTeam.count
         number_of_teams_in_assignment = Assignment.find(@assignment.id).teams.count
         controller.send(:remove_empty_teams, @assignment)
@@ -216,12 +215,9 @@ describe LotteryController do
   end
 
   describe "#assign_available_slots" do
-    before :each do
-      @sign_up_topic = topic1
-      @topic_bids1 = [{topic_id: @sign_up_topic.id, priority: 1}]
-      @team_bids = [{team_id: assignment_team1.id, bids: @topic_bids1}]
-    end
     it "should assign topic to team of biggest size" do
+      @topic_bids1 = [{topic_id: topic1.id, priority: 1}]
+      @team_bids = [{team_id: assignment_team1.id, bids: @topic_bids1}]
       number_of_signed_up_teams = SignedUpTeam.count
       controller.send(:assign_available_slots, @team_bids)
       expect(SignedUpTeam.count).to eq(number_of_signed_up_teams + 1)

@@ -53,11 +53,6 @@ describe LotteryController do
 
     @teams = assignment.teams
     @sign_up_topics = assignment.sign_up_topics
-    # Only members in assignment_team1 and assignment_team2 are involved in the bidding process
-    @expected_users_bidding_info = [{pid: student1.id, ranks: [1, 0, 0, 3]},
-                                    {pid: student2.id, ranks: [1, 0, 0, 3]},
-                                    {pid: student3.id, ranks: [1, 0, 0, 3]},
-                                    {pid: student4.id, ranks: [0, 2, 5, 1]}]
   end
 
   describe "#action_allowed?" do
@@ -79,6 +74,11 @@ describe LotteryController do
 
   describe "#construct_users_bidding_info" do
     it "generate users bidding information hash" do
+      # Only members in assignment_team1 and assignment_team2 are involved in the bidding process
+      @expected_users_bidding_info = [{pid: student1.id, ranks: [1, 0, 0, 3]},
+                                      {pid: student2.id, ranks: [1, 0, 0, 3]},
+                                      {pid: student3.id, ranks: [1, 0, 0, 3]},
+                                      {pid: student4.id, ranks: [0, 2, 5, 1]}]
       users_bidding_info = controller.send(:construct_users_bidding_info, @sign_up_topics, @teams)
       expect(users_bidding_info).to eq(@expected_users_bidding_info)
     end
@@ -187,10 +187,8 @@ describe LotteryController do
     end
     describe "#remove_user_from_previous_team" do
       it "should return the team without the removed user" do
-        user_id = @team_user3.user_id
-        assignment_id = @assignment.id
         number_of_team_users = TeamsUser.count
-        controller.send(:remove_user_from_previous_team, assignment_id, user_id)
+        controller.send(:remove_user_from_previous_team, @assignment.id, @team_user3.user_id)
 
         expect(TeamsUser.count).to eq(number_of_team_users - 1)
         expect(TeamsUser.find_by(user_id: @team_user3.user_id)).to be nil

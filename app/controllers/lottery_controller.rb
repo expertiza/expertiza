@@ -13,7 +13,7 @@ class LotteryController < ApplicationController
   # to build teams automatically.
   # The webservice tries to create teams with sizes close to the max team size
   # allowed by the assignment by potentially combining existing smaller teams
-  # that have similar bidding info/priorities associated with the assignment's signup topics.
+  # that have similar bidding info/priorities associated with the assignment's sign-up topics.
   #
   # rubocop:disable Metrics/AbcSize
   def run_intelligent_assignment
@@ -61,7 +61,7 @@ class LotteryController < ApplicationController
     users_bidding_info
   end
 
-  # Generate team bidding infomation hash based on newly-created teams
+  # Generate team bidding information hash based on newly-created teams
   # Structure of team_bidding_info variable: [{team_id1, bids_1}, {team_id2, bids_2}]
   def construct_teams_bidding_info(unassigned_teams, sign_up_topics)
     teams_bidding_info = []
@@ -124,7 +124,6 @@ class LotteryController < ApplicationController
   # previous teams
   # [Future work]: we need to find a better way to merge bids
   # that came from different previous teams
-  #
   def merge_bids_from_different_previous_teams(sign_up_topics, team_id, user_ids, users_bidding_info)
     # Select data from `users_bidding_info` variable that only related to team members in current team and transpose it.
     # For example, below matrix shows 4 topics (key) and corresponding priorities given by 3 team members (value).
@@ -193,7 +192,7 @@ class LotteryController < ApplicationController
       flash[:error] = "This action is not allowed. The assignment #{assignment.name} does not enable intelligent assignments."
       return
     end
-    # Getting signup topics with max_choosers > 0
+    # Getting sign-up topics with max_choosers > 0
     sign_up_topics = SignUpTopic.where('assignment_id = ? AND max_choosers > 0', assignment.id)
     unassigned_teams = assignment.teams.reload.select do |t|
       SignedUpTeam.where(team_id: t.id, is_waitlisted: 0).blank? and Bid.where(team_id: t.id).any?
@@ -212,7 +211,7 @@ class LotteryController < ApplicationController
     teams_bidding_info = construct_teams_bidding_info(unassigned_teams, sign_up_topics)
     assign_available_slots(teams_bidding_info)
 
-    # Remove is_intelligent property from assignment so that it can revert to the default signup state
+    # Remove is_intelligent property from assignment so that it can revert to the default sign-up state
     assignment.update_attributes(is_intelligent: false)
     flash[:success] = 'The intelligent assignment was successfully completed for ' + assignment.name + '.'
   end

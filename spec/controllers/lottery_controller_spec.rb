@@ -1,11 +1,6 @@
-include AssignmentHelper
-
 describe LotteryController do
-  let(:assignment) { create(:assignment, is_intelligent: true) }
-  let(:assignment2) { build(:assignment) }
-  let(:ta) { build(:teaching_assistant) }
-  let(:instructor) { build(:instructor) }
-  let(:admin) { build(:admin) }
+  let(:assignment) { create(:assignment, is_intelligent: true, name: "assignment") }
+  let(:assignment_2) { create(:assignment, is_intelligent: false, name: "assignment_2") }
 
   let(:student1) { create(:student, name: "student1") }
   let(:student2) { create(:student, name: "student2") }
@@ -36,58 +31,47 @@ describe LotteryController do
     assignment_team2.save
     assignment_team3.save
     assignment_team4.save
-
     team_user1.save
     team_user2.save
     team_user3.save
     team_user4.save
     team_user5.save
     team_user6.save
-
     topic1.save
     topic2.save
     topic3.save
     topic4.save
 
-    create(:bid, topic_id: topic1.id, team_id: assignment_team1.id, priority: 1)
-    create(:bid, topic_id: topic2.id, team_id: assignment_team2.id, priority: 2)
-    create(:bid, topic_id: topic4.id, team_id: assignment_team2.id, priority: 1)
-    create(:bid, topic_id: topic3.id, team_id: assignment_team2.id, priority: nil)
-    create(:bid, topic_id: topic4.id, team_id: assignment_team3.id, priority: 5)
-    create(:bid, topic_id: topic4.id, team_id: assignment_team1.id, priority: 3)
+    Bid.create(topic_id: topic1.id, team_id: assignment_team1.id, priority: 1)
+    Bid.create(topic_id: topic2.id, team_id: assignment_team2.id, priority: 2)
+    Bid.create(topic_id: topic4.id, team_id: assignment_team2.id, priority: 1)
+    Bid.create(topic_id: topic3.id, team_id: assignment_team2.id, priority: 0)
+    Bid.create(topic_id: topic4.id, team_id: assignment_team3.id, priority: 5)
+    Bid.create(topic_id: topic4.id, team_id: assignment_team1.id, priority: 3)
 
+    @teams = assignment.teams
+    @sign_up_topics = assignment.sign_up_topics
     @expected_users_bidding_info = [{pid: student1.id, ranks: [1, 0, 0, 3]},
                                     {pid: student2.id, ranks: [1, 0, 0, 3]},
                                     {pid: student3.id, ranks: [1, 0, 0, 3]},
                                     {pid: student4.id, ranks: [0, 2, 0, 1]},
                                     {pid: student5.id, ranks: [0, 0, 0, 5]},
                                     {pid: student6.id, ranks: [0, 0, 0, 5]}]
-
-    @team_users = []
-    @team_users << team_user1 << team_user2 << team_user3
-
-    @teams = assignment.teams
-    @sign_up_topics = assignment.sign_up_topics
   end
 
   describe "#action_allowed?" do
     it "allows Instructors, Teaching Assistants, Administrators to run the bid" do
-      user = instructor
-      stub_current_user(user, user.role.name, user.role)
+      session[:user] = build(:instructor)
       expect(controller.action_allowed?).to be true
-      user = admin
-      stub_current_user(user, user.role.name, user.role)
+      session[:user] = build(:teaching_assistant)
       expect(controller.action_allowed?).to be true
-      user = ta
-      stub_current_user(user, user.role.name, user.role)
+      session[:user] = build(:admin)
       expect(controller.action_allowed?).to be true
     end
     it "does not allow Students or Visitors to run the bid" do
-      user = student1
-      stub_current_user(user, user.role.name, user.role)
+      session[:user] = student1
       expect(controller.action_allowed?).to be false
-      user = nil
-      stub_current_user(nil, nil, nil)
+      session[:user] = nil
       expect(controller.action_allowed?).to be false
     end
   end
@@ -117,7 +101,7 @@ describe LotteryController do
 
   describe "#run_intelligent_assignment" do
     before :each do
-      session[:user] = instructor
+      session[:user] = build(:instructor)
       params = ActionController::Parameters.new(id: assignment.id)
       allow(controller).to receive(:params).and_return(params)
       allow(controller).to receive(:redirect_to).with(controller: 'tree_display', action: "list")
@@ -162,9 +146,9 @@ describe LotteryController do
       bid.save
     end
     it "assigns topics to teams" do
-      expect(assignment2.is_intelligent).to eq(false)
-      controller.send(:match_new_teams_to_topics, assignment2)
-      expect(assignment2.is_intelligent).to eq(false)
+      expect(assignment_2.is_intelligent).to eq(false)
+      controller.send(:match_new_teams_to_topics, assignment_2)
+      expect(assignment_2.is_intelligent).to eq(false)
       expect(assignment.is_intelligent).to eq(true)
       Bid.create(team_id: assignment_team1.id, topic_id: topic1.id)
       Bid.create(team_id: assignment_team2.id, topic_id: topic2.id)
@@ -177,7 +161,7 @@ describe LotteryController do
     before :each do
       @sign_up_topics = @sign_up_topics
       @team_id = assignment_team1.id
-      @user_ids = @team_users.map(&:id)
+      @user_ids = [team_user1.id, team_user2.id, team_user3.id]
       @user_bidding_info = [{pid: team_user1.id, ranks: [1, 0, 2, 2]},
                             {pid: team_user2.id, ranks: [2, 1, 3, 0]},
                             {pid: team_user3.id, ranks: [3, 2, 1, 1]}]
@@ -202,7 +186,7 @@ describe LotteryController do
       @team_user2 = create(:team_user, team: @assignment_team, user: create(:student, name: "team_user2"))
       @team_user3 = create(:team_user, team: @assignment_team, user: create(:student, name: "team_user3"))
     end
-    
+
     describe "#remove_user_from_previous_team" do
       it "should return the team without the removed user" do
         user_id = @team_user3.user_id

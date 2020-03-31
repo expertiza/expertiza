@@ -94,6 +94,23 @@ describe LotteryController do
     end
   end
 
+
+  describe "#create_new_teams_for_bidding_response" do
+    it "create new Assignment Teams" do
+      user_bidding_info = []
+      teams = [[student1.id, student2.id], [student3.id]]
+      expect(AssignmentTeam.count).to eq(4)
+      expect(TeamNode.count).to eq(0)
+      expect(TeamsUser.count).to eq(6)
+      expect(TeamUserNode.count).to eq(0)
+      controller.send(:create_new_teams_for_bidding_response, teams, assignment, user_bidding_info)
+      expect(AssignmentTeam.count).to eq(6)
+      expect(TeamNode.count).to eq(2)
+      expect(TeamsUser.count).to eq(6)
+      expect(TeamUserNode.count).to eq(3)
+    end
+  end
+
   describe "#merge_bids_from_different_previous_teams" do
     before :each do
       @sign_up_topics = @sign_up_topics

@@ -112,7 +112,8 @@ describe Assignment do
 
     it 'raises an error' do
       metareviewer = nil
-      expect { assignment.response_map_to_metareview(metareviewer) }.to raise_error(RuntimeError, /There are no reviews to metareview at this time for this assignment./)
+      expect { assignment.response_map_to_metareview(metareviewer) }
+          .to raise_error(RuntimeError, /There are no reviews to metareview at this time for this assignment./)
     end
   end
 

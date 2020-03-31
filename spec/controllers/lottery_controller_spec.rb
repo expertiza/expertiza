@@ -94,7 +94,6 @@ describe LotteryController do
     end
   end
 
-
   describe "#create_new_teams_for_bidding_response" do
     it "create new Assignment Teams" do
       user_bidding_info = []
@@ -108,6 +107,18 @@ describe LotteryController do
       expect(TeamNode.count).to eq(2)
       expect(TeamsUser.count).to eq(6)
       expect(TeamUserNode.count).to eq(3)
+    end
+  end
+
+  describe "#run_intelligent_assignment" do
+    it "should redirect to list action in tree_display controller" do
+      params = ActionController::Parameters.new(id: assignment.id)
+      allow(controller).to receive(:params).and_return(params)
+      session[:user] = instructor
+      allow(controller).to receive(:flash).and_return({})
+      allow(Assignment).to receive(:find_by).with(id: assignment.id).and_return(assignment)
+      expect(controller).to receive(:redirect_to).with(controller: 'tree_display', action: "list")
+      controller.run_intelligent_assignment
     end
   end
 

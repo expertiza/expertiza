@@ -102,7 +102,7 @@ class Assignment < ActiveRecord::Base
   def response_map_to_metareview(metareviewer)
     response_map_set = Array.new(review_mappings)
     # Reject response maps without responses
-    response_map_set.reject! { |response_map| response_map.response.empty? }
+    response_map_set.reject! {|response_map| response_map.response.empty? }
     raise 'There are no reviews to metareview at this time for this assignment.' if response_map_set.empty?
 
     # Reject reviews where the meta_reviewer was the reviewer or the contributor
@@ -112,13 +112,13 @@ class Assignment < ActiveRecord::Base
     raise 'There are no more reviews to metareview for this assignment.' if response_map_set.empty?
 
     # Metareviewer can only metareview each review once
-    response_map_set.reject! { |response_map| response_map.metareviewed_by?(metareviewer) }
+    response_map_set.reject! {|response_map| response_map.metareviewed_by?(metareviewer) }
     raise 'You have already metareviewed all reviews for this assignment.' if response_map_set.empty?
 
     # Reduce to the response maps with the least number of metareviews received
-    response_map_set.sort! {|a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count}
+    response_map_set.sort! {|a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
     min_metareviews = response_map_set.first.metareview_response_maps.count
-    response_map_set.reject! { |response_map| response_map.metareview_response_maps.count > min_metareviews }
+    response_map_set.reject! {|response_map| response_map.metareview_response_maps.count > min_metareviews }
 
     # Reduce the response maps to the reviewers with the least number of metareviews received
     reviewers = {} # <reviewer, number of metareviews>
@@ -126,15 +126,15 @@ class Assignment < ActiveRecord::Base
       reviewer = response_map.reviewer
       reviewers.member?(reviewer) ? reviewers[reviewer] += 1 : reviewers[reviewer] = 1
     end
-    reviewers = reviewers.sort_by { |a| a[1] }
+    reviewers = reviewers.sort_by {|a| a[1] }
     min_metareviews = reviewers.first[1]
-    reviewers.reject! { |reviewer| reviewer[1] == min_metareviews }
-    response_map_set.reject! { |response_map| reviewers.member?(response_map.reviewer) }
+    reviewers.reject! {|reviewer| reviewer[1] == min_metareviews }
+    response_map_set.reject! {|response_map| reviewers.member?(response_map.reviewer) }
 
     # Pick the response map whose most recent meta_reviewer was assigned longest ago
-    response_map_set.sort! { |a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
+    response_map_set.sort! {|a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
     min_metareviews = response_map_set.first.metareview_response_maps.count
-    response_map_set.sort! { |a, b| a.metareview_response_maps.last.id <=> b.metareview_response_maps.last.id } if min_metareviews > 0
+    response_map_set.sort! {|a, b| a.metareview_response_maps.last.id <=> b.metareview_response_maps.last.id } if min_metareviews > 0
     # The first review_map is the best to metareview
     response_map_set.first
   end
@@ -257,14 +257,14 @@ class Assignment < ActiveRecord::Base
   def delete(force = nil)
     begin
       maps = ReviewResponseMap.where(reviewed_object_id: self.id)
-      maps.each { |map| map.delete(force) }
+      maps.each {|map| map.delete(force) }
     rescue StandardError
       raise "There is at least one review response that exists for #{self.name}."
     end
 
     begin
       maps = TeammateReviewResponseMap.where(reviewed_object_id: self.id)
-      maps.each { |map| map.delete(force) }
+      maps.each {|map| map.delete(force) }
     rescue StandardError
       raise "There is at least one teammate review response that exists for #{self.name}."
     end
@@ -629,6 +629,6 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_due_dates(type)
-    self.due_dates.select { |due_date| due_date.deadline_type_id == DeadlineType.find_by(name: type).id }
+    self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: type).id }
   end
 end

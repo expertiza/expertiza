@@ -277,12 +277,12 @@ class AssignmentsController < ApplicationController
   end
 
   # helper methods for copy
-  #checks if two assignments are in the same directory
+  # checks if two assignments are in the same directory
   def check_same_directory?(old_id, new_id)
     Assignment.find(old_id).directory_path == Assignment.find(new_id).directory_path
   end
 
-  #sets the user for the copy method to the current user and indicates the session is for copying
+  # sets the user for the copy method to the current user and indicates the session is for copying
   def update_copy_session
     @user = current_user
     session[:copy_flag] = true

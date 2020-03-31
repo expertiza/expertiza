@@ -139,10 +139,6 @@ class Assignment < ActiveRecord::Base
     response_map_set.first
   end
 
-  def check_response_for_error(response_map_set)
-
-  end
-
   def metareview_mappings
     mappings = []
     self.review_mappings.each do |map|

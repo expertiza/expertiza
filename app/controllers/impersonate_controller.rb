@@ -25,74 +25,74 @@ class ImpersonateController < ApplicationController
   def overwrite_session
     #if not impersonatable, then original user's session remains
     if params[:impersonate].nil?
-          user = User.find_by(name: params[:user][:name])
-          session[:super_user] = session[:user] if session[:super_user].nil?
-      	  AuthController.clear_user_info(session, nil)
-          session[:original_user] = @original_user
-          session[:impersonate] = true
-          session[:user] = user
+      user = User.find_by(name: params[:user][:name])
+      session[:super_user] = session[:user] if session[:super_user].nil?
+      AuthController.clear_user_info(session, nil)
+      session[:original_user] = @original_user
+      session[:impersonate] = true
+      session[:user] = user
     else
     #if some user is to be impersonated, their session details are overwritten onto the current to impersonate	
 
-          if !params[:impersonate][:name].empty?
-	    user = User.find_by(name: params[:impersonate][:name])
-	    AuthController.clear_user_info(session, nil)
-            session[:user] = user
-            session[:impersonate] =  true
-            session[:original_user] = @original_user
-          else
-            user = User.find_by(name: params[:user][:name])
-	    AuthController.clear_user_info(session, nil)
-            session[:user] = session[:super_user]
-            user = session[:user]
-            session[:super_user] = nil
-          end
+      if !params[:impersonate][:name].empty?
+	user = User.find_by(name: params[:impersonate][:name])
+	AuthController.clear_user_info(session, nil)
+        session[:user] = user
+        session[:impersonate] =  true
+        session[:original_user] = @original_user
+      else
+        user = User.find_by(name: params[:user][:name])
+	AuthController.clear_user_info(session, nil)
+        session[:user] = session[:super_user]
+        user = session[:user]
+        session[:super_user] = nil
+      end
     end
    end
 
   # checking if special characters are present in the username provided, only alphanumeric should be used
   def check_if_special_char
     if warn_for_special_chars(params[:user][:name], "Username")
-          redirect_back
-          return
+      redirect_back
+      return
     end
   end
  
   # Checking if the username provided can be impersonated or not
   def check_if_user_impersonateable 
     if params[:impersonate].nil?
-          user = User.find_by(name: params[:user][:name])
-          if !@original_user.can_impersonate? user
-            @message = "You cannot impersonate '#{params[:user][:name]}'."	    
-            temp
-	    AuthController.clear_user_info(session, nil)          
-          else 
-            overwrite_session
-	  end
+      user = User.find_by(name: params[:user][:name])
+      if !@original_user.can_impersonate? user
+        @message = "You cannot impersonate '#{params[:user][:name]}'."	    
+        temp
+	AuthController.clear_user_info(session, nil)          
+      else 
+        overwrite_session
+      end
     else 
-          if !params[:impersonate][:name].empty?
-            user = User.find_by(name: params[:impersonate][:name])
-	    overwrite_session
-          end
+      if !params[:impersonate][:name].empty?
+        user = User.find_by(name: params[:impersonate][:name])
+	overwrite_session
+      end
     end
   end 
 
   # Function to display appropriate error messages based on different username provided, the message explains each error
   def display_error_msg
     if params[:user]
-          @message = "No user exists with the name '#{params[:user][:name]}'."
+      @message = "No user exists with the name '#{params[:user][:name]}'."
     elsif params[:impersonate]
-          @message = "No user exists with the name '#{params[:impersonate][:name]}'."    
+      @message = "No user exists with the name '#{params[:impersonate][:name]}'."    
     else	 
-          if params[:impersonate].nil?
-            @message = "You cannot impersonate '#{params[:user][:name]}'."
-          else
-            if !params[:impersonate][:name].empty?
-              @message = "You cannot impersonate '#{params[:impersonate][:name]}'."
-            else
-              @message = "No original account was found. Please close your browser and start a new session."
-           end 
-       end
+      if params[:impersonate].nil?
+        @message = "You cannot impersonate '#{params[:user][:name]}'."
+      else
+        if !params[:impersonate][:name].empty?
+          @message = "You cannot impersonate '#{params[:impersonate][:name]}'."
+        else
+          @message = "No original account was found. Please close your browser and start a new session."
+        end 
+      end
     end
     rescue Exception => e
       flash[:error] = @message
@@ -101,11 +101,11 @@ class ImpersonateController < ApplicationController
  
   # Main operation 
   def do_main_operation(user)
-     if user
+    if user
       check_if_user_impersonateable
-     else
+    else
       display_error_msg
-     end
+    end
   end   
    
   # Main operation, method used to break the functions in impersonate controller and bring out 2 functionalities at same level, 

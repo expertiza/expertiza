@@ -24,7 +24,7 @@ describe LotteryController do
   let(:team_user3) { create(:team_user, team_id: assignment_team1.id, user_id: student3.id, id: 3) }
   let(:team_user4) { create(:team_user, team_id: assignment_team2.id, user_id: student4.id, id: 4) }
   let(:team_user5) { create(:team_user, team_id: assignment_team3.id, user_id: student5.id, id: 5) }
-  let(:team_user6) { create(:team_user, team_id: assignment_team3.id, user_id: student6.id, id: 6) }
+  let(:team_user6) { create(:team_user, team_id: assignment_team4.id, user_id: student6.id, id: 6) }
 
   before :each do
     assignment_team1.save
@@ -45,18 +45,17 @@ describe LotteryController do
     Bid.create(topic_id: topic1.id, team_id: assignment_team1.id, priority: 1)
     Bid.create(topic_id: topic2.id, team_id: assignment_team2.id, priority: 2)
     Bid.create(topic_id: topic4.id, team_id: assignment_team2.id, priority: 1)
-    Bid.create(topic_id: topic3.id, team_id: assignment_team2.id, priority: 0)
-    Bid.create(topic_id: topic4.id, team_id: assignment_team3.id, priority: 5)
+    Bid.create(topic_id: topic3.id, team_id: assignment_team2.id, priority: 5)
+    Bid.create(topic_id: topic4.id, team_id: assignment_team3.id, priority: 0)
     Bid.create(topic_id: topic4.id, team_id: assignment_team1.id, priority: 3)
 
     @teams = assignment.teams
     @sign_up_topics = assignment.sign_up_topics
+    # Only members in assignment_team1 and assignment_team2 are involved in the bidding process
     @expected_users_bidding_info = [{pid: student1.id, ranks: [1, 0, 0, 3]},
                                     {pid: student2.id, ranks: [1, 0, 0, 3]},
                                     {pid: student3.id, ranks: [1, 0, 0, 3]},
-                                    {pid: student4.id, ranks: [0, 2, 0, 1]},
-                                    {pid: student5.id, ranks: [0, 0, 0, 5]},
-                                    {pid: student6.id, ranks: [0, 0, 0, 5]}]
+                                    {pid: student4.id, ranks: [0, 2, 5, 1]}]
   end
 
   describe "#action_allowed?" do
@@ -108,25 +107,26 @@ describe LotteryController do
     end
     context "with valid assignment id" do
       it "should not set any error message in the flash" do
-        expect(controller).not_to receive("flash[:error]")
+        controller.run_intelligent_assignment
+        expect(controller).not_to set_flash[:error]
       end
       it "should redirect to list action in tree_display controller" do
         expect(controller).to receive(:redirect_to).with(controller: 'tree_display', action: "list")
+        controller.run_intelligent_assignment
       end
     end
     context "with no participants" do
       before :each do
         allow(controller).to receive(:construct_users_bidding_info).and_return([])
       end
-      it "should not set any error message in the flash" do
-        expect(controller).not_to receive("flash[:error]")
+      it "should set error message in the flash" do
+        controller.run_intelligent_assignment
+        expect(controller).to set_flash[:error]
       end
       it "should redirect to list action in tree_display controller" do
         expect(controller).to receive(:redirect_to).with(controller: 'tree_display', action: "list")
+        controller.run_intelligent_assignment
       end
-    end
-    after :each do
-      controller.run_intelligent_assignment
     end
   end
 
@@ -141,12 +141,17 @@ describe LotteryController do
 
   describe "#match_new_teams_to_topics" do
     it "assigns topics to teams" do
+      expect(assignment_2.is_intelligent).to eq(false)
       controller.send(:match_new_teams_to_topics, assignment_2)
       expect(assignment_2.is_intelligent).to eq(false)
+      expect(controller).to set_flash[:error]
+
+      expect(assignment.is_intelligent).to eq(true)
       Bid.create(team_id: assignment_team1.id, topic_id: topic1.id)
       Bid.create(team_id: assignment_team2.id, topic_id: topic2.id)
       controller.send(:match_new_teams_to_topics, assignment)
       expect(assignment.is_intelligent).to eq(false)
+      expect(controller).to set_flash[:success]
     end
   end
 

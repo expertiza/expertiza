@@ -15,6 +15,13 @@ describe TreeDisplayController do
       expect(response).to redirect_to('/student_task/list')
     end
 
+    it "should not redirect if current user is a TA" do
+      user = build(:teaching_assistant)
+      stub_current_user(user, user.role.name, user.role)
+      get "list"
+      expect(response).to have_http_status(200)
+    end
+
     it "should redirect to login page if current user is nil" do
       get "list"
       expect(response).to redirect_to('/auth/failure')

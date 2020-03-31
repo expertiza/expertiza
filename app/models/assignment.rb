@@ -116,12 +116,7 @@ class Assignment < ActiveRecord::Base
     response_map_set.reject! {|response_map| response_map.metareview_response_maps.count > min_metareviews }
 
     # Reduce the response maps to the reviewers with the least number of metareviews received
-    reviewers = {} # <reviewer, number of metareviews>
-    response_map_set.each do |response_map|
-      reviewer = response_map.reviewer
-      reviewers.member?(reviewer) ? reviewers[reviewer] += 1 : reviewers[reviewer] = 1
-    end
-    reviewers = reviewers.sort_by {|a| a[1] }
+    reviewers = get_reviewer_metareviews_map(response_map_set)
     min_metareviews = reviewers.first[1]
     reviewers.reject! {|reviewer| reviewer[1] == min_metareviews }
     response_map_set.reject! {|response_map| reviewers.member?(response_map.reviewer) }
@@ -616,6 +611,16 @@ class Assignment < ActiveRecord::Base
   def get_min_metareview(response_map_set)
     response_map_set.sort! {|a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
     min_metareviews = response_map_set.first.metareview_response_maps.count
+  end
+
+  # returns a map of reviewer to meta_reviews
+  def get_reviewer_metareviews_map(response_map_set)
+    reviewers = {}
+    response_map_set.each do |response_map|
+      reviewer = response_map.reviewer
+      reviewers.member?(reviewer) ? reviewers[reviewer] += 1 : reviewers[reviewer] = 1
+    end
+    reviewers = reviewers.sort_by {|a| a[1]}
   end
 
   def delete_review_response(responsemap_type,force)

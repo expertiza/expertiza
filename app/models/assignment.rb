@@ -112,7 +112,6 @@ class Assignment < ActiveRecord::Base
     raise 'You have already metareviewed all reviews for this assignment.' if response_map_set.empty?
 
     # Reduce to the response maps with the least number of metareviews received
-
     min_metareviews=get_min_metareview(response_map_set)
     response_map_set.reject! {|response_map| response_map.metareview_response_maps.count > min_metareviews }
 
@@ -353,9 +352,9 @@ class Assignment < ActiveRecord::Base
       round = next_due_date.try(:round)
     end
 
-    rev_q_ids = get_questionnaire_ids(round)
+    rev_questionnaire_ids = get_questionnaire_ids(round)
     review_questionnaire_id = nil
-    rev_q_ids.each do |rqid|
+    rev_questionnaire_ids.each do |rqid|
       next if rqid.questionnaire_id.nil?
       rtype = Questionnaire.find(rqid.questionnaire_id).type
       if rtype == 'ReviewQuestionnaire'
@@ -449,13 +448,7 @@ class Assignment < ActiveRecord::Base
   # Checks if there are rounds with no reviews
   def self.check_empty_rounds(answers, round_num, res_type)
     unless answers[round_num][res_type].empty?
-      round_type =
-        if round_num.nil?
-          "Round Nill - " + res_type
-        else
-          "Round " + round_num.to_s + " - " + res_type.to_s
-        end
-      return round_type
+      return round_num.nil? ? "Round Nil - " + res_type : "Round " + round_num.to_s + " - " + res_type.to_s
     end
     nil
   end
@@ -477,11 +470,7 @@ class Assignment < ActiveRecord::Base
     questionnaires.each do |questionnaire|
       if @assignment.varying_rubrics_by_round?
         round = AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: @questionnaire.id).used_in_round
-        questionnaire_symbol = if round.nil?
-                                 questionnaire.symbol
-                               else
-                                 (questionnaire.symbol.to_s + round.to_s).to_sym
-                               end
+        questionnaire_symbol = round.nil? ? questionnaire.symbol : (questionnaire.symbol.to_s + round.to_s).to_sym
       else
         questionnaire_symbol = questionnaire.symbol
       end

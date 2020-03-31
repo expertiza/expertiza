@@ -53,13 +53,11 @@ class Criterion < ScoredQuestion
     question_advices.each do |question_advice|
       advice_total_length += question_advice.advice.length if question_advice.advice && question_advice.advice != ""
     end
-    #show advice given for different questions
+    # show advice given for different questions
     html += advices_criterion_question(count, question_advices) if !question_advices.empty? and advice_total_length > 0
-
-    #dropdown options to rate a project based on the quetion
+    # dropdown options to rate a project based on the question
     html += dropdown_criterion_question(count, answer, questionnaire_min, questionnaire_max) if dropdown_or_scale == 'dropdown'
-
-    #scale optioins
+    # scale options to rate a project based on the question
     html += scale_criterion_question(count, answer, questionnaire_min, questionnaire_max) if dropdown_or_scale == 'scale'
     safe_join(["".html_safe, "".html_safe], html.html_safe)
   end
@@ -87,16 +85,16 @@ class Criterion < ScoredQuestion
     html += '</div>'
   end
 
+  # dropdown options to rate a project based on the question
   def dropdown_criterion_question(count, answer = nil, questionnaire_min, questionnaire_max)
-    current_value = "" 
+    current_value = ""
     current_value += 'data-current-rating =' + answer.answer.to_s unless answer.nil?
     html = '<div><select id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" class="review-rating" ' + current_value + '>'
     html += "<option value = ''>--</option>"
     questionnaire_min.upto(questionnaire_max).each do |j|
       html += '<option value=' + j.to_s
       html += ' selected="selected"' if !answer.nil? && j == answer.answer
-      html += '>'
-      html += j.to_s
+      html += '>' + j.to_s
       html += "-" + self.min_label if self.min_label.present? && j == questionnaire_min
       html += "-" + self.max_label if self.max_label.present? && j == questionnaire_max
       html += "</option>"
@@ -108,13 +106,14 @@ class Criterion < ScoredQuestion
     html += '</textarea></td>'
   end
 
+  # scale options to rate a project based on the question
   def scale_criterion_question(count, answer = nil, questionnaire_min, questionnaire_max)
-    if self.size.nil? || !self.size.present?
+    if self.size.nil? || self.size.blank?
       cols = '70'
       rows = '1'
     else
-     cols = self.size.split(',')[0]
-     rows = self.size.split(',')[1]
+      cols = self.size.split(',')[0]
+      rows = self.size.split(',')[1]
     end
     html = '<input id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" type="hidden"'
     html += 'value="' + answer.answer.to_s + '"' unless answer.nil?
@@ -142,7 +141,7 @@ class Criterion < ScoredQuestion
     html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments"' \
       ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
     html += answer.comments if !answer.nil? && !answer.comments.nil?
-    html += '</textarea>'    
+    html += '</textarea>'
   end
 
   # This method returns what to display if a student is viewing a filled-out questionnaire

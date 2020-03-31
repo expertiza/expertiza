@@ -131,6 +131,24 @@ describe LotteryController do
     end
   end
 
+  describe "#match_new_teams_to_topics" do
+    before :each do
+      bid = Bid.find_by(topic_id: topic3.id, team_id: assignment_team2.id)
+      bid.priority = 0
+      bid.save
+    end
+    it "assigns topics to teams" do
+      expect(assignment2.is_intelligent).to eq(false)
+      controller.send(:match_new_teams_to_topics, assignment2)
+      expect(assignment2.is_intelligent).to eq(false)
+      expect(assignment.is_intelligent).to eq(true)
+      Bid.create(team_id: assignment_team1.id, topic_id: topic1.id)
+      Bid.create(team_id: assignment_team2.id, topic_id: topic2.id)
+      controller.send(:match_new_teams_to_topics, assignment)
+      expect(assignment.is_intelligent).to eq(false)
+    end
+  end
+
   describe "#merge_bids_from_different_previous_teams" do
     before :each do
       @sign_up_topics = @sign_up_topics

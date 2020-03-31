@@ -22,6 +22,7 @@
         <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.id%>
         (Sign up for a topic)
       </li>
+      <!--Show bookmarks if they are allowed for this assignment-->
       <% if @use_bookmark %>
         <li>
             <% if @topic_id and @assignment.submission_allowed(@topic_id) %>

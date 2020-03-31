@@ -8,6 +8,7 @@ module SummaryHelper
   class Summary
     attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion, :summary_ws_url
 
+    # produce average score and summary of comments for reviews by a reviewer for each question
     def summarize_reviews_by_reviewee(questions, assignment, reviewee_id, summary_ws_url)
       self.summary = ({})
       self.avg_scores_by_round = ({})
@@ -28,13 +29,12 @@ module SummaryHelper
       self
     end
 
-    # get average scores and summary for each question
+    # get average scores and summary for each question in a review by a reviewer
     def summarize_reviews_by_reviewee_question(assignment, reviewee_id, question, round)
       question_answers = Answer.answers_by_question_for_reviewee(assignment.id, reviewee_id, question.id)
 
-      # get the avg scores for this question
       self.avg_scores_by_criterion[round.to_s][question.txt] = calculate_avg_score_by_criterion(question_answers, get_max_score_for_question(question))
-      # get the summary of answers to this question
+
       self.summary[round.to_s][question.txt] = summarize_sentences(break_up_comments_to_sentences(question_answers), self.summary_ws_url)
     end
 
@@ -48,17 +48,14 @@ module SummaryHelper
 
     # produce summaries for instructor. it merges all feedback given to all reviewees, and summarize them by criterion
     def summarize_reviews_by_criterion(assignment, summary_ws_url)
-      # @summary[reviewee][round][question]
-      # @avg_score_round[reviewee][round]
-      # @avg_scores_by_criterion[reviewee][round][criterion]
       self.summary = self.avg_scores_by_criterion = self.avg_scores_by_round = Array.new(assignment.rounds_of_reviews)
       rubric = get_questions_by_assignment(assignment)
 
+      # get question in each round and summarize them all
       (0..assignment.rounds_of_reviews - 1).each do |round|
         questions_used_in_round = rubric[assignment.varying_rubrics_by_round? ? round : 0]
         questions_used_in_round.each do |question|
           next if question.type.eql?("SectionHeader")
-          # get answers of each question in the rubric
           summarize_reviews_by_criterion_question(assignment, summary_ws_url, round, question)
         end
         self.avg_scores_by_round[round] = calculate_avg_score_by_round(avg_scores_by_criterion[round], questions_used_in_round)
@@ -66,13 +63,12 @@ module SummaryHelper
       self
     end
 
+    # get summary of answers of each question in the rubric
     def summarize_reviews_by_criterion_question(assignment, summary_ws_url, round, question)
       threads = []
       answers_questions = Answer.answers_by_question(assignment.id, question.id)
 
-      # process each question in a seperate thread
       threads << Thread.new do
-        # store each avg in a hashmap and use the question as the key
         self.avg_scores_by_criterion[round][question.txt] = calculate_avg_score_by_criterion(answers_questions, get_max_score_for_question(question))
         self.summary[round][question.txt] = summarize_sentences(break_up_comments_to_sentences(answers_questions), summary_ws_url)
       end
@@ -82,11 +78,6 @@ module SummaryHelper
 
     # produce summaries for instructor and students. It sum up the feedback by criterion for each reviewee
     def summarize_reviews_by_reviewees(assignment, summary_ws_url)
-      # @summary[reviewee][round][question]
-      # @reviewers[team][reviewer]
-      # @avg_scores_by_reviewee[team]
-      # @avg_score_round[reviewee][round]
-      # @avg_scores_by_criterion[reviewee][round][criterion]
       self.summary = ({})
       self.avg_scores_by_reviewee = ({})
       self.avg_scores_by_round = ({})
@@ -108,6 +99,7 @@ module SummaryHelper
       self
     end
 
+    # get answers and average scores for each team
     def summarize_reviews_by_team_reviewee(assignment, reviewee, rubric)
       self.summary[reviewee.name] = []
       self.avg_scores_by_reviewee[reviewee.name] = 0.0
@@ -116,7 +108,7 @@ module SummaryHelper
       # get the name of reviewers for display only
       self.reviewers[reviewee.name] = get_reviewers_by_reviewee_and_assignment(reviewee, assignment.id)
 
-      # get answers of each reviewer by rubric
+      # get answers and average scores of each round by rubric
       (0..assignment.rounds_of_reviews - 1).each do |round|
         self.summary[reviewee.name][round] = {}
         self.avg_scores_by_round[reviewee.name][round] = 0.0
@@ -125,9 +117,9 @@ module SummaryHelper
       end
     end
 
+    # get answers and averge score for each question in a round
     def summarize_by_reviewee_round(assignment, reviewee, round, rubric)
       threads = []
-      # iterate each round and get answers
       # if use the same rubric, only use rubric[0]
       rubric_questions_used = rubric[assignment.varying_rubrics_by_round? ? round : 0]
       rubric_questions_used.each do |q|
@@ -139,8 +131,6 @@ module SummaryHelper
         # get score and summary of answers for each question
         self.avg_scores_by_criterion[reviewee.name][round][q.txt] = calculate_avg_score_by_criterion(question_answers, get_max_score_for_question(q))
 
-        # summarize the comments by calling the summarization Web Service
-        # since it'll do a lot of request, do this in seperate threads
         threads << Thread.new do
           self.summary[reviewee.name][round][q.txt] = summarize_sentences(break_up_comments_to_sentences(question_answers), self.summary_ws_url)
         end
@@ -171,13 +161,14 @@ module SummaryHelper
       end
     end
 
+    # convert answers to each question to sentences
     def get_sentences(ans)
       sentences = ans.comments.gsub!(/[.?!]/, '\1|').split('|').map!(&:strip) unless ans.comments.nil?
       sentences
     end
 
     def break_up_comments_to_sentences(question_answers)
-      # strore answers of each question in an array to be converted into json
+      # store answers of each question in an array to be converted into json
       comments = []
       question_answers.each do |ans|
         sentences = get_sentences(ans)

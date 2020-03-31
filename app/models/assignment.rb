@@ -101,7 +101,19 @@ class Assignment < ActiveRecord::Base
   # Returns a review (response) to metareview if available, otherwise will raise an error
   def response_map_to_metareview(metareviewer)
     response_map_set = Array.new(review_mappings)
-    check_response_for_error(response_map_set)
+    # Reject response maps without responses
+    response_map_set.reject! {|response_map| response_map.response.empty?}
+    raise 'There are no reviews to metareview at this time for this assignment.' if response_map_set.empty?
+
+    # Reject reviews where the meta_reviewer was the reviewer or the contributor
+    response_map_set.reject! do |response_map|
+      response_map.reviewee == metareviewer or response_map.reviewer == metareviewer
+    end
+    raise 'There are no more reviews to metareview for this assignment.' if response_map_set.empty?
+
+    # Metareviewer can only metareview each review once
+    response_map_set.reject! {|response_map| response_map.metareviewed_by?(metareviewer)}
+    raise 'You have already metareviewed all reviews for this assignment.' if response_map_set.empty?
 
     # Reduce to the response maps with the least number of metareviews received
     response_map_set.sort! {|a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count}
@@ -127,21 +139,8 @@ class Assignment < ActiveRecord::Base
     response_map_set.first
   end
 
-  # Will raise an error if response is empty
   def check_response_for_error(response_map_set)
-    # Reject response maps without responses
-    response_map_set.reject! {|response_map| response_map.response.empty?}
-    raise 'There are no reviews to metareview at this time for this assignment.' if response_map_set.empty?
 
-    # Reject reviews where the meta_reviewer was the reviewer or the contributor
-    response_map_set.reject! do |response_map|
-      response_map.reviewee == metareviewer or response_map.reviewer == metareviewer
-    end
-    raise 'There are no more reviews to metareview for this assignment.' if response_map_set.empty?
-
-    # Metareviewer can only metareview each review once
-    response_map_set.reject! {|response_map| response_map.metareviewed_by?(metareviewer)}
-    raise 'You have already metareviewed all reviews for this assignment.' if response_map_set.empty?
   end
 
   def metareview_mappings

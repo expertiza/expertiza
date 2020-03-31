@@ -140,33 +140,18 @@ describe LotteryController do
   end
 
   describe "#match_new_teams_to_topics" do
-    context "to intelligent assignment" do
-      before :each do
-        Bid.create(team_id: assignment_team1.id, topic_id: topic1.id)
-        Bid.create(team_id: assignment_team2.id, topic_id: topic2.id)
-      end
-      it "assigns topics to teams" do
-        expect(controller).to receive(:assign_available_slots)
-        controller.send(:match_new_teams_to_topics, assignment)
-      end
-      it "sets the assignment to unintelligent" do
-        controller.send(:match_new_teams_to_topics, assignment)
-        expect(assignment.is_intelligent).to eq(false)
-      end
-    end
-    context "to unintelligent assignment" do
-      before :each do
-        controller.send(:match_new_teams_to_topics, assignment_2)
-      end
-      it "outputs an error message to flash" do
-        expect(flash[:error]).to eq("This action is not allowed. The assignment #{assignment_2.name} does not enable intelligent assignments.")
-      end
+    it "assigns topics to teams" do
+      controller.send(:match_new_teams_to_topics, assignment_2)
+      expect(assignment_2.is_intelligent).to eq(false)
+      Bid.create(team_id: assignment_team1.id, topic_id: topic1.id)
+      Bid.create(team_id: assignment_team2.id, topic_id: topic2.id)
+      controller.send(:match_new_teams_to_topics, assignment)
+      expect(assignment.is_intelligent).to eq(false)
     end
   end
 
   describe "#merge_bids_from_different_previous_teams" do
     before :each do
-      @sign_up_topics = @sign_up_topics
       @team_id = assignment_team1.id
       @user_ids = [team_user1.id, team_user2.id, team_user3.id]
       @user_bidding_info = [{pid: team_user1.id, ranks: [1, 0, 2, 2]},
@@ -195,8 +180,11 @@ describe LotteryController do
     end
     describe "#remove_user_from_previous_team" do
       it "should return the team without the removed user" do
+        user_id = @team_user3.user_id
+        assignment_id = @assignment.id
         number_of_team_users = TeamsUser.count
-        controller.send(:remove_user_from_previous_team, @assignment.id, @team_user3.user_id)
+        controller.send(:remove_user_from_previous_team, assignment_id, user_id)
+
         expect(TeamsUser.count).to eq(number_of_team_users - 1)
         expect(TeamsUser.find_by(user_id: @team_user3.user_id)).to be nil
         expect(TeamsUser.find_by(user_id: @team_user2.user_id)).to eq @team_user2
@@ -205,7 +193,7 @@ describe LotteryController do
     end
     describe "#remove_empty_teams" do
       it "should reduce the number of teams by the number of empty teams in the assignment" do
-        @assignment_team2 = create(:assignment_team, assignment: @assignment, teams_users: [])
+        create(:assignment_team, assignment: @assignment, teams_users: [])
         number_of_teams = AssignmentTeam.count
         number_of_teams_in_assignment = Assignment.find(@assignment.id).teams.count
         controller.send(:remove_empty_teams, @assignment)

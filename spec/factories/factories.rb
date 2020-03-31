@@ -449,6 +449,17 @@ FactoryBot.define do
     content_page_id nil
   end
 
+  factory :bookmark, class: Bookmark do
+    id 1
+    url 'example.com'
+    title 'Test Bookmark'
+    description 'Test description'
+    user_id '1234'
+    topic_id '1'
+    created_at '2020-03-24 12:10:20'
+    updated_at '2020-03-24 12:10:20'
+  end
+
   factory :site_controller, class: SiteController do
     id 1
     name 'fake_site'

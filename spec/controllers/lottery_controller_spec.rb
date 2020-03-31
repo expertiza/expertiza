@@ -81,8 +81,13 @@ describe LotteryController do
       user = ta
       stub_current_user(user, user.role.name, user.role)
       expect(controller.action_allowed?).to be true
+    end
+    it "does not allow Students or Visitors to run the bid" do
       user = student1
       stub_current_user(user, user.role.name, user.role)
+      expect(controller.action_allowed?).to be false
+      user = nil
+      stub_current_user(nil, nil, nil)
       expect(controller.action_allowed?).to be false
     end
   end
@@ -111,13 +116,32 @@ describe LotteryController do
   end
 
   describe "#run_intelligent_assignment" do
-    it "should redirect to list action in tree_display controller" do
+    before :each do
+      session[:user] = instructor
       params = ActionController::Parameters.new(id: assignment.id)
       allow(controller).to receive(:params).and_return(params)
-      session[:user] = instructor
-      allow(controller).to receive(:flash).and_return({})
-      allow(Assignment).to receive(:find_by).with(id: assignment.id).and_return(assignment)
-      expect(controller).to receive(:redirect_to).with(controller: 'tree_display', action: "list")
+      allow(controller).to receive(:redirect_to).with(controller: 'tree_display', action: "list")
+    end
+    context "with valid assignment id" do
+      it "should not set any error message in the flash" do
+        expect(controller).not_to receive("flash[:error]")
+      end
+      it "should redirect to list action in tree_display controller" do
+        expect(controller).to receive(:redirect_to).with(controller: 'tree_display', action: "list")
+      end
+    end
+    context "with no participants" do
+      before :each do
+        allow(controller).to receive(:construct_users_bidding_info).and_return([])
+      end
+      it "should not set any error message in the flash" do
+        expect(controller).not_to receive("flash[:error]")
+      end
+      it "should redirect to list action in tree_display controller" do
+        expect(controller).to receive(:redirect_to).with(controller: 'tree_display', action: "list")
+      end
+    end
+    after :each do
       controller.run_intelligent_assignment
     end
   end

@@ -109,6 +109,11 @@ describe Assignment do
       allow(review_response_map).to receive(:metareview_response_maps).and_return([double('MetareviewResponseMap')])
       expect(assignment.response_map_to_metareview(metareviewer)).to eq(review_response_map)
     end
+
+    it 'raises an error' do
+      allow(review_response_map).to receive(:metareview_response_maps).and_return(nil)
+      expect(assignment.response_map_to_metareview(metareviewer))to raise_error('There are no reviews to metareview at this time for this assignment.')
+    end
   end
 
   describe '#metareview_mappings' do

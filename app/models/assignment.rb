@@ -10,7 +10,6 @@ class Assignment < ActiveRecord::Base
   include ReviewAssignment
   include QuizAssignment
   include OnTheFlyCalc
-  include AssignmentHelper
   has_paper_trail
   # When an assignment is created, it needs to
   # be created as an instance of a subclass of the Assignment (model) class;
@@ -95,11 +94,6 @@ class Assignment < ActiveRecord::Base
     response_map.assign_metareviewer(meta_reviewer)
   end
 
-  def get_min_metareview(response_map_set)
-    response_map_set.sort! {|a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
-    min_metareviews = response_map_set.first.metareview_response_maps.count
-    min_metareviews
-  end
   # Returns a review (response) to metareview if available, otherwise will raise an error
   def response_map_to_metareview(metareviewer)
     response_map_set = Array.new(review_mappings)
@@ -189,7 +183,6 @@ class Assignment < ActiveRecord::Base
                   Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(self.instructor[:name]) + '/'
                 end
     path_text += FileHelper.clean_path(self.directory_path)
-    path_text
   end
 
   # Check whether review, metareview, etc.. is allowed
@@ -227,15 +220,13 @@ class Assignment < ActiveRecord::Base
   DELETE_INSTANCES=['invitations','teams','participants','due_dates','assignment_questionnaires']
   
   def delete(force = nil)
-
     begin
-      review_type(ReviewResponseMap,force)
+      delete_review_response(ReviewResponseMap,force)
     rescue StandardError
       raise "There is at least one review response that exists for #{self.name}."
     end
-
     begin
-      review_type(TeammateReviewResponseMap,force)
+      delete_review_response(TeammateReviewResponseMap,force)
     rescue StandardError
       raise "There is at least one teammate review response that exists for #{self.name}."
     end
@@ -252,7 +243,6 @@ class Assignment < ActiveRecord::Base
       raise 'The assignment directory is not empty.' if directory.size != 2
       Dir.delete(Rails.root + '/pg_data/' + self.directory_path)
     end
-
     self.destroy
   end
 
@@ -565,5 +555,82 @@ class Assignment < ActiveRecord::Base
 
   def find_due_dates(type)
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: type).id }
+  end
+
+  private
+  #Method extracted from scores method. This method computes and returns grades by rounds and
+  #total_num_of_assessments and total_score when the assignment has varying rubrics by round
+  def compute_grades_by_rounds(questions, team)
+    grades_by_rounds = {}
+    total_score = 0
+    total_num_of_assessments = 0 # calculate grades for each rounds
+    (1..self.num_review_rounds).each do |i|
+      assessments = ReviewResponseMap.get_responses_for_team_round(team, i)
+      round_sym = ("review" + i.to_s).to_sym
+      grades_by_rounds[round_sym] = Answer.compute_scores(assessments, questions[round_sym])
+      total_num_of_assessments += assessments.size
+      total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f unless grades_by_rounds[round_sym][:avg].nil?
+    end
+    return grades_by_rounds, total_num_of_assessments, total_score
+  end
+
+  # merge the grades from multiple rounds Jasmine:extracted from scores method in assignment.rb (for OSS Project E2009)
+  def merge_grades_by_rounds(grades_by_rounds, num_of_assessments, total_score)
+    team_scores = {:max => 0, :min => 0, :avg => nil}
+    if num_of_assessments == 0
+      return team_scores
+    end
+
+    team_scores[:max] = -999_999_999
+    team_scores[:min] = 999_999_999
+    team_scores[:avg] = total_score/num_of_assessments
+    (1..self.num_review_rounds).each do |i|
+      round_sym = ("review" + i.to_s).to_sym
+      if !grades_by_rounds[round_sym][:max].nil? && team_scores[:max] < grades_by_rounds[round_sym][:max]
+        team_scores[:max] = grades_by_rounds[round_sym][:max]
+      end
+      if !grades_by_rounds[round_sym][:min].nil? && team_scores[:min] > grades_by_rounds[round_sym][:min]
+        team_scores[:min] = grades_by_rounds[round_sym][:min]
+      end
+    end
+    team_scores
+  end
+
+  #returns true if assignment has staggered deadline and topic_id is nil
+  def staggered_and_no_topic?(topic_id)
+    self.staggered_deadline? and topic_id.nil?
+  end
+
+  #returns true if reviews required is greater than reviews allowed
+  def num_reviews_greater?(reviews_required, reviews_allowed)
+    reviews_allowed && reviews_allowed != -1 && reviews_required > reviews_allowed
+  end
+
+  # for program 1 like assignment, if same rubric is used in both rounds,
+  # the 'used_in_round' field in 'assignment_questionnaires' will be null,
+  # since one field can only store one integer
+  # if questionnaire_ids is empty, Expertiza will try to find questionnaire whose type is 'ReviewQuestionnaire'.
+  def get_questionnaire_ids(round)
+    questionnaire_ids = if round.nil?
+                          AssignmentQuestionnaire.where(assignment_id: self.id)
+                        else
+                          AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
+                        end
+    if questionnaire_ids.empty?
+      AssignmentQuestionnaire.where(assignment_id: self.id).find_each do |aq|
+        questionnaire_ids << aq if aq.questionnaire.type == "ReviewQuestionnaire"
+      end
+    end
+    questionnaire_ids
+  end
+
+  def get_min_metareview(response_map_set)
+    response_map_set.sort! {|a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
+    min_metareviews = response_map_set.first.metareview_response_maps.count
+  end
+
+  def delete_review_response(responsemap_type,force)
+    maps = responsemap_type.where(reviewed_object_id: self.id)
+    maps.each {|map| map.delete(force) }
   end
 end

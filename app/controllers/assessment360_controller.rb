@@ -66,7 +66,7 @@ class Assessment360Controller < ApplicationController
   def overall_review_count(assignments, overall_teammate_review_count, overall_meta_review_count)
     assignments.each do |assignment|
       temp_count = overall_teammate_review_count[assignment.id]
-      overall_review_count_hash[assignment.id] = 1 if temp_count.nil? or temp_count.zero?
+      overall_teammate_review_count[assignment.id] = 1 if temp_count.nil? or temp_count.zero?
       temp_count = overall_meta_review_count[assignment.id]
       overall_meta_review_count[assignment.id] = 1 if temp_count.nil? or temp_count.zero?
     end

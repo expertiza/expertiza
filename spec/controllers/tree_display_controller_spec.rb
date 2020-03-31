@@ -28,11 +28,6 @@ describe TreeDisplayController do
     end
   end
 
-  describe "#ta_for_current_mappings?" do
-    it "should return true if current user is a TA for current course" do
-      allow(session[:user]).to receive("ta?").and_return(true)
-    end
-  end
 
   describe "#drill" do
     it "redirect to list action" do

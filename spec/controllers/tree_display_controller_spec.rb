@@ -1,11 +1,11 @@
 describe TreeDisplayController do
   # Airbrake-1517247902792549741
   describe "#list" do
-    it "should not redirect to tree_display#list if current user is an instructor" do
+    it "should not redirect if current user is an instructor" do
       user = build(:instructor)
       stub_current_user(user, user.role.name, user.role)
       get "list"
-      expect(response).not_to redirect_to('/tree_display/list')
+      expect(response).to have_http_status(200)
     end
 
     it "should redirect to student_task#list if current user is a student" do

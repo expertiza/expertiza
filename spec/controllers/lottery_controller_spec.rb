@@ -31,12 +31,14 @@ describe LotteryController do
     assignment_team2.save
     assignment_team3.save
     assignment_team4.save
+
     team_user1.save
     team_user2.save
     team_user3.save
     team_user4.save
     team_user5.save
     team_user6.save
+
     topic1.save
     topic2.save
     topic3.save

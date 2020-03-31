@@ -70,6 +70,23 @@ describe LotteryController do
     @sign_up_topics = assignment.sign_up_topics
   end
 
+  describe "#action_allowed?" do
+    it "allows Instructors, Teaching Assistants, Administrators to run the bid" do
+      user = instructor
+      stub_current_user(user, user.role.name, user.role)
+      expect(controller.action_allowed?).to be true
+      user = admin
+      stub_current_user(user, user.role.name, user.role)
+      expect(controller.action_allowed?).to be true
+      user = ta
+      stub_current_user(user, user.role.name, user.role)
+      expect(controller.action_allowed?).to be true
+      user = student1
+      stub_current_user(user, user.role.name, user.role)
+      expect(controller.action_allowed?).to be false
+    end
+  end
+
   describe "#merge_bids_from_different_previous_teams" do
     before :each do
       @sign_up_topics = @sign_up_topics

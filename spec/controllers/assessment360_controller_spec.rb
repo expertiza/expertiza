@@ -225,8 +225,6 @@ describe Assessment360Controller do
         expect(controller.send(:action_allowed?)).to be true
         expect(response.status).to eq(200)
         expect(response).to render_template(:course_student_grade_summary)
-        returned_topics = controller.instance_variable_get(:@topics)
-        expect(returned_topics[nil][1]).to eq(topic)
         returned_assignment_grades = controller.instance_variable_get(:@assignment_grades)
         expect(returned_assignment_grades[nil]).to eq({})
         returned_peer_review_scores = controller.instance_variable_get(:@peer_review_scores)

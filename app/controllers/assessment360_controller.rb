@@ -40,20 +40,20 @@ class Assessment360Controller < ApplicationController
         next if assignment_participant.nil?
         teammate_reviews = assignment_participant.teammate_reviews
         meta_reviews = assignment_participant.metareviews
-        populate_hash_for_all_students_all_reviews(assignment,
-                                                   cp,
-                                                   teammate_reviews,
-                                                   @teammate_review,
-                                                   @overall_teammate_review_grades,
-                                                   @overall_teammate_review_count,
-                                                   @teammate_review_info_per_stu)
-        populate_hash_for_all_students_all_reviews(assignment,
-                                                   cp,
-                                                   meta_reviews,
-                                                   @meta_review,
-                                                   @overall_meta_review_grades,
-                                                   @overall_meta_review_count,
-                                                   @meta_review_info_per_stu)
+        calc_overall_review_info(assignment,
+                                 cp,
+                                 teammate_reviews,
+                                 @teammate_review,
+                                 @overall_teammate_review_grades,
+                                 @overall_teammate_review_count,
+                                 @teammate_review_info_per_stu)
+        calc_overall_review_info(assignment,
+                                 cp,
+                                 meta_reviews,
+                                 @meta_review,
+                                 @overall_meta_review_grades,
+                                 @overall_meta_review_count,
+                                 @meta_review_info_per_stu)
       end
       # calculate average grade for each student on all assignments in this course
       avg_review_calc_per_student(cp, @teammate_review_info_per_stu, @teammate_review)
@@ -66,7 +66,7 @@ class Assessment360Controller < ApplicationController
   def overall_review_count(assignments, overall_teammate_review_count, overall_meta_review_count)
     assignments.each do |assignment|
       temp_count = overall_teammate_review_count[assignment.id]
-      overall_review_count_hash = 1 if temp_count.nil? or temp_count.zero?
+      overall_review_count_hash[assignment.id] = 1 if temp_count.nil? or temp_count.zero?
       temp_count = overall_meta_review_count[assignment.id]
       overall_meta_review_count[assignment.id] = 1 if temp_count.nil? or temp_count.zero?
     end
@@ -109,9 +109,8 @@ class Assessment360Controller < ApplicationController
         next if TeamsUser.team_id(assignment_id, user_id).nil?
         # pull information about the student's grades for particular assignment
         assignment_grade_summary(cp, assignment_id)
-
         peer_review_score = find_peer_review_score(user_id, assignment_id)
-        next if peer_review_score.dig(:review, :scores, :avg).nil?
+        next if (peer_review_score[:review] && peer_review_score[:review][:scores] && peer_review_score[:review][:scores][:avg]).nil?
         @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
       end
     end
@@ -140,13 +139,13 @@ class Assessment360Controller < ApplicationController
   # The function populates the hash value for all students for all the reviews that they have gotten.
   # I.e., Teammate and Meta for each of the assignments that they have taken
   # This value is then used to display the overall teammate_review and meta_review grade in the view
-  def populate_hash_for_all_students_all_reviews(assignment,
-                                                 course_participant,
-                                                 reviews,
-                                                 hash_per_stu,
-                                                 overall_review_grade_hash,
-                                                 overall_review_count_hash,
-                                                 review_info_per_stu)
+  def calc_overall_review_info(assignment,
+                               course_participant,
+                               reviews,
+                               hash_per_stu,
+                               overall_review_grade_hash,
+                               overall_review_count_hash,
+                               review_info_per_stu)
     # If a student has not taken an assignment or if they have not received any grade for the same,
     # assign it as 0 instead of leaving it blank. This helps in easier calculation of overall grade
     overall_review_grade_hash[assignment.id] = 0 unless overall_review_grade_hash.key?(assignment.id)
@@ -174,7 +173,6 @@ class Assessment360Controller < ApplicationController
     participant = AssignmentParticipant.find_by(user_id: user_id, parent_id: assignment_id)
     assignment = participant.assignment
     questions = retrieve_questions assignment.questionnaires, assignment_id
-
     participant.scores(questions)
   end
 

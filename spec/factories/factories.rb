@@ -453,4 +453,16 @@ FactoryBot.define do
     id 1
     name 'fake_site'
   end
+
+  factory :bookmark, class: Bookmark do
+    id 1
+    url 'bookmark.com'
+    title 'Random'
+    description 'Testing bookmark'
+    user_id '10'
+    topic_id '1'
+    created_at '2020-10-11 12:13:14'
+    updated_at '2020-10-11 14:15:16'
+
+  end
 end

@@ -1,6 +1,6 @@
 class ImpersonateController < ApplicationController
   include SecurityHelper
-  	
+
   def action_allowed?
     if ['Student'].include? current_role_name
       !session[:super_user].nil?
@@ -19,12 +19,11 @@ class ImpersonateController < ApplicationController
 
   def start
     flash[:error] = "This page doesn't take any query string." unless request.GET.empty?
-  end
- 
+  end 
 
   # method to overwrite the session details that are corresponding to the user or one being impersonated 
   def overwrite_session
-    #if not impersonatable, then original user's session remains	
+    #if not impersonatable, then original user's session remains
     if params[:impersonate].nil?
           user = User.find_by(name: params[:user][:name])
           session[:super_user] = session[:user] if session[:super_user].nil?
@@ -34,6 +33,7 @@ class ImpersonateController < ApplicationController
           session[:user] = user
     else
     #if some user is to be impersonated, their session details are overwritten onto the current to impersonate	
+
           if !params[:impersonate][:name].empty?
 	    user = User.find_by(name: params[:impersonate][:name])
 	    AuthController.clear_user_info(session, nil)
@@ -48,7 +48,7 @@ class ImpersonateController < ApplicationController
             session[:super_user] = nil
           end
     end
-  end
+   end
 
   # checking if special characters are present in the username provided, only alphanumeric should be used
   def check_if_special_char
@@ -65,7 +65,9 @@ class ImpersonateController < ApplicationController
           if !@original_user.can_impersonate? user
             @message = "You cannot impersonate '#{params[:user][:name]}'."	    
             temp
-	    AuthController.clear_user_info(session, nil)
+	    AuthController.clear_user_info(session, nil)          
+          else 
+            overwrite_session
 	  end
     else 
           if !params[:impersonate][:name].empty?
@@ -73,7 +75,7 @@ class ImpersonateController < ApplicationController
 	    overwrite_session
           end
     end
-  end
+  end 
 
   # Function to display appropriate error messages based on different username provided, the message explains each error
   def display_error_msg
@@ -97,17 +99,17 @@ class ImpersonateController < ApplicationController
       redirect_to :back
   end 
  
-  # Main operation, method used to break the functions in impersonate controller and bring out 2 functionalities at same level, 
-  # checking if user impersonateable, if not throw corresponding error message 
+  # Main operation 
   def do_main_operation(user)
      if user
       check_if_user_impersonateable
      else
       display_error_msg
      end
-  end  
+  end   
    
-  # Main method responsible for the impersonating function, checks for different conditions and calls other methods that facilitate the full functionality
+  # Main operation, method used to break the functions in impersonate controller and bring out 2 functionalities at same level, 
+  # checking if user impersonateable, if not throw corresponding error message 
   def impersonate
     #initial check to see if the username exists	
     display_error_msg
@@ -138,7 +140,7 @@ class ImpersonateController < ApplicationController
         end
       end
     end
-    # Navigate to user's home location
+    # Navigate to user's home location as the default landing page after impersonating or reverting
     AuthController.set_current_role(user.role_id, session)
     redirect_to action: AuthHelper.get_home_action(session[:user]),
 		controller: AuthHelper.get_home_controller(session[:user])

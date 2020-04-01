@@ -70,11 +70,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.remove_assignment_from_course(assignment)
-    oldpath = assignment.path rescue nil
+    old_path = assignment.path rescue nil
     assignment.course_id = nil
     assignment.save
-    newpath = assignment.path rescue nil
-    FileHelper.update_file_location(oldpath, newpath)
+    new_path = assignment.path rescue nil
+    FileHelper.update_file_location(old_path, new_path)
   end
 
   def teams?

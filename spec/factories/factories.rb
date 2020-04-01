@@ -381,6 +381,14 @@ FactoryBot.define do
     dropdown 1
   end
 
+  factory :bookmark_questionnaire, class: BookmarkRatingQuestionnaire do
+    name "BookmarkRatingQuestionnaire"
+    assignments {[ Assignment.first || association(:assignment) ]}
+    min_question_score 0
+    max_question_score 5
+    type 'BookmarkRatingQuestionnaire'
+  end
+
   factory :review_response_map, class: ReviewResponseMap do
     assignment { Assignment.first || association(:assignment) }
     reviewer { AssignmentParticipant.first || association(:participant) }
@@ -394,6 +402,14 @@ FactoryBot.define do
     reviewee { AssignmentParticipant.first || association(:participant) }
     reviewer_id 1
     type 'MetareviewResponseMap'
+    calibrate_to 0
+  end
+
+  factory :bookmark_review_response_map, class: BookmarkRatingResponseMap do
+    assignment { Assignment.first || association(:assignment) }
+    reviewer { AssignmentParticipant.first || association(:participant) }
+    reviewee { Bookmark.first || association(:assignment_team) }
+    type 'BookmarkRatingResponseMap'
     calibrate_to 0
   end
 

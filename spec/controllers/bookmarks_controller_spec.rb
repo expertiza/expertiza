@@ -4,11 +4,10 @@ describe BookmarksController do
   let(:student) { build(:student, id: 1) }
   let(:instructor) { build(:instructor, id: 2) }
   let(:ta) { build(:teaching_assistant, id: 3) }
-  let(:topic) { build(:topic) }
 
   # for student
   describe '#action_allowed?' do
-    context 'when params action pertains to student' do
+    context 'when params action pertains to student minus edit, update, destroy' do
       before(:each) do
         @session = {user: student}
         stub_current_user(student, student.role.name, student.role)
@@ -77,6 +76,29 @@ describe BookmarksController do
     end
   end
 
+  # for special cases of edit, update, destroy params actions
+  describe '#action_allowed?' do
+    context 'when edit, update, destroy params action pertains to student' do
+      before(:each) do
+        allow(Bookmark).to receive(:find).with(1).and_return(bookmark)
+        @session = {user: student}
+        @request.session[:user] = student
+      end
+      it 'allows edit action' do
+        controller.params = {id: '1', action: 'edit'}
+        expect(controller.action_allowed?).to eq("Student")
+      end
+      it 'allows update action' do
+        controller.params = {id: '1', action: 'update'}
+        expect(controller.action_allowed?).to eq("Student")
+      end
+      it 'allows destroy action' do
+        controller.params = {id: '1', action: 'destroy'}
+        expect(controller.action_allowed?).to eq("Student")
+      end
+    end
+  end
+
   describe '#specific_average_score' do
     context 'check corner cases for specific_average_score' do
       let(:controller) { BookmarksController.new }
@@ -85,11 +107,6 @@ describe BookmarksController do
         nullBookmark = nil
         expect(controller.specific_average_score(nullBookmark)).to eq('-')
       end
-
-      #it 'score is not null' do
-      #  allow(SignUpTopic).to receive(:find).with("1").and_return(topic)
-      #  expect(controller.specific_average_score(bookmark)).to be_a(Numeric)
-      #end
     end
   end
 

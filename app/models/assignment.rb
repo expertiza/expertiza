@@ -212,8 +212,6 @@ class Assignment < ActiveRecord::Base
     check_condition('review_of_review_allowed_id', topic_id)
   end
 
-
-  DELETE_INSTANCES=['invitations','teams','participants','due_dates','assignment_questionnaires']
   #Deletes all instances created as part of assignment and finally destroys itself.
   def delete(force = nil)
     begin
@@ -230,9 +228,10 @@ class Assignment < ActiveRecord::Base
       raise "There is at least one teammate review response that exists for #{self.name}."
     end
 
-    # destroy instances of invitations, teams, particiapnts, etfc, refactored by Rajan, Jasmine, Sreenidhi 3/30/2020
+    # destroy instances of invitations, teams, particiapnts, etc, refactored by Rajan, Jasmine, Sreenidhi 3/30/2020
     #You can now add the instances to be deleted into the list.
-    DELETE_INSTANCES.each do |instance|
+    delete_instances = ['invitations','teams','participants','due_dates','assignment_questionnaires']
+    delete_instances.each do |instance|
       self.instance_eval(instance).each(&:destroy)
     end
 

@@ -63,6 +63,7 @@ class Assessment360Controller < ApplicationController
     overall_review_count(@assignments, @overall_teammate_review_count, @overall_meta_review_count)
   end
 
+  # to avoid divide by zero error
   def overall_review_count(assignments, overall_teammate_review_count, overall_meta_review_count)
     assignments.each do |assignment|
       temp_count = overall_teammate_review_count[assignment.id]

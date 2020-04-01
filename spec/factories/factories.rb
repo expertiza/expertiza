@@ -410,7 +410,6 @@ FactoryBot.define do
     reviewer { AssignmentParticipant.first || association(:participant) }
     reviewee { Bookmark.first || association(:assignment_team) }
     type 'BookmarkRatingResponseMap'
-    #questionnaire {Questionnaire.first || association(:questionnaire)}
     calibrate_to 0
   end
 

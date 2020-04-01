@@ -74,7 +74,7 @@ describe Assignment do
         assignment.num_reviews_required = 2
         expect(assignment.errors[:message]).to eq []
         expect { assignment.valid_num_review }.to change { assignment.errors[:message] }.from([])
-                                                                                        .to(['Number of reviews required cannot be greater than number of reviews allowed'])
+                                                                                        .to(['Num of reviews required cannot be greater than number of reviews allowed'])
       end
     end
 

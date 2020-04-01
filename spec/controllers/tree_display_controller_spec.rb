@@ -28,7 +28,6 @@ describe TreeDisplayController do
     end
   end
 
-
   describe "#drill" do
     it "redirect to list action" do
       get "drill", root: 1

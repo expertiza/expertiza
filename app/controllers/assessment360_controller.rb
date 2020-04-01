@@ -124,7 +124,6 @@ class Assessment360Controller < ApplicationController
     end
   end
 
-  # To pull information about the student's grades for particular assignment
   def assignment_grade_summary(cp, assignment_id)
     user_id = cp.user_id
     # topic exists if a team signed up for a topic, which can be found via the user and the assignment
@@ -138,7 +137,6 @@ class Assessment360Controller < ApplicationController
     @final_grades[cp.id] += @assignment_grades[cp.id][assignment_id]
   end
 
-  # To make sure there are participants for the course
   def insure_existence_of(course_participants,course)
     if course_participants.empty?
       flash[:error] = "There is no course participant in course #{course.name}"

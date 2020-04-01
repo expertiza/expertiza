@@ -226,6 +226,7 @@ class Assignment < ActiveRecord::Base
     end
 
     # destroy instances of invitations, teams, particiapnts, etfc, refactored by Rajan, Jasmine, Sreenidhi 3/30/2020
+    #You can now add the instances to be deleted into the list.
     DELETE_INSTANCES.each do |instance|
       self.instance_eval(instance).each(&:destroy)
     end
@@ -389,6 +390,7 @@ class Assignment < ActiveRecord::Base
   end
 
   # This method was refactored to reduce complexity, additional fields could now be added to the list - Rajan, Jasmine, Sreenidhi
+  #Now you could add your export fields to the hashmap
   EXPORT_DETAIL_FIELDS={team_id:'Team ID / Author ID', team_name:'Reviewee (Team / Student Name)',reviewer:'Reviewer',question:'Question / Criterion',question_id:'Question ID',comment_id:'Answer / Comment ID',comments:'Answer / Comment',score:'Score' }.freeze
   def self.export_details_fields(detail_options)
     fields = []
@@ -520,7 +522,8 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  # This method is used for export contents of grade#view.  -Zhewei
+  # This method was refactored by Rajan, Jasmine, Sreenidhi on 03/31/2020
+  #Now you can add groups of fields to the hashmap
   EXPORT_FIELDS={team_score:['Team Max','Team Min','Team Avg'], submitted_score:['Submitted Max','Submitted Min','Submitted Avg'],metareview_score:['Metareview Max','Metareview Min','Metareview Avg'],author_feedback_score:['Author Feedback Max, Author Feedback Min, Author Feedback Avg'],teammate_review_score:['Teammate Review Max', 'Teammate Review Min', 'Teammate Review Avg']}.freeze
   def self.export_fields(options)
     fields = []

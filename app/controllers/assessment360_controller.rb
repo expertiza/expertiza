@@ -110,9 +110,13 @@ class Assessment360Controller < ApplicationController
         # pull information about the student's grades for particular assignment
         assignment_grade_summary(cp, assignment_id)
         peer_review_score = find_peer_review_score(user_id, assignment_id)
+        #Skip if there are no peers
         next if peer_review_score.nil? 
+        #Skip if there are no reviews done by peers
         next if peer_review_score[:review].nil? 
+        #Skip if there are no reviews scores assigned by peers
         next if peer_review_score[:review][:scores].nil?
+        #Skip if there are is no peer review average score
         next if peer_review_score[:review][:scores][:avg].nil?
         @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
       end

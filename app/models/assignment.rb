@@ -65,6 +65,7 @@ class Assignment < ActiveRecord::Base
     @courses = Course.where(instructor_id: user.id).order(:name)
   end
 
+  #removes an assignment from course
   def self.remove_assignment_from_course(assignment)
     oldpath = assignment.path rescue nil
     assignment.course_id = nil
@@ -77,6 +78,7 @@ class Assignment < ActiveRecord::Base
     @has_teams ||= !self.teams.empty?
   end
 
+  #checks whether the assignment is getting a valid number of reviews (less than number of reviews allowed)
   def valid_num_review
     self.num_reviews = self.num_reviews_allowed
     if num_reviews_greater?(self.num_reviews_required, self.num_reviews_allowed)
@@ -212,15 +214,18 @@ class Assignment < ActiveRecord::Base
 
 
   DELETE_INSTANCES=['invitations','teams','participants','due_dates','assignment_questionnaires']
-  
+  #Deletes all instances created as part of assignment and finally destroys itself.
   def delete(force = nil)
     begin
-      delete_review_response(ReviewResponseMap,force)
+      maps = ReviewResponseMap.where(reviewed_object_id: self.id)
+      maps.each {|map| map.delete(force) }
     rescue StandardError
       raise "There is at least one review response that exists for #{self.name}."
     end
+
     begin
-      delete_review_response(TeammateReviewResponseMap,force)
+      maps = TeammateReviewResponseMap.where(reviewed_object_id: self.id)
+      maps.each {|map| map.delete(force) }
     rescue StandardError
       raise "There is at least one teammate review response that exists for #{self.name}."
     end
@@ -246,6 +251,7 @@ class Assignment < ActiveRecord::Base
     self.microtask.nil? ? false : self.microtask
   end
 
+  # Check to see if assignment has badge
   def badge?
     self.has_badge.nil? ? false : self.has_badge
   end
@@ -545,8 +551,9 @@ class Assignment < ActiveRecord::Base
   end
 
   private
-  #Method extracted from scores method. This method computes and returns grades by rounds and
-  #total_num_of_assessments and total_score when the assignment has varying rubrics by round
+  #Below private methods are extracted and added as part of refactoring project E2009 - Spring 2020
+  #This method computes and returns grades by rounds, total_num_of_assessments and total_score
+  # when the assignment has varying rubrics by round
   def compute_grades_by_rounds(questions, team)
     grades_by_rounds = {}
     total_score = 0
@@ -561,7 +568,7 @@ class Assignment < ActiveRecord::Base
     return grades_by_rounds, total_num_of_assessments, total_score
   end
 
-  # merge the grades from multiple rounds Jasmine:extracted from scores method in assignment.rb (for OSS Project E2009)
+  # merge the grades from multiple rounds
   def merge_grades_by_rounds(grades_by_rounds, num_of_assessments, total_score)
     team_scores = {:max => 0, :min => 0, :avg => nil}
     if num_of_assessments == 0
@@ -624,10 +631,5 @@ class Assignment < ActiveRecord::Base
       reviewers.member?(reviewer) ? reviewers[reviewer] += 1 : reviewers[reviewer] = 1
     end
     reviewers = reviewers.sort_by {|a| a[1]}
-  end
-
-  def delete_review_response(responsemap_type,force)
-    maps = responsemap_type.where(reviewed_object_id: self.id)
-    maps.each {|map| map.delete(force) }
   end
 end

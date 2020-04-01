@@ -23,7 +23,10 @@ describe "bookmark review testing" do
     create(:assignment_team)
     create(:team_user, user: User.where(role_id: 2).third, team: AssignmentTeam.second)
     create(:signed_up_team, team_id: 2, topic: SignUpTopic.second)
-  end
+    create(:bookmark_questionnaire)
+    create(:question)
+    create(:bookmark_review_response_map, reviewer_id: User.where(role_id: 2).second.id, reviewee: Bookmark.first)
+   end
 
   def load_bookmark_list
     login_as('student2064')
@@ -65,4 +68,15 @@ describe "bookmark review testing" do
     click_button "Add new bookmark"
     expect(page).to have_content "Your bookmark has been successfully created!"
   end
+
+   it "can review a bookmark" do
+     load_bookmark_list
+     click_link "Review"
+     expect(page).to have_content "New Bookmark Review for TestAssignment"
+     fill_in "responses[0][comment]", with: "bookmark is awesome!"
+     select 5, from: "responses[0][score]"
+     click_button "Save Bookmark Review"
+     expect(page).to have_content "Your response was successfully saved."
+   end
+
 end

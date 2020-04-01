@@ -1,5 +1,4 @@
 describe "bookmark review testing" do
-  let(:bookmark_rating_response_map) { build(:review_response_map, type: 'BookmarkRatingResponseMap') }
 
    before(:each) do
     create(:assignment, name: "TestAssignment", directory_path: 'test_assignment', use_bookmark: true)

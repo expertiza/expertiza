@@ -46,6 +46,13 @@ describe TreeDisplayController do
     end
   end
 
+  describe "GET #set_session_last_open_tab" do
+    it "returns HTTP status 200" do
+      get :set_session_last_open_tab
+      expect(response).to have_http_status(200)
+      end
+  end
+
   describe "GET #get_folder_contents" do
     before(:each) do
       @treefolder = TreeFolder.new

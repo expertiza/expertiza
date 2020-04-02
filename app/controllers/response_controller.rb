@@ -1,3 +1,4 @@
+# Initial Commit
 class ResponseController < ApplicationController
   helper :submitted_content
   helper :file

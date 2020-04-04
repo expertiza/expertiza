@@ -563,28 +563,30 @@ class Assignment < ActiveRecord::Base
         names_of_participants += '; ' unless p == team[:team].participants.last
       end
       tcsv << names_of_participants
-      export_data_fields(options)
+      export_data_fields(options, team, tcsv, pscore)
       csv << tcsv
     end
   end
 
-  def self.export_data_fields(options)
+  def self.export_data_fields(options, team, tcsv, pscore)
     if options['team_score'] == 'true'
-      team[:scores] ?
-        tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg]) :
+      if team[:scores]
+        tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg])
+      else
         tcsv.push('---', '---', '---')
+      end
     end
     review_hype_mapping_hash = {review: 'submitted_score',
                                 metareview: 'metareview_score',
                                 feedback: 'author_feedback_score',
                                 teammate: 'teammate_review_score'}
     review_hype_mapping_hash.each do |review_type, score_name|
-      export_individual_data_fields(review_type, score_name)
+      export_individual_data_fields(review_type, score_name, tcsv, pscore, options)
     end
     tcsv.push(pscore[:total_score])
   end
 
-  def self.export_individual_data_fields(review_type, score_name)
+  def self.export_individual_data_fields(review_type, score_name, tcsv, pscore, options)
     if pscore[review_type]
       tcsv.push(pscore[review_type][:scores][:max], pscore[review_type][:scores][:min], pscore[review_type][:scores][:avg])
     else

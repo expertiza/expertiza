@@ -384,6 +384,7 @@
             if(document.getElementById("metareview")) {
                 removeDueDateTableElement('metareview', 0);
                 jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
+                hideMetaReviewLimit();
             } else {
                 addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
                 jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
@@ -394,10 +395,32 @@
                         <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
                         <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
                 );
+                showMetaReviewLimit();
             }
 
             <%@metareview_allowed_checkbox=true%>
 
+        }
+        function showMetaReviewLimit(){
+            localStorage .setItem("meta", "show") ;
+            var e = $.Event("storage");
+            e.originalEvent = {
+                key: 'meta',
+                newValue: 'show'
+            };
+            $(window).trigger(e);
+            $(window).trigger('storage', e.originalEvent);
+        }
+
+        function hideMetaReviewLimit(){
+            localStorage .setItem("meta", "hide") ;
+            var e = $.Event("storage");
+            e.originalEvent = {
+                key: 'meta',
+                newValue: 'hide'
+            };
+            $(window).trigger(e);
+            $(window).trigger('storage', e.originalEvent);
         }
         function removeOrAddSignup(){
             if(document.getElementById("signup"))
@@ -426,23 +449,6 @@
             <%@team_formation_allowed_checkbox=true%>
 
         }
-function removeOrAddMetareview() {
-    if (document.getElementById("metareview")) {
-        removeDueDateTableElement('metareview', 0);
-        jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
-    } else {
-        addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
-        jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
-        addQuestionnaireTableRow(
-            'MetareviewQuestionnaire',
-            null,
-            <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
-            <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
-            <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
-        );
-    }
-    <%@metareview_allowed_checkbox=true%>
-}
 //E1654. Improve date-picker and deadlines Code change starts
 //This is a generic funtion to add and substract days and months
 function addDaysOrMonth(mul, type) {

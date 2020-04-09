@@ -9,6 +9,10 @@ class TeamsUser < ActiveRecord::Base
     self.user.name(ip_address)
   end
 
+  def fullname(ip_address = nil)
+    self.user.fullname(ip_address)
+  end
+
   def delete
     TeamUserNode.find_by(node_object_id: self.id).destroy
     team = self.team

@@ -82,4 +82,50 @@ class Mailer < ActionMailer::Base
     mail(subject: defn[:subject],
          to: defn[:to])
   end
+
+  # after mentor assigned, email mentor about team info(names+emails)
+  def notify_mentor(mentor,team)
+    members = TeamsUser.where(team_id: team.id)
+    members_name=""
+    for i in 0..members.size-2 do
+      members_name += " "+ members[i].fullname+", "+User.find(members[i].user_id).email+"<br>"
+    end
+    Mailer.delayed_message(bcc: [User.find(mentor.user_id).email],
+                           subject: "[Expertiza]: New Team Assignment",
+                           body: "You have been assigned as a mentor to team " + team.name + "<br>Current member:<br>"+members_name).deliver_now
+  end
+
+  # after mentor assigned, email all current team members about mentor and team member info
+  def notify_team_members(mentor,team)
+    members = TeamsUser.where(team_id: team.id)
+    members_name = ""
+    # i=size-1 does not count since it will be the mentor not student
+    for i in 0..members.size-2 do
+      members_name += " " + members[i].fullname+", "+User.find(members[i].user_id).email+"<br>"
+    end
+    mentor_info=mentor.fullname + "("+User.find(mentor.user_id).email+") "
+    members.each do |member|
+      if member.user_id != mentor.user_id
+        Mailer.delayed_message(bcc: [User.find(member.user_id).email],
+                               subject: "[Expertiza]: New Mentor Assignment",
+                               body: mentor_info+"has been assigned as your mentor for assignment "+ Assignment.find(team.parent_id).name+"<br>Current member:<br>"+members_name).deliver_now
+      end
+    end
+  end
+
+  # after mentor assigned, when new member added to the team, only email new added member about mentor and team info
+  def notify_single_team_member(member,mentor,team)
+    members = TeamsUser.where(team_id: team.id)
+    members_name = ""
+    for i in 0..members.size-1 do
+      if members[i].user_id !=  mentor.user_id
+        members_name += " " + members[i].fullname+", "+User.find(members[i].user_id).email+"<br>"
+      end
+    end
+    mentor_info=mentor.fullname + "("+User.find(mentor.user_id).email+") "
+    Mailer.delayed_message(bcc: [member.email],
+                           subject: "[Expertiza]: New Mentor Assignment",
+                           body: mentor_info+"has been assigned as your mentor for assignment"+ Assignment.find(team.parent_id).name+"<br>Current member:<br>"+members_name).deliver_now
+  end
+
 end

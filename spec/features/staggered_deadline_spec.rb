@@ -6,7 +6,7 @@ describe "Staggered deadline test" do
            directory_path: "Assignment1665",
            rounds_of_reviews: 2,
            staggered_deadline: true,
-           max_team_size: 1,
+           max_team_size: 3,
            allow_selecting_additional_reviews_after_1st_round: true)
     create_list(:participant, 3)
     create(:topic, topic_name: "Topic_1")

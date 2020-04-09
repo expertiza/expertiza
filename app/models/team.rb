@@ -147,20 +147,15 @@ class Team < ActiveRecord::Base
   def self.size(team_id)
     team_no_mentor = true
     check_team = Team.find_by_sql("SELECT parent_id FROM teams where (teams.id = '#{team_id}')").first.parent_id
+    team_size = TeamsUser.where(team_id: team_id).count
     members = TeamsUser.where(team_id: team_id)
     members.each do |member|
-      # The mentor will not be count
-      if Participant.where(['user_id = ? and can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', member.user_id ,0, 0, 0, check_team]).count > 0
-        team_no_mentor = false
+    # The mentor is subtracted from the team size count
+    if Participant.where(['user_id = ? and can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', member.user_id ,0, 0, 0, check_team]).count > 0
+      team_size -= 1
       end
     end
-    if team_no_mentor
-      team_size = TeamsUser.where(team_id: team_id).count
-    else
-      team_size = TeamsUser.where(team_id: team_id).count - 1
-    end
     team_size
-    #TeamsUser.where(team_id: team_id).count
   end
 
   # Copy method to copy this team

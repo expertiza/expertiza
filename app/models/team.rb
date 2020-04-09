@@ -66,15 +66,15 @@ class Team < ActiveRecord::Base
   end
 
   # Check if the current team dont have mentor?
-  def dont_have_mentor?
-    no_mentor = true
+  def have_mentor?
+    has_mentor = false
     members = TeamsUser.where(team_id: self.id)
     members.each do |member|
       if Participant.where(['user_id = ? and can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', member.user_id ,0, 0, 0, self.parent_id]).count > 0
-        no_mentor = false
+        has_mentor = true
       end
     end
-    (no_mentor)
+    has_mentor
   end
 
 
@@ -93,7 +93,7 @@ class Team < ActiveRecord::Base
       # only assign mentor when number of mentor > 0
       if Participant.where(['can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', 0, 0, 0, self.parent_id]).count > 0
         # for new added member and team already has mentor
-        if half? && !dont_have_mentor?
+        if half? && have_mentor?
           members = TeamsUser.where(team_id: self.id)
           members.each do |member|
             if Participant.where(['user_id = ? and can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', member.user_id ,0, 0, 0, self.parent_id]).count > 0
@@ -102,8 +102,8 @@ class Team < ActiveRecord::Base
             end
           end
 
-          # num > max/2 and dont have mentor yet
-        else if half? && dont_have_mentor?
+        # num > max/2 and dont have mentor yet
+        else if half? && !have_mentor?
               mentor=assign_mentor
               new_mentor = TeamsUser.create(user_id: mentor.user_id, team_id: self.id)
               TeamUserNode.create(parent_id: parent.id, node_object_id: new_mentor.id)

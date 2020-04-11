@@ -9,6 +9,19 @@ Expertiza
 
 Expertiza is a web application where students can submit and peer-review learning objects (articles, code, web sites, etc). It is used in select courses at NC State and by professors at several other colleges and universities.
 
+#### My Work
+This project was done as a part of CSC 517 Object Oriented Design & Development, where we had to develop a feature that tracks and displays the time a student spends while peer-reviewing others' projects. 
+
+Our approach and other details have been well documented at Expertiza's Wiki Page. [Link](https://expertiza.csc.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_E1989._Track_the_time_students_look_at_other_submissions).
+
+<b>Team Information:</b><br>
+[Dylan Spruill](mailto:drspruil@ncsu.edu)<br>
+[Forrest Devita](mailto:fcdevita@ncsu.edu)<br>
+[Rohan Pillai](mailto:rspillai@ncsu.edu)<br>
+[Shalin Rathi](mailto:sjrathi@ncsu.edu)<br>
+Mentor: [Akanksha Mohan](mailto:amohan7@ncsu.edu)<br>
+Professor: [Dr. Edward F. Gehringer](mailto:efg@ncsu.edu)<br>
+
 Setup
 -----
 

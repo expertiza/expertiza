@@ -22,7 +22,7 @@ class Answer < ActiveRecord::Base
         scores[:max] = curr_score if curr_score > scores[:max]
         scores[:min] = curr_score if curr_score < scores[:min] and curr_score != -1
 
-        # Check if the review is invalid. If is not valid do not include in score calculation
+        # Check if the review is invalid. If it is not valid do not include in score calculation.
         if @invalid == 1 or curr_score == -1
           length_of_assessments -= 1
           curr_score = 0

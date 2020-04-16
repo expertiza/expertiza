@@ -54,7 +54,7 @@ class Team < ActiveRecord::Base
     return false if self.parent_id.nil? # course team, does not max_team_size
     max_team_members = Assignment.find(self.parent_id).max_team_size
     curr_team_size = Team.size(self.id)
-    (curr_team_size >= max_team_members)
+    (curr_team_size === max_team_members)
   end
 
   # Check if the current team size is more than half?
@@ -62,7 +62,7 @@ class Team < ActiveRecord::Base
     return false if self.parent_id.nil?
     max_team_members = Assignment.find(self.parent_id).max_team_size
     curr_team_size = Team.size(self.id)
-    (curr_team_size*2 > max_team_members)
+    (curr_team_size*2 >= max_team_members)
   end
 
   # Check if the current team dont have mentor?
@@ -102,7 +102,7 @@ class Team < ActiveRecord::Base
             end
           end
 
-        # num > max/2 and dont have mentor yet
+        # num >= max/2 and dont have mentor yet
         else if half? && !have_mentor?
               mentor=assign_mentor
               new_mentor = TeamsUser.create(user_id: mentor.user_id, team_id: self.id)

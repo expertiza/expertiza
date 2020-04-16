@@ -10,7 +10,8 @@ describe AssignmentsController do
   let(:instructor2) { build(:instructor, id: 66) }
   let(:ta) { build(:teaching_assistant, id: 8) }
   let(:student) { build(:student) }
-  let(:assignment_questionnaire) { build(:assignment_questionnaire) }
+  let(:questionnaire) { build(:questionnaire, id: 666) }
+  let(:assignment_questionnaire) { build(:assignment_questionnaire, id: 1, questionnaire: questionnaire) }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -211,10 +212,13 @@ describe AssignmentsController do
 
     context 'when params has key :assignment_form' do
       before(:each) do
-        assignment_questionnaire = double('AssignmentQuestionnaire')
-        allow(AssignmentQuestionnaire).to receive(:new).with(any_args).and_return(assignment_questionnaire)
-        allow(assignment_questionnaire).to receive(:save).and_return(true)
-        allow(assignment_questionnaire).to receive(:topic_id=).with(any_args)
+        new_assignment_questionnaire = AssignmentQuestionnaire.new
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: '1').and_return([assignment_questionnaire])
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 2, used_in_round: '1', topic_id: nil).and_return([])
+        allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
+        allow(AssignmentQuestionnaire).to receive(:new).and_return(new_assignment_questionnaire)
+        allow(Questionnaire).to receive(:find).with('666').and_return(questionnaire)
+        allow(new_assignment_questionnaire).to receive(:save).and_return(true)
         @params = {
           vary_by_topic: true,
           id: 1,
@@ -257,7 +261,7 @@ describe AssignmentsController do
           expect(flash[:note]).to eq('The assignment was successfully saved....')
           expect(flash[:error]).to eq("We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. "\
                                       "For now we assume you are in Eastern Time (US & Canada)")
-          expect(response).to render_template("assignments/edit/_topics")
+          expect(response).to render_template('assignments/edit/_topics')
         end
       end
 
@@ -267,7 +271,7 @@ describe AssignmentsController do
           post :update, @params, session
           expect(flash[:note]).to eq('The assignment was successfully saved....')
           expect(flash[:error]).to be nil
-          expect(response).to render_template("assignments/edit/_topics")
+          expect(response).to render_template('assignments/edit/_topics')
         end
       end
     end

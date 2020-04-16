@@ -11,7 +11,7 @@ module OnTheFlyCalc
     @review_scores = {}
     @response_type = 'ReviewResponseMap'
     @response_maps = ResponseMap.where(reviewed_object_id: self.id, type: @response_type)
-    if self.varying_rubrics_by_round?
+    if self.vary_by_round
       scores_varying_rubrics
     else
       scores_non_varying_rubrics

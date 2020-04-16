@@ -14,8 +14,6 @@ describe ResponseController do
   let(:assignment_team) { build(:assignment_team, id: 1) }
   let(:signed_up_team) { build(:signed_up_team, team_id: assignment_team.id) }
   let(:assignment_form) { AssignmentForm.new }
-  let(:assignment_team) { build(:assignment_team, id: 1) }
-  let(:signed_up_team) { build(:signed_up_team, team_id: assignment_team.id) }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)

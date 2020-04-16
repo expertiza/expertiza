@@ -284,8 +284,6 @@ class AssignmentsController < ApplicationController
 
     @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
     @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
-    @review_vary_by_round_check = false
-    @review_vary_by_topic_check = false
     @due_date_nameurl_not_empty = false
     @due_date_nameurl_not_empty_checkbox = false
     @metareview_allowed = false
@@ -326,21 +324,6 @@ class AssignmentsController < ApplicationController
   def validate_due_date
     @due_date_nameurl_not_empty && @due_date_nameurl_not_empty_checkbox &&
       (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
-  end
-
-  def check_assignment_questionnaires_usage
-    @assignment_questionnaires.each do |aq|
-      unless aq.used_in_round.nil?
-        @review_vary_by_round_check = 1
-        break
-      end
-    end
-    @assignment_questionnaires.each do |aq|
-      unless aq.topic_id.nil?
-        @review_vary_by_topic_check = 1
-        break
-      end
-    end
   end
 
   def handle_rubrics_not_assigned_case

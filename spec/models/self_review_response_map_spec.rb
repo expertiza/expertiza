@@ -1,70 +1,66 @@
 describe SelfReviewResponseMap do
 
+  let(:assignment) { build(:assignment, id: 1) }
+  let(:assignment_questionnaire1) { build(:assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 1) }
+  let(:assignment_questionnaire2) { build(:assignment_questionnaire, id: 2, assignment_id: 1, questionnaire_id: 2) }
+  let(:questionnaire1) { build(:questionnaire, type: 'ReviewQuestionnaire') }
+  let(:questionnaire2) { build(:questionnaire, type: 'MetareviewQuestionnaire') }
+  let(:self_review_response_map) { build(:self_review_response_map, assignment: assignment) }
+  let(:next_due_date) { build(:assignment_due_date, round: 1) }
+
   describe '#questionnaire' do
-
     # This method is little more than a wrapper for assignment.review_questionnaire_id()
-    # So it will be tested relatively lightly
-    # We want to know how it responds to the combinations of various arguments it could receive
-    # We want to know how it responds if no questionnaire can be found
+    # Test how it responds to the combinations of various arguments it could receive
 
-    it "returns the correct questionnaire when round given, topic given" do
-      # create multiple questionnaires and assignment_questionnaires,
-      # for confidence that correct questionnaire is returned
-      assignment = create(:assignment)
-      self_review_response_map = create(:self_review_response_map, assignment: assignment)
-      questionnaire_1 = create(:questionnaire)
-      questionnaire_2 = create(:questionnaire)
-      questionnaire_3 = create(:questionnaire)
-      questionnaire_4 = create(:questionnaire)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_1, used_in_round: 1, topic_id: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_2, used_in_round: 1, topic_id: 2)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_3, used_in_round: 2, topic_id: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_4, used_in_round: 2, topic_id: 2)
-      expect(self_review_response_map.questionnaire(2, 2).id).to eql questionnaire_4.id
+    context 'when corresponding active record for assignment_questionnaire is found' do
+      before(:each) do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
+            [assignment_questionnaire1, assignment_questionnaire2])
+        allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire1)
+      end
+
+      it 'returns correct questionnaire found by used_in_round and topic_id if both used_in_round and topic_id are given' do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return(
+            [assignment_questionnaire1])
+        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
+        expect(self_review_response_map.questionnaire(1, 1)).to eq(questionnaire1)
+      end
+
+      it 'returns correct questionnaire found by used_in_round if only used_in_round is given' do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: nil).and_return(
+            [assignment_questionnaire1])
+        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
+        expect(self_review_response_map.questionnaire(1, nil)).to eq(questionnaire1)
+      end
+
+      it 'returns correct questionnaire found by topic_id if only topic_id is given and there is no current round used in the due date' do
+        allow(DueDate).to receive(:get_next_due_date).with(assignment.id).and_return(nil)
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: nil, topic_id: 1).and_return(
+            [assignment_questionnaire1])
+        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
+        expect(self_review_response_map.questionnaire(nil, 1)).to eq(questionnaire1)
+      end
+
+      it 'returns correct questionnaire found by used_in_round and topic_id if only topic_id is given, but current round is found by the due date' do
+        allow(DueDate).to receive(:get_next_due_date).with(assignment.id).and_return(next_due_date)
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return(
+            [assignment_questionnaire1])
+        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
+        expect(self_review_response_map.questionnaire(nil, 1)).to eq(questionnaire1)
+      end
     end
 
-    it "returns the correct questionnaire when round not given, topic given" do
-      # create multiple questionnaires and assignment_questionnaires,
-      # for confidence that correct questionnaire is returned
-      assignment = create(:assignment)
-      self_review_response_map = create(:self_review_response_map, assignment: assignment)
-      questionnaire_1 = create(:questionnaire)
-      questionnaire_2 = create(:questionnaire)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_1, topic_id: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_2, topic_id: 2)
-      expect(self_review_response_map.questionnaire(nil, 2).id).to eql questionnaire_2.id
+    context 'when corresponding active record for assignment_questionnaire is not found' do
+      it 'returns correct questionnaire found by type' do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
+            [assignment_questionnaire1, assignment_questionnaire2])
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return([])
+        allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
+        allow(Questionnaire).to receive(:find_by).with(id: nil).and_return(nil)
+        allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire1)
+        allow(Questionnaire).to receive(:find).with(2).and_return(questionnaire2)
+        expect(self_review_response_map.questionnaire(1, 1)).to eq(questionnaire1)
+      end
     end
-
-    it "returns the correct questionnaire when round given, topic not given" do
-      # create multiple questionnaires and assignment_questionnaires,
-      # for confidence that correct questionnaire is returned
-      assignment = create(:assignment)
-      self_review_response_map = create(:self_review_response_map, assignment: assignment)
-      questionnaire_1 = create(:questionnaire)
-      questionnaire_2 = create(:questionnaire)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_1, used_in_round: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_2, used_in_round: 2)
-      expect(self_review_response_map.questionnaire(2, nil).id).to eql questionnaire_2.id
-    end
-
-    it "returns the correct questionnaire when round number not given, topic not given" do
-      # create multiple questionnaires and assignment_questionnaires,
-      # for confidence that correct questionnaire is returned
-      assignment = create(:assignment)
-      self_review_response_map = create(:self_review_response_map, assignment: assignment)
-      questionnaire_1 = create(:questionnaire)
-      questionnaire_2 = create(:questionnaire)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_1, used_in_round: 1)
-      create(:assignment_questionnaire, assignment: assignment, questionnaire: questionnaire_2, used_in_round: 2)
-      expect(self_review_response_map.questionnaire(nil, nil).id).to eql questionnaire_1.id
-    end
-
-    it "returns nil when no questionnaire can be found" do
-      assignment = create(:assignment)
-      self_review_response_map = create(:self_review_response_map, assignment: assignment)
-      expect(self_review_response_map.questionnaire(2, nil)).to be_nil
-    end
-
   end
-
 end

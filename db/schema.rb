@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181205201208) do
+ActiveRecord::Schema.define(version: 20190607174531) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -55,6 +55,7 @@ ActiveRecord::Schema.define(version: 20181205201208) do
     t.integer "questionnaire_weight", limit: 4, default: 0,    null: false
     t.integer "used_in_round",        limit: 4
     t.boolean "dropdown",                       default: true
+    t.integer "topic_id",             limit: 4
   end
 
   add_index "assignment_questionnaires", ["assignment_id"], name: "fk_aq_assignments_id", using: :btree
@@ -112,6 +113,8 @@ ActiveRecord::Schema.define(version: 20181205201208) do
     t.boolean  "is_answer_tagging_allowed"
     t.boolean  "has_badge"
     t.boolean  "allow_selecting_additional_reviews_after_1st_round"
+    t.boolean  "vary_by_topic",                                                    default: false
+    t.boolean  "vary_by_round",                                                    default: false
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree

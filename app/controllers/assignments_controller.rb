@@ -1,4 +1,5 @@
 class AssignmentsController < ApplicationController
+  
   include AssignmentHelper
   autocomplete :user, :name
   before_action :authorize
@@ -71,7 +72,6 @@ class AssignmentsController < ApplicationController
       adjust_timezone_when_due_date_present(dd)
       break if validate_due_date
     end
-    check_assignment_questionnaires_usage
     @due_date_all = update_nil_dd_deadline_name(@due_date_all)
     @due_date_all = update_nil_dd_description_url(@due_date_all)
     # only when instructor does not assign rubrics and in assignment edit page will show this error message.
@@ -89,9 +89,25 @@ class AssignmentsController < ApplicationController
       return
     end
     retrieve_assignment_form
+    assignment_form_assignment_staggered_deadline?
     handle_current_user_timezonepref_nil
     update_feedback_assignment_form_attributes
-    redirect_to edit_assignment_path @assignment_form.assignment.id
+    # What to do next depends on how we got here
+    if params['button'].nil?
+      # REFRESH the topics tab after changing tabs
+      # Specifically useful when switching between vary-do-not-vary by topic on the Rubrics tab
+      # This changes how the Topics tab should appear
+      # Followed instructions at:
+      #https://atlwendy.ghost.io/render-a-partial-view-tutorial-for-beginners/
+      render :partial => "assignments/edit/topics"
+      # TODO E1936 (future work)
+      # There is a noticeable delay bewtween changing the state of the
+      # "Review rubric varies by topic?" checkbox on the Rubrics tab,
+      # and the show / hide of rubric drop-downs on the Topics tab
+    else
+      # SAVE button was used (do a redirect)
+      redirect_to edit_assignment_path @assignment_form.assignment.id
+    end
   end
 
   def show
@@ -178,6 +194,19 @@ class AssignmentsController < ApplicationController
     redirect_to delayed_mailer_assignments_index_path params[:id]
   end
 
+  # Provide a means for a rendering of all flash messages to be requested
+  # This is useful because the assignments page has tabs
+  #   and switching tabs acts like a "save" but does NOT cause a new page load
+  #   so if we want to see via flash messages when something goes wrong,
+  #   we need to ask about it
+  # Doing it this way has a few advantages
+  #   doesn't matter what kind of flash item is set (error, note, notice, etc.)
+  #   doesn't matter what tab we are on (anybody can request this render)
+  #   doesn't matter where the flash item originated, anything can get seen this way
+  def instant_flash
+    render :partial => "shared/flash_messages"
+  end
+
   private
 
   # check whether rubrics are set before save assignment
@@ -254,7 +283,6 @@ class AssignmentsController < ApplicationController
 
     @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
     @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
-    @reviewvarycheck = false
     @due_date_nameurl_not_empty = false
     @due_date_nameurl_not_empty_checkbox = false
     @metareview_allowed = false
@@ -272,6 +300,7 @@ class AssignmentsController < ApplicationController
   def assignment_form_assignment_staggered_deadline?
     if @assignment_form.assignment.staggered_deadline == true
       @review_rounds = @assignment_form.assignment.num_review_rounds
+      @due_date_all ||= AssignmentDueDate.where(parent_id: @assignment_form.assignment.id)
       @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_SUBMISSION }
       @assignment_review_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_REVIEW }
     end
@@ -294,15 +323,6 @@ class AssignmentsController < ApplicationController
   def validate_due_date
     @due_date_nameurl_not_empty && @due_date_nameurl_not_empty_checkbox &&
       (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
-  end
-
-  def check_assignment_questionnaires_usage
-    @assignment_questionnaires.each do |aq|
-      unless aq.used_in_round.nil?
-        @reviewvarycheck = 1
-        break
-      end
-    end
   end
 
   def handle_rubrics_not_assigned_case

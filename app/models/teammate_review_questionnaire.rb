@@ -1,6 +1,6 @@
 class TeammateReviewQuestionnaire < Questionnaire
   after_initialize :post_initialization
-  @print_name = "Team Review Rubric"
+  @print_name = "Teammate Review Rubric"
 
   class << self
     attr_reader :print_name

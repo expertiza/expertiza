@@ -56,7 +56,7 @@ class AssignmentParticipant < Participant
     compute_assignment_score(questions, scores)
     scores[:total_score] = self.assignment.compute_total_score(scores)
     # merge scores[review#] (for each round) to score[review]  -Yang
-    merge_scores(scores) if self.assignment.varying_rubrics_by_round?
+    merge_scores(scores) if self.assignment.vary_by_round
     # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
     # PS: I don't like the fact that we are doing this here but it is difficult to make it work anywhere else
     topic_total_scores(scores) if self.assignment.microtask?
@@ -198,12 +198,13 @@ class AssignmentParticipant < Participant
   def self.import(row_hash, _row_header = nil, session, id)
     raise ArgumentError, "No user id has been specified." if row_hash.empty?
     user = User.find_by(name: row_hash[:name])
-    return unless user.nil?
-    raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 4
-    attributes = ImportFileHelper.define_attributes(row_hash)
-    user = ImportFileHelper.create_new_user(attributes, session)
-
-    raise ImportError, "The assignment with id \"#{id}\" was not found." if Assignment.find(id).nil?
+    # Create new user if not already present in the system - svshingt
+    if user.nil?
+      raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 4
+      attributes = ImportFileHelper.define_attributes(row_hash)
+      user = ImportFileHelper.create_new_user(attributes, session)
+      raise ImportError, "The assignment with id \"#{id}\" was not found." if Assignment.find(id).nil?
+    end
     return if AssignmentParticipant.exists?(user_id: user.id, parent_id: id)
     new_part = AssignmentParticipant.create(user_id: user.id, parent_id: id)
     new_part.set_handle

@@ -58,7 +58,7 @@ module SummaryHelper
         self.summary[round] = {}
         self.avg_scores_by_criterion[round] = {}
 
-        questions_used_in_round = rubric[assignment.varying_rubrics_by_round? ? round : 0]
+        questions_used_in_round = rubric[assignment.vary_by_round ? round : 0]
         # get answers of each question in the rubric
         questions_used_in_round.each do |question|
           next if question.type.eql?("SectionHeader")
@@ -120,7 +120,7 @@ module SummaryHelper
 
           # iterate each round and get answers
           # if use the same rubric, only use rubric[0]
-          rubric_questions_used = rubric[assignment.varying_rubrics_by_round? ? round : 0]
+          rubric_questions_used = rubric[assignment.vary_by_round ? round : 0]
           rubric_questions_used.each do |q|
             next if q.type.eql?("SectionHeader")
             summary[reviewee.name][round][q.txt] = ""
@@ -193,7 +193,7 @@ module SummaryHelper
       rubric = []
       (0..assignment.rounds_of_reviews - 1).each do |round|
         rubric[round] = nil
-        if assignment.varying_rubrics_by_round?
+        if assignment.vary_by_round
           # get rubric id in each round
           questionnaire_id = assignment.review_questionnaire_id(round + 1)
           # get criteria in the corresponding rubric (each round may use different rubric)

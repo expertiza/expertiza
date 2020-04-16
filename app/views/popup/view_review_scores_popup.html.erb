@@ -1,4 +1,9 @@
-<h2> Review scores: <%= Participant.find(@reviewer_id).name %> </h2>
+<!--As instructed by Zhewei Hu and Dr. Gehringer, if the current assignment varies by topic,-->
+<!--this view should not display the content below. Instead it should display a message-->
+<!--saying that this report is not available for assignments where rubrics vary by topic-->
+<!--This message is set as the flash message from popup_controller.rb-->
+<% assignment = Assignment.find(@assignment_id) %>
+<% if !assignment.vary_by_topic %>
 
 <% keys = @review_final_versions.keys %>
 <% keys.each do |key| %>

@@ -31,7 +31,7 @@ class AssignmentsController < ApplicationController
     if params[:button]
       if @assignment_form.save
         @assignment_form.create_assignment_node
-        exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
+        exist_assignment = Assignment.find_by(id: @assignment_form.assignment.id)
         assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
         if assignment_form_params[:assignment][:directory_path].blank?
           assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
@@ -47,7 +47,7 @@ class AssignmentsController < ApplicationController
         assignment_form_params[:assignment_questionnaire] = ques_array
         assignment_form_params[:due_date] = due_array
         @assignment_form.update(assignment_form_params, current_user)
-        aid = Assignment.find_by(name: @assignment_form.assignment.name).id
+        aid = Assignment.find_by(id: @assignment_form.assignment.id).id
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
         redirect_to edit_assignment_path aid
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
@@ -72,7 +72,6 @@ class AssignmentsController < ApplicationController
       adjust_timezone_when_due_date_present(dd)
       break if validate_due_date
     end
-    check_assignment_questionnaires_usage
     @due_date_all = update_nil_dd_deadline_name(@due_date_all)
     @due_date_all = update_nil_dd_description_url(@due_date_all)
     # only when instructor does not assign rubrics and in assignment edit page will show this error message.
@@ -255,7 +254,6 @@ class AssignmentsController < ApplicationController
 
     @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
     @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
-    @reviewvarycheck = false
     @due_date_nameurl_not_empty = false
     @due_date_nameurl_not_empty_checkbox = false
     @metareview_allowed = false
@@ -295,15 +293,6 @@ class AssignmentsController < ApplicationController
   def validate_due_date
     @due_date_nameurl_not_empty && @due_date_nameurl_not_empty_checkbox &&
       (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
-  end
-
-  def check_assignment_questionnaires_usage
-    @assignment_questionnaires.each do |aq|
-      unless aq.used_in_round.nil?
-        @reviewvarycheck = 1
-        break
-      end
-    end
   end
 
   def handle_rubrics_not_assigned_case

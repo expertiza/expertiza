@@ -160,7 +160,7 @@ class Assignment < ActiveRecord::Base
     self.teams.each do |team|
       scores[:teams][index.to_s.to_sym] = {}
       scores[:teams][index.to_s.to_sym][:team] = team
-      if self.varying_rubrics_by_round?
+      if self.vary_by_round
         grades_by_rounds = {}
         total_score = 0
         total_num_of_assessments = 0 # calculate grades for each rounds
@@ -342,11 +342,6 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  # check if this assignment has multiple review phases with different review rubrics
-  def varying_rubrics_by_round?
-    AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: 2).size >= 1
-  end
-
   def link_for_current_stage(topic_id = nil)
     if self.staggered_deadline?
       return nil if topic_id.nil?
@@ -387,36 +382,24 @@ class Assignment < ActiveRecord::Base
     due_date.nil? || due_date == 'Finished' ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
   end
 
-  def review_questionnaire_id(round = nil)
-    # Get the round it's in from the next duedates
-    if round.nil?
+  # Find the ID of a review questionnaire for this assignment
+  def review_questionnaire_id(round_number = nil, topic_id = nil)
+    # If round is not given, try to retrieve current round from the next due date
+    if round_number.nil?
       next_due_date = DueDate.get_next_due_date(self.id)
-      round = next_due_date.try(:round)
+      round_number = next_due_date.try(:round)
     end
-    # for program 1 like assignment, if same rubric is used in both rounds,
-    # the 'used_in_round' field in 'assignment_questionnaires' will be null,
-    # since one field can only store one integer
-    # if rev_q_ids is empty, Expertiza will try to find questionnaire whose type is 'ReviewQuestionnaire'.
-    rev_q_ids = if round.nil?
-                  AssignmentQuestionnaire.where(assignment_id: self.id)
-                else
-                  AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
-                end
-    if rev_q_ids.empty?
-      AssignmentQuestionnaire.where(assignment_id: self.id).find_each do |aq|
-        rev_q_ids << aq if aq.questionnaire.type == "ReviewQuestionnaire"
-      end
+    # Create assignment_form that we can use to retrieve AQ with all the same attributes and questionnaire based on AQ
+    assignment_form = AssignmentForm.create_form_object(self.id)
+    assignment_questionnaire = assignment_form.assignment_questionnaire('ReviewQuestionnaire', round_number, topic_id)
+    questionnaire = assignment_form.questionnaire(assignment_questionnaire, 'ReviewQuestionnaire')
+    return questionnaire.id unless questionnaire.id.nil?
+    # If correct questionnaire is not found, find it by type
+    AssignmentQuestionnaire.where(assignment_id: self.id).select do |aq|
+      !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == 'ReviewQuestionnaire'
+      return aq.questionnaire_id
     end
-    review_questionnaire_id = nil
-    rev_q_ids.each do |rqid|
-      next if rqid.questionnaire_id.nil?
-      rtype = Questionnaire.find(rqid.questionnaire_id).type
-      if rtype == 'ReviewQuestionnaire'
-        review_questionnaire_id = rqid.questionnaire_id
-        break
-      end
-    end
-    review_questionnaire_id
+    nil
   end
 
   def self.export_details(csv, parent_id, detail_options)
@@ -532,7 +515,7 @@ class Assignment < ActiveRecord::Base
     @questions = {}
     questionnaires = @assignment.questionnaires
     questionnaires.each do |questionnaire|
-      if @assignment.varying_rubrics_by_round?
+      if @assignment.vary_by_round
         round = AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: @questionnaire.id).used_in_round
         questionnaire_symbol = if round.nil?
                                  questionnaire.symbol
@@ -563,28 +546,30 @@ class Assignment < ActiveRecord::Base
         names_of_participants += '; ' unless p == team[:team].participants.last
       end
       tcsv << names_of_participants
-      export_data_fields(options)
+      export_data_fields(options, team, tcsv, pscore)
       csv << tcsv
     end
   end
 
-  def self.export_data_fields(options)
+  def self.export_data_fields(options, team, tcsv, pscore)
     if options['team_score'] == 'true'
-      team[:scores] ?
-        tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg]) :
+      if team[:scores]
+        tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg])
+      else
         tcsv.push('---', '---', '---')
+      end
     end
     review_hype_mapping_hash = {review: 'submitted_score',
                                 metareview: 'metareview_score',
                                 feedback: 'author_feedback_score',
                                 teammate: 'teammate_review_score'}
     review_hype_mapping_hash.each do |review_type, score_name|
-      export_individual_data_fields(review_type, score_name)
+      export_individual_data_fields(review_type, score_name, tcsv, pscore, options)
     end
     tcsv.push(pscore[:total_score])
   end
 
-  def self.export_individual_data_fields(review_type, score_name)
+  def self.export_individual_data_fields(review_type, score_name, tcsv, pscore, options)
     if pscore[review_type]
       tcsv.push(pscore[review_type][:scores][:max], pscore[review_type][:scores][:min], pscore[review_type][:scores][:avg])
     else

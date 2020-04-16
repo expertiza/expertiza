@@ -10,6 +10,12 @@ describe ResponseController do
   let(:assignment_questionnaire) { build(:assignment_questionnaire) }
   let(:answer) { double('Answer') }
   let(:assignment_due_date) { build(:assignment_due_date) }
+<<<<<<< HEAD
+=======
+  let(:assignment_team) { build(:assignment_team, id: 1) }
+  let(:signed_up_team) { build(:signed_up_team, team_id: assignment_team.id) }
+  let(:assignment_form) { AssignmentForm.new }
+>>>>>>> belld19233-beta
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -130,20 +136,12 @@ describe ResponseController do
 
   describe '#new' do
     it 'renders response#response page' do
-      allow(ResponseMap).to receive(:find).with('1').and_return(review_response_map)
+      allow(AssignmentForm).to receive(:create_form_object).with(1).and_return(assignment_form)
+      allow(assignment_form).to receive(:assignment_questionnaire).with('ReviewQuestionnaire', 1, 1).and_return(assignment_questionnaire)
       allow(SignedUpTeam).to receive(:where).with(team_id: 1, is_waitlisted: 0).and_return([double('SignedUpTeam', topic_id: 1)])
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       allow(AssignmentDueDate).to receive(:find_by).with(any_args).and_return(assignment_due_date)
-      # varying_rubrics_by_round?
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
-      # review_questionnaire_id
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire])
-      # set_dropdown_or_scale
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 1).and_return([assignment_questionnaire])
-      allow(Questionnaire).to receive(:find).with(any_args).and_return(questionnaire)
-      allow(Questionnaire).to receive(:questions).and_return(question)
-      allow(Answer).to receive(:create).and_return(answer)
       params = {
         id: 1,
         feedback: '',

@@ -1,0 +1,53 @@
+<h1>Review Bidding Signup sheet for <%= @assignment.name %> assignment</h1>
+<div style="display:block">
+  <h3 style="width: 40%; float: left">Topics</h3>
+  <h3 style="width: 40%; float:right">Selections</h3>
+</div>
+
+<div style="display:block">
+  <div style="display:inline-block" >
+    <!--Topics table-->
+    <table style="width: 48%; float: left" class="general">
+      <tr><th width="5%">Topic #</th>
+        <th width="50%">Topic name(s)</th></tr>
+      <br/><br/>
+
+      <% i=1 %>
+      <tbody id="topics"  class="connectedSortable">
+      <tr class="sort-disabled"><td></td><td></td></tr>
+      <% for topic in @sign_up_topics %>
+        <tr style="background-color:<%=get_quartiles(topic) %>" id="topic_<%= topic.id %>">
+          <td><%= topic.topic_identifier %></td>
+          <td><span class="inline" id="<%= i %>_show"><%= topic.topic_name %> </span></td>
+        </tr>
+        <% i=i+1 %>
+      <% end %>
+      </tbody>
+    </table>
+
+    <!--Selections table-->
+    <table style="width: 48%; display:block" class="general" align="right">
+      <% i=1 %>
+      <tr><th width="5%">Topic #</th>
+        <th width="50%">Topic name(s)</th></tr>
+
+      <tbody id="selections" class="connectedSortable" data-update-url=<%= "/review_bidding/set_priority?participant_id=#{@participant.id}" %>>
+      <tr class="sort-disabled"><td></td><td></td></tr>
+      <% for topic in @bids %>
+        <tr style="background-color:<%=get_quartiles(topic.id) %>" id="topic_<%= topic.id %>">
+          <td><%= topic.topic_identifier %></td>
+          <td><span class="inline" id="<%= i %>_show"><%= topic.topic_name %> </span></td>
+        </tr>
+        <% i=i+1 %>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+  <div>
+    <% session[:return_to] = request.url %>
+    <br/>
+    <br/>
+    <a href="javascript:history.back()">Back</a>
+    <br/>
+  </div>
+</div>

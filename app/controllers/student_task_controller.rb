@@ -55,6 +55,7 @@ class StudentTaskController < ApplicationController
     @topics = SignUpTopic.where(assignment_id: @assignment.id)
     # Timeline feature
     @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
+	@has_web_service_for_review_bid_invoked = !ResponseMap.where(reviewed_object_id: @assignment.id).exists?
   end
 
   def others_work

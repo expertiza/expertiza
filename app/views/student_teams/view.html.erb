@@ -23,18 +23,19 @@
       <th class="head">Full name</th>
       <!--<th class="head">Team-member role (duty)</th>-->
       <th class="head">Email address</th>
-      <th class="head">Role</th>
+      <!--<th class="head">Role</th>-->
       <% if @teammate_review_allowed %>
         <th class="head">Review action</th>
       <% end %>
     </tr>
 
-    <% for member in team.participants %> <!--start team member content-->
+    <% for member in team.participants  %> <!--start team member content-->
       <tr>
+	<% if Participant.get_authorization(member.able_to_submit, member.able_to_review, member.able_to_take_quiz) !='mentor' %>	
         <td><%= member.user.name(session[:ip]) %></td>
         <td><%= member.user.fullname(session[:ip]) %></td>
         <td><%= member.user.email(session[:ip]) %></td>
-        <td><%= Participant.get_authorization(member.able_to_submit, member.able_to_review, member.able_to_take_quiz) %>
+        <!--<td><%= Participant.get_authorization(member.able_to_submit, member.able_to_review, member.able_to_take_quiz) %>-->
         <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
         <% if @teammate_review_allowed %>
           <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
@@ -56,6 +57,7 @@
           <% end %>
         <% end %>
       <% end %>
+<% end %>
     </tr>
   <% end %>   <!--end team member content-->
     <tr>
@@ -67,6 +69,56 @@
   </table>
  
 <% end %>
+
+
+
+  <br/><br/>
+  <b>Mentor</b>
+  <br/><br/>
+  <!--start team member table-->
+  <table style="width:80%" align="center" >
+    <tr style="border: 1px outset #000000; padding: 10px 20px" >
+      <th class="head">Username</th>
+      <th class="head">Full name</th>
+      <!--<th class="head">Team-member role (duty)</th>-->
+      <th class="head">Email address</th>
+      <% if @teammate_review_allowed %>
+        <th class="head">Review action</th>
+      <% end %>
+    </tr>
+
+    <% for member in team.participants %> <!--start team member content-->
+      <tr>
+	<% if Participant.get_authorization(member.able_to_submit, member.able_to_review, member.able_to_take_quiz) =='mentor' %>
+        <td><%= member.user.name(session[:ip]) %></td>
+        <td><%= member.user.fullname(session[:ip]) %></td>
+        <td><%= member.user.email(session[:ip]) %></td>        
+        <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
+        <% if @teammate_review_allowed %>
+          <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
+            <% map = TeammateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first
+            if map.nil?
+              map = TeammateReviewResponseMap.create(:reviewer_id => @student.id, :reviewee_id => member.id, :reviewed_object_id => @student.assignment.id)
+            end
+            review = map.response.last
+            if review.nil? %>
+            <td>
+              <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :return => "teammate"} %>
+            </td>
+          <% else %>
+            <td>
+              <%= link_to "View", {:controller => 'response', :action => 'view', :id => review.id} %>
+              &nbsp;&nbsp;
+              <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "teammate"} %>
+            </td>
+          <% end %>
+        <% end %>
+      <% end %>
+<% end %>
+    </tr>
+  <% end %>   <!--end team member content-->
+  </table>
+
 
 <!--render partial for join team request-->
   <% if team!=nil %>
@@ -233,4 +285,13 @@
            } %>
 <br>
    <a href="javascript:window.history.back()">Back</a>
+
+
+
+
+
+
+
+
+
 

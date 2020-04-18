@@ -470,7 +470,7 @@ ActiveRecord::Schema.define(version: 20181205201208) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "calibrate_to",                   default: false
-    t.string   "status",             limit: 255, default: "private"
+    t.string   "visibility",             limit: 255, default: "private"
   end
 
   add_index "response_maps", ["reviewer_id"], name: "fk_response_map_reviewer", using: :btree

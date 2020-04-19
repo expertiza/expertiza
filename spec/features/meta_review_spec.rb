@@ -11,15 +11,11 @@ describe "meta-review user tests" do
                         name: "TestAssignment",
                         directory_path: 'test_assignment')
 
-      create(:deadline_type, name: "metareview")
     # Create a reivew
     reivew = create(:questionnaire, name: "Review")
     create(:question, txt: "Question1", questionnaire: reivew)
     create(:assignment_questionnaire, questionnaire: reivew, used_in_round: 1)
 
-      metareview_due_date = create(:assignment_due_date,
-                                    deadline_type: DeadlineType.where(name: 'metareview').first,
-                                    due_at: Time.now + 3.day)
     # Populate deadline type
     create(:deadline_type, name: "submission")
     create(:deadline_type, name: "review")
@@ -86,4 +82,15 @@ describe "meta-review user tests" do
     it "Student is able to leave a simple meta review." do
       
     end
+  # Add meta-review parameters to the assignment that was defined first
+  def add_meta_review
+    create(:deadline_type, name: "metareview")
+    create(:assignment_due_date,
+           deadline_type: DeadlineType.where(name: 'metareview').first,
+           due_at: Time.now + 3.day)
+    # create a meta-review
+    reivew = create(:questionnaire, name: "Review")
+    create(:question, txt: "Question1", questionnaire: reivew)
+    create(:assignment_questionnaire, questionnaire: reivew, used_in_round: 1)
   end
+end

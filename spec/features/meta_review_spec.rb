@@ -1,61 +1,62 @@
-require 'pry'
+describe "meta-review user tests" do
+  # In order to test the meta-review functionality as a user an assignment needs to have passed
+  # the submission and review deadlines. It also requires two actors.
+  #   1. The submitter is responsible for submitting the assignment and is the actor who
+  #      is capable of completing a meta review.
+  #   2. The reviewer is used to review the submitters submission.
+  before(:each) do
+    # Create an assignment. Defaults to 3 metareviews required and allowed.
+    # See spec/factories/factories.rb  factory :assignment for more details on defaults.
+    assignment = create(:assignment,
+                        name: "TestAssignment",
+                        directory_path: 'test_assignment')
 
-describe "meta review user tests" do
-    before(:each) do
-      # create an assignment. Defaults to 3 metareviews required and allowed.
-      # See spec/factories/factories.rb  factory :assignment for more details on defaults.
-      assignment = create(:assignment,
-                           name: "TestAssignment",
-                           directory_path: 'test_assignment')
-      
-      # create a reivew
-      reivew = create(:questionnaire, name: "Review")
-      create(:question, txt: "Question1", questionnaire: reivew, type: "Criterion")
-      create(:assignment_questionnaire, questionnaire: reivew, used_in_round: 1)
-      
-      # populate deadline type
-      create(:deadline_type, name: "submission")
-      create(:deadline_type, name: "review")
       create(:deadline_type, name: "metareview")
-      create(:deadline_right, name: 'No')
-      create(:deadline_right, name: 'Late')
-      create(:deadline_right, name: 'OK')
+    # Create a reivew
+    reivew = create(:questionnaire, name: "Review")
+    create(:question, txt: "Question1", questionnaire: reivew)
+    create(:assignment_questionnaire, questionnaire: reivew, used_in_round: 1)
 
-      # populate assignment deadline
-      submission_due_date = create(:assignment_due_date,
-                                    deadline_type: DeadlineType.where(name: 'submission').first,
-                                    due_at: Time.now + 1.day)
-      review_due_date = create(:assignment_due_date,
-                                deadline_type: DeadlineType.where(name: 'review').first,
-                                due_at: Time.now + 2.day)
       metareview_due_date = create(:assignment_due_date,
                                     deadline_type: DeadlineType.where(name: 'metareview').first,
                                     due_at: Time.now + 3.day)
+    # Populate deadline type
+    create(:deadline_type, name: "submission")
+    create(:deadline_type, name: "review")
+    create(:deadline_right, name: 'No')
+    create(:deadline_right, name: 'Late')
+    create(:deadline_right, name: 'OK')
 
-      # add participants to assignment
-      submitter = create(:student, name: 'submit_and_meta_student')
-      reviewer = create(:student, name: 'review_student')
-      create(:participant, assignment: assignment, user: submitter)
-      create(:participant, assignment: assignment, user: reviewer)
+    # Populate assignment deadlines
+    submission_due_date = create(:assignment_due_date,
+                                 deadline_type: DeadlineType.where(name: 'submission').first,
+                                 due_at: Time.now + 1.day)
+    review_due_date = create(:assignment_due_date,
+                             deadline_type: DeadlineType.where(name: 'review').first,
+                             due_at: Time.now + 2.day)
 
-      # The first student submits an assigment to be reviewed.
-      submit_assignment(submitter)
-      
-      # Pull submission due date back so it has already passed.
-      submission_due_date.due_at = Time.now - 1.day
-      submission_due_date.save
-      
-      # The second reviewer reviews the submitted assignment
-      review_assignment(reviewer)
+    # Add participants to assignment
+    submitter = create(:student, name: 'submit_and_meta_student')
+    reviewer = create(:student, name: 'review_student')
+    create(:participant, assignment: assignment, user: submitter)
+    create(:participant, assignment: assignment, user: reviewer)
 
-      # Pull review due date back so it has already passed.
-      review_due_date.due_at = Time.now - 1.day
-      review_due_date.save
+    # The submitter submits an assigment to be reviewed.
+    submit_assignment(submitter)
 
-      # We are now setup for the meta review tests.
-    end
+    # Set the submission due date so it has already passed.
+    submission_due_date.due_at = Time.now - 1.day
+    submission_due_date.save
 
-  # impersonate student to submit work
+    # The reviewer reviews the submitted assignment
+    review_assignment(reviewer)
+
+    # Set the review due date so it has already passed.
+    review_due_date.due_at = Time.now - 1.day
+    review_due_date.save
+  end
+
+  # Impersonate student to submit the assignment
   def submit_assignment(user)
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
@@ -66,6 +67,7 @@ describe "meta review user tests" do
     expect(page).to have_content "https://ncsu.edu"
   end
 
+  # Impersonate student to review the assignment
   def review_assignment(user)
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'

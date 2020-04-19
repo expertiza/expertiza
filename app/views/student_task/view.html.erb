@@ -35,6 +35,12 @@ to display the label "Your team" in the student assignment tasks-->
     <% end %>
   <%end%>
 
+  <!--testing the link to review bidding-->
+  <li>
+    <%= link_to 'Review Bidding test', :controller=>'review_bids', :action=>'review_bid', :id => @participant.id%>
+    (Bid for review topics)
+  </li>
+
   <!--Your work-->
   <% if @authorization == 'participant' or @can_submit == true %>
     <li>

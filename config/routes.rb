@@ -1,5 +1,7 @@
 
 Expertiza::Application.routes.draw do
+  get 'review_bids/review_bid'
+
   ###
   # Please insert new routes alphabetically!
   ###
@@ -509,4 +511,5 @@ resources :institution, except: [:destroy] do
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
   get ':controller(/:action(/:id))(.:format)'
   match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
+  get '/review_bids_controller/review_bid/:id(.:format)' => 'review_bids#review_bid'
 end

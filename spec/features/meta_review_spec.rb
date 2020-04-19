@@ -13,7 +13,7 @@ describe "meta-review user tests" do
 
     # Create a reivew
     reivew = create(:questionnaire, name: "Review")
-    create(:question, txt: "Question1", questionnaire: reivew)
+    create(:question, txt: "ReviewQuestion1", questionnaire: reivew)
     create(:assignment_questionnaire, questionnaire: reivew, used_in_round: 1)
 
     # Populate deadline type

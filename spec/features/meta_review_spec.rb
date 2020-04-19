@@ -97,7 +97,18 @@ describe "meta-review user tests" do
     end
     
     it "Student is able to leave a simple meta review." do
-
+      stub_current_user(@submitter, @submitter.role.name, @submitter.role)
+      visit '/student_task/list'
+      expect(page).to have_content "metareview"
+      click_link "TestAssignment"
+      expect(page).to have_content "Others' work"
+      click_link "Others' work"
+      expect(page).to have_content 'Metareviews for "TestAssignment"'
+      click_button "Request a new metareview to perform" 
+      click_link "Begin"
+      fill_in "responses[0][comment]", with: "Can you explain why this is garbage?"
+      click_button "Save Metareview"
+      expect(page).to have_content "Your response was successfully saved." 
     end
     
     it "If the metareview limit on the assignment is set to 3, then a student will see they need to submit 3 meta reviews" do

@@ -79,9 +79,6 @@ describe "meta-review user tests" do
     expect(page).to have_content "Your response was successfully saved."
   end
 
-    it "Student is able to leave a simple meta review." do
-      
-    end
   # Add meta-review parameters to the assignment that was defined first
   def add_meta_review
     create(:deadline_type, name: "metareview")
@@ -92,5 +89,41 @@ describe "meta-review user tests" do
     reivew = create(:questionnaire, name: "Review")
     create(:question, txt: "Question1", questionnaire: reivew)
     create(:assignment_questionnaire, questionnaire: reivew, used_in_round: 1)
+  end
+
+  it "Student is able to leave a simple meta review." do
+      
+  end
+
+  it "If the metareview limit on the assignment is set to 3, then a student will see they need to submit 3 meta reviews" do
+    
+  end
+
+  it "If the assignment does not have any legal meta reviews, then the 'Request a new metareview to perform' button is not visible" do
+    
+  end
+
+  it "A student should not be able to request a metareview if they have reached the limit of their allowed reviews" do
+    
+  end
+
+  it "A student should be able to request a metareview if they are above their required but below their allowed reviews" do
+
+  end
+
+  it "A student should not be able to request a metareview about their own work" do
+
+  end
+
+  it "A student should not be able to request a metareview about themselves" do
+
+  end
+
+  it "If a student has requested two metareviewes but have not submitted it, then they should not be able to request a new metareview." do
+  
+  end
+
+  it "If the metareview limit on the assignment is set to 1 then a student should not be able to request a second meta review" do
+
   end
 end

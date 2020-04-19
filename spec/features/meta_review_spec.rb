@@ -91,39 +91,47 @@ describe "meta-review user tests" do
     create(:assignment_questionnaire, questionnaire: reivew, used_in_round: 1)
   end
 
-  it "Student is able to leave a simple meta review." do
-      
-  end
-
-  it "If the metareview limit on the assignment is set to 3, then a student will see they need to submit 3 meta reviews" do
+  context "has a meta-review" do
+    before(:each) do
+      add_meta_review
+    end
     
-  end
+    it "Student is able to leave a simple meta review." do
 
-  it "If the assignment does not have any legal meta reviews, then the 'Request a new metareview to perform' button is not visible" do
+    end
     
-  end
-
-  it "A student should not be able to request a metareview if they have reached the limit of their allowed reviews" do
+    it "If the metareview limit on the assignment is set to 3, then a student will see they need to submit 3 meta reviews" do
     
-  end
+    end
+    
+    it "A student should not be able to request a metareview if they have reached the limit of their allowed reviews" do
+    
+    end
+    
+    it "A student should be able to request a metareview if they are above their required but below their allowed reviews" do
 
-  it "A student should be able to request a metareview if they are above their required but below their allowed reviews" do
-
-  end
-
-  it "A student should not be able to request a metareview about their own work" do
-
-  end
-
-  it "A student should not be able to request a metareview about themselves" do
-
-  end
-
-  it "If a student has requested two metareviewes but have not submitted it, then they should not be able to request a new metareview." do
+    end
   
+    it "A student should not be able to request a metareview about their own work" do
+  
+    end
+  
+    it "A student should not be able to request a metareview about themselves" do
+  
+    end
+  
+    it "If a student has requested two metareviewes but have not submitted it, then they should not be able to request a new metareview." do
+    
+    end
+  
+    it "If the metareview limit on the assignment is set to 1 then a student should not be able to request a second meta review" do
+  
+    end
   end
 
-  it "If the metareview limit on the assignment is set to 1 then a student should not be able to request a second meta review" do
-
+  context "does not have a meta-review" do
+    it "If the assignment does not have any legal meta reviews, then the 'Request a new metareview to perform' button is not visible" do
+      
+    end
   end
 end

@@ -1,3 +1,5 @@
+# initial pull request commit
+
 class LotteryController < ApplicationController
   require 'json'
   require 'rest_client'

@@ -86,9 +86,9 @@ describe "meta-review user tests" do
            deadline_type: DeadlineType.where(name: 'metareview').first,
            due_at: Time.now + 3.day)
     # create a meta-review
-    reivew = create(:questionnaire, name: "Review")
-    create(:question, txt: "Question1", questionnaire: reivew)
-    create(:assignment_questionnaire, questionnaire: reivew, used_in_round: 1)
+    metareivew = create(:questionnaire, name: "Metareview", type: "MetareviewQuestionnaire")
+    create(:question, txt: "MetaReviewQuestion", questionnaire: metareivew)
+    create(:assignment_questionnaire, questionnaire: metareivew, used_in_round: 1)
   end
 
   context "has a meta-review" do

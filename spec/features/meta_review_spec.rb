@@ -32,13 +32,13 @@ describe "meta-review user tests" do
                              due_at: Time.now + 2.day)
 
     # Add participants to assignment
-    submitter = create(:student, name: 'submit_and_meta_student')
+    @submitter = create(:student, name: 'submit_and_meta_student')
     reviewer = create(:student, name: 'review_student')
-    create(:participant, assignment: assignment, user: submitter)
-    create(:participant, assignment: assignment, user: reviewer)
+    @reviewee = create(:participant, assignment: assignment, user: @submitter)
+    @reviewer = create(:participant, assignment: assignment, user: reviewer)
 
     # The submitter submits an assigment to be reviewed.
-    submit_assignment(submitter)
+    submit_assignment(@submitter)
 
     # Set the submission due date so it has already passed.
     submission_due_date.due_at = Time.now - 1.day

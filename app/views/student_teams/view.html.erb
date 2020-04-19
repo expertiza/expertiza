@@ -31,11 +31,11 @@
 
     <% for member in team.participants  %> <!--start team member content-->
       <tr>
-	<% if Participant.get_authorization(member.able_to_submit, member.able_to_review, member.able_to_take_quiz) !='mentor' %>	
+	<% if Participant.get_authorization(member.can_submit, member.can_review, member.can_take_quiz) !='mentor' %>	
         <td><%= member.user.name(session[:ip]) %></td>
         <td><%= member.user.fullname(session[:ip]) %></td>
         <td><%= member.user.email(session[:ip]) %></td>
-        <!--<td><%= Participant.get_authorization(member.able_to_submit, member.able_to_review, member.able_to_take_quiz) %>-->
+        <!--<td><%= Participant.get_authorization(member.can_submit, member.can_review, member.can_take_quiz) %>-->
         <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
         <% if @teammate_review_allowed %>
           <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
@@ -89,7 +89,7 @@
 
     <% for member in team.participants %> <!--start team member content-->
       <tr>
-	<% if Participant.get_authorization(member.able_to_submit, member.able_to_review, member.able_to_take_quiz) =='mentor' %>
+	<% if Participant.get_authorization(member.can_submit, member.can_review, member.can_take_quiz) =='mentor' %>
         <td><%= member.user.name(session[:ip]) %></td>
         <td><%= member.user.fullname(session[:ip]) %></td>
         <td><%= member.user.email(session[:ip]) %></td>        

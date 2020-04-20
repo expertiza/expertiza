@@ -119,7 +119,7 @@ class Questionnaire < ActiveRecord::Base
     if team_id
       revision_plan_questions = Question.where(questionnaire_id: self.id, team_id: team_id)
       revision_plan_questions.unshift(SectionHeader.new(txt: "Revision Planning", questionnaire_id: self.id, break_before: 1, seq: questions[-1].seq + 0.1))
-      questions = questions + revision_plan_questions
+      questions += revision_plan_questions
     end
     questions
   end

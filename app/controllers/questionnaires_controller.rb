@@ -124,15 +124,7 @@ class QuestionnairesController < ApplicationController
 
         # Save all questions
         unless params[:question].nil?
-          params[:question].each_pair do |k, v|
-            @question = Question.find(k)
-            # example of 'v' value
-            # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
-            v.each_pair do |key, value|
-              @question.send(key + '=', value) if @question.send(key) != value
-            end
-            @question.save
-          end
+          update_questions(params[:question])
         end
         flash[:success] = 'The questionnaire has been successfully updated!'
       rescue StandardError
@@ -188,7 +180,7 @@ class QuestionnairesController < ApplicationController
     questionnaire_id = params[:id] unless params[:id].nil?
     num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
-      question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
+      question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true, team_id: params[:team_id])
       if question.is_a? ScoredQuestion
         question.weight = 1
         question.max_label = 'Strongly agree'
@@ -204,7 +196,12 @@ class QuestionnairesController < ApplicationController
         flash[:error] = $ERROR_INFO
       end
     end
-    redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+
+    if (params[:team_id]) # student path
+      redirect_to action: 'edit_revision_plan', id: params[:id], team_id: params[:team_id]
+    else # instructor path
+      redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+    end
   end
 
   # Zhewei: This method is used to save all questions in current questionnaire.
@@ -212,17 +209,8 @@ class QuestionnairesController < ApplicationController
     questionnaire_id = params[:id]
     begin
       if params[:save]
-        params[:question].each_pair do |k, v|
-          @question = Question.find(k)
-          # example of 'v' value
-          # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
-          v.each_pair do |key, value|
-            @question.send(key + '=', value) if @question.send(key) != value
-          end
-
-          @question.save
-          flash[:success] = 'All questions have been successfully saved!'
-        end
+        update_questions(params[:question])
+        flash[:success] = 'All questions have been successfully saved!'
       end
     rescue StandardError
       flash[:error] = $ERROR_INFO
@@ -235,7 +223,42 @@ class QuestionnairesController < ApplicationController
     end
   end
 
+  # Yulin: student's view of the questionnaire's creation page
+  def edit_revision_plan
+    @questions = AssignmentTeam.find(params[:team_id]).revision_plan_questions
+  end
+
+  # Yulin: save student's revision plan questions to the rubric of current round
+  def update_revision_plan
+    assignment = AssignmentTeam.find(params[:team_id]).assignment
+    @questionnaire = Questionnaire.find(assignment.review_questionnaire_id(nil))
+    begin
+      # Save all questions
+      unless params[:question].nil?
+        update_questions(params[:question])
+      end
+      flash[:success] = 'The revision plan has been successfully updated!'
+    rescue StandardError
+      flash[:error] = $ERROR_INFO
+    end
+    redirect_to action: 'edit_revision_plan', id: params[:id], team_id: params[:team_id]
+  end
+
   private
+
+  # Yulin: update questions that are already created. extract from the existing implementation that is
+  # used many times in this file.
+  def update_questions(question)
+    question.each_pair do |k, v|
+      @question = Question.find(k)
+      # example of 'v' value
+      # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
+      v.each_pair do |key, value|
+        @question.send(key + '=', value) if @question.send(key) != value
+      end
+      @question.save
+    end
+  end
 
   # save questionnaire object after create or edit
   def save

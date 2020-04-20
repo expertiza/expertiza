@@ -377,6 +377,19 @@ describe QuestionnairesController do
         expect(response).to redirect_to('/questionnaires/1/edit')
       end
     end
+
+    context 'when adding a question with team id' do
+      it 'redirects to questionnaires#edit revision plan page after adding new questions' do
+        question = double('Criterion', weight: 1, max_label: '', min_label: '', size: '', alternatives: '')
+        allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', id: 1, questions: [question]))
+        allow(question).to receive(:save).and_return(true)
+        params = {id: 1,
+                  question: {total_num: 2,
+                             type: 'Criterion'}, team_id: 3}
+        post :add_new_questions, params
+        expect(response).to redirect_to :action => 'edit_revision_plan', id: params[:id], team_id: params[:team_id]
+      end
+    end
   end
 
   describe '#save_all_questions' do
@@ -408,4 +421,15 @@ describe QuestionnairesController do
       end
     end
   end
+
+  # describe '#edit_revision_plan' do
+  #   Context 'when @team_id is not nil'
+  #     it 'renders the questionnaires#edit_revision_plan page' do
+  #       allow(AssignmentTeam).to receive(:find).with().revision_plan_questions
+  #       session = {user: student}
+  #       params = {team_id: }
+  #       get :edit_revision_plan, params, session
+  #       except(response).to render_template(:edit_revision_plan)
+  #   end
+  # end
 end

@@ -244,6 +244,7 @@ class QuestionnairesController < ApplicationController
     redirect_to action: 'edit_revision_plan', id: params[:id], team_id: params[:team_id]
   end
 
+
   private
 
   # Yulin: update questions that are already created. extract from the existing implementation that is

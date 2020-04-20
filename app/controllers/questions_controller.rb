@@ -10,11 +10,20 @@ class QuestionsController < ApplicationController
     render action: 'list'
   end
 
+  #Guoyi, hope student could delete question, doesn't work
+  #Checkt destory method
   def action_allowed?
-    ['Super-Administrator',
-     'Administrator',
-     'Instructor',
-     'Teaching Assistant'].include? current_role_name
+    if params[:action] == "destory"
+      ['Super-Administrator',
+      'Administrator',
+      'Instructor',
+      'Teaching Assistant', 'Student'].include? current_role_name
+    else
+      ['Super-Administrator',
+      'Administrator',
+      'Instructor',
+      'Teaching Assistant'].include? current_role_name
+    end
   end
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)

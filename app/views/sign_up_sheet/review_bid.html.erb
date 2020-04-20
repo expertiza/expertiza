@@ -18,7 +18,7 @@
       <tbody id="topics"  class="connectedSortable">
       <tr class="sortable"><td></td><td></td></tr>
         <% for topic in @sign_up_topics %>
-          <%color_value = (400*((Math.tanh(2*(ReviewBid.where(signuptopic_id:topic.id).count.to_f/ReviewBid.all.count.to_f)-1)+1)/2)).to_i%>
+          <%color_value = (400*((Math.tanh(2*(ReviewBid.where(signuptopic_id:topic.id).count.to_f/@no_of_participants.to_f)-1)+1)/2)).to_i%>
           <tr style= <%= "background-color:rgb("+(color_value).to_s+","+(400-color_value).to_s+",0)"%> id="topic_<%= topic.id %>">
             <td><%= topic.topic_identifier %></td>
             <td><span class="inline" id="<%= i %>_show"><%= topic.topic_name %> </span></td>
@@ -37,7 +37,7 @@
       <tbody id="selections" class="connectedSortable" data-update-url=<%= "/review_bids/assign_review_priority?participant_id=#{@participant.id}" %>>
       <tr class="sort-disabled"><td></td><td></td></tr>
       <% for topic in @bids %>
-          <%color_value = (400*((Math.tanh(2*(ReviewBid.where(signuptopic_id:topic.id).count.to_f/ReviewBid.all.count.to_f)-1)+1)/2)).to_i%>
+          <%color_value = (400*((Math.tanh(2*(ReviewBid.where(signuptopic_id:topic.id).count.to_f/@no_of_participants.to_f)-1)+1)/2)).to_i%>
           <tr style= <%= "background-color:rgb("+(color_value).to_s+","+(400-color_value).to_s+",0)"%> id="topic_<%= topic.id %>">
             <td><%= topic.topic_identifier %></td>
             <td><span class="inline" id="<%= i %>_show"><%= topic.topic_name %> </span></td>

@@ -522,4 +522,5 @@ resources :institution, except: [:destroy] do
   get ':controller(/:action(/:id))(.:format)'
   match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
   get '/review_bids_controller/review_bid/:id(.:format)' => 'review_bids#review_bid'
+  post '/review_bids/assign_review_priority' => 'review_bids#assign_review_priority'
 end

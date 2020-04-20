@@ -7,6 +7,7 @@ class ReviewBidsController < ApplicationController
     ['Student'].include? current_role_name
   end
 
+  # display the review topics to bid
   def review_bid
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
@@ -27,5 +28,29 @@ class ReviewBidsController < ApplicationController
     @bids = signed_up_topics
     @num_of_topics = @sign_up_topics.size
     render 'sign_up_sheet/review_bid'
+  end
+
+  def assign_review_priority
+    if params[:topic].nil?
+      ReviewBid.where(participant_id: params[:participant_id]).destroy_all
+    else
+      participant = AssignmentParticipant.find_by(id: params[:participant_id])
+      assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
+      team_id = participant.team.try(:id)
+      @bids = ReviewBid.where(participant_id: params[:participant_id])
+      signed_up_topics = ReviewBid.where(participant_id: params[:participant_id]).map(&:sign_up_topic_id)
+      signed_up_topics -= params[:topic].map(&:to_i)
+      signed_up_topics.each do |topic|
+        ReviewBid.where(sign_up_topic_id: topic, participant_id: params[:participant_id]).destroy_all
+      end
+      params[:topic].each_with_index do |topic_id, index|
+        bid_existence = ReviewBid.where(sign_up_topic_id: topic_id, participant_id: params[:participant_id])
+        if bid_existence.empty?
+          ReviewBid.create(priority: index + 1,sign_up_topic_id: topic_id, participant_id: params[:participant_id],assignment_id: assignment_id)
+        else
+          ReviewBid.where(sign_up_topic_id: topic_id, participant_id: params[:participant_id]).update_all(priority: index + 1)
+        end
+      end
+    end
   end
 end

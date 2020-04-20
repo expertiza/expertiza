@@ -34,7 +34,7 @@
         <th width="5%">Topic #</th>
         <th width="50%">Topic name(s)</th>
       </tr>
-      <tbody id="selections" class="connectedSortable" data-update-url=<%= "/review_bidding/set_priority?participant_id=#{@participant.id}" %>>
+      <tbody id="selections" class="connectedSortable" data-update-url=<%= "/review_bids/assign_review_priority?participant_id=#{@participant.id}" %>>
       <tr class="sort-disabled"><td></td><td></td></tr>
       <% for topic in @bids %>
           <%color_value = 400*((Math.tanh(2*[@max_team_size.to_f/ReviewBid.where(signuptopic_id:topic.id).count,1].min-1)+1)/2).to_i%>

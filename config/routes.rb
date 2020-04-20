@@ -426,7 +426,7 @@ resources :institution, except: [:destroy] do
       get :record_end_time
     end
   end
-  
+
   resources :suggestion, only: %i[show new create] do
     collection do
       get :list

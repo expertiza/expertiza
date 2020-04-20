@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  map_id: 1
+  round: 1
+  link: MyString
+  start_at: 2020-04-20 16:18:07
+  end_at: 2020-04-20 16:18:07
+
+two:
+  map_id: 1
+  round: 1
+  link: MyString
+  start_at: 2020-04-20 16:18:07
+  end_at: 2020-04-20 16:18:07

@@ -1,0 +1,2 @@
+class SubmissionViewingEventsController < ApplicationController
+end

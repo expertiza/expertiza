@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181205201208) do
+ActiveRecord::Schema.define(version: 20200420201807) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -613,6 +613,16 @@ ActiveRecord::Schema.define(version: 20181205201208) do
     t.integer  "team_id",       limit: 4
     t.string   "user",          limit: 255
     t.integer  "assignment_id", limit: 4
+  end
+
+  create_table "submission_viewing_events", force: :cascade do |t|
+    t.integer  "map_id",     limit: 4
+    t.integer  "round",      limit: 4
+    t.string   "link",       limit: 255
+    t.datetime "start_at"
+    t.datetime "end_at"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
   end
 
   create_table "suggestion_comments", force: :cascade do |t|

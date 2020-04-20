@@ -25,15 +25,26 @@
   })();
 
   jQuery(document).ready(function() {
+    var map_id = <%= @map.id%>;
+    var round = <%= @current_round %>;
 
-    //use barrating for dropdown
+    function startTime(map_id, round, link) {
+      var t = new Date();
+      $.ajax({
+          type: "POST",
+          url: '/submission_viewing_events/record_start_time',
+          data: $.param({submission_viewing_event:{map_id: map_id, round: round, link: link, start_at: ISODateString(t)}})
+      });
+    }
+
+    // use barrating for dropdown
     $('.review-rating').each(function(index, el) {
       var $El;
       $El = $(el);
       $El.barrating({
-        theme: 'fontawesome-stars',
-        initialRating: $El.attr('data-current-rating'),
-        showSelectedRating: true
+          theme: 'fontawesome-stars',
+          initialRating: $El.attr('data-current-rating'),
+          showSelectedRating: true
       });
     });
 

@@ -1,7 +1,7 @@
 <h1>Team Information for <%= @student.assignment.name %></h1>
 <!--present all teams-->
-<%@student.teams.each do |team| %>
-<% if team == nil %>
+
+<% if @student.team == nil %>
   You no longer have a team!
   <h3>Name team</h3>
   <%= form_tag :controller => 'student_teams', :action => 'create' do %>
@@ -11,8 +11,8 @@
     <%= submit_tag "Name team" %>
   <% end %>
 <% else %>
-  <b style="text-align: center">Team Name: &nbsp;&nbsp;</b><%= team.name %> &nbsp;&nbsp;&nbsp;
-    <%= link_to "Edit name", controller: 'StudentTeams', action: 'edit', team_id: team.id, student_id: @student.id %>
+  <b style="text-align: center">Team Name: &nbsp;&nbsp;</b><%= @student.team.name %> &nbsp;&nbsp;&nbsp;
+    <%= link_to "Edit name", controller: 'StudentTeams', action: 'edit', team_id: @student.team.id, student_id: @student.id %>
   <br/><br/>
   <b>Team members</b>
   <br/><br/>
@@ -29,7 +29,7 @@
       <% end %>
     </tr>
 
-    <% for member in team.participants  %> <!--start team member content-->
+    <% for member in @student.team.participants  %> <!--start team member content-->
       <tr>
 	<% if Participant.get_authorization(member.can_submit, member.can_review, member.can_take_quiz) !='mentor' %>	
         <td><%= member.user.name(session[:ip]) %></td>
@@ -57,22 +57,20 @@
           <% end %>
         <% end %>
       <% end %>
-<% end %>
+     <% end %>
     </tr>
   <% end %>   <!--end team member content-->
     <tr>
       <td colspan="3">
         <br/>
-        <%= link_to "Leave team", remove_participant_student_teams_path(student_id: @student.id, team_id: team.id) %>
+        <%= link_to "Leave team", remove_participant_student_teams_path(student_id: @student.id, team_id: @student.team.id) %>
       <td>
     </tr>
   </table>
  
-<% end %>
 
 
-
-  <br/><br/>
+<br/><br/>
   <b>Mentor</b>
   <br/><br/>
   <!--start team member table-->
@@ -87,7 +85,7 @@
       <% end %>
     </tr>
 
-    <% for member in team.participants %> <!--start team member content-->
+    <% for member in @student.team.participants %> <!--start team member content-->
       <tr>
 	<% if Participant.get_authorization(member.can_submit, member.can_review, member.can_take_quiz) =='mentor' %>
         <td><%= member.user.name(session[:ip]) %></td>
@@ -119,11 +117,12 @@
   <% end %>   <!--end team member content-->
   </table>
 
+<% end %>  
 
 <!--render partial for join team request-->
-  <% if team!=nil %>
+  <% if @student.team!=nil %>
     <%= render :partial => 'join_team_requests/list_received',
-    :locals =>{:team_id=>team.id,
+    :locals =>{:team_id=>@student.team.id,
                :teams_user_id=>params[:student_id],
                :assignment_id => @student.assignment.id} %>
   <% end %>
@@ -161,8 +160,8 @@
 <br/>
 
 <!--send invitation-->
-<% if team != nil && @student.assignment.max_team_size > 1 %>
-     <% if team == nil %> <!--dead code-->
+<% if @student.team != nil && @student.assignment.max_team_size > 1 %>
+     <% if @student.team == nil %> <!--dead code-->
        <h3>Name team</h3>
        <%= form_tag :controller => 'student_teams', :action => 'create' do %>
          <%= hidden_field_tag 'student_id', @student.id %>
@@ -170,10 +169,10 @@
          <%= text_field 'team', 'name' %>
          <%= submit_tag "Name team" %>
        <% end %>
-     <% elsif !team.full?%>
+     <% elsif !@student.team.full?%>
        <b>Invite people</b>
        <%= form_tag :controller => 'invitations', :action => 'create' do %>
-         <%= hidden_field_tag 'team_id', team.id %>
+         <%= hidden_field_tag 'team_id', @student.team.id %>
          <%= hidden_field_tag 'student_id', @student.id %>
          <%= hidden_field_tag 'session[:dummy][:assignment_id]', @student.parent_id %>
          <table style="width:80%" align="center" >
@@ -207,34 +206,6 @@
   <% end %>
 <% end %>
 
-
-<br/>
-
-<!--display the advertisement-->
-
-  <% if team && @student.assignment.topics? && team.topic%>
-    <b>Advertisement for teammates</b>
-    <br>
-    <table style="width:80%" align="center" >
-      <tr>
-        <td>
-        <% if team && team.advertise_for_partner%>
-            <%= team.comments_for_advertisement%>
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <%= link_to 'Edit', :controller => 'advertise_for_partner', :action => 'edit', :team_id=>team.id %>
-            &nbsp;&nbsp;
-            <%= link_to 'Delete', :controller => 'advertise_for_partner', :action => 'remove', :team_id=>team.id %>
-        <% else %>
-            <%= link_to 'Create', :controller => 'advertise_for_partner', :action => 'new', :team_id=>team.id %>
-        <% end %>
-        </td>
-      </tr>
-    </table>
-  <% end %>
-
-
- <%end %>
-<br/>
 <!--display a table of received invitation-->
   <% if @received_invs && @received_invs.length > 0 %>
     <table style="width:80%" align="center" >
@@ -275,9 +246,39 @@
               </tr>
           <% end %>
       <% end %>
-    </table>
+	</table>		
 
+ <% end %>
+<br/>
+
+<!--display the advertisement-->
+
+  <% if @student.team && @student.assignment.topics? && @student.team.topic%>
+    <b>Advertisement for teammates</b>
+    <br>
+    <table style="width:80%" align="center" >
+      <tr>
+        <td>
+        <% if @student.team && @student.team.advertise_for_partner%>
+            <%= @student.team.comments_for_advertisement%>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <%= link_to 'Edit', :controller => 'advertise_for_partner', :action => 'edit', :team_id=>@student.team.id %>
+            &nbsp;&nbsp;
+            <%= link_to 'Delete', :controller => 'advertise_for_partner', :action => 'remove', :team_id=>@student.team.id %>
+        <% else %>
+            <%= link_to 'Create', :controller => 'advertise_for_partner', :action => 'new', :team_id=>@student.team.id %>
+        <% end %>
+        </td>
+      </tr>
+    </table>
   <% end %>
+
+
+
+<br/>		   
+    
+
+
 <!--display a list of sent join-team requests-->
 <%= render :partial => 'join_team_requests/list_sent',
            :locals =>{:teams_user_id=>params[:student_id],

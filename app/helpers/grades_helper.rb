@@ -105,10 +105,10 @@ module GradesHelper
     return "underlined" if score.comment.present?
   end
 
-  def retrieve_questions(questionnaires, assignment_id)
+  def retrieve_questions(questionnaires, assignment_id, team_id)
     questions = {}
     questionnaires.each do |questionnaire|
-      round = AssignmentQuestionnaire.where(assignment_id: assignment_id, questionnaire_id: questionnaire.id).first.used_in_round
+      round = AssignmentQuestionnaire.where(assignment_id: assignment_id, questionnaire_id: questionnaire.id, team_id: team_id).first.used_in_round
       questionnaire_symbol = if !round.nil?
                                (questionnaire.symbol.to_s + round.to_s).to_sym
                              else

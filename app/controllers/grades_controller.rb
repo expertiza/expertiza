@@ -41,7 +41,7 @@ class GradesController < ApplicationController
     questionnaires = @assignment.questionnaires
 
     if @assignment.varying_rubrics_by_round?
-      @questions = retrieve_questions questionnaires, @assignment.id
+      @questions = retrieve_questions questionnaires, @assignment.id, @team_id
     else # if this assignment does not have "varying rubric by rounds" feature
       @questions = {}
       questionnaires.each do |questionnaire|
@@ -64,7 +64,7 @@ class GradesController < ApplicationController
     return if redirect_when_disallowed
     @assignment = @participant.assignment
     questionnaires = @assignment.questionnaires
-    @questions = retrieve_questions questionnaires, @assignment.id
+    @questions = retrieve_questions questionnaires, @assignment.id, @team_id
     # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
     @pscore = @participant.scores(@questions)
     make_chart
@@ -86,7 +86,7 @@ class GradesController < ApplicationController
     @team = @participant.team
     @team_id = @team.id
     questionnaires = @assignment.questionnaires
-    @questions = retrieve_questions questionnaires, @assignment.id
+    @questions = retrieve_questions questionnaires, @assignment.id, @team_id
     @pscore = @participant.scores(@questions)
     @vmlist = []
 

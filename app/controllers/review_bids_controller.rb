@@ -20,7 +20,7 @@ class ReviewBidsController < ApplicationController
     @bids = team_id.nil? ? [] : ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id).order(:priority)
     signed_up_topics = []
     @bids.each do |bid|
-      sign_up_topic = SignUpTopic.find_by(id: bid.sign_up_topic_id)
+      sign_up_topic = SignUpTopic.find_by(id: bid.signuptopic_id)
       signed_up_topics << sign_up_topic if sign_up_topic
     end
     signed_up_topics &= @sign_up_topics
@@ -38,17 +38,17 @@ class ReviewBidsController < ApplicationController
       assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
       team_id = participant.team.try(:id)
       @bids = ReviewBid.where(participant_id: params[:participant_id])
-      signed_up_topics = ReviewBid.where(participant_id: params[:participant_id]).map(&:sign_up_topic_id)
+      signed_up_topics = ReviewBid.where(participant_id: params[:participant_id]).map(&:signuptopic_id)
       signed_up_topics -= params[:topic].map(&:to_i)
       signed_up_topics.each do |topic|
-        ReviewBid.where(sign_up_topic_id: topic, participant_id: params[:participant_id]).destroy_all
+        ReviewBid.where(signuptopic_id: topic, participant_id: params[:participant_id]).destroy_all
       end
       params[:topic].each_with_index do |topic_id, index|
-        bid_existence = ReviewBid.where(sign_up_topic_id: topic_id, participant_id: params[:participant_id])
+        bid_existence = ReviewBid.where(signuptopic_id: topic_id, participant_id: params[:participant_id])
         if bid_existence.empty?
-          ReviewBid.create(priority: index + 1,sign_up_topic_id: topic_id, participant_id: params[:participant_id],assignment_id: assignment_id)
+          ReviewBid.create(priority: index + 1,signuptopic_id: topic_id, participant_id: params[:participant_id],assignment_id: assignment_id)
         else
-          ReviewBid.where(sign_up_topic_id: topic_id, participant_id: params[:participant_id]).update_all(priority: index + 1)
+          ReviewBid.where(signuptopic_id: topic_id, participant_id: params[:participant_id]).update_all(priority: index + 1)
         end
       end
     end

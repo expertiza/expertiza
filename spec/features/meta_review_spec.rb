@@ -96,7 +96,7 @@ describe "meta-review user tests" do
       add_meta_review
     end
     
-    it "Student is able to leave a simple meta review." do
+    it "User is able to leave a simple meta review." do
       stub_current_user(@submitter, @submitter.role.name, @submitter.role)
       visit '/student_task/list'
       expect(page).to have_content "metareview"
@@ -105,6 +105,7 @@ describe "meta-review user tests" do
       click_link "Others' work"
       expect(page).to have_content 'Metareviews for "TestAssignment"'
       click_button "Request a new metareview to perform" 
+      expect(page).to have_content "Begin"
       click_link "Begin"
       fill_in "responses[0][comment]", with: "Can you explain why this is garbage?"
       click_button "Save Metareview"

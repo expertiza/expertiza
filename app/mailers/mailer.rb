@@ -76,6 +76,7 @@ class Mailer < ActionMailer::Base
     @new_score = @body[:new_score]
     @conflicting_response_url = @body[:conflicting_response_url]
     @summary_url = @body[:summary_url]
+    @review_conflict_report_url = @body[:review_conflict_report_url]
     @assignment_edit_url = @body[:assignment_edit_url]
 
     defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?

@@ -37,6 +37,17 @@
       });
     }
 
+    function endTime(link){
+      var t = new Date();
+      $.ajax({
+          type: 'POST',
+          dataType: 'json',
+          async: false,
+          url: '/submission_viewing_events/record_end_time',
+          data: $.param({submission_viewing_event: {map_id: map_id, round: round, link: link, end_at: ISODateString(t)}})
+      });
+    }
+
     // use barrating for dropdown
     $('.review-rating').each(function(index, el) {
       var $El;

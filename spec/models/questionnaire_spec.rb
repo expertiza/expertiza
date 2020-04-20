@@ -62,4 +62,30 @@ describe Questionnaire do
     question_advice = build(:question_advice)
     allow(QuestionAdvice).to receive(:where).with(question_id: 1).and_return([question_advice])
   end
+
+  describe "#questions" do
+    before :each do
+      questionnaire.save
+      @team = create(:assignment_team, id: 1)
+      @question_without_team_id = create(:question, id: 1, txt: "Question 1", seq: 1.00, team_id: nil, questionnaire_id: questionnaire.id)
+      @question_with_team_id = create(:question, id: 2, txt: "Question 2", seq: 2.00, team_id: @team.id, questionnaire_id: questionnaire.id)
+      @question_with_another_team_id = create(:question, id: 3, txt: "Question 3", seq: 1.00, team_id: 2, questionnaire_id: questionnaire.id)
+    end
+    context "without team_id" do
+      it "returns only questions from the original rubric" do
+        questions = questionnaire.questions
+        expect(questions.size).to eql(1)
+        expect(questions[0]).to eql(@question_without_team_id)
+      end
+    end
+    context "with team_id" do
+      it "returns both questions from the original rubric as well as questions created by the team" do
+        questions = questionnaire.questions(@team.id)
+        expect(questions.size).to eql(3)
+        expect(questions[0]).to eql(@question_without_team_id)
+        expect(questions[1]).to be_a(SectionHeader)
+        expect(questions[2]).to eql(@question_with_team_id)
+      end
+    end
+  end
 end

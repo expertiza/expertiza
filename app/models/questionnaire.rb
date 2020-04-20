@@ -111,4 +111,16 @@ class Questionnaire < ActiveRecord::Base
     results = Questionnaire.where("id <> ? and name = ? and instructor_id = ?", id, name, instructor_id)
     errors.add(:name, "Questionnaire names must be unique.") if results.present?
   end
+
+  # return questions in the original rubric
+  # as well as the team's revision planning questions if team_id is supplied
+  def questions(team_id = nil)
+    questions = Question.where(questionnaire_id: self.id, team_id: nil)
+    if team_id
+      revision_plan_questions = Question.where(questionnaire_id: self.id, team_id: team_id)
+      revision_plan_questions.unshift(SectionHeader.new(txt: "Revision Planning", questionnaire_id: self.id, break_before: 1, seq: questions[-1].seq + 0.1))
+      questions = questions + revision_plan_questions
+    end
+    questions
+  end
 end

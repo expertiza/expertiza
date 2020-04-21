@@ -31,64 +31,71 @@ module ReviewMappingHelper
   def review_score_for_team(reviewed_object_id, team_name)
     question_answers=[]
     reviewee_id = Team.select(:id).where(name: team_name, parent_id: reviewed_object_id)
+    # Add the total scores assigned to reviewee by each round
     reviewee_id.each do |reviewee|
       total_rounds = Assignment.find(reviewed_object_id).rounds_of_reviews
       question_answers = Array.new(total_rounds)
+      # Find total scores for each round
       (0..total_rounds-1).each do |round|
-        temp_values = Answer.answers_by_round_for_reviewee(reviewed_object_id, reviewee,round+1)
-        question_answers[round] = review_score_helper_for_team(temp_values)
+        review_answers = Answer.answers_by_round_for_reviewee(reviewed_object_id, reviewee,round+1)
+        question_answers[round] = review_score_helper_for_team(review_answers)
       end
     end
     question_answers
   end
 
   #Get review score for each round of particular team
-  def review_score_helper_for_team(temp_values)
-  question_answers={}
-  temp_values.each do |temp_value|
-          if question_answers.key?(temp_value[:reviewer_id])
-            if temp_value[:answer].nil?
-              question_answers[temp_value[:reviewer_id]] += 0
-            else
-              question_answers[temp_value[:reviewer_id]] += temp_value[:answer]
-            end
-          else
-            if temp_value[:answer].nil?
-              question_answers[temp_value[:reviewer_id]] = 0
-            else
-              question_answers[temp_value[:reviewer_id]] = temp_value[:answer]
-            end
-          end
+  def review_score_helper_for_team(review_answers)
+    question_answers={}
+    # Add scores of all reviews
+    review_answers.each do |review_answer|
+      if question_answers.key?(review_answer[:reviewer_id])
+        if review_answer[:answer].nil?
+          question_answers[review_answer[:reviewer_id]] += 0
+        else
+          question_answers[review_answer[:reviewer_id]] += review_answer[:answer]
         end
-  question_answers
+      else
+        if review_answer[:answer].nil?
+          question_answers[review_answer[:reviewer_id]] = 0
+        else
+          question_answers[review_answer[:reviewer_id]] = review_answer[:answer]
+        end
+      end
+    end
+    question_answers
   end
 
   #Average score of a particular round for Review Conflict Report
-  def average_of_round(question_answer)
-  average=0.0
-  i=0
-  question_answer.each do |reviewer,answer|
-    average+=answer
-    i+=1
+  def average_of_round(review_scores)
+    average=0.0
+    count=0
+    # Add all review scores
+    review_scores.each do |reviewer,answer|
+      average+=answer
+      count+=1
     end
-  if i != 0
-    average=average/i
-  end
-  average.round(2)
+    # Divide review scores by count to find average
+    if count != 0
+      average=average/count
+    end
+    average.round(2)
   end
 
   #Standard Deviation of a particular round for Review Conflict Report
   def std_of_round(average,question_answer)
-  accum=0.0
-  i=0
-  question_answer.each do |reviewer,answer|
-    accum+=(answer-average)**2
-    i+=1
-  end
-  if i != 0
-    accum=Math.sqrt(accum/i)
-  end 
-  accum.round(2)
+    accum=0.0
+    count=0
+    # Summing mean squared difference
+    question_answer.each do |reviewer,answer|
+      accum+=(answer-average)**2
+      count+=1
+    end
+    # Find std deviation
+    if count != 0
+      accum=Math.sqrt(accum/count)
+    end
+    accum.round(2)
   end
     
   #Get team members for a particular team for Review Conflict Report
@@ -103,9 +110,10 @@ module ReviewMappingHelper
     assignment = Assignment.find(reviewed_object_id)
     total_rounds = assignment.rounds_of_reviews
     review_max_scores = Array.new(total_rounds)
+    # Create a map of rounds and corresponding max scores
     (0..total_rounds-1).each do |round|
       review_max_scores[round] = SummaryHelper::Summary.new.max_score_of_assignment_per_round(assignment, round)
-        end
+    end
     review_max_scores
   end
 
@@ -131,6 +139,7 @@ module ReviewMappingHelper
     scores = Array.new
     question_answer.each do |reviewer,answer|
       scores << ((answer.to_f/review_max_score.to_f)*100).round(2)
+      # Different color for conflicting bars
       if answer > upper_tolerance or answer < lower_tolerance
         colors << '#FFFF00'
       else
@@ -139,6 +148,7 @@ module ReviewMappingHelper
     end
     labels = (1..scores.length).to_a
     chartSize = 5 + 2*scores.length
+    # Initialize chart
     data = {
       labels: labels,
       datasets: [
@@ -167,7 +177,6 @@ module ReviewMappingHelper
       }
     }
     horizontal_bar_chart data, options
-
   end
 
   #

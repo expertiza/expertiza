@@ -316,7 +316,6 @@
             <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
             <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage => @assignment.get_current_stage(topic_id)} %>
         <%end%>
-        <hr/>
     <% end %>
 <% end %>
 
@@ -325,7 +324,7 @@
 <% @responses_versions = @map.get_all_versions() %>
 
 <% if @responses_versions.empty? %>
-    <I>No previous review was performed.</I><br/><hr/><br/>
+    <I>No previous review was performed.</I>
 <% else %>
     <%= render :partial => 'review', :locals => {:versions => @responses_versions} %>
 <% end %>
@@ -362,7 +361,7 @@
       </tr>
       <tr>
         <td>
-          <label for="review_comments">Additional Comments</label><BR/>
+          <label for="review_comments">Additional Comments</label>
           <textarea cols="70" rows="1" id="review_comments" name="review[comments]" style="overflow:hidden;" class="tinymce">
             <% if controller.action_name != 'new' and @response.additional_comment != nil %>
                 <%= @response.additional_comment.strip if !@response.nil?%>
@@ -402,7 +401,6 @@
     <%end%>
     <%= hidden_field_tag "review[questionnaire_id]", @questionnaire.id %>
 
-    <br/>
     <br>
     <div id="save_confirm"></div>
     <%= submit_tag "Save "+@title, :name => "save", :id => "save_review" %>

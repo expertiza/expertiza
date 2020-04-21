@@ -509,4 +509,6 @@ resources :institution, except: [:destroy] do
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
   get ':controller(/:action(/:id))(.:format)'
   match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
+  post '/response_toggle/:id' => 'response#toggle'
 end
+

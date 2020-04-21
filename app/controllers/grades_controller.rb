@@ -37,7 +37,10 @@ class GradesController < ApplicationController
   # It also gives a final score, which is an average of all the reviews and greatest difference
   # in the scores of all the reviews.
   def view
-    @assignment = Assignment.find(params[:id])
+    @participant = AssignmentParticipant.find(params[:id])
+    @assignment = @participant.assignment
+    @team = @participant.team
+    @team_id = @team.id
     questionnaires = @assignment.questionnaires
 
     if @assignment.varying_rubrics_by_round?

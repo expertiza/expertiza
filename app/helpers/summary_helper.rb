@@ -41,9 +41,6 @@ module SummaryHelper
       self
     end
 
-    # E1936 team recommends this method be REMOVED
-    #   it does not seem to be used anywhere in Expertiza as of 4/21/19
-    #   aside from in methods which are themselves not used anywhere in Expertiza as of 4/21/19
     # produce summaries for instructor. it merges all feedback given to all reviewees, and summarize them by criterion
     def summarize_reviews_by_criterion(assignment, summary_ws_url)
       # @summary[reviewee][round][question]
@@ -86,9 +83,6 @@ module SummaryHelper
       self
     end
 
-    # E1936 team recommends this method be REMOVED
-    #   it does not seem to be used anywhere in Expertiza as of 4/21/19
-    #   aside from in methods which are themselves not used anywhere in Expertiza as of 4/21/19
     # produce summaries for instructor and students. It sum up the feedback by criterion for each reviewee
     def summarize_reviews_by_reviewees(assignment, summary_ws_url)
       # @summary[reviewee][round][question]

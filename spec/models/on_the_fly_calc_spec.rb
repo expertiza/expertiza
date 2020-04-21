@@ -1,5 +1,4 @@
 describe OnTheFlyCalc do
-
   let(:on_the_fly_calc) { Class.new { extend OnTheFlyCalc } }
   let(:questionnaire) { create(:questionnaire, id: 1) }
   let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }
@@ -9,7 +8,6 @@ describe OnTheFlyCalc do
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
   let(:questionnaire1) { build(:questionnaire, name: "abc", private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234) }
   let(:contributor) { build(:assignment_team, id: 1) }
-  let(:signed_up_team) { build(:signed_up_team, team_id: contributor.id) }
 
   describe '#compute_total_score' do
     context 'when avg score is nil' do

@@ -211,6 +211,8 @@ class ResponseController < ApplicationController
       redirect_to view_student_teams_path student_id: @map.reviewer.id
     when "instructor"
       redirect_to controller: 'grades', action: 'view', id: @map.response_map.assignment.id
+    when "instructor_review"
+      redirect_to controller: 'assignments', action: 'list_submissions', id: @map.response_map.assignment.id
     when "assignment_edit"
       redirect_to controller: 'assignments', action: 'edit', id: @map.response_map.assignment.id
     when "selfreview"

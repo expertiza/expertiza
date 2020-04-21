@@ -162,6 +162,13 @@ class AssignmentsController < ApplicationController
   def list_submissions
     @assignment = Assignment.find(params[:id])
     @teams = Team.where(parent_id: params[:id])
+    @participant = AssignmentParticipant.where(user_id: current_user.id, parent_id: @assignment.id).first
+    # If the current user is not a participant in the assignment, they cannot review submissions.
+    if not @participant.nil?
+      @review_maps = ReviewResponseMap.where(reviewer_id: @participant.id, reviewed_object_id: @assignment.id)
+    else
+      @review_maps = []
+    end
   end
 
   def remove_assignment_from_course

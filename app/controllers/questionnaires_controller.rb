@@ -107,6 +107,7 @@ class QuestionnairesController < ApplicationController
   # Edit a questionnaire
   def edit
     @questionnaire = Questionnaire.find(params[:id])
+    @participant_id = params[:participant_id]
     redirect_to Questionnaire if @questionnaire.nil?
     session[:return_to] = request.original_url
   end
@@ -198,7 +199,7 @@ class QuestionnairesController < ApplicationController
       end
     end
 
-    redirect_to action: 'edit', id: questionnaire_id.to_s.to_sym, team_id: params[:team_id]
+    redirect_to action: 'edit', id: questionnaire_id.to_s.to_sym, team_id: params[:team_id], participant_id: params[:participant_id]
   end
 
   # Zhewei: This method is used to save all questions in current questionnaire.
@@ -216,7 +217,7 @@ class QuestionnairesController < ApplicationController
     if params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     elsif !questionnaire_id.nil?
-      redirect_to action: 'edit', id: questionnaire_id.to_s.to_sym, team_id: params[:team_id]
+      redirect_to action: 'edit', id: questionnaire_id.to_s.to_sym, team_id: params[:team_id], participant_id: params[:participant_id]
     end
   end
 

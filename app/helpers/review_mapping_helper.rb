@@ -343,7 +343,7 @@ module ReviewMappingHelper
 
   #returns false if the review response's visibility is private else returns true (Visibility public or published means student
   #has given consent to make his reviews public.)
-  def is_visibility_public?(response_map)
+  def visibility_public?(response_map)
     !(Response.exists?(map_id: response_map.id, visibility: "private"))
   end
 

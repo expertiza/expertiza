@@ -9,6 +9,7 @@ describe QuestionnairesController do
   let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:instructor2) { build(:instructor, id: 66) }
+  let(:student){build(:student)}
   let(:ta) { build(:teaching_assistant, id: 8) }
   let(:student) { build(:student) }
   before(:each) do

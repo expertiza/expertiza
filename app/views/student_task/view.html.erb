@@ -109,7 +109,7 @@ to display the label "Your team" in the student assignment tasks-->
     <% end %>
     <li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> (Provide a different handle for this assignment)</li>
     <li>
-      <% if @assignment.is_revision_planning_enabled and @assignment.number_of_current_round(@topic_id) > 1 %>
+      <% if @team && @assignment.is_revision_planning_enabled and @assignment.number_of_current_round(@topic_id) > 1 %>
         <%= link_to "Revision planning", {:controller => 'questionnaires', :action => 'edit_revision_plan', :id => @assignment.review_questionnaire_id, :team_id => @team.try(:id)} %>
       <% else %>
         <font color="gray">Revision planning </font>

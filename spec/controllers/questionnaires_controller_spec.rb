@@ -9,6 +9,7 @@ describe QuestionnairesController do
   let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:instructor2) { build(:instructor, id: 66) }
+  let(:student){build(:student)}
   let(:ta) { build(:teaching_assistant, id: 8) }
   before(:each) do
     allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
@@ -387,7 +388,7 @@ describe QuestionnairesController do
                   question: {total_num: 2,
                              type: 'Criterion'}, team_id: 3}
         post :add_new_questions, params
-        expect(response).to redirect_to :action => 'edit_revision_plan', id: params[:id], team_id: params[:team_id]
+        expect(response).to redirect_to :action => 'edit', id: params[:id], team_id: params[:team_id]
       end
     end
   end

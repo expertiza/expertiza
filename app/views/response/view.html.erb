@@ -10,7 +10,7 @@
 <% end %>
 
 <!-- Added a checkbox to enable students to mark their review as a sample for others, by E2022 @SujalAhrodia -->
-<input type="checkbox" id="sample_cbx"/>
+<input type="checkbox" id="sample_cbx" checked="false"/>
 <label id="sample_cbx_lbl" for="sample_cbx">I agree to share my review as a sample for others</label>
 
 <% @review_versions = @map.get_all_versions() %>
@@ -45,3 +45,27 @@
 <br/>
 <a href="javascript:window.history.back()">Back</a>
 
+<script>
+  $(document).on("ready",function(e){
+    $("#sample_cbx").prop("checked",<%= !@response.visibility.nil? && (@response.visibility=="public" || @response.visibility=="published")%>);
+    $("#sample_cbx").on("change",function(e){
+      var _d = $(this);
+      var check = _d.is(":checked")?1:0;
+      var visibility = check?"public":"private";
+      var message = check?"Your review may now ":"Your review may no longer ";
+      message += "be available for other students to view. Are you sure?";
+      if(!confirm(message)){
+        _d.prop("checked",!check);
+      }else{
+        $.ajax({
+        "url":"/response_toggle/"+"<%= @response.id %>",
+        "type":"POST",
+        "data":{
+          "visibility":visibility
+        },
+        "dataType":"json"
+      });
+      }
+    });
+  });
+</script>

@@ -10,13 +10,22 @@ class QuestionsController < ApplicationController
     render action: 'list'
   end
 
-  #Guoyi, hope student could delete question, doesn't work
-  #Checkt destory method
+  # Guoyi, hope student could delete question, doesn't work
+  # Check destroy method
   def action_allowed?
-    ['Super-Administrator',
-    'Administrator',
-    'Instructor',
-    'Teaching Assistant'].include? current_role_name
+    question = Question.find(params[:id])
+    team = AssignmentTeam.find(question.team_id)
+    if team.users.find(current_user)
+      ['Super-Administrator',
+       'Administrator',
+       'Instructor',
+       'Teaching Assistant', 'Student'].include? current_role_name
+    else
+      ['Super-Administrator',
+       'Administrator',
+       'Instructor',
+       'Teaching Assistant'].include? current_role_name
+    end
   end
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
@@ -73,13 +82,14 @@ class QuestionsController < ApplicationController
   def destroy
     question = Question.find(params[:id])
     questionnaire_id = question.questionnaire_id
+    team_id = question.team_id
     begin
       question.destroy
       flash[:success] = "You have successfully deleted the question!"
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
-    redirect_to edit_questionnaire_path(questionnaire_id.to_s.to_sym)
+    redirect_to controller: 'questionnaires', action: 'edit', id: questionnaire_id.to_s.to_sym, team_id: team_id
   end
 
   # required for answer tagging
@@ -87,4 +97,6 @@ class QuestionsController < ApplicationController
     types = Question.distinct.pluck(:type)
     render json: types.to_a
   end
+
+  private
 end

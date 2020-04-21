@@ -13,8 +13,8 @@ class QuestionnairesController < ApplicationController
       (['Super-Administrator',
         'Administrator'].include? current_role_name) ||
           ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id))) ||
-          ((['Teaching Assistant'].include? current_role_name) && session[:user].instructor_id == @questionnaire.try(:instructor_id))
-
+          ((['Teaching Assistant'].include? current_role_name) && session[:user].instructor_id == @questionnaire.try(:instructor_id)) ||
+          ((['Student'].include? current_role_name))
     else
       ['Super-Administrator',
        'Administrator',
@@ -105,9 +105,13 @@ class QuestionnairesController < ApplicationController
 
   # Edit a questionnaire
   def edit
-    @questionnaire = Questionnaire.find(params[:id])
-    redirect_to Questionnaire if @questionnaire.nil?
-    session[:return_to] = request.original_url
+    if current_role_name == 'Student'
+      redirect_to action: 'edit_revision_plan', id: params[:id], team_id: params[:team_id]
+    else
+      @questionnaire = Questionnaire.find(params[:id])
+      redirect_to Questionnaire if @questionnaire.nil?
+      session[:return_to] = request.original_url
+    end
   end
 
   def update
@@ -130,7 +134,7 @@ class QuestionnairesController < ApplicationController
       rescue StandardError
         flash[:error] = $ERROR_INFO
       end
-      redirect_to action: 'edit', id: @questionnaire.id.to_s.to_sym
+      redirect_to action: 'edit', id: params[:id], team_id: params[:team_id]
     end
   end
 
@@ -197,11 +201,7 @@ class QuestionnairesController < ApplicationController
       end
     end
 
-    if (params[:team_id]) # student path
-      redirect_to action: 'edit_revision_plan', id: params[:id], team_id: params[:team_id]
-    else # instructor path
-      redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
-    end
+    redirect_to action: 'edit', id: questionnaire_id.to_s.to_sym, team_id: params[:team_id]
   end
 
   # Zhewei: This method is used to save all questions in current questionnaire.
@@ -219,31 +219,15 @@ class QuestionnairesController < ApplicationController
     if params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     elsif !questionnaire_id.nil?
-      redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+      redirect_to action: 'edit', id: questionnaire_id.to_s.to_sym, team_id: params[:team_id]
     end
   end
 
   # Yulin: student's view of the questionnaire's creation page
   def edit_revision_plan
     @questions = AssignmentTeam.find(params[:team_id]).revision_plan_questions
+    @participant = current_role
   end
-
-  # Yulin: save student's revision plan questions to the rubric of current round
-  def update_revision_plan
-    assignment = AssignmentTeam.find(params[:team_id]).assignment
-    @questionnaire = Questionnaire.find(assignment.review_questionnaire_id(nil))
-    begin
-      # Save all questions
-      unless params[:question].nil?
-        update_questions(params[:question])
-      end
-      flash[:success] = 'The revision plan has been successfully updated!'
-    rescue StandardError
-      flash[:error] = $ERROR_INFO
-    end
-    redirect_to action: 'edit_revision_plan', id: params[:id], team_id: params[:team_id]
-  end
-
 
   private
 

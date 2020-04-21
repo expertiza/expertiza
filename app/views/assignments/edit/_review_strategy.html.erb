@@ -1,7 +1,7 @@
 <!--The reason why add an empty form_tag here. (https://github.com/expertiza/expertiza/commit/4d1a9d50833aca4e8771afd851daa40455d4fc37)-->
 <%= form_tag controller: 'assignment', action: 'edit', assignment_id: @assignment_form.assignment.id do %>
 <% end %>
-<table border=0 class="table-hover table-borderless" style="width: 100%">
+<table border=0 class="table-hover table-borderless" style="width: 100%" >
   <col width="150"/>
   <col width="70"/>
   <col width="70"/>
@@ -44,9 +44,8 @@
     </td>
   </tr>
 
-  <tr id="assignment_review_topic_threshold_row">
+  <tr id="assignment_metareview_topic_threshold_row" <%= 'hidden' if @assignment_form.assignment.num_reviews_allowed.nil?%> >
     <td>
-      <span id="reviews_allowed" <%= 'hidden' if @assignment_form.assignment.num_reviews_allowed.nil?%> class = "form-inline">
       <%= label_tag('assignment_form[assignment][num_reviews_allowed]', ' Set allowed number of reviews per reviewer') %>
         <%if @assignment_form.assignment.num_reviews_allowed && @assignment_form.assignment.num_reviews_allowed >= 0 %>
         <%= text_field_tag('assignment_form[assignment][num_reviews_allowed]', @assignment_form.assignment.num_reviews_allowed, size: 1, class: "form-control width-70", :style => 'margin-left :130px') %>
@@ -56,7 +55,6 @@
         <br/>
         <%= label_tag('assignment_form[assignment][num_reviews_required]', 'Set required number of reviews per reviewer') %>
         <%= text_field_tag('assignment_form[assignment][num_reviews_required]', @assignment_form.assignment.num_reviews_required ||= @assignment_form.assignment.num_reviews, size: 1, class: "form-control width-70", :style => 'margin-left :120px') %>
-      </span>
     </td>
   </tr>
 

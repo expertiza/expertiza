@@ -100,7 +100,7 @@ module ReviewMappingHelper
     
   #Get team members for a particular team for Review Conflict Report
   def team_members(team_name, assignment_id)
-    team_id = Team.select(:id).where(name: team_name)
+    team_id = Team.select(:id).where(name: team_name, parent_id: assignment_id)
     members = TeamsUser.where(team_id: team_id)
     members
   end

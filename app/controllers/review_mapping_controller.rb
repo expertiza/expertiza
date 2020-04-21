@@ -78,6 +78,19 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment.id, msg: msg
   end
 
+  def add_instructor_as_reviewer
+    assignment = Assignment.find(params[:id])
+    user = User.from_params(params)
+
+    regurl = url_for id: assignment.id,
+                     user_id: user.id,
+                     contributor_id: params[:contributor_id]
+    reviewer = get_reviewer(user, assignment, regurl)
+
+    map = ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
+    redirect_to :controller => 'response', :action => 'new', :id => map.id, :contributor_id => params[:contributor_id], :return => "instructor_review"
+  end
+
   # 7/12/2015 -zhewei
   # This method is used for assign submissions to students for peer review.
   # This method is different from 'assignment_reviewer_automatically', which is in 'review_mapping_controller'

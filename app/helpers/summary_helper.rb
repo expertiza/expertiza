@@ -159,6 +159,21 @@ module SummaryHelper
       question.type.eql?("Checkbox") ? 1 : Questionnaire.where(id: question.questionnaire_id).first.max_question_score
     end
 
+    #Get maximum score of the assignment per round for Review Conflict Report
+    def max_score_of_assignment_per_round(assignment,round)
+      # Get all questions used in each round
+      rubric = get_questions_by_assignment(assignment)
+      rubric_questions_used = rubric[assignment.varying_rubrics_by_round? ? round : 0]
+      assignment_max_score_per_round = 0
+      # Add the max score for each question to find the max score for the assignment
+      rubric_questions_used.each do |q|
+        next if q.type.eql?("SectionHeader")
+        q_max_score = get_max_score_for_question(q)
+        assignment_max_score_per_round += q_max_score
+      end
+      assignment_max_score_per_round
+    end
+
     def summarize_sentences(comments, summary_ws_url)
       summary = ""
       param = {sentences: comments}

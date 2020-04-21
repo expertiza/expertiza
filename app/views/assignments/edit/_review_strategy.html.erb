@@ -58,7 +58,7 @@
     </td>
   </tr>
 
-  <tr id="metareview_limit_row"<%= 'style=display:none' if @metareview_allowed == false%>>
+  <tr id="metareview_limit_row"<%= 'style=display:none' if (@metareview_allowed.nil? || @metareview_allowed == false)%>>
     <td>
       <%= check_box_tag('meta_review_limit', 'false', @metareview_allowed && (@assignment_form.assignment.num_metareviews_allowed.nil? == false || @assignment_form.assignment.num_metareviews_required.nil? == false), {:onChange => 'hasMetaReviewChanged()'}) %>
       <%= label_tag('meta_review', 'Has meta-review limit?') %>  
@@ -66,7 +66,7 @@
     </td>
   </tr>
 
-  <tr id="metareview_limit_threshold_row" <%= 'style=display:none' if @metareview_allowed == false%> >
+  <tr id="metareview_limit_threshold_row" <%= 'style=display:none' if (@metareview_allowed.nil? || @metareview_allowed == false)%> >
     <td>
         <%= label_tag('assignment_form[assignment][num_metareviews_allowed]', ' Set allowed number of metareviews per reviewer') %>
         <%if @assignment_form.assignment.num_metareviews_allowed && @assignment_form.assignment.num_metareviews_allowed >= 0 %>

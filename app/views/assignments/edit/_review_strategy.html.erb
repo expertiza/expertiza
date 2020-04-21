@@ -58,7 +58,7 @@
     </td>
   </tr>
 
-  <tr id="meta_review_limit_row" style="display:none" <%= 'hidden' if @metareview_allowed == false%>>
+  <tr id="meta_review_limit_row" style="display:none" <%= 'style=display:none' if @metareview_allowed == false%>>
     <td>
       <%= check_box_tag('meta_review_limit', 'false', @metareview_allowed && (@assignment_form.assignment.num_metareviews_allowed || @assignment_form.assignment.num_metareviews_required), {:onChange => 'hasMetaReviewChanged()'}) %>
       <%= label_tag('meta_review', 'Has meta-review limit?') %>  

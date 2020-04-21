@@ -392,7 +392,7 @@
                         <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
                         <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
                 );
-                jQuery("#meta_review_limit_row").removeAttr('hidden');
+                jQuery("#meta_review_limit_row").removeAttr('style');
             } else {
 				removeDueDateTableElement('metareview', 0);
                 jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()

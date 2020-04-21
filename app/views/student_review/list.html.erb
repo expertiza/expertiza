@@ -35,20 +35,20 @@
     <p><em>Reviews cannot be performed at this time</em></p >
 <% end %>
 
-<% if @assignment.metareview_allowed(@topic_id) %>
-    <h4>Your instructor expects you to do <%= @assignment.num_metareview_required %> reviews. You are not allowed to do any extra metareviews. </h4>
+<% if @assignment.metareviews_allowed(@topic_id) %>
+    <h4>Your instructor expects you to do <%= @assignment.num_metareviews_required %> reviews. You are not allowed to do any extra metareviews. </h4>
 
-<% elsif @assignment.num_metareview_allowed == @assignment.num_metareview_required %>
-    <h4>You should perform exactly <%= @assignment.num_metareview_allowed %> metareviews </h4>
+<% elsif @assignment.num_metareviews_allowed == @assignment.num_metareviews_required %>
+    <h4>You should perform exactly <%= @assignment.num_metareviews_allowed %> metareviews </h4>
 <% else %>
 
-    <h4>You may perform between <%= @assignment.num_metareview_required %> and <%= @assignment.num_metareviews_allowed %> metareviews</h4>
+    <h4>You may perform between <%= @assignment.num_metareviews_required %> and <%= @assignment.num_metareviews_allowed %> metareviews</h4>
 <% end %>
-<h4>You are required to do <%= @assignment.num_metareview_required %> metareviews</h4>
-<h4> Number of metareviews left: <%= @assignment.num_metareview_allowed - @num_metareview_completed %></h4>
+<h4>You are required to do <%= @assignment.num_metareviews_required %> metareviews</h4>
+<h4> Number of metareviews left: <%= @assignment.num_metareviews_allowed - @num_metareviews_completed %></h4>
 
 
-  <%= render :partial => 'responses', :locals => {:mappings => @metareview_mappings, :title => 'Metareview'} %>
+  <%= render :partial => 'responses', :locals => {:mappings => @metareviews_mappings, :title => 'Metareview'} %>
     <br/>
     <% if @assignment.review_assignment_strategy == Assignment::RS_AUTO_SELECTED %>
         <% if @assignment.num_metareviews_allowed - @num_metareviews_completed <= 0 %>

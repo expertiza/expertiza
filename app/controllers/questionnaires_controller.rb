@@ -223,7 +223,7 @@ class QuestionnairesController < ApplicationController
   # Yulin: student's view of the questionnaire's creation page
   def edit_revision_plan
     @questions = AssignmentTeam.find(params[:team_id]).revision_plan_questions
-    @participant_id = params[:id]
+    @participant_id = params[:participant_id]
   end
 
   private

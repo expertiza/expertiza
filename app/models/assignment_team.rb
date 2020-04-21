@@ -37,6 +37,116 @@ class AssignmentTeam < Team
     AssignmentTeam.new
   end
 
+
+  # Check if the current team is full?
+  def full?
+    return false if self.parent_id.nil? # course team, does not max_team_size
+    max_team_members = Assignment.find(self.parent_id).max_team_size
+    curr_team_size = Team.size(self.id)
+    (curr_team_size === max_team_members)
+  end
+
+  # Check if the current team size is more than half?
+  def half?
+    return false if self.parent_id.nil?
+    max_team_members = Assignment.find(self.parent_id).max_team_size
+    curr_team_size = Team.size(self.id)
+    (curr_team_size*2 >= max_team_members)
+  end
+
+  # Check if the current team dont have mentor?
+  def have_mentor?
+    has_mentor = false
+    members = TeamsUser.where(team_id: self.id)
+    members.each do |member|
+      if Participant.where(['user_id = ? and can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', member.user_id ,0, 0, 0, self.parent_id]).count > 0
+        has_mentor = true
+      end
+    end
+    has_mentor
+  end
+
+  #remove mentor if group size falls below the limit
+  #def remove_mentor
+  #  if !half? && have_mentor?
+  #  	members = TeamsUser.where(team_id: self.id)
+  #  	members.each do |member|
+  #   	if Participant.where(['user_id = ? and can_submit = ? and can_review = ? and can_take_quiz = ?', member.user_id ,0, 0, 0]).count > 0
+  #    		mentor=member         
+  #  		TeamsUser.where(user_id: mentor.user_id, team_id: self.id).find_each(&:destroy)
+  # 		node = TeamNode.find_by(node_object_id: mentor.user_id)
+  #  		node.destroy if node
+ 
+#	   end
+#	end
+#     end
+#   end
+  # Add member to the team, if size > max/2 and mentor exist for assignment, trigger mentor assign
+  def add_member(user, _assignment_id = nil)
+    raise "The user #{user.name} is already a member of the team #{self.name}" if user?(user)
+    can_add_member = false
+    unless full?
+      can_add_member = true
+      t_user = TeamsUser.create(user_id: user.id, team_id: self.id)
+      parent = TeamNode.find_by(node_object_id: self.id)
+      TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
+      add_participant(self.parent_id, user)
+      ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{self.id}")
+
+      # only assign mentor when number of mentor > 0
+      if Participant.where(['can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', 0, 0, 0, self.parent_id]).count > 0
+        # for new added member and team already has mentor
+        if half? && have_mentor?
+          members = TeamsUser.where(team_id: self.id)
+          members.each do |member|
+            if Participant.where(['user_id = ? and can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', member.user_id ,0, 0, 0, self.parent_id]).count > 0
+              mentor=member
+              Mailer.notify_single_team_member(user,mentor,self)
+            end
+          end
+        # num >= max/2 and dont have mentor yet
+        else if half? && !have_mentor?
+              mentor=assign_mentor
+              new_mentor = TeamsUser.create(user_id: mentor.user_id, team_id: self.id)
+              TeamUserNode.create(parent_id: parent.id, node_object_id: new_mentor.id)
+              ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{self.id}")
+
+              # Email notification
+              Mailer.notify_mentor(mentor,self)
+              Mailer.notify_team_members(mentor,self)
+             end
+	   
+        end
+      end
+    end
+    can_add_member
+  end
+
+
+  # Assign mentor with lowest number of teams he/she mentored
+  def assign_mentor
+    # find all mentor of this assignment
+    mentors = Participant.where(['can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', 0, 0, 0, self.parent_id])
+    target=0xffff
+    mentor_assigned=mentors.first
+    mentors.each do |mentor|
+      num=0
+      teams = Team.where(parent_id: self.parent_id)
+      teams.each do |team|
+        # count how many times mentor show up in all teams of this assignment
+        tmp=TeamsUser.where(user_id: mentor.user_id,team_id: team.id).count
+        num+=tmp
+      end
+      # store the lowest one
+      if num<target
+        mentor_assigned=mentor
+        target=num
+      end
+    end
+    mentor_assigned
+  end
+
+
   # Use current object (AssignmentTeam) as reviewee and create the ReviewResponseMap record
   def assign_reviewer(reviewer)
     assignment = Assignment.find(self.parent_id)

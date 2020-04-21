@@ -381,7 +381,7 @@
     }
 		<%# This function hides and shows the rest of the elements on the other pages that have to do with metareviews when this is enabled/disbaled. On creation, they should already have to logic for this. %>
         function removeOrAddMetareview(){
-			var metaCheckbox = jQuery('#review');
+			var metaCheckbox = jQuery('#metareviewAllowed');
             if(metaCheckbox.is(':checked')) {
 				addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
                 jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()

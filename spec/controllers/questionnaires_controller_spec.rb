@@ -82,7 +82,7 @@ describe QuestionnairesController do
       end
     end
   end
-  describe '#copy' do
+  describe '#copy,  #copy_questionnaire_details and #assign_instructor_id' do
     it 'redirects to view page of copied questionnaire' do
       allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
       allow(Question).to receive(:where).with(questionnaire_id: '1').and_return([question])
@@ -98,7 +98,7 @@ describe QuestionnairesController do
       session = {user: instructor}
       get :copy, params, session
       expect(response).to redirect_to('/questionnaires/view?id=2')
-      expect(controller.instance_variable_get(:@questionnaire).name).to eq 'Copy of Test questionnaire'
+      expect(controller.instance_variable_get(:@questionnaire).name).to eq ('Copy of ' + questionnaire.name)
       expect(controller.instance_variable_get(:@questionnaire).private).to eq false
       expect(controller.instance_variable_get(:@questionnaire).min_question_score).to eq 0
       expect(controller.instance_variable_get(:@questionnaire).max_question_score).to eq 5
@@ -171,8 +171,8 @@ describe QuestionnairesController do
         it 'redirects to submitted_content#edit page' do
           params = {aid: 1,
                     pid: 1,
-                    questionnaire: {name: 'Test questionnaire',
-                                    type: 'ReviewQuestionnaire'}}
+                    questionnaire: {name: review_questionnaire.name,
+                                    type: review_questionnaire.type}}
           # create_questionnaire
           allow(ReviewQuestionnaire).to receive(:new).with(any_args).and_return(review_questionnaire)
           session = {user: build(:teaching_assistant, id: 1)}
@@ -185,10 +185,10 @@ describe QuestionnairesController do
           expect(flash[:note]).to be nil
           expect(response).to redirect_to('/tree_display/list')
           expect(controller.instance_variable_get(:@questionnaire).private).to eq false
-          expect(controller.instance_variable_get(:@questionnaire).name).to eq 'Test questionnaire'
+          expect(controller.instance_variable_get(:@questionnaire).name).to eq review_questionnaire.name
           expect(controller.instance_variable_get(:@questionnaire).min_question_score).to eq 0
           expect(controller.instance_variable_get(:@questionnaire).max_question_score).to eq 5
-          expect(controller.instance_variable_get(:@questionnaire).type).to eq 'ReviewQuestionnaire'
+          expect(controller.instance_variable_get(:@questionnaire).type).to eq review_questionnaire.type
           expect(controller.instance_variable_get(:@questionnaire).instructor_id).to eq 6
         end
       end

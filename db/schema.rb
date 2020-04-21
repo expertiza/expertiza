@@ -55,6 +55,7 @@ ActiveRecord::Schema.define(version: 20190607174531) do
     t.integer "questionnaire_weight", limit: 4, default: 0,    null: false
     t.integer "used_in_round",        limit: 4
     t.boolean "dropdown",                       default: true
+    t.integer "topic_id",             limit: 4
   end
 
   add_index "assignment_questionnaires", ["assignment_id"], name: "fk_aq_assignments_id", using: :btree
@@ -632,7 +633,6 @@ ActiveRecord::Schema.define(version: 20190607174531) do
     t.string  "status",            limit: 255
     t.string  "unityID",           limit: 255
     t.string  "signup_preference", limit: 255
-    t.string  "feedback",          limit: 255
   end
 
   create_table "survey_deployments", force: :cascade do |t|
@@ -718,14 +718,14 @@ ActiveRecord::Schema.define(version: 20190607174531) do
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 
   create_table "track_notifications", force: :cascade do |t|
+    t.integer  "notification_id", limit: 4
     t.integer  "user_id",         limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "notification_id", limit: 4, null: false
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
   end
 
-  add_index "track_notifications", ["notification_id"], name: "notification_id", using: :btree
-  add_index "track_notifications", ["user_id"], name: "user_id", using: :btree
+  add_index "track_notifications", ["notification_id"], name: "index_track_notifications_on_notification_id", using: :btree
+  add_index "track_notifications", ["user_id"], name: "index_track_notifications_on_user_id", using: :btree
 
   create_table "tree_folders", force: :cascade do |t|
     t.string  "name",       limit: 255
@@ -819,4 +819,6 @@ ActiveRecord::Schema.define(version: 20190607174531) do
   add_foreign_key "tag_prompt_deployments", "tag_prompts"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
+  add_foreign_key "track_notifications", "notifications"
+  add_foreign_key "track_notifications", "users"
 end

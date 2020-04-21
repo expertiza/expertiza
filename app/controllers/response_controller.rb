@@ -19,19 +19,20 @@ class ResponseController < ApplicationController
     when 'delete', 'update'
       return current_user_id?(user_id)
     when 'view'
-      return view_allowed?(response.map, user_id)
+      return edit_allowed?(response.map, user_id)
     else
       current_user
     end
   end
 
-  def view_allowed?(map, user_id)
-    assignment = map.reviewer.assignment # if it is a review response map, all the members of reviewee team should be able to view the response
+  def edit_allowed?(map, user_id)
+    assignment = map.reviewer.assignment
+    # if it is a review response map, all the members of reviewee team should be able to view the reponse (can be done from heat map)
     if map.is_a? ReviewResponseMap
       reviewee_team = AssignmentTeam.find(map.reviewee_id)
       return current_user_id?(user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' ||
         (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) ||
-          (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
+        (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
     else
       current_user_id?(user_id)
     end
@@ -172,7 +173,7 @@ class ResponseController < ApplicationController
     was_submitted = @response.is_submitted
     @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
 
-    # :version_num=>@version)
+    # ,:version_num=>@version)
     # Change the order for displaying questions for editing response views.
     questions = sort_questions(@questionnaire.questions)
     create_answers(params, questions) if params[:responses]
@@ -208,30 +209,26 @@ class ResponseController < ApplicationController
   end
 
   def redirect
-    error_id = params[:error_msg]
-    message_id = params[:msg]
-    flash[:error] = error_id unless error_id and error_id.empty?
-    flash[:note] = message_id unless message_id and message_id.empty?
+    flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
+    flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
     @map = Response.find_by(map_id: params[:id])
-    case params[:return]
-    when "feedback"
+    if params[:return] == "feedback"
       redirect_to controller: 'grades', action: 'view_my_scores', id: @map.reviewer.id
-    when "teammate"
+    elsif params[:return] == "teammate"
       redirect_to view_student_teams_path student_id: @map.reviewer.id
-    when "instructor"
+    elsif params[:return] == "instructor"
       redirect_to controller: 'grades', action: 'view', id: @map.response_map.assignment.id
-    when "assignment_edit"
+    elsif params[:return] == "assignment_edit"
       redirect_to controller: 'assignments', action: 'edit', id: @map.response_map.assignment.id
-    when "selfreview"
+    elsif params[:return] == "selfreview"
       redirect_to controller: 'submitted_content', action: 'edit', id: @map.response_map.reviewer_id
-    when "survey"
-      redirect_to controller: 'survey_deployment', action: 'pending_surveys'
+    elsif params[:return] == "survey"
+      redirect_to controller: 'response', action: 'pending_surveys'
     else
       redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
     end
   end
 
-  # assigning variables for the expert reviews
   def show_calibration_results_for_student
     calibration_response_map = ReviewResponseMap.find(params[:calibration_response_map_id])
     review_response_map = ReviewResponseMap.find(params[:review_response_map_id])
@@ -241,6 +238,40 @@ class ResponseController < ApplicationController
     @review_questionnaire_ids = ReviewQuestionnaire.select("id")
     @assignment_questionnaire = AssignmentQuestionnaire.where(["assignment_id = ? and questionnaire_id IN (?)", @assignment.id, @review_questionnaire_ids]).first
     @questions = @assignment_questionnaire.questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }
+  end
+
+  # This method should be moved to survey_deployment_contoller.rb
+  def pending_surveys
+    unless session[:user] # Check for a valid user
+      redirect_to '/'
+      return
+    end
+
+    # Get all the course survey deployments for this user
+    @surveys = []
+    [CourseParticipant, AssignmentParticipant].each do |participant_type|
+      # Get all the participant(course or assignment) entries for this user
+      participants = participant_type.where(user_id: session[:user].id)
+      next unless participants
+      participants.each do |p|
+        survey_deployment_type = (participant_type == CourseParticipant ? CourseSurveyDeployment : AssignmentSurveyDeployment)
+        survey_deployments = survey_deployment_type.where(parent_id: p.parent_id)
+        next unless survey_deployments
+        survey_deployments.each do |survey_deployment|
+          next unless survey_deployment && Time.now > survey_deployment.start_date && Time.now < survey_deployment.end_date
+          @surveys <<
+              [
+                'survey' => Questionnaire.find(survey_deployment.questionnaire_id),
+                'survey_deployment_id' => survey_deployment.id,
+                'start_date' => survey_deployment.start_date,
+                'end_date' => survey_deployment.end_date,
+                'parent_id' => p.parent_id,
+                'participant_id' => p.id,
+                'global_survey_id' => survey_deployment.global_survey_id
+              ]
+        end
+      end
+    end
   end
 
   private
@@ -265,6 +296,7 @@ class ResponseController < ApplicationController
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
   end
+
   # assigning the instance variables for Edit and New actions
   def assign_instance_vars
     case params[:action]
@@ -283,14 +315,13 @@ class ResponseController < ApplicationController
     end
     @return = params[:return]
   end
-  # identifying the questionnaire type
-  # updating the current round for the reviewer's responses
+
   def set_questionnaire_for_new_response
     case @map.type
     when "ReviewResponseMap", "SelfReviewResponseMap"
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.number_of_current_round(reviewees_topic)
-      @questionnaire = @map.questionnaire(@current_round)
+      @questionnaire = @map.questionnaire(@current_round, reviewees_topic)
     when
       "MetareviewResponseMap",
       "TeammateReviewResponseMap",
@@ -301,7 +332,7 @@ class ResponseController < ApplicationController
       @questionnaire = @map.questionnaire
     end
   end
-  # stores the first instance of the score for each question
+
   def scores
     @review_scores = []
     @questions.each do |question|
@@ -319,7 +350,6 @@ class ResponseController < ApplicationController
     @questionnaire = @response.questionnaire_by_answer(answer)
   end
 
-  # checks if the questionnaire is nil and opens drop down or rating accordingly
   def set_dropdown_or_scale
     use_dropdown = AssignmentQuestionnaire.where(assignment_id: @assignment.try(:id),
                                                  questionnaire_id: @questionnaire.try(:id))
@@ -327,12 +357,12 @@ class ResponseController < ApplicationController
     @dropdown_or_scale = (use_dropdown ? 'dropdown' : 'scale')
   end
 
-  # sorts by sequence number
   def sort_questions(questions)
     questions.sort_by(&:seq)
   end
-  # For each question in the list, starting with the first one, you update the comment and score
+
   def create_answers(params, questions)
+    # create score if it is not found. If it is found update it otherwise update it
     params[:responses].each_pair do |k, v|
       score = Answer.where(response_id: @response.id, question_id: questions[k.to_i].id).first
       score ||= Answer.create(response_id: @response.id, question_id: questions[k.to_i].id, answer: v[:score], comments: v[:comment])

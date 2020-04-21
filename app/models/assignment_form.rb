@@ -30,7 +30,7 @@ class AssignmentForm
     assignment_form
   end
 
-  def update(attributes, user)
+  def update(attributes, user, vary_by_topic_desired = false)
     @has_errors = false
     has_late_policy = false
     if attributes[:assignment][:late_policy_id].to_i > 0
@@ -391,8 +391,10 @@ class AssignmentForm
         notification_limit: aq.notification_limit,
         questionnaire_weight: aq.questionnaire_weight,
         used_in_round: aq.used_in_round,
-        dropdown: aq.dropdown
+        dropdown: aq.dropdown,
+        topic_id: aq.topic_id
       )
     end
   end
+
 end

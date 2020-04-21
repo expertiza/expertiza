@@ -58,7 +58,7 @@
     </td>
   </tr>
 
-  <tr id="meta_review_limit_row" style="display:none" <%= 'style=display:none' if @metareview_allowed == false%>>
+  <tr id="metareview_limit_row"<%= 'style=display:none' if @metareview_allowed == false%>>
     <td>
       <%= check_box_tag('meta_review_limit', 'false', @metareview_allowed && (@assignment_form.assignment.num_metareviews_allowed || @assignment_form.assignment.num_metareviews_required), {:onChange => 'hasMetaReviewChanged()'}) %>
       <%= label_tag('meta_review', 'Has meta-review limit?') %>  
@@ -66,15 +66,12 @@
     </td>
   </tr>
 
-  <tr id="assignment_review_topic_threshold_row">
+  <tr id="metareview_limit_threshold_row" <%= 'style=display:none' if @metareview_allowed == false &&  @assignment_form.assignment.num_metareviews_allowed.nil?%> >
     <td>
-        <span id="meta_reviews_allowed" <%= 'hidden' if @metareview_allowed == false &&  @assignment_form.assignment.num_metareviews_allowed.nil?%> class="form-inline">
-
         <%= label_tag('assignment_form[assignment][num_metareviews_allowed]', ' Set allowed number of meta-reviews per reviewer') %>
 			<%= text_field_tag('assignment_form[assignment][num_metareviews_allowed]', 3, size: 1, class: "form-control width-70", :style => 'margin-left :120px') %>
 		<%= label_tag('assignment_form[assignment][num_metareviews_required]', 'Set required number of meta-reviews per reviewer') %>
 			<%= text_field_tag('assignment_form[assignment][num_reviews_required]', @assignment_form.assignment.num_reviews_required ||= @assignment_form.assignment.num_metareviews_allowed, size: 1, class: "form-control width-70", :style => 'margin-left :120px') %>
-        </span>
     </td>
   </tr>
 
@@ -153,13 +150,13 @@
         }
     }
     function hasMetaReviewChanged() {
-        var checkbox = jQuery('#meta_review');
-        var meta_reviews_allowed_field = jQuery('#meta_reviews_allowed');
+        var checkbox = jQuery('#meta_review_limit');
+        var meta_reviews_allowed_field = jQuery('#metareview_limit_threshold_row');
         if (checkbox.is(':checked')) {
-            meta_reviews_allowed_field.removeAttr('hidden');
+            meta_reviews_allowed_field.removeAttr('style');
             jQuery('#assignment_form_assignment_num_metareviews_allowed').val(<%=@assignment_form.assignment.num_metareviews_allowed ||= 3%>);
         } else {
-            meta_reviews_allowed_field.attr('hidden', true);
+            meta_reviews_allowed_field.css("display","none"); 
             jQuery('#assignment_form_assignment_num_metareviews_allowed').val('-1');
         }
     }

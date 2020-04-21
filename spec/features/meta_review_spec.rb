@@ -111,9 +111,46 @@ describe "meta-review user tests" do
       click_button "Save Metareview"
       expect(page).to have_content "Your response was successfully saved." 
     end
-    
+
     it "If the metareview limit on the assignment is set to 3, then a student will see they need to submit 3 meta reviews" do
-    
+      stub_current_user(@submitter, @submitter.role.name, @submitter.role)
+      visit '/student_task/list'
+      expect(page).to have_content "metareview"
+      click_link "TestAssignment"
+      expect(page).to have_content "Others' work"
+      click_link "Others' work"
+      expect(page).to have_content 'Metareviews for "TestAssignment"'
+      expect(page).to have_content 'Number of Meta-Reviews Allowed: "3"'
+    end
+
+    it "A student should see the number of meta-reviews decrement after a review is requested" do
+      stub_current_user(@submitter, @submitter.role.name, @submitter.role)
+      visit '/student_task/list'
+      expect(page).to have_content "metareview"
+      click_link "TestAssignment"
+      expect(page).to have_content "Others' work"
+      click_link "Others' work"
+      expect(page).to have_content 'Metareviews for "TestAssignment"'
+      expect(page).to have_content 'Number of Meta-Reviews Allowed: "3"'
+      click_button "Request a new metareview to perform"
+      expect(page).to have_content 'Number of Meta-Reviews left: 2'
+    end
+
+    it "A student should see the number of meta-reviews decrement after they complete a review" do
+      stub_current_user(@submitter, @submitter.role.name, @submitter.role)
+      visit '/student_task/list'
+      expect(page).to have_content "metareview"
+      click_link "TestAssignment"
+      expect(page).to have_content "Others' work"
+      click_link "Others' work"
+      expect(page).to have_content 'Metareviews for "TestAssignment"'
+      expect(page).to have_content 'Number of Meta-Reviews Allowed: "3"'
+      click_button "Request a new metareview to perform"
+      click_link "Begin"
+      fill_in "responses[0][comment]", with: "Can you explain why this is garbage?"
+      click_button "Save Metareview"
+      expect(page).to have_content "Your response was successfully saved."
+      expect(page).to have_content 'Number of Meta-Reviews left: 2'
     end
     
     it "A student should not be able to request a metareview if they have reached the limit of their allowed reviews" do
@@ -124,11 +161,11 @@ describe "meta-review user tests" do
 
     end
   
-    it "A student should not be able to request a metareview about their own work" do
+    it "A student should not be able to request a metareview about their teams work" do
   
     end
   
-    it "A student should not be able to request a metareview about themselves" do
+    it "A student should not be able to request a metareview about their work" do
   
     end
   

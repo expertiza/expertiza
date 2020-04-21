@@ -88,15 +88,17 @@ to display the label "Your team" in the student assignment tasks-->
     <% end %>
   <%end%>
 
+  <%if @team && @assignment.is_revision_planning_enabled %>
   <li>
-    <% if @team && @assignment.is_revision_planning_enabled && @assignment.number_of_current_round(@topic_id) > 1 && @assignment.get_current_stage(@topic_id) == "submission" %>
+    <% if @assignment.number_of_current_round(@topic_id) > 1 && @assignment.get_current_stage(@topic_id) == "submission" %>
       <%= link_to "Revision planning", {:controller => 'questionnaires', :action => 'edit_revision_plan', :id => @assignment.review_questionnaire_id, :team_id => @team.try(:id)} %>
     <% else %>
       <font color="gray">Revision planning</font>
     <% end %>
     (Input the revision planning)
   </li>
-
+  <%end%>
+  
   <% if @team && (@authorization == 'participant' or @can_submit == true) %>
     <li>
       <!--Only if the assignment supports self-review and students submitted self-review can he or she view scores.-->

@@ -1,44 +1,41 @@
 <table width="100%" border="0" >
-  <%question_answers = review_score_for_team(@id, team_name) %>
+  <%review_scores = review_score_for_team(@id, team_name) %>
   <% i = 1 %>
-  <% question_answers.each do |question_answer| %>
-    <% average = average_of_round(question_answer) %>
-    <% std = std_of_round(average,question_answer) %>
-    <% upper_tolerance_limit = calculate_upper_tolerance(question_answer) %>
-    <% lower_tolerance_limit = calculate_lower_tolerance(question_answer) %>
+  <% review_scores.each do |review_score| %>
+    <% metrics = get_score_metrics(review_score) %>
     <tr>
       <td width="30%">
         <div>
           <strong>Reviewers with scores</strong><br>
           <ol>
-            <% question_answer.each do |reviewer, answer| %>
-              <% if answer > upper_tolerance_limit or answer < lower_tolerance_limit  %>
+            <% review_score.each do |reviewer, score| %>
+              <% if score > metrics[:upper_tolerance_limit] or score < metrics[:lower_tolerance_limit]  %>
                 <li><% response_id = response_id_review_conflict(reviewer, @teams[team_name], @id) %>
                   <mark style="background-color:#FFFF00">
                   <%= link_to "("+@reviewers[team_name.to_s][reviewer.to_s].to_s+")", :controller => 'popup', :action => 'team_users_popup', :id => @teams[team_name], :id2 => response_id, :assignment_id=>@id %>
                   <%= list_review_submissions(reviewer, @teams[team_name], response_id) %>
-                  <%= ": " + answer.to_s %></mark>
+                  <%= ": " + score.to_s %></mark>
                 </li>
               <% else %>
                 <li><% response_id = response_id_review_conflict(reviewer, @teams[team_name], @id) %>
                   <%= link_to "("+@reviewers[team_name.to_s][reviewer.to_s].to_s+")", :controller => 'popup', :action => 'team_users_popup', :id => @teams[team_name], :id2 => response_id, :assignment_id=>@id %>
                   <%= list_review_submissions(reviewer, @teams[team_name], response_id) %>
-                  <%= ": " + answer.to_s %>
+                  <%= ": " + score.to_s %>
                 </li>
               <% end %>
             <% end %>
           </ol>
         </div>
         <strong>Max Possible Review Score: </strong><%=max_scores[i-1]%><br>
-        <strong>Average Score: </strong><%=  average.to_s %><br>
-        <strong>Standard Deviation: </strong><%=  std.to_s %><br>
-        <strong>Lower Threshold: </strong><%= lower_tolerance_limit.to_s %><br>
-        <strong>Upper Threshold: </strong><%= upper_tolerance_limit.to_s %><br><br>
+        <strong>Average Score: </strong><%=  metrics[:average].to_s %><br>
+        <strong>Standard Deviation: </strong><%=  metrics[:std].to_s %><br>
+        <strong>Lower Threshold: </strong><%= metrics[:lower_tolerance_limit].to_s %><br>
+        <strong>Upper Threshold: </strong><%= metrics[:upper_tolerance_limit].to_s %><br><br>
       </td>
       <td>
         <div>
           <strong><u><%= "Round: " + i.to_s %></u></strong>
-          <%= generate_score_chart(max_scores[i-1], question_answer) %>
+          <%= generate_score_chart(max_scores[i-1], review_score) %>
         </div>
       </td>
     </tr>

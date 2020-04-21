@@ -66,6 +66,16 @@ module ReviewMappingHelper
     question_answers
   end
 
+  # Calculate all metrics using other helper methods
+  def get_score_metrics(review_score)
+    metrics = {}
+    metrics[:average] = average_of_round(review_score)
+    metrics[:std] = std_of_round(metrics[:average],review_score)
+    metrics[:upper_tolerance_limit] = calculate_upper_tolerance(review_score)
+    metrics[:lower_tolerance_limit] = calculate_lower_tolerance(review_score)
+    metrics
+  end
+
   #Average score of a particular round for Review Conflict Report
   def average_of_round(review_scores)
     average=0.0
@@ -147,7 +157,7 @@ module ReviewMappingHelper
       end
     end
     labels = (1..scores.length).to_a
-    chartSize = 5 + 2*scores.length
+    chartSize = 5 + 3*scores.length
     # Initialize chart
     data = {
       labels: labels,

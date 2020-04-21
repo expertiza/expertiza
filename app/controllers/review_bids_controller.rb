@@ -4,8 +4,45 @@ class ReviewBidsController < ApplicationController
   require "json"
 
   def action_allowed?
-    ['Student'].include? current_role_name
+    case params[:action]
+    when 'review_bid', 'assign_review_priority'
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator',
+       'Student'].include? current_role_name and
+      ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer") : true)
+    else
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator'].include? current_role_name
+    end
   end
+
+  #entry point to the webservice call
+  def assign
+    assignment_id = params[:id]
+    reviewers = ReviewBid.assignment_reviewers(assignment_id)
+    topics = SignUpTopic.where(assignment_id: assignment_id).ids
+    bidding_data = ReviewBid.assignment_bidding_data(assignment_id,reviewers)
+    matched_topics = reviewer_topic_matching(bidding_data,topics,assignment_id)
+    ReviewBid.assign_matched_topics(assignment_id,reviewers,matched_topics)
+    redirect_to :back
+  end
+
+  def reviewer_topic_matching(bidding_data,topics,assignment_id)
+  #hash of participant ids
+    num_reviews_allowed = Assignment.where(id:assignment_id).pluck(:num_reviews_allowed).first
+    json_like_bidding_hash = {"users": bidding_data, "tids": topics, "q_S": num_reviews_allowed}
+    uri = URI.parse(WEBSERVICE_CONFIG["review_bidding_webservice_url"])
+    http = Net::HTTP.new(uri.host, uri.port)
+    request = Net::HTTP::Post.new(uri.path, {'Content-Type' => 'application/json'})
+    request.body = json_like_bidding_hash.to_json
+    response = http.request(request)
+    return JSON.parse(response.body)
+  end
+
 
   # display the review topics to bid
   def review_bid

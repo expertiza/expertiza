@@ -379,7 +379,7 @@
             return;
         }
     }
-		<%=# This function hides and shows the rest of the elements on the other pages that have to do with metareviews when this is enabled/disbaled. On creation, they should already have to logic for this. %>
+		<%# This function hides and shows the rest of the elements on the other pages that have to do with metareviews when this is enabled/disbaled. On creation, they should already have to logic for this. %>
         function removeOrAddMetareview(){
             if(document.getElementById("metareview")) {
                 removeDueDateTableElement('metareview', 0);
@@ -398,7 +398,7 @@
                 );
             }
         }
-		<%=# Shows/Hides the limit in the review strategy page %>
+		<%# Shows/Hides the limit in the review strategy page %>
         function showMetaReviewLimit(){
             localStorage .setItem("meta", "show") ;
             var e = $.Event("storage");

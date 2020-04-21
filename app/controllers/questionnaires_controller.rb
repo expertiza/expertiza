@@ -8,13 +8,14 @@ class QuestionnairesController < ApplicationController
 
   # Check role access for edit questionnaire
   def action_allowed?
-    if params[:action] == "edit"
+    if ['Student'].include? current_role_name and params[:action] == "edit"
+      redirect_to action: 'edit_revision_plan', id: params[:id], team_id: params[:team_id]
+    elsif params[:action] == "edit"
       @questionnaire = Questionnaire.find(params[:id])
       (['Super-Administrator',
         'Administrator'].include? current_role_name) ||
           ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id))) ||
-          ((['Teaching Assistant'].include? current_role_name) && session[:user].instructor_id == @questionnaire.try(:instructor_id)) ||
-          ((['Student'].include? current_role_name))
+          ((['Teaching Assistant'].include? current_role_name) && session[:user].instructor_id == @questionnaire.try(:instructor_id))
     else
       ['Super-Administrator',
        'Administrator',
@@ -105,13 +106,9 @@ class QuestionnairesController < ApplicationController
 
   # Edit a questionnaire
   def edit
-    if current_role_name == 'Student'
-      redirect_to action: 'edit_revision_plan', id: params[:id], team_id: params[:team_id]
-    else
-      @questionnaire = Questionnaire.find(params[:id])
-      redirect_to Questionnaire if @questionnaire.nil?
-      session[:return_to] = request.original_url
-    end
+    @questionnaire = Questionnaire.find(params[:id])
+    redirect_to Questionnaire if @questionnaire.nil?
+    session[:return_to] = request.original_url
   end
 
   def update

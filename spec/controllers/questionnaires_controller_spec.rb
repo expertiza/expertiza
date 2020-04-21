@@ -10,6 +10,7 @@ describe QuestionnairesController do
   let(:instructor) { build(:instructor, id: 6) }
   let(:instructor2) { build(:instructor, id: 66) }
   let(:ta) { build(:teaching_assistant, id: 8) }
+  let(:student) { build(:student) }
   before(:each) do
     allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
     stub_current_user(instructor, instructor.role.name, instructor.role)
@@ -48,6 +49,7 @@ describe QuestionnairesController do
           check_access(ta).to be true
         end
       end
+
       context 'when current user is a ta but not the ta of the course which current questionnaires belongs to' do
         it 'does not allow certain action' do
           allow(TaMapping).to receive(:exists?).with(ta_id: 10, course_id: 1).and_return(false)
@@ -69,7 +71,16 @@ describe QuestionnairesController do
           check_access(instructor2).to be false
         end
       end
+
+      context 'when current user is a student' do
+        it 'redirects the user to the #edit_revision_plan action' do
+          stub_current_user(student, student.role.name, student.role)
+          get :edit
+          expect(response).to redirect_to("/questionnaires/edit_revision_plan")
+        end
+      end
     end
+
     context 'when params action is not edit and update' do
       before(:each) do
         controller.params = {id: '1', action: 'new'}
@@ -377,19 +388,6 @@ describe QuestionnairesController do
         expect(response).to redirect_to('/questionnaires/1/edit')
       end
     end
-
-    context 'when adding a question with team id' do
-      it 'redirects to questionnaires#edit revision plan page after adding new questions' do
-        question = double('Criterion', weight: 1, max_label: '', min_label: '', size: '', alternatives: '')
-        allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', id: 1, questions: [question]))
-        allow(question).to receive(:save).and_return(true)
-        params = {id: 1,
-                  question: {total_num: 2,
-                             type: 'Criterion'}, team_id: 3}
-        post :add_new_questions, params
-        expect(response).to redirect_to :action => 'edit_revision_plan', id: params[:id], team_id: params[:team_id]
-      end
-    end
   end
 
   describe '#save_all_questions' do
@@ -422,14 +420,20 @@ describe QuestionnairesController do
     end
   end
 
-  # describe '#edit_revision_plan' do
-  #   Context 'when @team_id is not nil'
-  #     it 'renders the questionnaires#edit_revision_plan page' do
-  #       allow(AssignmentTeam).to receive(:find).with().revision_plan_questions
-  #       session = {user: student}
-  #       params = {team_id: }
-  #       get :edit_revision_plan, params, session
-  #       except(response).to render_template(:edit_revision_plan)
-  #   end
-  # end
+  describe '#edit_revision_plan' do
+    before :each do
+      assignment = AssignmentTeam.new
+      allow(AssignmentTeam).to receive(:find).and_return(assignment)
+      allow(assignment).to receive(:revision_plan_questions).and_return([1, 2, 3])
+      params = {id: questionnaire.id, team_id: 1}
+      session = {user: student}
+      get :edit_revision_plan, params, session
+    end
+    it 'renders the questionnaires#edit_revision_plan page' do
+      expect(response).to render_template(:edit_revision_plan)
+    end
+    it 'returns a correct set of revision plan questions belong to the team' do
+      expect(assigns(:questions)).to eq([1, 2, 3])
+    end
+  end
 end

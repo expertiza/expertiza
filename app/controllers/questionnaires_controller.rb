@@ -9,7 +9,7 @@ class QuestionnairesController < ApplicationController
   # Check role access for edit questionnaire
   def action_allowed?
     if ['Student'].include? current_role_name and params[:action] == "edit"
-      redirect_to action: 'edit_revision_plan', id: params[:id], team_id: params[:team_id]
+      redirect_to action: 'edit_revision_plan', id: params[:id], team_id: params[:team_id], participant_id: params[:participant_id]
     elsif params[:action] == "edit"
       @questionnaire = Questionnaire.find(params[:id])
       (['Super-Administrator',
@@ -223,7 +223,7 @@ class QuestionnairesController < ApplicationController
   # Yulin: student's view of the questionnaire's creation page
   def edit_revision_plan
     @questions = AssignmentTeam.find(params[:team_id]).revision_plan_questions
-    @participant = current_role
+    @participant_id = params[:participant_id]
   end
 
   private

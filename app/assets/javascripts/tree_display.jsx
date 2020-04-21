@@ -209,10 +209,13 @@ jQuery(document).ready(function() {
                 <a title="View reports" href={"/reports/response_report?id="+(parseInt(this.props.id)/2).toString()}>
                   <img src="/assets/tree_view/view-review-report-24.png" />
                 </a>
-              <a title="View survey responses" href={"/survey_response/view_responses?id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/view-survey-24.png" />
-                </a>
-              </span>
+                <a title="View survey responses" href={"/survey_response/view_responses?id="+(parseInt(this.props.id)/2).toString()}>
+                    <img src="/assets/tree_view/view-survey-24.png" />
+                  </a>
+                <a title="Intelligent review assignment" href={"/review_bidding/assign?id="+(parseInt(this.props.id)/2).toString()}>
+                    <img src="/assets/tree_view/assign-reviewers-24.png" />
+                  </a>
+                </span>
             )
 
             if(this.props.is_intelligent) {

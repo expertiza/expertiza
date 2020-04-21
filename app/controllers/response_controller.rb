@@ -85,7 +85,7 @@ class ResponseController < ApplicationController
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = set_questionnaire
-      questions = sort_questions(@questionnaire.questions)
+      questions = sort_questions(@questionnaire.questions(@map.reviewee_id))
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
@@ -110,7 +110,7 @@ class ResponseController < ApplicationController
     if @response.nil? || AssignmentTeam.find(@map.reviewee_id).most_recent_submission.updated_at > @response.updated_at
       @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
     end
-    questions = sort_questions(@questionnaire.questions)
+    questions = sort_questions(@questionnaire.questions(@map.reviewee_id))
     init_answers(questions)
     render action: 'response'
   end
@@ -165,7 +165,7 @@ class ResponseController < ApplicationController
 
     # :version_num=>@version)
     # Change the order for displaying questions for editing response views.
-    questions = sort_questions(@questionnaire.questions)
+    questions = sort_questions(@questionnaire.questions(@map.reviewee_id))
     create_answers(params, questions) if params[:responses]
     msg = "Your response was successfully saved."
     error_msg = ""
@@ -252,7 +252,7 @@ class ResponseController < ApplicationController
     @contributor = @map.contributor
     new_response ? set_questionnaire_for_new_response : set_questionnaire
     set_dropdown_or_scale
-    @questions = sort_questions(@questionnaire.questions)
+    @questions = sort_questions(@questionnaire.questions(@map.reviewee_id))
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
   end

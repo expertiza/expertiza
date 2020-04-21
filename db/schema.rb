@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181205201208) do
+ActiveRecord::Schema.define(version: 20202104133333) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -104,8 +104,8 @@ ActiveRecord::Schema.define(version: 20181205201208) do
     t.string   "reputation_algorithm",                               limit: 255,   default: "Lauw"
     t.boolean  "is_anonymous",                                                     default: true
     t.integer  "num_reviews_required",                               limit: 4,     default: 3
-    t.integer  "num_metareviews_required",                           limit: 4,     default: 3
-    t.integer  "num_metareviews_allowed",                            limit: 4,     default: 3
+    t.integer  "num_metareviews_required",                           limit: 4
+    t.integer  "num_metareviews_allowed",                            limit: 4
     t.integer  "num_reviews_allowed",                                limit: 4,     default: 3
     t.integer  "simicheck",                                          limit: 4,     default: -1
     t.integer  "simicheck_threshold",                                limit: 4,     default: 100
@@ -630,7 +630,6 @@ ActiveRecord::Schema.define(version: 20181205201208) do
     t.string  "status",            limit: 255
     t.string  "unityID",           limit: 255
     t.string  "signup_preference", limit: 255
-    t.string  "feedback",          limit: 255
   end
 
   create_table "survey_deployments", force: :cascade do |t|

@@ -50,8 +50,33 @@
           <% team_name_color = get_team_name_color_in_list_submission(team) %>
           <td><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
           <% unless participants.empty? %>
-            <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %></td>
+              <!-- If no due dates for assignment, allow assigning grades. -->
+            <% if not @assignment.find_due_dates('submission').nil? %>
+              <!-- If due date has passed, Assign Grade. Otherwise, allow reviews. -->
+              <% if Time.now > @assignment.find_due_dates('submission').sort[-1].due_at or not @participant %>
+                <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %>
+              <% else %>
+                <% review = @review_maps.select{|m| m.reviewee_id == team.id} %>
+                <!-- If a review has not yet been performed, allow review. Otherwise, allow view/edit actions. -->
+                <% if review.size == 0 %>
+                  <%= link_to 'Perform Review', {:controller => 'review_mapping', :action => 'add_instructor_as_reviewer', :id => @assignment.id, :contributor_id => team.id, :user_id => current_user.id} %>
+                <% else %>
+                  <% r =  Response.where(["map_id IN (?)", review.last.id]).first %>
+                  <% if r %>
+                    <!-- Reviews cannot be edited after being submitted. -->
+                    <% if r.is_submitted %>
+                      <%= link_to 'View Review', {:controller => 'response', :action => 'view', :id => r.id, :return => "instructor_review"} %>
+                    <% else %>
+                      <%= link_to 'Edit Review', {:controller => 'response', :action => 'edit', :id => r.id, :return => "instructor_review"} %>
+                    <% end %>
+                  <% end %>
+                <% end %>
+              <% end %>
+            <% else %>
+              <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %>
+            <% end %>
           <% end %>
+          </td>
         <% end %>
 
         <!--Team member(s) / Participant name-->

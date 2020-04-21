@@ -379,14 +379,16 @@
             return;
         }
     }
-
+		<%=# This function hides and shows the rest of the elements on the other pages that have to do with metareviews when this is enabled/disbaled. On creation, they should already have to logic for this. %>
         function removeOrAddMetareview(){
             if(document.getElementById("metareview")) {
                 removeDueDateTableElement('metareview', 0);
-                jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
+                jQuery("#questionnaire_table_MetareviewQuestionnaire").remove();
+				hideMetaReviewLimit();
             } else {
+				showMetaReviewLimit();
                 addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
-                jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
+                jQuery("#questionnaire_table_MetareviewQuestionnaire").remove();
                 addQuestionnaireTableRow(
                         'MetareviewQuestionnaire',
                         null,
@@ -398,6 +400,28 @@
 
             <%@metareview_allowed_checkbox=true%>
 
+        }
+		<%=# Shows/Hides the limit in the review strategy page %>
+        function showMetaReviewLimit(){
+            localStorage .setItem("meta", "show") ;
+            var e = $.Event("storage");
+            e.originalEvent = {
+                key: 'meta',
+                newValue: 'show'
+            };
+            $(window).trigger(e);
+            $(window).trigger('storage', e.originalEvent);
+        }
+
+        function hideMetaReviewLimit(){
+            localStorage .setItem("meta", "hide") ;
+            var e = $.Event("storage");
+            e.originalEvent = {
+                key: 'meta',
+                newValue: 'hide'
+            };
+            $(window).trigger(e);
+            $(window).trigger('storage', e.originalEvent);
         }
         function removeOrAddSignup(){
             if(document.getElementById("signup"))

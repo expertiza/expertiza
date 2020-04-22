@@ -2,5 +2,6 @@
     <% rm = ResponseMap.find(response.map_id) %>
     <% as = Assignment.find(rm.reviewed_object_id) %>
     <% questionnaire = rm.questionnaire %>
-    <%= response.display_as_html()+"<br/><hr/><br/>" %>
+    <%= response.display_as_html() %>
+    <br/><hr/><br/>
 <% end %>

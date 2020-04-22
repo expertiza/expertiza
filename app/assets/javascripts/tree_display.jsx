@@ -213,7 +213,7 @@ jQuery(document).ready(function() {
                     <img src="/assets/tree_view/view-survey-24.png" />
                   </a>
                 <a title="Intelligent review assignment" href={"/review_bids/assign?id="+(parseInt(this.props.id)/2).toString()}>
-                    <img src="/assets/tree_view/assign-reviewers-24.png" />
+                    <img src="/assets/tree_view/assign-course-green-24.png" />
                   </a>
                 </span>
             )

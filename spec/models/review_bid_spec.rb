@@ -1,5 +1,5 @@
 describe ReviewBid do
-  let(:test) { build(:menu_item, priority: 1, participant_id: 1,  signuptopic_id: 1,assignment_id: 1) }
+  let(:test) { build(:review_bid, priority: 1, participant_id: 1,  signuptopic_id: 1,assignment_id: 1) }
   let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 8) }
@@ -14,11 +14,11 @@ describe ReviewBid do
 	
   describe "#participant_id" do
     it "returns the priority of the ReviewBid" do
-      expect(test.participant_id).to eq(2)
+      expect(test.participant_id).to eq(1)
     end
 	
 	it "validate participant_id is integer" do
-      expect(test.participant_id).to eq(2)
+      expect(test.participant_id).to eq(1)
       test.participant_id = 'a'
       expect(test).not_to be_valid
     end
@@ -38,11 +38,11 @@ describe ReviewBid do
   
   describe "#assignment_id" do
     it "returns the priority of the ReviewBid" do
-      expect(assignment_id).to eq(2)
+      expect(test.assignment_id).to eq(1)
 	end  
 	  
 	it "validate participant_id is integer" do
-      expect(test.assignment_id).to eq(2)
+      expect(test.assignment_id).to eq(1)
       test.signuptopic_id = 'a'
       expect(test).not_to be_valid
     end

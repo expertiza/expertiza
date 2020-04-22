@@ -448,6 +448,13 @@ FactoryBot.define do
     controller_action_id nil
     content_page_id nil
   end
+  
+  factory :review_bid, class: ReviewBid do
+	priority 1
+	participant_id 1
+	signuptopic_id 1
+	assignment_id 1
+  end
 
   factory :site_controller, class: SiteController do
     id 1

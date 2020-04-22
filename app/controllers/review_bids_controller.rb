@@ -33,7 +33,6 @@ class ReviewBidsController < ApplicationController
 
   def reviewer_topic_matching(bidding_data,topics,assignment_id)
   #hash of participant ids
-	ALL_NET_HTTP_ERRORS = [Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError]
 	begin
 		num_reviews_allowed = Assignment.where(id:assignment_id).pluck(:num_reviews_allowed).first
 		json_like_bidding_hash = {"users": bidding_data, "tids": topics, "q_S": num_reviews_allowed}
@@ -44,7 +43,7 @@ class ReviewBidsController < ApplicationController
 		request.body = json_like_bidding_hash.to_json
 		response = http.request(request)
 		return JSON.parse(response.body)
-	rescue *ALL_NET_HTTP_ERRORS => e
+	rescue StandardError
 		return false
 	end
   end

@@ -11,10 +11,10 @@ describe "meta-review user tests" do
                         name: "TestAssignment",
                         directory_path: 'test_assignment')
 
-    # Create a reivew
-    reivew = create(:questionnaire, name: "Review")
-    create(:question, txt: "ReviewQuestion1", questionnaire: reivew)
-    create(:assignment_questionnaire, questionnaire: reivew, used_in_round: 1)
+    # Create a review
+    review = create(:questionnaire, name: "Review")
+    create(:question, txt: "ReviewQuestion1", questionnaire: review)
+    create(:assignment_questionnaire, questionnaire: review, used_in_round: 1)
 
     # Populate deadline type
     create(:deadline_type, name: "submission")

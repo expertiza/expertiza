@@ -211,9 +211,8 @@ describe "Meta-review tests" do
       end
 
       it "If the meta-review limit on the assignment is set to 1 then a student should not be able to request a second meta review" do
-        @assignment.num_metareviews_required = 1
-        @assignment.num_metareviews_allowed = 1
-        @assignment.save
+        set_metareview_limits(1,1)
+        
         submit_metareview(@submitter)
         expect(page).to have_content 'Meta-reviews for "TestAssignment"'
         expect(page).to_not have_button "Request a new meta-review to perform"
@@ -277,9 +276,8 @@ describe "Meta-review tests" do
       end
 
       it "A student should be able to request a meta-review if they are above their required but below their allowed reviews" do
-        @assignment.num_metareviews_required = 1
-        @assignment.num_metareviews_allowed = 3
-        @assignment.save
+        set_metareview_limits(3,1)
+        
         submit_metareview(@submitter)
         submit_metareview(@submitter)
         expect(page).to have_content 'Meta-reviews for "TestAssignment"'
@@ -344,6 +342,13 @@ end
 def set_due_date(assignment_due_date, time)
   assignment_due_date.due_at = time
   assignment_due_date.save
+end
+
+# Sets and saves the meta review limits on an assignment
+def set_metareview_limits(allowed, required)
+  @assignment.num_metareviews_allowed = allowed
+  @assignment.num_metareviews_required = required
+  @assignment.save
 end
 
 # Add meta-review parameters to the assignment that was defined first

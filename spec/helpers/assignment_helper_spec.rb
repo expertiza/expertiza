@@ -1,9 +1,5 @@
 describe AssignmentHelper do
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> da51535... Merge branch 'belld19233-beta' into beta
   # E1936
   # Both AssignmentHelper#assignment_questionnaire and AssignmentHelper#questionnaire methods are removed from the
   # helpers/assignment_helper.rb since both methods contained duplicate implementation found in the different files
@@ -17,8 +13,8 @@ describe AssignmentHelper do
     it 'throws exception if type argument nil' do
       expect { questionnaire_options(nil) }.to raise_exception(NoMethodError)
     end
-<<<<<<< HEAD
-=======
+  end
+
   before(:each) do
     # Assignment Factory creates an assignment with default:
     #   name 'assignment[some number]'
@@ -158,10 +154,5 @@ describe AssignmentHelper do
     it "find by type if round and topic are given, no luck finding by round and topic" do
       expect(assignment_questionnaire(@assignment, questionnaire_type, 2, 2).id).to eql @aq_round_nil_topic_nil.id
     end
-
->>>>>>> 8f24f82... Merge branch 'beta' of git://github.com/gabalmat/expertiza into gabalmat-beta
-=======
->>>>>>> da51535... Merge branch 'belld19233-beta' into beta
   end
-
 end

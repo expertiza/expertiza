@@ -18,20 +18,22 @@ describe "Meta-review tests" do
     create(:question, txt: "ReviewQuestion1", questionnaire: review)
     create(:assignment_questionnaire, questionnaire: review, used_in_round: 1)
 
-    # Populate deadline type
-    create(:deadline_type, name: "submission")
-    create(:deadline_type, name: "review")
-    create(:deadline_right, name: 'No')
-    create(:deadline_right, name: 'Late')
-    create(:deadline_right, name: 'OK')
+    # Populate deadline type                 id
+    create(:deadline_right, name: 'No')    # 1
+    create(:deadline_right, name: 'Late')  # 2
+    create(:deadline_right, name: 'OK')    # 3
 
     # Populate assignment deadlines
     @submission_due_date = create(:assignment_due_date,
-                                 deadline_type: DeadlineType.where(name: 'submission').first,
-                                 due_at: Time.now + 1.day)
+                                  deadline_type: create(:deadline_type, name: "submission"),
+                                  submission_allowed_id: 3,        # OK
+                                  review_allowed_id: 1,            # No
+                                  review_of_review_allowed_id: 1)  # No
     @review_due_date = create(:assignment_due_date,
-                              deadline_type: DeadlineType.where(name: 'review').first,
-                              due_at: Time.now + 2.day)
+                              deadline_type: create(:deadline_type, name: "review"),
+                              submission_allowed_id: 1,            # No
+                              review_allowed_id: 3,                # OK
+                              review_of_review_allowed_id: 1)      # No
 
     # Add participants to assignment
     @submitter = create(:student, name: 'submit_and_meta_student')
@@ -372,10 +374,12 @@ end
 
 # Add meta-review parameters to the assignment that was defined first
 def add_meta_review
-  create(:deadline_type, name: "metareview")
+  
   @metareview_due_date = create(:assignment_due_date,
-                                deadline_type: DeadlineType.where(name: 'metareview').first,
-                                due_at: Time.now + 3.day)
+                                deadline_type: create(:deadline_type, name: "metareview"),
+                                submission_allowed_id: 1,         # No
+                                review_allowed_id: 1,             # No
+                                review_of_review_allowed_id: 3)   # OK
   # create a meta-review
   metareview = create(:questionnaire, name: "Metareview", type: "MetareviewQuestionnaire")
   create(:question, txt: "MetaReviewQuestion", questionnaire: metareview)

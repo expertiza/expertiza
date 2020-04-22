@@ -234,6 +234,30 @@ class ResponseController < ApplicationController
     @questions = @assignment_questionnaire.questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }
   end
 
+  def toggle_permission
+    render nothing: true unless action_allowed?
+    
+    # the response to be updated
+    @response = Response.find(params[:id])
+
+    # Error message placehoder
+    msg = ""
+    
+    begin
+      @map = @response.map
+      
+      # Updating visibility for the response object, by E2022 @SujalAhrodia -->
+      visibility = params[:visibility]
+      if (!visibility.nil?)
+        @response.update_attribute("visibility",visibility)
+      end
+    
+    rescue StandardError
+      msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
+    end
+    redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
+  end
+
   private
 
   # new_response if a flag parameter indicating that if user is requesting a new rubric to fill
@@ -340,3 +364,4 @@ class ResponseController < ApplicationController
     end
   end
 end
+

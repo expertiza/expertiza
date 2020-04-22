@@ -5,11 +5,13 @@ describe "Meta-review tests" do
   #      is capable of completing a meta review.
   #   2. The reviewer is used to review the submitters submission.
   before(:each) do
-    # Create an assignment. Defaults to 3 meta-reviews required and allowed.
+    # Create an assignment.
     # See spec/factories/factories.rb  factory :assignment for more details on defaults.
     @assignment = create(:assignment,
                          name: "TestAssignment",
-                         directory_path: 'test_assignment')
+                         directory_path: 'test_assignment',
+                         num_metareviews_allowed: 5,
+                         num_metareviews_required: 3)
 
     # Create a review
     review = create(:questionnaire, name: "Review")

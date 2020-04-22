@@ -28,6 +28,7 @@ class ReviewBidsController < ApplicationController
     bidding_data = ReviewBid.assignment_bidding_data(assignment_id,reviewers)
     matched_topics = reviewer_topic_matching(bidding_data,topics,assignment_id)
     ReviewBid.assign_matched_topics(assignment_id,reviewers,matched_topics)
+    Assignment.find(assignment_id).update(allow_review_bidding: false)
     redirect_to :back
   end
 

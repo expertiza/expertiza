@@ -157,46 +157,63 @@ describe "Meta-review tests" do
       #   expect(page).to have_content "View" 
       # end
 
-      # it "If the meta-review limit on the assignment is set to 3, then a student will see they need to submit 3 meta reviews" do
-      #   stub_current_user(@submitter, @submitter.role.name, @submitter.role)
-      #   visit '/student_task/list'
-      #   expect(page).to have_content "metareview"
-      #   click_link "TestAssignment"
-      #   expect(page).to have_content "Others' work"
-      #   click_link "Others' work"
-      #   expect(page).to have_content 'Meta-reviews for "TestAssignment"'
-      #   expect(page).to have_content 'Number of Meta-Reviews Allowed: "3"'
-      # end
+      it "When the limit and required number of meta-reviews on the assignment are equal, 
+          then a student will see they need to submit exactly that number of meta-reviews" do
+        set_metareview_limits(3,3)
+        
+        stub_current_user(@submitter, @submitter.role.name, @submitter.role)
+        visit '/student_task/list'
+        expect(page).to have_content "metareview"
+        click_link "TestAssignment"
+        expect(page).to have_content "Others' work"
+        click_link "Others' work"
+        expect(page).to have_content 'Meta-reviews for "TestAssignment"'
+        expect(page).to have_content "You should perform exactly #{@assignment.num_metareviews_required} meta-reviews"
+      end
 
-      # it "A student should see the number of meta-reviews decrement after a review is requested" do
-      #   stub_current_user(@submitter, @submitter.role.name, @submitter.role)
-      #   visit '/student_task/list'
-      #   expect(page).to have_content "metareview"
-      #   click_link "TestAssignment"
-      #   expect(page).to have_content "Others' work"
-      #   click_link "Others' work"
-      #   expect(page).to have_content 'Meta-reviews for "TestAssignment"'
-      #   expect(page).to have_content 'Number of Meta-Reviews Allowed: "3"'
-      #   click_button "Request a new meta-review to perform"
-      #   expect(page).to have_content 'Number of Meta-Reviews left: 2'
-      # end
+      it "When the limit and required number of meta-reviews on the assignment are equal, 
+          then a student will see they need to submit exactly that number of meta-reviews" do
+        set_metareview_limits(3,3)
+        
+        stub_current_user(@submitter, @submitter.role.name, @submitter.role)
+        visit '/student_task/list'
+        expect(page).to have_content "metareview"
+        click_link "TestAssignment"
+        expect(page).to have_content "Others' work"
+        click_link "Others' work"
+        expect(page).to have_content 'Meta-reviews for "TestAssignment"'
+        expect(page).to have_content "You should perform exactly #{@assignment.num_metareviews_required} meta-reviews"
+      end
 
-      # it "A student should see the number of meta-reviews decrement after they complete a review" do
-      #   stub_current_user(@submitter, @submitter.role.name, @submitter.role)
-      #   visit '/student_task/list'
-      #   expect(page).to have_content "metareview"
-      #   click_link "TestAssignment"
-      #   expect(page).to have_content "Others' work"
-      #   click_link "Others' work"
-      #   expect(page).to have_content 'Meta-reviews for "TestAssignment"'
-      #   expect(page).to have_content 'Number of Meta-Reviews Allowed: "3"'
-      #   click_button "Request a new meta-review to perform"
-      #   click_link "Begin"
-      #   fill_in "responses[0][comment]", with: "Can you explain why this is garbage?"
-      #   click_button "Save Metareview"
-      #   expect(page).to have_content "Your response was successfully saved."
-      #   expect(page).to have_content 'Number of Meta-Reviews left: 2'
-      # end
+      it "A student should see the number of meta-reviews decrement after a review is requested" do
+        stub_current_user(@submitter, @submitter.role.name, @submitter.role)
+        visit '/student_task/list'
+        expect(page).to have_content "metareview"
+        click_link "TestAssignment"
+        expect(page).to have_content "Others' work"
+        click_link "Others' work"
+        expect(page).to have_content 'Meta-reviews for "TestAssignment"'
+        expect(page).to have_content "Number of meta-reviews left: #{@assignment.num_metareviews_allowed}"
+        click_button "Request a new meta-review to perform"
+        expect(page).to have_content "Number of meta-reviews left: #{@assignment.num_metareviews_allowed - 1}"
+      end
+
+      it "A student should see the number of meta-reviews decrement after they complete a review" do
+        stub_current_user(@submitter, @submitter.role.name, @submitter.role)
+        visit '/student_task/list'
+        expect(page).to have_content "metareview"
+        click_link "TestAssignment"
+        expect(page).to have_content "Others' work"
+        click_link "Others' work"
+        expect(page).to have_content 'Meta-reviews for "TestAssignment"'
+        expect(page).to have_content "Number of meta-reviews left: #{@assignment.num_metareviews_allowed}"
+        click_button "Request a new meta-review to perform"
+        click_link "Begin"
+        fill_in "responses[0][comment]", with: "Can you explain why this is garbage?"
+        click_button "Save Metareview"
+        expect(page).to have_content "Your response was successfully saved."
+        expect(page).to have_content "Number of meta-reviews left: #{@assignment.num_metareviews_allowed - 1}"
+      end
 
       it "A student should not be able to request a meta-review on their own reviews" do
         # The reviewer is the only one with an existing review, thus they should not be able to request a meta review on it.
@@ -253,6 +270,8 @@ describe "Meta-review tests" do
       end
       
       it "User should not be able to see 'Request a new meta-review to perfom' button when they have reached the meta-review limit" do
+        set_metareview_limits(3,3)
+        
         submit_metareview(@submitter)
         submit_metareview(@submitter)
         submit_metareview(@submitter)

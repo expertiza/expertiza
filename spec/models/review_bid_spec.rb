@@ -29,7 +29,7 @@ describe ReviewBid do
       expect(test.signuptopic_id).to eq(1)
     end
 	
-	it "validate participant_id is integer" do
+	  it "validate participant_id is integer" do
       expect(test.signuptopic_id).to eq(1)
       test.signuptopic_id = 'a'
       expect(test).not_to be_valid

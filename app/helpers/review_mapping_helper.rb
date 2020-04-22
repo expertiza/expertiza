@@ -63,16 +63,23 @@ module ReviewMappingHelper
         end
       end
     end
-    question_answers
+    question_answers = Hash[question_answers.sort_by {|id, score| score}]
   end
 
   # Calculate all metrics using other helper methods
-  def get_score_metrics(review_score)
+  def get_score_metrics(review_scores, max_score)
     metrics = {}
-    metrics[:average] = average_of_round(review_score)
-    metrics[:std] = std_of_round(metrics[:average],review_score)
-    metrics[:upper_tolerance_limit] = calculate_upper_tolerance(review_score)
-    metrics[:lower_tolerance_limit] = calculate_lower_tolerance(review_score)
+    metrics[:average] = average_of_round(review_scores)
+    metrics[:std] = std_of_round(metrics[:average],review_scores)
+    metrics[:upper_tolerance_limit] = calculate_upper_tolerance(review_scores)
+    metrics[:lower_tolerance_limit] = calculate_lower_tolerance(review_scores)
+
+    review_scores_percents = review_scores.inject({}) { |h, (reviewer, answer)| h[reviewer]=(answer.to_f/max_score.to_f)*100; h}
+
+    metrics[:average_percent] = average_of_round(review_scores_percents)
+    metrics[:std_percent] = std_of_round(metrics[:average_percent],review_scores_percents)
+    metrics[:upper_tolerance_limit_percent] = calculate_upper_tolerance(review_scores_percents)
+    metrics[:lower_tolerance_limit_percent] = calculate_lower_tolerance(review_scores_percents)
     metrics
   end
 
@@ -142,13 +149,17 @@ module ReviewMappingHelper
   end
 
   #Generate the bar chart for reviewers score for a particular round for Review Conflict Report
-  def generate_score_chart(review_max_score, question_answer)
+  def generate_score_chart(review_max_score, question_answer, by_raw_points)
     upper_tolerance = calculate_upper_tolerance(question_answer)
     lower_tolerance = calculate_lower_tolerance(question_answer)
     colors = []
     scores = Array.new
     question_answer.each do |reviewer,answer|
-      scores << ((answer.to_f/review_max_score.to_f)*100).round(2)
+      if !by_raw_points
+        scores << ((answer.to_f/review_max_score.to_f)*100).round(2)
+      else  
+        scores << answer.to_f
+      end
       # Different color for conflicting bars
       if answer > upper_tolerance or answer < lower_tolerance
         colors << '#FFFF00'
@@ -163,7 +174,7 @@ module ReviewMappingHelper
       labels: labels,
       datasets: [
         {
-          label: "score%",
+          label: "percentage score",
           backgroundColor: colors,
           borderWidth: 1,
           data: scores,
@@ -179,13 +190,16 @@ module ReviewMappingHelper
           {
             ticks: {	
             beginAtZero: true,
-            stepSize: 10,
             max: 100
             }
           }
         ]
       }
     }
+    if by_raw_points
+      data[:datasets][0][:label] = "raw points score"
+      options[:scales][:xAxes][0][:ticks][:max] = review_max_score.to_f
+    end
     horizontal_bar_chart data, options
   end
 

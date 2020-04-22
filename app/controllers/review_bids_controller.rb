@@ -38,7 +38,8 @@ class ReviewBidsController < ApplicationController
     uri = URI.parse(WEBSERVICE_CONFIG["review_bidding_webservice_url"])
     http = Net::HTTP.new(uri.host, uri.port)
     request = Net::HTTP::Post.new(uri.path, {'Content-Type' => 'application/json'})
-    request.body = json_like_bidding_hash.to_json
+    http.use_ssl = true
+	request.body = json_like_bidding_hash.to_json
     response = http.request(request)
     return JSON.parse(response.body)
   end

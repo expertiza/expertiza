@@ -1,9 +1,31 @@
-<%= create_report_table_header("Reviewer" => "16%",
-                               "# teammate reviews done" => "14%",
-                               "Teammate reviewed" => "20%",
-                               "Last reviewed at" => "20%") %>
-    <%@l = -1 %>
+<!--E1877: Script to sort the table-->
+<div class='reviewreport'>
 
+<script>
+   $(function () {
+     /*E1877: Function for sorting the table */
+     $("#teammateReviewTable").tablesorter({
+
+        dateFormat : "mmddyyyy", //E1877: set the default date format
+       sortList: [[0,0]] // E1877: sort First Column by default when page loads
+     });
+   });
+ </script>
+
+<!--E1877: table teammateReviewTable modified-->
+<table id= "teammateReviewTable" cellspacing='0' cellpadding='2' border=0 class="table table-striped">
+<thead>
+<!--E1877: "sorter-true" included to sort the table using each attribute-->
+ <tr bgcolor='#CCCCCC'>
+ <th class="sorter-true" >Reviewer</th>
+ <th class="sorter-true" ># teammate reviews done</th>
+ <th class="sorter-true" >Teammate reviewed</th>
+ <th class="sorter-true" >Last reviewed at</th>
+ </tr>
+</thead>
+
+    <%@l = -1 %>
+    
     <% @reviewers.each do |r| %>
       <% @teammate_review_response_maps = ResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and type = ?", @id, r.reviewer_id, @type]) %>
       <% @user = User.find(Participant.find(r.reviewer_id).user_id) %>
@@ -53,7 +75,7 @@
                 <!--Last reviewed at-->
                 <td bgcolor=<%= @bgcolor %> align = 'left'>
                   <%= @teammate_review_response.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
-                </td></tr><tr>
+                </td>
             <% else %>
               <!-- Teammate reviewed-->
               <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left' colspan=1>
@@ -66,7 +88,7 @@
                 <% end %>
               </td>
               <!--Last reviewed at-->
-              <td bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left'>No</td></tr><tr>
+              <td bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left'>No</td>
             <% end %>
           <% end %>
           </tr>

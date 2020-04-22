@@ -49,12 +49,17 @@
 
   <%= render :partial => 'responses', :locals => {:mappings => @metareview_mappings, :title => 'Metareview'} %>
     <br/>
-    <% if @assignment.review_assignment_strategy == Assignment::RS_AUTO_SELECTED %>
-        <% if @assignment.num_metareviews_allowed - @num_metareviews_completed <= 0 %>
-            <span>Note: You can not do more than <%=@assignment.num_metareviews_allowed%> metareviews according to assignment policy.</span>
-        <% elsif @num_metareviews_in_progress == 0 %>
-            <%= render :partial => 'set_dynamic_metareview', :locals => {:assignment => @assignment} %>
-        <% end %>
+    <% if @num_metareviews_in_progress >= Assignment.max_outstanding_reviews %>
+        <br/>
+        <span>Note: You can't have more than 2 outstanding meta-reviews. You must complete one of your outstanding meta-reviews before selecting another.</span>
+    <% elsif @num_metareviews_completed == @assignment.num_metareviews_allowed %>
+        <br/>
+        <span>Note: You can not do more than <%=@assignment.num_metareviews_allowed%> metareviews according to assignment policy.</span>
+    <% elsif (!@assignment.metareview_available?(session[:user].id)) %>
+    <%= "#{@assignment.metareview_available?(session[:user].id)}" %>
+        <p><em>Meta-reviews cannot be performed at this time.</em></p>
+    <% else %>
+        <%= render :partial => 'set_dynamic_metareview', :locals => {:assignment => @assignment} %>
     <% end %>
 <% end %>
 

@@ -45,7 +45,7 @@ class ReviewBidsController < ApplicationController
 		response = http.request(request)
 		return JSON.parse(response.body)
 	rescue *ALL_NET_HTTP_ERRORS => e
-		puts "Caught HTTP New Exception from the webserivce: #{se}"
+		return false
 	end
   end
 

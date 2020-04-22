@@ -33,14 +33,19 @@ class ReviewBidsController < ApplicationController
 
   def reviewer_topic_matching(bidding_data,topics,assignment_id)
   #hash of participant ids
-    num_reviews_allowed = Assignment.where(id:assignment_id).pluck(:num_reviews_allowed).first
-    json_like_bidding_hash = {"users": bidding_data, "tids": topics, "q_S": num_reviews_allowed}
-    uri = URI.parse(WEBSERVICE_CONFIG["review_bidding_webservice_url"])
-    http = Net::HTTP.new(uri.host, uri.port)
-    request = Net::HTTP::Post.new(uri.path, {'Content-Type' => 'application/json'})
-    request.body = json_like_bidding_hash.to_json
-    response = http.request(request)
-    return JSON.parse(response.body)
+	begin
+		num_reviews_allowed = Assignment.where(id:assignment_id).pluck(:num_reviews_allowed).first
+		json_like_bidding_hash = {"users": bidding_data, "tids": topics, "q_S": num_reviews_allowed}
+		uri = URI.parse(WEBSERVICE_CONFIG["review_bidding_webservice_url"])
+		http = Net::HTTP.new(uri.host, uri.port)
+		request = Net::HTTP::Post.new(uri.path, {'Content-Type' => 'application/json'})
+		http.use_ssl = true
+		request.body = json_like_bidding_hash.to_json
+		response = http.request(request)
+		return JSON.parse(response.body)
+	rescue StandardError
+		return false
+	end
   end
 
 

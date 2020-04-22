@@ -116,11 +116,14 @@ class Questionnaire < ActiveRecord::Base
   # as well as the team's revision planning questions if team_id is supplied
   def questions(team_id = nil)
     questions = Question.where(questionnaire_id: self.id, team_id: nil)
-    if team_id
-      revision_plan_questions = Question.where(questionnaire_id: self.id, team_id: team_id)
-      revision_plan_questions.unshift(SectionHeader.new(txt: "Revision Planning", questionnaire_id: self.id, break_before: 1, seq: questions[-1].seq + 0.1))
-      questions += revision_plan_questions
-    end
+    questions += revision_plan_questions(team_id, questions[-1].seq) if team_id
     questions
+  end
+
+  def revision_plan_questions(team_id, last_seq)
+    revision_plan_questions = Question.where(questionnaire_id: self.id, team_id: team_id)
+    revision_plan_header = SectionHeader.find_by(txt: "Revision Planning")
+    revision_plan_header ||= SectionHeader.create(txt: "Revision Planning", questionnaire_id: self.id, break_before: 1, seq: last_seq + 0.5, team_id: 99999999)
+    revision_plan_questions.unshift(revision_plan_header)
   end
 end

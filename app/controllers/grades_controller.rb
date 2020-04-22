@@ -48,7 +48,7 @@ class GradesController < ApplicationController
     else # if this assignment does not have "varying rubric by rounds" feature
       @questions = {}
       questionnaires.each do |questionnaire|
-        @questions[questionnaire.symbol] = questionnaire.questions
+        @questions[questionnaire.symbol] = questionnaire.questions @team_id
       end
     end
 

@@ -16,7 +16,9 @@
         <% if Participant.get_authorization(@student.can_submit, @student.can_review, @student.can_take_quiz) !='mentor' %>
             <%= link_to "Edit name", controller: 'StudentTeams', action: 'edit', team_id: @student.team.id, student_id: @student.id %>
             <%else%>
+            <%if (@student and !team.hyperlinks.empty?) or (@student and !team.submitted_files.empty?)%>
             <%= link_to "View Submission History", submission_records_path(team_id: team.id) %>
+                <%end%>
         <%end%>
   <br/><br/>
   <b>Team members</b>
@@ -75,9 +77,26 @@
     </tr>
   </table>
         <br/><br/>
+        <%if (@student and !team.hyperlinks.empty?) or (@student and !team.submitted_files.empty?)%>
+        <b>Submissions</b>
+            </br>
+            <%end%>
+        <% participant = @student %>
+        <% if participant and !team.hyperlinks.empty? %>
+            <% team.hyperlinks.each do |link| %>
+                <a href="<%= link %>" target="_blank">- <%= link %></a><br/>
+            <% end %>
+        <% end %>
+        <br>
+        <!--Display submitted files-->
+        <% p team.submitted_files %>
+        <% if participant and !team.submitted_files.empty? %>
+            <% files = team.submitted_files %>
+            <%= display_directory_tree(participant, files, true).html_safe if files and files.length > 0 %>
+        <% end %>
     <%end%>
 
-
+    <% if Participant.get_authorization(@student.can_submit, @student.can_review, @student.can_take_quiz) !='mentor' %>
 <br/><br/>
   <b>Mentor</b>
   <br/><br/>
@@ -124,6 +143,7 @@
     </tr>
   <% end %>   <!--end team member content-->
   </table>
+        <%end%>
 
 <% end %>  
 

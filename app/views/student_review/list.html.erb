@@ -35,7 +35,7 @@
     <p><em>Reviews cannot be performed at this time</em></p >
 <% end %>
 
-<% if @assignment.metareviews_allowed(@topic_id) %>
+<% if @assignment.metareview_allowed(@topic_id) %>
     <h4>Your instructor expects you to do <%= @assignment.num_metareviews_required %> reviews. You are not allowed to do any extra metareviews. </h4>
 
 <% elsif @assignment.num_metareviews_allowed == @assignment.num_metareviews_required %>
@@ -48,7 +48,7 @@
 <h4> Number of metareviews left: <%= @assignment.num_metareviews_allowed - @num_metareviews_completed %></h4>
 
 
-  <%= render :partial => 'responses', :locals => {:mappings => @metareviews_mappings, :title => 'Metareview'} %>
+  <%= render :partial => 'responses', :locals => {:mappings => @metareview_mappings, :title => 'Metareview'} %>
     <br/>
     <% if @assignment.review_assignment_strategy == Assignment::RS_AUTO_SELECTED %>
         <% if @assignment.num_metareviews_allowed - @num_metareviews_completed <= 0 %>
@@ -57,7 +57,6 @@
             <%= render :partial => 'set_dynamic_metareview', :locals => {:assignment => @assignment} %>
         <% end %>
     <% end %>
-<% end %>
 
 <br><br>
 <a href="javascript:window.history.back()">Back</a>

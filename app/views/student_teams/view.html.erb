@@ -11,8 +11,11 @@
     <%= submit_tag "Name team" %>
   <% end %>
 <% else %>
-  <b style="text-align: center">Team Name: &nbsp;&nbsp;</b><%= @student.team.name %> &nbsp;&nbsp;&nbsp;
-    <%= link_to "Edit name", controller: 'StudentTeams', action: 'edit', team_id: @student.team.id, student_id: @student.id %>
+    <%@student.teams.each do |team|%>
+  <b style="text-align: center">Team Name: &nbsp;&nbsp;</b><%= team.name %> &nbsp;&nbsp;&nbsp;
+        <% if Participant.get_authorization(@student.can_submit, @student.can_review, @student.can_take_quiz) !='mentor' %>
+            <%= link_to "Edit name", controller: 'StudentTeams', action: 'edit', team_id: @student.team.id, student_id: @student.id %>
+        <%end%>
   <br/><br/>
   <b>Team members</b>
   <br/><br/>
@@ -29,7 +32,7 @@
       <% end %>
     </tr>
 
-    <% for member in @student.team.participants  %> <!--start team member content-->
+    <% team.participants.each do |member|  %> <!--start team member content-->
       <tr>
 	<% if Participant.get_authorization(member.can_submit, member.can_review, member.can_take_quiz) !='mentor' %>	
         <td><%= member.user.name(session[:ip]) %></td>
@@ -59,15 +62,18 @@
       <% end %>
      <% end %>
     </tr>
-  <% end %>   <!--end team member content-->
+  <% end %><!--end team member content-->
     <tr>
-      <td colspan="3">
+      <% if Participant.get_authorization(@student.can_submit, @student.can_review, @student.can_take_quiz) !='mentor' %>
+    <td colspan="3">
         <br/>
         <%= link_to "Leave team", remove_participant_student_teams_path(student_id: @student.id, team_id: @student.team.id) %>
       <td>
+          <%end%>
     </tr>
   </table>
- 
+        <br/><br/>
+    <%end%>
 
 
 <br/><br/>

@@ -28,6 +28,7 @@
   <li><i style="color:green">green</i> indicates that there is no submitted work to review within the round;</li>
   <li><i style="color:purple">purple</i> indicates that there is no review for a submitted work within the round;</li>
   <li><i style="color: #986633">brown</i> indicates that the review grade has been assigned</li>
+      <li>Tick mark indicates that the student has given consent to make his reviews public</li>
 </ul>
   <p>&nbsp;</p>
   
@@ -72,9 +73,17 @@
               <% if Team.where(id: ri.reviewee_id).length > 0 %>
                 <!--Team reviewed-->
                 <% if index == 0 %>
-                  <div id= <%= team_name_color %>>
+                        <% if visibility_public?(ri) %>
+                            <div id = <%= team_name_color %>>&#10004;
+                        <% else %>
+                          <div id= <%= team_name_color %>>
+                        <% end %>
                 <% else %>
-                  <div id = <%= team_name_color %> style="border-top: solid; border-width: 1px;">
+                        <% if visibility_public?(ri) %>
+                            <div id = <%= team_name_color %> style='border-top: solid; border-width: 1px;'>&#10004;
+                        <% else %>
+                            <div id = <%= team_name_color %> style="border-top: solid; border-width: 1px;">
+                        <% end %>
                 <% end %>
                     <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
                     <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>

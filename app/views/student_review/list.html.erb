@@ -36,28 +36,28 @@
 <% end %>
 
 <% if @assignment.metareview_allowed(@topic_id) or @assignment.get_current_stage() == "Complete" %>
-    <h2>Metareviews for "<%= @assignment.name %>"</h2>
+    <h2>Meta-reviews for "<%= @assignment.name %>"</h2>
 
     <% if @assignment.num_metareviews_allowed.nil? || @assignment.num_metareviews_allowed == -1%>
-        <h4>Your instructor expects you to do <%= @assignment.num_metareviews_required %> metareviews. You are not allowed to do any extra metareviews. </h4>
+        <h4>Your instructor expects you to do <%= @assignment.num_metareviews_required %> meta-reviews. You are not allowed to do any extra meta-reviews. </h4>
 
     <% elsif @assignment.num_metareviews_allowed == @assignment.num_metareviews_required %>
-        <h4>You should perform exactly <%= @assignment.num_metareviews_allowed %> metareviews </h4>
+        <h4>You should perform exactly <%= @assignment.num_metareviews_allowed %> meta-reviews </h4>
     <% else %>
 
-        <h4>You may perform between <%= @assignment.num_metareviews_required %> and <%= @assignment.num_metareviews_allowed %> metareviews</h4>
+        <h4>You may perform between <%= @assignment.num_metareviews_required %> and <%= @assignment.num_metareviews_allowed %> meta-reviews</h4>
     <% end %>
-    <h4>You are required to do <%= @assignment.num_metareviews_required %> metareviews</h4>
-    <h4> Number of metareviews left: <%= @assignment.num_metareviews_allowed - @num_metareviews_completed %></h4>
+    <h4>You are required to do <%= @assignment.num_metareviews_required %> meta-reviews</h4>
+    <h4> Number of meta-reviews left: <%= @assignment.num_metareviews_allowed - @num_metareviews_completed %></h4>
 
-  <%= render :partial => 'responses', :locals => {:mappings => @metareview_mappings, :title => 'Metareview'} %>
+  <%= render :partial => 'responses', :locals => {:mappings => @metareview_mappings, :title => 'Meta-review'} %>
     <br/>
     <% if @num_metareviews_in_progress >= Assignment.max_outstanding_reviews %>
         <br/>
         <span>Note: You can't have more than 2 outstanding meta-reviews. You must complete one of your outstanding meta-reviews before selecting another.</span>
     <% elsif @num_metareviews_completed == @assignment.num_metareviews_allowed %>
         <br/>
-        <span>Note: You can not do more than <%=@assignment.num_metareviews_allowed%> metareviews according to assignment policy.</span>
+        <span>Note: You can not do more than <%=@assignment.num_metareviews_allowed%> meta-reviews according to assignment policy.</span>
     <% elsif (!@assignment.metareview_available?(session[:user].id)) %>
     <%= "#{@assignment.metareview_available?(session[:user].id)}" %>
         <p><em>Meta-reviews cannot be performed at this time.</em></p>

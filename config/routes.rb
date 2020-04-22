@@ -241,8 +241,6 @@ resources :institution, except: [:destroy] do
       get :view  
       post :add_new_questions
       post :save_all_questions
-      get :edit_revision_plan
-      post :update_revision_plan
     end
   end
 

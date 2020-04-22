@@ -114,7 +114,6 @@ module GradesHelper
                              else
                                questionnaire.symbol
                              end
-      team_id = nil if round.to_s.to_i <= 1
       questions[questionnaire_symbol] = questionnaire.questions(team_id)
     end
     questions

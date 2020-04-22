@@ -39,8 +39,7 @@ class GradesController < ApplicationController
   def view
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
-    @team = @participant.team
-    @team_id = @team.id
+    @team_id = @participant.team.id
     questionnaires = @assignment.questionnaires
 
     if @assignment.varying_rubrics_by_round?

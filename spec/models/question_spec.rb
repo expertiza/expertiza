@@ -12,11 +12,11 @@ describe 'Question' do
   end
   it 'is a ReviewQuestionnaire question if it does not belong to any team' do
     question = Question.find_by(questionnaire_id: questionnaire.id, team_id: nil)
-    expect(question).to eql(question_1)
+    expect(question).to eq(question_1)
   end
   it 'is a RevisionPlanning question if it belongs to a team' do
     question = Question.find_by(questionnaire_id: questionnaire.id, team_id: team.id)
-    expect(question).to eql(question_2)
-    expect(question.team).to eql(team)
+    expect(question).to eq(question_2)
+    expect(question.team).to eq(team)
   end
 end

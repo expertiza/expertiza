@@ -93,6 +93,17 @@ class Assignment < ActiveRecord::Base
     response_map.assign_metareviewer(meta_reviewer)
   end
 
+  # Returns true if there is a meta-review task available for the user
+  def metareview_available?(user_id)
+    metareviewer = AssignmentParticipant.where(user_id: user_id, parent_id: self.id).first
+    begin
+      self.response_map_to_metareview(metareviewer)
+      true
+    rescue 
+      false
+    end
+  end
+
   # Returns a review (response) to metareview if available, otherwise will raise an error
   def response_map_to_metareview(metareviewer)
     response_map_set = Array.new(review_mappings)

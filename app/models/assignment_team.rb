@@ -183,6 +183,10 @@ class AssignmentTeam < Team
   end
   alias get_participants participants
 
+  def participant(user)
+    participant=AssignmentParticipant.find_by(user_id: user.id, parent_id: self.parent_id)
+    participant
+  end
   # Delete the team
   def delete
     if self[:type] == 'AssignmentTeam'

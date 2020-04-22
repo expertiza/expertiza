@@ -56,9 +56,11 @@
 
         <!--Team member(s) / Participant name-->
           <td>
-              <% users_for_curr_team.each do |user| %>
-                  <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
-                  (<%= user.fullname(session[:ip])%>)<br>
+              <% participants.each do |participant| %>
+                <% if Participant.get_authorization(participant.can_submit, participant.can_review, participant.can_take_quiz) !='mentor' %>
+                  <%= link_to participant.user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => participant.user.name(session[:ip])}), :method => :post %>
+                  (<%= participant.user.fullname(session[:ip])%>)<br>
+                <%end%>
               <% end %>
           </td>
 

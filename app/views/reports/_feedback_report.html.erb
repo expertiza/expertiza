@@ -31,14 +31,21 @@
           <% end %>
 
           <!--Rejoinder-->
-        <% ['one', 'two', 'three'].each do |round| %>
-          <% if @first_col_identifier == true %>
-            <% @reviewer_name = r.user.fullname(session[:ip]) %>
+         <% ['one', 'two', 'three'].each do |round| %>
+      <% if @first_col_identifier == true %>
+        <% @reviewer_name = r.user.fullname(session[:ip]) %>
+        <%row_span = @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>
+        <%if row_span == 0 %>
+          <tr><td rowspan = <% 1 %>>
+            <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id => @id %>
+          </td>
+          <%else %>
             <tr><td rowspan= <%= @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>>
               <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id => @id %>
             </td>
-            <% @first_col_identifier = false %>
-          <% end %>
+          <%end %>
+          <% @first_col_identifier = false %>
+      <% end %>
 
           <!--# author feedbacks done-->
           <% @rspan_certain_round = instance_variable_get("@rspan_round_#{round}") %>
@@ -62,7 +69,7 @@
                 (<%= Participant.find(rr.response_map.reviewer_id).user.fullname(session[:ip]) %>)
               </td>
               <!--Last rejoined at-->
-              <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td></tr><tr>
+              <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
             <% else %>
               <% @reviewee_name = Participant.find(@frm.reviewee_id).user.fullname(session[:ip]) %>
               <% if Response.exists?(map_id: @frm.id) %>
@@ -75,7 +82,7 @@
                 <!--Last rejoined at-->
                 <td bgcolor=<%= @bgcolor %> align='left'>
                   <%= feedback_response.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
-                </td></tr><tr>
+                </td></tr><tr class="tablesorter-childRow">
               <% else %>
                 <!--Review response rejoined-->
                 <td id = "green" bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left' colspan=1>
@@ -83,7 +90,7 @@
                   (<%= @reviewee_name %>)
                 </td>
                 <!--Last rejoined at-->
-                <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td></tr><tr>
+                <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
               <% end %>
             <% end %>
           <% end %>
@@ -94,10 +101,18 @@
           <% @l = @l+1 %>
           <% (@l % 2 == 0) ? @bgcolor = "#ffffff" : @bgcolor = "#f9f9f9" %>
           <!--Rejoinder-->
-          <tr><td bgcolor=<%= @bgcolor %> rowspan= <%= @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>>
-            <% @reviewer_name = r.user.fullname(session[:ip]) %>
-            <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id => @id %>
-          </td>
+           <%row_span= @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>
+    <% if row_span == 0 %>
+        <tr><td bgcolor=<%= @bgcolor %> rowspan=  <%1%>>
+          <% @reviewer_name = r.user.fullname(session[:ip]) %>
+          <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id => @id %>
+        </td>
+     <%else %>
+      <tr><td bgcolor=<%= @bgcolor %> rowspan= <%= @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>>
+        <% @reviewer_name = r.user.fullname(session[:ip]) %>
+        <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id => @id %>
+      </td>
+        <%end %>
 
           <!--# author feedbacks done-->
           <% unless @rspan == 0 %>
@@ -116,7 +131,7 @@
                 (<%= reviewee_name = Participant.find(rr.response_map.reviewer_id).user.fullname(session[:ip]) %>)
               </td>
               <!--Last rejoined at-->
-              <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td></tr><tr>
+              <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
             <% else %>
               <% @reviewee_name = Participant.find(@frm.reviewee_id).user.fullname(session[:ip]) %>
               <% if Response.exists?(map_id: @frm.id) %>
@@ -129,7 +144,7 @@
                 <!--Last rejoined at-->
                 <td bgcolor=<%= @bgcolor %> align='left'>
                   <%= feedback_response.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
-                </td></tr><tr>
+                </td></tr><tr class="tablesorter-childRow">
               <% else %>
                 <!--Review response rejoined-->
                 <td id = "green" bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left' colspan=1>
@@ -137,7 +152,7 @@
                   (<%= @reviewee_name %>)
                 </td>
                 <!--Last rejoined at-->
-                <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td></tr><tr>
+                <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
               <% end %>
             <% end %>
           <% end %>
@@ -145,3 +160,44 @@
     <% end %>
   </table>
 </div>
+
+<!--E1877: custom parser added to sort the metric data-->
+ <script>
+     $(function () {
+         /*E1877: Function for sorting the table */
+         $("table").tablesorter({
+             textSorter : {
+                 1: function (a, b) {
+                     if (a === b) {
+                         return 0;
+                     }
+                     //E1877: values split by "/", to get the digits before and after it.
+                     var res1 = a.split("/");
+                     var res2 = b.split("/");
+                     res1[1] = res1[1].split(" ")[0];
+                     res2[1] = res2[1].split(" ")[0];
+                     //E1877: comparison of int values
+                     if(parseInt(res1[0])>parseInt(res2[0])){
+                         return 1;
+                     }
+                     else if(parseInt(res1[0])<parseInt(res2[0])){
+                         return -1;
+                     }
+                     else{
+                         if(parseInt(res1[1])>parseInt(res2[1])){
+                             return 1;
+                         }
+                         else if(parseInt(res1[1])<parseInt(res2[1])){
+                             return -1;
+                         }
+                         else{
+                             return 0;
+                         }
+                     }
+                 }
+             }
+         });
+     });
+
+
+ </script>

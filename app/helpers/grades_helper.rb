@@ -118,4 +118,15 @@ module GradesHelper
     end
     questions
   end
+
+  # used to determine whether a review was done by a course staff
+  # course staff is defined as an Instructor or Teaching Assistant
+  def review_done_by_course_staff?(staff)
+    if staff.nil?
+      false
+    else
+      role = Role.find(User.find(Participant.find(ResponseMap.find(Response.find(staff.id).map_id).reviewer_id).user_id).role_id).name
+      role == ("Instructor" || "Teaching Assistant") ? true : false
+    end
+  end
 end

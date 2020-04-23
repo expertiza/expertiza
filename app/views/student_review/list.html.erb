@@ -13,6 +13,8 @@
 <h4>You are required to do <%= @assignment.num_reviews_required %> reviews</h4>
 <h4> Number of reviews left: <%= @assignment.num_reviews_allowed - @num_reviews_completed %></h4>
 
+<%= link_to "Sample Reviews" , sample_reviews_path %>
+
 <% if check_reviewable_topics(@assignment) or @assignment.get_current_stage(@topic_id) == "Finished" %>
     <%= render :partial => 'responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>
     <!-- Temporary fix for Staggered Deadline assignment issue preventing students from reviewing 04-23-19 -->

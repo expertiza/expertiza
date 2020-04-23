@@ -18,11 +18,6 @@
 <ul>
   <%if @topics.size > 0 %>
     <% if @authorization == 'participant' || @authorization == 'submitter' %>
-		<% if @has_web_service_for_review_bid_invoked %>
-        <li>
-        <%= link_to "Review bid",{:controller => 'review_bidding', :action => 'review_bid', :id => @participant.id} %>(Bid a topic for review)</
-        </li>
-        <% end %>
       <li>
         <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.id%>
         (Sign up for a topic)
@@ -39,12 +34,6 @@ to display the label "Your team" in the student assignment tasks-->
       </li>
     <% end %>
   <%end%>
-
-  <!--testing the link to review bidding-->
-  <li>
-    <%= link_to 'Review Bidding test', :controller=>'review_bids', :action=>'review_bid', :id => @participant.id%>
-    (Bid for review topics)
-  </li>
 
   <!--Your work-->
   <% if @authorization == 'participant' or @can_submit == true %>

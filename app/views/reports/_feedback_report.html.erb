@@ -55,6 +55,9 @@
           <tr><td rowspan = <% 1 %>>
             <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id => @id %>
           </td>
+	  <td></td>
+          <td></td>
+          <td></td>
           <%else %>
             <tr><td rowspan= <%= @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>>
               <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id => @id %>
@@ -123,6 +126,9 @@
           <% @reviewer_name = r.user.fullname(session[:ip]) %>
           <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id => @id %>
         </td>
+        <td></td>
+        <td></td>
+        <td></td>
      <%else %>
       <tr><td bgcolor=<%= @bgcolor %> rowspan= <%= @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>>
         <% @reviewer_name = r.user.fullname(session[:ip]) %>
@@ -187,6 +193,15 @@
             sortList: [[0, 0]], //sort First Column by default when page loads
             textSorter: {
                       1: function (a, b) {
+                    if (a.length == 0 && b.length == 0){
+                        return 0;
+                    }
+                    if (a.length == 0){
+                        return -1;
+                    }
+                    if (b.length == 0){
+                        return 1;
+                    }
                      if (a === b) {
                          return 0;
                      }

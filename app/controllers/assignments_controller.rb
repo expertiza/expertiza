@@ -4,7 +4,6 @@ class AssignmentsController < ApplicationController
   autocomplete :user, :name
   before_action :authorize
 
-  # Inital PR for E2026
   def action_allowed?
     if %w[edit update list_submissions].include? params[:action]
       assignment = Assignment.find(params[:id])
@@ -385,19 +384,11 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  def convert_to_boolean(expression)
-    expression == 'true'
-  end
-
   def update_feedback_assignment_form_attributes
     if params[:set_pressed][:bool] == 'false'
       flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."
     else
-      vary_by_topic_desired = convert_to_boolean(params[:vary_by_topic])
-      # Update based on the attributes rec'd in the form
-      # This also updates assignment_questionnaire records, including adding / removing records
-      # as "vary by topic" selection changes
-      if @assignment_form.update_attributes(assignment_form_params, current_user, vary_by_topic_desired)
+      if @assignment_form.update_attributes(assignment_form_params, current_user)
         flash[:note] = 'The assignment was successfully saved....'
       else
         flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"

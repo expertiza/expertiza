@@ -1,6 +1,7 @@
 class ReviewBid < ActiveRecord::Base
   belongs_to :topic, class_name: 'SignUpTopic'
   belongs_to :participant, class_name: 'Participant'
+  belongs_to :assignment, class_name: 'Assignment'
 
   def self.assignment_reviewers(assignment_id)
     #assignment id is the paramter to hold assignment id of reviewer.
@@ -32,7 +33,8 @@ class ReviewBid < ActiveRecord::Base
       bidding_data['priority'] << bid.priority
       # bidding_data['time'] << bid.updated_at
       bidding_data['time'] << 1
-      bidding_data['tid'] << bid.sign_up_topic_id
+      #bidding_data['tid'] << bid.sign_up_topic_id
+      bidding_data['tid'] << bid.topic_id
     end
     return bidding_data
   end

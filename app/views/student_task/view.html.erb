@@ -74,6 +74,18 @@ to display the label "Your team" in the student assignment tasks-->
     </li>
   <% end %>
 
+  <% if@authorization == 'participant' or @can_review == true  %>
+    <li>
+      <% @alias_name = "Bid for Reviews" %>
+      <% if review_deadline?(@assignment) and  @assignment.allow_review_bidding %>
+        <%= link_to "#{@alias_name}", :controller=>'review_bids', :action=>'review_bid', :id => @participant.id%>
+      <% else %>
+        <font color="gray"><%= @alias_name%></font>
+      <% end %>  
+      (You can Bid for reviewing other's work)
+    </li>
+  <% end %>
+
     <!--Quiz-->
   <%if @assignment.require_quiz%>
     <% if @authorization == 'participant' or @can_take_quiz == true %>

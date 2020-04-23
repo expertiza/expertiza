@@ -101,19 +101,19 @@
             
               <% i = 1 %>
               <% vm.list_of_reviews.each do |review| %>
-                  <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
-                  <!-- instructor reviews labelled with a balck star under the Review heading -->
+                <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
+                <!-- instructor reviews labeled with a black star under the Review heading -->
+                <% if (['Student'].include? @current_role_name) && (@assignment.is_anonymous) %>
+                  <% review_name = "Review " + i.to_s  %>
+                <% else %>
+                  <% review_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
+                <% end %>
+                <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= review_name %></a>
                   <% if review_done_by_course_staff?(review) %>
-                    <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>
-                      <br><span class="glyphicon glyphicon-star" style="margin:auto; display:table"></span>
-                    </th>
-                  <% elsif (['Student'].include? @current_role_name) && (@assignment.is_anonymous) %>
-                    <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>  </th>
-                  <% else %>
-                      <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
-                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
+                    <br><span class="glyphicon glyphicon-star" style="margin:auto; display:table"></span>
                   <% end %>
-                  <% i += 1 %>
+                </th>
+                <% i += 1 %>
               <% end %>
 
               <th class="sorter-true" align="right" >

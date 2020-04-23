@@ -19,6 +19,14 @@
         I don't care which topic I review.
         <p><b>Select a topic below to begin a new review:</b></p>
 
+            <!--testing the link to review bidding-->
+    <% if @assignment.allow_review_bidding %>
+      <li>
+        <%= link_to 'Bid for Reviews', :controller=>'review_bids', :action=>'review_bid', :id => @participant.id%>
+        (You can Bid for reviewing other's work)
+      </li>
+    <% end %>
+
     <table cellpadding="0" id="topic_list">
       <% #candidate_topics_to_review = assignment.candidate_topics_to_review(session[:user]).to_a %>
       <% candidate_topics_to_review = assignment.candidate_topics_to_review(participant).to_a %>

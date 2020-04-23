@@ -407,7 +407,7 @@ class ReviewMappingController < ApplicationController
   def assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
     if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0)
                         .where("created_at > :time",
-                              time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
+                               time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
 
       participants_with_insufficient_review_num = []
       participants_hash.each do |participant_id, review_num|
@@ -440,8 +440,8 @@ class ReviewMappingController < ApplicationController
       end
     end
     @@time_create_last_review_mapping_record = ReviewResponseMap.
-                                              where(reviewed_object_id: assignment_id).
-                                              last.created_at
+                                               where(reviewed_object_id: assignment_id).
+                                               last.created_at
   end
 
   def peer_review_strategy(assignment_id, review_strategy, participants_hash)

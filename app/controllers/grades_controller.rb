@@ -39,11 +39,11 @@ class GradesController < ApplicationController
   def view
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
-    @team_id = @participant.team.id #E2016: team_id is used for revision planning
+    @team_id = @participant.team.id # E2016: team_id is used for revision planning
     questionnaires = @assignment.questionnaires
 
     if @assignment.varying_rubrics_by_round?
-      @questions = retrieve_questions questionnaires, @assignment.id, @team_id #E2016: team_id is used for revision planning
+      @questions = retrieve_questions questionnaires, @assignment.id, @team_id # E2016: team_id is used for revision planning
     else # if this assignment does not have "varying rubric by rounds" feature
       @questions = {}
       questionnaires.each do |questionnaire|
@@ -108,7 +108,7 @@ class GradesController < ApplicationController
         end
       end
       vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
-      vmquestions = questionnaire.questions(@team_id)
+      vmquestions = questionnaire.questions(@team_id, @round)
       vm.add_questions(vmquestions)
       vm.add_team_members(@team)
       vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)

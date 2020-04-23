@@ -114,7 +114,8 @@ module GradesHelper
                              else
                                questionnaire.symbol
                              end
-      questions[questionnaire_symbol] = questionnaire.questions(team_id) #E2016: questions with team_id are created in revision planning
+
+      questions[questionnaire_symbol] = questionnaire.questions(team_id, round) # E2016: questions with team_id are created in revision planning
     end
     questions
   end

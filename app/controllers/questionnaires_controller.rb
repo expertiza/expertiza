@@ -207,7 +207,8 @@ class QuestionnairesController < ApplicationController
     questionnaire_id = params[:id]
     begin
       if params[:save]
-        update_questions(questionnaire_id, params[:question])
+        update_questions(params[:question])
+        adjust_question_seq(questionnaire_id, params[:team_id]) if params[:team_id]
         flash[:success] = 'All questions have been successfully saved!'
       end
     rescue StandardError
@@ -231,8 +232,7 @@ class QuestionnairesController < ApplicationController
 
   # Yulin: update questions that are already created. extract from the existing implementation that is
   # used many times in this file.
-  def update_questions(questionnaire_id, questions)
-    seq = next_seq(questionnaire_id) unless questions.empty?
+  def update_questions(questions)
     questions.each_pair do |k, v|
       @question = Question.find(k)
       # example of 'v' value
@@ -240,8 +240,20 @@ class QuestionnairesController < ApplicationController
       v.each_pair do |key, value|
         @question.send(key + '=', value) if @question.send(key) != value
       end
-      @question.send('seq=', seq) if @question.send('seq') != seq
       @question.save
+    end
+  end
+
+  # Always move questions created by students to after questions in the original rubric
+  def adjust_question_seq(questionnaire_id, team_id)
+    # find the largest seq value in the questionnaire and assign each revision plan question with the seq
+    # value larger than the largest seq value
+    question_with_largest_seq = Question.where(questionnaire_id: questionnaire_id).order('seq ASC').last
+    seq = (question_with_largest_seq.seq + 1).round(0) if question_with_largest_seq
+    questions = Question.where(questionnaire_id: questionnaire_id, team_id: team_id).order('seq ASC')
+    questions.each do |question|
+      question.send('seq=', seq)
+      question.save
       seq += 1
     end
   end
@@ -329,12 +341,6 @@ class QuestionnairesController < ApplicationController
   def question_params
     params.require(:question).permit(:txt, :weight, :questionnaire_id, :seq, :type, :size,
                                      :alternatives, :break_before, :max_label, :min_label, :team_id)
-  end
-
-  # Yulin: return the largest seq value among all Questions in the questionnaire they belong
-  def next_seq(questionnaire_id)
-    question_with_largest_seq = Question.where(questionnaire_id: questionnaire_id).order('seq ASC').last
-    (question_with_largest_seq.seq + 1).round(0)
   end
 
   # FIXME: These private methods belong in the Questionnaire model

@@ -14,11 +14,11 @@ class ReviewMappingController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'add_dynamic_reviewer',
-          'show_available_submissions',
-          'assign_reviewer_dynamically',
-          'assign_metareviewer_dynamically',
-          'assign_quiz_dynamically',
-          'start_self_review'
+        'show_available_submissions',
+        'assign_reviewer_dynamically',
+        'assign_metareviewer_dynamically',
+        'assign_quiz_dynamically',
+        'start_self_review'
       true
     else ['Instructor', 'Teaching Assistant', 'Administrator'].include? current_role_name
     end
@@ -46,50 +46,33 @@ class ReviewMappingController < ApplicationController
   def add_reviewer
     assignment = Assignment.find(params[:id])
     topic_id = params[:topic_id]
-    if params[:user][:name] == ""
-      msg = 'User field cannot be empty'
-    else
-      user_id = User.where(name: params[:user][:name]).first.id rescue nil
-      msg = "Cannot find user '" + params[:user][:name] + "'" unless user_id
-    end
+    user_id = User.where(name: params[:user][:name]).first.id
     # If instructor want to assign one student to review his/her own artifact,
     # it should be counted as “self-review” and we need to make /app/views/submitted_content/_selfreview.html.erb work.
+    if TeamsUser.exists?(team_id: params[:contributor_id], user_id: user_id)
+      flash[:error] = "You cannot assign this student to review his/her own artifact."
+    else
+      # Team lazy initialization
+      SignUpSheet.signup_team(assignment.id, user_id, topic_id)
+      msg = ''
+      begin
+        user = User.from_params(params)
+        # contributor_id is team_id
+        regurl = url_for id: assignment.id,
+                         user_id: user.id,
+                         contributor_id: params[:contributor_id]
 
-    participant_temp = Participant.where(user_id: user_id, parent_id: params[:id]).first rescue nil
-    # msg = 'User field cannot be empty'
-
-    # Check for user field is empty or not
-    if user_id
-      if TeamsUser.exists?(team_id: params[:contributor_id], user_id: user_id)
-        flash[:error] = "You cannot assign this student to review his/her own artifact."
-
-        # If the user is not allowed to review this assignment
-      elsif !participant_temp or !participant_temp.can_review
-        flash[:error] = "This user is not authorized to review the assignment."
-        msg = 'This user is not authorized to review the assignment.'
-      else
-        # Team lazy initialization
-        SignUpSheet.signup_team(assignment.id, user_id, topic_id)
-
-        begin
-          user = User.from_params(params)
-          # contributor_id is team_id
-          regurl = url_for id: assignment.id,
-                           user_id: user.id,
-                           contributor_id: params[:contributor_id]
-
-          # Get the assignment's participant corresponding to the user
-          reviewer = get_reviewer(user, assignment, regurl)
-          # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
-          # to treat all assignments as team assignments
-          if ReviewResponseMap.where(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id).first.nil?
-            ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
-          else
-            raise "The reviewer, \"" + reviewer.name + "\", is already assigned to this contributor."
-          end
-        rescue StandardError => e
-          msg = e.message
+        # Get the assignment's participant corresponding to the user
+        reviewer = get_reviewer(user, assignment, regurl)
+        # ACS Removed the if condition(and corressponding else) which differentiate assignments as team and individual assignments
+        # to treat all assignments as team assignments
+        if ReviewResponseMap.where(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id).first.nil?
+          ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
+        else
+          raise "The reviewer, \"" + reviewer.name + "\", is already assigned to this contributor."
         end
+      rescue StandardError => e
+        msg = e.message
       end
     end
     redirect_to action: 'list_mappings', id: assignment.id, msg: msg
@@ -313,17 +296,17 @@ class ReviewMappingController < ApplicationController
         teams << team
       end
     end
-    num_reviews_per_student = params[:num_reviews_per_student].to_i
+    student_review_num = params[:num_reviews_per_student].to_i
     submission_review_num = params[:num_reviews_per_submission].to_i
     calibrated_artifacts_num = params[:num_calibrated_artifacts].to_i
     uncalibrated_artifacts_num = params[:num_uncalibrated_artifacts].to_i
     if calibrated_artifacts_num.zero? and uncalibrated_artifacts_num.zero?
       # check for exit paths first
-      if num_reviews_per_student == 0 and submission_review_num == 0
+      if student_review_num == 0 and submission_review_num == 0
         flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
-      elsif num_reviews_per_student != 0 and submission_review_num != 0
+      elsif student_review_num != 0 and submission_review_num != 0
         flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
-      elsif num_reviews_per_student >= teams.size
+      elsif student_review_num >= teams.size
         # Exception detection: If instructor want to assign too many reviews done
         # by each student, there will be an error msg.
         flash[:error] = 'You cannot set the number of reviews done ' \
@@ -331,7 +314,7 @@ class ReviewMappingController < ApplicationController
                          '[or "participants" if it is an individual assignment].'
       else
         # REVIEW: mapping strategy
-        automatic_review_mapping_strategy(assignment_id, participants, teams, num_reviews_per_student, submission_review_num)
+        automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num, submission_review_num)
       end
     else
       teams_with_calibrated_artifacts = []
@@ -351,29 +334,23 @@ class ReviewMappingController < ApplicationController
   end
 
   def automatic_review_mapping_strategy(assignment_id,
-                                        participants, teams, num_reviews_per_student = 0,
+                                        participants, teams, student_review_num = 0,
                                         submission_review_num = 0)
     participants_hash = {}
     participants.each {|participant| participants_hash[participant.id] = 0 }
     # calculate reviewers for each team
-    if num_reviews_per_student != 0 and submission_review_num == 0
-      review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, teams, num_reviews_per_student)
-    elsif num_reviews_per_student == 0 and submission_review_num != 0
+    if student_review_num != 0 and submission_review_num == 0
+      review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, teams, student_review_num)
+    elsif student_review_num == 0 and submission_review_num != 0
       review_strategy = ReviewMappingHelper::TeamReviewStrategy.new(participants, teams, submission_review_num)
     end
 
-    # student_review_num was ambiguous. Changed it to num_reviews_per_student.
-    # Following test was added to avoid bug when review_strategy is null.  But, the if statement immediately above
-    # should be fixed.  StudentReviewStrategy is very likely an artifact of "individual assignments," which were
-    # removed from Expertiza years ago.  Try removing that branch of the if statement, as wall as all other refs to them. -efg
-    if review_strategy
-      peer_review_strategy(assignment_id, review_strategy, participants_hash)
+    peer_review_strategy(assignment_id, review_strategy, participants_hash)
 
-      # after assigning peer reviews for each team,
-      # if there are still some peer reviewers not obtain enough peer review,
-      # just assign them to valid teams
-      assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
-    end
+    # after assigning peer reviews for each team,
+    # if there are still some peer reviewers not obtain enough peer review,
+    # just assign them to valid teams
+    assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
   end
 
   # This is for staggered deadline assignment
@@ -429,8 +406,8 @@ class ReviewMappingController < ApplicationController
 
   def assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
     if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0)
-                        .where("created_at > :time",
-                               time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
+           .where("created_at > :time",
+                  time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
 
       participants_with_insufficient_review_num = []
       participants_hash.each do |participant_id, review_num|
@@ -463,8 +440,8 @@ class ReviewMappingController < ApplicationController
       end
     end
     @@time_create_last_review_mapping_record = ReviewResponseMap.
-                                               where(reviewed_object_id: assignment_id).
-                                               last.created_at
+        where(reviewed_object_id: assignment_id).
+        last.created_at
   end
 
   def peer_review_strategy(assignment_id, review_strategy, participants_hash)

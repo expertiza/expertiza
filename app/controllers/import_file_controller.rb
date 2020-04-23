@@ -45,8 +45,6 @@ class ImportFileController < ApplicationController
     end
     @current_file = params[:file]
     @current_file_contents = @current_file.read
-    # Removing BOM characters from the file - svshingt
-    @current_file_contents.sub!("\xEF\xBB\xBF".force_encoding("ASCII-8BIT"), '')
     @contents_grid = parse_to_grid(@current_file_contents, @delimiter)
     @contents_hash = parse_to_hash(@contents_grid, params[:has_header])
   end

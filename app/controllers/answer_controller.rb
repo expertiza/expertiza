@@ -4,11 +4,11 @@ class AnswerController < ApplicationController
 
   def action_allowed?
     case params[:action]
-      when 'index'
-        ['Instructor',
-         'Teaching Assistant',
-         'Student',
-         'Administrator'].include? current_role_name
+    when 'index'
+      ['Instructor',
+       'Teaching Assistant',
+       'Student',
+       'Administrator'].include? current_role_name
     end
   end
 
@@ -23,9 +23,9 @@ class AnswerController < ApplicationController
     end
     # get all answers given the questionaire and response id
     question_answers = Question.joins(join_query)
-                               .select('answers.*, questions.txt as qtxt, questions.type as qtype, questions.seq as qseq')
-                               .where(where_query)
-                               .order("seq asc")
+                           .select('answers.*, questions.txt as qtxt, questions.type as qtype, questions.seq as qseq')
+                           .where(where_query)
+                           .order("seq asc")
     render json: question_answers
   end
 end

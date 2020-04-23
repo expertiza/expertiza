@@ -4,11 +4,15 @@ describe 'AssignmentTeam' do
   let(:assignment) { build(:assignment, id: 1) }
   let(:participant1) { build(:participant, id: 1) }
   let(:participant2) { build(:participant, id: 2) }
+  let(:user) { build(:student, id: 1, name: 'no name', fullname: 'no one', participants: [participant1]) }
   let(:user1) { build(:student, id: 2) }
   let(:user2) { build(:student, id: 3) }
   let(:review_response_map) { build(:review_response_map, reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 1) }
   let(:topic) { build(:topic, id: 1, topic_name: "New Topic") }
   let(:signedupteam) { build(:signed_up_team) }
+  let(:team_user) { build(:team_user, id: 1, user: user) }
+  let(:team3) { build(:assignment_team, id: 3, name: 'full team', users: [user,user1,user2]) }
+
 
   describe "#hyperlinks" do
     context "when current teams submitted hyperlinks" do
@@ -111,6 +115,39 @@ describe 'AssignmentTeam' do
       end
     end
   end
+
+  describe '#add_member' do
+    context 'when parameterized user has already joined in current team' do
+      it 'raise an error' do
+        expect { team.add_member(user) }.to raise_error(RuntimeError, "The user #{user.name} is already a member of the team #{team.name}")
+      end
+    end
+
+    context 'when parameterized user did not join in current team yet' do
+      context 'when current team is not full' do
+        it 'does not raise an error' do
+          allow_any_instance_of(Team).to receive(:user?).with(user).and_return(false)
+          allow_any_instance_of(Team).to receive(:full?).and_return(false)
+          allow(TeamsUser).to receive(:create).with(user_id: 1, team_id: 1).and_return(team_user)
+          allow(TeamNode).to receive(:find_by).with(node_object_id: 1).and_return(double('TeamNode', id: 1))
+          allow_any_instance_of(Team).to receive(:add_participant).with(1, user).and_return(double('Participant'))
+          expect(team.add_member(user)).to be true
+        end
+      end
+
+      context 'when current team is full' do
+        it 'cannot accept new member' do
+          allow_any_instance_of(Team).to receive(:user?).with(user).and_return(false)
+          allow_any_instance_of(Team).to receive(:full?).and_return(true)
+          allow(TeamsUser).to receive(:create).with(user_id: 1, team_id: 1).and_return(team_user)
+          allow(TeamNode).to receive(:find_by).with(node_object_id: 1).and_return(double('TeamNode', id: 1))
+          allow_any_instance_of(Team).to receive(:add_participant).with(1, user).and_return(double('Participant'))
+          expect(team3.add_member(user)).to be false
+        end
+      end
+    end
+  end
+
 
   describe "#participants" do
     context "when an assignment team has two participants" do

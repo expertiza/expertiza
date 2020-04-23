@@ -6,7 +6,7 @@ class Team < ActiveRecord::Base
   has_many :signed_up_teams, dependent: :destroy
   has_many :bids, dependent: :destroy
   has_paper_trail
-
+  has_many :assignment_teams, class_name: 'AssignmentTeam', foreign_key: 'parent_id'
   scope :find_team_for_assignment_and_user, lambda {|assignment_id, user_id|
     joins(:teams_users).where("teams.parent_id = ? AND teams_users.user_id = ?", assignment_id, user_id)
   }
@@ -49,6 +49,45 @@ class Team < ActiveRecord::Base
     users.include? user
   end
 
+  def add_member(user, _assignment_id = nil)
+    raise "The user #{user.name} is already a member of the team #{self.name}" if user?(user)
+    can_add_member = false
+    unless full?
+      can_add_member = true
+      t_user = TeamsUser.create(user_id: user.id, team_id: self.id)
+      parent = TeamNode.find_by(node_object_id: self.id)
+      TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
+      add_participant(self.parent_id, user)
+      ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{self.id}")
+
+      # only assign mentor when number of mentor > 0
+      if Participant.where(['can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', 0, 0, 0, self.parent_id]).count > 0
+        # for new added member and team already has mentor
+        if half? && have_mentor?
+          members = TeamsUser.where(team_id: self.id)
+          members.each do |member|
+            if Participant.where(['user_id = ? and can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', member.user_id ,0, 0, 0, self.parent_id]).count > 0
+              mentor=member
+              Mailer.notify_single_team_member(user,mentor,self)
+            end
+          end
+        # num >= max/2 and dont have mentor yet
+        else if half? && !have_mentor?
+              mentor=assign_mentor
+              new_mentor = TeamsUser.create(user_id: mentor.user_id, team_id: self.id)
+              TeamUserNode.create(parent_id: parent.id, node_object_id: new_mentor.id)
+              ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{self.id}")
+
+              # Email notification
+              Mailer.notify_mentor(mentor,self)
+              Mailer.notify_team_members(mentor,self)
+             end
+	   
+        end
+      end
+    end
+    can_add_member
+  end
 
 
 
@@ -123,8 +162,7 @@ class Team < ActiveRecord::Base
       min_team_size.times do
         break if next_team_member_index >= users.length
         user = users[next_team_member_index]
-        team.add_member(user, parent.id)
-	team.remove_mentor
+        team.add_member(user, parent.id)	
         next_team_member_index += 1
       end
     end

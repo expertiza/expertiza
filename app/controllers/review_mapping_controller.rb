@@ -78,16 +78,21 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment.id, msg: msg
   end
 
+  # Enable a staff user (Instructor, TA) to review all submissions for an assignment when they are a participant.
+  # Will redirect to the list_submissions view.
   def add_instructor_as_reviewer
     assignment = Assignment.find(params[:id])
     user = User.from_params(params)
-
+    # Get registration url for user in case the user is not a participant in the assignment.
     regurl = url_for id: assignment.id,
                      user_id: user.id,
                      contributor_id: params[:contributor_id]
     reviewer = get_reviewer(user, assignment, regurl)
-
-    map = ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
+    # Create response map for the participant so they can begin review.
+    map = ReviewResponseMap.where(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id).first
+    if map.nil?
+      map = ReviewResponseMap.create(reviewee_id: params[:contributor_id], reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
+    end
     redirect_to :controller => 'response', :action => 'new', :id => map.id, :contributor_id => params[:contributor_id], :return => "instructor_review"
   end
 

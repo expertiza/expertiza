@@ -9,6 +9,9 @@ describe AssignmentsController do
   let(:instructor2) { build(:instructor, id: 66) }
   let(:ta) { build(:teaching_assistant, id: 8) }
   let(:student) { build(:student) }
+  let(:teams) {build(:assignment_team)}
+  let(:participants) {[build(:participant, id: 12)]}
+  let(:review_response_maps) {[build(:review_response_map)]}
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     stub_current_user(instructor, instructor.role.name, instructor.role)
@@ -150,6 +153,32 @@ describe AssignmentsController do
       end
     end
   end
+
+  describe '#list_submissions' do
+    before(:each) do
+      allow(Assignment).to receive(:find).with(id: '1').and_return(assignment)
+      allow(Team).to receive(:where).with(parent_id: '1').and_return(teams)
+    end
+    context 'when user is a participant' do
+      it 'sets instance vars including ReviewResponseMap' do
+        allow(AssignmentParticipant).to receive(:where).with(user_id: 6, parent_id: 1).and_return(participants)
+        allow(ReviewResponseMap).to receive(:where).with(reviewer_id: 12, reviewed_object_id: 1).and_return(review_response_maps)
+        get :list_submissions, {id: 1}
+        expect(controller.instance_variable_get(:@assignment)).to eq assignment
+        expect(controller.instance_variable_get(:@teams)).to eq teams
+        expect(controller.instance_variable_get(:@participant)).to eq participants.first
+        expect(controller.instance_variable_get(:@review_maps)).to eq review_response_maps
+      end
+    end
+    context 'when user is not a participant' do
+      it 'does not load ReviewResponseMap' do
+        allow(AssignmentParticipant).to receive(:where).with(user_id: 6, parent_id: 1).and_return([])
+        get :list_submissions, {id: 1}
+        expect(controller.instance_variable_get(:@review_maps)).to eq []
+      end
+    end
+  end
+
 
   describe '#edit' do
     context 'when assignment has staggered deadlines' do

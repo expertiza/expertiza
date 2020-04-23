@@ -93,10 +93,10 @@ to display the label "Your team" in the student assignment tasks-->
     <li>
       <% if @assignment.number_of_current_round(@topic_id) > 1 && @assignment.get_current_stage(@topic_id) == "submission" %>
         <%= link_to "Revision planning", {:controller => 'questionnaires', :action => 'edit_revision_plan', :id => @assignment.review_questionnaire_id, :team_id => @team.try(:id), :participant_id => @participant.id} %>
+        (Plan to ask your reviewers more questions about your revision)
       <% else %>
-        <font color="gray">Revision planning</font>
+        <font color="gray">Revision planning</font> (You are not allowed to edit your revision plan right now)
       <% end %>
-      (Input the revision planning)
     </li>
   <%end%>
 

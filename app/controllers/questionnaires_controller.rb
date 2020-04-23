@@ -126,7 +126,7 @@ class QuestionnairesController < ApplicationController
 
         # Save all questions
         unless params[:question].nil?
-          update_questions(params[:question])
+          update_questions(@questionnaire.id, params[:question])
         end
         flash[:success] = 'The questionnaire has been successfully updated!'
       rescue StandardError
@@ -180,7 +180,7 @@ class QuestionnairesController < ApplicationController
   # Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions
     questionnaire_id = params[:id] unless params[:id].nil?
-    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
+    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions(params[:team_id]).size
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true, team_id: params[:team_id])
       if question.is_a? ScoredQuestion
@@ -207,7 +207,7 @@ class QuestionnairesController < ApplicationController
     questionnaire_id = params[:id]
     begin
       if params[:save]
-        update_questions(params[:question])
+        update_questions(questionnaire_id, params[:question])
         flash[:success] = 'All questions have been successfully saved!'
       end
     rescue StandardError
@@ -231,15 +231,18 @@ class QuestionnairesController < ApplicationController
 
   # Yulin: update questions that are already created. extract from the existing implementation that is
   # used many times in this file.
-  def update_questions(question)
-    question.each_pair do |k, v|
+  def update_questions(questionnaire_id, questions)
+    seq = next_seq(questionnaire_id) unless questions.empty?
+    questions.each_pair do |k, v|
       @question = Question.find(k)
       # example of 'v' value
       # {"seq"=>"1.0", "txt"=>"WOW", "weight"=>"1", "size"=>"50,3", "max_label"=>"Strong agree", "min_label"=>"Not agree"}
       v.each_pair do |key, value|
         @question.send(key + '=', value) if @question.send(key) != value
       end
+      @question.send('seq=', seq) if @question.send('seq') != seq
       @question.save
+      seq += 1
     end
   end
 
@@ -325,7 +328,13 @@ class QuestionnairesController < ApplicationController
 
   def question_params
     params.require(:question).permit(:txt, :weight, :questionnaire_id, :seq, :type, :size,
-                                     :alternatives, :break_before, :max_label, :min_label, :item_id)
+                                     :alternatives, :break_before, :max_label, :min_label, :team_id)
+  end
+
+  # Yulin: return the largest seq value among all Questions in the questionnaire they belong
+  def next_seq(questionnaire_id)
+    question_with_largest_seq = Question.where(questionnaire_id: questionnaire_id).order('seq ASC').last
+    (question_with_largest_seq.seq + 1).round(0)
   end
 
   # FIXME: These private methods belong in the Questionnaire model

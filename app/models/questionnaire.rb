@@ -116,18 +116,15 @@ class Questionnaire < ActiveRecord::Base
   # as well as the team's revision planning questions if team_id is supplied
   def questions(team_id = nil)
     questions = Question.where(questionnaire_id: self.id, team_id: nil)
-    questions += revision_plan_questions(team_id, questions[-1].seq) if team_id
+    questions += revision_plan_questions(team_id, questions.last.seq) if team_id
     questions
   end
 
   def revision_plan_questions(team_id, last_seq)
     revision_plan_questions = Question.where(questionnaire_id: self.id, team_id: team_id)
     revision_plan_header = SectionHeader.find_by(txt: "Revision Planning")
-    # team_id of the revision_plan_header is set to 1000000 because we don't want it to be considered
-    # as part of the original rubric, but we also don't want it to be considered as to belong to a specific team
-    # 1000000 may not be a safe value, suggestions needed here
     revision_plan_header ||= SectionHeader.create(txt: "Revision Planning", questionnaire_id: self.id, break_before: 1,
-                                                  seq: last_seq + 0.5, team_id: 1000000)
+                                                  seq: last_seq + 0.5, team_id: -1)
     revision_plan_questions.unshift(revision_plan_header)
   end
 end

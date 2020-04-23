@@ -108,7 +108,7 @@ class GradesController < ApplicationController
         end
       end
       vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
-      vmquestions = questionnaire.questions
+      vmquestions = questionnaire.questions(@team_id)
       vm.add_questions(vmquestions)
       vm.add_team_members(@team)
       vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)

@@ -124,8 +124,9 @@ module GradesHelper
   def review_done_by_course_staff?(staff)
     if staff.nil?
       false
+    else
+      role = Role.find(User.find(Participant.find(ResponseMap.find(Response.find(staff.id).map_id).reviewer_id).user_id).role_id).name
+      role == ("Instructor" || "Teaching Assistant") ? true : false
     end
-    role = Role.find(User.find(Participant.find(ResponseMap.find(Response.find(staff.id).map_id).reviewer_id).user_id).role_id).name
-    role == ("Instructor" || "Teaching Assistant") ? true : false
   end
 end

@@ -78,9 +78,9 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment.id, msg: msg
   end
 
-  # Enable a staff user (Instructor, TA) to review all submissions for an assignment when they are a participant.
+  # Enable a staff user (Instructor, Teaching Assistant, Admin) to review all submissions for an assignment when they are a participant.
   # Will redirect to the list_submissions view.
-  def add_instructor_as_reviewer
+  def add_staff_as_reviewer
     assignment = Assignment.find(params[:id])
     user = User.from_params(params)
     # Get registration url for user in case the user is not a participant in the assignment.

@@ -51,15 +51,15 @@
           <td><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
           <% unless participants.empty? %>
               <!-- If no due dates for assignment, allow assigning grades. -->
-            <% if not @assignment.find_due_dates('submission').nil? %>
-              <!-- If due date has passed, Assign Grade. Otherwise, allow reviews. -->
-              <% if Time.now > @assignment.find_due_dates('submission').sort[-1].due_at or not @participant %>
+            <% if not @assignment.find_due_dates('review').nil? %>
+              <!-- If due date has passed or user not a participant, Assign Grade. Otherwise, allow reviews. -->
+              <% if Time.now > @assignment.find_due_dates('review').sort_by{|due_date| due_date.due_at}[-1].due_at or not @participant %>
                 <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %>
               <% else %>
                 <% review = @review_maps.select{|m| m.reviewee_id == team.id} %>
                 <!-- If a review has not yet been performed, allow review. Otherwise, allow view/edit actions. -->
                 <% if review.size == 0 %>
-                  <%= link_to 'Perform Review', {:controller => 'review_mapping', :action => 'add_instructor_as_reviewer', :id => @assignment.id, :contributor_id => team.id, :user_id => current_user.id} %>
+                  <%= link_to 'Perform Review', {:controller => 'review_mapping', :action => 'add_staff_as_reviewer', :id => @assignment.id, :contributor_id => team.id, :user_id => current_user.id} %>
                 <% else %>
                   <% r =  Response.where(["map_id IN (?)", review.last.id]).first %>
                   <% if r %>

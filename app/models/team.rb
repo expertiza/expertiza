@@ -30,6 +30,16 @@ class Team < ActiveRecord::Base
     self.destroy
   end
 
+  # Check if the current team is full?
+  def full?
+    return false if self.parent_id.nil? # course team, does not max_team_size
+    max_team_members = Assignment.find(self.parent_id).max_team_size
+    curr_team_size = Team.size(self.id)
+    (curr_team_size >= max_team_members)
+  end
+
+
+
   # Get the node type of the tree structure
   def node_type
     "TeamNode"
@@ -49,6 +59,7 @@ class Team < ActiveRecord::Base
     users.include? user
   end
 
+ # Add member to the team, if size > max/2 and mentor exist for assignment, trigger mentor assign
   def add_member(user, _assignment_id = nil)
     raise "The user #{user.name} is already a member of the team #{self.name}" if user?(user)
     can_add_member = false

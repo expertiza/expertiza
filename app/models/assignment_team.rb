@@ -38,13 +38,6 @@ class AssignmentTeam < Team
   end
 
 
-  # Check if the current team is full?
-  def full?
-    return false if self.parent_id.nil? # course team, does not max_team_size
-    max_team_members = Assignment.find(self.parent_id).max_team_size
-    curr_team_size = Team.size(self.id)
-    (curr_team_size >= max_team_members)
-  end
 
   # Check if the current team size is more than half?
   def half?
@@ -81,7 +74,7 @@ class AssignmentTeam < Team
 #	end
 #     end
 #   end
-  # Add member to the team, if size > max/2 and mentor exist for assignment, trigger mentor assign
+
 
 
   # Assign mentor with lowest number of teams he/she mentored

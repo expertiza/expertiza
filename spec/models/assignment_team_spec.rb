@@ -116,37 +116,6 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe '#add_member' do
-    context 'when parameterized user has already joined in current team' do
-      it 'raise an error' do
-        expect { team.add_member(user) }.to raise_error(RuntimeError, "The user #{user.name} is already a member of the team #{team.name}")
-      end
-    end
-
-    context 'when parameterized user did not join in current team yet' do
-      context 'when current team is not full' do
-        it 'does not raise an error' do
-          allow_any_instance_of(Team).to receive(:user?).with(user).and_return(false)
-          allow_any_instance_of(Team).to receive(:full?).and_return(false)
-          allow(TeamsUser).to receive(:create).with(user_id: 1, team_id: 1).and_return(team_user)
-          allow(TeamNode).to receive(:find_by).with(node_object_id: 1).and_return(double('TeamNode', id: 1))
-          allow_any_instance_of(Team).to receive(:add_participant).with(1, user).and_return(double('Participant'))
-          expect(team.add_member(user)).to be true
-        end
-      end
-
-      context 'when current team is full' do
-        it 'cannot accept new member' do
-          allow_any_instance_of(Team).to receive(:user?).with(user).and_return(false)
-          allow_any_instance_of(Team).to receive(:full?).and_return(true)
-          allow(TeamsUser).to receive(:create).with(user_id: 1, team_id: 1).and_return(team_user)
-          allow(TeamNode).to receive(:find_by).with(node_object_id: 1).and_return(double('TeamNode', id: 1))
-          allow_any_instance_of(Team).to receive(:add_participant).with(1, user).and_return(double('Participant'))
-          expect(team3.add_member(user)).to be false
-        end
-      end
-    end
-  end
 
 
   describe "#participants" do

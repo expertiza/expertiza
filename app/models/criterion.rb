@@ -21,9 +21,9 @@ class Criterion < ScoredQuestion
     html += '<td>text area size <input size="3" value="' + self.size.to_s
     html += '" name="question[' + self.id.to_s + '][size]" id="question_' + self.id.to_s + '_size" type="text"></td>'
 
-    html += '<td> min_label <input size="10" value="' + self.min_label.to_s + '" name="question[' + self.id.to_s
-    html += '][min_label]" id="question_' + self.id.to_s + '_min_label" type="text">  max_label <input size="12" value="' + self.max_label.to_s
-    html += '" name="question[' + self.id.to_s + '][max_label]" id="question_' + self.id.to_s + '_max_label" type="text"></td>'
+    html += '<td> max_label <input size="10" value="' + self.max_label.to_s + '" name="question[' + self.id.to_s
+    html += '][max_label]" id="question_' + self.id.to_s + '_max_label" type="text">  min_label <input size="12" value="' + self.min_label.to_s
+    html += '" name="question[' + self.id.to_s + '][min_label]" id="question_' + self.id.to_s + '_min_label" type="text"></td>'
 
     safe_join(["<tr>".html_safe, "</tr>".html_safe], html.html_safe)
   end

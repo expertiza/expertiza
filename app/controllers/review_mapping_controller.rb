@@ -14,11 +14,11 @@ class ReviewMappingController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'add_dynamic_reviewer',
-        'show_available_submissions',
-        'assign_reviewer_dynamically',
-        'assign_metareviewer_dynamically',
-        'assign_quiz_dynamically',
-        'start_self_review'
+          'show_available_submissions',
+          'assign_reviewer_dynamically',
+          'assign_metareviewer_dynamically',
+          'assign_quiz_dynamically',
+          'start_self_review'
       true
     else ['Instructor', 'Teaching Assistant', 'Administrator'].include? current_role_name
     end
@@ -406,8 +406,8 @@ class ReviewMappingController < ApplicationController
 
   def assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
     if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0)
-           .where("created_at > :time",
-                  time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
+                        .where("created_at > :time",
+                              time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
 
       participants_with_insufficient_review_num = []
       participants_hash.each do |participant_id, review_num|
@@ -440,8 +440,8 @@ class ReviewMappingController < ApplicationController
       end
     end
     @@time_create_last_review_mapping_record = ReviewResponseMap.
-        where(reviewed_object_id: assignment_id).
-        last.created_at
+                                              where(reviewed_object_id: assignment_id).
+                                              last.created_at
   end
 
   def peer_review_strategy(assignment_id, review_strategy, participants_hash)

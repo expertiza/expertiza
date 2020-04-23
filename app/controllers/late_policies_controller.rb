@@ -20,7 +20,6 @@ class LatePoliciesController < ApplicationController
   # GET /late_policies
   # GET /late_policies.xml
   def index
-    @assignment_id = session[:assignment_id]
     @penalty_policies = LatePolicy.all
     respond_to do |format|
       format.html # index.html.erb

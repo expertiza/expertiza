@@ -126,7 +126,7 @@ class QuestionnairesController < ApplicationController
 
         # Save all questions
         unless params[:question].nil?
-          update_questions(@questionnaire.id, params[:question])
+          update_questions(params[:question])
         end
         flash[:success] = 'The questionnaire has been successfully updated!'
       rescue StandardError

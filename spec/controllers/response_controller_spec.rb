@@ -13,6 +13,7 @@ describe ResponseController do
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
+    allow(questionnaire).to receive(:questions).and_return([question])
     stub_current_user(instructor, instructor.role.name, instructor.role)
     allow(Response).to receive(:find).with('1').and_return(review_response)
     allow(review_response).to receive(:map).and_return(review_response_map)
@@ -134,13 +135,7 @@ describe ResponseController do
       allow(SignedUpTeam).to receive(:where).with(team_id: 1, is_waitlisted: 0).and_return([double('SignedUpTeam', topic_id: 1)])
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       allow(AssignmentDueDate).to receive(:find_by).with(any_args).and_return(assignment_due_date)
-      # varying_rubrics_by_round?
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
-      # review_questionnaire_id
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire])
-      # set_dropdown_or_scale
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 1).and_return([assignment_questionnaire])
+      allow(AssignmentQuestionnaire).to receive(:where).and_return([assignment_questionnaire])
       allow(Questionnaire).to receive(:find).with(any_args).and_return(questionnaire)
       allow(Questionnaire).to receive(:questions).and_return(question)
       allow(Answer).to receive(:create).and_return(answer)

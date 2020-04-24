@@ -10,7 +10,6 @@ class QuestionsController < ApplicationController
     render action: 'list'
   end
 
-  # Check destroy method
   def action_allowed?
     ['Super-Administrator',
      'Administrator',
@@ -87,6 +86,4 @@ class QuestionsController < ApplicationController
     types = Question.distinct.pluck(:type)
     render json: types.to_a
   end
-
-  private
 end

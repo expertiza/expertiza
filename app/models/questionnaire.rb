@@ -101,7 +101,7 @@ class Questionnaire < ActiveRecord::Base
       end
     end
     questionnaire
-  end  
+  end
 
   # validate the entries for this questionnaire
   def validate_questionnaire
@@ -112,19 +112,11 @@ class Questionnaire < ActiveRecord::Base
     errors.add(:name, "Questionnaire names must be unique.") if results.present?
   end
 
-  # return questions in the original rubric
+  # E2016: return questions in the original rubric
   # as well as the team's revision planning questions if team_id is supplied
   def questions(team_id = nil, round = nil)
     questions = Question.where(questionnaire_id: self.id, team_id: nil).order('seq ASC')
-    questions += revision_plan_questions(team_id, questions.last.seq) if team_id and !round.nil? and round > 1
+    questions += RevisionPlanQuestionnaire.questions(team_id, questions.last.seq) if team_id and !round.nil? and round > 1
     questions
-  end
-
-  def revision_plan_questions(team_id, last_seq)
-    revision_plan_questions = Question.where(questionnaire_id: self.id, team_id: team_id)
-    revision_plan_header = SectionHeader.find_by(txt: "Revision Planning")
-    revision_plan_header ||= SectionHeader.create(txt: "Revision Planning", questionnaire_id: self.id, break_before: 1,
-                                                  seq: last_seq + 0.5, team_id: -1)
-    revision_plan_questions.unshift(revision_plan_header)
   end
 end

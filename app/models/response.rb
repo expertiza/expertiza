@@ -242,7 +242,7 @@ class Response < ActiveRecord::Base
       questions = questionnaire.questions(team_id, round).sort_by(&:seq)
       # get the tag settings this questionnaire
       tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id) : nil
-      code = add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments, current_user
+      code += add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments, current_user
     end
     comment = if !self.additional_comment.nil?
                 self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')

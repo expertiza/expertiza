@@ -31,6 +31,28 @@ describe 'Tests Review report' do
   end
 end
 
+describe "Test Review conflict report" do
+  before(:each) do
+    create(:instructor)
+    create(:assignment, course: nil, name: 'Test Assignment')
+    assignment_id = Assignment.where(name: 'Test Assignment')[0].id
+    login_as 'instructor6'
+    visit "/reports/response_report?id=#{assignment_id}"
+    page.select("Review conflict report", :from => "report[type]")
+    click_button "View"
+  end
+
+  it "can display teams" do
+    expect(page).to have_content('Team')
+  end
+
+  it "can display author reviewers and metrics" do
+    expect(page).to have_content('Reviewers/Metrics')
+  end
+
+end
+
+
 describe "Test Author feedback report" do
   before(:each) do
     create(:instructor)

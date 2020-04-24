@@ -27,7 +27,7 @@
 <!--Question part-->
 <hr/>
 <% if !params[:id].nil? and params[:action] == 'edit' %>
-  <%= render :partial => 'question', :locals => {:questions => @questionnaire.questions,
+  <%= render :partial => 'questions', :locals => {:questions => @questionnaire.questions,
                                                  :questionnaire_type => @questionnaire.display_type.downcase + ' questionnaire'} %>
   <%= link_to 'Import Questionnaire', :controller=>'import_file', :action=>'start', :model => 'Question', :id=> @questionnaire.id, :expected_fields => 'txt, type ,seq, size, break_before' %>|
   <%= link_to 'Export Questionnaire', :controller=>'export_file',:action=>'start',:model=> 'Question',:id=> @questionnaire.id %>

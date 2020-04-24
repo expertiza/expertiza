@@ -59,7 +59,6 @@
         <br/>
         <span>Note: You can not do more than <%=@assignment.num_metareviews_allowed%> meta-reviews according to assignment policy.</span>
     <% elsif (!@assignment.metareview_available?(session[:user].id)) %>
-    <%= "#{@assignment.metareview_available?(session[:user].id)}" %>
         <p><em>Meta-reviews cannot be performed at this time.</em></p>
     <% else %>
         <%= render :partial => 'set_dynamic_metareview', :locals => {:assignment => @assignment} %>

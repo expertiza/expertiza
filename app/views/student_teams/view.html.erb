@@ -96,7 +96,7 @@
         <% end %>
     <%end%>
 
-    <% if Participant.get_authorization(@student.can_submit, @student.can_review, @student.can_take_quiz) !='mentor' %>
+    <% if (Participant.get_authorization(@student.can_submit, @student.can_review, @student.can_take_quiz) !='mentor') and (@student.team.have_mentor?) %>
 <br/><br/>
   <b>Mentor</b>
   <br/><br/>

@@ -119,6 +119,8 @@ class StudentTeamsController < ApplicationController
     # remove the record from teams_users table
     team_user = TeamsUser.where(team_id: params[:team_id], user_id: student.user_id)
     remove_team_user(team_user)
+
+    team.remove_mentor
     # if your old team does not have any members, delete the entry for the team
     if TeamsUser.where(team_id: params[:team_id]).empty?
       old_team = AssignmentTeam.find params[:team_id]

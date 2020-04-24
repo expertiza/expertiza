@@ -60,20 +60,20 @@ class AssignmentTeam < Team
   end
 
   #remove mentor if group size falls below the limit
-  #def remove_mentor
-  #  if !half? && have_mentor?
-  #  	members = TeamsUser.where(team_id: self.id)
-  #  	members.each do |member|
-  #   	if Participant.where(['user_id = ? and can_submit = ? and can_review = ? and can_take_quiz = ?', member.user_id ,0, 0, 0]).count > 0
-  #    		mentor=member         
-  #  		TeamsUser.where(user_id: mentor.user_id, team_id: self.id).find_each(&:destroy)
-  # 		node = TeamNode.find_by(node_object_id: mentor.user_id)
-  #  		node.destroy if node
- 
-#	   end
-#	end
-#     end
-#   end
+  def remove_mentor
+    if !half? && have_mentor?
+    	members = TeamsUser.where(team_id: self.id)
+    	members.each do |member|
+     	if Participant.where(['user_id = ? and can_submit = ? and can_review = ? and can_take_quiz = ?', member.user_id ,0, 0, 0]).count > 0
+      		mentor=member
+          TeamUserNode.where(parent_id: self.parent_id, node_object_id: mentor.id).destroy_all
+          TeamsUser.where(user_id: mentor.user_id, team_id: self.id).destroy_all
+      end
+   		#node = TeamNode.find_by(node_object_id: mentor.user_id)
+    	#	node.destroy if node
+	end
+     end
+   end
 
 
 

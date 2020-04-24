@@ -86,8 +86,8 @@ class ResponseController < ApplicationController
       @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = set_questionnaire
       team_id = @response.round > 1 ? @map.reviewee_id : nil
-      questions = sort_questions(@questionnaire.questions(team_id))
-      create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
+      set_questions
+      create_answers(params, @questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
     rescue StandardError
@@ -111,9 +111,8 @@ class ResponseController < ApplicationController
     if @response.nil? || AssignmentTeam.find(@map.reviewee_id).most_recent_submission.updated_at > @response.updated_at
       @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
     end
-    team_id = @assignment.number_of_current_round(nil) > 1 ? @map.reviewee_id : nil
-    questions = sort_questions(@questionnaire.questions(team_id))
-    init_answers(questions)
+    set_questions
+    init_answers(@questions)
     render action: 'response'
   end
 
@@ -167,9 +166,8 @@ class ResponseController < ApplicationController
 
     # :version_num=>@version)
     # Change the order for displaying questions for editing response views.
-    team_id = @round.to_i > 1 ? @map.reviewee_id : nil
-    questions = sort_questions(@questionnaire.questions(team_id))
-    create_answers(params, questions) if params[:responses]
+    set_questions
+    create_answers(params, @questions) if params[:responses]
     msg = "Your response was successfully saved."
     error_msg = ""
     # only notify if is_submitted changes from false to true
@@ -256,8 +254,7 @@ class ResponseController < ApplicationController
     new_response ? set_questionnaire_for_new_response : set_questionnaire
     set_dropdown_or_scale
     round = @response.try(:round) || @assignment.number_of_current_round(nil)
-    team_id = round > 1 ? @map.reviewee_id : nil
-    @questions = sort_questions(@questionnaire.questions(team_id, round))
+    set_questions
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
   end
@@ -288,12 +285,12 @@ class ResponseController < ApplicationController
       @current_round = @assignment.number_of_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
     when
-      "MetareviewResponseMap",
-      "TeammateReviewResponseMap",
-      "FeedbackResponseMap",
-      "CourseSurveyResponseMap",
-      "AssignmentSurveyResponseMap",
-      "GlobalSurveyResponseMap"
+    "MetareviewResponseMap",
+        "TeammateReviewResponseMap",
+        "FeedbackResponseMap",
+        "CourseSurveyResponseMap",
+        "AssignmentSurveyResponseMap",
+        "GlobalSurveyResponseMap"
       @questionnaire = @map.questionnaire
     end
   end
@@ -327,6 +324,14 @@ class ResponseController < ApplicationController
   def sort_questions(questions)
     questions.sort_by(&:seq)
   end
+
+  # gets a correct set of questions for each team in a given round
+  def set_questions
+    round = @response.try(:round) || @assignment.number_of_current_round(nil)
+    team_id = round > 1 ? @map.reviewee_id : nil
+    @questions = sort_questions(@questionnaire.questions(team_id, round))
+  end
+
   # For each question in the list, starting with the first one, you update the comment and score
   def create_answers(params, questions)
     params[:responses].each_pair do |k, v|

@@ -95,6 +95,4 @@ class QuestionsController < ApplicationController
     types = Question.distinct.pluck(:type)
     render json: types.to_a
   end
-
-  private
 end

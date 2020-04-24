@@ -14,7 +14,7 @@ class AssignmentForm
       @assignment.instructor = @assignment.course.instructor if @assignment.course
       @assignment.max_team_size = DEFAULT_MAX_TEAM_SIZE
     end
-    @assignment.num_review_of_reviews = 0
+    @assignment.num_review_of_reviews = 3
     @assignment_questionnaires = Array(args[:assignment_questionnaires])
     @due_dates = Array(args[:due_dates])
   end
@@ -60,8 +60,10 @@ class AssignmentForm
       @errors = @assignment.errors.to_s
       @has_errors = true
     end
+    @assignment.num_metareviews_allowed ||= 3
     @assignment.num_review_of_reviews = @assignment.num_metareviews_allowed
     @assignment.num_reviews = @assignment.num_reviews_allowed
+    @assignment.save
   end
 
   # code to save assignment questionnaires

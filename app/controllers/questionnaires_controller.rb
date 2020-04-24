@@ -180,7 +180,7 @@ class QuestionnairesController < ApplicationController
   # Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions
     questionnaire_id = params[:id] unless params[:id].nil?
-    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions(params[:team_id]).size#E2016: @team_id used for revision plan
+    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions(params[:team_id], 2).size#E2016: @team_id used for revision plan
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true, team_id: params[:team_id])
       if question.is_a? ScoredQuestion

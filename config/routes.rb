@@ -304,7 +304,7 @@ resources :institution, except: [:destroy] do
       get :add_reviewer
       post :add_reviewer
       post :add_self_reviewer
-      post :add_instructor_as_reviewer
+      post :add_staff_as_reviewer
       get :add_self_reviewer
       get :add_user_to_assignment
       get :auto_complete_for_user_name

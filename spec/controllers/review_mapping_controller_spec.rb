@@ -90,19 +90,19 @@ describe ReviewMappingController do
     end
   end
 
-  describe '#add_instructor_as_reviewer' do
+  describe '#add_staff_as_reviewer' do
     context 'when a review map does not exist for the user' do
       it 'creates a new ReviewResponseMap for the user' do
         allow(Assignment).to receive(:find).with(any_args).and_return(user)
         allow(User).to receive(:from_params).with(any_args).and_return(assignment)
         allow_any_instance_of(ReviewMappingController).to receive(:get_reviewer)
-          .with(assignment, user, "http://test.host/review_mapping/add_instructor_as_reviewer?contributor_id=1&id=3&user_id=1")
+          .with(assignment, user, "http://test.host/review_mapping/add_staff_as_reviewer?contributor_id=1&id=3&user_id=1")
           .and_return(double('AssignmentParticipant', id: 1, name: 'no one'))
         allow(ReviewResponseMap).to receive(:where)
           .with(reviewed_object_id: 3, reviewer_id: 1, reviewee_id: '1').and_return([])
         allow(ReviewResponseMap).to receive(:create)
           .with(reviewed_object_id: 3, reviewer_id: 1, reviewee_id: '1').and_return(review_response_map)
-        post :add_instructor_as_reviewer, :id => 3, :contributor_id => 1, :user_id => 1
+        post :add_staff_as_reviewer, :id => 3, :contributor_id => 1, :user_id => 1
         expect(response).to redirect_to '/response/new?contributor_id=1&id=1&return=instructor_review'  #:controller => 'response', :action => 'new', :id => 1, :contributor_id => 1, :return => "instructor_review"
       end
     end
@@ -111,13 +111,11 @@ describe ReviewMappingController do
         allow(Assignment).to receive(:find).with(any_args).and_return(user)
         allow(User).to receive(:from_params).with(any_args).and_return(assignment)
         allow_any_instance_of(ReviewMappingController).to receive(:get_reviewer)
-                                                              .with(assignment, user, "http://test.host/review_mapping/add_instructor_as_reviewer?contributor_id=1&id=3&user_id=1")
+                                                              .with(assignment, user, "http://test.host/review_mapping/add_staff_as_reviewer?contributor_id=1&id=3&user_id=1")
                                                               .and_return(double('AssignmentParticipant', id: 1, name: 'no one'))
         allow(ReviewResponseMap).to receive(:where)
                                         .with(reviewed_object_id: 3, reviewer_id: 1, reviewee_id: '1').and_return([review_response_map])
-        #allow(ReviewResponseMap).to receive(:create)
-        #                                .with(reviewed_object_id: 3, reviewer_id: 1, reviewee_id: '1').and_return(review_response_map)
-        post :add_instructor_as_reviewer, :id => 3, :contributor_id => 1, :user_id => 1
+        post :add_staff_as_reviewer, :id => 3, :contributor_id => 1, :user_id => 1
         expect(response).to redirect_to '/response/new?contributor_id=1&id=1&return=instructor_review'  #:controller => 'response', :action => 'new', :id => 1, :contributor_id => 1, :return => "instructor_review"
       end
     end

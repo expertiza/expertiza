@@ -78,9 +78,16 @@ describe Questionnaire do
         expect(questions[0]).to eql(@question_without_team_id)
       end
     end
-    context "with team_id" do
+    context "with team_id but round less than 2" do
       it "returns both questions from the original rubric as well as questions created by the team" do
-        questions = questionnaire.questions(@team.id)
+        questions = questionnaire.questions(@team.id, 1)
+        expect(questions.size).to eql(1)
+        expect(questions[0]).to eql(@question_without_team_id)
+      end
+    end
+    context "with team_id but round less than 2" do
+      it "returns both questions from the original rubric as well as questions created by the team" do
+        questions = questionnaire.questions(@team.id, 2)
         expect(questions.size).to eql(3)
         expect(questions[0]).to eql(@question_without_team_id)
         expect(questions[1]).to be_a(SectionHeader)

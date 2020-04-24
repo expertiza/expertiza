@@ -16,6 +16,7 @@ describe GradesController do
   before(:each) do
     allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
     allow(participant).to receive(:team).and_return(team)
+    allow(review_questionnaire).to receive(:questions).and_return([question])
     stub_current_user(instructor, instructor.role.name, instructor.role)
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(Assignment).to receive(:find).with(1).and_return(assignment)

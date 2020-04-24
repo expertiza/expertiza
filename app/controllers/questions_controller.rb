@@ -11,10 +11,19 @@ class QuestionsController < ApplicationController
   end
 
   def action_allowed?
-    ['Super-Administrator',
-     'Administrator',
-     'Instructor',
-     'Teaching Assistant'].include? current_role_name
+    question = Question.find(params[:id])
+    team = AssignmentTeam.find(question.team_id)
+    if team.users.find(current_user)
+      ['Super-Administrator',
+      'Administrator',
+      'Instructor',
+      'Teaching Assistant', 'Student'].include? current_role_name
+    else
+      ['Super-Administrator',
+      'Administrator',
+      'Instructor',
+      'Teaching Assistant'].include? current_role_name
+    end
   end
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)

@@ -79,7 +79,7 @@ module GradesHelper
                end
       next unless questionnaire.type == type
       vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
-      questions = questionnaire.questions(@team_id, @round)
+      questions = sort_questions(questionnaire.questions(@team_id, @round))
       vm.add_questions(questions)
       vm.add_team_members(@team)
       vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
@@ -118,5 +118,10 @@ module GradesHelper
       questions[questionnaire_symbol] = questionnaire.questions(team_id, round) # E2016: questions with team_id are created in revision planning
     end
     questions
+  end
+
+  # sorts by sequence number
+  def sort_questions(questions)
+    questions.sort_by(&:seq)
   end
 end

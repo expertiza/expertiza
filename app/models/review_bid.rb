@@ -42,6 +42,9 @@ class ReviewBid < ActiveRecord::Base
   def self.reviewer_self_topic(reviewer,assignment_id)
   #to return topic id  of the review a reviewer is working on
     user_id = Participant.where(id: reviewer).pluck(:user_id).first
+    if user_id.nil?
+      return nil
+    end
     self_topic = ActiveRecord::Base.connection.execute("SELECT ST.topic_id FROM teams T, teams_users TU,signed_up_teams ST where TU.team_id=T.id and T.parent_id="+assignment_id.to_s+" and TU.user_id="+user_id.to_s+" and ST.team_id=TU.team_id;").first
     if self_topic==nil
       return self_topic

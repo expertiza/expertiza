@@ -27,7 +27,7 @@
         <% members = team_members(team_name, @id)%>
         <strong>Team Name: </strong><%= team_name %><br>
         <strong>Team Members: </strong><br>
-        <ol>
+        <ol class="team_members_ol">
           <% members.each do |member|%>
             <li><%=User.find(member.user_id).fullname %><br></li>
           <% end %>
@@ -42,7 +42,7 @@
 </table>
 
 <style>
-  ol {
+  .team_members_ol {
     column-count: 3;
   }
 </style>

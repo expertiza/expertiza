@@ -54,7 +54,7 @@ describe GradesHelper, type: :helper do
       result = has_team_and_metareview?
       expect(result).to be == {has_team: false, has_metareview: false, true_num: 0}
     end
-    
+
     it 'should return 1 for an assignment with a team but no metareview deadline after a view action' do
       @assignment.max_team_size = 2
       @assignment.save
@@ -84,19 +84,9 @@ describe GradesHelper, type: :helper do
   end
 
   describe 'review_done_by_course_staff' do
-    #before(:each) do
-    # @review = create(:review, id: 2)
-    #end
-
     it 'should return false' do
       expect(review_done_by_course_staff?(nil)).to eq(false)
     end
-
-    #it 'should return true when role is Instructor' do
-    # params[:id] = @review.id
-    # response = Response.find(params[:id]).map_id
-    # expect(response).to respond_to(@review.id)
-    #end
 
   end
 end

@@ -71,14 +71,14 @@ module ReviewMappingHelper
     metrics = {}
     metrics[:average] = average_of_round(review_scores)
     metrics[:std] = std_of_round(metrics[:average],review_scores)
-    metrics[:upper_tolerance_limit] = calculate_upper_tolerance(review_scores)
+    metrics[:upper_tolerance_limit] = calculate_upper_tolerance(review_scores, max_score)
     metrics[:lower_tolerance_limit] = calculate_lower_tolerance(review_scores)
 
     review_scores_percents = review_scores.inject({}) { |h, (reviewer, answer)| h[reviewer]=(answer.to_f/max_score.to_f)*100; h}
 
     metrics[:average_percent] = average_of_round(review_scores_percents)
     metrics[:std_percent] = std_of_round(metrics[:average_percent],review_scores_percents)
-    metrics[:upper_tolerance_limit_percent] = calculate_upper_tolerance(review_scores_percents)
+    metrics[:upper_tolerance_limit_percent] = calculate_upper_tolerance(review_scores_percents, 100)
     metrics[:lower_tolerance_limit_percent] = calculate_lower_tolerance(review_scores_percents)
     metrics
   end
@@ -135,22 +135,48 @@ module ReviewMappingHelper
   end
 
   # Calculate the upper tolerance limit based off the threshold for conflict
-  def calculate_upper_tolerance(question_answer)
+  def calculate_upper_tolerance(question_answer, max_score)
     average = average_of_round(question_answer)
     std = std_of_round(average,question_answer)
-    return (average+(2*std)).round(2)
+    upper_tolerance = (average+(2*std)).round(2)
+
+    if upper_tolerance < max_score
+      return upper_tolerance
+    else
+      return max_score
+    end
   end
 
   # Calculate the lower tolerance limit based off the threshold for conflict
   def calculate_lower_tolerance(question_answer)
     average = average_of_round(question_answer)
     std = std_of_round(average,question_answer)
-    return (average-(2*std)).round(2)
+    lower_tolerance = (average-(2*std)).round(2)
+
+    if lower_tolerance > 0
+      return lower_tolerance
+    else
+      return 0
+    end
+  end
+
+  def get_conflict_color(is_graph, score, upper_tolerance, lower_tolerance)
+    if score > upper_tolerance
+      return '#ffa200'
+    elsif score < lower_tolerance
+      return '#fff200'
+    else
+      if is_graph
+        return '#A90201'
+      else
+        return '#FFFFFF'
+      end
+    end
   end
 
   #Generate the bar chart for reviewers score for a particular round for Review Conflict Report
   def generate_score_chart(review_max_score, question_answer, by_raw_points)
-    upper_tolerance = calculate_upper_tolerance(question_answer)
+    upper_tolerance = calculate_upper_tolerance(question_answer, review_max_score)
     lower_tolerance = calculate_lower_tolerance(question_answer)
     colors = []
     scores = Array.new
@@ -161,14 +187,10 @@ module ReviewMappingHelper
         scores << answer.to_f
       end
       # Different color for conflicting bars
-      if answer > upper_tolerance or answer < lower_tolerance
-        colors << '#FFFF00'
-      else
-        colors << '#A90201'
-      end
+      colors << get_conflict_color(true, answer, upper_tolerance, lower_tolerance)
     end
     labels = (1..scores.length).to_a
-    chartSize = 5 + 3*scores.length
+    chartSize = 5 + 2*scores.length
     # Initialize chart
     data = {
       labels: labels,
@@ -176,9 +198,8 @@ module ReviewMappingHelper
         {
           label: "percentage score",
           backgroundColor: colors,
-          borderWidth: 1,
           data: scores,
-          hoverBackgroundColor: "orange",
+          hoverBackgroundColor: "blue",
         }
       ]
     }

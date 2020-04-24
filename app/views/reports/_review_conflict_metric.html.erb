@@ -1,48 +1,3 @@
-<script>
-function switchPoints() {
-  var raws_graph = document.getElementsByClassName("raw_points_graph");
-  var percents_graph = document.getElementsByClassName("percentage_points_graph");
-  var raws = document.getElementsByClassName("raw_points");
-  var percents = document.getElementsByClassName("percentage_points");
-  var button = document.getElementById("switchPointsButton");
-
-  for (var k=0; k<raws_graph.length; k++){
-    switch_graph_points_helper(raws_graph[k]);
-    switch_graph_points_helper(percents_graph[k]);
-    switch_points_helper(raws[k])
-    switch_points_helper(percents[k])
-  }
-
-  switch_button_helper(button)
-
-}
-
-function switch_graph_points_helper(x) {
-  if (x.style.display === "none") {
-    x.style.display = "block"
-  } else {
-    x.style.display = "none";
-  }
-}
-
-function switch_points_helper(x) {
-  if (x.style.display === "none") {
-    x.style.display = "inline"
-  } else {
-    x.style.display = "none";
-  }
-}
-
-function switch_button_helper(button){
-  if (button.innerHTML === "Convert Points to Percents"){
-    button.innerHTML = "Convert Points to Raw"
-  } else {
-    button.innerHTML = "Convert Points to Percents"
-  }
-
-}
-</script>
-
 <table width="100%" border="0" >
   <%review_scores = review_score_for_team(@id, team_name) %>
   <% i = 1 %>
@@ -54,31 +9,18 @@ function switch_button_helper(button){
           <strong>Reviewers with scores</strong><br>
           <ol>
             <% review_score.each do |reviewer, score| %>
-              <% if score > metrics[:upper_tolerance_limit] or score < metrics[:lower_tolerance_limit]  %>
-                <li><% response_id = response_id_review_conflict(reviewer, @teams[team_name], @id) %>
-                  <mark style="background-color:#FFFF00">
-                  <%= link_to "("+@reviewers[team_name.to_s][reviewer.to_s].to_s+")", :controller => 'popup', :action => 'team_users_popup', :id => @teams[team_name], :id2 => response_id, :assignment_id=>@id %>
-                  <%= list_review_submissions(reviewer, @teams[team_name], response_id) %>
-                  <div class="raw_points" style="display:inline">
+              <li><% response_id = response_id_review_conflict(reviewer, @teams[team_name], @id) %>
+              <mark style="background-color:<%=get_conflict_color(false, score, metrics[:upper_tolerance_limit], metrics[:lower_tolerance_limit])%>">
+                <%= link_to "("+@reviewers[team_name.to_s][reviewer.to_s].to_s+")", :controller => 'popup', :action => 'team_users_popup', :id => @teams[team_name], :id2 => response_id, :assignment_id=>@id %>
+                <%= list_review_submissions(reviewer, @teams[team_name], response_id) %>
+                <div class="raw_points" style="display:inline">
                   <%= ": " + score.to_s %>
-                  </div>
-                  <div class="percentage_points" style="display:none">
-                    <%= ": " + (((score.to_f/max_scores[i-1].to_f)*100).round(2)).to_s %>
-                  </div>
-                  </mark>
-                </li>
-              <% else %>
-                <li><% response_id = response_id_review_conflict(reviewer, @teams[team_name], @id) %>
-                  <%= link_to "("+@reviewers[team_name.to_s][reviewer.to_s].to_s+")", :controller => 'popup', :action => 'team_users_popup', :id => @teams[team_name], :id2 => response_id, :assignment_id=>@id %>
-                  <%= list_review_submissions(reviewer, @teams[team_name], response_id) %>
-                  <div class="raw_points" style="display:inline">
-                  <%= ": " + score.to_s %>
-                  </div>
-                  <div class="percentage_points" style="display:none">
-                    <%= ": " + (((score.to_f/max_scores[i-1].to_f)*100).round(2)).to_s %>
-                  </div>
-                </li>
-              <% end %>
+                </div>
+                <div class="percentage_points" style="display:none">
+                  <%= ": " + (((score.to_f/max_scores[i-1].to_f)*100).round(2)).to_s %>
+                </div>
+              </mark>
+              </li>
             <% end %>
           </ol>
         </div>

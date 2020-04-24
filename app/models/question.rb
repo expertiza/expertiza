@@ -2,7 +2,7 @@ class Question < ActiveRecord::Base
   belongs_to :questionnaire # each question belongs to a specific questionnaire
   belongs_to :review_score  # each review_score pertains to a particular question
   belongs_to :review_of_review_score # ditto
-  belongs_to :team, class_name: 'AssignmentTeam', foreign_key: 'team_id' # each question may belong to a specific assignment team
+  belongs_to :team, class_name: 'AssignmentTeam', foreign_key: 'team_id' #E2016: each question may belong to a specific assignment team
 
   has_many :question_advices, dependent: :destroy # for each question, there is separate advice about each possible score
   has_many :signup_choices # ?? this may reference signup type questionnaires
@@ -13,7 +13,7 @@ class Question < ActiveRecord::Base
   validates :txt, length: {minimum: 0, allow_nil: false, message: "can't be nil"} # user must define text content for a question
   validates :type, presence: true # user must define type for a question
   validates :break_before, presence: true
-  validates :team_id, numericality: true, allow_nil: true # team_id must be numeric
+  validates :team_id, numericality: true, allow_nil: true #E2016: team_id must be numeric
 
   has_paper_trail
 

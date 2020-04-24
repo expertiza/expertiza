@@ -10,7 +10,6 @@ class QuestionsController < ApplicationController
     render action: 'list'
   end
 
-  # Check destroy method
   def action_allowed?
     ['Super-Administrator',
      'Administrator',

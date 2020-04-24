@@ -180,7 +180,7 @@ class QuestionnairesController < ApplicationController
   # Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions
     questionnaire_id = params[:id] unless params[:id].nil?
-    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions(params[:team_id]).size
+    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions(params[:team_id]).size#E2016: @team_id used for revision plan
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true, team_id: params[:team_id])
       if question.is_a? ScoredQuestion
@@ -222,7 +222,7 @@ class QuestionnairesController < ApplicationController
     end
   end
 
-  # Yulin: student's view of the questionnaire's creation page
+  # E2016: student's view of the questionnaire's creation page
   def edit_revision_plan
     @questions = AssignmentTeam.find(params[:team_id]).revision_plan_questions
     @participant_id = params[:participant_id]
@@ -230,7 +230,7 @@ class QuestionnairesController < ApplicationController
 
   private
 
-  # Yulin: update questions that are already created. extract from the existing implementation that is
+  # E2016: update questions that are already created. This function is extract from the existing implementation that is
   # used many times in this file.
   def update_questions(questions)
     questions.each_pair do |k, v|
@@ -244,7 +244,7 @@ class QuestionnairesController < ApplicationController
     end
   end
 
-  # Always move questions created by students to after questions in the original rubric
+  #E2016: Always move questions created by students to after questions in the original rubric
   def adjust_question_seq(questionnaire_id, team_id)
     # find the largest seq value in the questionnaire and assign each revision plan question with the seq
     # value larger than the largest seq value

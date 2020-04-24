@@ -112,14 +112,15 @@ class Questionnaire < ActiveRecord::Base
     errors.add(:name, "Questionnaire names must be unique.") if results.present?
   end
 
-  # return questions in the original rubric
-  # as well as the team's revision planning questions if team_id is supplied
+  #E2016: return questions in the original rubric
+  #as well as the team's revision planning questions if team_id is supplied
   def questions(team_id = nil, round = nil)
     questions = Question.where(questionnaire_id: self.id, team_id: nil).order('seq ASC')
     questions += revision_plan_questions(team_id, questions.last.seq) if team_id and !round.nil? and round > 1
     questions
   end
-
+  
+  #E2016: return revision plan questions
   def revision_plan_questions(team_id, last_seq)
     revision_plan_questions = Question.where(questionnaire_id: self.id, team_id: team_id)
     revision_plan_header = SectionHeader.find_by(txt: "Revision Planning")

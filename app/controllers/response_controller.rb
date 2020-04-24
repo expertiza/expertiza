@@ -85,7 +85,6 @@ class ResponseController < ApplicationController
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = set_questionnaire
-      team_id = @response.round > 1 ? @map.reviewee_id : nil
       set_questions
       create_answers(params, @questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
@@ -253,7 +252,6 @@ class ResponseController < ApplicationController
     @contributor = @map.contributor
     new_response ? set_questionnaire_for_new_response : set_questionnaire
     set_dropdown_or_scale
-    round = @response.try(:round) || @assignment.number_of_current_round(nil)
     set_questions
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score

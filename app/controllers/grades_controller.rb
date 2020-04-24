@@ -95,14 +95,18 @@ class GradesController < ApplicationController
     counter_for_same_rubric = 0
     questionnaires.each do |questionnaire|
       @round = nil
-      if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
+      if questionnaire.type == "ReviewQuestionnaire"
         questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
-        if questionnaires.count > 1
-          @round = questionnaires[counter_for_same_rubric].used_in_round
-          counter_for_same_rubric += 1
+        if @assignment.varying_rubrics_by_round?
+          if questionnaires.count > 1
+            @round = questionnaires[counter_for_same_rubric].used_in_round
+            counter_for_same_rubric += 1
+          else
+            @round = questionnaires[0].used_in_round
+            counter_for_same_rubric = 0
+          end
         else
-          @round = questionnaires[0].used_in_round
-          counter_for_same_rubric = 0
+          @round = @assignment.number_of_current_round(nil)
         end
       end
       vm = VmQuestionResponse.new(questionnaire, @assignment, @round)

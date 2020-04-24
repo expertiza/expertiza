@@ -60,8 +60,6 @@ class AssignmentForm
       @errors = @assignment.errors.to_s
       @has_errors = true
     end
-    @assignment.num_metareviews_allowed ||= 3
-    @assignment.num_review_of_reviews = @assignment.num_metareviews_allowed
     @assignment.num_reviews = @assignment.num_reviews_allowed
     @assignment.save
   end

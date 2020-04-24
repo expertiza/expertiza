@@ -38,24 +38,35 @@
 <% if @assignment.metareview_allowed(@topic_id)%>
     <h2>Meta-reviews for "<%= @assignment.name %>"</h2>
 
-    <% if @assignment.num_metareviews_allowed.nil? || @assignment.num_metareviews_allowed == -1%>
-        <h4>Your instructor expects you to do <%= @assignment.num_metareviews_required %> meta-reviews. You are not allowed to do any extra meta-reviews. </h4>
-
-    <% elsif @assignment.num_metareviews_allowed == @assignment.num_metareviews_required %>
-        <h4>You should perform exactly <%= @assignment.num_metareviews_allowed %> meta-reviews </h4>
+    <% if @assignment.num_metareviews_required.nil? || @assignment.num_metareviews_required == -1 %>
+        <h4>Your instructor has made meta-reviews optional. You are not required to complete any meta-reviews</h4>
+        <% if @assignment.num_metareviews_allowed.nil? || @assignment.num_metareviews_allowed == -1 %>
+            <h4>There is no limit on the number of meta-reviews you may complete.</h4>
+        <% else %>
+            <h4>You may complete as many as <%= @assignment.num_meta_reviews_allowed %> meta-reviews.</h4>
+            <h4>Number of meta-reviews left: <%= @assignment.num_metareviews_allowed - @num_metareviews_total %></h4>
+        <% end %>
     <% else %>
-
-        <h4>You may perform between <%= @assignment.num_metareviews_required %> and <%= @assignment.num_metareviews_allowed %> meta-reviews</h4>
+      <% if @assignment.num_metareviews_allowed.nil? || @assignment.num_metareviews_allowed == -1%>
+          <h4>Your instructor expects you to complete at least <%= @assignment.num_metareviews_required %> meta-reviews.</h4>
+          <h4>There is no limit on the number of meta-reviews you can perform.</h4>
+      <% elsif @assignment.num_metareviews_allowed == @assignment.num_metareviews_required %>
+          <h4>You should perform exactly <%= @assignment.num_metareviews_allowed %> meta-reviews </h4>
+      <% else %>
+          <h4>You may perform between <%= @assignment.num_metareviews_required %> and <%= @assignment.num_metareviews_allowed %> meta-reviews</h4>
+      <% end %>
+      <h4>You are required to do <%= @assignment.num_metareviews_required %> meta-reviews</h4>
+      <% if !@assignment.num_metareviews_allowed.nil? && @assignment.num_metareviews_allowed != -1 %>
+        <h4>Number of meta-reviews left: <%= @assignment.num_metareviews_allowed - @num_metareviews_total %></h4>
+      <% end %>
     <% end %>
-    <h4>You are required to do <%= @assignment.num_metareviews_required %> meta-reviews</h4>
-    <h4> Number of meta-reviews left: <%= @assignment.num_metareviews_allowed - @num_metareviews_total %></h4>
 
   <%= render :partial => 'responses', :locals => {:mappings => @metareview_mappings, :title => 'Meta-review'} %>
     <br/>
     <% if @num_metareviews_in_progress >= Assignment.max_outstanding_reviews %>
         <br/>
         <span>Note: You can't have more than 2 outstanding meta-reviews. You must complete one of your outstanding meta-reviews before selecting another.</span>
-    <% elsif @num_metareviews_total == @assignment.num_metareviews_allowed %>
+    <% elsif @assignment.num_metareviews_allowed && @num_metareviews_total == @assignment.num_metareviews_allowed %>
         <br/>
         <span>Note: You can not do more than <%=@assignment.num_metareviews_allowed%> meta-reviews according to assignment policy.</span>
     <% elsif (!@assignment.metareview_available?(session[:user].id)) %>

@@ -77,6 +77,7 @@
     </tr>
   </table>
         <br/><br/>
+        <%if (Participant.get_authorization(@student.can_submit, @student.can_review, @student.can_take_quiz) =='mentor')%>
         <%if (@student and !team.hyperlinks.empty?) or (@student and !team.submitted_files.empty?)%>
         <b>Submissions</b>
             </br>
@@ -95,7 +96,7 @@
             <%= display_directory_tree(participant, files, true).html_safe if files and files.length > 0 %>
         <% end %>
     <%end%>
-
+<%end%>
     <% if (Participant.get_authorization(@student.can_submit, @student.can_review, @student.can_take_quiz) !='mentor') and (@student.team.have_mentor?) %>
 <br/><br/>
   <b>Mentor</b>

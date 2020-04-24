@@ -1,7 +1,6 @@
 describe ReviewBid do
   let(:test) { build(:review_bid, priority: 1, participant_id: 1,  topic_id: 1,assignment_id: 1) }
   let(:test1) { build(:review_bid, priority: 1, participant_id: 'b',  topic_id: 'c',assignment_id: 'd') }
-  let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 8) }
   let(:participant) { build(:participant, id: 16, user_id: 6, assignment: assignment) }
@@ -62,14 +61,6 @@ it "validate assignment_id is integer" do
       allow(Participant).to receive(:reviewer).with(8).and_return(7)
       val = ReviewBid.reviewer_bidding_data(test.participant_id,test.assignment_id)
       expect(val).to be_a_kind_of(Hash)
-    end
-  end
-
-  describe '.reviewer_self_topic' do
-    it 'check if integer or nil is being returned for reviewer_self_topic' do
-      allow(Participant).to receive(:reviewer).with(5).and_return(10)
-      val = ReviewBid.reviewer_self_topic(test.participant_id,test.assignment_id)
-      expect(val).to be_a_kind_of(Integer) or be_nil
     end
   end
 

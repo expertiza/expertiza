@@ -11,13 +11,10 @@ class QuestionsController < ApplicationController
   end
 
   def action_allowed?
-    question = Question.find(params[:id])
-    team = AssignmentTeam.find(question.team_id)
-    if team.users.find(current_user)
-      ['Super-Administrator',
-      'Administrator',
-      'Instructor',
-      'Teaching Assistant', 'Student'].include? current_role_name
+    if current_role_name == 'Student'
+      question = Question.find(params[:id])
+      team = AssignmentTeam.find(question.team_id)
+      team.users.find(current_user)
     else
       ['Super-Administrator',
       'Administrator',

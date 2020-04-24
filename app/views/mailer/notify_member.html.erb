@@ -1,0 +1,31 @@
+<p>
+  <%if @ismentor%>
+      Team <%= @team.name %> has been assigned to you
+  <%else%>
+  <%= @mentor.user.name %> has been assigned as your mentor
+  <%end%>
+</p>
+<br/>
+<b style="text-align: center">Team Name: &nbsp;&nbsp;</b><%= @team.name %>
+<br/><br/>
+<b>Team members</b>
+<br/><br/>
+<table style="width:80%" align="center" >
+  <tr style="border: 1px outset #000000; padding: 10px 20px" >
+    <th class="head">Username</th>
+    <th class="head">Full name</th>
+    <!--<th class="head">Team-member role (duty)</th>-->
+    <th class="head">Email address</th>
+    <!--<th class="head">Role</th>-->
+  </tr>
+  <%@members.each do |member|%>
+      <% if member.user_id!=@mentor.user_id %>
+      <tr>
+            <td><%= member.user.name %></td>
+            <td><%= member.user.fullname %></td>
+            <td><%= member.user.email %></td>
+
+            </tr>
+            <%end%>
+  <%end%>
+</table>

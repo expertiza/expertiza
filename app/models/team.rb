@@ -69,17 +69,29 @@ class Team < ActiveRecord::Base
       parent = TeamNode.find_by(node_object_id: self.id)
       TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
       add_participant(self.parent_id, user)
-      ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{self.id}")
+      members = TeamsUser.where(team_id: self.id)
+      members_id=TeamsUser.where(team_id: self.id).pluck(:user_id)
+      participants=Participant.where(user_id: members_id)
 
       # only assign mentor when number of mentor > 0
       if Participant.where(['can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', 0, 0, 0, self.parent_id]).count > 0
         # for new added member and team already has mentor
         if half? && have_mentor?
-          members = TeamsUser.where(team_id: self.id)
+
           members.each do |member|
             if Participant.where(['user_id = ? and can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', member.user_id ,0, 0, 0, self.parent_id]).count > 0
               mentor=member
-              Mailer.notify_single_team_member(user,mentor,self)
+              ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Mentor already available #{self.id}")
+              Mailer.notify_member(
+                  to: user.email,
+                  subject: "Mentor assigned to team",
+                  body: {
+                      members: participants,
+                      team: self,
+                      mentor: mentor,
+                      ismentor: false
+                  }
+              ).deliver_now
             end
           end
         # num >= max/2 and dont have mentor yet
@@ -87,18 +99,43 @@ class Team < ActiveRecord::Base
               mentor=assign_mentor
               new_mentor = TeamsUser.create(user_id: mentor.user_id, team_id: self.id)
               TeamUserNode.create(parent_id: parent.id, node_object_id: new_mentor.id)
-              ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{self.id}")
+              ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added mentor to the team #{self.id}")
 
               # Email notification
-              Mailer.notify_mentor(mentor,self)
-              Mailer.notify_team_members(mentor,self)
+              participants.each do |member|
+                if member.user_id!=mentor.user_id
+
+              Mailer.notify_member(
+                to: member.user.email,
+                subject: "Mentor assigned to team",
+                body: {
+                    members: participants,
+                    team: self,
+                    mentor: mentor,
+                    ismentor: false
+                }
+              ).deliver_now
+                else
+                  Mailer.notify_member(
+                      to: mentor.user.email,
+                      subject: "New team assigned",
+                      body: {
+                          members: participants,
+                          team: self,
+                          mentor: mentor,
+                          ismentor: true
+                      }
+                  ).deliver_now
+                  end
+              #Mailer.notify_team_members(mentor,self)
              end
 	   
         end
       end
     end
     can_add_member
-  end
+    end
+    end
 
 
 

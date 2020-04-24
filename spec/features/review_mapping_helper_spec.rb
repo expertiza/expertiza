@@ -31,6 +31,7 @@ describe 'Tests Review report' do
   end
 end
 
+# E2015 : Test Review Conflict Report
 describe "Test Review conflict report" do
   before(:each) do
     create(:instructor)
@@ -41,6 +42,8 @@ describe "Test Review conflict report" do
     page.select("Review conflict report", :from => "report[type]")
     click_button "View"
   end
+
+  # Check if the page renders
 
   it "can display teams" do
     expect(page).to have_content('Team')

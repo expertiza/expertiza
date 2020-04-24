@@ -10,22 +10,12 @@ class QuestionsController < ApplicationController
     render action: 'list'
   end
 
-  # Guoyi, hope student could delete question, doesn't work
   # Check destroy method
   def action_allowed?
-    question = Question.find(params[:id])
-    team = AssignmentTeam.find(question.team_id)
-    if team.users.find(current_user)
-      ['Super-Administrator',
-       'Administrator',
-       'Instructor',
-       'Teaching Assistant', 'Student'].include? current_role_name
-    else
-      ['Super-Administrator',
-       'Administrator',
-       'Instructor',
-       'Teaching Assistant'].include? current_role_name
-    end
+    ['Super-Administrator',
+     'Administrator',
+     'Instructor',
+     'Teaching Assistant'].include? current_role_name
   end
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)

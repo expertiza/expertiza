@@ -71,32 +71,6 @@ class PopupController < ApplicationController
     end
   end
 
-  def get_bigrams(string)
-    '''
-    Takes a string and returns a list of bigrams
-    '''
-    s = string.downcase
-    bg = []
-    s.split('').each_with_index do |item, index|
-
-      bg << s[index..index+3]
-
-    end
-    bg
-  end
-
-
-  def string_similarity(str1, str2)
-    '''
-    Perform bigram comparison between two strings
-    and return a percentage match in decimal form
-    '''
-    pairs1 = get_bigrams(str1)
-    pairs2 = get_bigrams(str2)
-    puts pairs1
-    return (2.0 * (pairs1 & pairs2).size / (pairs1.size + pairs2.size))
-  end
-
 
   def participants_popup
     @sum = 0

@@ -5,8 +5,8 @@ module StringOperationHelper
     Perform bigram comparison between two strings
     and return a percentage match in decimal form
     '''
-    pairs1 = get_bigrams(str1,3)
-    pairs2 = get_bigrams(str2,3)
+    pairs1 = get_ngrams(str1,3)
+    pairs2 = get_ngrams(str2,3)
 
     return (2.0 * (pairs1 & pairs2).size / (pairs1.size + pairs2.size))
   end

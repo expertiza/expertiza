@@ -281,6 +281,7 @@ describe QuestionnairesController do
         allow(Question).to receive(:find).with('1').and_return(question)
         allow(question).to receive(:save).and_return(true)
         allow(@questionnaire1).to receive(:update_attributes).with(any_args).and_return(true)
+        allow(QuestionnairesController).to receive(:update_questions).with(any_args).and_return(true)
         post :update, @params_with_question
         expect(flash[:success]).to eq('The questionnaire has been successfully updated!')
         expect(response).to redirect_to('/questionnaires/1/edit')

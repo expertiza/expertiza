@@ -206,6 +206,14 @@ class AssignmentForm
       # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
       return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
     end
+
+    # Get all AQs for the assignment and specified round number (if round # + topic didn't work)
+    assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number)
+    assignment_questionnaires.each do |aq|
+      # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
+      return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+    end
+
     # Create a new AQ if it was not found based on the attributes
     default_weight = {}
     default_weight['ReviewQuestionnaire'] = 100

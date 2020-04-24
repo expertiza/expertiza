@@ -45,12 +45,16 @@ describe "Test Review conflict report" do
 
   # Check if the page renders
 
+  it "has a conflicting review table" do
+    expect(page).to have_css('table')
+  end
+
   it "can display teams" do
     expect(page).to have_content('Team')
   end
 
   it "can display author reviewers and metrics" do
-    expect(page).to have_content('Reviewers/Metrics')
+    expect(page).to have_selector(:link_or_button, 'Convert Points to Percents')
   end
 
 end

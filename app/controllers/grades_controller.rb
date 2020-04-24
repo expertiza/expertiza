@@ -37,17 +37,15 @@ class GradesController < ApplicationController
   # It also gives a final score, which is an average of all the reviews and greatest difference
   # in the scores of all the reviews.
   def view
-    @participant = AssignmentParticipant.find(params[:id])
-    @assignment = @participant.assignment
-    @team_id = @participant.team.id # E2016: team_id is used for revision planning
+    @assignment = Assignment.find(params[:id])
     questionnaires = @assignment.questionnaires
 
     if @assignment.varying_rubrics_by_round?
-      @questions = retrieve_questions questionnaires, @assignment.id, @team_id # E2016: team_id is used for revision planning
+      @questions = retrieve_questions questionnaires, @assignment.id
     else # if this assignment does not have "varying rubric by rounds" feature
       @questions = {}
       questionnaires.each do |questionnaire|
-        @questions[questionnaire.symbol] = questionnaire.questions @team_id
+        @questions[questionnaire.symbol] = questionnaire.questions
       end
     end
 
@@ -211,7 +209,7 @@ class GradesController < ApplicationController
     @all_penalties = {}
     @assignment = Assignment.find(assignment_id)
     calculate_for_participants = true unless @assignment.is_penalty_calculated
-    Participant.where(parent_id: assignment_id).each do |participant|
+    AssignmentParticipant.where(parent_id: assignment_id).each do |participant|
       penalties = calculate_penalty(participant.id)
       @total_penalty = 0
 

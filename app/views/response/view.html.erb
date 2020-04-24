@@ -18,7 +18,7 @@
 <% end %>
 
 <% file_url = nil %>
-<%= @response.display_as_html(nil, nil, file_url) %>
+<%= @response.display_as_html(nil, nil, file_url, nil, nil, @map.reviewee_id, @response.round) %>
 <br/>
 
 <!--Check whether there is a UploadFile question.-->

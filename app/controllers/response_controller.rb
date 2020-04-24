@@ -257,7 +257,7 @@ class ResponseController < ApplicationController
     set_dropdown_or_scale
     round = @response.try(:round) || @assignment.number_of_current_round(nil)
     team_id = round > 1 ? @map.reviewee_id : nil
-    @questions = sort_questions(@questionnaire.questions(team_id))
+    @questions = sort_questions(@questionnaire.questions(team_id, round))
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
   end

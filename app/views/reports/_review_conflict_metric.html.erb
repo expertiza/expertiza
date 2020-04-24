@@ -7,7 +7,7 @@
       <td width="30%">
         <div>
           <strong>Reviewers with scores</strong><br>
-          <ol>
+          <ol class="reviewers_ol">
             <% review_score.each do |reviewer, score| %>
               <li><% response_id = response_id_review_conflict(reviewer, @teams[team_name], @id) %>
               <mark style="background-color:<%=get_conflict_color(false, score, metrics[:upper_tolerance_limit], metrics[:lower_tolerance_limit])%>">
@@ -56,7 +56,7 @@
 </table>
 
 <style>
-  ol {
+  .reviewers_ol {
     column-count: 3;
   }
 </style>

@@ -31,6 +31,35 @@ describe 'Tests Review report' do
   end
 end
 
+# E2015 : Test Review Conflict Report
+describe "Test Review conflict report" do
+  before(:each) do
+    create(:instructor)
+    create(:assignment, course: nil, name: 'Test Assignment')
+    assignment_id = Assignment.where(name: 'Test Assignment')[0].id
+    login_as 'instructor6'
+    visit "/reports/response_report?id=#{assignment_id}"
+    page.select("Review conflict report", :from => "report[type]")
+    click_button "View"
+  end
+
+  # Check if the page renders
+
+  it "has a conflicting review table" do
+    expect(page).to have_css('table')
+  end
+
+  it "can display teams" do
+    expect(page).to have_content('Team')
+  end
+
+  it "can display author reviewers and metrics" do
+    expect(page).to have_selector(:link_or_button, 'Convert Points to Percents')
+  end
+
+end
+
+
 describe "Test Author feedback report" do
   before(:each) do
     create(:instructor)

@@ -74,6 +74,23 @@ describe ReportsController do
       end
     end
 
+    describe '#review_conflict_response_map' do
+      context 'when type is ReviewConflictResponseMap' do
+        it 'renders response_report page with corresponding data' do
+          allow(TeammateReviewResponseMap).to receive(:teammate_response_report)
+            .with('1')
+            .and_return([participant, participant2])
+          params = {
+              id: 1,
+              report: {type: 'ReviewConflictResponseMap'},
+              user: 'no one'
+          }
+          get :response_report, params
+          expect(response).to render_template(:response_report)
+        end
+      end
+    end
+
     describe 'feedback_response_map' do
       context 'when type is FeedbackResponseMap' do
         context 'when assignment has varying_rubrics_by_round feature' do

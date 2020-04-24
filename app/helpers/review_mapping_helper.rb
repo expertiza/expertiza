@@ -73,7 +73,7 @@ module ReviewMappingHelper
     metrics[:std] = std_of_round(metrics[:average],review_scores)
     metrics[:upper_tolerance_limit] = calculate_upper_tolerance(review_scores, max_score)
     metrics[:lower_tolerance_limit] = calculate_lower_tolerance(review_scores)
-
+    # Calculate percentage scores
     review_scores_percents = review_scores.inject({}) { |h, (reviewer, answer)| h[reviewer]=(answer.to_f/max_score.to_f)*100; h}
 
     metrics[:average_percent] = average_of_round(review_scores_percents)
@@ -152,15 +152,13 @@ module ReviewMappingHelper
     average = average_of_round(question_answer)
     std = std_of_round(average,question_answer)
     lower_tolerance = (average-(2*std)).round(2)
-
-    if lower_tolerance > 0
-      return lower_tolerance
-    else
-      return 0
-    end
+    # Return zero if negative
+    [lower_tolerance, 0].max
   end
 
+  # Highlight the conflicting score with a different coloured graph
   def get_conflict_color(is_graph, score, upper_tolerance, lower_tolerance)
+    # Check tolerance values to devide graph color
     if score > upper_tolerance
       return '#ffa200'
     elsif score < lower_tolerance

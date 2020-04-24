@@ -84,7 +84,7 @@ class QuestionsController < ApplicationController
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
-    redirect_to controller: 'questionnaires', action: 'edit', id: questionnaire_id.to_s.to_sym, team_id: team_id
+    redirect_to controller: 'questionnaires', action: 'edit', id: questionnaire_id.to_s.to_sym, team_id: team_id, participant_id: session[:participant_id]
   end
 
   # required for answer tagging

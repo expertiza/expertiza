@@ -107,7 +107,6 @@ class QuestionnairesController < ApplicationController
   # Edit a questionnaire
   def edit
     @questionnaire = Questionnaire.find(params[:id])
-    @participant_id = params[:participant_id]
     redirect_to Questionnaire if @questionnaire.nil?
     session[:return_to] = request.original_url
   end
@@ -225,7 +224,7 @@ class QuestionnairesController < ApplicationController
   # E2016: student's view of the questionnaire's creation page
   def edit_revision_plan
     @questions = AssignmentTeam.find(params[:team_id]).revision_plan_questions
-    @participant_id = params[:participant_id]
+    session[:participant_id] = params[:participant_id] # E2016: participant_id for uploading revision plan link
   end
 
   private

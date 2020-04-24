@@ -1,12 +1,12 @@
 <h1>Edit Revision Plan</h1>
 
 Remember to
-<%= link_to 'upload', :controller => 'submitted_content', :action => 'edit', :id => @participant_id %>
+<%= link_to 'upload', :controller => 'submitted_content', :action => 'edit', :id => session[:participant_id] %>
 your revision plan info page (description + questions) if you haven't done so.
 
 <hr />
 <%= render :partial => 'questions', :locals => {:questions => @questions,
-                                               :participant_id => @participant_id,
+                                               :participant_id => session[:participant_id],
                                                :questionnaire_type => 'revision plan'} %>
 <br />
 <%= render :partial => '/shared_scripts/back' %>

@@ -116,7 +116,7 @@ class Questionnaire < ActiveRecord::Base
   # as well as the team's revision planning questions if team_id is supplied
   def questions(team_id = nil, round = nil)
     questions = Question.where(questionnaire_id: self.id, team_id: nil).order('seq ASC')
-    questions += RevisionPlanQuestionnaire.questions(team_id, questions.last.seq) if team_id and !round.nil? and round > 1
+    questions += RevisionPlanQuestionnaire.questions(self.id, team_id, questions.last.seq) if team_id and !round.nil? and round > 1
     questions
   end
 end

@@ -12,4 +12,52 @@ class SampleReviewsController < ApplicationController
 
         @sample_reviews = SampleReview.all
     end
+
+    def map_to_assignment
+
+      params[:assignments].each do |assignment_id|
+        @sample_review = SampleReview.create(:response_id => params[:id],:assignment_id=>assignment_id)
+
+      end
+      @response = Response.find(params[:id])
+      begin
+        @map = @response.map
+
+        # Updating visibility for the response object, by E2022 @khotAyush -->
+        visibility = 'published'
+        @response.update_attribute("visibility",visibility)
+
+
+      rescue StandardError
+        msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
+      end
+
+      respond_to do |format|
+          format.html { redirect_to request.referrer, notice: 'Review Marked as Example' }
+          format.json { render json: @sample_review.id, status: :created }
+      end
+    end
+
+    def unmap_from_assignment
+
+      SampleReview.where(:response_id=> params[:id]).delete_all
+
+      @response = Response.find(params[:id])
+      begin
+        @map = @response.map
+
+        # Updating visibility for the response object, by E2022 @khotAyush -->
+        visibility = 'public'
+        @response.update_attribute("visibility",visibility)
+
+
+      rescue StandardError
+        msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
+      end
+
+      respond_to do |format|
+        format.html { redirect_to request.referrer, notice: 'Review Unmarked as Example' }
+        format.json { head :no_content }
+      end
+    end
 end

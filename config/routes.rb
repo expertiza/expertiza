@@ -512,5 +512,8 @@ resources :institution, except: [:destroy] do
   get ':controller(/:action(/:id))(.:format)'
   match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
   post '/response_toggle_permission/:id' => 'response#toggle_permission'
+  post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'
+  post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'
+
 end
 

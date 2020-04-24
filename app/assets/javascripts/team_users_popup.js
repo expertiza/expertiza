@@ -1,31 +1,81 @@
 $(document).ready(function () {
-    $('#dialog').dialog({
+    $('#dialogConfirmMark').dialog({
         autoOpen: false
     })
-    $('#btn').click(function() {
-        $("#dialog").dialog({
-            modal: true,
-            height: 600,
-            width: 500,
-
-            buttons: {
-                Cancel : function () {
-                    $(this).dialog("close");
-                },
-                'Publish Sample Reviews': function() {
-                    var array = [];
-                    $("input:checkbox[name=published_assignments]:checked").each(function() {
-                        array.push($(this).val());
-                    });
-                    console.log(array)
-                    $(this).dialog("close");
-                }
-
-
-            }
-        });
-
-        $('#dialog').dialog('open');
-    });
+    $('#dialogConfirmUnmark').dialog({
+        autoOpen: false
+    })
 });
+
+function publish_example_review(bid) {
+    $("#dialogConfirmMark").dialog({
+        modal: true,
+        height: 600,
+        width: 500,
+
+        buttons: {
+            Cancel : function () {
+                $(this).dialog("close");
+            },
+            'Publish Sample Reviews': function() {
+                var array = [];
+                $("input:checkbox[name=published_assignments]:checked").each(function() {
+                    array.push($(this).val());
+                });
+
+                console.log(bid.getAttribute('data-response-id'))
+                console.log(array)
+                $.ajax({
+                    "url":"/sample_reviews/map/"+bid.getAttribute('data-response-id'),
+                    "type":"POST",
+                    "data":{
+                        "assignments":array
+                    },
+                    "dataType":"json"
+                });
+                $(this).dialog("close");
+            }
+
+
+        }
+    });
+
+    $('#dialogConfirmMark').dialog('open');
+}
+
+function suppress_example_review(bid) {
+    $("#dialogConfirmUnmark").dialog({
+        modal: true,
+        height: 600,
+        width: 500,
+
+        buttons: {
+            Cancel : function () {
+                $(this).dialog("close");
+            },
+            Yes: function() {
+                var array = [];
+                $("input:checkbox[name=published_assignments]:checked").each(function() {
+                    array.push($(this).val());
+                });
+
+                console.log(bid.getAttribute('data-response-id'))
+                console.log(array)
+                $.ajax({
+                    "url":"/sample_reviews/unmap/"+bid.getAttribute('data-response-id'),
+                    "type":"POST",
+                    "data":{
+                        "assignments":array
+                    },
+                    "dataType":"json"
+                });
+                $(this).dialog("close");
+            }
+
+
+        }
+    });
+
+    $('#dialogConfirmUnmark').dialog('open');
+}
 

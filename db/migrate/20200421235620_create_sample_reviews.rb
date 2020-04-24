@@ -7,6 +7,6 @@ class CreateSampleReviews < ActiveRecord::Migration
 
       t.timestamps null: false
     end
-    add_index :sample_reviews, :id
+
   end
 end

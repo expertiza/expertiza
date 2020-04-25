@@ -116,20 +116,21 @@ class Team < ActiveRecord::Base
                     ismentor: false
                 }
               ).deliver_now
-                else
-                  Mailer.notify_member(
-                      to: mentor.user.email,
-                      subject: "New team assigned",
-                      body: {
-                          members: participants,
-                          team: self,
-                          mentor: mentor,
-                          ismentor: true
-                      }
-                  ).deliver_now
+
+
                   end
               #Mailer.notify_team_members(mentor,self)
-             end
+              end
+              Mailer.notify_member(
+                  to: mentor.user.email,
+                  subject: "New team assigned",
+                  body: {
+                      members: participants,
+                      team: self,
+                      mentor: mentor,
+                      ismentor: true
+                  }
+              ).deliver_now
 	   
         end
       #end

@@ -340,10 +340,10 @@
         <input name="_method" type="hidden" value="put" />
     <%end%>
     <table width="100%">
+      <% i = 0 %>
+      <% @questions.each do |question| %>
       <tr>
         <td>
-          <% i = 0 %>
-          <% @questions.each do |question| %>
             <% answer = Answer.where(question_id: question.id, response_id: @response.id).first if !@response.nil?%>
             <% if question.instance_of? Criterion%>
               <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
@@ -357,9 +357,9 @@
               <div id="analysis_<%= i.to_s %>_comments"></div>
             <% end %>
             <% i += 1%>
-          <% end %>
         </td>
       </tr>
+      <% end %>
       <tr>
         <td>
           <label for="review_comments">Additional Comments</label><BR/>

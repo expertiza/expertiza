@@ -323,7 +323,7 @@ class ResponseController < ApplicationController
     questions.sort_by(&:seq)
   end
 
-  #E2016: gets a correct set of questions for each team in a given round
+  # E2016: return a correct set of questions for each team in a given round
   def set_questions
     round = @response.try(:round) || @assignment.number_of_current_round(nil)
     team_id = round > 1 ? @map.reviewee_id : nil

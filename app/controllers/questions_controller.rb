@@ -12,9 +12,7 @@ class QuestionsController < ApplicationController
 
   def action_allowed?
     if current_role_name == 'Student'
-      question = Question.find(params[:id])
-      team = AssignmentTeam.find(question.team_id)
-      team.users.find(current_user)
+      is_for_revision_planning?
     else
       ['Super-Administrator',
       'Administrator',
@@ -91,5 +89,13 @@ class QuestionsController < ApplicationController
   def types
     types = Question.distinct.pluck(:type)
     render json: types.to_a
+  end
+
+  private
+
+  def is_for_revision_planning?
+    question = Question.find(params[:id])
+    team = AssignmentTeam.find(question.team_id)
+    team.users.find(current_user)
   end
 end

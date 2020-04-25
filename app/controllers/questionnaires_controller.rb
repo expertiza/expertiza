@@ -8,14 +8,13 @@ class QuestionnairesController < ApplicationController
 
   # Check role access for edit questionnaire
   def action_allowed?
-    if ['Student'].include? current_role_name and params[:action] == "edit"
-      redirect_to action: 'edit_revision_plan', id: params[:id], team_id: params[:team_id], participant_id: params[:participant_id]
-    elsif params[:action] == "edit"
+    if params[:action] == "edit"
       @questionnaire = Questionnaire.find(params[:id])
       (['Super-Administrator',
         'Administrator'].include? current_role_name) ||
           ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id))) ||
-          ((['Teaching Assistant'].include? current_role_name) && session[:user].instructor_id == @questionnaire.try(:instructor_id))
+          ((['Teaching Assistant'].include? current_role_name) && session[:user].instructor_id == @questionnaire.try(:instructor_id)) ||
+          ((['Student'].include? current_role_name) && params[:team_id])
     else
       ['Super-Administrator',
        'Administrator',
@@ -106,6 +105,9 @@ class QuestionnairesController < ApplicationController
 
   # Edit a questionnaire
   def edit
+    if params[:team_id]
+      redirect_to action: 'edit_revision_plan', id: params[:id], team_id: params[:team_id], participant_id: params[:participant_id]
+    end
     @questionnaire = Questionnaire.find(params[:id])
     redirect_to Questionnaire if @questionnaire.nil?
     session[:return_to] = request.original_url
@@ -179,7 +181,7 @@ class QuestionnairesController < ApplicationController
   # Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions
     questionnaire_id = params[:id] unless params[:id].nil?
-    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions(params[:team_id], 2).size#E2016: @team_id used for revision plan
+    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions(params[:team_id], 2).size # E2016: team_id used for revision plan
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true, team_id: params[:team_id])
       if question.is_a? ScoredQuestion
@@ -207,6 +209,7 @@ class QuestionnairesController < ApplicationController
     begin
       if params[:save]
         update_questions(params[:question])
+        # E2016: re-adjust seq values of questions created by students so they appear after the original rubric questions
         adjust_question_seq(questionnaire_id, params[:team_id]) if params[:team_id]
         flash[:success] = 'All questions have been successfully saved!'
       end
@@ -243,7 +246,9 @@ class QuestionnairesController < ApplicationController
     end
   end
 
-  #E2016: Always move questions created by students to after questions in the original rubric
+  # E2016: Always move questions created by students to after questions in the original rubric
+  # These questions' relative order will remain the same so to give students a little freedom when
+  # designing their revision plans
   def adjust_question_seq(questionnaire_id, team_id)
     # find the largest seq value in the questionnaire and assign each revision plan question with the seq
     # value larger than the largest seq value

@@ -71,14 +71,6 @@ describe QuestionnairesController do
           check_access(instructor2).to be false
         end
       end
-
-      context 'when current user is a student' do
-        it 'redirects the user to the #edit_revision_plan action' do
-          stub_current_user(student, student.role.name, student.role)
-          get :edit
-          expect(response).to redirect_to("/questionnaires/edit_revision_plan")
-        end
-      end
     end
 
     context 'when params action is not edit and update' do

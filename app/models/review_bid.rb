@@ -34,7 +34,7 @@ class ReviewBid < ActiveRecord::Base
       # bidding_data['time'] << bid.updated_at
       bidding_data['time'] << 1
       #bidding_data['tid'] << bid.sign_up_topic_id
-      bidding_data['tid'] << bid.topic_id
+      bidding_data['tid'] << bid.signuptopic_id
     end
     return bidding_data
   end

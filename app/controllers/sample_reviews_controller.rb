@@ -33,7 +33,7 @@ class SampleReviewsController < ApplicationController
       end
 
       respond_to do |format|
-          format.html { redirect_to request.referrer, notice: 'Review Marked as Example' }
+          flash[:notice] = 'Review Marked as Example'
           format.json { render json: @sample_review.id, status: :created }
       end
     end
@@ -56,7 +56,7 @@ class SampleReviewsController < ApplicationController
       end
 
       respond_to do |format|
-        format.html { redirect_to request.referrer, notice: 'Review Unmarked as Example' }
+        flash[:notice] = 'Review Unmarked as Example'
         format.json { head :no_content }
       end
     end

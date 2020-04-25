@@ -31,9 +31,15 @@ function publish_example_review(bid) {
                     "data":{
                         "assignments":array
                     },
-                    "dataType":"json"
+                    "dataType":"json",
+                    success:function(data, textStatus, jqXHR)
+                    {
+
+                        window.location.reload();
+
+                    },
                 });
-                $(this).dialog("close");
+
             }
 
 
@@ -67,9 +73,14 @@ function suppress_example_review(bid) {
                     "data":{
                         "assignments":array
                     },
-                    "dataType":"json"
+                    "dataType":"json", success:function(data, textStatus, jqXHR)
+                    {
+
+                        window.location.reload();
+
+                    },
                 });
-                $(this).dialog("close");
+
             }
 
 

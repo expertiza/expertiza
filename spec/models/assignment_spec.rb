@@ -502,7 +502,7 @@ describe Assignment do
             [assignment_questionnaire1, assignment_questionnaire2])
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return([])
         allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
-        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(nil)
+        allow(Questionnaire).to receive(:find_by).with(id: nil).and_return(nil)
         allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire1)
         allow(Questionnaire).to receive(:find).with(2).and_return(questionnaire2)
         expect(assignment.review_questionnaire_id(1, 1)).to eq(questionnaire1.id)
@@ -513,7 +513,7 @@ describe Assignment do
       it 'returns nil' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
             [assignment_questionnaire1, assignment_questionnaire2])
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return(
             [assignment_questionnaire1])
         allow(assignment_questionnaire1).to receive(:questionnaire_id).and_return(nil)
         allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])

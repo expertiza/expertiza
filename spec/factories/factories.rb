@@ -454,6 +454,7 @@ FactoryBot.define do
     name 'fake_site'
   end
 
+
   factory :review_bid, class: ReviewBid do
     priority 1
     #participant

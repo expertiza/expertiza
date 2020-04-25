@@ -56,4 +56,4 @@ When editing existing files:
  * Follow the Ruby style Guide on code you add or edit, as above
 
 Please do no go crazy changing old code to match these guidelines; it will just create lots of potential merge conflicts.
-Applying style guidelines to code you add and modify is good enough. :-))
+Applying style guidelines to code you add and modify is good enough. :-)

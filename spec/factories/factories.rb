@@ -461,7 +461,7 @@ FactoryBot.define do
     #topic
     #assignment
     participant {Participant.first || association(:participant)}
-    topic {SignUpTopic.first || association(:topic)}
+    signuptopic_id 1
     assignment {Assignment.first || association(:assignment)}
   end
 end

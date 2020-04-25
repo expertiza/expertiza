@@ -7,8 +7,8 @@ RSpec.describe ReviewBidsController, type: :controller do
   let(:participant2) { build(:participant, id: 2, assignment: assignment, user_id: 2) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:topic) { build(:topic) }
-  let(:review_bid1) { build(:review_bid, id: 1, priority: 1, participant: participant1, topic: topic, assignment: assignment) }
-  let(:review_bid2) { build(:review_bid, id: 2, priority: 2, participant: participant2, topic: topic, assignment: assignment) }
+  let(:review_bid1) { build(:review_bid, id: 1, priority: 1, participant: participant1, signuptopic_id: 1, assignment: assignment) }
+  let(:review_bid2) { build(:review_bid, id: 2, priority: 2, participant: participant2, signuptopic_id: 1, assignment: assignment) }
 
   describe "#assign" do
 

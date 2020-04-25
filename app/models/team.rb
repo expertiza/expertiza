@@ -70,8 +70,8 @@ class Team < ActiveRecord::Base
       TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
       add_participant(self.parent_id, user)
       members = TeamsUser.where(team_id: self.id)
-      members_id=TeamsUser.where(team_id: self.id).pluck(:user_id)
-      participants=Participant.where(user_id: members_id)
+      members_id=members.collect(&:user_id)
+      participants=Participant.where(user_id: members_id, parent_id: self.parent_id)
 
       # only assign mentor when number of mentor > 0
       if Participant.where(['can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', 0, 0, 0, self.parent_id]).count > 0
@@ -94,8 +94,9 @@ class Team < ActiveRecord::Base
               ).deliver_now
             end
           end
+          end
         # num >= max/2 and dont have mentor yet
-        else if half? && !have_mentor?
+        if half? && !have_mentor?
               mentor=assign_mentor
               new_mentor = TeamsUser.create(user_id: mentor.user_id, team_id: self.id)
               TeamUserNode.create(parent_id: parent.id, node_object_id: new_mentor.id)
@@ -131,10 +132,10 @@ class Team < ActiveRecord::Base
              end
 	   
         end
+      #end
       end
-    end
+      end
     can_add_member
-    end
     end
 
 

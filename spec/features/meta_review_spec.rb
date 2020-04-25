@@ -91,73 +91,29 @@ describe "Meta-review tests" do
         expect(page).to have_content "Begin"
         click_link "Begin"
         fill_in "responses[0][comment]", with: "Can you explain why this is garbage?"
-        click_button "Submit Metareview"
+        click_button "Save Metareview"
         expect(page).to have_content "Your response was successfully saved."
-        
+
 
         # We should see 'Edit' Because we are in the current round of the review.
-        expect(page).to have_content "Edit" #TODO: This should be EDIT 
-        expect(page).to have_content "View" 
+        expect(page).to have_content "Edit"
+        expect(page).to have_content "View"
       end
 
-      it "User is able to SUBMIT a simple meta-review." do
-        submit_metareview(@submitter)
-        
-        # We should see 'Edit' Because we are in the current round of the review.
-        expect(page).to_not have_content "Edit"
-        expect(page).to_not have_content "Update"
-        expect(page).to have_content "View" 
+      it "User is able to go BACK during a simple meta review." do
+        stub_current_user(@submitter, @submitter.role.name, @submitter.role)
+        visit '/student_task/list'
+        expect(page).to have_content "metareview"
+        click_link "TestAssignment"
+        expect(page).to have_content "Others' work"
+        click_link "Others' work"
+        expect(page).to have_content 'Meta-reviews for "TestAssignment"'
+        click_button "Request a new meta-review to perform"
+        expect(page).to have_content "Begin"
+        click_link "Begin"
+        fill_in "responses[0][comment]", with: "Can you explain why this is garbage?"
+        expect(page).to have_content "Back"
       end
-
-      # it "User is able to SUBMIT a simple meta review." do
-      #   stub_current_user(@submitter, @submitter.role.name, @submitter.role)
-      #   visit '/student_task/list'
-      #   expect(page).to have_content "metareview"
-      #   click_link "TestAssignment"
-      #   expect(page).to have_content "Others' work"
-      #   click_link "Others' work"
-      #   expect(page).to have_content 'Meta-reviews for "TestAssignment"'
-      #   click_button "Request a new meta-review to perform"
-      #   expect(page).to have_content "Begin"
-      #   click_link "Begin"
-      #   fill_in "responses[0][comment]", with: "Can you explain why this is garbage?"
-      #   click_button "Save Metareview"
-      #   expect(page).to have_content "Your response was successfully saved."
-        
-      #   # We should see 'Edit' Because we are in the current round of the review.
-      #   expect(page).to have_content "Edit"
-      #   expect(page).to have_content "View"
-
-      #   # Set the meta review due date so it has already passed.
-      #   @metareview_due_date.due_at = Time.now - 1.day
-      #   @metareview_due_date.save
-
-      #   visit '/student_task/list'
-      #   click_link "TestAssignment"
-      #   click_link "Others' work"
-      #   expect(page).to have_content 'Meta-reviews for "TestAssignment"'
-      #   expect(page).not_to have_content "Update"
-      #   expect(page).not_to have_content "Edit"
-      #   expect(page).to have_content "View" 
-      # end
-
-      # it "User is able to go BACK during a simple meta review." do
-      #   stub_current_user(@submitter, @submitter.role.name, @submitter.role)
-      #   visit '/student_task/list'
-      #   expect(page).to have_content "meta-review"
-      #   click_link "TestAssignment"
-      #   expect(page).to have_content "Others' work"
-      #   click_link "Others' work"
-      #   expect(page).to have_content 'Meta-reviews for "TestAssignment"'
-      #   click_button "Request a new meta-review to perform"
-      #   expect(page).to have_content "Begin"
-      #   click_link "Begin"
-      #   fill_in "responses[0][comment]", with: "Can you explain why this is garbage?"
-      #   expect(page).to have_content "Back"
-      #   click_link "Back"
-      #   expect(page).to have_content "Update"
-      #   expect(page).to have_content "View" 
-      # end
 
       it "When the limit and required number of meta-reviews on the assignment are equal, 
           then a student will see they need to submit exactly that number of meta-reviews" do
@@ -414,5 +370,5 @@ def add_meta_review
   # create a meta-review
   metareview = create(:questionnaire, name: "Metareview", type: "MetareviewQuestionnaire")
   create(:question, txt: "MetaReviewQuestion", questionnaire: metareview)
-  create(:assignment_questionnaire, questionnaire: metareview, used_in_round: 1)
+  create(:assignment_questionnaire, questionnaire: metareview)
 end

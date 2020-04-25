@@ -7,8 +7,8 @@ RSpec.describe ReviewBidsController, type: :controller do
   let(:participant2) { build(:participant, id: 2, assignment: assignment, user_id: 2) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:topic) { build(:topic) }
-  let(:review_bid1) { build(:review_bid, id: 1, priority: 1, participant: participant1, signuptopic_id: topic, assignment: assignment) }
-  let(:review_bid2) { build(:review_bid, id: 2, priority: 2, participant: participant2, signuptopic_id: topic, assignment: assignment) }
+  let(:review_bid1) { build(:review_bid, id: 1, priority: 1, participant: participant1, signuptopic_id: 4, assignment: assignment) }
+  let(:review_bid2) { build(:review_bid, id: 2, priority: 2, participant: participant2, signuptopic_id: 5, assignment: assignment) }
 
   describe "#assign" do
 
@@ -39,19 +39,19 @@ RSpec.describe ReviewBidsController, type: :controller do
     #if there is no bid
     context "when there is no bid"
       it "creates a new ReviewBid item" do
-        expect{post :assign_review_priority, :participant_id=>1, :topic=>2}.to change{ReviewBid.count}
+        expect{post :assign_review_priority, :participant_id=>1, :topic=>17}.to change{ReviewBid.count}
       end
 
     context "when there is a bid" do
       it "should not create a new ReviewBid item" do
-        expect{post :assign_review_priority, :participant_id=>1, :topic=>1}.not_to change{ReviewBid.count}
+        expect{post :assign_review_priority, :participant_id=>1, :topic=>18}.not_to change{ReviewBid.count}
       end
 
       it "should update the priorities of the entries" do
         #review_priority = ReviewBid.where(participant_id:1,assignment_id:1).pluck(:priority)
         #expect{post :assign_review_priority, :participant_id=>1, :topic=>1}.to change{ReviewBid.where(participant_id:1,assignment_id:1).pluck(:priority)}.from(review_priority)
         #review_priority = ReviewBid.where(participant_id:1,assignment_id:1).pluck(:priority)
-        expect{post :assign_review_priority, :participant_id=>1, :topic=>1}.to change{review_bid1}
+        expect{post :assign_review_priority, :participant_id=>1, :topic=>19}.to change{review_bid1}
       end
     end
 

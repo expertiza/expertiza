@@ -10,7 +10,15 @@ class SampleReviewsController < ApplicationController
 
     def index
 
-        @sample_reviews = SampleReview.all
+        @all_assignments = SampleReview.where(:assignment_id => params[:id])
+        @responses = []
+        @all_assignments.each do |assignment|
+            @responses << Response.find(SampleReview.find(assignment).response_id)
+
+        end
+        
+
+
     end
 
     def map_to_assignment

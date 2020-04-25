@@ -1,6 +1,12 @@
-<h2>Sample Reviews</h2>
-
-
-
-<br><br>
+<h2>Sample Reviews for <%=Assignment.find(params[:id]).name%></h2>
+<table>
+<% if !@responses.nil? %>
+    <% @responses.each do |response| %>
+        <tr>
+            <%= link_to "View Sample", {:controller => 'response', :action => 'view', :id => response.response_id} %>
+            <br>
+        </tr>
+    <% end %>
+<% end %>
+</table>
 <a href="javascript:window.history.back()">Back</a>

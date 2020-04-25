@@ -77,9 +77,8 @@ class Team < ActiveRecord::Base
       if Participant.where(['can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', 0, 0, 0, self.parent_id]).count > 0
         # for new added member and team already has mentor
         if half? && have_mentor?
-
           members.each do |member|
-            if Participant.where(['user_id = ? and can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', member.user_id ,0, 0, 0, self.parent_id]).count > 0
+            if member.is_mentor
               mentor=member
               ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Mentor already available #{self.id}")
               Mailer.notify_member(
@@ -99,7 +98,7 @@ class Team < ActiveRecord::Base
         if half? && !have_mentor?
               mentor=assign_mentor
               new_mentor = TeamsUser.create(user_id: mentor.user_id, team_id: self.id)
-              TeamUserNode.create(parent_id: parent.id, node_object_id: new_mentor.id)
+              TeamUserNode.create(parent_id: parent.id, node_object_id: new_mentor.id, is_mentor: true)
               ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added mentor to the team #{self.id}")
 
               # Email notification
@@ -150,7 +149,7 @@ class Team < ActiveRecord::Base
     members = TeamsUser.where(team_id: team_id)
     members.each do |member|
     # The mentor is subtracted from the team size count
-    if Participant.where(['user_id = ? and can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', member.user_id ,0, 0, 0, check_team]).count > 0
+    if member.is_mentor
       team_size -= 1
       end
     end

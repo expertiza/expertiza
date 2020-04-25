@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200423065013) do
+ActiveRecord::Schema.define(version: 20200425020432) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -497,7 +497,7 @@ ActiveRecord::Schema.define(version: 20200423065013) do
 
   create_table "review_bids", force: :cascade do |t|
     t.integer  "priority",       limit: 4
-    t.integer  "topic_id",       limit: 4
+    t.integer  "signuptopic_id", limit: 4
     t.integer  "participant_id", limit: 4
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -507,7 +507,7 @@ ActiveRecord::Schema.define(version: 20200423065013) do
 
   add_index "review_bids", ["assignment_id"], name: "fk_rails_549e23ae08", using: :btree
   add_index "review_bids", ["participant_id"], name: "fk_rails_ab93feeb35", using: :btree
-  add_index "review_bids", ["topic_id"], name: "fk_rails_e88fa4058f", using: :btree
+  add_index "review_bids", ["signuptopic_id"], name: "fk_rails_e88fa4058f", using: :btree
   add_index "review_bids", ["user_id"], name: "fk_rails_6041e1cdb9", using: :btree
 
   create_table "review_comment_paste_bins", force: :cascade do |t|
@@ -823,7 +823,7 @@ ActiveRecord::Schema.define(version: 20200423065013) do
   add_foreign_key "resubmission_times", "participants", name: "fk_resubmission_times_participants"
   add_foreign_key "review_bids", "assignments"
   add_foreign_key "review_bids", "participants"
-  add_foreign_key "review_bids", "sign_up_topics", column: "topic_id"
+  add_foreign_key "review_bids", "sign_up_topics", column: "signuptopic_id"
   add_foreign_key "review_bids", "users"
   add_foreign_key "review_comment_paste_bins", "review_grades"
   add_foreign_key "review_grades", "participants"

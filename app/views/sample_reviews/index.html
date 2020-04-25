@@ -1,12 +1,17 @@
-<h2>Sample Reviews for <%=Assignment.find(params[:id]).name%></h2>
-<table>
-<% if !@responses.nil? %>
-    <% @responses.each do |response| %>
-        <tr>
-            <%= link_to "View Sample", {:controller => 'response', :action => 'view', :id => response.response_id} %>
-            <br>
-        </tr>
-    <% end %>
+<% if !@links.empty? %>
+  <h3>Below are the Sample Reviews for <%= @assignment.name%></h3>
+  <ul style="list-style-type: none;" class="list-group samples" data-id="<%= @assignment.id %>">
+    <li class="hide" id="li_template">
+      <a></a>
+    </li>
+    <%@links.each_with_index do |link, index|%>
+      <li><%=link_to("Sample Review " + (index+1).to_s, link, :id => link)%></li>
+      <%end%>
+  </ul>
+<% else %>
+  <h3>There are no sample reviews available for this assignment</h3>
 <% end %>
-</table>
-<a href="javascript:window.history.back()">Back</a>
+  
+<div class="footer">
+    <a href="javascript:window.history.back()">Back</a>
+</div>

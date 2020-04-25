@@ -11,18 +11,39 @@ class SampleReviewsController < ApplicationController
     def index
 
         @all_assignments = SampleReview.where(:assignment_id => params[:id])
-        @responses = []
+        @response_ids = []
         @all_assignments.each do |assignment|
-            @responses << Response.find(SampleReview.find(assignment).response_id)
-
+            @response_id = assignment.response_id
+            @response_ids << assignment.response_id
+            @assignment  = Assignment.find(assignment.assignment_id)
         end
-        
+        @links = generate_links(@response_ids)
+      end
 
+      def show
+        @response_id = params[:id]
+        unless @response_id.nil?
+          first_question_in_questionnaire = Answer.where(response_id: @response_id).first.question_id
+          questionnaire_id = Question.find(first_question_in_questionnaire).questionnaire_id
+          questionnaire = Questionnaire.find(questionnaire_id)
+          @maxscore = questionnaire.max_question_score
+          @scores = Answer.where(response_id: @response_id)
+          @response = Response.find(@response_id)
+          @total_percentage = @response.average_score
+          @sum = @response.total_score
+          @total_possible = @response.maximum_score
+        end
+      end
 
-    end
-
+      def generate_links(response_ids)
+        links = []
+        response_ids.each do |id|
+          links.append('/sample_reviews/show/' + id.to_s)
+        end
+        links
+      end
+      
     def map_to_assignment
-
       params[:assignments].each do |assignment_id|
         @sample_review = SampleReview.create(:response_id => params[:id],:assignment_id=>assignment_id)
 
@@ -68,4 +89,5 @@ class SampleReviewsController < ApplicationController
         format.json { head :no_content }
       end
     end
-end
+
+  end

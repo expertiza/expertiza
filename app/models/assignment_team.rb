@@ -52,7 +52,7 @@ class AssignmentTeam < Team
     has_mentor = false
     members = TeamsUser.where(team_id: self.id)
     members.each do |member|
-      if member.is_mentor
+      if Participant.where(['user_id = ? and can_submit = ? and can_review = ? and can_take_quiz = ? and parent_id = ?', member.user_id ,0, 0, 0, self.parent_id]).count > 0
         has_mentor = true
       end
     end
@@ -64,7 +64,7 @@ class AssignmentTeam < Team
     if !half? && have_mentor?
     	members = TeamsUser.where(team_id: self.id)
     	members.each do |member|
-     	if member.is_mentor
+        if Participant.where(['user_id = ? and can_submit = ? and can_review = ? and can_take_quiz = ?', member.user_id ,0, 0, 0]).count > 0
       		mentor=member
           TeamUserNode.where(parent_id: self.parent_id, node_object_id: mentor.id).destroy_all
           TeamsUser.where(user_id: mentor.user_id, team_id: self.id).destroy_all

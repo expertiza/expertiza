@@ -187,6 +187,37 @@ describe "Meta-review tests" do
         expect(page).to have_content "You should perform exactly #{@assignment.num_metareviews_required} meta-reviews"
       end
 
+      it "When the meta-review limits for an assignment are unset then a student will see
+          that the number of meta-reviews aren't limited" do
+
+        set_metareview_limits(-1,-1)
+
+        stub_current_user(@submitter, @submitter.role.name, @submitter.role)
+        visit '/student_task/list'
+        expect(page).to have_content "metareview"
+        click_link "TestAssignment"
+        expect(page).to have_content "Others' work"
+        click_link "Others' work"
+        expect(page).to have_content 'Meta-reviews for "TestAssignment"'
+        expect(page).not_to have_content "Number of meta-reviews left:"
+        expect(page).not_to have_content "You are required to do #{@assignment.num_metareviews_required} meta-reviews"
+      end
+
+      it "A student should not see a number of required or allowed meta-reviews when there are no limits on meta-reviews" do
+
+        set_metareview_limits(-1,-1)
+
+        stub_current_user(@submitter, @submitter.role.name, @submitter.role)
+        visit '/student_task/list'
+        expect(page).to have_content "metareview"
+        click_link "TestAssignment"
+        expect(page).to have_content "Others' work"
+        click_link "Others' work"
+        expect(page).to have_content 'Meta-reviews for "TestAssignment"'
+        expect(page).to have_content "Your instructor has made meta-reviews optional. You are not required to complete any meta-reviews"
+        expect(page).to have_content "There is no limit on the number of meta-reviews you may complete."
+      end
+
       it "A student should see the number of meta-reviews decrement after a review is requested" do
         stub_current_user(@submitter, @submitter.role.name, @submitter.role)
         visit '/student_task/list'

@@ -10,7 +10,7 @@
 		<% end %>
 	</tr>
 	<% if controller.action_name != "view_my_scores" || !@assignment.is_anonymous?%>
-	<tr class="head"><td align="right"><b><%= rowlabel %></b></td>	    	
+	<tr class="head"><td align="right"><b><%= rowlabel %></b></td>
 		<% for review in reviews %>
        <td align="center">
        <% if controller.action_name != "view_my_scores"%>
@@ -59,7 +59,7 @@
                   <%= review_participant.Hamer%></p>
                 <% end %>
               </td>
-          <% end %>        
+          <% end %>
       <% end %>
     </tr>
   <% end %>

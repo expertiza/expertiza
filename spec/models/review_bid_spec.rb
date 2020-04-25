@@ -1,6 +1,6 @@
 describe ReviewBid do
-  let(:test) { build(:review_bid, priority: 1, participant_id: 1,  topic_id: 1,assignment_id: 1) }
-  let(:test1) { build(:review_bid, priority: 1, participant_id: 'b',  topic_id: 'c',assignment_id: 'd') }
+  let(:test) { build(:review_bid, priority: 1, participant_id: 1,  signuptopic_id: 1,assignment_id: 1) }
+  let(:test1) { build(:review_bid, priority: 1, participant_id: 'b',  signuptopic_id: 'c',assignment_id: 'd') }
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 8) }
   let(:participant) { build(:participant, id: 16, user_id: 6, assignment: assignment) }
@@ -22,13 +22,13 @@ it "validate participant_id is integer" do
     end
   end
 
-  describe "#topic_id" do
-    it "returns the topic_id of the ReviewBid" do
-      expect(test.topic_id).to eq(1)
+  describe "#signuptopic_id" do
+    it "returns the signuptopic_id of the ReviewBid" do
+      expect(test.signuptopic_id).to eq(1)
     end
 
-it "validate topic_id is integer" do
-      expect(test1.topic_id).not_to eq('c')
+it "validate signuptopic_id is integer" do
+      expect(test1.signuptopic_id).not_to eq('c')
     end
   end
  

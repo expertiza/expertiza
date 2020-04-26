@@ -44,7 +44,7 @@ describe AssignmentForm do
     context 'when updating attributes of assignment unsuccessfully' do
       it 'changes @has_errors value to true and returns @assignment.num_reviews (3 by default)' do
         allow(assignment).to receive(:update_attributes).with({}).and_return(false)
-        expect(assignment_form.update_assignment({})).to eq(3)
+        expect(assignment_form.update_assignment({})).to eq(true)
         expect(assignment_form.instance_variable_get(:@has_errors)).to be true
       end
     end
@@ -52,7 +52,7 @@ describe AssignmentForm do
     context 'when updating attributes of assignment successfully' do
       it 'returns @assignment.num_reviews (3 by default) and the value of @has_errors is nil' do
         allow(assignment).to receive(:update_attributes).with({}).and_return('Succeed!')
-        expect(assignment_form.update_assignment({})).to eq(3)
+        expect(assignment_form.update_assignment({})).to eq(true)
         expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
       end
     end

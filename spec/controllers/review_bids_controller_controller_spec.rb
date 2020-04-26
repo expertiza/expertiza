@@ -33,6 +33,6 @@ RSpec.describe ReviewBidsController, type: :controller do
       it "should not create a new ReviewBid item" do
         expect{post :assign_review_priority, :participant_id=>1, :topic=>18}.not_to change{ReviewBid.count}
       end
-
+	end
   end
 end

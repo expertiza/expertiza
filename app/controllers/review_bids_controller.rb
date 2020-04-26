@@ -32,7 +32,8 @@ class ReviewBidsController < ApplicationController
     Assignment.find(assignment_id).update(allow_review_bidding: false)
     redirect_to :back
   end
-
+  
+  #fucntion that return the topic matching with the reviewers
   def reviewer_topic_matching(bidding_data,topics,assignment_id)
   #hash of participant ids
 	begin

@@ -57,7 +57,7 @@ describe "Meta-review tests" do
         set_due_date(@review_due_date, Time.now - 1.day)
       end
       
-      it "User should NOT be able to see 'Request a new meta-review to perfom' button when there are no reviews available" do
+      it "User should NOT be able to see 'Request a new meta-review to perform' button when there are no reviews available" do
         stub_current_user(@submitter, @submitter.role.name, @submitter.role)
         visit '/student_task/list'
         expect(page).to have_content "metareview"
@@ -118,7 +118,7 @@ describe "Meta-review tests" do
       it "When the limit and required number of meta-reviews on the assignment are equal, 
           then a student will see they need to submit exactly that number of meta-reviews" do
         set_metareview_limits(3,3)
-        
+
         stub_current_user(@submitter, @submitter.role.name, @submitter.role)
         visit '/student_task/list'
         expect(page).to have_content "metareview"
@@ -129,9 +129,9 @@ describe "Meta-review tests" do
         expect(page).to have_content "You should perform exactly #{@assignment.num_metareviews_required} meta-reviews"
       end
 
-      it "When the limit and required number of meta-reviews on the assignment are equal, 
-          then a student will see they need to submit exactly that number of meta-reviews" do
-        set_metareview_limits(3,3)
+      it "When there are more meta-reviews allowed than required, then a student will see they
+          need to submit between the two numbers of meta-reviews" do
+        set_metareview_limits(5,3)
         
         stub_current_user(@submitter, @submitter.role.name, @submitter.role)
         visit '/student_task/list'
@@ -140,7 +140,7 @@ describe "Meta-review tests" do
         expect(page).to have_content "Others' work"
         click_link "Others' work"
         expect(page).to have_content 'Meta-reviews for "TestAssignment"'
-        expect(page).to have_content "You should perform exactly #{@assignment.num_metareviews_required} meta-reviews"
+        expect(page).to have_content "You may perform between #{@assignment.num_metareviews_required} and #{@assignment.num_metareviews_allowed} meta-reviews"
       end
 
       it "When the meta-review limits for an assignment are unset then a student will see
@@ -225,7 +225,7 @@ describe "Meta-review tests" do
         expect(page).to have_content "Note: You can not do more than #{@assignment.num_metareviews_allowed} meta-reviews according to assignment policy."
       end
       
-      it "User should not be able to see 'Request a new meta-review to perfom' button when they have reviewed all valid reviews already" do
+      it "User should not be able to see 'Request a new meta-review to perform' button when they have reviewed all valid reviews already" do
         submit_metareview(@submitter)
         expect(page).to have_content 'Meta-reviews for "TestAssignment"'
         expect(page).to_not have_button "Request a new meta-review to perform"
@@ -245,7 +245,7 @@ describe "Meta-review tests" do
         set_due_date(@review_due_date, Time.now - 1.day)
       end
       
-      it "User should be able to click the 'Begin' button and still see 'Request a new meta-review to perform' button" do
+      it "User should be able to request more than one meta-review before completing any" do
         stub_current_user(@submitter, @submitter.role.name, @submitter.role)
         visit '/student_task/list'
         expect(page).to have_content "metareview"
@@ -258,7 +258,7 @@ describe "Meta-review tests" do
         expect(page).to have_button "Request a new meta-review to perform"
       end
       
-      it "User should not be able to see 'Request a new meta-review to perfom' button when they have reached the meta-review limit" do
+      it "User should not be able to see 'Request a new meta-review to perform' button when they have reached the meta-review limit" do
         set_metareview_limits(3,3)
         
         submit_metareview(@submitter)
@@ -267,7 +267,7 @@ describe "Meta-review tests" do
         expect(page).to have_content "Note: You can not do more than #{@assignment.num_metareviews_allowed} meta-reviews according to assignment policy."
       end
 
-      it "If a student has requested two meta-reviewes but have not submitted it, then they should not be able to request a new meta-review." do
+      it "User should not be able to request more than two meta-reviews without completing at least 1" do
         stub_current_user(@submitter, @submitter.role.name, @submitter.role)
         visit '/student_task/list'
         expect(page).to have_content "metareview"
@@ -283,7 +283,7 @@ describe "Meta-review tests" do
         expect(page).not_to have_button "Request a new meta-review to perform"
       end
 
-      it "A student should be able to request a meta-review if they are above their required but below their allowed reviews" do
+      it "A student should be able to request a meta-review if they are above their required but below their allowed meta-reviews" do
         set_metareview_limits(3,1)
         
         submit_metareview(@submitter)

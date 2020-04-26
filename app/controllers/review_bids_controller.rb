@@ -21,7 +21,7 @@ class ReviewBidsController < ApplicationController
     end
   end
 
-  #entry point to the webservice call
+  #entry point to the webservice call to enable json dating passing between the webservice and controller
   def assign
     assignment_id = params[:id]
     reviewers = ReviewBid.assignment_reviewers(assignment_id)
@@ -75,7 +75,8 @@ class ReviewBidsController < ApplicationController
     @num_of_topics = @sign_up_topics.size
     render 'sign_up_sheet/review_bid'
   end
-
+  
+  
   def assign_review_priority
     if params[:topic].nil?
       ReviewBid.where(participant_id: params[:participant_id]).destroy_all

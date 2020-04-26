@@ -2,7 +2,8 @@ class ReviewBidsController < ApplicationController
   require "net/http"
   #require "uri"
   require "json"
-
+  
+  #action allowed function checks the action allowed based on the user working
   def action_allowed?
     case params[:action]
     when 'review_bid', 'assign_review_priority'
@@ -48,6 +49,7 @@ class ReviewBidsController < ApplicationController
 		return false
 	end
   end
+  
 
 
   # display the review topics to bid

@@ -338,7 +338,8 @@ describe Assignment do
 
     context 'when next_due_date is not nil' do
       it 'returns the round of next_due_date' do
-        allow(DueDate).to receive(:get_next_due_date).with(1, 1).and_return(double('DueDate', round: 2))
+        create(:deadline_type)
+        allow(DueDate).to receive(:get_next_due_date).with(1, 1).and_return(double('DueDate', round: 2, deadline_type_id: 1))
         expect(assignment.number_of_current_round(1)).to eq(2)
       end
     end

@@ -23,8 +23,6 @@ function publish_example_review(bid) {
                     array.push($(this).val());
                 });
 
-                console.log(bid.getAttribute('data-response-id'))
-                console.log(array)
                 $.ajax({
                     "url":"/sample_reviews/map/"+bid.getAttribute('data-response-id'),
                     "type":"POST",
@@ -65,8 +63,6 @@ function suppress_example_review(bid) {
                     array.push($(this).val());
                 });
 
-                console.log(bid.getAttribute('data-response-id'))
-                console.log(array)
                 $.ajax({
                     "url":"/sample_reviews/unmap/"+bid.getAttribute('data-response-id'),
                     "type":"POST",

@@ -379,12 +379,16 @@
             return;
         }
     }
-		<%# This function hides and shows the rest of the elements on the other pages that have to do with metareviews when this is enabled/disbaled. On creation, they should already have to logic for this. %>
+	// This function hides and shows the rest of the elements on the other pages that have to do with metareviews when this is enabled/disbaled. 
+	// This includes adding a due date row, adding a questionnaire rubric row, and showing the meta-review limits checkbox.
         function removeOrAddMetareview(){
-			var metaCheckbox = jQuery('#metareviewAllowed');
+	    var metaCheckbox = jQuery('#metareviewAllowed');
             if(metaCheckbox.is(':checked')) {
-				addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
-                jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
+		// Add due date row for meta-reviews
+		addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
+                // Remove any previously stored questionnaire for meta-reviews
+		jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
+		// Add new meta-review questionnaire row
                 addQuestionnaireTableRow(
                         'MetareviewQuestionnaire',
                         null,
@@ -392,12 +396,17 @@
                         <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
                         <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
                 );
+		// Remove style="display:none" from the meta-review limits checkbox.
                 jQuery("#metareview_limit_row").removeAttr('style');
             } else {
-				removeDueDateTableElement('metareview', 0);
+		// Remove due date row for meta-reviews
+		removeDueDateTableElement('metareview', 0);
+		// Remove questionnaire row
                 jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
-				jQuery("#metareview_limit_row").css("display","none");
-        jQuery("#metareview_limit_threshold_row").css("display","none");
+		// Hide the checkbox for meta-review limits
+		jQuery("#metareview_limit_row").css("display","none");
+		// Hide the inputs for meta-review limits
+        	jQuery("#metareview_limit_threshold_row").css("display","none");
             }
         }
         function removeOrAddSignup(){

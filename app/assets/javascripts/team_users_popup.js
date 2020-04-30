@@ -22,7 +22,6 @@ function publish_example_review(bid) {
                 $("input:checkbox[name=published_assignments]:checked").each(function() {
                     array.push($(this).val());
                 });
-
                 $.ajax({
                     "url":"/sample_reviews/map/"+bid.getAttribute('data-response-id'),
                     "type":"POST",
@@ -32,17 +31,10 @@ function publish_example_review(bid) {
                     "dataType":"json",
                     success:function(data, textStatus, jqXHR)
                     {
-
                         window.location.reload();
-
                     },
                 });
-
-            }
-
-
-        }
-    });
+            }}});
 
     $('#dialogConfirmMark').dialog('open');
 }
@@ -71,17 +63,10 @@ function suppress_example_review(bid) {
                     },
                     "dataType":"json", success:function(data, textStatus, jqXHR)
                     {
-
                         window.location.reload();
-
                     },
                 });
-
-            }
-
-
-        }
-    });
+            }}});
 
     $('#dialogConfirmUnmark').dialog('open');
 }

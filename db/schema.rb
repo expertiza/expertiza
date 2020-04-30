@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181205201208) do
+ActiveRecord::Schema.define(version: 20200421235620) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -475,13 +475,14 @@ ActiveRecord::Schema.define(version: 20181205201208) do
   add_index "response_maps", ["reviewer_id"], name: "fk_response_map_reviewer", using: :btree
 
   create_table "responses", force: :cascade do |t|
-    t.integer  "map_id",             limit: 4,     default: 0,     null: false
+    t.integer  "map_id",             limit: 4,     default: 0,         null: false
     t.text     "additional_comment", limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "version_num",        limit: 4
     t.integer  "round",              limit: 4
     t.boolean  "is_submitted",                     default: false
+    t.string   "visibility",         limit: 255,   default: "private"
   end
 
   add_index "responses", ["map_id"], name: "fk_response_response_map", using: :btree
@@ -532,6 +533,13 @@ ActiveRecord::Schema.define(version: 20181205201208) do
 
   add_index "roles_permissions", ["permission_id"], name: "fk_roles_permission_permission_id", using: :btree
   add_index "roles_permissions", ["role_id"], name: "fk_roles_permission_role_id", using: :btree
+
+  create_table "sample_reviews", force: :cascade do |t|
+    t.integer  "assignment_id", limit: 4
+    t.integer  "response_id",   limit: 4
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
 
   create_table "score_views", id: false, force: :cascade do |t|
     t.integer  "question_weight",       limit: 4
@@ -630,7 +638,7 @@ ActiveRecord::Schema.define(version: 20181205201208) do
     t.string  "status",            limit: 255
     t.string  "unityID",           limit: 255
     t.string  "signup_preference", limit: 255
-    t.string  "feedback",          limit: 255
+    t.string  "feedback",
   end
 
   create_table "survey_deployments", force: :cascade do |t|

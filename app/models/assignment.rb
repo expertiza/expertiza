@@ -332,7 +332,7 @@ class Assignment < ActiveRecord::Base
   end
 
   # if current  stage is submission or review, find the round number
-  # otherwise, return 0
+  # otherwise, return 0. (Metareviews do not have rounds.)
   def number_of_current_round(topic_id)
     return 0 if self.get_current_stage(topic_id) == "metareview"
     next_due_date = DueDate.get_next_due_date(self.id, topic_id)

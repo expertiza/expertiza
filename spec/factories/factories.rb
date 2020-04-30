@@ -403,6 +403,7 @@ FactoryBot.define do
     version_num nil
     round 1
     is_submitted false
+    visibility 'private'
   end
 
   factory :submission_record, class: SubmissionRecord do

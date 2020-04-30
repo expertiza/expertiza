@@ -13,7 +13,6 @@ class SampleReviewsController < ApplicationController
         @all_assignments = SampleReview.where(:assignment_id => params[:id])
         @response_ids = []
         @all_assignments.each do |assignment|
-            @response_id = assignment.response_id
             @response_ids << assignment.response_id
             @assignment  = Assignment.find(assignment.assignment_id)
         end
@@ -27,7 +26,7 @@ class SampleReviewsController < ApplicationController
           questionnaire_id = Question.find(first_question_in_questionnaire).questionnaire_id
           questionnaire = Questionnaire.find(questionnaire_id)
           @maxscore = questionnaire.max_question_score
-          @scores = Answer.where(response_id: @response_id)
+          @ques_answer = Answer.where(response_id: @response_id)
           @response = Response.find(@response_id)
           @total_percentage = @response.average_score
           @sum = @response.total_score

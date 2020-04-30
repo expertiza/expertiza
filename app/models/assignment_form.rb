@@ -6,6 +6,7 @@ class AssignmentForm
   attr_accessor :errors
 
   DEFAULT_MAX_TEAM_SIZE = 1
+  DEFAULT_NUMBER_OF_REVIEWS = 3
 
   def initialize(args = {})
     @assignment = Assignment.new(args[:assignment])
@@ -14,7 +15,7 @@ class AssignmentForm
       @assignment.instructor = @assignment.course.instructor if @assignment.course
       @assignment.max_team_size = DEFAULT_MAX_TEAM_SIZE
     end
-    @assignment.num_review_of_reviews = 3
+    @assignment.num_review_of_reviews = DEFAULT_NUMBER_OF_REVIEWS
     @assignment_questionnaires = Array(args[:assignment_questionnaires])
     @due_dates = Array(args[:due_dates])
   end

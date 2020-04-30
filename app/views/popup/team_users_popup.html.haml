@@ -70,15 +70,19 @@
   %br/
 
   %div{:id=>"dialogConfirmMark",:class=>"col-md-12"}
-    %div{:class=>"col-md-12",:id=>"similar_assignments_popup",:data=>{"assignment-id":@assignment.id}}
-      %h5{:class=>"col-md-11"}
-        %strong Select the assignments for which you want to mark these reviews as samples:
-      %div{:class=>"col-md-12 popup-list-container"}
-        - @similar_assignments.each do |assignment|
-          %p
-            = check_box_tag "published_assignments", assignment.id
-            = label_tag "#{assignment.name}"
-          %br/
+    %h5{:class=>"col-md-11"}
+    %strong Select the assignments for which you want to mark these reviews as samples:
+    %br/
+    %table{:class => "general",:width => "100%"}
+      %tr
+        %td
+        %th Assignments
+      - @similar_assignments.each do |assignment|
+        %tr
+          - @course_name = Assignment.find(assignment.id).course.name
+          %td= check_box_tag "published_assignments", assignment.id
+          %td= label_tag "#{@course_name} : #{assignment.name}"
+
 
   %div{:id=>"dialogConfirmUnmark",:class=>"col-md-12"}
     %div{:class=>"col-md-12",:id=>"similar_assignments_popup"}

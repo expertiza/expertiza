@@ -1,5 +1,6 @@
 class PopupController < ApplicationController
   include StringOperationHelper
+  ASSIGNMENT_NAME_SIMILARITY_THRESHOLD = 0.50
 
   def action_allowed?
     ['Super-Administrator',
@@ -63,10 +64,11 @@ class PopupController < ApplicationController
     all_assignments = Assignment.where(:instructor_id=>session[:user].id)
     @similar_assignments = []
     all_assignments.each do |assignment|
-      if (string_similarity(@assignment.name, assignment.name) > 0.50)
+      if (string_similarity(@assignment.name, assignment.name) > ASSIGNMENT_NAME_SIMILARITY_THRESHOLD)
         @similar_assignments << assignment
       end
     end
+    @similar_assignments = @similar_assignments.sort_by { |sim_assignment| -sim_assignment.id }
   end
 
 

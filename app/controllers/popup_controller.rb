@@ -59,14 +59,12 @@ class PopupController < ApplicationController
         instance_variable_set('@total_possible_round_' + round.to_s, response.maximum_score)
       end
     end
+
     all_assignments = Assignment.where(:instructor_id=>session[:user].id)
     @similar_assignments = []
     all_assignments.each do |assignment|
-
-      #if (name_similarity(@assignment.name, assignment.name)/[@assignment.name, assignment.name].min > 0.50)
       if (string_similarity(@assignment.name, assignment.name) > 0.50)
         @similar_assignments << assignment
-
       end
     end
   end

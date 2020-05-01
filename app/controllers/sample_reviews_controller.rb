@@ -22,15 +22,8 @@ class SampleReviewsController < ApplicationController
       def show
         @response_id = params[:id]
         unless @response_id.nil?
-          first_question_in_questionnaire = Answer.where(response_id: @response_id).first.question_id
-          questionnaire_id = Question.find(first_question_in_questionnaire).questionnaire_id
-          questionnaire = Questionnaire.find(questionnaire_id)
-          @maxscore = questionnaire.max_question_score
           @ques_answer = Answer.where(response_id: @response_id)
           @response = Response.find(@response_id)
-          @total_percentage = @response.average_score
-          @sum = @response.total_score
-          @total_possible = @response.maximum_score
         end
       end
 

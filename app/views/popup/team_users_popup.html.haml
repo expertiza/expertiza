@@ -79,7 +79,7 @@
         %th Assignments
       - @similar_assignments.each do |assignment|
         %tr
-          - @course_name = Assignment.find(assignment.id).course.name
+          - @course_name = !assignment.course.nil? ? assignment.course.name : ""
           %td= check_box_tag "published_assignments", assignment.id
           %td= label_tag "#{@course_name} : #{assignment.name}"
 

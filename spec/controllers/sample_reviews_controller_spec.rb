@@ -26,9 +26,14 @@ RSpec.describe SampleReviewsController, type: :controller do
   let(:student) { build(:student, id: 1, name: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
   let(:student1) { build(:student, id: 2, name: "name1", fullname: 'no one', email: 'expertiza@mailinator.com') }
   let(:questionnaire) { Questionnaire.new(id: 1, type: 'ReviewQuestionnaire') }
+  let(:answer) {Answer.new(id: 5, question_id: 1)}
+  let(:samplereview1) { SampleReview.new id: 3, assignment_id: 10, response_id: 5}
+  let(:samplereview2) { SampleReview.new id: 4, assignment_id: 10, response_id: 6}
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(Response).to receive(:find).with('1').and_return(responsex)
+    allow(SampleReview).to receive(:find).with('10').and_return(samplereview1)
+    allow(Answer).to receive(:find).with('5').and_return(answer)
     instructor = build(:instructor)
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
@@ -55,4 +60,22 @@ RSpec.describe SampleReviewsController, type: :controller do
       end
     end
   end
+
+  describe '#index' do
+    it 'renders assignments#index page' do
+      params = {id: 5}
+      get :index, params
+      expect(response).to render_template(:index)
+    end
+  end
+  
+  describe '#show' do
+  it 'renders assignments#show page' do
+    allow(Response).to receive(:find).with('5').and_return(samplereview1)
+    params = {id: 5}
+    get :show, params
+    expect(response).to render_template(:show)
+  end
+end
+
   end

@@ -1,35 +1,18 @@
 <!DOCTYPE html>
+
 <div>
-<%if @response_id.nil? %>
-  <tr> <td align = "center">No review done yet.</td> </tr>
-  <br/>
-  <tr>
-    <th align = "left"> Reviewer score </th>
-  </tr>
-  <tr>
-    <td align = "center">--</td>
-  </tr>
-  <br/>
-<%else%>
-  <table border = "1px solid #ccc">
-    <tr>
-      <th align = 'left' width = "50%"> Question </th>
-      <th width = "50%"> Answer </th>
-    </tr>
-    <% @ques_answer.each do |s|%>
-      <tr>
-        <td align = 'left'> <%= Question.find(s.question_id).txt %></td>
-        <td align = 'left'> <%= sanitize s.comments.html_safe unless s.comments.nil? %> </td>
-      </tr>
-    <%end%>
-    <tr>
-    </table>
-  <%end%>
-
-  <br/>
-  
-  <div class="footer">
-    <a href="javascript:window.history.back()">Back</a>
-  </div>
-
+  <% @review_versions = @map.get_all_versions() %>
+  <% if !@review_versions.empty? %>
+      <%= @review_versions.each do |response| %>
+        <%= response.display_as_html() %>
+          <br/>
+      <% end %>
+      <hr/>
+  <% end %>
 </div>
+
+<% file_url = nil %>
+<%= @response.display_as_html(nil, nil, file_url) %>
+<br/>
+
+<a href="javascript:window.history.back()">Back</a>

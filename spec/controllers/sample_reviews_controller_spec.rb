@@ -29,11 +29,23 @@ RSpec.describe SampleReviewsController, type: :controller do
   let(:answer) {Answer.new(id: 5, question_id: 1)}
   let(:samplereview1) { SampleReview.new id: 3, assignment_id: 10, response_id: 5}
   let(:samplereview2) { SampleReview.new id: 4, assignment_id: 10, response_id: 6}
+  let(:review_response) { build(:response, id: 1, map_id: 1) }
+  let(:review_response_map) { build(:review_response_map, id: 1, reviewer: participant) }
+  let(:assignment_questionnaire) { build(:assignment_questionnaire) }
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(Response).to receive(:find).with('1').and_return(responsex)
     allow(SampleReview).to receive(:find).with('10').and_return(samplereview1)
     allow(Answer).to receive(:find).with('5').and_return(answer)
+    allow(Response).to receive(:where).with(map_id: 1).and_return([review_response])
+
+    allow(ResponseMap).to receive(:find).with(1).and_return(review_response_map)
+    allow(review_response_map).to receive(:reviewer_id).and_return(1)
+    allow(Participant).to receive(:find).with(1).and_return(participant)
+    allow(assignment).to receive(:review_questionnaire_id).and_return(1)
+    allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire)
+    allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
+
     instructor = build(:instructor)
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
@@ -71,10 +83,9 @@ RSpec.describe SampleReviewsController, type: :controller do
   
   describe '#show' do
   it 'renders assignments#show page' do
-    allow(Response).to receive(:find).with('5').and_return(samplereview1)
-    params = {id: 5}
-    get :show, params
-    expect(response).to render_template(:show)
+      params = {id: 1, return: 'assignment_edit'}
+      get :show, params
+      expect(response).to render_template(:show)
   end
 end
 

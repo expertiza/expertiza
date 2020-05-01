@@ -9,7 +9,7 @@ class SampleReviewsController < ApplicationController
     end
 
     def index
-
+      
         @all_assignments = SampleReview.where(:assignment_id => params[:id])
         @response_ids = []
         @all_assignments.each do |assignment|
@@ -24,6 +24,8 @@ class SampleReviewsController < ApplicationController
         unless @response_id.nil?
           @ques_answer = Answer.where(response_id: @response_id)
           @response = Response.find(@response_id)
+          @map = @response.map
+
         end
       end
 

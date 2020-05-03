@@ -53,7 +53,7 @@ describe "Test Review conflict report" do
     expect(page).to have_content('Team')
   end
 
-  it "can display author reviewers and metrics" do
+  it "has a button to change points to percent" do
     expect(page).to have_selector(:link_or_button, 'Convert Points to Percents')
   end
 

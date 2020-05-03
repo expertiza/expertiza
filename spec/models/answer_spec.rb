@@ -128,7 +128,9 @@ describe Answer do
     end
 
     it "returns answers by reviewer for reviewee in round from db which is not empty" do
-      expect(Answer.answers_by_round_for_reviewee(@assignment_id, @reviewee_id,@round)).not_to be_empty
+      question_answers = Answer.answers_by_round_for_reviewee(@assignment_id, @reviewee_id,@round)
+      expect(question_answers).to_not be_empty
+      expect(question_answers.first.attributes).to include('answer' => 1, 'reviewer_id' => 1)
     end
   end
 

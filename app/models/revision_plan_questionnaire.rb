@@ -1,5 +1,5 @@
 class RevisionPlanQuestionnaire < Questionnaire
-  # return the team's revision planning questions
+  #E2016: return the team's revision planning questions
   def self.questions(questionnaire_id, team_id, last_seq)
     revision_plan_questions = Question.where(questionnaire_id: questionnaire_id, team_id: team_id)
     revision_plan_header = SectionHeader.find_by(txt: "Revision Planning", questionnaire_id: questionnaire_id)

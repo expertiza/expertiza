@@ -15,7 +15,7 @@ class Response < ActiveRecord::Base
     id
   end
 
-  def display_as_html(prefix = nil, count = nil, _file_url = nil, show_tags = nil, current_user = nil, team_id = nil, round = nil)
+  def display_as_html(prefix = nil, count = nil, _file_url = nil, show_tags = nil, current_user = nil, team_id = nil, round = nil)#E2016: team_id and round are used for revision plan questions
     identifier = ""
     # The following three lines print out the type of rubric before displaying
     # feedback.  Currently this is only done if the rubric is Author Feedback.
@@ -233,7 +233,7 @@ class Response < ActiveRecord::Base
 						 '</tr></table>'
   end
 
-  def construct_review_response code, self_id, show_tags = nil, current_user = nil, team_id = nil, round = nil
+  def construct_review_response code, self_id, show_tags = nil, current_user = nil, team_id = nil, round = nil #E2016: team_id and round are used for revision plan questions
     code += '<table id="review_' + self_id + '" class="table table-bordered">'
     answers = Answer.where(response_id: self.response_id)
     unless answers.empty?

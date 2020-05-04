@@ -11,7 +11,7 @@ class QuestionsController < ApplicationController
   end
 
   def action_allowed?
-    if current_role_name == 'Student'
+    if current_role_name == 'Student'#E2016 students are allowed to remove questions in revision plan
       is_for_revision_planning?
     else
       ['Super-Administrator',

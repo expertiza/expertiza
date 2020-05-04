@@ -105,7 +105,7 @@ module GradesHelper
     return "underlined" if score.comment.present?
   end
 
-  def retrieve_questions(questionnaires, assignment_id, team_id = nil)
+  def retrieve_questions(questionnaires, assignment_id, team_id = nil)#E2016: team_id for revision plan questions
     questions = {}
     questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.where(assignment_id: assignment_id, questionnaire_id: questionnaire.id).first.used_in_round
@@ -120,7 +120,7 @@ module GradesHelper
     questions
   end
 
-  # sorts by sequence number
+  #E2016: sorts by sequence number
   def sort_questions(questions)
     questions.sort_by(&:seq)
   end

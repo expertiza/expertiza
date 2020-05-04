@@ -106,6 +106,8 @@ class QuestionnairesController < ApplicationController
   # Edit a questionnaire
   def edit
     if params[:team_id]
+      #E2016：when the team_id is exited, 'edit_revision_plan' could be redirected
+      #The questionnaire id, team_id and participant_id are needed in edit_revision_plan
       redirect_to action: 'edit_revision_plan', id: params[:id], team_id: params[:team_id], participant_id: params[:participant_id]
     end
     @questionnaire = Questionnaire.find(params[:id])
@@ -133,6 +135,7 @@ class QuestionnairesController < ApplicationController
       rescue StandardError
         flash[:error] = $ERROR_INFO
       end
+      #E2016: team_id should be passed to 'edit', so when team_id is supplied, students could edit revision plan questions
       redirect_to action: 'edit', id: params[:id], team_id: params[:team_id]
     end
   end
@@ -181,7 +184,7 @@ class QuestionnairesController < ApplicationController
   # Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions
     questionnaire_id = params[:id] unless params[:id].nil?
-    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions(params[:team_id], 2).size # E2016: team_id used for revision plan
+    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions(params[:team_id], 2).size # E2016: team_id used for revision plan, 2 means the second round
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true, team_id: params[:team_id])
       if question.is_a? ScoredQuestion
@@ -199,7 +202,7 @@ class QuestionnairesController < ApplicationController
         flash[:error] = $ERROR_INFO
       end
     end
-
+    #E2016: questionnaire_id, team_id and participant_id should be passed to 'edit'
     redirect_to action: 'edit', id: questionnaire_id.to_s.to_sym, team_id: params[:team_id], participant_id: params[:participant_id]
   end
 
@@ -220,6 +223,7 @@ class QuestionnairesController < ApplicationController
     if params[:view_advice]
       redirect_to controller: 'advice', action: 'edit_advice', id: params[:id]
     elsif !questionnaire_id.nil?
+      #E2016: questionnaire_id, team_id and participant_id should be passed to 'edit'
       redirect_to action: 'edit', id: questionnaire_id.to_s.to_sym, team_id: params[:team_id], participant_id: params[:participant_id]
     end
   end

@@ -202,17 +202,14 @@ class AssignmentForm
     topic_id = nil if topic_id.blank?
     assignment_questionnaires = nil
     
+    # Get AQs by the correct parameters according to if the assignment varies by round/topic
     if @assignment.vary_by_round && @assignment.vary_by_topic
-        # Get all AQs for the assignment by current round number and topic
         assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number, topic_id: topic_id)
     elsif @assignment.vary_by_round
-        # Get all AQs for the assignment by current round number
         assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number)
     elsif @assignment.vary_by_topic
-        # Get all AQs for the assignment by current topic
         assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, topic_id: topic_id)
     else
-        # Get all AQs for the assignment
         assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
     end
     

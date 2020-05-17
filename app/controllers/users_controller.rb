@@ -136,7 +136,8 @@ class UsersController < ApplicationController
       redirect_to action: 'list'
     else
       foreign
-      render action: 'new'
+      flash[:error] = "Another user with these credentials already exists"
+      redirect_to action: 'new', role: 'Student'
     end
   end
 

@@ -8,10 +8,17 @@
     <h4>You should perform exactly <%= @assignment.num_reviews_allowed %> reviews </h4>
 <% else %>
 
-    <h4>You may perform between <%= @assignment.num_reviews_required %> and <%= @assignment.num_reviews_allowed %> reviews</h4>
+    <h4>You may perform between <%= @assignment.num_reviews_required %> to <%= @assignment.num_reviews_allowed %> reviews</h4>
 <% end %>
 <h4>You are required to do <%= @assignment.num_reviews_required %> reviews</h4>
-<h4> Number of reviews left: <%= @assignment.num_reviews_allowed - @num_reviews_completed %></h4>
+<br>
+<%if @assignment.num_reviews_required - @num_reviews_completed > -1 %>
+  <h4> Number of required reviews left : <%=  @assignment.num_reviews_required - @num_reviews_completed %></h4>
+<%else %>
+  <h4> Number of required reviews left : 0</h4>
+<%end %>
+<h4> Number of total reviews which can be done: <%= @assignment.num_reviews_allowed - @num_reviews_completed %></h4>
+<br>
 
 <% if check_reviewable_topics(@assignment) or @assignment.get_current_stage(@topic_id) == "Finished" %>
     <%= render :partial => 'responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>

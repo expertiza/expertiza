@@ -1,6 +1,8 @@
 <script type="text/javascript" src="/assets/view_team_in_grades.js"></script>
 <script type="text/javascript">
-  // Added logic to dfferentiate all toggle tags
+  // Added logic to differentiate all toggle tags
+  // elementId is the element which needs to be toggled and
+  // caller is the element which caused the call to this function.
   function tags_toggler(elementId,caller){
       console.log(caller.id)
       var target_list = document.getElementsByName(elementId)
@@ -13,6 +15,7 @@
   }
   function toggleFunction(target,caller){
       if (!(target instanceof Element)){
+        // Assigning dummy element if the caller is not specified
         target = document.getElementById(target);
         caller = document.getElementById('dummy');
       }

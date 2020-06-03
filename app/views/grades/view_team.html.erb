@@ -4,10 +4,8 @@
   // elementId is the element which needs to be toggled and
   // caller is the element which caused the call to this function.
   function tags_toggler(elementId,caller){
-      console.log(caller.id)
       var target_list = document.getElementsByName(elementId)
       var caller_element = document.getElementById(caller.id)
-      console.log(caller)
       // target_list.forEach(custom_toggle)
       for(i =0; i<target_list.length; i++){
           toggleFunction(target_list[i],caller_element)

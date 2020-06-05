@@ -1,0 +1,13 @@
+user1:
+  id: 1
+  name: 'user1'
+  fullname: 'user1 user1'
+  email: "user1@mailinator.com"
+  role_id: 2
+  timezonepref: 'Eastern Time (US & Canada)'
+
+user2:
+  id: 2
+  name: 'user2'
+  fullname: 'user2 user2'
+  email: 'user2@mailinator.com'

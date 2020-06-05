@@ -166,7 +166,7 @@ describe ReviewResponseMap do
     allow(User).to receive(:find).with(1).and_return(student)
     review_response_map.reviewee_id = 1
     defn = {body: {type: "Peer Review", obj_name: "Test Assgt", first_name: "no one", partial_name: "new_submission"}, to: "expertiza@mailinator.com"}
-    expect { review_response_map.email(defn, participant, Assignment.find(Participant.find(reviewer_id).parent_id)) }
+    expect { review_response_map.email(defn, Assignment.find(Participant.find(reviewer_id).parent_id)) }
       .to change { ActionMailer::Base.deliveries.count }.by 1
   end
 

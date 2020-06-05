@@ -263,4 +263,5 @@ class AssignmentParticipant < Participant
     end
     stage
   end
+
 end

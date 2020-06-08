@@ -1,3 +1,4 @@
+#testing
 require 'will_paginate/array'
 
 class UsersController < ApplicationController
@@ -123,9 +124,6 @@ class UsersController < ApplicationController
     # set the user's timezone to its parent's
     @user.timezonepref = User.find(@user.parent_id).timezonepref
     if @user.save
-      password = @user.reset_password # the password is reset
-      prepared_mail = MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password)
-      prepared_mail.deliver
       flash[:success] = "A new password has been sent to new user's e-mail address."
       # Instructor and Administrator users need to have a default set for their notifications
       # the creation of an AssignmentQuestionnaire object with only the User ID field populated
@@ -188,10 +186,6 @@ class UsersController < ApplicationController
       new_user.parent_id = session[:user].id
       new_user.timezonepref = User.find_by(id: new_user.parent_id).timezonepref
       if new_user.save
-        password = new_user.reset_password
-        # Mail is sent to the user with a new password
-        prepared_mail = MailerHelper.send_mail_to_user(new_user, "Your Expertiza account and password have been created.", "user_welcome", password)
-        prepared_mail.deliver
         flash[:success] = "A new password has been sent to new user's e-mail address."
         undo_link("The user \"#{requested_user.name}\" has been successfully created. ")
       else

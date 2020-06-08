@@ -403,6 +403,7 @@ FactoryBot.define do
     version_num nil
     round 1
     is_submitted false
+    visibility 'private'
   end
 
   factory :submission_record, class: SubmissionRecord do
@@ -462,4 +463,11 @@ FactoryBot.define do
     object nil
     created_at '2015-06-11 15:11:51'
   end
+
+  factory :test_user, class: User do
+    name 'username'
+    fullname 'full name'
+    email 'abc@mailinator.com'
+  end
+
 end

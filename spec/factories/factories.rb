@@ -454,11 +454,4 @@ FactoryBot.define do
     id 1
     name 'fake_site'
   end
-
-  factory :test_user, class: User do
-    name 'username'
-    fullname 'full name'
-    email 'abc@mailinator.com'
-  end
-
 end

@@ -89,8 +89,6 @@ class ResponseController < ApplicationController
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
-      #this method will notify all the reviewees of the work
-      send_email_to_reviewee(@map)
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
@@ -164,27 +162,20 @@ class ResponseController < ApplicationController
     end
     was_submitted = @response.is_submitted
     @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
+
     # :version_num=>@version)
-
-    #if review was not submitted before and is submitted now, in that case email notification should be sent to the reviews.
-    if was_submitted == false && @response.is_submitted
-      send_email_to_reviewee(@map)
-    end
-
     # Change the order for displaying questions for editing response views.
     questions = sort_questions(@questionnaire.questions)
     create_answers(params, questions) if params[:responses]
     msg = "Your response was successfully saved."
     error_msg = ""
-
+    # only notify if is_submitted changes from false to true
+    if (@map.is_a? ReviewResponseMap) && (was_submitted == false && @response.is_submitted) && @response.significant_difference?
+      @response.notify_instructor_on_difference
+      @response.email
+    end
     redirect_to controller: 'response', action: 'save', id: @map.map_id,
                 return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
-  end
-
-  #this method will sent the reviewee about new peer review submission of their work
-  def send_email_to_reviewee(map)
-    defn = {body: {type: "Peer Review", partial_name: "new_submission"}}
-    map.email(defn, Assignment.find(Participant.find(map.reviewer_id).parent_id))
   end
 
   def save

@@ -10,6 +10,8 @@ class UsersController < ApplicationController
 
   def action_allowed?
     case params[:action]
+    when 'set_anonymized_view'
+      true
     when 'list_pending_requested'
       current_user_has_admin_privileges?
     when 'request_new', 'create_requested_user_record'

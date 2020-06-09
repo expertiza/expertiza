@@ -8,6 +8,8 @@ class UsersController < ApplicationController
 
   def action_allowed?
     case params[:action]
+    when 'set_anonymized_view'
+      true
     when 'list_pending_requested'
       ['Super-Administrator',
        'Administrator'].include? current_role_name

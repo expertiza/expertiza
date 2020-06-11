@@ -228,10 +228,7 @@ describe "Staggered deadline test" do
     # student in finish stage can not review others' work
     click_link 'Assignment1665'
     expect(page).to have_content "Others' work"
-    click_link "Others' work"
-    expect(page).to have_content 'Reviews for "Assignment1665"'
-    # it should not able to choose topic for review
-    expect { choose "topic_id_2" }.to raise_error(/Unable to find visible radio button "topic_id_2"/)
+    expect { click_link "Others' work"}.to raise_error(/Unable to find visible link "Others' work"/)
 
     user = User.find_by(name: 'student2065')
     stub_current_user(user, user.role.name, user.role)
@@ -239,9 +236,7 @@ describe "Staggered deadline test" do
     expect(page).to have_content "Finished"
     click_link 'Assignment1665'
     expect(page).to have_content "Others' work"
-    click_link "Others' work"
-    expect(page).to have_content 'Reviews for "Assignment1665"'
-    expect { choose "topic_id_2" }.to raise_error(/Unable to find visible radio button "topic_id_2"/)
+    expect { click_link "Others' work"}.to raise_error(/Unable to find visible link "Others' work"/)
   end
 
   # the test will test the Java script which is embedded into the sign up sheet. The java script will

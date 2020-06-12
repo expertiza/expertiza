@@ -240,16 +240,8 @@
         jQuery('#due_date_description_url').val(due_date.description_url).attr('id', '');
 
         jQuery('#datetimepicker_' + element_id).datetimepicker({
-            dateFormat: 'yy/mm/dd',
-            timeFormat: 'HH:mm:ss z',
-            controlType: 'select',
-            timezoneList: [
-                { value: -000, label: 'GMT'},
-                { value: -300, label: 'Eastern'},
-                { value: -360, label: 'Central' },
-                { value: -420, label: 'Mountain' },
-                { value: -480, label: 'Pacific' }
-            ]
+            format: 'YYYY/MM/DD HH:mm z',
+            sideBySide: true
         });
     }
 

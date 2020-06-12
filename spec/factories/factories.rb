@@ -455,6 +455,15 @@ FactoryBot.define do
     name 'fake_site'
   end
 
+  factory :version, class: Version do
+    item_type 'Node'
+    item_id 1
+    event 'create'
+    whodunnit nil
+    object nil
+    created_at '2015-06-11 15:11:51'
+  end
+
   factory :test_user, class: User do
     name 'username'
     fullname 'full name'

@@ -469,5 +469,5 @@ FactoryBot.define do
     fullname 'full name'
     email 'abc@mailinator.com'
   end
-
+  
 end

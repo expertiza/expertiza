@@ -20,17 +20,6 @@ class Mailer < ActionMailer::Base
          bcc: defn[:bcc])
   end
 
-  def new_review_request_message(defn)
-    @partial_name = defn[:body][:partial_name]
-    @user = defn[:body][:user]
-    @first_name = defn[:body][:first_name]
-    @message = defn[:body][:message]
-    defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
-    mail(subject: defn[:subject],
-         to: defn[:to],
-         bcc: defn[:bcc])
-  end
-
   def request_user_message(defn)
     @user = defn[:body][:user]
     @super_user = defn[:body][:super_user]
@@ -55,8 +44,7 @@ class Mailer < ActionMailer::Base
     defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
     mail(subject: defn[:subject],
          # content_type: "text/html",
-         to: defn[:to],
-         bcc: defn[:bcc])
+         to: defn[:to])
   end
 
   def delayed_message(defn)

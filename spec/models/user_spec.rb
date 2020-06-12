@@ -1,4 +1,3 @@
-#testing
 describe User do
   let(:user) do
     User.new name: 'abc', fullname: 'abc xyz', email: 'abcxyz@gmail.com', password: '12345678', password_confirmation: '12345678',

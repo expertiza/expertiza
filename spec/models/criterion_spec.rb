@@ -21,7 +21,7 @@ describe "criterion" do
   describe "#complete" do
     it "returns the html without answer and no dropdown or scale" do
       html = criterion.complete(0, nil, 0, 5).to_s
-      expect(html).to eq("<div><label for=\"responses_0\">test txt</label></div>")
+      expect(html).to eq("<div><br><label for=\"responses_0\"><b style=\"color: #986633; font-size: x-large\">test txt</b></label></div>")
     end
 
     it "returns the html without answer and dropdown" do

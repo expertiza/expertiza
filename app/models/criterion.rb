@@ -55,7 +55,7 @@ class Criterion < ScoredQuestion
       rows = self.size.split(',')[1]
     end
 
-    html = '<div><br><label for="responses_' + count.to_s + '"><b style="color: #986633; font-size: x-large">' + self.txt + '</b></label></div>'
+    html = '<div><br><br><label for="responses_' + count.to_s + '"><b style="color: #986633; font-size: x-large">' + self.txt + '</b></label></div>'
     # show advice for each criterion question
     question_advices = QuestionAdvice.where(question_id: self.id).sort_by(&:id)
     advice_total_length = 0
@@ -97,9 +97,11 @@ class Criterion < ScoredQuestion
     if dropdown_or_scale == 'dropdown'
       current_value = ""
       current_value += 'data-current-rating =' + answer.answer.to_s if !answer.nil?
-      temp_min_label = "" if self.min_label.blank?
-      temp_max_label = "" if self.max_label.blank?
-      html += '<div><div id="min_label">' + temp_min_label + '</div><div id="stars_div"><select id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" class="review-rating" ' + current_value + '>'
+      # temp_min_label = self.min_label.blank? "" : self.min_label
+      # temp_max_label = " " if self.max_label.blank?
+      self.min_label ||= ""
+      self.max_label ||= ""
+      html += '<div><div id="min_label">' + self.min_label + '</div><div id="stars_div"><select id="responses_' + count.to_s + '_score" name="responses[' + count.to_s + '][score]" class="review-rating" ' + current_value + '>'
       html += "<option value = ''>--</option>"
       questionnaire_min.upto(questionnaire_max).each do |j|
         html += if !answer.nil? and j == answer.answer
@@ -111,7 +113,7 @@ class Criterion < ScoredQuestion
         html += j.to_s
         html += "</option>"
       end
-      html += "</select></div><div id='max_label'>" + temp_max_label + "</div></div><br>"
+      html += "</select></div><div id='max_label'>" + self.max_label + "</div></div><br>"
       html += '<textarea' + ' id="responses_' + count.to_s + '_comments"' \
        ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
       html += answer.comments unless answer.nil?

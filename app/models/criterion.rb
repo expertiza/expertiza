@@ -203,23 +203,9 @@ class Criterion < ScoredQuestion
       html += '<td style="padding-left:10px">'
       html += '<br>' + answer.comments.html_safe
       html += '</td>'
-      #### start code to show tag prompts ####
-      unless tag_prompt_deployments.nil?
-        # show check boxes for answer tagging
-        resp = Response.find(answer.response_id)
-        question = Question.find(answer.question_id)
-        if tag_prompt_deployments.count > 0
-          html += '<tr><td colspan="2">'
-          tag_prompt_deployments.each do |tag_dep|
-            tag_prompt = TagPrompt.find(tag_dep.tag_prompt_id)
-            if tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold.to_i
-              html += tag_prompt.html_control(tag_dep, answer, current_user)
-            end
-          end
-          html += '</td></tr>'
-        end
-      end
-      #### end code to show tag prompts ####
+
+
+      html += TagPrompt.show_tag_prompts(tag_prompt_deployments, answer, user_id)
     end
     html += '</tr></table>'
     safe_join(["".html_safe, "".html_safe], html.html_safe)

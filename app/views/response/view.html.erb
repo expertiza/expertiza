@@ -1,4 +1,4 @@
-  <% if @map.survey? %>
+<% if @map.survey? %>
     <h1><%= @title %> for <%= @survey_parent.name %></h1>
 <% else %>
     <h1><%= @title %> for <%= @assignment.name %></h1>
@@ -8,6 +8,11 @@
   <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
   <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(topic_id)} %>
 <% end %>
+
+<!-- Added a checkbox to enable students to mark their review as a sample for others, by E2022 @SujalAhrodia -->
+<input type="checkbox" id="sample_cbx" checked="false"/>
+<label id="sample_cbx_lbl" for="sample_cbx">I agree to share my review as a sample for others</label>
+
 <% @review_versions = @map.get_all_versions() %>
 <% if !@review_versions.empty? %>
     <%= @review_versions.each do |response| %>
@@ -39,3 +44,40 @@
 <%= @map.show_feedback(@response) %>
 <br/>
 <a href="javascript:window.history.back()">Back</a>
+
+<!-- Script to toggle visibility on selecting the checkbox, by E2022 @SujalAhrodia -->
+<script>
+  $(document).on("ready",function(e){
+    
+    //Show a pop up message on selecting/unselecting the checkbox, by E2022 @SujalAhrodia
+    $("#sample_cbx").prop("checked",<%= !@response.visibility.nil? && (@response.visibility=="public" || @response.visibility=="published")%>);
+    
+    $("#sample_cbx").on("change",function(e){
+      var _d = $(this);
+      var check = _d.is(":checked")?1:0;
+      var visibility = check?"public":"private";
+      
+      // Construct respective message to be displayed, by E2022 @SujalAhrodia
+      
+      var message = check?"Your review may now ":"Your review may no longer ";
+      
+      message += "be available for other students to view. Are you sure?";
+      
+      if(!confirm(message)){
+        _d.prop("checked",!check);
+      }
+      else{
+        // Ajax call to update the value in db  
+
+        $.ajax({
+        "url":"/response_toggle_permission/"+"<%= @response.id %>",
+        "type":"POST",
+        "data":{
+          "visibility":visibility
+        },
+        "dataType":"json"
+      });
+      }
+    });
+  });
+</script>

@@ -153,4 +153,5 @@ module AssignmentHelper
       '#0984e3' # submission grade is not assigned yet.
     end
   end
+
 end

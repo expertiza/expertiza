@@ -5,6 +5,8 @@ class User < ActiveRecord::Base
     Authlogic::CryptoProviders::Sha1.join_token = ''
     Authlogic::CryptoProviders::Sha1.stretches = 1
   end
+  #Added for E1973. A user can hold a lock on a resource
+  has_many :locks, class_name: 'Lock', foreign_key: 'user_id', dependent: :destroy, inverse_of: false
   has_many :participants, class_name: 'Participant', foreign_key: 'user_id', dependent: :destroy
   has_many :assignment_participants, class_name: 'AssignmentParticipant', foreign_key: 'user_id', dependent: :destroy
   has_many :assignments, through: :participants

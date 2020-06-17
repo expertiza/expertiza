@@ -15,14 +15,14 @@
           <tr>
           <td><label for="start_date">Start Date:</label></td>
           <td class="form-inline">
-            <input type="text" id="survey_deployment_start_date" name ="survey_deployment[start_date]" class="form-control width-250" onClick="$('#survey_deployment_start_date').datetimepicker()"/>
+            <input type="text" id="survey_deployment_start_date" name ="survey_deployment[start_date]" class="form-control width-250" />
           </td>
         </tr>
 
         <tr>
           <td><label for="end_date">End Date:</label></td>
         <td class="form-inline">
-          <input type="text" id="survey_deployment_end_date" name ="survey_deployment[end_date]" class="form-control width-250"  onClick="$('#survey_deployment_end_date').datetimepicker()"/>
+          <input type="text" id="survey_deployment_end_date" name ="survey_deployment[end_date]" class="form-control width-250" />
         </td>
       </tr>
 
@@ -50,12 +50,14 @@
   </td>
 </tr>
    </table>
+  <script type="text/javascript">
+      jQuery('#survey_deployment_start_date, #survey_deployment_end_date').datetimepicker({
+          format: 'YYYY/MM/DD HH:mm',
+          sideBySide: true
+      });
+  </script>
    <p>
      <%= submit_tag "Add", class: "btn btn-default" %>
-
-
-
-
    <% end %>
    <br />
    <%= link_to 'Back', :action => 'list' %>

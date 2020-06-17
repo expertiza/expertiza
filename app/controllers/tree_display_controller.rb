@@ -211,8 +211,10 @@ class TreeDisplayController < ApplicationController
     flash[:error] = "Invalid JSON in the TreeList" unless json_valid? params[:reactParams][:child_nodes]
     child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
     tmp_res = {}
-    child_nodes.each do |node|
-      initialize_fnode_update_children(params, node, tmp_res)
+    unless child_nodes.blank?
+      child_nodes.each do |node|
+        initialize_fnode_update_children(params, node, tmp_res)
+      end
     end
     res = res_node_for_child(tmp_res)
     res['Assignments'] = res['Assignments'].sort_by {|x| [x['instructor'], -1 * x['creation_date'].to_i] } if res.key?('Assignments')

@@ -156,7 +156,7 @@ class AssignmentsController < ApplicationController
 
   def associate_assignment_with_course
     @assignment = Assignment.find(params[:id])
-    @courses = Assignment.set_courses_to_assignment(current_user)
+    @courses = Assignment.assign_courses_to_assignment(current_user)
   end
 
   def list_submissions

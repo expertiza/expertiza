@@ -217,7 +217,7 @@ class ResponseController < ApplicationController
     @map.save
     participant = Participant.find_by(id: @map.reviewee_id)
     # E1822: Added logic to insert a student suggested 'Good Teammate' or 'Good Reviewer' badge in the awarded_badges table.
-    if @map.assignment.has_badge?
+    if @map.assignment.badge?
       if @map.is_a? TeammateReviewResponseMap and params[:review][:good_teammate_checkbox] == 'on'
         badge_id = Badge.get_id_from_name('Good Teammate')
         AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
@@ -268,6 +268,30 @@ class ResponseController < ApplicationController
     @review_questionnaire_ids = ReviewQuestionnaire.select("id")
     @assignment_questionnaire = AssignmentQuestionnaire.where(["assignment_id = ? and questionnaire_id IN (?)", @assignment.id, @review_questionnaire_ids]).first
     @questions = @assignment_questionnaire.questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }
+  end
+
+  def toggle_permission
+    render nothing: true unless action_allowed?
+    
+    # the response to be updated
+    @response = Response.find(params[:id])
+
+    # Error message placehoder
+    msg = ""
+    
+    begin
+      @map = @response.map
+      
+      # Updating visibility for the response object, by E2022 @SujalAhrodia -->
+      visibility = params[:visibility]
+      if (!visibility.nil?)
+        @response.update_attribute("visibility",visibility)
+      end
+    
+    rescue StandardError
+      msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
+    end
+    redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
   private
@@ -383,3 +407,4 @@ class ResponseController < ApplicationController
     end
   end
 end
+

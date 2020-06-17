@@ -48,5 +48,11 @@ class StudentReviewController < ApplicationController
     end
     @num_metareviews_in_progress = @num_metareviews_total - @num_metareviews_completed
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
+
+    @all_assignments = SampleReview.where(:assignment_id => @assignment.id)
+    @response_ids = []
+    @all_assignments.each do |assignment|
+        @response_ids << assignment.response_id
+    end
   end
 end

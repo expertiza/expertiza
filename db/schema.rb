@@ -112,6 +112,7 @@ ActiveRecord::Schema.define(version: 20200421235620) do
     t.boolean  "is_answer_tagging_allowed"
     t.boolean  "has_badge"
     t.boolean  "allow_selecting_additional_reviews_after_1st_round"
+    t.boolean  "reviewer_is_team"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -316,6 +317,17 @@ ActiveRecord::Schema.define(version: 20200421235620) do
 
   add_index "late_policies", ["instructor_id"], name: "fk_instructor_id", using: :btree
 
+  create_table "locks", force: :cascade do |t|
+    t.integer  "timeout_period", limit: 4
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "user_id",        limit: 4
+    t.integer  "lockable_id",    limit: 4
+    t.string   "lockable_type",  limit: 255
+  end
+
+  add_index "locks", ["user_id"], name: "fk_rails_426f571216", using: :btree
+
   create_table "markup_styles", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
   end
@@ -470,6 +482,7 @@ ActiveRecord::Schema.define(version: 20200421235620) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "calibrate_to",                   default: false
+    t.boolean  "reviewer_is_team"
   end
 
   add_index "response_maps", ["reviewer_id"], name: "fk_response_map_reviewer", using: :btree
@@ -638,7 +651,6 @@ ActiveRecord::Schema.define(version: 20200421235620) do
     t.string  "status",            limit: 255
     t.string  "unityID",           limit: 255
     t.string  "signup_preference", limit: 255
-    t.string  "feedback",          limit: 255
   end
 
   create_table "survey_deployments", force: :cascade do |t|
@@ -724,14 +736,14 @@ ActiveRecord::Schema.define(version: 20200421235620) do
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 
   create_table "track_notifications", force: :cascade do |t|
+    t.integer  "notification_id", limit: 4
     t.integer  "user_id",         limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "notification_id", limit: 4, null: false
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
   end
 
-  add_index "track_notifications", ["notification_id"], name: "notification_id", using: :btree
-  add_index "track_notifications", ["user_id"], name: "user_id", using: :btree
+  add_index "track_notifications", ["notification_id"], name: "index_track_notifications_on_notification_id", using: :btree
+  add_index "track_notifications", ["user_id"], name: "index_track_notifications_on_user_id", using: :btree
 
   create_table "tree_folders", force: :cascade do |t|
     t.string  "name",       limit: 255
@@ -807,6 +819,7 @@ ActiveRecord::Schema.define(version: 20200421235620) do
   add_foreign_key "invitations", "users", column: "from_id", name: "fk_invitationfrom_users"
   add_foreign_key "invitations", "users", column: "to_id", name: "fk_invitationto_users"
   add_foreign_key "late_policies", "users", column: "instructor_id", name: "fk_instructor_id"
+  add_foreign_key "locks", "users"
   add_foreign_key "participants", "users", name: "fk_participant_users"
   add_foreign_key "plagiarism_checker_assignment_submissions", "assignments"
   add_foreign_key "plagiarism_checker_comparisons", "plagiarism_checker_assignment_submissions"
@@ -825,4 +838,6 @@ ActiveRecord::Schema.define(version: 20200421235620) do
   add_foreign_key "tag_prompt_deployments", "tag_prompts"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
+  add_foreign_key "track_notifications", "notifications"
+  add_foreign_key "track_notifications", "users"
 end

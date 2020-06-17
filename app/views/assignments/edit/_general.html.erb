@@ -45,8 +45,15 @@ function microtaskChanged() {
 
 <tr>
 <td style='padding:5px'><%= label_tag('assignment_form[assignment][course_id]', 'Course:') %></td>
-<td style='padding:5px'><%= select('assignment_form[assignment]', 'course_id', course_options(@assignment_form.assignment.instructor), {:selected => @assignment_form.assignment.course_id}, {:class => "form-control", :style => 'width: 250px'}) %></td>
+<td style='padding:5px'><%= select('assignment_form[assignment]', 'course_id', course_options(@assignment_form.assignment.instructor), {:selected => @assignment_form.assignment.course_id}, {:class => "form-control", :style => 'width: 250px', :disabled => session[:user].role.name == 'Teaching Assistant'}) %></td>
 </tr>
+
+<%if session[:user].role.name == 'Teaching Assistant' %>
+<tr>
+  <td></td>
+  <td style='color:red;padding:0px 10px 0.8em;'> TAs are not allowed to move an assignment to another course.</td>
+</tr>
+<%end %>
 
 <tr><div class="form-inline">
 <td style='padding:5px'><%= label_tag('assignment_form[assignment][directory_path]', 'Submission directory:') %></td>

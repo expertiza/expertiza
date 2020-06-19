@@ -24,7 +24,7 @@ module AssignmentHelper
     options = []
     options << ['-----------', nil]
     courses.each do |course|
-      options << [course.name, course.id]
+      options << [course.name.strip, course.id]
     end
     options.uniq.sort
   end

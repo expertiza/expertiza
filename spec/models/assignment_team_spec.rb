@@ -333,7 +333,7 @@ describe 'AssignmentTeam' do
       it "assign the reviewer to the team" do
         allow(Assignment).to receive(:find).with(team.parent_id).and_return(assignment)
         allow(ReviewResponseMap).to receive(:create).
-          with(reviewee_id: team.id, reviewer_id: participant1.id, reviewed_object_id: assignment.id).and_return(review_response_map)
+          with(reviewee_id: team.id, reviewer_id: participant1.id, reviewed_object_id: assignment.id, reviewer_is_team: nil).and_return(review_response_map)
         expect(team.assign_reviewer(participant1)).to eq(review_response_map)
       end
     end

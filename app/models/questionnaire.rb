@@ -14,19 +14,20 @@ class Questionnaire < ActiveRecord::Base
   DEFAULT_MIN_QUESTION_SCORE = 0  # The lowest score that a reviewer can assign to any questionnaire question
   DEFAULT_MAX_QUESTION_SCORE = 5  # The highest score that a reviewer can assign to any questionnaire question
   DEFAULT_QUESTIONNAIRE_URL = "http://www.courses.ncsu.edu/csc517".freeze
-  QUESTIONNAIRE_TYPES = ['ReviewQuestionnaire',
-                         'MetareviewQuestionnaire',
-                         'Author FeedbackQuestionnaire',
-                         'AuthorFeedbackQuestionnaire',
-                         'Teammate ReviewQuestionnaire',
-                         'TeammateReviewQuestionnaire',
-                         'SurveyQuestionnaire',
-                         'AssignmentSurveyQuestionnaire',
-                         'Assignment SurveyQuestionnaire',
-                         'Global SurveyQuestionnaire',
-                         'GlobalSurveyQuestionnaire',
-                         'Course SurveyQuestionnaire',
-                         'CourseSurveyQuestionnaire',
+  QUESTIONNAIRE_TYPES = ['ReviewQuestionnaire',	
+                         'MetareviewQuestionnaire',	
+                         'Author FeedbackQuestionnaire',	
+                         'AuthorFeedbackQuestionnaire',	
+                         'Teammate ReviewQuestionnaire',	
+                         'TeammateReviewQuestionnaire',	
+                         'SurveyQuestionnaire',	
+                         'AssignmentSurveyQuestionnaire',	
+                         'Assignment SurveyQuestionnaire',	
+                         'Global SurveyQuestionnaire',	
+                         'GlobalSurveyQuestionnaire',	
+                         'Course SurveyQuestionnaire',	
+                         'CourseSurveyQuestionnaire',	
+                         'Bookmark RatingQuestionnaire',
                          'BookmarkRatingQuestionnaire',
                          'QuizQuestionnaire'].freeze
   has_paper_trail

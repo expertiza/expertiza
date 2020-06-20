@@ -77,9 +77,19 @@ class QuestionnairesController < ApplicationController
         @questionnaire.type = params[:questionnaire][:type]
         # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
         # In the future, we need to write migration files to make them consistency.
-        # E1903 : We are not sure of other type of cases, so have added a if statement. If there are only 5 cases, remove the if statement
-        if %w[AuthorFeedback CourseSurvey TeammateReview GlobalSurvey AssignmentSurvey BookmarkRating].include?(display_type)
-          display_type = (display_type.split /(?=[A-Z])/).join("%")
+        case display_type
+        when 'AuthorFeedback'
+          display_type = 'Author%Feedback'
+        when 'CourseSurvey'
+          display_type = 'Course%Survey'
+        when 'TeammateReview'
+          display_type = 'Teammate%Review'
+        when 'GlobalSurvey'
+          display_type = 'Global%Survey'
+        when 'AssignmentSurvey'
+          display_type = 'Assignment%Survey'
+        when 'BookmarkRating'
+          display_type = 'Bookmark Rating'
         end
         @questionnaire.display_type = display_type
         @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL

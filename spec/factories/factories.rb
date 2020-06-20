@@ -336,6 +336,12 @@ FactoryBot.define do
     type 'AssignmentNode'
   end
 
+  factory :assignment_team_node, class: TeamNode do
+    node_object { AssignmentTeam.first || association(:assignment_team) }
+    node_object_id 1
+    type 'TeamNode'
+  end
+
   factory :course_node, class: CourseNode do
     course { Course.first || association(:course) }
     node_object_id 1

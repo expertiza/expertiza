@@ -1,26 +1,28 @@
 class ReviewMetricsQuery
+  include Singleton
+
   # The certainty threshold is the fraction (between 0 and 1) that says how certain
   # the ML algorithm must be of a tag value before it will ask the author to tag it
   # manually.
   TAG_CERTAINTY_THRESHOLD = 0.8
 
   # link each tag prompt to the corresponding key in the review hash
-  PROMPT_TO_METRIC = {"Mention Problems?" => "Problem",
-                      "Suggest Solutions?" => "Suggestions",
-                      "Mention Praise?" => "Sentiment",
-                      "Positive Tone?" => "Emotion"}.freeze
+  PROMPT_TO_METRIC = {"Mention Problems?" => :Problem,
+                      "Suggest Solutions?" => :Suggestions,
+                      "Mention Praise?" => :Sentiment,
+                      "Positive Tone?" => :Emotion}.freeze
 
-  # the only ReviewMetricQuery object
-  @@query_obj = ReviewMetricsQuery.new
-
-  # queried_result is an array of reviews, where each review is a hash that maps several of its attributes like "Suggestions", and "Emotion" to the result determined by the WS.
-  @queried_result = nil
+  def initialize
+    # queried_result is an array of reviews, where each review is a hash that maps several of its attributes like "Suggestions", and "Emotion" to the result determined by the WS.
+    @queried_result = []
+  end
 
   # metric: :Sentiment, :Suggestions, :Emotion, and :Problem
   def confidence(metric, review_id)
     review = review_from_cache(review_id)
     confidence = review[:Confidence][metric]
-    confidence | 0 # in case that there is no corresponding metric for this tag_prompt
+    confidence ||= 0 # in case that there is no corresponding metric for this tag_prompt
+    confidence
   end
 
   # metric: :Suggestions, and :Problem
@@ -48,11 +50,11 @@ class ReviewMetricsQuery
     # put reviews in a format that the WS can understand
     ws_input = {reviews: []}
     reviews.each do |review|
-      ws_input["reviews"] << {id: review.id, text: review.comments}
+      ws_input[:reviews] << {id: review.id, text: review.comments}
     end
     # ask MetricsController to make a call to the review metrics web service
-    ws_output = MetricsController.new.make_web_service_call(:review, ws_input)
-    @queried_result = ws_output["reviews"]
+    ws_output = MetricsController.new.confidence_metric(ws_input)
+    @queried_result = ws_output[:reviews]
   end
 
   # find all reviews that may be displayed in the requesting page
@@ -76,23 +78,22 @@ class ReviewMetricsQuery
   # usage: ReviewMetricQuery.confidence(tag_dep.tag_prompt.prompt, answer.id)
   def self.confidence(prompt, review_id)
     # let the instance method do the job
-    @@query_obj.confidence(PROMPT_TO_METRIC[prompt], review_id)
+    ReviewMetricsQuery.instance.confidence(PROMPT_TO_METRIC[prompt], review_id)
   end
 
   # usage: ReviewMetricQuery.confident?(tag_dep.tag_prompt.prompt, answer.id)
   # answer_tagging would most likely to use this method since it returns either
   # true or false
   def self.confident?(prompt, review_id)
-    confidence = @@query_obj.confidence(PROMPT_TO_METRIC[prompt], review_id)
+    confidence = ReviewMetricsQuery.instance.confidence(PROMPT_TO_METRIC[prompt], review_id)
     confidence > TAG_CERTAINTY_THRESHOLD
   end
 
   # usage: ReviewMetricQuery.has(tag_dep.tag_prompt.prompt, answer.id)
   def self.has(prompt, review_id)
     # let the instance method do the job
-    @@query_obj.has(PROMPT_TO_METRIC[prompt], review_id)
+    ReviewMetricsQuery.instance.has(PROMPT_TO_METRIC[prompt], review_id)
   end
 
   # =============== End of caller's interfaces ===============
-
 end

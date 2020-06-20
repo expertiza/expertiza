@@ -205,7 +205,7 @@ class Criterion < ScoredQuestion
       html += '</td>'
 
 
-      html += TagPrompt.show_tag_prompts(tag_prompt_deployments, answer, user_id)
+      html += TagPrompt.show_tag_prompts(tag_prompt_deployments, answer, current_user)
     end
     html += '</tr></table>'
     safe_join(["".html_safe, "".html_safe], html.html_safe)

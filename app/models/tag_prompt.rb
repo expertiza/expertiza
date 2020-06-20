@@ -10,7 +10,7 @@ class TagPrompt < ActiveRecord::Base
       question = Question.find(answer.question_id)
       html += '<tr><td colspan="2">'
       tag_prompt_deployments.each do |tag_dep|
-        if ReviewMetricsQuery.confident?(tag_dep.tag_prompt.prompt,answer.id) and tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold.to_i
+        if !ReviewMetricsQuery.confident?(tag_dep.tag_prompt.prompt,answer.id) and tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold.to_i
           tag_prompt = TagPrompt.find(tag_dep.tag_prompt_id)
           html += tag_prompt.html_control(tag_dep, answer, user_id)
         end

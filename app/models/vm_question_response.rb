@@ -141,7 +141,7 @@ class VmQuestionResponse
       # check if the tag prompt applies for thsi question type and if the comment length is above the threshold
       # if it does, then associate this answer with the tag_prompt and tag deployment (the setting)
       tag_deps.each do |tag_dep|
-        if tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold and ReviewMetricsQuery.confident?(tag_dep.tag_prompt.prompt,answer.id)
+        if tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold and !ReviewMetricsQuery.confident?(tag_dep.tag_prompt.prompt,answer.id)
           vm_tag_prompts.append(VmTagPromptAnswer.new(answer, TagPrompt.find(tag_dep.tag_prompt_id), tag_dep))
         end
       end

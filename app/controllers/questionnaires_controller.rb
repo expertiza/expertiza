@@ -13,9 +13,11 @@ class QuestionnairesController < ApplicationController
     case params[:action]
     when 'edit'
       @questionnaire = Questionnaire.find(params[:id])
-      current_user_has_admin_privileges? ||
-          (current_user_is_a?('Instructor') && current_user_id?(@questionnaire.try(:instructor_id))) ||
-          (current_user_is_a?('Teaching Assistant') && session[:user].instructor_id == @questionnaire.try(:instructor_id))
+      (['Super-Administrator',
+        'Administrator'].include? current_role_name) ||
+          ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id))) ||
+          ((['Teaching Assistant'].include? current_role_name) && Ta.get_my_instructors(session[:user].id).include?(@questionnaire.try(:instructor_id)))
+
     else
       current_user_has_student_privileges?
     end
@@ -65,7 +67,11 @@ class QuestionnairesController < ApplicationController
       begin
         @questionnaire.private = questionnaire_private
         @questionnaire.name = params[:questionnaire][:name]
-        @questionnaire.instructor_id = session[:user].id
+        @questionnaire.instructor_id = if ['Teaching Assistant'].include? current_role_name
+                                         Ta.get_my_instructor(session[:user].id)
+                                       else
+                                         session[:user].id
+                                       end
         @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
         @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
         @questionnaire.type = params[:questionnaire][:type]

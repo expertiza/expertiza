@@ -81,6 +81,8 @@ class QuestionnairesController < ApplicationController
           display_type = 'Global%Survey'
         when 'AssignmentSurvey'
           display_type = 'Assignment%Survey'
+        when 'BookmarkRating'
+          display_type = 'Bookmark Rating'
         end
         @questionnaire.display_type = display_type
         @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL

@@ -85,6 +85,7 @@ describe ReviewResponseMap do
     allow(ReviewResponseMap).to receive(:find_or_create_by)
       .with(reviewed_object_id: 1, reviewer_id: 2, reviewee_id: 1, calibrate_to: false)
       .and_return(review_response_map)
+    allow(participant1).to receive(:get_reviewer).and_return(participant1)
     expect(ReviewResponseMap.import(row_hash, session, 1)).to eq(["name1"])
     # when reviewee_team = nil
     allow(AssignmentTeam).to receive(:team).with(participant).and_return(nil)
@@ -134,7 +135,7 @@ describe ReviewResponseMap do
     allow(assignment).to receive(:review_questionnaire_id).with(1).and_return(1)
     allow(Response).to receive(:where).with(map_id: 1, round: 2).and_return([response1])
     allow(assignment).to receive(:review_questionnaire_id).with(2).and_return(1)
-    expect(ReviewResponseMap.final_versions_from_reviewer(1))
+    expect(ReviewResponseMap.final_versions_from_reviewer(1, 1))
       .to eq("review round1": {questionnaire_id: 1, response_ids: [1]}, "review round2": {questionnaire_id: 1, response_ids: [2]})
   end
 

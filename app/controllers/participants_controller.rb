@@ -63,7 +63,14 @@ class ParticipantsController < ApplicationController
     can_take_quiz = permissions[:can_take_quiz]
     participant = Participant.find(params[:id])
     parent_id = participant.parent_id
-    participant.update_attributes(can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz)
+    # Upon successfully updating the attributes based on user role, a flash message is displayed to the user after the
+    # change in the database. This also gives the user the error message if the update fails.
+    begin
+      participant.update_attributes(can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz)
+      flash[:success] = "The role of the selected participants has been successfully updated."
+    rescue StandardError
+      flash[:error] = 'The update action failed.'
+    end
     redirect_to action: 'list', id: parent_id, model: participant.class.to_s.gsub("Participant", "")
   end
 

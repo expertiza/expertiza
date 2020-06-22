@@ -1,4 +1,6 @@
 %div
+  %script{:src=>"/assets/team_users_popup.js"}
+
   %h3
     Members of #{@team.name}
   %table{:width => "100%"}
@@ -21,7 +23,14 @@
         %td{:align => "center"} --
       %br/
     - else
-      %h3= "Reviewed by #{User.find(@reviewer_id).fullname} (Round #{round})"
+      %h3{:style=>"display:inline-block"}= "Reviewed by #{User.find(@reviewer_id).fullname} (Round #{round})"
+      - response_id = instance_variable_get('@response_id_round_' + round.to_s).to_s
+      - response = Response.find(response_id)
+      - if response.visibility=='public'
+        %button{ :id=>"btn"+round.to_s, :onclick=>"publish_example_review(this)", :data => { :response_id => response_id }, :style=>"float:right" } Mark as Example
+      - elsif response.visibility=='published'
+        %button{ :id=>"btnun"+round.to_s, :onclick=>"suppress_example_review(this)", :data => { :response_id => response_id }, :style=>"float:right" } Unmark as Example
+
       %table{:class => "general", :border => "1px solid #ccc"}
         %tr
           %th{:align => "left", :width => "50%"} Question
@@ -59,5 +68,28 @@
           %td= additional_comment.nil? ? 'No Comments' : additional_comment.html_safe
       %hr/
   %br/
+
+  %div{:id=>"dialogConfirmMark",:class=>"col-md-12"}
+    %h5{:class=>"col-md-11"}
+    %strong Select the assignments for which you want to mark these reviews as samples:
+    %br/
+    %table{:class => "general",:width => "100%"}
+      %tr
+        %td
+        %th Assignments
+      - @similar_assignments.each do |assignment|
+        %tr
+          - @course_name = !assignment.course.nil? ? assignment.course.name : ""
+          %td= check_box_tag "published_assignments", assignment.id
+          %td= label_tag "#{@course_name} : #{assignment.name}"
+
+
+  %div{:id=>"dialogConfirmUnmark",:class=>"col-md-12"}
+    %div{:class=>"col-md-12",:id=>"similar_assignments_popup"}
+      %p
+        This will remove this review as example for all assignments. Continue?
+
+
+
   .footer
     = link_to 'Back', :controller=> 'review_mapping', :action=>'response_report', :id=>params[:assignment_id]

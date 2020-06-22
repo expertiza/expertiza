@@ -15,7 +15,7 @@
             <td><%= check_box 'user', 'email_on_submission', {}, true, false  %></td>
           </tr>
           <tr>
-            <td><label for="user_email_on_review_of_review">When someone else reviews one of my reviews (<strong>metareviews</strong> my work)</label></td>
+            <td><label for="user_email_on_review_of_review">When someone else reviews one of my reviews (<strong>meta-reviews</strong> my work)</label></td>
             <td><%= check_box 'user', 'email_on_review_of_review', {}, true, false %></td>
           </tr>
           <% if @user.role_id == 2 %>

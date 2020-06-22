@@ -336,6 +336,12 @@ FactoryBot.define do
     type 'AssignmentNode'
   end
 
+  factory :assignment_team_node, class: TeamNode do
+    node_object { AssignmentTeam.first || association(:assignment_team) }
+    node_object_id 1
+    type 'TeamNode'
+  end
+
   factory :course_node, class: CourseNode do
     course { Course.first || association(:course) }
     node_object_id 1
@@ -403,6 +409,7 @@ FactoryBot.define do
     version_num nil
     round 1
     is_submitted false
+    visibility 'private'
   end
 
   factory :submission_record, class: SubmissionRecord do
@@ -454,8 +461,26 @@ FactoryBot.define do
     name 'fake_site'
   end
 
+
   factory :team, class: Team do
     id 1
     parent_id 1
   end
+
+  factory :version, class: Version do
+    item_type 'Node'
+    item_id 1
+    event 'create'
+    whodunnit nil
+    object nil
+    created_at '2015-06-11 15:11:51'
+  end
+
+  factory :test_user, class: User do
+    name 'username'
+    fullname 'full name'
+    email 'abc@mailinator.com'
+  end
+  
 end
+

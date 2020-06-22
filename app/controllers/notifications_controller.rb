@@ -36,8 +36,7 @@ class NotificationsController < ApplicationController
 
   # POST /notifications
   def create
-    if params[:notification] && (warn_for_special_chars(params[:notification][:subject], "Subject") ||
-        warn_for_special_chars(params[:notification][:description], "Description"))
+    if params[:notification]
       redirect_back
       return
     end

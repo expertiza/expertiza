@@ -1,4 +1,8 @@
 <h1>Manage content</h1>
 
 <%= link_to 'Manage Notifications', notifications_url %>
-<div id="tree_display" params="#{@reactjsParams}"></div>
+<%# add data-user-id %>
+<%# associated with current logged in user %>
+<%# done to make it available in the frontend %>
+<div id="tree_display" params="#{@reactjsParams}" data-user-id="<%= current_user.id %>" data-menu-item= '<%= "#{@currCtlr}" %>'></div>
+

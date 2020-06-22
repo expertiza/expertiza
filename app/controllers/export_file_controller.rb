@@ -41,9 +41,11 @@ class ExportFileController < ApplicationController
     # The export_details_fields and export_headers methods are defined in Assignment.rb that packs all the details from
     # the model in the generated CSV file.
     csv_data = CSV.generate(col_sep: delimiter) do |csv|
-      csv << Object.const_get(allowed_models[0]).export_headers(params[:id])
-      csv << Object.const_get(allowed_models[0]).export_details_fields(params[:details])
-      Object.const_get(allowed_models[0]).export_details(csv, params[:id], params[:details])
+      if allowed_models.include? params[:model]
+        csv << Object.const_get(params[:model]).export_headers(params[:id])
+        csv << Object.const_get(params[:model]).export_details_fields(params[:details])
+        Object.const_get(params[:model]).export_details(csv, params[:id], params[:details])
+      end
     end
 
     send_data csv_data,

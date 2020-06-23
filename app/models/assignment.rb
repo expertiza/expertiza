@@ -533,7 +533,7 @@ class Assignment < ActiveRecord::Base
     questionnaires = @assignment.questionnaires
     questionnaires.each do |questionnaire|
       if @assignment.varying_rubrics_by_round?
-        round = AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: @questionnaire.id).used_in_round
+        round = AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).used_in_round
         questionnaire_symbol = if round.nil?
                                  questionnaire.symbol
                                else
@@ -554,6 +554,7 @@ class Assignment < ActiveRecord::Base
     (0..@scores[:teams].length - 1).each do |index|
       team = @scores[:teams][index.to_s.to_sym]
       first_participant = team[:team].participants[0] unless team[:team].participants[0].nil?
+      next if first_participant.nil?
       pscore = @scores[:participants][first_participant.id.to_s.to_sym]
       tcsv = []
       tcsv << team[:team].name

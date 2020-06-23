@@ -470,9 +470,13 @@ class Assignment < ActiveRecord::Base
     @questions = {}
     questionnaires = @assignment.questionnaires
     questionnaires.each do |questionnaire|
-      if @assignment.vary_by_round
-        round = AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: @questionnaire.id).used_in_round
-        questionnaire_symbol = round.nil? ? questionnaire.symbol : (questionnaire.symbol.to_s + round.to_s).to_sym
+      if @assignment.varying_rubrics_by_round?
+        round = AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).used_in_round
+        questionnaire_symbol = if round.nil?
+                                 questionnaire.symbol
+                               else
+                                 (questionnaire.symbol.to_s + round.to_s).to_sym
+                               end
       else
         questionnaire_symbol = questionnaire.symbol
       end
@@ -488,8 +492,10 @@ class Assignment < ActiveRecord::Base
     (0..@scores[:teams].length - 1).each do |index|
       team = @scores[:teams][index.to_s.to_sym]
       first_participant = team[:team].participants[0] unless team[:team].participants[0].nil?
-      teams_csv = []
-      teams_csv << team[:team].name
+      next if first_participant.nil?
+      pscore = @scores[:participants][first_participant.id.to_s.to_sym]
+      tcsv = []
+      tcsv << team[:team].name
       names_of_participants = ''
       team[:team].participants.each do |p|
         names_of_participants += p.fullname

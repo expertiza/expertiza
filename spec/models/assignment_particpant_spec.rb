@@ -278,12 +278,43 @@ describe AssignmentParticipant do
         end
       end
 
+      context 'when new user needs to be created' do
+        let(:row) do
+          {name: 'no one', fullname: 'no one', email: 'name@email.com', role:'user_role_name', parent: 'user_parent_name'}
+        end
+        let(:attributes) do
+          {role_id: 1, name: 'no one', fullname: 'no one', email: 'name@email.com', email_on_submission: 'name@email.com',
+           email_on_review: 'name@email.com', email_on_review_of_review: 'name@email.com'}
+        end
+        let(:test_user) do
+          {name: 'abc', email: 'abcbbc@gmail.com'}
+        end
+        it 'create the user and number of mails sent should be 1' do
+          ActionMailer::Base.deliveries.clear
+          allow(ImportFileHelper).to receive(:define_attributes).with(row).and_return(attributes)
+          allow(ImportFileHelper).to receive(:create_new_user) do
+            test_user = User.new(name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com')
+            test_user.id = 123
+            test_user.save!
+            test_user
+          end
+          #allow(ImportFileHelper).to receive(:create_new_user).with(attributes, {}).and_return()
+          allow(Assignment).to receive(:find).with(1).and_return(assignment)
+          allow(User).to receive(:exists?).with(name: 'no one').and_return(false)
+          allow(participant).to receive(:set_handle).and_return('handle')
+          allow(AssignmentParticipant).to receive(:exists?).and_return(false)
+          allow(AssignmentParticipant).to receive(:create).and_return(participant)
+          allow(AssignmentParticipant).to receive(:set_handle)
+          expect{(AssignmentParticipant.import(row, nil, {}, 1))}.to change { ActionMailer::Base.deliveries.count }.by(1)
+        end
+      end
+
       context 'when the record has more than 4 items' do
         let(:row) do
           {name: 'no one', fullname: 'no one', email: 'name@email.com', role:'user_role_name', parent: 'user_parent_name'}
         end
         let(:attributes) do
-          {role_id: 1, name: 'no one', fullname: 'no one', email: '', email_on_submission: 'name@email.com',
+          {role_id: 1, name: 'no one', fullname: 'no one', email: 'name@email.com', email_on_submission: 'name@email.com',
            email_on_review: 'name@email.com', email_on_review_of_review: 'name@email.com'}
         end
         before(:each) do

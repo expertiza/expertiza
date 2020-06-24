@@ -5,6 +5,8 @@ class User < ActiveRecord::Base
     Authlogic::CryptoProviders::Sha1.join_token = ''
     Authlogic::CryptoProviders::Sha1.stretches = 1
   end
+  #Added for E1973. A user can hold a lock on a resource
+  has_many :locks, class_name: 'Lock', foreign_key: 'user_id', dependent: :destroy, inverse_of: false
   has_many :participants, class_name: 'Participant', foreign_key: 'user_id', dependent: :destroy
   has_many :assignment_participants, class_name: 'AssignmentParticipant', foreign_key: 'user_id', dependent: :destroy
   has_many :assignments, through: :participants
@@ -126,7 +128,8 @@ class User < ActiveRecord::Base
 
   # Function which has a MailerHelper which sends the mail welcome email to the user after signing up
   def email_welcome
-    MailerHelper.send_mail_to_user(self, "Your Expertiza password has been created", "user_welcome", password)
+    #this will send an account creation notification to user via email.
+    MailerHelper.send_mail_to_user(self, "Your Expertiza account and password has been created", "user_welcome", password).deliver_now
   end
 
   def valid_password?(password)
@@ -147,8 +150,6 @@ class User < ActiveRecord::Base
     if user.nil?
       attributes = ImportFileHelper.define_attributes(row_hash)
       user = ImportFileHelper.create_new_user(attributes, session)
-      password = user.reset_password
-      MailerHelper.send_mail_to_user(user, "Your Expertiza account has been created.", "user_welcome", password).deliver
     else
       user.email = row_hash[:email]
       user.fullname = row_hash[:fullname]

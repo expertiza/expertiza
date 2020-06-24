@@ -5,7 +5,7 @@
   <td><a href="mailto: <%= participant.user.email(session[:ip]) %>"><%= participant.user.email(session[:ip]) %></a></td>
   <td><%= participant.user.role.name %></td>
   <td align = "left"><%= (User.find(participant.user.parent_id)).name(session[:ip]) %></td>
-  <% if participant.assignment.has_badge? %>
+  <% if participant.assignment.badge? %>
     <td align = "left"><%= get_awarded_badges(participant) %></td>
   <% end %>
   <td align = "left"><%= User.yesorno(participant.user.email_on_review) %></td>
@@ -27,7 +27,8 @@
   <% end %>
   <!-- E726 Fall2012 Changes End -->
 
-  <td>
+  <!-- Aligning the column to the left keeping it similar to the entire page -->
+  <td align="left">
     <%= form_tag :controller=>'participants', :action=>'update_authorizations', :id => participant.id do %>
         <% params[:authorization] = authorization %>
         <select class="form-control" id=<%=participant.user_id%> name="authorization" style="font-size:15px">
@@ -53,7 +54,8 @@
                   <% end -%>
                   >submitter</option>
         </select>
-        <%= button_tag "Submit", {:id=>'button'+participant.user_id.to_s,:style=>"font-size:15px; opacity:0;", :class => "btn btn-md btn-default" } %>
+        <!-- Change to display the Submit button -->
+        <%= button_tag "Submit", {:id=>'button'+participant.user_id.to_s,:style=>"font-size:15px; opacity:1;", :class => "btn btn-md btn-default" } %>
     <% end %>
   </td>
 

@@ -97,6 +97,10 @@ class AssignmentParticipant < Participant
     end
   end
 
+  # E1973, dummy method to match the functionality of AssignmentTeam
+  def set_current_user(current_user)
+  end
+
   def merge_scores(scores)
     review_sym = "review".to_sym
     scores[review_sym] = {}
@@ -158,6 +162,27 @@ class AssignmentParticipant < Participant
     ReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)
   end
 
+  # returns the reviewer of the assignment. Checks the reviewer_is_team flag to
+  # determine whether this AssignmentParticipant or their team is the reviewer
+  def get_reviewer
+    if self.assignment.reviewer_is_team
+      return self.team
+    else
+      return self
+    end
+  end
+
+  # polymorphic twin of method in AssignmentTeam
+  # this method is called to check if the current user is this one
+  def get_logged_in_reviewer_id(current_user_id)
+    return self.id
+  end
+
+  # checks if this assignment participant is the currently logged on user, given their user id
+  def current_user_is_reviewer?(current_user_id)
+    return user_id == current_user_id
+  end
+
   def quizzes_taken
     QuizResponseMap.get_assessments_for(self)
   end
@@ -198,13 +223,24 @@ class AssignmentParticipant < Participant
   def self.import(row_hash, _row_header = nil, session, id)
     raise ArgumentError, "No user id has been specified." if row_hash.empty?
     user = User.find_by(name: row_hash[:name])
-    return unless user.nil?
-    raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 4
-    attributes = ImportFileHelper.define_attributes(row_hash)
-    user = ImportFileHelper.create_new_user(attributes, session)
 
+    #if user with provided name in csv file is not present then new user will be created.
+    if user.nil?
+      raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 4
+
+      #define_attributes method will return an element that stores values from the row_hash.
+      attributes = ImportFileHelper.define_attributes(row_hash)
+
+      #create_new_user method will create new user with values present in attribute.
+      user = ImportFileHelper.create_new_user(attributes, session)
+
+    end
     raise ImportError, "The assignment with id \"#{id}\" was not found." if Assignment.find(id).nil?
+
+    #if user is already added to the assignment then return.
     return if AssignmentParticipant.exists?(user_id: user.id, parent_id: id)
+
+    #if user is not already a participant then, user will be added to the assignment.
     new_part = AssignmentParticipant.create(user_id: user.id, parent_id: id)
     new_part.set_handle
   end

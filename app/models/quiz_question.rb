@@ -1,10 +1,11 @@
 class QuizQuestion < Question
-  has_many :quiz_question_choices, class_name: 'QuizQuestionChoice', foreign_key: 'question_id'
+  has_many :quiz_question_choices, class_name: 'QuizQuestionChoice', foreign_key: 'question_id', inverse_of: false, dependent: :nullify
   def edit; end
 
   def view_question_text
     html = "<b>" + self.txt + '</b><br />'
     html += "Question Type: " + self.type + '<br />'
+    html += 'Question Weight: ' + self.weight.to_s + '<br />'
     if self.quiz_question_choices
       self.quiz_question_choices.each do |choices|
         html += if choices.iscorrect?

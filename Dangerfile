@@ -284,7 +284,7 @@ Even in test descriptions, please avoid using `should`.
 end
 
 # ------------------------------------------------------------------------------
-# 14. Your RSpec testing files do not need to require helper files (e.g., rails_helper.rb, spec_helper.rb). 
+# 14. Your RSpec testing files do not need to require helper files (e.g., rails_helper.rb, spec_helper.rb).
 # ------------------------------------------------------------------------------
 if PR_ADDED.include? "require 'rspec'"                or
    PR_ADDED.include? "require \"rspec\""              or
@@ -310,7 +310,7 @@ end
 # ------------------------------------------------------------------------------
 # 15. You should avoid committing text files for RSpec tests.
 # ------------------------------------------------------------------------------
-if (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/.*spec.*\.txt/).any? or 
+if (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/.*spec.*\.txt/).any? or
    (ADDED_FILES + MODIFIED_FILES + RENAMED_FILES).grep(/.*spec.*\.csv/).any?
   warn("You committed text files (`*.txt` or `*.csv`) for RSpec tests; please double-check whether this is necessary.", sticky: true)
 end
@@ -486,7 +486,7 @@ end
 
 # ------------------------------------------------------------------------------
 # RSpec tests should avoid shallow tests
-# 37. Including too many wildcard argument matchers (e.g., anything, any_args).
+# 37. Including greater than or equal to five wildcard argument matchers (e.g., anything, any_args).
 # 38. Not writing/commenting out expectations for the tests.
 # 39. Test expectations do not include matchers, such as comparisons (e.g.,equal(expected_value)),
 #     the status change of objects (e.g.,change(object, :value).by(delta)), error handlings (e.g.,raise_error("message")).

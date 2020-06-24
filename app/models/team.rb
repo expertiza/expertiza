@@ -10,7 +10,7 @@ class Team < ActiveRecord::Base
   scope :find_team_for_assignment_and_user, lambda {|assignment_id, user_id|
     joins(:teams_users).where("teams.parent_id = ? AND teams_users.user_id = ?", assignment_id, user_id)
   }
-
+  
   # Get the participants of the given team
   def participants
     users.where(parent_id: parent_id || current_user_id).flat_map(&:participants)

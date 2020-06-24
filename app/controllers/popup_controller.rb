@@ -1,4 +1,7 @@
 class PopupController < ApplicationController
+  include StringOperationHelper
+  ASSIGNMENT_NAME_SIMILARITY_THRESHOLD = 0.50
+
   def action_allowed?
     ['Super-Administrator',
      'Administrator',
@@ -39,8 +42,16 @@ class PopupController < ApplicationController
 
     # id2 is a response_map id
     unless params[:id2].nil?
-      participant_id = ResponseMap.find(params[:id2]).reviewer_id
-      @reviewer_id = Participant.find(participant_id).user_id
+      # E1973 - we set the reviewer id either to the student's user id or the current reviewer id
+      # This results from reviewers being either assignment participants or assignment teams.
+      # If the reviewer is a participant, the id is currently the id of the assignment participant.
+      # However, we want their user_id. This is not possible for teams, so we just return the current id
+      reviewer_id = ResponseMap.find(params[:id2]).reviewer_id
+      if @assignment.reviewer_is_team
+        @reviewer_id = Participant.find(reviewer_id).user_id
+      else
+        @reviewer_id = reviewer_id
+      end
       # get the last response in each round from response_map id
       (1..@assignment.num_review_rounds).each do |round|
         response = Response.where(map_id: params[:id2], round: round).last
@@ -57,7 +68,17 @@ class PopupController < ApplicationController
         instance_variable_set('@total_possible_round_' + round.to_s, response.maximum_score)
       end
     end
+
+    all_assignments = Assignment.where(:instructor_id=>session[:user].id)
+    @similar_assignments = []
+    all_assignments.each do |assignment|
+      if (string_similarity(@assignment.name, assignment.name) > ASSIGNMENT_NAME_SIMILARITY_THRESHOLD)
+        @similar_assignments << assignment
+      end
+    end
+    @similar_assignments = @similar_assignments.sort_by { |sim_assignment| -sim_assignment.id }
   end
+
 
   def participants_popup
     @sum = 0
@@ -75,7 +96,13 @@ class PopupController < ApplicationController
     else
       @reviewid = Response.find_by(map_id: params[:id2]).id
       @pid = ResponseMap.find(params[:id2]).reviewer_id
-      @reviewer_id = Participant.find(@pid).user_id
+      # E-1973 we either pass the id of the team or the user, depending
+      # on if reviewers are teams
+      if not @assignment.reviewer_is_team
+        @reviewer_id = Participant.find(@pid).user_id
+      else
+        @reviewer_id = Team.find(@pid)
+      end
       # @reviewer_id = ReviewMapping.find(params[:id2]).reviewer_id
       @assignment_id = ResponseMap.find(params[:id2]).reviewed_object_id
       @assignment = Assignment.find(@assignment_id)
@@ -108,7 +135,7 @@ class PopupController < ApplicationController
   def tone_analysis_chart_popup
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
-    @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@reviewer_id)
+    @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@assignment_id, @reviewer_id)
 
     # Builds tone analysis report and heatmap when instructor/admin/superadmin clicks on the "Tone analysis chart button" link for an assignment.
     build_tone_analysis_report
@@ -118,7 +145,7 @@ class PopupController < ApplicationController
   def view_review_scores_popup
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
-    @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@reviewer_id)
+    @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@assignment_id, @reviewer_id)
     @reviews = []
 
     # Builds tone analysis report and heatmap when instructor/admin/superadmin clicks on the "View Review Report" Icon for an assignment.

@@ -1,13 +1,14 @@
 require 'rails_helper'
 describe ReviewMappingController do
   let(:assignment) { double('Assignment', id: 1) }
+  let(:reviewer) {double('Participant', id: 1, name: 'reviewer')}
   let(:review_response_map) do
     double('ReviewResponseMap', id: 1, map_id: 1, assignment: assignment,
-                                reviewer: double('Participant', id: 1, name: 'reviewer'), reviewee: double('Participant', id: 2, name: 'reviewee'))
+                                reviewer: reviewer, reviewee: double('Participant', id: 2, name: 'reviewee'))
   end
   let(:metareview_response_map) do
     double('MetareviewResponseMap', id: 1, map_id: 1, assignment: assignment,
-                                    reviewer: double('Participant', id: 1, name: 'reviewer'), reviewee: double('Participant', id: 2, name: 'reviewee'))
+                                    reviewer: reviewer, reviewee: double('Participant', id: 2, name: 'reviewee'))
   end
   let(:participant) { double('AssignmentParticipant', id: 1, can_review: false, user: double('User', id: 1)) }
   let(:participant1) { double('AssignmentParticipant', id: 2, can_review: true, user: double('User', id: 2)) }
@@ -20,6 +21,10 @@ describe ReviewMappingController do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     instructor = build(:instructor)
     stub_current_user(instructor, instructor.role.name, instructor.role)
+    allow(participant).to receive(:get_reviewer).and_return(participant)
+    allow(participant1).to receive(:get_reviewer).and_return(participant1)
+    allow(participant2).to receive(:get_reviewer).and_return(participant2)
+    allow(reviewer).to receive(:get_reviewer).and_return(reviewer)
   end
 
   describe '#add_calibration' do
@@ -80,7 +85,7 @@ describe ReviewMappingController do
         user = double('User', id: 1)
         allow(User).to receive(:from_params).with(any_args).and_return(user)
         allow(AssignmentParticipant).to receive(:where).with(user_id: 1, parent_id: 1)
-                                                       .and_return([double('AssignmentParticipant', id: 1, name: 'no one')])
+                                                       .and_return([reviewer])
         allow(ReviewResponseMap).to receive_message_chain(:where, :first)
           .with(reviewee_id: '1', reviewer_id: 1).with(no_args).and_return(nil)
         allow(ReviewResponseMap).to receive(:create).with(reviewee_id: '1', reviewer_id: 1, reviewed_object_id: 1).and_return(nil)
@@ -129,6 +134,7 @@ describe ReviewMappingController do
     context 'when assignment does not have topics' do
       it 'runs another algorithms and redirects to student_review#list page' do
         allow(assignment).to receive(:topics?).and_return(false)
+        allow(participant).to receive(:set_current_user)
         team1 = double('AssignmentTeam')
         team2 = double('AssignmentTeam')
         teams = [team1, team2]

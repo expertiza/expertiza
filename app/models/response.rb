@@ -2,12 +2,14 @@ require 'analytic/response_analytic'
 require 'lingua/en/readability'
 
 class Response < ActiveRecord::Base
+  # Added for E1973. A team review will have a lock on it so only one user at a time may edit it.
+  include Lockable
   include ResponseAnalytic
-
-  belongs_to :response_map, class_name: 'ResponseMap', foreign_key: 'map_id'
-  has_many :scores, class_name: 'Answer', foreign_key: 'response_id', dependent: :destroy
+  belongs_to :response_map, class_name: 'ResponseMap', foreign_key: 'map_id', inverse_of: false
+  
+  has_many :scores, class_name: 'Answer', foreign_key: 'response_id', dependent: :destroy, inverse_of: false
   # TODO: change metareview_response_map relationship to belongs_to
-  has_many :metareview_response_maps, class_name: 'MetareviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy
+  has_many :metareview_response_maps, class_name: 'MetareviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy, inverse_of: false
   alias map response_map
   attr_accessor :difficulty_rating
   delegate :questionnaire, :reviewee, :reviewer, to: :map
@@ -63,7 +65,8 @@ class Response < ActiveRecord::Base
 
   # Returns the maximum possible score for this response
   def maximum_score
-    # only count the scorable questions, only when the answer is not nil (we accept nil as answer for scorable questions, and they will not be counted towards the total score)
+    # only count the scorable questions, only when the answer is not nil (we accept nil as
+    # answer for scorable questions, and they will not be counted towards the total score)
     total_weight = 0
     scores.each do |s|
       question = Question.find(s.question_id)
@@ -101,7 +104,12 @@ class Response < ActiveRecord::Base
       # there is small possibility that the answers is empty: when the questionnaire only have 1 question and it is a upload file question
       # the reason is that for this question type, there is no answer record, and this question is handled by a different form
       map = ResponseMap.find(self.map_id)
-      assignment = Participant.find(map.reviewer_id).assignment
+      # E-1973 either get the assignment from the participant or the map itself
+      if map.is_a? ReviewResponseMap
+        assignment = map.assignment
+      else
+        assignment = Participant.find(map.reviewer_id).assignment
+      end
       questionnaire = Questionnaire.find(assignment.review_questionnaire_id)
     end
     questionnaire
@@ -146,7 +154,9 @@ class Response < ActiveRecord::Base
     review_comments_volume = []
     review_comments_volume.push(overall_avg_vol)
     (1..3).each do |i|
-      avg_vol_in_round = (Lingua::EN::Readability.new(instance_variable_get('@comments_in_round' + i.to_s)).num_words / (instance_variable_get('@counter_in_round' + i.to_s).zero? ? 1 : instance_variable_get('@counter_in_round' + i.to_s))).round(0)
+      num = Lingua::EN::Readability.new(instance_variable_get('@comments_in_round' + i.to_s)).num_words
+      den = (instance_variable_get('@counter_in_round' + i.to_s).zero? ? 1 : instance_variable_get('@counter_in_round' + i.to_s))
+      avg_vol_in_round = (num / den).round(0)
       review_comments_volume.push(avg_vol_in_round)
     end
     review_comments_volume
@@ -161,7 +171,7 @@ class Response < ActiveRecord::Base
     existing_responses = map_class.get_assessments_for(self.map.reviewee)
     average_score_on_same_artifact_from_others, count = Response.avg_scores_and_count_for_prev_reviews(existing_responses, self)
     # if this response is the first on this artifact, there's no grade conflict
-    return false if count == 0
+    return false if count.zero?
     # This score has already skipped the unfilled scorable question(s)
     score = total_score.to_f / maximum_score
     questionnaire = questionnaire_by_answer(self.scores.first)
@@ -217,14 +227,14 @@ class Response < ActiveRecord::Base
     identifier += '<h4><B>Review ' + count.to_s + '</B></h4>'
     identifier += '<B>Reviewer: </B>' + self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
     identifier + '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' \
-           "'review_" + self_id + "','review'" + ');return false;">show review</a><BR/>'
+           "'review_" + self_id + "','review'" + ');return false;">hide review</a><BR/>'
   end
 
   def construct_student_html identifier, self_id, count
     identifier += '<table width="100%">'\
 						 '<tr>'\
 						 '<td align="left" width="70%"><b>Review ' + count.to_s + '</b>&nbsp;&nbsp;&nbsp;'\
-						 '<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' + "'review_" + self_id + "','review'" + ');return false;">show review</a>'\
+						 '<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' + "'review_" + self_id + "','review'" + ');return false;">hide review</a>'\
 						 '</td>'\
 						 '<td align="left"><b>Last Reviewed:</b>'\
 						 "<span>#{(self.updated_at.nil? ? 'Not available' : self.updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span></td>"\
@@ -232,7 +242,7 @@ class Response < ActiveRecord::Base
   end
 
   def construct_review_response code, self_id, show_tags = nil, current_user = nil
-    code += '<table id="review_' + self_id + '" style="display: none;" class="table table-bordered">'
+    code += '<table id="review_' + self_id + '" class="table table-bordered">'
     answers = Answer.where(response_id: self.response_id)
     unless answers.empty?
       questionnaire = self.questionnaire_by_answer(answers.first)
@@ -262,7 +272,7 @@ class Response < ActiveRecord::Base
       code += '<tr class="' + row_class + '"><td>'
       if !answer.nil? or question.is_a? QuestionnaireHeader
         code += if question.instance_of? Criterion
-                  #Answer Tags are enabled only for Criterion questions at the moment.
+                  # Answer Tags are enabled only for Criterion questions at the moment.
                   question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments, current_user) || ''
                 elsif question.instance_of? Scale
                   question.view_completed_question(count, answer, questionnaire_max) || ''

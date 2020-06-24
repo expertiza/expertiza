@@ -1,10 +1,6 @@
 <% rscore = pscore[:review] %> 
-
-<% if controller.action_name != "view_my_scores"%>
-    <tr>
-        <td colspan="10">
-<% end %> 
-
+<tr>
+    <td colspan="10">
 <% if rscore and rscore[:assessments].length > 0 %>
     <%flag_varying_rubrics=false%>
 
@@ -29,9 +25,6 @@
     <%if flag_varying_rubrics==false%>
         <%= render :partial => 'grades/review_table', :locals => { :ctrl => 'review', :caction => 'view_review', :symbol => "review".to_sym, :prefix => prefix, :assignment => participant.assignment, :reviews => rscore[:assessments], :collabel => "Review", :rowlabel => "Reviewer" }%>
     <%end%>
-<% end %>  
-
-<% if controller.action_name != "view_my_scores"%>    
-        </td>
-    </tr>
+    </td>
+</tr>
 <% end %>

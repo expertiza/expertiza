@@ -169,13 +169,6 @@ class ResponseController < ApplicationController
     @map = @response.map
     set_content
   end
-  #view response for instructor-end
-  def view_instructor
-    @response = Response.find(params[:id])
-    @map = @response.map
-    set_content_instructor
-    render "response/view"
-  end  
 
   def create
     map_id = params[:id]
@@ -329,34 +322,6 @@ class ResponseController < ApplicationController
     @questions = sort_questions(@questionnaire.questions)
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
-  end
-  # sets content when as instructor
-  def set_content_instructor(new_response = false)
-    @contributor = @map.contributor
-    members = TeamsUser.where(team_id: params[:team])
-    @user = members.first
-    @participant = AssignmentParticipant.where(user_id: @user.user_id, parent_id: params[:assignment]).first
-    @assignment = @participant.assignment
-    questionnaires = @assignment.questionnaires
-    @questions = retrieve_questions questionnaires, @assignment.id
-    # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
-    @pscore = @participant.scores(@questions)
-    @reviewer = @map.reviewer
-    @round = params[:round]
-  end 
-  # retrieves questions for this questionnaires
-  def retrieve_questions(questionnaires, assignment_id)
-    questions = {}
-    questionnaires.each do |questionnaire|
-      round = AssignmentQuestionnaire.where(assignment_id: assignment_id, questionnaire_id: questionnaire.id).first.used_in_round
-      questionnaire_symbol = if !round.nil?
-                               (questionnaire.symbol.to_s + round.to_s).to_sym
-                             else
-                               questionnaire.symbol
-                             end
-      questions[questionnaire_symbol] = questionnaire.questions
-    end
-    questions
   end
   # assigning the instance variables for Edit and New actions
   def assign_instance_vars

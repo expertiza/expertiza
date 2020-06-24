@@ -41,7 +41,8 @@ before_script:
   - export JAVA_HOME=/usr/lib/jvm/java-6-openjdk-amd64
   - bundle install
   - bundle exec danger --verbose
-  - bundle exec rake db:setup
+  - bundle exec rake db:create
+  - bundle exec rake db:migrate
   # Test coverage offered by Code Climate
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter

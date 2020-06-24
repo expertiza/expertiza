@@ -341,6 +341,12 @@ module ReviewMappingHelper
     css_class
   end
 
+  #returns true if the review response's visibility is public or published else returns false. (Visibility public or published means student
+  #has given consent to make his reviews public.)
+  def visibility_public?(response_map)
+    Response.where(map_id: response_map.id, visibility: ["public","published"]).exists?
+  end
+
   class ReviewStrategy
     attr_accessor :participants, :teams
 

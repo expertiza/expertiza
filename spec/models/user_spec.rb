@@ -32,6 +32,7 @@ describe User do
   end
 
   describe '#email' do
+
     it 'returns the email of the user' do
       expect(user.email).to eq('abcxyz@gmail.com')
     end

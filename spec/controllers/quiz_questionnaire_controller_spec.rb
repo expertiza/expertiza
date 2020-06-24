@@ -280,7 +280,10 @@ describe QuizQuestionnaireController do
                                                       {'1' => {iscorrect: '1', txt: 'a31'},
                                                        '2' => {iscorrect: '0', txt: 'a32'},
                                                        '3' => {iscorrect: '1', txt: 'a33'},
-                                                       '4' => {iscorrect: '0', txt: 'a34'}}}}}
+                                                       '4' => {iscorrect: '0', txt: 'a34'}}}},
+                  question_weights: {'1' => {txt: '1'},
+                                    '2' => {txt: '1'},
+                                    '3' => {txt: '1'}}}
         questionnaire = double('Questionnaire')
         allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
         allow(questionnaire).to receive(:update_attributes).with(any_args).and_return(true)

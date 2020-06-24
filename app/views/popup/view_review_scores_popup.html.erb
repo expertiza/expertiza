@@ -54,6 +54,7 @@
                           <tr>
                             <% index = ResponseMap.find(Response.find(response_id).map_id).reviewee_id %>
                             <% team = Team.find(index)%>
+
                             <% response_map = ReviewResponseMap.where(reviewed_object_id: @assignment_id,
                                                                       reviewer_id: @reviewer_id,
                                                                       reviewee_id: team.id).last %>

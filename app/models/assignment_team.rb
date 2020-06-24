@@ -7,6 +7,27 @@ class AssignmentTeam < Team
   has_many :review_response_maps, foreign_key: 'reviewee_id'
   has_many :responses, through: :review_response_maps, foreign_key: 'map_id'
   # START of contributor methods, shared with AssignmentParticipant
+  
+  # Added for E1973, Team reviews.
+  # Some methods prompt a reviewer for a user id. This method just returns the user id of the first user in the team
+  # This is a very hacky way to deal with very complex functionality but the reasoning is this:
+  # The reason this is being added is to give ReviewAssignment#reject_own_submission a way to reject the submission
+  # Of the reviewer. If there are team reviews, there must be team submissions, so any team member's user id will do.
+  # Hopefully, this logic applies if there are other situations where reviewer.user_id was called
+  # EDIT: A situation was found which differs slightly. If the current user is on the team, we want to
+  # return that instead for instances where the code uses the current user.
+  def user_id
+    if @current_user != nil and users.include? @current_user
+      @current_user.id
+    end
+    users.first.id
+  end
+
+  # E1973
+  # stores the current user so that we can check them when returning the user_id
+  def set_current_user(current_user)
+    @current_user = current_user
+  end
 
   # Whether this team includes a given participant or not
   def includes?(participant)
@@ -41,13 +62,18 @@ class AssignmentTeam < Team
   def assign_reviewer(reviewer)
     assignment = Assignment.find(self.parent_id)
     raise "The assignment cannot be found." if assignment.nil?
-    ReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
+    ReviewResponseMap.create(reviewee_id: self.id, reviewer_id: reviewer.get_reviewer.id, reviewed_object_id: assignment.id, reviewer_is_team: assignment.reviewer_is_team)
+  end
+
+  # E-1973 If a team is being treated as a reviewer of an assignment, then they are the reviewer
+  def get_reviewer
+    return self
   end
 
   # Evaluates whether any contribution by this team was reviewed by reviewer
   # @param[in] reviewer AssignmentParticipant object
   def reviewed_by?(reviewer)
-    ReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', self.id, reviewer.id, assignment.id).count > 0
+    ReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', self.id, reviewer.get_reviewer.id, assignment.id).count > 0
   end
 
   # Topic picked by the team for the assignment
@@ -240,4 +266,22 @@ class AssignmentTeam < Team
     assignment = Assignment.find(self.parent_id)
     SubmissionRecord.where(team_id: self.id, assignment_id: assignment.id).order(updated_at: :desc).first
   end
+
+  # E-1973 gets the participant id of the currently logged in user, given their user id
+  # this method assumes that the team is the reviewer since it would be called on
+  # AssignmentParticipant otherwise
+  def get_logged_in_reviewer_id(current_user_id)
+    self.participants.each do |participant|
+      if participant.user.id == current_user_id
+        return participant.id
+      end
+    end
+    return nil
+  end
+
+  # determines if the team contains a participant who is currently logged in
+  def current_user_is_reviewer?(current_user_id)
+    return get_logged_in_reviewer_id(current_user_id) != nil
+  end
+
 end

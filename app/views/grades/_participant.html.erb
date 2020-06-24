@@ -163,7 +163,10 @@
 <!-- end summarization table -->
 
 <TR id="<%= prefix %>_reviews" style="display:none; background-color: white;">
-    <TD COLSPAN="10"><%= render :partial=>'grades/reviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:review]} %></TD>
+    <TD COLSPAN="10">
+    <%= render :partial=>'grades/team_review_statistics', :locals => {:prefix => 'user', :participant => participant, :pscore => pscore} %>
+    <%= render :partial=>'grades/tabbed_reviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:review]} %>
+    </TD>
 </TR>
 <TR id="<%= prefix %>_mreviews" style="display:none; background-color: white;">
     <TD COLSPAN="10"><%= render :partial=>'grades/metareviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:metareview]} %></TD>

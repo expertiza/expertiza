@@ -170,7 +170,7 @@ class StudentTask
     timeline_list = []
     get_due_date_data(assignment, timeline_list)
     get_submission_data(assignment.try(:id), team.try(:id), timeline_list)
-    get_peer_review_data(participant.try(:id), timeline_list)
+    get_peer_review_data(participant.get_reviewer.try(:id), timeline_list)
     get_author_feedback_data(participant.try(:id), timeline_list)
     timeline_list.sort_by {|f| Time.zone.parse f[:updated_at] }
   end

@@ -3,6 +3,7 @@ Expertiza::Application.routes.draw do
   ###
   # Please insert new routes alphabetically!
   ###
+
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
 
@@ -187,6 +188,12 @@ resources :institution, except: [:destroy] do
       get :list
     end
   end
+  
+  resources :lock do
+    collection do
+      post :release_lock
+    end
+  end
 
   resources :notifications
 
@@ -338,6 +345,8 @@ resources :institution, except: [:destroy] do
       post ':id', action: :update
     end
   end
+
+  resources :sample_reviews
 
   resources :sign_up_sheet, except: %i[index show] do
     collection do
@@ -509,4 +518,9 @@ resources :institution, except: [:destroy] do
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
   get ':controller(/:action(/:id))(.:format)'
   match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
+  post '/response_toggle_permission/:id' => 'response#toggle_permission'
+  post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'
+  post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'
+
 end
+

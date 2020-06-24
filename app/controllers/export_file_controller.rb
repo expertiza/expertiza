@@ -38,7 +38,8 @@ class ExportFileController < ApplicationController
     filename, delimiter = find_delim_filename(@delim_type, params[:other_char2], "_Details")
 
     allowed_models = ['Assignment']
-
+    # The export_details_fields and export_headers methods are defined in Assignment.rb that packs all the details from
+    # the model in the generated CSV file.
     csv_data = CSV.generate(col_sep: delimiter) do |csv|
       if allowed_models.include? params[:model]
         csv << Object.const_get(params[:model]).export_headers(params[:id])

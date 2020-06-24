@@ -42,13 +42,51 @@
                     <td colspan="3" style="padding: 0px;" width="100-<%= col_percent %>%">
                       <%= render :partial => 'checkbox_question_review', :locals => {:question => question, :responses => responses} %>
                     </td>
-                <% else %>
-                    <!-- show review summary for non-checkbox question -->
-                    <td colspan="3" style="padding: 0px;" width="100-<%= col_percent %>%">
-                      <%= render :partial => 'non_checkbox_question_review', :locals => {:question => question, :responses => responses, :col_percent => col_percent, :col_percent_comment => col_percent_comment} %>
-                    </td>
-                <% end %>
-              </tr>
+                  </tr>
+              <% else %>
+                  <!-- Only assign these column headers if the question isn't a checkbox question -->
+                  <tr>
+                    <td width="20%"> Reviewee</td>
+                    <td width="10%"> Score</td>
+                    <td width="70%"> Comments</td>
+                  </tr>
+
+                  <% responses.each do |response_id| %>
+                      <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
+                      <% if !answer.nil? %>
+                          <tr>
+                            <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
+                            <% #TODO does this one need reviewer fixed? %>>
+                            <% response_map = ReviewResponseMap.where(reviewed_object_id: @assignment_id,
+                                                                      reviewer_id: @reviewer_id,
+                                                                      reviewee_id: team.id).last %>
+                            <% response_update_at = response_map.try(:response).try(:last).try(:updated_at) %>
+                            <% review_graded_at = ReviewGrade.find_by(participant_id: @reviewer_id).try(:review_graded_at) %>
+                            <% col_color = 'black' %>
+                            <% col_color = 'blue' if review_graded_at && response_update_at && response_update_at > review_graded_at %>
+                            <!--Reviewee-->
+                            <td>
+                              <p style="color: <%= col_color %>"><%= team.name %> <br>
+                            </td>
+                            <!--Score-->
+                            <% if question.instance_of? Checkbox %>
+                                <td align='center'>
+                                  <p style="color: <%= col_color %>"><%= answer.answer == 0 ? image_tag("delete_icon.png") : image_tag("Check-icon.png") %></p>
+                                </td>
+                            <% else %>
+                                <td align='center'><p style="color: <%= col_color %>"><%= answer.answer %></p></td>
+                            <% end %>
+
+                            <!--Comments-->
+                            <td align='left'><p style="color: <%= col_color %>"><%= answer.comments.html_safe unless answer.comments.nil? %></p></td>
+                          </tr>
+                      <% else %>
+                          <td>N/A</td>
+                          <td>N/A</td>
+                          <td>N/A</td>
+                      <% end %>
+                  <% end %>
+              <% end %>
           <% else %>
               <% next %>
           <% end %>

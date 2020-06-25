@@ -1,7 +1,8 @@
-#testing
 require 'will_paginate/array'
 
 class UsersController < ApplicationController
+  include AuthorizationHelper
+
   autocomplete :user, :name
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[destroy create update],
@@ -10,24 +11,26 @@ class UsersController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'list_pending_requested'
-      ['Super-Administrator',
-       'Administrator'].include? current_role_name
-    when 'request_new'
+      current_user_has_admin_privileges?
+    when 'request_new', 'create_requested_user_record'
       true
-    when 'create_requested_user_record'
-      true
-    when 'keys'
-      current_role_name.eql? 'Student'
+    when 'keys', 'index'
+      # These action methods are all written with the clear expectation
+      # that a student should be allowed to proceed
+      current_user_has_student_privileges?
+    when 'show'
+      # This action method is written with the clear expectation
+      # that a student should be allowed to proceed
+      # Furthermore, there is an RSPec test that a 'student' with no role id
+      # should be allowed to proceed
+      user_logged_in?
     else
-      ['Super-Administrator',
-       'Administrator',
-       'Instructor',
-       'Teaching Assistant'].include? current_role_name
+      current_user_has_ta_privileges?
     end
   end
 
   def index
-    if current_user_role? == "Student"
+    if current_user_is_a? 'Student'
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
       list
@@ -69,9 +72,14 @@ class UsersController < ApplicationController
   end
 
   def show_selection
-    @user = User.find_by(name: params[:user][:name])
+    @user = User.find_by(name: params['user']['name'])
     if !@user.nil?
       get_role
+      # The 'parent' of a role is a lesser-privileged role
+      # So this logic says:
+      # if you are trying to perform this action for a role of the lowest privilege, go for it
+      # if you are trying to perform this action for a role of lesser privilege than the current user, go for it
+      # if you are trying to perform this action for the current user themselves, go for it
       if @role.parent_id.nil? || @role.parent_id < session[:user].role_id || @user.id == session[:user].id
         render action: 'show'
       else
@@ -85,7 +93,7 @@ class UsersController < ApplicationController
   end
 
   def show
-    if params[:id].nil? || ((current_user_role? == "Student") && (session[:user].id != params[:id].to_i))
+    if params[:id].nil? || ((current_user_is_a? 'Student') && (!current_user_has_id? params[:id]))
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
       @user = User.find(params[:id])
@@ -243,7 +251,7 @@ class UsersController < ApplicationController
   end
 
   def keys
-    if params[:id].nil? || ((current_user_role? == "Student") && (session[:user].id != params[:id].to_i))
+    if params[:id].nil? || ((current_user_is_a? 'Student') && (!current_user_has_id? params[:id]))
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
       @user = User.find(params[:id])

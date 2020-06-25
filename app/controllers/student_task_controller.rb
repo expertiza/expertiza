@@ -1,8 +1,10 @@
 class StudentTaskController < ApplicationController
+  include AuthorizationHelper
+
   helper :submitted_content
 
   def action_allowed?
-    ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student'].include? current_role_name
+    current_user_has_student_privileges?
   end
 
   def impersonating_as_admin?

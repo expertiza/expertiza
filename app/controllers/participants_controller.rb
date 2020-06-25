@@ -1,18 +1,12 @@
 class ParticipantsController < ApplicationController
+  include AuthorizationHelper
   autocomplete :user, :name
 
   def action_allowed?
     if %w[change_handle update_duties].include? params[:action]
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator',
-       'Student'].include? current_role_name
+      current_user_has_student_privileges?
     else
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator'].include? current_role_name
+      current_user_has_ta_privileges?
     end
   end
 

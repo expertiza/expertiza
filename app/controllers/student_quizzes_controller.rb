@@ -1,10 +1,16 @@
 class StudentQuizzesController < ApplicationController
+  include AuthorizationHelper
+
   def action_allowed?
-    ['Administrator',
-     'Instructor',
-     'Teaching Assistant'].include? current_role_name or
-    (current_role_name.eql?("Student") and
-      ((%w[index].include? action_name) ? are_needed_authorizations_present?(params[:id], "reviewer", "submitter") : true))
+    if current_user_is_a? 'Student'
+      if action_name.eql? 'index'
+        return are_needed_authorizations_present?(params[:id], "reviewer", "submitter")
+      else
+        true
+      end
+    else
+      current_user_has_ta_privileges?
+    end
   end
 
   def index

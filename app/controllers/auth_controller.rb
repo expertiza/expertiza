@@ -1,4 +1,5 @@
 class AuthController < ApplicationController
+  include AuthorizationHelper
   helper :auth
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
@@ -10,7 +11,7 @@ class AuthController < ApplicationController
     when 'login', 'logout', 'login_failed', 'google_login'
       true
     else
-      current_role_name.eql?("Super-Administrator")
+      current_user_has_super_admin_privileges?
     end
   end
 

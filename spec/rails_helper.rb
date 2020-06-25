@@ -20,7 +20,7 @@ ActiveRecord::Migration.maintain_test_schema!
 
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
-  config.fixture_path = "#{::Rails.root}/spec/fixtures"
+  # config.fixture_path = "#{::Rails.root}/spec/fixtures"
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
@@ -66,10 +66,20 @@ RSpec.configure do |config|
     stub_current_user(user, user.role.name, user.role)
   end
 
+  def logout
+    click_link "Logout"
+  end
+
   def stub_current_user(current_user, current_role_name = 'Student', current_role)
-    allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(current_user)
+    allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(current_user) if defined?(session)
     allow_any_instance_of(ApplicationController).to receive(:current_role_name).and_return(current_role_name)
     allow_any_instance_of(ApplicationController).to receive(:current_role).and_return(current_role)
+    # Also pop this stub user into the session to support the authorization helper
+
+    # Check if session is defined to differentiate between controller and non-controller tests.
+    # This is required as the session variable is only defined for controller specs.
+    # Other kinds of specs(feature specs,etc) use an internal rack.session that cannot be interacted with.
+    session[:user] = current_user if defined?(session)
   end
 
   def http_status_factory(status_code)

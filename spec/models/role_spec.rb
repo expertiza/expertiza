@@ -1,8 +1,8 @@
 describe Role do
   before :all do
-    @student_role = build(:role_of_student, id: 1, name: "Student", description: '', parent_id: nil, default_page_id: nil)
-    @instructor_role = build(:role_of_instructor, id: 2, name: "Instructor", description: '', parent_id: nil, default_page_id: nil)
-    @admin_role = build(:role_of_administrator, id: 3, name: "Administrator", description: '', parent_id: nil, default_page_id: nil)
+    @student_role = build(:role_of_student, id: 1, name: "Student_role_test", description: '', parent_id: nil, default_page_id: nil)
+    @instructor_role = build(:role_of_instructor, id: 2, name: "Instructor_role_test", description: '', parent_id: nil, default_page_id: nil)
+    @admin_role = build(:role_of_administrator, id: 3, name: "Administrator_role_test", description: '', parent_id: nil, default_page_id: nil)
     @invalid_role = build(:role_of_student, id: 1, name: nil, description: "", parent_id: nil, default_page_id: nil)
   end
 

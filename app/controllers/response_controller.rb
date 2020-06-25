@@ -1,4 +1,6 @@
 class ResponseController < ApplicationController
+  include AuthorizationHelper
+
   helper :submitted_content
   helper :file
 
@@ -17,21 +19,9 @@ class ResponseController < ApplicationController
     when 'delete', 'update'
       return current_user_id?(user_id)
     when 'view'
-      return view_allowed?(response.map, user_id)
+      return response_edit_allowed?(response.map, user_id)
     else
-      current_user
-    end
-  end
-
-  def view_allowed?(map, user_id)
-    assignment = map.reviewer.assignment # if it is a review response map, all the members of reviewee team should be able to view the response
-    if map.is_a? ReviewResponseMap
-      reviewee_team = AssignmentTeam.find(map.reviewee_id)
-      return current_user_id?(user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' ||
-        (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) ||
-          (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
-    else
-      current_user_id?(user_id)
+      user_logged_in?
     end
   end
 
@@ -245,22 +235,22 @@ class ResponseController < ApplicationController
 
   def toggle_permission
     render nothing: true unless action_allowed?
-    
+
     # the response to be updated
     @response = Response.find(params[:id])
 
     # Error message placehoder
     msg = ""
-    
+
     begin
       @map = @response.map
-      
+
       # Updating visibility for the response object, by E2022 @SujalAhrodia -->
       visibility = params[:visibility]
       if (!visibility.nil?)
         @response.update_attribute("visibility",visibility)
       end
-    
+
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end

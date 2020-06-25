@@ -1,12 +1,10 @@
 class Assessment360Controller < ApplicationController
   include GradesHelper
+  include AuthorizationHelper
 
   # Added the @instructor to display the instructor name in the home page of the 360 degree assessment
   def action_allowed?
-    ['Super-Administrator',
-     'Administrator',
-     'Instructor',
-     'Teaching Assistant'].include? current_role_name
+    current_user_has_ta_privileges?
   end
 
   # Find the list of all students and assignments pertaining to the course.

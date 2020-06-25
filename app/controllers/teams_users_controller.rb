@@ -24,8 +24,10 @@ class TeamsUsersController < ApplicationController
   def create
     user = User.find_by(name: params[:user][:name].strip)
     unless user
-      urlCreate = url_for controller: 'users', action: 'new'
+      urlCreate = url_for controller: 'users', action: 'new', role: 'Student'
       flash[:error] = "\"#{params[:user][:name].strip}\" is not defined. Please <a href=\"#{urlCreate}\">create</a> this user before continuing."
+      redirect_to controller: 'teams_users', action: 'new', id: params[:id]
+      return
     end
 
     team = Team.find(params[:id])

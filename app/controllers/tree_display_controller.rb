@@ -44,6 +44,11 @@ class TreeDisplayController < ApplicationController
     goto_controller('Teammate Review','3')
   end
 
+  # direct access to bookmark review rubrics
+  def goto_bookmark_reviews
+    goto_controller('Bookmark Rating')
+  end
+
   # direct access to author feedbacks
   def goto_author_feedbacks
     goto_controller('Author Feedback','3')

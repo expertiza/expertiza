@@ -9,7 +9,7 @@
   <%= render :partial => '/sign_up_sheet/available_slots', :locals => {:topic=>topic} %>
   <%= render :partial => '/sign_up_sheet/num_waiting', :locals => {:topic=>topic} %>
   <% if @assignment.current_stage_name(@topic_id) != 'Finished' %>
-      <td align="center"><%= render :partial => '/sign_up_sheet/actions', :locals => {:i=>i,:topic=>topic, :is_suggested_topic=>is_suggested_topic ||= false} %></td>
+      <td align="center"> <%= render :partial => '/sign_up_sheet/actions', :locals => {:i=>i,:topic=>topic, :is_suggested_topic=>is_suggested_topic ||= false} %> </td>
   <% end %>
   <td align="center">
   <% if SignUpSheet.has_teammate_ads?(topic.id) %>

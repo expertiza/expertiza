@@ -177,6 +177,7 @@ class SignUpSheetController < ApplicationController
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     @max_team_size = @assignment.max_team_size
     team_id = @participant.team.try(:id)
+    @use_bookmark = @assignment.use_bookmark
 
     if @assignment.is_intelligent
       @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)

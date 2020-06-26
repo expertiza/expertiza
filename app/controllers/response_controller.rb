@@ -105,11 +105,7 @@ class ResponseController < ApplicationController
   # Update the response and answers when student "edit" existing response
   def update
     render nothing: true unless action_allowed?
-
-    # the response to be updated
-    @response = Response.find(params[:id])
-    @current_round = @response.round
-
+    
     msg = ""
     begin
       # the response to be updated
@@ -337,7 +333,6 @@ class ResponseController < ApplicationController
       @header = 'Edit'
       @next_action = 'update'
       @response = Response.find(params[:id])
-      @current_round = @response.round
       @map = @response.map
       @contributor = @map.contributor
     when 'new'

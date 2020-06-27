@@ -132,7 +132,7 @@ class UsersController < ApplicationController
     @user.parent_id = session[:user].id
     # set the user's timezone to its parent's
     @user.timezonepref = User.find(@user.parent_id).timezonepref
-    if @user.save!
+    if @user.save
       password = @user.reset_password # the password is reset
       prepared_mail = MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password)
       prepared_mail.deliver

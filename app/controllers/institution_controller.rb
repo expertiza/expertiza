@@ -15,7 +15,7 @@ class InstitutionController < ApplicationController
          redirect_to: {action: :list}
 
   def list
-    @institutions = Institution.all
+    @institutions = Institution.order('name').all
   end
 
   def show

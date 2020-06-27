@@ -4,9 +4,11 @@ $(document).ready(function(){
     if(this.value == "") {
       $('#institution_name').show();
       $('#name_of_other_institution').show();
+        $('#institution_name').prop('disabled', false)
     }else{
       $('#institution_name').hide();
       $('#name_of_other_institution').hide();
+      $('#institution_name').prop('disabled', true)
     }
   });
 });
@@ -14,4 +16,4 @@ $(document).ready(function(){
 <tr><td><label for="user_institutions"><b>Institution: </b></label></td><td>
     <%= collection_select('user',:institution_id, Institution.all.order(:name), :id, :name, {include_blank: 'Other', selected: 1}, :class => "form-control width-250") %></td></tr>
     <tr><td><label id="name_of_other_institution" style="display: none">Name of other institution: </label></td><td>
-    <%= text_field 'institution', 'name', style: 'display: none', class: "form-control width-250" %></td></tr>
+    <%= text_field 'institution', 'name', style: 'display: none', class: "form-control width-250", :required => true, disabled: true %></td></tr>

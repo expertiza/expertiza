@@ -28,7 +28,8 @@ describe 'new user request' do
       # if the email address of a new user is not valid, the flash message should display the corresponding messages
       fill_in 'user_email', with: 'test.com'
       click_on 'Request'
-      expect(page).to have_content('Email format is wrong')
+      # It stays on the same page because of the malformed email
+      expect(page).to have_current_path('/users/request_new?role=Instructor')
       # all data can be saved to DB successfully
       select 'North Carolina State University', from: 'user_institution_id'
       fill_in 'user_name', with: 'requester'

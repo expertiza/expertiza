@@ -27,7 +27,7 @@ class StudentTaskController < ApplicationController
         ta_course_ids = TaMapping.where(:ta_id => session[:original_user].id).pluck(:course_id)
         @student_tasks = @student_tasks.select {|t| ta_course_ids.include?t.assignment.course_id }
       else
-        @student_tasks = @student_tasks.select {|t| session[:original_user].id == t.assignment.course.instructor_id }
+        @student_tasks = @student_tasks.select {|t| t.assignment.course and session[:original_user].id == t.assignment.course.instructor_id or !t.assignment.course and session[:original_user].id == t.assignment.instructor_id }
       end
     end
     @student_tasks.select! {|t| t.assignment.availability_flag }
@@ -53,6 +53,7 @@ class StudentTaskController < ApplicationController
     @can_provide_suggestions = @assignment.allow_suggestions
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
     @topics = SignUpTopic.where(assignment_id: @assignment.id)
+    @use_bookmark = @assignment.use_bookmark
     # Timeline feature
     @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
   end

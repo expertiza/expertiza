@@ -27,7 +27,7 @@ class Questionnaire < ActiveRecord::Base
                          'GlobalSurveyQuestionnaire',
                          'Course SurveyQuestionnaire',
                          'CourseSurveyQuestionnaire',
-                         'BookmarkratingQuestionnaire',
+                         'BookmarkRatingQuestionnaire',
                          'QuizQuestionnaire'].freeze
   has_paper_trail
 

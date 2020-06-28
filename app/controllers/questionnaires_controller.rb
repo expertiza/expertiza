@@ -58,19 +58,48 @@ class QuestionnairesController < ApplicationController
 
   def new
     begin
-      @questionnaire = Object.const_get(params[:model].split.join).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model]
+      @questionnaire = Object.const_get(params[:model].split.join).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model].split.join
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
   end
 
   def create
-    # if questionnaire has name create new questionnaire
-    # Create questionnaire node for new questionnaire
-    if questionnaire_has_name? 
-    # Calling create_new_questionnnaire_obj method from questionnaire Model  
-      @questionnaire = Questionnaire.create_new_questionnaire_obj(params, session)
-      flash[:success] = 'You have successfully created a questionnaire!'
+    if params[:questionnaire][:name].blank?
+      flash[:error] = 'A rubric or survey must have a title.'
+      redirect_to controller: 'questionnaires', action: 'new', model: params[:questionnaire][:type], private: params[:questionnaire][:private]
+    else
+      questionnaire_private = params[:questionnaire][:private] == 'true'
+      display_type = params[:questionnaire][:type].split('Questionnaire')[0]
+      begin
+        @questionnaire = Object.const_get(params[:questionnaire][:type]).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
+      rescue StandardError
+        flash[:error] = $ERROR_INFO
+      end
+      begin
+        @questionnaire.private = questionnaire_private
+        @questionnaire.name = params[:questionnaire][:name]
+        @questionnaire.instructor_id = session[:user].id
+        @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
+        @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
+        @questionnaire.type = params[:questionnaire][:type]
+        # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
+        # In the future, we need to write migration files to make them consistency.
+        # E1903 : We are not sure of other type of cases, so have added a if statement. If there are only 5 cases, remove the if statement
+        if %w[AuthorFeedback CourseSurvey TeammateReview GlobalSurvey AssignmentSurvey BookmarkRating].include?(display_type)
+          display_type = (display_type.split /(?=[A-Z])/).join("%")
+        end
+        @questionnaire.display_type = display_type
+        @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
+        @questionnaire.save
+        # Create node
+        tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
+        parent = FolderNode.find_by(node_object_id: tree_folder.id)
+        QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')
+        flash[:success] = 'You have successfully created a questionnaire!'
+      rescue StandardError
+        flash[:error] = $ERROR_INFO
+      end
       redirect_to controller: 'questionnaires', action: 'edit', id: @questionnaire.id
     else
       flash[:error] = 'A rubric or survey must have a title.'
@@ -233,14 +262,16 @@ class QuestionnairesController < ApplicationController
     if params[:new_question]
       # The new_question array contains all the new questions
       # that should be saved to the database
-      params[:new_question].keys.each do |question_key|
+      params[:new_question].keys.each_with_index do |question_key, index|
         q = Question.new
         q.txt = params[:new_question][question_key]
         q.questionnaire_id = @questionnaire.id
         q.type = params[:question_type][question_key][:type]
         q.seq = question_key.to_i
         if @questionnaire.type == "QuizQuestionnaire"
-          q.weight = 1 # setting the weight to 1 for quiz questionnaire since the model validates this field
+          # using the weight user enters when creating quiz
+          weight_key = "question_#{index + 1}"
+          q.weight = params[:question_weights][weight_key.to_sym]
         end
         q.save unless q.txt.strip.empty?
       end

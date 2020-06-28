@@ -1,3 +1,4 @@
+<% @l = -1 %>
 <!-- the table creation is changed top accommodate functionality of tablesorter, which requires thead and tbody seperately. Previously, headers were in tbody only -->
 <div class='reviewreport'>
   <!-- Added headers for tablesorter -->
@@ -28,9 +29,13 @@
   <li><i style="color:green">green</i> indicates that there is no submitted work to review within the round;</li>
   <li><i style="color:purple">purple</i> indicates that there is no review for a submitted work within the round;</li>
   <li><i style="color: #986633">brown</i> indicates that the review grade has been assigned</li>
+  <li>&#10004; Check mark indicates that the student has given consent to make the reviews public</li>
 </ul>
   <p>&nbsp;</p>
-  
+
+  <button onclick="exportTableToCSV('review_scores.csv')">Export Review Scores To CSV File</button>
+  <br />
+  <br />
   <table id="myTable" class="tbl_heat tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
     <thead>
     <tr bgcolor='#CCCCCC'>
@@ -44,16 +49,18 @@
     </tr>
     </thead>
     <tbody>
-
+    <% timeHash = Hash.new %>
     <% sort_reviewer_by_review_volume_desc.each do |r| %>
       <% @response_maps, @rspan = get_data_for_review_report(@id, r.id, @type) %>
       <tr>
         <% if r.id != -1 %>
           <% user = Participant.find(r.id).user %>
             <!--reviewer-->
+			
+			<!-- added class attribute and span tag to extract full name and unityID of the user for scraping (Used in export to CSV functionality) -->
             <td>
-              <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
-              (<%= user.fullname(session[:ip]) %>)
+              <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post, :class => "user_unityID" %>
+              (<span class="user_name"><%= user.fullname(session[:ip]) %></span>)
             </td>
             <!--# reviews done-->
             <td align = 'left'>
@@ -72,9 +79,17 @@
               <% if Team.where(id: ri.reviewee_id).length > 0 %>
                 <!--Team reviewed-->
                 <% if index == 0 %>
-                  <div id= <%= team_name_color %>>
+                        <% if visibility_public?(ri) %>
+                            <div id = <%= team_name_color %>>&#10004;
+                        <% else %>
+                          <div id= <%= team_name_color %>>
+                        <% end %>
                 <% else %>
-                  <div id = <%= team_name_color %> style="border-top: solid; border-width: 1px;">
+                        <% if visibility_public?(ri) %>
+                            <div id = <%= team_name_color %> style='border-top: solid; border-width: 1px;'>&#10004;
+                        <% else %>
+                            <div id = <%= team_name_color %> style="border-top: solid; border-width: 1px;">
+                        <% end %>
                 <% end %>
                     <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
                     <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>
@@ -82,6 +97,10 @@
                     <!--later we can create a hyperlink question type to deal with this situation.-->
                     <%= list_hyperlink_submission(ri.id, 5386) if Assignment.find_by(id: @id.to_i).try(:course).try(:instructor).try(:name) == 'Jkidd' %>
                   </div>
+                </div>
+
+                  <!--Display total time spent on reviewing as a hyperlink to popup which shows the breakdown of time spent between expertiza and other links as piechart-->
+                  <%= render partial: 'review_submissions_time_spent',  locals: {bgcolor: @bgcolor, map_id: ri.id,id: r.id, reviewee_id: ri.reviewee_id, timeHash: timeHash} %>
 
                 <!--Author feedback-->
                 <!--Dr.Kidd required to add a "author feedback" column that shows the average score the reviewers received from the authors. In this case, she can see all the data on a single screen.-->
@@ -171,3 +190,73 @@
     });
 </script>
 
+<script>
+	function downloadCSV(csv, filename) {
+		var csvFile;
+		var downloadLink;
+
+		// CSV file
+		csvFile = new Blob([csv], {type: "text/csv"});
+
+		// Download link
+		downloadLink = document.createElement("a");
+
+		// File name
+		downloadLink.download = filename;
+
+		// Create a link to the file
+		downloadLink.href = window.URL.createObjectURL(csvFile);
+
+		// Hide download link
+		downloadLink.style.display = "none";
+
+		// Add the link to DOM
+		document.body.appendChild(downloadLink);
+
+		// Click download link
+		downloadLink.click();
+	}
+	
+	// Method to extract review report fields data from HTML Table and convert the data into CSV format.
+	// Currently, it will extract and store data for 'Full Name, Unity ID, Email ID, Grade and Comment' fields into CSV file 
+	function exportTableToCSV(filename) {  	
+		var csv = [];
+		var rows = document.querySelector("table#myTable").rows;
+		var row = [];
+		row = setHeaderForCSV();
+		csv.push(row.join(","));
+		
+		for (var i = 1; i < rows.length; i++) {
+			var row = [];
+			
+			reviewer_name = "\"" + rows[i].querySelector("td span.user_name").innerHTML + "\"";
+			reviewer_unityid = rows[i].querySelector("td a.user_unityID").innerHTML;
+			reviewer_emailid = reviewer_unityid + "@ncsu.edu";
+			reviewer_grade = rows[i].querySelector("input#grade_for_reviewer").value;
+			reviewer_comment = "\"" + rows[i].querySelector("textarea#comment_for_reviewer").innerHTML.replace(/"/g,"\'") + "\"";
+			
+			row.push(reviewer_name);
+			row.push(reviewer_unityid);
+			row.push(reviewer_emailid);
+			row.push(reviewer_grade);
+			row.push(reviewer_comment);
+			
+			csv.push(row.join(","));
+              
+		}
+	
+		downloadCSV(csv.join("\n"), filename);
+	}
+	
+	// Method to set names of header columns in Exported CSV file
+	function setHeaderForCSV() {
+		var row = [];
+		row.push("Name");
+		row.push("UnityID");
+		row.push("EmailID");
+		row.push("Grade");
+		row.push("Comment");
+		
+		return row;
+	}
+</script>

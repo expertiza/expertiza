@@ -12,10 +12,10 @@ class ResponseController < ApplicationController
     case action
     when 'edit' # If response has been submitted, no further editing allowed
       return false if response.is_submitted
-      return current_user_id?(user_id)
+      return current_user_is_reviewer?(response.map, user_id)
       # Deny access to anyone except reviewer & author's team
     when 'delete', 'update'
-      return current_user_id?(user_id)
+      return current_user_is_reviewer?(response.map, user_id)
     when 'view'
       return view_allowed?(response.map, user_id)
     else
@@ -23,15 +23,21 @@ class ResponseController < ApplicationController
     end
   end
 
+  # E-1973 - helper method to check if the current user is the reviewer
+  # if the reviewer is an assignment team, we have to check if the current user is on the team
+  def current_user_is_reviewer?(map, reviewer_id)
+    return map.get_reviewer.current_user_is_reviewer? current_user.try(:id)
+  end
+
   def view_allowed?(map, user_id)
     assignment = map.reviewer.assignment # if it is a review response map, all the members of reviewee team should be able to view the response
     if map.is_a? ReviewResponseMap
       reviewee_team = AssignmentTeam.find(map.reviewee_id)
-      return current_user_id?(user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' ||
+      return current_user_is_reviewer?(map, user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' ||
         (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) ||
           (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
     else
-      current_user_id?(user_id)
+      current_user_is_reviewer?(map, user_id)
     end
   end
 
@@ -43,9 +49,20 @@ class ResponseController < ApplicationController
   end
 
   def delete
+    #The locking was added for E1973, team-based reviewing. See lock.rb for details
     @response = Response.find(params[:id])
+    @map = @response.map
+    if @map.reviewer_is_team
+      @response = Lock.get_lock(@response, current_user, Lock::DEFAULT_TIMEOUT)
+      if @response.nil?
+        response_lock_action
+        return
+      end
+    end
+    
     # user cannot delete other people's responses. Needs to be authenticated.
     map_id = @response.map.id
+    # The lock will be automatically destroyed when the response is destroyed
     @response.delete
     redirect_to action: 'redirect', id: map_id, return: params[:return], msg: "The response was deleted."
   end
@@ -62,6 +79,16 @@ class ResponseController < ApplicationController
       @sorted = @review_scores.sort {|m1, m2| m1.version_num.to_i && m2.version_num.to_i ? m2.version_num.to_i <=> m1.version_num.to_i : (m1.version_num ? -1 : 1) }
       @largest_version_num = @sorted[0]
     end
+    #Added for E1973, team-based reviewing
+    @map = @response.map
+    if @map.reviewer_is_team
+      @response = Lock.get_lock(@response, current_user, Lock::DEFAULT_TIMEOUT)
+      if @response.nil?
+        response_lock_action
+        return
+      end
+    end
+    
     @modified_object = @response.response_id
     # set more handy variables for the view
     set_content
@@ -78,11 +105,21 @@ class ResponseController < ApplicationController
   # Update the response and answers when student "edit" existing response
   def update
     render nothing: true unless action_allowed?
+
     # the response to be updated
     @response = Response.find(params[:id])
+    @current_round = @response.round
+
     msg = ""
     begin
+      # the response to be updated
+      # Locking functionality added for E1973, team-based reviewing
+      @response = Response.find(params[:id])
       @map = @response.map
+      if @map.reviewer_is_team && !Lock.lock_between?(@response, current_user)
+        response_lock_action
+        return
+      end
       @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = set_questionnaire
       questions = sort_questions(@questionnaire.questions)
@@ -184,7 +221,7 @@ class ResponseController < ApplicationController
     @map.save
     participant = Participant.find_by(id: @map.reviewee_id)
     # E1822: Added logic to insert a student suggested 'Good Teammate' or 'Good Reviewer' badge in the awarded_badges table.
-    if @map.assignment.has_badge?
+    if @map.assignment.badge?
       if @map.is_a? TeammateReviewResponseMap and params[:review][:good_teammate_checkbox] == 'on'
         badge_id = Badge.get_id_from_name('Good Teammate')
         AwardedBadge.where(participant_id: participant.id, badge_id: badge_id, approval_status: 0).first_or_create
@@ -217,8 +254,14 @@ class ResponseController < ApplicationController
       redirect_to controller: 'submitted_content', action: 'edit', id: @map.response_map.reviewer_id
     when "survey"
       redirect_to controller: 'survey_deployment', action: 'pending_surveys'
+    when "bookmark"
+      bookmark = Bookmark.find(@map.response_map.reviewee_id)
+      redirect_to controller: 'bookmarks', action: 'list', id: bookmark.topic_id
     else
-      redirect_to controller: 'student_review', action: 'list', id: @map.reviewer.id
+      # if reviewer is team, then we have to get the id of the participant from the team
+      # the id in reviewer_id is of an AssignmentTeam
+      reviewer_id = @map.response_map.get_reviewer.get_logged_in_reviewer_id(current_user.try(:id))
+      redirect_to controller: 'student_review', action: 'list', id: reviewer_id
     end
   end
 
@@ -234,7 +277,38 @@ class ResponseController < ApplicationController
     @questions = @assignment_questionnaire.questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }
   end
 
+  def toggle_permission
+    render nothing: true unless action_allowed?
+    
+    # the response to be updated
+    @response = Response.find(params[:id])
+
+    # Error message placehoder
+    msg = ""
+    
+    begin
+      @map = @response.map
+      
+      # Updating visibility for the response object, by E2022 @SujalAhrodia -->
+      visibility = params[:visibility]
+      if (!visibility.nil?)
+        @response.update_attribute("visibility",visibility)
+      end
+    
+    rescue StandardError
+      msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
+    end
+    redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
+  end
+
   private
+  
+  # Added for E1973, team-based reviewing:
+  # http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_Project_E1973._Team_Based_Reviewing
+  # This action gets taken if the response is locked and cannot be edit right now
+  def response_lock_action
+    redirect_to action: 'redirect', id: @map.map_id, return: 'locked', error_msg: 'Another user is modifying this response or has modified this response. Try again later.'
+  end
 
   # new_response if a flag parameter indicating that if user is requesting a new rubric to fill
   # if true: we figure out which questionnaire to use based on current time and records in assignment_questionnaires table
@@ -263,6 +337,7 @@ class ResponseController < ApplicationController
       @header = 'Edit'
       @next_action = 'update'
       @response = Response.find(params[:id])
+      @current_round = @response.round
       @map = @response.map
       @contributor = @map.contributor
     when 'new'
@@ -288,7 +363,8 @@ class ResponseController < ApplicationController
       "FeedbackResponseMap",
       "CourseSurveyResponseMap",
       "AssignmentSurveyResponseMap",
-      "GlobalSurveyResponseMap"
+      "GlobalSurveyResponseMap",
+      "BookmarkRatingResponseMap"
       @questionnaire = @map.questionnaire
     end
   end
@@ -340,3 +416,4 @@ class ResponseController < ApplicationController
     end
   end
 end
+

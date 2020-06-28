@@ -86,6 +86,7 @@ class QuizQuestionnaireController < QuestionnairesController
       params[:question].each_key do |qid|
         @question = Question.find(qid)
         @question.txt = params[:question][qid.to_sym][:txt]
+        @question.weight = params[:question_weights][qid.to_sym][:txt]
         @question.save
 
         @quiz_question_choices = QuizQuestionChoice.where(question_id: qid)

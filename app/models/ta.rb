@@ -89,7 +89,7 @@ class Ta < User
     new_assign.course_id = TaMapping.get_course_id(self.id)
   end
 
-  def set_courses_to_assignment
+  def assign_courses_to_assignment
     @courses = TaMapping.get_courses(self.id)
   end
 

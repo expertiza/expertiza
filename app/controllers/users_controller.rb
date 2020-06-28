@@ -188,10 +188,7 @@ class UsersController < ApplicationController
       new_user.parent_id = session[:user].id
       new_user.timezonepref = User.find_by(id: new_user.parent_id).timezonepref
       if new_user.save
-        password = new_user.reset_password
         # Mail is sent to the user with a new password
-        prepared_mail = MailerHelper.send_mail_to_user(new_user, "Your Expertiza account and password have been created.", "user_welcome", password)
-        prepared_mail.deliver
         flash[:success] = "A new password has been sent to new user's e-mail address."
         undo_link("The user \"#{requested_user.name}\" has been successfully created. ")
       else

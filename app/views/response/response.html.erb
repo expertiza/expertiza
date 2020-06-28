@@ -3,6 +3,17 @@
 <%= tinymce_assets %>
 <%= tinymce %>
 <script>
+
+  /*
+   * Added for E1973, team-based reviewing:
+   * http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_Project_E1973._Team_Based_Reviewing
+   * If the user exits this page, we want to release the lock on this object
+   */
+  function release_lock() {
+    $.post("../../../lock/release_lock?id=<%= @response.id %>,&type=Response");
+  }
+  window.onbeforeunload = release_lock;
+
   // todo: to be moved to assets, once it's fixed so that not every script is loaded in every page.
   //detect if the window is in foreground or background
   var vis = (function(){
@@ -25,8 +36,48 @@
   })();
 
   jQuery(document).ready(function() {
+    var map_id = <%= @map.id%>;
+    var round = <%= @current_round %>;
 
-    //use barrating for dropdown
+    // This interval ensures that we are constantly checking whether or not the user is focusing
+    // on the report or on another tab/application. Polling is an inefficient method, but since
+    // Expertiza text boxes are generated as iFrames it is one of the easiest, consistent methods.
+    setInterval(function checkFocus() {
+      // If the document isn't losing focus to itself (iFrame to iFrame, window to iFrame, etc)
+      if (checkFocus.prev == document.hasFocus()) {
+        return;
+      }
+      if (document.hasFocus()) {
+        // starTime is a function written in E1791 - it creates an entry in the database that
+        // is identified by a "link" which we just call "Expertiza Review."
+        startTime(map_id, round, "Expertiza Review");
+      } else {
+        endTime("Expertiza Review");
+      }
+      checkFocus.prev = document.hasFocus();
+    }, 50);
+
+    function startTime(map_id, round, link) {
+      var t = new Date();
+      $.ajax({
+          type: "POST",
+          url: '/submission_viewing_events/record_start_time',
+          data: $.param({submission_viewing_event:{map_id: map_id, round: round, link: link, start_at: ISODateString(t)}})
+      });
+    }
+
+    function endTime(link){
+      var t = new Date();
+      $.ajax({
+          type: 'POST',
+          dataType: 'json',
+          async: false,
+          url: '/submission_viewing_events/record_end_time',
+          data: $.param({submission_viewing_event: {map_id: map_id, round: round, link: link, end_at: ISODateString(t)}})
+      });
+    }
+
+    // use barrating for dropdown
     $('.review-rating').each(function(index, el) {
       var $El;
       $El = $(el);
@@ -60,7 +111,6 @@
       if(vis() && $("#autosave_cbx").prop("checked"))
         executeSave();
     }, interval);
-
 
     //click ajax
     function executeSave(){
@@ -106,6 +156,8 @@
         e.stopPropagation();
         return;
       }else{
+        //Top line added for E1973
+        release_lock();
         jQuery('#isSubmit').val('Yes');
         window.location.href= "../../../student_review/list?id=<%= @map.reviewer.id %>";
       }
@@ -190,7 +242,6 @@
         }, 1000);
       }else if (!vis() && $("#autosave_cbx").prop("checked")){
         executeSave();
-        //console.log("Saving before going to background at " + new Date().toLocaleString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true }));
       }
     });
     //overlay to block user entering new info before the form is updated with data from the server
@@ -309,6 +360,10 @@
             <% end %>
         <% end %>
 
+        <% @submission_check = true %>
+        <%= hidden_field_tag :timeout_flag, :id => 'timeout_flag', :value => 'false' %>
+        <%= hidden_field_tag :restart_link_timing_flag, :id => 'restart_link_timing_flag', :value => 'false' %>
+        <%= hidden_field_tag :restart_file_timing_flag, :id => 'restart_file_timing_flag', :value => 'false' %>
         <%if @assignment.teams?%>
             <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
             <%= render :partial => 'submitted_content/main', :locals => {:reviewee_participant => @contributor.participants.first,:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(topic_id)} %>
@@ -375,7 +430,7 @@
       </tr>
 
       <!-- Add a Good Teammate badge to the Teammate Review Questionnaire if the assignment has badges -->
-      <% if @assignment.has_badge? and (@questionnaire.type == 'TeammateReviewQuestionnaire' or @questionnaire.type == 'Teammate ReviewQuestionnaire') and AssignmentBadge.where(assignment_id: @assignment.id, badge_id: Badge.get_id_from_name('Good Teammate')).any?%>
+      <% if @assignment.badge? and (@questionnaire.type == 'TeammateReviewQuestionnaire' or @questionnaire.type == 'Teammate ReviewQuestionnaire') and AssignmentBadge.where(assignment_id: @assignment.id, badge_id: Badge.get_id_from_name('Good Teammate')).any?%>
         <tr>
           <td>
             <img width = "100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Teammate")}" %> title="GoodTeammate">
@@ -386,7 +441,7 @@
       <% end%>
 
       <!-- Add a Good Reviewer badge to the Feedback Review Questionnaire if the assignment has badges -->
-      <% if @assignment.has_badge? and (@questionnaire.type == 'AuthorFeedbackQuestionnaire' or @questionnaire.type == 'Author FeedbackQuestionnaire') and AssignmentBadge.where(assignment_id: @assignment.id, badge_id: Badge.get_id_from_name('Good Reviewer')).any?%>
+      <% if @assignment.badge? and (@questionnaire.type == 'AuthorFeedbackQuestionnaire' or @questionnaire.type == 'Author FeedbackQuestionnaire') and AssignmentBadge.where(assignment_id: @assignment.id, badge_id: Badge.get_id_from_name('Good Reviewer')).any?%>
         <tr>
           <td>
             <img width="100px" src=<%= "/assets/badges/#{Badge.get_image_name_from_name("Good Reviewer")}" %> title="GoodReviewer">
@@ -430,5 +485,90 @@
     <% end %>
 <% end %>
 <%= @map.show_feedback(@response) %>
-<a href="javascript:window.history.back()">Back</a>
+<!-- Changed for E1973. If the user clicks back, the lock on this response should be released -->
+<script>
+  document.getElementById('BackLink').onClick = go_back_and_release_lock;
+  function go_back_and_release_lock() {
+    release_lock();
+    window.location.href=window.history.back();
+  }
+</script>
+<div id="BackLink"><a href="javascript:window.history.back()">Back</a></div>
 <div id="dialog-message" style="word-wrap: normal"></div>
+
+<% if @submission_check %>
+  <script type="text/javascript">
+    $(document).ready(function(){
+      var map_id = <%= @map.id %>;
+        var round = <%= @current_round %>;
+        var current_window_timer = null;
+        var auto_window_timer = null;
+        var time_out_interval = 120000; // in milliseconds, checkout end time when not interaction on review page
+        var time_period = 30000; // automaticall record end time every minunte
+        var timer_flag = false;
+        startTimer();
+        resetTimer();
+        autoTimer();
+        function timeoutAction(){
+          window.focus();
+          timer_flag = false;
+          markEndTime();
+          if(confirm("Are you still reviewing your submissions? Press OK to continue")){
+            startTimer();
+            resetTimer();
+          } else {
+            clearTimeout(current_window_timer);
+            clearInterval(auto_window_timer);
+            $("#timeout_flag").val("true");
+            //markEndTime();
+            alert("The page has not been interacted for a long time, and will close reference windows and go back!");
+            window.history.back();
+          }
+        }
+        function autoTimer(){
+          clearInterval(auto_window_timer);
+          auto_window_timer = setInterval(autoRecordTime, time_period);
+        }
+        function autoRecordTime(){
+          markEndTime();
+          if (timer_flag == true){
+              startTimer();
+          }
+        }
+        function resetTimer() {
+          clearTimeout(current_window_timer);
+          current_window_timer = setTimeout(timeoutAction, time_out_interval);
+          timer_flag = true;
+        }
+        function startTimer() {
+          // resetTimer();
+          // autoTimer();
+          $("#timeout_flag").val("false");
+          $("#restart_file_timing_flag").val("true");
+          $("#restart_link_timing_flag").val("true");
+          document.onmousemove = resetTimer;
+          document.onkeypress = resetTimer;
+          document.onload = resetTimer;
+          document.onmousedown = resetTimer; // touchscreen presses
+          document.ontouchstart = resetTimer;
+          document.onclick = resetTimer;     // touchpad clicks
+          document.onscroll = resetTimer;    // scrolling with arrow keys
+        }
+        function markEndTime() {
+          var  t = new Date();
+          $.ajax({
+              type: 'POST',
+              dataType: 'json',
+              async: false,
+              url: '/submission_viewing_events/mark_end_time',
+              data: $.param({
+                  submission_viewing_event: {map_id: map_id, round: round, end_at: ISODateString(t)}
+              })
+          });
+        }
+        $(":submit").click(function(){
+          markEndTime();
+        });
+    });
+  </script>
+<% end %>

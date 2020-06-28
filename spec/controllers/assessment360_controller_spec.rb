@@ -225,8 +225,6 @@ describe Assessment360Controller do
         expect(controller.send(:action_allowed?)).to be true
         expect(response.status).to eq(200)
         expect(response).to render_template(:course_student_grade_summary)
-        returned_topics = controller.instance_variable_get(:@topics)
-        expect(returned_topics[nil][1]).to eq(topic)
         returned_assignment_grades = controller.instance_variable_get(:@assignment_grades)
         expect(returned_assignment_grades[nil]).to eq({})
         returned_peer_review_scores = controller.instance_variable_get(:@peer_review_scores)
@@ -291,4 +289,89 @@ describe Assessment360Controller do
       end
     end
   end
+
+  describe '#insure_existence_of' do
+    context 'checking if the course participants are empty' do
+      before(:each) do
+        request.env['HTTP_REFERER'] = 'http://example.com'
+        get "insure_existence_of"
+      end
+
+      it 'redirects to back' do
+        expect(response).to redirect_to(:back)
+      end
+
+      it 'flashes an error' do
+        expect(flash[:error]).to be_present
+      end
+    end
+    context 'method is called' do
+      before(:each) do
+        allow(Course).to receive(:find).with("1").and_return(course)
+        request.env['HTTP_REFERER'] = 'http://example.com'
+      end
+
+      it 'redirects to back and flashes error as there are no participants' do
+        allow(course).to receive(:assignments).and_return([assignment])
+        allow(assignment).to receive(:reject).and_return(assignment)
+        allow(course).to receive(:get_participants).and_return([]) # no participants
+        params = {course_id: 1}
+        session = {user: instructor}
+        get :course_student_grade_summary, params, session
+        expect(controller.send(:action_allowed?)).to be true
+        expect(response).to redirect_to(:back)
+        expect(flash[:error]).to be_present
+      end
+    end
+  end
+
+  describe '#assignment_grade_summary' do
+    context 'when course does not have participants' do
+      before(:each) do
+        request.env['HTTP_REFERER'] = 'http://example.com'
+        get "assignment_grade_summary"
+      end
+
+      it 'redirects to back' do
+        expect(response).to redirect_to(:back)
+      end
+
+      it 'flashes an error' do
+        expect(flash[:error]).to be_present
+      end
+    end
+
+    context 'method is called' do
+      before(:each) do
+        allow(Course).to receive(:find).with("1").and_return(course)
+        request.env['HTTP_REFERER'] = 'http://example.com'
+      end
+      
+      it 'has participants, has team id' do
+        allow(course).to receive(:assignments).and_return(assignment_with_participants_list)
+        allow(assignment_with_participants_list).to receive(:reject).and_return(assignment_with_participants_list)
+        allow(course).to receive(:get_participants).and_return([course_participant]) # has participants
+        allow(assignment_list).to receive(:reject).and_return(assignment_list)
+        allow(assignment_with_participants.participants).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
+        allow(SignedUpTeam).to receive(:topic_id).with(assignment.id, course_participant.user_id).and_return(1)
+        allow(SignUpTopic).to receive(:find_by).with(id: 1).and_return(topic)
+        allow(TeamsUser).to receive(:team_id).with(assignment.id, course_participant.user_id).and_return(1)
+        allow(Team).to receive(:find).with(1).and_return(team)
+        allow(AssignmentParticipant).to receive(:find_by).with(user_id: course_participant.user_id, parent_id: assignment.id).and_return(course_participant)
+        allow(course_participant).to receive(:scores).with({}).and_return(review: {scores: {avg: 90}})
+        params = {course_id: 1}
+        session = {user: instructor}
+        get :course_student_grade_summary, params, session
+        expect(controller.send(:action_allowed?)).to be true
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:course_student_grade_summary)
+        returned_topics = controller.instance_variable_get(:@topics)
+        expect(returned_topics[nil][1]).to eq(topic)
+        returned_assignment_grades = controller.instance_variable_get(:@assignment_grades)
+        returned_peer_review_scores = controller.instance_variable_get(:@peer_review_scores)
+        expect(returned_peer_review_scores[nil][1]).to eq(90)
+        returned_final_grades = controller.instance_variable_get(:@final_grades)
+      end
+    end
+  end  
 end

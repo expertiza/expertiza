@@ -52,7 +52,9 @@
                       <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
                       <% if !answer.nil? %>
                           <tr>
-                            <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
+                            <% index = ResponseMap.find(Response.find(response_id).map_id).reviewee_id %>
+                            <% team = Team.find(index)%>
+
                             <% response_map = ReviewResponseMap.where(reviewed_object_id: @assignment_id,
                                                                       reviewer_id: @reviewer_id,
                                                                       reviewee_id: team.id).last %>

@@ -32,8 +32,8 @@
 <%# This is done based on the difference in dates of the first topic in that staggered Assignment %>
 <script type="text/javascript">
 $('.datetimepicker').datetimepicker({
-    dateFormat: 'yy/mm/dd',
-    timeFormat: 'HH:mm:ss'
+    format: 'YYYY/MM/DD HH:mm',
+    sideBySide: true
 });
 
 function populateDueDates(topic_id, review_rounds) {

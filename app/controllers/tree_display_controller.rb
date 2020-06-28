@@ -7,10 +7,15 @@ class TreeDisplayController < ApplicationController
   end
 
   # refactored method to provide direct access to parameters
-  def goto_controller(name_parameter)
+  # added an argument prevTab for sending the respective tab to be highlighted on homepage
+  def goto_controller(name_parameter, prevTab)
     node_object = TreeFolder.find_by(name: name_parameter)
     session[:root] = FolderNode.find_by(node_object_id: node_object.id).id
-    redirect_to controller: 'tree_display', action: 'list'
+    # if we have to highlight a tab, we store this arg. to the last_open_tab elements of session
+    if(prevTab!=nil)
+      session[:last_open_tab] = prevTab
+    end
+    redirect_to controller: 'tree_display', action: 'list', currCtlr: name_parameter
   end
 
   def confirm
@@ -18,63 +23,70 @@ class TreeDisplayController < ApplicationController
     @node_type = params[:nodeType]
   end
 
-  # direct access to questionnaires
+  # for all of the methods below, we send the respective tab to be highlighted (Courses:1, Assignments:2, Questionnaires:3)
+  # direct access to the questionnaires
   def goto_questionnaires
-    goto_controller('Questionnaires')
+    goto_controller('Questionnaires','3')
   end
 
   # direct access to review rubrics
   def goto_review_rubrics
-    goto_controller('Review')
+    goto_controller('Review','3')
   end
 
   # direct access to metareview rubrics
   def goto_metareview_rubrics
-    goto_controller('Metareview')
+    goto_controller('Metareview','3')
   end
 
   # direct access to teammate review rubrics
   def goto_teammatereview_rubrics
-    goto_controller('Teammate Review')
+    goto_controller('Teammate Review','3')
+  end
+
+  # direct access to bookmark review rubrics
+  def goto_bookmark_reviews
+    goto_controller('Bookmark Rating')
   end
 
   # direct access to author feedbacks
   def goto_author_feedbacks
-    goto_controller('Author Feedback')
+    goto_controller('Author Feedback','3')
   end
 
   # direct access to global survey
   def goto_global_survey
-    goto_controller('Global Survey')
+    goto_controller('Global Survey','3')
   end
 
   # direct access to surveys
   def goto_surveys
-    goto_controller('Assignment Survey')
+    goto_controller('Assignment Survey','3')
   end
 
   # direct access to course surveys
   def goto_course_surveys
-    goto_controller('Course Survey')
+    goto_controller('Course Survey','3')
   end
 
   # direct access to courses
   def goto_courses
-    goto_controller('Courses')
+    goto_controller('Courses','1')
   end
 
   def goto_bookmarkrating_rubrics
-    goto_controller('Bookmarkrating')
+    goto_controller('Bookmarkrating','3')
   end
 
   # direct access to assignments
   def goto_assignments
-    goto_controller('Assignments')
+    goto_controller('Assignments','2')
   end
 
   # called when the display is requested
   # ajbudlon, July 3rd 2008
   def list
+    @currCtlr = params[:currCtlr]
     redirect_to controller: :content_pages, action: :view if current_user.nil?
     redirect_to controller: :student_task, action: :list if current_user.try(:student?)
   end
@@ -206,8 +218,14 @@ class TreeDisplayController < ApplicationController
     flash[:error] = "Invalid JSON in the TreeList" unless json_valid? params[:reactParams][:child_nodes]
     child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
     tmp_res = {}
-    child_nodes.each do |node|
-      initialize_fnode_update_children(params, node, tmp_res)
+
+    begin
+      child_nodes.each do |node|
+        initialize_fnode_update_children(params, node, tmp_res)
+      end
+      flash[:error] = "Invalid child nodes in the TreeList"
+    rescue
+
     end
     res = res_node_for_child(tmp_res)
     res['Assignments'] = res['Assignments'].sort_by {|x| [x['instructor'], -1 * x['creation_date'].to_i] } if res.key?('Assignments')
@@ -278,6 +296,7 @@ class TreeDisplayController < ApplicationController
         res2 = {
           "nodeinfo" => child,
           "name" => child.get_name,
+          "instructor_id" => child.get_instructor_id, # add instructor id to the payload to make it available in the frontend
           "key" => params[:reactParams2][:key],
           "type" => node_type,
           "private" => child.get_private,

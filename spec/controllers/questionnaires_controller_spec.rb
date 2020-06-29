@@ -164,7 +164,7 @@ describe QuestionnairesController do
     context 'when quiz is valid' do
       before(:each) do
         # create_quiz_questionnaire
-        allow_any_instance_of(QuestionnairesController).to receive(:valid_quiz).and_return('valid')
+        allow_any_instance_of(QuestionnairesController).to receive(:validate_quiz).and_return('valid')
       end
 
       context 'when questionnaire type is not QuizQuestionnaire' do

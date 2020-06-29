@@ -1,7 +1,7 @@
 <%= render :partial => 'new_quiz_script' %>
 <h1>New <%= @questionnaire.display_type %></h1>
 <% if @questionnaire.type == "QuizQuestionnaire" %>    <!--handle a questionnaire differently if it is a quiz-->
-    <%= form_tag :controller => 'quiz_questionnaire', :action => 'create_quiz_questionnaire', 
+    <%= form_tag :controller => 'quiz_questionnaires', :action => 'create', 
 :pid => @participant_id, :aid => @assignment_id do %>
         <% $disp_flag = 1 %>
         <%= render :partial => 'quiz_questionnaire' %>

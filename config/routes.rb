@@ -250,7 +250,7 @@ resources :institution, except: [:destroy] do
       post :save_all_questions
     end
   end
-
+=begin
 #Nitin - Created new routes for quiz_questionnaire
   resources :quiz_questionnaire, only: %i[new create edit update] do
     collection do
@@ -261,6 +261,8 @@ resources :institution, except: [:destroy] do
       
     end
   end
+=end
+  resources :quiz_questionnaires
 
   resources :author_feedback_questionnaires, controller: :questionnaires
   resources :review_questionnaires, controller: :questionnaires

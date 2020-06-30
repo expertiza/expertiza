@@ -55,6 +55,7 @@ class StudentTaskController < ApplicationController
     @can_provide_suggestions = @assignment.allow_suggestions
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
     @topics = SignUpTopic.where(assignment_id: @assignment.id)
+    @use_bookmark = @assignment.use_bookmark
     # Timeline feature
     @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
   end

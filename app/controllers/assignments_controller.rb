@@ -75,6 +75,7 @@ class AssignmentsController < ApplicationController
     # added it to display the assigned badges while creating a badge in the assignments page
     @assigned_badges = @assignment_form.assignment.badges
     @badges = Badge.all
+    @use_bookmark = @assignment.use_bookmark
   end
 
   def update

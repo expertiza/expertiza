@@ -10,7 +10,7 @@ describe ResponseController do
   let(:assignment_questionnaire) { build(:assignment_questionnaire) }
   let(:answer) { double('Answer') }
   let(:assignment_due_date) { build(:assignment_due_date) }
-  #E1973, team reviews
+  let(:bookmark) { build(:bookmark) }
   let(:team_response) { build(:response, id: 2, map_id: 2) }
   let(:team_response_map) { build(:review_response_map, id: 2, reviewer: participant, reviewer_is_team: true) }
   let(:team_questionnaire) {build(:questionnaire, id: 2)}
@@ -297,6 +297,15 @@ describe ResponseController do
     before(:each) do
       allow(Response).to receive(:find_by).with(map_id: '1').and_return(review_response)
       @params = {id: 1}
+    end
+
+    context 'when params[:return] is bookmark' do
+      it 'redirects to bookmarks#list page' do
+        allow(Bookmark).to receive(:find).with(1).and_return(bookmark)
+        @params[:return] = 'bookmark'
+        get :redirect, @params
+        expect(response).to redirect_to('/bookmarks/list?id=1')
+      end
     end
 
     context 'when params[:return] is feedback' do

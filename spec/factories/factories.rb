@@ -389,6 +389,14 @@ FactoryBot.define do
     dropdown 1
   end
 
+  factory :bookmark_questionnaire, class: BookmarkRatingQuestionnaire do
+    name "BookmarkRatingQuestionnaire"
+    assignments {[ Assignment.first || association(:assignment) ]}
+    min_question_score 0
+    max_question_score 5
+    type 'BookmarkRatingQuestionnaire'
+  end
+
   factory :review_response_map, class: ReviewResponseMap do
     assignment { Assignment.first || association(:assignment) }
     reviewer { AssignmentParticipant.first || association(:participant) }
@@ -402,6 +410,14 @@ FactoryBot.define do
     reviewee { AssignmentParticipant.first || association(:participant) }
     reviewer_id 1
     type 'MetareviewResponseMap'
+    calibrate_to 0
+  end
+
+  factory :bookmark_review_response_map, class: BookmarkRatingResponseMap do
+    assignment { Assignment.first || association(:assignment) }
+    reviewer { AssignmentParticipant.first || association(:participant) }
+    reviewee { Bookmark.first || association(:assignment_team) }
+    type 'BookmarkRatingResponseMap'
     calibrate_to 0
   end
 
@@ -456,6 +472,17 @@ FactoryBot.define do
     seq 1
     controller_action_id nil
     content_page_id nil
+  end
+
+  factory :bookmark, class: Bookmark do
+    id 1
+    url 'example.com'
+    title 'Test Bookmark'
+    description 'Test description'
+    user_id '1234'
+    topic_id '1'
+    created_at '2020-03-24 12:10:20'
+    updated_at '2020-03-24 12:10:20'
   end
 
   factory :site_controller, class: SiteController do

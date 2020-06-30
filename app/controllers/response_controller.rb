@@ -95,11 +95,7 @@ class ResponseController < ApplicationController
   # Update the response and answers when student "edit" existing response
   def update
     render nothing: true unless action_allowed?
-
-    # the response to be updated
-    @response = Response.find(params[:id])
-    @current_round = @response.round
-
+    
     msg = ""
     begin
       # the response to be updated
@@ -244,6 +240,9 @@ class ResponseController < ApplicationController
       redirect_to controller: 'submitted_content', action: 'edit', id: @map.response_map.reviewer_id
     when "survey"
       redirect_to controller: 'survey_deployment', action: 'pending_surveys'
+    when "bookmark"
+      bookmark = Bookmark.find(@map.response_map.reviewee_id)
+      redirect_to controller: 'bookmarks', action: 'list', id: bookmark.topic_id
     else
       # if reviewer is team, then we have to get the id of the participant from the team
       # the id in reviewer_id is of an AssignmentTeam
@@ -324,7 +323,6 @@ class ResponseController < ApplicationController
       @header = 'Edit'
       @next_action = 'update'
       @response = Response.find(params[:id])
-      @current_round = @response.round
       @map = @response.map
       @contributor = @map.contributor
     when 'new'
@@ -350,7 +348,8 @@ class ResponseController < ApplicationController
       "FeedbackResponseMap",
       "CourseSurveyResponseMap",
       "AssignmentSurveyResponseMap",
-      "GlobalSurveyResponseMap"
+      "GlobalSurveyResponseMap",
+      "BookmarkRatingResponseMap"
       @questionnaire = @map.questionnaire
     end
   end

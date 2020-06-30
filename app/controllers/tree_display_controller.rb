@@ -45,6 +45,11 @@ class TreeDisplayController < ApplicationController
     goto_controller('Teammate Review','3')
   end
 
+  # direct access to bookmark review rubrics
+  def goto_bookmark_reviews
+    goto_controller('Bookmark Rating')
+  end
+
   # direct access to author feedbacks
   def goto_author_feedbacks
     goto_controller('Author Feedback','3')
@@ -215,14 +220,10 @@ class TreeDisplayController < ApplicationController
     flash[:error] = "Invalid JSON in the TreeList" unless json_valid? params[:reactParams][:child_nodes]
     child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
     tmp_res = {}
-
-    begin
+    unless child_nodes.blank?
       child_nodes.each do |node|
         initialize_fnode_update_children(params, node, tmp_res)
       end
-      flash[:error] = "Invalid child nodes in the TreeList"
-    rescue
-
     end
     res = res_node_for_child(tmp_res)
     res['Assignments'] = res['Assignments'].sort_by {|x| [x['instructor'], -1 * x['creation_date'].to_i] } if res.key?('Assignments')

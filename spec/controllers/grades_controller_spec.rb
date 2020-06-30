@@ -59,11 +59,9 @@ describe GradesController do
       allow(Participant).to receive(:find).with('1').and_return(participant)
     end
 
-    context 'when view_my_scores page is not allow to access' do
-      it 'shows a flash errot message and redirects to root path (/)' do
-        allow(TeamsUser).to receive(:where).with(user_id: 1).and_return([double('TeamsUser', team_id: 1)])
-        team.users = []
-        allow(Team).to receive(:find).with(1).and_return(team)
+    context 'when view_my_scores page is not allowed to access' do
+      it 'shows a flash error message and redirects to root path (/)' do
+        session[:user] = nil
         params = {id: 1}
         get :view_my_scores, params
         expect(response).to redirect_to('/')

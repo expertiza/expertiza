@@ -1,4 +1,6 @@
 class ContentPagesController < ApplicationController
+  include AuthorizationHelper
+
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[destroy create update],
          redirect_to: {action: :list}
@@ -8,7 +10,7 @@ class ContentPagesController < ApplicationController
     when 'view', 'view_default'
       true
     else
-      current_role_name.eql?('Super-Administrator')
+      current_user_has_super_admin_privileges?
     end
   end
 

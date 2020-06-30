@@ -1,12 +1,12 @@
 class LotteryController < ApplicationController
+  include AuthorizationHelper
+
   require 'json'
   require 'rest_client'
 
   # Give permission to run the bid to appropriate roles
   def action_allowed?
-    ['Instructor',
-     'Teaching Assistant',
-     'Administrator'].include? current_role_name
+    current_user_has_ta_privileges?
   end
 
   # This method sends a request to a web service that uses k-means and students' bidding data

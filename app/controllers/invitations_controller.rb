@@ -1,8 +1,11 @@
 class InvitationsController < ApplicationController
+  include AuthorizationHelper
+
   before_action :check_user_before_invitation, only: [:create]
   before_action :check_team_before_accept, only: [:accept]
+
   def action_allowed?
-    ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student'].include? current_role_name
+    current_user_has_student_privileges?
   end
 
   def new

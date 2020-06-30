@@ -1,8 +1,8 @@
 class TeamsUsersController < ApplicationController
+  include AuthorizationHelper
+
   def action_allowed?
-    ['Instructor',
-     'Teaching Assistant',
-     'Administrator'].include? current_role_name
+    current_user_has_ta_privileges?
   end
 
   def auto_complete_for_user_name

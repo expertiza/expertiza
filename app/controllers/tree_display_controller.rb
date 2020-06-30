@@ -1,6 +1,7 @@
 class TreeDisplayController < ApplicationController
   helper :application
   include SecurityHelper
+  include AuthorizationHelper
 
   def action_allowed?
     true
@@ -82,7 +83,8 @@ class TreeDisplayController < ApplicationController
   # ajbudlon, July 3rd 2008
   def list
     @currCtlr = params[:currCtlr]
-    redirect_to controller: :content_pages, action: :view if current_user.nil?
+    redirect_to controller: :content_pages, action: :view unless user_logged_in?
+
     redirect_to controller: :student_task, action: :list if current_user.try(:student?)
   end
 

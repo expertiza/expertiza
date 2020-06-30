@@ -1,12 +1,10 @@
 class PopupController < ApplicationController
   include StringOperationHelper
+  include AuthorizationHelper
   ASSIGNMENT_NAME_SIMILARITY_THRESHOLD = 0.50
 
   def action_allowed?
-    ['Super-Administrator',
-     'Administrator',
-     'Instructor',
-     'Teaching Assistant'].include? current_role_name
+    current_user_has_ta_privileges?
   end
 
   # this can be called from "response_report" by clicking student names from instructor end.

@@ -1,20 +1,14 @@
 class AssignmentsController < ApplicationController
   include AssignmentHelper
+  include AuthorizationHelper
   autocomplete :user, :name
   before_action :authorize
 
   def action_allowed?
     if %w[edit update list_submissions].include? params[:action]
-      assignment = Assignment.find(params[:id])
-      (%w[Super-Administrator Administrator].include? current_role_name) ||
-      (assignment.instructor_id == current_user.try(:id)) ||
-      TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) ||
-      (assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id))
+      current_user_has_admin_privileges? || current_user_teaching_staff_of_assignment?(params[:id])
     else
-      ['Super-Administrator',
-       'Administrator',
-       'Instructor',
-       'Teaching Assistant'].include? current_role_name
+      current_user_has_ta_privileges?
     end
   end
 

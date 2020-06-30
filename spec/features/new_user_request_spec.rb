@@ -1,9 +1,9 @@
 describe 'new user request' do
   before(:each) do
-    create(:role_of_student)
-    create(:role_of_instructor)
-    create(:role_of_administrator)
-    create(:role_of_teaching_assistant)
+    # create(:role_of_student)
+    # create(:role_of_instructor)
+    # create(:role_of_administrator)
+    # create(:role_of_teaching_assistant)
     create(:admin, name: 'super_administrator2')
     create(:institution)
   end
@@ -38,7 +38,7 @@ describe 'new user request' do
       fill_in 'user_email', with: 'test@test.com'
       expect { click_on 'Request' }.to change { RequestedUser.count }.by(1)
       expect(RequestedUser.first.name).to eq('requester')
-      expect(RequestedUser.first.role_id).to eq(2)
+      expect(RequestedUser.first.role_id).to eq(3)
       expect(RequestedUser.first.fullname).to eq('requester, requester')
       expect(RequestedUser.first.email).to eq('test@test.com')
       expect(RequestedUser.first.status).to eq('Under Review')

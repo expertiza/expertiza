@@ -10,17 +10,16 @@ class TagPrompt < ActiveRecord::Base
       question = Question.find(answer.question_id)
       html += '<tr><td colspan="2">'
       tag_prompt_deployments.each do |tag_dep|
-        if !ReviewMetricsQuery.confident?(tag_dep.tag_prompt.prompt,answer.id) and tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold.to_i
+        if tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold.to_i
           tag_prompt = TagPrompt.find(tag_dep.tag_prompt_id)
-          html += tag_prompt.html_control(tag_dep, answer, user_id)
-        end
+          tag_is_confident = ReviewMetricsQuery.confident?(tag_dep.tag_prompt.prompt, answer.id)
+          html += tag_prompt.html_control(tag_dep, answer, user_id) unless tag_is_confident
       end
       html += '</td></tr>'
     end
     #### end code to show tag prompts ####
     html
   end
-
 
   def html_control(tag_prompt_deployment, answer, user_id)
     html = ""

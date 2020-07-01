@@ -7,54 +7,75 @@ class ReviewMetricsQuery
   TAG_CERTAINTY_THRESHOLD = 0.8
 
   # link each tag prompt to the corresponding key in the review hash
-  PROMPT_TO_METRIC = {"Mention Problems?" => :Problem,
-                      "Suggest Solutions?" => :Suggestions,
-                      "Mention Praise?" => :Sentiment,
-                      "Positive Tone?" => :Emotion}.freeze
+  PROMPT_TO_METRIC = {'Mention Problems?' => 'problem',
+                      'Suggest Solutions?' => 'suggestions',
+                      'Mention Praise?' => 'sentiment',
+                      'Positive Tone?' => 'emotions'}.freeze
 
   def initialize
-    # queried_result is an array of reviews, where each review is a hash that maps several of its attributes like "Suggestions", and "Emotion" to the result determined by the WS.
-    @queried_result = []
+    # structure of @queried_results = [ {request => queried_result} ]
+    # where request can be either metric or metric_confidence
+    # and queried result is the response gotten from the web service
+    @queried_results = []
   end
 
-  # metric: :Sentiment, :Suggestions, :Emotion, and :Problem
   def confidence(metric, review_id)
-    review = review_from_cache(review_id)
-    confidence = review[:Confidence][metric]
-    confidence ||= 0 # in case that there is no corresponding metric for this tag_prompt
-    confidence
+    request = metric << '_confidence'
+    review = review_from_cache(request, review_id)
+    confidence = review['confidence'].to_i
+
+    if (metric == 'problem' || metric == 'suggestions') && (confidence < 0.5)
+      1 - confidence
+    else
+      confidence
+    end
   end
 
-  # metric: :Suggestions, and :Problem
   def has(metric, review_id)
-    review = review_from_cache(review_id)
-    review[metric] == "Present"
+    review = review_from_cache(metric, review_id)
+    case metric
+    when 'problem'
+      review['problems'] == 'Present'
+    when 'suggestions'
+      review['suggestions'] == 'Present'
+    when 'emotions'
+      review['Praise'] != 'None'
+    when 'sentiment'
+      review['sentiment_tone'] == 'Positive'
+    else
+      false
+    end
   end
 
-  # ----------------- helper methods ----------------- #
-
-  # find the review that matches the review_id
-  def review_from_cache(review_id)
-    review = @queried_result.find {|review| review[:id] == review_id }
+  def review_from_cache(request, review_id)
+    review = @queried_results[request].find {|review| review[:id] == review_id }
     # if not yet cached
     unless review
       # cache it, along with other reviews that may also need to be cached
-      cache_ws_results(review_id)
-      review = @queried_result.find {|r| r[:id] == review_id }
+      cache_ws_results(request, review_id)
+      review = @queried_results[request].find {|r| r[:id] == review_id }
     end
     review
   end
 
-  def cache_ws_results(review_id)
-    reviews = reviews_to_be_cached(review_id)
-    # put reviews in a format that the WS can understand
+  def cache_ws_results(request, review_id)
     ws_input = {reviews: []}
-    reviews.each do |review|
-      ws_input[:reviews] << {id: review.id, text: review.comments}
+    # see if this set of reviews has already been queried
+    reviews = @queried_results.find {|_key, value| value.find {|r| r[:id] == review_id } }
+    if reviews
+      # use output from previous query which is already in a format used by the ws
+      # thus avoid the need to gather the same data from the database
+      ws_input[:reviews] = reviews.value
+    else
+      reviews = reviews_to_be_cached(review_id)
+      reviews.each do |review|
+        ws_input[:reviews] << {id: review.id, text: review.comments}
+      end
     end
+
     # ask MetricsController to make a call to the review metrics web service
-    ws_output = MetricsController.new.confidence_metric(ws_input)
-    @queried_result = ws_output[:reviews]
+    ws_output = MetricsController.new.bulk_service_retrival(ws_input, request.split('_'))
+    @queried_results << {request => ws_output['reviews']}
   end
 
   # find all reviews that may be displayed in the requesting page
@@ -77,7 +98,6 @@ class ReviewMetricsQuery
 
   # usage: ReviewMetricQuery.confidence(tag_dep.tag_prompt.prompt, answer.id)
   def self.confidence(prompt, review_id)
-    # let the instance method do the job
     ReviewMetricsQuery.instance.confidence(PROMPT_TO_METRIC[prompt], review_id)
   end
 
@@ -91,7 +111,6 @@ class ReviewMetricsQuery
 
   # usage: ReviewMetricQuery.has(tag_dep.tag_prompt.prompt, answer.id)
   def self.has(prompt, review_id)
-    # let the instance method do the job
     ReviewMetricsQuery.instance.has(PROMPT_TO_METRIC[prompt], review_id)
   end
 

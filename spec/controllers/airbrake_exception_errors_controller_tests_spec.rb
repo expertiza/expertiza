@@ -117,7 +117,7 @@ describe ReviewMappingController do
       allow(ReviewResponseMap).to receive(:find).with(any_args).and_return(nil)
       allow(ReviewResponseMap).to receive(:find_by).with(any_args).and_return(nil)
       post :delete_reviewer, id: 1
-      expect(flash[:error]).to eq('This review has already been done. It cannot been deleted.')
+      expect(flash[:error]).to eq('No review found.')
       expect(response).to redirect_to 'www.google.com'
     end
 

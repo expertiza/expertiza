@@ -272,8 +272,12 @@ class ReviewMappingController < ApplicationController
         end
       end
     end
-    review_response_map.destroy
-    flash[:success] = "The review mapping for \"" + review_response_map.reviewee.name + "\" and \"" + review_response_map.reviewer.name + "\" has been deleted."
+    if review_response_map
+      review_response_map.destroy
+      flash[:success] = "The review mapping for \"" + review_response_map.reviewee.name + "\" and \"" + review_response_map.reviewer.name + "\" has been deleted."
+    else
+      flash[:error] = "No review found."
+    end
     redirect_to :back
   end
 

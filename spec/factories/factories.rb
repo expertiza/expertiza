@@ -505,11 +505,11 @@ FactoryBot.define do
     email 'abc@mailinator.com'
     end
 
-  factory :bookmark do
-    id 1
-    url "www.fake.com"
-    title "fake bookmark title"
-    description "fake bookmark description"
-  end
-  
+  # factory :bookmark do
+  #   id 1
+  #   url "www.fake.com"
+  #   title "fake bookmark title"
+  #   description "fake bookmark description"
+  # end
+
 end

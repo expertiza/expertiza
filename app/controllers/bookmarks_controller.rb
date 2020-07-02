@@ -6,7 +6,7 @@ class BookmarksController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'list'
-      current_user_has_student_privileges?
+      current_role_name =~ /^(Student|Instructor|Teaching Assistant)$/
     when 'new', 'create', 'bookmark_rating', 'save_bookmark_rating_score'
       current_role_name.eql? 'Student'
     when 'edit', 'update', 'destroy'

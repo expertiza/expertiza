@@ -46,7 +46,7 @@ class QuestionnairesController < ApplicationController
 
   def new
     begin
-      @questionnaire = Object.const_get(params[:model].split.join).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model]
+      @questionnaire = Object.const_get(params[:model].split.join).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model].split.join
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
@@ -74,7 +74,7 @@ class QuestionnairesController < ApplicationController
         # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
         # In the future, we need to write migration files to make them consistency.
         # E1903 : We are not sure of other type of cases, so have added a if statement. If there are only 5 cases, remove the if statement
-        if %w[AuthorFeedback CourseSurvey TeammateReview GlobalSurvey AssignmentSurvey].include?(display_type)
+        if %w[AuthorFeedback CourseSurvey TeammateReview GlobalSurvey AssignmentSurvey BookmarkRating].include?(display_type)
           display_type = (display_type.split /(?=[A-Z])/).join("%")
         end
         @questionnaire.display_type = display_type
@@ -199,7 +199,7 @@ class QuestionnairesController < ApplicationController
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: params[:id], seq: i, type: params[:question][:type], break_before: true)
       if question.is_a? ScoredQuestion
-        question.weight = 1
+        question.weight = params[:question][:weight]
         question.max_label = 'Strongly agree'
         question.min_label = 'Strongly disagree'
       end
@@ -265,14 +265,16 @@ class QuestionnairesController < ApplicationController
     if params[:new_question]
       # The new_question array contains all the new questions
       # that should be saved to the database
-      params[:new_question].keys.each do |question_key|
+      params[:new_question].keys.each_with_index do |question_key, index|
         q = Question.new
         q.txt = params[:new_question][question_key]
         q.questionnaire_id = questionnaire_id
         q.type = params[:question_type][question_key][:type]
         q.seq = question_key.to_i
         if @questionnaire.type == "QuizQuestionnaire"
-          q.weight = 1 # setting the weight to 1 for quiz questionnaire since the model validates this field
+          # using the weight user enters when creating quiz
+          weight_key = "question_#{index + 1}"
+          q.weight = params[:question_weights][weight_key.to_sym]
         end
         q.save unless q.txt.strip.empty?
       end

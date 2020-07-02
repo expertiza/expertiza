@@ -40,17 +40,20 @@
                            class: "btn btn-default"%>
             <%= text_field 'question', 'total_num', :size => 1, :value => "1", :class => "form-control" %> more
             <%= select "question", "type",
-                       {"Criterion" =>"Criterion",
-                        "Scale"=>"Scale",
-                        "Dropdown"=>"Dropdown",
-                        "Checkbox"=>"Checkbox",
-                        "TextArea"=>"TextArea",
-                        "TextField"=>"TextField",
-                        "UploadFile"=>"UploadFile",
-                        "SectionHeader"=>"SectionHeader",
-                        "TableHeader"=>"TableHeader",
-                        "ColumnHeader"=>"ColumnHeader",
-                       }, {}, {class: "form-control"} %> question(s)</p>
+                 {"Criterion" =>"Criterion",
+                  "Scale"=>"Scale",
+                  "Dropdown"=>"Dropdown",
+                  "Checkbox"=>"Checkbox",
+                  "TextArea"=>"TextArea",
+                  "TextField"=>"TextField",
+                  "UploadFile"=>"UploadFile",
+                  "SectionHeader"=>"SectionHeader",
+                  "TableHeader"=>"TableHeader",
+                  "ColumnHeader"=>"ColumnHeader",
+                 }, {}, {class: "form-control", onchange: "checkQuestionType()"} %> question(s)
+             <span id = "new_question_weight">
+              Add question weight <%= text_field 'question', 'weight', :size => 1, :value => "1", :class => "form-control" %>
+             </span></p>
         <% end %>
       </td>
     </tr>

@@ -1,3 +1,21 @@
+// initialize a global object available throughout the application
+// can be useful on different pages
+let app_variables = {
+  currentUserId: null
+};
+
+// execute the grabbing of user id after the page is fully loaded
+// helps to make sure that the react component is rendered for sure
+// also avoid hindering the rendering steps
+window.addEventListener('load', e => {
+  // grab the data attribute
+  let treeDisplayDiv = document.querySelector('#tree_display');
+  // check if the html element is present requested in the query above
+  if (treeDisplayDiv) {
+    // set the userid for the current user
+    app_variables.currentUserId = treeDisplayDiv.dataset.userId;
+  }
+});
 jQuery(document).ready(function() {
   // This preloadedImages function is refered from http://jsfiddle.net/slashingweapon/8jAeu/
   // Actually I am not using the values in preloadedImages, but image loading speed is indeed getting faster
@@ -91,9 +109,18 @@ jQuery(document).ready(function() {
           newNodeType = this.props.nodeType + "s"
         }
         if (this.props.is_available || newNodeType == 'questionnaires') {
+          // check if the user id exists
+          // check if the current user id matches the user/instructor id associated with a questionnaire/survey
+          // show edit button only for the items which are associated to that user
+          if (app_variables.currentUserId == null || this.props.instructor_id == app_variables.currentUserId) {
+            moreContent.push(
+              <span>
+                <a title="Edit" href={"/"+newNodeType+"/"+(parseInt(this.props.id)/2).toString()+"/edit"}><img src="/assets/tree_view/edit-icon-24.png" /></a>
+              </span>
+            );  
+          }
           moreContent.push(
             <span>
-              <a title="Edit" href={"/"+newNodeType+"/"+(parseInt(this.props.id)/2).toString()+"/edit"}><img src="/assets/tree_view/edit-icon-24.png" /></a>
               <a title="Delete" href={"/tree_display/confirm?id="+(parseInt(this.props.id)/2).toString()+"&nodeType="+newNodeType}><img src="/assets/tree_view/delete-icon-24.png" /></a>
             </span>
           )
@@ -310,6 +337,7 @@ jQuery(document).ready(function() {
                             allow_suggestions={this.props.allow_suggestions}
                             has_topic={this.props.has_topic}
                             id={id}
+                            instructor_id = {this.props.instructor_id}
                         />
                     </td>
                 </tr>
@@ -336,6 +364,7 @@ jQuery(document).ready(function() {
                             allow_suggestions={this.props.allow_suggestions}
                             has_topic={this.props.has_topic}
                             id={id}
+                            instructor_id = {this.props.instructor_id}
                         />
                     </td>
                 </tr>
@@ -381,6 +410,7 @@ jQuery(document).ready(function() {
                       require_quiz={entry.require_quiz}
                       has_topic={entry.has_topic}
                       dataType={_this.props.dataType}
+                      instructor_id={entry.instructor_id}
                   />)
               })
           }
@@ -402,6 +432,7 @@ jQuery(document).ready(function() {
                       require_quiz={entry.require_quiz}
                       has_topic={entry.has_topic}
                       dataType={_this.props.dataType}
+                      instructor_id={entry.instructor_id}
                   />)
               })
           }
@@ -464,6 +495,26 @@ jQuery(document).ready(function() {
         expanded: false
       }
     },
+      componentDidMount: function() {
+        // this buffer holds the title for all of the rubric types under the Questionnaire tab
+          rubricBuffer = ["Review", "Metareview", "Author Feedback", "Teammate Review", "Assignment Survey", "Global Survey", "Course Survey"];
+
+       //selectedMenuItem then takes the clicked rubric from the panel under questionnaire
+       //selectedMenuItemIndex finds the corresponding index of the click rubric from the above buffer
+          selectedMenuItem = document.getElementById("tree_display").getAttribute("data-menu-item");
+          selectedMenuItemIndex = rubricBuffer.indexOf(selectedMenuItem);
+
+          if (selectedMenuItemIndex !== -1) {
+          if(rubricBuffer[selectedMenuItemIndex] === this.props.name) {
+              //if the name matches, expand the rubric panel by setting this property to true
+                  this.setState({
+                      expanded: true
+                  }, function () {
+                      this.props.rowClicked(this.props.id, true, this.props.newParams)
+                  })
+              }
+          }
+      },
     handleClick: function(event) {
         //alert('click');
 

@@ -81,6 +81,7 @@ class AssignmentsController < ApplicationController
     # added it to display the assigned badges while creating a badge in the assignments page
     @assigned_badges = @assignment_form.assignment.badges
     @badges = Badge.all
+    @use_bookmark = @assignment.use_bookmark
   end
 
   def update
@@ -156,7 +157,7 @@ class AssignmentsController < ApplicationController
 
   def associate_assignment_with_course
     @assignment = Assignment.find(params[:id])
-    @courses = Assignment.set_courses_to_assignment(current_user)
+    @courses = Assignment.assign_courses_to_assignment(current_user)
   end
 
   def list_submissions
@@ -365,8 +366,13 @@ class AssignmentsController < ApplicationController
   end
 
   def update_feedback_assignment_form_attributes
+    # E1973 - numResponses pertains to how many review responses students have made on an assignment
+    # we cannot change if the assignment has teams as reviewers if students have submitted them
+    num_responses = ReviewResponseMap.where(assignment: @assignment_form.assignment).count
     if params[:set_pressed][:bool] == 'false'
       flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."
+    elsif params[:assignment_form][:assignment][:reviewer_is_team] != @assignment_form.assignment.reviewer_is_team.to_s && num_responses > 0
+      flash[:error] = "You cannot change whether reviewers are teams if reviews have already been completed."
     else
       if @assignment_form.update_attributes(assignment_form_params, current_user)
         flash[:note] = 'The assignment was successfully saved....'

@@ -1,4 +1,5 @@
 class AdminController < ApplicationController
+
   def action_allowed?
     case params[:action]
     when 'list_instructors'
@@ -34,4 +35,5 @@ class AdminController < ApplicationController
     @user = User.find(params[:id])
     @role = Role.find(@user.role_id)
   end
+
 end

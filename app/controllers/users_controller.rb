@@ -45,9 +45,7 @@ class UsersController < ApplicationController
     render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
 
-  #
   # for anonymized view for demo purposes
-  #
   def set_anonymized_view
     anonymized_view_starter_ips = $redis.get('anonymized_view_starter_ips') || ''
     session[:ip] = request.remote_ip
@@ -64,22 +62,20 @@ class UsersController < ApplicationController
   def list
     user = session[:user]
     @users = user.get_user_list
+    # paginate_list is called with the entire list of users
+    # @paginated_users can be used to display set number of users per page
+    @paginated_users = paginate_list(@users)
   end
 
-  def list_pending_requested
-    @requested_users = RequestedUser.all
-    @roles = Role.all
-  end
 
-  def show_selection
-    @user = User.find_by(name: params['user']['name'])
+
+  # for displaying users which are being searched for editing purposes after checking whether current user is authorized to do so
+  def show_if_authorized
+    @user = User.find_by(name: params[:user][:name])
     if !@user.nil?
-      get_role
-      # The 'parent' of a role is a lesser-privileged role
-      # So this logic says:
-      # if you are trying to perform this action for a role of the lowest privilege, go for it
-      # if you are trying to perform this action for a role of lesser privilege than the current user, go for it
-      # if you are trying to perform this action for the current user themselves, go for it
+      role
+      #check whether current user is authorized to edit the user being searched, call show if true
+
       if @role.parent_id.nil? || @role.parent_id < session[:user].role_id || @user.id == session[:user].id
         render action: 'show'
       else
@@ -97,7 +93,7 @@ class UsersController < ApplicationController
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
       @user = User.find(params[:id])
-      get_role
+      role
       # obtain number of assignments participated
       @assignment_participant_num = 0
       AssignmentParticipant.where(user_id: @user.id).each {|_participant| @assignment_participant_num += 1 }
@@ -114,12 +110,6 @@ class UsersController < ApplicationController
     foreign
   end
 
-  def request_new
-    flash[:warn] = "If you are a student, please contact your teaching staff to get your Expertiza ID."
-    @user = User.new
-    @rolename = Role.find_by(name: params[:role])
-    roles_for_request_sign_up
-  end
 
   def create
     # if the user name already exists, register the user by email address
@@ -218,7 +208,7 @@ class UsersController < ApplicationController
 
   def edit
     @user = User.find(params[:id])
-    get_role
+    role
     foreign
   end
 
@@ -266,13 +256,11 @@ class UsersController < ApplicationController
   protected
 
   def foreign
+    # stores all the roles that are possible 
+    # when a new user joins or an existing user updates his/her profile they will get to choose
+    # from all the roles available
     role = Role.find(session[:user].role_id)
     @all_roles = Role.where('id in (?) or id = ?', role.get_available_roles, role.id)
-  end
-
-  def roles_for_request_sign_up
-    roles_can_be_requested_online = ["Instructor", "Teaching Assistant"]
-    @all_roles = Role.where(name: roles_can_be_requested_online)
   end
 
   private
@@ -301,12 +289,8 @@ class UsersController < ApplicationController
                                  :institution_id)
   end
 
-  def requested_user_params
-    params.require(:user).permit(:name, :role_id, :fullname, :institution_id, :email)
-          .merge(self_introduction: params[:requested_user][:self_introduction])
-  end
-
-  def get_role
+  #to find the role of a given user object and set the @role accordingly
+  def role
     if @user && @user.role_id
       @role = Role.find(@user.role_id)
     elsif @user
@@ -326,7 +310,7 @@ class UsersController < ApplicationController
 
     # The type of condition for the search depends on what the user has selected from the search_by dropdown
     @search_by = params[:search_by]
-
+    @per_page = 3
     # search for corresponding users
     # users = User.search_users(role, user_id, letter, @search_by)
 

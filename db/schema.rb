@@ -11,7 +11,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200421235620) do
+ActiveRecord::Schema.define(version: 20191027205712) do
+
+  create_table "account_requests", force: :cascade do |t|
+    t.string   "name",              limit: 255
+    t.integer  "role_id",           limit: 4
+    t.string   "fullname",          limit: 255
+    t.string   "institution_id",    limit: 255
+    t.string   "email",             limit: 255
+    t.string   "status",            limit: 255
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.text     "self_introduction", limit: 65535
+  end
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -460,18 +472,6 @@ ActiveRecord::Schema.define(version: 20200421235620) do
     t.integer "question_id", limit: 4
     t.text    "txt",         limit: 65535
     t.boolean "iscorrect",                 default: false
-  end
-
-  create_table "requested_users", force: :cascade do |t|
-    t.string   "name",              limit: 255
-    t.integer  "role_id",           limit: 4
-    t.string   "fullname",          limit: 255
-    t.string   "institution_id",    limit: 255
-    t.string   "email",             limit: 255
-    t.string   "status",            limit: 255
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
-    t.text     "self_introduction", limit: 65535
   end
 
   create_table "response_maps", force: :cascade do |t|

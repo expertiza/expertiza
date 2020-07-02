@@ -13,8 +13,7 @@ describe 'new user request' do
       # click 'REQUEST ACCOUNT' button on root path, redirect to users#request_new page
       visit '/'
       click_link 'Request account'
-      expect(page).to have_current_path('/users/request_new?role=Instructor')
-      select 'Instructor', from: 'user_role_id'
+      expect(page).to have_current_path('/account_request/request_new?role=Instructor')
       fill_in 'user_name', with: 'requester'
       fill_in 'user_fullname', with: 'requester, requester'
       # a new user is able to add a new institution
@@ -31,17 +30,16 @@ describe 'new user request' do
       click_on 'Request'
       expect(page).to have_content('Email format is wrong')
       # all data can be saved to DB successfully
-      select 'Instructor', from: 'user_role_id'
       select 'North Carolina State University', from: 'user_institution_id'
       fill_in 'user_name', with: 'requester'
       fill_in 'user_fullname', with: 'requester, requester'
       fill_in 'user_email', with: 'test@test.com'
-      expect { click_on 'Request' }.to change { RequestedUser.count }.by(1)
-      expect(RequestedUser.first.name).to eq('requester')
-      expect(RequestedUser.first.role_id).to eq(2)
-      expect(RequestedUser.first.fullname).to eq('requester, requester')
-      expect(RequestedUser.first.email).to eq('test@test.com')
-      expect(RequestedUser.first.status).to eq('Under Review')
+      expect { click_on 'Request' }.to change { AccountRequest.count }.by(1)
+      expect(AccountRequest.first.name).to eq('requester')
+      expect(AccountRequest.first.role_id).to eq(2)
+      expect(AccountRequest.first.fullname).to eq('requester, requester')
+      expect(AccountRequest.first.email).to eq('test@test.com')
+      expect(AccountRequest.first.status).to eq('Under Review')
     end
   end
 
@@ -51,7 +49,7 @@ describe 'new user request' do
     it 'allows super-admin and admin to communicate with requesters by clicking email addresses' do
       visit '/'
       login_as 'super_administrator2'
-      visit '/users/list_pending_requested'
+      visit '/account_request/list_pending_requested'
       expect(page).to have_link('requester1@test.com')
     end
 
@@ -59,12 +57,12 @@ describe 'new user request' do
       it 'displays \'Rejected\' as status' do
         visit '/'
         login_as 'super_administrator2'
-        visit '/users/list_pending_requested'
+        visit '/account_request/list_pending_requested'
         expect(page).to have_content('requester1')
         choose(name: 'status', option: 'Rejected')
         click_on('Submit')
         expect(page).to have_content('The user "requester1" has been Rejected.')
-        expect(RequestedUser.first.status).to eq('Rejected')
+        expect(AccountRequest.first.status).to eq('Rejected')
         expect(page).to have_content('requester1')
         expect(page).to have_content('Rejected')
       end
@@ -74,10 +72,10 @@ describe 'new user request' do
       it 'displays \'Accept\' as status and sends an email with randomly-generated password to the new user' do
         visit '/'
         login_as 'super_administrator2'
-        visit '/users/list_pending_requested'
+        visit '/account_request/list_pending_requested'
         ActionMailer::Base.deliveries.clear
         expect(page).to have_content('requester1')
-        expect(RequestedUser.first.status).to eq('Under Review')
+        expect(AccountRequest.first.status).to eq('Under Review')
         choose(name: 'status', option: 'Approved')
         click_on('Submit')
         expect(page).to have_content('requester1')

@@ -64,4 +64,5 @@
 <% end %>
 
 <br><br>
-<a href="javascript:window.history.back()">Back</a>
+<!--<a href="javascript:window.history.back()">Back</a>-->
+<%= link_to "back",:controller => 'student_task',:action=>"view", :id => params[:id] %>

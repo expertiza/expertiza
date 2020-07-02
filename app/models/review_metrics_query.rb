@@ -16,7 +16,7 @@ class ReviewMetricsQuery
     # structure of @queried_results = [ {request => queried_result} ]
     # where request can be either metric or metric_confidence
     # and queried result is the response gotten from the web service
-    @queried_results = []
+    @queried_results = {}
   end
 
   def confidence(metric, review_id)
@@ -75,7 +75,7 @@ class ReviewMetricsQuery
 
     # ask MetricsController to make a call to the review metrics web service
     ws_output = MetricsController.new.bulk_service_retrival(ws_input, request.split('_'))
-    @queried_results << {request => ws_output['reviews']}
+    @queried_results[request] = ws_output['reviews']
   end
 
   # find all reviews that may be displayed in the requesting page

@@ -274,8 +274,13 @@ class ReviewMappingController < ApplicationController
     if review_response_map and Response.exists?(map_id: review_response_map.id)
       # Iterate through every response and related answers and check whether they are empty or not
       Response.where(map_id: review_response_map.id).each do |response|
+        unless response.additional_comment.empty?
+          flash[:error] = "This reviewer has already started the review. Hence, it cannot been deleted."
+          redirect_to :back
+          return
+        end
         Answer.where(response_id: response.id).each do |answer|
-          if !response.additional_comment.empty? or !answer.comments.empty? or (answer.answer != 0 and !answer.answer.nil?)
+          if !answer.comments.empty? or (answer.answer != 0 and !answer.answer.nil?)
             flash[:error] = "This reviewer has already started the review. Hence, it cannot been deleted."
             redirect_to :back
             return

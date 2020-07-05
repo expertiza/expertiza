@@ -21,9 +21,12 @@ class ReviewMetricsQuery
 
   def confidence(metric, review_id)
     request = metric << '_confidence'
-    review = review_from_cache(request, review_id)
+    review = retrieve_from_cache(request, review_id)
     confidence = review['confidence'].to_i
 
+    # translate the meaning of 'confidence'
+    # from 'confidence of the positive'
+    # to 'confidence of the predicted value (present or absent)'
     if (metric == 'problem' || metric == 'suggestions') && (confidence < 0.5)
       1 - confidence
     else
@@ -32,7 +35,7 @@ class ReviewMetricsQuery
   end
 
   def has(metric, review_id)
-    review = review_from_cache(metric, review_id)
+    review = retrieve_from_cache(metric, review_id)
     case metric
     when 'problem'
       review['problems'] == 'Present'
@@ -47,7 +50,7 @@ class ReviewMetricsQuery
     end
   end
 
-  def review_from_cache(request, review_id)
+  def retrieve_from_cache(request, review_id)
     review = @queried_results[request].find {|review| review[:id] == review_id }
     # if not yet cached
     unless review
@@ -60,11 +63,11 @@ class ReviewMetricsQuery
 
   def cache_ws_results(request, review_id)
     ws_input = {reviews: []}
-    # see if this set of reviews has already been queried
+    # see if this set of reviews has already been retrieved by a query
     reviews = @queried_results.find {|_key, value| value.find {|r| r[:id] == review_id } }
     if reviews
       # use output from previous query which is already in a format used by the ws
-      # thus avoid the need to gather the same data from the database
+      # thus avoid the need to gather the same data from the database again
       ws_input[:reviews] = reviews.value
     else
       reviews = reviews_to_be_cached(review_id)

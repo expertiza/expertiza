@@ -1,11 +1,17 @@
 class SectionHeader < QuestionnaireHeader
   def complete(_count, _answer = nil)
-    html = '<b style="color: #986633; font-size: x-large">' + self.txt + '</b><br/><br/>'
-    html.html_safe
+    capture do
+      concat make_header
+      concat tag("br")
+      concat tag("br")
+    end
   end
 
   def view_completed_question(_count, _answer)
-    html = '<b style="color: #986633; font-size: x-large">' + self.txt + '</b>'
-    html.html_safe
+    make_header
+  end
+
+  private def make_header
+    content_tag(:b, self.txt, {style: "color: #986633", 'font-size': "x-large"}, false)
   end
 end

@@ -10,34 +10,48 @@ describe TagPrompt do
   let(:an_short) { Answer.new question: ct_criterion, answer: 5, comments: "yes" }
   let(:tp) { TagPrompt.new(prompt: "test prompt", desc: "test desc", control_type: "Checkbox") }
   let(:tp2) { TagPrompt.new(prompt: "test prompt2", desc: "test desc2", control_type: "Slider") }
-  let(:tag_dep) { TagPromptDeployment.new id: 1, tag_prompt: tp,  question_type: "Criterion", answer_length_threshold: 5 }
-  let(:tag_dep_slider) { TagPromptDeployment.new id: 2, tag_prompt: tp2,  question_type: "Criterion", answer_length_threshold: 5 }
+  let(:tag_dep) { TagPromptDeployment.new id: 1, tag_prompt: tp, question_type: "Criterion", answer_length_threshold: 5 }
+  let(:tag_dep_slider) { TagPromptDeployment.new id: 2, tag_prompt: tp2, question_type: "Criterion", answer_length_threshold: 5 }
   let(:answer_tag) { AnswerTag.new(tag_prompt_deployment_id: 2, answer: an_long, user_id: 1, value: 1) }
 
   it "is valid with valid attributes" do
-    expect(TagPrompt.new(prompt: "test prompt", desc: "test desc", control_type: "Checkbox")).to be_valid
+    expect(tp).to be_valid
   end
 
   it "is invalid without valid attributes" do
     expect(TagPrompt.new).not_to be_valid
   end
 
-  it "returns a checkbox when the control_type is checkbox" do
-    expect(tp.html_control(tag_dep, an_long, 1)).to include("input type=\"checkbox\"")
+  context 'when the control_type is a checkbox' do
+    before(:each) do
+      @checkbox_html = tp.html_control(tag_dep, an_long, 1)
+    end
+    it 'returns an html safe string' do
+      expect(@checkbox_html.html_safe?).to be_truthy
+    end
+    it 'returns a checkbox' do
+      expect(@checkbox_html).to match(/<input/).and match(/type="checkbox"/)
+    end
   end
 
-  it "returns a slider when the control_type is slider" do
-    expect(tp2.html_control(tag_dep_slider, an_long, 1)).to include("input type=\"range\"")
-  end
-
-  it "returns a slider with a value of 1 when user 1 has tagged an answer with 1" do
-    allow(AnswerTag).to receive(:where).and_return([answer_tag])
-    expect(tp2.html_control(tag_dep_slider, an_long, 1)).to include("input type=\"range\"", "value=\"1\"")
-  end
-
-  it "returns a slider without a value when user 2 hasn't tagged an answer with 1" do
-    allow(AnswerTag).to receive(:where).and_return([])
-    expect(tp2.html_control(tag_dep_slider, an_long, 2)).not_to include("value=\"1\"")
+  context 'when the control_type is a slider' do
+    before(:each) do
+      @slider_html = tp2.html_control(tag_dep_slider, an_long, 1)
+    end
+    it 'returns an html safe string' do
+      expect(@slider_html.html_safe?).to be_truthy
+    end
+    it 'returns a slider' do
+      expect(@slider_html).to match(/<input/).and match(/type="range"/)
+    end
+    it 'returns a slider with a value of 1 when user 1 has tagged an answer with 1' do
+      allow(AnswerTag).to receive(:where).and_return([answer_tag])
+      expect(tp2.html_control(tag_dep_slider, an_long, 1)).to include('input type="range"', 'value="1"')
+    end
+    it 'returns a slider without a value when user 2 has not tagged an answer with 1' do
+      allow(AnswerTag).to receive(:where).and_return([])
+      expect(tp2.html_control(tag_dep_slider, an_long, 2)).not_to include('value="1"')
+    end
   end
 
   it "returns an empty string when the question_type is not Criterion" do

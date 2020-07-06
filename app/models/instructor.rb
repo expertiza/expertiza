@@ -35,7 +35,7 @@ class Instructor < User
     ta_ids
   end
 
-  def self.get_user_list(user)
+  def self.user_list(user)
     participants = []
     user_list = []
     Course.where(instructor_id: user.id).find_each do |course|

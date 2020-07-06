@@ -42,7 +42,7 @@ class AssignmentNode < Node
   end
 
   # Indicates that this object is always a leaf
-  def is_leaf
+  def leaf?
     true
   end
 

@@ -3,12 +3,12 @@ class VmQuestionResponseRow
   attr_reader :question_seq, :question_text, :question_id, :score_row, :weight
   attr_accessor :countofcomments
 
-  def initialize(question_text, question_id, weight, question_max_score, seq)
-    @question_text = question_text
-    @weight = weight
-    @question_id = question_id
-    @question_seq = seq
-    @question_max_score = question_max_score
+  def initialize(question_data)
+    @question_text = question_data[:text]
+    @question_id = question_data[:id]
+    @weight = question_data[:weight]
+    @question_max_score = question_data[:max_score]
+    @question_seq = question_data[:seq]
     @score_row = []
     @countofcomments = 0
   end
@@ -17,27 +17,24 @@ class VmQuestionResponseRow
   # the max score is one.
   def question_max_score
     question = Question.find(self.question_id)
-    if question.type == "Checkbox"
-      return 1
-    elsif question.is_a? ScoredQuestion
-      @question_max_score
-    else
-      "N/A"
-    end
+    return 1 if question.type == 'Checkbox'
+    return @question_max_score if question.is_a? ScoredQuestion
+    'N/A'
   end
 
   def average_score_for_row
     row_average_score = 0.0
-    no_of_columns = 0.0 # Counting reviews that are not null
+    count_columns = 0.0 # Counting reviews that are not null
     @score_row.each do |score|
       if score.score_value.is_a? Numeric
-        no_of_columns += 1
+        count_columns += 1
         row_average_score += score.score_value.to_f
       end
     end
-    unless no_of_columns.zero?
-      row_average_score /= no_of_columns
-      row_average_score.round(2)
-    end
+    # Return if none of the score in the score row is Numeric
+    return if count_columns.zero?
+    # Otherwise, calculate average score for a row
+    row_average_score /= count_columns
+    row_average_score.round(2)
   end
 end

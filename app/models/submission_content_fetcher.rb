@@ -2,14 +2,12 @@
 class SubmissionContentFetcher
   class << self
     def doc_factory(url)
+      return nil unless GoogleDocFetcher.supports_url?(url) || WebsiteFetcher.supports_url?(url)
+
       params = {"url" => url}
 
-      if GoogleDocFetcher.supports_url?(url)
-        return GoogleDocFetcher.new(params)
-      elsif WebsiteFetcher.supports_url?(url) # leave last as catch-all
-        return WebsiteFetcher.new(params)
-      end
-      nil
+      return GoogleDocFetcher.new(params) if GoogleDocFetcher.supports_url?(url)
+      return WebsiteFetcher.new(params) if WebsiteFetcher.supports_url?(url) # leave as catch-all
     end
 
     def code_factory(url)

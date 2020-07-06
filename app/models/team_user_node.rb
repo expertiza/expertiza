@@ -1,9 +1,9 @@
 class TeamUserNode < Node
-  belongs_to :node_object, class_name: 'TeamsUser'
+  belongs_to :node_object, class_name: 'TeamsUser', inverse_of: :team_user_node
   attr_accessible :parent_id, :node_object_id
 
   def self.table
-    "teams_users"
+    'teams_users'
   end
 
   def get_name(ip_address = nil)
@@ -17,7 +17,7 @@ class TeamUserNode < Node
     nodes.where("teams_users.team_id = ?", parent_id) if parent_id
   end
 
-  def is_leaf
+  def leaf?
     true
   end
 end

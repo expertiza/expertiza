@@ -39,7 +39,7 @@ class StudentTask
   end
 
   def content_submitted_in_current_stage?
-    current_stage == "submission" && participant.team.has_submissions?
+    current_stage == "submission" && !participant.team.nil? && participant.team.has_submissions?
   end
 
   delegate :course, to: :assignment

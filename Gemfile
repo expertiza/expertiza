@@ -18,7 +18,7 @@ gem 'capistrano-rvm'
 gem 'chartjs-ror'
 gem 'coffee-rails'
 gem 'coveralls', require: false
-gem 'danger', git: 'https://github.com/Winbobob/danger.git', ref: '6df469a', require: false
+gem 'danger', git: 'https://github.com/Winbobob/danger.git', ref: 'a2fe557209879642615473ee9919788fc650be75', require: false
 gem 'delayed_job_active_record'
 gem 'dynamic_form'
 gem 'edavis10-ruby-web-search'

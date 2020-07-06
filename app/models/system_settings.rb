@@ -1,9 +1,9 @@
 class SystemSettings < ActiveRecord::Base
   self.table_name = 'system_settings'
 
-  attr_accessor :public_role, :default_markup_style
-  attr_accessor :site_default_page, :not_found_page, :permission_denied_page,
-                :session_expired_page
+  attr_writer :public_role, :default_markup_style
+  attr_writer :site_default_page, :not_found_page, :permission_denied_page,
+              :session_expired_page
 
   def public_role
     @public_role ||= Role.find(self.public_role_id)
@@ -16,7 +16,6 @@ class SystemSettings < ActiveRecord::Base
                                 MarkupStyle.new(id: nil,
                                                 name: '(None)')
                               end
-    @default_markup_style
   end
 
   def site_default_page
@@ -40,15 +39,12 @@ class SystemSettings < ActiveRecord::Base
   def system_pages(pageid)
     pages = []
 
-    pages << "Site default page" if self.site_default_page_id == pageid
-    pages << "Not found page" if self.not_found_page_id == pageid
-    pages << "Permission denied page" if self.permission_denied_page_id == pageid
-    pages << "Session expired page" if self.session_expired_page_id == pageid
+    pages << 'Site default page' if self.site_default_page_id == pageid
+    pages << 'Not found page' if self.not_found_page_id == pageid
+    pages << 'Permission denied page' if self.permission_denied_page_id == pageid
+    pages << 'Session expired page' if self.session_expired_page_id == pageid
 
-    if !pages.empty?
-      return pages
-    else
-      return nil
-    end
+    return nil if pages.empty?
+    pages
   end
 end

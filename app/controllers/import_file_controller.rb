@@ -93,9 +93,9 @@ class ImportFileController < ApplicationController
       begin
         @header_integrated_body.each do |row_hash|
           if params[:model] == "AssignmentTeam"
-            teamtype = AssignmentTeam
+            teamtype = AssignmentTeam.new
           else
-            teamtype = CourseTeam
+            teamtype = CourseTeam.new
           end
           options = eval(params[:options])
           options[:has_teamname] = params[:has_teamname]

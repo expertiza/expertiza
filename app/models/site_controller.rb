@@ -1,5 +1,5 @@
 class SiteController < ActiveRecord::Base
-  has_many :controller_actions
+  has_many :controller_actions, dependent: :destroy
   belongs_to :permission
 
   validates :name, presence: true

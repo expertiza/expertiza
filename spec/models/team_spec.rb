@@ -7,6 +7,8 @@ describe Team do
   let(:user2) { build(:student, id: 2) }
   let(:user3) { build(:student, id: 3) }
   let(:team) { build(:assignment_team, id: 1, name: 'no team', users: [user]) }
+  let(:team2) { build(:assignment_team, id: 2, name: 'assignment team', users: []) }
+  let(:team3) { build(:course_team, id: 3, name: 'course team', users: [user2]) }
   let(:team_user) { build(:team_user, id: 1, user: user) }
   before(:each) do
     allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
@@ -159,7 +161,7 @@ describe Team do
       allow(Team).to receive(:find_by).with(name: 'Team_1').and_return(team)
 
       allow(Team).to receive(:find_by).with(name: 'Team_2').and_return(nil)
-      expect(Team.generate_team_name('no name')).to eq('Team_2')
+      expect(Team.generate_team_name).to eq('Team_2')
     end
   end
 
@@ -167,8 +169,8 @@ describe Team do
     context 'when cannot find a user by name' do
       it 'raises an ImportError' do
         allow(User).to receive(:find_by).with(name: 'no name').and_return(nil)
-        expect { team.import_team_members(0, {teammembers: ['no name']}) }.to raise_error(ImportError,
-                                                                           "The user 'no name' was not found. <a href='/users/new'>Create</a> this user?")
+        expect { team.import_team_members({teammembers: ['no name']}) }.to raise_error(ImportError,
+                                                                                       "The user 'no name' was not found. <a href='/users/new'>Create</a> this user?")
       end
     end
 
@@ -177,16 +179,104 @@ describe Team do
         allow(User).to receive(:find_by).with(name: 'no name').and_return(user)
         allow(TeamsUser).to receive(:find_by).with(team_id: 1, user_id: 1).and_return(nil)
         allow_any_instance_of(Team).to receive(:add_member).with(user).and_return(true)
-        expect(team.import_team_members(0, {teammembers: ['no name']})).to eq(['no name'])
+        expect(team.import_team_members({teammembers: ['no name']})).to eq(['no name'])
       end
     end
   end
 
   describe '.import' do
-    context 'when row is empty and has_column_names option is not true' do
+    context 'when row is empty and no options are specified' do
       it 'raises an ArgumentError' do
-        expect { Team.import({}, 1, {has_column_names: 'false'}, AssignmentTeam.new) }
+        expect { Team.import({}, 1, {}, AssignmentTeam.new) }
           .to raise_error(ArgumentError, 'Not enough fields on this line.')
+        end
+    end
+
+    context 'when row contains only one team member and has_teamname option is true_first or true_last' do
+      it 'raises an ArgumentError' do
+        expect { Team.import({teammembers: [user.name]}, 1, {has_teamname: 'true_first'}, AssignmentTeam.new) }
+          .to raise_error(ArgumentError, 'Not enough fields on this line.')
+      end
+
+      it 'raises an ArgumentError' do
+        expect { Team.import({teammembers: [user.name]}, 1, {has_teamname: 'true_last'}, AssignmentTeam.new) }
+          .to raise_error(ArgumentError, 'Not enough fields on this line.')
+      end
+    end
+
+    context 'when row contains only one team member, no options, and team type is AssignmentTeam' do
+      it 'generates new name, saves new team with new name in DB and imports team members' do
+        allow(Team).to receive(:find_by).with(name: 'Team_1').and_return(nil)
+        allow(AssignmentTeam).to receive(:create_team_and_node).with(1).and_return(team)
+        allow(team).to receive(:import_team_members).with(teammembers: [user.name]).and_return(true)
+        expect(team).to receive(:import_team_members).with(teammembers: [user.name])
+        expect(Team.import({teammembers: [user.name]}, 1, {}, AssignmentTeam.new)).to be true
+      end
+    end
+
+    context 'when row contains only one team member, no options, and team type is Team' do
+      it 'name is not generated, returns without creating new team and importing team members' do
+        expect(Team).to_not receive(:create_team_and_node).with(1)
+        expect(team).to_not receive(:import_team_members).with(teammembers: [user.name])
+        Team.import({teammembers: [user.name]}, 1, {}, Team.new)
+      end
+    end
+
+    context 'when row contains team name and multiple team members and multiple options are given' do
+      it 'handles duplicated teams by renaming it and imports team members into renamed team' do
+        allow(Team).to receive(:find_by).with(name: team.name, parent_id: 1).and_return(team)
+        allow(Team).to receive(:find_by).with(name: 'Team_1').and_return(nil)
+        allow(AssignmentTeam).to receive(:create_team_and_node).with(1).and_return(team)
+        allow(team).to receive(:import_team_members).with(teamname: team.name, teammembers: [user.name, user2.name]).and_return(true)
+        expect(team).to receive(:import_team_members).with(teamname: team.name, teammembers: [user.name, user2.name])
+        # Generate with options has_teamname: 'true_first', handle_dups: 'rename'
+        expect(Team.import({teamname: team.name, teammembers: [user.name, user2.name]}, 1,
+                           {has_teamname: 'true_first', handle_dups: 'rename'}, AssignmentTeam.new)).to be true
+      end
+
+      it 'handles duplicated teams by replacing old team and imports team members into new team' do
+        allow(Team).to receive(:find_by).with(name: team.name, parent_id: 1).and_return(team)
+        allow(TeamsUser).to receive_message_chain(:where, :find_each).with(team_id: 1).with(no_args).and_yield(team_user)
+        allow(team_user).to receive(:destroy).and_return(team_user)
+        allow(AssignmentTeam).to receive(:create_team_and_node).with(1).and_return(team2)
+        allow(team2).to receive(:import_team_members).with(teamname: team.name, teammembers: [user.name, user2.name]).and_return(true)
+        expect(team2).to receive(:import_team_members).with(teamname: team.name, teammembers: [user.name, user2.name])
+        # Generate with options has_teamname: 'true_last', handle_dups: 'replace'
+        expect(Team.import({teamname: team.name, teammembers: [user.name, user2.name]}, 1,
+                           {has_teamname: 'true_last', handle_dups: 'replace'}, AssignmentTeam.new)).to be true
+      end
+
+      it 'does not create new team, but imports team members into existing team' do
+        allow(Team).to receive(:find_by).with(name: team.name, parent_id: 1).and_return(team)
+        allow(User).to receive(:find_by).with(name: user.name).and_return(user)
+        allow(User).to receive(:find_by).with(name: user2.name).and_return(user2)
+        allow(TeamsUser).to receive(:find_by).with(team_id: 1, user_id: 1).and_return(team_user)
+        allow(TeamsUser).to receive(:find_by).with(team_id: 1, user_id: 2).and_return(team_user)
+        expect(AssignmentTeam).to_not receive(:create_team_and_node).with(1)
+        allow(team).to receive(:import_team_members).with(teamname: team.name, teammembers: [user.name, user2.name]).and_return(true)
+        expect(team).to receive(:import_team_members).with(teamname: team.name, teammembers: [user.name, user2.name])
+        # Generate with options has_teamname: 'true_first'
+        expect(Team.import({teamname: team.name, teammembers: [user.name, user2.name]}, 1,
+                           {has_teamname: 'true_first'}, AssignmentTeam.new)).to be true
+      end
+
+      it 'has no duplicate, creates new team and imports team members ' do
+        allow(Team).to receive(:find_by).with(name: '', parent_id: 1).and_return(nil)
+        allow(AssignmentTeam).to receive(:create_team_and_node).with(1).and_return(team)
+        allow(team).to receive(:import_team_members).with(teammembers: [user.name, user2.name]).and_return(true)
+        expect(team).to receive(:import_team_members).with(teammembers: [user.name, user2.name])
+        # Generate with options has_teamname: 'true_last'
+        expect(Team.import({teammembers: [user.name, user2.name]}, 1,
+                           {has_teamname: 'true_last'}, AssignmentTeam.new)).to be true
+      end
+
+      it 'ignores duplicates, does not creates new team, and does not imports team members ' do
+        allow(Team).to receive(:find_by).with(name: team.name, parent_id: 1).and_return(team)
+        expect(AssignmentTeam).to_not receive(:create_team_and_node).with(1)
+        expect(team).to_not receive(:import_team_members).with(teammembers: [user.name, user2.name])
+        # Generate with options has_teamname: 'true_last', handle_dups: 'replace'
+        Team.import({teamname: team.name, teammembers: [user.name, user2.name]}, 1,
+                    {has_teamname: 'true_last', handle_dups: 'ignore'}, AssignmentTeam.new)
       end
     end
 
@@ -219,22 +309,22 @@ describe Team do
   describe '.handle_duplicate' do
     context 'when parameterized team is nil' do
       it 'returns team name' do
-        expect(Team.handle_duplicate(nil, 'no name', 1, 'replace', CourseTeam.new)).to eq('no name')
+        expect(Team.handle_duplicate(nil, 'no name', 'replace', CourseTeam.new)).to eq('no name')
       end
     end
 
     context 'when parameterized team is not nil' do
       context 'when handle_dups option is ignore' do
         it 'does not create the new team and returns nil' do
-          expect(Team.handle_duplicate(team, 'no name', 1, 'ignore', CourseTeam.new)).to be nil
+          expect(Team.handle_duplicate(team, 'no name', 'ignore', CourseTeam.new)).to be nil
         end
       end
 
       context 'when handle_dups option is rename' do
         it 'returns new team name' do
           allow(Course).to receive(:find).with(1).and_return(double('Course', name: 'no course'))
-          allow(Team).to receive(:generate_team_name).with('no course').and_return('new team name')
-          expect(Team.handle_duplicate(team, 'no name', 1, 'rename', CourseTeam.new)).to eq('new team name')
+          allow(Team).to receive(:generate_team_name).and_return('new team name')
+          expect(Team.handle_duplicate(team, 'no name', 'rename', CourseTeam.new)).to eq('new team name')
         end
       end
 
@@ -242,17 +332,44 @@ describe Team do
         it 'deletes the old team' do
           allow(TeamsUser).to receive_message_chain(:where, :find_each).with(team_id: 1).with(no_args).and_yield(team_user)
           allow(team_user).to receive(:destroy).and_return(team_user)
-          expect(Team.handle_duplicate(team, 'no name', 1, 'replace', CourseTeam.new)).to eq('no name')
+          expect(Team.handle_duplicate(team, 'no name', 'replace', CourseTeam.new)).to eq('no name')
         end
       end
     end
   end
 
   describe '.export' do
-    it 'exports teams to csv' do
-      allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team])
-      allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
-      expect(Team.export([], 1, {team_name: 'false'}, AssignmentTeam.new)).to eq([["no team", "no name"]])
+    context 'when exporting single assignment and course teams to csv' do
+      it 'exports single assignments team to csv' do
+        allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team])
+        allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
+        expect(Team.export([], 1, {team_name: 'false'}, AssignmentTeam.new)).to eq([[team.name, user.name]])
+      end
+      it 'exports single course team to csv' do
+        allow(CourseTeam).to receive(:where).with(parent_id: 1).and_return([team3])
+        allow(TeamsUser).to receive(:where).with(team_id: 3).and_return([team_user])
+        expect(Team.export([], 1, {team_name: 'false'}, CourseTeam.new)).to eq([[team3.name, user.name]])
+      end
+      it 'exports only single assignment team name to csv' do
+        allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team])
+        allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
+        expect(Team.export([], 1, {}, AssignmentTeam.new)).to eq([[team.name]])
+      end
+    end
+
+    context 'when exporting multiple assignment teams to csv' do
+      it 'exports single assignments team to csv' do
+        allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team, team2])
+        allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
+        allow(TeamsUser).to receive(:where).with(team_id: 2).and_return([])
+        expect(Team.export([], 1, {team_name: 'false'}, AssignmentTeam.new)).to eq([[team.name, user.name], [team2.name]])
+      end
+    end
+
+    context 'when exporting unhandled teams to csv' do
+      it 'does not export unhandled teams to csv' do
+        expect(Team.export([], 1, {team_name: 'false'}, Team.new)).to be_empty
+      end
     end
   end
 end

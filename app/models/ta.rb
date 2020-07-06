@@ -37,7 +37,7 @@ class Ta < User
   end
 
   def get(object_type, id, user_id)
-    object_type.where(["id = ? AND (instructor_id = ? OR private = 0)", id, user_id]).first
+    object_type.find_by(["id = ? AND (instructor_id = ? OR private = 0)", id, user_id])
   end
 
   # This method is potentially problematic: it assumes one TA only help teach one course.
@@ -80,13 +80,13 @@ class Ta < User
     ids
   end
 
-  def get_instructor
+  def instructor
     Ta.get_my_instructor(self.id)
   end
 
-  def set_instructor(new_assign)
-    new_assign.instructor_id = Ta.get_my_instructor(self.id)
-    new_assign.course_id = TaMapping.get_course_id(self.id)
+  def assign_instructor_for_assignment(new_assignment)
+    new_assignment.instructor_id = Ta.get_my_instructor(self.id)
+    new_assignment.course_id = TaMapping.get_course_id(self.id)
   end
 
   def set_courses_to_assignment
@@ -97,7 +97,7 @@ class Ta < User
     true
   end
 
-  def self.get_user_list(user)
+  def self.user_list(user)
     courses = Ta.get_mapped_courses(user.id)
     participants = []
     user_list = []

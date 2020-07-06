@@ -1,4 +1,7 @@
 class Question < ActiveRecord::Base
+  include ActionView::Helpers
+  include ActionView::Context
+
   belongs_to :questionnaire # each question belongs to a specific questionnaire
   belongs_to :review_score  # each review_score pertains to a particular question
   belongs_to :review_of_review_score # ditto
@@ -54,14 +57,39 @@ class Question < ActiveRecord::Base
   end
 
   # Placeholder methods, override in derived classes if required.
-  # this method decide what to display if an instructor (etc.) is creating or editing a questionnaire
-  def edit
-    nil
+  # this method decide what to display if an instructor (etc.) is creating or editing a questionnaire (questionnaires_controller.rb)
+  def edit(_count)
+    capture do
+      concat content_tag(:td,
+                         content_tag(:a,
+                                     "Remove", {rel: "nofollow", 'data-method': "delete",
+                                                href: '/questions/' + self.id.to_s}, false), {align: "center"}, false)
+      concat content_tag(:td,
+                         tag(:input, {size: "6", value: self.seq.to_s,
+                                      name: 'question[' + self.id.to_s + '][seq]',
+                                      id: 'question_' + self.id.to_s + '_seq', type: "text"}, false, false), {}, false)
+      concat content_tag(:td,
+                         content_tag(:textarea,
+                                     self.txt, {cols: "50", rows: "1",
+                                                name: 'question[' + self.id.to_s + '][txt]',
+                                                id: 'question_' + self.id.to_s + '_txt',
+                                                placeholder: "Edit question content here"}, false), {}, false)
+      concat content_tag(:td,
+                         tag(:input, {size: "10", disabled: "disabled", value: self.type,
+                                      name: 'question[' + self.id.to_s + '][type]',
+                                      id: 'question_' + self.id.to_s + '_type', type: "text"}, false, false), {}, false)
+    end
   end
 
-  # this method decide what to display if an instructor (etc.) is viewing a questionnaire
+  # This method returns what to display if an instructor (etc.) is viewing a questionnaire
   def view_question_text
-    nil
+    content_tag(:tr,
+                capture do
+                  concat content_tag(:td, ' ' + self.txt + ' ', {align: "left"}, false)
+                  concat content_tag(:td, self.type, {align: "left"}, false)
+                  concat content_tag(:td, self.weight.to_s, {align: "center"}, false)
+                  concat content_tag(:td, '&mdash;', {align: "center"}, false)
+                end, {}, false)
   end
 
   # this method decide what to display if a student is filling out a questionnaire

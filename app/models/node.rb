@@ -25,7 +25,7 @@ class Node < ActiveRecord::Base
   # Most objects are not leaves
   # Currently only assignment and questionnaire are a leaf
   # type node
-  def is_leaf
+  def leaf?
     false
   end
 

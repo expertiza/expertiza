@@ -13,16 +13,18 @@ class ReviewMetricsQuery
                       'Positive Tone?' => 'emotions'}.freeze
 
   def initialize
-    # structure of @queried_results = [ {request => queried_result} ]
+    # structure of @queried_results = {request => queried_result, request => queried_result}
     # where request can be either metric or metric_confidence
     # and queried result is the response gotten from the web service
     @queried_results = {}
   end
 
   def confidence(metric, review_id)
-    request = metric << '_confidence'
+    return 0 unless metric
+
+    request = metric + '_confidence'
     review = retrieve_from_cache(request, review_id)
-    confidence = review['confidence'].to_i
+    confidence = review['confidence'].to_f
 
     # translate the meaning of 'confidence'
     # from 'confidence of the positive'
@@ -35,6 +37,8 @@ class ReviewMetricsQuery
   end
 
   def has(metric, review_id)
+    return false unless metric
+
     review = retrieve_from_cache(metric, review_id)
     case metric
     when 'problem'
@@ -51,28 +55,29 @@ class ReviewMetricsQuery
   end
 
   def retrieve_from_cache(request, review_id)
-    review = @queried_results[request].find {|review| review[:id] == review_id }
+    review = {}
+    review = @queried_results[request].find {|review| review['id'] == review_id } if @queried_results[request]
     # if not yet cached
-    unless review
+    if review.blank?
       # cache it, along with other reviews that may also need to be cached
       cache_ws_results(request, review_id)
-      review = @queried_results[request].find {|r| r[:id] == review_id }
+      review = @queried_results[request].find {|r| r['id'] == review_id } if @queried_results[request]
     end
     review
   end
 
   def cache_ws_results(request, review_id)
-    ws_input = {reviews: []}
+    ws_input = {'reviews' => []}
     # see if this set of reviews has already been retrieved by a query
-    reviews = @queried_results.find {|_key, value| value.find {|r| r[:id] == review_id } }
+    reviews = @queried_results.find {|_key, value| value.find {|r| r['id'] == review_id } }
     if reviews
       # use output from previous query which is already in a format used by the ws
       # thus avoid the need to gather the same data from the database again
-      ws_input[:reviews] = reviews.value
+      ws_input['reviews'] = reviews
     else
       reviews = reviews_to_be_cached(review_id)
       reviews.each do |review|
-        ws_input[:reviews] << {id: review.id, text: review.comments}
+        ws_input['reviews'] << {'id' => review.id, 'text' => review.comments}
       end
     end
 
@@ -93,7 +98,6 @@ class ReviewMetricsQuery
                 else
                   ReviewResponseMap.get_assessments_for(team)
                 end
-
     responses.map(&:scores).flatten
   end
 

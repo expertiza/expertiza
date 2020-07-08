@@ -4,8 +4,6 @@ class AssignmentsController < ApplicationController
   autocomplete :user, :name
   before_action :authorize
 
-  # either current_user is an super/admin or instructor for the assignment
-  # or a TA for the course exists or owner of the Course
   def action_allowed?
     if %w[edit update list_submissions].include? params[:action]
       current_user_has_admin_privileges? || current_user_teaching_staff_of_assignment?(params[:id])
@@ -26,19 +24,27 @@ class AssignmentsController < ApplicationController
     if params[:button]
       if @assignment_form.save
         @assignment_form.create_assignment_node
-
-        # update ids in the form
-        if update_assignment_form
-          # send out success notifications and navigate to edit page
-          aid = Assignment.find_by(name: @assignment_form.assignment.name).id
-          ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
-          redirect_to edit_assignment_path aid
-          undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
-        else
-          flash.now[:error] = "Failed to update assignment IDs"
-          render 'new'
+        exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
+        assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
+        if assignment_form_params[:assignment][:directory_path].blank?
+          assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
         end
-
+        ques_array = assignment_form_params[:assignment_questionnaire]
+        due_array = assignment_form_params[:due_date]
+        ques_array.each do |cur_questionnaire|
+          cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
+        end
+        due_array.each do |cur_due|
+          cur_due[:parent_id] = exist_assignment.id.to_s
+        end
+        assignment_form_params[:assignment_questionnaire] = ques_array
+        assignment_form_params[:due_date] = due_array
+        @assignment_form.update(assignment_form_params, current_user)
+        aid = Assignment.find_by(name: @assignment_form.assignment.name).id
+        ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
+        redirect_to edit_assignment_path aid
+        undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
+        return
       else
         flash.now[:error] = "Failed to create assignment"
         render 'new'
@@ -53,18 +59,18 @@ class AssignmentsController < ApplicationController
     ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Timezone not specified", request) if current_user.timezonepref.nil?
     flash.now[:error] = "You have not specified your preferred timezone yet. Please do this before you set up the deadlines." if current_user.timezonepref.nil?
     edit_params_setting
-    assignment_staggered_deadline?
+    assignment_form_assignment_staggered_deadline?
     @due_date_all.each do |dd|
-      check_due_date_nameurl(dd)
+      check_due_date_nameurl_not_empty(dd)
       adjust_timezone_when_due_date_present(dd)
       break if validate_due_date
     end
     check_assignment_questionnaires_usage
-    @due_date_all = update_due_date_deadline_name(@due_date_all)
-    @due_date_all = update_due_date_description_url(@due_date_all)
+    @due_date_all = update_nil_dd_deadline_name(@due_date_all)
+    @due_date_all = update_nil_dd_description_url(@due_date_all)
     # only when instructor does not assign rubrics and in assignment edit page will show this error message.
     handle_rubrics_not_assigned_case
-    missing_submission_directory
+    handle_assignment_directory_path_nonexist_case_and_answer_tagging
     # assigned badges will hold all the badges that have been assigned to an assignment
     # added it to display the assigned badges while creating a badge in the assignments page
     @assigned_badges = @assignment_form.assignment.badges
@@ -74,12 +80,12 @@ class AssignmentsController < ApplicationController
 
   def update
     unless params.key?(:assignment_form)
-      assignment_submission_handler
+      assignment_form_key_nonexist_case_handler
       return
     end
     retrieve_assignment_form
-    timezone_handler
-    update_feedback_attributes
+    handle_current_user_timezonepref_nil
+    update_feedback_assignment_form_attributes
     redirect_to edit_assignment_path @assignment_form.assignment.id
   end
 
@@ -169,38 +175,6 @@ class AssignmentsController < ApplicationController
 
   private
 
-  # The questionnaire array and due date params are updated for the current user
-  def update_assignment_form
-    exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
-    assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
-    if assignment_form_params[:assignment][:directory_path].blank?
-      assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
-    end
-
-    ques_array = assignment_form_params[:assignment_questionnaire]
-    ques_array = array_traverser(ques_array, 1)
-    assignment_form_params[:assignment_questionnaire] = ques_array
-
-    due_array = assignment_form_params[:due_date]
-    due_array = array_traverser(due_array, 2)
-    assignment_form_params[:due_date] = due_array
-
-    @assignment_form.update(assignment_form_params, current_user)
-  end
-
-  # Iterates through an array and makes each id a string.
-  def array_traverser(temp_array, option)
-    exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
-    temp_array.each do |cur_ele|
-      if option == 1
-        cur_ele[:assignment_id] = exist_assignment.id.to_s
-      else
-        cur_ele[:parent_id] = exist_assignment.id.to_s
-      end
-    end
-    temp_array
-  end
-
   # check whether rubrics are set before save assignment
   def empty_rubrics_list
     rubrics_list = %w[ReviewQuestionnaire
@@ -248,32 +222,64 @@ class AssignmentsController < ApplicationController
     dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_TEAM_FORMATION
   end
 
-  # Iterates through all the due dates and sets the deadline name to ''
-  def update_due_date_deadline_name(due_date_all)
+  def update_nil_dd_deadline_name(due_date_all)
     due_date_all.each do |dd|
       dd.deadline_name ||= ''
     end
     due_date_all
   end
 
-  # Iterates through all the due dates and sets the description url to ''
-  def update_due_date_description_url(due_date_all)
+  def update_nil_dd_description_url(due_date_all)
     due_date_all.each do |dd|
       dd.description_url ||= ''
     end
+
     due_date_all
   end
 
-  # When there is a staggered deadline the submission due date and the review due date deadline_type_id are set
-  # If the assignment deadline is not staggered then set the variable to true
-  def assignment_staggered_deadline?
-    if @assignment_form.assignment.staggered_deadline #== true
+  # helper methods for edit
+  def edit_params_setting
+    @assignment = Assignment.find(params[:id])
+    @num_submissions_round = @assignment.find_due_dates('submission').nil? ? 0 : @assignment.find_due_dates('submission').count
+    @num_reviews_round = @assignment.find_due_dates('review').nil? ? 0 : @assignment.find_due_dates('review').count
+
+    @topics = SignUpTopic.where(assignment_id: params[:id])
+    @assignment_form = AssignmentForm.create_form_object(params[:id])
+    @user = current_user
+
+    @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
+    @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
+    @reviewvarycheck = false
+    @due_date_nameurl_not_empty = false
+    @due_date_nameurl_not_empty_checkbox = false
+    @metareview_allowed = false
+    @metareview_allowed_checkbox = false
+    @signup_allowed = false
+    @signup_allowed_checkbox = false
+    @drop_topic_allowed = false
+    @drop_topic_allowed_checkbox = false
+    @team_formation_allowed = false
+    @team_formation_allowed_checkbox = false
+    @participants_count = @assignment_form.assignment.participants.size
+    @teams_count = @assignment_form.assignment.teams.size
+  end
+
+  def assignment_form_assignment_staggered_deadline?
+    if @assignment_form.assignment.staggered_deadline == true
       @review_rounds = @assignment_form.assignment.num_review_rounds
       @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_SUBMISSION }
       @assignment_review_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_REVIEW }
     end
-    # if it is not true then set it to true
     @assignment_form.assignment.staggered_deadline == true
+  end
+
+  def check_due_date_nameurl_not_empty(dd)
+    @due_date_nameurl_not_empty = due_date_nameurl_not_empty?(dd)
+    @due_date_nameurl_not_empty_checkbox = @due_date_nameurl_not_empty
+    @metareview_allowed = meta_review_allowed?(dd)
+    @drop_topic_allowed = drop_topic_allowed?(dd)
+    @signup_allowed = signup_allowed?(dd)
+    @team_formation_allowed = team_formation_allowed?(dd)
   end
 
   def adjust_timezone_when_due_date_present(dd)
@@ -306,14 +312,28 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  # When the submission directory is not set flash error and log
-  # Otherwise when answer tagging is allowed then tagpromptdeployment is initialized with assignment id
-  def missing_submission_directory
+  def handle_assignment_directory_path_nonexist_case_and_answer_tagging
     if @assignment_form.assignment.directory_path.blank?
       flash.now[:error] = "You did not specify your submission directory."
       ExpertizaLogger.error LoggerMessage.new(controller_name, "", "Submission directory not specified", request)
     end
     @assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id]) if @assignment_form.assignment.is_answer_tagging_allowed
+  end
+
+  # helper methods for update
+  def assignment_form_key_nonexist_case_handler
+    @assignment = Assignment.find(params[:id])
+    @assignment.course_id = params[:course_id]
+
+    if @assignment.save
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "The assignment was successfully saved: #{@assignment.as_json}", request)
+      flash[:note] = 'The assignment was successfully saved.'
+      redirect_to list_tree_display_index_path
+    else
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Failed assignment: #{@assignment.errors.full_messages.join(' ')}", request)
+      flash[:error] = "Failed to save the assignment: #{@assignment.errors.full_messages.join(' ')}"
+      redirect_to edit_assignment_path @assignment.id
+    end
   end
 
   def retrieve_assignment_form
@@ -324,14 +344,13 @@ class AssignmentsController < ApplicationController
     end
 
     # Deleting Due date info from table if meta-review is unchecked. - UNITY ID: ralwan and vsreeni
+
     @due_date_info = DueDate.find_each(parent_id: params[:id])
 
     DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all if params[:metareviewAllowed] == "false"
   end
 
-  # If the current user has not set the time zone then flash a message
-  # Then set the time zone equal to the parent timezone
-  def timezone_handler
+  def handle_current_user_timezonepref_nil
     if current_user.timezonepref.nil?
       parent_id = current_user.parent_id
       parent_timezone = User.find(parent_id).timezonepref
@@ -340,9 +359,10 @@ class AssignmentsController < ApplicationController
     end
   end
 
-  # When there have been submissions for reviews then the number of reviews expected can not be reduced
-  # If there are no reviews yet then update the assignment if possible and log results
-  def update_feedback_attributes
+  def update_feedback_assignment_form_attributes
+    # E1973 - numResponses pertains to how many review responses students have made on an assignment
+    # we cannot change if the assignment has teams as reviewers if students have submitted them
+    num_responses = ReviewResponseMap.where(assignment: @assignment_form.assignment).count
     if params[:set_pressed][:bool] == 'false'
       flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."
     elsif params[:assignment_form][:assignment][:reviewer_is_team] != @assignment_form.assignment.reviewer_is_team.to_s && num_responses > 0
@@ -359,32 +379,5 @@ class AssignmentsController < ApplicationController
 
   def assignment_form_params
     params.require(:assignment_form).permit!
-  end
-
-  # helper methods for edit
-  def edit_params_setting
-    @assignment = Assignment.find(params[:id])
-    @num_submissions_round = @assignment.find_due_dates('submission').nil? ? 0 : @assignment.find_due_dates('submission').count
-    @num_reviews_round = @assignment.find_due_dates('review').nil? ? 0 : @assignment.find_due_dates('review').count
-
-    @topics = SignUpTopic.where(assignment_id: params[:id])
-    @assignment_form = AssignmentForm.create_form_object(params[:id])
-    @user = current_user
-
-    @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
-    @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
-    @reviewvarycheck = false
-    @due_date_nameurl_not_empty = false
-    @due_date_nameurl_not_empty_checkbox = false
-    @metareview_allowed = false
-    @metareview_allowed_checkbox = false
-    @signup_allowed = false
-    @signup_allowed_checkbox = false
-    @drop_topic_allowed = false
-    @drop_topic_allowed_checkbox = false
-    @team_formation_allowed = false
-    @team_formation_allowed_checkbox = false
-    @participants_count = @assignment_form.assignment.participants.size
-    @teams_count = @assignment_form.assignment.teams.size
   end
 end

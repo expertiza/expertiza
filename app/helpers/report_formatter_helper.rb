@@ -42,6 +42,13 @@ module ReportFormatterHelper
     @reviewers = TeammateReviewResponseMap.teammate_response_report(@id)
   end
 
+  # Get reviewers for bookmark ratings and topics for assignment
+  def bookmark_rating_response_map(params, _session = nil)
+    assign_basics(params)
+    @reviewers = BookmarkRatingResponseMap.bookmark_response_report(@id)
+    @topics = @assignment.sign_up_topics
+   end
+
   def calibration(params, session)
     assign_basics(params)
     user = session[:user]

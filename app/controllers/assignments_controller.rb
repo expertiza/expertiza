@@ -1,5 +1,6 @@
 class AssignmentsController < ApplicationController
   include AssignmentHelper
+  include AuthorizationHelper
   autocomplete :user, :name
   before_action :authorize
 
@@ -7,15 +8,9 @@ class AssignmentsController < ApplicationController
   # or a TA for the course exists or owner of the Course
   def action_allowed?
     if %w[edit update list_submissions].include? params[:action]
-      assignment = Assignment.find(params[:id])
-      user_id = current_user.try(:id)
-
-      (%w[Super-Administrator Administrator].include? current_role_name) ||
-      (assignment.instructor_id == user_id) ||
-      TaMapping.exists?(ta_id: user_id, course_id: assignment.course_id) ||
-      (assignment.course_id && Course.find(assignment.course_id).instructor_id == user_id)
+      current_user_has_admin_privileges? || current_user_teaching_staff_of_assignment?(params[:id])
     else
-      ['Super-Administrator', 'Administrator', 'Instructor', 'Teaching Assistant'].include? current_role_name
+      current_user_has_ta_privileges?
     end
   end
 
@@ -74,6 +69,7 @@ class AssignmentsController < ApplicationController
     # added it to display the assigned badges while creating a badge in the assignments page
     @assigned_badges = @assignment_form.assignment.badges
     @badges = Badge.all
+    @use_bookmark = @assignment.use_bookmark
   end
 
   def update
@@ -149,7 +145,7 @@ class AssignmentsController < ApplicationController
 
   def associate_assignment_with_course
     @assignment = Assignment.find(params[:id])
-    @courses = Assignment.set_courses_to_assignment(current_user)
+    @courses = Assignment.assign_courses_to_assignment(current_user)
   end
 
   def list_submissions
@@ -349,6 +345,8 @@ class AssignmentsController < ApplicationController
   def update_feedback_attributes
     if params[:set_pressed][:bool] == 'false'
       flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."
+    elsif params[:assignment_form][:assignment][:reviewer_is_team] != @assignment_form.assignment.reviewer_is_team.to_s && num_responses > 0
+      flash[:error] = "You cannot change whether reviewers are teams if reviews have already been completed."
     else
       if @assignment_form.update_attributes(assignment_form_params, current_user)
         flash[:note] = 'The assignment was successfully saved....'

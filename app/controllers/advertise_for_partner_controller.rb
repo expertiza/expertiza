@@ -1,6 +1,25 @@
 class AdvertiseForPartnerController < ApplicationController
+  include AuthorizationHelper
+
   def action_allowed?
-    current_user.role.name.eql?("Student")
+    # Any user with at least a Student role should be able to advertise for a partner
+    # For the create, edit, update, and remove actions the current user should also be a participant in the assignment
+    # 'create' and 'update' are separated from 'edit' and 'remove' because they use different params
+    case params[:action]
+
+    when 'create', 'update'
+      assignment = AssignmentTeam.find_by(id: params[:id]).assignment
+      current_user_is_assignment_participant?(assignment.id) &&
+          current_user_has_student_privileges?
+
+    when 'edit', 'remove'
+      assignment = AssignmentTeam.find_by(id: params[:team_id]).assignment
+      current_user_is_assignment_participant?(assignment.id) &&
+          current_user_has_student_privileges?
+
+    else
+      current_user_has_student_privileges?
+    end
   end
 
   def new; end

@@ -1,9 +1,8 @@
 class ImportFileController < ApplicationController
+  include AuthorizationHelper
+
   def action_allowed?
-    ['Instructor',
-     'Teaching Assistant',
-     'Administrator',
-     'Super-Administrator'].include? current_role_name
+    current_user_has_ta_privileges?
   end
 
   def show

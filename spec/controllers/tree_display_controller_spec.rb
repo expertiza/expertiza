@@ -32,6 +32,8 @@ describe TreeDisplayController do
 
   describe "#ta_for_current_mappings?" do
     it "should return true if current user is a TA for current course" do
+      ta = build(:teaching_assistant)
+      stub_current_user(ta, ta.role.name, ta.role)
       allow(session[:user]).to receive("ta?").and_return(true)
     end
   end
@@ -107,16 +109,23 @@ describe TreeDisplayController do
       @foldernode.type = "FolderNode"
       @foldernode.node_object_id = 1
       @foldernode.save
-      @course = create(:course)
+      @instructor = create(:instructor)
+      stub_current_user(@instructor, @instructor.role.name, @instructor.role)
+      # Course will be associated with the first instructor record we have
+      # For robustness, associate explicitly with our instructor
+      @course = create(:course, instructor_id: @instructor.id)
+      # Course node will be associated with the first course record we have
+      # For robustness, associate explicitly with our course
+      create(:course_node, course: @course)
+      # Assignment node will be associated with the first assignment record we have
+      # (or will cause a new assignment to be built)
       create(:assignment_node)
-      create(:course_node)
-      @instructor = User.where(role_id: 1).first
     end
 
     it "returns a list of course objects(private) as json" do
       params = FolderNode.all
       post :children_node_ng, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @instructor
-      expect(response.body).to match /csc517\/test/
+      expect(response.body).to include @course.directory_path
     end
 
     it "returns an empty list when there are no private or public courses" do
@@ -132,7 +141,7 @@ describe TreeDisplayController do
       @course.private = false
       @course.save
       post :children_node_ng, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @instructor
-      expect(response.body).to match /csc517\/test/
+      expect(response.body).to include @course.directory_path
     end
   end
 

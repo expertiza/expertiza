@@ -9,6 +9,8 @@
 # to
 
 class SignUpSheetController < ApplicationController
+  include AuthorizationHelper
+
   require 'rgl/adjacency'
   require 'rgl/dot'
   require 'rgl/topsort'
@@ -16,17 +18,12 @@ class SignUpSheetController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator',
-       'Student'].include? current_role_name and
-      ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer") : true)
+      (current_user_has_student_privileges? &&
+          (%w[list].include? action_name) &&
+          are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer")) ||
+          current_user_has_student_privileges?
     else
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator'].include? current_role_name
+      current_user_has_ta_privileges?
     end
   end
 
@@ -64,14 +61,20 @@ class SignUpSheetController < ApplicationController
   # Renaming delete method to destroy for rails 4 compatible
   def destroy
     @topic = SignUpTopic.find(params[:id])
+    assignment = Assignment.find(params[:assignment_id])
     if @topic
       @topic.destroy
       undo_link("The topic: \"#{@topic.topic_name}\" has been successfully deleted. ")
     else
       flash[:error] = "The topic could not be deleted."
     end
-    # changing the redirection url to topics tab in edit assignment view.
-    redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
+    # Akshay - redirect to topics tab if there are still any topics left, otherwise redirect to
+    # assignment's edit page
+    if assignment.topics?
+      redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
+    else
+      redirect_to edit_assignment_path(params[:assignment_id])
+    end
   end
 
   # prepares the page. shows the form which can be used to enter new values for the different properties of an assignment
@@ -95,8 +98,19 @@ class SignUpSheetController < ApplicationController
     else
       flash[:error] = "The topic could not be updated."
     end
-    # changing the redirection url to topics tab in edit assignment view.
-    redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-5"
+    # Akshay - correctly changing the redirection url to topics tab in edit assignment view.
+    redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"
+  end
+
+  # This deletes all topics for the given assignment
+  def delete_all_topics_for_assignment
+    topics = SignUpTopic.where(assignment_id: params[:assignment_id])
+    topics.each(&:destroy)
+    flash[:success] = "All topics have been deleted successfully."
+    respond_to do |format|
+      format.html { redirect_to edit_assignment_path(params[:assignment_id]) }
+      format.js {}
+    end
   end
 
   # This displays a page that lists all the available topics for an assignment.
@@ -160,6 +174,7 @@ class SignUpSheetController < ApplicationController
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     @max_team_size = @assignment.max_team_size
     team_id = @participant.team.try(:id)
+    @use_bookmark = @assignment.use_bookmark
 
     if @assignment.is_intelligent
       @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
@@ -412,7 +427,8 @@ class SignUpSheetController < ApplicationController
     end
     if @sign_up_topic.save
       undo_link "The topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. "
-      redirect_to edit_assignment_path(@sign_up_topic.assignment_id) + "#tabs-5"
+      # Akshay - correctly changing the redirection url to topics tab in edit assignment view.
+      redirect_to edit_assignment_path(@sign_up_topic.assignment_id) + "#tabs-2"
     else
       render action: 'new', id: params[:id]
     end

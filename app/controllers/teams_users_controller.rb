@@ -1,8 +1,8 @@
 class TeamsUsersController < ApplicationController
+  include AuthorizationHelper
+
   def action_allowed?
-    ['Instructor',
-     'Teaching Assistant',
-     'Administrator'].include? current_role_name
+    current_user_has_ta_privileges?
   end
 
   def auto_complete_for_user_name
@@ -30,32 +30,34 @@ class TeamsUsersController < ApplicationController
 
     team = Team.find(params[:id])
 
-    if team.is_a?(AssignmentTeam)
-      assignment = Assignment.find(team.parent_id)
-      if AssignmentParticipant.find_by(user_id: user.id, assignment_id: assignment.id).nil?
-        urlAssignmentParticipantList = url_for controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment', authorization: 'participant'
-        flash[:error] = "\"#{user.name}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
-      else
-        add_member_return = team.add_member(user, team.parent_id)
-        flash[:error] = "This team already has the maximum number of members." if add_member_return == false
-
-        @teams_user = TeamsUser.last
-        undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
-      end
-    else # CourseTeam
-      course = Course.find(team.parent_id)
-      if CourseParticipant.find_by(user_id: user.id, parent_id: course.id).nil?
-        urlCourseParticipantList = url_for controller: 'participants', action: 'list', id: course.id, model: 'Course', authorization: 'participant'
-        flash[:error] = "\"#{user.name}\" is not a participant of the current course. Please <a href=\"#{urlCourseParticipantList}\">add</a> this user before continuing."
-      else
-        add_member_return = team.add_member(user)
-        flash[:error] = "This team already has the maximum number of members." if add_member_return == false
-
-        @teams_user = TeamsUser.last
-        undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
+    if !user.nil?
+      if team.is_a?(AssignmentTeam)
+        assignment = Assignment.find(team.parent_id)
+        if AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id).nil?
+          urlAssignmentParticipantList = url_for controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment', authorization: 'participant'
+          flash[:error] = "\"#{user.name}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
+        else
+          add_member_return = team.add_member(user, team.parent_id)
+          flash[:error] = "This team already has the maximum number of members." if add_member_return == false
+  
+          @teams_user = TeamsUser.last
+          undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
+        end
+      else # CourseTeam
+        course = Course.find(team.parent_id)
+        if CourseParticipant.find_by(user_id: user.id, parent_id: course.id).nil?
+          urlCourseParticipantList = url_for controller: 'participants', action: 'list', id: course.id, model: 'Course', authorization: 'participant'
+          flash[:error] = "\"#{user.name}\" is not a participant of the current course. Please <a href=\"#{urlCourseParticipantList}\">add</a> this user before continuing."
+        else
+          add_member_return = team.add_member(user)
+          flash[:error] = "This team already has the maximum number of members." if add_member_return == false
+  
+          @teams_user = TeamsUser.last
+          undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
+        end
       end
     end
-
+    
     redirect_to controller: 'teams', action: 'list', id: team.parent_id
   end
 

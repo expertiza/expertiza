@@ -1,12 +1,13 @@
 class NotificationsController < ApplicationController
   before_action :set_notification, only: %i[show edit update destroy]
   helper_method :validate_params
+
   include SecurityHelper
+  include AuthorizationHelper
+
   # Give permission to manage notifications to appropriate roles
   def action_allowed?
-    ['Instructor',
-     'Teaching Assistant',
-     'Administrator'].include? current_role_name
+    current_user_has_ta_privileges?
   end
 
   def run_get_notification
@@ -36,8 +37,7 @@ class NotificationsController < ApplicationController
 
   # POST /notifications
   def create
-    if params[:notification] && (warn_for_special_chars(params[:notification][:subject], "Subject") ||
-        warn_for_special_chars(params[:notification][:description], "Description"))
+    if params[:notification]
       redirect_back
       return
     end

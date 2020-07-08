@@ -99,7 +99,7 @@
 
         <!--Reviewed by-->
         <tr style="background-color:<%=bgcolor2%>">
-          <td width="50%" style="vertical-align:top;"><%= map.reviewer.name(session[:ip]) %> (<%= map.reviewer.fullname(session[:ip]) %>)
+          <td width="50%" style="vertical-align:top;"><%= map.get_reviewer.name %> (<%= map.get_reviewer.fullname %>)
             <div style="text-align:right">
               <div id="review_status<%=map.map_id%>">
                 <% if(Response.where(map_id: map.map_id).last.nil?) %>

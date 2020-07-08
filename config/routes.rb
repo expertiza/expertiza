@@ -1,7 +1,9 @@
+
 Expertiza::Application.routes.draw do
   ###
   # Please insert new routes alphabetically!
   ###
+
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
 
@@ -111,9 +113,19 @@ Expertiza::Application.routes.draw do
       post :export
       post :exportdetails
       post :export_advices
+      put :exporttags
+      post :exporttags
     end
   end
 
+  put '/tags.csv', to: 'export_file#export_tags'
+
+  resources :export_tags, only: [] do
+    collection do
+      put :exporttags
+      post :exporttags
+    end
+  end
   resources :grades, only: %i[edit update] do
     collection do
       get :view
@@ -176,6 +188,12 @@ resources :institution, except: [:destroy] do
       get :list
     end
   end
+  
+  resources :lock do
+    collection do
+      post :release_lock
+    end
+  end
 
   resources :notifications
 
@@ -220,21 +238,31 @@ resources :institution, except: [:destroy] do
       get :set_publish_permission
     end
   end
-
+#Nitin - removed quiz related routes from questionnaires controller
   resources :questionnaires, only: %i[new create edit update] do
     collection do
       get :copy
-      get :new_quiz
       get :select_questionnaire_type
       post :select_questionnaire_type
       get :toggle_access
-      get :view
-      post :create_quiz_questionnaire
-      post :update_quiz
+      get :view  
       post :add_new_questions
       post :save_all_questions
     end
   end
+=begin
+#Nitin - Created new routes for quiz_questionnaire
+  resources :quiz_questionnaire, only: %i[new create edit update] do
+    collection do
+      get :new_quiz
+      post :create_quiz_questionnaire
+      get :edit_quiz
+      post :update_quiz
+      
+    end
+  end
+=end
+  resources :quiz_questionnaires
 
   resources :author_feedback_questionnaires, controller: :questionnaires
   resources :review_questionnaires, controller: :questionnaires
@@ -275,7 +303,6 @@ resources :institution, except: [:destroy] do
       get :redirect
       get :show_calibration_results_for_student
       post :custom_create
-      get :pending_surveys
       get :json
     end
   end
@@ -321,6 +348,8 @@ resources :institution, except: [:destroy] do
     end
   end
 
+  resources :sample_reviews
+
   resources :sign_up_sheet, except: %i[index show] do
     collection do
       get :signup
@@ -336,6 +365,7 @@ resources :institution, except: [:destroy] do
       get :intelligent_sign_up
       get :intelligent_save
       get :signup_as_instructor
+      post :delete_all_topics_for_assignment
       post :signup_as_instructor_action
       post :set_priority
       post :save_topic_deadlines
@@ -411,6 +441,7 @@ resources :institution, except: [:destroy] do
     collection do
       get :list
       get :reminder_thread
+      get :pending_surveys
     end
   end
 
@@ -454,9 +485,20 @@ resources :institution, except: [:destroy] do
     collection do
       get :list
       post :list
+      post ':id', action: :update
+      post :show_if_authorized
+      get :auto_complete_for_user_name
+      get :set_anonymized_view
+      get :keys
+    end
+  end
+
+  resources :account_request, constraints: {id: /\d+/} do
+    collection do
+      get :list
+      post :list
       get :list_pending_requested
       post ':id', action: :update
-      get :show_selection
       get :auto_complete_for_user_name
       get :set_anonymized_view
       get :keys
@@ -489,4 +531,9 @@ resources :institution, except: [:destroy] do
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
   get ':controller(/:action(/:id))(.:format)'
   match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
+  post '/response_toggle_permission/:id' => 'response#toggle_permission'
+  post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'
+  post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'
+
 end
+

@@ -146,7 +146,7 @@ FactoryBot.define do
 
   factory :course, class: Course do
     sequence(:name) {|n| "CSC517, test#{n}" }
-    instructor { Instructor.where(role_id: 1).first || association(:instructor) }
+    instructor { Instructor.first || association(:instructor) }
     directory_path 'csc517/test'
     info 'Object-Oriented Languages and Systems'
     private true
@@ -220,6 +220,7 @@ FactoryBot.define do
 
   factory :team_user, class: TeamsUser do
     team { AssignmentTeam.first || association(:assignment_team) }
+    # Beware: it is fragile to assume that role_id of student is 2 (or any other unchanging value)
     user { User.where(role_id: 2).first || association(:student) }
   end
 
@@ -336,6 +337,12 @@ FactoryBot.define do
     type 'AssignmentNode'
   end
 
+  factory :assignment_team_node, class: TeamNode do
+    node_object { AssignmentTeam.first || association(:assignment_team) }
+    node_object_id 1
+    type 'TeamNode'
+  end
+
   factory :course_node, class: CourseNode do
     course { Course.first || association(:course) }
     node_object_id 1
@@ -344,7 +351,8 @@ FactoryBot.define do
 
   factory :questionnaire, class: ReviewQuestionnaire do
     name 'Test questionnaire'
-    instructor { Instructor.where(role_id: 1).first || association(:instructor) }
+    # Beware: it is fragile to assume that role_id of instructor is 1 (or any other unchanging value)
+    instructor { Instructor.first || association(:instructor) }
     private 0
     min_question_score 0
     max_question_score 5
@@ -381,6 +389,14 @@ FactoryBot.define do
     dropdown 1
   end
 
+  factory :bookmark_questionnaire, class: BookmarkRatingQuestionnaire do
+    name "BookmarkRatingQuestionnaire"
+    assignments {[ Assignment.first || association(:assignment) ]}
+    min_question_score 0
+    max_question_score 5
+    type 'BookmarkRatingQuestionnaire'
+  end
+
   factory :review_response_map, class: ReviewResponseMap do
     assignment { Assignment.first || association(:assignment) }
     reviewer { AssignmentParticipant.first || association(:participant) }
@@ -397,12 +413,21 @@ FactoryBot.define do
     calibrate_to 0
   end
 
+  factory :bookmark_review_response_map, class: BookmarkRatingResponseMap do
+    assignment { Assignment.first || association(:assignment) }
+    reviewer { AssignmentParticipant.first || association(:participant) }
+    reviewee { Bookmark.first || association(:assignment_team) }
+    type 'BookmarkRatingResponseMap'
+    calibrate_to 0
+  end
+
   factory :response, class: Response do
     response_map { ReviewResponseMap.first || association(:review_response_map) }
     additional_comment nil
     version_num nil
     round 1
     is_submitted false
+    visibility 'private'
   end
 
   factory :submission_record, class: SubmissionRecord do
@@ -413,7 +438,7 @@ FactoryBot.define do
     created_at Time.now
   end
 
-  factory :requested_user, class: RequestedUser do
+  factory :requested_user, class: AccountRequest do
     name 'requester1'
     role_id 2
     fullname 'requester, requester'
@@ -449,8 +474,42 @@ FactoryBot.define do
     content_page_id nil
   end
 
+  factory :bookmark, class: Bookmark do
+    id 1
+    url 'example.com'
+    title 'Test Bookmark'
+    description 'Test description'
+    user_id '1234'
+    topic_id '1'
+    created_at '2020-03-24 12:10:20'
+    updated_at '2020-03-24 12:10:20'
+  end
+
   factory :site_controller, class: SiteController do
     id 1
     name 'fake_site'
   end
+
+  factory :version, class: Version do
+    item_type 'Node'
+    item_id 1
+    event 'create'
+    whodunnit nil
+    object nil
+    created_at '2015-06-11 15:11:51'
+  end
+
+  factory :test_user, class: User do
+    name 'username'
+    fullname 'full name'
+    email 'abc@mailinator.com'
+    end
+
+  # factory :bookmark do
+  #   id 1
+  #   url "www.fake.com"
+  #   title "fake bookmark title"
+  #   description "fake bookmark description"
+  # end
+
 end

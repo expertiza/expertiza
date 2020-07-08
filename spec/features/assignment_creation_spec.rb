@@ -227,7 +227,7 @@ describe "assignment function" do
       fill_in 'assignment_form_assignment_directory_path', with: 'testDirectory'
 
       find_link('ReviewStrategy').click
-      expect(page).to have_content("Review Strategy")
+      expect(page).to have_content("Review strategy")
     end
 
     it "is able show tab due deadlines" do
@@ -442,6 +442,7 @@ describe "assignment function" do
       assignment = create(:assignment, name: 'public assignment for test')
       login_as("instructor6")
       visit "/assignments/#{assignment.id}/edit"
+      check("assignment_has_topics")
       click_link 'Topics'
     end
 
@@ -499,11 +500,12 @@ describe "assignment function" do
     end
 
     it "Delete existing topic", js: true do
+      create(:assignment_due_date, deadline_type: DeadlineType.where(name: "submission").first, due_at: DateTime.now.in_time_zone + 1.day)
       click_link 'Due date'
       fill_in 'assignment_form_assignment_rounds_of_reviews', with: '1'
       click_button 'set_rounds'
-      fill_in 'datetimepicker_submission_round_1', with: (Time.now.in_time_zone + 1.day).strftime("%Y/%m/%d %H:%M")
-      fill_in 'datetimepicker_review_round_1', with: (Time.now.in_time_zone + 10.days).strftime("%Y/%m/%d %H:%M")
+      # fill_in 'datetimepicker_submission_round_1', with: (Time.current + 1.day).strftime("%Y/%m/%d %H:%M")
+      # fill_in 'datetimepicker_review_round_1', with: (Time.now.in_time_zone + 1.day).strftime("%Y/%m/%d %H:%M")
       click_button 'submit_btn'
       assignment = Assignment.where(name: 'public assignment for test').first
       create(:topic, assignment_id: assignment.id)
@@ -514,6 +516,16 @@ describe "assignment function" do
 
       topics_exist = SignUpTopic.where(assignment_id: assignment.id).count
       expect(topics_exist).to be_eql 0
+    end
+
+    it "hides topics tab when has topics is un-checked", js: true do
+      click_link 'General'
+      uncheck("assignment_has_topics")
+      # The below line is used to accept the js confirmation popup
+      page.driver.browser.switch_to.alert.accept
+      # Wait for topics to be removed and page to re-load
+      sleep 3
+      expect(page).not_to have_link('Topics')
     end
   end
 

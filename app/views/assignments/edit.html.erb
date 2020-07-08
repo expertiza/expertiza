@@ -5,14 +5,14 @@
     <div class= "table" id="tabs">
       <ul>
         <li><a href="#tabs-1" id="General">General</a></li>
-        <li><a href="#tabs-2" id="Topics">Topics</a></li>
+        <li id="topics_tab_header"><a href="#tabs-2" id="Topics">Topics</a></li>
         <li><a href="#tabs-3" id="Rubrics">Rubrics</a></li>
         <li><a href="#tabs-4" id="ReviewStrategy">Review strategy</a></li>
         <li><a href="#tabs-5" id="DueDates">Due dates</a></li>
         <% if @assignment_form.assignment.is_calibrated %>
             <li><a href="#tabs-6" id="Calibration">Calibration</a></li>
         <% end %>
-        <% if @assignment_form.assignment.has_badge? %>
+        <% if @assignment_form.assignment.badge? %>
           <li><a href="#tabs-7" id="Badges">Badges</a></li>
         <% end %>
         <li><a href="#tabs-8" id="Other">Other stuff</a></li>
@@ -68,7 +68,7 @@
           <%= render 'assignments/edit/calibration' %>
         </div>
       <% end %>
-      <% if @assignment_form.assignment.has_badge? %>
+      <% if @assignment_form.assignment.badge? %>
         <div id="tabs-7">
           <%= render 'assignments/edit/badges' %>
         </div>

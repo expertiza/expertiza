@@ -154,4 +154,31 @@ module AssignmentHelper
     end
   end
 
+  # helper methods for update
+  # Finds assignment and course id, if the assignment is savable then flash and log
+  # If it is not savable then flash and log appropriately
+  def assignment_submission_handler
+    @assignment = Assignment.find(params[:id])
+    @assignment.course_id = params[:course_id]
+
+    if @assignment.save
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "The assignment was successfully saved: #{@assignment.as_json}", request)
+      flash[:note] = 'The assignment was successfully saved.'
+      redirect_to list_tree_display_index_path
+    else
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Failed assignment: #{@assignment.errors.full_messages.join(' ')}", request)
+      flash[:error] = "Failed to save the assignment: #{@assignment.errors.full_messages.join(' ')}"
+      redirect_to edit_assignment_path @assignment.id
+    end
+  end
+
+  # Setting various variables with boolean values
+  def check_due_date_nameurl(dd)
+    @due_date_nameurl_not_empty = due_date_nameurl_not_empty?(dd)
+    @due_date_nameurl_not_empty_checkbox = @due_date_nameurl_not_empty
+    @metareview_allowed = meta_review_allowed?(dd)
+    @drop_topic_allowed = drop_topic_allowed?(dd)
+    @signup_allowed = signup_allowed?(dd)
+    @team_formation_allowed = team_formation_allowed?(dd)
+  end
 end

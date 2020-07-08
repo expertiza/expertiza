@@ -127,10 +127,11 @@ describe AssignmentsController do
         }
       }
     end
-    context 'when assignment_form is saved successfully' do
+    context 'when assignment_form is saved and updated successfully' do
       it 'redirects to assignment#edit page' do
         allow(assignment_form).to receive(:assignment).and_return(assignment)
         allow(assignment_form).to receive(:save).and_return(true)
+        # assignment_form is also updated after it is saved
         allow(assignment_form).to receive(:update).with(any_args).and_return(true)
         allow(assignment_form).to receive(:create_assignment_node).and_return(double('node'))
         allow(assignment).to receive(:id).and_return(1)
@@ -139,6 +140,22 @@ describe AssignmentsController do
           .with('Assignment "test assignment" has been created successfully. ').and_return(true)
         post :create, @params
         expect(response).to redirect_to('/assignments/1/edit')
+      end
+    end
+
+    context 'when assignment_form is saved successfully but fails to update' do
+      it 'renders assignment#new page' do
+        allow(assignment_form).to receive(:assignment).and_return(assignment)
+        allow(assignment_form).to receive(:save).and_return(true)
+        # assignment_form is also updated after it is saved
+        allow(assignment_form).to receive(:update).with(any_args).and_return(false)
+        allow(assignment_form).to receive(:create_assignment_node).and_return(double('node'))
+        allow(assignment).to receive(:id).and_return(1)
+        allow(Assignment).to receive(:find_by).with(name: 'test assignment').and_return(assignment)
+        allow_any_instance_of(AssignmentsController).to receive(:undo_link)
+          .with('Assignment "test assignment" has been created successfully. ').and_return(true)
+        post :create, @params
+        expect(response).to render_template(:new)
       end
     end
 

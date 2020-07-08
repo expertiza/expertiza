@@ -136,7 +136,7 @@ class SubmittedContentController < ApplicationController
           to: User.find(Participant.find(map.reviewer_id).user_id).email,
           subject:  "Link to update the review for Assignment '#{@participant.assignment.name}'",
           cc: User.find_by(@participant.assignment.instructor_id).email,
-          link: "Link: http://https://expertiza.ncsu.edu/response/new?id=#{map.id}",
+          link: "Link: https://expertiza.ncsu.edu/response/new?id=#{map.id}",
           assignment: @participant.assignment.name
         ).deliver_now
       end

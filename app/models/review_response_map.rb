@@ -44,19 +44,9 @@ class ReviewResponseMap < ResponseMap
   end
 
   def self.import(row_hash, _session, assignment_id)
-    reviewee_user_name = row_hash[:reviewee].to_s
-    reviewee_user = User.find_by(name: reviewee_user_name)
-    raise ArgumentError, "Cannot find reviewee user." unless reviewee_user
-    reviewee_participant = AssignmentParticipant.find_by(user_id: reviewee_user.id, parent_id: assignment_id)
-    raise ArgumentError, "Reviewee user is not a participant in this assignment." unless reviewee_participant
-    reviewee_team = AssignmentTeam.team(reviewee_participant)
-    if reviewee_team.nil? # lazy team creation: if the reviewee does not have team, create one.
-      reviewee_team = AssignmentTeam.create(name: 'Team' + '_' + rand(1000).to_s,
-                                            parent_id: assignment_id, type: 'AssignmentTeam')
-      t_user = TeamsUser.create(team_id: reviewee_team.id, user_id: reviewee_user.id)
-      team_node = TeamNode.create(parent_id: assignment_id, node_object_id: reviewee_team.id)
-      TeamUserNode.create(parent_id: team_node.id, node_object_id: t_user.id)
-    end
+    reviewee_team = Team.where(name: row_hash[:reviewee].to_s, parent_id: assignment_id).first
+    raise ArgumentError, "Could not find a team with name #{row_hash[:reviewee].to_s}, please import teams first" unless reviewee_team
+    return unless reviewee_team
     row_hash[:reviewers].each do |reviewer|
       reviewer_user_name = reviewer.to_s
       reviewer_user = User.find_by(name: reviewer_user_name)

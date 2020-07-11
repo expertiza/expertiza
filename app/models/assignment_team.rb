@@ -235,7 +235,7 @@ class AssignmentTeam < Team
     fields = []
     fields.push("Team Name")
     fields.push("Team members") if options[:team_name] == "false"
-    fields.push("Assignment Name")
+    # fields.push("Assignment Name")
   end
 
   # Remove a team given the team id

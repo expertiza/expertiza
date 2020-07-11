@@ -182,7 +182,7 @@ class Team < ActiveRecord::Base
   #  changed to hash by E1776
   def self.import(row_hash, id, options, teamtype)
 
-    raise ArgumentError, "Not enough fields on this line." if row_hash.empty? || (row_hash[:teammembers].length < 2 && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last")) || (row_hash[:teammembers].empty? && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"))
+    raise ArgumentError, "Not enough fields on this line." if row_hash.empty? || (row_hash[:teammembers].length < 1 && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last")) || (row_hash[:teammembers].empty? && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"))
     if options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"
       name = row_hash[:teamname].to_s
       team = where(["name =? && parent_id =?", name, id]).first

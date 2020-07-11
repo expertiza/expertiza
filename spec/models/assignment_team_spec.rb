@@ -134,7 +134,7 @@ describe 'AssignmentTeam' do
   describe ".export_fields" do
     context "when team has name" do
       it "exports the fields" do
-        expect(AssignmentTeam.export_fields(team)).to eq(["Team Name", "Assignment Name"])
+        expect(AssignmentTeam.export_fields(team)).to eq(["Team Name"])
       end
     end
   end

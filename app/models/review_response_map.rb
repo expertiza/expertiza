@@ -44,7 +44,7 @@ class ReviewResponseMap < ResponseMap
   end
 
   def self.import(row_hash, _session, assignment_id)
-    reviewee_team = Team.where(name: row_hash[:reviewee].to_s, parent_id: assignment_id).first
+    reviewee_team = Team.find_by(name: row_hash[:reviewee].to_s, parent_id: assignment_id)
     raise ArgumentError, "Could not find a team with name #{row_hash[:reviewee].to_s}, please import teams first" unless reviewee_team
     return unless reviewee_team
     row_hash[:reviewers].each do |reviewer|

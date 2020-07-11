@@ -209,6 +209,7 @@ class AssignmentTeam < Team
     fields = []
     fields.push("Team Name")
     fields.push("Team members") if options[:team_name] == "false"
+    fields
     # fields.push("Assignment Name")
   end
 

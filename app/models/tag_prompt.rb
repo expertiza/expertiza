@@ -12,8 +12,8 @@ class TagPrompt < ActiveRecord::Base
       tag_prompt_deployments.each do |tag_dep|
         if tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold.to_i
           tag_prompt = TagPrompt.find(tag_dep.tag_prompt_id)
-          tag_is_confident = ReviewMetricsQuery.confident?(tag_dep.tag_prompt.prompt, answer.id)
-          html += tag_prompt.html_control(tag_dep, answer, user_id) unless tag_is_confident
+          html += tag_prompt.html_control(tag_dep, answer, user_id)
+        end
       end
       html += '</td></tr>'
     end
@@ -22,6 +22,8 @@ class TagPrompt < ActiveRecord::Base
   end
 
   def html_control(tag_prompt_deployment, answer, user_id)
+    return ''.html_safe if ReviewMetricsQuery.confident?(tag_prompt_deployment.tag_prompt.prompt, answer.id)
+
     html = ""
     unless answer.nil?
       stored_tags = AnswerTag.where(tag_prompt_deployment_id: tag_prompt_deployment.id, answer_id: answer.id, user_id: user_id)
@@ -42,6 +44,8 @@ class TagPrompt < ActiveRecord::Base
         end
       end
     end
+    html += "#{ReviewMetricsQuery.confident?(prompt, answer.id)} "
+    html += ReviewMetricsQuery.confidence(prompt, answer.id).to_s
     html.html_safe
   end
 

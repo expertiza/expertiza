@@ -70,10 +70,11 @@ class ReviewMetricsQuery
     ws_input = {'reviews' => []}
     # see if this set of reviews has already been retrieved by a query
     reviews = @queried_results.find {|_key, value| value.find {|r| r['id'] == review_id } }
+
     if reviews
       # use output from previous query which is already in a format used by the ws
       # thus avoid the need to gather the same data from the database again
-      ws_input['reviews'] = reviews
+      ws_input['reviews'] = reviews[1]
     else
       reviews = reviews_to_be_cached(review_id)
       reviews.each do |review|
@@ -82,7 +83,8 @@ class ReviewMetricsQuery
     end
 
     # ask MetricsController to make a call to the review metrics web service
-    ws_output = MetricsController.new.bulk_service_retrival(ws_input, request.split('_'))
+    confidence = request.split('_').count > 1
+    ws_output = MetricsController.new.bulk_service_retrival(ws_input, request.split('_')[0], confidence)
     @queried_results[request] = ws_output['reviews']
   end
 

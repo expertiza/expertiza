@@ -1,6 +1,6 @@
 class MetricsController
-  def bulk_service_retrival(reviews,metric,confidence)
-    if confidence
+  def bulk_service_retrival(reviews,metric,type)
+    if type == 'confidence'
         if %w(problem suggestions sentiment emotions).include?(metric)
           reviews['reviews'].each do |review|
             output_to_append = {'confidence': rand }

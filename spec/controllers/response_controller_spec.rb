@@ -15,6 +15,9 @@ describe ResponseController do
   let(:team_response_map) { build(:review_response_map, id: 2, reviewer: participant, reviewer_is_team: true) }
   let(:team_questionnaire) {build(:questionnaire, id: 2)}
   let(:team_assignment) {build(:assignment, id: 2)}
+  let(:assignment_team) { build(:assignment_team, id: 1) }
+  let(:signed_up_team) { build(:signed_up_team, team_id: assignment_team.id) }
+  let(:assignment_form) { AssignmentForm.new }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -32,7 +35,9 @@ describe ResponseController do
     
     allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
     allow(review_response).to receive(:map).and_return(review_response_map)
+
     allow(team_response).to receive(:map).and_return(team_response_map)
+    allow(SignedUpTeam).to receive(:find_by).with(team_id: assignment_team.id).and_return(signed_up_team)
   end
 
   describe '#action_allowed?' do
@@ -183,20 +188,12 @@ describe ResponseController do
 
   describe '#new' do
     it 'renders response#response page' do
-      allow(ResponseMap).to receive(:find).with('1').and_return(review_response_map)
+      allow(AssignmentForm).to receive(:create_form_object).with(1).and_return(assignment_form)
+      allow(assignment_form).to receive(:assignment_questionnaire).with('ReviewQuestionnaire', 1, 1).and_return(assignment_questionnaire)
       allow(SignedUpTeam).to receive(:where).with(team_id: 1, is_waitlisted: 0).and_return([double('SignedUpTeam', topic_id: 1)])
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       allow(AssignmentDueDate).to receive(:find_by).with(any_args).and_return(assignment_due_date)
-      # varying_rubrics_by_round?
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
-      # review_questionnaire_id
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire])
-      # set_dropdown_or_scale
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 1).and_return([assignment_questionnaire])
-      allow(Questionnaire).to receive(:find).with(any_args).and_return(questionnaire)
-      allow(Questionnaire).to receive(:questions).and_return(question)
-      allow(Answer).to receive(:create).and_return(answer)
       params = {
         id: 1,
         feedback: '',
@@ -365,32 +362,4 @@ describe ResponseController do
     end
   end
 
-  # describe '#pending_surveys' do
-  #   context 'when session[:user] is nil' do
-  #     it 'redirects to root path (/)' do
-  #       params = {}
-  #       session[:user] = nil
-  #       get :pending_surveys, params, session
-  #       expect(response).to redirect_to('/')
-  #     end
-  #   end
-  #
-  #   context 'when session[:user] is not nil' do
-  #     it 'renders pending_surveys page' do
-  #       allow(CourseParticipant).to receive(:where).with(user_id: 6).and_return([double('CourseParticipant', id: 8, parent_id: 1)])
-  #       allow(AssignmentParticipant).to receive(:where).with(user_id: 6).and_return([participant])
-  #       survey_deployment = double('SurveyDeployment', id: 1, questionnaire_id: 1, global_survey_id: 1,
-  #                                                      start_date: DateTime.now.in_time_zone - 1.day, end_date: DateTime.now.in_time_zone + 1.day)
-  #       allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire)
-  #       allow(CourseSurveyDeployment).to receive(:where).with(parent_id: 1).and_return([survey_deployment])
-  #       participant.parent_id = 1
-  #       allow(AssignmentSurveyDeployment).to receive(:where).with(parent_id: 1).and_return([survey_deployment])
-  #       params = {}
-  #       session = {user: instructor}
-  #       get :pending_surveys, params, session
-  #       expect(controller.instance_variable_get(:@surveys).size).to eq(2)
-  #       expect(response).to render_template(:pending_surveys)
-  #     end
-  #   end
-  # end
 end

@@ -110,6 +110,7 @@ class Response < ActiveRecord::Base
       else
         assignment = Participant.find(map.reviewer_id).assignment
       end
+      topic_id = SignedUpTeam.find_by(team_id: map.reviewee_id).topic_id
       questionnaire = Questionnaire.find(assignment.review_questionnaire_id)
     end
     questionnaire

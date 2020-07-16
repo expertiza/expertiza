@@ -1,10 +1,12 @@
 describe "Staggered deadline test" do
   before(:each) do
+
     # assignment and topic
     create(:assignment,
            name: "Assignment1665",
            directory_path: "Assignment1665",
            rounds_of_reviews: 2,
+           vary_by_round: true,
            staggered_deadline: true,
            max_team_size: 1,
            allow_selecting_additional_reviews_after_1st_round: true)
@@ -16,8 +18,8 @@ describe "Staggered deadline test" do
     # rubric
     create(:questionnaire, name: "TestQuestionnaire1")
     create(:questionnaire, name: "TestQuestionnaire2")
-    create(:question, txt: "Question1", questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first, type: "Criterion")
-    create(:question, txt: "Question2", questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first, type: "Criterion")
+    create(:question, txt: "Question1", questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first)
+    create(:question, txt: "Question2", questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first)
     create(:assignment_questionnaire, questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first, used_in_round: 1)
     create(:assignment_questionnaire, questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first, used_in_round: 2)
 
@@ -47,6 +49,7 @@ describe "Staggered deadline test" do
     topic_due('review', DateTime.now.in_time_zone + 20, 2, 1)
     topic_due('submission', DateTime.now.in_time_zone + 30, 2, 2, 1)
     topic_due('review', DateTime.now.in_time_zone + 40, 2, 2)
+
   end
 
   # create assignment deadline

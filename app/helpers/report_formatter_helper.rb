@@ -1,4 +1,6 @@
 module ReportFormatterHelper
+
+  # E1936 team recommends this method be REMOVED (it does not seem to be used anywhere in Expertiza as of 4/21/19)
   def summary_by_reviewee_and_criteria(params, _session = nil)
     assign_basics(params)
     sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(@assignment, @summary_ws_url)
@@ -9,6 +11,7 @@ module ReportFormatterHelper
     @avg_scores_by_criterion = sum.avg_scores_by_criterion
   end
 
+  # E1936 team recommends this method be REMOVED (it does not seem to be used anywhere in Expertiza as of 4/21/19)
   def summary_by_criteria(params, _session = nil)
     assign_basics(params)
     sum = SummaryHelper::Summary.new.summarize_reviews_by_criterion(@assignment, @summary_ws_url)
@@ -29,7 +32,7 @@ module ReportFormatterHelper
   def feedback_response_map(params, _session = nil)
     assign_basics(params)
     # If review report for feedback is required call feedback_response_report method in feedback_review_response_map model
-    if @assignment.varying_rubrics_by_round?
+    if @assignment.vary_by_round
       @authors, @all_review_response_ids_round_one, @all_review_response_ids_round_two, @all_review_response_ids_round_three =
         FeedbackResponseMap.feedback_response_report(@id, @type)
     else

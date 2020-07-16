@@ -21,6 +21,7 @@ end
 
 def login_and_create_quiz
   login_as @student.name
+  click_link 'Assignments'
   click_link @assignment.name
   click_link 'Your work'
   click_link 'Create a quiz'

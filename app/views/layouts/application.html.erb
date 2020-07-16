@@ -18,7 +18,9 @@
     <div class="wrapper">
       <div class="main">
         <div class="content">
-          <%= render 'shared/flash_messages' %>
+          <div id="application-flash-div">
+            <%= render 'shared/flash_messages' %>
+          </div>
           <% if session[:user] %>
             <%= render 'shared/flash_notifications' %> <%# display notifications, Randal Myers, 22 March 2017 %>
           <% end %>

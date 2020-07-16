@@ -1,4 +1,4 @@
-<% if !@assignment.varying_rubrics_by_round? %>
+<% if !@assignment.vary_by_round %>
     <!--Score awarded / Avg. score-->
     <div>
     <% if @review_scores[reviewer_id][team_id] != -1%>

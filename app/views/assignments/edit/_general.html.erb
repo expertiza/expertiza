@@ -272,17 +272,19 @@ function microtaskChanged() {
 
         jQuery("#questionnaire_table_TeammateReviewQuestionnaire").remove()
         if (checkbox.is(':checked')) {
-          team_count_field.removeAttr('hidden');
-          team_formation_due_date_checkbox.removeAttr('hidden')
-          jQuery('#assignment_form_assignment_max_team_size').val('2');
-          teammate_reviews_field.removeAttr('hidden');
-          addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
-          addQuestionnaireTableRow(
-                  'TeammateReviewQuestionnaire',
-                  null,
-                  <%= questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
-                  <%= assignment_questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
-                  <%= questionnaire_options(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>
+            team_count_field.removeAttr('hidden');
+            team_formation_due_date_checkbox.removeAttr('hidden')
+            jQuery('#assignment_form_assignment_max_team_size').val('2');
+            teammate_reviews_field.removeAttr('hidden');
+            addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
+            <% assignment_questionnaire = @assignment_form.assignment_questionnaire('TeammateReviewQuestionnaire', nil, nil) %>
+            <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'TeammateReviewQuestionnaire') %>
+            addQuestionnaireTableRow(
+                'TeammateReviewQuestionnaire',
+                <%= assignment_questionnaire.to_json.html_safe %>,
+                <%= questionnaire.to_json.html_safe %>,
+                <%= questionnaire_options('TeammateReviewQuestionnaire').to_json.html_safe %>,
+                null
           );
 
         } else {

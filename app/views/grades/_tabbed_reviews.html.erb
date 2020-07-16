@@ -21,7 +21,7 @@
 
                 <!--<%= review.display_as_html(nil, count, nil, true) %><BR/>-->
                 <!--change code in order to compat to multi-round review-->
-                <% if @assignment.varying_rubrics_by_round? and !review.round.nil? %>
+                <% if @assignment.vary_by_round and !review.round.nil? %>
                     <% review_symbol = 'review' + review.round.to_s %>
                 <% else %>
                     <% review_symbol = 'review' %>

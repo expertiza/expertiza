@@ -63,7 +63,7 @@
                 <% count = count + 1 %>
                 <% prefix = nil if controller.action_name == "view_my_scores" %>
                 <!--change code in order to compat to multi-round review-->
-                <% if @assignment.varying_rubrics_by_round? and !review.round.nil? %>
+                <% if @assignment.vary_by_round and !review.round.nil? %>
                     <% review_symbol = 'review' + review.round.to_s %>
                 <% else %>
                     <% review_symbol = 'review' %>

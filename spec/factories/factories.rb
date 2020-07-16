@@ -154,7 +154,9 @@ FactoryBot.define do
   end
 
   factory :assignment, class: Assignment do
-    name 'final2'
+    # Help multiple factory-created assignments get unique names
+    # Let the first created assignment have the name 'final2' to avoid breaking some fragile existing tests
+    name { "#{Assignment.last ? ('assignment' + (Assignment.last.id + 1).to_s) : 'final2'}" }
     directory_path 'final_test'
     submitter_count 0
     course { Course.first || association(:course) }
@@ -174,6 +176,8 @@ FactoryBot.define do
     review_topic_threshold 0
     copy_flag false
     rounds_of_reviews 2
+    vary_by_round false
+    vary_by_topic false
     microtask false
     require_quiz false
     num_quiz_questions 0
@@ -291,9 +295,9 @@ FactoryBot.define do
     due_at DateTime.now.in_time_zone + 1.day
     deadline_type { DeadlineType.first || association(:deadline_type) }
     assignment { Assignment.first || association(:assignment) }
-    submission_allowed_id 3
-    review_allowed_id 3
-    review_of_review_allowed_id 3
+    submission_allowed_id { DeadlineRight.first.nil? ? association(:deadline_right).id : DeadlineRight.first.id }
+    review_allowed_id { DeadlineRight.first.nil? ? association(:deadline_right).id : DeadlineRight.first.id  }
+    review_of_review_allowed_id { DeadlineRight.first.nil? ? association(:deadline_right).id : DeadlineRight.first.id  }
     round 1
     flag false
     threshold 1
@@ -328,7 +332,7 @@ FactoryBot.define do
   end
 
   factory :deadline_right, class: DeadlineRight do
-    name  'No'
+    name  'OK'
   end
 
   factory :assignment_node, class: AssignmentNode do
@@ -386,6 +390,7 @@ FactoryBot.define do
     user_id 1
     questionnaire_weight 100
     used_in_round nil
+    topic_id nil
     dropdown 1
   end
 
@@ -398,6 +403,14 @@ FactoryBot.define do
   end
 
   factory :review_response_map, class: ReviewResponseMap do
+    assignment { Assignment.first || association(:assignment) }
+    reviewer { AssignmentParticipant.first || association(:participant) }
+    reviewee { AssignmentTeam.first || association(:assignment_team) }
+    type 'ReviewResponseMap'
+    calibrate_to 0
+  end
+
+  factory :self_review_response_map, class: SelfReviewResponseMap do
     assignment { Assignment.first || association(:assignment) }
     reviewer { AssignmentParticipant.first || association(:participant) }
     reviewee { AssignmentTeam.first || association(:assignment_team) }
@@ -431,6 +444,7 @@ FactoryBot.define do
   end
 
   factory :submission_record, class: SubmissionRecord do
+    assignment_id 1
     team_id 666
     operation 'create'
     user 'student1234'
@@ -504,12 +518,5 @@ FactoryBot.define do
     fullname 'full name'
     email 'abc@mailinator.com'
     end
-
-  # factory :bookmark do
-  #   id 1
-  #   url "www.fake.com"
-  #   title "fake bookmark title"
-  #   description "fake bookmark description"
-  # end
 
 end

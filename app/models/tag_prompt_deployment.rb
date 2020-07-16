@@ -31,7 +31,7 @@ class TagPromptDeployment < ActiveRecord::Base
     user_answer_tagging = []
     unless teams.empty? or questions.empty?
       teams.each do |team|
-        if self.assignment.varying_rubrics_by_round?
+        if self.assignment.vary_by_round
           responses = []
           for round in 1..self.assignment.rounds_of_reviews
             responses += ReviewResponseMap.get_responses_for_team_round(team, round)

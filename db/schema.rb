@@ -11,6 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+
 ActiveRecord::Schema.define(version: 20200421235620) do
 
   create_table "account_requests", force: :cascade do |t|
@@ -67,6 +68,7 @@ ActiveRecord::Schema.define(version: 20200421235620) do
     t.integer "questionnaire_weight", limit: 4, default: 0,    null: false
     t.integer "used_in_round",        limit: 4
     t.boolean "dropdown",                       default: true
+    t.integer "topic_id",             limit: 4
   end
 
   add_index "assignment_questionnaires", ["assignment_id"], name: "fk_aq_assignments_id", using: :btree
@@ -125,6 +127,8 @@ ActiveRecord::Schema.define(version: 20200421235620) do
     t.boolean  "has_badge"
     t.boolean  "allow_selecting_additional_reviews_after_1st_round"
     t.boolean  "reviewer_is_team"
+    t.boolean  "vary_by_topic",                                                    default: false
+    t.boolean  "vary_by_round",
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree

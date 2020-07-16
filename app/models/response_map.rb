@@ -1,6 +1,6 @@
 class ResponseMap < ActiveRecord::Base
-  has_many :response, foreign_key: 'map_id', dependent: :destroy
-  belongs_to :reviewer, class_name: 'Participant', foreign_key: 'reviewer_id'
+  has_many :response, foreign_key: 'map_id', dependent: :destroy, inverse_of: false
+  belongs_to :reviewer, class_name: 'Participant', foreign_key: 'reviewer_id', inverse_of: false
 
   def map_id
     id
@@ -9,7 +9,7 @@ class ResponseMap < ActiveRecord::Base
   # return latest versions of the responses
   def self.get_assessments_for(team)
     responses = []
-    stime = Time.now
+    # stime = Time.now
     if team
       @array_sort = []
       @sort_to = []
@@ -35,10 +35,20 @@ class ResponseMap < ActiveRecord::Base
     responses
   end
 
+  def comparator(m1, m2)
+    if m1.version_num and m2.version_num
+      m2.version_num <=> m1.version_num
+    elsif m1.version_num
+      -1
+    else
+      1
+    end
+  end
+
   # return latest versions of the response given by reviewer
   def self.get_reviewer_assessments_for(team, reviewer)
     map = where(reviewee_id: team.id, reviewer_id: reviewer.id)
-    Response.where(map_id: map).sort {|m1, m2| m1.version_num and m2.version_num ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }[0]
+    Response.where(map_id: map).sort {|m1, m2| self.comparator(m1, m2) }[0]
   end
 
   # Placeholder method, override in derived classes if required.

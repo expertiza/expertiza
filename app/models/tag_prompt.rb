@@ -44,8 +44,7 @@ class TagPrompt < ActiveRecord::Base
         end
       end
     end
-    html += "#{ReviewMetricsQuery.confident?(prompt, answer.id)} "
-    html += ReviewMetricsQuery.confidence(prompt, answer.id).to_s
+
     html.html_safe
   end
 

@@ -52,12 +52,6 @@ class Questionnaire < ActiveRecord::Base
     end
   end
 
-  # Does this questionnaire contain true/false questions?
-  def true_false_questions?
-    questions.each {|question| return true if question.type == "Checkbox" }
-    false
-  end
-
   def delete
     self.assignments.each do |assignment|
       raise "The assignment #{assignment.name} uses this questionnaire.

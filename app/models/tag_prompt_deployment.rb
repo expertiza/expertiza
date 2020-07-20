@@ -42,14 +42,16 @@ class TagPromptDeployment < ActiveRecord::Base
         responses_ids = responses.map(&:id)
         answers = Answer.where(question_id: questions_ids, response_id: responses_ids)
         answers = answers.where("length(comments) > ?", self.answer_length_threshold.to_s) unless self.answer_length_threshold.nil?
-        answers_ids = answers.map(&:id)
+        confident_answers = answers.select {|answer| ReviewMetricsQuery.confident?(self.tag_prompt.prompt, answer.id) }
+        taggable_answers = answers - confident_answers
+        taggable_answers_ids = taggable_answers.map(&:id)
         users = TeamsUser.where(team_id: team.id).map(&:user)
         users.each do |user|
-          tags = AnswerTag.where(tag_prompt_deployment_id: self.id, user_id: user.id, answer_id: answers_ids)
+          tags = AnswerTag.where(tag_prompt_deployment_id: self.id, user_id: user.id, answer_id: taggable_answers_ids)
           tagged_answers_ids = tags.map(&:answer_id)
-          percentage = answers.count == 0 ? "-" : format("%.1f", tags.count.to_f / answers.count * 100)
-          not_tagged_answers = answers.where.not(id: tagged_answers_ids)
-          answer_tagging = VmUserAnswerTagging.new(user, percentage, tags.count, not_tagged_answers.count, answers.count)
+          percentage = taggable_answers.count.zero? ? "-" : format("%.1f", tags.count.to_f / taggable_answers.count * 100)
+          not_tagged_answers = taggable_answers.reject {|a| tagged_answers_ids.include?(a.id) }
+          answer_tagging = VmUserAnswerTagging.new(user, percentage, tags.count, not_tagged_answers.count, taggable_answers.count, confident_answers.count)
           user_answer_tagging.append(answer_tagging)
         end
       end

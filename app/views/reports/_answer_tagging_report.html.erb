@@ -39,6 +39,7 @@
               <th class="sorter-true"># answers tagged</th>
               <th class="sorter-true"># answers not tagged</th>
               <th class="sorter-true"># taggable answers<img src='/assets/info.png' title='As set up in the assignment setting, the authors can only tag answers of <%= tag_dep.question_type %> question type that are more than <%= tag_dep.answer_length_threshold %> character(s).'/></th>
+              <th class="sorter-true"># answers need not to be tagged<img src='/assets/info.png' title='Number of answers that are confidently determined by the Peer-Review web service of its characteristic and therefore do not need manual input from the student.'/></th>
             </tr>
             </thead>
             <% report_lines.each do |report_line| %>
@@ -48,7 +49,8 @@
                   <td><%= report_line.percentage.to_s %>%</td>
                   <td><%= report_line.no_tagged.to_s %></td>
                   <td><%= report_line.no_not_tagged.to_s %></td>
-                  <td><%= report_line.no_tagable %></td>
+                  <td><%= report_line.no_taggable %></td>
+                  <td><%= report_line.no_not_taggable %></td>
                 </tr>
             <% end %>
           </table>
@@ -68,6 +70,7 @@
             <th class="sorter-true"># tags done</th>
             <th class="sorter-true"># tags not done</th>
             <th class="sorter-true"># possible tags to do<img src='/assets/info.png' title='Number of answers that fulfil the prerequisite setup for each tags (Answer of certain question types and has a length of greater than the threshold).'/></th>
+            <th class="sorter-true"># tags hidden<img src='/assets/info.png' title='Number of answers that are confidently determined by the Peer-Review web service of its characteristic and therefore do not need manual input from the student.'/></th>
             <th>Tags export</th>
           </tr>
           </thead>
@@ -79,7 +82,8 @@
                 <td><%= val.percentage.to_s %>%</td>
                 <td><%= val.no_tagged.to_s %></td>
                 <td><%= val.no_not_tagged.to_s %></td>
-                <td><%= val.no_tagable %></td>
+                <td><%= val.no_taggable %></td>
+                <td><%= val.no_not_taggable %></td>
                 <td><%= check_box_tag 'names[]', val.user.name(session[:ip]), true %></td>
               </tr>
           <% end %>

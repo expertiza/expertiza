@@ -154,7 +154,7 @@ class Assignment < ActiveRecord::Base
     index = 0
     self.teams.each do |team|
       scores[:teams][index.to_s.to_sym] = {:team => team, :scores => {}}
-      if self.varying_rubrics_by_round?
+      if self.vary_by_round
         grades_by_rounds, total_num_of_assessments, total_score = compute_grades_by_rounds(questions, team)
         # merge the grades from multiple rounds
         scores[:teams][index.to_s.to_sym][:scores] = merge_grades_by_rounds(grades_by_rounds, total_num_of_assessments, total_score)

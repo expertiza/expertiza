@@ -181,9 +181,11 @@ class ReviewMappingController < ApplicationController
   def assign_metareviewer_dynamically
     assignment = Assignment.find(params[:assignment_id])
     metareviewer = AssignmentParticipant.where(user_id: params[:metareviewer_id], parent_id: assignment.id).first
-
-    assignment.assign_metareviewer_dynamically(metareviewer)
-
+    begin
+      assignment.assign_metareviewer_dynamically(metareviewer)
+    rescue StandardError => e
+      flash[:error] = e
+    end
     redirect_to controller: 'student_review', action: 'list', id: metareviewer.id
   end
 

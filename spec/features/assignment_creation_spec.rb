@@ -683,7 +683,7 @@ describe "assignment function" do
       click_link 'Due date'
     end
 
-    xit "Able to create a new penalty policy" do # This case doesn't work in expertiza yet, i.e. not able to create new late policy.
+    xit "Able to create a new late policy" do # This case doesn't work in expertiza yet, i.e. not able to create new late policy.
       find_link('New late policy').click
       fill_in 'late_policy_policy_name', with: 'testlatepolicy'
       fill_in 'policy_penalty_per_unit', with: 'testlatepolicypenalty'

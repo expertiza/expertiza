@@ -24,8 +24,8 @@ describe "peer review testing" do
     create(:assignment_questionnaire)
     create(:question)
     create(:submission_record, team_id: 2)
-    # create(:review_response_map, reviewer_id: User.where(role_id: 2).third.id)
-    # create(:review_response_map, reviewer_id: User.where(role_id: 2).second.id, reviewee: AssignmentTeam.second)
+    create(:review_response_map, reviewer_id: User.where(role_id: 1).third.id)
+    create(:review_response_map, reviewer_id: User.where(role_id: 1).second.id, reviewee: AssignmentTeam.second)
     # sleep(10000)
   end
 

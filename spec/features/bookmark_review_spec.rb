@@ -34,6 +34,7 @@ describe "bookmark review testing" do
      expect(page).to have_content "TestAssignment"
 
      click_link "TestAssignment"
+     sleep(4)
      expect(page).to have_content "Submit or Review work for TestAssignment"
      expect(page).to have_content "View bookmarks"
 

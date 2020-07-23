@@ -1,0 +1,24 @@
+.grey-out {
+  opacity: 0.4;
+  transition: opacity .2s;
+}
+
+.grey-out:hover {
+  opacity: 1;
+}
+
+.grey-out::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+.grey-out::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  background: #4CAF50;
+  cursor: pointer;
+}

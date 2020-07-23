@@ -15,7 +15,7 @@ save_tag = function(answer_id, tag_prompt_deployment_id, control){
         tag_prompt_deployment_id: tag_prompt_deployment_id.toString(),
         value: control.value.toString()
     }));
-}
+};
 
 toggleLabel = function(range) {
     var val = range.value;
@@ -32,4 +32,5 @@ toggleLabel = function(range) {
         $('#' + no_text_id).attr('class', 'toggle-false-msg');
         $('#' + yes_text_id).attr('class', 'toggle-true-msg textActive');
     }
-}
+    $('#' + range.id).attr('class', 'rangeAll');
+};

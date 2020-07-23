@@ -22,8 +22,6 @@ class TagPrompt < ActiveRecord::Base
   end
 
   def html_control(tag_prompt_deployment, answer, user_id)
-    return ''.html_safe if ReviewMetricsQuery.confident?(tag_prompt_deployment.tag_prompt.prompt, answer.id)
-
     html = ""
     unless answer.nil?
       stored_tags = AnswerTag.where(tag_prompt_deployment_id: tag_prompt_deployment.id, answer_id: answer.id, user_id: user_id)
@@ -71,9 +69,13 @@ class TagPrompt < ActiveRecord::Base
   def slider_control(answer, tag_prompt_deployment, stored_tags)
     html = ""
     value = "0"
+    style = ""
     if stored_tags.count > 0
       tag = stored_tags.first
       value = tag.value.to_s
+    elsif ReviewMetricsQuery.confident?(tag_prompt_deployment.tag_prompt.prompt, answer.id)
+      style = "grey-out"
+      value = ReviewMetricsQuery.has(tag_prompt_deployment.tag_prompt.prompt, answer.id) ? 1 : -1
     end
     element_id = answer.id.to_s + '_' + self.id.to_s
     control_id = "tag_prompt_" + element_id
@@ -90,7 +92,7 @@ class TagPrompt < ActiveRecord::Base
     html += '<div class="toggle-container tag_prompt_container" title="' + self.desc.to_s + '">'
     html += ' <div class="' + no_text_class + '" id="no_text_' + element_id + '">No</div>'
     html += ' <div class="range-field" style=" width:60px">'
-    html += '   <input type="range" name="tag_checkboxes[]" id="' + control_id + '" min="-1" class="rangeAll" max="1" value="' + value + '" onLoad="toggleLabel(this)" onChange="toggleLabel(this); save_tag(' + answer.id.to_s + ', ' + tag_prompt_deployment.id.to_s + ', ' + control_id + ');"></input>'
+    html += '   <input type="range" name="tag_checkboxes[]" id="' + control_id.to_s + '" min="-1" class="rangeAll ' + style + '" max="1" value="' + value.to_s + '" onLoad="toggleLabel(this)" onChange="toggleLabel(this); save_tag(' + answer.id.to_s + ', ' + tag_prompt_deployment.id.to_s + ', ' + control_id + ');"></input>'
     html += ' </div>'
     html += ' <div class="' + yes_text_class + '" id="yes_text_' + element_id + '">Yes</div>'
     html += ' <div class="toggle-caption">' + self.prompt.to_s + '</div>'

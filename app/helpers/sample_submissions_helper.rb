@@ -1,0 +1,2 @@
+module SampleSubmissionsHelper
+end

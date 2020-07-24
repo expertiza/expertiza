@@ -29,6 +29,18 @@ module AssignmentHelper
     options.uniq.sort
   end
 
+  # Sample submission options
+  def sample_sub_options
+    assignments = Assignment.where.not(course_id: [nil, 0])
+    options = []
+    assignments.each do |assignment|
+      course_name = Course.find(assignment.course_id).try(:name)
+      options << [course_name + ' - ' + assignment.name, assignment.id]
+    end
+    options.uniq.sort
+    options.unshift(['-----------', nil])
+  end
+
   # round=0 added by E1450
   def questionnaire_options(assignment, type, _round = 0)
     questionnaires = Questionnaire.where(['private = 0 or instructor_id = ?', assignment.instructor_id]).order('name')

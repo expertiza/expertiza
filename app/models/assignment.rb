@@ -16,8 +16,9 @@ class Assignment < ActiveRecord::Base
   # then Rails will "automatically' set the type field to the value that
   # designates an assignment of the appropriate type.
   belongs_to :course
-  belongs_to :instructor, class_name: 'User',inverse_of: :assignments
-  has_one :assignment_node, foreign_key: 'node_object_id', dependent: :destroy, inverse_of: :assignment
+  belongs_to :instructor, class_name: 'User'
+  has_one :assignment_node, foreign_key: 'node_object_id', dependent: :destroy
+  has_one :assignment, foreign_key: 'sample_assignment_id', dependent: :destroy
   has_many :participants, class_name: 'AssignmentParticipant', foreign_key: 'parent_id', dependent: :destroy
   has_many :users, through: :participants, inverse_of: :assignment
   has_many :due_dates, class_name: 'AssignmentDueDate', foreign_key: 'parent_id', dependent: :destroy, inverse_of: :assignment

@@ -3,8 +3,8 @@
 <!--displaying suggestion information-->
 <table border=0 cellspacing=10>
 <colgroup>
-<col width=25%>
-    <col width=60%>
+<col width=20%>
+    <col width=50%>
 </colgroup>
 <tr>
   <td><b>Title:</b></td>
@@ -41,17 +41,9 @@
   <td><%=h @suggestion.status %></td>
 </tr>
 </table>
-<p>
-  <% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' && session[:user] != nil && (session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4) %>
-    <%= form_tag :action => 'submit', :id => @suggestion do %>
-      <%= submit_tag "Approve suggestion", :name => 'approve_suggestion' %>
-      &nbsp; &nbsp;
-      <%= submit_tag "Reject suggestion", :name => 'reject_suggestion' %>
-    <% end %>
-  <% end %>
-</p>
 
-<br><br>
+
+<br><hr>
 <!--displaying comments-->
 <h2>Comments</h2>
 <%if @suggestion.suggestion_comments.size > 0 %>
@@ -101,6 +93,18 @@
   <% end %>
 
 <% end %>
+<hr>
+<br>
+<p>
+  <% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' && session[:user] != nil && (session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4) %>
+    <%= form_tag :action => 'submit', :id => @suggestion do %>
+      <%= submit_tag "Approve suggestion", :name => 'approve_suggestion' %>
+      &nbsp; &nbsp;
+      <%= submit_tag "Reject suggestion", :name => 'reject_suggestion' %>
+    <% end %>
+  <% end %>
+</p>
+<br>
 <p>
   <%= link_to 'Back', :action => 'list', :id => @suggestion.assignment_id %>
 </p>

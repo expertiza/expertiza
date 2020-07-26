@@ -48,7 +48,7 @@ Expertiza::Application.routes.draw do
 
   resources :assignments, except: [:destroy] do
     collection do
-      get :place_assignment_in_course
+      get :associate_assignment_with_course
       get :copy
       get :toggle_access
       get :delayed_mailer

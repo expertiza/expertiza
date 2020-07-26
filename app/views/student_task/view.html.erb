@@ -20,7 +20,9 @@
     <% if @authorization == 'participant' || @authorization == 'submitter' %>
       <li>
         <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.id%>
-        (Sign up for a topic)
+        (Sign up for a topic)  &nbsp <%if @can_provide_suggestions == true %>
+          <%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %>
+        <% end %>
       </li>
       <!--Show bookmarks if they are allowed for this assignment-->
       <% if @use_bookmark %>
@@ -110,16 +112,13 @@ to display the label "Your team" in the student assignment tasks-->
       <% end %>
     </li>
   <% end %>
-    <%if @can_provide_suggestions == true %>
-      <li><%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
-    <% end %>
 
     <% if @assignment.get_current_stage(@topic_id) == "Complete" %>
       <!-- removed code for survey assignment add in line above && SurveyHelper::is_user_eligible_for_survey?	(@assignment.id, session[:user].id)  -->
       <li><%= link_to "Take a survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id} %> (This will log you out)</li>
     <% end %>
       <li>
-            <%= link_to "Sample Submissions", controller: 'sample_submissions', :action => 'index', :id => @assignment.id %>
+            <%= link_to "Sample submissions", controller: 'sample_submissions', :action => 'index', :id => @assignment.id %>
             (View sample work submitted by other participants/teams)
       </li>
 

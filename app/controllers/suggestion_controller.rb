@@ -15,7 +15,7 @@ class SuggestionController < ApplicationController
     @suggestioncomment.suggestion_id = params[:id]
     @suggestioncomment.commenter = session[:user].name
     if @suggestioncomment.save
-      flash[:notice] = "Your comment has been successfully added."
+      flash[:success] = "Your comment has been successfully added."
     else
       flash[:error] = "There was an error in adding your comment."
     end
@@ -172,6 +172,12 @@ class SuggestionController < ApplicationController
       flash[:error] = 'An error occurred when rejecting the suggestion.'
     end
     redirect_to action: 'show', id: @suggestion
+  end
+
+  def update_visibility
+    SuggestionComment.find(params[:cmnt_id]).update_attributes(visible_to_student: params[:visibility])
+    puts params[:cmnt_id], params[:visibility]
+    render json: {success: 'true'}
   end
 
   private

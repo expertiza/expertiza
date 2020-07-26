@@ -20,12 +20,13 @@
     <% if @authorization == 'participant' || @authorization == 'submitter' %>
       <li>
         <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.id%>
-        (Sign up for a topic)  &nbsp <%if @can_provide_suggestions == true %>
+        (Sign up for a topic)  &nbsp
+      <%end%>
+  <%end%>
+      <%if @can_provide_suggestions == true %>
           <%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %>
         <% end %>
       </li>
-    <% end %>
-  <%end%>
 
 
 <!--ACS Here we need to know the size of the team to decide whether or not

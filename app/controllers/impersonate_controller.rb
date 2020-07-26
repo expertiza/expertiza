@@ -24,6 +24,16 @@ class ImpersonateController < ApplicationController
     flash[:error] = "This page doesn't take any query string." unless request.GET.empty?
   end
 
+  def ajax_search
+    users = User.select(:name).where('name LIKE ?', "#{params[:search]}%")
+    ret = []
+    users.each do |user|
+      ret << user.name
+    end
+    ret.sort!
+    render :json => ret
+  end
+
   def impersonate
     if params[:user]
       message = "No user exists with the name '#{params[:user][:name]}'."

@@ -269,7 +269,6 @@ class AssignmentsController < ApplicationController
   # helper methods for edit
   def edit_params_setting
     @assignment = Assignment.find(params[:id])
-    session[:assignment] = @assignment
     @num_submissions_round = @assignment.find_due_dates('submission').nil? ? 0 : @assignment.find_due_dates('submission').count
     @num_reviews_round = @assignment.find_due_dates('review').nil? ? 0 : @assignment.find_due_dates('review').count
 

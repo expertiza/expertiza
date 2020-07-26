@@ -40,14 +40,14 @@ to display the label "Your team" in the student assignment tasks-->
     <li>
       <% if @topics.size > 0 %>
         <% if @topic_id and @assignment.submission_allowed(@topic_id) %>
-          <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> (Submit and view your work)
+          <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id ,data: { disable_with: "Yosur work" }%> (Submit and view your work)
         <% else %>
           <!--if one team do not hold a topic (still in waitlist), they cannot submit their work.-->
           <font color="gray">Your work</font> (You have to choose a topic first)
         <% end %>
       <% else %>
         <% if @assignment.submission_allowed(@topic_id) %>
-          <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> (Submit and view your work)
+          <%= link_to 'Your work', {:controller => 'submitted_content', :action => 'edit', :id => @participant.id },data: { disable_with: "Your work"} %> (Submit and view your work)
         <% else %>
           <font color="gray">Your work</font> (You are not allowed to submit your work right now)
         <% end %>
@@ -65,7 +65,7 @@ to display the label "Your team" in the student assignment tasks-->
       <% end %>
       <!--Zhewei: professor mentioned that a submission is reviewable if the submission is in a stage where reviews can be done. It does not depend on the stage of the topic the reviewer is writing on-->
       <!--Akshay: Fix Issue 1218 - this link is disabled if assignment does not require any peer reviews-->
-      <% if review_deadline?(@assignment) and (check_reviewable_topics(@assignment) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@topic_id) == "Finished") %>
+      <% if review_deadline?(@assignment) and  (check_reviewable_topics(@assignment) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@topic_id) == "Finished") %>
         <%= link_to "#{@alias_name}",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
       <% else %>
         <font color="gray"><%= @alias_name%></font>
@@ -107,6 +107,11 @@ to display the label "Your team" in the student assignment tasks-->
       <!-- removed code for survey assignment add in line above && SurveyHelper::is_user_eligible_for_survey?	(@assignment.id, session[:user].id)  -->
       <li><%= link_to "Take a survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id} %> (This will log you out)</li>
     <% end %>
+      <li>
+            <%= link_to "Sample Submissions", controller: 'sample_submissions', :action => 'index', :id => @assignment.id %>
+            (View sample work submitted by other participants/teams)
+      </li>
+
     <li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> (Provide a different handle for this assignment)</li>
   </ul>
   <br>

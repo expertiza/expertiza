@@ -1,6 +1,6 @@
 class SectionHeader < QuestionnaireHeader
   def complete(_count, _answer = nil)
-    html = '<b style="color: #986633; font-size: x-large">' + self.txt + '</b><br/><br/>'
+    html = '<br><br><div><b style="color: #986633; font-size: x-large">' + self.txt + '</b></div>'
     html.html_safe
   end
 

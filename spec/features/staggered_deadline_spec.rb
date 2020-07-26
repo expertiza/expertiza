@@ -93,9 +93,9 @@ describe "Staggered deadline test" do
   it "test1: in round 1, student2064 in review stage could do review" do
     # impersonate each participant submit their topics
     submit_topic('student2064', '/sign_up_sheet/sign_up?id=1&topic_id=1', "https://google.com")
-    submit_topic('student2065', '/sign_up_sheet/sign_up?id=1&topic_id=2', "https://ncsu.edu")
+    submit_topic('student2065', '/sign_up_sheet/sign_up?id=1&topic_id=2', "https://youtube.com")
     # change deadline to make student2064 in review stage in round 1
-    change_due(1, 1, 1, DateTime.now.in_time_zone - 10)
+    change_due(1, 1, 1, DateTime.now.in_time_zone - 20)
 
     # impersonate each participant and check their topic's current stage
 
@@ -122,6 +122,7 @@ describe "Staggered deadline test" do
     visit '/student_task/list'
     expect(page).to have_content "Stage Deadline"
     click_link 'Assignment1665'
+    sleep(10)
     expect(page).to have_content "Others' work"
     click_link "Others' work"
     expect(page).to have_content 'Reviews for "Assignment1665"'
@@ -242,6 +243,7 @@ describe "Staggered deadline test" do
     click_link "Others' work"
     expect(page).to have_content 'Reviews for "Assignment1665"'
     expect { choose "topic_id_2" }.to raise_error(/Unable to find visible radio button "topic_id_2"/)
+      # expect { click_link "Others' work"}.to raise_error(/Unable to find visible link "Others' work"/)
   end
 
   # the test will test the Java script which is embedded into the sign up sheet. The java script will

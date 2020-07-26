@@ -10,6 +10,8 @@ class ResponseController < ApplicationController
       user_id = response.map.reviewer.user_id if response.map.reviewer
     end
     case action
+    when 'new' # Only allow appropriate student
+      return current_user_id?(ResponseMap.find(params[:id]).reviewer.user_id)
     when 'edit' # If response has been submitted, no further editing allowed
       return false if response.is_submitted
       return current_user_id?(user_id)

@@ -240,6 +240,16 @@ development:
         parent_id:
         site_controller_id: 23
         url: "/student_task/list"
+      50: &24 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 15
+        id: 50
+        label: Anonymized view
+        name: anonymized_view
+        parent:
+        parent_id:
+        site_controller_id:
+        url: "/users/set_anonymized_view"
       30: &3 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 42
@@ -289,6 +299,7 @@ development:
       profile: *4
       contact_us: *5
       credits: *7
+      anonymized_view: *24
     crumbs:
     - 1
     root: &8 !ruby/object:Menu::Node
@@ -296,6 +307,7 @@ development:
       children:
       - 1
       - 26
+      - 50
       - 30
       - 27
       - 2
@@ -494,6 +506,7 @@ test:
       - 1
       - 5
       - 6
+      - 50
       - 7
     by_id:
       1: &1 !ruby/object:Menu::Node
@@ -516,6 +529,16 @@ test:
         controller_action_id: 33
         content_page_id:
         url: "/student_task/list"
+      50: &24 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 15
+        id: 50
+        label: Anonymized view
+        name: anonymized_view
+        parent:
+        parent_id:
+        site_controller_id:
+        url: "/users/set_anonymized_view"
       6: &3 !ruby/object:Menu::Node
         parent:
         parent_id:
@@ -554,6 +577,7 @@ test:
       profile: *3
       contact_us: *4
       credits: *6
+      anonymized_view: *24
     selected:
       1: *1
     vector:
@@ -803,6 +827,16 @@ production:
         parent_id:
         site_controller_id: 23
         url: "/student_task/list"
+      50: &24 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 15
+        id: 50
+        label: Anonymized view
+        name: anonymized_view
+        parent:
+        parent_id:
+        site_controller_id:
+        url: "/users/set_anonymized_view"
       30: &3 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 42
@@ -852,6 +886,7 @@ production:
       profile: *4
       contact_us: *5
       credits: *7
+      anonymized_view: *24
     crumbs:
     - 1
     root: &8 !ruby/object:Menu::Node
@@ -859,6 +894,7 @@ production:
       children:
       - 1
       - 26
+      - 50
       - 30
       - 27
       - 2

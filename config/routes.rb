@@ -14,6 +14,7 @@ Expertiza::Application.routes.draw do
       get :remove_instructor
       post :remove_instructor
       get :show_instructor
+      post :remove_administrator
     end
   end
 
@@ -370,6 +371,7 @@ resources :institution, except: [:destroy] do
     collection do
       get :list
       get :view
+      put :make_public
       get '/*other', to: redirect('/student_task/list')
     end
   end
@@ -490,4 +492,5 @@ resources :institution, except: [:destroy] do
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
   get ':controller(/:action(/:id))(.:format)'
   match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
+  put 'student_task/make_public', controller: :student_task,  action: :make_public, method: :put
 end

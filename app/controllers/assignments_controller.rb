@@ -89,7 +89,7 @@ class AssignmentsController < ApplicationController
       return
     end
     retrieve_assignment_form
-    assignment_form_assignment_staggered_deadline?
+    assignment_staggered_deadline?
     nil_timezone_update
     update_feedback_attributes
 

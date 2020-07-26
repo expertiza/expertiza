@@ -12,7 +12,7 @@
         <% if @assignment_form.assignment.is_calibrated %>
             <li><a href="#tabs-6" id="Calibration">Calibration</a></li>
         <% end %>
-        <% if @assignment_form.assignment.has_badge? %>
+        <% if @assignment_form.assignment.badge? %>
           <li><a href="#tabs-7" id="Badges">Badges</a></li>
         <% end %>
         <li><a href="#tabs-8" id="Other">Other stuff</a></li>
@@ -21,38 +21,7 @@
         <%= render 'assignments/edit/general' %>
       </div>
       <div id="tabs-2">
-        <h3>Topics for <%= @assignment_form.assignment.name %> assignment</h3><br>
-            <input name="assignment_form[assignment][allow_suggestions]" type="hidden" value="false"/>
-            <%= check_box_tag('assignment_form[assignment][allow_suggestions]', 'true', @assignment_form.assignment.allow_suggestions) %>
-            <%= label_tag('assignment_form[assignment][allow_suggestions]', 'Allow topic suggestions from students?') %>
-            <br>
-            <input name="assignment_form[assignment][is_intelligent]" type="hidden" value="false"/>
-            <%= check_box_tag('assignment_form[assignment][is_intelligent]', 'true', @assignment_form.assignment.is_intelligent?)%>
-            <%= label_tag('assignment_form[assignment][is_intelligent]', 'Enable bidding for topics?') %>
-            <img src="/assets/info.png" title="This feature allow students to &quot;bid&quot; for topics.
-      Instructor must specify when topics are assigned, by going to the Due Dates tab and
-      entering a due date for &quot;signup&quot;."/>
-            <br>
-            <input name="assignment_form[assignment][can_review_same_topic]" type="hidden" value="false"/>
-            <%= check_box_tag('assignment_form[assignment][can_review_same_topic]', 'true', @assignment_form.assignment.can_review_same_topic?)%>
-            <%= label_tag('assignment_form[assignment][can_review_same_topic]', 'Enable authors to review others working on same topic?') %>
-            <img src="/assets/info.png" title="If checked, it is possible that the authors review another artifact on the same topic "/>
-            <br>
-
-            <input name="assignment_form[assignment][can_choose_topic_to_review]" type="hidden" value="false"/>
-            <%= check_box_tag('assignment_form[assignment][can_choose_topic_to_review]', 'true', @assignment_form.assignment.can_choose_topic_to_review?)%>
-            <%= label_tag('assignment_form[assignment][can_choose_topic_to_review]', 'Allow reviewer to choose which topic to review?') %>
-
-            <br>
-            <input name="assignment_form[assignment][use_bookmark]" type="hidden" value="false"/>
-            <%= check_box_tag('assignment_form[assignment][use_bookmark]', 'true', @assignment_form.assignment.use_bookmark, {:onChange => 'useBookmarkChanged()'})%>
-            <%= label_tag('assignment_form[assignment][use_bookmark]', 'Allow participants to create bookmarks?') %>
-          <br><br>
-          <% if @assignment_form.assignment.staggered_deadline == true %>
-              <%= render partial: '/sign_up_sheet/add_signup_topics_staggered', locals: {review_rounds: @review_rounds, assignment_submission_due_dates: @assignment_submission_due_dates, assignment_review_due_dates: @assignment_review_due_dates} %>
-          <% else %>
-              <%= render '/sign_up_sheet/add_signup_topics' %>
-          <% end %>
+        <%= render 'assignments/edit/topics' %>
       </div>
       <div id="tabs-3">
         <%= render 'assignments/edit/rubrics' %>
@@ -68,7 +37,7 @@
           <%= render 'assignments/edit/calibration' %>
         </div>
       <% end %>
-      <% if @assignment_form.assignment.has_badge? %>
+      <% if @assignment_form.assignment.badge? %>
         <div id="tabs-7">
           <%= render 'assignments/edit/badges' %>
         </div>
@@ -85,13 +54,15 @@
           jQuery("#questionnaire_table_BookmarkRatingQuestionnaire").remove()
           var bookmark_checkbox = jQuery('#assignment_form_assignment_use_bookmark');
           if (bookmark_checkbox.is(':checked')) {
-            addQuestionnaireTableRow(
-                    'BookmarkRatingQuestionnaire',
-                    null,
-                    <%= questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>,
-                    <%= assignment_questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>,
-                    <%= questionnaire_options(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>
-            );
+              <% assignment_questionnaire = @assignment_form.assignment_questionnaire('BookmarkRatingQuestionnaire', nil, nil) %>
+              <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'BookmarkRatingQuestionnaire') %>
+              addQuestionnaireTableRow(
+                  'BookmarkRatingQuestionnaire',
+                  <%= assignment_questionnaire.to_json.html_safe %>,
+                  <%= questionnaire.to_json.html_safe %>,
+                  <%= questionnaire_options('BookmarkRatingQuestionnaire').to_json.html_safe %>,
+                  null
+              );
           }
       }
 
@@ -104,6 +75,7 @@
           }
         })
         jQuery("#tabs").tabs({
+          // Changing from one tab to another is sort of like a "save" action
           beforeActivate: function (event, ui) {
             var deleteTeam = 0;
             var frm = jQuery("#assignment_form");
@@ -117,7 +89,33 @@
                 url: frm.attr('action'),
                 method: frm.attr('method'),
                 data: frm.serialize(),
-              })
+                success: function(data, textStatus, xhr){
+                    // REFRESH the topics tab after changing tabs
+                    // Specifically useful when switching between vary-do-not-vary by topic on the Rubrics tab
+                    // This changes how the Topics tab should appear
+                    // We only refresh the Topics tab if that is the tab we are switching to
+                    // Followed instructions at:
+                    // https://atlwendy.ghost.io/render-a-partial-view-tutorial-for-beginners/
+                    if (ui.newPanel.attr('id') == 'tabs-2') {
+                        jQuery("#tabs-2").html(data);
+                    }
+                    // TODO E1936 (future work)
+                    // There is a noticeable delay between changing the state of the
+                    // "Review rubric varies by topic?" checkbox on the Rubrics tab,
+                    // and the show / hide of rubric drop-downs on the Topics tab
+                },
+              });
+              // Update the flash messages onscreen
+              // we are performing an action that could result in important info put in flash,
+              // but we will not see this without requesting it explicitly because we don't do a full page re-load
+              jQuery.ajax({
+                  url: "/assignments/instant_flash",
+                  method: "get",
+                  data: "",
+                  success: function(data, textStatus, xhr){
+                      jQuery("#application-flash-div").html(data);
+                  },
+              });
             } else {
               event.preventDefault();
             }

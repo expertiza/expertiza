@@ -1,13 +1,23 @@
-<%= link_to :controller=>'bookmarks', :action=> 'list', :id => topic.id do %>
+<!--Shows bookmarks if they are allowed for this assignment.-->
+<% if @use_bookmark %>
+  <%= link_to :controller=>'bookmarks', :action=> 'list', :id => topic.id do %>
+    <span class="fa-stack fa-md" title='View topic bookmarks'>
+      <i class="fa fa-bookmark fa-stack-1x fa-2x"></i>
+      <p class="fa fa-stack-2x fa-inverse" style='font-size: 1.0em; padding-top: 2px; font-weight: bold;'>
+        <%= Bookmark.where(topic_id: topic.id).length.to_s %>
+      </p>
+    </span>
+  <% end %>
+  <%= link_to :controller=>'bookmarks', :action=> 'new', :id => topic.id , :assignment_id => params[:assignment_id] do %>
+    <span class="fa-stack fa-md" title='Add bookmark to topic'>
+      <i class="fa fa-bookmark fa-stack-1x fa-2x"></i>
+      <i class="fa fa-plus fa-stack-1x fa-inverse" style='font-size: .5em'></i>
+    </span>
+  <% end %>
+<% else %>
   <span class="fa-stack fa-md" title='View topic bookmarks'>
-    <i class="fa fa-bookmark fa-stack-1x fa-2x"></i>
-  </span>
-<% end %>
-<%= link_to :controller=>'bookmarks', :action=> 'new', :id => topic.id , :assignment_id => params[:assignment_id] do %>
-  <span class="fa-stack fa-md" title='Add bookmark to topic'>
-    <i class="fa fa-bookmark fa-stack-1x fa-2x"></i>
-    <i class="fa fa-plus fa-stack-1x fa-inverse" style='font-size: .5em'></i>
-  </span>
+    <i class="fa fa-bookmark fa-stack-1x fa-2x" style="opacity: 0.3;"></i>
+ </span>
 <% end %>
 
 <%= render :partial => '/sign_up_sheet/all_actions', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>

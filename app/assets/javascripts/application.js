@@ -34,6 +34,8 @@
 //= require awesome_input
 //= require jquery-bar-rating/jquery.barrating
 //= require Chart.min
+//= require moment
+//= require bootstrap-datetimepicker
 // Eliminate the “element.dispatchEvent is not a function” error
 jQuery.noConflict();
 

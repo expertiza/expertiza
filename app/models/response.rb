@@ -2,8 +2,11 @@ require 'analytic/response_analytic'
 require 'lingua/en/readability'
 
 class Response < ActiveRecord::Base
+  # Added for E1973. A team review will have a lock on it so only one user at a time may edit it.
+  include Lockable
   include ResponseAnalytic
   belongs_to :response_map, class_name: 'ResponseMap', foreign_key: 'map_id', inverse_of: false
+  
   has_many :scores, class_name: 'Answer', foreign_key: 'response_id', dependent: :destroy, inverse_of: false
   # TODO: change metareview_response_map relationship to belongs_to
   has_many :metareview_response_maps, class_name: 'MetareviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy, inverse_of: false
@@ -101,7 +104,13 @@ class Response < ActiveRecord::Base
       # there is small possibility that the answers is empty: when the questionnaire only have 1 question and it is a upload file question
       # the reason is that for this question type, there is no answer record, and this question is handled by a different form
       map = ResponseMap.find(self.map_id)
-      assignment = Participant.find(map.reviewer_id).assignment
+      # E-1973 either get the assignment from the participant or the map itself
+      if map.is_a? ReviewResponseMap
+        assignment = map.assignment
+      else
+        assignment = Participant.find(map.reviewer_id).assignment
+      end
+      topic_id = SignedUpTeam.find_by(team_id: map.reviewee_id).topic_id
       questionnaire = Questionnaire.find(assignment.review_questionnaire_id)
     end
     questionnaire

@@ -1,4 +1,6 @@
 class QuestionsController < ApplicationController
+  include AuthorizationHelper
+
   # A question is a single entry within a questionnaire
   # Questions provide a way of scoring an object
   # based on either a numeric value or a true/false
@@ -11,10 +13,7 @@ class QuestionsController < ApplicationController
   end
 
   def action_allowed?
-    ['Super-Administrator',
-     'Administrator',
-     'Instructor',
-     'Teaching Assistant'].include? current_role_name
+    current_user_has_ta_privileges?
   end
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)

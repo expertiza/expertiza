@@ -1,21 +1,16 @@
 class AssignmentsController < ApplicationController
+  
   include AssignmentHelper
+  include AuthorizationHelper
   autocomplete :user, :name
   before_action :authorize
 
   # determines if an action is allowed for a user
   def action_allowed?
     if %w[edit update list_submissions].include? params[:action]
-      assignment = Assignment.find(params[:id])
-      (%w[Super-Administrator Administrator].include? current_role_name) ||
-      (assignment.instructor_id == current_user.try(:id)) ||
-      TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) ||
-      (assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id))
+      current_user_has_admin_privileges? || current_user_teaching_staff_of_assignment?(params[:id])
     else
-      ['Super-Administrator',
-       'Administrator',
-       'Instructor',
-       'Teaching Assistant'].include? current_role_name
+      current_user_has_ta_privileges?
     end
   end
 
@@ -33,7 +28,27 @@ class AssignmentsController < ApplicationController
     if params[:button]
       if @assignment_form.save
         @assignment_form.create_assignment_node
-        assignment_form_save_handler
+        exist_assignment = Assignment.find_by(id: @assignment_form.assignment.id)
+        assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
+        if assignment_form_params[:assignment][:directory_path].blank?
+          assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
+        end
+        ques_array = assignment_form_params[:assignment_questionnaire]
+        due_array = assignment_form_params[:due_date]
+        ques_array.each do |cur_questionnaire|
+          cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
+        end
+        due_array.each do |cur_due|
+          cur_due[:parent_id] = exist_assignment.id.to_s
+        end
+        assignment_form_params[:assignment_questionnaire] = ques_array
+        assignment_form_params[:due_date] = due_array
+        @assignment_form.update(assignment_form_params, current_user)
+        aid = Assignment.find_by(id: @assignment_form.assignment.id).id
+        ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
+        redirect_to edit_assignment_path aid
+        undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
+        return
       else
         flash.now[:error] = "Failed to create assignment"
         render 'new'
@@ -58,7 +73,13 @@ class AssignmentsController < ApplicationController
     path_warning_and_answer_tag
     # assigned badges will hold all the badges that have been assigned to an assignment
     # added it to display the assigned badges while creating a badge in the assignments page
+
     update_assignment_badges
+
+    @assigned_badges = @assignment_form.assignment.badges
+    @badges = Badge.all
+    @use_bookmark = @assignment.use_bookmark
+
   end
 
   # updates an assignment via an assignment form
@@ -68,9 +89,26 @@ class AssignmentsController < ApplicationController
       return
     end
     retrieve_assignment_form
+    assignment_form_assignment_staggered_deadline?
     nil_timezone_update
     update_feedback_attributes
-    redirect_to edit_assignment_path @assignment_form.assignment.id
+
+    # What to do next depends on how we got here
+    if params['button'].nil?
+      # REFRESH the topics tab after changing tabs
+      # Specifically useful when switching between vary-do-not-vary by topic on the Rubrics tab
+      # This changes how the Topics tab should appear
+      # Followed instructions at:
+      #https://atlwendy.ghost.io/render-a-partial-view-tutorial-for-beginners/
+      render :partial => "assignments/edit/topics"
+      # TODO E1936 (future work)
+      # There is a noticeable delay bewtween changing the state of the
+      # "Review rubric varies by topic?" checkbox on the Rubrics tab,
+      # and the show / hide of rubric drop-downs on the Topics tab
+    else
+      # SAVE button was used (do a redirect)
+      redirect_to edit_assignment_path @assignment_form.assignment.id
+    end
   end
 
   # displays an assignment via ID
@@ -138,7 +176,7 @@ class AssignmentsController < ApplicationController
   # place an assignment in a course
   def place_assignment_in_course
     @assignment = Assignment.find(params[:id])
-    @courses = Assignment.set_courses_to_assignment(current_user)
+    @courses = Assignment.assign_courses_to_assignment(current_user)
   end
 
   # list team assignment submissions
@@ -160,6 +198,19 @@ class AssignmentsController < ApplicationController
       job.delete if job.jid == params[:delayed_job_id]
     end
     redirect_to delayed_mailer_assignments_index_path params[:id]
+  end
+
+  # Provide a means for a rendering of all flash messages to be requested
+  # This is useful because the assignments page has tabs
+  #   and switching tabs acts like a "save" but does NOT cause a new page load
+  #   so if we want to see via flash messages when something goes wrong,
+  #   we need to ask about it
+  # Doing it this way has a few advantages
+  #   doesn't matter what kind of flash item is set (error, note, notice, etc.)
+  #   doesn't matter what tab we are on (anybody can request this render)
+  #   doesn't matter where the flash item originated, anything can get seen this way
+  def instant_flash
+    render :partial => "shared/flash_messages"
   end
 
   private
@@ -302,7 +353,6 @@ class AssignmentsController < ApplicationController
 
     @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
     @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
-    @reviewvarycheck = false
     @due_date_nameurl_not_empty = false
     @due_date_nameurl_not_empty_checkbox = false
     @metareview_allowed = false
@@ -321,6 +371,7 @@ class AssignmentsController < ApplicationController
   def assignment_staggered_deadline?
     if @assignment_form.assignment.staggered_deadline == true
       @review_rounds = @assignment_form.assignment.num_review_rounds
+      @due_date_all ||= AssignmentDueDate.where(parent_id: @assignment_form.assignment.id)
       @assignment_submission_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_SUBMISSION }
       @assignment_review_due_dates = @due_date_all.select {|due_date| due_date.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_REVIEW }
     end

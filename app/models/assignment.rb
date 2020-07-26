@@ -3,6 +3,7 @@
 ### We have spent a lot of time on refactoring this file, PLEASE consult with Expertiza development team before putting code in.
 ###
 ###
+
 class Assignment < ActiveRecord::Base
   require 'analytic/assignment_analytic'
   include AssignmentAnalytic
@@ -10,24 +11,23 @@ class Assignment < ActiveRecord::Base
   include QuizAssignment
   include OnTheFlyCalc
   has_paper_trail
-
   # When an assignment is created, it needs to
   # be created as an instance of a subclass of the Assignment (model) class;
   # then Rails will "automatically' set the type field to the value that
   # designates an assignment of the appropriate type.
   belongs_to :course
-  belongs_to :instructor, class_name: 'User'
-  has_one :assignment_node, foreign_key: 'node_object_id', dependent: :destroy
+  belongs_to :instructor, class_name: 'User',inverse_of: :assignments
+  has_one :assignment_node, foreign_key: 'node_object_id', dependent: :destroy, inverse_of: :assignment
   has_many :participants, class_name: 'AssignmentParticipant', foreign_key: 'parent_id', dependent: :destroy
-  has_many :users, through: :participants
-  has_many :due_dates, class_name: 'AssignmentDueDate', foreign_key: 'parent_id', dependent: :destroy
-  has_many :teams, class_name: 'AssignmentTeam', foreign_key: 'parent_id', dependent: :destroy
-  has_many :invitations, class_name: 'Invitation', foreign_key: 'assignment_id', dependent: :destroy
+  has_many :users, through: :participants, inverse_of: :assignment
+  has_many :due_dates, class_name: 'AssignmentDueDate', foreign_key: 'parent_id', dependent: :destroy, inverse_of: :assignment
+  has_many :teams, class_name: 'AssignmentTeam', foreign_key: 'parent_id', dependent: :destroy, inverse_of: :assignment
+  has_many :invitations, class_name: 'Invitation', foreign_key: 'assignment_id', dependent: :destroy#, inverse_of: :assignment
   has_many :assignment_questionnaires, dependent: :destroy
   has_many :questionnaires, through: :assignment_questionnaires
-  has_many :sign_up_topics, foreign_key: 'assignment_id', dependent: :destroy
-  has_many :response_maps, foreign_key: 'reviewed_object_id', dependent: :destroy
-  has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy
+  has_many :sign_up_topics, foreign_key: 'assignment_id', dependent: :destroy, inverse_of: :assignment
+  has_many :response_maps, foreign_key: 'reviewed_object_id', dependent: :destroy, inverse_of: :assignment
+  has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy, inverse_of: :assignment
   has_many :plagiarism_checker_assignment_submissions, dependent: :destroy
   has_many :assignment_badges, dependent: :destroy
   has_many :badges, through: :assignment_badges
@@ -36,6 +36,7 @@ class Assignment < ActiveRecord::Base
   validate :valid_num_review
 
   REVIEW_QUESTIONNAIRES = {author_feedback: 0, metareview: 1, review: 2, teammate_review: 3}.freeze
+
   #  Review Strategy information.
   RS_AUTO_SELECTED = 'Auto-Selected'.freeze
   RS_INSTRUCTOR_SELECTED = 'Instructor-Selected'.freeze
@@ -60,10 +61,11 @@ class Assignment < ActiveRecord::Base
     self.is_calibrated
   end
 
-  def self.set_courses_to_assignment(user)
+  def self.assign_courses_to_assignment(user)
     @courses = Course.where(instructor_id: user.id).order(:name)
   end
 
+  #removes an assignment from course
   def self.remove_assignment_from_course(assignment)
     oldpath = assignment.path rescue nil
     assignment.course_id = nil
@@ -76,11 +78,12 @@ class Assignment < ActiveRecord::Base
     @has_teams ||= !self.teams.empty?
   end
 
+  #checks whether the assignment is getting a valid number of reviews (less than number of reviews allowed)
   def valid_num_review
     self.num_reviews = self.num_reviews_allowed
-    if self.num_reviews_allowed && self.num_reviews_allowed != -1 && self.num_reviews_allowed < self.num_reviews_required
+    if num_reviews_greater?(self.num_reviews_required, self.num_reviews_allowed)
       self.errors.add(:message, "Num of reviews required cannot be greater than number of reviews allowed")
-    elsif self.num_metareviews_allowed && self.num_metareviews_allowed != -1 && self.num_metareviews_allowed < self.num_metareviews_required
+    elsif num_reviews_greater?(self.num_metareviews_required, self.num_metareviews_allowed)
       self.errors.add(:message, "Number of Meta-Reviews required cannot be greater than number of meta-reviews allowed")
     end
   end
@@ -111,24 +114,17 @@ class Assignment < ActiveRecord::Base
     raise 'You have already metareviewed all reviews for this assignment.' if response_map_set.empty?
 
     # Reduce to the response maps with the least number of metareviews received
-    response_map_set.sort! {|a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
-    min_metareviews = response_map_set.first.metareview_response_maps.count
+    min_metareviews=get_min_metareview(response_map_set)
     response_map_set.reject! {|response_map| response_map.metareview_response_maps.count > min_metareviews }
 
     # Reduce the response maps to the reviewers with the least number of metareviews received
-    reviewers = {} # <reviewer, number of metareviews>
-    response_map_set.each do |response_map|
-      reviewer = response_map.reviewer
-      reviewers.member?(reviewer) ? reviewers[reviewer] += 1 : reviewers[reviewer] = 1
-    end
-    reviewers = reviewers.sort_by {|a| a[1] }
+    reviewers = get_reviewer_metareviews_map(response_map_set)
     min_metareviews = reviewers.first[1]
     reviewers.reject! {|reviewer| reviewer[1] == min_metareviews }
     response_map_set.reject! {|response_map| reviewers.member?(response_map.reviewer) }
 
     # Pick the response map whose most recent meta_reviewer was assigned longest ago
-    response_map_set.sort! {|a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
-    min_metareviews = response_map_set.first.metareview_response_maps.count
+    min_metareviews=get_min_metareview(response_map_set)
     response_map_set.sort! {|a, b| a.metareview_response_maps.last.id <=> b.metareview_response_maps.last.id } if min_metareviews > 0
     # The first review_map is the best to metareview
     response_map_set.first
@@ -149,49 +145,19 @@ class Assignment < ActiveRecord::Base
   end
   alias is_using_dynamic_reviewer_assignment? dynamic_reviewer_assignment?
 
+  #Computes and returns the scores of assignment for participants and teams
   def scores(questions)
-    scores = {}
-    scores[:participants] = {}
+    scores = {:participants => {}, :teams => {}}
     self.participants.each do |participant|
       scores[:participants][participant.id.to_s.to_sym] = participant.scores(questions)
     end
-    scores[:teams] = {}
     index = 0
     self.teams.each do |team|
-      scores[:teams][index.to_s.to_sym] = {}
-      scores[:teams][index.to_s.to_sym][:team] = team
-      if self.varying_rubrics_by_round?
-        grades_by_rounds = {}
-        total_score = 0
-        total_num_of_assessments = 0 # calculate grades for each rounds
-        (1..self.num_review_rounds).each do |i|
-          assessments = ReviewResponseMap.get_responses_for_team_round(team, i)
-          round_sym = ("review" + i.to_s).to_sym
-          grades_by_rounds[round_sym] = Answer.compute_scores(assessments, questions[round_sym])
-          total_num_of_assessments += assessments.size
-          total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f unless grades_by_rounds[round_sym][:avg].nil?
-        end
+      scores[:teams][index.to_s.to_sym] = {:team => team, :scores => {}}
+      if self.vary_by_round
+        grades_by_rounds, total_num_of_assessments, total_score = compute_grades_by_rounds(questions, team)
         # merge the grades from multiple rounds
-        scores[:teams][index.to_s.to_sym][:scores] = {}
-        scores[:teams][index.to_s.to_sym][:scores][:max] = -999_999_999
-        scores[:teams][index.to_s.to_sym][:scores][:min] = 999_999_999
-        scores[:teams][index.to_s.to_sym][:scores][:avg] = 0
-        (1..self.num_review_rounds).each do |i|
-          round_sym = ("review" + i.to_s).to_sym
-          if !grades_by_rounds[round_sym][:max].nil? && scores[:teams][index.to_s.to_sym][:scores][:max] < grades_by_rounds[round_sym][:max]
-            scores[:teams][index.to_s.to_sym][:scores][:max] = grades_by_rounds[round_sym][:max]
-          end
-          if !grades_by_rounds[round_sym][:min].nil? && scores[:teams][index.to_s.to_sym][:scores][:min] > grades_by_rounds[round_sym][:min]
-            scores[:teams][index.to_s.to_sym][:scores][:min] = grades_by_rounds[round_sym][:min]
-          end
-        end
-        if total_num_of_assessments != 0
-          scores[:teams][index.to_s.to_sym][:scores][:avg] = total_score / total_num_of_assessments
-        else
-          scores[:teams][index.to_s.to_sym][:scores][:avg] = nil
-          scores[:teams][index.to_s.to_sym][:scores][:max] = 0
-          scores[:teams][index.to_s.to_sym][:scores][:min] = 0
-        end
+        scores[:teams][index.to_s.to_sym][:scores] = merge_grades_by_rounds(grades_by_rounds, total_num_of_assessments, total_score)
       else
         assessments = ReviewResponseMap.get_assessments_for(team)
         scores[:teams][index.to_s.to_sym][:scores] = Answer.compute_scores(assessments, questions[:review])
@@ -205,7 +171,7 @@ class Assignment < ActiveRecord::Base
     if self.course_id.nil? && self.instructor_id.nil?
       raise 'The path cannot be created. The assignment must be associated with either a course or an instructor.'
     end
-    path_text = ""
+
     path_text = if !self.course_id.nil? && self.course_id > 0
                   Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(self.instructor[:name]) + '/' +
                     FileHelper.clean_path(self.course.directory_path) + '/'
@@ -213,7 +179,6 @@ class Assignment < ActiveRecord::Base
                   Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(self.instructor[:name]) + '/'
                 end
     path_text += FileHelper.clean_path(self.directory_path)
-    path_text
   end
 
   # Check whether review, metareview, etc.. is allowed
@@ -247,6 +212,7 @@ class Assignment < ActiveRecord::Base
     check_condition('review_of_review_allowed_id', topic_id)
   end
 
+  #Deletes all instances created as part of assignment and finally destroys itself.
   def delete(force = nil)
     begin
       maps = ReviewResponseMap.where(reviewed_object_id: self.id)
@@ -262,23 +228,20 @@ class Assignment < ActiveRecord::Base
       raise "There is at least one teammate review response that exists for #{self.name}."
     end
 
-    self.invitations.each(&:destroy)
-    self.teams.each(&:delete)
-    self.participants.each(&:delete)
-    self.due_dates.each(&:destroy)
-    self.assignment_questionnaires.each(&:destroy)
+    # destroy instances of invitations, teams, particiapnts, etc, refactored by Rajan, Jasmine, Sreenidhi 3/30/2020
+    #You can now add the instances to be deleted into the list.
+    delete_instances = ['invitations','teams','participants','due_dates','assignment_questionnaires']
+    delete_instances.each do |instance|
+      self.instance_eval(instance).each(&:destroy)
+    end
 
     # The size of an empty directory is 2
     # Delete the directory if it is empty
     directory = Dir.entries(Rails.root + '/pg_data/' + self.directory_path) rescue nil
     if self.directory_path.present? and !directory.nil?
-      if directory.size == 2
-        Dir.delete(Rails.root + '/pg_data/' + self.directory_path)
-      else
-        raise 'The assignment directory is not empty.'
-      end
+      raise 'The assignment directory is not empty.' if directory.size != 2
+      Dir.delete(Rails.root + '/pg_data/' + self.directory_path)
     end
-
     self.destroy
   end
 
@@ -287,7 +250,8 @@ class Assignment < ActiveRecord::Base
     self.microtask.nil? ? false : self.microtask
   end
 
-  def has_badge?
+  # Check to see if assignment has badge
+  def badge?
     self.has_badge.nil? ? false : self.has_badge
   end
 
@@ -331,15 +295,12 @@ class Assignment < ActiveRecord::Base
     if self.staggered_deadline?
       return (topic_id.nil? ? 'Unknown' : get_current_stage(topic_id))
     end
-    due_date = find_current_stage(topic_id)
 
-    unless self.staggered_deadline?
-      if due_date != 'Finished' && !due_date.nil? && !due_date.deadline_name.nil?
-        return due_date.deadline_name
-      else
-        return get_current_stage(topic_id)
-      end
+    due_date = find_current_stage(topic_id)
+    if due_date != 'Finished' && !due_date.nil? && !due_date.deadline_name.nil?
+      return due_date.deadline_name
     end
+    get_current_stage(topic_id)
   end
 
   # check if this assignment has multiple review phases with different review rubrics
@@ -348,19 +309,17 @@ class Assignment < ActiveRecord::Base
   end
 
   def link_for_current_stage(topic_id = nil)
-    if self.staggered_deadline?
-      return nil if topic_id.nil?
-    end
+    return nil if staggered_and_no_topic?(topic_id)
+
     due_date = find_current_stage(topic_id)
     if due_date.nil? or due_date == 'Finished' or due_date.is_a?(TopicDueDate)
       return nil
-    else
-      due_date.description_url
     end
+    due_date.description_url
   end
 
   def stage_deadline(topic_id = nil)
-    return 'Unknown' if topic_id.nil? and self.staggered_deadline?
+    return 'Unknown' if staggered_and_no_topic?(topic_id)
     due_date = find_current_stage(topic_id)
     due_date.nil? || due_date == 'Finished' ? due_date : due_date.due_at.to_s
   end
@@ -382,41 +341,29 @@ class Assignment < ActiveRecord::Base
 
   # Zhewei: this method is almost the same as 'stage_deadline'
   def get_current_stage(topic_id = nil)
-    return 'Unknown' if topic_id.nil? and self.staggered_deadline?
+    return 'Unknown' if staggered_and_no_topic?(topic_id)
     due_date = find_current_stage(topic_id)
     due_date.nil? || due_date == 'Finished' ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
   end
 
-  def review_questionnaire_id(round = nil)
-    # Get the round it's in from the next duedates
-    if round.nil?
+  # Find the ID of a review questionnaire for this assignment
+  def review_questionnaire_id(round_number = nil, topic_id = nil)
+    # If round is not given, try to retrieve current round from the next due date
+    if round_number.nil?
       next_due_date = DueDate.get_next_due_date(self.id)
-      round = next_due_date.try(:round)
+      round_number = next_due_date.try(:round)
     end
-    # for program 1 like assignment, if same rubric is used in both rounds,
-    # the 'used_in_round' field in 'assignment_questionnaires' will be null,
-    # since one field can only store one integer
-    # if rev_q_ids is empty, Expertiza will try to find questionnaire whose type is 'ReviewQuestionnaire'.
-    rev_q_ids = if round.nil?
-                  AssignmentQuestionnaire.where(assignment_id: self.id)
-                else
-                  AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
-                end
-    if rev_q_ids.empty?
-      AssignmentQuestionnaire.where(assignment_id: self.id).find_each do |aq|
-        rev_q_ids << aq if aq.questionnaire.type == "ReviewQuestionnaire"
-      end
+    # Create assignment_form that we can use to retrieve AQ with all the same attributes and questionnaire based on AQ
+    assignment_form = AssignmentForm.create_form_object(self.id)
+    assignment_questionnaire = assignment_form.assignment_questionnaire('ReviewQuestionnaire', round_number, topic_id)
+    questionnaire = assignment_form.questionnaire(assignment_questionnaire, 'ReviewQuestionnaire')
+    return questionnaire.id unless questionnaire.id.nil?
+    # If correct questionnaire is not found, find it by type
+    AssignmentQuestionnaire.where(assignment_id: self.id).select do |aq|
+      !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == 'ReviewQuestionnaire'
+      return aq.questionnaire_id
     end
-    review_questionnaire_id = nil
-    rev_q_ids.each do |rqid|
-      next if rqid.questionnaire_id.nil?
-      rtype = Questionnaire.find(rqid.questionnaire_id).type
-      if rtype == 'ReviewQuestionnaire'
-        review_questionnaire_id = rqid.questionnaire_id
-        break
-      end
-    end
-    review_questionnaire_id
+    nil
   end
 
   def self.export_details(csv, parent_id, detail_options)
@@ -447,17 +394,14 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  # This method is used for export detailed contents. - Akshit, Kushagra, Vaibhav
+  # This method was refactored to reduce complexity, additional fields could now be added to the list - Rajan, Jasmine, Sreenidhi
+  #Now you could add your export fields to the hashmap
+  EXPORT_DETAIL_FIELDS={team_id:'Team ID / Author ID', team_name:'Reviewee (Team / Student Name)',reviewer:'Reviewer',question:'Question / Criterion',question_id:'Question ID',comment_id:'Answer / Comment ID',comments:'Answer / Comment',score:'Score' }.freeze
   def self.export_details_fields(detail_options)
     fields = []
-    fields << 'Team ID / Author ID' if detail_options['team_id'] == 'true'
-    fields << 'Reviewee (Team / Student Name)' if detail_options['team_name'] == 'true'
-    fields << 'Reviewer' if detail_options['reviewer'] == 'true'
-    fields << 'Question / Criterion' if detail_options['question'] == 'true'
-    fields << 'Question ID' if detail_options['question_id'] == 'true'
-    fields << 'Answer / Comment ID' if detail_options['comment_id'] == 'true'
-    fields << 'Answer / Comment' if detail_options['comments'] == 'true'
-    fields << 'Score' if detail_options['score'] == 'true'
+    EXPORT_DETAIL_FIELDS.each do |key, value|
+      fields << value if detail_options[key.to_s]=='true'
+    end
     fields
   end
 
@@ -468,21 +412,21 @@ class Assignment < ActiveRecord::Base
 
   # Generates a single row based on the detail_options selected
   def self.csv_row(detail_options, answer)
-    tcsv = []
+    teams_csv = []
     @response = Response.find(answer.response_id)
     map = ResponseMap.find(@response.map_id)
     @reviewee = Team.find_by id: map.reviewee_id
     @reviewee = Participant.find(map.reviewee_id).user if @reviewee.nil?
     reviewer = Participant.find(map.reviewer_id).user
-    tcsv << handle_nil(@reviewee.id) if detail_options['team_id'] == 'true'
-    tcsv << handle_nil(@reviewee.name) if detail_options['team_name'] == 'true'
-    tcsv << handle_nil(reviewer.name) if detail_options['reviewer'] == 'true'
-    tcsv << handle_nil(answer.question.txt) if detail_options['question'] == 'true'
-    tcsv << handle_nil(answer.question.id) if detail_options['question_id'] == 'true'
-    tcsv << handle_nil(answer.id) if detail_options['comment_id'] == 'true'
-    tcsv << handle_nil(answer.comments) if detail_options['comments'] == 'true'
-    tcsv << handle_nil(answer.answer) if detail_options['score'] == 'true'
-    tcsv
+    teams_csv << handle_nil(@reviewee.id) if detail_options['team_id'] == 'true'
+    teams_csv << handle_nil(@reviewee.name) if detail_options['team_name'] == 'true'
+    teams_csv << handle_nil(reviewer.name) if detail_options['reviewer'] == 'true'
+    teams_csv << handle_nil(answer.question.txt) if detail_options['question'] == 'true'
+    teams_csv << handle_nil(answer.question.id) if detail_options['question_id'] == 'true'
+    teams_csv << handle_nil(answer.id) if detail_options['comment_id'] == 'true'
+    teams_csv << handle_nil(answer.comments) if detail_options['comments'] == 'true'
+    teams_csv << handle_nil(answer.answer) if detail_options['score'] == 'true'
+    teams_csv
   end
 
   # Populate answers will review information
@@ -506,13 +450,7 @@ class Assignment < ActiveRecord::Base
   # Checks if there are rounds with no reviews
   def self.check_empty_rounds(answers, round_num, res_type)
     unless answers[round_num][res_type].empty?
-      round_type =
-        if round_num.nil?
-          "Round Nill - " + res_type
-        else
-          "Round " + round_num.to_s + " - " + res_type.to_s
-        end
-      return round_type
+      return round_num.nil? ? "Round Nil - " + res_type : "Round " + round_num.to_s + " - " + res_type.to_s
     end
     nil
   end
@@ -532,13 +470,9 @@ class Assignment < ActiveRecord::Base
     @questions = {}
     questionnaires = @assignment.questionnaires
     questionnaires.each do |questionnaire|
-      if @assignment.varying_rubrics_by_round?
+      if @assignment.vary_by_round
         round = AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: @questionnaire.id).used_in_round
-        questionnaire_symbol = if round.nil?
-                                 questionnaire.symbol
-                               else
-                                 (questionnaire.symbol.to_s + round.to_s).to_sym
-                               end
+        questionnaire_symbol = round.nil? ? questionnaire.symbol : (questionnaire.symbol.to_s + round.to_s).to_sym
       else
         questionnaire_symbol = questionnaire.symbol
       end
@@ -554,59 +488,147 @@ class Assignment < ActiveRecord::Base
     (0..@scores[:teams].length - 1).each do |index|
       team = @scores[:teams][index.to_s.to_sym]
       first_participant = team[:team].participants[0] unless team[:team].participants[0].nil?
-      pscore = @scores[:participants][first_participant.id.to_s.to_sym]
-      tcsv = []
-      tcsv << team[:team].name
+      teams_csv = []
+      teams_csv << team[:team].name
       names_of_participants = ''
       team[:team].participants.each do |p|
         names_of_participants += p.fullname
         names_of_participants += '; ' unless p == team[:team].participants.last
       end
       tcsv << names_of_participants
-      export_data_fields(options)
+      export_data_fields(options, team, tcsv, pscore)
       csv << tcsv
     end
   end
 
-  def self.export_data_fields(options)
+  def self.export_data_fields(options, team, tcsv, pscore)
     if options['team_score'] == 'true'
-      team[:scores] ?
-        tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg]) :
+      if team[:scores]
+        tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg])
+      else
         tcsv.push('---', '---', '---')
+      end
     end
     review_hype_mapping_hash = {review: 'submitted_score',
                                 metareview: 'metareview_score',
                                 feedback: 'author_feedback_score',
                                 teammate: 'teammate_review_score'}
     review_hype_mapping_hash.each do |review_type, score_name|
-      export_individual_data_fields(review_type, score_name)
+      export_individual_data_fields(review_type, score_name, tcsv, pscore, options)
     end
-    tcsv.push(pscore[:total_score])
+    teams_csv.push(pscore[:total_score])
   end
 
-  def self.export_individual_data_fields(review_type, score_name)
+  def self.export_individual_data_fields(review_type, score_name, tcsv, pscore, options)
     if pscore[review_type]
-      tcsv.push(pscore[review_type][:scores][:max], pscore[review_type][:scores][:min], pscore[review_type][:scores][:avg])
-    else
-      tcsv.push('---', '---', '---') if options[score_name]
+      teams_csv.push(pscore[review_type][:scores][:max], pscore[review_type][:scores][:min], pscore[review_type][:scores][:avg])
+    elsif options[score_name]
+      teams_csv.push('---', '---', '---')
     end
   end
 
-  # This method is used for export contents of grade#view.  -Zhewei
+  # This method was refactored by Rajan, Jasmine, Sreenidhi on 03/31/2020
+  #Now you can add groups of fields to the hashmap
+  EXPORT_FIELDS={team_score:['Team Max','Team Min','Team Avg'], submitted_score:['Submitted Max','Submitted Min','Submitted Avg'],metareview_score:['Metareview Max','Metareview Min','Metareview Avg'],author_feedback_score:['Author Feedback Max, Author Feedback Min, Author Feedback Avg'],teammate_review_score:['Teammate Review Max', 'Teammate Review Min', 'Teammate Review Avg']}.freeze
   def self.export_fields(options)
     fields = []
     fields << 'Team Name'
     fields << 'Team Member(s)'
-    fields.push('Team Max', 'Team Min', 'Team Avg') if options['team_score'] == 'true'
-    fields.push('Submitted Max', 'Submitted Min', 'Submitted Avg') if options['submitted_score']
-    fields.push('Metareview Max', 'Metareview Min', 'Metareview Avg') if options['metareview_score']
-    fields.push('Author Feedback Max', 'Author Feedback Min', 'Author Feedback Avg') if options['author_feedback_score']
-    fields.push('Teammate Review Max', 'Teammate Review Min', 'Teammate Review Avg') if options['teammate_review_score']
+    EXPORT_FIELDS.each do |key, value|
+      if options[key.to_s]=='true'
+        value.each do |f|
+          fields.push(f)
+        end
+      end
+    end
     fields.push('Final Score')
     fields
   end
 
   def find_due_dates(type)
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: type).id }
+  end
+
+  private
+  #Below private methods are extracted and added as part of refactoring project E2009 - Spring 2020
+  #This method computes and returns grades by rounds, total_num_of_assessments and total_score
+  # when the assignment has varying rubrics by round
+  def compute_grades_by_rounds(questions, team)
+    grades_by_rounds = {}
+    total_score = 0
+    total_num_of_assessments = 0 # calculate grades for each rounds
+    (1..self.num_review_rounds).each do |i|
+      assessments = ReviewResponseMap.get_responses_for_team_round(team, i)
+      round_sym = ("review" + i.to_s).to_sym
+      grades_by_rounds[round_sym] = Answer.compute_scores(assessments, questions[round_sym])
+      total_num_of_assessments += assessments.size
+      total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f unless grades_by_rounds[round_sym][:avg].nil?
+    end
+    return grades_by_rounds, total_num_of_assessments, total_score
+  end
+
+  # merge the grades from multiple rounds
+  def merge_grades_by_rounds(grades_by_rounds, num_of_assessments, total_score)
+    team_scores = {:max => 0, :min => 0, :avg => nil}
+    if num_of_assessments == 0
+      return team_scores
+    end
+
+    team_scores[:max] = -999_999_999
+    team_scores[:min] = 999_999_999
+    team_scores[:avg] = total_score/num_of_assessments
+    (1..self.num_review_rounds).each do |i|
+      round_sym = ("review" + i.to_s).to_sym
+      if !grades_by_rounds[round_sym][:max].nil? && team_scores[:max] < grades_by_rounds[round_sym][:max]
+        team_scores[:max] = grades_by_rounds[round_sym][:max]
+      end
+      if !grades_by_rounds[round_sym][:min].nil? && team_scores[:min] > grades_by_rounds[round_sym][:min]
+        team_scores[:min] = grades_by_rounds[round_sym][:min]
+      end
+    end
+    team_scores
+  end
+
+  #returns true if assignment has staggered deadline and topic_id is nil
+  def staggered_and_no_topic?(topic_id)
+    self.staggered_deadline? and topic_id.nil?
+  end
+
+  #returns true if reviews required is greater than reviews allowed
+  def num_reviews_greater?(reviews_required, reviews_allowed)
+    reviews_allowed && reviews_allowed != -1 && reviews_required > reviews_allowed
+  end
+
+  # for program 1 like assignment, if same rubric is used in both rounds,
+  # the 'used_in_round' field in 'assignment_questionnaires' will be null,
+  # since one field can only store one integer
+  # if questionnaire_ids is empty, Expertiza will try to find questionnaire whose type is 'ReviewQuestionnaire'.
+  def get_questionnaire_ids(round)
+    questionnaire_ids = if round.nil?
+                          AssignmentQuestionnaire.where(assignment_id: self.id)
+                        else
+                          AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
+                        end
+    if questionnaire_ids.empty?
+      AssignmentQuestionnaire.where(assignment_id: self.id).find_each do |aq|
+        questionnaire_ids << aq if aq.questionnaire.type == "ReviewQuestionnaire"
+      end
+    end
+    questionnaire_ids
+  end
+
+  def get_min_metareview(response_map_set)
+    response_map_set.sort! {|a, b| a.metareview_response_maps.count <=> b.metareview_response_maps.count }
+    min_metareviews = response_map_set.first.metareview_response_maps.count
+  end
+
+  # returns a map of reviewer to meta_reviews
+  def get_reviewer_metareviews_map(response_map_set)
+    reviewers = {}
+    response_map_set.each do |response_map|
+      reviewer = response_map.reviewer
+      reviewers.member?(reviewer) ? reviewers[reviewer] += 1 : reviewers[reviewer] = 1
+    end
+    reviewers = reviewers.sort_by {|a| a[1]}
   end
 end

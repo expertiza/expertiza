@@ -530,8 +530,6 @@ resources :institution, except: [:destroy] do
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
   get ':controller(/:action(/:id))(.:format)'
   match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
-  post '/response_toggle_permission/:id' => 'response#toggle_permission'
-  post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'
-  post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'
-
+  put 'student_task/make_public', controller: :student_task,  action: :make_public, method: :put
+  post '/suggestion/update_visibility/', to: 'suggestion#update_visibility'
 end

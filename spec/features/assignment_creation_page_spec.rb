@@ -210,7 +210,7 @@ describe "adding to course", js: true do
 		assignment_id = Assignment.where(name: 'Test Assignment')[0].id
 
 		login_as('instructor6')
-		visit "/assignments/associate_assignment_with_course?id=#{assignment_id}"
+		visit "/assignments/place_assignment_in_course?id=#{assignment_id}"
 
 		choose "course_id_#{course_id}"
 		click_button 'Save'

@@ -175,3 +175,20 @@ input[type=range]:focus::-ms-fill-upper {
 .rangeTrue::-webkit-slider-thumb {
   background: white !important;
 }
+
+.grey-out-text, .grey-out-toggle {
+  opacity: 0.2;
+  transition: opacity .3s;
+}
+
+.grey-out-toggle:hover {
+  opacity: 1;
+}
+
+input[type=range].changed-toggle::-webkit-slider-runnable-track {
+  background: #CCCCCC;
+}
+
+input[type=range].changed-toggle:focus::-webkit-slider-runnable-track {
+  background: #CCCCCC;
+}

@@ -69,14 +69,23 @@ class TagPrompt < ActiveRecord::Base
   def slider_control(answer, tag_prompt_deployment, stored_tags)
     html = ""
     value = "0"
-    style = ""
-    if stored_tags.count > 0
+    text_style = ""
+    toggle_style = ""
+    if ReviewMetricsQuery.confident?(tag_prompt_deployment.tag_prompt.prompt, answer.id)
+      if stored_tags.count > 0
+        toggle_style = "changed-toggle"
+        tag = stored_tags.first
+        value = tag.value.to_s
+      else
+        text_style = "grey-out-text"
+        toggle_style = "grey-out-toggle"
+        value = ReviewMetricsQuery.has(tag_prompt_deployment.tag_prompt.prompt, answer.id) ? 1 : -1
+      end
+    elsif stored_tags.count > 0
       tag = stored_tags.first
       value = tag.value.to_s
-    elsif ReviewMetricsQuery.confident?(tag_prompt_deployment.tag_prompt.prompt, answer.id)
-      style = "grey-out"
-      value = ReviewMetricsQuery.has(tag_prompt_deployment.tag_prompt.prompt, answer.id) ? 1 : -1
     end
+
     element_id = answer.id.to_s + '_' + self.id.to_s
     control_id = "tag_prompt_" + element_id
     no_text_class = "toggle-false-msg"
@@ -90,12 +99,12 @@ class TagPrompt < ActiveRecord::Base
     end
 
     html += '<div class="toggle-container tag_prompt_container" title="' + self.desc.to_s + '">'
-    html += ' <div class="' + no_text_class + '" id="no_text_' + element_id + '">No</div>'
+    html += ' <div class="' + no_text_class + ' ' + text_style + '" id="no_text_' + element_id + '">No</div>'
     html += ' <div class="range-field" style=" width:60px">'
-    html += '   <input type="range" name="tag_checkboxes[]" id="' + control_id.to_s + '" min="-1" class="rangeAll ' + style + '" max="1" value="' + value.to_s + '" onLoad="toggleLabel(this)" onChange="toggleLabel(this); save_tag(' + answer.id.to_s + ', ' + tag_prompt_deployment.id.to_s + ', ' + control_id + ');"></input>'
+    html += '   <input type="range" name="tag_checkboxes[]" id="' + control_id.to_s + '" min="-1" class="rangeAll ' + toggle_style + '" max="1" value="' + value.to_s + '" onLoad="toggleLabel(this)" onChange="toggleLabel(this); save_tag(' + answer.id.to_s + ', ' + tag_prompt_deployment.id.to_s + ', ' + control_id + ');"></input>'
     html += ' </div>'
-    html += ' <div class="' + yes_text_class + '" id="yes_text_' + element_id + '">Yes</div>'
-    html += ' <div class="toggle-caption">' + self.prompt.to_s + '</div>'
+    html += ' <div class="' + yes_text_class + ' ' + text_style + '" id="yes_text_' + element_id + '">Yes</div>'
+    html += ' <div class="toggle-caption ' + text_style + '">' + self.prompt.to_s + '</div>'
     html += '</div>'
 
     html

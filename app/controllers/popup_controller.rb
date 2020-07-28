@@ -66,18 +66,8 @@ class PopupController < ApplicationController
         instance_variable_set('@total_possible_round_' + round.to_s, response.maximum_score)
       end
     end
-
-    all_assignments = Assignment.where(:instructor_id=>session[:user].id)
-    @similar_assignments = []
-    all_assignments.each do |assignment|
-      if (string_similarity(@assignment.name, assignment.name) > ASSIGNMENT_NAME_SIMILARITY_THRESHOLD)
-        @similar_assignments << assignment
-      end
-    end
-    @similar_assignments = @similar_assignments.sort_by { |sim_assignment| -sim_assignment.id }
   end
 
-  # Views tone analysis report and heatmap
   def view_review_scores_popup
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]

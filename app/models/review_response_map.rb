@@ -152,7 +152,10 @@ class ReviewResponseMap < ResponseMap
       where_map = {map_id: map.id}
       where_map[:round] = round unless round.nil?
       responses = Response.where(where_map)
-      response_ids << responses.last.id unless responses.empty?
+      next if responses.empty?
+      responses.each do |response|
+        response_ids << response.id
+      end
     end
     review_final_versions[symbol][:response_ids] = response_ids
   end

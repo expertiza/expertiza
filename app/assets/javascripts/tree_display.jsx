@@ -781,7 +781,7 @@ jQuery(document).ready(function() {
         });
         if(this.props.dataType!='assignment') {
             _this = this;
-            jQuery.post('/tree_display/children_node_2_ng',
+            jQuery.get('/tree_display/get_sub_folder_contents',
                 {
                     reactParams2: newParams
                 },
@@ -1173,14 +1173,7 @@ jQuery(document).ready(function() {
           activeTab: data
         })
       })
-      jQuery.get("/tree_display/folder_node_ng_getter", function(data) {
-        jQuery.post("/tree_display/children_node_ng",
-          {
-            reactParams: {
-              child_nodes: data,
-              nodeType: 'FolderNode'
-            }
-          }, function(data2, status) {
+        jQuery.get("/tree_display/get_folder_contents", function(data2, status) {
             jQuery.each(data2, function(nodeType, outerNode) {
               jQuery.each(outerNode, function(i, node) {
                 var newParams = {
@@ -1207,8 +1200,6 @@ jQuery(document).ready(function() {
             }
           },
           'json')
-      })
-      
     },
     handleTabChange: function(tabIndex) {
       jQuery.get("/tree_display/set_session_last_open_tab?tab="+tabIndex.toString())

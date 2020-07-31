@@ -42,24 +42,24 @@ describe "bookmark review testing" do
      expect(page).to have_content 'Bookmarks list for TestReview'
    end
 
-   it "can view bookmark list" do
+   xit "can view bookmark list" do
      load_bookmark_list
    end
 
-   it "can edit bookmark" do
+   xit "can edit bookmark" do
      load_bookmark_list
      click_link "Edit Bookmark"
      expect(page).to have_content "Editing bookmark"
      click_button "Update"
    end
 
-   it "can destroy bookmark" do
+   xit "can destroy bookmark" do
      load_bookmark_list
      click_link "Destroy Bookmark"
      expect(page).to have_content "Your bookmark has been successfully deleted!"
    end
 
-   it "can add new bookmark" do
+   xit "can add new bookmark" do
      load_bookmark_list
      click_link "New bookmark"
      expect(page).to have_content "Add new bookmark"
@@ -70,7 +70,7 @@ describe "bookmark review testing" do
      expect(page).to have_content "Your bookmark has been successfully created!"
    end
 
-   it "can review a bookmark" do
+   xit "can review a bookmark" do
      load_bookmark_list
      click_link "Review"
      expect(page).to have_content "New Bookmark Review for TestAssignment"

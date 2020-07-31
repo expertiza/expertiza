@@ -178,7 +178,7 @@ jQuery(document).ready(function() {
           } else {
             moreContent.push(
               <span>
-                <a title="Assign to course" href={"/assignments/associate_assignment_with_course?id="+(parseInt(this.props.id)/2).toString()}>
+                <a title="Assign to course" href={"/assignments/place_assignment_in_course?id="+(parseInt(this.props.id)/2).toString()}>
                   <img src="/assets/tree_view/assign-course-blue-24.png" />
                 </a>
               </span>

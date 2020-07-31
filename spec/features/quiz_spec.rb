@@ -21,6 +21,7 @@ end
 
 def login_and_create_quiz
   login_as @student.name
+  click_link 'Assignments'
   click_link @assignment.name
   click_link 'Your work'
   click_link 'Create a quiz'
@@ -40,6 +41,29 @@ def create_choices
     create(:quiz_question_choice, question: @question, txt: 'Answer 3'),
     create(:quiz_question_choice, question: @question, txt: 'Answer 4')
   ]
+end
+
+def create_choices_for_weighted_questionnaire(ques_id, type)
+  if type == "TrueFalse"
+    [
+      create(:quiz_question_choice, question: @question, txt: 'True_' + ques_id, iscorrect: 1),
+      create(:quiz_question_choice, question: @question, txt: 'False_' + ques_id)
+    ]
+  elsif type == "MultipleChoiceRadio"
+    [
+      create(:quiz_question_choice, question: @question, txt: 'Answer1_' + ques_id, iscorrect: 1),
+      create(:quiz_question_choice, question: @question, txt: 'Answer2_' + ques_id),
+      create(:quiz_question_choice, question: @question, txt: 'Answer3_' + ques_id),
+      create(:quiz_question_choice, question: @question, txt: 'Answer4_' + ques_id)
+    ]
+  else
+    [
+      create(:quiz_question_choice, question: @question, txt: 'Answer1_' + ques_id, iscorrect: 1),
+      create(:quiz_question_choice, question: @question, txt: 'Answer2_' + ques_id),
+      create(:quiz_question_choice, question: @question, txt: 'Answer3_' + ques_id, iscorrect: 1),
+      create(:quiz_question_choice, question: @question, txt: 'Answer4_' + ques_id)
+    ]
+  end
 end
 
 def fill_in_quiz
@@ -213,10 +237,49 @@ def setup_questionnaire
   @question = create :quiz_question, questionnaire: @questionnaire, txt: 'Question 1', quiz_question_choices: choices
 end
 
+# creates quiz questionnaire and assigns weights to questions
+def setup_weighted_questionnaire
+  @questionnaire = create :quiz_questionnaire, instructor_id: @team1.id
+  choices_one = create_choices_for_weighted_questionnaire("1", "TrueFalse")
+  @question1 = create :quiz_question, questionnaire: @questionnaire, txt: 'Sample True/False Question 1?', weight: 4, quiz_question_choices: choices_one, type: "TrueFalse"
+  choices_two = create_choices_for_weighted_questionnaire("2", "TrueFalse")
+  @question2 = create :quiz_question, questionnaire: @questionnaire, txt: 'Sample True/False Question 2', weight: 2, quiz_question_choices: choices_two, type: "TrueFalse"
+  choices_three = create_choices_for_weighted_questionnaire("3", "MultipleChoiceRadio")
+  @question3 = create :quiz_question, questionnaire: @questionnaire, txt: 'Sample MultipleChoiceRadio Question 3', weight: 6, quiz_question_choices: choices_three, type: "MultipleChoiceRadio"
+  choices_four = create_choices_for_weighted_questionnaire("4", "MultipleChoiceCheckbox")
+  @question4 = create :quiz_question, questionnaire: @questionnaire, txt: 'Sample MultipleChoiceCheckbox Question 3', weight: 8, quiz_question_choices: choices_four, type: "MultipleChoiceCheckbox"
+end
+
 def setup_responses
   @response_map = create :quiz_response_map, quiz_questionnaire: @questionnaire, reviewer: @participant2, reviewee_id: @team1.id
   @response = create :quiz_response, response_map: @response_map
   create :answer, question: @question, response_id: @response.id, answer: 1
+  create :score_view, q1_id: @questionnaire.id, s_question_id: @question.id, question_weight: 1, s_score: 1, s_response_id: @response.id
+end
+
+# this creates answers using factories so that grading of quizzes can be tested
+def setup_answers
+  create :answer, question: @question1, response_id: @response.id, answer: 1, comments: "True_1"
+  create :answer, question: @question2, response_id: @response.id, answer: 0, comments: "False_2"
+  create :answer, question: @question3, response_id: @response.id, answer: 0, comments: "Answer2_3"
+  create :answer, question: @question4, response_id: @response.id, answer: 1, comments: "Answer1_4"
+  create :answer, question: @question4, response_id: @response.id, answer: 1, comments: "Answer3_4"
+end
+
+# this creates score views using factories so that weighted score for quiz can be calculated
+def setup_score_views
+  create :score_view, q1_id: @questionnaire.id, s_question_id: @question1.id, question_weight: 4, s_score: 1, s_response_id: @response.id, s_comments: "True_1"
+  create :score_view, q1_id: @questionnaire.id, s_question_id: @question2.id, question_weight: 2, s_score: 0, s_response_id: @response.id, s_comments: "False_2"
+  create :score_view, q1_id: @questionnaire.id, s_question_id: @question3.id, question_weight: 6, s_score: 0, s_response_id: @response.id, s_comments: "Answer2_3"
+  create :score_view, q1_id: @questionnaire.id, s_question_id: @question4.id, question_weight: 8, s_score: 1, s_response_id: @response.id, s_comments: "Answer1_4"
+  create :score_view, q1_id: @questionnaire.id, s_question_id: @question4.id, question_weight: 8, s_score: 1, s_response_id: @response.id, s_comments: "Answer3_4"
+end
+
+# this creates the set up for grading of a weighted quiz questionnaire
+def setup_graded_responses
+  @response = create :quiz_response, response_map: @response_map
+  setup_answers
+  setup_score_views
 end
 
 def init_instructor_tests
@@ -250,13 +313,14 @@ describe 'Instructor', js: true do
     expect(student).to have_text(@student2.fullname)
     expect(score).to have_text('100.0')
     expect(page).to have_text('Average score for quiz takers: 100.0 ')
+    expect(page).to have_text('1')
     expect(page).to have_text(@question.txt)
     expect(page).to have_text("Question Type: MultipleChoiceRadio")
     expect(page).to have_text('Answer 1')
     expect(page).to have_text('Answer 2')
     expect(page).to have_text('Answer 3')
     expect(page).to have_text('Answer 4')
-    correct = find(".student_quizzes > b:nth-child(11)")
+    correct = find(".student_quizzes > b:nth-child(12)")
     expect(correct).to have_text('Answer 1')
   end
 end
@@ -302,8 +366,45 @@ describe 'Student reviewers can take the quizzes', js: true do
     click_link 'Begin'
     expect(page).to have_content('Questions')
     find(:css, "input[value='Answer 1']").click
+    # setting up data using factories to calculate grade
+    @response = create :quiz_response, response_map: @response_map
+    create :answer, question: @question, response_id: @response.id, answer: 1
+    create :score_view, q1_id: @questionnaire.id, s_question_id: @question.id, question_weight: 1, s_score: 1, s_response_id: @response.id
     click_on 'Submit Quiz'
     expect(page).to have_content('Quiz score: 100.0%')
+  end
+end
+
+# this creates the necessary set up so that a student reviewer can take a quiz
+# and checks if weights set up during the quiz creation are taken into
+# consideration when grading the quiz
+describe 'Grading of quizzes takes weights into consideration', js: true do
+  before :each do
+    @instructor = create(:instructor)
+    @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: 4
+    create_assignment_due_date
+    create_student1
+    make_team
+    setup_weighted_questionnaire
+    create_student2
+    @response_map = create :quiz_response_map, quiz_questionnaire: @questionnaire, reviewer: @participant2, reviewee_id: @team1.id
+  end
+
+  it 'can take quiz' do
+    login_as @student2.name
+    click_link @assignment.name
+    click_link 'Take quizzes'
+    expect(page).to have_link('Begin')
+    click_link 'Begin'
+    expect(page).to have_content('Questions')
+    find(:css, "input[value='True_1']").click
+    find(:css, "input[value='False_2']").click
+    find(:css, "input[value='Answer2_3']").click
+    find(:css, "input[value='Answer1_4']").click
+    find(:css, "input[value='Answer3_4']").click
+    setup_graded_responses
+    click_on 'Submit Quiz'
+    expect(page).to have_content('Quiz score: 60.0%')
   end
 end
 

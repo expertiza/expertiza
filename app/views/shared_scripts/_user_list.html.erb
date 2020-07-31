@@ -12,7 +12,7 @@
     <th class="head">Email Address</th>
     <th class="head">Role</th>
     <th class="head">Parent</th>
-    <% if params[:model] == 'Assignment' and Assignment.find_by(id: params[:id]).has_badge? %>
+    <% if params[:model] == 'Assignment' and Assignment.find_by(id: params[:id]).badge? %>
       <th class="head">Badges</th>
     <% end %>  
     <th class="head">Review</th>
@@ -23,6 +23,9 @@
     <th class="head">Take quiz</th>
     <th class="head">Handle</th>
     <th class="head">Action</th>
+    <!-- Adding header for the participant role on the UI -->
+    <th class="head">   </th>
+    <th class="head">Participant Role</th>
   </tr>
   <!--E1721 changes begin-->
   <% @user_id = [] %>

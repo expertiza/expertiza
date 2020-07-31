@@ -1,18 +1,12 @@
 class ParticipantsController < ApplicationController
+  include AuthorizationHelper
   autocomplete :user, :name
 
   def action_allowed?
     if %w[change_handle update_duties].include? params[:action]
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator',
-       'Student'].include? current_role_name
+      current_user_has_student_privileges?
     else
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator'].include? current_role_name
+      current_user_has_ta_privileges?
     end
   end
 
@@ -63,7 +57,14 @@ class ParticipantsController < ApplicationController
     can_take_quiz = permissions[:can_take_quiz]
     participant = Participant.find(params[:id])
     parent_id = participant.parent_id
-    participant.update_attributes(can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz)
+    # Upon successfully updating the attributes based on user role, a flash message is displayed to the user after the
+    # change in the database. This also gives the user the error message if the update fails.
+    begin
+      participant.update_attributes(can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz)
+      flash[:success] = "The role of the selected participants has been successfully updated."
+    rescue StandardError
+      flash[:error] = 'The update action failed.'
+    end
     redirect_to action: 'list', id: parent_id, model: participant.class.to_s.gsub("Participant", "")
   end
 

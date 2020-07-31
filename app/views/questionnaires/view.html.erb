@@ -26,7 +26,7 @@
 
     <BR/>
     <% if @questionnaire.type == "QuizQuestionnaire" %>
-      <%= link_to 'Edit', :controller => :quiz_questionnaire, :action => :edit_quiz, :id => 
+      <%= link_to 'Edit', :controller => :quiz_questionnaires, :action => :edit, :id => 
 @questionnaire.id, :pid => @participant.id %>|
     <% else %>
       <!--The following line may have bugs when @questionnaire.type != "QuizQuestionnaire"-->

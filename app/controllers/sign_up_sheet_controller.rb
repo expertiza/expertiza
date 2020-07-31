@@ -9,6 +9,8 @@
 # to
 
 class SignUpSheetController < ApplicationController
+  include AuthorizationHelper
+
   require 'rgl/adjacency'
   require 'rgl/dot'
   require 'rgl/topsort'
@@ -16,17 +18,12 @@ class SignUpSheetController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator',
-       'Student'].include? current_role_name and
-      ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer") : true)
+      (current_user_has_student_privileges? &&
+          (%w[list].include? action_name) &&
+          are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer")) ||
+          current_user_has_student_privileges?
     else
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator'].include? current_role_name
+      current_user_has_ta_privileges?
     end
   end
 
@@ -177,6 +174,7 @@ class SignUpSheetController < ApplicationController
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     @max_team_size = @assignment.max_team_size
     team_id = @participant.team.try(:id)
+    @use_bookmark = @assignment.use_bookmark
 
     if @assignment.is_intelligent
       @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)

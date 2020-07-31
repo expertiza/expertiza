@@ -1,3 +1,41 @@
+<script type="text/javascript">
+    function addQuestionnaireTableRowInTopics(questionnaire_type, questionnaire, questionnaire_options, round_no, topic_no) {
+        var table_name = "#topic_questionnaire_table" + topic_no + ">tbody>tr";
+        var questionnaire_table = jQuery(table_name);
+        var row_id = 'topic_questionnaire_table_' + topic_no + "_" + questionnaire_type;
+        var i;
+        var html = '<tr id=' + row_id + '>';
+        var t_id = "ti_id" + topic_no
+
+        html += '<input name="assignment_form[topic_questionnaire][][topic_id]" type="hidden" value="';
+        html += '<%= topic.id %>';
+        html += '">';
+        //Rubric name
+        if (round_no == null) {
+            html += '<td><label for=t_id>' + questionnaire.display_type + ':</label></td>';
+        } else {
+            html += '<td><label for=t_id>' + questionnaire.display_type + ' Round '+ round_no + ':</label></td>';
+        }
+        //Rubric options
+        html += '<td align="center">' +
+            '<select id=t_id name="assignment_form[topic_questionnaire][][questionnaire_id]" style="width:300px" class="form-control">' +
+            '<option value="">--Default rubric--</option>';
+        for (i = 0; i < questionnaire_options.length; i++) {
+            html += '<option value="' + questionnaire_options[i][1] + '">' + questionnaire_options[i][0] + '</option>';
+        }
+        html += '</select></td>';
+        if (round_no == null) {
+            html += '<td align="center"><input name="assignment_form[topic_questionnaire][][used_in_round]" style="width:30px" type="hidden" value=""' + '"> </td>';
+        } else {
+            html += '<td align="center"><input name="assignment_form[topic_questionnaire][][used_in_round]" style="width:30px" type="hidden" value="' + round_no + '"> </td>';
+        }
+        questionnaire_table.last().after(html);
+        jQuery('#t_id').val(questionnaire.id).attr('id', '');
+    }
+</script>
+
+<input name="hidden_topic_id" type="hidden" value=<%=topic.id %> >
+
 <td><%= topic.topic_identifier %></td>
 <td><%= render :partial => '/sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>
 <% if not @assignment.is_intelligent or ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].
@@ -5,11 +43,47 @@
   <% if @assignment.microtask? %>
       <td align="center"><%= topic.micropayment %></td>
   <% end %>
+
+  <% if @assignment.vary_by_topic %>
+    <% table_id = "topic_questionnaire_table" + i.to_s %>
+    <td>
+      <table id = <%=table_id %>>
+        <tr>
+          <script>
+              <% if @assignment.vary_by_round %>
+              <% 1.upto(@assignment.rounds_of_reviews) do |round| %>
+              <% assignment_questionnaire = @assignment_form.assignment_questionnaire('ReviewQuestionnaire', round, topic.id) %>
+              <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'ReviewQuestionnaire') %>
+              addQuestionnaireTableRowInTopics(
+                  'ReviewQuestionnaire',
+                  <%= questionnaire.to_json.html_safe %>,
+                  <%= questionnaire_options('ReviewQuestionnaire').to_json.html_safe %>,
+                  <%= round %>,
+                  <%= i %>
+              );
+              <% end %>
+              <% else %>
+              <% assignment_questionnaire = @assignment_form.assignment_questionnaire('ReviewQuestionnaire', nil, topic.id) %>
+              <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'ReviewQuestionnaire') %>
+              addQuestionnaireTableRowInTopics(
+                  'ReviewQuestionnaire',
+                  <%= questionnaire.to_json.html_safe %>,
+                  <%= questionnaire_options('ReviewQuestionnaire').to_json.html_safe %>,
+                  null,
+                  <%= i %>
+              );
+              <% end %>
+          </script>
+        </tr>
+      </table>
+    </td>
+  <% end %>
+
   <td align="center"><%= topic.max_choosers %></td>
   <%= render :partial => '/sign_up_sheet/available_slots', :locals => {:topic=>topic} %>
   <%= render :partial => '/sign_up_sheet/num_waiting', :locals => {:topic=>topic} %>
   <% if @assignment.current_stage_name(@topic_id) != 'Finished' %>
-      <td align="center"><%= render :partial => '/sign_up_sheet/actions', :locals => {:i=>i,:topic=>topic, :is_suggested_topic=>is_suggested_topic ||= false} %></td>
+      <td align="center"> <%= render :partial => '/sign_up_sheet/actions', :locals => {:i=>i,:topic=>topic, :is_suggested_topic=>is_suggested_topic ||= false} %> </td>
   <% end %>
   <td align="center">
   <% if SignUpSheet.has_teammate_ads?(topic.id) %>

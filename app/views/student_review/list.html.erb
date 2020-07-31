@@ -13,11 +13,16 @@
 <h4>You are required to do <%= @assignment.num_reviews_required %> reviews</h4>
 <h4> Number of reviews left: <%= @assignment.num_reviews_allowed - @num_reviews_completed %></h4>
 
+<% if !@response_ids.empty? %>
+    <%= link_to "Sample Reviews" , sample_reviews_path(:id => @assignment.id)%>
+<% end %>
+
 <% if check_reviewable_topics(@assignment) or @assignment.get_current_stage(@topic_id) == "Finished" %>
+    <%= @review_mappings.count %>
     <%= render :partial => 'responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>
     <!-- Temporary fix for Staggered Deadline assignment issue preventing students from reviewing 04-23-19 -->
     <!-- We need to perform the same check, but on the topic that is being reviewed and not the topic that the reviewer wrote on -->
-    <% if @assignment.staggered_deadline? or @assignment.number_of_current_round(@topic_id) == 1 or (@assignment.number_of_current_round(@topic_id) > 1 and @assignment.allow_selecting_additional_reviews_after_1st_round) %>   
+    <% if @assignment.staggered_deadline? or @assignment.number_of_current_round(@topic_id) == 1 or (@assignment.number_of_current_round(@topic_id) > 1 and @assignment.allow_selecting_additional_reviews_after_1st_round) %>
       <% if @assignment.dynamic_reviewer_assignment? %>
           <% if @num_reviews_in_progress >= Assignment.max_outstanding_reviews %>
               <br><br>

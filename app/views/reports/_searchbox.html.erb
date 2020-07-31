@@ -29,6 +29,9 @@
     <option value='SummaryByRevieweeAndCriteria' >
       Comment summary by reviewee (team)
     </option>
+    <option value='BookmarkRatingResponseMap' >
+      Bookmark Review Report
+    </option>
     <!--- Collusion report is not supported yet
     Refer collusion_cycle.rb for more details
     <option value='Collusion' >
@@ -82,6 +85,8 @@
   <h1> Author feedback report for <%= @assignment.name%> </h1>
 <% elsif @type == "TeammateReviewResponseMap" %>
   <h1> Teammate review report for <%= @assignment.name%> </h1>
+<% elsif @type == "BookmarkReviewResponseMap" %>
+  <h1> Bookmark review report for <%= @assignment.name%> </h1>
 <% elsif @type == "Calibration" %>
   <h1> Calibration report for <%= @assignment.name%> </h1>
 <!--Show summary reports-->
@@ -94,7 +99,6 @@
     <h1> Potential collusion report for <%= @assignment.name%> </h1>
 <% elsif @type == "PlagiarismCheckerReport" %>
     <h1> Plagiarism Checker Report for <%= @assignment.name%> </h1>
-
 <% end %>
 
 

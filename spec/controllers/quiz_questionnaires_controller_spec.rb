@@ -1,4 +1,4 @@
-describe QuizQuestionnaireController do
+describe QuizQuestionnairesController do
   let(:questionnaire) do
     build(id: 1, name: 'questionnaire', ta_id: 8, course_id: 1, private: false, min_question_score: 0, max_question_score: 5, type: 'ReviewQuestionnaire')
   end
@@ -9,6 +9,7 @@ describe QuizQuestionnaireController do
   let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:instructor2) { build(:instructor, id: 66) }
+  let(:student) { build(:student, id: 8609) }
   let(:ta) { build(:teaching_assistant, id: 8) }
   before(:each) do
     allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
@@ -28,7 +29,7 @@ describe QuizQuestionnaireController do
       it 'returns message (Please specify quiz name (please do not use your name or id).)' do
         controller.params = {aid: 1,
                              questionnaire: {name: ''}}
-        expect(controller.valid_quiz).to eq('Please specify quiz name (please do not use your name or id).')
+        expect(controller.validate_quiz).to eq('Please specify quiz name (please do not use your name or id).')
       end
     end
 # describe '#create_quiz_questionnaire, #create_questionnaire and #save' do
@@ -105,11 +106,11 @@ describe QuizQuestionnaireController do
 #     end
 #   end
 
-  describe '#create_quiz_questionnaire and #save' do
+  describe '#create and #save' do
     context 'when quiz is valid' do
       before(:each) do
         # create_quiz_questionnaire
-        allow_any_instance_of(QuizQuestionnaireController).to receive(:valid_quiz).and_return('valid')
+        allow_any_instance_of(QuizQuestionnairesController).to receive(:validate_quiz).and_return('valid')
       end
       context 'when questionnaire type is QuizQuestionnaire' do
         it 'redirects to submitted_content#edit page' do
@@ -121,11 +122,11 @@ describe QuizQuestionnaireController do
           participant = double('Participant')
           allow(Participant).to receive(:find).with('1').and_return(participant)
           allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', id: 6))
-          allow_any_instance_of(QuizQuestionnaireController).to receive(:save_choices).with(1).and_return(true)
+          allow_any_instance_of(QuizQuestionnairesController).to receive(:save_choices).with(1).and_return(true)
           # save
-          allow_any_instance_of(QuizQuestionnaireController).to receive(:save_questions).with(1).and_return(true)
-          allow_any_instance_of(QuizQuestionnaireController).to receive(:undo_link).with(any_args).and_return('')
-          post :create_quiz_questionnaire, params
+          allow_any_instance_of(QuizQuestionnairesController).to receive(:save_questions).with(1).and_return(true)
+          allow_any_instance_of(QuizQuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
+          post :create, params
           expect(flash[:note]).to eq('The quiz was successfully created.')
           expect(response).to redirect_to('/submitted_content/1/edit')
           expect(controller.instance_variable_get(:@questionnaire).private).to eq false
@@ -143,26 +144,26 @@ describe QuizQuestionnaireController do
                   questionnaire: {name: 'test questionnaire',
                                   type: 'QuizQuestionnaire'}}
         # create_quiz_questionnaire
-        allow_any_instance_of(QuizQuestionnaireController).to receive(:valid_quiz).and_return('Please select a correct answer for all questions')
+        allow_any_instance_of(QuizQuestionnairesController).to receive(:validate_quiz).and_return('Please select a correct answer for all questions')
         request.env['HTTP_REFERER'] = 'www.google.com'
-        post :create_quiz_questionnaire, params
+        post :create, params
         expect(flash[:error]).to eq('Please select a correct answer for all questions')
         expect(response).to redirect_to('www.google.com')
       end
     end
   end
 
-  describe '#view_quiz' do
+  describe '#view' do
     it 'renders questionnaires#view_quiz' do
       allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire'))
       allow(Participant).to receive(:find).with('1').and_return(double('Participant'))
       params = {id: 1, pid: 1}
-      get :view_quiz, params
+      get :view, params
       expect(response).to render_template(:view)
     end
   end
 
-  describe '#new_quiz' do
+  describe '#new' do
     context 'when an assignment requires quiz' do
       before(:each) do
         @params = {aid: 1,
@@ -174,18 +175,18 @@ describe QuizQuestionnaireController do
         allow(@assignment).to receive(:require_quiz?).and_return(true)
       end
 
-      it 'renders questionnaires#new_quiz if current participant has a team' do
+      it 'renders questionnaires#new if current participant has a team' do
         team = double('AssignmentTeam')
         allow(AssignmentParticipant).to receive_message_chain(:find, :team).with('1').with(no_args).and_return(team)
         allow(@assignment).to receive(:topics?).and_return(true)
         allow(team).to receive(:topic).and_return(double(:SignUpTopic))
-        get :new_quiz, @params
+        get :new, @params
         expect(response).to render_template(:new_quiz)
       end
 
       it 'shows error message and redirects to submitted_content#view if current participant does not have a team' do
         allow(AssignmentParticipant).to receive_message_chain(:find, :team).with('1').with(no_args).and_return(nil)
-        get :new_quiz, @params
+        get :new, @params
         expect(flash[:error]).to eq('You should create or join a team first.')
         expect(response).to redirect_to('/submitted_content/view?id=1')
       end
@@ -195,7 +196,7 @@ describe QuizQuestionnaireController do
         allow(AssignmentParticipant).to receive_message_chain(:find, :team).with('1').with(no_args).and_return(team)
         allow(@assignment).to receive(:topics?).and_return(true)
         allow(team).to receive(:topic).and_return(nil)
-        get :new_quiz, @params
+        get :new, @params
         expect(flash[:error]).to eq('Your team should have a topic.')
         expect(response).to redirect_to('/submitted_content/view?id=1')
       end
@@ -210,14 +211,14 @@ describe QuizQuestionnaireController do
         assignment = double('Assignment')
         allow(Assignment).to receive(:find).with('1').and_return(assignment)
         allow(assignment).to receive(:require_quiz?).and_return(false)
-        get :new_quiz, params
+        get :new, params
         expect(flash[:error]).to eq('This assignment does not support the quizzing feature.')
         expect(response).to redirect_to('/submitted_content/view?id=1')
       end
     end
   end
 
-  describe '#edit_quiz' do
+  describe '#edit' do
     before(:each) do
       @questionnaire = double('Questionnaire')
       allow(Questionnaire).to receive(:find).with('1').and_return(@questionnaire)
@@ -225,30 +226,32 @@ describe QuizQuestionnaireController do
 
     context 'when current questionnaire is not taken by anyone' do
       it 'renders questionnaires#edit page' do
+        stub_current_user(student, student.role.name, student.role) #action only permitted for Student role
         allow(@questionnaire).to receive(:taken_by_anyone?).and_return(false)
         params = {id: 1}
-        get :edit_quiz, params
+        get :edit, params
         expect(response).to render_template(:edit)
       end
     end
 
     context 'when current questionnaire has been taken by someone' do
       it 'shows flash[:error] message and redirects to submitted_content#view page' do
+        stub_current_user(student, student.role.name, student.role)  #action only permitted for Student role
         allow(@questionnaire).to receive(:taken_by_anyone?).and_return(true)
         params = {id: 1, pid: 1}
-        get :edit_quiz, params
+        get :edit, params
         expect(flash[:error]).to eq('Your quiz has been taken by some other students, you cannot edit it anymore.')
         expect(response).to redirect_to('/submitted_content/view?id=1')
       end
     end
   end
 
-  describe '#update_quiz' do
+  describe '#update' do
     context 'when @questionnaire is nil' do
       it 'redirects to submitted_content#view page' do
         allow(Questionnaire).to receive(:find).with('1').and_return(nil)
         params = {id: 1, pid: 1}
-        post :update_quiz, params
+        post :update, params
         expect(response).to redirect_to('/submitted_content/view?id=1')
       end
     end
@@ -280,7 +283,10 @@ describe QuizQuestionnaireController do
                                                       {'1' => {iscorrect: '1', txt: 'a31'},
                                                        '2' => {iscorrect: '0', txt: 'a32'},
                                                        '3' => {iscorrect: '1', txt: 'a33'},
-                                                       '4' => {iscorrect: '0', txt: 'a34'}}}}}
+                                                       '4' => {iscorrect: '0', txt: 'a34'}}}},
+                  question_weights: {'1' => {txt: '1'},
+                                    '2' => {txt: '1'},
+                                    '3' => {txt: '1'}}}
         questionnaire = double('Questionnaire')
         allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
         allow(questionnaire).to receive(:update_attributes).with(any_args).and_return(true)
@@ -301,7 +307,7 @@ describe QuizQuestionnaireController do
         allow(q3).to receive(:save).and_return(true)
         allow(qc).to receive(:update_attributes).with(any_args).and_return(true)
         allow(qc_tf).to receive(:update_attributes).with(any_args).and_return(true)
-        post :update_quiz, params
+        post :update, params
         expect(response).to redirect_to('/submitted_content/view?id=1')
       end
     end
@@ -311,7 +317,7 @@ describe QuizQuestionnaireController do
       it 'returns message (Please select a type for each question)' do
         controller.params = {aid: 1,
                              questionnaire: {name: 'test questionnaire'}}
-        expect(controller.valid_quiz).to eq('Please select a type for each question')
+        expect(controller.validate_quiz).to eq('Please select a type for each question')
       end
     end
 
@@ -322,7 +328,7 @@ describe QuizQuestionnaireController do
                              question_type: {'1' => {type: 'TrueFalse'}},
                              new_question: {'1' => {iscorrect: 'True'}},
                              new_choices: {'1' => {}}}
-        expect(controller.valid_quiz).to eq('Please select a correct answer for all questions')
+        expect(controller.validate_quiz).to eq('Please select a correct answer for all questions')
       end
     end
 
@@ -336,7 +342,7 @@ describe QuizQuestionnaireController do
         question = build(:question, type: 'TrueFalse')
         allow(TrueFalse).to receive(:create).with(txt: '', type: 'TrueFalse', break_before: true).and_return(question)
         allow(question).to receive(:isvalid).with('sth').and_return('valid')
-        expect(controller.valid_quiz).to eq('valid')
+        expect(controller.validate_quiz).to eq('valid')
       end
     end
   end

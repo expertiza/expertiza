@@ -1,6 +1,24 @@
 # require 'automated_metareview'
 class AutomatedMetareviewsController < ApplicationController
+  include AuthorizationHelper
+
   attr_accessor :automated_metareviews
+
+  # According to Dr. Gehringer, an instructor, ancestor of the instructor, TA for the course,
+  # or student in the course should be able to access this controller
+  def action_allowed?
+    assignment = find_assignment_from_response_id(params[:id])
+
+    if assignment
+      instructor = find_assignment_instructor(assignment)
+      current_user_teaching_staff_of_assignment?(assignment.id) ||
+          current_user_ancestor_of?(instructor) ||
+          current_user_is_assignment_participant?(assignment.id)
+    else
+      false
+    end
+  end
+
   def index
     @automated_metareviews = AutomatedMetareview.all
     respond_to do |format|

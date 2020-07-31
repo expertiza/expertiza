@@ -36,13 +36,15 @@
           jQuery("#questionnaire_table_BookmarkRatingQuestionnaire").remove()
           var bookmark_checkbox = jQuery('#assignment_form_assignment_use_bookmark');
           if (bookmark_checkbox.is(':checked')) {
-            addQuestionnaireTableRow(
-                    'BookmarkRatingQuestionnaire',
-                    null,
-                    <%= questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>,
-                    <%= assignment_questionnaire(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>,
-                    <%= questionnaire_options(@assignment_form.assignment, 'BookmarkRatingQuestionnaire',nil).to_json.html_safe %>
-            );
+              <% assignment_questionnaire = @assignment_form.assignment_questionnaire('BookmarkRatingQuestionnaire',nil, nil) %>
+              <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'BookmarkRatingQuestionnaire') %>
+              addQuestionnaireTableRow(
+                  'BookmarkRatingQuestionnaire',
+                  <%= assignment_questionnaire.to_json.html_safe %>,
+                  <%= questionnaire.to_json.html_safe %>,
+                  <%= questionnaire_options('BookmarkRatingQuestionnaire').to_json.html_safe %>,
+                  null
+              );
           }
       }
 

@@ -33,7 +33,7 @@
         <%= form_tag :action => 'add_new_questions', :id => params[:id], :questionnaire_type => params[:model], :private => params[:private] do %>
          <p class="form-inline"> <%= submit_tag 'Add', class: "btn btn-default"%>
           <%= text_field 'question', 'total_num', :size => 1, :value => "1", :class => "form-control" %> more
-          <%= select "question", "type", 
+          <%= select "question", "type",
               {"Criterion" =>"Criterion",
                "Scale"=>"Scale",
                "Dropdown"=>"Dropdown",
@@ -44,7 +44,10 @@
                "SectionHeader"=>"SectionHeader",
                "TableHeader"=>"TableHeader",
                "ColumnHeader"=>"ColumnHeader",
-               }, {}, {class: "form-control"} %> question(s)</p>
+               }, {}, {class: "form-control", onchange: "checkQuestionType()"} %> question(s)
+           <span id = "new_question_weight">
+            Add question weight <%= text_field 'question', 'weight', :size => 1, :value => "1", :class => "form-control" %>
+           </span></p>
         <% end %>
       </td>
     </tr>

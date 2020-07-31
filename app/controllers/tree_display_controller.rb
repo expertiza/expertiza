@@ -1,25 +1,28 @@
 class TreeDisplayController < ApplicationController
   helper :application
   include SecurityHelper
+  include AuthorizationHelper
 
   # Checks controller permissions
   def action_allowed?
     true
   end
 
-  # Confirm when user attempts to delete a node.
+  # refactored method to provide direct access to parameters
+  # added an argument prevTab for sending the respective tab to be highlighted on homepage
+  def goto_controller(name_parameter, prevTab)
+    node_object = TreeFolder.find_by(name: name_parameter)
+    session[:root] = FolderNode.find_by(node_object_id: node_object.id).id
+    # if we have to highlight a tab, we store this arg. to the last_open_tab elements of session
+    if(prevTab!=nil)
+      session[:last_open_tab] = prevTab
+    end
+    redirect_to controller: 'tree_display', action: 'list', currCtlr: name_parameter
+  end
+
   def confirm
     @id = params[:id]
     @node_type = params[:nodeType]
-  end
-
-  # The goto_ methods listed below are used to traverse the menu system. It is 
-  # hard to tell exactly where they are called from, but at least some (if not all) 
-  # are necessary. These functions may be better suited for another controller.
-  def goto_controller(name_parameter)
-    node_object = TreeFolder.find_by(name: name_parameter)
-    session[:root] = FolderNode.find_by(node_object_id: node_object.id).id
-    redirect_to controller: 'tree_display', action: 'list'
   end
 
   def goto_questionnaires; goto_controller('Questionnaires') end
@@ -36,7 +39,9 @@ class TreeDisplayController < ApplicationController
 
   # Redirects to proper page if user is not an instructor or TA.
   def list
-    redirect_to controller: :content_pages, action: :view if current_user.nil?
+    @currCtlr = params[:currCtlr]
+    redirect_to controller: :content_pages, action: :view unless user_logged_in?
+
     redirect_to controller: :student_task, action: :list if current_user.try(:student?)
   end
 
@@ -76,6 +81,104 @@ class TreeDisplayController < ApplicationController
     contents = []
     child_nodes.each do |node|
       contents.push(serialize_sub_folder_to_json(node))
+
+  # for child nodes
+  def children_node_ng
+    flash[:error] = "Invalid JSON in the TreeList" unless json_valid? params[:reactParams][:child_nodes]
+    child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
+    tmp_res = {}
+    unless child_nodes.blank?
+      child_nodes.each do |node|
+        initialize_fnode_update_children(params, node, tmp_res)
+      end
+    end
+    res = res_node_for_child(tmp_res)
+    res['Assignments'] = res['Assignments'].sort_by {|x| [x['instructor'], -1 * x['creation_date'].to_i] } if res.key?('Assignments')
+    respond_to do |format|
+      format.html { render json: res }
+    end
+  end
+
+  # check if nodetype is coursenode
+  def course_node_for_current_ta?(ta_mappings, node)
+    ta_mappings.each {|ta_mapping| return true if ta_mapping.course_id == node.node_object_id }
+    false
+  end
+
+  # check if nodetype is assignmentnode
+  def assignment_node_for_current_ta?(ta_mappings, node)
+    course_id = Assignment.find(node.node_object_id).course_id
+    ta_mappings.each {|ta_mapping| return true if ta_mapping.course_id == course_id }
+    false
+  end
+
+  # check if user is ta for current course
+  def ta_for_current_course?(node)
+    ta_mappings = TaMapping.where(ta_id: session[:user].id)
+    return course_node_for_current_ta?(ta_mappings, node) if node.is_a? CourseNode
+    return assignment_node_for_current_ta?(ta_mappings, node) if node.is_a? AssignmentNode
+    false
+  end
+
+  # check if current user is ta for instructor
+  def is_user_ta?(instructor_id, child)
+    # instructor created the course, current user is the ta of this course.
+    session[:user].role_id == 6 and
+        Ta.get_my_instructors(session[:user].id).include?(instructor_id) and ta_for_current_course?(child)
+  end
+
+  # check if current user is instructor
+  def is_user_instructor?(instructor_id)
+    # ta created the course, current user is the instructor of this ta.
+    instructor_ids = []
+    TaMapping.where(ta_id: instructor_id).each {|mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
+    session[:user].role_id == 2 and instructor_ids.include? session[:user].id
+  end
+
+  def update_is_available_2(res2, instructor_id, child)
+    # current user is the instructor (role can be admin/instructor/ta) of this course. is_available_condition1
+    res2["is_available"] = is_available(session[:user], instructor_id) ||
+        is_user_ta?(instructor_id, child) ||
+        is_user_instructor?(instructor_id)
+  end
+
+  # attaches assignment nodes to course node of instructor
+  def coursenode_assignmentnode(res2, child)
+    res2["directory"] = child.get_directory
+    instructor_id = child.get_instructor_id
+    update_instructor(res2, instructor_id)
+    update_is_available_2(res2, instructor_id, child)
+    assignments_method(child, res2) if child.type == "AssignmentNode"
+  end
+
+  # getting result nodes for child2. res[] contains all the resultant nodes.
+  def res_node_for_child_2(ch_nodes)
+    res = []
+
+    if ch_nodes
+      ch_nodes.each do |child|
+        node_type = child.type
+        res2 = {
+          "nodeinfo" => child,
+          "name" => child.get_name,
+          "instructor_id" => child.get_instructor_id, # add instructor id to the payload to make it available in the frontend
+          "key" => params[:reactParams2][:key],
+          "type" => node_type,
+          "private" => child.get_private,
+          "creation_date" => child.get_creation_date,
+          "updated_date" => child.get_modified_date
+        }
+        coursenode_assignmentnode(res2, child) if %w[CourseNode AssignmentNode].include? node_type
+        res << res2
+      end
+    end
+    res
+  end
+
+  # initialising folder node 2
+  def initialize_fnode_2(fnode, child_nodes)
+    child_nodes.each do |key, value|
+      fnode[key] = value
     end
     
     respond_to do |format|

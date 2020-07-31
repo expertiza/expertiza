@@ -1,5 +1,10 @@
 <th width="5%">Topic #</th>
-<th width="50%">Topic name(s)</th>
+<% if @assignment.vary_by_topic %>
+  <th width="25%">Topic name(s)</th>
+  <th width="25%">Questionnaire</th>
+<% else %>
+    <th width="50%">Topic name(s)</th>
+<% end %>
 <% if @assignment.microtask? %>
   <th width="5%">Micro- payment</th>
 <% end %>
@@ -7,7 +12,10 @@
   <th width="5%">Num. of slots</th>
   <th width="5%">Available slots</th>
   <th width="5%">Num. on waitlist</th>
-  <th width="10%">Bookmarks</th>
+  <th width="10%"> Bookmarks
+    <!--Bookmarks may be disabled for this assignment-->
+    <% unless @use_bookmark %> (disabled) <% end %>
+  </th>
   <% if @assignment.current_stage_name(@topic_id) != 'Finished' %>
       <th width="10%">Actions</th>
       <th width="5%">Advertise- ment(s)</th>

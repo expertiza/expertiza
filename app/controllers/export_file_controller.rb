@@ -1,9 +1,8 @@
 class ExportFileController < ApplicationController
+  include AuthorizationHelper
+
   def action_allowed?
-    ['Instructor',
-     'Teaching Assistant',
-     'Administrator',
-     'Super-Administrator'].include? current_role_name
+    current_user_has_ta_privileges?
   end
 
   # Assign titles to model for display
@@ -38,7 +37,8 @@ class ExportFileController < ApplicationController
     filename, delimiter = find_delim_filename(@delim_type, params[:other_char2], "_Details")
 
     allowed_models = ['Assignment']
-
+    # The export_details_fields and export_headers methods are defined in Assignment.rb that packs all the details from
+    # the model in the generated CSV file.
     csv_data = CSV.generate(col_sep: delimiter) do |csv|
       if allowed_models.include? params[:model]
         csv << Object.const_get(params[:model]).export_headers(params[:id])
@@ -114,7 +114,5 @@ class ExportFileController < ApplicationController
     send_data csv_data,
               type: 'text/csv; charset=iso-8859-1; header=present',
               disposition: "attachment; filename=#{filename}.csv"
-
   end
 end
-

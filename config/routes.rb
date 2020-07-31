@@ -3,6 +3,7 @@ Expertiza::Application.routes.draw do
   ###
   # Please insert new routes alphabetically!
   ###
+
   require 'sidekiq/web'
   mount Sidekiq::Web => '/sidekiq'
 
@@ -48,13 +49,14 @@ Expertiza::Application.routes.draw do
 
   resources :assignments, except: [:destroy] do
     collection do
-      get :associate_assignment_with_course
+      get :place_assignment_in_course
       get :copy
       get :toggle_access
       get :delayed_mailer
       get :list_submissions
       get :delete_delayed_mailer
       get :remove_assignment_from_course
+      get :instant_flash
     end
   end
 
@@ -187,6 +189,12 @@ resources :institution, except: [:destroy] do
       get :list
     end
   end
+  
+  resources :lock do
+    collection do
+      post :release_lock
+    end
+  end
 
   resources :notifications
 
@@ -243,7 +251,7 @@ resources :institution, except: [:destroy] do
       post :save_all_questions
     end
   end
-
+=begin
 #Nitin - Created new routes for quiz_questionnaire
   resources :quiz_questionnaire, only: %i[new create edit update] do
     collection do
@@ -254,6 +262,8 @@ resources :institution, except: [:destroy] do
       
     end
   end
+=end
+  resources :quiz_questionnaires
 
   resources :author_feedback_questionnaires, controller: :questionnaires
   resources :review_questionnaires, controller: :questionnaires
@@ -338,6 +348,8 @@ resources :institution, except: [:destroy] do
       post ':id', action: :update
     end
   end
+
+  resources :sample_reviews
 
   resources :sign_up_sheet, except: %i[index show] do
     collection do
@@ -472,9 +484,20 @@ resources :institution, except: [:destroy] do
     collection do
       get :list
       post :list
+      post ':id', action: :update
+      post :show_if_authorized
+      get :auto_complete_for_user_name
+      get :set_anonymized_view
+      get :keys
+    end
+  end
+
+  resources :account_request, constraints: {id: /\d+/} do
+    collection do
+      get :list
+      post :list
       get :list_pending_requested
       post ':id', action: :update
-      get :show_selection
       get :auto_complete_for_user_name
       get :set_anonymized_view
       get :keys
@@ -507,4 +530,9 @@ resources :institution, except: [:destroy] do
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
   get ':controller(/:action(/:id))(.:format)'
   match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
+  post '/response_toggle_permission/:id' => 'response#toggle_permission'
+  post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'
+  post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'
+
 end
+

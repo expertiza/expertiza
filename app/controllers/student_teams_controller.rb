@@ -1,4 +1,6 @@
 class StudentTeamsController < ApplicationController
+  include AuthorizationHelper
+
   autocomplete :user, :name
 
   def team
@@ -18,19 +20,16 @@ class StudentTeamsController < ApplicationController
 
   def action_allowed?
     # note, this code replaces the following line that cannot be called before action allowed?
-    if ['Instructor',
-        'Teaching Assistant',
-        'Administrator',
-        'Super-Administrator',
-        'Student'].include? current_role_name and
-       ((%w[view].include? action_name) ? are_needed_authorizations_present?(params[:student_id], "reader", "reviewer", "submitter") : true)
-      # make sure the student is the owner if they are trying to create it
-      return current_user_id? student.user_id if %w[create].include? action_name
-      # make sure the student belongs to the group before allowed them to try and edit or update
-      return team.get_participants.map(&:user_id).include? current_user.id if %w[edit update].include? action_name
-      true
+    return false unless current_user_has_student_privileges?
+    case action_name
+    when 'view'
+      are_needed_authorizations_present?(params[:student_id], "reader", "reviewer", "submitter")
+    when 'create'
+      current_user_has_id? student.user_id
+    when 'edit', 'update'
+      team.get_participants.map(&:user_id).include? current_user.id
     else
-      false
+      true
     end
   end
 

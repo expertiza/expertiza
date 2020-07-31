@@ -22,8 +22,19 @@
         <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.id%>
         (Sign up for a topic)
       </li>
+      <!--Show bookmarks if they are allowed for this assignment-->
+      <% if @use_bookmark %>
+        <li>
+            <% if @topic_id and @assignment.submission_allowed(@topic_id) %>
+              <%= link_to "View bookmarks", :controller=>'bookmarks', :action=> 'list', :id => @topic_id %> (View bookmarks others have submitted for your topic)
+            <% else %>
+              <font color="gray">View bookmarks</font> (You have to choose a topic first)
+            <% end %>
+        </li>
+      <% end %>
     <% end %>
   <%end%>
+
 <!--ACS Here we need to know the size of the team to decide whether or not
 to display the label "Your team" in the student assignment tasks-->
   <%if @assignment.max_team_size > 1 %>

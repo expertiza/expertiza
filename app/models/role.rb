@@ -109,7 +109,7 @@ class Role < ActiveRecord::Base
     ids
   end
 
-  # "parents" are lesser roles. This returns a list including this role and all lesser roels.
+  # "parents" are lesser roles. This returns a list including this role and all lesser roles.
   def get_parents
     parents = []
     seen = {}
@@ -135,7 +135,10 @@ class Role < ActiveRecord::Base
   end
 
   # determine if the current role has all the privileges of the parameter role
-  def all_privileges_of(target_role)
+  # If the current role is the same as the parameter role, return true
+  # That is, use greater-than-or-equal-to logic
+
+  def hasAllPrivilegesOf(target_role)
     privileges = {}
     privileges["Student"] = 1
     privileges["Teaching Assistant"] = 2
@@ -143,7 +146,7 @@ class Role < ActiveRecord::Base
     privileges["Administrator"] = 4
     privileges["Super-Administrator"] = 5
 
-    privileges[self.name] > privileges[target_role.name]
+    privileges[self.name] >= privileges[target_role.name]
   end
 
   def update_with_params(role_params)

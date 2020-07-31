@@ -1,10 +1,12 @@
 describe "Staggered deadline test" do
   before(:each) do
+
     # assignment and topic
     create(:assignment,
            name: "Assignment1665",
            directory_path: "Assignment1665",
            rounds_of_reviews: 2,
+           vary_by_round: true,
            staggered_deadline: true,
            max_team_size: 1,
            allow_selecting_additional_reviews_after_1st_round: true)
@@ -16,8 +18,8 @@ describe "Staggered deadline test" do
     # rubric
     create(:questionnaire, name: "TestQuestionnaire1")
     create(:questionnaire, name: "TestQuestionnaire2")
-    create(:question, txt: "Question1", questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first, type: "Criterion")
-    create(:question, txt: "Question2", questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first, type: "Criterion")
+    create(:question, txt: "Question1", questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first)
+    create(:question, txt: "Question2", questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first)
     create(:assignment_questionnaire, questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first, used_in_round: 1)
     create(:assignment_questionnaire, questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first, used_in_round: 2)
 
@@ -47,6 +49,7 @@ describe "Staggered deadline test" do
     topic_due('review', DateTime.now.in_time_zone + 20, 2, 1)
     topic_due('submission', DateTime.now.in_time_zone + 30, 2, 2, 1)
     topic_due('review', DateTime.now.in_time_zone + 40, 2, 2)
+
   end
 
   # create assignment deadline
@@ -72,7 +75,7 @@ describe "Staggered deadline test" do
   # impersonate student to submit work
   def submit_topic(name, topic, work)
     user = User.find_by(name: name)
-    stub_current_user(user, user.role.name, user.role)
+    login_as(user.name)
     visit '/student_task/list'
     visit topic # signup topic
     visit '/student_task/list'
@@ -93,7 +96,9 @@ describe "Staggered deadline test" do
   it "test1: in round 1, student2064 in review stage could do review" do
     # impersonate each participant submit their topics
     submit_topic('student2064', '/sign_up_sheet/sign_up?id=1&topic_id=1', "https://google.com")
+    click_link("Logout")
     submit_topic('student2065', '/sign_up_sheet/sign_up?id=1&topic_id=2', "https://ncsu.edu")
+    click_link("Logout")
     # change deadline to make student2064 in review stage in round 1
     change_due(1, 1, 1, DateTime.now.in_time_zone - 10)
 
@@ -101,7 +106,7 @@ describe "Staggered deadline test" do
 
     # ####student 1:
     user = User.find_by(name: 'student2064')
-    stub_current_user(user, user.role.name, user.role)
+    login_as(user.name)
     visit '/student_task/list'
     expect(page).to have_content "review"
 
@@ -115,10 +120,11 @@ describe "Staggered deadline test" do
     expect(page).to have_content 'Reviews for "Assignment1665"'
     click_button 'Request a new submission to review'
     expect(page).to have_content 'No topic is selected. Please go back and select a topic.'
+    click_link("Logout")
 
     # Although student2065 is in submission stage, he or she can still review other's work.
     user = User.find_by(name: 'student2065')
-    stub_current_user(user, user.role.name, user.role)
+    login_as(user.name)
     visit '/student_task/list'
     expect(page).to have_content "Stage Deadline"
     click_link 'Assignment1665'
@@ -140,7 +146,9 @@ describe "Staggered deadline test" do
   it "test2: in round 2, both students should be in review stage to review each other" do
     # impersonate each participant submit their topics
     submit_topic('student2064', '/sign_up_sheet/sign_up?id=1&topic_id=1', "https://google.com")
+    click_link("Logout")
     submit_topic('student2065', '/sign_up_sheet/sign_up?id=1&topic_id=2', "https://ncsu.edu")
+    click_link("Logout")
     # change deadline to make both in review stage in round 2
     change_due(1, 1, 1, DateTime.now.in_time_zone - 30)
     change_due(1, 2, 1, DateTime.now.in_time_zone - 20)
@@ -153,7 +161,7 @@ describe "Staggered deadline test" do
 
     # ##first student:
     user = User.find_by(name: 'student2064')
-    stub_current_user(user, user.role.name, user.role)
+    login_as(user.name)
     visit '/student_task/list'
     expect(page).to have_content "review"
 
@@ -176,10 +184,11 @@ describe "Staggered deadline test" do
     fill_in "responses_0_comments", with: "test fill"
     click_button "Save Review"
     expect(page).to have_content "View"
+    click_link("Logout")
 
     # ##second student
     user = User.find_by(name: 'student2065')
-    stub_current_user(user, user.role.name, user.role)
+    login_as(user.name)
     visit '/student_task/list'
     expect(page).to have_content "review"
 
@@ -202,12 +211,15 @@ describe "Staggered deadline test" do
     fill_in "responses_0_comments", with: "test fill"
     click_button "Save Review"
     expect(page).to have_content "View"
+    click_link("Logout")
   end
 
   it "test3: in round 2, both students after review deadline should not do review" do
     # impersonate each participant submit their topics
     submit_topic('student2064', '/sign_up_sheet/sign_up?id=1&topic_id=1', "https://google.com")
+    click_link("Logout")
     submit_topic('student2065', '/sign_up_sheet/sign_up?id=1&topic_id=2', "https://ncsu.edu")
+    click_link("Logout")
 
     # change deadline to make both after review deadline in round 2
     change_due(1, 1, 1, DateTime.now.in_time_zone - 40)
@@ -221,7 +233,7 @@ describe "Staggered deadline test" do
 
     # impersonate each participant and check their topic's current stage
     user = User.find_by(name: 'student2064')
-    stub_current_user(user, user.role.name, user.role)
+    login_as(user.name)
     visit '/student_task/list'
     expect(page).to have_content "Finished"
 
@@ -232,9 +244,10 @@ describe "Staggered deadline test" do
     expect(page).to have_content 'Reviews for "Assignment1665"'
     # it should not able to choose topic for review
     expect { choose "topic_id_2" }.to raise_error(/Unable to find visible radio button "topic_id_2"/)
+    click_link("Logout")
 
     user = User.find_by(name: 'student2065')
-    stub_current_user(user, user.role.name, user.role)
+    login_as(user.name)
     visit '/student_task/list'
     expect(page).to have_content "Finished"
     click_link 'Assignment1665'
@@ -242,6 +255,7 @@ describe "Staggered deadline test" do
     click_link "Others' work"
     expect(page).to have_content 'Reviews for "Assignment1665"'
     expect { choose "topic_id_2" }.to raise_error(/Unable to find visible radio button "topic_id_2"/)
+    click_link("Logout")
   end
 
   # the test will test the Java script which is embedded into the sign up sheet. The java script will

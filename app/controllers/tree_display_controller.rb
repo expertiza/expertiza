@@ -81,7 +81,8 @@ class TreeDisplayController < ApplicationController
     contents = []
     child_nodes.each do |node|
       contents.push(serialize_sub_folder_to_json(node))
-
+    end
+  end
   # for child nodes
   def children_node_ng
     flash[:error] = "Invalid JSON in the TreeList" unless json_valid? params[:reactParams][:child_nodes]

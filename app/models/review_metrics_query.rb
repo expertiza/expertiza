@@ -20,8 +20,6 @@ class ReviewMetricsQuery
   end
 
   def confidence(metric, review_id)
-    return 0 unless metric
-
     request = metric + '_confidence'
     review = retrieve_from_cache(request, review_id)
     confidence = review['confidence'].to_f
@@ -29,7 +27,7 @@ class ReviewMetricsQuery
     # translate the meaning of 'confidence'
     # from 'confidence of the positive'
     # to 'confidence of the predicted value (present or absent)'
-    if (metric == 'problem' || metric == 'suggestions') && (confidence < 0.5)
+    if (metric == 'problem' || metric == 'suggestions') && (confidence < 0.5) && (confidence != 0)
       1 - confidence
     else
       confidence
@@ -37,8 +35,6 @@ class ReviewMetricsQuery
   end
 
   def has(metric, review_id)
-    return false unless metric
-
     review = retrieve_from_cache(metric, review_id)
     case metric
     when 'problem'
@@ -55,6 +51,8 @@ class ReviewMetricsQuery
   end
 
   def retrieve_from_cache(request, review_id)
+    return nil unless request
+
     review = {}
     review = @queried_results[request].find {|review| review['id'] == review_id } if @queried_results[request]
     # if not yet cached
@@ -68,39 +66,27 @@ class ReviewMetricsQuery
 
   def cache_ws_results(request, review_id)
     ws_input = {'reviews' => []}
-    # see if this set of reviews has already been retrieved by a query
-    reviews = @queried_results.find {|_key, value| value.find {|r| r['id'] == review_id } }
-
-    if reviews
-      # use output from previous query which is already in a format used by the ws
-      # thus avoid the need to gather the same data from the database again
-      ws_input['reviews'] = reviews[1]
-    else
-      reviews = reviews_to_be_cached(review_id)
-      reviews.each do |review|
-        ws_input['reviews'] << {'id' => review.id, 'text' => review.comments}
-      end
+    reviews = reviews_to_be_cached(review_id)
+    reviews.each do |review|
+      ws_input['reviews'] << {'id' => review.id, 'text' => review.comments} if review.comments.present?
     end
 
     # ask MetricsController to make a call to the review metrics web service
     confidence = request.split('_').count > 1
-    ws_output = MetricsController.new.bulk_service_retrival(ws_input, request.split('_')[0], confidence)
-    @queried_results[request] = ws_output['reviews']
+    ws_output = MetricsController.new.bulk_retrieve_metric(request.split('_')[0], ws_input, confidence)
+    @queried_results[request] ||= []
+    if ws_output['reviews']
+      @queried_results[request].concat(ws_output['reviews']).uniq!
+    else
+      @queried_results[request].concat(ws_input['reviews']).uniq!
+    end
   end
 
   # find all reviews that may be displayed in the requesting page
   def reviews_to_be_cached(review_id)
     answer = Answer.find(review_id)
     response = answer.response
-    response_map = response.response_map
-    team = AssignmentTeam.find(response_map.reviewee_id)
-    assignment = team.assignment
-    responses = if assignment.varying_rubrics_by_round?
-                  ReviewResponseMap.get_responses_for_team_round(team, response.round)
-                else
-                  ReviewResponseMap.get_assessments_for(team)
-                end
-    responses.map(&:scores).flatten
+    response.scores
   end
 
   # =============== Caller's interfaces ===============

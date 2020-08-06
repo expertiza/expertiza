@@ -71,19 +71,19 @@ class TagPrompt < ActiveRecord::Base
     value = "0"
     text_style = ""
     toggle_style = ""
-    if ReviewMetricsQuery.confident?(tag_prompt_deployment.tag_prompt.prompt, answer.id)
-      if stored_tags.count > 0
-        toggle_style = "changed-toggle"
-        tag = stored_tags.first
-        value = tag.value.to_s
-      else
-        text_style = "grey-out-text"
-        toggle_style = "grey-out-toggle"
-        value = ReviewMetricsQuery.has(tag_prompt_deployment.tag_prompt.prompt, answer.id) ? 1 : -1
-      end
-    elsif stored_tags.count > 0
+    if stored_tags.count > 0
       tag = stored_tags.first
       value = tag.value.to_s
+    end
+    if ReviewMetricsQuery.confident?(tag_prompt_deployment.tag_prompt.prompt, answer.id)
+      predetermined_value = ReviewMetricsQuery.has(tag_prompt_deployment.tag_prompt.prompt, answer.id) ? "1" : "-1"
+      if value == predetermined_value || value == "0"
+        text_style = "grey-out-text"
+        toggle_style = "grey-out-toggle"
+        value = predetermined_value
+      else
+        toggle_style = "changed-toggle"
+      end
     end
 
     element_id = answer.id.to_s + '_' + self.id.to_s

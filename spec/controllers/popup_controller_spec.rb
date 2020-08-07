@@ -27,10 +27,6 @@ describe PopupController do
     ## INSERT CONTEXT/DESCRIPTION/CODE HERE
   end
 
-  describe '#participants_popup' do
-    ## INSERT CONTEXT/DESCRIPTION/CODE HERE
-  end
-
   ######### Tone Analysis Tests ##########
   describe "tone analysis tests" do
     before(:each) do

@@ -77,59 +77,6 @@ class PopupController < ApplicationController
     @similar_assignments = @similar_assignments.sort_by { |sim_assignment| -sim_assignment.id }
   end
 
-
-  def participants_popup
-    @sum = 0
-    @count = 0
-    @participantid = params[:id]
-    @uid = Participant.find(params[:id]).user_id
-    @assignment_id = Participant.find(params[:id]).parent_id
-    @user = User.find(@uid)
-    @myuser = @user.id
-    @temp = 0
-    @maxscore = 0
-
-    if params[:id2].nil?
-      @scores = nil
-    else
-      @reviewid = Response.find_by(map_id: params[:id2]).id
-      @pid = ResponseMap.find(params[:id2]).reviewer_id
-      # E-1973 we either pass the id of the team or the user, depending
-      # on if reviewers are teams
-      if not @assignment.reviewer_is_team
-        @reviewer_id = Participant.find(@pid).user_id
-      else
-        @reviewer_id = Team.find(@pid)
-      end
-      # @reviewer_id = ReviewMapping.find(params[:id2]).reviewer_id
-      @assignment_id = ResponseMap.find(params[:id2]).reviewed_object_id
-      @assignment = Assignment.find(@assignment_id)
-      @participant = Participant.where(["id = ? and parent_id = ? ", params[:id], @assignment_id])
-
-      # #3
-      @revqids = AssignmentQuestionnaire.where(["assignment_id = ?", @assignment.id])
-      @revqids.each do |rqid|
-        rtype = Questionnaire.find(rqid.questionnaire_id).type
-        @review_questionnaire_id = rqid.questionnaire_id if rtype == 'ReviewQuestionnaire'
-      end
-      if @review_questionnaire_id
-        @review_questionnaire = Questionnaire.find(@review_questionnaire_id)
-        @maxscore = @review_questionnaire.max_question_score
-        @review_questions = @review_questionnaire.questions
-      end
-
-      @scores = Answer.where(response_id: @reviewid)
-      @scores.each do |s|
-        @sum += s.answer
-        @temp += s.answer
-        @count += 1
-      end
-
-      @sum1 = (100 * @sum.to_f) / (@maxscore.to_f * @count.to_f)
-
-    end
-  end
-
   def tone_analysis_chart_popup
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]

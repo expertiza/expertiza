@@ -77,16 +77,6 @@ class PopupController < ApplicationController
     @similar_assignments = @similar_assignments.sort_by { |sim_assignment| -sim_assignment.id }
   end
 
-  def tone_analysis_chart_popup
-    @reviewer_id = params[:reviewer_id]
-    @assignment_id = params[:assignment_id]
-    @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@assignment_id, @reviewer_id)
-
-    # Builds tone analysis report and heatmap when instructor/admin/superadmin clicks on the "Tone analysis chart button" link for an assignment.
-    build_tone_analysis_report
-    build_tone_analysis_heatmap
-  end
-
   def view_review_scores_popup
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]

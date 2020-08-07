@@ -77,6 +77,7 @@ class PopupController < ApplicationController
     @similar_assignments = @similar_assignments.sort_by { |sim_assignment| -sim_assignment.id }
   end
 
+  # Views tone analysis report and heatmap
   def view_review_scores_popup
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
@@ -91,6 +92,7 @@ class PopupController < ApplicationController
     build_tone_analysis_heatmap
   end
 
+  # Builds tone analysis report
   def build_tone_analysis_report
     uri =  WEBSERVICE_CONFIG['sentiment_webservice_url'] + "analyze_reviews_bulk"
     index = 0
@@ -150,6 +152,7 @@ class PopupController < ApplicationController
     logger.error err.message
   end
 
+  # Builds tone analysis heatmap
   def build_tone_analysis_heatmap
 
     @heatmap_urls = []

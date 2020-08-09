@@ -129,4 +129,8 @@ class Answer < ActiveRecord::Base
     map.reviewee_id
   end
   # end added by ferry for answer tagging
+
+  def plain_comments
+    comments.gsub(/\u003c.*?\u003e/, '')
+  end
 end

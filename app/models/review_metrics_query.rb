@@ -68,7 +68,7 @@ class ReviewMetricsQuery
     ws_input = {'reviews' => []}
     reviews = reviews_to_be_cached(review_id)
     reviews.each do |review|
-      ws_input['reviews'] << {'id' => review.id, 'text' => review.comments} if review.comments.present?
+      ws_input['reviews'] << {'id' => review.id, 'text' => review.plain_comments} if review.comments.present?
     end
 
     # ask MetricsController to make a call to the review metrics web service

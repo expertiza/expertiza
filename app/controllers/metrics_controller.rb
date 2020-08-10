@@ -14,7 +14,7 @@ class MetricsController < ApplicationController
       metric_url = @@service_url + metric + (is_confidence_required ? "_confidence" : "")
       response = call_webservice(parameters, metric_url)
     else
-      raise StandardError.new "call must include a valid web service name."
+      raise StandardError.new "Call must include a valid web service name."
     end
   end
 

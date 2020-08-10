@@ -8,35 +8,20 @@ class MetricsController < ApplicationController
   # @@service_url = "http://152.7.98.91:5000/"
 
   def bulk_retrieve_metric(metric,parameters,is_confidence_required)
-    #getting data for confidence metric
-    response = Array.new
-    url = ""
-    if is_confidence_required
-      url = "_confidence"
-    end
-    case metric.downcase
-    when "reputation"
-      reputation_metric = call_webservice(parameters, @@service_url + "reputation" + url)
-      response = reputation_metric
-    when "suggestions"
-      suggestion_metric = call_webservice(parameters, @@service_url + "suggestions" + url)
-      response = suggestion_metric
-    when "volume"
-      volume_metric = call_webservice(parameters, @@service_url + "volume")
-      response = volume_metric
-    when "sentiment"
-      sentiment_metric = call_webservice(parameters, @@service_url + "sentiment"+ url)
-      response = sentiment_metric
-    when "emotions"
-      emotions_metric = call_webservice(parameters, @@service_url + "emotions" + url)
-      response = emotions_metric
-      #problem detection
-    when "problem"
-      problem_metric = call_webservice(parameters, @@service_url + "problem" + url)
-      response = problem_metric
+    metric = metric.downcase
+    if is_valid_metric(metric)
+      #if only confidence is required from metric, append string "_confidence" to url
+      metric_url = @@service_url + metric + (is_confidence_required ? "_confidence" : "")
+      response = call_webservice(parameters, metric_url)
     else
-      raise StandardError.new "provide a valid webservice name for which metric is required."
+      raise StandardError.new "call must include a valid web service name."
     end
+  end
+
+  def is_valid_metric(metric)
+    #return true if metric name is valid else return false
+    valid_metrics = ['reputation','suggestions','volume', 'sentiment', 'emotions', 'problem']
+    valid_metrics.include?(metric)
   end
 
   def call_webservice(parameters, url)
@@ -48,7 +33,7 @@ class MetricsController < ApplicationController
     responseObject = http.request(reqestObject)
     response = JSON.parse(responseObject.body)
   rescue Exception => error
-    print ("Unable to get metric for " + url + ", following error occurred " + error.to_s)
+    print ("Unable to get metric for " + url + " ; the following error occurred " + error.to_s)
   end
 
 end

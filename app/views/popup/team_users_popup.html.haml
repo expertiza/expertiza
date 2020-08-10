@@ -39,7 +39,7 @@
         - instance_variable_get('@scores_round_' + round.to_s).each do |answer|
           %tr
             %td{:align => "left"}
-              = answer.question.txt
+              = answer.question.txt.html_safe
             - if answer.question.is_a?(ScoredQuestion)
               %td{:align => "center"}
                 = answer.answer
@@ -51,7 +51,7 @@
               %td{:align => "center"}
                 =answer.answer
             %td{:align => "left"}
-              = answer.comments
+              = answer.comments.html_safe
         %tr
           %th Reviewer Score (Σ weighted score/Σ weighted available score)
           %td{:align => "center"}

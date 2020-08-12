@@ -1,5 +1,6 @@
 
 Expertiza::Application.routes.draw do
+  resources :question_types
   ###
   # Please insert new routes alphabetically!
   ###

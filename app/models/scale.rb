@@ -21,6 +21,7 @@ class Scale < ScoredQuestion
     html += '][weight]" id="question_' + self.id.to_s + '_weight" type="text"></td>'
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     html += '<td> max_label <input size="10" value="' + self.max_label.to_s + '" name="question[' + self.id.to_s + '][max_label]" id="question_' + self.id.to_s
     html += '_max_label" type="text">  min_label <input size="12" value="' + self.min_label.to_s + '" name="question[' + self.id.to_s
     html += '][min_label]" id="question_' + self.id.to_s + '_min_label" type="text"></td>'
@@ -30,6 +31,9 @@ class Scale < ScoredQuestion
     html += self.max_label.to_s + '" name="question[' + self.id.to_s + '][max_label]" id="question_' + self.id.to_s + '_max_label" type="text"></td>'
 >>>>>>> Rahul and Shraddha Code Climate Fixes
 =======
+=======
+    html += '<td style="color: grey">N/A</td>'
+>>>>>>> Fixed #1669 and made some changes to the questionnaire/edit UI
     html += '<td> min_label <input size="10" value="' + self.min_label.to_s + '" name="question[' + self.id.to_s + '][min_label]" id="question_' + self.id.to_s
     html += '_min_label" type="text">  max_label <input size="12" value="' + self.max_label.to_s + '" name="question[' + self.id.to_s
     html += '][max_label]" id="question_' + self.id.to_s + '_max_label" type="text"></td>'

@@ -129,6 +129,9 @@ class QuestionnairesController < ApplicationController
   # Edit a questionnaire
   def edit
     @questionnaire = Questionnaire.find(params[:id])
+
+    @question_types = QuestionType.pluck(:type)
+
     redirect_to Questionnaire if @questionnaire.nil?
     session[:return_to] = request.original_url
   end

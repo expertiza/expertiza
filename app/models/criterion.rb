@@ -18,7 +18,7 @@ class Criterion < ScoredQuestion
     html += '<td><input size="2" value="' + self.weight.to_s
     html += '" name="question[' + self.id.to_s + '][weight]" id="question_' + self.id.to_s + '_weight" type="text"></td>'
 
-    html += '<td>text area size <input size="3" value="' + self.size.to_s
+    html += '<td><input size="4" value="' + self.size.to_s
     html += '" name="question[' + self.id.to_s + '][size]" id="question_' + self.id.to_s + '_size" type="text"></td>'
 
     html += '<td> min_label <input size="10" value="' + self.min_label.to_s + '" name="question[' + self.id.to_s

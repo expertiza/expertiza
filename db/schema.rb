@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200724165034) do
+ActiveRecord::Schema.define(version: 20200812211018) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -111,8 +111,8 @@ ActiveRecord::Schema.define(version: 20200724165034) do
     t.integer  "simicheck_threshold",                                limit: 4,     default: 100
     t.boolean  "is_answer_tagging_allowed"
     t.boolean  "has_badge"
-    t.boolean  "allow_selecting_additional_reviews_after_1st_round"
     t.integer  "sample_assignment_id",                               limit: 4
+    t.boolean  "allow_selecting_additional_reviews_after_1st_round"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -417,6 +417,10 @@ ActiveRecord::Schema.define(version: 20200724165034) do
   end
 
   add_index "question_advices", ["question_id"], name: "fk_question_question_advices", using: :btree
+
+  create_table "question_types", force: :cascade do |t|
+    t.string "type", limit: 255
+  end
 
   create_table "questionnaires", force: :cascade do |t|
     t.string   "name",               limit: 64

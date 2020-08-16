@@ -13,7 +13,7 @@ class GradesController < ApplicationController
     when 'view_my_scores'
       current_user_has_student_privileges? and
       are_needed_authorizations_present?(params[:id], "reader", "reviewer") and
-      check_self_review_status
+      self_review_finished?
     when 'view_team'
       if current_user_is_a? 'Student' # students can only see the head map for their own team
         participant = AssignmentParticipant.find(params[:id])
@@ -244,7 +244,7 @@ class GradesController < ApplicationController
       if @assignment.vary_by_round
         (1..@assignment.rounds_of_reviews).each do |round|
           responses = @pscore[:review][:assessments].select {|response| response.round == round }
-          scores = scores.concat(get_scores_for_chart(responses, 'review' + round.to_s))
+          scores = scores.concat(build_score_vector(responses, 'review' + round.to_s))
           scores -= [-1.0]
         end
         @grades_bar_charts[:review] = bar_chart(scores)
@@ -257,13 +257,13 @@ class GradesController < ApplicationController
 
   def remove_negative_scores_and_build_charts(symbol)
     if @participant_score and @participant_score[symbol]
-      scores = get_scores_for_chart @participant_score[symbol][:assessments], symbol.to_s
+      scores = build_score_vector @participant_score[symbol][:assessments], symbol.to_s
       scores -= [-1.0]
       @grades_bar_charts[symbol] = bar_chart(scores)
     end
   end
 
-  def get_scores_for_chart(reviews, symbol)
+  def build_score_vector(reviews, symbol)
     scores = []
     reviews.each do |review|
       scores << Answer.get_total_score(response: [review], questions: @questions[symbol.to_sym], q_types: [])
@@ -271,6 +271,8 @@ class GradesController < ApplicationController
     scores
   end
 
+  # Filters all non nil values and converts them to integer
+  # Returns a vector
   def calculate_average_vector(scores)
     scores[:teams].reject! {|_k, v| v[:scores][:avg].nil? }
     scores[:teams].map {|_k, v| v[:scores][:avg].to_i }
@@ -291,14 +293,11 @@ class GradesController < ApplicationController
     link
   end
 
-  def check_self_review_status
+  def self_review_finished?
     participant = Participant.find(params[:id])
     assignment = participant.try(:assignment)
-    if assignment.try(:is_selfreview_enabled) and unsubmitted_self_review?(participant.try(:id))
-      return false
-    else
-      return true
-    end
+    # Below is only false when self review is enabled and not submitted
+    return not ( assignment.try(:is_selfreview_enabled) and unsubmitted_self_review?(participant.try(:id)) )
   end
 
   def mean(array)

@@ -28,6 +28,7 @@ describe "Global Survey questionnaire tests for instructor interface" do
     @previous_day = (Time.now.getlocal - 1 * 86_400).strftime("%Y-%m-%d %H:%M:%S")
     @next_day = (Time.now.getlocal + 1 * 86_400).strftime("%Y-%m-%d %H:%M:%S")
     @next_to_next_day = (Time.now.getlocal + 2 * 86_400).strftime("%Y-%m-%d %H:%M:%S")
+    allow(QuestionType).to receive(:pluck).with(:type).and_return(%w[Criterion Scale Dropdown Checkbox TextArea TextField UploadFile SectionHeader TableHeader ColumnHeader])
   end
 
   it "is able to create a Global survey" do

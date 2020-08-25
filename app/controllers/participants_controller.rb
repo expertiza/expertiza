@@ -68,7 +68,7 @@ class ParticipantsController < ApplicationController
     redirect_to action: 'list', id: parent_id, model: participant.class.to_s.gsub("Participant", "")
   end
 
-  # duties: manager, designer, programmer, tester
+  # Example of duties: manager, designer, programmer, tester
   def update_duties
     participant = Participant.find(params[:student_id])
     participant.update_attributes(duty: params[:duty])
@@ -82,7 +82,7 @@ class ParticipantsController < ApplicationController
       participant.destroy
       flash[:note] = undo_link("The user \"#{participant.user.name}\" has been successfully removed as a participant.")
     rescue StandardError
-      flash[:error] = 'The delete action failed: At least one review mapping or team membership exist for this participant.'
+      flash[:error] = 'This participant is on a team, or is assigned as a reviewer for someone’s work.'
     end
     redirect_to action: 'list', id: parent_id, model: participant.class.to_s.gsub("Participant", "")
   end

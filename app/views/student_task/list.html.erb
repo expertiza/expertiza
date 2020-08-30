@@ -39,7 +39,7 @@
     %>
 
     <span>&nbsp; &raquo;
-      <%= link_to student_task.assignment.name + " " + student_task.current_stage, :controller => controller, :action => action, :id => participant.id %>
+      <%= link_to student_task.assignment.name + " " + student_task.current_stage, {:controller => controller, :action => action, :id => participant.id}, data: { disable_with: "Loading..."} %>
       (<%= student_task.relative_deadline %> left)
     </span><br/>
     <% end %>

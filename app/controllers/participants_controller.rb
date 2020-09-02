@@ -68,7 +68,7 @@ class ParticipantsController < ApplicationController
     redirect_to action: 'list', id: parent_id, model: participant.class.to_s.gsub("Participant", "")
   end
 
-  # duties: manager, designer, programmer, tester
+  # Example of duties: manager, designer, programmer, tester
   def update_duties
     participant = Participant.find(params[:student_id])
     participant.update_attributes(duty: params[:duty])
@@ -82,7 +82,7 @@ class ParticipantsController < ApplicationController
       participant.destroy
       flash[:note] = undo_link("The user \"#{participant.user.name}\" has been successfully removed as a participant.")
     rescue StandardError
-      flash[:error] = 'The delete action failed: At least one review mapping or team membership exist for this participant.'
+      flash[:error] = 'This participant is on a team, or is assigned as a reviewer for someone’s work.'
     end
     redirect_to action: 'list', id: parent_id, model: participant.class.to_s.gsub("Participant", "")
   end
@@ -114,6 +114,7 @@ class ParticipantsController < ApplicationController
     redirect_to controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment'
   end
 
+  # Take all participants from an assignment and "bequeath" them to course as course_participants.
   def bequeath_all
     @copied_participants = []
     assignment = Assignment.find(params[:id])
@@ -154,6 +155,7 @@ class ParticipantsController < ApplicationController
     end
   end
 
+  # Deletes participants from an assignment
   def delete_assignment_participant
     contributor = AssignmentParticipant.find(params[:id])
     name = contributor.name
@@ -167,9 +169,9 @@ class ParticipantsController < ApplicationController
     redirect_to controller: 'review_mapping', action: 'list_mappings', id: assignment_id
   end
 
-  # Seems like this function is similar to the above function> we are not quite sure what publishing rights mean. Seems like
-  # the values for the last column in http://expertiza.ncsu.edu/student_task/list are sourced from here
-  def view_copyright_grants
+  # A ‘copyright grant’ means the author has given permission to the instructor to use the work outside the course.  
+  # This is incompletely implemented, but the values in the last column in http://expertiza.ncsu.edu/student_task/list are sourced from here.
+  def view_publishing_rights
     assignment_id = params[:id]
     assignment = Assignment.find(assignment_id)
     @assignment_name = assignment.name

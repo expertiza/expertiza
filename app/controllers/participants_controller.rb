@@ -169,7 +169,7 @@ class ParticipantsController < ApplicationController
 
   # Seems like this function is similar to the above function> we are not quite sure what publishing rights mean. Seems like
   # the values for the last column in http://expertiza.ncsu.edu/student_task/list are sourced from here
-  def view_publishing_rights
+  def view_copyright_grants
     assignment_id = params[:id]
     assignment = Assignment.find(assignment_id)
     @assignment_name = assignment.name

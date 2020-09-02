@@ -114,6 +114,7 @@ class ParticipantsController < ApplicationController
     redirect_to controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment'
   end
 
+  # Take all participants from an assignment and "bequeath" them to course as course_participants.
   def bequeath_all
     @copied_participants = []
     assignment = Assignment.find(params[:id])
@@ -168,8 +169,8 @@ class ParticipantsController < ApplicationController
     redirect_to controller: 'review_mapping', action: 'list_mappings', id: assignment_id
   end
 
-  # Seems like this function is similar to the above function> we are not quite sure what publishing rights mean. Seems like
-  # the values for the last column in http://expertiza.ncsu.edu/student_task/list are sourced from here
+  # A ‘copyright grant’ means the author has given permission to the instructor to use the work outside the course.  
+  # This is incompletely implemented, but the values in the last column in http://expertiza.ncsu.edu/student_task/list are sourced from here.
   def view_publishing_rights
     assignment_id = params[:id]
     assignment = Assignment.find(assignment_id)

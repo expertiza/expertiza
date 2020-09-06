@@ -75,8 +75,8 @@ class TagPrompt < ActiveRecord::Base
       tag = stored_tags.first
       value = tag.value.to_s
     end
-    if ReviewMetricsQuery.confident?(tag_prompt_deployment.tag_prompt.prompt, answer.id)
-      predetermined_value = ReviewMetricsQuery.has(tag_prompt_deployment.tag_prompt.prompt, answer.id) ? "1" : "-1"
+    if ReviewMetricsQuery.confident?(tag_prompt_deployment.id, answer.id)
+      predetermined_value = ReviewMetricsQuery.has(tag_prompt_deployment.id, answer.id) ? "1" : "-1"
       if value == predetermined_value || value == "0"
         text_style = "grey-out-text"
         toggle_style = "grey-out-toggle"

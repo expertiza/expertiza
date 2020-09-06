@@ -100,16 +100,18 @@
         $('#save_confirm').html('')
       }, 5000);
     });
-    $('#Submit').click(function(e){
-      if(!confirm('Once a review has been submitted, you cannot edit it again')){
-        e.preventDefault();
-        e.stopPropagation();
-        return;
-      }else{
-        jQuery('#isSubmit').val('Yes');
-        window.location.href= "../../../student_review/list?id=<%= @map.reviewer.id %>";
-      }
+
+    // display loader
+    $("#Submit").click(function(e){
+      $('.loader-holder').addClass('loader');
+      $('.loader-msg').html('Please wait for the system to process your review. It should take about few minutes. Keep this page active.\n')
     });
+
+    $('#modal-window').bind('DOMSubtreeModified', function(e) {
+      $('.loader-holder').removeClass('loader');
+      $('.loader-msg').html('')
+    });
+
     // update the values in the form using ajax
     function updateForm(){
       //update the additional comments
@@ -333,7 +335,7 @@
 <input type="checkbox" id="autosave_cbx" checked>
 <label id="autosave_cbx_lbl" for="autosave_cbx"></label>
 <div id="save_progress"></div>
-<%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form") do %>
+<%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form", :remote => true) do %>
     <%= hidden_field_tag "map_id", @modified_object %>
     <%= hidden_field_tag "saved", (@header == "New") ? 1 : 0 %>
     <% if @next_action.eql?'update' %>
@@ -411,6 +413,8 @@
         <%= submit_tag "Submit "+@title, :name => "Submit", :id => "Submit" %>
         <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
     <% end %>
+    <div class="loader-holder"></div>
+    <div class="loader-msg"></div>
     <%= hidden_field_tag('return', @return) %>
     <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %>
 <% end %>
@@ -432,3 +436,5 @@
 <%= @map.show_feedback(@response) %>
 <a href="javascript:window.history.back()">Back</a>
 <div id="dialog-message" style="word-wrap: normal"></div>
+
+<div class="modal" id="modal-window"><div class="modal-content"><div class="modal_container"></div></div></div>

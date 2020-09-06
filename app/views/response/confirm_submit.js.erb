@@ -1,0 +1,4 @@
+<% if @tag_prompt_deployments %>
+  $("#modal-window").find(".modal_container").html("<%= j render partial: 'response/confirm_submit' %>");
+  $("#modal-window").modal("show")
+<% end %>

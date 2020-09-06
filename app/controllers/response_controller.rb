@@ -73,8 +73,6 @@ class ResponseController < ApplicationController
     render action: 'response'
   end
 
-
-
   # Update the response and answers when student "edit" existing response
   def update
     render nothing: true unless action_allowed?
@@ -87,14 +85,15 @@ class ResponseController < ApplicationController
       @questionnaire = set_questionnaire
       questions = sort_questions(@questionnaire.questions)
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
-      @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
-      @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
+
+      if params[:Submit]
+        @tag_prompt_deployments = TagPromptDeployment.where(assignment_id: @map.reviewee.assignment.id, questionnaire_id: @questionnaire.id)
+        ReviewMetricsQuery.instance.cache_ws_results(@response.scores, @tag_prompt_deployments, true)
+      end
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
-    redirect_to controller: 'response', action: 'save', id: @map.map_id,
-                return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
+    render "confirm_submit.js.erb"
   end
 
   def new
@@ -176,6 +175,17 @@ class ResponseController < ApplicationController
     end
     redirect_to controller: 'response', action: 'save', id: @map.map_id,
                 return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
+  end
+
+  def confirm_submit
+    @response = Response.find(params[:response_id])
+    @response.update_attribute('is_submitted', true)
+    @map = @response.map
+    @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
+
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
+    redirect_to controller: 'response', action: 'save', id: @map.map_id,
+                return: params[:return], msg: "Your response was submitted: #{@response.is_submitted}"
   end
 
   def save

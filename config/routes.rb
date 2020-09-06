@@ -296,6 +296,7 @@ resources :institution, except: [:destroy] do
       post :custom_create
       get :json
     end
+    get :confirm_submit
   end
 
   resources :review_mapping, only: [] do

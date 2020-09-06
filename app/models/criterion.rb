@@ -203,8 +203,6 @@ class Criterion < ScoredQuestion
       html += '<td style="padding-left:10px">'
       html += '<br>' + answer.comments.html_safe
       html += '</td>'
-
-
       html += TagPrompt.show_tag_prompts(tag_prompt_deployments, answer, current_user)
     end
     html += '</tr></table>'

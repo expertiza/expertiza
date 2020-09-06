@@ -5,7 +5,7 @@ class AnswerTag < ActiveRecord::Base
   validates :answer_id, presence: true
   validates :tag_prompt_deployment_id, presence: true
   validates :value, presence: true
-  # validates :user_id, presence: true
+  validates_presence_of :user_id, unless: :confidence_level?
 
   def tag_prompt
     tag_dep = TagPromptDeployment.find(self.tag_prompt_deployment_id)

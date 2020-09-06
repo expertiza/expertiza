@@ -11,15 +11,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181205201208) do
+ActiveRecord::Schema.define(version: 20200825210644) do
+
+  create_table "answer_tag_mappings", force: :cascade do |t|
+    t.integer  "answer_id",     limit: 4
+    t.integer  "tag_prompt_id", limit: 4
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
+  add_index "answer_tag_mappings", ["answer_id"], name: "index_answer_tag_mappings_on_answer_id", using: :btree
+  add_index "answer_tag_mappings", ["tag_prompt_id"], name: "index_answer_tag_mappings_on_tag_prompt_id", using: :btree
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
     t.integer  "tag_prompt_deployment_id", limit: 4
     t.integer  "user_id",                  limit: 4
     t.string   "value",                    limit: 255
-    t.datetime "created_at",                           null: false
-    t.datetime "updated_at",                           null: false
+    t.datetime "created_at",                                                    null: false
+    t.datetime "updated_at",                                                    null: false
+    t.decimal  "confidence_level",                     precision: 10, scale: 5
   end
 
   add_index "answer_tags", ["answer_id"], name: "index_answer_tags_on_answer_id", using: :btree
@@ -630,7 +641,6 @@ ActiveRecord::Schema.define(version: 20181205201208) do
     t.string  "status",            limit: 255
     t.string  "unityID",           limit: 255
     t.string  "signup_preference", limit: 255
-    t.string  "feedback",          limit: 255
   end
 
   create_table "survey_deployments", force: :cascade do |t|
@@ -776,6 +786,8 @@ ActiveRecord::Schema.define(version: 20181205201208) do
 
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
 
+  add_foreign_key "answer_tag_mappings", "answers"
+  add_foreign_key "answer_tag_mappings", "tag_prompts"
   add_foreign_key "answer_tags", "answers"
   add_foreign_key "answer_tags", "tag_prompt_deployments"
   add_foreign_key "answer_tags", "users"

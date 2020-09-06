@@ -73,6 +73,8 @@ class ResponseController < ApplicationController
     render action: 'response'
   end
 
+
+
   # Update the response and answers when student "edit" existing response
   def update
     render nothing: true unless action_allowed?

@@ -13,9 +13,7 @@ class ReviewMetricsQuery
                       'Positive Tone?' => 'emotions'}.freeze
 
   def initialize
-    # structure of @queried_results = {request => queried_result, request => queried_result}
-    # where request can be either metric or metric_confidence
-    # and queried result is the response gotten from the web service
+    # @queried_results: an array of AnswerTag objects
     @queried_results = []
   end
 
@@ -44,7 +42,6 @@ class ReviewMetricsQuery
 
   def cache_ws_results(reviews, tag_prompt_deployments, cache_to_db)
     ws_input = {'reviews' => []}
-    # reviews = reviews_to_be_cached(review_id)
     reviews.each do |review|
       ws_input['reviews'] << {'id' => review.id, 'text' => review.plain_comments} if review.comments.present?
     end
@@ -100,21 +97,14 @@ class ReviewMetricsQuery
     end
   end
 
-  # find all reviews that may be displayed in the requesting page
-  def reviews_to_be_cached(review_id)
-    answer = Answer.find(review_id)
-    response = answer.response
-    response.scores
-  end
-
   # =============== Caller's interfaces ===============
 
-  # usage: ReviewMetricQuery.confidence(tag_dep.tag_prompt.prompt, answer.id)
+  # usage: ReviewMetricQuery.confidence(tag_dep.id, answer.id)
   def self.confidence(tag_prompt_deployment_id, review_id)
     ReviewMetricsQuery.instance.confidence(tag_prompt_deployment_id, review_id)
   end
 
-  # usage: ReviewMetricQuery.confident?(tag_dep.tag_prompt.prompt, answer.id)
+  # usage: ReviewMetricQuery.confident?(tag_dep.id, answer.id)
   # answer_tagging would most likely to use this method since it returns either
   # true or false
   def self.confident?(tag_prompt_deployment_id, review_id)
@@ -122,7 +112,7 @@ class ReviewMetricsQuery
     confidence > TAG_CERTAINTY_THRESHOLD
   end
 
-  # usage: ReviewMetricQuery.has(tag_dep.tag_prompt.prompt, answer.id)
+  # usage: ReviewMetricQuery.has(tag_dep.id, answer.id)
   def self.has(tag_prompt_deployment_id, review_id)
     ReviewMetricsQuery.instance.has(tag_prompt_deployment_id, review_id)
   end

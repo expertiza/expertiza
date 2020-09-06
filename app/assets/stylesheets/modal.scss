@@ -26,42 +26,6 @@
   width: 80%; /* Could be more or less, depending on screen size */
 }
 
-/* Style the horizontal ruler */
-hr {
-  border: 1px solid #f1f1f1;
-  margin-bottom: 25px;
-}
-
-/* The Modal Close Button (x) */
-.close {
-  position: absolute;
-  right: 35px;
-  top: 15px;
-  font-size: 40px;
-  font-weight: bold;
-  color: #f1f1f1;
-}
-
-.close:hover,
-.close:focus {
-  color: #f44336;
-  cursor: pointer;
-}
-
-/* Clear floats */
-.clearfix::after {
-  content: "";
-  clear: both;
-  display: table;
-}
-
-/* Change styles for cancel button and delete button on extra small screens */
-@media screen and (max-width: 300px) {
-  .cancelbtn, .deletebtn {
-    width: 100%;
-  }
-}
-
 .loader {
   border: 5px solid #f3f3f3; /* Light grey */
   border-top: 5px solid #030303; /* Blue */
@@ -69,7 +33,6 @@ hr {
   width: 20px;
   height: 20px;
   animation: spin 2s linear infinite;
-  //display: inline;
 }
 
 @keyframes spin {

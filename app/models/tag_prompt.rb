@@ -42,7 +42,6 @@ class TagPrompt < ActiveRecord::Base
         end
       end
     end
-
     html.html_safe
   end
 

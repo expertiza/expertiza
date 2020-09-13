@@ -92,9 +92,7 @@ class ResponseController < ApplicationController
       redirect_to controller: 'response', action: 'save', id: @map.map_id,
                   return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
     else
-      @tag_prompt_deployments = TagPromptDeployment.where(assignment_id: @map.reviewee.assignment.id, questionnaire_id: @questionnaire.id)
-      # ReviewMetricsQuery.instance.cache_ws_results(@response.scores, @tag_prompt_deployments, true)
-      render "confirm_submit.js.erb"
+      render "confirm_submit.js.erb", locals: {isSubmit: params[:isSubmit]}
     end
   end
 

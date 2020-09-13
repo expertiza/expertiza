@@ -22,7 +22,7 @@ to update it anymore. You can scroll down to see the button.</p>
     <tr>
       <th>Question</th>
       <th>Response</th>
-      <% @tag_prompt_deployments.each do |tag_prompt_deployment|  %>
+      <% tag_prompt_deployments.each do |tag_prompt_deployment|  %>
         <td>
           <b><%= tag_prompt_deployment.tag_prompt.prompt %></b><br>
           (class avg=<%= tag_prompt_deployment.average_number_of_satisfied_comments %>/<%= answers.count %>)
@@ -33,7 +33,7 @@ to update it anymore. You can scroll down to see the button.</p>
       <tr style="border-bottom: 1px solid lightgrey;">
         <td><%= answer.question.txt[0...50] + "..." %></td>
         <td><%= answer.plain_comments.html_safe %></td>
-        <% @tag_prompt_deployments.each do |tag_prompt_deployment|  %>
+        <% tag_prompt_deployments.each do |tag_prompt_deployment|  %>
           <td>
             <% if answer.comments.present? %>
               <%= ReviewMetricsQuery.has?(tag_prompt_deployment.id, answer.id) ?
@@ -45,7 +45,7 @@ to update it anymore. You can scroll down to see the button.</p>
       </tr>
     <% end %>
     <tr>
-      <% (1..@tag_prompt_deployments.length+1).each do %>
+      <% (1..tag_prompt_deployments.length+1).each do %>
         <td></td>
       <% end %>
       <td style="text-align: right; padding-top: 10px">

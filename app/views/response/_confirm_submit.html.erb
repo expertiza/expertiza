@@ -36,7 +36,7 @@ to update it anymore. You can scroll down to see the button.</p>
         <% @tag_prompt_deployments.each do |tag_prompt_deployment|  %>
           <td>
             <% if answer.comments.present? %>
-              <%= ReviewMetricsQuery.has(tag_prompt_deployment.id, answer.id) ?
+              <%= ReviewMetricsQuery.has?(tag_prompt_deployment.id, answer.id) ?
                       "<span style='color: green'>Yes</span><br>".html_safe :
                       "<span style='color: red'>No</span><br>".html_safe %>
             <% end %>

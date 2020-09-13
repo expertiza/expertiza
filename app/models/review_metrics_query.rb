@@ -22,7 +22,7 @@ class ReviewMetricsQuery
     review ? review.confidence_level : 0
   end
 
-  def has(tag_prompt_deployment_id, review_id)
+  def has?(tag_prompt_deployment_id, review_id)
     review = retrieve_from_cache(tag_prompt_deployment_id, review_id)
     review ? review.value == '1' : false
   end
@@ -117,7 +117,7 @@ class ReviewMetricsQuery
 
   # usage: ReviewMetricQuery.has?(tag_dep.id, answer.id)
   def self.has?(tag_prompt_deployment_id, review_id)
-    ReviewMetricsQuery.instance.has(tag_prompt_deployment_id, review_id)
+    ReviewMetricsQuery.instance.has?(tag_prompt_deployment_id, review_id)
   end
 
   # =============== End of caller's interfaces ===============

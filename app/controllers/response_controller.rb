@@ -87,15 +87,15 @@ class ResponseController < ApplicationController
       @questionnaire = set_questionnaire
       questions = sort_questions(@questionnaire.questions)
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
-
-      if params[:Submit]
-        @tag_prompt_deployments = TagPromptDeployment.where(assignment_id: @map.reviewee.assignment.id, questionnaire_id: @questionnaire.id)
-        ReviewMetricsQuery.instance.cache_ws_results(@response.scores, @tag_prompt_deployments, true)
-      end
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
+      redirect_to controller: 'response', action: 'save', id: @map.map_id,
+                  return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
+    else
+      @tag_prompt_deployments = TagPromptDeployment.where(assignment_id: @map.reviewee.assignment.id, questionnaire_id: @questionnaire.id)
+      # ReviewMetricsQuery.instance.cache_ws_results(@response.scores, @tag_prompt_deployments, true)
+      render "confirm_submit.js.erb"
     end
-    render "confirm_submit.js.erb"
   end
 
   def new
@@ -186,8 +186,7 @@ class ResponseController < ApplicationController
     @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
 
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
-    redirect_to controller: 'response', action: 'save', id: @map.map_id,
-                return: params[:return], msg: "Your response was submitted: #{@response.is_submitted}"
+    redirect_to controller: 'response', action: 'save', id: @map.map_id, return: params[:return]
   end
 
   def save

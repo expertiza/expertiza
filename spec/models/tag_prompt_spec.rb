@@ -32,11 +32,13 @@ describe TagPrompt do
 
   it "returns a slider with a value of 1 when user 1 has tagged an answer with 1" do
     allow(AnswerTag).to receive(:where).and_return([answer_tag])
+    allow(ReviewMetricsQuery).to receive(:confident?).and_return(false)
     expect(tp2.html_control(tag_dep_slider, an_long, 1)).to include("input type=\"range\"", "value=\"1\"")
   end
 
   it "returns a slider without a value when user 2 hasn't tagged an answer with 1" do
     allow(AnswerTag).to receive(:where).and_return([])
+    allow(ReviewMetricsQuery).to receive(:confident?).and_return(false)
     expect(tp2.html_control(tag_dep_slider, an_long, 2)).not_to include("value=\"1\"")
   end
 

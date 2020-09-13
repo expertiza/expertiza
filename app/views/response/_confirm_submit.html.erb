@@ -1,13 +1,14 @@
 <script>
-  $('#Submit').click(function(e){
-    if(!confirm('Once a review has been submitted, you cannot edit it again')){
+  $('#ok').click(function(e){
+    if(!confirm('Once a review has been submitted, you cannot edit it again')) {
       e.preventDefault();
       e.stopPropagation();
       return;
-    }else{
-      jQuery('#isSubmit').val('Yes');
-      window.location.href= "../../../student_review/list?id=<%= @map.reviewer.id %>";
     }
+<!--    }else{-->
+<!--      jQuery('#isSubmit').val('Yes');-->
+<!--      window.location.href= "../../../student_review/list?id=<%= @map.reviewer.id %>";-->
+<!--    }-->
   });
 </script>
 
@@ -21,31 +22,36 @@ to update it anymore. You can scroll down to see the button.</p>
     <tr>
       <th>Question</th>
       <th>Response</th>
-      <th>Status</th>
+      <% @tag_prompt_deployments.each do |tag_prompt_deployment|  %>
+        <td>
+          <b><%= tag_prompt_deployment.tag_prompt.prompt %></b><br>
+          (class avg=<%= tag_prompt_deployment.average_number_of_satisfied_comments %>/<%= answers.count %>)
+        </td>
+      <% end %>
     </tr>
     <% answers.each do |answer| %>
-      <tr style="border-bottom: 1px solid black;">
+      <tr style="border-bottom: 1px solid lightgrey;">
         <td><%= answer.question.txt[0...50] + "..." %></td>
-        <td><%= answer.comments.html_safe %></td>
-        <td>
-          <% if answer.comments.present? %>
-            <% @tag_prompt_deployments.each do |tag_prompt_deployment|  %>
-              <b><%= tag_prompt_deployment.tag_prompt.prompt %></b>
+        <td><%= answer.plain_comments.html_safe %></td>
+        <% @tag_prompt_deployments.each do |tag_prompt_deployment|  %>
+          <td>
+            <% if answer.comments.present? %>
               <%= ReviewMetricsQuery.has(tag_prompt_deployment.id, answer.id) ?
                       "<span style='color: green'>Yes</span><br>".html_safe :
                       "<span style='color: red'>No</span><br>".html_safe %>
             <% end %>
-          <% end %>
-        </td>
+          </td>
+        <% end %>
       </tr>
     <% end %>
     <tr>
-      <td></td>
-      <td></td>
+      <% (1..@tag_prompt_deployments.length+1).each do %>
+        <td></td>
+      <% end %>
       <td style="text-align: right; padding-top: 10px">
         <form action="/response/<%= @response.id %>/confirm_submit" method="get">
           <a href="javascript:$('#modal-window').modal('hide')">Back</a>
-          <input type="submit" value="OK" id="Submit">
+          <input type="submit" value="OK" id="ok">
           <%= hidden_field_tag('return', @return) %>
         </form>
       </td>

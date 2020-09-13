@@ -58,4 +58,11 @@ class TagPromptDeployment < ActiveRecord::Base
     end
     user_answer_tagging
   end
+
+  def average_number_of_satisfied_comments
+    tags = AnswerTag.where(tag_prompt_deployment_id: self.id, user_id: nil)
+    analyzed_responses = tags.map {|tag| tag.answer.response }.uniq
+    positive_tags = tags.where(value: '1')
+    positive_tags.count / analyzed_responses.count
+  end
 end

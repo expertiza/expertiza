@@ -34,7 +34,8 @@ class ReviewMetricsQuery
     # if pre-cached tag is not present
     # unless tag
     #   # cache it, along with other reviews that may also need to be cached
-    #   cache_ws_results(reviews_to_be_cached(review_id), [TagPromptDeployment.find(tag_prompt_deployment_id)], false)
+    #   reviews = Answer.find(review_id).response.scores
+    #   cache_ws_results(reviews, [TagPromptDeployment.find(tag_prompt_deployment_id)], false)
     #   tag = @queried_results.find {|tag| tag.answer.id == review_id && tag.tag_prompt_deployment.id == tag_prompt_deployment_id }
     # end
     tag
@@ -51,12 +52,14 @@ class ReviewMetricsQuery
     tag_prompt_deployments.each do |tag_prompt_deployment|
       tag_prompt = tag_prompt_deployment.tag_prompt
       metric = PROMPT_TO_METRIC[tag_prompt.prompt]
-      ws_output = MetricsController.new.bulk_retrieve_metric(metric, ws_input, false)['reviews']
-      ws_output_confidence = MetricsController.new.bulk_retrieve_metric(metric, ws_input, true)['reviews']
-      ws_output.zip(ws_output_confidence).each do |review_with_value, review_with_confidence|
+      ws_output = MetricsController.new.bulk_retrieve_metric(metric, ws_input, false)
+      ws_output_confidence = MetricsController.new.bulk_retrieve_metric(metric, ws_input, true)
+
+      next unless ws_output['reviews'] && ws_output_confidence['reviews']
+      ws_output['reviews'].zip(ws_output_confidence['reviews']).each do |review_with_value, review_with_confidence|
         tag = AnswerTag.where(answer_id: review_with_value['id'],
                               tag_prompt_deployment_id: tag_prompt_deployment.id)
-                       .where.not(confidence_level: [nil]).first_or_create
+                       .where.not(confidence_level: [nil]).first_or_initialize
         tag.assign_attributes(value: translate_value(metric, review_with_value),
                               confidence_level: translate_confidence(metric, review_with_confidence))
         tags << tag
@@ -65,7 +68,7 @@ class ReviewMetricsQuery
 
     tags.each(&:save) if cache_to_db
     tags.each {|tag| @queried_results << tag }
-    @queried_results.uniq!
+    @queried_results.uniq! {|a| a.answer_id && a.tag_prompt_deployment_id }
   end
 
   def translate_value(metric, review)
@@ -109,11 +112,11 @@ class ReviewMetricsQuery
   # true or false
   def self.confident?(tag_prompt_deployment_id, review_id)
     confidence = ReviewMetricsQuery.instance.confidence(tag_prompt_deployment_id, review_id)
-    confidence > TAG_CERTAINTY_THRESHOLD
+    confidence >= TAG_CERTAINTY_THRESHOLD
   end
 
-  # usage: ReviewMetricQuery.has(tag_dep.id, answer.id)
-  def self.has(tag_prompt_deployment_id, review_id)
+  # usage: ReviewMetricQuery.has?(tag_dep.id, answer.id)
+  def self.has?(tag_prompt_deployment_id, review_id)
     ReviewMetricsQuery.instance.has(tag_prompt_deployment_id, review_id)
   end
 

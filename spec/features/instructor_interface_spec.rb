@@ -36,7 +36,7 @@ describe "Integration tests for instructor interface" do
     end
   end
 
-  describe "View Publishing Rights" do
+  describe "View Copyright Grants" do
     it 'should display teams for assignment without topic' do
       login_as("instructor6")
       visit '/participants/view_copyright_grants?id=1'

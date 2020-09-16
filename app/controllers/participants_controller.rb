@@ -171,7 +171,7 @@ class ParticipantsController < ApplicationController
 
   # A ‘copyright grant’ means the author has given permission to the instructor to use the work outside the course.  
   # This is incompletely implemented, but the values in the last column in http://expertiza.ncsu.edu/student_task/list are sourced from here.
-  def view_publishing_rights
+  def view_copyright_grants
     assignment_id = params[:id]
     assignment = Assignment.find(assignment_id)
     @assignment_name = assignment.name

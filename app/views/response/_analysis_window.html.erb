@@ -5,10 +5,6 @@
       e.stopPropagation();
       return;
     }
-<!--    }else{-->
-<!--      jQuery('#isSubmit').val('Yes');-->
-<!--      window.location.href= "../../../student_review/list?id=<%= @map.reviewer.id %>";-->
-<!--    }-->
   });
 </script>
 
@@ -44,10 +40,9 @@ to update it anymore. You can scroll down to see the button.</p>
         <% end %>
       </tr>
     <% end %>
+    <!-- Empty row, the 'OK' button on the right -->
     <tr>
-      <% (1..tag_prompt_deployments.length+1).each do %>
-        <td></td>
-      <% end %>
+      <%= ("<td></td>" * (tag_prompt_deployments.length + 1)).html_safe %>
       <td style="text-align: right; padding-top: 10px">
         <form action="/response/<%= @response.id %>/confirm_submit" method="get">
           <a href="javascript:$('#modal-window').modal('hide')">Back</a>

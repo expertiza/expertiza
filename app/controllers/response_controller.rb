@@ -76,6 +76,8 @@ class ResponseController < ApplicationController
 
 
   # Update the response and answers when student "edit" existing response
+  # Render metrics analysis results in a pop-up modal if student activates
+  # this call from the "Submit" button and no error has occurred
   def update
     render nothing: true unless action_allowed?
     # the response to be updated
@@ -92,7 +94,7 @@ class ResponseController < ApplicationController
       redirect_to controller: 'response', action: 'save', id: @map.map_id,
                   return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
     else
-      render "confirm_submit.js.erb", locals: {isSubmit: params[:isSubmit]}
+      render "analysis_window.js.erb", locals: {call_from_submit: params[:Submit]}
     end
   end
 
@@ -177,6 +179,8 @@ class ResponseController < ApplicationController
                 return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
   end
 
+  # This method is called when the student confirms to have his/her review submitted
+  # as he/she is satisfied with the quality of review that our system has estimated
   def confirm_submit
     @response = Response.find(params[:response_id])
     @response.update_attribute('is_submitted', true)

@@ -52,17 +52,21 @@ class ReviewMetricsQuery
     tag_prompt_deployments.each do |tag_prompt_deployment|
       tag_prompt = tag_prompt_deployment.tag_prompt
       metric = PROMPT_TO_METRIC[tag_prompt.prompt]
-      ws_output = MetricsController.new.bulk_retrieve_metric(metric, ws_input, false)
-      ws_output_confidence = MetricsController.new.bulk_retrieve_metric(metric, ws_input, true)
-
-      next unless ws_output['reviews'] && ws_output_confidence['reviews']
-      ws_output['reviews'].zip(ws_output_confidence['reviews']).each do |review_with_value, review_with_confidence|
-        tag = AnswerTag.where(answer_id: review_with_value['id'],
-                              tag_prompt_deployment_id: tag_prompt_deployment.id)
-                       .where.not(confidence_level: [nil]).first_or_initialize
-        tag.assign_attributes(value: translate_value(metric, review_with_value),
-                              confidence_level: translate_confidence(metric, review_with_confidence))
-        tags << tag
+      begin
+        ws_output = MetricsController.new.bulk_retrieve_metric(metric, ws_input, false)
+        ws_output_confidence = MetricsController.new.bulk_retrieve_metric(metric, ws_input, true)
+      rescue StandardError
+        # skipped
+      else
+        next unless ws_output && ws_output['reviews'] && ws_output_confidence && ws_output_confidence['reviews']
+        ws_output['reviews'].zip(ws_output_confidence['reviews']).each do |review_with_value, review_with_confidence|
+          tag = AnswerTag.where(answer_id: review_with_value['id'],
+                                tag_prompt_deployment_id: tag_prompt_deployment.id)
+                         .where.not(confidence_level: [nil]).first_or_initialize
+          tag.assign_attributes(value: translate_value(metric, review_with_value),
+                                confidence_level: translate_confidence(metric, review_with_confidence))
+          tags << tag
+        end
       end
     end
 

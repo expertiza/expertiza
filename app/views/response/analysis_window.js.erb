@@ -1,7 +1,7 @@
-<% if isSubmit %>
+<% if call_from_submit %>
   <% tag_prompt_deployments = TagPromptDeployment.where(assignment_id: @map.reviewee.assignment.id, questionnaire_id: @questionnaire.id) %>
   <% ReviewMetricsQuery.instance.cache_ws_results(@response.scores, tag_prompt_deployments, true) %>
 
-  $("#modal-window").find(".modal_container").html("<%= j render partial: 'response/confirm_submit', locals: {tag_prompt_deployments: tag_prompt_deployments} %>");
+  $("#modal-window").find(".modal_container").html("<%= j render partial: 'response/analysis_window', locals: {tag_prompt_deployments: tag_prompt_deployments} %>");
   $("#modal-window").modal("show")
 <% end %>

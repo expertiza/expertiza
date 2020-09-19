@@ -21,7 +21,7 @@ to update it anymore. You can scroll down to see the button.</p>
       <% tag_prompt_deployments.each do |tag_prompt_deployment|  %>
         <td>
           <b><%= tag_prompt_deployment.tag_prompt.prompt %></b><br>
-          (class avg=<%= tag_prompt_deployment.average_number_of_satisfied_comments %>/<%= answers.count %>)
+          (class avg=<%= tag_prompt_deployment.average_number_of_qualified_comments %>/<%= answers.count %>)
         </td>
       <% end %>
     </tr>

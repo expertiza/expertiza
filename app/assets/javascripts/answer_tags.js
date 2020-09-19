@@ -5,6 +5,7 @@
  */
 
 save_tag = function(answer_id, tag_prompt_deployment_id, control){
+
     var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
     xmlhttp.open("POST", "/answer_tags/create_edit");
     xmlhttp.setRequestHeader("Content-Type", "application/json");
@@ -34,8 +35,8 @@ toggleLabel = function(range) {
 
     // grey-out and overrode tags
     var toggle = $('#' + range.id);
-    if (toggle.attr('class').indexOf('grey-out-toggle') >= 0 || toggle.attr('class').indexOf('changed-toggle') >= 0) {
-        $('#' + range.id).attr('class', 'rangeAll changed-toggle');
+    if (toggle.attr('class').indexOf('grey-out') >= 0 || toggle.attr('class').indexOf('overridden') >= 0) {
+        $('#' + range.id).attr('class', 'rangeAll overridden');
     }
     $('#' + range.id).closest(".toggle-container").find('.toggle-caption').attr('class', 'toggle-caption');
 }

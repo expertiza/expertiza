@@ -1,11 +1,11 @@
 class VmUserAnswerTagging
-  def initialize(user, percentage, no_tagged, no_not_tagged, no_taggable, no_not_taggable)
+  def initialize(user, percentage, no_tagged, no_not_tagged, no_tagable, no_inferred)
     @user = user
     @percentage = percentage
     @no_tagged = no_tagged
     @no_not_tagged = no_not_tagged
-    @no_taggable = no_taggable
-    @no_not_taggable = no_not_taggable
+    @no_tagable = no_tagable
+    @no_inferred = no_inferred
   end
 
   attr_accessor :user
@@ -16,7 +16,7 @@ class VmUserAnswerTagging
 
   attr_accessor :no_not_tagged
 
-  attr_accessor :no_taggable
+  attr_accessor :no_tagable
 
-  attr_accessor :no_not_taggable
+  attr_accessor :no_inferred
 end

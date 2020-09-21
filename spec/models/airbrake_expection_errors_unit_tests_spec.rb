@@ -16,7 +16,7 @@ describe 'Airbrake-1781551925379466692' do
     @qs.instance_variable_set(:@list_of_rows, [VmQuestionResponseRow.new('', 1, 1, 5, 0)])
   end
 
-  it 'can deal with comment is not nil, with one comments greater than 10' do
+  xit 'can deal with comment is not nil, with one comments greater than 10' do
     # @list_of_rows = [VmQuestionResponseRow.new('', 1, 1, 5, 0)]
     allow(Answer).to receive(:where).with(any_args).
       and_return([double("Answer", question_id: 1, response_id: 1, comments: 'one two three four five six seven eight nine ten eleven'),

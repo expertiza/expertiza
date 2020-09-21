@@ -124,5 +124,17 @@ class ReviewMetricsQuery
     ReviewMetricsQuery.instance.has?(tag_prompt_deployment_id, review_id)
   end
 
+  def self.average(tag_prompt_deployment_id, reviewer = nil)
+    tags = AnswerTag.where(tag_prompt_deployment_id: tag_prompt_deployment_id, user_id: nil)
+    if reviewer
+      responses = reviewer.becomes(Participant).reviews.map(&:response).flatten
+      answers = responses.map(&:scores).flatten
+      tags = tags.where(answer_id: answers.map(&:id))
+    end
+    analyzed_responses = tags.map {|tag| tag.answer.response }.uniq
+    positive_tags = tags.where(value: '1')
+    analyzed_responses.count.zero? ? 0 : positive_tags.count / analyzed_responses.count
+  end
+
   # =============== End of caller's interfaces ===============
 end

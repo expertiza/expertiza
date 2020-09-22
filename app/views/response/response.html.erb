@@ -101,13 +101,15 @@
       }, 5000);
     });
 
-    // display loader
+    // display loader and disable button
     $("#Submit").click(function(e){
+      $('#Submit').addClass('disabled');
       $('#return').before('<div class="loader"></div>');
       $('#return').before('<div class="loader-msg">Please wait for the system to process your review. It should take about few minutes. Keep this page active.</div>');
     });
 
     $('#modal-window').bind('DOMSubtreeModified', function(e) {
+      $('#Submit').removeClass('disabled');
       $('.loader').remove();
       $('.loader-msg').remove();
     });

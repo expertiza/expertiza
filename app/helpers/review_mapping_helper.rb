@@ -258,10 +258,11 @@ module ReviewMappingHelper
     horizontal_bar_chart data, options
   end
 
-  def initialize_review_metrics_chart_elements(reviewer, tag_prompt_deployments)
+  def initialize_review_metrics_chart_elements(reviewer)
     labels = []
     reviewer_data = []
     all_reviewers_data = []
+    tag_prompt_deployments = TagPromptDeployment.where(assignment_id: reviewer.assignment.id)
 
     tag_prompt_deployments.each do |tag_prompt_deployment|
       labels.push tag_prompt_deployment.tag_prompt.prompt
@@ -276,8 +277,7 @@ module ReviewMappingHelper
   end
 
   def display_review_metrics_chart(reviewer)
-    tag_prompt_deployments = TagPromptDeployment.where(assignment_id: reviewer.assignment.id)
-    labels, reviewer_data, all_reviewers_data = initialize_review_metrics_chart_elements(reviewer, tag_prompt_deployments)
+    labels, reviewer_data, all_reviewers_data = initialize_review_metrics_chart_elements(reviewer)
     data = {
       labels: labels,
       datasets: [
@@ -305,7 +305,7 @@ module ReviewMappingHelper
         }
       },
       width: "200",
-      height: (78.125+15.625*tag_prompt_deployments.count).to_s,
+      height: (78.125+15.625*labels.count).to_s,
       scales: {
         yAxes: [{
                   stacked: true,

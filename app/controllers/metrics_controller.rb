@@ -3,16 +3,15 @@ class MetricsController < ApplicationController
   require 'net/http'
   require 'uri'
   require 'json'
-  # @@service_url = "https://peerlogic.csc.ncsu.edu/"
+  @@service_url = "https://peerlogic.csc.ncsu.edu/"
   #url for testing peer review web apis, currently hosted at 152.7.98.91
-  # @service_url = "http://152.7.98.91:5000/"
+  # @@service_url = "http://152.7.98.91:5000/"
 
   def bulk_retrieve_metric(metric,parameters,is_confidence_required)
     metric = metric.downcase
-    service_url = "http://152.7.98.91:5000/"
     if is_valid_metric(metric)
       #if only confidence is required from metric, append string "_confidence" to url
-      metric_url = service_url + metric + (is_confidence_required ? "_confidence" : "")
+      metric_url = @@service_url + metric + (is_confidence_required ? "_confidence" : "")
       response = call_webservice(parameters, metric_url)
     else
       raise StandardError.new "Call must include a valid web service name."

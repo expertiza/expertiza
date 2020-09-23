@@ -123,7 +123,7 @@ describe ResponseController do
         }
         session = {user: instructor}
         post :update, params, session
-        expect(response).to render_template('response/confirm_submit.js.erb')
+        expect(response).to render_template('response/analysis_modal.js.erb')
       end
     end
   end

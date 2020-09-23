@@ -13,8 +13,9 @@
 that after clicking the '<b>OK</b>' button, the peer-review will be displayed to reviewee, and you will not be able
 to update it anymore. You can scroll down to see the button.</p>
 <% answers = @response.scores %>
+<% tag_prompt_deployments = TagPromptDeployment.where(assignment_id: @map.reviewee.assignment.id, questionnaire_id: @questionnaire.id) %>
 <div>
-  <table style="margin-left: auto; margin-right: auto;">
+  <table  class="tbl_heat">
     <tr>
       <th>Question</th>
       <th>Response</th>
@@ -25,13 +26,14 @@ to update it anymore. You can scroll down to see the button.</p>
         </td>
       <% end %>
     </tr>
+
     <% answers.each do |answer| %>
-      <tr style="border-bottom: 1px solid lightgrey;">
-        <td><%= answer.question.txt[0...50] + "..." %></td>
+      <tr>
+        <td><%= answer.question.txt %></td>
         <td><%= answer.plain_comments.html_safe %></td>
         <% tag_prompt_deployments.each do |tag_prompt_deployment|  %>
           <td>
-            <% if answer.comments.present? %>
+            <% if answer.comments.present? & ReviewMetricsQuery.confident?(tag_prompt_deployment.id, answer.id) %>
               <%= ReviewMetricsQuery.has?(tag_prompt_deployment.id, answer.id) ?
                       "<span style='color: green'>Yes</span><br>".html_safe :
                       "<span style='color: red'>No</span><br>".html_safe %>
@@ -40,16 +42,13 @@ to update it anymore. You can scroll down to see the button.</p>
         <% end %>
       </tr>
     <% end %>
-    <!-- Empty row, 'OK' button on the right -->
-    <tr>
-      <%= ("<td></td>" * (tag_prompt_deployments.length + 1)).html_safe %>
-      <td style="text-align: right; padding-top: 10px">
-        <form action="/response/<%= @response.id %>/confirm_submit" method="get">
-          <a href="javascript:$('#modal-window').modal('hide')">Back</a>
-          <input type="submit" value="OK" id="ok">
-          <%= hidden_field_tag('return', @return) %>
-        </form>
-      </td>
-    </tr>
   </table>
+  <div style="text-align: right; padding-top: 5px">
+    <form action="/response/<%= @response.id %>/confirm_submit" method="get">
+      <a href="javascript:$('#modal-window').modal('hide')">Back</a>
+      <input type="submit" value="OK" id="ok">
+      <%= hidden_field_tag('return', @return) %>
+    </form>
+  </div>
+
 </div>

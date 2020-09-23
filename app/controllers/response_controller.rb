@@ -94,7 +94,7 @@ class ResponseController < ApplicationController
       redirect_to controller: 'response', action: 'save', id: @map.map_id,
                   return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
     else
-      render "analysis_window.js.erb", locals: {call_from_submit: params[:Submit]}
+      render "analysis_modal.js.erb", locals: {call_from_submit: params[:Submit]}
     end
   end
 

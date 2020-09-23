@@ -58,17 +58,11 @@ describe ReviewMetricsQuery do
     end
     it 'calls the web service' do
       expect(@controller).to receive(:bulk_retrieve_metric).twice
-      ReviewMetricsQuery.instance.cache_ws_results([answer], [tag_prompt_deployment_3], false)
+      ReviewMetricsQuery.instance.cache_ws_results([answer], [tag_prompt_deployment_3])
     end
-    it 'parses the web service results to AnswerTag objects and make them available in @queried_results' do
-      ReviewMetricsQuery.instance.cache_ws_results([answer], [tag_prompt_deployment_3], false)
-      parsed_answer_tag = ReviewMetricsQuery.instance.instance_variable_get(:@queried_results).find {|a| a.tag_prompt_deployment == tag_prompt_deployment_3}
-      expect(parsed_answer_tag.value).to eq("-1")
-      expect(parsed_answer_tag.confidence_level).to eq(0.23)
-    end
-    it 'saves parsed AnswerTag objects to database when cache_to_ws is set to true' do
+    it 'saves parsed AnswerTag objects to database' do
       expect(AnswerTag.count).to eq(3)
-      ReviewMetricsQuery.instance.cache_ws_results([answer], [tag_prompt_deployment_3], true)
+      ReviewMetricsQuery.instance.cache_ws_results([answer], [tag_prompt_deployment_3])
       expect(AnswerTag.count).to eq(4)
     end
   end

@@ -262,8 +262,8 @@ module ReviewMappingHelper
     labels = []
     reviewer_data = []
     all_reviewers_data = []
-    tag_prompt_deployments = TagPromptDeployment.where(assignment_id: reviewer.assignment.id)
 
+    tag_prompt_deployments = TagPromptDeployment.where(assignment_id: reviewer.assignment.id)
     tag_prompt_deployments.each do |tag_prompt_deployment|
       labels.push tag_prompt_deployment.tag_prompt.prompt
       reviewer_avg = reviewer.average_number_of_qualified_comments(tag_prompt_deployment.id)

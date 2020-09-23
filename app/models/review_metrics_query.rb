@@ -12,11 +12,6 @@ class ReviewMetricsQuery
                       'Mention Praise?' => 'sentiment',
                       'Positive Tone?' => 'emotions'}.freeze
 
-  def initialize
-    # @queried_results: an array of AnswerTag objects
-    @queried_results = []
-  end
-
   def confidence(tag_prompt_deployment_id, review_id)
     review = retrieve_from_cache(tag_prompt_deployment_id, review_id)
     review ? review.confidence_level : 0
@@ -28,20 +23,10 @@ class ReviewMetricsQuery
   end
 
   def retrieve_from_cache(tag_prompt_deployment_id, review_id)
-    tag = @queried_results.find {|tag| tag.answer.id == review_id && tag.tag_prompt_deployment.id == tag_prompt_deployment_id }
-    tag ||= AnswerTag.where(answer_id: review_id, tag_prompt_deployment_id: tag_prompt_deployment_id).where.not(confidence_level: nil).first
-
-    # if pre-cached tag is not present
-    # unless tag
-    #   # cache it, along with other reviews that may also need to be cached
-    #   reviews = Answer.find(review_id).response.scores
-    #   cache_ws_results(reviews, [TagPromptDeployment.find(tag_prompt_deployment_id)], false)
-    #   tag = @queried_results.find {|tag| tag.answer.id == review_id && tag.tag_prompt_deployment.id == tag_prompt_deployment_id }
-    # end
-    tag
+    AnswerTag.where(answer_id: review_id, tag_prompt_deployment_id: tag_prompt_deployment_id).where.not(confidence_level: nil).first
   end
 
-  def cache_ws_results(reviews, tag_prompt_deployments, cache_to_db)
+  def cache_ws_results(reviews, tag_prompt_deployments)
     ws_input = {'reviews' => []}
     reviews.each do |review|
       ws_input['reviews'] << {'id' => review.id, 'text' => review.plain_comments} if review.comments.present?
@@ -56,7 +41,7 @@ class ReviewMetricsQuery
         ws_output = MetricsController.new.bulk_retrieve_metric(metric, ws_input, false)
         ws_output_confidence = MetricsController.new.bulk_retrieve_metric(metric, ws_input, true)
       rescue StandardError
-        # skipped
+        # error occurred when calling the web service, skipped.
       else
         next unless ws_output && ws_output['reviews'] && ws_output_confidence && ws_output_confidence['reviews']
         ws_output['reviews'].zip(ws_output_confidence['reviews']).each do |review_with_value, review_with_confidence|
@@ -70,9 +55,7 @@ class ReviewMetricsQuery
       end
     end
 
-    tags.each(&:save) if cache_to_db
-    tags.each {|tag| @queried_results << tag }
-    @queried_results.uniq! {|a| a.answer_id && a.tag_prompt_deployment_id }
+    tags.each(&:save)
   end
 
   def translate_value(metric, review)
@@ -97,7 +80,7 @@ class ReviewMetricsQuery
     # translate the meaning of 'confidence'
     # from 'confidence of the positive'
     # to 'confidence of the predicted value (present or absent)'
-    if (metric == 'problem' || metric == 'suggestions') && (confidence < 0.5) && (confidence != 0)
+    if (metric == 'problem' || metric == 'suggestions') && (confidence < 0.5)
       1 - confidence
     else
       confidence
@@ -106,25 +89,23 @@ class ReviewMetricsQuery
 
   # =============== Caller's interfaces ===============
 
-  # usage: ReviewMetricQuery.confidence(tag_dep.id, answer.id)
   def self.confidence(tag_prompt_deployment_id, review_id)
     ReviewMetricsQuery.instance.confidence(tag_prompt_deployment_id, review_id)
   end
 
-  # usage: ReviewMetricQuery.confident?(tag_dep.id, answer.id)
-  # answer_tagging would most likely to use this method since it returns either
-  # true or false
   def self.confident?(tag_prompt_deployment_id, review_id)
     confidence = ReviewMetricsQuery.instance.confidence(tag_prompt_deployment_id, review_id)
     confidence >= TAG_CERTAINTY_THRESHOLD
   end
 
-  # usage: ReviewMetricQuery.has?(tag_dep.id, answer.id)
   def self.has?(tag_prompt_deployment_id, review_id)
     ReviewMetricsQuery.instance.has?(tag_prompt_deployment_id, review_id)
   end
 
-  def self.average(tag_prompt_deployment_id, reviewer = nil)
+  # return the average number of qualified comments (comments that meet the description of the
+  # tag prompt, e.g. Mention problem?) in a group of reviews. When reviewer is supplied,
+  # it returns the average number of qualified comments made by the reviewer.
+  def self.average_number_of_qualified_comments(tag_prompt_deployment_id, reviewer = nil)
     tags = AnswerTag.where(tag_prompt_deployment_id: tag_prompt_deployment_id, user_id: nil)
     if reviewer
       responses = reviewer.becomes(Participant).reviews.map(&:response).flatten

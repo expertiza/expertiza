@@ -58,6 +58,6 @@ class TagPromptDeployment < ActiveRecord::Base
   end
 
   def average_number_of_qualified_comments
-    ReviewMetricsQuery.average(self.id)
+    ReviewMetricsQuery.average_number_of_qualified_comments(self.id)
   end
 end

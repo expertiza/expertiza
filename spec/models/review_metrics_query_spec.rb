@@ -58,11 +58,11 @@ describe ReviewMetricsQuery do
     end
     it 'calls the web service' do
       expect(@controller).to receive(:bulk_retrieve_metric).twice
-      ReviewMetricsQuery.instance.cache_ws_results([answer], [tag_prompt_deployment_3])
+      ReviewMetricsQuery.cache_ws_results([answer], [tag_prompt_deployment_3])
     end
     it 'saves parsed AnswerTag objects to database' do
       expect(AnswerTag.count).to eq(3)
-      ReviewMetricsQuery.instance.cache_ws_results([answer], [tag_prompt_deployment_3])
+      ReviewMetricsQuery.cache_ws_results([answer], [tag_prompt_deployment_3])
       expect(AnswerTag.count).to eq(4)
     end
   end
@@ -70,11 +70,11 @@ describe ReviewMetricsQuery do
   describe 'translate_value' do
     it 'translates text into value 1 or -1' do
       review = {"id" => answer.id, "text" => answer.comments, "Praise" => "None"}
-      result = ReviewMetricsQuery.instance.translate_value('emotions', review)
+      result = ReviewMetricsQuery.inferred_value('emotions', review)
       expect(result).to eq(-1)
 
       review = {"id" => answer.id, "text" => answer.comments, "sentiment_tone" => "Positive"}
-      result = ReviewMetricsQuery.instance.translate_value('sentiment', review)
+      result = ReviewMetricsQuery.inferred_value('sentiment', review)
       expect(result).to eq(1)
     end
   end
@@ -82,7 +82,7 @@ describe ReviewMetricsQuery do
   describe 'translate_confidence' do
     it 'flips the confidence level when the determined value is Absent' do
       review = {"id" => answer.id, "text" => answer.comments, "problems" => "Absent", "confidence" => 0.02}
-      result = ReviewMetricsQuery.instance.translate_confidence('problem', review)
+      result = ReviewMetricsQuery.inferred_confidence('problem', review)
       expect(result).to eq(1 - 0.02)
     end
   end

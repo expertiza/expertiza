@@ -264,7 +264,7 @@ class AssignmentParticipant < Participant
     stage
   end
 
-  def average_number_of_qualified_comments(tag_prompt_deployment_id)
-    ReviewMetricsQuery.average_number_of_qualified_comments(tag_prompt_deployment_id, self)
+  def average_number_of_qualifying_comments(tag_prompt_deployment_id)
+    ReviewMetricsQuery.average_number_of_qualifying_comments(tag_prompt_deployment_id, self)
   end
 end

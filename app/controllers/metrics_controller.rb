@@ -20,8 +20,7 @@ class MetricsController < ApplicationController
 
   def is_valid_metric(metric)
     # return true if metric name is valid else return false
-    valid_metrics = ['reputation','suggestions','volume', 'problem']
-    # valid_metrics = ['reputation','suggestions','volume', 'sentiment', 'emotions', 'problem']
+    valid_metrics = ['reputation','suggestions','volume', 'sentiment', 'emotions', 'problem']
     valid_metrics.include?(metric)
   end
 

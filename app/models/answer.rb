@@ -130,7 +130,7 @@ class Answer < ActiveRecord::Base
   end
   # end added by ferry for answer tagging
 
-  def plain_comments
+  def de_tag_comments
     comments.gsub(/\u003c.*?\u003e/, '')
   end
 end

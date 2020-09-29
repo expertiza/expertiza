@@ -103,12 +103,15 @@
 
     // display loader and disable button
     $("#Submit").click(function(e){
+      $("#autosave_cbx").removeProp("checked"); // temporarily remove the shield
       $('#Submit').addClass('disabled');
       $('#return').before('<div class="loader"></div>');
       $('#return').before('<div class="loader-msg">Please wait for the system to process your review. It should take about few minutes. Keep this page active.</div>');
     });
 
+    // remove loader and the disabled effect on the button after the modal gets loaded
     $('#modal-window').bind('DOMSubtreeModified', function(e) {
+      $("#autosave_cbx").prop("checked","true"); // restore the shield
       $('#Submit').removeClass('disabled');
       $('.loader').remove();
       $('.loader-msg').remove();

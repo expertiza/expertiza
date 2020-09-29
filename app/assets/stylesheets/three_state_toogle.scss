@@ -176,12 +176,12 @@ input[type=range]:focus::-ms-fill-upper {
   background: white !important;
 }
 
-.grey-out {
+.gray-out {
   opacity: 0.2;
   transition: opacity .3s;
 }
 
-input[type=range].grey-out:hover {
+input[type=range].gray-out:hover {
   opacity: 1;
 }
 

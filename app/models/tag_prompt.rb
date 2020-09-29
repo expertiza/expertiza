@@ -76,7 +76,7 @@ class TagPrompt < ActiveRecord::Base
     if ReviewMetricsQuery.confident?(tag_prompt_deployment.id, answer.id)
       inferred_value = ReviewMetricsQuery.has?(tag_prompt_deployment.id, answer.id) ? "1" : "-1"
       if value == inferred_value || value == "0"
-        style = "grey-out"
+        style = "gray-out"
         value = inferred_value
       else
         style = "overridden"

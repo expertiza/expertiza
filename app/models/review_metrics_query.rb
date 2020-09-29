@@ -1,6 +1,4 @@
 class ReviewMetricsQuery
-  include Singleton
-
   # The certainty threshold is the fraction (between 0 and 1) that says how certain
   # the ML algorithm must be of a tag value before it will ask the author to tag it
   # manually.
@@ -12,24 +10,14 @@ class ReviewMetricsQuery
                       'Mention Praise?' => 'sentiment',
                       'Positive Tone?' => 'emotions'}.freeze
 
-  def confidence(tag_prompt_deployment_id, review_id)
-    review = retrieve_from_cache(tag_prompt_deployment_id, review_id)
-    review ? review.confidence_level : 0
-  end
-
-  def has?(tag_prompt_deployment_id, review_id)
-    review = retrieve_from_cache(tag_prompt_deployment_id, review_id)
-    review ? review.value == '1' : false
-  end
-
-  def retrieve_from_cache(tag_prompt_deployment_id, review_id)
+  def self.retrieve_from_cache(tag_prompt_deployment_id, review_id)
     AnswerTag.where(answer_id: review_id, tag_prompt_deployment_id: tag_prompt_deployment_id).where.not(confidence_level: nil).first
   end
 
-  def cache_ws_results(reviews, tag_prompt_deployments)
+  def self.cache_ws_results(reviews, tag_prompt_deployments)
     ws_input = {'reviews' => []}
     reviews.each do |review|
-      ws_input['reviews'] << {'id' => review.id, 'text' => review.plain_comments} if review.comments.present?
+      ws_input['reviews'] << {'id' => review.id, 'text' => review.de_tag_comments} if review.comments.present?
     end
 
     tags = []
@@ -48,8 +36,8 @@ class ReviewMetricsQuery
           tag = AnswerTag.where(answer_id: review_with_value['id'],
                                 tag_prompt_deployment_id: tag_prompt_deployment.id)
                          .where.not(confidence_level: [nil]).first_or_initialize
-          tag.assign_attributes(value: translate_value(metric, review_with_value),
-                                confidence_level: translate_confidence(metric, review_with_confidence))
+          tag.assign_attributes(value: inferred_value(metric, review_with_value),
+                                confidence_level: inferred_confidence(metric, review_with_confidence))
           tags << tag
         end
       end
@@ -58,7 +46,7 @@ class ReviewMetricsQuery
     tags.each(&:save)
   end
 
-  def translate_value(metric, review)
+  def self.inferred_value(metric, review)
     value = case metric
             when 'problem'
               review['problems'] == 'Present'
@@ -74,7 +62,7 @@ class ReviewMetricsQuery
     value ? 1 : -1
   end
 
-  def translate_confidence(metric, review)
+  def self.inferred_confidence(metric, review)
     confidence = review['confidence'].to_f
 
     # translate the meaning of 'confidence'
@@ -87,25 +75,25 @@ class ReviewMetricsQuery
     end
   end
 
-  # =============== Caller's interfaces ===============
-
   def self.confidence(tag_prompt_deployment_id, review_id)
-    ReviewMetricsQuery.instance.confidence(tag_prompt_deployment_id, review_id)
+    review = retrieve_from_cache(tag_prompt_deployment_id, review_id)
+    review ? review.confidence_level : 0
   end
 
   def self.confident?(tag_prompt_deployment_id, review_id)
-    confidence = ReviewMetricsQuery.instance.confidence(tag_prompt_deployment_id, review_id)
+    confidence = confidence(tag_prompt_deployment_id, review_id)
     confidence >= TAG_CERTAINTY_THRESHOLD
   end
 
   def self.has?(tag_prompt_deployment_id, review_id)
-    ReviewMetricsQuery.instance.has?(tag_prompt_deployment_id, review_id)
+    review = retrieve_from_cache(tag_prompt_deployment_id, review_id)
+    review ? review.value == '1' : false
   end
 
-  # return the average number of qualified comments (comments that meet the description of the
+  # return the average number of qualifying comments (comments that meet the description of the
   # tag prompt, e.g. Mention problem?) in a group of reviews. When reviewer is supplied,
-  # it returns the average number of qualified comments made by the reviewer.
-  def self.average_number_of_qualified_comments(tag_prompt_deployment_id, reviewer = nil)
+  # it returns the average number of qualifying comments made by the reviewer.
+  def self.average_number_of_qualifying_comments(tag_prompt_deployment_id, reviewer = nil)
     tags = AnswerTag.where(tag_prompt_deployment_id: tag_prompt_deployment_id, user_id: nil)
     if reviewer
       responses = reviewer.becomes(Participant).reviews.map(&:response).flatten
@@ -117,5 +105,4 @@ class ReviewMetricsQuery
     analyzed_responses.count.zero? ? 0 : positive_tags.count / analyzed_responses.count
   end
 
-  # =============== End of caller's interfaces ===============
 end

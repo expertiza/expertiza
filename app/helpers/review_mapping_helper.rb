@@ -144,10 +144,13 @@ module ReviewMappingHelper
   def sort_reviewer_by_review_volume_desc 
     @reviewers.each do |r|
       review_volumes = Response.get_volume_of_review_comments(@assignment.id, r.id)
-      r.avg_vol_per_round = []
-      r.overall_avg_vol = review_volumes[0]
-      (1..(review_volumes.length)) do |round_num|
-        r.avg_vol_per_round.push(review_volumes[round_num])
+      r.avg_vol_per_round = []     
+      review_volumes.each_index do |i|
+        if i == 0 
+          r.overall_avg_vol = review_volumes[0]
+        else 
+          r.avg_vol_per_round.push(review_volumes[round_num])
+        end
       end
     end
     @all_reviewers_overall_avg_vol = @reviewers.inject(0) {|sum, r| sum += r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)

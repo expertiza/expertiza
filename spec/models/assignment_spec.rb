@@ -1,4 +1,5 @@
 describe Assignment do
+
   let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 3, name: 'no one') }
@@ -14,6 +15,11 @@ describe Assignment do
                                 description_url: 'https://expertiza.ncsu.edu/', round: 1)
   end
   let(:topic_due_date) { build(:topic_due_date, deadline_name: 'Submission', description_url: 'https://github.com/expertiza/expertiza') }
+  let(:deadline_type) { build(:deadline_type, id: 1) }
+  let(:assignment_questionnaire1) { build(:assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 1) }
+  let(:assignment_questionnaire2) { build(:assignment_questionnaire, id: 2, assignment_id: 1, questionnaire_id: 2) }
+  let(:questionnaire1) { build(:questionnaire, id: 1, type: 'ReviewQuestionnaire') }
+  let(:questionnaire2) { build(:questionnaire, id: 2, type: 'MetareviewQuestionnaire') }
 
   describe '.max_outstanding_reviews' do
     it 'returns 2 by default' do
@@ -43,11 +49,11 @@ describe Assignment do
     end
   end
 
-  describe '.set_courses_to_assignment' do
+  describe '.assign_courses_to_assignment' do
     it 'fetches all courses belong to current instructor and with the order of course names' do
       course = double('Course')
       allow(Course).to receive_message_chain(:where, :order).with(instructor_id: 6).with(:name).and_return([course])
-      expect(Assignment.set_courses_to_assignment(instructor)).to eq([course])
+      expect(Assignment.assign_courses_to_assignment(instructor)).to eq([course])
     end
   end
 
@@ -140,7 +146,7 @@ describe Assignment do
     context 'when assignment is varying rubric by round assignment' do
       it 'calculates scores in each round of each team in current assignment' do
         allow(participant).to receive(:scores).with(review1: [question]).and_return(98)
-        allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
+        allow(assignment).to receive(:vary_by_round).and_return(true)
         allow(assignment).to receive(:num_review_rounds).and_return(1)
         allow(ReviewResponseMap).to receive(:get_responses_for_team_round).with(team, 1).and_return([response])
         allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
@@ -154,7 +160,7 @@ describe Assignment do
     context 'when assignment is not varying rubric by round assignment' do
       it 'calculates scores of each team in current assignment' do
         allow(participant).to receive(:scores).with(review: [question]).and_return(98)
-        allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
+        allow(assignment).to receive(:vary_by_round).and_return(false)
         allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([response])
         allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
         expect(assignment.scores(review: [question]).inspect).to eq("{:participants=>{:\"1\"=>98}, :teams=>{:\"0\"=>{:team=>#<AssignmentTeam id: 1, "\
@@ -282,6 +288,11 @@ describe Assignment do
       it 'returns microtask status (false by default)' do
         expect(assignment.microtask?).to be false
       end
+
+      it 'returns microtask status true if microtask of assignment was reset from default value' do
+        assignment = build(:assignment, microtask: true)
+        expect(assignment.microtask?).to be true
+      end
     end
 
     context 'when microtask is nil' do
@@ -372,20 +383,6 @@ describe Assignment do
     end
   end
 
-  describe '#microtask?' do
-    it 'checks whether assignment is a micro task' do
-      assignment = build(:assignment, microtask: true)
-      expect(assignment.microtask?).to be true
-    end
-  end
-
-  describe '#varying_rubrics_by_round?' do
-    it 'returns true if the number of 2nd round questionnaire(s) is larger or equal 1' do
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([double('AssignmentQuestionnaire')])
-      expect(assignment.varying_rubrics_by_round?).to be true
-    end
-  end
-
   describe '#link_for_current_stage' do
     context 'when current assignment has staggered deadline and topic id is nil' do
       it 'returns nil' do
@@ -461,11 +458,69 @@ describe Assignment do
   end
 
   describe '#review_questionnaire_id' do
-    it 'returns review_questionnaire_id' do
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 1).and_return([build(:assignment_questionnaire)])
-      allow(Questionnaire).to receive(:find).and_return(build(:questionnaire))
-      expect(assignment.review_questionnaire_id(1)).to eq(1)
+    context 'when corresponding active record for assignment_questionnaire is found' do
+      before(:each) do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
+            [assignment_questionnaire1, assignment_questionnaire2])
+        allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire1)
+      end
+
+      it 'returns correct questionnaire id found by used_in_round and topic_id if both used_in_round and topic_id are given' do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return(
+            [assignment_questionnaire1])
+        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
+        expect(assignment.review_questionnaire_id(1, 1)).to eq(questionnaire1.id)
+      end
+
+      it 'returns correct questionnaire id found by used_in_round if only used_in_round is given' do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: nil).and_return(
+            [assignment_questionnaire1])
+        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
+        expect(assignment.review_questionnaire_id(1, nil)).to eq(questionnaire1.id)
+      end
+
+      it 'returns correct questionnaire id found by topic_id if only topic_id is given and there is no current round used in the due date' do
+        allow(DueDate).to receive(:get_next_due_date).with(assignment.id).and_return(nil)
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: nil, topic_id: 1).and_return(
+            [assignment_questionnaire1])
+        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
+        expect(assignment.review_questionnaire_id(nil, 1)).to eq(questionnaire1.id)
+      end
+
+      it 'returns correct questionnaire id found by used_in_round and topic_id if only topic_id is given, but current round is found by the due date' do
+        allow(DueDate).to receive(:get_next_due_date).with(assignment.id).and_return(assignment_due_date)
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return(
+            [assignment_questionnaire1])
+        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
+        expect(assignment.review_questionnaire_id(nil, 1)).to eq(questionnaire1.id)
+      end
     end
+
+    context 'when corresponding active record for assignment_questionnaire is not found' do
+      it 'returns correct questionnaire id found by type' do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
+            [assignment_questionnaire1, assignment_questionnaire2])
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return([])
+        allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
+        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(nil)
+        allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire1)
+        allow(Questionnaire).to receive(:find).with(2).and_return(questionnaire2)
+        expect(assignment.review_questionnaire_id(1, 1)).to eq(questionnaire1.id)
+      end
+    end
+
+    context 'when corresponding active record for assignment_questionnaire is found, but for questionnaire is not found' do
+      it 'returns nil' do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
+            [assignment_questionnaire1, assignment_questionnaire2])
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
+            [assignment_questionnaire1])
+        allow(assignment_questionnaire1).to receive(:questionnaire_id).and_return(nil)
+        allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
+        expect(assignment.review_questionnaire_id(1, 1)).to eq(nil)
+      end
+    end
+
   end
 
   describe 'has correct csv values?' do

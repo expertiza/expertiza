@@ -52,7 +52,7 @@ module PenaltyHelper
     penalty = 0
     num_of_reviews_required = @assignment.num_reviews
     if num_of_reviews_required > 0
-      review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
+      review_mappings = ReviewResponseMap.where(reviewer_id: @participant.get_reviewer.id)
       review_due_date = AssignmentDueDate.where(deadline_type_id: @review_deadline_type_id,
                                                 parent_id:  @assignment.id).first
       penalty = compute_penalty_on_reviews(review_mappings, review_due_date.due_at, num_of_reviews_required) unless review_due_date.nil?

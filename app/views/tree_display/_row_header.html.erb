@@ -30,7 +30,7 @@
       <br/><I>Directory:</I> <%= parent_node.get_directory %>
   <% end %>
   <% if parent_node.get_creation_date != nil %>
-    <br/><I>Creation Date:</I> <%= parent_node.get_creation_date.strftime("%F") %>
+    <br/><I>Creation Date:</I> <%= parent_node.get_creation_date.strftime("%Y-%m-%d %H:%M") %>
 <% end %>
 <% if parent_node.get_modified_date != nil %>
   <br/><I>Updated Date:</I> <%= parent_node.get_modified_date %>
@@ -38,3 +38,4 @@
 
       <%end%>
     </td>
+

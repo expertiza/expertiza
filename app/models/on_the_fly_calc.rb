@@ -11,7 +11,7 @@ module OnTheFlyCalc
     @review_scores = {}
     @response_type = 'ReviewResponseMap'
     @response_maps = ResponseMap.where(reviewed_object_id: self.id, type: @response_type)
-    if self.varying_rubrics_by_round?
+    if self.vary_by_round
       scores_varying_rubrics
     else
       scores_non_varying_rubrics
@@ -23,12 +23,11 @@ module OnTheFlyCalc
   def compute_avg_and_ranges_hash
     scores = {}
     contributors = self.contributors # assignment_teams
-    if self.varying_rubrics_by_round?
+    if self.vary_by_round
       rounds = self.rounds_of_reviews
       (1..rounds).each do |round|
-        review_questionnaire_id = review_questionnaire_id(round)
-        questions = Question.where('questionnaire_id = ?', review_questionnaire_id)
         contributors.each do |contributor|
+          questions = peer_review_questions_for_team(contributor, round)
           assessments = ReviewResponseMap.get_assessments_for(contributor)
           assessments = assessments.select {|assessment| assessment.round == round }
           scores[contributor.id] = {} if round == 1
@@ -37,9 +36,8 @@ module OnTheFlyCalc
         end
       end
     else
-      review_questionnaire_id = review_questionnaire_id()
-      questions = Question.where('questionnaire_id = ?', review_questionnaire_id)
       contributors.each do |contributor|
+        questions = peer_review_questions_for_team(contributor)
         assessments = ReviewResponseMap.get_assessments_for(contributor)
         scores[contributor.id] = {}
         scores[contributor.id] = Answer.compute_scores(assessments, questions)
@@ -50,6 +48,13 @@ module OnTheFlyCalc
 end
 
 private
+
+# Get all of the questions asked during peer review for the given team's work
+def peer_review_questions_for_team(team, round_number = nil)
+  topic_id = SignedUpTeam.find_by(team_id: team.id).topic_id
+  review_questionnaire_id = review_questionnaire_id(round_number, topic_id)
+  Question.where(questionnaire_id: review_questionnaire_id)
+end
 
 def calc_review_score
   if !@corresponding_response.empty?
@@ -65,9 +70,8 @@ end
 def scores_varying_rubrics
   rounds = self.rounds_of_reviews
   (1..rounds).each do |round|
-    review_questionnaire_id = review_questionnaire_id(round)
-    @questions = Question.where('questionnaire_id = ?', review_questionnaire_id)
     @response_maps.each do |response_map|
+      @questions = peer_review_questions_for_team(response_map.reviewee, round)
       reviewer = @review_scores[response_map.reviewer_id]
       @corresponding_response = Response.where('map_id = ?', response_map.id)
       @corresponding_response = @corresponding_response.select {|response| response.round == round } unless @corresponding_response.empty?
@@ -83,9 +87,8 @@ def scores_varying_rubrics
 end
 
 def scores_non_varying_rubrics
-  review_questionnaire_id = review_questionnaire_id()
-  @questions = Question.where('questionnaire_id = ?', review_questionnaire_id)
   @response_maps.each do |response_map|
+    @questions = peer_review_questions_for_team(response_map.reviewee)
     reviewer = @review_scores[response_map.reviewer_id]
     @corresponding_response = Response.where('map_id = ?', response_map.id)
     @respective_scores = {}

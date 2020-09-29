@@ -108,4 +108,16 @@ FactoryBot.define do
     desc "Description"
     control_type "Slider"
   end
+
+  # ScoreView contains data from Questions, Questionnaire
+  # and Answer tables and has all the information necessary
+  # to calculate weighted grades
+  factory :score_view, class: ScoreView do
+    q1_id 1
+    s_question_id 1
+    question_weight 1
+    s_score 1
+    s_response_id 1
+    s_comments "test comment"
+  end
 end

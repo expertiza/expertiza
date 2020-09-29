@@ -18,6 +18,7 @@ describe "assignment submisstion test" do
 
   def signup_topic
     user = User.find_by(name: "student2064")
+    login_as(user.name)
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     visit '/sign_up_sheet/sign_up?id=1&topic_id=1' # signup topic
@@ -26,14 +27,14 @@ describe "assignment submisstion test" do
     click_link "Your work"
   end
 
-  it "is able to submit a single valid link" do
+  it "is able to submit a single valid link"  do
     signup_topic
     fill_in 'submission', with: "https://www.ncsu.edu"
     click_on 'Upload link'
     expect(page).to have_content "https://www.ncsu.edu"
     # open the link and check content
     click_on "https://www.ncsu.edu"
-    expect(page).to have_http_status(200)
+    expect(page).to have_current_path("https://www.ncsu.edu")
   end
 
   it "should not submit invalid link" do

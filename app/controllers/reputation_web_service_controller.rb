@@ -5,6 +5,8 @@ require 'openssl'
 require 'base64'
 
 class ReputationWebServiceController < ApplicationController
+  include AuthorizationHelper
+
   @@request_body = ''
   @@response_body = ''
   @@assignment_id = ''
@@ -15,10 +17,7 @@ class ReputationWebServiceController < ApplicationController
   @@response = ''
 
   def action_allowed?
-    ['Super-Administrator',
-     'Administrator',
-     'Instructor',
-     'Teaching Assistant'].include? current_role_name
+    current_user_has_ta_privileges?
   end
 
   # normal db query, return peer review grades

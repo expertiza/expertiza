@@ -1,6 +1,8 @@
 class PublishingController < ApplicationController
+  include AuthorizationHelper
+
   def action_allowed?
-    current_role_name.eql?("Student")
+    current_user_has_student_privileges?
   end
 
   def view

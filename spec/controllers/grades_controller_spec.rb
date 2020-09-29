@@ -30,8 +30,9 @@ describe GradesController do
       allow(assignment).to receive(:calculate_penalty).and_return(false)
     end
 
-    context 'when current assignment varys rubric by round' do
+    context 'when current assignment varies rubrics by round' do
       it 'retrieves questions, calculates scores and renders grades#view page' do
+        allow(assignment).to receive(:vary_by_round).and_return(true)
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([assignment_questionnaire])
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
         params = {id: 1}
@@ -59,11 +60,9 @@ describe GradesController do
       allow(Participant).to receive(:find).with('1').and_return(participant)
     end
 
-    context 'when view_my_scores page is not allow to access' do
-      it 'shows a flash errot message and redirects to root path (/)' do
-        allow(TeamsUser).to receive(:where).with(user_id: 1).and_return([double('TeamsUser', team_id: 1)])
-        team.users = []
-        allow(Team).to receive(:find).with(1).and_return(team)
+    context 'when view_my_scores page is not allowed to access' do
+      it 'shows a flash error message and redirects to root path (/)' do
+        session[:user] = nil
         params = {id: 1}
         get :view_my_scores, params
         expect(response).to redirect_to('/')

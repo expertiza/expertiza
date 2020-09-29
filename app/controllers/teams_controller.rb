@@ -1,10 +1,10 @@
 class TeamsController < ApplicationController
+  include AuthorizationHelper
+
   autocomplete :user, :name
 
   def action_allowed?
-    ['Instructor',
-     'Teaching Assistant',
-     'Administrator'].include? current_role_name
+    current_user_has_ta_privileges?
   end
 
   # This function is used to create teams with random names.

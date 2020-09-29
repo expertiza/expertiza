@@ -5,6 +5,7 @@ class QuizQuestion < Question
   def view_question_text
     html = "<b>" + self.txt + '</b><br />'
     html += "Question Type: " + self.type + '<br />'
+    html += 'Question Weight: ' + self.weight.to_s + '<br />'
     if self.quiz_question_choices
       self.quiz_question_choices.each do |choices|
         html += if choices.iscorrect?

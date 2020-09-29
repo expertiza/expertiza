@@ -109,6 +109,7 @@ development:
         goto_teammate_reviews: true
         goto_metareview_rubrics: true
         goto_teammatereview_rubrics: true
+        goto_bookmark_reviews: true
       grades:
         view_my_scores: true
       sign_up_sheet:
@@ -362,6 +363,7 @@ development:
         - 41
         - 42
         - 43
+        - 52
       44: &14 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 66
@@ -472,6 +474,16 @@ development:
         parent_id: 37
         site_controller_id: 35
         url: "/users/set_anonymized_view"
+      52: &38 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 64
+        id: 52
+        label: Bookmark Rating rubrics
+        name: manage/questionnaires/bookmark rating rubrics
+        parent:
+        parent_id: 38
+        site_controller_id: 38
+        url: "/tree_display/goto_bookmark_reviews"
     by_name:
       home: *1
       manage instructor content: *2
@@ -495,6 +507,7 @@ development:
       manage/questionnaires/global survey: *21
       manage/questionnaires/assignment surveys: *22
       manage/questionnaires/course surveys: *23
+      manage/questionnaires/bookmark rating rubrics: *38
       anonymized_view: *24
     crumbs:
     - 1
@@ -616,6 +629,7 @@ test:
         goto_teammate_reviews: true
         goto_metareview_rubrics: true
         goto_teammatereview_rubrics: true
+        goto_bookmark_reviews: true
       sign_up_sheet:
         list: true
         signup: true
@@ -818,6 +832,7 @@ test:
         - 28
         - 29
         - 30
+        - 52
       21: &11 !ruby/object:Menu::Node
         parent:
         parent_id: 3
@@ -938,6 +953,16 @@ test:
         controller_action_id: 57
         content_page_id:
         url: "/tree_display/goto_surveys"
+      52: &38 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 64
+        id: 52
+        label: Bookmark Rating rubrics
+        name: manage/questionnaires/bookmark rating rubrics
+        parent:
+        parent_id: 38
+        site_controller_id: 38
+        url: "/tree_display/goto_bookmark_reviews"
     by_name:
       home: *1
       manage instructor content: *2
@@ -960,6 +985,7 @@ test:
       manage/questionnaires/global survey: *20
       manage/questionnaires/assignment surveys: *21
       manage/questionnaires/course course: *22
+      manage/questionnaires/bookmark rating rubrics: *38
     selected:
       1: *1
     vector:
@@ -1078,6 +1104,7 @@ production:
         goto_teammate_reviews: true
         goto_metareview_rubrics: true
         goto_teammatereview_rubrics: true
+        goto_bookmark_reviews: true
       grades:
         view_my_scores: true
       sign_up_sheet:
@@ -1331,6 +1358,7 @@ production:
         - 41
         - 42
         - 43
+        - 52
       44: &14 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 66
@@ -1441,6 +1469,16 @@ production:
         parent_id: 37
         site_controller_id: 35
         url: "/users/set_anonymized_view"
+      52: &38 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 64
+        id: 52
+        label: Bookmark Rating rubrics
+        name: manage/questionnaires/bookmark rating rubrics
+        parent:
+        parent_id: 38
+        site_controller_id: 38
+        url: "/tree_display/goto_bookmark_reviews"
     by_name:
       home: *1
       manage instructor content: *2
@@ -1464,6 +1502,7 @@ production:
       manage/questionnaires/global survey: *21
       manage/questionnaires/assignment surveys: *22
       manage/questionnaires/course surveys: *23
+      manage/questionnaires/bookmark rating rubrics: *38
       anonymized_view: *24
     crumbs:
     - 1

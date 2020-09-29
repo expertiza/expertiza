@@ -21,10 +21,13 @@ describe QuestionnairesController do
   end
 
   describe '#action_allowed?' do
+
     let(:questionnaire) { build(:questionnaire, id: 1) }
     let(:instructor) { build(:instructor, id: 1) }
     let(:ta) { build(:teaching_assistant, id: 10, parent_id: 66) }
+
     context 'when params action is edit or update' do
+
       before(:each) do
         controller.params = {id: '1', action: 'edit'}
         controller.request.session[:user] = instructor
@@ -44,15 +47,27 @@ describe QuestionnairesController do
 
       context 'when current user is the ta of the course which current questionnaires belongs to' do
         it 'allows certain action' do
-          allow(TaMapping).to receive(:exists?).with(ta_id: 8, course_id: 1).and_return(true)
-          check_access(ta).to be true
+          teaching_assistant = create(:teaching_assistant)
+          stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
+          course = create(:course)
+          TaMapping.create(ta_id: teaching_assistant.id, course_id: course.id)
+          check_access(teaching_assistant).to be true
         end
       end
+
       context 'when current user is a ta but not the ta of the course which current questionnaires belongs to' do
         it 'does not allow certain action' do
-          allow(TaMapping).to receive(:exists?).with(ta_id: 10, course_id: 1).and_return(false)
-          controller.request.session[:user] = instructor2
-          check_access(ta).to be false
+          # The questionnaire is associated with the first instructor
+          # A factory created course will associate itself with the first instructor
+          # So here we want the TA on a course that explicitly has some other instructor
+          # Otherwise the TA will be indirectly associated with the questionnaire
+          teaching_assistant = create(:teaching_assistant)
+          stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
+          instructor1 = create(:instructor, name: "test_instructor1")
+          instructor2 = create(:instructor, name: "test_instructor2")
+          course = create(:course, instructor_id: instructor2.id)
+          TaMapping.create(ta_id: teaching_assistant.id, course_id: course.id)
+          check_access(teaching_assistant).to be false
         end
       end
 
@@ -98,7 +113,7 @@ describe QuestionnairesController do
       session = {user: instructor}
       get :copy, params, session
       expect(response).to redirect_to('/questionnaires/view?id=2')
-      expect(controller.instance_variable_get(:@questionnaire).name).to eq 'Copy of Test questionnaire'
+      expect(controller.instance_variable_get(:@questionnaire).name).to eq ('Copy of ' + questionnaire.name)
       expect(controller.instance_variable_get(:@questionnaire).private).to eq false
       expect(controller.instance_variable_get(:@questionnaire).min_question_score).to eq 0
       expect(controller.instance_variable_get(:@questionnaire).max_question_score).to eq 5
@@ -142,7 +157,7 @@ describe QuestionnairesController do
                                 min_question_score: 0,
                                 max_question_score: 5,
                                 type: 'ReviewQuestionnaire'}}
-      session = {user: double('Instructor', id: 6)}
+      session = {user: instructor}
       tree_folder = double('TreeFolder', id: 1)
       allow(TreeFolder).to receive_message_chain(:where, :first).with(['name like ?', 'Review']).with(no_args).and_return(tree_folder)
       allow(FolderNode).to receive(:find_by).with(node_object_id: 1).and_return(double('FolderNode', id: 1))
@@ -164,15 +179,15 @@ describe QuestionnairesController do
     context 'when quiz is valid' do
       before(:each) do
         # create_quiz_questionnaire
-        allow_any_instance_of(QuestionnairesController).to receive(:valid_quiz).and_return('valid')
+        allow_any_instance_of(QuestionnairesController).to receive(:validate_quiz).and_return('valid')
       end
 
       context 'when questionnaire type is not QuizQuestionnaire' do
         it 'redirects to submitted_content#edit page' do
           params = {aid: 1,
                     pid: 1,
-                    questionnaire: {name: 'Test questionnaire',
-                                    type: 'ReviewQuestionnaire'}}
+                    questionnaire: {name: review_questionnaire.name,
+                                    type: review_questionnaire.type}}
           # create_questionnaire
           allow(ReviewQuestionnaire).to receive(:new).with(any_args).and_return(review_questionnaire)
           session = {user: build(:teaching_assistant, id: 1)}
@@ -185,10 +200,10 @@ describe QuestionnairesController do
           expect(flash[:note]).to be nil
           expect(response).to redirect_to('/tree_display/list')
           expect(controller.instance_variable_get(:@questionnaire).private).to eq false
-          expect(controller.instance_variable_get(:@questionnaire).name).to eq 'Test questionnaire'
+          expect(controller.instance_variable_get(:@questionnaire).name).to eq review_questionnaire.name
           expect(controller.instance_variable_get(:@questionnaire).min_question_score).to eq 0
           expect(controller.instance_variable_get(:@questionnaire).max_question_score).to eq 5
-          expect(controller.instance_variable_get(:@questionnaire).type).to eq 'ReviewQuestionnaire'
+          expect(controller.instance_variable_get(:@questionnaire).type).to eq review_questionnaire.type
           expect(controller.instance_variable_get(:@questionnaire).instructor_id).to eq 6
         end
       end

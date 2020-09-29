@@ -31,13 +31,13 @@ class CourseNode < Node
                      "courses.instructor_id = #{user_id}"
                    else
                      'courses.id in (?)'
-                                end
+                   end
                  else
                    if current_user.teaching_assistant? == false
                      "(courses.private = 0 or courses.instructor_id = #{user_id})"
                    else
                      "((courses.private = 0 and courses.instructor_id != #{user_id}) or courses.instructor_id = #{user_id})"
-                                end
+                   end
                  end
     conditions
   end

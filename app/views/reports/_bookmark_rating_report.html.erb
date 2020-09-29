@@ -1,0 +1,58 @@
+<%= create_report_table_header("Reviewed By" => "16%",
+                               "Topic" => "14%",
+                               "Bookmark Review" => "20%",
+                               "Submitted By" => "20%",
+                               "Last reviewed at" => "20%") %>
+<%@l = -1 %>
+
+<% @reviewers.each do |r| %>
+  <% @user = User.find(Participant.find(r.reviewer_id).user_id) %>
+  <% @bookmark_rating_response_maps = BookmarkRatingResponseMap.where(reviewer_id: r.reviewer_id, reviewed_object_id: @id) %>
+  <!-- Find only valid responses from this user -->
+  <% maps = @bookmark_rating_response_maps.select { |m| !Response.where(map_id: m.id).first.blank? and m.reviewee and m.reviewee.user_id != @user.id }%>
+  
+  <%@l = @l+1 %>
+  <% (@l % 2 == 0) ? @bgcolor = "#ffffff" : @bgcolor = "#f9f9f9" %>
+
+  <tr>
+
+  <% if maps.count > 0 %>
+      <!--Reviewer-->
+    <td bgcolor=<%= @bgcolor %> rowspan= <%= maps.count %>>
+      <% @reviewer_name = @user.fullname(session[:ip]) %>
+      <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id => @id %>
+    </td>
+
+    <% maps.each do |map| %>
+      <% @reviewee = map.reviewee %>
+        <!-- Topic -->
+        <td bgcolor=<%= @bgcolor %>  align="left" colspan=1>
+          <% topic = SignUpTopic.find(@reviewee.topic_id) %>
+          <%= topic.topic_name %>
+        </td>
+
+        <!-- Bookmarks reviewed-->
+        <td id = "green" bgcolor=<%= @bgcolor %> align="left" colspan=1>
+          <%= link_to @reviewee.title, {:controller => 'response', :action => 'view', :id => map.response.last.id}, :title => "Click here to view this bookmark review" %>
+        </td>
+
+        <!-- Submitted by-->
+        <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align="left" colspan=1>
+          <% reviewed_by_user = User.find(@reviewee.user_id).name %>
+          <%= link_to reviewed_by_user, impersonate_impersonate_path(:user => {:name => reviewed_by_user}), :method => :post, :title => "Click here to impersonate this user" %>
+        </td>
+
+        <!--Last reviewed at-->
+        <td bgcolor=<%= @bgcolor %> align="left">
+          <% @bookmark_review_response = Response.where(map_id: map.id).first %>
+          <%= @bookmark_review_response.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
+        </td>
+
+        </tr>
+        <tr>
+    <% end %>
+  <% end %>
+  </tr>
+<% end %>
+</table>
+</div>

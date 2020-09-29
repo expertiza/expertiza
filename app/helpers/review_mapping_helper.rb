@@ -146,13 +146,13 @@ module ReviewMappingHelper
       review_volumes = Response.get_volume_of_review_comments(@assignment.id, r.id)
       r.avg_vol_per_round = []
       r.overall_avg_vol = review_volumes[0]
-      (1..(review_volumes.length)) do |vol|
-        r.avg_vol_per_round.push(review_volumes[i])
+      (1..(review_volumes.length)) do |round_num|
+        r.avg_vol_per_round.push(review_volumes[round_num])
     end
     @all_reviewers_overall_avg_vol = @reviewers.inject(0) {|sum, r| sum += r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @all_reviewers_avg_vol_in_round_1 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_in_round_1 } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @all_reviewers_avg_vol_in_round_2 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_in_round_2 } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @all_reviewers_avg_vol_in_round_3 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_in_round_3 } / (@reviewers.blank? ? 1 : @reviewers.length)
+    @all_reviewers_avg_vol_in_round_1 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_per_round[1] } / (@reviewers.blank? ? 1 : @reviewers.length)
+    @all_reviewers_avg_vol_in_round_2 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_per_round[2] } / (@reviewers.blank? ? 1 : @reviewers.length)
+    @all_reviewers_avg_vol_in_round_3 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_per_round[3] } / (@reviewers.blank? ? 1 : @reviewers.length)
     @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 

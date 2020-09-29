@@ -270,7 +270,7 @@ module ReviewMappingHelper
 
   # Zhewei - 2017-02-27
   # This is for all Dr.Kidd's courses
-  def calcutate_average_author_feedback_score(assignment_id, max_team_size, response_map_id, reviewee_id)
+  def calculate_average_author_feedback_score(assignment_id, max_team_size, response_map_id, reviewee_id)
     review_response = ResponseMap.where(id: response_map_id).try(:first).try(:response).try(:last)
     author_feedback_avg_score = "-- / --"
     unless review_response.nil?

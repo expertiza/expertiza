@@ -162,6 +162,8 @@ class ResponseController < ApplicationController
   end
 
   def create
+    render nothing: true unless action_allowed?
+
     map_id = params[:id]
     map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
     @map = ResponseMap.find(map_id)
@@ -198,8 +200,10 @@ class ResponseController < ApplicationController
       @response.notify_instructor_on_difference
       @response.email
     end
-    redirect_to controller: 'response', action: 'save', id: @map.map_id,
-                return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
+    # redirect_to controller: 'response', action: 'save', id: @map.map_id,
+    #             return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
+
+    render "analysis_modal.js.erb", locals: {call_from_submit: params[:Submit]}
   end
 
   # This method is called when the student confirms to have his/her review submitted

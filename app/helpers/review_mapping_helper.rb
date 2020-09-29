@@ -141,12 +141,13 @@ module ReviewMappingHelper
   end
 
   # sorts the reviewers by the average volume of reviews in each round, in descending order
-  def sort_reviewer_by_review_volume_desc
+  def sort_reviewer_by_review_volume_desc 
     @reviewers.each do |r|
-      r.overall_avg_vol,
-          r.avg_vol_in_round_1,
-          r.avg_vol_in_round_2,
-          r.avg_vol_in_round_3 = Response.get_volume_of_review_comments(@assignment.id, r.id)
+      review_volumes = Response.get_volume_of_review_comments(@assignment.id, r.id)
+      r.avg_vol_per_round = []
+      r.overall_avg_vol = review_volumes[0]
+      (1..(review_volumes.length)) do |vol|
+        r.avg_vol_per_round.push(review_volumes[i])
     end
     @all_reviewers_overall_avg_vol = @reviewers.inject(0) {|sum, r| sum += r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
     @all_reviewers_avg_vol_in_round_1 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_in_round_1 } / (@reviewers.blank? ? 1 : @reviewers.length)

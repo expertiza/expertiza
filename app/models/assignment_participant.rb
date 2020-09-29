@@ -18,6 +18,8 @@ class AssignmentParticipant < Participant
   # has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'ReviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
   belongs_to :user
   validates :handle, presence: true
+  #array of the average volume in each round of reviews
+  attr_accessor :avg_vol_per_round
   attr_accessor :overall_avg_vol
   attr_accessor :avg_vol_in_round_1
   attr_accessor :avg_vol_in_round_2

@@ -111,18 +111,23 @@
         $('#save_confirm').html('')
       }, 5000);
     });
-    $('#Submit').click(function(e){
-      if(!confirm('Once a review has been submitted, you cannot edit it again')){
-        e.preventDefault();
-        e.stopPropagation();
-        return;
-      }else{
-        //Top line added for E1973
-        release_lock();
-        jQuery('#isSubmit').val('Yes');
-        window.location.href= "../../../student_review/list?id=<%= @map.reviewer.id %>";
-      }
+    
+    // display loader and disable button
+    $("#Submit").click(function(e){
+      $("#autosave_cbx").removeProp("checked"); // temporarily remove the shield
+      $('#Submit').addClass('disabled');
+      $('#return').before('<div class="loader"></div>');
+      $('#return').before('<div class="loader-msg">Please wait for the system to process your review. It should take about few minutes. Keep this page active.</div>');
     });
+
+    // remove loader and the disabled effect on the button after the modal gets loaded
+    $('#modal-window').bind('DOMSubtreeModified', function(e) {
+      $("#autosave_cbx").prop("checked","true"); // restore the shield
+      $('#Submit').removeClass('disabled');
+      $('.loader').remove();
+      $('.loader-msg').remove();
+    });
+
     // update the values in the form using ajax
     function updateForm(){
       //update the additional comments
@@ -346,7 +351,7 @@
 <input type="checkbox" id="autosave_cbx" checked>
 <label id="autosave_cbx_lbl" for="autosave_cbx"></label>
 <div id="save_progress"></div>
-<%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form") do %>
+<%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form", :remote => true) do %>
     <%= hidden_field_tag "map_id", @modified_object %>
     <%= hidden_field_tag "saved", (@header == "New") ? 1 : 0 %>
     <% if @next_action.eql?'update' %>
@@ -453,3 +458,10 @@
 </script>
 <div id="BackLink"><a href="javascript:window.history.back()">Back</a></div>
 <div id="dialog-message" style="word-wrap: normal"></div>
+
+<div class="modal" id="modal-window">
+  <div class="modal-content">
+    <div class="modal_container">
+    </div>
+  </div>
+</div>

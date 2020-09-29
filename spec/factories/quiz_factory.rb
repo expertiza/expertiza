@@ -81,6 +81,34 @@ FactoryBot.define do
     comments 'Answer text'
   end
 
+  # Answer Tag records the response made by either the web service
+  # or the student participant to a tag prompt question. Tags storing
+  # web service responses come with non-nil confidence level, indicating
+  # how sure web service is to its response.
+  factory :answer_tag, class: AnswerTag do
+    answer { Answer.first || association(:answer) }
+    tag_prompt_deployment { TagPromptDeployment.first || association(:tag_prompt_deployment) }
+    user_id nil
+    value 0
+    confidence_level nil
+  end
+
+  # Tag Prompt Deployment links 3 entities, assignment, questionnaire, and
+  # tag prompt together.
+  factory :tag_prompt_deployment, class: TagPromptDeployment do
+    assignment { Assignment.first || association(:assignment) }
+    questionnaire { Questionnaire.first || association(:questionnaire) }
+    tag_prompt { TagPrompt.first || association(:tag_prompt) }
+  end
+
+  # Tag Prompt is the primitive block that specifies the configuration
+  # (type and meaning) of each tag
+  factory :tag_prompt, class: TagPrompt do
+    prompt "Mention Problems?"
+    desc "Description"
+    control_type "Slider"
+  end
+
   # ScoreView contains data from Questions, Questionnaire
   # and Answer tables and has all the information necessary
   # to calculate weighted grades

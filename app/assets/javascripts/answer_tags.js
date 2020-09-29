@@ -32,4 +32,11 @@ toggleLabel = function(range) {
         $('#' + no_text_id).attr('class', 'toggle-false-msg');
         $('#' + yes_text_id).attr('class', 'toggle-true-msg textActive');
     }
+
+    // gray-out and allow student to override tag
+    var toggle = $('#' + range.id);
+    if (toggle.attr('class').indexOf('gray-out') >= 0 || toggle.attr('class').indexOf('overridden') >= 0) {
+        $('#' + range.id).attr('class', 'rangeAll overridden');
+    }
+    $('#' + range.id).closest(".toggle-container").find('.toggle-caption').attr('class', 'toggle-caption');
 }

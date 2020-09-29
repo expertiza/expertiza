@@ -181,7 +181,7 @@ describe ResponseController do
         }
         session = {user: instructor}
         post :update, params, session
-        expect(response).to redirect_to('/response/save?id=1&msg=&review%5Bcomments%5D=some+comments')
+        expect(response).to render_template('response/analysis_modal.js.erb')
       end
     end
   end
@@ -362,4 +362,15 @@ describe ResponseController do
     end
   end
 
+  describe '#confirm_submit' do
+    it 'sets the input response to "submitted" and redirects to response#save page' do
+      params = {
+        response_id: 1
+      }
+      session = {user: instructor}
+      expect(review_response).to receive(:update_attribute)
+      get :confirm_submit, params, session
+      expect(response).to redirect_to('/response/save?id=1')
+    end
+  end
 end

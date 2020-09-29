@@ -87,9 +87,11 @@ module ReviewMappingHelper
   # returns last modified header date
   # only checks certain links (wiki)
   def get_link_updated_at(link)
-    uri = URI(link)
-    res = Net::HTTP.get_response(uri)['last-modified']
-    res.to_time
+    begin
+      res = Net::HTTP.get_response(URI(link))
+      link = res['location']
+    end while res.is_a? Net::HTTPRedirection
+    res['last-modified'].to_time
   end
 
   # checks if a link was updated since last round submission
@@ -166,7 +168,7 @@ module ReviewMappingHelper
   end
 
   # moves data of reviews in each round from a current round
-  def initialize_chart_elements(reviewer)
+  def initialize_volume_metric_chart_elements(reviewer)
     round = 0
     labels = []
     reviewer_data = []
@@ -197,7 +199,7 @@ module ReviewMappingHelper
 
   # The data of all the reviews is displayed in the form of a bar chart
   def display_volume_metric_chart(reviewer)
-    labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
+    labels, reviewer_data, all_reviewers_data = initialize_volume_metric_chart_elements(reviewer)
     data = {
       labels: labels,
       datasets: [
@@ -251,6 +253,84 @@ module ReviewMappingHelper
             max: 400
           }
         }]
+      }
+    }
+    horizontal_bar_chart data, options
+  end
+
+  def initialize_review_metrics_chart_elements(reviewer)
+    labels = []
+    reviewer_data = []
+    all_reviewers_data = []
+
+    tag_prompt_deployments = TagPromptDeployment.where(assignment_id: reviewer.assignment.id)
+    tag_prompt_deployments.each do |tag_prompt_deployment|
+      labels.push tag_prompt_deployment.tag_prompt.prompt
+      reviewer_avg = reviewer.average_number_of_qualifying_comments(tag_prompt_deployment.id)
+      all_reviewers_avg = tag_prompt_deployment.average_number_of_qualifying_comments
+
+      reviewer_data.push reviewer_avg
+      all_reviewers_data.push all_reviewers_avg
+    end
+
+    [labels, reviewer_data, all_reviewers_data]
+  end
+
+  def display_review_metrics_chart(reviewer)
+    labels, reviewer_data, all_reviewers_data = initialize_review_metrics_chart_elements(reviewer)
+    data = {
+      labels: labels,
+      datasets: [
+        {
+          label: 'reviewer avg.',
+          backgroundColor: "rgba(71,119,158,0.8)",
+          borderWidth: 1,
+          data: reviewer_data,
+          yAxisID: "bar-y-axis1"
+        },
+        {
+          label: 'class avg.',
+          backgroundColor: "rgba(255,206,86,0.8)",
+          borderWidth: 1,
+          data: all_reviewers_data,
+          yAxisID: "bar-y-axis2"
+        }
+      ]
+    }
+    options = {
+      legend: {
+        position: 'top',
+        labels: {
+          usePointStyle: true
+        }
+      },
+      width: "200",
+      height: (78.125+15.625*labels.count).to_s,
+      scales: {
+        yAxes: [{
+                  stacked: true,
+                  id: "bar-y-axis1",
+                  barThickness: 10
+                }, {
+                  display: false,
+                  stacked: true,
+                  id: "bar-y-axis2",
+                  barThickness: 15,
+                  type: 'category',
+                  categoryPercentage: 0.8,
+                  barPercentage: 0.9,
+                  gridLines: {
+                    offsetGridLines: true
+                  }
+                }],
+        xAxes: [{
+                  stacked: false,
+                  ticks: {
+                    beginAtZero: true,
+                    stepSize: 1,
+                    max: 16
+                  }
+                }]
       }
     }
     horizontal_bar_chart data, options

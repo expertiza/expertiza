@@ -93,11 +93,11 @@ class ResponseController < ApplicationController
 
 
   # Update the response and answers when student "edit" existing response
-  # Render metrics analysis results in a pop-up modal if student activates
+  # Render metrics analysis results if student activates
   # this call from the "Submit" button and no error has occurred
   def update
     render nothing: true unless action_allowed?
-
+    msg = ""
     error_msg = ""
     begin
       # the response to be updated
@@ -112,6 +112,7 @@ class ResponseController < ApplicationController
       @questionnaire = set_questionnaire
       questions = sort_questions(@questionnaire.questions)
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
+      msg = 'Your response was successfully saved.'
     rescue StandardError
       error_msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
@@ -120,7 +121,7 @@ class ResponseController < ApplicationController
       render 'analysis'
     else
       redirect_to controller: 'response', action: 'save', id: @map.map_id,
-                  return: params[:return], msg: 'Your response was successfully saved.', error_msg: error_msg,
+                  return: params[:return], msg: msg, error_msg: error_msg,
                   review: params[:review], save_options: params[:save_options]
     end
   end
@@ -166,8 +167,6 @@ class ResponseController < ApplicationController
   end
 
   def create
-    render nothing: true unless action_allowed?
-
     map_id = params[:id]
     map_id = params[:map_id] unless params[:map_id].nil? # pass map_id as a hidden field in the review form
     @map = ResponseMap.find(map_id)

@@ -166,6 +166,7 @@ class StudentTeamsController < ApplicationController
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'The team has been successfully created.', request)
   end
 
+  # This method is used to show the Author Feedback Questionnaire of current assignment
   def review
     @assignment = Assignment.find params[:assignment_id]
     redirect_to view_questionnaires_path id: @assignment.questionnaires.find_by(type: 'AuthorFeedbackQuestionnaire').id

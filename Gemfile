@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+gem 'scanf', '~> 1.0' 
+gem 'bigdecimal', '1.3.5'
 gem 'rails', '~> 4.2.11.1'
 
 ## Gems in Alphabetical Order

@@ -4,14 +4,23 @@
       e.preventDefault();
       e.stopPropagation();
       return;
+    } else {
+      //Top line added for E1973
+      release_lock();
+      jQuery('#isSubmit').val('Yes');
+      window.location.href= "../../../student_review/list?id=<%= @map.reviewer.id %>";
     }
   });
 </script>
 
+<% tag_prompt_deployments = TagPromptDeployment.where(assignment_id: @map.reviewee.assignment.id, questionnaire_id: @questionnaire.id) %>
+<% ReviewMetricsQuery.cache_ws_results(@response.scores, tag_prompt_deployments) %>
+
 <h2>Analysis of your review</h2>
 <p>Below we provided you with the auto-analysis results on the review you are about to submit. Please note
-that after clicking the '<b>OK</b>' button, the peer-review will be displayed to reviewee, and you will not be able
-to update it anymore. You can scroll down to see the '<b>OK</b>' button.</p>
+  that after clicking the '<b>OK</b>' button, the peer-review will be displayed to reviewee, and you will not be able
+  to update it anymore. You can scroll down to see the '<b>OK</b>' button.</p>
+<p>Empty cell either means there is no response to the question, or the machine learning algorithm is unsure of the response's quality.</p>
 <% answers = @response.scores %>
 <% tag_prompt_deployments = TagPromptDeployment.where(assignment_id: @map.reviewee.assignment.id, questionnaire_id: @questionnaire.id) %>
 <div>
@@ -45,7 +54,7 @@ to update it anymore. You can scroll down to see the '<b>OK</b>' button.</p>
   </table>
   <div style="text-align: right; padding-top: 5px">
     <form action="/response/<%= @response.id %>/confirm_submit" method="get">
-      <a href="javascript:$('#modal-window').modal('hide')">Back</a>
+      <div id="BackLink"><a href="javascript:window.history.back()">Back</a></div>
       <input type="submit" value="OK" id="ok">
       <%= hidden_field_tag('return', @return) %>
     </form>

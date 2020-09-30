@@ -111,6 +111,7 @@ RSpec.configure do |config|
   #   so populate this information here
   #   by defining the least to most privileged roles
   config.before(:each) do
+    Role.delete_all
     role_student = create(:role_of_student)
     role_teaching_assistant = create(:role_of_teaching_assistant, parent_id: role_student.id)
     role_instructor = create(:role_of_instructor, parent_id: role_teaching_assistant.id)

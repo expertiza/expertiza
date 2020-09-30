@@ -349,7 +349,7 @@
 <input type="checkbox" id="autosave_cbx" checked>
 <label id="autosave_cbx_lbl" for="autosave_cbx"></label>
 <div id="save_progress"></div>
-<%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form", :remote => true) do %>
+<%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form") do %>
     <%= hidden_field_tag "map_id", @modified_object %>
     <%= hidden_field_tag "saved", (@header == "New") ? 1 : 0 %>
     <% if @next_action.eql?'update' %>
@@ -456,10 +456,3 @@
 </script>
 <div id="BackLink"><a href="javascript:window.history.back()">Back</a></div>
 <div id="dialog-message" style="word-wrap: normal"></div>
-
-<div class="modal" id="modal-window">
-  <div class="modal-content">
-    <div class="modal_container">
-    </div>
-  </div>
-</div>

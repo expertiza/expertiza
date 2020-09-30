@@ -444,10 +444,6 @@ ActiveRecord::Schema.define(version: 20200825210644) do
 
   add_index "question_advices", ["question_id"], name: "fk_question_question_advices", using: :btree
 
-  create_table "question_types", force: :cascade do |t|
-    t.string "type", limit: 255
-  end
-
   create_table "questionnaires", force: :cascade do |t|
     t.string   "name",               limit: 64
     t.integer  "instructor_id",      limit: 4,     default: 0,     null: false

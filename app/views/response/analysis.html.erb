@@ -1,15 +1,17 @@
 <script>
-  $('#ok').click(function(e){
-    if(!confirm('Once a review has been submitted, you cannot edit it again')) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    } else {
-      //Top line added for E1973
-      release_lock();
-      jQuery('#isSubmit').val('Yes');
-      window.location.href= "../../../student_review/list?id=<%= @map.reviewer.id %>";
-    }
+  $(document).ready(function() {
+    $('#ok').click(function (e) {
+      if (!confirm('Once a review has been submitted, you cannot edit it again')) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      } else {
+        //Top line added for E1973
+        release_lock();
+        jQuery('#isSubmit').val('Yes');
+        window.location.href = "../../../student_review/list?id=<%= @map.reviewer.id %>";
+      }
+    });
   });
 </script>
 

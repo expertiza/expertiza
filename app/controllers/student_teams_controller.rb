@@ -55,9 +55,9 @@ class StudentTeamsController < ApplicationController
   end
 
   def create
-    existing_assignments = AssignmentTeam.where name: params[:team][:name], parent_id: student.parent_id
+    existing_teams = AssignmentTeam.where name: params[:team][:name], parent_id: student.parent_id
     # check if the team name is in use
-    if existing_assignments.empty?
+    if existing_teams.empty?
       if params[:team][:name].blank?
         flash[:notice] = 'The team name is empty.'
         ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Team name missing while creating team', request)

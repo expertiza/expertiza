@@ -144,7 +144,7 @@ class AssignmentParticipant < Participant
   end
 
   # Copy this participant to a course
-  def copy(course_id)
+  def copy_participant(course_id)
     CourseParticipant.find_or_create_by(user_id: self.user_id, parent_id: course_id)
   end
 
@@ -248,7 +248,7 @@ class AssignmentParticipant < Participant
   # grant publishing rights to one or more assignments. Using the supplied private key,
   # digital signatures are generated.
   # reference: http://stuff-things.net/2008/02/05/encrypting-lots-of-sensitive-data-with-ruby-on-rails/
-  def self.grant_publishing_rights(private_key, participants)
+  def assign_copyright(private_key, participants)
     participants.each do |participant|
       # now, check to make sure the digital signature is valid, if not raise error
       participant.permission_granted = participant.verify_digital_signature(private_key)

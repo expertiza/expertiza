@@ -23,6 +23,7 @@ class StudentTeamsController < ApplicationController
     return false unless current_user_has_student_privileges?
     case action_name
     when 'view'
+      current_user_id? student.user_id and
       are_needed_authorizations_present?(params[:student_id], "reader", "reviewer", "submitter")
     when 'create'
       current_user_has_id? student.user_id
@@ -36,7 +37,6 @@ class StudentTeamsController < ApplicationController
   def view
     # View will check if send_invs and recieved_invs are set before showing
     # only the owner should be able to see those.
-    return unless current_user_id? student.user_id
 
     @send_invs = Invitation.where from_id: student.user.id, assignment_id: student.assignment.id
     @received_invs = Invitation.where to_id: student.user.id, assignment_id: student.assignment.id, reply_status: 'W'

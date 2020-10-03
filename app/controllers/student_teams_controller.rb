@@ -123,19 +123,19 @@ class StudentTeamsController < ApplicationController
         old_team.destroy
         # if assignment has signup sheet then the topic selected by the team has to go back to the pool
         # or to the first team in the waitlist
-        sign_ups = SignedUpTeam.where team_id: params[:team_id]
-        sign_ups.each do |sign_up|
+        signups = SignedUpTeam.where team_id: params[:team_id]
+        signups.each do |signup|
           # get the topic_id
-          sign_up_topic_id = sign_up.topic_id
-          # destroy the sign_up
-          sign_up.destroy
+          signup_topic_id = signup.topic_id
+          # destroy the signup
+          signup.destroy
           # get the number of non-waitlisted users signed up for this topic
-          non_waitlisted_users = SignedUpTeam.where topic_id: sign_up_topic_id, is_waitlisted: false
+          non_waitlisted_users = SignedUpTeam.where topic_id: signup_topic_id, is_waitlisted: false
           # get the number of max-choosers for the topic
-          max_choosers = SignUpTopic.find(sign_up_topic_id).max_choosers
+          max_choosers = SignUpTopic.find(signup_topic_id).max_choosers
           # check if this number is less than the max choosers
           next unless non_waitlisted_users.length < max_choosers
-          first_waitlisted_team = SignedUpTeam.find_by topic_id: sign_up_topic_id, is_waitlisted: true
+          first_waitlisted_team = SignedUpTeam.find_by topic_id: signup_topic_id, is_waitlisted: true
           # moving the waitlisted team into the confirmed signed up teams list and delete all waitlists for this team
           SignUpTopic.assign_to_first_waiting_team(first_waitlisted_team) if first_waitlisted_team
         end

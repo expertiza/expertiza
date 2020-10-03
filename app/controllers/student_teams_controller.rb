@@ -82,6 +82,7 @@ class StudentTeamsController < ApplicationController
   def edit; end
 
   def update
+    # Update the team name only if the given team name is not used already
     matching_teams = AssignmentTeam.where name: params[:team][:name], parent_id: team.parent_id
     if matching_teams.length.zero?
       if team.update_attribute('name', params[:team][:name])

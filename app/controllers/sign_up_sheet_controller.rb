@@ -39,9 +39,9 @@ class SignUpSheetController < ApplicationController
   # Prepares the form for adding a new topic. Used in conjunction with create
   def new
     @id = params[:id]
-    @sign_up_topic = SignUpTopic.new
-    @sign_up_topic.assignment = Assignment.find(params[:id])
-    @topic = @sign_up_topic
+    @signup_topic = SignUpTopic.new
+    @signup_topic.assignment = Assignment.find(params[:id])
+    @topic = @signup_topic
   end
 
   # This method is used to create signup topics
@@ -129,8 +129,8 @@ class SignUpSheetController < ApplicationController
   def load_add_signup_topics(assignment_id)
     @id = assignment_id
     @sign_up_topics = SignUpTopic.where('assignment_id = ?', assignment_id)
-    @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
-    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(assignment_id)
+    @slots_filled = SignUpTopic.filled_slots(assignment_id)
+    @slots_waitlisted = SignUpTopic.find_waitlisted_slots(assignment_id)
 
     @assignment = Assignment.find(assignment_id)
     # ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
@@ -141,12 +141,12 @@ class SignUpSheetController < ApplicationController
   end
 
   def set_values_for_new_topic
-    @sign_up_topic = SignUpTopic.new
-    @sign_up_topic.topic_identifier = params[:topic][:topic_identifier]
-    @sign_up_topic.topic_name = params[:topic][:topic_name]
-    @sign_up_topic.max_choosers = params[:topic][:max_choosers]
-    @sign_up_topic.category = params[:topic][:category]
-    @sign_up_topic.assignment_id = params[:id]
+    @signup_topic = SignUpTopic.new
+    @signup_topic.topic_identifier = params[:topic][:topic_identifier]
+    @signup_topic.topic_name = params[:topic][:topic_name]
+    @signup_topic.max_choosers = params[:topic][:max_choosers]
+    @signup_topic.category = params[:topic][:category]
+    @signup_topic.assignment_id = params[:id]
     @assignment = Assignment.find(params[:id])
   end
 
@@ -167,8 +167,8 @@ class SignUpSheetController < ApplicationController
   def list
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
-    @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
-    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
+    @slots_filled = SignUpTopic.filled_slots(@assignment.id)
+    @slots_waitlisted = SignUpTopic.find_waitlisted_slots(@assignment.id)
     @show_actions = true
     @priority = 0
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
@@ -180,8 +180,8 @@ class SignUpSheetController < ApplicationController
       @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
       signed_up_topics = []
       @bids.each do |bid|
-        sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
-        signed_up_topics << sign_up_topic if sign_up_topic
+        signup_topic = SignUpTopic.find_by(id: bid.topic_id)
+        signed_up_topics << signup_topic if signup_topic
       end
       signed_up_topics &= @sign_up_topics
       @sign_up_topics -= signed_up_topics
@@ -420,15 +420,15 @@ class SignUpSheetController < ApplicationController
 
   def setup_new_topic
     set_values_for_new_topic
-    @sign_up_topic.micropayment = params[:topic][:micropayment] if @assignment.microtask?
+    @signup_topic.micropayment = params[:topic][:micropayment] if @assignment.microtask?
     if @assignment.staggered_deadline?
       topic_set = []
-      topic = @sign_up_topic.id
+      topic = @signup_topic.id
     end
-    if @sign_up_topic.save
-      undo_link "The topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. "
+    if @signup_topic.save
+      undo_link "The topic: \"#{@signup_topic.topic_name}\" has been created successfully. "
       # Akshay - correctly changing the redirection url to topics tab in edit assignment view.
-      redirect_to edit_assignment_path(@sign_up_topic.assignment_id) + "#tabs-2"
+      redirect_to edit_assignment_path(@signup_topic.assignment_id) + "#tabs-2"
     else
       render action: 'new', id: params[:id]
     end

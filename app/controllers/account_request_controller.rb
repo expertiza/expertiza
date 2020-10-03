@@ -8,19 +8,22 @@ class AccountRequestController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'list_pending_requested'
-      ['Super-Administrator',
-       'Administrator'].include? current_role_name
+      current_user_has_admin_privileges?
+      # ['Super-Administrator',
+      #  'Administrator'].include? current_role_name
     when 'request_new'
       true
     when 'create_requested_user_record'
       true
     when 'keys'
-      current_role_name.eql? 'Student'
+      current_user_has_student_privileges?
+      # current_role_name.eql? 'Student'
     else
-      ['Super-Administrator',
-       'Administrator',
-       'Instructor',
-       'Teaching Assistant'].include? current_role_name
+      current_user_has_ta_privileges?
+      # ['Super-Administrator',
+      #  'Administrator',
+      #  'Instructor',
+      #  'Teaching Assistant'].include? current_role_name
     end
   end
 

@@ -153,10 +153,12 @@ module ReviewMappingHelper
         end
       end
     end
+    @num_rounds = @reviewers.assginment.num_review_rounds 
+    @all_reviewers_avg_vol_per_round = []
     @all_reviewers_overall_avg_vol = @reviewers.inject(0) {|sum, r| sum += r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @all_reviewers_avg_vol_in_round_1 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_per_round[1] } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @all_reviewers_avg_vol_in_round_2 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_per_round[2] } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @all_reviewers_avg_vol_in_round_3 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_per_round[3] } / (@reviewers.blank? ? 1 : @reviewers.length)
+    @num_rounds.each do |round|
+      @all_reviewers_avg_vol_per_round.push(@reviewers.inject(0) {|sum, r| sum += r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
+    end 
     @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 
@@ -176,23 +178,23 @@ module ReviewMappingHelper
     labels = []
     reviewer_data = []
     all_reviewers_data = []
-    if @all_reviewers_avg_vol_in_round_1 > 0
+    if @all_reviewers_avg_vol_in_round[0] > 0
       round += 1
       labels.push '1st'
-      reviewer_data.push reviewer.avg_vol_in_round_1
-      all_reviewers_data.push @all_reviewers_avg_vol_in_round_1
+      reviewer_data.push reviewer.avg_vol_in_round[0]
+      all_reviewers_data.push @all_reviewers_avg_vol_in_round[0]
     end
-    if @all_reviewers_avg_vol_in_round_2 > 0
+    if @all_reviewers_avg_vol_in_round[1] > 0
       round += 1
       labels.push '2nd'
-      reviewer_data.push reviewer.avg_vol_in_round_2
-      all_reviewers_data.push @all_reviewers_avg_vol_in_round_2
+      reviewer_data.push reviewer.avg_vol_in_round[1]
+      all_reviewers_data.push @all_reviewers_avg_vol_in_round[1]
     end
-    if @all_reviewers_avg_vol_in_round_3 > 0
+    if @all_reviewers_avg_vol_in_round_[2] > 0
       round += 1
       labels.push '3rd'
-      reviewer_data.push reviewer.avg_vol_in_round_3
-      all_reviewers_data.push @all_reviewers_avg_vol_in_round_3
+      reviewer_data.push reviewer.avg_vol_in_round[2]
+      all_reviewers_data.push @all_reviewers_avg_vol_in_round[2]
     end
     labels.push 'Total'
     reviewer_data.push reviewer.overall_avg_vol

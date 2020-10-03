@@ -34,17 +34,37 @@ class SignUpTopic < ActiveRecord::Base
     end
   end
 
-  def self.filled_slots(assignment_id)
+  # The old method is commented out below.
+  #
+  # def self.import(columns, session, _id = nil)
+  #   if columns.length < 3
+  #     raise ArgumentError, "The CSV File expects the format: Topic identifier, Topic name, Max choosers, Topic Category (optional), Topic Description (Optional), Topic Link (optional)."
+  #   end
+  #
+  #   topic = SignUpTopic.where(topic_name: columns[1], assignment_id: session[:assignment_id]).first
+  #
+  #   if topic.nil?
+  #     attributes = ImportTopicsHelper.define_attributes(columns)
+  #     ImportTopicsHelper.create_new_sign_up_topic(attributes, session)
+  #   else
+  #     topic.max_choosers = columns[2]
+  #     topic.topic_identifier = columns[0]
+  #     # topic.assignment_id = session[:assignment_id]
+  #     topic.save
+  #   end
+  # end
+
+  def self.find_slots_filled(assignment_id)
     # SignUpTopic.find_by_sql("SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id =" + assignment_id+  " and u.is_waitlisted = false GROUP BY t.id")
     SignUpTopic.find_by_sql(["SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id = ? and u.is_waitlisted = false GROUP BY t.id", assignment_id])
   end
 
-  def self.find_waitlisted_slots(assignment_id)
+  def self.find_slots_waitlisted(assignment_id)
     # SignUpTopic.find_by_sql("SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id =" + assignment_id +  " and u.is_waitlisted = true GROUP BY t.id")
     SignUpTopic.find_by_sql(["SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id = ? and u.is_waitlisted = true GROUP BY t.id", assignment_id])
   end
 
-  def self.waitlisted_topics(assignment_id, team_id)
+  def self.find_waitlisted_topics(assignment_id, team_id)
     # SignedUpTeam.find_by_sql("SELECT u.id FROM sign_up_topics t, signed_up_teams u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = " + assignment_id.to_s + " and u.team_id = " + team_id.to_s)
     SignedUpTeam.find_by_sql(["SELECT u.id FROM sign_up_topics t, signed_up_teams u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = ? and u.team_id = ?", assignment_id.to_s, team_id.to_s])
   end
@@ -65,7 +85,7 @@ class SignUpTopic < ActiveRecord::Base
   end
 
   def self.reassign_topic(session_user_id, assignment_id, topic_id)
-    
+    # find whether assignment is team assignment
     assignment = Assignment.find(assignment_id)
 
     # making sure that the drop date deadline hasn't passed

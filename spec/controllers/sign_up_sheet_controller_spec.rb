@@ -80,7 +80,7 @@ describe SignUpSheetController do
         allow(SignedUpTeam).to receive(:find_by).with(topic_id: 1).and_return(signed_up_team)
         allow(SignedUpTeam).to receive(:where).with(topic_id: 1, is_waitlisted: true).and_return([signed_up_team2])
         allow(Team).to receive(:find).with(2).and_return(team)
-        allow(SignUpTopic).to receive(:waitlisted_topics).with(1, 2).and_return(nil)
+        allow(SignUpTopic).to receive(:find_waitlisted_topics).with(1, 2).and_return(nil)
         params = {
           id: 1,
           topic: {
@@ -157,7 +157,7 @@ describe SignUpSheetController do
         allow(SignedUpTeam).to receive(:find_by).with(topic_id: 2).and_return(signed_up_team)
         allow(SignedUpTeam).to receive(:where).with(topic_id: 2, is_waitlisted: true).and_return([signed_up_team2])
         allow(Team).to receive(:find).with(2).and_return(team)
-        allow(SignUpTopic).to receive(:waitlisted_topics).with(1, 2).and_return(nil)
+        allow(SignUpTopic).to receive(:find_waitlisted_topics).with(1, 2).and_return(nil)
         allow_any_instance_of(SignUpSheetController).to receive(:undo_link)
           .with("The topic: \"Hello world!\" has been successfully updated. ").and_return('OK')
         params = {
@@ -179,8 +179,8 @@ describe SignUpSheetController do
 
   describe '#list' do
     before(:each) do
-      allow(SignUpTopic).to receive(:filled_slots).with(1).and_return([topic])
-      allow(SignUpTopic).to receive(:find_waitlisted_slots).with(1).and_return([])
+      allow(SignUpTopic).to receive(:find_slots_filled).with(1).and_return([topic])
+      allow(SignUpTopic).to receive(:find_slots_waitlisted).with(1).and_return([])
       allow(SignUpTopic).to receive(:where).with(assignment_id: 1, private_to: nil).and_return([topic])
       allow(participant).to receive(:team).and_return(team)
     end

@@ -19,14 +19,15 @@ describe ReviewMappingHelper, type: :helper do
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
       @reviewer = create(:participant, review_grade: nil)
       @reviewee = create(:assignment_team)
+      @reviewee_with_assignment = create(:assignment_team, assignment: @assignment)
       @response_map = create(:review_response_map, reviewer: @reviewer)
     end
 
     it 'color should be red if response_map does not exist' do
-      response_map_dne = create(:does_not_exist)
+      response_map_dne = create(:review_response_map)
 
       color = get_team_colour(response_map_dne)
-      expect(color).to be == 'red'
+      expect(color).to eq('red')
     end
 
     it 'color should be blue if the a review was submitted for each round' do
@@ -47,7 +48,7 @@ describe ReviewMappingHelper, type: :helper do
       create(:response, response_map: response_map_with_reviewee)
 
       color = get_team_colour(response_map_with_reviewee)
-      expect(color).to be 'blue'
+      expect(color).to eq('blue')
     end
 
     it 'color should NOT be blue if the a review was NOT submitted for each round' do
@@ -62,7 +63,7 @@ describe ReviewMappingHelper, type: :helper do
       create(:response, response_map: @response_map)
 
       color = get_team_colour(@response_map)
-      expect(color).not_to be 'blue'
+      expect(color).not_to eq('blue')
     end
 
     it 'color should be brown if the review and review_grade exist' do
@@ -72,7 +73,7 @@ describe ReviewMappingHelper, type: :helper do
       create(:response, response_map: response_map_with_grade_reviewer)
 
       color = get_team_colour(response_map_with_grade_reviewer)
-      expect(color).to be 'brown'
+      expect(color).to eq('brown')
     end
 
     it 'color should be green if the submission link is non-existent' do
@@ -87,7 +88,7 @@ describe ReviewMappingHelper, type: :helper do
       create(:response, response_map: @response_map)
 
       color = get_team_colour(@response_map)
-      expect(color).to be 'green'
+      expect(color).to eq('green')
     end
 
     it 'color should be green if the submission link is NOT a link to a Expertiza wiki' do
@@ -109,7 +110,7 @@ describe ReviewMappingHelper, type: :helper do
       create(:response, response_map: response_map_with_reviewee)
 
       color = get_team_colour(response_map_with_reviewee)
-      expect(color).to be 'green'
+      expect(color).to eq('green')
     end
 
     it 'color should be purple if review were submitted for each round (on time)' do
@@ -132,7 +133,7 @@ describe ReviewMappingHelper, type: :helper do
       create(:response, response_map: response_map_with_reviewee)
 
       color = get_team_colour(response_map_with_reviewee)
-      expect(color).to be 'purple'
+      expect(color).to eq('purple')
     end
 
     it 'color should be purple if submission link has been updated since due date for a specified round' do
@@ -141,12 +142,9 @@ describe ReviewMappingHelper, type: :helper do
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')
 
-      # make a team for the assignment
-      create(:assignment_team, assignment: @assignment)
+      response_map_with_reviewee = create(:review_response_map, reviewer: @reviewer, reviewee: @reviewee_with_assignment)
 
-      response_map_with_reviewee = create(:review_response_map, reviewer: @reviewer, reviewee: @reviewee)
-
-      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'https://en.wikipedia.org/wiki/Ruby_(programming_language)', created_at: DateTime.now.in_time_zone - 7.day)
+      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee_with_assignment.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 7.day)
 
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 5.day)
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone + 6.day)
@@ -154,7 +152,7 @@ describe ReviewMappingHelper, type: :helper do
       create(:response, response_map: response_map_with_reviewee)
 
       color = get_team_colour(response_map_with_reviewee)
-      expect(color).to be 'purple'
+      expect(color).to eq('purple')
     end
 
   end

@@ -6,7 +6,6 @@ describe ReviewMappingHelper, type: :helper do
   let(:review_response_map) { build(:review_response_map, id: 2) }
 
   describe '#visibility_public?' do
-
     it 'should return true if visibility is public or published' do
       allow(Response).to receive(:where).with(map_id: 2, visibility: ['public', 'published']).and_return(response)
       allow(response).to receive(:exists?).and_return(true)
@@ -154,6 +153,80 @@ describe ReviewMappingHelper, type: :helper do
       color = get_team_colour(response_map_with_reviewee)
       expect(color).to eq('purple')
     end
+  end
 
+  describe 'get_each_review_and_feedback_response' do
+    @response_list = []
+    @feedback_response_map_list = []
+    @all_review_response_ids = []
+
+    before(:each) do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+
+      @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
+
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 3)
+
+      student = create(:student)
+      @reviewer = create(:assignment_team, assignment: @assignment)
+      @reviewee = create(:participant, assignment: @assignment, user: student)
+
+      create(:team_user, user: student, team: @reviewee)
+
+      @response_map_1 = create(:review_response_map, reviewer: @reviewer)
+      @response_map_2 = create(:review_response_map, reviewer: @reviewer)
+      @response_map_3 = create(:review_response_map, reviewer: @reviewer)
+    end
+
+    it 'should return the number of responses given in round 1 reviews' do
+      @response_1 = create(:response, response_map: @response_map_1, round: 1)
+      @response_list << @response_1
+      @feedback_response_map_list << FeedbackResponseMap.create(reviewed_object_id: @response_1.id, reviewer_id: @reviewer.id)
+      @all_review_response_ids << @response_1.id
+
+      get_each_review_and_feedback_response_map(@reviewer)
+
+      # rspan means the all peer reviews one student received, including unfinished one
+      # retrieved from method call in review_mapping_helper.rb file
+      expect(@rspan_round_one).to eq 1
+    end
+
+    it 'should return the number of responses given in round 2 reviews' do
+      @response_2 = create(:response, response_map: @response_map_2, round: 2)
+      @response_list << @response_2
+      @feedback_response_map_list << FeedbackResponseMap.create(reviewed_object_id: @response_2.id, reviewer_id: @reviewer.id)
+      @all_review_response_ids << @response_2.id
+
+      get_each_review_and_feedback_response_map(@reviewer)
+
+      # rspan means the all peer reviews one student received, including unfinished one
+      # retrieved from method call in review_mapping_helper.rb file
+      expect(@rspan_round_two).to eq 1
+    end
+
+    it 'should return the number of responses given in round 3 reviews' do
+      @response_3 = create(:response, response_map: @response_map_3, round: 3)
+      @response_list << @response_3
+      @feedback_response_map_list << FeedbackResponseMap.create(reviewed_object_id: @response_3.id, reviewer_id: @reviewer.id)
+      @all_review_response_ids << @response_3.id
+
+      get_each_review_and_feedback_response_map(@reviewer)
+
+      # rspan means the all peer reviews one student received, including unfinished one
+      # retrieved from method call in review_mapping_helper.rb file
+      expect(@rspan_round_three).to eq 1
+    end
+
+    it 'should return 0 responses given in round 3 reviews' do
+      get_each_review_and_feedback_response_map(@reviewer)
+
+      # rspan means the all peer reviews one student received, including unfinished one
+      # retrieved from method call in review_mapping_helper.rb file
+      expect(@rspan_round_three).to eq 0
+    end
   end
 end

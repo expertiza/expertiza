@@ -1,8 +1,8 @@
 <h1>Assignments</h1>
 <%= render 'publishing_rights' %>
-
-<div style="">
-  <div class="taskbox">
+# start of first block
+<div style="display: inline">
+  <div class="taskbox" style="width:30%; display: inline-block; float:left; margin-right: 10px;" >
     <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @tasknotstarted.size.to_s %>&nbsp;</span> Tasks not yet started<br></strong><br>
 
     <% @tasknotstarted.each do |student_task|
@@ -85,9 +85,10 @@
     <% end %>
 
   </div>
-</div>
 
-<div class="topictable">
+# end of first block
+# start of second block
+<div class="topictable" style="width:70%; display: inline-block; float:left; margin-right: 10px;">
   <table class="table table-striped" cellpadding="2">
     <tr class="taskheader">
       <th>Assignment</th>
@@ -143,4 +144,6 @@
         <% end %>
     <% end %>
   </table>
+</div>
+#end of second block
 </div>

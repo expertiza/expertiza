@@ -1,9 +1,10 @@
 require 'spec_helper'
+require 'rails_helper'
 
 describe ReviewMappingHelper, type: :helper do
 
-  let(:response) { build(:response, map_id: 2, visibility: 'public') }
-  let(:review_response_map) { build(:review_response_map, id: 2) }
+  let(:response) {build(:response, map_id: 2, visibility: 'public')}
+  let(:review_response_map) {build(:review_response_map, id: 2)}
 
   describe '#visibility_public?' do
     it 'should return true if visibility is public or published' do
@@ -156,9 +157,6 @@ describe ReviewMappingHelper, type: :helper do
   end
 
   describe 'get_each_review_and_feedback_response' do
-    @response_list = []
-    @feedback_response_map_list = []
-    @all_review_response_ids = []
 
     before(:each) do
       create(:deadline_right, name: 'No')
@@ -172,22 +170,35 @@ describe ReviewMappingHelper, type: :helper do
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 3)
 
       student = create(:student)
-      @reviewer = create(:assignment_team, assignment: @assignment)
-      @reviewee = create(:participant, assignment: @assignment, user: student)
-
+      @reviewee = create(:assignment_team, assignment: @assignment)
       create(:team_user, user: student, team: @reviewee)
+      @reviewer = create(:participant, assignment: @assignment, user: student)
 
       @response_map_1 = create(:review_response_map, reviewer: @reviewer)
       @response_map_2 = create(:review_response_map, reviewer: @reviewer)
       @response_map_3 = create(:review_response_map, reviewer: @reviewer)
-    end
 
-    it 'should return the number of responses given in round 1 reviews' do
+      @review_response_map_list = []
+      @review_response_map_list << @response_map_1.id
+      @review_response_map_list << @response_map_2.id
+      @review_response_map_list << @response_map_3.id
+
+      @response_list = []
+      @feedback_response_map_list = []
+      @all_review_response_ids = []
+
       @response_1 = create(:response, response_map: @response_map_1, round: 1)
       @response_list << @response_1
       @feedback_response_map_list << FeedbackResponseMap.create(reviewed_object_id: @response_1.id, reviewer_id: @reviewer.id)
       @all_review_response_ids << @response_1.id
 
+      @response_2 = create(:response, response_map: @response_map_2, round: 2)
+      @response_list << @response_2
+      @feedback_response_map_list << FeedbackResponseMap.create(reviewed_object_id: @response_2.id, reviewer_id: @reviewer.id)
+      @all_review_response_ids << @response_2.id
+    end
+
+    it 'should return the number of responses given in round 1 reviews' do
       get_each_review_and_feedback_response_map(@reviewer)
 
       # rspan means the all peer reviews one student received, including unfinished one
@@ -196,11 +207,6 @@ describe ReviewMappingHelper, type: :helper do
     end
 
     it 'should return the number of responses given in round 2 reviews' do
-      @response_2 = create(:response, response_map: @response_map_2, round: 2)
-      @response_list << @response_2
-      @feedback_response_map_list << FeedbackResponseMap.create(reviewed_object_id: @response_2.id, reviewer_id: @reviewer.id)
-      @all_review_response_ids << @response_2.id
-
       get_each_review_and_feedback_response_map(@reviewer)
 
       # rspan means the all peer reviews one student received, including unfinished one
@@ -221,7 +227,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(@rspan_round_three).to eq 1
     end
 
-    it 'should return 0 responses given in round 3 reviews' do
+    it 'should return 0 responses for no round 3 reviews' do
       get_each_review_and_feedback_response_map(@reviewer)
 
       # rspan means the all peer reviews one student received, including unfinished one

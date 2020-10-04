@@ -67,7 +67,7 @@ describe ReviewMetricsQuery do
     end
   end
 
-  describe 'translate_value' do
+  describe 'inferred_value' do
     it 'translates text into value 1 or -1' do
       review = {"id" => answer.id, "text" => answer.comments, "Praise" => "None"}
       result = ReviewMetricsQuery.inferred_value('emotions', review)
@@ -79,7 +79,7 @@ describe ReviewMetricsQuery do
     end
   end
 
-  describe 'translate_confidence' do
+  describe 'inferred_confidence' do
     it 'flips the confidence level when the determined value is Absent' do
       review = {"id" => answer.id, "text" => answer.comments, "problems" => "Absent", "confidence" => 0.02}
       result = ReviewMetricsQuery.inferred_confidence('problem', review)

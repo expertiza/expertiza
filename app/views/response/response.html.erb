@@ -115,15 +115,13 @@
     // display loader and disable button
     $("#Submit").click(function(e){
       $('#Submit').addClass('disabled');
-      $('#return').before('<div class="loader"></div>');
-      $('#return').before('<div class="loader-msg">Please wait for the system to process your review. It should take about one minutes. \n If the page does not redirect, refresh the page and try again.</div>');
+      $('#loader').removeClass('hide');
     });
 
     // remove loader and the disabled effect on the button after the modal gets loaded
     $('#modal-window').bind('DOMSubtreeModified', function(e) {
       $('#Submit').removeClass('disabled');
-      $('.loader').remove();
-      $('.loader-msg').remove();
+      $('#loader').addClass('hide');
     });
 
     // update the values in the form using ajax
@@ -427,6 +425,10 @@
         <%= submit_tag "Submit "+@title, :name => "Submit", :id => "Submit" %>
         <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
     <% end %>
+    <div id="loader" class="hide">
+      <div class="loader"></div>
+      Please wait for the system to process your review. It should take about one minutes. \n If the page does not redirect, refresh the page and try again.
+    </div>
     <%= hidden_field_tag('return', @return) %>
     <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %>
 <% end %>

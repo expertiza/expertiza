@@ -25,35 +25,45 @@ module ReviewMappingHelper
   # gets the team name's color according to review and assignment submission status
   #
   def get_team_colour(response_map)
+    # Storing redundantly computed value in a variable
     assignment_created = @assignment.created_at
+    # Storing redundantly computed value in a variable
     assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
+    # Returning colour based on conditions
     if Response.exists?(map_id: response_map.id)
       if !response_map.try(:reviewer).try(:review_grade).nil?
         'brown'
       elsif response_for_each_round?(response_map)
         'blue'
       else
-        color = []
-        (1..@assignment.num_review_rounds).each do |round|
-          if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
-            color.push 'purple'
-          else
-            link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
-            if link.nil? or (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
-              color.push 'green'
-            else
-              link_updated_at = get_link_updated_at(link)
-              color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
-            end
-          end
-        end
-        color[-1]
+        obtain_team_colour(response_map,assignment_created,assignment_due_dates)
       end
     else
       'red'
     end
   end
-
+  # loops through the number of assignment review rounds and obains the team colour
+  def obtain_team_colour(response_map, assignment_created, assignment_due_dates)
+    color = []
+    (1..@assignment.num_review_rounds).each do |round|
+      check_submission_state(response_map, assignment_created, assignment_due_dates, round)
+    end
+    color[-1]
+  end
+  # checks the submission state within each round and assigns team colour
+  def check_submission_state(response_map, assignment_created, assignment_due_dates, round)
+    if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
+      color.push 'purple'
+    else
+      link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
+      if link.nil? or (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
+        color.push 'green'
+      else
+        link_updated_at = get_link_updated_at(link)
+        color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green' 
+      end
+    end
+  end
   # checks if a review was submitted in every round and gives the total responses count
   def response_for_each_round?(response_map)
     num_responses = 0
@@ -120,22 +130,37 @@ module ReviewMappingHelper
   # end
 
   # gets the review score awarded based on each round of the review
-  def get_awarded_review_score(reviewer_id, team_id)
-    (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----') }
-    (1..@assignment.num_review_rounds).each do |round|
-      if @review_scores[reviewer_id] && @review_scores[reviewer_id][round] && @review_scores[reviewer_id][round][team_id] && @review_scores[reviewer_id][round][team_id] != -1.0
-        instance_variable_set("@score_awarded_round_" + round.to_s, @review_scores[reviewer_id][round][team_id].inspect + '%')
+
+  def get_awarded_review_score(reviewer_id, team_id) 
+        # Storing redundantly computed value in num_rounds variable
+	num_rounds = @assignment.num_review_rounds
+    # Setting values of instance variables
+    (1..num_rounds).each {|round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----') }
+    # Iterating through list
+    (1..num_rounds).each do |round|
+	 # Setting values of instance variables
+         teamID = @review_scores.dig(reviewer_id, round, team_id)
+       # Changing values of instance variable based on below condition
+       if teamID != nil && teamID != -1.0
+         instance_variable_set("@score_awarded_round_" + round.to_s, teamID.inspect + '%')
       end
     end
   end
 
   # gets minimum, maximum and average value for all the reviews
-  def get_review_metrics(round, team_id)
-    %i[max min avg].each {|metric| instance_variable_set('@' + metric.to_s, '-----') }
-    if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? {|k| @avg_and_ranges[team_id][round].key? k }
-      %i[max min avg].each do |metric|
-        metric_value = @avg_and_ranges[team_id][round][metric].nil? ? '-----' : @avg_and_ranges[team_id][round][metric].round(0).to_s + '%'
-        instance_variable_set('@' + metric.to_s, metric_value)
+ def get_review_metrics(round, team_id)
+    # Setting values of instance variables
+    ['max', 'min', 'avg'].each {|metric| instance_variable_set('@' + metric, '-----') }
+    # Fetching value of @avg_and_ranges[team_id][round] 
+    x = @avg_and_ranges.dig(team_id, round)
+
+    if x && %i[max min avg].all? {|k| x.key? k }
+      # Iterating though the list
+      ['max', 'min', 'avg'].each do |metric|
+        # setting values of variables based on certain conditions
+	average_metric = @avg_and_ranges.dig(team_id, round, metric)
+        metric_value = average_metric.nil? ? '-----' : average_metric.round(0).to_s + '%'
+        instance_variable_set('@' + metric, metric_value)
       end
     end
   end
@@ -304,22 +329,26 @@ module ReviewMappingHelper
     # Calculate how many responses one team received from each round
     # It is the feedback number each team member should make
     @review_response_map_ids = ReviewResponseMap.where(["reviewed_object_id = ? and reviewee_id = ?", @id, @team_id]).pluck("id")
+    feedback_response_map_record(author)
+    # rspan means the all peer reviews one student received, including unfinished one
+    @rspan_round_one = @review_responses_round_one.length
+    @rspan_round_two = @review_responses_round_two.length
+    @rspan_round_three = @review_responses_round_three.nil? ? 0 : @review_responses_round_three.length
+  end
+  # This function sets the values of instance variable
+  def feedback_response_map_record(author)
     {1 => 'one', 2 => 'two', 3 => 'three'}.each do |key, round_num|
       instance_variable_set('@review_responses_round_' + round_num,
                             Response.where(["map_id IN (?) and round = ?", @review_response_map_ids, key]))
       # Calculate feedback response map records
       instance_variable_set('@feedback_response_maps_round_' + round_num,
                             FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?",
-                                                       instance_variable_get('@all_review_response_ids_round_' + round_num), author.id]))
+                                                      instance_variable_get('@all_review_response_ids_round_' + round_num), author.id]))
     end
-    # rspan means the all peer reviews one student received, including unfinished one
-    @rspan_round_one = @review_responses_round_one.length
-    @rspan_round_two = @review_responses_round_two.length
-    @rspan_round_three = @review_responses_round_three.nil? ? 0 : @review_responses_round_three.length
   end
-
   # gets review and feedback responses for a certain round for the feedback report
   def get_certain_review_and_feedback_response_map(author)
+    # Setting values of instance variables
     @feedback_response_maps = FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?", @all_review_response_ids, author.id])
     @team_id = TeamsUser.team_id(@id.to_i, author.user_id)
     @review_response_map_ids = ReviewResponseMap.where(["reviewed_object_id = ? and reviewee_id = ?", @id, @team_id]).pluck("id")
@@ -332,19 +361,13 @@ module ReviewMappingHelper
   #
   def get_css_style_for_calibration_report(diff)
     # diff - difference between stu's answer and instructor's answer
-    dict = {0 => 'c5',1 => 'c4',2 => 'c3',3 => 'c2'}
-    if dict.key?(diff.abs)
-      css_class = dict[diff.abs]
-    else
-      css_class = 'c1'
-    end
+    dict = {0 => 'c5', 1 => 'c4', 2 => 'c3', 3 => 'c2'}
+    css_class = if dict.key?(diff.abs)
+                  dict[diff.abs]
+                else
+                  css_class = 'c1'
+                end
     css_class
-  end
-
-  #returns true if the review response's visibility is public or published else returns false. (Visibility public or published means student
-  #has given consent to make his reviews public.)
-  def visibility_public?(response_map)
-    Response.where(map_id: response_map.id, visibility: ["public","published"]).exists?
   end
 
   class ReviewStrategy

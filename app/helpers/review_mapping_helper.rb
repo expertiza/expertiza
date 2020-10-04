@@ -46,12 +46,12 @@ module ReviewMappingHelper
   def obtain_team_colour(response_map, assignment_created, assignment_due_dates)
     color = []
     (1..@assignment.num_review_rounds).each do |round|
-      check_submission_state(response_map, assignment_created, assignment_due_dates, round)
+      check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
     end
     color[-1]
   end
   # checks the submission state within each round and assigns team colour
-  def check_submission_state(response_map, assignment_created, assignment_due_dates, round)
+  def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
     if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
       color.push 'purple'
     else

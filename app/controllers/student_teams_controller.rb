@@ -23,6 +23,7 @@ class StudentTeamsController < ApplicationController
     return false unless current_user_has_student_privileges?
     case action_name
     when 'view'
+      current_user_id? student.user_id and
       are_needed_authorizations_present?(params[:student_id], "reader", "reviewer", "submitter")
     when 'create'
       current_user_has_id? student.user_id
@@ -36,7 +37,6 @@ class StudentTeamsController < ApplicationController
   def view
     # View will check if send_invs and recieved_invs are set before showing
     # only the owner should be able to see those.
-    return unless current_user_id? student.user_id
 
     @send_invs = Invitation.where from_id: student.user.id, assignment_id: student.assignment.id
     @received_invs = Invitation.where to_id: student.user.id, assignment_id: student.assignment.id, reply_status: 'W'
@@ -85,6 +85,7 @@ class StudentTeamsController < ApplicationController
   def edit; end
 
   def update
+    # Update the team name only if the given team name is not used already
     matching_teams = AssignmentTeam.where name: params[:team][:name], parent_id: team.parent_id
     if matching_teams.length.zero?
       if team.update_attribute('name', params[:team][:name])
@@ -93,7 +94,7 @@ class StudentTeamsController < ApplicationController
         redirect_to view_student_teams_path student_id: params[:student_id]
 
       end
-    elsif matching_teams.length == 1 && (matching_teams[0].name <=> team.name).zero?
+    elsif matching_teams.length == 1 && (matching_teams[0].name == team.name)
 
       team_created_successfully
       redirect_to view_student_teams_path student_id: params[:student_id]
@@ -105,11 +106,12 @@ class StudentTeamsController < ApplicationController
 
     end
   end
-
+  #The following two methods are necessary to improve readability
+  #update the advertise_for_partner of team table
   def advertise_for_partners
     Team.update_all advertise_for_partner: true, id: params[:team_id]
   end
-
+  
   def remove_advertisement
     Team.update_all advertise_for_partner: false, id: params[:team_id]
     redirect_to view_student_teams_path student_id: params[:team_id]
@@ -126,19 +128,19 @@ class StudentTeamsController < ApplicationController
         old_team.destroy
         # if assignment has signup sheet then the topic selected by the team has to go back to the pool
         # or to the first team in the waitlist
-        sign_ups = SignedUpTeam.where team_id: params[:team_id]
-        sign_ups.each do |sign_up|
+        signups = SignedUpTeam.where team_id: params[:team_id]
+        signups.each do |signup|
           # get the topic_id
-          sign_up_topic_id = sign_up.topic_id
-          # destroy the sign_up
-          sign_up.destroy
+          signup_topic_id = signup.topic_id
+          # destroy the signup
+          signup.destroy
           # get the number of non-waitlisted users signed up for this topic
-          non_waitlisted_users = SignedUpTeam.where topic_id: sign_up_topic_id, is_waitlisted: false
+          non_waitlisted_users = SignedUpTeam.where topic_id: signup_topic_id, is_waitlisted: false
           # get the number of max-choosers for the topic
-          max_choosers = SignUpTopic.find(sign_up_topic_id).max_choosers
+          max_choosers = SignUpTopic.find(signup_topic_id).max_choosers
           # check if this number is less than the max choosers
           next unless non_waitlisted_users.length < max_choosers
-          first_waitlisted_team = SignedUpTeam.find_by topic_id: sign_up_topic_id, is_waitlisted: true
+          first_waitlisted_team = SignedUpTeam.find_by topic_id: signup_topic_id, is_waitlisted: true
           # moving the waitlisted team into the confirmed signed up teams list and delete all waitlists for this team
           SignUpTopic.assign_to_first_waiting_team(first_waitlisted_team) if first_waitlisted_team
         end

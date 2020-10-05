@@ -8,7 +8,7 @@ describe 'add TA', js: true do
   it "check to see if TA can be added and removed" do
     student = create(:student)
     login_as('instructor6')
-    visit "/courses/view_teaching_assistants?id=#{@course.id}&model=Course"
+    visit "/course/view_teaching_assistants?id=#{@course.id}&model=Course"
     fill_in 'user_name', with: student.name
 
     expect do
@@ -16,7 +16,7 @@ describe 'add TA', js: true do
       wait_for_ajax
     end.to change { TaMapping.count }.by(1)
 
-    visit "/courses/view_teaching_assistants?id=#{@course.id}&model=Course"
+    visit "/course/view_teaching_assistants?id=#{@course.id}&model=Course"
 
     expect do
       first(:link, 'Delete').click
@@ -26,7 +26,7 @@ describe 'add TA', js: true do
 
   it "should display newly created course" do
     login_as('instructor6')
-    visit "/courses/view_teaching_assistants?id=#{@course.id}&model=Course"
+    visit "/course/view_teaching_assistants?id=#{@course.id}&model=Course"
 
     expect(page).to have_content("TA course")
   end

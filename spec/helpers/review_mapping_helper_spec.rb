@@ -168,19 +168,18 @@ describe ReviewMappingHelper, type: :helper do
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2)
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 3)
 
+      # @id is used in the method call, need to assign it to the assignment id
+      @id = @assignment.id
+
       student = create(:student)
       @reviewee = create(:assignment_team, assignment: @assignment)
-      create(:team_user, user: student, team: @reviewee)
       @reviewer = create(:participant, assignment: @assignment, user: student)
+
+      create(:team_user, user: student, team: @reviewee)
 
       @response_map_1 = create(:review_response_map, reviewer: @reviewer)
       @response_map_2 = create(:review_response_map, reviewer: @reviewer)
       @response_map_3 = create(:review_response_map, reviewer: @reviewer)
-
-      @review_response_map_list = []
-      @review_response_map_list << @response_map_1.id
-      @review_response_map_list << @response_map_2.id
-      @review_response_map_list << @response_map_3.id
 
       @response_1 = create(:response, response_map: @response_map_1, round: 1)
       @response_2 = create(:response, response_map: @response_map_2, round: 2)
@@ -212,10 +211,10 @@ describe ReviewMappingHelper, type: :helper do
     end
 
     it 'should return the number of responses given in round 3 reviews' do
+      # have to add in third response, did not in before action for nil scenario
       @response_3 = create(:response, response_map: @response_map_3, round: 3)
       @response_list << @response_3
-      feedback_response_map_3 = FeedbackResponseMap.create(reviewed_object_id: @response_3.id, reviewer_id: @reviewer.id)
-      @feedback_response_map_list << feedback_response_map_3
+      @feedback_response_map_list << FeedbackResponseMap.create(reviewed_object_id: @response_3.id, reviewer_id: @reviewer.id)
       @all_review_response_ids << @response_3.id
 
       get_each_review_and_feedback_response_map(@reviewer)
@@ -244,6 +243,8 @@ describe ReviewMappingHelper, type: :helper do
       @response_map_2 = create(:review_response_map, reviewer: @reviewer)
       @response_map_3 = create(:review_response_map, reviewer: @reviewer)
 
+      @review_response_map_ids = [@response_map_1.id, @response_map_2.id, @response_map_3.id]
+
       @response_1 = create(:response, response_map: @response_map_1, round: 1)
       @response_2 = create(:response, response_map: @response_map_2, round: 2)
       @response_3 = create(:response, response_map: @response_map_3, round: 3)
@@ -251,8 +252,6 @@ describe ReviewMappingHelper, type: :helper do
       FeedbackResponseMap.create(reviewed_object_id: @response_1.id, reviewer_id: @reviewer.id)
       FeedbackResponseMap.create(reviewed_object_id: @response_2.id, reviewer_id: @reviewer.id)
       FeedbackResponseMap.create(reviewed_object_id: @response_3.id, reviewer_id: @reviewer.id)
-
-      @review_response_map_ids = [@response_map_1.id, @response_map_2.id, @response_map_3.id]
 
       @all_review_response_ids_round_one = [@response_1.id]
       @all_review_response_ids_round_two = [@response_2.id]

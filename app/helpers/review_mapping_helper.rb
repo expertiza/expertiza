@@ -141,11 +141,9 @@ module ReviewMappingHelper
     (1..num_rounds).each { |round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----') }
     # Iterating through list
     (1..num_rounds).each do |round|
-      # Setting values of instance variables
-      teamID = @review_scores.dig(reviewer_id, round, team_id)
       # Changing values of instance variable based on below condition
-      if teamID != nil && teamID != -1.0
-        instance_variable_set("@score_awarded_round_" + round.to_s, teamID.inspect + '%')
+      if team_id != nil && team_id != -1.0
+        instance_variable_set("@score_awarded_round_" + round.to_s, @review_scores[reviewer_id][round][team_id].to_s + '%')
       end
     end
   end

@@ -381,7 +381,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(@score_awarded_round_2).to eq "20%"
     end
 
-    it 'should return the review score given by a reviewer for round 1 for the defined team' do
+    it 'should return the review score given by a reviewer for round 3 for the defined team' do
       expect(@score_awarded_round_3).to eq "30%"
     end
   end

@@ -8,7 +8,7 @@ module ReviewMappingHelper
   #
   def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
     rspan = 0
-    (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@review_in_round_" + round.to_s, 0) }
+    (1..@assignment.num_review_rounds).each { |round| instance_variable_set("@review_in_round_" + round.to_s, 0) }
 
     response_maps = ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", reviewed_object_id, reviewer_id, type])
     response_maps.each do |ri|
@@ -36,12 +36,13 @@ module ReviewMappingHelper
       elsif response_for_each_round?(response_map)
         'blue'
       else
-        obtain_team_colour(response_map,assignment_created,assignment_due_dates)
+        obtain_team_colour(response_map, assignment_created, assignment_due_dates)
       end
     else
       'red'
     end
   end
+
   # loops through the number of assignment review rounds and obains the team colour
   def obtain_team_colour(response_map, assignment_created, assignment_due_dates)
     color = []
@@ -50,6 +51,7 @@ module ReviewMappingHelper
     end
     color[-1]
   end
+
   # checks the submission state within each round and assigns team colour
   def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
     if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
@@ -60,10 +62,11 @@ module ReviewMappingHelper
         color.push 'green'
       else
         link_updated_at = get_link_updated_at(link)
-        color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green' 
+        color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
       end
     end
   end
+
   # checks if a review was submitted in every round and gives the total responses count
   def response_for_each_round?(response_map)
     num_responses = 0
@@ -131,34 +134,31 @@ module ReviewMappingHelper
 
   # gets the review score awarded based on each round of the review
 
-  def get_awarded_review_score(reviewer_id, team_id) 
-        # Storing redundantly computed value in num_rounds variable
-	num_rounds = @assignment.num_review_rounds
+  def get_awarded_review_score(reviewer_id, team_id)
+    # Storing redundantly computed value in num_rounds variable
+    num_rounds = @assignment.num_review_rounds
     # Setting values of instance variables
-    (1..num_rounds).each {|round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----') }
+    (1..num_rounds).each { |round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----') }
     # Iterating through list
     (1..num_rounds).each do |round|
-	 # Setting values of instance variables
-         teamID = @review_scores.dig(reviewer_id, round, team_id)
-       # Changing values of instance variable based on below condition
-       if teamID != nil && teamID != -1.0
-         instance_variable_set("@score_awarded_round_" + round.to_s, teamID.inspect + '%')
+      # Changing values of instance variable based on below condition
+      if team_id != nil && team_id != -1.0
+        instance_variable_set("@score_awarded_round_" + round.to_s, @review_scores[reviewer_id][round][team_id].to_s + '%')
       end
     end
   end
 
-  # gets minimum, maximum and average value for all the reviews
- def get_review_metrics(round, team_id)
+  def get_review_volume(round, team_id)
     # Setting values of instance variables
-    ['max', 'min', 'avg'].each {|metric| instance_variable_set('@' + metric, '-----') }
+    ['max', 'min', 'avg'].each { |metric| instance_variable_set('@' + metric, '-----') }
     # Fetching value of @avg_and_ranges[team_id][round] 
     x = @avg_and_ranges.dig(team_id, round)
 
-    if x && %i[max min avg].all? {|k| x.key? k }
+    if x && %i[max min avg].all? { |k| x.key? k }
       # Iterating though the list
       ['max', 'min', 'avg'].each do |metric|
         # setting values of variables based on certain conditions
-	average_metric = @avg_and_ranges.dig(team_id, round, metric)
+        average_metric = @avg_and_ranges.dig(team_id, round, metric)
         metric_value = average_metric.nil? ? '-----' : average_metric.round(0).to_s + '%'
         instance_variable_set('@' + metric, metric_value)
       end
@@ -173,11 +173,11 @@ module ReviewMappingHelper
           r.avg_vol_in_round_2,
           r.avg_vol_in_round_3 = Response.get_volume_of_review_comments(@assignment.id, r.id)
     end
-    @all_reviewers_overall_avg_vol = @reviewers.inject(0) {|sum, r| sum += r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @all_reviewers_avg_vol_in_round_1 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_in_round_1 } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @all_reviewers_avg_vol_in_round_2 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_in_round_2 } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @all_reviewers_avg_vol_in_round_3 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_in_round_3 } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
+    @all_reviewers_overall_avg_vol = @reviewers.inject(0) { |sum, r| sum += r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
+    @all_reviewers_avg_vol_in_round_1 = @reviewers.inject(0) { |sum, r| sum += r.avg_vol_in_round_1 } / (@reviewers.blank? ? 1 : @reviewers.length)
+    @all_reviewers_avg_vol_in_round_2 = @reviewers.inject(0) { |sum, r| sum += r.avg_vol_in_round_2 } / (@reviewers.blank? ? 1 : @reviewers.length)
+    @all_reviewers_avg_vol_in_round_3 = @reviewers.inject(0) { |sum, r| sum += r.avg_vol_in_round_3 } / (@reviewers.blank? ? 1 : @reviewers.length)
+    @reviewers.sort! { |r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 
   # displays the average scores in round 1, 2 and 3
@@ -224,59 +224,59 @@ module ReviewMappingHelper
   def display_volume_metric_chart(reviewer)
     labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
     data = {
-      labels: labels,
-      datasets: [
-        {
-          label: 'vol.',
-          backgroundColor: "rgba(255,99,132,0.8)",
-          borderWidth: 1,
-          data: reviewer_data,
-          yAxisID: "bar-y-axis1"
-        },
-        {
-          label: 'avg. vol.',
-          backgroundColor: "rgba(255,206,86,0.8)",
-          borderWidth: 1,
-          data: all_reviewers_data,
-          yAxisID: "bar-y-axis2"
-        }
-      ]
+        labels: labels,
+        datasets: [
+            {
+                label: 'vol.',
+                backgroundColor: "rgba(255,99,132,0.8)",
+                borderWidth: 1,
+                data: reviewer_data,
+                yAxisID: "bar-y-axis1"
+            },
+            {
+                label: 'avg. vol.',
+                backgroundColor: "rgba(255,206,86,0.8)",
+                borderWidth: 1,
+                data: all_reviewers_data,
+                yAxisID: "bar-y-axis2"
+            }
+        ]
     }
     options = {
-      legend: {
-        position: 'top',
-        labels: {
-          usePointStyle: true
+        legend: {
+            position: 'top',
+            labels: {
+                usePointStyle: true
+            }
+        },
+        width: "200",
+        height: "125",
+        scales: {
+            yAxes: [{
+                        stacked: true,
+                        id: "bar-y-axis1",
+                        barThickness: 10
+                    }, {
+                        display: false,
+                        stacked: true,
+                        id: "bar-y-axis2",
+                        barThickness: 15,
+                        type: 'category',
+                        categoryPercentage: 0.8,
+                        barPercentage: 0.9,
+                        gridLines: {
+                            offsetGridLines: true
+                        }
+                    }],
+            xAxes: [{
+                        stacked: false,
+                        ticks: {
+                            beginAtZero: true,
+                            stepSize: 50,
+                            max: 400
+                        }
+                    }]
         }
-      },
-      width: "200",
-      height: "125",
-      scales: {
-        yAxes: [{
-          stacked: true,
-          id: "bar-y-axis1",
-          barThickness: 10
-        }, {
-          display: false,
-          stacked: true,
-          id: "bar-y-axis2",
-          barThickness: 15,
-          type: 'category',
-          categoryPercentage: 0.8,
-          barPercentage: 0.9,
-          gridLines: {
-            offsetGridLines: true
-          }
-        }],
-        xAxes: [{
-          stacked: false,
-          ticks: {
-            beginAtZero: true,
-            stepSize: 50,
-            max: 400
-          }
-        }]
-      }
     }
     horizontal_bar_chart data, options
   end
@@ -335,6 +335,7 @@ module ReviewMappingHelper
     @rspan_round_two = @review_responses_round_two.length
     @rspan_round_three = @review_responses_round_three.nil? ? 0 : @review_responses_round_three.length
   end
+
   # This function sets the values of instance variable
   def feedback_response_map_record(author)
     {1 => 'one', 2 => 'two', 3 => 'three'}.each do |key, round_num|
@@ -343,9 +344,10 @@ module ReviewMappingHelper
       # Calculate feedback response map records
       instance_variable_set('@feedback_response_maps_round_' + round_num,
                             FeedbackResponseMap.where(["reviewed_object_id IN (?) and reviewer_id = ?",
-                                                      instance_variable_get('@all_review_response_ids_round_' + round_num), author.id]))
+                                                       instance_variable_get('@all_review_response_ids_round_' + round_num), author.id]))
     end
   end
+
   # gets review and feedback responses for a certain round for the feedback report
   def get_certain_review_and_feedback_response_map(author)
     # Setting values of instance variables

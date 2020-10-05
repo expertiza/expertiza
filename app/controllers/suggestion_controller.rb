@@ -1,12 +1,19 @@
 class SuggestionController < ApplicationController
-  include AuthorizationHelper
-
   def action_allowed?
     case params[:action]
-      when 'create', 'new', 'student_view', 'student_edit', 'update_suggestion', 'submit'
-        current_user_has_student_privileges?
-      else
-        current_user_has_ta_privileges?
+    when 'create', 'new', 'student_view', 'student_edit', 'update_suggestion'
+      current_role_name.eql? 'Student'
+    when 'submit'
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator',
+       'Student'].include? current_role_name
+    else
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator'].include? current_role_name
     end
   end
 
@@ -15,11 +22,11 @@ class SuggestionController < ApplicationController
     @suggestioncomment.suggestion_id = params[:id]
     @suggestioncomment.commenter = session[:user].name
     if @suggestioncomment.save
-      flash[:notice] = "Your comment has been successfully added."
+      flash[:success] = "Your comment has been successfully added."
     else
       flash[:error] = "There was an error in adding your comment."
     end
-    if current_user_has_student_privileges?
+    if current_role_name.eql? 'Student'
       redirect_to action: "student_view", id: params[:id]
     else
       redirect_to action: "show", id: params[:id]
@@ -72,7 +79,7 @@ class SuggestionController < ApplicationController
                             session[:user].name
                           else
                             ""
-                          end
+    end
 
     if @suggestion.save
       flash[:success] = 'Thank you for your suggestion!' if @suggestion.unityID != ''
@@ -113,13 +120,13 @@ class SuggestionController < ApplicationController
         cc_mail_list << User.find(teams_user.user_id).email if teams_user.user_id != proposer.id
       end
       Mailer.suggested_topic_approved_message(
-          to: proposer.email,
-          cc: cc_mail_list,
-          subject: "Suggested topic '#{@suggestion.title}' has been approved",
-          body: {
-              approved_topic_name: @suggestion.title,
-              proposer: proposer.name
-          }
+        to: proposer.email,
+        cc: cc_mail_list,
+        subject: "Suggested topic '#{@suggestion.title}' has been approved",
+        body: {
+          approved_topic_name: @suggestion.title,
+          proposer: proposer.name
+        }
       ).deliver_now!
     end
   end
@@ -174,6 +181,12 @@ class SuggestionController < ApplicationController
       flash[:error] = 'An error occurred when rejecting the suggestion.'
     end
     redirect_to action: 'show', id: @suggestion
+  end
+
+  def update_visibility
+    SuggestionComment.find(params[:cmnt_id]).update_attributes(visible_to_student: params[:visibility])
+    puts params[:cmnt_id], params[:visibility]
+    render json: {success: 'true'}
   end
 
   private

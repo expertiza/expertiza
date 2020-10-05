@@ -48,6 +48,9 @@ class StudentTeamsController < ApplicationController
       end
     end
 
+    #this line generates a list of users on the waiting list for the topic of a students team,
+    #this will only be set if: the student has signed up for topics, the student has a team, and the
+    #student's team has a topic.   
     @users_on_waiting_list = (SignUpTopic.find(@student.team.topic).users_on_waiting_list if @student.assignment.topics? && @student.team && @student.team.topic)
 
     @teammate_review_allowed = true if @student.assignment.find_current_stage == 'Finished' || @current_due_date && (@current_due_date.teammate_review_allowed_id == 3 || @current_due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)

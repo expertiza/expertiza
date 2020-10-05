@@ -7,6 +7,7 @@ describe GradesController do
   let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
   let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }
+  let(:teaching_assistant) { build(:teaching_assistant, id: 10) }
   let(:question) { build(:question) }
   let(:team) { build(:assignment_team, id: 1, assignment: assignment, users: [instructor]) }
   let(:student) { build(:student) }
@@ -98,6 +99,12 @@ describe GradesController do
       get :view_team, params
       expect(response).to render_template(:view_team)
     end
+  end
+
+  describe 'view ta page' do
+    it 'renders grades#view_team page' do
+      expect(response).not_to have_content "TA Grade-Comment:"
+    end   
   end
 
   describe '#edit' do

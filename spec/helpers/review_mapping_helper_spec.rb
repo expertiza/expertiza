@@ -182,19 +182,17 @@ describe ReviewMappingHelper, type: :helper do
       @review_response_map_list << @response_map_2.id
       @review_response_map_list << @response_map_3.id
 
-      @response_list = []
-      @feedback_response_map_list = []
-      @all_review_response_ids = []
-
       @response_1 = create(:response, response_map: @response_map_1, round: 1)
-      @response_list << @response_1
-      @feedback_response_map_list << FeedbackResponseMap.create(reviewed_object_id: @response_1.id, reviewer_id: @reviewer.id)
-      @all_review_response_ids << @response_1.id
-
       @response_2 = create(:response, response_map: @response_map_2, round: 2)
-      @response_list << @response_2
-      @feedback_response_map_list << FeedbackResponseMap.create(reviewed_object_id: @response_2.id, reviewer_id: @reviewer.id)
-      @all_review_response_ids << @response_2.id
+
+      @response_list = [@response_1, @response_2]
+
+      feedback_response_map_1 = FeedbackResponseMap.create(reviewed_object_id: @response_1.id, reviewer_id: @reviewer.id)
+      feedback_response_map_2 = FeedbackResponseMap.create(reviewed_object_id: @response_2.id, reviewer_id: @reviewer.id)
+
+      @feedback_response_map_list = [feedback_response_map_1, feedback_response_map_2]
+
+      @all_review_response_ids = [@response_1.id, @response_2.id]
     end
 
     it 'should return the number of responses given in round 1 reviews' do
@@ -216,7 +214,8 @@ describe ReviewMappingHelper, type: :helper do
     it 'should return the number of responses given in round 3 reviews' do
       @response_3 = create(:response, response_map: @response_map_3, round: 3)
       @response_list << @response_3
-      @feedback_response_map_list << FeedbackResponseMap.create(reviewed_object_id: @response_3.id, reviewer_id: @reviewer.id)
+      feedback_response_map_3 = FeedbackResponseMap.create(reviewed_object_id: @response_3.id, reviewer_id: @reviewer.id)
+      @feedback_response_map_list << feedback_response_map_3
       @all_review_response_ids << @response_3.id
 
       get_each_review_and_feedback_response_map(@reviewer)
@@ -227,11 +226,51 @@ describe ReviewMappingHelper, type: :helper do
     end
 
     it 'should return 0 responses for no round 3 reviews' do
+      # no feedback responses set before method call
       get_each_review_and_feedback_response_map(@reviewer)
 
       # rspan means the all peer reviews one student received, including unfinished one
       # retrieved from method call in review_mapping_helper.rb file
       expect(@rspan_round_three).to eq 0
+    end
+  end
+
+  # feedback_response_map_record is called within get_each_review_and_feedback_response_map
+  describe 'feedback_response_map_record' do
+    before(:each) do
+      @reviewer = create(:participant)
+
+      @response_map_1 = create(:review_response_map, reviewer: @reviewer)
+      @response_map_2 = create(:review_response_map, reviewer: @reviewer)
+      @response_map_3 = create(:review_response_map, reviewer: @reviewer)
+
+      @response_1 = create(:response, response_map: @response_map_1, round: 1)
+      @response_2 = create(:response, response_map: @response_map_2, round: 2)
+      @response_3 = create(:response, response_map: @response_map_3, round: 3)
+
+      FeedbackResponseMap.create(reviewed_object_id: @response_1.id, reviewer_id: @reviewer.id)
+      FeedbackResponseMap.create(reviewed_object_id: @response_2.id, reviewer_id: @reviewer.id)
+      FeedbackResponseMap.create(reviewed_object_id: @response_3.id, reviewer_id: @reviewer.id)
+
+      @review_response_map_ids = [@response_map_1.id, @response_map_2.id, @response_map_3.id]
+
+      @all_review_response_ids_round_one = [@response_1.id]
+      @all_review_response_ids_round_two = [@response_2.id]
+      @all_review_response_ids_round_three = [@response_3.id]
+
+      feedback_response_map_record(@reviewer)
+    end
+
+    it 'should return response_map id tied to the feedback provided in round 1' do
+      expect(@feedback_response_maps_round_one.first.reviewed_object_id).to eq(@response_1.id)
+    end
+
+    it 'should return response_map id tied to the feedback provided in round 2' do
+      expect(@feedback_response_maps_round_two.first.reviewed_object_id).to eq(@response_2.id)
+    end
+
+    it 'should return response_map id tied to the feedback provided in round 3' do
+      expect(@feedback_response_maps_round_three.first.reviewed_object_id).to eq(@response_3.id)
     end
   end
 

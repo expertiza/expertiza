@@ -16,7 +16,7 @@ describe 'add TA', js: true do
       wait_for_ajax
     end.to change { TaMapping.count }.by(1)
 
-    visit "/course/view_teaching_assistants?id=#{@course.id}&model=Course"
+    visit "/courses/view_teaching_assistants?id=#{@course.id}&model=Course"
 
     expect do
       first(:link, 'Delete').click

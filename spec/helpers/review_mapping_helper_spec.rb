@@ -3,8 +3,8 @@ require 'rails_helper'
 
 describe ReviewMappingHelper, type: :helper do
 
-  let(:response) {build(:response, map_id: 2, visibility: 'public')}
-  let(:review_response_map) {build(:review_response_map, id: 2)}
+  let(:response) { build(:response, map_id: 2, visibility: 'public') }
+  let(:review_response_map) { build(:review_response_map, id: 2) }
 
   describe '#visibility_public?' do
     it 'should return true if visibility is public or published' do
@@ -346,6 +346,43 @@ describe ReviewMappingHelper, type: :helper do
       color = []
       resp_color = check_submission_state(@response_map, assignment_created, assignment_due_dates, round, color)
       expect(resp_color).to eq(['purple'])
+    end
+  end
+
+  describe 'get_awarded_review_score' do
+    before(:each) do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+
+      @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
+
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 3)
+
+      student = create(:student)
+      @reviewee = create(:assignment_team, assignment: @assignment)
+      @reviewer = create(:participant, assignment: @assignment, user: student)
+
+      create(:team_user, user: student, team: @reviewee)
+
+      @review_scores = {@reviewer.id => {1 => {@reviewee.id => 10}, 2 => {@reviewee.id => 20}, 3 => {@reviewee.id => 30}}}
+
+      get_awarded_review_score(@reviewer.id, @reviewee.id)
+    end
+
+
+    it 'should return the review score given by a reviewer for round 1 for the defined team' do
+      expect(@score_awarded_round_1).to eq "10%"
+    end
+
+    it 'should return the review score given by a reviewer for round 2 for the defined team' do
+      expect(@score_awarded_round_2).to eq "20%"
+    end
+
+    it 'should return the review score given by a reviewer for round 1 for the defined team' do
+      expect(@score_awarded_round_3).to eq "30%"
     end
   end
 end

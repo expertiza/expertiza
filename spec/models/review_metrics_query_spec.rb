@@ -4,17 +4,17 @@ describe ReviewMetricsQuery do
   let!(:assignment) { create(:assignment, name: 'Assignment 101') }
   let!(:questionnaire) { create(:questionnaire) }
   let!(:answer) { create(:answer) }
-  let!(:tag_prompt_1) { create(:tag_prompt, prompt: "Mention Problems?") }
-  let!(:tag_prompt_2) { create(:tag_prompt, prompt: "Suggest Solutions?") }
-  let!(:tag_prompt_3) { create(:tag_prompt, prompt: "Mention Praise?") }
-  let!(:tag_prompt_4) { create(:tag_prompt, prompt: "Positive Tone?") }
-  let!(:tag_prompt_deployment_1) { create(:tag_prompt_deployment, assignment: assignment, questionnaire: questionnaire, tag_prompt: tag_prompt_1) }
-  let!(:tag_prompt_deployment_2) { create(:tag_prompt_deployment, assignment: assignment, questionnaire: questionnaire, tag_prompt: tag_prompt_2) }
-  let!(:tag_prompt_deployment_3) { create(:tag_prompt_deployment, assignment: assignment, questionnaire: questionnaire, tag_prompt: tag_prompt_3) }
-  let!(:tag_prompt_deployment_4) { create(:tag_prompt_deployment, assignment: assignment, questionnaire: questionnaire, tag_prompt: tag_prompt_4) }
-  let!(:answer_tag_1) { create(:answer_tag, tag_prompt_deployment: tag_prompt_deployment_1, value: 1, confidence_level: 0.2) }
-  let!(:answer_tag_2) { create(:answer_tag, tag_prompt_deployment: tag_prompt_deployment_2, value: 0, confidence_level: 0.9) }
-  let!(:answer_tag_4) { create(:answer_tag, tag_prompt_deployment: tag_prompt_deployment_4, value: 1, confidence_level: 0.8) }
+  let!(:tag_prompt_1) { TagPrompt.create(prompt: "Mention Problems?", desc: "Description", control_type: "Slider") }
+  let!(:tag_prompt_2) { TagPrompt.create(prompt: "Suggest Solutions?", desc: "Description", control_type: "Slider") }
+  let!(:tag_prompt_3) { TagPrompt.create(prompt: "Mention Praise?", desc: "Description", control_type: "Slider") }
+  let!(:tag_prompt_4) { TagPrompt.create(prompt: "Positive Tone?", desc: "Description", control_type: "Slider") }
+  let!(:tag_prompt_deployment_1) { TagPromptDeployment.create(assignment: assignment, questionnaire: questionnaire, tag_prompt: tag_prompt_1) }
+  let!(:tag_prompt_deployment_2) { TagPromptDeployment.create(assignment: assignment, questionnaire: questionnaire, tag_prompt: tag_prompt_2) }
+  let!(:tag_prompt_deployment_3) { TagPromptDeployment.create(assignment: assignment, questionnaire: questionnaire, tag_prompt: tag_prompt_3) }
+  let!(:tag_prompt_deployment_4) { TagPromptDeployment.create(assignment: assignment, questionnaire: questionnaire, tag_prompt: tag_prompt_4) }
+  let!(:answer_tag_1) { AnswerTag.create(answer: answer, tag_prompt_deployment: tag_prompt_deployment_1, value: 1, confidence_level: 0.2) }
+  let!(:answer_tag_2) { AnswerTag.create(answer: answer, tag_prompt_deployment: tag_prompt_deployment_2, value: 0, confidence_level: 0.9) }
+  let!(:answer_tag_4) { AnswerTag.create(answer: answer, tag_prompt_deployment: tag_prompt_deployment_4, value: 1, confidence_level: 0.8) }
 
   before(:each) do
     stub_const("ReviewMetricsQuery::TAG_CERTAINTY_THRESHOLD", 0.8)

@@ -3,10 +3,10 @@ class SuggestionController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'create', 'new', 'student_view', 'student_edit', 'update_suggestion', 'submit'
-      current_user_has_student_privileges?
-    else
-      current_user_has_ta_privileges?
+      when 'create', 'new', 'student_view', 'student_edit', 'update_suggestion', 'submit'
+        current_user_has_student_privileges?
+      else
+        current_user_has_ta_privileges?
     end
   end
 
@@ -37,6 +37,8 @@ class SuggestionController < ApplicationController
 
   def student_view
     @suggestion = Suggestion.find(params[:id])
+    @current_role_name = current_role_name
+    render :show
   end
 
   def student_edit
@@ -70,7 +72,7 @@ class SuggestionController < ApplicationController
                             session[:user].name
                           else
                             ""
-    end
+                          end
 
     if @suggestion.save
       flash[:success] = 'Thank you for your suggestion!' if @suggestion.unityID != ''
@@ -111,13 +113,13 @@ class SuggestionController < ApplicationController
         cc_mail_list << User.find(teams_user.user_id).email if teams_user.user_id != proposer.id
       end
       Mailer.suggested_topic_approved_message(
-        to: proposer.email,
-        cc: cc_mail_list,
-        subject: "Suggested topic '#{@suggestion.title}' has been approved",
-        body: {
-          approved_topic_name: @suggestion.title,
-          proposer: proposer.name
-        }
+          to: proposer.email,
+          cc: cc_mail_list,
+          subject: "Suggested topic '#{@suggestion.title}' has been approved",
+          body: {
+              approved_topic_name: @suggestion.title,
+              proposer: proposer.name
+          }
       ).deliver_now!
     end
   end

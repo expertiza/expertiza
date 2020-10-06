@@ -216,7 +216,7 @@ class User < ActiveRecord::Base
     if replacing_key
       participants = AssignmentParticipant.where(user_id: self.id)
       for participant in participants
-        AssignmentParticipant.grant_publishing_rights(new_key.to_pem, [participant]) if participant.permission_granted
+        AssignmentParticipant.assign_copyright(new_key.to_pem, [participant]) if participant.permission_granted
       end
     end
 

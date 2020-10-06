@@ -153,7 +153,7 @@ module ReviewMappingHelper
         end
       end
     end
-    @num_rounds = @reviewers.assginment.num_review_rounds 
+    @num_rounds = review_volumes.length
     @all_reviewers_avg_vol_per_round = []
     @all_reviewers_overall_avg_vol = @reviewers.inject(0) {|sum, r| sum += r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
     @num_rounds.each do |round|

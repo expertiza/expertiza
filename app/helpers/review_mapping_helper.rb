@@ -153,10 +153,10 @@ module ReviewMappingHelper
         end
       end
     end
-    @num_rounds = review_volumes.length
+    @num_rounds = @reviewers.Assignemnt.num_review_rounds
     @all_reviewers_avg_vol_per_round = []
     @all_reviewers_overall_avg_vol = @reviewers.inject(0) {|sum, r| sum += r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @num_rounds.each do |round|
+    @num_rounds.each_index do |round|
       @all_reviewers_avg_vol_per_round.push(@reviewers.inject(0) {|sum, r| sum += r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
     end 
     @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }

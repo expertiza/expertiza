@@ -56,10 +56,13 @@ describe Questionnaire do
     end
   end
 
-  it "allowing calls from copy_questionnaire_details" do
-    allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
-    allow(Question).to receive(:where).with(questionnaire_id: '1').and_return([Question])
-    question_advice = build(:question_advice)
-    allow(QuestionAdvice).to receive(:where).with(question_id: 1).and_return([question_advice])
+  describe '#assign_quiz' do
+    it 'creates a new QuizResponseMap record' do
+      allow(QuizQuestionnaire).to receive(:find_by).with(instructor_id: 1).and_return(double('QuizQuestionnaire', id: 1))
+      expect { participant.assign_quiz(participant, participant2) }.to change { QuizResponseMap.count }.from(0).to(1)
+      expect(QuizResponseMap.first.reviewee_id).to eq(1)
+      expect(QuizResponseMap.first.reviewer_id).to eq(2)
+    end
   end
+  
 end

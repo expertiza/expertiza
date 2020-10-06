@@ -19,14 +19,15 @@ describe AssignmentParticipant do
     end
   end
 
-  describe '#assign_quiz' do
-    it 'creates a new QuizResponseMap record' do
-      allow(QuizQuestionnaire).to receive(:find_by).with(instructor_id: 1).and_return(double('QuizQuestionnaire', id: 1))
-      expect { participant.assign_quiz(participant, participant2) }.to change { QuizResponseMap.count }.from(0).to(1)
-      expect(QuizResponseMap.first.reviewee_id).to eq(1)
-      expect(QuizResponseMap.first.reviewer_id).to eq(2)
-    end
-  end
+  # refactor into quiz_questionnaire_spec.rb ?
+  # describe '#assign_quiz' do
+  #   it 'creates a new QuizResponseMap record' do
+  #     allow(QuizQuestionnaire).to receive(:find_by).with(instructor_id: 1).and_return(double('QuizQuestionnaire', id: 1))
+  #     expect { participant.assign_quiz(participant, participant2) }.to change { QuizResponseMap.count }.from(0).to(1)
+  #     expect(QuizResponseMap.first.reviewee_id).to eq(1)
+  #     expect(QuizResponseMap.first.reviewer_id).to eq(2)
+  #   end
+  # end
 
   describe '#reviewers' do
     it 'returns all the participants in this assignment who have reviewed the team where this participant belongs' do
@@ -188,9 +189,9 @@ describe AssignmentParticipant do
     end
   end
 
-  describe '#copy' do
+  describe '#copy_participant' do
     it 'copies assignment participants to a certain course' do
-      expect { participant.copy(123) }.to change { CourseParticipant.count }.from(0).to(1)
+      expect { participant.copy_participant(123) }.to change { CourseParticipant.count }.from(0).to(1)
       expect(CourseParticipant.first.user_id).to eq(2)
       expect(CourseParticipant.first.parent_id).to eq(123)
     end
@@ -360,6 +361,8 @@ describe AssignmentParticipant do
       )
     end
   end
+
+
 
   describe '#set_handle' do
     let(:student) { build(:student, name: 'no one') }

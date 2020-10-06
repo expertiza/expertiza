@@ -149,7 +149,7 @@ module ReviewMappingHelper
         if i == 0 
           r.overall_avg_vol = review_volumes[0]
         else 
-          r.avg_vol_per_round[i - 1] = review_volumes[i - 1]
+          r.avg_vol_per_round.push(review_volumes[i])
         end
       end
     end
@@ -157,8 +157,8 @@ module ReviewMappingHelper
     @num_rounds = @assignment.num_review_rounds.to_f.to_i
     @all_reviewers_avg_vol_per_round = []
     @all_reviewers_overall_avg_vol = @reviewers.inject(0) {|sum, r| sum += r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
-    (0..(@num_rounds-1)).each do |round|
-      @all_reviewers_avg_vol_per_round[round] = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length)
+    @num_rounds.times do |round|
+      @all_reviewers_avg_vol_per_round.push(@reviewers.inject(0) {|sum, r| sum += r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
     end 
     @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end

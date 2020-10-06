@@ -149,7 +149,7 @@ module ReviewMappingHelper
         if i == 0 
           r.overall_avg_vol = review_volumes[0]
         else 
-          r.avg_vol_per_round.push(review_volumes[round_num])
+          r.avg_vol_per_round.push(review_volumes[i])
         end
       end
     end

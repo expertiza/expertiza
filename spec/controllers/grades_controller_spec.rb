@@ -7,6 +7,7 @@ describe GradesController do
   let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
   let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }
+  let(:teaching_assistant) { build(:teaching_assistant, id: 10) }
   let(:question) { build(:question) }
   let(:team) { build(:assignment_team, id: 1, assignment: assignment, users: [instructor]) }
   let(:student) { build(:student) }
@@ -98,6 +99,28 @@ describe GradesController do
       get :view_team, params
       expect(response).to render_template(:view_team)
     end
+  end
+
+  describe '#view_team' do
+   render_views
+    it 'renders grades#view_team page' do
+      #allow(TeamsUser).to receive(:where).with(any_args).and_return([double('TeamsUser', team_id: 1)])
+      #allow(Team).to receive(:find).with(1).and_return(team)
+      allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(assignment_questionnaire)
+      allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_questionnaire])
+      allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([review_response])
+      allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
+      #allow(Participant).to receive(:where).with(parent_id: 1).and_return([participant])
+      #allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+      allow(assignment).to receive(:late_policy_id).and_return(false)
+      allow(assignment).to receive(:calculate_penalty).and_return(false)
+      allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
+
+      allow(participant).to receive(:team).and_return(team)
+      params = {id: 1}
+      get :view_team, params
+      expect(response.body).not_to have_content "TA"
+    end   
   end
 
   describe '#edit' do

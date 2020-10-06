@@ -46,12 +46,16 @@ class ReputationWebServiceController < ApplicationController
   #   "order by RM.reviewee_id"
   #
   #  result = ActiveRecord::Base.connection.select_all(query)
-  def db_query(assignment_id, round_num, has_topic, another_assignment_id = 0)
-    raw_data_array = []
+  def get_review_responses_query(assignment_id, another_assignment_id = 0)
     assignment_ids = []
     assignment_ids << assignment_id
     assignment_ids << another_assignment_id unless another_assignment_id.zero?
-    ReviewResponseMap.where('reviewed_object_id in (?) and calibrate_to = ?', assignment_ids, false).each do |response_map|
+    ReviewResponseMap.where('reviewed_object_id in (?) and calibrate_to = ?', assignment_ids, false)
+  end
+
+  def calculate_peer_review_grades(has_topic, review_responses, round_num)
+    raw_data_array = []
+    review_responses.each do |response_map|
       reviewer = response_map.reviewer.user
       team = AssignmentTeam.find(response_map.reviewee_id)
       topic_condition = ((has_topic and SignedUpTeam.where(team_id: team.id).first.is_waitlisted == false) or !has_topic)
@@ -77,7 +81,7 @@ class ReputationWebServiceController < ApplicationController
   end
 
   # special db query, return quiz scores
-  def db_query_with_quiz_score(assignment_id, another_assignment_id = 0)
+  def calculate_quiz_score(assignment_id, another_assignment_id = 0)
     raw_data_array = []
     assignment_ids = []
     assignment_ids << assignment_id
@@ -85,9 +89,9 @@ class ReputationWebServiceController < ApplicationController
     teams = AssignmentTeam.where('parent_id in (?)', assignment_ids)
     team_ids = []
     teams.each {|team| team_ids << team.id }
-    quiz_questionnnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
-    quiz_questionnnaire_ids = []
-    quiz_questionnnaires.each {|questionnaire| quiz_questionnnaire_ids << questionnaire.id }
+    quiz_questionnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
+    quiz_questionnaire_ids = []
+    quiz_questionnaires.each {|questionnaire| quiz_questionnnaire_ids << questionnaire.id }
     QuizResponseMap.where('reviewed_object_id in (?)', quiz_questionnnaire_ids).each do |response_map|
       quiz_score = response_map.quiz_score
       participant = Participant.find(response_map.reviewer_id)
@@ -96,14 +100,15 @@ class ReputationWebServiceController < ApplicationController
     raw_data_array
   end
 
-  def json_generator(assignment_id, another_assignment_id = 0, round_num = 2, type = 'peer review grades')
+  def generate_json(assignment_id, another_assignment_id = 0, round_num = 2, type = 'peer review grades')
     assignment = Assignment.find_by(id: assignment_id)
     has_topic = !SignUpTopic.where(assignment_id: assignment_id).empty?
 
     if type == 'peer review grades'
-      @results = db_query(assignment.id, round_num, has_topic, another_assignment_id)
+      @responses = get_review_responses_query(assignment.id,  another_assignment_id)
+      @results = calculate_peer_review_grades(has_topic,@responses, round_num)
     elsif type == 'quiz scores'
-      @results = db_query_with_quiz_score(assignment.id, another_assignment_id)
+      @results = calculate_quiz_score(assignment.id, another_assignment_id)
     end
     request_body = {}
     @results.each_with_index do |record, _index|

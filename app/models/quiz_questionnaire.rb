@@ -33,4 +33,10 @@ class QuizQuestionnaire < Questionnaire
   def taken_by? participant
     !ResponseMap.where(reviewed_object_id: self.id, type: 'QuizResponseMap', reviewer_id: participant.id).empty?
   end
+
+  def assign_quiz(contributor, reviewer, _topic = nil)
+    quiz = QuizQuestionnaire.find_by(instructor_id: contributor.id)
+    QuizResponseMap.create(reviewed_object_id: quiz.try(:id), reviewee_id: contributor.id, reviewer_id: reviewer.id)
+  end
+
 end

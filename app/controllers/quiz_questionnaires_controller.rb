@@ -37,8 +37,6 @@ class QuizQuestionnairesController < QuestionnairesController
       @questionnaire = QuizQuestionnaire.new
       @questionnaire.private = params[:private]
       render 'questionnaires/new_quiz'
-      #@questionnaire.min_question_score = params[:questionnaire][:min_question_score] # 0
-      #@questionnaire.max_question_score = params[:questionnaire][:max_question_score] # 1
     else
       redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
     end
@@ -52,6 +50,7 @@ class QuizQuestionnairesController < QuestionnairesController
       participant_id = params[:pid] # creating a local variable to send as parameter to submitted content if it is a quiz questionnaire
       @questionnaire.min_question_score = params[:questionnaire][:min_question_score] # 0
       @questionnaire.max_question_score = params[:questionnaire][:max_question_score] # 1
+      
       author_team = AssignmentTeam.team(Participant.find(participant_id))
 
       @questionnaire.instructor_id = author_team.id # for a team assignment, set the instructor id to the team_id
@@ -75,7 +74,7 @@ class QuizQuestionnairesController < QuestionnairesController
     if !@questionnaire.taken_by_anyone? # quiz can be edited only if its not taken by anyone
       render :'questionnaires/edit'
     else
-      flash[:error] = "Your quiz has been taken by some other students, you cannot edit it anymore."
+      flash[:error] = "Your quiz has been taken by one or more students; you cannot edit it anymore."
       redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
     end
   end

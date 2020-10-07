@@ -250,7 +250,7 @@ describe AssignmentParticipant do
     it 'grant publishing rights to one or more assignments using the supplied private key' do
       # create new RSA key-pair 
       key = OpenSSL::PKey::RSA.new 2048
-      participant.public_key = key.public_key.to_pem
+      participant.user.public_key = key.public_key.to_pem
 
       participant.assign_copyright(key.private_key)
       expect(participant.permission_granted).to eq(true) 

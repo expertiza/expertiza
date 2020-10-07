@@ -42,7 +42,7 @@ class StudentTeamsController < ApplicationController
     @received_invs = Invitation.where to_id: student.user.id, assignment_id: student.assignment.id, reply_status: 'W'
 
 
-    @current_due_date = DueDate.current_due_date(@student)
+    @current_due_date = DueDate.current_due_date(@student.assignment.due_dates)
 
     #this line generates a list of users on the waiting list for the topic of a student's team,
     #this will only be set if: the student has signed up for topics, the student has a team, and the

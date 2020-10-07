@@ -92,10 +92,7 @@ class AssignmentParticipant < Participant
     end
   end
 
-  # E1973, dummy method to match the functionality of AssignmentTeam
-  def set_current_user(current_user)
-  end
-
+  # for each assignment review all scores and determine a max, min and average value
   def merge_scores(scores)
     review_sym = "review".to_sym
     scores[review_sym] = {}
@@ -104,17 +101,21 @@ class AssignmentParticipant < Participant
     total_score = 0
     (1..self.assignment.num_review_rounds).each do |i|
       round_sym = ("review" + i.to_s).to_sym
+      # check if that assignment round is empty 
       next if scores[round_sym].nil? || scores[round_sym][:assessments].nil? || scores[round_sym][:assessments].empty?
       length_of_assessments = scores[round_sym][:assessments].length.to_f
       scores[review_sym][:assessments] += scores[round_sym][:assessments]
+      # update the max value if that rounds max exists and is higher than the current max
       if !scores[round_sym][:scores][:max].nil? && scores[review_sym][:scores][:max] < scores[round_sym][:scores][:max]
         scores[review_sym][:scores][:max] = scores[round_sym][:scores][:max]
       end
+      # update the min value if that rounds min exists and is lower than the current min
       if !scores[round_sym][:scores][:min].nil? && scores[review_sym][:scores][:min] > scores[round_sym][:scores][:min]
         scores[review_sym][:scores][:min] = scores[round_sym][:scores][:min]
       end
       total_score += scores[round_sym][:scores][:avg] * length_of_assessments unless scores[round_sym][:scores][:avg].nil?
     end
+    # if the scores max and min weren't updated set them to zero.
     if scores[review_sym][:scores][:max] == -999_999_999 && scores[review_sym][:scores][:min] == 999_999_999
       scores[review_sym][:scores][:max] = 0
       scores[review_sym][:scores][:min] = 0

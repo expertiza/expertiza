@@ -163,15 +163,15 @@ module ReviewMappingHelper
     @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 
-  # # displays the average scores in round 1, 2 and 3
-  # def display_volume_metric(overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3)
-  #   metric = "Avg. Volume: #{overall_avg_vol} <br/> ("
-  #   metric += "1st: " + avg_vol_in_round_1.to_s if avg_vol_in_round_1 > 0
-  #   metric += ", 2nd: " + avg_vol_in_round_2.to_s if avg_vol_in_round_2 > 0
-  #   metric += ", 3rd: " + avg_vol_in_round_3.to_s if avg_vol_in_round_3 > 0
-  #   metric += ")"
-  #   metric.html_safe
-  # end
+  # displays the average scores in round 1, 2 and 3
+  def display_volume_metric(overall_avg_vol, all_reviewers_avg_vol_per_round)
+    metric = "Avg. Volume: #{overall_avg_vol} <br/> ("
+    metric += "1st: " + avg_vol_in_round_1.to_s if avg_vol_in_round[0] > 0
+    metric += ", 2nd: " + avg_vol_in_round_2.to_s if avg_vol_in_round[1] > 0
+    metric += ", 3rd: " + avg_vol_in_round_3.to_s if avg_vol_in_round[2] > 0
+    metric += ")"
+    metric.html_safe
+  end
 
   # moves data of reviews in each round from a current round
   def initialize_chart_elements(reviewer)

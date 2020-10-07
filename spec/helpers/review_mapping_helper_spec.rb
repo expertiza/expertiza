@@ -504,5 +504,91 @@ describe ReviewMappingHelper, type: :helper do
 
   end
 
+  #rspec test for get_review_volume method
+
+  describe 'get_review_volume' do
+
+    before(:each) do
+
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+  
+      @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 3)
+  
+      student = create(:student)
+      @reviewee = create(:assignment_team, assignment: @assignment)
+      @reviewer = create(:participant, assignment: @assignment, user: student)
+      
+      # each round in avg_and_ranges must have a symbol and a string for the metric as indicated by corresponding source code
+
+      @avg_and_ranges = {
+      		@reviewee.id => 
+		{
+			1 => {
+			   :min => 2,
+			   'min' => 2,
+			   :max => 4,
+			   'max' => 4,
+			   :avg => 3,
+			   'avg' => 3
+			},
+			2 => {
+			   'min' => 5,	
+                           :min => 5,
+			   'max' => 7,
+                           :max => 7,
+			   'avg' => 6,
+                           :avg => 6
+                        },
+			3 => {
+			   'min' => 8,	
+                           :min => 8,
+			   'max' => 10,
+                           :max => 10,
+			   'avg' => 9,
+                           :avg => 9
+                        }
+		}
+      }
+
+      create(:team_user, user: student, team: @reviewee)
+      
+    end
+  
+    ## check for metrics in round 1 for given team_id
+    it 'should return minimum maximum and average score for round 1' do
+      @round = 1
+      get_review_volume(@round, @reviewee.id)
+      expect(@min).to eq '2%'
+      expect(@max).to eq '4%'
+      expect(@avg).to eq '3%'
+    end
+
+
+    ## check for metrics in round 2 for given team_id
+    it 'should return the minimum, maximum and average score for round 2' do
+      @round = 2
+      get_review_volume(@round, @reviewee.id)
+      expect(@min).to eq '5%'
+      expect(@max).to eq '7%'
+      expect(@avg).to eq '6%'
+    end
+	
+    ## check for metrics in round 3 for given team_id
+    it 'should return the minimum, maximum and average score for round 3' do
+      @round = 3
+      get_review_volume(@round, @reviewee.id)
+      expect(@min).to eq '8%'
+      expect(@max).to eq '10%'
+      expect(@avg).to eq '9%'
+    end
+
+  
+  end
+
 
 end

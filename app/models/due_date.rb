@@ -18,6 +18,15 @@ class DueDate < ActiveRecord::Base
     return nil 
   end
 
+  def self.teammate_review_allowed(student)
+    # time when teammate review is allowed
+    due_date = current_due_date(student)
+    student.assignment.find_current_stage == 'Finished' ||
+    due_date &&
+    (due_date.teammate_review_allowed_id == 3 ||
+    due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
+  end
+
   def set_flag
     self.flag = true
     self.save

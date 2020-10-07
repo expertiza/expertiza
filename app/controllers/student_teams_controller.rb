@@ -38,6 +38,7 @@ class StudentTeamsController < ApplicationController
   def view
     # View will check if send_invs and recieved_invs are set before showing
     # only the owner should be able to see those.
+    return unless current_user_id? student.user_id
 
     @send_invs = Invitation.where from_id: student.user.id, assignment_id: student.assignment.id
     @received_invs = Invitation.where to_id: student.user.id, assignment_id: student.assignment.id, reply_status: 'W'
@@ -50,7 +51,7 @@ class StudentTeamsController < ApplicationController
     #student's team has a topic.   
     @users_on_waiting_list = (SignUpTopic.find(@student.team.topic).users_on_waiting_list if @student.assignment.topics? && @student.team && @student.team.topic)
 
-    @teammate_review_allowed = true if @student.assignment.find_current_stage == 'Finished' || @current_due_date && (@current_due_date.teammate_review_allowed_id == 3 || @current_due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
+    @teammate_review_allowed = DueDate.teammate_review_allowed(@student)
   end
 
   def create

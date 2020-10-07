@@ -122,6 +122,7 @@ class AssignmentParticipant < Participant
     scores[review_sym][:scores][:avg] = total_score / scores[review_sym][:assessments].length.to_f
   end
 
+  # update the total_score and max_pts_available for micropayment assignments
   def topic_total_scores(scores)
     topic = SignUpTopic.find_by(assignment_id: self.assignment.id)
     return if topic.nil?

@@ -23,9 +23,9 @@ class StudentTeamsController < ApplicationController
     return false unless current_user_has_student_privileges?
     case action_name
     when 'view'
-      #current_user_id? student.user_id
-      ['Student'].include? current_role_name and
-      are_needed_authorizations_present?(params[:id], "reader", "reviewer", "submitter")
+      current_user_id? student.user_id
+      #['Student'].include? current_role_name and
+      #are_needed_authorizations_present?(params[:id], "reader", "reviewer", "submitter")
     when 'create'
       current_user_has_id? student.user_id
     when 'edit', 'update'
@@ -43,7 +43,7 @@ class StudentTeamsController < ApplicationController
     @received_invs = Invitation.where to_id: student.user.id, assignment_id: student.assignment.id, reply_status: 'W'
 
 
-    @current_due_date = nil #DueDate.current_due_date(@student.assignment.due_dates)
+    @current_due_date = DueDate.current_due_date(@student.assignment.due_dates)
 
     #this line generates a list of users on the waiting list for the topic of a student's team,
     #this will only be set if: the student has signed up for topics, the student has a team, and the

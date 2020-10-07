@@ -6,9 +6,9 @@ class DueDate < ActiveRecord::Base
     DeadlineRight::DEFAULT_PERMISSION[deadline_type][permission_type]
   end
 
-  def current_due_date(student)
-    #Get the current due date
-    student.assignment.due_dates.each do |due_date|
+  def current_due_date(due_dates)
+    #Get the current due date from list of due dates
+    due_dates.each do |due_date|
       if due_date.due_at > Time.now
         current_due_date = due_date
         return current_due_date

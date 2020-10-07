@@ -183,19 +183,19 @@ module ReviewMappingHelper
       round += 1
       labels.push '1st'
       reviewer_data.push reviewer.avg_vol_per_round[0]
-      all_reviewers_data.push @all_reviewers_avg_vol_in_round[0]
+      all_reviewers_data.push @all_reviewers_avg_vol_per_round[0]
     end
     if @all_reviewers_avg_vol_per_round[1] > 0
       round += 1
       labels.push '2nd'
       reviewer_data.push reviewer.avg_vol_per_round[1]
-      all_reviewers_data.push @all_reviewers_avg_vol_in_round[1]
+      all_reviewers_data.push @all_reviewers_avg_vol_per_round[1]
     end
     if @all_reviewers_avg_vol_per_round[2] > 0
       round += 1
       labels.push '3rd'
       reviewer_data.push reviewer.avg_vol_per_round[2]
-      all_reviewers_data.push @all_reviewers_avg_vol_in_round[2]
+      all_reviewers_data.push @all_reviewers_avg_vol_per_round[2]
     end
     labels.push 'Total'
     reviewer_data.push reviewer.overall_avg_vol

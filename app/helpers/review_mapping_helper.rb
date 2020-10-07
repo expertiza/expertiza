@@ -179,12 +179,12 @@ module ReviewMappingHelper
     reviewer_data = []
     all_reviewers_data = []
 
-    @num_rounds.times do |round|
-      if @all_reviewers_avg_vol_per_round[round] > 0
+    @num_rounds.times do |rnd|
+      if @all_reviewers_avg_vol_per_round[rnd] > 0
         round += 1
-        labels.push (round + 1)
-        reviewer_data.push reviewer.avg_vol_per_round[round]
-        all_reviewers_data.push @all_reviewers_avg_vol_per_round[round]
+        labels.push ('Round' + round)
+        reviewer_data.push reviewer.avg_vol_per_round[rnd]
+        all_reviewers_data.push @all_reviewers_avg_vol_per_round[rnd]
       end
     end 
 

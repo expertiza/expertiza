@@ -20,7 +20,7 @@ class DueDate < ActiveRecord::Base
 
   def self.teammate_review_allowed(student)
     # time when teammate review is allowed
-    due_date = current_due_date(student)
+    due_date = current_due_date(student.assignment.due_dates)
     student.assignment.find_current_stage == 'Finished' ||
     due_date &&
     (due_date.teammate_review_allowed_id == 3 ||

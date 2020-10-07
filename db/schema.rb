@@ -111,8 +111,8 @@ ActiveRecord::Schema.define(version: 20200812211018) do
     t.integer  "simicheck_threshold",                                limit: 4,     default: 100
     t.boolean  "is_answer_tagging_allowed"
     t.boolean  "has_badge"
-    t.integer  "sample_assignment_id",                               limit: 4
     t.boolean  "allow_selecting_additional_reviews_after_1st_round"
+    t.integer  "sample_assignment_id",                               limit: 4
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -441,7 +441,7 @@ ActiveRecord::Schema.define(version: 20200812211018) do
     t.integer "questionnaire_id", limit: 4
     t.decimal "seq",                            precision: 6, scale: 2
     t.string  "type",             limit: 255
-    t.string  "size",             limit: 255
+    t.string  "size",             limit: 255,                           default: ""
     t.string  "alternatives",     limit: 255
     t.boolean "break_before",                                           default: true
     t.string  "max_label",        limit: 255,                           default: ""
@@ -720,7 +720,6 @@ ActiveRecord::Schema.define(version: 20200812211018) do
   end
 
   add_index "teams_users", ["team_id"], name: "fk_users_teams", using: :btree
-  add_index "teams_users", ["user_id", "team_id"], name: "index_teams_users_on_user_id_and_team_id", unique: true, using: :btree
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 
   create_table "track_notifications", force: :cascade do |t|

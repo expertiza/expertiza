@@ -155,31 +155,6 @@ class AssignmentParticipant < Participant
     ReviewResponseMap.get_assessments_for(self.team)
   end
 
-  def reviews_by_reviewer(reviewer)
-    ReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)
-  end
-
-  # returns the reviewer of the assignment. Checks the reviewer_is_team flag to
-  # determine whether this AssignmentParticipant or their team is the reviewer
-  def get_reviewer
-    if self.assignment.reviewer_is_team
-      return self.team
-    else
-      return self
-    end
-  end
-
-  # polymorphic twin of method in AssignmentTeam
-  # this method is called to check if the current user is this one
-  def get_logged_in_reviewer_id(current_user_id)
-    return self.id
-  end
-
-  # checks if this assignment participant is the currently logged on user, given their user id
-  def current_user_is_reviewer?(current_user_id)
-    return user_id == current_user_id
-  end
-
   def quizzes_taken
     QuizResponseMap.get_assessments_for(self)
   end

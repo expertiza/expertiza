@@ -143,6 +143,7 @@ module ReviewMappingHelper
   # sorts the reviewers by the average volume of reviews in each round, in descending order
   def sort_reviewer_by_review_volume_desc 
     @reviewers.each do |r|
+      # get the volume of review comments
       review_volumes = Response.get_volume_of_review_comments(@assignment.id, r.id)
       r.avg_vol_per_round = []     
       review_volumes.each_index do |i|
@@ -153,6 +154,7 @@ module ReviewMappingHelper
         end
       end
     end
+    # get the number of review rounds for the assignment 
     @num_rounds = @assignment.num_review_rounds.to_f.to_i
     @all_reviewers_avg_vol_per_round = []
     @all_reviewers_overall_avg_vol = @reviewers.inject(0) {|sum, r| sum += r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
@@ -179,6 +181,7 @@ module ReviewMappingHelper
     reviewer_data = []
     all_reviewers_data = []
 
+    #display avg volume for all reviewers per round
     @num_rounds.times do |rnd|
       if @all_reviewers_avg_vol_per_round[rnd] > 0
         round += 1
@@ -188,18 +191,6 @@ module ReviewMappingHelper
       end
     end 
 
-    # if @all_reviewers_avg_vol_per_round[1] > 0
-    #   round += 1
-    #   labels.push '2nd'
-    #   reviewer_data.push reviewer.avg_vol_per_round[1]
-    #   all_reviewers_data.push @all_reviewers_avg_vol_per_round[1]
-    # end
-    # if @all_reviewers_avg_vol_per_round[2] > 0
-    #   round += 1
-    #   labels.push '3rd'
-    #   reviewer_data.push reviewer.avg_vol_per_round[2]
-    #   all_reviewers_data.push @all_reviewers_avg_vol_per_round[2]
-    # end
     labels.push 'Total'
     reviewer_data.push reviewer.overall_avg_vol
     all_reviewers_data.push @all_reviewers_overall_avg_vol

@@ -23,8 +23,9 @@ class StudentTeamsController < ApplicationController
     return false unless current_user_has_student_privileges?
     case action_name
     when 'view'
-      current_user_id? student.user_id and
-      are_needed_authorizations_present?(params[:student_id], "reader", "reviewer", "submitter")
+      #current_user_id? student.user_id and
+      ['Student'].include? current_role_name and
+      are_needed_authorizations_present?(params[:id], "reader", "reviewer", "submitter")
     when 'create'
       current_user_has_id? student.user_id
     when 'edit', 'update'

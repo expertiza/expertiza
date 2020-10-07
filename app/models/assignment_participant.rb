@@ -129,6 +129,8 @@ class AssignmentParticipant < Participant
     scores[:max_pts_available] = topic.micropayment
   end
 
+  # update :total_score key in scores hash to user's current grade if they have one
+  # update :total_score key in scores hash to 100 if the current value is greater than 100
   def calculate_scores(scores)
     if self.grade
       scores[:total_score] = self.grade

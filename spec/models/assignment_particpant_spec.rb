@@ -252,7 +252,7 @@ describe AssignmentParticipant do
       key = OpenSSL::PKey::RSA.new 2048
       participant.user.public_key = key.public_key.to_pem
 
-      participant.assign_copyright(key.private_key)
+      participant.assign_copyright(key)
       expect(participant.permission_granted).to eq(true) 
     end
   end

@@ -158,6 +158,7 @@ module ReviewMappingHelper
     @all_reviewers_overall_avg_vol = @reviewers.inject(0) {|sum, r| sum += r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
     @num_rounds.times do |round|
       @all_reviewers_avg_vol_per_round.push(@reviewers.inject(0) {|sum, r| sum += r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
+      puts @all_reviewers_avg_vol_per_round
     end 
     @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
@@ -178,6 +179,7 @@ module ReviewMappingHelper
     labels = []
     reviewer_data = []
     all_reviewers_data = []
+
     if @all_reviewers_avg_vol_in_round[0] > 0
       round += 1
       labels.push '1st'

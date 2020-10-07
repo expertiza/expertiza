@@ -164,14 +164,14 @@ module ReviewMappingHelper
   end
 
   # displays the average scores in round 1, 2 and 3
-  def display_volume_metric(overall_avg_vol, all_reviewers_avg_vol_per_round)
-    metric = "Avg. Volume: #{overall_avg_vol} <br/> ("
-    metric += "1st: " + avg_vol_in_round_1.to_s if avg_vol_in_round[0] > 0
-    metric += ", 2nd: " + avg_vol_in_round_2.to_s if avg_vol_in_round[1] > 0
-    metric += ", 3rd: " + avg_vol_in_round_3.to_s if avg_vol_in_round[2] > 0
-    metric += ")"
-    metric.html_safe
-  end
+  # def display_volume_metric(overall_avg_vol, all_reviewers_avg_vol_per_round)
+  #   metric = "Avg. Volume: #{overall_avg_vol} <br/> ("
+  #   metric += "1st: " + avg_vol_in_round_1.to_s if avg_vol_in_round[0] > 0
+  #   metric += ", 2nd: " + avg_vol_in_round_2.to_s if avg_vol_in_round[1] > 0
+  #   metric += ", 3rd: " + avg_vol_in_round_3.to_s if avg_vol_in_round[2] > 0
+  #   metric += ")"
+  #   metric.html_safe
+  # end
 
   # moves data of reviews in each round from a current round
   def initialize_chart_elements(reviewer)
@@ -179,29 +179,30 @@ module ReviewMappingHelper
     labels = []
     reviewer_data = []
     all_reviewers_data = []
-
-    if @all_reviewers_avg_vol_in_round[0] > 0
-      round += 1
-      labels.push '1st'
-      reviewer_data.push reviewer.avg_vol_in_round[0]
-      all_reviewers_data.push @all_reviewers_avg_vol_in_round[0]
+    if !@all_reviewers_avg_vol_per_round.nil?
+      if @all_reviewers_avg_vol_in_round[0] > 0
+        round += 1
+        labels.push '1st'
+        reviewer_data.push reviewer.avg_vol_in_round[0]
+        all_reviewers_data.push @all_reviewers_avg_vol_in_round[0]
+      end
+      if @all_reviewers_avg_vol_in_round[1] > 0
+        round += 1
+        labels.push '2nd'
+        reviewer_data.push reviewer.avg_vol_in_round[1]
+        all_reviewers_data.push @all_reviewers_avg_vol_in_round[1]
+      end
+      if @all_reviewers_avg_vol_in_round[2] > 0
+        round += 1
+        labels.push '3rd'
+        reviewer_data.push reviewer.avg_vol_in_round[2]
+        all_reviewers_data.push @all_reviewers_avg_vol_in_round[2]
+      end
+      labels.push 'Total'
+      reviewer_data.push reviewer.overall_avg_vol
+      all_reviewers_data.push @all_reviewers_overall_avg_vol
+      [labels, reviewer_data, all_reviewers_data]
     end
-    if @all_reviewers_avg_vol_in_round[1] > 0
-      round += 1
-      labels.push '2nd'
-      reviewer_data.push reviewer.avg_vol_in_round[1]
-      all_reviewers_data.push @all_reviewers_avg_vol_in_round[1]
-    end
-    if @all_reviewers_avg_vol_in_round[2] > 0
-      round += 1
-      labels.push '3rd'
-      reviewer_data.push reviewer.avg_vol_in_round[2]
-      all_reviewers_data.push @all_reviewers_avg_vol_in_round[2]
-    end
-    labels.push 'Total'
-    reviewer_data.push reviewer.overall_avg_vol
-    all_reviewers_data.push @all_reviewers_overall_avg_vol
-    [labels, reviewer_data, all_reviewers_data]
   end
 
   # The data of all the reviews is displayed in the form of a bar chart

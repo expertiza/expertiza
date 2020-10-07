@@ -154,10 +154,10 @@ module ReviewMappingHelper
       end
     end
     @num_rounds = @assignment.num_review_rounds.to_f.to_i
-    @all_reviewers_avg_vol_in_round = []
+    @all_reviewers_avg_vol_per_round = []
     @all_reviewers_overall_avg_vol = @reviewers.inject(0) {|sum, r| sum += r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
     @num_rounds.times do |round|
-      @all_reviewers_avg_vol_in_round.push(@reviewers.inject(0) {|sum, r| sum += r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
+      @all_reviewers_avg_vol_per_round.push(@reviewers.inject(0) {|sum, r| sum += r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
     end 
     @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
@@ -179,22 +179,22 @@ module ReviewMappingHelper
     reviewer_data = []
     all_reviewers_data = []
 
-    if @all_reviewers_avg_vol_in_round[0] > 0
+    if @all_reviewers_avg_vol_per_round[0] > 0
       round += 1
       labels.push '1st'
-      reviewer_data.push reviewer.avg_vol_in_round[0]
+      reviewer_data.push reviewer.avg_vol_per_round[0]
       all_reviewers_data.push @all_reviewers_avg_vol_in_round[0]
     end
-    if @all_reviewers_avg_vol_in_round[1] > 0
+    if @all_reviewers_avg_vol_per_round[1] > 0
       round += 1
       labels.push '2nd'
-      reviewer_data.push reviewer.avg_vol_in_round[1]
+      reviewer_data.push reviewer.avg_vol_per_round[1]
       all_reviewers_data.push @all_reviewers_avg_vol_in_round[1]
     end
-    if @all_reviewers_avg_vol_in_round[2] > 0
+    if @all_reviewers_avg_vol_per_round[2] > 0
       round += 1
       labels.push '3rd'
-      reviewer_data.push reviewer.avg_vol_in_round[2]
+      reviewer_data.push reviewer.avg_vol_per_round[2]
       all_reviewers_data.push @all_reviewers_avg_vol_in_round[2]
     end
     labels.push 'Total'

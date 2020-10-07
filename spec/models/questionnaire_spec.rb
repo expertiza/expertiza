@@ -64,5 +64,5 @@ describe Questionnaire do
       expect(QuizResponseMap.first.reviewer_id).to eq(2)
     end
   end
-  
+
 end

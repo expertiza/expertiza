@@ -53,7 +53,9 @@ class PublishingController < ApplicationController
     private_key = params[:private_key]
 
     begin
-      AssignmentParticipant.assign_copyright(private_key, participants)
+      participants.each do |participant|
+        participant.assign_copyright(private_key)
+      end
       redirect_to action: 'view'
     rescue StandardError
       flash[:notice] = 'The private key you inputted was invalid.'

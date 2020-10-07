@@ -76,6 +76,7 @@ class AssignmentParticipant < Participant
     calculate_scores(scores)
   end
 
+  # determine the possible assigment score for each assignment questionnaire
   def compute_assignment_score(questions, scores)
     self.assignment.questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.find_by(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id).used_in_round
@@ -88,6 +89,7 @@ class AssignmentParticipant < Participant
 
       scores[questionnaire_symbol] = {}
 
+      # if the round exists get the assessments for the round
       scores[questionnaire_symbol][:assessments] = if round.nil?
                                                      questionnaire.get_assessments_for(self)
                                                    else

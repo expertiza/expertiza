@@ -23,8 +23,9 @@ class StudentTeamsController < ApplicationController
     return false unless current_user_has_student_privileges?
     case action_name
     when 'view'
-      current_user_id? student.user_id and
-      are_needed_authorizations_present?(params[:student_id], "reader", "reviewer", "submitter")
+      #current_user_id? student.user_id and
+      ['Student'].include? current_role_name and
+      are_needed_authorizations_present?(params[:id], "reader", "reviewer", "submitter")
     when 'create'
       current_user_has_id? student.user_id
     when 'edit', 'update'
@@ -124,22 +125,7 @@ class StudentTeamsController < ApplicationController
         old_team.destroy
         # if assignment has signup sheet then the topic selected by the team has to go back to the pool
         # or to the first team in the waitlist
-        signups = SignedUpTeam.where team_id: params[:team_id]
-        signups.each do |signup|
-          # get the topic_id
-          signup_topic_id = signup.topic_id
-          # destroy the signup
-          signup.destroy
-          # get the number of non-waitlisted users signed up for this topic
-          non_waitlisted_users = SignedUpTeam.where topic_id: signup_topic_id, is_waitlisted: false
-          # get the number of max-choosers for the topic
-          max_choosers = SignUpTopic.find(signup_topic_id).max_choosers
-          # check if this number is less than the max choosers
-          next unless non_waitlisted_users.length < max_choosers
-          first_waitlisted_team = SignedUpTeam.find_by topic_id: signup_topic_id, is_waitlisted: true
-          # moving the waitlisted team into the confirmed signed up teams list and delete all waitlists for this team
-          SignUpTopic.assign_to_first_waiting_team(first_waitlisted_team) if first_waitlisted_team
-        end
+        Waitlist.remove_from_waitlists(params[:team_id])
       end
     end
     # remove all the sent invitations

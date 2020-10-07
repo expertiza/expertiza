@@ -66,3 +66,10 @@ jQuery("input[id^='due_date_']").datetimepicker({
         { value: -480, label: 'Pacific' }
     ]
 });
+
+function selectAll(source) {
+    checkboxes = document.getElementsByName('Selected-Box');
+    for (var i = 0, n = checkboxes.length; i < n; i++) {
+        checkboxes[i].checked = source.checked;
+    }
+}

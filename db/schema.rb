@@ -11,7 +11,6 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
 ActiveRecord::Schema.define(version: 20200421235620) do
 
   create_table "account_requests", force: :cascade do |t|
@@ -126,9 +125,9 @@ ActiveRecord::Schema.define(version: 20200421235620) do
     t.boolean  "is_answer_tagging_allowed"
     t.boolean  "has_badge"
     t.boolean  "allow_selecting_additional_reviews_after_1st_round"
-    t.boolean  "reviewer_is_team"
     t.boolean  "vary_by_topic",                                                    default: false
-    t.boolean  "vary_by_round"
+    t.boolean  "vary_by_round",                                                    default: false
+    t.boolean  "reviewer_is_team"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree

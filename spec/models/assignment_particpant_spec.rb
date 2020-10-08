@@ -436,4 +436,18 @@ describe AssignmentParticipant do
       end
     end
   end
+
+
+  describe '#update_max_or_min' do
+    context 'test updating the max' do
+      it 'should not update the max if :max is nil' do
+        scores = {:round1 => {:scores => { :max => nil } }, :review => {:scores => { :max => 90 }}}
+        #Scores[:review][:scores][:max] should not change to nil (currently 90)
+        participant.update_max_or_min(scores, :round1, :review, :max)
+        expect(scores[:review][:scores][:max]).to eq(90) 
+      end
+      
+    end
+
+  end
 end

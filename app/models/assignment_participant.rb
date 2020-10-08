@@ -133,6 +133,7 @@ class AssignmentParticipant < Participant
     op = :> if symbol == :min
 
     if !scores[round_sym][:scores][symbol].nil? 
+      # if scores[review_sym][:scores][symbol] ( < or > ) scores[round_sym][:scores][symbol]
       if scores[review_sym][:scores][symbol].send(op, scores[round_sym][:scores][symbol])
         scores[review_sym][:scores][symbol] = scores[round_sym][:scores][symbol]
       end

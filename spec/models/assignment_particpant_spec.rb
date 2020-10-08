@@ -148,6 +148,7 @@ describe AssignmentParticipant do
     end
   end
 
+<<<<<<< HEAD
   describe '#calculate_scores' do
     context 'when the participant has the grade' do
       it 'his total scores equals his grade' do
@@ -170,6 +171,9 @@ describe AssignmentParticipant do
   end
 
   describe '#copy_participant' do
+=======
+  describe '#copy' do
+>>>>>>> remove calculate scores spec tests
     it 'copies assignment participants to a certain course' do
       expect { participant.copy_participant(123) }.to change { CourseParticipant.count }.from(0).to(1)
       expect(CourseParticipant.first.user_id).to eq(2)

@@ -82,7 +82,18 @@ class AssignmentParticipant < Participant
     scores[:total_score] = assignment.compute_total_score(scores)
     # scores[:total_score] += compute_quiz_scores(scores)
     # move lots of calculation from view(_participant.html.erb) to model
-    calculate_scores(scores)
+    #### REWRITE:
+    #calculate_scores(scores)
+
+    # update :total_score key in scores hash to user's current grade if they have one
+    # update :total_score key in scores hash to 100 if the current value is greater than 100
+    #### Calculate Final Score
+    if self.grade
+      scores[:total_score] = self.grade
+    else
+      scores[:total_score] = 100 if scores[:total_score] > 100
+    end
+    scores
   end
 
   # determine the possible assigment score for each assignment questionnaire
@@ -139,20 +150,6 @@ class AssignmentParticipant < Participant
       scores[review_sym][:scores][:min] = 0
     end
     scores[review_sym][:scores][:avg] = total_score / scores[review_sym][:assessments].length.to_f
-  end
-
-  # update the total_score and max_pts_available for micropayment assignments
-
-
-  # update :total_score key in scores hash to user's current grade if they have one
-  # update :total_score key in scores hash to 100 if the current value is greater than 100
-  def calculate_scores(scores)
-    if self.grade
-      scores[:total_score] = self.grade
-    else
-      scores[:total_score] = 100 if scores[:total_score] > 100
-      scores
-    end
   end
 
   # Copy this participant to a course

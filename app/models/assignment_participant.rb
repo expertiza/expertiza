@@ -56,24 +56,16 @@ class AssignmentParticipant < Participant
     # merge scores[review#] (for each round) to score[review]  -Yang
     merge_scores(scores) if self.assignment.vary_by_round
     # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
-    # PS: I don't like the fact that we are doing this here but it is difficult to make it work anywhere else
-    # REWRITE:
-    #topic_total_scores(scores) if self.assignment.microtask?
     if self.assignment.microtask?
       topic = SignUpTopic.find_by(assignment_id: self.assignment.id)
       return if topic.nil?
-      scores[:total_score] *= (topic.micropayment.to_f / 100.to_f)
+      scores[:total_score] *= (topic.micropayment.to_f / 100.to_f) 
       scores[:max_pts_available] = topic.micropayment
     end
-    
     scores[:total_score] = assignment.compute_total_score(scores)
-    # move lots of calculation from view(_participant.html.erb) to model
-    #### REWRITE:
-    #calculate_scores(scores)
 
     # update :total_score key in scores hash to user's current grade if they have one
     # update :total_score key in scores hash to 100 if the current value is greater than 100
-    #### Calculate Final Score
     if self.grade
       scores[:total_score] = self.grade
     else
@@ -121,13 +113,10 @@ class AssignmentParticipant < Participant
       length_of_assessments = scores[round_sym][:assessments].length.to_f
       scores[review_sym][:assessments] += scores[round_sym][:assessments]
       # update the max value if that rounds max exists and is higher than the current max
-      if !scores[round_sym][:scores][:max].nil? && scores[review_sym][:scores][:max] < scores[round_sym][:scores][:max]
-        scores[review_sym][:scores][:max] = scores[round_sym][:scores][:max]
-      end
+      update_score(scores, round_sym, review_sym, :max)
       # update the min value if that rounds min exists and is lower than the current min
-      if !scores[round_sym][:scores][:min].nil? && scores[review_sym][:scores][:min] > scores[round_sym][:scores][:min]
-        scores[review_sym][:scores][:min] = scores[round_sym][:scores][:min]
-      end
+      update_score(scores, round_sym, review_sym, :min)
+      # Compute average score for current round, and sets overall total score to be average_from_round * length of assignment (# of questions)
       total_score += scores[round_sym][:scores][:avg] * length_of_assessments unless scores[round_sym][:scores][:avg].nil?
     end
     # if the scores max and min weren't updated set them to zero.
@@ -135,7 +124,19 @@ class AssignmentParticipant < Participant
       scores[review_sym][:scores][:max] = 0
       scores[review_sym][:scores][:min] = 0
     end
+    # Compute the average score for a particular review (all rounds)
     scores[review_sym][:scores][:avg] = total_score / scores[review_sym][:assessments].length.to_f
+  end
+
+  def update_score(scores, round_sym, review_sym, symbol)
+    op = :< if symbol == :max
+    op = :> if symbol == :min
+
+    if !scores[round_sym][:scores][symbol].nil? 
+      if scores[review_sym][:scores][symbol].send(op, scores[round_sym][:scores][symbol])
+        scores[review_sym][:scores][symbol] = scores[round_sym][:scores][symbol]
+      end
+    end
   end
 
   # Copy this participant to a course

@@ -113,9 +113,9 @@ class AssignmentParticipant < Participant
       length_of_assessments = scores[round_sym][:assessments].length.to_f
       scores[review_sym][:assessments] += scores[round_sym][:assessments]
       # update the max value if that rounds max exists and is higher than the current max
-      update_score(scores, round_sym, review_sym, :max)
+      update_max_or_min(scores, round_sym, review_sym, :max)
       # update the min value if that rounds min exists and is lower than the current min
-      update_score(scores, round_sym, review_sym, :min)
+      update_max_or_min(scores, round_sym, review_sym, :min)
       # Compute average score for current round, and sets overall total score to be average_from_round * length of assignment (# of questions)
       total_score += scores[round_sym][:scores][:avg] * length_of_assessments unless scores[round_sym][:scores][:avg].nil?
     end
@@ -128,7 +128,7 @@ class AssignmentParticipant < Participant
     scores[review_sym][:scores][:avg] = total_score / scores[review_sym][:assessments].length.to_f
   end
 
-  def update_score(scores, round_sym, review_sym, symbol)
+  def update_max_or_min(scores, round_sym, review_sym, symbol)
     op = :< if symbol == :max
     op = :> if symbol == :min
 

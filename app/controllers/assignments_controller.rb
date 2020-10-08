@@ -98,6 +98,23 @@ class AssignmentsController < ApplicationController
     end
     retrieve_assignment_form
     handle_current_user_timezonepref_nil
+
+    #Check if assignment name or submission directory exists when updating
+    exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
+    dir_path = assignment_form_params[:assignment][:directory_path]
+    exist_directory = Assignment.find_by(directory_path: dir_path, course_id: @assignment_form.assignment.course_id)
+    if exist_assignment
+      flash[:error] = "Duplicate Assignment name or Submission Directory"
+      redirect_to edit_assignment_path @assignment_form.assignment.id
+      return
+    end
+    if exist_directory
+      flash[:error] = "Duplicate Assignment name or Submission Directory"
+      redirect_to edit_assignment_path @assignment_form.assignment.id
+      return
+    end
+
+    #if checks pass update accordingly
     update_feedback_assignment_form_attributes
     redirect_to edit_assignment_path @assignment_form.assignment.id
   end

@@ -446,6 +446,39 @@ describe AssignmentParticipant do
         participant.update_max_or_min(scores, :round1, :review, :max)
         expect(scores[:review][:scores][:max]).to eq(90) 
       end
+
+      it 'should update the review max score to the round max score if round was higher' do
+        scores = {:round1 => {:scores => { :max => 90 } }, :review => {:scores => { :max => 80 }}}
+        participant.update_max_or_min(scores, :round1, :review, :max)
+        expect(scores[:review][:scores][:max]).to eq(90) 
+      end
+
+      it 'review max score should be unchanged if round max score is less than review max score' do
+        scores = {:round1 => {:scores => { :max => 70 } }, :review => {:scores => { :max => 80 }}}
+        participant.update_max_or_min(scores, :round1, :review, :max)
+        expect(scores[:review][:scores][:max]).to eq(80) 
+      end
+      
+    end
+    context 'test updating the min' do
+      it 'should not update the min if :min is nil' do
+        scores = {:round1 => {:scores => { :min => nil } }, :review => {:scores => { :min => 90 }}}
+        #Scores[:review][:scores][:max] should not change to nil (currently 90)
+        participant.update_max_or_min(scores, :round1, :review, :min)
+        expect(scores[:review][:scores][:min]).to eq(90) 
+      end
+
+      it 'update the review min score to the round min score if round was less' do
+        scores = {:round1 => {:scores => { :min => 20 } }, :review => {:scores => { :min => 30 }}}
+        participant.update_max_or_min(scores, :round1, :review, :min)
+        expect(scores[:review][:scores][:min]).to eq(20) 
+      end
+
+      it 'review min score should be unchanged if round min score greater than the review min score' do
+        scores = {:round1 => {:scores => { :min => 60 } }, :review => {:scores => { :min => 20 }}}
+        participant.update_max_or_min(scores, :round1, :review, :min)
+        expect(scores[:review][:scores][:min]).to eq(20) 
+      end
       
     end
 

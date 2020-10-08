@@ -152,13 +152,13 @@ module ReviewMappingHelper
     # Setting values of instance variables
     ['max', 'min', 'avg'].each { |metric| instance_variable_set('@' + metric, '-----') }
     # Fetching value of @avg_and_ranges[team_id][round] 
-    x = @avg_and_ranges.dig(team_id, round)
+    x = @avg_and_ranges[team_id][round]
 
     if x && %i[max min avg].all? { |k| x.key? k }
       # Iterating though the list
       ['max', 'min', 'avg'].each do |metric|
         # setting values of variables based on certain conditions
-        average_metric = @avg_and_ranges.dig(team_id, round, metric)
+	average_metric = @avg_and_ranges[team_id][round][metric]
         metric_value = average_metric.nil? ? '-----' : average_metric.round(0).to_s + '%'
         instance_variable_set('@' + metric, metric_value)
       end

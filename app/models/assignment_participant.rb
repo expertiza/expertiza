@@ -51,11 +51,7 @@ class AssignmentParticipant < Participant
     # Retrieve assignment score ?
     compute_assignment_score(questions, scores)
     # Compute the Total Score (with question weights factored in)
-    ### REWRITE:
-    #scores[:total_score] = self.assignment.compute_total_score(scores) 
-    total = 0
-    self.assignment.questionnaires.each {|questionnaire| total += questionnaire.get_weighted_score(self.assignment, scores) }
-    scores[:total_score] = total
+    scores[:total_score] = self.assignment.compute_total_score(scores) 
 
     # merge scores[review#] (for each round) to score[review]  -Yang
     merge_scores(scores) if self.assignment.vary_by_round

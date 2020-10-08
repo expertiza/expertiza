@@ -25,7 +25,7 @@ describe GradesController do
     allow(Assignment).to receive(:find).with(1).and_return(assignment)
   end
 
-  xdescribe '#view' do
+  describe '#view' do
     before(:each) do
       allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
       allow(Participant).to receive(:where).with(parent_id: 1).and_return([participant])
@@ -57,7 +57,7 @@ describe GradesController do
     end
   end
 
-  xdescribe '#view_my_scores' do
+  describe '#view_my_scores' do
     before(:each) do
       allow(Participant).to receive(:find_by).with(id: '1').and_return(participant)
       allow(Participant).to receive(:find).with('1').and_return(participant)
@@ -120,13 +120,12 @@ describe GradesController do
         allow(TaMapping).to receive(:exists?).with(ta_id: 1, course_id: 1).and_return(true)
         stub_current_user(ta, ta.role.name, ta.role)
         get :view_team, params
-        expect(flash[:note]).to eq("User does not belong to this course") 
         expect(response.body).not_to have_content "TA"
       end
     end
   end
 
-  xdescribe '#edit' do
+  describe '#edit' do
     it 'renders grades#edit page' do
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
       assignment_questionnaire.used_in_round = nil
@@ -140,7 +139,7 @@ describe GradesController do
     end
   end
 
-  xdescribe '#instructor_review' do
+  describe '#instructor_review' do
     context 'when review exists' do
       it 'redirects to response#edit page' do
         allow(AssignmentParticipant).to receive(:find_or_create_by).with(user_id: 6, parent_id: 1).and_return(participant)
@@ -155,7 +154,7 @@ describe GradesController do
       end
     end
 
-    xcontext 'when review does not exist' do
+    context 'when review does not exist' do
       it 'redirects to response#new page' do
         allow(AssignmentParticipant).to receive(:find_or_create_by).with(user_id: 6, parent_id: 1).and_return(participant2)
         allow(participant2).to receive(:new_record?).and_return(false)
@@ -170,7 +169,7 @@ describe GradesController do
     end
   end
 
-  xdescribe '#update' do
+  describe '#update' do
     before(:each) do
       allow(participant).to receive(:update_attribute).with(any_args).and_return(participant)
     end
@@ -189,7 +188,7 @@ describe GradesController do
       end
     end
 
-    xcontext 'when total is equal to participant\'s grade' do
+    context 'when total is equal to participant\'s grade' do
       it 'redirects to grades#edit page' do
         params = {
           id: 1,
@@ -205,7 +204,7 @@ describe GradesController do
     end
   end
 
-  xdescribe '#save_grade_and_comment_for_submission' do
+  describe '#save_grade_and_comment_for_submission' do
     it 'saves grade and comment for submission and refreshes the grades#view_team page' do
       allow(AssignmentParticipant).to receive(:find_by).with(id: '1').and_return(participant)
       allow(participant).to receive(:team).and_return(build(:assignment_team, id: 2, parent_id: 8))

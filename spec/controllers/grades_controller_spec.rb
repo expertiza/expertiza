@@ -12,6 +12,7 @@ describe GradesController do
   let(:student) { build(:student) }
   let(:review_response_map) { build(:review_response_map, id: 1) }
   let(:assignment_due_date) { build(:assignment_due_date) }
+  let(:ta) { build(:teaching_assistant, id: 8) }
 
 
   before(:each) do

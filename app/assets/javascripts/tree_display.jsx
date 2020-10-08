@@ -1,14 +1,17 @@
 jQuery(document).ready(function() {
   // This preloadedImages function is refered from http://jsfiddle.net/slashingweapon/8jAeu/
   // Actually I am not using the values in preloadedImages, but image loading speed is indeed getting faster
-  var preloadedImages = []
-  function preloadImages() {
-    for (var idx = 0; idx < arguments.length; idx++) {
-        var oneImage = new Image()
-        oneImage.src = arguments[idx];
-        preloadedImages.push(oneImage);
-    }
-  }
+  // var preloadedImages = [] // global variable in this react element
+  // function preloadImages() {
+  //   for (var idx = 0; idx < arguments.length; idx++) {
+  //       var oneImage = new Image()
+  //       oneImage.src = arguments[idx];
+  //       preloadedImages.push(oneImage);
+  //   }
+  //   /** this is downloading each image, reading it in, duplicating it, and putting it into an array */
+  //   // <img src="/url/img.jpg"></img>
+  // }
+  /** this is not being used, maybe try using it? ^^^^ TODO:  */
 
   function formatDate(date) {
     var month = new Array();
@@ -35,9 +38,9 @@ jQuery(document).ready(function() {
     return month[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear() + " - " + strTime;
   }
 
-  function showIntelligentAssignmentDialog() {
-    jQuery( "#intelligent_assignment_dialog" ).dialog({ closeText: "hide", modal: true, resizable: false, width: 500 });
-  }
+  // function showIntelligentAssignmentDialog() {
+  //   jQuery( "#intelligent_assignment_dialog" ).dialog({ closeText: "hide", modal: true, resizable: false, width: 500 });
+  // }
 
   var RowAction = React.createClass({
     getInitialState: function() {
@@ -90,6 +93,7 @@ jQuery(document).ready(function() {
         if (this.props.nodeType === 'assignment' || this.props.nodeType === 'questionnaire') {
           newNodeType = this.props.nodeType + "s"
         }
+        /** this is ugly TODO: */
         if (this.props.is_available || newNodeType == 'questionnaires') {
           moreContent.push(
             <span>
@@ -289,6 +293,7 @@ jQuery(document).ready(function() {
             if(typeof this.props.institution !== 'undefined' && this.props.institution.length != 0){
               institution_name = this.props.institution[0].name
             }
+            /** TODO: this is pretty bad */
             return (
                 <tr id={this.props.id}>
                     <td width={colWidthArray[0]}>{this.props.name}</td>
@@ -361,6 +366,8 @@ jQuery(document).ready(function() {
       }  else if(this.props.dataType === 'course') {
         colWidthArray = ["20%", "0%", "0%", "20%", "20%", "20%", "20%"]
       }
+      /** these if statements are pointlesssfjdkaslfjdkslafdas
+        TODO:  */
       if (this.props.data) {
           if (this.props.dataType == 'course') {
               this.props.data.forEach(function (entry, i) {
@@ -381,6 +388,27 @@ jQuery(document).ready(function() {
                       require_quiz={entry.require_quiz}
                       has_topic={entry.has_topic}
                       dataType={_this.props.dataType}
+                      // js will always pass by reference if you are passing an object or an array
+                      // basically everything but numbers, strings, or 
+                      // data={entry}
+                      // {key
+                      //   id
+                      //   name
+                      //   institution
+                      //   creation_date
+                      //   updated_date
+                      //   private
+                      //   actions
+                      //   is_available
+                      //   course_id
+                      //   max_team_size
+                      //   is_intelligent
+                      //   allow_suggestions
+                      //   require_quiz
+                      //   has_topic
+                      //   dataType} = data
+                      // use destructuring
+                      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
                   />)
               })
           }
@@ -501,6 +529,7 @@ jQuery(document).ready(function() {
         updated_date = formatDate(new Date(updated))
 
       }
+      /** this is a lot of data maniupulation can be fixed TODO: */
       var nodeTypeRaw = this.props.id.split("_")[0]
       var nodeType = nodeTypeRaw.substring(0, nodeTypeRaw.length-4).toLowerCase()
       var id = this.props.id.split("_")[1]
@@ -616,6 +645,7 @@ jQuery(document).ready(function() {
     }
   })
 
+/** maybe fix the search ? cache the searches? TODO: */
   var SearchBar = React.createClass({
     handleChange: function() {
         this.props.onUserInput(
@@ -695,6 +725,7 @@ jQuery(document).ready(function() {
         order: this.props.order
       }
     },
+    /** TODO:  */
     handleClick: function() {
       if (this.state.order === "normal") {
         this.setState({
@@ -753,6 +784,7 @@ jQuery(document).ready(function() {
     handleSortingClick: function(colName, order) {
       this.props.onUserClick(colName, order)
     },
+    /** this is what we have to fix the most TODO: */
     render: function() {
       var _rows = []
       var _this = this
@@ -998,7 +1030,9 @@ jQuery(document).ready(function() {
       })
     },
     handleUserClick: function(colName, order) {
+      // this isnt doing anything, its a reference so its changing it in place
       var tmpData = this.state.tableData
+      /** they defined their own sorting function, definitely not optimal */
       tmpData.sort(function(a, b) {
         var a_val = eval("a."+colName)
         var b_val = eval("b."+colName)
@@ -1026,15 +1060,18 @@ jQuery(document).ready(function() {
           return (a_val.localeCompare(b_val))
         }
       })
+      /** it was a reference, this is unneccessary */
       this.setState({
         tableData: tmpData
       })
     },
+    /** this is called if the data passed in updates, probably unlikely (unless we lazy load things) */
     componentWillReceiveProps: function(nextProps) {
       this.setState({
         tableData: nextProps.data
       })
     },
+    /** they are defining this function to be passed into the other components */
     handleUserFilter: function(name, checked) {
       var publicCheckboxStatus = this.state.publicCheckbox
         publicCheckboxStatus = checked
@@ -1080,7 +1117,11 @@ jQuery(document).ready(function() {
     }
   })
 
+  /** main react element that houses the rest of the view, this is loaded first */
   var TabSystem = React.createClass({
+    /** this is where the database data shown on the screen is stored */
+    /** theres three tabs on the website, but only one is shown at a time
+     Maybe dont load all at once before showing anything? */
     getInitialState: function() {
       return {
         tableContent: {
@@ -1091,55 +1132,96 @@ jQuery(document).ready(function() {
         activeTab: "1"
       }
     },
+    
+    /** this is the lifecycle hook that is called/ran 
+        before the view is loaded for the user */
     componentWillMount: function() {
-      var _this = this
-      preloadImages('/assets/tree_view/edit-icon-24.png',
-                    '/assets/tree_view/delete-icon-24.png',
-                    '/assets/tree_view/lock-off-disabled-icon-24.png',
-                    '/assets/tree_view/lock-disabled-icon-24.png',
-                    '/assets/tree_view/Copy-icon-24.png',
-                    '/assets/tree_view/add-public-24.png',
-                    '/assets/tree_view/add-private-24.png',
-                    '/assets/tree_view/add-ta-24.png',
-                    '/assets/tree_view/add-assignment-24.png',
-                    '/assets/tree_view/add-participant-24.png',
-                    '/assets/tree_view/create-teams-24.png',
-                    '/assets/tree_view/360-dashboard-24.png',
-                    '/assets/tree_view/remove-from-course-24.png',
-                    '/assets/tree_view/assign-course-blue-24.png',
-                    '/assets/tree_view/run-lottery.png',
-                    '/assets/tree_view/assign-reviewers-24.png',
-                    '/assets/tree_view/assign-survey-24.png',
-                    '/assets/tree_view/view-survey-24.png',
-                    '/assets/tree_view/view-scores-24.png',
-                    '/assets/tree_view/view-review-report-24.png',
-                    '/assets/tree_view/view-suggestion-24.png',
-                    '/assets/tree_view/view-delayed-mailer.png',
-                    '/assets/tree_view/view-publish-rights-24.png'
-                    )
-      jQuery.get("/tree_display/session_last_open_tab", function(data) {
-        _this.setState({
+      // console.log([1,2,3,4,5].forEach((v) => console.log(`testing ---> ${v}`)))
+      var _this = this // this isnt needed anymore 
+      // preloadImages('/assets/tree_view/edit-icon-24.png',
+      //               '/assets/tree_view/delete-icon-24.png',
+      //               '/assets/tree_view/lock-off-disabled-icon-24.png',
+      //               '/assets/tree_view/lock-disabled-icon-24.png',
+      //               '/assets/tree_view/Copy-icon-24.png',
+      //               '/assets/tree_view/add-public-24.png',
+      //               '/assets/tree_view/add-private-24.png',
+      //               '/assets/tree_view/add-ta-24.png',
+      //               '/assets/tree_view/add-assignment-24.png',
+      //               '/assets/tree_view/add-participant-24.png',
+      //               '/assets/tree_view/create-teams-24.png',
+      //               '/assets/tree_view/360-dashboard-24.png',
+      //               '/assets/tree_view/remove-from-course-24.png',
+      //               '/assets/tree_view/assign-course-blue-24.png',
+      //               '/assets/tree_view/run-lottery.png',
+      //               '/assets/tree_view/assign-reviewers-24.png',
+      //               '/assets/tree_view/assign-survey-24.png',
+      //               '/assets/tree_view/view-survey-24.png',
+      //               '/assets/tree_view/view-scores-24.png',
+      //               '/assets/tree_view/view-review-report-24.png',
+      //               '/assets/tree_view/view-suggestion-24.png',
+      //               '/assets/tree_view/view-delayed-mailer.png',
+      //               '/assets/tree_view/view-publish-rights-24.png'
+      //               )
+      // here, this = the entire react element class (TabSystem)
+      jQuery.get("/tree_display/session_last_open_tab", (data) => {
+        // in here, this = the entire reach element again (because of the arrow function)
+        // console.log(data) -> returns the number 2 if the second tab was previously open
+        this.setState({
           activeTab: data
         })
       })
-      jQuery.get("/tree_display/folder_node_ng_getter", function(data) {
+      jQuery.get("/tree_display/folder_node_ng_getter", (data) => {
+        // in here, this = the function we are defining right here, not needed/old use
+        // console.log(data) ---> three values, for each of the tabs (each id number, 1-3)
         jQuery.post("/tree_display/children_node_ng",
           {
             reactParams: {
               child_nodes: data,
               nodeType: 'FolderNode'
             }
+            // function name(param1) {
+            //   return
+            //   }
+            // name = () => { 
+            //   some code;
+            //   return
+            //    }
+            // name = () => ([].map(d fdsafda))
           }, function(data2, status) {
+            // console.log(data2, status) -> this is all of the data for the page
+            /** this is loading all the data for this page, (for each tab) 
+                We could make this only load the data for the tab viewed, this would chop it in a third
+                TODO: */
+                
+            /** these are very old, unoptimized funcitons, we can parse the data much faster/cleaner
+                with other librarys/basic java functions */
             jQuery.each(data2, function(nodeType, outerNode) {
+              
+              // console.log(nodeType, outerNode) --> iterates over each type, outerNode is the data
+              
               jQuery.each(outerNode, function(i, node) {
+                /** iterates fdsafd  over the node with an array */
                 var newParams = {
                   key: node.name + "|" + node.directory,
                   nodeType: nodeType,
                   child_nodes: node.nodeinfo
                 }
                 if (nodeType === 'Assignments') {
+                  // console.log(newParams) --> 
+                  // {
+                  // "key": "TestAssignmentMauricio |",
+                  // "nodeType": "Assignments",
+                  // "child_nodes": {
+                  //   "id": 4601,
+                  //   "parent_id": null,
+                  //   "node_object_id": 293
+                  // }
+                  // }
+                  // console.log(node[newParams]) --> always null
+                  // console.log(node["children"]) --> always null
                   node["children"] = null;
                   node[newParams]=newParams;
+                  // console.log(node[newParams]) --> same as first output
                 } else if (nodeType === 'Courses') {
                   newParams["nodeType"] = 'CourseNode'
                   node["newParams"]=newParams;
@@ -1152,12 +1234,11 @@ jQuery(document).ready(function() {
             if (data2) {
               _this.setState({
                 tableContent: data2
-              })
+              }) // this puts the data back into the intial state on line 1088 (getInitialState)
             }
           },
           'json')
       })
-      
     },
     handleTabChange: function(tabIndex) {
       jQuery.get("/tree_display/set_session_last_open_tab?tab="+tabIndex.toString())
@@ -1183,6 +1264,7 @@ jQuery(document).ready(function() {
     }
   })
 
+  /** this returns the rendered react element */
   if (document.getElementById("tree_display")) {
     React.render(
       React.createElement(TabSystem),

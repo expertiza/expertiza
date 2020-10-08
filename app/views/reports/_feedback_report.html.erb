@@ -120,7 +120,7 @@
             <% else %>
               <% @reviewee_name = Participant.find(@frm.reviewee_id).user.fullname(session[:ip]) %>
               <% if Response.exists?(map_id: @frm.id) %>
-                <% feedback_response = Response.where(map_id: @frm.id).first %>
+                <% feedback_response = Response.where(map_id: @frm.id).last %>
                 <!--Review response rejoined-->
                 <td id = "green" bgcolor=<%= @bgcolor %> align='left' colspan=1>
                   <%= link_to user_name = Participant.find(rr.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user_name}), :method => :post, :title => "Click here to impersonate this user"%>

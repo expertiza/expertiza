@@ -186,7 +186,7 @@ class QuizQuestionnairesController < QuestionnairesController
 
   # create checkbox question
   def create_checkbox(question, choice_key, q_choices)
-    q = if q_choices[1.to_s][:iscorrect] ==  choice_key
+    q = if q_choices[choice_key][:iscorrect] ==  1.to_s
           QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "true", question_id: question.id)
         else
           QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "false", question_id: question.id)

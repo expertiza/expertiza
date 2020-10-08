@@ -117,11 +117,12 @@ describe QuizQuestionnairesController do
           params = {aid: 1,
                     pid: 1,
                     questionnaire: {name: 'Test questionnaire',
-                                    type: 'QuizQuestionnaire'}}
+                                    type: 'QuizQuestionnaire',
+                                    }}
           # create_questionnaire
           participant = double('Participant')
           allow(Participant).to receive(:find).with('1').and_return(participant)
-          allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', id: 6))
+          allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', rspid: 6))
           allow_any_instance_of(QuizQuestionnairesController).to receive(:save_choices).with(1).and_return(true)
           # save
           allow_any_instance_of(QuizQuestionnairesController).to receive(:save_questions).with(1).and_return(true)
@@ -240,7 +241,7 @@ describe QuizQuestionnairesController do
         allow(@questionnaire).to receive(:taken_by_anyone?).and_return(true)
         params = {id: 1, pid: 1}
         get :edit, params
-        expect(flash[:error]).to eq('Your quiz has been taken by some other students, you cannot edit it anymore.')
+        expect(flash[:error]).to eq('Your quiz has been taken by one or more students; you cannot edit it anymore.')
         expect(response).to redirect_to('/submitted_content/view?id=1')
       end
     end

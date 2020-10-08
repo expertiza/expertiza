@@ -148,16 +148,6 @@ describe AssignmentParticipant do
     end
   end
 
-  describe '#topic_total_scores' do
-    it 'set total_score and max_pts_available of score when topic is not nil' do
-      scores = {total_score: 100}
-      allow(SignUpTopic).to receive(:find_by).with(assignment_id: 1).and_return(double('SignUpTopic', micropayment: 1))
-      participant.topic_total_scores(scores)
-      expect(scores[:total_score]).to eq(1.0)
-      expect(scores[:max_pts_available]).to eq(1)
-    end
-  end
-
   describe '#calculate_scores' do
     context 'when the participant has the grade' do
       it 'his total scores equals his grade' do

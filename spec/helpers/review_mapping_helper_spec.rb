@@ -259,6 +259,18 @@ describe ReviewMappingHelper, type: :helper do
     it 'should return response_map id tied to the feedback provided in round 3' do
       expect(@feedback_response_maps_round_three.first.reviewed_object_id).to eq(@response_3.id)
     end
+
+    it 'should return the response_map id associated with round 1' do
+      expect(@review_responses_round_one.first.id).to eq(@response_map_1.id)
+    end
+
+    it 'should return the response_map id associated with round 2' do
+      expect(@review_responses_round_two.first.id).to eq(@response_map_2.id)
+    end
+
+    it 'should return the response_map id associated with round 3' do
+      expect(@review_responses_round_three.first.id).to eq(@response_map_3.id)
+    end
   end
   
   describe 'check_submission_state' do

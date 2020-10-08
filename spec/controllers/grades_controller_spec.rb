@@ -1,4 +1,3 @@
-require 'pp'
 describe GradesController do
   let(:review_response) { build(:response) }
   let(:assignment) { build(:assignment, id: 1, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
@@ -8,7 +7,6 @@ describe GradesController do
   let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
   let(:admin) { build(:admin) }
   let(:instructor) { build(:instructor, id: 6) }
-  let(:teaching_assistant) { build(:teaching_assistant, id: 10) }
   let(:question) { build(:question) }
   let(:team) { build(:assignment_team, id: 1, assignment: assignment, users: [instructor]) }
   let(:student) { build(:student) }

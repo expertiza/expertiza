@@ -30,13 +30,15 @@ module StudentTaskHelper
 
   def get_awarded_badges(participant)
     info = ''
-    participant.awarded_badges.each do |awarded_badge|
-      badge = awarded_badge.badge
-      # In the student task homepage, list only those badges that are approved
-      if awarded_badge.is_approved?
-        info += '<img width="30px" src="/assets/badges/' + badge.image_name + '" title="' + badge.name + '" />'
-      end
-    end
+    info += '<img width="30px" src="/assets/badges/' + 'good-teammate.png' + '" title="' + 'teammate' + '" />'
+
+    # participant.awarded_badges.each do |awarded_badge|
+    #   badge = awarded_badge.badge
+    #   # In the student task homepage, list only those badges that are approved
+    #   if awarded_badge.is_approved?
+    #     info += '<img width="30px" src="/assets/badges/' + badge.image_name + '" title="' + badge.name + '" />'
+    #   end
+    # end
     info.html_safe
   end
 

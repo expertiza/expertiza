@@ -14,7 +14,6 @@ describe GradesController do
   let(:assignment_due_date) { build(:assignment_due_date) }
   let(:ta) { build(:teaching_assistant, id: 8) }
 
-
   before(:each) do
     allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
     allow(participant).to receive(:team).and_return(team)

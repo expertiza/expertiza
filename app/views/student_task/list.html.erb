@@ -95,7 +95,7 @@
       <th>Course</th>
       <th>Topic</th>
       <th>Current Stage</th>
-      <th>Review Grade</th>
+      <th>Submission Grade</th>
 <!--      <th>Badges</th>-->
       <th>Stage Deadline <img src="/assets/info.png" title="You can change 'Preferred Time Zone' in 'Profile' in the banner."/></th>
       <th>Publishing Rights</th>
@@ -126,7 +126,7 @@
                     <%= participant.assignment.current_stage_name(topic_id) %>
                 <% end %>
               </td>
-              <!--review grade-->
+              <!--submission grade-->
               <td><%= get_review_grade_info(participant) %></td>
               <!--badges-->
 <!--              <td><%#= get_awarded_badges(participant) %></td>-->

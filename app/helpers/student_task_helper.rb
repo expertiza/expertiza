@@ -5,10 +5,12 @@ module StudentTaskHelper
        participant.try(:review_grade).try(:comment_for_reviewer).nil?
       result = "N/A"
     else
+      score = participant.try(:review_grade).try(:grade_for_reviewer).to_s
       info = "Score: " + participant.try(:review_grade).try(:grade_for_reviewer).to_s + "/40\n"
       info += "Comment: " + participant.try(:review_grade).try(:comment_for_reviewer).to_s
       info = truncate(info, length: 1500, omission: '...')
-      result = "<img src = '/assets/info.png' title = '" + info + "'>"
+      result = score + "<img src = '/assets/info.png' title = '" + info + "'>"
+      # result = "<img src = '/assets/info.png' title = '" + info + "'>"
     end
     result.html_safe
   end

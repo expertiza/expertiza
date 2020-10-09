@@ -95,7 +95,7 @@
       <th>Topic</th>
       <th>Current Stage</th>
       <th>Review Grade</th>
-      <th>Badges</th>
+<!--      <th>Badges</th>-->
       <th>Stage Deadline <img src="/assets/info.png" title="You can change 'Preferred Time Zone' in 'Profile' in the banner."/></th>
       <th>Publishing Rights</th>
     </tr>
@@ -103,8 +103,8 @@
       <% participant = student_task.participant %>
       <% if student_task.assignment %>
         <tr class="listingRow">
-          <!--assignment-->
-          <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>
+          <!--assignment and badge-->
+          <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b><p>(<%= get_awarded_badges(participant) %>)</p></td>
           <!--course-->
           <td><%= student_task.course.try :name %></td>
           <!--topic-->
@@ -125,7 +125,7 @@
           <!--review grade-->
           <td><%= get_review_grade_info(participant) %></td>
           <!--badges-->
-          <td><%= get_awarded_badges(participant) %></td>
+<!--          <td><%#= get_awarded_badges(participant) %></td>-->
           <!--stage deadline-->
           <td><%= student_task.stage_deadline.in_time_zone(session[:user].timezonepref) %></td>
           <!--publish rights-->

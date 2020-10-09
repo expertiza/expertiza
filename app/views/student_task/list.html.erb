@@ -104,7 +104,7 @@
       <% if student_task.assignment %>
         <tr class="listingRow">
           <!--assignment and badge-->
-          <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b><p>(<%= get_awarded_badges(participant) %>)</p></td>
+          <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b><p><%= get_awarded_badges(participant) %></p></td>
           <!--course-->
           <td><%= student_task.course.try :name %></td>
           <!--topic-->

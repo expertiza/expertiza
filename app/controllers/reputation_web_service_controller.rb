@@ -46,12 +46,16 @@ class ReputationWebServiceController < ApplicationController
   #   "order by RM.reviewee_id"
   #
   #  result = ActiveRecord::Base.connection.select_all(query)
-  def db_query(assignment_id, round_num, has_topic, another_assignment_id = 0)
-    raw_data_array = []
+  def get_review_responses_query(assignment_id, another_assignment_id = 0)
     assignment_ids = []
     assignment_ids << assignment_id
     assignment_ids << another_assignment_id unless another_assignment_id.zero?
-    ReviewResponseMap.where('reviewed_object_id in (?) and calibrate_to = ?', assignment_ids, false).each do |response_map|
+    ReviewResponseMap.where('reviewed_object_id in (?) and calibrate_to = ?', assignment_ids, false)
+  end
+
+  def calculate_peer_review_grades(has_topic, review_responses, round_num)
+    raw_data_array = []
+    review_responses.each do |response_map|
       reviewer = response_map.reviewer.user
       team = AssignmentTeam.find(response_map.reviewee_id)
       topic_condition = ((has_topic and SignedUpTeam.where(team_id: team.id).first.is_waitlisted == false) or !has_topic)
@@ -77,7 +81,7 @@ class ReputationWebServiceController < ApplicationController
   end
 
   # special db query, return quiz scores
-  def db_query_with_quiz_score(assignment_id, another_assignment_id = 0)
+  def calculate_quiz_score(assignment_id, another_assignment_id = 0)
     raw_data_array = []
     assignment_ids = []
     assignment_ids << assignment_id
@@ -85,9 +89,9 @@ class ReputationWebServiceController < ApplicationController
     teams = AssignmentTeam.where('parent_id in (?)', assignment_ids)
     team_ids = []
     teams.each {|team| team_ids << team.id }
-    quiz_questionnnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
-    quiz_questionnnaire_ids = []
-    quiz_questionnnaires.each {|questionnaire| quiz_questionnnaire_ids << questionnaire.id }
+    quiz_questionnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
+    quiz_questionnaire_ids = []
+    quiz_questionnaires.each {|questionnaire| quiz_questionnnaire_ids << questionnaire.id }
     QuizResponseMap.where('reviewed_object_id in (?)', quiz_questionnnaire_ids).each do |response_map|
       quiz_score = response_map.quiz_score
       participant = Participant.find(response_map.reviewer_id)
@@ -96,14 +100,15 @@ class ReputationWebServiceController < ApplicationController
     raw_data_array
   end
 
-  def json_generator(assignment_id, another_assignment_id = 0, round_num = 2, type = 'peer review grades')
+  def generate_json(assignment_id, another_assignment_id = 0, round_num = 2, type = 'peer review grades')
     assignment = Assignment.find_by(id: assignment_id)
     has_topic = !SignUpTopic.where(assignment_id: assignment_id).empty?
 
     if type == 'peer review grades'
-      @results = db_query(assignment.id, round_num, has_topic, another_assignment_id)
+      @responses = get_review_responses_query(assignment.id,  another_assignment_id)
+      @results = calculate_peer_review_grades(has_topic,@responses, round_num)
     elsif type == 'quiz scores'
-      @results = db_query_with_quiz_score(assignment.id, another_assignment_id)
+      @results = calculate_quiz_score(assignment.id, another_assignment_id)
     end
     request_body = {}
     @results.each_with_index do |record, _index|
@@ -214,12 +219,7 @@ class ReputationWebServiceController < ApplicationController
     if params[:checkbox][:expert_grade] == 'Add expert grades'
       set_additional_info('add expert grades')
       case params[:assignment_id]
-      when '724' # expert grades of Wiki 1a (724)
-        if params[:another_assignment_id].to_i.zero?
-          req.body.prepend("\"expert_grades\": {\"submission23967\":93,\"submission23969\":89,\"submission23971\":95,\"submission23972\":86,\"submission23973\":91,\"submission23975\":94,\"submission23979\":90,\"submission23980\":94,\"submission23981\":87,\"submission23982\":79,\"submission23983\":91,\"submission23986\":92,\"submission23987\":91,\"submission23988\":93,\"submission23991\":98,\"submission23992\":91,\"submission23994\":87,\"submission23995\":93,\"submission23998\":92,\"submission23999\":87,\"submission24000\":93,\"submission24001\":93,\"submission24006\":96,\"submission24007\":87,\"submission24008\":92,\"submission24009\":92,\"submission24010\":93,\"submission24012\":94,\"submission24013\":96,\"submission24016\":91,\"submission24018\":93,\"submission24024\":96,\"submission24028\":88,\"submission24031\":94,\"submission24040\":93,\"submission24043\":95,\"submission24044\":91,\"submission24046\":95,\"submission24051\":92},")
-        else # expert grades of Wiki 1a and 1b (724, 733)
-          req.body.prepend("\"expert_grades\": {\"submission23967\":93, \"submission23969\":89, \"submission23971\":95, \"submission23972\":86, \"submission23973\":91, \"submission23975\":94, \"submission23979\":90, \"submission23980\":94, \"submission23981\":87, \"submission23982\":79, \"submission23983\":91, \"submission23986\":92, \"submission23987\":91, \"submission23988\":93, \"submission23991\":98, \"submission23992\":91, \"submission23994\":87, \"submission23995\":93, \"submission23998\":92, \"submission23999\":87, \"submission24000\":93, \"submission24001\":93, \"submission24006\":96, \"submission24007\":87, \"submission24008\":92, \"submission24009\":92, \"submission24010\":93, \"submission24012\":94, \"submission24013\":96, \"submission24016\":91, \"submission24018\":93, \"submission24024\":96, \"submission24028\":88, \"submission24031\":94, \"submission24040\":93, \"submission24043\":95, \"submission24044\":91, \"submission24046\":95, \"submission24051\":92, \"submission24100\":90, \"submission24079\":92, \"submission24298\":86, \"submission24545\":92, \"submission24082\":96, \"submission24080\":86, \"submission24284\":92, \"submission24534\":93, \"submission24285\":94, \"submission24297\":91},")
-        end
+
       when '735' # expert grades of program 1 (735)
         req.body.prepend("\"expert_grades\": {\"submission24083\":96.084,\"submission24085\":88.811,\"submission24086\":100,\"submission24087\":100,\"submission24088\":92.657,\"submission24091\":96.783,\"submission24092\":90.21,\"submission24093\":100,\"submission24097\":90.909,\"submission24098\":98.601,\"submission24101\":99.301,\"submission24278\":98.601,\"submission24279\":72.727,\"submission24281\":54.476,\"submission24289\":94.406,\"submission24291\":99.301,\"submission24293\":93.706,\"submission24296\":98.601,\"submission24302\":83.217,\"submission24303\":91.329,\"submission24305\":100,\"submission24307\":100,\"submission24308\":100,\"submission24311\":95.804,\"submission24313\":91.049,\"submission24314\":100,\"submission24315\":97.483,\"submission24316\":91.608,\"submission24317\":98.182,\"submission24320\":90.21,\"submission24321\":90.21,\"submission24322\":98.601},")
       when '754' # expert grades of Wiki contribution (754)

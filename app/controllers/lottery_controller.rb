@@ -93,7 +93,10 @@ class LotteryController < ApplicationController
         # Create new team_user and team_user node
         new_team.add_member(User.find(user_id))
       end
-      merge_bids_from_different_previous_teams(assignment.sign_up_topics, new_team.id, user_ids, users_bidding_info)
+
+      # Select data from `users_bidding_info` variable that only related to team members in current team
+      current_team_members_info = users_bidding_info.select { |info| user_ids.include? info[:pid] }.map { |info| info[:ranks] }
+      Bid.merge_bids_from_different_users(new_team.id, assignment.sign_up_topics, current_team_members_info)
     end
   end
 
@@ -101,58 +104,6 @@ class LotteryController < ApplicationController
   def remove_user_from_previous_team(assignment_id, user_id)
     team_user = TeamsUser.where(user_id: user_id).find {|team_user| team_user.team.parent_id == assignment_id }
     team_user.destroy rescue nil
-  end
-
-  # Create new bids for team based on `ranks` variable for each team member
-  # Currently, it is possible (already proved by db records) that
-  # some teams have multiple 1st priority, multiply 2nd priority.
-  # these multiple identical priorities come from different
-  # previous teams
-  # [Future work]: we need to find a better way to merge bids
-  # that came from different previous teams
-  def merge_bids_from_different_previous_teams(sign_up_topics, team_id, user_ids, users_bidding_info)
-    # Select data from `users_bidding_info` variable that only related to team members in current team and transpose it.
-    # For example, below matrix shows 4 topics (key) and corresponding priorities given by 3 team members (value).
-    # {
-    #   1: [1, 2, 3],
-    #   2: [0, 1, 2],
-    #   3: [2, 3, 1],
-    #   4: [2, 0, 1]
-    # }
-    bidding_matrix = Hash.new {|hash, key| hash[key] = [] }
-    current_team_members_info = users_bidding_info.select {|info| user_ids.include? info[:pid] }
-    current_team_members_info.map {|info| info[:ranks] }.each do |bids|
-      sign_up_topics.each_with_index do |topic, index|
-        bidding_matrix[topic.id] << bids[index]
-      end
-    end
-
-    # Below is the structure of matrix summary
-    # The first value is the number of nonzero item, the second value is the sum of priorities, the third value of the topic_id.
-    # [
-    #   [3, 6, 1],
-    #   [2, 3, 2],
-    #   [3, 6, 3],
-    #   [2, 3, 4]
-    # ]
-    bidding_matrix_summary = []
-    bidding_matrix.each do |topic_id, value|
-      # Exclude topics that no one bid
-      bidding_matrix_summary << [value.count {|i| i != 0 }, value.inject(:+), topic_id] unless value.inject(:+).zero?
-    end
-    bidding_matrix_summary.sort! {|b1, b2| [b2[0], b1[1]] <=> [b1[0], b2[1]] }
-    # Result of sorting first element descendingly and second element ascendingly.
-    # We want the topic with most bids and lowest sum of priorities at the top.
-    # [
-    #   [3, 6, 1],
-    #   [3, 6, 3],
-    #   [2, 3, 2],
-    #   [2, 3, 4]
-    # ]
-    # Therefore the bidding priority of these 4 topics is 1 -> 3 -> 2 -> 4
-    bidding_matrix_summary.each_with_index do |b, index|
-      Bid.create(topic_id: b[2], team_id: team_id, priority: index + 1)
-    end
   end
 
   # If certain topic has available slot(s),

@@ -157,26 +157,6 @@ describe LotteryController do
     end
   end
 
-  describe "#merge_bids_from_different_previous_teams" do
-    before :each do
-      @team_id = assignment_team1.id
-      @user_ids = [team_user1.id, team_user2.id, team_user3.id]
-      @user_bidding_info = [{pid: team_user1.id, ranks: [1, 0, 2, 2]},
-                            {pid: team_user2.id, ranks: [2, 1, 3, 0]},
-                            {pid: team_user3.id, ranks: [3, 2, 1, 1]}]
-    end
-    it "should create bids objects of the newly-merged team on each sign-up topics" do
-      bid_count = Bid.count
-      controller.send(:merge_bids_from_different_previous_teams, @sign_up_topics, @team_id, @user_ids, @user_bidding_info)
-      expect(Bid.count).to eq(bid_count + 4)
-      expect(Bid.find_by(topic_id: 1, team_id: 1, priority: 1)).to_not be nil
-      expect(Bid.find_by(topic_id: 2, team_id: 1, priority: 3)).to_not be nil
-      expect(Bid.find_by(topic_id: 3, team_id: 1, priority: 2)).to_not be nil
-      expect(Bid.find_by(topic_id: 4, team_id: 1, priority: 4)).to_not be nil
-      expect(Bid.find_by(topic_id: 1, team_id: 1, priority: 2)).to be nil
-    end
-  end
-
   describe "remove" do
     before :each do
       @assignment = create(:assignment, name: "remove_user_from_previous_team")

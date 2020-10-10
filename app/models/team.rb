@@ -258,4 +258,24 @@ class Team < ActiveRecord::Base
   end
 
   # REFACTOR END:: class methods import export moved from course_team & assignment_team to here
+
+  def self.create_team_with_users(parent_id, user_ids)
+    team = self.create_team_and_node(parent_id)
+
+    user_ids.each do |user_id|
+      remove_user_from_previous_team(parent_id, user_id)
+
+      # Create new team_user and team_user node
+      team.add_member(User.find(user_id))
+    end
+    return team
+  end
+  
+  private
+
+  # Removes the specified user from any team of the specified assignment
+  def self.remove_user_from_previous_team(parent_id, user_id)
+    team_user = TeamsUser.where(user_id: user_id).find { |team_user| team_user.team.parent_id == parent_id }
+    team_user.destroy rescue nil
+  end
 end

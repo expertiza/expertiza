@@ -84,26 +84,11 @@ class LotteryController < ApplicationController
   # teams
   def create_new_teams_for_bidding_response(teams, assignment, users_bidding_info)
     teams.each do |user_ids|
-      # Create new team and team node
-      new_team = AssignmentTeam.create_team_and_node(assignment.id)
-
-      user_ids.each do |user_id|
-        remove_user_from_previous_team(assignment.id, user_id)
-
-        # Create new team_user and team_user node
-        new_team.add_member(User.find(user_id))
-      end
-
+      new_team = AssignmentTeam.create_team_with_users(assignment.id, user_ids)
       # Select data from `users_bidding_info` variable that only related to team members in current team
       current_team_members_info = users_bidding_info.select { |info| user_ids.include? info[:pid] }.map { |info| info[:ranks] }
       Bid.merge_bids_from_different_users(new_team.id, assignment.sign_up_topics, current_team_members_info)
     end
-  end
-
-  # Removes the specified user from any team of the specified assignment
-  def remove_user_from_previous_team(assignment_id, user_id)
-    team_user = TeamsUser.where(user_id: user_id).find {|team_user| team_user.team.parent_id == assignment_id }
-    team_user.destroy rescue nil
   end
 
   # If certain topic has available slot(s),

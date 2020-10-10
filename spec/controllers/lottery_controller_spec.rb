@@ -196,24 +196,14 @@ describe LotteryController do
         expect(TeamsUser.find_by(user_id: @team_user1.user_id)).to eq @team_user1
       end
     end
-    describe "#remove_empty_teams" do
-      it "should reduce the number of teams by the number of empty teams in the assignment" do
-        create(:assignment_team, assignment: @assignment, teams_users: [])
-        number_of_teams = AssignmentTeam.count
-        number_of_teams_in_assignment = Assignment.find(@assignment.id).teams.count
-        controller.send(:remove_empty_teams, @assignment)
-        expect(AssignmentTeam.count).to eq(number_of_teams - 1)
-        expect(Assignment.find(@assignment.id).teams.count).to_not eq(number_of_teams_in_assignment)
-      end
-    end
   end
 
   describe "#assign_available_slots" do
     it "should assign topic to team of biggest size" do
-      @topic_bids1 = [{topic_id: topic1.id, priority: 1}]
-      @team_bids = [{team_id: assignment_team1.id, bids: @topic_bids1}]
+      topic_bids = [{topic_id: topic1.id, priority: 1}]
+      teams_bidding_info = [{team_id: assignment_team1.id, bids: topic_bids}]
       number_of_signed_up_teams = SignedUpTeam.count
-      controller.send(:assign_available_slots, @team_bids)
+      controller.send(:assign_available_slots, teams_bidding_info)
       expect(SignedUpTeam.count).to eq(number_of_signed_up_teams + 1)
     end
   end

@@ -31,7 +31,7 @@ class LotteryController < ApplicationController
       teams = JSON.parse(response)["teams"]
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Team formation info for assignment #{assignment.name}: #{teams}", request)
       create_new_teams_for_bidding_response(teams, assignment, users_bidding_info)
-      remove_empty_teams(assignment)
+      assignment.remove_empty_teams
       match_new_teams_to_topics(assignment)
     rescue StandardError => e
       flash[:error] = e.message
@@ -101,15 +101,6 @@ class LotteryController < ApplicationController
   def remove_user_from_previous_team(assignment_id, user_id)
     team_user = TeamsUser.where(user_id: user_id).find {|team_user| team_user.team.parent_id == assignment_id }
     team_user.destroy rescue nil
-  end
-
-  # Destroy teams which no longer contain any team members
-  def remove_empty_teams(assignment)
-    assignment.teams.reload.each do |team|
-      if team.teams_users.empty?
-        team.destroy
-      end
-    end
   end
 
   # Create new bids for team based on `ranks` variable for each team member

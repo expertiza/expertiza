@@ -100,7 +100,6 @@ class LotteryController < ApplicationController
   # Removes the specified user from any team of the specified assignment
   def remove_user_from_previous_team(assignment_id, user_id)
     team_user = TeamsUser.where(user_id: user_id).find {|team_user| team_user.team.parent_id == assignment_id }
-    team_user.team_user_node.destroy rescue nil
     team_user.destroy rescue nil
   end
 
@@ -108,7 +107,6 @@ class LotteryController < ApplicationController
   def remove_empty_teams(assignment)
     assignment.teams.reload.each do |team|
       if team.teams_users.empty?
-        TeamNode.where(parent_id: assignment.id, node_object_id: team.id).destroy_all rescue nil
         team.destroy
       end
     end

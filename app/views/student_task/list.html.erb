@@ -107,7 +107,7 @@
         <% participant = student_task.participant %>
         <% if student_task.assignment %>
           <tr class="listingRow">
-            <!--assignment also badge at the end-->
+            <!--assignment also badge at the end if the assignment has badge-->
             <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b><p><%= get_awarded_badges(participant) %></p> </td>
             <!--course-->
             <td><%= student_task.course.try :name %></td>

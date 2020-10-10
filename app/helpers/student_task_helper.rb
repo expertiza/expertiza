@@ -5,7 +5,7 @@ module StudentTaskHelper
        participant.try(:review_grade).try(:comment_for_reviewer).nil?
       result = "N/A"
     else
-      score = participant.try(:review_grade).try(:grade_for_reviewer).to_s + "/" + (@assignment.num_reviews_allowed)*10
+      score = participant.try(:review_grade).try(:grade_for_reviewer).to_s + "/40\n"
       info = "Score: " + participant.try(:review_grade).try(:grade_for_reviewer).to_s + "/40\n"
       info += "Comment: " + participant.try(:review_grade).try(:comment_for_reviewer).to_s
       info = truncate(info, length: 1500, omission: '...')

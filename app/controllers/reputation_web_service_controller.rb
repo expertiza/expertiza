@@ -132,6 +132,77 @@ class ReputationWebServiceController < ApplicationController
     @response = @@response
   end
 
+  def set_request_body(request_body)
+    @request_body = request_body
+  end
+
+  def get_request_body
+    @request_body
+  end
+
+  def set_response_body(response_body)
+    @response_body = response_body
+  end
+
+  def get_response_body
+    @response_body
+  end
+
+  def set_last_assignment_id
+    @max_assignment_id = Assignment.last.id
+  end
+
+  def get_last_assignment_id
+    @max_assignment_id
+  end
+
+  def set_assignment(assignment_id)
+    @assignment = Assignment.find(assignment_id) rescue nil
+  end
+
+  def get_assignment
+    @assignment
+  end
+
+  def set_another_assignment(another_assignment_id)
+    @another_assignment = Assignment.find(another_assignment_id) rescue nil
+  end
+
+  def get_another_assignment
+    @another_assignment
+  end
+
+  def set_round_num(round_num)
+    @round_num = round_num
+  end
+
+  def get_round_num
+    @round_num
+  end
+
+  def set_algorithm(algorithm)
+    @algorithm
+  end
+
+  def get_algorithm
+    @algorithm
+  end
+
+  def set_additional_info(additional_info)
+    @additional_info = additional_info
+  end
+
+  def get_additional_info
+    @additional_info
+  end
+
+  def set_response(response)
+    @response = response
+  end
+
+  def get_response
+    @response
+  end
 
   # abhishek 10/10 8 pm
   def send_post_request

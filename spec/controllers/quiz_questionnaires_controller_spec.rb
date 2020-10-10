@@ -118,11 +118,15 @@ describe QuizQuestionnairesController do
                     pid: 1,
                     questionnaire: {name: 'Test questionnaire',
                                     type: 'QuizQuestionnaire',
+                                    min_question_score: 0,
+                                    max_question_score: 5
                                     }}
           # create_questionnaire
           participant = double('Participant')
           allow(Participant).to receive(:find).with('1').and_return(participant)
           allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', rspid: 6))
+          allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', id: 6))
+          #allow(AssignmentTeam).to receive(:id).with(participant).and_return(double('AssignmentTeam', id: 6))
           allow_any_instance_of(QuizQuestionnairesController).to receive(:save_choices).with(1).and_return(true)
           # save
           allow_any_instance_of(QuizQuestionnairesController).to receive(:save_questions).with(1).and_return(true)
@@ -133,9 +137,10 @@ describe QuizQuestionnairesController do
           expect(controller.instance_variable_get(:@questionnaire).private).to eq false
           expect(controller.instance_variable_get(:@questionnaire).name).to eq 'Test questionnaire'
           expect(controller.instance_variable_get(:@questionnaire).min_question_score).to eq 0
-          expect(controller.instance_variable_get(:@questionnaire).max_question_score).to eq 1
+          expect(controller.instance_variable_get(:@questionnaire).max_question_score).to eq 5
           expect(controller.instance_variable_get(:@questionnaire).type).to eq 'QuizQuestionnaire'
           expect(controller.instance_variable_get(:@questionnaire).instructor_id).to eq 6
+
         end
       end
       context 'when quiz is invalid and questionnaire type is QuizQuestionnaire' do

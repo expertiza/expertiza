@@ -85,18 +85,15 @@ class LotteryController < ApplicationController
   def create_new_teams_for_bidding_response(teams, assignment, users_bidding_info)
     teams.each do |user_ids|
       # Create new team and team node
-      new_team = AssignmentTeam.create(name: 'Team_' + rand(10_000).to_s, parent_id: assignment.id)
-      team_node = TeamNode.create(parent_id: assignment.id, node_object_id: new_team.id)
+      new_team = AssignmentTeam.create_team_and_node(assignment.id)
 
       user_ids.each do |user_id|
         remove_user_from_previous_team(assignment.id, user_id)
 
         # Create new team_user and team_user node
-        new_team_user = TeamsUser.create(user_id: user_id, team_id: new_team.id)
-        TeamUserNode.create(parent_id: team_node.id, node_object_id: new_team_user.id)
-
-        merge_bids_from_different_previous_teams(assignment.sign_up_topics, new_team.id, user_ids, users_bidding_info)
+        new_team.add_member(User.find(user_id))
       end
+      merge_bids_from_different_previous_teams(assignment.sign_up_topics, new_team.id, user_ids, users_bidding_info)
     end
   end
 
@@ -151,12 +148,12 @@ class LotteryController < ApplicationController
     # ]
     bidding_matrix_summary = []
     bidding_matrix.each do |topic_id, value|
-      # Exclude topics that no one bidded
+      # Exclude topics that no one bid
       bidding_matrix_summary << [value.count {|i| i != 0 }, value.inject(:+), topic_id] unless value.inject(:+).zero?
     end
     bidding_matrix_summary.sort! {|b1, b2| [b2[0], b1[1]] <=> [b1[0], b2[1]] }
     # Result of sorting first element descendingly and second element ascendingly.
-    # We want the topic with most people bidded and lowest sum of priorities at the top.
+    # We want the topic with most bids and lowest sum of priorities at the top.
     # [
     #   [3, 6, 1],
     #   [3, 6, 3],

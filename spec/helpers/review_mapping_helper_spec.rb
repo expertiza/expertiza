@@ -14,7 +14,7 @@ describe ReviewMappingHelper, type: :helper do
     it 'color should be red if response_map does not exist' do
       response_map_dne = create(:review_response_map)
 
-      color = get_team_colour(response_map_dne)
+      color = get_team_color(response_map_dne)
       expect(color).to eq('red')
     end
 
@@ -35,7 +35,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: response_map_with_reviewee)
 
-      color = get_team_colour(response_map_with_reviewee)
+      color = get_team_color(response_map_with_reviewee)
       expect(color).to eq('blue')
     end
 
@@ -50,7 +50,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: @response_map)
 
-      color = get_team_colour(@response_map)
+      color = get_team_color(@response_map)
       expect(color).not_to eq('blue')
     end
 
@@ -60,7 +60,7 @@ describe ReviewMappingHelper, type: :helper do
       response_map_with_grade_reviewer = create(:review_response_map, reviewer: reviewer_with_grade)
       create(:response, response_map: response_map_with_grade_reviewer)
 
-      color = get_team_colour(response_map_with_grade_reviewer)
+      color = get_team_color(response_map_with_grade_reviewer)
       expect(color).to eq('brown')
     end
 
@@ -75,7 +75,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: @response_map)
 
-      color = get_team_colour(@response_map)
+      color = get_team_color(@response_map)
       expect(color).to eq('green')
     end
 
@@ -97,7 +97,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: response_map_with_reviewee)
 
-      color = get_team_colour(response_map_with_reviewee)
+      color = get_team_color(response_map_with_reviewee)
       expect(color).to eq('green')
     end
 
@@ -120,7 +120,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: response_map_with_reviewee)
 
-      color = get_team_colour(response_map_with_reviewee)
+      color = get_team_color(response_map_with_reviewee)
       expect(color).to eq('purple')
     end
 
@@ -139,7 +139,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:response, response_map: response_map_with_reviewee)
 
-      color = get_team_colour(response_map_with_reviewee)
+      color = get_team_color(response_map_with_reviewee)
       expect(color).to eq('purple')
     end
   end
@@ -448,7 +448,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
       
       
-      last_round_color = obtain_team_colour(@response_map, assignment_created, assignment_due_dates)
+      last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('purple')
     end
 
@@ -472,7 +472,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
 	
-      last_round_color = obtain_team_colour(@response_map, assignment_created, assignment_due_dates)
+      last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('purple')
 	    
     end
@@ -490,7 +490,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
       
-      last_round_color = obtain_team_colour(@response_map, assignment_created, assignment_due_dates)
+      last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('green')
     end
 
@@ -509,7 +509,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
 
-      last_round_color = obtain_team_colour(@response_map, assignment_created, assignment_due_dates)
+      last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('purple')
 
     end

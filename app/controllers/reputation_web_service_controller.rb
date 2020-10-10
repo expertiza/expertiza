@@ -127,19 +127,92 @@ class ReputationWebServiceController < ApplicationController
     @response = @@response
   end
 
+  def set_request_body(request_body)
+    @request_body = request_body
+  end
+
+  def get_request_body
+    @request_body
+  end
+
+  def set_response_body(response_body)
+    @response_body = response_body
+  end
+
+  def get_response_body
+    @response_body
+  end
+
+  def set_last_assignment_id
+    @max_assignment_id = Assignment.last.id
+  end
+
+  def get_last_assignment_id
+    @max_assignment_id
+  end
+
+  def set_assignment(assignment_id)
+    @assignment = Assignment.find(assignment_id) rescue nil
+  end
+
+  def get_assignment
+    @assignment
+  end
+
+  def set_another_assignment(another_assignment_id)
+    @another_assignment = Assignment.find(another_assignment_id) rescue nil
+  end
+
+  def get_another_assignment
+    @another_assignment
+  end
+
+  def set_round_num(round_num)
+    @round_num = round_num
+  end
+
+  def get_round_num
+    @round_num
+  end
+
+  def set_algorithm(algorithm)
+    @algorithm
+  end
+
+  def get_algorithm
+    @algorithm
+  end
+
+  def set_additional_info(additional_info)
+    @additional_info = additional_info
+  end
+
+  def get_additional_info
+    @additional_info
+  end
+
+  def set_response(response)
+    @response = response
+  end
+
+  def get_response
+    @response
+  end
+
   def send_post_request
     # https://www.socialtext.net/open/very_simple_rest_in_ruby_part_3_post_to_create_a_new_workspace
     req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader = {'Content-Type' => 'application/json', 'charset' => 'utf-8'})
     curr_assignment_id = (params[:assignment_id].empty? ? '724' : params[:assignment_id])
     req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
     req.body[0] = '' # remove the first '{'
-    @@assignment_id = params[:assignment_id]
-    @@round_num = params[:round_num]
-    @@algorithm = params[:algorithm]
-    @@another_assignment_id = params[:another_assignment_id]
+
+    set_assignment_id(params[:assignment_id])
+    set_round_num(params[:round_num])
+    set_algorithm(params[:algorithm])
+    set_another_assignment_id(params[:another_assignment_id])
 
     if params[:checkbox][:expert_grade] == 'Add expert grades'
-      @@additional_info = 'add expert grades'
+      set_additional_info('add expert grades')
       case params[:assignment_id]
       when '724' # expert grades of Wiki 1a (724)
         if params[:another_assignment_id].to_i.zero?
@@ -155,11 +228,12 @@ class ReputationWebServiceController < ApplicationController
         req.body.prepend("\"expert_grades\": {\"submission25107\":76.6667,\"submission25109\":83.3333},")
       end
     elsif params[:checkbox][:hamer] == 'Add initial Hamer reputation values'
-      @@additional_info = 'add initial hamer reputation values'
+      set_additional_info('add initial hamer reputation values')
     elsif params[:checkbox][:lauw] == 'Add initial Lauw reputation values'
-      @@additional_info = 'add initial lauw reputation values'
+      set_additional_info('add initial lauw reputation values')
     elsif params[:checkbox][:quiz] == 'Add quiz scores'
-      @@additional_info = 'add quiz scores'
+      set_additional_info('add quiz scores')
+
       quiz_str = json_generator(params[:assignment_id].to_i, params[:another_assignment_id].to_i, params[:round_num].to_i, 'quiz scores').to_json
       quiz_str[0] = ''
       quiz_str.prepend('"quiz_scores":{')
@@ -167,7 +241,7 @@ class ReputationWebServiceController < ApplicationController
       quiz_str = quiz_str.gsub('"N/A"', '20.0')
       req.body.prepend(quiz_str)
     else
-      @@additional_info = ''
+      set_additional_info('')
     end
 
     # Eg.
@@ -177,7 +251,7 @@ class ReputationWebServiceController < ApplicationController
     # "quiz_scores" : {"submission1" : {"stu1":100, "stu3":80}, "submission2":{"stu2":40, "stu1":60}}, #optional
     # "submission1": {"stu1":91, "stu3":99},"submission2": {"stu5":92, "stu8":90},"submission3": {"stu2":91, "stu4":88}}"
     req.body.prepend("{")
-    @@request_body = req.body
+    set_request_body(req.body)
     # puts 'This is the request prior to encryption: ' + req.body
     # puts
     # Encryption
@@ -207,8 +281,8 @@ class ReputationWebServiceController < ApplicationController
     # puts "Response #{response.code} #{response.message}:
     # {response.body}"
     # puts
-    @@response = response
-    @@response_body = response.body
+    set_response(response)
+    set_response_body(response.body)
 
     JSON.parse(response.body.to_s).each do |alg, list|
       next unless alg == "Hamer" || alg == "Lauw"
@@ -217,7 +291,7 @@ class ReputationWebServiceController < ApplicationController
       end
     end
 
-    redirect_to action: 'client'
+    redirect_to action: 'set_last_assignment_id'
   end
 
   def rsa_public_key1(data)

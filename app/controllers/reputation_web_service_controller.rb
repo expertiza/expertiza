@@ -132,108 +132,34 @@ class ReputationWebServiceController < ApplicationController
     @response = @@response
   end
 
-  def set_request_body(request_body)
-    @request_body = request_body
-  end
-
-  def get_request_body
-    @request_body
-  end
-
-  def set_response_body(response_body)
-    @response_body = response_body
-  end
-
-  def get_response_body
-    @response_body
-  end
-
-  def set_last_assignment_id
-    @max_assignment_id = Assignment.last.id
-  end
-
-  def get_last_assignment_id
-    @max_assignment_id
-  end
-
-  def set_assignment(assignment_id)
-    @assignment = Assignment.find(assignment_id) rescue nil
-  end
-
-  def get_assignment
-    @assignment
-  end
-
-  def set_another_assignment(another_assignment_id)
-    @another_assignment = Assignment.find(another_assignment_id) rescue nil
-  end
-
-  def get_another_assignment
-    @another_assignment
-  end
-
-  def set_round_num(round_num)
-    @round_num = round_num
-  end
-
-  def get_round_num
-    @round_num
-  end
-
-  def set_algorithm(algorithm)
-    @algorithm
-  end
-
-  def get_algorithm
-    @algorithm
-  end
-
-  def set_additional_info(additional_info)
-    @additional_info = additional_info
-  end
-
-  def get_additional_info
-    @additional_info
-  end
-
-  def set_response(response)
-    @response = response
-  end
-
-  def get_response
-    @response
-  end
-
   def send_post_request
     # https://www.socialtext.net/open/very_simple_rest_in_ruby_part_3_post_to_create_a_new_workspace
     req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader = {'Content-Type' => 'application/json', 'charset' => 'utf-8'})
     curr_assignment_id = (params[:assignment_id].empty? ? '724' : params[:assignment_id])
     req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
     req.body[0] = '' # remove the first '{'
-
-    set_assignment_id(params[:assignment_id])
-    set_round_num(params[:round_num])
-    set_algorithm(params[:algorithm])
-    set_another_assignment_id(params[:another_assignment_id])
+    @@assignment_id = params[:assignment_id]
+    @@round_num = params[:round_num]
+    @@algorithm = params[:algorithm]
+    @@another_assignment_id = params[:another_assignment_id]
 
     if params[:checkbox][:expert_grade] == 'Add expert grades'
-      set_additional_info('add expert grades')
+      @@additional_info = 'add expert grades'
       case params[:assignment_id]
 
-      when '735' # expert grades of program 1 (735)
-        req.body.prepend("\"expert_grades\": {\"submission24083\":96.084,\"submission24085\":88.811,\"submission24086\":100,\"submission24087\":100,\"submission24088\":92.657,\"submission24091\":96.783,\"submission24092\":90.21,\"submission24093\":100,\"submission24097\":90.909,\"submission24098\":98.601,\"submission24101\":99.301,\"submission24278\":98.601,\"submission24279\":72.727,\"submission24281\":54.476,\"submission24289\":94.406,\"submission24291\":99.301,\"submission24293\":93.706,\"submission24296\":98.601,\"submission24302\":83.217,\"submission24303\":91.329,\"submission24305\":100,\"submission24307\":100,\"submission24308\":100,\"submission24311\":95.804,\"submission24313\":91.049,\"submission24314\":100,\"submission24315\":97.483,\"submission24316\":91.608,\"submission24317\":98.182,\"submission24320\":90.21,\"submission24321\":90.21,\"submission24322\":98.601},")
-      when '754' # expert grades of Wiki contribution (754)
-        req.body.prepend("\"expert_grades\": {\"submission25030\":95,\"submission25031\":92,\"submission25033\":88,\"submission25034\":98,\"submission25035\":100,\"submission25037\":95,\"submission25038\":95,\"submission25039\":93,\"submission25040\":96,\"submission25041\":90,\"submission25042\":100,\"submission25046\":95,\"submission25049\":90,\"submission25050\":88,\"submission25053\":91,\"submission25054\":96,\"submission25055\":94,\"submission25059\":96,\"submission25071\":85,\"submission25082\":100,\"submission25086\":95,\"submission25097\":90,\"submission25098\":85,\"submission25102\":97,\"submission25103\":94,\"submission25105\":98,\"submission25114\":95,\"submission25115\":94},")
-      when '756' # expert grades of Wikipedia contribution (756)
-        req.body.prepend("\"expert_grades\": {\"submission25107\":76.6667,\"submission25109\":83.3333},")
+        when '735' # expert grades of program 1 (735)
+          req.body.prepend("\"expert_grades\": {\"submission24083\":96.084,\"submission24085\":88.811,\"submission24086\":100,\"submission24087\":100,\"submission24088\":92.657,\"submission24091\":96.783,\"submission24092\":90.21,\"submission24093\":100,\"submission24097\":90.909,\"submission24098\":98.601,\"submission24101\":99.301,\"submission24278\":98.601,\"submission24279\":72.727,\"submission24281\":54.476,\"submission24289\":94.406,\"submission24291\":99.301,\"submission24293\":93.706,\"submission24296\":98.601,\"submission24302\":83.217,\"submission24303\":91.329,\"submission24305\":100,\"submission24307\":100,\"submission24308\":100,\"submission24311\":95.804,\"submission24313\":91.049,\"submission24314\":100,\"submission24315\":97.483,\"submission24316\":91.608,\"submission24317\":98.182,\"submission24320\":90.21,\"submission24321\":90.21,\"submission24322\":98.601},")
+        when '754' # expert grades of Wiki contribution (754)
+          req.body.prepend("\"expert_grades\": {\"submission25030\":95,\"submission25031\":92,\"submission25033\":88,\"submission25034\":98,\"submission25035\":100,\"submission25037\":95,\"submission25038\":95,\"submission25039\":93,\"submission25040\":96,\"submission25041\":90,\"submission25042\":100,\"submission25046\":95,\"submission25049\":90,\"submission25050\":88,\"submission25053\":91,\"submission25054\":96,\"submission25055\":94,\"submission25059\":96,\"submission25071\":85,\"submission25082\":100,\"submission25086\":95,\"submission25097\":90,\"submission25098\":85,\"submission25102\":97,\"submission25103\":94,\"submission25105\":98,\"submission25114\":95,\"submission25115\":94},")
+        when '756' # expert grades of Wikipedia contribution (756)
+          req.body.prepend("\"expert_grades\": {\"submission25107\":76.6667,\"submission25109\":83.3333},")
       end
     elsif params[:checkbox][:hamer] == 'Add initial Hamer reputation values'
-      set_additional_info('add initial hamer reputation values')
+      @@additional_info = 'add initial hamer reputation values'
     elsif params[:checkbox][:lauw] == 'Add initial Lauw reputation values'
-      set_additional_info('add initial lauw reputation values')
+      @@additional_info = 'add initial lauw reputation values'
     elsif params[:checkbox][:quiz] == 'Add quiz scores'
-      set_additional_info('add quiz scores')
-
+      @@additional_info = 'add quiz scores'
       quiz_str = json_generator(params[:assignment_id].to_i, params[:another_assignment_id].to_i, params[:round_num].to_i, 'quiz scores').to_json
       quiz_str[0] = ''
       quiz_str.prepend('"quiz_scores":{')
@@ -241,7 +167,7 @@ class ReputationWebServiceController < ApplicationController
       quiz_str = quiz_str.gsub('"N/A"', '20.0')
       req.body.prepend(quiz_str)
     else
-      set_additional_info('')
+      @@additional_info = ''
     end
 
     # Eg.
@@ -251,7 +177,7 @@ class ReputationWebServiceController < ApplicationController
     # "quiz_scores" : {"submission1" : {"stu1":100, "stu3":80}, "submission2":{"stu2":40, "stu1":60}}, #optional
     # "submission1": {"stu1":91, "stu3":99},"submission2": {"stu5":92, "stu8":90},"submission3": {"stu2":91, "stu4":88}}"
     req.body.prepend("{")
-    set_request_body(req.body)
+    @@request_body = req.body
     # puts 'This is the request prior to encryption: ' + req.body
     # puts
     # Encryption
@@ -281,8 +207,8 @@ class ReputationWebServiceController < ApplicationController
     # puts "Response #{response.code} #{response.message}:
     # {response.body}"
     # puts
-    set_response(response)
-    set_response_body(response.body)
+    @@response = response
+    @@response_body = response.body
 
     JSON.parse(response.body.to_s).each do |alg, list|
       next unless alg == "Hamer" || alg == "Lauw"
@@ -291,7 +217,7 @@ class ReputationWebServiceController < ApplicationController
       end
     end
 
-    redirect_to action: 'set_last_assignment_id'
+    redirect_to action: 'client'
   end
 
   def rsa_public_key1(data)

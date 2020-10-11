@@ -115,7 +115,6 @@ class SignUpSheetController < ApplicationController
 
   def delete_all_selected_topics
     load_all_selected_topics
-    print(@stopics)
     @stopics.each(&:destroy)
     flash[:success] = "All selected topics have been deleted successfully."
     respond_to do |format|
@@ -126,7 +125,6 @@ class SignUpSheetController < ApplicationController
 
   
   def load_all_selected_topics
-    print(params)
     @stopics = SignUpTopic.where(assignment_id: params[:a_id], topic_identifier: params[:idents])
   end
   # This displays a page that lists all the available topics for an assignment.

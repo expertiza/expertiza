@@ -1,3 +1,25 @@
+<script type="text/javascript" src="/assets/view_team_in_grades.js"></script>
+<script type="text/javascript">
+    $( document ).ready(function() {
+        $('#tag_prompt_toggler').click(function () {
+            if ($('#tag_prompt_toggler').text() == "hide tags")
+                $('#tag_prompt_toggler').text("show tags")
+            else
+                $('#tag_prompt_toggler').text("hide tags")
+            $('.tag_prompt_container').toggle();
+        });
+    });
+
+function toggleFunction(elementId) {
+var target = document.getElementById(elementId);
+if (target.style.display === 'none') {
+target.style.display = 'block';
+} else {
+target.style.display = 'none';
+}
+}
+</script>
+
 <h1>Summary report for <%= @assignment.name %></h1>
 <BR/>
 <% if @scores[:teams] %>

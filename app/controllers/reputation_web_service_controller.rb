@@ -7,15 +7,6 @@ require 'base64'
 class ReputationWebServiceController < ApplicationController
   include AuthorizationHelper
 
-  @@request_body = ''
-  @@response_body = ''
-  @@assignment_id = ''
-  @@another_assignment_id = ''
-  @@round_num = ''
-  @@algorithm = ''
-  @@additional_info = ''
-  @@response = ''
-
   def action_allowed?
     current_user_has_ta_privileges?
   end
@@ -120,16 +111,8 @@ class ReputationWebServiceController < ApplicationController
     request_body.sort.to_h
   end
 
-  def client
-    @request_body = @@request_body
-    @response_body = @@response_body
-    @max_assignment_id = Assignment.last.id
-    @assignment = Assignment.find(@@assignment_id) rescue nil
-    @another_assignment = Assignment.find(@@another_assignment_id) rescue nil
-    @round_num = @@round_num
-    @algorithm = @@algorithm
-    @additional_info = @@additional_info
-    @response = @@response
+  def class
+
   end
 
   def set_request_body(request_body)
@@ -218,7 +201,7 @@ class ReputationWebServiceController < ApplicationController
     set_another_assignment_id(params[:another_assignment_id])
 
     if params[:checkbox][:expert_grade] == 'Add expert grades'
-      @@additional_info = 'add expert grades'
+      set_additional_info(@@additional_info = 'add expert grades')
       case params[:assignment_id]
 
       when '735' # expert grades of program 1 (735)
@@ -230,11 +213,11 @@ class ReputationWebServiceController < ApplicationController
 
       end
     elsif params[:checkbox][:hamer] == 'Add initial Hamer reputation values'
-      @@additional_info = 'add initial hamer reputation values'
+      set_additional_info('add initial hamer reputation values')
     elsif params[:checkbox][:lauw] == 'Add initial Lauw reputation values'
-      @@additional_info = 'add initial lauw reputation values'
+      set_additional_info('add initial lauw reputation values')
     elsif params[:checkbox][:quiz] == 'Add quiz scores'
-      @@additional_info = 'add quiz scores'
+      set_additional_info('add quiz scores')
       quiz_str = json_generator(params[:assignment_id].to_i, params[:another_assignment_id].to_i, params[:round_num].to_i, 'quiz scores').to_json
       quiz_str[0] = ''
       quiz_str.prepend('"quiz_scores":{')
@@ -242,7 +225,7 @@ class ReputationWebServiceController < ApplicationController
       quiz_str = quiz_str.gsub('"N/A"', '20.0')
       req.body.prepend(quiz_str)
     else
-      @@additional_info = ''
+      set_additional_info('')
     end
 
     # Eg.
@@ -252,7 +235,7 @@ class ReputationWebServiceController < ApplicationController
     # "quiz_scores" : {"submission1" : {"stu1":100, "stu3":80}, "submission2":{"stu2":40, "stu1":60}}, #optional
     # "submission1": {"stu1":91, "stu3":99},"submission2": {"stu5":92, "stu8":90},"submission3": {"stu2":91, "stu4":88}}"
     req.body.prepend("{")
-    @@request_body = req.body
+    set_request_body(req.body)
     # puts 'This is the request prior to encryption: ' + req.body
     # puts
     # Encryption
@@ -282,8 +265,8 @@ class ReputationWebServiceController < ApplicationController
     # puts "Response #{response.code} #{response.message}:
     # {response.body}"
     # puts
-    @@response = response
-    @@response_body = response.body
+    set_response(response)
+    set_response_body(response.body)
 
     JSON.parse(response.body.to_s).each do |alg, list|
       next unless alg == "Hamer" || alg == "Lauw"
@@ -292,7 +275,7 @@ class ReputationWebServiceController < ApplicationController
       end
     end
 
-    redirect_to action: 'client'
+    redirect_to action: 'set_last_assignment_id'
   end
 
   def rsa_public_key1(data)

@@ -1,17 +1,18 @@
+include InstructorInterfaceHelperSpec
 
-describe 'student_task/list.html.erb' do
-  let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
-  let(:course) { build(:course) }
-  let(:topic) { build(:topic)}
-  # let(:current)
-  let(:participant) { build(:participant, id: 1) }
-  let(:submission_grade) { build(:review_grade)}
-  let(:badge) {build(:badge)}
+describe "Integration tests for instructor's assignment page" do
+  before(:each) do
+    assignment_setup
+  end
 
-  describe ''
-    # render
-    #
-    # rendered.should contain('Shirt')
-    # rendered.should contain('50.0')
-  # end
+  describe "Instructor login" do
+    it "with valid username and password" do
+      login_as("instructor6")
+      visit '/menu/student_task'
+      expect(page).to have_content("Assignments")
+      expect(page).to have_content("CSC 517 Fall 2009")
+    end
+
+
+  end
 end

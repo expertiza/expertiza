@@ -87,24 +87,28 @@
   </div>
 </div>
 
-<div class="topictable">
+<% group = @student_tasks.group_by(&:course).each do | course, student_tasks|%>
+  <% if course%>
+  <%end %>
+  <div class="topictable" style="float: right;width: 80%;margin-bottom: 10px; display: inline-block; border: 1px solid #000000">
+
   <table class="table table-striped" cellpadding="2">
     <tr class="taskheader">
       <th>Assignment</th>
       <th>Course</th>
       <th>Topic</th>
       <th>Current Stage</th>
-      <th>Review Grade</th>
-      <th>Badges</th>
+      <th>Submission Grade</th>
+<!--      <th>Badges</th>-->
       <th>Stage Deadline <img src="/assets/info.png" title="You can change 'Preferred Time Zone' in 'Profile' in the banner."/></th>
       <th>Publishing Rights</th>
     </tr>
-    <% @student_tasks.each do |student_task| %>
+    <% student_tasks.each do |student_task| %>
       <% participant = student_task.participant %>
       <% if student_task.assignment %>
         <tr class="listingRow">
           <!--assignment-->
-          <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>
+          <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b><p><%= get_awarded_badges(participant) %></p></td>
           <!--course-->
           <td><%= student_task.course.try :name %></td>
           <!--topic-->
@@ -122,10 +126,10 @@
               <%= participant.assignment.current_stage_name(topic_id) %>
             <% end %>
           </td>
-          <!--review grade-->
+          <!--submission grade-->
           <td><%= get_review_grade_info(participant) %></td>
           <!--badges-->
-          <td><%= get_awarded_badges(participant) %></td>
+<!--          <td><%#= get_awarded_badges(participant) %></td>-->
           <!--stage deadline-->
           <td><%= student_task.stage_deadline.in_time_zone(session[:user].timezonepref) %></td>
           <!--publish rights-->
@@ -135,3 +139,5 @@
     <% end %>
   </table>
 </div>
+
+<% end %>

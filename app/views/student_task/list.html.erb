@@ -2,7 +2,7 @@
 <%= render 'publishing_rights' %>
 <!--# start of first block-->
 <div style="display: inline">
-  <div class="taskbox" style="width:30%; display: inline-block; float:left; margin-right: 10px;" >
+  <div class="taskbox" style="width:18%; display: inline-block; float:left; margin-right: 10px;" >
     <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @tasknotstarted.size.to_s %>&nbsp;</span> Tasks not yet started<br></strong><br>
 
     <% @tasknotstarted.each do |student_task|
@@ -92,7 +92,7 @@
   <% group = @student_tasks.group_by(&:course).each do | course, student_tasks|%>
     <% if course%>
     <%end %>
-    <div class="topictable" style="width: 65%; display: inline-block; border: 1px solid #FFFFFF">
+    <div class="topictable" style="float: right;width: 80%;margin-bottom: 10px; display: inline-block; border: 1px solid #000000">
       <!--  add a for loop to check different course-->
       <table class="table table-striped" cellpadding="2">
         <tr class="taskheader">
@@ -150,6 +150,7 @@
         <% end %>
       </table>
     </div>
+
   <% end %>
   <!--#end of second block-->
 </div>

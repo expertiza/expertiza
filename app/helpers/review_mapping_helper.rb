@@ -43,7 +43,7 @@ module ReviewMappingHelper
     end
   end
 
-  # loops through the number of assignment review rounds and obains the team colour
+  # loops through the number of assignment review rounds and obtains the team colour
   def obtain_team_color(response_map, assignment_created, assignment_due_dates)
     color = []
     (1..@assignment.num_review_rounds).each do |round|

@@ -272,7 +272,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(@review_responses_round_three.first.id).to eq(@response_map_3.id)
     end
   end
-  
+
   describe 'check_submission_state' do
     before(:each) do
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
@@ -389,7 +389,7 @@ describe ReviewMappingHelper, type: :helper do
   describe 'link_updated_since_last?' do
 
     before(:each) do
-      
+
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')
@@ -403,7 +403,7 @@ describe ReviewMappingHelper, type: :helper do
       create(:assignment_due_date, round: 1, due_at: DateTime.now.in_time_zone + 5.day)
       create(:assignment_due_date, round: 2, due_at: DateTime.now.in_time_zone + 10.day)
       @due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
-      
+
     end
 
     it 'should return false if submission link was not updated between the last round and the current one' do
@@ -446,8 +446,8 @@ describe ReviewMappingHelper, type: :helper do
 
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
-      
-      
+
+
       last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('purple')
     end
@@ -471,10 +471,10 @@ describe ReviewMappingHelper, type: :helper do
 
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
-	
+
       last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('purple')
-	    
+
     end
 
     it 'should return green if there was no assignment submission in any round' do
@@ -482,14 +482,14 @@ describe ReviewMappingHelper, type: :helper do
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')
 
-      
+
       create(:response, response_map: @response_map)
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 5.day)
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone + 6.day)
 
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
-      
+
       last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('green')
     end
@@ -525,52 +525,52 @@ describe ReviewMappingHelper, type: :helper do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')
-  
+
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2)
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 3)
-  
+
       student = create(:student)
       @reviewee = create(:assignment_team, assignment: @assignment)
       @reviewer = create(:participant, assignment: @assignment, user: student)
-      
+
       # each round in avg_and_ranges must have a symbol and a string for the metric as indicated by corresponding source code
 
       @avg_and_ranges = {
-      		@reviewee.id => 
-		{
-			1 => {
-			   :min => 2,
-			   'min' => 2,
-			   :max => 4,
-			   'max' => 4,
-			   :avg => 3,
-			   'avg' => 3
-			},
-			2 => {
-			   'min' => 5,	
-                           :min => 5,
-			   'max' => 7,
-                           :max => 7,
-			   'avg' => 6,
-                           :avg => 6
-                        },
-			3 => {
-			   'min' => 8,	
-                           :min => 8,
-			   'max' => 10,
-                           :max => 10,
-			   'avg' => 9,
-                           :avg => 9
-                        }
-		}
+          @reviewee.id =>
+              {
+                  1 => {
+                      :min => 2,
+                      'min' => 2,
+                      :max => 4,
+                      'max' => 4,
+                      :avg => 3,
+                      'avg' => 3
+                  },
+                  2 => {
+                      'min' => 5,
+                      :min => 5,
+                      'max' => 7,
+                      :max => 7,
+                      'avg' => 6,
+                      :avg => 6
+                  },
+                  3 => {
+                      'min' => 8,
+                      :min => 8,
+                      'max' => 10,
+                      :max => 10,
+                      'avg' => 9,
+                      :avg => 9
+                  }
+              }
       }
 
       create(:team_user, user: student, team: @reviewee)
-      
+
     end
-  
+
     ## check for metrics in round 1 for given team_id
     it 'should return minimum maximum and average score for round 1' do
       @round = 1
@@ -589,7 +589,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(@max).to eq '7%'
       expect(@avg).to eq '6%'
     end
-	
+
     ## check for metrics in round 3 for given team_id
     it 'should return the minimum, maximum and average score for round 3' do
       @round = 3
@@ -599,7 +599,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(@avg).to eq '9%'
     end
 
-  
+
   end
 
 

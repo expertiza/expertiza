@@ -1,8 +1,8 @@
 <h1>Assignments</h1>
 <%= render 'publishing_rights' %>
 
-<div style="">
-  <div class="taskbox">
+<div style="display: inline">
+    <div class="taskbox" style="width:18%; display: inline-block; float:left; margin-right: 10px;" >
     <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @tasknotstarted.size.to_s %>&nbsp;</span> Tasks not yet started<br></strong><br>
 
     <% @tasknotstarted.each do |student_task|
@@ -85,7 +85,7 @@
     <% end %>
 
   </div>
-</div>
+
 
 <% group = @student_tasks.group_by(&:course).each do | course, student_tasks|%>
   <% if course%>
@@ -141,3 +141,5 @@
 </div>
 
 <% end %>
+  <!--#end of second block-->
+</div>

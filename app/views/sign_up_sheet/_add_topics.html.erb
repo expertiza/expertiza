@@ -64,11 +64,9 @@
                 :expected_fields => 'Topic identifier, User Name1, User Name2, ...' %>|
     <input type="button" value="Delete selected topics" onclick="deleteTopics()" />|
     <input id='select_all' type="checkbox" onClick="selectAll(this)" />Select All |
-   
 <% end %>
 
 <script>
-    
     function deleteTopics() {
         var msg = 'Are you sure? It will delete all selected topics';
         if (confirm(msg)) {

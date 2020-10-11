@@ -104,6 +104,4 @@ describe "Assignment creation topics tab", js: true do
 		sleep 3
 		expect(page).not_to have_link('Topics')
 	end
-
-	
 end

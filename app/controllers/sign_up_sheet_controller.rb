@@ -121,9 +121,7 @@ class SignUpSheetController < ApplicationController
       format.html { redirect_to edit_assignment_path(params[:a_id]) + "#tabs-2"}
       format.js {}
     end
-  end
-
-  
+  end  
   def load_all_selected_topics
     @stopics = SignUpTopic.where(assignment_id: params[:a_id], topic_identifier: params[:idents])
   end
@@ -501,8 +499,4 @@ class SignUpSheetController < ApplicationController
   def delete_signup_for_topic(assignment_id, topic_id, user_id)
     SignUpTopic.reassign_topic(user_id, assignment_id, topic_id)
   end
-
-  
-
-
 end

@@ -88,63 +88,68 @@
 
   <!--# end of first block-->
   <!--# start of second block-->
-  <div class="topictable" style="width: 65%; display: inline-block; border: 1px solid #ff0000">
-    <!--  add a for loop to check different course-->
-    <table class="table table-striped" cellpadding="2">
-      <tr class="taskheader">
-        <th>Assignment</th>
-        <th>Course</th>
-        <th>Topic</th>
-        <th>Current Stage</th>
-        <th>Submission Grade</th>
-        <!--      <th>Badges</th>-->
-        <th>Stage Deadline <img src="/assets/info.png" title="You can change 'Preferred Time Zone' in 'Profile' in the banner."/></th>
-        <th>Publishing Rights</th>
-        <th>Make Public <img src="/assets/info.png" title="Checking this means that you provide permission for your/your team's work to be available to others in the class or whomever the instructor chooses, once the submission deadline is passed."/></th>
-      </tr>
-      <% @student_tasks.each do |student_task| %>
 
-        <% participant = student_task.participant %>
-        <% if student_task.assignment %>
-          <tr class="listingRow">
-            <!--assignment also badge at the end if the assignment has badge-->
-            <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b><p><%= get_awarded_badges(participant) %></p> </td>
-            <!--course-->
-            <td><%= student_task.course.try :name %></td>
-            <!--topic-->
-            <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
-            <% if SignUpTopic.exists?(topic_id) %>
-              <td><%= SignUpTopic.find(topic_id).try :topic_name %></td>
+  <% group = @student_tasks.group_by(&:course).each do | course, student_tasks|%>
+    <% if course%>
+    <%end %>
+    <div class="topictable" style="width: 65%; display: inline-block; border: 1px solid #FFFFFF">
+      <!--  add a for loop to check different course-->
+      <table class="table table-striped" cellpadding="2">
+        <tr class="taskheader">
+          <th>Assignment</th>
+          <th>Course</th>
+          <th>Topic</th>
+          <th>Current Stage</th>
+          <th>Submission Grade</th>
+          <!--      <th>Badges</th>-->
+          <th>Stage Deadline <img src="/assets/info.png" title="You can change 'Preferred Time Zone' in 'Profile' in the banner."/></th>
+          <th>Publishing Rights</th>
+          <th>Make Public <img src="/assets/info.png" title="Checking this means that you provide permission for your/your team's work to be available to others in the class or whomever the instructor chooses, once the submission deadline is passed."/></th>
+        </tr>
+        <% student_tasks.each do |student_task| %>
 
-            <% else %>
-              <td>-</td>
-            <% end %>
-            <!--current stage-->
-            <td>
-              <% if participant.assignment.link_for_current_stage(topic_id)!= nil && participant.assignment.link_for_current_stage(topic_id).length!=0%>
-                <%= link_to participant.assignment.current_stage_name(topic_id), participant.assignment.link_for_current_stage(topic_id) %>
+          <% participant = student_task.participant %>
+          <% if student_task.assignment %>
+            <tr class="listingRow">
+              <!--assignment also badge at the end-->
+              <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b><p><%= get_awarded_badges(participant) %></p> </td>
+              <!--course-->
+              <td><%= student_task.course.try :name %></td>
+              <!--topic-->
+              <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
+              <% if SignUpTopic.exists?(topic_id) %>
+                <td><%= SignUpTopic.find(topic_id).try :topic_name %></td>
+
               <% else %>
-                <%= participant.assignment.current_stage_name(topic_id) %>
+                <td>-</td>
               <% end %>
-            </td>
-            <!--submission grade-->
-            <td><%= get_review_grade_info(participant) %></td>
-            <!--badges-->
-            <!--              <td><%#= get_awarded_badges(participant) %></td>-->
-            <!--stage deadline-->
-            <td><%= student_task.stage_deadline.in_time_zone(session[:user].timezonepref) %></td>
-            <!--publish rights-->
-            <td align=center><%= participant.permission_granted ? "granted" : "denied" %></td>
-            <!--make assignment public-->
-            <% if !participant.team.nil? %>
-              <td align=center>
-                <input class='make-public-check' teamid="<%= participant.team.id %>" type="checkbox" <% if participant.team.make_public %>checked<% end %>>
+              <!--current stage-->
+              <td>
+                <% if participant.assignment.link_for_current_stage(topic_id)!= nil && participant.assignment.link_for_current_stage(topic_id).length!=0%>
+                  <%= link_to participant.assignment.current_stage_name(topic_id), participant.assignment.link_for_current_stage(topic_id) %>
+                <% else %>
+                  <%= participant.assignment.current_stage_name(topic_id) %>
+                <% end %>
               </td>
-            <% end %>
-          </tr>
+              <!--submission grade-->
+              <td><%= get_review_grade_info(participant) %></td>
+              <!--badges-->
+              <!--              <td><%#= get_awarded_badges(participant) %></td>-->
+              <!--stage deadline-->
+              <td><%= student_task.stage_deadline.in_time_zone(session[:user].timezonepref) %></td>
+              <!--publish rights-->
+              <td align=center><%= participant.permission_granted ? "granted" : "denied" %></td>
+              <!--make assignment public-->
+              <% if !participant.team.nil? %>
+                <td align=center>
+                  <input class='make-public-check' teamid="<%= participant.team.id %>" type="checkbox" <% if participant.team.make_public %>checked<% end %>>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
         <% end %>
-      <% end %>
-    </table>
-  </div>
+      </table>
+    </div>
+  <% end %>
   <!--#end of second block-->
 </div>

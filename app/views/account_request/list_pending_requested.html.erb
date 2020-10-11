@@ -1,7 +1,7 @@
 <div class="exp">
 
-  <table>
-    <tr><th class="head">Name</th><th class="head">Full Name</th><th class="head">Email Address</th><th class="head">Role</th><th class="head">Self Introduction</th><th class="head">Status</th><th class="head">Actions</th></tr>
+  <table class = "table table-hover">
+    <tr><th class="head">Name</th><th class="head">Full Name</th><th class="head">Email Address</th><th class="head">Role</th><th class="head">Self Introduction</th><th class="head" colspan="4" >Status</th><th class="head">Actions</th></tr>
 
     <% @requested_users.each do |requested_user| %>
       <%= form_tag action: :create_approved_user, id: requested_user.id do %>
@@ -21,4 +21,6 @@
       <% end %>
     <% end %>
   </table>
+  <!--Added pagination bar for showing selected results per page -->
+  <%= will_paginate @requested_users %>
 </div>

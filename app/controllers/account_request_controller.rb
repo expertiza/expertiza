@@ -80,7 +80,9 @@ class AccountRequestController < ApplicationController
   end
 
   def list_pending_requested
-    @requested_users = AccountRequest.all
+    # @requested_users = AccountRequest.all
+    # display all requests with pagination and in reverse chronologigal order
+    @requested_users = AccountRequest.all.order(created_at: :desc).paginate(page: params[:page], per_page: 10) 
     @roles = Role.all
   end
 

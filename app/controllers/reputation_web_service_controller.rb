@@ -115,7 +115,7 @@ class ReputationWebServiceController < ApplicationController
       request_body['submission' + record[1].to_s] = {} unless request_body.key?('submission' + record[1].to_s)
       request_body['submission' + record[1].to_s]['stu' + record[0].to_s] = record[2]
     end
-    # sort the 2-dimention hash
+    # sort the 2-dimension hash
     request_body.each {|k, v| request_body[k] = v.sort.to_h }
     request_body.sort.to_h
   end
@@ -181,7 +181,7 @@ class ReputationWebServiceController < ApplicationController
   end
 
   def set_algorithm(algorithm)
-    @algorithm
+    @algorithm = algorithm
   end
 
   def get_algorithm
@@ -211,10 +211,11 @@ class ReputationWebServiceController < ApplicationController
     curr_assignment_id = (params[:assignment_id].empty? ? '724' : params[:assignment_id])
     req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
     req.body[0] = '' # remove the first '{'
-    @@assignment_id = params[:assignment_id]
-    @@round_num = params[:round_num]
-    @@algorithm = params[:algorithm]
-    @@another_assignment_id = params[:another_assignment_id]
+
+    set_assignment_id(params[:assignment_id])
+    set_round_num(params[:round_num])
+    set_algorithm(params[:algorithm])
+    set_another_assignment_id(params[:another_assignment_id])
 
     if params[:checkbox][:expert_grade] == 'Add expert grades'
       @@additional_info = 'add expert grades'

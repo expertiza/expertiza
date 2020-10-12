@@ -41,6 +41,8 @@ class StudentTeamsController < ApplicationController
     # View will check if send_invs and recieved_invs are set before showing
     # only the owner should be able to see those.
 
+    return unless current_user_id? student.user_id
+
     @send_invs = Invitation.where from_id: student.user.id, assignment_id: student.assignment.id
     @received_invs = Invitation.where to_id: student.user.id, assignment_id: student.assignment.id, reply_status: 'W'
 
@@ -158,6 +160,7 @@ class StudentTeamsController < ApplicationController
   end
 
 
+  #used to check student team requirements
   def student_team_requirements_met?
     #checks if the student has a team
     if @student.team.nil?

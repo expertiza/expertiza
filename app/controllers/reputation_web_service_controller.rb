@@ -232,37 +232,22 @@ class ReputationWebServiceController < ApplicationController
     # "submission1": {"stu1":91, "stu3":99},"submission2": {"stu5":92, "stu8":90},"submission3": {"stu2":91, "stu4":88}}"
     req.body.prepend("{")
     set_request_body(req.body)
-    # puts 'This is the request prior to encryption: ' + req.body
-    # puts
-    # Encryption
-    # AES symmetric algorithm encrypts raw data
-    aes_encrypted_request_data = aes_encrypt(req.body)
-    req.body = aes_encrypted_request_data[0]
-    # RSA asymmetric algorithm encrypts keys of AES
-    encrypted_key = rsa_public_key1(aes_encrypted_request_data[1])
-    encrypted_vi = rsa_public_key1(aes_encrypted_request_data[2])
-    # fixed length 350
-    req.body.prepend('", "data":"')
-    req.body.prepend(encrypted_vi)
-    req.body.prepend(encrypted_key)
-    # request body should be in JSON format.
-    req.body.prepend('{"keys":"')
-    req.body << '"}'
-    req.body.gsub!(/\n/, '\\n')
-    response = Net::HTTP.new('peerlogic.csc.ncsu.edu').start {|http| http.request(req) }
-    # RSA asymmetric algorithm decrypts keys of AES
-    # Decryption
+
+
+
+
+ # Encrypting the request being sent over the internet
+    encrypted_request = encrypt_request(req)
+
+    # Encrypted response of the request sent in previous step
+    response = Net::HTTP.new('peerlogic.csc.ncsu.edu').start {|http| http.request(encrypted_request) }
+
+    # Decrypting the response
     response.body = JSON.parse(response.body)
-    key = rsa_private_key2(response.body["keys"][0, 350])
-    vi = rsa_private_key2(response.body["keys"][350, 350])
-    # AES symmetric algorithm decrypts data
-    aes_encrypted_response_data = response.body["data"]
-    response.body = aes_decrypt(aes_encrypted_response_data, key, vi)
-    # puts "Response #{response.code} #{response.message}:
-    # {response.body}"
-    # puts
+    decrypted_response_body= decrypt_response(response.body)
+
     set_response(response)
-    set_response_body(response.body)
+    set_response_body(decrypted_response_body)
 
     JSON.parse(response.body.to_s).each do |alg, list|
       next unless alg == "Hamer" || alg == "Lauw"
@@ -270,9 +255,41 @@ class ReputationWebServiceController < ApplicationController
         Participant.find_by(user_id: id).update(alg.to_sym => rep) unless /leniency/ =~ id.to_s
       end
     end
-
     redirect_to action: 'set_last_assignment_id'
   end
+
+
+    # RSA asymmetric algorithm decrypts keys of AES
+    # Decryption
+  def decrypt_request(response)
+
+      key = rsa_private_key2(response["keys"][0, 350])
+      vi = rsa_private_key2(response["keys"][350, 350])
+      # AES symmetric algorithm decrypts data
+      aes_encrypted_response_data = response["data"]
+      decrypted_response = aes_decrypt(aes_encrypted_response_data, key, vi)
+      decrypt_response
+  end
+
+    # Encryption
+    # AES symmetric algorithm encrypts raw data
+  def encrypt_request(request)
+      aes_encrypted_request_data = aes_encrypt(request.body)
+      request = aes_encrypted_request_data[0]
+      # RSA asymmetric algorithm encrypts keys of AES
+      encrypted_key = rsa_public_key1(aes_encrypted_request_data[1])
+      encrypted_vi = rsa_public_key1(aes_encrypted_request_data[2])
+      # fixed length 350
+      request.body.prepend('", "data":"')
+      request.body.prepend(encrypted_vi)
+      request.body.prepend(encrypted_key)
+      # request body should be in JSON format.
+      request.body.prepend('{"keys":"')
+      request.body<< '"}'
+      request.body.gsub!(/\n/, '\\n')
+      request
+  end
+     
 
   def rsa_public_key1(data)
     public_key_file = 'public1.pem'

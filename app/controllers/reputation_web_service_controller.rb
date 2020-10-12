@@ -36,8 +36,9 @@ class ReputationWebServiceController < ApplicationController
   #   query+="group by RM.id "+
   #   "order by RM.reviewee_id"
   #
-  #  result = ActiveRecord::Base.connection.select_all(query)
-  def get_review_responses_query(assignment_id, another_assignment_id = 0)
+  #  result = ActiveRecord::Base.connection.select_all(query)git status
+  # db query to return review responses
+  def get_review_responses(assignment_id, another_assignment_id = 0)
     assignment_ids = []
     assignment_ids << assignment_id
     assignment_ids << another_assignment_id unless another_assignment_id.zero?
@@ -59,6 +60,7 @@ class ReputationWebServiceController < ApplicationController
         temp_sum = 0
         weight_sum = 0
         valid_answer = answers.select {|a| a.question.type == 'Criterion' and !a.answer.nil? }
+        # calculate weighted sum for valid answers
         next if valid_answer.empty?
         valid_answer.each do |answer|
           temp_sum += answer.answer * answer.question.weight
@@ -72,7 +74,7 @@ class ReputationWebServiceController < ApplicationController
   end
 
   # special db query, return quiz scores
-  def calculate_quiz_score(assignment_id, another_assignment_id = 0)
+  def calculate_quiz_scores(assignment_id, another_assignment_id = 0)
     raw_data_array = []
     assignment_ids = []
     assignment_ids << assignment_id
@@ -82,8 +84,8 @@ class ReputationWebServiceController < ApplicationController
     teams.each {|team| team_ids << team.id }
     quiz_questionnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
     quiz_questionnaire_ids = []
-    quiz_questionnaires.each {|questionnaire| quiz_questionnnaire_ids << questionnaire.id }
-    QuizResponseMap.where('reviewed_object_id in (?)', quiz_questionnnaire_ids).each do |response_map|
+    quiz_questionnaires.each {|questionnaire| quiz_questionnaire_ids << questionnaire.id }
+    QuizResponseMap.where('reviewed_object_id in (?)', quiz_questionnaire_ids).each do |response_map|
       quiz_score = response_map.quiz_score
       participant = Participant.find(response_map.reviewer_id)
       raw_data_array << [participant.user_id, response_map.reviewee_id, quiz_score]
@@ -96,7 +98,7 @@ class ReputationWebServiceController < ApplicationController
     has_topic = !SignUpTopic.where(assignment_id: assignment_id).empty?
 
     if type == 'peer review grades'
-      @responses = get_review_responses_query(assignment.id,  another_assignment_id)
+      @responses = get_review_responses(assignment.id, another_assignment_id)
       @results = calculate_peer_review_grades(has_topic,@responses, round_num)
     elsif type == 'quiz scores'
       @results = calculate_quiz_score(assignment.id, another_assignment_id)

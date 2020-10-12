@@ -88,7 +88,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :courses, only: %i[new create edit update] do
+  resources :courses, controller: 'courses', only: %i[new create edit update] do
     collection do
       get :toggle_access
       get :copy

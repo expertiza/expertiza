@@ -75,9 +75,14 @@ class AccountRequestController < ApplicationController
     @rolename = Role.find_by(name: params[:role])
     roles_for_request_sign_up
   end
+ 
+  def list_pending_requested_finalized
+    @requested_users = AccountRequest.where.not(:status => 'Under Review').order("created_at DESC")
+    @roles = Role.all
 
+  end
   def list_pending_requested
-    @requested_users = AccountRequest.all
+    @requested_users = AccountRequest.where(:status => 'Under Review').order("created_at DESC")
     @roles = Role.all
   end
 

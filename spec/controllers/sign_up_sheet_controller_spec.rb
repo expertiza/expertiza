@@ -123,9 +123,9 @@ describe SignUpSheetController do
   end
 
   describe '#delete_all_selected_topics' do
-    it 'delete_all_selected_topics and redirects to edit assignment page with single topic as input', :focus do
-      allow(SignUpTopic).to receive(:find).with(a_id: 1,topic_identifier: ['E1732']).and_return(topic)
-      params = {a_id: 1, idents: ['E1732']}
+    it 'delete_all_selected_topics and redirects to edit assignment page with single topic as input' do
+      allow(SignUpTopic).to receive(:find).with(assignment_id: 1,topic_identifier: ['E1732']).and_return(topic)
+      params = {assignment_id: 1, topic_ids: ['E1732']}
       post :delete_all_selected_topics, params
       expect(flash[:success]).to eq('All selected topics have been deleted successfully.')
       expect(response).to redirect_to('/assignments/1/edit#tabs-2')

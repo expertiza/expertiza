@@ -11,8 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
-ActiveRecord::Schema.define(version: 20200421235620) do
+ActiveRecord::Schema.define(version: 20201011214909) do
 
   create_table "account_requests", force: :cascade do |t|
     t.string   "name",              limit: 255
@@ -60,80 +59,11 @@ ActiveRecord::Schema.define(version: 20200421235620) do
   add_index "assignment_badges", ["assignment_id"], name: "index_assignment_badges_on_assignment_id", using: :btree
   add_index "assignment_badges", ["badge_id"], name: "index_assignment_badges_on_badge_id", using: :btree
 
-  create_table "assignment_questionnaires", force: :cascade do |t|
-    t.integer "assignment_id",        limit: 4
-    t.integer "questionnaire_id",     limit: 4
-    t.integer "user_id",              limit: 4
-    t.integer "notification_limit",   limit: 4, default: 15,   null: false
-    t.integer "questionnaire_weight", limit: 4, default: 0,    null: false
-    t.integer "used_in_round",        limit: 4
-    t.boolean "dropdown",                       default: true
-    t.integer "topic_id",             limit: 4
-  end
+# Could not dump table "assignment_questionnaires" because of following FrozenError
+#   can't modify frozen String: "true"
 
-  add_index "assignment_questionnaires", ["assignment_id"], name: "fk_aq_assignments_id", using: :btree
-  add_index "assignment_questionnaires", ["questionnaire_id"], name: "fk_aq_questionnaire_id", using: :btree
-  add_index "assignment_questionnaires", ["user_id"], name: "fk_aq_user_id", using: :btree
-
-  create_table "assignments", force: :cascade do |t|
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "name",                                               limit: 255
-    t.string   "directory_path",                                     limit: 255
-    t.integer  "submitter_count",                                    limit: 4,     default: 0,      null: false
-    t.integer  "course_id",                                          limit: 4,     default: 0
-    t.integer  "instructor_id",                                      limit: 4,     default: 0
-    t.boolean  "private",                                                          default: false,  null: false
-    t.integer  "num_reviews",                                        limit: 4,     default: 3,      null: false
-    t.integer  "num_review_of_reviews",                              limit: 4,     default: 0,      null: false
-    t.integer  "num_review_of_reviewers",                            limit: 4,     default: 0,      null: false
-    t.boolean  "reviews_visible_to_all"
-    t.integer  "num_reviewers",                                      limit: 4,     default: 0,      null: false
-    t.text     "spec_location",                                      limit: 65535
-    t.integer  "max_team_size",                                      limit: 4,     default: 0,      null: false
-    t.boolean  "staggered_deadline"
-    t.boolean  "allow_suggestions"
-    t.integer  "days_between_submissions",                           limit: 4
-    t.string   "review_assignment_strategy",                         limit: 255
-    t.integer  "max_reviews_per_submission",                         limit: 4
-    t.integer  "review_topic_threshold",                             limit: 4,     default: 0
-    t.boolean  "copy_flag",                                                        default: false
-    t.integer  "rounds_of_reviews",                                  limit: 4,     default: 1
-    t.boolean  "microtask",                                                        default: false
-    t.boolean  "require_quiz"
-    t.integer  "num_quiz_questions",                                 limit: 4,     default: 0,      null: false
-    t.boolean  "is_coding_assignment"
-    t.boolean  "is_intelligent"
-    t.boolean  "calculate_penalty",                                                default: false,  null: false
-    t.integer  "late_policy_id",                                     limit: 4
-    t.boolean  "is_penalty_calculated",                                            default: false,  null: false
-    t.integer  "max_bids",                                           limit: 4
-    t.boolean  "show_teammate_reviews"
-    t.boolean  "availability_flag",                                                default: true
-    t.boolean  "use_bookmark"
-    t.boolean  "can_review_same_topic",                                            default: true
-    t.boolean  "can_choose_topic_to_review",                                       default: true
-    t.boolean  "is_calibrated",                                                    default: false
-    t.boolean  "is_selfreview_enabled"
-    t.string   "reputation_algorithm",                               limit: 255,   default: "Lauw"
-    t.boolean  "is_anonymous",                                                     default: true
-    t.integer  "num_reviews_required",                               limit: 4,     default: 3
-    t.integer  "num_metareviews_required",                           limit: 4,     default: 3
-    t.integer  "num_metareviews_allowed",                            limit: 4,     default: 3
-    t.integer  "num_reviews_allowed",                                limit: 4,     default: 3
-    t.integer  "simicheck",                                          limit: 4,     default: -1
-    t.integer  "simicheck_threshold",                                limit: 4,     default: 100
-    t.boolean  "is_answer_tagging_allowed"
-    t.boolean  "has_badge"
-    t.boolean  "allow_selecting_additional_reviews_after_1st_round"
-    t.boolean  "reviewer_is_team"
-    t.boolean  "vary_by_topic",                                                    default: false
-    t.boolean  "vary_by_round"
-  end
-
-  add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
-  add_index "assignments", ["instructor_id"], name: "fk_assignments_instructors", using: :btree
-  add_index "assignments", ["late_policy_id"], name: "fk_late_policy_id", using: :btree
+# Could not dump table "assignments" because of following FrozenError
+#   can't modify frozen String: "false"
 
   create_table "automated_metareviews", force: :cascade do |t|
     t.float    "relevance",         limit: 24
@@ -233,18 +163,8 @@ ActiveRecord::Schema.define(version: 20200421235620) do
   add_index "controller_actions", ["permission_id"], name: "fk_controller_action_permission_id", using: :btree
   add_index "controller_actions", ["site_controller_id"], name: "fk_controller_action_site_controller_id", using: :btree
 
-  create_table "courses", force: :cascade do |t|
-    t.string   "name",            limit: 255
-    t.integer  "instructor_id",   limit: 4
-    t.string   "directory_path",  limit: 255
-    t.text     "info",            limit: 65535
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.boolean  "private",                       default: false, null: false
-    t.integer  "institutions_id", limit: 4
-  end
-
-  add_index "courses", ["instructor_id"], name: "fk_course_users", using: :btree
+# Could not dump table "courses" because of following FrozenError
+#   can't modify frozen String: "false"
 
   create_table "deadline_rights", force: :cascade do |t|
     t.string "name", limit: 32
@@ -270,29 +190,8 @@ ActiveRecord::Schema.define(version: 20200421235620) do
 
   add_index "delayed_jobs", ["priority", "run_at"], name: "delayed_jobs_priority", using: :btree
 
-  create_table "due_dates", force: :cascade do |t|
-    t.datetime "due_at"
-    t.integer  "deadline_type_id",            limit: 4
-    t.integer  "parent_id",                   limit: 4
-    t.integer  "submission_allowed_id",       limit: 4
-    t.integer  "review_allowed_id",           limit: 4
-    t.integer  "review_of_review_allowed_id", limit: 4
-    t.integer  "round",                       limit: 4
-    t.boolean  "flag",                                    default: false
-    t.integer  "threshold",                   limit: 4,   default: 1
-    t.string   "delayed_job_id",              limit: 255
-    t.string   "deadline_name",               limit: 255
-    t.string   "description_url",             limit: 255
-    t.integer  "quiz_allowed_id",             limit: 4,   default: 1
-    t.integer  "teammate_review_allowed_id",  limit: 4,   default: 3
-    t.string   "type",                        limit: 255, default: "AssignmentDueDate"
-  end
-
-  add_index "due_dates", ["deadline_type_id"], name: "fk_deadline_type_due_date", using: :btree
-  add_index "due_dates", ["parent_id"], name: "fk_due_dates_assignments", using: :btree
-  add_index "due_dates", ["review_allowed_id"], name: "fk_due_date_review_allowed", using: :btree
-  add_index "due_dates", ["review_of_review_allowed_id"], name: "fk_due_date_review_of_review_allowed", using: :btree
-  add_index "due_dates", ["submission_allowed_id"], name: "fk_due_date_submission_allowed", using: :btree
+# Could not dump table "due_dates" because of following FrozenError
+#   can't modify frozen String: "false"
 
   create_table "institutions", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
@@ -379,26 +278,8 @@ ActiveRecord::Schema.define(version: 20200421235620) do
 
   add_index "notifications", ["course_id"], name: "index_notifications_on_course_id", using: :btree
 
-  create_table "participants", force: :cascade do |t|
-    t.boolean  "can_submit",                        default: true
-    t.boolean  "can_review",                        default: true
-    t.integer  "user_id",             limit: 4
-    t.integer  "parent_id",           limit: 4
-    t.datetime "submitted_at"
-    t.boolean  "permission_granted"
-    t.integer  "penalty_accumulated", limit: 4,     default: 0,    null: false
-    t.float    "grade",               limit: 24
-    t.string   "type",                limit: 255
-    t.string   "handle",              limit: 255
-    t.datetime "time_stamp"
-    t.text     "digital_signature",   limit: 65535
-    t.string   "duty",                limit: 255
-    t.boolean  "can_take_quiz",                     default: true
-    t.float    "Hamer",               limit: 24,    default: 1.0
-    t.float    "Lauw",                limit: 24,    default: 0.0
-  end
-
-  add_index "participants", ["user_id"], name: "fk_participant_users", using: :btree
+# Could not dump table "participants" because of following FrozenError
+#   can't modify frozen String: "true"
 
   create_table "password_resets", force: :cascade do |t|
     t.string   "user_email", limit: 255
@@ -444,65 +325,24 @@ ActiveRecord::Schema.define(version: 20200421235620) do
 
   add_index "question_advices", ["question_id"], name: "fk_question_question_advices", using: :btree
 
-  create_table "questionnaires", force: :cascade do |t|
-    t.string   "name",               limit: 64
-    t.integer  "instructor_id",      limit: 4,     default: 0,     null: false
-    t.boolean  "private",                          default: false, null: false
-    t.integer  "min_question_score", limit: 4,     default: 0,     null: false
-    t.integer  "max_question_score", limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at",                                       null: false
-    t.string   "type",               limit: 255
-    t.string   "display_type",       limit: 255
-    t.text     "instruction_loc",    limit: 65535
+  create_table "question_types", force: :cascade do |t|
+    t.string "type", limit: 255
   end
 
-  create_table "questions", force: :cascade do |t|
-    t.text    "txt",              limit: 65535
-    t.integer "weight",           limit: 4
-    t.integer "questionnaire_id", limit: 4
-    t.decimal "seq",                            precision: 6, scale: 2
-    t.string  "type",             limit: 255
-    t.string  "size",             limit: 255,                           default: ""
-    t.string  "alternatives",     limit: 255
-    t.boolean "break_before",                                           default: true
-    t.string  "max_label",        limit: 255,                           default: ""
-    t.string  "min_label",        limit: 255,                           default: ""
-  end
+# Could not dump table "questionnaires" because of following FrozenError
+#   can't modify frozen String: "false"
 
-  add_index "questions", ["questionnaire_id"], name: "fk_question_questionnaires", using: :btree
+# Could not dump table "questions" because of following FrozenError
+#   can't modify frozen String: "true"
 
-  create_table "quiz_question_choices", force: :cascade do |t|
-    t.integer "question_id", limit: 4
-    t.text    "txt",         limit: 65535
-    t.boolean "iscorrect",                 default: false
-  end
+# Could not dump table "quiz_question_choices" because of following FrozenError
+#   can't modify frozen String: "false"
 
-  create_table "response_maps", force: :cascade do |t|
-    t.integer  "reviewed_object_id", limit: 4,   default: 0,     null: false
-    t.integer  "reviewer_id",        limit: 4,   default: 0,     null: false
-    t.integer  "reviewee_id",        limit: 4,   default: 0,     null: false
-    t.string   "type",               limit: 255, default: "",    null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.boolean  "calibrate_to",                   default: false
-    t.boolean  "reviewer_is_team"
-  end
+# Could not dump table "response_maps" because of following FrozenError
+#   can't modify frozen String: "false"
 
-  add_index "response_maps", ["reviewer_id"], name: "fk_response_map_reviewer", using: :btree
-
-  create_table "responses", force: :cascade do |t|
-    t.integer  "map_id",             limit: 4,     default: 0,         null: false
-    t.text     "additional_comment", limit: 65535
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "version_num",        limit: 4
-    t.integer  "round",              limit: 4
-    t.boolean  "is_submitted",                     default: false
-    t.string   "visibility",         limit: 255,   default: "private"
-  end
-
-  add_index "responses", ["map_id"], name: "fk_response_response_map", using: :btree
+# Could not dump table "responses" because of following FrozenError
+#   can't modify frozen String: "false"
 
   create_table "resubmission_times", force: :cascade do |t|
     t.integer  "participant_id", limit: 4
@@ -558,27 +398,8 @@ ActiveRecord::Schema.define(version: 20200421235620) do
     t.datetime "updated_at",              null: false
   end
 
-  create_table "score_views", id: false, force: :cascade do |t|
-    t.integer  "question_weight",       limit: 4
-    t.string   "type",                  limit: 255
-    t.integer  "q1_id",                 limit: 4,     default: 0
-    t.string   "q1_name",               limit: 64
-    t.integer  "q1_instructor_id",      limit: 4,     default: 0
-    t.boolean  "q1_private",                          default: false
-    t.integer  "q1_min_question_score", limit: 4,     default: 0
-    t.integer  "q1_max_question_score", limit: 4
-    t.datetime "q1_created_at"
-    t.datetime "q1_updated_at"
-    t.string   "q1_type",               limit: 255
-    t.string   "q1_display_type",       limit: 255
-    t.integer  "ques_id",               limit: 4,     default: 0,     null: false
-    t.integer  "ques_questionnaire_id", limit: 4
-    t.integer  "s_id",                  limit: 4,     default: 0
-    t.integer  "s_question_id",         limit: 4,     default: 0
-    t.integer  "s_score",               limit: 4
-    t.text     "s_comments",            limit: 65535
-    t.integer  "s_response_id",         limit: 4
-  end
+# Could not dump table "score_views" because of following FrozenError
+#   can't modify frozen String: "false"
 
   create_table "sections", force: :cascade do |t|
     t.string   "name",       limit: 255,   null: false
@@ -612,14 +433,8 @@ ActiveRecord::Schema.define(version: 20200421235620) do
   add_index "sign_up_topics", ["assignment_id"], name: "fk_sign_up_categories_sign_up_topics", using: :btree
   add_index "sign_up_topics", ["assignment_id"], name: "index_sign_up_topics_on_assignment_id", using: :btree
 
-  create_table "signed_up_teams", force: :cascade do |t|
-    t.integer "topic_id",                   limit: 4, default: 0,     null: false
-    t.integer "team_id",                    limit: 4, default: 0,     null: false
-    t.boolean "is_waitlisted",                        default: false, null: false
-    t.integer "preference_priority_number", limit: 4
-  end
-
-  add_index "signed_up_teams", ["topic_id"], name: "fk_signed_up_users_sign_up_topics", using: :btree
+# Could not dump table "signed_up_teams" because of following FrozenError
+#   can't modify frozen String: "false"
 
   create_table "site_controllers", force: :cascade do |t|
     t.string  "name",          limit: 255, default: "", null: false
@@ -640,13 +455,8 @@ ActiveRecord::Schema.define(version: 20200421235620) do
     t.integer  "assignment_id", limit: 4
   end
 
-  create_table "suggestion_comments", force: :cascade do |t|
-    t.text     "comments",      limit: 65535
-    t.string   "commenter",     limit: 255
-    t.string   "vote",          limit: 255
-    t.integer  "suggestion_id", limit: 4
-    t.datetime "created_at"
-  end
+# Could not dump table "suggestion_comments" because of following FrozenError
+#   can't modify frozen String: "false"
 
   create_table "suggestions", force: :cascade do |t|
     t.integer "assignment_id",     limit: 4
@@ -719,17 +529,8 @@ ActiveRecord::Schema.define(version: 20200421235620) do
     t.datetime "updated_at",               null: false
   end
 
-  create_table "teams", force: :cascade do |t|
-    t.string  "name",                       limit: 255
-    t.integer "parent_id",                  limit: 4
-    t.string  "type",                       limit: 255
-    t.text    "comments_for_advertisement", limit: 65535
-    t.boolean "advertise_for_partner"
-    t.text    "submitted_hyperlinks",       limit: 65535
-    t.integer "directory_num",              limit: 4
-    t.integer "grade_for_submission",       limit: 4
-    t.text    "comment_for_submission",     limit: 65535
-  end
+# Could not dump table "teams" because of following FrozenError
+#   can't modify frozen String: "false"
 
   create_table "teams_users", force: :cascade do |t|
     t.integer "team_id", limit: 4
@@ -740,14 +541,14 @@ ActiveRecord::Schema.define(version: 20200421235620) do
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 
   create_table "track_notifications", force: :cascade do |t|
-    t.integer  "notification_id", limit: 4
     t.integer  "user_id",         limit: 4
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "notification_id", limit: 4, null: false
   end
 
-  add_index "track_notifications", ["notification_id"], name: "index_track_notifications_on_notification_id", using: :btree
-  add_index "track_notifications", ["user_id"], name: "index_track_notifications_on_user_id", using: :btree
+  add_index "track_notifications", ["notification_id"], name: "notification_id", using: :btree
+  add_index "track_notifications", ["user_id"], name: "user_id", using: :btree
 
   create_table "tree_folders", force: :cascade do |t|
     t.string  "name",       limit: 255
@@ -763,31 +564,8 @@ ActiveRecord::Schema.define(version: 20200421235620) do
     t.datetime "updated_at",               null: false
   end
 
-  create_table "users", force: :cascade do |t|
-    t.string  "name",                      limit: 255,      default: "",    null: false
-    t.string  "crypted_password",          limit: 40,       default: "",    null: false
-    t.integer "role_id",                   limit: 4,        default: 0,     null: false
-    t.string  "password_salt",             limit: 255
-    t.string  "fullname",                  limit: 255
-    t.string  "email",                     limit: 255
-    t.integer "parent_id",                 limit: 4
-    t.boolean "private_by_default",                         default: false
-    t.string  "mru_directory_path",        limit: 128
-    t.boolean "email_on_review"
-    t.boolean "email_on_submission"
-    t.boolean "email_on_review_of_review"
-    t.boolean "is_new_user",                                default: true,  null: false
-    t.integer "master_permission_granted", limit: 1,        default: 0
-    t.string  "handle",                    limit: 255
-    t.text    "digital_certificate",       limit: 16777215
-    t.string  "persistence_token",         limit: 255
-    t.string  "timezonepref",              limit: 255
-    t.text    "public_key",                limit: 16777215
-    t.boolean "copy_of_emails",                             default: false
-    t.integer "institution_id",            limit: 4
-  end
-
-  add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree
+# Could not dump table "users" because of following FrozenError
+#   can't modify frozen String: "false"
 
   create_table "versions", force: :cascade do |t|
     t.string   "item_type",  limit: 255,      null: false
@@ -809,6 +587,7 @@ ActiveRecord::Schema.define(version: 20200421235620) do
   add_foreign_key "assignment_badges", "badges"
   add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
   add_foreign_key "assignment_questionnaires", "questionnaires", name: "fk_aq_questionnaire_id"
+  add_foreign_key "assignments", "assignments", column: "sample_assignment_id"
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
   add_foreign_key "assignments", "users", column: "instructor_id", name: "fk_assignments_instructors"
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"
@@ -842,6 +621,4 @@ ActiveRecord::Schema.define(version: 20200421235620) do
   add_foreign_key "tag_prompt_deployments", "tag_prompts"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
-  add_foreign_key "track_notifications", "notifications"
-  add_foreign_key "track_notifications", "users"
 end

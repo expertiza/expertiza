@@ -205,6 +205,7 @@ class QuizQuestionnairesController < QuestionnairesController
   end
 
   def create_multchoice(question, choice_key, q_choices)
+
     q = if q_choices[choice_key][:iscorrect] == 1.to_s
           QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "true", question_id: question.id)
         else
@@ -215,7 +216,7 @@ class QuizQuestionnairesController < QuestionnairesController
 
   # create true/false question
   def create_truefalse(question, choice_key, q_choices)
-    if q_choices[choice_key][:iscorrect] == 1.to_s
+    if q_choices[1.to_s][:iscorrect] == choice_key
       q = QuizQuestionChoice.new(txt: "True", iscorrect: "true", question_id: question.id)
       q.save
       q = QuizQuestionChoice.new(txt: "False", iscorrect: "false", question_id: question.id)
@@ -266,7 +267,7 @@ class QuizQuestionnairesController < QuestionnairesController
       q_choices.each_key do |choice_key|
         if q_type == "TrueFalse"
           create_truefalse(question, choice_key, q_choices)
-        else # MultipleChoiceRadio
+        else # MultipleChoice
           create_multchoice(question, choice_key, q_choices)
         end
       end

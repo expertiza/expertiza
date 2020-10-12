@@ -1,7 +1,8 @@
 // initialize a global object available throughout the application
 // can be useful on different pages
 let app_variables = {
-  currentUserId: null
+  currentUserId: null,
+  homeActionShowFlag: null
 };
 
 // execute the grabbing of user id after the page is fully loaded
@@ -19,6 +20,8 @@ window.addEventListener('load', e => {
 jQuery(document).ready(function() {
   // This preloadedImages function is refered from http://jsfiddle.net/slashingweapon/8jAeu/
   // Actually I am not using the values in preloadedImages, but image loading speed is indeed getting faster
+  let treeDisplayDiv = document.querySelector('#tree_display');
+  app_variables.homeActionShowFlag = treeDisplayDiv.dataset.userShow;
   var preloadedImages = []
   function preloadImages() {
     for (var idx = 0; idx < arguments.length; idx++) {
@@ -161,7 +164,7 @@ jQuery(document).ready(function() {
               </span>
             )
           }
-        } else if (newNodeType === 'assignments') {
+        } else if (newNodeType === 'assignments' && app_variables.homeActionShowFlag=='true') {
           // Assignment tab starts here
           // Now is_intelligent and Add Manager related buttons have not been added into the new UI
           moreContent.push(

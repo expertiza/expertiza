@@ -264,7 +264,7 @@ class UsersController < ApplicationController
   end
 
   private
-
+ #add user preference_home_flag
   def user_params
     params.require(:user).permit(:name,
                                  :crypted_password,
@@ -286,7 +286,8 @@ class UsersController < ApplicationController
                                  :timezonepref,
                                  :public_key,
                                  :copy_of_emails,
-                                 :institution_id)
+                                 :institution_id,
+                                 :preference_home_flag)
   end
 
   #to find the role of a given user object and set the @role accordingly

@@ -785,6 +785,7 @@ ActiveRecord::Schema.define(version: 20200421235620) do
     t.text    "public_key",                limit: 16777215
     t.boolean "copy_of_emails",                             default: false
     t.integer "institution_id",            limit: 4
+    t.boolean "preference_home_flag",                       default: true
   end
 
   add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree

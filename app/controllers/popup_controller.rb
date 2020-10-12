@@ -46,9 +46,9 @@ class PopupController < ApplicationController
       # However, we want their user_id. This is not possible for teams, so we just return the current id
       reviewer_id = ResponseMap.find(params[:id2]).reviewer_id
       if @assignment.reviewer_is_team
-        @reviewer_id = Participant.find(reviewer_id).user_id
-      else
         @reviewer_id = reviewer_id
+      else
+        @reviewer_id = Participant.find(reviewer_id).user_id
       end
       # get the last response in each round from response_map id
       (1..@assignment.num_review_rounds).each do |round|

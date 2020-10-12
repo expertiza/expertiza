@@ -27,12 +27,6 @@ class AssignmentParticipant < Participant
     assignment.try :directory_path
   end
 
-  # refactor into quiz_questionnaire.rb ?
-  # def assign_quiz(contributor, reviewer, _topic = nil)
-  #   quiz = QuizQuestionnaire.find_by(instructor_id: contributor.id)
-  #   QuizResponseMap.create(reviewed_object_id: quiz.try(:id), reviewee_id: contributor.id, reviewer_id: reviewer.id)
-  # end
-
   # all the participants in this assignment who have reviewed the team where this participant belongs
   def reviewers
     reviewers = []

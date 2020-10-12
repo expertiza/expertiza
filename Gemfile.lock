@@ -276,6 +276,7 @@ GEM
       thread_safe (~> 0.3, >= 0.3.1)
     method_source (0.8.2)
     mime-types (2.99.3)
+    mimemagic (0.3.5)
     mini_mime (1.0.1)
     mini_portile2 (2.4.0)
     minitest (5.11.3)
@@ -627,6 +628,7 @@ DEPENDENCIES
   json
   launchy
   lingua
+  mimemagic
   momentjs-rails (>= 2.9.0)
   mutant-rspec
   mysql2
@@ -674,4 +676,4 @@ DEPENDENCIES
   zip-zip
 
 BUNDLED WITH
-   1.16.2
+   1.17.2

@@ -55,6 +55,14 @@ class Mailer < ActionMailer::Base
     ExpertizaLogger.info(ret.encoded.to_s)
   end
 
+  def notify_reviewer_for_new_submission(defn)
+    @partial_name = defn[:body][:partial_name]
+    @user = defn[:body][:user]
+    @message = defn[:body][:message]
+    mail(subject: defn[:subject],
+         to: defn[:to])
+  end
+
   def suggested_topic_approved_message(defn)
     @body = defn[:body]
     @topic_name = defn[:body][:approved_topic_name]

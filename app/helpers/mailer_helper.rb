@@ -23,4 +23,17 @@ module MailerHelper
       }
     })
   end
+
+  def self.submission_mail_to_reviewr(user, subject, mail_partial)
+    Mailer.notify_reviewer_for_new_submission ({
+        to: user.email,
+        subject: subject,
+        body: {
+            user: user,
+            #first_name: ApplicationHelper.get_user_first_name(user),
+            message: "",
+            partial_name: mail_partial
+        }
+    })
+  end
 end

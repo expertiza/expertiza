@@ -13,7 +13,7 @@ describe "Assignment creation topics tab", js: true do
 		check("assignment_has_topics")
 		click_link 'Topics'
 	end
-	it 'Selects all the checkboxes when select all checkbox clicked', :focus do
+	it 'Selects all the checkboxes when select all checkbox clicked' do
 		assignment = Assignment.where(name: 'public assignment for test').first
 		create(:topic, assignment_id: assignment.id)
 		create(:topic, assignment_id: assignment.id)

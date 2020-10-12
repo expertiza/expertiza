@@ -70,11 +70,10 @@
     function deleteTopics() {
         var msg = 'Are you sure? It will delete all selected topics';
         if (confirm(msg)) {
-            var identifiers = []
+            var topic_identifiers = []
             $("#topics input[type=checkbox]:checked").each(function() {
-                var ient = $(this).closest('tr').find('#topic_id').text();
-                i= ient;
-                identifiers.push(ient);
+                var topic_id = $(this).closest('tr').find('#topic_id').text();
+                topic_identifiers.push(topic_id);
                 
             });
             
@@ -82,8 +81,8 @@
                 url: '/sign_up_sheet/delete_all_selected_topics',
                 method: 'POST',
                 data: {
-                    idents: identifiers,
-                    a_id: <%= @assignment.id %>  
+                    topic_ids: topic_identifiers,
+                    assignment_id: <%= @assignment.id %>  
                 },
                 success: function() {
                     location.reload();

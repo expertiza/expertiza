@@ -26,7 +26,7 @@ describe 'add TA', js: true do
 
   it "should display newly created course" do
     login_as('instructor6')
-    visit "/courses/view_teaching_assistants?id=#{@course.id}&model=Course"
+    visit "/courses/view_teaching_assistants?id=#{@course.id}&model=Courses"
 
     expect(page).to have_content("TA course")
   end

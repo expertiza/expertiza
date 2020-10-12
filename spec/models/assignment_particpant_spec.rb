@@ -19,16 +19,6 @@ describe AssignmentParticipant do
     end
   end
 
-  # refactor into quiz_questionnaire_spec.rb ?
-  # describe '#assign_quiz' do
-  #   it 'creates a new QuizResponseMap record' do
-  #     allow(QuizQuestionnaire).to receive(:find_by).with(instructor_id: 1).and_return(double('QuizQuestionnaire', id: 1))
-  #     expect { participant.assign_quiz(participant, participant2) }.to change { QuizResponseMap.count }.from(0).to(1)
-  #     expect(QuizResponseMap.first.reviewee_id).to eq(1)
-  #     expect(QuizResponseMap.first.reviewer_id).to eq(2)
-  #   end
-  # end
-
   describe '#reviewers' do
     it 'returns all the participants in this assignment who have reviewed the team where this participant belongs' do
       allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', 1).and_return([response_map])

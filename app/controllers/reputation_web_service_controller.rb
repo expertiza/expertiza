@@ -111,10 +111,6 @@ class ReputationWebServiceController < ApplicationController
     request_body.sort.to_h
   end
 
-  def class
-
-  end
-
   def set_request_body(request_body)
     @request_body = request_body
   end

@@ -17,6 +17,6 @@ jQuery ->
       $("#overlay").show()
       close = () ->
         $("#overlay").hide()
-      setTimeout(close, 4000)
+      setTimeout(close, 5650)
 
 

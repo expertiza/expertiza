@@ -22,6 +22,11 @@
 <h4> Number of reviews which can be done: <%= tot_reviews_left < 0? 0 : tot_reviews_left %></h4>
 <br>
 
+<%if @assignment.allow_selecting_additional_reviews_after_1st_round.nil? or @assignment.allow_selecting_additional_reviews_after_1st_round == 0  %>
+    <span class="alert-warning">Note: You can only review those works which you reviewed in round 1</span>
+  <br><br>
+<%end%>
+
 <% if check_reviewable_topics(@assignment) or @assignment.get_current_stage(@topic_id) == "Finished" %>
     <%= render :partial => 'responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>
     <!-- Temporary fix for Staggered Deadline assignment issue preventing students from reviewing 04-23-19 -->

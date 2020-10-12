@@ -5,7 +5,7 @@
 # By: ajbudlon
 
 # change access permission from public to private or vice versa
-class CourseController < ApplicationController
+class CoursesController < ApplicationController
   include AuthorizationHelper
 
   autocomplete :user, :name

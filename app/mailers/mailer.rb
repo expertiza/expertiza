@@ -82,4 +82,28 @@ class Mailer < ActionMailer::Base
     mail(subject: defn[:subject],
          to: defn[:to])
   end
+
+  #E2069 UPDATE
+  # If the user submits a suggestion and gets it approved -> Send email
+  # If user submits a suggestion anonymously and it gets approved -> DOES NOT get an email
+  def send_email(user_id, team_id, propose, suggestion)
+    proposer = User.find_by(id: user_id)
+    if propose
+      teams_users = TeamsUser.where(team_id: team_id)
+      cc_mail_list = []
+      teams_users.each do |teams_user|
+        cc_mail_list << User.find(teams_user.user_id).email if teams_user.user_id != proposer.id
+      end
+      suggested_topic_approved_message(
+        to: proposer.email,
+        cc: cc_mail_list,
+        subject: "Suggested topic '#{suggestion.title}' has been approved",
+        body: {
+          approved_topic_name: suggestion.title,
+          proposer: proposer.name
+        }
+      ).deliver_now!
+    end
+  end
+
 end

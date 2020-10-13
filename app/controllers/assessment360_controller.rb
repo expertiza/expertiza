@@ -119,9 +119,7 @@ class Assessment360Controller < ApplicationController
         user_id = cp.user_id
         assignment_id = assignment.id
         assignment_participant = assignment.participants.find_by(user_id: user_id)
-        next if peer_review_score.nil? 
-        next if peer_review_score[:total_score].nil?
-        @average_peer_review_score[cp.id] += peer_review_score[:total_score].round(2)
+        
         next if assignment.participants.find_by(user_id: user_id).nil? # break out of the loop if there are no participants in the assignment
         next if TeamsUser.team_id(assignment_id, user_id).nil? # break out of the loop if the participant has no team
         assignment_grade_summary(cp, assignment_id) # pull information about the student's grades for particular assignment
@@ -132,11 +130,14 @@ class Assessment360Controller < ApplicationController
         next if peer_review_score[:review][:scores].nil? #Skip if there are no reviews scores assigned by peer
         next if peer_review_score[:review][:scores][:avg].nil? #Skip if there are is no peer review average score
         @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
+        next if peer_review_score.nil? 
+        next if peer_review_score[:total_score].nil?
+        @average_peer_review_score[cp.id] += peer_review_score[:total_score].round(2)
       end
-    end
-    if @assignments.count > 0
-      @average_peer_review_score[cp.id] = (@average_peer_review_score[cp.id] / @assignments.count()).round(2)
-    end
+      if @assignments.count > 0
+        @average_peer_review_score[cp.id] = (@average_peer_review_score[cp.id] / @assignments.count()).round(2)
+      end
+    end 
   end
 
   def assignment_grade_summary(cp, assignment_id)

@@ -19,15 +19,6 @@ describe AssignmentParticipant do
     end
   end
 
-  describe '#assign_quiz' do
-    it 'creates a new QuizResponseMap record' do
-      allow(QuizQuestionnaire).to receive(:find_by).with(instructor_id: 1).and_return(double('QuizQuestionnaire', id: 1))
-      expect { participant.assign_quiz(participant, participant2) }.to change { QuizResponseMap.count }.from(0).to(1)
-      expect(QuizResponseMap.first.reviewee_id).to eq(1)
-      expect(QuizResponseMap.first.reviewer_id).to eq(2)
-    end
-  end
-
   describe '#reviewers' do
     it 'returns all the participants in this assignment who have reviewed the team where this participant belongs' do
       allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', 1).and_return([response_map])
@@ -156,10 +147,10 @@ describe AssignmentParticipant do
       end
     end
   end
-
-  describe '#copy' do
+  
+  describe '#copy_participant' do
     it 'copies assignment participants to a certain course' do
-      expect { participant.copy(123) }.to change { CourseParticipant.count }.from(0).to(1)
+      expect { participant.copy_participant(123) }.to change { CourseParticipant.count }.from(0).to(1)
       expect(CourseParticipant.first.user_id).to eq(2)
       expect(CourseParticipant.first.parent_id).to eq(123)
     end
@@ -211,6 +202,17 @@ describe AssignmentParticipant do
     it 'returns corrsponding bookmark review responses given by current participant' do
       allow(BookmarkRatingResponseMap).to receive(:get_assessments_for).with(participant).and_return([response])
       expect(participant.bookmark_reviews).to eq([response])
+    end
+  end
+
+  describe '#assign_copyright' do
+    it 'grant publishing rights to one or more assignments using the supplied private key' do
+      # create new RSA key-pair 
+      key = OpenSSL::PKey::RSA.new 2048
+      participant.user.public_key = key.public_key.to_pem
+
+      participant.assign_copyright(key)
+      expect(participant.permission_granted).to eq(true) 
     end
   end
 

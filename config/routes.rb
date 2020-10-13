@@ -496,8 +496,10 @@ resources :institution, except: [:destroy] do
     collection do
       get :list
       post :list
+      #Changes made here
       post :list_pending_requested_finalized
       post :list_pending_requested
+      #Changes completed here
       post ':id', action: :update
       get :auto_complete_for_user_name
       get :set_anonymized_view

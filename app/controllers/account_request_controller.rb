@@ -76,16 +76,21 @@ class AccountRequestController < ApplicationController
     roles_for_request_sign_up
   end
  
+  #Changes Started Here
   def list_pending_requested_finalized
     @requested_users = AccountRequest.where.not(:status => 'Under Review').order("created_at DESC")
     @roles = Role.all
-
   end
+  #Changes Ended Here
+
   def list_pending_requested
+    #Changes Started Here
     @requested_users = AccountRequest.where(:status => 'Under Review').order("created_at DESC")
+    #Changes Completed Here
     @roles = Role.all
   end
 
+  #Changes Started Here
   def create_requested_user_record
   
     requested_user = AccountRequest.new(requested_user_params)
@@ -134,6 +139,7 @@ class AccountRequestController < ApplicationController
     redirect_to controller: 'account_request', action: 'request_new', role: 'Student'
     #if the first if clause fails, redirect back to the account requests page!
   end
+#Changes Completed Here
 
   def roles_for_request_sign_up
     roles_can_be_requested_online = ["Instructor"]

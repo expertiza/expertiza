@@ -109,22 +109,9 @@ class ResponseController < ApplicationController
     assign_action_parameter
     set_content(true)
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
-    # Because of the autosave feature and the javascript that sync if two reviewing windows are opened
-    # The response must be created when the review begin.
-    # So do the answers, otherwise the response object can't find the questionnaire when the user hasn't saved his new review and closed the window.
-    # A new response has to be created when there hasn't been any reviews done for the current round,
-    # or when there has been a submission after the most recent review in thisa round.
-    @response = Response.where(map_id: @map.id, round: @current_round.to_i).order(updated_at: :desc).first
+    # put all the complicated logic into model
+    @response = Response.get_most_recent_response(@map, @response, @current_round)
 
-    # Finding Reviewee team, nil is it doesn't exist(in case of teammate review)
-    reviewee_team = AssignmentTeam.find_by(id: @map.reviewee_id)
-
-    # Finding most recent submission
-    most_recent_submission_by_reviewee = reviewee_team.most_recent_submission if reviewee_team
-
-    if @response.nil? || (most_recent_submission_by_reviewee and most_recent_submission_by_reviewee.updated_at > @response.updated_at)
-      @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
-    end
     questions = sort_questions(@questionnaire.questions)
     init_answers(questions)
     render action: 'response'

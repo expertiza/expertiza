@@ -105,6 +105,28 @@ class Response < ActiveRecord::Base
     return @assignment_questionnaire.questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }
   end
 
+  # Because of the autosave feature and the javascript that sync if two reviewing windows are opened
+  # The response must be created when the review begin.
+  # So do the answers, otherwise the response object can't find the questionnaire when the user hasn't saved his new review and closed the window.
+  # A new response has to be created when there hasn't been any reviews done for the current round,
+  # or when there has been a submission after the most recent review in thisa round.
+  # refactor 'new' method
+  # 'self.get_most_recent_response' was part of the 'new',
+  # because this part of the code tests whether there has been a review since the last file or link was submitted,
+  # it should be model function.
+  def self.get_most_recent_response(input_map, input_response, input_current_round)
+    response = Response.where(map_id: input_map.id, round: input_current_round.to_i).order(updated_at: :desc).first
+    # Finding Reviewee team, nil is it doesn't exist(in case of teammate review)
+    reviewee_team = AssignmentTeam.find_by(id: input_map.reviewee_id)
+    # Finding most recent submission
+    most_recent_submission_by_reviewee = reviewee_team.most_recent_submission if reviewee_team
+    if response.nil? || (most_recent_submission_by_reviewee and most_recent_submission_by_reviewee.updated_at > input_response.updated_at)
+      response = Response.create(map_id: input_map.id, additional_comment: '', round: input_current_round, is_submitted: 0)
+    end
+
+    return response
+  end
+
   def questionnaire_by_answer(answer)
     if !answer.nil? # for all the cases except the case that  file submission is the only question in the rubric.
       questionnaire = Question.find(answer.question_id).questionnaire

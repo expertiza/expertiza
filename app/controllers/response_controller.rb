@@ -77,7 +77,7 @@ class ResponseController < ApplicationController
     @questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
-    @questionnaire = edit_questionnaire
+    @questionnaire = find_questionnaire
     render action: 'response'
   end
 
@@ -92,7 +92,7 @@ class ResponseController < ApplicationController
     begin
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
-      @questionnaire = edit_questionnaire
+      @questionnaire = find_questionnaire
       questions = sort_questions(@questionnaire.questions)
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
@@ -297,7 +297,7 @@ class ResponseController < ApplicationController
     end
     @participant = @map.reviewer
     @contributor = @map.contributor
-    new_response ? create_new_questionnaire : edit_questionnaire
+    new_response ? create_new_questionnaire : find_questionnaire
     set_dropdown_or_scale
     @questions = sort_questions(@questionnaire.questions)
     @min = @questionnaire.min_question_score
@@ -325,13 +325,14 @@ class ResponseController < ApplicationController
 
   def create_new_questionnaire
     #Create a new questionnaire for new response, then basic on different kind of questionnaire
-    # apply different implement.
+    # apply different implement. For the Review, the code will look up contributor's topic which
+    # is reviewee's topic.
     case @map.type
     when "ReviewResponseMap", "SelfReviewResponseMap"   #Reivew questionnaire
-      reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
+      reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)   #look up contributor's topic
       @current_round = @assignment.number_of_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
-    when
+    when                        #Other types of questionnaire
       "MetareviewResponseMap",
       "TeammateReviewResponseMap",
       "FeedbackResponseMap",
@@ -344,7 +345,7 @@ class ResponseController < ApplicationController
 
 
 
-  def edit_questionnaire  #editing exist questionnaire of the exist response
+  def find_questionnaire #finding questionnaire of the exist response
     # if user is not filling a new rubric, the @response object should be available.
     # we can find the questionnaire from the question_id in answers
     answer = @response.scores.first

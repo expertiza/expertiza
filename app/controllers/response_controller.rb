@@ -58,7 +58,7 @@ class ResponseController < ApplicationController
 
   # Prepare the parameters when student clicks "Edit"
   def edit
-    assign_instance_vars
+    assign_action_parameter
     @prev = Response.where(map_id: @map.id)
     @review_scores = @prev.to_a
     if @prev.present?
@@ -106,14 +106,14 @@ class ResponseController < ApplicationController
   end
 
   def new
-    assign_instance_vars
+    assign_action_parameter
     set_content(true)
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
     # Because of the autosave feature and the javascript that sync if two reviewing windows are opened
     # The response must be created when the review begin.
     # So do the answers, otherwise the response object can't find the questionnaire when the user hasn't saved his new review and closed the window.
     # A new response has to be created when there hasn't been any reviews done for the current round,
-    # or when there has been a submission after the most recent review in this round.
+    # or when there has been a submission after the most recent review in thisa round.
     @response = Response.where(map_id: @map.id, round: @current_round.to_i).order(updated_at: :desc).first
 
     # Finding Reviewee team, nil is it doesn't exist(in case of teammate review)
@@ -304,8 +304,8 @@ class ResponseController < ApplicationController
     @max = @questionnaire.max_question_score
   end
 
-  # assigning the instance variables for Edit and New actions
-  def assign_instance_vars
+  # Assign the input parameter for actions such as Edit and New
+  def assign_action_parameter
     case params[:action]
     when 'edit'
       @header = 'Edit'

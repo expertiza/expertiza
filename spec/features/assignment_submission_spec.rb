@@ -27,7 +27,10 @@ describe "assignment submisstion test" do
     click_link "Your work"
   end
 
-  it "is able to submit a single valid link"  do
+  it "is able to submit a single valid link" do
+    dueDate=DueDate.new
+    expect(DueDate).to receive(:where).and_return(dueDate)
+    expect(dueDate).to receive(:maximum).and_return(DateTime.now)
     signup_topic
     fill_in 'submission', with: "https://www.ncsu.edu"
     click_on 'Upload link'
@@ -47,11 +50,20 @@ describe "assignment submisstion test" do
   end
 
   it "is able to submit multiple valid links" do
+    dueDate=DueDate.new
+    expect(DueDate).to receive(:where).and_return(dueDate)
+    expect(dueDate).to receive(:maximum).and_return(DateTime.now)
     signup_topic
     fill_in 'submission', with: "https://www.ncsu.edu"
     click_on 'Upload link'
+    dueDate1=DueDate.new
+    expect(DueDate).to receive(:where).and_return(dueDate1)
+    expect(dueDate1).to receive(:maximum).and_return(DateTime.now)
     fill_in 'submission', with: "https://www.google.com"
     click_on 'Upload link'
+    dueDate2=DueDate.new
+    expect(DueDate).to receive(:where).and_return(dueDate2)
+    expect(dueDate2).to receive(:maximum).and_return(DateTime.now)
     fill_in 'submission', with: "https://bing.com"
     click_on 'Upload link'
     expect(page).to have_content "https://www.ncsu.edu"
@@ -60,6 +72,9 @@ describe "assignment submisstion test" do
   end
 
   it "should not submit duplicated link" do
+    dueDate=DueDate.new
+    expect(DueDate).to receive(:where).and_return(dueDate)
+    expect(dueDate).to receive(:maximum).and_return(DateTime.now)
     signup_topic
     fill_in 'submission', with: "https://google.com"
     click_on 'Upload link'
@@ -70,12 +85,18 @@ describe "assignment submisstion test" do
   end
 
   it "submit empty link" do
+    dueDate=DueDate.new
+    expect(DueDate).to receive(:where).and_return(dueDate)
+    expect(dueDate).to receive(:maximum).and_return(DateTime.now)
     signup_topic
     # hyperlink is empty
     fill_in 'submission', with: ""
     click_on 'Upload link'
     expect(page).to have_content "The URL or URI is invalid. Reason: The hyperlink cannot be empty!"
     # hyperlink is "http://"
+    dueDate1=DueDate.new
+    expect(DueDate).to receive(:where).and_return(dueDate1)
+    expect(dueDate1).to receive(:maximum).and_return(DateTime.now)
     fill_in 'submission', with: "http://"
     click_on 'Upload link'
     expect(page).to have_content "The URL or URI is invalid."

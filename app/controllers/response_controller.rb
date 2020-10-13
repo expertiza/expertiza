@@ -341,6 +341,7 @@ class ResponseController < ApplicationController
   end
 
 
+
   def edit_questionnaire
     # if user is not filling a new rubric, the @response object should be available.
     # we can find the questionnaire from the question_id in answers

@@ -157,14 +157,8 @@ class ReputationWebServiceController < ApplicationController
     if params[:checkbox][:expert_grade] == 'Add expert grades'
       @additional_info = 'add expert grades'
       case params[:assignment_id]
-
-      when '735' # expert grades of program 1 (735)
-        req.body.prepend("\"expert_grades\": {\"submission24083\":96.084,\"submission24085\":88.811,\"submission24086\":100,\"submission24087\":100,\"submission24088\":92.657,\"submission24091\":96.783,\"submission24092\":90.21,\"submission24093\":100,\"submission24097\":90.909,\"submission24098\":98.601,\"submission24101\":99.301,\"submission24278\":98.601,\"submission24279\":72.727,\"submission24281\":54.476,\"submission24289\":94.406,\"submission24291\":99.301,\"submission24293\":93.706,\"submission24296\":98.601,\"submission24302\":83.217,\"submission24303\":91.329,\"submission24305\":100,\"submission24307\":100,\"submission24308\":100,\"submission24311\":95.804,\"submission24313\":91.049,\"submission24314\":100,\"submission24315\":97.483,\"submission24316\":91.608,\"submission24317\":98.182,\"submission24320\":90.21,\"submission24321\":90.21,\"submission24322\":98.601},")
       when '754' # expert grades of Wiki contribution (754)
         req.body.prepend("\"expert_grades\": {\"submission25030\":95,\"submission25031\":92,\"submission25033\":88,\"submission25034\":98,\"submission25035\":100,\"submission25037\":95,\"submission25038\":95,\"submission25039\":93,\"submission25040\":96,\"submission25041\":90,\"submission25042\":100,\"submission25046\":95,\"submission25049\":90,\"submission25050\":88,\"submission25053\":91,\"submission25054\":96,\"submission25055\":94,\"submission25059\":96,\"submission25071\":85,\"submission25082\":100,\"submission25086\":95,\"submission25097\":90,\"submission25098\":85,\"submission25102\":97,\"submission25103\":94,\"submission25105\":98,\"submission25114\":95,\"submission25115\":94},")
-      when '756' # expert grades of Wikipedia contribution (756)
-        req.body.prepend("\"expert_grades\": {\"submission25107\":76.6667,\"submission25109\":83.3333},")
-
       end
     elsif params[:checkbox][:hamer] == 'Add initial Hamer reputation values'
       @additional_info = 'add initial hamer reputation values'
@@ -191,8 +185,7 @@ class ReputationWebServiceController < ApplicationController
     req.body.prepend("{")
     @request_body = (req.body)
 
-
- # Encrypting the request being sent over the internet
+    # Encrypting the request being sent over the internet
     encrypted_request = encrypt_request(req)
 
     # Encrypted response of the request sent in previous step
@@ -213,11 +206,28 @@ class ReputationWebServiceController < ApplicationController
     end
     redirect_to action: 'client'
   end
+  
+  # Method Encrypting request
+  def encrypt_request(request)
+    aes_encrypted_request_data = aes_encrypt(request.body)
+    request = aes_encrypted_request_data[0]
+    # RSA asymmetric algorithm encrypts keys of AES
+    encrypted_key = rsa_public_key1(aes_encrypted_request_data[1])
+    encrypted_vi = rsa_public_key1(aes_encrypted_request_data[2])
+    # fixed length 350
+    request.body.prepend('", "data":"')
+    request.body.prepend(encrypted_vi)
+    request.body.prepend(encrypted_key)
+    # request body should be in JSON format.
+    request.body.prepend('{"keys":"')
+    request.body<< '"}'
+    request.body.gsub!(/\n/, '\\n')
+    request
+  end
 
-
-    # RSA asymmetric algorithm decrypts keys of AES
-    # Decryption
+  # Method Decrypting request
   def decrypt_request(response)
+      # RSA asymmetric algorithm decrypts keys of AES
       key = rsa_private_key2(response["keys"][0, 350])
       vi = rsa_private_key2(response["keys"][350, 350])
       # AES symmetric algorithm decrypts data
@@ -226,31 +236,11 @@ class ReputationWebServiceController < ApplicationController
       decrypt_response
   end
 
-    # Encryption
-    # AES symmetric algorithm encrypts raw data
-  def encrypt_request(request)
-      aes_encrypted_request_data = aes_encrypt(request.body)
-      request = aes_encrypted_request_data[0]
-      # RSA asymmetric algorithm encrypts keys of AES
-      encrypted_key = rsa_public_key1(aes_encrypted_request_data[1])
-      encrypted_vi = rsa_public_key1(aes_encrypted_request_data[2])
-      # fixed length 350
-      request.body.prepend('", "data":"')
-      request.body.prepend(encrypted_vi)
-      request.body.prepend(encrypted_key)
-      # request body should be in JSON format.
-      request.body.prepend('{"keys":"')
-      request.body<< '"}'
-      request.body.gsub!(/\n/, '\\n')
-      request
-  end
-     
 
   def rsa_public_key1(data)
 
     public_key_file = 'public1.pem'
     public_key = OpenSSL::PKey::RSA.new(File.read(public_key_file))
-
     #could reduce this code by completely removing the encrypted_string variable
     encrypted_string = Base64.encode64(public_key.public_encrypt(data))
 

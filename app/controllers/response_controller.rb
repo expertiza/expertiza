@@ -295,7 +295,7 @@ class ResponseController < ApplicationController
     end
     @participant = @map.reviewer
     @contributor = @map.contributor
-    new_response ? set_questionnaire_for_new_response : edit_questionnaire
+    new_response ? create_new_questionnaire : edit_questionnaire
     set_dropdown_or_scale
     @questions = sort_questions(@questionnaire.questions)
     @min = @questionnaire.min_question_score
@@ -321,9 +321,11 @@ class ResponseController < ApplicationController
     @return = params[:return]
   end
 
-  def set_questionnaire_for_new_response
+  def create_new_questionnaire
+    #Create a new questionnaire for new response, then basic on different kind of questionnaire
+    # apply different implement.
     case @map.type
-    when "ReviewResponseMap", "SelfReviewResponseMap"
+    when "ReviewResponseMap", "SelfReviewResponseMap"   #Reivew questionnaire
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.number_of_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
@@ -348,7 +350,7 @@ class ResponseController < ApplicationController
     end
   end
 
-  def edit_questionnaire
+  def edit_questionnaire  #editing exist questionnaire of the exist response
     # if user is not filling a new rubric, the @response object should be available.
     # we can find the questionnaire from the question_id in answers
     answer = @response.scores.first

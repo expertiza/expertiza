@@ -82,10 +82,10 @@ class ReputationWebServiceController < ApplicationController
     teams = AssignmentTeam.where('parent_id in (?)', assignment_ids)
     team_ids = []
     teams.each {|team| team_ids << team.id }
-    quiz_questionnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
-    quiz_questionnaire_ids = []
-    quiz_questionnaires.each {|questionnaire| quiz_questionnaire_ids << questionnaire.id }
-    QuizResponseMap.where('reviewed_object_id in (?)', quiz_questionnaire_ids).each do |response_map|
+    quiz_questionnnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
+    quiz_questionnnaire_ids = []
+    quiz_questionnnaires.each {|questionnaire| quiz_questionnnaire_ids << questionnaire.id }
+    QuizResponseMap.where('reviewed_object_id in (?)', quiz_questionnnaire_ids).each do |response_map|
       quiz_score = response_map.quiz_score
       participant = Participant.find(response_map.reviewer_id)
       raw_data_array << [participant.user_id, response_map.reviewee_id, quiz_score]
@@ -101,7 +101,7 @@ class ReputationWebServiceController < ApplicationController
       @responses = get_review_responses(assignment.id, another_assignment_id)
       @results = calculate_peer_review_grades(has_topic,@responses, round_num)
     elsif type == 'quiz scores'
-      @results = calculate_quiz_score(assignment.id, another_assignment_id)
+      @results = calculate_quiz_scores(assignment.id, another_assignment_id)
     end
     request_body = {}
     @results.each_with_index do |record, _index|

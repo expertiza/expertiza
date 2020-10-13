@@ -22,6 +22,11 @@ class AccountRequestController < ApplicationController
   end
 
   def create_approved_user
+    if params[:selection] == nil
+      flash[:error] = "Please make a selection before submitting"
+      redirect_to action: 'list_pending_requested'
+      return
+    end
     users = params[:selection]
     users.each do |user|
       requested_user = AccountRequest.find_by(id: user.first)

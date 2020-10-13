@@ -234,15 +234,17 @@ class ResponseController < ApplicationController
     end
   end
 
+  # First instructor has to create a new assignment with calibration for training checked
+  # After the students do reviews, instructor can do expert review by click 'assignment' -> 'edit' ->
+  #   'Calibration'
+  # In students views, by clicking 'Others work' -> 'Show calibration results' to call this method
   def show_calibration_results_for_student
     calibration_response_map = ReviewResponseMap.find(params[:calibration_response_map_id])
     review_response_map = ReviewResponseMap.find(params[:review_response_map_id])
     @calibration_response = calibration_response_map.response[0]
     @review_response = review_response_map.response[0]
     @assignment = Assignment.find(calibration_response_map.reviewed_object_id)
-    @review_questionnaire_ids = ReviewQuestionnaire.select("id")
-    @assignment_questionnaire = AssignmentQuestionnaire.where(["assignment_id = ? and questionnaire_id IN (?)", @assignment.id, @review_questionnaire_ids]).first
-    @questions = @assignment_questionnaire.questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }
+    @questions = Response.get_questions_from_assignment(@assignment)
   end
 
   # This method should be moved to survey_deployment_contoller.rb
@@ -338,15 +340,6 @@ class ResponseController < ApplicationController
     end
   end
 
-  def scores
-    @review_scores = []
-    @questions.each do |question|
-      @review_scores << Answer.where(
-        response_id: @response.id,
-        question_id:  question.id
-      ).first
-    end
-  end
 
   def edit_questionnaire
     # if user is not filling a new rubric, the @response object should be available.

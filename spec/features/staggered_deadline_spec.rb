@@ -318,4 +318,22 @@ describe "Staggered deadline test" do
 		# topics_exist = SignUpTopic.where(assignment_id: assignment.id).count
 		# expect(topics_exist).to be_eql 0       
   end
+
+  it 'Deletes all selected topics that contain staggered deadlines', :focus do
+    Selenium::WebDriver::Firefox.driver_path = "/home/skollip/geckodriver"
+    driver = Selenium::WebDriver.for :firefox
+    driver.navigate.to "http://localhost:3000"
+    login_as("instructor6")
+		assignment = Assignment.find_by(name: 'Assignment1665')
+		visit "/assignments/#{assignment.id}/edit"
+    click_link 'Topics'
+    check('select_all')
+    click_button 'Delete selected topics'
+    alert = driver.switch_to.alert
+    alert.accept
+    driver.navigate.windows(windowHandle)
+
+		topics_exist = SignUpTopic.where(assignment_id: assignment.id).count
+		expect(topics_exist).to be_eql 0       
+  end
 end

@@ -94,7 +94,7 @@ GEM
       babel-source (>= 4.0, < 6)
       execjs (~> 2.0)
     bind-it (0.2.7)
-      rjb (~> 1.4.3)
+      rjb (>= 1.4.3)
     bootstrap3-datetimepicker-rails (4.17.47)
       momentjs-rails (>= 2.8.1)
     builder (3.2.3)
@@ -670,9 +670,6 @@ DEPENDENCIES
   uglifier
   will_paginate
   zip-zip
-
-RUBY VERSION
-   ruby 2.3.7p456
 
 BUNDLED WITH
    1.17.3

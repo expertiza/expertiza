@@ -58,11 +58,16 @@ class ResponseController < ApplicationController
 
   # Prepare the parameters when student clicks "Edit"
   def edit
-    assign_instance_vars
+    assign_action_parameters
     @prev = Response.where(map_id: @map.id)
     @review_scores = @prev.to_a
     if @prev.present?
-      @sorted = @review_scores.sort {|m1, m2| m1.version_num.to_i && m2.version_num.to_i ? m2.version_num.to_i <=> m1.version_num.to_i : (m1.version_num ? -1 : 1) }
+      @sorted = @review_scores.sort {|m1, m2|
+        if m1.version_num.to_i && m2.version_num.to_i
+          m2.version_num.to_i <=> m1.version_num.to_i
+        else
+          m1.version_num ? -1 : 1
+        end }
       @largest_version_num = @sorted[0]
     end
     @modified_object = @response.response_id
@@ -72,7 +77,7 @@ class ResponseController < ApplicationController
     @questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
-    @questionnaire = set_questionnaire
+    @questionnaire = find_questionnaire
     render action: 'response'
   end
 
@@ -87,7 +92,7 @@ class ResponseController < ApplicationController
     begin
       @map = @response.map
       @response.update_attribute('additional_comment', params[:review][:comments])
-      @questionnaire = set_questionnaire
+      @questionnaire = find_questionnaire
       questions = sort_questions(@questionnaire.questions)
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
@@ -101,25 +106,12 @@ class ResponseController < ApplicationController
   end
 
   def new
-    assign_instance_vars
+    assign_action_parameters
     set_content(true)
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
-    # Because of the autosave feature and the javascript that sync if two reviewing windows are opened
-    # The response must be created when the review begin.
-    # So do the answers, otherwise the response object can't find the questionnaire when the user hasn't saved his new review and closed the window.
-    # A new response has to be created when there hasn't been any reviews done for the current round,
-    # or when there has been a submission after the most recent review in this round.
-    @response = Response.where(map_id: @map.id, round: @current_round.to_i).order(updated_at: :desc).first
+    # put all the complicated logic into model
+    @response = Response.get_most_recent_response(@map, @response, @current_round)
 
-    # Finding Reviewee team, nil is it doesn't exist(in case of teammate review)
-    reviewee_team = AssignmentTeam.find_by(id: @map.reviewee_id)
-
-    # Finding most recent submission
-    most_recent_submission_by_reviewee = reviewee_team.most_recent_submission if reviewee_team
-
-    if @response.nil? || (most_recent_submission_by_reviewee and most_recent_submission_by_reviewee.updated_at > @response.updated_at)
-      @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
-    end
     questions = sort_questions(@questionnaire.questions)
     init_answers(questions)
     render action: 'response'
@@ -229,15 +221,17 @@ class ResponseController < ApplicationController
     end
   end
 
+  # First instructor has to create a new assignment with calibration for training checked
+  # After the students do reviews, instructor can do expert review by click 'assignment' -> 'edit' ->
+  #   'Calibration'
+  # In students views, by clicking 'Others work' -> 'Show calibration results' to call this method
   def show_calibration_results_for_student
     calibration_response_map = ReviewResponseMap.find(params[:calibration_response_map_id])
     review_response_map = ReviewResponseMap.find(params[:review_response_map_id])
     @calibration_response = calibration_response_map.response[0]
     @review_response = review_response_map.response[0]
     @assignment = Assignment.find(calibration_response_map.reviewed_object_id)
-    @review_questionnaire_ids = ReviewQuestionnaire.select("id")
-    @assignment_questionnaire = AssignmentQuestionnaire.where(["assignment_id = ? and questionnaire_id IN (?)", @assignment.id, @review_questionnaire_ids]).first
-    @questions = @assignment_questionnaire.questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }
+    @questions = Response.get_questions_from_assignment(@assignment)
   end
 
   # This method should be moved to survey_deployment_contoller.rb
@@ -290,15 +284,15 @@ class ResponseController < ApplicationController
     end
     @participant = @map.reviewer
     @contributor = @map.contributor
-    new_response ? set_questionnaire_for_new_response : set_questionnaire
+    new_response ? create_new_questionnaire : find_questionnaire
     set_dropdown_or_scale
     @questions = sort_questions(@questionnaire.questions)
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
   end
 
-  # assigning the instance variables for Edit and New actions
-  def assign_instance_vars
+  # Assign the input parameters for actions such as Edit and New
+  def assign_action_parameters
     case params[:action]
     when 'edit'
       @header = 'Edit'
@@ -316,13 +310,16 @@ class ResponseController < ApplicationController
     @return = params[:return]
   end
 
-  def set_questionnaire_for_new_response
+  def create_new_questionnaire
+    #Create a new questionnaire for new response, then basic on different kind of questionnaire
+    # apply different implement. For the Review, the code will look up contributor's topic which
+    # is reviewee's topic.
     case @map.type
     when "ReviewResponseMap", "SelfReviewResponseMap"
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.number_of_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
-    when
+    when                        #Other types of questionnaire
       "MetareviewResponseMap",
       "TeammateReviewResponseMap",
       "FeedbackResponseMap",
@@ -333,17 +330,10 @@ class ResponseController < ApplicationController
     end
   end
 
-  def scores
-    @review_scores = []
-    @questions.each do |question|
-      @review_scores << Answer.where(
-        response_id: @response.id,
-        question_id:  question.id
-      ).first
-    end
-  end
 
-  def set_questionnaire
+
+  def find_questionnaire
+    #finding questionnaire of the exist response
     # if user is not filling a new rubric, the @response object should be available.
     # we can find the questionnaire from the question_id in answers
     answer = @response.scores.first

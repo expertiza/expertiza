@@ -58,7 +58,7 @@ class ResponseController < ApplicationController
 
   # Prepare the parameters when student clicks "Edit"
   def edit
-    assign_action_parameter
+    assign_action_parameters
     @prev = Response.where(map_id: @map.id)
     @review_scores = @prev.to_a
     if @prev.present?
@@ -106,7 +106,7 @@ class ResponseController < ApplicationController
   end
 
   def new
-    assign_action_parameter
+    assign_action_parameters
     set_content(true)
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
     # put all the complicated logic into model
@@ -291,8 +291,8 @@ class ResponseController < ApplicationController
     @max = @questionnaire.max_question_score
   end
 
-  # Assign the input parameter for actions such as Edit and New
-  def assign_action_parameter
+  # Assign the input parameters for actions such as Edit and New
+  def assign_action_parameters
     case params[:action]
     when 'edit'
       @header = 'Edit'

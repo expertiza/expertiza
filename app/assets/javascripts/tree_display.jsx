@@ -1045,7 +1045,8 @@ jQuery(document).ready(function() {
       }
     }
   })
-
+  
+  /** beta branch isnt getting a prop related to the data to be displayed in the dropdown */
   var FilterableTable = React.createClass({
     getInitialState: function() {
       return {
@@ -1089,9 +1090,9 @@ jQuery(document).ready(function() {
           return (a_val.localeCompare(b_val))
         }
       })
-      this.setState({
-        tableData: tmpData
-      })
+      // this.setState({
+      //   tableData: tmpData
+      // })
     },
     componentWillReceiveProps: function(nextProps) {
       this.setState({
@@ -1188,6 +1189,7 @@ jQuery(document).ready(function() {
         jQuery.get("/tree_display/get_folder_contents", function(data2, status) {
             jQuery.each(data2, function(nodeType, outerNode) {
               jQuery.each(outerNode, function(i, node) {
+                console.log(node)
                 var newParams = {
                   key: node.name + "|" + node.directory,
                   nodeType: nodeType,

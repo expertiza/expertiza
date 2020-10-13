@@ -7,6 +7,7 @@ require 'base64'
 class ReputationWebServiceController < ApplicationController
   include AuthorizationHelper
 
+
   def action_allowed?
     current_user_has_ta_privileges?
   end
@@ -113,93 +114,42 @@ class ReputationWebServiceController < ApplicationController
     request_body.sort.to_h
   end
 
-  def set_request_body(request_body)
-    @request_body = request_body
-  end
-
-  def get_request_body
-    @request_body
-  end
-
-  def set_response_body(response_body)
-    @response_body = response_body
-  end
-
-  def get_response_body
-    @response_body
+  # Routed as a GET in routes.rb
+  # sets the most recent assignment id to the @max_assignment_id variable
+  # Returns response
+  def client
+    set_last_assignment_id
+    @response
   end
 
   def set_last_assignment_id
     @max_assignment_id = Assignment.last.id
   end
 
-  def get_last_assignment_id
-    @max_assignment_id
-  end
-
   def set_assignment(assignment_id)
     @assignment = Assignment.find(assignment_id) rescue nil
-  end
-
-  def get_assignment
-    @assignment
   end
 
   def set_another_assignment(another_assignment_id)
     @another_assignment = Assignment.find(another_assignment_id) rescue nil
   end
 
-  def get_another_assignment
-    @another_assignment
-  end
-
-  def set_round_num(round_num)
-    @round_num = round_num
-  end
-
-  def get_round_num
-    @round_num
-  end
-
-  def set_algorithm(algorithm)
-    @algorithm = algorithm
-  end
-
-  def get_algorithm
-    @algorithm
-  end
-
-  def set_additional_info(additional_info)
-    @additional_info = additional_info
-  end
-
-  def get_additional_info
-    @additional_info
-  end
-
-  def set_response(response)
-    @response = response
-  end
-
-  def get_response
-    @response
-  end
 
   # abhishek 10/10 8 pm
   def send_post_request
     # https://www.socialtext.net/open/very_simple_rest_in_ruby_part_3_post_to_create_a_new_workspace
     req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader = {'Content-Type' => 'application/json', 'charset' => 'utf-8'})
     curr_assignment_id = (params[:assignment_id].empty? ? '724' : params[:assignment_id])
-    req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
+    req.body = generate_json(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
     req.body[0] = '' # remove the first '{'
 
-    set_assignment_id(params[:assignment_id])
-    set_round_num(params[:round_num])
-    set_algorithm(params[:algorithm])
-    set_another_assignment_id(params[:another_assignment_id])
+    @assignment = params[:assignment_id]
+    @round_num = params[:round_num]
+    @algorithm = params[:algorithm]
+    @another_assignment = params[:another_assignment_id]
 
     if params[:checkbox][:expert_grade] == 'Add expert grades'
-      set_additional_info(@@additional_info = 'add expert grades')
+      @additional_info = 'add expert grades'
       case params[:assignment_id]
 
       when '735' # expert grades of program 1 (735)
@@ -211,19 +161,19 @@ class ReputationWebServiceController < ApplicationController
 
       end
     elsif params[:checkbox][:hamer] == 'Add initial Hamer reputation values'
-      set_additional_info('add initial hamer reputation values')
+      @additional_info = 'add initial hamer reputation values'
     elsif params[:checkbox][:lauw] == 'Add initial Lauw reputation values'
-      set_additional_info('add initial lauw reputation values')
+      @additional_info = 'add initial lauw reputation values'
     elsif params[:checkbox][:quiz] == 'Add quiz scores'
-      set_additional_info('add quiz scores')
-      quiz_str = json_generator(params[:assignment_id].to_i, params[:another_assignment_id].to_i, params[:round_num].to_i, 'quiz scores').to_json
+      @additional_info = 'add quiz scores'
+      quiz_str = generate_json(params[:assignment_id].to_i, params[:another_assignment_id].to_i, params[:round_num].to_i, 'quiz scores').to_json
       quiz_str[0] = ''
       quiz_str.prepend('"quiz_scores":{')
       quiz_str += ','
       quiz_str = quiz_str.gsub('"N/A"', '20.0')
       req.body.prepend(quiz_str)
     else
-      set_additional_info('')
+      @additional_info = ''
     end
 
     # Eg.
@@ -233,9 +183,7 @@ class ReputationWebServiceController < ApplicationController
     # "quiz_scores" : {"submission1" : {"stu1":100, "stu3":80}, "submission2":{"stu2":40, "stu1":60}}, #optional
     # "submission1": {"stu1":91, "stu3":99},"submission2": {"stu5":92, "stu8":90},"submission3": {"stu2":91, "stu4":88}}"
     req.body.prepend("{")
-    set_request_body(req.body)
-
-
+    @request_body = req.body
 
 
  # Encrypting the request being sent over the internet
@@ -248,8 +196,8 @@ class ReputationWebServiceController < ApplicationController
     response.body = JSON.parse(response.body)
     decrypted_response_body= decrypt_response(response.body)
 
-    set_response(response)
-    set_response_body(decrypted_response_body)
+    @response = response
+    @response_body = decrypted_response_body
 
     JSON.parse(response.body.to_s).each do |alg, list|
       next unless alg == "Hamer" || alg == "Lauw"
@@ -257,14 +205,13 @@ class ReputationWebServiceController < ApplicationController
         Participant.find_by(user_id: id).update(alg.to_sym => rep) unless /leniency/ =~ id.to_s
       end
     end
-    redirect_to action: 'set_last_assignment_id'
+    redirect_to action: 'client'
   end
 
 
     # RSA asymmetric algorithm decrypts keys of AES
     # Decryption
   def decrypt_request(response)
-
       key = rsa_private_key2(response["keys"][0, 350])
       vi = rsa_private_key2(response["keys"][350, 350])
       # AES symmetric algorithm decrypts data
@@ -294,8 +241,11 @@ class ReputationWebServiceController < ApplicationController
      
 
   def rsa_public_key1(data)
+
     public_key_file = 'public1.pem'
     public_key = OpenSSL::PKey::RSA.new(File.read(public_key_file))
+
+    #could reduce this code by completely removing the encrypted_string variable
     encrypted_string = Base64.encode64(public_key.public_encrypt(data))
 
     encrypted_string

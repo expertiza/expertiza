@@ -25,33 +25,40 @@ class AssignmentsController < ApplicationController
   # creates a new assignment via the assignment form
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
-    if params[:button]
-      if @assignment_form.save
+if params[:button]
+      # Do not create an assignment if the assignment name or directory name already present in the course
+      exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
+      dir_path = assignment_form_params[:assignment][:directory_path]
+      exist_directory = Assignment.find_by(directory_path: dir_path, course_id: @assignment_form.assignment.course_id)
+      if !exist_assignment and !exist_directory and @assignment_form.save
         @assignment_form.create_assignment_node
-        exist_assignment = Assignment.find_by(id: @assignment_form.assignment.id)
-        assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
-        if assignment_form_params[:assignment][:directory_path].blank?
-          assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
-        end
+        current_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
+        assignment_form_params[:assignment][:id] = current_assignment.id.to_s
         ques_array = assignment_form_params[:assignment_questionnaire]
         due_array = assignment_form_params[:due_date]
         ques_array.each do |cur_questionnaire|
-          cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
+          cur_questionnaire[:assignment_id] = current_assignment.id.to_s
         end
         due_array.each do |cur_due|
-          cur_due[:parent_id] = exist_assignment.id.to_s
+          cur_due[:parent_id] = current_assignment.id.to_s
         end
         assignment_form_params[:assignment_questionnaire] = ques_array
         assignment_form_params[:due_date] = due_array
         @assignment_form.update(assignment_form_params, current_user)
-        aid = Assignment.find_by(id: @assignment_form.assignment.id).id
+        aid = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id).id
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
         redirect_to edit_assignment_path aid
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
         return
       else
-        flash.now[:error] = "Failed to create assignment"
-        render 'new'
+        if exist_assignment
+          flash[:error] = @assignment_form.assignment.name + " already exists as an assignment name"
+        end
+        if exist_directory
+          flash[:error] = dir_path + " already exists as a submisison directory name"
+        end
+        redirect_to "/assignments/new?private=1"
+        #render 'new' This is redirecting to /assignments instead of /assignments/new
       end
     else
       render 'new'

@@ -113,7 +113,7 @@ describe AssignmentsController do
             max_team_size: 1,
             id: 1,
             name: 'test assignment',
-            directory_path: 'test',
+            directory_path: '/test',
             spec_location: '',
             private: false,
             show_teammate_reviews: false,
@@ -131,27 +131,22 @@ describe AssignmentsController do
         }
       }
     end
-=begin Rewrite this test
-    context 'when assignment_form is saved successfully' do
-      it 'redirects to assignment#edit page' do
-        allow(assignment_form).to receive(:assignment).and_return(assignment)
-        allow(assignment_form).to receive(:save).and_return(true)
-        allow(assignment_form).to receive(:update).with(any_args).and_return(true)
-        allow(assignment_form).to receive(:create_assignment_node).and_return(double('node'))
-        allow(assignment).to receive(:id).and_return(1)
-        allow(Assignment).to receive(:find_by).with(id: 1).and_return(assignment)
-        allow_any_instance_of(AssignmentsController).to receive(:undo_link)
-          .with('Assignment "test assignment" has been created successfully. ').and_return(true)
-        post :create, @params
-        expect(response).to redirect_to('/assignments/1/edit')
+
+    #E2054 Ensure Assignment Names Cannot Match
+    context 'when assignment_form is not saved successfully due to same assignment name already existing' do
+      it 'raises validation error' do
+        assignment1 = create(:assignment, name: 'Assignment 1', course_id: 1, directory_path: 'Assignment1')
+        expect {create(:assignment, name: 'Assignment 1', course_id: 1,
+                       directory_path: 'Assignment2')}.to raise_error(ActiveRecord::RecordInvalid)
       end
     end
-=end
-    context 'when assignment_form is not saved successfully' do
-      it 'renders assignment#new page' do
-        allow(assignment_form).to receive(:save).and_return(false)
-        post :create, @params
-        expect(response).to redirect_to('/assignments/new?private=1') #E2054 redirect to correct 
+
+    #E2054 Ensure Submission Directory Cannot Match
+    context 'when assignment_form is not saved successfully due to same submission directory already existing' do
+      it 'raises validation error' do
+        assignment1 = create(:assignment, name: 'Assignment 1', course_id: 1, directory_path: 'Assignment1')
+        expect {create(:assignment, name: 'Assignment 2', course_id: 1,
+                       directory_path: 'Assignment1')}.to raise_error(ActiveRecord::RecordInvalid)
       end
     end
   end

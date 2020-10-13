@@ -98,17 +98,6 @@ class SuggestionController < ApplicationController
     end
   end
 
-  # this is a method for lazy team creation. Here may not be the right place for this method.
-  # should be refactored into a static method in AssignmentTeam class. --Yang
-  def create_new_team
-    new_team = AssignmentTeam.create(name: 'Team_' + rand(10_000).to_s,
-                                     parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
-    t_user = TeamsUser.create(team_id: new_team.id, user_id: @user_id)
-    SignedUpTeam.create(topic_id: @signuptopic.id, team_id: new_team.id, is_waitlisted: 0)
-    parent = TeamNode.create(parent_id: @signuptopic.assignment_id, node_object_id: new_team.id)
-    TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
-  end
-
   def notification
     #--zhewei-----06/22/2015--------------------------------------------------------------------------------------
     # If you want to create a new team with topic and team members on view, you have to
@@ -125,7 +114,8 @@ class SuggestionController < ApplicationController
     if @suggestion.signup_preference == 'Y'
       # if this user do not have team in this assignment, create one for him/her and assign this topic to this team.
       if @team_id.nil?
-        create_new_team
+        #E2069 UPDATE
+        Team.create_new_team(@user_id, @signuptopic)
       else # this user has a team in this assignment, check whether this team has topic or not
         if @topic_id.nil?
           # clean waitlists

@@ -5,4 +5,4 @@
 <%# associated with current logged in user %>
 <%# done to make it available in the frontend %>
 <div id="tree_display" params="#{@reactjsParams}" data-user-id="<%= current_user.id %>" data-menu-item= '<%= "#{@currCtlr}" %>'></div>
-
+<%= render "dialog"%>

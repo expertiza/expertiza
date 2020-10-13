@@ -42,8 +42,10 @@
         <th><b>Topic</b></th>
         <th><b>Peer Score</b></th>
         <th><b>Instructor Grade</b></th>
+        
     <% end %>
       <th class="sorter-true"><b>Total Instructor Grade</b></th>
+      <th class="sorter-true"><b>Average Peer Score</b></th>
     </tr>
   </thead>
 
@@ -60,6 +62,7 @@
           <% end %>
 
           <td><%= @final_grades[cp.id] %></td>
+          <td><%= @average_peer_review_score[cp.id] %></td>
       </tr>
   <% end %>
 </table>

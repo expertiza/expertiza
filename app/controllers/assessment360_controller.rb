@@ -11,13 +11,24 @@ class Assessment360Controller < ApplicationController
   # This data is used to compute the metareview and teammate review scores.
   def all_students_all_reviews
     course = Course.find(params[:course_id])
+    fields = params[:fields]
+    @show_meta_reviews = fields.include? 'MetaReviewScores'
+    @show_teammate_reviews = fields.include? 'TeammateReviewScores'
+    @show_teammate_count = fields.include? 'NumberOfTeammates'
+    @colspan_count = 2
+    if !@show_teammate_reviews
+      @colspan_count -= 1
+    end
+    if !@show_meta_reviews
+      @colspan_count -= 1
+    end
     @assignments = course.assignments.reject(&:is_calibrated).reject {|a| a.participants.empty? }
     @course_participants = course.get_participants
     insure_existence_of(@course_participants,course)
     # hashes for view
     @meta_review = {}
     @teammate_review = {}
-    @teamed_count = {}
+    @total_unique_teammates = {}
     # for course
     # eg. @overall_teammate_review_grades = {assgt_id1: 100, assgt_id2: 178, ...}
     # @overall_teammate_review_count = {assgt_id1: 1, assgt_id2: 2, ...}
@@ -30,7 +41,7 @@ class Assessment360Controller < ApplicationController
       # [aggregrate_review_grades_per_stu, review_count_per_stu] --> [0, 0]
       %w[teammate meta].each {|type| instance_variable_set("@#{type}_review_info_per_stu", [0, 0]) }
       students_teamed = StudentTask.teamed_students(cp.user)
-      @teamed_count[cp.id] = students_teamed[course.id].try(:size).to_i
+      @total_unique_teammates[cp.id] = students_teamed[course.id].try(:size).to_i
       @assignments.each do |assignment|
         @meta_review[cp.id] = {} unless @meta_review.key?(cp.id)
         @teammate_review[cp.id] = {} unless @teammate_review.key?(cp.id)
@@ -89,8 +100,13 @@ class Assessment360Controller < ApplicationController
     @assignment_grades = {}
     @peer_review_scores = {}
     @final_grades = {}
+    @average_peer_review_score = {}
     course = Course.find(params[:course_id])
     @assignments = course.assignments.reject(&:is_calibrated).reject {|a| a.participants.empty? }
+    fields = params[:fields]
+    @show_instructor_scores = fields.include? 'InstructorAssignedScores'
+    @show_peer_grades = fields.include? 'PeerGrades'
+    @show_topics = fields.include? 'Topics'
     @course_participants = course.get_participants
     insure_existence_of(@course_participants,course)
     @course_participants.each do |cp|
@@ -98,13 +114,16 @@ class Assessment360Controller < ApplicationController
       @assignment_grades[cp.id] = {}
       @peer_review_scores[cp.id] = {}
       @final_grades[cp.id] = 0
+      @average_peer_review_score[cp.id] = 0
       @assignments.each do |assignment|
         user_id = cp.user_id
         assignment_id = assignment.id
         assignment_participant = assignment.participants.find_by(user_id: user_id)
+        next if peer_review_score.nil? 
+        next if peer_review_score[:total_score].nil?
+        @average_peer_review_score[cp.id] += peer_review_score[:total_score].round(2)
         next if assignment.participants.find_by(user_id: user_id).nil? # break out of the loop if there are no participants in the assignment
         next if TeamsUser.team_id(assignment_id, user_id).nil? # break out of the loop if the participant has no team
-        
         assignment_grade_summary(cp, assignment_id) # pull information about the student's grades for particular assignment
         peer_review_score = find_peer_review_score(user_id, assignment_id)
         
@@ -114,6 +133,9 @@ class Assessment360Controller < ApplicationController
         next if peer_review_score[:review][:scores][:avg].nil? #Skip if there are is no peer review average score
         @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
       end
+    end
+    if @assignments.count > 0
+      @average_peer_review_score[cp.id] = (@average_peer_review_score[cp.id] / @assignments.count()).round(2)
     end
   end
 
@@ -178,11 +200,11 @@ class Assessment360Controller < ApplicationController
   end
 
   def format_topic(topic)
-    topic.nil? ? '-' : topic.format_for_display
+    topic.nil? ? '―' : topic.format_for_display
   end
 
   def format_score(score)
-    score.nil? ? '-' : score
+    score.nil? ? '―' : score
   end
 
   helper_method :format_score

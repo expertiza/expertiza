@@ -53,6 +53,13 @@ jQuery(document).ready(function() {
     return month[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear() + " - " + strTime;
   }
 
+  if (document.getElementById('closeDialog')) {
+    document.getElementById('closeDialog').onclick = () => {jQuery('#dialog').dialog('close')};
+  }
+  if (document.getElementById('closeCourseSummaryDialog')) {
+    document.getElementById('closeCourseSummaryDialog').onclick = () => {jQuery('#dialog_course_summary').dialog('close')};
+  }
+
   function showIntelligentAssignmentDialog() {
     jQuery( "#intelligent_assignment_dialog" ).dialog({ closeText: "hide", modal: true, resizable: false, width: 500 });
   }
@@ -72,6 +79,14 @@ jQuery(document).ready(function() {
           })
         }
       }
+    },
+    toggleModal: function() {
+      jQuery( "#dialog" ).dialog();
+      document.getElementById('course_id').value = parseInt(this.props.id/2).toString();
+    },
+    toggleCourseSummaryModal: function() {
+      jQuery( "#dialog_course_summary" ).dialog();
+      document.getElementById('course_summary_course_id').value = parseInt(this.props.id/2).toString();
     },
     render: function() {
       var moreContent = []
@@ -149,15 +164,15 @@ jQuery(document).ready(function() {
                 <a title="Create teams" href={"/teams/list?id="+(parseInt(this.props.id)/2).toString()+"&type=Course"}>
                   <img src="/assets/tree_view/create-teams-24.png" />
                 </a>
-                <a title="View grade summary by student" href={"/assessment360/course_student_grade_summary?course_id="+(parseInt(this.props.id)/2).toString()}>
+                <button title="View grade summary by student" onClick={this.toggleCourseSummaryModal} style={{"padding": "0px", "margin": "0px", "border": "0px", "width": "24px", "height": "24px", "top": "8px"}} >
                   <img src="/assets/tree_view/360-dashboard-24.png" />
-                </a>
+                </button>
                 <a title="Assign survey" href={"/survey_deployment/new?id="+(parseInt(this.props.id)/2).toString()+"&type=CourseSurveyDeployment"}>
                   <img src="/assets/tree_view/assign-survey-24.png" />
                 </a>
-                <a title="View aggregated teammate & meta reviews" href={"/assessment360/all_students_all_reviews?course_id="+(parseInt(this.props.id)/2).toString()}>
+                <button title="View aggregated teammate & meta reviews" onClick={this.toggleModal} style={{"padding": "0px", "margin": "0px", "border": "0px", "width": "24px", "height": "24px", "top": "8px"}} >
                   <span style={{"fontSize": "22px", "top": "8px"}} className="glyphicon glyphicon-list-alt"></span>
-                </a>
+                </button>
               </span>
             )
           }

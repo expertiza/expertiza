@@ -201,7 +201,7 @@
 <p>
   <% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' && session[:user] != nil && (session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4) %>
   <%= form_tag :action => 'submit', :id => @suggestion do %>
-  <%= submit_tag "Approve suggestion", :name => 'approve_suggestion' ,:class => "btn btn-success"%>
+  <%= submit_tag "Approve suggestion", :name => 'approve_suggestion_and_notify' ,:class => "btn btn-success"%>
   &nbsp; &nbsp;
   <%= submit_tag "Reject suggestion", :name => 'reject_suggestion', :class => "btn btn-danger" %>
   <% end %>

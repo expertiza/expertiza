@@ -165,4 +165,20 @@ class SignUpTopic < ActiveRecord::Base
     topic_display += self.topic_identifier.to_s + ' - '
     topic_display + self.topic_name
   end
+
+  # Was originally "approve" from suggestion_controller, but setting topic fields
+  # should happen here in sign_up_topic.rb
+  def new_topic_from_assignment(suggestion)
+    signuptopic = SignUpTopic.new
+    signuptopic.topic_identifier = 'S' + Suggestion.where("assignment_id = ? and id <= ?", suggestion.assignment_id, suggestion.id).size.to_s
+    signuptopic.topic_name = suggestion.title
+    signuptopic.assignment_id = suggestion.assignment_id
+    signuptopic.max_choosers = 1
+    if signuptopic.save && suggestion.update_attribute('status', 'Approved')
+      flash[:success] = 'The suggestion was successfully approved.'
+    else
+      flash[:error] = 'An error occurred when approving the suggestion.'
+    end
+  end
+
 end

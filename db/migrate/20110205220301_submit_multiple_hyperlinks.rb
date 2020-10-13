@@ -4,7 +4,7 @@ class SubmitMultipleHyperlinks < ActiveRecord::Migration
   def self.up
     rename_column :participants, :submitted_hyperlink, :submitted_hyperlinks
 
-    puts "[Converting to YAML] Please wait, this could take some seconds..."
+    #puts "[Converting to YAML] Please wait, this could take some seconds..."
 
     Participant.find_each do |p|
       unless p.submitted_hyperlinks.nil?
@@ -19,14 +19,14 @@ class SubmitMultipleHyperlinks < ActiveRecord::Migration
       end
     end
     
-    puts "[Converting to YAML] Done"
+    #puts "[Converting to YAML] Done"
   end
 
   # Becareful when downgrading the database, because at this point there might
   # be many multiple links values that are going to be converted to a space 
   # sparated string
   def self.down
-    puts "Becareful when downgrading submitted_hyperlinks, please read 20110205220301_submit_multiple_hyperlinks.rb"
+    #puts "Becareful when downgrading submitted_hyperlinks, please read 20110205220301_submit_multiple_hyperlinks.rb"
     
     Participant.find_each do |p|
       unless p.submitted_hyperlinks.nil?

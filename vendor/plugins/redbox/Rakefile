@@ -29,7 +29,7 @@ task :update_scripts => [] do |t|
   File.copy File.join(redbox_dir, 'stylesheets', 'redbox.css'), File.join(root_dir, 'public', 'stylesheets', 'redbox.css')
   File.copy File.join(redbox_dir, 'images', 'redbox_spinner.gif'), File.join(root_dir, 'public', 'images', 'redbox_spinner.gif')
 
-  puts "Updated Scripts." 
+  #puts "Updated Scripts."
 end
 
 

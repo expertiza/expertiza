@@ -245,6 +245,17 @@ describe AssignmentParticipant do
     end
   end
 
+  describe '#assign_copyright' do
+    it 'grant publishing rights to one or more assignments using the supplied private key' do
+      # create new RSA key-pair 
+      key = OpenSSL::PKey::RSA.new 2048
+      participant.user.public_key = key.public_key.to_pem
+
+      participant.assign_copyright(key)
+      expect(participant.permission_granted).to eq(true) 
+    end
+  end
+
   describe '#files' do
     context 'when there is not subdirectory in current directory' do
       it 'returns all files in current directory' do

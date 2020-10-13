@@ -135,13 +135,6 @@ class AssignmentParticipant < Participant
     scores[review_sym][:scores][:avg] = total_score / scores[review_sym][:assessments].length.to_f
   end
 
-  def topic_total_scores(scores)
-    topic = SignUpTopic.find_by(assignment_id: self.assignment.id)
-    return if topic.nil?
-    scores[:total_score] *= (topic.micropayment.to_f / 100.to_f)
-    scores[:max_pts_available] = topic.micropayment
-  end
-
   def calculate_scores(scores)
     if self.grade
       scores[:total_score] = self.grade

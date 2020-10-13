@@ -328,8 +328,8 @@ class ResponseController < ApplicationController
     # apply different implement. For the Review, the code will look up contributor's topic which
     # is reviewee's topic.
     case @map.type
-    when "ReviewResponseMap", "SelfReviewResponseMap"   #Reivew questionnaire
-      reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)   #look up contributor's topic
+    when "ReviewResponseMap", "SelfReviewResponseMap"
+      reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.number_of_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
     when                        #Other types of questionnaire
@@ -345,7 +345,8 @@ class ResponseController < ApplicationController
 
 
 
-  def find_questionnaire #finding questionnaire of the exist response
+  def find_questionnaire
+    #finding questionnaire of the exist response
     # if user is not filling a new rubric, the @response object should be available.
     # we can find the questionnaire from the question_id in answers
     answer = @response.scores.first

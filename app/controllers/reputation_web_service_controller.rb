@@ -7,7 +7,6 @@ require 'base64'
 class ReputationWebServiceController < ApplicationController
   include AuthorizationHelper
 
-
   def action_allowed?
     current_user_has_ta_privileges?
   end

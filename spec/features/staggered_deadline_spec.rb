@@ -276,23 +276,46 @@ describe "Staggered deadline test" do
     expect(find_field("due_date_3_submission_1_due_date").value).to_not eq(nil)
     find(:xpath, ".//input[@id='due_date_3_review_1_due_date']").click
     expect(find_field("due_date_3_review_1_due_date").value).to_not eq(nil)
+    # click_link 'Hide start/due date'
+    # sleep 6
+    # check('select_all')
+    # click_button 'Delete selected topics'
+    # page.driver.browser.switch_to.alert.accept
+    # # driver.navigate.windows(windowHandle)
+
+		# topics_exist = SignUpTopic.where(assignment_id: assignment.id).count
+		# expect(topics_exist).to be_eql 0      
   end
 
-  it 'Deletes all selected topics that contain staggered deadlines', :focus do
-    Selenium::WebDriver::Firefox.driver_path = "/home/skollip/geckodriver"
-    driver = Selenium::WebDriver.for :firefox
-    driver.navigate.to "http://localhost:3000"
+  it 'test5: Deletes all selected topics that contain staggered deadlines', js: true do
+    # Selenium::WebDriver::Firefox.driver_path = "/home/skollip/geckodriver"
+    # driver = Selenium::WebDriver.for :firefox
+    # driver.navigate.to "http://localhost:3000"
+      
     login_as("instructor6")
-		assignment = Assignment.find_by(name: 'Assignment1665')
-		visit "/assignments/#{assignment.id}/edit"
+    assignment = Assignment.find_by(name: 'Assignment1665')
+    visit "/assignments/#{assignment.id}/edit"
     click_link 'Topics'
     check('select_all')
     click_button 'Delete selected topics'
-    alert = driver.switch_to.alert
-    alert.accept
-    driver.navigate.windows(windowHandle)
+    page.driver.browser.switch_to.alert.accept
+    sleep 3
+    expect(page).not_to have_content('Topic_1')
+    expect(page).not_to have_content('Topic_2')
+    expect(page).not_to have_content('Topic_3')
+    
 
-		topics_exist = SignUpTopic.where(assignment_id: assignment.id).count
-		expect(topics_exist).to be_eql 0       
+    # login_as("instructor6")
+		# assignment = Assignment.find_by(name: 'Assignment1665')
+		# visit "/assignments/#{assignment.id}/edit"
+    # click_link 'Topics'
+    # check('select_all')
+    # click_button 'Delete selected topics'
+    # alert = driver.switch_to.alert
+    # alert.accept
+    # driver.navigate.windows(windowHandle)
+
+		# topics_exist = SignUpTopic.where(assignment_id: assignment.id).count
+		# expect(topics_exist).to be_eql 0       
   end
 end

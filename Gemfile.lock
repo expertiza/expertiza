@@ -1,3 +1,6 @@
+heroku_java_home = '/usr/lib/jvm/java-6-openjdk'
+ENV['JAVA_HOME'] = heroku_java_home if Dir.exist?(heroku_java_home)
+
 GIT
   remote: https://github.com/Winbobob/danger.git
   revision: e8dd327719b415997da60ca5fd78f8d76106c8b0
@@ -448,6 +451,7 @@ GEM
     rgl (0.5.3)
       lazy_priority_queue (~> 0.1.0)
       stream (~> 0.5.0)
+    rjb (1.4.9)
     rspec (3.6.0)
       rspec-core (~> 3.6.0)
       rspec-expectations (~> 3.6.0)

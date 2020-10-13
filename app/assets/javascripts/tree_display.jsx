@@ -11,17 +11,24 @@ let app_variables = {
 window.addEventListener('load', e => {
   // grab the data attribute
   let treeDisplayDiv = document.querySelector('#tree_display');
+
   // check if the html element is present requested in the query above
   if (treeDisplayDiv) {
     // set the userid for the current user
     app_variables.currentUserId = treeDisplayDiv.dataset.userId;
+    
   }
 });
 jQuery(document).ready(function() {
   // This preloadedImages function is refered from http://jsfiddle.net/slashingweapon/8jAeu/
   // Actually I am not using the values in preloadedImages, but image loading speed is indeed getting faster
   let treeDisplayDiv = document.querySelector('#tree_display');
-  app_variables.homeActionShowFlag = treeDisplayDiv.dataset.userShow;
+
+  if (treeDisplayDiv) {
+    // set the user preference to homeActionshowflag 
+    app_variables.homeActionShowFlag = treeDisplayDiv.dataset.userShow;
+    
+  }
   var preloadedImages = []
   function preloadImages() {
     for (var idx = 0; idx < arguments.length; idx++) {

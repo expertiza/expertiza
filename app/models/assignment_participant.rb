@@ -44,7 +44,7 @@ class AssignmentParticipant < Participant
   end
 
   # Return scores that this participant has been given
-  # methods extracted from scores method: merge_scores, topic_total_scores, calculate_scores
+  # methods extracted from scores method: merge_scores
   def scores(questions)
     scores = {}
     scores[:participant] = self

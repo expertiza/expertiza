@@ -128,6 +128,8 @@ describe SignUpSheetController do
       params = {assignment_id: 1, topic_ids: ['E1732']}
       post :delete_all_selected_topics, params
       expect(flash[:success]).to eq('All selected topics have been deleted successfully.')
+      topics_exist = SignUpTopic.where(assignment_id: 1).count
+      expect(topics_exist).to be_eql 0
       expect(response).to redirect_to('/assignments/1/edit#tabs-2')
     end
   end

@@ -1,5 +1,6 @@
 
 class AccountRequestController < ApplicationController
+  include AuthorizationHelper
   autocomplete :user, :name
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[destroy create update],

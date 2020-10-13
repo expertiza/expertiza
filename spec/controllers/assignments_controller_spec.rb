@@ -113,7 +113,7 @@ describe AssignmentsController do
             max_team_size: 1,
             id: 1,
             name: 'test assignment',
-            directory_path: '/test',
+            directory_path: 'test',
             spec_location: '',
             private: false,
             show_teammate_reviews: false,
@@ -131,6 +131,7 @@ describe AssignmentsController do
         }
       }
     end
+
     context 'when assignment_form is saved successfully' do
       it 'redirects to assignment#edit page' do
         allow(assignment_form).to receive(:assignment).and_return(assignment)
@@ -150,7 +151,7 @@ describe AssignmentsController do
       it 'renders assignment#new page' do
         allow(assignment_form).to receive(:save).and_return(false)
         post :create, @params
-        expect(response).to render_template(:new)
+        expect(response).to redirect_to('/assignments/new?private=1') #E2054 redirect to correct 
       end
     end
   end

@@ -11,10 +11,6 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 6a2d9965cab934c5b221eb5ce9b7bef15cd76d96
 ActiveRecord::Schema.define(version: 20201011214909) do
 
   create_table "account_requests", force: :cascade do |t|

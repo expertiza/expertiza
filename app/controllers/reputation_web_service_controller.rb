@@ -36,7 +36,7 @@ class ReputationWebServiceController < ApplicationController
   #   query+="group by RM.id "+
   #   "order by RM.reviewee_id"
   #
-  #  result = ActiveRecord::Base.connection.select_all(query)git status
+  #  result = ActiveRecord::Base.connection.select_all(query)
   # db query to return review responses
   def get_review_responses(assignment_id, another_assignment_id = 0)
     assignment_ids = []
@@ -53,6 +53,8 @@ class ReputationWebServiceController < ApplicationController
       topic_condition = ((has_topic and SignedUpTeam.where(team_id: team.id).first.is_waitlisted == false) or !has_topic)
       last_valid_response = response_map.response.select {|r| r.round == round_num }.sort.last
       valid_response = [last_valid_response] unless last_valid_response.nil?
+
+      # calculate peer review grade for each valid response
       next unless topic_condition == true and !valid_response.nil? and !valid_response.empty?
       valid_response.each do |response|
         answers = Answer.where(response_id: response.id)
@@ -60,7 +62,7 @@ class ReputationWebServiceController < ApplicationController
         temp_sum = 0
         weight_sum = 0
         valid_answer = answers.select {|a| a.question.type == 'Criterion' and !a.answer.nil? }
-        # calculate weighted sum for valid answers
+        # find weighted sum for valid answers that are not empty
         next if valid_answer.empty?
         valid_answer.each do |answer|
           temp_sum += answer.answer * answer.question.weight
@@ -82,10 +84,10 @@ class ReputationWebServiceController < ApplicationController
     teams = AssignmentTeam.where('parent_id in (?)', assignment_ids)
     team_ids = []
     teams.each {|team| team_ids << team.id }
-    quiz_questionnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
-    quiz_questionnaire_ids = []
-    quiz_questionnaires.each {|questionnaire| quiz_questionnaire_ids << questionnaire.id }
-    QuizResponseMap.where('reviewed_object_id in (?)', quiz_questionnaire_ids).each do |response_map|
+    quiz_questionnnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
+    quiz_questionnnaire_ids = []
+    quiz_questionnnaires.each {|questionnaire| quiz_questionnnaire_ids << questionnaire.id }
+    QuizResponseMap.where('reviewed_object_id in (?)', quiz_questionnnaire_ids).each do |response_map|
       quiz_score = response_map.quiz_score
       participant = Participant.find(response_map.reviewer_id)
       raw_data_array << [participant.user_id, response_map.reviewee_id, quiz_score]
@@ -93,6 +95,12 @@ class ReputationWebServiceController < ApplicationController
     raw_data_array
   end
 
+  # Create request body in json format with peer review grades/quiz scores
+  # Params:
+  # - assignment_id: id of the reviewed assignment
+  # - another_assignment_id: additional assignment id if any (set to 0 if none)
+  # - round_num: number indicating the round of review. (i.e. Round 1,2..)
+  # - type: string to indicate whether it is a peer review grade/quiz score
   def generate_json(assignment_id, another_assignment_id = 0, round_num = 2, type = 'peer review grades')
     assignment = Assignment.find_by(id: assignment_id)
     has_topic = !SignUpTopic.where(assignment_id: assignment_id).empty?
@@ -101,7 +109,7 @@ class ReputationWebServiceController < ApplicationController
       @responses = get_review_responses(assignment.id, another_assignment_id)
       @results = calculate_peer_review_grades(has_topic,@responses, round_num)
     elsif type == 'quiz scores'
-      @results = calculate_quiz_score(assignment.id, another_assignment_id)
+      @results = calculate_quiz_scores(assignment.id, another_assignment_id)
     end
     request_body = {}
     @results.each_with_index do |record, _index|
@@ -134,7 +142,6 @@ class ReputationWebServiceController < ApplicationController
   end
 
 
-  # abhishek 10/10 8 pm
   def send_post_request
     # https://www.socialtext.net/open/very_simple_rest_in_ruby_part_3_post_to_create_a_new_workspace
     req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader = {'Content-Type' => 'application/json', 'charset' => 'utf-8'})
@@ -164,7 +171,7 @@ class ReputationWebServiceController < ApplicationController
     elsif params[:checkbox][:lauw] == 'Add initial Lauw reputation values'
       @additional_info = 'add initial lauw reputation values'
     elsif params[:checkbox][:quiz] == 'Add quiz scores'
-      @additional_info = 'add quiz scores'
+      set_additional_info('add quiz scores')
       quiz_str = generate_json(params[:assignment_id].to_i, params[:another_assignment_id].to_i, params[:round_num].to_i, 'quiz scores').to_json
       quiz_str[0] = ''
       quiz_str.prepend('"quiz_scores":{')
@@ -182,7 +189,7 @@ class ReputationWebServiceController < ApplicationController
     # "quiz_scores" : {"submission1" : {"stu1":100, "stu3":80}, "submission2":{"stu2":40, "stu1":60}}, #optional
     # "submission1": {"stu1":91, "stu3":99},"submission2": {"stu5":92, "stu8":90},"submission3": {"stu2":91, "stu4":88}}"
     req.body.prepend("{")
-    @request_body = req.body
+    @request_body = (req.body)
 
 
  # Encrypting the request being sent over the internet

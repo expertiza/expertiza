@@ -102,8 +102,10 @@ jQuery(document).ready(function() {
           </span>
         )
       }
+      /** only running this check after the state changes to show the details (which currently is on any click on the row) */
       if (this.state.showDetails) {
         moreButtonStyle.display = "none"
+        /** what does this mean^^ */
         var newNodeType = this.props.nodeType
         if (this.props.nodeType === 'assignment' || this.props.nodeType === 'questionnaire') {
           newNodeType = this.props.nodeType + "s"
@@ -112,13 +114,15 @@ jQuery(document).ready(function() {
           // check if the user id exists
           // check if the current user id matches the user/instructor id associated with a questionnaire/survey
           // show edit button only for the items which are associated to that user
-          if (app_variables.currentUserId == null || this.props.instructor_id == app_variables.currentUserId) {
+          /** TODO: EXPLAIN WHY THIS WORKS */
+          /** its checking if the user is an instructor, but how can it differentiate the types by the instructor here anyways? */
+          // if (app_variables.currentUserId == null || this.props.instructor_id == app_variables.currentUserId) {
             moreContent.push(
               <span>
                 <a title="Edit" href={"/"+newNodeType+"/"+(parseInt(this.props.id)/2).toString()+"/edit"}><img src="/assets/tree_view/edit-icon-24.png" /></a>
               </span>
             );  
-          }
+          // }
           moreContent.push(
             <span>
               <a title="Delete" href={"/tree_display/confirm?id="+(parseInt(this.props.id)/2).toString()+"&nodeType="+newNodeType}><img src="/assets/tree_view/delete-icon-24.png" /></a>
@@ -619,6 +623,7 @@ jQuery(document).ready(function() {
 
   var ContentTableDetailsRow = React.createClass({
     render: function() {
+      // console.log(this)
       var colSpan = "5"
       var colDisplayStyle = {
         "display": ""
@@ -651,6 +656,7 @@ jQuery(document).ready(function() {
             />
           </td>
         </tr>
+          /** no data is being passed in here after inspecting */
       )
     }
   })
@@ -775,6 +781,7 @@ jQuery(document).ready(function() {
       }
     },
     handleExpandClick: function(id, expanded,newParams) {
+      this.state.expandedRow.concat([id])
       if (expanded) {
         this.setState({ 
           expandedRow: this.state.expandedRow.concat([id])
@@ -859,7 +866,9 @@ jQuery(document).ready(function() {
                   _rows.push(<ContentTableDetailsRow
                       key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
                       id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
-                      showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                      showElement={true}
+                      // showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                      // what tfffff^^^
                       dataType={_this.props.dataType}
                       children={entry.children}
                   />)
@@ -867,12 +876,15 @@ jQuery(document).ready(function() {
                   return;
               }
           })
+          // if (true) {
+            /** this was protecting an always null field, weird TODO */
           if (this.props.showPublic) {
               if (this.props.dataType == 'course') {
                   _rows.push(<TitleRow
                       title="Others' Public Courses"
                   />)
                   jQuery.each(this.props.data, function (i, entry) {
+                    // console.log(this.props.data)
                       if (((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
                           (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
                           (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||

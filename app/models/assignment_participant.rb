@@ -135,6 +135,18 @@ class AssignmentParticipant < Participant
     scores[review_sym][:scores][:avg] = total_score / scores[review_sym][:assessments].length.to_f
   end
 
+  def update_max_or_min(scores, round_sym, review_sym, symbol)
+    op = :< if symbol == :max
+    op = :> if symbol == :min
+      # check if there is a max/min score for this particular round
+    if !scores[round_sym][:scores][symbol].nil? 
+      # if scores[review_sym][:scores][symbol] (< or >) scores[round_sym][:scores][symbol]
+      if scores[review_sym][:scores][symbol].send(op, scores[round_sym][:scores][symbol])
+        scores[review_sym][:scores][symbol] = scores[round_sym][:scores][symbol]
+      end
+    end
+  end
+
   # Copy this participant to a course
   def copy(course_id)
     CourseParticipant.find_or_create_by(user_id: self.user_id, parent_id: course_id)

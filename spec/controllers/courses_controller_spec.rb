@@ -1,4 +1,4 @@
-describe CourseController do
+describe CoursesController do
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student) }
   let(:course) { double('Course', instructor_id: 6, path: '/cscs', name: 'abc') }

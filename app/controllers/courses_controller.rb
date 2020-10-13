@@ -28,11 +28,12 @@ class CoursesController < ApplicationController
     @private = params[:private]
   end
 
-  # Modify an existing course
+  # GET /courses/1/edit
   def edit
     @course = Course.find(params[:id])
   end
 
+  # POST /courses
   def update
     @course = Course.find(params[:id])
     if params[:course][:directory_path] && @course.directory_path != params[:course][:directory_path]
@@ -54,6 +55,7 @@ class CoursesController < ApplicationController
     redirect_to controller: 'tree_display', action: 'list'
   end
 
+  # Create a copy of a course with a new submission directory
   def copy
     orig_course = Course.find(params[:id])
     new_course = orig_course.dup
@@ -109,11 +111,13 @@ class CoursesController < ApplicationController
     redirect_to controller: 'tree_display', action: 'list'
   end
 
+  # Displays all the teaching assistants for a course
   def view_teaching_assistants
     @course = Course.find(params[:id])
     @ta_mappings = @course.ta_mappings
   end
 
+  # Adds a teaching assistant to a course
   def add_ta
     @course = Course.find(params[:course_id])
     @user = User.find_by(name: params[:user][:name])
@@ -132,6 +136,7 @@ class CoursesController < ApplicationController
     render action: 'add_ta.js.erb', layout: false
   end
 
+  # Remove a teaching assistant from a course
   def remove_ta
     @ta_mapping = TaMapping.find(params[:id])
     @ta = User.find(@ta_mapping.ta_id)
@@ -150,6 +155,7 @@ class CoursesController < ApplicationController
     render action: 'remove_ta.js.erb', layout: false
   end
 
+  #This method is called in the update and create methods to set the fields of a course
   def set_course_fields(course)
     @course.name = params[:course][:name]
     @course.institutions_id = params[:course][:institutions_id]

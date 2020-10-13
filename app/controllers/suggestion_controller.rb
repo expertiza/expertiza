@@ -91,8 +91,8 @@ class SuggestionController < ApplicationController
   def submit
     if !params[:add_comment].nil?
       add_comment
-    elsif !params[:approve_suggestion].nil?
-      approve_suggestion
+    elsif !params[:approve_suggestion_and_notify].nil?
+      approve_suggestion_and_notify
     elsif !params[:reject_suggestion].nil?
       reject_suggestion
     end
@@ -166,8 +166,16 @@ class SuggestionController < ApplicationController
     end
   end
 
-  def approve_suggestion
-    approve
+  #Changed name from approve_suggestion to approve_suggestion_and_notify, since this method really is doing both things
+  #rather than just approving a suggestion
+  def approve_suggestion_and_notify
+    @suggestion = Suggestion.find(params[:id])
+    @user_id = User.find_by(name: @suggestion.unityID).try(:id)
+    if @user_id
+      @team_id = TeamsUser.team_id(@suggestion.assignment_id, @user_id)
+      @topic_id = SignedUpTeam.topic_id(@suggestion.assignment_id, @user_id)
+    end
+    SignUpTopic.new_topic_from_suggestion(@suggestion)
     notification
     redirect_to action: 'show', id: @suggestion
   end
@@ -196,22 +204,4 @@ class SuggestionController < ApplicationController
                                        :status, :unityID, :signup_preference)
   end
 
-  def approve
-    @suggestion = Suggestion.find(params[:id])
-    @user_id = User.find_by(name: @suggestion.unityID).try(:id)
-    if @user_id
-      @team_id = TeamsUser.team_id(@suggestion.assignment_id, @user_id)
-      @topic_id = SignedUpTeam.topic_id(@suggestion.assignment_id, @user_id)
-    end
-    @signuptopic = SignUpTopic.new
-    @signuptopic.topic_identifier = 'S' + Suggestion.where("assignment_id = ? and id <= ?", @suggestion.assignment_id, @suggestion.id).size.to_s
-    @signuptopic.topic_name = @suggestion.title
-    @signuptopic.assignment_id = @suggestion.assignment_id
-    @signuptopic.max_choosers = 1
-    if @signuptopic.save && @suggestion.update_attribute('status', 'Approved')
-      flash[:success] = 'The suggestion was successfully approved.'
-    else
-      flash[:error] = 'An error occurred when approving the suggestion.'
-    end
-  end
 end

@@ -74,7 +74,7 @@ class CoursesController < ApplicationController
       undo_link("The course \"#{orig_course.name}\" has been successfully copied.
         Warning: The submission directory path for this copy is the original course's directory path appended with the word \"_copy\".
         If you do not want this to happen, change the submission directory in the new copy of the course.")
-      redirect_to controller: 'course', action: 'edit', id: new_course.id
+      redirect_to controller: 'courses', action: 'edit', id: new_course.id
     rescue StandardError
       flash[:error] = 'The course was not able to be copied: ' + $ERROR_INFO
       redirect_to controller: 'tree_display', action: 'list'

@@ -385,7 +385,9 @@ describe ReviewMappingHelper, type: :helper do
       expect(@score_awarded_round_3).to eq "30%"
     end
   end
+	
 
+  # rspec test for link_updated_since_last? method
   describe 'link_updated_since_last?' do
 
     before(:each) do
@@ -393,26 +395,30 @@ describe ReviewMappingHelper, type: :helper do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')
-
+      
+      # create assignment and respective reviewer, reviewee instance variables
       assignment = create(:assignment, name: 'assignment', created_at: DateTime.now.in_time_zone - 13.day)
       reviewer = create(:participant, review_grade: nil)
       reviewee = create(:assignment_team, assignment: assignment)
       response_map = create(:review_response_map, reviewer: reviewer, reviewee: reviewee)
-
+      
+      # create due dates for assignment
       @round = 2
       create(:assignment_due_date, round: 1, due_at: DateTime.now.in_time_zone + 5.day)
       create(:assignment_due_date, round: 2, due_at: DateTime.now.in_time_zone + 10.day)
       @due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
 
     end
-
+    
+    # This test case asserts that false is returned when submission link is not updated from the last round
     it 'should return false if submission link was not updated between the last round and the current one' do
       link_updated_at = DateTime.now.in_time_zone + 1.day
 
       result = link_updated_since_last?(@round, @due_dates, link_updated_at)
       expect(result).to eq(false)
     end
-
+    
+    # This test case asserts that true is returned when submission link is updated from last round
     it 'should return true if submission link was updated between the last round and the current one' do
       link_updated_at = DateTime.now.in_time_zone + 7.day
 
@@ -422,17 +428,20 @@ describe ReviewMappingHelper, type: :helper do
 
   end
 
-  ## rspec test for obtain_team_color method
-
+  # rspec test for obtain_team_color method
   describe 'obtain_team_color' do
 
     before(:each) do
-
+      
+      # create assignment and respective reviewer, reviewee instance variables
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
       @reviewer = create(:participant, review_grade: nil)
       @reviewee = create(:assignment_team, assignment: @assignment)
       @response_map = create(:review_response_map, reviewer: @reviewer, reviewee: @reviewee)
     end
+
+    # Following test cases to assert whether the right color is returned by obtain_team_color for the given combination of pre-conditions
+    
 
     it 'should return purple if previous round was not submitted but submitted in current round' do
       create(:deadline_right, name: 'No')
@@ -516,8 +525,7 @@ describe ReviewMappingHelper, type: :helper do
 
   end
 
-  #rspec test for get_review_volume method
-
+  # rspec test for get_review_volume method
   describe 'get_review_volume' do
 
     before(:each) do
@@ -525,7 +533,8 @@ describe ReviewMappingHelper, type: :helper do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')
-
+	
+      # create assignment(with due dates for each round) and respective reviewer, reviewee instance variables
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2)
@@ -535,8 +544,9 @@ describe ReviewMappingHelper, type: :helper do
       @reviewee = create(:assignment_team, assignment: @assignment)
       @reviewer = create(:participant, assignment: @assignment, user: student)
 
-      # each round in avg_and_ranges must have a symbol and a string for the metric as indicated by corresponding source code
-
+      # Populate @avg_and_ranges instance variable required for lookup to extract the metrics for the given round in get_review_volume method.
+      # Each round in avg_and_ranges must have a symbol and a string for the metric as indicated by corresponding source code
+      # Here, key is the round number (1, 2, 3 ., etc) and the value is the metrics (min, max, avg) for the given round number.
       @avg_and_ranges = {
           @reviewee.id =>
               {
@@ -571,7 +581,7 @@ describe ReviewMappingHelper, type: :helper do
 
     end
 
-    ## check for metrics in round 1 for given team_id
+    # assert the value for metrics in round 1 for given team_id
     it 'should return minimum maximum and average score for round 1' do
       @round = 1
       get_review_volume(@round, @reviewee.id)
@@ -581,7 +591,7 @@ describe ReviewMappingHelper, type: :helper do
     end
 
 
-    ## check for metrics in round 2 for given team_id
+    # assert the value for metrics in round 2 for given team_id
     it 'should return the minimum, maximum and average score for round 2' do
       @round = 2
       get_review_volume(@round, @reviewee.id)
@@ -590,7 +600,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(@avg).to eq '6%'
     end
 
-    ## check for metrics in round 3 for given team_id
+    # assert the value metrics in round 3 for given team_id
     it 'should return the minimum, maximum and average score for round 3' do
       @round = 3
       get_review_volume(@round, @reviewee.id)

@@ -3,7 +3,7 @@ class CourseNode < Node
   belongs_to :node_object, class_name: "Course", foreign_key: "node_object_id"
 
   # Creates a new courese node from the given course
-  def create_course_node(course)
+  def self.create_course_node(course)
     parent_id = CourseNode.get_parent_id
     @course_node = CourseNode.new
     @course_node.node_object_id = course.id

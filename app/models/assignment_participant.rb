@@ -135,15 +135,6 @@ class AssignmentParticipant < Participant
     scores[review_sym][:scores][:avg] = total_score / scores[review_sym][:assessments].length.to_f
   end
 
-  def calculate_scores(scores)
-    if self.grade
-      scores[:total_score] = self.grade
-    else
-      scores[:total_score] = 100 if scores[:total_score] > 100
-      scores
-    end
-  end
-
   # Copy this participant to a course
   def copy(course_id)
     CourseParticipant.find_or_create_by(user_id: self.user_id, parent_id: course_id)

@@ -26,11 +26,6 @@ class AssignmentParticipant < Participant
     assignment.try :directory_path
   end
 
-  def assign_quiz(contributor, reviewer, _topic = nil)
-    quiz = QuizQuestionnaire.find_by(instructor_id: contributor.id)
-    QuizResponseMap.create(reviewed_object_id: quiz.try(:id), reviewee_id: contributor.id, reviewer_id: reviewer.id)
-  end
-
   # all the participants in this assignment who have reviewed the team where this participant belongs
   def reviewers
     reviewers = []
@@ -143,7 +138,7 @@ class AssignmentParticipant < Participant
   end
 
   # Copy this participant to a course
-  def copy(course_id)
+  def copy_participant(course_id)
     CourseParticipant.find_or_create_by(user_id: self.user_id, parent_id: course_id)
   end
 
@@ -247,13 +242,11 @@ class AssignmentParticipant < Participant
   # grant publishing rights to one or more assignments. Using the supplied private key,
   # digital signatures are generated.
   # reference: http://stuff-things.net/2008/02/05/encrypting-lots-of-sensitive-data-with-ruby-on-rails/
-  def self.grant_publishing_rights(private_key, participants)
-    participants.each do |participant|
-      # now, check to make sure the digital signature is valid, if not raise error
-      participant.permission_granted = participant.verify_digital_signature(private_key)
-      participant.save
-      raise 'Invalid key' unless participant.permission_granted
-    end
+  def assign_copyright(private_key)
+    # now, check to make sure the digital signature is valid, if not raise error
+    self.permission_granted = self.verify_digital_signature(private_key)
+    self.save
+    raise 'Invalid key' unless self.permission_granted  
   end
 
   # verify the digital signature is valid

@@ -156,10 +156,6 @@ class AssignmentParticipant < Participant
     ReviewResponseMap.get_assessments_for(self.team)
   end
 
-  def reviews_by_reviewer(reviewer)
-    ReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)
-  end
-
   # returns the reviewer of the assignment. Checks the reviewer_is_team flag to
   # determine whether this AssignmentParticipant or their team is the reviewer
   def get_reviewer

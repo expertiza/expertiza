@@ -14,7 +14,6 @@ app/controllers/auth_controller.rb
 nohup.out
 pg_data/*
 
-db/schema.rb
 #################
 ## scrubbed_db ##
 #################

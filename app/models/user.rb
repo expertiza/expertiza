@@ -216,8 +216,8 @@ class User < ActiveRecord::Base
     # when replacing an existing key, update any digital signatures made previously with the new key
     if replacing_key
       participants = AssignmentParticipant.where(user_id: self.id)
-      for participant in participants
-        AssignmentParticipant.grant_publishing_rights(new_key.to_pem, [participant]) if participant.permission_granted
+      participants.each do |participant|
+        participant.assign_copyright(new_key.to_pem) if participant.permission_granted
       end
     end
 

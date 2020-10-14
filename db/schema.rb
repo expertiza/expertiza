@@ -11,7 +11,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200812211018) do
+
+ActiveRecord::Schema.define(version: 20200421235620) do
 
   create_table "account_requests", force: :cascade do |t|
     t.string   "name",              limit: 255
@@ -125,16 +126,14 @@ ActiveRecord::Schema.define(version: 20200812211018) do
     t.boolean  "is_answer_tagging_allowed"
     t.boolean  "has_badge"
     t.boolean  "allow_selecting_additional_reviews_after_1st_round"
-    t.integer  "sample_assignment_id",                               limit: 4
-    t.boolean  "vary_by_topic",                                                    default: false
-    t.boolean  "vary_by_round",                                                    default: false
     t.boolean  "reviewer_is_team"
+    t.boolean  "vary_by_topic",                                                    default: false
+    t.boolean  "vary_by_round"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
   add_index "assignments", ["instructor_id"], name: "fk_assignments_instructors", using: :btree
   add_index "assignments", ["late_policy_id"], name: "fk_late_policy_id", using: :btree
-  add_index "assignments", ["sample_assignment_id"], name: "fk_rails_b01b82a1a2", using: :btree
 
   create_table "automated_metareviews", force: :cascade do |t|
     t.float    "relevance",         limit: 24

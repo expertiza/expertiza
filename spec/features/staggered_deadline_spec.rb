@@ -277,4 +277,19 @@ describe "Staggered deadline test" do
     find(:xpath, ".//input[@id='due_date_3_review_1_due_date']").click
     expect(find_field("due_date_3_review_1_due_date").value).to_not eq(nil)
   end
+
+  it 'test5: Deletes all selected topics that contain staggered deadlines', js: true do     
+    login_as("instructor6")
+    assignment = Assignment.find_by(name: 'Assignment1665')
+    visit "/assignments/#{assignment.id}/edit"
+    click_link 'Topics'
+    check('select_all')
+    click_button 'Delete selected topics'
+    page.driver.browser.switch_to.alert.accept
+    sleep 3
+    expect(page).not_to have_content('Topics')
+    expect(page).not_to have_content('Topic_1')
+    expect(page).not_to have_content('Topic_2')
+    expect(page).not_to have_content('Topic_3')
+  end
 end

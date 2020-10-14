@@ -336,3 +336,4 @@ describe CollusionCycle do
     end
   end
 end
+end

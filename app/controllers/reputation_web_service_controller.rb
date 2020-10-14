@@ -121,79 +121,23 @@ class ReputationWebServiceController < ApplicationController
     request_body.sort.to_h
   end
 
-  def set_request_body(request_body)
-    @request_body = request_body
-  end
-
-  def get_request_body
-    @request_body
-  end
-
-  def set_response_body(response_body)
-    @response_body = response_body
-  end
-
-  def get_response_body
-    @response_body
+  def client
+    set_last_assignment_id
+    @response
   end
 
   def set_last_assignment_id
     @max_assignment_id = Assignment.last.id
   end
 
-  def get_last_assignment_id
-    @max_assignment_id
-  end
-
   def set_assignment(assignment_id)
     @assignment = Assignment.find(assignment_id) rescue nil
-  end
-
-  def get_assignment
-    @assignment
   end
 
   def set_another_assignment(another_assignment_id)
     @another_assignment = Assignment.find(another_assignment_id) rescue nil
   end
 
-  def get_another_assignment
-    @another_assignment
-  end
-
-  def set_round_num(round_num)
-    @round_num = round_num
-  end
-
-  def get_round_num
-    @round_num
-  end
-
-  def set_algorithm(algorithm)
-    @algorithm = algorithm
-  end
-
-  def get_algorithm
-    @algorithm
-  end
-
-  def set_additional_info(additional_info)
-    @additional_info = additional_info
-  end
-
-  def get_additional_info
-    @additional_info
-  end
-
-  def set_response(response)
-    @response = response
-  end
-
-  def get_response
-    @response
-  end
-
-  #old version
 
   def send_post_request
     # https://www.socialtext.net/open/very_simple_rest_in_ruby_part_3_post_to_create_a_new_workspace
@@ -202,10 +146,10 @@ class ReputationWebServiceController < ApplicationController
     req.body = generate_json(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
     req.body[0] = '' # remove the first '{'
 
-    set_assignment_id(params[:assignment_id])
-    set_round_num(params[:round_num])
-    set_algorithm(params[:algorithm])
-    set_another_assignment_id(params[:another_assignment_id])
+    @assignment = params[:assignment_id]
+    @round_num = params[:round_num]
+    @algorithm = params[:algorithm]
+    @another_assignment = params[:another_assignment_id]
 
     if params[:checkbox][:expert_grade] == 'Add expert grades'
       set_additional_info(@@additional_info = 'add expert grades')
@@ -220,11 +164,11 @@ class ReputationWebServiceController < ApplicationController
 
       end
     elsif params[:checkbox][:hamer] == 'Add initial Hamer reputation values'
-      set_additional_info('add initial hamer reputation values')
+      @additional_info = 'add initial hamer reputation values'
     elsif params[:checkbox][:lauw] == 'Add initial Lauw reputation values'
-      set_additional_info('add initial lauw reputation values')
+      @additional_info = 'add initial lauw reputation values'
     elsif params[:checkbox][:quiz] == 'Add quiz scores'
-      set_additional_info('add quiz scores')
+      @additional_info = 'add quiz scores'
       quiz_str = generate_json(params[:assignment_id].to_i, params[:another_assignment_id].to_i, params[:round_num].to_i, 'quiz scores').to_json
       quiz_str[0] = ''
       quiz_str.prepend('"quiz_scores":{')
@@ -232,7 +176,7 @@ class ReputationWebServiceController < ApplicationController
       quiz_str = quiz_str.gsub('"N/A"', '20.0')
       req.body.prepend(quiz_str)
     else
-      set_additional_info('')
+      @additional_info = ''
     end
 
     # Eg.
@@ -242,21 +186,21 @@ class ReputationWebServiceController < ApplicationController
     # "quiz_scores" : {"submission1" : {"stu1":100, "stu3":80}, "submission2":{"stu2":40, "stu1":60}}, #optional
     # "submission1": {"stu1":91, "stu3":99},"submission2": {"stu5":92, "stu8":90},"submission3": {"stu2":91, "stu4":88}}"
     req.body.prepend("{")
-    set_request_body(req.body)
+    @request_body = req.body
 
-
- # Encrypting the request being sent over the internet
+    # Encrypting the request being sent over the internet
     encrypted_request = encrypt_request(req)
 
     # Encrypted response of the request sent in previous step
     response = Net::HTTP.new('peerlogic.csc.ncsu.edu').start {|http| http.request(encrypted_request) }
 
+
     # Decrypting the response
     response.body = JSON.parse(response.body)
-    decrypted_response_body= decrypt_response(response.body)
+    decrypted_response_body= decrypt_request(response.body)
 
-    set_response(response)
-    set_response_body(decrypted_response_body)
+    @response = response
+    @response_body = decrypted_response_body
 
     JSON.parse(response.body.to_s).each do |alg, list|
       next unless alg == "Hamer" || alg == "Lauw"
@@ -264,39 +208,39 @@ class ReputationWebServiceController < ApplicationController
         Participant.find_by(user_id: id).update(alg.to_sym => rep) unless /leniency/ =~ id.to_s
       end
     end
-    redirect_to action: 'set_last_assignment_id'
+    redirect_to action: 'client'
+  end
+
+
+  # Encryption
+  # AES symmetric algorithm encrypts raw data
+  def encrypt_request(request)
+    aes_encrypted_request_data = aes_encrypt(request.body)
+    request = aes_encrypted_request_data[0]
+    # RSA asymmetric algorithm encrypts keys of AES
+    encrypted_key = rsa_public_key1(aes_encrypted_request_data[1])
+    encrypted_vi = rsa_public_key1(aes_encrypted_request_data[2])
+    # fixed length 350
+    request.body.prepend('", "data":"')
+    request.body.prepend(encrypted_vi)
+    request.body.prepend(encrypted_key)
+    # request body should be in JSON format.
+    request.body.prepend('{"keys":"')
+    request.body<< '"}'
+    request.body.gsub!(/\n/, '\\n')
+    request
   end
 
 
     # RSA asymmetric algorithm decrypts keys of AES
-    # Decryption
+  # Method Decrypting request
   def decrypt_request(response)
-
-      key = rsa_private_key2(response["keys"][0, 350])
-      vi = rsa_private_key2(response["keys"][350, 350])
-      # AES symmetric algorithm decrypts data
-      aes_encrypted_response_data = response["data"]
-      decrypted_response = aes_decrypt(aes_encrypted_response_data, key, vi)
-      decrypt_response
-  end
-
-    # Encryption
-    # AES symmetric algorithm encrypts raw data
-  def encrypt_request(request)
-      aes_encrypted_request_data = aes_encrypt(request.body)
-      request = aes_encrypted_request_data[0]
-      # RSA asymmetric algorithm encrypts keys of AES
-      encrypted_key = rsa_public_key1(aes_encrypted_request_data[1])
-      encrypted_vi = rsa_public_key1(aes_encrypted_request_data[2])
-      # fixed length 350
-      request.body.prepend('", "data":"')
-      request.body.prepend(encrypted_vi)
-      request.body.prepend(encrypted_key)
-      # request body should be in JSON format.
-      request.body.prepend('{"keys":"')
-      request.body<< '"}'
-      request.body.gsub!(/\n/, '\\n')
-      request
+    # RSA asymmetric algorithm decrypts keys of AES
+    key = rsa_private_key2(response["keys"][0, 350])
+    vi = rsa_private_key2(response["keys"][350, 350])
+    # AES symmetric algorithm decrypts data
+    aes_encrypted_response_data = response["data"]
+    decrypted_response = aes_decrypt(aes_encrypted_response_data, key, vi)
   end
      
 

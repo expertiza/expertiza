@@ -193,7 +193,7 @@ class ReputationWebServiceController < ApplicationController
     # "quiz_scores" : {"submission1" : {"stu1":100, "stu3":80}, "submission2":{"stu2":40, "stu1":60}}, #optional
     # "submission1": {"stu1":91, "stu3":99},"submission2": {"stu5":92, "stu8":90},"submission3": {"stu2":91, "stu4":88}}"
     req.body.prepend("{")
-    @request_body = (req.body)
+    @request_body = req.body
 
     # Encrypting the request being sent over the internet
     encrypted_request = encrypt_request(req)
@@ -203,7 +203,7 @@ class ReputationWebServiceController < ApplicationController
 
     # Decrypting the response
     response.body = JSON.parse(response.body)
-    decrypted_response_body= decrypt_response(response.body)
+    decrypted_response_body= decrypt_request(response.body)
 
     @response = response
     @response_body = decrypted_response_body
@@ -216,7 +216,7 @@ class ReputationWebServiceController < ApplicationController
     end
     redirect_to action: 'client'
   end
-  
+
   # Method Encrypting request
   def encrypt_request(request)
     aes_encrypted_request_data = aes_encrypt(request.body)
@@ -243,7 +243,6 @@ class ReputationWebServiceController < ApplicationController
       # AES symmetric algorithm decrypts data
       aes_encrypted_response_data = response["data"]
       decrypted_response = aes_decrypt(aes_encrypted_response_data, key, vi)
-      decrypt_response
   end
 
 

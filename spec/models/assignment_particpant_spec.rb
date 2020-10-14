@@ -36,16 +36,6 @@ describe AssignmentParticipant do
     end
   end
 
-  describe '#review_score' do
-    it 'returns the review score' do
-      allow(review_questionnaire).to receive(:get_assessments_for).with(participant).and_return([response])
-      allow(review_questionnaire).to receive(:questions).and_return([question])
-      allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
-      allow(review_questionnaire).to receive(:max_possible_score).and_return(5)
-      expect(participant.review_score).to eq(4.5)
-    end
-  end
-
   describe '#scores' do
     before(:each) do
       allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)

@@ -35,7 +35,7 @@
       <% @assignments.each do |assignment| %>
         <th colspan=<%=@colspan_count%> class="sorter-false"> <%= assignment.name %> </th>
       <% end %>
-      <th colspan=2>Final Grades</th>
+      <% if @show_instructor_scores and @show_peer_grades %> <th colspan=<%=@final_grades_colspan%>>Final Grades</th> <%end%>
     </tr>
     <tr>
       <% (1..@assignments.size).each do %>

@@ -107,6 +107,24 @@ class Assessment360Controller < ApplicationController
     @show_instructor_scores = fields.include? 'InstructorAssignedScores'
     @show_peer_grades = fields.include? 'PeerGrades'
     @show_topics = fields.include? 'Topics'
+    @colspan_count = 3
+    if !@show_instructor_scores
+      @colspan_count -= 1
+    end
+    if !@show_peer_grades
+      @colspan_count -= 1
+    end
+    if !@show_topics
+      @colspan_count -= 1
+    end
+
+    @final_grades_colspan = 2
+    if !@show_instructor_scores
+      @final_grades_colspan -=1
+    end
+    if !@show_peer_grades
+      @final_grades_colspan -=1
+    end
     @course_participants = course.get_participants
     insure_existence_of(@course_participants,course)
     @course_participants.each do |cp|

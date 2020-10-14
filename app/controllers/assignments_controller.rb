@@ -26,11 +26,11 @@ class AssignmentsController < ApplicationController
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
     if params[:button]
-      # Do not create an assignment if the assignment name or directory name already present in the course
-      exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
+      #E2054 Query for existing directory name and assignment name
+      find_existing_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
       dir_path = assignment_form_params[:assignment][:directory_path]
-      exist_directory = Assignment.find_by(directory_path: dir_path, course_id: @assignment_form.assignment.course_id)
-      if !exist_assignment and !exist_directory and @assignment_form.save
+      find_existing_directory = Assignment.find_by(directory_path: dir_path, course_id: @assignment_form.assignment.course_id)
+      if !find_existing_assignment and !find_existing_directory and @assignment_form.save #No existing names/directories
         @assignment_form.create_assignment_node
         current_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
         assignment_form_params[:assignment][:id] = current_assignment.id.to_s
@@ -50,7 +50,7 @@ class AssignmentsController < ApplicationController
         redirect_to edit_assignment_path aid
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
         return
-      else
+      else #Existing Directory or Assignment Name was Found
         if exist_assignment
           flash[:error] = @assignment_form.assignment.name + " already exists as an assignment name"
         end
@@ -58,7 +58,7 @@ class AssignmentsController < ApplicationController
           flash[:error] = dir_path + " already exists as a submisison directory name"
         end
         redirect_to "/assignments/new?private=1"
-        #render 'new' This is redirecting to /assignments instead of /assignments/new
+        #Rendering to this page instead of render new, this prevents it from creating a new assignment upon error
       end
     else
       render 'new'

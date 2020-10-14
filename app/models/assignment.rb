@@ -33,8 +33,8 @@ class Assignment < ActiveRecord::Base
   has_many :badges, through: :assignment_badges
   validates :name, presence: true
   validates :name, uniqueness: {scope: :course_id}
-  validates :directory_path, presence: true
-  validates :directory_path, uniqueness: {scope: :course_id}
+  validates :directory_path, presence: true #E2054 Needs Validation for unique submission directory
+  validates :directory_path, uniqueness: {scope: :course_id}  #E2054 Needs Validation for unique submission directory
   validate :valid_num_review
 
   REVIEW_QUESTIONNAIRES = {author_feedback: 0, metareview: 1, review: 2, teammate_review: 3}.freeze

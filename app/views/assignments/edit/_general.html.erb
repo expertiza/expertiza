@@ -26,7 +26,7 @@ function microtaskChanged() {
   }
 }
 
-//Replace spaces in assignment name with '_' for submission directory
+//E2054 Javascript function to generate the submission directory
 $(function() {
     $("#assignment_form_assignment_name").change(function() {
         filename = $( "#assignment_form_assignment_name" ).val().replace(/ /g,"_").replace(/[/\\?%*:|"<>/$&!#%^@]/g, '');;

@@ -210,13 +210,6 @@ describe AssignmentParticipant do
     end
   end
 
-  describe '#reviews_by_reviewer' do
-    it 'returns corrsponding peer review responses given by certain reviewer' do
-      allow(ReviewResponseMap).to receive(:get_reviewer_assessments_for).with(team, participant).and_return([response])
-      expect(participant.reviews_by_reviewer(participant)).to eq([response])
-    end
-  end
-
   describe '#quizzes_taken' do
     it 'returns corrsponding quiz responses given by current participant' do
       allow(QuizResponseMap).to receive(:get_assessments_for).with(participant).and_return([response])

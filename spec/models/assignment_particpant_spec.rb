@@ -147,38 +147,7 @@ describe AssignmentParticipant do
       end
     end
   end
-
-  describe '#topic_total_scores' do
-    it 'set total_score and max_pts_available of score when topic is not nil' do
-      scores = {total_score: 100}
-      allow(SignUpTopic).to receive(:find_by).with(assignment_id: 1).and_return(double('SignUpTopic', micropayment: 1))
-      participant.topic_total_scores(scores)
-      expect(scores[:total_score]).to eq(1.0)
-      expect(scores[:max_pts_available]).to eq(1)
-    end
-  end
-
-  describe '#calculate_scores' do
-    context 'when the participant has the grade' do
-      it 'his total scores equals his grade' do
-        scores = {}
-        expect(participant2.calculate_scores(scores)).to eq(100.0)
-      end
-    end
-    context 'when the participant has the grade and the total score more than 100' do
-      it 'return the score of a given participant with total score 100' do
-        scores = {total_score: 110}
-        expect(participant.calculate_scores(scores)).to eq(total_score: 100)
-      end
-    end
-    context 'when the participant has the grade and the total score less than 100' do
-      it 'return the score of a given participant with total score' do
-        scores = {total_score: 90}
-        expect(participant.calculate_scores(scores)).to eq(total_score: 90)
-      end
-    end
-  end
-
+  
   describe '#copy_participant' do
     it 'copies assignment participants to a certain course' do
       expect { participant.copy_participant(123) }.to change { CourseParticipant.count }.from(0).to(1)
@@ -439,5 +408,51 @@ describe AssignmentParticipant do
         end
       end
     end
+  end
+
+  describe '#update_max_or_min' do
+    context 'test updating the max' do
+      it 'should not update the max if :max is nil' do
+        scores = {:round1 => {:scores => { :max => nil } }, :review => {:scores => { :max => 90 }}}
+        #Scores[:review][:scores][:max] should not change to nil (currently 90)
+        participant.update_max_or_min(scores, :round1, :review, :max)
+        expect(scores[:review][:scores][:max]).to eq(90) 
+      end
+
+      it 'should update the review max score to the round max score if round was higher' do
+        scores = {:round1 => {:scores => { :max => 90 } }, :review => {:scores => { :max => 80 }}}
+        participant.update_max_or_min(scores, :round1, :review, :max)
+        expect(scores[:review][:scores][:max]).to eq(90) 
+      end
+
+      it 'review max score should be unchanged if round max score is less than review max score' do
+        scores = {:round1 => {:scores => { :max => 70 } }, :review => {:scores => { :max => 80 }}}
+        participant.update_max_or_min(scores, :round1, :review, :max)
+        expect(scores[:review][:scores][:max]).to eq(80) 
+      end
+
+    end
+    context 'test updating the min' do
+      it 'should not update the min if :min is nil' do
+        scores = {:round1 => {:scores => { :min => nil } }, :review => {:scores => { :min => 90 }}}
+        #Scores[:review][:scores][:max] should not change to nil (currently 90)
+        participant.update_max_or_min(scores, :round1, :review, :min)
+        expect(scores[:review][:scores][:min]).to eq(90) 
+      end
+
+      it 'update the review min score to the round min score if round was less' do
+        scores = {:round1 => {:scores => { :min => 20 } }, :review => {:scores => { :min => 30 }}}
+        participant.update_max_or_min(scores, :round1, :review, :min)
+        expect(scores[:review][:scores][:min]).to eq(20) 
+      end
+
+      it 'review min score should be unchanged if round min score greater than the review min score' do
+        scores = {:round1 => {:scores => { :min => 60 } }, :review => {:scores => { :min => 20 }}}
+        participant.update_max_or_min(scores, :round1, :review, :min)
+        expect(scores[:review][:scores][:min]).to eq(20) 
+      end
+
+    end
+
   end
 end

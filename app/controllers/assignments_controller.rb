@@ -51,10 +51,10 @@ class AssignmentsController < ApplicationController
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
         return
       else #Existing Directory or Assignment Name was Found
-        if exist_assignment
+        if find_existing_assignment
           flash[:error] = @assignment_form.assignment.name + " already exists as an assignment name"
         end
-        if exist_directory
+        if find_existing_directory
           flash[:error] = dir_path + " already exists as a submisison directory name"
         end
         redirect_to "/assignments/new?private=1"

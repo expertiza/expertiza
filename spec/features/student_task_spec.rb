@@ -2,7 +2,7 @@ include InstructorInterfaceHelperSpec
 
 describe "Student_task, list page" do
   before(:each) do
-    course_setup
+    # course_setup
     assignment_setup
   end
 

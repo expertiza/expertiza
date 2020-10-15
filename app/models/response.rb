@@ -138,7 +138,7 @@ class Response < ActiveRecord::Base
         comments += additional_comment
         counter += 1
         @comments_in_round[round] += additional_comment
-        @counter_in_round[round] + 1
+        @counter_in_round[round] += 1
       end
     end
     [comments, counter, @comments_in_round, @counter_in_round]

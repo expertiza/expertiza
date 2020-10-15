@@ -130,13 +130,13 @@ class Response < ActiveRecord::Base
         next if last_response_in_current_round.nil?
         last_response_in_current_round.scores.each do |answer|
           comments += answer.comments if question_ids.include? answer.question_id
-          instance_variable_set(@comments_in_round[round], instance_variable_get(@comments_in_round[round]) + answer.comments ||= '')
+          @comments_in_round[round] += answer.comments ||= ''
         end
         additional_comment = last_response_in_current_round.additional_comment
         comments += additional_comment
         counter += 1
-        instance_variable_set(@comments_in_round[round], instance_variable_get(@comments_in_round[round]) + additional_comment)
-        instance_variable_set(@counter_in_round[round], instance_variable_get(@counter_in_round[round]) + 1)
+        @comments_in_round[round] += additional_comment
+        @counter_in_round[round] + 1
       end
     end
     [comments, counter, @comments_in_round, @counter_in_round]

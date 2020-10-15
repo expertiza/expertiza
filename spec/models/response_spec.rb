@@ -143,7 +143,7 @@ describe Response do
       allow(review_response_map).to receive(:response).and_return([response1, response2])
       allow(response1).to receive(:scores).and_return([answer])
       allow(response2).to receive(:scores).and_return([answer2])
-      expect(Response.concatenate_all_review_comments(1, 1)).to eq(["Answer textAnswer textLGTM", 2, "Answer text", 1, "Answer textLGTM", 1, "", 0])
+      expect(Response.concatenate_all_review_comments(1, 1)).to eq(["Answer textAnswer textLGTM", 2, [nil, "Answer text", "Answer textLGTM", ""], [nil, 1, 1, 0]])
     end
   end
 

@@ -125,7 +125,7 @@ class Response < ActiveRecord::Base
     question_ids = Question.get_all_questions_with_comments_available(assignment_id)
 
     ReviewResponseMap.where(reviewed_object_id: assignment_id, reviewer_id: reviewer_id).find_each do |response_map|
-      (1..assignment.num_review_rounds).each do |round|
+      (1..assignment.num_review_rounds+1).each do |round|
         @comments_in_round[round] = ''
         @counter_in_round[round] = 0
         last_response_in_current_round = response_map.response.select {|r| r.round == round }.last
@@ -152,7 +152,7 @@ class Response < ActiveRecord::Base
     overall_avg_vol = (Lingua::EN::Readability.new(comments).num_words / (counter.zero? ? 1 : counter)).round(0)
     review_comments_volume = []
     review_comments_volume.push(overall_avg_vol)
-    (1..assignment.num_review_rounds).each do |i|
+    (1..assignment.num_review_rounds+1).each do |i|
       num = Lingua::EN::Readability.new(@comments_in_round[i]).num_words
       den = (@counter_in_round[i].zero? ? 1 : @counter_in_round[i])
       avg_vol_in_round = (num / den).round(0)

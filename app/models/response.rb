@@ -119,8 +119,8 @@ class Response < ActiveRecord::Base
   def self.concatenate_all_review_comments(assignment_id, reviewer_id)
     comments = ''
     counter = 0
-    @comments_in_round1 = @comments_in_round2 = @comments_in_round3 = ''
-    @counter_in_round1 = @counter_in_round2 = @counter_in_round3 = 0
+    @comments_in_round = []
+    @counter_in_round = []
     assignment = Assignment.find(assignment_id)
     question_ids = Question.get_all_questions_with_comments_available(assignment_id)
 
@@ -130,19 +130,16 @@ class Response < ActiveRecord::Base
         next if last_response_in_current_round.nil?
         last_response_in_current_round.scores.each do |answer|
           comments += answer.comments if question_ids.include? answer.question_id
-          instance_variable_set('@comments_in_round' + round.to_s, instance_variable_get('@comments_in_round' + round.to_s) + answer.comments ||= '')
+          instance_variable_set(@comments_in_round[round], instance_variable_get(@comments_in_round[round]) + answer.comments ||= '')
         end
         additional_comment = last_response_in_current_round.additional_comment
         comments += additional_comment
         counter += 1
-        instance_variable_set('@comments_in_round' + round.to_s, instance_variable_get('@comments_in_round' + round.to_s) + additional_comment)
-        instance_variable_set('@counter_in_round' + round.to_s, instance_variable_get('@counter_in_round' + round.to_s) + 1)
+        instance_variable_set(@comments_in_round[round], instance_variable_get(@comments_in_round[round]) + additional_comment)
+        instance_variable_set(@counter_in_round[round], instance_variable_get(@counter_in_round[round]) + 1)
       end
     end
-    [comments, counter,
-     @comments_in_round1, @counter_in_round1,
-     @comments_in_round2, @counter_in_round2,
-     @comments_in_round3, @counter_in_round3]
+    [comments, counter, @comments_in_round, @counter_in_round]
   end
 
   def self.get_volume_of_review_comments(assignment_id, reviewer_id)

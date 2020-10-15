@@ -126,6 +126,8 @@ class Response < ActiveRecord::Base
 
     ReviewResponseMap.where(reviewed_object_id: assignment_id, reviewer_id: reviewer_id).find_each do |response_map|
       (1..assignment.num_review_rounds).each do |round|
+        @comments_in_round[round] = ''
+        @counter_in_round[round] = 0
         last_response_in_current_round = response_map.response.select {|r| r.round == round }.last
         next if last_response_in_current_round.nil?
         last_response_in_current_round.scores.each do |answer|

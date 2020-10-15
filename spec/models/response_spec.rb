@@ -150,7 +150,7 @@ describe Response do
   describe '.get_volume_of_review_comments' do
     it 'returns volumes of review comments in each round' do
       allow(Response).to receive(:concatenate_all_review_comments).with(1, 1)
-                                                                  .and_return(["Answer textAnswer textLGTM", 2, "Answer text", 1, "Answer textLGTM", 1, "", 0])
+                                                                  .and_return(["Answer textAnswer textLGTM", 2, [nil, "Answer text", "Answer textLGTM", ""], [nil, 1, 1, 0]])
       expect(Response.get_volume_of_review_comments(1, 1)).to eq([1, 2, 2, 0])
     end
   end

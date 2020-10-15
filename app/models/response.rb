@@ -144,16 +144,15 @@ class Response < ActiveRecord::Base
 
   def self.get_volume_of_review_comments(assignment_id, reviewer_id)
     comments, counter,
-        @comments_in_round1, @counter_in_round1,
-        @comments_in_round2, @counter_in_round2,
-        @comments_in_round3, @counter_in_round3 = Response.concatenate_all_review_comments(assignment_id, reviewer_id)
+      @comments_in_round, @counter_in_round = Response.concatenate_all_review_comments(assignment_id, reviewer_id)
 
+    assignment = Assignment.find(assignment_id)  
     overall_avg_vol = (Lingua::EN::Readability.new(comments).num_words / (counter.zero? ? 1 : counter)).round(0)
     review_comments_volume = []
     review_comments_volume.push(overall_avg_vol)
-    (1..3).each do |i|
-      num = Lingua::EN::Readability.new(instance_variable_get('@comments_in_round' + i.to_s)).num_words
-      den = (instance_variable_get('@counter_in_round' + i.to_s).zero? ? 1 : instance_variable_get('@counter_in_round' + i.to_s))
+    (1..assignment.num_review_rounds).each do |i|
+      num = Lingua::EN::Readability.new(@comments_in_round[i]).num_words
+      den = (@counter_in_round[i].zero? ? 1 : @counter_in_round[i])
       avg_vol_in_round = (num / den).round(0)
       review_comments_volume.push(avg_vol_in_round)
     end

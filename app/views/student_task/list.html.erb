@@ -91,7 +91,7 @@
   <% if course%>
   <%end %>
   <div class="topictable" style="float: right;width: 80%;margin-bottom: 10px; display: inline-block; border: 1px solid #000000">
-<!--  <h1>student_task.course.try :name</h1>-->
+  <h1><%=student_tasks.first.course.try :name %></h1>
   <table class="table table-striped" cellpadding="2">
     <tr class="taskheader">
       <th>Assignment</th>

@@ -130,7 +130,7 @@ class Response < ActiveRecord::Base
         next if last_response_in_current_round.nil?
         last_response_in_current_round.scores.each do |answer|
           comments += answer.comments if question_ids.include? answer.question_id
-          @comments_in_round[round] += answer.comments ||= ''
+          @comments_in_round[round] += (answer.comments ||= '')
         end
         additional_comment = last_response_in_current_round.additional_comment
         comments += additional_comment

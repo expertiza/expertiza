@@ -134,8 +134,6 @@
               </td>
               <!--submission grade-->
               <td><%= get_review_grade_info(participant) %></td>
-              <!--badges-->
-              <!--          <td><%#= get_awarded_badges(participant) %></td>-->
               <!--stage deadline-->
               <td><%= student_task.stage_deadline.in_time_zone(session[:user].timezonepref) %></td>
               <!--publish rights-->

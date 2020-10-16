@@ -39,6 +39,47 @@ describe "student_task list page" do
       expect(page).to have_content("Assignment1684")
     end
 
+#change part
 
+# describe "app/views/student_task/list.html.erb" do
+ it "group the course and display on different tables" do
+     go_to_student_task_page
+     expect(rendered).to have_tag('div', :with => { :class => "topictable"}) do
+     without_tag "h1", :text => 'No Course Assigned Yet' # have course or not
+     with_tag "table", :with => { :class => "table table-striped", :cellpadding => '2' } # test the Outermost layer is built
+     with_tag "td",  :text => '#{student_task.course.try :name}' # test show the course name 
+     end
+     expect(page).to have_selector('listingRow', count: group) # the number of different tables
+  end
+
+ it "submission grade display" do
+     go_to_student_task_page
+     expect(rendered).to have_tag('tr', :with => { :class => "listingRow"}) do
+     get :get_awarded_badges(participant) #badges shows or not 
+     expect(response).to be_ok
+     end
+ end
+
+ it "badges showing location fixing" do
+     go_to_student_task_page
+     expect(rendered).to have_tag('tr', :with => { :class => "listingRow"}) do
+     without_tag "td",  :text => "-" #the topic is not empty 
+     get :topic_id # topic _id shows or not 
+     expect(response).to be_ok
+     get :get_review_grade_info(participant) #grades shows or not 
+     expect(response).to be_ok
+     end
+  end
+
+ it "unnecessary white space" do
+     go_to_student_task_page
+     expect(rendered).to have_tag('render', :with => { :text => "publishing_rights"}) do
+     with_tag "div", :class = "taskbox",float = left # taskbox is left
+     with_tag "div", :class = "topictable",float = right  #topictable is right
+     end
+
+  end 
+
+#change ends
 
 end

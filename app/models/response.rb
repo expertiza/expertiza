@@ -152,9 +152,9 @@ class Response < ActiveRecord::Base
     overall_avg_vol = (Lingua::EN::Readability.new(comments).num_words / (counter.zero? ? 1 : counter)).round(0)
     review_comments_volume = []
     review_comments_volume.push(overall_avg_vol)
-    (1..num_rounds).each do |i|
-      num = Lingua::EN::Readability.new(@comments_in_round[i]).num_words
-      den = (@counter_in_round[i].zero? ? 1 : @counter_in_round[i])
+    (1..num_rounds).each do |round|
+      num = Lingua::EN::Readability.new(@comments_in_round[round]).num_words
+      den = (@counter_in_round[round].zero? ? 1 : @counter_in_round[round])
       avg_vol_in_round = (num / den).round(0)
       review_comments_volume.push(avg_vol_in_round)
     end

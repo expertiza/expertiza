@@ -78,6 +78,7 @@ class Assignment < ActiveRecord::Base
     @has_teams ||= !self.teams.empty?
   end
 
+  # remove empty teams (teams with no users) from assignment
   def remove_empty_teams
     empty_teams = teams.reload.select { |team| team.teams_users.empty? }
     teams.delete(empty_teams)

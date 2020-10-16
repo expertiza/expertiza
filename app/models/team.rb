@@ -259,6 +259,7 @@ class Team < ActiveRecord::Base
 
   # REFACTOR END:: class methods import export moved from course_team & assignment_team to here
 
+  # Create the team with corresponding tree node and given users
   def self.create_team_with_users(parent_id, user_ids)
     team = self.create_team_and_node(parent_id)
 

@@ -52,7 +52,7 @@ describe "student_task list page" do
      expect(page).to have_selector('listingRow', count: group) # the number of different tables
   end
 
- it "submission grade display" do
+ it "badges showing location fixing" do
      go_to_student_task_page
      expect(rendered).to have_tag('tr', :with => { :class => "listingRow"}) do
      get :get_awarded_badges(participant) #badges shows or not 
@@ -60,7 +60,7 @@ describe "student_task list page" do
      end
  end
 
- it "badges showing location fixing" do
+ it "submission grade display" do
      go_to_student_task_page
      expect(rendered).to have_tag('tr', :with => { :class => "listingRow"}) do
      without_tag "td",  :text => "-" #the topic is not empty 

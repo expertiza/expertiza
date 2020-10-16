@@ -205,7 +205,7 @@ class QuizQuestionnairesController < QuestionnairesController
   end
 
   def create_multchoice(question, choice_key, q_choices)
-
+    # this method takes combines the functionality of create_radio and create_checkbox, so that all mult choice questions are create by 1 func
     q = if q_choices[choice_key][:iscorrect] == 1.to_s
           QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "true", question_id: question.id)
         else
@@ -267,7 +267,7 @@ class QuizQuestionnairesController < QuestionnairesController
       q_choices.each_key do |choice_key|
         if q_type == "TrueFalse"
           create_truefalse(question, choice_key, q_choices)
-        else # MultipleChoice
+        else # create MultipleChoice of either type, rather than creating them separately based on q_type
           create_multchoice(question, choice_key, q_choices)
         end
       end

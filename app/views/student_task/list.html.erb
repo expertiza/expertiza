@@ -91,11 +91,13 @@
     <% if course%>
     <%end %>
     <div class="topictable" style="float: right;width: 80%;margin-bottom: 10px; display: inline-block; border: 1px solid #000000">
+<!--      <print the courses name on top of the tables>-->
       <% if !student_tasks.first.course %>
         <h1>Not Course Assigned Yet</h1>
       <%else%>
         <h1><%=student_tasks.first.course.try :name %></h1>
       <%end%>
+
       <table class="table table-striped" cellpadding="2">
         <tr class="taskheader">
           <th>Assignment</th>

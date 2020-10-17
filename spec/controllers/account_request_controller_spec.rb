@@ -27,8 +27,10 @@ describe AccountRequestController do
 
     it 'the input status is nil and original status is nil' do
       params = {
-          id: 4,
-          status: nil
+          selection: nil,
+          commit: 'Reject'
+          # id: 4,
+          # status: nil
       }
       post :create_approved_user, params
       expect(flash[:error]).to eq 'Please Approve or Reject before submitting'
@@ -38,8 +40,10 @@ describe AccountRequestController do
     it 'the input status is Approved' do
       session = {user: admin}
       params = {
-          id: 4,
-          status: 'Approved'
+          selection: {"4" => true},
+          commit: 'Accept'
+          # id: 4,
+          # status: 'Approved'
       }
       post :create_approved_user, params, session
       allow_any_instance_of(AccountRequest).to receive(:undo_link).with('The user "requester1" has been successfully created. ').and_return(true)
@@ -51,8 +55,10 @@ describe AccountRequestController do
       expect_any_instance_of(User).to receive(:save).and_return(false)
       session = {user: admin}
       params = {
-          id: 4,
-          status: 'Approved'
+          selection: {"4" => true},
+          commit: 'Accept'
+          # id: 4,
+          # status: 'Approved'
       }
       post :create_approved_user, params, session
       expect(flash[:success]).to eq 'The user "requester1" has been successfully updated.'
@@ -61,8 +67,10 @@ describe AccountRequestController do
 
     it 'the input status is Rejected' do
       params = {
-          id: 4,
-          status: 'Rejected'
+          selection: {"4" => true},
+          commit: 'Reject'
+          # id: 4,
+          # status: 'Rejected'
       }
       post :create_approved_user, params
       expect(flash[:success]).to eq 'The user "requester1" has been Rejected.' or 'The user "requester1" has been successfully updated.'
@@ -72,8 +80,10 @@ describe AccountRequestController do
       it 'the input status is Rejected but update_colums fails' do
       expect_any_instance_of(AccountRequest).to receive(:update_columns).and_return(false)
       params = {
-          id: 4,
-          status: 'Rejected'
+          selection: {"4" => true},
+          commit: 'Reject'
+          # id: 4,
+          # status: 'Rejected'
       }
       post :create_approved_user, params
       expect(flash[:success]).to eq 'The user "requester1" has been successfully updated.'

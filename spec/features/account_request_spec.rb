@@ -60,8 +60,8 @@ describe 'new user request' do
         login_as 'super_administrator2'
         visit '/account_request/list_pending_requested'
         expect(page).to have_content('requester1')
-        choose(name: 'status', option: 'Rejected')
-        click_on('Submit')
+        page.check('selection')
+        click_on('Reject')
         expect(page).to have_content('The user "requester1" has been Rejected.')
         expect(AccountRequest.first.status).to eq('Rejected')
         expect(page).to have_content('requester1')
@@ -77,8 +77,9 @@ describe 'new user request' do
         ActionMailer::Base.deliveries.clear
         expect(page).to have_content('requester1')
         expect(AccountRequest.first.status).to eq('Under Review')
-        choose(name: 'status', option: 'Approved')
-        click_on('Submit')
+        page.check('selection')
+        # click_on('Submit')
+        click_on('Accept')
         expect(page).to have_content('requester1')
         # the size of mailing queue changes by 1
         expect(ActionMailer::Base.deliveries.count).to eq(2)

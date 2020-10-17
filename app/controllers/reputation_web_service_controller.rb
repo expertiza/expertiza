@@ -37,8 +37,7 @@ class ReputationWebServiceController < ApplicationController
   #   "order by RM.reviewee_id"
   #
   #  result = ActiveRecord::Base.connection.select_all(query)
-  # db query to return review responses
-  def get_review_responses(assignment_id, another_assignment_id = 0)
+  def get_review_responses_query(assignment_id, another_assignment_id = 0)
     assignment_ids = []
     assignment_ids << assignment_id
     assignment_ids << another_assignment_id unless another_assignment_id.zero?
@@ -53,8 +52,6 @@ class ReputationWebServiceController < ApplicationController
       topic_condition = ((has_topic and SignedUpTeam.where(team_id: team.id).first.is_waitlisted == false) or !has_topic)
       last_valid_response = response_map.response.select {|r| r.round == round_num }.sort.last
       valid_response = [last_valid_response] unless last_valid_response.nil?
-
-      # calculate peer review grade for each valid response
       next unless topic_condition == true and !valid_response.nil? and !valid_response.empty?
       valid_response.each do |response|
         answers = Answer.where(response_id: response.id)
@@ -62,7 +59,6 @@ class ReputationWebServiceController < ApplicationController
         temp_sum = 0
         weight_sum = 0
         valid_answer = answers.select {|a| a.question.type == 'Criterion' and !a.answer.nil? }
-        # find weighted sum for valid answers that are not empty
         next if valid_answer.empty?
         valid_answer.each do |answer|
           temp_sum += answer.answer * answer.question.weight
@@ -76,6 +72,7 @@ class ReputationWebServiceController < ApplicationController
   end
 
   # special db query, return quiz scores
+  def calculate_quiz_score(assignment_id, another_assignment_id = 0)
   def calculate_quiz_scores(assignment_id, another_assignment_id = 0)
     raw_data_array = []
     assignment_ids = []
@@ -84,9 +81,9 @@ class ReputationWebServiceController < ApplicationController
     teams = AssignmentTeam.where('parent_id in (?)', assignment_ids)
     team_ids = []
     teams.each {|team| team_ids << team.id }
-    quiz_questionnnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
-    quiz_questionnnaire_ids = []
-    quiz_questionnnaires.each {|questionnaire| quiz_questionnnaire_ids << questionnaire.id }
+    quiz_questionnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
+    quiz_questionnaire_ids = []
+    quiz_questionnaires.each {|questionnaire| quiz_questionnnaire_ids << questionnaire.id }
     QuizResponseMap.where('reviewed_object_id in (?)', quiz_questionnnaire_ids).each do |response_map|
       quiz_score = response_map.quiz_score
       participant = Participant.find(response_map.reviewer_id)
@@ -95,88 +92,79 @@ class ReputationWebServiceController < ApplicationController
     raw_data_array
   end
 
-  # Create request body in json format with peer review grades/quiz scores
-  # Params:
-  # - assignment_id: id of the reviewed assignment
-  # - another_assignment_id: additional assignment id if any (set to 0 if none)
-  # - round_num: number indicating the round of review. (i.e. Round 1,2..)
-  # - type: string to indicate whether it is a peer review grade/quiz score
   def generate_json(assignment_id, another_assignment_id = 0, round_num = 2, type = 'peer review grades')
     assignment = Assignment.find_by(id: assignment_id)
     has_topic = !SignUpTopic.where(assignment_id: assignment_id).empty?
 
     if type == 'peer review grades'
-      @responses = get_review_responses(assignment.id, another_assignment_id)
+      @responses = get_review_responses_query(assignment.id,  another_assignment_id)
       @results = calculate_peer_review_grades(has_topic,@responses, round_num)
     elsif type == 'quiz scores'
-      @results = calculate_quiz_scores(assignment.id, another_assignment_id)
+      @results = calculate_quiz_score(assignment.id, another_assignment_id)
     end
     request_body = {}
     @results.each_with_index do |record, _index|
       request_body['submission' + record[1].to_s] = {} unless request_body.key?('submission' + record[1].to_s)
       request_body['submission' + record[1].to_s]['stu' + record[0].to_s] = record[2]
     end
-    # sort the 2-dimension hash
+    # sort the 2-dimention hash
     request_body.each {|k, v| request_body[k] = v.sort.to_h }
     request_body.sort.to_h
   end
 
   def client
-    set_last_assignment_id
-    @response
-  end
-
-  def set_last_assignment_id
+    @request_body = @@request_body
+    @response_body = @@response_body
     @max_assignment_id = Assignment.last.id
+    @assignment = Assignment.find(@@assignment_id) rescue nil
+    @another_assignment = Assignment.find(@@another_assignment_id) rescue nil
+    @round_num = @@round_num
+    @algorithm = @@algorithm
+    @additional_info = @@additional_info
+    @response = @@response
   end
-
-  def set_assignment(assignment_id)
-    @assignment = Assignment.find(assignment_id) rescue nil
-  end
-
-  def set_another_assignment(another_assignment_id)
-    @another_assignment = Assignment.find(another_assignment_id) rescue nil
-  end
-
 
   def send_post_request
     # https://www.socialtext.net/open/very_simple_rest_in_ruby_part_3_post_to_create_a_new_workspace
     req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader = {'Content-Type' => 'application/json', 'charset' => 'utf-8'})
     curr_assignment_id = (params[:assignment_id].empty? ? '724' : params[:assignment_id])
-    req.body = generate_json(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
+    req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
     req.body[0] = '' # remove the first '{'
-
-    @assignment = params[:assignment_id]
-    @round_num = params[:round_num]
-    @algorithm = params[:algorithm]
-    @another_assignment = params[:another_assignment_id]
+    @@assignment_id = params[:assignment_id]
+    @@round_num = params[:round_num]
+    @@algorithm = params[:algorithm]
+    @@another_assignment_id = params[:another_assignment_id]
 
     if params[:checkbox][:expert_grade] == 'Add expert grades'
-      set_additional_info(@@additional_info = 'add expert grades')
+      @@additional_info = 'add expert grades'
       case params[:assignment_id]
-
+      when '724' # expert grades of Wiki 1a (724)
+        if params[:another_assignment_id].to_i.zero?
+          req.body.prepend("\"expert_grades\": {\"submission23967\":93,\"submission23969\":89,\"submission23971\":95,\"submission23972\":86,\"submission23973\":91,\"submission23975\":94,\"submission23979\":90,\"submission23980\":94,\"submission23981\":87,\"submission23982\":79,\"submission23983\":91,\"submission23986\":92,\"submission23987\":91,\"submission23988\":93,\"submission23991\":98,\"submission23992\":91,\"submission23994\":87,\"submission23995\":93,\"submission23998\":92,\"submission23999\":87,\"submission24000\":93,\"submission24001\":93,\"submission24006\":96,\"submission24007\":87,\"submission24008\":92,\"submission24009\":92,\"submission24010\":93,\"submission24012\":94,\"submission24013\":96,\"submission24016\":91,\"submission24018\":93,\"submission24024\":96,\"submission24028\":88,\"submission24031\":94,\"submission24040\":93,\"submission24043\":95,\"submission24044\":91,\"submission24046\":95,\"submission24051\":92},")
+        else # expert grades of Wiki 1a and 1b (724, 733)
+          req.body.prepend("\"expert_grades\": {\"submission23967\":93, \"submission23969\":89, \"submission23971\":95, \"submission23972\":86, \"submission23973\":91, \"submission23975\":94, \"submission23979\":90, \"submission23980\":94, \"submission23981\":87, \"submission23982\":79, \"submission23983\":91, \"submission23986\":92, \"submission23987\":91, \"submission23988\":93, \"submission23991\":98, \"submission23992\":91, \"submission23994\":87, \"submission23995\":93, \"submission23998\":92, \"submission23999\":87, \"submission24000\":93, \"submission24001\":93, \"submission24006\":96, \"submission24007\":87, \"submission24008\":92, \"submission24009\":92, \"submission24010\":93, \"submission24012\":94, \"submission24013\":96, \"submission24016\":91, \"submission24018\":93, \"submission24024\":96, \"submission24028\":88, \"submission24031\":94, \"submission24040\":93, \"submission24043\":95, \"submission24044\":91, \"submission24046\":95, \"submission24051\":92, \"submission24100\":90, \"submission24079\":92, \"submission24298\":86, \"submission24545\":92, \"submission24082\":96, \"submission24080\":86, \"submission24284\":92, \"submission24534\":93, \"submission24285\":94, \"submission24297\":91},")
+        end
       when '735' # expert grades of program 1 (735)
         req.body.prepend("\"expert_grades\": {\"submission24083\":96.084,\"submission24085\":88.811,\"submission24086\":100,\"submission24087\":100,\"submission24088\":92.657,\"submission24091\":96.783,\"submission24092\":90.21,\"submission24093\":100,\"submission24097\":90.909,\"submission24098\":98.601,\"submission24101\":99.301,\"submission24278\":98.601,\"submission24279\":72.727,\"submission24281\":54.476,\"submission24289\":94.406,\"submission24291\":99.301,\"submission24293\":93.706,\"submission24296\":98.601,\"submission24302\":83.217,\"submission24303\":91.329,\"submission24305\":100,\"submission24307\":100,\"submission24308\":100,\"submission24311\":95.804,\"submission24313\":91.049,\"submission24314\":100,\"submission24315\":97.483,\"submission24316\":91.608,\"submission24317\":98.182,\"submission24320\":90.21,\"submission24321\":90.21,\"submission24322\":98.601},")
       when '754' # expert grades of Wiki contribution (754)
         req.body.prepend("\"expert_grades\": {\"submission25030\":95,\"submission25031\":92,\"submission25033\":88,\"submission25034\":98,\"submission25035\":100,\"submission25037\":95,\"submission25038\":95,\"submission25039\":93,\"submission25040\":96,\"submission25041\":90,\"submission25042\":100,\"submission25046\":95,\"submission25049\":90,\"submission25050\":88,\"submission25053\":91,\"submission25054\":96,\"submission25055\":94,\"submission25059\":96,\"submission25071\":85,\"submission25082\":100,\"submission25086\":95,\"submission25097\":90,\"submission25098\":85,\"submission25102\":97,\"submission25103\":94,\"submission25105\":98,\"submission25114\":95,\"submission25115\":94},")
       when '756' # expert grades of Wikipedia contribution (756)
         req.body.prepend("\"expert_grades\": {\"submission25107\":76.6667,\"submission25109\":83.3333},")
-
       end
     elsif params[:checkbox][:hamer] == 'Add initial Hamer reputation values'
-      @additional_info = 'add initial hamer reputation values'
+      @@additional_info = 'add initial hamer reputation values'
     elsif params[:checkbox][:lauw] == 'Add initial Lauw reputation values'
-      @additional_info = 'add initial lauw reputation values'
+      @@additional_info = 'add initial lauw reputation values'
     elsif params[:checkbox][:quiz] == 'Add quiz scores'
-      @additional_info = 'add quiz scores'
-      quiz_str = generate_json(params[:assignment_id].to_i, params[:another_assignment_id].to_i, params[:round_num].to_i, 'quiz scores').to_json
+      @@additional_info = 'add quiz scores'
+      quiz_str = json_generator(params[:assignment_id].to_i, params[:another_assignment_id].to_i, params[:round_num].to_i, 'quiz scores').to_json
       quiz_str[0] = ''
       quiz_str.prepend('"quiz_scores":{')
       quiz_str += ','
       quiz_str = quiz_str.gsub('"N/A"', '20.0')
       req.body.prepend(quiz_str)
     else
-      @additional_info = ''
+      @@additional_info = ''
     end
 
     # Eg.
@@ -186,21 +174,38 @@ class ReputationWebServiceController < ApplicationController
     # "quiz_scores" : {"submission1" : {"stu1":100, "stu3":80}, "submission2":{"stu2":40, "stu1":60}}, #optional
     # "submission1": {"stu1":91, "stu3":99},"submission2": {"stu5":92, "stu8":90},"submission3": {"stu2":91, "stu4":88}}"
     req.body.prepend("{")
-    @request_body = req.body
-
-    # Encrypting the request being sent over the internet
-    encrypted_request = encrypt_request(req)
-
-    # Encrypted response of the request sent in previous step
-    response = Net::HTTP.new('peerlogic.csc.ncsu.edu').start {|http| http.request(encrypted_request) }
-
-
-    # Decrypting the response
+    @@request_body = req.body
+    # puts 'This is the request prior to encryption: ' + req.body
+    # puts
+    # Encryption
+    # AES symmetric algorithm encrypts raw data
+    aes_encrypted_request_data = aes_encrypt(req.body)
+    req.body = aes_encrypted_request_data[0]
+    # RSA asymmetric algorithm encrypts keys of AES
+    encrypted_key = rsa_public_key1(aes_encrypted_request_data[1])
+    encrypted_vi = rsa_public_key1(aes_encrypted_request_data[2])
+    # fixed length 350
+    req.body.prepend('", "data":"')
+    req.body.prepend(encrypted_vi)
+    req.body.prepend(encrypted_key)
+    # request body should be in JSON format.
+    req.body.prepend('{"keys":"')
+    req.body << '"}'
+    req.body.gsub!(/\n/, '\\n')
+    response = Net::HTTP.new('peerlogic.csc.ncsu.edu').start {|http| http.request(req) }
+    # RSA asymmetric algorithm decrypts keys of AES
+    # Decryption
     response.body = JSON.parse(response.body)
-    decrypted_response_body= decrypt_request(response.body)
-
-    @response = response
-    @response_body = decrypted_response_body
+    key = rsa_private_key2(response.body["keys"][0, 350])
+    vi = rsa_private_key2(response.body["keys"][350, 350])
+    # AES symmetric algorithm decrypts data
+    aes_encrypted_response_data = response.body["data"]
+    response.body = aes_decrypt(aes_encrypted_response_data, key, vi)
+    # puts "Response #{response.code} #{response.message}:
+    # {response.body}"
+    # puts
+    @@response = response
+    @@response_body = response.body
 
     JSON.parse(response.body.to_s).each do |alg, list|
       next unless alg == "Hamer" || alg == "Lauw"
@@ -208,41 +213,9 @@ class ReputationWebServiceController < ApplicationController
         Participant.find_by(user_id: id).update(alg.to_sym => rep) unless /leniency/ =~ id.to_s
       end
     end
+
     redirect_to action: 'client'
   end
-
-
-  # Encryption
-  # AES symmetric algorithm encrypts raw data
-  def encrypt_request(request)
-    aes_encrypted_request_data = aes_encrypt(request.body)
-    request = aes_encrypted_request_data[0]
-    # RSA asymmetric algorithm encrypts keys of AES
-    encrypted_key = rsa_public_key1(aes_encrypted_request_data[1])
-    encrypted_vi = rsa_public_key1(aes_encrypted_request_data[2])
-    # fixed length 350
-    request.body.prepend('", "data":"')
-    request.body.prepend(encrypted_vi)
-    request.body.prepend(encrypted_key)
-    # request body should be in JSON format.
-    request.body.prepend('{"keys":"')
-    request.body<< '"}'
-    request.body.gsub!(/\n/, '\\n')
-    request
-  end
-
-
-    # RSA asymmetric algorithm decrypts keys of AES
-  # Method Decrypting request
-  def decrypt_request(response)
-    # RSA asymmetric algorithm decrypts keys of AES
-    key = rsa_private_key2(response["keys"][0, 350])
-    vi = rsa_private_key2(response["keys"][350, 350])
-    # AES symmetric algorithm decrypts data
-    aes_encrypted_response_data = response["data"]
-    decrypted_response = aes_decrypt(aes_encrypted_response_data, key, vi)
-  end
-     
 
   def rsa_public_key1(data)
     public_key_file = 'public1.pem'

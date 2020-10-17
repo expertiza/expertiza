@@ -1,7 +1,11 @@
 describe ReputationWebServiceController do
 
-
   describe '#calculate' do
+    it 'should query database and return review responses' do
+      result = controller.get_review_responses(55, 0)
+      expect(result).to_not eq(nil)
+    end
+
     it 'should calculate peer review grades' do
       has_topic = !SignUpTopic.where(41).empty?
       raw_data_array = []
@@ -9,11 +13,6 @@ describe ReputationWebServiceController do
       raw_data_array = controller.calculate_peer_review_grades(has_topic,result,1)
       expect(raw_data_array).to be_an_instance_of(Array)
       expect(raw_data_array).should_not be(nil)
-    end
-
-    it 'should query database and return review responses' do
-      result = controller.get_review_responses(55, 0)
-      expect(result).to_not eq(nil)
     end
 
     it 'should calculate quiz scores and return them as an array' do

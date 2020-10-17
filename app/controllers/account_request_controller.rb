@@ -75,20 +75,11 @@ class AccountRequestController < ApplicationController
     @rolename = Role.find_by(name: params[:role])
     roles_for_request_sign_up
   end
- 
-  #Changes Started Here
-  def list_pending_requested_finalized
-    @requested_users = AccountRequest.where.not(:status => 'Under Review').order("created_at DESC")
-    @roles = Role.all
-  end
-  #Changes Ended Here
 
-  def list_pending_requested
-    #Changes Started Here
-    @requested_users = AccountRequest.where(:status => 'Under Review').order("created_at DESC")
-    #Changes Completed Here
+   def list_pending_requested
+    @requested_users = AccountRequest.all
     @roles = Role.all
-  end
+    end
 
   #Changes Started Here
   def create_requested_user_record

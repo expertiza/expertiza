@@ -56,8 +56,4 @@ class TagPromptDeployment < ActiveRecord::Base
     end
     user_answer_tagging
   end
-
-  def average_number_of_qualifying_comments
-    ReviewMetricsQuery.average_number_of_qualifying_comments(self.id)
-  end
 end

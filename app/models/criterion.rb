@@ -168,9 +168,20 @@ class Criterion < ScoredQuestion
 
     if answer && !answer.comments.nil?
       html += '<td style="padding-left:10px"><br>' + answer.comments.html_safe + '</td>'
-      html += '<br>' + answer.comments.html_safe
-      html += '</td>'
-      html += TagPrompt.show_tag_prompts(tag_prompt_deployments, answer, current_user)
+      #### start code to show tag prompts ####
+      if !tag_prompt_deployments.nil? && tag_prompt_deployments.count > 0
+        # show check boxes for answer tagging
+        question = Question.find(answer.question_id)
+        html += '<tr><td colspan="2">'
+        tag_prompt_deployments.each do |tag_dep|
+          tag_prompt = TagPrompt.find(tag_dep.tag_prompt_id)
+          if tag_dep.question_type == question.type && answer.comments.length > tag_dep.answer_length_threshold.to_i
+            html += tag_prompt.html_control(tag_dep, answer, current_user)
+          end
+        end
+        html += '</td></tr>'
+      end
+      #### end code to show tag prompts ####
     end
     html += '</tr></table>'
     safe_join(["".html_safe, "".html_safe], html.html_safe)

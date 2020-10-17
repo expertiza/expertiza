@@ -3,24 +3,6 @@ class TagPrompt < ActiveRecord::Base
   validates :desc, presence: true
   validates :control_type, presence: true
 
-  def self.show_tag_prompts(tag_prompt_deployments, answer, user_id = nil)
-    html = ''
-    #### start code to show tag prompts ####
-    unless tag_prompt_deployments.blank?
-      question = Question.find(answer.question_id)
-      html += '<tr><td colspan="2">'
-      tag_prompt_deployments.each do |tag_dep|
-        if tag_dep.question_type == question.type and answer.comments.length > tag_dep.answer_length_threshold.to_i
-          tag_prompt = TagPrompt.find(tag_dep.tag_prompt_id)
-          html += tag_prompt.html_control(tag_dep, answer, user_id)
-        end
-      end
-      html += '</td></tr>'
-    end
-    #### end code to show tag prompts ####
-    html
-  end
-
   def html_control(tag_prompt_deployment, answer, user_id)
     html = ""
     unless answer.nil?

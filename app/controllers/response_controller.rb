@@ -98,7 +98,6 @@ class ResponseController < ApplicationController
   def update
     render nothing: true unless action_allowed?
     msg = ""
-    error_msg = ""
     begin
       # the response to be updated
       # Locking functionality added for E1973, team-based reviewing
@@ -112,17 +111,15 @@ class ResponseController < ApplicationController
       @questionnaire = set_questionnaire
       questions = sort_questions(@questionnaire.questions)
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
-      msg = 'Your response was successfully saved.'
     rescue StandardError
-      error_msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
+      msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
 
-    if params[:Submit] && error_msg.blank?
+    if params[:Submit] && msg.blank?
       render 'analysis'
     else
       redirect_to controller: 'response', action: 'save', id: @map.map_id,
-                  return: params[:return], msg: msg, error_msg: error_msg,
-                  review: params[:review], save_options: params[:save_options]
+                  return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
     end
   end
 

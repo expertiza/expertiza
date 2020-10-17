@@ -33,7 +33,7 @@
       <% tag_prompt_deployments.each do |tag_prompt_deployment|  %>
         <td>
           <b><%= tag_prompt_deployment.tag_prompt.prompt %></b><br>
-          (class avg=<%= tag_prompt_deployment.average_number_of_qualifying_comments %>/<%= answers.count %>)
+          (class avg=<%= ReviewMetricsQuery.average_number_of_qualifying_comments(tag_prompt_deployment.id) %>/<%= answers.count %>)
         </td>
       <% end %>
     </tr>

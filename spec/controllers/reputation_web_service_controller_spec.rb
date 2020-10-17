@@ -3,7 +3,7 @@ describe ReputationWebServiceController do
 
   describe '#calculate' do
     it 'should calculate peer review grades' do
-      has_topic = true
+      has_topic = !SignUpTopic.where(41).empty?
       raw_data_array = []
       result = controller.get_review_responses(41, 0)
       raw_data_array = controller.calculate_peer_review_grades(has_topic,result,1)

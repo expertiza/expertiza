@@ -2,16 +2,14 @@ describe ReputationWebServiceController do
 
 
   describe '#calculate' do
-    # xit 'should calculate peer review grades' do
-    #   has_topic = false
-    #   raw_data_array = []
-    #   #review_responses = controller.get_review_responses(45, 0)
-    #   review_responses = controller.get_review_responses(55, 0)
-    #   #review_responses << review_response
-    #   raw_data_array = controller.calculate_peer_review_grades(has_topic, review_responses, 0)
-    #   expect(raw_data_array).to be_an_instance_of(Array)
-    #   expect(raw_data_array).to_not eq(nil)
-    # end
+    it 'should calculate peer review grades' do
+      has_topic = true
+      raw_data_array = []
+      result = controller.get_review_responses(41, 0)
+      raw_data_array = controller.calculate_peer_review_grades(has_topic,result,1)
+      expect(raw_data_array).to be_an_instance_of(Array)
+      expect(raw_data_array).should_not be(nil)
+    end
 
     it 'should query database and return review responses' do
       result = controller.get_review_responses(55, 0)

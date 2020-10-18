@@ -138,16 +138,35 @@ describe QuizQuestionnairesController do
           expect(controller.instance_variable_get(:@questionnaire).name).to eq 'Test questionnaire'
           expect(controller.instance_variable_get(:@questionnaire).min_question_score).to eq 0
           expect(controller.instance_variable_get(:@questionnaire).max_question_score).to eq 5
-
-          expect(controller.instance_variable_get(:@questionnaire).min_question_score).to be <= (:@questionnaire).min_question_score)
-          expect(controller.instance_variable_get(:@questionnaire).min_question_score).to be >= 0 
-          expect(controller.instance_variable_get(:@questionnaire).max_question_score).to eq >= 0
-
           expect(controller.instance_variable_get(:@questionnaire).type).to eq 'QuizQuestionnaire'
           expect(controller.instance_variable_get(:@questionnaire).instructor_id).to eq 6
 
         end
       end
+      context 'when questionnaire type is QuizQuestionnaire and min/max values are invalid' do
+        it 'redirects to submitted_content#edit page' do
+          params = {aid: 1,
+                    pid: 1,
+                    questionnaire: {name: 'Test questionnaire',
+                                    type: 'QuizQuestionnaire',
+                                    min_question_score: 0,
+                                    max_question_score: -1
+                                    }}  
+          # create_questionnaire
+          participant = double('Participant')
+          allow(Participant).to receive(:find).with('1').and_return(participant)
+          allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', rspid: 6))
+          allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', id: 6))
+          #allow(AssignmentTeam).to receive(:id).with(participant).and_return(double('AssignmentTeam', id: 6))
+          allow_any_instance_of(QuizQuestionnairesController).to receive(:save_choices).with(1).and_return(true)
+          # save
+          allow_any_instance_of(QuizQuestionnairesController).to receive(:save_questions).with(1).and_return(true)
+          allow_any_instance_of(QuizQuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
+           
+           expect {post :create, params}.to raise_error(ActiveRecord::RecordInvalid)
+        end
+      end
+
       context 'when quiz is invalid and questionnaire type is QuizQuestionnaire' do
       it 'redirects to submitted_content#edit page' do
         params = {aid: 1,

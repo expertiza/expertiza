@@ -50,8 +50,9 @@ class QuizQuestionnairesController < QuestionnairesController
       participant_id = params[:pid] # creating a local variable to send as parameter to submitted content if it is a quiz questionnaire
       @questionnaire.min_question_score = params[:questionnaire][:min_question_score] # 0
       @questionnaire.max_question_score = params[:questionnaire][:max_question_score] # 1
+      
       flash[:error] = "Minumum and/or maximum question score cannot be less than 0." if @questionnaire.min_question_score < 0 || @questionnaire.max_question_score < 0 
-      flash[:error] = "Minumum question score cannot be less than maximum question score." if @questionnaire.min_question_score < @questionnaire.max_question_score
+      flash[:error] = "Maximum question score cannot be less than minumum question score." if @questionnaire.min_question_score < @questionnaire.max_question_score
      
       author_team = AssignmentTeam.team(Participant.find(participant_id))
 

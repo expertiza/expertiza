@@ -70,7 +70,7 @@ describe QuizQuestionnairesController do
 
         end
       end
-      context 'when questionnaire type is QuizQuestionnaire and max question score < 0' do
+      context 'when questionnaire type is QuizQuestionnaire and min_question_score < 0' do
         it 'redirects to submitted_content#edit page' do
           params = {aid: 1,
                     pid: 1,

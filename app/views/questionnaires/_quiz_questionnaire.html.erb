@@ -1,4 +1,15 @@
-<%= error_messages_for 'questionnaire' %>
+
+
+<% if @questionnaire.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= pluralize(@questionnaire.errors.count, "error") %> prohibited this article from being saved:</h2>
+    <ul>
+    <% @questionnaire.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+    </ul>
+  </div>
+<% end %>
 
   <table>
     <tr>

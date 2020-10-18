@@ -45,6 +45,7 @@ class QuizQuestionnairesController < QuestionnairesController
   # create quiz questionnaire
   def create
     valid = validate_quiz
+    @errors = []
     if valid.eql?("valid")
       @questionnaire = QuizQuestionnaire.new(questionnaire_params)
       participant_id = params[:pid] # creating a local variable to send as parameter to submitted content if it is a quiz questionnaire
@@ -59,12 +60,23 @@ class QuizQuestionnairesController < QuestionnairesController
       @questionnaire.instructor_id = author_team.id # for a team assignment, set the instructor id to the team_id
 
       @successful_create = true
-      save
 
-      save_choices @questionnaire.id
+      unless @questionnaire.save
+        @errors.append @questionnaire.errors
+      end
 
-      flash[:note] = "The quiz was successfully created." if @successful_create
-      redirect_to controller: 'submitted_content', action: 'edit', id: participant_id
+      if @errors.any?
+        #format.html { render :new  }
+        #format.json { render json: @errors, status: :unprocessable_entity }
+        redirect_to :back
+
+      else
+        save_choices @questionnaire.id
+        flash[:note] = "The quiz was successfully created." if @successful_create
+        redirect_to controller: 'submitted_content', action: 'edit', id: participant_id
+      end
+      
+      
     else
       flash[:error] = valid.to_s
       redirect_to :back

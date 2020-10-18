@@ -90,7 +90,10 @@ describe QuizQuestionnairesController do
           allow_any_instance_of(QuizQuestionnairesController).to receive(:save_questions).with(1).and_return(true)
           allow_any_instance_of(QuizQuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
            
-           expect {post :create, params}.to raise_error(ActiveRecord::RecordInvalid)
+           #expect {post :create, params}.to raise_error(ActiveRecord::RecordInvalid)
+           expect(flash[:error]).to be_present
+           #expect(flash[:error]).to match("Maximum question score cannot be less than minumum question score.")
+           #expect(controller.validate_quiz).to eq('The maximum question score must be a positive integer.')
         end
       end
 
@@ -100,7 +103,7 @@ describe QuizQuestionnairesController do
                     pid: 1,
                     questionnaire: {name: 'Test questionnaire',
                                     type: 'QuizQuestionnaire',
-                                    min_question_score: 3,
+                                    min_question_score: 3,      
                                     max_question_score: 1
                                     }}  
           # create_questionnaire
@@ -114,7 +117,11 @@ describe QuizQuestionnairesController do
           allow_any_instance_of(QuizQuestionnairesController).to receive(:save_questions).with(1).and_return(true)
           allow_any_instance_of(QuizQuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
            
-           expect {post :create, params}.to raise_error(ActiveRecord::RecordInvalid)
+           expect {post :create, params}.to set_flash
+           #expect(controller).to set_flash
+           #expect(flash[:error]).to match("Maximum question score cannot be less than minumum question score.")
+
+           #expect(controller.create).to eq('The minimum question score must be less than the maximum.')
         end
       end
 

@@ -52,9 +52,7 @@ class QuizQuestionnairesController < QuestionnairesController
       @questionnaire.min_question_score = params[:questionnaire][:min_question_score] # 0
       @questionnaire.max_question_score = params[:questionnaire][:max_question_score] # 1
       
-      flash[:error] = "Minumum and/or maximum question score cannot be less than 0." if @questionnaire.min_question_score < 0 || @questionnaire.max_question_score < 0 
-      flash[:error] = "Maximum question score cannot be less than minumum question score." if @questionnaire.max_question_score < @questionnaire.min_question_score
-     
+
       author_team = AssignmentTeam.team(Participant.find(participant_id))
 
       @questionnaire.instructor_id = author_team.id # for a team assignment, set the instructor id to the team_id
@@ -66,10 +64,12 @@ class QuizQuestionnairesController < QuestionnairesController
       end
 
       if @errors.any?
+        flash[:error] = "Minumum and/or maximum question score cannot be less than 0." if @questionnaire.min_question_score < 0 || @questionnaire.max_question_score < 0 
+        flash[:error] = "Maximum question score cannot be less than minumum question score." if @questionnaire.max_question_score < @questionnaire.min_question_score  
         #format.html { render :new  }
         #format.json { render json: @errors, status: :unprocessable_entity }
+        valid = @questionnaire.validate_questionnaire 
         redirect_to :back
-
       else
         save_choices @questionnaire.id
         flash[:note] = "The quiz was successfully created." if @successful_create

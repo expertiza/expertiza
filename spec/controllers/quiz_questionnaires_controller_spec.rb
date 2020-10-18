@@ -70,60 +70,31 @@ describe QuizQuestionnairesController do
 
         end
       end
+
       context 'when questionnaire type is QuizQuestionnaire and max_question_score value is negative' do
-        it 'redirects to submitted_content#edit page' do
-          params = {aid: 1,
-                    pid: 1,
-                    questionnaire: {name: 'Test questionnaire',
-                                    type: 'QuizQuestionnaire',
-                                    min_question_score: 0,
-                                    max_question_score: -1
-                                    }}  
-          # create_questionnaire
-          participant = double('Participant')
-          allow(Participant).to receive(:find).with('1').and_return(participant)
-          allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', rspid: 6))
-          allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', id: 6))
-          #allow(AssignmentTeam).to receive(:id).with(participant).and_return(double('AssignmentTeam', id: 6))
-          allow_any_instance_of(QuizQuestionnairesController).to receive(:save_choices).with(1).and_return(true)
-          # save
-          allow_any_instance_of(QuizQuestionnairesController).to receive(:save_questions).with(1).and_return(true)
-          allow_any_instance_of(QuizQuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
-           
-           #expect {post :create, params}.to raise_error(ActiveRecord::RecordInvalid)
-           expect(flash[:error]).to be_present
-           #expect(flash[:error]).to match("Maximum question score cannot be less than minumum question score.")
-           #expect(controller.validate_quiz).to eq('The maximum question score must be a positive integer.')
-        end
+        it 'creates error: The maximum question score must be a positive integer.' do
+          questionnaire.max_question_score = -1
+          questionnaire.valid?
+          expect(questionnaire.errors[:max_question_score]).to include('The maximum question score must be a positive integer.')                      
       end
+    end
 
-      context 'when questionnaire type is QuizQuestionnaire and min_question score > max_question_score' do
-        it 'redirects to submitted_content#edit page' do
-          params = {aid: 1,
-                    pid: 1,
-                    questionnaire: {name: 'Test questionnaire',
-                                    type: 'QuizQuestionnaire',
-                                    min_question_score: 3,      
-                                    max_question_score: 1
-                                    }}  
-          # create_questionnaire
-          participant = double('Participant')
-          allow(Participant).to receive(:find).with('1').and_return(participant)
-          allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', rspid: 6))
-          allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', id: 6))
-          #allow(AssignmentTeam).to receive(:id).with(participant).and_return(double('AssignmentTeam', id: 6))
-          allow_any_instance_of(QuizQuestionnairesController).to receive(:save_choices).with(1).and_return(true)
-          # save
-          allow_any_instance_of(QuizQuestionnairesController).to receive(:save_questions).with(1).and_return(true)
-          allow_any_instance_of(QuizQuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
-           
-           expect {post :create, params}.to set_flash
-           #expect(controller).to set_flash
-           #expect(flash[:error]).to match("Maximum question score cannot be less than minumum question score.")
+    context 'when questionnaire type is QuizQuestionnaire and min_question_score value is negative' do
+      it 'creates error: The minimum question score must be a positive integer.' do
+        questionnaire.min_question_score = -1
+        questionnaire.valid?
+        expect(questionnaire.errors[:min_question_score]).to include('The minimum question score must be a positive integer.')                      
+    end
+  end
 
-           #expect(controller.create).to eq('The minimum question score must be less than the maximum.')
-        end
-      end
+    context 'when questionnaire type is QuizQuestionnaire and max_question_score is less than min_question_score' do
+      it 'creates error: The minimum question score must be less than the maximum.' do
+        questionnaire.min_question_score = 3
+        questionnaire.max_question_score = 1
+        questionnaire.valid?
+        expect(questionnaire.errors[:min_question_score]).to include('The minimum question score must be less than the maximum.')                      
+    end
+  end
 
       context 'when quiz is invalid and questionnaire type is QuizQuestionnaire' do
       it 'redirects to submitted_content#edit page' do

@@ -71,10 +71,14 @@ describe QuizQuestionnairesController do
         end
       end
 <<<<<<< HEAD
+<<<<<<< HEAD
       context 'when questionnaire type is QuizQuestionnaire and min_question_score < 0' do
 =======
       context 'when questionnaire type is QuizQuestionnaire and min/max values are invalid' do
 >>>>>>> parent of 9058243... update model validations
+=======
+      context 'when questionnaire type is QuizQuestionnaire and max question score < 0' do
+>>>>>>> parent of 85b118f... typo in spec context
         it 'redirects to submitted_content#edit page' do
           params = {aid: 1,
                     pid: 1,

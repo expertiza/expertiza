@@ -138,6 +138,11 @@ describe QuizQuestionnairesController do
           expect(controller.instance_variable_get(:@questionnaire).name).to eq 'Test questionnaire'
           expect(controller.instance_variable_get(:@questionnaire).min_question_score).to eq 0
           expect(controller.instance_variable_get(:@questionnaire).max_question_score).to eq 5
+
+          expect(controller.instance_variable_get(:@questionnaire).min_question_score).to be <= (:@questionnaire).min_question_score)
+          expect(controller.instance_variable_get(:@questionnaire).min_question_score).to be >= 0 
+          expect(controller.instance_variable_get(:@questionnaire).max_question_score).to eq >= 0
+
           expect(controller.instance_variable_get(:@questionnaire).type).to eq 'QuizQuestionnaire'
           expect(controller.instance_variable_get(:@questionnaire).instructor_id).to eq 6
 

@@ -60,33 +60,6 @@ describe "assignment submisstion test" do
     expect(page).to have_selector('listingRow', count: group) # the number of different tables
   end
 
-  it "badges showing location fixing" do
-    go_to_student_task_page
-    expect(rendered).to have_tag('tr', :with => { :class => "listingRow"}) do
-      get :get_awarded_badges(participant) #badges shows or not
-      expect(response).to be_ok
-    end
-  end
-
-  it "submission grade display" do
-    go_to_student_task_page
-    expect(rendered).to have_tag('tr', :with => { :class => "listingRow"}) do
-      without_tag "td",  :text => "-" #the topic is not empty
-      get :topic_id # topic _id shows or not
-      expect(response).to be_ok
-      get :get_review_grade_info(participant) #grades shows or not
-      expect(response).to be_ok
-    end
-  end
-
-  it "unnecessary white space" do
-    go_to_student_task_page
-    expect(rendered).to have_tag('render', :with => { :text => "publishing_rights"}) do
-      with_tag "div", :class = "taskbox",float = left # taskbox is left
-      with_tag "div", :class = "topictable",float = right  #topictable is right
-    end
-
-  end
 
   it "is able to submit a single valid link"  do
     signup_topic

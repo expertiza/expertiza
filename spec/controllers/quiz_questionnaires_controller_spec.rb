@@ -70,38 +70,18 @@ describe QuizQuestionnairesController do
 
         end
       end
+<<<<<<< HEAD
       context 'when questionnaire type is QuizQuestionnaire and min_question_score < 0' do
+=======
+      context 'when questionnaire type is QuizQuestionnaire and min/max values are invalid' do
+>>>>>>> parent of 9058243... update model validations
         it 'redirects to submitted_content#edit page' do
           params = {aid: 1,
                     pid: 1,
                     questionnaire: {name: 'Test questionnaire',
                                     type: 'QuizQuestionnaire',
-                                    min_question_score: -1,
-                                    max_question_score: 1
-                                    }}  
-          # create_questionnaire
-          participant = double('Participant')
-          allow(Participant).to receive(:find).with('1').and_return(participant)
-          allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', rspid: 6))
-          allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', id: 6))
-          #allow(AssignmentTeam).to receive(:id).with(participant).and_return(double('AssignmentTeam', id: 6))
-          allow_any_instance_of(QuizQuestionnairesController).to receive(:save_choices).with(1).and_return(true)
-          # save
-          allow_any_instance_of(QuizQuestionnairesController).to receive(:save_questions).with(1).and_return(true)
-          allow_any_instance_of(QuizQuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
-           
-           expect {post :create, params}.to raise_error(ActiveRecord::RecordInvalid)
-        end
-      end
-
-      context 'when questionnaire type is QuizQuestionnaire and max question score < min question score' do
-        it 'redirects to submitted_content#edit page' do
-          params = {aid: 1,
-                    pid: 1,
-                    questionnaire: {name: 'Test questionnaire',
-                                    type: 'QuizQuestionnaire',
-                                    min_question_score: 3,
-                                    max_question_score: 1
+                                    min_question_score: 0,
+                                    max_question_score: -1
                                     }}  
           # create_questionnaire
           participant = double('Participant')

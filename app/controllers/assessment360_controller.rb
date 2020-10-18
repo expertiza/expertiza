@@ -15,12 +15,12 @@ class Assessment360Controller < ApplicationController
     @show_meta_reviews = fields.include? 'MetaReviewScores'
     @show_teammate_reviews = fields.include? 'TeammateReviewScores'
     @show_teammate_count = fields.include? 'NumberOfTeammates'
-    @colspan_count = 2
+    @all_students_colspan_count = 2
     if !@show_teammate_reviews
-      @colspan_count -= 1
+      @all_students_colspan_count -= 1
     end
     if !@show_meta_reviews
-      @colspan_count -= 1
+      @all_students_colspan_count -= 1
     end
     @assignments = course.assignments.reject(&:is_calibrated).reject {|a| a.participants.empty? }
     @course_participants = course.get_participants
@@ -91,6 +91,14 @@ class Assessment360Controller < ApplicationController
     end
   end
 
+  def all_students_all_reviews_all_grades
+    course_student_grade_summary()
+    all_students_all_reviews()
+    @total_colspan_count = @course_grades_colspan_count + @all_students_colspan_count
+
+    
+  end
+
   # Find the list of all students and assignments pertaining to the course.
   # This data is used to compute the instructor assigned grade and peer review scores.
   # There are many nuances about how to collect these scores. See our design document for more deails
@@ -107,15 +115,15 @@ class Assessment360Controller < ApplicationController
     @show_instructor_scores = fields.include? 'InstructorAssignedScores'
     @show_peer_grades = fields.include? 'PeerGrades'
     @show_topics = fields.include? 'Topics'
-    @colspan_count = 3
+    @course_grades_colspan_count = 3
     if !@show_instructor_scores
-      @colspan_count -= 1
+      @course_grades_colspan_count -= 1
     end
     if !@show_peer_grades
-      @colspan_count -= 1
+      @course_grades_colspan_count -= 1
     end
     if !@show_topics
-      @colspan_count -= 1
+      @course_grades_colspan_count -= 1
     end
 
     @final_grades_colspan = 2

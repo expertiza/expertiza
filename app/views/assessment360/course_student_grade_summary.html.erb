@@ -27,13 +27,12 @@
         });
     });
 </script>
-
 <table class="table table-striped sortable">
   <thead>
     <tr>
       <th rowspan=2 width="320" class="sorter-true">Students</th>
       <% @assignments.each do |assignment| %>
-        <th colspan=<%=@colspan_count%> class="sorter-false"> <%= assignment.name %> </th>
+        <th colspan=<%=@course_grades_colspan_count%> class="sorter-false"> <%= assignment.name %> </th>
       <% end %>
       <% if @show_instructor_scores and @show_peer_grades %> <th colspan=<%=@final_grades_colspan%>>Final Grades</th> <%end%>
     </tr>

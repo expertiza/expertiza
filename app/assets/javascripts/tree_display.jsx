@@ -59,6 +59,9 @@ jQuery(document).ready(function() {
   if (document.getElementById('closeCourseSummaryDialog')) {
     document.getElementById('closeCourseSummaryDialog').onclick = () => {jQuery('#dialog_course_summary').dialog('close')};
   }
+  if (document.getElementById('allGradesDialog')) {
+    document.getElementById('allGradesDialog').onclick = () => {jQuery('#dialog_all_grades').dialog('close')};
+  }
 
   function showIntelligentAssignmentDialog() {
     jQuery( "#intelligent_assignment_dialog" ).dialog({ closeText: "hide", modal: true, resizable: false, width: 500 });
@@ -87,6 +90,10 @@ jQuery(document).ready(function() {
     toggleCourseSummaryModal: function() {
       jQuery( "#dialog_course_summary" ).dialog();
       document.getElementById('course_summary_course_id').value = parseInt(this.props.id/2).toString();
+    },
+    toggleAllGradesModal: function() {
+      jQuery( "#dialog_all_grades" ).dialog();
+      document.getElementById('all_grades_course_id').value = parseInt(this.props.id/2).toString();
     },
     render: function() {
       var moreContent = []
@@ -171,6 +178,9 @@ jQuery(document).ready(function() {
                   <img src="/assets/tree_view/assign-survey-24.png" />
                 </a>
                 <button title="View aggregated teammate & meta reviews" onClick={this.toggleModal} style={{"padding": "0px", "margin": "0px", "border": "0px", "width": "24px", "height": "24px", "top": "8px"}} >
+                  <span style={{"fontSize": "22px", "top": "8px"}} className="glyphicon glyphicon-list-alt"></span>
+                </button>
+                <button title="View combined teammate & meta reviews & grades" onClick={this.toggleAllGradesModal} style={{"padding": "0px", "margin": "0px", "border": "0px", "width": "24px", "height": "24px", "top": "8px"}} >
                   <span style={{"fontSize": "22px", "top": "8px"}} className="glyphicon glyphicon-list-alt"></span>
                 </button>
               </span>

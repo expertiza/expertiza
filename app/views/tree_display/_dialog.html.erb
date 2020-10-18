@@ -36,3 +36,34 @@
         <button type="button" id='closeDialog'>Close</button>
     <% end %>
 </div>
+<div id="dialog_all_grades" title="Select Columns" hidden="true"> 
+    <%= form_tag('/assessment360/all_students_all_reviews_all_grades', method: :get) do %>
+        <div class="form-group row" style="margin-bottom: 0px !important;">
+            <%= label_tag('TeammateReviewScores', "Teammate Review Scores") %>
+            <%= check_box_tag 'fields[]', 'TeammateReviewScores'%>
+        </div>
+        <div class="form-group row" style="margin-bottom: 0px !important;">
+            <%= label_tag('MetaReviewScores', "Meta-Review Scores") %>
+            <%= check_box_tag 'fields[]', 'MetaReviewScores'%>
+        </div>
+        <div class="form-group row" style="margin-bottom: 0px !important;">
+            <%= label_tag('NumberOfTeammates', "Number Of Teammates") %>
+            <%= check_box_tag 'fields[]', 'NumberOfTeammates'%>
+        </div>
+        <div class="form-group row" style="margin-bottom: 0px !important;">
+            <%= label_tag('InstructorAssignedScores', "Instuctor Assigned Scores") %>
+            <%= check_box_tag 'fields[]', 'InstructorAssignedScores'%>
+        </div>
+        <div class="form-group row" style="margin-bottom: 0px !important;">
+            <%= label_tag('PeerGrades', "Peer Grades") %>
+            <%= check_box_tag 'fields[]', 'PeerGrades'%>
+        </div>
+        <div class="form-group row" style="margin-bottom: 0px !important;">
+            <%= label_tag('Topics', "Topics") %>
+            <%= check_box_tag 'fields[]', 'Topics'%>
+        </div>
+        <%= hidden_field_tag('course_id', '', :id => 'all_grades_course_id')%>
+        <%= submit_tag("Submit") %>
+        <button type="button" id='allGradesDialog'>Close</button>
+    <% end %>
+</div>

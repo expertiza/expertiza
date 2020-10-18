@@ -64,11 +64,8 @@ class QuizQuestionnairesController < QuestionnairesController
       end
 
       if @errors.any?
-        flash[:error] = "Minumum and/or maximum question score cannot be less than 0." if @questionnaire.min_question_score < 0 || @questionnaire.max_question_score < 0 
-        flash[:error] = "Maximum question score cannot be less than minumum question score." if @questionnaire.max_question_score < @questionnaire.min_question_score  
-        #format.html { render :new  }
-        #format.json { render json: @errors, status: :unprocessable_entity }
-        valid = @questionnaire.validate_questionnaire 
+        # flash[:error] = "Minumum and/or maximum question score cannot be less than 0." if @questionnaire.min_question_score < 0 || @questionnaire.max_question_score < 0 
+        # flash[:error] = "Maximum question score cannot be less than minumum question score." if @questionnaire.max_question_score < @questionnaire.min_question_score  
         redirect_to :back
       else
         save_choices @questionnaire.id

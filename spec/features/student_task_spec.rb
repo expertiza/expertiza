@@ -14,12 +14,7 @@ describe "Student_task, list page" do
       expect(page).to have_no_content("badge")
       expect(page).to have_no_content("Review Grade")
       expect(page). to have_content("assignment")
-      expect(page). to have_content("Submission Grade")
-      expect(page). to have_content("Topic")
-      expect(page). to have_content("Current Stage")
-      expect(page). to have_content("Stage Deadline")
-      expect(page). to have_content("Publishing Rights")
-      expect(page).to have_content("CSC517, test1")
+
     end
 
 

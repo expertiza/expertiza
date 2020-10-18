@@ -27,6 +27,29 @@ describe "assignment submisstion test" do
     click_link "Your work"
   end
 
+  def list_page
+    user = User.find_by(name: "student2064")
+    login_as(user.name)
+    stub_current_user(user, user.role.name, user.role)
+    visit '/student_task/list'
+    visit '/sign_up_sheet/sign_up?id=1&topic_id=1' # signup topic
+    visit '/student_task/list'
+  end
+
+  it "have the right content" do
+    list_page
+    expect(page).to have_content("Assignments")
+    expect(page).to have_no_content("badge")
+    expect(page).to have_no_content("Review Grade")
+    expect(page).to have_content("Assignment")
+    expect(page).to have_content("Submission Grade")
+    expect(page).to have_content("Topic")
+    expect(page).to have_content("Current Stage")
+    expect(page).to have_content("Stage Deadline")
+    expect(page).to have_content("Publishing Rights")
+    expect(page).to have_content("Assignment1684")
+  end
+
   it "is able to submit a single valid link"  do
     signup_topic
     fill_in 'submission', with: "https://www.ncsu.edu"

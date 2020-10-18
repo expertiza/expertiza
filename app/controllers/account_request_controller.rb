@@ -10,21 +10,14 @@ class AccountRequestController < ApplicationController
     case params[:action]
     when 'list_pending_requested'
       current_user_has_admin_privileges?
-      # ['Super-Administrator',
-      #  'Administrator'].include? current_role_name
-    when 'request_new'
+    when 'new'
       true
     when 'create_requested_user_record'
       true
     when 'keys'
       current_user_has_student_privileges?
-      # current_role_name.eql? 'Student'
     else
       current_user_has_ta_privileges?
-      # ['Super-Administrator',
-      #  'Administrator',
-      #  'Instructor',
-      #  'Teaching Assistant'].include? current_role_name
     end
   end
 
@@ -83,7 +76,7 @@ class AccountRequestController < ApplicationController
     @all_roles = Role.where('id in (?) or id = ?', role.get_available_roles, role.id)
   end
 
-  def request_new
+  def new
     flash[:warn] = "If you are a student, please contact your teaching staff to get your Expertiza ID."
     @user = User.new
     @rolename = Role.find_by(name: params[:role])
@@ -143,7 +136,7 @@ class AccountRequestController < ApplicationController
       #If saving in the AccountRequests model has failed
     end
     ExpertizaLogger.error LoggerMessage.new(controller_name, requested_user.name, flash[:error], request)
-    redirect_to controller: 'account_request', action: 'request_new', role: 'Student'
+    redirect_to controller: 'account_request', action: 'new', role: 'Student'
     #if the first if clause fails, redirect back to the account requests page!
   end
 #Changes Completed Here

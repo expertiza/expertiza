@@ -104,8 +104,8 @@ describe AccountRequestController do
     it '1' do
       allow(Role).to receive(:find_by).with(name: 'instructor').and_return('instructor')
       params = {role: 'instructor'}
-      post :request_new, params
-      expect(response).to render_template(:request_new)
+      post :new, params
+      expect(response).to render_template(:new)
     end
   end
 
@@ -136,7 +136,7 @@ describe AccountRequestController do
       }
       post :create_requested_user_record, params
       expect(flash[:error]).to eq 'The account you are requesting has already existed in Expertiza.'
-      expect(response).to redirect_to('http://test.host/account_request/request_new?role=Student')
+      expect(response).to redirect_to('http://test.host/account_request/new?role=Student')
     end
 
     it 'if requested user is not saved' do
@@ -150,7 +150,7 @@ describe AccountRequestController do
           requested_user: {self_introduction: 'I am good'}
       }
       post :create_requested_user_record, params
-      expect(response).to redirect_to('http://test.host/account_request/request_new?role=Student')
+      expect(response).to redirect_to('http://test.host/account_request/new?role=Student')
     end
 
     it 'if user not exists, requested user is saved and params[:user][:institution_id] is empty' do

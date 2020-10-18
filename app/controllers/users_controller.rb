@@ -12,7 +12,7 @@ class UsersController < ApplicationController
     case params[:action]
     when 'list_pending_requested'
       current_user_has_admin_privileges?
-    when 'request_new', 'create_requested_user_record'
+    when 'new', 'create_requested_user_record'
       true
     when 'keys', 'index'
       # These action methods are all written with the clear expectation
@@ -166,7 +166,7 @@ class UsersController < ApplicationController
       flash[:error] = requested_user.errors.full_messages.to_sentence
     end
     ExpertizaLogger.error LoggerMessage.new(controller_name, requested_user.name, flash[:error], request)
-    redirect_to controller: 'users', action: 'request_new', role: 'Student'
+    redirect_to controller: 'users', action: 'new', role: 'Student'
   end
 
   def create_approved_user

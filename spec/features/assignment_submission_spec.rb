@@ -50,15 +50,7 @@ describe "assignment submisstion test" do
     expect(page).to have_content("Assignment1684")
   end
 
-  it "group the course and display on different tables" do
-    list_page
-    expect(rendered).to have_tag('div', :with => { :class => "topictable"}) do
-      without_tag "h1", :text => 'No Course Assigned Yet' # have course or not
-      with_tag "table", :with => { :class => "table table-striped", :cellpadding => '2' } # test the Outermost layer is built
-      with_tag "td",  :text => '#{student_task.course.try :name}' # test show the course name
-    end
-    expect(page).to have_selector('listingRow', count: group) # the number of different tables
-  end
+
 
 
   it "is able to submit a single valid link"  do

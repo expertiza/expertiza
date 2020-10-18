@@ -51,7 +51,7 @@ describe "assignment submisstion test" do
   end
 
   it "group the course and display on different tables" do
-    go_to_student_task_page
+    list_page
     expect(rendered).to have_tag('div', :with => { :class => "topictable"}) do
       without_tag "h1", :text => 'No Course Assigned Yet' # have course or not
       with_tag "table", :with => { :class => "table table-striped", :cellpadding => '2' } # test the Outermost layer is built

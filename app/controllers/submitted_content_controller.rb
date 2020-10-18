@@ -90,7 +90,7 @@ class SubmittedContentController < ApplicationController
         user = User.find(reviewer.user_id)
 
         if user.email_on_submission?
-          MailerHelper.submission_mail_to_reviewr(user,
+          MailerHelper.submission_mail_to_reviewer(user,
                                              "New submission available to review.",
                                              "update").deliver
         end

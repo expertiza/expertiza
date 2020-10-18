@@ -79,13 +79,13 @@ describe QuizQuestionnairesController do
       end
     end
 
-    context 'when questionnaire type is QuizQuestionnaire and min_question_score value is negative' do
-      it 'creates error: The minimum question score must be a positive integer.' do
-        questionnaire.min_question_score = -1
-        questionnaire.valid?
-        expect(questionnaire.errors[:min_question_score]).to include('The minimum question score must be a positive integer.')                      
-    end
-  end
+  #   context 'when questionnaire type is QuizQuestionnaire and min_question_score value is negative' do
+  #     it 'creates error: The minimum question score must be a positive integer.' do
+  #       questionnaire.min_question_score = -1
+  #       questionnaire.valid?
+  #       expect(questionnaire.errors[:min_question_score]).to include('The minimum question score must be a positive integer.')                      
+  #   end
+  # end
 
     context 'when questionnaire type is QuizQuestionnaire and max_question_score is less than min_question_score' do
       it 'creates error: The minimum question score must be less than the maximum.' do

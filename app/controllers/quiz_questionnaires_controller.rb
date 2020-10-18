@@ -188,19 +188,19 @@ class QuizQuestionnairesController < QuestionnairesController
   end
 
   # update multiple choice (radio or checkbox) question(s)
-  def create_multchoice(question, choice_key, q_choices)
-    # this method takes combines the functionality of create_radio and create_checkbox, so that all mult choice questions are create by 1 func
-    q = if q_choices[choice_key][:iscorrect] == 1.to_s
-          QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "true", question_id: question.id)
+  def create_multchoice(question, choice_key, q_answer_choices)
+    # this method combines the functionality of create_radio and create_checkbox, so that all mult choice questions are create by 1 func
+    q = if q_answer_choices[choice_key][:iscorrect] == 1.to_s
+          QuizQuestionChoice.new(txt: q_answer_choices[choice_key][:txt], iscorrect: "true", question_id: question.id)
         else
-          QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "false", question_id: question.id)
+          QuizQuestionChoice.new(txt: q_answer_choices[choice_key][:txt], iscorrect: "false", question_id: question.id)
         end
     q.save
   end
 
   # create true/false question
-  def create_truefalse(question, choice_key, q_choices)
-    if q_choices[1.to_s][:iscorrect] == choice_key
+  def create_truefalse(question, choice_key, q_answer_choices)
+    if q_answer_choices[1.to_s][:iscorrect] == choice_key
       q = QuizQuestionChoice.new(txt: "True", iscorrect: "true", question_id: question.id)
       q.save
       q = QuizQuestionChoice.new(txt: "False", iscorrect: "false", question_id: question.id)
@@ -247,12 +247,12 @@ class QuizQuestionnairesController < QuestionnairesController
 
     questions.each do |question|
       q_type = params[:question_type][question_num.to_s][:type]
-      q_choices = params[:new_choices][question_num.to_s][q_type]
-      q_choices.each_key do |choice_key|
+      q_answer_choices = params[:new_choices][question_num.to_s][q_type]
+      q_answer_choices.each_key do |choice_key|
         if q_type == "TrueFalse"
-          create_truefalse(question, choice_key, q_choices)
+          create_truefalse(question, choice_key, q_answer_choices)
         else # create MultipleChoice of either type, rather than creating them separately based on q_type
-          create_multchoice(question, choice_key, q_choices)
+          create_multchoice(question, choice_key, q_answer_choices)
         end
       end
       question_num += 1

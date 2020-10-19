@@ -28,31 +28,32 @@ describe StudentTask do
   let(:submission_record) {build(:submission_record, id:1, team_id: 1, assignment_id: 1) }
   let(:student_task) do
     StudentTask.new(
-        user: user,
-        participant: participant,
-        assignment: assignment,
-        stage_deadline: 'Complete'
-    )
-  end
-  let(:student_task2) do
-    StudentTask.new(
-        user: user,
-        participant: participant,
-        assignment: assignment
+      user: user,
+      participant: participant,
+      assignment: assignment,
     )
   end
 
-  describe "#complete?" do
-    it 'checks a student_task is complete' do
-      expect(student_task.complete?).to be true
-    end
-  end
 
-  describe "#incomplete?" do
-    it 'checks a student_task is incomplete' do
-      expect(student_task2.incomplete?).to be true
-    end
-  end
+describe "#topic_name" do
+	it 'returns the topic name if given one' do
+	expect(topic2.topic_name).to eq("TestReview")
+	end
+
+end
+
+describe "#complete?" do
+      it 'checks a student_task is complete' do
+	student_task.stage_deadline = 'Complete'
+        expect(student_task.complete?).to be true
+      end
+end
+
+describe "#incomplete?" do
+      it 'checks a student_task is incomplete' do
+	expect(student_task.incomplete?).to be true
+      end 	
+end
 
   describe "#not_started?" do
     it 'returns true' do
@@ -197,11 +198,45 @@ describe StudentTask do
     end
   end
 
-  describe '#get_timeline_data' do
-    context 'when no timeline data mapped' do
-      it 'returns nil' do
-        expect(StudentTask.get_timeline_data(assignment, participant, team)).to eq([])
-      end
-    end
-  end
+describe "#revision?" do
+	it 'returns true if content is submitted' do
+	allow(student_task).to receive(:content_submitted_in_current_stage?).and_return(true)
+	allow(student_task).to receive(:reviews_given_in_current_stage?).and_return(false)
+	allow(student_task).to receive(:metareviews_given_in_current_stage?).and_return(false)
+	expect(student_task.revision?).to eq(true)
+	end
+
+	it 'returns true if reviews given is true' do
+	allow(student_task).to receive(:content_submitted_in_current_stage?).and_return(false)
+	allow(student_task).to receive(:reviews_given_in_current_stage?).and_return(true)
+	allow(student_task).to receive(:metareviews_given_in_current_stage?).and_return(false)
+	expect(student_task.revision?).to eq(true)
+	end
+
+	it 'returns true if metareviews given is true' do
+	allow(student_task).to receive(:content_submitted_in_current_stage?).and_return(false)
+	allow(student_task).to receive(:reviews_given_in_current_stage?).and_return(false)
+	allow(student_task).to receive(:metareviews_given_in_current_stage?).and_return(true)
+	expect(student_task.revision?).to eq(true)
+	end
+	
+end
+
+describe "#metreviews_given_in_current_stage?" do
+	it 'return true' do
+	student_task.current_stage = "metareview"
+	allow(student_task).to receive(:metareviews_given?).and_return(true)
+	expect(student_task.metareviews_given_in_current_stage?).to eq(true)
+	end
+end
+
+describe "#reviews_given_in_current_stage?" do
+	it 'return true' do
+	student_task.current_stage = "review"
+	allow(student_task).to receive(:reviews_given?).and_return(true)
+	expect(student_task.reviews_given_in_current_stage?).to eq(true)
+	end
+end
+
+
 end

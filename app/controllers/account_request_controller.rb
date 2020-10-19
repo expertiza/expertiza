@@ -83,13 +83,10 @@ class AccountRequestController < ApplicationController
     roles_for_request_sign_up
   end
 
-  def list_pending_requested_finalized
-    @requested_users = AccountRequest.where.not(:status => 'Under Review').order("created_at DESC").paginate(page: params[:page], per_page: 10)
-    @roles = Role.all
-
-  end
   def list_pending_requested
-    @requested_users = AccountRequest.where(:status => 'Under Review').order("created_at DESC").paginate(page: params[:page], per_page: 10)
+    # @requested_users = AccountRequest.all
+    # display all requests with pagination and in reverse chronologigal order
+    @requested_users = AccountRequest.all.order(created_at: :desc).paginate(page: params[:page], per_page: 10) 
     @roles = Role.all
   end
 

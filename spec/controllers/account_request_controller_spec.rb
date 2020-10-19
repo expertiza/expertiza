@@ -93,18 +93,10 @@ describe AccountRequestController do
   end
 
   context "#list_pending_requested" do
-    it 'test list_pending_requested view' do
+    it 'test list_pednign_requested view' do
       stub_current_user(super_admin, super_admin.role.name, super_admin.role)
       get :list_pending_requested
       expect(response).to render_template(:list_pending_requested)
-    end
-  end
-
-  context "#list_pending_requested_finalized" do
-    it 'test list_pending_requested_finalized view' do
-      stub_current_user(super_admin, super_admin.role.name, super_admin.role)
-      get :list_pending_requested_finalized
-      expect(response).to render_template(:list_pending_requested_finalized)
     end
   end
 

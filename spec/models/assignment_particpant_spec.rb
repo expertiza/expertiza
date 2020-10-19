@@ -289,7 +289,7 @@ describe AssignmentParticipant do
         let(:test_user) do
           {name: 'abc', email: 'abcbbc@gmail.com'}
         end
-        it 'create the user and number of mails sent should be 1' do
+        it 'create the user and number of mails sent should be 2' do
           ActionMailer::Base.deliveries.clear
           allow(ImportFileHelper).to receive(:define_attributes).with(row).and_return(attributes)
           allow(ImportFileHelper).to receive(:create_new_user) do
@@ -305,7 +305,7 @@ describe AssignmentParticipant do
           allow(AssignmentParticipant).to receive(:exists?).and_return(false)
           allow(AssignmentParticipant).to receive(:create).and_return(participant)
           allow(AssignmentParticipant).to receive(:set_handle)
-          expect{(AssignmentParticipant.import(row, nil, {}, 1))}.to change { ActionMailer::Base.deliveries.count }.by(1)
+          expect{(AssignmentParticipant.import(row, nil, {}, 1))}.to change { ActionMailer::Base.deliveries.count }.by(2)
         end
       end
 

@@ -1,8 +1,8 @@
 describe Response do
   let(:participant) { build(:participant, id: 1, user: build(:student, name: 'no name', fullname: 'no one')) }
   let(:participant2) { build(:participant, id: 2) }
-  let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
   let(:course) { build(:course, id: 1, name: 'History', instructor: build(:instructor, email: 'tluo@ncsu.edu'))}
+  let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt', instructor: build(:instructor, email: 'tluo@ncsu.edu')) }
   let(:team) { build(:assignment_team) }
   let(:signed_up_team) { build(:signed_up_team, team_id: team.id) }
   let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
@@ -15,6 +15,20 @@ describe Response do
   let(:questionnaire2) { ReviewQuestionnaire.new(id: 2, questions: [question2], max_question_score: 5) }
   let(:tag_prompt) {TagPrompt.new(id: 1, prompt: "prompt")}
   let(:tag_prompt_deployment) {TagPromptDeployment.new(id: 1, tag_prompt_id: 1, assignment_id: 1, questionnaire_id: 1, question_type: 'Criterion')}
+  let(:mail) { Mailer.notify_grade_conflict_message(
+    to: 'tluo@ncsu.edu',
+    subject: 'Expertiza Notification: A review score is outside the acceptable range',
+    body: {
+      reviewer_name: 'no one',
+      type: 'review',
+      reviewee_name: 'no one',
+      new_score: 0.96,
+      assignment: assignment,
+      conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=1',
+      summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=2',
+      assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/1/edit'
+    }
+  )}
   before(:each) do
     allow(response).to receive(:map).and_return(review_response_map)
   end
@@ -194,6 +208,44 @@ describe Response do
                                                              .and_return(double('AssignmentQuestionnaire', notification_limit: 5.0))
           expect(response.significant_difference?).to be true
         end
+      end
+    end
+  end
+
+  describe '#notify_instructor_on_difference' do
+    before(:each) do
+      allow(review_response_map).to receive(:reviewer_id).and_return(1)
+      allow(review_response_map).to receive(:reviewee_id).and_return(2)
+    end
+
+    context 'when a review score is outside the acceptable range' do
+      it 'sends notification to assignment instructor' do
+        allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+        allow(participant).to receive(:user_id).and_return(2)
+        allow(User).to receive(:find).with(2).and_return(participant.user)
+        allow(AssignmentTeam).to receive(:find).with(2).and_return(team)
+        allow(team).to receive(:participants).and_return([participant])
+        allow(User).to receive(:find).with(2).and_return(participant.user)
+        allow(participant).to receive(:parent_id).and_return(3)
+        allow(Assignment).to receive(:find).with(3).and_return(assignment)
+        allow(response).to receive(:total_score).and_return(96)
+        allow(response).to receive(:maximum_score).and_return(100)
+        allow(Mailer).to receive(:notify_grade_conflict_message).and_return(mail)
+        expect(Mailer).to receive(:notify_grade_conflict_message).with(
+          to: 'tluo@ncsu.edu',
+          subject: 'Expertiza Notification: A review score is outside the acceptable range',
+          body: {
+            reviewer_name: 'no one',
+            type: 'review',
+            reviewee_name: 'no one',
+            new_score: 0.96,
+            assignment: assignment,
+            conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=1',
+            summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=1',
+            assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/1/edit'
+          }
+        )
+        response.notify_instructor_on_difference
       end
     end
   end

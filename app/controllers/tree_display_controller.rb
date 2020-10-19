@@ -52,7 +52,7 @@ class TreeDisplayController < ApplicationController
     folders = {}
     FolderNode.get.each do |folder_node|
       child_nodes = folder_node.get_children(nil, nil, session[:user].id, nil, nil)
-       # Serialize the contents of each node so it can be displayed on the UI
+      # Serialize the contents of each node so it can be displayed on the UI
       contents = []
       child_nodes.each do |node|
       # TODO: INCLUDE THE CHILDREN NODES HERE, ITS FILTERING TOO MUCH AND NOT RETRIEVING ANYTHING USEFUL INT EH CHILDREN SECTION OF THE REACT REFERENCE HERE

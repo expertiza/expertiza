@@ -16,6 +16,7 @@ window.addEventListener('load', e => {
     app_variables.currentUserId = treeDisplayDiv.dataset.userId;
   }
 });
+
 jQuery(document).ready(function() {
   // This preloadedImages function is refered from http://jsfiddle.net/slashingweapon/8jAeu/
   // Actually I am not using the values in preloadedImages, but image loading speed is indeed getting faster
@@ -116,6 +117,24 @@ jQuery(document).ready(function() {
           // show edit button only for the items which are associated to that user
           /** TODO: EXPLAIN WHY THIS WORKS */
           /** its checking if the user is an instructor, but how can it differentiate the types by the instructor here anyways? */
+          /** it was checking for the user id to verify if they had permissions to view the data directly after they clicked on it
+          Apparently the app_variables.currentUserId was null or not equal to anything
+          Need to test/check if this gives access to users that shouldnt have this */
+          // if (app_variables.currentUserId == null || this.props.instructor_id == app_variables.currentUserId) {
+            moreContent.push(
+              <span>
+                <a title="Edit" href={"/"+newNodeType+"/"+(parseInt(this.props.id)/2).toString()+"/edit"}><img src="/assets/tree_view/edit-icon-24.png" /></a>
+              </span>
+            );  
+          // }
+          moreContent.push(
+            <span>
+              <a title="Delete" href={"/tree_display/confirm?id="+(parseInt(this.props.id)/2).toString()+"&nodeType="+newNodeType}><img src="/assets/tree_view/delete-icon-24.png" /></a>
+            </span>
+          )
+        }
+        moreContent.push(
+          <span>
           // if (app_variables.currentUserId == null || this.props.instructor_id == app_variables.currentUserId) {
             moreContent.push(
               <span>

@@ -230,8 +230,7 @@ describe QuizQuestionnairesController do
                                   instructor_loc: ''},
                   question: {'1' => {txt: 'Q1'},
                              '2' => {txt: 'Q2'},
-                             '3' => {txt: 'Q3'},
-                             '4' => {text: 'Q4'}},
+                             '3' => {txt: 'Q3'}},
                   quiz_question_choices: {'1' => {MultipleChoiceRadio:
                                                       {:correctindex => 1,
                                                        '1' => {txt: 'a11'},
@@ -240,11 +239,10 @@ describe QuizQuestionnairesController do
                                                        '4' => {txt: 'a14'}}},
                                           '2' => {TrueFalse: {'1' => {iscorrect: 'True'}}},
                                           '3' => {MultipleChoiceCheckbox:
-                                                      {'1' => {iscorrect: '0', txt: 'a31'},
-                                                       '2' => {iscorrect: '1', txt: 'a32'},
+                                                      {'1' => {iscorrect: '1', txt: 'a31'},
+                                                       '2' => {iscorrect: '0', txt: 'a32'},
                                                        '3' => {iscorrect: '1', txt: 'a33'},
-                                                       '4' => {iscorrect: '0', txt: 'a34'}}}
-                                          '4' => {TrueFalse: {'1' => {iscorrect: 'False'}}}},
+                                                       '4' => {iscorrect: '0', txt: 'a34'}}}},
                   question_weights: {'1' => {txt: '1'},
                                     '2' => {txt: '1'},
                                     '3' => {txt: '1'}}}
@@ -313,7 +311,7 @@ describe QuizQuestionnairesController do
       controller.params = {new_question: {'1' => 'q1', '2' => 'q2', '3' => 'q3'},
                            new_choices: {'1' => {MultipleChoiceRadio: {'1' => {txt: 'a11', iscorrect: '3'},
                                                                        '2' => {txt: 'a12'}, '3' => {txt: 'a13'}, '4' => {txt: 'a14'}}},
-                                         '2' => {TrueFalse: {'1' => {iscorrect: '0'}}},
+                                         '2' => {TrueFalse: {'1' => {iscorrect: '1'}}},
                                          '3' => {MultipleChoiceCheckbox: {'1' => {iscorrect: '1', txt: 'a31'},
                                                                           '2' => {iscorrect: '0', txt: 'a32'},
                                                                           '3' => {iscorrect: '1', txt: 'a33'},

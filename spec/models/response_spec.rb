@@ -2,7 +2,7 @@ describe Response do
   let(:participant) { build(:participant, id: 1, user: build(:student, name: 'no name', fullname: 'no one')) }
   let(:participant2) { build(:participant, id: 2) }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
-  let(:course) { build(:course, id: 1, name: 'History')}
+  let(:course) { build(:course, id: 1, name: 'History', instructor: build(:instructor, email: 'tluo@ncsu.edu'))}
   let(:team) { build(:assignment_team) }
   let(:signed_up_team) { build(:signed_up_team, team_id: team.id) }
   let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }

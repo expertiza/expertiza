@@ -45,6 +45,7 @@ class PopupController < ApplicationController
       # If the reviewer is a participant, the id is currently the id of the assignment participant.
       # However, we want their user_id. This is not possible for teams, so we just return the current id
       reviewer_id = ResponseMap.find(params[:id2]).reviewer_id
+      # E2060 - we had to change this if/else clause in order to properly view reports page 
       if @assignment.reviewer_is_team
         @reviewer_id = reviewer_id
       else

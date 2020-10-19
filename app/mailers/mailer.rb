@@ -69,6 +69,7 @@ class Mailer < ActionMailer::Base
     @proposer = defn[:body][:proposer]
 
     defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
+    defn[:cc] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
     mail(subject: defn[:subject],
          to: defn[:to],
          bcc: defn[:cc])

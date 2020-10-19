@@ -139,6 +139,12 @@ describe "Assignment creation page", js: true do
 		find_link('Due date').click
 		expect(page).to have_content("Deadline type")
 	end
+	it "is able show tab Etc." do
+		assignment_creation_setup(0,'public assignment for test')
+
+		find_link('Etc.').click
+		expect(page).to have_content("Create teams")
+	end
 	
 	it "set the deadline for an assignment review" do
 		assignment_creation_setup(0,'public assignment for test')

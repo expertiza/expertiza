@@ -27,6 +27,7 @@ describe "assignment submisstion test" do
     click_link "Your work"
   end
 
+  #define the student_task/list page
   def list_page
     user = User.find_by(name: "student2064")
     login_as(user.name)
@@ -36,10 +37,11 @@ describe "assignment submisstion test" do
     visit '/student_task/list'
   end
 
+  #test for student_task/list page to have the right content
   it "have the right content" do
     list_page
     expect(page).to have_content("Assignments")
-    expect(page).to have_no_content("badge")
+    expect(page).to have_no_content("badges")
     expect(page).to have_no_content("Review Grade")
     expect(page).to have_content("Assignment")
     expect(page).to have_content("Submission Grade")

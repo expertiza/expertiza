@@ -125,7 +125,7 @@ jQuery(document).ready(function() {
 
 
           // if (app_variables.currentUserId == null || this.props.instructor_id == app_variables.currentUserId) {
-          if(newNodeType == 'questionnaires') { // should only be viewed by either assignments or courses
+          if(newNodeType != 'questionnaires') { // should only be viewed by either assignments or courses
               moreContent.push(
                   <span>
                 <a title="Edit" href={"/" + newNodeType + "/" + (parseInt(this.props.id) / 2).toString() + "/edit"}><img

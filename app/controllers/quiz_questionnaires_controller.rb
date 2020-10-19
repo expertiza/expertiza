@@ -70,6 +70,10 @@ class QuizQuestionnairesController < QuestionnairesController
         elsif @questionnaire.max_question_score < @questionnaire.min_question_score  
           flash[:error] = "Maximum question score cannot be less than minumum question score." 
           redirect_to :back
+        else
+          save_choices @questionnaire.id
+          flash[:note] = "The quiz was successfully created." if @successful_create
+          redirect_to controller: 'submitted_content', action: 'edit', id: participant_id
         end
       else
         save_choices @questionnaire.id

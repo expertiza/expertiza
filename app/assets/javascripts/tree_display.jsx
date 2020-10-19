@@ -125,11 +125,14 @@ jQuery(document).ready(function() {
 
 
           // if (app_variables.currentUserId == null || this.props.instructor_id == app_variables.currentUserId) {
-            moreContent.push(
-              <span>
-                <a title="Edit" href={"/"+newNodeType+"/"+(parseInt(this.props.id)/2).toString()+"/edit"}><img src="/assets/tree_view/edit-icon-24.png" /></a>
+          if(newNodeType == 'questionnaires') { // should only be viewed by either assignments or courses
+              moreContent.push(
+                  <span>
+                <a title="Edit" href={"/" + newNodeType + "/" + (parseInt(this.props.id) / 2).toString() + "/edit"}><img
+                    src="/assets/tree_view/edit-icon-24.png"/></a>
               </span>
-            );  
+              );
+          }
           // }
           moreContent.push(
             <span>

@@ -36,10 +36,10 @@ describe "Integration tests for instructor interface" do
     end
   end
 
-  describe "View Publishing Rights" do
+  describe "View Copyright Grants" do
     it 'should display teams for assignment without topic' do
       login_as("instructor6")
-      visit '/participants/view_publishing_rights?id=1'
+      visit '/participants/view_copyright_grants?id=1'
       expect_page_content_to_have(['Team name'], true)
       expect_page_content_to_have(['Topic name(s)', 'Topic #'], false)
     end

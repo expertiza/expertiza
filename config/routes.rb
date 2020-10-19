@@ -213,7 +213,7 @@ resources :institution, except: [:destroy] do
       post :update_authorizations
       post :update_duties
       post :change_handle
-      get :view_publishing_rights
+      get :view_copyright_grants
     end
   end
 

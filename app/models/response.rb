@@ -44,9 +44,7 @@ class Response < ActiveRecord::Base
     end
     sum
   end
-
-
-
+	
   def delete
     self.scores.each(&:destroy)
     self.destroy
@@ -95,7 +93,6 @@ class Response < ActiveRecord::Base
     defn[:subject] = "A new submission is available for " + parent.name
     response_map.email(defn, participant, parent)
   end
-
 
   # This method is called in 'response_controller.rb' method: show_calibration_results_for_student
   # It takes an assignment object as input and return questions to show in Show calibration results page
@@ -309,6 +306,4 @@ class Response < ActiveRecord::Base
     end
     code
   end
-
-
 end

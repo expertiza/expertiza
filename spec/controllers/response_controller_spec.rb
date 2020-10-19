@@ -302,6 +302,7 @@ describe ResponseController do
     end
   end
 
+
   describe '#pending_surveys' do
     context 'when session[:user] is nil' do
       it 'redirects to root path (/)' do

@@ -7,10 +7,12 @@ describe Response do
   let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer]) }
   let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
   let(:answer2) { Answer.new(answer: 2, comments: 'Answer text', question_id: 2) }
-  let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
+  let(:question) { Criterion.new(id: 1, questionnaire_id: 1, weight: 2, break_before: true) }
   let(:question2) { TextArea.new(id: 1, weight: 2, break_before: true) }
   let(:questionnaire) { ReviewQuestionnaire.new(id: 1, questions: [question], max_question_score: 5) }
   let(:questionnaire2) { ReviewQuestionnaire.new(id: 2, questions: [question2], max_question_score: 5) }
+  let(:questionnaire3) { ReviewQuestionnaire.new(id: 3, questions: [question, question2], max_question_score: 5)}
+  let(:assignment_questionnaire) {AssignmentQuestionnaire.new(id: 1, assignment_id: 1, questionnaire_id: 1)}
   let(:tag_prompt) {TagPrompt.new(id: 1, prompt: "prompt")}
   let(:tag_prompt_deployment) {TagPromptDeployment.new(id: 1, tag_prompt_id: 1, assignment_id: 1, questionnaire_id: 1, question_type: 'Criterion')}
   before(:each) do
@@ -150,6 +152,26 @@ describe Response do
                                                                   .and_return(["Answer textAnswer textLGTM", 2, "Answer text", 1, "Answer textLGTM", 1, "", 0])
       expect(Response.get_volume_of_review_comments(1, 1)).to eq([1, 2, 2, 0])
     end
+  end
+
+  describe '.get_questions_from_assignment' do
+
+    it 'returns nil from assignment' do
+      allow(Response).to receive(:get_questions_from_assignment).with(assignment)
+      expect(Response.get_questions_from_assignment(assignment)).to eq(nil)
+    end
+
+  end
+
+  describe '.get_most_recent_response' do
+
+    it 'returns most recent response from response map' do
+      allow(response).to receive(:get_most_recent_response).with(review_response_map, response, 1)
+      expect(response.id).to eq(1)
+      expect(response.map_id).to eq(1)
+      expect(response.round).to eq(1)
+    end
+
   end
 
   describe '#significant_difference?' do

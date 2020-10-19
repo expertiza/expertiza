@@ -95,7 +95,7 @@ describe Response do
   end
 
   describe '#email' do
-    it 'calls email method in corresponding respons maps' do
+    it 'calls email method in corresponding response maps' do
       assignment_survey_response_map = double('AssignmentSurveyResponseMap', reviewer_id: 1)
       allow(ResponseMap).to receive(:find).with(1).and_return(assignment_survey_response_map)
       allow(Participant).to receive(:find).with(1).and_return(participant)

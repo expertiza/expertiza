@@ -28,38 +28,180 @@ describe StudentTask do
   let(:submission_record) {build(:submission_record, id:1, team_id: 1, assignment_id: 1) }
   let(:student_task) do
     StudentTask.new(
-      user: user,
-      participant: participant,
-      assignment: assignment,
-      stage_deadline: 'Complete'
+        user: user,
+        participant: participant,
+        assignment: assignment,
+        stage_deadline: 'Complete'
     )
   end
   let(:student_task2) do
     StudentTask.new(
-      user: user,
-      participant: participant,
-      assignment: assignment
+        user: user,
+        participant: participant,
+        assignment: assignment
     )
   end
 
-describe "#complete?" do
-      it 'checks a student_task is complete' do
-        expect(student_task.complete?).to be true
+  describe "#complete?" do
+    it 'checks a student_task is complete' do
+      expect(student_task.complete?).to be true
+    end
+  end
+
+  describe "#incomplete?" do
+    it 'checks a student_task is incomplete' do
+      expect(student_task2.incomplete?).to be true
+    end
+  end
+
+  describe "#not_started?" do
+    it 'returns true' do
+      allow(student_task).to receive(:in_work_stage?).and_return(true)
+      allow(student_task).to receive(:started?).and_return(true)
+      expect(student_task.not_started?).to eq(false)
+    end
+  end
+  describe "#teamed_students" do
+    context 'when not in any team' do
+      it 'returns empty' do
+        expect(StudentTask.teamed_students(user3)).to eq({})
       end
-end
+    end
+    context 'when assigned in a cource_team ' do
+      it 'returns empty' do
+        allow(user).to receive(:teams).and_return([course_team])
+        expect(StudentTask.teamed_students(user)).to eq({})
+      end
+    end
+    context 'when assigned in a assignment_team ' do
+      it 'returns empty' do
+        allow(user).to receive(:teams).and_return([team])
+        allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: assignment.id).and_return(participant)
+        allow(AssignmentParticipant).to receive(:find_by).with(user_id: 5, parent_id: assignment.id).and_return(participant2)
+        allow(Assignment).to receive(:find_by).with(id: team.parent_id).and_return(assignment)
+        # allow(Team).to receive(:find).with(team.id).and_return(team)
+        expect(StudentTask.teamed_students(user)).to eq({assignment.course_id => [user2.fullname]})
+      end
+    end
+  end
+  describe "#get_due_date_data" do
+    context 'when called with assignment having empty due dates' do
+      it "return empty time_list array" do
+        timeline_list = []
+        StudentTask.get_due_date_data(assignment, timeline_list)
+        expect(timeline_list).to eq([])
+      end
+    end
+    context 'when called with assignment having due date' do
+      context 'and due_at value nil' do
+        it "return empty time_list array" do
+          allow(due_date).to receive(:deadline_type).and_return(deadline_type)
+          timeline_list = []
+          due_date.due_at=nil;
+          assignment.due_dates = [due_date]
+          StudentTask.get_due_date_data(assignment, timeline_list)
+          expect(timeline_list).to eq([])
+        end
+      end
+      context 'and due_at value not nil' do
+        it "return time_list array" do
+          allow(due_date).to receive(:deadline_type).and_return(deadline_type)
+          timeline_list = []
+          assignment.due_dates = [due_date]
+          StudentTask.get_due_date_data(assignment, timeline_list)
+          expect(timeline_list).to eq([{
+                                           :label=>(due_date.deadline_type.name + ' Deadline').humanize,
+                                           :updated_at=>due_date.due_at.strftime('%a, %d %b %Y %H:%M')
+                                       }])
+        end
+      end
+    end
+  end
+  describe "#get_peer_review_data" do
+    context 'when no review response mapped' do
+      it 'returns empty' do
+        timeline_list=[]
+        StudentTask.get_peer_review_data(user2,timeline_list)
+        expect(timeline_list).to eq([])
+      end
+    end
+    context 'when mapped to review response map' do
+      it 'returns timeline array' do
+        timeline_list=[]
+        allow(ReviewResponseMap).to receive_message_chain(:where, :find_each).with(reviewer_id: 1).with(no_args).and_yield(review_response_map)
+        allow(review_response_map).to receive(:id).and_return(1)
+        allow(Response).to receive_message_chain(:where, :last).with(map_id: 1).with(no_args).and_return(response)
+        allow(response).to receive(:round).and_return(1)
+        allow(response).to receive(:updated_at).and_return(Time.new(2019))
+        timevalue = Time.new(2019).strftime('%a, %d %b %Y %H:%M')
+        expect(StudentTask.get_peer_review_data(1,timeline_list)).to eq([{:id=>1, :label=>"Round 1 peer review", :updated_at=>timevalue}])
+      end
+    end
+  end
+  describe "#get_author_feedback_data" do
+    context 'when no feedback response mapped' do
+      it 'returns empty' do
+        timeline_list=[]
+        StudentTask.get_author_feedback_data(user2,timeline_list)
+        expect(timeline_list).to eq([])
+      end
+    end
+    context 'when mapped to feedback response map' do
+      it 'returns timeline array' do
+        timeline_list=[]
+        allow(FeedbackResponseMap).to receive_message_chain(:where, :find_each).with(reviewer_id: 1).with(no_args).and_yield(review_response_map)
+        allow(review_response_map).to receive(:id).and_return(1)
+        allow(Response).to receive_message_chain(:where, :last).with(map_id: 1).with(no_args).and_return(response)
+        allow(response).to receive(:updated_at).and_return(Time.now)
+        timevalue = Time.now.strftime('%a, %d %b %Y %H:%M')
+        expect(StudentTask.get_author_feedback_data(1,timeline_list)).to eq([{:id=>1, :label=>"Author feedback", :updated_at=>timevalue}])
+      end
+    end
+  end
+  describe '#get_submission_data' do
+    context 'when no submission data mapped' do
+      it 'returns nil' do
+        timeline_list=[]
+        expect(StudentTask.get_submission_data(1,1,timeline_list)).to eq(nil)
+      end
+    end
+    context 'when submission data mapped and not submit hyperlink or Remove hyperlink' do
+      it 'returns timeline_list' do
+        timeline_list=[]
+        allow(SubmissionRecord).to receive_message_chain(:where, :find_each).with(team_id: 1, assignment_id: 1).with(no_args).and_yield(submission_record)
+        allow(submission_record).to receive(:operation).and_return('testing_label')
+        allow(submission_record).to receive(:updated_at).and_return(Time.new(2019))
+        timevalue = Time.new(2019).strftime('%a, %d %b %Y %H:%M')
+        expect(StudentTask.get_submission_data(1,1,timeline_list)).to eq([{:label=>"Testing label", :updated_at=>timevalue}])
+      end
+    end
+    context 'when submission data mapped and operation is submit_hyperlink' do
+      it 'returns timeline_list with link' do
+        timeline_list=[]
+        allow(SubmissionRecord).to receive_message_chain(:where, :find_each).with(team_id: 1, assignment_id: 1).with(no_args).and_yield(submission_record)
+        allow(submission_record).to receive(:operation).and_return('Submit Hyperlink')
+        allow(submission_record).to receive(:updated_at).and_return(Time.new(2019))
+        timevalue = Time.new(2019).strftime('%a, %d %b %Y %H:%M')
+        expect(StudentTask.get_submission_data(1,1,timeline_list)).to eq([{:label=>"Submit hyperlink", :updated_at=>timevalue, :link=>"www.wolfware.edu"}])
+      end
+    end
+    context 'when submission data mapped and operation is Remove Hyperlink' do
+      it 'returns timeline_list with link' do
+        timeline_list=[]
+        allow(SubmissionRecord).to receive_message_chain(:where, :find_each).with(team_id: 1, assignment_id: 1).with(no_args).and_yield(submission_record)
+        allow(submission_record).to receive(:operation).and_return('Remove Hyperlink')
+        timevalue = Time.new(2019).strftime('%a, %d %b %Y %H:%M')
+        allow(submission_record).to receive(:updated_at).and_return(Time.new(2019))
+        expect(StudentTask.get_submission_data(1,1,timeline_list)).to eq([{:label=>"Remove hyperlink", :updated_at=>timevalue, :link=>"www.wolfware.edu"}])
+      end
+    end
+  end
 
-describe "#incomplete?" do
-      it 'checks a student_task is incomplete' do
-	expect(student_task2.incomplete?).to be true
-      end 	
-end
-
-describe "#not_started?" do
-	it 'returns true' do
-	allow(student_task).to receive(:in_work_stage?).and_return(true)
-	allow(student_task).to receive(:started?).and_return(true)
-	expect(student_task.not_started?).to eq(false)
-	end
-end
-
+  describe '#get_timeline_data' do
+    context 'when no timeline data mapped' do
+      it 'returns nil' do
+        expect(StudentTask.get_timeline_data(assignment, participant, team)).to eq([])
+      end
+    end
+  end
 end

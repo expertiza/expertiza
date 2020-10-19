@@ -240,10 +240,10 @@ describe QuizQuestionnairesController do
                                                        '4' => {txt: 'a14'}}},
                                           '2' => {TrueFalse: {'1' => {iscorrect: 'True'}}},
                                           '3' => {MultipleChoiceCheckbox:
-                                                      {'1' => {iscorrect: '1', txt: 'a31'},
-                                                       '2' => {iscorrect: '0', txt: 'a32'},
-                                                       '3' => {iscorrect: '1', txt: 'a33'},
-                                                       '4' => {iscorrect: '0', txt: 'a34'}}},
+                                                      {'1' => {iscorrect: '0', txt: 'a31'},
+                                                       '2' => {iscorrect: '1', txt: 'a32'},
+                                                       '3' => {iscorrect: '0', txt: 'a33'},
+                                                       '4' => {iscorrect: '1', txt: 'a34'}}},
                                           '4' => {TrueFalse: {'1' => {iscorrect: 'False'}}}},
                   question_weights: {'1' => {txt: '1'},
                                     '2' => {txt: '1'},
@@ -315,22 +315,25 @@ describe QuizQuestionnairesController do
 
   describe '#save_choices' do
     it 'is able to save different kinds of quiz questions' do
-      controller.params = {new_question: {'1' => 'q1', '2' => 'q2', '3' => 'q3'},
+      controller.params = {new_question: {'1' => 'q1', '2' => 'q2', '3' => 'q3', '4' => 'q4'},
                            new_choices: {'1' => {MultipleChoiceRadio: {'1' => {txt: 'a11', iscorrect: '3'},
                                                                        '2' => {txt: 'a12'}, '3' => {txt: 'a13'}, '4' => {txt: 'a14'}}},
                                          '2' => {TrueFalse: {'1' => {iscorrect: '0'}}},
-                                         '3' => {MultipleChoiceCheckbox: {'1' => {iscorrect: '1', txt: 'a31'},
-                                                                          '2' => {iscorrect: '0', txt: 'a32'},
+                                         '3' => {MultipleChoiceCheckbox: {'1' => {iscorrect: '0', txt: 'a31'},
+                                                                          '2' => {iscorrect: '1', txt: 'a32'},
                                                                           '3' => {iscorrect: '1', txt: 'a33'},
-                                                                          '4' => {iscorrect: '0', txt: 'a34'}}}},
+                                                                          '4' => {iscorrect: '0', txt: 'a34'}}},
+                                          '4' => {TrueFalse: {'1' => {iscorrect: '1'}}}},
                            question_type: {'1' => {type: 'MultipleChoiceRadio'},
                                            '2' => {type: 'TrueFalse'},
-                                           '3' => {type: 'MultipleChoiceCheckbox'}}}
+                                           '3' => {type: 'MultipleChoiceCheckbox'},
+                                           '4' => {type: 'TrueFalse'}}}
       q1 = build(:question, id: 1, type: 'MultipleChoiceRadio')
       q2 = build(:question, id: 2, type: 'TrueFalse')
       q3 = build(:question, id: 3, type: 'MultipleChoiceCheckbox')
-      allow(Question).to receive(:where).with(questionnaire_id: 1).and_return([q1, q2, q3])
-      expect { controller.send(:save_choices, 1) }.to change { QuizQuestionChoice.count }.from(0).to(10)
+      q4 = build(:question, id: 4, type: 'TrueFalse')
+      allow(Question).to receive(:where).with(questionnaire_id: 1).and_return([q1, q2, q3, q4])
+      expect { controller.send(:save_choices, 1) }.to change { QuizQuestionChoice.count }.from(0).to(12)
     end
   end
 end

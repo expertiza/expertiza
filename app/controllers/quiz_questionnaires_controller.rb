@@ -58,30 +58,19 @@ class QuizQuestionnairesController < QuestionnairesController
       @questionnaire.instructor_id = author_team.id # for a team assignment, set the instructor id to the team_id
 
       @successful_create = true
+      save
 
-      unless @questionnaire.save
-        @errors.append @questionnaire.errors
-      end
-
-      if @errors.any?
-        if @questionnaire.min_question_score < 0 || @questionnaire.max_question_score < 0 
-          flash[:error] = "Minumum and/or maximum question score cannot be less than 0." 
-          redirect_to :back
-        elsif @questionnaire.max_question_score < @questionnaire.min_question_score  
-          flash[:error] = "Maximum question score cannot be less than minumum question score." 
-          redirect_to :back
-        else
-          save_choices @questionnaire.id
-          flash[:note] = "The quiz was successfully created." if @successful_create
-          redirect_to controller: 'submitted_content', action: 'edit', id: participant_id
-        end
+      if @questionnaire.min_question_score < 0 || @questionnaire.max_question_score < 0
+        flash[:error] = "Minumum and/or maximum question score cannot be less than 0."
+        redirect_to :back
+      elsif @questionnaire.max_question_score < @questionnaire.min_question_score
+        flash[:error] = "Maximum question score cannot be less than minumum question score."
+        redirect_to :back
       else
         save_choices @questionnaire.id
         flash[:note] = "The quiz was successfully created." if @successful_create
         redirect_to controller: 'submitted_content', action: 'edit', id: participant_id
       end
-      
-      
     else
       flash[:error] = valid.to_s
       redirect_to :back

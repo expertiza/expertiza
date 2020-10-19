@@ -175,10 +175,11 @@ class SignUpTopic < ActiveRecord::Base
     signuptopic.assignment_id = suggestion.assignment_id
     signuptopic.max_choosers = 1
     if signuptopic.save && suggestion.update_attribute('status', 'Approved')
-      flash[:success] = 'The suggestion was successfully approved.'
+      isSuccess = true
     else
-      flash[:error] = 'An error occurred when approving the suggestion.'
+      isSuccess = false
     end
+    return isSuccess
   end
 
 end

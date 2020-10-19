@@ -152,6 +152,7 @@ describe 'Tests mailer' do
   end
 
   it 'should send email with a suggested topic is approved' do
+    ActionMailer::Base.deliveries.clear
     # Send the email, then test that it got queued
     email = Mailer.suggested_topic_approved_message(
       to: 'tluo@ncsu.edu',
@@ -162,13 +163,18 @@ describe 'Tests mailer' do
         proposer: 'User'
       }
     ).deliver_now
-    expect(email.from[0]).to eq("expertiza.development@gmail.com")
-    expect(email.to[0]).to eq('expertiza.development@gmail.com')
-    expect(email.bcc[0]).to eq('expertiza.development@gmail.com')
-    expect(email.subject).to eq("Suggested topic 'Test' has been approved")
+
+    ActionMailer::Base.deliveries.last.tap do |mail|
+      expect(mail.from).to eq(["expertiza.development@gmail.com"])
+      expect(mail.to).to eq(["expertiza.development@gmail.com"])
+      expect(mail.bcc).to eq(["expertiza.development@gmail.com"])
+      expect(mail.subject).to eq(email.subject)
+      expect(mail.body).to eq(email.body)
+    end
   end
 
   it 'should send email to required email address when score is outside acceptable value ' do
+    ActionMailer::Base.deliveries.clear
     # Send the email, then test that it got queued
     email = Mailer.notify_grade_conflict_message(
       to: 'tluo@ncsu.edu',
@@ -185,8 +191,11 @@ describe 'Tests mailer' do
       }
     ).deliver_now
 
-    expect(email.from[0]).to eq("expertiza.development@gmail.com")
-    expect(email.to[0]).to eq('expertiza.development@gmail.com')
-    expect(email.subject).to eq('Test')
+    ActionMailer::Base.deliveries.last.tap do |mail|
+      expect(mail.from).to eq(["expertiza.development@gmail.com"])
+      expect(mail.to).to eq(["expertiza.development@gmail.com"])
+      expect(mail.subject).to eq(email.subject)
+      expect(mail.body).to eq(email.body)
+    end
   end
 end

@@ -1,1 +1,1 @@
-User.create([{name:'admin',email:'twang33@ncsu.edu', role_id:3}])
+

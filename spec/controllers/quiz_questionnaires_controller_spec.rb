@@ -230,7 +230,8 @@ describe QuizQuestionnairesController do
                                   instructor_loc: ''},
                   question: {'1' => {txt: 'Q1'},
                              '2' => {txt: 'Q2'},
-                             '3' => {txt: 'Q3'}},
+                             '3' => {txt: 'Q3'},
+                             '4' => {txt: 'Q4'}},
                   quiz_question_choices: {'1' => {MultipleChoiceRadio:
                                                       {:correctindex => 1,
                                                        '1' => {txt: 'a11'},
@@ -242,28 +243,34 @@ describe QuizQuestionnairesController do
                                                       {'1' => {iscorrect: '1', txt: 'a31'},
                                                        '2' => {iscorrect: '0', txt: 'a32'},
                                                        '3' => {iscorrect: '1', txt: 'a33'},
-                                                       '4' => {iscorrect: '0', txt: 'a34'}}}},
+                                                       '4' => {iscorrect: '0', txt: 'a34'}}},
+                                          '4' => {TrueFalse: {'1' => {iscorrect: 'False'}}}},
                   question_weights: {'1' => {txt: '1'},
                                     '2' => {txt: '1'},
-                                    '3' => {txt: '1'}}}
+                                    '3' => {txt: '1'},
+                                    '4' => {txt: '1'}}}
         questionnaire = double('Questionnaire')
         allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
         allow(questionnaire).to receive(:update_attributes).with(any_args).and_return(true)
         q1 = build(:question, id: 1, type: 'MultipleChoiceRadio')
         q2 = build(:question, id: 2, type: 'TrueFalse')
         q3 = build(:question, id: 3, type: 'MultipleChoiceCheckbox')
+        q4 = build(:question, id: 4, type: 'TrueFalse')
         allow(Question).to receive(:find).with('1').and_return(q1)
         allow(Question).to receive(:find).with('2').and_return(q2)
         allow(Question).to receive(:find).with('3').and_return(q3)
+        allow(Question).to receive(:find).with('4').and_return(q4)
         qc = double('QuizQuestionChoice')
         # quiz question choice for true/false question
         qc_tf = double('QuizQuestionChoice', txt: 'True')
         allow(QuizQuestionChoice).to receive(:where).with(question_id: '1').and_return([qc, qc, qc, qc])
         allow(QuizQuestionChoice).to receive(:where).with(question_id: '2').and_return([qc_tf])
         allow(QuizQuestionChoice).to receive(:where).with(question_id: '3').and_return([qc, qc, qc, qc])
+        allow(QuizQuestionChoice).to receive(:where).with(question_id: '4').and_return([qc_tf])
         allow(q1).to receive(:save).and_return(true)
         allow(q2).to receive(:save).and_return(true)
         allow(q3).to receive(:save).and_return(true)
+        allow(q4).to receive(:save).and_return(true)
         allow(qc).to receive(:update_attributes).with(any_args).and_return(true)
         allow(qc_tf).to receive(:update_attributes).with(any_args).and_return(true)
         post :update, params
@@ -311,7 +318,7 @@ describe QuizQuestionnairesController do
       controller.params = {new_question: {'1' => 'q1', '2' => 'q2', '3' => 'q3'},
                            new_choices: {'1' => {MultipleChoiceRadio: {'1' => {txt: 'a11', iscorrect: '3'},
                                                                        '2' => {txt: 'a12'}, '3' => {txt: 'a13'}, '4' => {txt: 'a14'}}},
-                                         '2' => {TrueFalse: {'1' => {iscorrect: '1'}}},
+                                         '2' => {TrueFalse: {'1' => {iscorrect: '0'}}},
                                          '3' => {MultipleChoiceCheckbox: {'1' => {iscorrect: '1', txt: 'a31'},
                                                                           '2' => {iscorrect: '0', txt: 'a32'},
                                                                           '3' => {iscorrect: '1', txt: 'a33'},

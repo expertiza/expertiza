@@ -30,7 +30,6 @@ class MetricsController < ApplicationController
     responseObject = http.request(reqestObject)
     response = JSON.parse(responseObject.body)
   rescue Exception => error
-    puts 'Unable to get metric for " + url + " ; the following error occurred "' + error.to_s
   end
 
 end

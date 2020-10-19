@@ -144,7 +144,7 @@ describe Assignment do
 
   describe '#scores' do
     context 'when assignment is varying rubric by round assignment' do
-      xit 'calculates scores in each round of each team in current assignment' do
+      it 'calculates scores in each round of each team in current assignment' do
         allow(participant).to receive(:scores).with(review1: [question]).and_return(98)
         allow(assignment).to receive(:vary_by_round).and_return(true)
         allow(assignment).to receive(:num_review_rounds).and_return(1)
@@ -158,7 +158,7 @@ describe Assignment do
     end
 
     context 'when assignment is not varying rubric by round assignment' do
-      xit 'calculates scores of each team in current assignment' do
+      it 'calculates scores of each team in current assignment' do
         allow(participant).to receive(:scores).with(review: [question]).and_return(98)
         allow(assignment).to receive(:vary_by_round).and_return(false)
         allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([response])

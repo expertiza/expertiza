@@ -311,7 +311,7 @@ class ResponseController < ApplicationController
   end
 
   def create_new_questionnaire
-    #Create a new questionnaire for new response, then basic on different kind of questionnaire
+    # Create a new questionnaire for new response, then basic on different kind of questionnaire
     # apply different implement. For the Review, the code will look up contributor's topic which
     # is reviewee's topic.
     case @map.type
@@ -319,7 +319,8 @@ class ResponseController < ApplicationController
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.number_of_current_round(reviewees_topic)
       @questionnaire = @map.questionnaire(@current_round)
-    when                        #Other types of questionnaire
+    #Other types of questionnaire
+    when 
       "MetareviewResponseMap",
       "TeammateReviewResponseMap",
       "FeedbackResponseMap",

@@ -168,7 +168,7 @@ class SignUpTopic < ActiveRecord::Base
 
   # Was originally "approve" from suggestion_controller, but setting topic fields
   # should happen here in sign_up_topic.rb
-  def new_topic_from_assignment(suggestion)
+  def self.new_topic_from_suggestion(suggestion)
     signuptopic = SignUpTopic.new
     signuptopic.topic_identifier = 'S' + Suggestion.where("assignment_id = ? and id <= ?", suggestion.assignment_id, suggestion.id).size.to_s
     signuptopic.topic_name = suggestion.title

@@ -117,13 +117,13 @@ class SuggestionController < ApplicationController
           @signuptopic.save
           # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team
           #E2069 UPDATE - move send_email to an appropriate class
-          Mailer.send_email(@user_id, @team_id, propose, @suggestion)
+          Mailer.send_email(@user_id, @team_id, @suggestion)
         end
       end
     else
       # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team
       #E2069 UPDATE - move send_email to an appropriate class
-      Mailer.send_email(@user_id, @team_id, propose, @suggestion)
+      Mailer.send_email(@user_id, @team_id, @suggestion)
     end
   end
 

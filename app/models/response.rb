@@ -44,7 +44,7 @@ class Response < ActiveRecord::Base
     end
     sum
   end
-	
+
   def delete
     self.scores.each(&:destroy)
     self.destroy

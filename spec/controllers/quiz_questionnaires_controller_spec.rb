@@ -73,18 +73,53 @@ describe QuizQuestionnairesController do
 
       context 'when questionnaire type is QuizQuestionnaire and max_question_score value is negative' do
         it 'creates error: The maximum question score must be a positive integer.' do
-          questionnaire.max_question_score = -1
-          questionnaire.valid?
-          expect(questionnaire.errors[:max_question_score]).to include('The maximum question score must be a positive integer.')                      
-      end
+          params = {aid: 1,
+                    pid: 1,
+                    questionnaire: {name: 'Test questionnaire',
+                                    type: 'QuizQuestionnaire',
+                                    min_question_score: -2,
+                                    max_question_score: -1
+                    }}
+          # create_questionnaire
+          participant = double('Participant')
+          allow(Participant).to receive(:find).with('1').and_return(participant)
+          allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', rspid: 6))
+          allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', id: 6))
+          #allow(AssignmentTeam).to receive(:id).with(participant).and_return(double('AssignmentTeam', id: 6))
+          allow_any_instance_of(QuizQuestionnairesController).to receive(:save_choices).with(1).and_return(true)
+          # save
+          allow_any_instance_of(QuizQuestionnairesController).to receive(:save_questions).with(1).and_return(true)
+          allow_any_instance_of(QuizQuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
+          request.env['HTTP_REFERER'] = 'www.google.com'
+          post :create, params
+          expect(flash[:error]).to eq('Minumum and/or maximum question score cannot be less than 0.')
+          expect(response).to redirect_to('www.google.com')
+          end
     end
 
     context 'when questionnaire type is QuizQuestionnaire and min_question_score value is negative' do
       it 'creates error: The minimum question score must be a positive integer.' do
-        questionnaire.min_question_score = -1
-        questionnaire.valid?
-        expect(questionnaire.errors[:min_question_score]).to include('The minimum question score must be a positive integer.')                      
-    end
+        params = {aid: 1,
+                  pid: 1,
+                  questionnaire: {name: 'Test questionnaire',
+                                  type: 'QuizQuestionnaire',
+                                  min_question_score: 2,
+                                  max_question_score: 1
+                  }}
+        # create_questionnaire
+        participant = double('Participant')
+        allow(Participant).to receive(:find).with('1').and_return(participant)
+        allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', rspid: 6))
+        allow(AssignmentTeam).to receive(:team).with(participant).and_return(double('AssignmentTeam', id: 6))
+        #allow(AssignmentTeam).to receive(:id).with(participant).and_return(double('AssignmentTeam', id: 6))
+        allow_any_instance_of(QuizQuestionnairesController).to receive(:save_choices).with(1).and_return(true)
+        # save
+        allow_any_instance_of(QuizQuestionnairesController).to receive(:save_questions).with(1).and_return(true)
+        allow_any_instance_of(QuizQuestionnairesController).to receive(:undo_link).with(any_args).and_return('')
+        request.env['HTTP_REFERER'] = 'www.google.com'
+        post :create, params
+        expect(flash[:error]).to eq('Maximum question score cannot be less than minumum question score.')
+        expect(response).to redirect_to('www.google.com')    end
   end
 
     context 'when questionnaire type is QuizQuestionnaire and max_question_score is less than min_question_score' do

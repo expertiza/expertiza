@@ -13,7 +13,7 @@
         <td><%= requested_user.fullname %></td>
         <td><%= mail_to requested_user.email, requested_user.email %></td>
         <td><%= Role.find_by(id: requested_user.role_id).try(:name) %></td>
-        <td><%= requested_user.self_introduction %></td>
+        <td style = "width:20%"><div class = "comment"><%= requested_user.self_introduction %></div></td>
         <td><%= requested_user.status %></td>
         <% if requested_user.status == 'Under Review' %>
           <td> <input type="radio" name="status" value="Approved"> Accept </td>
@@ -24,4 +24,14 @@
     <% end %>
   <% end %>
 </table>
+  <!--Added pagination bar for showing selected results per page -->
+  <%= will_paginate @requested_users %>
 </div> 
+<!--Using Jquery plugin to set character limit using "showChars"-->
+<script type="text/javascript">
+	$(document).ready(function() {	
+		$(".comment").shorten({
+	    "showChars" : 40
+    });
+	});
+</script> 

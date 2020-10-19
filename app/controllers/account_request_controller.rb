@@ -84,7 +84,7 @@ class AccountRequestController < ApplicationController
   end
 
   def list_pending_requested_finalized
-    @requested_users = AccountRequest.where.not(:status => 'Under Review').order("created_at DESC").paginate(page: params[:page], per_page: 10)
+    @requested_users = AccountRequest.where.not(:status => 'Under Review').order("updated_at DESC").paginate(page: params[:page], per_page: 10)
     @roles = Role.all
 
   end

@@ -474,7 +474,7 @@ resources :institution, except: [:destroy] do
     collection do
       post :list
       get :get_folder_contents
-      get :get_sub_folder_contents
+      post :get_sub_folder_contents
       get :session_last_open_tab
       get :set_session_last_open_tab
     end

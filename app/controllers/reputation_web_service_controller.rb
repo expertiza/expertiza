@@ -210,7 +210,7 @@ class ReputationWebServiceController < ApplicationController
   # AES symmetric algorithm encrypts raw data
   def encrypt_request(request)
     aes_encrypted_request_data = aes_encrypt(request.body)
-    request = aes_encrypted_request_data[0]
+    request.body = aes_encrypted_request_data[0]
     # RSA asymmetric algorithm encrypts keys of AES
     encrypted_key = rsa_public_key1(aes_encrypted_request_data[1])
     encrypted_vi = rsa_public_key1(aes_encrypted_request_data[2])

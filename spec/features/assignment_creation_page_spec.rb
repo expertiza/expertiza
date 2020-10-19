@@ -142,7 +142,7 @@ describe "Assignment creation page", js: true do
 	it "is able show tab Etc." do
 		assignment_creation_setup(0,'public assignment for test')
 
-		find_link('Etc.').click
+		find_link('Other').click
 		expect(page).to have_content("Create teams")
 	end
 	

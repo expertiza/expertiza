@@ -121,20 +121,9 @@ jQuery(document).ready(function() {
           Apparently the app_variables.currentUserId was null or not equal to anything
           Need to test/check if this gives access to users that shouldnt have this */
           // if (app_variables.currentUserId == null || this.props.instructor_id == app_variables.currentUserId) {
-            moreContent.push(
-              <span>
-                <a title="Edit" href={"/"+newNodeType+"/"+(parseInt(this.props.id)/2).toString()+"/edit"}><img src="/assets/tree_view/edit-icon-24.png" /></a>
-              </span>
-            );  
-          // }
-          moreContent.push(
-            <span>
-              <a title="Delete" href={"/tree_display/confirm?id="+(parseInt(this.props.id)/2).toString()+"&nodeType="+newNodeType}><img src="/assets/tree_view/delete-icon-24.png" /></a>
-            </span>
-          )
-        }
-        moreContent.push(
-          <span>
+
+
+
           // if (app_variables.currentUserId == null || this.props.instructor_id == app_variables.currentUserId) {
             moreContent.push(
               <span>

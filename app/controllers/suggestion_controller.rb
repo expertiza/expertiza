@@ -138,7 +138,12 @@ class SuggestionController < ApplicationController
       @topic_id = SignedUpTeam.topic_id(@suggestion.assignment_id, @user_id)
     end
     #After getting topic from user/team, get the suggestion
-    SignUpTopic.new_topic_from_suggestion(@suggestion)
+    isSuccess = SignUpTopic.new_topic_from_suggestion(@suggestion)
+    if isSuccess
+      flash[:success] = 'The suggestion was successfully approved.'
+    else
+      flash[:error] = 'An error occurred when approving the suggestion.'
+    end
     notification
     redirect_to action: 'show', id: @suggestion
   end

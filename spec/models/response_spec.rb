@@ -1,6 +1,7 @@
 describe Response do
   let(:participant) { build(:participant, id: 1, user: build(:student, name: 'no name', fullname: 'no one')) }
   let(:participant2) { build(:participant, id: 2) }
+  let(:course) { build(:course, id: 1, name: 'History', instructor: build(:instructor, email: 'tluo@ncsu.edu'))}
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt', instructor: build(:instructor, email: 'tluo@ncsu.edu')) }
   let(:team) { build(:assignment_team) }
   let(:signed_up_team) { build(:signed_up_team, team_id: team.id) }
@@ -109,17 +110,32 @@ describe Response do
   end
 
   describe '#email' do
-    it 'calls email method in corresponding response maps' do
+    it 'calls email method in assignment survey response maps' do
       assignment_survey_response_map = double('AssignmentSurveyResponseMap', reviewer_id: 1)
       allow(ResponseMap).to receive(:find).with(1).and_return(assignment_survey_response_map)
       allow(Participant).to receive(:find).with(1).and_return(participant)
       allow(assignment_survey_response_map).to receive(:survey?).and_return(true)
       allow(assignment_survey_response_map).to receive(:survey_parent).and_return(assignment)
       allow(assignment_survey_response_map).to receive(:email).with({body: {partial_name: "new_submission"},
-                                                                     subject: "A new submission is available for Test Assgt"},
-                                                                    participant, assignment).and_return(true)
+                                                   subject: "A new submission is available for Test Assgt"},
+                                                  participant, assignment).and_return(true)
       expect(response.email).to eq(true)
     end
+
+    it 'calls email method on course survey response map' do
+      course_survey_response_map = double('CourseSurveyResponseMap', reviewer_id: 1)
+      allow(ResponseMap).to receive(:find).with(1).and_return(course_survey_response_map)
+      allow(Participant).to receive(:find).with(1).and_return(participant)
+      allow(course_survey_response_map).to receive(:survey?).and_return(true)
+      allow(course_survey_response_map).to receive(:survey_parent).and_return(course)
+
+      allow(course_survey_response_map).to receive(:email).with({body: {partial_name: "new_submission"},
+                                                   subject: "A new submission is available for History"},
+                                                  participant, course).and_return(true)
+      expect(response.email).to eq(true)
+
+    end
+
   end
 
   describe '#questionnaire_by_answer' do

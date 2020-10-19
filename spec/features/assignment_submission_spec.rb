@@ -50,6 +50,9 @@ describe "assignment submisstion test" do
     expect(page).to have_content("Stage Deadline")
     expect(page).to have_content("Publishing Rights")
     expect(page).to have_content("Assignment1684")
+    expect(page).to have_content("No Course Assigned Yet")
+    expect(page).to have_content("N/A")
+    expect(page).to have_no_content("CSC 517 Fall 2010")
   end
 
 

@@ -14,34 +14,36 @@ describe 'Tests MailerHelper' do
     @subject = "Test"
     @partial_name = "new_submission"
     @password = "pa$Sw0rD"
+    @mail_partial = "new_submission"
   end
 
-    it 'Check if send_mail_to_all_super_users can properly send emails to super_users' do 
-        ActionMailer::Base.deliveries.clear
-        
-        MailerHelper.send_mail_to_all_super_users(
-          super_user, user, @subject
-        ).deliver_now
+  it 'Check if send_mail_to_all_super_users can properly send emails to super_users' do 
+    ActionMailer::Base.deliveries.clear
+    
+    MailerHelper.submission_mail_to_reviewer(
+      user, @subject, @mail_partial
+    ).deliver_now
 
-        email = Mailer.generic_message(
-            to: 'tluo@ncsu.edu',
-            subject: "Test",
-            body: {
-              partial_name: "new_submission",
-              user: "John Doe",
-              first_name: "John",
-              password: "Password",
-              new_pct: 97,
-              avg_pct: 90,
-              assignment: "code assignment"
-            }
-          )
-        ActionMailer::Base.deliveries.last.tap do |mail|
-            expect(mail.from).to eq(["expertiza.development@gmail.com"])
-            expect(mail.to).to eq(["expertiza.development@gmail.com"])
-            expect(mail.subject).to eq("Test")
-          end
-    end
+    email = Mailer.notify_reviewer_for_new_submission(
+        to: 'tluo@ncsu.edu',
+        subject: "Test",
+        body: {
+          partial_name: "new_submission",
+          user: "John Doe",
+          first_name: "John",
+          password: "Password",
+          new_pct: 97,
+          avg_pct: 90,
+          assignment: "code assignment"
+        }
+      )
+    ActionMailer::Base.deliveries.last.tap do |mail|
+        expect(mail.from).to eq(["expertiza.development@gmail.com"])
+        expect(mail.to).to eq(["abcxyz@gmail.com"])
+        expect(mail.subject).to eq("Test")
+      end
+  end
+
 
     it 'Check if send_mail_to_user can properly send emails using generic message' do 
       ActionMailer::Base.deliveries.clear

@@ -8,6 +8,41 @@ describe 'Tests mailer' do
               email_on_submission: 1, email_on_review: 1, email_on_review_of_review: 0, copy_of_emails: 1, handle: 'handle'
   end
 
+  it 'should pass parameters correctly to notify_reviewer_for_new_submission' do 
+    email = Mailer.notify_reviewer_for_new_submission(
+      to: 'tluo@ncsu.edu',
+      subject: "Test",
+      body: {
+        partial_name: "new_submission",
+        user: user,
+        message: "Random Message"
+      }
+    )
+    expect(email.from[0]).to eq("expertiza.development@gmail.com")
+    expect(email.to[0]).to eq('tluo@ncsu.edu')
+    expect(email.subject).to eq('Test')
+  end
+
+
+  it 'should be able to send an email using notify_reviewer_for_new_submission message' do 
+    ActionMailer::Base.deliveries.clear
+    email = Mailer.notify_reviewer_for_new_submission(
+      to: 'tluo@ncsu.edu',
+      subject: "Test",
+      body: {
+        partial_name: "new_submission",
+        user: user,
+        message: "Random Message"
+      }
+    ).deliver_now
+    ActionMailer::Base.deliveries.last.tap do |mail|
+      expect(mail.from).to eq(["expertiza.development@gmail.com"])
+      expect(mail.to).to eq(["tluo@ncsu.edu"])
+      expect(mail.subject).to eq("Test")
+      expect(mail.body).to eq(email.body)
+    end
+  end
+
   it 'should pass parameters correctly to request user message' do
     email = Mailer.request_user_message(
       to: 'tluo@ncsu.edu',

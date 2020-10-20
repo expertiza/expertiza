@@ -51,11 +51,34 @@ class TreeDisplayController < ApplicationController
     # to view. Top level folders include Questionaires, Courses, and Assignments.
     folders = {}
     FolderNode.get.each do |folder_node|
+    
       child_nodes = folder_node.get_children(nil, nil, session[:user].id, nil, nil)
       # Serialize the contents of each node so it can be displayed on the UI
       contents = []
       child_nodes.each do |node|
-      # TODO: INCLUDE THE CHILDREN NODES HERE, ITS FILTERING TOO MUCH AND NOT RETRIEVING ANYTHING USEFUL INT EH CHILDREN SECTION OF THE REACT REFERENCE HERE
+        contents.push(serialize_folder_to_json(folder_node.get_name, node))
+      end
+      
+      # Store contents according to the root level folder.
+      folders[folder_node.get_name] = contents
+    end
+
+    respond_to do |format| 
+      format.html { render json: folders } 
+    end
+  end
+  
+  # Returns the contents of only the specified folder
+  def get_specific_folder_contents
+    # Get all child nodes associated with a top level folder that the logged in user is authorized
+    # to view. Top level folders include Questionaires, Courses, and Assignments.
+    folders = {}
+    FolderNode.get.each do |folder_node|
+      child_nodes = folder_node.get_children(nil, nil, session[:user].id, nil, nil)
+      # Serialize the contents of each node so it can be displayed on the UI
+      contents = []
+      child_nodes.each do |node|
+        # TODO: INCLUDE THE CHILDREN NODES HERE, ITS FILTERING TOO MUCH AND NOT RETRIEVING ANYTHING USEFUL INT EH CHILDREN SECTION OF THE REACT REFERENCE HERE
         contents.push(serialize_folder_to_json(folder_node.get_name, node))
       end
       

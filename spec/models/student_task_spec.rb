@@ -82,6 +82,7 @@ describe StudentTask do
   end
 
   # Tests the updating of the @hyperlinks instance variable based on participant's team
+  # Does not verify operation of ||= call, only tests cases of right hand side
   describe "#hyperlinks" do
     it 'returns empty array if participant has no team' do
       allow(student_task).to receive_message_chain(:participant, :team, :nil?).and_return(true)
@@ -94,15 +95,23 @@ describe StudentTask do
     end 	
   end
 
+  # Verifies incomplete status of student task
   describe "#incomplete?" do
     it 'checks a student_task is incomplete' do
       expect(student_task.incomplete?).to be true
     end 	
   end
 
+  # Verifies that a task has not started
   describe "#not_started?" do
-    it 'returns true' do
+    it 'verfies started status' do
       allow(student_task).to receive(:in_work_stage?).and_return(true)
+      allow(student_task).to receive(:started?).and_return(true)
+      expect(student_task.not_started?).to eq(false)
+    end
+
+    it 'is not started due to work stage' do
+      allow(student_task).to receive(:in_work_stage?).and_return(false)
       allow(student_task).to receive(:started?).and_return(true)
       expect(student_task.not_started?).to eq(false)
     end

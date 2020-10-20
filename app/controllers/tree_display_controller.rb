@@ -24,18 +24,18 @@ class TreeDisplayController < ApplicationController
     @id = params[:id]
     @node_type = params[:nodeType]
   end
-
-  def goto_questionnaires; goto_controller('Questionnaires') end
-  def goto_review_rubrics; goto_controller('Review') end
-  def goto_metareview_rubrics; goto_controller('Metareview') end
-  def goto_teammatereview_rubrics; goto_controller('Teammate Review') end
-  def goto_author_feedbacks; goto_controller('Author Feedback') end
-  def goto_global_survey; goto_controller('Global Survey') end
-  def goto_surveys; goto_controller('Assignment Survey') end
-  def goto_course_surveys; goto_controller('Course Survey') end
-  def goto_courses; goto_controller('Courses') end
-  def goto_bookmarkrating_rubrics; goto_controller('Bookmarkrating') end
-  def goto_assignments; goto_controller('Assignments') end
+  
+  def goto_questionnaires; goto_controller('Questionnaires','3') end
+  def goto_review_rubrics; goto_controller('Review','3') end
+  def goto_metareview_rubrics; goto_controller('Metareview','3') end
+  def goto_teammatereview_rubrics; goto_controller('Teammate Review','3') end
+  def goto_author_feedbacks; goto_controller('Author Feedback','3') end
+  def goto_global_survey; goto_controller('Global Survey','3') end
+  def goto_surveys; goto_controller('Assignment Survey','3') end
+  def goto_course_surveys; goto_controller('Course Survey','3') end
+  def goto_courses; goto_controller('Courses','1') end
+  def goto_bookmarkrating_rubrics; goto_controller('Bookmarkrating','3') end
+  def goto_assignments; goto_controller('Assignments','2') end
 
   # Redirects to proper page if user is not an instructor or TA.
   def list

@@ -97,7 +97,7 @@ describe Assessment360Controller do
         allow(course).to receive(:assignments).and_return(assignment_list)
         allow(assignment_list).to receive(:reject).and_return(assignment_list)
         allow(course).to receive(:get_participants).and_return([]) # no participants
-        params = {course_id: 1}
+        params = {course_id: 1, fields:['TeammateReviewScores','MetaReviewScores','NumberOfTeammates']}
         session = {user: instructor}
         get :all_students_all_reviews, params, session
         expect(controller.send(:action_allowed?)).to be true
@@ -110,7 +110,7 @@ describe Assessment360Controller do
         allow(assignment_list).to receive(:reject).and_return(assignment_list)
         allow(course).to receive(:get_participants).and_return([course_participant]) # has participants
         allow(StudentTask).to receive(:teamed_students).with(course_participant.user).and_return(student1)
-        params = {course_id: 1}
+        params = {course_id: 1,fields:['TeammateReviewScores','MetaReviewScores','NumberOfTeammates']}
         session = {user: instructor}
         get :all_students_all_reviews, params, session
         expect(controller.send(:action_allowed?)).to be true
@@ -130,7 +130,7 @@ describe Assessment360Controller do
         allow(assignment_with_participants.participants).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
         allow(course_participant).to receive(:teammate_reviews).and_return(empty_teammate_review)
         allow(course_participant).to receive(:metareviews).and_return(empty_meta_review)
-        params = {course_id: 1}
+        params = {course_id: 1,fields:['TeammateReviewScores','MetaReviewScores','NumberOfTeammates']}
         session = {user: instructor}
         get :all_students_all_reviews, params, session
         expect(controller.send(:action_allowed?)).to be true
@@ -150,7 +150,7 @@ describe Assessment360Controller do
         allow(assignment_with_participants.participants).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
         allow(course_participant).to receive(:teammate_reviews).and_return(teammate_review)
         allow(course_participant).to receive(:metareviews).and_return(meta_review)
-        params = {course_id: 1}
+        params = {course_id: 1,fields:['TeammateReviewScores','MetaReviewScores','NumberOfTeammates']}
         session = {user: instructor}
         get :all_students_all_reviews, params, session
         expect(controller.send(:action_allowed?)).to be true
@@ -190,7 +190,7 @@ describe Assessment360Controller do
         allow(course).to receive(:assignments).and_return([assignment])
         allow(assignment).to receive(:reject).and_return(assignment)
         allow(course).to receive(:get_participants).and_return([]) # no participants
-        params = {course_id: 1}
+        params = {course_id: 1, fields:['InstructorAssignedScores','PeerGrades','Topics']}
         session = {user: instructor}
         get :course_student_grade_summary, params, session
         expect(controller.send(:action_allowed?)).to be true
@@ -203,7 +203,7 @@ describe Assessment360Controller do
         allow(assignment_with_participants_list).to receive(:reject).and_return(assignment_with_participants_list)
         allow(course).to receive(:get_participants).and_return([course_participant]) # has participants
         allow(assignment_list).to receive(:reject).and_return(assignment_list)
-        params = {course_id: 1}
+        params = {course_id: 1,fields:['InstructorAssignedScores','PeerGrades','Topics']}
         session = {user: instructor}
         get :course_student_grade_summary, params, session
         expect(controller.send(:action_allowed?)).to be true
@@ -219,7 +219,7 @@ describe Assessment360Controller do
         allow(assignment_with_participants.participants).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
         allow(signed_up_team).to receive(:topic_id).with(assignment.id, course_participant.user_id).and_return(1)
         allow(SignUpTopic).to receive(:find_by).with(id: nil).and_return(topic)
-        params = {course_id: 1}
+        params = {course_id: 1,fields:['InstructorAssignedScores','PeerGrades','Topics']}
         session = {user: instructor}
         get :course_student_grade_summary, params, session
         expect(controller.send(:action_allowed?)).to be true
@@ -244,7 +244,7 @@ describe Assessment360Controller do
         allow(TeamsUser).to receive(:team_id).with(assignment.id, course_participant.user_id).and_return(1)
         allow(Team).to receive(:find).with(1).and_return(team)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: course_participant.user_id, parent_id: assignment.id).and_return(course_participant)
-        params = {course_id: 1}
+        params = {course_id: 1,fields:['InstructorAssignedScores','PeerGrades','Topics']}
         session = {user: instructor}
         get :course_student_grade_summary, params, session
         expect(controller.send(:action_allowed?)).to be true
@@ -272,7 +272,7 @@ describe Assessment360Controller do
         allow(Team).to receive(:find).with(1).and_return(team_with_grade)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: course_participant.user_id, parent_id: assignment.id).and_return(course_participant)
         allow(course_participant).to receive(:scores).with({}).and_return(review: {scores: {avg: 90}})
-        params = {course_id: 1}
+        params = {course_id: 1,fields:['InstructorAssignedScores','PeerGrades','Topics']}
         session = {user: instructor}
         get :course_student_grade_summary, params, session
         expect(controller.send(:action_allowed?)).to be true
@@ -284,6 +284,8 @@ describe Assessment360Controller do
         expect(returned_assignment_grades[nil][1]).to eq(95)
         returned_peer_review_scores = controller.instance_variable_get(:@peer_review_scores)
         expect(returned_peer_review_scores[nil][1]).to eq(90)
+        returned_average_peer_review_scores = controller.instance_variable_get(:@average_peer_review_score)
+        expect(returned_average_peer_review_scores[nil]).to eq(0)
         returned_final_grades = controller.instance_variable_get(:@final_grades)
         expect(returned_final_grades[nil]).to eq(95)
       end
@@ -315,7 +317,7 @@ describe Assessment360Controller do
         allow(course).to receive(:assignments).and_return([assignment])
         allow(assignment).to receive(:reject).and_return(assignment)
         allow(course).to receive(:get_participants).and_return([]) # no participants
-        params = {course_id: 1}
+        params = {course_id: 1, fields:['InstructorAssignedScores','PeerGrades','Topics']}
         session = {user: instructor}
         get :course_student_grade_summary, params, session
         expect(controller.send(:action_allowed?)).to be true
@@ -359,7 +361,7 @@ describe Assessment360Controller do
         allow(Team).to receive(:find).with(1).and_return(team)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: course_participant.user_id, parent_id: assignment.id).and_return(course_participant)
         allow(course_participant).to receive(:scores).with({}).and_return(review: {scores: {avg: 90}})
-        params = {course_id: 1}
+        params = {course_id: 1, fields:['InstructorAssignedScores','PeerGrades','Topics']}
         session = {user: instructor}
         get :course_student_grade_summary, params, session
         expect(controller.send(:action_allowed?)).to be true
@@ -370,6 +372,8 @@ describe Assessment360Controller do
         returned_assignment_grades = controller.instance_variable_get(:@assignment_grades)
         returned_peer_review_scores = controller.instance_variable_get(:@peer_review_scores)
         expect(returned_peer_review_scores[nil][1]).to eq(90)
+        returned_average_peer_review_scores = controller.instance_variable_get(:@average_peer_review_score)
+        expect(returned_average_peer_review_scores[nil]).to eq(0)
         returned_final_grades = controller.instance_variable_get(:@final_grades)
       end
     end

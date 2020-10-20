@@ -40,14 +40,15 @@ describe "assignment submisstion test" do
     expect(page).to have_current_path("https://www.ncsu.edu")
   end
 
-  it "should not submit invalid link" do
-    skip('the error depends on the dns server. For spectrum network provider, invalid url will redirect to http://www.dnsrsearch.com')
-    signup_topic
-    # invalid format url1
-    fill_in 'submission', with: "wolfpack"
-    click_on 'Upload link'
-    expect(page).to have_content "The URL or URI is invalid"
-  end
+  # This test results in pending failure due to url variability
+  # it "should not submit invalid link" do
+  #   skip('the error depends on the dns server. For spectrum network provider, invalid url will redirect to http://www.dnsrsearch.com')
+  #   signup_topic
+  #   # invalid format url1
+  #   fill_in 'submission', with: "wolfpack"
+  #   click_on 'Upload link'
+  #   expect(page).to have_content "The URL or URI is invalid"
+  # end
 
   it "is able to submit multiple valid links" do
     dueDate=DueDate.new

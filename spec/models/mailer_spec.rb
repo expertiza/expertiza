@@ -22,7 +22,7 @@ describe 'Tests mailer' do
     # Send the email, then test that it got queued
     email = Mailer.suggested_topic_approved_message(
       to: 'tluo@ncsu.edu',
-      bcc: 'tluo@ncsu.edu'
+      bcc: 'tluo@ncsu.edu',
       subject: "Suggestion",
       body: {
         approved_topic_name: 'topic1',

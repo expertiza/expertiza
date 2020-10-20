@@ -22,21 +22,64 @@ const node_attributes = {
       {
         title: (props) => props.course_id ? "Remove from course" : "Assign to course",
         href: (props) => props.course_id ? "/assignments/remove_assignment_from_course?id=" + (parseInt(props.id) / 2).toString() : "/assignments/place_assignment_in_course?id=" + (parseInt(props.id) / 2).toString(),
-        src: (props) => props.course_id? "/assets/tree_view/remove-from-course-24.png" :,
+        src: (props) => props.course_id? "/assets/tree_view/remove-from-course-24.png" :"/assets/tree_view/view-review-report-24.png",
       },
       {
-      title: "Add TA",
-      href: "/course/view_teaching_assistants?model=Course&id=",
-      src: "/assets/tree_view/add-ta-24.png",
-      },{
-        title: "Add TA",
-        href: "/course/view_teaching_assistants?model=Course&id=",
-        src: "/assets/tree_view/add-ta-24.png",
-    },{
-      title: "Add TA",
-      href: "/course/view_teaching_assistants?model=Course&id=",
-      src: "/assets/tree_view/add-ta-24.png",
-    }
+        title: "Add participants",
+        href: "/participants/list?id="+(parseInt(this.props.id)/2).toString()+"&model=Assignment",
+        src: "/assets/tree_view/add-participant-24.png",
+      },
+      {
+          title: "Create teams",
+        href: "/teams/list?id="+(parseInt(this.props.id)/2).toString()+"&type=Assignment",
+        src: "/assets/tree_view/create-teams-24.png",
+      },
+      {
+      title: "Assign reviewers",
+      href: "/review_mapping/list_mappings?id="+(parseInt(this.props.id)/2).toString(),
+      src: "/assets/tree_view/assign-reviewers-24.png",
+      },
+      {
+      title: "Assign survey",
+      href: "/survey_deployment/new?id="+(parseInt(this.props.id)/2).toString()+"&type=AssignmentSurveyDeployment",
+      src: "/assets/tree_view/assign-survey-24.png"
+      },
+        {
+            title: "View quiz questions",
+            href: "/student_quizzes/review_questions?id="+(parseInt(this.props.id)/2).toString()+"&type=Assignment",
+            src: "/assets/tree_view/view-survey-24.png"
+        },
+        {
+            title: "View submissions",
+            href: "/assignments/list_submissions?id="+(parseInt(this.props.id)/2).toString(),
+            src: "/assets/tree_view/List-submisstions-24.png"
+        },
+        {
+            title: "View scores",
+            href: "/grades/view?id="+(parseInt(this.props.id)/2).toString(),
+            src: "/assets/tree_view/view-scores-24.png"
+        },
+        {
+            title: "View reports",
+            href: "/reports/response_report?id="+(parseInt(this.props.id)/2).toString(),
+            src: "/assets/tree_view/view-review-report-24.png"
+        },
+        {
+            title: "View survey responses",
+            href: "/survey_response/view_responses?id="+(parseInt(this.props.id)/2).toString(),
+            src: "/assets/tree_view/view-survey-24.png"
+        },
+        {
+            title: "Intelligent Assignment",
+            href: "/lottery/run_intelligent_assignment/"+(parseInt(this.props.id)/2).toString(),
+            src: "/assets/tree_view/run-lottery.png"
+        },
+        {
+            title: "View suggestions",
+            href: "/suggestion/list?id="+(parseInt(this.props.id)/2).toString()+"&type=Assignment",
+            src: "/assets/tree_view/view-suggestion-24.png"
+        }
+
   ],
   getActions: function(props) {
             return node_attributes.actions.map((i) => {

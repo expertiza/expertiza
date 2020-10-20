@@ -116,24 +116,24 @@ describe "#reviews_given_in_current_stage?" do
 	end
 end
 
-#tests whether a student task has been started
-#if the task is not incomplete && is not in the revision stage
-#started? returns false
-#if the task is incomplete && is in the revision stage
-#started? returns true
-describe "#started?" do
-	it 'is not started' do
-	allow(student_task).to receive(:incomplete?).and_return(false)
-	allow(student_task).to receive(:revision?).and_return(false)
-	expect(student_task.started?).to eq(false)
-	end
-
-	it 'is started' do
-	allow(student_task).to receive(:incomplete?).and_return(true)
-	allow(student_task).to receive(:revision?).and_return(true)
-	expect(student_task.started?).to eq(true)
-	end
-
+# Tests works stage to ensure state is represented correctly
+describe "#in_work_stage?" do
+  it "is true, submission is a work stage" do
+    allow(student_task).to receive(:current_stage).and_return("submission")
+    expect(student_task.in_work_stage?).to eq(true)
+  end
+  it "is true, review is a work stage" do
+    allow(student_task).to receive(:current_stage).and_return("review")
+    expect(student_task.in_work_stage?).to eq(true)
+  end
+  it "is true, metareview is a work stage" do
+    allow(student_task).to receive(:current_stage).and_return("metareview")
+    expect(student_task.in_work_stage?).to eq(true)
+  end
+  it "is false, empty object" do
+    allow(student_task).to receive(:current_stage).and_return("")
+    expect(student_task.in_work_stage?).to eq(false)
+  end
 end
 
 describe "#teamed_students" do

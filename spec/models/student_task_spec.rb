@@ -123,63 +123,64 @@ describe StudentTask do
       allow(student_task).to receive(:stage_deadline).and_return(nil)
       expect(student_task.relative_deadline).to be_falsey
     end
-    it 'returns true' do
+    it 'verifies a valid case where stage_deadline is present' do
       allow(student_task).to receive(:stage_deadline).and_return(true)
       allow(student_task).to receive(:time_ago_in_words).and_return("astring")
       expect(student_task.relative_deadline).to eq("astring")
     end
   end
 
+  # Examines a task to determine if the task is a revision
   describe "#revision?" do
-	it 'returns true if content is submitted' do
-    allow(student_task).to receive(:content_submitted_in_current_stage?).and_return(true)
-    allow(student_task).to receive(:reviews_given_in_current_stage?).and_return(false)
-    allow(student_task).to receive(:metareviews_given_in_current_stage?).and_return(false)
-    expect(student_task.revision?).to eq(true)
-	end
+    it 'returns true if content is submitted' do
+      allow(student_task).to receive(:content_submitted_in_current_stage?).and_return(true)
+      allow(student_task).to receive(:reviews_given_in_current_stage?).and_return(false)
+      allow(student_task).to receive(:metareviews_given_in_current_stage?).and_return(false)
+      expect(student_task.revision?).to eq(true)
+    end
 
-	it 'returns true if reviews given is true' do
-    allow(student_task).to receive(:content_submitted_in_current_stage?).and_return(false)
-    allow(student_task).to receive(:reviews_given_in_current_stage?).and_return(true)
-    allow(student_task).to receive(:metareviews_given_in_current_stage?).and_return(false)
-    expect(student_task.revision?).to eq(true)
-	end
+    it 'returns true if reviews given is true' do
+      allow(student_task).to receive(:content_submitted_in_current_stage?).and_return(false)
+      allow(student_task).to receive(:reviews_given_in_current_stage?).and_return(true)
+      allow(student_task).to receive(:metareviews_given_in_current_stage?).and_return(false)
+      expect(student_task.revision?).to eq(true)
+    end
 
-	it 'returns true if metareviews given is true' do
-    allow(student_task).to receive(:content_submitted_in_current_stage?).and_return(false)
-    allow(student_task).to receive(:reviews_given_in_current_stage?).and_return(false)
-    allow(student_task).to receive(:metareviews_given_in_current_stage?).and_return(true)
-    expect(student_task.revision?).to eq(true)
-	end
-end
-
-describe "#metreviews_given_in_current_stage?" do
-	it 'return true' do
-    student_task.current_stage = "metareview"
-    allow(student_task).to receive(:metareviews_given?).and_return(true)
-    expect(student_task.metareviews_given_in_current_stage?).to eq(true)
-	end
-end
-
-describe "#reviews_given_in_current_stage?" do
-	it 'return true' do
-    student_task.current_stage = "review"
-    allow(student_task).to receive(:reviews_given?).and_return(true)
-    expect(student_task.reviews_given_in_current_stage?).to eq(true)
-	end
-end
-
-# tests whether a student task has been started
-# if the task is not incomplete && is not in the revision stage
-# started? returns false
-# if the task is incomplete && is in the revision stage
-# started? returns true
-describe "#started?" do
-	it 'is not started' do
-    allow(student_task).to receive(:incomplete?).and_return(false)
-    allow(student_task).to receive(:revision?).and_return(false)
-    expect(student_task.started?).to eq(false)
+    it 'returns true if metareviews given is true' do
+      allow(student_task).to receive(:content_submitted_in_current_stage?).and_return(false)
+      allow(student_task).to receive(:reviews_given_in_current_stage?).and_return(false)
+      allow(student_task).to receive(:metareviews_given_in_current_stage?).and_return(true)
+      expect(student_task.revision?).to eq(true)
+    end
   end
+  # Checks if metareview was given in current task stage
+  describe "#metreviews_given_in_current_stage?" do
+    it 'return true' do
+      student_task.current_stage = "metareview"
+      allow(student_task).to receive(:metareviews_given?).and_return(true)
+      expect(student_task.metareviews_given_in_current_stage?).to eq(true)
+    end
+  end
+  # Checks if review was given in current task stage
+  describe "#reviews_given_in_current_stage?" do
+    it 'return true' do
+      student_task.current_stage = "review"
+      allow(student_task).to receive(:reviews_given?).and_return(true)
+      expect(student_task.reviews_given_in_current_stage?).to eq(true)
+    end
+  end
+
+  # tests whether a student task has been started
+  # if the task is not incomplete && is not in the revision stage
+  # started? returns false
+  # if the task is incomplete && is in the revision stage
+  # started? returns true
+  describe "#started?" do
+    it 'is not started' do
+      allow(student_task).to receive(:incomplete?).and_return(false)
+      allow(student_task).to receive(:revision?).and_return(false)
+      expect(student_task.started?).to eq(false)
+    end
 
 	it 'is started' do
     allow(student_task).to receive(:incomplete?).and_return(true)

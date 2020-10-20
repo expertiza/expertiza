@@ -19,6 +19,7 @@ describe StudentTask do
   let(:cource_team_user2) { create(:team_user, id: 7, team_id: course_team.id, user_id: user2.id) }
   let(:topic) { build(:topic) }
   let(:topic2) { create(:topic, topic_name: "TestReview") }
+  let(:topic3) { create(:topic) }
   let(:due_date) { build(:assignment_due_date, deadline_type_id: 1) }
   let(:deadline_type) { build(:deadline_type, id: 1) }
   let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team2) }
@@ -31,9 +32,29 @@ describe StudentTask do
       user: user,
       participant: participant,
       assignment: assignment,
+      topic: topic3,
+    )
+  end
+  let(:student_task2) do
+    StudentTask.new(
+      user: user,
+      participant: participant2,
+      assignment: assignment,
+      topic: topic2,
     )
   end
 
+  # Tests topic name to ensure it is stored or set as "-"
+  describe "#topic_name" do
+    it 'returns the topic name if given one' do
+      allow(student_task2).to receive(:topic).and_return(topic2)
+      expect(student_task2.topic_name).to eq("TestReview")
+    end
+
+    it 'returns - for blank name' do
+      expect(student_task.topic_name).to eq("-")
+    end
+  end
 
   describe "#complete?" do
     it 'checks a student_task is complete' do

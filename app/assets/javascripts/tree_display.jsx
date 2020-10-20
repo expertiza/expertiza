@@ -905,7 +905,6 @@ jQuery(document).ready(function() {
     },
     handleExpandClick: function(id, expanded, newParams) {
       this.state.expandedRow.concat([ id ])
-      // console.log(this.state, this, expanded, newParams)
       if (expanded) {
         this.setState({
           expandedRow: this.state.expandedRow.concat([ id ])
@@ -1034,7 +1033,6 @@ jQuery(document).ready(function() {
           if (this.props.dataType == 'course') {
             _rows.push(<TitleRow title="Others' Public Courses" />)
             jQuery.each(this.props.data, function(i, entry) {
-              // console.log(this.props.data)
               if (
                 ((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
                   (entry.creation_date &&
@@ -1408,7 +1406,6 @@ jQuery(document).ready(function() {
       jQuery.get(
         '/tree_display/get_folder_contents',
         function(data2, status) {
-          console.log(data2)
           jQuery.each(data2, function(nodeType, outerNode) {
             jQuery.each(outerNode, function(i, node) {
               var newParams = {

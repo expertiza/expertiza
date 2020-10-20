@@ -284,4 +284,15 @@ class AssignmentTeam < Team
     return get_logged_in_reviewer_id(current_user_id) != nil
   end
 
+  #E2069 UPDATE
+  # this is a method for lazy team creation. Here is the right place for this method.
+  def self.create_new_team(user_id, signuptopic_id, assignment_id)
+    new_team = AssignmentTeam.create(name: 'Team_' + rand(10_000).to_s,
+                                     parent_id: assignment_id, type: 'AssignmentTeam')
+    t_user = TeamsUser.create(team_id: new_team.id, user_id: user_id)
+    SignedUpTeam.create(topic_id: signuptopic_id, team_id: new_team.id, is_waitlisted: 0)
+    parent = TeamNode.create(parent_id: assignment_id, node_object_id: new_team.id)
+    TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
+  end
+
 end

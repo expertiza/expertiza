@@ -34,11 +34,6 @@ describe StudentTask do
     )
   end
 
-  describe "#topic_name" do
-    it 'returns the topic name if given one' do
-      expect(topic2.topic_name).to eq("TestReview")
-    end
-  end
 
   describe "#complete?" do
     it 'checks a student_task is complete' do
@@ -98,6 +93,26 @@ describe "#reviews_given_in_current_stage?" do
     allow(student_task).to receive(:reviews_given?).and_return(true)
     expect(student_task.reviews_given_in_current_stage?).to eq(true)
 	end
+end
+
+#tests whether a student task has been started
+#if the task is not incomplete && is not in the revision stage
+#started? returns false
+#if the task is incomplete && is in the revision stage
+#started? returns true
+describe "#started?" do
+	it 'is not started' do
+	allow(student_task).to receive(:incomplete?).and_return(false)
+	allow(student_task).to receive(:revision?).and_return(false)
+	expect(student_task.started?).to eq(false)
+	end
+
+	it 'is started' do
+	allow(student_task).to receive(:incomplete?).and_return(true)
+	allow(student_task).to receive(:revision?).and_return(true)
+	expect(student_task.started?).to eq(true)
+	end
+
 end
 
 describe "#teamed_students" do

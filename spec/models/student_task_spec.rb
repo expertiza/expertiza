@@ -70,13 +70,11 @@ describe StudentTask do
 
   # tests if hyperlinks or other content is submitted during the submission stage
   # current stage must be submission
-  # participant has to belong to a team
   # the team has submitted some content
   describe "content_submitted_in_current_stage?" do
-    it 'checks if content is submitted during submission stage'do
+    it 'checks if hyperlinks is submitted during submission stage'do
        student_task.current_stage = "submission"
-       allow(participant).to receive(:team).and_return([team])
-       allow(participant.team).to receive(:has_submissions?).and_return(true)
+       allow(student_task).to receive_message_chain(:hyperlinks, :present).and_return(true)
        expect(student_task.content_submitted_in_current_stage?).to eq(true)
     end
   end
@@ -358,6 +356,7 @@ describe StudentTask do
   describe '#get_timeline_data' do
     context 'when no timeline data mapped' do
       it 'returns nil' do
+        allow(participant).to receive(:get_reviewer).and_return(participant)
         expect(StudentTask.get_timeline_data(assignment, participant, team)).to eq([])
       end
     end

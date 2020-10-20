@@ -1,11 +1,6 @@
 Expertiza
 =========
 
-### Wiki Documentation Page
-https://expertiza.csc.ncsu.edu/index.php/CSC/ECE_517_Fall_2020/oss_E2072_RLM
-
-http://152.7.99.79:8080/
-
 [![Build Status](https://travis-ci.org/expertiza/expertiza.svg?branch=master)](https://travis-ci.org/expertiza/expertiza)
 [![Coverage Status](https://coveralls.io/repos/github/expertiza/expertiza/badge.svg?branch=master)](https://coveralls.io/github/expertiza/expertiza?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/f3a41f16c2b6e45aa9d4/maintainability)](https://codeclimate.com/github/expertiza/expertiza/maintainability)

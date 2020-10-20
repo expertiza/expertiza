@@ -115,7 +115,7 @@ class SuggestionController < ApplicationController
       # if this user do not have team in this assignment, create one for him/her and assign this topic to this team.
       if @team_id.nil?
         #E2069 UPDATE
-        Team.create_new_team(@user_id, @signuptopic)
+        AssignmentTeam.create_new_team(@user_id, @signuptopic)
       else # this user has a team in this assignment, check whether this team has topic or not
         if @topic_id.nil?
           # clean waitlists
@@ -145,7 +145,13 @@ class SuggestionController < ApplicationController
       @team_id = TeamsUser.team_id(@suggestion.assignment_id, @user_id)
       @topic_id = SignedUpTeam.topic_id(@suggestion.assignment_id, @user_id)
     end
-    SignUpTopic.new_topic_from_suggestion(@suggestion)
+    #After getting topic from user/team, get the suggestion
+    isSuccess = SignUpTopic.new_topic_from_suggestion(@suggestion)
+    if isSuccess
+      flash[:success] = 'The suggestion was successfully approved.'
+    else
+      flash[:error] = 'An error occurred when approving the suggestion.'
+    end
     notification
     redirect_to action: 'show', id: @suggestion
   end

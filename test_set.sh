@@ -1,0 +1,1 @@
+rspec spec/models/mailer_spec.rb spec/models/response_spec.rb spec/features/assignment_submission_spec.rb spec/helpers/mailerhelper_spec.rb spec/models/assignment_participant_spec.rb spec/models/feedback_response_map_spec.rb spec/models/metareview_response_map_spec.rb spec/models/teammate_review_response_map_spec.rb

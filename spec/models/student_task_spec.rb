@@ -63,10 +63,10 @@ describe StudentTask do
     end
   end
 
-#tests if hyperlinks or other content is submitted during the submission stage
-#current stage must be submission
-#participant has to belong to a team
-#the team has submitted some content
+# tests if hyperlinks or other content is submitted during the submission stage
+# current stage must be submission
+# participant has to belong to a team
+# the team has submitted some content
   describe "content_submitted_in_current_stage?" do
     it 'checks if content is submitted during submission stage'do
        student_task.current_stage = "submission"
@@ -74,6 +74,17 @@ describe StudentTask do
        allow(participant.team).to receive(:has_submissions?).and_return(true)
        expect(student_task.content_submitted_in_current_stage?).to eq(true)
     end
+  # Tests the updating of the @hyperlinks instance variable based on participant's team
+  describe "#hyperlinks" do
+    it 'returns empty array if participant has no team' do
+      allow(student_task).to receive_message_chain(:participant, :team, :nil?).and_return(true)
+      expect(student_task.hyperlinks).to eq([])
+    end
+    it 'assigns returns populated hyperlinks instance if participant has team' do
+      allow(student_task).to receive_message_chain(:participant, :team, :hyperlinks).and_return(['something'])
+      allow(student_task).to receive_message_chain(:participant, :team, :nil?).and_return(false)
+      expect(student_task.hyperlinks).to eq(['something'])
+    end 	
   end
 
   describe "#incomplete?" do
@@ -142,6 +153,24 @@ describe "#reviews_given_in_current_stage?" do
 	end
 end
 
+# tests whether a student task has been started
+# if the task is not incomplete && is not in the revision stage
+# started? returns false
+# if the task is incomplete && is in the revision stage
+# started? returns true
+describe "#started?" do
+	it 'is not started' do
+	allow(student_task).to receive(:incomplete?).and_return(false)
+	allow(student_task).to receive(:revision?).and_return(false)
+	expect(student_task.started?).to eq(false)
+	end
+
+	it 'is started' do
+	allow(student_task).to receive(:incomplete?).and_return(true)
+	allow(student_task).to receive(:revision?).and_return(true)
+	expect(student_task.started?).to eq(true)
+	end
+
 # Tests works stage to ensure state is represented correctly
 describe "#in_work_stage?" do
   it "is true, submission is a work stage" do
@@ -160,6 +189,7 @@ describe "#in_work_stage?" do
     allow(student_task).to receive(:current_stage).and_return("")
     expect(student_task.in_work_stage?).to eq(false)
   end
+
 end
 
 describe "#teamed_students" do

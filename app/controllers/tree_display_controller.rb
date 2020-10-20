@@ -24,7 +24,7 @@ class TreeDisplayController < ApplicationController
     @id = params[:id]
     @node_type = params[:nodeType]
   end
-  
+
   def goto_questionnaires; goto_controller('Questionnaires','3') end
   def goto_review_rubrics; goto_controller('Review','3') end
   def goto_metareview_rubrics; goto_controller('Metareview','3') end

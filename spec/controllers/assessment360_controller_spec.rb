@@ -314,6 +314,19 @@ describe Assessment360Controller do
         request.env['HTTP_REFERER'] = 'http://example.com'
       end
 
+      it 'properly recognizes url field params' do
+        allow(course).to receive(:assignments).and_return(assignment_list)
+        allow(assignment_list).to receive(:reject).and_return(assignment_list)
+        allow(course).to receive(:get_participants).and_return([]) # no participants
+        params = {course_id: 1, fields:['TeammateReviewScores']}
+        session = {user: instructor}
+        get :all_students_all_reviews, params, session
+        show_teammate_scores = controller.instance_variable_get(:@show_teammate_reviews)
+        expect(show_teammate_scores).to eq(true)
+        show_number_of_teammates = controller.instance_variable_get(:@show_teammate_count)
+        expect(show_number_of_teammates).to eq(false)
+      end
+      
       it 'redirects to back and flashes error as there are no participants' do
         allow(course).to receive(:assignments).and_return(assignment_list)
         allow(assignment_list).to receive(:reject).and_return(assignment_list)

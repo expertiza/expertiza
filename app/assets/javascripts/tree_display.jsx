@@ -4,6 +4,121 @@ let app_variables = {
   currentUserId: null
 };
 
+const node_attributes = {
+  isAssignment(name) {
+    return name === 'assignment' || name === "assignments"
+  },
+  isCourse(name) {
+    return name === 'course' || name === "courses"
+  },
+  isQuestionnaire(name) {
+    return name === 'questionnaire' || name === "questionnaires"
+  },
+  assignment: {
+    plural: "assignments",
+    colWidthArray: ["30%", "0%", "0%", "0%", "25%", "25%", "20%"],
+
+    actions: [
+      {
+        title: (props) => props.course_id ? "Remove from course" : "Assign to course",
+        href: (props) => props.course_id ? "/assignments/remove_assignment_from_course?id=" + (parseInt(props.id) / 2).toString() : "/assignments/place_assignment_in_course?id=" + (parseInt(props.id) / 2).toString(),
+        src: (props) => props.course_id? "/assets/tree_view/remove-from-course-24.png" :,
+      },
+      {
+      title: "Add TA",
+      href: "/course/view_teaching_assistants?model=Course&id=",
+      src: "/assets/tree_view/add-ta-24.png",
+      },{
+        title: "Add TA",
+        href: "/course/view_teaching_assistants?model=Course&id=",
+        src: "/assets/tree_view/add-ta-24.png",
+    },{
+      title: "Add TA",
+      href: "/course/view_teaching_assistants?model=Course&id=",
+      src: "/assets/tree_view/add-ta-24.png",
+    }
+  ],
+  getActions: function(props) {
+            return node_attributes.actions.map((i) => {
+              return (<span><a title={i.title(props)} href={i.href(props)}>
+                          <img src={i.src(props)}/>
+                </a></span>)
+             })
+          },
+    
+  },
+  course: {
+    plural: "course",
+    actions: [ {
+      title: "Add TA",
+      href: "/course/view_teaching_assistants?model=Course&id=",
+      src: "/assets/tree_view/add-ta-24.png",
+    },
+    {
+      title: "Create assignment",
+      href: "/assignments/new?parent_id=",
+      src: "/assets/tree_view/add-assignment-24.png",
+    },
+    {
+      title: "Add participants",
+      href: "/participants/list?model=Course&id=",
+      src: "/assets/tree_view/add-participant-24.png",
+    },
+    {
+      title: "Create teams",
+      href: "/teams/list?type=Course&id=",
+      src: "/assets/tree_view/create-teams-24.png",
+    },
+    {
+      title: "View grade summary by student",
+      href: "/assessment360/course_student_grade_summary?course_id=",
+      src: "/assets/tree_view/360-dashboard-24.png",
+    },
+    {
+      title: "Assign survey",
+      href: "/survey_deployment/new?type=CourseSurveyDeployment&id=",
+      src: "/assets/tree_view/assign-survey-24.png",
+    },
+    {
+      title: "View aggregated teammate & meta reviews",
+      href: "/assessment360/all_students_all_reviews?course_id=",
+      src: null,
+      extra: <span style={{"fontSize": "22px", "top": "8px"}} className="glyphicon glyphicon-list-alt"></span>
+    }],
+    getActions: function (id) {
+    return (node_attributes.course.actions.map((action) =>
+        (action.src
+          ? <a title={action.title} href={action.href + id}> <img src={action.src} /></a>
+          : <a title={action.title} href={action.href + id}> {action.extra} </a>)))
+    }
+  },
+  questionnaire: {
+    plural: "questionnaires",
+    colWidthArray: ["30%", "0%", "0%", "0%", "20%", "20%", "30%"],
+    getActions: function (handleButtonClick, parent_name ) {
+      return (<span onClick={this.handleButtonClick}>
+            <form
+              style={{
+                margin: 0,
+                padding: 0,
+                display: 'inline'
+              }}
+              action={"/questionnaires/new"}
+              method="GET">
+              <input type="hidden" name="model" value={parent_name+"Questionnaire"} />
+              <input type="hidden" name="private" value={1} />
+              <button type="submit"
+                      className="btn btn-primary questionnaire-button">
+                  <b>+</b>
+              </button>
+            </form>
+          </span>)
+    }
+  }
+}
+
+/** make an object used to determine many of the logical params needed in this program */
+
 // execute the grabbing of user id after the page is fully loaded
 // helps to make sure that the react component is rendered for sure
 // also avoid hindering the rendering steps
@@ -77,107 +192,46 @@ jQuery(document).ready(function() {
     },
     render: function() {
       var moreContent = []
-      var buttonContent = ""
       var moreButtonStyle = {
         "display": "",
         "padding": "0 2px"
       }
-      var formStyle = {
-        margin: 0,
-        padding: 0,
-        display: 'inline'
-      }
-      if (this.props.dataType === 'questionnaire') {
-        return (
-          <span onClick={this.handleButtonClick}>
-            <form
-              style={formStyle}
-              action={"/questionnaires/new"}
-              method="GET">
-              <input type="hidden" name="model" value={this.props.parent_name+"Questionnaire"} />
-              <input type="hidden" name="private" value={1} />
-              <button type="submit"
-                      className="btn btn-primary questionnaire-button">
-                  <b>+</b>
-              </button>
-            </form>
-          </span>
-        )
+      if (node_attributes.isQuestionnaire(this.props.dataType)) {
+        return node_attributes.questionnaire.getActions(this.handleButtonClick, this.props.parent_name)
       }
       /** only running this check after the state changes to show the details (which currently is on any click on the row) */
-      if (this.state.showDetails) {
+      else if (this.state.showDetails) {
+        /** this will update after the user clicks anywhere on the row */
+        
         moreButtonStyle.display = "none"
-        /** what does this mean^^ */
         var newNodeType = this.props.nodeType
-        if (this.props.nodeType === 'assignment' || this.props.nodeType === 'questionnaire') {
-          newNodeType = this.props.nodeType + "s"
-        }
-        if (this.props.is_available || newNodeType == 'questionnaires') {
+        
+        if (this.props.is_available || node_attributes.isQuestionnaire(this.props.dataType)) {
           // check if the user id exists
           // check if the current user id matches the user/instructor id associated with a questionnaire/survey
-          // show edit button only for the items which are associated to that user
-          /** TODO: EXPLAIN WHY THIS WORKS */
-          /** its checking if the user is an instructor, but how can it differentiate the types by the instructor here anyways? */
-          /** it was checking for the user id to verify if they had permissions to view the data directly after they clicked on it
-          Apparently the app_variables.currentUserId was null or not equal to anything
-          Need to test/check if this gives access to users that shouldnt have this */
-          // if (app_variables.currentUserId == null || this.props.instructor_id == app_variables.currentUserId) {
-
-
-
-          // if (app_variables.currentUserId == null || this.props.instructor_id == app_variables.currentUserId) {
-          if(newNodeType != 'questionnaires') { // should only be viewed by either assignments or courses
-              moreContent.push(
-                  <span>
-                <a title="Edit" href={"/" + newNodeType + "/" + (parseInt(this.props.id) / 2).toString() + "/edit"}><img
-                    src="/assets/tree_view/edit-icon-24.png"/></a>
+          if (!node_attributes.isQuestionnaire(this.props.dataType)) {
+            moreContent.push(  // should only be viewed by either assignments or courses
+              <span> <a title="Edit" href={`/${node_attributes[this.props.nodeType].plural}/${parseInt(this.props.id)/2}/edit`}>
+                <img src="/assets/tree_view/edit-icon-24.png"/></a>
               </span>
-              );
+            );
           }
-          // }
           moreContent.push(
             <span>
-              <a title="Delete" href={"/tree_display/confirm?id="+(parseInt(this.props.id)/2).toString()+"&nodeType="+newNodeType}><img src="/assets/tree_view/delete-icon-24.png" /></a>
+              <a title="Delete" href={`/tree_display/confirm?id=${parseInt(this.props.id)/2}&nodeType=${node_attributes[this.props.nodeType].plural}`}><img src="/assets/tree_view/delete-icon-24.png" /></a>
             </span>
           )
         }
         moreContent.push(
           <span>
-            <a title="Copy" href={"/"+newNodeType+"/copy?assets=course&id="+(parseInt(this.props.id)/2).toString()}><img src="/assets/tree_view/Copy-icon-24.png" /></a>
+            <a title="Copy" href={`/${node_attributes[this.props.nodeType].plural}/copy?assets=course&id=${parseInt(this.props.id)/2}`}><img src="/assets/tree_view/Copy-icon-24.png" /></a>
           </span>
         )
-        if (newNodeType === 'course') {
-          moreContent.push(
-            <br/>
-          )
-          if (this.props.is_available) {
-            moreContent.push(
-              <span>
-                <a title="Add TA" href={"/course/view_teaching_assistants?id="+(parseInt(this.props.id)/2).toString()+"&model=Course"}>
-                  <img src="/assets/tree_view/add-ta-24.png" />
-                </a>
-                <a title="Create assignment" href={"/assignments/new?parent_id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/add-assignment-24.png" />
-                </a>
-                <a title="Add participants" href={"/participants/list?id="+(parseInt(this.props.id)/2).toString()+"&model=Course"}>
-                  <img src="/assets/tree_view/add-participant-24.png" />
-                </a>
-                <a title="Create teams" href={"/teams/list?id="+(parseInt(this.props.id)/2).toString()+"&type=Course"}>
-                  <img src="/assets/tree_view/create-teams-24.png" />
-                </a>
-                <a title="View grade summary by student" href={"/assessment360/course_student_grade_summary?course_id="+(parseInt(this.props.id)/2).toString()}>
-                  <img src="/assets/tree_view/360-dashboard-24.png" />
-                </a>
-                <a title="Assign survey" href={"/survey_deployment/new?id="+(parseInt(this.props.id)/2).toString()+"&type=CourseSurveyDeployment"}>
-                  <img src="/assets/tree_view/assign-survey-24.png" />
-                </a>
-                <a title="View aggregated teammate & meta reviews" href={"/assessment360/all_students_all_reviews?course_id="+(parseInt(this.props.id)/2).toString()}>
-                  <span style={{"fontSize": "22px", "top": "8px"}} className="glyphicon glyphicon-list-alt"></span>
-                </a>
-              </span>
-            )
-          }
-        } else if (newNodeType === 'assignments') {
+        if (node_attributes.isCourse(this.props.dataType)) {
+          moreContent.push(<br/>)
+          moreContent.push(...node_attributes.course.getActions(parseInt(this.props.id)/2))
+        }
+      } else if (node_attributes.isAssignment(this.props.dataType)) {
           // Assignment tab starts here
           // Now is_intelligent and Add Manager related buttons have not been added into the new UI
           moreContent.push(
@@ -277,13 +331,10 @@ jQuery(document).ready(function() {
             }
             // if ends
             
-            if (this.props.has_topic) {
-                // Moved content out of this to the block outside this containing "if" statement
-            }
           }
           // if ends
 
-        } else if (newNodeType === 'questionnaires'){
+        } else if (node_attributes.isQuestionnaire(this.props.dataType)){
           moreContent.push(
             <span>
               <a title="View questionnaire" href={"/questionnaires/view?id="+(parseInt(this.props.id)/2).toString()}>
@@ -293,7 +344,6 @@ jQuery(document).ready(function() {
           )
         }
         // if ends
-      }
       return (
         <span onClick={this.handleButtonClick}>
           <button style={moreButtonStyle} name="more" type="button" className="glyphicon glyphicon-option-horizontal">

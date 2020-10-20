@@ -174,13 +174,11 @@ class SignUpTopic < ActiveRecord::Base
     signuptopic.topic_name = suggestion.title
     signuptopic.assignment_id = suggestion.assignment_id
     signuptopic.max_choosers = 1
-    isSuccess = false
     if signuptopic.save && suggestion.update_attribute('status', 'Approved')
-      isSuccess = true
+      return signuptopic
     else
-      isSuccess = false
+      return 'failed'
     end
-    return isSuccess
   end
 
 end

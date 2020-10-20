@@ -1,5 +1,4 @@
 source 'https://rubygems.org'
-# ruby "2.3.7"
 
 gem 'rails', '~> 4.2.11.1'
 
@@ -58,7 +57,7 @@ gem 'redis-namespace'
 gem 'redis-rails'
 gem 'rest-client'
 gem 'rgl', require: 'rgl/adjacency'
-# gem 'rjb'
+gem 'rjb'
 gem 'rubyzip'
 gem 'rwordnet'
 gem 'sass-rails'

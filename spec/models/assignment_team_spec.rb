@@ -363,6 +363,21 @@ describe 'AssignmentTeam' do
       team.destroy
     end
   end
+  
+  describe "#create_new_team" do
+    context "for given assignment" do
+      it "creates a new team for assignment" do
+        team = build(:assignment_team, id: 1, name: "new_team_E2069")
+        allow(AssignmentTeam).to receive(:create)
+        allow(TeamsUser).to receive(:create)
+        allow(SignedUpTeam).to receive(:create)
+        allow(TeamNode).to receive(:create)
+        allow(TeamUserNode).to receive(:create)
+        expect(team.fullname).to eq "new_team_E2069"
+      end
+    end
+  end
+  
 
   describe "#scores" do
     context "when a hash of question is given" do

@@ -106,7 +106,7 @@ class SuggestionController < ApplicationController
       # if this user do not have team in this assignment, create one for him/her and assign this topic to this team.
       if @team_id.nil?
         #E2069 UPDATE - move create_new_team to appropriate class
-        Team.create_new_team(@user_id, @signuptopic)
+        Team.create_new_team(@user_id, @signuptopic.id, @signuptopic.assignment_id)
       else # this user has a team in this assignment, check whether this team has topic or not
         if @topic_id.nil?
           # clean waitlists
@@ -117,13 +117,13 @@ class SuggestionController < ApplicationController
           @signuptopic.save
           # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team
           #E2069 UPDATE - move send_email to an appropriate class
-          Mailer.send_email(@user_id, @team_id, @suggestion)
+          Mailer.send_email(@user_id, @team_id, @suggestion.title)
         end
       end
     else
       # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team
       #E2069 UPDATE - move send_email to an appropriate class
-      Mailer.send_email(@user_id, @team_id, @suggestion)
+      Mailer.send_email(@user_id, @team_id, @suggestion.title)
     end
   end
 

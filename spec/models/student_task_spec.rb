@@ -76,6 +76,19 @@ describe StudentTask do
       expect(student_task.not_started?).to eq(false)
     end
   end
+  
+  # Tests relative_deadline for proper assignment when stage_deadline is present
+  describe "#relative_deadline" do
+    it 'returns false without a valid stage deadline' do
+      allow(student_task).to receive(:stage_deadline).and_return(nil)
+      expect(student_task.relative_deadline).to be_falsey
+    end
+    it 'returns true' do
+      allow(student_task).to receive(:stage_deadline).and_return(true)
+      allow(student_task).to receive(:time_ago_in_words).and_return("astring")
+      expect(student_task.relative_deadline).to eq("astring")
+    end
+  end
 
   describe "#revision?" do
 	it 'returns true if content is submitted' do

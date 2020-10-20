@@ -54,9 +54,10 @@ jQuery(document).ready(function() {
     return month[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear() + " - " + strTime;
   }
 
-  function showIntelligentAssignmentDialog() {
-    jQuery( "#intelligent_assignment_dialog" ).dialog({ closeText: "hide", modal: true, resizable: false, width: 500 });
-  }
+  // function showIntelligentAssignmentDialog() {
+  //   jQuery( "#intelligent_assignment_dialog" ).dialog({ closeText: "hide", modal: true, resizable: false, width: 500 });
+  // }
+  /** Commented out unused method above */
 
   var RowAction = React.createClass({
     getInitialState: function() {

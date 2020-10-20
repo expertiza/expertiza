@@ -33,91 +33,6 @@ describe StudentTask do
       assignment: assignment,
     )
   end
-
-
-describe "#topic_name" do
-	it 'returns the topic name if given one' do
-	expect(topic2.topic_name).to eq("TestReview")
-	end
-
-end
-
-describe "#complete?" do
-      it 'checks a student_task is complete' do
-	student_task.stage_deadline = 'Complete'
-        expect(student_task.complete?).to be true
-      end
-end
-
-describe "#incomplete?" do
-      it 'checks a student_task is incomplete' do
-	expect(student_task.incomplete?).to be true
-      end 	
-end
-
-  describe "#not_started?" do
-    it 'returns true' do
-      allow(student_task).to receive(:in_work_stage?).and_return(true)
-      allow(student_task).to receive(:started?).and_return(true)
-      expect(student_task.not_started?).to eq(false)
-    end
-  end
-  describe "#teamed_students" do
-    context 'when not in any team' do
-      it 'returns empty' do
-        expect(StudentTask.teamed_students(user3)).to eq({})
-      end
-    end
-    context 'when assigned in a cource_team ' do
-      it 'returns empty' do
-        allow(user).to receive(:teams).and_return([course_team])
-        expect(StudentTask.teamed_students(user)).to eq({})
-      end
-    end
-    context 'when assigned in a assignment_team ' do
-      it 'returns empty' do
-        allow(user).to receive(:teams).and_return([team])
-        allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: assignment.id).and_return(participant)
-        allow(AssignmentParticipant).to receive(:find_by).with(user_id: 5, parent_id: assignment.id).and_return(participant2)
-        allow(Assignment).to receive(:find_by).with(id: team.parent_id).and_return(assignment)
-        # allow(Team).to receive(:find).with(team.id).and_return(team)
-        expect(StudentTask.teamed_students(user)).to eq({assignment.course_id => [user2.fullname]})
-      end
-    end
-  end
-  describe "#get_due_date_data" do
-    context 'when called with assignment having empty due dates' do
-      it "return empty time_list array" do
-        timeline_list = []
-        StudentTask.get_due_date_data(assignment, timeline_list)
-        expect(timeline_list).to eq([])
-      end
-    end
-    context 'when called with assignment having due date' do
-      context 'and due_at value nil' do
-        it "return empty time_list array" do
-          allow(due_date).to receive(:deadline_type).and_return(deadline_type)
-          timeline_list = []
-          due_date.due_at=nil;
-          assignment.due_dates = [due_date]
-          StudentTask.get_due_date_data(assignment, timeline_list)
-          expect(timeline_list).to eq([])
-        end
-      end
-      context 'and due_at value not nil' do
-        it "return time_list array" do
-          allow(due_date).to receive(:deadline_type).and_return(deadline_type)
-          timeline_list = []
-          assignment.due_dates = [due_date]
-          StudentTask.get_due_date_data(assignment, timeline_list)
-          expect(timeline_list).to eq([{
-                                           :label=>(due_date.deadline_type.name + ' Deadline').humanize,
-                                           :updated_at=>due_date.due_at.strftime('%a, %d %b %Y %H:%M')
-                                       }])
-        end
-      end
-    end
-  end
   describe "#get_peer_review_data" do
     context 'when no review response mapped' do
       it 'returns empty' do
@@ -197,6 +112,75 @@ end
       end
     end
   end
+
+describe "#revision?" do
+	it 'returns true if content is submitted' do
+	allow(student_task).to receive(:content_submitted_in_current_stage?).and_return(true)
+	allow(student_task).to receive(:reviews_given_in_current_stage?).and_return(false)
+	allow(student_task).to receive(:metareviews_given_in_current_stage?).and_return(false)
+	expect(student_task.revision?).to eq(true)
+	end
+
+	it 'returns true if reviews given is true' do
+	allow(student_task).to receive(:content_submitted_in_current_stage?).and_return(false)
+	allow(student_task).to receive(:reviews_given_in_current_stage?).and_return(true)
+	allow(student_task).to receive(:metareviews_given_in_current_stage?).and_return(false)
+	expect(student_task.revision?).to eq(true)
+	end
+
+	it 'returns true if metareviews given is true' do
+	allow(student_task).to receive(:content_submitted_in_current_stage?).and_return(false)
+	allow(student_task).to receive(:reviews_given_in_current_stage?).and_return(false)
+	allow(student_task).to receive(:metareviews_given_in_current_stage?).and_return(true)
+	expect(student_task.revision?).to eq(true)
+	end
+	
+end
+
+describe "#metreviews_given_in_current_stage?" do
+	it 'return true' do
+	student_task.current_stage = "metareview"
+	allow(student_task).to receive(:metareviews_given?).and_return(true)
+	expect(student_task.metareviews_given_in_current_stage?).to eq(true)
+	end
+end
+
+describe "#reviews_given_in_current_stage?" do
+	it 'return true' do
+	student_task.current_stage = "review"
+	allow(student_task).to receive(:reviews_given?).and_return(true)
+	expect(student_task.reviews_given_in_current_stage?).to eq(true)
+	end
+end
+
+
+describe "#topic_name" do
+	it 'returns the topic name if given one' do
+	expect(topic2.topic_name).to eq("TestReview")
+	end
+
+end
+
+describe "#complete?" do
+      it 'checks a student_task is complete' do
+	student_task.stage_deadline = 'Complete'
+        expect(student_task.complete?).to be true
+      end
+end
+
+describe "#incomplete?" do
+      it 'checks a student_task is incomplete' do
+	expect(student_task.incomplete?).to be true
+      end 	
+end
+
+describe "#not_started?" do
+	it 'returns true' do
+	allow(student_task).to receive(:in_work_stage?).and_return(true)
+	allow(student_task).to receive(:started?).and_return(true)
+	expect(student_task.not_started?).to eq(false)
+	end
+end
 
 describe "#revision?" do
 	it 'returns true if content is submitted' do

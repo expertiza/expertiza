@@ -525,8 +525,10 @@ jQuery(document).ready(function() {
                   this.setState({
                       expanded: true
                   }, function () {
+                    console.log('line 528 ', this.props.newParams, this.props)
                       this.props.rowClicked(this.props.id, true, this.props.newParams)
                   })
+                  
               }
           }
       },
@@ -537,7 +539,8 @@ jQuery(document).ready(function() {
         this.setState({
           expanded: !this.state.expanded
         }, function() {
-          this.props.rowClicked(this.props.id, this.state.expanded,this.props.newParams)
+          console.log('line 542 ', this.props.newParams, this.props)
+          this.props.rowClicked(this.props.id, this.state.expanded, this.props.newParams)
         })
       } else {
         event.stopPropagation()
@@ -791,23 +794,25 @@ jQuery(document).ready(function() {
         expandedRow: []
       }
     },
-    handleExpandClick: function(id, expanded,newParams) {
+    handleExpandClick: function(id, expanded, newParams) {
       this.state.expandedRow.concat([id])
+      console.log(this.state, this, expanded, newParams)
       if (expanded) {
         this.setState({ 
           expandedRow: this.state.expandedRow.concat([id])
         });
-        if(this.props.dataType!='assignment') {
+        // if(this.props.dataType!='assignment') {
             _this = this;
-            jQuery.get('/tree_display/get_sub_folder_contents',
+            jQuery.post('/tree_display/get_sub_folder_contents',
                 {
-                    reactParams2: newParams
+                    reactParams2: newParams,
+                    
                 },
                 function (data) {
                     _this.props.data[id.split("_")[2]]['children'] = data;
                     _this.forceUpdate();
                 }, 'json');
-        }
+        // }
       } else {
         var index = this.state.expandedRow.indexOf(id)
         if (index > -1) {
@@ -877,8 +882,8 @@ jQuery(document).ready(function() {
                   _rows.push(<ContentTableDetailsRow
                       key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
                       id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
-                      showElement={true}
-                      // showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                      // showElement={true}
+                      showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
                       // what tfffff^^^
                       dataType={_this.props.dataType}
                       children={entry.children}

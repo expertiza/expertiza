@@ -291,65 +291,70 @@ describe StudentTask do
       end
     end
   end
-describe "#get_author_feedback_data" do
-  context 'when no feedback response mapped' do
-    it 'returns empty' do
-      timeline_list=[]
-      StudentTask.get_author_feedback_data(user2,timeline_list)
-      expect(timeline_list).to eq([])
+  
+  # Verifies retrieval of feedback from author
+  describe "#get_author_feedback_data" do
+    context 'when no feedback response mapped' do
+      it 'returns empty' do
+        timeline_list=[]
+        StudentTask.get_author_feedback_data(user2,timeline_list)
+        expect(timeline_list).to eq([])
+      end
+    end
+    context 'when mapped to feedback response map' do
+      it 'returns timeline array' do
+        timeline_list=[]
+        allow(FeedbackResponseMap).to receive_message_chain(:where, :find_each).with(reviewer_id: 1).with(no_args).and_yield(review_response_map)
+        allow(review_response_map).to receive(:id).and_return(1)
+        allow(Response).to receive_message_chain(:where, :last).with(map_id: 1).with(no_args).and_return(response)
+        allow(response).to receive(:updated_at).and_return(Time.now)
+        timevalue = Time.now.strftime('%a, %d %b %Y %H:%M')
+        expect(StudentTask.get_author_feedback_data(1,timeline_list)).to eq([{:id=>1, :label=>"Author feedback", :updated_at=>timevalue}])
+      end
     end
   end
-  context 'when mapped to feedback response map' do
-    it 'returns timeline array' do
-      timeline_list=[]
-      allow(FeedbackResponseMap).to receive_message_chain(:where, :find_each).with(reviewer_id: 1).with(no_args).and_yield(review_response_map)
-      allow(review_response_map).to receive(:id).and_return(1)
-      allow(Response).to receive_message_chain(:where, :last).with(map_id: 1).with(no_args).and_return(response)
-      allow(response).to receive(:updated_at).and_return(Time.now)
-      timevalue = Time.now.strftime('%a, %d %b %Y %H:%M')
-      expect(StudentTask.get_author_feedback_data(1,timeline_list)).to eq([{:id=>1, :label=>"Author feedback", :updated_at=>timevalue}])
-    end
-  end
-end
-describe '#get_submission_data' do
-  context 'when no submission data mapped' do
-    it 'returns nil' do
-      timeline_list=[]
-      expect(StudentTask.get_submission_data(1,1,timeline_list)).to eq(nil)
-    end
-  end
-  context 'when submission data mapped and not submit hyperlink or Remove hyperlink' do
-    it 'returns timeline_list' do
-      timeline_list=[]
-      allow(SubmissionRecord).to receive_message_chain(:where, :find_each).with(team_id: 1, assignment_id: 1).with(no_args).and_yield(submission_record)
-      allow(submission_record).to receive(:operation).and_return('testing_label')
-      allow(submission_record).to receive(:updated_at).and_return(Time.new(2019))
-      timevalue = Time.new(2019).strftime('%a, %d %b %Y %H:%M')
-      expect(StudentTask.get_submission_data(1,1,timeline_list)).to eq([{:label=>"Testing label", :updated_at=>timevalue}])
-    end
-  end
-  context 'when submission data mapped and operation is submit_hyperlink' do
-    it 'returns timeline_list with link' do
-      timeline_list=[]
-      allow(SubmissionRecord).to receive_message_chain(:where, :find_each).with(team_id: 1, assignment_id: 1).with(no_args).and_yield(submission_record)
-      allow(submission_record).to receive(:operation).and_return('Submit Hyperlink')
-      allow(submission_record).to receive(:updated_at).and_return(Time.new(2019))
-      timevalue = Time.new(2019).strftime('%a, %d %b %Y %H:%M')
-      expect(StudentTask.get_submission_data(1,1,timeline_list)).to eq([{:label=>"Submit hyperlink", :updated_at=>timevalue, :link=>"www.wolfware.edu"}])
-    end
-  end
-  context 'when submission data mapped and operation is Remove Hyperlink' do
-    it 'returns timeline_list with link' do
-      timeline_list=[]
-      allow(SubmissionRecord).to receive_message_chain(:where, :find_each).with(team_id: 1, assignment_id: 1).with(no_args).and_yield(submission_record)
-      allow(submission_record).to receive(:operation).and_return('Remove Hyperlink')
-      timevalue = Time.new(2019).strftime('%a, %d %b %Y %H:%M')
-      allow(submission_record).to receive(:updated_at).and_return(Time.new(2019))
-      expect(StudentTask.get_submission_data(1,1,timeline_list)).to eq([{:label=>"Remove hyperlink", :updated_at=>timevalue, :link=>"www.wolfware.edu"}])
-    end
-  end
-end
 
+  # Verrifies retrieval of submission data from submission
+  describe '#get_submission_data' do
+    context 'when no submission data mapped' do
+      it 'returns nil' do
+        timeline_list=[]
+        expect(StudentTask.get_submission_data(1,1,timeline_list)).to eq(nil)
+      end
+    end
+    context 'when submission data mapped and not submit hyperlink or Remove hyperlink' do
+      it 'returns timeline_list' do
+        timeline_list=[]
+        allow(SubmissionRecord).to receive_message_chain(:where, :find_each).with(team_id: 1, assignment_id: 1).with(no_args).and_yield(submission_record)
+        allow(submission_record).to receive(:operation).and_return('testing_label')
+        allow(submission_record).to receive(:updated_at).and_return(Time.new(2019))
+        timevalue = Time.new(2019).strftime('%a, %d %b %Y %H:%M')
+        expect(StudentTask.get_submission_data(1,1,timeline_list)).to eq([{:label=>"Testing label", :updated_at=>timevalue}])
+      end
+    end
+    context 'when submission data mapped and operation is submit_hyperlink' do
+      it 'returns timeline_list with link' do
+        timeline_list=[]
+        allow(SubmissionRecord).to receive_message_chain(:where, :find_each).with(team_id: 1, assignment_id: 1).with(no_args).and_yield(submission_record)
+        allow(submission_record).to receive(:operation).and_return('Submit Hyperlink')
+        allow(submission_record).to receive(:updated_at).and_return(Time.new(2019))
+        timevalue = Time.new(2019).strftime('%a, %d %b %Y %H:%M')
+        expect(StudentTask.get_submission_data(1,1,timeline_list)).to eq([{:label=>"Submit hyperlink", :updated_at=>timevalue, :link=>"www.wolfware.edu"}])
+      end
+    end
+    context 'when submission data mapped and operation is Remove Hyperlink' do
+      it 'returns timeline_list with link' do
+        timeline_list=[]
+        allow(SubmissionRecord).to receive_message_chain(:where, :find_each).with(team_id: 1, assignment_id: 1).with(no_args).and_yield(submission_record)
+        allow(submission_record).to receive(:operation).and_return('Remove Hyperlink')
+        timevalue = Time.new(2019).strftime('%a, %d %b %Y %H:%M')
+        allow(submission_record).to receive(:updated_at).and_return(Time.new(2019))
+        expect(StudentTask.get_submission_data(1,1,timeline_list)).to eq([{:label=>"Remove hyperlink", :updated_at=>timevalue, :link=>"www.wolfware.edu"}])
+      end
+    end
+  end
+  
+  # Verifies retrieval of timeline data
   describe '#get_timeline_data' do
     context 'when no timeline data mapped' do
       it 'returns nil' do

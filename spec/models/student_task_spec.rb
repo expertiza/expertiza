@@ -63,6 +63,19 @@ describe StudentTask do
     end
   end
 
+  # Tests the updating of the @hyperlinks instance variable based on participant's team
+  describe "#hyperlinks" do
+    it 'returns empty array if participant has no team' do
+      allow(student_task).to receive_message_chain(:participant, :team, :nil?).and_return(true)
+      expect(student_task.hyperlinks).to eq([])
+    end
+    it 'assigns returns populated hyperlinks instance if participant has team' do
+      allow(student_task).to receive_message_chain(:participant, :team, :hyperlinks).and_return(['something'])
+      allow(student_task).to receive_message_chain(:participant, :team, :nil?).and_return(false)
+      expect(student_task.hyperlinks).to eq(['something'])
+    end 	
+  end
+
   describe "#incomplete?" do
     it 'checks a student_task is incomplete' do
       expect(student_task.incomplete?).to be true

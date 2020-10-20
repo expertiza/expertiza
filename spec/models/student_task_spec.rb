@@ -63,17 +63,17 @@ describe StudentTask do
     end
   end
 
-  # Tests the updating of the @hyperlinks instance variable based on participant's team
-  describe "#hyperlinks" do
-    it 'returns empty array if participant has no team' do
-      allow(student_task).to receive_message_chain(:participant, :team, :nil?).and_return(true)
-      expect(student_task.hyperlinks).to eq([])
+#tests if hyperlinks or other content is submitted during the submission stage
+#current stage must be submission
+#participant has to belong to a team
+#the team has submitted some content
+  describe "content_submitted_in_current_stage?" do
+    it 'checks if content is submitted during submission stage'do
+       student_task.current_stage = "submission"
+       allow(participant).to receive(:team).and_return([team])
+       allow(participant.team).to receive(:has_submissions?).and_return(true)
+       expect(student_task.content_submitted_in_current_stage?).to eq(true)
     end
-    it 'assigns returns populated hyperlinks instance if participant has team' do
-      allow(student_task).to receive_message_chain(:participant, :team, :hyperlinks).and_return(['something'])
-      allow(student_task).to receive_message_chain(:participant, :team, :nil?).and_return(false)
-      expect(student_task.hyperlinks).to eq(['something'])
-    end 	
   end
 
   describe "#incomplete?" do

@@ -4,6 +4,7 @@ let app_variables = {
   currentUserId: null
 }
 
+/** this object helps consolidate some of the logic used on this page */
 const node_attributes = {
   isAssignment(name) {
     return name === 'assignment' || name === 'assignments'
@@ -270,11 +271,6 @@ jQuery(document).ready(function() {
     var strTime = hours + ':' + minutes + ' ' + ampm
     return month[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear() + ' - ' + strTime
   }
-
-  // function showIntelligentAssignmentDialog() {
-  //   jQuery( "#intelligent_assignment_dialog" ).dialog({ closeText: "hide", modal: true, resizable: false, width: 500 });
-  // }
-  /** Commented out unused method above */
 
   var RowAction = React.createClass({
     getInitialState: function() {

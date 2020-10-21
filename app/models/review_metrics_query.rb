@@ -5,10 +5,10 @@ class ReviewMetricsQuery
   TAG_CERTAINTY_THRESHOLD = 0.8
 
   # link each tag prompt to the corresponding key in the review hash
-  PROMPT_TO_METRIC = {'Mention Problems?' => 'problem',
-                      'Suggest Solutions?' => 'suggestions',
-                      'Mention Praise?' => 'sentiment',
-                      'Positive Tone?' => 'emotions'}.freeze
+  PROMPT_TO_METRIC = {'mention problems?' => 'problem',
+                      'suggest solutions?' => 'suggestions',
+                      'mention praise?' => 'sentiment',
+                      'positive tone?' => 'emotions'}.freeze
 
   def self.retrieve_from_cache(tag_prompt_deployment_id, review_id)
     AnswerTag.where(answer_id: review_id, tag_prompt_deployment_id: tag_prompt_deployment_id).where.not(confidence_level: nil).first
@@ -24,7 +24,7 @@ class ReviewMetricsQuery
     # ask MetricsController to make a call to the review metrics web service
     tag_prompt_deployments.each do |tag_prompt_deployment|
       tag_prompt = tag_prompt_deployment.tag_prompt
-      metric = PROMPT_TO_METRIC[tag_prompt.prompt]
+        metric = PROMPT_TO_METRIC[tag_prompt.prompt.downcase]
       begin
         ws_output = MetricsController.new.bulk_retrieve_metric(metric, ws_input, false)
         ws_output_confidence = MetricsController.new.bulk_retrieve_metric(metric, ws_input, true)

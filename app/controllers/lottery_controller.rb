@@ -215,5 +215,5 @@ class LotteryController < ApplicationController
     assignment.update_attributes(is_intelligent: false)
     flash[:success] = 'The intelligent assignment was successfully completed for ' + assignment.name + '.'
   end
-  # rubocop:enable Metrics/AbcSize
+  # rubocop:enable Metrics/AbcSize 
 end

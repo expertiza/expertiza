@@ -1,5 +1,6 @@
 <%if @current_role_name == 'Student' %>
 
+<!-- Student view will differ from Instructor view -->
 <!--Following code was brought over from student_view-->
 <h2>View Suggested topic <%= @suggestion.title %></h2>
 <table border=0 cellspacing=10>
@@ -74,6 +75,7 @@
 
 <%else%>
 
+<!-- Function to pass permission parameters to the controller -->
 <script>
   $(document).ready(function(){
     $('input[type="checkbox"].suggestion_comment_class').change(function(e) {
@@ -199,6 +201,7 @@
 <br>
 <hr>
 <p>
+  <!-- Suggestion's approval uses the new logic refactored in E2069 -->
   <% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' && session[:user] != nil && (session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4) %>
   <%= form_tag :action => 'submit', :id => @suggestion do %>
   <%= submit_tag "Approve suggestion", :name => 'approve_suggestion_and_notify' ,:class => "btn btn-success"%>

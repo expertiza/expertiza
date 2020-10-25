@@ -24,9 +24,9 @@ class CreateTeammateReviewMappings < ActiveRecord::Migration
        if reviewer != nil and reviewee != nil
           map = TeammateReviewMapping.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => review["assignment_id"])
        else
-          #puts "REVIEWER: #{review["reviewer_id"]}"
-          #puts "REVIEWEE: #{review["reviewe3_id"]}"
-          #puts review.id
+          puts "REVIEWER: #{review["reviewer_id"]}"
+          puts "REVIEWEE: #{review["reviewe3_id"]}"
+          puts review.id
        end
        execute "update `teammate_reviews` set `mapping_id` = #{map.id} where `id` = #{review["id"]}"           
     }

@@ -26,7 +26,7 @@ class SubmitMultipleHyperlinks < ActiveRecord::Migration
   # be many multiple links values that are going to be converted to a space 
   # sparated string
   def self.down
-    #puts "Becareful when downgrading submitted_hyperlinks, please read 20110205220301_submit_multiple_hyperlinks.rb"
+    puts "Becareful when downgrading submitted_hyperlinks, please read 20110205220301_submit_multiple_hyperlinks.rb"
     
     Participant.find_each do |p|
       unless p.submitted_hyperlinks.nil?

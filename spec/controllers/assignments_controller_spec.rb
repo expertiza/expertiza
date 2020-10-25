@@ -132,7 +132,7 @@ describe AssignmentsController do
       }
     end
 
-    #E2054 Ensure Assignment Names Cannot Match
+    #E2054 Ensure Assignment Names Cannot Match When Creating Assignments
     context 'when assignment_form is not saved successfully due to same assignment name already existing' do
       it 'raises validation error' do
         assignment1 = create(:assignment, name: 'Assignment 1', course_id: 1, directory_path: 'Assignment1')
@@ -141,7 +141,7 @@ describe AssignmentsController do
       end
     end
 
-    #E2054 Ensure Submission Directory Cannot Match
+    #E2054 Ensure Submission Directory Cannot Match When Creating Assignments
     context 'when assignment_form is not saved successfully due to same submission directory already existing' do
       it 'raises validation error' do
         assignment1 = create(:assignment, name: 'Assignment 1', course_id: 1, directory_path: 'Assignment1')

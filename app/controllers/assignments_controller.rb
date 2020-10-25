@@ -30,7 +30,9 @@ class AssignmentsController < ApplicationController
       find_existing_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
       dir_path = assignment_form_params[:assignment][:directory_path]
       find_existing_directory = Assignment.find_by(directory_path: dir_path, course_id: @assignment_form.assignment.course_id)
-      if !find_existing_assignment and !find_existing_directory and @assignment_form.save #No existing names/directories
+
+      #E2054 No existing names/directories were found
+      if !find_existing_assignment and !find_existing_directory and @assignment_form.save
         @assignment_form.create_assignment_node
         current_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
         assignment_form_params[:assignment][:id] = current_assignment.id.to_s
@@ -50,15 +52,20 @@ class AssignmentsController < ApplicationController
         redirect_to edit_assignment_path aid
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
         return
-      else #Existing Directory or Assignment Name was Found
+      else
+        #E2054 Existing Assignment Name Found
         if find_existing_assignment
           flash[:error] = @assignment_form.assignment.name + " already exists as an assignment name"
         end
+        #E2054 Submission Directory Found
         if find_existing_directory
           flash[:error] = dir_path + " already exists as a submisison directory name"
         end
+
+        #E2054 Redirect to this page instead of render new
+        #Render new was causing the assignment to be made
+        #Even when the validation failed
         redirect_to "/assignments/new?private=1"
-        #Rendering to this page instead of render new, this prevents it from creating a new assignment upon error
       end
     else
       render 'new'

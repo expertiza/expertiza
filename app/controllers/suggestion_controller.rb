@@ -114,7 +114,7 @@ class SuggestionController < ApplicationController
     if @suggestion.signup_preference == 'Y'
       # if this user do not have team in this assignment, create one for him/her and assign this topic to this team.
       if @team_id.nil?
-        #E2069 UPDATE
+        #E2069 UPDATE - move creation of team to appropriate class
         AssignmentTeam.create_new_team(@user_id, @signuptopic)
       else # this user has a team in this assignment, check whether this team has topic or not
         if @topic_id.nil?
@@ -125,28 +125,31 @@ class SuggestionController < ApplicationController
           @signuptopic.private_to = @user_id
           @signuptopic.save
           # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team
-          #E2069 UPDATE
+          #E2069 UPDATE - move send_email to appropriate class
           Mailer.send_email(@user_id, @team_id, @suggestion)
         end
       end
     else
       # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team
-      #E2069 UPDATE
+      #E2069 UPDATE - move send_email to appropriate class
       Mailer.send_email(@user_id, @team_id, @suggestion)
     end
   end
 
   #Changed name from approve_suggestion to approve_suggestion_and_notify, since this method really is doing both things
   #rather than just approving a suggestion
+  #merge two approve methods into one sensible method
   def approve_suggestion_and_notify
     @suggestion = Suggestion.find(params[:id])
     @user_id = User.find_by(name: @suggestion.unityID).try(:id)
+    #can approve only if team & topic are found
     if @user_id
       @team_id = TeamsUser.team_id(@suggestion.assignment_id, @user_id)
       @topic_id = SignedUpTeam.topic_id(@suggestion.assignment_id, @user_id)
     end
     #After getting topic from user/team, get the suggestion
     @signuptopic = SignUpTopic.new_topic_from_suggestion(@suggestion)
+    #Get success only if the signuptopic object was returned from its class
     if @signuptopic != 'failed'
       flash[:success] = 'The suggestion was successfully approved.'
     else

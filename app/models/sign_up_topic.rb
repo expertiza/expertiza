@@ -166,7 +166,7 @@ class SignUpTopic < ActiveRecord::Base
     topic_display + self.topic_name
   end
 
-  # Was originally "approve" from suggestion_controller, but setting topic fields
+  # E2069 - Was originally "approve" from suggestion_controller, but setting topic fields
   # should happen here in sign_up_topic.rb
   def self.new_topic_from_suggestion(suggestion)
     signuptopic = SignUpTopic.new
@@ -174,6 +174,7 @@ class SignUpTopic < ActiveRecord::Base
     signuptopic.topic_name = suggestion.title
     signuptopic.assignment_id = suggestion.assignment_id
     signuptopic.max_choosers = 1
+    #return this model based on these checks
     if signuptopic.save && suggestion.update_attribute('status', 'Approved')
       return signuptopic
     else

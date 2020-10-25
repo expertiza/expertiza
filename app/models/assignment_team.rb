@@ -288,6 +288,7 @@ class AssignmentTeam < Team
   # this is a method for lazy team creation. Here may not be the right place for this method.
   # should be refactored into a static method in AssignmentTeam class. --Yang
   def self.create_new_team(user_id, signuptopic)
+    #create team based on given signuptopic and users
     new_team = AssignmentTeam.create(name: 'Team_' + rand(10_000).to_s,
                                      parent_id: signuptopic.assignment_id, type: 'AssignmentTeam')
     t_user = TeamsUser.create(team_id: new_team.id, user_id: user_id)

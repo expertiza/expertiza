@@ -1,12 +1,19 @@
 class SuggestionController < ApplicationController
-  include AuthorizationHelper
-
   def action_allowed?
     case params[:action]
-    when 'create', 'new', 'student_view', 'student_edit', 'update_suggestion', 'submit'
-      current_user_has_student_privileges?
+    when 'create', 'new', 'student_view', 'student_edit', 'update_suggestion'
+      current_role_name.eql? 'Student'
+    when 'submit'
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator',
+       'Student'].include? current_role_name
     else
-      current_user_has_ta_privileges?
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator'].include? current_role_name
     end
   end
 
@@ -15,11 +22,11 @@ class SuggestionController < ApplicationController
     @suggestioncomment.suggestion_id = params[:id]
     @suggestioncomment.commenter = session[:user].name
     if @suggestioncomment.save
-      flash[:notice] = "Your comment has been successfully added."
+      flash[:success] = "Your comment has been successfully added."
     else
       flash[:error] = "There was an error in adding your comment."
     end
-    if current_user_has_student_privileges?
+    if current_role_name.eql? 'Student'
       redirect_to action: "student_view", id: params[:id]
     else
       redirect_to action: "show", id: params[:id]
@@ -37,6 +44,8 @@ class SuggestionController < ApplicationController
 
   def student_view
     @suggestion = Suggestion.find(params[:id])
+    @current_role_name = current_role_name
+    render :show
   end
 
   def student_edit
@@ -82,43 +91,10 @@ class SuggestionController < ApplicationController
   def submit
     if !params[:add_comment].nil?
       add_comment
-    elsif !params[:approve_suggestion].nil?
-      approve_suggestion
+    elsif !params[:approve_suggestion_and_notify].nil?
+      approve_suggestion_and_notify
     elsif !params[:reject_suggestion].nil?
       reject_suggestion
-    end
-  end
-
-  # this is a method for lazy team creation. Here may not be the right place for this method.
-  # should be refactored into a static method in AssignmentTeam class. --Yang
-  def create_new_team
-    new_team = AssignmentTeam.create(name: 'Team_' + rand(10_000).to_s,
-                                     parent_id: @signuptopic.assignment_id, type: 'AssignmentTeam')
-    t_user = TeamsUser.create(team_id: new_team.id, user_id: @user_id)
-    SignedUpTeam.create(topic_id: @signuptopic.id, team_id: new_team.id, is_waitlisted: 0)
-    parent = TeamNode.create(parent_id: @signuptopic.assignment_id, node_object_id: new_team.id)
-    TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
-  end
-
-  # If the user submits a suggestion and gets it approved -> Send email
-  # If user submits a suggestion anonymously and it gets approved -> DOES NOT get an email
-  def send_email
-    proposer = User.find_by(id: @user_id)
-    if proposer
-      teams_users = TeamsUser.where(team_id: @team_id)
-      cc_mail_list = []
-      teams_users.each do |teams_user|
-        cc_mail_list << User.find(teams_user.user_id).email if teams_user.user_id != proposer.id
-      end
-      Mailer.suggested_topic_approved_message(
-        to: proposer.email,
-        cc: cc_mail_list,
-        subject: "Suggested topic '#{@suggestion.title}' has been approved",
-        body: {
-          approved_topic_name: @suggestion.title,
-          proposer: proposer.name
-        }
-      ).deliver_now!
     end
   end
 
@@ -138,7 +114,8 @@ class SuggestionController < ApplicationController
     if @suggestion.signup_preference == 'Y'
       # if this user do not have team in this assignment, create one for him/her and assign this topic to this team.
       if @team_id.nil?
-        create_new_team
+        #E2069 UPDATE - move creation of team to appropriate class
+        AssignmentTeam.create_new_team(@user_id, @signuptopic)
       else # this user has a team in this assignment, check whether this team has topic or not
         if @topic_id.nil?
           # clean waitlists
@@ -148,17 +125,36 @@ class SuggestionController < ApplicationController
           @signuptopic.private_to = @user_id
           @signuptopic.save
           # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team
-          send_email
+          #E2069 UPDATE - move send_email to appropriate class
+          Mailer.send_email(@user_id, @team_id, @suggestion)
         end
       end
     else
       # if this team has topic, Expertiza will send an email (suggested_topic_approved_message) to this team
-      send_email
+      #E2069 UPDATE - move send_email to appropriate class
+      Mailer.send_email(@user_id, @team_id, @suggestion)
     end
   end
 
-  def approve_suggestion
-    approve
+  #Changed name from approve_suggestion to approve_suggestion_and_notify, since this method really is doing both things
+  #rather than just approving a suggestion
+  #merge two approve methods into one sensible method
+  def approve_suggestion_and_notify
+    @suggestion = Suggestion.find(params[:id])
+    @user_id = User.find_by(name: @suggestion.unityID).try(:id)
+    #can approve only if team & topic are found
+    if @user_id
+      @team_id = TeamsUser.team_id(@suggestion.assignment_id, @user_id)
+      @topic_id = SignedUpTeam.topic_id(@suggestion.assignment_id, @user_id)
+    end
+    #After getting topic from user/team, get the suggestion
+    @signuptopic = SignUpTopic.new_topic_from_suggestion(@suggestion)
+    #Get success only if the signuptopic object was returned from its class
+    if @signuptopic != 'failed'
+      flash[:success] = 'The suggestion was successfully approved.'
+    else
+      flash[:error] = 'An error occurred when approving the suggestion.'
+    end
     notification
     redirect_to action: 'show', id: @suggestion
   end
@@ -174,6 +170,12 @@ class SuggestionController < ApplicationController
     redirect_to action: 'show', id: @suggestion
   end
 
+  def update_visibility
+    SuggestionComment.find(params[:cmnt_id]).update_attributes(visible_to_student: params[:visibility])
+    puts params[:cmnt_id], params[:visibility]
+    render json: {success: 'true'}
+  end
+
   private
 
   def suggestion_params
@@ -181,22 +183,4 @@ class SuggestionController < ApplicationController
                                        :status, :unityID, :signup_preference)
   end
 
-  def approve
-    @suggestion = Suggestion.find(params[:id])
-    @user_id = User.find_by(name: @suggestion.unityID).try(:id)
-    if @user_id
-      @team_id = TeamsUser.team_id(@suggestion.assignment_id, @user_id)
-      @topic_id = SignedUpTeam.topic_id(@suggestion.assignment_id, @user_id)
-    end
-    @signuptopic = SignUpTopic.new
-    @signuptopic.topic_identifier = 'S' + Suggestion.where("assignment_id = ? and id <= ?", @suggestion.assignment_id, @suggestion.id).size.to_s
-    @signuptopic.topic_name = @suggestion.title
-    @signuptopic.assignment_id = @suggestion.assignment_id
-    @signuptopic.max_choosers = 1
-    if @signuptopic.save && @suggestion.update_attribute('status', 'Approved')
-      flash[:success] = 'The suggestion was successfully approved.'
-    else
-      flash[:error] = 'An error occurred when approving the suggestion.'
-    end
-  end
 end

@@ -63,7 +63,7 @@ describe CoursesController do
       allow(Course).to receive(:new).and_return(course_double)
       allow(course_double).to receive(:save).and_return(true)
     end
-    
+
     it "redirects to the correct url" do
       post :create
       expect(response).to redirect_to root_url
@@ -71,8 +71,8 @@ describe CoursesController do
   end
 
   describe '#update' do
-    
-    it "checks updated is saved" do
+
+    it "redirects when trying to update deleted course" do
       allow(Course).to receive(:find).with('1').and_return(course)
       allow(course).to receive(:destroy).and_return(true)
       params = {id: 1}

@@ -136,7 +136,7 @@ class AssignmentParticipant < Participant
   end
 
   # Copy this participant to a course
-  def copy_participant(course_id)
+  def copy_to_course(course_id)
     CourseParticipant.find_or_create_by(user_id: self.user_id, parent_id: course_id)
   end
 

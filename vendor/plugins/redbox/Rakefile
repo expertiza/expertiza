@@ -29,11 +29,7 @@ task :update_scripts => [] do |t|
   File.copy File.join(redbox_dir, 'stylesheets', 'redbox.css'), File.join(root_dir, 'public', 'stylesheets', 'redbox.css')
   File.copy File.join(redbox_dir, 'images', 'redbox_spinner.gif'), File.join(root_dir, 'public', 'images', 'redbox_spinner.gif')
 
-<<<<<<< HEAD
   puts "Updated Scripts."
-=======
-  puts "Updated Scripts." 
->>>>>>> parent of 0eac440... removed puts commands that were outputed in dangerfile
 end
 
 

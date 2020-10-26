@@ -305,21 +305,22 @@ jQuery(document).ready(function() {
         if (this.props.is_available || node_attributes.isQuestionnaire(this.props.dataType)) {
           // check if the user id exists
           // check if the current user id matches the user/instructor id associated with a questionnaire/survey
-          if (!node_attributes.isQuestionnaire(this.props.dataType)) {
+
             moreContent.push(
               // should only be viewed by either assignments or courses
               <span>
                 {' '}
                 <a
                   title="Edit"
-                  href={`/${node_attributes[this.props.nodeType].plural}/${parseInt(this.props.id) /
-                    2}/edit`}
+
+                  href={`/${node_attributes[this.props.nodeType].plural}/${parseInt(this.props.id) /2}/edit`}
+
                 >
                   <img src="/assets/tree_view/edit-icon-24.png" />
                 </a>
               </span>
             )
-          }
+
           moreContent.push(
             <span>
               <a

@@ -140,7 +140,7 @@ describe AssignmentParticipant do
   
   describe '#copy_to_course' do
     it 'copies assignment participants to a certain course' do
-      expect { participant.copy_to_course123) }.to change { CourseParticipant.count }.from(0).to(1)
+      expect { participant.copy_to_course(123) }.to change { CourseParticipant.count }.from(0).to(1)
       expect(CourseParticipant.first.user_id).to eq(2)
       expect(CourseParticipant.first.parent_id).to eq(123)
     end

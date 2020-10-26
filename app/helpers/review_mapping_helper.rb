@@ -8,7 +8,7 @@ module ReviewMappingHelper
   #
   def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
     rspan = 0
-    (1..@assignment.num_review_rounds).each { |round| instance_variable_set("@review_in_round_" + round.to_s, 0) }
+    (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@review_in_round_" + round.to_s, 0) }
 
     response_maps = ResponseMap.where(["reviewed_object_id = ? AND reviewer_id = ? AND type = ?", reviewed_object_id, reviewer_id, type])
     response_maps.each do |ri|
@@ -181,11 +181,11 @@ module ReviewMappingHelper
           r.avg_vol_in_round_2,
           r.avg_vol_in_round_3 = Response.get_volume_of_review_comments(@assignment.id, r.id)
     end
-    @all_reviewers_overall_avg_vol = @reviewers.inject(0) { |sum, r| sum += r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @all_reviewers_avg_vol_in_round_1 = @reviewers.inject(0) { |sum, r| sum += r.avg_vol_in_round_1 } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @all_reviewers_avg_vol_in_round_2 = @reviewers.inject(0) { |sum, r| sum += r.avg_vol_in_round_2 } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @all_reviewers_avg_vol_in_round_3 = @reviewers.inject(0) { |sum, r| sum += r.avg_vol_in_round_3 } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @reviewers.sort! { |r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
+    @all_reviewers_overall_avg_vol = @reviewers.inject(0) {|sum, r| sum += r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
+    @all_reviewers_avg_vol_in_round_1 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_in_round_1 } / (@reviewers.blank? ? 1 : @reviewers.length)
+    @all_reviewers_avg_vol_in_round_2 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_in_round_2 } / (@reviewers.blank? ? 1 : @reviewers.length)
+    @all_reviewers_avg_vol_in_round_3 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_in_round_3 } / (@reviewers.blank? ? 1 : @reviewers.length)
+    @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 
   # displays the average scores in round 1, 2 and 3
@@ -232,23 +232,23 @@ module ReviewMappingHelper
   def display_volume_metric_chart(reviewer)
     labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
     data = {
-        labels: labels,
-        datasets: [
-            {
-                label: 'vol.',
-                backgroundColor: "rgba(255,99,132,0.8)",
-                borderWidth: 1,
-                data: reviewer_data,
-                yAxisID: "bar-y-axis1"
-            },
-            {
-                label: 'avg. vol.',
-                backgroundColor: "rgba(255,206,86,0.8)",
-                borderWidth: 1,
-                data: all_reviewers_data,
-                yAxisID: "bar-y-axis2"
-            }
-        ]
+      labels: labels,
+      datasets: [
+        {
+          label: 'vol.',
+          backgroundColor: "rgba(255,99,132,0.8)",
+          borderWidth: 1,
+          data: reviewer_data,
+          yAxisID: "bar-y-axis1"
+        },
+        {
+          label: 'avg. vol.',
+          backgroundColor: "rgba(255,206,86,0.8)",
+          borderWidth: 1,
+          data: all_reviewers_data,
+          yAxisID: "bar-y-axis2"
+        }
+      ]
     }
     options = {
         legend: {
@@ -371,7 +371,7 @@ module ReviewMappingHelper
   #
   def get_css_style_for_calibration_report(diff)
     # diff - difference between stu's answer and instructor's answer
-    dict = {0 => 'c5', 1 => 'c4', 2 => 'c3', 3 => 'c2'}
+    dict = {0 => 'c5',1 => 'c4',2 => 'c3',3 => 'c2'}
     css_class = if dict.key?(diff.abs)
                   dict[diff.abs]
                 else

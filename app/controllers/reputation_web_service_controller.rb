@@ -121,7 +121,8 @@ class ReputationWebServiceController < ApplicationController
     request_body.sort.to_h
   end
 
-  def client
+  # Set the maximum assignment id as the last id in the list to be used for listing assignments to pick for calculating reputation score
+  def set_max_assignment_id
     set_last_assignment_id
     @response
   end
@@ -192,6 +193,8 @@ class ReputationWebServiceController < ApplicationController
     # Decrypting the response
     response.body = JSON.parse(response.body)
     decrypted_response_body= decrypt_request(response.body)
+
+    set_max_assignment_id
 
     @response = response
     @response_body = decrypted_response_body

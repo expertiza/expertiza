@@ -290,7 +290,7 @@ resources :institution, except: [:destroy] do
 
   resources :reputation_web_service, only: [] do
     collection do
-      get :client
+      get :set_max_assignment_id
       post :send_post_request
     end
   end

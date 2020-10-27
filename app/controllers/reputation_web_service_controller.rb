@@ -251,7 +251,8 @@ class ReputationWebServiceController < ApplicationController
 
   def rsa_private_key2(cipertext)
     private_key_file = 'private2.pem'
-    password = "ZXhwZXJ0aXph\n"
+    #get password from db
+    password = RsaPrivateKey.first(:select => "key_value")
     encrypted_string = cipertext
     private_key = OpenSSL::PKey::RSA.new(File.read(private_key_file), Base64.decode64(password))
     string = private_key.private_decrypt(Base64.decode64(encrypted_string))

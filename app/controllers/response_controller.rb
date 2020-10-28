@@ -1,3 +1,4 @@
+# initial pull request comment
 class ResponseController < ApplicationController
   include AuthorizationHelper
 

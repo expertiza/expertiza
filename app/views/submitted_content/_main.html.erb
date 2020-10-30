@@ -7,9 +7,18 @@
 <% end %>
 <br/>
 <% if participant.team.hyperlinks.try(:length) %>
-  <%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant, stage: @stage} %>
+  <% if local_assigns[:submission_check] %>
+    <%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant, stage: @stage, :map_id => map_id, :submission_check => submission_check, :round => round} %>
+  <% else %>
+    <%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant, stage: @stage} %>
+  <% end %>
 <% end %>
-<%= render partial: 'submitted_content/submitted_files', locals: {participant: participant, stage: @stage, origin: ''} %>
+
+<% if local_assigns[:submission_check] %>
+  <%= render partial: 'submitted_content/submitted_files', locals: {:participant => participant, stage: @stage, :map_id => map_id, :submission_check => submission_check, :round => round, origin: ''} %>
+<% else %>
+  <%= render partial: 'submitted_content/submitted_files', locals: {participant: participant, stage: @stage, origin: ''} %>
+<%end%>
 <% if @assignment.require_quiz? %>
   <!-- Setting the t_id for team assignments. The t_id should be not be nil because when the user does not have team, "your work" is unclickable-->
     <%team_for_current_participant = AssignmentTeam.team(participant)%>

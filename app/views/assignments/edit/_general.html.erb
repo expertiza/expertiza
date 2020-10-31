@@ -23,46 +23,46 @@
 </script>
 
 <table id='assignment_general_info_table' class="borderless">
-<tr class='heading'>
-<th width="0%"></th>
-<th width="100%"></th>
-</tr>
+  <tr class='heading'>
+    <th width="0%"></th>
+    <th width="100%"></th>
+  </tr>
 
-<%= hidden_field_tag('assignment_form[assignment][instructor_id]', @assignment_form.assignment.instructor_id) %>
-<%= hidden_field_tag('assignment_form[assignment][course_id]', @assignment_form.assignment.course_id) %>
-<%= hidden_field_tag('assignment_form[assignment][id]', @assignment_form.assignment.id) %>
+  <%= hidden_field_tag('assignment_form[assignment][instructor_id]', @assignment_form.assignment.instructor_id) %>
+  <%= hidden_field_tag('assignment_form[assignment][course_id]', @assignment_form.assignment.course_id) %>
+  <%= hidden_field_tag('assignment_form[assignment][id]', @assignment_form.assignment.id) %>
 
-<tr>
-  <td style='padding:5px'><%= label_tag('assignment_form[assignment][name]', 'Assignment name:') %></td>
-  <td style='padding:5px'><%= text_field_tag('assignment_form[assignment][name]', @assignment_form.assignment.name, :style => 'width:250px', class: 'form-control') %></td>
-</tr>
+  <tr>
+    <td style='padding:5px'><%= label_tag('assignment_form[assignment][name]', 'Assignment name:') %></td>
+    <td style='padding:5px'><%= text_field_tag('assignment_form[assignment][name]', @assignment_form.assignment.name, :style => 'width:250px', class: 'form-control') %></td>
+  </tr>
 
-<tr>
-  <td style='padding:5px'><%= label_tag('assignment_form[assignment][course_id]', 'Course:') %></td>
-  <td style='padding:5px'><%= select('assignment_form[assignment]', 'course_id', course_options(@assignment_form.assignment.instructor), {:selected => @assignment_form.assignment.course_id}, {:class => "form-control", :style => 'width: 250px'}) %></td>
-</tr>
+  <tr>
+    <td style='padding:5px'><%= label_tag('assignment_form[assignment][course_id]', 'Course:') %></td>
+    <td style='padding:5px'><%= select('assignment_form[assignment]', 'course_id', course_options(@assignment_form.assignment.instructor), {:selected => @assignment_form.assignment.course_id}, {:class => "form-control", :style => 'width: 250px'}) %></td>
+  </tr>
 
-<tr><div class="form-inline">
-  <td style='padding:5px'><%= label_tag('assignment_form[assignment][directory_path]', 'Submission directory:') %></td>
-  <td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, :style => 'width:250px', class: 'form-control') %>  (Mandatory field. No space or special chars. <br/> Directory name will be auto-generated if not provided. In the form of assignment_[assignment_id].)
-    <img src="/assets/info.png" title='- DO NOT change this filed for an on-going assignment. This may cause lost of student submitted file.'>
-  </td></div>
-</tr>
+  <tr><div class="form-inline">
+    <td style='padding:5px'><%= label_tag('assignment_form[assignment][directory_path]', 'Submission directory:') %></td>
+    <td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, :style => 'width:250px', class: 'form-control') %>  (Mandatory field. No space or special chars. <br/> Directory name will be auto-generated if not provided. In the form of assignment_[assignment_id].)
+      <img src="/assets/info.png" title='- DO NOT change this filed for an on-going assignment. This may cause lost of student submitted file.'>
+    </td></div>
+  </tr>
 
-<tr>
-  <td style='padding:5px'><%= label_tag('assignment_form[assignment][spec_location]', 'Description URL: ') %></td>
-  <td style='padding:5px'><%= text_field_tag('assignment_form[assignment][spec_location]', @assignment_form.assignment.spec_location, :style => 'width:250px', class: 'form-control') %></td>
-</tr>
+  <tr>
+    <td style='padding:5px'><%= label_tag('assignment_form[assignment][spec_location]', 'Description URL: ') %></td>
+    <td style='padding:5px'><%= text_field_tag('assignment_form[assignment][spec_location]', @assignment_form.assignment.spec_location, :style => 'width:250px', class: 'form-control') %></td>
+  </tr>
 </table>
 
 <br/>
 <hr/>
 
 <table id='assignment_general_setting_table' class="borderless table-not-full-width">
-<tr class='heading'>
-<th width=82%></th>
-<th width=100%></th>
-</tr>
+  <tr class='heading'>
+    <th width=82%></th>
+    <th width=100%></th>
+  </tr>
 
   <tr>
     <td style='padding:5px' id='assignment_access'>
@@ -75,28 +75,28 @@
   <tr>
     <td style='padding:5px' id='assignment_team_assignment_field'>
 
-    <div class="form-inline">
-      <% if(@assignment_form.assignment.max_team_size == 1)%>
-        <%= check_box_tag('team_assignment', 'true', false, {:onChange => 'hasTeamsChanged()'}) %>
-      <% else %>
-        <%= check_box_tag('team_assignment', 'true', @assignment_form.assignment.team_assignment?, {:onChange => 'hasTeamsChanged()'}) %>
-      <% end %>
-      <% @assignment_form.assignment.max_team_size %>
-      <%= label_tag('team_assignment', 'Has teams?') %>
+      <div class="form-inline">
+        <% if(@assignment_form.assignment.max_team_size == 1)%>
+          <%= check_box_tag('team_assignment', 'true', false, {:onChange => 'hasTeamsChanged()'}) %>
+        <% else %>
+          <%= check_box_tag('team_assignment', 'true', @assignment_form.assignment.team_assignment?, {:onChange => 'hasTeamsChanged()'}) %>
+        <% end %>
+        <% @assignment_form.assignment.max_team_size %>
+        <%= label_tag('team_assignment', 'Has teams?') %>
 
-    <span style='padding:5px' class="form-inline" id='assignment_team_count_field' <%= 'hidden' if @assignment_form.assignment.max_team_size == 1%>>
+        <span style='padding:5px' class="form-inline" id='assignment_team_count_field' <%= 'hidden' if @assignment_form.assignment.max_team_size == 1%>>
 
       <!--Teammate reviews fields-->
       <input name="assignment_form[assignment][show_teammate_reviews]" type="hidden" value="false"/>
-      <%= label_tag('assignment_form[assignment][max_team_size]', 'Maximum number of members per team:') %>
-      <%= text_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size, {:style => 'width:50px;', class: 'form-control'}) %>
+          <%= label_tag('assignment_form[assignment][max_team_size]', 'Maximum number of members per team:') %>
+          <%= text_field_tag('assignment_form[assignment][max_team_size]', @assignment_form.assignment.max_team_size, {:style => 'width:50px;', class: 'form-control'}) %>
 
       </span>
       </div>
       <span id='assignment_show_teammate_reviews' class="form-inline"  <%= 'hidden' if @assignment_form.assignment.max_team_size < 2%>>
 
       <%= check_box_tag('assignment_form[assignment][show_teammate_reviews]', 'true', @assignment_form.assignment.show_teammate_reviews) %>
-      <%= label_tag('assignment_form[assignment][show_teammate_reviews]', 'Show teammate reviews?') %>
+        <%= label_tag('assignment_form[assignment][show_teammate_reviews]', 'Show teammate reviews?') %>
     </span>
       &nbsp;&nbsp;&nbsp;&nbsp;
       <!--Maximum number of members per team-->
@@ -162,9 +162,9 @@
   <tr>
     <td style='padding:5px' id='assignment_reputation_algorithm_field'>
       <div class="form-inline">
-      <!--<input name="assignment_form[assignment][reputation_algorithm]" type="hidden" value="false"/>-->
-      <%= label_tag('assignment_form[assignment][reputation_algorithm]', 'Reputation Algorithm?') %>
-      <%= select('assignment_form[assignment]','reputation_algorithm', [['--', ''],['Lauw', 'Lauw'],['Hamer','Hamer']], {:selected => @assignment_form.assignment.reputation_algorithm}, {:class => 'form-control', :style => 'width: 100px'}) %>
+        <!--<input name="assignment_form[assignment][reputation_algorithm]" type="hidden" value="false"/>-->
+        <%= label_tag('assignment_form[assignment][reputation_algorithm]', 'Reputation Algorithm?') %>
+        <%= select('assignment_form[assignment]','reputation_algorithm', [['--', ''],['Lauw', 'Lauw'],['Hamer','Hamer']], {:selected => @assignment_form.assignment.reputation_algorithm}, {:class => 'form-control', :style => 'width: 100px'}) %>
       </div>
     </td>
   </tr>
@@ -229,16 +229,16 @@
             );
         } else {
             if (confirm(msg)) {
-              team_count_field.attr('hidden', true);
-              team_formation_due_date_checkbox.attr('hidden', true)
-              teammate_reviews_field.attr('hidden', true);
-              document.getElementById('assignment_form_assignment_max_team_size').value = '1';
-              removeDueDateTableElement('team_formation', 0);
+                team_count_field.attr('hidden', true);
+                team_formation_due_date_checkbox.attr('hidden', true)
+                teammate_reviews_field.attr('hidden', true);
+                document.getElementById('assignment_form_assignment_max_team_size').value = '1';
+                removeDueDateTableElement('team_formation', 0);
             } else {
-              checkbox.prop('checked', true);
+                checkbox.prop('checked', true);
             }
             if (<%= @assignment_form.assignment.max_team_size == 1%>){
-              team_count_field.attr('hidden', true);
+                team_count_field.attr('hidden', true);
             }
         }
     }
@@ -253,69 +253,69 @@
     function reviewStrategyChanged() {
         var val = jQuery('#assignment_form_assignment_review_assignment_strategy').val();
         if (val == 'Auto-Selected') {
-          jQuery('#assignment_review_topic_threshold_row').removeAttr('hidden');
-          jQuery('#instructor_selected_review_mapping_mechanism').attr('hidden', true);
+            jQuery('#assignment_review_topic_threshold_row').removeAttr('hidden');
+            jQuery('#instructor_selected_review_mapping_mechanism').attr('hidden', true);
         } else {
-          jQuery('#instructor_selected_review_mapping_mechanism').removeAttr('hidden');
-          jQuery('#assignment_review_topic_threshold_row').attr('hidden', true);
+            jQuery('#instructor_selected_review_mapping_mechanism').removeAttr('hidden');
+            jQuery('#assignment_review_topic_threshold_row').attr('hidden', true);
         }
     }
     function hasQuizChanged() {
-      if (jQuery('#assignment_form[assignment][require_quiz]').is(':checked')) {
-          jQuery('#assignment_numbers_of_quiz_field').removeAttr('hidden');
-      } else {
-          jQuery('#assignment_numbers_of_quiz_field').attr('hidden', true);
-      }
+        if (jQuery('#assignment_form[assignment][require_quiz]').is(':checked')) {
+            jQuery('#assignment_numbers_of_quiz_field').removeAttr('hidden');
+        } else {
+            jQuery('#assignment_numbers_of_quiz_field').attr('hidden', true);
+        }
     }
     function useSimicheckChanged(){
-      if (jQuery('#toggle_simicheck_setting').is(':checked')) {
-        jQuery('#assignment_simicheck_field').show();
-        jQuery('#assignment_simicheck_threshold').show();
-      } else {
-        jQuery('#assignment_simicheck_field').hide();
-        jQuery('#assignment_simicheck_threshold').hide();
-      }
+        if (jQuery('#toggle_simicheck_setting').is(':checked')) {
+            jQuery('#assignment_simicheck_field').show();
+            jQuery('#assignment_simicheck_threshold').show();
+        } else {
+            jQuery('#assignment_simicheck_field').hide();
+            jQuery('#assignment_simicheck_threshold').hide();
+        }
     }
     jQuery(document).ready(function() {
-      jQuery('input[type=radio][name=num_reviews]').change(function(){
-        if (this.value == 'student'){
-          jQuery('#num_reviews_per_student_threshold').removeAttr('hidden');
-          jQuery('#num_reviews_per_submission_threshold').attr('hidden','hidden');
-          jQuery('#calibrated_and_uncalibrated_artifacts_threshold').attr('hidden','hidden');
-          jquery('#second_submit_tag').attr('disabled', 'disabled');
-          jquery('#third_submit_tag').attr('disabled', 'disabled');
-        }
-        else if(this.value == 'submission'){
-          jQuery('#num_reviews_per_student_threshold').attr('hidden', 'hidden');
-          jQuery('#num_reviews_per_submission_threshold').removeAttr('hidden');
-          jQuery('#calibrated_and_uncalibrated_artifacts_threshold').attr('hidden','hidden');
-          jquery('#first_submit_tag').attr('disabled', 'disabled');
-          jquery('#third_submit_tag').attr('disabled', 'disabled');
-        }
-        else if(this.value == 'calibrated_and_uncalibrated'){
-          jQuery('#num_reviews_per_student_threshold').attr('hidden', 'hidden');
-          jQuery('#num_reviews_per_submission_threshold').attr('hidden', 'hidden');
-          jQuery('#calibrated_and_uncalibrated_artifacts_threshold').removeAttr('hidden');
-          jquery('#first_submit_tag').attr('disabled', 'disabled');
-          jquery('#second_submit_tag').attr('disabled', 'disabled');
-        }
-      });
-      jQuery('#first_submit_tag').add('#second_submit_tag').click(function(e){
-        if(<%= @participants_count == 0 &&  @teams_count == 0 &&  @assignment_form.assignment.max_team_size > 1 %>) {
-          alert('Please create participants and teams for this assignment before assigning reviewers.');
-          e.preventDefault();
-          e.stopPropagation();
-        }
-        else if(<%= @participants_count == 0 %>){
-          alert('Please create participants for this assignment before assigning reviewers.');
-          e.preventDefault();
-          e.stopPropagation();
-        }
-        else if(<%= @teams_count == 0 %> && <%= @assignment_form.assignment.max_team_size > 1 %>){
-          alert('Please create teams for this assignment before assigning reviewers.');
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      });
+        jQuery('input[type=radio][name=num_reviews]').change(function(){
+            if (this.value == 'student'){
+                jQuery('#num_reviews_per_student_threshold').removeAttr('hidden');
+                jQuery('#num_reviews_per_submission_threshold').attr('hidden','hidden');
+                jQuery('#calibrated_and_uncalibrated_artifacts_threshold').attr('hidden','hidden');
+                jquery('#second_submit_tag').attr('disabled', 'disabled');
+                jquery('#third_submit_tag').attr('disabled', 'disabled');
+            }
+            else if(this.value == 'submission'){
+                jQuery('#num_reviews_per_student_threshold').attr('hidden', 'hidden');
+                jQuery('#num_reviews_per_submission_threshold').removeAttr('hidden');
+                jQuery('#calibrated_and_uncalibrated_artifacts_threshold').attr('hidden','hidden');
+                jquery('#first_submit_tag').attr('disabled', 'disabled');
+                jquery('#third_submit_tag').attr('disabled', 'disabled');
+            }
+            else if(this.value == 'calibrated_and_uncalibrated'){
+                jQuery('#num_reviews_per_student_threshold').attr('hidden', 'hidden');
+                jQuery('#num_reviews_per_submission_threshold').attr('hidden', 'hidden');
+                jQuery('#calibrated_and_uncalibrated_artifacts_threshold').removeAttr('hidden');
+                jquery('#first_submit_tag').attr('disabled', 'disabled');
+                jquery('#second_submit_tag').attr('disabled', 'disabled');
+            }
+        });
+        jQuery('#first_submit_tag').add('#second_submit_tag').click(function(e){
+            if(<%= @participants_count == 0 &&  @teams_count == 0 &&  @assignment_form.assignment.max_team_size > 1 %>) {
+                alert('Please create participants and teams for this assignment before assigning reviewers.');
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            else if(<%= @participants_count == 0 %>){
+                alert('Please create participants for this assignment before assigning reviewers.');
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            else if(<%= @teams_count == 0 %> && <%= @assignment_form.assignment.max_team_size > 1 %>){
+                alert('Please create teams for this assignment before assigning reviewers.');
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        });
     });
 </script>

@@ -28,10 +28,10 @@ class GradesController < ApplicationController
 
   def calc_final_score(avg_peer_review_score, self_review_scores, w = 0.05, l = 0.25)
     
-    if |avg_peer_review_score - self_review_score|/avg_peer_review_score <= l
-      self = (avg_peer_review_score * (1 + (|avg_peer_review_score - self_review_score|/avg_peer_review_score)))
+    if (avg_peer_review_score - self_review_score).abs()/avg_peer_review_score <= l
+      self = (avg_peer_review_score * (1 + ((avg_peer_review_score - self_review_score).abs()/avg_peer_review_score)))
     else
-      self = (avg_peer_review_score * (1 - (|avg_peer_review_score - self_review_score|/avg_peer_review_score)))
+      self = (avg_peer_review_score * (1 - ((avg_peer_review_score - self_review_score).abs()/avg_peer_review_score)))
     end
     grade = w*(avg_peer_review_score) + (1-w)*self
   end

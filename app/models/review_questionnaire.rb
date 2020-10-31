@@ -14,8 +14,8 @@ class ReviewQuestionnaire < Questionnaire
     "review".to_sym
   end
 
-  def get_assessments_for(participant)
-    participant.reviews
+  def get_assessments_for(participant, requesting_score)
+    participant.reviews(requesting_score)
   end
 
   # return  the responses for specified round, for varying rubric feature -Yang
@@ -33,7 +33,6 @@ class ReviewQuestionnaire < Questionnaire
           responses << response if response.round == round && response.is_submitted
         end
       end
-      # responses = Response.find(:all, :include => :map, :conditions => ['reviewee_id = ? and type = ?',participant.id, self.to_s])
       responses.sort! {|a, b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }
     end
     responses

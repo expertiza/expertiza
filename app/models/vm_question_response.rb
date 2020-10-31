@@ -49,28 +49,47 @@ class VmQuestionResponse
                 else
                   ReviewResponseMap.get_assessments_for(team)
                 end
+
+      # Changes for E1984 Improve self-review  Link peer review & self-review to derive grades
+      @self_review_answers = nil
+      # review_map = SelfReviewResponseMap.get_assessments_for(team)
+      # review_map will include self_review responses iff rubrics does not vary by review rounds
+      review_map = if vary
+                     ReviewResponseMap.get_responses_for_team_round(team, @round)
+                   else
+                     SelfReviewResponseMap.get_assessments_for(team)
+                   end
+      review_map.each do |review|
+        next unless SelfReviewResponseMap.exists?(review.map_id)
+        mapping = SelfReviewResponseMap.find(review.map_id)
+        next unless mapping && mapping.present?
+        next unless participant.id == mapping.reviewer_id
+        participant = Participant.find(mapping.reviewer_id)
+        @list_of_reviewers << participant
+        @self_review_answers = review
+      end
+      # Changes End
+
       reviews.each do |review|
         review_mapping = ReviewResponseMap.find(review.map_id)
-        if review_mapping.present?
+        if review_mapping && review_mapping.present?
           participant = Participant.find(review_mapping.reviewer_id)
           @list_of_reviewers << participant
         end
       end
-      @list_of_reviews = reviews
-    elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"   #ISSUE E-1967 updated
-      reviews = []
-      #finding feedbacks where current pariticipant of assignment (author) is reviewer 
-      feedbacks = FeedbackResponseMap.where(reviewer_id: participant.id) 
-      feedbacks.each do |feedback|
-        #finding the participant ids for each reviewee of feedback
-        #participant is really reviewee here.
-        participant = Participant.find_by(id: feedback.reviewee_id)
-        #finding the all the responses for the feedback
-        response = Response.where(map_id: feedback.id).order('updated_at').last
-        if response
-          reviews << response
-          @list_of_reviews << response
-        end 
+
+      # Changes by E1984. Improve self-review  Link peer review & self-review to derive grades
+      @list_of_reviews = if !@self_review_answers.nil?
+                           reviews + [@self_review_answers]
+                         else
+                           reviews
+                         end
+      # Changes End
+    elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"
+      reviews = participant.feedback # feedback reviews
+      reviews.each do |review|
+        review_mapping = FeedbackResponseMap.find_by(id: review.map_id)
+        participant = Participant.find(review_mapping.reviewer_id)
         @list_of_reviewers << participant
       end
     elsif @questionnaire_type == "TeammateReviewQuestionnaire"
@@ -98,6 +117,14 @@ class VmQuestionResponse
         add_answer(answer)
       end
     end
+
+    # Changes for E1984 Improve self-review  Link peer review & self-review to derive grades
+    return if @self_review_answers.nil?
+    answers = Answer.where(response_id: @self_review_answers.response_id)
+    answers.each do |answer|
+      add_answer(answer)
+    end
+    # Changes End
   end
 
   def display_team_members

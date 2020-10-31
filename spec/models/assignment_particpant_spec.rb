@@ -108,7 +108,7 @@ describe AssignmentParticipant do
         score_map = {max: 100, min: 100, avg: 100}
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
                                                            .and_return(double('AssignmentQuestionnaire', used_in_round: nil))
-        allow(review_questionnaire).to receive(:get_assessments_for).with(participant).and_return([response])
+        allow(review_questionnaire).to receive(:get_assessments_for).with(participant, false).and_return([response])
         allow(Answer).to receive(:compute_scores).with(any_args).and_return(score_map)
         participant.compute_assignment_score(question_hash, scores)
         expect(scores[:review][:assessments]).to eq([response])

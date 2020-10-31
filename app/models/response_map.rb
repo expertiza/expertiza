@@ -7,22 +7,34 @@ class ResponseMap < ActiveRecord::Base
   end
 
   # return latest versions of the responses
-  def self.get_assessments_for(team)
+  def self.get_assessments_for(team, user_id = nil)
     responses = []
     # stime = Time.now
     if team
       @array_sort = []
       @sort_to = []
-      maps = where(reviewee_id: team.id)
+
+      # Changes for E1984. Improve self-review  Link peer review & self-review to derive grades
+      # user_id is by defalt nil, if this method is called with user_id as not nil, then get assessment for self work
+      maps = if user_id.nil?
+               where(reviewee_id: team.id)
+             else
+               where(reviewee_id: team.id, reviewer_id: user_id)
+             end
+      # Changes End
       maps.each do |map|
         next if map.response.empty?
         @all_resp = Response.where(map_id: map.map_id).last
-        if map.type.eql?('ReviewResponseMap')
+        # Changes for E1984. Improve self-review  Link peer review & self-review to derive grades
+        # map can be self review or peer review
+        if map.type.eql?('ReviewResponseMap') || map.type.eql?("SelfReviewResponseMap")
           # If its ReviewResponseMap then only consider those response which are submitted.
           @array_sort << @all_resp if @all_resp.is_submitted
         else
           @array_sort << @all_resp
         end
+        # Changes End
+
         # sort all versions in descending order and get the latest one.
         # @sort_to=@array_sort.sort { |m1, m2| (m1.version_num and m2.version_num) ? m2.version_num <=> m1.version_num : (m1.version_num ? -1 : 1) }
         @sort_to = @array_sort.sort # { |m1, m2| (m1.updated_at and m2.updated_at) ? m2.updated_at <=> m1.updated_at : (m1.version_num ? -1 : 1) }

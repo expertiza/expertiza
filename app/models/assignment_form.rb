@@ -27,6 +27,7 @@ class AssignmentForm
     assignment_form.due_dates = AssignmentDueDate.where(parent_id: assignment_id)
     assignment_form.set_up_assignment_review
     assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: assignment_id)
+    #assignment_form.self_review_formula
     assignment_form
   end
 

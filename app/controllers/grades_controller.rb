@@ -45,7 +45,7 @@ class GradesController < ApplicationController
     return grade
   end
 
-  def derive_final_score()
+  def derive_final_score(formula_choice)
     # E2078 start
     if @assignment.is_selfreview_enabled?
       @self_review_scores = @participant.scores(@questions, true)
@@ -58,7 +58,17 @@ class GradesController < ApplicationController
 
       # ! final_score formula is in calc_final_score(), extend comment here to explain
       # weight and impact need to be passed from the view, according to  what the instructor chooses for those values
-      @new_derived_scores = calc_final_score(avg_peer_review_score, avg_self_review_score, 0.05, 0.25).to_s
+      if formula_choice == "None"
+        @new_derived_scores = calc_final_score(avg_peer_review_score, avg_self_review_score, 1, 0.25).to_s
+      elsif formula_choice == "Formula 1, w = 5%"
+        @new_derived_scores = calc_final_score(avg_peer_review_score, avg_self_review_score, 0.95, 0.25).to_s
+      elsif formula_choice == "Formula 1, w = 10%"
+        @new_derived_scores = calc_final_score(avg_peer_review_score, avg_self_review_score, 0.90, 0.25).to_s
+      elsif formula_choice == "Formula 1, w = 15%"
+        @new_derived_scores = calc_final_score(avg_peer_review_score, avg_self_review_score, 0.85, 0.25).to_s
+      elsif formula_choice == "Formula 1, w = 20%"
+        @new_derived_scores = calc_final_score(avg_peer_review_score, avg_self_review_score, 0.80, 0.25).to_s
+      end
     end
     # E2078 end
   end
@@ -97,11 +107,12 @@ class GradesController < ApplicationController
     @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
     return if redirect_when_disallowed
     @assignment = @participant.assignment
+    formula_choice = @assignment.self_review_formula
     questionnaires = @assignment.questionnaires
     @questions = retrieve_questions questionnaires, @assignment.id
     # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
     @pscore = @participant.scores(@questions)
-    derive_final_score()
+    derive_final_score(formula_choice)
     make_chart
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
     @stage = @participant.assignment.get_current_stage(@topic_id)
@@ -118,12 +129,13 @@ class GradesController < ApplicationController
   def view_team
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
+    formula_choice = @assignment.self_review_formula
     @team = @participant.team
     @team_id = @team.id
     questionnaires = @assignment.questionnaires
     @questions = retrieve_questions questionnaires, @assignment.id
     @pscore = @participant.scores(@questions)
-    derive_final_score()
+    derive_final_score(formula_choice)
     @vmlist = []
 
     # loop through each questionnaire, and populate the view model for all data necessary

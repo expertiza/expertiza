@@ -86,10 +86,19 @@ class VmQuestionResponse
                          end
       # Changes End
     elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"
-      reviews = participant.feedback # feedback reviews
-      reviews.each do |review|
-        review_mapping = FeedbackResponseMap.find_by(id: review.map_id)
-        participant = Participant.find(review_mapping.reviewer_id)
+      reviews = []
+      #finding feedbacks where current pariticipant of assignment (author) is reviewer 
+      feedbacks = FeedbackResponseMap.where(reviewer_id: participant.id) 
+      feedbacks.each do |feedback|
+        #finding the participant ids for each reviewee of feedback
+        #participant is really reviewee here.
+        participant = Participant.find_by(id: feedback.reviewee_id)
+        #finding the all the responses for the feedback
+        response = Response.where(map_id: feedback.id).order('updated_at').last
+        if response
+          reviews << response
+          @list_of_reviews << response
+        end 
         @list_of_reviewers << participant
       end
     elsif @questionnaire_type == "TeammateReviewQuestionnaire"

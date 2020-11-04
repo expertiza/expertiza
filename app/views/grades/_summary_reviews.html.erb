@@ -25,20 +25,6 @@
                     </h5>
                   </td>
                 </tr>
-                <tr>
-                  <td>
-                    <%
-                      if !@summary[round][q].eql?("")
-                        @summary[round][q].each do |sentence|
-                          safe_concat "<li>"
-                          concat sentence
-                        end
-                      else
-                        safe_concat "&nbsp;"
-                      end
-                    %>
-                  </td>
-                </tr>
        <%
          i += 1
          end

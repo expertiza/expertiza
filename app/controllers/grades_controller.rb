@@ -266,14 +266,14 @@ class GradesController < ApplicationController
         @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
         l_policy = LatePolicy.find(@assignment.late_policy_id)
         @total_penalty = l_policy.max_penalty if @total_penalty > l_policy.max_penalty
-        calculate_penatly_attributes(@participant) if calculate_for_participants
+        calculate_penalty_attributes(@participant) if calculate_for_participants
       end
       assign_all_penalties(participant, penalties)
     end
     @assignment.update_attribute(:is_penalty_calculated, true) unless @assignment.is_penalty_calculated
   end
 
-  def calculate_penatly_attributes(_participant)
+  def calculate_penalty_attributes(_participant)
     deadline_type_id = [1, 2, 5]
     penalties_symbols = %i[submission review meta_review]
     deadline_type_id.zip(penalties_symbols).each do |id, symbol|

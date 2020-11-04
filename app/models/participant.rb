@@ -150,4 +150,9 @@ class Participant < ActiveRecord::Base
     fields.push("handle") if options["handle"] == "true"
     fields
   end
+
+  # Generate list of possible mentors that have been added as participants to a specified assignment. Looking for specifically for participants added that are either 
+  def self.getPotentialMentors(parent_id)
+    where(parent_id: parent_id).select{|p| User.find(p.user_id).role.ta? || User.find(p.user_id).role.instructor?} 
+  end
 end

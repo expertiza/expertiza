@@ -1,4 +1,5 @@
 module SubmittedContentHelper
+  require 'pstore'
   def display_directory_tree(participant, files, display_to_reviewer_flag)
     index = 0
     participant = @participant if @participant # TODO: Verify why this is needed
@@ -120,4 +121,54 @@ module SubmittedContentHelper
   # rescue
   # end
 end
+
+  class LocalSubmittedContent
+    attr_accessor :map_id, :round, :link , :start_at, :end_at, :created_at, :updated_at, :pstore
+
+    def initialize( map_id=nil, round=nil, link=nil, start_at=nil, end_at=nil, created_at=nil, updated_at=nil )
+      @map_id = map_id
+      @round = round
+      @link = link
+      @start_at = start_at
+      @end_at = end_at
+      @created_at = created_at
+      @updated_at = updated_at
+      @pstore = PStore.new("local_submitted_content.pstore")
+    end
+
+    #updates the field with a particular peice of data
+    def update(field, data)
+      
+    end
+
+  end
+
+  class LocalStorage
+
+    def self.save(instance)
+      instance.pstore.transaction do
+        instance.pstore[:map_id] = instance.map_id
+        instance.pstore[:round] = instance.round
+        instance.pstore[:link] = instance.link
+        instance.pstore[:start_at] = instance.start_at
+        instance.pstore[:end_at] = instance.end_at
+        instance.pstore[:created_at] = instance.created_at
+        instance.pstore[:updated_at] = instance.updated_at
+      end
+    end
+
+
+    # Find all entries that meet every field in the params hash
+    # return list of matching entries 
+    def self.where(params)
+
+    end
+
+    # Actually saves into the database
+    def self.hard_save(instance)
+      
+    end
+
+  end
+
 end

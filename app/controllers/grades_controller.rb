@@ -33,7 +33,7 @@ class GradesController < ApplicationController
   end
 
   ######################################## E2078 ########################################
-  def calc_final_score(avg_peer_review_score, self_review_score, w, l)
+  def calc_final_score_formula1(avg_peer_review_score, self_review_score, w, l)
 
     self_score = 0;
     if (avg_peer_review_score - self_review_score).abs() / avg_peer_review_score <= l
@@ -59,15 +59,15 @@ class GradesController < ApplicationController
       # ! final_score formula is in calc_final_score(), extend comment here to explain
       # weight and impact need to be passed from the view, according to  what the instructor chooses for those values
       if formula_choice == "None"
-        @new_derived_scores = calc_final_score(avg_peer_review_score, avg_self_review_score, 1, 0.25).to_s
+        @new_derived_scores = calc_final_score_formula1(avg_peer_review_score, avg_self_review_score, 1, 0.25).to_s
       elsif formula_choice == "Formula 1, w = 5%"
-        @new_derived_scores = calc_final_score(avg_peer_review_score, avg_self_review_score, 0.95, 0.25).to_s
+        @new_derived_scores = calc_final_score_formula1(avg_peer_review_score, avg_self_review_score, 0.95, 0.25).to_s
       elsif formula_choice == "Formula 1, w = 10%"
-        @new_derived_scores = calc_final_score(avg_peer_review_score, avg_self_review_score, 0.90, 0.25).to_s
+        @new_derived_scores = calc_final_score_formula1(avg_peer_review_score, avg_self_review_score, 0.90, 0.25).to_s
       elsif formula_choice == "Formula 1, w = 15%"
-        @new_derived_scores = calc_final_score(avg_peer_review_score, avg_self_review_score, 0.85, 0.25).to_s
+        @new_derived_scores = calc_final_score_formula1(avg_peer_review_score, avg_self_review_score, 0.85, 0.25).to_s
       elsif formula_choice == "Formula 1, w = 20%"
-        @new_derived_scores = calc_final_score(avg_peer_review_score, avg_self_review_score, 0.80, 0.25).to_s
+        @new_derived_scores = calc_final_score_formula1(avg_peer_review_score, avg_self_review_score, 0.80, 0.25).to_s
       end
     end
     # E2078 end
@@ -266,14 +266,14 @@ class GradesController < ApplicationController
         @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
         l_policy = LatePolicy.find(@assignment.late_policy_id)
         @total_penalty = l_policy.max_penalty if @total_penalty > l_policy.max_penalty
-        calculate_penatly_attributes(@participant) if calculate_for_participants
+        calculate_penalty_attributes(@participant) if calculate_for_participants
       end
       assign_all_penalties(participant, penalties)
     end
     @assignment.update_attribute(:is_penalty_calculated, true) unless @assignment.is_penalty_calculated
   end
 
-  def calculate_penatly_attributes(_participant)
+  def calculate_penalty_attributes(_participant)
     deadline_type_id = [1, 2, 5]
     penalties_symbols = %i[submission review meta_review]
     deadline_type_id.zip(penalties_symbols).each do |id, symbol|

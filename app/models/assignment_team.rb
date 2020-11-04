@@ -6,6 +6,10 @@ class AssignmentTeam < Team
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewee_id'
   has_many :review_response_maps, foreign_key: 'reviewee_id'
   has_many :responses, through: :review_response_maps, foreign_key: 'map_id'
+
+  #E2077. Mentor management for assignments without topics E2024
+  has_one :assignment_team_mentor, class_name: "AssignmentTeamMentor", foreign_key: "assignment_team_id", dependent: :destroy
+
   # START of contributor methods, shared with AssignmentParticipant
   
   # Added for E1973, Team reviews.

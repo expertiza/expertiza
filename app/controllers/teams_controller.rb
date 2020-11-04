@@ -40,6 +40,19 @@ class TeamsController < ApplicationController
       Team.check_for_existing(parent, params[:team][:name], session[:team_type])
       @team = Object.const_get(session[:team_type] + 'Team').create(name: params[:team][:name], parent_id: parent.id)
       TeamNode.create(parent_id: parent.id, node_object_id: @team.id)
+
+      
+      begin
+        assignmentTeamMentor = AssignmentTeamMentor.new(assignment_team_id: @team.id)
+        assignmentTeamMentor.assignMentor(parent.id)
+      # rescue NoParticipantMentors => e
+      rescue AssignmentTeamMentorError 
+        # p e.backtrace.inspect 
+        # redirect_to :controller => 'participants', :action => 'list', id: parent.id, model: model and return
+        flash[:error] = $ERROR_INFO
+        redirect_to action: 'list', id: parent.id and return
+      end
+
       undo_link("The team \"#{@team.name}\" has been successfully created.")
       redirect_to action: 'list', id: parent.id
     rescue TeamExistsError

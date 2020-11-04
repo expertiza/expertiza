@@ -11,8 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
-ActiveRecord::Schema.define(version: 20200421235620) do
+ActiveRecord::Schema.define(version: 20201031212244) do
 
   create_table "account_requests", force: :cascade do |t|
     t.string   "name",              limit: 255
@@ -75,6 +74,14 @@ ActiveRecord::Schema.define(version: 20200421235620) do
   add_index "assignment_questionnaires", ["questionnaire_id"], name: "fk_aq_questionnaire_id", using: :btree
   add_index "assignment_questionnaires", ["user_id"], name: "fk_aq_user_id", using: :btree
 
+  create_table "assignment_team_mentors", force: :cascade do |t|
+    t.integer "assignment_team_id",        limit: 4
+    t.integer "assignment_team_mentor_id", limit: 4
+  end
+
+  add_index "assignment_team_mentors", ["assignment_team_id"], name: "fk_rails_3dd769436b", using: :btree
+  add_index "assignment_team_mentors", ["assignment_team_mentor_id"], name: "fk_rails_5ab16ff24f", using: :btree
+
   create_table "assignments", force: :cascade do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -126,9 +133,9 @@ ActiveRecord::Schema.define(version: 20200421235620) do
     t.boolean  "is_answer_tagging_allowed"
     t.boolean  "has_badge"
     t.boolean  "allow_selecting_additional_reviews_after_1st_round"
-    t.boolean  "reviewer_is_team"
     t.boolean  "vary_by_topic",                                                    default: false
-    t.boolean  "vary_by_round"
+    t.boolean  "vary_by_round",                                                    default: false
+    t.boolean  "reviewer_is_team"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -740,14 +747,14 @@ ActiveRecord::Schema.define(version: 20200421235620) do
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 
   create_table "track_notifications", force: :cascade do |t|
-    t.integer  "notification_id", limit: 4
     t.integer  "user_id",         limit: 4
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "notification_id", limit: 4, null: false
   end
 
-  add_index "track_notifications", ["notification_id"], name: "index_track_notifications_on_notification_id", using: :btree
-  add_index "track_notifications", ["user_id"], name: "index_track_notifications_on_user_id", using: :btree
+  add_index "track_notifications", ["notification_id"], name: "notification_id", using: :btree
+  add_index "track_notifications", ["user_id"], name: "user_id", using: :btree
 
   create_table "tree_folders", force: :cascade do |t|
     t.string  "name",       limit: 255
@@ -809,6 +816,8 @@ ActiveRecord::Schema.define(version: 20200421235620) do
   add_foreign_key "assignment_badges", "badges"
   add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
   add_foreign_key "assignment_questionnaires", "questionnaires", name: "fk_aq_questionnaire_id"
+  add_foreign_key "assignment_team_mentors", "teams", column: "assignment_team_id"
+  add_foreign_key "assignment_team_mentors", "users", column: "assignment_team_mentor_id"
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
   add_foreign_key "assignments", "users", column: "instructor_id", name: "fk_assignments_instructors"
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"
@@ -842,6 +851,4 @@ ActiveRecord::Schema.define(version: 20200421235620) do
   add_foreign_key "tag_prompt_deployments", "tag_prompts"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
-  add_foreign_key "track_notifications", "notifications"
-  add_foreign_key "track_notifications", "users"
 end

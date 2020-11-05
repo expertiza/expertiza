@@ -50,6 +50,7 @@ class AssignmentParticipant < Participant
 
   # Return scores that this participant has been given
   # methods extracted from scores method: merge_scores, topic_total_scores, calculate_scores
+  # default false is for peer reviews, set to true for self reviews
   def scores(questions, requesting_score = false)
     scores = {}
     scores[:participant] = self
@@ -76,6 +77,7 @@ class AssignmentParticipant < Participant
     calculate_scores(scores)
   end
 
+  # default false is for peer reviews, set to true for self reviews
   def compute_assignment_score(questions, scores, requesting_score = false)
     self.assignment.questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.find_by(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id).used_in_round
@@ -152,6 +154,7 @@ class AssignmentParticipant < Participant
     FeedbackResponseMap.get_assessments_for(self)
   end
 
+  # default false is for peer reviews, set to true for self reviews
   def reviews(requesting_score = false)
     # ACS Always get assessments for a team
     # removed check to see if it is a team assignment

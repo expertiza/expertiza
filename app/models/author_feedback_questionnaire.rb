@@ -14,6 +14,7 @@ class AuthorFeedbackQuestionnaire < Questionnaire
     "feedback".to_sym
   end
 
+  # default false is for peer reviews, set to true for self reviews
   def get_assessments_for(participant, _requesting_score = false)
     participant.feedback
   end

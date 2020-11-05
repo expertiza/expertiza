@@ -120,17 +120,32 @@ module GradesHelper
   end
 
  ######################################## E2078 ########################################
- def calc_final_score_Vossen_formula(avg_peer_review_score, self_review_score, w, l)
+
+ ## calc_final_score_Vossen_formula(avg_peer_review_score, self_review_score, w, l)
+ # Called from grades_controller.rb
+ # Inputs: 
+        # avg_peer_review_score and avg_self_review_score, both calculated in response.rb and called in grades_controller.rb
+        # w - chosen from the UI when Vossen formula is chosen and so hard-coded in the controller, the weight for peer reviews in final grade (inverse, 1-w, is weight for self/peer review deviation)
+        # l - a parameter in the Vossen formula, to determine to what extent peer reviews can differ from self reviews before impacting grade
+          # this is also hard-coded because it depends on the assignment grading scale, usually we scale out of 5, so l = 0.25 because the minimum deviation is 1 / (max score -1) and max score is 5
+          # if we have an peer review where we review out of 100 instead of 5, consider decreasing for refinement. Again: hard-code in controller
+ # Outputs:
+ def calc_final_score_Vossen_formula(avg_peer_review_score, avg_self_review_score, w, l)
   self_score = 0;
-  if (avg_peer_review_score - self_review_score).abs() / avg_peer_review_score <= l
-    self_score = (avg_peer_review_score * (1 + ((avg_peer_review_score - self_review_score).abs() / avg_peer_review_score)))
+  if (avg_peer_review_score - avg_self_review_score).abs() / avg_peer_review_score <= l
+    self_score = (avg_peer_review_score * (1 + ((avg_peer_review_score - avg_self_review_score).abs() / avg_peer_review_score)))
   else
-    self_score = (avg_peer_review_score * (1 - ((avg_peer_review_score - self_review_score).abs() / avg_peer_review_score)))
+    self_score = (avg_peer_review_score * (1 - ((avg_peer_review_score - avg_self_review_score).abs() / avg_peer_review_score)))
   end
   grade = w * (avg_peer_review_score) + (1 - w) * self_score
   return grade.round(2)
 end
 
+## derive_final_score(formula_choice)
+# Called from grades_controller.rb
+# Derives a final score for an assignment based on 1) avg peer review score 2) average self review score 3) formula choice on how to combine 1) and 2)
+# Inputs: formula_choice (passed from _review_strategy  partial - the review strategy tab on the edit assignment page)
+# Outputs: new_derived_score  - the final grade for the assignment
 def derive_final_score(formula_choice)
   # E2078 start
   if @assignment.is_selfreview_enabled?
@@ -142,8 +157,7 @@ def derive_final_score(formula_choice)
     # calculate actual_score as an average of ratings given by peers
     avg_peer_review_score = Rscore.new(@pscore, :review).my_avg || 0
 
-    # ! final_score formula is in calc_final_score(), extend comment here to explain
-    # weight and impact need to be passed from the view, according to  what the instructor chooses for those values
+    # formula_choice is passed from _review_strategy  partial - the review strategy tab on the edit assignment page
     if formula_choice == "None"
       new_derived_scores = calc_final_score_Vossen_formula(avg_peer_review_score, @avg_self_review_score, 1, 0.25).to_s
     elsif formula_choice == "Vossen Formula, w = 5%"

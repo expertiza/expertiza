@@ -11,6 +11,9 @@
   if !@new_derived_scores.nil?
     ndscore_review = @new_derived_scores
   end
+  if @assignment.is_selfreview_enabled?
+    avg_self_review = @avg_self_review_score
+  end
   rscore_metareview = Rscore.new(pscore,:metareview) if pscore[:metareview]
   rscore_feedback = Rscore.new(pscore,:feedback) if pscore[:feedback]
   rscore_teammate = Rscore.new(pscore,:teammate) if pscore[:teammate]
@@ -144,6 +147,11 @@
             <% end %>
         <% end %>
       </TD>
+  <% end %>
+  <% if @assignment.is_selfreview_enabled? %>
+    <TD align="center">
+      <%= avg_self_review %><%= score_postfix %>
+    </TD>
   <% end %>
   <% if !@new_derived_scores.nil? %>
       <TD align="center">

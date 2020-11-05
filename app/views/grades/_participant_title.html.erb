@@ -44,9 +44,11 @@
       <th style="text-align:center;" WIDTH="<%= colwidth %>%">Average</th>
       <th style="text-align:center;" WIDTH="<%= colwidth %>%">Range </th>
   <% end %>
-  <th style="text-align:center;" WIDTH="<%= colwidth %>%">Final Score</th>
-
+  <% if @assignment.is_selfreview_enabled? %>
+      <th style="text-align:center;">Self-Review Score</th>
+  <% end %>
+  <th style="text-align:center;" WIDTH="<%= colwidth %>%">Final Peer-Review Score</th>
   <%if @new_derived_scores %>
-      <th style="text-align:center;"  WIDTH="<%= colwidth %>%">Final Derived Peer Review Score</th>
+      <th style="text-align:center;"  WIDTH="<%= colwidth %>%">Final Score</th>
   <%end%>
 </tr>

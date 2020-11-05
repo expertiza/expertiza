@@ -72,7 +72,7 @@ class VmQuestionResponse
 
       reviews.each do |review|
         review_mapping = ReviewResponseMap.find(review.map_id)
-        if review_mapping && review_mapping.present?
+        if review_mapping.present?
           participant = Participant.find(review_mapping.reviewer_id)
           @list_of_reviewers << participant
         end

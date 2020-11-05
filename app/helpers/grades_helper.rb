@@ -118,4 +118,46 @@ module GradesHelper
     end
     questions
   end
+
+ ######################################## E2078 ########################################
+ def calc_final_score_formula1(avg_peer_review_score, self_review_score, w, l)
+  self_score = 0;
+  if (avg_peer_review_score - self_review_score).abs() / avg_peer_review_score <= l
+    self_score = (avg_peer_review_score * (1 + ((avg_peer_review_score - self_review_score).abs() / avg_peer_review_score)))
+  else
+    self_score = (avg_peer_review_score * (1 - ((avg_peer_review_score - self_review_score).abs() / avg_peer_review_score)))
+  end
+  grade = w * (avg_peer_review_score) + (1 - w) * self_score
+  return grade.round(2)
+end
+
+def derive_final_score(formula_choice)
+  # E2078 start
+  if @assignment.is_selfreview_enabled?
+    @self_review_scores = @participant.scores(@questions, true)
+
+    # calculate avg_self_review_score as an average of ratings given to self
+    @avg_self_review_score = Rscore.new(@self_review_scores, :review).my_avg || 0
+
+    # calculate actual_score as an average of ratings given by peers
+    avg_peer_review_score = Rscore.new(@pscore, :review).my_avg || 0
+
+    # ! final_score formula is in calc_final_score(), extend comment here to explain
+    # weight and impact need to be passed from the view, according to  what the instructor chooses for those values
+    if formula_choice == "None"
+      @new_derived_scores = calc_final_score_formula1(avg_peer_review_score, @avg_self_review_score, 1, 0.25).to_s
+    elsif formula_choice == "Formula 1, w = 5%"
+      @new_derived_scores = calc_final_score_formula1(avg_peer_review_score, @avg_self_review_score, 0.95, 0.25).to_s
+    elsif formula_choice == "Formula 1, w = 10%"
+      @new_derived_scores = calc_final_score_formula1(avg_peer_review_score, @avg_self_review_score, 0.90, 0.25).to_s
+    elsif formula_choice == "Formula 1, w = 15%"
+      @new_derived_scores = calc_final_score_formula1(avg_peer_review_score, @avg_self_review_score, 0.85, 0.25).to_s
+    elsif formula_choice == "Formula 1, w = 20%"
+      @new_derived_scores = calc_final_score_formula1(avg_peer_review_score, @avg_self_review_score, 0.80, 0.25).to_s
+    end
+  end
+  # E2078 end
+end
+######################################## E2078 ########################################
+
 end

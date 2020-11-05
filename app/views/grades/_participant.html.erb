@@ -12,7 +12,7 @@
     ndscore_review = @new_derived_scores
   end
   if @assignment.is_selfreview_enabled?
-    avg_self_review = @avg_self_review_score
+    avg_self_review = @avg_self_review_score.round(2)
   end
   rscore_metareview = Rscore.new(pscore,:metareview) if pscore[:metareview]
   rscore_feedback = Rscore.new(pscore,:feedback) if pscore[:feedback]
@@ -115,9 +115,15 @@
        score_postfix = "%"
      end %>
 
-    <% topic_id = SignedUpTeam.topic_id(@assignment.id, participant.user_id) %>
-    <% stage = @assignment.get_current_stage(topic_id) %>
-    <% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
+  <% if @assignment.is_selfreview_enabled? %>
+      <TD align="center">
+        <%= avg_self_review %><%= score_postfix %>
+      </TD>
+  <% end %>
+
+  <% topic_id = SignedUpTeam.topic_id(@assignment.id, participant.user_id) %>
+  <% stage = @assignment.get_current_stage(topic_id) %>
+  <% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
       <TD ALIGN="CENTER">
       <% if stage == "Finished" %>
 
@@ -147,11 +153,6 @@
             <% end %>
         <% end %>
       </TD>
-  <% end %>
-  <% if @assignment.is_selfreview_enabled? %>
-    <TD align="center">
-      <%= avg_self_review %><%= score_postfix %>
-    </TD>
   <% end %>
   <% if !@new_derived_scores.nil? %>
       <TD align="center">

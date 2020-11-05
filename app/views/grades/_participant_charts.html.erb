@@ -56,6 +56,10 @@
       </th>
   <% end %>
 
+  <% if @assignment.is_selfreview_enabled? %>
+    <th style="text-align:center;">&nbsp;&nbsp; </th>
+  <% end %>
+
   <th style="text-align:center;" WIDTH="<%= colwidth %>%">&nbsp;
     <div class="circle" id="final-circle">
 

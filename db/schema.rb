@@ -11,8 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
-ActiveRecord::Schema.define(version: 20200421235620) do
+ActiveRecord::Schema.define(version: 20201105175651) do
 
   create_table "account_requests", force: :cascade do |t|
     t.string   "name",              limit: 255
@@ -80,17 +79,17 @@ ActiveRecord::Schema.define(version: 20200421235620) do
     t.datetime "updated_at"
     t.string   "name",                                               limit: 255
     t.string   "directory_path",                                     limit: 255
-    t.integer  "submitter_count",                                    limit: 4,     default: 0,      null: false
+    t.integer  "submitter_count",                                    limit: 4,     default: 0,               null: false
     t.integer  "course_id",                                          limit: 4,     default: 0
     t.integer  "instructor_id",                                      limit: 4,     default: 0
-    t.boolean  "private",                                                          default: false,  null: false
-    t.integer  "num_reviews",                                        limit: 4,     default: 3,      null: false
-    t.integer  "num_review_of_reviews",                              limit: 4,     default: 0,      null: false
-    t.integer  "num_review_of_reviewers",                            limit: 4,     default: 0,      null: false
+    t.boolean  "private",                                                          default: false,           null: false
+    t.integer  "num_reviews",                                        limit: 4,     default: 3,               null: false
+    t.integer  "num_review_of_reviews",                              limit: 4,     default: 0,               null: false
+    t.integer  "num_review_of_reviewers",                            limit: 4,     default: 0,               null: false
     t.boolean  "reviews_visible_to_all"
-    t.integer  "num_reviewers",                                      limit: 4,     default: 0,      null: false
+    t.integer  "num_reviewers",                                      limit: 4,     default: 0,               null: false
     t.text     "spec_location",                                      limit: 65535
-    t.integer  "max_team_size",                                      limit: 4,     default: 0,      null: false
+    t.integer  "max_team_size",                                      limit: 4,     default: 0,               null: false
     t.boolean  "staggered_deadline"
     t.boolean  "allow_suggestions"
     t.integer  "days_between_submissions",                           limit: 4
@@ -101,12 +100,12 @@ ActiveRecord::Schema.define(version: 20200421235620) do
     t.integer  "rounds_of_reviews",                                  limit: 4,     default: 1
     t.boolean  "microtask",                                                        default: false
     t.boolean  "require_quiz"
-    t.integer  "num_quiz_questions",                                 limit: 4,     default: 0,      null: false
+    t.integer  "num_quiz_questions",                                 limit: 4,     default: 0,               null: false
     t.boolean  "is_coding_assignment"
     t.boolean  "is_intelligent"
-    t.boolean  "calculate_penalty",                                                default: false,  null: false
+    t.boolean  "calculate_penalty",                                                default: false,           null: false
     t.integer  "late_policy_id",                                     limit: 4
-    t.boolean  "is_penalty_calculated",                                            default: false,  null: false
+    t.boolean  "is_penalty_calculated",                                            default: false,           null: false
     t.integer  "max_bids",                                           limit: 4
     t.boolean  "show_teammate_reviews"
     t.boolean  "availability_flag",                                                default: true
@@ -126,9 +125,11 @@ ActiveRecord::Schema.define(version: 20200421235620) do
     t.boolean  "is_answer_tagging_allowed"
     t.boolean  "has_badge"
     t.boolean  "allow_selecting_additional_reviews_after_1st_round"
-    t.boolean  "reviewer_is_team"
     t.boolean  "vary_by_topic",                                                    default: false
-    t.boolean  "vary_by_round"
+    t.boolean  "vary_by_round",                                                    default: false
+    t.boolean  "reviewer_is_team"
+    t.string   "review_method",                                      limit: 255,   default: "Simple Choose"
+    t.string   "review_choosing_algorithm",                          limit: 255,   default: "Simple Choose"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree

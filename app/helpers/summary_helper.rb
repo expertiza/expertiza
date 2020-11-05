@@ -170,11 +170,11 @@ module SummaryHelper
         logger.warn "Standard Error: #{err.inspect}"
       end
     end
+    
 
     # convert answers to each question to sentences
     def get_sentences(ans)
-      ans_comments = (ans.comments.gsub!(/[.?!]/, '\1|') || ans.comments.concat('|')) unless ans.comments.nil?
-      sentences = ans_comments.split('|').map!(&:strip) unless ans_comments.nil?
+      sentences = ans.comments.gsub!(/[.?!]/, '\1|').split('|').map!(&:strip) unless ans.comments.nil?
       sentences
     end
 

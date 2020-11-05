@@ -154,7 +154,7 @@
       <td style='padding:5px' id='self_review_formula'>
         <div class="form-inline">
           <p>
-            Formula 1 is: grade = w * (avg_peer_review_score) + (1 - w) * (avg_peer_review_score * (1 +/- ((avg_peer_review_score - self_review_score).abs() / avg_peer_review_score)))
+            <a href="https://expertiza.csc.ncsu.edu/index.php/How_Self_Reviews_are_combined_with_Peer_Reviews_for_Final_Grade" target="_blank">Information on Formulas</a>
           </p>
           <%= label_tag('assignment_form[assignment][self_review_formula]', 'Choose a formula to add self reviews to grades') %>
           <%= select('assignment_form[assignment]', 'self_review_formula', [['None', 'None'], ['Formula 1, w = 5%', 'Formula 1, w = 5%'], ['Formula 1, w = 10%', 'Formula 1, w = 10%'], ['Formula 1, w = 15%', 'Formula 1, w = 15%'], ['Formula 1, w = 20%', 'Formula 1, w = 20%']], {:selected => @assignment_form.assignment.self_review_formula}, {:class => 'form-control', :style => 'width: 100px'}) %>

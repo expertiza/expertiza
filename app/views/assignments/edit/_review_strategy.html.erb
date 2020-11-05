@@ -157,7 +157,7 @@
             <a href="https://expertiza.csc.ncsu.edu/index.php/How_Self_Reviews_are_combined_with_Peer_Reviews_for_Final_Grade" target="_blank">Information on Formulas</a>
           </p>
           <%= label_tag('assignment_form[assignment][self_review_formula]', 'Choose a formula to add self reviews to grades') %>
-          <%= select('assignment_form[assignment]', 'self_review_formula', [['None', 'None'], ['Formula 1, w = 5%', 'Formula 1, w = 5%'], ['Formula 1, w = 10%', 'Formula 1, w = 10%'], ['Formula 1, w = 15%', 'Formula 1, w = 15%'], ['Formula 1, w = 20%', 'Formula 1, w = 20%']], {:selected => @assignment_form.assignment.self_review_formula}, {:class => 'form-control', :style => 'width: 100px'}) %>
+          <%= select('assignment_form[assignment]', 'self_review_formula', [['None', 'None'], ['Vossen Formula, w = 5%', 'Vossen Formula, w = 5%'], ['Vossen Formula, w = 10%', 'Vossen Formula, w = 10%'], ['Vossen Formula, w = 15%', 'Vossen Formula, w = 15%'], ['Vossen Formula, w = 20%', 'Vossen Formula, w = 20%']], {:selected => @assignment_form.assignment.self_review_formula}, {:class => 'form-control', :style => 'width: 100px'}) %>
         </div>
       </td>
     </tr>

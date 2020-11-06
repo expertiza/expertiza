@@ -58,7 +58,9 @@ class StudentTaskController < ApplicationController
     @use_bookmark = @assignment.use_bookmark
     # Timeline feature
     @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
+    # Revision plan feature
     @can_submit_revision_plan = student_task.can_submit_revision_plan?
+    @revision_plan_questionnaire_id = student_task.revision_plan_questionnaire_id
   end
 
   def others_work

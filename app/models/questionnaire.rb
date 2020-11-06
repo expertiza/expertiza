@@ -28,7 +28,8 @@ class Questionnaire < ActiveRecord::Base
                          'Course SurveyQuestionnaire',
                          'CourseSurveyQuestionnaire',
                          'BookmarkRatingQuestionnaire',
-                         'QuizQuestionnaire'].freeze
+                         'QuizQuestionnaire',
+                         'RevisionPlanQuestionnaire'].freeze
   has_paper_trail
 
   def get_weighted_score(assignment, scores)

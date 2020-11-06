@@ -267,6 +267,7 @@ resources :institution, except: [:destroy] do
 
   resources :author_feedback_questionnaires, controller: :questionnaires
   resources :review_questionnaires, controller: :questionnaires
+  resources :revision_plan_questionnaires, controller: :revision_plan_questionnaires, only: %i[new edit update] 
   resources :metareview_questionnaires, controller: :questionnaires
   resources :teammate_review_questionnaires, controller: :questionnaires
   resources :survey_questionnaires, controller: :questionnaires

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20201105023711) do
+ActiveRecord::Schema.define(version: 20201106020642) do
 
   create_table "account_requests", force: :cascade do |t|
     t.string   "name",              limit: 255
@@ -531,7 +531,7 @@ ActiveRecord::Schema.define(version: 20201105023711) do
 
   add_index "review_grades", ["participant_id"], name: "fk_rails_29587cf6a9", using: :btree
 
-  create_table "revision_plan_questionnaires", force: :cascade do |t|
+  create_table "revision_plan_team_maps", force: :cascade do |t|
     t.integer  "team_id",          limit: 4
     t.integer  "questionnaire_id", limit: 4
     t.integer  "used_in_round",    limit: 4
@@ -539,8 +539,8 @@ ActiveRecord::Schema.define(version: 20201105023711) do
     t.datetime "updated_at",                 null: false
   end
 
-  add_index "revision_plan_questionnaires", ["questionnaire_id"], name: "index_revision_plan_questionnaires_on_questionnaire_id", using: :btree
-  add_index "revision_plan_questionnaires", ["team_id"], name: "index_revision_plan_questionnaires_on_team_id", using: :btree
+  add_index "revision_plan_team_maps", ["questionnaire_id"], name: "index_revision_plan_team_maps_on_questionnaire_id", using: :btree
+  add_index "revision_plan_team_maps", ["team_id"], name: "index_revision_plan_team_maps_on_team_id", using: :btree
 
   create_table "roles", force: :cascade do |t|
     t.string   "name",            limit: 255, default: "", null: false
@@ -843,8 +843,8 @@ ActiveRecord::Schema.define(version: 20201105023711) do
   add_foreign_key "resubmission_times", "participants", name: "fk_resubmission_times_participants"
   add_foreign_key "review_comment_paste_bins", "review_grades"
   add_foreign_key "review_grades", "participants"
-  add_foreign_key "revision_plan_questionnaires", "questionnaires"
-  add_foreign_key "revision_plan_questionnaires", "teams"
+  add_foreign_key "revision_plan_team_maps", "questionnaires"
+  add_foreign_key "revision_plan_team_maps", "teams"
   add_foreign_key "sign_up_topics", "assignments", name: "fk_sign_up_topics_assignments"
   add_foreign_key "signed_up_teams", "sign_up_topics", column: "topic_id", name: "fk_signed_up_users_sign_up_topics"
   add_foreign_key "survey_deployments", "questionnaires"

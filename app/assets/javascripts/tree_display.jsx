@@ -826,46 +826,47 @@ jQuery(document).ready(function() {
           }
           else if(this.props.dataType=='assignment') {
               _rows.push(<TitleRow
-                  title="My Assignments"
+                  title="My Assignment"
               />)
           }
-          jQuery.each(this.props.data, function (i, entry) {
-              if (((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
-                  (entry.private == true || entry.type == 'FolderNode')) {
+          
+          jQuery.each(this.props.data, function (i, entry) { 
+            if (((entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(_this.props.filterText.toLowerCase()) !== -1) ||
+                (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
+                (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
+                (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
+                (entry.private == true || entry.type == 'FolderNode')) {
                   _rows.push(<ContentTableRow
-                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
-                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
-                      name={entry.name}
-                      institution={entry.institution}
-                      creation_date={entry.creation_date}
-                      updated_date={entry.updated_date}
-                      actions={entry.actions}
-                      is_available={entry.is_available}
-                      course_id={entry.course_id}
-                      max_team_size={entry.max_team_size}
-                      is_intelligent={entry.is_intelligent}
-                      require_quiz={entry.require_quiz}
-                      dataType={_this.props.dataType}
-                      //this is just a hack. All current users courses are marked as private during fetch for display purpose.
-                      private={entry.private}
-                      allow_suggestions={entry.allow_suggestions}
-                      has_topic={entry.has_topic}
-                      rowClicked={_this.handleExpandClick}
-                      newParams={entry.newParams}
-                  />)
-                  _rows.push(<ContentTableDetailsRow
-                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
-                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
-                      showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
-                      dataType={_this.props.dataType}
-                      children={entry.children}
-                  />)
-              } else {
-                  return;
-              }
+                    key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
+                    id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
+                    name={entry.name}
+                    institution={entry.institution}
+                    creation_date={entry.creation_date}
+                    updated_date={entry.updated_date}
+                    actions={entry.actions}
+                    is_available={entry.is_available}
+                    course_id={entry.course_id}
+                    max_team_size={entry.max_team_size}
+                    is_intelligent={entry.is_intelligent}
+                    require_quiz={entry.require_quiz}
+                    dataType={_this.props.dataType}
+                    //this is just a hack. All current users courses are marked as private during fetch for display purpose.
+                    private={entry.private}
+                    allow_suggestions={entry.allow_suggestions}
+                    has_topic={entry.has_topic}
+                    rowClicked={_this.handleExpandClick}
+                    newParams={entry.newParams}
+                />)
+                _rows.push(<ContentTableDetailsRow
+                    key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
+                    id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
+                    showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                    dataType={_this.props.dataType}
+                    children={entry.children}
+                />)
+            } else {
+                return;
+            }
           })
           if (this.props.showPublic) {
               if (this.props.dataType == 'course') {

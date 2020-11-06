@@ -19,8 +19,4 @@ class RevisionPlanQuestionnairesController < QuestionnairesController
     end
   end
 
-  def edit
-    
-  end
-
 end

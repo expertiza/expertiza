@@ -831,11 +831,8 @@ jQuery(document).ready(function() {
           }
           
           jQuery.each(this.props.data, function (i, entry) { 
-            if (((entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(_this.props.filterText.toLowerCase()) !== -1) ||
-                (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
-                (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
-                (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
-                (entry.private == true || entry.type == 'FolderNode')) {
+            if (((entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(_this.props.filterText.toLowerCase()) !== -1) &&
+                (entry.private == true || entry.type == 'FolderNode'))) {
                   _rows.push(<ContentTableRow
                     key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
                     id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}

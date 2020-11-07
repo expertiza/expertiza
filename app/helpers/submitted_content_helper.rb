@@ -136,7 +136,7 @@ end
     end
     
     def to_h()
-        return {uniq_id: @uniq_id, map_id: @map_id, round: @round, link: @link, start_at: @start_at, end_at: @end_at, created_at: @created_at, updated_at: @updated_at}
+        return {map_id: @map_id, round: @round, link: @link, start_at: @start_at, end_at: @end_at, created_at: @created_at, updated_at: @updated_at}
     end
 
   end
@@ -180,7 +180,13 @@ end
 
     # Actually saves into the database
     def hard_save(instance)
+        return SubmissionViewingEvent.create(instance.to_h())
+    end
+
+    def hard_save_all()
+      @registry.each do |item|
         SubmissionViewingEvent.create(instance.to_h())
+      end
     end
 
   end

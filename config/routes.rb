@@ -513,7 +513,7 @@ resources :institution, except: [:destroy] do
       get :search
     end
   end
-
+  resources :conference
   root to: 'content_pages#view', page_name: 'home'
   post :login, to: 'auth#login'
   post :logout, to: 'auth#logout'
@@ -533,6 +533,6 @@ resources :institution, except: [:destroy] do
   post '/response_toggle_permission/:id' => 'response#toggle_permission'
   post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'
   post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'
-
+  # get '/conference/creating_user' => 'conference#creating_user', as: 'conference_user'
 end
 

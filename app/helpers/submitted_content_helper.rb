@@ -123,50 +123,64 @@ module SubmittedContentHelper
 end
 
   class LocalSubmittedContent
-    attr_accessor :map_id, :round, :link , :start_at, :end_at, :created_at, :updated_at, :pstore
+    attr_accessor :map_id, :round, :link , :start_at, :end_at, :created_at, :updated_at
 
-    def initialize( map_id=nil, round=nil, link=nil, start_at=nil, end_at=nil, created_at=nil, updated_at=nil )
-      @map_id = map_id
-      @round = round
-      @link = link
-      @start_at = start_at
-      @end_at = end_at
-      @created_at = created_at
-      @updated_at = updated_at
-      @pstore = PStore.new("local_submitted_content.pstore")
+    def initialize(**args)
+      @map_id = args.fetch(:map_id,nil)
+      @round = args.fetch(:round,nil)
+      @link = args.fetch(:link,nil)
+      @start_at = args.fetch(:start_at,nil)
+      @end_at = args.fetch(:end_at,nil)
+      @created_at = args.fetch(:created_at,nil)
+      @updated_at = args.fetch(:updated_at,nil)
     end
-
-    #updates the field with a particular peice of data
-    def update(field, data)
-      
+    
+    def to_h()
+        return {uniq_id: @uniq_id, map_id: @map_id, round: @round, link: @link, start_at: @start_at, end_at: @end_at, created_at: @created_at, updated_at: @updated_at}
     end
 
   end
 
   class LocalStorage
 
-    def self.save(instance)
-      instance.pstore.transaction do
-        instance.pstore[:map_id] = instance.map_id
-        instance.pstore[:round] = instance.round
-        instance.pstore[:link] = instance.link
-        instance.pstore[:start_at] = instance.start_at
-        instance.pstore[:end_at] = instance.end_at
-        instance.pstore[:created_at] = instance.created_at
-        instance.pstore[:updated_at] = instance.updated_at
+    def initialize()
+      @registry = []
+      @pstore = PStore.new("local_submitted_content.pstore")
+      @pstore.transaction do
+        @pstore[:registry] ||= []
       end
+      @registry = read()
+    end
+
+    def save(instance)
+        @pstore.transaction do
+          @registry << instance
+          @pstore[:registry] = @registry
+        end
     end
 
 
     # Find all entries that meet every field in the params hash
     # return list of matching entries 
-    def self.where(params)
+    def where(params)
+        return @registry.select do |item|
+          if (params.to_a - item.to_a).empty?
+            return item
+          end
+        end
+    end
 
+
+    # Reads and returns data from Pstore registry
+    def read()
+      @pstore.transaction do 
+        return @pstore[:registry]
+      end
     end
 
     # Actually saves into the database
-    def self.hard_save(instance)
-      
+    def hard_save(instance)
+        SubmissionViewingEvent.create(instance.to_h())
     end
 
   end

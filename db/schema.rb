@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20201105175651) do
+ActiveRecord::Schema.define(version: 20201107203204) do
 
   create_table "account_requests", force: :cascade do |t|
     t.string   "name",              limit: 255
@@ -512,6 +512,21 @@ ActiveRecord::Schema.define(version: 20201105175651) do
 
   add_index "resubmission_times", ["participant_id"], name: "fk_resubmission_times_participants", using: :btree
 
+  create_table "review_bids", force: :cascade do |t|
+    t.integer  "priority",       limit: 4
+    t.integer  "signuptopic_id", limit: 4
+    t.integer  "participant_id", limit: 4
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+    t.integer  "user_id",        limit: 4
+    t.integer  "assignment_id",  limit: 4
+  end
+
+  add_index "review_bids", ["assignment_id"], name: "fk_rails_549e23ae08", using: :btree
+  add_index "review_bids", ["participant_id"], name: "fk_rails_ab93feeb35", using: :btree
+  add_index "review_bids", ["signuptopic_id"], name: "fk_rails_e88fa4058f", using: :btree
+  add_index "review_bids", ["user_id"], name: "fk_rails_6041e1cdb9", using: :btree
+
   create_table "review_comment_paste_bins", force: :cascade do |t|
     t.integer  "review_grade_id", limit: 4
     t.string   "title",           limit: 255
@@ -831,6 +846,10 @@ ActiveRecord::Schema.define(version: 20201105175651) do
   add_foreign_key "question_advices", "questions", name: "fk_question_question_advices"
   add_foreign_key "questions", "questionnaires", name: "fk_question_questionnaires"
   add_foreign_key "resubmission_times", "participants", name: "fk_resubmission_times_participants"
+  add_foreign_key "review_bids", "assignments"
+  add_foreign_key "review_bids", "participants"
+  add_foreign_key "review_bids", "sign_up_topics", column: "signuptopic_id"
+  add_foreign_key "review_bids", "users"
   add_foreign_key "review_comment_paste_bins", "review_grades"
   add_foreign_key "review_grades", "participants"
   add_foreign_key "sign_up_topics", "assignments", name: "fk_sign_up_topics_assignments"

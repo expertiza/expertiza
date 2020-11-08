@@ -197,7 +197,7 @@ class Response < ActiveRecord::Base
     [scores_assigned.sum / scores_assigned.size.to_f, count]
   end
 
-  def notify_instructor_on_difference
+  def notify_instructor_on_difference(base_url)
     response_map = self.map
     reviewer_participant_id = response_map.reviewer_id
     reviewer_participant = AssignmentParticipant.find(reviewer_participant_id)
@@ -215,9 +215,9 @@ class Response < ActiveRecord::Base
         reviewee_name: reviewee_name,
         new_score: total_score.to_f / maximum_score,
         assignment: assignment,
-        conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s,
-        summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
-        assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
+        conflicting_response_url: base_url + '/response/view?id=' + response_id.to_s,
+        summary_url: base_url + '/grades/view_team?id=' + reviewee_participant.id.to_s,
+        assignment_edit_url: base_url + '/assignments/' + assignment.id.to_s + '/edit'
       }
     ).deliver_now
   end

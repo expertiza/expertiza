@@ -111,7 +111,8 @@ class ResponseController < ApplicationController
       questions = sort_questions(@questionnaire.questions)
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
-      @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
+      #adding base_url from the controller as this method is not accessible from model
+      @response.notify_instructor_on_difference(request.base_url) if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
@@ -194,7 +195,7 @@ class ResponseController < ApplicationController
     error_msg = ""
     # only notify if is_submitted changes from false to true
     if (@map.is_a? ReviewResponseMap) && (was_submitted == false && @response.is_submitted) && @response.significant_difference?
-      @response.notify_instructor_on_difference
+      @response.notify_instructor_on_difference(request.base_url)
       @response.email
     end
     redirect_to controller: 'response', action: 'save', id: @map.map_id,

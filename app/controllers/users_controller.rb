@@ -108,11 +108,11 @@ class UsersController < ApplicationController
     @user = User.new
     @rolename = Role.find_by(name: params[:role])
     foreign
-   
   end
 
 
   def create
+    print('In user create')
     # if the user name already exists, register the user by email address
     check = User.find_by(name: params[:user][:name])
     params[:user][:name] = params[:user][:email] unless check.nil?

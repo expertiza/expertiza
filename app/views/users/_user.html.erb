@@ -7,9 +7,13 @@
 <% new_user ||= false %>
 <%= render :partial => 'users/name' %>
 <%= render :partial => 'users/email' %>
-<%= render :partial => 'users/password', :locals => { :new_user => new_user, :request_user => request_user } %>
-<%= render :partial => 'users/prefs', :locals => { :request_user => request_user } %>
-<%= render :partial => 'users/institutions' %>
-<%= render :partial => 'users/self_introduction' if request_user%>
+<% if @assignment.nil? %>
+  <%= render :partial => 'users/password', :locals => { :new_user => new_user, :request_user => request_user } %>
+  <%= render :partial => 'users/prefs', :locals => { :request_user => request_user } %>
+  <%= render :partial => 'users/institutions' %>
+  <%= render :partial => 'users/self_introduction' if request_user%>
+<% else %>
+  <%= render :partial => 'users/assignment'%>
+<% end %>
 <!--[eoform:user]-->
 <br/>

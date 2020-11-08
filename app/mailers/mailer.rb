@@ -1,6 +1,6 @@
 class Mailer < ActionMailer::Base
   if Rails.env.development? || Rails.env.test?
-    default from: 'expertiza.development@gmail.com'
+    default from: 'ooddmailer2@gmail.com'
   else
     default from: 'expertiza-support@lists.ncsu.edu'
   end
@@ -14,12 +14,30 @@ class Mailer < ActionMailer::Base
     @avg_pct = defn[:body][:avg_pct]
     @assignment = defn[:body][:assignment]
 
-    defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
+    defn[:to] = 'ooddmailer2@gmail.com' if Rails.env.development? || Rails.env.test?
     mail(subject: defn[:subject],
          to: defn[:to],
          bcc: defn[:bcc])
   end
 
+  def generic_message(defn)
+    @partial_name = defn[:body][:partial_name]
+    @user = defn[:body][:user]
+    @first_name = defn[:body][:first_name]
+    @password = defn[:body][:password]
+    print('\n ----------------passwored is---------]\n')
+    print(@password)
+    print('\n ----------------passwored is---------]\n')
+    @new_pct = defn[:body][:new_pct]
+    @avg_pct = defn[:body][:avg_pct]
+    @assignment = defn[:body][:assignment]
+    @conference_variable = defn[:body][:conference_variable]
+
+    defn[:to] = 'ooddmailer2@gmail.com' if Rails.env.development? || Rails.env.test?
+    mail(subject: defn[:subject],
+         to: defn[:to],
+         bcc: defn[:bcc])
+  end
   def request_user_message(defn)
     @user = defn[:body][:user]
     @super_user = defn[:body][:super_user]

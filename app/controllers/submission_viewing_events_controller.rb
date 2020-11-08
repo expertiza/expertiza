@@ -1,4 +1,5 @@
 class SubmissionViewingEventsController < ApplicationController
+  include SubmittedContentHelper
   def action_allowed?
     true
   end
@@ -7,20 +8,24 @@ class SubmissionViewingEventsController < ApplicationController
   def record_start_time
     param_args = params[:submission_viewing_event]
     # check if this link is already opened and timed
-    submission_viewing_event_records = SubmissionViewingEvent.where(map_id: param_args[:map_id], round: param_args[:round], link: param_args[:link])
+    store = LocalStorage.new()
+    submission_viewing_event_records = store.where(map_id: param_args[:map_id], round: param_args[:round], link: param_args[:link])
     # if opened, end these records with current time
     if submission_viewing_event_records
       submission_viewing_event_records.each do |time_record|
         if time_record.end_at.nil?
           # time_record.update_attribute('end_at', start_at)
-          time_record.destroy
+          store.remove(time_record)
         end
       end
     end
     # create new response time record for current link
-    submission_viewing_event = SubmissionViewingEvent.new(submission_viewing_event_params)
-    submission_viewing_event.save
-    
+    # submission_viewing_event = SubmissionViewingEvent.new(submission_viewing_event_params)
+    # submission_viewing_event.save
+    puts submission_viewing_event_params
+    submission_viewing_event = LocalSubmittedContent.new(submission_viewing_event_params)
+    store.save(submission_viewing_event)
+
     #if creating start time for expertiza update end times for all other links.
     if param_args[:link]=='Expertiza Review' 
       params[:submission_viewing_event][:link] = nil
@@ -33,14 +38,16 @@ class SubmissionViewingEventsController < ApplicationController
   # record time when link or file window is closed
   def record_end_time
     data = params.require(:submission_viewing_event)
+    store = LocalStorage.new()
     if data[:link].nil?
-      submission_viewing_event_records = SubmissionViewingEvent.where(map_id: data[:map_id], round: data[:round], end_at: nil).where.not(link: "Expertiza Review")
+      submission_viewing_event_records = store.where(map_id: data[:map_id], round: data[:round], end_at: nil).select { |item| item.link != "Expertiza Review"}
     else
-      submission_viewing_event_records = SubmissionViewingEvent.where(map_id: data[:map_id], round: data[:round], link: data[:link])
+      submission_viewing_event_records = store.where(map_id: data[:map_id], round: data[:round], link: data[:link])
     end
     submission_viewing_event_records.each do |time_record|
       if time_record.end_at.nil?
-        time_record.update_attribute('end_at', data[:end_at])
+        #time_record.update_attribute('end_at', data[:end_at])
+        time_record.end_at = data[:end_at]
         # break
       end
     end
@@ -53,11 +60,14 @@ class SubmissionViewingEventsController < ApplicationController
   def mark_end_time
     data = params.require(:submission_viewing_event)
     @link_array = []
-    submission_viewing_event_records = SubmissionViewingEvent.where(map_id: data[:map_id], round: data[:round])
+    store = LocalStorage.new()
+    submission_viewing_event_records = store.where(map_id: data[:map_id], round: data[:round])
     submission_viewing_event_records.each do |submissionviewingevent_entry|
       if submissionviewingevent_entry.end_at.nil?
         @link_array.push(submissionviewingevent_entry.link)
-        submissionviewingevent_entry.update_attribute('end_at', data[:end_at])
+        submissionviewingevent_entry.end_at = data[:end_at]
+        store.hard_save(submissionviewingevent_entry)
+        store.remove(submissionviewingevent_entry)
       end
     end
     respond_to do |format|

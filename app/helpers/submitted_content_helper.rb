@@ -134,6 +134,16 @@ end
       @created_at = args.fetch(:created_at,nil)
       @updated_at = args.fetch(:updated_at,nil)
     end
+
+    def initialize(args)
+      @map_id = args.fetch(:map_id,nil)
+      @round = args.fetch(:round,nil)
+      @link = args.fetch(:link,nil)
+      @start_at = args.fetch(:start_at,nil)
+      @end_at = args.fetch(:end_at,nil)
+      @created_at = args.fetch(:created_at,nil)
+      @updated_at = args.fetch(:updated_at,nil)
+    end
     
     def to_h()
         return {map_id: @map_id, round: @round, link: @link, start_at: @start_at, end_at: @end_at, created_at: @created_at, updated_at: @updated_at}
@@ -159,15 +169,23 @@ end
         end
     end
 
+    def sync()
+      @pstore.transaction do
+        @pstore[:registry] = @registry
+      end
+    end
 
     # Find all entries that meet every field in the params hash
     # return list of matching entries 
     def where(params)
-        return @registry.select do |item|
-          if (params.to_a - item.to_a).empty?
-            return item
+        found = []
+
+        @registry.each do |item|
+          if item.to_h().values_at(*params.keys) == params.values
+            found << item
           end
         end
+        return found
     end
 
 
@@ -187,6 +205,20 @@ end
       @registry.each do |item|
         SubmissionViewingEvent.create(instance.to_h())
       end
+    end
+
+    def remove(instance)
+      @registry.each_with_index do |item,i|
+        if item.to_h() == instance.to_h()
+          @registry.delete_at(i)
+        end
+      end
+      sync()
+    end
+
+    def remove_all()
+      @registry = []
+      sync()
     end
 
   end

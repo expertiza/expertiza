@@ -2,7 +2,25 @@ class ReviewBidsController < ApplicationController
   require "json"
   require "net/http"
 
-  before_action :set_review_bid, only: [:show, :edit, :update, :destroy]
+  # before_action :set_review_bid, only: [:show, :edit, :update, :destroy]
+
+  #action allowed function checks the action allowed based on the user working
+  def action_allowed?
+    case params[:action]
+    when 'review_bid', 'assign_review_priority'
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator',
+       'Student'].include? current_role_name and
+      ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer") : true)
+    else
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator'].include? current_role_name
+    end
+  end  
 
   # GET /review_bids
   def index
@@ -11,6 +29,13 @@ class ReviewBidsController < ApplicationController
 
   # GET /review_bids/1
   def show
+    params[:id] = 36221 # TODO remove this line 
+    @participant =  AssignmentParticipant.find(params[:id].to_i)
+    @assignment = @participant.assignment
+    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id)
+	@selected_topics = []
+    @max_team_size = @assignment.max_team_size
+    @bids = ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id).order(:priority)
   end
 
   # GET /review_bids/new

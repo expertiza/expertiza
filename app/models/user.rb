@@ -16,10 +16,6 @@ class User < ActiveRecord::Base
   has_many :received_invitations, class_name: 'Invitation', foreign_key: 'to_id', dependent: :destroy
   has_many :children, class_name: 'User', foreign_key: 'parent_id'
   has_many :track_notifications, dependent: :destroy
-
-  #E2077. Mentor management for assignments without topics E2024
-  has_many :assignment_team_mentors, class_name: "AssignmentTeamMentor", foreign_key: "assignment_team_mentor_id", dependent: :destroy
-    
   belongs_to :parent, class_name: 'User'
   belongs_to :role
   validates :name, presence: true

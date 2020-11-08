@@ -1,6 +1,6 @@
 class AssignmentTeamMentor < ActiveRecord::Base
   belongs_to :team
-  belongs_to :user
+  belongs_to :participant
 
   validates :assignment_team_id, presence: true
   validates :assignment_team_mentor_id, presence: true

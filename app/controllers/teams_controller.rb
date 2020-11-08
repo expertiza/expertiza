@@ -41,15 +41,18 @@ class TeamsController < ApplicationController
       @team = Object.const_get(session[:team_type] + 'Team').create(name: params[:team][:name], parent_id: parent.id)
       TeamNode.create(parent_id: parent.id, node_object_id: @team.id)
 
-      
-      begin
-        assignmentTeamMentor = AssignmentTeamMentor.new(assignment_team_id: @team.id)
-        assignmentTeamMentor.assignMentor(parent.id)
+      # Only assign mentor to AssignmentTeam team
+      if @team.type == "AssignmentTeam"
+        begin
+          assignmentTeamMentor = AssignmentTeamMentor.new(assignment_team_id: @team.id)
+          assignmentTeamMentor.assignMentor(parent.id)
           # Notify when no mentor was assigned to team because none were available from participants
         rescue StandardError 
           flash[:error] = $ERROR_INFO
           redirect_to action: 'list', id: parent.id and return
         end
+        assignmentTeamMentor.save
+      end    
 
       undo_link("The team \"#{@team.name}\" has been successfully created.")
       redirect_to action: 'list', id: parent.id

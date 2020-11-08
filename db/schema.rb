@@ -393,7 +393,7 @@ ActiveRecord::Schema.define(version: 20201108040411) do
     t.integer  "parent_id",           limit: 4
     t.datetime "submitted_at"
     t.boolean  "permission_granted"
-    t.integer  "penalty_accumulated", limit: 4,     default: 0,    null: false
+    t.integer  "penalty_accumulated", limit: 4,     default: 0,     null: false
     t.float    "grade",               limit: 24
     t.string   "type",                limit: 255
     t.string   "handle",              limit: 255
@@ -403,6 +403,7 @@ ActiveRecord::Schema.define(version: 20201108040411) do
     t.boolean  "can_take_quiz",                     default: true
     t.float    "Hamer",               limit: 24,    default: 1.0
     t.float    "Lauw",                limit: 24,    default: 0.0
+    t.boolean  "can_mentor",                        default: false
   end
 
   add_index "participants", ["user_id"], name: "fk_participant_users", using: :btree

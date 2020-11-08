@@ -1,3 +1,8 @@
+# TODO 
+# Fix views - edit 'show' and partials - Bria may work on partial formatting
+# Bidding data - 
+# Route correctly - Ryan will look into 
+
 class ReviewBidsController < ApplicationController
   require "json"
   require "net/http"
@@ -7,13 +12,13 @@ class ReviewBidsController < ApplicationController
   #action allowed function checks the action allowed based on the user working
   def action_allowed?
     case params[:action]
-    when 'review_bid', 'assign_review_priority'
+    when 'show', 'review_bid', 'assign_review_priority'
       ['Instructor',
        'Teaching Assistant',
        'Administrator',
        'Super-Administrator',
        'Student'].include? current_role_name and
-      ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer") : true)
+      ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], "participant" "reader", "submitter", "reviewer") : true)
     else
       ['Instructor',
        'Teaching Assistant',
@@ -29,7 +34,8 @@ class ReviewBidsController < ApplicationController
 
   # GET /review_bids/1
   def show
-    params[:id] = 36221 # TODO remove this line 
+    # params[:id] = 36221 # TODO remove this line 
+    params[:id] = 36242
     @participant =  AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id)

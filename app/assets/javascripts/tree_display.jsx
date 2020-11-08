@@ -190,7 +190,7 @@ jQuery(document).ready(function() {
                 <a title="Add participants" href={"/participants/list?id="+(parseInt(this.props.id)/2).toString()+"&model=Assignment"}>
                   <img src="/assets/tree_view/add-participant-24.png" />
                 </a>
-              </span>
+              </span> 
             )
             if (parseInt(this.props.max_team_size) > 1) {
               moreContent.push(
@@ -707,6 +707,31 @@ jQuery(document).ready(function() {
     }
   })
 
+  var AdditionalSearchDropDown = React.createClass({
+    getInitialState:function(){
+        return {selectValue:'empty'};
+    },
+    handleChange: function(e) {
+      this.setState({selectValue:e.target.value})
+    },
+    render: function() {
+        console.log(this.state.selectValue);
+          return (
+          <div>
+            <select value={this.state.selectValue}
+              onChange={this.handleChange} >
+              <option value="empty">----------</option>
+              <option value="created_date">Created Date Filter</option>
+              <option value="updated_date">Updated Date Filter</option>
+              
+            </select>
+          </div>
+        );
+      }
+  });
+  
+
+
   var NewItemButton = React.createClass({
     render: function() {
       var renderContent = []
@@ -829,7 +854,11 @@ jQuery(document).ready(function() {
                   title="My Assignment"
               />)
           }
-          
+
+          if(_this.props.showPublic){
+            console.log(_this.props.selectValue);
+          }
+
           jQuery.each(this.props.data, function (i, entry) { 
             if (((entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(_this.props.filterText.toLowerCase()) !== -1) &&
                 (entry.private == true || entry.type == 'FolderNode'))) {
@@ -1113,6 +1142,10 @@ jQuery(document).ready(function() {
             inputCheckboxValue={this.state.publicCheckbox}
             dataType={this.props.dataType}
           />
+
+          <AdditionalSearchDropDown value={this.state.selectValue} />
+
+
           <NewItemButton
             dataType={this.props.dataType}
             private={true}
@@ -1123,6 +1156,7 @@ jQuery(document).ready(function() {
             onUserClick={this.handleUserClick}
             dataType={this.props.dataType}
             showPublic={this.state.publicCheckbox}
+            selectValue={this.state.selectValue}
           />
         </div>
       )

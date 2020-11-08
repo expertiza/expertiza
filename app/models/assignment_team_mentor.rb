@@ -9,7 +9,7 @@ class AssignmentTeamMentor < ActiveRecord::Base
     list = Participant.getPotentialMentors(parent_id)
     if list.count < 1
       # Add code for when no tas or instructor have been added as a participant to current assignent
-      raise AssignmentTeamMentorError, "No participant mentors have been added to this assignment. Unable to assign mentor to latest team created."
+      raise StandardError, "No participant mentors have been added to this assignment. Unable to assign mentor to latest team created."
     else
       currentAssignedTeamMentors = {}
       list.each { |p| teamAssignedCount = AssignmentTeamMentor.where(assignment_team_mentor_id: p.user_id).count

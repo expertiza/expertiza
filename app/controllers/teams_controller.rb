@@ -45,13 +45,11 @@ class TeamsController < ApplicationController
       begin
         assignmentTeamMentor = AssignmentTeamMentor.new(assignment_team_id: @team.id)
         assignmentTeamMentor.assignMentor(parent.id)
-      # rescue NoParticipantMentors => e
-      rescue AssignmentTeamMentorError 
-        # p e.backtrace.inspect 
-        # redirect_to :controller => 'participants', :action => 'list', id: parent.id, model: model and return
-        flash[:error] = $ERROR_INFO
-        redirect_to action: 'list', id: parent.id and return
-      end
+          # Notify when no mentor was assigned to team because none were available from participants
+        rescue StandardError 
+          flash[:error] = $ERROR_INFO
+          redirect_to action: 'list', id: parent.id and return
+        end
 
       undo_link("The team \"#{@team.name}\" has been successfully created.")
       redirect_to action: 'list', id: parent.id

@@ -708,18 +708,12 @@ jQuery(document).ready(function() {
   })
 
   var AdditionalSearchDropDown = React.createClass({
-    getInitialState:function(){
-        return {selectValue:'empty'};
-    },
-    handleChange: function(e) {
-      this.setState({selectValue:e.target.value})
-    },
     render: function() {
-        console.log(this.state.selectValue);
           return (
           <div>
-            <select value={this.state.selectValue}
-              onChange={this.handleChange} >
+            <select 
+              value={this.props.selectValue}
+              onChange={this.props.onChange} >
               <option value="empty">----------</option>
               <option value="created_date">Created Date Filter</option>
               <option value="updated_date">Updated Date Filter</option>
@@ -1067,7 +1061,8 @@ jQuery(document).ready(function() {
         filterText: '',
         privateCheckbox: false,
         publicCheckbox: false,
-        tableData: this.props.data
+        tableData: this.props.data,
+        selectValue: 'empty'
       }
     },
     handleUserInput: function(filterText) {
@@ -1128,6 +1123,11 @@ jQuery(document).ready(function() {
           publicCheckbox: publicCheckboxStatus
         })
     },
+
+    changeName: function(event) {
+      this.setState({ selectValue: event.target.value });
+    },
+
     render: function() {
       return (
         <div className="filterable_table">
@@ -1143,7 +1143,10 @@ jQuery(document).ready(function() {
             dataType={this.props.dataType}
           />
 
-          <AdditionalSearchDropDown value={this.state.selectValue} />
+          <AdditionalSearchDropDown 
+            selectValue = {this.state.selectValue}
+            onChange={this.changeName}  
+          />
 
 
           <NewItemButton

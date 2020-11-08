@@ -1,2 +1,0 @@
-class AssignmentTeamMentorError < StandardError
-end

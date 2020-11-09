@@ -112,61 +112,63 @@ module ReviewMappingHelper
 
   #Generate the bar chart for reviewers score for a particular round for Review Conflict Report, change how display metric
   def generate_score_chart(review_max_score, question_answer)
-    scores = Array.new
-    question_answer.each do |reviewer,answer|
-      scores << ((answer.to_f/review_max_score.to_f)*100).round(2)
-    end
-    labels = (1..scores.length).to_a
-    data = {
-        labels: labels,
-        datasets: [
-            {
-                label: "score%",
-                backgroundColor: "rgba(255,99,132,0.8)",
-                borderWidth: 1,
-                data: scores,
-                hoverBackgroundColor: "orange",
-                yAxisID: "bar-y-axis1"
-            }
-        ]
-    }
-    options = {
-      legend: {
-        position: 'top',
-        labels: {
-          usePointStyle: true
-        }
-      },
-      width: "125",
-      height: "75",
-      scales: {
-            yAxes: [{
-                        stacked: true,
-                        id: "bar-y-axis1",
-                        barThickness: 10
-                    }, {
-                        display: false,
-                        stacked: true,
-                        id: "bar-y-axis2",
-                        barThickness: 15,
-                        type: 'category',
-                        categoryPercentage: 0.8,
-                        barPercentage: 0.9,
-                        gridLines: {
-                            offsetGridLines: true
-                        }
-                    }],
-            xAxes: [{
-                        stacked: false,
-                        ticks: {	
-			    beginAtZero: true,
-                            stepSize: 10,
-                            max: 100
-                        }
-                    }]
-        }
-    }
-    horizontal_bar_chart data, options
+    # if (question_answer.size() > 2)
+      scores = Array.new
+      question_answer.each do |reviewer,answer|
+        scores << ((answer.to_f/review_max_score.to_f)*100).round(2)
+      end
+      labels = (1..scores.length).to_a
+      data = {
+          labels: labels,
+          datasets: [
+              {
+                  label: "score%",
+                  backgroundColor: "rgba(255,99,132,0.8)",
+                  borderWidth: 1,
+                  data: scores,
+                  hoverBackgroundColor: "orange",
+                  yAxisID: "bar-y-axis1"
+              }
+          ]
+      }
+      options = {
+        legend: {
+          position: 'top',
+          labels: {
+            usePointStyle: true
+          }
+        },
+        width: "125",
+        height: 4*question_answer.size() +14,
+        scales: {
+              yAxes: [{
+                          stacked: true,
+                          id: "bar-y-axis1",
+                          barThickness: 10
+                      }, {
+                          display: false,
+                          stacked: true,
+                          id: "bar-y-axis2",
+                          barThickness: 15,
+                          type: 'category',
+                          categoryPercentage: 0.8,
+                          barPercentage: 0.9,
+                          gridLines: {
+                              offsetGridLines: true
+                          }
+                      }],
+              xAxes: [{
+                          stacked: false,
+                          ticks: {	
+            beginAtZero: true,
+                              stepSize: 10,
+                              max: 100
+                          }
+                      }]
+          }
+      }
+      horizontal_bar_chart data, options
+    # end
 
   end
 

@@ -111,18 +111,30 @@ module ReviewMappingHelper
   end
 
   #Generate the bar chart for reviewers score for a particular round for Review Conflict Report
-  def generate_score_chart(review_max_score, question_answer)
+  def generate_score_chart(review_max_score, question_answer, reviewers, team_name)
     scores = Array.new
+    labels = Array.new
+    colors = Array.new
+    average = average_of_round(question_answer)
+    std = std_of_round(average, question_answer)
+    upper_tolerance_limit = (average+(2*std)).round(2)
+    lower_tolerance_limit = (average-(2*std)).round(2)
     question_answer.each do |reviewer,answer|
       scores << ((answer.to_f/review_max_score.to_f)*100).round(2)
+      labels << reviewers[team_name.to_s][reviewer.to_s].to_s
+      if answer > upper_tolerance_limit or answer < lower_tolerance_limit
+        colors << "rgba(255,99,132,0.8)" # green
+      else
+        colors << "rgba(77, 175, 124, 1)" # red
+      end
     end
-    labels = (1..scores.length).to_a
+    # labels = (1..scores.length).to_a
     data = {
         labels: labels,
         datasets: [
             {
                 label: "score%",
-                backgroundColor: "rgba(255,99,132,0.8)",
+                backgroundColor: colors,
                 borderWidth: 1,
                 data: scores,
                 hoverBackgroundColor: "orange",
@@ -132,10 +144,15 @@ module ReviewMappingHelper
     }
     options = {
       legend: {
+        display: false,
         position: 'top',
         labels: {
           usePointStyle: true
         }
+      },
+      title: {
+        display: true,
+        text: 'Score %'
       },
       width: "125",
       height: "75",
@@ -168,6 +185,11 @@ module ReviewMappingHelper
     }
     horizontal_bar_chart data, options
 
+  end
+
+  def set_column_color()
+    "rgba(77, 175, 124, 1)"
+    # "rgba(255,99,132,0.8)" 
   end
 
 

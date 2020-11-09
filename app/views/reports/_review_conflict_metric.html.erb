@@ -37,7 +37,7 @@
       <td>
       <div>
           <strong><u><%= "Round: " + i.to_s %></u></strong>
-          <%= generate_score_chart(max_scores[i-1], question_answer) %>
+          <%= generate_score_chart(max_scores[i-1], question_answer, @reviewers, team_name) %>
       </div>
       </td>
     </tr>

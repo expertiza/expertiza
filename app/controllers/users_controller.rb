@@ -66,6 +66,7 @@ class UsersController < ApplicationController
 
     # Passes the above received search criterias to the User model to populate the list accordingly.
     @users = user.get_user_list search_uname, search_fname, search_email
+    @paginated_users = paginate_list(@users)
   end
 
   # Modularized the code to pass the search parameters, if found in the search textboxes, to the list method that

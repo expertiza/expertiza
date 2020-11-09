@@ -124,12 +124,13 @@ jQuery(document).ready(function() {
               <a title="Delete" href={"/tree_display/confirm?id="+(parseInt(this.props.id)/2).toString()+"&nodeType="+newNodeType}><img src="/assets/tree_view/delete-icon-24.png" /></a>
             </span>
           )
+
+          moreContent.push(
+            <span>
+              <a title="Copy" href={"/"+newNodeType+"/copy?assets=course&id="+(parseInt(this.props.id)/2).toString()}><img src="/assets/tree_view/Copy-icon-24.png" /></a>
+            </span>
+          )
         }
-        moreContent.push(
-          <span>
-            <a title="Copy" href={"/"+newNodeType+"/copy?assets=course&id="+(parseInt(this.props.id)/2).toString()}><img src="/assets/tree_view/Copy-icon-24.png" /></a>
-          </span>
-        )
         if (newNodeType === 'course') {
           moreContent.push(
             <br/>
@@ -750,15 +751,15 @@ jQuery(document).ready(function() {
       }
   });
 
-  var ISAVAILABLE_TOGGLE = React.createClass({
+  var HASQUIZ_TOGGLE = React.createClass({
     render: function() {
-        console.log(this.props.is_available_var);
+        console.log(this.props.has_quiz_var);
         return (
           <span 
-              is_available_var={this.props.is_available_var}
+              has_quiz_var={this.props.has_quiz_var}
               onChange={this.props.onChange}>                
-              Is Available <input
-              type="checkbox" id="is_available_var"></input>
+              Require a Quiz <input
+              type="checkbox" id="has_quiz_var"></input>
           </span>
         );
       }
@@ -904,12 +905,43 @@ jQuery(document).ready(function() {
             console.log(_this.props.selectValue);
             console.log(_this.props.start_date);
             console.log(_this.props.end_date);
-            console.log(_this.is_available_var);
+            console.log(_this.props.has_quiz_var);
           }
           if(_this.props.selectValue == 'empty'){
             jQuery.each(this.props.data, function (i, entry) { 
-              if (((entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(_this.props.filterText.toLowerCase()) !== -1) &&
-                  (entry.private == true || entry.type == 'FolderNode'))) {
+              if (((entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(_this.props.filterText.toLowerCase()) !== -1)
+                    &&(entry.private == true || entry.type == 'FolderNode'))) {
+
+                    if(_this.props.has_quiz_var && entry.require_quiz) {
+                      _rows.push(<ContentTableRow
+                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
+                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
+                      name={entry.name}
+                      institution={entry.institution}
+                      creation_date={entry.creation_date}
+                      updated_date={entry.updated_date}
+                      actions={entry.actions}
+                      is_available={entry.is_available}
+                      course_id={entry.course_id}
+                      max_team_size={entry.max_team_size}
+                      is_intelligent={entry.is_intelligent}
+                      require_quiz={entry.require_quiz}
+                      dataType={_this.props.dataType}
+                      //this is just a hack. All current users courses are marked as private during fetch for display purpose.
+                      private={entry.private}
+                      allow_suggestions={entry.allow_suggestions}
+                      has_topic={entry.has_topic}
+                      rowClicked={_this.handleExpandClick}
+                      newParams={entry.newParams}
+                    />)
+                    _rows.push(<ContentTableDetailsRow
+                        key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
+                        id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
+                        showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                        dataType={_this.props.dataType}
+                        children={entry.children}
+                    />)
+                  } else if(!_this.props.has_quiz_var){
                     _rows.push(<ContentTableRow
                       key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
                       id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
@@ -930,14 +962,17 @@ jQuery(document).ready(function() {
                       has_topic={entry.has_topic}
                       rowClicked={_this.handleExpandClick}
                       newParams={entry.newParams}
-                  />)
-                  _rows.push(<ContentTableDetailsRow
-                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
-                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
-                      showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
-                      dataType={_this.props.dataType}
-                      children={entry.children}
-                  />)
+                    />)
+                    _rows.push(<ContentTableDetailsRow
+                        key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
+                        id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
+                        showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                        dataType={_this.props.dataType}
+                        children={entry.children}
+                    />)
+                  }
+
+                    
               } else {
                   return;
               }
@@ -953,26 +988,27 @@ jQuery(document).ready(function() {
                   (entry.private == true || entry.type == 'FolderNode'))) {
 
                     if ((date >= var_start_date) && (var_end_date >= date)) {
+                    if(_this.props.has_quiz_var && entry.require_quiz) {
                       _rows.push(<ContentTableRow
-                        key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
-                        id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
-                        name={entry.name}
-                        institution={entry.institution}
-                        creation_date={entry.creation_date}
-                        updated_date={entry.updated_date}
-                        actions={entry.actions}
-                        is_available={entry.is_available}
-                        course_id={entry.course_id}
-                        max_team_size={entry.max_team_size}
-                        is_intelligent={entry.is_intelligent}
-                        require_quiz={entry.require_quiz}
-                        dataType={_this.props.dataType}
-                        //this is just a hack. All current users courses are marked as private during fetch for display purpose.
-                        private={entry.private}
-                        allow_suggestions={entry.allow_suggestions}
-                        has_topic={entry.has_topic}
-                        rowClicked={_this.handleExpandClick}
-                        newParams={entry.newParams}
+                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
+                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
+                      name={entry.name}
+                      institution={entry.institution}
+                      creation_date={entry.creation_date}
+                      updated_date={entry.updated_date}
+                      actions={entry.actions}
+                      is_available={entry.is_available}
+                      course_id={entry.course_id}
+                      max_team_size={entry.max_team_size}
+                      is_intelligent={entry.is_intelligent}
+                      require_quiz={entry.require_quiz}
+                      dataType={_this.props.dataType}
+                      //this is just a hack. All current users courses are marked as private during fetch for display purpose.
+                      private={entry.private}
+                      allow_suggestions={entry.allow_suggestions}
+                      has_topic={entry.has_topic}
+                      rowClicked={_this.handleExpandClick}
+                      newParams={entry.newParams}
                     />)
                     _rows.push(<ContentTableDetailsRow
                         key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
@@ -981,6 +1017,36 @@ jQuery(document).ready(function() {
                         dataType={_this.props.dataType}
                         children={entry.children}
                     />)
+                  } else if(!_this.props.has_quiz_var){
+                    _rows.push(<ContentTableRow
+                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
+                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
+                      name={entry.name}
+                      institution={entry.institution}
+                      creation_date={entry.creation_date}
+                      updated_date={entry.updated_date}
+                      actions={entry.actions}
+                      is_available={entry.is_available}
+                      course_id={entry.course_id}
+                      max_team_size={entry.max_team_size}
+                      is_intelligent={entry.is_intelligent}
+                      require_quiz={entry.require_quiz}
+                      dataType={_this.props.dataType}
+                      //this is just a hack. All current users courses are marked as private during fetch for display purpose.
+                      private={entry.private}
+                      allow_suggestions={entry.allow_suggestions}
+                      has_topic={entry.has_topic}
+                      rowClicked={_this.handleExpandClick}
+                      newParams={entry.newParams}
+                    />)
+                    _rows.push(<ContentTableDetailsRow
+                        key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
+                        id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
+                        showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                        dataType={_this.props.dataType}
+                        children={entry.children}
+                    />)
+                  }
                   }
 
               } else {
@@ -997,6 +1063,36 @@ jQuery(document).ready(function() {
               if (((entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(_this.props.filterText.toLowerCase()) !== -1) &&
                   (entry.private == true || entry.type == 'FolderNode'))) {
                     if ((date >= var_start_date) && (var_end_date >= date)) {
+                      if(_this.props.has_quiz_var && entry.require_quiz) {
+                      _rows.push(<ContentTableRow
+                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
+                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
+                      name={entry.name}
+                      institution={entry.institution}
+                      creation_date={entry.creation_date}
+                      updated_date={entry.updated_date}
+                      actions={entry.actions}
+                      is_available={entry.is_available}
+                      course_id={entry.course_id}
+                      max_team_size={entry.max_team_size}
+                      is_intelligent={entry.is_intelligent}
+                      require_quiz={entry.require_quiz}
+                      dataType={_this.props.dataType}
+                      //this is just a hack. All current users courses are marked as private during fetch for display purpose.
+                      private={entry.private}
+                      allow_suggestions={entry.allow_suggestions}
+                      has_topic={entry.has_topic}
+                      rowClicked={_this.handleExpandClick}
+                      newParams={entry.newParams}
+                    />)
+                    _rows.push(<ContentTableDetailsRow
+                        key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
+                        id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
+                        showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                        dataType={_this.props.dataType}
+                        children={entry.children}
+                    />)
+                    } else if(!_this.props.has_quiz_var){
                       _rows.push(<ContentTableRow
                         key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
                         id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
@@ -1017,14 +1113,15 @@ jQuery(document).ready(function() {
                         has_topic={entry.has_topic}
                         rowClicked={_this.handleExpandClick}
                         newParams={entry.newParams}
-                    />)
-                    _rows.push(<ContentTableDetailsRow
-                        key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
-                        id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
-                        showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
-                        dataType={_this.props.dataType}
-                        children={entry.children}
-                    />)
+                      />)
+                      _rows.push(<ContentTableDetailsRow
+                          key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
+                          id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
+                          showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                          dataType={_this.props.dataType}
+                          children={entry.children}
+                      />)
+                    }
                   }
 
               } else {
@@ -1210,7 +1307,7 @@ jQuery(document).ready(function() {
         selectValue: 'empty',
         start_date: '',
         end_date:'',
-        is_available_var: false
+        has_quiz_var: false
       }
     },
     handleUserInput: function(filterText) {
@@ -1290,7 +1387,7 @@ jQuery(document).ready(function() {
 
     changeAvailableToggle: function(event) {
       this.setState({ 
-        is_available_var: event.target.checked,
+        has_quiz_var: event.target.checked,
       });
     },
 
@@ -1334,8 +1431,8 @@ jQuery(document).ready(function() {
                 onChange={this.changeDateEnd}  
               />
 
-            <ISAVAILABLE_TOGGLE
-                is_available_var = {this.state.is_available_var}
+            <HASQUIZ_TOGGLE
+                has_quiz_var = {this.state.has_quiz_var}
                 onChange={this.changeAvailableToggle}              
             />  
             </div>
@@ -1354,7 +1451,7 @@ jQuery(document).ready(function() {
             selectValue={this.state.selectValue}
             start_date = {this.state.start_date}
             end_date = {this.state.end_date}
-            is_available_var = {this.state.is_available_var}
+            has_quiz_var = {this.state.has_quiz_var}
           />
         </div>
       )

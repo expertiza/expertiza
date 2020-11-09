@@ -19,7 +19,157 @@ module ReviewMappingHelper
       end
     end
     [response_maps, rspan]
+  end 
+
+  #
+  #Get the response_id for a particular review for Review Conflict Report
+  def response_id_review_conflict(reviewer_id, reviewee_id, reviewed_object_id)
+    response_id = ResponseMap.select(:id).where(reviewee_id: reviewee_id, reviewer_id: reviewer_id, reviewed_object_id: reviewed_object_id)
+    response_id[0][:id]
   end
+
+  #Get Review scores for all the rounds of a particular team for the Review Conflict Report
+  def review_score_for_team(reviewed_object_id, team_name)
+    question_answers=[]
+    reviewee_id = Team.select(:id).where(name: team_name, parent_id: reviewed_object_id)
+    reviewee_id.each do |reviewee|
+      total_rounds = Assignment.find(reviewed_object_id).rounds_of_reviews
+      question_answers = Array.new(total_rounds)
+      (0..total_rounds-1).each do |round|
+        temp_values = Answer.answers_by_round_for_reviewee(reviewed_object_id, reviewee,round+1)
+	      question_answers[round] = review_score_helper_for_team(temp_values)
+	    end
+    end
+    question_answers
+  end
+
+  #Get review score for each round of particular team
+  def review_score_helper_for_team(temp_values)
+	question_answers={}
+	temp_values.each do |temp_value|
+          if question_answers.key?(temp_value[:reviewer_id])
+            if temp_value[:answer].nil?
+              question_answers[temp_value[:reviewer_id]] += 0
+            else
+              question_answers[temp_value[:reviewer_id]] += temp_value[:answer]
+            end
+          else
+            if temp_value[:answer].nil?
+              question_answers[temp_value[:reviewer_id]] = 0
+            else
+              question_answers[temp_value[:reviewer_id]] = temp_value[:answer]
+            end
+          end
+        end
+	question_answers
+  end
+
+  #Average score of a particular round for Review Conflict Report
+  def average_of_round(question_answer)
+	average=0.0
+	i=0
+	question_answer.each do |reviewer,answer|
+		average+=answer
+		i+=1
+  	end
+	if i != 0
+		average=average/i
+	end
+	average.round(2)
+  end
+
+  #Standard Deviation of a particular round for Review Conflict Report
+  def std_of_round(average,question_answer)
+	accum=0.0
+	i=0
+  question_answer.each do |reviewer,answer|
+		accum+=(answer-average)**2
+		i+=1
+	end
+	if i != 0
+		accum=Math.sqrt(accum/i)
+	end 
+	accum.round(2)
+  end
+
+  #Get team members for a particular team for Review Conflict Report
+  def team_members(team_name, assignment_id)
+    team_id = Team.select(:id).where(name: team_name)
+    members = TeamsUser.where(team_id: team_id)
+    members
+  end
+
+  #Get Max assignment score for a particular round in an assignment for Review Conflict Report
+  def max_assignment_review_score_per_round(reviewed_object_id)
+    assignment = Assignment.find(reviewed_object_id)
+    total_rounds = assignment.rounds_of_reviews
+    review_max_scores = Array.new(total_rounds)
+    (0..total_rounds-1).each do |round|
+      review_max_scores[round] = SummaryHelper::Summary.new.max_score_of_assignment_per_round(assignment, round)
+       end
+    review_max_scores
+  end
+
+  #Generate the bar chart for reviewers score for a particular round for Review Conflict Report
+  def generate_score_chart(review_max_score, question_answer)
+    scores = Array.new
+    question_answer.each do |reviewer,answer|
+      scores << ((answer.to_f/review_max_score.to_f)*100).round(2)
+    end
+    labels = (1..scores.length).to_a
+    data = {
+        labels: labels,
+        datasets: [
+            {
+                label: "score%",
+                backgroundColor: "rgba(255,99,132,0.8)",
+                borderWidth: 1,
+                data: scores,
+                hoverBackgroundColor: "orange",
+                yAxisID: "bar-y-axis1"
+            }
+        ]
+    }
+    options = {
+      legend: {
+        position: 'top',
+        labels: {
+          usePointStyle: true
+        }
+      },
+      width: "125",
+      height: "75",
+      scales: {
+            yAxes: [{
+                        stacked: true,
+                        id: "bar-y-axis1",
+                        barThickness: 10
+                    }, {
+                        display: false,
+                        stacked: true,
+                        id: "bar-y-axis2",
+                        barThickness: 15,
+                        type: 'category',
+                        categoryPercentage: 0.8,
+                        barPercentage: 0.9,
+                        gridLines: {
+                            offsetGridLines: true
+                        }
+                    }],
+            xAxes: [{
+                        stacked: false,
+                        ticks: {	
+			    beginAtZero: true,
+                            stepSize: 10,
+                            max: 100
+                        }
+                    }]
+        }
+    }
+    horizontal_bar_chart data, options
+
+  end
+
 
   #
   # gets the team name's color according to review and assignment submission status

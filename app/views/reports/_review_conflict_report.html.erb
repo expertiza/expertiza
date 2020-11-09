@@ -1,0 +1,33 @@
+<div style="color:green;text-align:adjust">
+  Note: <br>
+  X- axis represents precentage score of the team<br>
+  Y- axis represents the reviewers <br>
+  Highlighted reviewers are outside the tolerance limit<br>
+</div><br><br>
+<table id="myTable" border="1px solid black" margin-top="-9px"  width="100%" cellspacing='0' cellpadding='2' border='0'>
+  <thead>
+  <tr bgcolor='#CCCCCC'>
+    <!-- class value decides whether the column should be sortable or not  -->
+    <th width="30%" class="sorter-false" border="1px black solid" style="text-align:center">Team <span></span></th>
+    <th width="70%" class="sorter-false" border="1px black solid" style="text-align:center" >Reviewers/Metrics <span></span></th>
+  </tr>
+  </thead>
+  <tbody>
+  <% max_scores= max_assignment_review_score_per_round(@id) %>
+  <%@reviewers.keys.each do |team_name| %>
+    <tr>
+      <td style="padding-left: 50px;" >
+        <% members = team_members(team_name, @id)%>
+        <strong>Team Name: </strong><%= team_name %><br>
+        <strong>Team Members: </strong><br>
+	<% members.each do |member|%>
+          <%=User.find(member.user_id).fullname %><br>
+        <% end %>
+      </td>
+      <td style="padding-left: 10px;" >
+      <%= render 'review_conflict_metric' , team_name: team_name , max_scores: max_scores %>
+  </td>
+  </tr>
+  <% end %>
+  </tbody>
+</table>

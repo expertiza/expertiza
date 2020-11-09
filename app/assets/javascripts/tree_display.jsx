@@ -706,44 +706,15 @@ jQuery(document).ready(function() {
       )
     }
   })
-
-  var AdvancedSearchButton = React.createClass({
-    render: function() {
-      return(
-        <span>
-          <button id="advanced_show">Advanced Options</button>
-        </span>
-      )
-    }
-  })
-
-  var AdditionalSearchDropDown = React.createClass({
-    render: function() {
-          return (
-          <div>
-            <select 
-              value={this.props.selectValue}
-              onChange={this.props.onChange} >
-              <option value="empty">----------</option>
-              <option value="created_date">Created Date Filter</option>
-              <option value="updated_date">Updated Date Filter</option>
-              
-            </select>
-          </div>
-        );
-      }
-  });
   
   var DatePickerStart = React.createClass({
     render: function() {
           return (
-          <div>
             <span 
               start_date={this.props.start_date}
               onChange={this.props.onChange} >
                 Start Date <input type="date" id="start_date"></input>                
             </span>
-          </div>
         );
       }
   });
@@ -752,26 +723,55 @@ jQuery(document).ready(function() {
    var DatePickerEnd = React.createClass({
     render: function() {
           return (
-          <div>
             <span 
               end_date={this.props.end_date}
               onChange={this.props.onChange} >                
                 End Date <input type="date" id="end_date"></input>
             </span>
-          </div>
         );
       }
   });
 
+  var AdditionalSearchDropDown = React.createClass({
+    render: function() {
+          return (
+            <span>
+            Filter Option 
+            <select 
+              value={this.props.selectValue}
+              onChange={this.props.onChange} >
+              <option value="empty">----------</option>
+              <option value="created_date">Created Date Filter</option>
+              <option value="updated_date">Updated Date Filter</option>              
+            </select>
+
+            </span>
+        );
+      }
+  });
+
+  var ISAVAILABLE_TOGGLE = React.createClass({
+    render: function() {
+        console.log(this.props.is_available_var);
+        return (
+          <span 
+              is_available_var={this.props.is_available_var}
+              onChange={this.props.onChange}>                
+              Is Available <input
+              type="checkbox" id="is_available_var"></input>
+          </span>
+        );
+      }
+  })
+
+
   var DatePickerEnd = React.createClass({
     render: function() {
           return (
-          <div>
-            <span 
+          <div
               end_date={this.props.end_date}
               onChange={this.props.onChange} >                
                 End Date <input type="date" id="end_date"></input>
-            </span>
           </div>
         );
       }
@@ -904,7 +904,7 @@ jQuery(document).ready(function() {
             console.log(_this.props.selectValue);
             console.log(_this.props.start_date);
             console.log(_this.props.end_date);
-            
+            console.log(_this.is_available_var);
           }
           if(_this.props.selectValue == 'empty'){
             jQuery.each(this.props.data, function (i, entry) { 
@@ -1209,7 +1209,8 @@ jQuery(document).ready(function() {
         tableData: this.props.data,
         selectValue: 'empty',
         start_date: '',
-        end_date:''
+        end_date:'',
+        is_available_var: false
       }
     },
     handleUserInput: function(filterText) {
@@ -1274,14 +1275,22 @@ jQuery(document).ready(function() {
     changeAdditionalDrop: function(event) {
       this.setState({ selectValue: event.target.value });
     },
+
     changeDateStart: function(event) {
       this.setState({ 
         start_date: event.target.value,
       });
     },
+
     changeDateEnd: function(event) {
       this.setState({ 
         end_date: event.target.value,
+      });
+    },
+
+    changeAvailableToggle: function(event) {
+      this.setState({ 
+        is_available_var: event.target.checked,
       });
     },
 
@@ -1316,18 +1325,21 @@ jQuery(document).ready(function() {
               selectValue = {this.state.selectValue}
               onChange={this.changeAdditionalDrop}  
             />
+            <div>
+              <DatePickerStart
+                start_date = {this.state.start_date}
+                onChange={this.changeDateStart}  
+              /><DatePickerEnd
+                start_date = {this.state.end_date}
+                onChange={this.changeDateEnd}  
+              />
 
-            <DatePickerStart
-              start_date = {this.state.start_date}
-              onChange={this.changeDateStart}  
-            />
-
-            <DatePickerEnd
-              start_date = {this.state.end_date}
-              onChange={this.changeDateEnd}  
-            />
+            <ISAVAILABLE_TOGGLE
+                is_available_var = {this.state.is_available_var}
+                onChange={this.changeAvailableToggle}              
+            />  
+            </div>
           </div>
-
 
           <NewItemButton
             dataType={this.props.dataType}
@@ -1342,6 +1354,7 @@ jQuery(document).ready(function() {
             selectValue={this.state.selectValue}
             start_date = {this.state.start_date}
             end_date = {this.state.end_date}
+            is_available_var = {this.state.is_available_var}
           />
         </div>
       )

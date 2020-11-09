@@ -332,7 +332,7 @@ class UsersController < ApplicationController
     @search_by = params[:search_by]
     @per_page = 3
     # search for corresponding users
-    users = User.search_users(role, user_id, letter, @search_by)
+    
 
     # paginate
     users = if paginate_options[@per_page.to_s].nil? # displaying all - no pagination

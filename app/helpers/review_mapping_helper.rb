@@ -138,7 +138,7 @@ module ReviewMappingHelper
         }
       },
       width: "125",
-      height: "75",
+      height: 4*question_answer.size() + 14,
       scales: {
             yAxes: [{
                         stacked: true,

@@ -707,6 +707,16 @@ jQuery(document).ready(function() {
     }
   })
 
+  var AdvancedSearchButton = React.createClass({
+    render: function() {
+      return(
+        <span>
+          <button id="advanced_show">Advanced Options</button>
+        </span>
+      )
+    }
+  })
+
   var AdditionalSearchDropDown = React.createClass({
     render: function() {
           return (
@@ -740,6 +750,20 @@ jQuery(document).ready(function() {
 
 
    var DatePickerEnd = React.createClass({
+    render: function() {
+          return (
+          <div>
+            <span 
+              end_date={this.props.end_date}
+              onChange={this.props.onChange} >                
+                End Date <input type="date" id="end_date"></input>
+            </span>
+          </div>
+        );
+      }
+  });
+
+  var DatePickerEnd = React.createClass({
     render: function() {
           return (
           <div>
@@ -921,14 +945,58 @@ jQuery(document).ready(function() {
           }
 
           if(_this.props.selectValue == 'created_date'){
-            var var_start_date = _this.props.start_date;
-            var var_end_date = _this.props.end_date;
+            var var_start_date = _this.props.start_date+1;
+            var var_end_date = _this.props.end_date+1;
             jQuery.each(this.props.data, function (i, entry) { 
               var date = entry.creation_date;
               if (((entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(_this.props.filterText.toLowerCase()) !== -1) &&
                   (entry.private == true || entry.type == 'FolderNode'))) {
 
-                    if ((date >= var_start_date) && (var_end_date >= var_end_date)) {
+                    if ((date >= var_start_date) && (var_end_date >= date)) {
+                      _rows.push(<ContentTableRow
+                        key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
+                        id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
+                        name={entry.name}
+                        institution={entry.institution}
+                        creation_date={entry.creation_date}
+                        updated_date={entry.updated_date}
+                        actions={entry.actions}
+                        is_available={entry.is_available}
+                        course_id={entry.course_id}
+                        max_team_size={entry.max_team_size}
+                        is_intelligent={entry.is_intelligent}
+                        require_quiz={entry.require_quiz}
+                        dataType={_this.props.dataType}
+                        //this is just a hack. All current users courses are marked as private during fetch for display purpose.
+                        private={entry.private}
+                        allow_suggestions={entry.allow_suggestions}
+                        has_topic={entry.has_topic}
+                        rowClicked={_this.handleExpandClick}
+                        newParams={entry.newParams}
+                    />)
+                    _rows.push(<ContentTableDetailsRow
+                        key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
+                        id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
+                        showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                        dataType={_this.props.dataType}
+                        children={entry.children}
+                    />)
+                  }
+
+              } else {
+                  return;
+              }
+            })
+          }
+
+          if(_this.props.selectValue == 'updated_date'){
+            var var_start_date = _this.props.start_date+1;
+            var var_end_date = _this.props.end_date+1;
+            jQuery.each(this.props.data, function (i, entry) { 
+              var date = entry.updated_date;
+              if (((entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(_this.props.filterText.toLowerCase()) !== -1) &&
+                  (entry.private == true || entry.type == 'FolderNode'))) {
+                    if ((date >= var_start_date) && (var_end_date >= date)) {
                       _rows.push(<ContentTableRow
                         key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
                         id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
@@ -1225,27 +1293,41 @@ jQuery(document).ready(function() {
             onUserInput={this.handleUserInput}
             dataType={this.props.dataType}
           />
+
           <FilterButton
             filterOption="public"
             onUserFilter={this.handleUserFilter}
             inputCheckboxValue={this.state.publicCheckbox}
             dataType={this.props.dataType}
           />
+          
+          <button onClick={() => {
+                var x = document.getElementById("advancedToggle");
+                if (x.style.display === "none") {
+                  x.style.display = "block";
+                } else {
+                  x.style.display = "none";
+                }}}>
+            Advanced Search
+          </button>
 
-          <AdditionalSearchDropDown 
-            selectValue = {this.state.selectValue}
-            onChange={this.changeAdditionalDrop}  
-          />
+          <div id="advancedToggle">
+            <AdditionalSearchDropDown 
+              selectValue = {this.state.selectValue}
+              onChange={this.changeAdditionalDrop}  
+            />
 
-          <DatePickerStart
-            start_date = {this.state.start_date}
-            onChange={this.changeDateStart}  
-          />
+            <DatePickerStart
+              start_date = {this.state.start_date}
+              onChange={this.changeDateStart}  
+            />
 
-          <DatePickerEnd
-            start_date = {this.state.end_date}
-            onChange={this.changeDateEnd}  
-          />
+            <DatePickerEnd
+              start_date = {this.state.end_date}
+              onChange={this.changeDateEnd}  
+            />
+          </div>
+
 
           <NewItemButton
             dataType={this.props.dataType}

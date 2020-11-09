@@ -110,7 +110,7 @@ module ReviewMappingHelper
     review_max_scores
   end
 
-  #Generate the bar chart for reviewers score for a particular round for Review Conflict Report
+  #Generate the bar chart for reviewers score for a particular round for Review Conflict Report, change how display metric
   def generate_score_chart(review_max_score, question_answer)
     scores = Array.new
     question_answer.each do |reviewer,answer|

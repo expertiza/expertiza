@@ -710,8 +710,20 @@ jQuery(document).ready(function() {
   
   var DatePickerStart = React.createClass({
     render: function() {
+          var formStyle = {
+            margin: 0,
+            padding: 0,
+            display: 'inline'
+          }
+          if (this.props.dataType === 'questionnaire') {
+            formStyle = {
+              margin: 0,
+              padding: 0,
+              display: 'none'
+            }
+          }
           return (
-            <span style={{"display": (this.props.dataType === 'questionnaire' ? "none" : "")}
+            <span style = {formStyle}
               start_date={this.props.start_date}
               onChange={this.props.onChange} >
                 Start Date <input type="date" id="start_date"></input>                
@@ -723,8 +735,20 @@ jQuery(document).ready(function() {
 
    var DatePickerEnd = React.createClass({
     render: function() {
+          var formStyle = {
+            margin: 0,
+            padding: 0,
+            display: 'inline'
+          }
+          if (this.props.dataType === 'questionnaire') {
+            formStyle = {
+              margin: 0,
+              padding: 0,
+              display: 'none'
+            }
+          }
           return (
-            <span style={{"display": (this.props.dataType === 'questionnaire' ? "none" : "")}
+            <span style = {formStyle}
               end_date={this.props.end_date}
               onChange={this.props.onChange} >                
                 End Date <input type="date" id="end_date"></input>
@@ -735,8 +759,22 @@ jQuery(document).ready(function() {
 
   var AdditionalSearchDropDown = React.createClass({
     render: function() {
+          var formStyle = {
+            margin: 0,
+            padding: 0,
+            display: 'inline'
+          }
+          if (this.props.dataType === 'questionnaire') {
+            formStyle = {
+              margin: 0,
+              padding: 0,
+              display: 'none'
+            }
+          }
           return (
-            <span  >
+            <span
+              style = {formStyle}
+            >
             Filter Option 
             <select 
               value={this.props.selectValue}
@@ -753,9 +791,9 @@ jQuery(document).ready(function() {
 
   var HASQUIZ_TOGGLE = React.createClass({
     render: function() {
-        console.log(this.props.has_quiz_var);
         return (
-          <span style={{"display": (this.props.dataType === 'questionnaire' ? "none" : "")}
+          <span 
+              style={{"display": (this.props.dataType === 'questionnaire' ? "none" : "")}}
               has_quiz_var={this.props.has_quiz_var}
               onChange={this.props.onChange}>                
               Require a Quiz <input
@@ -769,7 +807,8 @@ jQuery(document).ready(function() {
   var DatePickerEnd = React.createClass({
     render: function() {
           return (
-          <span
+          <div
+              style={{"display": (this.props.dataType === 'questionnaire' ? "none" : "")}}
               end_date={this.props.end_date}
               onChange={this.props.onChange} >                
                 End Date <input type="date" id="end_date"></input>
@@ -901,12 +940,6 @@ jQuery(document).ready(function() {
               />)
           }
 
-          if(_this.props.showPublic){
-            console.log(_this.props.selectValue);
-            console.log(_this.props.start_date);
-            console.log(_this.props.end_date);
-            console.log(_this.props.has_quiz_var);
-          }
           if(_this.props.selectValue == 'empty'){
             jQuery.each(this.props.data, function (i, entry) { 
               if (((entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(_this.props.filterText.toLowerCase()) !== -1)
@@ -1391,6 +1424,20 @@ jQuery(document).ready(function() {
     },
 
     render: function() {
+
+      var formStyle = {
+          margin: 0,
+          padding: 0,
+          display: 'inline'
+        }
+        if (this.props.dataType === 'questionnaire') {
+          formStyle = {
+            margin: 0,
+            padding: 0,
+            display: 'none'
+          }
+        }
+
       return (
         <div className="filterable_table">
           <SearchBar
@@ -1406,7 +1453,9 @@ jQuery(document).ready(function() {
             dataType={this.props.dataType}
           />
           
-          <button onClick={() => {
+          <button 
+          style = {formStyle}
+          onClick={() => {
                 var x = document.getElementById("advancedToggle");
                 if (x.style.display === "none") {
                   x.style.display = "block";
@@ -1420,19 +1469,24 @@ jQuery(document).ready(function() {
             <AdditionalSearchDropDown 
               selectValue = {this.state.selectValue}
               onChange={this.changeAdditionalDrop}  
+              dataType={this.props.dataType}
             />
             <div>
               <DatePickerStart
                 start_date = {this.state.start_date}
                 onChange={this.changeDateStart}  
-              /><DatePickerEnd
+                dataType={this.props.dataType}
+              />
+              <DatePickerEnd
                 start_date = {this.state.end_date}
                 onChange={this.changeDateEnd}  
+                dataType={this.props.dataType}
               />
 
             <HASQUIZ_TOGGLE
                 has_quiz_var = {this.state.has_quiz_var}
-                onChange={this.changeAvailableToggle}              
+                onChange={this.changeAvailableToggle} 
+                dataType={this.props.dataType}        
             />  
             </div>
           </div>

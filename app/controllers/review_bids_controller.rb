@@ -35,7 +35,7 @@ class ReviewBidsController < ApplicationController
   # GET /review_bids/1
   def show
     # params[:id] = 36221 # TODO remove this line 
-    params[:id] = 36242
+    #params[:id] = 36242
     @participant =  AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id)

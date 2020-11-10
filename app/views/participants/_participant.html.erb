@@ -58,6 +58,7 @@
         <%= button_tag "Submit", {:id=>'button'+participant.user_id.to_s,:style=>"font-size:15px; opacity:1;", :class => "btn btn-md btn-default" } %>
     <% end %>
   </td>
-
+  <!--E2077 Can mentor column indicates whether a particpant can mentor or not-->
+  <td align = "left"><%= participant.can_mentor == false ? 'no' : 'yes' %></td>
 </tr>
 

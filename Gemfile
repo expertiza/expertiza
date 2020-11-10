@@ -74,6 +74,7 @@ gem 'tinymce-rails'
 gem 'uglifier'
 gem 'will_paginate'
 gem 'zip-zip'
+gem 'pry-rails'
 
 group :development do
   gem 'daemons'

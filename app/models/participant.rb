@@ -10,6 +10,10 @@ class Participant < ActiveRecord::Base
   has_many :awarded_badges, dependent: :destroy
   has_many :badges, through: :awarded_badges
   has_one :review_grade, dependent: :destroy
+
+  #E2077. Mentor management for assignments without topics E2024
+  has_many :assignment_team_mentors, class_name: "AssignmentTeamMentor", foreign_key: "assignment_team_mentor_id", dependent: :destroy
+
   validates :grade, numericality: {allow_nil: true}
   has_paper_trail
   delegate :course, to: :assignment
@@ -172,5 +176,10 @@ class Participant < ActiveRecord::Base
     fields.push("email on submission", "email on review", "email on metareview") if options["email_options"] == "true"
     fields.push("handle") if options["handle"] == "true"
     fields
+  end
+
+  # Generate list of possible mentors that have been added as participants to a specified assignment. Looking for specifically for participants added that are either 
+  def self.getPotentialMentors(assignment_id)
+    where(parent_id: assignment_id).select{|p| User.find(p.user_id).role.ta? || User.find(p.user_id).role.instructor?} 
   end
 end

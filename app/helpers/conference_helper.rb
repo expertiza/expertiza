@@ -11,28 +11,13 @@ module ConferenceHelper
        end
     end
     
-    def check_role
+    def current_user_has_admin_rights
         ['Super-Administrator',
             'Administrator',
             'Instructor',
             'Teaching Assistant'].include? current_role_name
     end
 
-    def foreign
-        # stores all the roles that are possible 
-        # when a new user joins or an existing user updates his/her profile they will get to choose
-        # from all the roles available
-        # role = Role.find(session[:user].role_id)
-         #if user creation call is for conference user then only possible role is Student
-        # else  get all the roles types which logged in user can create as new user.
-        if params[:assignment_id].nil?
-          role = Role.find(session[:user].role_id)
-        else
-          role = Role.find_by_name('Student')
-        end
-        @all_roles = Role.where('id in (?) or id = ?', role.get_available_roles, role.id)
-      
-    end
     def add_conference_user_as_participant
         print("\n In add conference participant\n")
         # Author added as participant, function written in Conference Helper

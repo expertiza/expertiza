@@ -85,13 +85,10 @@ class InvitationsController < ApplicationController
     # student has information about the participant
     @student = AssignmentParticipant.find(params[:student_id])
     @assignment = Assignment.find(@student.parent_id)
-
     if @assignment.is_conference
       @user =  create_coauthor unless @user
     end
-
     return unless current_user_id?(@student.user_id)
-
     # check if the invited user is valid
     unless @user
       flash[:error] = "The user \"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
@@ -105,9 +102,6 @@ class InvitationsController < ApplicationController
     @participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', @user.id, @student.parent_id).first
     # check if the user is a participant of the assignment
     unless @participant
-      # flash[:error] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
-      # redirect_to view_student_teams_path student_id: @student.id
-      # return
       if @assignment.is_conference
         add_participant_coauthor
       else
@@ -116,7 +110,6 @@ class InvitationsController < ApplicationController
         return
       end
     end
-    
     check_team_before_invitation
   end
 

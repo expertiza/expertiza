@@ -711,7 +711,7 @@ jQuery(document).ready(function() {
   var DatePickerStart = React.createClass({
     render: function() {
           return (
-            <span 
+            <span style={{"display": (this.props.dataType === 'questionnaire' ? "none" : "")}
               start_date={this.props.start_date}
               onChange={this.props.onChange} >
                 Start Date <input type="date" id="start_date"></input>                
@@ -724,7 +724,7 @@ jQuery(document).ready(function() {
    var DatePickerEnd = React.createClass({
     render: function() {
           return (
-            <span 
+            <span style={{"display": (this.props.dataType === 'questionnaire' ? "none" : "")}
               end_date={this.props.end_date}
               onChange={this.props.onChange} >                
                 End Date <input type="date" id="end_date"></input>
@@ -736,7 +736,7 @@ jQuery(document).ready(function() {
   var AdditionalSearchDropDown = React.createClass({
     render: function() {
           return (
-            <span>
+            <span  >
             Filter Option 
             <select 
               value={this.props.selectValue}
@@ -755,7 +755,7 @@ jQuery(document).ready(function() {
     render: function() {
         console.log(this.props.has_quiz_var);
         return (
-          <span 
+          <span style={{"display": (this.props.dataType === 'questionnaire' ? "none" : "")}
               has_quiz_var={this.props.has_quiz_var}
               onChange={this.props.onChange}>                
               Require a Quiz <input
@@ -769,7 +769,7 @@ jQuery(document).ready(function() {
   var DatePickerEnd = React.createClass({
     render: function() {
           return (
-          <div
+          <span
               end_date={this.props.end_date}
               onChange={this.props.onChange} >                
                 End Date <input type="date" id="end_date"></input>
@@ -911,7 +911,6 @@ jQuery(document).ready(function() {
             jQuery.each(this.props.data, function (i, entry) { 
               if (((entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(_this.props.filterText.toLowerCase()) !== -1)
                     &&(entry.private == true || entry.type == 'FolderNode'))) {
-
                     if(_this.props.has_quiz_var && entry.require_quiz) {
                       _rows.push(<ContentTableRow
                       key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}

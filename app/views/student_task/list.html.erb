@@ -32,10 +32,15 @@
             action = "list"
             end
           end
-       elsif stage == "review" or stage == "metareview"
-         controller = "student_review"
-         action = "list"
-       end
+        elsif stage == "review" or stage == "metareview"
+          if Assignment.find(participant.assignment.id).review_choosing_algorithm == 'Bidding'
+            controller = "review_bids"
+            action = "show"
+          else
+            controller = "student_review"
+            action = "list"
+          end
+        end
      %>
 
     <span>&nbsp; &raquo;
@@ -56,8 +61,13 @@
       controller = "submitted_content"
       action = "edit"
     elsif stage == "review" or stage == "metareview"
-      controller = "student_review"
-      action = "list"
+      if Assignment.find(participant.assignment.id).review_choosing_algorithm == 'Bidding'
+        controller = "review_bids"
+        action = "show"
+      else
+        controller = "student_review"
+        action = "list"
+      end
     end
   %>
 

@@ -8,7 +8,7 @@ class ReviewBidsController < ApplicationController
   #action allowed function checks the action allowed based on the user working
   def action_allowed?
     case params[:action]
-    when 'show', 'review_bid', 'assign_review_priority'
+    when 'show', 'review_bid', 'set_priority'
       ['Instructor',
        'Teaching Assistant',
        'Administrator',
@@ -58,22 +58,22 @@ class ReviewBidsController < ApplicationController
       participant = AssignmentParticipant.find_by(id: params[:id])
       assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
       # team_id = participant.team.try(:id)
-      @bids = ReviewBid.where(participant_id: params[:participant_id])
-      signed_up_topics = ReviewBid.where(participant_id: params[:participant_id]).map(&:signuptopic_id)
+      @bids = ReviewBid.where(participant_id: params[:id])
+      signed_up_topics = ReviewBid.where(participant_id: params[:id]).map(&:signuptopic_id)
       signed_up_topics -= params[:topic].map(&:to_i)
       signed_up_topics.each do |topic|
-        ReviewBid.where(signuptopic_id: topic, participant_id: params[:participant_id]).destroy_all
+        ReviewBid.where(signuptopic_id: topic, participant_id: params[:id]).destroy_all
       end
       params[:topic].each_with_index do |topic_id, index|
-        bid_existence = ReviewBid.where(signuptopic_id: topic_id, participant_id: params[:participant_id])
+        bid_existence = ReviewBid.where(signuptopic_id: topic_id, participant_id: params[:id])
         if bid_existence.empty?
-          ReviewBid.create(priority: index + 1,signuptopic_id: topic_id, participant_id: params[:participant_id],assignment_id: assignment_id)
+          ReviewBid.create(priority: index + 1,signuptopic_id: topic_id, participant_id: params[:id],assignment_id: assignment_id)
         else
-          ReviewBid.where(signuptopic_id: topic_id, participant_id: params[:participant_id]).update_all(priority: index + 1)
+          ReviewBid.where(signuptopic_id: topic_id, participant_id: params[:id]).update_all(priority: index + 1)
         end
       end
     end
-    redirect_to action: 'show', assignment_id: params[:assignment_id], id: params[:participant_id]
+    redirect_to action: 'show', assignment_id: params[:assignment_id], id: params[:id]
   end
 
   # GET /review_bids/new

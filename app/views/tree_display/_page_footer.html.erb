@@ -1,6 +1,8 @@
 <% if @child_nodes.length > 0 %>
   <table id="theTable" width="80%" cell="5">
-    <tr id="header"><th colspan="5" width="70%">Details</th><th width="10%">Actions</th></tr>
+    <tr id="header"><th colspan="5" width="60%">Details</th>
+    <th width="20%">Mentor</th> <%# Additional Mentor column header added for E2077 %>
+    <th width="10%">Actions</th></tr>
     <%
       index = 1
     @child_nodes.each do |node|

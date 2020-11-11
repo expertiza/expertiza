@@ -12,7 +12,7 @@ class Participant < ActiveRecord::Base
   has_one :review_grade, dependent: :destroy
 
   #E2077. Mentor management for assignments without topics E2024
-  has_many :assignment_team_mentors, class_name: "AssignmentTeamMentor", dependent: :destroy
+  has_many :assignment_team_mentors, class_name: "AssignmentTeamMentor",foreign_key: "assignment_team_mentor_id", dependent: :destroy
 
   validates :grade, numericality: {allow_nil: true}
   has_paper_trail

@@ -24,6 +24,12 @@ class TeamsController < ApplicationController
     begin
       @root_node = Object.const_get(session[:team_type] + "Node").find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
+      # Incorporated hash to keep track of assigned team mentors based on node.node_object_id (assignment_team_team_id)
+      @assigned_team_mentors = {}
+      # Loop thru the different assignment_team_ids and assign the key to the user designated as assignment team mentor
+      @child_nodes.each do |node|
+        @assigned_team_mentors[node.node_object_id] = AssignmentTeamMentor.getAssignedMentor(node.node_object_id)
+      end
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end

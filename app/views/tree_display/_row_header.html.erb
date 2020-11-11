@@ -39,3 +39,19 @@
       <%end%>
     </td>
 
+<% if rowtype != nil %>
+<td>
+<%# Display the mentor's fullname assigned for current assignment team 
+If no mentor is assigned, "No assignment team mentor" will display
+%>
+<% if @assigned_team_mentors[parent_node.node_object_id]['fullname'] != nil %>
+<%= @assigned_team_mentors[parent_node.node_object_id]['fullname'] %> 
+<% else %>
+No mentor assigned
+<% end %>
+</td>
+<%# This is to create an empty table cell for the participants listed within a team, only displaying team mentor at team name row %>
+<% else %>
+<td></td>
+<% end %>
+

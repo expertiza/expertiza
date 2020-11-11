@@ -1,4 +1,9 @@
 class ReviewBid < ActiveRecord::Base
+  belongs_to :topic, class_name: 'SignUpTopic'
+  belongs_to :participant, class_name: 'Participant'
+  belongs_to :assignment, class_name: 'Assignment'
+
+
 
   # method that returns the bidding data needed for the assigning algorithm
   # student_ids, topic_ids, student_preferences, topic_preferences

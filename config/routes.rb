@@ -1,5 +1,8 @@
 
 Expertiza::Application.routes.draw do
+  resources :review_bids
+  resources :review_bids
+  resources :review_bids
   ###
   # Please insert new routes alphabetically!
   ###
@@ -308,6 +311,9 @@ resources :institution, except: [:destroy] do
     end
   end
 
+  resources :review_bids
+
+
   resources :review_mapping, only: [] do
     collection do
       post :add_metareviewer
@@ -370,6 +376,12 @@ resources :institution, except: [:destroy] do
       post :signup_as_instructor_action
       post :set_priority
       post :save_topic_deadlines
+    end
+  end
+
+  resources :review_bids do
+    collection do
+      post :set_priority
     end
   end
 

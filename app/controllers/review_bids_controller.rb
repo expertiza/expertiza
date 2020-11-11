@@ -1,13 +1,9 @@
 # TODO 
-# Fix views - edit 'show' and partials - Bria may work on partial formatting
 # Bidding data - 
-# Route correctly - Ryan will look into 
 
 class ReviewBidsController < ApplicationController
   require "json"
   require "net/http"
-
-  # before_action :set_review_bid, only: [:show, :edit, :update, :destroy]
 
   #action allowed function checks the action allowed based on the user working
   def action_allowed?
@@ -34,14 +30,50 @@ class ReviewBidsController < ApplicationController
 
   # GET /review_bids/1
   def show
-    # params[:id] = 36221 # TODO remove this line 
-    #params[:id] = 36242
-    @participant =  AssignmentParticipant.find(params[:id].to_i)
+    @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
-    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id)
-	@selected_topics = []
-    @max_team_size = @assignment.max_team_size
-    @bids = ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id).order(:priority)
+    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
+    team_id = @participant.team.try(:id)
+    my_topic = SignedUpTeam.where(team_id: team_id).pluck(:topic_id).first
+    @sign_up_topics -= SignUpTopic.where(assignment_id: @assignment.id, id: my_topic)
+    @max_team_size = @assignment.num_reviews_allowed 
+    @no_of_participants = AssignmentParticipant.where(parent_id: @assignment.id).count
+    @selected_topics = nil
+    @bids = team_id.nil? ? [] : ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id).order(:priority)
+    signed_up_topics = []
+    @bids.each do |bid|
+      sign_up_topic = SignUpTopic.find_by(id: bid.signuptopic_id)
+      signed_up_topics << sign_up_topic if sign_up_topic
+    end
+    signed_up_topics &= @sign_up_topics
+    @sign_up_topics -= signed_up_topics
+    @bids = signed_up_topics
+    @num_of_topics = @sign_up_topics.size
+  end
+  
+  def set_priority
+    if params[:topic].nil?
+      ReviewBid.where(participant_id: params[:id]).destroy_all
+    else
+      participant = AssignmentParticipant.find_by(id: params[:id])
+      assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
+      # team_id = participant.team.try(:id)
+      @bids = ReviewBid.where(participant_id: params[:participant_id])
+      signed_up_topics = ReviewBid.where(participant_id: params[:participant_id]).map(&:signuptopic_id)
+      signed_up_topics -= params[:topic].map(&:to_i)
+      signed_up_topics.each do |topic|
+        ReviewBid.where(signuptopic_id: topic, participant_id: params[:participant_id]).destroy_all
+      end
+      params[:topic].each_with_index do |topic_id, index|
+        bid_existence = ReviewBid.where(signuptopic_id: topic_id, participant_id: params[:participant_id])
+        if bid_existence.empty?
+          ReviewBid.create(priority: index + 1,signuptopic_id: topic_id, participant_id: params[:participant_id],assignment_id: assignment_id)
+        else
+          ReviewBid.where(signuptopic_id: topic_id, participant_id: params[:participant_id]).update_all(priority: index + 1)
+        end
+      end
+    end
+    redirect_to action: 'show', assignment_id: params[:assignment_id], id: params[:participant_id]
   end
 
   # GET /review_bids/new

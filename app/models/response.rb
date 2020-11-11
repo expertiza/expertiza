@@ -274,8 +274,10 @@ class Response < ActiveRecord::Base
       # get the tag settings this questionnaire
       tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id) : nil
       map = ResponseMap.find(self.map_id)
+      # if questionnaire isn't a review, add all questions to the table
       unless map.is_a? ReviewResponseMap
         code = add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments, current_user
+      # if questionnaire is a Review, separate Review questions from Revision Plan questions
       else
         assignment = map.assignment
         questions.each do |question|
@@ -285,8 +287,10 @@ class Response < ActiveRecord::Base
             revision_plan_questions.append(question)
           end
         end
+        # add Review questions to first table
         code = add_table_rows questionnaire_max, review_questions, answers, code, tag_prompt_deployments, current_user
         if assignment.is_revision_planning_enabled
+          # create new table for Revision Plan questions and add them
           code += '</table>' + "<h5>Revision Plan Responses</h5>"
           code += '<table id="review_' + self_id + '" class="table table-bordered">'
           code = add_table_rows questionnaire_max, revision_plan_questions, answers, code, tag_prompt_deployments, current_user
@@ -298,6 +302,7 @@ class Response < ActiveRecord::Base
               else
                 ''
               end
+    # create a separate table for the additional comment to maintain consistent formatting
     code += '</table>' + "<h5>Additional Comment</h5>" + '<table id="review_' + self_id + '" class="table table-bordered">' + '<tr><td>' + comment + '</td></tr>' + '</table>'
   end
 

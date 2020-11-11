@@ -1034,7 +1034,85 @@ jQuery(document).ready(function() {
     }
   })
 
-  var FilterableTable = React.createClass({
+    var QuestionnairesAdvancedSearchBar = React.createClass({
+        getInputValues: function () {
+            return {
+                question_text: this.refs.question_text.getDOMNode().value,
+                course: this.refs.course.getDOMNode().value,
+                assignment: this.refs.assignment.getDOMNode().value,
+            };
+        },
+        // E1987 Added function to display Advanced Search textbox on the Questionnaire page
+        render: function () {
+            return (
+                <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(6, auto) 1fr', gridGap: '8px' }}>
+                    <label for="question_text">Question Text:</label>
+                    <input
+                        data-toggle="tooltip" title="Search by words used in questions that belong to the questionnaires"
+                        ref="question_text"
+                        type="text"
+                        className="form-control" />
+                    <label for="course">Course:</label>
+                    <input
+                        data-toggle="tooltip" title="Search for questionnaires that are used in the given course"
+                        ref="course"
+                        type="text"
+                        className="form-control" />
+                    <label for="assignment">Assignment:</label>
+                    <input
+                        data-toggle="tooltip" title="Search for questionnaires that are used in the given assignment"
+                        ref="assignment"
+                        type="text"
+                        className="form-control" />
+                </div>
+            );
+        }
+    })
+
+    var QuestionnairesSearchBar = React.createClass({
+        getInitialState: () => {
+            return {
+                advancedSearchVisible: false,
+            }
+        },
+        toggleAdvancedSearch() {
+            this.setState({
+                advancedSearchVisible: !this.state.advancedSearchVisible
+            });
+        },
+        handleSearch: function () {
+            this.props.onSearchClick({
+                name: this.refs.nameInput.getDOMNode().value,
+                ...this.state.advancedSearchVisible ? this.child.getInputValues() : null,
+            });
+        },
+        render: function () {
+            return (
+                <div>
+                    <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px', alignItems: 'center' }}>
+                        <input
+                            data-toggle="tooltip" title="The name of the questionnaire"
+                            ref="nameInput"
+                            type="text"
+                            className="form-control"
+                            placeholder="Name" />
+                        <button type="button"
+                                className="btn btn-primary"
+                                onClick={this.handleSearch}>
+                            Search
+                        </button>
+                        <a onClick={this.toggleAdvancedSearch}>
+                            {this.state.advancedSearchVisible ? 'Hide Advanced Search' : 'Advanced Search'}
+                        </a>
+                    </div>
+                    {this.state.advancedSearchVisible ? <QuestionnairesAdvancedSearchBar ref={instance => { this.child = instance; }} /> : null}
+                </div>
+            );
+        }
+    })
+
+
+    var FilterableTable = React.createClass({
     getInitialState: function() {
       return {
         filterText: '',
@@ -1102,13 +1180,30 @@ jQuery(document).ready(function() {
         })
     },
     render: function() {
+        let searchBar;
+
+        switch (this.props.dataType) {
+            case 'course':
+                searchBar = ''
+                break;
+            case 'assignment':
+                searchBar = <SearchBar
+                    filterText={this.state.filterText}
+                    onUserInput={this.handleUserInput}
+                    dataType={this.props.dataType}
+                                />
+                break;
+            case 'questionnaire':
+                searchBar = <QuestionnairesSearchBar
+                    onSearchClick={this.handleSearchClick}
+                    dataType={this.props.dataType} />
+                break;
+        }
+
+
       return (
         <div className="filterable_table">
-          <SearchBar
-            filterText={this.state.filterText}
-            onUserInput={this.handleUserInput}
-            dataType={this.props.dataType}
-          />
+            {searchBar}
           <FilterButton
             filterOption="public"
             onUserFilter={this.handleUserFilter}

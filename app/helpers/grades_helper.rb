@@ -119,3 +119,9 @@ module GradesHelper
     questions
   end
 end
+
+# Check if this review was done by TA/instructor return True or False
+def done_by_staff_participant?( review )
+  role = Role.find(User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).role_id).name
+  return (role == "Instructor") || (role == "Teaching Assistant")
+end

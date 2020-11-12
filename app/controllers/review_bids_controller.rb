@@ -29,56 +29,28 @@ class ReviewBidsController < ApplicationController
   end
 
   # GET /review_bids/1
-
-  #method used to render the review bidding page, similar to 
-  #sign_up_sheet/list and store the important bidding information 
   def show
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     team_id = @participant.team.try(:id)
     my_topic = SignedUpTeam.where(team_id: team_id).pluck(:topic_id).first
-    @sign_up_topics -= SignUpTopic.where(assignment_id: @assignment.id, id: @my_topic)
+    @sign_up_topics -= SignUpTopic.where(assignment_id: @assignment.id, id: my_topic)
     @max_team_size = @assignment.num_reviews_allowed 
     @no_of_participants = AssignmentParticipant.where(parent_id: @assignment.id).count
     @selected_topics = nil
     @bids = team_id.nil? ? [] : ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id).order(:priority)
     signed_up_topics = []
-
-    #A bidding hash and some temporary values used to store important
-    #bidding information for the webservice algorithm
-    # {'topics'=> [], 'own_topic' => [], 'priority' => [], 'time'=>[]}
-    @bid_hash = Hash.new({'topic_ids'=> [], 'self_topic' => [], 'priority' => [], 'time'=>[]})
-    topic_ids = []
-    self_topic = []
-    priorities = []
-    time_stamps = []
-    self_topic << my_topic
-    time_stamps << Time.now.strftime("%Y-%d-%m %H:%M:%S %Z")
-
     @bids.each do |bid|
-      topic_ids << bid.signuptopic_id
-      priorities << bid.priority
-      #time_stamps << Time.now.strftime("%Y-%d-%m %H:%M:%S %Z") if we want a time stamp for each bid (all the same)
       sign_up_topic = SignUpTopic.find_by(id: bid.signuptopic_id)
       signed_up_topics << sign_up_topic if sign_up_topic
     end
-    #stores the temporary values into the bid_hash
-    @bid_hash['topic_ids'] = topic_ids 
-    @bid_hash['self_topic'] = self_topic
-    @bid_hash['priority'] = priorities
-    @bid_hash['time'] = time_stamps
-
     signed_up_topics &= @sign_up_topics
     @sign_up_topics -= signed_up_topics
     @bids = signed_up_topics
     @num_of_topics = @sign_up_topics.size
   end
   
-
-  #method used to store the update the bids when the user
-  #moves a bid to the bid column and adds prioirties to them, 
-  #it redirects back to show when finished
   def set_priority
     if params[:topic].nil?
       ReviewBid.where(participant_id: params[:id]).destroy_all
@@ -94,10 +66,8 @@ class ReviewBidsController < ApplicationController
       end
       params[:topic].each_with_index do |topic_id, index|
         bid_existence = ReviewBid.where(signuptopic_id: topic_id, participant_id: params[:id])
-
-
         if bid_existence.empty?
-          ReviewBid.create(priority: index + 1,signuptopic_id: topic_id, participant_id: params[:id], assignment_id: assignment_id)
+          ReviewBid.create(priority: index + 1,signuptopic_id: topic_id, participant_id: params[:id],assignment_id: assignment_id)
         else
           ReviewBid.where(signuptopic_id: topic_id, participant_id: params[:id]).update_all(priority: index + 1)
         end

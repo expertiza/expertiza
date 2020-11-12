@@ -308,7 +308,6 @@ class AssignmentForm
     MailWorker.perform_in(find_min_from_now(Time.parse(due_date.due_at.to_s(:db)) + simicheck_delay.to_i.hours).minutes.from_now * 60, @assignment.id, "compare_files_with_simicheck", due_date.due_at.to_s(:db))
   end
 
-  # Copies the inputted assignment into new one and returns the new assignment id
   def self.copy(assignment_id, user)
     print("\n",assignment_id)
     Assignment.record_timestamps = false
@@ -347,7 +346,16 @@ class AssignmentForm
       new_assign_id = nil
     end
     print("\n",new_assign_id)
-    if old_assign.is_calibrated
+    @old_team = Team.where(parent_id:old_assign)
+    count = 0
+    @old_team.each do |latt|
+      teamid = latt.id
+      map = ReviewResponseMap.where(reviewed_object_id: old_assign, reviewee_id: teamid, calibrate_to: true).first
+      if !map.nil? and !map.response.empty?
+        count = 1
+      end
+    end
+    if old_assign.is_calibrated and count>0
       @original_values = SubmissionRecord.where(assignment_id:assignment_id)
 
       @original_values.each do |catt|
@@ -430,7 +438,6 @@ class AssignmentForm
           @iota.type = satt.type
           @iota.created_at = satt.created_at
           @iota.calibrate_to = satt.calibrate_to
-          @iota.reviewer_is_team = satt.reviewer_is_team
           @iota.save
         end
 
@@ -458,7 +465,7 @@ class AssignmentForm
             @theta.version_num = zatt.version_num
             @theta.round = zatt.round
             @theta.is_submitted = zatt.is_submitted
-            @theta.visibility = zatt.visibility
+           # @theta.visibility = zatt.visibility
             @theta.save
           end
         end
@@ -467,7 +474,7 @@ class AssignmentForm
     end
     new_assign_id
   end
-#new changes
+
   def self.copy_assignment_questionnaire(old_assign, new_assign, user)
     old_assign.assignment_questionnaires.each do |aq|
       AssignmentQuestionnaire.create(

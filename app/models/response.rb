@@ -238,7 +238,7 @@ class Response < ActiveRecord::Base
   def get_questions
     @questions = []
     questionnaires = questionnaires_by_answers(scores)
-    questionnaires.each {|questionnaire| @questions += questionnaire.questions }
+    questionnaires.each {|questionnaire| @questions += questionnaire.questions.sort_by(&:seq) }
     return @questions
   end
 

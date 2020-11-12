@@ -1,4 +1,3 @@
-
 require 'active_support/time_with_zone'
 
 class AssignmentForm
@@ -311,6 +310,7 @@ class AssignmentForm
 
   # Copies the inputted assignment into new one and returns the new assignment id
   def self.copy(assignment_id, user)
+    print("\n",assignment_id)
     Assignment.record_timestamps = false
     old_assign = Assignment.find(assignment_id)
     new_assign = old_assign.dup
@@ -345,6 +345,125 @@ class AssignmentForm
       end
     else
       new_assign_id = nil
+    end
+    print("\n",new_assign_id)
+    if old_assign.is_calibrated
+      @original_values = SubmissionRecord.where(assignment_id:assignment_id)
+
+      @original_values.each do |catt|
+        @new_entry = SubmissionRecord.new
+        @new_entry.type = catt.type
+        @new_entry.content = catt.content
+        @new_entry.operation = catt.operation
+        @new_entry.team_id = catt.team_id
+        @new_entry.user = catt.user
+        @new_entry.assignment_id = new_assign_id
+        @new_entry.save
+      end
+
+      @original_team_values = Team.where(parent_id:assignment_id)
+
+      @original_team_values.each do |catt|
+        @new_entry = Team.new
+        @new_entry.name = catt.name
+        @new_entry.parent_id = new_assign_id
+        @new_entry.type = catt.type
+        @new_entry.comments_for_advertisement = catt.comments_for_advertisement
+        @new_entry.advertise_for_partner = catt.advertise_for_partner
+        @new_entry.submitted_hyperlinks = catt.submitted_hyperlinks
+        @new_entry.directory_num = catt.directory_num
+        @new_entry.grade_for_submission = catt.grade_for_submission
+        @new_entry.comment_for_submission = catt.comment_for_submission
+        @new_entry.make_public = catt.make_public
+        @new_entry.save
+      end
+
+      @alpha = Team.where(parent_id:assignment_id)
+      @beta = Team.where(parent_id:new_assign_id)
+      a = []
+      b = []
+      @beta.each do |catt|
+        a.append(catt.id)
+      end
+
+      @alpha.each do |catt|
+        b.append(catt.id)
+      end
+      
+      dict = Hash[b.zip a]
+      count = 0
+      @alpha.each do |catt|
+        @charlie = TeamsUser.where(team_id:catt.id)
+        @charlie.each do |matt|
+          @delta = TeamsUser.new
+            @delta.team_id = a[count]
+            @delta.user_id = matt.user_id
+          @delta.save
+
+          @gamma = Participant.where(user_id:matt.user_id,parent_id:old_assign)
+
+          @gamma.each do |natt|
+            @zeta = Participant.new
+            @zeta.can_submit = natt.can_submit
+            @zeta.can_review = natt.can_review
+            @zeta.user_id = matt.user_id
+            @zeta.parent_id = new_assign_id
+            @zeta.submitted_at = natt.submitted_at
+            @zeta.permission_granted = natt.permission_granted
+            @zeta.penalty_accumulated = natt.penalty_accumulated
+            @zeta.grade = natt.grade
+            @zeta.type = natt.type
+            @zeta.handle = natt.handle
+            @zeta.time_stamp = natt.time_stamp
+            @zeta.digital_signature = natt.digital_signature
+            @zeta.duty = natt.duty
+            @zeta.can_take_quiz = natt.can_take_quiz
+            @zeta.save
+          end
+        end
+        @xenon = ReviewResponseMap.where(reviewed_object_id:old_assign) 
+        @xenon.each do |satt|
+          @iota = ReviewResponseMap.new
+          @iota.reviewed_object_id = new_assign_id
+          @iota.reviewer_id = satt.reviewer_id
+          @iota.reviewee_id = dict[satt.reviewee_id]
+          @iota.type = satt.type
+          @iota.created_at = satt.created_at
+          @iota.calibrate_to = satt.calibrate_to
+          @iota.reviewer_is_team = satt.reviewer_is_team
+          @iota.save
+        end
+
+        @xenon = ReviewResponseMap.where(reviewed_object_id:old_assign,reviewee_id:catt.id) 
+        @eta =  ReviewResponseMap.where(reviewed_object_id:new_assign_id,reviewee_id:dict[catt.id])
+
+        list1 = []
+        list2 = []
+
+        @xenon.each do |zatt|
+          list1.append(zatt.id)
+        end
+
+        @eta.each do |zatt|
+          list2.append(zatt.id)
+        end
+
+        dict1 = Hash[list1.zip list2]
+        dict1.each do |item,value|
+          @neo = Response.where(map_id:item)
+          @neo.each do |zatt|
+            @theta = Response.new
+            @theta.map_id = value
+            @theta.additional_comment = zatt.additional_comment
+            @theta.version_num = zatt.version_num
+            @theta.round = zatt.round
+            @theta.is_submitted = zatt.is_submitted
+            @theta.visibility = zatt.visibility
+            @theta.save
+          end
+        end
+        count+=1
+      end
     end
     new_assign_id
   end

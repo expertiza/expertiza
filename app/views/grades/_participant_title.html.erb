@@ -12,7 +12,7 @@
 	<% colwidth = 15 %>
 <% end %>
 
-<%if @new_derived_scores %>
+<%if @peer_self_review_score %>
     <% colwidth = 10 %>
 <%end%>
 
@@ -48,7 +48,7 @@
 	<th style="text-align:center;">Self-Review Score</th>
 <% end %>
 	<th style="text-align:center;" WIDTH="<%= colwidth %>%">Final Peer-Review Score</th>
-<% if @new_derived_scores %>
+<% if @peer_self_review_score %>
 	<th style="text-align:center;"  WIDTH="<%= colwidth %>%">Final Score</th>
 <% end %>
 </tr>

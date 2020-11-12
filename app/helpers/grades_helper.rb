@@ -133,9 +133,9 @@ module GradesHelper
  def calc_final_score_Vossen_formula(avg_peer_review_score, avg_self_review_score, w, l)
   self_score = 0;
   if (avg_peer_review_score - avg_self_review_score).abs() / avg_peer_review_score <= l
-    self_score = (avg_peer_review_score * (1 + ((avg_peer_review_score - avg_self_review_score).abs() / avg_peer_review_score)))
+    self_score = (avg_peer_review_score.to_f * (1 + ((avg_peer_review_score.to_f - avg_self_review_score.to_f).abs() / avg_peer_review_score.to_f)))
   else
-    self_score = (avg_peer_review_score * (1 - ((avg_peer_review_score - avg_self_review_score).abs() / avg_peer_review_score)))
+    self_score = (avg_peer_review_score.to_f * (1 - ((avg_peer_review_score.to_f - avg_self_review_score.to_f).abs() / avg_peer_review_score.to_f)))
   end
   grade = w * (avg_peer_review_score) + (1 - w) * self_score
   return grade.round(2)
@@ -146,7 +146,7 @@ end
 # Derives a final score for an assignment based on 1) avg peer review score 2) average self review score 3) formula choice on how to combine 1) and 2)
 # Inputs: formula_choice (passed from _review_strategy  partial - the review strategy tab on the edit assignment page)
 # Outputs: new_derived_score  - the final grade for the assignment
-def derive_final_score(formula_choice)
+def peer_self_review_score(formula_choice)
   # E2078 start
   if @assignment.is_selfreview_enabled?
     @self_review_scores = @participant.scores(@questions, true)
@@ -159,18 +159,18 @@ def derive_final_score(formula_choice)
 
     # formula_choice is passed from _review_strategy  partial - the review strategy tab on the edit assignment page
     if formula_choice == "None"
-      new_derived_scores = calc_final_score_Vossen_formula(avg_peer_review_score, @avg_self_review_score, 1, 0.25).to_s
+      peer_self_review_score = calc_final_score_Vossen_formula(avg_peer_review_score, @avg_self_review_score, 1, 0.25).to_s
     elsif formula_choice == "Vossen Formula, w = 5%"
-      new_derived_scores = calc_final_score_Vossen_formula(avg_peer_review_score, @avg_self_review_score, 0.95, 0.25).to_s
+      peer_self_review_score = calc_final_score_Vossen_formula(avg_peer_review_score, @avg_self_review_score, 0.95, 0.25).to_s
     elsif formula_choice == "Vossen Formula, w = 10%"
-      new_derived_scores = calc_final_score_Vossen_formula(avg_peer_review_score, @avg_self_review_score, 0.90, 0.25).to_s
+      peer_self_review_score = calc_final_score_Vossen_formula(avg_peer_review_score, @avg_self_review_score, 0.90, 0.25).to_s
     elsif formula_choice == "Vossen Formula, w = 15%"
-      new_derived_scores = calc_final_score_Vossen_formula(avg_peer_review_score, @avg_self_review_score, 0.85, 0.25).to_s
+      peer_self_review_score = calc_final_score_Vossen_formula(avg_peer_review_score, @avg_self_review_score, 0.85, 0.25).to_s
     elsif formula_choice == "Vossen Formula, w = 20%"
-      new_derived_scores = calc_final_score_Vossen_formula(avg_peer_review_score, @avg_self_review_score, 0.80, 0.25).to_s
+      peer_self_review_score = calc_final_score_Vossen_formula(avg_peer_review_score, @avg_self_review_score, 0.80, 0.25).to_s
     end
   end
-  return new_derived_scores
+  return peer_self_review_score
   # E2078 end
 end
 ######################################## E2078 ########################################

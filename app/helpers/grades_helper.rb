@@ -129,7 +129,7 @@ module GradesHelper
         # l - a parameter in the Vossen formula, to determine to what extent peer reviews can differ from self reviews before impacting grade
           # this is also hard-coded because it depends on the assignment grading scale, usually we scale out of 5, so l = 0.25 because the minimum deviation is 1 / (max score -1) and max score is 5
           # if we have an peer review where we review out of 100 instead of 5, consider decreasing for refinement. Again: hard-code in controller
- # Outputs:
+ # Outputs: the final grade for the assignment using the formula
  def calc_final_score_Vossen_formula(avg_peer_review_score, avg_self_review_score, w, l)
   self_score = 0;
   if (avg_peer_review_score - avg_self_review_score).abs() / avg_peer_review_score <= l

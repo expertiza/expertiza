@@ -98,18 +98,19 @@ class ReviewBidsController < ApplicationController
 
   # assign bidding topics to reviewers
   def assign_bidding
-	#parameters for running bidding algorithm
-    assignment_id = params[:id]
-    reviewers = ReviewBid.reviewers(assignment_id) # TODO (maybe finished) create to get list of reviewers
-    topics = SignUpTopic.where(assignment_id: assignment_id).ids
-    bidding_data = ReviewBid.get_bidding_data(assignment_id,reviewers) # TODO create this function with info we want for WebService
-
-	#runs algorithm and assigns reviews
-    matched_topics = run_bidding_algorithm(bidding_data,topics,assignment_id) # TODO already started, adjust for our values
-    ReviewBid.assign_review_topics(assignment_id,reviewers,matched_topics) # TODO create to assign the return matching reviews to students
-    Assignment.find(assignment_id).update(can_choose_topic_to_review: false)  #turns off bidding for students
-    redirect_to :back
-  end
+    #parameters for running bidding algorithm
+      participant = AssignmentParticipant.find(params[:id].to_i)
+      assignment_id = participant.assignment
+      reviewers = ReviewBid.reviewers(assignment_id) # TODO (maybe finished) create to get list of reviewers
+      topics = SignUpTopic.where(assignment_id: assignment_id).ids
+      bidding_data = ReviewBid.get_bidding_data(assignment_id,reviewers) # TODO create this function with info we want for WebService
+  
+    #runs algorithm and assigns reviews
+      matched_topics = run_bidding_algorithm(bidding_data,topics,assignment_id) # TODO already started, adjust for our values
+      ReviewBid.assign_review_topics(assignment_id,reviewers,matched_topics) # TODO create to assign the return matching reviews to students
+      Assignment.find(assignment_id).update(can_choose_topic_to_review: false)  #turns off bidding for students
+      redirect_to :back
+    end
 
   # call webserver for running assigning algorthim
   # passing webserver: student_ids, topic_ids, student_preferences, topic_preferences

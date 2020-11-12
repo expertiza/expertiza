@@ -7,35 +7,48 @@ class ReviewBid < ActiveRecord::Base
 
   # method that returns the bidding data needed for the assigning algorithm
   # student_ids, topic_ids, student_preferences, topic_preferences
-  def get_bidding_data(assignment_id,reviewers)
-    bidding_data = Hash.new()
+  public 
+  def self.get_bidding_data(assignment_id,reviewers)
+    reviewers = self.reviewers(assignment_id)
+    bidding_data = {'tid'=> [], 'users' => Hash.new, 'max_accepted_proposals' => []}
+    bidding_data['tid'] = SignUpTopic.where(assignment_id: assignment_id).ids
+    bidding_data['max_accepted_proposals'] = Assignment.where(id:assignment_id).pluck(:num_reviews_allowed).first
     for reviewer in reviewers do
-      bidding_data[reviewer] = reviewer_bidding_data(reviewer,assignment_id)
+      bidding_data['users'][reviewer] = self.reviewer_bidding_data(reviewer,assignment_id)
     end
+    puts("Bidding Data:", bidding_data)
     return bidding_data
   end
 
   # list of reviewers from a specific assignment
-  def reviewers(assignment_id)
-	#list of reviewers for an assignment only if they have a topic from that assignment
-	reviewers = AssignmentParticipants.find_by(parent_id: assignment_id, topic_id: !nil) #not sure this works lol
+  def self.reviewers(assignment_id)
+	  reviewers = AssignmentParticipant.where(parent_id: assignment_id).ids
   end
 
   # assigns topics to reviews as matched by the webservice algorithm
   def assign_review_topics(assignment_id,reviewers,matched_topics)
   end 
 
-end
+  def self.reviewer_self_topic(reviewer_id)
+    participant = AssignmentParticipant.find_by(id: reviewer_id)
+    team_id = participant.team.try(:id)
+    self_topic = SignedUpTeam.where(team_id: team_id).pluck(:topic_id).first
 
-def self.reviewer_bidding_data(reviewer,assignment_id)
-    #has of bidding data for particular reviewers
-      self_topic = reviewer_self_topic(reviewer,assignment_id)
-      bidding_data = {'priority' => [], 'time' => [], 'tid' =>  [], 'otid' => self_topic}
+    return self_topic
+  end
+
+  public 
+    def self.reviewer_bidding_data(reviewer,assignment_id)
+      self_topic = self.reviewer_self_topic(reviewer)
+      bidding_data = {'tid'=> [], 'otid' => self_topic, 'priority' => [], 'time'=>[]}
       bids = ReviewBid.where(participant_id: reviewer)
       for bid in bids do
+        bidding_data['tid'] << bid.signuptopic_id
         bidding_data['priority'] << bid.priority
         bidding_data['time'] << bid.updated_at
-        bidding_data['tid'] << bid.signuptopic_id
       end
       return bidding_data
     end
+
+end
+

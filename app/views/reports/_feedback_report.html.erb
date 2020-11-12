@@ -30,15 +30,28 @@
             <% @feedback_response_maps_round_three.each {|rm| @count_round_three += 1 if Response.exists? map_id: rm.id} %>
           <% end %>
 
-          <!--Rejoinder-->
+          
+        <!--Rejoinder-->
         <% ['one', 'two', 'three'].each do |round| %>
-          <% if @first_col_identifier == true %>
+        <% if @first_col_identifier == true %>
             <% @reviewer_name = r.user.fullname(session[:ip]) %>
-            <tr><td rowspan= <%= @assignment.vary_by_round ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>>
+            <%row_span = @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>
+        <%# If no  feedback has been submitted, rowspan is seen as 0, then rowspan manually set to 1 so that it takes up its own row.%>
+          <%if row_span == 0 %>
+          <%# Rowspan manually set to 1 to represent an empty row. %>
+            <tr><td rowspan = <% 1 %>>
               <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id => @id %>
             </td>
-            <% @first_col_identifier = false %>
-          <% end %>
+	          <td></td>
+            <td></td>
+            <td></td>
+          <%else %>
+            <tr><td rowspan= <%= @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>>
+              <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id => @id %>
+            </td>
+          <%end %>
+          <% @first_col_identifier = false %>
+        <% end %>
 
           <!--# author feedbacks done-->
           <% @rspan_certain_round = instance_variable_get("@rspan_round_#{round}") %>

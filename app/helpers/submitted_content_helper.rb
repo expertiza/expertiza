@@ -149,6 +149,12 @@ end
         return {map_id: @map_id, round: @round, link: @link, start_at: @start_at, end_at: @end_at, created_at: @created_at, updated_at: @updated_at}
     end
 
+    def ==(other)
+      return @map_id = other.map_id && @round == other.round && @link == other.link &&
+      @start_at == other.start_at && @end_at == other.end_at &&
+      @created_at == other.created_at && @updated_at == other.updated_at
+    end
+
   end
 
   class LocalStorage
@@ -203,7 +209,7 @@ end
 
     def hard_save_all()
       @registry.each do |item|
-        SubmissionViewingEvent.create(instance.to_h())
+        SubmissionViewingEvent.create(item.to_h())
       end
     end
 

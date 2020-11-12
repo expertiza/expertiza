@@ -21,20 +21,4 @@ class SelfReviewResponseMap < ResponseMap
 
   # do not send any reminder for self review received.
   def email(defn, participant, assignment); end
-
-  #E-1973 - returns the reviewer of the response, either a participant or a team
-  def get_reviewer
-    return ReviewResponseMap.get_reviewer_with_id(assignment.id, self.reviewee_id)
-  end
-
-  # E-1973 - gets the reviewer of the response, given the assignment and the reviewer id
-  # the assignment is used to determine if the reviewer is a participant or a team
-  def self.get_reviewer_with_id(assignment_id, reviewer_id)
-    assignment = Assignment.find(assignment_id)
-    if assignment.reviewer_is_team
-      return AssignmentTeam.find(reviewer_id)
-    else
-      return AssignmentParticipant.find(reviewer_id)
-    end
-  end
 end

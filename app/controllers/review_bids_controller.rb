@@ -102,11 +102,10 @@ class ReviewBidsController < ApplicationController
       participant = AssignmentParticipant.find(params[:id].to_i)
       assignment_id = participant.assignment
       reviewers = ReviewBid.reviewers(assignment_id) # TODO (maybe finished) create to get list of reviewers
-      topics = SignUpTopic.where(assignment_id: assignment_id).ids
       bidding_data = ReviewBid.get_bidding_data(assignment_id,reviewers) # TODO create this function with info we want for WebService
   
     #runs algorithm and assigns reviews
-      matched_topics = run_bidding_algorithm(bidding_data,topics,assignment_id) # TODO already started, adjust for our values
+      matched_topics = run_bidding_algorithm(bidding_data) # TODO already started, adjust for our values
       ReviewBid.assign_review_topics(assignment_id,reviewers,matched_topics) # TODO create to assign the return matching reviews to students
       Assignment.find(assignment_id).update(can_choose_topic_to_review: false)  #turns off bidding for students
       redirect_to :back
@@ -116,15 +115,13 @@ class ReviewBidsController < ApplicationController
   # passing webserver: student_ids, topic_ids, student_preferences, topic_preferences
   # webserver returns: 
   # returns matched assignments as json body
-  def run_bidding_algorithm(bidding_data,topics,assignment_id)
+  def run_bidding_algorithm(bidding_data)
     # begin
-      num_reviews_allowed = Assignment.where(id:assignment_id).pluck(:num_reviews_allowed).first
-      raw_webserver_input_hash = {"users": bidding_data, "tids": topics, "q_S": num_reviews_allowed} #TODO adjust hash values
       uri = URI.parse(WEBSERVICE_CONFIG["review_bidding_webservice_url"])
       http = Net::HTTP.new(uri.host, uri.port)
       request = Net::HTTP::Post.new(uri.path, {'Content-Type' => 'application/json'})
       http.use_ssl = true
-      request.body = raw_webserver_input_hash.to_json
+      request.body = bidding_data.to_json
       response = http.request(request)
       return JSON.parse(response.body)
     rescue StandardError

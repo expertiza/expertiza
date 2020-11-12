@@ -467,7 +467,7 @@ class AssignmentForm
     end
     new_assign_id
   end
-
+#new changes
   def self.copy_assignment_questionnaire(old_assign, new_assign, user)
     old_assign.assignment_questionnaires.each do |aq|
       AssignmentQuestionnaire.create(

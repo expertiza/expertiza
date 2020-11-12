@@ -29,4 +29,28 @@ describe GradesHelper, type: :helper do
       end
     end
   end
+
+  describe 'apply formula to incorporate self review in final grade' do
+    
+    before(:each) do
+      @avg_peer_review_score1 = 90
+      @avg_self_review_score1 = 85
+      @avg_peer_review_score2 = 40
+      @avg_self_review_score2 = 85
+      @weight = 0.95
+      @leniency = 0.25
+    end
+
+    it 'test Vossen formula' do
+      vossen_result = calc_final_score_Vossen_formula(@avg_peer_review_score1, @avg_self_review_score1, @weight, @leniency)
+      expect(vossen_result).to eq(90.25)
+    end
+
+    it 'test Vossen formula' do
+      vossen_result = calc_final_score_Vossen_formula(@avg_peer_review_score2, @avg_self_review_score2, @weight, @leniency)
+      expect(vossen_result).to eq(37.75)
+    end
+  end
+
+
 end

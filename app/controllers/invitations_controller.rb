@@ -82,7 +82,7 @@ class InvitationsController < ApplicationController
     # user is the student you are inviting to your team
     print("\\n In check user vbefore invitation \\n")
     @user = User.find_by(name: params[:user][:name].strip)
-    # student has information about the participant
+    # User/Author has information about the participant
     @student = AssignmentParticipant.find(params[:student_id])
     @assignment = Assignment.find(@student.parent_id)
     if @assignment.is_conference

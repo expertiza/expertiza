@@ -1,6 +1,7 @@
 include ConferenceHelper
 class ConferenceController < ApplicationController
     include AuthorizationHelper
+    
     autocomplete :user, :name
     # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
     verify method: :post, only: %i[destroy create update],
@@ -19,7 +20,7 @@ class ConferenceController < ApplicationController
     end
    
     def new
-        if current_user && current_role_name == "Student"
+        if current_user && current_role_name == "Student" # current_user_has_student_privileges?
             @user = current_user
             params[:user] = current_user
             add_conference_user_as_participant and return
@@ -41,9 +42,18 @@ class ConferenceController < ApplicationController
      
     def create
         print('In conference create')
+        
         # Check if user needs to be created as author for conference type assignment and add author to assignment
-        if create_conference_user
+        @recaptcha_succeeded = verify_recaptcha secret_key: '6Lfb_uEZAAAAAPcSk-9fcNh3syzfvfagPeNc8Y_B'
+        print("\\n")
+        print(@recaptcha_succeeded)
+        if @recaptcha_succeeded==true && create_conference_user
           add_conference_user_as_participant
+        else
+          print(@all_roles)
+          print('in else')
+          print(@rolename)
+          redirect_to :controller => 'conference', :action => 'new'
         end
     end
 

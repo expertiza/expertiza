@@ -6,10 +6,11 @@
 <% end %>
 <%= form_tag :controller => 'conference', :action => 'create' do %>
   <p><label for="role_id">Role</label><br/>
-    <%= collection_select 'user', 'role_id', @all_roles, :id, :name, {:selected => @rolename.id} %></p>
+    <%= collection_select 'user', 'role_id', @all_roles, :id, :name, {:selected => @rolename.id}%></p>
 
   <%= render :partial => 'users/user', :locals => { :new_user => true , :request_user =>false} %>
   <%# <%= submit_tag "Create" %>
+<div class="g-recaptcha" data-sitekey="6Lfb_uEZAAAAAOrVHOhLI7i2yewc3Fgr87IohvaH"></div>
 
 <% if @assignment.nil? || !@assignment.is_conference?%>
     <%= submit_tag "Create" %>

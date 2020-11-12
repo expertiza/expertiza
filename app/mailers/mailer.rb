@@ -1,6 +1,6 @@
 class Mailer < ActionMailer::Base
   if Rails.env.development? || Rails.env.test?
-    default from: 'ooddmailer2@gmail.com'
+    default from: 'expertiza.development@gmail.com'
   else
     default from: 'expertiza-support@lists.ncsu.edu'
   end
@@ -14,7 +14,7 @@ class Mailer < ActionMailer::Base
     @avg_pct = defn[:body][:avg_pct]
     @assignment = defn[:body][:assignment]
 
-    defn[:to] = 'ooddmailer2@gmail.com' if Rails.env.development? || Rails.env.test?
+    defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
     mail(subject: defn[:subject],
          to: defn[:to],
          bcc: defn[:bcc])
@@ -33,7 +33,7 @@ class Mailer < ActionMailer::Base
     @assignment = defn[:body][:assignment]
     @conference_variable = defn[:body][:conference_variable]
 
-    defn[:to] = 'ooddmailer2@gmail.com' if Rails.env.development? || Rails.env.test?
+    defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
     mail(subject: defn[:subject],
          to: defn[:to],
          bcc: defn[:bcc])

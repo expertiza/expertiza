@@ -39,12 +39,6 @@ module ConferenceHelper
         end
     end
 
-    def send_mail_to_new_user
-        password = @user.reset_password # the password is reset
-        prepared_mail = MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password)
-        prepared_mail.deliver
-        flash[:success] = "A new password has been sent to new user's e-mail address. "
-    end
 
     def create_author
         print("/n In create Author/n")
@@ -60,8 +54,9 @@ module ConferenceHelper
         if @user.save
           password = @user.reset_password # the password is reset
           #Mail to be sent to Author once the user has been created. New partial is used as content for email is different from normal user
-        #   prepared_mail = MailerHelper.send_mail_for_conference_user(@user, "Your Expertiza account and password have been created.", "author_conference_invitation", password, @assignment.name)
-        #   prepared_mail.deliver_now
+          print("\\n Create author email "+@user.email)
+          prepared_mail = MailerHelper.send_mail_for_conference_user(@user, "Your Expertiza account and password have been created.", "author_conference_invitation", password, @assignment.name)
+          prepared_mail.deliver_now
           print('\n ----------------passwored is---------]\n')
           print(password)
           print('\n ----------------passwored is---------\n')
@@ -105,9 +100,9 @@ module ConferenceHelper
             new_participant = AssignmentParticipant.create(parent_id: @assignment.id,
                                                     user_id: @user.id,
                                                     permission_granted: @user.master_permission_granted,
-                                                    can_submit: 1,
-                                                    can_review: 0,
-                                                    can_take_quiz: 1)
+                                                    can_submit: true,
+                                                    can_review: false,
+                                                    can_take_quiz: true)
             new_participant.set_handle
         end
     end

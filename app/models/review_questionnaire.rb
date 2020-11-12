@@ -33,6 +33,7 @@ class ReviewQuestionnaire < Questionnaire
           responses << response if response.round == round && response.is_submitted
         end
       end
+      # responses = Response.find(:all, :include => :map, :conditions => ['reviewee_id = ? and type = ?',participant.id, self.to_s])
       responses.sort! {|a, b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }
     end
     responses

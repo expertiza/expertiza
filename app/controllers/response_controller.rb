@@ -246,7 +246,6 @@ class ResponseController < ApplicationController
     else
       # if reviewer is team, then we have to get the id of the participant from the team
       # the id in reviewer_id is of an AssignmentTeam
-      # reviewer_id = @map.response_map.get_reviewer.get_logged_in_reviewer_id(current_user.try(:id))
       redirect_to controller: 'student_review', action: 'list', id: @map.response_map.reviewer_id
     end
   end

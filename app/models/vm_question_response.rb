@@ -49,7 +49,6 @@ class VmQuestionResponse
                 else
                   ReviewResponseMap.get_assessments_for(team)
                 end
-
       # Changes for E1984 Improve self-review  Link peer review & self-review to derive grades
       @self_review_answers = nil
       # review_map = SelfReviewResponseMap.get_assessments_for(team)
@@ -68,8 +67,6 @@ class VmQuestionResponse
         @list_of_reviewers << participant
         @self_review_answers = review
       end
-      # Changes End
-
       reviews.each do |review|
         review_mapping = ReviewResponseMap.find(review.map_id)
         if review_mapping.present?
@@ -77,14 +74,12 @@ class VmQuestionResponse
           @list_of_reviewers << participant
         end
       end
-
       # Changes by E1984. Improve self-review  Link peer review & self-review to derive grades
       @list_of_reviews = if !@self_review_answers.nil?
                            reviews + [@self_review_answers]
                          else
                            reviews
                          end
-      # Changes End
     elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"
       reviews = []
       #finding feedbacks where current pariticipant of assignment (author) is reviewer 
@@ -126,14 +121,12 @@ class VmQuestionResponse
         add_answer(answer)
       end
     end
-
     # Changes for E1984 Improve self-review  Link peer review & self-review to derive grades
     return if @self_review_answers.nil?
     answers = Answer.where(response_id: @self_review_answers.response_id)
     answers.each do |answer|
       add_answer(answer)
     end
-    # Changes End
   end
 
   def display_team_members

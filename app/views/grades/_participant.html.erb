@@ -138,11 +138,11 @@
         <div <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= total_score==(-1)? "N/A": sprintf("%.2f",total_score) %><%= score_postfix %></div>
 
         <% if controller.action_name != "view_my_scores" %>
-          <FONT SIZE="-1"><a href="../grades/view_team?id=<%= participant.id%>"  >view heatgrid</a></FONT>
-          <!--Zhewei: Since edit grade does not work now, hide this link temporarily.-->
-          <!--<BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>-->
+            <FONT SIZE="-1"><a href="../grades/view_team?id=<%= participant.id%>"  >view heatgrid</a></FONT>
+            <!--Zhewei: Since edit grade does not work now, hide this link temporarily.-->
+            <!--<BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>-->
         <% else %>
-          <FONT SIZE="-1">(in <%= stage %>)</FONT>
+            <FONT SIZE="-1">(in <%= stage %>)</FONT>
         <% end %>
 
       <% else %>
@@ -151,19 +151,19 @@
             <% else %>
                 <%= '---' %>
             <% end %>
-        <% end %>
+      <% end %>
       </TD>
   <% end %>
   <% if !@new_derived_scores.nil? %>
       <TD align="center">
         <%= ndscore_review %><%= score_postfix %>
       </TD>
-  <%end %>
+  <% end %>
 </TR>
 
 <% if (controller.action_name != "view_my_scores" and index == team_size - 1) or controller.action_name == "view_my_scores" %>
     <TR id="<%= prefix %>_files" style="display:none; background-color: white;">
-      <TD COLSPAN="10"><%= render :partial=>'grades/submissions', :locals => {:participant => participant} %></TD>
+        <TD COLSPAN="10"><%= render :partial=>'grades/submissions', :locals => {:participant => participant} %></TD>
     </TR>
 <% end %>
 
@@ -180,15 +180,15 @@
 <!-- end summarization table -->
 
 <TR id="<%= prefix %>_reviews" style="display:none; background-color: white;">
-  <TD COLSPAN="10"><%= render :partial=>'grades/reviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:review]} %></TD>
+    <TD COLSPAN="10"><%= render :partial=>'grades/reviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:review]} %></TD>
 </TR>
 <TR id="<%= prefix %>_mreviews" style="display:none; background-color: white;">
-  <TD COLSPAN="10"><%= render :partial=>'grades/metareviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:metareview]} %></TD>
+    <TD COLSPAN="10"><%= render :partial=>'grades/metareviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:metareview]} %></TD>
 </TR>
 <TR id="<%= prefix %>_feedback" style="display:none; background-color: white;">
-  <TD COLSPAN="10"><%= render :partial=>'grades/author_feedbacks', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:feedback]} %></TD>
+    <TD COLSPAN="10"><%= render :partial=>'grades/author_feedbacks', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:feedback]} %></TD>
 </TR>
 <TR id="<%= prefix %>_teammate_reviews" style="display:none; background-color: white;">
-  <TD COLSPAN="10"><%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:teammate]} %></TD>
+    <TD COLSPAN="10"><%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:teammate]} %></TD>
 </TR>
-<!-- END PARTICIPANT -->
+    <!-- END PARTICIPANT -->

@@ -289,7 +289,7 @@ class Response < ActiveRecord::Base
         end
         # add Review questions to first table
         code = add_table_rows questionnaire_max, review_questions, answers, code, tag_prompt_deployments, current_user
-        if assignment.is_revision_planning_enabled
+        if assignment.is_revision_planning_enabled && revision_plan_questions.any?
           # create new table for Revision Plan questions and add them
           code += '</table>' + "<h5>Revision Plan Responses</h5>"
           code += '<table id="review_' + self_id + '" class="table table-bordered">'

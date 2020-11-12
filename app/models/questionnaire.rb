@@ -112,4 +112,9 @@ class Questionnaire < ActiveRecord::Base
     results = Questionnaire.where("id <> ? and name = ? and instructor_id = ?", id, name, instructor_id)
     errors.add(:name, "Questionnaire names must be unique.") if results.present?
   end
+
+  # Display questionnaire heading in response view
+  def display_heading?
+    return false
+  end
 end

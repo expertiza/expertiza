@@ -113,9 +113,9 @@ class Participant < ActiveRecord::Base
   end
 
   # Edit this to enable manual setting of mentors
-  def get_can_mentor(user_id)
+  def get_can_mentor
     can_mentor = false
-    user_role = User.find(user_id).role.name
+    user_role = User.find(self.user_id).role.name
     case user_role
       when 'Student'
         can_mentor = false
@@ -124,7 +124,7 @@ class Participant < ActiveRecord::Base
       when 'Teaching Assistant'
         can_mentor = true
     end
-    can_mentor
+    self.update_column(:can_mentor, can_mentor)
   end
 
   # Get mentors for specified assignment

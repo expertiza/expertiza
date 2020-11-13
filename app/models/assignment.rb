@@ -264,7 +264,6 @@ class Assignment < ActiveRecord::Base
       raise "The user account with the name #{user_name} does not exist. Please <a href='" +
         url_for(controller: 'users', action: 'new') + "'>create</a> the user first."
     end
-    can_mentor = Participant.get_can_mentor(user.id)
     participant = AssignmentParticipant.find_by(parent_id: self.id, user_id: user.id)
     raise "The user #{user.name} is already a participant." if participant
     new_part = AssignmentParticipant.create(parent_id: self.id,
@@ -272,8 +271,7 @@ class Assignment < ActiveRecord::Base
                                             permission_granted: user.master_permission_granted,
                                             can_submit: can_submit,
                                             can_review: can_review,
-                                            can_take_quiz: can_take_quiz,
-                                            can_mentor: can_mentor
+                                            can_take_quiz: can_take_quiz
     )
     new_part.set_handle
   end

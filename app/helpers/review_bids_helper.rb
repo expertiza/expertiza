@@ -15,16 +15,17 @@ module ReviewBidsHelper
                    end
       end
     else
-      row_html = '<tr id="topic_' + topic.id.to_s + '" style="background-color:' + get_topic_bg_color_review_bid(topic, num_participants) + '">'
+      row_html = '<tr id="topic_' + topic.id.to_s + '" style="background-color:' + get_topic_bg_color_review_bids(topic, num_participants) + '">'
     end
     row_html.html_safe
   end
 
-  #renders the topic row for the selections table
+  #gets the background color with respect to number of participants and bid size
   #in review_bids/show.html.erb
   def get_topic_bg_color_review_bids(topic, num_participants)
-    red = (400 * (1 - (Math.tanh(2 * (ReviewBid.where(signuptopic_id:topic.id).count.to_f/num_participants.to_f) - 1) + 1) / 2)).to_i.to_s
-    green = (400 * (Math.tanh(2 * (ReviewBid.where(signuptopic_id:topic.id).count.to_f/num_participants.to_f) - 1) + 1) / 2).to_i.to_s
+  	num_bids = ReviewBid.where(signuptopic_id:topic.id).count.to_f
+    green =  (400 * (1 - (Math.tanh(2 * (num_bids/num_participants.to_f) - 1) + 1) / 2)).to_i.to_s
+    red = (400 * (Math.tanh(2 * (num_bids/num_participants.to_f) - 1) + 1) / 2).to_i.to_s
     'rgb(' + red + ',' + green + ',0)'
   end
 

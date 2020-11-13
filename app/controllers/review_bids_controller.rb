@@ -36,9 +36,9 @@ class ReviewBidsController < ApplicationController
     team_id = @participant.team.try(:id)
     my_topic = SignedUpTeam.where(team_id: team_id).pluck(:topic_id).first
     @sign_up_topics -= SignUpTopic.where(assignment_id: @assignment.id, id: my_topic)
-    @max_team_size = @assignment.num_reviews_allowed 
+    # @max_team_size = @assignment.num_reviews_allowed  #dont need this
     @num_participants = AssignmentParticipant.where(parent_id: @assignment.id).count
-    @selected_topics = nil
+    @selected_topics = nil #this is used to list the topics assigned to review. (ie select == assigned i believe)
     @bids = team_id.nil? ? [] : ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id).order(:priority)
     signed_up_topics = []
     @bids.each do |bid|
@@ -105,7 +105,7 @@ class ReviewBidsController < ApplicationController
       bidding_data = ReviewBid.get_bidding_data(assignment_id,reviewers) # TODO create this function with info we want for WebService
   
     #runs algorithm and assigns reviews
-      matched_topics = run_bidding_algorithm(bidding_data) # TODO already started, adjust for our values
+      matched_topics = run_bidding_algorithm(bidding_data) # TODO already started, add WebServices URL when its available
       ReviewBid.assign_review_topics(assignment_id,reviewers,matched_topics) # TODO create to assign the return matching reviews to students
       Assignment.find(assignment_id).update(can_choose_topic_to_review: false)  #turns off bidding for students
       redirect_to :back

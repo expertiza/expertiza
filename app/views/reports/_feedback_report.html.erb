@@ -129,7 +129,7 @@
           <% @l = @l+1 %>
           <% (@l % 2 == 0) ? @bgcolor = "#ffffff" : @bgcolor = "#f9f9f9" %>
           <!--Rejoinder-->
-           <%row_span= @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>
+           <%row_span= @assignment.varying_rubrics_by_round? ? (@rspan_round_one.to_i + @rspan_round_two.to_i + @rspan_round_three.to_i) : @rspan %>
            <% if row_span == 0 %>
             <tr><td bgcolor=<%= @bgcolor %> rowspan=  <%1%>>
               <% @reviewer_name = rejoinder.user.fullname(session[:ip]) %>

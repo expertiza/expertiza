@@ -124,12 +124,13 @@ jQuery(document).ready(function() {
               <a title="Delete" href={"/tree_display/confirm?id="+(parseInt(this.props.id)/2).toString()+"&nodeType="+newNodeType}><img src="/assets/tree_view/delete-icon-24.png" /></a>
             </span>
           )
+
+          moreContent.push(
+            <span>
+              <a title="Copy" href={"/"+newNodeType+"/copy?assets=course&id="+(parseInt(this.props.id)/2).toString()}><img src="/assets/tree_view/Copy-icon-24.png" /></a>
+            </span>
+          )
         }
-        moreContent.push(
-          <span>
-            <a title="Copy" href={"/"+newNodeType+"/copy?assets=course&id="+(parseInt(this.props.id)/2).toString()}><img src="/assets/tree_view/Copy-icon-24.png" /></a>
-          </span>
-        )
         if (newNodeType === 'course') {
           moreContent.push(
             <br/>
@@ -190,7 +191,7 @@ jQuery(document).ready(function() {
                 <a title="Add participants" href={"/participants/list?id="+(parseInt(this.props.id)/2).toString()+"&model=Assignment"}>
                   <img src="/assets/tree_view/add-participant-24.png" />
                 </a>
-              </span>
+              </span> 
             )
             if (parseInt(this.props.max_team_size) > 1) {
               moreContent.push(
@@ -706,6 +707,115 @@ jQuery(document).ready(function() {
       )
     }
   })
+  
+  var DatePickerStart = React.createClass({
+    render: function() {
+          var formStyle = {
+            margin: 0,
+            padding: 0,
+            display: 'inline'
+          }
+          if (this.props.dataType === 'questionnaire') {
+            formStyle = {
+              margin: 0,
+              padding: 0,
+              display: 'none'
+            }
+          }
+          return (
+            <span style = {formStyle}
+              start_date={this.props.start_date}
+              onChange={this.props.onChange} >
+                Start Date <input type="date" id="start_date"></input>                
+            </span>
+        );
+      }
+  });
+
+
+   var DatePickerEnd = React.createClass({
+    render: function() {
+          var formStyle = {
+            margin: 0,
+            padding: 0,
+            display: 'inline'
+          }
+          if (this.props.dataType === 'questionnaire') {
+            formStyle = {
+              margin: 0,
+              padding: 0,
+              display: 'none'
+            }
+          }
+          return (
+            <span style = {formStyle}
+              end_date={this.props.end_date}
+              onChange={this.props.onChange} >                
+                End Date <input type="date" id="end_date"></input>
+            </span>
+        );
+      }
+  });
+
+  var AdditionalSearchDropDown = React.createClass({
+    render: function() {
+          var formStyle = {
+            margin: 0,
+            padding: 0,
+            display: 'inline'
+          }
+          if (this.props.dataType === 'questionnaire') {
+            formStyle = {
+              margin: 0,
+              padding: 0,
+              display: 'none'
+            }
+          }
+          return (
+            <span
+              style = {formStyle}
+            >
+            Filter Option 
+            <select 
+              value={this.props.selectValue}
+              onChange={this.props.onChange} >
+              <option value="empty">----------</option>
+              <option value="created_date">Created Date Filter</option>
+              <option value="updated_date">Updated Date Filter</option>              
+            </select>
+
+            </span>
+        );
+      }
+  });
+
+  var HASQUIZ_TOGGLE = React.createClass({
+    render: function() {
+        return (
+          <span 
+              style={{"display": (this.props.dataType === 'questionnaire' ? "none" : "")}}
+              has_quiz_var={this.props.has_quiz_var}
+              onChange={this.props.onChange}>                
+              Require a Quiz <input
+              type="checkbox" id="has_quiz_var"></input>
+          </span>
+        );
+      }
+  })
+
+
+  var DatePickerEnd = React.createClass({
+    render: function() {
+          return (
+          <div
+              style={{"display": (this.props.dataType === 'questionnaire' ? "none" : "")}}
+              end_date={this.props.end_date}
+              onChange={this.props.onChange} >                
+                End Date <input type="date" id="end_date"></input>
+          </div>
+        );
+      }
+  });
 
   var NewItemButton = React.createClass({
     render: function() {
@@ -826,16 +936,16 @@ jQuery(document).ready(function() {
           }
           else if(this.props.dataType=='assignment') {
               _rows.push(<TitleRow
-                  title="My Assignments"
+                  title="My Assignment"
               />)
           }
-          jQuery.each(this.props.data, function (i, entry) {
-              if (((entry.name && entry.name.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.creation_date && entry.creation_date.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.institution && entry.institution.indexOf(_this.props.filterText) !== -1) ||
-                  (entry.updated_date && entry.updated_date.indexOf(_this.props.filterText) !== -1)) &&
-                  (entry.private == true || entry.type == 'FolderNode')) {
-                  _rows.push(<ContentTableRow
+
+          if(_this.props.selectValue == 'empty'){
+            jQuery.each(this.props.data, function (i, entry) { 
+              if (((entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(_this.props.filterText.toLowerCase()) !== -1)
+                    &&(entry.private == true || entry.type == 'FolderNode'))) {
+                    if(_this.props.has_quiz_var && entry.require_quiz) {
+                      _rows.push(<ContentTableRow
                       key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
                       id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
                       name={entry.name}
@@ -855,18 +965,203 @@ jQuery(document).ready(function() {
                       has_topic={entry.has_topic}
                       rowClicked={_this.handleExpandClick}
                       newParams={entry.newParams}
-                  />)
-                  _rows.push(<ContentTableDetailsRow
-                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
-                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
-                      showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                    />)
+                    _rows.push(<ContentTableDetailsRow
+                        key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
+                        id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
+                        showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                        dataType={_this.props.dataType}
+                        children={entry.children}
+                    />)
+                  } else if(!_this.props.has_quiz_var){
+                    _rows.push(<ContentTableRow
+                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
+                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
+                      name={entry.name}
+                      institution={entry.institution}
+                      creation_date={entry.creation_date}
+                      updated_date={entry.updated_date}
+                      actions={entry.actions}
+                      is_available={entry.is_available}
+                      course_id={entry.course_id}
+                      max_team_size={entry.max_team_size}
+                      is_intelligent={entry.is_intelligent}
+                      require_quiz={entry.require_quiz}
                       dataType={_this.props.dataType}
-                      children={entry.children}
-                  />)
+                      //this is just a hack. All current users courses are marked as private during fetch for display purpose.
+                      private={entry.private}
+                      allow_suggestions={entry.allow_suggestions}
+                      has_topic={entry.has_topic}
+                      rowClicked={_this.handleExpandClick}
+                      newParams={entry.newParams}
+                    />)
+                    _rows.push(<ContentTableDetailsRow
+                        key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
+                        id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
+                        showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                        dataType={_this.props.dataType}
+                        children={entry.children}
+                    />)
+                  }
+
+                    
               } else {
                   return;
               }
-          })
+            })
+          }
+
+          if(_this.props.selectValue == 'created_date'){
+            var var_start_date = _this.props.start_date+1;
+            var var_end_date = _this.props.end_date+1;
+            jQuery.each(this.props.data, function (i, entry) { 
+              var date = entry.creation_date;
+              if (((entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(_this.props.filterText.toLowerCase()) !== -1) &&
+                  (entry.private == true || entry.type == 'FolderNode'))) {
+
+                    if ((date >= var_start_date) && (var_end_date >= date)) {
+                    if(_this.props.has_quiz_var && entry.require_quiz) {
+                      _rows.push(<ContentTableRow
+                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
+                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
+                      name={entry.name}
+                      institution={entry.institution}
+                      creation_date={entry.creation_date}
+                      updated_date={entry.updated_date}
+                      actions={entry.actions}
+                      is_available={entry.is_available}
+                      course_id={entry.course_id}
+                      max_team_size={entry.max_team_size}
+                      is_intelligent={entry.is_intelligent}
+                      require_quiz={entry.require_quiz}
+                      dataType={_this.props.dataType}
+                      //this is just a hack. All current users courses are marked as private during fetch for display purpose.
+                      private={entry.private}
+                      allow_suggestions={entry.allow_suggestions}
+                      has_topic={entry.has_topic}
+                      rowClicked={_this.handleExpandClick}
+                      newParams={entry.newParams}
+                    />)
+                    _rows.push(<ContentTableDetailsRow
+                        key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
+                        id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
+                        showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                        dataType={_this.props.dataType}
+                        children={entry.children}
+                    />)
+                  } else if(!_this.props.has_quiz_var){
+                    _rows.push(<ContentTableRow
+                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
+                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
+                      name={entry.name}
+                      institution={entry.institution}
+                      creation_date={entry.creation_date}
+                      updated_date={entry.updated_date}
+                      actions={entry.actions}
+                      is_available={entry.is_available}
+                      course_id={entry.course_id}
+                      max_team_size={entry.max_team_size}
+                      is_intelligent={entry.is_intelligent}
+                      require_quiz={entry.require_quiz}
+                      dataType={_this.props.dataType}
+                      //this is just a hack. All current users courses are marked as private during fetch for display purpose.
+                      private={entry.private}
+                      allow_suggestions={entry.allow_suggestions}
+                      has_topic={entry.has_topic}
+                      rowClicked={_this.handleExpandClick}
+                      newParams={entry.newParams}
+                    />)
+                    _rows.push(<ContentTableDetailsRow
+                        key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
+                        id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
+                        showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                        dataType={_this.props.dataType}
+                        children={entry.children}
+                    />)
+                  }
+                  }
+
+              } else {
+                  return;
+              }
+            })
+          }
+
+          if(_this.props.selectValue == 'updated_date'){
+            var var_start_date = _this.props.start_date+1;
+            var var_end_date = _this.props.end_date+1;
+            jQuery.each(this.props.data, function (i, entry) { 
+              var date = entry.updated_date;
+              if (((entry.name.toLowerCase() && entry.name.toLowerCase().indexOf(_this.props.filterText.toLowerCase()) !== -1) &&
+                  (entry.private == true || entry.type == 'FolderNode'))) {
+                    if ((date >= var_start_date) && (var_end_date >= date)) {
+                      if(_this.props.has_quiz_var && entry.require_quiz) {
+                      _rows.push(<ContentTableRow
+                      key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
+                      id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
+                      name={entry.name}
+                      institution={entry.institution}
+                      creation_date={entry.creation_date}
+                      updated_date={entry.updated_date}
+                      actions={entry.actions}
+                      is_available={entry.is_available}
+                      course_id={entry.course_id}
+                      max_team_size={entry.max_team_size}
+                      is_intelligent={entry.is_intelligent}
+                      require_quiz={entry.require_quiz}
+                      dataType={_this.props.dataType}
+                      //this is just a hack. All current users courses are marked as private during fetch for display purpose.
+                      private={entry.private}
+                      allow_suggestions={entry.allow_suggestions}
+                      has_topic={entry.has_topic}
+                      rowClicked={_this.handleExpandClick}
+                      newParams={entry.newParams}
+                    />)
+                    _rows.push(<ContentTableDetailsRow
+                        key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
+                        id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
+                        showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                        dataType={_this.props.dataType}
+                        children={entry.children}
+                    />)
+                    } else if(!_this.props.has_quiz_var){
+                      _rows.push(<ContentTableRow
+                        key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2).toString()+'_'+i}
+                        id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i}
+                        name={entry.name}
+                        institution={entry.institution}
+                        creation_date={entry.creation_date}
+                        updated_date={entry.updated_date}
+                        actions={entry.actions}
+                        is_available={entry.is_available}
+                        course_id={entry.course_id}
+                        max_team_size={entry.max_team_size}
+                        is_intelligent={entry.is_intelligent}
+                        require_quiz={entry.require_quiz}
+                        dataType={_this.props.dataType}
+                        //this is just a hack. All current users courses are marked as private during fetch for display purpose.
+                        private={entry.private}
+                        allow_suggestions={entry.allow_suggestions}
+                        has_topic={entry.has_topic}
+                        rowClicked={_this.handleExpandClick}
+                        newParams={entry.newParams}
+                      />)
+                      _rows.push(<ContentTableDetailsRow
+                          key={entry.type+'_'+(parseInt(entry.nodeinfo.id)*2+1).toString()+'_'+i}
+                          id={entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2+1).toString()+'_'+i}
+                          showElement={_this.state.expandedRow.indexOf(entry.type+'_'+(parseInt(entry.nodeinfo.node_object_id)*2).toString()+'_'+i) > -1 ? "" : "none"}
+                          dataType={_this.props.dataType}
+                          children={entry.children}
+                      />)
+                    }
+                  }
+
+              } else {
+                  return;
+              }
+            })
+          }
+
           if (this.props.showPublic) {
               if (this.props.dataType == 'course') {
                   _rows.push(<TitleRow
@@ -1040,7 +1335,11 @@ jQuery(document).ready(function() {
         filterText: '',
         privateCheckbox: false,
         publicCheckbox: false,
-        tableData: this.props.data
+        tableData: this.props.data,
+        selectValue: 'empty',
+        start_date: '',
+        end_date:'',
+        has_quiz_var: false
       }
     },
     handleUserInput: function(filterText) {
@@ -1101,7 +1400,44 @@ jQuery(document).ready(function() {
           publicCheckbox: publicCheckboxStatus
         })
     },
+
+    changeAdditionalDrop: function(event) {
+      this.setState({ selectValue: event.target.value });
+    },
+
+    changeDateStart: function(event) {
+      this.setState({ 
+        start_date: event.target.value,
+      });
+    },
+
+    changeDateEnd: function(event) {
+      this.setState({ 
+        end_date: event.target.value,
+      });
+    },
+
+    changeAvailableToggle: function(event) {
+      this.setState({ 
+        has_quiz_var: event.target.checked,
+      });
+    },
+
     render: function() {
+
+      var formStyle = {
+          margin: 0,
+          padding: 0,
+          display: 'inline'
+        }
+        if (this.props.dataType === 'questionnaire') {
+          formStyle = {
+            margin: 0,
+            padding: 0,
+            display: 'none'
+          }
+        }
+
       return (
         <div className="filterable_table">
           <SearchBar
@@ -1109,12 +1445,52 @@ jQuery(document).ready(function() {
             onUserInput={this.handleUserInput}
             dataType={this.props.dataType}
           />
+
           <FilterButton
             filterOption="public"
             onUserFilter={this.handleUserFilter}
             inputCheckboxValue={this.state.publicCheckbox}
             dataType={this.props.dataType}
           />
+          
+          <button 
+          style = {formStyle}
+          onClick={() => {
+                var x = document.getElementById("advancedToggle");
+                if (x.style.display === "none") {
+                  x.style.display = "block";
+                } else {
+                  x.style.display = "none";
+                }}}>
+            Advanced Search
+          </button>
+
+          <div id="advancedToggle">
+            <AdditionalSearchDropDown 
+              selectValue = {this.state.selectValue}
+              onChange={this.changeAdditionalDrop}  
+              dataType={this.props.dataType}
+            />
+            <div>
+              <DatePickerStart
+                start_date = {this.state.start_date}
+                onChange={this.changeDateStart}  
+                dataType={this.props.dataType}
+              />
+              <DatePickerEnd
+                start_date = {this.state.end_date}
+                onChange={this.changeDateEnd}  
+                dataType={this.props.dataType}
+              />
+
+            <HASQUIZ_TOGGLE
+                has_quiz_var = {this.state.has_quiz_var}
+                onChange={this.changeAvailableToggle} 
+                dataType={this.props.dataType}        
+            />  
+            </div>
+          </div>
+
           <NewItemButton
             dataType={this.props.dataType}
             private={true}
@@ -1125,6 +1501,10 @@ jQuery(document).ready(function() {
             onUserClick={this.handleUserClick}
             dataType={this.props.dataType}
             showPublic={this.state.publicCheckbox}
+            selectValue={this.state.selectValue}
+            start_date = {this.state.start_date}
+            end_date = {this.state.end_date}
+            has_quiz_var = {this.state.has_quiz_var}
           />
         </div>
       )

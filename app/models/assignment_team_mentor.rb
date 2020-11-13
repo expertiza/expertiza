@@ -7,7 +7,7 @@ class AssignmentTeamMentor < ActiveRecord::Base
 
   # Assign a team mentor provided an assignment_id is given
   def assignMentor(assignment_id)
-    list = Participant.getPotentialMentors(assignment_id)
+    list = Participant.get_mentors(assignment_id)
     if list.count < 1
       # Add code for when no tas or instructor have been added as a participant to current assignent
       raise StandardError, "No participant mentors have been added to this assignment. Unable to assign mentor to latest team created."

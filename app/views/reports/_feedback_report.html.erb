@@ -5,31 +5,34 @@
       });
   </script>
 
-
+  <!-- construct table with appropriate columns, all should be sortable -->
   <table id="feedbackReportTable" class="table table-striped" width="100%" cellspacing='0' cellpadding='2' border='0' style="font-size: 15px">
     <thead>
-    <tr>
-      <!-- class value decides whether the column should be sortable or not  -->
-      <th width="16%" class="sorter-true">Rejoinder <span></span></th>
-      <th width="14%" class="sorter-true"># author feedbacks done<span></span></th>
-      <th width="20%" class="sorter-true">Review responded to <span></span></th>
-      <th width="20%" class="sorter-true">Last responded at<span></span></th>
-    </tr>
+      <tr>
+        <!-- class value decides whether the column should be sortable or not  -->
+        <th width="16%" class="sorter-true">Rejoinder <span></span></th> <!-- sorted alphabetically -->
+        <th width="14%" class="sorter-true"># author feedbacks done<span></span></th> <!-- sorted numerically by 1st num then 2nd num -->
+        <th width="20%" class="sorter-true">Review responded to <span></span></th> <!-- sorted alphabetically -->
+        <th width="20%" class="sorter-true">Last responded at<span></span></th> <!-- sorted by date -->
+      </tr>
     </thead>
+
     <tbody>
 
     <%@l = -1 %>
 
-    <% @authors.each do |r| %>
-      <% next unless r %>
+    <% @authors.each do |rejoinder| %>
+      <% next unless rejoinder %>
       <% if @assignment.vary_by_round %>
-        <% get_each_round_review_and_feedback_response_map_for_feedback_report(r) %> 
+        <% get_each_round_review_and_feedback_response_map_for_feedback_report(rejoinder) %> 
       <% else %>
-        <% get_certain_review_and_feedback_response_map(r) %>
+        <% get_certain_review_and_feedback_response_map(rejoinder) %>
       <% end %>
 
       <% @first_col_identifier = true %>
-      <% if @assignment.vary_by_round %>
+      
+      <!-- if the assignment varies by round, prepare data: -->
+      <% if @assignment.vary_by_round %> 
           <!--data prepare-->
           <% @count_round_one, @count_round_two, @count_round_three = 0, 0, 0 %>
           <% unless @feedback_response_maps_round_one.nil? %>
@@ -50,20 +53,22 @@
         <!--Rejoinder-->
         <% ['one', 'two', 'three'].each do |round| %>
         <% if @first_col_identifier == true %>
-            <% @reviewer_name = r.user.fullname(session[:ip]) %>
+            <% @reviewer_name = rejoinder.user.fullname(session[:ip]) %>
             <%row_span = @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>
         <%# If no  feedback has been submitted, rowspan is seen as 0, then rowspan manually set to 1 so that it takes up its own row.%>
           <% if row_span == 0 %>
           <%# Rowspan manually set to 1 to represent an empty row. %>
             <tr><td rowspan = <% 1 %>>
-              <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id => @id %>
+              <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => rejoinder.id, :assignment_id => @id %>
             </td>
+            <!-- No feedback submitted, rest of columns are blank -->
 	          <td></td>
             <td></td>
             <td></td>
+          <!-- if feedback has been submitted -->
           <% else %>
-            <tr><td rowspan= <%= @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>>
-              <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id => @id %>
+            <tr><td rowspan= <%= row_span %>>
+              <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => rejoinder.id, :assignment_id => @id %>
             </td>
           <% end %>
           <% @first_col_identifier = false %>
@@ -82,7 +87,7 @@
           <% @review_responses_certain_round = instance_variable_get("@review_responses_round_#{round}") %>
           <% @review_responses_certain_round.each do |rr| %>
             <!--'FeedbackResponseMap' alias as 'frm' -->
-            <% @frm = FeedbackResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and reviewee_id = ?", rr.id, r.id, rr.response_map.reviewer_id]).first %>
+            <% @frm = FeedbackResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and reviewee_id = ?", rr.id, rejoinder.id, rr.response_map.reviewer_id]).first %>
 
             <% if @frm.blank? %>
               <!--Review response rejoined-->
@@ -118,6 +123,7 @@
           <% end %>
         <% end %>
       <% else %>
+        <!-- if assignment does not vary by round, prepare data: -->
           <% @count = 0 %>
           <% @feedback_response_maps.each {|rm| @count += 1 if Response.exists? map_id: rm.id} %>
           <% @l = @l+1 %>
@@ -126,16 +132,16 @@
            <%row_span= @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>
            <% if row_span == 0 %>
             <tr><td bgcolor=<%= @bgcolor %> rowspan=  <%1%>>
-              <% @reviewer_name = r.user.fullname(session[:ip]) %>
-              <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id => @id %>
+              <% @reviewer_name = rejoinder.user.fullname(session[:ip]) %>
+              <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => rejoinder.id, :assignment_id => @id %>
             </td>
             <td></td>
             <td></td>
             <td></td>
             <%else %>
            <tr><td bgcolor=<%= @bgcolor %> rowspan= <%= @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>>
-              <% @reviewer_name = r.user.fullname(session[:ip]) %>
-              <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.id, :assignment_id => @id %>
+              <% @reviewer_name = rejoinder.user.fullname(session[:ip]) %>
+              <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => rejoinder.id, :assignment_id => @id %>
             </td>
         <%end %>          
 
@@ -147,7 +153,7 @@
           <% end %>
           <% @review_responses.each do |rr| %>
             <!--'FeedbackResponseMap' alias as 'frm' -->
-            <% @frm = FeedbackResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and reviewee_id = ?", rr.id, r.id, rr.response_map.reviewer_id]).first %>
+            <% @frm = FeedbackResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and reviewee_id = ?", rr.id, rejoinder.id, rr.response_map.reviewer_id]).first %>
 
             <% if @frm.blank? %>
               <!--Review response rejoined-->

@@ -100,17 +100,38 @@ class Participant < ActiveRecord::Base
     can_review = true
     can_take_quiz = true
     case authorization
-    when 'reader'
-      can_submit = false
-    when 'reviewer'
-      can_submit = false
-      can_take_quiz = false
-    when 'submitter'
-      can_review = false
-      can_take_quiz = false
+      when 'reader'
+        can_submit = false
+      when 'reviewer'
+        can_submit = false
+        can_take_quiz = false
+      when 'submitter'
+        can_review = false
+        can_take_quiz = false
     end
     {can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz}
   end
+
+  # Edit this to enable manual setting of mentors
+  def get_can_mentor
+    can_mentor = false
+    user_role = User.find(self.user_id).role.name
+    case user_role
+      when 'Student'
+        can_mentor = false
+      when 'Instructor'
+        can_mentor = true
+      when 'Teaching Assistant'
+        can_mentor = true
+    end
+    self.update_column(:can_mentor, can_mentor)
+  end
+
+  # Get mentors for specified assignment
+  def get_mentors(assignment_id)
+    Participants.where(can_mentor: true).where(assignment_id: assignment_id)
+  end
+
 
   # Get authorization from permissions.
   def self.get_authorization(can_submit, can_review, can_take_quiz)
@@ -120,6 +141,8 @@ class Participant < ActiveRecord::Base
     authorization = 'reviewer' if can_submit == false and can_review == true and can_take_quiz == false
     authorization
   end
+
+
 
   # Sort a set of participants based on their user names.
   # Please make sure there is no duplicated participant in this input array.

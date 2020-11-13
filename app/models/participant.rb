@@ -181,7 +181,7 @@ class Participant < ActiveRecord::Base
   end
 
   # Generate list of possible mentors that have been added as participants to a specified assignment. Looking for specifically for participants added that are either 
-  def self.getPotentialMentors(assignment_id)
-    where(parent_id: assignment_id).select{|p| User.find(p.user_id).role.ta? || User.find(p.user_id).role.instructor?}
-  end
+  # def self.getPotentialMentors(assignment_id)
+  #   where(parent_id: assignment_id).select{|p| User.find(p.user_id).role.ta? || User.find(p.user_id).role.instructor?}
+  # end
 end

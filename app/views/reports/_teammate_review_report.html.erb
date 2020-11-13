@@ -4,31 +4,32 @@
                                "Last reviewed at" => "20%") %>
     <%@l = -1 %>
 
-    <% @reviewers.each do |r| %>
-      <% @teammate_review_response_maps = ResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and type = ?", @id, r.reviewer_id, @type]) %>
-      <% @user = User.find(Participant.find(r.reviewer_id).user_id) %>
+    <% @reviewers.each do |reviewer| %>
+      <% @teammate_review_response_maps = ResponseMap.where(["reviewed_object_id = ? and reviewer_id = ? and type = ?", @id, reviewer.reviewer_id, @type]) %>
+      <% @user = User.find(Participant.find(reviewer.reviewer_id).user_id) %>
       <% @team_id = TeamsUser.team_id(@id.to_i, @user.id) %>
-      <% @team_member_count = TeammateReviewResponseMap.where(reviewer_id: r.reviewer_id, reviewed_object_id: @id).count %>
+      <% @team_member_count = TeammateReviewResponseMap.where(reviewer_id: reviewer.reviewer_id, reviewed_object_id: @id).count %>
       <tr>
         <% @count = 0 %>
         <% @rspan = 0 %>
         <%@l = @l+1 %>
+        <!-- alternate the colors of columns -->
         <% (@l % 2 == 0) ? @bgcolor = "#ffffff" : @bgcolor = "#f9f9f9" %>
 
-        <% @teammate_review_response_maps.each do |rm| %>
+        <% @teammate_review_response_maps.each do |response_map| %>
         <!--count means the teammate reviews one student completed.-->
-          <% if Response.exists?(map_id: rm.id) %>
+          <% if Response.exists?(map_id: response_map.id) %>
             <% @count = @count + 1 %>
           <% end %>
         <%end %>
         <!--rspan means the all teammate reviews one student should finish, here is the num of team members minus 1.-->
         <% @team_member_count > 1 ? @rspan = @team_member_count : @rspan = 1 %>      
-
-        <%if Participant.exists?(id: r.reviewer_id) %>
+        <!-- for a valid reviewer -->
+        <%if Participant.exists?(id: reviewer.reviewer_id) %>
           <% @reviewer_name = @user.fullname(session[:ip]) %>
           <!--Reviewer-->
           <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan %>>
-            <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id => @id%>
+            <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => reviewer.reviewer_id, :assignment_id => @id%>
           </td>
           <!--# teammate reviews done-->
           <td bgcolor=<%= @bgcolor %>  align = "left" rowspan= <%= @rspan %>>

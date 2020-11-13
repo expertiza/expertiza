@@ -51,7 +51,7 @@
 
           
         <!--Rejoinder-->
-        <% ['one', 'two', 'three'].each do |round| %>
+        <% ['one', 'two', 'three'].each do |round| %> <!-- hardcoded for 3 rounds of review -->
         <% if @first_col_identifier == true %>
             <% @reviewer_name = rejoinder.user.fullname(session[:ip]) %>
             <%row_span = @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>
@@ -65,7 +65,7 @@
 	          <td></td>
             <td></td>
             <td></td>
-          <!-- if feedback has been submitted -->
+          <!-- if feedback has been submitted, set rejoinder name in first column -->
           <% else %>
             <tr><td rowspan= <%= row_span %>>
               <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => rejoinder.id, :assignment_id => @id %>

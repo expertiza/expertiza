@@ -298,6 +298,18 @@ module ReviewMappingHelper
     line_chart data, options
   end
 
+  def display_key_chart_information(intervals)
+    threshold = 30
+    intervals = intervals.select{|v| v < threshold}
+    if not intervals.empty?
+      interval_mean = (intervals.reduce(:+) / intervals.size.to_f).round(1)
+      interval_min = intervals.min
+      interval_max = intervals.max
+      information_string = "Mean Time: #{interval_mean}, Min Time: #{interval_min}, Max Time #{interval_max}"
+      return information_string
+    end
+  end
+
   def list_review_submissions(participant_id, reviewee_team_id, response_map_id)
     participant = Participant.find(participant_id)
     team = AssignmentTeam.find(reviewee_team_id)

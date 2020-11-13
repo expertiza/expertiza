@@ -39,6 +39,7 @@
               <th class="sorter-true"># answers tagged</th>
               <th class="sorter-true"># answers not tagged</th>
               <th class="sorter-true"># intervals</th>
+              <th class="sorter-true">Key Graph Info</th>
               <th class="sorter-true"># taggable answers<img src='/assets/info.png' title='As set up in the assignment setting, the authors can only tag answers of <%= tag_dep.question_type %> question type that are more than <%= tag_dep.answer_length_threshold %> character(s).'/></th>
             </tr>
             </thead>
@@ -54,6 +55,7 @@
                     <%= display_tagging_interval_chart(report_line.tag_update_intervals) %>
                   </td>
                   <!-- <td><%= report_line.tag_update_intervals.to_s %></td> -->
+                  <td><%= display_key_chart_information(report_line.tag_update_intervals) %></td>
                   <td><%= report_line.no_tagable %></td>
                 </tr>
             <% end %>

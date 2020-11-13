@@ -153,6 +153,13 @@ FactoryBot.define do
     institutions_id nil
   end
 
+  factory :rscore, class: Rscore do
+    my_max 100
+    my_min 0
+    my_avg 85
+    my_type :review
+  end
+
   factory :assignment, class: Assignment do
     # Help multiple factory-created assignments get unique names
     # Let the first created assignment have the name 'final2' to avoid breaking some fragile existing tests
@@ -436,7 +443,7 @@ FactoryBot.define do
 
   factory :response, class: Response do
     response_map { ReviewResponseMap.first || association(:review_response_map) }
-    additional_comment nil
+    additional_comment nilF
     version_num nil
     round 1
     is_submitted false

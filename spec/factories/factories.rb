@@ -436,7 +436,7 @@ FactoryBot.define do
 
   factory :response, class: Response do
     response_map { ReviewResponseMap.first || association(:review_response_map) }
-    additional_comment nilF
+    additional_comment nil
     version_num nil
     round 1
     is_submitted false

@@ -14,12 +14,8 @@
     <div>
     <% (1..@assignment.num_review_rounds).each do |round| %>
         <% get_review_metrics(round, team_id) %>
-            <%= instance_variable_get("@score_awarded_round_" + round.to_s) %> / <%= @avg %>
-            <%= ', ' unless round == @assignment.num_review_rounds %>
-        <!--Score range
-        <td bgcolor=<%= bgcolor %> align = 'left' >
-            (<%= @min %>% - <%= @max %>%)
-        </td>-->
+            <!--Get the team score for each assignment round-->
+            <%= @avg.tr('%','').to_i%> 
     <%end%>
     </div>
 <%end%>

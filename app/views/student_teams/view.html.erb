@@ -1,5 +1,34 @@
 <h1>Team Information for <%= @student.assignment.name %></h1>
 
+<!--Display assigned team mentor - -->
+<% if @student.team.type == 'AssignmentTeam' && @assignment_team_mentor != 'No assignment team mentor' %>
+  <br/><br/>
+  <b>Tean Mentor</b>
+  <br/><br/>
+  <!-- start Assignment Team Mentor table --> 
+  <table style="width:80%" align="center" >
+    <tr style="border: 1px outset #000000; padding: 10px 20px" >
+      <th class="head">Username</th>
+      <th class="head">Full name</th>
+      <th class="head">Email address</th>
+    </tr>
+
+    <tr>
+      <td><%= @assignment_team_mentor[:name] %></td>
+      <td><%= @assignment_team_mentor[:fullname] %></td>
+      <td><%= @assignment_team_mentor[:email] %></td>
+    </tr>
+
+  </table>
+  <!-- end Assignment Team Mentor table -->
+  <br/><br/>
+
+<% elsif @student.team.type == 'AssignmentTeam' && @assignment_team_mentor == 'No assignment team mentor' %>
+<!--If no team mentor has been assigned, display the following -->
+  <b style="text-align: center">Team Mentor: &nbsp;&nbsp;</b> No team mentor has been assigned &nbsp;&nbsp;&nbsp;
+  <br/><br/>
+<% end %>
+  
 <% if @student.team == nil %>
   You no longer have a team!
   <h3>Name team</h3>

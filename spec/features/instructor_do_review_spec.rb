@@ -1,6 +1,5 @@
 describe "check 'Begin review' showing up before due date and 'Assign grade' after due date" do
   let(:team) { build(:assignment_team, id: 1, name: 'team1') }
-  let(:rscore)  {build(:rscore)}
 
   it "Begin review" do
     instructor6 = create(:instructor)   #create instructor6

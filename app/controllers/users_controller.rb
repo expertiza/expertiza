@@ -260,16 +260,8 @@ class UsersController < ApplicationController
     # stores all the roles that are possible 
     # when a new user joins or an existing user updates his/her profile they will get to choose
     # from all the roles available
-    # role = Role.find(session[:user].role_id)
-     #if user creation call is for conference user then only possible role is Student
-    # else  get all the roles types which logged in user can create as new user.
-    if params[:assignment_id].nil?
-      role = Role.find(session[:user].role_id)
-    else
-      role = Role.find_by_name('Student')
-    end
+    role = Role.find(session[:user].role_id)
     @all_roles = Role.where('id in (?) or id = ?', role.get_available_roles, role.id)
-  
   end
 
   private

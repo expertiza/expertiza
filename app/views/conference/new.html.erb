@@ -1,5 +1,5 @@
 <%# <h1>New user</h1> %>
-<% if  @assignment.nil? || !@assignment.is_conference?%>
+<% if  @assignment.nil? || !@assignment.is_assignment_conference?%>
   <h1>New User</h1>
 <% else %>
   <h1>Conference User</h1>
@@ -12,7 +12,7 @@
   <%# <%= submit_tag "Create" %>
 <div class="g-recaptcha" data-sitekey="6Lfb_uEZAAAAAOrVHOhLI7i2yewc3Fgr87IohvaH"></div>
 
-<% if @assignment.nil? || !@assignment.is_conference?%>
+<% if @assignment.nil? || !@assignment.is_assignment_conference?%>
     <%= submit_tag "Create" %>
   <% else%>
     <%= submit_tag "Join Conference" %>

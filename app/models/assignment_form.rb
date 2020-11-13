@@ -308,8 +308,9 @@ class AssignmentForm
     MailWorker.perform_in(find_min_from_now(Time.parse(due_date.due_at.to_s(:db)) + simicheck_delay.to_i.hours).minutes.from_now * 60, @assignment.id, "compare_files_with_simicheck", due_date.due_at.to_s(:db))
   end
 
+  # Copies the inputted assignment into new one and returns the new assignment id
   def self.copy(assignment_id, user)
-    print("\n",assignment_id)
+    puts assignment_id
     Assignment.record_timestamps = false
     old_assign = Assignment.find(assignment_id)
     new_assign = old_assign.dup
@@ -345,18 +346,9 @@ class AssignmentForm
     else
       new_assign_id = nil
     end
-    print("\n",new_assign_id)
-    @old_team = Team.where(parent_id:old_assign)
-    count = 0
-    @old_team.each do |latt|
-      teamid = latt.id
-      map = ReviewResponseMap.where(reviewed_object_id: old_assign, reviewee_id: teamid, calibrate_to: true).first
-      if !map.nil? and !map.response.empty?
-        count = 1
-      end
-    end
-    if old_assign.is_calibrated and count>0
-      @original_values = SubmissionRecord.where(assignment_id:assignment_id)
+
+    if old_assign.is_calibrated
+      @original_values = SubmissionRecord.where(assignment_id:old_assign.id)
 
       @original_values.each do |catt|
         @new_entry = SubmissionRecord.new
@@ -369,46 +361,51 @@ class AssignmentForm
         @new_entry.save
       end
 
-      @original_team_values = Team.where(parent_id:assignment_id)
-
+      @original_team_values = Team.where(parent_id:old_assign.id)
+      keep_track = []
       @original_team_values.each do |catt|
-        @new_entry = Team.new
-        @new_entry.name = catt.name
-        @new_entry.parent_id = new_assign_id
-        @new_entry.type = catt.type
-        @new_entry.comments_for_advertisement = catt.comments_for_advertisement
-        @new_entry.advertise_for_partner = catt.advertise_for_partner
-        @new_entry.submitted_hyperlinks = catt.submitted_hyperlinks
-        @new_entry.directory_num = catt.directory_num
-        @new_entry.grade_for_submission = catt.grade_for_submission
-        @new_entry.comment_for_submission = catt.comment_for_submission
-        @new_entry.make_public = catt.make_public
-        @new_entry.save
+        @assignment_sample1 = Assignment.find(old_assign.id)
+        @instructor_sample1 = Participant.where(parent_id: old_assign.id, user_id: @assignment_sample1.instructor_id).first
+        @map = ReviewResponseMap.where(reviewed_object_id: old_assign.id,reviewer_id:@instructor_sample1.id, reviewee_id: catt.id).first
+        if @map
+        @resp = Response.where(map_id:@map.id,is_submitted:false).first 
+          if @resp
+            keep_track.append(catt.id)
+            @new_entry = Team.new
+            @new_entry.name = catt.name
+            @new_entry.parent_id = new_assign_id
+            @new_entry.type = catt.type
+            @new_entry.comments_for_advertisement = catt.comments_for_advertisement
+            @new_entry.advertise_for_partner = catt.advertise_for_partner
+            @new_entry.submitted_hyperlinks = catt.submitted_hyperlinks
+            @new_entry.directory_num = catt.directory_num
+            @new_entry.grade_for_submission = catt.grade_for_submission
+            @new_entry.comment_for_submission = catt.comment_for_submission
+            @new_entry.make_public = catt.make_public
+            @new_entry.save
+          end
+        end
       end
 
-      @alpha = Team.where(parent_id:assignment_id)
       @beta = Team.where(parent_id:new_assign_id)
+
       a = []
-      b = []
       @beta.each do |catt|
         a.append(catt.id)
       end
+      dict = Hash[keep_track.zip a]
+      puts dict
 
-      @alpha.each do |catt|
-        b.append(catt.id)
-      end
-      
-      dict = Hash[b.zip a]
       count = 0
-      @alpha.each do |catt|
-        @charlie = TeamsUser.where(team_id:catt.id)
+      keep_track.each do |catt|
+        @charlie = TeamsUser.where(team_id:catt)
         @charlie.each do |matt|
           @delta = TeamsUser.new
             @delta.team_id = a[count]
             @delta.user_id = matt.user_id
           @delta.save
 
-          @gamma = Participant.where(user_id:matt.user_id,parent_id:old_assign)
+          @gamma = Participant.where(user_id:matt.user_id,parent_id:old_assign.id)
 
           @gamma.each do |natt|
             @zeta = Participant.new
@@ -429,20 +426,47 @@ class AssignmentForm
             @zeta.save
           end
         end
-        @xenon = ReviewResponseMap.where(reviewed_object_id:old_assign) 
+
+        @assignment_number1 = Assignment.where(id:old_assign.id).first
+        @assignment_number2 = Assignment.where(id:new_assign_id).first
+        
+        @old_entry = Participant.where(parent_id:old_assign.id,user_id:@assignment_number1.instructor_id).first
+        @updating_participant = Participant.new
+        @updating_participant.can_submit = @old_entry.can_submit
+        @updating_participant.can_review = @old_entry.can_review
+        @updating_participant.user_id = @assignment_number2.instructor_id
+        @updating_participant.parent_id = new_assign_id
+        @updating_participant.submitted_at = @old_entry.submitted_at
+        @updating_participant.permission_granted = @old_entry.permission_granted
+        @updating_participant.penalty_accumulated = @old_entry.penalty_accumulated
+        @updating_participant.grade = @old_entry.grade
+        @updating_participant.type = @old_entry.type
+        @updating_participant.handle = @old_entry.handle
+        @updating_participant.time_stamp = @old_entry.time_stamp
+        @updating_participant.digital_signature = @old_entry.digital_signature
+        @updating_participant.duty = @old_entry.duty
+        @updating_participant.can_take_quiz = @old_entry.can_take_quiz
+        @updating_participant.save
+
+        @getparticipant = Participant.where(parent_id:new_assign_id,user_id:@assignment_number1.instructor_id).first
+
+        @xenon = ReviewResponseMap.where(reviewed_object_id:old_assign.id) 
         @xenon.each do |satt|
-          @iota = ReviewResponseMap.new
-          @iota.reviewed_object_id = new_assign_id
-          @iota.reviewer_id = satt.reviewer_id
-          @iota.reviewee_id = dict[satt.reviewee_id]
-          @iota.type = satt.type
-          @iota.created_at = satt.created_at
-          @iota.calibrate_to = satt.calibrate_to
-          @iota.save
+          if dict.key?(satt.reviewee_id)
+            puts satt.reviewee_id
+            @iota = ReviewResponseMap.new
+            @iota.reviewed_object_id = new_assign_id
+            @iota.reviewer_id = @getparticipant.id
+            @iota.reviewee_id = dict[satt.reviewee_id]
+            @iota.type = satt.type
+            @iota.created_at = satt.created_at
+            @iota.calibrate_to = satt.calibrate_to
+            @iota.save
+          end
         end
 
-        @xenon = ReviewResponseMap.where(reviewed_object_id:old_assign,reviewee_id:catt.id) 
-        @eta =  ReviewResponseMap.where(reviewed_object_id:new_assign_id,reviewee_id:dict[catt.id])
+        @xenon = ReviewResponseMap.where(reviewed_object_id:old_assign.id,reviewee_id:catt) 
+        @eta =  ReviewResponseMap.where(reviewed_object_id:new_assign_id,reviewee_id:dict[catt])
 
         list1 = []
         list2 = []
@@ -465,13 +489,13 @@ class AssignmentForm
             @theta.version_num = zatt.version_num
             @theta.round = zatt.round
             @theta.is_submitted = zatt.is_submitted
-           # @theta.visibility = zatt.visibility
             @theta.save
           end
         end
         count+=1
       end
     end
+
     new_assign_id
   end
 

@@ -27,9 +27,9 @@ class TeamsController < ApplicationController
       # Incorporated hash to keep track of assigned team mentors based on node.node_object_id (assignment_team_team_id)
       @assigned_team_mentors = {}
       # Loop thru the different assignment_team_ids and assign the key to the user designated as assignment team mentor
-      @child_nodes.each do |node|
-        @assigned_team_mentors[node.node_object_id] = AssignmentTeamMentor.getAssignedMentor(node.node_object_id)
-      end
+      @child_nodes.each do |child_node|  
+        @assigned_team_mentors[child_node[:node_object_id]] = AssignmentTeamMentor.getAssignedMentor(child_node[:node_object_id])  
+      end 
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
@@ -50,15 +50,16 @@ class TeamsController < ApplicationController
       # Only assign mentor to AssignmentTeam team
       if @team.type == "AssignmentTeam"
         begin
-          assignmentTeamMentor = AssignmentTeamMentor.new(assignment_team_id: @team.id)
-          assignmentTeamMentor.assignMentor(parent.id)
+          assignmentTeamMentor = AssignmentTeamMentor.new(assignment_team_id: @team[:id])
+          assignmentTeamMentor.assignMentor(@team[:parent_id])
           # Notify when no mentor was assigned to team because none were available from participants
         rescue StandardError 
           flash[:error] = $ERROR_INFO
           redirect_to action: 'list', id: parent.id and return
         end
-        assignmentTeamMentor.save
-      end    
+        # If row was saved in assignment_team_mentors table, notify affected stakeholders of assigned team mentor via registered user email
+        assignmentTeamMentor.email if assignmentTeamMentor.save
+      end
 
       undo_link("The team \"#{@team.name}\" has been successfully created.")
       redirect_to action: 'list', id: parent.id

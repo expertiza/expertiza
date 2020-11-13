@@ -39,12 +39,17 @@
     <thead>
     <tr bgcolor='#CCCCCC'>
       <!-- class value decides whether the column should be sortable or not  -->
-      <th width="16%" class="sorter-true">Reviewer <span></span></th>
-      <th width="10%" class="sorter-false">Reviews done<span></span></th>
-      <th width="24%" class="sorter-false">Team reviewed <span></span></th>
-      <th width="13%" class="sorter-false">Score awarded / Avg. score <span></span></th>
-      <th width="13%" class="sorter-true">Metrics <span></span></th>
-      <th class="sorter-false">Assign grade and write comments <span></span></th>
+      <th rowspan ="2" width="16%" class="sorter-true">Reviewer <span></span></th>
+      <th rowspan ="2" width="10%" class="sorter-true">Reviews done<span></span></th>
+      <th rowspan ="2" width="24%" class="sorter-true">Team reviewed <span></span></th>
+      <th width="6%" colspan=  "2" class="sorter-false">Scores<span></span></th>
+      <th rowspan ="2" width="14%" class="sorter-true">Metrics <span></span></th>
+      <th rowspan ="2" class="sorter-false">Assign grade and write comments <span></span></th>
+    </tr>
+    <tr bgcolor='#CCCCCC'>
+
+		  <th width="6%" class="sorter-true"> Score Awarded <span></span></th>
+		  <th width="6%" class="sorter-true"> AVG Score <span></span></th>
     </tr>
     </thead>
     <tbody>
@@ -87,7 +92,7 @@
                         <% if visibility_public?(ri) %>
                             <div id = <%= team_name_color %> style='border-top: solid; border-width: 1px;'>&#10004;
                         <% else %>
-                            <div id = <%= team_name_color %> style="border-top: solid; border-width: 1px;">
+                            <div id = <%= team_name_color %> style='border-top: solid; border-width: 1px;'>
                         <% end %>
                 <% end %>
                     <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
@@ -114,7 +119,16 @@
               <% end %>
             <% end %>
           </td>
-          <!--Score awarded / Avg. score-->
+          <!--Score awarded-->
+          <td align='left'>
+            <% @response_maps.each_with_index do |ri, index| %>
+              <% if Team.where(id: ri.reviewee_id).length > 0 %>
+                <% @team = Team.find(ri.reviewee_id) %>
+                <%= render partial: 'team_score_score_awarded', locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: r.id} %>
+              <% end %>
+            <% end %>
+          </td>         
+          <!--Avg. score-->
           <td align='left'>
             <% @response_maps.each_with_index do |ri, index| %>
               <% if Team.where(id: ri.reviewee_id).length > 0 %>

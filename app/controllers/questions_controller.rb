@@ -13,6 +13,12 @@ class QuestionsController < ApplicationController
   end
 
   def action_allowed?
+    if ['destroy'].include?(params[:action])
+      question = Question.find(params[:id])
+      if(question.questionnaire.owner?(session[:user].id))
+        return true
+      end
+    end
     current_user_has_ta_privileges?
   end
 
@@ -76,7 +82,12 @@ class QuestionsController < ApplicationController
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
-    redirect_to edit_questionnaire_path(questionnaire_id.to_s.to_sym)
+
+    if(question.questionnaire.type == 'RevisionPlanQuestionnaire')
+      redirect_to edit_revision_plan_questionnaire_path(questionnaire_id.to_s.to_sym)
+    else
+      redirect_to edit_questionnaire_path(questionnaire_id.to_s.to_sym)
+    end
   end
 
   # required for answer tagging

@@ -43,4 +43,9 @@ class RevisionPlanQuestionnaire < Questionnaire
   def display_heading?
     return true
   end
+
+  # Return true if user owns questionnaire
+  def owner?(user_id)
+    team.users.map{ |u| u.id }.include?(user_id) || super
+  end
 end

@@ -119,7 +119,7 @@
               <% end %>
             <% end %>
           </td>
-          <!--Score awarded-->
+          <!--Render partial view corresponding to the overall score awarded to a team-->
           <td align='left'>
             <% @response_maps.each_with_index do |ri, index| %>
               <% if Team.where(id: ri.reviewee_id).length > 0 %>
@@ -128,7 +128,7 @@
               <% end %>
             <% end %>
           </td>         
-          <!--Avg. score-->
+          <!--Render partial view corresponding to the average score awarded to a team-->
           <td align='left'>
             <% @response_maps.each_with_index do |ri, index| %>
               <% if Team.where(id: ri.reviewee_id).length > 0 %>

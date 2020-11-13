@@ -37,7 +37,7 @@ class ReviewBidsController < ApplicationController
     my_topic = SignedUpTeam.where(team_id: team_id).pluck(:topic_id).first
     @sign_up_topics -= SignUpTopic.where(assignment_id: @assignment.id, id: my_topic)
     @max_team_size = @assignment.num_reviews_allowed 
-    @no_of_participants = AssignmentParticipant.where(parent_id: @assignment.id).count
+    @num_participants = AssignmentParticipant.where(parent_id: @assignment.id).count
     @selected_topics = nil
     @bids = team_id.nil? ? [] : ReviewBid.where(participant_id:@participant,assignment_id:@assignment.id).order(:priority)
     signed_up_topics = []

@@ -76,15 +76,15 @@ class Participant < ActiveRecord::Base
     assignment = Assignment.find_by(id: self.assignment.id)
 
     Mailer.sync_message(
-      recipients: user.email,
-      subject: "You have been registered as a participant in the Assignment #{assignment.name}",
-      body: {
-        home_page: home_page,
-        first_name: ApplicationHelper.get_user_first_name(user),
-        name: user.name,
-        password: pw,
-        partial_name: "register"
-      }
+        recipients: user.email,
+        subject: "You have been registered as a participant in the Assignment #{assignment.name}",
+        body: {
+            home_page: home_page,
+            first_name: ApplicationHelper.get_user_first_name(user),
+            name: user.name,
+            password: pw,
+            partial_name: "register"
+        }
     ).deliver
   end
 
@@ -124,12 +124,14 @@ class Participant < ActiveRecord::Base
       when 'Teaching Assistant'
         can_mentor = true
     end
-    self.update_column(:can_mentor, can_mentor)
+    Participant.where(user_id: self.user_id).each do |participant|
+      participant.update_column(:can_mentor, can_mentor)
+    end
   end
 
   # Get mentors for specified assignment
-  def get_mentors(assignment_id)
-    Participants.where(can_mentor: true).where(assignment_id: assignment_id)
+  def self.get_mentors(assignment_id)
+    Participant.where(can_mentor: true).where(parent_id: assignment_id)
   end
 
 
@@ -180,6 +182,6 @@ class Participant < ActiveRecord::Base
 
   # Generate list of possible mentors that have been added as participants to a specified assignment. Looking for specifically for participants added that are either 
   def self.getPotentialMentors(assignment_id)
-    where(parent_id: assignment_id).select{|p| User.find(p.user_id).role.ta? || User.find(p.user_id).role.instructor?} 
+    where(parent_id: assignment_id).select{|p| User.find(p.user_id).role.ta? || User.find(p.user_id).role.instructor?}
   end
 end

@@ -5,18 +5,18 @@
   <% if depth != nil
        index = 0
        while index < depth %>
-     <td WIDTH="2%">&nbsp;</td>
-     <%   index += 1
+    <td WIDTH="2%">&nbsp;</td>
+    <%   index += 1
        end
   end %>
-<% if parent_node.is_leaf %>
-  <td WIDTH="2%">&nbsp;</td>
-  <td WIDTH="2%">&nbsp;</td>
-<% else %>
-  <% if parent_node.get_name == 'Courses'&& session[:user].role_id == 6 %>
-  <%else%>
-    <% if child_nodes %>
-      <td WIDTH="2%" ALIGN="RIGHT"><a id="<%= prefix %>Link" name="<%= prefix %>Link" href="#" <% if child_nodes.length > 0 %>onclick="toggleList('<%= prefix %>',<%= child_nodes.length %>);alternate('theTable');return false;"><img src="/assets/expand.png"><% else %>onclick="return false;"><img src="/assets/noaction.png"><% end %></a></td>
+    <% if parent_node.is_leaf %>
+      <td WIDTH="2%">&nbsp;</td>
+      <td WIDTH="2%">&nbsp;</td>
+    <% else %>
+      <% if parent_node.get_name == 'Courses'&& session[:user].role_id == 6 %>
+      <%else%>
+        <% if child_nodes %>
+          <td WIDTH="2%" ALIGN="RIGHT"><a id="<%= prefix %>Link" name="<%= prefix %>Link" href="#" <% if child_nodes.length > 0 %>onclick="toggleList('<%= prefix %>',<%= child_nodes.length %>);alternate('theTable');return false;"><img src="/assets/expand.png"><% else %>onclick="return false;"><img src="/assets/noaction.png"><% end %></a></td>
       <td WIDTH="2%" ALIGN="RIGHT"><%= link_to image_tag('/assets/drill.png'), :controller => 'tree_display', :action => 'drill', :root => parent_node.id %></td>
     <% end %>
   <%end%>
@@ -28,30 +28,29 @@
     <%= parent_node.get_name(session[:ip]) %>
     <% if parent_node.get_directory != nil%>
       <br/><I>Directory:</I> <%= parent_node.get_directory %>
-  <% end %>
-  <% if parent_node.get_creation_date != nil %>
-    <br/><I>Creation Date:</I> <%= parent_node.get_creation_date.strftime("%Y-%m-%d %H:%M") %>
-<% end %>
-<% if parent_node.get_modified_date != nil %>
-  <br/><I>Updated Date:</I> <%= parent_node.get_modified_date %>
-        <% end %>
-
-      <%end%>
-    </td>
-
-<% if rowtype != nil %>
-<td>
-<%# Display the mentor's fullname assigned for current assignment team 
+          <% end %>
+          <% if parent_node.get_creation_date != nil %>
+            <br/>
+            <I>Creation Date:</I> <%= parent_node.get_creation_date.strftime("%Y-%m-%d %H:%M") %>
+          <% end %>
+          <% if parent_node.get_modified_date != nil %>
+            <br/>
+            <I>Updated Date:</I> <%= parent_node.get_modified_date %>
+          <% end %>
+        <%end%>
+      </td>
+      <% if rowtype != nil %>
+        <td>
+          <%# Display the mentor's fullname assigned for current assignment team 
 If no mentor is assigned, "No assignment team mentor" will display
 %>
-<% if @assigned_team_mentors[parent_node.node_object_id]['fullname'] != nil %>
-<%= @assigned_team_mentors[parent_node.node_object_id]['fullname'] %> 
-<% else %>
-No mentor assigned
-<% end %>
-</td>
-<%# This is to create an empty table cell for the participants listed within a team, only displaying team mentor at team name row %>
-<% else %>
-<td></td>
-<% end %>
-
+          <% if @assigned_team_mentors[parent_node.node_object_id]['fullname'] != nil %>
+            <%= @assigned_team_mentors[parent_node.node_object_id]['fullname'] %>
+          <% else %>
+            No mentor assigned
+          <% end %>
+        </td>
+        <%# This is to create an empty table cell for the participants listed within a team, only displaying team mentor at team name row %>
+      <% else %>
+        <td></td>
+      <% end %>

@@ -35,7 +35,7 @@ class AssignmentTeamMentor < ActiveRecord::Base
   def self.getAssignedMentor(assignment_team_id)
     # Checks to see if there is an assigned team mentor, if not return string "No assignment team mentor"
     if find_by(assignment_team_id: assignment_team_id).nil?
-      return "No assignment team mentor" 
+      return "No assignment team mentor"
     end
     mentor = find_by(assignment_team_id: assignment_team_id).participant.user
   end

@@ -20,7 +20,7 @@ class ConferenceController < ApplicationController
     end
 
     def new
-        if current_user && current_role_name == "Student" # current_user_has_student_privileges?
+        if current_user &&  current_user_has_student_privileges?
             @user = current_user
             params[:user] = current_user
             add_conference_user_as_participant and return
@@ -28,7 +28,6 @@ class ConferenceController < ApplicationController
             flash[:error] = "Your current role does not allow you to join this assignment. Please log in as Student and retry to join."
             redirect_to get_redirect_url_link and return
         else
-            print('\n Going to user new')
             @user = User.new
             @rolename = Role.find_by(name: params[:role])
             # when a new user joins or an existing user updates his/her profile they will get to choose
@@ -39,23 +38,16 @@ class ConferenceController < ApplicationController
         end
     end
     def create
-      print('In conference create')
-
       # Check if user needs to be created as author for conference type assignment and add author to assignment
       @recaptcha_succeeded = verify_recaptcha secret_key: '6Lfb_uEZAAAAAPcSk-9fcNh3syzfvfagPeNc8Y_B'
-      print("\\n")
-      print(@recaptcha_succeeded)
-      if @recaptcha_succeeded==true && create_conference_user
+      if @recaptcha_succeeded==true && add_conference_user
         add_conference_user_as_participant
       else
-        print(@all_roles)
-        print('in else')
-        print(@rolename)
         redirect_to :controller => 'conference', :action => 'new'
       end
   end
 
-  def create_conference_user
+  def add_conference_user
       # check if user is already present with given username in system
       existing_user = User.find_by(name: params[:user][:name])
       # if user exist then add user as participant to assignment else create account and then add as participant
@@ -68,7 +60,6 @@ class ConferenceController < ApplicationController
         # Create author called from Conference Helper
         create_author
       else
-          print("\nIn else of create conf\n")
         @user = existing_user
       end
   end

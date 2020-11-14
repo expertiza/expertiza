@@ -128,7 +128,6 @@ ActiveRecord::Schema.define(version: 20201114001045) do
     t.boolean  "vary_by_topic",                                                    default: false
     t.boolean  "vary_by_round",                                                    default: false
     t.boolean  "reviewer_is_team"
-    t.boolean  "is_conference",                                                    default: false
     t.boolean  "is_assignment_conference",                                         default: false
   end
 

@@ -101,12 +101,12 @@ class InvitationsController < ApplicationController
 
   def check_participant_before_invitation
     @participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', @user.id, @student.parent_id).first
-    # check if the user is a participant of the assignment
+    # check if the user is a participant in the assignment
     unless @participant
       if @assignment.is_assignment_conference
         add_participant_coauthor
       else
-        flash[:error] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
+        flash[:error] = "The user \"#{params[:user][:name].strip}\" is not a participant in this assignment."
         redirect_to view_student_teams_path student_id: @student.id
         return
       end

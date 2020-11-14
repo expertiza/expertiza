@@ -25,9 +25,6 @@ class Mailer < ActionMailer::Base
     @user = defn[:body][:user]
     @first_name = defn[:body][:first_name]
     @password = defn[:body][:password]
-    print('\n ----------------passwored is---------]\n')
-    print(@password)
-    print('\n ----------------passwored is---------]\n')
     @new_pct = defn[:body][:new_pct]
     @avg_pct = defn[:body][:avg_pct]
     @assignment = defn[:body][:assignment]

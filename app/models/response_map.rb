@@ -85,4 +85,14 @@ class ResponseMap < ActiveRecord::Base
   def survey?
     false
   end
+  
+  def self.find_team_member(map)
+    # ACS Have metareviews done for all teams
+    if map.type.to_s == "MetareviewResponseMap"
+        review_mapping = ResponseMap.find_by(id: map.reviewed_object_id)
+        team = AssignmentTeam.find_by(id: review_mapping.reviewee_id)
+    else
+        team = AssignmentTeam.find(map.reviewee_id)
+    end
+  end
 end

@@ -1,0 +1,61 @@
+describe ConferenceController do
+    let(:admin) { build(:admin, id: 3) }
+    let(:super_admin) {build (:superadmin)}
+    let(:instructor) { build(:instructor, id: 2) }
+    let(:instructor1) { build(:instructor, id: 2, timezonepref: 'Eastern Time (US & Canada)') }
+    let(:student1) { build(:student, id: 1, name: :lily) }
+    let(:student2) { build(:student) }
+    let(:student3) { build(:student, id: 10, role_id: 1, parent_id: nil) }
+    let(:student4) { build(:student, id: 20, role_id: 4) }
+    let(:student5) { build(:student, role_id: 4, parent_id: 3) }
+
+    let(:participant) { build(:participant, id: 1) }
+    let(:institution1) {build(:institution, id: 1)}
+    let(:assignment1) { build(:assignment, id: 2, is_assignment_conference: 1, max_team_size:100) }
+    let(:requested_user1) {
+      AccountRequest.new id: 4, name: 'requester1', role_id: 2, fullname: 're, requester1',
+                         institution_id: 1, email: 'requester1@test.com', status: nil, self_introduction: 'no one'}
+    let(:superadmin) {build(:superadmin)}
+    let(:assignment) {
+      build(:assignment, id: 1, name: "test_assignment", instructor_id: 2, 
+                         participants: [build(:participant, id: 1, user_id: 1, assignment: assignment)], course_id: 1)}
+    before(:each) do
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+    end
+
+    context 'Author/Co-Author login with captcha' do
+        it 'should login with correct recaptcha' do
+        #   ConferenceController.any_instance.expects(:verify_recaptcha).returns(true)
+        #   user = with_user # get your user...
+        #   post :login, { :username => user.username, :password => user.password }
+        #   session[:user].should eql(user.id)
+        allow(ConferenceController).to receive(:verify_recaptcha).and_return(true)
+        #   expect(response).to render_template 'content_pages/view'
+        session = {user: student1}
+        params = {
+            user: {name: 'lily',
+                crypted_password: 'password',
+                role_id: 1,
+                password_salt: 1,
+                fullname: '6, instructor',
+                email: 'chenzy@gmail.com',
+                parent_id: 1,
+                private_by_default: false,
+                mru_directory_path: nil,
+                email_on_review: true,
+                email_on_submission: true,
+                email_on_review_of_review: true,
+                is_new_user: false,
+                master_permission_granted: 0,
+                handle: 'handle',
+                digital_certificate: nil,
+                timezonepref: 'Eastern Time (US & Canada)',
+                public_key: nil,
+                copy_of_emails: nil,
+                institution_id: 1}
+        }  
+        post :create, params, session
+        expect(response).to redirect_to(root_path)
+        end
+    end
+end

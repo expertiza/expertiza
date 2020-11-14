@@ -1,0 +1,14 @@
+Hi <%= @first_name %>,<BR/>
+<BR/>
+<p>
+
+  <%=@conference_variable %> has named you as a co-author of a paper.
+  To confirm your account, please click on this link.  <a href="http://localhost:3000/profile/edit">http://expertiza.ncsu.edu</a>.
+  After you have set up a password, you will be able to log in and access your co-author's work.
+  We strongly recommend that you change the password the first time you access the application. Please update your profile.
+
+</p>
+
+User Name: <%= @user.name %><BR/>
+E-mail address: <%= @user.email %><BR/><BR/>
+New password: <%= @password %><BR/> 

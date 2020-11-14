@@ -51,6 +51,21 @@ class ReviewBidsController < ApplicationController
     @sign_up_topics -= signed_up_topics
     @bids = signed_up_topics
     @num_of_topics = @sign_up_topics.size
+    @assigned_review_maps = []
+    selected_topics = []
+    ReviewResponseMap.where({:reviewed_object_id => @assignment.id, :reviewer_id => @participant.id}).each do |review_map|
+      @assigned_review_maps << review_map
+    end
+    
+
+
+    #if !@assigned_topics.nil?
+    #  selected_topics = []
+    #  @assigned_topics.each do |review_topic|
+    #    selected_topics << SignedUpTopic.find_by(assignment_id: review_topic.reviewed_object_id)
+    #  end
+    #  @selected_topics = selected_topics
+    #end
   end
   
   def set_priority
@@ -104,19 +119,20 @@ class ReviewBidsController < ApplicationController
       #participant = AssignmentParticipant.find(params[:id].to_i)
       participant = AssignmentParticipant.find(40764)
       assignment_id = participant.assignment
+      @assignment_id = assignment_id.id
       reviewers = ReviewBid.reviewers(assignment_id) # TODO (maybe finished) create to get list of reviewers
-      @bidding_data = ReviewBid.get_bidding_data(assignment_id,reviewers) # TODO create this function with info we want for WebService
-      #@bidding_data = @bidding_data.to_json
+      bidding_data = ReviewBid.get_bidding_data(assignment_id,reviewers) # TODO create this function with info we want for WebService
     #runs algorithm and assigns reviews
-      @matched_topics = run_bidding_algorithm(@bidding_data)
-      render 'review_bids/assign_bidding'
-      #ReviewBid.assign_review_topics(assignment_id,reviewers,matched_topics) # TODO create to assign the return matching reviews to students
-      #Assignment.find(assignment_id).update(can_choose_topic_to_review: false)  #turns off bidding for students
-      #redirect_to :back
+      matched_topics = run_bidding_algorithm(bidding_data)
+      #render 'review_bids/assign_bidding'
+      ReviewBid.assign_review_topics(@assignment_id,reviewers,matched_topics) # TODO create to assign the return matching reviews to students
+      Assignment.find(assignment_id).update(can_choose_topic_to_review: false)  #turns off bidding for students
+      redirect_to :back
+
     end
 
   # call webserver for running assigning algorthim
-  # passing webserver: student_ids, topic_ids, student_preferences, topic_preferences
+  # passing webserver: student_ids, topic_ids, student_preferences, time_stamps
   # webserver returns: 
   # returns matched assignments as json body
   def run_bidding_algorithm(bidding_data)

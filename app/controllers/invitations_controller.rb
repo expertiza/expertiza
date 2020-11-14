@@ -1,3 +1,4 @@
+include ConferenceHelper
 class InvitationsController < ApplicationController
   include AuthorizationHelper
 
@@ -80,8 +81,12 @@ class InvitationsController < ApplicationController
   def check_user_before_invitation
     # user is the student you are inviting to your team
     @user = User.find_by(name: params[:user][:name].strip)
-    # student has information about the participant
+    # User/Author has information about the participant
     @student = AssignmentParticipant.find(params[:student_id])
+    @assignment = Assignment.find(@student.parent_id)
+    if @assignment.is_assignment_conference
+      @user =  create_coauthor unless @user
+    end
 
     return unless current_user_id?(@student.user_id)
 
@@ -98,9 +103,13 @@ class InvitationsController < ApplicationController
     @participant = AssignmentParticipant.where('user_id = ? and parent_id = ?', @user.id, @student.parent_id).first
     # check if the user is a participant of the assignment
     unless @participant
-      flash[:error] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
-      redirect_to view_student_teams_path student_id: @student.id
-      return
+      if @assignment.is_assignment_conference
+        add_participant_coauthor
+      else
+        flash[:error] = "The user \"#{params[:user][:name].strip}\" is not a participant of this assignment."
+        redirect_to view_student_teams_path student_id: @student.id
+        return
+      end
     end
     check_team_before_invitation
   end

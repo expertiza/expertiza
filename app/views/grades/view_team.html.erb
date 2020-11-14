@@ -103,22 +103,11 @@
               <% vm.list_of_reviews.each do |review| %>
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
-                    
-                    <!-- Add an icon to identify if this review was done by TA/instructor -->
-                    <% if ReviewResponseMap.done_by_staff_participant?(review) %>
-                        <th class="sorter-false"> <img data-toggle="tooltip" data-placement="right" title="Icon indicates this review was done by course staff" class="img_icon" src="/assets/staff.png"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s  %></a> </th>
-                    <% else %>
-                        <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>  </th>
-                    <% end %>
+                    <%= render :partial => 'show_name_and_icon', :locals => {review: review, i: i} %>
+
                   <% else %>
-                      <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
-                    
-                     <!-- Add an icon to identify if this review was done by TA/instructor -->
-                    <% if done_by_staff_participant?(review) %>
-                      <th class="sorter-false"> <img data-toggle="tooltip" data-placement="right" title="Icon indicates this review was done by course staff" class="img_icon" src="/assets/staff.png"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s  %></a> </th>
-                    <% else %>
-                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>  </th>
-                    <% end %>
+                    <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
+                    <%= render :partial => 'show_name_and_icon', :locals => {review: review, i: i} %>
                   <% end %>
                   <% i += 1 %>
               <% end %>

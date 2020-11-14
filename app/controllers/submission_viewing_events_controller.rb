@@ -66,7 +66,14 @@ class SubmissionViewingEventsController < ApplicationController
       if submissionviewingevent_entry.end_at.nil?
         @link_array.push(submissionviewingevent_entry.link)
         submissionviewingevent_entry.end_at = data[:end_at]
+
+        to_find = submissionviewingevent_entry.to_h()
+        search = {map_id: to_find[:map_id], round: to_find[:round], link: to_find[:link]}
+        if(!SubmissionViewingEvent.where(search).empty?)
+          SubmissionViewingEvent.where(search).update_all(end_at: data[:end_at])
+        else 
         store.hard_save(submissionviewingevent_entry)
+        end
         store.remove(submissionviewingevent_entry)
       end
     end

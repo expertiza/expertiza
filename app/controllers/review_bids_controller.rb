@@ -1,6 +1,7 @@
 # TODO 
 # Bidding data - 
-
+# Routing to bidding vs routing to reviewing. 
+# clean up code,ie remove unused variables, refactor some code,or some things, remove unecessary methods
 class ReviewBidsController < ApplicationController
   require "json"
   require "uri"
@@ -10,7 +11,7 @@ class ReviewBidsController < ApplicationController
   #action allowed function checks the action allowed based on the user working
   def action_allowed?
     case params[:action]
-    when 'show', 'review_bid', 'set_priority'
+    when 'show', 'review_bid', 'set_priority', 'index'
       ['Instructor',
        'Teaching Assistant',
        'Administrator',
@@ -26,12 +27,41 @@ class ReviewBidsController < ApplicationController
   end  
 
   # GET /review_bids
-  def index
-    @review_bids = ReviewBid.all
+  def index #TODO: remove unused variables. 
+    # @participant = AssignmentParticipant.find(params[:id].to_i)
+    # @assignment = @participant.assignment
+    # @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
+    @participant = AssignmentParticipant.find(params[:id])
+    return unless current_user_id?(@participant.user_id)
+
+    @assignment = @participant.assignment
+    # Finding the current phase that we are in
+    due_dates = AssignmentDueDate.where(parent_id: @assignment.id)
+    @very_last_due_date = AssignmentDueDate.where(parent_id: @assignment.id).order("due_at DESC").limit(1)
+    next_due_date = @very_last_due_date[0]
+    for due_date in due_dates
+      if due_date.due_at > Time.now
+        next_due_date = due_date if due_date.due_at < next_due_date.due_at
+      end
+    end
+
+    @review_phase = next_due_date.deadline_type_id
+    if next_due_date.review_of_review_allowed_id == DeadlineRight::LATE or next_due_date.review_of_review_allowed_id == DeadlineRight::OK
+      @can_view_metareview = true if @review_phase == DeadlineType.find_by(name: "metareview").id
+    end
+
+    @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
+    @review_of_review_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
+
+	@num_reviews_completed = 0
+    @review_mappings.each do |map|
+      @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
+    end
+    render 'review_bids/others_work'
   end
 
   # GET /review_bids/1
-  def show
+  def show 
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
@@ -55,17 +85,7 @@ class ReviewBidsController < ApplicationController
     selected_topics = []
     ReviewResponseMap.where({:reviewed_object_id => @assignment.id, :reviewer_id => @participant.id}).each do |review_map|
       @assigned_review_maps << review_map
-    end
-    
-
-
-    #if !@assigned_topics.nil?
-    #  selected_topics = []
-    #  @assigned_topics.each do |review_topic|
-    #    selected_topics << SignedUpTopic.find_by(assignment_id: review_topic.reviewed_object_id)
-    #  end
-    #  @selected_topics = selected_topics
-    #end
+	  end
   end
   
   def set_priority
@@ -115,17 +135,14 @@ class ReviewBidsController < ApplicationController
 
   # assign bidding topics to reviewers
   def assign_bidding
-    #parameters for running bidding algorithm
-      #participant = AssignmentParticipant.find(params[:id].to_i)
-      participant = AssignmentParticipant.find(40764)
-      assignment_id = participant.assignment
-      @assignment_id = assignment_id.id
-      reviewers = ReviewBid.reviewers(assignment_id) # TODO (maybe finished) create to get list of reviewers
-      bidding_data = ReviewBid.get_bidding_data(assignment_id,reviewers) # TODO create this function with info we want for WebService
-    #runs algorithm and assigns reviews
+      assignment_id = params[:assignment_id]
+      reviewers = ReviewBid.reviewers(assignment_id) 
+      bidding_data = ReviewBid.get_bidding_data(assignment_id,reviewers) 
+      
+      #runs algorithm and assigns reviews
       matched_topics = run_bidding_algorithm(bidding_data)
       #render 'review_bids/assign_bidding'
-      ReviewBid.assign_review_topics(@assignment_id,reviewers,matched_topics) # TODO create to assign the return matching reviews to students
+      ReviewBid.assign_review_topics(assignment_id,reviewers,matched_topics) 
       Assignment.find(assignment_id).update(can_choose_topic_to_review: false)  #turns off bidding for students
       redirect_to :back
 

@@ -30,8 +30,10 @@ class ReviewBid < ActiveRecord::Base
   def self.assign_review_topics(assignment_id,reviewers,matched_topics,min_num_reviews=2)
     reviewers.each do |reviewer|
       topics_to_assign = matched_topics[reviewer.to_s]
-      (1..min_num_reviews).each do |i|
-        assign_topic_to_reviewer(assignment_id,reviewer,topics_to_assign[i])
+      puts("REVIEWER: ", reviewer)
+      puts("MATCHED TOPICS: ", topics_to_assign)
+      topics_to_assign.each do |topic|
+        assign_topic_to_reviewer(assignment_id,reviewer,topic)
       end
     end
   end 
@@ -40,6 +42,7 @@ class ReviewBid < ActiveRecord::Base
   def self.assign_topic_to_reviewer(assignment_id,reviewer,topic)
     team_to_review = SignedUpTeam.where(topic_id: topic).pluck(:team_id).first
     team_to_review.nil? ? [] : ReviewResponseMap.create({:reviewed_object_id => assignment_id, :reviewer_id => reviewer, :reviewee_id => team_to_review, :type => "ReviewResponseMap"})
+    # puts("ASSIGNED TOPICS": ReviewResponseMap.where(reviewed_object_id: assignment_id, ))
   end
 
 

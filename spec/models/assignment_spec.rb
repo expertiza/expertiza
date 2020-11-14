@@ -154,6 +154,7 @@ describe Assignment do
           "name: \"no team\", parent_id: 1, type: \"AssignmentTeam\", comments_for_advertisement: nil, advertise_for_partner: nil, "\
           "submitted_hyperlinks: \"---\\n- https://www.expertiza.ncsu.edu\", directory_num: 0, grade_for_submission: nil, "\
           "comment_for_submission: nil>, :scores=>{:max=>95, :min=>88, :avg=>90.0}}}}")
+        expect(assignment.varying_rubrics_by_round?).to be true
       end
     end
 

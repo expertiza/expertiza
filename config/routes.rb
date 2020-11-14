@@ -514,6 +514,7 @@ resources :institution, except: [:destroy] do
     end
   end
 
+  resources :conference
   root to: 'content_pages#view', page_name: 'home'
   post :login, to: 'auth#login'
   post :logout, to: 'auth#logout'

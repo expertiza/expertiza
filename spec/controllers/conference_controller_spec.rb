@@ -23,6 +23,56 @@ describe ConferenceController do
       stub_current_user(instructor, instructor.role.name, instructor.role)
     end
 
+    context "#new" do
+        it 'saves successfully for logged in user as Author' do
+            params = {assignment_id:2}
+            session = {user: student1}
+            stub_current_user(student1, student1.role.name, student1.role)
+            allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)
+            allow(AssignmentParticipant).to receive(:create).with(any_args).and_return(participant)
+            post :new, params,session
+            expect(flash[:success]).to eq "You are added as an Author for assignment final2"
+            expect(response).to redirect_to('http://test.host/student_task/list')
+        end
+    end
+
+    context "#create" do
+        before(:each) do
+            allow(User).to receive(:find).with(3).and_return(admin)
+        end
+
+        it 'save successfully for new Author' do
+            params = {
+                user: {name: 'lily',
+                       role_id: 2,
+                       email: 'chenzy@gmail.com',
+                       assignment: '2'
+                       }
+            }
+            allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)
+            allow(Assignment).to receive(:find).with('2').and_return(assignment1)
+            allow(User).to receive(:find).with(1).and_return(instructor1)
+            post :create, params
+            expect(flash[:success]).to eq "You are added as an Author for assignment final2"
+        end
+
+        it 'save successfully for existing user as Author' do
+            params = {
+                user: {name: 'lily',
+                        assignment: '2'
+                }
+            }
+            allow(User).to receive(:find_by).with(name: 'lily').and_return(student1)
+            allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)
+            allow(Assignment).to receive(:find).with('2').and_return(assignment1)
+            allow(AssignmentParticipant).to receive(:create).with(any_args).and_return(participant)
+            allow(User).to receive(:find).with(1).and_return(instructor1)
+            post :create, params
+            expect(flash[:success]).to eq "You are added as an Author for assignment final2"
+        end
+
+    end
+
     context 'Author/Co-Author login with captcha' do
         it 'should login with correct recaptcha' do
         #   ConferenceController.any_instance.expects(:verify_recaptcha).returns(true)

@@ -78,9 +78,7 @@ describe Assignment do
       it 'should return true' do
         assignment_questionnaire1.used_in_round = 2
         assignment_questionnaire2.used_in_round = 2
-        assignment_questionnaire1.save!
-        assignment_questionnaire2.save!
-        #allow(AssignmentQuestionnaire).to receive(:where).and_return([assignment_questionnaire1, assignment_questionnaire2])
+        allow(AssignmentQuestionnaire).to receive(:where).and_return([assignment_questionnaire1, assignment_questionnaire2])
         expect(assignment.varying_rubrics_by_round?).to be true
       end
     end
@@ -89,9 +87,7 @@ describe Assignment do
       it 'should return false' do
         assignment_questionnaire1.used_in_round = 2
         assignment_questionnaire2.used_in_round = 1
-        assignment_questionnaire1.save!
-        assignment_questionnaire2.save!
-        #allow(AssignmentQuestionnaire).to receive(:where).and_return([assignment_questionnaire1])
+        allow(AssignmentQuestionnaire).to receive(:where).and_return([assignment_questionnaire1])
         expect(assignment.varying_rubrics_by_round?).to be false
       end
     end

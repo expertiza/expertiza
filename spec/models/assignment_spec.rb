@@ -78,7 +78,7 @@ describe Assignment do
       it 'should return true' do
         assignment_questionnaire1.used_in_round = 2
         assignment_questionnaire2.used_in_round = 2
-        expect(assignment.vary_rubrics_by_round?).to be true
+        expect(assignment.varying_rubrics_by_round?).to be true
       end
     end
 
@@ -86,7 +86,7 @@ describe Assignment do
       it 'should return false' do
         assignment_questionnaire1.used_in_round = 2
         assignment_questionnaire2.used_in_round = 1
-        expect(assignment.vary_rubrics_by_round?).to be false
+        expect(assignment.varying_rubrics_by_round?).to be false
       end
     end
   end

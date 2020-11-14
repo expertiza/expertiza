@@ -72,6 +72,23 @@ describe InvitationsController do
       session = {user: student1}
       expect{post :create, params, session}.to change(Invitation, :count).by(1).and change(User, :count).by(1)
     end
+
+    it 'invitation not added for new user if enetered email has incorrect format' do
+      params = {
+          user: {name: 'testuser',
+                parent_id: 1,
+                institution_id: 1},
+          student_id: 1,
+          team_id: 1
+      }
+      allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
+      allow(Assignment).to receive(:find).with(1).and_return(assignment)
+      allow(TeamsUser).to receive(:find).with("1").and_return(teamUser)
+      allow(Team).to receive(:find).with("1").and_return(team)
+      session = {user: student1}
+      expect{post :create, params, session}.to change(Invitation, :count).by(0).and change(User, :count).by(0)
+    end
+
     it 'invitation and user not added for new user with normal assignment' do
       params = {
           user: {name: 'testuser@gmail.com',

@@ -3,7 +3,9 @@
 
 class ReviewBidsController < ApplicationController
   require "json"
+  require "uri"
   require "net/http"
+  require "rest_client"
 
   #action allowed function checks the action allowed based on the user working
   def action_allowed?
@@ -99,16 +101,18 @@ class ReviewBidsController < ApplicationController
   # assign bidding topics to reviewers
   def assign_bidding
     #parameters for running bidding algorithm
-      participant = AssignmentParticipant.find(params[:id].to_i)
+      #participant = AssignmentParticipant.find(params[:id].to_i)
+      participant = AssignmentParticipant.find(40764)
       assignment_id = participant.assignment
       reviewers = ReviewBid.reviewers(assignment_id) # TODO (maybe finished) create to get list of reviewers
-      bidding_data = ReviewBid.get_bidding_data(assignment_id,reviewers) # TODO create this function with info we want for WebService
-  
+      @bidding_data = ReviewBid.get_bidding_data(assignment_id,reviewers) # TODO create this function with info we want for WebService
+      #@bidding_data = @bidding_data.to_json
     #runs algorithm and assigns reviews
-      matched_topics = run_bidding_algorithm(bidding_data) # TODO already started, add WebServices URL when its available
-      ReviewBid.assign_review_topics(assignment_id,reviewers,matched_topics) # TODO create to assign the return matching reviews to students
-      Assignment.find(assignment_id).update(can_choose_topic_to_review: false)  #turns off bidding for students
-      redirect_to :back
+      @matched_topics = run_bidding_algorithm(@bidding_data)
+      render 'review_bids/assign_bidding'
+      #ReviewBid.assign_review_topics(assignment_id,reviewers,matched_topics) # TODO create to assign the return matching reviews to students
+      #Assignment.find(assignment_id).update(can_choose_topic_to_review: false)  #turns off bidding for students
+      #redirect_to :back
     end
 
   # call webserver for running assigning algorthim
@@ -117,12 +121,9 @@ class ReviewBidsController < ApplicationController
   # returns matched assignments as json body
   def run_bidding_algorithm(bidding_data)
     # begin
-      uri = URI.parse(WEBSERVICE_CONFIG["review_bidding_webservice_url"])
-      http = Net::HTTP.new(uri.host, uri.port)
-      request = Net::HTTP::Post.new(uri.path, {'Content-Type' => 'application/json'})
-      http.use_ssl = true
-      request.body = bidding_data.to_json
-      response = http.request(request)
+      url = WEBSERVICE_CONFIG["review_bidding_webservice_url"] #won't work unless ENV variables are configured
+      url = 'https://app-csc517.herokuapp.com/match_topics' #hard coding for the time being
+      response = RestClient.post url, bidding_data.to_json, content_type: 'application/json', accept: :json
       return JSON.parse(response.body)
     rescue StandardError
       return false

@@ -129,7 +129,7 @@ class User < ActiveRecord::Base
   # Function which has a MailerHelper which sends the mail welcome email to the user after signing up
   def email_welcome
     #this will send an account creation notification to user via email.
-    # MailerHelper.send_mail_to_user(self, "Your Expertiza account and password has been created", "user_welcome", password).deliver_now
+    MailerHelper.send_mail_to_user(self, "Your Expertiza account and password has been created", "user_welcome", password).deliver_now
   end
 
   def valid_password?(password)

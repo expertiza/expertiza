@@ -73,6 +73,24 @@ describe Assignment do
     end
   end
 
+  describe '#vary_rubrics_by_round?' do
+    context 'when rubrics varies over rounds' do
+      it 'should return true' do
+        assignment_questionnaire1.used_in_round = 2
+        assignment_questionnaire2.used_in_round = 2
+        expect(assignment.vary_rubrics_by_round?).to be true
+      end
+    end
+
+    context 'when rubrics do not vary over rounds' do
+      it 'should return false' do
+        assignment_questionnaire1.used_in_round = 2
+        assignment_questionnaire2.used_in_round = 1
+        expect(assignment.vary_rubrics_by_round?).to be false
+      end
+    end
+  end
+
   describe '#valid_num_review' do
     context 'when num_reviews_allowed is not -1 and num_reviews_allowed is less than num_reviews_required' do
       it 'adds an error message to current assignment object' do

@@ -409,7 +409,7 @@ describe User do
       User.export(@csv, nil, 'role' => 'true', 'parent' => 'true')
       expect(@csv).to eq([%w[Student Instructor]])
     end
-    get_user_list
+    
     it 'exports only email_options' do
       @csv = []
       User.export(@csv, nil, 'email_options' => 'true')

@@ -111,7 +111,8 @@ class ReviewBidsController < ApplicationController
   def assign_bidding
       # sets parameters used for running bidding algorithm
       assignment_id = params[:assignment_id]
-      reviewers = ReviewBid.reviewers(assignment_id) 
+      # list of reviewers from a specific assignment
+      reviewers = AssignmentParticipant.where(parent_id: assignment_id).ids
       bidding_data = ReviewBid.get_bidding_data(assignment_id,reviewers) 
       
       #runs algorithm and assigns reviews

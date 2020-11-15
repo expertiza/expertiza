@@ -9,6 +9,7 @@ describe ReportsController do
   let(:participant1) { double('AssignmentParticipant', id: 2, can_review: true, user: double('User', id: 2)) }
   let(:role) { double('Role', id: 2) }
   let(:user) { double('User', id: 3, role: role) }
+  let(:user1) { double('User', id: 1, role: role) }
   let(:participant2) { double('AssignmentParticipant', id: 3, can_review: true, user: user) }
   let(:team) { double('AssignmentTeam', name: 'no one') }
   let(:team1) { double('AssignmentTeam', name: 'no one1') }
@@ -99,7 +100,7 @@ describe ReportsController do
       @reviewee_id = 1
     end
     it 'returns reviewers name from Answer by reviewee and assignment id from db which is not empty' do
-      expect(allow(User).to receive(:where).with(@reviewee_id, @assignment_id).and_return([test])).not_to be_empty
+      expect(allow(User).to receive(:where).with(@reviewee_id, @assignment_id).and_return([user1])).not_to be_empty
     end
   end
 

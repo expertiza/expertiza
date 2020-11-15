@@ -16,12 +16,12 @@
         <%end%>
 
         <% current_round = @assignment.number_of_current_round(topic_id) %>
-        <% if reviewer_flag == 'Student' %>
+        <% if reviewer_role == 'Student' %>
             <td>&nbsp;</td>
             <td>
                 <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
             </td>
-        <%elsif reviewer_flag == 'Staff' %>
+        <%elsif reviewer_role == 'Staff' %>
             <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
         <% end %>
 
@@ -29,7 +29,7 @@
           <%- # show the link as 'Edit' when latest review is done in current round -%>
           <%- # show link as 'Update' when latest review is done in different round or there has been a new submission in current round -%>
           <% if last_response_round == current_round%>
-            <% if reviewer_flag == 'Student' %>
+            <% if reviewer_role == 'Student' %>
                 <td>
               <%- # If review is not submitted (is still being edited), show an 'Edit' link. -%>
               <% if ! @latest_response.is_submitted %>
@@ -40,7 +40,7 @@
                   <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
               <%end%>
                 </td>
-            <%elsif reviewer_flag == 'Staff' %>
+            <%elsif reviewer_role == 'Staff' %>
                 <%- # If review is not submitted (is still being edited), show an 'Edit' link. -%>
               <% if ! @latest_response.is_submitted %>
                   <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id, :return => "ta_review" } %>
@@ -51,28 +51,28 @@
               <%end%>
             <% end %>
           <% else %>
-            <% if reviewer_flag == 'Student' %>
+            <% if reviewer_role == 'Student' %>
                 <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
-            <%elsif reviewer_flag == 'Staff'%>
+            <%elsif reviewer_role == 'Staff'%>
                 <%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id, :return => "ta_review" } %>
             <%end%>
           <% end %>
         <% end %>
-        <% if reviewer_flag == 'Student' %>
+        <% if reviewer_role == 'Student' %>
             <td><%= "  -- latest update at #{@latest_response.updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p")}" %></td>
         <% end %>
     <% end %>
 <% elsif @assignment.get_current_stage(topic_id) != "Finished" && @assignment.can_review(topic_id) && latest_submission%>
-        <% if reviewer_flag == 'Student' %>
+        <% if reviewer_role == 'Student' %>
         <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
         <td>&nbsp;&nbsp;</td>
-        <%elsif reviewer_flag == 'Staff'%>
+        <%elsif reviewer_role == 'Staff'%>
             <%= link_to 'Begin review', { controller: 'response', action: 'new', :id => map.id, :return => "ta_review" } %><br>
         <% end %>
 
     <%- # If the team being reviewed has not submitted yet -%>
 <% else %>
-    <% if reviewer_flag == 'Student' %>
+    <% if reviewer_role == 'Student' %>
         <td> Work has not yet been submitted for Review
         <%= review_no  %></td>
     <% end %>

@@ -19,8 +19,6 @@
 
     <tbody>
 
-    <%@l = -1 %>
-
     <% @authors.each do |rejoinder| %>
       <% next unless rejoinder %>
       <% if @assignment.vary_by_round %>
@@ -78,8 +76,6 @@
           <% @rspan_certain_round = instance_variable_get("@rspan_round_#{round}") %>
           <% @count_certain_round = instance_variable_get("@count_round_#{round}") %>
           <% unless @rspan_certain_round == 0 %>
-            <% @l = @l+1 %>
-            <%# (@l % 2 == 0) ? @bgcolor = "#ffffff" : @bgcolor = "#f9f9f9" %>
             <td bgcolor="#ffffff"  align="left" rowspan= <%= @rspan_certain_round %>>
               <%= @count_certain_round %>/<%= @rspan_certain_round %></td>
           <% end %>
@@ -126,8 +122,6 @@
         <!-- if assignment does not vary by round, prepare data: -->
           <% @count = 0 %>
           <% @feedback_response_maps.each {|rm| @count += 1 if Response.exists? map_id: rm.id} %>
-          <% @l = @l+1 %>
-          <% (@l % 2 == 0) ? @bgcolor = "#ffffff" : @bgcolor = "#f9f9f9" %>
           <!--Rejoinder-->
            <%row_span= @assignment.varying_rubrics_by_round? ? (@rspan_round_one.to_i + @rspan_round_two.to_i + @rspan_round_three.to_i) : @rspan.to_i %>
            <% if row_span == 0 %>

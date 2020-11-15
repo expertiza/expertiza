@@ -12,6 +12,7 @@ describe ReportsController do
   let(:participant2) { double('AssignmentParticipant', id: 3, can_review: true, user: user) }
   let(:team) { double('AssignmentTeam', name: 'no one') }
   let(:team1) { double('AssignmentTeam', name: 'no one1') }
+  let(:test) { double('AssignmentTeam', id: 1) }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -80,7 +81,7 @@ describe ReportsController do
     describe '#review_conflict_response_map' do
     context 'when type is ReviewConflictResponseMap' do
       it 'renders response_report page with corresponding data' do
-        allow(Team).to receive(:where).with(parent_id: '1').and_return([integer('id')]).ordered
+        allow(Team).to receive(:where).with(parent_id: '1').and_return([test]).ordered
         params = {
             id: 1,
             report: {type: 'ReviewConflictResponseMap'},
@@ -98,7 +99,7 @@ describe ReportsController do
       @reviewee_id = 1
     end
     it 'returns reviewers name from Answer by reviewee and assignment id from db which is not empty' do
-      expect(allow(User).to receive(:where).with(@reviewee_id, @assignment_id).and_return([integer('id')])).not_to be_empty
+      expect(allow(User).to receive(:where).with(@reviewee_id, @assignment_id).and_return([test])).not_to be_empty
     end
   end
 

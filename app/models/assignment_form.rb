@@ -1,4 +1,5 @@
 require 'active_support/time_with_zone'
+require 'fileutils'
 
 class AssignmentForm
   attr_accessor :assignment, :assignment_questionnaires, :due_dates, :tag_prompt_deployments
@@ -493,6 +494,17 @@ class AssignmentForm
           end
         end
         count+=1
+      end
+    end
+    old_directory_name = old_assign.directory_path
+    directory_path_name = "pg_data/instructor6/"+old_directory_name
+    if File.exists?(directory_path_name)
+      directory_name = new_assign.directory_path
+      directory = "pg_data/instructor6/"+directory_name
+      Dir.mkdir(directory) unless File.exists?(directory)
+      my_dir = Dir[directory_path_name+'/*']
+      my_dir.each do |filename|
+        FileUtils.cp(filename, directory+'/')
       end
     end
 

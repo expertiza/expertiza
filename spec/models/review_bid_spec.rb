@@ -27,13 +27,8 @@ describe ReviewBid  do
   end
 
   describe 'bidding_data validation' do
-    it 'validates get reviewers method if it returns an array' do
-      test_reviewers = ReviewBid.reviewers(bid2.assignment_id)
-      expect(test_reviewers).to be_an_instance_of(Array)
-    end
-
     it 'checks if get_bidding_data returns bidding_data as a hash' do
-      test_reviewers = ReviewBid.reviewers(bid1.assignment_id)
+      test_reviewers = []
       expect(ReviewBid.get_bidding_data(bid1.assignment_id,test_reviewers)).to be_a_kind_of(Hash)
     end
   end

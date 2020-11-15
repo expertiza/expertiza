@@ -79,8 +79,8 @@
           <% @count_certain_round = instance_variable_get("@count_round_#{round}") %>
           <% unless @rspan_certain_round == 0 %>
             <% @l = @l+1 %>
-            <% (@l % 2 == 0) ? @bgcolor = "#ffffff" : @bgcolor = "#f9f9f9" %>
-            <td bgcolor=<%= @bgcolor %>  align="left" rowspan= <%= @rspan_certain_round %>>
+            <%# (@l % 2 == 0) ? @bgcolor = "#ffffff" : @bgcolor = "#f9f9f9" %>
+            <td bgcolor="#ffffff"  align="left" rowspan= <%= @rspan_certain_round %>>
               <%= @count_certain_round %>/<%= @rspan_certain_round %></td>
           <% end %>
 
@@ -91,33 +91,33 @@
 
             <% if @frm.blank? %>
               <!--Review response rejoined-->
-              <td id = "green" bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left' colspan=1>
+              <td id = "green" bgcolor="#ffffff" style="color:#A90201" align = 'left' colspan=1>
                 <%= link_to user_name = Participant.find(review_response.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user_name}), :method => :post, :title => "Click here to impersonate this user" %>
                 (<%= Participant.find(review_response.response_map.reviewer_id).user.fullname(session[:ip]) %>)
               </td>
               <!--Last rejoined at-->
-              <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
+              <td bgcolor="#ffffff" style="color:#A90201" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
             <% else %>
               <% @reviewee_name = Participant.find(@frm.reviewee_id).user.fullname(session[:ip]) %>
               <% if Response.exists?(map_id: @frm.id) %>
                 <% feedback_response = Response.where(map_id: @frm.id).first %>
                 <!--Review response rejoined-->
-                <td id = "green" bgcolor=<%= @bgcolor %> align='left' colspan=1>
+                <td id = "green" bgcolor="#ffffff" align='left' colspan=1>
                   <%= link_to user_name = Participant.find(review_response.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user_name}), :method => :post, :title => "Click here to impersonate this user" %>
                   (<%= link_to @reviewee_name, :controller => 'popup', :action => 'author_feedback_popup', :response_id => feedback_response.id, :reviewee_id => @frm.reviewee_id, :source => 'author_feedback' %>)
                 </td>
                 <!--Last rejoined at-->
-                <td bgcolor=<%= @bgcolor %> align='left'>
+                <td bgcolor="#ffffff" align='left'>
                   <%= feedback_response.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
                 </td></tr><tr class="tablesorter-childRow">
               <% else %>
                 <!--Review response rejoined-->
-                <td id = "green" bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left' colspan=1>
+                <td id = "green" bgcolor="#ffffff" style="color:#A90201" align = 'left' colspan=1>
                   <%= link_to user_name = Participant.find(review_response.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user_name}), :method => :post, :title => "Click here to impersonate this user" %>
                   (<%= @reviewee_name %>)
                 </td>
                 <!--Last rejoined at-->
-                <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
+                <td bgcolor="#ffffff" style="color:#A90201" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
               <% end %>
             <% end %>
           <% end %>
@@ -131,7 +131,7 @@
           <!--Rejoinder-->
            <%row_span= @assignment.varying_rubrics_by_round? ? (@rspan_round_one.to_i + @rspan_round_two.to_i + @rspan_round_three.to_i) : @rspan.to_i %>
            <% if row_span == 0 %>
-            <tr><td bgcolor=<%= @bgcolor %> rowspan=  <%1%>>
+            <tr><td bgcolor="#ffffff" rowspan=  <%1%>>
               <% @reviewer_name = rejoinder.user.fullname(session[:ip]) %>
               <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => rejoinder.id, :assignment_id => @id %>
             </td>
@@ -139,7 +139,7 @@
             <td></td>
             <td></td>
             <%else %>
-           <tr><td bgcolor=<%= @bgcolor %> rowspan= <%= @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>>
+           <tr><td bgcolor="#ffffff" rowspan= <%= @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>>
               <% @reviewer_name = rejoinder.user.fullname(session[:ip]) %>
               <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => rejoinder.id, :assignment_id => @id %>
             </td>
@@ -147,7 +147,7 @@
 
           <!--# author feedbacks done-->
           <% unless @rspan == 0 %>
-            <td bgcolor=<%= @bgcolor %>  align="left" rowspan= <%= @rspan %>>
+            <td bgcolor="#ffffff"  align="left" rowspan= <%= @rspan %>>
               <%= @count %>/<%= @rspan %>
             </td>
           <% end %>
@@ -157,33 +157,33 @@
 
             <% if @frm.blank? %>
               <!--Review response rejoined-->
-              <td id = "green" bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left' colspan=1>
+              <td id = "green" bgcolor="#ffffff" style="color:#A90201" align = 'left' colspan=1>
                 <%= link_to user_name = Participant.find(review_response.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user_name}), :method => :post, :title => "Click here to impersonate this user" %>
                 (<%= reviewee_name = Participant.find(review_response.response_map.reviewer_id).user.fullname(session[:ip]) %>)
               </td>
               <!--Last rejoined at-->
-              <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
+              <td bgcolor="#ffffff" style="color:#A90201" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
             <% else %>
               <% @reviewee_name = Participant.find(@frm.reviewee_id).user.fullname(session[:ip]) %>
               <% if Response.exists?(map_id: @frm.id) %>
                 <% feedback_response = Response.where(map_id: @frm.id).first %>
                 <!--Review response rejoined-->
-                <td id = "green" bgcolor=<%= @bgcolor %> align='left' colspan=1>
+                <td id = "green" bgcolor="#ffffff" align='left' colspan=1>
                   <%= link_to user_name = Participant.find(review_response.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user_name}), :method => :post, :title => "Click here to impersonate this user"%>
                   (<%= link_to @reviewee_name, :controller => 'popup', :action => 'author_feedback_popup', :response_id => feedback_response.id, :reviewee_id => @frm.reviewee_id, :source => 'author_feedback' %>)
                 </td>
                 <!--Last rejoined at-->
-                <td bgcolor=<%= @bgcolor %> align='left'>
+                <td bgcolor="#ffffff" align='left'>
                   <%= feedback_response.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
                 </td></tr><tr class="tablesorter-childRow">
               <% else %>
                 <!--Review response rejoined-->
-                <td id = "green" bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left' colspan=1>
+                <td id = "green" bgcolor="#ffffff" style="color:#A90201" align = 'left' colspan=1>
                   <%= link_to user_name = Participant.find(review_response.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user_name}), :method => :post, :title => "Click here to impersonate this user" %>
                   (<%= @reviewee_name %>)
                 </td>
                 <!--Last rejoined at-->
-                <td bgcolor=<%= @bgcolor %> style="color:#A90201" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
+                <td bgcolor="#ffffff" style="color:#A90201" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
               <% end %>
             <% end %>
           <% end %>

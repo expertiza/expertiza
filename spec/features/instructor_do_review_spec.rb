@@ -3,13 +3,15 @@ describe "check 'Begin review' showing up before due date and 'Assign grade' aft
 
   it "Begin review" do
     instructor6 = create(:instructor)   #create instructor6
-    assignment_test = create(:assignment, name: 'E1968', course: nil) #create an assignment without course
+    assignment_test = create(:assignment, name: 'E2086', course: nil) #create an assignment without course
     create(:deadline_type, name: "submission")
     create(:deadline_type, name: "review")
-    create(:assignment_due_date, deadline_type: DeadlineType.where(name: "submission").first, due_at: DateTime.now.in_time_zone - 10.day)
-    create(:assignment_due_date, deadline_type: DeadlineType.where(name: "review").first, due_at: DateTime.now.in_time_zone + 20.day)
+    create(:deadline_type, name: "team_formation")
+    create(:assignment_due_date, deadline_type: DeadlineType.where(name: "submission").first, due_at: DateTime.now.in_time_zone .day)
+    create(:assignment_due_date, deadline_type: DeadlineType.where(name: "review").first, due_at: DateTime.now.in_time_zone + 10.day)
+    create(:assignment_due_date, deadline_type: DeadlineType.where(name: "team_formation").first, due_at: DateTime.now.in_time_zone .day)
 
-    create(:questionnaire, name: "TestQuestionnaire1")
+    questionnaire1 = create(:questionnaire, name: "TestQuestionnaire1")
     create(:questionnaire, name: "TestQuestionnaire2")
     create(:question, txt: "Question1", questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire1').first)
     create(:question, txt: "Question2", questionnaire: ReviewQuestionnaire.where(name: 'TestQuestionnaire2').first)
@@ -27,8 +29,9 @@ describe "check 'Begin review' showing up before due date and 'Assign grade' aft
     expect(current_path).to eql("/tree_display/list")
     expect(page).to have_content('Manage content')
 
+
     visit("/participants/list?id=#{assignment_test.id}&model=Assignment")
-    expect(page).to have_content("E1968")
+    expect(page).to have_content("E2086")
     fill_in("user_name", match: :first, with: instructor6.name)
     click_button("Add", match: :first)
     expect(page).to have_content(instructor6.name)
@@ -36,7 +39,7 @@ describe "check 'Begin review' showing up before due date and 'Assign grade' aft
     click_button("Submit", match: :first)
 
     visit("/participants/list?id=#{assignment_test.id}&model=Assignment")
-    expect(page).to have_content("E1968")
+    expect(page).to have_content("E2086")
     fill_in("user_name", match: :first, with: student_test.name)
     click_button("Add", match: :first)
     expect(page).to have_content(student_test.name)
@@ -50,15 +53,20 @@ describe "check 'Begin review' showing up before due date and 'Assign grade' aft
     team_user = create(:team_user, user_id: user_id)
 
     visit("/assignments/list_submissions?id=#{assignment_test.id}")
+    expect(page).to have_content("student6666")
     expect(page).to have_content("https://www.expertiza.ncsu.edu")
-    expect(page).to have_link('Begin review', exact:true)
 
-    click_link("Begin review")
-    expect(page).to have_content("E1968")
+    visit("/response/new?id=#{questionnaire1.id}&return=ta_review")
+    expect(page).to have_content("E2086")
 
     fill_in "responses[0][comment]", with: "Excellent Work"
     click_button "Submit Review"
     expect(page).to have_content "Your response was successfully saved."
+
+
+    visit("/assignments/list_submissions?id=#{assignment_test.id}")
+    expect(page).to have_content("student6666")
+    expect(page).to have_content("https://www.expertiza.ncsu.edu")
 
     visit('/impersonate/start')
     expect(page).to have_content("Enter user account")
@@ -66,12 +74,13 @@ describe "check 'Begin review' showing up before due date and 'Assign grade' aft
     click_button("Impersonate")
     expect(current_path).to eql("/student_task/list")
     expect(page).to have_content("User: #{student_test.name}")
-    expect(page).to have_content("E1968")
+    expect(page).to have_content("E2086")
+    click_link("E2086")
   end
 
   it "Assign grade" do
     instructor6 = create(:instructor)   #create instructor6
-    assignment_test = create(:assignment, name: 'E1968', course: nil) #create an assignment without course
+    assignment_test = create(:assignment, name: 'E2086', course: nil) #create an assignment without course
     create(:deadline_type, name: "submission")
     create(:deadline_type, name: "review")
     create(:assignment_due_date, deadline_type: DeadlineType.where(name: "submission").first, due_at: DateTime.now.in_time_zone - 10.day)
@@ -96,7 +105,7 @@ describe "check 'Begin review' showing up before due date and 'Assign grade' aft
     expect(page).to have_content('Manage content')
 
     visit("/participants/list?id=#{assignment_test.id}&model=Assignment")
-    expect(page).to have_content("E1968")
+    expect(page).to have_content("E2086")
     fill_in("user_name", match: :first, with: instructor6.name)
     click_button("Add", match: :first)
     expect(page).to have_content(instructor6.name)
@@ -104,7 +113,7 @@ describe "check 'Begin review' showing up before due date and 'Assign grade' aft
     click_button("Submit", match: :first)
 
     visit("/participants/list?id=#{assignment_test.id}&model=Assignment")
-    expect(page).to have_content("E1968")
+    expect(page).to have_content("E2086")
     fill_in("user_name", match: :first, with: student_test.name)
     click_button("Add", match: :first)
     expect(page).to have_content(student_test.name)

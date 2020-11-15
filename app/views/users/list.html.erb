@@ -7,9 +7,7 @@
 <% end %>
 
 <%= form_tag :action => 'list', :paginate_show => '1', :num_users => @per_page do %>
-  <%= label_tag :letter, 'Search users: ' %><%= text_field_tag(:letter,params[:letter]) %>
-<%= select_tag(:search_by, options_for_select([['Username', 1], ['Full name', 2], ['Email', 3]])) %>
-<%= submit_tag("Search") %>
+  <%= render :partial => 'search' %>
 <% end %>
 
 <%= render :partial => 'links' %>
@@ -44,13 +42,12 @@
 </div>
 
 <div style="clear: both;"></div>
+<div style="clear: both;"></div>
 <p>
   <%
       session[:return_to] = "#{request.protocol}#{request.host_with_port}#{request.fullpath}"
     %>
 
-  <%= link_to 'New user',:role => "Student", :action => 'new' %> |
-  <%= link_to 'Import users', :controller=>'import_file', :action=>'start', :model => 'User', :expected_fields => 'username&nbsp;&nbsp;|&nbsp;&nbsp;full name (first [middle] last)&nbsp;&nbsp;|&nbsp;&nbsp;e-mail address' %> |
-  <%= link_to 'Export users', :controller=>'export_file',:action=>'start',:model=> 'User',:id=> 1 %>
+
 
 </p>

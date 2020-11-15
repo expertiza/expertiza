@@ -4,7 +4,7 @@
 
   <script type='text/javascript'>
       $(window).load(function () {
-          $("#myTable tbody").sortable().disableSelection();
+          $("#myTable tbody");
           $("#dialog").dialog({
             autoOpen: false,
             modal: true,
@@ -36,7 +36,7 @@
   <button onclick="exportTableToCSV('review_scores.csv')">Export Review Scores To CSV File</button>
   <br />
   <br />
-  <table id="myTable" class="tbl_heat tablesorter" width="100%" cellspacing='0' cellpadding='2' border='0'>
+  <table id="myTable" class="table table_striped" width="100%" cellspacing='0' cellpadding='2' border='0'>
     <thead>
     <tr bgcolor='#CCCCCC'>
       <!-- class value decides whether the column should be sortable or not  -->

@@ -45,7 +45,7 @@ class VmQuestionResponse
   def add_reviews(participant, team, vary)
     if (@questionnaire_type == "ReviewQuestionnaire" or @questionnaire_type == "RevisionPlanQuestionnaire")
       reviews = if vary
-                  ReviewResponseMap.get_responses_for_team_round(team, @round)
+                  ReviewResponseMap.get_assessments_for(team)
                 else
                   ReviewResponseMap.get_assessments_for(team)
                 end

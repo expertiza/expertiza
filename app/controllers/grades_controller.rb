@@ -34,14 +34,10 @@ class GradesController < ApplicationController
     @assignment = Assignment.find(params[:id])
     questionnaires = @assignment.questionnaires
 
-    if @assignment.vary_by_round
-      @questions = retrieve_questions questionnaires, @assignment.id
-    else
       @questions = {}
       questionnaires.each do |questionnaire|
         @questions[questionnaire.symbol] = questionnaire.questions
       end
-    end
 
     @scores = @assignment.scores(@questions)
     averages = calculate_average_vector(@assignment.scores(@questions))
@@ -98,13 +94,15 @@ class GradesController < ApplicationController
           counter_for_same_rubric = 0
         end
       end
-      vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
-      vmquestions = questionnaire.questions
-      vm.add_questions(vmquestions)
-      vm.add_team_members(@team)
-      vm.add_reviews(@participant, @team, @assignment.vary_by_round)
-      vm.number_of_comments_greater_than_10_words
-      @vmlist << vm
+      unless @assignment.vary_by_round? && @round == nil
+        vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
+        vmquestions = questionnaire.questions
+        vm.add_questions(vmquestions)
+        vm.add_team_members(@team)
+        vm.add_reviews(@participant, @team, @assignment.vary_by_round)
+        vm.number_of_comments_greater_than_10_words
+        @vmlist << vm
+      end
       # Finds RevisionPlanQuestionnaire, if any
       if @assignment.vary_by_round? && @assignment.is_revision_planning_enabled?
         rp_questionnaire = RevisionPlanTeamMap.find_by(team: Team.find(@team_id), used_in_round: counter_for_same_rubric).try(:questionnaire)

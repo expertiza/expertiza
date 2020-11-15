@@ -85,10 +85,10 @@
   var myCircle = Circles.create({
     id:           'final-circle',
     radius:       35,
-    value:        <%= @pscore[:total_score].to_i %>,
+    value:        <%= @pscore[:total_score].to_f %>,
     maxValue:     100,
     width:        15,
-    text:         '<%=@pscore[:total_score].to_i==-1? "N/A":@pscore[:total_score].to_i%>',
+    text:         '<%=@pscore[:total_score].to_f==-1? "N/A":@pscore[:total_score].to_f%>',
     colors:       ['#FFEB99', '#FFCC00'],
     duration:       700,
     textClass:      'circles-final'  

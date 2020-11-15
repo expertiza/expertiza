@@ -85,7 +85,9 @@ module ReviewMappingHelper
     lower_tolerance_limit = (average-(2*std)).round(2)
     question_answer.each do |reviewer,answer|
       scores << ((answer.to_f/review_max_score.to_f)*100).round(2)
+      #change the labels on metrix to be student ID
       labels << reviewers[team_name.to_s][reviewer.to_s].to_s
+      #if the reviews score are having conflict, change to red, otherwise stay in green
       if answer > upper_tolerance_limit or answer < lower_tolerance_limit
         colors << "rgba(255,99,132,0.8)" # green
       else

@@ -1,43 +1,30 @@
 
 <table width="100%" border="0" >
-        <%question_answers = review_score_for_team(@id, team_name) %>
         <% i = 1 %>
-        <% question_answers.each do |question_answer| %>
-                <% average = average_of_round(question_answer) %>
-                <% std = std_of_round(average,question_answer) %>
-                <% upper_tolerance_limit = (average+(2*std)).round(2) %>
-                <% lower_tolerance_limit = (average-(2*std)).round(2) %>
-                <tr>
-                <td width="30%">
-                <div>
-                  <strong>Reviewers with scores</strong><br>
+        <% @statistics[team_name.to_s].each do |stat| %>
+        <%= puts stat%>
+        <tr>
+        <td width="30%">
+        <div>
+            <strong>Reviewers with scores</strong><br>
             <ol>
-            <% question_answer.each do |reviewer, answer| %>
-                <% if answer > upper_tolerance_limit or answer < lower_tolerance_limit  %>
-                        <li><% response_id = response_id_review_conflict(reviewer, @teams[team_name], @id) %>
-                        <mark style="background-color:#FFFF00">
-                        <%= link_to "("+@reviewers[team_name.to_s][reviewer.to_s].to_s+")", :controller => 'popup', :action => 'team_users_popup', :id => @teams[team_name], :id2 => response_id, :assignment_id=>@id %>
-                        <%= list_review_submissions(reviewer, @teams[team_name], response_id) %>
-                        <%= ": " + answer.to_s %></mark>
-                        </li>
-                <% else %>
-                        <li><% response_id = response_id_review_conflict(reviewer, @teams[team_name], @id) %>
-                        <%= link_to "("+@reviewers[team_name.to_s][reviewer.to_s].to_s+")", :controller => 'popup', :action => 'team_users_popup', :id => @teams[team_name], :id2 => response_id, :assignment_id=>@id %>
-                        <%= list_review_submissions(reviewer, @teams[team_name], response_id) %>
-                        <%= ": " + answer.to_s %>
-                        </li>
-                <% end %>
+            <% stat[:question_answer].each do |reviewer, answer| %>
+                <li><% response_id = response_id_review_conflict(reviewer, @teams[team_name], @id) %>
+                <%= link_to "("+@reviewers[team_name.to_s][reviewer.to_s].to_s+")", :controller => 'popup', :action => 'team_users_popup', :id => @teams[team_name], :id2 => response_id, :assignment_id=>@id %>
+                <%= list_review_submissions(reviewer, @teams[team_name], response_id) %>
+                <%= ": " + answer.to_s %>
+                </li>
             <% end %>
             </ol>
             </div>
           <strong>Max Review Score: </strong><%=max_scores[i-1]%><br>
-          <strong>Average Score: </strong><%=  average.to_s %><br>
-          <strong>Standard Deviation: </strong><%=  std.to_s %><br><br>
+          <strong>Average Score: </strong><%=  stat[:average].to_s %><br>
+          <strong>Standard Deviation: </strong><%=  stat[:std].to_s %><br><br>
       </td>
       <td>
-      <div>
+      <div style="text-align:center;">
           <strong><u><%= "Round: " + i.to_s %></u></strong>
-          <%= generate_score_chart(max_scores[i-1], question_answer, @reviewers, team_name) %>
+          <%= generate_score_chart(max_scores[i-1], stat[:question_answer], @reviewers, team_name) %>
       </div>
       </td>
     </tr>

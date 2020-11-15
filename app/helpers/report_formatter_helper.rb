@@ -35,10 +35,92 @@ module ReportFormatterHelper
     teams = Team.select(:id, :name).where(parent_id: @id).order(:name)
     @teams = ({})
     @reviewers = ({})
+    @statistics = ({})
     teams.each do |reviewee|
       @reviewers[reviewee.name] = reviewers_name_id_by_reviewee_and_assignment(reviewee, @id)
       @teams[reviewee.name] = reviewee.id
+      @statistics[reviewee.name] = review_statistics(@id, reviewee.name)
     end
+  end
+
+  # generate statistics for each round
+  def review_statistics(id, team_name)
+    res = []
+    question_answers = review_score_for_team(id, team_name)
+    question_answers.each do |question_answer|
+      round = {}
+      round[:question_answer] = question_answer
+      round[:average] = average_of_round(question_answer)
+      round[:std] = std_of_round(round[:average], question_answer)
+      round[:upper_tolerance_limit] = (round[:average]+(2*round[:std])).round(2)
+      round[:lower_tolerance_limit] = (round[:average]-(2*round[:std])).round(2)
+      res.push(round)
+    end
+    res
+  end
+
+  #Average score of a particular round for Review Conflict Report
+  def average_of_round(question_answer)
+  average=0.0
+  i=0
+  question_answer.each do |reviewer,answer|
+    average+=answer
+    i+=1
+    end
+  if i != 0
+    average=average/i
+  end
+  average.round(2)
+  end
+
+  #Standard Deviation of a particular round for Review Conflict Report
+  def std_of_round(average,question_answer)
+  accum=0.0
+  i=0
+  question_answer.each do |reviewer,answer|
+    accum+=(answer-average)**2
+    i+=1
+  end
+  if i != 0
+    accum=Math.sqrt(accum/i)
+  end 
+  accum.round(2)
+  end
+
+  #Get review score for each round of particular team
+  def review_score_helper_for_team(temp_values)
+    question_answers={}
+    temp_values.each do |temp_value|
+            if question_answers.key?(temp_value[:reviewer_id])
+              if temp_value[:answer].nil?
+                question_answers[temp_value[:reviewer_id]] += 0
+              else
+                question_answers[temp_value[:reviewer_id]] += temp_value[:answer]
+              end
+            else
+              if temp_value[:answer].nil?
+                question_answers[temp_value[:reviewer_id]] = 0
+              else
+                question_answers[temp_value[:reviewer_id]] = temp_value[:answer]
+              end
+            end
+          end
+    question_answers
+    end
+
+  #Get Review scores for all the rounds of a particular team for the Review Conflict Report
+  def review_score_for_team(reviewed_object_id, team_name)
+    question_answers=[]
+    reviewee_id = Team.select(:id).where(name: team_name, parent_id: reviewed_object_id)
+    reviewee_id.each do |reviewee|
+      total_rounds = Assignment.find(reviewed_object_id).rounds_of_reviews
+      question_answers = Array.new(total_rounds)
+      (0..total_rounds-1).each do |round|
+        temp_values = Answer.answers_by_round_for_reviewee(reviewed_object_id, reviewee,round+1)
+        question_answers[round] = review_score_helper_for_team(temp_values)
+      end
+    end
+    question_answers
   end
 
   #Get the reviewers of a particular assignment and particular reviewee for Review Conflict Report

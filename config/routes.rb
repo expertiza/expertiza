@@ -381,6 +381,7 @@ resources :institution, except: [:destroy] do
 
   resources :review_bids do
     collection do
+      post :assign_bidding
       post :set_priority
     end
   end

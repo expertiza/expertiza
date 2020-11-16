@@ -311,15 +311,12 @@ class AssignmentForm
 
   # Copies the inputted assignment into new one and returns the new assignment id
   def self.copy(assignment_id, user)
-    puts assignment_id
     Assignment.record_timestamps = false
     old_assign = Assignment.find(assignment_id)
     new_assign = old_assign.dup
     user.set_instructor(new_assign)
-
     # Set name of new assignment as 'Copy of <old assignment name>'. If it already exists, set it as 'Copy of <old assignment name> (1)'.
     # Repeated till unique name is found.
-
     name_counter = 0
     new_name = 'Copy of ' + new_assign.name
     until Assignment.find_by(name: new_name).nil?
@@ -327,7 +324,6 @@ class AssignmentForm
       name_counter += 1
       new_name += ' (' + name_counter.to_s + ')'
     end
-
     new_assign.update_attribute('name', new_name)
     new_assign.update_attribute('created_at', Time.now)
     new_assign.update_attribute('updated_at', Time.now)
@@ -347,10 +343,8 @@ class AssignmentForm
     else
       new_assign_id = nil
     end
-
     if old_assign.is_calibrated
       @original_values = SubmissionRecord.where(assignment_id: old_assign.id)
-
       @original_values.each do |catt|
         @new_entry = SubmissionRecord.new
         @new_entry.type = catt.type
@@ -361,7 +355,6 @@ class AssignmentForm
         @new_entry.assignment_id = new_assign_id
         @new_entry.save
       end
-
       @original_team_values = Team.where(parent_id: old_assign.id)
       keep_track = []
       @original_team_values.each do |catt|
@@ -387,16 +380,12 @@ class AssignmentForm
           end
         end
       end
-
       @beta = Team.where(parent_id: new_assign_id)
-
       a = []
       @beta.each do |catt|
         a.append(catt.id)
       end
       dict = Hash[keep_track.zip a]
-      puts dict
-
       count = 0
       keep_track.each do |catt|
         @charlie = TeamsUser.where(team_id: catt)
@@ -405,9 +394,7 @@ class AssignmentForm
           @delta.team_id = a[count]
           @delta.user_id = matt.user_id
           @delta.save
-
           @gamma = Participant.where(user_id: matt.user_id, parent_id: old_assign.id)
-
           @gamma.each do |natt|
             @zeta = Participant.new
             @zeta.can_submit = natt.can_submit
@@ -446,13 +433,10 @@ class AssignmentForm
         @updating_participant.duty = @old_entry.duty
         @updating_participant.can_take_quiz = @old_entry.can_take_quiz
         @updating_participant.save
-
         @getparticipant = Participant.where(parent_id: new_assign_id, user_id: @assignment_number1.instructor_id).first
-
         @xenon = ReviewResponseMap.where(reviewed_object_id: old_assign.id) 
         @xenon.each do |satt|
           if dict.key?(satt.reviewee_id)
-            puts satt.reviewee_id
             @iota = ReviewResponseMap.new
             @iota.reviewed_object_id = new_assign_id
             @iota.reviewer_id = @getparticipant.id
@@ -463,21 +447,16 @@ class AssignmentForm
             @iota.save
           end
         end
-
         @xenon = ReviewResponseMap.where(reviewed_object_id: old_assign.id, reviewee_id: catt) 
         @eta =  ReviewResponseMap.where(reviewed_object_id: new_assign_id, reviewee_id: dict[catt])
-
         list1 = []
         list2 = []
-
         @xenon.each do |zatt|
           list1.append(zatt.id)
         end
-
         @eta.each do |zatt|
           list2.append(zatt.id)
         end
-
         dict1 = Hash[list1.zip list2]
         dict1.each do |item, value|
           @neo = Response.where(map_id: item)
@@ -505,10 +484,8 @@ class AssignmentForm
         FileUtils.cp(filename, directory + '/')
       end
     end
-
     new_assign_id
   end
-
   def self.copy_assignment_questionnaire(old_assign, new_assign, user)
     old_assign.assignment_questionnaires.each do |aq|
       AssignmentQuestionnaire.create(

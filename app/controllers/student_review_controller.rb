@@ -54,5 +54,8 @@ class StudentReviewController < ApplicationController
     @all_assignments.each do |assignment|
         @response_ids << assignment.response_id
     end
+    if @assignment.review_choosing_algorithm == "Bidding"
+      redirect_to controller: 'review_bids', action: 'index', assignment_id: params[:assignment_id], id: params[:id]
+    end
   end
 end

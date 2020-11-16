@@ -52,13 +52,17 @@ class TeamsController < ApplicationController
         begin
           assignmentTeamMentor = AssignmentTeamMentor.new(assignment_team_id: @team[:id])
           assignmentTeamMentor.assignMentor(@team[:parent_id])
+          p '--------------------------------------------'
+          p @team.id
+          p TeamsUser.where(team_id: @team.id)
+          p '--------------------------------------------'
           # Notify when no mentor was assigned to team because none were available from participants
         rescue StandardError 
           flash[:error] = $ERROR_INFO
           redirect_to action: 'list', id: parent.id and return
         end
         # If row was saved in assignment_team_mentors table, notify affected stakeholders of assigned team mentor via registered user email
-        assignmentTeamMentor.email if assignmentTeamMentor.save
+        assignmentTeamMentor.email_mentor(@team.id) if assignmentTeamMentor.save
       end
 
       undo_link("The team \"#{@team.name}\" has been successfully created.")

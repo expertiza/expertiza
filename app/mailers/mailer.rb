@@ -1,8 +1,14 @@
 class Mailer < ActionMailer::Base
-  if Rails.env.development? || Rails.env.test?
-    default from: 'expertiza.development@gmail.com'
+  # if Rails.env.development? || Rails.env.test?
+  #   default from: 'expertiza.development@gmail.com'
+  # else
+  #   default from: 'expertiza-support@lists.ncsu.edu'
+  # end
+
+    if Rails.env.development? || Rails.env.test?
+    default from: 'rubytuesdayteam@gmail.com'
   else
-    default from: 'expertiza-support@lists.ncsu.edu'
+    default from: 'rubytuesdayteam@gmail.com'
   end
 
   def generic_message(defn)
@@ -79,6 +85,13 @@ class Mailer < ActionMailer::Base
     @assignment_edit_url = @body[:assignment_edit_url]
 
     defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
+    mail(subject: defn[:subject],
+         to: defn[:to])
+  end
+
+  def notify_member(defn)
+    @subject=defn[:subject]
+    
     mail(subject: defn[:subject],
          to: defn[:to])
   end

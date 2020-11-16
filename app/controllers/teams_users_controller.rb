@@ -29,7 +29,6 @@ class TeamsUsersController < ApplicationController
     end
 
     team = Team.find(params[:id])
-
     if !user.nil?
       if team.is_a?(AssignmentTeam)
         assignment = Assignment.find(team.parent_id)
@@ -42,6 +41,10 @@ class TeamsUsersController < ApplicationController
   
           @teams_user = TeamsUser.last
           undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
+          #E2077- Email member when he is added to a team.
+          assignmentTeamMentor = AssignmentTeamMentor.new(assignment_team_id: team[:id])
+          assignmentTeamMentor.email_member(user.id)
+          assignmentTeamMentor.email_mentor(team[:id])
         end
       else # CourseTeam
         course = Course.find(team.parent_id)

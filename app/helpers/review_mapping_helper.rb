@@ -298,15 +298,22 @@ module ReviewMappingHelper
     line_chart data, options
   end
 
-  def display_key_chart_information(intervals)
+  #Calculate mean, min, max, variance, and stand deviation for tagging intervals
+  def calculate_key_chart_information(intervals)
     threshold = 30
+    interval_precision = 2 #Round to 2 Decimal Places
     intervals = intervals.select{|v| v < threshold}
+
+    #Get Metrics once tagging intervals are available
     if not intervals.empty?
-      interval_mean = (intervals.reduce(:+) / intervals.size.to_f).round(1)
-      interval_min = intervals.min
-      interval_max = intervals.max
-      information_string = "Mean Time: #{interval_mean}, Min Time: #{interval_min}, Max Time #{interval_max}"
-      return information_string
+      metrics = Hash.new
+      metrics[:mean] = (intervals.reduce(:+) / intervals.size.to_f).round(interval_precision)
+      metrics[:min] = intervals.min
+      metrics[:max] = intervals.max
+      sum = intervals.inject(0){|accum, i| accum +(i- metrics[:mean])**2}
+      metrics[:variance] = (sum/(intervals.size).to_f).round(interval_precision)
+      metrics[:stand_dev] = Math.sqrt(metrics[:variance]).round(interval_precision)
+      return metrics
     end
   end
 

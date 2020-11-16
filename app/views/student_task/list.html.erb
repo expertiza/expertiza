@@ -33,9 +33,13 @@
             end
           end
         elsif stage == "review" or stage == "metareview"
-          if Assignment.find(participant.assignment.id).review_choosing_algorithm == 'Bidding'
+          assignment = Assignment.find(participant.assignment.id)
+          if assignment.review_choosing_algorithm == 'Bidding' and assignment.can_choose_topic_to_review?
             controller = "review_bids"
             action = "show"
+          elsif assignment.review_choosing_algorithm == 'Bidding'
+            controller = "review_bids"
+            action = "index"
           else
             controller = "student_review"
             action = "list"

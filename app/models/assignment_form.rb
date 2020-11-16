@@ -359,10 +359,10 @@ class AssignmentForm
       keep_track = []
       @original_team_values.each do |catt|
         @assignment_sample1 = Assignment.find(old_assign.id)
-        @instructor_sample1 = Participant.where(parent_id: old_assign.id, user_id: @assignment_sample1.instructor_id).first
-        @map = ReviewResponseMap.where(reviewed_object_id: old_assign.id, reviewer_id: @instructor_sample1.id, reviewee_id: catt.id).first
+        @instructor_sample1 = Participant.find_by(parent_id: old_assign.id, user_id: @assignment_sample1.instructor_id)
+        @map = ReviewResponseMap.find_by(reviewed_object_id: old_assign.id, reviewer_id: @instructor_sample1.id, reviewee_id: catt.id)
         if @map
-          @resp = Response.where(map_id: @map.id, is_submitted: false).first
+          @resp = Response.find_by(map_id: @map.id, is_submitted: false)
           if @resp
             keep_track.append(catt.id)
             @new_entry = Team.new
@@ -377,7 +377,11 @@ class AssignmentForm
             @new_entry.comment_for_submission = catt.comment_for_submission
             @new_entry.make_public = catt.make_public
             @new_entry.save
+          else
+            next
           end
+        else
+          next
         end
       end
       @beta = Team.where(parent_id: new_assign_id)
@@ -414,9 +418,9 @@ class AssignmentForm
             @zeta.save
           end
         end
-        @assignment_number1 = Assignment.where(id: old_assign.id).first
-        @assignment_number2 = Assignment.where(id: new_assign_id).first
-        @old_entry = Participant.where(parent_id: old_assign.id, user_id: @assignment_number1.instructor_id).first
+        @assignment_number1 = Assignment.find_by(id: old_assign.id)
+        @assignment_number2 = Assignment.find_by(id: new_assign_id)
+        @old_entry = Participant.find_by(parent_id: old_assign.id, user_id: @assignment_number1.instructor_id)
         @updating_participant = Participant.new
         @updating_participant.can_submit = @old_entry.can_submit
         @updating_participant.can_review = @old_entry.can_review
@@ -433,8 +437,8 @@ class AssignmentForm
         @updating_participant.duty = @old_entry.duty
         @updating_participant.can_take_quiz = @old_entry.can_take_quiz
         @updating_participant.save
-        @getparticipant = Participant.where(parent_id: new_assign_id, user_id: @assignment_number1.instructor_id).first
-        @xenon = ReviewResponseMap.where(reviewed_object_id: old_assign.id) 
+        @getparticipant = Participant.find_by(parent_id: new_assign_id, user_id: @assignment_number1.instructor_id)
+        @xenon = ReviewResponseMap.where(reviewed_object_id: old_assign.id)
         @xenon.each do |satt|
           if dict.key?(satt.reviewee_id)
             @iota = ReviewResponseMap.new
@@ -445,9 +449,11 @@ class AssignmentForm
             @iota.created_at = satt.created_at
             @iota.calibrate_to = satt.calibrate_to
             @iota.save
+          else
+            next
           end
         end
-        @xenon = ReviewResponseMap.where(reviewed_object_id: old_assign.id, reviewee_id: catt) 
+        @xenon = ReviewResponseMap.where(reviewed_object_id: old_assign.id, reviewee_id: catt)
         @eta =  ReviewResponseMap.where(reviewed_object_id: new_assign_id, reviewee_id: dict[catt])
         list1 = []
         list2 = []
@@ -475,10 +481,10 @@ class AssignmentForm
     end
     old_directory_name = old_assign.directory_path
     directory_path_name = "pg_data/instructor6/" + old_directory_name
-    if File.exists?(directory_path_name)
+    if File.exist?(directory_path_name)
       directory_name = new_assign.directory_path
       directory = "pg_data/instructor6/" + directory_name
-      Dir.mkdir(directory) unless File.exists?(directory)
+      Dir.mkdir(directory) unless File.exist?(directory)
       my_dir = Dir[directory_path_name + '/*']
       my_dir.each do |filename|
         FileUtils.cp(filename, directory + '/')
@@ -486,6 +492,7 @@ class AssignmentForm
     end
     new_assign_id
   end
+  
   def self.copy_assignment_questionnaire(old_assign, new_assign, user)
     old_assign.assignment_questionnaires.each do |aq|
       AssignmentQuestionnaire.create(

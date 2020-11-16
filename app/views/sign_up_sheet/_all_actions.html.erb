@@ -45,7 +45,7 @@
             <% end %></td>
           <% elsif (@signup_topic_deadline.nil? || (Time.now < @signup_topic_deadline.due_at)) && 
           (!@assignment.staggered_deadline? || get_topic_deadline([@assignment.due_dates.find_by(deadline_type_id: 1)], topic.id).nil? ||  (Time.now < get_topic_deadline([@assignment.due_dates.find_by(deadline_type_id: 1)], topic.id))) %>
-              <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'sign_up', :id=>params[:id],:topic_id => topic.id, :assignment_id => params[:assignment_id] %></td>
+              <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), {:controller=>'sign_up_sheet', :action=> 'sign_up', :id=>params[:id],:topic_id => topic.id, :assignment_id => params[:assignment_id]}, data:{ :disable_with =>"Working.." } %></td>
           <% end %>
       <% end %>
   <% end %>

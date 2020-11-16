@@ -1,11 +1,11 @@
-<h1>Publishing Rights</h1>
+<h1>Copyright grants</h1>
 
 <table class="listing" cellpadding=2>
   <% if @user.public_key.nil?  %>
          <tr><td>
          <div class="flash_note">
          In order for your work to be published on our website, you need to grant us
-         publishing rights for your work.  Before doing so you must generate a set of public and private keys so
+           copyright grants for your work.  Before doing so you must generate a set of public and private keys so
          you can digitally sign your granting action.
 
            <h3><%= link_to 'generate a key pair', {:controller => :users, :action => :keys, :id => @user.id} %></h3>
@@ -19,7 +19,7 @@
          <td colspan=5>
          <div class="flash_note">
          In order for your work to be published on our website, you need to need to grant us
-         publishing rights for your work. You may do this on a per assignment basis, or if
+           copyright grants for your work. You may do this on a per assignment basis, or if
          you wish you can grant or deny rights to all your past work.
            </div>
          </td>
@@ -29,11 +29,11 @@
          <td></td>
          </tr>
          <tr>
-         <td colspan=4><%= link_to 'Grant', :action =>'update_publish_permissions', :allow => 1 %> publishing rights to all my past work.</td>
+         <td colspan=4><%= link_to 'Grant', :action =>'update_publish_permissions', :allow => 1 %> copyright grants to all my past work.</td>
          <td></td>
          </tr>
          <tr>
-         <td colspan=4><%= link_to 'Deny', :action =>'update_publish_permissions', :allow => 0 %> publishing rights to all my past work.</td>
+         <td colspan=4><%= link_to 'Deny', :action =>'update_publish_permissions', :allow => 0 %> copyright grants to all my past work.</td>
          <td></td>
          </tr>
          <tr>
@@ -43,7 +43,7 @@
          <tr>
          <th></th>
          <th>Assignment</th>
-         <th>Publishing Rights</th>
+         <th>Copyright Grants</th>
          <th>Digital Signature</th>
          <td></td>
          </tr>

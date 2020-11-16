@@ -4,10 +4,8 @@
   // elementId is the element which needs to be toggled and
   // caller is the element which caused the call to this function.
   function tags_toggler(elementId,caller){
-      console.log(caller.id)
       var target_list = document.getElementsByName(elementId)
       var caller_element = document.getElementById(caller.id)
-      console.log(caller)
       // target_list.forEach(custom_toggle)
       for(i =0; i<target_list.length; i++){
           toggleFunction(target_list[i],caller_element)
@@ -37,9 +35,13 @@
   <h4>Topic: <%= topic_id + '. ' + topic_name %></h4>
 <% end %>
 <!--Obtain only review scores-->
-<% rscore_review = Rscore.new(@pscore,:review) if @pscore[:review] %>
+<% if @pscore[:review]  %>
+<% rscore_review = Rscore.new(@pscore,:review)%>
 <h4>Average peer review score: <span class = "c5"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span></h4>
-<!--Toggle submission-->
+<%else %>
+  <h4> There are no reviews for this assignment</h4>
+<%end %>
+  <!--Toggle submission-->
 <button onclick="toggleFunction('<%= @participant.id.to_s%>',null)" class="btn btn-default">Show Submission</button>
 <div id="<%= @participant.id.to_s%>" style="display:none;">
 <% if @participant.team.hyperlinks.try(:length) %>

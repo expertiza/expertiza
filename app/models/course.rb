@@ -10,6 +10,7 @@ class Course < ActiveRecord::Base
   has_many :notifications, dependent: :destroy
   has_paper_trail
   validates :name, presence: true
+  before_validation :strip_whitespaces
   # Return any predefined teams associated with this course
   # Author: ajbudlon
   # Date: 7/21/2008
@@ -63,6 +64,10 @@ class Course < ActiveRecord::Base
       end
       raise error_msg
     end
+  end
+
+  def strip_whitespaces
+    self.name = self.name.strip
   end
 
   require 'analytic/course_analytic'

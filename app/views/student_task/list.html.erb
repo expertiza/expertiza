@@ -30,61 +30,61 @@
             # there is a signup sheet and user/team hasn't signed up yet, produce a link to do so
             controller = "sign_up_sheet"
             action = "list"
-            end
           end
-       elsif stage == "review" or stage == "metareview"
-         controller = "student_review"
-         action = "list"
-       end
-     %>
+        end
+      elsif stage == "review" or stage == "metareview"
+        controller = "student_review"
+        action = "list"
+      end
+    %>
 
     <span>&nbsp; &raquo;
-      <%= link_to student_task.assignment.name + " " + student_task.current_stage, :controller => controller, :action => action, :id => participant.id %>
+      <%= link_to student_task.assignment.name + " " + student_task.current_stage, {:controller => controller, :action => action, :id => participant.id}, data: { disable_with: "Loading..."} %>
       (<%= student_task.relative_deadline %> left)
     </span><br/>
-  <% end %>
+    <% end %>
 
-  <br/> <strong> &nbsp;&nbsp;<span class="revnum">&nbsp;<%= @taskrevisions.size.to_s %>&nbsp;</span> Revisions<br></strong><br>
-  <% @taskrevisions.each do |student_task|
-    participant = student_task.participant
-    stage = student_task.current_stage
-    topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
-    duedate = participant.assignment.stage_deadline(topic_id)
-    controller = ""
-    action = ""
-    if stage == "submission"
-      controller = "submitted_content"
-      action = "edit"
-    elsif stage == "review" or stage == "metareview"
-      controller = "student_review"
-      action = "list"
-    end
-  %>
+    <br/> <strong> &nbsp;&nbsp;<span class="revnum">&nbsp;<%= @taskrevisions.size.to_s %>&nbsp;</span> Revisions<br></strong><br>
+    <% @taskrevisions.each do |student_task|
+      participant = student_task.participant
+      stage = student_task.current_stage
+      topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
+      duedate = participant.assignment.stage_deadline(topic_id)
+      controller = ""
+      action = ""
+      if stage == "submission"
+        controller = "submitted_content"
+        action = "edit"
+      elsif stage == "review" or stage == "metareview"
+        controller = "student_review"
+        action = "list"
+      end
+    %>
 
 <span>&nbsp; &raquo; <%= link_to participant.assignment.name + " " +
-  stage, :controller => controller, :action => action, :id => participant.id %>
-(<%= time_ago_in_words(duedate) %> left) </span><br/>
-<% end %>
-<br/>
+                                     stage, :controller => controller, :action => action, :id => participant.id %>
+  (<%= time_ago_in_words(duedate) %> left) </span><br/>
+    <% end %>
+    <br/>
 
-<strong>Students who have teamed with you<br></strong><br>
+    <strong>Students who have teamed with you<br></strong><br>
 
-<% @students_teamed_with.keys.each do |course_id| %>
-    <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @students_teamed_with[course_id].size.to_s %>&nbsp;</span>
-      <%if course_id.nil?%>
-        assignments not associated with any course
-      <%else%>
-        <%=  Course.find(course_id).name %>
-      <%end%>
-      <br></strong><br>
-    <% if @students_teamed_with[course_id].size %>
-        <% @students_teamed_with[course_id].each do |student|%>
+    <% @students_teamed_with.keys.each do |course_id| %>
+        <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @students_teamed_with[course_id].size.to_s %>&nbsp;</span>
+          <%if course_id.nil?%>
+              assignments not associated with any course
+          <%else%>
+              <%=  Course.find(course_id).name %>
+          <%end%>
+          <br></strong><br>
+        <% if @students_teamed_with[course_id].size %>
+            <% @students_teamed_with[course_id].each do |student|%>
                 <span class="notification">&nbsp; &raquo; <%= student %> </span><br/>
+            <% end %>
         <% end %>
     <% end %>
-<% end %>
 
-</div>
+  </div>
 </div>
 
 <div class="topictable">
@@ -97,41 +97,50 @@
       <th>Review Grade</th>
       <th>Badges</th>
       <th>Stage Deadline <img src="/assets/info.png" title="You can change 'Preferred Time Zone' in 'Profile' in the banner."/></th>
-      <th>Publishing Rights</th>
+      <th>Copyright Grants</th>
+      <th>Make Public <img src="/assets/info.png" title="Checking this means that you provide permission for your/your team's work to be available to others in the class or whomever the instructor chooses, once the submission deadline is passed."/></th>
     </tr>
     <% @student_tasks.each do |student_task| %>
-      <% participant = student_task.participant %>
-      <% if student_task.assignment %>
-        <tr class="listingRow">
-          <!--assignment-->
-          <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>
-          <!--course-->
-          <td><%= student_task.course.try :name %></td>
-          <!--topic-->
-          <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
-          <% if SignUpTopic.exists?(topic_id) %>
-            <td><%= SignUpTopic.find(topic_id).try :topic_name %></td>
-          <% else %>
-            <td>-</td>
-          <% end %>
-          <!--current stage-->
-          <td>
-          <% if participant.assignment.link_for_current_stage(topic_id)!= nil && participant.assignment.link_for_current_stage(topic_id).length!=0%>
-              <%= link_to participant.assignment.current_stage_name(topic_id), participant.assignment.link_for_current_stage(topic_id) %>
+
+        <% participant = student_task.participant %>
+        <% if student_task.assignment %>
+            <tr class="listingRow">
+              <!--assignment-->
+              <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>
+              <!--course-->
+              <td><%= student_task.course.try :name %></td>
+              <!--topic-->
+              <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
+              <% if SignUpTopic.exists?(topic_id) %>
+                  <td><%= SignUpTopic.find(topic_id).try :topic_name %></td>
+
               <% else %>
-              <%= participant.assignment.current_stage_name(topic_id) %>
+                  <td>-</td>
               <% end %>
-          </td>
-          <!--review grade-->
-          <td><%= get_review_grade_info(participant) %></td>
-          <!--badges-->
-          <td><%= get_awarded_badges(participant) %></td>
-          <!--stage deadline-->
-          <td><%= student_task.stage_deadline.in_time_zone(session[:user].timezonepref) %></td>
-          <!--publish rights-->
-          <td align=center><%= participant.permission_granted ? "granted" : "denied" %></td>
-        </tr>
-      <% end %>
+              <!--current stage-->
+              <td>
+                <% if participant.assignment.link_for_current_stage(topic_id)!= nil && participant.assignment.link_for_current_stage(topic_id).length!=0%>
+                    <%= link_to participant.assignment.current_stage_name(topic_id), participant.assignment.link_for_current_stage(topic_id) %>
+                <% else %>
+                    <%= participant.assignment.current_stage_name(topic_id) %>
+                <% end %>
+              </td>
+              <!--review grade-->
+              <td><%= get_review_grade_info(participant) %></td>
+              <!--badges-->
+              <td><%= get_awarded_badges(participant) %></td>
+              <!--stage deadline-->
+              <td><%= student_task.stage_deadline.in_time_zone(session[:user].timezonepref) %></td>
+              <!--publish rights-->
+              <td align=center><%= participant.permission_granted ? "granted" : "denied" %></td>
+              <!--make assignment public-->
+              <% if !participant.team.nil? %>
+                <td align=center>
+                  <input class='make-public-check' teamid="<%= participant.team.id %>" type="checkbox" <% if participant.team.make_public %>checked<% end %>>
+                </td>
+              <% end %>
+            </tr>
+        <% end %>
     <% end %>
   </table>
 </div>

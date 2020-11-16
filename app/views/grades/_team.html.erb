@@ -17,7 +17,9 @@
           <% for index in 0..tscore[:team].users.length - 2 %>
             <%= tscore[:team].users[index].name(session[:ip]) %>,
           <% end %>
-          <%= tscore[:team].users[tscore[:team].users.length - 1].name(session[:ip]) %>
+          <%unless tscore[:team].users.length == 0 %>
+            <%= tscore[:team].users[tscore[:team].users.length - 1].name(session[:ip]) %>
+          <%end %>
         <% end %>
       <% end %>
   </td>

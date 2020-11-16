@@ -8,8 +8,9 @@ class TextResponse < Question
     html += '<td><input size="6" value="' + self.seq.to_s + '" name="question[' + self.id.to_s + '][seq]" id="question_' + self.id.to_s + '_seq" type="text"></td>'
     html += '<td><textarea cols="50" rows="1" name="question[' + self.id.to_s + '][txt]" id="question_' + self.id.to_s + '_txt" placeholder="Edit question content here">' + self.txt + '</textarea></td>'
     html += '<td><input size="10" disabled="disabled" value="' + self.type + '" name="question[' + self.id.to_s + '][type]" id="question_' + self.id.to_s + '_type" type="text">''</td>'
-    html += '<td><!--placeholder (TextResponse does not need weight)--></td>'
-    html += '<td>text area size <input size="6" value="' + self.size.to_s + '" name="question[' + self.id.to_s + '][size]" id="question_' + self.id.to_s + '_size" type="text"></td>'
+    html += '<td style="color: grey">Text response does not need weight</td>'
+    html += '<td><input size="4" value="' + self.size.to_s + '" name="question[' + self.id.to_s + '][size]" id="question_' + self.id.to_s + '_size" type="text"></td>'
+    html += '<td style="color: grey">No labels required</td>'
     html += '</tr>'
 
     html.html_safe

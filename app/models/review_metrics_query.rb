@@ -24,7 +24,7 @@ class ReviewMetricsQuery
     # ask MetricsController to make a call to the review metrics web service
     tag_prompt_deployments.each do |tag_prompt_deployment|
       tag_prompt = tag_prompt_deployment.tag_prompt
-        metric = PROMPT_TO_METRIC[tag_prompt.prompt.downcase]
+      metric = PROMPT_TO_METRIC[tag_prompt.prompt.downcase]
       begin
         ws_output = MetricsController.new.bulk_retrieve_metric(metric, ws_input, false)
         ws_output_confidence = MetricsController.new.bulk_retrieve_metric(metric, ws_input, true)

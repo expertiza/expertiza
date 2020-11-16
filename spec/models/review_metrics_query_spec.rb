@@ -1,5 +1,3 @@
-require "rails_helper"
-
 describe ReviewMetricsQuery do
   let!(:assignment) { create(:assignment, name: 'Assignment 101') }
   let!(:questionnaire) { create(:questionnaire) }

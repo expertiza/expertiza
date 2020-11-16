@@ -2,6 +2,7 @@ include SubmittedContentHelper
 describe SubmittedContentHelper do
 
     describe LocalSubmittedContent do
+	#tests LocalSubmittedContent.new() successfully creates entry
         describe '#initialize' do
             it 'should create object using specified params' do
                 content = LocalSubmittedContent.new(map_id: 1, round: 2, link: "http://google.com",start_at: "2017-12-05 19:11:52", end_at: "2017-12-05 20:11:52" )
@@ -43,6 +44,7 @@ describe SubmittedContentHelper do
             end
         end
 
+	#Tests that LocalSubmittedContent gets saved to PStore file
         describe "#save" do
             it "should save a instance to the Pstore registry" do
                 storage = LocalStorage.new()
@@ -63,6 +65,7 @@ describe SubmittedContentHelper do
             end
         end
 
+	#Tests that where function successfully finds an instance stored in PStore file
         describe "#where" do
             it "should retrieve a single matching instance from Pstore registry" do
                 storage = LocalStorage.new()
@@ -74,6 +77,7 @@ describe SubmittedContentHelper do
             end
         end
 
+	#Returns data that is currently stored in PStore file
         describe "#read" do
             it "should pull updated data from pstore" do
                 storage = LocalStorage.new()
@@ -86,6 +90,7 @@ describe SubmittedContentHelper do
             end
         end
 
+	#Saves a LocalSubmittedContent object into the database
         describe "#hard_save" do
             it "should save a instance to the database" do
                 storage = LocalStorage.new()
@@ -94,6 +99,7 @@ describe SubmittedContentHelper do
             end
         end
 
+	#Saves all LocalSubmittedContent objects into database
         describe("#hard_save_all") do
             it "should save all registry instances to the database" do
                 storage = LocalStorage.new()
@@ -109,6 +115,7 @@ describe SubmittedContentHelper do
             end
         end
 
+	#Tests that a LocalSubmittedContent objects is removed from PStore file
         describe "#remove" do 
             it "should remove a instance from pstore" do
                 storage = LocalStorage.new()
@@ -119,6 +126,7 @@ describe SubmittedContentHelper do
             end
         end
 
+	#Tests that all LocalSubmittedContent objects are removed from PStore file
         describe "#remove_all" do 
             it "should remove all instances from pstore" do
                 storage = LocalStorage.new()

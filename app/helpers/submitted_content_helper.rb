@@ -122,6 +122,7 @@ module SubmittedContentHelper
   # end
 end
 
+  #Holds information related to a link pressed during a review
   class LocalSubmittedContent
     attr_accessor :map_id, :round, :link , :start_at, :end_at, :created_at, :updated_at
 
@@ -144,7 +145,8 @@ end
       @created_at = args.fetch(:created_at,nil)
       @updated_at = args.fetch(:updated_at,nil)
     end
-    
+
+    #Turns a LocalSubmittedContent object into a hash
     def to_h()
         return {map_id: @map_id, round: @round, link: @link, start_at: @start_at, end_at: @end_at, created_at: @created_at, updated_at: @updated_at}
     end
@@ -157,6 +159,7 @@ end
 
   end
 
+  #LocalStorage implementation using PStore
   class LocalStorage
 
     def initialize()
@@ -168,6 +171,7 @@ end
       @registry = read()
     end
 
+    #saves an instance of LocalSubmittedContent to pstore file and pushes to registry list
     def save(instance)
         @pstore.transaction do
           @registry << instance
@@ -175,6 +179,7 @@ end
         end
     end
 
+    #Ensures the registry list and pstore file always have the same instances
     def sync()
       @pstore.transaction do
         @pstore[:registry] = @registry
@@ -207,12 +212,14 @@ end
         return SubmissionViewingEvent.create(instance.to_h())
     end
 
+    # Actually saves all instances in registry list to database
     def hard_save_all()
       @registry.each do |item|
         SubmissionViewingEvent.create(item.to_h())
       end
     end
 
+    #Removes instance from registry list then syncs to update pstore file
     def remove(instance)
       @registry.each_with_index do |item,i|
         if item.to_h() == instance.to_h()
@@ -222,6 +229,7 @@ end
       sync()
     end
 
+    #Clears registry and PStore file
     def remove_all()
       @registry = []
       sync()

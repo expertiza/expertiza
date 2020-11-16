@@ -24,6 +24,10 @@ class ReviewBid < ActiveRecord::Base
 
     # assigns topics to reviews as matched by the webservice algorithm
     def self.assign_review_topics(assignment_id,reviewers,matched_topics,min_num_reviews=2)
+      # if review response map already created, delete it 
+      if ReviewResponseMap.where(:reviewed_object_id => assignment_id)
+        ReviewResponseMap.where(:reviewed_object_id => assignment_id).destroy_all
+      end
       # loop through reviewers to assign reviews to each reviewer
       reviewers.each do |reviewer|
         topics_to_assign = matched_topics[reviewer.to_s]

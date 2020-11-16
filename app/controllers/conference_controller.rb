@@ -43,18 +43,19 @@ class ConferenceController < ApplicationController
       if @recaptcha_succeeded==true && add_conference_user
         add_conference_user_as_participant
       else
-        redirect_to :controller => 'conference', :action => 'new'
+        url = polymorphic_url :conference, action: 'new',role: 'Student', assignment_id: params[:user][:assignment]
+        return redirect_to url
       end
   end
-
+ 
   def add_conference_user
       # check if user is already present with given username in system
       existing_user = User.find_by(name: params[:user][:name])
       # if user exist then add user as participant to assignment else create account and then add as participant
       if existing_user.nil?
-        if (params[:user][:name].nil? or params[:user][:name].empty?)and !User.find_by(name: params[:user][:email]).nil?
-          flash[:error] = "A user with username of this email already exists, Please provide a unique username to continue."
-          redirect_to request.referrer
+        if !User.find_by(email: params[:user][:email]).nil? or (params[:user][:name].nil? or params[:user][:name].empty?)
+          flash[:error] = "A user with username of this email already exists, Please provide a unique email to continue."
+          # redirect_to request.referrer
           return false
         end
         # Create author called from Conference Helper

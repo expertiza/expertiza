@@ -37,6 +37,7 @@ module ConferenceHelper
 
     def create_author
         params[:user][:name] = params[:user][:email] unless !params[:user][:name].nil? and !params[:user][:name].empty?
+        User.skip_callback(:create, :after, :email_welcome)
         @user = User.new(user_params)
         # parent id for a conference user will be conference assignment instructor id
         @user.parent_id = Assignment.find(params[:user][:assignment]).instructor.id
@@ -46,6 +47,7 @@ module ConferenceHelper
         # set default value for institute
         @user.institution_id = nil
         if @user.save
+          User.set_callback(:create, :after, :email_welcome)
           password = @user.reset_password # the password is reset
           #Mail to be sent to Author once the user has been created. New partial is used as content for email is different from normal user
           prepared_mail = MailerHelper.send_mail_for_conference_user(@user, "Your Expertiza account and password have been created.", "author_conference_invitation", password, @assignment.name)
@@ -59,6 +61,7 @@ module ConferenceHelper
     def create_coauthor
       check = User.find_by(name: params[:user][:name])
       params[:user][:name] = params[:user][:email] unless check.nil?
+      User.skip_callback(:create, :after, :email_welcome)
       @new_user = User.new(user_params)
       @new_user.institution_id =nil
       @new_user.email = params[:user][:name]
@@ -72,10 +75,9 @@ module ConferenceHelper
       #creating user with the parameters provided
       if @new_user.save
         @user = User.find_by(email: @new_user.email)
-
+        User.set_callback(:create, :after, :email_welcome)
         #password is regenerated so that we could provide it in a mail
         password = @user.reset_password
-
         #Mail to be sent to co-author once the user has been created. New partial is used as content for email is different from normal user
         MailerHelper.send_mail_for_conference_user(@user, "Your Expertiza account has been created.", "user_conference_invitation", password,current_user.name).deliver
         return @user

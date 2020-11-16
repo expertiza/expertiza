@@ -4,6 +4,7 @@ describe ConferenceController do
     let(:instructor) { build(:instructor, id: 2) }
     let(:instructor1) { build(:instructor, id: 2, timezonepref: 'Eastern Time (US & Canada)') }
     let(:student1) { build(:student, id: 1, name: :lily) }
+    let(:student1) { build(:student, id: 2, name: :lily23) }
     let(:student2) { build(:student) }
     let(:student3) { build(:student, id: 10, role_id: 1, parent_id: nil) }
     let(:student4) { build(:student, id: 20, role_id: 4) }
@@ -70,42 +71,96 @@ describe ConferenceController do
             post :create, params
             expect(flash[:success]).to eq "You are added as an Author for assignment final2"
         end
+        it 'return error if user email already exist' do
+            params = {
+                user: {name: 'lily',
+                       role_id: 2,
+                       email: 'chenzy@gmail.com',
+                       assignment: '2'
+                       }
+            }
+            allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)
+            allow(Assignment).to receive(:find).with('2').and_return(assignment1)
+            allow(User).to receive(:find).with(1).and_return(instructor1)
+            post :create, params
+
+            params2 = {
+                user: {name: 'lily23',
+                       role_id: 2,
+                       email: 'chenzy@gmail.com',
+                       assignment: '2'
+                       }
+            }
+            allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)
+            allow(Assignment).to receive(:find).with('2').and_return(assignment1)
+            allow(User).to receive(:find).with(2).and_return(instructor1)
+            post :create, params2
+            expect(flash[:error]).to eq "A user with username of this email already exists, Please provide a unique email to continue."
+        end
 
     end
 
     context 'Author/Co-Author login with captcha' do
-        it 'should login with correct recaptcha' do
-        #   ConferenceController.any_instance.expects(:verify_recaptcha).returns(true)
-        #   user = with_user # get your user...
-        #   post :login, { :username => user.username, :password => user.password }
-        #   session[:user].should eql(user.id)
-        allow(ConferenceController).to receive(:verify_recaptcha).and_return(true)
-        #   expect(response).to render_template 'content_pages/view'
-        session = {user: student1}
-        params = {
-            user: {name: 'lily',
-                crypted_password: 'password',
-                role_id: 1,
-                password_salt: 1,
-                fullname: '6, instructor',
-                email: 'chenzy@gmail.com',
-                parent_id: 1,
-                private_by_default: false,
-                mru_directory_path: nil,
-                email_on_review: true,
-                email_on_submission: true,
-                email_on_review_of_review: true,
-                is_new_user: false,
-                master_permission_granted: 0,
-                handle: 'handle',
-                digital_certificate: nil,
-                timezonepref: 'Eastern Time (US & Canada)',
-                public_key: nil,
-                copy_of_emails: nil,
-                institution_id: 1}
-        }  
-        post :create, params, session
-        expect(response).to redirect_to(root_path)
+        it 'should redirect to root with correct recaptcha' do
+            session = {user: student1}
+            params = {
+                user: {name: 'lily',
+                    crypted_password: 'password',
+                    role_id: 1,
+                    password_salt: 1,
+                    fullname: '6, instructor',
+                    email: 'chenzy@gmail.com',
+                    parent_id: 1,
+                    private_by_default: false,
+                    mru_directory_path: nil,
+                    email_on_review: true,
+                    email_on_submission: true,
+                    email_on_review_of_review: true,
+                    is_new_user: false,
+                    master_permission_granted: 0,
+                    handle: 'handle',
+                    digital_certificate: nil,
+                    timezonepref: 'Eastern Time (US & Canada)',
+                    public_key: nil,
+                    copy_of_emails: nil,
+                    institution_id: 1}
+            }  
+            allow(ConferenceController).to receive(:verify_recaptcha).and_return(true)
+            #   expect(response).to render_template 'content_pages/view'
+        
+            post :create, params, session
+            expect(response).to redirect_to(root_path)
+        end
+        it 'should redirect to join conference page with incorrect recaptcha' do
+            session = {user: student2}
+            params = {
+                user: {name: 'lily2',
+                    crypted_password: 'password',
+                    role_id: 1,
+                    password_salt: 1,
+                    fullname: '6, instructor',
+                    email: 'chenzy2@gmail.com',
+                    parent_id: 1,
+                    private_by_default: false,
+                    mru_directory_path: nil,
+                    email_on_review: true,
+                    email_on_submission: true,
+                    email_on_review_of_review: true,
+                    is_new_user: false,
+                    master_permission_granted: 0,
+                    handle: 'handle',
+                    digital_certificate: nil,
+                    timezonepref: 'Eastern Time (US & Canada)',
+                    public_key: nil,
+                    copy_of_emails: nil,
+                    institution_id: 1}
+            }  
+            
+            allow_any_instance_of(ConferenceController).to receive(:verify_recaptcha).and_return(false)
+            #   expect(response).to render_template 'content_pages/view'
+            post :create, params, session
+            expect{post :create, params, session}.to change(User, :count).by(0)
+            
         end
     end
 end

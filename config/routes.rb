@@ -278,6 +278,7 @@ resources :institution, except: [:destroy] do
       get :pending_surveys
       get :json
     end
+    get :confirm_submit
   end
 
   resources :review_mapping, only: [] do

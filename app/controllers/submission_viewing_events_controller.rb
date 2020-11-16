@@ -22,7 +22,6 @@ class SubmissionViewingEventsController < ApplicationController
     # create new response time record for current link
     # submission_viewing_event = SubmissionViewingEvent.new(submission_viewing_event_params)
     # submission_viewing_event.save
-    puts submission_viewing_event_params
     submission_viewing_event = LocalSubmittedContent.new(submission_viewing_event_params)
     store.save(submission_viewing_event)
 

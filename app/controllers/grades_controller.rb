@@ -86,6 +86,7 @@ class GradesController < ApplicationController
 
     # loop through each questionnaire, and populate the view model for all data necessary
     # to render the html tables.
+    counter_for_revisions = 0
     counter_for_same_rubric = 0
     questionnaires.each do |questionnaire|
       if @assignment.vary_by_round? && questionnaire.type == "ReviewQuestionnaire"
@@ -107,11 +108,11 @@ class GradesController < ApplicationController
       @vmlist << vm
       # Finds RevisionPlanQuestionnaire, if any
       if @assignment.vary_by_round? && @assignment.is_revision_planning_enabled?
-        rp_questionnaire = RevisionPlanTeamMap.find_by(team: Team.find(@team_id), used_in_round: counter_for_same_rubric).try(:questionnaire)
+        rp_questionnaire = RevisionPlanTeamMap.find_by(team: Team.find(@team_id)).try(:questionnaire)
         # Confirms revision planning enabled
         # Confirms not first round
         # Confirms haven't surpassed maximum number of rounds
-        if rp_questionnaire # && counter_for_rounds >= 1
+        if rp_questionnaire && counter_for_revisions > 2
           # Adds RevisionPlanQuestionnaire to heatgrid
           vm = VmQuestionResponse.new(rp_questionnaire, @assignment, @round)
           vmquestions = rp_questionnaire.questions
@@ -121,10 +122,11 @@ class GradesController < ApplicationController
           vm.number_of_comments_greater_than_10_words
           @vmlist << vm
         end
+        counter_for_revisions += 1
       elsif @assignment.is_revision_planning_enabled? && questionnaire == questionnaires.last
         reviewees_topic = SignedUpTeam.topic_id_by_team_id(@participant.id)
         current_round = @assignment.number_of_current_round(reviewees_topic)+1
-        rp_questionnaire = RevisionPlanTeamMap.find_by(team: Team.find(@team_id), used_in_round: current_round).try(:questionnaire)
+        rp_questionnaire = RevisionPlanTeamMap.find_by(team: Team.find(@team_id)).try(:questionnaire)
         # Confirms revision planning enabled
         # Confirms not first round
         # Confirms haven't surpassed maximum number of rounds

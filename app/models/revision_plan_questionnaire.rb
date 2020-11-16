@@ -19,7 +19,7 @@ class RevisionPlanQuestionnaire < Questionnaire
   def self.get_questionnaire_for_current_round(team_id)
     assignment_team = Team.find(team_id)
     assignment = assignment_team.assignment
-    current_round = assignment.number_of_current_round(assignment_team.topic)+1
+    current_round = assignment.number_of_current_round(assignment_team.topic)
     
     questionnaire = RevisionPlanTeamMap.find_by(team: assignment_team, used_in_round: current_round).try(:questionnaire)
     unless questionnaire

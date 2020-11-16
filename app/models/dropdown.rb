@@ -14,7 +14,8 @@ class Dropdown < UnscoredQuestion
     html += '<td><input size="10" disabled="disabled" value="' + self.type
     html += '" name="question[' + self.id.to_s + '][type]" id="question_' + self.id.to_s + '_type" type="text"></td>'
 
-    html += '<td><!--placeholder (UnscoredQuestion does not need weight)--></td>'
+    html += '<td style="color: grey">Dropdown question does not need weight</td>'
+    html += '<td style="color: grey">N/A</td>'
     html += '<td> alternatives <input size="8" value="' + self.alternatives
     html += '" name="question[' + self.id.to_s + '][alternatives]" id="question_' + self.id.to_s + '_alternatives" type="text"></td>'
 

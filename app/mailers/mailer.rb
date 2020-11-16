@@ -5,6 +5,19 @@ class Mailer < ActionMailer::Base
     default from: 'expertiza-support@lists.ncsu.edu'
   end
 
+  def general_email(defn)
+    @link = defn[:link]
+    @assignment = defn[:assignment]
+    if Rails.env.development? || Rails.env.test?
+      defn[:to] = 'expertiza.development@gmail.com'
+      defn[:cc] = nil
+    end
+    mail(subject: defn[:subject],
+         to: defn[:to],
+         cc: defn[:cc],
+         body: defn[:body])
+  end
+
   def generic_message(defn)
     @partial_name = defn[:body][:partial_name]
     @user = defn[:body][:user]

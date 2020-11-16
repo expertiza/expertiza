@@ -23,7 +23,7 @@
                 <% array_not_empty = 1 %>
                 <% @sorted_responses << element %>
             <% end %>
-            <!--The code above helps in retrieving any exsiting responses for self-review-->
+            <!--The code above helps in retrieving any existing responses for self-review-->
             <!--The if condition below ensures that responses are retrieved and can be viewed by user when 'View' option is selected-->
             <% if (array_not_empty == 1) %>
                 <% @sorted_responses = @sorted_responses.sort_by { |obj| obj.updated_at } %>

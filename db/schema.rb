@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181205201208) do
+ActiveRecord::Schema.define(version: 20200812211018) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -111,12 +111,14 @@ ActiveRecord::Schema.define(version: 20181205201208) do
     t.integer  "simicheck_threshold",                                limit: 4,     default: 100
     t.boolean  "is_answer_tagging_allowed"
     t.boolean  "has_badge"
+    t.integer  "sample_assignment_id",                               limit: 4
     t.boolean  "allow_selecting_additional_reviews_after_1st_round"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
   add_index "assignments", ["instructor_id"], name: "fk_assignments_instructors", using: :btree
   add_index "assignments", ["late_policy_id"], name: "fk_late_policy_id", using: :btree
+  add_index "assignments", ["sample_assignment_id"], name: "fk_rails_b01b82a1a2", using: :btree
 
   create_table "automated_metareviews", force: :cascade do |t|
     t.float    "relevance",         limit: 24
@@ -416,6 +418,10 @@ ActiveRecord::Schema.define(version: 20181205201208) do
 
   add_index "question_advices", ["question_id"], name: "fk_question_question_advices", using: :btree
 
+  create_table "question_types", force: :cascade do |t|
+    t.string "type", limit: 255
+  end
+
   create_table "questionnaires", force: :cascade do |t|
     t.string   "name",               limit: 64
     t.integer  "instructor_id",      limit: 4,     default: 0,     null: false
@@ -435,7 +441,7 @@ ActiveRecord::Schema.define(version: 20181205201208) do
     t.integer "questionnaire_id", limit: 4
     t.decimal "seq",                            precision: 6, scale: 2
     t.string  "type",             limit: 255
-    t.string  "size",             limit: 255,                           default: ""
+    t.string  "size",             limit: 255
     t.string  "alternatives",     limit: 255
     t.boolean "break_before",                                           default: true
     t.string  "max_label",        limit: 255,                           default: ""
@@ -616,11 +622,12 @@ ActiveRecord::Schema.define(version: 20181205201208) do
   end
 
   create_table "suggestion_comments", force: :cascade do |t|
-    t.text     "comments",      limit: 65535
-    t.string   "commenter",     limit: 255
-    t.string   "vote",          limit: 255
-    t.integer  "suggestion_id", limit: 4
+    t.text     "comments",           limit: 65535
+    t.string   "commenter",          limit: 255
+    t.string   "vote",               limit: 255
+    t.integer  "suggestion_id",      limit: 4
     t.datetime "created_at"
+    t.boolean  "visible_to_student",               default: false
   end
 
   create_table "suggestions", force: :cascade do |t|
@@ -704,6 +711,7 @@ ActiveRecord::Schema.define(version: 20181205201208) do
     t.integer "directory_num",              limit: 4
     t.integer "grade_for_submission",       limit: 4
     t.text    "comment_for_submission",     limit: 65535
+    t.boolean "make_public",                              default: false
   end
 
   create_table "teams_users", force: :cascade do |t|
@@ -712,6 +720,7 @@ ActiveRecord::Schema.define(version: 20181205201208) do
   end
 
   add_index "teams_users", ["team_id"], name: "fk_users_teams", using: :btree
+  add_index "teams_users", ["user_id", "team_id"], name: "index_teams_users_on_user_id_and_team_id", unique: true, using: :btree
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 
   create_table "track_notifications", force: :cascade do |t|
@@ -784,6 +793,7 @@ ActiveRecord::Schema.define(version: 20181205201208) do
   add_foreign_key "assignment_badges", "badges"
   add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
   add_foreign_key "assignment_questionnaires", "questionnaires", name: "fk_aq_questionnaire_id"
+  add_foreign_key "assignments", "assignments", column: "sample_assignment_id"
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
   add_foreign_key "assignments", "users", column: "instructor_id", name: "fk_assignments_instructors"
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"

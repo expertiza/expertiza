@@ -49,13 +49,10 @@ class TeamsController < ApplicationController
 
       # Only assign mentor to AssignmentTeam team and with assignments that don't have topics
       if @team.type == "AssignmentTeam" && Assignment.find_by(id: params[:id]).topics? != true
-        begin
-          assignmentTeamMentor = AssignmentTeamMentor.new(assignment_team_id: @team[:id])
-          assignmentTeamMentor.assignMentor(@team[:parent_id])
-          # Notify when no mentor was assigned to team because none were available from participants
-        rescue StandardError
-          flash[:error] = $ERROR_INFO
-          redirect_to action: 'list', id: parent.id and return
+        assignmentTeamMentor = AssignmentTeamMentor.new(assignment_team_id: @team[:id])
+        # Provide notice when no mentor was assigned to team because no mentors have been added as participants
+        if assignmentTeamMentor.assignMentor(@team[:parent_id]).nil?
+          flash[:notice] = 'No instructors or tas have been added as participants to current assignment, unable to assign mentor to team created.'
         end
         # If row was saved in assignment_team_mentors table, notify affected stakeholders of assigned team mentor via registered user email
         assignmentTeamMentor.email if assignmentTeamMentor.save

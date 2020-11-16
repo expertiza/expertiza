@@ -74,20 +74,11 @@ class StudentTeamsController < ApplicationController
       parent = AssignmentNode.find_by node_object_id: student.parent_id
       TeamNode.create parent_id: parent.id, node_object_id: team.id
 
-      p '**************************************'
-      p params
-      p '**************************************'
       # Only assign mentor to AssignmentTeam team and with assignments that don't have topics
       if team.type == "AssignmentTeam" && Assignment.find_by(id: student.parent_id).topics? != true
-        begin
-          assignmentTeamMentor = AssignmentTeamMentor.new(assignment_team_id: team[:id])
-          assignmentTeamMentor.assignMentor(team[:parent_id])
-          # Notify when no mentor was assigned to team because none were available from participants
-        rescue StandardError 
-          flash[:error] = $ERROR_INFO
-          # redirect_to action: 'list', id: parent.id and return
-          redirect_to view_student_teams_path student_id: student.id
-        end
+        assignmentTeamMentor = AssignmentTeamMentor.new(assignment_team_id: team[:id])
+        # notify student if unable to assign team mentor
+        flash[:notice] = 'No mentor assigned at this moment' if assignmentTeamMentor.assignMentor(team[:parent_id]).nil?
         # If row was saved in assignment_team_mentors table, notify affected stakeholders of assigned team mentor via registered user email
         assignmentTeamMentor.email if assignmentTeamMentor.save
       end

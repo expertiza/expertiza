@@ -349,7 +349,7 @@ class AssignmentForm
     end
 
     if old_assign.is_calibrated
-      @original_values = SubmissionRecord.where(assignment_id:old_assign.id)
+      @original_values = SubmissionRecord.where(assignment_id: old_assign.id)
 
       @original_values.each do |catt|
         @new_entry = SubmissionRecord.new
@@ -362,14 +362,14 @@ class AssignmentForm
         @new_entry.save
       end
 
-      @original_team_values = Team.where(parent_id:old_assign.id)
+      @original_team_values = Team.where(parent_id: old_assign.id)
       keep_track = []
       @original_team_values.each do |catt|
         @assignment_sample1 = Assignment.find(old_assign.id)
         @instructor_sample1 = Participant.where(parent_id: old_assign.id, user_id: @assignment_sample1.instructor_id).first
-        @map = ReviewResponseMap.where(reviewed_object_id: old_assign.id,reviewer_id:@instructor_sample1.id, reviewee_id: catt.id).first
+        @map = ReviewResponseMap.where(reviewed_object_id: old_assign.id, reviewer_id: @instructor_sample1.id, reviewee_id: catt.id).first
         if @map
-        @resp = Response.where(map_id:@map.id,is_submitted:false).first 
+          @resp = Response.where(map_id: @map.id, is_submitted: false).first
           if @resp
             keep_track.append(catt.id)
             @new_entry = Team.new
@@ -388,7 +388,7 @@ class AssignmentForm
         end
       end
 
-      @beta = Team.where(parent_id:new_assign_id)
+      @beta = Team.where(parent_id: new_assign_id)
 
       a = []
       @beta.each do |catt|
@@ -399,14 +399,14 @@ class AssignmentForm
 
       count = 0
       keep_track.each do |catt|
-        @charlie = TeamsUser.where(team_id:catt)
+        @charlie = TeamsUser.where(team_id: catt)
         @charlie.each do |matt|
           @delta = TeamsUser.new
-            @delta.team_id = a[count]
-            @delta.user_id = matt.user_id
+          @delta.team_id = a[count]
+          @delta.user_id = matt.user_id
           @delta.save
 
-          @gamma = Participant.where(user_id:matt.user_id,parent_id:old_assign.id)
+          @gamma = Participant.where(user_id: matt.user_id, parent_id: old_assign.id)
 
           @gamma.each do |natt|
             @zeta = Participant.new
@@ -427,11 +427,9 @@ class AssignmentForm
             @zeta.save
           end
         end
-
-        @assignment_number1 = Assignment.where(id:old_assign.id).first
-        @assignment_number2 = Assignment.where(id:new_assign_id).first
-        
-        @old_entry = Participant.where(parent_id:old_assign.id,user_id:@assignment_number1.instructor_id).first
+        @assignment_number1 = Assignment.where(id: old_assign.id).first
+        @assignment_number2 = Assignment.where(id: new_assign_id).first
+        @old_entry = Participant.where(parent_id: old_assign.id, user_id: @assignment_number1.instructor_id).first
         @updating_participant = Participant.new
         @updating_participant.can_submit = @old_entry.can_submit
         @updating_participant.can_review = @old_entry.can_review
@@ -449,9 +447,9 @@ class AssignmentForm
         @updating_participant.can_take_quiz = @old_entry.can_take_quiz
         @updating_participant.save
 
-        @getparticipant = Participant.where(parent_id:new_assign_id,user_id:@assignment_number1.instructor_id).first
+        @getparticipant = Participant.where(parent_id: new_assign_id, user_id: @assignment_number1.instructor_id).first
 
-        @xenon = ReviewResponseMap.where(reviewed_object_id:old_assign.id) 
+        @xenon = ReviewResponseMap.where(reviewed_object_id: old_assign.id) 
         @xenon.each do |satt|
           if dict.key?(satt.reviewee_id)
             puts satt.reviewee_id
@@ -466,8 +464,8 @@ class AssignmentForm
           end
         end
 
-        @xenon = ReviewResponseMap.where(reviewed_object_id:old_assign.id,reviewee_id:catt) 
-        @eta =  ReviewResponseMap.where(reviewed_object_id:new_assign_id,reviewee_id:dict[catt])
+        @xenon = ReviewResponseMap.where(reviewed_object_id: old_assign.id, reviewee_id: catt) 
+        @eta =  ReviewResponseMap.where(reviewed_object_id: new_assign_id, reviewee_id: dict[catt])
 
         list1 = []
         list2 = []
@@ -481,8 +479,8 @@ class AssignmentForm
         end
 
         dict1 = Hash[list1.zip list2]
-        dict1.each do |item,value|
-          @neo = Response.where(map_id:item)
+        dict1.each do |item, value|
+          @neo = Response.where(map_id: item)
           @neo.each do |zatt|
             @theta = Response.new
             @theta.map_id = value
@@ -493,18 +491,18 @@ class AssignmentForm
             @theta.save
           end
         end
-        count+=1
+        count += 1
       end
     end
     old_directory_name = old_assign.directory_path
-    directory_path_name = "pg_data/instructor6/"+old_directory_name
+    directory_path_name = "pg_data/instructor6/" + old_directory_name
     if File.exists?(directory_path_name)
       directory_name = new_assign.directory_path
-      directory = "pg_data/instructor6/"+directory_name
+      directory = "pg_data/instructor6/" + directory_name
       Dir.mkdir(directory) unless File.exists?(directory)
-      my_dir = Dir[directory_path_name+'/*']
+      my_dir = Dir[directory_path_name + '/*']
       my_dir.each do |filename|
-        FileUtils.cp(filename, directory+'/')
+        FileUtils.cp(filename, directory + '/')
       end
     end
 

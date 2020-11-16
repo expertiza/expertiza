@@ -23,7 +23,7 @@
                 &nbsp; (author: <%= participant.fullname%>)
               <%end%>
             </td>
-            <%= render partial: 'shared/responses/response_actions', :locals => {:team => team ,:topic_id => topic_id, :map =>map, :reviewer_role => 'Student', :title => 'Review'} %>
+            <%= render partial: 'shared/responses/response_actions', :locals => {:team => team ,:topic_id => topic_id, :map =>map, :reviewer_role => :student, :title => 'Review'} %>
             <% review_no+=1 %>
 
             <!--[zhewei, 1/20/2016]: show calibration results-->

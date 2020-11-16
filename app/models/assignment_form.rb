@@ -356,7 +356,7 @@ class AssignmentForm
     old_team_ids
   end
 
-  def self.participant(matt, old_assign, new_assign_id)
+  def self.participant(matt,old_assign, new_assign_id)
     @old_participant = Participant.where(user_id: matt.user_id, parent_id: old_assign.id)
     @old_participant.each do |natt|
       @new_participant = Participant.new
@@ -418,7 +418,7 @@ class AssignmentForm
   
   def self.newreviewresp(old_assign, catt, dict, new_assign_id)
     @old_reviewrespmap = ReviewResponseMap.where(reviewed_object_id: old_assign.id, reviewee_id: catt)
-    @find_newrespmap = ReviewResponseMap.where(reviewed_object_id: new_assign_id, reviewee_id: dict[catt])
+    @find_newrespmap =  ReviewResponseMap.where(reviewed_object_id: new_assign_id, reviewee_id: dict[catt])
     oldreviewrespids = []
     newreviewrespids = []
     @old_reviewrespmap.each do |zatt|
@@ -442,10 +442,10 @@ class AssignmentForm
     end
   end
   
-  def self.copydirectory(old_directory_path_name, new_assign)
+  def self.copydirectory(old_directory_path_name, new_assign, name)
     if File.exist?(old_directory_path_name)
       new_directory_name = new_assign.directory_path
-      directory = "pg_data/instructor6/" + new_directory_name
+      directory = "pg_data/" + name + "/" + new_directory_name
       Dir.mkdir(directory) unless File.exist?(directory)
       my_dir = Dir[old_directory_path_name + '/*']
       my_dir.each do |filename|
@@ -513,8 +513,8 @@ class AssignmentForm
       end
     end
     old_directory_name = old_assign.directory_path
-    old_directory_path_name = "pg_data/instructor6/" + old_directory_name
-    copydirectory(old_directory_path_name, new_assign)
+    old_directory_path_name = "pg_data/" + user.name + "/" + old_directory_name
+    copydirectory(old_directory_path_name, new_assign, user.name)
     new_assign_id
   end
   

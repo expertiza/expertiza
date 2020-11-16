@@ -356,7 +356,7 @@ class AssignmentForm
     old_team_ids
   end
 
-  def self.participant(matt,old_assign, new_assign_id)
+  def self.participant(matt, old_assign, new_assign_id)
     @old_participant = Participant.where(user_id: matt.user_id, parent_id: old_assign.id)
     @old_participant.each do |natt|
       @new_participant = Participant.new
@@ -418,7 +418,7 @@ class AssignmentForm
   
   def self.newreviewresp(old_assign, catt, dict, new_assign_id)
     @old_reviewrespmap = ReviewResponseMap.where(reviewed_object_id: old_assign.id, reviewee_id: catt)
-    @find_newrespmap =  ReviewResponseMap.where(reviewed_object_id: new_assign_id, reviewee_id: dict[catt])
+    @find_newrespmap = ReviewResponseMap.where(reviewed_object_id: new_assign_id, reviewee_id: dict[catt])
     oldreviewrespids = []
     newreviewrespids = []
     @old_reviewrespmap.each do |zatt|

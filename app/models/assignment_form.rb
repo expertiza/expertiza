@@ -309,6 +309,151 @@ class AssignmentForm
     MailWorker.perform_in(find_min_from_now(Time.parse(due_date.due_at.to_s(:db)) + simicheck_delay.to_i.hours).minutes.from_now * 60, @assignment.id, "compare_files_with_simicheck", due_date.due_at.to_s(:db))
   end
 
+  def self.createnewsubmission(old_assign, new_assign_id)
+    @prev_submission_record = SubmissionRecord.where(assignment_id: old_assign.id)
+    @prev_submission_record.each do |catt|
+      @new_submission_record = SubmissionRecord.new
+      @new_submission_record.type = catt.type
+      @new_submission_record.content = catt.content
+      @new_submission_record.operation = catt.operation
+      @new_submission_record.team_id = catt.team_id
+      @new_submission_record.user = catt.user
+      @new_submission_record.assignment_id = new_assign_id
+      @new_submission_record.save
+    end
+  end
+
+  def self.createnewteam(old_assign, new_assign_id)
+    @original_team_values = Team.where(parent_id: old_assign.id)
+    old_team_ids = []
+    @original_team_values.each do |catt|
+      @prev_assignment = Assignment.find(old_assign.id)
+      @prev_instructor = Participant.find_by(parent_id: old_assign.id, user_id: @prev_assignment.instructor_id)
+      @map = ReviewResponseMap.find_by(reviewed_object_id: old_assign.id, reviewer_id: @prev_instructor.id, reviewee_id: catt.id)
+      if @map
+        @resp = Response.find_by(map_id: @map.id, is_submitted: false)
+        if @resp
+          old_team_ids.append(catt.id)
+          @new_team = Team.new
+          @new_team.name = catt.name
+          @new_team.parent_id = new_assign_id
+          @new_team.type = catt.type
+          @new_team.comments_for_advertisement = catt.comments_for_advertisement
+          @new_team.advertise_for_partner = catt.advertise_for_partner
+          @new_team.submitted_hyperlinks = catt.submitted_hyperlinks
+          @new_team.directory_num = catt.directory_num
+          @new_team.grade_for_submission = catt.grade_for_submission
+          @new_team.comment_for_submission = catt.comment_for_submission
+          @new_team.make_public = catt.make_public
+          @new_team.save
+        else
+          next
+        end
+      else
+        next
+      end
+    end
+    old_team_ids
+  end
+
+  def self.participant(matt,old_assign, new_assign_id)
+    @old_participant = Participant.where(user_id: matt.user_id, parent_id: old_assign.id)
+    @old_participant.each do |natt|
+      @new_participant = Participant.new
+      @new_participant.can_submit = natt.can_submit
+      @new_participant.can_review = natt.can_review
+      @new_participant.user_id = matt.user_id
+      @new_participant.parent_id = new_assign_id
+      @new_participant.submitted_at = natt.submitted_at
+      @new_participant.permission_granted = natt.permission_granted
+      @new_participant.penalty_accumulated = natt.penalty_accumulated
+      @new_participant.grade = natt.grade
+      @new_participant.type = natt.type
+      @new_participant.handle = natt.handle
+      @new_participant.time_stamp = natt.time_stamp
+      @new_participant.digital_signature = natt.digital_signature
+      @new_participant.duty = natt.duty
+      @new_participant.can_take_quiz = natt.can_take_quiz
+      @new_participant.save
+    end
+  end
+
+  def self.createnewparticipant(old_assign, new_assign_id, dict)
+    @old_assignmentnumber = Assignment.find_by(id: old_assign.id)
+    @new_assignmentnumber = Assignment.find_by(id: new_assign_id)
+    @find_participant = Participant.find_by(parent_id: old_assign.id, user_id: @old_assignmentnumber.instructor_id)
+    @new_participant = Participant.new
+    @new_participant.can_submit = @find_participant.can_submit
+    @new_participant.can_review = @find_participant.can_review
+    @new_participant.user_id = @new_assignmentnumber.instructor_id
+    @new_participant.parent_id = new_assign_id
+    @new_participant.submitted_at = @find_participant.submitted_at
+    @new_participant.permission_granted = @find_participant.permission_granted
+    @new_participant.penalty_accumulated = @find_participant.penalty_accumulated
+    @new_participant.grade = @find_participant.grade
+    @new_participant.type = @find_participant.type
+    @new_participant.handle = @find_participant.handle
+    @new_participant.time_stamp = @find_participant.time_stamp
+    @new_participant.digital_signature = @find_participant.digital_signature
+    @new_participant.duty = @find_participant.duty
+    @new_participant.can_take_quiz = @find_participant.can_take_quiz
+    @new_participant.save
+    @getnewparticipant = Participant.find_by(parent_id: new_assign_id, user_id: @old_assignmentnumber.instructor_id)
+    @old_reviewrespmap = ReviewResponseMap.where(reviewed_object_id: old_assign.id)
+    @old_reviewrespmap.each do |satt|
+      if dict.key?(satt.reviewee_id)
+        @new_reviewrespmap = ReviewResponseMap.new
+        @new_reviewrespmap.reviewed_object_id = new_assign_id
+        @new_reviewrespmap.reviewer_id = @getnewparticipant.id
+        @new_reviewrespmap.reviewee_id = dict[satt.reviewee_id]
+        @new_reviewrespmap.type = satt.type
+        @new_reviewrespmap.created_at = satt.created_at
+        @new_reviewrespmap.calibrate_to = satt.calibrate_to
+        @new_reviewrespmap.save
+      else
+        next
+      end
+    end
+  end
+  
+  def self.newreviewresp(old_assign, catt, dict, new_assign_id)
+    @old_reviewrespmap = ReviewResponseMap.where(reviewed_object_id: old_assign.id, reviewee_id: catt)
+    @find_newrespmap =  ReviewResponseMap.where(reviewed_object_id: new_assign_id, reviewee_id: dict[catt])
+    oldreviewrespids = []
+    newreviewrespids = []
+    @old_reviewrespmap.each do |zatt|
+      oldreviewrespids.append(zatt.id)
+    end
+    @find_newrespmap.each do |zatt|
+      newreviewrespids.append(zatt.id)
+    end
+    dict1 = Hash[oldreviewrespids.zip newreviewrespids]
+    dict1.each do |item, value|
+      @oldresp = Response.where(map_id: item)
+      @oldresp.each do |zatt|
+        @newresp = Response.new
+        @newresp.map_id = value
+        @newresp.additional_comment = zatt.additional_comment
+        @newresp.version_num = zatt.version_num
+        @newresp.round = zatt.round
+        @newresp.is_submitted = zatt.is_submitted
+        @newresp.save
+      end
+    end
+  end
+  
+  def self.copydirectory(old_directory_path_name, new_assign)
+    if File.exist?(old_directory_path_name)
+      new_directory_name = new_assign.directory_path
+      directory = "pg_data/instructor6/" + new_directory_name
+      Dir.mkdir(directory) unless File.exist?(directory)
+      my_dir = Dir[old_directory_path_name + '/*']
+      my_dir.each do |filename|
+        FileUtils.cp(filename, directory + '/')
+      end
+    end
+  end
+
   # Copies the inputted assignment into new one and returns the new assignment id
   def self.copy(assignment_id, user)
     Assignment.record_timestamps = false
@@ -344,152 +489,32 @@ class AssignmentForm
       new_assign_id = nil
     end
     if old_assign.is_calibrated
-      @original_values = SubmissionRecord.where(assignment_id: old_assign.id)
-      @original_values.each do |catt|
-        @new_entry = SubmissionRecord.new
-        @new_entry.type = catt.type
-        @new_entry.content = catt.content
-        @new_entry.operation = catt.operation
-        @new_entry.team_id = catt.team_id
-        @new_entry.user = catt.user
-        @new_entry.assignment_id = new_assign_id
-        @new_entry.save
+      createnewsubmission(old_assign, new_assign_id)
+      old_team_ids = createnewteam(old_assign, new_assign_id)
+      @new_teams = Team.where(parent_id: new_assign_id)
+      new_team_ids = []
+      @new_teams.each do |catt|
+        new_team_ids.append(catt.id)
       end
-      @original_team_values = Team.where(parent_id: old_assign.id)
-      keep_track = []
-      @original_team_values.each do |catt|
-        @assignment_sample1 = Assignment.find(old_assign.id)
-        @instructor_sample1 = Participant.find_by(parent_id: old_assign.id, user_id: @assignment_sample1.instructor_id)
-        @map = ReviewResponseMap.find_by(reviewed_object_id: old_assign.id, reviewer_id: @instructor_sample1.id, reviewee_id: catt.id)
-        if @map
-          @resp = Response.find_by(map_id: @map.id, is_submitted: false)
-          if @resp
-            keep_track.append(catt.id)
-            @new_entry = Team.new
-            @new_entry.name = catt.name
-            @new_entry.parent_id = new_assign_id
-            @new_entry.type = catt.type
-            @new_entry.comments_for_advertisement = catt.comments_for_advertisement
-            @new_entry.advertise_for_partner = catt.advertise_for_partner
-            @new_entry.submitted_hyperlinks = catt.submitted_hyperlinks
-            @new_entry.directory_num = catt.directory_num
-            @new_entry.grade_for_submission = catt.grade_for_submission
-            @new_entry.comment_for_submission = catt.comment_for_submission
-            @new_entry.make_public = catt.make_public
-            @new_entry.save
-          else
-            next
-          end
-        else
-          next
-        end
-      end
-      @beta = Team.where(parent_id: new_assign_id)
-      a = []
-      @beta.each do |catt|
-        a.append(catt.id)
-      end
-      dict = Hash[keep_track.zip a]
+      dict = Hash[old_team_ids.zip new_team_ids]
       count = 0
-      keep_track.each do |catt|
-        @charlie = TeamsUser.where(team_id: catt)
-        @charlie.each do |matt|
-          @delta = TeamsUser.new
-          @delta.team_id = a[count]
-          @delta.user_id = matt.user_id
-          @delta.save
-          @gamma = Participant.where(user_id: matt.user_id, parent_id: old_assign.id)
-          @gamma.each do |natt|
-            @zeta = Participant.new
-            @zeta.can_submit = natt.can_submit
-            @zeta.can_review = natt.can_review
-            @zeta.user_id = matt.user_id
-            @zeta.parent_id = new_assign_id
-            @zeta.submitted_at = natt.submitted_at
-            @zeta.permission_granted = natt.permission_granted
-            @zeta.penalty_accumulated = natt.penalty_accumulated
-            @zeta.grade = natt.grade
-            @zeta.type = natt.type
-            @zeta.handle = natt.handle
-            @zeta.time_stamp = natt.time_stamp
-            @zeta.digital_signature = natt.digital_signature
-            @zeta.duty = natt.duty
-            @zeta.can_take_quiz = natt.can_take_quiz
-            @zeta.save
-          end
+      old_team_ids.each do |catt|
+        @old_team_user = TeamsUser.where(team_id: catt)
+        @old_team_user.each do |matt|
+          @new_team_user = TeamsUser.new
+          @new_team_user.team_id = new_team_ids[count]
+          @new_team_user.user_id = matt.user_id
+          @new_team_user.save
+          participant(matt, old_assign, new_assign_id)
         end
-        @assignment_number1 = Assignment.find_by(id: old_assign.id)
-        @assignment_number2 = Assignment.find_by(id: new_assign_id)
-        @old_entry = Participant.find_by(parent_id: old_assign.id, user_id: @assignment_number1.instructor_id)
-        @updating_participant = Participant.new
-        @updating_participant.can_submit = @old_entry.can_submit
-        @updating_participant.can_review = @old_entry.can_review
-        @updating_participant.user_id = @assignment_number2.instructor_id
-        @updating_participant.parent_id = new_assign_id
-        @updating_participant.submitted_at = @old_entry.submitted_at
-        @updating_participant.permission_granted = @old_entry.permission_granted
-        @updating_participant.penalty_accumulated = @old_entry.penalty_accumulated
-        @updating_participant.grade = @old_entry.grade
-        @updating_participant.type = @old_entry.type
-        @updating_participant.handle = @old_entry.handle
-        @updating_participant.time_stamp = @old_entry.time_stamp
-        @updating_participant.digital_signature = @old_entry.digital_signature
-        @updating_participant.duty = @old_entry.duty
-        @updating_participant.can_take_quiz = @old_entry.can_take_quiz
-        @updating_participant.save
-        @getparticipant = Participant.find_by(parent_id: new_assign_id, user_id: @assignment_number1.instructor_id)
-        @xenon = ReviewResponseMap.where(reviewed_object_id: old_assign.id)
-        @xenon.each do |satt|
-          if dict.key?(satt.reviewee_id)
-            @iota = ReviewResponseMap.new
-            @iota.reviewed_object_id = new_assign_id
-            @iota.reviewer_id = @getparticipant.id
-            @iota.reviewee_id = dict[satt.reviewee_id]
-            @iota.type = satt.type
-            @iota.created_at = satt.created_at
-            @iota.calibrate_to = satt.calibrate_to
-            @iota.save
-          else
-            next
-          end
-        end
-        @xenon = ReviewResponseMap.where(reviewed_object_id: old_assign.id, reviewee_id: catt)
-        @eta =  ReviewResponseMap.where(reviewed_object_id: new_assign_id, reviewee_id: dict[catt])
-        list1 = []
-        list2 = []
-        @xenon.each do |zatt|
-          list1.append(zatt.id)
-        end
-        @eta.each do |zatt|
-          list2.append(zatt.id)
-        end
-        dict1 = Hash[list1.zip list2]
-        dict1.each do |item, value|
-          @neo = Response.where(map_id: item)
-          @neo.each do |zatt|
-            @theta = Response.new
-            @theta.map_id = value
-            @theta.additional_comment = zatt.additional_comment
-            @theta.version_num = zatt.version_num
-            @theta.round = zatt.round
-            @theta.is_submitted = zatt.is_submitted
-            @theta.save
-          end
-        end
+        createnewparticipant(old_assign, new_assign_id, dict)
+        newreviewresp(old_assign, catt, dict, new_assign_id)
         count += 1
       end
     end
     old_directory_name = old_assign.directory_path
-    directory_path_name = "pg_data/instructor6/" + old_directory_name
-    if File.exist?(directory_path_name)
-      directory_name = new_assign.directory_path
-      directory = "pg_data/instructor6/" + directory_name
-      Dir.mkdir(directory) unless File.exist?(directory)
-      my_dir = Dir[directory_path_name + '/*']
-      my_dir.each do |filename|
-        FileUtils.cp(filename, directory + '/')
-      end
-    end
+    old_directory_path_name = "pg_data/instructor6/" + old_directory_name
+    copydirectory(old_directory_path_name, new_assign)
     new_assign_id
   end
   

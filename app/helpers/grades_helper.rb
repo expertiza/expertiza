@@ -160,6 +160,8 @@ module GradesHelper
           round = questionnaires[0].used_in_round
           counter_for_same_rubric = 0
         end
+      else
+        round = AssignmentQuestionnaire.where(assignment_id: assignment_id, questionnaire_id: questionnaire.id).first.used_in_round
       end
       questionnaire_symbol = if !round.nil?
                                (questionnaire.symbol.to_s + round.to_s).to_sym

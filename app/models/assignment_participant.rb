@@ -77,8 +77,20 @@ class AssignmentParticipant < Participant
   end
 
   def compute_assignment_score(questions, scores)
+    counter_for_same_rubric = 0
     self.assignment.questionnaires.each do |questionnaire|
-      round = AssignmentQuestionnaire.find_by(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id).used_in_round
+      if self.assignment.vary_by_round? && questionnaire.type == "ReviewQuestionnaire"
+        questionnaires = AssignmentQuestionnaire.where(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id)
+        if questionnaires.count > 1
+          round = questionnaires[counter_for_same_rubric].used_in_round
+          counter_for_same_rubric += 1
+        else
+          round = questionnaires[0].used_in_round
+          counter_for_same_rubric = 0
+        end
+      else
+        round = AssignmentQuestionnaire.find_by(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id).used_in_round
+      end
       # create symbol for "varying rubrics" feature -Yang
       questionnaire_symbol = if round.nil?
                                questionnaire.symbol

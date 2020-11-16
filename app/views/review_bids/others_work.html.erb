@@ -7,22 +7,24 @@
 
 <h2>Reviews for "<%= @assignment.name %>"</h2>
 
-<!-- Added the feature to find the reviews and meta-reviews left for students by E1839 @Rayan Dasoriya -->
+<!-- add headers that provide information regarding review numbers -->
 <% if @assignment.num_reviews_allowed.nil? || @assignment.num_reviews_allowed == -1%>
     <h4>Your instructor expects you to do <%= @assignment.num_reviews_required %> reviews. You are not allowed to do any extra reviews. </h4>
-
 <% elsif @assignment.num_reviews_allowed == @assignment.num_reviews_required %>
     <h4>You should perform exactly <%= @assignment.num_reviews_allowed %> reviews </h4>
 <% else %>
-
     <h4>You may perform between <%= @assignment.num_reviews_required %> and <%= @assignment.num_reviews_allowed %> reviews</h4>
 <% end %>
 <h4>You are required to do <%= @assignment.num_reviews_required %> reviews</h4>
 <h4> Number of reviews left: <%= @assignment.num_reviews_allowed - @num_reviews_completed %></h4>
+
+<!-- table with reviews available to complete -->
 <table>
   <% review_no = 1 %>
   <% title = 'Review' %>
+  <!-- loop through each review map -->
   <% @review_mappings.each do |map| %>
+    <% if review_no <= @reviews_to_show %>
       <%@sorted_responses=[]%>
       <% team = AssignmentTeam.find(map.reviewee_id) %>
       <% participant = team.participants.first %>
@@ -106,8 +108,12 @@
 
           </tr>
       <% end %>
+    <% end%>
   <% end %>
 </table>
-
+<br>
+<% if @reviews_to_show < @assignment.num_reviews_allowed %>
+  <%= button_to 'Request Another Review', {:controller=>'review_bids',:action=>'index', :id => @participant.id, :reviews_to_show => (@reviews_to_show.to_i+1)} %>
+<% end %>
 <BR/>
 <%= link_to "Back", :controller=>'student_task', :action => 'view', :id => @participant.id %>

@@ -24,7 +24,11 @@ class ReviewBidsController < ApplicationController
        'Administrator',
        'Super-Administrator'].include? current_role_name
     end
-  end  
+  end 
+  
+  def create
+    redirect_to action: 'index', params: params
+  end
 
   # provides variables for reviewing page located at 
   def index 
@@ -43,15 +47,15 @@ class ReviewBidsController < ApplicationController
       end
     end
     @review_phase = next_due_date.deadline_type_id
-
+    @reviews_to_show = params[:reviews_to_show].nil? ? (@assignment.num_reviews_required).to_i : (params[:reviews_to_show]).to_i
     # Finding how many reviews have been completed
 	  @num_reviews_completed = 0
     @review_mappings.each do |map|
-      @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
+      @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted 
     end
 
     # render view for completing reviews after review bidding has been completed
-    render 'review_bids/others_work'
+    render 'review_bids/others_work' 
   end
 
   # provides vaiables for review bidding page

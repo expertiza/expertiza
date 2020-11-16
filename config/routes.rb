@@ -383,6 +383,7 @@ resources :institution, except: [:destroy] do
     collection do
       post :assign_bidding
       post :set_priority
+      post :index
     end
   end
 

@@ -25,7 +25,8 @@
     <input name="assignment_form[assignment][review_choosing_algorithm]" type="hidden" value="Simple Choose"/>
     <%= label_tag('assignment_form[assignment][review_choosing_algorithm]', 'Method for reviewer to choose which topic to review:') %>
     <%= select('assignment_form[assignment]', 'review_choosing_algorithm',[['Simple Choose', 'Simple Choose'],['Bidding','Bidding']], {:selected => @assignment_form.assignment.review_choosing_algorithm})%>
-    <img src="/assets/info.png" title="This will dictact how reviewers will be able to choose topics to review:
+    <%= button_to 'Run Review Algorithm', :controller=>'review_bids', :action=>'assign_bidding', :assignment_id => @assignment_form.assignment.id %>
+	<img src="/assets/info.png" title="This will dictact how reviewers will be able to choose topics to review:
             Simple Choose allows reviews to choose topics on a first come first serve basis
             Bidding allows reviewers to bid on topics to review"/>
 <% end %>

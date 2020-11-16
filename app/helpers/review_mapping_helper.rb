@@ -199,7 +199,7 @@ module ReviewMappingHelper
   def display_volume_metric_chart(reviewer)
     labels, reviewer_data, all_reviewers_data = initialize_volume_metric_chart_elements(reviewer)
     data = prepare_chart_data(labels, reviewer_data, all_reviewers_data, "rgba(255,99,132,0.8)")
-    options = prepare_chart_options(125)
+    options = prepare_chart_options(125, 50, 400)
     horizontal_bar_chart data, options
   end
 
@@ -224,7 +224,7 @@ module ReviewMappingHelper
   def display_review_metrics_chart(reviewer)
     labels, reviewer_data, all_reviewers_data = initialize_review_metrics_chart_elements(reviewer)
     data = prepare_chart_data(labels, reviewer_data, all_reviewers_data, "rgba(71,119,158,0.8)")
-    options = prepare_chart_options(78.125 + 15.625 * labels.count)
+    options = prepare_chart_options(78.125 + 15.625 * labels.count, 1, 16)
     horizontal_bar_chart data, options
   end
 
@@ -250,7 +250,7 @@ module ReviewMappingHelper
     }
   end
 
-  def prepare_chart_options(height)
+  def prepare_chart_options(height, step_size, max)
     {
       legend: {
         position: 'top',
@@ -265,24 +265,24 @@ module ReviewMappingHelper
           stacked: true,
           id: "bar-y-axis1",
           barThickness: 10
-          }, {
-            display: false,
-            stacked: true,
-            id: "bar-y-axis2",
-            barThickness: 15,
-            type: 'category',
-            categoryPercentage: 0.8,
-            barPercentage: 0.9,
-            gridLines: {
-              offsetGridLines: true
-            }
-          }],
+        }, {
+          display: false,
+          stacked: true,
+          id: "bar-y-axis2",
+          barThickness: 15,
+          type: 'category',
+          categoryPercentage: 0.8,
+          barPercentage: 0.9,
+          gridLines: {
+            offsetGridLines: true
+          }
+        }],
         xAxes: [{
           stacked: false,
           ticks: {
             beginAtZero: true,
-            stepSize: 1,
-            max: 16
+            stepSize: step_size,
+            max: max
           }
         }]
       }

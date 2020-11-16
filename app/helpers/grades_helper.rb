@@ -148,8 +148,19 @@ module GradesHelper
 
   def retrieve_questions(questionnaires, assignment_id)
     questions = {}
+    counter_for_same_rubric = 0
+    assignment = Assignment.find(assignment_id)
     questionnaires.each do |questionnaire|
-      round = AssignmentQuestionnaire.where(assignment_id: assignment_id, questionnaire_id: questionnaire.id).first.used_in_round
+      if assignment.vary_by_round? && questionnaire.type == "ReviewQuestionnaire"
+        questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment_id, questionnaire_id: questionnaire.id)
+        if questionnaires.count > 1
+          round = questionnaires[counter_for_same_rubric].used_in_round
+          counter_for_same_rubric += 1
+        else
+          round = questionnaires[0].used_in_round
+          counter_for_same_rubric = 0
+        end
+      end
       questionnaire_symbol = if !round.nil?
                                (questionnaire.symbol.to_s + round.to_s).to_sym
                              else

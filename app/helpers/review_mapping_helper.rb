@@ -303,32 +303,32 @@ module ReviewMappingHelper
         }
       },
       width: "200",
-      height: (78.125+15.625*labels.count).to_s,
+      height: (78.125 + 15.625 * labels.count).to_s,
       scales: {
         yAxes: [{
-                  stacked: true,
-                  id: "bar-y-axis1",
-                  barThickness: 10
-                }, {
-                  display: false,
-                  stacked: true,
-                  id: "bar-y-axis2",
-                  barThickness: 15,
-                  type: 'category',
-                  categoryPercentage: 0.8,
-                  barPercentage: 0.9,
-                  gridLines: {
-                    offsetGridLines: true
-                  }
-                }],
+          stacked: true,
+          id: "bar-y-axis1",
+          barThickness: 10
+        }, {
+          display: false,
+          stacked: true,
+          id: "bar-y-axis2",
+          barThickness: 15,
+          type: 'category',
+          categoryPercentage: 0.8,
+          barPercentage: 0.9,
+          gridLines: {
+            offsetGridLines: true
+          }
+        }],
         xAxes: [{
-                  stacked: false,
-                  ticks: {
-                    beginAtZero: true,
-                    stepSize: 1,
-                    max: 16
-                  }
-                }]
+          stacked: false,
+          ticks: {
+            beginAtZero: true,
+            stepSize: 1,
+            max: 16
+          }
+        }]
       }
     }
     horizontal_bar_chart data, options

@@ -269,7 +269,8 @@ function microtaskChanged() {
         var team_count_field = jQuery('#assignment_team_count_field');
         var teammate_reviews_field = jQuery('#assignment_show_teammate_reviews');
         var team_formation_due_date_checkbox = jQuery('#team_formation_due_date_checkbox')
-
+        var teammate_review_deadline_checkbox = jQuery('#teammate_review_deadline_checkbox')
+        
         jQuery("#questionnaire_table_TeammateReviewQuestionnaire").remove()
         if (checkbox.is(':checked')) {
             team_count_field.removeAttr('hidden');

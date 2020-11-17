@@ -3,7 +3,32 @@ module OnTheFlyCalc
   # Only scores passed in are included in this sum.
   def compute_total_score(scores)
     total = 0
-    self.questionnaires.each {|questionnaire| total += questionnaire.get_weighted_score(self, scores) }
+    counter_for_same_rubric = 0
+    self.questionnaires.each do |questionnaire|
+      if self.vary_by_round? && questionnaire.type == "ReviewQuestionnaire"
+        questionnaires = AssignmentQuestionnaire.where(assignment_id: self.id, questionnaire_id: questionnaire.id)
+        if questionnaires.count > 1
+          round = questionnaires[counter_for_same_rubric].used_in_round
+          counter_for_same_rubric += 1
+        else
+          round = questionnaires[0].used_in_round
+          counter_for_same_rubric = 0
+        end
+      else
+        round = AssignmentQuestionnaire.find_by(assignment_id: self.id, questionnaire_id: questionnaire.id).used_in_round
+      end
+      # create symbol for "varying rubrics" feature -Yang
+      questionnaire_symbol = if round.nil?
+                               questionnaire.symbol
+                             else
+                               (questionnaire.symbol.to_s + round.to_s).to_sym
+                             end
+      aq = AssignmentQuestionnaire.find_by(assignment_id: self.id, questionnaire_id: questionnaire.id)
+      if !scores[questionnaire_symbol][:scores][:avg].nil?
+        total += scores[questionnaire_symbol][:scores][:avg] * aq.questionnaire_weight / 100.0
+      end
+    end
+    #self.questionnaires.each {|questionnaire| total += questionnaire.get_weighted_score(self, scores) }
     total
   end
 

@@ -1536,76 +1536,77 @@ jQuery(document).ready(function() {
             }
 
             return (
-                <div className="filterable_table">
-                    <SearchBar
-                        filterText={this.state.filterText}
-                        onUserInput={this.handleUserInput}
-                        dataType={this.props.dataType}
-                    />
-
-                    <FilterButton
-                        filterOption="public"
-                        onUserFilter={this.handleUserFilter}
-                        inputCheckboxValue={this.state.publicCheckbox}
-                        dataType={this.props.dataType}
-                    />
-
-                    <button
-                        style = {formStyle}
-                        onClick={() => {
-                            var x = document.getElementById("advancedToggle");
-                            if (x.style.display === "none") {
-                                x.style.display = "block";
-                            } else {
-                                x.style.display = "none";
-                            }}}>
-                        Advanced Search
-                    </button>
-
-                    <div id="advancedToggle">
-                        <AdditionalSearchDropDown
-                            selectValue = {this.state.selectValue}
-                            onChange={this.changeAdditionalDrop}
+                    <div className="filterable_table">
+                        <SearchBar
+                            filterText={this.state.filterText}
+                            onUserInput={this.handleUserInput}
                             dataType={this.props.dataType}
                         />
-                        <div>
-                            <DatePickerStart
-                                start_date = {this.state.start_date}
-                                onChange={this.changeDateStart}
-                                dataType={this.props.dataType}
-                            />
-                            <DatePickerEnd
-                                start_date = {this.state.end_date}
-                                onChange={this.changeDateEnd}
-                                dataType={this.props.dataType}
-                            />
 
-                            <HASQUIZ_TOGGLE
-                                has_quiz_var = {this.state.has_quiz_var}
-                                onChange={this.changeAvailableToggle}
+                        <FilterButton
+                            filterOption="public"
+                            onUserFilter={this.handleUserFilter}
+                            inputCheckboxValue={this.state.publicCheckbox}
+                            dataType={this.props.dataType}
+                        />
+
+                        <button
+                            style = {formStyle}
+                            onClick={() => {
+                                var x = document.getElementById("advancedToggle");
+                                if (x.style.display === "none") {
+                                    x.style.display = "block";
+                                } else {
+                                    x.style.display = "none";
+                                }}}>
+                            Advanced Search
+                        </button>
+
+                        <div id="advancedToggle">
+                            <AdditionalSearchDropDown
+                                selectValue = {this.state.selectValue}
+                                onChange={this.changeAdditionalDrop}
                                 dataType={this.props.dataType}
                             />
+                            <div>
+                                <DatePickerStart
+                                    start_date = {this.state.start_date}
+                                    onChange={this.changeDateStart}
+                                    dataType={this.props.dataType}
+                                />
+                                <DatePickerEnd
+                                    start_date = {this.state.end_date}
+                                    onChange={this.changeDateEnd}
+                                    dataType={this.props.dataType}
+                                />
+
+                                <HASQUIZ_TOGGLE
+                                    has_quiz_var = {this.state.has_quiz_var}
+                                    onChange={this.changeAvailableToggle}
+                                    dataType={this.props.dataType}
+                                />
+                            </div>
                         </div>
-                    </div>
 
-                    <NewItemButton
-                        dataType={this.props.dataType}
-                        private={true}
-                    />
-                    <ContentTable
-                        data={this.state.tableData}
-                        filterText={this.state.filterText}
-                        onUserClick={this.handleUserClick}
-                        dataType={this.props.dataType}
-                        showPublic={this.state.publicCheckbox}
-                        selectValue={this.state.selectValue}
-                        start_date = {this.state.start_date}
-                        end_date = {this.state.end_date}
-                        has_quiz_var = {this.state.has_quiz_var}
-                    />
-                </div>
-            )
-        }
+                        <NewItemButton
+                            dataType={this.props.dataType}
+                            private={true}
+                        />
+                        <ContentTable
+                            data={this.state.tableData}
+                            filterText={this.state.filterText}
+                            onUserClick={this.handleUserClick}
+                            dataType={this.props.dataType}
+                            showPublic={this.state.publicCheckbox}
+                            selectValue={this.state.selectValue}
+                            start_date = {this.state.start_date}
+                            end_date = {this.state.end_date}
+                            has_quiz_var = {this.state.has_quiz_var}
+                        />
+                    </div>
+                )
+            }
+
     })
 
     var TabSystem = React.createClass({

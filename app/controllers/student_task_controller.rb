@@ -56,6 +56,8 @@ class StudentTaskController < ApplicationController
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
     @topics = SignUpTopic.where(assignment_id: @assignment.id)
     @use_bookmark = @assignment.use_bookmark
+    # E 2074 - Hide "Your Work" and "Others' Work" tab on assignments with zero rounds of reviews/submissions
+    @has_submissions = action_allowed? ? @assignment.rounds_of_reviews > 0 : true
     # Timeline feature
     @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
   end

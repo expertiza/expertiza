@@ -33,9 +33,6 @@
       <tr>
         <% @count = 0 %>
         <% @rspan = 0 %>
-        <%@l = @l+1 %>
-        <!-- alternate the colors of columns -->
-        <% (@l % 2 == 0) ? @bgcolor = "#ffffff" : @bgcolor = "#f9f9f9" %>
 
         <% @teammate_review_response_maps.each do |response_map| %>
         <!--count means the teammate reviews one student completed.-->
@@ -49,11 +46,11 @@
         <%if Participant.exists?(id: reviewer.reviewer_id) %>
           <% @reviewer_name = @user.fullname(session[:ip]) %>
           <!--Reviewer-->
-          <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan %>>
+          <td rowspan= <%= @rspan %>>
             <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => reviewer.reviewer_id, :assignment_id => @id%>
           </td>
           <!--# teammate reviews done-->
-          <td bgcolor=<%= @bgcolor %>  align = "left" rowspan= <%= @rspan %>>
+          <td  align = "left" rowspan= <%= @rspan %>>
             <% if @team_member_count == 1 %>
               <%= '--' %>
             <% else %>
@@ -68,17 +65,17 @@
             <% if !@teammate_review_response.blank? %>
               <% @reviewee = rm.reviewee.user %>
                 <!--Teammate reviewed-->
-                <td id = "green" bgcolor=<%= @bgcolor %> align = 'left' colspan=1>
+                <td id = "green" align = 'left' colspan=1>
                   <%= link_to @reviewee.name(session[:ip]), impersonate_impersonate_path(:user => {:name => @reviewee.name}), :method => :post, :title => "Click here to impersonate this user" %>
                   (<%= @reviewee.fullname(session[:ip]) %>)
                 </td>
                 <!--Last reviewed at-->
-                <td bgcolor=<%= @bgcolor %> align = 'left'>
+                <td align = 'left'>
                   <%= @teammate_review_response.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
                 </td></tr><tr class="tablesorter-childRow">
             <% else %>
               <!-- Teammate reviewed-->
-              <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left' colspan=1>
+              <td id = "green" style="color:#DD3300" align = 'left' colspan=1>
                 <% if @team_member_count == 1 %>
                   <%= 'N/A' %>
                 <% else %>
@@ -88,7 +85,7 @@
                 <% end %>
               </td>
               <!--Last reviewed at-->
-              <td bgcolor=<%= @bgcolor %> style="color:#DD3300" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
+              <td style="color:#DD3300" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
             <% end %>
           <% end %>
           </tr>

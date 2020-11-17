@@ -1,7 +1,3 @@
-# TODO 
-# Routing to bidding vs routing to reviewing
-# clean up code,ie remove unused variables, refactor some code,or some things, remove unecessary methods
-
 class ReviewBidsController < ApplicationController
   require "json"
   require "uri"
@@ -26,11 +22,13 @@ class ReviewBidsController < ApplicationController
     end
   end 
   
+  #needed in order to run index from "Request another submission" button correctly
   def create
+    @@reviews_to_show = params[:reviews_to_show]
     redirect_to action: 'index', params: params
   end
 
-  # provides variables for reviewing page located at 
+  # provides variables for reviewing page located at views/review_bids/others_work.html.erb
   def index 
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
@@ -47,7 +45,7 @@ class ReviewBidsController < ApplicationController
       end
     end
     @review_phase = next_due_date.deadline_type_id
-    @reviews_to_show = params[:reviews_to_show].nil? ? (@assignment.num_reviews_required).to_i : (params[:reviews_to_show]).to_i
+    @reviews_to_show = @@reviews_to_show.nil? ? (@assignment.num_reviews_required).to_i : @@reviews_to_show.to_i
     # Finding how many reviews have been completed
 	  @num_reviews_completed = 0
     @review_mappings.each do |map|
@@ -121,6 +119,7 @@ class ReviewBidsController < ApplicationController
       
       #runs algorithm and assigns reviews
       matched_topics = run_bidding_algorithm(bidding_data)
+      @@reviews_to_show = nil
       ReviewBid.assign_review_topics(assignment_id,reviewers,matched_topics) 
       Assignment.find(assignment_id).update(can_choose_topic_to_review: false)  #turns off bidding for students
       redirect_to :back

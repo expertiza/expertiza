@@ -77,7 +77,7 @@
           <% @rspan_certain_round = instance_variable_get("@rspan_round_#{round}") %>
           <% @count_certain_round = instance_variable_get("@count_round_#{round}") %>
           <% unless @rspan_certain_round == 0 %>
-            <td bgcolor="#ffffff"  align="left" rowspan= <%= @rspan_certain_round %>>
+            <td align="left" rowspan= <%= @rspan_certain_round %>>
               <%= @count_certain_round %>/<%= @rspan_certain_round %></td>
           <% end %>
 
@@ -89,13 +89,13 @@
 
             <% if @frm.blank? %> 
               <!--Review response rejoined-->
-              <td id = "green" bgcolor="#ffffff" style="color:#A90201" align = 'left' colspan=1>
+              <td id = "green" style="color:#A90201" align = 'left' colspan=1>
                 <%= link_to user_name = Participant.find(review_response.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user_name}), :method => :post, :title => "Click here to impersonate this user" %>
                 (<%= Participant.find(review_response.response_map.reviewer_id).user.fullname(session[:ip]) %>)
               </td>
               <!--Last rejoined at-->
               <!-- If the FeedbackResponseMap is blank, then this was never rejoined, display 'No' -->
-              <td bgcolor="#ffffff" style="color:#A90201" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
+              <td style="color:#A90201" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
             <% else %>
               <!-- If FeedbackResponseMap is NOT blank: -->
               <% @reviewee_name = Participant.find(@frm.reviewee_id).user.fullname(session[:ip]) %>
@@ -103,24 +103,24 @@
                 <!-- If a response for this reviee exists, display reviewer name and last time rejoined -->
                 <% feedback_response = Response.where(map_id: @frm.id).first %>
                 <!--Review response rejoined-->
-                <td id = "green" bgcolor="#ffffff" align='left' colspan=1>
+                <td id = "green"  align='left' colspan=1>
                   <%= link_to user_name = Participant.find(review_response.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user_name}), :method => :post, :title => "Click here to impersonate this user" %>
                   (<%= link_to @reviewee_name, :controller => 'popup', :action => 'author_feedback_popup', :response_id => feedback_response.id, :reviewee_id => @frm.reviewee_id, :source => 'author_feedback' %>)
                 </td>
                 <!--Last rejoined at-->
-                <td bgcolor="#ffffff" align='left'>
+                <td  align='left'>
                   <%= feedback_response.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
                 </td></tr><tr class="tablesorter-childRow">
               <% else %>
                 <!-- If a response does not exist (is blank), display reviewer name but 'No' in last rejoined at -->
                 <!--Review response rejoined-->
-                <td id = "green" bgcolor="#ffffff" style="color:#A90201" align = 'left' colspan=1>
+                <td id = "green" style="color:#A90201" align = 'left' colspan=1>
                   <%= link_to user_name = Participant.find(review_response.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user_name}), :method => :post, :title => "Click here to impersonate this user" %>
                   (<%= @reviewee_name %>)
                 </td>
                 <!--Last rejoined at-->
                 <!-- Display 'No' because this review has not been rejoined, Response does not exist -->
-                <td bgcolor="#ffffff" style="color:#A90201" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
+                <td style="color:#A90201" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
               <% end %>
             <% end %>
           <% end %>
@@ -136,7 +136,7 @@
            <%row_span= @assignment.varying_rubrics_by_round? ? (@rspan_round_one.to_i + @rspan_round_two.to_i + @rspan_round_three.to_i) : @rspan.to_i %>
            <!-- If row_span is zero, (no reviews completed), then manually set rowspan to 1 to fix formatting -->
            <% if row_span == 0 %>
-            <tr><td bgcolor="#ffffff" rowspan=  <%1%>>
+            <tr><td rowspan=  <%1%>>
               <% @reviewer_name = rejoinder.user.fullname(session[:ip]) %>
               <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => rejoinder.id, :assignment_id => @id %>
             </td>
@@ -145,7 +145,7 @@
             <td></td>
             <td></td>
             <%else %>
-           <tr><td bgcolor="#ffffff" rowspan= <%= @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>>
+           <tr><td rowspan= <%= @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>>
               <% @reviewer_name = rejoinder.user.fullname(session[:ip]) %>
               <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => rejoinder.id, :assignment_id => @id %>
             </td>
@@ -153,7 +153,7 @@
 
           <!--# author feedbacks done-->
           <% unless @rspan == 0 %>
-            <td bgcolor="#ffffff"  align="left" rowspan= <%= @rspan %>>
+            <td align="left" rowspan= <%= @rspan %>>
               <%= @count %>/<%= @rspan %>
             </td>
           <% end %>
@@ -163,39 +163,39 @@
 
             <% if @frm.blank? %>
               <!--Review response rejoined-->
-              <td id = "green" bgcolor="#ffffff" style="color:#A90201" align = 'left' colspan=1>
+              <td id = "green" style="color:#A90201" align = 'left' colspan=1>
                 <!-- Display link with username of reviewer -->
                 <%= link_to user_name = Participant.find(review_response.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user_name}), :method => :post, :title => "Click here to impersonate this user" %>
                 (<%= reviewee_name = Participant.find(review_response.response_map.reviewer_id).user.fullname(session[:ip]) %>)
               </td>
               <!--Last rejoined at-->
               <!-- Not ever rejoined, display 'No', because the feedbackresponsemap is blank -->
-              <td bgcolor="#ffffff" style="color:#A90201" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
+              <td style="color:#A90201" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
             <% else %>
             <!-- FeedbackResponseMap is NOT blank, prepare table data: -->
               <% @reviewee_name = Participant.find(@frm.reviewee_id).user.fullname(session[:ip]) %>
               <% if Response.exists?(map_id: @frm.id) %>
                 <% feedback_response = Response.where(map_id: @frm.id).first %>
                 <!--Review response rejoined-->
-                <td id = "green" bgcolor="#ffffff" align='left' colspan=1>
+                <td id = "green"  align='left' colspan=1>
                   <!-- Display link with username of reviewer -->
                   <%= link_to user_name = Participant.find(review_response.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user_name}), :method => :post, :title => "Click here to impersonate this user"%>
                   (<%= link_to @reviewee_name, :controller => 'popup', :action => 'author_feedback_popup', :response_id => feedback_response.id, :reviewee_id => @frm.reviewee_id, :source => 'author_feedback' %>)
                 </td>
                 <!--Last rejoined at-->
-                <td bgcolor="#ffffff" align='left'>
+                <td align='left'>
                 <!-- Update last rejoined at with the time the last feedback response was updated -->
                   <%= feedback_response.updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
                 </td></tr><tr class="tablesorter-childRow">
               <% else %>
                 <!--Review response rejoined-->
-                <td id = "green" bgcolor="#ffffff" style="color:#A90201" align = 'left' colspan=1>
+                <td id = "green"  style="color:#A90201" align = 'left' colspan=1>
                   <%= link_to user_name = Participant.find(review_response.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user_name}), :method => :post, :title => "Click here to impersonate this user" %>
                   (<%= @reviewee_name %>)
                 </td>
                 <!--Last rejoined at-->
                 <!-- Since the reponse DNE, last rejoined at is 'No' -->
-                <td bgcolor="#ffffff" style="color:#A90201" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
+                <td  style="color:#A90201" align = 'left'>No</td></tr><tr class="tablesorter-childRow">
               <% end %>
             <% end %>
           <% end %>
@@ -212,6 +212,7 @@
 
         $("#feedbackReportTable").tablesorter({
             sortList: [[0, 0]], //sort First Column by default when page loads
+            widgets: ['zebra'],
             textSorter: {
                       1: function (a, b) {
                     if (a.length == 0 && b.length == 0){

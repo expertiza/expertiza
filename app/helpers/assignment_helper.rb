@@ -94,5 +94,32 @@ module AssignmentHelper
       '#0984e3' # submission grade is not assigned yet.
     end
   end
+  
+  # determines if the user has teammate reviews to finish or not according to the 
+  # 
+  def user_has_teammate_reviews?(assignment)
+    assignment.find_due_dates("teammate_review").count > 0
+  end
+  
+  def remove_teammate_review_deadline
+    @dd = AssignmentDueDate.find_by(deadline_type_id: DeadlineHelper::DEADLINE_TYPE_TEAMMATE_REVIEW)
+    if @dd
+      @dd.destroy
+    end
+  end
+
+  # determines if user completed all teammate reviews for a particular assignment
+  def user_completed_teammate_reviews?(user_id, assignment_id)
+    @teammates = Team.find_team_for_assignment_and_user(assignment_id, user_id).first.participants.select { |p| p.user_id != user_id }
+    puts @teammates, "\n\n\n\n\n\n hhrehhee \n\n\n\n\n", @teammates.count
+    if @teammates.count < 1
+      true
+    else
+      @reviewer = AssignmentParticipant.find_by(user_id: user_id, parent_id: assignment_id)
+      if @reviewer
+        @teammates.all? { |t| TeammateReviewResponseMap.where(reviewer_id: @reviewer.id, reviewee_id: t.id).exists? }
+      end
+    end
+  end
 
 end

@@ -198,7 +198,7 @@ const node_attributes = {
     colWidthArray: [ '30%', '0%', '0%', '0%', '20%', '20%', '30%' ],
     getActions: function(handleButtonClick, parent_name) {
       return (
-        <span onClick={this.handleButtonClick}>
+        <span onClick={handleButtonClick}>
           <form
             style={{
               margin: 0,
@@ -296,31 +296,29 @@ jQuery(document).ready(function() {
       }
       if (node_attributes.isQuestionnaire(this.props.dataType)) {
         return node_attributes.questionnaire.getActions(this.handleButtonClick, this.props.parent_name)
-      } else if (this.state.showDetails) {
+      }
+      if (this.state.showDetails) {
         /** only running this check after the state changes to show the details (which currently is on any click on the row) */
         /** this will update after the user clicks anywhere on the row */
 
         moreButtonStyle.display = 'none'
-
-        if (this.props.is_available || node_attributes.isQuestionnaire(this.props.dataType)) {
+        if (this.props.is_available || node_attributes.isQuestionnaire(this.props.nodeType)) {
           // check if the user id exists
           // check if the current user id matches the user/instructor id associated with a questionnaire/survey
-
+          // show edit button only for the items which are associated to that user
+          // if (app_variables.currentUserId == null || this.props.instructor_id == app_variables.currentUserId) {
             moreContent.push(
-              // should only be viewed by either assignments or courses
-              <span>
-                {' '}
-                <a
-                  title="Edit"
-
-                  href={`/${node_attributes[this.props.nodeType].plural}/${parseInt(this.props.id) /2}/edit`}
-
-                >
-                  <img src="/assets/tree_view/edit-icon-24.png" />
-                </a>
-              </span>
-            )
-
+                <span>
+                  <a
+                    title="Edit"
+                    href={`/${node_attributes[this.props.nodeType].plural}/${parseInt(this.props.id) /
+                      2}/edit`}
+                  >
+                    <img src="/assets/tree_view/edit-icon-24.png" />
+                  </a>
+                </span>
+                )
+          // }
           moreContent.push(
             <span>
               <a
@@ -1019,7 +1017,6 @@ jQuery(document).ready(function() {
                     'none'
                   )
                 }
-                // what tfffff^^^
                 dataType={_this.props.dataType}
                 children={entry.children}
               />
@@ -1028,7 +1025,6 @@ jQuery(document).ready(function() {
             return
           }
         })
-        // if (true) {
         /** this was protecting an always null field, weird TODO */
         if (this.props.showPublic) {
           if (this.props.dataType == 'course') {

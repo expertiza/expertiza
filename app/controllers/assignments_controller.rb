@@ -278,7 +278,7 @@ class AssignmentsController < ApplicationController
   def team_formation_allowed?(dd)
     dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_TEAM_FORMATION
   end
-
+  
   # sets an assignment's deadline name
   def update_nil_dd_deadline_name(due_date_all)
     due_date_all.each do |dd|
@@ -363,6 +363,8 @@ class AssignmentsController < ApplicationController
     @drop_topic_allowed_checkbox = false
     @team_formation_allowed = false
     @team_formation_allowed_checkbox = false
+    @teammate_review_deadline_allowed = false
+    @teammate_review_deadline_allowed_checkbox = false # E2074
     @participants_count = @assignment_form.assignment.participants.size
     @teams_count = @assignment_form.assignment.teams.size
   end
@@ -386,6 +388,10 @@ class AssignmentsController < ApplicationController
     @drop_topic_allowed = drop_topic_allowed?(dd)
     @signup_allowed = signup_allowed?(dd)
     @team_formation_allowed = team_formation_allowed?(dd)
+    @teammate_review_deadline_allowed = team_formation_allowed?(dd)
+    # E2074 - Add teammate review deadline/assignment
+    # Teammate review deadlines should only be allowed on assignments that allow
+    # teams to be formed
   end
 
   # adjusts the time zone for a due date

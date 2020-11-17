@@ -515,18 +515,19 @@ function addDaysOrMonth(mul, type) {
     <%= label_tag('dropTopicAllowed', 'Use drop topic deadline') %><br/>
 <% end %>
 
+
+<span id='team_formation_due_date_checkbox' <%= 'hidden' if @assignment_form.assignment.max_team_size == 1%> 
+    <input name="teamFormationAllowed" type="hidden" value="false" />
+    <%= check_box_tag('teamFormationAllowed', 'true', @team_formation_allowed,:onclick=>"removeOrAddTeamFormation()" ) %>
+    <%= label_tag('teamFormationAllowed', 'Use team formation deadline') %><br/>
+</span>
+
 <%# E2074 - Add teammate review deadline %>
 <span id='teammate_review_deadline_checkbox' <%= 'hidden' if @assignment_form.assignment.max_team_size == 1 %> 
     <%# ** hide if this if no more than 1 person can be on a team %>
     <input name="teammateReviewDeadlineAllowed" type="hidden" value="false" />
     <%= check_box_tag('teammateReviewDeadlineAllowed', 'true', @teammate_review_deadline_allowed, :onclick=>"toggleTeammateReview()" ) %>
     <%= label_tag('teammateReviewDeadlineAllowed', 'Use teammate review deadline') %><br/>
-</span>
-
-<span id='team_formation_due_date_checkbox' <%= 'hidden' if @assignment_form.assignment.max_team_size == 1%> 
-    <input name="teamFormationAllowed" type="hidden" value="false" />
-    <%= check_box_tag('teamFormationAllowed', 'true', @team_formation_allowed,:onclick=>"removeOrAddTeamFormation()" ) %>
-    <%= label_tag('teamFormationAllowed', 'Use team formation deadline') %><br/>
 </span>
 
 <input name="metareviewAllowed" type="hidden" value="false" />

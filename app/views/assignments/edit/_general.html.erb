@@ -274,6 +274,8 @@ function microtaskChanged() {
         if (checkbox.is(':checked')) {
             team_count_field.removeAttr('hidden');
             team_formation_due_date_checkbox.removeAttr('hidden')
+            teammate_review_deadline_checkbox.removeAttr('hidden')
+            /** remove hidden attribute on update */
             jQuery('#assignment_form_assignment_max_team_size').val('2');
             teammate_reviews_field.removeAttr('hidden');
             addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
@@ -292,6 +294,7 @@ function microtaskChanged() {
               team_count_field.attr('hidden', true);
               team_formation_due_date_checkbox.attr('hidden', true)
               teammate_reviews_field.attr('hidden', true);
+              teammate_review_deadline_checkbox.attr('hidden', true)
               document.getElementById('assignment_form_assignment_max_team_size').value = '1';
               removeDueDateTableElement('team_formation', 0);
 

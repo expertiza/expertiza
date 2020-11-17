@@ -423,7 +423,7 @@ class AssignmentForm
   
   def self.newreviewresp(old_assign, catt, dict, new_assign_id)
     @old_reviewrespmap = ReviewResponseMap.where(reviewed_object_id: old_assign.id, reviewee_id: catt)
-    @find_newrespmap = ReviewResponseMap.where(reviewed_object_id: new_assign_id, reviewee_id: dict[catt])
+    @find_newrespmap =  ReviewResponseMap.where(reviewed_object_id: new_assign_id, reviewee_id: dict[catt])
     oldreviewrespids = []
     newreviewrespids = []
     @old_reviewrespmap.each do |zatt|
@@ -443,18 +443,15 @@ class AssignmentForm
         @newresp.round = zatt.round
         @newresp.is_submitted = zatt.is_submitted
         @newresp.save
-      end
-    end
-  end
-  
-  def self.copydirectory(old_directory_path_name, new_assign, name)
-    if File.exist?(old_directory_path_name)
-      new_directory_name = new_assign.directory_path
-      directory = "pg_data/" + name + "/" + new_directory_name
-      Dir.mkdir(directory) unless File.exist?(directory)
-      my_dir = Dir[old_directory_path_name + '/*']
-      my_dir.each do |filename|
-        FileUtils.cp(filename, directory + '/')
+        @oldanswers = Answer.where(response_id:zatt.id)
+        @oldanswers.each do |latt|
+          @newanswer = Answer.new
+          @newanswer.question_id = latt.question_id
+          @newanswer.answer = latt.answer
+          @newanswer.comments = latt.comments
+          @newanswer.response_id = @newresp.id
+          @newanswer.save
+        end
       end
     end
   end
@@ -516,10 +513,20 @@ class AssignmentForm
         newreviewresp(old_assign, catt, dict, new_assign_id)
         count += 1
       end
+      old_directory_path = ""
+      new_directory_path = ""
+      old_team_ids.each do |catt|
+        @team_needed = Team.where(id:catt).first
+        @team_inserted = Team.where(id:dict[catt]).first
+        old_directory_path = @team_needed.path_calibration
+        new_directory_path = @team_inserted.path_calibration
+        break
+      end
     end
-    old_directory_name = old_assign.directory_path
-    old_directory_path_name = "pg_data/" + user.name + "/" + old_directory_name
-    copydirectory(old_directory_path_name, new_assign, user.name)
+    if File.exist?(old_directory_path)
+      Dir.mkdir(new_directory_path) unless File.exist?(new_directory_path)
+      FileUtils.cp_r old_directory_path+'/.', new_directory_path
+    end
     new_assign_id
   end
   

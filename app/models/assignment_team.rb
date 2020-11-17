@@ -224,6 +224,11 @@ class AssignmentTeam < Team
     self.assignment.path + "/" + self.directory_num.to_s
   end
 
+   #Get the path of the directory for the assignment
+   def path_calibration
+    self.assignment.path
+  end
+
   # Set the directory num for this team
   def set_student_directory_num
     return if self.directory_num and self.directory_num >= 0

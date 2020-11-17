@@ -87,6 +87,7 @@ class ResponseController < ApplicationController
       @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
     @questionnaire = set_questionnaire
+    calculate_total_score
     render action: 'response'
   end
 
@@ -134,6 +135,7 @@ class ResponseController < ApplicationController
       @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
     end
     questions = sort_questions(@questionnaire.questions)
+    calculate_total_score
     init_answers(questions)
     render action: 'response'
   end
@@ -398,6 +400,21 @@ class ResponseController < ApplicationController
       # it's unlikely that these answers exist, but in case the user refresh the browser some might have been inserted.
       a = Answer.where(response_id: @response.id, question_id: q.id).first
       Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '') if a.nil?
+    end
+  end
+
+  # Calculates and updates the total contribution for a Cake question across all teammates
+  def calculate_total_score
+    @total_score = Hash.new
+    @questions.each do |question|
+      if question.instance_of? Cake
+        reviewee_id = ResponseMap.select(:reviewee_id, :type).where(id: @response.map_id.to_s).first
+        total_score = question.get_total_score_for_question(reviewee_id.type, question.id, @participant.id, @assignment.id, reviewee_id.reviewee_id).to_s
+        if total_score.nil?
+          total_score = 0
+        end
+        @total_score[question.id] = total_score
+      end
     end
   end
 end

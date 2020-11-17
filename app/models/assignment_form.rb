@@ -378,6 +378,26 @@ class AssignmentForm
     end
   end
 
+  def self.newreview(old_assign, new_assign_id, dict)
+    @old_assignmentnumber = Assignment.find_by(id: old_assign.id)
+    @old_reviewrespmap = ReviewResponseMap.where(reviewed_object_id: old_assign.id)
+    @getnewparticipant = Participant.find_by(parent_id: new_assign_id, user_id: @old_assignmentnumber.instructor_id)
+    @old_reviewrespmap.each do |satt|
+      if dict.key?(satt.reviewee_id)
+        @new_reviewrespmap = ReviewResponseMap.new
+        @new_reviewrespmap.reviewed_object_id = new_assign_id
+        @new_reviewrespmap.reviewer_id = @getnewparticipant.id
+        @new_reviewrespmap.reviewee_id = dict[satt.reviewee_id]
+        @new_reviewrespmap.type = satt.type
+        @new_reviewrespmap.created_at = satt.created_at
+        @new_reviewrespmap.calibrate_to = satt.calibrate_to
+        @new_reviewrespmap.save
+      else
+        next
+      end
+    end
+  end
+
   def self.createnewparticipant(old_assign, new_assign_id, dict)
     @old_assignmentnumber = Assignment.find_by(id: old_assign.id)
     @new_assignmentnumber = Assignment.find_by(id: new_assign_id)
@@ -398,22 +418,7 @@ class AssignmentForm
     @new_participant.duty = @find_participant.duty
     @new_participant.can_take_quiz = @find_participant.can_take_quiz
     @new_participant.save
-    @getnewparticipant = Participant.find_by(parent_id: new_assign_id, user_id: @old_assignmentnumber.instructor_id)
-    @old_reviewrespmap = ReviewResponseMap.where(reviewed_object_id: old_assign.id)
-    @old_reviewrespmap.each do |satt|
-      if dict.key?(satt.reviewee_id)
-        @new_reviewrespmap = ReviewResponseMap.new
-        @new_reviewrespmap.reviewed_object_id = new_assign_id
-        @new_reviewrespmap.reviewer_id = @getnewparticipant.id
-        @new_reviewrespmap.reviewee_id = dict[satt.reviewee_id]
-        @new_reviewrespmap.type = satt.type
-        @new_reviewrespmap.created_at = satt.created_at
-        @new_reviewrespmap.calibrate_to = satt.calibrate_to
-        @new_reviewrespmap.save
-      else
-        next
-      end
-    end
+    newreview(old_assign, new_assign_id, dict)
   end
   
   def self.newreviewresp(old_assign, catt, dict, new_assign_id)

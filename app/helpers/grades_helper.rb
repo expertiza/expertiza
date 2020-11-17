@@ -59,6 +59,63 @@ module GradesHelper
     css_class
   end
 
+  def add_response_to_vmlist(participant, assignment, team, questionnaire, vmlist, round)
+    vm = VmQuestionResponse.new(questionnaire, assignment, round)
+    vmquestions = questionnaire.questions
+    vm.add_questions(vmquestions)
+    vm.add_team_members(team)
+    vm.add_reviews(participant, team, assignment.vary_by_round)
+    vm.number_of_comments_greater_than_10_words
+    vmlist << vm
+  end
+
+  def generate_heatgrid(participant, assignment, team, team_id, questionnaires, vmlist)
+    # loop through each questionnaire, and populate the view model for all data necessary
+    # to render the html tables.
+    counter_for_revisions = -1
+    counter_for_same_rubric = 0
+    questionnaires.each do |questionnaire|
+      if assignment.vary_by_round? && questionnaire.type == "ReviewQuestionnaire"
+        questionnaires = AssignmentQuestionnaire.where(assignment_id: assignment.id, questionnaire_id: questionnaire.id)
+        if questionnaires.count > 1
+          @round = questionnaires[counter_for_same_rubric].used_in_round
+          counter_for_same_rubric += 1
+        else
+          @round = questionnaires[0].used_in_round
+          counter_for_same_rubric = 0
+        end
+      end
+      add_response_to_vmlist(participant, assignment, team, questionnaire, vmlist, @round)
+      # Finds RevisionPlanQuestionnaire, if any
+      if assignment.vary_by_round? && assignment.is_revision_planning_enabled?
+        rp_questionnaire = RevisionPlanTeamMap.find_by(team: Team.find(team_id), used_in_round: counter_for_revisions).try(:questionnaire)
+        # Confirms revision planning enabled
+        # Confirms not first round
+        # Confirms haven't surpassed maximum number of rounds
+        if rp_questionnaire
+          # Adds RevisionPlanQuestionnaire to heatgrid
+          add_response_to_vmlist(participant, assignment, team, rp_questionnaire, vmlist, @round)
+        end
+        counter_for_revisions += 1
+      elsif assignment.is_revision_planning_enabled? && questionnaire == questionnaires.last
+        if assignment.get_current_stage == "Finished"
+          current_round = assignment.rounds_of_reviews
+        else
+          reviewees_topic = SignedUpTeam.topic_id_by_team_id(participant.id)
+          current_round = assignment.number_of_current_round(reviewees_topic)
+        end
+        rp_questionnaire = RevisionPlanTeamMap.find_by(team: Team.find(team_id), used_in_round: current_round).try(:questionnaire)
+        # Confirms revision planning enabled
+        # Confirms not first round
+        # Confirms haven't surpassed maximum number of rounds
+        if rp_questionnaire
+          # Adds RevisionPlanQuestionnaire to heatgrid
+          add_response_to_vmlist(participant, assignment, team, rp_questionnaire, vmlist, @round)
+        end
+      end
+    end
+  end
+
   def view_heatgrid(participant_id, type)
     # get participant, team, questionnaires for assignment.
     @participant = AssignmentParticipant.find(participant_id)
@@ -69,65 +126,8 @@ module GradesHelper
     questionnaires = @assignment.questionnaires
     @vmlist = []
 
-    # loop through each questionnaire, and populate the view model for all data necessary
-    # to render the html tables.
-    counter_for_revisions = 0
-    counter_for_same_rubric = 0
-    questionnaires.each do |questionnaire|
-      if @assignment.vary_by_round? && questionnaire.type == "ReviewQuestionnaire"
-        questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
-        if questionnaires.count > 1
-          @round = questionnaires[counter_for_same_rubric].used_in_round
-          counter_for_same_rubric += 1
-        else
-          @round = questionnaires[0].used_in_round
-          counter_for_same_rubric = 0
-        end
-      end
-      vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
-      vmquestions = questionnaire.questions
-      vm.add_questions(vmquestions)
-      vm.add_team_members(@team)
-      vm.add_reviews(@participant, @team, @assignment.vary_by_round)
-      vm.number_of_comments_greater_than_10_words
-      @vmlist << vm
-      # Finds RevisionPlanQuestionnaire, if any
-      if @assignment.vary_by_round? && @assignment.is_revision_planning_enabled?
-        rp_questionnaire = RevisionPlanTeamMap.find_by(team: Team.find(@team_id)).try(:questionnaire)
-        # Confirms revision planning enabled
-        # Confirms not first round
-        # Confirms haven't surpassed maximum number of rounds
-        if rp_questionnaire && counter_for_revisions > 2
-          # Adds RevisionPlanQuestionnaire to heatgrid
-          vm = VmQuestionResponse.new(rp_questionnaire, @assignment, @round)
-          vmquestions = rp_questionnaire.questions
-          vm.add_questions(vmquestions)
-          vm.add_team_members(@team)
-          vm.add_reviews(@participant, @team, @assignment.vary_by_round)
-          vm.number_of_comments_greater_than_10_words
-          @vmlist << vm
-        end
-        counter_for_revisions += 1
-      elsif @assignment.is_revision_planning_enabled? && questionnaire == questionnaires.last
-        reviewees_topic = SignedUpTeam.topic_id_by_team_id(@participant.id)
-        current_round = @assignment.number_of_current_round(reviewees_topic)+1
-        rp_questionnaire = RevisionPlanTeamMap.find_by(team: Team.find(@team_id)).try(:questionnaire)
-        # Confirms revision planning enabled
-        # Confirms not first round
-        # Confirms haven't surpassed maximum number of rounds
-        if rp_questionnaire # && counter_for_rounds >= 1
-          # Adds RevisionPlanQuestionnaire to heatgrid
-          vm = VmQuestionResponse.new(rp_questionnaire, @assignment, @round)
-          vmquestions = rp_questionnaire.questions
-          vm.add_questions(vmquestions)
-          vm.add_team_members(@team)
-          vm.add_reviews(@participant, @team, @assignment.vary_by_round)
-          vm.number_of_comments_greater_than_10_words
-          @vmlist << vm
-        end
-      end
-    end
-    #@current_role_name = current_role_name
+    generate_heatgrid(@participant, @assignment, @team, @team_id, questionnaires, @vmlist)
+
     render "grades/view_heatgrid.html.erb"
   end
 

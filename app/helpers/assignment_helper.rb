@@ -109,7 +109,7 @@ module AssignmentHelper
     else
       @reviewer = AssignmentParticipant.find_by(user_id: user_id, parent_id: assignment_id)
       if @reviewer
-        @teammates.all? { |t| TeammateReviewResponseMap.where(reviewer_id: @reviewer.id, reviewee_id: t.id).exists? }
+        @teammates.all? { |t| TeammateReviewResponseMap.where(reviewer_id: @reviewer.id, reviewee_id: t.id).exists? and TeammateReviewResponseMap.where(reviewer_id: @reviewer.id, reviewee_id: t.id).first.response.exists? }
       end
     end
   end

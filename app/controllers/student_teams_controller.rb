@@ -40,19 +40,24 @@ class StudentTeamsController < ApplicationController
 
     @send_invs = Invitation.where from_id: student.user.id, assignment_id: student.assignment.id
     @received_invs = Invitation.where to_id: student.user.id, assignment_id: student.assignment.id, reply_status: 'W'
+    
     # Get the current due dates
-    @student.assignment.due_dates.each do |due_date|
-      if due_date.due_at > Time.now
-        @current_due_date = due_date
-        break
-      end
-    end
-
+    # @student.assignment.due_dates.each do |due_date|
+    #   if due_date.due_at > Time.now
+    #     @current_due_date = due_date
+    #     break
+    #   end
+    # end
+    # This above is no longer needed as there is a dedicated field for teammate deadline reviews
+    # It may be wise to keep it though, in the case that no due date is assigned, as this basically
+    # is preventing the student from submitting a peer review after all of the due dates for the current assignment have passed
     current_team = @student.team
 
     @users_on_waiting_list = (SignUpTopic.find(current_team.topic).users_on_waiting_list if @student.assignment.topics? && current_team && current_team.topic)
-
-    @teammate_review_allowed = true if @student.assignment.find_current_stage == 'Finished' || @current_due_date && (@current_due_date.teammate_review_allowed_id == 3 || @current_due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
+    
+    # E2074 - teammate review deadline
+    @teammate_review_deadline = @student.assignment.due_dates.find_by(deadline_type_id: DeadlineType.find_by(name: "teammate_review"))
+    @teammate_review_allowed = @teammate_review_deadline ? Time.now < @teammate_review_deadline.due_at : true
   end
 
   def create

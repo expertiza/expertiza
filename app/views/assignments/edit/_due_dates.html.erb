@@ -512,7 +512,7 @@ function addDaysOrMonth(mul, type) {
 <span id='teammate_review_deadline_checkbox' <%= 'hidden' if @assignment_form.assignment.max_team_size < 2%> 
     <%# ** hide if this if no more than 1 person can be on a team %>
     <input name="teammateReviewDeadlineAllowed" type="hidden" value="false" />
-    <%= check_box_tag('teammateReviewDeadlineAllowed', 'true', @teammate_review_deadline_allowed,:onclick=>"toggleTeammateReview()" ) %>
+    <%= check_box_tag('teammateReviewDeadlineAllowed', 'true', @teammate_review_deadline_allowed, :onclick=>"toggleTeammateReview()" ) %>
     <%= label_tag('teammateReviewDeadlineAllowed', 'Use teammate review deadline') %><br/>
 </span>
 

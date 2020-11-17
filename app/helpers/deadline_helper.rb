@@ -7,6 +7,7 @@ module DeadlineHelper
   DEADLINE_TYPE_DROP_TOPIC = 6
   DEADLINE_TYPE_SIGN_UP = 7
   DEADLINE_TYPE_TEAM_FORMATION = 8
+  DEADLINE_TYPE_TEAMMATE_REVIEW = DeadlineType.find_by(name: 'teammate_review').id
 
   # Creates a new topic deadline for topic specified by topic_id.
   # The deadline itself is specified by due_date object which contains several values which specify

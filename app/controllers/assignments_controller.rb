@@ -386,14 +386,14 @@ class AssignmentsController < ApplicationController
   end
 
   # gets the current settings of the current assignment
-  def update_due_date_nameurl(dd)
-    @due_date_nameurl_not_empty = due_date_nameurl_not_empty?(dd)
+  def update_due_date_nameurl
+    @due_date_nameurl_not_empty =  @due_date_all.any? { |d| due_date_nameurl_not_empty?(d) }
     @due_date_nameurl_not_empty_checkbox = @due_date_nameurl_not_empty
-    @metareview_allowed = meta_review_allowed?(dd)
-    @drop_topic_allowed = drop_topic_allowed?(dd)
-    @signup_allowed = signup_allowed?(dd)
-    @team_formation_allowed = team_formation_allowed?(dd)
-    @teammate_review_deadline_allowed = teammate_review_deadline_allowed?(dd)
+    @metareview_allowed = @due_date_all.any? { |d| meta_review_allowed?(d) }
+    @drop_topic_allowed = @due_date_all.any? { |d| drop_topic_allowed?(d) }
+    @signup_allowed = @due_date_all.any? { |d| signup_allowed?(d) }
+    @team_formation_allowed = @due_date_all.any? { |d| team_formation_allowed?(d) }
+    @teammate_review_deadline_allowed = @due_date_all.any? { |d| teammate_review_deadline_allowed?(d) } 
     # E2074 - Add teammate review deadline/assignment
     # Teammate review deadlines should only be allowed on assignments that allow
     # teams to be formed
@@ -407,7 +407,7 @@ class AssignmentsController < ApplicationController
   # ensures due dates ahave a name, description and at least either meta reviews, topic drops, signups, or team formations
   def validate_due_date
     @due_date_nameurl_not_empty && @due_date_nameurl_not_empty_checkbox &&
-      (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
+      (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed || @teammate_review_deadline_allowed)
   end
 
   # checks if each questionnaire in an assignment is used
@@ -443,12 +443,19 @@ class AssignmentsController < ApplicationController
   end
 
   # update values for an assignment's due date when editing
+  # this method doesn't work, it overwrites all the state values on each iteration
+  # the method update_due_date_nameurl has been fixed to account for this
   def update_due_date
+    # @due_date_all.each do |dd|
+    #   update_due_date_nameurl(dd)
+    #   adjust_due_date_for_timezone(dd)
+    #   break if validate_due_date
+    # end
     @due_date_all.each do |dd|
-      update_due_date_nameurl(dd)
       adjust_due_date_for_timezone(dd)
       break if validate_due_date
     end
+    update_due_date_nameurl # only calling this method once now
   end
 
   # update the current assignment's badges when editing

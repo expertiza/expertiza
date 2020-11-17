@@ -71,6 +71,15 @@
                 method: frm.attr('method'),
                 data: frm.serialize(),
               })
+              /** add update on change of tabs on create assignment page */
+              jQuery.ajax({
+                  url: "/assignments/instant_flash",
+                  method: "get",
+                  data: "",
+                  success: function(data, textStatus, xhr){
+                      jQuery("#application-flash-div").html(data);
+                  },
+              })
             } else {
               event.preventDefault();
             }

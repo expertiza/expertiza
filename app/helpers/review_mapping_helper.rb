@@ -94,7 +94,6 @@ module ReviewMappingHelper
         colors << "rgba(77, 175, 124, 1)" # red
       end
     end
-    # labels = (1..scores.length).to_a
     data = {
         labels: labels,
         datasets: [
@@ -152,12 +151,6 @@ module ReviewMappingHelper
     horizontal_bar_chart data, options
 
   end
-
-  def set_column_color()
-    "rgba(77, 175, 124, 1)"
-    # "rgba(255,99,132,0.8)" 
-  end
-
 
   #
   # gets the team name's color according to review and assignment submission status

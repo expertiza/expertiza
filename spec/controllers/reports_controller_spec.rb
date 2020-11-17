@@ -101,6 +101,7 @@ describe ReportsController do
     end
     it 'returns reviewers name from Answer by reviewee and assignment id from db which is not empty' do
       allow(User).to receive(:where).with(@reviewee_id, @assignment_id).and_return([user1])
+      expect(User.where(@reviewee_id, @assignment_id)).to eq([user1])
     end
   end
 

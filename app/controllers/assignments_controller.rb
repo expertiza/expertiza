@@ -279,6 +279,11 @@ class AssignmentsController < ApplicationController
     dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_TEAM_FORMATION
   end
   
+  # checks if an assignment has a teammate review deadline associated
+  def teammate_review_deadline_allowed?(dd)
+    dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_TEAMMATE_REVIEW
+  end
+  
   # sets an assignment's deadline name
   def update_nil_dd_deadline_name(due_date_all)
     due_date_all.each do |dd|
@@ -388,7 +393,7 @@ class AssignmentsController < ApplicationController
     @drop_topic_allowed = drop_topic_allowed?(dd)
     @signup_allowed = signup_allowed?(dd)
     @team_formation_allowed = team_formation_allowed?(dd)
-    @teammate_review_deadline_allowed = team_formation_allowed?(dd)
+    @teammate_review_deadline_allowed = teammate_review_deadline_allowed?(dd)
     # E2074 - Add teammate review deadline/assignment
     # Teammate review deadlines should only be allowed on assignments that allow
     # teams to be formed

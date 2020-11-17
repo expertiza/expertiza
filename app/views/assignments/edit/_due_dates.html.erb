@@ -418,14 +418,21 @@
             <%@team_formation_allowed_checkbox=true%>
 
         }
+        
+        
         /** E2074 Add teammate review deadline, toggle made more sense */
+        // document.getElementById('#teammate_review_deadline_checkbox').onClick() {
+            
+        // }
         function toggleTeammateReview(){
-            if(document.getElementById("teammate_review"))
+            if(document.getElementById("teammate_review")) {
                 removeDueDateTableElement('teammate_review', 0);
-             else
+                <% remove_teammate_review_deadline() %>
+                }
+             else 
                  addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'teammate_review', 0, <%= due_date(@assignment_form.assignment, 'teammate_review').to_json.html_safe %>);
-
             <%@teammate_review_deadline_allowed_checkbox=true%>
+
 
         }
 function removeOrAddMetareview() {

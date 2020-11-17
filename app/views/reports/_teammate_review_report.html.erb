@@ -3,8 +3,9 @@
     /*E2084: Function for sorting the table */
     $("#teammateReviewTable").tablesorter({
 
-        dateFormat : "mmddyyyy", //E2084: set the default date format
-      sortList: [[0,0]] // E2084: sort First Column by default when page loads
+      dateFormat : "mmddyyyy", //E2084: set the default date format
+      sortList: [[0,0]], // E2084: sort First Column by default when page loads
+      widgets: ['zebra'], // Make sure to update the css when column is sorted
     });
   });
 </script>

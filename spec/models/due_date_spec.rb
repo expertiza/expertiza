@@ -130,4 +130,9 @@ describe "due_date_functions" do
   it "review submission_allowed default permission NO" do
     expect(DueDate.default_permission('review', 'submission_allowed')).to be == DeadlineRight::NO
   end
+  
+  it "teammate_review submission_allowed default permission NO" do
+    expect(DueDate.default_permission('teammate_review', 'submission_allowed')).to be == DeadlineRight::NO
+    # E2074/ensure teammate reviews cannot be added past deadline
+  end
 end

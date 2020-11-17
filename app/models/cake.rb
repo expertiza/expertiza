@@ -82,10 +82,7 @@ class Cake < ScoredQuestion
       safe_join(["".html_safe, "".html_safe], html.html_safe)
     end
   
-<<<<<<< HEAD
     # Finds all teammates and calculates the total contribution of all members for the question
-=======
->>>>>>> 5405e3422016aba1fe626e52da18d7a8c756edb7
     def get_total_score_for_question(review_type, question_id, participant_id, assignment_id, reviewee_id)
       # get the reviewer's team id for the currently answered question
       team_id = Team.joins([:teams_users, teams_users: [{user: :participants}]]).where("participants.id = ? and teams.parent_id in (?)", participant_id, assignment_id).first
@@ -94,27 +91,18 @@ class Cake < ScoredQuestion
       end
       if review_type == 'TeammateReviewResponseMap'
         answers_for_team_members =  get_answers_for_teammatereview(team_id, question_id, participant_id, assignment_id, reviewee_id)
-<<<<<<< HEAD
       # else
       #   answers_for_team_members = get_answers_for_review(question_id, participant_id, assignment_id)
-=======
-      else
-        answers_for_team_members = get_answers_for_review(question_id, participant_id, assignment_id)
->>>>>>> 5405e3422016aba1fe626e52da18d7a8c756edb7
       end
       calculate_total_score(answers_for_team_members)
     end
   
-<<<<<<< HEAD
     # Finds the scores for all teammates for this question
-=======
->>>>>>> 5405e3422016aba1fe626e52da18d7a8c756edb7
     def get_answers_for_teammatereview(team_id, question_id, participant_id, assignment_id, reviewee_id)
       # get the reviewer's team members for the currently answered question
       team_members = Participant.joins(user: :teams_users).where("teams_users.team_id in (?) and participants.parent_id in (?)", team_id, assignment_id).ids
       # get the reviewer's ratings for his team members
       Answer.joins([{response: :response_map}, :question]).where("response_maps.reviewee_id in (?) and response_maps.reviewed_object_id = (?)
-<<<<<<< HEAD
         and answer is not null and response_maps.reviewer_id in (?) and answers.question_id in (?) and response_maps.reviewee_id not in (?)", team_members, assignment_id, participant_id, question_id, reviewee_id).to_a
     end
   
@@ -124,17 +112,6 @@ class Cake < ScoredQuestion
     # end
   
     # Sums up the scores given by all teammates that should be less than or equal to 100
-=======
-  and answer is not null and response_maps.reviewer_id in (?) and answers.question_id in (?) and response_maps.reviewee_id not in (?)", team_members, assignment_id, participant_id, question_id, reviewee_id).to_a
-    end
-  
-    def get_answers_for_review(question_id, participant_id, assignment_id)
-      Answer.joins([{response: :response_map}, :question]).where("response_maps.reviewed_object_id = (?)
-  and answer is not null and response_maps.reviewer_id in (?) and answers.question_id in (?)", assignment_id, participant_id, question_id).to_a
-    end
-  
-    # sums up the answer ratings for the given answers
->>>>>>> 5405e3422016aba1fe626e52da18d7a8c756edb7
     def calculate_total_score(question_answers)
       question_score = 0.0
       question_answers.each do |ans|

@@ -27,23 +27,38 @@ class AssignmentTeamMentor < ActiveRecord::Base
   
   # Email assignment team mentor and assignment team participants of mentor assigned given the team_id we can send the email to the users.
   def email_mentor(team_id)
-   p TeamsUser.find_by(team_id: team_id)
+    members = TeamsUser.where(team_id: team_id)
+    parent_id = Team.find_by(id: team_id).parent_id
+    members_id=members.collect(&:user_id)
+  #store the names and emails of the members by iterating through their ids.
+    @user_name = []
+    @user_email = []
+    members_id.each do|i|
+     @user_name.push(User.find_by(id: i).name) 
+     @user_email.push(User.find_by(id: i).email)
+    end
    user = User.find_by(id: TeamsUser.find_by(team_id: team_id).user_id)
      Mailer.notify_member(
       to: user.email,
-      subject: "You have been assigned to a team"
+      subject: "You have been assigned to mentor a team",
+      body:{
+        user_name: @user_name,
+        user_email: @user_email
+      }
     ).deliver_now
   end
 
-  def email_member(member_id)
-    user = User.find_by(id: member_id )
-      Mailer.notify_member(
-       to: user.email,
-       subject: "You have been assigned to a team"
-     ).deliver_now
-   end
 
-  
+  # def email_member(member_id)
+  #   user = User.find_by(id: member_id )
+  #     Mailer.notify_member(
+  #      to: user.email,
+  #      subject: "You are now part of a team",
+  #      body:{
+  #      }
+  #    ).deliver_now
+  #  end
+
 
   # Class method returns assigned team mentor with assignment_team_id.
   # Returns fields associated with User data model. i.e name,: fullname: and email:.

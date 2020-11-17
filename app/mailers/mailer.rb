@@ -1,14 +1,8 @@
 class Mailer < ActionMailer::Base
-  # if Rails.env.development? || Rails.env.test?
-  #   default from: 'expertiza.development@gmail.com'
-  # else
-  #   default from: 'expertiza-support@lists.ncsu.edu'
-  # end
-
-    if Rails.env.development? || Rails.env.test?
-    default from: 'rubytuesdayteam@gmail.com'
+  if Rails.env.development? || Rails.env.test?
+    default from: 'expertiza.development@gmail.com'
   else
-    default from: 'rubytuesdayteam@gmail.com'
+    default from: 'expertiza-support@lists.ncsu.edu'
   end
 
   def generic_message(defn)
@@ -90,8 +84,11 @@ class Mailer < ActionMailer::Base
   end
 
   def notify_member(defn)
+    @body = defn[:body]
     @subject=defn[:subject]
-    
+    @user_name=defn[:body][:user_name]
+    @user_email=defn[:body][:user_email]
+
     mail(subject: defn[:subject],
          to: defn[:to])
   end

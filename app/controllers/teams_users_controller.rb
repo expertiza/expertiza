@@ -43,7 +43,7 @@ class TeamsUsersController < ApplicationController
           undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
           #E2077- Email member when he is added to a team.
           assignmentTeamMentor = AssignmentTeamMentor.new(assignment_team_id: team[:id])
-          assignmentTeamMentor.email_member(user.id)
+          # assignmentTeamMentor.email_member(user.id)
           assignmentTeamMentor.email_mentor(team[:id])
         end
       else # CourseTeam

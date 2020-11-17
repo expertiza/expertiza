@@ -212,6 +212,7 @@
 
         $("#feedbackReportTable").tablesorter({
             sortList: [[0, 0]], //sort First Column by default when page loads
+            widgets: ['zebra'],
             textSorter: {
                       1: function (a, b) {
                     if (a.length == 0 && b.length == 0){

@@ -48,18 +48,6 @@ class AssignmentTeamMentor < ActiveRecord::Base
     ).deliver_now
   end
 
-
-  # def email_member(member_id)
-  #   user = User.find_by(id: member_id )
-  #     Mailer.notify_member(
-  #      to: user.email,
-  #      subject: "You are now part of a team",
-  #      body:{
-  #      }
-  #    ).deliver_now
-  #  end
-
-
   # Class method returns assigned team mentor with assignment_team_id.
   # Returns fields associated with User data model. i.e name,: fullname: and email:.
   def self.getAssignedMentor(assignment_team_id)

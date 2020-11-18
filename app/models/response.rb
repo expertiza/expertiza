@@ -29,7 +29,6 @@ class Response < ActiveRecord::Base
       self_id = self.id.to_s
       code = construct_student_html identifier, self_id, count
     end
-    puts code, self_id, show_tags, current_user
     code = construct_review_response code, self_id, show_tags, current_user
     code.html_safe
   end

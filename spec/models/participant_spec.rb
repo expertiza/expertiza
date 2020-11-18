@@ -6,6 +6,9 @@ describe Participant do
   let(:participant) { build(:participant, user: build(:student, name: "Jane", fullname: "Doe, Jane", id: 1)) }
   let(:participant2) { build(:participant, user: build(:student, name: "John", fullname: "Doe, John", id: 2)) }
   let(:participant3) { build(:participant, can_review: false, user: build(:student, name: "King", fullname: "Titan, King", id: 3)) }
+  let(:student_participant) { create(:participant, user: build(:student, name: "King", fullname: "Titan, King", id: 4)) }
+  let(:instructor_participant) { create(:participant, user: create(:instructor, name: "King", fullname: "Titan, King", id: 5)) }
+  let(:ta_participant) { create(:participant, user: build(:teaching_assistant, name: "King", fullname: "Titan, King", id: 6)) }
   let(:participant4) { Participant.new }
   let(:assignment) { build(:assignment, id: 1, name: 'no assgt') }
   let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
@@ -15,6 +18,8 @@ describe Participant do
   let(:question2) { Criterion.new(id: 2, weight: 2, break_before: true) }
   let(:questionnaire1) { ReviewQuestionnaire.new(id: 1, questions: [question1], max_question_score: 5) }
   let(:questionnaire2) { ReviewQuestionnaire.new(id: 2, questions: [question2], max_question_score: 5) }
+
+  let(:instructor) { build(:instructor, id: 7) }
 
   after(:each) do
     ActionMailer::Base.deliveries.clear
@@ -114,6 +119,35 @@ describe Participant do
     end
     it 'returns the permissions of submitter' do
       expect(Participant.get_permissions('submitter')).to contain_exactly([:can_submit, true], [:can_review, false], [:can_take_quiz, false])
+    end
+  end
+
+  describe '#get_can_mentor' do
+    it 'returns false if participant is a student' do
+      allow(student_participant).to receive_message_chain(:role, :student?).and_return(true)
+      expect(student_participant.get_can_mentor).to eq(false)
+    end
+    it 'returns true if participant is an instructor' do
+      allow(instructor_participant).to receive_message_chain(:role, :instructor?).and_return(true)
+      expect(instructor_participant.get_can_mentor).to eq(true)
+    end
+    it 'returns true if participant is a ta' do
+      allow(ta_participant).to receive_message_chain(:role, :ta?).and_return(true)
+      expect(ta_participant.get_can_mentor).to eq(true)
+    end
+  end
+
+  describe '#get_mentors' do
+    it 'returns nil if no mentors are assigned to the assignment' do
+      p Participant.get_mentors(assignment.id).count
+      expect(Participant.get_mentors(assignment.id).count).to eq(0)
+    end
+    it 'returns possible mentors for an assignment' do
+      mentor = Participant.new
+      mentor.can_mentor = true
+      mentor.parent_id = assignment.id
+      mentor.save
+      expect(Participant.get_mentors(assignment.id).first).to eq(mentor)
     end
   end
 

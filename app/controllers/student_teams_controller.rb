@@ -50,10 +50,12 @@ class StudentTeamsController < ApplicationController
 
     current_team = @student.team
 
+    # Only run following code if student is associated with a team
+    if current_team.nil? != true
     # Retrieve assigned team mentor
-    @assignment_team_mentor = AssignmentTeamMentor.getAssignedMentor(@student.team[:id])
-    @users_on_waiting_list = (SignUpTopic.find(current_team.topic).users_on_waiting_list if @student.assignment.topics? && current_team && current_team.topic)
-
+      @assignment_team_mentor = AssignmentTeamMentor.getAssignedMentor(@student.team[:id])
+      @users_on_waiting_list = (SignUpTopic.find(current_team.topic).users_on_waiting_list if @student.assignment.topics? && current_team && current_team.topic)
+    end
     @teammate_review_allowed = true if @student.assignment.find_current_stage == 'Finished' || @current_due_date && (@current_due_date.teammate_review_allowed_id == 3 || @current_due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
   end
 
@@ -72,17 +74,11 @@ class StudentTeamsController < ApplicationController
       parent = AssignmentNode.find_by node_object_id: student.parent_id
       TeamNode.create parent_id: parent.id, node_object_id: team.id
 
-      # Only assign mentor to AssignmentTeam team
-      if team.type == "AssignmentTeam"
-        begin
-          assignmentTeamMentor = AssignmentTeamMentor.new(assignment_team_id: team[:id])
-          assignmentTeamMentor.assignMentor(team[:parent_id])
-          # Notify when no mentor was assigned to team because none were available from participants
-        rescue StandardError 
-          flash[:error] = $ERROR_INFO
-          # redirect_to action: 'list', id: parent.id and return
-          redirect_to view_student_teams_path student_id: student.id
-        end
+      # Only assign mentor to AssignmentTeam team and with assignments that don't have topics
+      if team.type == "AssignmentTeam" && Assignment.find_by(id: student.parent_id).topics? != true
+        assignmentTeamMentor = AssignmentTeamMentor.new(assignment_team_id: team[:id])
+        # notify student if unable to assign team mentor
+        flash[:notice] = 'No mentor assigned at this moment' if assignmentTeamMentor.assignMentor(team[:parent_id]).nil?
         # If row was saved in assignment_team_mentors table, notify affected stakeholders of assigned team mentor via registered user email
         assignmentTeamMentor.email if assignmentTeamMentor.save
       end

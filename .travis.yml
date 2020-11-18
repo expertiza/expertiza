@@ -2,7 +2,8 @@ env:
   global:
     - CC_TEST_REPORTER_ID=d20eadb9183f9f1866657be5b5e47b4a2398ff1ea0be29fbd50a26a43ea98b62
     - REPORT_REPO_NAME=Travis-ci-code-coverage-reports
-    - secure: fpBhnY1Y4U0qx/BOFyO8OaS5gBPlF9Y8mFONF7WkphqbEJytlfIunbLFpQ1CX/9rDo1+96g0TDJUMx3bs4AnsgGEt16oSLOiRhKfyMcdsVRJry8a0PZMtYaEpBReyPv0Va0V7VTy1hFzLKTkmxKoIoYgNY0msocRypl/K6CF7l8=
+    # - secure: fpBhnY1Y4U0qx/BOFyO8OaS5gBPlF9Y8mFONF7WkphqbEJytlfIunbLFpQ1CX/9rDo1+96g0TDJUMx3bs4AnsgGEt16oSLOiRhKfyMcdsVRJry8a0PZMtYaEpBReyPv0Va0V7VTy1hFzLKTkmxKoIoYgNY0msocRypl/K6CF7l8=
+    - secure: MIGJAoGBAKY1mJtfyxF51Z8XSE4q/kLixEUegc4UGyP0lTH/URfJ3Yg7HzNwOXNg\nxWYtBWg8foI6H71J25iDGFYFA7ihY1GwDDlfd/RmYzBHD3nrVRdzYvvqKZgAfS9J\nvQnqfMVBRNYlP6osvgf394BvOTCrXh7WEQX6zLD0PO1wKgIEHhBzAgMBAAE=
   matrix:
     - TESTFOLDER=features
     - TESTFOLDER=models

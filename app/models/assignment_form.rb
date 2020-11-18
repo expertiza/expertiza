@@ -420,10 +420,11 @@ class AssignmentForm
     @new_participant.save
     newreview(old_assign, new_assign_id, dict)
   end
-  
+
+
   def self.newreviewresp(old_assign, catt, dict, new_assign_id)
     @old_reviewrespmap = ReviewResponseMap.where(reviewed_object_id: old_assign.id, reviewee_id: catt)
-    @find_newrespmap =  ReviewResponseMap.where(reviewed_object_id: new_assign_id, reviewee_id: dict[catt])
+    @find_newrespmap = ReviewResponseMap.where(reviewed_object_id: new_assign_id, reviewee_id: dict[catt])
     oldreviewrespids = []
     newreviewrespids = []
     @old_reviewrespmap.each do |zatt|
@@ -443,7 +444,7 @@ class AssignmentForm
         @newresp.round = zatt.round
         @newresp.is_submitted = zatt.is_submitted
         @newresp.save
-        @oldanswers = Answer.where(response_id:zatt.id)
+        @oldanswers = Answer.where(response_id: zatt.id)
         @oldanswers.each do |latt|
           @newanswer = Answer.new
           @newanswer.question_id = latt.question_id
@@ -516,8 +517,8 @@ class AssignmentForm
       old_directory_path = ""
       new_directory_path = ""
       old_team_ids.each do |catt|
-        @team_needed = Team.where(id:catt).first
-        @team_inserted = Team.where(id:dict[catt]).first
+        @team_needed = Team.where(id: catt).first
+        @team_inserted = Team.where(id: dict[catt]).first
         old_directory_path = @team_needed.path_calibration
         new_directory_path = @team_inserted.path_calibration
         break
@@ -525,11 +526,11 @@ class AssignmentForm
     end
     if File.exist?(old_directory_path)
       Dir.mkdir(new_directory_path) unless File.exist?(new_directory_path)
-      FileUtils.cp_r old_directory_path+'/.', new_directory_path
+      FileUtils.cp_r old_directory_path + '/.', new_directory_path
     end
     new_assign_id
   end
-  
+
   def self.copy_assignment_questionnaire(old_assign, new_assign, user)
     old_assign.assignment_questionnaires.each do |aq|
       AssignmentQuestionnaire.create(

@@ -224,8 +224,8 @@ class AssignmentTeam < Team
     self.assignment.path + "/" + self.directory_num.to_s
   end
 
-   #Get the path of the directory for the assignment
-   def path_calibration
+  #Get the path of the directory for the assignment
+  def path_calibration
     self.assignment.path
   end
 

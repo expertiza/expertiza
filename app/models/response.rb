@@ -235,7 +235,6 @@ class Response < ActiveRecord::Base
   end
 
   def construct_review_response code, self_id, show_tags = nil, current_user = nil
-    puts "in line 238"
     code += '<table id="review_' + self_id + '" class="table table-bordered">'
     answers = Answer.where(response_id: self.response_id)
     unless answers.empty?

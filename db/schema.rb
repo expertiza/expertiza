@@ -11,7 +11,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200812211018) do
+
+ActiveRecord::Schema.define(version: 20200421235620) do
 
   create_table "account_requests", force: :cascade do |t|
     t.string   "name",              limit: 255
@@ -115,26 +116,24 @@ ActiveRecord::Schema.define(version: 20200812211018) do
     t.boolean  "is_calibrated",                                                    default: false
     t.boolean  "is_selfreview_enabled"
     t.string   "reputation_algorithm",                               limit: 255,   default: "Lauw"
-    t.integer  "simicheck",                                          limit: 4,     default: -1
     t.boolean  "is_anonymous",                                                     default: true
     t.integer  "num_reviews_required",                               limit: 4,     default: 3
     t.integer  "num_metareviews_required",                           limit: 4,     default: 3
     t.integer  "num_metareviews_allowed",                            limit: 4,     default: 3
     t.integer  "num_reviews_allowed",                                limit: 4,     default: 3
+    t.integer  "simicheck",                                          limit: 4,     default: -1
     t.integer  "simicheck_threshold",                                limit: 4,     default: 100
     t.boolean  "is_answer_tagging_allowed"
     t.boolean  "has_badge"
-    t.integer  "sample_assignment_id",                               limit: 4
     t.boolean  "allow_selecting_additional_reviews_after_1st_round"
-    t.boolean  "vary_by_topic",                                                    default: false
-    t.boolean  "vary_by_round",                                                    default: false
     t.boolean  "reviewer_is_team"
+    t.boolean  "vary_by_topic",                                                    default: false
+    t.boolean  "vary_by_round"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
   add_index "assignments", ["instructor_id"], name: "fk_assignments_instructors", using: :btree
   add_index "assignments", ["late_policy_id"], name: "fk_late_policy_id", using: :btree
-  add_index "assignments", ["sample_assignment_id"], name: "fk_rails_b01b82a1a2", using: :btree
 
   create_table "automated_metareviews", force: :cascade do |t|
     t.float    "relevance",         limit: 24
@@ -445,10 +444,6 @@ ActiveRecord::Schema.define(version: 20200812211018) do
 
   add_index "question_advices", ["question_id"], name: "fk_question_question_advices", using: :btree
 
-  create_table "question_types", force: :cascade do |t|
-    t.string "type", limit: 255
-  end
-
   create_table "questionnaires", force: :cascade do |t|
     t.string   "name",               limit: 64
     t.integer  "instructor_id",      limit: 4,     default: 0,     null: false
@@ -646,12 +641,11 @@ ActiveRecord::Schema.define(version: 20200812211018) do
   end
 
   create_table "suggestion_comments", force: :cascade do |t|
-    t.text     "comments",           limit: 65535
-    t.string   "commenter",          limit: 255
-    t.string   "vote",               limit: 255
-    t.integer  "suggestion_id",      limit: 4
+    t.text     "comments",      limit: 65535
+    t.string   "commenter",     limit: 255
+    t.string   "vote",          limit: 255
+    t.integer  "suggestion_id", limit: 4
     t.datetime "created_at"
-    t.boolean  "visible_to_student",               default: false
   end
 
   create_table "suggestions", force: :cascade do |t|
@@ -735,7 +729,6 @@ ActiveRecord::Schema.define(version: 20200812211018) do
     t.integer "directory_num",              limit: 4
     t.integer "grade_for_submission",       limit: 4
     t.text    "comment_for_submission",     limit: 65535
-    t.boolean "make_public",                              default: false
   end
 
   create_table "teams_users", force: :cascade do |t|
@@ -771,26 +764,26 @@ ActiveRecord::Schema.define(version: 20200812211018) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string  "name",                      limit: 255,   default: "",    null: false
-    t.string  "crypted_password",          limit: 40,    default: "",    null: false
-    t.integer "role_id",                   limit: 4,     default: 0,     null: false
+    t.string  "name",                      limit: 255,      default: "",    null: false
+    t.string  "crypted_password",          limit: 40,       default: "",    null: false
+    t.integer "role_id",                   limit: 4,        default: 0,     null: false
     t.string  "password_salt",             limit: 255
     t.string  "fullname",                  limit: 255
     t.string  "email",                     limit: 255
     t.integer "parent_id",                 limit: 4
-    t.boolean "private_by_default",                      default: false
+    t.boolean "private_by_default",                         default: false
     t.string  "mru_directory_path",        limit: 128
     t.boolean "email_on_review"
     t.boolean "email_on_submission"
     t.boolean "email_on_review_of_review"
-    t.boolean "is_new_user",                             default: true,  null: false
-    t.integer "master_permission_granted", limit: 1,     default: 0
+    t.boolean "is_new_user",                                default: true,  null: false
+    t.integer "master_permission_granted", limit: 1,        default: 0
     t.string  "handle",                    limit: 255
-    t.text    "digital_certificate",       limit: 65535
+    t.text    "digital_certificate",       limit: 16777215
     t.string  "persistence_token",         limit: 255
     t.string  "timezonepref",              limit: 255
-    t.text    "public_key",                limit: 65535
-    t.boolean "copy_of_emails",                          default: false
+    t.text    "public_key",                limit: 16777215
+    t.boolean "copy_of_emails",                             default: false
     t.integer "institution_id",            limit: 4
   end
 
@@ -816,7 +809,6 @@ ActiveRecord::Schema.define(version: 20200812211018) do
   add_foreign_key "assignment_badges", "badges"
   add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
   add_foreign_key "assignment_questionnaires", "questionnaires", name: "fk_aq_questionnaire_id"
-  add_foreign_key "assignments", "assignments", column: "sample_assignment_id"
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
   add_foreign_key "assignments", "users", column: "instructor_id", name: "fk_assignments_instructors"
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"

@@ -125,15 +125,15 @@ describe Participant do
   describe '#get_can_mentor' do
     it 'returns false if participant is a student' do
       allow(student_participant).to receive_message_chain(:role, :student?).and_return(true)
-      expect(student_participant.get_can_mentor).to eq(false)
+      expect(student_participant.get_can_mentor[0][:can_mentor]).to eq(false)
     end
     it 'returns true if participant is an instructor' do
       allow(instructor_participant).to receive_message_chain(:role, :instructor?).and_return(true)
-      expect(instructor_participant.get_can_mentor).to eq(true)
+      expect(instructor_participant.get_can_mentor[0][:can_mentor]).to eq(true)
     end
     it 'returns true if participant is a ta' do
       allow(ta_participant).to receive_message_chain(:role, :ta?).and_return(true)
-      expect(ta_participant.get_can_mentor).to eq(true)
+      expect(ta_participant.get_can_mentor[0][:can_mentor]).to eq(true)
     end
   end
 

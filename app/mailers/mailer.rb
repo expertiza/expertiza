@@ -78,7 +78,6 @@ class Mailer < ActionMailer::Base
     @summary_url = @body[:summary_url]
     @review_conflict_report_url = @body[:review_conflict_report_url]
     @assignment_edit_url = @body[:assignment_edit_url]
-
     defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
     mail(subject: defn[:subject],
          to: defn[:to])

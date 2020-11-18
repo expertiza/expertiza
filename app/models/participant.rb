@@ -127,6 +127,7 @@ class Participant < ActiveRecord::Base
     Participant.where(user_id: self.user_id).each do |participant|
       participant.update_column(:can_mentor, can_mentor)
     end
+    can_mentor
   end
 
   # Get mentors for specified assignment

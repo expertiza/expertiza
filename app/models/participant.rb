@@ -179,5 +179,9 @@ class Participant < ActiveRecord::Base
     fields.push("handle") if options["handle"] == "true"
     fields
   end
+<<<<<<< HEAD
 
 end
+=======
+end
+>>>>>>> beta_project4_skieler

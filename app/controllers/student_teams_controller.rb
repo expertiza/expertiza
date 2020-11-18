@@ -79,8 +79,7 @@ class StudentTeamsController < ApplicationController
         assignmentTeamMentor = AssignmentTeamMentor.new(assignment_team_id: team[:id])
         # notify student if unable to assign team mentor
         flash[:notice] = 'No mentor assigned at this moment' if assignmentTeamMentor.assignMentor(team[:parent_id]).nil?
-        # If row was saved in assignment_team_mentors table, notify affected stakeholders of assigned team mentor via registered user email
-        assignmentTeamMentor.email if assignmentTeamMentor.save
+        assignmentTeamMentor.save
       end
 
       user = User.find student.user_id

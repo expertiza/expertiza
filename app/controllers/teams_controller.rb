@@ -54,8 +54,7 @@ class TeamsController < ApplicationController
         if assignmentTeamMentor.assignMentor(@team[:parent_id]).nil?
           flash[:notice] = 'No instructors or tas have been added as participants to current assignment, unable to assign mentor to team created.'
         end
-        # If row was saved in assignment_team_mentors table, notify affected stakeholders of assigned team mentor via registered user email
-        assignmentTeamMentor.email_mentor(@team.id) if assignmentTeamMentor.save
+        assignmentTeamMentor.save
       end
 
       undo_link("The team \"#{@team.name}\" has been successfully created.")

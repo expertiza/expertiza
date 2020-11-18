@@ -4,15 +4,10 @@ class QuizQuestionnairesController < QuestionnairesController
   def action_allowed?
     if params[:action] == "edit"
       @questionnaire = Questionnaire.find(params[:id])
-      (['Super-Administrator', 'Administrator'].include? current_role_name) ||
-          (['Student'].include? current_role_name)
-    else
-      ['Super-Administrator',
-       'Administrator',
-       'Instructor',
-       'Teaching Assistant', 'Student'].include? current_role_name
     end
-  end
+    current_user_has_student_privileges?
+    end
+
   # View a quiz questionnaire
   def view
     @questionnaire = Questionnaire.find(params[:id])

@@ -5,10 +5,8 @@ class BookmarksController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'list'
-      current_role_name =~ /^(Student|Instructor|Teaching Assistant)$/
-    when 'new', 'create', 'bookmark_rating', 'save_bookmark_rating_score'
-      current_role_name.eql? 'Student'
+    when 'list', 'new', 'create', 'bookmark_rating', 'save_bookmark_rating_score'
+      current_user_has_student_privileges?
     when 'edit', 'update', 'destroy'
       # edit, update, delete bookmarks can only be done by owner
       current_user_has_student_privileges? and current_user_created_bookmark_id?(params[:id])

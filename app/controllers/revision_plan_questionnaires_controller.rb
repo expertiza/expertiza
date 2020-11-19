@@ -4,7 +4,11 @@ class RevisionPlanQuestionnairesController < QuestionnairesController
     case params[:action]
     when 'edit'
       questionnaire = Questionnaire.find(params[:id])
-      (user_logged_in? && questionnaire.team.users.collect { |u| u.id }.include?(session[:user].id)) || super
+      team = RevisionPlanTeamMap.where(questionnaire: questionnaire)
+      @teams_users = TeamsUser.where(team: team)
+      
+      (user_logged_in? && 
+        @teams_users.collect { |u| u.id }.include?(session[:user].id)) || super    
     else
       super
     end

@@ -16,7 +16,7 @@ describe 'Tests Review report' do
   end
 
   it "can display review grades of each round" do
-    expect(page).to have_content('Score Awarded')
+    expect(page).to have_content('Score awarded')
   end
 
   it "can display reviews done" do
@@ -121,7 +121,7 @@ describe "review report html test cases" do
   end
 
   it "can display review grades of each round" do
-    expect(page).to have_content('Score Awarded')
+    expect(page).to have_content('Score awarded')
   end
 
   it "can display reviews done" do

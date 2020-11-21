@@ -1329,6 +1329,10 @@ jQuery(document).ready(function() {
         }
     })
 
+    /* Added by E2079
+    * React Component containing the UI elements for
+    * Advanced Search parameters: question_text, course and assignment
+    * */
     var QuestionnairesAdvancedSearchBar = React.createClass({
         getInputValues: function () {
             return {
@@ -1337,7 +1341,7 @@ jQuery(document).ready(function() {
                 assignment: this.refs.assignment.getDOMNode().value,
             };
         },
-        // E1987 Added function to display Advanced Search textbox on the Questionnaire page
+
         render: function () {
             return (
                 <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(6, auto) 1fr', gridGap: '8px' }}>
@@ -1364,6 +1368,10 @@ jQuery(document).ready(function() {
         }
     })
 
+    /* Added by E2079
+    *  React component containing the UI elements
+    *  for the Questionnaire Search Bar, along with Advanced Search.
+    * */
     var QuestionnairesSearchBar = React.createClass({
         getInitialState: () => {
             return {
@@ -1535,6 +1543,11 @@ jQuery(document).ready(function() {
                 )
             }
 
+            /* Added by E2079
+            * Returns advanced search functionality by
+            * created and updated date
+            * in courses and assignments
+            * */
             return (
                     <div className="filterable_table">
                         <SearchBar

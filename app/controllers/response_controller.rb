@@ -97,7 +97,8 @@ class ResponseController < ApplicationController
     end
 
     if params[:Submit] && msg.blank?
-      render 'analysis'
+      redirect_to controller: 'response', action: 'analysis', id: @response.id, questionnaire_id: @questionnaire.id,
+                  return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
     else
       redirect_to controller: 'response', action: 'save', id: @map.map_id,
                   return: params[:return], msg: msg, review: params[:review], save_options: params[:save_options]
@@ -190,17 +191,24 @@ class ResponseController < ApplicationController
     end
 
     if params[:Submit]
-      render 'analysis'
+      redirect_to controller: 'response', action: 'analysis', id: @response.id, questionnaire_id: @questionnaire.id,
+                  return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
     else
       redirect_to controller: 'response', action: 'save', id: @map.map_id,
                   return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
     end
   end
 
+  def analysis
+    @response = Response.find(params[:id])
+    @map = @response.map
+    @questionnaire = Questionnaire.find(params[:questionnaire_id])
+  end
+
   # This method is called when students confirm to have their review submitted
   # as they are satisfied with the quality of review that our system has estimated
   def confirm_submit
-    @response = Response.find(params[:response_id])
+    @response = Response.find(params[:id])
     @map = @response.map
     @response.update_attribute('is_submitted', true)
     @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?

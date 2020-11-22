@@ -279,8 +279,9 @@ resources :institution, except: [:destroy] do
       post :custom_create
       get :pending_surveys
       get :json
+      get :analysis
+      post :confirm_submit
     end
-    get :confirm_submit
   end
 
   resources :review_mapping, only: [] do

@@ -6,7 +6,6 @@
         e.stopPropagation();
         return;
       } else {
-        jQuery('#isSubmit').val('Yes');
         window.location.href= "../../../student_review/list?id=<%= @map.reviewer.id %>";
       }
     });
@@ -53,11 +52,11 @@
     <% end %>
   </table>
   <div style="text-align: right; padding-top: 5px">
-    <form action="/response/<%= @response.id %>/confirm_submit" method="get">
-      <div id="BackLink"><a href="javascript:window.history.back()">Back</a></div>
+    <%= form_tag(:action => 'confirm_submit', :id => @response.id) do %>
+      <div id="BackLink"><a href="/response/<%= @response.id %>/edit">Back</a></div>
       <input type="submit" value="OK" id="ok">
       <%= hidden_field_tag('return', @return) %>
-    </form>
+    <% end %>
   </div>
 
 </div>

@@ -732,9 +732,9 @@ jQuery(document).ready(function() {
             }
             return (
                 <span style = {formStyle}
-                      start_date={this.props.start_date}
-                      onChange={this.props.onChange} >
-                Start Date <input type="date" id="start_date"></input>                
+                    start_date={this.props.start_date}
+                    onChange={this.props.onChange} >
+                Start Date <input className="form-control" type="date" id="start_date"></input>                
             </span>
             );
         }
@@ -759,7 +759,7 @@ jQuery(document).ready(function() {
                 <span style = {formStyle}
                       end_date={this.props.end_date}
                       onChange={this.props.onChange} >
-                End Date <input type="date" id="end_date"></input>
+                End Date <input className="form-control" type="date" id="end_date"></input>
             </span>
             );
         }
@@ -780,13 +780,19 @@ jQuery(document).ready(function() {
                 }
             }
             return (
-            <select class="form-control form-control-lg"
+
+                <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px', alignItems: 'center' }}>
+            <select 
                 value={this.props.selectValue}
-                onChange={this.props.onChange} >
+                onChange={this.props.onChange} 
+                className="form-control"
+                >
               <option value="empty">----------</option>
               <option value="created_date">Created Date Filter</option>
               <option value="updated_date">Updated Date Filter</option>              
-            </select>
+            </select>                    
+                </div>
+
             );
         }
     });
@@ -798,26 +804,16 @@ jQuery(document).ready(function() {
                     style={{"display": (this.props.dataType === 'questionnaire' ? "none" : "")}}
                     has_quiz_var={this.props.has_quiz_var}
                     onChange={this.props.onChange}>
-              Require a Quiz <input
-                    type="checkbox" id="has_quiz_var"></input>
+
+                    <div class="checkbox">
+               <input
+                    type="checkbox" id="has_quiz_var" value="">Require a Quiz</input>
+
+                    </div>
           </span>
             );
         }
     })
-
-
-    var DatePickerEnd = React.createClass({
-        render: function() {
-            return (
-                <div
-                    style={{"display": (this.props.dataType === 'questionnaire' ? "none" : "")}}
-                    end_date={this.props.end_date}
-                    onChange={this.props.onChange} >
-                    End Date <input type="date" id="end_date"></input>
-                </div>
-            );
-        }
-    });
 
     var NewItemButton = React.createClass({
         render: function() {
@@ -1554,7 +1550,7 @@ jQuery(document).ready(function() {
                     <div className="">
 
                         <div
-                                          style={{ margin: '8px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px', alignItems: 'center' }}
+                            style={{ margin: '8px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px', alignItems: 'center' }}
                         >
                         <SearchBar
                             filterText={this.state.filterText}
@@ -1583,13 +1579,14 @@ jQuery(document).ready(function() {
                         </div>
 
 
-                        <div id="advancedToggle">
+                        <span 
+                            id="advancedToggle">
                             <AdditionalSearchDropDown
                                 selectValue = {this.state.selectValue}
                                 onChange={this.changeAdditionalDrop}
                                 dataType={this.props.dataType}
                             />
-                            <div>
+                            <div style={{ margin: '10px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px', alignItems: 'center' }}>
                                 <DatePickerStart
                                     start_date = {this.state.start_date}
                                     onChange={this.changeDateStart}
@@ -1607,7 +1604,7 @@ jQuery(document).ready(function() {
                                     dataType={this.props.dataType}
                                 />
                             </div>
-                        </div>
+                        </span>
 
                         <NewItemButton
                             dataType={this.props.dataType}

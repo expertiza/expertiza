@@ -676,15 +676,14 @@ jQuery(document).ready(function() {
         },
         render: function() {
             return (
-                <span style={{"display": (this.props.dataType === 'questionnaire' ? "none" : "")}}>
               <input
                   type="text"
                   placeholder="Search..."
                   value={this.props.filterText}
                   ref="filterTextInput"
                   onChange={this.handleChange}
+                  className="form-control"
               />
-          </span>
             );
         }
     })
@@ -696,14 +695,23 @@ jQuery(document).ready(function() {
         },
         render: function() {
             return (
-                <span className='show-checkbox' style={{"display": (this.props.dataType === 'questionnaire' ? "none" : "")}}>
-           <input type="checkbox"
-                  checked={this.props.inputCheckboxValue}
-                  ref="filterCheckbox"
-                  onChange={this.handleChange}>
-             {" Include others' items"}
+
+    <div class="form-group">
+        <div class="checkbox">
+           <input 
+                 class="checkbox"
+                    type="checkbox"
+                    checked={this.props.inputCheckboxValue}
+                    ref="filterCheckbox"
+                    onChange={this.handleChange}
+                    class="form-check-input"
+                >
+                <label class="checkbox-label">Include others' items</label>
+             {""}
            </input>
-         </span>
+        </div>
+    </div>
+
             )
         }
     })
@@ -772,19 +780,13 @@ jQuery(document).ready(function() {
                 }
             }
             return (
-                <span
-                    style = {formStyle}
-                >
-            Filter Option 
-            <select
+            <select class="form-control form-control-lg"
                 value={this.props.selectValue}
                 onChange={this.props.onChange} >
               <option value="empty">----------</option>
               <option value="created_date">Created Date Filter</option>
               <option value="updated_date">Updated Date Filter</option>              
             </select>
-
-            </span>
             );
         }
     });
@@ -1549,7 +1551,11 @@ jQuery(document).ready(function() {
             * in courses and assignments
             * */
             return (
-                    <div className="filterable_table">
+                    <div className="">
+
+                        <div
+                                          style={{ margin: '8px auto', display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gridGap: '8px', alignItems: 'center' }}
+                        >
                         <SearchBar
                             filterText={this.state.filterText}
                             onUserInput={this.handleUserInput}
@@ -1564,7 +1570,7 @@ jQuery(document).ready(function() {
                         />
 
                         <button
-                            style = {formStyle}
+                            className="btn btn-link"
                             onClick={() => {
                                 var x = document.getElementById("advancedToggle");
                                 if (x.style.display === "none") {
@@ -1573,7 +1579,9 @@ jQuery(document).ready(function() {
                                     x.style.display = "none";
                                 }}}>
                             Advanced Search
-                        </button>
+                        </button>  
+                        </div>
+
 
                         <div id="advancedToggle">
                             <AdditionalSearchDropDown

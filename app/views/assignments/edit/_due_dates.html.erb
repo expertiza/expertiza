@@ -260,7 +260,7 @@
 
         var submissions_count = <%= @num_submissions_round %>;
         var reviews_count = <%= @num_reviews_round %>;
-        // E2074 Add teammate review deadline
+        // E2074 - Add ability to have assignment with 0 rounds of review 
         if (new_round_count < 0) {
             alert('ERROR: number of rounds of review should be greater than or equal to 0');
             return
@@ -388,16 +388,12 @@
                 );
             }
 
-            <%@metareview_allowed_checkbox=true%>
-
         }
         function removeOrAddSignup(){
             if(document.getElementById("signup"))
                 removeDueDateTableElement('signup', 0);
              else
                 addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'signup', 0, <%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
-
-            <%@signup_allowed_checkbox=true%>
 
         }
         function removeOrAddDropTopic(){
@@ -406,8 +402,6 @@
              else
                 addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'drop_topic', 0, <%= due_date(@assignment_form.assignment, 'drop_topic').to_json.html_safe %>);
 
-            <%@drop_topic_allowed_checkbox=true%>
-
         }
         function removeOrAddTeamFormation(){
             if(document.getElementById("team_formation"))
@@ -415,24 +409,17 @@
              else
                 addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'team_formation', 0, <%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
 
-            <%@team_formation_allowed_checkbox=true%>
-
         }
         
         
-        /** E2074 Add teammate review deadline, toggle made more sense  */
-        // document.getElementById('#teammate_review_deadline_checkbox').onClick() {
-            // 
-            
-        // }
-        function toggleTeammateReview(){
+        /** E2074 Add teammate review deadline */
+        function toggleTeammateReviewDeadline(){
             if(document.getElementById("teammate_review")) {
                 removeDueDateTableElement('teammate_review', 0);
                 }
              else 
                  addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'teammate_review', 0, <%= due_date(@assignment_form.assignment, 'teammate_review').to_json.html_safe %>);
 
-            <%@teammate_review_deadline_allowed_checkbox=true%>
 
         }
 function removeOrAddMetareview() {
@@ -452,7 +439,6 @@ function removeOrAddMetareview() {
             null
         );
     }
-    <%@metareview_allowed_checkbox=true%>
 }
 //E1654. Improve date-picker and deadlines Code change starts
 //This is a generic funtion to add and substract days and months
@@ -500,7 +486,7 @@ function addDaysOrMonth(mul, type) {
 <% if @assignment_form.assignment.rounds_of_reviews > 1 %>
     <!--Add a change name or url checkbox. By: Xiaoqiang Shao-->
     <input name="changenameurl" type="hidden" value="false" />
-    <%= check_box_tag('changenameurl', 'true', @due_date_nameurl_not_empty_checkbox, :onclick=>"handleChangenameurl(this.checked,due_date_name_column,due_date_url_column)" ) %>
+    <%= check_box_tag('changenameurl', 'true', @due_date_nameurl_not_empty, :onclick=>"handleChangenameurl(this.checked,due_date_name_column,due_date_url_column)" ) %>
     <%= label_tag('changenameurl', 'Name and description URL vary by round') %>
     <br>
 <% end %>
@@ -525,9 +511,9 @@ function addDaysOrMonth(mul, type) {
 <%# E2074 - Add teammate review deadline %>
 <span id='teammate_review_deadline_checkbox' <%= 'hidden' if @assignment_form.assignment.max_team_size == 1 %> 
     <%# ** hide if this if no more than 1 person can be on a team %>
-    <input name="teammateReviewDeadlineAllowed" type="hidden" value="false" />
-    <%= check_box_tag('teammateReviewDeadlineAllowed', 'true', @teammate_review_deadline_allowed, :onclick=>"toggleTeammateReview()" ) %>
-    <%= label_tag('teammateReviewDeadlineAllowed', 'Use teammate review deadline') %><br/>
+    <input name="teammateReviewDeadline" type="hidden" value="false" />
+    <%= check_box_tag('teammateReviewDeadline', 'true', @has_teammate_review_deadline, :onclick=>"toggleTeammateReviewDeadline()" ) %>
+    <%= label_tag('teammateReviewDeadline', 'Use teammate review deadline') %><br/>
 </span>
 
 <input name="metareviewAllowed" type="hidden" value="false" />
@@ -569,11 +555,6 @@ function addDaysOrMonth(mul, type) {
             addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
         <% end %>
         
-        /** E2074 Add teamate review deadline if max_team_size > 1 if there is a deadline already set (technically only need the second check but the others are making the double check anyways) */
-        <% if @assignment_form.assignment.max_team_size > 1 && due_date(@assignment_form.assignment, 'teammate_review').due_at %>
-            addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'teammate_review', 0,<%= due_date(@assignment_form.assignment, 'teammate_review').to_json.html_safe %>);
-        <% end %>
-        
         <% if @assignment_form.assignment.topics? %>
             <% if due_date(@assignment_form.assignment, 'signup').due_at %>
                 addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'signup', 0,<%= due_date(@assignment_form.assignment, 'signup').to_json.html_safe %>);
@@ -586,6 +567,12 @@ function addDaysOrMonth(mul, type) {
         addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'submission', <%=i%>, <%= due_date(@assignment_form.assignment, 'submission', i-1).to_json.html_safe %>); // or use questionnaire_options(@assignment, nil).to_json
         addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'review', <%=i%>, <%= due_date(@assignment_form.assignment, 'review', i-1).to_json.html_safe %>) ;
         <% end %>
+        
+        /** E2074 Add teamate review deadline option in table if already attached to assignment*/
+        <% if due_date(@assignment_form.assignment, 'teammate_review').due_at %>
+            addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'teammate_review', 0,<%= due_date(@assignment_form.assignment, 'teammate_review').to_json.html_safe %>);
+        <% end %>
+        
         // Assignments with zero rounds of review will show no submission or review links/rows in the due dates table
         <% if @metareview_allowed %>
         addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);

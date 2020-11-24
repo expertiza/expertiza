@@ -279,8 +279,8 @@ class AssignmentsController < ApplicationController
     dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_TEAM_FORMATION
   end
   
-  # checks if an assignment has a teammate review deadline associated
-  def teammate_review_deadline_allowed?(dd)
+  # checks if passed in due date is a teammate review deadline
+  def is_teammate_review_deadline?(dd)
     dd.deadline_type_id == DeadlineHelper::DEADLINE_TYPE_TEAMMATE_REVIEW
   end
   
@@ -359,17 +359,11 @@ class AssignmentsController < ApplicationController
     @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
     @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
     @due_date_nameurl_not_empty = false
-    @due_date_nameurl_not_empty_checkbox = false
     @metareview_allowed = false
-    @metareview_allowed_checkbox = false
     @signup_allowed = false
-    @signup_allowed_checkbox = false
     @drop_topic_allowed = false
-    @drop_topic_allowed_checkbox = false
     @team_formation_allowed = false
-    @team_formation_allowed_checkbox = false
-    @teammate_review_deadline_allowed = false
-    @teammate_review_deadline_allowed_checkbox = false # E2074
+    @has_teammate_review_deadline = false
     @participants_count = @assignment_form.assignment.participants.size
     @teams_count = @assignment_form.assignment.teams.size
   end
@@ -385,20 +379,6 @@ class AssignmentsController < ApplicationController
     @assignment_form.assignment.staggered_deadline == true
   end
 
-  # gets the current settings of the current assignment
-  def update_due_date_nameurl
-    @due_date_nameurl_not_empty =  @due_date_all.any? { |d| due_date_nameurl_not_empty?(d) }
-    @due_date_nameurl_not_empty_checkbox = @due_date_nameurl_not_empty
-    @metareview_allowed = @due_date_all.any? { |d| meta_review_allowed?(d) }
-    @drop_topic_allowed = @due_date_all.any? { |d| drop_topic_allowed?(d) }
-    @signup_allowed = @due_date_all.any? { |d| signup_allowed?(d) }
-    @team_formation_allowed = @due_date_all.any? { |d| team_formation_allowed?(d) }
-    @teammate_review_deadline_allowed = @due_date_all.any? { |d| teammate_review_deadline_allowed?(d) } 
-    # E2074 - Add teammate review deadline/assignment
-    # Teammate review deadlines should only be allowed on assignments that allow
-    # teams to be formed
-  end
-
   # adjusts the time zone for a due date
   def adjust_due_date_for_timezone(dd)
     dd.due_at = dd.due_at.to_s.in_time_zone(current_user.timezonepref) if dd.due_at.present?
@@ -406,8 +386,8 @@ class AssignmentsController < ApplicationController
 
   # ensures due dates ahave a name, description and at least either meta reviews, topic drops, signups, or team formations
   def validate_due_date
-    @due_date_nameurl_not_empty && @due_date_nameurl_not_empty_checkbox &&
-      (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed || @teammate_review_deadline_allowed)
+    @due_date_nameurl_not_empty &&
+      (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed || @has_teammate_review_deadline)
   end
 
   # checks if each questionnaire in an assignment is used
@@ -443,19 +423,18 @@ class AssignmentsController < ApplicationController
   end
 
   # update values for an assignment's due date when editing
-  # this method doesn't work, it overwrites all the state values on each iteration
-  # the method update_due_date_nameurl has been fixed to account for this
   def update_due_date
-    # @due_date_all.each do |dd|
-    #   update_due_date_nameurl(dd)
-    #   adjust_due_date_for_timezone(dd)
-    #   break if validate_due_date
-    # end
     @due_date_all.each do |dd|
       adjust_due_date_for_timezone(dd)
+      # check if current due date type matches any of the below types, if so, then update variable "true"
+      @due_date_nameurl_not_empty = @due_date_nameurl_not_empty || due_date_nameurl_not_empty?(dd)
+      @metareview_allowed = @metareview_allowed || meta_review_allowed?(dd)
+      @drop_topic_allowed = @drop_topic_allowed || drop_topic_allowed?(dd)
+      @signup_allowed = @signup_allowed || signup_allowed?(dd)
+      @team_formation_allowed = @team_formation_allowed || team_formation_allowed?(dd)
+      @has_teammate_review_deadline = @has_teammate_review_deadline || is_teammate_review_deadline?(dd)
       break if validate_due_date
     end
-    update_due_date_nameurl # only calling this method once now
   end
 
   # update the current assignment's badges when editing

@@ -174,6 +174,7 @@ describe AssignmentsController do
         expect(controller.instance_variable_get(:@drop_topic_allowed)).to be false
         expect(controller.instance_variable_get(:@signup_allowed)).to be false
         expect(controller.instance_variable_get(:@team_formation_allowed)).to be false
+        expect(controller.instance_variable_get(:@has_teammate_review_deadline)).to be false
         expect(response).to render_template(:edit)
       end
     end

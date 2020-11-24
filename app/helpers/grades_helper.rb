@@ -59,6 +59,10 @@ module GradesHelper
     css_class
   end
 
+  # Added by project E2083 in Fall 2020.  Refactored code used to add a response
+  # to the view model that generates heat grids for review scores. The view model
+  # was implemented by a previous project and can be found in any of the model
+  # files that start with "vm_".
   def add_response_to_vmlist(participant, assignment, team, questionnaire, vmlist, round)
     vm = VmQuestionResponse.new(questionnaire, assignment, round)
     vmquestions = questionnaire.questions
@@ -69,6 +73,10 @@ module GradesHelper
     vmlist << vm
   end
 
+  # Added by project E2083 in Fall 2020.  Refactored code used in multiple views
+  # and in the grades_controller (specifically view_heatgrid and view_team).
+  # Added functionality to check for Revision Plan responses in addition to
+  # Review Responses.
   def generate_heatgrid(participant, assignment, team, team_id, questionnaires, vmlist)
     # loop through each questionnaire, and populate the view model for all data necessary
     # to render the html tables.

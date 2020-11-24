@@ -265,7 +265,7 @@ class Response < ActiveRecord::Base
   def construct_review_response code, self_id, show_tags = nil, current_user = nil
     review_questions = []
     revision_plan_questions = []
-    code += "<h5>Review Responses</h5>" + '<table id="review_' + self_id + '" class="table table-bordered">'
+    code += "<h5>Review responses</h5>" + '<table id="review_' + self_id + '" class="table table-bordered">'
     answers = Answer.where(response_id: self.response_id)
     unless answers.empty?
       questionnaire = self.questionnaire_by_answer(answers.first)
@@ -291,7 +291,7 @@ class Response < ActiveRecord::Base
         code = add_table_rows questionnaire_max, review_questions, answers, code, tag_prompt_deployments, current_user
         if assignment.is_revision_planning_enabled && revision_plan_questions.any?
           # create new table for Revision Plan questions and add them
-          code += '</table>' + "<h5>Revision Plan Responses</h5>"
+          code += '</table>' + "<h5>Revision plan responses</h5>"
           code += '<table id="review_' + self_id + '" class="table table-bordered">'
           code = add_table_rows questionnaire_max, revision_plan_questions, answers, code, tag_prompt_deployments, current_user
         end
@@ -303,7 +303,7 @@ class Response < ActiveRecord::Base
                 ''
               end
     # create a separate table for the additional comment to maintain consistent formatting
-    code += '</table>' + "<h5>Additional Comment</h5>" + '<table id="review_' + self_id + '" class="table table-bordered">' + '<tr><td>' + comment + '</td></tr>' + '</table>'
+    code += '</table>' + "<h5>Additional comment</h5>" + '<table id="review_' + self_id + '" class="table table-bordered">' + '<tr><td>' + comment + '</td></tr>' + '</table>'
   end
 
   def add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, current_user = nil

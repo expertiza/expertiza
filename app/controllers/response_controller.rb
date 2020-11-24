@@ -316,6 +316,8 @@ class ResponseController < ApplicationController
     @max = @questionnaire.max_question_score
   end
 
+  # gets questions sorted by sequence from review and revision questionnaire,
+  # and merges them in a single list.
   def set_questions_for_new_response
     @questions = sort_questions(@questionnaire.questions)
     if(@assignment && @assignment.is_revision_planning_enabled)
@@ -329,6 +331,8 @@ class ResponseController < ApplicationController
     return @questions
   end
 
+  # get questions from a response.
+  # Use when response has already been created.
   def set_questions
     @questions = @response.get_questions
   end

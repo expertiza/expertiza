@@ -103,9 +103,9 @@ to display the label "Your team" in the student assignment tasks-->
     <li>
       <% if @can_submit_revision_plan %>
         <% if @revision_plan_questionnaire_id %>
-          <%= link_to "Revision Planning", controller: 'revision_plan_questionnaires', action: 'edit', id: @revision_plan_questionnaire_id %> 
+          <%= link_to "Revision planning", controller: 'revision_plan_questionnaires', action: 'edit', id: @revision_plan_questionnaire_id %> 
         <% else %>
-          <%= link_to "Revision Planning", controller: 'revision_plan_questionnaires', action: 'new', team_id: @team %>
+          <%= link_to "Revision planning", controller: 'revision_plan_questionnaires', action: 'new', team_id: @team %>
         <% end %>
         (Add new questions to next-round rubric)
       <% else %>

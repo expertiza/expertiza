@@ -1,5 +1,6 @@
 class RevisionPlanQuestionnairesController < QuestionnairesController
 
+  # Update permision to allow a team member to update revision plan.
   def action_allowed?
     case params[:action]
     when 'edit'

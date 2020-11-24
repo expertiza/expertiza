@@ -21,7 +21,7 @@ FactoryBot.define do
         min_question_score 0
         max_question_score 1
         type 'RevisionPlanQuestionnaire'
-        display_type 'Revision Plan'
+        display_type 'Revision plan'
         instruction_loc nil
       end
 

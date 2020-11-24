@@ -12,6 +12,8 @@ class QuestionsController < ApplicationController
     render action: 'list'
   end
 
+  # Update authorization code to allow a user to remove questions 
+  # from his teams revision plan.
   def action_allowed?
     if ['destroy'].include?(params[:action])
       question = Question.find(params[:id])

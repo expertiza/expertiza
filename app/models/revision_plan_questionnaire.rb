@@ -9,13 +9,14 @@ class RevisionPlanQuestionnaire < Questionnaire
   end
 
   def post_initialization
-    self.display_type = 'Revision Plan'
+    self.display_type = 'Revision plan'
   end
 
   def symbol
     "revisionplan".to_sym
   end
 
+  # get questionnaire for a current round based on team.
   def self.get_questionnaire_for_current_round(team_id)
     assignment_team = Team.find(team_id)
     assignment = assignment_team.assignment
@@ -35,6 +36,7 @@ class RevisionPlanQuestionnaire < Questionnaire
     return questionnaire
   end
 
+  # get team associated to a revision plan questionnaire.
   def team
     revision_plan_team_map.team
   end

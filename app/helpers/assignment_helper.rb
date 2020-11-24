@@ -95,21 +95,21 @@ module AssignmentHelper
     end
   end
   
-  # determines if the user has teammate reviews to finish or not according to the 
-  # 
+  # determines if the user is assigned teammate reviews
   def user_has_teammate_reviews?(assignment)
     assignment.find_due_dates("teammate_review").count > 0
   end
   
-  # determines if user completed all teammate reviews for a particular assignment
-  def user_completed_teammate_reviews?(user_id, assignment_id)
+  # returns number of teammate reviews remaining
+  def teammate_reviews_remaining(user_id, assignment_id)
     @teammates = Team.find_team_for_assignment_and_user(assignment_id, user_id).first.participants.select { |p| p.user_id != user_id }
     if @teammates.count < 1
-      true
+      0
     else
       @reviewer = AssignmentParticipant.find_by(user_id: user_id, parent_id: assignment_id)
       if @reviewer
-        @teammates.all? { |t| TeammateReviewResponseMap.where(reviewer_id: @reviewer.id, reviewee_id: t.id).exists? and TeammateReviewResponseMap.where(reviewer_id: @reviewer.id, reviewee_id: t.id).first.response.exists? }
+        @reviews_completed = @teammates.select { |t| TeammateReviewResponseMap.where(reviewer_id: @reviewer.id, reviewee_id: t.id).exists? and TeammateReviewResponseMap.where(reviewer_id: @reviewer.id, reviewee_id: t.id).first.response.exists? }.length
+        @teammates.count - @reviews_completed
       end
     end
   end

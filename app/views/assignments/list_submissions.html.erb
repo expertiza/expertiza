@@ -6,6 +6,9 @@
       sortList: [[0,0]] //E1877: sort First Column by default when page loads
     });
   });
+  $(document).ready(function() {
+    $('[data-toggle]="tooltip"]').tooltip()
+  })
 </script>
 <% headers = {} %>
 <% headers["Topic_name"] = "16%" if @assignment.topics? %>
@@ -57,13 +60,16 @@
         <!--Team member(s) / Participant name-->
           <td>
               <% users_for_curr_team.each do |user| %>
-                  <!-- E 2074 - Red dot placed before users who didnt complete teammate reviews (if applicable) -->
-                  <% if user_has_teammate_reviews?(@assignment) and not user_completed_teammate_reviews?(user.id, @assignment.id) %>
-                  <span id="red_cirle" style="height: 1.5rem; width: 1.5rem; background-color: red; border-radius: 50%; display: inline-block;"></span>
-                  <% @hide_circle=(user_has_teammate_reviews?(@assignment) and not user_completed_teammate_reviews?(user.id, @assignment.id)) %>
-                  <% end %>
-                  <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
-                  (<%= user.fullname(session[:ip])%>)<br>
+                <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
+                (<%= user.fullname(session[:ip])%>)
+                <!-- E 2074 - Green checkmark if user completed teammate reviews, red X if not -->
+                <% @reviews_remaining = teammate_reviews_remaining(user.id, @assignment.id)%>
+                <% if @reviews_remaining == 0 %>
+                  <i class="fa fa-check" data-toggle="tooltip" data-placement="right" title="<%= user.fullname(session[:ip])%> has completed all teammate reviews." style='color: green;'></i>
+                <% else %>
+                  <i class="fa fa-times" data-toggle="tooltip" data-placement="right" title='<%= user.fullname(session[:ip])%> has <%= @reviews_remaining %> teammate <%= @reviews_remaining > 1 ? 'reviews' : 'review' %> remaining.' style='color: red;'></i>
+                <% end %>
+                <br>
               <% end %>
           </td>
 
@@ -93,7 +99,5 @@
     <% end %>
   </table>
   <p> **In "Team name" column, text in <i style = "color:#0984e3">blue</i> indicates that the submission grade is not assigned; text in <i style = "color: #cd6133">brown</i> indicates that the submission grade has been assigned.</p>
-  <% if @hide_circle%>
-    <p> **In "Team Members" column, the circle colored <i style = "color:red">red</i> indicates that the team member has not finished all of their required teammate reviews. </p>
-  <% end %>
+  <p> **Also in the "Team Members" column, the green checkmark indicates that the user completed all teammate reviews (if applicable), and a red cross ('x') signifies they have reviews remaining to be finished. </p>
 </div>

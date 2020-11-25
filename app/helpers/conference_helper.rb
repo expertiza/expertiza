@@ -3,7 +3,7 @@ module ConferenceHelper
         #if assignment id is present in url the check if it's a valid conference assignment.
         if !params[:assignment_id].nil?
           @assignment = Assignment.find_by_id(params[:assignment_id])
-          if !@assignment.nil? and @assignment.is_assignment_conference
+          if !@assignment.nil? and @assignment.is_conference_assignment
             true
           else
             false

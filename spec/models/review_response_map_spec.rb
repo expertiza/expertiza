@@ -162,8 +162,8 @@ describe ReviewResponseMap do
     allow(feedback).to receive(:response).and_return([response])
     expect(review_response_map.show_feedback(response)).to eq("<table width=\"100%\"><tr><td align=\"left\" width=\"70%\"><b>Review </b>"\
         "&nbsp;&nbsp;&nbsp;<a href=\"#\" name= \"review_1Link\" onClick=\"toggleElement('review_1','review');return false;\">"\
-        "hide review</a></td><td align=\"left\"><b>Last Reviewed:</b><span>Not available</span></td></tr></table><h5>Review Responses</h5>"\
-        "<table id=\"review_1\" class=\"table table-bordered\"></table><h5>Additional Comment</h5>"\
+        "hide review</a></td><td align=\"left\"><b>Last Reviewed:</b><span>Not available</span></td></tr></table><h5>Review responses</h5>"\
+        "<table id=\"review_1\" class=\"table table-bordered\"></table><h5>Additional comment</h5>"\
         "<table id=\"review_1\" class=\"table table-bordered\"><tr><td></td></tr></table>")
   end
 

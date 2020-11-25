@@ -1,6 +1,6 @@
-include ConferenceHelper
 class ConferenceController < ApplicationController
     include AuthorizationHelper
+    include ConferenceHelper
 
     autocomplete :user, :name
     # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
@@ -37,6 +37,7 @@ class ConferenceController < ApplicationController
             @all_roles = Role.where('id in (?) or id = ?', role.get_available_roles, role.id)
         end
     end
+    
     def create
       # Check if user needs to be created as author for conference type assignment and add author to assignment
       @recaptcha_succeeded = verify_recaptcha secret_key: '6Lfb_uEZAAAAAPcSk-9fcNh3syzfvfagPeNc8Y_B'

@@ -1,6 +1,6 @@
-include ConferenceHelper
 class InvitationsController < ApplicationController
   include AuthorizationHelper
+  include ConferenceHelper
 
   before_action :check_user_before_invitation, only: [:create]
   before_action :check_team_before_accept, only: [:accept]

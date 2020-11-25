@@ -210,10 +210,4 @@ class ReviewResponseMap < ResponseMap
     review_final_versions[symbol][:response_ids] = response_ids
   end
 
-    # Check if this review was done by TA/instructor return True or False
-  def self.done_by_staff_participant?( review )
-    role = Role.find(User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).role_id).name
-    return (role == "Instructor") || (role == "Teaching Assistant")
-  end
-
 end

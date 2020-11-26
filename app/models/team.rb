@@ -10,7 +10,7 @@ class Team < ActiveRecord::Base
   scope :find_team_for_assignment_and_user, lambda {|assignment_id, user_id|
     joins(:teams_users).where("teams.parent_id = ? AND teams_users.user_id = ?", assignment_id, user_id)
   }
-  
+
   # Get the participants of the given team
   def participants
     users.where(parent_id: parent_id || current_user_id).flat_map(&:participants)
@@ -182,7 +182,7 @@ class Team < ActiveRecord::Base
   #  changed to hash by E1776
   def self.import(row_hash, id, options, teamtype)
 
-    raise ArgumentError, "Not enough fields on this line." if row_hash.empty? || (row_hash[:teammembers].length < 2 && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last")) || (row_hash[:teammembers].empty? && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"))
+    raise ArgumentError, "Not enough fields on this line." if row_hash.empty? || (row_hash[:teammembers].length < 1 && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last")) || (row_hash[:teammembers].empty? && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"))
     if options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"
       name = row_hash[:teamname].to_s
       team = where(["name =? && parent_id =?", name, id]).first
@@ -255,6 +255,41 @@ class Team < ActiveRecord::Base
     TeamNode.create(parent_id: id, node_object_id: team.id)
     ExpertizaLogger.info LoggerMessage.new('Model:Team', '', "New TeamNode created with teamname #{team_name}")
     team
+  end
+
+  #Create new teams for calibrated assignments with respect to the old team already present
+  def self.createnewteam(old_assign, new_assign_id)
+    puts "Alpha"
+    @original_team_values = Team.where(parent_id: old_assign.id)
+    old_team_ids = []
+    @original_team_values.each do |catt|
+      @prev_assignment = Assignment.find(old_assign.id)
+      @prev_instructor = Participant.find_by(parent_id: old_assign.id, user_id: @prev_assignment.instructor_id)
+      @map = ReviewResponseMap.find_by(reviewed_object_id: old_assign.id, reviewer_id: @prev_instructor.id, reviewee_id: catt.id)
+      if @map
+        @resp = Response.find_by(map_id: @map.id, is_submitted: false)
+        if @resp
+          old_team_ids.append(catt.id)
+          @new_team = Team.new
+          @new_team.name = catt.name
+          @new_team.parent_id = new_assign_id
+          @new_team.type = catt.type
+          @new_team.comments_for_advertisement = catt.comments_for_advertisement
+          @new_team.advertise_for_partner = catt.advertise_for_partner
+          @new_team.submitted_hyperlinks = catt.submitted_hyperlinks
+          @new_team.directory_num = catt.directory_num
+          @new_team.grade_for_submission = catt.grade_for_submission
+          @new_team.comment_for_submission = catt.comment_for_submission
+          @new_team.make_public = catt.make_public
+          @new_team.save
+        else
+          next
+        end
+      else
+        next
+      end
+    end
+    old_team_ids
   end
 
   # REFACTOR END:: class methods import export moved from course_team & assignment_team to here

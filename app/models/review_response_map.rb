@@ -2,18 +2,15 @@ class ReviewResponseMap < ResponseMap
   belongs_to :reviewee, class_name: 'Team', foreign_key: 'reviewee_id', inverse_of: false
   belongs_to :contributor, class_name: 'Team', foreign_key: 'reviewee_id', inverse_of: false
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id', inverse_of: false
-  
-  # Added for E1973:
-  # http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_Project_E1973._Team_Based_Reviewing
-  # ReviewResponseMap was created in so many places, I thought it best to add this here as a catch-all
-  def after_initialize
-    # If an assignment supports team reviews, it is marked in each mapping
-    reviewer_is_team = assignment.reviewer_is_team
-  end
 
-  # Find a review questionnaire associated with this review response map's assignment
-  def questionnaire(round_number = nil, topic_id = nil)
-    Questionnaire.find(self.assignment.review_questionnaire_id(round_number, topic_id))
+  # In if this assignment uses "varying rubrics" feature, the sls
+  # "used_in_round" field should not be nil
+  # so find the round # based on current time and the due date times, and use that round # to find corresponding
+  # questionnaire_id from assignment_questionnaires table
+  # otherwise this assignment does not use the "varying rubrics", so in assignment_questionnaires table there should
+  # be only 1 questionnaire with type 'ReviewQuestionnaire'.    -Yang
+  def questionnaire(round = nil)
+    Questionnaire.find_by(id: self.assignment.review_questionnaire_id(round))
   end
 
   def get_title
@@ -44,19 +41,9 @@ class ReviewResponseMap < ResponseMap
   end
 
   def self.import(row_hash, _session, assignment_id)
-    reviewee_user_name = row_hash[:reviewee].to_s
-    reviewee_user = User.find_by(name: reviewee_user_name)
-    raise ArgumentError, "Cannot find reviewee user." unless reviewee_user
-    reviewee_participant = AssignmentParticipant.find_by(user_id: reviewee_user.id, parent_id: assignment_id)
-    raise ArgumentError, "Reviewee user is not a participant in this assignment." unless reviewee_participant
-    reviewee_team = AssignmentTeam.team(reviewee_participant)
-    if reviewee_team.nil? # lazy team creation: if the reviewee does not have team, create one.
-      reviewee_team = AssignmentTeam.create(name: 'Team' + '_' + rand(1000).to_s,
-                                            parent_id: assignment_id, type: 'AssignmentTeam')
-      t_user = TeamsUser.create(team_id: reviewee_team.id, user_id: reviewee_user.id)
-      team_node = TeamNode.create(parent_id: assignment_id, node_object_id: reviewee_team.id)
-      TeamUserNode.create(parent_id: team_node.id, node_object_id: t_user.id)
-    end
+    reviewee_team = Team.find_by(name: row_hash[:reviewee].to_s, parent_id: assignment_id)
+    raise ArgumentError, "Could not find a team with name #{row_hash[:reviewee].to_s}, please import teams first" unless reviewee_team
+    return unless reviewee_team
     row_hash[:reviewers].each do |reviewer|
       reviewer_user_name = reviewer.to_s
       reviewer_user = User.find_by(name: reviewer_user_name)
@@ -65,7 +52,7 @@ class ReviewResponseMap < ResponseMap
       reviewer_participant = AssignmentParticipant.find_by(user_id: reviewer_user.id, parent_id: assignment_id)
       raise ArgumentError, "Reviewer user is not a participant in this assignment." unless reviewer_participant
       ReviewResponseMap.find_or_create_by(reviewed_object_id: assignment_id,
-                                          reviewer_id: reviewer_participant.get_reviewer.id,
+                                          reviewer_id: reviewer_participant.id,
                                           reviewee_id: reviewee_team.id,
                                           calibrate_to: false)
     end
@@ -102,28 +89,11 @@ class ReviewResponseMap < ResponseMap
     responses
   end
 
-  #E-1973 - returns the reviewer of the response, either a participant or a team
-  def get_reviewer
-    return ReviewResponseMap.get_reviewer_with_id(assignment.id, reviewer_id)
-  end
-
-  # E-1973 - gets the reviewer of the response, given the assignment and the reviewer id
-  # the assignment is used to determine if the reviewer is a participant or a team
-  def self.get_reviewer_with_id(assignment_id, reviewer_id)
-    assignment = Assignment.find(assignment_id)
-    if assignment.reviewer_is_team
-      return AssignmentTeam.find(reviewer_id)
-    else
-      return AssignmentParticipant.find(reviewer_id)
-    end
-  end
-
   # wrap lastest version of responses in each response map, together withe the questionnaire_id
   # will be used to display the reviewer summary
-  def self.final_versions_from_reviewer(assignment_id, reviewer_id)
-    reviewer = ReviewResponseMap.get_reviewer_with_id(assignment_id, reviewer_id)
+  def self.final_versions_from_reviewer(reviewer_id)
     maps = ReviewResponseMap.where(reviewer_id: reviewer_id)
-    assignment = Assignment.find(reviewer.parent_id)
+    assignment = Assignment.find(Participant.find(reviewer_id).parent_id)
     prepare_final_review_versions(assignment, maps)
   end
 
@@ -134,29 +104,13 @@ class ReviewResponseMap < ResponseMap
         ResponseMap.select("DISTINCT reviewer_id").where('reviewed_object_id = ? and type = ? and calibrate_to = ?', id, type, 0)
       @reviewers = []
       response_maps_with_distinct_participant_id.each do |reviewer_id_from_response_map|
-        @reviewers << ReviewResponseMap.get_reviewer_with_id(assignment.id, reviewer_id_from_response_map.reviewer_id)
+        @reviewers << AssignmentParticipant.find(reviewer_id_from_response_map.reviewer_id)
       end
-      # we sort the reviewer by name here, using whichever class it is an instance of
-      if not assignment.reviewer_is_team
-        @reviewers = Participant.sort_by_name(@reviewers)
-      else
-        @reviewers = Team.sort_by_name(@reviewers)
-      end
+      @reviewers = Participant.sort_by_name(@reviewers)
     else
       # This is a search, so find reviewers by user's full name
       user_ids = User.select("DISTINCT id").where('fullname LIKE ?', '%' + review_user[:fullname] + '%')
-      #E1973 - we use a separate query depending on if the reviewer is a team or participant
-      if not assignment.reviewer_is_team
-        @reviewers = AssignmentParticipant.where('user_id IN (?) and parent_id = ?', user_ids, assignment.id)
-      else
-        reviewer_participants = AssignmentTeam.where('id IN (?) and parent_id = ?', team_ids, assignment.id)
-        @reviewers = []
-        reviewer_participants.each do |participant|
-          if not @reviewers.include? participant.team
-            @reviewers << participant.team
-          end
-        end
-      end
+      @reviewers = AssignmentParticipant.where('user_id IN (?) and parent_id = ?', user_ids, assignment.id)
     end
     # @review_scores[reveiwer_id][reviewee_id] = score for assignments not using vary_rubric_by_rounds feature
     # @review_scores[reviewer_id][round][reviewee_id] = score for assignments using vary_rubric_by_rounds feature
@@ -192,21 +146,53 @@ class ReviewResponseMap < ResponseMap
                ("review round" + round.to_s).to_sym
              end
     review_final_versions[symbol] = {}
-    # TODO E1936 (future work)
-    # review_questionnaire_id method signature has changed
-    # need to change call to review_questionnaire_id here
-    # cannot do this as part of this project's scope
-    # the structure of the output (assumes only 1 questionnaire per round) has to change
-    # and this change has to bubble all the way up to tone analysis, heatmaps, and review scores pop-up
-    # this is a vary-by-topic redesign project all on its own
     review_final_versions[symbol][:questionnaire_id] = assignment.review_questionnaire_id(round)
     response_ids = []
     maps.each do |map|
       where_map = {map_id: map.id}
       where_map[:round] = round unless round.nil?
       responses = Response.where(where_map)
-      response_ids << responses.last.id unless responses.empty?
+      next if responses.empty?
+      responses.each do |response|
+        response_ids << response.id
+      end
     end
     review_final_versions[symbol][:response_ids] = response_ids
   end
+
+  def self.newreviewresp(old_assign, catt, dict, new_assign_id)
+    @old_reviewrespmap = ReviewResponseMap.where(reviewed_object_id: old_assign.id, reviewee_id: catt)
+    @find_newrespmap =  ReviewResponseMap.where(reviewed_object_id: new_assign_id, reviewee_id: dict[catt])
+    oldreviewrespids = []
+    newreviewrespids = []
+    @old_reviewrespmap.each do |zatt|
+      oldreviewrespids.append(zatt.id)
+    end
+    @find_newrespmap.each do |zatt|
+      newreviewrespids.append(zatt.id)
+    end
+    dict1 = Hash[oldreviewrespids.zip newreviewrespids]
+    dict1.each do |item, value|
+      @oldresp = Response.where(map_id: item)
+      @oldresp.each do |zatt|
+        @newresp = Response.new
+        @newresp.map_id = value
+        @newresp.additional_comment = zatt.additional_comment
+        @newresp.version_num = zatt.version_num
+        @newresp.round = zatt.round
+        @newresp.is_submitted = zatt.is_submitted
+        @newresp.save
+        @oldanswers = Answer.where(response_id:zatt.id)
+        @oldanswers.each do |latt|
+          @newanswer = Answer.new
+          @newanswer.question_id = latt.question_id
+          @newanswer.answer = latt.answer
+          @newanswer.comments = latt.comments
+          @newanswer.response_id = @newresp.id
+          @newanswer.save
+        end
+      end
+    end
+  end
+  
 end

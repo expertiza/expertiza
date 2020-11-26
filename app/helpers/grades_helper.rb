@@ -73,10 +73,29 @@ module GradesHelper
     vmlist << vm
   end
 
+  # Added by project E2083 in Fall 2020.  Adds functionality to check for and
+  # add Revision Plan responses to heatgrid view.
+  def add_revision_plan_response(participant, assignment, team_id, vmlist, used_in_round, round)
+    rp_questionnaire = RevisionPlanTeamMap.find_by(team: Team.find(team_id), used_in_round: used_in_round).try(:questionnaire)
+    if rp_questionnaire
+      add_response_to_vmlist(participant, assignment, Team.find(team_id), rp_questionnaire, vmlist, round)
+    end
+  end
+
+  # Added by project E2083 in Fall 2020.  Adds functionality for finding and
+  # adding the last Revision Plan when not varying by round.
+  def add_last_revision_plan_response(participant, assignment, team_id, vmlist, round)
+    if assignment.get_current_stage == "Finished"
+      current_round = assignment.rounds_of_reviews
+    else
+      reviewees_topic = SignedUpTeam.topic_id_by_team_id(participant.id)
+      current_round = assignment.number_of_current_round(reviewees_topic)
+    end
+    add_revision_plan_response(participant, assignment, team_id, vmlist, current_round, round)
+  end
+
   # Added by project E2083 in Fall 2020.  Refactored code used in multiple views
   # and in the grades_controller (specifically view_heatgrid and view_team).
-  # Added functionality to check for Revision Plan responses in addition to
-  # Review Responses.
   def generate_heatgrid(participant, assignment, team, team_id, questionnaires, vmlist)
     # loop through each questionnaire, and populate the view model for all data necessary
     # to render the html tables.
@@ -95,31 +114,11 @@ module GradesHelper
       end
       add_response_to_vmlist(participant, assignment, team, questionnaire, vmlist, @round)
       # Finds RevisionPlanQuestionnaire, if any
-      if assignment.vary_by_round? && assignment.is_revision_planning_enabled?
-        rp_questionnaire = RevisionPlanTeamMap.find_by(team: Team.find(team_id), used_in_round: counter_for_revisions).try(:questionnaire)
-        # Confirms revision planning enabled
-        # Confirms not first round
-        # Confirms haven't surpassed maximum number of rounds
-        if rp_questionnaire
-          # Adds RevisionPlanQuestionnaire to heatgrid
-          add_response_to_vmlist(participant, assignment, team, rp_questionnaire, vmlist, @round)
-        end
+      if assignment.is_revision_planning_enabled? && assignment.vary_by_round?
+        add_revision_plan_response(participant, assignment, team_id, vmlist, counter_for_revisions, @round)
         counter_for_revisions += 1
       elsif assignment.is_revision_planning_enabled? && questionnaire == questionnaires.last
-        if assignment.get_current_stage == "Finished"
-          current_round = assignment.rounds_of_reviews
-        else
-          reviewees_topic = SignedUpTeam.topic_id_by_team_id(participant.id)
-          current_round = assignment.number_of_current_round(reviewees_topic)
-        end
-        rp_questionnaire = RevisionPlanTeamMap.find_by(team: Team.find(team_id), used_in_round: current_round).try(:questionnaire)
-        # Confirms revision planning enabled
-        # Confirms not first round
-        # Confirms haven't surpassed maximum number of rounds
-        if rp_questionnaire
-          # Adds RevisionPlanQuestionnaire to heatgrid
-          add_response_to_vmlist(participant, assignment, team, rp_questionnaire, vmlist, @round)
-        end
+        add_last_revision_plan_response(participant, assignment, team_id, vmlist, @round)
       end
     end
   end

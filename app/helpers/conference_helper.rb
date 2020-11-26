@@ -38,14 +38,9 @@ module ConferenceHelper
     def create_author
         params[:user][:name] = params[:user][:email] unless !params[:user][:name].nil? and !params[:user][:name].empty?
         User.skip_callback(:create, :after, :email_welcome)
-        @user = User.new(user_params)
-        # parent id for a conference user will be conference assignment instructor id
-        @user.parent_id = Assignment.find(params[:user][:assignment]).instructor.id
-        @assignment = Assignment.find(params[:user][:assignment])
-        # set the user's timezone to its parent's
-        @user.timezonepref = User.find(@user.parent_id).timezonepref
-        # set default value for institute
-        @user.institution_id = nil
+        is_author = true
+        # Assign all user params for creating author using assign_user_params function
+        @user= assign_user_params(is_author)
         if @user.save
           User.set_callback(:create, :after, :email_welcome)
           password = @user.reset_password # the password is reset
@@ -62,16 +57,9 @@ module ConferenceHelper
       check = User.find_by(name: params[:user][:name])
       params[:user][:name] = params[:user][:email] unless check.nil?
       User.skip_callback(:create, :after, :email_welcome)
-      @new_user = User.new(user_params)
-      @new_user.institution_id =nil
-      @new_user.email = params[:user][:name]
-
-      #parent_id denotes who created the co-author
-      @new_user.parent_id = session[:user].id
-
-      #co-author role is same as student hence role_id =1
-      @new_user.role_id = 1
-
+      is_author = false
+      # Assign all user params for creating co-author using assign_user_params function
+      @new_user = assign_user_params(is_author)
       #creating user with the parameters provided
       if @new_user.save
         @user = User.find_by(email: @new_user.email)
@@ -98,6 +86,39 @@ module ConferenceHelper
             new_participant.set_handle
         end
     end
+
+    def assign_user_params(is_author)
+      @user = User.new(user_params)
+      #Checks if its a co-author
+      if not is_author
+        @user.email = params[:user][:name]
+        #parent_id denotes who created the co-author
+        @user.parent_id = session[:user].id
+        #co-author role is same as student hence role_id =1
+        @user.role_id = Role.find_by(name: 'Student').id
+      
+      #If not a co-author, check if its a author or an user created by an instructor
+      else
+        # To check if its a author we need to check if the passed assignment is of conference type.
+        if is_valid_conference_assignment?
+          # set default value for institute
+          @user.institution_id = nil
+          # parent id for a conference user will be conference assignment instructor id
+          @user.parent_id = Assignment.find(params[:user][:assignment]).instructor.id
+          # set the user's timezone to its parent's
+          @user.timezonepref = User.find(@user.parent_id).timezonepref        
+          
+        else
+          @user.institution_id = params[:user][:institution_id]
+          # record the person who created this new user
+          @user.parent_id = session[:user].id
+          # set the user's timezone to its parent's
+          @user.timezonepref = User.find(@user.parent_id).timezonepref
+        end       
+      end
+      @user
+    end
+
     def user_params
         params.require(:user).permit(:name,
                                      :role_id,

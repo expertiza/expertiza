@@ -87,7 +87,7 @@ class ResponseController < ApplicationController
       @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
     @questionnaire = set_questionnaire
-    calculate_total_score
+    store_total_cake_score
     render action: 'response'
   end
 
@@ -135,7 +135,7 @@ class ResponseController < ApplicationController
       @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
     end
     questions = sort_questions(@questionnaire.questions)
-    calculate_total_score
+    store_total_cake_score
     init_answers(questions)
     render action: 'response'
   end
@@ -403,8 +403,8 @@ class ResponseController < ApplicationController
     end
   end
 
-  # Calculates and updates the total contribution for a Cake question across all teammates
-  def calculate_total_score
+  # Creates a table to store total contribution for Cake question across all reviewers
+  def store_total_cake_score
     @total_score = Hash.new
     @questions.each do |question|
       if question.instance_of? Cake

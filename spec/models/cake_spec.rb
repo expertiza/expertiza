@@ -16,34 +16,6 @@ describe "cake" do
         expect(html).to eq("<TR><TD align=\"left\"> Cake type question? </TD><TD align=\"left\">Cake</TD><td align=\"center\">1</TD><TD align=\"center\">0 to 5</TD></TR>")
       end
     end
-  
-    # describe "#complete" do
-    #   it "returns the html " do
-    #     total_score = 70.to_s
-    #     html = cake.complete(0, nil, total_score).to_s
-    #     expect(html).to eq('<table> <tbody> <tr><td><label for="responses_0"">Cake type question?&nbsp;&nbsp;</label><input class="form-control" id="responses_0" min="0" name="responses[0][score]"type="number" size = 5 onchange="validateScore(this.value,70,this.id)"> </td></tr></tbody></table><td width="10%"></td></tr></table><p>Total contribution so far (excluding current review): 70% </p><textarea cols=50 rows= id="responses_0_comments" name="responses[0][comment]" class="tinymce"></textarea> {
-    #       <script> function validateScore(val, total_score,id, view_type) {
-    #         var int_val = parseInt(val);
-    #         var int_total_score = parseInt(total_score);
-    #         if(view_type == "teammate")
-    #         {
-    #           if (int_val+int_total_score>100)
-    #             {
-    #               alert("Total contribution cannot exceed 100, current total: " + (int_val+int_total_score));
-    #               document.getElementById(id).value = 0
-    #             }
-    #         }
-    #         else
-    #          {
-    #             if (int_val > 100)
-    #             {
-    #               alert("Total contribution cannot exceed 100, current total: " + (int_val));
-    #               document.getElementById(id).value = 0
-    #             }
-    #           }
-    #       }</script>')
-    #   end
-    # end
     
     describe "#view_completed_question" do
       it "returns the html " do

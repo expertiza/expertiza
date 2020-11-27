@@ -27,7 +27,8 @@ class Cake < ScoredQuestion
       safe_join(["<TR>".html_safe, "</TR>".html_safe], html.html_safe)
     end
   
-    def complete(count, answer = nil, total_score, view_type)
+    # Method is called when completing the percentage contribution text box for a cake question in a review
+    def complete(count, answer = nil, total_score)
       if self.size.nil?
         cols = '70'
         rows = '1'
@@ -39,33 +40,22 @@ class Cake < ScoredQuestion
       html += '<label for="responses_' + count.to_s + '"">' + self.txt + '&nbsp;&nbsp;</label>'
       html += '<input class="form-control" id="responses_' + count.to_s + '" min="0" name="responses[' + count.to_s + '][score]"'
       html += 'value="' + answer.answer.to_s + '"' unless answer.nil?
-      html += 'type="number" size = 5 onchange="validateScore(this.value,' + total_score + ',this.id,\''+view_type.to_s+'\')"> '
+      html += 'type="number" size = 5 onchange="validateScore(this.value,' + total_score.to_s + ',this.id)"> '
       html += '</td></tr></tbody></table>'
       html += '<td width="10%"></td></tr></table>'
-      html += '<p>Total contribution so far (excluding current review): ' + total_score + '% </p>' #display total
-      html += '<textarea cols=' + cols + ' rows=' + rows + ' id="responses_' + count.to_s + '_comments"' \
+      html += '<p>Total contribution so far (excluding current review): ' + total_score.to_s + '% </p>' #display total
+      html += '<textarea cols=' + cols.to_s + ' rows=' + rows.to_s + ' id="responses_' + count.to_s + '_comments"' \
           ' name="responses[' + count.to_s + '][comment]" class="tinymce">'
       html += answer.comments unless answer.nil?
       html += '</textarea>'
-      html += '<script> function validateScore(val, total_score,id, view_type) {
+      html += '<script> function validateScore(val, total_score,id) {
                 var int_val = parseInt(val);
-                var int_total_score = parseInt(total_score);
-                if(view_type == "teammate")
+                var int_total_score = parseInt(total_score);                
+                if (int_val+int_total_score > 100 || int_val < 0)
                 {
-                  if (int_val+int_total_score>100)
-                    {
-                      alert("Total contribution cannot exceed 100, current total: " + (int_val+int_total_score));
-                      document.getElementById(id).value = 0
-                    }
+                  alert("Total contribution cannot exceed 100 or be a negative value, current total: " + (int_val+int_total_score));
+                  document.getElementById(id).value = 0
                 }
-                else
-                 {
-                    if (int_val > 100)
-                    {
-                      alert("Total contribution cannot exceed 100, current total: " + (int_val));
-                      document.getElementById(id).value = 0
-                    }
-                  }
               }</script>'
       safe_join(["".html_safe, "".html_safe], html.html_safe)
     end
@@ -91,8 +81,6 @@ class Cake < ScoredQuestion
       end
       if review_type == 'TeammateReviewResponseMap'
         answers_for_team_members =  get_answers_for_teammatereview(team_id, question_id, participant_id, assignment_id, reviewee_id)
-      # else
-      #   answers_for_team_members = get_answers_for_review(question_id, participant_id, assignment_id)
       end
       calculate_total_score(answers_for_team_members)
     end
@@ -105,11 +93,6 @@ class Cake < ScoredQuestion
       Answer.joins([{response: :response_map}, :question]).where("response_maps.reviewee_id in (?) and response_maps.reviewed_object_id = (?)
         and answer is not null and response_maps.reviewer_id in (?) and answers.question_id in (?) and response_maps.reviewee_id not in (?)", team_members, assignment_id, participant_id, question_id, reviewee_id).to_a
     end
-  
-    # def get_answers_for_review(question_id, participant_id, assignment_id)
-    #   Answer.joins([{response: :response_map}, :question]).where("response_maps.reviewed_object_id = (?)
-    #     and answer is not null and response_maps.reviewer_id in (?) and answers.question_id in (?)", assignment_id, participant_id, question_id).to_a
-    # end
   
     # Sums up the scores given by all teammates that should be less than or equal to 100
     def calculate_total_score(question_answers)

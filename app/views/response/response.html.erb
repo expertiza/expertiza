@@ -363,7 +363,7 @@
             <% elsif question.instance_of? Scale %>
               <%= question.complete(i, @questionnaire.min_question_score, @questionnaire.max_question_score, answer) %>
             <% elsif question.instance_of? Cake %>
-              <%= question.complete(i, answer, @total_score[question.id].to_s, @return) %>  
+              <%= question.complete(i, answer, @total_score[question.id].to_s) %>  
             <% else %>
               <%= question.complete(i, answer) %>
             <% end %>

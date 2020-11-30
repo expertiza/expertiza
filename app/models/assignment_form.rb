@@ -1,5 +1,4 @@
 require 'active_support/time_with_zone'
-require 'fileutils'
 
 class AssignmentForm
   attr_accessor :assignment, :assignment_questionnaires, :due_dates, :tag_prompt_deployments
@@ -30,7 +29,7 @@ class AssignmentForm
     assignment_form
   end
 
-  def update(attributes, user)
+  def update(attributes, user, vary_by_topic_desired = false)
     @has_errors = false
     has_late_policy = false
     if attributes[:assignment][:late_policy_id].to_i > 0
@@ -40,6 +39,7 @@ class AssignmentForm
     end
     update_assignment(attributes[:assignment])
     update_assignment_questionnaires(attributes[:assignment_questionnaire]) unless @has_errors
+    update_assignment_questionnaires(attributes[:topic_questionnaire]) unless @has_errors || attributes[:assignment][:vary_by_topic] == 'false'
     update_due_dates(attributes[:due_date], user) unless @has_errors
     update_assigned_badges(attributes[:badge], attributes[:assignment]) unless @has_errors
     add_simicheck_to_delayed_queue(attributes[:assignment][:simicheck])
@@ -64,24 +64,29 @@ class AssignmentForm
     @assignment.num_reviews = @assignment.num_reviews_allowed
   end
 
-  # code to save assignment questionnaires
+  # code to save assignment questionnaires updated in the Rubrics and Topics tabs
   def update_assignment_questionnaires(attributes)
-    return false unless attributes
-    validate_assignment_questionnaires_weights(attributes)
-    @errors = @assignment.errors
+    return if attributes.nil? || attributes.empty?
+    if attributes[0].key?(:questionnaire_weight)
+      validate_assignment_questionnaires_weights(attributes)
+      @errors = @assignment.errors.to_s
+      topic_id = nil
+    end
     unless @has_errors
-      existing_aqs = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
-      existing_aqs.each(&:delete)
-      attributes.each do |assignment_questionnaire|
-        if assignment_questionnaire[:id].nil? or assignment_questionnaire[:id].blank?
-          aq = AssignmentQuestionnaire.new(assignment_questionnaire)
-          unless aq.save
-            @errors = @assignment.errors.to_s
-            @has_errors = true
+      # Update AQ if found, otherwise create new entry
+      attributes.each do |attr|
+        unless attr[:questionnaire_id].blank?
+          questionnaire_type = Questionnaire.find(attr[:questionnaire_id]).type
+          topic_id = attr[:topic_id] if attr.key?(:topic_id)
+          aq = assignment_questionnaire(questionnaire_type, attr[:used_in_round], topic_id)
+          if aq.id.nil?
+            unless aq.save
+              @errors = @assignment.errors.to_s
+              @has_errors = true
+              next
+            end
           end
-        else
-          aq = AssignmentQuestionnaire.find(assignment_questionnaire[:id])
-          unless aq.update_attributes(assignment_questionnaire)
+          unless aq.update_attributes(attr)
             @errors = @assignment.errors.to_s
             @has_errors = true
           end
@@ -188,6 +193,69 @@ class AssignmentForm
       next unless deadline_type == "team_formation" and @assignment.team_assignment?
       add_delayed_job(@assignment, "drop_one_member_topics", due_date, min_left)
     end
+  end
+
+  # Find an AQ based on the given values
+  def assignment_questionnaire(questionnaire_type, round_number, topic_id)
+    round_number = nil if round_number.blank?
+    topic_id = nil if topic_id.blank?
+    if @assignment.vary_by_round && @assignment.vary_by_topic
+        # Get all AQs for the assignment and specified round number and topic
+        assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number, topic_id: topic_id)
+        assignment_questionnaires.each do |aq|
+          # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
+          return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+        end
+    elsif @assignment.vary_by_round
+        # Get all AQs for the assignment and specified round number by round #
+        assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number)
+        assignment_questionnaires.each do |aq|
+          # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
+          return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+        end
+    elsif @assignment.vary_by_topic
+        # Get all AQs for the assignment and specified round number by topic
+        assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, topic_id: topic_id)
+        assignment_questionnaires.each do |aq|
+          # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
+          return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+        end
+    else
+        # Get all AQs for the assignment
+        assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
+        assignment_questionnaires.each do |aq|
+          # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
+          return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+        end
+    end
+
+    # Create a new AQ if it was not found based on the attributes
+    default_weight = {}
+    default_weight['ReviewQuestionnaire'] = 100
+    default_weight['MetareviewQuestionnaire'] = 0
+    default_weight['AuthorFeedbackQuestionnaire'] = 0
+    default_weight['TeammateReviewQuestionnaire'] = 0
+    default_weight['BookmarkRatingQuestionnaire'] = 0
+    default_aq = AssignmentQuestionnaire.where(user_id: @assignment.instructor_id, assignment_id: nil, questionnaire_id: nil).first
+    default_limit = if default_aq.blank?
+                      15
+                    else
+                      default_aq.notification_limit
+                    end
+
+    aq = AssignmentQuestionnaire.new
+    aq.questionnaire_weight = default_weight[questionnaire_type]
+    aq.notification_limit = default_limit
+    aq.assignment = @assignment
+    aq
+  end
+
+  # Find a questionnaire for the given AQ and questionnaire type
+  def questionnaire(assignment_questionnaire, questionnaire_type)
+    return Object.const_get(questionnaire_type).new if assignment_questionnaire.nil?
+    questionnaire = Questionnaire.find_by(id: assignment_questionnaire.questionnaire_id)
+    return questionnaire unless questionnaire.nil?
+    Object.const_get(questionnaire_type).new
   end
 
   def get_time_diff_btw_due_date_and_now(due_date)
@@ -309,170 +377,13 @@ class AssignmentForm
     MailWorker.perform_in(find_min_from_now(Time.parse(due_date.due_at.to_s(:db)) + simicheck_delay.to_i.hours).minutes.from_now * 60, @assignment.id, "compare_files_with_simicheck", due_date.due_at.to_s(:db))
   end
 
-  def self.createnewsubmission(old_assign, new_assign_id)
-    @prev_submission_record = SubmissionRecord.where(assignment_id: old_assign.id)
-    @prev_submission_record.each do |catt|
-      @new_submission_record = SubmissionRecord.new
-      @new_submission_record.type = catt.type
-      @new_submission_record.content = catt.content
-      @new_submission_record.operation = catt.operation
-      @new_submission_record.team_id = catt.team_id
-      @new_submission_record.user = catt.user
-      @new_submission_record.assignment_id = new_assign_id
-      @new_submission_record.save
-    end
-  end
-
-  def self.createnewteam(old_assign, new_assign_id)
-    @original_team_values = Team.where(parent_id: old_assign.id)
-    old_team_ids = []
-    @original_team_values.each do |catt|
-      @prev_assignment = Assignment.find(old_assign.id)
-      @prev_instructor = Participant.find_by(parent_id: old_assign.id, user_id: @prev_assignment.instructor_id)
-      @map = ReviewResponseMap.find_by(reviewed_object_id: old_assign.id, reviewer_id: @prev_instructor.id, reviewee_id: catt.id)
-      if @map
-        @resp = Response.find_by(map_id: @map.id, is_submitted: false)
-        if @resp
-          old_team_ids.append(catt.id)
-          @new_team = Team.new
-          @new_team.name = catt.name
-          @new_team.parent_id = new_assign_id
-          @new_team.type = catt.type
-          @new_team.comments_for_advertisement = catt.comments_for_advertisement
-          @new_team.advertise_for_partner = catt.advertise_for_partner
-          @new_team.submitted_hyperlinks = catt.submitted_hyperlinks
-          @new_team.directory_num = catt.directory_num
-          @new_team.grade_for_submission = catt.grade_for_submission
-          @new_team.comment_for_submission = catt.comment_for_submission
-          @new_team.make_public = catt.make_public
-          @new_team.save
-        else
-          next
-        end
-      else
-        next
-      end
-    end
-    old_team_ids
-  end
-
-  def self.participant(matt, old_assign, new_assign_id)
-    @old_participant = Participant.where(user_id: matt.user_id, parent_id: old_assign.id)
-    @old_participant.each do |natt|
-      @new_participant = Participant.new
-      @new_participant.can_submit = natt.can_submit
-      @new_participant.can_review = natt.can_review
-      @new_participant.user_id = matt.user_id
-      @new_participant.parent_id = new_assign_id
-      @new_participant.submitted_at = natt.submitted_at
-      @new_participant.permission_granted = natt.permission_granted
-      @new_participant.penalty_accumulated = natt.penalty_accumulated
-      @new_participant.grade = natt.grade
-      @new_participant.type = natt.type
-      @new_participant.handle = natt.handle
-      @new_participant.time_stamp = natt.time_stamp
-      @new_participant.digital_signature = natt.digital_signature
-      @new_participant.duty = natt.duty
-      @new_participant.can_take_quiz = natt.can_take_quiz
-      @new_participant.save
-    end
-  end
-
-  def self.newreview(old_assign, new_assign_id, dict)
-    @old_assignmentnumber = Assignment.find_by(id: old_assign.id)
-    @old_reviewrespmap = ReviewResponseMap.where(reviewed_object_id: old_assign.id)
-    @getnewparticipant = Participant.find_by(parent_id: new_assign_id, user_id: @old_assignmentnumber.instructor_id)
-    @old_reviewrespmap.each do |satt|
-      if dict.key?(satt.reviewee_id)
-        @new_reviewrespmap = ReviewResponseMap.new
-        @new_reviewrespmap.reviewed_object_id = new_assign_id
-        @new_reviewrespmap.reviewer_id = @getnewparticipant.id
-        @new_reviewrespmap.reviewee_id = dict[satt.reviewee_id]
-        @new_reviewrespmap.type = satt.type
-        @new_reviewrespmap.created_at = satt.created_at
-        @new_reviewrespmap.calibrate_to = satt.calibrate_to
-        @new_reviewrespmap.save
-      else
-        next
-      end
-    end
-  end
-
-  def self.createnewparticipant(old_assign, new_assign_id, dict)
-    @old_assignmentnumber = Assignment.find_by(id: old_assign.id)
-    @new_assignmentnumber = Assignment.find_by(id: new_assign_id)
-    @find_participant = Participant.find_by(parent_id: old_assign.id, user_id: @old_assignmentnumber.instructor_id)
-    @new_participant = Participant.new
-    @new_participant.can_submit = @find_participant.can_submit
-    @new_participant.can_review = @find_participant.can_review
-    @new_participant.user_id = @new_assignmentnumber.instructor_id
-    @new_participant.parent_id = new_assign_id
-    @new_participant.submitted_at = @find_participant.submitted_at
-    @new_participant.permission_granted = @find_participant.permission_granted
-    @new_participant.penalty_accumulated = @find_participant.penalty_accumulated
-    @new_participant.grade = @find_participant.grade
-    @new_participant.type = @find_participant.type
-    @new_participant.handle = @find_participant.handle
-    @new_participant.time_stamp = @find_participant.time_stamp
-    @new_participant.digital_signature = @find_participant.digital_signature
-    @new_participant.duty = @find_participant.duty
-    @new_participant.can_take_quiz = @find_participant.can_take_quiz
-    @new_participant.save
-    newreview(old_assign, new_assign_id, dict)
-  end
-
-
-  def self.newreviewresp(old_assign, catt, dict, new_assign_id)
-    @old_reviewrespmap = ReviewResponseMap.where(reviewed_object_id: old_assign.id, reviewee_id: catt)
-    @find_newrespmap = ReviewResponseMap.where(reviewed_object_id: new_assign_id, reviewee_id: dict[catt])
-    oldreviewrespids = []
-    newreviewrespids = []
-    @old_reviewrespmap.each do |zatt|
-      oldreviewrespids.append(zatt.id)
-    end
-    @find_newrespmap.each do |zatt|
-      newreviewrespids.append(zatt.id)
-    end
-    dict1 = Hash[oldreviewrespids.zip newreviewrespids]
-    dict1.each do |item, value|
-      @oldresp = Response.where(map_id: item)
-      @oldresp.each do |zatt|
-        @newresp = Response.new
-        @newresp.map_id = value
-        @newresp.additional_comment = zatt.additional_comment
-        @newresp.version_num = zatt.version_num
-        @newresp.round = zatt.round
-        @newresp.is_submitted = zatt.is_submitted
-        @newresp.save
-        @oldanswers = Answer.where(response_id: zatt.id)
-        @oldanswers.each do |latt|
-          @newanswer = Answer.new
-          @newanswer.question_id = latt.question_id
-          @newanswer.answer = latt.answer
-          @newanswer.comments = latt.comments
-          @newanswer.response_id = @newresp.id
-          @newanswer.save
-        end
-      end
-    end
-  end
-
   # Copies the inputted assignment into new one and returns the new assignment id
   def self.copy(assignment_id, user)
     Assignment.record_timestamps = false
     old_assign = Assignment.find(assignment_id)
     new_assign = old_assign.dup
     user.set_instructor(new_assign)
-    # Set name of new assignment as 'Copy of <old assignment name>'. If it already exists, set it as 'Copy of <old assignment name> (1)'.
-    # Repeated till unique name is found.
-    name_counter = 0
-    new_name = 'Copy of ' + new_assign.name
-    until Assignment.find_by(name: new_name).nil?
-      new_name = 'Copy of ' + new_assign.name
-      name_counter += 1
-      new_name += ' (' + name_counter.to_s + ')'
-    end
-    new_assign.update_attribute('name', new_name)
+    new_assign.update_attribute('name', 'Copy of ' + new_assign.name)
     new_assign.update_attribute('created_at', Time.now)
     new_assign.update_attribute('updated_at', Time.now)
     new_assign.update_attribute('directory_path', new_assign.directory_path + '_copy') if new_assign.directory_path.present?
@@ -491,43 +402,6 @@ class AssignmentForm
     else
       new_assign_id = nil
     end
-    if old_assign.is_calibrated
-      createnewsubmission(old_assign, new_assign_id)
-      old_team_ids = createnewteam(old_assign, new_assign_id)
-      @new_teams = Team.where(parent_id: new_assign_id)
-      new_team_ids = []
-      @new_teams.each do |catt|
-        new_team_ids.append(catt.id)
-      end
-      dict = Hash[old_team_ids.zip new_team_ids]
-      count = 0
-      old_team_ids.each do |catt|
-        @old_team_user = TeamsUser.where(team_id: catt)
-        @old_team_user.each do |matt|
-          @new_team_user = TeamsUser.new
-          @new_team_user.team_id = new_team_ids[count]
-          @new_team_user.user_id = matt.user_id
-          @new_team_user.save
-          participant(matt, old_assign, new_assign_id)
-        end
-        createnewparticipant(old_assign, new_assign_id, dict)
-        newreviewresp(old_assign, catt, dict, new_assign_id)
-        count += 1
-      end
-      old_directory_path = ""
-      new_directory_path = ""
-      old_team_ids.each do |catt|
-        @team_needed = Team.where(id: catt).first
-        @team_inserted = Team.where(id: dict[catt]).first
-        old_directory_path = @team_needed.path_calibration
-        new_directory_path = @team_inserted.path_calibration
-        break
-      end
-    end
-    if File.exist?(old_directory_path)
-      Dir.mkdir(new_directory_path) unless File.exist?(new_directory_path)
-      FileUtils.cp_r old_directory_path + '/.', new_directory_path
-    end
     new_assign_id
   end
 
@@ -540,9 +414,10 @@ class AssignmentForm
         notification_limit: aq.notification_limit,
         questionnaire_weight: aq.questionnaire_weight,
         used_in_round: aq.used_in_round,
-        dropdown: aq.dropdown
+        dropdown: aq.dropdown,
+        topic_id: aq.topic_id
       )
     end
   end
-end
 
+end

@@ -256,6 +256,39 @@ class Team < ActiveRecord::Base
     ExpertizaLogger.info LoggerMessage.new('Model:Team', '', "New TeamNode created with teamname #{team_name}")
     team
   end
+  
+  def self.createnewteam(old_assign, new_assign_id)
+    @original_team_v = Team.where(parent_id: old_assign.id)
+    old_team_ids = []
+    @original_team_v.each do |hatt|
+      @prev_assignment = Assignment.find(old_assign.id)
+      @prev_instructor = Participant.find_by(parent_id: old_assign.id, user_id: @prev_assignment.instructor_id)
+      @map = ReviewResponseMap.find_by(reviewed_object_id: old_assign.id, reviewer_id: @prev_instructor.id, reviewee_id: hatt.id)
+      if @map
+        @resp = Response.find_by(map_id: @map.id, is_submitted: false)
+        if @resp
+          old_team_ids.append(hatt.id)
+          @new_team = Team.new
+          @new_team.name = hatt.name
+          @new_team.parent_id = new_assign_id
+          @new_team.type = hatt.type
+          @new_team.comments_for_advertisement = hatt.comments_for_advertisement
+          @new_team.advertise_for_partner = hatt.advertise_for_partner
+          @new_team.submitted_hyperlinks = hatt.submitted_hyperlinks
+          @new_team.directory_num = hatt.directory_num
+          @new_team.grade_for_submission = hatt.grade_for_submission
+          @new_team.comment_for_submission = hatt.comment_for_submission
+          @new_team.make_public = hatt.make_public
+          @new_team.save
+        else
+          next
+        end
+      else
+        next
+      end
+    end
+    old_team_ids
+  end
 
   # REFACTOR END:: class methods import export moved from course_team & assignment_team to here
 end

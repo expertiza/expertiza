@@ -1,5 +1,5 @@
 class AssignmentTeam < Team
-  require File.dirname(__FILE__) + '/analytic/assignment_team_analytic'
+  require File.dirname(_FILE_) + '/analytic/assignment_team_analytic'
   include AssignmentTeamAnalytic
 
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'parent_id'
@@ -247,6 +247,11 @@ class AssignmentTeam < Team
   # Get the path of the team directory
   def path
     self.assignment.path + "/" + self.directory_num.to_s
+  end
+  
+  #Get the path of the directory for the assignment
+  def directory_path
+    self.assignment.path
   end
 
   # Set the directory num for this team

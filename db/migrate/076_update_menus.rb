@@ -61,7 +61,7 @@ class UpdateMenus < ActiveRecord::Migration
     MenuItem.create(:name => 'manage/questionnaires/author feedbacks', :label => 'Author feedbacks', :parent_id => item.id, :seq => 2, :controller_action_id => author_feedbacks_action.id)
     MenuItem.create(:name => 'manage/questionnaires/global survey', :label => 'Global survey', :parent_id => item.id, :seq => 3, :controller_action_id => global_survey_action.id)
     MenuItem.create(:name => 'manage/questionnaires/surveys', :label => 'Surveys', :parent_id => item.id, :seq => 4, :controller_action_id => surveys_action.id)
-    MenuItem.create(:name => 'manage/questionnaires/course evaluations', :label => 'Course evaluations', :parent_id => item.id, :seq => 5, :controller_action_id => surveys_action.id)
+    MenuItem.create(:name => 'manage/questionnaires/courses evaluations', :label => 'Course evaluations', :parent_id => item.id, :seq => 5, :controller_action_id => surveys_action.id)
     
     MenuItem.create(:name => 'manage/courses', :label => 'Courses', :parent_id => manage_item.id, :seq => 3, :controller_action_id => courses_action.id)
     MenuItem.create(:name => 'manage/assignments', :label => 'Assignments', :parent_id => manage_item.id, :seq => 4, :controller_action_id => assignments_action.id)

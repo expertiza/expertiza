@@ -1,0 +1,11 @@
+<h1>Edit Course</h1>
+
+<%= form_for @course do %>
+  <%= render :partial => 'course' %>
+    <p><%= check_box_tag('courses[private]', 'true',  @course.private?) %>
+    <%= label_tag('toggle_access_setting', 'Private courses') %></p>
+    <%= submit_tag "Update" %>
+<% end %>
+
+<br/>
+<%= render :partial => '/shared_scripts/back' %>

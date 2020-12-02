@@ -50,7 +50,7 @@ describe Assignment do
   end
 
   describe '.assign_courses_to_assignment' do
-    it 'fetches all courses belong to current instructor and with the order of course names' do
+    it 'fetches all courses belong to current instructor and with the order of courses names' do
       course = double('Course')
       allow(Course).to receive_message_chain(:where, :order).with(instructor_id: 6).with(:name).and_return([course])
       expect(Assignment.assign_courses_to_assignment(instructor)).to eq([course])
@@ -107,7 +107,7 @@ describe Assignment do
   end
 
   describe '#response_map_to_metareview' do
-    it 'does not raise any errors and returns the first review response map' do
+    it 'does not raise any errors and returns the first review responses map' do
       metareviewer = double('AssignmentParticipant', name: 'metareviewer')
       allow(assignment).to receive(:review_mappings).and_return([review_response_map])
       allow(Array).to receive(:new).with([review_response_map]).and_return([review_response_map])
@@ -176,12 +176,12 @@ describe Assignment do
       it 'raises an error' do
         assignment.course_id = nil
         assignment.instructor_id = nil
-        expect { assignment.path }.to raise_error('The path cannot be created. The assignment must be associated with either a course or an instructor.')
+        expect { assignment.path }.to raise_error('The path cannot be created. The assignment must be associated with either a courses or an instructor.')
       end
     end
 
     context 'when course_id is not nil and course_id is larger than 0' do
-      it 'returns path with course directory path' do
+      it 'returns path with courses directory path' do
         allow(Rails).to receive(:root).and_return('/root')
         allow(User).to receive(:find).with(1).and_return(instructor)
         allow(Course).to receive(:find).with(1).and_return(course)
@@ -190,7 +190,7 @@ describe Assignment do
     end
 
     context 'when course_id is nil' do
-      it 'returns path without course directory path' do
+      it 'returns path without courses directory path' do
         assignment.course_id = nil
         allow(Rails).to receive_message_chain(:root, :to_s).and_return('/root')
         allow(User).to receive(:find).with(1).and_return(instructor)
@@ -251,19 +251,19 @@ describe Assignment do
       allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: 1).and_return([review_response_map])
       allow(TeammateReviewResponseMap).to receive(:where).with(reviewed_object_id: 1).and_return([teammate_review_response_map])
     end
-    context 'when there is at least one review response in current assignment' do
+    context 'when there is at least one review responses in current assignment' do
       it 'raises an error messge and current assignment cannot be deleted' do
         allow(review_response_map).to receive(:delete).with(nil)
                                                       .and_raise('Mysql2::Error: Cannot delete or update a parent row: a foreign key constraint fails')
-        expect { assignment.delete }.to raise_error('There is at least one review response that exists for no assignment.')
+        expect { assignment.delete }.to raise_error('There is at least one review responses that exists for no assignment.')
       end
     end
 
-    context 'when there is no review response in current assignment and at least one teammate review response in current assignment' do
+    context 'when there is no review responses in current assignment and at least one teammate review responses in current assignment' do
       it 'raises an error messge and current assignment cannot be deleted' do
         allow(review_response_map).to receive(:delete).with(nil).and_return(true)
         allow(teammate_review_response_map).to receive(:delete).with(nil).and_raise('Something wrong during deletion')
-        expect { assignment.delete }.to raise_error('There is at least one teammate review response that exists for no assignment.')
+        expect { assignment.delete }.to raise_error('There is at least one teammate review responses that exists for no assignment.')
       end
     end
 

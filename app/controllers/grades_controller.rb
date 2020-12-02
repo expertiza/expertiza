@@ -3,7 +3,7 @@ class GradesController < ApplicationController
   helper :submitted_content
   helper :penalty
   include PenaltyHelper
-  include StudentTaskHelper
+  include StudentTasksHelper
   include AssignmentHelper
   include GradesHelper
   include AuthorizationHelper
@@ -59,7 +59,7 @@ class GradesController < ApplicationController
     @assignment = @participant.assignment
     questionnaires = @assignment.questionnaires
     @questions = retrieve_questions questionnaires, @assignment.id
-    # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
+    # @pscore has the newest versions of responses for each responses map, and only one for each responses map (unless it is vary rubric by round)
     @pscore = @participant.scores(@questions)
     make_chart
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
@@ -130,9 +130,9 @@ class GradesController < ApplicationController
       review = Response.find_by(map_id: review_mapping.map_id)
     end
     if review_exists
-      redirect_to controller: 'response', action: 'edit', id: review.id, return: "instructor"
+      redirect_to controller: 'responses', action: 'edit', id: review.id, return: "instructor"
     else
-      redirect_to controller: 'response', action: 'new', id: review_mapping.map_id, return: "instructor"
+      redirect_to controller: 'responses', action: 'new', id: review_mapping.map_id, return: "instructor"
     end
   end
 
@@ -179,7 +179,7 @@ class GradesController < ApplicationController
 
   def redirect_when_disallowed
     # For author feedback, participants need to be able to read feedback submitted by other teammates.
-    # If response is anything but author feedback, only the person who wrote feedback should be able to see it.
+    # If responses is anything but author feedback, only the person who wrote feedback should be able to see it.
     ## This following code was cloned from response_controller.
 
     # ACS Check if team count is more than 1 instead of checking if it is a team assignment

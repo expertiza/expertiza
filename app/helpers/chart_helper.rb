@@ -113,7 +113,7 @@ module ChartHelper
 
     def self.test_data
       {
-        course_list: [["course 1", 1], ["course 2", 2], ["course 3", 3]],
+        course_list: [["courses 1", 1], ["courses 2", 2], ["courses 3", 3]],
         assignment_list: [["assignment 1", 1], ["assignment 2", 2], ["assignment", 3]],
         team_list: [["team 1", 1], ["team 2", 2], ["team 3", 3]],
         chart_obj: ChartHelper.data_template[:bar]

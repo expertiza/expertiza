@@ -33,7 +33,7 @@ class QuestionnairesController < ApplicationController
       undo_link("Copy of questionnaire #{@questionnaire.name} has been created successfully.")
       redirect_to controller: 'questionnaires', action: 'view', id: @questionnaire.id
     rescue StandardError
-      flash[:error] = 'The questionnaire was not able to be copied. Please check the original course for missing information.' + $ERROR_INFO.to_s
+      flash[:error] = 'The questionnaire was not able to be copied. Please check the original courses for missing information.' + $ERROR_INFO.to_s
       redirect_to action: 'list', controller: 'tree_display'
     end
   end

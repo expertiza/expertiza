@@ -3,7 +3,7 @@ class CreateCourses < ActiveRecord::Migration
     create_table :courses do |t|
 	t.column :title, :string
         t.column :instructor_id, :int
-	t.column :directory_path, :string # the directory for this course; all assgts. will be in subdirectories of this
+	t.column :directory_path, :string # the directory for this courses; all assgts. will be in subdirectories of this
 	t.column :info, :text  # this is used to hold semester, section #, etc., anything the instructor wants
     end
 

@@ -257,7 +257,7 @@ development:
         parent:
         parent_id:
         site_controller_id: 33
-        url: "/survey_deployment/list"
+        url: "/survey_deployments/list"
         children:
         - 36
       26: &4 !ruby/object:Menu::Node
@@ -265,11 +265,11 @@ development:
         controller_action_id: 33
         id: 26
         label: Assignments
-        name: student_task
+        name: student_tasks
         parent:
         parent_id:
         site_controller_id: 23
-        url: "/student_task/list"
+        url: "/student_tasks/list"
       30: &5 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 42
@@ -285,11 +285,11 @@ development:
         controller_action_id: 36
         id: 27
         label: Profile
-        name: profile
+        name: profiles
         parent:
         parent_id:
         site_controller_id: 26
-        url: "/profile/edit"
+        url: "/profiles/edit"
       2: &7 !ruby/object:Menu::Node
         content_page_id: 6
         controller_action_id:
@@ -455,7 +455,7 @@ development:
         controller_action_id: 64
         id: 43
         label: Course surveys
-        name: manage/questionnaires/course surveys
+        name: manage/questionnaires/courses surveys
         parent:
         parent_id: 38
         site_controller_id: 38
@@ -717,23 +717,23 @@ test:
       5: &2 !ruby/object:Menu::Node
         parent:
         parent_id:
-        name: student_task
+        name: student_tasks
         id: 5
         label: Assignments
         site_controller_id: 20
         controller_action_id: 33
         content_page_id:
-        url: "/student_task/list"
+        url: "/student_tasks/list"
       6: &3 !ruby/object:Menu::Node
         parent:
         parent_id:
-        name: profile
+        name: profiles
         id: 6
         label: Profile
         site_controller_id: 21
         controller_action_id: 34
         content_page_id:
-        url: "/profile/edit"
+        url: "/profiles/edit"
       7: &4 !ruby/object:Menu::Node
         parent:
         parent_id:
@@ -1028,7 +1028,7 @@ production:
         parent:
         parent_id:
         site_controller_id: 33
-        url: "/survey_deployment/list"
+        url: "/survey_deployments/list"
         children:
         - 36
       26: &4 !ruby/object:Menu::Node
@@ -1036,11 +1036,11 @@ production:
         controller_action_id: 33
         id: 26
         label: Assignments
-        name: student_task
+        name: student_tasks
         parent:
         parent_id:
         site_controller_id: 23
-        url: "/student_task/list"
+        url: "/student_tasks/list"
       30: &5 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 42
@@ -1056,11 +1056,11 @@ production:
         controller_action_id: 36
         id: 27
         label: Profile
-        name: profile
+        name: profiles
         parent:
         parent_id:
         site_controller_id: 26
-        url: "/profile/edit"
+        url: "/profiles/edit"
       2: &7 !ruby/object:Menu::Node
         content_page_id: 6
         controller_action_id:
@@ -1226,7 +1226,7 @@ production:
         controller_action_id: 64
         id: 43
         label: Course surveys
-        name: manage/questionnaires/course surveys
+        name: manage/questionnaires/courses surveys
         parent:
         parent_id: 38
         site_controller_id: 38

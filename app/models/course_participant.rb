@@ -19,11 +19,11 @@ class CourseParticipant < Participant
     user = User.find_by(name: row_hash[:name])
     if user.nil?
       raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 4
-      attributes = ImportFileHelper.define_attributes(row_hash)
-      user = ImportFileHelper.create_new_user(attributes, session)
+      attributes = ImportFilesHelper.define_attributes(row_hash)
+      user = ImportFilesHelper.create_new_user(attributes, session)
     end
     course = Course.find_by(id)
-    raise ImportError, "The course with the id \"" + id.to_s + "\" was not found." if course.nil?
+    raise ImportError, "The courses with the id \"" + id.to_s + "\" was not found." if course.nil?
     unless CourseParticipant.exists?(user_id: user.id, parent_id: id)
       CourseParticipant.create(user_id: user.id, parent_id: id)
     end

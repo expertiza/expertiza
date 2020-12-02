@@ -73,7 +73,7 @@ class User < ActiveRecord::Base
     # If the user is a super admin, fetch all users
     user_list = SuperAdministrator.get_user_list if self.role.super_admin?
 
-    # If the user is an instructor, fetch all users in his course/assignment
+    # If the user is an instructor, fetch all users in his courses/assignment
     user_list = Instructor.get_user_list(self) if self.role.instructor?
 
     # If the user is a TA, fetch all users in his courses
@@ -148,8 +148,8 @@ class User < ActiveRecord::Base
     raise ArgumentError, "Only #{row_hash.length} column(s) is(are) found. It must contain at least username, full name, email." if row_hash.length < 3
     user = User.find_by_name(row_hash[:name])
     if user.nil?
-      attributes = ImportFileHelper.define_attributes(row_hash)
-      user = ImportFileHelper.create_new_user(attributes, session)
+      attributes = ImportFilesHelper.define_attributes(row_hash)
+      user = ImportFilesHelper.create_new_user(attributes, session)
     else
       user.email = row_hash[:email]
       user.fullname = row_hash[:fullname]

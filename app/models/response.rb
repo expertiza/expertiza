@@ -54,7 +54,7 @@ class Response < ActiveRecord::Base
   end
 
   # bug fixed
-  # Returns the average score for this response as an integer (0-100)
+  # Returns the average score for this responses as an integer (0-100)
   def average_score
     if maximum_score != 0
       ((total_score.to_f / maximum_score.to_f) * 100).round
@@ -63,7 +63,7 @@ class Response < ActiveRecord::Base
     end
   end
 
-  # Returns the maximum possible score for this response
+  # Returns the maximum possible score for this responses
   def maximum_score
     # only count the scorable questions, only when the answer is not nil (we accept nil as
     # answer for scorable questions, and they will not be counted towards the total score)
@@ -87,7 +87,7 @@ class Response < ActiveRecord::Base
     defn[:body][:partial_name] = partial
     response_map = ResponseMap.find map_id
     participant = Participant.find(response_map.reviewer_id)
-    # parent is used as a common variable name for either an assignment or course depending on what the questionnaire is associated with
+    # parent is used as a common variable name for either an assignment or courses depending on what the questionnaire is associated with
     parent = if response_map.survey?
                response_map.survey_parent
              else
@@ -163,15 +163,15 @@ class Response < ActiveRecord::Base
     review_comments_volume
   end
 
-  # compare the current response score with other scores on the same artifact, and test if the difference
+  # compare the current responses score with other scores on the same artifact, and test if the difference
   # is significant enough to notify instructor.
-  # Precondition: the response object is associated with a ReviewResponseMap
+  # Precondition: the responses object is associated with a ReviewResponseMap
   ### "map_class.get_assessments_for" method need to be refactored
   def significant_difference?
     map_class = self.map.class
     existing_responses = map_class.get_assessments_for(self.map.reviewee)
     average_score_on_same_artifact_from_others, count = Response.avg_scores_and_count_for_prev_reviews(existing_responses, self)
-    # if this response is the first on this artifact, there's no grade conflict
+    # if this responses is the first on this artifact, there's no grade conflict
     return false if count.zero?
     # This score has already skipped the unfilled scorable question(s)
     score = total_score.to_f / maximum_score
@@ -215,7 +215,7 @@ class Response < ActiveRecord::Base
         reviewee_name: reviewee_name,
         new_score: total_score.to_f / maximum_score,
         assignment: assignment,
-        conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s,
+        conflicting_response_url: 'https://expertiza.ncsu.edu/responses/view?id=' + response_id.to_s,
         summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
         assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
       }

@@ -23,7 +23,7 @@ module ReportFormatterHelper
   def review_response_map(params, _session = nil)
     assign_basics(params)
     @review_user = params[:user]
-    # If review response is required call review_response_report method in review_response_map model
+    # If review responses is required call review_response_report method in review_response_map model
     @reviewers = ReviewResponseMap.review_response_report(@id, @assignment, @type, @review_user)
     @review_scores = @assignment.compute_reviews_hash
     @avg_and_ranges = @assignment.compute_avg_and_ranges_hash

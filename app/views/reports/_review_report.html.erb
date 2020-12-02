@@ -67,7 +67,7 @@
                 <%= instance_variable_get("@review_in_round_" + round.to_s) %>/<%= @rspan %>
                 <%= ', ' unless round == @assignment.num_review_rounds %>
               <% end %>
-              <%= link_to "summary", {:controller => 'popup', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id}, target: :_blank %>
+              <%= link_to "summary", {:controller => 'popups', :action => 'view_review_scores_popup', :reviewer_id => r.id, :assignment_id=>@id}, target: :_blank %>
             </td>
           <!--Team reviewed / Author feedback-->
           <td align = 'left'>
@@ -90,7 +90,7 @@
                             <div id = <%= team_name_color %> style="border-top: solid; border-width: 1px;">
                         <% end %>
                 <% end %>
-                    <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
+                    <%= link_to team_reviewed_link_name, :controller => 'popups', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
                     <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>
                     <!--Hard-coded Dr.Kidd's question in order to display link.-->
                     <!--later we can create a hyperlink question type to deal with this situation.-->
@@ -100,7 +100,7 @@
 
                 <!--Author feedback-->
                 <!--Dr.Kidd required to add a "author feedback" column that shows the average score the reviewers received from the authors. In this case, she can see all the data on a single screen.-->
-                <!--Dr.Kidd's course-->
+                <!--Dr.Kidd's courses-->
                 <!--
                 <% if @assignment.instructor_id == 2026 %>
                   <% if index == 0 %>

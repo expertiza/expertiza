@@ -22,7 +22,7 @@ class MenuUpdateLeaderboard < ActiveRecord::Migration
     #  item.save
     # }
     # insert menu item in the spot where we want
-    profileMenu = MenuItem.find_by_name('profile')
+    profileMenu = MenuItem.find_by_name('profiles')
     MenuItem.create(:name => 'leaderboard', :label => 'Leaderboard', :parent_id => profileMenu, :seq => 1, :controller_action_id => action.id)
     # find 'contact_us' and slide it over one spot.
     

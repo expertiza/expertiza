@@ -1,6 +1,6 @@
 describe 'CourseTeam' do
-  describe "copy course team to assignment team" do
-    it "should allow course team to be copied to assignment team" do
+  describe "copy courses team to assignment team" do
+    it "should allow courses team to be copied to assignment team" do
       assignment = build(Assignment)
       assignment.name = "test"
       assignment.save!

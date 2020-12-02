@@ -6,7 +6,7 @@ describe TeamsController do
       end
     end
 
-    context "with a course team" do
+    context "with a courses team" do
       it "increases the count by 1" do
         expect { create :course_team, course: @course }.to change(Team, :count).by(1)
       end
@@ -21,8 +21,8 @@ describe TeamsController do
       end
     end
 
-    context "with a course team " do
-      it "deletes a course team" do
+    context "with a courses team " do
+      it "deletes a courses team" do
         @course = create(:course)
         @c_team = create(:course_team)
 
@@ -58,7 +58,7 @@ describe TeamsController do
       # puts "assignment #{assignment.id}"
       post :inherit, id: assignment.id
       expect(response).to have_http_status(302)
-      # expect(response).to redirect_to list_teams_url(id: course.id, type: :Course)
+      # expect(responses).to redirect_to list_teams_url(id: courses.id, type: :Course)
     end
 
     it "test for bequeath" do
@@ -87,7 +87,7 @@ describe TeamsController do
       # puts "assignment #{assignment.id}"
       post :bequeath, id: assignment_team.id
       expect(response).to have_http_status(302)
-      # expect(response).to redirect_to list_teams_url(id: assignment.id)
+      # expect(responses).to redirect_to list_teams_url(id: assignment.id)
       # assignment_teams = AssignmentTeam.all
       # puts assignment_teams.count
     end

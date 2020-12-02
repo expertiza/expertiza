@@ -26,7 +26,7 @@ class UpdateQuestionnaireMenus < ActiveRecord::Migration
     mitem = MenuItem.find_by_name('manage/questionnaires/surveys')
     mitem.seq += 2
     mitem.save    
-    mitem = MenuItem.find_by_name('manage/questionnaires/course evaluations')
+    mitem = MenuItem.find_by_name('manage/questionnaires/courses evaluations')
     mitem.seq += 2
     mitem.save        
     

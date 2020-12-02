@@ -46,13 +46,13 @@ class SampleReviewsController < ApplicationController
       begin
         @map = @response.map
 
-        # Updating visibility for the response object, by E2022 @khotAyush -->
+        # Updating visibility for the responses object, by E2022 @khotAyush -->
         visibility = 'published'
         @response.update_attribute("visibility",visibility)
 
 
       rescue StandardError
-        msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
+        msg = "Your responses was not saved. Cause:189 #{$ERROR_INFO}"
       end
 
       respond_to do |format|
@@ -69,13 +69,13 @@ class SampleReviewsController < ApplicationController
       begin
         @map = @response.map
 
-        # Updating visibility for the response object, by E2022 @khotAyush -->
+        # Updating visibility for the responses object, by E2022 @khotAyush -->
         visibility = 'public'
         @response.update_attribute("visibility",visibility)
 
 
       rescue StandardError
-        msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
+        msg = "Your responses was not saved. Cause:189 #{$ERROR_INFO}"
       end
 
       respond_to do |format|

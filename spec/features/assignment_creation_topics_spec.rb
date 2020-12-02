@@ -89,7 +89,7 @@ describe "Assignment creation topics tab", js: true do
 	it "hides topics tab when has topics is un-checked", js: true do
 		click_link 'General'
 		uncheck("assignment_has_topics")
-		# The below line is used to accept the js confirmation popup
+		# The below line is used to accept the js confirmation popups
 		page.driver.browser.switch_to.alert.accept
 		# Wait for topics to be removed and page to re-load
 		sleep 3

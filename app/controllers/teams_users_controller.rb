@@ -47,7 +47,7 @@ class TeamsUsersController < ApplicationController
         course = Course.find(team.parent_id)
         if CourseParticipant.find_by(user_id: user.id, parent_id: course.id).nil?
           urlCourseParticipantList = url_for controller: 'participants', action: 'list', id: course.id, model: 'Course', authorization: 'participant'
-          flash[:error] = "\"#{user.name}\" is not a participant of the current course. Please <a href=\"#{urlCourseParticipantList}\">add</a> this user before continuing."
+          flash[:error] = "\"#{user.name}\" is not a participant of the current courses. Please <a href=\"#{urlCourseParticipantList}\">add</a> this user before continuing."
         else
           add_member_return = team.add_member(user)
           flash[:error] = "This team already has the maximum number of members." if add_member_return == false

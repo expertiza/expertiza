@@ -39,9 +39,9 @@ end
 #
 # The tests below are no longer reflective of the current import process.
 #
-# 1. The method importFile has been replaced with import_from_hash in import_file_controller.rb
+# 1. The method importFile has been replaced with import_from_hash in import_files_controller.rb
 #
-# describe ImportFileController do
+# describe ImportFilesController do
 #   # Airbrake-1774360945974838307
 #   describe '#importFile' do
 #     it 'will catch the error info if the tempfile cannot be obtained from params[:file]' do
@@ -104,7 +104,7 @@ describe GradesController do
   end
 end
 
-describe ReviewMappingController do
+describe ReviewMappingsController do
   before(:each) do
     user = build(:instructor)
     stub_current_user(user, user.role.name, user.role)

@@ -65,7 +65,7 @@ class Assignment < ActiveRecord::Base
     @courses = Course.where(instructor_id: user.id).order(:name)
   end
 
-  #removes an assignment from course
+  #removes an assignment from courses
   def self.remove_assignment_from_course(assignment)
     oldpath = assignment.path rescue nil
     assignment.course_id = nil
@@ -96,10 +96,10 @@ class Assignment < ActiveRecord::Base
     response_map.assign_metareviewer(meta_reviewer)
   end
 
-  # Returns a review (response) to metareview if available, otherwise will raise an error
+  # Returns a review (responses) to metareview if available, otherwise will raise an error
   def response_map_to_metareview(metareviewer)
     response_map_set = Array.new(review_mappings)
-    # Reject response maps without responses
+    # Reject responses maps without responses
     response_map_set.reject! {|response_map| response_map.response.empty? }
     raise 'There are no reviews to metareview at this time for this assignment.' if response_map_set.empty?
 
@@ -113,17 +113,17 @@ class Assignment < ActiveRecord::Base
     response_map_set.reject! {|response_map| response_map.metareviewed_by?(metareviewer) }
     raise 'You have already metareviewed all reviews for this assignment.' if response_map_set.empty?
 
-    # Reduce to the response maps with the least number of metareviews received
+    # Reduce to the responses maps with the least number of metareviews received
     min_metareviews=get_min_metareview(response_map_set)
     response_map_set.reject! {|response_map| response_map.metareview_response_maps.count > min_metareviews }
 
-    # Reduce the response maps to the reviewers with the least number of metareviews received
+    # Reduce the responses maps to the reviewers with the least number of metareviews received
     reviewers = get_reviewer_metareviews_map(response_map_set)
     min_metareviews = reviewers.first[1]
     reviewers.reject! {|reviewer| reviewer[1] == min_metareviews }
     response_map_set.reject! {|response_map| reviewers.member?(response_map.reviewer) }
 
-    # Pick the response map whose most recent meta_reviewer was assigned longest ago
+    # Pick the responses map whose most recent meta_reviewer was assigned longest ago
     min_metareviews=get_min_metareview(response_map_set)
     response_map_set.sort! {|a, b| a.metareview_response_maps.last.id <=> b.metareview_response_maps.last.id } if min_metareviews > 0
     # The first review_map is the best to metareview
@@ -169,7 +169,7 @@ class Assignment < ActiveRecord::Base
 
   def path
     if self.course_id.nil? && self.instructor_id.nil?
-      raise 'The path cannot be created. The assignment must be associated with either a course or an instructor.'
+      raise 'The path cannot be created. The assignment must be associated with either a courses or an instructor.'
     end
 
     path_text = if !self.course_id.nil? && self.course_id > 0
@@ -218,14 +218,14 @@ class Assignment < ActiveRecord::Base
       maps = ReviewResponseMap.where(reviewed_object_id: self.id)
       maps.each {|map| map.delete(force) }
     rescue StandardError
-      raise "There is at least one review response that exists for #{self.name}."
+      raise "There is at least one review responses that exists for #{self.name}."
     end
 
     begin
       maps = TeammateReviewResponseMap.where(reviewed_object_id: self.id)
       maps.each {|map| map.delete(force) }
     rescue StandardError
-      raise "There is at least one teammate review response that exists for #{self.name}."
+      raise "There is at least one teammate review responses that exists for #{self.name}."
     end
 
     # destroy instances of invitations, teams, particiapnts, etc, refactored by Rajan, Jasmine, Sreenidhi 3/30/2020
@@ -370,11 +370,11 @@ class Assignment < ActiveRecord::Base
     return csv unless detail_options.value?('true')
     @assignment = Assignment.find(parent_id)
     @answers = {} # Contains all answer objects for this assignment
-    # Find all unique response types
+    # Find all unique responses types
     @uniq_response_type = ResponseMap.uniq.pluck(:type)
     # Find all unique round numbers
     @uniq_rounds = Response.uniq.pluck(:round)
-    # create the nested hash that holds all the answers organized by round # and response type
+    # create the nested hash that holds all the answers organized by round # and responses type
     @uniq_rounds.each do |round_num|
       @answers[round_num] = {}
       @uniq_response_type.each do |res_type|
@@ -382,7 +382,7 @@ class Assignment < ActiveRecord::Base
       end
     end
     @answers = generate_answer(@answers, @assignment)
-    # Loop through each round and response type and construct a new row to be pushed in CSV
+    # Loop through each round and responses type and construct a new row to be pushed in CSV
     @uniq_rounds.each do |round_num|
       @uniq_response_type.each do |res_type|
         round_type = check_empty_rounds(@answers, round_num, res_type)
@@ -431,12 +431,12 @@ class Assignment < ActiveRecord::Base
 
   # Populate answers will review information
   def self.generate_answer(answers, assignment)
-    # get all response maps for this assignment
+    # get all responses maps for this assignment
     @response_maps_for_assignment = ResponseMap.find_by_sql(["SELECT * FROM response_maps WHERE reviewed_object_id = #{assignment.id}"])
-    # for each map, get the response & answer associated with it
+    # for each map, get the responses & answer associated with it
     @response_maps_for_assignment.each do |map|
       @response_for_this_map = Response.find_by_sql(["SELECT * FROM responses WHERE map_id = #{map.id}"])
-      # for this response, get the answer associated with it
+      # for this responses, get the answer associated with it
       @response_for_this_map.each do |resp|
         @answer = Answer.find_by_sql(["SELECT * FROM answers WHERE response_id = #{resp.id}"])
         @answer.each do |ans|

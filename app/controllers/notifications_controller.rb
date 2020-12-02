@@ -11,7 +11,7 @@ class NotificationsController < ApplicationController
   end
 
   def run_get_notification
-    redirect_to controller: :student_task, action: :view if current_user.try(:student?)
+    redirect_to controller: :student_tasks, action: :view if current_user.try(:student?)
   end
 
   # GET /notifications

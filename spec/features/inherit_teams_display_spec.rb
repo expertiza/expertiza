@@ -10,7 +10,7 @@ describe 'displaying inherit teams section' do
     expect(page).to have_content('Inherit Teams From Course')
   end
 
-  it 'should not display inherit teams option while creating a course team' do
+  it 'should not display inherit teams option while creating a courses team' do
     create(:course)
     create(:course_node)
     create(:course_team)
@@ -21,7 +21,7 @@ describe 'displaying inherit teams section' do
     expect(page).to have_no_content('Inherit Teams From Course')
   end
 
-  it 'should not display inherit teams option while creating team for an assignment without a course' do
+  it 'should not display inherit teams option while creating team for an assignment without a courses' do
     assignment = create(:assignment)
     create(:assignment_node)
     assignment.update_attributes(course_id: nil)

@@ -47,7 +47,7 @@ end
 
 describe 'Aribrake-1805332790232222219' do
   it 'will not raise error if instance variables are not nil' do
-    rc = ResponseController.new
+    rc = ResponsesController.new
     # http://www.rubydoc.info/github/rspec/rspec-mocks/RSpec%2FMocks%2FMessageExpectation%3Awith
     # With a stub, if the message might be received with other args as well,
     # you should stub a default value first,
@@ -63,7 +63,7 @@ describe 'Aribrake-1805332790232222219' do
   end
 
   it 'will not raise error even if instance variables are nil' do
-    rc = ResponseController.new
+    rc = ResponsesController.new
     @assignment = nil
     allow(@assignment).to receive(:try){}
     allow(@questionnaire).to receive(:try){}

@@ -25,9 +25,9 @@ describe 'calibration' do
   context 'when current assignment is in calibration stage' do
     context 'calibration feature' do
       it 'works correctly'
-      # shows current stage of this assignment to be 'Calibration' on student_task#view page
+      # shows current stage of this assignment to be 'Calibration' on student_tasks#view page
 
-      # shows 'Calibration review 1, 2, 3...' instead of 'Review 1, 2, 3...' on student_review#list page
+      # shows 'Calibration review 1, 2, 3...' instead of 'Review 1, 2, 3...' on student_reviews#list page
 
       # allows students to do calibration review and the data can be saved successfully
 
@@ -38,6 +38,6 @@ describe 'calibration' do
   context 'when current assignment is in review stage' do
     it 'excludes calibration reviews from outstanding review restriction and total review restriction'
 
-    it 'shows \'Review 1, 2, 3...\' instead of \'Calibration review 1, 2, 3...\' on student_review#list page'
+    it 'shows \'Review 1, 2, 3...\' instead of \'Calibration review 1, 2, 3...\' on student_reviews#list page'
   end
 end

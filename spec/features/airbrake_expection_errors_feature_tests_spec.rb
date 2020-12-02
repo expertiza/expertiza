@@ -29,7 +29,7 @@ describe "Airbrake expection errors" do
   # Airbrake-1806782678925052472
   it "can list sign_up_topics by using 'id' (participant_id) as parameter" do
     login_as 'student2066'
-    visit '/sign_up_sheet/list?id=1'
+    visit '/signup_sheets/list?id=1'
     expect(page).to have_content('Signup sheet for')
     expect(page).to have_content('Hello world!')
     expect(page).to have_content('TestReview')
@@ -42,7 +42,7 @@ describe "Airbrake expection errors" do
     login_as 'student2064'
     user_id = User.find_by(name: 'student2064').id
     participant_id = Participant.where(user_id: user_id).first.id
-    visit '/student_task/list'
+    visit '/student_tasks/list'
     click_link 'TestAssignment'
     click_link 'Your work'
     click_link 'Create a quiz'
@@ -135,11 +135,11 @@ describe "airbrake-1517247902792549741" do
     expect(page).not_to have_content('Password')
   end
 
-  it "can access to '/student_task/list' after login as a student" do
+  it "can access to '/student_tasks/list' after login as a student" do
     stu = create(:student)
     login_as stu.name
     visit '/tree_display/list'
-    expect(page).to have_current_path('/student_task/list')
+    expect(page).to have_current_path('/student_tasks/list')
     expect(page).to have_content('Assignments')
     expect(page).to have_content('Tasks not yet started')
     expect(page).to have_content('Students who have teamed with you')

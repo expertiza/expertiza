@@ -19,7 +19,7 @@ class TeammateReviewResponseMap < ResponseMap
   end
 
   # Send Teammate Review Emails
-  # Refactored from email method in response.rb
+  # Refactored from email method in responses.rb
   def email(defn, participant, assignment)
     defn[:body][:type] = "Teammate Review"
     participant = AssignmentParticipant.find(reviewee_id)

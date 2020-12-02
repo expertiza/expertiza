@@ -2,7 +2,7 @@ class ModifyUsers < ActiveRecord::Migration
   def self.up
     # t.column :username, :string, :limit=>32  --  called "name" in Goldberg
     # t.column :password, :string -- already included in Goldberg table
-    add_column :institution_id, :integer # reference to an entry in institutions table, referring to the institution at which this user is registered ... this tells format of record to be uploaded & prevents usernames from diff. insts. from clashing
+    add_column :institution_id, :integer # reference to an entry in institutions table, referring to the institutions at which this user is registered ... this tells format of record to be uploaded & prevents usernames from diff. insts. from clashing
     # t.column :first_name, :string, :limit=>30  -- subsumed by "fullname" in Goldberg data model (we may want to add this in future
     # t.column :last_name, :string, :limit=>30   -- subsumed by "fullname" in Goldberg data model   "  "
     # t.column :role_id, :integer -- already included in Goldberg table

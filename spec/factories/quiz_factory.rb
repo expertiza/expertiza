@@ -64,8 +64,8 @@ FactoryBot.define do
     reviewee_id { Teams.first.id || association(:team).id }
   end
 
-  # Quiz Response represents a single response to a quiz
-  # questionnaire. It foreign keys to a quiz response map.
+  # Quiz Response represents a single responses to a quiz
+  # questionnaire. It foreign keys to a quiz responses map.
   factory :quiz_response, class: QuizResponse do
     response_map { QuizResponseMap.first || association(:response_map) }
     is_submitted 1
@@ -73,7 +73,7 @@ FactoryBot.define do
 
   # Answer records a participants answer to a single quiz
   # question. It shares a many-to-one relationship with
-  # quiz question and quiz response.
+  # quiz question and quiz responses.
   factory :answer, class: Answer do
     question { Question.first || association(:question) }
     response { Response.first || association(:response) }

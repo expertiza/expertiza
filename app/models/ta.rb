@@ -18,7 +18,7 @@ class Ta < User
 
   def list_mine(object_type, user_id)
     #### if we are loading "My Assignments" for a user who is a TA we need to find all assignments
-    #### which are assigned to a course for which the user is a TA (in addition to his own assignments
+    #### which are assigned to a courses for which the user is a TA (in addition to his own assignments
     #### which he created
     if object_type.to_s.eql? "Assignment"
       #### once the course_id on the assignments table is being assigned properly we can use
@@ -27,8 +27,8 @@ class Ta < User
       #  "from assignments inner join ta_mappings ON (assignments.course_id=ta_mappings.course_id and ta_id=?) " +
       #  "UNION select assignments.id, assignments.name, assignments.directory_path from assignments where instructor_id=?",user_id,user_id])
 
-      #### this find method compares the directories of an assignment and a course to find out if the
-      #### the assignment is in a subdirectory of a course that the user is a TA for.
+      #### this find method compares the directories of an assignment and a courses to find out if the
+      #### the assignment is in a subdirectory of a courses that the user is a TA for.
       Assignment.find_by_sql(["select assignments.id, assignments.name, assignments.directory_path " \
       "from assignments, ta_mappings where assignments.course_id = ta_mappings.course_id and ta_mappings.ta_id=?", user_id])
     else
@@ -40,8 +40,8 @@ class Ta < User
     object_type.where(["id = ? AND (instructor_id = ? OR private = 0)", id, user_id]).first
   end
 
-  # This method is potentially problematic: it assumes one TA only help teach one course.
-  # This method only returns the instructor_id for the 1st course that this user help teach.  -Yang Oct. 05 2015
+  # This method is potentially problematic: it assumes one TA only help teach one courses.
+  # This method only returns the instructor_id for the 1st courses that this user help teach.  -Yang Oct. 05 2015
   def self.get_my_instructor(user_id)
     course_id = TaMapping.get_course_id(user_id)
     Course.find(course_id).instructor_id

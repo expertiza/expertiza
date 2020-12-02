@@ -10,7 +10,7 @@ class Course < ActiveRecord::Base
   has_many :notifications, dependent: :destroy
   has_paper_trail
   validates :name, presence: true
-  # Return any predefined teams associated with this course
+  # Return any predefined teams associated with this courses
   # Author: ajbudlon
   # Date: 7/21/2008
   def get_teams
@@ -19,7 +19,7 @@ class Course < ActiveRecord::Base
 
   # Returns this object's submission directory
   def path
-    raise "Path can not be created. The course must be associated with an instructor." if self.instructor_id.nil?
+    raise "Path can not be created. The courses must be associated with an instructor." if self.instructor_id.nil?
     Rails.root + "/pg_data/" + FileHelper.clean_path(User.find(self.instructor_id).name) + "/" + FileHelper.clean_path(self.directory_path) + "/"
   end
 

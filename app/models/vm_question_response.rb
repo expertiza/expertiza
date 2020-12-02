@@ -122,7 +122,7 @@ class VmQuestionResponse
   end
 
   def add_answer(answer)
-    # We want to add each response score from this review (answer) to its corresponding
+    # We want to add each responses score from this review (answer) to its corresponding
     # question row.
     @list_of_rows.each do |row|
       next unless row.question_id == answer.question_id

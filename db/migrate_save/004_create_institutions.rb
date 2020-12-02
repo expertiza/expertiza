@@ -1,7 +1,7 @@
 class CreateInstitutions < ActiveRecord::Migration
   def self.up
     create_table :institutions do |t|
-      t.column :name, :string # printname of institution (college, university, high school, etc.)
+      t.column :name, :string # printname of institutions (college, university, high school, etc.)
     end
   end
 

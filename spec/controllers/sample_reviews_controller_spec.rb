@@ -52,7 +52,7 @@ RSpec.describe SampleReviewsController, type: :controller do
 
   describe '#map_to_assignment' do
     context 'when Instructor selects assignments for sample reviews to be published to' do
-      it 'add entry in sampleReviews and marks response visibility to published' do
+      it 'add entry in sampleReviews and marks responses visibility to published' do
         params = {id: 1, assignments: [1,2],format: :json}
         session = {user: build(:instructor, id: 1)}
         post :map_to_assignment, params, session
@@ -63,7 +63,7 @@ RSpec.describe SampleReviewsController, type: :controller do
   end
   describe '#unmap_from_assignment' do
     context 'when Instructor selects to umark sample review from all assignments' do
-      it 'deletes mapping and marks response visibility to public' do
+      it 'deletes mapping and marks responses visibility to public' do
         params = {id: 1,format: :json}
         session = {user: build(:instructor, id: 1)}
         post :unmap_from_assignment, params, session

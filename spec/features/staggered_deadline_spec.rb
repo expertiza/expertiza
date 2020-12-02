@@ -76,9 +76,9 @@ describe "Staggered deadline test" do
   def submit_topic(name, topic, work)
     user = User.find_by(name: name)
     login_as(user.name)
-    visit '/student_task/list'
+    visit '/student_tasks/list'
     visit topic # signup topic
-    visit '/student_task/list'
+    visit '/student_tasks/list'
     click_link "Assignment1665"
     click_link "Your work"
     fill_in 'submission', with: work
@@ -95,9 +95,9 @@ describe "Staggered deadline test" do
 
   it "test1: in round 1, student2064 in review stage could do review" do
     # impersonate each participant submit their topics
-    submit_topic('student2064', '/sign_up_sheet/sign_up?id=1&topic_id=1', "https://google.com")
+    submit_topic('student2064', '/signup_sheets/sign_up?id=1&topic_id=1', "https://google.com")
     click_link("Logout")
-    submit_topic('student2065', '/sign_up_sheet/sign_up?id=1&topic_id=2', "https://ncsu.edu")
+    submit_topic('student2065', '/signup_sheets/sign_up?id=1&topic_id=2', "https://ncsu.edu")
     click_link("Logout")
     # change deadline to make student2064 in review stage in round 1
     change_due(1, 1, 1, DateTime.now.in_time_zone - 10)
@@ -107,7 +107,7 @@ describe "Staggered deadline test" do
     # ####student 1:
     user = User.find_by(name: 'student2064')
     login_as(user.name)
-    visit '/student_task/list'
+    visit '/student_tasks/list'
     expect(page).to have_content "review"
 
     # student2064 in review stage could review others' work
@@ -125,7 +125,7 @@ describe "Staggered deadline test" do
     # Although student2065 is in submission stage, he or she can still review other's work.
     user = User.find_by(name: 'student2065')
     login_as(user.name)
-    visit '/student_task/list'
+    visit '/student_tasks/list'
     expect(page).to have_content "Stage Deadline"
     click_link 'Assignment1665'
     expect(page).to have_content "Others' work"
@@ -145,9 +145,9 @@ describe "Staggered deadline test" do
 
   it "test2: in round 2, both students should be in review stage to review each other" do
     # impersonate each participant submit their topics
-    submit_topic('student2064', '/sign_up_sheet/sign_up?id=1&topic_id=1', "https://google.com")
+    submit_topic('student2064', '/signup_sheets/sign_up?id=1&topic_id=1', "https://google.com")
     click_link("Logout")
-    submit_topic('student2065', '/sign_up_sheet/sign_up?id=1&topic_id=2', "https://ncsu.edu")
+    submit_topic('student2065', '/signup_sheets/sign_up?id=1&topic_id=2', "https://ncsu.edu")
     click_link("Logout")
     # change deadline to make both in review stage in round 2
     change_due(1, 1, 1, DateTime.now.in_time_zone - 30)
@@ -162,7 +162,7 @@ describe "Staggered deadline test" do
     # ##first student:
     user = User.find_by(name: 'student2064')
     login_as(user.name)
-    visit '/student_task/list'
+    visit '/student_tasks/list'
     expect(page).to have_content "review"
 
     # student in review stage could review others' work
@@ -189,7 +189,7 @@ describe "Staggered deadline test" do
     # ##second student
     user = User.find_by(name: 'student2065')
     login_as(user.name)
-    visit '/student_task/list'
+    visit '/student_tasks/list'
     expect(page).to have_content "review"
 
     # student in review stage could review others' work
@@ -216,9 +216,9 @@ describe "Staggered deadline test" do
 
   it "test3: in round 2, both students after review deadline should not do review" do
     # impersonate each participant submit their topics
-    submit_topic('student2064', '/sign_up_sheet/sign_up?id=1&topic_id=1', "https://google.com")
+    submit_topic('student2064', '/signup_sheets/sign_up?id=1&topic_id=1', "https://google.com")
     click_link("Logout")
-    submit_topic('student2065', '/sign_up_sheet/sign_up?id=1&topic_id=2', "https://ncsu.edu")
+    submit_topic('student2065', '/signup_sheets/sign_up?id=1&topic_id=2', "https://ncsu.edu")
     click_link("Logout")
 
     # change deadline to make both after review deadline in round 2
@@ -234,7 +234,7 @@ describe "Staggered deadline test" do
     # impersonate each participant and check their topic's current stage
     user = User.find_by(name: 'student2064')
     login_as(user.name)
-    visit '/student_task/list'
+    visit '/student_tasks/list'
     expect(page).to have_content "Finished"
 
     # student in finish stage can not review others' work
@@ -248,7 +248,7 @@ describe "Staggered deadline test" do
 
     user = User.find_by(name: 'student2065')
     login_as(user.name)
-    visit '/student_task/list'
+    visit '/student_tasks/list'
     expect(page).to have_content "Finished"
     click_link 'Assignment1665'
     expect(page).to have_content "Others' work"

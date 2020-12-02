@@ -196,12 +196,12 @@ describe "Assignment creation page", js: true do
 	end
 end
 
-describe "adding to course", js: true do
+describe "adding to courses", js: true do
 	include AssignmentCreationHelper
 	before(:each) do
 		create_deadline_types()
 	end
-	it "check to find if the assignment can be added to a course", js: true do
+	it "check to find if the assignment can be added to a courses", js: true do
 		create(:assignment, course: nil, name: 'Test Assignment')
 		create(:course, name: 'Test Course')
 

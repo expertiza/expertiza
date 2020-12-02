@@ -103,17 +103,17 @@ end
       #puts "~~~~~~~~~~Assignment name: #{assign_name}\n"                                  
       #check if the participant/reviewer has reviewed the latest version of the resubmitted file, else send him a reminder
       allresponsemaps = participant.review_mappings
-      #puts" ~~~~~number of response maps #{allresponsemaps.size}\n"
+      #puts" ~~~~~number of responses maps #{allresponsemaps.size}\n"
       if(allresponsemaps.size > 0)
         for eachresponsemap in allresponsemaps
             response = eachresponsemap.response.last
             resubmission_times = ResubmissionTime.find(:all, :conditions => ["participant_id = ?", eachresponsemap.reviewee_id], :order => "resubmitted_at DESC")           
             #puts" ~~~~~resubmission times: #{resubmission_times.size}\n"
-            if(!response.nil? && resubmission_times.size > 0)#meaning the reviewer has submitted a response for that map_id  
+            if(!response.nil? && resubmission_times.size > 0)#meaning the reviewer has submitted a responses for that map_id
               if(response.updated_at < resubmission_times[0].resubmitted_at) #participant/reviewer has reviewed an older version
                   emails << email
               end
-            elsif(response.nil?) #where the reviewee has submitted and reviewer has provided no response
+            elsif(response.nil?) #where the reviewee has submitted and reviewer has provided no responses
               if(resubmission_times.size > 0)
                 emails << email
               else #if the reviewee has made some sort of submission
@@ -125,7 +125,7 @@ end
                 end
               end
            end
-        end #endof the response maps loop
+        end #endof the responses maps loop
       end
     end #end of the for loop for all participants of the assignment
     #puts "~~~~~~~~~~Emails: #{emails.length} addresses, #{assign_name}, #{due_date.due_at}, #{assign_type}\n"
@@ -149,7 +149,7 @@ end
       allresponsemaps = participant.metareview_mappings
       if(allresponsemaps.size > 0)
         for eachresponsemap in allresponsemaps
-            #checking to see if the response map was for a review in the same assignment
+            #checking to see if the responses map was for a review in the same assignment
             checkresponsemap = ResponseMap.find(:all, :conditions => ["id = ? AND type = 'ParticipantReviewResponseMap' AND reviewed_object_id = ?", eachresponsemap.reviewed_object_id, assign.id])
             if(checkresponsemap.size > 0)
               if eachresponsemap.response.empty?

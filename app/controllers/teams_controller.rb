@@ -92,7 +92,7 @@ class TeamsController < ApplicationController
     redirect_to :back
   end
 
-  # Copies existing teams from a course down to an assignment
+  # Copies existing teams from a courses down to an assignment
   # The team and team members are all copied.
   def inherit
     assignment = Assignment.find(params[:id])
@@ -107,12 +107,12 @@ class TeamsController < ApplicationController
         flash[:note] = "No teams were found when trying to inherit."
       end
     else
-      flash[:error] = "No course was found for this assignment."
+      flash[:error] = "No courses was found for this assignment."
     end
     redirect_to controller: 'teams', action: 'list', id: assignment.id
   end
 
-  # Copies existing teams from an assignment up to a course
+  # Copies existing teams from an assignment up to a courses
   # The team and team members are all copied.
   def bequeath
     team = AssignmentTeam.find(params[:id])
@@ -122,7 +122,7 @@ class TeamsController < ApplicationController
       team.copy(course.id)
       flash[:note] = "The team \"" + team.name + "\" was successfully copied to \"" + course.name + "\""
     else
-      flash[:error] = "This assignment is not #{url_for(controller: 'assignment', action: 'assign', id: assignment.id)} with a course."
+      flash[:error] = "This assignment is not #{url_for(controller: 'assignment', action: 'assign', id: assignment.id)} with a courses."
     end
     redirect_to controller: 'teams', action: 'list', id: assignment.id
   end

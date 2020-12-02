@@ -173,7 +173,7 @@ class AssignmentsController < ApplicationController
     @assignment = Assignment.find(params[:id])
   end
 
-  # place an assignment in a course
+  # place an assignment in a courses
   def place_assignment_in_course
     @assignment = Assignment.find(params[:id])
     @courses = Assignment.assign_courses_to_assignment(current_user)
@@ -185,7 +185,7 @@ class AssignmentsController < ApplicationController
     @teams = Team.where(parent_id: params[:id])
   end
 
-  # remove an assignment from a course. Doesn't delete assignment
+  # remove an assignment from a courses. Doesn't delete assignment
   def remove_assignment_from_course
     assignment = Assignment.find(params[:id])
     Assignment.remove_assignment_from_course(assignment)

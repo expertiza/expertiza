@@ -39,7 +39,7 @@
                 <% current_round = @assignment.number_of_current_round(@topic_id) %>
 
                 <td>&nbsp;&nbsp;</td>
-                <td><%= link_to 'View', {:controller => 'response', :action => 'view', :id => @latest_response.id} %></td>
+                <td><%= link_to 'View', {:controller => 'responses', :action => 'view', :id => @latest_response.id} %></td>
                 <td>&nbsp;&nbsp;</td>
 
                 <% if @assignment.get_current_stage(@topic_id) != 'Finished' %>
@@ -48,21 +48,21 @@
                     <% if (last_response_round == current_round) %>
                         <td>
                           <% if (!@latest_response.is_submitted) %>
-                              <%= link_to 'Edit', {:controller => 'response', :action => 'edit', :return=>"selfreview", :id => @latest_response.id} %>
+                              <%= link_to 'Edit', {:controller => 'responses', :action => 'edit', :return=>"selfreview", :id => @latest_response.id} %>
                           <% end %>
                         </td>
                     <% else %>
-                        <td><%= link_to 'Update', {:controller => 'response', :action => 'new', :return=>"selfreview", :id => @review_mappings[0].map_id} %></td>
+                        <td><%= link_to 'Update', {:controller => 'responses', :action => 'new', :return=>"selfreview", :id => @review_mappings[0].map_id} %></td>
                     <% end %>
                 <% end %>
             <% end %>
         <% elsif @assignment.get_current_stage(@topic_id) != 'Complete' && @assignment.submission_allowed(@topic_id) %>
             <td>&nbsp;&nbsp;</td>
-            <td><%= link_to 'Begin', {:controller => 'response', :action => 'new', :id => @review_mappings[0].id} %></td>
+            <td><%= link_to 'Begin', {:controller => 'responses', :action => 'new', :id => @review_mappings[0].id} %></td>
         <% end %>
     <% elsif @assignment.get_current_stage(@topic_id) != 'Complete' && @assignment.submission_allowed(@topic_id) %>
         <!--If the reviewer is yet to request a self-review, then the controller reaches this point-->
-        <%= form_tag :controller => 'review_mapping',
+        <%= form_tag :controller => 'review_mappings',
                      :action => 'start_self_review',
                      :assignment_id => @assignment.id,
                      :reviewer_id => @participant.id,

@@ -10,7 +10,7 @@ var ready = function() {
             url: "/user_pastebins", // should be mapped in routes.rb
             datatype: "json", // check more option
             success: function (data) {
-                // handle response data
+                // handle responses data
                 list = data;
                 //Calling awesome function
                 if (list.length > 0) {

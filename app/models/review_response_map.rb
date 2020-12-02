@@ -11,7 +11,7 @@ class ReviewResponseMap < ResponseMap
     reviewer_is_team = assignment.reviewer_is_team
   end
 
-  # Find a review questionnaire associated with this review response map's assignment
+  # Find a review questionnaire associated with this review responses map's assignment
   def questionnaire(round_number = nil, topic_id = nil)
     Questionnaire.find(self.assignment.review_questionnaire_id(round_number, topic_id))
   end
@@ -102,12 +102,12 @@ class ReviewResponseMap < ResponseMap
     responses
   end
 
-  #E-1973 - returns the reviewer of the response, either a participant or a team
+  #E-1973 - returns the reviewer of the responses, either a participant or a team
   def get_reviewer
     return ReviewResponseMap.get_reviewer_with_id(assignment.id, reviewer_id)
   end
 
-  # E-1973 - gets the reviewer of the response, given the assignment and the reviewer id
+  # E-1973 - gets the reviewer of the responses, given the assignment and the reviewer id
   # the assignment is used to determine if the reviewer is a participant or a team
   def self.get_reviewer_with_id(assignment_id, reviewer_id)
     assignment = Assignment.find(assignment_id)
@@ -118,7 +118,7 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
-  # wrap lastest version of responses in each response map, together withe the questionnaire_id
+  # wrap lastest version of responses in each responses map, together withe the questionnaire_id
   # will be used to display the reviewer summary
   def self.final_versions_from_reviewer(assignment_id, reviewer_id)
     reviewer = ReviewResponseMap.get_reviewer_with_id(assignment_id, reviewer_id)

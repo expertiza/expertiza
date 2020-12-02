@@ -32,17 +32,17 @@ describe "CourseParticipant" do
       expect { CourseParticipant.import(row, nil, nil, nil) }.to raise_error("The record containing #{row[:name]} does not have enough items.")
     end
 
-    it "raise error if course with id not found" do
+    it "raise error if courses with id not found" do
       course = build(:course)
       session = {}
       row = []
       allow(Course).to receive(:find).and_return(nil)
       allow(session[:user]).to receive(:id).and_return(1)
       row = { :name => 'user_name', :fullname => 'user_fullname', :email => 'name@gmail.com', :password => 'user_password' }
-      expect { CourseParticipant.import(row, nil, session, 2) }.to raise_error("The course with the id \"2\" was not found.")
+      expect { CourseParticipant.import(row, nil, session, 2) }.to raise_error("The courses with the id \"2\" was not found.")
     end
 
-    it "creates course participant form record" do
+    it "creates courses participant form record" do
       course = build(:course)
       session = {}
       row = []

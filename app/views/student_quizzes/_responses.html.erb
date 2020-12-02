@@ -17,7 +17,7 @@
           <% elsif @assignment.get_current_stage(topic) != "Complete" %>
             <% if @assignment.staggered_deadline?%>
               <% if @assignment.get_current_stage(topic) != 'submission'%>
-                <td><%= link_to "Begin",{:controller => 'response', :action => 'new', :id => map.id} %></td>
+                <td><%= link_to "Begin",{:controller => 'responses', :action => 'new', :id => map.id} %></td>
               <%else%>
                 <td>Begin</td><td> (Work has not yet been submitted)</td>
               <% end %>

@@ -20,9 +20,9 @@ describe "peer review testing" do
   def signup_topic
     user = User.find_by(name: "student2064")
     login_as(user.name)
-    visit '/student_task/list'
-    visit '/sign_up_sheet/sign_up?id=1&topic_id=1' # signup topic
-    visit '/student_task/list'
+    visit '/student_tasks/list'
+    visit '/signup_sheets/sign_up?id=1&topic_id=1' # signup topic
+    visit '/student_tasks/list'
     click_link "TestAssignment"
     click_link "Your work"
   end
@@ -44,7 +44,7 @@ describe "peer review testing" do
   it "is not able to select review with no submissions" do
     user = User.find_by(name: "student2065")
     login_as(user.name)
-    visit '/student_task/list'
+    visit '/student_tasks/list'
     click_link "TestAssignment"
     click_link "Others' work"
     find(:css, "#i_dont_care").set(true)
@@ -54,7 +54,7 @@ describe "peer review testing" do
 
   it "is not able to be assigned to review a topic only they have submitted on" do
     submit_to_topic
-    visit '/student_task/list'
+    visit '/student_tasks/list'
     click_link "TestAssignment"
     click_link "Others' work"
     find(:css, "#i_dont_care").set(true)
@@ -64,7 +64,7 @@ describe "peer review testing" do
 
   it "is not able to select topic for review only they have submitted to" do
     submit_to_topic
-    visit '/student_task/list'
+    visit '/student_tasks/list'
     click_link "TestAssignment"
     click_link "Others' work"
     expect(page).to have_content 'Reviews for "TestAssignment"'
@@ -76,9 +76,9 @@ describe "peer review testing" do
     click_link "Logout"
     user = User.find_by(name: "student2065")
     login_as(user.name)
-    visit '/student_task/list'
-    visit '/sign_up_sheet/sign_up?id=1&topic_id=1'
-    visit '/student_task/list'
+    visit '/student_tasks/list'
+    visit '/signup_sheets/sign_up?id=1&topic_id=1'
+    visit '/student_tasks/list'
     click_link "TestAssignment"
     click_link "Others' work"
     choose "topic_id_#{SignUpTopic.find_by(topic_name: 'TestTopic').id}"
@@ -91,9 +91,9 @@ describe "peer review testing" do
     click_link "Logout"
     user = User.find_by(name: "student2065")
     login_as(user.name)
-    visit '/student_task/list'
-    visit '/sign_up_sheet/sign_up?id=1&topic_id=1'
-    visit '/student_task/list'
+    visit '/student_tasks/list'
+    visit '/signup_sheets/sign_up?id=1&topic_id=1'
+    visit '/student_tasks/list'
     click_link "TestAssignment"
     click_link "Others' work"
     find(:css, "#i_dont_care").set(true)

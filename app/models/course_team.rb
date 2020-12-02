@@ -3,9 +3,9 @@ class CourseTeam < Team
 
   # NOTE: inconsistency in naming of users that's in the team
   #   currently they are being called: member, participant, user, etc...
-  #   suggestion: refactor all to participant
+  #   suggestions: refactor all to participant
 
-  # Get parent course
+  # Get parent courses
   def parent_model
     "Course"
   end
@@ -24,7 +24,7 @@ class CourseTeam < Team
     CourseTeam.new
   end
 
-  # Copy this course team to the assignment team
+  # Copy this courses team to the assignment team
   def copy(assignment_id)
     new_team = AssignmentTeam.create_team_and_node(assignment_id)
     new_team.name = name
@@ -32,7 +32,7 @@ class CourseTeam < Team
     copy_members(new_team)
   end
 
-  # deprecated: the functionality belongs to course
+  # deprecated: the functionality belongs to courses
   def add_participant(course_id, user)
     if CourseParticipant.find_by(parent_id: course_id, user_id: user.id).nil?
       CourseParticipant.create(parent_id: course_id, user_id: user.id, permission_granted: user.master_permission_granted)
@@ -43,7 +43,7 @@ class CourseTeam < Team
 
   # Import from csv
   def self.import(row, course_id, options)
-    raise ImportError, "The course with the id \"" + id.to_s + "\" was not found. <a href='/course/new'>Create</a> this course?" if Course.find(course_id).nil?
+    raise ImportError, "The courses with the id \"" + id.to_s + "\" was not found. <a href='/courses/new'>Create</a> this courses?" if Course.find(course_id).nil?
     @course_team = prototype
     Team.import(row, course_id, options, @course_team)
   end
@@ -64,7 +64,7 @@ class CourseTeam < Team
     fields.push("Course Name")
   end
 
-  # Add member to the course team
+  # Add member to the courses team
   def add_member(user, id = nil)
     raise "The user \"#{user.name}\" is already a member of the team, \"#{self.name}\"" if user?(user)
     t_user = TeamsUser.create(user_id: user.id, team_id: self.id)

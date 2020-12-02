@@ -20,7 +20,7 @@
       <!--Reviewer-->
     <td bgcolor=<%= @bgcolor %> rowspan= <%= maps.count %>>
       <% @reviewer_name = @user.fullname(session[:ip]) %>
-      <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id => @id %>
+      <%= link_to @reviewer_name, :controller => 'popups', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id => @id %>
     </td>
 
     <% maps.each do |map| %>
@@ -33,7 +33,7 @@
 
         <!-- Bookmarks reviewed-->
         <td id = "green" bgcolor=<%= @bgcolor %> align="left" colspan=1>
-          <%= link_to @reviewee.title, {:controller => 'response', :action => 'view', :id => map.response.last.id}, :title => "Click here to view this bookmark review" %>
+          <%= link_to @reviewee.title, {:controller => 'responses', :action => 'view', :id => map.response.last.id}, :title => "Click here to view this bookmark review" %>
         </td>
 
         <!-- Submitted by-->

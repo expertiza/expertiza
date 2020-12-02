@@ -9,7 +9,7 @@ class EulaController < ApplicationController
 
   def accept
     session[:user].update_attribute('is_new_user', 0)
-    redirect_to controller: 'student_task', action: 'list'
+    redirect_to controller: 'student_tasks', action: 'list'
   end
 
   def decline

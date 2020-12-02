@@ -50,7 +50,7 @@ describe "review mapping" do
     participant_reviewer = create :participant, assignment: @assignment
     participant_reviewer2 = create :participant, assignment: @assignment
     login_as("instructor6")
-    visit "/review_mapping/list_mappings?id=#{@assignment.id}"
+    visit "/review_mappings/list_mappings?id=#{@assignment.id}"
 
     # add_reviewer
     first(:link, 'add reviewer').click
@@ -67,7 +67,7 @@ describe "review mapping" do
     expect(page).to have_content participant_reviewer2.user.name
 
     # delete_meta_reviewer
-    find(:xpath, "//a[@href='/review_mapping/delete_metareviewer?id=3']").click
+    find(:xpath, "//a[@href='/review_mappings/delete_metareviewer?id=3']").click
     expect(page).to have_content "The metareview mapping for #{participant_reviewer.user.name} and #{participant_reviewer2.user.name} has been deleted"
 
     click_link('add metareviewer')
@@ -120,7 +120,7 @@ describe "review mapping" do
     map_id = team.review_mappings[0].map_id
     create(:response, map_id: map_id, is_submitted: true)
 
-    visit "/review_mapping/list_mappings?id=#{@assignment.id}"
+    visit "/review_mappings/list_mappings?id=#{@assignment.id}"
     expect(page).to have_content 'unsubmit'
 
     # unsubmit the review

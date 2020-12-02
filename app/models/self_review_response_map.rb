@@ -4,7 +4,7 @@ class SelfReviewResponseMap < ResponseMap
   belongs_to :reviewee, class_name: 'Team', foreign_key: 'reviewee_id'
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
 
-  # Find a review questionnaire associated with this self-review response map's assignment
+  # Find a review questionnaire associated with this self-review responses map's assignment
   def questionnaire(round_number = nil, topic_id = nil)
     Questionnaire.find(self.assignment.review_questionnaire_id(round_number, topic_id))
   end

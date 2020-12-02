@@ -46,13 +46,13 @@ describe ParticipantsController do
   end
 
   describe '#delete_assignment_participant' do
-    it 'deletes the assignment_participant and redirects to #review_mapping/list_mappings page' do
+    it 'deletes the assignment_participant and redirects to #review_mappings/list_mappings page' do
       allow(Participant).to receive(:find).with('1').and_return(participant)
       allow(participant).to receive(:destroy).and_return(true)
       params = {id: 1}
       session = {user: instructor}
       get :delete_assignment_participant, params, session
-      expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+      expect(response).to redirect_to('/review_mappings/list_mappings?id=1')
     end
   end
 
@@ -151,7 +151,7 @@ describe ParticipantsController do
       params = {id: 1}
       session = {user: instructor}
       get :bequeath_all, params, session
-      expect(flash[:note]).to eq 'All assignment participants are already part of the course'
+      expect(flash[:note]).to eq 'All assignment participants are already part of the courses'
       expect(response).to redirect_to('/participants/list?model=Assignment')
     end
   end

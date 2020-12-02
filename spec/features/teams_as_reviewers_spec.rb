@@ -30,13 +30,13 @@ describe "teams as reviewers" do
     @assignment.save!
   end
 
-  xit "can allow team mates to edit the response" do
+  xit "can allow team mates to edit the responses" do
     user = User.where(name: "student10").first
     student = AssignmentParticipant.where(user_id: user.id).first
 
     # login as student 10 and start working on the review
     login_as("student10")
-    visit "/student_task/view?id=10}"
+    visit "/student_tasks/view?id=10}"
     click_link "Others' work"
     click_button "Request a new submission to review"
     click_link "Begin"
@@ -47,7 +47,7 @@ describe "teams as reviewers" do
     # switch to their teammate, student 9 and check that student 10's comment is there
     login_as_other_user_and_view_review(9)
     expect(page).to have_content "Excellent work done!"
-    visit "/student_task/view?id=9"
+    visit "/student_tasks/view?id=9"
     click_link "Others' work"
 
     # have student 9 modify the review comment to say something different
@@ -62,7 +62,7 @@ describe "teams as reviewers" do
 
   def login_as_other_user_and_view_review(student_num)
     login_as_other_user("student" + student_num.to_s)
-    visit "/student_task/view?id=#{student_num.to_s}}"
+    visit "/student_tasks/view?id=#{student_num.to_s}}"
     click_link "Others' work"
     click_link "View"
   end

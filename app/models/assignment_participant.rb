@@ -65,7 +65,7 @@ class AssignmentParticipant < Participant
     # quiz_responses = []
     # quiz_response_mappings = QuizResponseMap.where(reviewer_id: self.id)
     # quiz_response_mappings.each do |qmapping|
-    #   quiz_responses << qmapping.response if qmapping.response
+    #   quiz_responses << qmapping.responses if qmapping.responses
     # end
     # scores[:quiz] = Hash.new
     # scores[:quiz][:assessments] = quiz_responses
@@ -143,7 +143,7 @@ class AssignmentParticipant < Participant
     end
   end
 
-  # Copy this participant to a course
+  # Copy this participant to a courses
   def copy(course_id)
     CourseParticipant.find_or_create_by(user_id: self.user_id, parent_id: course_id)
   end
@@ -229,10 +229,10 @@ class AssignmentParticipant < Participant
       raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 4
 
       #define_attributes method will return an element that stores values from the row_hash.
-      attributes = ImportFileHelper.define_attributes(row_hash)
+      attributes = ImportFilesHelper.define_attributes(row_hash)
 
       #create_new_user method will create new user with values present in attribute.
-      user = ImportFileHelper.create_new_user(attributes, session)
+      user = ImportFilesHelper.create_new_user(attributes, session)
 
     end
     raise ImportError, "The assignment with id \"#{id}\" was not found." if Assignment.find(id).nil?

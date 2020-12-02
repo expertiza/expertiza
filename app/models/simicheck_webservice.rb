@@ -8,7 +8,7 @@ class SimiCheckWebService
   # Parameters:
   #   <none>
   # Returns:
-  #   response = RestClient::Response
+  #   responses = RestClient::Response
   def self.all_comparisons
     full_url = @@base_uri + '/comparisons'
     RestClient::Request.execute(method: :get,
@@ -22,7 +22,7 @@ class SimiCheckWebService
   #   comparison_name (optional) - string containing the name for the new comparison
   #                                (name will be date and time if not provided)
   # Returns:
-  #   response = RestClient::Response
+  #   responses = RestClient::Response
   def self.new_comparison(comparison_name = '')
     full_url = @@base_uri + '/comparison'
     json_body = {comparison_name: comparison_name}.to_json
@@ -42,7 +42,7 @@ class SimiCheckWebService
   # Parameters:
   #   comparison_id - string id of the comparison to delete
   # Returns:
-  #   response = RestClient::Response (NO BODY)
+  #   responses = RestClient::Response (NO BODY)
   def self.delete_comparison(comparison_id)
     full_url = @@base_uri + '/comparison/' + comparison_id
     RestClient::Request.execute(method: :delete,
@@ -55,7 +55,7 @@ class SimiCheckWebService
   # Parameters:
   #   comparison_id - string id of the comparison to look up
   # Returns:
-  #   response = RestClient::Response
+  #   responses = RestClient::Response
   def self.get_comparison_details(comparison_id)
     full_url = @@base_uri + '/comparison/' + comparison_id
     RestClient::Request.execute(method: :get,
@@ -69,7 +69,7 @@ class SimiCheckWebService
   #   comparison_id - string id of the comparison to update
   #   new_comparison_name - string containing the new name for the comparison
   # Returns:
-  #   response = RestClient::Response (NO BODY)
+  #   responses = RestClient::Response (NO BODY)
   def self.update_comparison(comparison_id, new_comparison_name)
     full_url = @@base_uri + '/comparison/' + comparison_id
     json_body = {comparison_name: new_comparison_name}.to_json
@@ -94,7 +94,7 @@ class SimiCheckWebService
   #   comparison_id - string id of the comparison to update
   #   path_to_file - string containing the path to the file being uploaded
   # Returns:
-  #   response = RestClient::Response
+  #   responses = RestClient::Response
   def self.upload_file(comparison_id, path_to_file)
     full_url = @@base_uri + '/upload_file/' + comparison_id
     file_to_upload = File.new(path_to_file, 'rb')
@@ -116,7 +116,7 @@ class SimiCheckWebService
   #   comparison_id - string id of the comparison to update
   #   filenames_to_delete - array of strings containing filenames to be deleted
   # Returns:
-  #   response = RestClient::Response (NO BODY)
+  #   responses = RestClient::Response (NO BODY)
   def self.delete_files(comparison_id, filenames_to_delete)
     full_url = @@base_uri + '/delete_files/' + comparison_id
     json_body = {"filenames" => filenames_to_delete}.to_json
@@ -140,7 +140,7 @@ class SimiCheckWebService
   # Parameters:
   #   comparison_id - string id of the comparison to update
   # Returns:
-  #   response = RestClient::Response
+  #   responses = RestClient::Response
   def self.get_similarity_nxn(comparison_id)
     full_url = @@base_uri + '/similarity_nxn/' + comparison_id
     RestClient::Request.execute(method: :get,
@@ -153,7 +153,7 @@ class SimiCheckWebService
   # Parameters:
   #   comparison_id - string id of the comparison to update
   # Returns:
-  #   response = RestClient::Response
+  #   responses = RestClient::Response
   def self.post_similarity_nxn(comparison_id, callback_url = '')
     full_url = @@base_uri + '/similarity_nxn/' + comparison_id
     json_body = callback_url.empty? ? {}.to_json : {"callback_url" => callback_url}.to_json

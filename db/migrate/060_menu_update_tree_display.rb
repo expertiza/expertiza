@@ -18,7 +18,7 @@ class MenuUpdateTreeDisplay < ActiveRecord::Migration
        menu.delete
      end
 
-     site_controller = SiteController.find_or_create_by(name: 'survey_deployment')
+     site_controller = SiteController.find_or_create_by(name: 'survey_deployments')
      site_controller.permission_id = permission1.id
      site_controller.save
      action = ControllerAction.where(['site_controller_id = ? and name = ?',site_controller.id,'list']).first

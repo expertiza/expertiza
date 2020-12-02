@@ -18,11 +18,11 @@ describe 'badge system' do
   end
 
   context 'when a student receives a very high average teammate review grade (higher than 95 by default)' do
-    it 'assigns the \'Good teammate\' badge to this student on student_task#list page'
+    it 'assigns the \'Good teammate\' badge to this student on student_tasks#list page'
   end
 
   context 'when a student receives a very high review grades assigned by teaching staff (higher than 95 by default)' do
-    it 'assigns the \'Good reviewer\' badge to this student on student_task#list page'
+    it 'assigns the \'Good reviewer\' badge to this student on student_tasks#list page'
   end
 
   context 'on participants#list page' do

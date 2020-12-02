@@ -51,7 +51,7 @@
 <%= " + #{@additional_info}" unless @additional_info.try(:empty?) %>
 <br/><br/>
 
-<!--Beautified request and response message-->
+<!--Beautified request and responses message-->
 <b>Beautified request and response information</b>
 <table border = '1' width="60%">
 	<tr>
@@ -65,7 +65,7 @@
 </table>
 <br/>
 
-<!--Minified request and response message-->
+<!--Minified request and responses message-->
 <b>Minified request and response message</b><br/>
 <p style="background-color: #fdf6e3; color: #657b83; padding: 5px; word-wrap: break-word;">
 	<%=@request_body unless @request_body.try(:empty?) %><br/><br/>
@@ -125,7 +125,7 @@
 		var response = JSON.parse('<%= @response_body %>'.replace(/&quot;/g,'"'));
 		
 		$('#request').html(library.json.prettyPrint(request));
-		$('#response').html(library.json.prettyPrint(response));
+		$('#responses').html(library.json.prettyPrint(response));
 	});
 
 	$('#algorithm').change(function changeDropdown(){

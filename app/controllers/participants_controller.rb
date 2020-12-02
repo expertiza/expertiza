@@ -87,7 +87,7 @@ class ParticipantsController < ApplicationController
     redirect_to action: 'list', id: parent_id, model: participant.class.to_s.gsub("Participant", "")
   end
 
-  # Copies existing participants from a course down to an assignment
+  # Copies existing participants from a courses down to an assignment
   def inherit
     assignment = Assignment.find(params[:id])
     course = assignment.course
@@ -103,18 +103,18 @@ class ParticipantsController < ApplicationController
         if !@copied_participants.empty?
           undo_link("The participants from \"#{course.name}\" have been successfully copied to this assignment. ")
         else
-          flash[:note] = 'All course participants are already in this assignment'
+          flash[:note] = 'All courses participants are already in this assignment'
         end
       else
         flash[:note] = "No participants were found to inherit this assignment."
       end
     else
-      flash[:error] = "No course was found for this assignment."
+      flash[:error] = "No courses was found for this assignment."
     end
     redirect_to controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment'
   end
 
-  # Take all participants from an assignment and "bequeath" them to course as course_participants.
+  # Take all participants from an assignment and "bequeath" them to courses as course_participants.
   def bequeath_all
     @copied_participants = []
     assignment = Assignment.find(params[:id])
@@ -128,10 +128,10 @@ class ParticipantsController < ApplicationController
       if !@copied_participants.empty?
         undo_link("All participants were successfully copied to \"#{course.name}\". ")
       else
-        flash[:note] = 'All assignment participants are already part of the course'
+        flash[:note] = 'All assignment participants are already part of the courses'
       end
     else
-      flash[:error] = "This assignment is not associated with a course."
+      flash[:error] = "This assignment is not associated with a courses."
     end
     redirect_to controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment'
   end
@@ -150,7 +150,7 @@ class ParticipantsController < ApplicationController
       else
         @participant.update_attributes(participant_params)
         ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, "The change handle is saved successfully", request)
-        redirect_to controller: 'student_task', action: 'view', id: @participant
+        redirect_to controller: 'student_tasks', action: 'view', id: @participant
       end
     end
   end
@@ -166,10 +166,10 @@ class ParticipantsController < ApplicationController
       rescue StandardError
         flash[:error] = "\"#{name}\" was not removed from this assignment. Please ensure that \"#{name}\" is not a reviewer or metareviewer and try again."
       end
-    redirect_to controller: 'review_mapping', action: 'list_mappings', id: assignment_id
+    redirect_to controller: 'review_mappings', action: 'list_mappings', id: assignment_id
   end
 
-  # A ‘copyright grant’ means the author has given permission to the instructor to use the work outside the course.  
+  # A ‘copyright grant’ means the author has given permission to the instructor to use the work outside the courses.
   # This is incompletely implemented, but the values in the last column in http://expertiza.ncsu.edu/student_task/list are sourced from here.
   def view_copyright_grants
     assignment_id = params[:id]

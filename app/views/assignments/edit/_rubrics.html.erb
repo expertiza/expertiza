@@ -152,7 +152,7 @@
     function openAddNewTagPopup(){
       $.colorbox({
         iframe: true,
-        href: "../../tag_prompts/view?popup=true",
+        href: "../../tag_prompts/view?popups=true",
         opacity: 0.8,
         innerWidth: 800,
         innerHeight: 500,
@@ -176,7 +176,7 @@
                 option += "<option value='" + tag_prompts[i].id + "'";
                 option += ">" + tag_prompts[i].prompt + "</option>";
               }
-              //update all dropdown with the option, restore the selected option, unless for the dropdown that calls the popup
+              //update all dropdown with the option, restore the selected option, unless for the dropdown that calls the popups
               $('select[name*="\\[tag_prompt\\]"]').each( function() {
                 s = jQuery(this)
                 s_value = s[0].options[s[0].selectedIndex].value;

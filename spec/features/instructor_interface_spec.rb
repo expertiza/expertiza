@@ -21,18 +21,18 @@ describe "Integration tests for instructor interface" do
     end
   end
 
-  describe "Create a course" do
-    it "is able to create a public course or a private course" do
+  describe "Create a courses" do
+    it "is able to create a public courses or a private courses" do
       login_as("instructor6")
-      visit '/course/new?private=0'
-      fill_in "Course Name", with: 'public course for test'
+      visit '/courses/new?private=0'
+      fill_in "Course Name", with: 'public courses for test'
       click_button "Create"
-      expect(Course.where(name: "public course for test")).to exist
+      expect(Course.where(name: "public courses for test")).to exist
 
-      visit '/course/new?private=1'
-      fill_in "Course Name", with: 'private course for test'
+      visit '/courses/new?private=1'
+      fill_in "Course Name", with: 'private courses for test'
       click_button "Create"
-      expect(Course.where(name: "private course for test")).to exist
+      expect(Course.where(name: "private courses for test")).to exist
     end
   end
 

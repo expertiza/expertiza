@@ -23,7 +23,7 @@ class QuizResponseMap < ResponseMap
   end
 
   def quiz_score
-    questionnaire_id = self.reviewed_object_id  # the reviewed id is questionnaire id in response map table
+    questionnaire_id = self.reviewed_object_id  # the reviewed id is questionnaire id in responses map table
     response_id = self.response.first.id rescue nil
 
     # quiz not taken yet

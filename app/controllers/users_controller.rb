@@ -257,7 +257,7 @@ class UsersController < ApplicationController
 
   def foreign
     # stores all the roles that are possible 
-    # when a new user joins or an existing user updates his/her profile they will get to choose
+    # when a new user joins or an existing user updates his/her profiles they will get to choose
     # from all the roles available
     role = Role.find(session[:user].role_id)
     @all_roles = Role.where('id in (?) or id = ?', role.get_available_roles, role.id)

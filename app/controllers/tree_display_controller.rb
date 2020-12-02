@@ -42,7 +42,7 @@ class TreeDisplayController < ApplicationController
     @currCtlr = params[:currCtlr]
     redirect_to controller: :content_pages, action: :view unless user_logged_in?
 
-    redirect_to controller: :student_task, action: :list if current_user.try(:student?)
+    redirect_to controller: :student_tasks, action: :list if current_user.try(:student?)
   end
 
   # Returns the contents of each top level folder as a json object.
@@ -113,7 +113,7 @@ class TreeDisplayController < ApplicationController
     false
   end
 
-  # check if user is ta for current course
+  # check if user is ta for current courses
   def ta_for_current_course?(node)
     ta_mappings = TaMapping.where(ta_id: session[:user].id)
     return course_node_for_current_ta?(ta_mappings, node) if node.is_a? CourseNode
@@ -123,27 +123,27 @@ class TreeDisplayController < ApplicationController
 
   # check if current user is ta for instructor
   def is_user_ta?(instructor_id, child)
-    # instructor created the course, current user is the ta of this course.
+    # instructor created the courses, current user is the ta of this courses.
     session[:user].role_id == 6 and
         Ta.get_my_instructors(session[:user].id).include?(instructor_id) and ta_for_current_course?(child)
   end
 
   # check if current user is instructor
   def is_user_instructor?(instructor_id)
-    # ta created the course, current user is the instructor of this ta.
+    # ta created the courses, current user is the instructor of this ta.
     instructor_ids = []
     TaMapping.where(ta_id: instructor_id).each {|mapping| instructor_ids << Course.find(mapping.course_id).instructor_id }
     session[:user].role_id == 2 and instructor_ids.include? session[:user].id
   end
 
   def update_is_available_2(res2, instructor_id, child)
-    # current user is the instructor (role can be admin/instructor/ta) of this course. is_available_condition1
+    # current user is the instructor (role can be admin/instructor/ta) of this courses. is_available_condition1
     res2["is_available"] = is_available(session[:user], instructor_id) ||
         is_user_ta?(instructor_id, child) ||
         is_user_instructor?(instructor_id)
   end
 
-  # attaches assignment nodes to course node of instructor
+  # attaches assignment nodes to courses node of instructor
   def coursenode_assignmentnode(res2, child)
     res2["directory"] = child.get_directory
     instructor_id = child.get_instructor_id
@@ -237,7 +237,7 @@ class TreeDisplayController < ApplicationController
         "directory" => node.get_directory,
         "creation_date" => node.get_creation_date,
         "updated_date" => node.get_modified_date,
-        "institution" => Institution.where(id: node.retrieve_institution_id),
+        "institutions" => Institution.where(id: node.retrieve_institution_id),
         "private" => course_is_available?(node)
       })
       json["instructor_id"] = node.get_instructor_id
@@ -276,22 +276,22 @@ class TreeDisplayController < ApplicationController
     return json
   end
 
-  # Checks if the user is the instructor for the course or assignment node provided.
+  # Checks if the user is the instructor for the courses or assignment node provided.
   # Note: Admin and super admin users are considered instructors for all courses.
   def instructor_for_course?(node)
     is_available(session[:user], node.get_instructor_id)
   end
 
-  # Checks if the user is a TA for the course or assignment node provided.
+  # Checks if the user is a TA for the courses or assignment node provided.
   def ta_for_course?(node)
       ta_mappings = TaMapping.where(ta_id: session[:user].id)
       course_id = node.is_a?(CourseNode) ? node.node_object_id : Assignment.find(node.node_object_id).course_id
       ta_mappings.any? { |ta_mapping| ta_mapping.course_id == course_id }
   end
 
-  # Check if the provided course or assignment node is avaiable to the logged in user.
+  # Check if the provided courses or assignment node is avaiable to the logged in user.
   # Instructors and TA's have access to courses, not individual assignments. It doesn't matter
-  # which node is passed in, we only about course access. 
+  # which node is passed in, we only about courses access.
   def course_is_available?(node)
     instructor_for_course?(node) or ta_for_course?(node)
   end

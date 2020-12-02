@@ -127,17 +127,17 @@ jQuery(document).ready(function() {
         }
         moreContent.push(
           <span>
-            <a title="Copy" href={"/"+newNodeType+"/copy?assets=course&id="+(parseInt(this.props.id)/2).toString()}><img src="/assets/tree_view/Copy-icon-24.png" /></a>
+            <a title="Copy" href={"/"+newNodeType+"/copy?assets=courses&id="+(parseInt(this.props.id)/2).toString()}><img src="/assets/tree_view/Copy-icon-24.png" /></a>
           </span>
         )
-        if (newNodeType === 'course') {
+        if (newNodeType === 'courses') {
           moreContent.push(
             <br/>
           )
           if (this.props.is_available) {
             moreContent.push(
               <span>
-                <a title="Add TA" href={"/course/view_teaching_assistants?id="+(parseInt(this.props.id)/2).toString()+"&model=Course"}>
+                <a title="Add TA" href={"/courses/view_teaching_assistants?id="+(parseInt(this.props.id)/2).toString()+"&model=Course"}>
                   <img src="/assets/tree_view/add-ta-24.png" />
                 </a>
                 <a title="Create assignment" href={"/assignments/new?parent_id="+(parseInt(this.props.id)/2).toString()}>
@@ -152,7 +152,7 @@ jQuery(document).ready(function() {
                 <a title="View grade summary by student" href={"/assessment360/course_student_grade_summary?course_id="+(parseInt(this.props.id)/2).toString()}>
                   <img src="/assets/tree_view/360-dashboard-24.png" />
                 </a>
-                <a title="Assign survey" href={"/survey_deployment/new?id="+(parseInt(this.props.id)/2).toString()+"&type=CourseSurveyDeployment"}>
+                <a title="Assign survey" href={"/survey_deployments/new?id="+(parseInt(this.props.id)/2).toString()+"&type=CourseSurveyDeployment"}>
                   <img src="/assets/tree_view/assign-survey-24.png" />
                 </a>
                 <a title="View aggregated teammate & meta reviews" href={"/assessment360/all_students_all_reviews?course_id="+(parseInt(this.props.id)/2).toString()}>
@@ -204,10 +204,10 @@ jQuery(document).ready(function() {
             // if ends
             moreContent.push(
               <span>
-                <a title="Assign reviewers" href={"/review_mapping/list_mappings?id="+(parseInt(this.props.id)/2).toString()}>
+                <a title="Assign reviewers" href={"/review_mappings/list_mappings?id="+(parseInt(this.props.id)/2).toString()}>
                   <img src="/assets/tree_view/assign-reviewers-24.png" />
                 </a>
-                <a title="Assign survey" href={"/survey_deployment/new?id="+(parseInt(this.props.id)/2).toString()+"&type=AssignmentSurveyDeployment"}>
+                <a title="Assign survey" href={"/survey_deployments/new?id="+(parseInt(this.props.id)/2).toString()+"&type=AssignmentSurveyDeployment"}>
                   <img src="/assets/tree_view/assign-survey-24.png" />
                 </a>
               </span>
@@ -253,7 +253,7 @@ jQuery(document).ready(function() {
             if (this.props.allow_suggestions) {
               moreContent.push(
                 <span>
-                  <a title="View suggestions" href={"/suggestion/list?id="+(parseInt(this.props.id)/2).toString()+"&type=Assignment"}>
+                  <a title="View suggestions" href={"/suggestions/list?id="+(parseInt(this.props.id)/2).toString()+"&type=Assignment"}>
                     <img src="/assets/tree_view/view-suggestion-24.png" />
                   </a>
                 </span>
@@ -301,7 +301,7 @@ jQuery(document).ready(function() {
         colDisplayStyle = {
           "display": "none"
         }
-      } else if(this.props.dataType === 'course') {
+      } else if(this.props.dataType === 'courses') {
         colWidthArray = ["20%", "0%", "0%", "20%", "20%", "20%", "20%"]
       }
       if (this.props.creation_date && this.props.updated_date) {
@@ -311,7 +311,7 @@ jQuery(document).ready(function() {
       var nodeTypeRaw = this.props.id.split("_")[0]
       var nodeType = nodeTypeRaw.substring(0, nodeTypeRaw.length-4).toLowerCase()
       var id = this.props.id.split("_")[1]
-        if (this.props.dataType == 'course') {
+        if (this.props.dataType == 'courses') {
             var institution_name = "-"
             if(typeof this.props.institution !== 'undefined' && this.props.institution.length != 0){
               institution_name = this.props.institution[0].name
@@ -387,11 +387,11 @@ jQuery(document).ready(function() {
         colDisplayStyle = {
           "display": "none"
         }
-      }  else if(this.props.dataType === 'course') {
+      }  else if(this.props.dataType === 'courses') {
         colWidthArray = ["20%", "0%", "0%", "20%", "20%", "20%", "20%"]
       }
       if (this.props.data) {
-          if (this.props.dataType == 'course') {
+          if (this.props.dataType == 'courses') {
               this.props.data.forEach(function (entry, i) {
                   _rows.push(<SimpleTableRow
                       key={entry.type + '_' + (parseInt(entry.nodeinfo.id) * 2).toString() + '_' + i}
@@ -437,7 +437,7 @@ jQuery(document).ready(function() {
               })
           }
       }
-      if (this.props.dataType == 'course') {
+      if (this.props.dataType == 'courses') {
           return (
               <table className="table table-hover">
                   <thead>
@@ -541,7 +541,7 @@ jQuery(document).ready(function() {
         colDisplayStyle = {
           "display": "none"
         }
-      } else if(this.props.dataType === 'course') {
+      } else if(this.props.dataType === 'courses') {
         colWidthArray = ["20%", "0%", "0%", "20%", "20%", "20%", "20%"]
       }
       if (this.props.creation_date && this.props.updated_date) {
@@ -555,7 +555,7 @@ jQuery(document).ready(function() {
       var nodeTypeRaw = this.props.id.split("_")[0]
       var nodeType = nodeTypeRaw.substring(0, nodeTypeRaw.length-4).toLowerCase()
       var id = this.props.id.split("_")[1]
-      if (this.props.dataType == 'course') {
+      if (this.props.dataType == 'courses') {
           var institution_name = "-"
             if(typeof this.props.institution !== 'undefined' && this.props.institution.length != 0){
               institution_name = this.props.institution[0].name
@@ -818,7 +818,7 @@ jQuery(document).ready(function() {
                   "display": "none"
               }
           }
-          if (this.props.dataType == 'course') {
+          if (this.props.dataType == 'courses') {
               colWidthArray = ["20%", "0%", "0%", "20%", "20%", "20%", "20%"]
               _rows.push(<TitleRow
                   title="My Courses"
@@ -868,7 +868,7 @@ jQuery(document).ready(function() {
               }
           })
           if (this.props.showPublic) {
-              if (this.props.dataType == 'course') {
+              if (this.props.dataType == 'courses') {
                   _rows.push(<TitleRow
                       title="Others' Public Courses"
                   />)
@@ -954,7 +954,7 @@ jQuery(document).ready(function() {
       }
 
       }
-      if (this.props.dataType == 'course') {
+      if (this.props.dataType == 'courses') {
           return (
               <table className="table table-hover" style={{"table-layout": "fixed"}}>
                   <thead>
@@ -1156,15 +1156,15 @@ jQuery(document).ready(function() {
                     '/assets/tree_view/add-participant-24.png',
                     '/assets/tree_view/create-teams-24.png',
                     '/assets/tree_view/360-dashboard-24.png',
-                    '/assets/tree_view/remove-from-course-24.png',
-                    '/assets/tree_view/assign-course-blue-24.png',
+                    '/assets/tree_view/remove-from-courses-24.png',
+                    '/assets/tree_view/assign-courses-blue-24.png',
                     '/assets/tree_view/run-lottery.png',
                     '/assets/tree_view/assign-reviewers-24.png',
                     '/assets/tree_view/assign-survey-24.png',
                     '/assets/tree_view/view-survey-24.png',
                     '/assets/tree_view/view-scores-24.png',
                     '/assets/tree_view/view-review-report-24.png',
-                    '/assets/tree_view/view-suggestion-24.png',
+                    '/assets/tree_view/view-suggestions-24.png',
                     '/assets/tree_view/view-delayed-mailer.png',
                     '/assets/tree_view/view-publish-rights-24.png'
                     )

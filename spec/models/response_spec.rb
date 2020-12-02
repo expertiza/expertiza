@@ -19,7 +19,7 @@ describe Response do
   end
 
   describe '#response_id' do
-    it 'returns the id of current response' do
+    it 'returns the id of current responses' do
       expect(response.response_id).to eq(1)
     end
   end
@@ -84,7 +84,7 @@ describe Response do
   end
 
   describe '#maximum_score' do
-    it 'returns the maximum possible score for current response' do
+    it 'returns the maximum possible score for current responses' do
       question2 = double('ScoredQuestion', weight: 2)
       allow(Question).to receive(:find).with(1).and_return(question2)
       allow(question2).to receive(:is_a?).with(ScoredQuestion).and_return(true)
@@ -183,7 +183,7 @@ describe Response do
   end
 
   describe '.avg_scores_and_count_for_prev_reviews' do
-    context 'when current response is not in current response array' do
+    context 'when current responses is not in current responses array' do
       it 'returns the average score and count of previous reviews' do
         allow(response).to receive(:total_score).and_return(96)
         allow(response).to receive(:maximum_score).and_return(100)

@@ -53,7 +53,7 @@ class CreateResponseMaps < ActiveRecord::Migration
        create_response_map(map,"teammate_reviews","TeammateReviewResponseMap", "TeammateReviewQuestionnaire",assignment)        
     }     
    
-    # create response mappings as associate to a given review object
+    # create responses mappings as associate to a given review object
     ActiveRecord::Base.connection.select_all("select * from review_mappings").each{
        | map | 
        

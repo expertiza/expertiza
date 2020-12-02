@@ -72,8 +72,8 @@
     <%= submit_tag "Save #{@questionnaire.display_type.downcase} questionnaire", :name=>"save", :class => "btn btn-primary" %>
     <input style="margin-left:36em" type="submit" name="view_advice" value="Edit/View advice" class="btn btn-default"/>
     <hr/>
-    <%= link_to 'Import Questionnaire', :controller=>'import_file', :action=>'start', :model => 'Question', :id=> @questionnaire.id, :expected_fields => 'txt, type ,seq,size, break_before' %>|
-    <%= link_to 'Export Questionnaire', :controller=>'export_file',:action=>'start',:model=> 'Question',:id=> @questionnaire.id %>
+    <%= link_to 'Import Questionnaire', :controller=>'import_files', :action=>'start', :model => 'Question', :id=> @questionnaire.id, :expected_fields => 'txt, type ,seq,size, break_before' %>|
+    <%= link_to 'Export Questionnaire', :controller=>'export_files', :action=>'start', :model=> 'Question', :id=> @questionnaire.id %>
   <% end %>
 <% end %>
 <BR/>

@@ -23,7 +23,7 @@ class StudentQuizzesController < ApplicationController
   def finished_quiz
     @response = Response.where(map_id: params[:map_id]).first
     @response_map = QuizResponseMap.find(params[:map_id])
-    @questions = Question.where(questionnaire_id: @response_map.reviewed_object_id) # for quiz response map, the reivewed_object_id is questionnaire id
+    @questions = Question.where(questionnaire_id: @response_map.reviewed_object_id) # for quiz responses map, the reivewed_object_id is questionnaire id
     @map = ResponseMap.find(params[:map_id])
     @participant = AssignmentTeam.find(@map.reviewee_id).participants.first
 
@@ -98,7 +98,7 @@ class StudentQuizzesController < ApplicationController
 
   def record_response
     map = ResponseMap.find(params[:map_id])
-    # check if there is any response for this map_id. This is to prevent student take same quiz twice
+    # check if there is any responses for this map_id. This is to prevent student take same quiz twice
     if map.response.empty?
       response = Response.new
       response.map_id = params[:map_id]

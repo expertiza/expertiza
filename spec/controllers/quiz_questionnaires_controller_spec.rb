@@ -54,7 +54,7 @@ describe QuizQuestionnairesController do
 #           allow_any_instance_of(QuizQuestionnaireController).to receive(:undo_link).with(any_args).and_return('')
 #           post :create_quiz_questionnaire, params
 #           expect(flash[:note]).to eq('The quiz was successfully created.')
-#           expect(response).to redirect_to('/submitted_content/1/edit')
+#           expect(responses).to redirect_to('/submitted_content/1/edit')
 #           expect(controller.instance_variable_get(:@questionnaire).private).to eq false
 #           expect(controller.instance_variable_get(:@questionnaire).name).to eq 'Test questionnaire'
 #           expect(controller.instance_variable_get(:@questionnaire).min_question_score).to eq 0
@@ -80,7 +80,7 @@ describe QuizQuestionnairesController do
 #           allow_any_instance_of(QuizQuestionnaireController).to receive(:undo_link).with(any_args).and_return('')
 #           post :create_quiz_questionnaire, params, session
 #           expect(flash[:note]).to be nil
-#           expect(response).to redirect_to('/tree_display/list')
+#           expect(responses).to redirect_to('/tree_display/list')
 #           expect(controller.instance_variable_get(:@questionnaire).private).to eq false
 #           expect(controller.instance_variable_get(:@questionnaire).name).to eq 'Test questionnaire'
 #           expect(controller.instance_variable_get(:@questionnaire).min_question_score).to eq 0
@@ -101,7 +101,7 @@ describe QuizQuestionnairesController do
 #         request.env['HTTP_REFERER'] = 'www.google.com'
 # post :create_quiz_questionnaire, params
 #         expect(flash[:error]).to eq('Please select a correct answer for all questions')
-#         expect(response).to redirect_to('www.google.com')
+#         expect(responses).to redirect_to('www.google.com')
 #       end
 #     end
 #   end

@@ -190,20 +190,20 @@ describe AuthorizationHelper do
 
   describe ".current_user_teaching_staff_of_assignment?" do
 
-    # # Rather than specifying IDs explicitly for instructor, TA, course, etc.
+    # # Rather than specifying IDs explicitly for instructor, TA, courses, etc.
     # # Use factory create method to auto generate IDs.
     # # In this way we have less risk of making a mistake (e.g. duplication) in the ID numbers.
     #
     # it 'returns false if the user is not logged in' do
     #   instructor1 = create(:instructor)
     #   instructor2 = create(:instructor)
-    #   course = create(:course, instructor_id: instructor2.id)
-    #   assignment = create(:assignment, course_id: course.id)
+    #   courses = create(:courses, instructor_id: instructor2.id)
+    #   assignment = create(:assignment, course_id: courses.id)
     #   session[:user] = nil
     #   expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be false
     # end
     #
-    # it 'returns true if the instructor is assigned to the course of the assignment' do
+    # it 'returns true if the instructor is assigned to the courses of the assignment' do
     #   # To be on the safe side (avoid passing this test when there might be some problem)
     #   # Create 2 instructors and associate the 2nd one with the assignment
     #   # See comments in other tests of this method
@@ -211,25 +211,25 @@ describe AuthorizationHelper do
     #
     #   instructor1 = create(:instructor)
     #   instructor2 = create(:instructor)
-    #   course = create(:course, instructor_id: instructor2.id)
-    #   assignment = create(:assignment, course_id: course.id)
+    #   courses = create(:courses, instructor_id: instructor2.id)
+    #   assignment = create(:assignment, course_id: courses.id)
     #   stub_current_user(instructor2, instructor2.role.name, instructor2.role)
     #   expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be true
     # end
     #
-    # it 'returns false if the instructor is not assigned to the course of the assignment' do
+    # it 'returns false if the instructor is not assigned to the courses of the assignment' do
     #   # This test requires some extra care
-    #   # The assignment factory will associate the created assignment with the first course
-    #   # (or will create a course if needed)
+    #   # The assignment factory will associate the created assignment with the first courses
+    #   # (or will create a courses if needed)
     #   # The assignment factory in will ALSO associate the assignment with the first instructor
     #   # (or will create an instructor if needed)
     #   # Therefore, with no extra care, the assignment will end up associated with the first instructor
-    #   # Therefore, we must take care that we specify both the course and the instructor for the assignment
+    #   # Therefore, we must take care that we specify both the courses and the instructor for the assignment
     #
     #   instructor1 = create(:instructor)
     #   instructor2 = create(:instructor)
-    #   course = create(:course, instructor_id: instructor2.id)
-    #   assignment = create(:assignment, course_id: course.id, instructor_id: instructor2.id)
+    #   courses = create(:courses, instructor_id: instructor2.id)
+    #   assignment = create(:assignment, course_id: courses.id, instructor_id: instructor2.id)
     #   stub_current_user(instructor1, instructor1.role.name, instructor1.role)
     #   expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be false
     # end
@@ -249,9 +249,9 @@ describe AuthorizationHelper do
     #
     # it 'returns false if the instructor is not associated with the assignment' do
     #   # This test requires some extra care
-    #   # The assignment factory will associate the created assignment with the first course
-    #   # (or will create a course if needed)
-    #   # The course factory in turn will associate the course with the first instructor
+    #   # The assignment factory will associate the created assignment with the first courses
+    #   # (or will create a courses if needed)
+    #   # The courses factory in turn will associate the courses with the first instructor
     #   # (or will create an instructor if needed)
     #   # Therefore, with no extra care, the assignment will end up associated indirectly with the first instructor
     #   # Therefore, we must take care that the current user we stub here is NOT the first instructor
@@ -263,7 +263,7 @@ describe AuthorizationHelper do
     #   expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be false
     # end
 
-    it 'returns true if the teaching assistant is associated with the course of the assignment' do
+    it 'returns true if the teaching assistant is associated with the courses of the assignment' do
       teaching_assistant1 = create(:teaching_assistant)
       course = create(:course)
       assignment = create(:assignment)
@@ -272,7 +272,7 @@ describe AuthorizationHelper do
       expect(current_user_teaching_staff_of_assignment?(assignment.id)).to be true
     end
 
-    it 'returns false if the teaching assistant is not associated with the course of the assignment' do
+    it 'returns false if the teaching assistant is not associated with the courses of the assignment' do
 
       instructor1 = create(:instructor)
       teaching_assistant1 = create(:teaching_assistant)
@@ -578,7 +578,7 @@ describe AuthorizationHelper do
       expect(response_edit_allowed?(map, map.reviewer.user_id)).to be true
     end
 
-    it 'returns true if map is of type ReviewResponseMap and user is a Teaching Assistant and a mapping exists between the user and the course of the assignment' do
+    it 'returns true if map is of type ReviewResponseMap and user is a Teaching Assistant and a mapping exists between the user and the courses of the assignment' do
       stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
       course = create(:course)
       TaMapping.create(ta_id: session[:user].id, course_id: course.id)
@@ -666,7 +666,7 @@ describe AuthorizationHelper do
       expect(current_user_instructs_assignment?(assignment)).to be true
     end
 
-    it 'returns true if the course associated with the assignment is instructed by the current user' do
+    it 'returns true if the courses associated with the assignment is instructed by the current user' do
       instructor1 = create(:instructor, name: "test_instructor_1")
       instructor2 = create(:instructor, name: "test_instructor_2")
       course = create(:course, instructor_id: instructor1.id)
@@ -711,7 +711,7 @@ describe AuthorizationHelper do
   end
 
   describe ".find_assignment_from_response_id" do
-    # Makes use of existing :response, :review_response_map, and :meta_review_response_map factories
+    # Makes use of existing :responses, :review_response_map, and :meta_review_response_map factories
 
     it 'returns the assignment if one is found without recursion' do
       response = create(:response)
@@ -733,16 +733,16 @@ describe AuthorizationHelper do
     end
 
     describe ".find_assignment_instructor" do
-      # Makes use of existing :assignment and :course factories. Both point to Instructor.first
+      # Makes use of existing :assignment and :courses factories. Both point to Instructor.first
 
-      it 'returns the instructor if the assignment belongs to a course' do
+      it 'returns the instructor if the assignment belongs to a courses' do
         instructor = create(:instructor).becomes(User)
         course = create(:course, instructor: instructor)
         assignment = create(:assignment, course: course, instructor: nil)
         expect(find_assignment_instructor(assignment)).to eq(assignment.course.instructor)
       end
 
-      it 'returns the instructor if the assignment does not belong to a course' do
+      it 'returns the instructor if the assignment does not belong to a courses' do
         instructor = create(:instructor).becomes(User)
         assignment = create(:assignment, course: nil, instructor: instructor)
         expect(find_assignment_instructor(assignment)).to eq(assignment.instructor)

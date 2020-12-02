@@ -141,7 +141,7 @@ describe 'AssignmentTeam' do
 
   describe "#copy" do
     context "for given assignment team" do
-      it "copies the assignment team to course team" do
+      it "copies the assignment team to courses team" do
         assignment = team.assignment
         course = assignment.course
         expect(team.copy(course.id)).to eq([])

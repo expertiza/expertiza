@@ -13,7 +13,7 @@ def deploy_course_survey(start_date, end_date, survey_name)
   survey = Questionnaire.where(name: survey_name)
   instructor = User.where(name: 'instructor6').first
   course = Course.where(instructor_id: instructor.id).first
-  visit '/survey_deployment/new?id=' + course.id.to_s + '&type=CourseSurveyDeployment'
+  visit '/survey_deployments/new?id=' + course.id.to_s + '&type=CourseSurveyDeployment'
   expect(page).to have_content('New Survey Deployment')
   fill_in 'survey_deployment_start_date', with: start_date
   fill_in 'survey_deployment_end_date', with: end_date
@@ -36,20 +36,20 @@ describe "Course Survey questionnaire tests for instructor interface" do
     expect(Questionnaire.where(name: survey_name)).to exist
   end
 
-  it "is able to deploy a course survey with valid dates" do
+  it "is able to deploy a courses survey with valid dates" do
     survey_name = 'Course Survey Questionnaire 1'
     deploy_course_survey(@next_day, @next_to_next_day, survey_name)
     expect(page).to have_content(survey_name)
   end
 
-  it "is not able to deploy a course survey with invalid dates" do
+  it "is not able to deploy a courses survey with invalid dates" do
     survey_name = 'Course Survey Questionnaire 1'
     # passing current time - 1 day for start date and current time + 2 days for end date
     deploy_course_survey(@previous_day, @next_day, survey_name)
     expect(page).to have_content(survey_name)
   end
 
-  it "is able to add and edit questions to a course survey" do
+  it "is able to add and edit questions to a courses survey" do
     survey_name = 'Course Survey Questionnaire 1'
     deploy_course_survey(@next_day, @next_to_next_day, survey_name)
     survey_questionnaire = Questionnaire.where(name: survey_name).first
@@ -60,11 +60,11 @@ describe "Course Survey questionnaire tests for instructor interface" do
     click_button "Add"
     expect(page).to have_content('Remove')
     fill_in "Edit question content here", with: "Test question 1"
-    click_button "Save course survey questionnaire"
+    click_button "Save courses survey questionnaire"
     expect(page).to have_content('All questions have been successfully saved!')
   end
 
-  it "is able to delete question from a course survey" do
+  it "is able to delete question from a courses survey" do
     survey_name = 'Course Survey Questionnaire 1'
     deploy_course_survey(@next_day, @next_to_next_day, survey_name)
     survey_questionnaire = Questionnaire.where(name: survey_name).first
@@ -74,7 +74,7 @@ describe "Course Survey questionnaire tests for instructor interface" do
     click_button "Add"
     expect(page).to have_content('Remove')
     fill_in "Edit question content here", with: "Test question 1"
-    click_button "Save course survey questionnaire"
+    click_button "Save courses survey questionnaire"
     expect(page).to have_content('All questions have been successfully saved!')
     question = Question.find_by_sql("select * from questions where questionnaire_id = " + survey_questionnaire.id.to_s)
     click_link('Remove')

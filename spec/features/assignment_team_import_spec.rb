@@ -21,8 +21,8 @@ describe "create team by importing file" do
       click_link 'Import Teams'
       expect(page).to have_content('Import AssignmentTeam List')
       file_path = Rails.root + "spec/features/upload_teams.txt" 
-      page.attach_file('import_file', file_path)
-      expect(find_field('import_file').value.length).not_to eq(0)
+      page.attach_file('import_files', file_path)
+      expect(find_field('import_files').value.length).not_to eq(0)
       click_button 'Import'
     end
   end

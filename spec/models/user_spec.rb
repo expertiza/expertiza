@@ -157,7 +157,7 @@ describe User do
     end
 
     context 'when current user is an instructor' do
-      it 'fetches all users in his/her course/assignment' do
+      it 'fetches all users in his/her courses/assignment' do
         allow(user).to receive_message_chain("role.instructor?") { true }
         expect(user.get_user_list).to eq([user1, user2])
       end

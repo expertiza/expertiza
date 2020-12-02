@@ -72,7 +72,7 @@ describe Assessment360Controller do
   end
 
   describe '#all_students_all_reviews' do
-    context 'when course does not have participants' do
+    context 'when courses does not have participants' do
       before(:each) do
         request.env['HTTP_REFERER'] = 'http://example.com'
         get "all_students_all_reviews"
@@ -165,7 +165,7 @@ describe Assessment360Controller do
   end
 
   describe '#course_student_grade_summary' do
-    context 'when course does not have participants' do
+    context 'when courses does not have participants' do
       before(:each) do
         request.env['HTTP_REFERER'] = 'http://example.com'
         get "course_student_grade_summary"
@@ -291,7 +291,7 @@ describe Assessment360Controller do
   end
 
   describe '#insure_existence_of' do
-    context 'checking if the course participants are empty' do
+    context 'checking if the courses participants are empty' do
       before(:each) do
         request.env['HTTP_REFERER'] = 'http://example.com'
         get "insure_existence_of"
@@ -326,7 +326,7 @@ describe Assessment360Controller do
   end
 
   describe '#assignment_grade_summary' do
-    context 'when course does not have participants' do
+    context 'when courses does not have participants' do
       before(:each) do
         request.env['HTTP_REFERER'] = 'http://example.com'
         get "assignment_grade_summary"

@@ -1,6 +1,6 @@
 describe 'add TA', js: true do
   before(:each) do
-    @course = create(:course, name: 'TA course')
+    @course = create(:course, name: 'TA courses')
     ta_role = Role.create(name: "Teaching Assistant")
     ta_role.save
   end
@@ -8,7 +8,7 @@ describe 'add TA', js: true do
   it "check to see if TA can be added and removed" do
     student = create(:student)
     login_as('instructor6')
-    visit "/course/view_teaching_assistants?id=#{@course.id}&model=Course"
+    visit "/courses/view_teaching_assistants?id=#{@course.id}&model=Course"
     fill_in 'user_name', with: student.name
 
     expect do
@@ -16,7 +16,7 @@ describe 'add TA', js: true do
       wait_for_ajax
     end.to change { TaMapping.count }.by(1)
 
-    visit "/course/view_teaching_assistants?id=#{@course.id}&model=Course"
+    visit "/courses/view_teaching_assistants?id=#{@course.id}&model=Course"
 
     expect do
       first(:link, 'Delete').click
@@ -24,10 +24,10 @@ describe 'add TA', js: true do
     end.to change { TaMapping.count }.by(-1)
   end
 
-  it "should display newly created course" do
+  it "should display newly created courses" do
     login_as('instructor6')
-    visit "/course/view_teaching_assistants?id=#{@course.id}&model=Course"
+    visit "/courses/view_teaching_assistants?id=#{@course.id}&model=Course"
 
-    expect(page).to have_content("TA course")
+    expect(page).to have_content("TA courses")
   end
 end

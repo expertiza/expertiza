@@ -51,8 +51,8 @@ describe "Test Author feedback report" do
     expect(page).to have_content('author feedbacks done')
   end
 
-  it "can display Review response rejoined" do
-    expect(page).to have_content('Review response rejoined ')
+  it "can display Review responses rejoined" do
+    expect(page).to have_content('Review responses rejoined ')
   end
 
   it "can display Last rejoined at" do
@@ -88,7 +88,7 @@ describe "Test Teammate Review report" do
   end
 end
 
-RSpec.describe ReviewMappingHelper, :type => :helper do
+RSpec.describe ReviewMappingsHelper, :type => :helper do
   describe "test get_css_style_for_calibration_report" do
     it "should return correct css for calibration report" do
       expect(helper.get_css_style_for_calibration_report(1)).to eq('c4')

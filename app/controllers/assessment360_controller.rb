@@ -7,7 +7,7 @@ class Assessment360Controller < ApplicationController
     current_user_has_ta_privileges?
   end
 
-  # Find the list of all students and assignments pertaining to the course.
+  # Find the list of all students and assignments pertaining to the courses.
   # This data is used to compute the metareview and teammate review scores.
   def all_students_all_reviews
     course = Course.find(params[:course_id])
@@ -18,7 +18,7 @@ class Assessment360Controller < ApplicationController
     @meta_review = {}
     @teammate_review = {}
     @teamed_count = {}
-    # for course
+    # for courses
     # eg. @overall_teammate_review_grades = {assgt_id1: 100, assgt_id2: 178, ...}
     # @overall_teammate_review_count = {assgt_id1: 1, assgt_id2: 2, ...}
     %w[teammate meta].each do |type|
@@ -53,7 +53,7 @@ class Assessment360Controller < ApplicationController
                                  @overall_meta_review_count,
                                  @meta_review_info_per_stu)
       end
-      # calculate average grade for each student on all assignments in this course
+      # calculate average grade for each student on all assignments in this courses
       avg_review_calc_per_student(cp, @teammate_review_info_per_stu, @teammate_review)
       avg_review_calc_per_student(cp, @meta_review_info_per_stu, @meta_review)
     end
@@ -80,7 +80,7 @@ class Assessment360Controller < ApplicationController
     end
   end
 
-  # Find the list of all students and assignments pertaining to the course.
+  # Find the list of all students and assignments pertaining to the courses.
   # This data is used to compute the instructor assigned grade and peer review scores.
   # There are many nuances about how to collect these scores. See our design document for more deails
   # http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2018_E1871_Grade_Summary_By_Student
@@ -132,7 +132,7 @@ class Assessment360Controller < ApplicationController
 
   def insure_existence_of(course_participants,course)
     if course_participants.empty?
-      flash[:error] = "There is no course participant in course #{course.name}"
+      flash[:error] = "There is no courses participant in courses #{course.name}"
       redirect_to(:back)
     end
   end
@@ -163,7 +163,7 @@ class Assessment360Controller < ApplicationController
       # for each assignment
       review_info_per_stu[0] += avg_grades
       review_info_per_stu[1] += 1
-      # for course
+      # for courses
       overall_review_grade_hash[assignment.id] += avg_grades
       overall_review_count_hash[assignment.id] += 1
     end

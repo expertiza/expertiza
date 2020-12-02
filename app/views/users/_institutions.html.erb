@@ -14,4 +14,4 @@ $(document).ready(function(){
 <tr><td><label for="user_institutions"><b>Institution: </b></label></td><td>
     <%= collection_select('user',:institution_id, Institution.all.order(:name), :id, :name, {include_blank: 'Other', selected: 1}, :class => "form-control width-250") %></td></tr>
     <tr><td><label id="name_of_other_institution" style="display: none">Name of other institution: </label></td><td>
-    <%= text_field 'institution', 'name', style: 'display: none', class: "form-control width-250" %></td></tr>
+    <%= text_field 'institutions', 'name', style: 'display: none', class: "form-control width-250" %></td></tr>

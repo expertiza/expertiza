@@ -11,7 +11,7 @@ def deploy_assignment_survey(start_date, end_date, survey_name)
   expect(page).to have_content('Manage content')
   create_assignment_questionnaire survey_name
   survey = Questionnaire.where(name: survey_name)
-  visit '/survey_deployment/new?id=' + \
+  visit '/survey_deployments/new?id=' + \
    Assignment.where(instructor_id: User.where(name: 'instructor6').first.id).first.id.to_s + '&type=AssignmentSurveyDeployment'
   expect(page).to have_content('New Survey Deployment')
   fill_in 'survey_deployment_start_date', with: start_date
@@ -72,7 +72,7 @@ describe "Survey questionnaire tests for instructor interface" do
     question = Question.find_by_sql(\
 "select * from questions where questionnaire_id = " + survey_questionnaire_1.id.to_s + " and (type = 'Criterion' OR type = 'Checkbox')")
 
-    visit '/survey_deployment/generate_statistics/' + survey_deployment.id.to_s
+    visit '/survey_deployments/generate_statistics/' + survey_deployment.id.to_s
     question.each do |q|
       expect(page).to have_content(q.txt)
     end
@@ -86,8 +86,8 @@ describe "Survey questionnaire tests for instructor interface" do
     survey_questionnaire_1 = Questionnaire.where(name: survey_name).first
     survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_1.id).first
 
-    # after adding a response:
-    visit '/survey_deployment/view_responses/' + survey_deployment.id.to_s
+    # after adding a responses:
+    visit '/survey_deployments/view_responses/' + survey_deployment.id.to_s
     expect(page).to have_content(survey_name)
   end
 end

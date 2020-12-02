@@ -4,7 +4,7 @@ class CreateAssignments < ActiveRecord::Migration
 	t.column :name, :string
 	t.column :directory_path, :string
 	t.column :submitter_count, :integer, :default => 0 # number of people who have submitted to this assgt. so far; initialized to 0
-    t.column :course_id, :integer # id of course (if any) that this assignment is associated with
+    t.column :course_id, :integer # id of courses (if any) that this assignment is associated with
 	t.column :instructor_id, :integer # id of instructor who created the assignment
 	t.column :private, :boolean  # whether assignment is visible to other instructors
     t.column :num_reviewers, :integer # number of people who review each submission for this assgt.
@@ -15,7 +15,7 @@ class CreateAssignments < ActiveRecord::Migration
 	t.column :reviews_visible_to_all, :boolean # if false, other reviewers can't see this reviewer's review
 	t.column :team_assignment, :boolean
 	t.column :wiki_assignment, :boolean
-	t.column :require_signup, :boolean # if true, users need to sign up thru Shimmer before submitting; if false, everyone in course may submit; if assgt. not in course, default is that no one may submit
+	t.column :require_signup, :boolean # if true, users need to sign up thru Shimmer before submitting; if false, everyone in courses may submit; if assgt. not in courses, default is that no one may submit
     end
     execute "alter table assignments 
              add constraint fk_assignments_review_questionnaires

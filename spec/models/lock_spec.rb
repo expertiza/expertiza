@@ -24,7 +24,7 @@ describe Lock do
   
   # This just ensures that locks have the correct dependencies
   # If another model is added to be locked someday, it may be useful to add more tests here
-  it 'Should be able to be created for a user and a response and be destroyed when one of those is destroyed' do
+  it 'Should be able to be created for a user and a responses and be destroyed when one of those is destroyed' do
     lock = Lock.create!(user: @smyoder, lockable: @response, timeout_period: 10)
     expect(Lock.find_by(user: @smyoder, lockable: @response)).to eq(lock)
     @smyoder.destroy!
@@ -38,7 +38,7 @@ describe Lock do
   #
   describe '#get_lock' do
     it 'Should create new locks when a user requests them' do
-      # smyoder should have a lock on the response for 10 minutes
+      # smyoder should have a lock on the responses for 10 minutes
       expect(Lock.get_lock(@response, @smyoder, 10)).to eq(@response)
       firstLock = Lock.find_by(user: @smyoder, lockable: @response)
       expect(firstLock).not_to be_nil
@@ -77,12 +77,12 @@ describe Lock do
   end
   
   describe '#lock_between?' do
-    it 'Should correctly report when users do own locks on resources' do
+    it 'Should correctly report when users do own locks on account_requests' do
       expect(Lock.get_lock(@response, @smyoder, 10)).to eq(@response)
       expect(Lock.lock_between?(@response, @smyoder)).to be true
     end
     
-    it 'Should correctly report when users do not own locks on resources' do
+    it 'Should correctly report when users do not own locks on account_requests' do
       expect(Lock.lock_between?(@response, @smyoder)).to be false
       expect(Lock.get_lock(@response, @smyoder1, 10)).to eq(@response)
       expect(Lock.lock_between?(@response, @smyoder)).to be false

@@ -9,18 +9,18 @@
 %>
 <br/>
 <% if params[:model] == 'Assignment' and @parent.course_id and  @parent.course_id > 0 %>
-  <%= link_to 'Copy participants from course', :action => 'inherit', :id => @root_node.node_object_id %>  |
-  <%= link_to 'Copy participants to course', :action => 'bequeath_all', :id => @root_node.node_object_id %><BR/>
+  <%= link_to 'Copy participants from courses', :action => 'inherit', :id => @root_node.node_object_id %>  |
+  <%= link_to 'Copy participants to courses', :action => 'bequeath_all', :id => @root_node.node_object_id %><BR/>
 <% end %>
 <%= link_to 'Import '+@model.to_s.downcase+' participants',
-            :controller=>'import_file',
+            :controller=>'import_files',
             :action=>'start',
             :model => @model+'Participant',
             :title => @model+' Participants',
             :expected_fields => 'username&nbsp;&nbsp;|&nbsp;&nbsp;full name (first [middle] last)&nbsp;&nbsp;|&nbsp;&nbsp;e-mail address&nbsp;&nbsp;|&nbsp;&nbsp;password',
             :id => @parent.id %> |
 <%= link_to 'Export '+@model.to_s.downcase+' participants',
-            :controller=>'export_file',
+            :controller=>'export_files',
             :action=>'start',
             :model=>@model+'Participant',
             :id=>@parent.id %> |

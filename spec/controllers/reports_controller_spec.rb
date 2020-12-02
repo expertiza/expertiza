@@ -139,7 +139,7 @@ describe ReportsController do
           allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: '1', calibrate_to: 1).and_return([review_response_map])
           allow(ReviewResponseMap).to receive_message_chain(:select, :where)
             .with('id').with(reviewed_object_id: '1', calibrate_to: 0).and_return([1, 2])
-          allow(Response).to receive(:where).with(map_id: [1, 2]).and_return([double('response')])
+          allow(Response).to receive(:where).with(map_id: [1, 2]).and_return([double('responses')])
           allow(role).to receive(:hasAllPrivilegesOf).with(any_args).and_return(true)
           params = {
             id: 1,

@@ -96,7 +96,7 @@ module AuthorizationHelper
 
   def response_edit_allowed?(map, user_id)
     assignment = map.reviewer.assignment
-    # if it is a review response map, all the members of reviewee team should be able to view the response (can be done from heat map)
+    # if it is a review responses map, all the members of reviewee team should be able to view the responses (can be done from heat map)
     if map.is_a? ReviewResponseMap
       reviewee_team = AssignmentTeam.find(map.reviewee_id)
       return user_logged_in? &&
@@ -157,7 +157,7 @@ module AuthorizationHelper
   end
 
   # Finds the assignment_instructor for a given assignment. If the assignment is associated with
-  # a course, the instructor for the course is returned. If not, the instructor associated
+  # a courses, the instructor for the courses is returned. If not, the instructor associated
   # with the assignment is return.
   def find_assignment_instructor(assignment)
     if assignment.course

@@ -17,7 +17,7 @@ class Team < ActiveRecord::Base
   end
   alias get_participants participants
 
-  # Get the response review map
+  # Get the responses review map
   def responses
     participants.flat_map(&:responses)
   end
@@ -51,7 +51,7 @@ class Team < ActiveRecord::Base
 
   # Check if the current team is full?
   def full?
-    return false if self.parent_id.nil? # course team, does not max_team_size
+    return false if self.parent_id.nil? # courses team, does not max_team_size
     max_team_members = Assignment.find(self.parent_id).max_team_size
     curr_team_size = Team.size(self.id)
     (curr_team_size >= max_team_members)
@@ -248,7 +248,7 @@ class Team < ActiveRecord::Base
 
   # Create the team with corresponding tree node
   def self.create_team_and_node(id)
-    parent = parent_model id # current_task will be either a course object or an assignment object. # current_task will be either a course object or an assignment object.
+    parent = parent_model id # current_task will be either a courses object or an assignment object. # current_task will be either a courses object or an assignment object.
     team_name = Team.generate_team_name(parent.name)
     team = self.create(name: team_name, parent_id: id)
     # new teamnode will have current_task.id as parent_id and team_id as node_object_id.

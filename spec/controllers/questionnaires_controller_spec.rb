@@ -45,7 +45,7 @@ describe QuestionnairesController do
         end
       end
 
-      context 'when current user is the ta of the course which current questionnaires belongs to' do
+      context 'when current user is the ta of the courses which current questionnaires belongs to' do
         it 'allows certain action' do
           teaching_assistant = create(:teaching_assistant)
           stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
@@ -55,11 +55,11 @@ describe QuestionnairesController do
         end
       end
 
-      context 'when current user is a ta but not the ta of the course which current questionnaires belongs to' do
+      context 'when current user is a ta but not the ta of the courses which current questionnaires belongs to' do
         it 'does not allow certain action' do
           # The questionnaire is associated with the first instructor
-          # A factory created course will associate itself with the first instructor
-          # So here we want the TA on a course that explicitly has some other instructor
+          # A factory created courses will associate itself with the first instructor
+          # So here we want the TA on a courses that explicitly has some other instructor
           # Otherwise the TA will be indirectly associated with the questionnaire
           teaching_assistant = create(:teaching_assistant)
           stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
@@ -71,14 +71,14 @@ describe QuestionnairesController do
         end
       end
 
-      context 'when current user is the instructor of the course which current questionnaires belongs to' do
+      context 'when current user is the instructor of the courses which current questionnaires belongs to' do
         it 'allows certain action' do
           allow(Course).to receive(:find).with(1).and_return(double('Course', instructor_id: 6))
           check_access(instructor).to be true
         end
       end
 
-      context 'when current user is an instructor but not the instructor of current course or current questionnaires' do
+      context 'when current user is an instructor but not the instructor of current courses or current questionnaires' do
         it 'does not allow certain action' do
           allow(Course).to receive(:find).with(1).and_return(double('Course', instructor_id: 66))
           check_access(instructor2).to be false

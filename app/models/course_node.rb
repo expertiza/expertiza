@@ -23,7 +23,7 @@ class CourseNode < Node
     end
   end
 
-  # get the query conditions for a public course
+  # get the query conditions for a public courses
   def self.get_course_query_conditions(show = nil, user_id = nil)
     current_user = User.find_by(id: user_id)
     conditions = if show and current_user
@@ -65,7 +65,7 @@ class CourseNode < Node
   end
 
   # Gets any children associated with this object
-  # the get_children method will return assignments belonging to a course, but the method name is necessary due to polymorphism
+  # the get_children method will return assignments belonging to a courses, but the method name is necessary due to polymorphism
   def get_children(sortvar = nil, sortorder = nil, user_id = nil, show = nil, _parent_id = nil, search = nil)
     AssignmentNode.get(sortvar, sortorder, user_id, show, self.node_object_id, search)
   end

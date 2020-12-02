@@ -60,7 +60,7 @@ class InitializeCustom < ActiveRecord::Migration
   execute "INSERT INTO `site_controllers` VALUES (10,'users',1,1)"
   execute "INSERT INTO `site_controllers` VALUES (11,'roles_permissions',1,1)"
   execute "INSERT INTO `site_controllers` VALUES (12,'admin',1,0)"
-  execute "INSERT INTO `site_controllers` VALUES (13,'course',7,0)"
+  execute "INSERT INTO `site_controllers` VALUES (13,'courses',7,0)"
   execute "INSERT INTO `site_controllers` VALUES (14,'assignment',7,0)"
   execute "INSERT INTO `site_controllers` VALUES (15,'questionnaire',7,0)"
   execute "INSERT INTO `site_controllers` VALUES (16,'submission',8,0)"
@@ -69,11 +69,11 @@ class InitializeCustom < ActiveRecord::Migration
   execute "INSERT INTO `site_controllers` VALUES (19,'reviewing',7,0)"
   execute "INSERT INTO `site_controllers` VALUES (20,'participants',7,0)"
   execute "INSERT INTO `site_controllers` VALUES (21,'reports',8,0)"
-  execute "INSERT INTO `site_controllers` VALUES (22,'institution',6,0)"
+  execute "INSERT INTO `site_controllers` VALUES (22,'institutions',6,0)"
   execute "INSERT INTO `site_controllers` VALUES (23,'student_assignment',8,0)"
   execute "INSERT INTO `site_controllers` VALUES (24,'review_of_review',8,0)"
   execute "INSERT INTO `site_controllers` VALUES (25,'review_feedback',8,0)"
-  execute "INSERT INTO `site_controllers` VALUES (26,'profile',8,0)"
+  execute "INSERT INTO `site_controllers` VALUES (26,'profiles',8,0)"
   execute "INSERT INTO `site_controllers` VALUES (27,'survey_response',4,0)"
   execute "INSERT INTO `site_controllers` VALUES (28,'team',7,0)"
   execute "INSERT INTO `site_controllers` VALUES (29,'teams_users',7,0)"
@@ -151,7 +151,7 @@ class InitializeCustom < ActiveRecord::Migration
   add_index "menu_items", ["content_page_id"], :name => "fk_menu_item_content_page_id"
   add_index "menu_items", ["parent_id"], :name => "fk_menu_item_parent_id"
 
-  execute "INSERT INTO `menu_items` VALUES (1,NULL,'home','Home',1,NULL,1),(2,NULL,'contact_us','Contact Us',9,NULL,6),(3,NULL,'admin','Administration',2,NULL,9),(5,9,'setup/permissions','Permissions',3,4,NULL),(6,9,'setup/roles','Roles',2,3,NULL),(7,9,'setup/pages','Content Pages',5,8,NULL),(8,9,'setup/controllers','Controllers / Actions',4,9,NULL),(9,3,'setup','Setup',1,NULL,8),(11,9,'setup/menus','Menu Editor',6,11,NULL),(12,9,'setup/system_settings','System Settings',7,12,NULL),(13,9,'setup/users','Users',1,15,NULL),(14,2,'credits','Credits &amp; Licence',1,NULL,10),(15,3,'List Instructors','Instructors',3,16,NULL),(16,3,'List Administrators','Administrators',4,17,NULL),(17,3,'List Super-Administrators','Super-Administrators',5,18,NULL),(18,NULL,'Courses','Courses',3,19,NULL),(19,NULL,'assignments','Assignment Creation',4,30,NULL),(21,NULL,'participants','Participants',5,31,NULL),(22,3,'List Institutions','Institutions',2,32,NULL),(24,21,'List courses','Add participants to course',2,34,NULL),(25,21,'List assignments','Add participants to assignment',1,35,NULL),(26,NULL,'student_assignment','Assignments',7,33,NULL),(27,NULL,'profile','Profile',8,36,NULL),(28,21,'Create team','Create team',3,40,NULL),(29,NULL,'questionnaires','Questionnaires',6,21,NULL);"
+  execute "INSERT INTO `menu_items` VALUES (1,NULL,'home','Home',1,NULL,1),(2,NULL,'contact_us','Contact Us',9,NULL,6),(3,NULL,'admin','Administration',2,NULL,9),(5,9,'setup/permissions','Permissions',3,4,NULL),(6,9,'setup/roles','Roles',2,3,NULL),(7,9,'setup/pages','Content Pages',5,8,NULL),(8,9,'setup/controllers','Controllers / Actions',4,9,NULL),(9,3,'setup','Setup',1,NULL,8),(11,9,'setup/menus','Menu Editor',6,11,NULL),(12,9,'setup/system_settings','System Settings',7,12,NULL),(13,9,'setup/users','Users',1,15,NULL),(14,2,'credits','Credits &amp; Licence',1,NULL,10),(15,3,'List Instructors','Instructors',3,16,NULL),(16,3,'List Administrators','Administrators',4,17,NULL),(17,3,'List Super-Administrators','Super-Administrators',5,18,NULL),(18,NULL,'Courses','Courses',3,19,NULL),(19,NULL,'assignments','Assignment Creation',4,30,NULL),(21,NULL,'participants','Participants',5,31,NULL),(22,3,'List Institutions','Institutions',2,32,NULL),(24,21,'List courses','Add participants to courses',2,34,NULL),(25,21,'List assignments','Add participants to assignment',1,35,NULL),(26,NULL,'student_assignment','Assignments',7,33,NULL),(27,NULL,'profiles','Profile',8,36,NULL),(28,21,'Create team','Create team',3,40,NULL),(29,NULL,'questionnaires','Questionnaires',6,21,NULL);"
 
     create_table "roles", :force => true do |t|
       t.column "name", :string, :default => "", :null => false

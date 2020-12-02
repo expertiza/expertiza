@@ -189,7 +189,7 @@ describe AssignmentParticipant do
   end
 
   describe '#copy' do
-    it 'copies assignment participants to a certain course' do
+    it 'copies assignment participants to a certain courses' do
       expect { participant.copy(123) }.to change { CourseParticipant.count }.from(0).to(1)
       expect(CourseParticipant.first.user_id).to eq(2)
       expect(CourseParticipant.first.parent_id).to eq(123)
@@ -291,14 +291,14 @@ describe AssignmentParticipant do
         end
         it 'create the user and number of mails sent should be 1' do
           ActionMailer::Base.deliveries.clear
-          allow(ImportFileHelper).to receive(:define_attributes).with(row).and_return(attributes)
-          allow(ImportFileHelper).to receive(:create_new_user) do
+          allow(ImportFilesHelper).to receive(:define_attributes).with(row).and_return(attributes)
+          allow(ImportFilesHelper).to receive(:create_new_user) do
             test_user = User.new(name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com')
             test_user.id = 123
             test_user.save!
             test_user
           end
-          #allow(ImportFileHelper).to receive(:create_new_user).with(attributes, {}).and_return()
+          #allow(ImportFilesHelper).to receive(:create_new_user).with(attributes, {}).and_return()
           allow(Assignment).to receive(:find).with(1).and_return(assignment)
           allow(User).to receive(:exists?).with(name: 'no one').and_return(false)
           allow(participant).to receive(:set_handle).and_return('handle')
@@ -318,8 +318,8 @@ describe AssignmentParticipant do
            email_on_review: 'name@email.com', email_on_review_of_review: 'name@email.com'}
         end
         before(:each) do
-          allow(ImportFileHelper).to receive(:define_attributes).with(row).and_return(attributes)
-          allow(ImportFileHelper).to receive(:create_new_user).with(attributes, {}).and_return(double('User', id: 1))
+          allow(ImportFilesHelper).to receive(:define_attributes).with(row).and_return(attributes)
+          allow(ImportFilesHelper).to receive(:create_new_user).with(attributes, {}).and_return(double('User', id: 1))
         end
 
         context 'when certain assignment cannot be found' do

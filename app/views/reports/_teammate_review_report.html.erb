@@ -28,7 +28,7 @@
           <% @reviewer_name = @user.fullname(session[:ip]) %>
           <!--Reviewer-->
           <td bgcolor=<%= @bgcolor %> rowspan= <%= @rspan %>>
-            <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id => @id%>
+            <%= link_to @reviewer_name, :controller => 'popups', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id => @id%>
           </td>
           <!--# teammate reviews done-->
           <td bgcolor=<%= @bgcolor %>  align = "left" rowspan= <%= @rspan %>>

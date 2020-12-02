@@ -13,7 +13,7 @@ def deploy_global_survey(start_date, end_date, survey_name)
   survey = Questionnaire.where(name: survey_name)
   instructor = User.where(name: 'instructor6').first
   course = Course.where(instructor_id: instructor.id).first
-  visit '/survey_deployment/new?id=' + course.id.to_s + '&type=CourseSurveyDeployment'
+  visit '/survey_deployments/new?id=' + course.id.to_s + '&type=CourseSurveyDeployment'
   expect(page).to have_content('New Survey Deployment')
   fill_in 'survey_deployment_start_date', with: start_date
   fill_in 'survey_deployment_end_date', with: end_date
@@ -50,7 +50,7 @@ describe "Global Survey questionnaire tests for instructor interface" do
     expect(Questionnaire.where(name: survey_name)).to exist
   end
 
-  it "is able to add and edit questions to a course survey" do
+  it "is able to add and edit questions to a courses survey" do
     survey_name = 'Global Survey Questionnaire 1'
     deploy_global_survey(@next_day, @next_to_next_day, survey_name)
     survey_questionnaire = Questionnaire.where(name: survey_name).first
@@ -62,7 +62,7 @@ describe "Global Survey questionnaire tests for instructor interface" do
     click_button "Add"
     expect(page).to have_content('Remove')
     fill_in "Edit question content here", with: "Test question 1"
-    click_button "Save course survey questionnaire"
+    click_button "Save courses survey questionnaire"
     expect(page).to have_content('All questions have been successfully saved!')
   end
 
@@ -76,7 +76,7 @@ describe "Global Survey questionnaire tests for instructor interface" do
     click_button "Add"
     expect(page).to have_content('Remove')
     fill_in "Edit question content here", with: "Test question 1"
-    click_button "Save course survey questionnaire"
+    click_button "Save courses survey questionnaire"
     expect(page).to have_content('All questions have been successfully saved!')
     question = Question.find_by_sql("select * from questions where questionnaire_id = " + survey_questionnaire.id.to_s)
     click_link('Remove')

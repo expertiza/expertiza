@@ -19,7 +19,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :advertise_for_partner, only: %i[new create edit update] do
+  resources :advertise_for_partners, only: %i[new create edit update] do
     collection do
       get :remove
       post ':id', action: :update
@@ -32,7 +32,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :answer
+  resources :answers
 
   resources :answer_tags, only: [:index] do
     collection do
@@ -88,7 +88,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :course, only: %i[new create edit update] do
+  resources :courses, only: %i[new create edit update] do
     collection do
       get :toggle_access
       get :copy
@@ -107,7 +107,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :export_file, only: [] do
+  resources :export_files, only: [] do
     collection do
       get :start
       get :export
@@ -119,7 +119,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  put '/tags.csv', to: 'export_file#export_tags'
+  put '/tags.csv', to: 'export_files#export_tags'
 
   resources :export_tags, only: [] do
     collection do
@@ -146,7 +146,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :import_file, only: [] do
+  resources :import_files, only: [] do
     collection do
       get :start
       get :show
@@ -156,7 +156,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-resources :institution, except: [:destroy] do
+resources :institutions, except: [:destroy] do
     collection do
       get :list
       post ':id', action: :update
@@ -190,7 +190,7 @@ resources :institution, except: [:destroy] do
     end
   end
   
-  resources :lock do
+  resources :LocksController do
     collection do
       post :release_lock
     end
@@ -226,7 +226,7 @@ resources :institution, except: [:destroy] do
     end
   end
 
-  resources :profile, only: %i[edit update]
+  resources :profiles, only: %i[edit update]
 
   resources :publishing, only: [] do
     collection do
@@ -253,7 +253,7 @@ resources :institution, except: [:destroy] do
   end
 =begin
 #Nitin - Created new routes for quiz_questionnaire
-  resources :quiz_questionnaire, only: %i[new create edit update] do
+  account_requests :quiz_questionnaire, only: %i[new create edit update] do
     collection do
       get :new_quiz
       post :create_quiz_questionnaire
@@ -295,7 +295,7 @@ resources :institution, except: [:destroy] do
     end
   end
 
-  resources :response, only: %i[new create edit update] do
+  resources :responses, only: %i[new create edit update] do
     collection do
       get :new_feedback
       get :view
@@ -308,7 +308,7 @@ resources :institution, except: [:destroy] do
     end
   end
 
-  resources :review_mapping, only: [] do
+  resources :review_mappings, only: [] do
     collection do
       post :add_metareviewer
       get :add_reviewer
@@ -351,7 +351,7 @@ resources :institution, except: [:destroy] do
 
   resources :sample_reviews
 
-  resources :sign_up_sheet, except: %i[index show] do
+  resources :signup_sheets, except: %i[index show] do
     collection do
       get :signup
       get :delete_signup
@@ -390,17 +390,17 @@ resources :institution, except: [:destroy] do
     end
   end
 
-  resources :student_review, only: [] do
+  resources :student_reviews, only: [] do
     collection do
       get :list
     end
   end
 
-  resources :student_task, only: [] do
+  resources :student_tasks, only: [] do
     collection do
       get :list
       get :view
-      get '/*other', to: redirect('/student_task/list')
+      get '/*other', to: redirect('/student_tasks/list')
     end
   end
 
@@ -429,7 +429,7 @@ resources :institution, except: [:destroy] do
 
   resources :submission_records, only: [:index]
 
-  resources :suggestion, only: %i[show new create] do
+  resources :suggestions, only: %i[show new create] do
     collection do
       get :list
       post :submit
@@ -438,7 +438,7 @@ resources :institution, except: [:destroy] do
     end
   end
 
-  resources :survey_deployment, only: %i[new create] do
+  resources :survey_deployments, only: %i[new create] do
     collection do
       get :list
       get :reminder_thread
@@ -492,7 +492,7 @@ resources :institution, except: [:destroy] do
     end
   end
 
-  resources :account_request, constraints: {id: /\d+/} do
+  resources :account_requests, constraints: {id: /\d+/} do
     collection do
       get :list
       post :list
@@ -525,12 +525,12 @@ resources :institution, except: [:destroy] do
   post 'impersonate/impersonate', to: 'impersonate#impersonate'
   post '/plagiarism_checker_results/:id' => 'plagiarism_checker_comparison#save_results'
   get 'instructions/home'
-  get 'response/', to: 'response#saving'
+  get 'responses/', to: 'responses#saving'
   get ':controller/service.wsdl', action: 'wsdl'
   get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
   get ':controller(/:action(/:id))(.:format)'
   match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
-  post '/response_toggle_permission/:id' => 'response#toggle_permission'
+  post '/response_toggle_permission/:id' => 'responses#toggle_permission'
   post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'
   post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'
 

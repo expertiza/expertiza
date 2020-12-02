@@ -1,5 +1,5 @@
 function checkForFile() {
-    var file_value = $('#import_file').val();
+    var file_value = $('#import_files').val();
     $(document).ready(function() {
         if (file_value.length <= 0) {
             alert('Please select a file before clicking Import.');

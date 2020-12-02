@@ -8,11 +8,11 @@ describe TreeDisplayController do
       expect(response).to have_http_status(200)
     end
 
-    it "should redirect to student_task#list if current user is a student" do
+    it "should redirect to student_tasks#list if current user is a student" do
       user = build(:student)
       stub_current_user(user, user.role.name, user.role)
       get "list"
-      expect(response).to redirect_to('/student_task/list')
+      expect(response).to redirect_to('/student_tasks/list')
     end
 
     it "should not redirect if current user is a TA" do
@@ -70,15 +70,15 @@ describe TreeDisplayController do
       # Course will be associated with the first instructor record we have
       # For robustness, associate explicitly with our instructor
       @course = create(:course, instructor_id: @instructor.id)
-      # Course node will be associated with the first course record we have
-      # For robustness, associate explicitly with our course
+      # Course node will be associated with the first courses record we have
+      # For robustness, associate explicitly with our courses
       create(:course_node, course: @course)
       # Assignment node will be associated with the first assignment record we have
       # (or will cause a new assignment to be built)
       create(:assignment_node)
     end
 
-    it "returns a list of course objects(private) as json" do
+    it "returns a list of courses objects(private) as json" do
       params = FolderNode.all
       @course.private = true
       @course.save
@@ -94,7 +94,7 @@ describe TreeDisplayController do
       expect(response.body).to eq "{\"Courses\":[]}"
     end
 
-    it "returns a list of course objects(public) as json" do
+    it "returns a list of courses objects(public) as json" do
       params = FolderNode.all
       @course.private = false
       @course.save
@@ -129,9 +129,9 @@ describe TreeDisplayController do
       @foldernode.node_object_id = 2
       @foldernode.save!
 
-      # create a new course
+      # create a new courses
       @course1 = create(:course)
-      # make sure the course is not private
+      # make sure the courses is not private
       @course1.private = false
       @course1.save
 
@@ -151,7 +151,7 @@ describe TreeDisplayController do
       student = User.new(user_student.attributes)
       student.save!
 
-      # create ta-course mapping for the student
+      # create ta-courses mapping for the student
       ta_mapping = TaMapping.new
       ta_mapping.ta_id = User.where(role_id: student.role_id).first.id
       ta_mapping.course_id = @course1.id
@@ -165,8 +165,8 @@ describe TreeDisplayController do
       expect(output.length).to eq 1
     end
 
-    it "returns a list of course objects ta is supposed to ta in as json" do
-      # create ta-course mapping
+    it "returns a list of courses objects ta is supposed to ta in as json" do
+      # create ta-courses mapping
       ta_mapping = TaMapping.new
       ta_mapping.ta_id = User.where(role_id: @ta.role_id).first.id
       ta_mapping.course_id = @course1.id
@@ -178,15 +178,15 @@ describe TreeDisplayController do
       params = FolderNode.all
       get :get_folder_contents, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @ta
 
-      # service should return the course as per the ta-course mapping
+      # service should return the courses as per the ta-courses mapping
       output = JSON.parse(response.body)['Courses']
       expect(output.length).to eq 1
       expect(output[0]['name']).to eq @course1.name
     end
 
-    it "returns an empty list when there are no mapping between ta and course" do
+    it "returns an empty list when there are no mapping between ta and courses" do
       params = FolderNode.all
-      # do not create any ta-course mapping
+      # do not create any ta-courses mapping
 
       # make sure it's the current user
       stub_current_user(@ta, @role.name, @role)
@@ -198,16 +198,16 @@ describe TreeDisplayController do
       expect(output.length).to eq 1
     end
 
-    it "returns only the course he is ta of when ta is a student of another course at the same time" do
+    it "returns only the courses he is ta of when ta is a student of another courses at the same time" do
       params = FolderNode.all
 
-      # create a new course
+      # create a new courses
       @course2 = create(:course)
-      # make sure the course is not private
+      # make sure the courses is not private
       @course2.private = false
       @course2.save
 
-      # make ta student of that course
+      # make ta student of that courses
       # create assignment against course_2
       @assignment1 = create(:assignment, name: 'test1')
       @assignment1.course_id = @course2.id
@@ -219,7 +219,7 @@ describe TreeDisplayController do
       @participant1.user_id = @ta.id
       @participant1.save
 
-      # create a ta mapping for the other existing course (other than in which he is ta of)
+      # create a ta mapping for the other existing courses (other than in which he is ta of)
       ta_mapping = TaMapping.new
       ta_mapping.ta_id = User.where(role_id: @ta.role_id).first.id
       ta_mapping.course_id = @course1.id
@@ -231,16 +231,16 @@ describe TreeDisplayController do
       get :get_folder_contents, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @ta
 
       output = JSON.parse(response.body)['Courses']
-      # service should return 1 course and should be course 1 not course 2
+      # service should return 1 courses and should be courses 1 not courses 2
       expect(output.length).to eq 1
       expect(output[0]['name']).to eq @course1.name
       expect(output[0]['name']).not_to eq @course2.name
     end
 
-    it "returns only the course he is ta of when ta is a student of same course at the same time" do
+    it "returns only the courses he is ta of when ta is a student of same courses at the same time" do
       params = FolderNode.all
 
-      # make ta student of the existing course he is ta of
+      # make ta student of the existing courses he is ta of
       # create assignment against course_1
       @assignment1 = create(:assignment, name: 'test2')
       @assignment1.course_id = @course1.id
@@ -252,7 +252,7 @@ describe TreeDisplayController do
       @participant1.user_id = @ta.id
       @participant1.save
 
-      # create a ta mapping for the same course he is ta of
+      # create a ta mapping for the same courses he is ta of
       ta_mapping = TaMapping.new
       ta_mapping.ta_id = User.where(role_id: @ta.role_id).first.id
       ta_mapping.course_id = @course1.id
@@ -263,13 +263,13 @@ describe TreeDisplayController do
 
       get :get_folder_contents, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @ta
 
-      # service should return 1 course
+      # service should return 1 courses
       output = JSON.parse(response.body)['Courses']
       expect(output.length).to eq 1
       expect(output[0]['name']).to eq @course1.name
     end
 
-    it "returns only the assignments which belongs to the course he is ta of" do
+    it "returns only the assignments which belongs to the courses he is ta of" do
       params = FolderNode.all
 
       # create assignment against course_1
@@ -282,7 +282,7 @@ describe TreeDisplayController do
       @assignment_node2.node_object_id = @assignment2.id
       @assignment_node2.save!
 
-      # create ta-course mapping
+      # create ta-courses mapping
       ta_mapping = TaMapping.new
       ta_mapping.ta_id = User.where(role_id: @ta.role_id).first.id
       ta_mapping.course_id = Course.find(@course1.id).id
@@ -304,13 +304,13 @@ describe TreeDisplayController do
       expect(output.length).to eq 2
     end
 
-    it "returns empty assignments list if none of the assignments belong to course he is ta of" do
+    it "returns empty assignments list if none of the assignments belong to courses he is ta of" do
       params = FolderNode.all
 
       # delete the assignment node
       Node.delete(@assignment_node1.id)
 
-      # create ta-course mapping
+      # create ta-courses mapping
       ta_mapping = TaMapping.new
       ta_mapping.ta_id = User.where(role_id: @ta.role_id).first.id
       ta_mapping.course_id = Course.find(@course1.id).id

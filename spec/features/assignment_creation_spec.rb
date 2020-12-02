@@ -521,7 +521,7 @@ describe "assignment function" do
     it "hides topics tab when has topics is un-checked", js: true do
       click_link 'General'
       uncheck("assignment_has_topics")
-      # The below line is used to accept the js confirmation popup
+      # The below line is used to accept the js confirmation popups
       page.driver.browser.switch_to.alert.accept
       # Wait for topics to be removed and page to re-load
       sleep 3
@@ -716,7 +716,7 @@ describe "assignment function" do
     end
   end
 
-  it "check to find if the assignment can be added to a course", js: true do
+  it "check to find if the assignment can be added to a courses", js: true do
     create(:assignment, course: nil, name: 'Test Assignment')
     create(:course, name: 'Test Course')
 

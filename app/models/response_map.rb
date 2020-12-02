@@ -18,7 +18,7 @@ class ResponseMap < ActiveRecord::Base
         next if map.response.empty?
         @all_resp = Response.where(map_id: map.map_id).last
         if map.type.eql?('ReviewResponseMap')
-          # If its ReviewResponseMap then only consider those response which are submitted.
+          # If its ReviewResponseMap then only consider those responses which are submitted.
           @array_sort << @all_resp if @all_resp.is_submitted
         else
           @array_sort << @all_resp
@@ -45,7 +45,7 @@ class ResponseMap < ActiveRecord::Base
     end
   end
 
-  # return latest versions of the response given by reviewer
+  # return latest versions of the responses given by reviewer
   def self.get_reviewer_assessments_for(team, reviewer)
     # get_reviewer may return an AssignmentParticipant or an AssignmentTeam
     map = where(reviewee_id: team.id, reviewer_id: reviewer.get_reviewer.id)
@@ -75,7 +75,7 @@ class ResponseMap < ActiveRecord::Base
     MetareviewResponseMap.where(reviewee_id: self.reviewer.id, reviewer_id: metareviewer.id, reviewed_object_id: self.id).count > 0
   end
 
-  # Assigns a metareviewer to this review (response)
+  # Assigns a metareviewer to this review (responses)
   # @param[in] metareviewer AssignmentParticipant object
   def assign_metareviewer(metareviewer)
     MetareviewResponseMap.create(reviewed_object_id: self.id,

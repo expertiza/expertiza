@@ -39,7 +39,7 @@ class ReputationWebServiceController < ApplicationController
   #   "and A.answer is not null "+
   #   "and Q.type ='Criterion' "+
   #   #If one assignment is varying rubric by round (724, 733, 736) or 2-round peer review with (735),
-  #   #the round field in response records corresponding to ReviewResponseMap will be 1 or 2, will not be null.
+  #   #the round field in responses records corresponding to ReviewResponseMap will be 1 or 2, will not be null.
   #   "and R.round = 2 "
   #   query+="and SU_team.is_waitlisted = 0 " if has_topic == true
   #   query+="group by RM.id "+
@@ -204,8 +204,8 @@ class ReputationWebServiceController < ApplicationController
     # AES symmetric algorithm decrypts data
     aes_encrypted_response_data = response.body["data"]
     response.body = aes_decrypt(aes_encrypted_response_data, key, vi)
-    # puts "Response #{response.code} #{response.message}:
-    # {response.body}"
+    # puts "Response #{responses.code} #{responses.message}:
+    # {responses.body}"
     # puts
     @@response = response
     @@response_body = response.body

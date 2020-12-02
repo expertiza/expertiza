@@ -13,10 +13,10 @@ describe 'new user request' do
       # click 'REQUEST ACCOUNT' button on root path, redirect to users#request_new page
       visit '/'
       click_link 'Request account'
-      expect(page).to have_current_path('/account_request/request_new?role=Instructor')
+      expect(page).to have_current_path('/account_requests/request_new?role=Instructor')
       fill_in 'user_name', with: 'requester'
       fill_in 'user_fullname', with: 'requester, requester'
-      # a new user is able to add a new institution
+      # a new user is able to add a new institutions
       select 'Other', from: 'user_institution_id'
       expect(page).to have_field("institution_name")
       fill_in 'institution_name', with: 'Xavier Institute for Mutant Education and Outreach'
@@ -50,7 +50,7 @@ describe 'new user request' do
     it 'allows super-admin and admin to communicate with requesters by clicking email addresses' do
       visit '/'
       login_as 'super_administrator2'
-      visit '/account_request/list_pending_requested'
+      visit '/account_requests/list_pending_requested'
       expect(page).to have_link('requester1@test.com')
     end
 
@@ -58,7 +58,7 @@ describe 'new user request' do
       it 'displays \'Rejected\' as status' do
         visit '/'
         login_as 'super_administrator2'
-        visit '/account_request/list_pending_requested'
+        visit '/account_requests/list_pending_requested'
         expect(page).to have_content('requester1')
         choose(name: 'status', option: 'Rejected')
         click_on('Submit')
@@ -73,7 +73,7 @@ describe 'new user request' do
       it 'displays \'Accept\' as status and sends an email with randomly-generated password to the new user' do
         visit '/'
         login_as 'super_administrator2'
-        visit '/account_request/list_pending_requested'
+        visit '/account_requests/list_pending_requested'
         ActionMailer::Base.deliveries.clear
         expect(page).to have_content('requester1')
         expect(AccountRequest.first.status).to eq('Under Review')
@@ -93,7 +93,7 @@ describe 'new user request' do
           fill_in 'login_name', with: 'approved_requster1'
           fill_in 'login_password', with: 'password'
           click_button 'Sign in'
-          expect(page).to have_current_path("/student_task/list")
+          expect(page).to have_current_path("/student_tasks/list")
         end
       end
     end

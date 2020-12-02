@@ -37,7 +37,7 @@ describe AssignmentsController do
         end
       end
 
-      context 'when current user is the ta of the course which current assignment belongs to' do
+      context 'when current user is the ta of the courses which current assignment belongs to' do
         it 'allows certain action' do
           stub_current_user(ta, ta.role.name, ta.role)
           allow(TaMapping).to receive(:exists?).with(ta_id: 8, course_id: 1).and_return(true)
@@ -45,7 +45,7 @@ describe AssignmentsController do
         end
       end
 
-      context 'when current user is a ta but not the ta of the course which current assignment belongs to' do
+      context 'when current user is a ta but not the ta of the courses which current assignment belongs to' do
         it 'does not allow certain action' do
           stub_current_user(ta, ta.role.name, ta.role)
           allow(TaMapping).to receive(:exists?).with(ta_id: 8, course_id: 1).and_return(false)
@@ -53,7 +53,7 @@ describe AssignmentsController do
         end
       end
 
-      context 'when current user is the instructor of the course which current assignment belongs to' do
+      context 'when current user is the instructor of the courses which current assignment belongs to' do
         it 'allows certain action' do
           stub_current_user(instructor2, instructor2.role.name, instructor2.role)
           allow(Course).to receive(:find).with(1).and_return(double('Course', instructor_id: 66))
@@ -61,7 +61,7 @@ describe AssignmentsController do
         end
       end
 
-      context 'when current user is an instructor but not the instructor of current course or current assignment' do
+      context 'when current user is an instructor but not the instructor of current courses or current assignment' do
         it 'does not allow certain action' do
           stub_current_user(instructor2, instructor2.role.name, instructor2.role)
           allow(Course).to receive(:find).with(1).and_return(double('Course', instructor_id: 666))
@@ -366,7 +366,7 @@ describe AssignmentsController do
   end
 
   describe '#remove_assignment_from_course' do
-    context 'when assignment is removed from course successfully' do
+    context 'when assignment is removed from courses successfully' do
       it 'removes assignment and redirects to tree_display#list page' do
         assignment_form = AssignmentForm.new
         allow(AssignmentForm).to receive(:new).and_return(assignment_form)

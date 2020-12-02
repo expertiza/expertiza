@@ -1,7 +1,7 @@
 class MenuUpdateImportFile < ActiveRecord::Migration
   def self.up
      permission1 = Permission.find_by_name('administer assignments')
-     site_controller = SiteController.find_or_create_by(name: 'import_file')
+     site_controller = SiteController.find_or_create_by(name: 'import_files')
      site_controller.permission_id = permission1.id
      site_controller.builtin = 0
      site_controller.save
@@ -9,7 +9,7 @@ class MenuUpdateImportFile < ActiveRecord::Migration
   end
 
   def self.down
-    site_controller = SiteController.find_by_name('import_file')
+    site_controller = SiteController.find_by_name('import_files')
     if site_controller != nil
       actions = ControllerAction.find(:all, :conditions => ['site_controller_id = ?',site_controller.id])
       actions.each {|action| 

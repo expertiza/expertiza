@@ -3,10 +3,10 @@ module GradesHelper
   def get_accordion_title(last_topic, new_topic)
     if last_topic.eql? nil
       # this is the first accordion
-      render partial: "response/accordion", locals: {title: new_topic, is_first: true}
+      render partial: "responses/accordion", locals: {title: new_topic, is_first: true}
     elsif !new_topic.eql? last_topic
       # render new accordion
-      render partial: "response/accordion", locals: {title: new_topic, is_first: false}
+      render partial: "responses/accordion", locals: {title: new_topic, is_first: false}
     end
   end
 

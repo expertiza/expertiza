@@ -235,11 +235,11 @@ development:
         controller_action_id: 33
         id: 26
         label: Assignments
-        name: student_task
+        name: student_tasks
         parent:
         parent_id:
         site_controller_id: 23
-        url: "/student_task/list"
+        url: "/student_tasks/list"
       30: &3 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 42
@@ -249,17 +249,17 @@ development:
         parent:
         parent_id:
         site_controller_id: 31
-        url: "/response/pending_surveys"
+        url: "/responses/pending_surveys"
       27: &4 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 36
         id: 27
         label: Profile
-        name: profile
+        name: profiles
         parent:
         parent_id:
         site_controller_id: 26
-        url: "/profile/edit"
+        url: "/profiles/edit"
       2: &5 !ruby/object:Menu::Node
         content_page_id: 6
         controller_action_id:
@@ -509,23 +509,23 @@ test:
       5: &2 !ruby/object:Menu::Node
         parent:
         parent_id:
-        name: student_task
+        name: student_tasks
         id: 5
         label: Assignments
         site_controller_id: 20
         controller_action_id: 33
         content_page_id:
-        url: "/student_task/list"
+        url: "/student_tasks/list"
       6: &3 !ruby/object:Menu::Node
         parent:
         parent_id:
-        name: profile
+        name: profiles
         id: 6
         label: Profile
         site_controller_id: 21
         controller_action_id: 34
         content_page_id:
-        url: "/profile/edit"
+        url: "/profiles/edit"
       7: &4 !ruby/object:Menu::Node
         parent:
         parent_id:
@@ -798,11 +798,11 @@ production:
         controller_action_id: 33
         id: 26
         label: Assignments
-        name: student_task
+        name: student_tasks
         parent:
         parent_id:
         site_controller_id: 23
-        url: "/student_task/list"
+        url: "/student_tasks/list"
       30: &3 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 42
@@ -812,17 +812,17 @@ production:
         parent:
         parent_id:
         site_controller_id: 31
-        url: "/response/pending_surveys"
+        url: "/responses/pending_surveys"
       27: &4 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 36
         id: 27
         label: Profile
-        name: profile
+        name: profiles
         parent:
         parent_id:
         site_controller_id: 26
-        url: "/profile/edit"
+        url: "/profiles/edit"
       2: &5 !ruby/object:Menu::Node
         content_page_id: 6
         controller_action_id:

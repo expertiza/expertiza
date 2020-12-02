@@ -61,7 +61,7 @@ describe "due_date_functions" do
   end
 
   describe "#done_in_assignment_round" do
-    it "return 0 when no response map" do
+    it "return 0 when no responses map" do
       response = ReviewResponseMap.create
       response.type = "ResponseMap"
       response.save

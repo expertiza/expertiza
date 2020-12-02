@@ -8,14 +8,14 @@
   <% modelType = 'CourseTeam' %>
 <% end %>
 | <%= link_to 'Import Teams',
-              :controller=>'import_file',
+              :controller=>'import_files',
               :action=>'start',
               :model => modelType,
               :title => 'Teams',
               :expected_fields =>  "Team Name <em>(optional)</em>&nbsp;&nbsp;|&nbsp;&nbsp;TeamMember1&nbsp;&nbsp;|&nbsp;&nbsp;TeamMember2&nbsp;&nbsp;|&nbsp;&nbsp;...&nbsp;&nbsp;|&nbsp;&nbsp;TeamMemberN",
               :id => @root_node.node_object_id %>
 |<%= link_to 'Export Teams',
-  :controller=>'export_file',
+  :controller=>'export_files',
   :action=>'start',
   :model=> modelType,
   :id=>@root_node.node_object_id %>

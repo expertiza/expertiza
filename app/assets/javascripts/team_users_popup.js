@@ -23,7 +23,7 @@ function publish_example_review(bid) {
                     array.push($(this).val());
                 });
                 $.ajax({
-                    "url":"/sample_reviews/map/"+bid.getAttribute('data-response-id'),
+                    "url":"/sample_reviews/map/"+bid.getAttribute('data-responses-id'),
                     "type":"POST",
                     "data":{
                         "assignments":array
@@ -56,7 +56,7 @@ function suppress_example_review(bid) {
                 });
 
                 $.ajax({
-                    "url":"/sample_reviews/unmap/"+bid.getAttribute('data-response-id'),
+                    "url":"/sample_reviews/unmap/"+bid.getAttribute('data-responses-id'),
                     "type":"POST",
                     "data":{
                         "assignments":array

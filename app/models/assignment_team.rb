@@ -48,7 +48,7 @@ class AssignmentTeam < Team
     self.name
   end
 
-  # Get the review response map
+  # Get the review responses map
   def review_map_type
     'ReviewResponseMap'
   end
@@ -108,7 +108,7 @@ class AssignmentTeam < Team
     super
   end
 
-  # Delete Review response map
+  # Delete Review responses map
   def destroy
     review_response_maps.each(&:destroy)
     super

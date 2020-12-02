@@ -77,7 +77,7 @@ describe "bookmark review testing" do
      fill_in "responses[0][comment]", with: "bookmark is awesome!"
      select 5, from: "responses[0][score]"
      click_button "Save Bookmark Review"
-     expect(page).to have_content "Your response was successfully saved."
+     expect(page).to have_content "Your responses was successfully saved."
    end
 
 end

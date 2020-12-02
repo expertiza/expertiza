@@ -51,7 +51,7 @@
          <% @participants.each do |participant| %>
            <tr class="listingRow">
            <td>&nbsp;</td>
-           <td><%= link_to participant.assignment.name, :controller => 'student_task', :action => 'view', :id => participant.id %></td>
+           <td><%= link_to participant.assignment.name, :controller => 'student_tasks', :action => 'view', :id => participant.id %></td>
            <%if participant.permission_granted %>
                  <td align="center">granted</td>
                  <td align="center">

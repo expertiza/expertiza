@@ -4,8 +4,8 @@ class AutomatedMetareviewsController < ApplicationController
 
   attr_accessor :automated_metareviews
 
-  # According to Dr. Gehringer, an instructor, ancestor of the instructor, TA for the course,
-  # or student in the course should be able to access this controller
+  # According to Dr. Gehringer, an instructor, ancestor of the instructor, TA for the courses,
+  # or student in the courses should be able to access this controller
   def action_allowed?
     assignment = find_assignment_from_response_id(params[:id])
 
@@ -29,7 +29,7 @@ class AutomatedMetareviewsController < ApplicationController
 
   def list
     @automated_metareview = AutomatedMetareview.new
-    # pass in the response id as a parameter
+    # pass in the responses id as a parameter
     @response = Response.find_by(map_id: params[:id])
     @automated_metareview.calculate_metareview_metrics(@response, params[:id])
     if @automated_metareview.save!

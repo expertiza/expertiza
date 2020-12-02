@@ -2,7 +2,7 @@ class UpdateControllersForResponse < ActiveRecord::Migration
   def self.up
     perm = Permission.find_by_name("do assignments")
     
-    controller = SiteController.find_or_create_by(name: "response")
+    controller = SiteController.find_or_create_by(name: "responses")
     if controller
       controller.permission_id = perm.id
       controller.save

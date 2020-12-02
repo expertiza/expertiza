@@ -93,10 +93,10 @@
             <% end %>
             <% review = map.response.last %>
             <% if review.nil? %>
-              <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :return => "bookmark"} %>
+              <%= link_to "Review", {:controller => 'responses', :action => 'new', :id => map.map_id, :return => "bookmark"} %>
             <% else %>
-              <%= link_to "View", {:controller => 'response', :action => 'view', :id => review.id} %>
-              <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "bookmark"} %>
+              <%= link_to "View", {:controller => 'responses', :action => 'view', :id => review.id} %>
+              <%= link_to "Edit", {:controller => 'responses', :action => 'edit', :id => review.id, :return => "bookmark"} %>
             <% end %>
           <% else %>
             <%= '-' %>

@@ -11,7 +11,7 @@ describe 'timestamps for student\'s submissions' do
 
   context 'when current assignment is in submission stage' do
     context 'when current participant does not submit anything yet' do
-      it 'displays due dates of current assignment in student_task#list page'
+      it 'displays due dates of current assignment in student_tasks#list page'
     end
 
     context 'after current participant has submitted a hyperlink' do

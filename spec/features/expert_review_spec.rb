@@ -16,7 +16,7 @@ describe 'expert review' do
       # an instructor is able to do expert review and the data can be saved successfully
       # a TA is able to do expert review and the data can be saved successfully
 
-      # on student_review#list page
+      # on student_reviews#list page
       # a student is able to do peer review
       # the student is able to compare the results of expert reviews done by both the instructor and the TA
       # by clicking 'show expert peer-review results'
@@ -31,7 +31,7 @@ describe 'expert review' do
       # an instructor is able to do round 1 expert review with review rubric 1 and the data can be saved successfully
       # a TA is able to do round 1 expert review  with review rubric 1 and the data can be saved successfully
 
-      # on student_review#list page
+      # on student_reviews#list page
       # a student is able to do round 1 peer review  with review rubric 1
       # the student is able to compare the results of round 1 expert reviews done by both the instructor and the TA
       # by clicking 'show expert peer-review results
@@ -41,7 +41,7 @@ describe 'expert review' do
       # an instructor is able to do round 2 expert review with review rubric 2 and the data can be saved successfully
       # a TA is able to do round 2 expert review  with review rubric 2 and the data can be saved successfully
 
-      # on student_review#list page
+      # on student_reviews#list page
       # a student is able to do round 2 peer review  with review rubric 2
       # the student is able to compare the results of round 1 and round 2 expert reviews done by both the instructor and the TA
       # by clicking 'show expert peer-review results

@@ -115,7 +115,7 @@ describe GradesController do
 
   describe '#instructor_review' do
     context 'when review exists' do
-      it 'redirects to response#edit page' do
+      it 'redirects to responses#edit page' do
         allow(AssignmentParticipant).to receive(:find_or_create_by).with(user_id: 6, parent_id: 1).and_return(participant)
         allow(participant).to receive(:new_record?).and_return(false)
         allow(ReviewResponseMap).to receive(:find_or_create_by).with(reviewee_id: 1, reviewer_id: 1, reviewed_object_id: 1).and_return(review_response_map)
@@ -124,12 +124,12 @@ describe GradesController do
         params = {id: 1}
         session = {user: instructor}
         get :instructor_review, params, session
-        expect(response).to redirect_to('/response/edit?return=instructor')
+        expect(response).to redirect_to('/responses/edit?return=instructor')
       end
     end
 
     context 'when review does not exist' do
-      it 'redirects to response#new page' do
+      it 'redirects to responses#new page' do
         allow(AssignmentParticipant).to receive(:find_or_create_by).with(user_id: 6, parent_id: 1).and_return(participant2)
         allow(participant2).to receive(:new_record?).and_return(false)
         allow(ReviewResponseMap).to receive(:find_or_create_by).with(reviewee_id: 1, reviewer_id: 2, reviewed_object_id: 1).and_return(review_response_map)
@@ -138,7 +138,7 @@ describe GradesController do
         params = {id: 1}
         session = {user: instructor}
         get :instructor_review, params, session
-        expect(response).to redirect_to('/response/new?id=1&return=instructor')
+        expect(response).to redirect_to('/responses/new?id=1&return=instructor')
       end
     end
   end

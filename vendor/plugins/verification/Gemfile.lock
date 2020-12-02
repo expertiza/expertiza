@@ -1,0 +1,72 @@
+PATH
+  remote: .
+  specs:
+    verification (1.0.3)
+      actionpack (>= 3.0.0, < 5.0)
+      activesupport (>= 3.0.0, < 5.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    actionpack (4.2.11.3)
+      actionview (= 4.2.11.3)
+      activesupport (= 4.2.11.3)
+      rack (~> 1.6)
+      rack-test (~> 0.6.2)
+      rails-dom-testing (~> 1.0, >= 1.0.5)
+      rails-html-sanitizer (~> 1.0, >= 1.0.2)
+    actionview (4.2.11.3)
+      activesupport (= 4.2.11.3)
+      builder (~> 3.1)
+      erubis (~> 2.7.0)
+      rails-dom-testing (~> 1.0, >= 1.0.5)
+      rails-html-sanitizer (~> 1.0, >= 1.0.3)
+    activesupport (4.2.11.3)
+      i18n (~> 0.7)
+      minitest (~> 5.1)
+      thread_safe (~> 0.3, >= 0.3.4)
+      tzinfo (~> 1.1)
+    builder (3.2.4)
+    concurrent-ruby (1.1.7)
+    crass (1.0.6)
+    erubis (2.7.0)
+    i18n (0.9.5)
+      concurrent-ruby (~> 1.0)
+    loofah (2.8.0)
+      crass (~> 1.0.2)
+      nokogiri (>= 1.5.9)
+    metaclass (0.0.4)
+    mini_portile2 (2.4.0)
+    minitest (5.14.2)
+    mocha (1.0.0.alpha)
+      metaclass (~> 0.0.1)
+    nokogiri (1.10.10-x64-mingw32)
+      mini_portile2 (~> 2.4.0)
+    rack (1.6.13)
+    rack-test (0.6.3)
+      rack (>= 1.0)
+    rails-deprecated_sanitizer (1.0.3)
+      activesupport (>= 4.2.0.alpha)
+    rails-dom-testing (1.0.9)
+      activesupport (>= 4.2.0, < 5.0)
+      nokogiri (~> 1.6)
+      rails-deprecated_sanitizer (>= 1.0.1)
+    rails-html-sanitizer (1.3.0)
+      loofah (~> 2.3)
+    rake (13.0.1)
+    test-unit (2.5.5)
+    thread_safe (0.3.6)
+    tzinfo (1.2.8)
+      thread_safe (~> 0.1)
+
+PLATFORMS
+  x64-mingw32
+
+DEPENDENCIES
+  mocha (= 1.0.0.alpha)
+  rake
+  test-unit (~> 2.5.5)
+  verification!
+
+BUNDLED WITH
+   2.1.4

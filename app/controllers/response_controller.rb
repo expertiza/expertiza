@@ -199,6 +199,7 @@ class ResponseController < ApplicationController
     end
   end
 
+  # This method renders the analysis page
   def analysis
     @response = Response.find(params[:id])
     @map = @response.map

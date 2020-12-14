@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/Winbobob/danger.git
-  revision: e8dd327719b415997da60ca5fd78f8d76106c8b0
-  ref: e8dd327719b415997da60ca5fd78f8d76106c8b0
+  revision: b77d1fb913e0b6099ad363836365d5c0b1e0f796
+  ref: b77d1fb913e0b6099ad363836365d5c0b1e0f796
   specs:
     danger (5.16.1)
       claide (~> 1.0)
@@ -331,7 +331,7 @@ GEM
       multi_json (~> 1.3)
       multi_xml (~> 0.5)
       rack (>= 1.2, < 3)
-    octokit (4.18.0)
+    octokit (4.19.0)
       faraday (>= 0.9)
       sawyer (~> 0.8.0, >= 0.5.3)
     omniauth (1.8.1)

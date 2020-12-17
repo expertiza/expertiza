@@ -1,12 +1,6 @@
 <% if !@assignment.vary_by_round %>
     <!--Score awarded / Avg. score-->
     <div>
-    <% if @review_scores[reviewer_id][team_id] != -1%>
-        <%= @review_scores[reviewer_id][team_id].inspect %>%
-    <% else %>
-        --
-    <% end %>
-    /
     <%if @avg_and_ranges[team_id] && !@avg_and_ranges[team_id][:avg].nil? && @avg_and_ranges[team_id][:avg] != -1.0 %>
         <%= @avg_and_ranges[team_id][:avg].round(0) %>%
     <%else%>
@@ -20,12 +14,8 @@
     <div>
     <% (1..@assignment.num_review_rounds).each do |round| %>
         <% get_review_metrics(round, team_id) %>
-            <%= instance_variable_get("@score_awarded_round_" + round.to_s) %> / <%= @avg %>
-            <%= ', ' unless round == @assignment.num_review_rounds %>
-        <!--Score range
-        <td bgcolor=<%= bgcolor %> align = 'left' >
-            (<%= @min %>% - <%= @max %>%)
-        </td>-->
+            <!--Get the team score for each assignment round-->
+            <%= @avg.tr('%','').to_i%> 
     <%end%>
     </div>
 <%end%>

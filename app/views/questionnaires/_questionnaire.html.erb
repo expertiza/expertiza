@@ -36,6 +36,7 @@
           <%= select "question", "type",
               {"Criterion" =>"Criterion",
                "Scale"=>"Scale",
+               "Cake" => "Cake",
                "Dropdown"=>"Dropdown",
                "Checkbox"=>"Checkbox",
                "TextArea"=>"TextArea",
@@ -43,7 +44,7 @@
                "UploadFile"=>"UploadFile",
                "SectionHeader"=>"SectionHeader",
                "TableHeader"=>"TableHeader",
-               "ColumnHeader"=>"ColumnHeader",
+               "ColumnHeader"=>"ColumnHeader"
                }, {}, {class: "form-control", onchange: "checkQuestionType()"} %> question(s)
            <span id = "new_question_weight">
             Add question weight <%= text_field 'question', 'weight', :size => 1, :value => "1", :class => "form-control" %>

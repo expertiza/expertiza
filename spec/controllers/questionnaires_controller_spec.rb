@@ -156,6 +156,14 @@ describe QuestionnairesController do
         expect(response).to render_template(:new)
       end
     end
+
+    context 'when the questionnaire is a bookmark rating rubric and has whitespace' do
+      it 'creates new questionnaire object and renders questionnaires#new page' do
+        params = {model: 'Bookmark RatingQuestionnaire'}
+        get :new, params
+        expect(response).to render_template(:new)
+      end
+    end
   end
 
   describe '#create' do

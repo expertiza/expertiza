@@ -256,6 +256,70 @@ module ReviewMappingHelper
     horizontal_bar_chart data, options
   end
 
+  # E2082 Generate chart for review tagging time intervals
+  def display_tagging_interval_chart(intervals)
+    # if someone did not do any tagging in 30 seconds, then ignore this interval
+    threshold = 30
+    intervals = intervals.select{|v| v < threshold}
+    if not intervals.empty?
+      interval_mean = intervals.reduce(:+) / intervals.size.to_f
+    end
+    #build the parameters for the chart
+    data = {
+      labels: [*1..intervals.length],
+      datasets: [
+        {
+          backgroundColor: "rgba(255,99,132,0.8)",
+          data: intervals,
+          label: "time intervals"
+        },
+        if not intervals.empty?
+          {
+            data: Array.new(intervals.length, interval_mean),
+            label: "Mean time spent"
+          }
+        end
+      ]
+    }
+    options = {
+      width: "200",
+      height: "125",
+      scales: {
+        yAxes: [{
+          stacked: false,
+          ticks: {
+                beginAtZero: true
+            }
+        }],
+        xAxes: [{
+          stacked: false
+        }]
+      }
+    }
+    line_chart data, options
+  end
+
+  #Calculate mean, min, max, variance, and stand deviation for tagging intervals
+  def calculate_key_chart_information(intervals)
+    # if someone did not do any tagging in 30 seconds, then ignore this interval
+    threshold = 30
+    interval_precision = 2 #Round to 2 Decimal Places
+    intervals = intervals.select{|v| v < threshold}
+
+    #Get Metrics once tagging intervals are available
+    if not intervals.empty?
+      metrics = Hash.new
+      metrics[:mean] = (intervals.reduce(:+) / intervals.size.to_f).round(interval_precision)
+      metrics[:min] = intervals.min
+      metrics[:max] = intervals.max
+      sum = intervals.inject(0){|accum, i| accum +(i- metrics[:mean])**2}
+      metrics[:variance] = (sum/(intervals.size).to_f).round(interval_precision)
+      metrics[:stand_dev] = Math.sqrt(metrics[:variance]).round(interval_precision)
+      return metrics
+    end
+    #if no Hash object is returned, the UI handles it accordingly
+  end
+
   def list_review_submissions(participant_id, reviewee_team_id, response_map_id)
     participant = Participant.find(participant_id)
     team = AssignmentTeam.find(reviewee_team_id)

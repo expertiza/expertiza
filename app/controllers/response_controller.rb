@@ -131,7 +131,8 @@ class ResponseController < ApplicationController
     # A new response has to be created when there hasn't been any reviews done for the current round,
     # or when there has been a submission after the most recent review in this round.
     @response = Response.where(map_id: @map.id, round: @current_round.to_i).order(updated_at: :desc).first
-    if @response.nil? || AssignmentTeam.find(@map.reviewee_id).most_recent_submission.updated_at > @response.updated_at
+    teams_most_recent_submission = AssignmentTeam.find(@map.reviewee_id).most_recent_submission
+    if @response.nil? || (!teams_most_recent_submission.nil? && teams_most_recent_submission.updated_at > @response.updated_at)
       @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
     end
     questions = sort_questions(@questionnaire.questions)
@@ -245,6 +246,8 @@ class ResponseController < ApplicationController
     when "bookmark"
       bookmark = Bookmark.find(@map.response_map.reviewee_id)
       redirect_to controller: 'bookmarks', action: 'list', id: bookmark.topic_id
+    when "ta_review"      # Page should be directed to list_submissions if TA/instructor performs the review
+      redirect_to controller: 'assignments', action: 'list_submissions', id: @map.response_map.assignment.id
     else
       # if reviewer is team, then we have to get the id of the participant from the team
       # the id in reviewer_id is of an AssignmentTeam

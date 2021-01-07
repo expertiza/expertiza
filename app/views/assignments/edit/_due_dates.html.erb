@@ -528,8 +528,12 @@ function addDaysOrMonth(mul, type) {
 <th width=5% style="text-align:center;">Use Date Updater</th>
 <th width=10% style="text-align:center;">Submission allowed</th>
 <th width=8% style="text-align:center;">Review allowed</th>
-<th width=8% style="text-align:center;">Teammate review allowed</th>
-<th width=10% style="text-align:center;">Meta-review allowed</th>
+<%if @assignment_form.assignment.teams?%>
+    <th width=8% style="text-align:center;">Teammate review allowed</th>
+<%end%>    
+<%if @assignment_form.assignment.num_metareviews_allowed > 0%>
+  <th width=10% style="text-align:center;">Meta-review allowed</th>
+<%end%>
 <%if @assignment_form.assignment.require_quiz%>
   <th width=9% style="text-align:center;">Has quiz</th>
 <%end%>

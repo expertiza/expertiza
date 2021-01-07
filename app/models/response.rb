@@ -29,7 +29,6 @@ class Response < ActiveRecord::Base
       self_id = self.id.to_s
       code = construct_student_html identifier, self_id, count
     end
-    puts code, self_id, show_tags, current_user
     code = construct_review_response code, self_id, show_tags, current_user
     code.html_safe
   end
@@ -235,7 +234,6 @@ class Response < ActiveRecord::Base
   end
 
   def construct_review_response code, self_id, show_tags = nil, current_user = nil
-    puts "in line 238"
     code += '<table id="review_' + self_id + '" class="table table-bordered">'
     answers = Answer.where(response_id: self.response_id)
     unless answers.empty?

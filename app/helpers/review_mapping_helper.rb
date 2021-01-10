@@ -176,27 +176,27 @@ module ReviewMappingHelper
   # sorts the reviewers by the average volume of reviews in each round, in descending order
   def sort_reviewer_by_review_volume_desc
     @reviewers.each do |r|
-      r.overall_avg_vol,
-          r.avg_vol_in_round_1,
-          r.avg_vol_in_round_2,
-          r.avg_vol_in_round_3 = Response.get_volume_of_review_comments(@assignment.id, r.id)
+      # get the volume of review comments
+      review_volumes = Response.get_volume_of_review_comments(@assignment.id, r.id)
+      r.avg_vol_per_round = []     
+      review_volumes.each_index do |i|
+        if i == 0 
+          r.overall_avg_vol = review_volumes[0]
+        else 
+          r.avg_vol_per_round.push(review_volumes[i])
+        end
+      end
     end
+    # get the number of review rounds for the assignment 
+    @num_rounds = @assignment.num_review_rounds.to_f.to_i
+    @all_reviewers_avg_vol_per_round = []
     @all_reviewers_overall_avg_vol = @reviewers.inject(0) {|sum, r| sum += r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @all_reviewers_avg_vol_in_round_1 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_in_round_1 } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @all_reviewers_avg_vol_in_round_2 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_in_round_2 } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @all_reviewers_avg_vol_in_round_3 = @reviewers.inject(0) {|sum, r| sum += r.avg_vol_in_round_3 } / (@reviewers.blank? ? 1 : @reviewers.length)
+    @num_rounds.times do |round|
+      @all_reviewers_avg_vol_per_round.push(@reviewers.inject(0) {|sum, r| sum += r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
+    end 
     @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 
-  # displays the average scores in round 1, 2 and 3
-  def display_volume_metric(overall_avg_vol, avg_vol_in_round_1, avg_vol_in_round_2, avg_vol_in_round_3)
-    metric = "Avg. Volume: #{overall_avg_vol} <br/> ("
-    metric += "1st: " + avg_vol_in_round_1.to_s if avg_vol_in_round_1 > 0
-    metric += ", 2nd: " + avg_vol_in_round_2.to_s if avg_vol_in_round_2 > 0
-    metric += ", 3rd: " + avg_vol_in_round_3.to_s if avg_vol_in_round_3 > 0
-    metric += ")"
-    metric.html_safe
-  end
 
   # moves data of reviews in each round from a current round
   def initialize_chart_elements(reviewer)
@@ -204,24 +204,17 @@ module ReviewMappingHelper
     labels = []
     reviewer_data = []
     all_reviewers_data = []
-    if @all_reviewers_avg_vol_in_round_1 > 0
-      round += 1
-      labels.push '1st'
-      reviewer_data.push reviewer.avg_vol_in_round_1
-      all_reviewers_data.push @all_reviewers_avg_vol_in_round_1
-    end
-    if @all_reviewers_avg_vol_in_round_2 > 0
-      round += 1
-      labels.push '2nd'
-      reviewer_data.push reviewer.avg_vol_in_round_2
-      all_reviewers_data.push @all_reviewers_avg_vol_in_round_2
-    end
-    if @all_reviewers_avg_vol_in_round_3 > 0
-      round += 1
-      labels.push '3rd'
-      reviewer_data.push reviewer.avg_vol_in_round_3
-      all_reviewers_data.push @all_reviewers_avg_vol_in_round_3
-    end
+
+    #display avg volume for all reviewers per round
+    @num_rounds.times do |rnd|
+      if @all_reviewers_avg_vol_per_round[rnd] > 0
+        round += 1
+        labels.push round
+        reviewer_data.push reviewer.avg_vol_per_round[rnd]
+        all_reviewers_data.push @all_reviewers_avg_vol_per_round[rnd]
+      end
+    end 
+
     labels.push 'Total'
     reviewer_data.push reviewer.overall_avg_vol
     all_reviewers_data.push @all_reviewers_overall_avg_vol
@@ -287,6 +280,70 @@ module ReviewMappingHelper
       }
     }
     horizontal_bar_chart data, options
+  end
+
+  # E2082 Generate chart for review tagging time intervals
+  def display_tagging_interval_chart(intervals)
+    # if someone did not do any tagging in 30 seconds, then ignore this interval
+    threshold = 30
+    intervals = intervals.select{|v| v < threshold}
+    if not intervals.empty?
+      interval_mean = intervals.reduce(:+) / intervals.size.to_f
+    end
+    #build the parameters for the chart
+    data = {
+      labels: [*1..intervals.length],
+      datasets: [
+        {
+          backgroundColor: "rgba(255,99,132,0.8)",
+          data: intervals,
+          label: "time intervals"
+        },
+        if not intervals.empty?
+          {
+            data: Array.new(intervals.length, interval_mean),
+            label: "Mean time spent"
+          }
+        end
+      ]
+    }
+    options = {
+      width: "200",
+      height: "125",
+      scales: {
+        yAxes: [{
+          stacked: false,
+          ticks: {
+                beginAtZero: true
+            }
+        }],
+        xAxes: [{
+          stacked: false
+        }]
+      }
+    }
+    line_chart data, options
+  end
+
+  #Calculate mean, min, max, variance, and stand deviation for tagging intervals
+  def calculate_key_chart_information(intervals)
+    # if someone did not do any tagging in 30 seconds, then ignore this interval
+    threshold = 30
+    interval_precision = 2 #Round to 2 Decimal Places
+    intervals = intervals.select{|v| v < threshold}
+
+    #Get Metrics once tagging intervals are available
+    if not intervals.empty?
+      metrics = Hash.new
+      metrics[:mean] = (intervals.reduce(:+) / intervals.size.to_f).round(interval_precision)
+      metrics[:min] = intervals.min
+      metrics[:max] = intervals.max
+      sum = intervals.inject(0){|accum, i| accum +(i- metrics[:mean])**2}
+      metrics[:variance] = (sum/(intervals.size).to_f).round(interval_precision)
+      metrics[:stand_dev] = Math.sqrt(metrics[:variance]).round(interval_precision)
+      return metrics
+    end
+    #if no Hash object is returned, the UI handles it accordingly
   end
 
   def list_review_submissions(participant_id, reviewee_team_id, response_map_id)

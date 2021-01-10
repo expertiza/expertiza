@@ -88,7 +88,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :course, only: %i[new create edit update] do
+  resources :course, controller: 'courses', only: %i[new create edit update] do
     collection do
       get :toggle_access
       get :copy
@@ -474,7 +474,7 @@ resources :institution, except: [:destroy] do
     collection do
       post :list
       get :get_folder_contents
-      get :get_sub_folder_contents
+      post :get_sub_folder_contents
       get :session_last_open_tab
       get :set_session_last_open_tab
     end
@@ -514,6 +514,7 @@ resources :institution, except: [:destroy] do
     end
   end
 
+  resources :conference
   root to: 'content_pages#view', page_name: 'home'
   post :login, to: 'auth#login'
   post :logout, to: 'auth#logout'

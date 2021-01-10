@@ -121,7 +121,7 @@ class ParticipantsController < ApplicationController
     if assignment.course
       course = assignment.course
       assignment.participants.each do |participant|
-        new_participant = participant.copy(course.id)
+        new_participant = participant.copy_to_course(course.id)
         @copied_participants.push new_participant if new_participant
       end
       # only display undo link if copies of participants are created

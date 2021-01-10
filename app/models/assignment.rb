@@ -305,7 +305,8 @@ class Assignment < ActiveRecord::Base
 
   # check if this assignment has multiple review phases with different review rubrics
   def varying_rubrics_by_round?
-    AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: 2).size >= 1
+    # E-2084 corrected '>=' to '>' to fix logic 
+    AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: 2).size > 1
   end
 
   def link_for_current_stage(topic_id = nil)

@@ -1,7 +1,6 @@
 <script>
-<% if SubmissionRecord.file_submissions_present?(@assignment.id)%>
+<%if !@assignment.nil? and SubmissionRecord.file_submissions_present?(@assignment.id)%>
   $(document).ready(function(){
-      alert("Here");
       $('#assignment_form_assignment_directory_path').prop("disabled",true);
   });
 <%end %>

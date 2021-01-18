@@ -14,16 +14,16 @@
 
 
     //E1654. Improve date-picker and deadlines Code change starts
-	//Hide date updater
+    //Hide date updater
     $("#date_updater_inner").hide();
-	//This on-click function toggles date updater div
+    //This on-click function toggles date updater div
     jQuery("#show_date_updater").click(function() {
 
         $("#date_updater_inner").toggle();
     });
-	//The functions below update the required parameter for the assignments that have their check-boxes marked for updation.
+    //The functions below update the required parameter for the assignments that have their check-boxes marked for updation.
 
-	//This function adds days to the date
+    //This function adds days to the date
     jQuery("#addDays_btn").click(function() {
 //calls the function addDaysOrMonth
         addDaysOrMonth(1, "days"); 
@@ -31,7 +31,7 @@
 
     });
 
-	//This function removes days from the date
+    //This function removes days from the date
     jQuery("#subDays_btn").click(function() {
 
         addDaysOrMonth(-1, "days");
@@ -39,7 +39,7 @@
 
     });
 
-	
+    
 
     //E1654. Improve date-picker and deadlines Code change starts
 
@@ -105,8 +105,8 @@
                 '<input name="assignment_form[due_date][][id]" type="hidden" value="' + id +'">';
 
         html += '<input class="due_date_assignment_id" name="assignment_form[due_date][][parent_id]" type="hidden" value="';
-	html += '<%= @assignment_form.assignment.id %>';
-	html += '">' +
+    html += '<%= @assignment_form.assignment.id %>';
+    html += '">' +
         '<input class="due_date_round" name="assignment_form[due_date][][round]" type="hidden" value="' + round_no + '">' +
         '<input class="due_date_deadline_type_id" name="assignment_form[due_date][][deadline_type_id]" type="hidden" value="' + due_date.deadline_type_id + '">';
 
@@ -450,7 +450,7 @@ function addDaysOrMonth(mul, type) {
     for (var i = 1; i < jQuery('#due_dates_table>tbody>tr:not(#due_date_heading)').length / 2; i++) {
         if ($('#use_updator_review_round_' + i).is(':checked')) {
             var date = $('#datetimepicker_review_round_' + i).val().split("/");
-		// curDate reads the date currently in the field
+        // curDate reads the date currently in the field
             var curDate = new Date(parseInt(date[0], 10), parseInt(date[1], 10) - 1, parseInt(date[2].split(" ")[0], 10));
             if (type == "days") {//checks if type is date then sets dates
                 curDate.setDate(curDate.getDate() + (days * mul));//sets the date
@@ -518,11 +518,11 @@ function addDaysOrMonth(mul, type) {
 
                                                         <%= label_tag('Days') %>
                                                             <button type="button" id="addDays_btn" class="btn btn-default">+</button>
-								<input id="days" type="number" name="quantity" min="0" value="0" style="width:50px">
+                                <input id="days" type="number" name="quantity" min="0" value="0" style="width:50px">
                                                                 <button type="button" id="subDays_btn" class="btn btn-default">-</button>
 
                                                 </div>
-												</div>
+                                                </div>
 <table class='exp table table-striped' id='due_dates_table' style='padding:10px;min-width: 990px;overflow: hidden; font-size: 15px'>
 
 <tr id='due_date_heading'>

@@ -175,8 +175,8 @@
             '<option value="3">Yes</option>' +
             '</select></td>';
         }
-        if (<%= @assignment_form.assignment == nil ? true : @assignment_form.assignment.metareview_allowed%>) 
-        {
+        //if (<%= @assignment_form.assignment == nil ? true : @assignment_form.assignment.metareview_allowed%>) 
+        //{
             html += '<td align="center" class="due_date_review_of_review_allowed_id" width="10%">';
             // if(deadline_type == 'team_formation'){
             //     html += '<select id="due_date_review_of_review_allowed_id" name="assignment_form[due_date][][review_of_review_allowed_id]" disabled>'
@@ -189,7 +189,7 @@
             '<option value="2">Late</option>' +
             '<option value="3">Yes</option>' +
             '</select></td>';
-        }
+        //}
         if (<%= @assignment_form.assignment.require_quiz == nil ? false : @assignment_form.assignment.require_quiz %>)
         {
             html += '<td align="center" class="due_date_quiz_allowed_id" width="10%">' +

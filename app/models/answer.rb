@@ -131,6 +131,6 @@ class Answer < ActiveRecord::Base
   # end added by ferry for answer tagging
 
   def de_tag_comments
-    comments.gsub(/\u003c.*?\u003e/, '')
+    ActionView::Base.full_sanitizer.sanitize(comments)
   end
 end

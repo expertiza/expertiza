@@ -534,7 +534,7 @@ function addDaysOrMonth(mul, type) {
 <%if @assignment_form.assignment.teams?%>
     <th width=8% style="text-align:center;">Teammate review allowed</th>
 <%end%>    
-<%if @assignment_form.assignment.num_metareviews_allowed > 0%>
+<%if @assignment_form.assignment.metareviews_allowed%>
   <th width=10% style="text-align:center;">Meta-review allowed</th>
 <%end%>
 <%if @assignment_form.assignment.require_quiz%>

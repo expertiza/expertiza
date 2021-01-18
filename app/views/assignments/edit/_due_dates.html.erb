@@ -175,7 +175,7 @@
             '<option value="3">Yes</option>' +
             '</select></td>';
         }
-        if (<%= @assignment_form.assignment.num_metareviews_allowed > 0 %>) 
+        if (<%= @assignment_form.assignment.metareview_allowed %>) 
         {
             html += '<td align="center" class="due_date_review_of_review_allowed_id" width="10%">';
             // if(deadline_type == 'team_formation'){

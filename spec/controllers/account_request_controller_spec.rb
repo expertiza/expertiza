@@ -112,6 +112,12 @@ describe AccountRequestController do
       post :create_requested_user_record, params # session
       expect(flash[:success]).to eq 'User signup for "instructor6" has been successfully requested.'
       expect(response).to redirect_to('http://test.host/instructions/home')
+
+      ActionMailer::Base.deliveries.last.tap do |mail|
+        expect(mail.from).to eq(["expertiza.development@gmail.com"])
+        expect(mail.to).to eq(["expertiza.development@gmail.com"])
+        expect(mail.subject).to eq('New account Request: 6 instructor')
+      end
     end
 
     it 'if user exists' do

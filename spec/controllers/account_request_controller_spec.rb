@@ -113,10 +113,22 @@ describe AccountRequestController do
       expect(flash[:success]).to eq 'User signup for "instructor6" has been successfully requested.'
       expect(response).to redirect_to('http://test.host/instructions/home')
 
+      email = Mailer.sync_message(
+      to: 'tluo@ncsu.edu',
+      subject: "New account Request: 6 instructor",
+      body: {
+        obj_name: 'assignment',
+        type: 'submission',
+        location: '1',
+        first_name: 'User',
+        partial_name: 'update'
+      }
+    ).deliver_now
+
       ActionMailer::Base.deliveries.last.tap do |mail|
-        expect(mail.from).to eq(["expertiza.development@gmail.com"])
-        expect(mail.to).to eq(["expertiza.development@gmail.com"])
-        expect(mail.subject).to eq('New account Request: 6 instructor')
+        expect(email.from).to eq(["expertiza.development@gmail.com"])
+        expect(email.to).to eq(["expertiza.development@gmail.com"])
+        expect(email.subject).to eq('New account Request: 6 instructor')
       end
     end
 

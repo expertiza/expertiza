@@ -52,6 +52,16 @@ describe "Assignment creation page", js: true do
 		)
 	end
 	
+	it "is able to create without teams" do
+		assignment_creation_setup(1,'private assignment for test')
+		click_button 'Create'
+
+		assignment = Assignment.where(name: 'private assignment for test').first
+		expect(assignment).to have_attributes(
+			teams?: false
+		)
+	end
+
 	# instructor can check "has quiz" box and set the number of quiz questions
 	it "is able to create with quiz" do
 		assignment_creation_setup(1,'private assignment for test')

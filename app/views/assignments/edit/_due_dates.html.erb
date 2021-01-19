@@ -165,15 +165,17 @@
         '<option value="2">Late</option>' +
         '<option value="3">Yes</option>' +
         '</select></td>';
-
-        html += '<td align="center" class="due_date_teammate_review_allowed_id" width="10%">';
-        html += '<select id="due_date_teammate_review_allowed_id" name="assignment_form[due_date][][teammate_review_allowed_id]" class="form-control" style="width: 75px">'
-         html +=
-        '<option value="1">No</option>' +
-        '<option value="2">Late</option>' +
-        '<option value="3">Yes</option>' +
-        '</select></td>';
-
+        if( <%= @assignment_form.assignment.teams? %>)
+        {
+          html += '<td align="center" class="due_date_teammate_review_allowed_id" width="10%">';
+          html += '<select id="due_date_teammate_review_allowed_id" name="assignment_form[due_date][][teammate_review_allowed_id]" class="form-control" style="width: 75px">'
+          html +=
+          '<option value="1">No</option>' +
+          '<option value="2">Late</option>' +
+          '<option value="3">Yes</option>' +
+          '</select></td>';
+        }
+      
         html += '<td align="center" class="due_date_review_of_review_allowed_id" width="10%">';
         // if(deadline_type == 'team_formation'){
         //     html += '<select id="due_date_review_of_review_allowed_id" name="assignment_form[due_date][][review_of_review_allowed_id]" disabled>'
@@ -528,7 +530,9 @@ function addDaysOrMonth(mul, type) {
 <th width=5% style="text-align:center;">Use Date Updater</th>
 <th width=10% style="text-align:center;">Submission allowed</th>
 <th width=8% style="text-align:center;">Review allowed</th>
-<th width=8% style="text-align:center;">Teammate review allowed</th>
+<%if @assignment_form.assignment.teams? %>
+  <th width=8% style="text-align:center;">Teammate review allowed</th>
+<% end %>
 <th width=10% style="text-align:center;">Meta-review allowed</th>
 <%if @assignment_form.assignment.require_quiz%>
   <th width=9% style="text-align:center;">Has quiz</th>

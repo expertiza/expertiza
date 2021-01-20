@@ -47,6 +47,8 @@ module OnTheFlyCalc
   end
 end
 
+public
+
 # Get all of the questions asked during peer review for the given team's work
 def peer_review_questions_for_team(team, round_number = nil)
   if !SignedUpTeam.find_by(team_id: team.id).nil?

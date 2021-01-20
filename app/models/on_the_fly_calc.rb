@@ -47,8 +47,6 @@ module OnTheFlyCalc
   end
 end
 
-private
-
 # Get all of the questions asked during peer review for the given team's work
 def peer_review_questions_for_team(team, round_number = nil)
   if !SignedUpTeam.find_by(team_id: team.id).nil?
@@ -59,6 +57,8 @@ def peer_review_questions_for_team(team, round_number = nil)
     nil
   end
 end
+
+private
 
 def calc_review_score
   if !@corresponding_response.empty?

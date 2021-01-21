@@ -51,7 +51,7 @@ public
 
 # Get all of the questions asked during peer review for the given team's work
 def peer_review_questions_for_team(team, round_number = nil)
-  if !SignedUpTeam.find_by(team_id: team.id).nil?
+  if !team.nil? and !SignedUpTeam.find_by(team_id: team.id).nil?
     topic_id = SignedUpTeam.find_by(team_id: team.id).topic_id
     review_questionnaire_id = review_questionnaire_id(round_number, topic_id)
     Question.where(questionnaire_id: review_questionnaire_id)

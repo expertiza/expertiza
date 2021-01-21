@@ -1,4 +1,5 @@
 class QuizQuestionnairesController < QuestionnairesController
+  include AuthorizationHelper
 
   #Quiz questionnaire edit option to be allowed for student
   def action_allowed?
@@ -6,7 +7,7 @@ class QuizQuestionnairesController < QuestionnairesController
       @questionnaire = Questionnaire.find(params[:id])
     end
     current_user_has_student_privileges?
-    end
+  end
 
   # View a quiz questionnaire
   def view
@@ -18,17 +19,17 @@ class QuizQuestionnairesController < QuestionnairesController
   # define a new quiz questionnaire
   # method invoked by the view
   def new
-    valid_request = true
-    @assignment_id = params[:aid] # creating an instance variable to hold the assignment id
-    @participant_id = params[:pid] # creating an instance variable to hold the participant id
+    can_create_quiz = true
+    @assignment_id = params[:aid] # assignment id
+    @participant_id = params[:pid] # participant id
     assignment = Assignment.find(@assignment_id)
     if !assignment.require_quiz? # flash error if this assignment does not require quiz
       flash[:error] = "This assignment does not support the quizzing feature."
-      valid_request = false
+      can_create_quiz = false
     else
-      valid_request = team_check(@participant_id, assignment) # check for validity of the request
+      can_create_quiz = has_team_and_topic(@participant_id, assignment) # check for validity of the request
     end
-    if valid_request && Questionnaire::QUESTIONNAIRE_TYPES.include?(params[:model])
+    if can_create_quiz && Questionnaire::QUESTIONNAIRE_TYPES.include?(params[:model])
       @questionnaire = QuizQuestionnaire.new
       @questionnaire.private = params[:private]
       @questionnaire.min_question_score = 0
@@ -42,7 +43,7 @@ class QuizQuestionnairesController < QuestionnairesController
   # create quiz questionnaire
   def create
     valid = validate_quiz
-    if valid.eql?("valid")
+    if valid?
       @questionnaire = QuizQuestionnaire.new(questionnaire_params)
       participant_id = params[:pid] # creating a local variable to send as parameter to submitted content if it is a quiz questionnaire
       @questionnaire.min_question_score = 0
@@ -70,7 +71,7 @@ class QuizQuestionnairesController < QuestionnairesController
     if !@questionnaire.taken_by_anyone? # quiz can be edited only if its not taken by anyone
       render :'questionnaires/edit'
     else
-      flash[:error] = "Your quiz has been taken by some other students, you cannot edit it anymore."
+      flash[:error] = "Your quiz has been taken by other students; you cannot edit it anymore"
       redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
     end
   end
@@ -119,17 +120,17 @@ class QuizQuestionnairesController < QuestionnairesController
 
   private
 
-  def team_check(participant_id, assignment)
-    valid_request = true
+  def has_team_and_topic(participant_id, assignment)
+    can_create_quiz = true
     team = AssignmentParticipant.find(participant_id).team
     if team.nil? # flash error if this current participant does not have a team
       flash[:error] = "You should create or join a team first."
-      valid_request = false
+      can_create_quiz = false
     elsif assignment.topics? && team.topic.nil? # flash error if this assignment has topic but current team does not have a topic
       flash[:error] = "Your team should have a topic."
-      valid_request = false
+      can_create_quiz = false
     end
-    valid_request # return whether the request is valid or not
+    can_create_quiz # return whether the request is valid or not
   end
 
   def validate_question(i)
@@ -152,6 +153,41 @@ class QuizQuestionnairesController < QuestionnairesController
   end
 
   # create checkbox question
+  def create_checkbox(question, choice_key, q_choices)
+    q = if q_choices[choice_key][:iscorrect] == 1.to_s
+          QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "true", question_id: question.id)
+        else
+          QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "false", question_id: question.id)
+        end
+    q.save
+  end
+
+  # create radio question
+  def create_radio(question, choice_key, q_choices)
+    q = if q_choices[1.to_s][:iscorrect] == choice_key
+          QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "true", question_id: question.id)
+        else
+          QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "false", question_id: question.id)
+        end
+    q.save
+  end
+
+  # create true/false question
+  def create_truefalse(question, choice_key, q_choices)
+    if q_choices[1.to_s][:iscorrect] == choice_key
+      q = QuizQuestionChoice.new(txt: "True", iscorrect: "true", question_id: question.id)
+      q.save
+      q = QuizQuestionChoice.new(txt: "False", iscorrect: "false", question_id: question.id)
+      q.save
+    else
+      q = QuizQuestionChoice.new(txt: "True", iscorrect: "false", question_id: question.id)
+      q.save
+      q = QuizQuestionChoice.new(txt: "False", iscorrect: "true", question_id: question.id)
+      q.save
+    end
+  end
+
+  # update checkbox question
   def update_checkbox(question_choice, question_index)
     if params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s]
       question_choice.update_attributes(iscorrect: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:iscorrect], txt: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:txt])
@@ -175,43 +211,8 @@ class QuizQuestionnairesController < QuestionnairesController
       question_choice.txt == "True" ? question_choice.update_attributes(iscorrect: '1') : question_choice.update_attributes(iscorrect: '0')
       # the statement is correct so "True" is the right answer
     else # the statement is not correct
-      question_choice.txt == "True" ? question_choice.update_attributes(iscorrect: '0') : question_choice.update_attributes(iscorrect: '1')
-      # the statement is not correct so "False" is the right answer
-    end
-  end
-
-  # create checkbox question
-  def create_checkbox(question, choice_key, q_choices)
-    q = if q_choices[choice_key][:iscorrect] == 1.to_s
-          QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "true", question_id: question.id)
-        else
-          QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "false", question_id: question.id)
-        end
-    q.save
-  end
-  
-  # create radio question
-  def create_radio(question, choice_key, q_choices)
-    q = if q_choices[1.to_s][:iscorrect] == choice_key
-          QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "true", question_id: question.id)
-        else
-          QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "false", question_id: question.id)
-        end
-    q.save
-  end
-
-  # create true/false question
-  def create_truefalse(question, choice_key, q_choices)
-    if q_choices[1.to_s][:iscorrect] == choice_key
-      q = QuizQuestionChoice.new(txt: "True", iscorrect: "true", question_id: question.id)
-      q.save
-      q = QuizQuestionChoice.new(txt: "False", iscorrect: "false", question_id: question.id)
-      q.save
-    else
-      q = QuizQuestionChoice.new(txt: "True", iscorrect: "false", question_id: question.id)
-      q.save
-      q = QuizQuestionChoice.new(txt: "False", iscorrect: "true", question_id: question.id)
-      q.save
+    question_choice.txt == "True" ? question_choice.update_attributes(iscorrect: '0') : question_choice.update_attributes(iscorrect: '1')
+         # the statement is not correct so "False" is the right answer
     end
   end
 

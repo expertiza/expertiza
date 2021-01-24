@@ -2,7 +2,7 @@ class ReviewMetricsQuery
   # The certainty threshold is the fraction (between 0 and 1) that says how certain
   # the ML algorithm must be of a tag value before it will ask the author to tag it
   # manually.
-  TAG_CERTAINTY_THRESHOLD = 0.95
+  TAG_CERTAINTY_THRESHOLD = 0.9
 
   # link each tag prompt to the corresponding key in the review hash
   PROMPT_TO_METRIC = {'mention problems?' => 'problem',
@@ -14,39 +14,37 @@ class ReviewMetricsQuery
     AnswerTag.where(answer_id: review_id, tag_prompt_deployment_id: tag_prompt_deployment_id).where.not(confidence_level: nil).first
   end
 
-  def self.cache_ws_results(reviews, tag_prompt_deployments)
-    reviews.each_slice(10) do |reviews_in_piece|
-      ws_input = {'reviews' => []}
-      reviews_in_piece.each do |review|
-        ws_input['reviews'] << {'id' => review.id, 'text' => review.de_tag_comments} if review.comments.present?
-      end
+  def self.cache_ws_results(reviews, tag_prompt_deployments
+    ws_input = {'reviews' => []}
+    reviews.each do |review|
+      ws_input['reviews'] << {'id' => review.id, 'text' => review.de_tag_comments} if review.comments.present?
+    end
 
-      tags = []
+    tags = []
 
-      # ask MetricsController to make a call to the review metrics web service
-      tag_prompt_deployments.each do |tag_prompt_deployment|
-        tag_prompt = tag_prompt_deployment.tag_prompt
-        metric = PROMPT_TO_METRIC[tag_prompt.prompt.downcase]
-        begin
-          ws_output = MetricsController.new.bulk_retrieve_metric(metric, ws_input, false)
-          ws_output_confidence = MetricsController.new.bulk_retrieve_metric(metric, ws_input, true)
-        rescue StandardError
-          break
-        else
-          next unless ws_output && ws_output['reviews'] && ws_output_confidence && ws_output_confidence['reviews']
-          ws_output['reviews'].zip(ws_output_confidence['reviews']).each do |review_with_value, review_with_confidence|
-            tag = AnswerTag.where(answer_id: review_with_value['id'],
-                                  tag_prompt_deployment_id: tag_prompt_deployment.id)
-                           .where.not(confidence_level: [nil]).first_or_initialize
-            tag.assign_attributes(value: inferred_value(metric, review_with_value),
-                                  confidence_level: inferred_confidence(metric, review_with_confidence))
-            tags << tag
-          end
+    # ask MetricsController to make a call to the review metrics web service
+    tag_prompt_deployments.each do |tag_prompt_deployment|
+      tag_prompt = tag_prompt_deployment.tag_prompt
+      metric = PROMPT_TO_METRIC[tag_prompt.prompt.downcase]
+      begin
+        ws_output = MetricsController.new.bulk_retrieve_metric(metric, ws_input, false)
+        ws_output_confidence = MetricsController.new.bulk_retrieve_metric(metric, ws_input, true)
+      rescue StandardError
+        break
+      else
+        next unless ws_output && ws_output['reviews'] && ws_output_confidence && ws_output_confidence['reviews']
+        ws_output['reviews'].zip(ws_output_confidence['reviews']).each do |review_with_value, review_with_confidence|
+          tag = AnswerTag.where(answer_id: review_with_value['id'],
+                                tag_prompt_deployment_id: tag_prompt_deployment.id)
+                         .where.not(confidence_level: [nil]).first_or_initialize
+          tag.assign_attributes(value: inferred_value(metric, review_with_value),
+                                confidence_level: inferred_confidence(metric, review_with_confidence))
+          tags << tag
         end
       end
-
-      tags.each(&:save)
     end
+
+    tags.each(&:save)
   end
 
   def self.inferred_value(metric, review)

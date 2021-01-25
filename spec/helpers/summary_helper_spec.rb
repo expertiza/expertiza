@@ -1,9 +1,7 @@
-require "spec_helper"
-
 describe "SummaryHelper" do
 	let(:answer) { Answer.new(answer: 1, comments: 'This is a sentence. This is anohter sentence.', question_id: 1) }
 	before(:each) do
-		sum = helper::Summary.new
+		sum = SummaryHelper::Summary.new
 	end
 	describe '#get_sentences' do
   	context 'when the answer is nil' do

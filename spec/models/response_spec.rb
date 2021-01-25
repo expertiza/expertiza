@@ -191,4 +191,12 @@ describe Response do
       end
     end
   end
+
+  describe '#get_sentences' do
+    context 'when the answer is nil' do
+      it 'returns a nil object' do
+        expect(SummaryHelper.get_sentences(nil).nil?)
+      end
+    end
+  end
 end

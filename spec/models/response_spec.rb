@@ -200,8 +200,8 @@ describe Response do
     end
     context 'when the comment is two sentences' do
       it 'returns an array of two sentences' do
-        allow(ans). to receive(:comments).and_return("This is a sentence. This is anohter sentence.")
-        sentences = SummaryHelper.get_sentences(ans)
+        allow(answer). to receive(:comments).and_return("This is a sentence. This is anohter sentence.")
+        sentences = SummaryHelper.get_sentences(answer)
         expect(sentences.length).to be(2)
       end
     end

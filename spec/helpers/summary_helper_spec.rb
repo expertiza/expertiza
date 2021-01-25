@@ -3,12 +3,12 @@ describe "SummaryHelper" do
 	describe '#get_sentences' do
   	context 'when the answer is nil' do
       it 'returns a nil object' do
-        expect(helper.Summary.get_sentences(nil)).to eq(nil)
+        expect(helper::Summary.new.get_sentences(nil)).to eq(nil)
       end
     end
     context 'when the comment is two sentences' do
       it 'returns an array of two sentences' do
-        sentences = helper.Summary.get_sentences(answer)
+        sentences = helper::Summary.new.get_sentences(answer)
         expect(sentences.length).to be(2)
       end
     end

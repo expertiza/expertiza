@@ -195,7 +195,7 @@ describe Response do
   describe '#get_sentences' do
     context 'when the answer is nil' do
       it 'returns a nil object' do
-        expect(SummaryHelper.get_sentences(nil).nil?)
+        expect(SummaryHelper.get_sentences(nil).to eq(nil))
       end
     end
   end

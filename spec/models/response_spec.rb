@@ -1,3 +1,5 @@
+require './app/helper/summary_helper.rb'
+
 describe Response do
   let(:participant) { build(:participant, id: 1, user: build(:student, name: 'no name', fullname: 'no one')) }
   let(:participant2) { build(:participant, id: 2) }

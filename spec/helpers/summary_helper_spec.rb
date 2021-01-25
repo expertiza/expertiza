@@ -1,4 +1,5 @@
 describe "SummaryHelper" do
+	let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
 	describe '#get_sentences' do
   	context 'when the answer is nil' do
       it 'returns a nil object' do

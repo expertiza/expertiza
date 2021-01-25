@@ -173,8 +173,10 @@ module SummaryHelper
 
     # convert answers to each question to sentences
     def get_sentences(ans)
-      sentences = ans.comments.gsub!(/[.?!]/, '\1|').split('|').map!(&:strip) unless ans.comments.nil?
-      sentences
+      if !ans.nil? 
+        sentences = ans.comments.gsub!(/[.?!]/, '\1|').split('|').map!(&:strip) unless ans.comments.nil?
+        sentences
+      end
     end
 
     def break_up_comments_to_sentences(question_answers)

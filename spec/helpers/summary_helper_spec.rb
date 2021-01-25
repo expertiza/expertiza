@@ -1,14 +1,17 @@
 describe "SummaryHelper" do
 	let(:answer) { Answer.new(answer: 1, comments: 'This is a sentence. This is anohter sentence.', question_id: 1) }
+	before(:each) do
+		sum = helper::Summary.new
+	end
 	describe '#get_sentences' do
   	context 'when the answer is nil' do
       it 'returns a nil object' do
-        expect(helper::Summary.new.get_sentences(nil)).to eq(nil)
+        expect(sum.get_sentences(nil)).to eq(nil)
       end
     end
     context 'when the comment is two sentences' do
       it 'returns an array of two sentences' do
-        sentences = helper::Summary.new.get_sentences(answer)
+        sentences = sum.get_sentences(answer)
         expect(sentences.length).to be(2)
       end
     end

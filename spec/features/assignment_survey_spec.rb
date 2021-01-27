@@ -96,6 +96,25 @@ describe "Survey questionnaire tests for instructor interface" do
     survey_name = "Assignment Survey Questionnaire 2"
     create_assignment_questionnaire survey_name
     expect(Questionnaire.where(name: survey_name)).to exist
-    
+  end
+
+  it "is able to deploy a second assignment survey with valid dates" do
+    survey_name = 'Assignment Survey Questionnaire 2'
+
+    # passing current time + 1 day for start date and current time + 2 days for end date
+    deploy_assignment_survey(@next_day, @next_to_next_day, survey_name)
+    expect(page).to have_content(survey_name)
+  end
+
+  it "is able to view responses of a second survey" do
+    survey_name = 'Assignment Survey Questionnaire 2'
+    deploy_assignment_survey(@next_day, @next_to_next_day, survey_name)
+
+    survey_questionnaire_2 = Questionnaire.where(name: survey_name).first
+    survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_2.id).first
+
+    # after adding a response:
+    visit '/survey_deployment/view_responses/' + survey_deployment.id.to_s
+    expect(page).to have_content(survey_name)
   end
 end

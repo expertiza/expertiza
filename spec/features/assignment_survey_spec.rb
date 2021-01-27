@@ -94,12 +94,14 @@ describe "Survey questionnaire tests for instructor interface" do
   it "is able to accept two surveys, will only return the first one on view" do
     login_as('instructor6')
     survey_name_1 = 'Assignment Survey Questionnaire 1'
+    create_assignment_questionnaire survey_name_1
     deploy_assignment_survey(@next_day, @next_to_next_day, survey_name_1)
 
     survey_questionnaire_1 = Questionnaire.where(name: survey_name_1).first
     survey_deployment_1 = SurveyDeployment.where(questionnaire_id: survey_questionnaire_1.id).first
 
     survey_name_2 = 'Assignment Survey Questionnaire 2'
+    create_assignment_questionnaire survey_name_2
     deploy_assignment_survey(@next_day, @next_to_next_day, survey_name_2)
 
     survey_questionnaire_2 = Questionnaire.where(name: survey_name_2).first

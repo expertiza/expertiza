@@ -165,7 +165,7 @@ class SurveyDeploymentController < ApplicationController
 
   # This method should be moved to survey_deployment_controller.rb
   def view_responses
-    sd = SurveyDeployment.find_by(parent_id: id)
+    sd = SurveyDeployment.find_by(parent_id: params[:id])
     @questionnaire = Questionnaire.find(sd.questionnaire_id)
     @questions = Question.where(questionnaire_id: @questionnaire.id)
     response_map_list = ResponseMap.where(reviewee_id: sd.id)

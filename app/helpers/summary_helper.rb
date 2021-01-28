@@ -173,12 +173,8 @@ module SummaryHelper
 
     # convert answers to each question to sentences
     def get_sentences(ans)
-      if !ans.nil? and !ans.comments.nil?
-        sentences = ans.comments.gsub!(/[.?!]/, '\1|').try(:split, '|') || nil
-        if !sentences.nil?
-          sentences.map!(&:strip)
-        end
-      end
+      sentences = ans.comments.gsub!(/[.?!]/, '\1|').try(:split, '|') || nil unless ans.nil? and ans.comments.nil?
+      sentences.map!(&:strip) unless sentences.nil?
       sentences
     end
 

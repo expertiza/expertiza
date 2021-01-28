@@ -55,8 +55,6 @@ def peer_review_questions_for_team(team, round_number = nil)
     topic_id = SignedUpTeam.find_by(team_id: team.id).topic_id
     review_questionnaire_id = review_questionnaire_id(round_number, topic_id)
     Question.where(questionnaire_id: review_questionnaire_id)
-  else
-    nil
   end
 end
 

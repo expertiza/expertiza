@@ -116,6 +116,5 @@ describe "Survey questionnaire tests for instructor interface" do
     # after adding a response:
     visit '/survey_deployment/view_responses/' + survey_deployment.id.to_s
     expect(page).to have_content(survey_name)
-    expect(page).to have_content('No responses for the question')
   end
 end

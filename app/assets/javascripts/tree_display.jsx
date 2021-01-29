@@ -80,7 +80,7 @@ const node_attributes = {
       }),
       (props) => ({
         title: 'View survey responses',
-        href: '/survey_response/view_responses?id=' + `${parseInt(props.id) / 2}`,
+        href: '/survey_deployment/view_responses?id=' + `${parseInt(props.id) / 2}`,
         src: '/assets/tree_view/view-survey-24.png'
       }),
       (props) =>

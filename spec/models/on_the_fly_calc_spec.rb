@@ -77,7 +77,9 @@ describe OnTheFlyCalc do
   end
   describe '#peer_review_questions_for_team' do
     context 'when there is no signed up team' do
-      expect(on_the_fly_calc.peer_review_questions_for_team(nil).to be nil)
+      it 'peer review questions should return nil' do
+        expect(on_the_fly_calc.peer_review_questions_for_team(nil).to be nil)
+      end
     end
   end
 

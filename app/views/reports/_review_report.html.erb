@@ -87,13 +87,13 @@
               <% if Team.where(id: reviewer_map.reviewee_id).length > 0 %>
                 <!--Team reviewed-->
                 <% if index == 0 %>
-                        <% if visibility_public?(reviewer_map) %>
+                        <% if Response.exists?(map_id: reviewer_map.id) %>
                             <div id = <%= team_name_color %>>&#10004;
                         <% else %>
                           <div id= <%= team_name_color %>>
                         <% end %>
                 <% else %>
-                        <% if visibility_public?(reviewer_map) %>
+                        <% if Response.exists?(map_id: reviewer_map.id) %>
                             <div id = <%= team_name_color %> style='border-top: solid; border-width: 1px;'>&#10004;
                         <% else %>
                             <div id = <%= team_name_color %> style='border-top: solid; border-width: 1px;'>

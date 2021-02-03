@@ -2,11 +2,17 @@ class QuizQuestionnairesController < QuestionnairesController
   include AuthorizationHelper
 
   #Quiz questionnaire edit option to be allowed for student
+  # Check role access for edit questionnaire
   def action_allowed?
-    if params[:action] == "edit"
+    case params[:action]
+    when 'edit'
       @questionnaire = Questionnaire.find(params[:id])
+      current_user_has_admin_privileges? ||
+          (current_user_is_a?('Instructor') && current_user_id?(@questionnaire.try(:instructor_id))) ||
+          (current_user_is_a?('Teaching Assistant') && session[:user].instructor_id == @questionnaire.try(:instructor_id))
+    else
+      current_user_has_student_privileges?
     end
-    current_user_has_student_privileges?
   end
 
   # View a quiz questionnaire
@@ -209,7 +215,7 @@ class QuizQuestionnairesController < QuestionnairesController
   def update_truefalse(question_choice)
     if params[:quiz_question_choices][@question.id.to_s][@question.type][1.to_s][:iscorrect] == "True" # the statement is correct
       question_choice.txt == "True" ? question_choice.update_attributes(iscorrect: '1') : question_choice.update_attributes(iscorrect: '0')
-      # the statement is correct so "True" is the RIGHT answer
+      # the statement is correct so "True" is the right answer
     else # the statement is not correct
     question_choice.txt == "True" ? question_choice.update_attributes(iscorrect: '0') : question_choice.update_attributes(iscorrect: '1')
          # the statement is not correct so "False" is the right answer

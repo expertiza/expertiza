@@ -209,7 +209,7 @@ class QuizQuestionnairesController < QuestionnairesController
   def update_truefalse(question_choice)
     if params[:quiz_question_choices][@question.id.to_s][@question.type][1.to_s][:iscorrect] == "True" # the statement is correct
       question_choice.txt == "True" ? question_choice.update_attributes(iscorrect: '1') : question_choice.update_attributes(iscorrect: '0')
-      # the statement is correct so "True" is the right answer
+      # the statement is correct so "True" is the RIGHT answer
     else # the statement is not correct
     question_choice.txt == "True" ? question_choice.update_attributes(iscorrect: '0') : question_choice.update_attributes(iscorrect: '1')
          # the statement is not correct so "False" is the right answer

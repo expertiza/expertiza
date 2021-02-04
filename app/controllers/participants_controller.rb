@@ -50,6 +50,7 @@ class ParticipantsController < ApplicationController
     # E1721 changes End.
   end
 
+  #when you change the duties, changes the permissions based on the new duty you go to
   def update_authorizations
     permissions = Participant.get_permissions(params[:authorization])
     can_submit = permissions[:can_submit]

@@ -15,7 +15,7 @@ class AdvertiseForPartnerController < ApplicationController
           :assignment_id => team.assignment.id,
           :assignment_name => team.assignment.name
           }
-      @log_message = "Your advertisement has been successfully created."
+      @log_message = "Your advertisement has been successfully created!"
     ExpertizaLogger.info LoggerMessage.new(controller_name,session[:user].name,@log_message,request,@log_map)
     redirect_to view_student_teams_path student_id: participant.id
   end

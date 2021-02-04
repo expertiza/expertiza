@@ -206,6 +206,7 @@ class ParticipantsController < ApplicationController
     user = {}
     user[:name] = team_user.name
     user[:fullname] = team_user.fullname
+    #set by default
     permission_granted = false
     assignment.participants.each do |participant|
       permission_granted = participant.permission_granted? if team_user.id == participant.user.id

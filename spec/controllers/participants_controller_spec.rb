@@ -165,7 +165,8 @@ describe ParticipantsController do
       allow(participant).to receive(:user).and_return(student)
       allow(student).to receive(:name).and_return('name')
       allow(student).to receive(:fullname).and_return('fullname')
-      expect(ParticipantsController.send(:get_user_info, [student, assignment])).to be({:name=>'name', :fullname=>'fullname', :pub_rights=>'Granted', :verified=>false})
+      pc = ParticipantsController.new
+      expect(pc.send(:get_user_info, student, assignment).to be({:name=>'name', :fullname=>'fullname', :pub_rights=>'Granted', :verified=>false})
     end
   end
 end

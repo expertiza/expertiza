@@ -212,7 +212,7 @@ class ParticipantsController < ApplicationController
     end
     # If permission is granted, set the publisting rights string
     user[:pub_rights] = permission_granted ? "Granted" : "Denied"
-    user[:verified] = permission_granted
+    user[:verified] = false
     user
   end
 

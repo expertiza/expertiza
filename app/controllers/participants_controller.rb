@@ -207,14 +207,12 @@ class ParticipantsController < ApplicationController
     user[:name] = team_user.name
     user[:fullname] = team_user.fullname
     permission_granted = false
-    has_signature = false
-    signature_valid = false
     assignment.participants.each do |participant|
       permission_granted = participant.permission_granted? if team_user.id == participant.user.id
     end
     # If permission is granted, set the publisting rights string
     user[:pub_rights] = permission_granted ? "Granted" : "Denied"
-    user[:verified] = permission_granted && has_signature && signature_valid
+    user[:verified] = permission_granted
     user
   end
 

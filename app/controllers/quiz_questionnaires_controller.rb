@@ -1,7 +1,7 @@
 class QuizQuestionnairesController < QuestionnairesController
   include AuthorizationHelper
 
-  #Quiz questionnaire edit option to be allowed for student
+  #Quiz questionnaire edit option to be allowed
   # Check role access for edit questionnaire
   def action_allowed?
     case params[:action]
@@ -29,8 +29,9 @@ class QuizQuestionnairesController < QuestionnairesController
     @assignment_id = params[:aid] # assignment id
     @participant_id = params[:pid] # participant id
     assignment = Assignment.find(@assignment_id)
-    if !assignment.require_quiz? # flash error if this assignment does not require quiz
-      flash[:error] = "This assignment does not support the quizzing feature."
+    if unless assignment.require_quiz?
+         # flash error if this assignment does not require quiz
+      flash[:error] = "This assignment is not configured to use quizzes."
       can_create_quiz = false
     else
       can_create_quiz = has_team_and_topic(@participant_id, assignment) # check for validity of the request

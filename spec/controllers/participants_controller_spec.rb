@@ -47,13 +47,13 @@ describe ParticipantsController do
     end
   end
 
-  describe '#delete_assignment_participant' do
+  describe '#delete' do
     it 'deletes the assignment_participant and redirects to #review_mapping/list_mappings page' do
       allow(Participant).to receive(:find).with('1').and_return(participant)
       allow(participant).to receive(:destroy).and_return(true)
       params = {id: 1}
       session = {user: instructor}
-      get :delete_assignment_participant, params, session
+      get :delete, params, session
       expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
     end
   end

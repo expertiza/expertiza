@@ -203,7 +203,7 @@ resources :institution, except: [:destroy] do
       get :add
       post :add
       get :auto_complete_for_user_name
-      get :delete_assignment_participant
+      get :delete
       get :list
       get :change_handle
       get :inherit

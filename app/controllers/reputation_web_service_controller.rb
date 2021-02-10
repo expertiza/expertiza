@@ -154,10 +154,6 @@ class ReputationWebServiceController < ApplicationController
 
     if params[:checkbox][:expert_grade] == 'Add expert grades'
       @additional_info = 'add expert grades'
-      case params[:assignment_id]
-      when '754' # expert grades of Wiki contribution (754)
-        req.body.prepend("\"expert_grades\": {\"submission25030\":95,\"submission25031\":92,\"submission25033\":88,\"submission25034\":98,\"submission25035\":100,\"submission25037\":95,\"submission25038\":95,\"submission25039\":93,\"submission25040\":96,\"submission25041\":90,\"submission25042\":100,\"submission25046\":95,\"submission25049\":90,\"submission25050\":88,\"submission25053\":91,\"submission25054\":96,\"submission25055\":94,\"submission25059\":96,\"submission25071\":85,\"submission25082\":100,\"submission25086\":95,\"submission25097\":90,\"submission25098\":85,\"submission25102\":97,\"submission25103\":94,\"submission25105\":98,\"submission25114\":95,\"submission25115\":94},")
-      end
     elsif params[:checkbox][:hamer] == 'Add initial Hamer reputation values'
       @additional_info = 'add initial hamer reputation values'
     elsif params[:checkbox][:lauw] == 'Add initial Lauw reputation values'

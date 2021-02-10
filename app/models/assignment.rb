@@ -78,6 +78,12 @@ class Assignment < ActiveRecord::Base
     @has_teams ||= !self.teams.empty?
   end
 
+  # remove empty teams (teams with no users) from assignment
+  def remove_empty_teams
+    empty_teams = teams.reload.select { |team| team.teams_users.empty? }
+    teams.delete(empty_teams)
+  end
+
   #checks whether the assignment is getting a valid number of reviews (less than number of reviews allowed)
   def valid_num_review
     self.num_reviews = self.num_reviews_allowed

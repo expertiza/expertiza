@@ -65,7 +65,7 @@ describe Assignment do
       end
     end
 
-    context 'when sign_up_topics array is empty' do
+    context 'when teams array is empty' do
       it 'says current assignment does not have a team' do
         assignment.teams = []
         expect(assignment.teams?).to be false
@@ -73,6 +73,23 @@ describe Assignment do
     end
   end
 
+
+  describe '#remove_empty_teams' do
+    before :each do
+      @assignment = create(:assignment)
+      @student = create(:student)
+      @empty_team = create(:assignment_team, assignment: @assignment, teams_users: [])
+      @non_empty_team = create(:assignment_team, assignment: @assignment, teams_users: [ create(:team_user, user: @student) ])
+    end
+    it 'should reduce the number of teams by the number of empty teams in the assignment' do
+      expect(@assignment.teams).to include @empty_team 
+      @assignment.remove_empty_teams
+      expect(@assignment.teams).to_not include @empty_team
+      expect(@assignment.teams).to include @non_empty_team
+    end
+  end
+  
+  
   describe '#vary_rubrics_by_round?' do
     context 'when rubrics varies over rounds' do
       it 'should return true' do

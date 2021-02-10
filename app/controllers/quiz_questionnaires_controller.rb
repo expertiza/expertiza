@@ -36,8 +36,6 @@ class QuizQuestionnairesController < QuestionnairesController
     if valid_request && Questionnaire::QUESTIONNAIRE_TYPES.include?(params[:model])
       @questionnaire = QuizQuestionnaire.new
       @questionnaire.private = params[:private]
-      @questionnaire.min_question_score = 0
-      @questionnaire.max_question_score = 1
       render 'questionnaires/new_quiz'
     else
       redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
@@ -50,19 +48,27 @@ class QuizQuestionnairesController < QuestionnairesController
     if valid.eql?("valid")
       @questionnaire = QuizQuestionnaire.new(questionnaire_params)
       participant_id = params[:pid] # creating a local variable to send as parameter to submitted content if it is a quiz questionnaire
-      @questionnaire.min_question_score = 0
-      @questionnaire.max_question_score = 1
+      @questionnaire.min_question_score = params[:questionnaire][:min_question_score] # 0
+      @questionnaire.max_question_score = params[:questionnaire][:max_question_score] # 1
+      
+
       author_team = AssignmentTeam.team(Participant.find(participant_id))
 
       @questionnaire.instructor_id = author_team.id # for a team assignment, set the instructor id to the team_id
 
-      @successful_create = true
-      save
-
-      save_choices @questionnaire.id
-
-      flash[:note] = "The quiz was successfully created." if @successful_create
-      redirect_to controller: 'submitted_content', action: 'edit', id: participant_id
+      if @questionnaire.min_question_score < 0 || @questionnaire.max_question_score < 0
+        flash[:error] = "Minumum and/or maximum question score cannot be less than 0."
+        redirect_to :back
+      elsif @questionnaire.max_question_score < @questionnaire.min_question_score
+        flash[:error] = "Maximum question score cannot be less than minumum question score."
+        redirect_to :back
+      else
+        @successful_create = true
+        save
+        save_choices @questionnaire.id
+        flash[:note] = "The quiz was successfully created." if @successful_create
+        redirect_to controller: 'submitted_content', action: 'edit', id: participant_id
+      end
     else
       flash[:error] = valid.to_s
       redirect_to :back
@@ -75,7 +81,7 @@ class QuizQuestionnairesController < QuestionnairesController
     if !@questionnaire.taken_by_anyone? # quiz can be edited only if its not taken by anyone
       render :'questionnaires/edit'
     else
-      flash[:error] = "Your quiz has been taken by some other students, you cannot edit it anymore."
+      flash[:error] = "Your quiz has been taken by one or more students; you cannot edit it anymore."
       redirect_to controller: 'submitted_content', action: 'view', id: params[:pid]
     end
   end
@@ -185,29 +191,20 @@ class QuizQuestionnairesController < QuestionnairesController
     end
   end
 
-  # create checkbox question
-  def create_checkbox(question, choice_key, q_choices)
-    q = if q_choices[choice_key][:iscorrect] == 1.to_s
-          QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "true", question_id: question.id)
+  # update multiple choice (radio or checkbox) question(s)
+  def create_multchoice(question, choice_key, q_answer_choices)
+    # this method combines the functionality of create_radio and create_checkbox, so that all mult choice questions are create by 1 func
+    q = if q_answer_choices[choice_key][:iscorrect] == 1.to_s
+          QuizQuestionChoice.new(txt: q_answer_choices[choice_key][:txt], iscorrect: "true", question_id: question.id)
         else
-          QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "false", question_id: question.id)
-        end
-    q.save
-  end
-  
-  # create radio question
-  def create_radio(question, choice_key, q_choices)
-    q = if q_choices[1.to_s][:iscorrect] == choice_key
-          QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "true", question_id: question.id)
-        else
-          QuizQuestionChoice.new(txt: q_choices[choice_key][:txt], iscorrect: "false", question_id: question.id)
+          QuizQuestionChoice.new(txt: q_answer_choices[choice_key][:txt], iscorrect: "false", question_id: question.id)
         end
     q.save
   end
 
   # create true/false question
-  def create_truefalse(question, choice_key, q_choices)
-    if q_choices[1.to_s][:iscorrect] == choice_key
+  def create_truefalse(question, choice_key, q_answer_choices)
+    if q_answer_choices[1.to_s][:iscorrect] == choice_key
       q = QuizQuestionChoice.new(txt: "True", iscorrect: "true", question_id: question.id)
       q.save
       q = QuizQuestionChoice.new(txt: "False", iscorrect: "false", question_id: question.id)
@@ -254,14 +251,12 @@ class QuizQuestionnairesController < QuestionnairesController
 
     questions.each do |question|
       q_type = params[:question_type][question_num.to_s][:type]
-      q_choices = params[:new_choices][question_num.to_s][q_type]
-      q_choices.each_key do |choice_key|
-        if q_type == "MultipleChoiceCheckbox"
-          create_checkbox(question, choice_key, q_choices)
-        elsif q_type == "TrueFalse"
-          create_truefalse(question, choice_key, q_choices)
-        else # MultipleChoiceRadio
-          create_radio(question, choice_key, q_choices)
+      q_answer_choices = params[:new_choices][question_num.to_s][q_type]
+      q_answer_choices.each_key do |choice_key|
+        if q_type == "TrueFalse"
+          create_truefalse(question, choice_key, q_answer_choices)
+        else # create MultipleChoice of either type, rather than creating them separately based on q_type
+          create_multchoice(question, choice_key, q_answer_choices)
         end
       end
       question_num += 1

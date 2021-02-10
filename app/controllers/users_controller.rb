@@ -2,6 +2,7 @@ require 'will_paginate/array'
 
 class UsersController < ApplicationController
   include AuthorizationHelper
+  include ConferenceHelper
 
   autocomplete :user, :name
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
@@ -115,12 +116,9 @@ class UsersController < ApplicationController
     # if the user name already exists, register the user by email address
     check = User.find_by(name: params[:user][:name])
     params[:user][:name] = params[:user][:email] unless check.nil?
-    @user = User.new(user_params)
-    @user.institution_id = params[:user][:institution_id]
-    # record the person who created this new user
-    @user.parent_id = session[:user].id
-    # set the user's timezone to its parent's
-    @user.timezonepref = User.find(@user.parent_id).timezonepref
+    is_user=true
+    # Assign all user params for creating user using assign_user_params function
+    @user=assign_user_params(is_user)
     if @user.save
       password = @user.reset_password # the password is reset
       prepared_mail = MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password)

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20201027034559) do
+ActiveRecord::Schema.define(version: 20201125202200) do
 
   create_table "account_requests", force: :cascade do |t|
     t.string   "name",              limit: 255
@@ -125,9 +125,10 @@ ActiveRecord::Schema.define(version: 20201027034559) do
     t.boolean  "is_answer_tagging_allowed"
     t.boolean  "has_badge"
     t.boolean  "allow_selecting_additional_reviews_after_1st_round"
-    t.boolean  "reviewer_is_team"
     t.boolean  "vary_by_topic",                                                    default: false
-    t.boolean  "vary_by_round"
+    t.boolean  "vary_by_round",                                                    default: false
+    t.boolean  "reviewer_is_team"
+    t.boolean  "is_conference_assignment",                                         default: false
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree

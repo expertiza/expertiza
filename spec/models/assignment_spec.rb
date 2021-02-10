@@ -73,6 +73,26 @@ describe Assignment do
     end
   end
 
+  describe '#vary_rubrics_by_round?' do
+    context 'when rubrics varies over rounds' do
+      it 'should return true' do
+        assignment_questionnaire1.used_in_round = 2
+        assignment_questionnaire2.used_in_round = 2
+        allow(AssignmentQuestionnaire).to receive(:where).and_return([assignment_questionnaire1, assignment_questionnaire2])
+        expect(assignment.varying_rubrics_by_round?).to be true
+      end
+    end
+
+    context 'when rubrics do not vary over rounds' do
+      it 'should return false' do
+        assignment_questionnaire1.used_in_round = 2
+        assignment_questionnaire2.used_in_round = 1
+        allow(AssignmentQuestionnaire).to receive(:where).and_return([assignment_questionnaire1])
+        expect(assignment.varying_rubrics_by_round?).to be false
+      end
+    end
+  end
+
   describe '#valid_num_review' do
     context 'when num_reviews_allowed is not -1 and num_reviews_allowed is less than num_reviews_required' do
       it 'adds an error message to current assignment object' do
@@ -146,7 +166,7 @@ describe Assignment do
     context 'when assignment is varying rubric by round assignment' do
       it 'calculates scores in each round of each team in current assignment' do
         allow(participant).to receive(:scores).with(review1: [question]).and_return(98)
-        allow(assignment).to receive(:vary_by_round).and_return(true)
+        assignment.vary_by_round = true 
         allow(assignment).to receive(:num_review_rounds).and_return(1)
         allow(ReviewResponseMap).to receive(:get_responses_for_team_round).with(team, 1).and_return([response])
         allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)

@@ -1,4 +1,4 @@
-describe CourseController do
+describe CoursesController do
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student) }
   let(:course) { double('Course', instructor_id: 6, path: '/cscs', name: 'abc') }
@@ -54,6 +54,31 @@ describe CourseController do
       session = {user: instructor}
       get :new, params, session
       expect(controller.instance_variable_get(:@private)).to eq('1')
+    end
+  end
+
+  describe '#create' do
+    let(:course_double) { double('OODD', instructor_id: 2, path: '/cs', name: 'xyz') }
+    before(:each) do
+      allow(Course).to receive(:new).and_return(course_double)
+      allow(course_double).to receive(:save).and_return(true)
+    end
+    
+    it "redirects to the correct url" do
+      post :create
+      expect(response).to redirect_to root_url
+    end
+  end
+
+  describe '#update' do
+    
+    it "checks updated is saved" do
+      allow(Course).to receive(:find).with('1').and_return(course)
+      allow(course).to receive(:destroy).and_return(true)
+      params = {id: 1}
+      session = {instructor_id: 1}
+      post :update, params, session
+      expect(response).to be_redirect
     end
   end
 end

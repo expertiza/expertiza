@@ -5,9 +5,9 @@
 # By: ajbudlon
 
 # change access permission from public to private or vice versa
-class CourseController < ApplicationController
+class CoursesController < ApplicationController
   include AuthorizationHelper
-
+  
   autocomplete :user, :name
   require 'fileutils'
 
@@ -28,11 +28,12 @@ class CourseController < ApplicationController
     @private = params[:private]
   end
 
-  # Modify an existing course
+  # GET /courses/1/edit
   def edit
     @course = Course.find(params[:id])
   end
 
+  # POST /courses
   def update
     @course = Course.find(params[:id])
     if params[:course][:directory_path] && @course.directory_path != params[:course][:directory_path]
@@ -48,16 +49,13 @@ class CourseController < ApplicationController
         flash[:error] = $ERROR_INFO
       end
     end
-    @course.name = params[:course][:name]
-    @course.institutions_id = params[:course][:institutions_id]
-    @course.directory_path = params[:course][:directory_path]
-    @course.info = params[:course][:info]
-    @course.private = params[:course][:private].nil? ? false : params[:course][:private]
+    set_course_fields(@course)
     @course.save
     undo_link("The course \"#{@course.name}\" has been updated successfully.")
     redirect_to controller: 'tree_display', action: 'list'
   end
 
+  # Create a copy of a course with a new submission directory
   def copy
     orig_course = Course.find(params[:id])
     new_course = orig_course.dup
@@ -74,9 +72,9 @@ class CourseController < ApplicationController
       end
 
       undo_link("The course \"#{orig_course.name}\" has been successfully copied.
-        The copy is currently associated with an existing location from the original course.
-        This could cause errors for future submissions and it is recommended that the copy be edited as needed.")
-      redirect_to controller: 'course', action: 'edit', id: new_course.id
+        Warning: The submission directory path for this copy is the original course's directory path appended with the word \"_copy\".
+        If you do not want this to happen, change the submission directory in the new copy of the course.")
+      redirect_to controller: 'courses', action: 'edit', id: new_course.id
     rescue StandardError
       flash[:error] = 'The course was not able to be copied: ' + $ERROR_INFO
       redirect_to controller: 'tree_display', action: 'list'
@@ -86,15 +84,11 @@ class CourseController < ApplicationController
   # create a course
   def create
     @course = Course.new
-    @course.name = params[:course][:name]
-    @course.institutions_id = params[:course][:institutions_id]
-    @course.directory_path = params[:course][:directory_path]
-    @course.info = params[:course][:info]
-    @course.private = params[:course][:private]
+    set_course_fields(@course)
     @course.instructor_id = session[:user].id
     begin
       @course.save!
-      create_course_node(@course)
+      CourseNode.create_course_node(@course)
       FileHelper.create_directory(@course)
       undo_link("The course \"#{@course.name}\" has been successfully created.")
       redirect_to controller: 'tree_display', action: 'list'
@@ -117,11 +111,13 @@ class CourseController < ApplicationController
     redirect_to controller: 'tree_display', action: 'list'
   end
 
+  # Displays all the teaching assistants for a course
   def view_teaching_assistants
     @course = Course.find(params[:id])
     @ta_mappings = @course.ta_mappings
   end
 
+  # Adds a teaching assistant to a course
   def add_ta
     @course = Course.find(params[:course_id])
     @user = User.find_by(name: params[:user][:name])
@@ -140,6 +136,7 @@ class CourseController < ApplicationController
     render action: 'add_ta.js.erb', layout: false
   end
 
+  # Remove a teaching assistant from a course
   def remove_ta
     @ta_mapping = TaMapping.find(params[:id])
     @ta = User.find(@ta_mapping.ta_id)
@@ -158,11 +155,12 @@ class CourseController < ApplicationController
     render action: 'remove_ta.js.erb', layout: false
   end
 
-  def create_course_node(course)
-    parent_id = CourseNode.get_parent_id
-    @course_node = CourseNode.new
-    @course_node.node_object_id = course.id
-    @course_node.parent_id = parent_id if parent_id
-    @course_node.save
+  #This method is called in the update and create methods to set the fields of a course
+  def set_course_fields(course)
+    @course.name = params[:course][:name]
+    @course.institutions_id = params[:course][:institutions_id]
+    @course.directory_path = params[:course][:directory_path]
+    @course.info = params[:course][:info]
+    @course.private = params[:course][:private].nil? ? false : params[:course][:private]
   end
 end

@@ -3,7 +3,7 @@ describe SurveyDeploymentController do
 		context 'when session[:user] is invalid' do
 			it 'redirects to root' do
 				get :pending_surveys, @params
-				expect(response).to redirect_to('/survey_deployment/pending_surveys')
+				expect(response).to redirect_to('/')
 			end
 		end
 	end

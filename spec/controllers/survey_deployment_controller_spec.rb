@@ -1,10 +1,17 @@
 describe SurveyDeploymentController do
 	let(:instructor) { build(:instructor, id: 6) }
+	let(:student) { build(:student, id: 1) }
 	describe '#action_allowed?' do
 		context 'when the user is a instructor' do
 			it 'returns true' do
 				session[:user] = instructor
 				expect(controller.send(:action_allowed?)).to be true
+			end
+		end
+		context 'when a user is a student' do
+			it 'returns false' do
+				session[:user] = student
+				expect(controller.send(:action_allowed?)).to be false
 			end
 		end
 	end

@@ -19,7 +19,7 @@ describe SurveyDeploymentController do
 describe '#survey_deployment_types' do
 	context 'when the function is called' do
 		it 'returns the types of survey deployments' do
-			expect(controller.send(:survey_deployment_types)). to be %w[AssignmentSurveyDeployment
+			expect(controller.send(:survey_deployment_types)).to eq %w[AssignmentSurveyDeployment
        CourseSurveyDeployment]
 		end
 	end

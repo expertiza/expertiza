@@ -1,6 +1,8 @@
 describe SurveyDeploymentController do
 	let(:instructor) { build(:instructor, id: 6) }
 	let(:student) { build(:student, id: 1) }
+	let(:questionnaire) { build(:questionnaire, id: 1, questions: [question]) , type: 'AssignmentSurveyDeployment'}
+  let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
 	describe '#action_allowed?' do
 		context 'when the user is a instructor' do
 			it 'returns true' do
@@ -24,6 +26,16 @@ describe '#survey_deployment_types' do
 		end
 	end
 end
+
+describe '#survey_deployment_type' do
+	context 'when the assignment is an Assignment Survey Deployment' do
+		it 'AssignmentSurveyDeployment is returned' do
+			params[:type] = questionnaire[:type]
+			expect(controller.send(:survey_deployment_type)).to eq 'AssignmentSurveyDeployment' 
+		end
+	end
+end
+
 
 	describe '#pending_surveys' do
 		context 'when session[:user] is invalid' do

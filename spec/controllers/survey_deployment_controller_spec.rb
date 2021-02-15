@@ -30,7 +30,7 @@ end
 describe '#survey_deployment_type' do
 	context 'when the assignment is an Assignment Survey Deployment' do
 		it 'AssignmentSurveyDeployment is returned' do
-			params[:type] = questionnaire[:type]
+			controller.params[:type] = questionnaire[:type]
 			expect(controller.send(:survey_deployment_type)).to eq 'AssignmentSurveyDeployment' 
 		end
 	end

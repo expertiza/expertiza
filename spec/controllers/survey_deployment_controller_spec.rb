@@ -16,6 +16,13 @@ describe SurveyDeploymentController do
 		end
 	end
 
+describe '#survey_deployment_types' do
+	context 'when the function is called' do
+		it 'returns the types of survey deployments' do
+			expect(controller.send(:survey_deployment_types)).size. to be 2
+		end
+	end
+end
 
 	describe '#pending_surveys' do
 		context 'when session[:user] is invalid' do

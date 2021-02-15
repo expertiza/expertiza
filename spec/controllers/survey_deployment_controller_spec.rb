@@ -29,9 +29,11 @@ end
 
 describe '#survey_deployment_type' do
 	context 'when the assignment is an Assignment Survey Deployment' do
-		it 'AssignmentSurveyDeployment is returned' do
+		it 'a constantized AssignmentSurveyDeployment is returned' do
 			controller.params[:type] = 'AssignmentSurveyDeployment'
-			expect(controller.send(:survey_deployment_type)).to eq 'AssignmentSurveyDeployment' 
+			expect(controller.send(:survey_deployment_type)).to eq AssignmentSurveyDeployment(id: integer, 
+				questionnaire_id: integer, start_date: datetime, end_date: datetime, last_reminder: datetime,
+				 parent_id: integer, global_survey_id: integer, type: string) 
 		end
 	end
 end

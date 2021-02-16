@@ -54,7 +54,14 @@ describe '#new' do
 			controller.params[:type] = 'InvalidSurveyDeployment'
 			get :new, controller.params
 			expect(flash[:error]).to be_present
-			expect(response).to redirect_to('/tree_display/list')
+		end
+	end
+	context 'when you try to create an Assignment Survey Deployment' do
+		it 'creates an assignment survey deployment' do
+			params = {type: 'AssignmentSurveyDeployment'}
+    	session = {user: instructor}
+			get :new, params, session
+			expect(response).to render_template(:new)
 		end
 	end
 end

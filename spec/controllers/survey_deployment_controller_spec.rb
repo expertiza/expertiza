@@ -40,6 +40,12 @@ describe '#survey_deployment_type' do
 			expect(controller.send(:survey_deployment_type)).to eq controller.params[:type].constantize
 		end
 	end
+	context 'when the assignment is an invalid Survey Deployment' do
+		it 'returns nil' do
+			controller.params[:type] = 'InvalidSurveyDeployment'
+			expect(controller.send(:survey_deployment_type)).to be nil
+		end
+	end
 end
 
 

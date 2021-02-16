@@ -1,7 +1,7 @@
 describe SurveyDeploymentController do
 	let(:instructor) { build(:instructor, id: 6) }
 	let(:student) { build(:student, id: 1) }
-	let(:questionnaire) { build(:questionnaire, id: 1, questions: [question] , type: 'AssignmentSurveyDeployment')}
+	let(:questionnaire1) { build(:questionnaire, id: 1, questions: [question] , type: 'AssignmentSurveyDeployment')}
   let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
 	describe '#action_allowed?' do
 		context 'when the user is a instructor' do
@@ -31,9 +31,13 @@ describe '#survey_deployment_type' do
 	context 'when the assignment is an Assignment Survey Deployment' do
 		it 'a constantized AssignmentSurveyDeployment is returned' do
 			controller.params[:type] = 'AssignmentSurveyDeployment'
-			expect(controller.send(:survey_deployment_type)).to eq AssignmentSurveyDeployment(id: integer, 
-				questionnaire_id: integer, start_date: datetime, end_date: datetime, last_reminder: datetime,
-				 parent_id: integer, global_survey_id: integer, type: string) 
+			expect(controller.send(:survey_deployment_type)).to eq controller.params
+		end
+	end
+	context 'when the assignment is an Course Survey Deployment' do
+		it 'a constantized CourseSurveyDeployment is returned' do
+			controller.params[:type] = 'CourseSurveyDeployment'
+			expect(controller.send(:survey_deployment_type)).to eq controller.params 
 		end
 	end
 end

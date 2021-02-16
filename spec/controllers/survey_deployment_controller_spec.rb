@@ -60,7 +60,7 @@ describe '#new' do
 	context 'when you try to create an Assignment Survey Deployment' do
 		it 'creates an assignment survey deployment' do
 			allow(Assignment).to receive(:find).with(1).and_return(assignment)
-			controller.params = {type: 'AssignmentSurveyDeployment', id: 1}
+			controller.params = {type: 'AssignmentSurveyDeployment', id: 1.to_i}
     	session = {user: instructor}
 			get :new, controller.params, session
 			expect(response).to render_template(:new)

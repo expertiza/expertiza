@@ -54,6 +54,7 @@ describe '#new' do
 			controller.params[:type] = 'InvalidSurveyDeployment'
 			get :new, controller.params
 			expect(flash[:error]).to be_present
+			expect(response).to redirect_to('/tree_display/list')
 		end
 	end
 end

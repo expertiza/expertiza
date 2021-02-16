@@ -83,8 +83,9 @@ end
 describe '#param_test' do
 	context 'params is nil' do
 		it 'returns an error' do
-			expect {get :param_test, params: {}}.to 
-				raise_error(ActionController::ParameterMissing)
+			expect {
+				get :param_test, params: nil
+			}.to raise_error(ActionController::ParameterMissing)
 		end
 	end
 end

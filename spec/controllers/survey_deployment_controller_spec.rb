@@ -80,6 +80,17 @@ describe '#new' do
 	end
 end
 
+describe '#param_test' do
+	context 'params is nil' do
+		it 'returns an error' do
+			controller.params = {}
+			get :param_test, controller.params
+			expect(response).to raise_error
+		end
+	end
+end
+
+
 	describe '#pending_surveys' do
 		context 'when session[:user] is invalid' do
 			it 'redirects to root' do

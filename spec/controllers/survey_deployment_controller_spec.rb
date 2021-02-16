@@ -3,6 +3,9 @@ describe SurveyDeploymentController do
 	let(:student) { build(:student, id: 1) }
 	let(:questionnaire1) { build(:questionnaire, id: 1, questions: [question] , type: 'AssignmentSurveyDeployment')}
   let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
+  let(:assignment) {
+    build(:assignment, id: 1, name: "test_assignment", instructor_id: 2, 
+                       participants: [build(:participant, id: 1, user_id: 1, assignment: assignment)], course_id: 1)}
 	describe '#action_allowed?' do
 		context 'when the user is a instructor' do
 			it 'returns true' do
@@ -58,6 +61,7 @@ describe '#new' do
 	end
 	context 'when you try to create an Assignment Survey Deployment' do
 		it 'creates an assignment survey deployment' do
+			allow(Assignment).to receive(:find).with(1).and_return(assignment)
 			params = {type: 'AssignmentSurveyDeployment'}
     	session = {user: instructor}
 			get :new, params, session

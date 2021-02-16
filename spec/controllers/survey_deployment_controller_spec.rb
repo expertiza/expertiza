@@ -48,6 +48,15 @@ describe '#survey_deployment_type' do
 	end
 end
 
+describe '#new' do
+	context 'when you try to make an invalid survey' do
+		it 'generates an error' do
+			controller.params[:type] = 'InvalidSurveyDeployment'
+			get :new, controller.params
+			expect(flash[:error]).to be_present
+		end
+	end
+end
 
 	describe '#pending_surveys' do
 		context 'when session[:user] is invalid' do

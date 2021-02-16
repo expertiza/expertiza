@@ -31,13 +31,13 @@ describe '#survey_deployment_type' do
 	context 'when the assignment is an Assignment Survey Deployment' do
 		it 'a constantized AssignmentSurveyDeployment is returned' do
 			controller.params[:type] = 'AssignmentSurveyDeployment'
-			expect(controller.send(:survey_deployment_type)).to eq controller.params.constantized
+			expect(controller.send(:survey_deployment_type)).to eq controller.params.constantize
 		end
 	end
 	context 'when the assignment is an Course Survey Deployment' do
 		it 'a constantized CourseSurveyDeployment is returned' do
 			controller.params[:type] = 'CourseSurveyDeployment'
-			expect(controller.send(:survey_deployment_type)).to eq controller.params.constantized 
+			expect(controller.send(:survey_deployment_type)).to eq controller.params.constantize
 		end
 	end
 end

@@ -2,7 +2,8 @@
 // can be useful on different pages
 let app_variables = {
 
-  currentUserId: null
+  currentUserId: null,
+  homeActionShowFlag: null
 };
 
 /** this object helps consolidate some of the logic used on this page */
@@ -228,17 +229,26 @@ const node_attributes = {
 // also avoid hindering the rendering steps
 window.addEventListener('load', (e) => {
   // grab the data attribute
+
   let treeDisplayDiv = document.querySelector('#tree_display')
   // check if the html element is present requested in the query above
   if (treeDisplayDiv) {
     // set the userid for the current user
     app_variables.currentUserId = treeDisplayDiv.dataset.userId
+
   }
 })
 
 jQuery(document).ready(function() {
   // This preloadedImages function is refered from http://jsfiddle.net/slashingweapon/8jAeu/
   // Actually I am not using the values in preloadedImages, but image loading speed is indeed getting faster
+  let treeDisplayDiv = document.querySelector('#tree_display');
+
+  if (treeDisplayDiv) {
+    // set the user preference to homeActionshowflag 
+    app_variables.homeActionShowFlag = treeDisplayDiv.dataset.userShow;
+    
+  }
   var preloadedImages = []
   function preloadImages() {
     for (var idx = 0; idx < arguments.length; idx++) {
@@ -344,12 +354,14 @@ jQuery(document).ready(function() {
             </a>
           </span>
         )
+
         if (node_attributes.isCourse(this.props.dataType)) {
           moreContent.push(<br />)
           moreContent.push(...node_attributes.course.getActions(parseInt(this.props.id) / 2))
+
         }
       }
-      if (node_attributes.isAssignment(this.props.dataType)) {
+      if (node_attributes.isAssignment(this.props.dataType) && app_variables.homeActionShowFlag == 'true') {
         // Assignment tab starts here
         // Now is_intelligent and Add Manager related buttons have not been added into the new UI
         moreContent.push(...node_attributes.assignment.getActions(this.props))

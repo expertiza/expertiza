@@ -3,7 +3,7 @@
 let app_variables = {
 
   currentUserId: null
-}
+};
 
 /** this object helps consolidate some of the logic used on this page */
 const node_attributes = {
@@ -1467,4 +1467,4 @@ jQuery(document).ready(function() {
   if (document.getElementById('tree_display')) {
     React.render(React.createElement(TabSystem), document.getElementById('tree_display'))
   }
-}
+})

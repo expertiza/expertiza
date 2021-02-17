@@ -1,8 +1,9 @@
 // initialize a global object available throughout the application
 // can be useful on different pages
 let app_variables = {
+
   currentUserId: null
-}
+};
 
 /** this object helps consolidate some of the logic used on this page */
 const node_attributes = {

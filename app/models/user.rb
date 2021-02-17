@@ -232,6 +232,7 @@ class User < ActiveRecord::Base
     @email_on_submission = true
     @email_on_review_of_review = true
     @copy_of_emails = false
+    @preference_home_flag = true
   end
 
   def self.export(csv, _parent_id, options)
@@ -243,6 +244,7 @@ class User < ActiveRecord::Base
       tcsv.push(user.parent.name) if options["parent"] == "true"
       tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails) if options["email_options"] == "true"
       tcsv.push(user.handle) if options["handle"] == "true"
+      tcsv.push(user.preference_home_flag) if options["preference_home_flag"] == "true"
       csv << tcsv
     end
   end

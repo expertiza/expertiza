@@ -1,6 +1,7 @@
 // initialize a global object available throughout the application
 // can be useful on different pages
 let app_variables = {
+
   currentUserId: null
 }
 
@@ -1466,4 +1467,4 @@ jQuery(document).ready(function() {
   if (document.getElementById('tree_display')) {
     React.render(React.createElement(TabSystem), document.getElementById('tree_display'))
   }
-})
+}

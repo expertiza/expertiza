@@ -1,6 +1,6 @@
 describe SurveyDeploymentController do
 	let(:instructor) { build(:instructor, id: 6) }
-	let(:admin) { build(:admin), id: 7 }
+	let(:admin) { build(:admin, id: 7) }
 	let(:student) { build(:student, id: 1) }
 	let(:questionnaire1) { build(:questionnaire, id: 1, questions: [question] , type: 'AssignmentSurveyDeployment')}
   let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }

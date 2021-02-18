@@ -150,6 +150,13 @@ describe SurveyDeploymentController do
 				expect(flash[:error]).to be_present
 			end
 		end
+		context 'when an instructor tries to access list of survey deployments' do 
+			it 'successfully responds' do
+				session = {user: instructor}
+				get :list, session
+				expect(response).to have_http_status(:ok)
+			end
+		end
 	end
 
 	describe '#pending_surveys' do

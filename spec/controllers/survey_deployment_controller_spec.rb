@@ -107,6 +107,7 @@ describe SurveyDeploymentController do
 	describe '#create' do
 		context "creating an assignment survey deployment" do
 			it 'increments count of survey deployment by one' do
+				allow(Assignment).to receive(:find).with('1').and_return(assignment)
 				params = ActionController::Parameters.new(
 					survey_deployment: {
 						questionnaire_id: 1, 

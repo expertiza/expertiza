@@ -112,7 +112,7 @@ describe SurveyDeploymentController do
 						questionnaire_id: 1, 
 						start_date: DateTime.now, 
 						end_date: DateTime.now.new_offset('+09:00'), 
-						type: 'AssignmentSurveyDeployment',
+						type: "AssignmentSurveyDeployment",
 						parent_id: 1
 					}
 				)

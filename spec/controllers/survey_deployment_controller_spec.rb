@@ -7,6 +7,7 @@ describe SurveyDeploymentController do
   let(:assignment) {build(:assignment, id: 1, name: "test_assignment")}
   let(:course) { build(:course, id: 1) }
   let(:survey_deployment) { build(:survey_deployment)}
+  let(:review_response_map) { build(:review_response_map)}
 	describe '#action_allowed?' do
 		context 'when the user is a instructor' do
 			it 'returns true' do
@@ -170,6 +171,7 @@ describe SurveyDeploymentController do
 			it 'redirects them to list and removes the SurveyDeployment from the database' do
 				allow(SurveyDeployment).to receive(:find).with('1').and_return(survey_deployment)
 				allow(survey_deployment).to receive(:destroy).and_return(true)
+				allow(survey_deployment).to receive(:response_maps).and_return([review_response_map])
 				params = {id: 1}
       	session = {user: instructor}
       	post :delete, params, session

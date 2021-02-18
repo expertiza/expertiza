@@ -1,5 +1,6 @@
 describe SurveyDeploymentController do
 	let(:instructor) { build(:instructor, id: 6) }
+	let(:admin) { build(:admin), id: 7 }
 	let(:student) { build(:student, id: 1) }
 	let(:questionnaire1) { build(:questionnaire, id: 1, questions: [question] , type: 'AssignmentSurveyDeployment')}
   let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
@@ -161,7 +162,7 @@ describe SurveyDeploymentController do
 						parent_id: 1
 					}
 				])
-				session = {user: instructor}
+				session = {user: admin}
 				get :list, session
 				expect(response).to redirect_to('/survey_deployment/list')
 			end

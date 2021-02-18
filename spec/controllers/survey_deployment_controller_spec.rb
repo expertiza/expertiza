@@ -107,18 +107,21 @@ describe SurveyDeploymentController do
 	describe '#create' do
 		context "creating an assignment survey deployment" do
 			it 'increments count of survey deployment by one' do
-				expect {post :create, {
-					type: 'AssignmentSurveyDeployment',
+				params = ActionController::Parameters.new(
 					survey_deployment: {
 						questionnaire_id: 1, 
 						start_date: DateTime.now, 
 						end_date: DateTime.now.new_offset('+09:00'), 
-						parent_id: 1,
-						type: 'AssignmentSurveyDeployment'
+						parent_id: 1
 					}
-				}, session = {user: instructor}
-			}. to change(SurveyDeployment, :count).by(1)
-				response.should redirect_to '/list'
+				)
+				session = {user: instructor}
+				post :create, params, session
+				specify("should created one survey deployment") {
+					change { 
+						SurveyDeployment.count 
+					}.from(0).to(1) 
+				}
 			end
 		end 
 	end

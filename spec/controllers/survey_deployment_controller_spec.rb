@@ -85,7 +85,6 @@ describe '#param_test' do
 		it 'returns an error' do
 			expect {
 				get :param_test, 
-				params: ActionController::Parameters.new
 			}.to raise_error(ActionController::ParameterMissing)
 
 		end

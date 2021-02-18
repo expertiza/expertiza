@@ -6,6 +6,7 @@ describe SurveyDeploymentController do
   let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
   let(:assignment) {build(:assignment, id: 1, name: "test_assignment")}
   let(:course) { build(:course, id: 1) }
+  let(:survey_deployment) { build(:survey_deployment)}
 	describe '#action_allowed?' do
 		context 'when the user is a instructor' do
 			it 'returns true' do
@@ -160,6 +161,19 @@ describe SurveyDeploymentController do
 				session = {user: instructor}
 				get :list, session
 				expect(response).to have_http_status(200)
+			end
+		end
+	end
+
+	describe '#delete' do 
+		context 'when someone tries to delete a SurveyDeployment' do
+			it 'redirects them to list and removes the SurveyDeployment from the database' do
+				allow(SurveyDeployment).to receive(:find).with('1').and_return(survey_deployment)
+				allow(survey_deployment).to receive(:destroy).and_return(true)
+				params = {id: 1}
+      	session = {user: instructor}
+      	post :delete, params, session
+      	expect(response).to redirect_to('/survey_deployment/list')
 			end
 		end
 	end

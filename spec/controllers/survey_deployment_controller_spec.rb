@@ -117,7 +117,6 @@ describe SurveyDeploymentController do
 					}
 				)
 				session = {user: instructor}
-				expect(flash[:error]).to be_present
 				expect {
 					post :create, params, session
 				}. to change(SurveyDeployment, :count).by(1)

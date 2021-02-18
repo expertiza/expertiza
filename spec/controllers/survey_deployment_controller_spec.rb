@@ -83,7 +83,7 @@ end
 describe '#param_test' do
 	context 'params is nil' do
 		it 'returns an error' do
-			controller.params = ActionController::Parameters.new(survey_deployment: nil)
+			controller.params = ActionController::Parameters.new(instructor: nil)
 			expect {
 				get :param_test,
 				controller.params

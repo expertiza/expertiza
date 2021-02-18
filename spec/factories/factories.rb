@@ -525,4 +525,7 @@ FactoryBot.define do
     email 'abc@mailinator.com'
     end
 
+  factory :survey_deployment, class: SurveyDeployment do
+    type 'AssignmentSurveyDeployment'
+    end
 end

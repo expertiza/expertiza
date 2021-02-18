@@ -154,7 +154,7 @@ describe SurveyDeploymentController do
 			it 'successfully responds' do
 				session = {user: instructor}
 				get :list, session
-				expect(response).to have_http_status(:ok)
+				expect(response).to render_template(:list)
 			end
 		end
 	end

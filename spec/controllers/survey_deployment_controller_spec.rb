@@ -153,6 +153,7 @@ describe SurveyDeploymentController do
 		end
 		context 'when an instructor tries to access list of survey deployments' do 
 			it 'successfully responds' do
+				before_filter :authorize
 				allow(SurveyDeployment).to receive(:all).and_return([
 				survey_deployment: {
 						questionnaire_id: 1, 

@@ -162,6 +162,7 @@ describe SurveyDeploymentController do
 						parent_id: 1
 					}
 				])
+				allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire1)
 				stub_current_user(instructor, instructor.role.name, instructor.role)
 				session = {user: instructor}
 				get :list, session

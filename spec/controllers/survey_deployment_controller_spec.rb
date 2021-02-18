@@ -107,7 +107,7 @@ describe SurveyDeploymentController do
 	describe '#create' do
 		context "creating a survey deployment" do
 			it 'increments count of survey deployment by one' do
-				controller.params = ActionController::Parameters.new(
+				params = ActionController::Parameters.new(
 					survey_deployment: {
 						questionnaire_id: 1, 
 						start_date: DateTime.now, 
@@ -115,7 +115,7 @@ describe SurveyDeploymentController do
 						parent_id: 1
 					}
 				)
-				expect {post :create, controller.params}. to change(SurveyDeployment, :count).by(1)
+				expect {post :create, params}. to change(SurveyDeployment, :count).by(1)
 				response.should redirect_to '/list'
 			end
 		end 

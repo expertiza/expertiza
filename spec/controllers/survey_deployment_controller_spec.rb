@@ -153,7 +153,6 @@ describe SurveyDeploymentController do
 		end
 		context 'when an instructor tries to access list of survey deployments' do 
 			it 'successfully responds' do
-				request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials('instructor6', 'password')
 				allow(SurveyDeployment).to receive(:all).and_return([
 				survey_deployment: {
 						questionnaire_id: 1, 
@@ -165,7 +164,7 @@ describe SurveyDeploymentController do
 				])
 				session = {user: admin}
 				get :list, session
-				expect(response).to redirect_to('/survey_deployment/list')
+				response.should be_success
 			end
 		end
 	end

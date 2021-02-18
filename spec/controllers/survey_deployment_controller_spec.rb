@@ -5,6 +5,16 @@ describe SurveyDeploymentController do
   let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
   let(:assignment) {build(:assignment, id: 1, name: "test_assignment")}
   let(:course) { build(:course, id: 1) }
+  let(:survey_deployment) { 
+  	build(
+  		:survey_deployment, 
+  			questionnaire_id: 1, 
+				start_date: DateTime.now, 
+				end_date: DateTime.now.new_offset('+09:00'), 
+				type: "AssignmentSurveyDeployment",
+				parent_id: 1
+				)
+  }
 	describe '#action_allowed?' do
 		context 'when the user is a instructor' do
 			it 'returns true' do
@@ -119,9 +129,8 @@ describe SurveyDeploymentController do
 					}
 				)
 				session = {user: instructor}
-				expect {
-					post :create, params, session
-				}. to change(SurveyDeployment, :count).by(1)
+				post :create, params, session
+				expect(response).to redirect_to('/survey_deployment/list')
 			end
 		end 
 	end

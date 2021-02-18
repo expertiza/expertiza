@@ -85,7 +85,7 @@ describe '#param_test' do
 		it 'remains unpermitted' do
 			controller.params = ActionController::Parameters.new(survey_deployment: nil)
 			get :param_test, controller.params
-			expect(controller.params.permitted?) to be false
+			expect(controller.params.permitted?).to be false
 
 
 		end

@@ -86,9 +86,13 @@ describe '#param_test' do
 			controller.params = ActionController::Parameters.new(survey_deployment: nil)
 			get :param_test, controller.params
 			expect(controller.params.permitted?).to be false
-
-
 		end
+	end
+	context 'params is valid' do
+		it 'is now permitted' do
+			controller.params = ActionController::Parameters.new(survey_deployment: {questionnaire_id: 1, start_date: 2, end_date: 3, parent_id: 4})
+			get :param_test, controller.params
+			expect(controller.params.permitted?).to be true
 	end
 end
 

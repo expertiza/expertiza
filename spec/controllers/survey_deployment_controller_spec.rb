@@ -108,11 +108,11 @@ describe SurveyDeploymentController do
 		context "creating an assignment survey deployment" do
 			it 'increments count of survey deployment by one' do
 				params = ActionController::Parameters.new(
-					type: 'AssignmentSurveyDeployment',
 					survey_deployment: {
 						questionnaire_id: 1, 
 						start_date: DateTime.now, 
 						end_date: DateTime.now.new_offset('+09:00'), 
+						type: 'AssignmentSurveyDeployment',
 						parent_id: 1
 					}
 				)

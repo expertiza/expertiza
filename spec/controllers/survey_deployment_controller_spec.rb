@@ -105,7 +105,7 @@ describe SurveyDeploymentController do
 	end
 
 	describe '#create' do
-		context "creating an assignment survey deployment" do
+		context 'creating an assignment survey deployment' do
 			it 'increments count of survey deployment by one' do
 				allow(Assignment).to receive(:find).with('1').and_return(assignment)
 				expect_any_instance_of(SurveyDeployment).to receive(:save).and_return(true) 
@@ -120,12 +120,24 @@ describe SurveyDeploymentController do
 					}
 				)
 				session = {user: instructor}
-				expect {
-					post :create, params, session 
-				}.to change(SurveyDeployment, :count).by(1)
+				post :create, params, session 
 				expect(response).to redirect_to('/survey_deployment/list')
 			end
 		end 
+		context 'creating an survey deployment with missing parameters' do
+			it 'redirects to the tree display and flashes an error' do
+				allow(Assignment).to receive(:find).with('1').and_return(assignment)
+				params = ActionController::Parameters.new(
+					type: "AssignmentSurveyDeployment",
+					survey_deployment: {
+						type: "AssignmentSurveyDeployment",
+					}
+				)
+				session = {user: instructor}
+				post :create, params, session 
+				expect(response).to redirect_to('/tree_display/list')
+			end
+		end
 	end
 
 	describe '#pending_surveys' do

@@ -526,5 +526,6 @@ FactoryBot.define do
     end
 
   factory :survey_deployment, class SurveyDeployment do
+    type 'AssignmentSurveyDeployment'
     end
 end

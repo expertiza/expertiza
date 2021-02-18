@@ -136,6 +136,18 @@ describe SurveyDeploymentController do
 				session = {user: instructor}
 				post :create, params, session 
 				expect(response).to redirect_to('/tree_display/list')
+				expect(flash[:error]).to be_present
+			end
+		end
+	end
+
+	describe '#list' do
+		context 'when a student tries to access list of survey deployments' do
+			it 'they are redirected to root' do
+				session = {user: student}
+				get :list session
+				expect(response).to redirect_to('/')
+				expect(flash[:error]).to be_present
 			end
 		end
 	end

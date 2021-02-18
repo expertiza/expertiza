@@ -105,10 +105,10 @@ describe SurveyDeploymentController do
 	end
 
 	describe '#create' do
-		context "creating a survey deployment" do
+		context "creating an assignment survey deployment" do
 			it 'increments count of survey deployment by one' do
 				expect {post :create, {
-					type: 'AssignmentSurveyDeployment'
+					type: 'AssignmentSurveyDeployment',
 					survey_deployment: {
 						questionnaire_id: 1, 
 						start_date: DateTime.now, 

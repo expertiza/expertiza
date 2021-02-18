@@ -163,6 +163,7 @@ describe SurveyDeploymentController do
 					}
 				])
 				allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire1)
+				allow_any_instance_of(SurveyDeployment).to receive(:questionnaire_id).and_return(1)
 				stub_current_user(instructor, instructor.role.name, instructor.role)
 				session = {user: instructor}
 				get :list, session

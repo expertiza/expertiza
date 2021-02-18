@@ -153,14 +153,13 @@ describe SurveyDeploymentController do
 		end
 		context 'when an instructor tries to access list of survey deployments' do 
 			it 'successfully responds' do
-				survey_deployment = survey_deployment: {
+				allow(SurveyDeployment).to receive(:all).and_return([survey_deployment: {
 						questionnaire_id: 1, 
 						start_date: DateTime.now, 
 						end_date: DateTime.now.new_offset('+09:00'), 
 						type: "AssignmentSurveyDeployment",
 						parent_id: 1
-					}
-				allow(SurveyDeployment).to receive(:all).and_return([survey_deployment])
+				}])
 				allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire1)
 				allow_any_instance_of(SurveyDeployment).to receive(:questionnaire_id).and_return(1)
 				stub_current_user(instructor, instructor.role.name, instructor.role)

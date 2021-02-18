@@ -163,7 +163,6 @@ class SurveyDeploymentController < ApplicationController
     end
   end
 
-  # This method should be moved to survey_deployment_controller.rb
   def view_responses
     sd = SurveyDeployment.find_by(parent_id: params[:id])
     @questionnaire = Questionnaire.find(sd.questionnaire_id)
@@ -186,7 +185,6 @@ class SurveyDeploymentController < ApplicationController
 
   private
 
-  # this method should be moved to another place with view_responses.
   def list_answers(questions, response_map_list)
     all_answers = []
     questions.each do |question|

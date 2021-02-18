@@ -114,6 +114,7 @@ describe SurveyDeploymentController do
 						start_date: DateTime.now, 
 						end_date: DateTime.now.new_offset('+09:00'), 
 						parent_id: 1
+						type: 'AssignmentSurveyDeployment',
 					}
 				}}. to change(SurveyDeployment, :count).by(1)
 				response.should redirect_to '/list'

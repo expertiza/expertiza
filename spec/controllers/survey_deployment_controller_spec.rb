@@ -109,6 +109,7 @@ describe SurveyDeploymentController do
 			it 'increments count of survey deployment by one' do
 				allow(Assignment).to receive(:find).with('1').and_return(assignment)
 				params = ActionController::Parameters.new(
+					type: "AssignmentSurveyDeployment",
 					survey_deployment: {
 						questionnaire_id: 1, 
 						start_date: DateTime.now, 

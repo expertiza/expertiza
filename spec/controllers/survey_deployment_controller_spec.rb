@@ -117,12 +117,9 @@ describe SurveyDeploymentController do
 					}
 				)
 				session = {user: instructor}
-				post :create, params, session
-				specify("should created one survey deployment") {
-					change { 
-						SurveyDeployment.count 
-					}.from(0).to(1) 
-				}
+				expect {
+					post :create, params, session
+				}. to change(SurveyDeployment, :count).by(1)
 			end
 		end 
 	end

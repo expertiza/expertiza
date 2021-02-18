@@ -90,7 +90,12 @@ describe '#param_test' do
 	end
 	context 'params is valid' do
 		it 'is now permitted' do
-			controller.params = ActionController::Parameters.new(survey_deployment: {questionnaire_id: Integer.new, start_date: DateTime.now, end_date: DateTime.now.new_offset('+09:00'), parent_id: Integer.new})
+			controller.params = ActionController::Parameters.new(survey_deployment: {
+				questionnaire_id: 1, 
+				start_date: DateTime.now, 
+				end_date: DateTime.now.new_offset('+09:00'), 
+				parent_id: 1
+			})
 			get :param_test, controller.params
 			expect(controller.params.permitted?).to be true
 		end

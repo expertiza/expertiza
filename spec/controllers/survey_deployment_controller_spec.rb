@@ -152,6 +152,15 @@ describe SurveyDeploymentController do
 		end
 		context 'when an instructor tries to access list of survey deployments' do 
 			it 'successfully responds' do
+				allow(SurveyDeployment).to receive(:all).and_return([
+				survey_deployment: {
+						questionnaire_id: 1, 
+						start_date: DateTime.now, 
+						end_date: DateTime.now.new_offset('+09:00'), 
+						type: "AssignmentSurveyDeployment",
+						parent_id: 1
+					}
+				])
 				session = {user: instructor}
 				get :list, session
 				expect(response).to redirect_to('/survey_deployment/list')

@@ -82,12 +82,11 @@ end
 
 describe '#param_test' do
 	context 'params is nil' do
-		it 'returns an error' do
-			controller.params = ActionController::Parameters.new(instructor: nil)
-			expect {
-				get :param_test,
-				controller.params
-			}.to raise_error(ActionController::ParameterMissing)
+		it 'remains unpermitted' do
+			controller.params = ActionController::Parameters.new(survey_deployment: nil)
+			get :param_test, controller.params
+			expect(controller.params.permitted?) to be false
+
 
 		end
 	end

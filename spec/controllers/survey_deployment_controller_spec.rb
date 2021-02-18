@@ -154,7 +154,7 @@ describe SurveyDeploymentController do
 			it 'successfully responds' do
 				session = {user: instructor}
 				get :list, session
-				expect(response).to render_template(:list)
+				expect(response).to redirect_to('/survey_deployment/list')
 			end
 		end
 	end

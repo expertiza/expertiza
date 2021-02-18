@@ -6,6 +6,15 @@ describe SurveyDeploymentController do
   let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
   let(:assignment) {build(:assignment, id: 1, name: "test_assignment")}
   let(:course) { build(:course, id: 1) }
+  let(:survey_deployment) { 
+  	build(
+  		:survey_deployment, 
+  			questionnaire_id: 1, 
+				start_date: DateTime.now, 
+				end_date: DateTime.now.new_offset('+09:00'), 
+				parent_id: 1
+				) 
+	}
 	describe '#action_allowed?' do
 		context 'when the user is a instructor' do
 			it 'returns true' do
@@ -153,17 +162,8 @@ describe SurveyDeploymentController do
 		end
 		context 'when an instructor tries to access list of survey deployments' do 
 			it 'successfully responds' do
-				allow(SurveyDeployment).to receive(:all).and_return([
-				survey_deployment: {
-						questionnaire_id: 1, 
-						start_date: DateTime.now, 
-						end_date: DateTime.now.new_offset('+09:00'), 
-						type: "AssignmentSurveyDeployment",
-						parent_id: 1
-					}
-				])
+				allow(SurveyDeployment).to receive(:all).and_return([survey_deployment])
 				allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire1)
-				allow_any_instance_of(SurveyDeployment).to receive(:questionnaire_id).and_return(1)
 				stub_current_user(instructor, instructor.role.name, instructor.role)
 				session = {user: instructor}
 				get :list, session

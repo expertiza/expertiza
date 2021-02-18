@@ -162,9 +162,10 @@ describe SurveyDeploymentController do
 						parent_id: 1
 					}
 				])
-				session = {user: admin}
+				stub_current_user(instructor, instructor.role.name, instructor.role)
+				session = {user: instructor}
 				get :list, session
-				response.should be_success
+				expect(response).to have_http_status(200)
 			end
 		end
 	end

@@ -116,6 +116,7 @@ describe SurveyDeploymentController do
 					}
 				)
 				expect {post :create, controller.params}. to change(SurveyDeployment, :count).by(1)
+				response.should redirect_to '/list
 			end
 		end 
 	end

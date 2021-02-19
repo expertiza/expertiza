@@ -7,7 +7,7 @@ describe SurveyDeploymentController do
 			id: 1, 
 			questions: [question], 
 			type: 'AssignmentSurveyDeployment',
-			min_question_score: 75
+			min_question_score: 75,
 			max_question_score: 95
 			)}
   let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }

@@ -194,7 +194,9 @@ describe SurveyDeploymentController do
 				params = {global_survey: false, id: 1}
 				allow(survey_deployment).to receive(:questionnaire_id).and_return('1')
 				allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire1)
-				get :generate_statistics, params
+				stub_current_user(instructor, instructor.role.name, instructor.role)
+				session = {user: instructor}
+				get :generate_statistics, params, session
 				expect(assigns(:sd)).to eq(survey_deployment)
 				expect(assigns(:range_of_scores)).to eq((75..95).to_a)
 			end

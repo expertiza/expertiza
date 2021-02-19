@@ -209,6 +209,7 @@ describe SurveyDeploymentController do
 				params = {global_survey: false, id: 1}
 				allow(SurveyDeployment).to receive(:find_by).with(parent_id: '1').and_return(survey_deployment)
 				allow(survey_deployment).to receive(:questionnaire_id).and_return('1')
+				allow(survey_deployment).to receive(:id).and_return('1')
 				allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire1)
 				allow(Question).to receive(:where).with(questionnaire_id: questionnaire1.id).and_return([question])
 				allow(ResponseMap).to receive(:where).with(reviewee_id: '1').and_return(review_response_map)

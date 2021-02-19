@@ -210,7 +210,8 @@ describe SurveyDeploymentController do
 				allow(SurveyDeployment).to receive(:find_by).with(parent_id: '1').and_return(survey_deployment)
 				allow(survey_deployment).to receive(:questionnaire_id).and_return('1')
 				allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire1)
-				allow(Question).to receive(:where).with(questionnaire_id: questionnaire1.id).and_return(question)
+				allow(Question).to receive(:where).with(questionnaire_id: questionnaire1.id).and_return([question])
+				allow(ResponseMap).to receive(:where).with(eviewee_id: '1').and_return(review_response_map)
 				stub_current_user(instructor, instructor.role.name, instructor.role)
 				session = {user: instructor}
 				get :view_responses, params, session

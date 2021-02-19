@@ -2,7 +2,14 @@ describe SurveyDeploymentController do
 	let(:instructor) { build(:instructor, id: 6) }
 	let(:admin) { build(:admin, id: 7) }
 	let(:student) { build(:student, id: 1) }
-	let(:questionnaire1) { build(:questionnaire, id: 1, questions: [question] , type: 'AssignmentSurveyDeployment')}
+	let(:questionnaire1) { 
+		build(:questionnaire, 
+			id: 1, 
+			questions: [question], 
+			type: 'AssignmentSurveyDeployment',
+			min_question_score: 75
+			max_question_score: 95
+			)}
   let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
   let(:assignment) {build(:assignment, id: 1, name: "test_assignment")}
   let(:course) { build(:course, id: 1) }
@@ -187,8 +194,6 @@ describe SurveyDeploymentController do
 				params = {global_survey: false, id: 1}
 				allow(survey_deployment).to receive(:questionnaire_id).and_return('1')
 				allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire1)
-				allow(questionnaire1).to receive(:min_question_score).and_return(75)
-				allow(questionnaire1).to receive(:max_question_score).and_return(95)
 				get :generate_statistics, params
 				expect(assigns(:range_of_scores)).to eq((75..95).to_a)
 			end

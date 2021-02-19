@@ -444,6 +444,7 @@ resources :institution, except: [:destroy] do
       get :list
       get :reminder_thread
       get :pending_surveys
+      get :generate_statistics
     end
   end
 

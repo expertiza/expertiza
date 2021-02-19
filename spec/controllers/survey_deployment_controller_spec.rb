@@ -211,6 +211,9 @@ describe SurveyDeploymentController do
 				allow(survey_deployment).to receive(:questionnaire_id).and_return('1')
 				allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire1)
 				allow(Question).to receive(:where).with(questionnaire_id: questionnaire1.id).and_return([question])
+				stub_current_user(instructor, instructor.role.name, instructor.role)
+				session = {user: instructor}
+				get :view_responses, params, session
 				expect(assigns(:questionnaire)).to eq(questionnaire1)
 				expect(assigns(:questions)).to eq([question]])
 			end

@@ -182,7 +182,7 @@ describe SurveyDeploymentController do
 
 	describe '#generate_statistics' do
 		context 'when generate_statistics is called' do
-			it 'returns data for a pie chart' do
+			it 'assigns range of scores' do
 				allow(SurveyDeployment).to receive(:find).with('1').and_return(survey_deployment)
 				params = {global_survey: false, id: 1}
 				allow(survey_deployment).to receive(:questionnaire_id).and_return('1')
@@ -190,7 +190,7 @@ describe SurveyDeploymentController do
 				allow(questionnaire1).to receive(:min_question_score).and_return(75)
 				allow(questionnaire1).to receive(:max_question_score).and_return(95)
 				get :generate_statistics, params
-				expect(@range_of_scores).to eq((75..95).to_a)
+				expect(assigns(:range_of_scores)).to eq((75..95).to_a)
 			end
 		end
 	end

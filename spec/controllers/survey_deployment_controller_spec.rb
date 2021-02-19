@@ -203,6 +203,20 @@ describe SurveyDeploymentController do
 		end
 	end
 
+	describe '#view_responses' do
+		context 'when the responses of a survey deployment is called' do
+			it 'it returns the questions' do
+				params = {global_survey: false, id: 1}
+				allow(SurveyDeployment).to receive(:find_by).with(parent_id: '1').and_return(survey_deployment)
+				allow(survey_deployment).to receive(:questionnaire_id).and_return('1')
+				allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire1)
+				allow(Question).to receive(:where).with(questionnaire_id: questionnaire1.id).and_return([question])
+				expect(assigns(:questionnaire)).to eq(questionnaire1)
+				expect(assigns(:questions)).to eq([question]])
+			end
+		end
+	end
+
 	describe '#pending_surveys' do
 		context 'when session[:user] is invalid' do
 			it 'redirects to root' do

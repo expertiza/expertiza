@@ -217,7 +217,7 @@ describe SurveyDeploymentController do
 				session = {user: instructor}
 				get :view_responses, params, session
 				expect(assigns(:questionnaire)).to eq(questionnaire1)
-				expect(assigns(:questions)).to eq(question)
+				expect(assigns(:questions)).to eq([question])
 			end
 		end
 	end

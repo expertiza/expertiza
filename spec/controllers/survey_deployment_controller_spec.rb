@@ -205,17 +205,17 @@ describe SurveyDeploymentController do
 
 	describe '#view_responses' do
 		context 'when the responses of a survey deployment is called' do
-			it 'it returns the questions' do
+			it 'it returns the question associated' do
 				params = {global_survey: false, id: 1}
 				allow(SurveyDeployment).to receive(:find_by).with(parent_id: '1').and_return(survey_deployment)
 				allow(survey_deployment).to receive(:questionnaire_id).and_return('1')
 				allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire1)
-				allow(Question).to receive(:where).with(questionnaire_id: questionnaire1.id).and_return([question])
+				allow(Question).to receive(:where).with(questionnaire_id: questionnaire1.id).and_return(question)
 				stub_current_user(instructor, instructor.role.name, instructor.role)
 				session = {user: instructor}
 				get :view_responses, params, session
 				expect(assigns(:questionnaire)).to eq(questionnaire1)
-				expect(assigns(:questions)).to eq([question]])
+				expect(assigns(:questions)).to eq(question)
 			end
 		end
 	end

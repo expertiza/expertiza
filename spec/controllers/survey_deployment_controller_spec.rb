@@ -195,6 +195,7 @@ describe SurveyDeploymentController do
 				allow(survey_deployment).to receive(:questionnaire_id).and_return('1')
 				allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire1)
 				get :generate_statistics, params
+				expect(assigns(:sd)).to eq(survey_deployment)
 				expect(assigns(:range_of_scores)).to eq((75..95).to_a)
 			end
 		end

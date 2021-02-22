@@ -1,0 +1,20 @@
+<% if  @assignment.nil? || !@assignment.is_conference_assignment?%>
+  <h1>New User</h1>
+<% else %>
+  <h1>Conference User</h1>
+<% end %>
+<%= form_tag :controller => 'conference', :action => 'create' do %>
+  <p><label for="role_id">Role</label><br/>
+    <%= collection_select 'user', 'role_id', @all_roles, :id, :name, {:selected => @rolename.id}%></p>
+
+  <%= render :partial => 'users/user', :locals => { :new_user => true , :request_user =>false} %>
+  
+<div class="g-recaptcha" data-sitekey="6Lfb_uEZAAAAAOrVHOhLI7i2yewc3Fgr87IohvaH"></div>
+
+<% if @assignment.nil? || !@assignment.is_conference_assignment?%>
+    <%= submit_tag "Create" %>
+  <% else%>
+    <%= submit_tag "Join Conference" %>
+  <% end  %>
+<% end %>
+<%= link_to 'Back', :action => 'list' %>

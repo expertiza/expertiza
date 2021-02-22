@@ -1,18 +1,12 @@
 class LatePoliciesController < ApplicationController
+  include AuthorizationHelper
+
   def action_allowed?
     case params[:action]
     when 'new', 'create', 'index'
-      ['Super-Administrator',
-       'Administrator',
-       'Instructor',
-       'Teaching Assistant'].include? current_role_name
+      current_user_has_ta_privileges?
     when 'edit', 'update', 'destroy'
-      [
-        'Super-Administrator',
-        'Administrator',
-        'Instructor',
-        'Teaching Assistant'
-      ].include?(current_role_name) &&
+      current_user_has_ta_privileges? &&
       current_user.instructor_id == instructor_id
     end
   end

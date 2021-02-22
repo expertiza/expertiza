@@ -1,4 +1,5 @@
 describe AssignmentsController do
+
   let(:assignment) do
     build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true, directory_path: 'same path',
                        participants: [build(:participant)], teams: [build(:assignment_team)], course_id: 1)
@@ -9,6 +10,9 @@ describe AssignmentsController do
   let(:instructor2) { build(:instructor, id: 66) }
   let(:ta) { build(:teaching_assistant, id: 8) }
   let(:student) { build(:student) }
+  let(:questionnaire) { build(:questionnaire, id: 666) }
+  let(:assignment_questionnaire) { build(:assignment_questionnaire, id: 1, questionnaire: questionnaire) }
+
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     stub_current_user(instructor, instructor.role.name, instructor.role)
@@ -134,7 +138,7 @@ describe AssignmentsController do
         allow(assignment_form).to receive(:update).with(any_args).and_return(true)
         allow(assignment_form).to receive(:create_assignment_node).and_return(double('node'))
         allow(assignment).to receive(:id).and_return(1)
-        allow(Assignment).to receive(:find_by).with(name: 'test assignment').and_return(assignment)
+        allow(Assignment).to receive(:find_by).with(id: 1).and_return(assignment)
         allow_any_instance_of(AssignmentsController).to receive(:undo_link)
           .with('Assignment "test assignment" has been created successfully. ').and_return(true)
         post :create, @params
@@ -154,12 +158,12 @@ describe AssignmentsController do
   describe '#edit' do
     context 'when assignment has staggered deadlines' do
       it 'shows an error flash message and renders edit page' do
-        allow(SignUpTopic).to receive(:where).with(assignment_id: '1').and_return([double('SignUpTopic'), double('SignUpTopic')])
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: '1')
-          .and_return([double('AssignmentQuestionnaire', questionnaire_id: 666, used_in_round: 1)])
-        allow(Questionnaire).to receive(:where).with(id: 666).and_return([double('Questionnaire', type: 'ReviewQuestionnaire')])
+        allow(SignUpTopic).to receive(:where).with(assignment_id: assignment.id.to_s).and_return([double('SignUpTopic'), double('SignUpTopic')])
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id.to_s)
+          .and_return([assignment_questionnaire])
+        allow(Questionnaire).to receive(:where).with(id: assignment_questionnaire.questionnaire_id).and_return([double('Questionnaire', type: 'ReviewQuestionnaire')])
         assignment_due_date = build(:assignment_due_date)
-        allow(AssignmentDueDate).to receive(:where).with(parent_id: '1').and_return([assignment_due_date])
+        allow(AssignmentDueDate).to receive(:where).with(parent_id: assignment.id.to_s).and_return([assignment_due_date])
         allow(assignment).to receive(:num_review_rounds).and_return(1)
         params = {id: 1}
         session = {user: instructor}
@@ -192,7 +196,7 @@ describe AssignmentsController do
       end
 
       context 'when assignment is not saved successfully' do
-        it 'shoes an error flash message and redirects to assignments#edit page' do
+        it 'displays an error flash message and redirects to assignments#edit page' do
           allow(assignment).to receive(:save).and_return(false)
           params = {
             id: 1,
@@ -208,10 +212,15 @@ describe AssignmentsController do
 
     context 'when params has key :assignment_form' do
       before(:each) do
-        assignment_questionnaire = double('AssignmentQuestionnaire')
-        allow(AssignmentQuestionnaire).to receive(:new).with(any_args).and_return(assignment_questionnaire)
-        allow(assignment_questionnaire).to receive(:save).and_return(true)
+        new_assignment_questionnaire = AssignmentQuestionnaire.new
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: '1').and_return([assignment_questionnaire])
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 2).and_return([])
+        allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
+        allow(AssignmentQuestionnaire).to receive(:new).and_return(new_assignment_questionnaire)
+        allow(Questionnaire).to receive(:find).with('666').and_return(questionnaire)
+        allow(new_assignment_questionnaire).to receive(:save).and_return(true)
         @params = {
+          vary_by_topic: true,
           id: 1,
           course_id: 1,
           set_pressed: {
@@ -252,17 +261,17 @@ describe AssignmentsController do
           expect(flash[:note]).to eq('The assignment was successfully saved....')
           expect(flash[:error]).to eq("We strongly suggest that instructors specify their preferred timezone to guarantee the correct display time. "\
                                       "For now we assume you are in Eastern Time (US & Canada)")
-          expect(response).to redirect_to('/assignments/2/edit')
+          expect(response).to render_template('assignments/edit/_topics')
         end
       end
 
-      context 'when the timezone preference of current user is not nil and assignment form updates attributes successfully' do
-        it 'shows an error message and redirects to assignments#edit page' do
+      context 'when update assignment_form of the assignment with @params attributes' do
+        it 'renders assignments/edit/_topic page' do
           session = {user: instructor}
           post :update, @params, session
           expect(flash[:note]).to eq('The assignment was successfully saved....')
           expect(flash[:error]).to be nil
-          expect(response).to redirect_to('/assignments/2/edit')
+          expect(response).to render_template('assignments/edit/_topics')
         end
       end
     end
@@ -352,6 +361,39 @@ describe AssignmentsController do
         expect(flash[:success]).to be nil
         expect(flash[:error]).to eq('You cannot delete this assignment!')
         expect(response).to redirect_to('/tree_display/list')
+      end
+    end
+  end
+
+  describe '#remove_assignment_from_course' do
+    context 'when assignment is removed from course successfully' do
+      it 'removes assignment and redirects to tree_display#list page' do
+        assignment_form = AssignmentForm.new
+        allow(AssignmentForm).to receive(:new).and_return(assignment_form)
+        allow(assignment_form).to receive(:remove_assignment_from_course)
+        allow(Assignment).to receive(:remove_assignment_from_course).with(assignment)
+
+        session = {user: instructor}
+        get :remove_assignment_from_course , {id: 1}
+        expect(flash[:error]).to be nil
+        expect(response).to redirect_to('/tree_display/list')
+      end
+    end
+  end
+
+  describe '#list_submissions' do
+    context 'when submissions are listed successfully' do
+      it 'gets list of submissions' do
+        assignment_form = AssignmentForm.new
+        allow(AssignmentForm).to receive(:new).and_return(assignment_form)
+        allow(assignment_form).to receive(:list_submissions).with('true')
+        params = {
+            id: 1,
+            force: 'true'
+        }
+        session = {user: instructor}
+        get :list_submissions, params, session
+        expect(flash[:error]).to be nil
       end
     end
   end

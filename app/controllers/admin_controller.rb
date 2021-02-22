@@ -1,10 +1,12 @@
 class AdminController < ApplicationController
+  include AuthorizationHelper
+
   def action_allowed?
     case params[:action]
     when 'list_instructors'
-      current_user.role.name['Administrator']
+      current_user_has_admin_privileges?
     else
-      current_user.role.name['Super-Administrator']
+      current_user_has_super_admin_privileges?
     end
   end
 

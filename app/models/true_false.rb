@@ -8,6 +8,13 @@ class TrueFalse < QuizQuestion
     html += '</td></tr>'
 
     html += '<tr><td>'
+    html += 'Question Weight: '
+    html += '<input type="number" name="question_weights[' + self.id.to_s + '][txt]" '
+    html += 'id="question_wt_' + self.id.to_s + '_txt" '
+    html += 'value="' + self.weight.to_s + '" min="0" />'
+    html += '</td></tr>'
+
+    html += '<tr><td>'
     html += '<input type="radio" name="quiz_question_choices[' + self.id.to_s + '][TrueFalse][1][iscorrect]" '
     html += 'id="quiz_question_choices_' + self.id.to_s + '_TrueFalse_1_iscorrect_True" value="True" '
     html += 'checked="checked" ' if quiz_question_choices[0].iscorrect

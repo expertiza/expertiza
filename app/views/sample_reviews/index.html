@@ -1,0 +1,17 @@
+<% if !@links.empty? %>
+  <h3>Below are the Sample Reviews for <%= @assignment.name%></h3>
+  <ul style="list-style-type: none;" class="list-group samples" data-id="<%= @assignment.id %>">
+    <li class="hide" id="li_template">
+      <a></a>
+    </li>
+    <%@links.each_with_index do |link, index|%>
+      <li><%=link_to("Sample Review " + (index+1).to_s, link, :id => link)%></li>
+      <%end%>
+  </ul>
+<% else %>
+  <h3>There are no sample reviews available for this assignment</h3>
+<% end %>
+  
+<div class="footer">
+    <a href="javascript:window.history.back()">Back</a>
+</div>

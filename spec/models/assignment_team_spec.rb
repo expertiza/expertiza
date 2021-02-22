@@ -333,7 +333,7 @@ describe 'AssignmentTeam' do
       it "assign the reviewer to the team" do
         allow(Assignment).to receive(:find).with(team.parent_id).and_return(assignment)
         allow(ReviewResponseMap).to receive(:create).
-          with(reviewee_id: team.id, reviewer_id: participant1.id, reviewed_object_id: assignment.id).and_return(review_response_map)
+          with(reviewee_id: team.id, reviewer_id: participant1.id, reviewed_object_id: assignment.id, reviewer_is_team: nil).and_return(review_response_map)
         expect(team.assign_reviewer(participant1)).to eq(review_response_map)
       end
     end
@@ -393,6 +393,25 @@ describe 'AssignmentTeam' do
         allow(team.assignment).to receive(:compute_total_score).with(scores.except(:total_score)).and_return(10)
         expect(team.scores(questions)).to eq(scores)
       end
+    end
+  end
+
+  describe "create team with users" do
+    before(:each) do
+      @assignment = create(:assignment)
+      @student = create(:student)
+      @team = create(:assignment_team, parent_id: @assignment.id)
+      @team_user = create(:team_user, team_id: @team.id, user_id: @student.id)
+    end
+    it 'should create a team with users' do
+      new_team = AssignmentTeam.create_team_with_users(@assignment.id, [ @student.id ])
+      expect(new_team.users).to include @student
+    end
+
+    it 'should remove user from previous team'  do
+      expect(@team.users).to include @student
+      new_team = AssignmentTeam.create_team_with_users(@assignment.id, [ @student.id ])
+      expect(@team.users).to_not include @student
     end
   end
 end

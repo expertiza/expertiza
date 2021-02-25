@@ -14,7 +14,7 @@ class ReviewMetricsQuery
     AnswerTag.where(answer_id: review_id, tag_prompt_deployment_id: tag_prompt_deployment_id).where.not(confidence_level: nil).first
   end
 
-  def self.cache_ws_results(reviews, tag_prompt_deployments
+  def self.cache_ws_results(reviews, tag_prompt_deployments)
     ws_input = {'reviews' => []}
     reviews.each do |review|
       ws_input['reviews'] << {'id' => review.id, 'text' => review.de_tag_comments} if review.comments.present?

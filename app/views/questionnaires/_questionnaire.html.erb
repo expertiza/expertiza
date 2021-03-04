@@ -15,7 +15,7 @@
      <tr class="form-inline">
        <td><label for="min_question_score">Min item score:</label>&nbsp;<%= text_field 'questionnaire', 'min_question_score', :size=> 1, :value=>@questionnaire.min_question_score ||= 0, :class => "form-control width-40" %>&nbsp;&nbsp;</td>
        <td><label for="max_question_score">Max item score:</label>&nbsp;<%= text_field 'questionnaire', 'max_question_score', :size=> 1, :value=>@questionnaire.max_question_score ||= 5, :class => "form-control width-40" %>&nbsp;&nbsp;</td>
-       <td><label for="questionnaire_private">Is this <%= @questionnaire.display_type %> private:</label>&nbsp;<%= select(:questionnaire, :private, [ ['no', false],['yes',  true]], {}, {class: "form-control"})%>
+       <td><label for="questionnaire_private">Is this <%= @questionnaire.display_type %> private?</label>&nbsp;<%= select(:questionnaire, :private, [ ['no', false],['yes',  true]], {}, {class: "form-control"})%>
        </td>
      </tr>
   </table>

@@ -47,7 +47,8 @@ class ResponseMap < ActiveRecord::Base
 
   # return latest versions of the response given by reviewer
   def self.get_reviewer_assessments_for(team, reviewer)
-    map = where(reviewee_id: team.id, reviewer_id: reviewer.id)
+    # get_reviewer may return an AssignmentParticipant or an AssignmentTeam
+    map = where(reviewee_id: team.id, reviewer_id: reviewer.get_reviewer.id)
     Response.where(map_id: map).sort {|m1, m2| self.comparator(m1, m2) }[0]
   end
 
@@ -83,5 +84,15 @@ class ResponseMap < ActiveRecord::Base
 
   def survey?
     false
+  end
+  
+  def find_team_member
+    # ACS Have metareviews done for all teams
+    if self.type.to_s == "MetareviewResponseMap"
+        review_mapping = ResponseMap.find_by(id: map.reviewed_object_id)
+        team = AssignmentTeam.find_by(id: review_mapping.reviewee_id)
+    else
+        team = AssignmentTeam.find(self.reviewee_id)
+    end
   end
 end

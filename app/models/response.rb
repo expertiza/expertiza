@@ -2,8 +2,11 @@ require 'analytic/response_analytic'
 require 'lingua/en/readability'
 
 class Response < ActiveRecord::Base
+  # Added for E1973. A team review will have a lock on it so only one user at a time may edit it.
+  include Lockable
   include ResponseAnalytic
   belongs_to :response_map, class_name: 'ResponseMap', foreign_key: 'map_id', inverse_of: false
+  
   has_many :scores, class_name: 'Answer', foreign_key: 'response_id', dependent: :destroy, inverse_of: false
   # TODO: change metareview_response_map relationship to belongs_to
   has_many :metareview_response_maps, class_name: 'MetareviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy, inverse_of: false
@@ -101,7 +104,13 @@ class Response < ActiveRecord::Base
       # there is small possibility that the answers is empty: when the questionnaire only have 1 question and it is a upload file question
       # the reason is that for this question type, there is no answer record, and this question is handled by a different form
       map = ResponseMap.find(self.map_id)
-      assignment = Participant.find(map.reviewer_id).assignment
+      # E-1973 either get the assignment from the participant or the map itself
+      if map.is_a? ReviewResponseMap
+        assignment = map.assignment
+      else
+        assignment = Participant.find(map.reviewer_id).assignment
+      end
+      topic_id = SignedUpTeam.find_by(team_id: map.reviewee_id).topic_id
       questionnaire = Questionnaire.find(assignment.review_questionnaire_id)
     end
     questionnaire
@@ -110,44 +119,42 @@ class Response < ActiveRecord::Base
   def self.concatenate_all_review_comments(assignment_id, reviewer_id)
     comments = ''
     counter = 0
-    @comments_in_round1 = @comments_in_round2 = @comments_in_round3 = ''
-    @counter_in_round1 = @counter_in_round2 = @counter_in_round3 = 0
+    @comments_in_round = []
+    @counter_in_round = []
     assignment = Assignment.find(assignment_id)
     question_ids = Question.get_all_questions_with_comments_available(assignment_id)
 
     ReviewResponseMap.where(reviewed_object_id: assignment_id, reviewer_id: reviewer_id).find_each do |response_map|
-      (1..assignment.num_review_rounds).each do |round|
+      (1..assignment.num_review_rounds+1).each do |round|
+        @comments_in_round[round] = ''
+        @counter_in_round[round] = 0
         last_response_in_current_round = response_map.response.select {|r| r.round == round }.last
         next if last_response_in_current_round.nil?
         last_response_in_current_round.scores.each do |answer|
           comments += answer.comments if question_ids.include? answer.question_id
-          instance_variable_set('@comments_in_round' + round.to_s, instance_variable_get('@comments_in_round' + round.to_s) + answer.comments ||= '')
+          @comments_in_round[round] += (answer.comments ||= '')
         end
         additional_comment = last_response_in_current_round.additional_comment
         comments += additional_comment
         counter += 1
-        instance_variable_set('@comments_in_round' + round.to_s, instance_variable_get('@comments_in_round' + round.to_s) + additional_comment)
-        instance_variable_set('@counter_in_round' + round.to_s, instance_variable_get('@counter_in_round' + round.to_s) + 1)
+        @comments_in_round[round] += additional_comment
+        @counter_in_round[round] += 1
       end
     end
-    [comments, counter,
-     @comments_in_round1, @counter_in_round1,
-     @comments_in_round2, @counter_in_round2,
-     @comments_in_round3, @counter_in_round3]
+    [comments, counter, @comments_in_round, @counter_in_round]
   end
 
   def self.get_volume_of_review_comments(assignment_id, reviewer_id)
     comments, counter,
-        @comments_in_round1, @counter_in_round1,
-        @comments_in_round2, @counter_in_round2,
-        @comments_in_round3, @counter_in_round3 = Response.concatenate_all_review_comments(assignment_id, reviewer_id)
+      @comments_in_round, @counter_in_round = Response.concatenate_all_review_comments(assignment_id, reviewer_id)
+    num_rounds = @comments_in_round.count - 1 #ignore nil element (index 0)
 
     overall_avg_vol = (Lingua::EN::Readability.new(comments).num_words / (counter.zero? ? 1 : counter)).round(0)
     review_comments_volume = []
     review_comments_volume.push(overall_avg_vol)
-    (1..3).each do |i|
-      num = Lingua::EN::Readability.new(instance_variable_get('@comments_in_round' + i.to_s)).num_words
-      den = (instance_variable_get('@counter_in_round' + i.to_s).zero? ? 1 : instance_variable_get('@counter_in_round' + i.to_s))
+    (1..num_rounds).each do |round|
+      num = Lingua::EN::Readability.new(@comments_in_round[round]).num_words
+      den = (@counter_in_round[round].zero? ? 1 : @counter_in_round[round])
       avg_vol_in_round = (num / den).round(0)
       review_comments_volume.push(avg_vol_in_round)
     end
@@ -211,6 +218,12 @@ class Response < ActiveRecord::Base
         assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
       }
     ).deliver_now
+  end
+
+  # Check if this review was done by TA/instructor return True or False
+  def done_by_staff_participant?
+    role = Role.find(User.find(Participant.find(ResponseMap.find(Response.find(self.id).map_id).reviewer_id).user_id).role_id).name
+    return (role == "Instructor") || (role == "Teaching Assistant")
   end
 
   private

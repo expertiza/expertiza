@@ -1,4 +1,6 @@
 class ReviewMappingController < ApplicationController
+  include AuthorizationHelper
+
   autocomplete :user, :name
   # use_google_charts
   require 'gchart'
@@ -20,7 +22,7 @@ class ReviewMappingController < ApplicationController
           'assign_quiz_dynamically',
           'start_self_review'
       true
-    else ['Instructor', 'Teaching Assistant', 'Administrator'].include? current_role_name
+    else current_user_has_instructor_privileges?
     end
   end
 
@@ -29,8 +31,8 @@ class ReviewMappingController < ApplicationController
     if participant.nil?
       participant = AssignmentParticipant.create(parent_id: params[:id], user_id: session[:user].id, can_submit: 1, can_review: 1, can_take_quiz: 1, handle: 'handle')
     end
-    map = ReviewResponseMap.where(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true).first rescue nil
-    map = ReviewResponseMap.create(reviewed_object_id: params[:id], reviewer_id: participant.id, reviewee_id: params[:team_id], calibrate_to: true) if map.nil?
+    map = ReviewResponseMap.where(reviewed_object_id: params[:id], reviewer_id: participant.get_reviewer.id, reviewee_id: params[:team_id], calibrate_to: true).first rescue nil
+    map = ReviewResponseMap.create(reviewed_object_id: params[:id], reviewer_id: participant.get_reviewer.id, reviewee_id: params[:team_id], calibrate_to: true) if map.nil?
     redirect_to controller: 'response', action: 'new', id: map.id, assignment_id: params[:id], return: 'assignment_edit'
   end
 
@@ -84,8 +86,8 @@ class ReviewMappingController < ApplicationController
   # and is used for instructor assigning reviewers in instructor-selected assignment.
   def assign_reviewer_dynamically
     assignment = Assignment.find(params[:assignment_id])
-    reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
-
+    participant = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
+    reviewer = participant.get_reviewer
     if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
       flash[:error] = "No topic is selected.  Please go back and select a topic."
     else
@@ -104,6 +106,10 @@ class ReviewMappingController < ApplicationController
         end
 
       else # assignment without topic -Yang
+
+        # E1973 - set the current user in case it is needed by the reviewer. Teams need to know
+        # the current user's id in order to return it for privilege access purposes
+        reviewer.set_current_user(current_user)
         assignment_teams = assignment.candidate_assignment_teams_to_review(reviewer)
         assignment_team = assignment_teams.to_a.sample rescue nil
         if assignment_team.nil?
@@ -118,7 +124,7 @@ class ReviewMappingController < ApplicationController
     #   flash[:error] = (e.nil?) ? $! : e
     # end
 
-    redirect_to controller: 'student_review', action: 'list', id: reviewer.id
+    redirect_to controller: 'student_review', action: 'list', id: participant.id
   end
 
   # assigns the quiz dynamically to the participant
@@ -174,7 +180,7 @@ class ReviewMappingController < ApplicationController
     begin
       reviewer = AssignmentParticipant.where(user_id: user.id, parent_id: assignment.id).first
       raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue." if reviewer.nil?
-      reviewer
+      reviewer.get_reviewer
     rescue StandardError => e
       flash[:error] = e.message
     end
@@ -227,7 +233,7 @@ class ReviewMappingController < ApplicationController
   def unsubmit_review
     @response = Response.where(map_id: params[:id]).last
     review_response_map = ReviewResponseMap.find_by(id: params[:id])
-    reviewer = review_response_map.reviewer.name
+    reviewer = review_response_map.reviewer.get_reviewer.name
     reviewee = review_response_map.reviewee.name
     if @response.update_attribute('is_submitted', false)
       flash.now[:success] = "The review by \"" + reviewer + "\" for \"" + reviewee + "\" has been unsubmitted."
@@ -430,7 +436,8 @@ class ReviewMappingController < ApplicationController
           next if TeamsUser.exists?(team_id: team_id,
                                     user_id: Participant.find(participant_id).user_id)
 
-          ReviewResponseMap.where(reviewee_id: team_id, reviewer_id: participant_id,
+          participant = AssignmentParticipant.find(participant_id)
+          ReviewResponseMap.where(reviewee_id: team_id, reviewer_id: participant.get_reviewer.id,
                                   reviewed_object_id: assignment_id).first_or_create
 
           teams_hash[team_id] += 1

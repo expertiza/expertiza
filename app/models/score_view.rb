@@ -1,5 +1,7 @@
 class ScoreView < ActiveRecord::Base
+  # setting this to false so that factories can be created
+  # to test the grading of weighted quiz questionnaires
   def readonly?
-    true
+    false
   end
 end

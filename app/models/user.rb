@@ -128,7 +128,8 @@ class User < ActiveRecord::Base
 
   # Function which has a MailerHelper which sends the mail welcome email to the user after signing up
   def email_welcome
-    MailerHelper.send_mail_to_user(self, "Your Expertiza password has been created", "user_welcome", password)
+    #this will send an account creation notification to user via email.
+    MailerHelper.send_mail_to_user(self, "Your Expertiza account and password has been created", "user_welcome", password).deliver_now
   end
 
   def valid_password?(password)
@@ -149,8 +150,6 @@ class User < ActiveRecord::Base
     if user.nil?
       attributes = ImportFileHelper.define_attributes(row_hash)
       user = ImportFileHelper.create_new_user(attributes, session)
-      password = user.reset_password
-      MailerHelper.send_mail_to_user(user, "Your Expertiza account has been created.", "user_welcome", password).deliver
     else
       user.email = row_hash[:email]
       user.fullname = row_hash[:fullname]
@@ -217,8 +216,8 @@ class User < ActiveRecord::Base
     # when replacing an existing key, update any digital signatures made previously with the new key
     if replacing_key
       participants = AssignmentParticipant.where(user_id: self.id)
-      for participant in participants
-        AssignmentParticipant.grant_publishing_rights(new_key.to_pem, [participant]) if participant.permission_granted
+      participants.each do |participant|
+        participant.assign_copyright(new_key.to_pem) if participant.permission_granted
       end
     end
 
@@ -233,6 +232,7 @@ class User < ActiveRecord::Base
     @email_on_submission = true
     @email_on_review_of_review = true
     @copy_of_emails = false
+    @preference_home_flag = true
   end
 
   def self.export(csv, _parent_id, options)
@@ -244,6 +244,7 @@ class User < ActiveRecord::Base
       tcsv.push(user.parent.name) if options["parent"] == "true"
       tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails) if options["email_options"] == "true"
       tcsv.push(user.handle) if options["handle"] == "true"
+      tcsv.push(user.preference_home_flag) if options["preference_home_flag"] == "true"
       csv << tcsv
     end
   end

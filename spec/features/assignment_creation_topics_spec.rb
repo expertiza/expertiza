@@ -13,7 +13,28 @@ describe "Assignment creation topics tab", js: true do
 		check("assignment_has_topics")
 		click_link 'Topics'
 	end
-
+	it 'Selects all the checkboxes when select all checkbox clicked' do
+		assignment = Assignment.where(name: 'public assignment for test').first
+		create(:topic, assignment_id: assignment.id)
+		create(:topic, assignment_id: assignment.id)
+		visit "/assignments/#{assignment.id}/edit"
+		click_link 'Topics'
+        expect(page).to have_field('select_all')
+		check('select_all')
+		expect(page).to have_checked_field('topic_check')        
+	end
+	it 'Deletes nothing when select all checkbox is not clicked and none of the topics are selected', js: true do
+		assignment = Assignment.where(name: 'public assignment for test').first
+		create(:topic, assignment_id: assignment.id)
+		create(:topic, assignment_id: assignment.id)
+		visit "/assignments/#{assignment.id}/edit"
+	 	click_link 'Topics'
+	 	click_button 'Delete selected topics'
+	    page.driver.browser.switch_to.alert.accept
+        sleep 3
+	 	topics_exist = SignUpTopic.where(assignment_id: assignment.id).count
+        expect(topics_exist).to be_eql 2
+    end
 	it "can edit topics properties" do
 		check("assignment_form_assignment_allow_suggestions")
 		check("assignment_form_assignment_is_intelligent")
@@ -68,11 +89,12 @@ describe "Assignment creation topics tab", js: true do
 	end
 
 	it "can delete existing topic", js: true do
+		create(:assignment_due_date, deadline_type: DeadlineType.where(name: "submission").first, due_at: DateTime.now.in_time_zone + 1.day)
 		click_link 'Due date'
 		fill_in 'assignment_form_assignment_rounds_of_reviews', with: '1'
 		click_button 'set_rounds'
-		fill_in 'datetimepicker_submission_round_1', with: (Time.now.in_time_zone + 1.day).strftime("%Y/%m/%d %H:%M")
-		fill_in 'datetimepicker_review_round_1', with: (Time.now.in_time_zone + 10.days).strftime("%Y/%m/%d %H:%M")
+		# fill_in 'datetimepicker_submission_round_1', with: (Time.now.in_time_zone + 10.days).strftime("%Y/%m/%d %H:%M")
+		# fill_in 'datetimepicker_review_round_1', with: (Time.now.in_time_zone + 100.days).strftime("%Y/%m/%d %H:%M")
 		click_button 'submit_btn'
 		assignment = Assignment.where(name: 'public assignment for test').first
 		create(:topic, assignment_id: assignment.id)

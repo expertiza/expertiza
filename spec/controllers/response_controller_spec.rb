@@ -10,11 +10,14 @@ describe ResponseController do
   let(:assignment_questionnaire) { build(:assignment_questionnaire) }
   let(:answer) { double('Answer') }
   let(:assignment_due_date) { build(:assignment_due_date) }
-  #E1973, team reviews
+  let(:bookmark) { build(:bookmark) }
   let(:team_response) { build(:response, id: 2, map_id: 2) }
   let(:team_response_map) { build(:review_response_map, id: 2, reviewer: participant, reviewer_is_team: true) }
   let(:team_questionnaire) {build(:questionnaire, id: 2)}
   let(:team_assignment) {build(:assignment, id: 2)}
+  let(:assignment_team) { build(:assignment_team, id: 1) }
+  let(:signed_up_team) { build(:signed_up_team, team_id: assignment_team.id) }
+  let(:assignment_form) { AssignmentForm.new }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -32,7 +35,9 @@ describe ResponseController do
     
     allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
     allow(review_response).to receive(:map).and_return(review_response_map)
+
     allow(team_response).to receive(:map).and_return(team_response_map)
+    allow(SignedUpTeam).to receive(:find_by).with(team_id: assignment_team.id).and_return(signed_up_team)
   end
 
   describe '#action_allowed?' do
@@ -183,20 +188,12 @@ describe ResponseController do
 
   describe '#new' do
     it 'renders response#response page' do
-      allow(ResponseMap).to receive(:find).with('1').and_return(review_response_map)
+      allow(AssignmentForm).to receive(:create_form_object).with(1).and_return(assignment_form)
+      allow(assignment_form).to receive(:assignment_questionnaire).with('ReviewQuestionnaire', 1, 1).and_return(assignment_questionnaire)
       allow(SignedUpTeam).to receive(:where).with(team_id: 1, is_waitlisted: 0).and_return([double('SignedUpTeam', topic_id: 1)])
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       allow(AssignmentDueDate).to receive(:find_by).with(any_args).and_return(assignment_due_date)
-      # varying_rubrics_by_round?
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
-      # review_questionnaire_id
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire])
-      # set_dropdown_or_scale
       allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 1).and_return([assignment_questionnaire])
-      allow(Questionnaire).to receive(:find).with(any_args).and_return(questionnaire)
-      allow(Questionnaire).to receive(:questions).and_return(question)
-      allow(Answer).to receive(:create).and_return(answer)
       params = {
         id: 1,
         feedback: '',
@@ -299,6 +296,15 @@ describe ResponseController do
       @params = {id: 1}
     end
 
+    context 'when params[:return] is bookmark' do
+      it 'redirects to bookmarks#list page' do
+        allow(Bookmark).to receive(:find).with(1).and_return(bookmark)
+        @params[:return] = 'bookmark'
+        get :redirect, @params
+        expect(response).to redirect_to('/bookmarks/list?id=1')
+      end
+    end
+
     context 'when params[:return] is feedback' do
       it 'redirects to grades#view_my_scores page' do
         @params[:return] = 'feedback'
@@ -340,7 +346,7 @@ describe ResponseController do
     end
 
     context 'when params[:return] is survey' do
-      it 'redirects to survey_deployment#pending_surveys page' do
+      it 'redirects to response#pending_surveys page' do
         @params[:return] = 'survey'
         get :redirect, @params
         expect(response).to redirect_to('/survey_deployment/pending_surveys')
@@ -356,9 +362,4 @@ describe ResponseController do
     end
   end
 
-  # describe '#json' do
-  #  allow(Response).to receive(:find).with(response_id: 1).and_return([review_response])
-  #  allow(response).to receive(:response_id).and_return(1)
-  #  expect(response).to respond_with_content_type(:json)
-  # end
 end

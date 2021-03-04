@@ -19,7 +19,6 @@ describe TeamsController do
       team = double('Team', id: 1, name: 'test team', parent_id: 1)
       signed_up_teams = [double('SignedUpTeam', topic_id: 1, is_waitlisted: true)]
       controller.session[:team_type] = 'Assignment'
-      controller.session[:user] = double('User', id: 1)
 
       allow(Team).to receive(:find).with(any_args).and_return(team)
       allow(Team).to receive(:find_by).with(any_args).and_return(team)

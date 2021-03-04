@@ -1,7 +1,9 @@
 describe PopupController do
   let(:assignment_team) { build(:assignment_team, id: 1, name: "team1", assignment: assignment) }
-  let(:team) { build(:team) }
+#   let(:team) { build(:team) }
   let(:team_user) { build(:team_user) }
+  let(:instructor) { build(:instructor, id: 6) }
+  let(:team) { build(:assignment_team, id: 1, name: "team1", assignment: assignment) }
   let(:student) { build(:student, id: 1, name: "student") }
   let(:student2) { build(:student, id: 2, name: "student2") }
   let(:admin) { build(:admin) }
@@ -132,6 +134,16 @@ describe PopupController do
         expect(controller.instance_variable_get(:@user)).to eq instructor
         expect(controller.instance_variable_get(:@myuser)).to eq instructor.id
         expect(controller.instance_variable_get(:@scores)).to be nil
+      end
+
+    ## INSERT CONTEXT/DESCRIPTION/CODE HERE
+      it "renders the page successfuly as Instructor" do 
+        allow(Team).to receive(:find).and_return(team)
+        allow(Assignment).to receive(:find).and_return(assignment)
+        params = {id: team.id, assignment: assignment, reviewer_id: participant2.id}
+        session = {user: instructor}
+        result = get :team_users_popup, params, session
+        expect(result.status).to eq 200
       end
     end
 

@@ -46,14 +46,21 @@ module SummaryHelper
       end
     end
 
+    # E1936 team recommends this method be REMOVED
+    #   it does not seem to be used anywhere in Expertiza as of 4/21/19
+    #   aside from in methods which are themselves not used anywhere in Expertiza as of 4/21/19
     # produce summaries for instructor. it merges all feedback given to all reviewees, and summarize them by criterion
     def summarize_reviews_by_criterion(assignment, summary_ws_url)
       self.summary = self.avg_scores_by_criterion = self.avg_scores_by_round = Array.new(assignment.rounds_of_reviews)
       rubric = get_questions_by_assignment(assignment)
 
-      # get question in each round and summarize them all
-      (0..assignment.rounds_of_reviews - 1).each do |round|
-        questions_used_in_round = rubric[assignment.varying_rubrics_by_round? ? round : 0]
+      (0..nround - 1).each do |round|
+        self.avg_scores_by_round[round] = 0.0
+        self.summary[round] = {}
+        self.avg_scores_by_criterion[round] = {}
+
+        questions_used_in_round = rubric[assignment.vary_by_round ? round : 0]
+        # get answers of each question in the rubric
         questions_used_in_round.each do |question|
           next if question.type.eql?("SectionHeader")
           summarize_reviews_by_criterion_question(assignment, summary_ws_url, round, question)
@@ -76,6 +83,9 @@ module SummaryHelper
       end_threads(threads)
     end
 
+    # E1936 team recommends this method be REMOVED
+    #   it does not seem to be used anywhere in Expertiza as of 4/21/19
+    #   aside from in methods which are themselves not used anywhere in Expertiza as of 4/21/19
     # produce summaries for instructor and students. It sum up the feedback by criterion for each reviewee
     def summarize_reviews_by_reviewees(assignment, summary_ws_url)
       self.summary = ({})
@@ -163,7 +173,8 @@ module SummaryHelper
 
     # convert answers to each question to sentences
     def get_sentences(ans)
-      sentences = ans.comments.gsub!(/[.?!]/, '\1|').split('|').map!(&:strip) unless ans.comments.nil?
+      sentences = ans.comments.gsub!(/[.?!]/, '\1|').try(:split, '|') || nil unless ans.nil? or ans.comments.nil?
+      sentences.map!(&:strip) unless sentences.nil?
       sentences
     end
 
@@ -178,16 +189,28 @@ module SummaryHelper
       comments
     end
 
+    # E1936 team recommends this method be REMOVED
+    #   it does not seem to be used anywhere in Expertiza as of 4/21/19
+    #   aside from in methods which are themselves not used anywhere in Expertiza as of 4/21/19
     def get_questions_by_assignment(assignment)
       rubric = []
       (0..assignment.rounds_of_reviews - 1).each do |round|
         rubric[round] = nil
-        if assignment.varying_rubrics_by_round?
+        if assignment.vary_by_round
+          # get rubric id in each round
+          # E1936 team did not update this usage of review_questionnaire_id() to include topic,
+          #   because this method does not seem to be used anywhere in Expertiza
+          #   as noted in method block comment above
+          questionnaire_id = assignment.review_questionnaire_id(round + 1)
           # get criteria in the corresponding rubric (each round may use different rubric)
           rubric[round] = Question.where(questionnaire_id: assignment.review_questionnaire_id(round + 1)).order(:seq)
         else
           # if use the same rubric then query only once at the beginning and store them in the rubric[0]
-          rubric[0] = rubric[0].nil? ? Question.where(questionnaire_id: assignment.review_questionnaire_id).order(:seq) : rubric[0]
+          # E1936 team did not update this usage of review_questionnaire_id() to include topic,
+          #   because this method does not seem to be used anywhere in Expertiza
+          #   as noted in method block comment above
+          questionnaire_id = questionnaire_id.nil? ? assignment.review_questionnaire_id : questionnaire_id
+          rubric[0] = rubric[0].nil? ? Question.where(questionnaire_id: questionnaire_id).order(:seq) : rubric[0]
         end
       end
       rubric

@@ -1,8 +1,10 @@
 class StudentTaskController < ApplicationController
+  include AuthorizationHelper
+
   helper :submitted_content
 
   def action_allowed?
-    ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student'].include? current_role_name
+    current_user_has_student_privileges?
   end
 
   def impersonating_as_admin?
@@ -53,6 +55,7 @@ class StudentTaskController < ApplicationController
     @can_provide_suggestions = @assignment.allow_suggestions
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
     @topics = SignUpTopic.where(assignment_id: @assignment.id)
+    @use_bookmark = @assignment.use_bookmark
     # Timeline feature
     @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
   end

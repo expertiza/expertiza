@@ -531,7 +531,10 @@ describe ReviewMappingController do
 
   describe '#save_grade_and_comment_for_reviewer' do
     it 'redirects to reports#response_report page' do
+      # Use factories to create stubs (user must be instructor or above to perform this action)
       review_grade = build(:review_grade)
+      instructor = build(:instructor)
+      # Stub out other items
       allow(ReviewGrade).to receive(:find_by).with(participant_id: '1').and_return(review_grade)
       allow(review_grade).to receive(:save).and_return(true)
       params = {
@@ -539,7 +542,8 @@ describe ReviewMappingController do
         grade_for_reviewer: 90,
         comment_for_reviewer: 'keke'
       }
-      session = {user: double('User', id: 1)}
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      # Perform test
       post :save_grade_and_comment_for_reviewer, params, session
       expect(flash[:note]).to be nil
       expect(response).to redirect_to('/reports/response_report')

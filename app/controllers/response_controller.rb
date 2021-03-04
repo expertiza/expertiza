@@ -1,4 +1,6 @@
 class ResponseController < ApplicationController
+  include AuthorizationHelper
+
   helper :submitted_content
   helper :file
 
@@ -17,28 +19,16 @@ class ResponseController < ApplicationController
     when 'delete', 'update'
       return current_user_is_reviewer?(response.map, user_id)
     when 'view'
-      return view_allowed?(response.map, user_id)
+      return response_edit_allowed?(response.map, user_id)
     else
-      current_user
+      user_logged_in?
     end
   end
 
   # E-1973 - helper method to check if the current user is the reviewer
   # if the reviewer is an assignment team, we have to check if the current user is on the team
   def current_user_is_reviewer?(map, reviewer_id)
-    return map.get_reviewer.current_user_is_reviewer? current_user.try(:id)
-  end
-
-  def view_allowed?(map, user_id)
-    assignment = map.reviewer.assignment # if it is a review response map, all the members of reviewee team should be able to view the response
-    if map.is_a? ReviewResponseMap
-      reviewee_team = AssignmentTeam.find(map.reviewee_id)
-      return current_user_is_reviewer?(map, user_id) || reviewee_team.user?(current_user) || current_user.role.name == 'Administrator' ||
-        (current_user.role.name == 'Instructor' and assignment.instructor_id == current_user.id) ||
-          (current_user.role.name == 'Teaching Assistant' and TaMapping.exists?(ta_id: current_user.id, course_id: assignment.course.id))
-    else
-      current_user_is_reviewer?(map, user_id)
-    end
+    map.get_reviewer.current_user_is_reviewer? current_user.try(:id)
   end
 
   # GET /response/json?response_id=xx
@@ -97,6 +87,7 @@ class ResponseController < ApplicationController
       @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
     @questionnaire = set_questionnaire
+    store_total_cake_score
     render action: 'response'
   end
 
@@ -140,10 +131,12 @@ class ResponseController < ApplicationController
     # A new response has to be created when there hasn't been any reviews done for the current round,
     # or when there has been a submission after the most recent review in this round.
     @response = Response.where(map_id: @map.id, round: @current_round.to_i).order(updated_at: :desc).first
-    if @response.nil? || AssignmentTeam.find(@map.reviewee_id).most_recent_submission.updated_at > @response.updated_at
+    teams_most_recent_submission = AssignmentTeam.find(@map.reviewee_id).most_recent_submission
+    if @response.nil? || (!teams_most_recent_submission.nil? && teams_most_recent_submission.updated_at > @response.updated_at)
       @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
     end
     questions = sort_questions(@questionnaire.questions)
+    store_total_cake_score
     init_answers(questions)
     render action: 'response'
   end
@@ -231,6 +224,10 @@ class ResponseController < ApplicationController
     redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
+  def pending_surveys
+    redirect_to controller: 'survey_deployment', action: 'pending_surveys'
+  end
+
   def redirect
     error_id = params[:error_msg]
     message_id = params[:msg]
@@ -250,6 +247,11 @@ class ResponseController < ApplicationController
       redirect_to controller: 'submitted_content', action: 'edit', id: @map.response_map.reviewer_id
     when "survey"
       redirect_to controller: 'survey_deployment', action: 'pending_surveys'
+    when "bookmark"
+      bookmark = Bookmark.find(@map.response_map.reviewee_id)
+      redirect_to controller: 'bookmarks', action: 'list', id: bookmark.topic_id
+    when "ta_review"      # Page should be directed to list_submissions if TA/instructor performs the review
+      redirect_to controller: 'assignments', action: 'list_submissions', id: @map.response_map.assignment.id
     else
       # if reviewer is team, then we have to get the id of the participant from the team
       # the id in reviewer_id is of an AssignmentTeam
@@ -272,22 +274,22 @@ class ResponseController < ApplicationController
 
   def toggle_permission
     render nothing: true unless action_allowed?
-    
+
     # the response to be updated
     @response = Response.find(params[:id])
 
     # Error message placehoder
     msg = ""
-    
+
     begin
       @map = @response.map
-      
+
       # Updating visibility for the response object, by E2022 @SujalAhrodia -->
       visibility = params[:visibility]
       if (!visibility.nil?)
         @response.update_attribute("visibility",visibility)
       end
-    
+
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
@@ -348,14 +350,15 @@ class ResponseController < ApplicationController
     when "ReviewResponseMap", "SelfReviewResponseMap"
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
       @current_round = @assignment.number_of_current_round(reviewees_topic)
-      @questionnaire = @map.questionnaire(@current_round)
+      @questionnaire = @map.questionnaire(@current_round, reviewees_topic)
     when
       "MetareviewResponseMap",
       "TeammateReviewResponseMap",
       "FeedbackResponseMap",
       "CourseSurveyResponseMap",
       "AssignmentSurveyResponseMap",
-      "GlobalSurveyResponseMap"
+      "GlobalSurveyResponseMap",
+      "BookmarkRatingResponseMap"
       @questionnaire = @map.questionnaire
     end
   end
@@ -404,6 +407,21 @@ class ResponseController < ApplicationController
       # it's unlikely that these answers exist, but in case the user refresh the browser some might have been inserted.
       a = Answer.where(response_id: @response.id, question_id: q.id).first
       Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '') if a.nil?
+    end
+  end
+
+  # Creates a table to store total contribution for Cake question across all reviewers
+  def store_total_cake_score
+    @total_score = Hash.new
+    @questions.each do |question|
+      if question.instance_of? Cake
+        reviewee_id = ResponseMap.select(:reviewee_id, :type).where(id: @response.map_id.to_s).first
+        total_score = question.get_total_score_for_question(reviewee_id.type, question.id, @participant.id, @assignment.id, reviewee_id.reviewee_id).to_s
+        if total_score.nil?
+          total_score = 0
+        end
+        @total_score[question.id] = total_score
+      end
     end
   end
 end

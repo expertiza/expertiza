@@ -1,4 +1,6 @@
 class ReportsController < ApplicationController
+  include AuthorizationHelper
+
   autocomplete :user, :name
   require 'gchart'
   helper :submitted_content
@@ -6,7 +8,7 @@ class ReportsController < ApplicationController
 
   # reports are allowed to be viewed by  only by TA, instructor and administrator
   def action_allowed?
-    ['Instructor', 'Teaching Assistant', 'Administrator'].include? current_role_name
+    current_user_has_ta_privileges?
   end
 
   def response_report

@@ -1,0 +1,12 @@
+<h1>Request new user</h1>
+
+<%= form_tag :action => 'create_requested_user_record' do %>
+  <p><label for="role_id"><b>Role</b></label><br/>
+    <div>Instructor</div>
+  </p>
+
+  <%= render :partial => 'users/user', :locals => { :new_user => true, :request_user => true } %>
+  <%= submit_tag "Request" %>
+<% end %>
+
+<%= link_to 'Back', root_path%>

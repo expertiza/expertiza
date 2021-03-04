@@ -1,9 +1,9 @@
 describe PopupController do
   let(:assignment_team) { build(:assignment_team, id: 1, name: "team1", assignment: assignment) }
-#   let(:team) { build(:team) }
+  let(:team) { build(:team) }
   let(:team_user) { build(:team_user) }
   let(:instructor) { build(:instructor, id: 6) }
-  let(:team) { build(:assignment_team, id: 1, name: "team1", assignment: assignment) }
+#   let(:team) { build(:assignment_team, id: 1, name: "team1", assignment: assignment) }
   let(:student) { build(:student, id: 1, name: "student") }
   let(:student2) { build(:student, id: 2, name: "student2") }
   let(:admin) { build(:admin) }

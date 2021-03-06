@@ -2,7 +2,6 @@
 // All this logic will automatically be available in application.js.
 /**
  * Created by ferry on 6/26/17.
- *
  */
 
 save_tag = function(answer_id, tag_prompt_deployment_id, control){

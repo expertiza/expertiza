@@ -18,24 +18,67 @@
           target.style.display = 'none';
       }
   }
+
+  //Count tags and put into a one d vector. Need to refactor to populate as an array.
   function countTags() {
-      //var temp = $('body').text();
-      //var count = temp.match(/id="tag_prompt_/g);
       var tagPrompts = document.getElementsByName("tag_checkboxes[]")
       var offTags = 0;
       var onTags = 0;
       for (index = 0; index < tagPrompts.length; ++index) {
-          if(tagPrompts[index].value == 0) {
+          if (tagPrompts[index].value == 0) {
               ++offTags;
-          }
-          else {
+          } else {
               ++onTags;
           }
-
       }
       document.getElementById("tagCount").innerText = "Total: " + tagPrompts.length + " Not Clicked: " + offTags + " Clicked: " + onTags;
-
-}
+      //Go ahead and run the generate table function now. This call needs to be changed.
+      generateTable(tagPrompts);
+  }
+  //Create a basic table layout of the review tags containing their status, numerically.
+  function generateTable(tagPrompts) {
+      //load table object
+      let table = document.getElementById("tagHeatMap");
+      //1-d vector maths, needs to be changed to 2-d array
+      let r = Math.sqrt(tagPrompts.length);
+      //create the header
+      let thead = table.createTHead();
+      let row = thead.insertRow();
+      for(index = 0; index < r; ++index) {
+          let th = document.createElement("th");
+          //Label the header
+          let text = document.createTextNode("Q"+index);
+          th.appendChild(text);
+          row.appendChild(th);
+      }
+      //create table body
+      for(rIndex = 0; rIndex < r; ++rIndex) {
+          let trow = table.insertRow();
+          for(cIndex = 0; cIndex < r; ++cIndex) {
+              let cell = trow.insertCell();
+              //compute 1-d vector indices. Needs to be updated to 2-d
+              let vectorIndex = rIndex*r + cIndex;
+              // set TD tag ids as tag_heatmap_id_rownum_colnum
+              let idString = "tag_heatmap_id_" + rIndex + "_" + cIndex;
+              cell.setAttribute("id", idString);
+              // set initial colors
+              let text = document.createTextNode("\u0058");
+              if(tagPrompts[vectorIndex].value == 0) {
+                  // Set color. Should probably be set with a stylesheet class yes?
+                  // Do we only care about coloring done/not done?
+                  cell.setAttribute("style", "background-color: red; text-align: center;");
+              }
+              else {
+                  // Set color. Should probably be set with a stylesheet class yes?
+                  // Do we only care about coloring done/not done?
+                  cell.setAttribute("style", "background-color: green; text-align: center;");
+                  text.data = "\u2713";
+              }
+              //add to table
+              cell.appendChild(text);
+          }
+      }
+  }
 </script>
 <h2>Summary Report for assignment: <%= @assignment.name %></h2>
 <h4>Team: <%= @team.name %></h4>
@@ -49,7 +92,7 @@
 <h4>Average peer review score: <span class = "c5"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span></h4>
 <!-- Show Number Of Tags on Page -->
 <h4><button onClick="countTags()" class="btn btn-default">Count Tags</button> Number of Tag Elements: <div id = "tagCount"></div></h4>
-
+<table id="tagHeatMap"></table>
 <!--Toggle submission-->
 <button onclick="toggleFunction('<%= @participant.id.to_s%>')" class="btn btn-default">Show Submission</button>
 <div id="<%= @participant.id.to_s%>" style="display:none;">

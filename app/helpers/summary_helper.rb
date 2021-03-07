@@ -8,7 +8,7 @@ module SummaryHelper
   class Summary
     attr_accessor :summary, :reviewers, :avg_scores_by_reviewee, :avg_scores_by_round, :avg_scores_by_criterion, :summary_ws_url
 
-    def summarize_reviews_by_reviewee(questions, assignment, r_id, summary_ws_url, session = nil)
+    def summarize_reviews_by_reviewee(questions, assignment, reviewee_id, summary_ws_url, session = nil)
       self.summary = ({})
       self.avg_scores_by_round = ({})
       self.avg_scores_by_criterion = ({})

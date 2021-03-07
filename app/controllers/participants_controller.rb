@@ -181,7 +181,7 @@ class ParticipantsController < ApplicationController
     teams = Team.where(parent_id: assignment_id)
     teams.each do |team|
       team_info = {}
-      team_info[:name] = team.name
+      team_info[:name] = team.name(session[:ip])
       users = []
       team.users {|team_user| users.append(get_user_info(team_user, assignment)) }
       team_info[:users] = users

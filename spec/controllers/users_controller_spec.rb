@@ -7,6 +7,8 @@ describe UsersController do
   let(:student3) { build(:student, id: 10, role_id: 1, parent_id: nil) }
   let(:student4) { build(:student, id: 20, role_id: 4) }
   let(:student5) { build(:student, role_id: 4, parent_id: 3) }
+  let(:student6) { build(:student, role_id: nil, name: :lilith)}
+  let(:student7) { build(:student, id: 30, name: :amanda)}
 
   let(:institution1) {build(:institution, id: 1)}
   let(:requested_user1) {
@@ -43,6 +45,26 @@ describe UsersController do
       request.env["HTTP_REFERER"] = "http://www.example.com"
       @params = {}
       session = {user: instructor}
+      get :set_anonymized_view, params: @params, session: session
+      expect(response).to redirect_to("http://www.example.com")
+    end
+
+    # check whether student / instructor is allowed to set anonymized view
+    it 'allows student / instructor to set anonymized view' do
+      params = {action: 'set_anonymized_view'}
+      allow(controller).to receive(:params).and_return(params)
+      expect(controller.action_allowed?).to be true
+      stub_current_user(student7, student7.role.name, student7.role)
+      allow(controller).to receive(:params).and_return(params)
+      expect(controller.action_allowed?).to be true
+    end
+
+    # check there are no errors while setting anonymized view as a student
+    it 'redirects to back' do
+      stub_current_user(student7, student7.role.name, student7.role)
+      request.env["HTTP_REFERER"] = "http://www.example.com"
+      @params = {}
+      session = {user: student7}
       get :set_anonymized_view, params: @params, session: session
       expect(response).to redirect_to("http://www.example.com")
     end

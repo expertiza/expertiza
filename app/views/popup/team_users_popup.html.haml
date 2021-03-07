@@ -2,7 +2,7 @@
   %script{:src=>"/assets/team_users_popup.js"}
 
   %h3
-    Members of #{@team.name}
+    Members of #{@team.name(session[:ip])}
   %table{:width => "100%"}
     - if @team_users.empty?
       %tr No team members

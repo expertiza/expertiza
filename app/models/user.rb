@@ -98,6 +98,16 @@ class User < ActiveRecord::Base
     false
   end
 
+  # E1991 : This function returns original name of the user 
+  # from their anonymized names. The process of obtaining
+  # real name is exactly opposite of what we'd do to get
+  # anonymized name from their real name.
+  def self.real_user_from_anonymized_name(anonymized_name)
+    user_id = anonymized_name.split(' ')[1]
+    user = User.find_by(id: user_id)
+    return user
+  end
+
   def name(ip_address = nil)
     User.anonymized_view?(ip_address) ? self.role.name + ' ' + self.id.to_s : self[:name]
   end

@@ -18,7 +18,7 @@ class UsersController < ApplicationController
       # These action methods are all written with the clear expectation
       # that a student should be allowed to proceed
       current_user_has_student_privileges?
-    when 'show'
+    when 'show', 'set_anonymized_view'
       # This action method is written with the clear expectation
       # that a student should be allowed to proceed
       # Furthermore, there is an RSPec test that a 'student' with no role id

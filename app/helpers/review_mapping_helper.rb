@@ -117,6 +117,7 @@ module ReviewMappingHelper
     team_reviewed_link_name = if max_team_size == 1
                                 TeamsUser.where(team_id: reviewee_id).first.user.fullname
                               else
+                                # E1991 : check anonymized view here
                                 Team.find(reviewee_id).name
                               end
     team_reviewed_link_name = "(" + team_reviewed_link_name + ")" if !response.empty? and !response.last.is_submitted?

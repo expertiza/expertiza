@@ -15,6 +15,8 @@ save_tag = function(answer_id, tag_prompt_deployment_id, control){
         tag_prompt_deployment_id: tag_prompt_deployment_id.toString(),
         value: control.value.toString()
     }));
+    // Update Heatmap
+    tagActionOnUpdate();
 }
 
 toggleLabel = function(range) {

@@ -3,6 +3,14 @@
     $('.tag_prompt_container').toggle();
   };
   $( document ).ready(function() {
+
+    $('#remaining_tags').text($(":input[value='0']").length)
+    //  Onclick function for all tags, which will calculate number of
+    //  tags with value 0. (i.e. incomplete tags)
+    $(".rangeAll").click(function() {
+      $('#remaining_tags').text($(":input[value='0']").length)
+    });
+
     $('#tag_prompt_toggler').click(function () {
       if ($('#tag_prompt_toggler').text() == "hide tags")
         $('#tag_prompt_toggler').text("show tags")
@@ -38,6 +46,9 @@
     <%end%>
     <BR/>
     <HR/>
+
+  <div class="tags_remaining_text">Number of tags remaining</div>
+  <div class="tags_remaining_count" id='remaining_tags'></div>
     <% count = 0 %>
     <!--Zhewei: If this assignment supports varying rubrics by round, Expertiza will display all-round reviews. -->
     <!--And if one reviewer did not do first-round review and did second round directly, Expertiza will display only second round.-->
@@ -83,8 +94,8 @@
                 <% map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: participant.id).first
                     review_feedbacks = map.try :response %>
                 <% if review_feedbacks && !review_feedbacks.empty? %>
-                    <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedbacks.first.id %> or
-                    <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedbacks.first.id, :return => "feedback" %> feedback for Review <%= count %>
+                    <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedbacks[-1].id %> or
+                    <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedbacks[-1].id, :return => "feedback" %> feedback for Review <%= count %>
                 <% else %>
                     <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
                 <% end %>

@@ -144,7 +144,7 @@ describe "airbrake-1517247902792549741" do
     expect(page).to have_content('Tasks not yet started')
     expect(page).to have_content('Students who have teamed with you')
     expect(page).to have_content('Review Grade')
-    expect(page).to have_content('Publishing Rights')
+    expect(page).to have_content('Copyright Grants')
     expect(page).not_to have_content('Welcome!')
     expect(page).not_to have_content('User Name')
     expect(page).not_to have_content('Password')

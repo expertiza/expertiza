@@ -5,7 +5,7 @@ module StudentTaskHelper
        participant.try(:review_grade).try(:comment_for_reviewer).nil?
       result = "N/A"
     else
-      info = "Score: " + participant.try(:review_grade).try(:grade_for_reviewer).to_s + "/100\n"
+      info = "Score: " + participant.try(:review_grade).try(:grade_for_reviewer).to_s + "/40\n"
       info += "Comment: " + participant.try(:review_grade).try(:comment_for_reviewer).to_s
       info = truncate(info, length: 1500, omission: '...')
       result = "<img src = '/assets/info.png' title = '" + info + "'>"
@@ -14,7 +14,7 @@ module StudentTaskHelper
   end
 
   def check_reviewable_topics(assignment)
-    return true if !assignment.topics? and assignment.get_current_stage != "submission"
+    return true if !assignment.topics? and assignment.can_review()
     sign_up_topics = SignUpTopic.where(assignment_id: assignment.id)
     sign_up_topics.each {|topic| return true if assignment.can_review(topic.id) }
     false

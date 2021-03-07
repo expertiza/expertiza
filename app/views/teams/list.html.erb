@@ -9,7 +9,7 @@
   <ul>
     <li><a href="#tabs-1" id="General">Teams</a></li>
     <% if session[:team_type] == 'Assignment' and @assignment.max_team_size > 1 %>
-      <li><a href="#tabs-2" id="Topics">Students without teams</a></li>
+      <li><a href="#tabs-2" id="Topics">Students Without Teams</a></li>
     <% end %>
   </ul>
   <div id="tabs-1"><%= render partial: 'team' %></div>
@@ -17,7 +17,7 @@
       <% participants_without_team = get_participants_without_team(@assignment) %>
       <div id="tabs-2">
         <table>
-          <th>name</th>
+          <th>Name</th>
           <% participants_without_team.each_with_index do |participant, index| %>
             <tr class=<%= index % 2 == 0 ? 'odd' : 'even' %>><td><%= participant.name(session[:ip]) %></td></tr>
           <% end %>

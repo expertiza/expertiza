@@ -17,9 +17,12 @@ class LatePoliciesController < ApplicationController
     end
   end
 
-  # GET /late_policies
-  # GET /late_policies.xml
+  def set_assignment_id
+    session[:assignment_id] = params[:assignment_id]
+  end
+
   def index
+    @assignment_id = session[:assignment_id]
     @penalty_policies = LatePolicy.all
     respond_to do |format|
       format.html # index.html.erb
@@ -40,6 +43,7 @@ class LatePoliciesController < ApplicationController
   # GET /late_policies/new
   # GET /late_policies/new.xml
   def new
+    set_assignment_id
     @late_policy = LatePolicy.new
     respond_to do |format|
       format.html # new.html.erb
@@ -69,8 +73,8 @@ class LatePoliciesController < ApplicationController
         @late_policy.save!
         flash[:notice] = "The penalty policy was successfully created."
         redirect_to action: 'index'
-      rescue StandardError
-        flash[:error] = "The following error occurred while saving the penalty policy: "
+      rescue StandardError => e
+        flash[:error] = "The following error occurred while saving the penalty policy: " + e.message
         redirect_to action: 'new'
       end
     else

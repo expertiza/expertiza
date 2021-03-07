@@ -7,9 +7,9 @@
     <% @authors.each do |r| %>
       <% next unless r %>
       <% if @assignment.varying_rubrics_by_round? %>
-        <% get_each_round_review_and_feedback_response_map_for_feedback_report(r) %> 
+        <% get_each_review_and_feedback_response_map(r) %>
       <% else %>
-        <% get_certain_round_review_and_feedback_response_map_for_feedback_report(r) %>      
+        <% get_certain_review_and_feedback_response_map(r) %>
       <% end %>
 
       <% @first_col_identifier = true %>
@@ -120,7 +120,7 @@
             <% else %>
               <% @reviewee_name = Participant.find(@frm.reviewee_id).user.fullname(session[:ip]) %>
               <% if Response.exists?(map_id: @frm.id) %>
-                <% feedback_response = Response.where(map_id: @frm.id).first %>
+                <% feedback_response = Response.where(map_id: @frm.id).last %>
                 <!--Review response rejoined-->
                 <td id = "green" bgcolor=<%= @bgcolor %> align='left' colspan=1>
                   <%= link_to user_name = Participant.find(rr.response_map.reviewer_id).user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user_name}), :method => :post, :title => "Click here to impersonate this user"%>

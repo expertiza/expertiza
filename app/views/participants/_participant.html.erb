@@ -5,9 +5,9 @@
   <td><a href="mailto: <%= participant.user.email(session[:ip]) %>"><%= participant.user.email(session[:ip]) %></a></td>
   <td><%= participant.user.role.name %></td>
   <td align = "left"><%= (User.find(participant.user.parent_id)).name(session[:ip]) %></td>
-  <% if participant.assignment.has_badge? %>
-    <td align = "left"><%= get_awarded_badges(participant) %></td>
-  <% end %>
+  <%# if participant.assignment.has_badge? %>
+<!--    <td align = "left"><%#= get_awarded_badges(participant) %></td>-->
+  <%# end %>
   <td align = "left"><%= User.yesorno(participant.user.email_on_review) %></td>
   <td align = "left"><%= User.yesorno(participant.user.email_on_submission) %></td>
   <td align = "left"><%= User.yesorno(participant.user.email_on_review_of_review) %></td>
@@ -53,7 +53,7 @@
                   <% end -%>
                   >submitter</option>
         </select>
-        <%= button_tag "Submit", {:id=>'button'+participant.user_id.to_s,:style=>"font-size:15px; opacity:0;", :class => "btn btn-md btn-default" } %>
+        <%= button_tag "Submit", {:id=>'button'+participant.user_id.to_s,:style=>"font-size:15px; opacity:1;", :class => "btn btn-md btn-default" } %>
     <% end %>
   </td>
 

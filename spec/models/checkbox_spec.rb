@@ -8,7 +8,7 @@ describe Checkbox do
   describe "#edit" do
     it "returns the html " do
       html = checkbox.edit(0).to_s
-      expect(html).to eq("<tr><td align=\"center\"><a rel=\"nofollow\" data-method=\"delete\" href=\"/questions/10\">Remove</a></td><td><input size=\"6\" value=\"1.0\" name=\"question[10][seq]\" id=\"question_10_seq\" type=\"text\"></td><td><textarea cols=\"50\" rows=\"1\" name=\"question[10][txt]\" id=\"question_10_txt\" placeholder=\"Edit question content here\">test txt</textarea></td><td><input size=\"10\" disabled=\"disabled\" value=\"Checkbox\" name=\"question[10][type]\" id=\"question_10_type\" type=\"text\"></td><td><!--placeholder (UnscoredQuestion does not need weight)--></td></tr>")
+      expect(html).to eq("<tr><td align=\"center\"><a rel=\"nofollow\" data-method=\"delete\" href=\"/questions/10\">Remove</a></td><td><input size=\"6\" value=\"1.0\" name=\"question[10][seq]\" id=\"question_10_seq\" type=\"text\"></td><td><textarea cols=\"50\" rows=\"1\" name=\"question[10][txt]\" id=\"question_10_txt\" placeholder=\"Edit question content here\">test txt</textarea></td><td><input size=\"10\" disabled=\"disabled\" value=\"Checkbox\" name=\"question[10][type]\" id=\"question_10_type\" type=\"text\"></td><td style=\"color: grey\">Checkbox questions does not need weight</td><td style=\"color: grey\">N/A</td><td style=\"color: grey\">No labels required</td></tr>")
     end
   end
 

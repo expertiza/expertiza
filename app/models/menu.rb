@@ -51,7 +51,8 @@ class Menu
     @vector = []
     @crumbs = []
     items = MenuItem.items_for_permissions(role.try(:cache)[:credentials].try(:permission_ids))
-    return if items.nil? or items.empty?
+    # return if items.nil? or items.empty?
+    return if items.blank?
     # Build hashes of items by name and id
     items.each do |item|
       node = Node.new

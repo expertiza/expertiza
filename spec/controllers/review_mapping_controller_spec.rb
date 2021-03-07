@@ -13,8 +13,10 @@ describe ReviewMappingController do
   let(:participant1) { double('AssignmentParticipant', id: 2, can_review: true, user: double('User', id: 2)) }
   let(:user) { double('User', id: 3) }
   let(:participant2) { double('AssignmentParticipant', id: 3, can_review: true, user: user) }
+  let(:participant3) { double('Participant', user_id: 1, parent_id: '1', can_review: true) }
   let(:team) { double('AssignmentTeam', name: 'no one') }
   let(:team1) { double('AssignmentTeam', name: 'no one1') }
+  let(:response1) { [double('Response', id: 1, map_id: 1, additional_comment: 'Test Comment')] }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -81,11 +83,13 @@ describe ReviewMappingController do
         allow(User).to receive(:from_params).with(any_args).and_return(user)
         allow(AssignmentParticipant).to receive(:where).with(user_id: 1, parent_id: 1)
                                                        .and_return([double('AssignmentParticipant', id: 1, name: 'no one')])
+        allow(Participant).to receive_message_chain(:where, :first)
+          .with(parent_id: '1', user_id: 1).with(no_args).and_return(participant3)
         allow(ReviewResponseMap).to receive_message_chain(:where, :first)
           .with(reviewee_id: '1', reviewer_id: 1).with(no_args).and_return(nil)
         allow(ReviewResponseMap).to receive(:create).with(reviewee_id: '1', reviewer_id: 1, reviewed_object_id: 1).and_return(nil)
         post :add_reviewer, @params
-        expect(response).to redirect_to '/review_mapping/list_mappings?id=1&msg='
+        expect(response).to redirect_to '/review_mapping/list_mappings?id=1'
       end
     end
   end
@@ -224,6 +228,7 @@ describe ReviewMappingController do
     context 'when review response map has corresponding responses' do
       it 'shows a flash error and redirects to review_mapping#list_mappings page' do
         allow(Response).to receive(:exists?).with(map_id: 1).and_return(true)
+        allow(Response).to receive(:where).with(map_id: 1).and_return(response1)
         params = {
           id: 1,
           contributor_id: 1
@@ -342,9 +347,10 @@ describe ReviewMappingController do
     context 'when corresponding response exists to current review response map' do
       it 'shows an error flash message and redirects to previous page' do
         allow(Response).to receive(:exists?).with(map_id: 1).and_return(true)
+        allow(Response).to receive(:where).with(map_id: 1).and_return(response1)
         params = {id: 1}
         post :delete_reviewer, params
-        expect(flash[:error]).to eq('This review has already been done. It cannot been deleted.')
+        expect(flash[:error]).to eq('This reviewer has already started the review. Hence, it cannot been deleted.')
         expect(flash[:success]).to be nil
         expect(response).to redirect_to('www.google.com')
       end

@@ -67,20 +67,21 @@
           <td align = 'left'>
           <% @response_maps.each_with_index do |ri, index| %>
             <!--For assignments with team member 1, team reviewed column should show username instead of team name, which is randomly generated.-->
-            <% team_name_color = get_team_name_color_in_review_report(ri) %>
+            <% team_name_color = get_team_colour(ri) %>
             <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, ri.response, ri.reviewee_id) %>
               <% if Team.where(id: ri.reviewee_id).length > 0 %>
                 <!--Team reviewed-->
                 <% if index == 0 %>
                   <div id= <%= team_name_color %>>
                 <% else %>
-                  <div id = <%= team_name_color %> style="border-top: solid; border-width: 1px;">
+                  <div id = <%= team_name_color %> style="border-top:solid;border-width:1px;">
                 <% end %>
                     <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => ri.reviewee_id, :id2 => ri.id, :assignment_id=>@id %>
                     <%= list_review_submissions(r.id, ri.reviewee_id, ri.id) %>
                     <!--Hard-coded Dr.Kidd's question in order to display link.-->
                     <!--later we can create a hyperlink question type to deal with this situation.-->
                     <%= list_hyperlink_submission(ri.id, 5386) if Assignment.find_by(id: @id.to_i).course.instructor.name == 'Jkidd' %>
+                    <div style="display: inline; float: right; font-size: 10px"><%= "done at - " + ri.response.last.updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p") if ri.response and ri.response.last %>&nbsp&nbsp&nbsp</div>
                   </div>
 
                 <!--Author feedback-->

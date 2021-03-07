@@ -314,7 +314,19 @@ class AssignmentForm
     old_assign = Assignment.find(assignment_id)
     new_assign = old_assign.dup
     user.set_instructor(new_assign)
-    new_assign.update_attribute('name', 'Copy of ' + new_assign.name)
+
+    # Set name of new assignment as 'Copy of <old assignment name>'. If it already exists, set it as 'Copy of <old assignment name> (1)'.
+    # Repeated till unique name is found.
+
+    name_counter = 0
+    new_name = 'Copy of ' + new_assign.name
+    until Assignment.find_by(name: new_name).nil?
+      new_name = 'Copy of ' + new_assign.name
+      name_counter += 1
+      new_name += ' (' + name_counter.to_s + ')'
+    end
+
+    new_assign.update_attribute('name', new_name)
     new_assign.update_attribute('created_at', Time.now)
     new_assign.update_attribute('updated_at', Time.now)
     new_assign.update_attribute('directory_path', new_assign.directory_path + '_copy') if new_assign.directory_path.present?

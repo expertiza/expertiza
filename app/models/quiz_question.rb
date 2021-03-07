@@ -1,5 +1,5 @@
 class QuizQuestion < Question
-  has_many :quiz_question_choices, class_name: 'QuizQuestionChoice', foreign_key: 'question_id'
+  has_many :quiz_question_choices, class_name: 'QuizQuestionChoice', foreign_key: 'question_id', inverse_of: false, dependent: :nullify
   def edit; end
 
   def view_question_text

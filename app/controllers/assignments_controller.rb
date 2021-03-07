@@ -30,7 +30,7 @@ class AssignmentsController < ApplicationController
     if params[:button]
       if @assignment_form.save
         @assignment_form.create_assignment_node
-        exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
+        exist_assignment = Assignment.find_by(id: @assignment_form.assignment.id)
         assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
         if assignment_form_params[:assignment][:directory_path].blank?
           assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
@@ -46,7 +46,7 @@ class AssignmentsController < ApplicationController
         assignment_form_params[:assignment_questionnaire] = ques_array
         assignment_form_params[:due_date] = due_array
         @assignment_form.update(assignment_form_params, current_user)
-        aid = Assignment.find_by(name: @assignment_form.assignment.name).id
+        aid = Assignment.find_by(id: @assignment_form.assignment.id).id
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
         redirect_to edit_assignment_path aid
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
@@ -349,8 +349,10 @@ class AssignmentsController < ApplicationController
   def retrieve_assignment_form
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @assignment_form.assignment.instructor ||= current_user
-    params[:assignment_form][:assignment_questionnaire].reject! do |q|
-      q[:questionnaire_id].empty?
+    unless params[:assignment_form][:assignment_questionnaire].nil?
+      params[:assignment_form][:assignment_questionnaire].reject! do |q|
+        q[:questionnaire_id].empty?
+      end
     end
 
     # Deleting Due date info from table if meta-review is unchecked. - UNITY ID: ralwan and vsreeni

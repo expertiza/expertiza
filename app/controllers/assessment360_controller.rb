@@ -79,7 +79,7 @@ class Assessment360Controller < ApplicationController
 
   # Find the list of all students and assignments pertaining to the course.
   # This data is used to compute the instructor assigned grade and peer review scores.
-  # There are many nuances about how to collect these scores. See our design document for more deails
+  # There are many nuances about how to collect these scores. See our design document for more details.
   # http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2018_E1871_Grade_Summary_By_Student
   def course_student_grade_summary
     @topics = {}
@@ -124,8 +124,8 @@ class Assessment360Controller < ApplicationController
         unless @assignment_grades[cp.id][assignment_id].nil?
           @final_grades[cp.id] += @assignment_grades[cp.id][assignment_id]
         end
-
-        unless (peer_review_score.nil? || peer_review_score[:review][:scores][:avg].nil?)
+        # peer_review_score hash won't have the key :review if the assignment doesn't have a review rubric assigned to it
+        unless peer_review_score.nil? || !peer_review_score.key?('review') || peer_review_score[:review][:scores][:avg].nil?
           @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
         end
       end

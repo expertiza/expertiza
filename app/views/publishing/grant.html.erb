@@ -1,7 +1,7 @@
 <% if (!@participant.nil?) %>
-  <h1>Grant Publishing Rights to <%= @participant.assignment.name %></h1>
+  <h1>Give Copyright Grants to <%= @participant.assignment.name %></h1>
 <% else %>
-  <h1>Grant Publishing Rights to all Past Assignments</h1>
+  <h1>Give Copyright Grants to all Past Assignments</h1>
 <% end %>
 <% unless flash[:notice].blank? %>
   <div class="flash_error">

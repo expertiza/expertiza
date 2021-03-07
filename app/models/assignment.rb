@@ -18,6 +18,7 @@ class Assignment < ActiveRecord::Base
   belongs_to :course
   belongs_to :instructor, class_name: 'User'
   has_one :assignment_node, foreign_key: 'node_object_id', dependent: :destroy
+  has_one :assignment, foreign_key: 'sample_assignment_id', dependent: :destroy
   has_many :participants, class_name: 'AssignmentParticipant', foreign_key: 'parent_id', dependent: :destroy
   has_many :users, through: :participants
   has_many :due_dates, class_name: 'AssignmentDueDate', foreign_key: 'parent_id', dependent: :destroy
@@ -533,7 +534,7 @@ class Assignment < ActiveRecord::Base
     questionnaires = @assignment.questionnaires
     questionnaires.each do |questionnaire|
       if @assignment.varying_rubrics_by_round?
-        round = AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: @questionnaire.id).used_in_round
+        round = AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).used_in_round
         questionnaire_symbol = if round.nil?
                                  questionnaire.symbol
                                else
@@ -554,6 +555,7 @@ class Assignment < ActiveRecord::Base
     (0..@scores[:teams].length - 1).each do |index|
       team = @scores[:teams][index.to_s.to_sym]
       first_participant = team[:team].participants[0] unless team[:team].participants[0].nil?
+      next if first_participant.nil?
       pscore = @scores[:participants][first_participant.id.to_s.to_sym]
       tcsv = []
       tcsv << team[:team].name
@@ -563,28 +565,30 @@ class Assignment < ActiveRecord::Base
         names_of_participants += '; ' unless p == team[:team].participants.last
       end
       tcsv << names_of_participants
-      export_data_fields(options)
+      export_data_fields(options, team, tcsv, pscore)
       csv << tcsv
     end
   end
 
-  def self.export_data_fields(options)
+  def self.export_data_fields(options, team, tcsv, pscore)
     if options['team_score'] == 'true'
-      team[:scores] ?
-        tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg]) :
+      if team[:scores]
+        tcsv.push(team[:scores][:max], team[:scores][:min], team[:scores][:avg])
+      else
         tcsv.push('---', '---', '---')
+      end
     end
     review_hype_mapping_hash = {review: 'submitted_score',
                                 metareview: 'metareview_score',
                                 feedback: 'author_feedback_score',
                                 teammate: 'teammate_review_score'}
     review_hype_mapping_hash.each do |review_type, score_name|
-      export_individual_data_fields(review_type, score_name)
+      export_individual_data_fields(review_type, score_name, tcsv, pscore, options)
     end
     tcsv.push(pscore[:total_score])
   end
 
-  def self.export_individual_data_fields(review_type, score_name)
+  def self.export_individual_data_fields(review_type, score_name, tcsv, pscore, options)
     if pscore[review_type]
       tcsv.push(pscore[review_type][:scores][:max], pscore[review_type][:scores][:min], pscore[review_type][:scores][:avg])
     else

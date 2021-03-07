@@ -10,6 +10,8 @@ class ResponseController < ApplicationController
       user_id = response.map.reviewer.user_id if response.map.reviewer
     end
     case action
+    when 'new' # Only allow appropriate student
+      return current_user_id?(ResponseMap.find(params[:id]).reviewer.user_id)
     when 'edit' # If response has been submitted, no further editing allowed
       return false if response.is_submitted
       return current_user_id?(user_id)
@@ -108,7 +110,14 @@ class ResponseController < ApplicationController
     # A new response has to be created when there hasn't been any reviews done for the current round,
     # or when there has been a submission after the most recent review in this round.
     @response = Response.where(map_id: @map.id, round: @current_round.to_i).order(updated_at: :desc).first
-    if @response.nil? || AssignmentTeam.find(@map.reviewee_id).most_recent_submission.updated_at > @response.updated_at
+
+    # Finding Reviewee team, nil is it doesn't exist(in case of teammate review)
+    reviewee_team = AssignmentTeam.find_by(id: @map.reviewee_id)
+
+    # Finding most recent submission
+    most_recent_submission_by_reviewee = reviewee_team.most_recent_submission if reviewee_team
+
+    if @response.nil? || (most_recent_submission_by_reviewee and most_recent_submission_by_reviewee.updated_at > @response.updated_at)
       @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
     end
     questions = sort_questions(@questionnaire.questions)

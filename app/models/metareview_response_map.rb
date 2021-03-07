@@ -7,14 +7,7 @@ class MetareviewResponseMap < ResponseMap
   # a person who is doing meta review has to be able to see all the versions of review.
   def get_all_versions
     if self.review_mapping.response
-      @sorted_array = []
-      @prev = Response.all
-      @prev.each do |element|
-        @sorted_array << element if element.map_id == self.review_mapping.map_id
-      end
-      @sorted = @sorted_array.sort {|m1, m2| m1.version_num and m2.version_num ? m1.version_num <=> m2.version_num : (m1.version_num ? -1 : 1) }
-      # return all the lists in ascending order.
-      @sorted
+      Response.where(map_id: self.reviewed_object_id).order('updated_at')
     else
       nil # "<I>No review was performed.</I><br/><hr/><br/>"
     end

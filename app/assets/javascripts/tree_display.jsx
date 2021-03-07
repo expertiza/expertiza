@@ -656,7 +656,7 @@ jQuery(document).ready(function() {
                   checked={this.props.inputCheckboxValue}
                   ref="filterCheckbox"
                   onChange={this.handleChange}>
-             {" Include others' items"}
+             {" Include all items (not just yours)"}
            </input>
          </span>
             )

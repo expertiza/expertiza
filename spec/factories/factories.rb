@@ -406,6 +406,7 @@ FactoryBot.define do
   end
 
   factory :submission_record, class: SubmissionRecord do
+    assignment_id 1
     team_id 666
     operation 'create'
     user 'student1234'

@@ -91,7 +91,12 @@ function toggleFunction(elementId) {
           <span style="width:100%;">
               <h4 style="font-weight:bold;display:inline-block;"><%= vm.questionnaire_display_type %>
                 <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
+                  <!-- For some old assignments round is set as null-->
+                  <%if !vm.round %>
+                    (Round: 1)
+                  <%else %>
                     (Round: <%= vm.round.to_s  %> of <%= vm.rounds.to_s  %>)
+                  <% end %>
                 <%end %>
               </h4>
               <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= @type + @participant.id.to_s + vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">toggle question list</span>

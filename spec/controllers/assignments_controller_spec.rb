@@ -134,7 +134,7 @@ describe AssignmentsController do
         allow(assignment_form).to receive(:update).with(any_args).and_return(true)
         allow(assignment_form).to receive(:create_assignment_node).and_return(double('node'))
         allow(assignment).to receive(:id).and_return(1)
-        allow(Assignment).to receive(:find_by).with(name: 'test assignment').and_return(assignment)
+        allow(Assignment).to receive(:find_by).with(id: 1).and_return(assignment)
         allow_any_instance_of(AssignmentsController).to receive(:undo_link)
           .with('Assignment "test assignment" has been created successfully. ').and_return(true)
         post :create, @params

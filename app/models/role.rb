@@ -2,8 +2,8 @@ require "credentials"
 require "menu"
 
 class Role < ActiveRecord::Base
-  belongs_to :parent, class_name: 'Role'
-  has_many :users
+  belongs_to :parent, class_name: 'Role', inverse_of: false
+  has_many :users, inverse_of: false, dependent: :nullify
 
   serialize :cache
   validates :name, presence: true
@@ -26,7 +26,7 @@ class Role < ActiveRecord::Base
   end
 
   def self.student
-    @@student_role ||= find_by name: 'Student'
+    @student_role ||= find_by name: 'Student'
   end
 
   def student?
@@ -46,15 +46,15 @@ class Role < ActiveRecord::Base
   end
 
   def self.ta
-    @@ta_role ||= find_by name: 'Teaching Assistant'
+    @ta_role ||= find_by name: 'Teaching Assistant'
   end
 
   def self.instructor
-    @@instructor_role ||= find_by name: 'Instructor'
+    @instructor_role ||= find_by name: 'Instructor'
   end
 
   def self.administrator
-    @@administrator_role ||= find_by name: 'Administrator'
+    @administrator_role ||= find_by name: 'Administrator'
   end
 
   def self.admin
@@ -62,7 +62,7 @@ class Role < ActiveRecord::Base
   end
 
   def self.superadministrator
-    @@superadministrator_role ||= find_by name: 'Super-Administrator'
+    @superadministrator_role ||= find_by name: 'Super-Administrator'
   end
 
   def super_admin?
@@ -135,7 +135,7 @@ class Role < ActiveRecord::Base
   end
 
   # determine if the current role has all the privileges of the parameter role
-  def hasAllPrivilegesOf(target_role)
+  def all_privileges_of(target_role)
     privileges = {}
     privileges["Student"] = 1
     privileges["Teaching Assistant"] = 2
@@ -152,7 +152,7 @@ class Role < ActiveRecord::Base
       self.parent_id = role_params[:parent_id]
       self.description = role_params[:description]
       self.save
-    rescue StandardError => e
+    rescue StandardError
       false
     end
   end

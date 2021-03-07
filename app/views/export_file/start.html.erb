@@ -58,7 +58,7 @@
     <input type='submit' value='Export Advices' onclick='{export_advices.submit();}'/>
     <br/><br/>
   <% end %>
-<% else %>
+<% elsif @model == 'Assignment'%>
   <h2>Export Details</h2>
   <%= form_tag({:controller => 'export_file', :action => 'exportdetails'}, {:method => 'post', :multipart => true, :name => 'export_details_form'}) do %>
     <table>

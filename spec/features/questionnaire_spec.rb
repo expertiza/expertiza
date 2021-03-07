@@ -5,6 +5,7 @@ question_type = %w[Criterion Scale Dropdown Checkbox TextArea TextField UploadFi
 describe "Questionnaire tests for instructor interface" do
   before(:each) do
     assignment_setup
+    allow(QuestionType).to receive(:pluck).with(:type).and_return(%w[Criterion Scale Dropdown Checkbox TextArea TextField UploadFile SectionHeader TableHeader ColumnHeader])
   end
   describe "Instructor login" do
     it "with valid username and password" do

@@ -1,5 +1,9 @@
 <script>
-
+<%if !@assignment.nil? and SubmissionRecord.file_submissions_present?(@assignment.id)%>
+  $(document).ready(function(){
+      $('#assignment_form_assignment_directory_path').prop("disabled",true);
+  });
+<%end %>
 function teamAssignmentChanged() {
   var msg = 'Warning! Unchecking this box will hide teams that already exist.'
 
@@ -45,20 +49,43 @@ function microtaskChanged() {
 
 <tr>
 <td style='padding:5px'><%= label_tag('assignment_form[assignment][course_id]', 'Course:') %></td>
-<td style='padding:5px'><%= select('assignment_form[assignment]', 'course_id', course_options(@assignment_form.assignment.instructor), {:selected => @assignment_form.assignment.course_id}, {:class => "form-control", :style => 'width: 250px'}) %></td>
+<td style='padding:5px'><%= select('assignment_form[assignment]', 'course_id', course_options(@assignment_form.assignment.instructor), {:selected => @assignment_form.assignment.course_id}, {:class => "form-control", :style => 'width: 250px', :disabled => session[:user].role.name == 'Teaching Assistant'}) %></td>
 </tr>
 
-<tr><div class="form-inline">
-<td style='padding:5px'><%= label_tag('assignment_form[assignment][directory_path]', 'Submission directory:') %></td>
-<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, :style => 'width:250px', class: 'form-control') %>  (Mandatory field. No space or special chars. <br/> Directory name will be auto-generated if not provided. In the form of assignment_[assignment_id].)
-  <img src="/assets/info.png" title='- DO NOT change this filed for an on-going assignment. This may cause lost of student submitted file.'>
-</td></div>
+<%if session[:user].role.name == 'Teaching Assistant' %>
+
+
+<tr>
+  <td></td>
+  <td style='color:red;padding:0px 10px 0.8em;'> TAs are not allowed to move an assignment to another course.</td>
+</tr>
+<%end %>
+
+<tr>
+  <div class="form-inline">
+    <td style='padding:5px'><%= label_tag('assignment_form[assignment][directory_path]', 'Submission directory:') %></td>
+    <td style='padding:5px'><%= text_field_tag('assignment_form[assignment][directory_path]', @assignment_form.assignment.directory_path, :style => 'width:250px', class: 'form-control') %>  (Mandatory field. No space or special chars. <br/> Directory name will be auto-generated if not provided. In the form of assignment_[assignment_id].)
+      <img src="/assets/info.png" title='DO NOT change this field if the assignment is already in progress. If you do, student submissions may be lost.'>
+    </td>
+  <tr>
+    <td></td>
+    <td style='color:red;padding:0px 10px 0.8em;'> You are not allowed to change the directory if files are already present in that directory.</td>
+  </tr>
+  </div>
 </tr>
 
 <tr>
-<td style='padding:5px'><%= label_tag('assignment_form[assignment][spec_location]', 'Description URL: ') %></td>
-<td style='padding:5px'><%= text_field_tag('assignment_form[assignment][spec_location]', @assignment_form.assignment.spec_location, :style => 'width:250px', class: 'form-control') %></td>
+  <td style='padding:5px'><%= label_tag('assignment_form[assignment][spec_location]', 'Description URL: ') %></td>
+  <td style='padding:5px'><%= text_field_tag('assignment_form[assignment][spec_location]', @assignment_form.assignment.spec_location, :style => 'width:250px', class: 'form-control') %></td>
 </tr>
+
+  <!-- Adding sample submissions for students to refer to -->
+  <tr>
+    <td style='padding:5px'><%= label_tag('assignment_form[assignment][sample_assignment_id]', 'Sample Assignment:') %>
+      <img src="/assets/info.png" title='Display examples of how this assignment has been done in the past'>
+    </td>
+    <td style='padding:5px'><%= select('assignment_form[assignment]', 'sample_assignment_id', sample_sub_options, :selected => @assignment_form.assignment.sample_assignment_id) %></td>
+  </tr>
 </table>
 
 <br/>

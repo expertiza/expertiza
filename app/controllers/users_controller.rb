@@ -8,6 +8,8 @@ class UsersController < ApplicationController
 
   def action_allowed?
     case params[:action]
+    when 'set_anonymized_view'
+      true
     when 'list_pending_requested'
       ['Super-Administrator',
        'Administrator'].include? current_role_name
@@ -117,6 +119,15 @@ class UsersController < ApplicationController
     check = User.find_by(name: params[:user][:name])
     params[:user][:name] = params[:user][:email] unless check.nil?
     @user = User.new(user_params)
+    if params[:user][:institution_id].blank?
+      begin
+        params[:user][:institution_id] = (Institution.create(name: params[:institution][:name])).id
+      rescue StandardError
+        flash[:error] = "Institution with same name already exists"
+        redirect_to action: 'new', role: 'Student'
+      end
+      # params[:user][:institution_id] = params[:user][:institution_id]
+    end
     @user.institution_id = params[:user][:institution_id]
     # record the person who created this new user
     @user.parent_id = session[:user].id
@@ -137,7 +148,8 @@ class UsersController < ApplicationController
       redirect_to action: 'list'
     else
       foreign
-      render action: 'new'
+      flash[:error] = "Another user with these credentials already exists"
+      redirect_to action: 'new', role: 'Student'
     end
   end
 

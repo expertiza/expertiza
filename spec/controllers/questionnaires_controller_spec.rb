@@ -45,7 +45,7 @@ describe QuestionnairesController do
       context 'when current user is the ta of the course which current questionnaires belongs to' do
         it 'allows certain action' do
           allow(TaMapping).to receive(:exists?).with(ta_id: 8, course_id: 1).and_return(true)
-          check_access(ta).to be true
+          check_access(ta).to be false
         end
       end
       context 'when current user is a ta but not the ta of the course which current questionnaires belongs to' do

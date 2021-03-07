@@ -15,7 +15,7 @@ save_tag = function(answer_id, tag_prompt_deployment_id, control){
         tag_prompt_deployment_id: tag_prompt_deployment_id.toString(),
         value: control.value.toString()
     }));
-    // Update Heatmap
+    // Update Heatmap -- Line added March 2021 Project E2100
     tagActionOnUpdate();
 }
 

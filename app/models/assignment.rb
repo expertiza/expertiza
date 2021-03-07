@@ -78,6 +78,12 @@ class Assignment < ActiveRecord::Base
     @has_teams ||= !self.teams.empty?
   end
 
+  # remove empty teams (teams with no users) from assignment
+  def remove_empty_teams
+    empty_teams = teams.reload.select { |team| team.teams_users.empty? }
+    teams.delete(empty_teams)
+  end
+
   #checks whether the assignment is getting a valid number of reviews (less than number of reviews allowed)
   def valid_num_review
     self.num_reviews = self.num_reviews_allowed
@@ -305,7 +311,8 @@ class Assignment < ActiveRecord::Base
 
   # check if this assignment has multiple review phases with different review rubrics
   def varying_rubrics_by_round?
-    AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: 2).size >= 1
+    # E-2084 corrected '>=' to '>' to fix logic 
+    AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: 2).size > 1
   end
 
   def link_for_current_stage(topic_id = nil)

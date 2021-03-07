@@ -50,6 +50,7 @@ class ParticipantsController < ApplicationController
     # E1721 changes End.
   end
 
+  #when you change the duties, changes the permissions based on the new duty you go to
   def update_authorizations
     permissions = Participant.get_permissions(params[:authorization])
     can_submit = permissions[:can_submit]
@@ -121,7 +122,7 @@ class ParticipantsController < ApplicationController
     if assignment.course
       course = assignment.course
       assignment.participants.each do |participant|
-        new_participant = participant.copy(course.id)
+        new_participant = participant.copy_to_course(course.id)
         @copied_participants.push new_participant if new_participant
       end
       # only display undo link if copies of participants are created
@@ -156,7 +157,7 @@ class ParticipantsController < ApplicationController
   end
 
   # Deletes participants from an assignment
-  def delete_assignment_participant
+  def delete
     contributor = AssignmentParticipant.find(params[:id])
     name = contributor.name
     assignment_id = contributor.assignment
@@ -205,15 +206,14 @@ class ParticipantsController < ApplicationController
     user = {}
     user[:name] = team_user.name
     user[:fullname] = team_user.fullname
+    #set by default
     permission_granted = false
-    has_signature = false
-    signature_valid = false
     assignment.participants.each do |participant|
       permission_granted = participant.permission_granted? if team_user.id == participant.user.id
     end
     # If permission is granted, set the publisting rights string
     user[:pub_rights] = permission_granted ? "Granted" : "Denied"
-    user[:verified] = permission_granted && has_signature && signature_valid
+    user[:verified] = false
     user
   end
 

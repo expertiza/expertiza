@@ -24,12 +24,12 @@ describe "Integration tests for instructor interface" do
   describe "Create a course" do
     it "is able to create a public course or a private course" do
       login_as("instructor6")
-      visit '/course/new?private=0'
+      visit '/courses/new?private=0'
       fill_in "Course Name", with: 'public course for test'
       click_button "Create"
       expect(Course.where(name: "public course for test")).to exist
 
-      visit '/course/new?private=1'
+      visit '/courses/new?private=1'
       fill_in "Course Name", with: 'private course for test'
       click_button "Create"
       expect(Course.where(name: "private course for test")).to exist
@@ -44,6 +44,39 @@ describe "Integration tests for instructor interface" do
       expect_page_content_to_have(['Topic name(s)', 'Topic #'], false)
     end
   end
+
+
+  describe "View Profile" do
+    it 'should see profile add one new radio button for user preference' do
+      login_as("instructor6")
+      visit '/profile/edit'
+      expect(page).to have_content("Action Preference")
+    end
+  end
+
+  describe "View User Preference" do
+    it 'should see user preference default button (home can show actions) is checked' do
+      login_as("instructor6")
+      visit '/profile/edit'
+      expect(page).to have_content("Action Preference")
+      choose "no_show_action_not_show_actions" 
+      click_button "Save"
+      expect(User.where(name: 'instructor6').first.preference_home_flag).to eq(false)
+    end
+  end
+
+  describe "View Assignment List" do
+    it 'should not see user action buttons if user preference (home cannot show actions) is checked' do
+      login_as("instructor6")
+      visit '/profile/edit'
+      expect(page).to have_content("Action Preference")
+      choose "no_show_action_not_show_actions" 
+      click_button "Save"
+      visit 'tree_display/list?currCtlr=Assignments'
+      expect(page).to have_no_content("View submission")
+    end
+  end
+
 
   # E1776 (Fall 2017)
   #

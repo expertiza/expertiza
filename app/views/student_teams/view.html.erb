@@ -61,7 +61,13 @@
         <br/>
         <%= link_to "Leave team", remove_participant_student_teams_path(student_id: @student.id, team_id: @student.team.id) %>
       <td>
-    </tr>
+    </tr> <!--E2081 TODO Table for self contribution Cake questions-->
+    <%# <% if @teammate_review_allowed %>
+      <%# <tr style="border: 1px outset #000000; padding: 10px 20px" >
+        <th class="head">Teammate review question</th>
+        <th class="head">Self contribution percentage</th>
+      </tr> %>
+    <%# <% end %> <!--end self contribution for Cake questions-->
   </table>
 <% end %>
 

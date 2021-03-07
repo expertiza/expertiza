@@ -88,7 +88,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :course, only: %i[new create edit update] do
+  resources :course, controller: 'courses', only: %i[new create edit update] do
     collection do
       get :toggle_access
       get :copy
@@ -203,7 +203,7 @@ resources :institution, except: [:destroy] do
       get :add
       post :add
       get :auto_complete_for_user_name
-      get :delete_assignment_participant
+      get :delete
       get :list
       get :change_handle
       get :inherit
@@ -370,6 +370,7 @@ resources :institution, except: [:destroy] do
       post :signup_as_instructor_action
       post :set_priority
       post :save_topic_deadlines
+      post :delete_all_selected_topics
     end
   end
 
@@ -474,7 +475,7 @@ resources :institution, except: [:destroy] do
     collection do
       post :list
       get :get_folder_contents
-      get :get_sub_folder_contents
+      post :get_sub_folder_contents
       get :session_last_open_tab
       get :set_session_last_open_tab
     end
@@ -496,7 +497,8 @@ resources :institution, except: [:destroy] do
     collection do
       get :list
       post :list
-      get :list_pending_requested
+      post :list_pending_requested
+      post :list_pending_requested_finalized
       post ':id', action: :update
       get :auto_complete_for_user_name
       get :set_anonymized_view
@@ -514,6 +516,7 @@ resources :institution, except: [:destroy] do
     end
   end
 
+  resources :conference
   root to: 'content_pages#view', page_name: 'home'
   post :login, to: 'auth#login'
   post :logout, to: 'auth#logout'
@@ -533,6 +536,5 @@ resources :institution, except: [:destroy] do
   post '/response_toggle_permission/:id' => 'response#toggle_permission'
   post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'
   post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'
-
 end
 

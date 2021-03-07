@@ -132,6 +132,30 @@ function microtaskChanged() {
     </td>
   </tr>
 
+  <!--Conference-->
+  <tr>
+    <td style='padding:5px' id='assignment_is_conference_assignment_field' colspan="2">
+      <input name="assignment_form[assignment][is_conference_assignment]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][is_conference_assignment]', 'true', @assignment_form.assignment.is_conference_assignment) %>
+      <%= label_tag('assignment_form[assignment][is_conference_assignment]','Will this assignment be used to review papers for conference?') %>
+    </td>
+  </tr>
+  <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+  <script type="text/javascript">
+       new Clipboard('button');
+  </script>
+  <tr>
+    <% if current_page?(action: 'edit') %>
+      <% if @assignment_form.assignment.is_conference_assignment %>
+        <%  url = polymorphic_url :conference, action: 'new',role: 'Student', assignment_id: @assignment.id %>
+        <div>Link to join conference assignment:
+          <%# <%= link_to conference_user_path(assignment_id: @assignment.id, role: 'Student')%> 
+          <span> <a id = "link" style="color: #5d0a0a"> <%=url%> </a> </span> 
+        </div>
+      <% end %>
+    <% end %>
+  </tr>
+
   <% if current_page?(action: 'edit') %>
   <!--Topics-->
   <tr>

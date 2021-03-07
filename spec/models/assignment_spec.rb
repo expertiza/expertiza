@@ -65,10 +65,47 @@ describe Assignment do
       end
     end
 
-    context 'when sign_up_topics array is empty' do
+    context 'when teams array is empty' do
       it 'says current assignment does not have a team' do
         assignment.teams = []
         expect(assignment.teams?).to be false
+      end
+    end
+  end
+
+
+  describe '#remove_empty_teams' do
+    before :each do
+      @assignment = create(:assignment)
+      @student = create(:student)
+      @empty_team = create(:assignment_team, assignment: @assignment, teams_users: [])
+      @non_empty_team = create(:assignment_team, assignment: @assignment, teams_users: [ create(:team_user, user: @student) ])
+    end
+    it 'should reduce the number of teams by the number of empty teams in the assignment' do
+      expect(@assignment.teams).to include @empty_team 
+      @assignment.remove_empty_teams
+      expect(@assignment.teams).to_not include @empty_team
+      expect(@assignment.teams).to include @non_empty_team
+    end
+  end
+  
+  
+  describe '#vary_rubrics_by_round?' do
+    context 'when rubrics varies over rounds' do
+      it 'should return true' do
+        assignment_questionnaire1.used_in_round = 2
+        assignment_questionnaire2.used_in_round = 2
+        allow(AssignmentQuestionnaire).to receive(:where).and_return([assignment_questionnaire1, assignment_questionnaire2])
+        expect(assignment.varying_rubrics_by_round?).to be true
+      end
+    end
+
+    context 'when rubrics do not vary over rounds' do
+      it 'should return false' do
+        assignment_questionnaire1.used_in_round = 2
+        assignment_questionnaire2.used_in_round = 1
+        allow(AssignmentQuestionnaire).to receive(:where).and_return([assignment_questionnaire1])
+        expect(assignment.varying_rubrics_by_round?).to be false
       end
     end
   end
@@ -146,7 +183,7 @@ describe Assignment do
     context 'when assignment is varying rubric by round assignment' do
       it 'calculates scores in each round of each team in current assignment' do
         allow(participant).to receive(:scores).with(review1: [question]).and_return(98)
-        allow(assignment).to receive(:vary_by_round).and_return(true)
+        assignment.vary_by_round = true 
         allow(assignment).to receive(:num_review_rounds).and_return(1)
         allow(ReviewResponseMap).to receive(:get_responses_for_team_round).with(team, 1).and_return([response])
         allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)

@@ -191,8 +191,7 @@ function generateTable(tagPrompts) {
     let th = document.createElement("th");
     let text = document.createTextNode("ReviewTags Completed: ");
     th.style.fontSize = "8px";
-    th.style.padding = 0;
-    th.style.borderSpacing = 0;
+    th.class = ".tbl_heat th";
     th.setAttribute("id", "tagsSuperLabel");
     th.colSpan = 3;
     th.appendChild(text);
@@ -201,8 +200,7 @@ function generateTable(tagPrompts) {
     th = document.createElement("th");
     text = document.createTextNode("0/0");
     th.style.fontSize = "8px";
-    th.style.padding = 0;
-    th.style.borderSpacing = 0;
+    th.class = ".tbl_heat th";
     th.setAttribute("id", "tagsSuperNumber");
     th.colSpan = 2;
     th.appendChild(text);
@@ -213,8 +211,7 @@ function generateTable(tagPrompts) {
         //Label the header
         let text = document.createTextNode(headerLabels[index]);
         th.style.fontSize = "8px";
-        th.style.padding = 0;
-        th.style.borderSpacing = 0;
+        th.class = ".tbl_heat th";
         th.appendChild(text);
         row.appendChild(th);
     }

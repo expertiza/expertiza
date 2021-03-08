@@ -20,8 +20,8 @@ class QuizQuestionnairesController < QuestionnairesController
     render :view
   end
 
-  # define a new quiz questionnaire
-  # method invoked by the view
+
+  
   def new
     valid_request = true
     @assignment_id = params[:aid] # creating an instance variable to hold the assignment id

@@ -3,8 +3,12 @@ describe AssignmentForm do
   let(:due_date) { build(:assignment_due_date) }
   let(:assignment_form) { AssignmentForm.new }
   let(:user) { double('Instructor', timezonepref: 'Eastern Time (US & Canada)') }
-  let(:assignment_questionnaire) { double('AssignmentQuestionnaire') }
-  let(:assignment_questionnaire2) { double('AssignmentQuestionnaire') }
+  let(:assignment_questionnaire1) { build(:assignment_questionnaire) }
+  let(:assignment_questionnaire2) { build(:assignment_questionnaire) }
+  let(:aq_attributes1) { double('AssignmentQuestionnaire') }
+  let(:aq_attributes2) { double('AssignmentQuestionnaire') }
+  let(:questionnaire1) { double('Questionnaire', type: 'ReviewQuestionnaire') }
+  let(:questionnaire2) { double('Questionnaire', type: 'MetareviewQuestionnaire') }
   before(:each) do
     assignment_form.instance_variable_set(:@assignment, assignment)
   end
@@ -12,7 +16,7 @@ describe AssignmentForm do
   describe '.create_form_object' do
     it 'create an assignment_form object' do
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
-      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire])
+      allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire1])
       allow(AssignmentDueDate).to receive(:where).with(parent_id: 1).and_return([due_date])
       allow_any_instance_of(AssignmentForm).to receive(:set_up_assignment_review).and_return(true)
       expect(AssignmentForm.create_form_object(1).instance_of?(AssignmentForm)).to be true
@@ -26,12 +30,12 @@ describe AssignmentForm do
           late_policy_id: 1,
           simicheck: true
         },
-        assignment_questionnaire: [assignment_questionnaire, assignment_questionnaire2],
+        assignment_questionnaire: [assignment_questionnaire1, assignment_questionnaire2],
         due_date: [double('DueDate'), double('DueDate')]
       }
       allow_any_instance_of(AssignmentForm).to receive(:update_assignment).with(attributes[:assignment]).and_return(true)
-      allow_any_instance_of(AssignmentForm).to receive(:update_assignment_questionnaires)
-        .with(attributes[:assignment_questionnaire]).and_return(true)
+      allow_any_instance_of(AssignmentForm).to receive(:update_assignment_questionnaires).with(attributes[:assignment_questionnaire]).and_return(true)
+      allow_any_instance_of(AssignmentForm).to receive(:update_assignment_questionnaires).with(attributes[:topic_questionnaire]).and_return(true)
       allow_any_instance_of(AssignmentForm).to receive(:update_due_dates).with(attributes[:due_date], user).and_return(true)
       allow_any_instance_of(AssignmentForm).to receive(:add_simicheck_to_delayed_queue).with(attributes[:assignment][:simicheck]).and_return(true)
       allow_any_instance_of(AssignmentForm).to receive(:delete_from_delayed_queue).and_return(true)
@@ -59,49 +63,447 @@ describe AssignmentForm do
   end
 
   describe '#update_assignment_questionnaires' do
-    context 'when attributes are nil' do
-      it 'returns false' do
-        expect(assignment_form.update_assignment_questionnaires(nil)).to be false
+    context 'when attributes are nil or empty' do
+      it 'returns nil' do
+        expect(assignment_form.update_assignment_questionnaires(nil)).to eq(nil)
+        expect(assignment_form.update_assignment_questionnaires([])).to eq(nil)
       end
     end
 
-    context 'when attributes are not nil and at least one assignment_questionnaire\'s id is nil or blank' do
-      let(:attributes) { [assignment_questionnaire, assignment_questionnaire2] }
+    context 'when attributes are not nil and received from Rubrics' do
+      let(:attributes) { [aq_attributes1, aq_attributes2] }
+
       before(:each) do
-        allow(assignment_questionnaire).to receive(:[]).with(:id).and_return(nil)
-        allow(assignment_questionnaire).to receive(:[]).with(:questionnaire_weight).and_return(0)
-        allow(assignment_questionnaire2).to receive(:[]).with(:id).and_return(1)
-        allow(assignment_questionnaire2).to receive(:[]).with(:questionnaire_weight).and_return(100)
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([])
-        allow(AssignmentQuestionnaire).to receive(:new).with(assignment_questionnaire).and_return(assignment_questionnaire)
-        allow(AssignmentQuestionnaire).to receive(:find).with(1).and_return(assignment_questionnaire2)
+        allow(assignment_questionnaire1).to receive(:questionnaire_id).and_return(1)
+        allow(assignment_questionnaire2).to receive(:questionnaire_id).and_return(2)
+        allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire1)
+        allow(Questionnaire).to receive(:find).with(2).and_return(questionnaire2)
+        allow(aq_attributes1).to receive(:key?).with(:questionnaire_weight).and_return(true)
+        allow(aq_attributes1).to receive(:[]).with(:questionnaire_weight).and_return(100)
+        allow(aq_attributes1).to receive(:[]).with(:questionnaire_id).and_return(1)
+        allow(aq_attributes1).to receive(:[]).with(:used_in_round).and_return("")
+        allow(aq_attributes1).to receive(:key?).with(:topic_id).and_return(false)
+        allow(aq_attributes2).to receive(:key?).with(:questionnaire_weight).and_return(true)
+        allow(aq_attributes2).to receive(:[]).with(:questionnaire_weight).and_return(0)
+        allow(aq_attributes2).to receive(:[]).with(:questionnaire_id).and_return(2)
+        allow(aq_attributes2).to receive(:[]).with(:used_in_round).and_return("")
+        allow(aq_attributes2).to receive(:key?).with(:topic_id).and_return(false)
       end
 
-      context 'when both save and update_attributes method do not work' do
-        it 'changes @has_errors value to true and returns attributes (args)' do
-          allow(assignment_questionnaire).to receive(:save).and_return(false)
-          allow(assignment_questionnaire2).to receive(:update_attributes).with(assignment_questionnaire2).and_return(false)
+      context 'when both active records exist and can be found' do
+        before(:each) do
+          allow(assignment_questionnaire1).to receive(:id).and_return(1)
+          allow(assignment_questionnaire2).to receive(:id).and_return(2)
+          allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
+              [assignment_questionnaire1, assignment_questionnaire2])
+        end
+
+        it 'returns attributes (args) and does not change @has_errors value since update_attributes method works correctly' do
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(true)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(true)
           expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
+        end
+
+        it 'returns attributes (args), but changes @has_errors value to true since update_attributes method works incorrectly for assignment_questionnaire1' do
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(false)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(true)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+
+        it 'returns attributes (args), but changes @has_errors value to true since update_attributes method works incorrectly for assignment_questionnaire2' do
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(true)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(false)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+
+        it 'returns attributes (args), but changes @has_errors value to true since update_attributes method works incorrectly' do
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(false)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(false)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+
+        it 'returns nil and changes @has_errors value to true since questionnaire_weight fails validation' do
+          allow(aq_attributes1).to receive(:[]).with(:questionnaire_weight).and_return(50)
+          allow(aq_attributes2).to receive(:[]).with(:questionnaire_weight).and_return(40)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(nil)
           expect(assignment_form.instance_variable_get(:@has_errors)).to be true
         end
       end
 
-      context 'when both save and update_attributes method work well' do
-        it 'returns attributes (args) and @has_errors value is nil' do
-          allow(assignment_questionnaire).to receive(:save).and_return(true)
-          allow(assignment_questionnaire2).to receive(:update_attributes).with(assignment_questionnaire2).and_return(true)
+      context 'when active record assignment_questionnaire exists but assignment_questionnaire2 does not exist' do
+        before(:each) do
+          allow(assignment_questionnaire1).to receive(:id).and_return(1)
+          allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
+              [assignment_questionnaire1])
+          allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
+          allow(AssignmentQuestionnaire).to receive(:new).and_return(assignment_questionnaire2)
+        end
+
+        it 'returns attributes (args) and does not change @has_errors value since save and update_attributes methods work correctly' do
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(true)
+          allow(assignment_questionnaire2).to receive(:save).and_return(true)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(true)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
+        end
+
+        it 'returns attributes (args), but changes @has_errors value to true since save method works incorrectly for assignment_questionnaire2' do
+          allow(assignment_questionnaire1).to receive(:id).and_return(1)
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(true)
+          allow(assignment_questionnaire2).to receive(:id).and_return(nil)
+          allow(assignment_questionnaire2).to receive(:save).and_return(false)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+
+        it 'returns attributes (args), but changes @has_errors value to true since update_attributes method works incorrectly for assignment_questionnaire2' do
+          allow(assignment_questionnaire1).to receive(:id).and_return(1)
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(true)
+          allow(assignment_questionnaire2).to receive(:id).and_return(nil)
+          allow(assignment_questionnaire2).to receive(:save).and_return(true)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(false)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+
+        it 'returns attributes (args), but changes @has_errors value to true since update_attributes method works incorrectly for assignment_questionnaire1' do
+          allow(assignment_questionnaire1).to receive(:id).and_return(1)
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(false)
+          allow(assignment_questionnaire2).to receive(:id).and_return(nil)
+          allow(assignment_questionnaire2).to receive(:save).and_return(true)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(true)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+
+        it 'returns nil and changes @has_errors value to true since questionnaire_weight fails validation' do
+          allow(aq_attributes1).to receive(:[]).with(:questionnaire_weight).and_return(50)
+          allow(aq_attributes2).to receive(:[]).with(:questionnaire_weight).and_return(40)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(nil)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+      end
+
+      context 'when active record assignment_questionnaire does not exist but assignment_questionnaire2 exists' do
+        before(:each) do
+          allow(assignment_questionnaire2).to receive(:id).and_return(2)
+          allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
+              [assignment_questionnaire2])
+          allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
+          allow(AssignmentQuestionnaire).to receive(:new).and_return(assignment_questionnaire1)
+        end
+
+        it 'returns attributes (args) and does not change @has_errors value since save and update_attributes methods work correctly' do
+          allow(assignment_questionnaire1).to receive(:save).and_return(true)
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(true)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(true)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
+        end
+
+        it 'returns attributes (args), but changes @has_errors value to true since save method works incorrectly for assignment_questionnaire1' do
+          allow(assignment_questionnaire1).to receive(:save).and_return(false)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(true)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+
+        it 'returns attributes (args), but changes @has_errors value to true since update_attributes method works incorrectly for assignment_questionnaire1' do
+          allow(assignment_questionnaire1).to receive(:save).and_return(true)
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(false)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(true)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+
+        it 'returns attributes (args), but changes @has_errors value to true since update_attributes method works incorrectly for assignment_questionnaire2' do
+          allow(assignment_questionnaire1).to receive(:save).and_return(true)
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(true)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(false)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+
+        it 'returns nil and changes @has_errors value to true since questionnaire_weight validation fails' do
+          allow(aq_attributes1).to receive(:[]).with(:questionnaire_weight).and_return(50)
+          allow(aq_attributes2).to receive(:[]).with(:questionnaire_weight).and_return(40)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(nil)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+      end
+
+      context 'when neither of active record exists' do
+        before(:each) do
+          allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return([])
+          allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
+          allow(AssignmentQuestionnaire).to receive(:new).and_return(assignment_questionnaire1)
+        end
+
+        it 'returns attributes (args) and does not change @has_errors value since save and update_attributes methods work correctly' do
+          allow(assignment_questionnaire1).to receive(:save).and_return(true)
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(true)
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes2).and_return(true)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
+        end
+
+        it 'returns attributes (args), but changes @has_errors value to true since save method works incorrectly' do
+          allow(assignment_questionnaire1).to receive(:save).and_return(false)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+
+        it 'returns attributes (args), but changes @has_errors value to true since update_attributes method works incorrectly' do
+          allow(assignment_questionnaire1).to receive(:save).and_return(true)
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(false)
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes2).and_return(false)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+
+        it 'returns nil and changes @has_errors value to true since questionnaire_weight validation fails' do
+          allow(aq_attributes1).to receive(:[]).with(:questionnaire_weight).and_return(50)
+          allow(aq_attributes2).to receive(:[]).with(:questionnaire_weight).and_return(40)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(nil)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+      end
+
+      context 'when questionnaire_id is not given within attributes' do
+        it 'returns attributes (args) and does not change @has_errors value when both attributes do not have questionnaire_id specified' do
+          allow(aq_attributes1).to receive(:[]).with(:questionnaire_id).and_return("")
+          allow(aq_attributes2).to receive(:[]).with(:questionnaire_id).and_return("")
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
+        end
+
+        it 'returns attributes (args) and does not change @has_errors value when attributes1 does not have questionnaire_id specified' do
+          allow(aq_attributes1).to receive(:[]).with(:questionnaire_id).and_return("")
+          allow(assignment_questionnaire2).to receive(:id).and_return(2)
+          allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
+              [assignment_questionnaire2])
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(true)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
+        end
+
+        it 'returns attributes (args) and does not change @has_errors value when attributes2 does not have questionnaire_id specified' do
+          allow(aq_attributes2).to receive(:[]).with(:questionnaire_id).and_return("")
+          allow(assignment_questionnaire1).to receive(:id).and_return(1)
+          allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
+              [assignment_questionnaire1])
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(true)
           expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
           expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
         end
       end
+    end
 
-      context 'when both save and update_attributes method do not work with wrong rubrics weights' do
-        it 'changes @has_errors value to true and returns nil' do
-          allow(assignment_questionnaire).to receive(:save).and_return(true)
-          allow(assignment_questionnaire2).to receive(:update_attributes).with(assignment_questionnaire2).and_return(true)
-          allow(assignment_questionnaire2).to receive(:[]).with(:questionnaire_weight).and_return(12)
-          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(nil)
+    context 'when attributes are not nil and received from Topics tab' do
+      let(:attributes) { [aq_attributes1, aq_attributes2] }
+
+      before(:each) do
+        allow(assignment_questionnaire1).to receive(:questionnaire_id).and_return(1)
+        allow(assignment_questionnaire2).to receive(:questionnaire_id).and_return(2)
+        allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire1)
+        allow(Questionnaire).to receive(:find).with(2).and_return(questionnaire2)
+        allow(aq_attributes1).to receive(:key?).with(:questionnaire_weight).and_return(false)
+        allow(aq_attributes1).to receive(:[]).with(:questionnaire_id).and_return(1)
+        allow(aq_attributes1).to receive(:[]).with(:used_in_round).and_return("")
+        allow(aq_attributes1).to receive(:key?).with(:topic_id).and_return(true)
+        allow(aq_attributes1).to receive(:[]).with(:topic_id).and_return("")
+        allow(aq_attributes2).to receive(:key?).with(:questionnaire_weight).and_return(false)
+        allow(aq_attributes2).to receive(:[]).with(:questionnaire_id).and_return(2)
+        allow(aq_attributes2).to receive(:[]).with(:used_in_round).and_return("")
+        allow(aq_attributes2).to receive(:key?).with(:topic_id).and_return(true)
+        allow(aq_attributes2).to receive(:[]).with(:topic_id).and_return("")
+      end
+
+      context 'when both active records exist and can be found' do
+        before(:each) do
+          allow(assignment_questionnaire1).to receive(:id).and_return(1)
+          allow(assignment_questionnaire2).to receive(:id).and_return(2)
+          allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
+              [assignment_questionnaire1, assignment_questionnaire2])
+        end
+
+        it 'returns attributes (args) and does not change @has_errors value since update_attributes method works correctly' do
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(true)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(true)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
+        end
+
+        it 'returns attributes (args), but changes @has_errors value to true since update_attributes method works incorrectly for assignment_questionnaire1' do
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(false)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(true)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
           expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+
+        it 'returns attributes (args), but changes @has_errors value to true since update_attributes method works incorrectly for assignment_questionnaire2' do
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(true)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(false)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+
+        it 'returns attributes (args), but changes @has_errors value to true since update_attributes method works incorrectly' do
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(false)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(false)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+      end
+
+      context 'when active record assignment_questionnaire exists but assignment_questionnaire2 does not exist' do
+        before(:each) do
+          allow(assignment_questionnaire1).to receive(:id).and_return(1)
+          allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
+              [assignment_questionnaire1])
+          allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
+          allow(AssignmentQuestionnaire).to receive(:new).and_return(assignment_questionnaire2)
+        end
+
+        it 'returns attributes (args) and does not change @has_errors value since save and update_attributes methods work correctly' do
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(true)
+          allow(assignment_questionnaire2).to receive(:save).and_return(true)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(true)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
+        end
+
+        it 'returns attributes (args), but changes @has_errors value to true since save method works incorrectly for assignment_questionnaire2' do
+          allow(assignment_questionnaire1).to receive(:id).and_return(1)
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(true)
+          allow(assignment_questionnaire2).to receive(:id).and_return(nil)
+          allow(assignment_questionnaire2).to receive(:save).and_return(false)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+
+        it 'returns attributes (args), but changes @has_errors value to true since update_attributes method works incorrectly for assignment_questionnaire2' do
+          allow(assignment_questionnaire1).to receive(:id).and_return(1)
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(true)
+          allow(assignment_questionnaire2).to receive(:id).and_return(nil)
+          allow(assignment_questionnaire2).to receive(:save).and_return(true)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(false)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+
+        it 'returns attributes (args), but changes @has_errors value to true since update_attributes method works incorrectly for assignment_questionnaire1' do
+          allow(assignment_questionnaire1).to receive(:id).and_return(1)
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(false)
+          allow(assignment_questionnaire2).to receive(:id).and_return(nil)
+          allow(assignment_questionnaire2).to receive(:save).and_return(true)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(true)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+      end
+
+      context 'when active record assignment_questionnaire does not exist but assignment_questionnaire2 exists' do
+        before(:each) do
+          allow(assignment_questionnaire2).to receive(:id).and_return(2)
+          allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
+              [assignment_questionnaire2])
+          allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
+          allow(AssignmentQuestionnaire).to receive(:new).and_return(assignment_questionnaire1)
+        end
+
+        it 'returns attributes (args) and does not change @has_errors value since save and update_attributes methods work correctly' do
+          allow(assignment_questionnaire1).to receive(:save).and_return(true)
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(true)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(true)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
+        end
+
+        it 'returns attributes (args), but changes @has_errors value to true since save method works incorrectly for assignment_questionnaire1' do
+          allow(assignment_questionnaire1).to receive(:save).and_return(false)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(true)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+
+        it 'returns attributes (args), but changes @has_errors value to true since update_attributes method works incorrectly for assignment_questionnaire1' do
+          allow(assignment_questionnaire1).to receive(:save).and_return(true)
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(false)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(true)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+
+        it 'returns attributes (args), but changes @has_errors value to true since update_attributes method works incorrectly for assignment_questionnaire2' do
+          allow(assignment_questionnaire1).to receive(:save).and_return(true)
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(true)
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(false)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+      end
+
+      context 'when neither of active record exists' do
+        before(:each) do
+          allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return([])
+          allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
+          allow(AssignmentQuestionnaire).to receive(:new).and_return(assignment_questionnaire1)
+        end
+
+        it 'returns attributes (args) and does not change @has_errors value since save and update_attributes methods work correctly' do
+          allow(assignment_questionnaire1).to receive(:save).and_return(true)
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(true)
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes2).and_return(true)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
+        end
+
+        it 'returns attributes (args), but changes @has_errors value to true since save method works incorrectly' do
+          allow(assignment_questionnaire1).to receive(:save).and_return(false)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+
+        it 'returns attributes (args), but changes @has_errors value to true since update_attributes method works incorrectly' do
+          allow(assignment_questionnaire1).to receive(:save).and_return(true)
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(false)
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes2).and_return(false)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be true
+        end
+      end
+
+      context 'when questionnaire_id is not given within attributes' do
+        it 'returns attributes (args) and does not change @has_errors value when both attributes do not have questionnaire_id specified' do
+          allow(aq_attributes1).to receive(:[]).with(:questionnaire_id).and_return("")
+          allow(aq_attributes2).to receive(:[]).with(:questionnaire_id).and_return("")
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
+        end
+
+        it 'returns attributes (args) and does not change @has_errors value when attributes1 does not have questionnaire_id specified' do
+          allow(aq_attributes1).to receive(:[]).with(:questionnaire_id).and_return("")
+          allow(assignment_questionnaire2).to receive(:id).and_return(2)
+          allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
+              [assignment_questionnaire2])
+          allow(assignment_questionnaire2).to receive(:update_attributes).with(aq_attributes2).and_return(true)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
+        end
+
+        it 'returns attributes (args) and does not change @has_errors value when attributes2 does not have questionnaire_id specified' do
+          allow(aq_attributes2).to receive(:[]).with(:questionnaire_id).and_return("")
+          allow(assignment_questionnaire1).to receive(:id).and_return(1)
+          allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
+              [assignment_questionnaire1])
+          allow(assignment_questionnaire1).to receive(:update_attributes).with(aq_attributes1).and_return(true)
+          expect(assignment_form.update_assignment_questionnaires(attributes)).to eq(attributes)
+          expect(assignment_form.instance_variable_get(:@has_errors)).to be nil
         end
       end
     end
@@ -163,7 +565,6 @@ describe AssignmentForm do
         Sidekiq::Stats.new.reset
         Sidekiq::DeadSet.new.clear
         queue = Sidekiq::Queues["mailers"]
-        puts queue.size
         expect { assignment_form.add_to_delayed_queue }.to change { queue.size }.by(2)
       end
     end
@@ -177,9 +578,69 @@ describe AssignmentForm do
         Sidekiq::Stats.new.reset
         Sidekiq::DeadSet.new.clear
         queue = Sidekiq::Queues["mailers"]
-        puts queue.size
         expect { assignment_form.add_to_delayed_queue }.to change { queue.size }.by(2)
       end
+    end
+  end
+
+  describe '#assignment_questionnaire' do
+    context 'when multiple active records of assignment_questionnaire are found for a given assignment_id, used_in_round, and topic_id' do
+      it 'returns correct assignment questionnaire found by questionnaire type' do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return(
+            [assignment_questionnaire1, assignment_questionnaire2])
+        allow(assignment_questionnaire1).to receive(:questionnaire_id).and_return(1)
+        allow(assignment_questionnaire2).to receive(:questionnaire_id).and_return(2)
+        allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire1)
+        allow(Questionnaire).to receive(:find).with(2).and_return(questionnaire2)
+        expect(assignment_form.assignment_questionnaire('ReviewQuestionnaire', nil, nil)).to eq(assignment_questionnaire1)
+        expect(assignment_form.assignment_questionnaire('MetareviewQuestionnaire', nil, nil)).to eq(assignment_questionnaire2)
+      end
+    end
+
+    context 'when active record for assignment_questionnaire is not found for a given assignment_id, used_in_round, and topic_id' do
+      let(:new_assignment_questionnaire) { build(:assignment_questionnaire) }
+      it 'returns new instance of assignment_questionnaire with default values' do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([])
+        allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
+        allow(AssignmentQuestionnaire).to receive(:new).and_return(new_assignment_questionnaire)
+        expect(assignment_form.assignment_questionnaire('ReviewQuestionnaire', nil, nil)).to eq(new_assignment_questionnaire)
+      end
+    end
+
+    context 'when active record for assignment_questionnaire is found for a given assignment_id, used_in_round, and topic_id, but associated questionnaire_id is nil' do
+      # Based on the E1936 design this is not possible, but there could different models that create AQ with questionnaire_id
+      let(:new_assignment_questionnaire) { build(:assignment_questionnaire) }
+      it 'returns new instance of assignment_questionnaire with default values' do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return(
+            [assignment_questionnaire1])
+        allow(assignment_questionnaire1).to receive(:questionnaire_id).and_return(nil)
+        allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
+        allow(AssignmentQuestionnaire).to receive(:new).and_return(new_assignment_questionnaire)
+        expect(assignment_form.assignment_questionnaire('ReviewQuestionnaire', 1, 1)).to eq(new_assignment_questionnaire)
+      end
+    end
+  end
+
+  describe '#questionnaire' do
+    context 'when active record of questionnaire exists for a given assignment_questionnaire' do
+      it 'returns correct questionnaire found by assignment_questionnaire' do
+        allow(assignment_questionnaire1).to receive(:questionnaire_id).and_return(1)
+        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
+        expect(assignment_form.questionnaire(assignment_questionnaire1, anything)).to eq(questionnaire1)
+      end
+    end
+
+    context 'when no active record of questionnaire exists for a given assignment_questionnaire' do
+      it 'returns new instance of questionnaire object with id nil if questionnaire is not found by id' do
+        allow(assignment_questionnaire1).to receive(:questionnaire_id).and_return(1)
+        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(nil)
+        expect(assignment_form.questionnaire(assignment_questionnaire1, 'ReviewQuestionnaire').id).to eq nil
+      end
+
+      it 'returns new instance of questionnaire object if assignment_questionnaire is nil' do
+        expect(assignment_form.questionnaire(nil, 'ReviewQuestionnaire').id).to eq nil
+      end
+
     end
   end
 

@@ -1,4 +1,6 @@
 class QuestionnairesController < ApplicationController
+  include AuthorizationHelper
+
   # Controller for Questionnaire objects
   # A Questionnaire can be of several types (QuestionnaireType)
   # Each Questionnaire contains zero or more questions (Question)
@@ -8,18 +10,14 @@ class QuestionnairesController < ApplicationController
 
   # Check role access for edit questionnaire
   def action_allowed?
-    if params[:action] == "edit"
+    case params[:action]
+    when 'edit'
       @questionnaire = Questionnaire.find(params[:id])
-      (['Super-Administrator',
-        'Administrator'].include? current_role_name) ||
-          ((['Instructor'].include? current_role_name) && current_user_id?(@questionnaire.try(:instructor_id))) ||
-          ((['Teaching Assistant'].include? current_role_name) && session[:user].instructor_id == @questionnaire.try(:instructor_id))
-
+      current_user_has_admin_privileges? ||
+          (current_user_is_a?('Instructor') && current_user_id?(@questionnaire.try(:instructor_id))) ||
+          (current_user_is_a?('Teaching Assistant') && session[:user].instructor_id == @questionnaire.try(:instructor_id))
     else
-      ['Super-Administrator',
-       'Administrator',
-       'Instructor',
-       'Teaching Assistant', 'Student'].include? current_role_name
+      current_user_has_student_privileges?
     end
   end
 
@@ -204,6 +202,7 @@ class QuestionnairesController < ApplicationController
         question.min_label = 'Strongly disagree'
       end
       question.size = '50, 3' if question.is_a? Criterion
+      question.size = '50, 3' if question.is_a? Cake
       question.alternatives = '0|1|2|3|4|5' if question.is_a? Dropdown
       question.size = '60, 5' if question.is_a? TextArea
       question.size = '30' if question.is_a? TextField

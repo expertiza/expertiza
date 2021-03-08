@@ -9,6 +9,8 @@
 # to
 
 class SignUpSheetController < ApplicationController
+  include AuthorizationHelper
+
   require 'rgl/adjacency'
   require 'rgl/dot'
   require 'rgl/topsort'
@@ -16,17 +18,12 @@ class SignUpSheetController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator',
-       'Student'].include? current_role_name and
-      ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer") : true)
+      (current_user_has_student_privileges? &&
+          (%w[list].include? action_name) &&
+          are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer")) ||
+          current_user_has_student_privileges?
     else
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator'].include? current_role_name
+      current_user_has_ta_privileges?
     end
   end
 
@@ -114,6 +111,22 @@ class SignUpSheetController < ApplicationController
       format.html { redirect_to edit_assignment_path(params[:assignment_id]) }
       format.js {}
     end
+  end
+
+  # This deletes all selected topics for the given assignment
+  def delete_all_selected_topics
+    load_all_selected_topics
+    @stopics.each(&:destroy)
+    flash[:success] = "All selected topics have been deleted successfully."
+    respond_to do |format|
+      format.html { redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"}
+      format.js {}
+    end
+  end  
+  
+  # This loads all selected topics based on all the topic identifiers selected for that assignment into stopics variable
+  def load_all_selected_topics
+    @stopics = SignUpTopic.where(assignment_id: params[:assignment_id], topic_identifier: params[:topic_ids])
   end
 
   # This displays a page that lists all the available topics for an assignment.

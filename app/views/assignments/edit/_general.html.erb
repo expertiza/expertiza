@@ -132,6 +132,30 @@ function microtaskChanged() {
     </td>
   </tr>
 
+  <!--Conference-->
+  <tr>
+    <td style='padding:5px' id='assignment_is_conference_assignment_field' colspan="2">
+      <input name="assignment_form[assignment][is_conference_assignment]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][is_conference_assignment]', 'true', @assignment_form.assignment.is_conference_assignment) %>
+      <%= label_tag('assignment_form[assignment][is_conference_assignment]','Will this assignment be used to review papers for conference?') %>
+    </td>
+  </tr>
+  <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+  <script type="text/javascript">
+       new Clipboard('button');
+  </script>
+  <tr>
+    <% if current_page?(action: 'edit') %>
+      <% if @assignment_form.assignment.is_conference_assignment %>
+        <%  url = polymorphic_url :conference, action: 'new',role: 'Student', assignment_id: @assignment.id %>
+        <div>Link to join conference assignment:
+          <%# <%= link_to conference_user_path(assignment_id: @assignment.id, role: 'Student')%> 
+          <span> <a id = "link" style="color: #5d0a0a"> <%=url%> </a> </span> 
+        </div>
+      <% end %>
+    <% end %>
+  </tr>
+
   <% if current_page?(action: 'edit') %>
   <!--Topics-->
   <tr>
@@ -272,17 +296,19 @@ function microtaskChanged() {
 
         jQuery("#questionnaire_table_TeammateReviewQuestionnaire").remove()
         if (checkbox.is(':checked')) {
-          team_count_field.removeAttr('hidden');
-          team_formation_due_date_checkbox.removeAttr('hidden')
-          jQuery('#assignment_form_assignment_max_team_size').val('2');
-          teammate_reviews_field.removeAttr('hidden');
-          addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
-          addQuestionnaireTableRow(
-                  'TeammateReviewQuestionnaire',
-                  null,
-                  <%= questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
-                  <%= assignment_questionnaire(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>,
-                  <%= questionnaire_options(@assignment_form.assignment, 'TeammateReviewQuestionnaire',nil).to_json.html_safe %>
+            team_count_field.removeAttr('hidden');
+            team_formation_due_date_checkbox.removeAttr('hidden')
+            jQuery('#assignment_form_assignment_max_team_size').val('2');
+            teammate_reviews_field.removeAttr('hidden');
+            addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
+            <% assignment_questionnaire = @assignment_form.assignment_questionnaire('TeammateReviewQuestionnaire', nil, nil) %>
+            <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'TeammateReviewQuestionnaire') %>
+            addQuestionnaireTableRow(
+                'TeammateReviewQuestionnaire',
+                <%= assignment_questionnaire.to_json.html_safe %>,
+                <%= questionnaire.to_json.html_safe %>,
+                <%= questionnaire_options('TeammateReviewQuestionnaire').to_json.html_safe %>,
+                null
           );
 
         } else {

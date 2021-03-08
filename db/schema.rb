@@ -11,7 +11,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200421235620) do
+
+ActiveRecord::Schema.define(version: 20201125202200) do
+
+
+  create_table "account_requests", force: :cascade do |t|
+    t.string   "name",              limit: 255
+    t.integer  "role_id",           limit: 4
+    t.string   "fullname",          limit: 255
+    t.string   "institution_id",    limit: 255
+    t.string   "email",             limit: 255
+    t.string   "status",            limit: 255
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.text     "self_introduction", limit: 65535
+  end
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -55,6 +69,7 @@ ActiveRecord::Schema.define(version: 20200421235620) do
     t.integer "questionnaire_weight", limit: 4, default: 0,    null: false
     t.integer "used_in_round",        limit: 4
     t.boolean "dropdown",                       default: true
+    t.integer "topic_id",             limit: 4
   end
 
   add_index "assignment_questionnaires", ["assignment_id"], name: "fk_aq_assignments_id", using: :btree
@@ -112,7 +127,10 @@ ActiveRecord::Schema.define(version: 20200421235620) do
     t.boolean  "is_answer_tagging_allowed"
     t.boolean  "has_badge"
     t.boolean  "allow_selecting_additional_reviews_after_1st_round"
+    t.boolean  "vary_by_topic",                                                    default: false
+    t.boolean  "vary_by_round",                                                    default: false
     t.boolean  "reviewer_is_team"
+    t.boolean  "is_conference_assignment",                                         default: false
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -462,18 +480,6 @@ ActiveRecord::Schema.define(version: 20200421235620) do
     t.boolean "iscorrect",                 default: false
   end
 
-  create_table "requested_users", force: :cascade do |t|
-    t.string   "name",              limit: 255
-    t.integer  "role_id",           limit: 4
-    t.string   "fullname",          limit: 255
-    t.string   "institution_id",    limit: 255
-    t.string   "email",             limit: 255
-    t.string   "status",            limit: 255
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
-    t.text     "self_introduction", limit: 65535
-  end
-
   create_table "response_maps", force: :cascade do |t|
     t.integer  "reviewed_object_id", limit: 4,   default: 0,     null: false
     t.integer  "reviewer_id",        limit: 4,   default: 0,     null: false
@@ -781,6 +787,7 @@ ActiveRecord::Schema.define(version: 20200421235620) do
     t.text    "public_key",                limit: 16777215
     t.boolean "copy_of_emails",                             default: false
     t.integer "institution_id",            limit: 4
+    t.boolean "preference_home_flag",                       default: true
   end
 
   add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree

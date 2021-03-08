@@ -1,7 +1,14 @@
-<h2> Review scores: <%= Participant.find(@reviewer_id).name %> </h2>
+<!--As instructed by Zhewei Hu and Dr. Gehringer, if the current assignment varies by topic,-->
+<!--this view should not display the content below. Instead it should display a message-->
+<!--saying that this report is not available for assignments where rubrics vary by topic-->
+<!--This message is set as the flash message from popup_controller.rb-->
+<% assignment = Assignment.find(@assignment_id) %>
+<% if !assignment.vary_by_topic %>
 
-<% keys = @review_final_versions.keys %>
-<% keys.each do |key| %>
+  <h2> Review scores: <%= Participant.find(@reviewer_id).name %> </h2>
+
+  <% keys = @review_final_versions.keys %>
+  <% keys.each do |key| %>
 
     <h4>Course: <%= Assignment.find(@assignment_id).course.name %></h4>
     <h4> Assignment: <%= Assignment.find(@assignment_id).name %></h4>
@@ -26,7 +33,7 @@
                         <tr>
                           <% responses.each do |response_id| %>
                               <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
-                              <td><%= team.name %></td>
+                              <td><%= team.name(session[:ip]) %></td>
                           <% end %>
                         </tr>
 
@@ -48,45 +55,45 @@
                     <td width="70%"> Comments</td>
                   </tr>
 
-                  <% responses.each do |response_id| %>
-                      <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
-                      <% if !answer.nil? %>
-                          <tr>
-                            <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
-                            <% #TODO does this one need reviewer fixed? %>>
-                            <% response_map = ReviewResponseMap.where(reviewed_object_id: @assignment_id,
-                                                                      reviewer_id: @reviewer_id,
-                                                                      reviewee_id: team.id).last %>
-                            <% response_update_at = response_map.try(:response).try(:last).try(:updated_at) %>
-                            <% review_graded_at = ReviewGrade.find_by(participant_id: @reviewer_id).try(:review_graded_at) %>
-                            <% col_color = 'black' %>
-                            <% col_color = 'blue' if review_graded_at && response_update_at && response_update_at > review_graded_at %>
-                            <!--Reviewee-->
-                            <td>
-                              <p style="color: <%= col_color %>"><%= team.name %> <br>
-                            </td>
-                            <!--Score-->
-                            <% if question.instance_of? Checkbox %>
-                                <td align='center'>
-                                  <p style="color: <%= col_color %>"><%= answer.answer == 0 ? image_tag("delete_icon.png") : image_tag("Check-icon.png") %></p>
-                                </td>
-                            <% else %>
-                                <td align='center'><p style="color: <%= col_color %>"><%= answer.answer %></p></td>
-                            <% end %>
-
-                            <!--Comments-->
-                            <td align='left'><p style="color: <%= col_color %>"><%= answer.comments.html_safe unless answer.comments.nil? %></p></td>
-                          </tr>
+            <% responses.each do |response_id| %>
+              <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
+                <% if !answer.nil? %>
+                    <tr>
+                      <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
+                      <% #TODO does this one need reviewer fixed? %>>
+                      <% response_map = ReviewResponseMap.where(reviewed_object_id: @assignment_id,
+                                                                reviewer_id: @reviewer_id,
+                                                                reviewee_id: team.id).last %>
+                      <% response_update_at = response_map.try(:response).try(:last).try(:updated_at) %>
+                      <% review_graded_at = ReviewGrade.find_by(participant_id: @reviewer_id).try(:review_graded_at) %>
+                      <% col_color = 'black' %>
+                      <% col_color = 'blue' if review_graded_at && response_update_at && response_update_at > review_graded_at %>
+                      <!--Reviewee-->
+                      <td>
+                        <p style="color: <%= col_color %>"><%= team.name %> <br>
+                      </td>
+                      <!--Score-->
+                      <% if question.instance_of? Checkbox %>
+                          <td align='center'>
+                            <p style="color: <%= col_color %>"><%= answer.answer == 0 ? image_tag("delete_icon.png") : image_tag("Check-icon.png") %></p>
+                          </td>
                       <% else %>
-                          <td>N/A</td>
-                          <td>N/A</td>
-                          <td>N/A</td>
+                          <td align='center'><p style="color: <%= col_color %>"><%= answer.answer %></p></td>
                       <% end %>
-                  <% end %>
+
+                  <!--Comments-->
+                  <td align='left'><p style="color: <%= col_color %>"><%= answer.comments.html_safe unless answer.comments.nil? %></p></td>
+                </tr>
+              <% else %>
+                <td>N/A</td>
+                <td>N/A</td>
+                <td>N/A</td>
               <% end %>
-          <% else %>
-              <% next %>
+            <% end %>
           <% end %>
+        <% else %>
+          <% next %>
+        <% end %>
       <% end %>
       <tr>
         <th align='left' style="background-color:#DDDDBB"> Reviewee</th>
@@ -96,11 +103,13 @@
       <% responses.each do |response_id| %>
           <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
           <tr>
-            <td> <%= team.name %> </td>
+            <td> <%= team.name(session[:ip]) %> </td>
             <td colspan="2"> <%=sanitize Response.find(response_id).additional_comment %> </td>
           </tr>
       <% end %>
     </table>
 
-<% end #loop for keys %>
-<br/>
+  <% end #loop for keys %>
+  <br/>
+
+<% end %>

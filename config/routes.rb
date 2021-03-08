@@ -49,13 +49,14 @@ Expertiza::Application.routes.draw do
 
   resources :assignments, except: [:destroy] do
     collection do
-      get :associate_assignment_with_course
+      get :place_assignment_in_course
       get :copy
       get :toggle_access
       get :delayed_mailer
       get :list_submissions
       get :delete_delayed_mailer
       get :remove_assignment_from_course
+      get :instant_flash
     end
   end
 
@@ -87,7 +88,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :course, only: %i[new create edit update] do
+  resources :course, controller: 'courses', only: %i[new create edit update] do
     collection do
       get :toggle_access
       get :copy
@@ -202,7 +203,7 @@ resources :institution, except: [:destroy] do
       get :add
       post :add
       get :auto_complete_for_user_name
-      get :delete_assignment_participant
+      get :delete
       get :list
       get :change_handle
       get :inherit
@@ -212,7 +213,7 @@ resources :institution, except: [:destroy] do
       post :update_authorizations
       post :update_duties
       post :change_handle
-      get :view_publishing_rights
+      get :view_copyright_grants
     end
   end
 
@@ -369,6 +370,7 @@ resources :institution, except: [:destroy] do
       post :signup_as_instructor_action
       post :set_priority
       post :save_topic_deadlines
+      post :delete_all_selected_topics
     end
   end
 
@@ -471,11 +473,9 @@ resources :institution, except: [:destroy] do
 
   resources :tree_display, only: [] do
     collection do
-      get :action
       post :list
-      post :children_node_ng
-      post :children_node_2_ng
-      post :bridge_to_is_available
+      get :get_folder_contents
+      post :get_sub_folder_contents
       get :session_last_open_tab
       get :set_session_last_open_tab
     end
@@ -485,9 +485,21 @@ resources :institution, except: [:destroy] do
     collection do
       get :list
       post :list
-      get :list_pending_requested
       post ':id', action: :update
-      get :show_selection
+      post :show_if_authorized
+      get :auto_complete_for_user_name
+      get :set_anonymized_view
+      get :keys
+    end
+  end
+
+  resources :account_request, constraints: {id: /\d+/} do
+    collection do
+      get :list
+      post :list
+      post :list_pending_requested
+      post :list_pending_requested_finalized
+      post ':id', action: :update
       get :auto_complete_for_user_name
       get :set_anonymized_view
       get :keys
@@ -504,6 +516,7 @@ resources :institution, except: [:destroy] do
     end
   end
 
+  resources :conference
   root to: 'content_pages#view', page_name: 'home'
   post :login, to: 'auth#login'
   post :logout, to: 'auth#logout'
@@ -523,6 +536,5 @@ resources :institution, except: [:destroy] do
   post '/response_toggle_permission/:id' => 'response#toggle_permission'
   post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'
   post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'
-
 end
 

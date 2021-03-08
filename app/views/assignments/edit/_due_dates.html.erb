@@ -379,12 +379,14 @@
             } else {
                 addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
                 jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
+                <% assignment_questionnaire = @assignment_form.assignment_questionnaire('MetareviewQuestionnaire', nil, nil) %>
+                <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'MetareviewQuestionnaire') %>
                 addQuestionnaireTableRow(
-                        'MetareviewQuestionnaire',
-                        null,
-                        <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
-                        <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
-                        <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
+                    'MetareviewQuestionnaire',
+                    <%= assignment_questionnaire.to_json.html_safe %>,
+                    <%= questionnaire.to_json.html_safe %>,
+                    <%= questionnaire_options('MetareviewQuestionnaire').to_json.html_safe %>,
+                    null
                 );
             }
 
@@ -425,12 +427,14 @@ function removeOrAddMetareview() {
     } else {
         addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>, 'metareview', 0, <%= due_date(@assignment_form.assignment, 'metareview').to_json.html_safe %>);
         jQuery("#questionnaire_table_MetareviewQuestionnaire").remove()
+        <% assignment_questionnaire = @assignment_form.assignment_questionnaire('MetareviewQuestionnaire', nil, nil) %>
+        <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'MetareviewQuestionnaire') %>
         addQuestionnaireTableRow(
             'MetareviewQuestionnaire',
-            null,
-            <%= questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
-            <%= assignment_questionnaire(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>,
-            <%= questionnaire_options(@assignment_form.assignment, 'MetareviewQuestionnaire',nil).to_json.html_safe %>
+            <%= assignment_questionnaire.to_json.html_safe %>,
+            <%= questionnaire.to_json.html_safe %>,
+            <%= questionnaire_options('MetareviewQuestionnaire').to_json.html_safe %>,
+            null
         );
     }
     <%@metareview_allowed_checkbox=true%>

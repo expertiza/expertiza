@@ -1,5 +1,5 @@
-def questionnaire_options(assignment, type, _round = 0)
-  questionnaires = Questionnaire.where(['private = 0 or instructor_id = ?', assignment.instructor_id]).order('name')
+def questionnaire_options(type)
+  questionnaires = Questionnaire.where(['private = 0 or instructor_id = ?', session[:user].id]).order('name')
   options = []
   questionnaires.select {|x| x.type == type }.each do |questionnaire|
     options << [questionnaire.name, questionnaire.id]
@@ -500,11 +500,12 @@ describe "assignment function" do
     end
 
     it "Delete existing topic", js: true do
+      create(:assignment_due_date, deadline_type: DeadlineType.where(name: "submission").first, due_at: DateTime.now.in_time_zone + 1.day)
       click_link 'Due date'
       fill_in 'assignment_form_assignment_rounds_of_reviews', with: '1'
       click_button 'set_rounds'
-      fill_in 'datetimepicker_submission_round_1', with: (Time.now.in_time_zone + 1.day).strftime("%Y/%m/%d %H:%M")
-      fill_in 'datetimepicker_review_round_1', with: (Time.now.in_time_zone + 10.days).strftime("%Y/%m/%d %H:%M")
+      # fill_in 'datetimepicker_submission_round_1', with: (Time.current + 1.day).strftime("%Y/%m/%d %H:%M")
+      # fill_in 'datetimepicker_review_round_1', with: (Time.now.in_time_zone + 1.day).strftime("%Y/%m/%d %H:%M")
       click_button 'submit_btn'
       assignment = Assignment.where(name: 'public assignment for test').first
       create(:topic, assignment_id: assignment.id)
@@ -724,7 +725,7 @@ describe "assignment function" do
     assignment_id = Assignment.where(name: 'Test Assignment')[0].id
 
     login_as('instructor6')
-    visit "/assignments/associate_assignment_with_course?id=#{assignment_id}"
+    visit "/assignments/place_assignment_in_course?id=#{assignment_id}"
 
     choose "course_id_#{course_id}"
     click_button 'Save'

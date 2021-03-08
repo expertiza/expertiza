@@ -1,4 +1,5 @@
 class BookmarksController < ApplicationController
+  include AuthorizationHelper
   helper_method :specific_average_score
   helper_method :total_average_score
 
@@ -10,7 +11,7 @@ class BookmarksController < ApplicationController
       current_role_name.eql? 'Student'
     when 'edit', 'update', 'destroy'
       # edit, update, delete bookmarks can only be done by owner
-      current_role_name.eql? 'Student' and Bookmark.find(params[:id].to_i).user_id == session[:user].id
+      current_user_has_student_privileges? and current_user_created_bookmark_id?(params[:id])
     end
     @current_role_name = current_role_name
   end

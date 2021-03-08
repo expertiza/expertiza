@@ -166,7 +166,7 @@ class UsersController < ApplicationController
     if !user_existed and requested_user_saved
       super_users = User.joins(:role).where('roles.name = ?', 'Super-Administrator')
       super_users.each do |super_user|
-        prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, requested_user, 'New account Request')
+        prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, requested_user, 'New account Request: ' + requested_user.fullname)
         prepared_mail.deliver
       end
       ExpertizaLogger.info LoggerMessage.new(controller_name, requested_user.name, 'The account you are requesting has been created successfully.', request)

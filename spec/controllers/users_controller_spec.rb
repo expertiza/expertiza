@@ -255,7 +255,8 @@ describe UsersController do
           first_name: 'User',
           partial_name: 'update'
         }
-      ).deliver_now
+      )
+      email.deliver_now
 
       ActionMailer::Base.deliveries.last.tap do |mail|
         expect(mail.from).to eq(["expertiza.development@gmail.com"])

@@ -265,15 +265,13 @@ function updateTable(tagPrompts){
             // set initial colors
             let text = "\u0058";
             if (tagPrompts[vectorIndex].value == 0) {
-                // Set color. Should probably be set with a stylesheet class yes?
+                // Set color as failing
                 // Do we only care about coloring done/not done?
-                //cell.setAttribute("style", "background-color: red; text-align: center;");
-                cell.style.backgroundColor = "red";
+                cell.setAttribute("class", "c1");
             } else {
-                // Set color. Should probably be set with a stylesheet class yes?
+                // Set color as successful
                 // Do we only care about coloring done/not done?
-                //cell.setAttribute("style", "background-color: green; text-align: center;");
-                cell.style.backgroundColor = "green";
+                cell.setAttribute("class", "c5");
                 text = "\u2713";
             }
             //Update Cell to table

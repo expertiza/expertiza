@@ -232,14 +232,14 @@ function generateTable(tagPrompts) {
             // set initial colors
             let text = document.createTextNode("\u0058");
             if(tagPrompts[vectorIndex].value == 0) {
-                // Set color. Should probably be set with a stylesheet class yes?
+                // Set color as failing
                 // Do we only care about coloring done/not done?
                 cell.setAttribute("class", "c1");
                 cell.setAttribute("style", "text-align: center;");
 
             }
             else {
-                // Set color. Should probably be set with a stylesheet class yes?
+                // Set color as successful
                 // Do we only care about coloring done/not done?
                 cell.setAttribute("class", "c5");
                 cell.setAttribute("style", "text-align: center;");

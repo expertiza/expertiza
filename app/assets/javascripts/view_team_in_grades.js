@@ -234,13 +234,15 @@ function generateTable(tagPrompts) {
             if(tagPrompts[vectorIndex].value == 0) {
                 // Set color. Should probably be set with a stylesheet class yes?
                 // Do we only care about coloring done/not done?
-                cell.setAttribute("style", "background-color: red; text-align: center;");
+                cell.setAttribute("class", "c1");
+                cell.setAttribute("style", "text-align: center;");
 
             }
             else {
                 // Set color. Should probably be set with a stylesheet class yes?
                 // Do we only care about coloring done/not done?
-                cell.setAttribute("style", "background-color: green; text-align: center;");
+                cell.setAttribute("class", "c5");
+                cell.setAttribute("style", "text-align: center;");
                 text.data = "\u2713";
             }
             //add to table

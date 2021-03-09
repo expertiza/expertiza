@@ -1,4 +1,4 @@
-<h2>Reviews for "<%= @assignment.name %>"</h2>
+-<h2>Reviews for "<%= @assignment.name %>"</h2>
 
 <!-- Added the feature to find the reviews and meta-reviews left for students by E1839 @Rayan Dasoriya -->
 <% if @assignment.num_reviews_allowed.nil? || @assignment.num_reviews_allowed == -1%>
@@ -18,7 +18,6 @@
 <% end %>
 
 <% if check_reviewable_topics(@assignment) or @assignment.get_current_stage(@topic_id) == "Finished" %>
-    <%= @review_mappings.count %>
     <%= render :partial => 'responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>
     <!-- Temporary fix for Staggered Deadline assignment issue preventing students from reviewing 04-23-19 -->
     <!-- We need to perform the same check, but on the topic that is being reviewed and not the topic that the reviewer wrote on -->

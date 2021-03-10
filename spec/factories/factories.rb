@@ -228,6 +228,12 @@ FactoryBot.define do
     user { User.where(role_id: 2).first || association(:student) }
   end
 
+  factory :team, class: Team do
+    id 1
+    name 'testteam'
+    parent_id 1
+  end
+  
   factory :invitation, class: Invitation do
     reply_status 'W'
   end
@@ -519,4 +525,7 @@ FactoryBot.define do
     email 'abc@mailinator.com'
     end
 
+  factory :survey_deployment, class: SurveyDeployment do
+    type 'AssignmentSurveyDeployment'
+    end
 end

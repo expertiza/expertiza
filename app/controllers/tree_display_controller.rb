@@ -51,10 +51,34 @@ class TreeDisplayController < ApplicationController
     # to view. Top level folders include Questionaires, Courses, and Assignments.
     folders = {}
     FolderNode.get.each do |folder_node|
+    
       child_nodes = folder_node.get_children(nil, nil, session[:user].id, nil, nil)
-       # Serialize the contents of each node so it can be displayed on the UI
+      # Serialize the contents of each node so it can be displayed on the UI
       contents = []
       child_nodes.each do |node|
+        contents.push(serialize_folder_to_json(folder_node.get_name, node))
+      end
+      
+      # Store contents according to the root level folder.
+      folders[folder_node.get_name] = contents
+    end
+
+    respond_to do |format| 
+      format.html { render json: folders } 
+    end
+  end
+  
+  # Returns the contents of only the specified folder
+  def get_specific_folder_contents
+    # Get all child nodes associated with a top level folder that the logged in user is authorized
+    # to view. Top level folders include Questionaires, Courses, and Assignments.
+    folders = {}
+    FolderNode.get.each do |folder_node|
+      child_nodes = folder_node.get_children(nil, nil, session[:user].id, nil, nil)
+      # Serialize the contents of each node so it can be displayed on the UI
+      contents = []
+      child_nodes.each do |node|
+        # TODO: INCLUDE THE CHILDREN NODES HERE, ITS FILTERING TOO MUCH AND NOT RETRIEVING ANYTHING USEFUL INT EH CHILDREN SECTION OF THE REACT REFERENCE HERE
         contents.push(serialize_folder_to_json(folder_node.get_name, node))
       end
       
@@ -77,6 +101,7 @@ class TreeDisplayController < ApplicationController
     
     # Get all of the children in the sub-folder.
     child_nodes = folder_node.get_children(nil, nil, session[:user].id, nil, nil)
+    
     # Serialize the contents of each node so it can be displayed on the UI
     contents = []
     child_nodes.each do |node|
@@ -98,9 +123,25 @@ class TreeDisplayController < ApplicationController
     res = res_node_for_child(tmp_res)
     res['Assignments'] = res['Assignments'].sort_by {|x| [x['instructor'], -1 * x['creation_date'].to_i] } if res.key?('Assignments')
     respond_to do |format|
-      format.html { render json: res }
+      format.html { render json: contents }
     end
   end
+  
+  # # for child nodes
+  # def children_node_2_ng
+  #   child_nodes = child_nodes_from_params(params[:reactParams2][:child_nodes])
+  #   res = get_tmp_res(params, child_nodes)
+  #   respond_to do |format|
+  #     format.html { render json: res }
+  #   end
+  # end
+  # ^^^ original method for "handleExpandClick"
+  # For the questionnaire's handleExpandClick function, it appears that the get_sub_folder_contents method is not capable of returning the data.
+  # We fixed the courses by rendering the json properly on the return to the jquery post request from the front-end
+  # The assignments tab did not have any data when we used the react debuging extension (i.e. the childNodes attribute was null)
+  # From this, we assumed there was no data to display underneath each assignment
+  # After debugging, we found that the "nodeType" attribute in the :reactParams field of the post request identifies the type of childNodes to be retrieved (i.e. "courses" or "Questionnaires")
+  # We found that a "FolderNode" value for this attribute equates to a questionnaire
 
   # check if nodetype is coursenode
   def course_node_for_current_ta?(ta_mappings, node)

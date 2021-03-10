@@ -87,6 +87,7 @@ class ResponseController < ApplicationController
       @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
     @questionnaire = set_questionnaire
+    store_total_cake_score
     render action: 'response'
   end
 
@@ -130,10 +131,12 @@ class ResponseController < ApplicationController
     # A new response has to be created when there hasn't been any reviews done for the current round,
     # or when there has been a submission after the most recent review in this round.
     @response = Response.where(map_id: @map.id, round: @current_round.to_i).order(updated_at: :desc).first
-    if @response.nil? || AssignmentTeam.find(@map.reviewee_id).most_recent_submission.updated_at > @response.updated_at
+    teams_most_recent_submission = AssignmentTeam.find(@map.reviewee_id).most_recent_submission
+    if @response.nil? || (!teams_most_recent_submission.nil? && teams_most_recent_submission.updated_at > @response.updated_at)
       @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
     end
     questions = sort_questions(@questionnaire.questions)
+    store_total_cake_score
     init_answers(questions)
     render action: 'response'
   end
@@ -221,6 +224,10 @@ class ResponseController < ApplicationController
     redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
+  def pending_surveys
+    redirect_to controller: 'survey_deployment', action: 'pending_surveys'
+  end
+
   def redirect
     error_id = params[:error_msg]
     message_id = params[:msg]
@@ -243,6 +250,8 @@ class ResponseController < ApplicationController
     when "bookmark"
       bookmark = Bookmark.find(@map.response_map.reviewee_id)
       redirect_to controller: 'bookmarks', action: 'list', id: bookmark.topic_id
+    when "ta_review"      # Page should be directed to list_submissions if TA/instructor performs the review
+      redirect_to controller: 'assignments', action: 'list_submissions', id: @map.response_map.assignment.id
     else
       # if reviewer is team, then we have to get the id of the participant from the team
       # the id in reviewer_id is of an AssignmentTeam
@@ -398,6 +407,21 @@ class ResponseController < ApplicationController
       # it's unlikely that these answers exist, but in case the user refresh the browser some might have been inserted.
       a = Answer.where(response_id: @response.id, question_id: q.id).first
       Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '') if a.nil?
+    end
+  end
+
+  # Creates a table to store total contribution for Cake question across all reviewers
+  def store_total_cake_score
+    @total_score = Hash.new
+    @questions.each do |question|
+      if question.instance_of? Cake
+        reviewee_id = ResponseMap.select(:reviewee_id, :type).where(id: @response.map_id.to_s).first
+        total_score = question.get_total_score_for_question(reviewee_id.type, question.id, @participant.id, @assignment.id, reviewee_id.reviewee_id).to_s
+        if total_score.nil?
+          total_score = 0
+        end
+        @total_score[question.id] = total_score
+      end
     end
   end
 end

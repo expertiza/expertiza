@@ -38,6 +38,8 @@
               <th class="sorter-true">Percentage of answers tagged</th>
               <th class="sorter-true"># answers tagged</th>
               <th class="sorter-true"># answers not tagged</th>
+              <th class="sorter-true"># intervals</th>
+              <th class="sorter-true">Key Graph Info</th>
               <th class="sorter-true"># taggable answers<img src='/assets/info.png' title='As set up in the assignment setting, the authors can only tag answers of <%= tag_dep.question_type %> question type that are more than <%= tag_dep.answer_length_threshold %> character(s).'/></th>
             </tr>
             </thead>
@@ -48,6 +50,24 @@
                   <td><%= report_line.percentage.to_s %>%</td>
                   <td><%= report_line.no_tagged.to_s %></td>
                   <td><%= report_line.no_not_tagged.to_s %></td>
+                  <!-- E2082 Call chart plotting function from review_mapping_helper -->
+                  <td align='left'>
+                    <%= display_tagging_interval_chart(report_line.tag_update_intervals) %>
+                  </td>
+                  <!-- <td><%= report_line.tag_update_intervals.to_s %></td> -->
+                  <% key_chart_information = calculate_key_chart_information(report_line.tag_update_intervals) %>
+                  <td>
+                    <!-- Populates statistics only if backend returned details -->
+                    <% if(key_chart_information.is_a?(Hash))%>
+                      <ul>
+                          <li>Mean: <%= key_chart_information[:mean] %></li>
+                          <li>Min: <%= key_chart_information[:min] %></li>
+                          <li>Max: <%= key_chart_information[:max] %></li>
+                          <li>Variance: <%= key_chart_information[:variance] %></li>
+                          <li>Standard Deviation: <%= key_chart_information[:stand_dev] %></li>
+                      </ul>
+                    <% end %>
+                  </td>
                   <td><%= report_line.no_tagable %></td>
                 </tr>
             <% end %>

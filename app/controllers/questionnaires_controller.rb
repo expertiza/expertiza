@@ -193,6 +193,7 @@ class QuestionnairesController < ApplicationController
         question.min_label = 'Strongly disagree'
       end
       question.size = '50, 3' if question.is_a? Criterion
+      question.size = '50, 3' if question.is_a? Cake
       question.alternatives = '0|1|2|3|4|5' if question.is_a? Dropdown
       question.size = '60, 5' if question.is_a? TextArea
       question.size = '30' if question.is_a? TextField

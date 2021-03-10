@@ -5,6 +5,8 @@ describe ParticipantsController do
   let(:participant) { build(:participant) }
   let(:assignment_node) { build(:assignment_node) }
   let(:assignment) { build(:assignment) }
+  let(:team) { build(:team) }
+  let(:participant) { build(:participant)}
   describe '#action_allowed?' do
     context 'when current user is student' do
       it 'allows update_duties action' do
@@ -45,13 +47,13 @@ describe ParticipantsController do
     end
   end
 
-  describe '#delete_assignment_participant' do
+  describe '#delete' do
     it 'deletes the assignment_participant and redirects to #review_mapping/list_mappings page' do
       allow(Participant).to receive(:find).with('1').and_return(participant)
       allow(participant).to receive(:destroy).and_return(true)
       params = {id: 1}
       session = {user: instructor}
-      get :delete_assignment_participant, params, session
+      get :delete, params, session
       expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
     end
   end
@@ -153,6 +155,18 @@ describe ParticipantsController do
       get :bequeath_all, params, session
       expect(flash[:note]).to eq 'All assignment participants are already part of the course'
       expect(response).to redirect_to('/participants/list?model=Assignment')
+    end
+  end
+
+  describe '#get_user_info' do
+    it 'gives the user information from the the team user' do
+      allow(assignment).to receive(:participants).and_return([participant])
+      allow(participant).to receive(:permission_granted?).and_return(true)
+      allow(participant).to receive(:user).and_return(student)
+      allow(student).to receive(:name).and_return('name')
+      allow(student).to receive(:fullname).and_return('fullname')
+      pc = ParticipantsController.new
+      expect(pc.send(:get_user_info, student, assignment)).to eq({:name=>'name', :fullname=>'fullname', :pub_rights=>'Granted', :verified=>false})
     end
   end
 end

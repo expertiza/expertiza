@@ -2,8 +2,7 @@
 
 <H2> Automatically </H2>
 
-<p> Uses, insofar as possible, the number of members specified when the
-  assignment was created.</p>
+<p> Team size is the maximum team size specified when the assignment was created.</p>
 
 <%= form_tag :action => 'create_teams' do %>
     <!-- BUG FIX: Check if the parent is course, then set the max size as 4 otherwise the max team size of assignment team-->
@@ -21,7 +20,7 @@
 <BR/>
 
 <H2> Manually </H2>
-<p>Specify Team name, then add members to team, one by one. </p>
+<p>Specify team name, then add members to team, one by one. </p>
 <%= form_tag :action => 'create' do %>
   <%= hidden_field_tag 'id', @parent.id %>
   <%= render :partial => 'form' %>

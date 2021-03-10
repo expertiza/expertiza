@@ -7,9 +7,9 @@ class AssignmentsController < ApplicationController
     if %w[edit update list_submissions].include? params[:action]
       assignment = Assignment.find(params[:id])
       (%w[Super-Administrator Administrator].include? current_role_name) ||
-      (assignment.instructor_id == current_user.try(:id)) ||
-      TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) ||
-      (assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id))
+          (assignment.instructor_id == current_user.try(:id)) ||
+          TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) ||
+          (assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id))
     else
       ['Super-Administrator',
        'Administrator',
@@ -107,13 +107,18 @@ class AssignmentsController < ApplicationController
     file_path
   end
 
+  def checktopicscopy
+    @assignment_id = params[:id]
+  end
+
   def copy
     @user = current_user
     session[:copy_flag] = true
     # check new assignment submission directory and old assignment submission directory
     old_assign = Assignment.find(params[:id])
-    new_assign_id = AssignmentForm.copy(params[:id], @user)
+    new_assign_id = AssignmentForm.copy(params[:id], params[:copyoption], @user)
     if new_assign_id
+      flash[:success] = 'The assignment was successfully Copied.'
       new_assign = Assignment.find(new_assign_id)
       if old_assign.directory_path == new_assign.directory_path
         flash[:note] = "Warning: The submission directory for the copy of this assignment will be the same as the submission directory "\
@@ -293,7 +298,7 @@ class AssignmentsController < ApplicationController
 
   def validate_due_date
     @due_date_nameurl_not_empty && @due_date_nameurl_not_empty_checkbox &&
-      (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
+        (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
   end
 
   def check_assignment_questionnaires_usage

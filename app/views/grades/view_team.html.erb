@@ -27,8 +27,12 @@
   <h4>Topic: <%= topic_id + '. ' + topic_name %></h4>
 <% end %>
 <!--Obtain only review scores-->
-<% rscore_review = Rscore.new(@pscore,:review) if @pscore[:review] %>
+<% if @pscore[:review]  %>
+<% rscore_review = Rscore.new(@pscore,:review)%>
 <h4>Average peer review score: <span class = "c5"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span></h4>
+<%else %>
+  <h4> There are no reviews for this assignment</h4>
+<%end %>
 <!--Toggle submission-->
 <button onclick="toggleFunction('<%= @participant.id.to_s%>')" class="btn btn-default">Show Submission</button>
 <div id="<%= @participant.id.to_s%>" style="display:none;">
@@ -191,7 +195,7 @@
                 <% j += 1 %>
             <% end %>
 
-            <!--displays the row for the add'l comments, by default: collapsed. -->
+            <!--displays the row for the addl comments, by default: collapsed. -->
             <tr>
               <td colspan="<%= (i+1).to_s %>" class="hiddenRow" >
                 <div id="hid<%= vm.questionnaire_type + vm.round.to_s + "comment" %>" class="accordion-body collapse" style="margin-left:10px;">
@@ -231,15 +235,24 @@
 <% end %>
 <!-- termination of the main outer loop.-->
 
-<h4 style="font-weight:bold;display:inline-block;">Grade and comment for submission</h4><br/>
-<% if ['Student'].include? current_user.role.name %>
-  Grade: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
-  Comment: <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %>
-<% else %>
-  <%= form_tag 'save_grade_and_comment_for_submission' do %>
-    <%= hidden_field_tag :participant_id, params[:id] %>
-    <%= number_field_tag 'grade_for_submission', @team.try(:grade_for_submission) ,min: 0, max: 100, maxlength: 3, size: 3, class: "form-control width-150", placeholder: 'Grade' %><br/>
-    <%= text_area_tag 'comment_for_submission', @team.try(:comment_for_submission), size: '75x10', placeholder: 'Comment', class: "form-control width-500" %><br>
-    <%= submit_tag 'Save' ,class: "btn btn-default" %>
+<!-- Get course ID and TA ID to restrict TAs ability to update his grades-->
+<%
+   @course_id = Assignment.find_by(id: @participant.parent_id).course_id;
+   @ta_id = @participant.user_id;  
+%>
+
+
+  <h4 style="font-weight:bold;display:inline-block;">Grade and comment for submission</h4><br/>
+  <% if ['Student', 'Teaching Assistant'].include? current_user.role.name %>
+    Grade: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
+    Comment: <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %><br>
   <% end %>
-<% end %>
+  <% if TaMapping.where(ta_id: @ta_id, course_id: @course_id).exists? %>
+  <h4 style="font-weight:bold;display:inline-block;">TA Grade-Comment:</h4><br/>
+    <%= form_tag 'save_grade_and_comment_for_submission' do %>
+      <%= hidden_field_tag :participant_id, params[:id] %>
+      <%= number_field_tag 'grade_for_submission', @team.try(:grade_for_submission) ,min: 0, max: 100, maxlength: 3, size: 3, class: "form-control width-150", placeholder: 'Grade' %><br/>
+      <%= text_area_tag 'comment_for_submission', @team.try(:comment_for_submission), size: '75x10', placeholder: 'Comment', class: "form-control width-500" %><br>
+      <%= submit_tag 'Save' ,class: "btn btn-default" %>
+    <% end %>
+  <% end %>

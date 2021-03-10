@@ -23,7 +23,7 @@ class QuizQuestionnairesController < QuestionnairesController
   # define a new quiz questionnaire
   # method invoked by the view
   def new
-    valid_request = true
+    valid_request = true # A request is valid if the assignment requires a quiz, the participant has a team, and that team has a topic if the assignment has a topic
     @assignment_id = params[:aid] # creating an instance variable to hold the assignment id
     @participant_id = params[:pid] # creating an instance variable to hold the participant id
     assignment = Assignment.find(@assignment_id)

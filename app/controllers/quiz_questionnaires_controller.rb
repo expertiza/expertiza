@@ -27,7 +27,7 @@ class QuizQuestionnairesController < QuestionnairesController
     @assignment_id = params[:aid] # creating an instance variable to hold the assignment id
     @participant_id = params[:pid] # creating an instance variable to hold the participant id
     assignment = Assignment.find(@assignment_id)
-    if !assignment.require_quiz? # flash error if this assignment does not require quiz
+    unless assignment.require_quiz? # flash error if this assignment does not require quiz
       flash[:error] = "This assignment does not support the quizzing feature."
       valid_request = false
     else

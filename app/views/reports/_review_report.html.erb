@@ -64,7 +64,7 @@
         <% if reviewer.id != -1 %>
           <% user = Participant.find(reviewer.id).user %>
             <!--reviewer-->
-			
+
 			<!-- added class attribute and span tag to extract full name and unityID of the user for scraping (Used in export to CSV functionality) -->
             <td>
               <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post, :class => "user_unityID" %>
@@ -107,6 +107,8 @@
                   </div>
                 </div>
               <% end %>
+              <!-- Link that displays the time tracking detail -->
+              <a onclick="displayTimeDetail(<%= reviewer_map.id %>)" href="javascript:void(0);"> {time_placeholder} </a>
             <% end %>
           </td>
           <!--Render partial view corresponding to the overall score awarded to a team-->
@@ -117,7 +119,7 @@
                 <%= render partial: 'team_score_score_awarded', locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: reviewer.id} %>
               <% end %>
             <% end %>
-          </td>         
+          </td>
           <!--Render partial view corresponding to the average score awarded to a team-->
           <td align='left'>
             <% @response_maps.each_with_index do |reviewer_map, index| %>
@@ -158,6 +160,21 @@
     <% end %>
     </table>
  </div>
+
+<!-- Time tracking Modal-->
+<div id="timeModal" class="t-modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="close" onlick=closeTimeDetail()>&times;</span>
+      <h2>Time tracking statistic</h2>
+    </div>
+    <div class="modal-body">
+      <p>Loading data...(This might need few seconds)</p>
+    </div>
+  </div>
+</div>
+
 <!--Partial for text macro form-->
 <%= render :partial => '/user_pastebins/save_text_macros' %>
 
@@ -258,7 +275,112 @@
 		row.push("EmailID");
 		row.push("Grade");
 		row.push("Comment");
-		
+
 		return row;
 	}
 </script>
+
+<!-- Javascript to show pop-up time tracking detial -->
+<script>
+
+    //this function render the pie chat for time tracking detail
+    function drawTimeCanvas(data) {
+        var ctx = $("#timeCanvas").getContext("2d");
+        var pieChart = new Chart(ctx, {
+            type: 'pie',
+            data: data
+        });
+    }
+
+    //this function pop up the modal and do AJAX call to load time tracking data.
+    function displayTimeDetail(resp_map_id){
+        $("#timeModal").style("display","block");
+        $.ajax({
+            url: Url_placeholder,
+            method: 'GET',
+            dataType: 'json',
+            success: function (respond) {
+                chartData = {
+                    labels: respond.Labels,
+                    datasets: [{
+                        data: respond.Data
+                    }]
+                };
+
+                //$("#timeModal").style("display","block");
+                //drawTimeCanvas(chartData);
+            }
+        });
+    }
+
+    //this function destroys the modal view.
+    function closeTimeDetail(){
+        $("#timeModal").style("display","none");
+    }
+
+</script>
+
+<!-- style sheet for time tracking modal-->
+<style>
+    .t-modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        padding-top: 100px;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0,0,0);
+        background-color: rgba(0,0,0,0.4);
+    }
+
+    .modal-content {
+        position: relative;
+        background-color: #fefefe;
+        margin: auto;
+        padding: 0;
+        border: 1px solid #888;
+        width: 450px;
+        height:500px;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+        -webkit-animation-name: animatetop;
+        -webkit-animation-duration: 0.4s;
+        animation-name: animatetop;
+        animation-duration: 0.4s
+    }
+
+    /* Add Animation */
+    @-webkit-keyframes animatetop {
+        from {top:-300px; opacity:0}
+        to {top:0; opacity:1}
+    }
+
+    @keyframes animatetop {
+        from {top:-300px; opacity:0}
+        to {top:0; opacity:1}
+    }
+
+    .close {
+        color: lightgray;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .modal-header {
+        padding: 2px 16px;
+        background-color: rgba(255,0,0,0.9);
+        color: white;
+    }
+
+    .modal-body {padding: 2px 16px;}
+</style>

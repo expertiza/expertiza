@@ -23,12 +23,12 @@ class QuizQuestionnairesController < QuestionnairesController
 
   
   def new
-    valid_request = true
+    valid_request = true # A request is valid if the assignment requires a quiz, the participant has a team, and that team has a topic if the assignment has a topic
     @assignment_id = params[:aid] # creating an instance variable to hold the assignment id
     @participant_id = params[:pid] # creating an instance variable to hold the participant id
     assignment = Assignment.find(@assignment_id)
-    if !assignment.require_quiz? # flash error if this assignment does not require quiz
-      flash[:error] = "This assignment does not support the quizzing feature."
+    unless assignment.require_quiz? # flash error if this assignment does not require quiz
+      flash[:error] = "This assignment is not configured to use quizzes."
       valid_request = false
     else
       valid_request = team_check(@participant_id, assignment) # check for validity of the request

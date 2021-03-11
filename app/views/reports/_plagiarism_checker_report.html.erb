@@ -32,7 +32,7 @@ else show records
               <% if team.nil? %>
                   <td>Unknown</td>
               <% else %>
-                  <td><%= team.name %></td>
+                  <td><%= team.name(session[:ip]) %></td>
               <% end %>
 
               <td><%= pcc.file2_name%></td>
@@ -41,7 +41,7 @@ else show records
               <% if team.nil? %>
                   <td>Unknown</td>
               <% else %>
-                  <td><%= team.name %></td>
+                  <td><%= team.name(session[:ip]) %></td>
               <% end %>
             </tr>
         <% end %>

@@ -182,6 +182,24 @@ describe Team do
     end
   end
 
+  # E1991 : we check whether anonymized view 
+  # sets the team name to anonymized. the test
+  # case should test both when anonymized view
+  # is set and when anonymized view is not set
+  describe '#anonymized_view' do
+    it 'returns anonymized name of team when anonymized view is set' do
+      allow(User).to receive(:anonymized_view?).and_return(true)
+      expect(team.name).to eq 'Anonymized_Team_' + team.id.to_s
+      expect(team.name).not_to eq 'no team'
+    end
+
+    it 'returns real name of team when anonymized view is not set' do
+      allow(User).to receive(:anonymized_view?).and_return(false)
+      expect(team.name).not_to eq 'Team_' + team.id.to_s
+      expect(team.name).to eq 'no team'
+    end
+  end 
+
   describe '.import' do
     context 'when row is empty and has_column_names option is not true' do
       it 'raises an ArgumentError' do

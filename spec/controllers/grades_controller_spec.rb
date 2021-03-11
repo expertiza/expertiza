@@ -12,6 +12,7 @@ describe GradesController do
   let(:student) { build(:student) }
   let(:review_response_map) { build(:review_response_map, id: 1) }
   let(:assignment_due_date) { build(:assignment_due_date) }
+  let(:ta) { build(:teaching_assistant, id: 8) }
 
   before(:each) do
     allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
@@ -96,6 +97,27 @@ describe GradesController do
       params = {id: 1}
       get :view_team, params
       expect(response).to render_template(:view_team)
+    end
+  end
+
+  describe '#view_team' do
+    render_views
+    context 'when view_team page is viewed by a student who is also a TA for another course' do
+      it 'renders grades#view_team page' do
+        allow(participant).to receive(:team).and_return(team)
+        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(assignment_questionnaire)
+        allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_questionnaire])
+        allow(assignment).to receive(:late_policy_id).and_return(false)
+        allow(assignment).to receive(:calculate_penalty).and_return(false)
+        allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
+        allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([review_response])
+        allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
+        params = {id: 1}
+        allow(TaMapping).to receive(:exists?).with(ta_id: 1, course_id: 1).and_return(true)
+        stub_current_user(ta, ta.role.name, ta.role)
+        get :view_team, params
+        expect(response.body).not_to have_content "TA"
+      end
     end
   end
 

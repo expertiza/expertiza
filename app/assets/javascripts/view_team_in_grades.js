@@ -202,17 +202,18 @@ function countTagsByQuestion() {
 function drawTagGrid(rowData) {
     //load table object
     let table = document.getElementById("tagHeatMap");
+    table.setAttribute("class", "scoresTable tbl_heat tablesorter");
     //Set up header Labels
     //let headerLabels = ["Probs?", "Solns?", "Praise?", "Tone?", "Mitig?"]
     let gridWidth = determineGridWidth(rowData);
     //create the header
     let thead = table.createTHead();
     let row = thead.insertRow();
+    row.setAttribute("class", "hide-scrollbar tablesorter-headerRow");
     // Create superhead label
     let th = document.createElement("th");
     let text = document.createTextNode("ReviewTags Completed: ");
-    th.style.fontSize = "11px";
-    th.class = ".tbl_heat th";
+    th.setAttribute("class", "sorter-false tablesorter-header tablesorter-headerUnSorted");
     th.setAttribute("id", "tagsSuperLabel");
     th.colSpan = 3;
     th.appendChild(text);
@@ -220,8 +221,7 @@ function drawTagGrid(rowData) {
     // create superhead numeric
     th = document.createElement("th");
     text = document.createTextNode("0/0");
-    th.style.fontSize = "10px";
-    th.class = ".tbl_heat th";
+    th.setAttribute("class", "sorter-false tablesorter-header tablesorter-headerUnSorted");
     th.setAttribute("id", "tagsSuperNumber");
     th.colSpan = 2;
     th.appendChild(text);
@@ -234,9 +234,9 @@ function drawTagGrid(rowData) {
         let th = document.createElement("th");
         //Label the header
         let text = document.createTextNode(headerLabels[index]);
-        th.style.fontSize = "8px";
-        th.class = ".tbl_heat th";
+        th.setAttribute("class", "sorter-false tablesorter-header tablesorter-headerUnSorted");
         th.appendChild(text);
+        row.setAttribute("class", "hide-scrollbar tablesorter-headerRow");
         row.appendChild(th);
     }*/
 

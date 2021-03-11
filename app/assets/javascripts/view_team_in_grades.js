@@ -212,7 +212,7 @@ function drawTagGrid(rowData) {
     row.setAttribute("class", "hide-scrollbar tablesorter-headerRow");
     // Create superhead label
     let th = document.createElement("th");
-    let text = document.createTextNode("ReviewTags Completed: ");
+    let text = document.createTextNode("Tags Completed: ");
     th.setAttribute("class", "sorter-false tablesorter-header tablesorter-headerUnSorted");
     th.setAttribute("id", "tagsSuperLabel");
     th.colSpan = 3;

@@ -210,7 +210,7 @@ function drawTagGrid(rowData) {
     let row = thead.insertRow();
     // Create superhead label
     let th = document.createElement("th");
-    let text = document.createTextNode("Tags Completed: ");
+    let text = document.createTextNode("ReviewTags Completed: ");
     th.style.fontSize = "11px";
     th.class = ".tbl_heat th";
     th.setAttribute("id", "tagsSuperLabel");

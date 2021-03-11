@@ -31,12 +31,8 @@
 <!--Obtain only review scores-->
 <% rscore_review = Rscore.new(@pscore,:review) if @pscore[:review] %>
 <h4>Average peer review score: <span class = "c5"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span></h4>
-<!-- Show/Hide Tag Heatgrid -->
-<button id="tagHGButton" onclick="toggleTagGrid('tagHeatMap')" class="btn btn-default">Hide Tag HeatGrid</button>
 <!--Toggle submission-->
 <button onclick="toggleFunction('<%= @participant.id.to_s%>')" class="btn btn-default">Show Submission</button>
-<!-- Anchor for Tag Heatgrid -->
-<table id="tagHeatMap" cellpadding="0" cellspacing="0" ></table>
 <div id="<%= @participant.id.to_s%>" style="display:none;">
 <% if @participant.team.hyperlinks.try(:length) %>
   <%= render :partial => 'submitted_content/hyperlink', :locals => {participant: @participant, stage: @stage} %>
@@ -177,7 +173,7 @@
                             <tr>
                               <td>Review <%=index + 1%></td>
                               <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
-                              <td>
+                              <td id="<%= 'rr'+ j.to_s + '_' + index.to_s %>" data-qNum="<%= j.to_s %>" data-rNum="<%= index.to_s %>" data-hasTag="<%= row.score_row[index].vm_prompts.count > 0 ? "true":"false"%>">
                                 <%= row.score_row[index].comment.html_safe unless row.score_row[index].comment.nil?  %>
                                 <% if row.score_row[index].vm_prompts.count > 0 %>
                                     <div class="tag_prompt_container">
@@ -249,3 +245,7 @@
     <%= submit_tag 'Save' ,class: "btn btn-default" %>
   <% end %>
 <% end %>
+<!-- Show/Hide Tag Heatgrid -->
+<button id="tagHGButton" onclick="toggleTagGrid('tagHeatMap')" class="btn btn-default" style="position:absolute;top:0px;right:120px;z-index:2;">Hide Tag HeatGrid</button>
+<!-- Anchor for Tag Heatgrid -->
+<table id="tagHeatMap" cellpadding="0" cellspacing="0" style="position:absolute;top:50px;right:120px;z-index:2;"></table>

@@ -100,18 +100,23 @@ function compare(a, b, less) {
 // Initialize Tag Report Heat grid and hide if empty.
 function tagActionOnLoad() {
     let tagPrompts = countTags();
-    generateTable(tagPrompts);
+    //generateTable(tagPrompts);
+    let rowData =  countTagsByQuestion();
+    drawTagGrid(rowData);
+
     // Hide heatgrid on load if no tags or if all tags done.
     if(tagsOnOffTotal(tagPrompts)) {
         document.getElementById("tagHeatMap").style.display = 'none';
     }
+
 
 }
 
 // Update Tag Report Heat grid each time a tag is changed
 function tagActionOnUpdate() {
     let tagPrompts = countTags();
-    updateTable(tagPrompts);
+    let qTagPrompts = countTagsByQuestion();
+    updateRevisedTable(qTagPrompts);
     tagsOnOffTotal(tagPrompts);
 }
 
@@ -153,29 +158,111 @@ function toggleTagGrid(elementID) {
     }
 }
 
-//Currently NON WORKING search by question, then by row, then by tag/no tag per row
+// Populate an array with all review rows, their question and review number, whether they have tag prompts,
+// and a pointer to the tag prompts.
 function countTagsByQuestion() {
-    // get collection of questions
-    let questionsArray = document.getElementsByClassName("tbl_questlist");
-    let rowArray = new Array();
-    // get collection of rows of review by question 0 .. n
-    for(i=0;i<questionsArray.length;++i) {
-        // rowArray.push(questionsArray.item(i).getElementsByName("tag_checkboxes[]"));
-    }
-    /*
-      let tagArray = new Array();
-      let tagExist = new Array();
-      //get array of tags by review
-      for(i=0;i<rowArray.length;++i) {
-          let tempTags = rowArray[i].getElementsByName("tag_checkboxes[]");
-          if (tempTags.length == 0) {
-              tagArray.push("none");
-          }
-          else {
-              tagArray.push(tempTags);
-          }
-      }*/
+
+    // Get all valid review rows
+    let rowsList = $("[id^=rr]");
+
+    // Set up matrix of questionNumber, reviewNumber, hasTag?, and pointer to tags if true
+    let rowData = new Array(rowsList.length);
+    $.each(rowsList, function(i) {
+        rowData[i] = new Array();
+        // Question Number
+        rowData[i].push( $( this ).data("qnum"));
+        // Review Number
+        rowData[i].push( $( this ).data("rnum"));
+        // Has tag bool?
+        rowData[i].push( $( this ).data("hastag"));
+        // Pointer to tag objects
+        if (rowData[i][2] == true) {
+            rowData[i].push($( this ).find('input[name^="tag_checkboxes"]'));
+        }
+    });
+
+    return rowData;
+    //    var debugTag = document.getElementById("debug_tag");
+    //  debugTag.innerText = rowData[13][3][0].value;
 }
+
+// Revision 2 of Heatgrid
+function drawTagGrid(rowData) {
+    //load table object
+    let table = document.getElementById("tagHeatMap");
+    //Set up header Labels
+    let headerLabels = ["Probs?", "Solns?", "Praise?", "Tone?", "Mitig?"]
+    //let r = rowData.length / headerLabels.length;
+    //create the header
+    let thead = table.createTHead();
+    let row = thead.insertRow();
+    // Create superhead label
+    let th = document.createElement("th");
+    let text = document.createTextNode("ReviewTags Completed: ");
+    th.style.fontSize = "11px";
+    th.class = ".tbl_heat th";
+    th.setAttribute("id", "tagsSuperLabel");
+    th.colSpan = 3;
+    th.appendChild(text);
+    row.appendChild(th);
+    // create superhead numeric
+    th = document.createElement("th");
+    text = document.createTextNode("0/0");
+    th.style.fontSize = "10px";
+    th.class = ".tbl_heat th";
+    th.setAttribute("id", "tagsSuperNumber");
+    th.colSpan = 2;
+    th.appendChild(text);
+    row.appendChild(th);
+    row = thead.insertRow();
+    for(index = 0; index < headerLabels.length; ++index) {
+        let th = document.createElement("th");
+        //Label the header
+        let text = document.createTextNode(headerLabels[index]);
+        th.style.fontSize = "8px";
+        th.class = ".tbl_heat th";
+        th.appendChild(text);
+        row.appendChild(th);
+    }
+
+    //create table body
+    for(let rIndex = 0; rIndex < rowData.length; ++rIndex) {
+        let trow = table.insertRow();
+        for(let cIndex = 0; cIndex < headerLabels.length; ++cIndex) {
+            let cell = trow.insertCell();
+            // Handle the backend inconsistency, Question Indices start with One and Review Indices start with Zero
+            let questionNum = rowData[rIndex][0];
+            let reviewNum = rowData[rIndex][1] + 1;
+            // Set the text value of the grid cell
+            let text = document.createTextNode("Q" + questionNum + "R" + reviewNum);
+            // If review doesn't have tag prompts
+            if(rowData[rIndex][2]== false){
+                cell.setAttribute("class", "c0");
+                cell.setAttribute("style", "text-align: center;");
+            }
+            else
+            {
+                let idString = "tag_heatmap_id_" + rIndex + "_" + cIndex;
+                cell.setAttribute("id", idString);
+                cell.setAttribute('onClick', 'gotoTagPrompt(' + rowData[rIndex][3][cIndex].id + ')');
+                if(rowData[rIndex][3][cIndex].value == 0) {
+                    // Set color as failing
+                    cell.setAttribute("class", "c1");
+                    cell.setAttribute("style", "text-align: center;");
+                }
+                else {
+                    // Set color as successful
+                    cell.setAttribute("class", "c5");
+                    cell.setAttribute("style", "text-align: center;");
+                }
+            }
+            //add to table
+            cell.style.fontSize = "8px";
+            cell.appendChild(text);
+        }
+    }
+}
+
 
 // Generates the Review Tag Heat Grid and populates it
 function generateTable(tagPrompts) {
@@ -226,6 +313,7 @@ function generateTable(tagPrompts) {
             let idString = "tag_heatmap_id_" + rIndex + "_" + cIndex;
 
             cell.setAttribute("id", idString);
+            cell.setAttribute('onClick', 'gotoTagPrompt(' + tagPrompts[vectorIndex].id + ')');
             // set initial colors
             let text = document.createTextNode("\u0058");
             if(tagPrompts[vectorIndex].value == 0) {
@@ -248,6 +336,26 @@ function generateTable(tagPrompts) {
         }
     }
 }
+
+// Updates the Review Tag Heat Grid each time a tag is changed
+function updateRevisedTable(rowData){
+    let headerLength = 5;
+    for(rIndex = 0; rIndex < rowData.length; ++rIndex) {
+        if (rowData[rIndex][2] == true) {
+            for (cIndex = 0; cIndex < headerLength; ++cIndex) {
+                // set TD tag ids as tag_heatmap_id_rownum_colnum
+                let cell = document.getElementById("tag_heatmap_id_" + rIndex + "_" + cIndex);
+                if (rowData[rIndex][3][cIndex].value == 0) {
+                    // Set color as NOT completed.
+                    cell.setAttribute("class", "c1");
+                } else {
+                    // Set color as COMPLETED.
+                    cell.setAttribute("class", "c5");
+                } //else
+            } // for cIndex
+        } // if rowData
+    } // for rIndex
+} // updateTable()
 
 // Updates the Review Tag Heat Grid each time a tag is changed
 function updateTable(tagPrompts){
@@ -276,3 +384,15 @@ function updateTable(tagPrompts){
         } // for cIndex
     } // for rIndex
 } // updateTable()
+
+//Scroll to a tag entry prompt on click from the heatgrid
+function gotoTagPrompt(tagPrompt) {
+    // expand accordions to make scroll work
+/*    let accordionable = document.getElementsByClassName("accordion-body collapse");
+    for (i=0;i<accordionable.length;++i) {
+
+        accordionable[i].setAttribute('accordion-body collapsearia-expanded', 'true');
+    }*/
+    //scroll to clicked tag prompt
+    tagPrompt.scrollIntoView();
+}

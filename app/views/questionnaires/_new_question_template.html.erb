@@ -5,11 +5,15 @@
 
   </div>
 
+  <div id="question_weight_<%= i %>">
+    Add question weight 
+    <input name="question_weights[question_<%= i %>]" value="1" type="number" min="0">
+  </div>
   <div id="radio_buttons<%= i %>" style="display: none;">
     <%= radio_button("new_choices[#{i}][MultipleChoiceRadio][1]",:iscorrect, '1') %> <%= text_field "new_choices[#{i}][MultipleChoiceRadio][1]", :txt, size: 50 %> <br>
-    <%= radio_button("new_choices[#{i}][MultipleChoiceRadio][1]",:iscorrect, '2') %> <%= text_field "new_choices[#{i}][MultipleChoiceRadio][2]", :txt, size: 50 %> <br>
-    <%= radio_button("new_choices[#{i}][MultipleChoiceRadio][1]",:iscorrect, '3') %> <%= text_field "new_choices[#{i}][MultipleChoiceRadio][3]", :txt, size: 50 %> <br>
-    <%= radio_button("new_choices[#{i}][MultipleChoiceRadio][1]",:iscorrect, '4') %> <%= text_field "new_choices[#{i}][MultipleChoiceRadio][4]", :txt, size: 50 %> <br><br>
+    <%= radio_button("new_choices[#{i}][MultipleChoiceRadio][2]",:iscorrect, '1') %> <%= text_field "new_choices[#{i}][MultipleChoiceRadio][2]", :txt, size: 50 %> <br>
+    <%= radio_button("new_choices[#{i}][MultipleChoiceRadio][3]",:iscorrect, '1') %> <%= text_field "new_choices[#{i}][MultipleChoiceRadio][3]", :txt, size: 50 %> <br>
+    <%= radio_button("new_choices[#{i}][MultipleChoiceRadio][4]",:iscorrect, '1') %> <%= text_field "new_choices[#{i}][MultipleChoiceRadio][4]", :txt, size: 50 %> <br><br>
   </div>
   <div id="true_false<%= i %>" style="display: none;">
     <%= radio_button("new_choices[#{i}][TrueFalse][1]",:iscorrect, '1') %> True <br>

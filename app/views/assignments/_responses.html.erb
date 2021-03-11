@@ -1,0 +1,9 @@
+<!-- check if instructor/TA has been mapped to current team -->
+<% reviewer = Participant.find_by(:parent_id => @assignment.id, :user_id => session[:user].id)%>
+<% map = ReviewResponseMap.find_by(:reviewed_object_id => @assignment.id, :reviewer_id => reviewer.id, :reviewee_id => team.id) %>
+<% if map.nil? %>
+  <% ReviewResponseMap.create(reviewee_id: team.id, reviewer_id: reviewer.id, reviewed_object_id: @assignment.id) %>
+<% end %>
+<!-- render shared template for review -->
+<% map = ReviewResponseMap.find_by(:reviewed_object_id => @assignment.id, :reviewer_id => reviewer.id, :reviewee_id => team.id) %>
+<%= render partial: 'shared/responses/response_actions', :locals => {:team => team ,:topic_id => topic_id, :map =>map, :reviewer_role => :staff, :title => 'Review'} %>

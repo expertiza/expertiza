@@ -1,6 +1,6 @@
 class QuestionnaireNode < Node
-  belongs_to :questionnaire, class_name: "Questionnaire", foreign_key: "node_object_id"
-  belongs_to :node_object, class_name: "Questionnaire", foreign_key: "node_object_id"
+  belongs_to :questionnaire, class_name: "Questionnaire", foreign_key: "node_object_id", inverse_of: false
+  belongs_to :node_object, class_name: "Questionnaire", foreign_key: "node_object_id", inverse_of: false
 
   def self.table
     "questionnaires"
@@ -12,13 +12,11 @@ class QuestionnaireNode < Node
                      'questionnaires.instructor_id = ?'
                    else
                      'questionnaires.instructor_id in (?)'
-                                end
+                   end
+                 elsif User.find(user_id).role.name != "Teaching Assistant"
+                   '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
                  else
-                   if User.find(user_id).role.name != "Teaching Assistant"
-                     '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
-                   else
-                     '(questionnaires.private = 0 or questionnaires.instructor_id in (?))'
-                                end
+                   '(questionnaires.private = 0 or questionnaires.instructor_id in (?))'
                  end
 
     values = if User.find(user_id).role.name != "Teaching Assistant"
@@ -34,13 +32,19 @@ class QuestionnaireNode < Node
     end
     sortvar = 'name' if sortvar.nil? or sortvar == 'directory_path'
     sortorder = 'ASC' if sortorder.nil?
-    if Questionnaire.column_names.include? sortvar and %w[ASC DESC asc desc].include? sortorder
-      self.includes(:questionnaire).where([conditions, values]).order("questionnaires.#{sortvar} #{sortorder}")
-    end
+    (self.includes(:questionnaire).where([conditions, values]).order("questionnaires.#{sortvar} #{sortorder}") if Questionnaire.column_names.include? sortvar and
+        %w[ASC DESC asc desc].include? sortorder)
   end
 
   def get_name
     Questionnaire.find_by(id: self.node_object_id).try(:name)
+  end
+
+  # this method return instructor id associated with a questionnaire
+  # expects no arguments
+  # returns int
+  def get_instructor_id
+    Questionnaire.find_by(id: self.node_object_id).try(:instructor_id)
   end
 
   def get_private

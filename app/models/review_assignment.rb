@@ -51,7 +51,7 @@ module ReviewAssignment
     # If this is an assignment with quiz required
     if self.require_quiz?
       signups = SignedUpTeam.where(team_id: team.id)
-      for signup in signups do
+      signups.each do |signup|
         signuptopic = SignUpTopic.find(signup.topic_id)
         if signuptopic.assignment_id == self.id
           contributors_signup_topic = signuptopic
@@ -61,10 +61,9 @@ module ReviewAssignment
     end
 
     # Look for the topic_id where the team_id equals the contributor id (contributor is a team)
-    unless SignedUpTeam.where(team_id: team.id, is_waitlisted: 0).empty?
-      topic_id = SignedUpTeam.where(team_id: team.id, is_waitlisted: 0).first.topic_id
-      SignUpTopic.find(topic_id)
-    end
+    return if SignedUpTeam.where(team_id: team.id, is_waitlisted: 0).empty?
+    topic_id = SignedUpTeam.find_by(team_id: team.id, is_waitlisted: 0).topic_id
+    SignUpTopic.find(topic_id)
   end
 
   def assign_reviewer_dynamically(reviewer, topic)

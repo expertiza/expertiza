@@ -6,6 +6,7 @@ class GradesController < ApplicationController
   include StudentTaskHelper
   include AssignmentHelper
   include GradesHelper
+  include AuthorizationHelper
 
   after_action only: [:save_grade_and_comment_for_submission] do
     log_action(@log_map, @log_message)
@@ -14,25 +15,18 @@ class GradesController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'view_my_scores'
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator',
-       'Student'].include? current_role_name and
-          are_needed_authorizations_present?(params[:id], "reader", "reviewer") and
-          check_self_review_status
+      current_user_has_student_privileges? and
+      are_needed_authorizations_present?(params[:id], "reader", "reviewer") and
+      self_review_finished?
     when 'view_team'
-      if ['Student'].include? current_role_name # students can only see the head map for their own team
+      if current_user_is_a? 'Student' # students can only see the head map for their own team
         participant = AssignmentParticipant.find(params[:id])
-        session[:user].id == participant.user_id
+        current_user_is_assignment_participant?(participant.assignment.id)
       else
         true
       end
     else
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator'].include? current_role_name
+      current_user_has_ta_privileges?
     end
   end
 
@@ -44,9 +38,9 @@ class GradesController < ApplicationController
     @assignment = Assignment.find(params[:id])
     questionnaires = @assignment.questionnaires
 
-    if @assignment.varying_rubrics_by_round?
+    if @assignment.vary_by_round
       @questions = retrieve_questions questionnaires, @assignment.id
-    else # if this assignment does not have "varying rubric by rounds" feature
+    else
       @questions = {}
       questionnaires.each do |questionnaire|
         @questions[questionnaire.symbol] = questionnaire.questions
@@ -77,7 +71,7 @@ class GradesController < ApplicationController
     calculate_all_penalties(@assignment.id)
     # prepare feedback summaries
     summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
-    sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewee(@questions, @assignment, @team_id, summary_ws_url)
+    sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewee(@questions, @assignment, @team_id, summary_ws_url, session)
     @summary = sum.summary
     @avg_scores_by_round = sum.avg_scores_by_round
     @avg_scores_by_criterion = sum.avg_scores_by_criterion
@@ -99,7 +93,7 @@ class GradesController < ApplicationController
     counter_for_same_rubric = 0
     questionnaires.each do |questionnaire|
       @round = nil
-      if @assignment.varying_rubrics_by_round? && questionnaire.type == "ReviewQuestionnaire"
+      if @assignment.vary_by_round && questionnaire.type == "ReviewQuestionnaire"
         questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, questionnaire_id: questionnaire.id)
         if questionnaires.count > 1
           @round = questionnaires[counter_for_same_rubric].used_in_round
@@ -113,7 +107,7 @@ class GradesController < ApplicationController
       vmquestions = questionnaire.questions
       vm.add_questions(vmquestions)
       vm.add_team_members(@team)
-      vm.add_reviews(@participant, @team, @assignment.varying_rubrics_by_round?)
+      vm.add_reviews(@participant, @team, @assignment.vary_by_round)
       vm.number_of_comments_greater_than_10_words
       @vmlist << vm
     end
@@ -235,14 +229,14 @@ class GradesController < ApplicationController
         @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
         l_policy = LatePolicy.find(@assignment.late_policy_id)
         @total_penalty = l_policy.max_penalty if @total_penalty > l_policy.max_penalty
-        calculate_penatly_attributes(@participant) if calculate_for_participants
+        calculate_penalty_attributes(@participant) if calculate_for_participants
       end
       assign_all_penalties(participant, penalties)
     end
     @assignment.update_attribute(:is_penalty_calculated, true) unless @assignment.is_penalty_calculated
   end
 
-  def calculate_penatly_attributes(_participant)
+  def calculate_penalty_attributes(_participant)
     deadline_type_id = [1, 2, 5]
     penalties_symbols = %i[submission review meta_review]
     deadline_type_id.zip(penalties_symbols).each do |id, symbol|
@@ -264,10 +258,10 @@ class GradesController < ApplicationController
     participant_score_types = %i[metareview feedback teammate]
     if @pscore[:review]
       scores = []
-      if @assignment.varying_rubrics_by_round?
+      if @assignment.vary_by_round
         (1..@assignment.rounds_of_reviews).each do |round|
           responses = @pscore[:review][:assessments].select {|response| response.round == round }
-          scores = scores.concat(get_scores_for_chart(responses, 'review' + round.to_s))
+          scores = scores.concat(build_score_vector(responses, 'review' + round.to_s))
           scores -= [-1.0]
         end
         @grades_bar_charts[:review] = bar_chart(scores)
@@ -280,13 +274,13 @@ class GradesController < ApplicationController
 
   def remove_negative_scores_and_build_charts(symbol)
     if @participant_score and @participant_score[symbol]
-      scores = get_scores_for_chart @participant_score[symbol][:assessments], symbol.to_s
+      scores = build_score_vector @participant_score[symbol][:assessments], symbol.to_s
       scores -= [-1.0]
       @grades_bar_charts[symbol] = bar_chart(scores)
     end
   end
 
-  def get_scores_for_chart(reviews, symbol)
+  def build_score_vector(reviews, symbol)
     scores = []
     reviews.each do |review|
       scores << Answer.get_total_score(response: [review], questions: @questions[symbol.to_sym], q_types: [])
@@ -294,6 +288,8 @@ class GradesController < ApplicationController
     scores
   end
 
+  # Filters all non nil values and converts them to integer
+  # Returns a vector
   def calculate_average_vector(scores)
     scores[:teams].reject! {|_k, v| v[:scores][:avg].nil? }
     scores[:teams].map {|_k, v| v[:scores][:avg].to_i }
@@ -314,14 +310,11 @@ class GradesController < ApplicationController
     link
   end
 
-  def check_self_review_status
+  def self_review_finished?
     participant = Participant.find(params[:id])
     assignment = participant.try(:assignment)
-    if assignment.try(:is_selfreview_enabled) and unsubmitted_self_review?(participant.try(:id))
-      return false
-    else
-      return true
-    end
+    # Below is only false when self review is enabled and not submitted
+    return ! ( assignment.try(:is_selfreview_enabled) and unsubmitted_self_review?(participant.try(:id)) )
   end
 
   def mean(array)

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+
+<div>
+  <% @review_versions = @map.get_all_versions() %>
+  <% if !@review_versions.empty? %>
+      <%= @review_versions.each do |response| %>
+        <%= response.display_as_html() %>
+          <br/>
+      <% end %>
+      <hr/>
+  <% end %>
+</div>
+
+<% file_url = nil %>
+<%= @response.display_as_html(nil, nil, file_url) %>
+<br/>
+
+<a href="javascript:window.history.back()">Back</a>

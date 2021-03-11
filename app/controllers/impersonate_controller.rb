@@ -1,14 +1,17 @@
 class ImpersonateController < ApplicationController
   include SecurityHelper
+  include AuthorizationHelper
 
   def action_allowed?
-    if ['Student'].include? current_role_name
+    # Check for TA privileges first since TA's also have student privileges.
+    if current_user_has_ta_privileges?
+      true
+    # Then check for student privileges as they have one more hurdle to surmount.
+    elsif current_user_has_student_privileges?
       !session[:super_user].nil?
+    # Not even student privileges?  Definitely not allowed.
     else
-      ['Super-Administrator',
-       'Administrator',
-       'Instructor',
-       'Teaching Assistant'].include? current_role_name
+      false
     end
   end
 
@@ -36,7 +39,13 @@ class ImpersonateController < ApplicationController
           redirect_back
           return
         end
-        user = User.find_by(name: params[:user][:name])
+        # E1991 : check whether instructor is currently in anonymized view
+        if User.anonymized_view?(session[:ip])
+          # get real name when instructor is in anonymized view
+          user = User.real_user_from_anonymized_name(params[:user][:name])
+        else         
+          user = User.find_by(name: params[:user][:name])
+        end
         if user
           unless original_user.can_impersonate? user
             flash[:error] = "You cannot impersonate #{params[:user][:name]}."
@@ -61,7 +70,13 @@ class ImpersonateController < ApplicationController
             redirect_back
             return
           end
-          user = User.find_by(name: params[:impersonate][:name])
+          # E1991 : check whether instructor is currently in anonymized view
+          if User.anonymized_view?(session[:ip])
+            # get real name when instructor is in anonymized view
+            user = User.real_user_from_anonymized_name(params[:impersonate][:name])
+          else         
+            user = User.find_by(name: params[:impersonate][:name])
+          end
           if user
             unless original_user.can_impersonate? user
               flash[:error] = "You cannot impersonate #{params[:user][:name]}."

@@ -12,6 +12,7 @@ describe GradesController do
   let(:student) { build(:student) }
   let(:review_response_map) { build(:review_response_map, id: 1) }
   let(:assignment_due_date) { build(:assignment_due_date) }
+  let(:ta) { build(:teaching_assistant, id: 8) }
 
   before(:each) do
     allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
@@ -30,8 +31,9 @@ describe GradesController do
       allow(assignment).to receive(:calculate_penalty).and_return(false)
     end
 
-    context 'when current assignment varys rubric by round' do
+    context 'when current assignment varies rubrics by round' do
       it 'retrieves questions, calculates scores and renders grades#view page' do
+        allow(assignment).to receive(:vary_by_round).and_return(true)
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([assignment_questionnaire])
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
         params = {id: 1}
@@ -59,11 +61,9 @@ describe GradesController do
       allow(Participant).to receive(:find).with('1').and_return(participant)
     end
 
-    context 'when view_my_scores page is not allow to access' do
-      it 'shows a flash errot message and redirects to root path (/)' do
-        allow(TeamsUser).to receive(:where).with(user_id: 1).and_return([double('TeamsUser', team_id: 1)])
-        team.users = []
-        allow(Team).to receive(:find).with(1).and_return(team)
+    context 'when view_my_scores page is not allowed to access' do
+      it 'shows a flash error message and redirects to root path (/)' do
+        session[:user] = nil
         params = {id: 1}
         get :view_my_scores, params
         expect(response).to redirect_to('/')
@@ -97,6 +97,27 @@ describe GradesController do
       params = {id: 1}
       get :view_team, params
       expect(response).to render_template(:view_team)
+    end
+  end
+
+  describe '#view_team' do
+    render_views
+    context 'when view_team page is viewed by a student who is also a TA for another course' do
+      it 'renders grades#view_team page' do
+        allow(participant).to receive(:team).and_return(team)
+        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(assignment_questionnaire)
+        allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_questionnaire])
+        allow(assignment).to receive(:late_policy_id).and_return(false)
+        allow(assignment).to receive(:calculate_penalty).and_return(false)
+        allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
+        allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([review_response])
+        allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
+        params = {id: 1}
+        allow(TaMapping).to receive(:exists?).with(ta_id: 1, course_id: 1).and_return(true)
+        stub_current_user(ta, ta.role.name, ta.role)
+        get :view_team, params
+        expect(response.body).not_to have_content "TA"
+      end
     end
   end
 

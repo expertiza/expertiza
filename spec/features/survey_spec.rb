@@ -60,14 +60,14 @@ describe "Survey questionnaire tests for instructor interface" do
 
     # adding some questions for the deployed survey
     visit '/questionnaires/' + survey_questionnaire_1.id.to_s + '/edit'
-    fill_in('new_question_total_num', with: '1')
-    select('Criterion', from: 'new_question_type')
+    fill_in('question_total_num', with: '1')
+    select('Criterion', from: 'question_type')
     click_button "Add"
     expect(page).to have_content('Remove')
 
     fill_in "Edit question content here", with: "Test question 1"
     click_button "Save assignment survey questionnaire"
-    expect(page).to have_content('The questionnaire has been successfully updated!')
+    expect(page).to have_content('All questions have been successfully saved!')
 
     survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_1.id).first
     question = Question.find_by_sql("select * from questions where questionnaire_id = " + survey_questionnaire_1.id.to_s +

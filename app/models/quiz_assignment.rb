@@ -18,11 +18,6 @@ module QuizAssignment
     candidate_topics
   end
 
-  def assign_quiz_dynamically(reviewer, topic)
-    contributor = contributor_for_quiz(reviewer, topic)
-    reviewer.assign_quiz(contributor, reviewer, topic) unless contributor.nil?
-  end
-
   # Returns a contributor whose quiz is to be taken if available, otherwise will raise an error
   def contributor_for_quiz(reviewer, topic)
     raise "Please select a topic." if topics? and topic.nil?

@@ -97,7 +97,8 @@ module ReportFormatterHelper
 
   def user_summary_report(line)
     if @user_tagging_report[line.user.name].nil?
-      @user_tagging_report[line.user.name] = VmUserAnswerTagging.new(line.user, line.percentage, line.no_tagged, line.no_not_tagged, line.no_tagable)
+      # E2082 Adding extra field of interval array into data structure
+      @user_tagging_report[line.user.name] = VmUserAnswerTagging.new(line.user, line.percentage, line.no_tagged, line.no_not_tagged, line.no_tagable, line.tag_update_intervals)
     else
       @user_tagging_report[line.user.name].no_tagged += line.no_tagged
       @user_tagging_report[line.user.name].no_not_tagged += line.no_not_tagged

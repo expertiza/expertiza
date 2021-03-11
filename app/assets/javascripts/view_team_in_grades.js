@@ -106,7 +106,8 @@ function tagActionOnLoad() {
 
     // Hide heatgrid on load if no tags or if all tags done.
     if(tagsOnOffTotal(tagPrompts)) {
-        document.getElementById("tagHeatMap").style.display = 'none';
+        // Disable for now; Will be replaced with collapsed version.
+        //document.getElementById("tagHeatMap").style.display = 'none';
     }
 
 

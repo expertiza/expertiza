@@ -116,7 +116,7 @@ function tagActionOnLoad() {
 function tagActionOnUpdate() {
     let tagPrompts = countTags();
     let qTagPrompts = countTagsByQuestion();
-    updateRevisedTable(qTagPrompts);
+    updateTagGrid(qTagPrompts);
     tagsOnOffTotal(tagPrompts);
 }
 
@@ -263,82 +263,8 @@ function drawTagGrid(rowData) {
     }
 }
 
-
-// Generates the Review Tag Heat Grid and populates it
-function generateTable(tagPrompts) {
-    //load table object
-    let table = document.getElementById("tagHeatMap");
-    //Set up header Labels
-    let headerLabels = ["Probs?", "Solns?", "Praise?", "Tone?", "Mitig?"]
-    let r = tagPrompts.length / headerLabels.length;
-    //create the header
-    let thead = table.createTHead();
-    let row = thead.insertRow();
-    // Create superhead label
-    let th = document.createElement("th");
-    let text = document.createTextNode("ReviewTags Completed: ");
-    th.style.fontSize = "8px";
-    th.class = ".tbl_heat th";
-    th.setAttribute("id", "tagsSuperLabel");
-    th.colSpan = 3;
-    th.appendChild(text);
-    row.appendChild(th);
-    // create superhead numeric
-    th = document.createElement("th");
-    text = document.createTextNode("0/0");
-    th.style.fontSize = "8px";
-    th.class = ".tbl_heat th";
-    th.setAttribute("id", "tagsSuperNumber");
-    th.colSpan = 2;
-    th.appendChild(text);
-    row.appendChild(th);
-    row = thead.insertRow();
-    for(index = 0; index < headerLabels.length; ++index) {
-        let th = document.createElement("th");
-        //Label the header
-        let text = document.createTextNode(headerLabels[index]);
-        th.style.fontSize = "8px";
-        th.class = ".tbl_heat th";
-        th.appendChild(text);
-        row.appendChild(th);
-    }
-    //create table body
-    for(rIndex = 0; rIndex < r; ++rIndex) {
-        let trow = table.insertRow();
-        for(cIndex = 0; cIndex < headerLabels.length; ++cIndex) {
-            let cell = trow.insertCell();
-            //compute 1-d vector indices. Needs to be updated to 2-d
-            let vectorIndex = (rIndex * headerLabels.length) + cIndex;
-            // set TD tag ids as tag_heatmap_id_rownum_colnum
-            let idString = "tag_heatmap_id_" + rIndex + "_" + cIndex;
-
-            cell.setAttribute("id", idString);
-            cell.setAttribute('onClick', 'gotoTagPrompt(' + tagPrompts[vectorIndex].id + ')');
-            // set initial colors
-            let text = document.createTextNode("\u0058");
-            if(tagPrompts[vectorIndex].value == 0) {
-                // Set color as failing
-                // Do we only care about coloring done/not done?
-                cell.setAttribute("class", "c1");
-                cell.setAttribute("style", "text-align: center;");
-
-            }
-            else {
-                // Set color as successful
-                // Do we only care about coloring done/not done?
-                cell.setAttribute("class", "c5");
-                cell.setAttribute("style", "text-align: center;");
-                text.data = "\u2713";
-            }
-            //add to table
-            cell.style.fontSize = "8px";
-            cell.appendChild(text);
-        }
-    }
-}
-
 // Updates the Review Tag Heat Grid each time a tag is changed
-function updateRevisedTable(rowData){
+function updateTagGrid(rowData){
     let headerLength = 5;
     for(rIndex = 0; rIndex < rowData.length; ++rIndex) {
         if (rowData[rIndex][2] == true) {
@@ -357,33 +283,6 @@ function updateRevisedTable(rowData){
     } // for rIndex
 } // updateTable()
 
-// Updates the Review Tag Heat Grid each time a tag is changed
-function updateTable(tagPrompts){
-    let headerLength = 5;
-    let r = tagPrompts.length / headerLength;
-    for(rIndex = 0; rIndex < r; ++rIndex) {
-        for (cIndex = 0; cIndex < headerLength; ++cIndex) {
-            //compute 1-d vector indices. Needs to be updated to 2-d
-            let vectorIndex = (rIndex * headerLength) + cIndex;
-            // set TD tag ids as tag_heatmap_id_rownum_colnum
-            let cell = document.getElementById("tag_heatmap_id_" + rIndex + "_" + cIndex);
-            // set initial colors
-            let text = "\u0058";
-            if (tagPrompts[vectorIndex].value == 0) {
-                // Set color as failing
-                // Do we only care about coloring done/not done?
-                cell.setAttribute("class", "c1");
-            } else {
-                // Set color as successful
-                // Do we only care about coloring done/not done?
-                cell.setAttribute("class", "c5");
-                text = "\u2713";
-            }
-            //Update Cell to table
-            cell.innerText = text;
-        } // for cIndex
-    } // for rIndex
-} // updateTable()
 
 //Scroll to a tag entry prompt on click from the heatgrid
 function gotoTagPrompt(tagPrompt) {

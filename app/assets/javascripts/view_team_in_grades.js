@@ -120,13 +120,9 @@ function tagActionOnUpdate() {
     tagsOnOffTotal(tagPrompts);
 }
 
-// Count tags and put into a one d vector. Need to refactor to populate as an array.
+// Simple query of all review tags and put references into a one d vector.
 function countTags() {
-    var tagPrompts = document.getElementsByName("tag_checkboxes[]")
-    //Go ahead and run the generate table function now. This call needs to be changed.
-    // generateTable(tagPrompts);
-    return tagPrompts;
-    //countTagsByQuestion();
+    return document.getElementsByName("tag_checkboxes[]");
 }
 
 /* Handle calculation of number of toggled review tags
@@ -159,12 +155,10 @@ function toggleTagGrid(elementID) {
 }
 
 // Populate an array with all review rows, their question and review number, whether they have tag prompts,
-// and a pointer to the tag prompts.
+// and a reference to the tag prompts.
 function countTagsByQuestion() {
-
     // Get all valid review rows
     let rowsList = $("[id^=rr]");
-
     // Set up matrix of questionNumber, reviewNumber, hasTag?, and pointer to tags if true
     let rowData = new Array(rowsList.length);
     $.each(rowsList, function(i) {
@@ -175,24 +169,20 @@ function countTagsByQuestion() {
         rowData[i].push( $( this ).data("rnum"));
         // Has tag bool?
         rowData[i].push( $( this ).data("hastag"));
-        // Pointer to tag objects
+        // Reference to tag objects
         if (rowData[i][2] == true) {
             rowData[i].push($( this ).find('input[name^="tag_checkboxes"]'));
         }
     });
-
     return rowData;
-    //    var debugTag = document.getElementById("debug_tag");
-    //  debugTag.innerText = rowData[13][3][0].value;
 }
 
-// Revision 2 of Heatgrid
+// Renders the review tag heatgrid table based on the review rowData array.
 function drawTagGrid(rowData) {
     //load table object
     let table = document.getElementById("tagHeatMap");
     //Set up header Labels
     let headerLabels = ["Probs?", "Solns?", "Praise?", "Tone?", "Mitig?"]
-    //let r = rowData.length / headerLabels.length;
     //create the header
     let thead = table.createTHead();
     let row = thead.insertRow();

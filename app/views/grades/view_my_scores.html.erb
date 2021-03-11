@@ -1,5 +1,16 @@
-<H1>Score for <%= @assignment.name %></H1>
+<script type="text/javascript" src="/assets/view_my_scores_helper.js"></script>
 
+<script type="text/javascript">
+    $( document ).ready(function() {
+        var total_tags = countTotalTags()   // Added March 2021 -- Set up the on page counter on first loading the page
+        var tagged_tags = countTaggedTags()
+        document.getElementById("tag_stats").innerHTML = "Tag Finished: " + tagged_tags + "/" + total_tags
+    });
+</script>
+
+
+<H1>Score for <%= @assignment.name %></H1>
+<div id = "tag_stats"></div>
 
 
 <table class="grades" >

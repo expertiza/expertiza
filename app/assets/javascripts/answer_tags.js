@@ -16,7 +16,15 @@ save_tag = function(answer_id, tag_prompt_deployment_id, control){
         value: control.value.toString()
     }));
     // Update Heatmap -- Line added March 2021 Project E2100
-    tagActionOnUpdate();
+    if (document.URL.includes("view_team")){ //Only display the heatmap on the view_team page, the update table only happens when conduct tag save action on view_team page.
+        tagActionOnUpdate();
+    }
+
+    if (document.URL.includes("view_my_scores")){ //On view_my_scores page, no heatmap exists, should not update table, but a simple counter is displayed for tagging progress.
+        var total_tags = countTotalTags();
+        var tagged_tages = countTaggedTags();
+        document.getElementById("tag_stats").innerHTML = "Tag Finished: " + tagged_tages + "/" + total_tags
+    }
 }
 
 toggleLabel = function(range) {

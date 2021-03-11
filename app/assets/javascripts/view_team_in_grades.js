@@ -129,16 +129,37 @@ function countTags() {
    Returns: True if all tags have been clicked; False if more tags available to click.
  */
 function tagsOnOffTotal(tagPrompts) {
-    var offTags = 0;
-    var onTags = 0;
-    for (index = 0; index < tagPrompts.length; ++index) {
+    let offTags = 0;
+    let onTags = 0;
+    let length = tagPrompts.length;
+    let ratio = 0;
+    let ratio_class = 0;
+    for (let index = 0; index < tagPrompts.length; ++index) {
         if (tagPrompts[index].value == 0) {
             ++offTags;
         } else {
             ++onTags;
         }
     }
-    document.getElementById("tagsSuperNumber").innerText = onTags + "/" + tagPrompts.length;
+    // Compute ratio as decimal
+    ratio = onTags / length;
+    // Scale ratio to 0 <= ratio <= 4
+    ratio_class = ratio*4;
+    // increment ratio so the range is 1 <= ratio_class <= 5
+    ++ratio_class;
+    // round ratio_class down to nearest int for class assignment
+    ratio_class = Math.floor(ratio_class);
+
+    // Never show a shade of green if we are less than  100% complete on tags
+    if(ratio_class === 4) { --ratio_class; }
+
+    // Get element to be updated
+    let cell = document.getElementById("tagsSuperNumber");
+    // Set text value with ratio
+    cell.innerText = onTags + "/" + tagPrompts.length;
+    // Set background color class based on ratio
+    cell.className = "c"+ratio_class.toString();
+
     if(tagPrompts.length == 0 || offTags == 0) return true;
     return false;
 }
@@ -182,13 +203,14 @@ function drawTagGrid(rowData) {
     //load table object
     let table = document.getElementById("tagHeatMap");
     //Set up header Labels
-    let headerLabels = ["Probs?", "Solns?", "Praise?", "Tone?", "Mitig?"]
+    //let headerLabels = ["Probs?", "Solns?", "Praise?", "Tone?", "Mitig?"]
+    let gridWidth = determineGridWidth(rowData);
     //create the header
     let thead = table.createTHead();
     let row = thead.insertRow();
     // Create superhead label
     let th = document.createElement("th");
-    let text = document.createTextNode("ReviewTags Completed: ");
+    let text = document.createTextNode("Tags Completed: ");
     th.style.fontSize = "11px";
     th.class = ".tbl_heat th";
     th.setAttribute("id", "tagsSuperLabel");
@@ -204,7 +226,10 @@ function drawTagGrid(rowData) {
     th.colSpan = 2;
     th.appendChild(text);
     row.appendChild(th);
-    row = thead.insertRow();
+
+/*   Removed top row labels 3/11/21 to make grid more flexible for future changes in tag quantity
+
+ row = thead.insertRow();
     for(index = 0; index < headerLabels.length; ++index) {
         let th = document.createElement("th");
         //Label the header
@@ -213,18 +238,34 @@ function drawTagGrid(rowData) {
         th.class = ".tbl_heat th";
         th.appendChild(text);
         row.appendChild(th);
-    }
+    }*/
 
     //create table body
+    let priorQuestionNum = -1;
     for(let rIndex = 0; rIndex < rowData.length; ++rIndex) {
         let trow = table.insertRow();
-        for(let cIndex = 0; cIndex < headerLabels.length; ++cIndex) {
+        // Handle the backend inconsistency, Question Indices start with One and Review Indices start with Zero
+        let questionNum = rowData[rIndex][0];
+        let reviewNum = rowData[rIndex][1] + 1;
+        // If this is a new question number, add a row indicating a new question.
+        if(questionNum !== priorQuestionNum) {
+            // Update prior question index
+            priorQuestionNum = questionNum;
+            // Draw a "Question: # " Row that spans all columns
             let cell = trow.insertCell();
-            // Handle the backend inconsistency, Question Indices start with One and Review Indices start with Zero
-            let questionNum = rowData[rIndex][0];
-            let reviewNum = rowData[rIndex][1] + 1;
+            cell.colSpan = gridWidth;
+            cell.className = "tbl_heat";
+            cell.style.textAlign = "center";
+            cell.style.fontSize = "9px";
+            let text = document.createTextNode("Criterion # " + questionNum);
+            cell.appendChild(text);
+            // Initialize new row to be used by the inner loop for reviews.
+            trow = table.insertRow();
+        }
+        for(let cIndex = 0; cIndex < gridWidth; ++cIndex) {
+            let cell = trow.insertCell();
             // Set the text value of the grid cell
-            let text = document.createTextNode("Q" + questionNum + "R" + reviewNum);
+            let text = document.createTextNode( "R." + reviewNum);
             // If review doesn't have tag prompts
             if(rowData[rIndex][2]== false){
                 cell.setAttribute("class", "c0");
@@ -284,4 +325,15 @@ function gotoTagPrompt(tagPrompt) {
     }*/
     //scroll to clicked tag prompt
     tagPrompt.scrollIntoView();
+}
+
+// Find the largest number of tags in a review, if any exist, and return the width that the grid should be drawn to.
+function determineGridWidth(rowData) {
+    let gridWidth = 0;
+    for(let i=0; i<rowData.length; ++i) {
+        if(rowData[i][2] == true && rowData[i][3].length > gridWidth) {
+            gridWidth =  rowData[i][3].length;
+        }
+    }
+    return gridWidth;
 }

@@ -130,9 +130,10 @@ background-color: #d3d3d3;
   padding:0;
   spacing: 0;
   border: 1px solid black;
-  position:absolute;
-  top:50px;
-  right:20px;
+  position: relative;
+  float: right;
+  top:0px;
+  right:0px;
   z-index:2;
 }
 .tag_heat_grid th {

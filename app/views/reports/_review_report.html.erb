@@ -107,7 +107,7 @@
                     <%= list_hyperlink_submission(reviewer_map.id, 5386) if Assignment.find_by(id: @id.to_i).try(:course).try(:instructor).try(:name) == 'Jkidd' %>
                   </div>
                   <!--Display total time spent on reviewing as a hyperlink to popup which shows the breakdown of time spent between expertiza and other links as piechart-->
-                  <%= render partial: 'review_submissions_time_spent',  locals: {bgcolor: @bgcolor, map_id: ri.id,id: r.id, reviewee_id: ri.reviewee_id, timeHash: timeHash} %>    
+                  <%= render partial: 'review_submissions_time_spent',  locals: {bgcolor: @bgcolor, map_id: reviewer_map.id,id: reviewer.id, reviewee_id: reviewer_map.reviewee_id, timeHash: timeHash} %>
                 </div>
               <% end %>
             <% end %>

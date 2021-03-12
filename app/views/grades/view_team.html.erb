@@ -44,10 +44,8 @@
  <b>No Submission</b>
 <% end %>
 </div><br><br>
-<!-- Show/Hide Tag Heatgrid -->
-<button id="tagHGButton" onclick="toggleTagGrid('tagHeatMap')" class="btn btn-default" style="position:absolute;top:0px;right:120px;z-index:2;">Hide Tag HeatGrid</button>
 <!-- Anchor for Tag Heatgrid -->
-<table id="tagHeatMap" cellpadding="0" cellspacing="0" style="position:absolute;top:50px;right:120px;z-index:2;"></table>
+<table id="tag_heat_grid" class="tag_heat_grid"></table>
 
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
 <% table_count = 0 %>

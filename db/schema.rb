@@ -642,6 +642,16 @@ ActiveRecord::Schema.define(version: 20201125202200) do
     t.integer  "assignment_id", limit: 4
   end
 
+  create_table "submission_viewing_events", force: :cascade do |t|
+    t.integer  "map_id",     limit: 4
+    t.integer  "round",      limit: 4
+    t.string   "link",       limit: 255
+    t.datetime "start_at"
+    t.datetime "end_at"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "suggestion_comments", force: :cascade do |t|
     t.text     "comments",      limit: 65535
     t.string   "commenter",     limit: 255

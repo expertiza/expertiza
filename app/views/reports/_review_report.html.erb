@@ -104,11 +104,11 @@
                     <!--Hard-coded Dr.Kidd's question in order to display link.-->
                     <!--later we can create a hyperlink question type to deal with this situation.-->
                     <%= list_hyperlink_submission(reviewer_map.id, 5386) if Assignment.find_by(id: @id.to_i).try(:course).try(:instructor).try(:name) == 'Jkidd' %>
-                  </div>
+                <!-- Link that displays the time tracking detail -->
+                <a onclick="displayTimeDetail(<%= reviewer_map.id %>)" href="javascript:void(0);"> {time_placeholder} </a>
+                </div>
                 </div>
               <% end %>
-              <!-- Link that displays the time tracking detail -->
-              <a onclick="displayTimeDetail(<%= reviewer_map.id %>)" href="javascript:void(0);"> {time_placeholder} </a>
             <% end %>
           </td>
           <!--Render partial view corresponding to the overall score awarded to a team-->
@@ -166,11 +166,11 @@
   <!-- Modal content -->
   <div class="modal-content">
     <div class="modal-header">
-      <span class="close" onlick=closeTimeDetail()>&times;</span>
+      <span class="close" id="closeTimeModal">&times;</span>
       <h2>Time tracking statistic</h2>
     </div>
-    <div class="modal-body">
-      <p>Loading data...(This might need few seconds)</p>
+    <div class="modal-body" id="timeModalBody">
+
     </div>
   </div>
 </div>
@@ -280,48 +280,111 @@
 	}
 </script>
 
+<!-- Import Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw==" crossorigin="anonymous"></script>
+<!-- Import Chart.js's add-on -->
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-colorschemes"></script>
 <!-- Javascript to show pop-up time tracking detial -->
 <script>
 
     //this function render the pie chat for time tracking detail
-    function drawTimeCanvas(data) {
-        var ctx = $("#timeCanvas").getContext("2d");
+    function drawTimeCanvas(data,tb) {
+        //initializing the timeModal view
+        $("#timeModalBody").empty().html("<div class=\"time-canvas-container\">" +
+            "<canvas id=\"timeCanvas\" width=\"300\" height=\"300\"></canvas>"+
+            "</div>"+
+            "<table id=\"timeTable\" class=\"time-table\">"+
+            "<tr>"+
+            "<th>Subject</th>"+
+            "<th>Time</th>"+
+            "<th>Avg.</th>"+
+            "</tr>" +
+            "</table>");
+
+        //var isTooLong = tb.objs.length > 2;
+
+        var mdata = [12, 19, 9];
+
+        var ctx = $("#timeCanvas").get(0).getContext("2d");
         var pieChart = new Chart(ctx, {
             type: 'pie',
-            data: data
+            data: {
+                labels: ['Data1', 'Data2', 'Data3'],
+                    datasets: [{
+                    data: mdata,
+                    borderWidth: 1
+                }]
+            },
+            options:{
+                plugins: {
+                    colorschemes: {
+                        scheme: 'office.Atlas6'
+                    }
+                }
+            }
         });
     }
 
     //this function pop up the modal and do AJAX call to load time tracking data.
     function displayTimeDetail(resp_map_id){
-        $("#timeModal").style("display","block");
+        $("#timeModalBody").empty().html("<p>Loading data...(This might need few seconds)</p>")
+        $("#timeModal").show();
         $.ajax({
-            url: Url_placeholder,
+            url: "Url_placeholder",
             method: 'GET',
             dataType: 'json',
             success: function (respond) {
                 chartData = {
                     labels: respond.Labels,
                     datasets: [{
-                        data: respond.Data
+                        data: respond.Data,
+                        borderWidth: 1
                     }]
                 };
 
-                //$("#timeModal").style("display","block");
-                //drawTimeCanvas(chartData);
+                drawTimeCanvas(chartData,repond.tables);
+            },
+            error: function(xhr, textStatus, errorThrown){
+                $("#timeModalBody").empty().html("<p>Failed, cannot get time details at this time..</p>")
             }
         });
     }
 
     //this function destroys the modal view.
-    function closeTimeDetail(){
-        $("#timeModal").style("display","none");
-    }
+    $("#closeTimeModal").click(function (){
+        $("#timeModal").hide();
+    });
 
 </script>
 
 <!-- style sheet for time tracking modal-->
 <style>
+    .time-canvas-container{
+        width: 250px !important;
+        height: 250px !important;
+        margin: auto;
+    }
+
+    .time-table {
+        margin: 10px auto;
+        width: 100%;
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+
+    #timeTable tr:nth-child(even) {
+        background-color: #eee;
+    }
+
+    #timeTable tr:nth-child(odd) {
+        background-color: #fff;
+    }
+
+    #timeTable th {
+        background-color: darkred;
+        color: white;
+    }
+
     .t-modal {
         display: none;
         position: fixed;
@@ -363,7 +426,7 @@
     }
 
     .close {
-        color: lightgray;
+        color: white;
         float: right;
         font-size: 28px;
         font-weight: bold;
@@ -378,7 +441,7 @@
 
     .modal-header {
         padding: 2px 16px;
-        background-color: rgba(255,0,0,0.9);
+        background-color: darkred;
         color: white;
     }
 

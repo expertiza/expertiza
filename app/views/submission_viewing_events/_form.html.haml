@@ -1,0 +1,25 @@
+= form_for @submission_viewing_event do |f|
+  - if @submission_viewing_event.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@submission_viewing_event.errors.count, "error")} prohibited this submission_viewing_event from being saved:"
+      %ul
+        - @submission_viewing_event.errors.full_messages.each do |msg|
+          %li= msg
+
+  .field
+    = f.label :map_id
+    = f.number_field :map_id
+  .field
+    = f.label :round
+    = f.number_field :round
+  .field
+    = f.label :link
+    = f.text_field :link
+  .field
+    = f.label :start_at
+    = f.datetime_select :start_at
+  .field
+    = f.label :end_at
+    = f.datetime_select :end_at
+  .actions
+    = f.submit 'Save'

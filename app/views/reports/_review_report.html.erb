@@ -1,3 +1,4 @@
+<% @l = -1 %>
 <!-- the table creation is changed top accommodate functionality of tablesorter, which requires thead and tbody seperately. Previously, headers were in tbody only -->
 <div class='reviewreport'>
   <!-- Added headers for tablesorter -->
@@ -56,7 +57,7 @@
     </tr>
     </thead>
     <tbody>
-
+    <% timeHash = Hash.new %>
     <!-- Set the review data and row span for each reviewer -->
     <% sort_reviewer_by_review_volume_desc.each do |reviewer| %>
       <% @response_maps, @rspan = get_data_for_review_report(@id, reviewer.id, @type) %>
@@ -105,6 +106,8 @@
                     <!--later we can create a hyperlink question type to deal with this situation.-->
                     <%= list_hyperlink_submission(reviewer_map.id, 5386) if Assignment.find_by(id: @id.to_i).try(:course).try(:instructor).try(:name) == 'Jkidd' %>
                   </div>
+                  <!--Display total time spent on reviewing as a hyperlink to popup which shows the breakdown of time spent between expertiza and other links as piechart-->
+                  <%= render partial: 'review_submissions_time_spent',  locals: {bgcolor: @bgcolor, map_id: reviewer_map.id,id: reviewer.id, reviewee_id: reviewer_map.reviewee_id, timeHash: timeHash} %>
                 </div>
               <% end %>
             <% end %>

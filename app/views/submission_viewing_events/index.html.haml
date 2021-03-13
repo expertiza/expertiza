@@ -1,0 +1,29 @@
+%h1 Listing submission_viewing_events
+
+%table
+  %thead
+    %tr
+      %th Map
+      %th Round
+      %th Link
+      %th Start at
+      %th End at
+      %th
+      %th
+      %th
+
+  %tbody
+    - @submission_viewing_events.each do |submission_viewing_event|
+      %tr
+        %td= submission_viewing_event.map_id
+        %td= submission_viewing_event.round
+        %td= submission_viewing_event.link
+        %td= submission_viewing_event.start_at
+        %td= submission_viewing_event.end_at
+        %td= link_to 'Show', submission_viewing_event
+        %td= link_to 'Edit', edit_submission_viewing_event_path(submission_viewing_event)
+        %td= link_to 'Destroy', submission_viewing_event, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Submission viewing event', new_submission_viewing_event_path

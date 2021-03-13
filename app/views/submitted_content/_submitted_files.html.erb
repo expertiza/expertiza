@@ -48,6 +48,120 @@
       </table>
     <% end %>
   <% end %>
+  
+  <% if local_assigns[:submission_check] %>
+    <script type="text/javascript">
+      var supported_file_type = ["pdf", "txt", "doc", "ppt", "png", "jpg"];
+      function ISODateString(date){
+        function pad(num){return num<10? '0'+num: num;}
+        return date.getUTCFullYear()+'-'
+                  + pad(date.getUTCMonth()+1) + '-'
+                  + pad(date.getUTCDate()) + ' '
+                  + pad(date.getUTCHours()) + ':'
+                  + pad(date.getUTCMinutes()) + ':'
+                  + pad(date.getUTCSeconds());
+      }
+      $(document).ready(function(){
+        var map_id = <%= @map.id %>;
+        var round = <%= @current_round %>;
+        // var current_window_timer = null;
+        var time_out_interval = 500; // in milliseconds
+        var filesToUpdate = {};
+        var windowsToClose = new Array();
+        // startTimer();
+        function timeoutAction(timeout_flag){
+          if (timeout_flag) {
+            while (windowsToClose!=null && windowsToClose.length>0){
+              windowsToClose.shift().close();
+            }
+          }
+          restart_file_timing_flag = $("#restart_file_timing_flag").val()=='true';
+          if (restart_file_timing_flag) {
+            for (file_name in filesToUpdate) {
+              if (filesToUpdate[file_name]){
+                startTime(map_id, round, file_name);
+              }
+            }
+            $("#restart_file_timing_flag").val('false');
+          }
+        }
+        // function resetTimer() {
+        //   clearTimeout(current_window_timer);
+        //   current_window_timer = setTimeout(timeoutAction, time_out_interval);
+        // }
+        // function startTimer() {
+        //   // resetTimer();
+        //   $(this).bind("click", resetTimer());
+        //   $(this).bind("mousemove", resetTimer());
+        // }
+        function startTime(map_id, round, link) {
+          var t = new Date();
+          $.ajax({
+            type: "POST",
+            url: '/submission_viewing_events/record_start_time',
+            data: $.param({submission_viewing_event:{map_id: map_id, round: round, link: link, start_at: ISODateString(t)}})
+          });
+        }
+        function markEndTime() {
+          var  t = new Date();
+          $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            async: false,
+            url: '/submission_viewing_events/mark_end_time',
+            data: $.param({
+              submission_viewing_event: {map_id: map_id, round: round, end_at: ISODateString(t)}
+              })
+          });
+        }
+        $("#1_myDiv #file_table a.fileLink").click(function(event){
+          event.preventDefault();
+          var file_path = $(this).attr("href");
+          var file_name = $(this).attr("download");
+          var file_name_extension = file_name.split(".").pop();
+          $("#restart_file_timing_flag").val("false");
+          startTime(map_id, round, file_name);
+          filesToUpdate[file_name] = true;
+          var window_handler = null;
+          var link_timer = null;
+          
+          if ($.inArray(file_name_extension, supported_file_type)>=0){
+            alert("Open file "+ file_name + " in new window to view it online.");
+            window_handler = window.open(file_path, "_blank");
+            windowsToClose.push(window_handler)
+            link_timer = setInterval(checkWindowStatus, time_out_interval);
+          } else {
+            // var window_handler = window.open(file_name);
+            alert("Download file "+file_name + " to view it locally.");
+            // window.location.href = file_path;
+            window_handler = window.open(file_path, "_blank");
+            // link_timer = setInterval(checkWindowStatus, 1000);
+          }
+          function endTime(link){
+            var t = new Date();
+            $.ajax({
+              type: 'POST',
+              dataType: 'json',
+              async: false,
+              url: '/submission_viewing_events/record_end_time',
+              data: $.param({
+                submission_viewing_event: {map_id: map_id, round: round, link: link, end_at: ISODateString(t)}
+                })
+            });
+          }
+          function checkWindowStatus() {
+            timeout_flag = $('#timeout_flag').val()=='true';
+            if (window_handler.closed) {
+              endTime(file_name);
+              filesToUpdate[file_name] = false;
+              clearInterval(link_timer);
+            } 
+            timeoutAction(timeout_flag);
+          }
+        })
+      });
+    </script>
+  <% end %>
 <% else %>
 <!--No files have been submitted.-->
-<% end %>
+<% end %> 

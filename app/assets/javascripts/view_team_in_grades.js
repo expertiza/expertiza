@@ -87,87 +87,40 @@ function compare(a, b, less) {
 }
 
 // Revisions In MARCH 2021 FOR E2100 Tagging Report for Students Below This Line.
+/********************************** ACTION HANDLERS ****************************************/
 
 // Initialize Tag Report Heat grid and hide if empty.
 function tagActionOnLoad() {
-    let tagPrompts = countTags();
-    //generateTable(tagPrompts);
-    let rowData =  countTagsByQuestion();
-    drawTagGrid(rowData);
-
-    // Hide heatgrid on load if no tags or if all tags done.
-    if(tagsOnOffTotal(tagPrompts)) {
-        // Disable for now; Will be replaced with collapsed version.
-        //document.getElementById("tagHeatMap").style.display = 'none';
+    let tagPrompts = getTagPrompts();
+    // Hide heatgrid and don't waste cycles counting/drawing, if no tags exist.
+    if(tagPrompts.length == 0) {
+        document.getElementById("tagHeatMap").style.display = 'none';
+    } else {
+        let countMap = countOnOffTags(tagPrompts);
+        let rowData =  getTagsByQuestion();
+        drawTagGrid(rowData);
+        updateTagsFraction(countMap);
     }
 }
 
 // Update Tag Report Heat grid each time a tag is changed
 function tagActionOnUpdate() {
-    let tagPrompts = countTags();
-    let qTagPrompts = countTagsByQuestion();
-    updateTagGrid(qTagPrompts);
-    tagsOnOffTotal(tagPrompts);
+    let tagPrompts = getTagPrompts();
+    let countMap = countOnOffTags(tagPrompts);
+    updateTagGrid(tagPrompts);
+    updateTagsFraction(countMap);
 }
+
+/********************************** ELEMENT GETTERS ****************************************/
 
 // Simple query of all review tags and put references into a one d vector.
-function countTags() {
+function getTagPrompts() {
     return document.getElementsByName("tag_checkboxes[]");
-}
-
-/* Handle calculation of number of toggled review tags
-   Returns: True if all tags have been clicked; False if more tags available to click.
- */
-function tagsOnOffTotal(tagPrompts) {
-    let offTags = 0;
-    let onTags = 0;
-    let length = tagPrompts.length;
-    let ratio = 0;
-    let ratio_class = 0;
-    for (let index = 0; index < tagPrompts.length; ++index) {
-        if (tagPrompts[index].value == 0) {
-            ++offTags;
-        } else {
-            ++onTags;
-        }
-    }
-    // Compute ratio as decimal
-    ratio = onTags / length;
-    // Scale ratio to 0 <= ratio <= 4
-    ratio_class = ratio*4;
-    // increment ratio so the range is 1 <= ratio_class <= 5
-    ++ratio_class;
-    // round ratio_class down to nearest int for class assignment
-    ratio_class = Math.floor(ratio_class);
-
-    // Never show a shade of green if we are less than  100% complete on tags
-    if(ratio_class === 4) { --ratio_class; }
-
-    // Get element to be updated
-    let cell = document.getElementById("tagsSuperNumber");
-    // Set text value with ratio
-    cell.innerText = onTags + "/" + tagPrompts.length;
-    // Set background color class based on ratio
-    cell.className = "c"+ratio_class.toString();
-
-    if(tagPrompts.length == 0 || offTags == 0) return true;
-    return false;
-}
-
-// Turn on and off the Review Tag heat grid and toggle button text
-function toggleTagGrid(elementID) {
-    toggleFunction(elementID);
-    let button = document.getElementById("tagHGButton")
-    if (button.innerText == "Show Tag HeatGrid") {
-        button.innerText = "Hide Tag HeatGrid";
-    } else {
-        button.innerText = "Show Tag HeatGrid";
-    }
 }
 
 // Populate an array with all review rows, their question and review number, whether they have tag prompts,
 // and a reference to the tag prompts.
-function countTagsByQuestion() {
+function getTagsByQuestion() {
     // Get all valid review rows
     let rowsList = $("[id^=rr]");
     // Set up matrix of questionNumber, reviewNumber, hasTag?, and pointer to tags if true
@@ -190,10 +143,59 @@ function countTagsByQuestion() {
     return rowData;
 }
 
-function addToolTip(element, text) {
-    element.setAttribute("data-toggle", "tooltip");
-    element.setAttribute("title", text);
+/********************************** ELEMENT CHANGERS/UPDATERS ****************************************/
+
+// Updates the tags complete fraction at the top of the tag heat grid
+function updateTagsFraction(countMap) {
+    // Get element to be updated
+    let cell = document.getElementById("tagsSuperNumber");
+    // Set text value with ratio
+    cell.innerText = countMap.get("onTags") + "/" + countMap.get("total");
+    // Set background color class based on ratio
+    cell.className = "c"+countMap.get("ratioClass").toString();
 }
+
+// Turn on and off the Review Tag heat grid and toggle button text
+function toggleTagGrid(elementID) {
+    toggleFunction(elementID);
+    let button = document.getElementById("tagHGButton")
+    if (button.innerText == "Show Tag HeatGrid") {
+        button.innerText = "Hide Tag HeatGrid";
+    } else {
+        button.innerText = "Show Tag HeatGrid";
+    }
+}
+
+// Updates the Review Tag Heat Grid each time a tag is changed
+function updateTagGrid(tagPrompts){
+    for(let i = 0; i< tagPrompts.length; ++i) {
+        // Look up the heatmap cell associated with this tag
+        let tempId = tagPrompts[i].getAttribute("data-tagheatmapid");
+        // Get the cell object from the document
+        let gridCell = document.getElementById(tempId);
+        // Update the heatgrid cell based on the value of this tag.
+        if(tagPrompts[i].value == 0) {
+            gridCell.setAttribute("class", "c1");
+        }
+        else {
+            gridCell.setAttribute("class", "c5");
+        }
+    }
+}
+
+// Expand or collapse the heatgrid rows which make up the Map of tags.
+function toggleHeatGridRows() {
+    $("[id^=hg_row]").each(function () {
+        if($( this ).css("display") === "none") {
+            $( this ).css("display", "");
+        }
+        else {
+            $( this ).css("display", "none");
+        }
+    });
+}
+
+/********************************** ELEMENT/CODE GENERATORS ****************************************/
 
 // Renders the review tag heatgrid table based on the review rowData array.
 function drawTagGrid(rowData) {
@@ -283,6 +285,7 @@ function drawTagGrid(rowData) {
                     // Set color as successful
                     cell.setAttribute("class", "c5");
                 }
+                rowData[rIndex].get('tag_list').get(cIndex).setAttribute("data-tagheatmapid", idString);
             }
             //add to table
             cell.appendChild(text);
@@ -291,25 +294,13 @@ function drawTagGrid(rowData) {
     }
 }
 
-// Updates the Review Tag Heat Grid each time a tag is changed
-function updateTagGrid(rowData){
-    let headerLength = 5;
-    for(rIndex = 0; rIndex < rowData.length; ++rIndex) {
-        if (rowData[rIndex].get('has_tag') == true) {
-            for (cIndex = 0; cIndex < headerLength; ++cIndex) {
-                // set TD tag ids as tag_heatmap_id_rownum_colnum
-                let cell = document.getElementById("tag_heatmap_id_" + rIndex + "_" + cIndex);
-                if (rowData[rIndex].get('tag_list').get(cIndex).value == 0) {
-                    // Set color as NOT completed.
-                    cell.setAttribute("class", "c1");
-                } else {
-                    // Set color as COMPLETED.
-                    cell.setAttribute("class", "c5");
-                }
-            }
-        }
-    }
+// Adds a tooltip to Element "element" that contains the "text"
+function addToolTip(element, text) {
+    element.setAttribute("data-toggle", "tooltip");
+    element.setAttribute("title", text);
 }
+
+/********************************** MATHEMATICS HELPERS ****************************************/
 
 // Find the largest number of tags in a review, if any exist, and return the width that the grid should be drawn to.
 function determineGridWidth(rowData) {
@@ -322,14 +313,45 @@ function determineGridWidth(rowData) {
     return gridWidth;
 }
 
-// Expand or collapse the heatgrid rows which make up the Map of tags.
-function toggleHeatGridRows() {
-    $("[id^=hg_row]").each(function () {
-        if($( this ).css("display") === "none") {
-            $( this ).css("display", "");
+// Returns as a HashMap the count of all, on, and off tags, and the ratio of done to total in decimal and
+// (special rounding) integer form to associate with existing heatgrid color classes.
+function countOnOffTags(tagPrompts){
+    let countMap = new Map();
+    let offTags = 0;
+    let onTags = 0;
+    let length = tagPrompts.length;
+    let ratio = 0;
+    let ratioClass = 0;
+    for (let index = 0; index < tagPrompts.length; ++index) {
+        if (tagPrompts[index].value == 0) {
+            ++offTags;
+        } else {
+            ++onTags;
         }
-        else {
-            $( this ).css("display", "none");
-        }
-    });
+    }
+    countMap.set("onTags", onTags);
+    countMap.set("offTags", offTags);
+    countMap.set("total", length);
+
+    // Compute ratio as decimal
+    ratio = onTags / length;
+
+    // Calculate the ratio class. This is used to look up CSS color mapping classes that range {0 .. 5}
+    // Scale ratio to 0 <= ratio <= 4
+    ratioClass = ratio*4;
+
+    // increment ratio so the range is 1 <= ratio_class <= 5
+    ++ratioClass;
+
+    // round ratioClass down to nearest integer
+    ratioClass = Math.floor(ratioClass);
+
+    // For our purposes, ratio_class should fall in the range { 1,2,3,5 } (skips class 4).
+    if(ratioClass === 4) { --ratioClass; }
+
+    // Add values to the hashmap
+    countMap.set("ratioClass", ratioClass);
+    countMap.set("ratioDecimal", ratio);
+    return countMap;
 }
+

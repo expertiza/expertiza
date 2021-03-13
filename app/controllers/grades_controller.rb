@@ -99,13 +99,7 @@ class GradesController < ApplicationController
           counter_for_same_rubric = 0
         end
       end
-      vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
-      vmquestions = questionnaire.questions
-      vm.add_questions(vmquestions)
-      vm.add_team_members(@team)
-      vm.add_reviews(@participant, @team, @assignment.vary_by_round)
-      vm.number_of_comments_greater_than_10_words
-      @vmlist << vm
+      @vmlist << populate_view_model
     end
     @current_role_name = current_role_name
   end
@@ -176,6 +170,16 @@ class GradesController < ApplicationController
   end
 
   private
+
+  def populate_view_model
+    vm = VmQuestionResponse.new(questionnaire, @assignment, @round)
+    vmquestions = questionnaire.questions
+    vm.add_questions(vmquestions)
+    vm.add_team_members(@team)
+    vm.add_reviews(@participant, @team, @assignment.vary_by_round)
+    vm.number_of_comments_greater_than_10_words
+    vm
+  end
 
   def redirect_when_disallowed
     # For author feedback, participants need to be able to read feedback submitted by other teammates.

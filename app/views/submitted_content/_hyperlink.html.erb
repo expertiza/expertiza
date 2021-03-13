@@ -16,7 +16,6 @@
   <a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;">hide links</a><br/>
   <!-- Setting user-select to none prevents users from copy-pasting url links -->
   <div id="url" style="user-select: none">
-    <p><b>Note:</b> You can only open one of each link at a time.</p>
     <ul>
       <% participant.team.hyperlinks.each_with_index {
         |link, index| %>

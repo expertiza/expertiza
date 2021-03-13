@@ -387,7 +387,7 @@
     <%= render :partial => 'review', :locals => {:versions => @responses_versions} %>
 <% end %>
 <h2>Directions for the reviewer</h2>
-<input type="checkbox" id="autosave_cbx" unchecked>
+<input type="checkbox" id="autosave_cbx" checked>
 <label id="autosave_cbx_lbl" for="autosave_cbx"></label>
 <div id="save_progress"></div>
 <%= form_tag({:action => @next_action}, :id => @modified_object, :class => "review_form") do %>

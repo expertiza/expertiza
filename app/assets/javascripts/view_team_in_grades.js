@@ -182,16 +182,16 @@ function countTagsByQuestion() {
     // Set up matrix of questionNumber, reviewNumber, hasTag?, and pointer to tags if true
     let rowData = new Array(rowsList.length);
     $.each(rowsList, function(i) {
-        rowData[i] = new Array();
+        rowData[i] = new Map();
         // Question Number
-        rowData[i].push( $( this ).data("qnum"));
+        rowData[i].set('question_num', $( this ).data("qnum"));
         // Review Number
-        rowData[i].push( $( this ).data("rnum"));
+        rowData[i].set('review_num',$( this ).data("rnum"));
         // Has tag bool?
-        rowData[i].push( $( this ).data("hastag"));
+        rowData[i].set('has_tag',$( this ).data("hastag"));
         // Reference to tag objects
-        if (rowData[i][2] == true) {
-            rowData[i].push($( this ).find('input[name^="tag_checkboxes"]'));
+        if (rowData[i].get('has_tag') == true) {
+            rowData[i].set('tag_list', $( this ).find('input[name^="tag_checkboxes"]'));
         }
     });
     return rowData;
@@ -271,8 +271,8 @@ function drawTagGrid(rowData) {
     for(let rIndex = 0; rIndex < rowData.length; ++rIndex) {
         let trow = tbody.insertRow();
         // Handle the backend inconsistency, Question Indices start with One and Review Indices start with Zero
-        let questionNum = rowData[rIndex][0];
-        let reviewNum = rowData[rIndex][1] + 1;
+        let questionNum = rowData[rIndex].get('question_num');
+        let reviewNum = rowData[rIndex].get('review_num') + 1;
         // If this is a new question number, add a row indicating a new question.
         if(questionNum !== priorQuestionNum) {
             // Update prior question index
@@ -303,7 +303,7 @@ function drawTagGrid(rowData) {
             // Set the text value of the grid cell
             let text = document.createTextNode( "R." + reviewNum);
             // If review doesn't have tag prompts
-            if(rowData[rIndex][2]== false){
+            if(rowData[rIndex].get('has_tag') == false){
                 cell.setAttribute("class", "c0");
              //   cell.setAttribute("style", "text-align: center;");
             }
@@ -312,7 +312,7 @@ function drawTagGrid(rowData) {
                 let idString = "tag_heatmap_id_" + rIndex + "_" + cIndex;
                 cell.setAttribute("id", idString);
                // cell.setAttribute('onClick', 'gotoTagPrompt(' + rowData[rIndex][3][cIndex].id + ')');
-                if(rowData[rIndex][3][cIndex].value == 0) {
+                if(rowData[rIndex].get('tag_list').get(cIndex).value == 0) {
                     // Set color as failing
                     cell.setAttribute("class", "c1");
                  //   cell.setAttribute("style", "text-align: center;");
@@ -335,11 +335,11 @@ function drawTagGrid(rowData) {
 function updateTagGrid(rowData){
     let headerLength = 5;
     for(rIndex = 0; rIndex < rowData.length; ++rIndex) {
-        if (rowData[rIndex][2] == true) {
+        if (rowData[rIndex].get('has_tag') == true) {
             for (cIndex = 0; cIndex < headerLength; ++cIndex) {
                 // set TD tag ids as tag_heatmap_id_rownum_colnum
                 let cell = document.getElementById("tag_heatmap_id_" + rIndex + "_" + cIndex);
-                if (rowData[rIndex][3][cIndex].value == 0) {
+                if (rowData[rIndex].get('tag_list').get(cIndex).value == 0) {
                     // Set color as NOT completed.
                     cell.setAttribute("class", "c1");
                 } else {
@@ -368,8 +368,8 @@ function gotoTagPrompt(tagPrompt) {
 function determineGridWidth(rowData) {
     let gridWidth = 0;
     for(let i=0; i<rowData.length; ++i) {
-        if(rowData[i][2] == true && rowData[i][3].length > gridWidth) {
-            gridWidth =  rowData[i][3].length;
+        if(rowData[i].get('has_tag') == true && rowData[i].get('tag_list').length > gridWidth) {
+            gridWidth =  rowData[i].get('tag_list').length;
         }
     }
     return gridWidth;

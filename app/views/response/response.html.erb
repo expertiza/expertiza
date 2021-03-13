@@ -520,12 +520,12 @@
           $("#timeout_flag").val("false");
           $("#restart_file_timing_flag").val("true");
           $("#restart_link_timing_flag").val("true");
-          document.onmousemove = resetTimer;
-          document.onkeypress = resetTimer;
-          document.onload = resetTimer;
-          document.onmousedown = resetTimer; // touchscreen presses
-          document.ontouchstart = resetTimer;
-          document.onclick = resetTimer;     // touchpad clicks
+          document.onmousemove = resetTimer; // mouse moves over an element
+          document.onkeypress = resetTimer;  // user presses key on keyboard
+          document.onload = resetTimer;      // page is loaded
+          document.onmousedown = resetTimer; // mouse is pressed on element
+          document.ontouchstart = resetTimer;// user touches on an element (relevant for touchscreen)
+          document.onclick = resetTimer;     // user clicks on an element
           document.onscroll = resetTimer;    // scrolling with arrow keys
       }
 

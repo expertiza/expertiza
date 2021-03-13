@@ -189,12 +189,10 @@ class GradesController < ApplicationController
     # ACS Check if team count is more than 1 instead of checking if it is a team assignment
     if @participant.assignment.max_team_size > 1
       team = @participant.team
-      unless team.nil?
-        unless team.user? session[:user]
+      if !team.nil? && !(team.user? session[:user])
           flash[:error] = 'You are not on the team that wrote this feedback'
           redirect_to '/'
           return true
-        end
       end
     else
       reviewer = AssignmentParticipant.where(user_id: session[:user].id, parent_id: @participant.assignment.id).first

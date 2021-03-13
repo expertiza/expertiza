@@ -183,6 +183,8 @@ function countTagsByQuestion() {
     let rowData = new Array(rowsList.length);
     $.each(rowsList, function(i) {
         rowData[i] = new Map();
+        //Round Number
+        rowData[i].set('round_num', $( this ).data("round"));
         // Question Number
         rowData[i].set('question_num', $( this ).data("qnum"));
         // Review Number
@@ -268,6 +270,7 @@ function drawTagGrid(rowData) {
     //create table body
     let tbody = table.appendChild(document.createElement('tbody'));
     let priorQuestionNum = -1;
+    let roundNum = 1;
     for(let rIndex = 0; rIndex < rowData.length; ++rIndex) {
         let trow = tbody.insertRow();
         // Handle the backend inconsistency, Question Indices start with One and Review Indices start with Zero
@@ -275,6 +278,8 @@ function drawTagGrid(rowData) {
         let reviewNum = rowData[rIndex].get('review_num') + 1;
         // If this is a new question number, add a row indicating a new question.
         if(questionNum !== priorQuestionNum) {
+            if(priorQuestionNum !== -1 && priorQuestionNum > questionNum)
+                ++roundNum;
             // Update prior question index
             priorQuestionNum = questionNum;
             // Draw a "Question: # " Row that spans all columns
@@ -288,7 +293,7 @@ function drawTagGrid(rowData) {
             //trow.className = "tag_hg_row";
             trow.id = "hg_row" + questionNum + "_" + reviewNum;
             trow.setAttribute("data-questionnum", questionNum);
-            let text = document.createTextNode("Criterion # " + questionNum);
+            let text = document.createTextNode("Round " + roundNum + " -- Question " + questionNum);
             cell.appendChild(text);
             // Initialize new row to be used by the inner loop for reviews.
             trow = tbody.insertRow();

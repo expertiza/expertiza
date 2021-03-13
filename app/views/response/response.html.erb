@@ -513,6 +513,33 @@
       startTimer();
       resetTimer();
       autoTimer();
+
+      function startTimer() {
+          // resetTimer();
+          // autoTimer();
+          $("#timeout_flag").val("false");
+          $("#restart_file_timing_flag").val("true");
+          $("#restart_link_timing_flag").val("true");
+          document.onmousemove = resetTimer;
+          document.onkeypress = resetTimer;
+          document.onload = resetTimer;
+          document.onmousedown = resetTimer; // touchscreen presses
+          document.ontouchstart = resetTimer;
+          document.onclick = resetTimer;     // touchpad clicks
+          document.onscroll = resetTimer;    // scrolling with arrow keys
+      }
+
+      function resetTimer() {
+          clearTimeout(current_window_timer);
+          current_window_timer = setTimeout(timeoutAction, time_out_interval);
+          timer_flag = true;
+      }
+
+      function autoTimer(){
+          clearInterval(auto_window_timer);
+          auto_window_timer = setInterval(autoRecordTime, time_period);
+      }
+
       function timeoutAction(){
         window.focus();
         timer_flag = false;
@@ -529,35 +556,14 @@
           window.history.back();
         }
       }
-      function autoTimer(){
-        clearInterval(auto_window_timer);
-        auto_window_timer = setInterval(autoRecordTime, time_period);
-      }
+
       function autoRecordTime(){
         markEndTime();
         if (timer_flag == true){
           startTimer();
         }
       }
-      function resetTimer() {
-        clearTimeout(current_window_timer);
-        current_window_timer = setTimeout(timeoutAction, time_out_interval);
-        timer_flag = true;
-      }
-      function startTimer() {
-        // resetTimer();
-        // autoTimer();
-        $("#timeout_flag").val("false");
-        $("#restart_file_timing_flag").val("true");
-        $("#restart_link_timing_flag").val("true");
-        document.onmousemove = resetTimer;
-        document.onkeypress = resetTimer;
-        document.onload = resetTimer;
-        document.onmousedown = resetTimer; // touchscreen presses
-        document.ontouchstart = resetTimer;
-        document.onclick = resetTimer;     // touchpad clicks
-        document.onscroll = resetTimer;    // scrolling with arrow keys
-      }
+
       function markEndTime() {
         var  t = new Date();
         $.ajax({

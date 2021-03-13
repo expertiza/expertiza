@@ -197,8 +197,16 @@ function countTagsByQuestion() {
     return rowData;
 }
 
+function addToolTip(element, text) {
+    element.setAttribute("data-toggle", "tooltip");
+    element.setAttribute("title", text);
+}
+
 // Renders the review tag heatgrid table based on the review rowData array.
 function drawTagGrid(rowData) {
+    //Configure text of tooltip Legend
+    let tooltipText = "Color Legend:\nGrey: no tags available\nRed: tag not complete\nGreen: tag complete.";
+    let headerTooltipText = "Tag Fraction Color Scaled by:\nRed: 0-30% tags completed\nOrange: 30-60% tags completed\nYellow: 60-99% Tags Completed\nGreen: All tags completed";
     //load table object
     let table = document.getElementById("tag_heat_grid");
     // Set basic table attributes
@@ -214,6 +222,7 @@ function drawTagGrid(rowData) {
    // th.setAttribute("class", "sorter-false tablesorter-header tablesorter-headerUnSorted");
     th.setAttribute("id", "tagsSuperLabel");
     th.colSpan = 3;
+    addToolTip(th, "Click to collapse/expand");
     th.appendChild(text);
     row.appendChild(th);
     // create "# / #" Cell showing number of completed tags (initialize as 0 / 0 for now)
@@ -222,6 +231,7 @@ function drawTagGrid(rowData) {
    // th.setAttribute("class", "sorter-false tablesorter-header tablesorter-headerUnSorted");
     th.setAttribute("id", "tagsSuperNumber");
     th.colSpan = 2;
+    addToolTip(th, headerTooltipText);
     th.appendChild(text);
     row.appendChild(th);
     row.setAttribute("onClick", "toggleHeatGridRows()");
@@ -253,6 +263,8 @@ function drawTagGrid(rowData) {
         row.appendChild(th);
     }*/
 
+
+
     //create table body
     let tbody = table.appendChild(document.createElement('tbody'));
     let priorQuestionNum = -1;
@@ -269,6 +281,8 @@ function drawTagGrid(rowData) {
             let cell = trow.insertCell();
             cell.colSpan = gridWidth;
             cell.className = "tag_heat_grid_criterion";
+            //data-toggle="tooltip" title="Color Legend: Grey indicates no tags available, Red indicates tag not complete, Green indicates tag complete."
+            addToolTip(cell, tooltipText);
             //cell.style.textAlign = "center";
             //cell.style.fontSize = "9px";
             //trow.className = "tag_hg_row";
@@ -312,6 +326,7 @@ function drawTagGrid(rowData) {
             //add to table
           //  cell.style.fontSize = "8px";
             cell.appendChild(text);
+            addToolTip(cell, tooltipText);
         }
     }
 }

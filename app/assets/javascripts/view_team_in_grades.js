@@ -18,20 +18,14 @@ function col_sort(m) {
     // Swaps two columns of the table
     jQuery.moveColumn = function (table, from, to) {
         var rows = jQuery('tr', table);
-
         var hidden_child_row = table.find('tr.tablesorter-childRow');
-
         hidden_child_row.each(function () {
             inner_table = jQuery(this).find('table.tbl_questlist')
             hidden_table = inner_table.eq(0).find('tr')
-
-
             hidden_table.eq(from - 1).detach().insertBefore(hidden_table.eq(to - 1));
             if (from - to > 1) {
                 hidden_table.eq(to - 1).detach().insertAfter((hidden_table.eq(from - 2)));
-
             }
-
         });
 
 
@@ -41,7 +35,6 @@ function col_sort(m) {
             cols.eq(from).detach().insertBefore(cols.eq(to));
             if (from - to > 1) {
                 cols.eq(to).detach().insertAfter((cols.eq(from - 1)));
-
             }
         });
     }
@@ -80,7 +73,6 @@ function col_sort(m) {
             tbr = tables.eq(m).find('tr.accordion-toggle');
             columns = tbr.eq(tbr.length - 1).find('td')
             j = j - 1;
-
         }
     }
 }
@@ -95,7 +87,6 @@ function compare(a, b, less) {
 }
 
 // Revisions In MARCH 2021 FOR E2100 Tagging Report for Students Below This Line.
-
 
 // Initialize Tag Report Heat grid and hide if empty.
 function tagActionOnLoad() {
@@ -209,63 +200,36 @@ function drawTagGrid(rowData) {
     //Configure text of tooltip Legend
     let tooltipText = "Color Legend:\nGrey: no tags available\nRed: tag not complete\nGreen: tag complete.";
     let headerTooltipText = "Tag Fraction Color Scaled by:\nRed: 0-30% tags completed\nOrange: 30-60% tags completed\nYellow: 60-99% Tags Completed\nGreen: All tags completed";
+
     //load table object
     let table = document.getElementById("tag_heat_grid");
+
     // Set basic table attributes
-    //table.setAttribute("class", "scoresTable tbl_heat tablesorter");
     let gridWidth = determineGridWidth(rowData);
+
     //create the header
     let thead = table.createTHead();
     let row = thead.insertRow();
     row.setAttribute("class", "hide-scrollbar tablesorter-headerRow");
+
     // Create "Tags Completed:" Cell
     let th = document.createElement("th");
     let text = document.createTextNode("\u2195 Tags Completed");
-   // th.setAttribute("class", "sorter-false tablesorter-header tablesorter-headerUnSorted");
     th.setAttribute("id", "tagsSuperLabel");
     th.colSpan = 3;
     addToolTip(th, "Click to collapse/expand");
     th.appendChild(text);
     row.appendChild(th);
+
     // create "# / #" Cell showing number of completed tags (initialize as 0 / 0 for now)
     th = document.createElement("th");
     text = document.createTextNode("0/0");
-   // th.setAttribute("class", "sorter-false tablesorter-header tablesorter-headerUnSorted");
     th.setAttribute("id", "tagsSuperNumber");
     th.colSpan = 2;
     addToolTip(th, headerTooltipText);
     th.appendChild(text);
     row.appendChild(th);
     row.setAttribute("onClick", "toggleHeatGridRows()");
-/*    // Create action row 1 "Show Only Incomplete Criteria"
-    row = thead.insertRow();
-    row.id = "incompleteActionRow";
-    row.className = "action_row";
-    row.setAttribute("onClick", "heatGridShowIncomplete()");
-    row.textContent = "Map Incomplete Tags \U+25BC";
-    // Create action row 2 "Show All Criteria"
-    row = thead.insertRow();
-    row.id = "allActionRow";
-    row.className = "action_row";
-    row.setAttribute("onClick", "heatGridShowAll()");
-    row.textContent = "Map All Tags \U+25BC";*/
-
-
-
-/*   Removed top row labels 3/11/21 to make grid more flexible for future changes in tag quantity
-
- row = thead.insertRow();
-    for(index = 0; index < headerLabels.length; ++index) {
-        let th = document.createElement("th");
-        //Label the header
-        let text = document.createTextNode(headerLabels[index]);
-        th.setAttribute("class", "sorter-false tablesorter-header tablesorter-headerUnSorted");
-        th.appendChild(text);
-        row.setAttribute("class", "hide-scrollbar tablesorter-headerRow");
-        row.appendChild(th);
-    }*/
-
-
 
     //create table body
     let tbody = table.appendChild(document.createElement('tbody'));
@@ -276,21 +240,17 @@ function drawTagGrid(rowData) {
         // Handle the backend inconsistency, Question Indices start with One and Review Indices start with Zero
         let questionNum = rowData[rIndex].get('question_num');
         let reviewNum = rowData[rIndex].get('review_num') + 1;
+
         // If this is a new question number, add a row indicating a new question.
         if(questionNum !== priorQuestionNum) {
-            if(priorQuestionNum !== -1 && priorQuestionNum > questionNum)
-                ++roundNum;
+            if(priorQuestionNum !== -1 && priorQuestionNum > questionNum) { ++roundNum; }
             // Update prior question index
             priorQuestionNum = questionNum;
             // Draw a "Question: # " Row that spans all columns
             let cell = trow.insertCell();
             cell.colSpan = gridWidth;
             cell.className = "tag_heat_grid_criterion";
-            //data-toggle="tooltip" title="Color Legend: Grey indicates no tags available, Red indicates tag not complete, Green indicates tag complete."
             addToolTip(cell, tooltipText);
-            //cell.style.textAlign = "center";
-            //cell.style.fontSize = "9px";
-            //trow.className = "tag_hg_row";
             trow.id = "hg_row" + questionNum + "_" + reviewNum;
             trow.setAttribute("data-questionnum", questionNum);
             let text = document.createTextNode("Round " + roundNum + " -- Question " + questionNum);
@@ -300,7 +260,8 @@ function drawTagGrid(rowData) {
             let temp = reviewNum - 1;
             trow.id = "hg_row" + questionNum + "_" + temp;
         }
-        //trow.className = "tag_hg_row";
+
+        // If not a new question, continue to populate rows with cells
         trow.id = "hg_row" + questionNum + "_" + reviewNum;
         trow.setAttribute("data-questionnum", questionNum);
         for(let cIndex = 0; cIndex < gridWidth; ++cIndex) {
@@ -310,26 +271,20 @@ function drawTagGrid(rowData) {
             // If review doesn't have tag prompts
             if(rowData[rIndex].get('has_tag') == false){
                 cell.setAttribute("class", "c0");
-             //   cell.setAttribute("style", "text-align: center;");
             }
-            else
-            {
+            else {
                 let idString = "tag_heatmap_id_" + rIndex + "_" + cIndex;
                 cell.setAttribute("id", idString);
-               // cell.setAttribute('onClick', 'gotoTagPrompt(' + rowData[rIndex][3][cIndex].id + ')');
                 if(rowData[rIndex].get('tag_list').get(cIndex).value == 0) {
                     // Set color as failing
                     cell.setAttribute("class", "c1");
-                 //   cell.setAttribute("style", "text-align: center;");
                 }
                 else {
                     // Set color as successful
                     cell.setAttribute("class", "c5");
-                //    cell.setAttribute("style", "text-align: center;");
                 }
             }
             //add to table
-          //  cell.style.fontSize = "8px";
             cell.appendChild(text);
             addToolTip(cell, tooltipText);
         }
@@ -350,23 +305,10 @@ function updateTagGrid(rowData){
                 } else {
                     // Set color as COMPLETED.
                     cell.setAttribute("class", "c5");
-                } //else
-            } // for cIndex
-        } // if rowData
-    } // for rIndex
-} // updateTable()
-
-
-//Scroll to a tag entry prompt on click from the heatgrid
-function gotoTagPrompt(tagPrompt) {
-    // expand accordions to make scroll work
-/*    let accordionable = document.getElementsByClassName("accordion-body collapse");
-    for (i=0;i<accordionable.length;++i) {
-
-        accordionable[i].setAttribute('accordion-body collapsearia-expanded', 'true');
-    }*/
-    //scroll to clicked tag prompt
-    tagPrompt.scrollIntoView();
+                }
+            }
+        }
+    }
 }
 
 // Find the largest number of tags in a review, if any exist, and return the width that the grid should be drawn to.
@@ -380,51 +322,8 @@ function determineGridWidth(rowData) {
     return gridWidth;
 }
 
-// Expand only criteria with incomplete tags
-function heatGridShowIncomplete(){
-    let rowData = countTagsByQuestion();
-    let incompleteQuestions = new Array();
-    for(let i=0; i < rowData.length; ++i) {
-        if(rowData[i][2] === true){
-            for(let tag in rowData[i][3]){
-                if(tag.value == 0) {
-                    incompleteQuestions.push(i);
-                }
-            }
-        }
-    }
-    for(let i = 0; i<incompleteQuestions.length; ++i) {
-        let j = i+1; // Account for Criteria being indexed from 1 .. n
-        // hide all rows first
-        $("[id^=hg_row]").each(function() {
-            $(this).css("display", "none");
-        });
-        $("[id^=hg_row]").each(function() {
-            if($( this ).data("questionnum") === j) {
-                $( this ).css("display", "");
-            }
-        });
-    }
-}
-
-function heatGridShowAll() {
-    //let rowsList = $("[id^=hg_row]");
-
-    $("[id^=hg_row]").each(function () {
-        $( this ).css("display", "");
-            //.style.display = 'block';
-    });
-}
-
+// Expand or collapse the heatgrid rows which make up the Map of tags.
 function toggleHeatGridRows() {
-/*    let header = $("[id=tagsSuperLabel]");
-    if(header.innerText === "\u25B2 Tags Completed: ") {
-        header.innerText = "\u25BC Tags Completed: "
-    }
-    else{
-        header.innerText = "\u25B2 Tags Completed: ";
-    }*/
-
     $("[id^=hg_row]").each(function () {
         if($( this ).css("display") === "none") {
             $( this ).css("display", "");
@@ -432,10 +331,5 @@ function toggleHeatGridRows() {
         else {
             $( this ).css("display", "none");
         }
-        //.style.display = 'block';
     });
-}
-
-function hide(element) {
-    element.style.display = 'none';
 }

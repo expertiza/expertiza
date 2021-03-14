@@ -27,7 +27,7 @@ class QuizQuestionnairesController < QuestionnairesController
       flash[:error] = "This assignment is not configured to use quizzes."
       valid_request = false
     else
-      valid_request = team_check(@participant_id, assignment) # check for validity of the request
+      valid_request = team_valid?(@participant_id, assignment) # check for validity of the request
     end
     if valid_request && Questionnaire::QUESTIONNAIRE_TYPES.include?(params[:model])
       @questionnaire = QuizQuestionnaire.new
@@ -126,17 +126,17 @@ class QuizQuestionnairesController < QuestionnairesController
 
   private
 
-  def team_check(participant_id, assignment)
-    valid_request = true
+  def team_valid?(participant_id, assignment)
     team = AssignmentParticipant.find(participant_id).team
     if team.nil? # flash error if this current participant does not have a team
       flash[:error] = "You should create or join a team first."
-      valid_request = false
+      false
     elsif assignment.topics? && team.topic.nil? # flash error if this assignment has topic but current team does not have a topic
       flash[:error] = "Your team should have a topic."
-      valid_request = false
+      false
+    else # the current participant is part of a team that has a topic
+      true
     end
-    valid_request # return whether the request is valid or not
   end
 
   def validate_question(i)

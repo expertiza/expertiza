@@ -1,4 +1,5 @@
 class QuizQuestionnairesController < QuestionnairesController
+  include AuthorizationHelper
 
   #Quiz questionnaire edit option to be allowed for student
   def action_allowed?

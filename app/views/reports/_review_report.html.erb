@@ -1,3 +1,4 @@
+<% @l = -1 %>
 <!-- the table creation is changed top accommodate functionality of tablesorter, which requires thead and tbody seperately. Previously, headers were in tbody only -->
 <div class='reviewreport'>
   <!-- Added headers for tablesorter -->
@@ -56,7 +57,7 @@
     </tr>
     </thead>
     <tbody>
-
+    <% timeHash = Hash.new %>
     <!-- Set the review data and row span for each reviewer -->
     <% sort_reviewer_by_review_volume_desc.each do |reviewer| %>
       <% @response_maps, @rspan = get_data_for_review_report(@id, reviewer.id, @type) %>

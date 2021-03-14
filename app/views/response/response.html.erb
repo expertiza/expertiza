@@ -36,6 +36,46 @@
   })();
 
   jQuery(document).ready(function() {
+    var map_id = <%= @map.id %>;
+    var round = <%= @current_round %>;
+    
+    // This interval ensures that we are constantly checking whether or not the user is focusing
+    // on the report or on another tab/application. Polling is an inefficient method, but since
+    // Expertiza text boxes are generated as iFrames it is one of the easiest, consistent methods.
+    setInterval(function checkFocus() {
+      // If the document isn't losing focus to itself (iFrame to iFrame, window to iFrame, etc)
+      if (checkFocus.prev == document.hasFocus()) {
+        return;
+      }
+      if (document.hasFocus()) {
+        // starTime is a function written in E1791 - it creates an entry in the database that
+        // is identified by a "link" which we just call "Expertiza Review."
+        startTime(map_id, round, "Expertiza Review");
+      } else {
+        endTime("Expertiza Review");
+      }
+      checkFocus.prev = document.hasFocus();
+    }, 50);
+   
+    function startTime(map_id, round, link) {
+          var t = new Date();
+          $.ajax({
+            type: "POST",
+            url: '/submission_viewing_events/record_start_time',
+            data: $.param({submission_viewing_event:{map_id: map_id, round: round, link: link, start_at: ISODateString(t)}})
+          });
+        }
+    function endTime(link){
+            var t = new Date();
+            $.ajax({
+              type: 'POST',
+              dataType: 'json',
+              async: false,
+              url: '/submission_viewing_events/record_end_time',
+              data: $.param({submission_viewing_event: {map_id: map_id, round: round, link: link, end_at: ISODateString(t)}
+                })
+            });
+          }
 
     //use barrating for dropdown
     $('.review-rating').each(function(index, el) {
@@ -322,12 +362,16 @@
             <% end %>
         <% end %>
 
+        <% @submission_check = true %>
+        <%= hidden_field_tag :timeout_flag, :id => 'timeout_flag', :value => 'false' %>
+        <%= hidden_field_tag :restart_link_timing_flag, :id => 'restart_link_timing_flag', :value => 'false' %>
+        <%= hidden_field_tag :restart_file_timing_flag, :id => 'restart_file_timing_flag', :value => 'false' %>
         <%if @assignment.teams?%>
             <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-            <%= render :partial => 'submitted_content/main', :locals => {:reviewee_participant => @contributor.participants.first,:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(topic_id)} %>
+            <%= render :partial => 'submitted_content/main', :locals => {:reviewee_participant => @contributor.participants.first,:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(topic_id), :map_id => @map.id, :submission_check => @submission_check, :round => @current_round} %>
         <%else%>
             <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-            <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage => @assignment.get_current_stage(topic_id)} %>
+            <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor, :stage => @assignment.get_current_stage(topic_id), :map_id => @map.id, :submission_check => @submission_check, :round => @current_round} %>
         <%end%>
         <hr/>
     <% end %>
@@ -455,3 +499,86 @@
 </script>
 <div id="BackLink"><a href="javascript:window.history.back()">Back</a></div>
 <div id="dialog-message" style="word-wrap: normal"></div>
+
+<% if @submission_check %>
+  <script type="text/javascript">
+    $(document).ready(function(){
+      var map_id = <%= @map.id %>;
+      var round = <%= @current_round %>;
+      var current_window_timer = null;
+      var auto_window_timer = null;
+      var time_out_interval = 120000; // in milliseconds, checkout end time when not interaction on review page
+      var time_period = 30000; // automatically record end time every minute
+      var timer_flag = false;
+      startTimer();
+      resetTimer();
+      autoTimer();
+
+      function startTimer() {
+          // resetTimer();
+          // autoTimer();
+          $("#timeout_flag").val("false");
+          $("#restart_file_timing_flag").val("true");
+          $("#restart_link_timing_flag").val("true");
+          document.onload = resetTimer;      // page is loaded
+          document.onmousemove = resetTimer; // mouse moves over an element
+          document.onkeypress = resetTimer;  // user presses key on keyboard
+          document.onmousedown = resetTimer; // mouse is pressed on element
+          document.ontouchstart = resetTimer;// user touches on an element (relevant for touchscreen)
+          document.onclick = resetTimer;     // user clicks on an element
+          document.onscroll = resetTimer;    // scrolling with arrow keys
+      }
+
+      function resetTimer() {
+          clearTimeout(current_window_timer);
+          current_window_timer = setTimeout(timeoutAction, time_out_interval);
+          timer_flag = true;
+      }
+
+      function autoTimer(){
+          clearInterval(auto_window_timer);
+          auto_window_timer = setInterval(autoRecordTime, time_period);
+      }
+
+      function timeoutAction(){
+        window.focus();
+        timer_flag = false;
+        markEndTime();
+        if(confirm("Are you still reviewing your submissions? Press OK to continue")){
+          startTimer();
+          resetTimer();
+        } else {
+          clearTimeout(current_window_timer);
+          clearInterval(auto_window_timer);
+          $("#timeout_flag").val("true");
+          //markEndTime();
+          alert("The page has not been interacted for a long time, and will close reference windows and go back!");
+          window.history.back();
+        }
+      }
+
+      function autoRecordTime(){
+        markEndTime();
+        if (timer_flag == true){
+          startTimer();
+        }
+      }
+
+      function markEndTime() {
+        var  t = new Date();
+        $.ajax({
+          type: 'POST',
+          dataType: 'json',
+          async: false,
+          url: '/submission_viewing_events/mark_end_time',
+          data: $.param({
+            submission_viewing_event: {map_id: map_id, round: round, end_at: ISODateString(t)}
+            })
+        });
+      }
+      $(":submit").click(function(){
+          markEndTime();
+      });
+    });
+  </script>
+<% end %> 

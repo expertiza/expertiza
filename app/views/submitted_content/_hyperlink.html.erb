@@ -12,9 +12,10 @@
     <%= f.hidden_field :participant_id, value: participant.id %>
     </br>
   <% end %>
-
+  
   <a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;">hide links</a><br/>
-  <div id="url" style="">
+  <!-- Setting user-select to none prevents users from copy-pasting url links -->
+  <div id="url" style="user-select: none">
     <ul>
       <% participant.team.hyperlinks.each_with_index {
         |link, index| %>
@@ -26,10 +27,120 @@
             <input type="radio" id='chk_links' name='chk_links' value="<%= index %>"/>
           <% end %>
         <% end %>
-              <a href="<%= link %>" target="_blank"><%= link %></a>
-              <br/>
+        <% if local_assigns[:submission_check] %>
+          <a href="<%= link %>" class="review_link"><%= link %></a>
+        <% else %>
+          <a href="<%= link %>" target="_blank"><%= link %></a>
+        <% end %>
+        <br/>
       <% end %>
       <% } %>
     </ul>
   </div>
+  <% if local_assigns[:submission_check] %>
+    <script type="text/javascript">
+      function ISODateString(date){
+        function pad(num){return num<10? '0'+num: num;}
+        return date.getUTCFullYear()+'-'
+                  + pad(date.getUTCMonth()+1) + '-'
+                  + pad(date.getUTCDate()) + ' '
+                  + pad(date.getUTCHours()) + ':'
+                  + pad(date.getUTCMinutes()) + ':'
+                  + pad(date.getUTCSeconds());
+      }
+      $(document).ready(function(){	    
+        var map_id = <%= @map.id %>;
+        var round = <%= @current_round %>;
+        var time_out_interval = 500; // in milliseconds
+        var linksToUpdate = {};
+        var windowsToClose = new Array();
+        $("#url a.review_link").on("contextmenu", function() {
+          return false;
+        });
+        $("#url a.review_link").on("auxclick", function(e) {
+          e.preventDefault();
+        });
+		window.onbeforeunload = function(){
+		  markEndTime();
+		  while (windowsToClose!=null && windowsToClose.length>0){
+            windowsToClose.shift().close();
+          }
+		}
+        function timeoutAction(timeout_flag){
+          if (timeout_flag) {
+            markEndTime();
+            while (windowsToClose!=null && windowsToClose.length>0){
+              windowsToClose.shift().close();
+            }
+          }
+          restart_link_timing_flag = $("#restart_link_timing_flag").val()=='true';
+          if (restart_link_timing_flag) {
+            for (link in linksToUpdate) {
+              if (linksToUpdate[link]) {
+                startTime(map_id, round, link);
+              }
+            }
+            $("#restart_link_timing_flag").val('false');
+          }
+        }
+        function startTime(map_id, round, link) {
+          var t = new Date();
+          $.ajax({
+            type: "POST",
+            url: '/submission_viewing_events/record_start_time',
+            data: $.param({submission_viewing_event:{map_id: map_id, round: round, link: link, start_at: ISODateString(t)}})
+          });
+        }
+        function markEndTime() {
+          var  t = new Date();
+          $.ajax({
+            type: 'POST',
+            dataType: 'json',
+            async: false,
+            url: '/submission_viewing_events/mark_end_time',
+            data: $.param({
+              submission_viewing_event: {map_id: map_id, round: round, end_at: ISODateString(t)}
+              })
+          });
+        }
+        $("#url a.review_link").click(function linkAction(event){		  
+          event.preventDefault();
+          var link_handler = $(this); // current link
+          var address = link_handler.attr("href"); // url address of the current link		  
+		  if(address in linksToUpdate){
+		    if(linksToUpdate[address]==true){
+			  return; //if the address in already present in the array, prevent the user from opening it again
+			}
+		  }
+          var window_handler = window.open(address); // open link in new window/tag
+          windowsToClose.push(window_handler);
+          $("#restart_link_timing_flag").val('false');
+          startTime(map_id, round, address);
+          linksToUpdate[address] = true;
+          var link_timer = setInterval(checkWindowStatus, time_out_interval); // check window open/close every second
+          function endTime(link){
+            var t = new Date();
+            $.ajax({
+              type: 'POST',
+              dataType: 'json',
+              async: false,
+              url: '/submission_viewing_events/record_end_time',
+              data: $.param({
+                submission_viewing_event: {map_id: map_id, round: round, link: link, end_at: ISODateString(t)}
+                })
+            });
+          }
+          function checkWindowStatus(){
+            timeout_flag = $('#timeout_flag').val()=='true';
+            if (window_handler.closed){
+              endTime(address);
+              linksToUpdate[address] = false;
+              clearInterval(link_timer);
+            }
+            timeoutAction(timeout_flag);
+          }
+        });
+      });
+    </script>
+  <% end %>
 <% end %>

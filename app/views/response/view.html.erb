@@ -6,7 +6,8 @@
 
 <% if !(@map.instance_of? TeammateReviewResponseMap) && !@map.survey? && !(@map.instance_of? BookmarkRatingResponseMap) %>
   <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
-  <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(topic_id)} %>
+  <% submission_check = false %>
+  <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(topic_id), :submission_check => @submission_check, :map_id => @map.id, :round => @round} %>
 <% end %>
 
 <!-- Added a checkbox to enable students to mark their review as a sample for others, by E2022 @SujalAhrodia -->

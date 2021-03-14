@@ -2,6 +2,7 @@
 <!--including tinymce javascript-->
 <%= tinymce_assets %>
 <%= tinymce %>
+<% javascript_include_tag "review_time" %>
 <script>
 
   /*
@@ -52,30 +53,10 @@
         // is identified by a "link" which we just call "Expertiza Review."
         startTime(map_id, round, "Expertiza Review");
       } else {
-        endTime("Expertiza Review");
+        endTime(map_id, round, "Expertiza Review");
       }
       checkFocus.prev = document.hasFocus();
     }, 50);
-   
-    function startTime(map_id, round, link) {
-          var t = new Date();
-          $.ajax({
-            type: "POST",
-            url: '/submission_viewing_events/record_start_time',
-            data: $.param({submission_viewing_event:{map_id: map_id, round: round, link: link, start_at: ISODateString(t)}})
-          });
-        }
-    function endTime(link){
-            var t = new Date();
-            $.ajax({
-              type: 'POST',
-              dataType: 'json',
-              async: false,
-              url: '/submission_viewing_events/record_end_time',
-              data: $.param({submission_viewing_event: {map_id: map_id, round: round, link: link, end_at: ISODateString(t)}
-                })
-            });
-          }
 
     //use barrating for dropdown
     $('.review-rating').each(function(index, el) {
@@ -543,7 +524,7 @@
       function timeoutAction(){
         window.focus();
         timer_flag = false;
-        markEndTime();
+        markEndTime(map_id, round);
         if(confirm("Are you still reviewing your submissions? Press OK to continue")){
           startTimer();
           resetTimer();
@@ -551,33 +532,20 @@
           clearTimeout(current_window_timer);
           clearInterval(auto_window_timer);
           $("#timeout_flag").val("true");
-          //markEndTime();
           alert("The page has not been interacted for a long time, and will close reference windows and go back!");
           window.history.back();
         }
       }
 
       function autoRecordTime(){
-        markEndTime();
-        if (timer_flag == true){
+        markEndTime(map_id, round);
+        if (timer_flag === true){
           startTimer();
         }
       }
 
-      function markEndTime() {
-        var  t = new Date();
-        $.ajax({
-          type: 'POST',
-          dataType: 'json',
-          async: false,
-          url: '/submission_viewing_events/mark_end_time',
-          data: $.param({
-            submission_viewing_event: {map_id: map_id, round: round, end_at: ISODateString(t)}
-            })
-        });
-      }
       $(":submit").click(function(){
-          markEndTime();
+          markEndTime(map_id, round);
       });
     });
   </script>

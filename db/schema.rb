@@ -11,9 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
 ActiveRecord::Schema.define(version: 20201125202200) do
-
 
   create_table "account_requests", force: :cascade do |t|
     t.string   "name",              limit: 255
@@ -659,10 +657,10 @@ ActiveRecord::Schema.define(version: 20201125202200) do
   end
 
   create_table "suggestion_comments", force: :cascade do |t|
-    t.text     "comments",      limit: 65535
-    t.string   "commenter",     limit: 255
-    t.string   "vote",          limit: 255
-    t.integer  "suggestion_id", limit: 4
+    t.text     "comments",           limit: 65535
+    t.string   "commenter",          limit: 255
+    t.string   "vote",               limit: 255
+    t.integer  "suggestion_id",      limit: 4
     t.datetime "created_at"
     t.boolean  "visible_to_student",               default: false
   end

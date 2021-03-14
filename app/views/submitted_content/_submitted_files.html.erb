@@ -54,15 +54,6 @@
   <% if local_assigns[:submission_check] %>
     <script type="text/javascript">
       var supported_file_type = ["pdf", "txt", "doc", "ppt", "png", "jpg"];
-      function ISODateString(date){
-        function pad(num){return num<10? '0'+num: num;}
-        return date.getUTCFullYear()+'-'
-                  + pad(date.getUTCMonth()+1) + '-'
-                  + pad(date.getUTCDate()) + ' '
-                  + pad(date.getUTCHours()) + ':'
-                  + pad(date.getUTCMinutes()) + ':'
-                  + pad(date.getUTCSeconds());
-      }
       $(document).ready(function(){
         var map_id = <%= @map.id %>;
         var round = <%= @current_round %>;

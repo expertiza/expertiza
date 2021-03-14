@@ -44,7 +44,7 @@ class QuizQuestionnairesController < QuestionnairesController
     valid = validate_quiz
     if valid.eql?("valid")
       @questionnaire = QuizQuestionnaire.new(questionnaire_params)
-      participant_id = params[:pid] # creating a local variable to send as parameter to submitted content if it is a quiz questionnaire
+      participant_id = params[:pid] # Gets the participant id to be used when finding team and editing submitted content
       @questionnaire.min_question_score = params[:questionnaire][:min_question_score] # 0
       @questionnaire.max_question_score = params[:questionnaire][:max_question_score] # 1
       

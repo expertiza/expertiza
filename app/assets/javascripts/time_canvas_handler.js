@@ -1,6 +1,6 @@
 
 //this function render the pie chat for time tracking detail
-function drawTimeCanvas(data,tb) {
+function drawTimeCanvas(chartdata,resd) {
     //initializing the timeModal view
     $("#timeModalBody").empty().html("<div class=\"time-canvas-container\">" +
         "<canvas id=\"timeCanvas\" width=\"300\" height=\"300\"></canvas>"+
@@ -13,14 +13,27 @@ function drawTimeCanvas(data,tb) {
         "</tr>" +
         "</table>");
 
-    //var isTooLong = tb.objs.length > 2;
+    for(var i = 0 ; i < tb.length ; i++){
 
-    var mdata = [12, 19, 9];
+        var d = resd[0];
+        $('#timeTable :last-child').append("<tr>" +
+            "<td>" + d.subject + "</td>" +
+            "<td>" + d.timecost + "</td>" +
+            "<td>" + d.clsavg + "</td>" +
+            "</tr>");
+
+    }
+
+    $('#timeTable :last-child').append("<tr>" +
+        "<td>Total</td>" +
+        "<td>" + resd.total + "</td>" +
+        "<td>" + resd.totalavg + "</td>" +
+        "</tr>");
 
     var ctx = $("#timeCanvas").get(0).getContext("2d");
     var pieChart = new Chart(ctx, {
         type: 'pie',
-        data: data,
+        data: chartdata,
         options:{
             plugins: {
                 colorschemes: {
@@ -32,11 +45,11 @@ function drawTimeCanvas(data,tb) {
 }
 
 //this function pop up the modal and do AJAX call to load time tracking data.
-function displayTimeDetail(resp_map_id){
+function displayTimeDetail(resp_map_id,round){
     $("#timeModalBody").empty().html("<p>Loading data...(This might need few seconds)</p>")
     $("#timeModal").show();
     $.ajax({
-        url: "Url_placeholder",
+        url: "Url_placeholder?response_map_id=" + resp_map_id + "&round=" + round ,
         method: 'GET',
         dataType: 'json',
         success: function (respond) {
@@ -48,7 +61,7 @@ function displayTimeDetail(resp_map_id){
                 }]
             };
 
-            drawTimeCanvas(chartData,repond.tables);
+            drawTimeCanvas(chartData,respond.tables);
         },
         error: function(xhr, textStatus, errorThrown){
             $("#timeModalBody").empty().html("<p>Failed, cannot get time details at this time..</p>")

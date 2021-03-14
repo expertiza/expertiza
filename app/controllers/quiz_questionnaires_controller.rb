@@ -49,7 +49,7 @@ class QuizQuestionnairesController < QuestionnairesController
       @questionnaire.max_question_score = params[:questionnaire][:max_question_score] # 1
       
 
-      author_team = AssignmentTeam.team(Participant.find(participant_id))
+      author_team = AssignmentTeam.team(Participant.find(participant_id)) # Gets the participant's team for the assignment
 
       @questionnaire.instructor_id = author_team.id # for a team assignment, set the instructor id to the team_id
 

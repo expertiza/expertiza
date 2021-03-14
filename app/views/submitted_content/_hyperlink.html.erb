@@ -38,6 +38,7 @@
       <% } %>
     </ul>
   </div>
+
   <% if local_assigns[:submission_check] %>
     <script type="text/javascript">
         function ISODateString(date) {
@@ -54,68 +55,83 @@
         }
 
         $(document).ready(function () {
-            var map_id = <%= @map.id %>;
-            var round = <%= @current_round %>;
+            var map_id = <%= @map.id %>; // map_id from response
+            var round = <%= @current_round %>; // round from response
             var time_out_interval = 500; // in milliseconds
-            var linksToUpdate = {};
-            var windowsToClose = [];
-            $('#url a.review_link').on("contextmenu", function () {
-                return false;
-            });
-            $("#url a.review_link").on("auxclick", function (e) {
-                e.preventDefault();
-            });
-            window.onbeforeunload = function () {
-                markEndTime(map_id, round);
-                while (windowsToClose != null && windowsToClose.length > 0) {
-                    windowsToClose.shift().close();
-                }
-            }
+            var linksToUpdate = {}; // track links to restart timing on
+            var windowsToClose = []; // track windows to close
 
-            function timeoutAction(timeout_flag) {
-                if (timeout_flag) {
-                    markEndTime(map_id, round);
-                    while (windowsToClose != null && windowsToClose.length > 0) {
-                        windowsToClose.shift().close();
-                    }
-                }
-                restart_link_timing_flag = $("#restart_link_timing_flag").val() == 'true';
-                if (restart_link_timing_flag) {
-                    for (link in linksToUpdate) {
-                        if (linksToUpdate[link]) {
-                            startTime(map_id, round, link);
-                        }
-                    }
-                    $("#restart_link_timing_flag").val('false');
-                }
-            }
+            // Prevents right click on hyperlink
+            $('#url a.review_link').on("contextmenu", function (event) {
+                event.preventDefault(); // prevents default action i.e. does nothing on right click
+            });
 
+            // Prevents middle-click on hyperlink
+            $("#url a.review_link").on("auxclick", function (event) {
+                event.preventDefault(); // prevents default action i.e. does nothing on middle click
+            });
+
+            // Occurs on click of hyperlink
             $("#url a.review_link").click(function linkAction(event) {
-                event.preventDefault();
+                event.preventDefault(); // prevents defults action of opening from occuring allowing our script to run
                 var link_handler = $(this); // current link
                 var address = link_handler.attr("href"); // url address of the current link
+
+                // If the address in already present in the array, prevent the user from opening it again
                 if (address in linksToUpdate) {
                     if (linksToUpdate[address] == true) {
-                        return; //if the address in already present in the array, prevent the user from opening it again
+                        return;
                     }
                 }
-                var window_handler = window.open(address); // open link in new window/tag
-                windowsToClose.push(window_handler);
-                $("#restart_link_timing_flag").val('false');
-                startTime(map_id, round, address);
-                linksToUpdate[address] = true;
+
+                var window_handler = window.open(address); // open link in new window/tab
+                windowsToClose.push(window_handler); // track open windows
+
+                $("#restart_link_timing_flag").val('false'); // set restart link timing false
+                startTime(map_id, round, address); // save start time of link
+                linksToUpdate[address] = true; // add link to array to track and sets true
+
                 var link_timer = setInterval(checkWindowStatus, time_out_interval); // check window open/close every second
 
+                // Checks if window closed to then track end time
                 function checkWindowStatus() {
-                    timeout_flag = $('#timeout_flag').val() == 'true';
-                    if (window_handler.closed) {
-                        endTime(map_id, round, address);
-                        linksToUpdate[address] = false;
-                        clearInterval(link_timer);
+                    timeout_flag = $('#timeout_flag').val() == 'true'; // checks for timeout flag == true and if so sets
+                    if (window_handler.closed) { // if window closed
+                        endTime(map_id, round, address); // save end time of link
+                        linksToUpdate[address] = false; // sets link in tracking array to false
+                        clearInterval(link_timer); // removes check for window open/close
                     }
-                    timeoutAction(timeout_flag);
+                    timeoutAction(timeout_flag); // if timeout flag is set, times out page
                 }
             });
+
+            // Occurs on close of page
+            window.onbeforeunload = function () {
+                markEndTime(map_id, round); // saves end time of all open links
+                while (windowsToClose != null && windowsToClose.length > 0) { // while there are open windows
+                    windowsToClose.shift().close(); // closes window on stack
+                }
+            }
+
+            // Occurs on timeout of page
+            function timeoutAction(timeout_flag) {
+                if (timeout_flag) {
+                    markEndTime(map_id, round); // save times of all pages
+                    while (windowsToClose != null && windowsToClose.length > 0) { // while there are open windows
+                        windowsToClose.shift().close(); // closes window on stack
+                    }
+                }
+                restart_link_timing_flag = $("#restart_link_timing_flag").val() == 'true'; // checks if link should start tracking again
+                if (restart_link_timing_flag) {
+                    // If link in linksToUpdate set start time
+                    for (link in linksToUpdate) {
+                        if (linksToUpdate[link]) { // if link is true in tracking array
+                            startTime(map_id, round, link); // start time tracking
+                        }
+                    }
+                    $("#restart_link_timing_flag").val('false'); // set restart flag false
+                }
+            }
         });
     </script>
   <% end %>

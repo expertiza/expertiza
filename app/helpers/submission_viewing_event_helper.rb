@@ -6,7 +6,7 @@ module SubmissionViewingEventHelper
     totalTime = 0;
 
     timeLog.each do |linkTime|
-      totalTime = totalTime + linkTime.end_at - linkTime.start_at
+      totalTime = totalTime + (linkTime.end_at - linkTime.start_at).to_i
     end
 
     return totalTime

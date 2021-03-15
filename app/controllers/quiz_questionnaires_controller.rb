@@ -240,7 +240,7 @@ class QuizQuestionnairesController < QuestionnairesController
     end
   end
 
-  # Saves choices from a questionnaire to a question id, for either True/False or Multiple Choice questions
+  # Saves choices from a questionnaire to a question, for either True/False or Multiple Choice questions
   def save_choices(questionnaire_id)
     return unless params[:new_question] or params[:new_choices]
     questions = Question.where(questionnaire_id: questionnaire_id)

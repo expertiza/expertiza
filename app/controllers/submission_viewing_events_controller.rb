@@ -76,13 +76,13 @@ class SubmissionViewingEventsController < ApplicationController
         search = {map_id: to_find[:map_id], round: to_find[:round], link: to_find[:link]}
         if(!SubmissionViewingEvent.where(search).empty?) # checks if record already exists for link
           SubmissionViewingEvent.where(search).update_all(end_at: data[:end_at]) # if yes update current entry
-        else 
-        store.hard_save(submissionviewingevent_entry) # if no create new entry
+        else
+          store.hard_save(submissionviewingevent_entry) # if no create new entry
         end
         store.remove(submissionviewingevent_entry) # remove from local storage
       end
     end
-    
+
     respond_to do |format|
       format.json { render json: @link_array }
     end

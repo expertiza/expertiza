@@ -32,7 +32,7 @@ class SubmissionViewingEventsController < ApplicationController
       record_end_time()
     end
 
-    render nothing: true
+    head :ok
   end
 
   # record time when link or file window is closed

@@ -87,6 +87,13 @@ function compare(a, b, less) {
 }
 
 // Revisions In MARCH 2021 FOR E2100 Tagging Report for Students Below This Line.
+/**************************** GLOBAL SYMBOLS AND PREFIXES **********************************/
+
+// Symbols added for users who cannot see the R/G Color spectrum well. Note that white spacing is added here as well.
+const symNoTag = "  " + "\u2298";        // Unicode universal "NO" circle-line symbol
+const symTagNotDone = " " + "\u26A0";   // Unicode Symbol Representing to-do ("Warning" Symbol)
+const symTagDone = " " + "\u2714";       // Unicode Heavy Check-Mark
+
 /********************************** ACTION HANDLERS ****************************************/
 
 // Initialize Tag Report Heat grid and hide if empty.
@@ -175,10 +182,16 @@ function updateTagGrid(tagPrompts){
         let gridCell = document.getElementById(tempId);
         // Update the heatgrid cell based on the value of this tag.
         if(tagPrompts[i].value == 0) {
+            // Change Cell Color ("NOT DONE")
             gridCell.setAttribute("class", "c1");
+            // Replace Unicode Icon
+            gridCell.innerText = gridCell.innerText.replace(/[\u{0080}-\u{FFFF}]/u, symTagNotDone);
         }
         else {
+            // Change Cell color ("DONE")
             gridCell.setAttribute("class", "c5");
+            // Replace unicode icon
+            gridCell.innerText = gridCell.innerText.replace(/[\u{0080}-\u{FFFF}]/u, symTagDone);
         }
     }
 }
@@ -276,10 +289,11 @@ function drawTagGrid(rowData) {
         for(let cIndex = 0; cIndex < gridWidth; ++cIndex) {
             let cell = trow.insertCell();
             // Set the text value of the grid cell
-            let text = document.createTextNode( "R." + reviewNum);
+            let innerText = "R." + reviewNum;
             // If review doesn't have tag prompts
             if(rowData[rIndex].get('has_tag') == false){
                 cell.setAttribute("class", "c0");
+                innerText += symNoTag;
             }
             else {
                 let idString = "tag_heatmap_id_" + rIndex + "_" + cIndex;
@@ -287,13 +301,16 @@ function drawTagGrid(rowData) {
                 if(rowData[rIndex].get('tag_list').get(cIndex).value == 0) {
                     // Set color as failing
                     cell.setAttribute("class", "c1");
+                    innerText += symTagNotDone;
                 }
                 else {
                     // Set color as successful
                     cell.setAttribute("class", "c5");
+                    innerText += symTagDone;
                 }
                 rowData[rIndex].get('tag_list').get(cIndex).setAttribute("data-tagheatmapid", idString);
             }
+            let text = document.createTextNode(innerText);
             //add to table
             cell.appendChild(text);
             addToolTip(cell, tooltipText);

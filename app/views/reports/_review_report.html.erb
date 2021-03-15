@@ -106,7 +106,7 @@
                     <!--later we can create a hyperlink question type to deal with this situation.-->
                     <%= list_hyperlink_submission(reviewer_map.id, 5386) if Assignment.find_by(id: @id.to_i).try(:course).try(:instructor).try(:name) == 'Jkidd' %>
                 <!-- Link that displays the time tracking detail -->
-                <a onclick="displayTimeDetail(<%= reviewer_map.id %>)" href="javascript:void(0);"> {time_placeholder} </a>
+                    <a onclick="displayTimeDetail(<%= reviewer_map.id %>)" href="javascript:void(0);"> <%= secondsToHuman(getTotalTime(reviewer_map.id, 1)) %> </a>
                 </div>
                 </div>
               <% end %>

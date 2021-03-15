@@ -29,6 +29,6 @@ module SubmissionViewingEventHelper
     # timeInSec now holds remaining seconds
 
     # Returns string of readable text
-    return  "#{hours} hrs #{mins} mins #{timeInSec} sec"
+    return  "#{hours} hr #{mins} min #{timeInSec} sec"
   end
 end

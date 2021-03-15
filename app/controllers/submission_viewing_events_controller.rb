@@ -6,11 +6,11 @@ class SubmissionViewingEventsController < ApplicationController
 
   # record time when link or file is opened in new window
   def record_start_time
-    data = params.require(:submission_viewing_event) # get args from triggering event
+    param_args = params[:submission_viewing_event] # get args from triggering event
     store = LocalStorage.new() # access local pstore file
 
     # check if this link is already opened and timed
-    submission_viewing_event_records = store.where(map_id: data[:map_id], round: data[:round], link: data[:link])
+    submission_viewing_event_records = store.where(map_id: param_args[:map_id], round: param_args[:round], link: param_args[:link])
 
     # if opened, end these records with current time
     if submission_viewing_event_records
@@ -26,7 +26,7 @@ class SubmissionViewingEventsController < ApplicationController
     store.save(submission_viewing_event)
 
     #if creating start time for expertiza update end times for all other links.
-    if param_args[:link]=='Expertiza Review' 
+    if param_args[:link]=='Expertiza Review'
       params[:submission_viewing_event][:link] = nil
       params[:submission_viewing_event][:end_at] = params[:submission_viewing_event][:start_at]
       record_end_time()

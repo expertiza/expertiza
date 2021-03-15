@@ -99,7 +99,7 @@ class QuizQuestionnairesController < QuestionnairesController
         @question.save
         @quiz_question_choices = QuizQuestionChoice.where(question_id: qid)
         question_index = 1
-        @quiz_question_choices.each do |question_choice|
+        @quiz_question_choices.each do |question_choice| # Updates state of each question choice for selected question
           # Call private methods to handle question types
           update_checkbox(question_choice, question_index) if @question.type == "MultipleChoiceCheckbox"
           update_radio(question_choice, question_index) if @question.type == "MultipleChoiceRadio"

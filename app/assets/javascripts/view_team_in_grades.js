@@ -203,7 +203,11 @@ function drawTagGrid(rowData) {
     let tooltipText = "Color Legend:\nGrey: no tags available\nRed: tag not complete\nGreen: tag complete.";
     let headerTooltipText = "Tag Fraction Color Scaled by:\nRed: 0-30% tags completed\nOrange: 30-60% tags completed\nYellow: 60-99% Tags Completed\nGreen: All tags completed";
 
-    //load table object
+    // Handle multi-round reviews and initialize prefix which will become "Round # -- " if multiple rounds
+    let numRounds = countRounds(rowData);
+    let roundPrefix = "";
+
+    // Load table object
     let table = document.getElementById("tag_heat_grid");
 
     // Set basic table attributes
@@ -255,7 +259,10 @@ function drawTagGrid(rowData) {
             addToolTip(cell, tooltipText);
             trow.id = "hg_row" + questionNum + "_" + reviewNum;
             trow.setAttribute("data-questionnum", questionNum);
-            let text = document.createTextNode("Round " + roundNum + " -- Question " + questionNum);
+            if(numRounds > 1) {
+                roundPrefix = "Round " + roundNum + " -- ";
+            }
+            let text = document.createTextNode( roundPrefix + "Question " + questionNum);
             cell.appendChild(text);
             // Initialize new row to be used by the inner loop for reviews.
             trow = tbody.insertRow();
@@ -355,3 +362,23 @@ function countOnOffTags(tagPrompts){
     return countMap;
 }
 
+// Determine number of rounds in this review dataset
+// For now, because of the broken round numbers in the backend, use changes in question number to find rounds
+function countRounds(rowData) {
+    let numRounds = 1;
+/*    let round = 0;
+    for(const row of rowData) {
+        if(row.get('round_num')>round) {
+            ++numRounds;
+        }
+    }*/
+    let questionNum = 1;
+    for(const row of rowData) {
+        if(row.get('question_num') < questionNum) {
+            ++numRounds;
+        }
+        questionNum = row.get('question_num');
+
+    }
+    return numRounds;
+}

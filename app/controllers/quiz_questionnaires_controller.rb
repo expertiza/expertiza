@@ -240,7 +240,7 @@ class QuizQuestionnairesController < QuestionnairesController
     end
   end
 
-  # save choice type and create template for the same
+  # Saves choices from a questionnaire to a question, for either True/False or Multiple Choice questions
   def save_choices(questionnaire_id)
     return unless params[:new_question] or params[:new_choices]
     questions = Question.where(questionnaire_id: questionnaire_id)

@@ -16,4 +16,15 @@ module SubmissionViewingEventHelper
 
   end
 
+  # Returns time in readable text (i.e. 1 hr 2 min 3 sec) given number of seconds
+  def secondsToHuman(timeInSec)
+    
+    hours = timeInSec/3600
+    timeInSec = timeInSec%3600
+
+    mins = timeInSec/60
+    timeInSec = timeInSec%60
+
+    return hours.to_s + " hours " + mins.to_s + " min " + timeInSec + " sec"
+  end
 end

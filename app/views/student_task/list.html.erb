@@ -2,7 +2,7 @@
 <%= render 'publishing_rights' %>
 
 <div style="">
-  <div class="taskbox">
+  <div class="taskbox" style="width:18%; display: inline; float:left; margin-right: 10px;" >
     <strong>&nbsp;&nbsp;<span class="tasknum">&nbsp;<%= @tasknotstarted.size.to_s %>&nbsp;</span> Tasks not yet started<br></strong><br>
 
     <% @tasknotstarted.each do |student_task|
@@ -83,12 +83,9 @@
         <% end %>
     <% end %>
 <% end %>
-
-</div>
-</div>
-
-<div class="topictable">
-  <table class="table table-striped" cellpadding="2">
+</div><!--
+<div class="topictable" style="float: left;width: 80%;margin-bottom: 10px; display: inline; ">  
+ <table class="table table-striped" cellpadding="2">
     <tr class="taskheader">
       <th>Assignment</th>
       <th>Course</th>
@@ -134,4 +131,5 @@
       <% end %>
     <% end %>
   </table>
+</div>
 </div>

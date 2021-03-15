@@ -18,13 +18,17 @@ module SubmissionViewingEventHelper
 
   # Returns time in readable text (i.e. 1 hr 2 min 3 sec) given number of seconds
   def secondsToHuman(timeInSec)
-    
+
+    # Calculates number of hours and subtracts
     hours = timeInSec/3600
     timeInSec = timeInSec%3600
 
+    # Calculates number of minutes and subtracts
     mins = timeInSec/60
     timeInSec = timeInSec%60
+    # timeInSec now holds remaining seconds
 
-    return hours.to_s + " hours " + mins.to_s + " min " + timeInSec + " sec"
+    # Returns string of readable text
+    return  "#{hours} hours #{mins} mins #{timeInSec} sec"
   end
 end

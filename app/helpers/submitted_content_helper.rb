@@ -127,16 +127,6 @@ module SubmittedContentHelper
   class LocalSubmittedContent
     attr_accessor :map_id, :round, :link, :start_at, :end_at, :created_at, :updated_at
 
-    def initialize(**args)
-      @map_id = args.fetch(:map_id, nil)
-      @round = args.fetch(:round, nil)
-      @link = args.fetch(:link, nil)
-      @start_at = args.fetch(:start_at, nil)
-      @end_at = args.fetch(:end_at, nil)
-      @created_at = args.fetch(:created_at, nil)
-      @updated_at = args.fetch(:updated_at, nil)
-    end
-
     def initialize(args)
       @map_id = args.fetch(:map_id, nil)
       @round = args.fetch(:round, nil)

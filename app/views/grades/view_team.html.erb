@@ -179,7 +179,11 @@
                             <tr>
                               <td>Review <%=index + 1%></td>
                               <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
-                              <td id="<%= 'rr'+ j.to_s + '_' + index.to_s %>" data-round="<%=vm.round.to_s %>" data-qNum="<%= j.to_s %>" data-rNum="<%= index.to_s %>" data-hasTag="<%= row.score_row[index].vm_prompts.count > 0 ? "true":"false"%>">
+                              <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
+                                <td id="<%= 'rr'+ j.to_s + '_' + index.to_s %>" data-round="<%=vm.round.to_s %>" data-qNum="<%= j.to_s %>" data-rNum="<%= index.to_s %>" data-hasTag="<%= row.score_row[index].vm_prompts.count > 0 ? "true":"false"%>">
+                              <% else %>
+                                <td>
+                              <% end %>
                                 <%= row.score_row[index].comment.html_safe unless row.score_row[index].comment.nil?  %>
                                 <% if row.score_row[index].vm_prompts.count > 0 %>
                                     <div class="tag_prompt_container">

@@ -90,7 +90,15 @@ class SubmissionViewingEventsController < ApplicationController
 
   def getTimingDetails
     require 'json'
+    puts params[:reponse_map_id]
+    puts params[:round]
 
+    timingEntries = SubmissionViewingEvent.where(map_id: params[:reponse_map_id], round: params[:round])
+
+    timingEntries.each do |entry|
+      puts entry.link
+    end
+    
     @timingDetails = {
         'Labels'=> [],
         'Data' => [],

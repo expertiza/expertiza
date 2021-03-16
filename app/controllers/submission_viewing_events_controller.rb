@@ -88,6 +88,17 @@ class SubmissionViewingEventsController < ApplicationController
     end
   end
 
+  def getTimingDetails
+    require 'json'
+
+    puts params[:round]
+    @timingDetails
+
+    respond_to do |format|
+      format.json {render json: @timingDetails}
+    end
+  end
+
   private
 
   # Only allow a trusted parameter "white list" through.

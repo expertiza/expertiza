@@ -1,3 +1,8 @@
+#timeModalBody{
+    overflow: auto;
+    height:428px;
+}
+
 .time-canvas-container{
     width: 250px !important;
     height: 250px !important;
@@ -7,21 +12,25 @@
 .time-table {
     margin: 10px auto;
     width: 100%;
-    border: 1px solid black;
-    border-collapse: collapse;
+    border: none;
 }
 
-#timeTable tr:nth-child(even) {
+#timeTableBody tr:nth-child(even) {
     background-color: #eee;
 }
 
-#timeTable tr:nth-child(odd) {
-    background-color: #fff;
+#timeTableBody tr:nth-child(odd) {
+    background-color: lightgrey;
 }
 
 #timeTable th {
     background-color: darkred;
     color: white;
+}
+
+#timeTable td {
+    padding: 0.6em;
+    color: black;
 }
 
 .t-modal {

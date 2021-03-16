@@ -1,20 +1,29 @@
 
 //this function render the pie chat for time tracking detail
 function drawTimeCanvas(chartdata,resd) {
+
+    if(resd.length == 0 || chartdata.datasets.data.length == 0){
+        $("#timeModalBody").empty().html("<p>This review has no time detail avaliable</p>");
+        return;
+    }
+
     //initializing the timeModal view
     $("#timeModalBody").empty().html("<div class=\"time-canvas-container\">" +
         "<canvas id=\"timeCanvas\" width=\"300\" height=\"300\"></canvas>"+
         "</div>"+
         "<table id=\"timeTable\" class=\"time-table\">"+
+        "<tbody id=\"timeTableBody\">"+
         "<tr>"+
         "<th>Subject</th>"+
         "<th>Time</th>"+
         "<th>Avg.</th>"+
         "</tr>" +
+        "</tbody>" +
         "</table>");
 
-    for(var i = 0 ; i < resd.length ; i++){
+    console.log(resd.length)
 
+    for(var i = 0 ; i < resd.length ; i++){
         var d = resd[0];
         $('#timeTable :last-child').append("<tr>" +
             "<td>" + d.subject + "</td>" +
@@ -24,7 +33,7 @@ function drawTimeCanvas(chartdata,resd) {
 
     }
 
-    $('#timeTable :last-child').append("<tr>" +
+    $('#timeTable > :last-child').append("<tr>" +
         "<td>Total</td>" +
         "<td>" + resd.total + "</td>" +
         "<td>" + resd.totalavg + "</td>" +
@@ -64,6 +73,8 @@ function displayTimeDetail(resp_map_id,round){
                     borderWidth: 1
                 }]
             };
+
+            console.log(jsonResponse);
 
             drawTimeCanvas(chartData,jsonResponse.tables);
         },

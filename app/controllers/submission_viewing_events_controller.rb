@@ -1,7 +1,51 @@
 class SubmissionViewingEventsController < ApplicationController
   include SubmittedContentHelper
+
+  before_action :ensure_store
+
   def action_allowed?
     true
+  end
+
+  def record_start_time2
+    args = request_params
+    # TODO:
+    #   record the start time for the link provided in the request args
+    #   assumption: only one record should exist for a given map_id, round, link combination
+
+    start_time = Time.at(args[:start_at]).to_datetime
+
+    # check for pre-existing record
+    records = @store.where(
+      map_id: args[:map_id],
+      round: args[:round],
+      link: args[:link]
+    )
+
+    if records
+      record = records[0]
+      record.start_at = start_time
+      record.end_at = nil
+    else
+      record = LocalSubmittedContent.new(args)
+      record.start_at = start_time
+      record.end_at = nil
+      @store.save(record)
+    end
+  end
+
+  def record_end_time2
+    args = request_params
+    # TODO:
+    #   record end time for the link provided in the request args
+    #   _or_ all links if none is provided
+  end
+
+  def hard_save
+    args = request_params
+    # TODO:
+    #   hard save all links in local storage
+    #   remove them from local storage
   end
 
   # record time when link or file is opened in new window
@@ -22,7 +66,7 @@ class SubmissionViewingEventsController < ApplicationController
     end
 
     # create new response time record for current link
-    submission_viewing_event = LocalSubmittedContent.new(submission_viewing_event_params)
+    submission_viewing_event = LocalSubmittedContent.new(request_params)
     store.save(submission_viewing_event)
 
     #if creating start time for expertiza update end times for all other links.
@@ -91,7 +135,13 @@ class SubmissionViewingEventsController < ApplicationController
   private
 
   # Only allow a trusted parameter "white list" through.
-  def submission_viewing_event_params
+  def request_params
     params.require(:submission_viewing_event).permit(:map_id, :round, :link, :start_at, :end_at)
+  end
+
+  def ensure_store
+    unless @store
+      @store = LocalStorage.new
+    end
   end
 end

@@ -1,5 +1,6 @@
 class SubmissionViewingEventsController < ApplicationController
   include SubmittedContentHelper
+  include SubmissionViewingEventHelper
   def action_allowed?
     true
   end

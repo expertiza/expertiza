@@ -1,5 +1,6 @@
 module SubmittedContentHelper
   require 'pstore'
+
   def display_directory_tree(participant, files, display_to_reviewer_flag)
     index = 0
     participant = @participant if @participant # TODO: Verify why this is needed
@@ -30,7 +31,7 @@ module SubmittedContentHelper
           #                                     :id => participant.id,
           #                                     :download => File.basename(file),
           #                                     "current_folder[name]" => File.dirname(file)
-          ret += link_to File.basename(file), {:controller => 'submitted_content', :action => 'download', :id => participant.id, :download => File.basename(file), "current_folder[name]" => File.dirname(file)}, :class => "fileLink", :download => File.basename(file).to_s
+          ret += link_to File.basename(file), { :controller => 'submitted_content', :action => 'download', :id => participant.id, :download => File.basename(file), "current_folder[name]" => File.dirname(file) }, :class => "fileLink", :download => File.basename(file).to_s
         end
         ret += "\n   </td>\n   <td valign = top>\n"
         ret += File.size(file).to_s
@@ -118,43 +119,43 @@ module SubmittedContentHelper
       # The zip file is no longer needed, so delete it
       File.delete(file_name)
     end
-  # rescue
-  # end
-end
+    # rescue
+    # end
+  end
 
   #Holds information related to a link pressed during a review
   class LocalSubmittedContent
-    attr_accessor :map_id, :round, :link , :start_at, :end_at, :created_at, :updated_at
+    attr_accessor :map_id, :round, :link, :start_at, :end_at, :created_at, :updated_at
 
     def initialize(**args)
-      @map_id = args.fetch(:map_id,nil)
-      @round = args.fetch(:round,nil)
-      @link = args.fetch(:link,nil)
-      @start_at = args.fetch(:start_at,nil)
-      @end_at = args.fetch(:end_at,nil)
-      @created_at = args.fetch(:created_at,nil)
-      @updated_at = args.fetch(:updated_at,nil)
+      @map_id = args.fetch(:map_id, nil)
+      @round = args.fetch(:round, nil)
+      @link = args.fetch(:link, nil)
+      @start_at = args.fetch(:start_at, nil)
+      @end_at = args.fetch(:end_at, nil)
+      @created_at = args.fetch(:created_at, nil)
+      @updated_at = args.fetch(:updated_at, nil)
     end
 
     def initialize(args)
-      @map_id = args.fetch(:map_id,nil)
-      @round = args.fetch(:round,nil)
-      @link = args.fetch(:link,nil)
-      @start_at = args.fetch(:start_at,nil)
-      @end_at = args.fetch(:end_at,nil)
-      @created_at = args.fetch(:created_at,nil)
-      @updated_at = args.fetch(:updated_at,nil)
+      @map_id = args.fetch(:map_id, nil)
+      @round = args.fetch(:round, nil)
+      @link = args.fetch(:link, nil)
+      @start_at = args.fetch(:start_at, nil)
+      @end_at = args.fetch(:end_at, nil)
+      @created_at = args.fetch(:created_at, nil)
+      @updated_at = args.fetch(:updated_at, nil)
     end
 
     #Turns a LocalSubmittedContent object into a hash
     def to_h()
-        return {map_id: @map_id, round: @round, link: @link, start_at: @start_at, end_at: @end_at, created_at: @created_at, updated_at: @updated_at}
+      return { map_id: @map_id, round: @round, link: @link, start_at: @start_at, end_at: @end_at, created_at: @created_at, updated_at: @updated_at }
     end
 
     def ==(other)
       return @map_id = other.map_id && @round == other.round && @link == other.link &&
-      @start_at == other.start_at && @end_at == other.end_at &&
-      @created_at == other.created_at && @updated_at == other.updated_at
+        @start_at == other.start_at && @end_at == other.end_at &&
+        @created_at == other.created_at && @updated_at == other.updated_at
     end
 
   end

@@ -161,7 +161,7 @@ module SubmittedContentHelper
     end
 
     def ==(other)
-      @map_id = other.map_id and
+      @map_id == other.map_id and
         @round == other.round and
         @link == other.link and
         @start_at == other.start_at and

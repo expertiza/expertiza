@@ -159,7 +159,7 @@ class QuizQuestionnairesController < QuestionnairesController
     valid
   end
 
-  # create checkbox question
+  # update checkbox question
   def update_checkbox(question_choice, question_index)
     if params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s]
       question_choice.update_attributes(iscorrect: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:iscorrect], txt: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:txt])
@@ -188,7 +188,7 @@ class QuizQuestionnairesController < QuestionnairesController
     end
   end
 
-  # update multiple choice (radio or checkbox) question(s)
+  # create multiple choice (radio or checkbox) question(s)
   def create_multchoice(question, choice_key, q_answer_choices)
     # this method combines the functionality of create_radio and create_checkbox, so that all mult choice questions are create by 1 func
     q = if q_answer_choices[choice_key][:iscorrect] == 1.to_s

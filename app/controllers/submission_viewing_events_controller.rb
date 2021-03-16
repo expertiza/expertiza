@@ -92,16 +92,19 @@ class SubmissionViewingEventsController < ApplicationController
   def getTimingDetails
     require 'json'
     labels = []
+    percentages = []
+    totalTime = getTotalTime(params[:reponse_map_id], params[:round])
 
     timingEntries = SubmissionViewingEvent.where(map_id: params[:reponse_map_id], round: params[:round])
 
     timingEntries.each do |entry|
       labels.push(entry.link)
+      percentages.push((entry.end_at - entry.start_at).to_f/totalTime)
     end
 
     @timingDetails = {
         'Labels'=> labels,
-        'Data' => [],
+        'Data' => percentages,
         'tables' => [],
         'total' => 0,
         'totalavg' => 0

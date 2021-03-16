@@ -42,9 +42,26 @@ class SubmissionViewingEventsController < ApplicationController
 
   def record_end_time2
     args = request_params
-    # TODO:
-    #   record end time for the link provided in the request args
-    #   _or_ all links if none is provided
+    link = args[:link]
+    records = if link
+                # if link is provided, we'll update the end time for it
+                @store.where(map_id: args[:map_id], round: args[:round], link: [:link])
+              else
+                # if no specific link is provided, then update the end
+                # time for all links _except_ the Expertiza Review
+                # TODO: determine _why_ the last group needed this logic
+                @store.where(map_id: args[:map_id], round: args[:round])
+                      .select { |item| item.link != "Expertiza Review" }
+              end
+
+    records.each do |record|
+      record.end_at = DateTime.now
+    end
+
+    respond_to do |format|
+      format.json { head :no_content }
+    end
+
   end
 
   def hard_save

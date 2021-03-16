@@ -159,6 +159,32 @@ class QuizQuestionnairesController < QuestionnairesController
     valid
   end
 
+  # create multiple choice (radio or checkbox) question(s)
+  def create_multchoice(question, choice_key, q_answer_choices)
+    # this method combines the functionality of create_radio and create_checkbox, so that all mult choice questions are create by 1 func
+    q = if q_answer_choices[choice_key][:iscorrect] == 1.to_s
+          QuizQuestionChoice.new(txt: q_answer_choices[choice_key][:txt], iscorrect: "true", question_id: question.id)
+        else
+          QuizQuestionChoice.new(txt: q_answer_choices[choice_key][:txt], iscorrect: "false", question_id: question.id)
+        end
+    q.save
+  end
+
+  # create true/false question
+  def create_truefalse(question, choice_key, q_answer_choices)
+    if q_answer_choices[1.to_s][:iscorrect] == choice_key
+      q = QuizQuestionChoice.new(txt: "True", iscorrect: "true", question_id: question.id)
+      q.save
+      q = QuizQuestionChoice.new(txt: "False", iscorrect: "false", question_id: question.id)
+      q.save
+    else
+      q = QuizQuestionChoice.new(txt: "True", iscorrect: "false", question_id: question.id)
+      q.save
+      q = QuizQuestionChoice.new(txt: "False", iscorrect: "true", question_id: question.id)
+      q.save
+    end
+  end
+
   # update checkbox question
   def update_checkbox(question_choice, question_index)
     if params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s]
@@ -183,34 +209,8 @@ class QuizQuestionnairesController < QuestionnairesController
       question_choice.txt == "True" ? question_choice.update_attributes(iscorrect: '1') : question_choice.update_attributes(iscorrect: '0')
       # the statement is correct so "True" is the right answer
     else # the statement is not correct
-      question_choice.txt == "True" ? question_choice.update_attributes(iscorrect: '0') : question_choice.update_attributes(iscorrect: '1')
-      # the statement is not correct so "False" is the right answer
-    end
-  end
-
-  # create multiple choice (radio or checkbox) question(s)
-  def create_multchoice(question, choice_key, q_answer_choices)
-    # this method combines the functionality of create_radio and create_checkbox, so that all mult choice questions are create by 1 func
-    q = if q_answer_choices[choice_key][:iscorrect] == 1.to_s
-          QuizQuestionChoice.new(txt: q_answer_choices[choice_key][:txt], iscorrect: "true", question_id: question.id)
-        else
-          QuizQuestionChoice.new(txt: q_answer_choices[choice_key][:txt], iscorrect: "false", question_id: question.id)
-        end
-    q.save
-  end
-
-  # create true/false question
-  def create_truefalse(question, choice_key, q_answer_choices)
-    if q_answer_choices[1.to_s][:iscorrect] == choice_key
-      q = QuizQuestionChoice.new(txt: "True", iscorrect: "true", question_id: question.id)
-      q.save
-      q = QuizQuestionChoice.new(txt: "False", iscorrect: "false", question_id: question.id)
-      q.save
-    else
-      q = QuizQuestionChoice.new(txt: "True", iscorrect: "false", question_id: question.id)
-      q.save
-      q = QuizQuestionChoice.new(txt: "False", iscorrect: "true", question_id: question.id)
-      q.save
+    question_choice.txt == "True" ? question_choice.update_attributes(iscorrect: '0') : question_choice.update_attributes(iscorrect: '1')
+         # the statement is not correct so "False" is the right answer
     end
   end
 

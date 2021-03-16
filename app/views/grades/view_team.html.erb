@@ -50,7 +50,6 @@
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
 <% table_count = 0 %>
 <% @vmlist.each do |vm| %>
-
     <% if (vm.questionnaire_display_type == "Metareview" or vm.questionnaire_display_type == "Author Feedback" or vm.questionnaire_display_type == "Teammate Review") and @current_role_name.eql?'Student' %>
     <% else %>
         <% if vm.list_of_reviewers.length > 0 %>
@@ -143,7 +142,7 @@
                   <!-- actual cells with scores and colored background. -->
                   <% row.score_row.each do |score| %>
                       <% score_comment = score.comment.nil? ? '' : score.comment %> <!-- changing nil to null string to avoid Null Pointer Exception -->
-                      <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%= strip_tags(score.comment).html_safe%>">
+                      <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%= strip_tags(score.comment).gsub('"','').html_safe%>">
                         <span class="<%=  underlined?(score) %>"><%= score.score_value.to_s %></span>
                       </td>
                   <% end %>
@@ -180,7 +179,7 @@
                               <td>Review <%=index + 1%></td>
                               <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
                               <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
-                                <td id="<%= 'rr'+ j.to_s + '_' + index.to_s %>" data-round="<%=vm.round.to_s %>" data-qNum="<%= j.to_s %>" data-rNum="<%= index.to_s %>" data-hasTag="<%= row.score_row[index].vm_prompts.count > 0 ? "true":"false"%>">
+                                <td id="<%= 'rr'+ j.to_s + '_' + index.to_s %>" data-round="1" data-qNum="<%= j.to_s %>" data-rNum="<%= index.to_s %>" data-hasTag="<%= row.score_row[index].vm_prompts.count > 0 ? "true":"false"%>">
                               <% else %>
                                 <td>
                               <% end %>

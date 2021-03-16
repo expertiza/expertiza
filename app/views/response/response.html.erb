@@ -78,12 +78,12 @@
     });
 
     // Server AUTO SAVE: triggers every 60 seconds to save the draft version of the review to database
-    var interval = 60000;
-    var last_save = new Date();
+    const interval = 60000;
+    let last_save = new Date();
     // detect how many seconds the userhas been idle
-    var idleTime = 0;
+    let idleTime = 0;
     //threshold to turn off the autosave
-    var maxIdleTime = 30;
+    const maxIdleTime = 30;
 
     $('#autosave_cbx_lbl').html("&nbsp;Auto save your response every " + interval / 1000 + " seconds?&nbsp;&nbsp;");
 
@@ -96,7 +96,7 @@
 
     //click ajax
     function executeSave(){
-      timeDiff = (new Date().getTime() - last_save.getTime())/1000;
+      let timeDiff = (new Date().getTime() - last_save.getTime()) / 1000;
       // ignore saving unless the last save was more than 5s
       if (timeDiff>5 && $('.review_form').length > 0) {
         $('form').attr('data-remote', 'true');
@@ -250,12 +250,12 @@
     }
 
     //Increment the idle time counter every minute and restart the timer if there is a mouse movement or keypress.
-    var idleInterval = setInterval(function(){
+    let idleInterval = setInterval(function(){
       idleTime = idleTime + 1;
       if (idleTime >= maxIdleTime && vis() && $("#autosave_cbx").prop("checked")) {
         $("#autosave_cbx").removeProp("checked");
         setTimeout(function(){
-          var r = confirm("The window has been idle more than " + maxIdleTime + " minutes. Auto save is disabled. Do you want to enable it again?");
+          let r = confirm("The window has been idle more than " + maxIdleTime + " minutes. Auto save is disabled. Do you want to enable it again?");
           if (r == true) {
             updateForm();
             $("#autosave_cbx").prop("checked","true");
@@ -484,13 +484,15 @@
 <% if @submission_check %>
   <script type="text/javascript">
     $(document).ready(function(){
-      var map_id = <%= @map.id %>;
-      var round = <%= @current_round %>;
-      var current_window_timer = null;
-      var auto_window_timer = null;
-      var time_out_interval = 120000; // in milliseconds, checkout end time when not interaction on review page
-      var time_period = 30000; // automatically record end time every minute
-      var timer_flag = false;
+      let map_id = <%= @map.id %>;
+      let round = <%= @current_round %>;
+      let current_window_timer = null;
+      let auto_window_timer = null;
+      let timer_flag = false;
+
+      const time_out_interval = 120000; // in milliseconds, checkout end time when not interaction on review page
+      const time_period = 30000; // automatically record end time every minute
+
       startTimer();
       resetTimer();
       autoTimer();

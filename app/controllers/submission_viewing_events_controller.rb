@@ -91,8 +91,13 @@ class SubmissionViewingEventsController < ApplicationController
   def getTimingDetails
     require 'json'
 
-    puts params[:round]
-    @timingDetails
+    @timingDetails = {
+        'Labels'=> [],
+        'Data' => [],
+        'tables' => [],
+        'total' => 0,
+        'totalavg' => 0
+    }
 
     respond_to do |format|
       format.json {render json: @timingDetails}

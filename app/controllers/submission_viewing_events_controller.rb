@@ -14,7 +14,7 @@ class SubmissionViewingEventsController < ApplicationController
 
     # :start_at has been updated to be a timestamp from the client-side
     # so it needs to be parsed to a DateTime for the database
-    start_time = Time.at(args[:start_at]).to_datetime
+    start_time = DateTime.now
 
     # check for pre-existing record
     records = @store.where(
@@ -38,6 +38,8 @@ class SubmissionViewingEventsController < ApplicationController
       record.end_at = nil
       @store.save(record)
     end
+
+    head :ok
   end
 
   def record_end_time2

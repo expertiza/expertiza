@@ -84,24 +84,7 @@
             let round = <%= @current_round %>;
             let filesToUpdate = {};
             let windowManager = new WindowManager();
-
             const time_out_interval = 500; // in milliseconds
-
-            function timeoutAction(timeout_flag) {
-                if (timeout_flag) {
-                    windowManager.closeAll();
-                }
-
-                if ($("#restart_file_timing_flag").val() === 'true') {
-                    filesToUpdate.forEach(function (file) {
-                        if (filesToUpdate[file]) {
-                            startTime(map_id, round, file);
-                        }
-                    });
-
-                    $("#restart_file_timing_flag").val('false');
-                }
-            }
 
             $("#1_myDiv #file_table a.fileLink").click(function (event) {
                 event.preventDefault();
@@ -136,6 +119,22 @@
                         clearInterval(link_timer);
                     }
                     timeoutAction(timeout_flag);
+                }
+
+                function timeoutAction(timeout_flag) {
+                    if (timeout_flag) {
+                        windowManager.closeAll();
+                    }
+
+                    if ($("#restart_file_timing_flag").val() === 'true') {
+                        filesToUpdate.forEach(function (file) {
+                            if (filesToUpdate[file]) {
+                                startTime(map_id, round, file);
+                            }
+                        });
+
+                        $("#restart_file_timing_flag").val('false');
+                    }
                 }
             })
         });

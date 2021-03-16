@@ -52,11 +52,15 @@ function displayTimeDetail(resp_map_id,round){
         url: '/submission_viewing_events/getTimingDetails',
         method: 'POST',
         dataType: 'json',
-        success: function (respond) {
+        data: {
+            reponse_map_id: resp_map_id,
+            round: round
+        },
+        success: function (jsonResponse) {
             chartData = {
-                labels: respond.Labels,
+                labels: jsonResponse.Labels,
                 datasets: [{
-                    data: respond.Data,
+                    data: jsonResponse.Data,
                     borderWidth: 1
                 }]
             };

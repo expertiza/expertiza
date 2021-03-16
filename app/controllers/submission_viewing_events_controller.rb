@@ -23,10 +23,15 @@ class SubmissionViewingEventsController < ApplicationController
     )
 
     if records
+      # one existed in local storage already
+      # update the start time, and clear the end time
       record = records[0]
       record.start_at = start_time
       record.end_at = nil
     else
+      # one did not exist in local storage already
+      # create a new one, record the start time, and clear the end time
+      # be sure to save the new record to local storage at the end
       record = LocalSubmittedContent.new(args)
       record.start_at = start_time
       record.end_at = nil

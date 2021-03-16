@@ -106,6 +106,8 @@ class SubmissionViewingEventsController < ApplicationController
         'totalavg' => 0
     }
 
+    puts @timingDetails
+
     respond_to do |format|
       format.json {render json: @timingDetails}
     end

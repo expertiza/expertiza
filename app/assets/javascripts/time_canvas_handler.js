@@ -2,7 +2,9 @@
 //this function render the pie chat for time tracking detail
 function drawTimeCanvas(chartdata,resd) {
 
-    if(resd.length == 0 || chartdata.datasets.data.length == 0){
+    var table = resd.tables;
+
+    if(table.length == 0 || chartdata.datasets[0].data.length == 0){
         $("#timeModalBody").empty().html("<p>This review has no time detail avaliable</p>");
         return;
     }
@@ -24,8 +26,8 @@ function drawTimeCanvas(chartdata,resd) {
     console.log(resd.length)
 
     for(var i = 0 ; i < resd.length ; i++){
-        var d = resd[0];
-        $('#timeTable :last-child').append("<tr>" +
+        var d = table[i];
+        $('#timeTable > :last-child').append("<tr>" +
             "<td>" + d.subject + "</td>" +
             "<td>" + d.timecost + "</td>" +
             "<td>" + d.clsavg + "</td>" +
@@ -76,7 +78,7 @@ function displayTimeDetail(resp_map_id,round){
 
             console.log(jsonResponse);
 
-            drawTimeCanvas(chartData,jsonResponse.tables);
+            drawTimeCanvas(chartData,jsonResponse);
         },
         error: function(xhr, textStatus, errorThrown){
             $("#timeModalBody").empty().html("<p>Failed, cannot get time details at this time..</p>")

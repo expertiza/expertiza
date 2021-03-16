@@ -49,8 +49,8 @@ function displayTimeDetail(resp_map_id,round){
     $("#timeModalBody").empty().html("<p>Loading data...(This might need few seconds)</p>")
     $("#timeModal").show();
     $.ajax({
-        url: "Url_placeholder?response_map_id=" + resp_map_id + "&round=" + round ,
-        method: 'GET',
+        url: '/submission_viewing_events/getTimingDetails',
+        method: 'POST',
         dataType: 'json',
         success: function (respond) {
             chartData = {

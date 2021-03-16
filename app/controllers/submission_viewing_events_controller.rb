@@ -98,10 +98,8 @@ class SubmissionViewingEventsController < ApplicationController
       labels.push(entry.link)
     end
 
-    puts labels
-    
     @timingDetails = {
-        'Labels'=> [],
+        'Labels'=> labels,
         'Data' => [],
         'tables' => [],
         'total' => 0,

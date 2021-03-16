@@ -93,6 +93,8 @@ class SubmissionViewingEventsController < ApplicationController
     require 'json'
     labels = []
     percentages = []
+    tables = []
+
     totalTime = getTotalTime(params[:reponse_map_id], params[:round])
 
     timingEntries = SubmissionViewingEvent.where(map_id: params[:reponse_map_id], round: params[:round])
@@ -100,12 +102,17 @@ class SubmissionViewingEventsController < ApplicationController
     timingEntries.each do |entry|
       labels.push(entry.link)
       percentages.push((entry.end_at - entry.start_at).to_f/totalTime)
+      tables.push({
+                      "subject" => entry.link,
+                      "timecost" => secondsToHuman((entry.end_at - entry.start_at).to_i),
+                      "clsavg" => 0
+                  })
     end
 
     @timingDetails = {
         'Labels'=> labels,
         'Data' => percentages,
-        'tables' => [],
+        'tables' => tables,
         'total' => 0,
         'totalavg' => 0
     }

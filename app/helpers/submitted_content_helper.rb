@@ -148,14 +148,26 @@ module SubmittedContentHelper
     end
 
     #Turns a LocalSubmittedContent object into a hash
-    def to_h()
-      return { map_id: @map_id, round: @round, link: @link, start_at: @start_at, end_at: @end_at, created_at: @created_at, updated_at: @updated_at }
+    def to_h
+      {
+        map_id: @map_id,
+        round: @round,
+        link: @link,
+        start_at: @start_at,
+        end_at: @end_at,
+        created_at: @created_at,
+        updated_at: @updated_at
+      }
     end
 
     def ==(other)
-      return @map_id = other.map_id && @round == other.round && @link == other.link &&
-        @start_at == other.start_at && @end_at == other.end_at &&
-        @created_at == other.created_at && @updated_at == other.updated_at
+      @map_id = other.map_id and
+        @round == other.round and
+        @link == other.link and
+        @start_at == other.start_at and
+        @end_at == other.end_at and
+        @created_at == other.created_at and
+        @updated_at == other.updated_at
     end
 
   end

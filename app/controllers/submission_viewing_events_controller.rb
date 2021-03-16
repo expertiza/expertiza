@@ -66,9 +66,30 @@ class SubmissionViewingEventsController < ApplicationController
 
   def hard_save
     args = request_params
-    # TODO:
-    #   hard save all links in local storage
-    #   remove them from local storage
+    @uncommitted = []
+    records = @store.where(map_id: args[:map_id], round: [:round])
+
+    records.each do |record|
+      # push the uncommitted link on to the stack
+      @uncommitted << record.link
+
+      # if an update on the database doesn't work
+      # then we can assume this record didn't exist already
+      # and we can delegate saving to `LocalStorage`
+      unless SubmissionViewingEvent.update(record.to_h)
+        store.hard_save(record)
+      end
+
+      # once the data is updated or added to the database,
+      # remove it from `LocalStorage`
+      store.remove(record)
+    end
+
+    # TODO: why does the previous group render json with the
+    # links that were just committed?
+    respond_to do |format|
+      format.json { render json: @uncommitted }
+    end
   end
 
   # record time when link or file is opened in new window

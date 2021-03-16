@@ -65,7 +65,7 @@
         <% if reviewer.id != -1 %>
           <% user = Participant.find(reviewer.id).user %>
             <!--reviewer-->
-			
+
 			<!-- added class attribute and span tag to extract full name and unityID of the user for scraping (Used in export to CSV functionality) -->
             <td>
               <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post, :class => "user_unityID" %>
@@ -105,9 +105,11 @@
                     <!--Hard-coded Dr.Kidd's question in order to display link.-->
                     <!--later we can create a hyperlink question type to deal with this situation.-->
                     <%= list_hyperlink_submission(reviewer_map.id, 5386) if Assignment.find_by(id: @id.to_i).try(:course).try(:instructor).try(:name) == 'Jkidd' %>
-                  </div>
-                  <!--Display total time spent on reviewing as a hyperlink to popup which shows the breakdown of time spent between expertiza and other links as piechart-->
-                  <%= render partial: 'review_submissions_time_spent',  locals: {bgcolor: @bgcolor, map_id: reviewer_map.id,id: reviewer.id, reviewee_id: reviewer_map.reviewee_id, timeHash: timeHash} %>
+                <!-- Link that displays the time tracking detail -->
+                    <% (1..@assignment.num_review_rounds).each do |round| %>
+                      <a onclick="displayTimeDetail(<%= reviewer_map.id %>)" href="javascript:void(0);"> <%= "R#{round}: "%><%= secondsToHuman(getTotalTime(reviewer_map.id, round)) %> </a>
+                    <% end %>
+                </div>
                 </div>
               <% end %>
             <% end %>
@@ -120,7 +122,7 @@
                 <%= render partial: 'team_score_score_awarded', locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: reviewer.id} %>
               <% end %>
             <% end %>
-          </td>         
+          </td>
           <!--Render partial view corresponding to the average score awarded to a team-->
           <td align='left'>
             <% @response_maps.each_with_index do |reviewer_map, index| %>
@@ -161,6 +163,21 @@
     <% end %>
     </table>
  </div>
+
+<!-- Time tracking Modal-->
+<div id="timeModal" class="t-modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="close" id="closeTimeModal">&times;</span>
+      <h2>Time tracking statistic</h2>
+    </div>
+    <div class="modal-body" id="timeModalBody">
+
+    </div>
+  </div>
+</div>
+
 <!--Partial for text macro form-->
 <%= render :partial => '/user_pastebins/save_text_macros' %>
 
@@ -261,7 +278,16 @@
 		row.push("EmailID");
 		row.push("Grade");
 		row.push("Comment");
-		
+
 		return row;
 	}
 </script>
+
+<!-- Import Chart.js -->
+<%= javascript_include_tag "https://cdn.jsdelivr.net/npm/chart.js@2.8.0" %>
+<!-- Import Chart.js's add-on -->
+<%= javascript_include_tag "https://cdn.jsdelivr.net/npm/chartjs-plugin-colorschemes" %>
+<!-- Javascript to show pop-up time tracking detial -->
+<%= javascript_include_tag "time_canvas_handler" %>
+<!-- style sheet for time tracking modal-->
+<%= stylesheet_link_tag "time_canvas_css" %>

@@ -7,12 +7,13 @@ class SubmissionViewingEventsController < ApplicationController
     true
   end
 
+  # Records the start time for a review asset and clears the end time.
+  # The intent here is to signal "we're currently tracking this as being reviewed."
   def record_start_time2
     args = request_params
-    # TODO:
-    #   record the start time for the link provided in the request args
-    #   assumption: only one record should exist for a given map_id, round, link combination
 
+    # :start_at has been updated to be a timestamp from the client-side
+    # so it needs to be parsed to a DateTime for the database
     start_time = Time.at(args[:start_at]).to_datetime
 
     # check for pre-existing record

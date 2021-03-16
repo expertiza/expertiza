@@ -13,7 +13,7 @@ function drawTimeCanvas(chartdata,resd) {
         "</tr>" +
         "</table>");
 
-    for(var i = 0 ; i < tb.length ; i++){
+    for(var i = 0 ; i < resd.length ; i++){
 
         var d = resd[0];
         $('#timeTable :last-child').append("<tr>" +
@@ -65,7 +65,7 @@ function displayTimeDetail(resp_map_id,round){
                 }]
             };
 
-            drawTimeCanvas(chartData,respond.tables);
+            drawTimeCanvas(chartData,jsonResponse.tables);
         },
         error: function(xhr, textStatus, errorThrown){
             $("#timeModalBody").empty().html("<p>Failed, cannot get time details at this time..</p>")

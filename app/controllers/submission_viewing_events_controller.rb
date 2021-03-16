@@ -118,7 +118,7 @@ class SubmissionViewingEventsController < ApplicationController
         'Labels'=> labels,
         'Data' => percentages,
         'tables' => tables,
-        'total' => totalTime,
+        'total' => secondsToHuman(totalTime),
         'totalavg' => 0
     }
 

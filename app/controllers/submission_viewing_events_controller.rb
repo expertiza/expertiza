@@ -52,65 +52,23 @@ class SubmissionViewingEventsController < ApplicationController
   # total_time for a given record.
   #
   # The intent here is that "these are done being review for now."
-  #
   def record_end_time2
     args = request_params2
-    link = args[:link]
-    records = if link
-                # if link is provided, we'll update the end time for it
-                @store.where(map_id: args[:map_id], round: args[:round], link: [:link])
-              else
-                # if no specific link is provided, then update the end
-                # time for all links _except_ the Expertiza Review
-                # TODO: determine _why_ the last group needed this logic
-                @store.where(map_id: args[:map_id], round: args[:round])
-                      .select { |item| item.link != "Expertiza Review" }
-              end
-
-    records.each do |record|
-      record.end_at = DateTime.now
-      record.total_time += record.time_diff
+    if args[:link]
+      end_timing_for_link(args[:map_id], args[:round], args[:link])
+    else
+      end_timing_for_round(args[:map_id], args[:round])
     end
-
     respond_to do |format|
       format.json { head :no_content }
     end
-
   end
 
   # Provide a function to explicitly flush local storage to
   # the database.
   def hard_save
     args = request_params2
-    @uncommitted = []
-    records = @store.where(map_id: args[:map_id], round: args[:round])
-
-    records.each do |record|
-      # push the uncommitted link on to the stack
-      @uncommitted << record.link
-
-      previous = SubmissionViewingEvent.where(
-        map_id: record.map_id,
-        round: record.round,
-        link: record.link
-      )
-
-      if previous
-        # make sure to add the total time on this record
-        # with what may have already been in the database
-        updated = record.merge(previous)
-        SubmissionViewingEvent.update(updated.to_h)
-      else
-        # if a previous record doesn't exist,
-        # we can delegate saving to `LocalStorage`
-        store.hard_save(record)
-      end
-
-      # once the data is updated or added to the database,
-      # remove it from `LocalStorage`
-      store.remove(record)
-    end
-
+    @uncommitted = save_and_remove_all(args[map_id], args[:round])
     # TODO: why does the previous group render json with the
     # links that were just committed?
     respond_to do |format|
@@ -261,4 +219,67 @@ class SubmissionViewingEventsController < ApplicationController
       @store = LocalStorage.new
     end
   end
+
+  # End timing for a single [link] in the given review and [round].
+  def end_timing_for_link(map_id, round, link)
+    # if link is provided, we'll update the end time for it
+    records = @store.where(map_id: map_id, round: round, link: link)
+    _record_end_time(records)
+  end
+
+  # End timing for all links for the given [map_id] and [round].
+  def end_timing_for_round(map_id, round)
+    # if no specific link is provided, then update the end
+    # time for all links _except_ the Expertiza Review
+    # TODO: determine _why_ the last group needed this logic
+    records = @store.where(map_id: map_id, round: round).select { |item| item.link != "Expertiza Review" }
+    _record_end_time(records)
+  end
+
+  # For each record in [records], set the end time
+  # to DateTime.now and update the total_time accumulator
+  def _record_end_time(records)
+    end_time = DateTime.now
+    records.each do |record|
+      record.end_at = end_time
+      record.updated_at = end_time
+      record.total_time += record.time_diff
+    end
+  end
+
+  # Actually performs the work flushing records from
+  # local storage to the database and removing them.
+  def save_and_remove_all(map_id, round)
+    uncommitted = []
+    records = @store.where(map_id: map_id, round: round)
+
+    records.each do |record|
+      # push the uncommitted link on to the stack
+      uncommitted << record.link
+
+      previous = SubmissionViewingEvent.where(
+        map_id: record.map_id,
+        round: record.round,
+        link: record.link
+      )
+
+      if previous
+        # make sure to add the total time on this record
+        # with what may have already been in the database
+        updated = record.merge(previous)
+        SubmissionViewingEvent.update(updated.to_h)
+      else
+        # if a previous record doesn't exist,
+        # we can delegate saving to `LocalStorage`
+        store.hard_save(record)
+      end
+
+      # once the data is updated or added to the database,
+      # remove it from `LocalStorage`
+      store.remove(record)
+    end
+
+    uncommitted
+  end
+
 end

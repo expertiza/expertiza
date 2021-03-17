@@ -46,7 +46,7 @@
             let round = <%= @current_round %>; // round from response
             let linksToUpdate = {}; // track links to restart timing on
             let windowManager = new WindowManager()
-            const time_out_interval = 500; // in milliseconds
+            const time_out_interval = 1000; // in milliseconds
             
             function markEndAndCloseWindows() {
                 markEndTime(map_id, round); // saves end time of all open links
@@ -63,7 +63,7 @@
                     // If link in linksToUpdate set start time
                     for (let link in linksToUpdate) {
                         if (linksToUpdate[link]) { // if link is true in tracking array
-                            startTime(map_id, round, link); // start time tracking
+                            startTime2(map_id, round, link); // start time tracking
                         }
                     }
                     $("#restart_link_timing_flag").val('false'); // set restart flag false
@@ -97,14 +97,14 @@
                 windowManager.manage(window_handler); // track open windows
 
                 $("#restart_link_timing_flag").val('false'); // set restart link timing false
-                startTime(map_id, round, address); // save start time of link
+                startTime2(map_id, round, address); // save start time of link
                 linksToUpdate[address] = true; // add link to array to track and sets true
 
                 // Checks if window closed to then track end time
                 function checkWindowStatus() {
                     let timeout_flag = $('#timeout_flag').val() == 'true'; // checks for timeout flag == true and if so sets
                     if (window_handler.closed) { // if window closed
-                        endTime(map_id, round, address); // save end time of link
+                        endTime2(map_id, round, address); // save end time of link
                         linksToUpdate[address] = false; // sets link in tracking array to false
                         clearInterval(link_timer); // removes check for window open/close
                     }

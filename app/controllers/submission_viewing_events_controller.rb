@@ -110,7 +110,7 @@ class SubmissionViewingEventsController < ApplicationController
       tables.push({
                       "subject" => entry.link,
                       "timecost" => secondsToHuman((entry.end_at - entry.start_at).to_i),
-                      "clsavg" => 0
+                      "clsavg" => nil
                   })
     end
 
@@ -120,7 +120,7 @@ class SubmissionViewingEventsController < ApplicationController
         'Data' => percentages,
         'tables' => tables,
         'total' => secondsToHuman(totalTime),
-        'totalavg' => 0
+        'totalavg' => avgClassTime
     }
 
     # respond to request with JSON containing all data

@@ -76,6 +76,18 @@ class SubmissionViewingEventsController < ApplicationController
     end
   end
 
+  # Provide a convenience function to stop timing for all
+  # links in a round and flush them to the database.
+  #
+  # This allows the client to combine these actions
+  # without necessarily having to send back-to-back requests.
+  def end_round_and_save
+    args = request_params2
+    end_timing_for_round(args[:map_id], args[:round])
+    save_and_remove_all(args[:map_id], args[:round])
+    head :no_content
+  end
+
   # record time when link or file is opened in new window
   def record_start_time
     param_args = params[:submission_viewing_event] # get args from triggering event

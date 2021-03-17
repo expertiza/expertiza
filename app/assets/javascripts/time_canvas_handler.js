@@ -13,7 +13,7 @@ function drawTimeCanvas(chartdata,resd) {
         "</tr>" +
         "</table>");
 
-    for(var i = 0 ; i < tb.length ; i++){
+    for(var i = 0 ; i < resd.length ; i++){
 
         var d = resd[0];
         $('#timeTable :last-child').append("<tr>" +
@@ -49,19 +49,23 @@ function displayTimeDetail(resp_map_id,round){
     $("#timeModalBody").empty().html("<p>Loading data...(This might need few seconds)</p>")
     $("#timeModal").show();
     $.ajax({
-        url: "Url_placeholder?response_map_id=" + resp_map_id + "&round=" + round ,
-        method: 'GET',
+        url: '/submission_viewing_events/getTimingDetails',
+        method: 'POST',
         dataType: 'json',
-        success: function (respond) {
+        data: {
+            reponse_map_id: resp_map_id,
+            round: round
+        },
+        success: function (jsonResponse) {
             chartData = {
-                labels: respond.Labels,
+                labels: jsonResponse.Labels,
                 datasets: [{
-                    data: respond.Data,
+                    data: jsonResponse.Data,
                     borderWidth: 1
                 }]
             };
 
-            drawTimeCanvas(chartData,respond.tables);
+            drawTimeCanvas(chartData,jsonResponse.tables);
         },
         error: function(xhr, textStatus, errorThrown){
             $("#timeModalBody").empty().html("<p>Failed, cannot get time details at this time..</p>")

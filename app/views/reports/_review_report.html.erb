@@ -107,7 +107,7 @@
                     <%= list_hyperlink_submission(reviewer_map.id, 5386) if Assignment.find_by(id: @id.to_i).try(:course).try(:instructor).try(:name) == 'Jkidd' %>
                 <!-- Link that displays the time tracking detail -->
                     <% (1..@assignment.num_review_rounds).each do |round| %>
-                      <a onclick="displayTimeDetail(<%= reviewer_map.id %>)" href="javascript:void(0);"> <%= "R#{round}: "%><%= secondsToHuman(getTotalTime(reviewer_map.id, round)) %> </a>
+                      <a onclick="displayTimeDetail(<%= reviewer_map.id %>, <%= round %>)" href="javascript:void(0);"> <%= "R#{round}: "%><%= secondsToHuman(getTotalTime(reviewer_map.id, round)) %> </a>
                     <% end %>
                 </div>
                 </div>

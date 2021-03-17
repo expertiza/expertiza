@@ -1,22 +1,33 @@
 
 //this function render the pie chat for time tracking detail
 function drawTimeCanvas(chartdata,resd) {
+
+    var table = resd.tables;
+
+    if(table.length == 0 || chartdata.datasets[0].data.length == 0){
+        $("#timeModalBody").empty().html("<p>This review has no time detail avaliable</p>");
+        return;
+    }
+
     //initializing the timeModal view
     $("#timeModalBody").empty().html("<div class=\"time-canvas-container\">" +
         "<canvas id=\"timeCanvas\" width=\"300\" height=\"300\"></canvas>"+
         "</div>"+
         "<table id=\"timeTable\" class=\"time-table\">"+
+        "<tbody id=\"timeTableBody\">"+
         "<tr>"+
         "<th>Subject</th>"+
         "<th>Time</th>"+
         "<th>Avg.</th>"+
         "</tr>" +
+        "</tbody>" +
         "</table>");
 
-    for(var i = 0 ; i < tb.length ; i++){
+    console.log(table.length)
 
-        var d = resd[0];
-        $('#timeTable :last-child').append("<tr>" +
+    for(var i = 0 ; i < table.length ; i++){
+        var d = table[i];
+        $('#timeTable > :last-child').append("<tr>" +
             "<td>" + d.subject + "</td>" +
             "<td>" + d.timecost + "</td>" +
             "<td>" + d.clsavg + "</td>" +
@@ -24,7 +35,7 @@ function drawTimeCanvas(chartdata,resd) {
 
     }
 
-    $('#timeTable :last-child').append("<tr>" +
+    $('#timeTable > :last-child').append("<tr>" +
         "<td>Total</td>" +
         "<td>" + resd.total + "</td>" +
         "<td>" + resd.totalavg + "</td>" +
@@ -49,19 +60,25 @@ function displayTimeDetail(resp_map_id,round){
     $("#timeModalBody").empty().html("<p>Loading data...(This might need few seconds)</p>")
     $("#timeModal").show();
     $.ajax({
-        url: "Url_placeholder?response_map_id=" + resp_map_id + "&round=" + round ,
-        method: 'GET',
+        url: '/submission_viewing_events/getTimingDetails',
+        method: 'POST',
         dataType: 'json',
-        success: function (respond) {
+        data: {
+            reponse_map_id: resp_map_id,
+            round: round
+        },
+        success: function (jsonResponse) {
             chartData = {
-                labels: respond.Labels,
+                labels: jsonResponse.Labels,
                 datasets: [{
-                    data: respond.Data,
+                    data: jsonResponse.Data,
                     borderWidth: 1
                 }]
             };
 
-            drawTimeCanvas(chartData,respond.tables);
+            console.log(jsonResponse);
+
+            drawTimeCanvas(chartData,jsonResponse);
         },
         error: function(xhr, textStatus, errorThrown){
             $("#timeModalBody").empty().html("<p>Failed, cannot get time details at this time..</p>")

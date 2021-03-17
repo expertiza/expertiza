@@ -1,5 +1,6 @@
 class SubmissionViewingEventsController < ApplicationController
   include SubmittedContentHelper
+  include SubmissionViewingEventHelper
 
   before_action :ensure_store
 
@@ -198,6 +199,45 @@ class SubmissionViewingEventsController < ApplicationController
 
     respond_to do |format|
       format.json { render json: @link_array }
+    end
+  end
+
+  # Respond with a JSON containing relevant timing information for specified review and round
+  def getTimingDetails
+    require 'json'
+    labels = [] # store links accessed during review
+    percentages = [] # store percentages per link for pie chart
+    tables = [] # store timing data breakdown per link
+
+    # get total time spent on review
+    totalTime = getTotalTime(params[:reponse_map_id], params[:round])
+
+    # get all timing entries for review (each link has one entry)
+    timingEntries = SubmissionViewingEvent.where(map_id: params[:reponse_map_id], round: params[:round])
+
+    # push all data into relevant arrays for JSON
+    timingEntries.each do |entry|
+      labels.push(entry.link)
+      percentages.push((entry.end_at - entry.start_at).to_f/totalTime)
+      tables.push({
+                      "subject" => entry.link,
+                      "timecost" => secondsToHuman((entry.end_at - entry.start_at).to_i),
+                      "clsavg" => 0
+                  })
+    end
+
+    # create JSON
+    @timingDetails = {
+        'Labels'=> labels,
+        'Data' => percentages,
+        'tables' => tables,
+        'total' => secondsToHuman(totalTime),
+        'totalavg' => 0
+    }
+
+    # respond to request with JSON containing all data
+    respond_to do |format|
+      format.json {render json: @timingDetails}
     end
   end
 

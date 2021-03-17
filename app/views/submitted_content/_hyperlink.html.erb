@@ -1,146 +1,124 @@
+<%= javascript_include_tag "reivew_time" %>
 <%= form_for :hyperlinks, url: '/submitted_content/remove_hyperlink' do |f| %>
   <% if stage != "Finished" %>
     <% team_id = TeamsUser.team_id(participant.parent_id, participant.user_id) %>
-    <% display_to_author = Team.exists?(team_id) && Team.find(team_id).user?(@current_user)%>
+    <% display_to_author = Team.exists?(team_id) && Team.find(team_id).user?(@current_user) %>
 
     <% if display_to_author %>
       <h5>Hyperlink Actions:</h5>
       <%= f.submit 'Delete selected hyperlink' %>
-    <% end  %>
+    <% end %>
     </br>
 
     <%= f.hidden_field :participant_id, value: participant.id %>
     </br>
   <% end %>
-  
+
   <a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;">hide links</a><br/>
   <!-- Setting user-select to none prevents users from copy-pasting url links -->
   <div id="url" style="user-select: none">
     <ul>
       <% participant.team.hyperlinks.each_with_index {
         |link, index| %>
-      <% if stage != "Complete" %>
-        <% if display_to_author%>
-          <% if index == 0 %>
-            <input type="radio" id='chk_links' name='chk_links' checked value="<%= index %>"/>
-          <% else %>
-            <input type="radio" id='chk_links' name='chk_links' value="<%= index %>"/>
+        <% if stage != "Complete" %>
+          <% if display_to_author %>
+            <% if index == 0 %>
+              <input type="radio" id='chk_links' name='chk_links' checked value="<%= index %>"/>
+            <% else %>
+              <input type="radio" id='chk_links' name='chk_links' value="<%= index %>"/>
+            <% end %>
           <% end %>
+          <% if local_assigns[:submission_check] %>
+            <a href="<%= link %>" class="review_link"><%= link %></a>
+          <% else %>
+            <a href="<%= link %>" target="_blank"><%= link %></a>
+          <% end %>
+          <br/>
         <% end %>
-        <% if local_assigns[:submission_check] %>
-          <a href="<%= link %>" class="review_link"><%= link %></a>
-        <% else %>
-          <a href="<%= link %>" target="_blank"><%= link %></a>
-        <% end %>
-        <br/>
-      <% end %>
       <% } %>
     </ul>
   </div>
+
   <% if local_assigns[:submission_check] %>
     <script type="text/javascript">
-      function ISODateString(date){
-        function pad(num){return num<10? '0'+num: num;}
-        return date.getUTCFullYear()+'-'
-                  + pad(date.getUTCMonth()+1) + '-'
-                  + pad(date.getUTCDate()) + ' '
-                  + pad(date.getUTCHours()) + ':'
-                  + pad(date.getUTCMinutes()) + ':'
-                  + pad(date.getUTCSeconds());
-      }
-      $(document).ready(function(){	    
-        var map_id = <%= @map.id %>;
-        var round = <%= @current_round %>;
-        var time_out_interval = 500; // in milliseconds
-        var linksToUpdate = {};
-        var windowsToClose = new Array();
-        $("#url a.review_link").on("contextmenu", function() {
-          return false;
-        });
-        $("#url a.review_link").on("auxclick", function(e) {
-          e.preventDefault();
-        });
-		window.onbeforeunload = function(){
-		  markEndTime();
-		  while (windowsToClose!=null && windowsToClose.length>0){
-            windowsToClose.shift().close();
-          }
-		}
-        function timeoutAction(timeout_flag){
-          if (timeout_flag) {
-            markEndTime();
-            while (windowsToClose!=null && windowsToClose.length>0){
-              windowsToClose.shift().close();
+        $(document).ready(function () {
+            let map_id = <%= @map.id %>; // map_id from response
+            let round = <%= @current_round %>; // round from response
+            let linksToUpdate = {}; // track links to restart timing on
+            let windowManager = new WindowManager()
+            const time_out_interval = 500; // in milliseconds
+            
+            function markEndAndCloseWindows() {
+                markEndTime(map_id, round); // saves end time of all open links
+                windowManager.closeAll()
             }
-          }
-          restart_link_timing_flag = $("#restart_link_timing_flag").val()=='true';
-          if (restart_link_timing_flag) {
-            for (link in linksToUpdate) {
-              if (linksToUpdate[link]) {
-                startTime(map_id, round, link);
-              }
+
+            // Occurs on timeout of page
+            function timeoutAction(timeout_flag) {
+                if (timeout_flag) {
+                    markEndAndCloseWindows();
+                }
+                let restart_link_timing_flag = $("#restart_link_timing_flag").val() == 'true'; // checks if link should start tracking again
+                if (restart_link_timing_flag) {
+                    // If link in linksToUpdate set start time
+                    for (let link in linksToUpdate) {
+                        if (linksToUpdate[link]) { // if link is true in tracking array
+                            startTime(map_id, round, link); // start time tracking
+                        }
+                    }
+                    $("#restart_link_timing_flag").val('false'); // set restart flag false
+                }
             }
-            $("#restart_link_timing_flag").val('false');
-          }
-        }
-        function startTime(map_id, round, link) {
-          var t = new Date();
-          $.ajax({
-            type: "POST",
-            url: '/submission_viewing_events/record_start_time',
-            data: $.param({submission_viewing_event:{map_id: map_id, round: round, link: link, start_at: ISODateString(t)}})
-          });
-        }
-        function markEndTime() {
-          var  t = new Date();
-          $.ajax({
-            type: 'POST',
-            dataType: 'json',
-            async: false,
-            url: '/submission_viewing_events/mark_end_time',
-            data: $.param({
-              submission_viewing_event: {map_id: map_id, round: round, end_at: ISODateString(t)}
-              })
-          });
-        }
-        $("#url a.review_link").click(function linkAction(event){		  
-          event.preventDefault();
-          var link_handler = $(this); // current link
-          var address = link_handler.attr("href"); // url address of the current link		  
-		  if(address in linksToUpdate){
-		    if(linksToUpdate[address]==true){
-			  return; //if the address in already present in the array, prevent the user from opening it again
-			}
-		  }
-          var window_handler = window.open(address); // open link in new window/tag
-          windowsToClose.push(window_handler);
-          $("#restart_link_timing_flag").val('false');
-          startTime(map_id, round, address);
-          linksToUpdate[address] = true;
-          var link_timer = setInterval(checkWindowStatus, time_out_interval); // check window open/close every second
-          function endTime(link){
-            var t = new Date();
-            $.ajax({
-              type: 'POST',
-              dataType: 'json',
-              async: false,
-              url: '/submission_viewing_events/record_end_time',
-              data: $.param({
-                submission_viewing_event: {map_id: map_id, round: round, link: link, end_at: ISODateString(t)}
-                })
+
+            // Prevents right click on hyperlink
+            $('#url a.review_link').on("contextmenu", function (event) {
+                event.preventDefault(); // prevents default action i.e. does nothing on right click
             });
-          }
-          function checkWindowStatus(){
-            timeout_flag = $('#timeout_flag').val()=='true';
-            if (window_handler.closed){
-              endTime(address);
-              linksToUpdate[address] = false;
-              clearInterval(link_timer);
+
+            // Prevents middle-click on hyperlink
+            $("#url a.review_link").on("auxclick", function (event) {
+                event.preventDefault(); // prevents default action i.e. does nothing on middle click
+            });
+
+            // Occurs on click of hyperlink
+            $("#url a.review_link").click(function linkAction(event) {
+                event.preventDefault(); // prevents defaults action of opening from occurring allowing our script to run
+                let link_handler = $(this); // current link
+                let address = link_handler.attr("href"); // url address of the current link
+
+                // If the address in already present in the array, prevent the user from opening it again
+                if (address in linksToUpdate) {
+                    if (linksToUpdate[address] === true) {
+                        return;
+                    }
+                }
+
+                let window_handler = window.open(address); // open link in new window/tab
+                windowManager.manage(window_handler); // track open windows
+
+                $("#restart_link_timing_flag").val('false'); // set restart link timing false
+                startTime(map_id, round, address); // save start time of link
+                linksToUpdate[address] = true; // add link to array to track and sets true
+
+                // Checks if window closed to then track end time
+                function checkWindowStatus() {
+                    let timeout_flag = $('#timeout_flag').val() == 'true'; // checks for timeout flag == true and if so sets
+                    if (window_handler.closed) { // if window closed
+                        endTime(map_id, round, address); // save end time of link
+                        linksToUpdate[address] = false; // sets link in tracking array to false
+                        clearInterval(link_timer); // removes check for window open/close
+                    }
+                    timeoutAction(timeout_flag); // if timeout flag is set, times out page
+                }
+
+                let link_timer = setInterval(checkWindowStatus, time_out_interval); // check window open/close every second
+            });
+
+            // Occurs on close of page
+            window.onbeforeunload = function() {
+                markEndAndCloseWindows();
             }
-            timeoutAction(timeout_flag);
-          }
         });
-      });
     </script>
   <% end %>
 <% end %>

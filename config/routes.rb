@@ -435,6 +435,7 @@ resources :institution, except: [:destroy] do
       post :record_start_time
       post :record_end_time
       post :mark_end_time
+      post :getTimingDetails
       get :record_start_time
       get :record_end_time
     end

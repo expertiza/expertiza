@@ -125,7 +125,14 @@ module SubmittedContentHelper
 
   #Holds information related to a link pressed during a review
   class LocalSubmittedContent
-    attr_accessor :map_id, :round, :link, :start_at, :end_at, :created_at, :updated_at
+    attr_accessor :map_id,
+                  :round,
+                  :link,
+                  :start_at,
+                  :end_at,
+                  :created_at,
+                  :updated_at,
+                  :total_time
 
     def initialize(args)
       @map_id = args.fetch(:map_id, nil)
@@ -135,6 +142,7 @@ module SubmittedContentHelper
       @end_at = args.fetch(:end_at, nil)
       @created_at = args.fetch(:created_at, nil)
       @updated_at = args.fetch(:updated_at, nil)
+      @total_time = args.fetch(:total_time, 0)
     end
 
     #Turns a LocalSubmittedContent object into a hash
@@ -160,5 +168,8 @@ module SubmittedContentHelper
         @updated_at == other.updated_at
     end
 
+    def time_diff
+      @start_at and @end_at ? (@end_at.to_time - @start_at.to_time).round.to_i : 0
+    end
   end
 end

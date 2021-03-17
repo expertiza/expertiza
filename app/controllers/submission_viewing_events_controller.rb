@@ -92,7 +92,7 @@ class SubmissionViewingEventsController < ApplicationController
   # Respond with a JSON containing relevant timing information for specified review and round
   def getTimingDetails
     labels = [] # store links accessed during review
-    percentages = [] # store percentages per link for pie chart
+    percentages = [] # store percentage time per link for pie chart
     tables = [] # store timing data breakdown per link
     avgClassTime = 0
 

@@ -11,7 +11,7 @@ class SubmissionViewingEventsController < ApplicationController
   # Records the start time for a review asset and clears the end time.
   # The intent here is to signal "we're currently tracking this as being reviewed."
   def record_start_time2
-    args = request_params
+    args = request_params2
 
     start_time = DateTime.now
 
@@ -54,7 +54,7 @@ class SubmissionViewingEventsController < ApplicationController
   # The intent here is that "these are done being review for now."
   #
   def record_end_time2
-    args = request_params
+    args = request_params2
     link = args[:link]
     records = if link
                 # if link is provided, we'll update the end time for it
@@ -81,7 +81,7 @@ class SubmissionViewingEventsController < ApplicationController
   # Provide a function to explicitly flush local storage to
   # the database.
   def hard_save
-    args = request_params
+    args = request_params2
     @uncommitted = []
     records = @store.where(map_id: args[:map_id], round: args[:round])
 
@@ -245,9 +245,17 @@ class SubmissionViewingEventsController < ApplicationController
 
   # Only allow a trusted parameter "white list" through.
   def request_params
-    params.require(:submission_viewing_event).permit(:map_id, :round, :link, :start_at, :end_at)
+    params.require(:submission_viewing_event).permit(:map_id, :round, :link)
   end
 
+  # Require: :map_id, :round
+  # Permit: :link
+  def request_params2
+    params.require(%i[map_id round]).permit(:link)
+  end
+
+  # Ensure that we have a non-nil instance of LocalStorage
+  # to work with.
   def ensure_store
     unless @store
       @store = LocalStorage.new

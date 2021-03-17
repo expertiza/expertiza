@@ -94,7 +94,7 @@
       <th>Review Grade</th>
       <th>Badges</th>
       <th>Stage Deadline <img src="/assets/info.png" title="You can change 'Preferred Time Zone' in 'Profile' in the banner."/></th>
-      <th>Publishing Rights</th>
+      <th>Publishing Rights <img src="/assets/info.png" title="Grant publishing rights"/></th>
     </tr>
     <% @student_tasks.each do |student_task| %>
       <% participant = student_task.participant %>
@@ -126,7 +126,8 @@
           <!--stage deadline-->
           <td><%= student_task.stage_deadline.in_time_zone(session[:user].timezonepref) %></td>
           <!--publish rights-->
-          <td align=center><%= participant.permission_granted ? "granted" : "denied" %></td>
+          <td align=center>
+		<type="checkbox" <%=if participant.permission_granted%>checked<%end%>></td>
         </tr>
       <% end %>
     <% end %>

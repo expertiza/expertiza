@@ -169,8 +169,14 @@ module SubmittedContentHelper
         @updated_at == other.updated_at
     end
 
+    # Compute the difference between [end_at] and [start_at]
+    # in whole seconds.
+    #
+    # Any fractional second is rounded according to normal
+    # rounding rules.
     def time_diff
-      @start_at and @end_at ? (@end_at.to_time - @start_at.to_time).round.to_i : 0
+      diff = (@start_at and @end_at) ? @end_at.to_time - @start_at.to_time : 0
+      diff.round.to_i
     end
 
     # Merge a SubmissionViewingEvent with this LocalSubmittedContent

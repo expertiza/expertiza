@@ -219,6 +219,7 @@ class SubmissionViewingEventsController < ApplicationController
   # Require: :map_id, :round
   # Permit: :link
   def request_params2
+    ExpertizaLogger.info("Submission Viewing Event Params: #{params}")
     params.require(%i[map_id round]).permit(:link)
   end
 

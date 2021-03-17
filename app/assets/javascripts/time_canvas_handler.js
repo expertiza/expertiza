@@ -23,9 +23,9 @@ function drawTimeCanvas(chartdata,resd) {
         "</tbody>" +
         "</table>");
 
-    console.log(resd.length)
+    console.log(table.length)
 
-    for(var i = 0 ; i < resd.length ; i++){
+    for(var i = 0 ; i < table.length ; i++){
         var d = table[i];
         $('#timeTable > :last-child').append("<tr>" +
             "<td>" + d.subject + "</td>" +

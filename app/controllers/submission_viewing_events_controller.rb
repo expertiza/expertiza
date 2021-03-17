@@ -44,6 +44,14 @@ class SubmissionViewingEventsController < ApplicationController
     head :ok
   end
 
+  # Record the end time for a single link given by :link
+  # or all links if :link is absent from the request args.
+  #
+  # This function records the end time, and accumulates
+  # total_time for a given record.
+  #
+  # The intent here is that "these are done being review for now."
+  #
   def record_end_time2
     args = request_params
     link = args[:link]
@@ -69,6 +77,8 @@ class SubmissionViewingEventsController < ApplicationController
 
   end
 
+  # Provide a function to explicitly flush local storage to
+  # the database.
   def hard_save
     args = request_params
     @uncommitted = []

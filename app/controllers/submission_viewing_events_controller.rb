@@ -78,6 +78,7 @@ class SubmissionViewingEventsController < ApplicationController
     head :no_content
   end
 
+  # @deprecated
   # record time when link or file is opened in new window
   def record_start_time
     param_args = params[:submission_viewing_event] # get args from triggering event
@@ -109,6 +110,7 @@ class SubmissionViewingEventsController < ApplicationController
     head :ok
   end
 
+  # @deprecated
   # record time when link or file window is closed
   def record_end_time
     data = params.require(:submission_viewing_event) # get args from triggering event
@@ -133,6 +135,7 @@ class SubmissionViewingEventsController < ApplicationController
     end
   end
 
+  # @deprecated
   # mark end_at review time for all uncommited links/files
   def mark_end_time
     data = params.require(:submission_viewing_event) # get args from triggering event

@@ -103,6 +103,8 @@ class SubmissionViewingEventsController < ApplicationController
     # get all timing entries for review (each link has one entry)
     timingEntries = SubmissionViewingEvent.where(map_id: params[:reponse_map_id], round: params[:round])
 
+    avgClassTime =  getAvgRevTime(params[:reponse_map_id], params[:round])
+
     # push all data into relevant arrays for JSON
     timingEntries.each do |entry|
       labels.push(entry.link)

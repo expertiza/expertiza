@@ -154,7 +154,8 @@ module SubmittedContentHelper
         start_at: @start_at,
         end_at: @end_at,
         created_at: @created_at,
-        updated_at: @updated_at
+        updated_at: @updated_at,
+        total_time: @total_time
       }
     end
 

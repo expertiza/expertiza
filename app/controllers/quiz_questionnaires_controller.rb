@@ -140,6 +140,7 @@ class QuizQuestionnairesController < QuestionnairesController
     end
   end
 
+  # A question is valid if it has a valid type ('TrueFalse', 'MultipleChoiceCheckbox', 'MultipleChoiceRadio') and a correct answer selected
   def validate_question(i)
     if !params.key?(:question_type) || !params[:question_type].key?(i.to_s) || params[:question_type][i.to_s][:type].nil?
       # A type isn't selected for a question

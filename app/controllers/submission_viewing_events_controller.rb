@@ -95,6 +95,7 @@ class SubmissionViewingEventsController < ApplicationController
     labels = [] # store links accessed during review
     percentages = [] # store percentages per link for pie chart
     tables = [] # store timing data breakdown per link
+    avgClassTime = 0
 
     # get total time spent on review
     totalTime = getTotalTime(params[:reponse_map_id], params[:round])

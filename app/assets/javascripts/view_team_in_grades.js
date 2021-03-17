@@ -103,8 +103,8 @@ function tagActionOnLoad() {
     if(tagPrompts.length == 0) {
         document.getElementById("tagHeatMap").style.display = 'none';
     } else {
-        let countMap = countOnOffTags(tagPrompts);
-        let rowData =  getTagsByQuestion();
+        let countMap = calcTagRatio(tagPrompts);
+        let rowData =  getRowData();
         drawTagGrid(rowData);
         updateTagsFraction(countMap);
     }
@@ -113,7 +113,7 @@ function tagActionOnLoad() {
 // Update Tag Report Heat grid each time a tag is changed
 function tagActionOnUpdate() {
     let tagPrompts = getTagPrompts();
-    let countMap = countOnOffTags(tagPrompts);
+    let countMap = calcTagRatio(tagPrompts);
     updateTagGrid(tagPrompts);
     updateTagsFraction(countMap);
 }
@@ -127,7 +127,7 @@ function getTagPrompts() {
 
 // Populate an array with all review rows, their question and review number, whether they have tag prompts,
 // and a reference to the tag prompts.
-function getTagsByQuestion() {
+function getRowData() {
     // Get all valid review rows
     let rowsList = $("[id^=rr]");
     // Set up matrix of questionNumber, reviewNumber, hasTag?, and pointer to tags if true
@@ -160,17 +160,6 @@ function updateTagsFraction(countMap) {
     cell.innerText = countMap.get("onTags") + "/" + countMap.get("total");
     // Set background color class based on ratio
     cell.className = "c"+countMap.get("ratioClass").toString();
-}
-
-// Turn on and off the Review Tag heat grid and toggle button text
-function toggleTagGrid(elementID) {
-    toggleFunction(elementID);
-    let button = document.getElementById("tagHGButton")
-    if (button.innerText == "Show Tag HeatGrid") {
-        button.innerText = "Hide Tag HeatGrid";
-    } else {
-        button.innerText = "Show Tag HeatGrid";
-    }
 }
 
 // Updates the Review Tag Heat Grid each time a tag is changed
@@ -224,7 +213,7 @@ function drawTagGrid(rowData) {
     let table = document.getElementById("tag_heat_grid");
 
     // Set basic table attributes
-    let gridWidth = determineGridWidth(rowData);
+    let gridWidth = getGridWidth(rowData);
 
     //create the header
     let thead = table.createTHead();
@@ -327,7 +316,7 @@ function addToolTip(element, text) {
 /********************************** MATHEMATICS HELPERS ****************************************/
 
 // Find the largest number of tags in a review, if any exist, and return the width that the grid should be drawn to.
-function determineGridWidth(rowData) {
+function getGridWidth(rowData) {
     let gridWidth = 0;
     for(let i=0; i<rowData.length; ++i) {
         if(rowData[i].get('has_tag') == true && rowData[i].get('tag_list').length > gridWidth) {
@@ -339,7 +328,7 @@ function determineGridWidth(rowData) {
 
 // Returns as a HashMap the count of all, on, and off tags, and the ratio of done to total in decimal and
 // (special rounding) integer form to associate with existing heatgrid color classes.
-function countOnOffTags(tagPrompts){
+function calcTagRatio(tagPrompts){
     let countMap = new Map();
     let offTags = 0;
     let onTags = 0;

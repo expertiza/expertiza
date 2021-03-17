@@ -172,5 +172,11 @@ module SubmittedContentHelper
     def time_diff
       @start_at and @end_at ? (@end_at.to_time - @start_at.to_time).round.to_i : 0
     end
+
+    # Merge a SubmissionViewingEvent with this LocalSubmittedContent
+    # by adding the viewing event's total time data to this
+    def merge(event)
+      @total_time += event.total_time
+    end
   end
 end

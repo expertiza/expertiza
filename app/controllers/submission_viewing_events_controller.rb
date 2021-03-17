@@ -10,36 +10,13 @@ class SubmissionViewingEventsController < ApplicationController
 
   # Records the start time for a review asset and clears the end time.
   # The intent here is to signal "we're currently tracking this as being reviewed."
-  def record_start_time2
+  def start_timing
     args = request_params2
 
-    start_time = DateTime.now
-
-    # check for pre-existing record
-    records = @store.where(
-      map_id: args[:map_id],
-      round: args[:round],
-      link: args[:link]
-    )
-
-    if records
-      record = records[0]
-      record.start_at = start_time
-      record.end_at = nil
-      record.updated_at = start_time
+    if args[:link]
+      start_timing_for_link(args[:map_id], args[:round], args[:link])
     else
-      # one did not exist in local storage already
-      # create a new one and save the new record to
-      # local storage
-      record = LocalSubmittedContent.new map_id: args[:map_id],
-                                         round: args[:round],
-                                         link: args[:link],
-                                         start_at: start_time,
-                                         end_at: nil,
-                                         created_at: start_time,
-                                         updated_at: start_time,
-                                         total_time: 0
-      @store.save(record)
+      start_timing_for_round(args[:map_id], args[:round])
     end
 
     head :ok
@@ -52,7 +29,7 @@ class SubmissionViewingEventsController < ApplicationController
   # total_time for a given record.
   #
   # The intent here is that "these are done being review for now."
-  def record_end_time2
+  def end_timing
     args = request_params2
     if args[:link]
       end_timing_for_link(args[:map_id], args[:round], args[:link])
@@ -62,6 +39,19 @@ class SubmissionViewingEventsController < ApplicationController
     respond_to do |format|
       format.json { head :no_content }
     end
+  end
+
+  def reset_timing
+    args = request_params2
+    if args[:link]
+      end_timing_for_link(args[:map_id], args[:round], args[:link])
+      start_timing_for_link(args[:map_id], args[:round], args[:link])
+    else
+      end_timing_for_round(args[:map_id], args[:round])
+      start_timing_for_round(args[:map_id], args[:round])
+    end
+
+    head :ok
   end
 
   # Provide a function to explicitly flush local storage to
@@ -110,7 +100,7 @@ class SubmissionViewingEventsController < ApplicationController
     store.save(submission_viewing_event)
 
     #if creating start time for expertiza update end times for all other links.
-    if param_args[:link]=='Expertiza Review'
+    if param_args[:link] == 'Expertiza Review'
       params[:submission_viewing_event][:link] = nil
       params[:submission_viewing_event][:end_at] = params[:submission_viewing_event][:start_at]
       record_end_time()
@@ -126,7 +116,7 @@ class SubmissionViewingEventsController < ApplicationController
 
     # if link is nil that means this is not an expertiza review
     if data[:link].nil?
-      submission_viewing_event_records = store.where(map_id: data[:map_id], round: data[:round], end_at: nil).select { |item| item.link != "Expertiza Review"}
+      submission_viewing_event_records = store.where(map_id: data[:map_id], round: data[:round], end_at: nil).select { |item| item.link != "Expertiza Review" }
     else
       submission_viewing_event_records = store.where(map_id: data[:map_id], round: data[:round], link: data[:link])
     end
@@ -157,8 +147,8 @@ class SubmissionViewingEventsController < ApplicationController
         submissionviewingevent_entry.end_at = data[:end_at]
 
         to_find = submissionviewingevent_entry.to_h()
-        search = {map_id: to_find[:map_id], round: to_find[:round], link: to_find[:link]}
-        if(!SubmissionViewingEvent.where(search).empty?) # checks if record already exists for link
+        search = { map_id: to_find[:map_id], round: to_find[:round], link: to_find[:link] }
+        if (!SubmissionViewingEvent.where(search).empty?) # checks if record already exists for link
           SubmissionViewingEvent.where(search).update_all(end_at: data[:end_at]) # if yes update current entry
         else
           store.hard_save(submissionviewingevent_entry) # if no create new entry
@@ -232,6 +222,52 @@ class SubmissionViewingEventsController < ApplicationController
     end
   end
 
+  def start_timing_for_link(map_id, round, link)
+    start_time = DateTime.now
+
+    # check for pre-existing record
+    records = @store.where(
+      map_id: args[:map_id],
+      round: args[:round],
+      link: args[:link]
+    )
+
+    if records
+      _record_start_time(records)
+    else
+      new = LocalSubmittedContent.new map_id: args[:map_id],
+                                      round: args[:round],
+                                      link: args[:link],
+                                      start_at: start_time,
+                                      end_at: nil,
+                                      created_at: start_time,
+                                      updated_at: start_time,
+                                      total_time: 0
+      @store.save(new)
+    end
+  end
+
+  def start_timing_for_round(map_id, round)
+    # check for pre-existing record
+    records = @store.where(
+      map_id: args[:map_id],
+      round: args[:round]
+    )
+
+    _record_start_time(records)
+  end
+
+  def _record_start_time(records)
+    start_time = DateTime.now
+    if records
+      records.each do |record|
+        record.start_at = start_time
+        record.end_at = nil
+        record.updated_at = start_time
+      end
+    end
+  end
+
   # End timing for a single [link] in the given review and [round].
   def end_timing_for_link(map_id, round, link)
     # if link is provided, we'll update the end time for it
@@ -252,10 +288,12 @@ class SubmissionViewingEventsController < ApplicationController
   # to DateTime.now and update the total_time accumulator
   def _record_end_time(records)
     end_time = DateTime.now
-    records.each do |record|
-      record.end_at = end_time
-      record.updated_at = end_time
-      record.total_time += record.time_diff
+    if records
+      records.each do |record|
+        record.end_at = end_time
+        record.updated_at = end_time
+        record.total_time += record.time_diff
+      end
     end
   end
 

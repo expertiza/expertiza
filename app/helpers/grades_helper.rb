@@ -10,6 +10,55 @@ module GradesHelper
     end
   end
 
+  # This function returns attributes for penalties
+  def get_penalty_attributes(_participant)
+    deadline_type_id = [1, 2, 5]
+    penalties_symbols = %i[submission review meta_review]
+    deadline_type_id.zip(penalties_symbols).each do |id, symbol|
+      CalculatedPenalty.create(deadline_type_id: id, participant_id: @participant.id, penalty_points: penalties[symbol])
+    end
+  end
+
+  # This function removes the negative scores and build charts
+  def get_charts(symbol)
+    if @participant_score and @participant_score[symbol]
+      scores = get_scores_for_chart @participant_score[symbol][:assessments], symbol.to_s
+      scores -= [-1.0]
+      @grades_bar_charts[symbol] = bar_chart(scores)
+    end
+  end
+
+  def get_average_vector(scores)
+    scores[:teams].reject! {|_k, v| v[:scores][:avg].nil? }
+    scores[:teams].map {|_k, v| v[:scores][:avg].to_i }
+  end
+
+  # Return the average of all the reviews
+  def mean(array)
+    array.inject(0) {|sum, x| sum + x } / array.size.to_f
+  end
+
+  # Get all the penalties
+  def get_penalties(assignment_id)
+    @all_penalties = {}
+    @assignment = Assignment.find(assignment_id)
+    calculate_for_participants = true unless @assignment.is_penalty_calculated
+    Participant.where(parent_id: assignment_id).each do |participant|
+      penalties = calculate_penalty(participant.id)
+      @total_penalty = 0
+
+      unless  penalties[:submission].zero? || penalties[:review].zero? || penalties[:meta_review].zero?
+
+        @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
+        l_policy = LatePolicy.find(@assignment.late_policy_id)
+        @total_penalty = l_policy.max_penalty if @total_penalty > l_policy.max_penalty
+        get_penalty_attributes(@participant) if calculate_for_participants
+      end
+      assign_all_penalties(participant, penalties)
+    end
+    @assignment.update_attribute(:is_penalty_calculated, true) unless @assignment.is_penalty_calculated
+  end
+
   def has_team_and_metareview?
     if params[:action] == "view"
       @assignment = Assignment.find(params[:id])

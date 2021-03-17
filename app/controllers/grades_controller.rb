@@ -18,10 +18,10 @@ class GradesController < ApplicationController
       are_needed_authorizations_present?(params[:id], "reader", "reviewer") and
       check_self_review_status
     when 'view_team'
-      if ['Student'].include? current_role_name # students can only see the head map for their own team
+      if ['Student'].include? current_role_name # students can only see the heat map for their own team
         participant = AssignmentParticipant.find(params[:id])
         session[:user].id == participant.user_id
-      else
+      elsevector
         true
       end
     else
@@ -50,10 +50,10 @@ class GradesController < ApplicationController
     end
 
     @scores = @assignment.scores(@questions)
-    averages = calculate_average_vector(@assignment.scores(@questions))
+    averages = get_average_vector(@assignment.scores(@questions))
     @average_chart = bar_chart(averages, 300, 100, 5)
     @avg_of_avg = mean(averages)
-    calculate_all_penalties(@assignment.id)
+    get_penalties(@assignment.id)
 
     @show_reputation = false
   end
@@ -70,7 +70,7 @@ class GradesController < ApplicationController
     make_chart
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
     @stage = @participant.assignment.get_current_stage(@topic_id)
-    calculate_all_penalties(@assignment.id)
+    get_penalties(@assignment.id)
     # prepare feedback summaries
     summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
     sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewee(@questions, @assignment, @team_id, summary_ws_url)
@@ -205,34 +205,6 @@ class GradesController < ApplicationController
     false
   end
 
-  def calculate_all_penalties(assignment_id)
-    @all_penalties = {}
-    @assignment = Assignment.find(assignment_id)
-    calculate_for_participants = true unless @assignment.is_penalty_calculated
-    Participant.where(parent_id: assignment_id).each do |participant|
-      penalties = calculate_penalty(participant.id)
-      @total_penalty = 0
-
-      unless penalties[:submission].zero? || penalties[:review].zero? || penalties[:meta_review].zero?
-
-        @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
-        l_policy = LatePolicy.find(@assignment.late_policy_id)
-        @total_penalty = l_policy.max_penalty if @total_penalty > l_policy.max_penalty
-        calculate_penatly_attributes(@participant) if calculate_for_participants
-      end
-      assign_all_penalties(participant, penalties)
-    end
-    @assignment.update_attribute(:is_penalty_calculated, true) unless @assignment.is_penalty_calculated
-  end
-
-  def calculate_penatly_attributes(_participant)
-    deadline_type_id = [1, 2, 5]
-    penalties_symbols = %i[submission review meta_review]
-    deadline_type_id.zip(penalties_symbols).each do |id, symbol|
-      CalculatedPenalty.create(deadline_type_id: id, participant_id: @participant.id, penalty_points: penalties[symbol])
-    end
-  end
-
   def assign_all_penalties(participant, penalties)
     @all_penalties[participant.id] = {
       submission: penalties[:submission],
@@ -255,18 +227,10 @@ class GradesController < ApplicationController
         end
         @grades_bar_charts[:review] = bar_chart(scores)
       else
-        remove_negative_scores_and_build_charts(:review)
+        get_charts(:review)
       end
     end
-    participant_score_types.each {|symbol| remove_negative_scores_and_build_charts(symbol) }
-  end
-
-  def remove_negative_scores_and_build_charts(symbol)
-    if @participant_score and @participant_score[symbol]
-      scores = get_scores_for_chart @participant_score[symbol][:assessments], symbol.to_s
-      scores -= [-1.0]
-      @grades_bar_charts[symbol] = bar_chart(scores)
-    end
+    participant_score_types.each {|symbol| get_charts(symbol) }
   end
 
   def get_scores_for_chart(reviews, symbol)
@@ -275,11 +239,6 @@ class GradesController < ApplicationController
       scores << Answer.get_total_score(response: [review], questions: @questions[symbol.to_sym], q_types: [])
     end
     scores
-  end
-
-  def calculate_average_vector(scores)
-    scores[:teams].reject! {|_k, v| v[:scores][:avg].nil? }
-    scores[:teams].map {|_k, v| v[:scores][:avg].to_i }
   end
 
   def bar_chart(scores, width = 100, height = 100, spacing = 1)
@@ -305,9 +264,5 @@ class GradesController < ApplicationController
     else
       return true
     end
-  end
-
-  def mean(array)
-    array.inject(0) {|sum, x| sum += x } / array.size.to_f
   end
 end

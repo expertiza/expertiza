@@ -12,8 +12,6 @@ class SubmissionViewingEventsController < ApplicationController
   def record_start_time2
     args = request_params
 
-    # :start_at has been updated to be a timestamp from the client-side
-    # so it needs to be parsed to a DateTime for the database
     start_time = DateTime.now
 
     # check for pre-existing record
@@ -24,18 +22,22 @@ class SubmissionViewingEventsController < ApplicationController
     )
 
     if records
-      # one existed in local storage already
-      # update the start time, and clear the end time
       record = records[0]
       record.start_at = start_time
       record.end_at = nil
+      record.updated_at = start_time
     else
       # one did not exist in local storage already
-      # create a new one, record the start time, and clear the end time
-      # be sure to save the new record to local storage at the end
-      record = LocalSubmittedContent.new(args)
-      record.start_at = start_time
-      record.end_at = nil
+      # create a new one and save the new record to
+      # local storage
+      record = LocalSubmittedContent.new map_id: args[:map_id],
+                                         round: args[:round],
+                                         link: args[:link],
+                                         start_at: start_time,
+                                         end_at: nil,
+                                         created_at: start_time,
+                                         updated_at: start_time,
+                                         total_time: 0
       @store.save(record)
     end
 
@@ -58,6 +60,7 @@ class SubmissionViewingEventsController < ApplicationController
 
     records.each do |record|
       record.end_at = DateTime.now
+      record.total_time += record.time_diff
     end
 
     respond_to do |format|

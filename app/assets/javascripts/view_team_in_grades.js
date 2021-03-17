@@ -209,35 +209,12 @@ function drawTagGrid(rowData) {
     let numRounds = countRounds(rowData);
     let roundPrefix = "";
 
-    // Load table object
+    // Load table object and set width attribute
     let table = document.getElementById("tag_heat_grid");
-
-    // Set basic table attributes
     let gridWidth = getGridWidth(rowData);
 
     //create the header
-    let thead = table.createTHead();
-    let row = thead.insertRow();
-    row.setAttribute("class", "hide-scrollbar tablesorter-headerRow");
-
-    // Create "Tags Completed:" Cell
-    let th = document.createElement("th");
-    let text = document.createTextNode("\u2195 Tags Completed");
-    th.setAttribute("id", "tagsSuperLabel");
-    th.colSpan = 3;
-    addToolTip(th, "Click to collapse/expand");
-    th.appendChild(text);
-    row.appendChild(th);
-
-    // create "# / #" Cell showing number of completed tags (initialize as 0 / 0 for now)
-    th = document.createElement("th");
-    text = document.createTextNode("0/0");
-    th.setAttribute("id", "tagsSuperNumber");
-    th.colSpan = 2;
-    addToolTip(th, headerTooltipText);
-    th.appendChild(text);
-    row.appendChild(th);
-    row.setAttribute("onClick", "toggleHeatGridRows()");
+    drawHeader(table, headerTooltipText);
 
     //create table body
     let tbody = table.appendChild(document.createElement('tbody'));
@@ -251,59 +228,98 @@ function drawTagGrid(rowData) {
 
         // If this is a new question number, add a row indicating a new question.
         if(questionNum !== priorQuestionNum) {
-            if(priorQuestionNum !== -1 && priorQuestionNum > questionNum) { ++roundNum; }
-            // Update prior question index
-            priorQuestionNum = questionNum;
-            // Draw a "Question: # " Row that spans all columns
-            let cell = trow.insertCell();
-            cell.colSpan = gridWidth;
-            cell.className = "tag_heat_grid_criterion";
-            addToolTip(cell, tooltipText);
-            trow.id = "hg_row" + questionNum + "_" + reviewNum;
-            trow.setAttribute("data-questionnum", questionNum);
-            if(numRounds > 1) {
-                roundPrefix = "Round " + roundNum + " -- ";
-            }
-            let text = document.createTextNode( roundPrefix + "Question " + questionNum);
-            cell.appendChild(text);
-            // Initialize new row to be used by the inner loop for reviews.
-            trow = tbody.insertRow();
-            let temp = reviewNum - 1;
-            trow.id = "hg_row" + questionNum + "_" + temp;
+            let labelRowData = drawQuestionRow(priorQuestionNum, questionNum, roundNum, trow, gridWidth, tooltipText,
+                reviewNum, numRounds, roundPrefix, tbody);
+            priorQuestionNum = labelRowData.priorQuestionNum;
+            trow = labelRowData.trow;
         }
 
-        // If not a new question, continue to populate rows with cells
-        trow.id = "hg_row" + questionNum + "_" + reviewNum;
-        trow.setAttribute("data-questionnum", questionNum);
-        for(let cIndex = 0; cIndex < gridWidth; ++cIndex) {
-            let cell = trow.insertCell();
-            // Set the text value of the grid cell
-            let innerText = "R." + reviewNum;
-            // If review doesn't have tag prompts
-            if(rowData[rIndex].get('has_tag') == false){
-                cell.setAttribute("class", "c0");
-                innerText += symNoTag;
+        // If not a new question, add a row containing review grid cells
+        drawReviewRow(trow, questionNum, reviewNum, gridWidth, rowData, rIndex, tooltipText);
+    }
+}
+
+// Generates the header rows and cells for the tag heatgrid with "Tags Completed # out of #"
+function drawHeader(table, headerTooltipText) {
+    let thead = table.createTHead();
+    let row = thead.insertRow();
+    row.setAttribute("class", "hide-scrollbar tablesorter-headerRow");
+
+    // Create "Tags Completed:" Cell
+    let th = document.createElement("th");
+    let text = document.createTextNode("\u2195 Tags Completed");
+    th.setAttribute("id", "tagsSuperLabel");
+    th.colSpan = 3;
+    addToolTip(th, "Click to collapse/expand");
+    th.appendChild(text);
+    row.appendChild(th);
+
+    // create "# / #" Cell to show number of completed tags
+    th = document.createElement("th");
+    text = document.createTextNode("0/0");
+    th.setAttribute("id", "tagsSuperNumber");
+    th.colSpan = 2;
+    addToolTip(th, headerTooltipText);
+    th.appendChild(text);
+    row.appendChild(th);
+    row.setAttribute("onClick", "toggleHeatGridRows()");
+}
+
+function drawQuestionRow(priorQuestionNum, questionNum, roundNum, trow, gridWidth, tooltipText, reviewNum, numRounds, roundPrefix, tbody) {
+    if (priorQuestionNum !== -1 && priorQuestionNum > questionNum) {
+        ++roundNum;
+    }
+    // Update prior question index
+    priorQuestionNum = questionNum;
+    // Draw a "Question: # " Row that spans all columns
+    let cell = trow.insertCell();
+    cell.colSpan = gridWidth;
+    cell.className = "tag_heat_grid_criterion";
+    addToolTip(cell, tooltipText);
+    trow.id = "hg_row" + questionNum + "_" + reviewNum;
+    trow.setAttribute("data-questionnum", questionNum);
+    if (numRounds > 1) {
+        roundPrefix = "Round " + roundNum + " -- ";
+    }
+    let text = document.createTextNode(roundPrefix + "Question " + questionNum);
+    cell.appendChild(text);
+    // Initialize new row to be used by the inner loop for reviews.
+    trow = tbody.insertRow();
+    let temp = reviewNum - 1;
+    trow.id = "hg_row" + questionNum + "_" + temp;
+    return {priorQuestionNum, trow};
+}
+
+// Draws a row of grid cells containing information from a single review's tags.
+function drawReviewRow(trow, questionNum, reviewNum, gridWidth, rowData, rIndex, tooltipText) {
+    trow.id = "hg_row" + questionNum + "_" + reviewNum;
+    trow.setAttribute("data-questionnum", questionNum);
+    for (let cIndex = 0; cIndex < gridWidth; ++cIndex) {
+        let cell = trow.insertCell();
+        // Set the text value of the grid cell
+        let innerText = "R." + reviewNum;
+        // If review doesn't have tag prompts
+        if (rowData[rIndex].get('has_tag') == false) {
+            cell.setAttribute("class", "c0");
+            innerText += symNoTag;
+        } else {
+            let idString = "tag_heatmap_id_" + rIndex + "_" + cIndex;
+            cell.setAttribute("id", idString);
+            if (rowData[rIndex].get('tag_list').get(cIndex).value == 0) {
+                // Set color as failing
+                cell.setAttribute("class", "c1");
+                innerText += symTagNotDone;
+            } else {
+                // Set color as successful
+                cell.setAttribute("class", "c5");
+                innerText += symTagDone;
             }
-            else {
-                let idString = "tag_heatmap_id_" + rIndex + "_" + cIndex;
-                cell.setAttribute("id", idString);
-                if(rowData[rIndex].get('tag_list').get(cIndex).value == 0) {
-                    // Set color as failing
-                    cell.setAttribute("class", "c1");
-                    innerText += symTagNotDone;
-                }
-                else {
-                    // Set color as successful
-                    cell.setAttribute("class", "c5");
-                    innerText += symTagDone;
-                }
-                rowData[rIndex].get('tag_list').get(cIndex).setAttribute("data-tagheatmapid", idString);
-            }
-            let text = document.createTextNode(innerText);
-            //add to table
-            cell.appendChild(text);
-            addToolTip(cell, tooltipText);
+            rowData[rIndex].get('tag_list').get(cIndex).setAttribute("data-tagheatmapid", idString);
         }
+        let text = document.createTextNode(innerText);
+        //add to table
+        cell.appendChild(text);
+        addToolTip(cell, tooltipText);
     }
 }
 

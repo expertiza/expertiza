@@ -13,14 +13,13 @@
   });
 
   function toggleFunction(elementId) {
-      var target = document.getElementById(elementId);
-      if (target.style.display === 'none') {
-          target.style.display = 'block';
-      } else {
-          target.style.display = 'none';
-      }
+    var target = document.getElementById(elementId);
+    if (target.style.display === 'none') {
+        target.style.display = 'block';
+    } else {
+        target.style.display = 'none';
+    }
   }
-
 </script>
 <h2>Summary Report for assignment: <%= @assignment.name %></h2>
 <!-- Anchor for Tag Heatgrid. Heatgrid generation code located in /assets/javascripts/view_team_in_grades.js -->

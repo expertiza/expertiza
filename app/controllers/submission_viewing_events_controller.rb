@@ -122,7 +122,7 @@ class SubmissionViewingEventsController < ApplicationController
         'Data' => percentages,
         'tables' => tables,
         'total' => secondsToHuman(totalTime),
-        'totalavg' => avgClassTime
+        'totalavg' => secondsToHuman(avgClassTime)
     }
 
     # respond to request with JSON containing all data

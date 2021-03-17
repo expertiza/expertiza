@@ -432,13 +432,6 @@ resources :institution, except: [:destroy] do
 
   resources :submission_viewing_events do
     collection do
-      post :record_start_time
-      post :record_end_time
-      post :mark_end_time
-      get :record_start_time
-      get :record_end_time
-
-      # new routes
       post :getTimingDetails
       post :start_timing
       post :end_timing

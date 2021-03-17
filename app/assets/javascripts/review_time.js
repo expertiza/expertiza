@@ -76,7 +76,7 @@ function markEndTime(map_id, round) {
 function startTime2(map_id, round, link) {
     $.ajax({
         type: "POST",
-        url: '/submission_viewing_events/record_start_time2',
+        url: '/submission_viewing_events/start_timing',
         data: JSON.stringify({
             map_id: map_id,
             round: round,
@@ -111,7 +111,7 @@ function endTime2(map_id, round, link) {
         type: 'POST',
         dataType: 'json',
         async: false,
-        url: '/submission_viewing_events/record_end_time',
+        url: '/submission_viewing_events/end_timing',
         data: JSON.stringify(data),
         error: function(e) {
             console.log(e);

@@ -1,13 +1,10 @@
 $=jQuery;
 
 $(function () {
-    $("[data-toggle='tooltip']").tooltip();
-    // Change to this was done as part of E1788_OSS_project_Maroon_Heatmap_fixes
-    //
-    // scoreTable was assigned to as classes for the table which required to be sortable
+    // Changed as part of E1788_OSS_project_Maroon_Heatmap_fixes
+    // scoreTable was assigned as classes for the table which is required to be sortable
     // tablesorter is initialised on all the elements having class scoreTable
-    //
-    // fix comment end
+    $("[data-toggle='tooltip']").tooltip();
     $(".scoresTable").tablesorter();
 });
 
@@ -28,7 +25,6 @@ function col_sort(m) {
             }
         });
 
-
         var cols;
         rows.each(function () {
             cols = jQuery(this).children('th, td');
@@ -47,7 +43,7 @@ function col_sort(m) {
     var columns = tbr.eq(tbr.length - 1).find('td');
     // Init an array to hold the review total
     var sum_array = [];
-    // iterate through the rows and calculate the total of each review
+    // Iterate through the rows and calculate the total of each review
     for (var l = 2; l < columns.length - 2; l++) {
         var total = 0;
         for (var n = 0; n < tbr.length; n++) {

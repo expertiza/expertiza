@@ -30,7 +30,7 @@ function drawTimeCanvas(chartdata,resd) {
         $('#timeTable > :last-child').append("<tr>" +
             "<td>" + d.subject + "</td>" +
             "<td>" + d.timecost + "</td>" +
-            "<td>" + d.clsavg + "</td>" +
+            "<td>" + "</td>" +
             "</tr>");
 
     }

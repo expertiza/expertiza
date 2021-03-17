@@ -98,13 +98,8 @@ class SubmissionViewingEventsController < ApplicationController
     # get total time spent on review
     totalTime = getTotalTime(params[:reponse_map_id], params[:round])
 
-    # get all timing entries for review (each link has one entry)
-    timingEntries = SubmissionViewingEvent.where(map_id: params[:reponse_map_id], round: params[:round])
-
-    avgClassTime = getAvgRevTime(params[:reponse_map_id], params[:round])
-
-    # push all data into relevant arrays for JSON
-    timingEntries.each do |entry|
+    # push relevant data for each row into arrays used to fill in JSON
+    SubmissionViewingEvent.where(map_id: params[:reponse_map_id], round: params[:round]).each do |entry|
       labels.push(entry.link)
       percentages.push((entry.end_at - entry.start_at).to_f/totalTime)
       tables.push({
@@ -116,11 +111,16 @@ class SubmissionViewingEventsController < ApplicationController
 
     # create JSON
     @timingDetails = {
+        # contains links accessed in review
         'Labels'=> labels,
+        # contains percentage time spent per link
         'Data' => percentages,
+        # contains link name and time spent for display table
         'tables' => tables,
+        # contains total time spent in human format
         'total' => secondsToHuman(totalTime),
-        'totalavg' => secondsToHuman(avgClassTime)
+        # contains average review time for assignment in human format
+        'totalavg' => secondsToHuman(getAvgRevTime(params[:reponse_map_id], params[:round]))
     }
 
     # respond to request with JSON containing all data

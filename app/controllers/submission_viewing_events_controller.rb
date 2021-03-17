@@ -82,16 +82,26 @@ class SubmissionViewingEventsController < ApplicationController
   def hard_save
     args = request_params
     @uncommitted = []
-    records = @store.where(map_id: args[:map_id], round: [:round])
+    records = @store.where(map_id: args[:map_id], round: args[:round])
 
     records.each do |record|
       # push the uncommitted link on to the stack
       @uncommitted << record.link
 
-      # if an update on the database doesn't work
-      # then we can assume this record didn't exist already
-      # and we can delegate saving to `LocalStorage`
-      unless SubmissionViewingEvent.update(record.to_h)
+      previous = SubmissionViewingEvent.where(
+        map_id: record.map_id,
+        round: record.round,
+        link: record.link
+      )
+
+      if previous
+        # make sure to add the total time on this record
+        # with what may have already been in the database
+        updated = record.merge(previous)
+        SubmissionViewingEvent.update(updated.to_h)
+      else
+        # if a previous record doesn't exist,
+        # we can delegate saving to `LocalStorage`
         store.hard_save(record)
       end
 

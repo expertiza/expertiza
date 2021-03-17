@@ -94,7 +94,6 @@ class SubmissionViewingEventsController < ApplicationController
     labels = [] # store links accessed during review
     percentages = [] # store percentage time per link for pie chart
     tables = [] # store timing data breakdown per link
-    avgClassTime = 0
 
     # get total time spent on review
     totalTime = getTotalTime(params[:reponse_map_id], params[:round])
@@ -102,7 +101,7 @@ class SubmissionViewingEventsController < ApplicationController
     # get all timing entries for review (each link has one entry)
     timingEntries = SubmissionViewingEvent.where(map_id: params[:reponse_map_id], round: params[:round])
 
-    avgClassTime =  getAvgRevTime(params[:reponse_map_id], params[:round])
+    avgClassTime = getAvgRevTime(params[:reponse_map_id], params[:round])
 
     # push all data into relevant arrays for JSON
     timingEntries.each do |entry|

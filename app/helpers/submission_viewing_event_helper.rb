@@ -39,11 +39,7 @@ module SubmissionViewingEventHelper
 
     # Iterates through the ResponseMap table to get maps pertaining to particular assignment
     ResponseMap.where(reviewed_object_id: assignmentId).each do |map|
-      # Iterates through SubmissionViewingEvent table to get rows pertaining to the current map.id
-      SubmissionViewingEvent.where(map_id: map.id, round: params[:round]).each do |event|
-        reviewTotalTime = reviewTotalTime + event.total_time # sums the total time spent on that review
-      end
-
+      getTotalTime(map.id, params[:round]) # returns total review time for specified map and round
       classTimes.push(reviewTotalTime) # pushes summed review time onto array
       reviewTotalTime = 0 # resets sum of review time
     end

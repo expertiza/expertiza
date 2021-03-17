@@ -127,11 +127,11 @@
                     }
 
                     if ($("#restart_file_timing_flag").val() === 'true') {
-                        filesToUpdate.forEach(function (file) {
+                        for (let file in filesToUpdate) {
                             if (filesToUpdate[file]) {
                                 startTime2(map_id, round, file);
                             }
-                        });
+                        }
 
                         $("#restart_file_timing_flag").val('false');
                     }

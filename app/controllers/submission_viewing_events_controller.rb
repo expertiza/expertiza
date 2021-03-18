@@ -134,8 +134,10 @@ class SubmissionViewingEventsController < ApplicationController
   # to work with.
   def ensure_store
     unless @store
+      ExpertizaLogger.info("No saved LocalStorage instance, creating one!")
       @store = LocalStorage.new
     end
+    ExpertizaLogger.info("Local Storage: #{@store}")
   end
 
   def start_timing_for_link(map_id, round, link)
@@ -151,6 +153,7 @@ class SubmissionViewingEventsController < ApplicationController
     if records
       _record_start_time(records)
     else
+      ExpertizaLogger.info("No previous link record found, creating a new one.")
       new = LocalSubmittedContent.new map_id: map_id,
                                       round: round,
                                       link: link,

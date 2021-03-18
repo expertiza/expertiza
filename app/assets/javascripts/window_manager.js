@@ -36,3 +36,16 @@ WindowManager.prototype.size = function() {
     return this.windows.length;
 };
 
+WindowManager.prototype.newViewingWindow = function(
+    response_map_id, response_round, resource,
+    onFocus, onBlur
+) {
+    return window.open(resource, "_blank")
+        .focus(function() {
+            onFocus();
+        })
+        .blur(function() {
+            onBlur();
+        });
+};
+

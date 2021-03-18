@@ -156,6 +156,17 @@ function updateTagsFraction(countMap) {
     cell.innerText = countMap.get("onTags") + " out of " + countMap.get("total");
     // Set background color class based on ratio
     cell.className = "c"+countMap.get("ratioClass").toString();
+    // If all tags are done, collapse the heatgrid
+    if(countMap.get("ratioClass") === 5) {
+        $("[id^=hg_row]").each(function () {
+            $( this ).css("display", "none");
+        });
+    } else { // Or, open the heatgrid if this change means tags are unfinished
+        $("[id^=hg_row]").each(function () {
+            $( this ).css("display", "");
+        });
+    }
+
 }
 
 // Updates the Review Tag Heat Grid each time a tag is changed
@@ -193,6 +204,11 @@ function toggleHeatGridRows() {
     });
 }
 
+// Collapse the heatgrid rows which make up the Map of tags.
+function collapseHeatGrid() {
+
+}
+
 /********************************** ELEMENT/CODE GENERATORS ****************************************/
 
 // Renders the review tag heatgrid table based on the review rowData array.
@@ -228,6 +244,7 @@ function drawTagGrid(rowData) {
                 reviewNum, numRounds, roundPrefix, tbody);
             priorQuestionNum = labelRowData.priorQuestionNum;
             trow = labelRowData.trow;
+            roundNum = labelRowData.roundNum;
         }
 
         // If not a new question, add a row containing review grid cells
@@ -286,7 +303,7 @@ function drawQuestionRow(priorQuestionNum, questionNum, roundNum, trow, gridWidt
     trow = tbody.insertRow();
     let temp = reviewNum - 1;
     trow.id = "hg_row" + questionNum + "_" + temp;
-    return {priorQuestionNum, trow};
+    return {priorQuestionNum, trow, roundNum};
 }
 
 // Draws a row of grid cells containing information from a single review's tags.

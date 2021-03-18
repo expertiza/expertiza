@@ -127,9 +127,7 @@ class SubmissionViewingEventsController < ApplicationController
   # Permit: :link
   def request_params2
     ExpertizaLogger.info("Submission Viewing Event Params: #{params}")
-    params
-      .require(:submission_viewing_event)
-      .permit(:map_id, :round, :link)
+    params.require(:submission_viewing_event).permit(:map_id, :round, :link)
   end
 
   # Ensure that we have a non-nil instance of LocalStorage

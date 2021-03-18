@@ -198,8 +198,8 @@ function toggleHeatGridRows() {
 // Renders the review tag heatgrid table based on the review rowData array.
 function drawTagGrid(rowData) {
     //Configure text of tooltip Legend
-    let tooltipText = "Color Legend:\nGrey: no tags available\nRed: tag not complete\nGreen: tag complete.";
-    let headerTooltipText = "Tag Fraction Color Scaled by:\nRed: 0-30% tags completed\nOrange: 30-60% tags completed\nYellow: 60-99% Tags Completed\nGreen: All tags completed";
+    let tooltipText = "Color Legend:\nGrey: no tags available\nRed: tag not complete\nGreen: tag complete";
+    let headerTooltipText = "Tag fraction color scaled by:\nRed: 0-30% tags completed\nOrange: 30-60% tags completed\nYellow: 60-99% tags completed\nGreen: all tags completed";
 
     // Handle multi-round reviews and initialize prefix which will become "Round # -- " if multiple rounds
     let numRounds = countRounds(rowData);

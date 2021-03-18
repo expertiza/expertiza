@@ -77,7 +77,7 @@ class SubmissionViewingEventsController < ApplicationController
   # without necessarily having to send back-to-back requests.
   def end_round_and_save
     args = request_params2
-    ExpertizaLogger.info "Received request to end timing for round #{args[:round]} with params #{args}"
+    ExpertizaLogger.info "Received request to end and save timing for round #{args[:round]} with params #{args}"
     end_timing_for_round(args[:map_id], args[:round])
     save_and_remove_all(args[:map_id], args[:round])
     head :no_content
@@ -216,6 +216,7 @@ class SubmissionViewingEventsController < ApplicationController
   # Actually performs the work flushing records from
   # local storage to the database and removing them.
   def save_and_remove_all(map_id, round)
+    ExpertizaLogger.info("Flushing LocalStorage to the database...")
     uncommitted = []
     records = @store.where(map_id: map_id, round: round)
 
@@ -245,6 +246,7 @@ class SubmissionViewingEventsController < ApplicationController
       store.remove(record)
     end
 
+    ExpertizaLogger.info("Flushed #{uncommited.length} links\n#{uncommitted}")
     uncommitted
   end
 end

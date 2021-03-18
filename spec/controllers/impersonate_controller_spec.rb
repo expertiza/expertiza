@@ -82,5 +82,23 @@ describe ImpersonateController do
             expect(session[:original_user]).to eq instructor
             expect(session[:impersonate]).to be true
         end
+
+        it 'instructor should be able to impersonate a user while already impersonating a user but from nav bar' do
+            allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
+            allow(User).to receive(:find_by).with(name: student2.name).and_return(student2)
+            allow(instructor).to receive(:can_impersonate?).with(student1).and_return(true)
+            allow(instructor).to receive(:can_impersonate?).with(student2).and_return(true)
+            request.env["HTTP_REFERER"] = "http://www.example.com"
+            @params = { user: { name: student1.name } }
+            @session = { user: instructor }
+            post :impersonate, @params, @session
+            # nav bar uses the :impersonate as the param name, so let make sure it always works from there too.
+            @params = { impersonate: { name: student2.name } }
+            post :impersonate, @params, @session
+            expect(session[:super_user]).to eq instructor
+            expect(session[:user]).to eq student2
+            expect(session[:original_user]).to eq instructor
+            expect(session[:impersonate]).to be true
+        end
     end
 end

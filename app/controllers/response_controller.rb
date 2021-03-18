@@ -290,7 +290,7 @@ class ResponseController < ApplicationController
     end
     @participant = @map.reviewer
     @contributor = @map.contributor
-    new_response ? set_questionnaire_for_new_response : set_questionnaire
+    new_response ? get_questionnaire_from_response_map : set_questionnaire
     set_dropdown_or_scale
     @questions = sort_questions(@questionnaire.questions)
     @min = @questionnaire.min_question_score
@@ -298,6 +298,7 @@ class ResponseController < ApplicationController
   end
 
   # assigning the instance variables for Edit and New actions
+
   def assign_instance_vars
     case params[:action]
     when 'edit'
@@ -316,7 +317,11 @@ class ResponseController < ApplicationController
     @return = params[:return]
   end
 
-  def set_questionnaire_for_new_response
+  # This method is called within set_content and the new_response flag is set to true
+  # Depending on what type of response map corresponds to this response,
+  # This is called after assign_instance_vars in the new method
+  # This is basically doing the same thing as set_questionnaire but it is finding the questionnaire from the respone map instead of from the response object
+  def get_questionnaire_from_response_map
     case @map.type
     when "ReviewResponseMap", "SelfReviewResponseMap"
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
@@ -333,6 +338,7 @@ class ResponseController < ApplicationController
     end
   end
 
+  # get_questionnaire_from_response
   def set_questionnaire
     # if user is not filling a new rubric, the @response object should be available.
     # we can find the questionnaire from the question_id in answers

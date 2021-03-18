@@ -39,16 +39,22 @@ module SubmissionViewingEventHelper
     return human
   end
 
-  # Returns average time taken for a review of an assignment for a specific round given a response_map_id in that assignment and a round
-  def getAvgRevTime(response_map_id, round)
-    classTimes = [] # holds total review times for each reviewer
+  # Return array of review times based on specific inputs
+  def getReviewTimes(map_id, round, link = nil, getAllSubmissions = nil)
+    reviewerTimes = [] # holds total review times for each reviewer
 
-    # Gets the assignmentId for the given response_map
-    assignmentId = ResponseMap.find(params[:reponse_map_id]).reviewed_object_id
+    # Generate search hash
+    # if link is not specified remove reviewee_id bc you will then be looking for the entire class average time
+    searchParams = {
+        # Get assignment id for specific response_map
+        reviewed_object_id: ResponseMap.find(map_id).reviewed_object_id,
+        # Get reviewee id for team being reviewed in respose_map
+        reviewee_id: ResponseMap.find(map_id).reviewee_id
+    }.delete_if{ |key, value| (getAllSubmissions == 1 || link == nil) && key == :reviewee_id }
 
     # Iterates through the ResponseMap table to get maps pertaining to particular assignment
-    ResponseMap.where(reviewed_object_id: assignmentId).each do |map|
-      classTimes.push(getTotalTime(map.id, params[:round])) # pushes summed review time onto array
+    ResponseMap.where(searchParams).each do |map|
+      reviewerTimes.push(getTotalTime(map.id, round, link)) # pushes summed review time onto array
     end
 
     return classTimes.reduce(:+) / classTimes.size # returns average of classTimes array

@@ -10,6 +10,18 @@ module GradesHelper
     end
   end
 
+  # Filters all non nil values and converts them to integer
+  # Returns a vector
+  def vector(scores)
+    scores[:teams].reject! {|_k, v| v[:scores][:avg].nil? }
+    scores[:teams].map {|_k, v| v[:scores][:avg].to_i }
+  end
+
+  # This function returns the average
+  def mean(array)
+    array.inject(0) {|sum, x| sum += x } / array.size.to_f
+  end
+
   # This function returns the penalty attributes
   def attributes(_participant)
     deadline_type_id = [1, 2, 5]

@@ -44,7 +44,7 @@ class GradesController < ApplicationController
     end
 
     @scores = @assignment.scores(@questions)
-    averages = calculate_average_vector(@assignment.scores(@questions))
+    averages = vector(@assignment.scores(@questions))
     @average_chart = bar_chart(averages, 300, 100, 5)
     @avg_of_avg = mean(averages)
     penalties(@assignment.id)
@@ -245,13 +245,6 @@ class GradesController < ApplicationController
     scores
   end
 
-  # Filters all non nil values and converts them to integer
-  # Returns a vector
-  def calculate_average_vector(scores)
-    scores[:teams].reject! {|_k, v| v[:scores][:avg].nil? }
-    scores[:teams].map {|_k, v| v[:scores][:avg].to_i }
-  end
-
   def bar_chart(scores, width = 100, height = 100, spacing = 1)
     link = nil
     GoogleChart::BarChart.new("#{width}x#{height}", " ", :vertical, false) do |bc|
@@ -277,9 +270,5 @@ class GradesController < ApplicationController
     else
       true
     end
-  end
-
-  def mean(array)
-    array.inject(0) {|sum, x| sum += x } / array.size.to_f
   end
 end

@@ -10,11 +10,13 @@ function startTime2(map_id, round, link) {
         type: "POST",
         url: '/submission_viewing_events/start_timing',
         data: $.param({
-            map_id: map_id,
-            round: round,
-            link: link
+            submission_viewing_event: {
+                map_id: map_id,
+                round: round,
+                link: link
+            }
         }),
-        error: function(e) {
+        error: function (e) {
             console.log(e);
         },
         dataType: "json"
@@ -30,12 +32,14 @@ function startTime2(map_id, round, link) {
  */
 function endTime2(map_id, round, link) {
     var data = {
-        map_id: map_id,
-        round: round
+        submission_viewing_event: {
+            map_id: map_id,
+            round: round
+        }
     };
 
     if (link) {
-        data.link = link;
+        data.submission_viewing_event.link = link;
     }
 
     $.ajax({
@@ -44,7 +48,7 @@ function endTime2(map_id, round, link) {
         async: false,
         url: '/submission_viewing_events/end_timing',
         data: $.param(data),
-        error: function(e) {
+        error: function (e) {
             console.log(e);
         }
     });
@@ -63,10 +67,12 @@ function saveAll(map_id, round) {
         async: false,
         url: '/submission_viewing_events/hard_save',
         data: $.param({
-            map_id: map_id,
-            round: round
+            submission_viewing_event: {
+                map_id: map_id,
+                round: round
+            }
         }),
-        error: function(e) {
+        error: function (e) {
             console.log(e);
         }
     });
@@ -79,10 +85,12 @@ function endRound(map_id, round) {
         async: false,
         url: '/submission_viewing_events/end_timing',
         data: $.param({
-            map_id: map_id,
-            round: round
+            submission_viewing_event: {
+                map_id: map_id,
+                round: round
+            }
         }),
-        error: function(e) {
+        error: function (e) {
             console.log(e);
         }
     });
@@ -95,10 +103,12 @@ function endRoundAndSave(map_id, round) {
         async: false,
         url: '/submission_viewing_events/end_round_and_save',
         data: $.param({
-            map_id: map_id,
-            round: round
+            submission_viewing_event: {
+                map_id: map_id,
+                round: round
+            }
         }),
-        error: function(e) {
+        error: function (e) {
             console.log(e);
         }
     });
@@ -111,10 +121,12 @@ function resetRound(map_id, round) {
         async: false,
         url: '/submission_viewing_events/reset_timing',
         data: $.param({
-            map_id: map_id,
-            round: round
+            submission_viewing_event: {
+                map_id: map_id,
+                round: round
+            }
         }),
-        error: function(e) {
+        error: function (e) {
             console.log(e);
         },
     });

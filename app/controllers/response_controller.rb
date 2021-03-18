@@ -62,7 +62,7 @@ class ResponseController < ApplicationController
 
   # Prepare the parameters when student clicks "Edit"
   def edit
-    assign_instance_vars
+    assign_action_parameters
     @prev = Response.where(map_id: @map.id)
     @review_scores = @prev.to_a
     if @prev.present?
@@ -122,7 +122,7 @@ class ResponseController < ApplicationController
   end
 
   def new
-    assign_instance_vars
+    assign_action_parameters
     set_content(true)
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
     # Because of the autosave feature and the javascript that sync if two reviewing windows are opened
@@ -325,9 +325,10 @@ class ResponseController < ApplicationController
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
   end
-  # assigning the instance variables for Edit and New actions
 
-  def assign_instance_vars
+  # This method is called within the Edit or New actions
+  # It will create references to the objects that the controller will need when a user creates a new response or edits an existing one.
+  def assign_action_parameters
     case params[:action]
     when 'edit'
       @header = 'Edit'
@@ -345,10 +346,9 @@ class ResponseController < ApplicationController
     @return = params[:return]
   end
 
-  # This method is called within set_content and the new_response flag is set to true
-  # Depending on what type of response map corresponds to this response,
-  # This is called after assign_instance_vars in the new method
-  # This is basically doing the same thing as set_questionnaire but it is finding the questionnaire from the respone map instead of from the response object
+  # This method is called within set_content and when the new_response flag is set to true
+  # Depending on what type of response map corresponds to this response, the method gets the reference to the proper questionnaire
+  # This is called after assign_action_parameters (where the map is first referenced) in the new method
   def get_questionnaire_from_response_map
     case @map.type
     when "ReviewResponseMap", "SelfReviewResponseMap"
@@ -367,8 +367,10 @@ class ResponseController < ApplicationController
     end
   end
 
-  # get_questionnaire_from_response
-  def set_questionnaire
+  # This method is called within set_content when the new_response flag is set to False
+  # This method gets the questionnaire directly from the response object since it is available.
+  # This method is called when they a user is editing or viewing
+  def get_questionnaire_from_response
     # if user is not filling a new rubric, the @response object should be available.
     # we can find the questionnaire from the question_id in answers
     answer = @response.scores.first

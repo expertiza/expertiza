@@ -555,7 +555,11 @@
           resetTimer();
           autoTimer();
 
-          $(":submit").click(function () {
+          $("#save_review").click(function () {
+              endRoundAndSave(map_id, round);
+          });
+
+          $("#Submit").click(function () {
               endRoundAndSave(map_id, round);
           });
       });

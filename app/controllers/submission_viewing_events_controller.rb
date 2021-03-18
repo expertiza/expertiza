@@ -133,10 +133,7 @@ class SubmissionViewingEventsController < ApplicationController
   # Ensure that we have a non-nil instance of LocalStorage
   # to work with.
   def ensure_store
-    unless @store
-      ExpertizaLogger.info("No saved LocalStorage instance, creating one!")
-      @store = LocalStorage.new
-    end
+    @store ||= LocalStorage.new
     ExpertizaLogger.info("Local Storage: #{@store}")
   end
 

@@ -127,14 +127,26 @@ class ImpersonateController < ApplicationController
       if params[:impersonate].nil?
         # Check if special chars /\?<>|&$# are used to avoid html tags or system command
         check_if_special_char
-        user = User.find_by(name: params[:user][:name])
+        # E1991 : check whether instructor is currently in anonymized view
+        if User.anonymized_view?(session[:ip])
+          # get real name when instructor is in anonymized view
+          user = User.real_user_from_anonymized_name(params[:user][:name])
+        else
+          user = User.find_by(name: params[:user][:name])
+        end
         do_main_operation(user)
       else
         # Impersonate a new account
         if !params[:impersonate][:name].empty?
           #check if special chars /\?<>|&$# are used to avoid html tags or system command
           check_if_special_char
-          user = User.find_by(name: params[:impersonate][:name])
+          # E1991 : check whether instructor is currently in anonymized view
+          if User.anonymized_view?(session[:ip])
+            # get real name when instructor is in anonymized view
+            user = User.real_user_from_anonymized_name(params[:impersonate][:name])
+          else
+            user = User.find_by(name: params[:impersonate][:name])
+          end
           do_main_operation(user)
           # Revert to original account when currently in the impersonated session
         else

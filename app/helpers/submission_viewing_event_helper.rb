@@ -1,13 +1,21 @@
 module SubmissionViewingEventHelper
 
-  # Returns number of seconds the review given at response_map_id took during given round
-  def getTotalTime(response_map_id, round)
+  # Returns number of seconds the review given at response_map_id took during given round for a given link
+  # if link is not specified give total time for all links in review instead of one specific
+  def getTotalTime(map_id, round, link = nil)
+
+    # Removes link parameter if not specified
+    searchParams = {
+        map_id: map_id,
+        round: round, link: link
+    }.delete_if{ |key, value| value.blank? }
+
     totalSeconds = 0; # Storage for number of seconds
 
     # Finds submission_viewing_event rows corresponding to map and round given
-    SubmissionViewingEvent.where(map_id: response_map_id, round: round).each do |linkTime|
-      totalSeconds = totalSeconds + (linkTime.end_at - linkTime.start_at).to_i # accumulates total time for review
-    end
+      SubmissionViewingEvent.where(searchParams).each do |linkTime|
+        totalSeconds = totalSeconds + (linkTime.end_at - linkTime.start_at).to_i # accumulates total time for review
+      end
 
     return totalSeconds
 

@@ -10,7 +10,7 @@
 
 <% session_participant = AssignmentParticipant.where(parent_id: @assignment.id, user_id: session[:user].id).first %>
 <% session_participants_team = AssignmentTeam.team(session_participant) %>
-<% same_team_flag = !session_participants_team.nil? and session_participants_team&.includes? participant %>
+<% same_team_flag = !session_participants_team.nil? and session_participants_team.includes? participant %>
 <% if params[:controller] == 'submitted_content' %>
   or
 <% end %>

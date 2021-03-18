@@ -101,7 +101,7 @@
                 let window_handler = null;
                 let link_timer = null;
 
-                if (file_name_extension in supported_file_type) {
+                if (supported_file_type.includes(file_name_extension)) {
                     alert("Open file " + file_name + " in new window to view it online.");
                     windowManager.manage(
                         windowManager.newViewingWindow(map_id, round, "Test", console.log, console.log)

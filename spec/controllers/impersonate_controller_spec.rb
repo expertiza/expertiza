@@ -11,7 +11,7 @@ describe ImpersonateController do
     end
 
     context "#impersonate" do
-        it 'when instructor tries to impersonate another user' do 
+        it 'when instructor tries to impersonate another user' do
             expect(controller.action_allowed?).to be true
         end
 

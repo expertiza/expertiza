@@ -86,8 +86,6 @@ function displayTimeDetail(resp_map_id,round){
                 }]
             };
 
-            console.log(jsonResponse);
-
             drawTimeCanvas(chartData,jsonResponse);
         },
         error: function(xhr, textStatus, errorThrown){

@@ -94,6 +94,7 @@ class SubmissionViewingEventsController < ApplicationController
     labels = [] # store links accessed during review
     percentages = [] # store percentage time per link for pie chart
     tables = [] # store timing data breakdown per link
+    stats = [] # store class stat data
 
     # get total time spent on review
     totalTime = getTotalTime(params[:reponse_map_id], params[:round])
@@ -104,10 +105,33 @@ class SubmissionViewingEventsController < ApplicationController
       percentages.push((entry.end_at - entry.start_at).to_f/totalTime)
       tables.push({
                       "subject" => entry.link,
-                      "timecost" => secondsToHuman((entry.end_at - entry.start_at).to_i),
-                      "clsavg" => nil
+                      "timeCost" => secondsToHuman((entry.end_at - entry.start_at).to_i),
+                      "avgTime" => secondsToHuman(getAvgRevTime(params[:reponse_map_id], params[:round], entry.link))
                   })
     end
+
+    tables.push({
+                    "subject" => "Total",
+                    # contains total time spent in human format
+                    "timeCost" => secondsToHuman(totalTime),
+                    # contains average review time for this submission in human format
+                    "avgTime" => secondsToHuman(getAvgRevTime(params[:reponse_map_id], params[:round]))
+                })
+
+    stats.push({
+                    "title" => 'Class Average',
+                    "value" => secondsToHuman(getClassAvgRevTime(params[:reponse_map_id], params[:round]))
+              })
+
+    stats.push({
+                   "title" => 'Median',
+                   "value" => secondsToHuman(getMedianRevTime(params[:reponse_map_id], params[:round]))
+               })
+
+    stats.push({
+                   "title" => 'Standard Deviation',
+                   "value" => secondsToHuman(getStdDevRevTime(params[:reponse_map_id], params[:round]))
+               })
 
     # create JSON
     @timingDetails = {
@@ -117,10 +141,8 @@ class SubmissionViewingEventsController < ApplicationController
         'Data' => percentages,
         # contains link name and time spent for display table
         'tables' => tables,
-        # contains total time spent in human format
-        'total' => secondsToHuman(totalTime),
-        # contains average review time for assignment in human format
-        'totalavg' => secondsToHuman(getAvgRevTime(params[:reponse_map_id], params[:round]))
+        # contains class stats
+        'stats' => stats
     }
 
     # respond to request with JSON containing all data

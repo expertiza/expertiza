@@ -149,6 +149,7 @@ class SubmissionViewingEventsController < ApplicationController
     )
 
     if records
+      ExpertizaLogger.info("#{records.length} previous link records found, updating start time.")
       _record_start_time(records)
     else
       ExpertizaLogger.info("No previous link record found, creating a new one.")

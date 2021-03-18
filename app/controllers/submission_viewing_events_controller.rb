@@ -200,7 +200,7 @@ class SubmissionViewingEventsController < ApplicationController
     # if no specific link is provided, then update the end
     # time for all links _except_ the Expertiza Review
     # TODO: determine _why_ the last group needed this logic
-    records = @store.where(map_id: map_id, round: round).select { |item| item.link != "Expertiza Review" }
+    records = @store.where(map_id: map_id, round: round)
     _record_end_time(records)
   end
 

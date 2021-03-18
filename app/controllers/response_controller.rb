@@ -344,18 +344,12 @@ class ResponseController < ApplicationController
     end
     @return = params[:return]
   end
-<<<<<<< HEAD
-  # identifying the questionnaire type
-  # updating the current round for the reviewer's responses
-  def set_questionnaire_for_new_response
-=======
 
   # This method is called within set_content and the new_response flag is set to true
   # Depending on what type of response map corresponds to this response,
   # This is called after assign_instance_vars in the new method
   # This is basically doing the same thing as set_questionnaire but it is finding the questionnaire from the respone map instead of from the response object
   def get_questionnaire_from_response_map
->>>>>>> 71471d6e5... Renaming set_questionnaire_for_new_response to get_questionnaire_from_respone_map due to its functionality - essentially, it determines which questionnaire to return depending on the type of response map available. It is called because the response object is not available.
     case @map.type
     when "ReviewResponseMap", "SelfReviewResponseMap"
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)

@@ -87,5 +87,24 @@ module SubmissionViewingEventHelper
     return sortedTimes[(sortedTimes.length - 1) / 2] + sortedTimes[sortedTimes.length / 2].to_f / 2
   end
 
-  
+  # Return variance of time taken for a review
+  def getVarianceRevTime(map_id, round)
+    total = 0 # contains sum of time-mean^2
+
+    # Get review times for map_id and round across the all submissions to this assignment
+    times = getReviewTimes(map_id, round, nil, 1)
+
+    # Get average review time for map_id and round across the all submissions to this assignment
+    mean = getClassAvgRevTime(map_id, round)
+
+    times.each {|time| total = total + (time-mean)**2}
+
+    return total/times.size
+  end
+
+  # Return standard deviation of time taken for a review
+  def getStdDevRevTime(map_id, round)
+
+    return Math.sqrt(getVarianceRevTime(map_id, round))
+  end
 end

@@ -57,6 +57,7 @@ module SubmissionViewingEventHelper
       reviewerTimes.push(getTotalTime(map.id, round, link)) # pushes summed review time onto array
     end
 
-    return classTimes.reduce(:+) / classTimes.size # returns average of classTimes array
+    return reviewerTimes
   end
+
 end

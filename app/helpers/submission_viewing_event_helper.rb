@@ -78,5 +78,14 @@ module SubmissionViewingEventHelper
     return times.reduce(:+) / times.size # returns average of reviewerTimes array
   end
 
+  # Return median time taken for a review
+  def getMedianRevTime(map_id, round)
+
+    # Get review times for map_id and round and sort them
+    sortedTimes = getReviewTimes(map_id, round).sort
+
+    return sortedTimes[(sortedTimes.length - 1) / 2] + sortedTimes[sortedTimes.length / 2].to_f / 2
+  end
+
   
 end

@@ -95,8 +95,8 @@ var symTagDone = " " + "\u2714";       // Unicode Heavy Check-Mark
 // Initialize Tag Report Heat grid and hide if empty.
 function tagActionOnLoad() {
     let tagPrompts = getTagPrompts();
-    // Hide heatgrid and don't waste cycles counting/drawing, if no tags exist.
     if(tagPrompts.length == 0) {
+        // Hide heatgrid and stop load action if no tags exist.
         document.getElementById("tagHeatMap").style.display = 'none';
     } else {
         let countMap = calcTagRatio(tagPrompts);
@@ -150,43 +150,37 @@ function getRowData() {
 
 // Updates the tags complete fraction at the top of the tag heat grid
 function updateTagsFraction(countMap) {
-    // Get element to be updated
+    // Get element to be updated, Set text of element, and set background color from ratio
     let cell = document.getElementById("tagsSuperNumber");
-    // Set text value with ratio
     cell.innerText = countMap.get("onTags") + " out of " + countMap.get("total");
-    // Set background color class based on ratio
     cell.className = "c"+countMap.get("ratioClass").toString();
-    // If all tags are done, collapse the heatgrid
+
+    // If all tags are finished, collapse the heatgrid
     if(countMap.get("ratioClass") === 5) {
         $("[id^=hg_row]").each(function () {
             $( this ).css("display", "none");
         });
-    } else { // Or, open the heatgrid if this change means tags are unfinished
+    } else {
         $("[id^=hg_row]").each(function () {
-            $( this ).css("display", "");
+            $( this ).css("display", ""); // open the heatgrid if tags are unfinished
         });
     }
-
 }
 
 // Updates the Review Tag Heat Grid each time a tag is changed
 function updateTagGrid(tagPrompts){
     for(let i = 0; i< tagPrompts.length; ++i) {
-        // Look up the heatmap cell associated with this tag
+        // Get the heatmap cell associated with this tag
         let tempId = tagPrompts[i].getAttribute("data-tag_heatgrid_id");
-        // Get the cell object from the document
         let gridCell = document.getElementById(tempId);
-        // Update the heatgrid cell based on the value of this tag.
+
+        // Change cell color by class and replace unicode icon
         if(tagPrompts[i].value == 0) {
-            // Change Cell Color ("NOT DONE")
             gridCell.setAttribute("class", "c1");
-            // Replace Unicode Icon
             gridCell.innerText = gridCell.innerText.replace(/[\u{0080}-\u{FFFF}]/u, symTagNotDone);
         }
         else {
-            // Change Cell color ("DONE")
             gridCell.setAttribute("class", "c5");
-            // Replace unicode icon
             gridCell.innerText = gridCell.innerText.replace(/[\u{0080}-\u{FFFF}]/u, symTagDone);
         }
     }
@@ -380,17 +374,12 @@ function calcTagRatio(tagPrompts){
 
     // Compute ratio as decimal
     ratio = onTags / length;
-
-    // Calculate the ratio class. This is used to look up CSS color mapping classes that range {0 .. 5}
-    // Scale ratio to 0 <= ratio <= 4
+    // calculate ratioClass (used in CSS Lookup), and scale ratioClass to 0 <= ratioClass <= 4
     ratioClass = ratio*4;
-
     // increment ratio so the range is 1 <= ratio_class <= 5
     ++ratioClass;
-
     // round ratioClass down to nearest integer
     ratioClass = Math.floor(ratioClass);
-
     // For our purposes, ratio_class should fall in the range { 1,2,3,5 } (skips class 4).
     if(ratioClass === 4) { --ratioClass; }
 

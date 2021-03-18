@@ -218,7 +218,7 @@ class GradesController < ApplicationController
       end
       assign_all_penalties(participant, penalties)
     end
-    @assignment.update_attribute(:is_penalty_calculated, true) unless @assignment.is_penalty_calculated
+    @assignment.update_attribute[:is_penalty_calculated] = true unless @assignment.is_penalty_calculated
   end
 
   def calculate_penalty_attributes(_participant)

@@ -132,6 +132,7 @@ class SubmissionViewingEventsController < ApplicationController
 
   # Ensure that we have a non-nil instance of LocalStorage
   # to work with.
+  attr_accessor :store
   def ensure_store
     @store ||= LocalStorage.new
     ExpertizaLogger.info("Local Storage: #{@store}")

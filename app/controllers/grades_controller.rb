@@ -144,7 +144,7 @@ class GradesController < ApplicationController
     participant = AssignmentParticipant.find(params[:id])
     total_score = params[:total_score]
     if format("%.2f", total_score) != params[:participant][:grade]
-      participant.update_attribute(:grade, params[:participant][:grade])
+      participant[:grade] = params[:participant][:grade]
       message = if participant.grade.nil?
                   "The computed score will be used for " + participant.user.name + "."
                 else
@@ -218,7 +218,7 @@ class GradesController < ApplicationController
       end
       assign_all_penalties(participant, penalties)
     end
-    @assignment.update_attribute(:is_penalty_calculated, true) unless @assignment.is_penalty_calculated
+    @assignment[:is_penalty_calculated] = true unless @assignment.is_penalty_calculated
   end
 
   def calculate_penalty_attributes(_participant)

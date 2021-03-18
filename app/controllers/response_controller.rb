@@ -49,7 +49,7 @@ class ResponseController < ApplicationController
         return
       end
     end
-    
+
     # user cannot delete other people's responses. Needs to be authenticated.
     map_id = @response.map.id
     # The lock will be automatically destroyed when the response is destroyed
@@ -78,7 +78,7 @@ class ResponseController < ApplicationController
         return
       end
     end
-    
+
     @modified_object = @response.response_id
     # set more handy variables for the view
     set_content
@@ -96,7 +96,7 @@ class ResponseController < ApplicationController
   # Update the response and answers when student "edit" existing response
   def update
     render nothing: true unless action_allowed?
-    
+
     msg = ""
     begin
       # the response to be updated
@@ -297,7 +297,7 @@ class ResponseController < ApplicationController
   end
 
   private
-  
+
   # Added for E1973, team-based reviewing:
   # http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_Project_E1973._Team_Based_Reviewing
   # This action gets taken if the response is locked and cannot be edit right now
@@ -362,16 +362,6 @@ class ResponseController < ApplicationController
       @questionnaire = @map.questionnaire
     end
   end
-  # stores the first instance of the score for each question
-  def scores
-    @review_scores = []
-    @questions.each do |question|
-      @review_scores << Answer.where(
-        response_id: @response.id,
-        question_id:  question.id
-      ).first
-    end
-  end
 
   def set_questionnaire
     # if user is not filling a new rubric, the @response object should be available.
@@ -425,4 +415,3 @@ class ResponseController < ApplicationController
     end
   end
 end
-

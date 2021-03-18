@@ -12,6 +12,8 @@
 <H1>Score for <%= @assignment.name %></H1>
 <div id="tag_stats"></div>
 
+<%= link_to "Main View", controller: 'grades', action: 'view_team', id: params[:id] %>
+<BR/>
 
 <table class="grades" >
 <%= render :partial => 'grades/participant_charts', :locals => {:prefix => nil} %> 

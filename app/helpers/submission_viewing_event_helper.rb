@@ -60,4 +60,23 @@ module SubmissionViewingEventHelper
     return reviewerTimes
   end
 
+  # Return average time taken for a specific review in a certain round or for a specific link
+  def getAvgRevTime(map_id, round, link = nil)
+
+    # Get review times for map_id, round, and link if provided
+    times = getReviewTimes(map_id, round, link)
+
+    return times.reduce(:+) / times.size # returns average of reviewerTimes array
+  end
+
+  # Return average time of all reviews taken in a submission in a certain round
+  def getClassAvgRevTime(map_id, round)
+
+    # Get review times for map_id and round across the all submissions to this assignment
+    times = getReviewTimes(map_id, round, nil, 1)
+
+    return times.reduce(:+) / times.size # returns average of reviewerTimes array
+  end
+
+  
 end

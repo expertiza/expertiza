@@ -23,18 +23,20 @@ module SubmissionViewingEventHelper
 
   # Returns time in readable text (i.e. 1 hr 2 min 3 sec) given number of seconds
   def secondsToHuman(timeInSec)
+    human = "" # empty string to store return
 
-    # Calculates number of hours and subtracts
-    hours = timeInSec/3600
-    timeInSec = timeInSec%3600
+    # Ensure time is an integer
+    intSeconds = timeInSec.to_i
 
-    # Calculates number of minutes and subtracts
-    mins = timeInSec/60
-    timeInSec = timeInSec%60
-    # timeInSec now holds remaining seconds
+    # Units of time to break timeInSec into
+    [[:hr, 3600], [:min, 60]].map{|unit, numSec|
+      human = human.concat("#{intSeconds/numSec} #{unit} ") if intSeconds/numSec > 0
+      intSeconds = intSeconds%numSec
+    }
+    human = human.concat("#{intSeconds} sec")
 
     # Returns string of readable text
-    return  "#{hours} hr #{mins} min #{timeInSec} sec"
+    return human
   end
 
   # Returns average time taken for a review of an assignment for a specific round given a response_map_id in that assignment and a round

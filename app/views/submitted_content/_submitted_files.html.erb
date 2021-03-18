@@ -84,7 +84,7 @@
             let round = <%= @current_round %>;
             let filesToUpdate = {};
             let windowManager = new WindowManager();
-            const time_out_interval = 500; // in milliseconds
+            const time_out_interval = 1000; // in milliseconds
 
             $("#1_myDiv #file_table a.fileLink").click(function (event) {
                 event.preventDefault();
@@ -101,14 +101,17 @@
                 let window_handler = null;
                 let link_timer = null;
 
-                if ($.inArray(file_name_extension, supported_file_type) >= 0) {
+                if (file_name_extension in supported_file_type) {
                     alert("Open file " + file_name + " in new window to view it online.");
-                    window_handler = window.open(file_path, "_blank");
-                    windowManager.manage(window_handler)
-                    link_timer = setInterval(checkWindowStatus, time_out_interval);
+                    windowManager.manage(
+                        windowManager.newViewingWindow(map_id, round, "Test", console.log, console.log)
+                    );
+                    // window_handler = window.open(file_path, "_blank");
+                    // windowManager.manage(window_handler)
+                    // link_timer = setInterval(checkWindowStatus, time_out_interval);
                 } else {
                     alert("Download file " + file_name + " to view it locally.");
-                    window_handler = window.open(file_path, "_blank");
+                    // window_handler = window.open(file_path, "_blank");
                 }
 
                 function checkWindowStatus() {

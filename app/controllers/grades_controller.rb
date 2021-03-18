@@ -99,7 +99,7 @@ class GradesController < ApplicationController
           counter_for_same_rubric = 0
         end
       end
-      @vmlist << populate_view_model(questionnaire, @assignment, @round, @team, @particpant)
+      @vmlist << populate_view_model
     end
     @current_role_name = current_role_name
   end
@@ -171,7 +171,7 @@ class GradesController < ApplicationController
 
   private
 
-  def populate_view_model(questionnaire, assignment, round, team, participant)
+  def populate_view_model
     vm = VmQuestionResponse.new(questionnaire, assignment, round)
     vmquestions = questionnaire.questions
     vm.add_questions(vmquestions)

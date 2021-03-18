@@ -246,7 +246,7 @@ class SubmissionViewingEventsController < ApplicationController
       store.remove(record)
     end
 
-    ExpertizaLogger.info("Flushed #{uncommited.length} links\n#{uncommitted}")
+    ExpertizaLogger.info("Flushed #{uncommitted.length} links\n#{uncommitted}")
     uncommitted
   end
 end

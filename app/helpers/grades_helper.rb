@@ -18,6 +18,15 @@ module GradesHelper
     scores
   end
 
+  # This function removes negative scores and build charts
+  def charts(symbol)
+    if @participant_score and @participant_score[symbol]
+      scores = score_vector @participant_score[symbol][:assessments], symbol.to_s
+      scores -= [-1.0]
+      @grades_bar_charts[symbol] = bar_chart(scores)
+    end
+  end
+
   # Filters all non nil values and converts them to integer
   # Returns a vector
   def vector(scores)

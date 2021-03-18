@@ -223,18 +223,10 @@ class GradesController < ApplicationController
         end
         @grades_bar_charts[:review] = bar_chart(scores)
       else
-        remove_negative_scores_and_build_charts(:review)
+        charts(:review)
       end
     end
-    participant_score_types.each {|symbol| remove_negative_scores_and_build_charts(symbol) }
-  end
-
-  def remove_negative_scores_and_build_charts(symbol)
-    if @participant_score and @participant_score[symbol]
-      scores = score_vector @participant_score[symbol][:assessments], symbol.to_s
-      scores -= [-1.0]
-      @grades_bar_charts[symbol] = bar_chart(scores)
-    end
+    participant_score_types.each {|symbol| charts(symbol) }
   end
 
   def bar_chart(scores, width = 100, height = 100, spacing = 1)

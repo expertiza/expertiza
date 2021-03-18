@@ -42,7 +42,7 @@ class QuizQuestionnairesController < QuestionnairesController
   # create quiz questionnaire
   def create
     valid = validate_quiz
-    if valid.eql?("valid")
+    if valid.eql?("valid") # The value of valid could either be valid or a msg to address before moving forward
       @questionnaire = QuizQuestionnaire.new(questionnaire_params)
       participant_id = params[:pid] # Gets the participant id to be used when finding team and editing submitted content
       @questionnaire.min_question_score = params[:questionnaire][:min_question_score] # 0
@@ -241,7 +241,8 @@ class QuizQuestionnairesController < QuestionnairesController
     end
   end
 
-  # Saves choices from a questionnaire to a question, for either True/False or Multiple Choice questions
+  # Saves either True/False or Multiple Choice questions to a quiz questionnaire
+  # Only scorable questions can be added to a quiz, but future projects could consider relaxing this constraint
   def save_choices(questionnaire_id)
     return unless params[:new_question] or params[:new_choices]
     questions = Question.where(questionnaire_id: questionnaire_id)

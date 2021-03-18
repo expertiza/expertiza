@@ -201,14 +201,6 @@ class GradesController < ApplicationController
     false
   end
 
-  def calculate_penalty_attributes(_participant)
-    deadline_type_id = [1, 2, 5]
-    penalties_symbols = %i[submission review meta_review]
-    deadline_type_id.zip(penalties_symbols).each do |id, symbol|
-      CalculatedPenalty.create(deadline_type_id: id, participant_id: @participant.id, penalty_points: penalties[symbol])
-    end
-  end
-
   def assign_all_penalties(participant, penalties)
     @all_penalties[participant.id] = {
       submission: penalties[:submission],

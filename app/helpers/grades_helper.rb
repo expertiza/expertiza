@@ -10,7 +10,16 @@ module GradesHelper
     end
   end
 
-  # Calculate all the penalties
+  # This function returns the penalty attributes
+  def attributes(_participant)
+    deadline_type_id = [1, 2, 5]
+    penalties_symbols = %i[submission review meta_review]
+    deadline_type_id.zip(penalties_symbols).each do |id, symbol|
+      CalculatedPenalty.create(deadline_type_id: id, participant_id: @participant.id, penalty_points: penalties[symbol])
+    end
+  end
+
+  # This function calculates all the penalties
   def penalties(assignment_id)
     @all_penalties = {}
     @assignment = Assignment.find(assignment_id)
@@ -24,7 +33,7 @@ module GradesHelper
         @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
         l_policy = LatePolicy.find(@assignment.late_policy_id)
         @total_penalty = l_policy.max_penalty if @total_penalty > l_policy.max_penalty
-        calculate_penalty_attributes(@participant) if calculate_for_participants
+        attributes(@participant) if calculate_for_participants
       end
       assign_all_penalties(participant, penalties)
     end

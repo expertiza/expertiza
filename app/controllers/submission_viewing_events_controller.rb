@@ -14,7 +14,7 @@ class SubmissionViewingEventsController < ApplicationController
     args = request_params2
     ExpertizaLogger.info "Received request to start timing event with params #{args}"
 
-    if args[:link]
+    if !args[:link].nil?
       start_timing_for_link(args[:map_id], args[:round], args[:link])
     else
       start_timing_for_round(args[:map_id], args[:round])
@@ -33,7 +33,7 @@ class SubmissionViewingEventsController < ApplicationController
   def end_timing
     args = request_params2
     ExpertizaLogger.info "Received request to stop timing event with params #{args}"
-    if args[:link]
+    if !args[:link].nil?
       end_timing_for_link(args[:map_id], args[:round], args[:link])
     else
       end_timing_for_round(args[:map_id], args[:round])
@@ -46,7 +46,7 @@ class SubmissionViewingEventsController < ApplicationController
   def reset_timing
     args = request_params2
     ExpertizaLogger.info "Received request to reset timing event with params #{args}"
-    if args[:link]
+    if !args[:link].nil?
       end_timing_for_link(args[:map_id], args[:round], args[:link])
       start_timing_for_link(args[:map_id], args[:round], args[:link])
     else
@@ -179,7 +179,7 @@ class SubmissionViewingEventsController < ApplicationController
 
   def _record_start_time(records)
     start_time = DateTime.now
-    if records and !records.empty?
+    unless records.empty?
       records.each do |record|
         record.start_at = start_time
         record.end_at = nil
@@ -208,7 +208,7 @@ class SubmissionViewingEventsController < ApplicationController
   # to DateTime.now and update the total_time accumulator
   def _record_end_time(records)
     end_time = DateTime.now
-    if records and !records.empty?
+    unless records.empty?
       records.each do |record|
         record.end_at = end_time
         record.updated_at = end_time
@@ -225,7 +225,7 @@ class SubmissionViewingEventsController < ApplicationController
     records = @store.where(map_id: map_id, round: round)
     ExpertizaLogger.info("Found #{records.length} records in local storage for timing events")
 
-    if records and !records.empty?
+    unless records.empty?
       records.each do |record|
         # push the uncommitted link on to the stack
         uncommitted << record.link
@@ -236,7 +236,7 @@ class SubmissionViewingEventsController < ApplicationController
           link: record.link
         )
 
-        if previous
+        if !previous.empty?
           # make sure to add the total time on this record
           # with what may have already been in the database
           updated = record.merge(previous)

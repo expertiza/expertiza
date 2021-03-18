@@ -218,7 +218,7 @@ class GradesController < ApplicationController
       if @assignment.vary_by_round
         (1..@assignment.rounds_of_reviews).each do |round|
           responses = @pscore[:review][:assessments].select {|response| response.round == round }
-          scores = scores.concat(build_score_vector(responses, 'review' + round.to_s))
+          scores = scores.concat(score_vector(responses, 'review' + round.to_s))
           scores -= [-1.0]
         end
         @grades_bar_charts[:review] = bar_chart(scores)
@@ -231,18 +231,10 @@ class GradesController < ApplicationController
 
   def remove_negative_scores_and_build_charts(symbol)
     if @participant_score and @participant_score[symbol]
-      scores = build_score_vector @participant_score[symbol][:assessments], symbol.to_s
+      scores = score_vector @participant_score[symbol][:assessments], symbol.to_s
       scores -= [-1.0]
       @grades_bar_charts[symbol] = bar_chart(scores)
     end
-  end
-
-  def build_score_vector(reviews, symbol)
-    scores = []
-    reviews.each do |review|
-      scores << Answer.get_total_score(response: [review], questions: @questions[symbol.to_sym], q_types: [])
-    end
-    scores
   end
 
   def bar_chart(scores, width = 100, height = 100, spacing = 1)

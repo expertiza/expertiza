@@ -10,6 +10,14 @@ module GradesHelper
     end
   end
 
+  def score_vector(reviews, symbol)
+    scores = []
+    reviews.each do |review|
+      scores << Answer.get_total_score(response: [review], questions: @questions[symbol.to_sym], q_types: [])
+    end
+    scores
+  end
+
   # Filters all non nil values and converts them to integer
   # Returns a vector
   def vector(scores)

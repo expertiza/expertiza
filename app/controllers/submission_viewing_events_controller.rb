@@ -239,8 +239,10 @@ class SubmissionViewingEventsController < ApplicationController
         if !previous.empty?
           # make sure to add the total time on this record
           # with what may have already been in the database
-          updated = record.merge(previous)
-          SubmissionViewingEvent.update(updated.to_h)
+          previous.each do |event|
+            updated = record.merge(event)
+            event.update_attribute(:total_time, updated)
+          end
         else
           # if a previous record doesn't exist,
           # we can delegate saving to `LocalStorage`

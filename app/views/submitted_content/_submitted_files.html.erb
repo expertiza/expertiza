@@ -104,7 +104,7 @@
                 if (supported_file_type.includes(file_name_extension)) {
                     alert("Open file " + file_name + " in new window to view it online.");
                     windowManager.manage(
-                        windowManager.newViewingWindow(map_id, round, "Test", console.log, console.log)
+                        windowManager.newViewingWindow(map_id, round, file_path, console.log, console.log)
                     );
                     // window_handler = window.open(file_path, "_blank");
                     // windowManager.manage(window_handler)

@@ -9,7 +9,7 @@ function startTime2(map_id, round, link) {
     $.ajax({
         type: "POST",
         url: '/submission_viewing_events/start_timing',
-        data: JSON.stringify({
+        data: $.param({
             map_id: map_id,
             round: round,
             link: link
@@ -17,8 +17,7 @@ function startTime2(map_id, round, link) {
         error: function(e) {
             console.log(e);
         },
-        dataType: "json",
-        contentType: "application/json"
+        dataType: "json"
     });
 }
 
@@ -44,11 +43,10 @@ function endTime2(map_id, round, link) {
         dataType: 'json',
         async: false,
         url: '/submission_viewing_events/end_timing',
-        data: JSON.stringify(data),
+        data: $.param(data),
         error: function(e) {
             console.log(e);
-        },
-        contentType: "application/json"
+        }
     });
 }
 
@@ -64,14 +62,13 @@ function saveAll(map_id, round) {
         dataType: 'json',
         async: false,
         url: '/submission_viewing_events/hard_save',
-        data: JSON.stringify({
+        data: $.param({
             map_id: map_id,
             round: round
         }),
         error: function(e) {
             console.log(e);
-        },
-        contentType: "application/json"
+        }
     });
 }
 
@@ -81,14 +78,13 @@ function endRound(map_id, round) {
         dataType: 'json',
         async: false,
         url: '/submission_viewing_events/end_timing',
-        data: JSON.stringify({
+        data: $.param({
             map_id: map_id,
             round: round
         }),
         error: function(e) {
             console.log(e);
-        },
-        contentType: "application/json"
+        }
     });
 }
 
@@ -98,14 +94,13 @@ function endRoundAndSave(map_id, round) {
         dataType: 'json',
         async: false,
         url: '/submission_viewing_events/end_round_and_save',
-        data: JSON.stringify({
+        data: $.param({
             map_id: map_id,
             round: round
         }),
         error: function(e) {
             console.log(e);
-        },
-        contentType: "application/json"
+        }
     });
 }
 
@@ -115,13 +110,12 @@ function resetRound(map_id, round) {
         dataType: 'json',
         async: false,
         url: '/submission_viewing_events/reset_timing',
-        data: JSON.stringify({
+        data: $.param({
             map_id: map_id,
             round: round
         }),
         error: function(e) {
             console.log(e);
         },
-        contentType: "application/json"
     });
 }

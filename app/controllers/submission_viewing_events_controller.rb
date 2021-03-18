@@ -77,7 +77,7 @@ class SubmissionViewingEventsController < ApplicationController
   # without necessarily having to send back-to-back requests.
   def end_round_and_save
     args = request_params2
-    ExpertizaLogger.info "Received request to end timing for round #{round} with params #{args}"
+    ExpertizaLogger.info "Received request to end timing for round #{args[:round]} with params #{args}"
     end_timing_for_round(args[:map_id], args[:round])
     save_and_remove_all(args[:map_id], args[:round])
     head :no_content

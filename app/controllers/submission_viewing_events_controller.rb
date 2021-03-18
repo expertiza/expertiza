@@ -99,30 +99,31 @@ class SubmissionViewingEventsController < ApplicationController
     # push all data into relevant arrays for JSON
     timingEntries.each do |entry|
       labels.push(entry.link)
-      percentages.push((entry.end_at - entry.start_at).to_f/totalTime)
+      percentages.push((entry.end_at - entry.start_at).to_f / totalTime)
       tables.push({
-                      "subject" => entry.link,
-                      "timecost" => secondsToHuman((entry.end_at - entry.start_at).to_i),
-                      "clsavg" => 0
+                    "subject" => entry.link,
+                    "timecost" => secondsToHuman((entry.end_at - entry.start_at).to_i),
+                    "clsavg" => 0
                   })
     end
 
     # create JSON
     @timingDetails = {
-        'Labels'=> labels,
-        'Data' => percentages,
-        'tables' => tables,
-        'total' => secondsToHuman(totalTime),
-        'totalavg' => 0
+      'Labels' => labels,
+      'Data' => percentages,
+      'tables' => tables,
+      'total' => secondsToHuman(totalTime),
+      'totalavg' => 0
     }
 
     # respond to request with JSON containing all data
     respond_to do |format|
-      format.json {render json: @timingDetails}
+      format.json { render json: @timingDetails }
     end
   end
 
   private
+
   # Require: :map_id, :round
   # Permit: :link
   def request_params2
@@ -133,6 +134,7 @@ class SubmissionViewingEventsController < ApplicationController
   # Ensure that we have a non-nil instance of LocalStorage
   # to work with.
   attr_accessor :store
+
   def ensure_store
     @store ||= LocalStorage.new
     ExpertizaLogger.info("Local Storage: #{@store}")
@@ -148,7 +150,7 @@ class SubmissionViewingEventsController < ApplicationController
       link: link
     )
 
-    if records
+    if !records.empty?
       ExpertizaLogger.info("#{records.length} previous link records found, updating start time.")
       _record_start_time(records)
     else
@@ -177,7 +179,7 @@ class SubmissionViewingEventsController < ApplicationController
 
   def _record_start_time(records)
     start_time = DateTime.now
-    if records
+    if records and !records.empty?
       records.each do |record|
         record.start_at = start_time
         record.end_at = nil
@@ -206,7 +208,7 @@ class SubmissionViewingEventsController < ApplicationController
   # to DateTime.now and update the total_time accumulator
   def _record_end_time(records)
     end_time = DateTime.now
-    if records
+    if records and !records.empty?
       records.each do |record|
         record.end_at = end_time
         record.updated_at = end_time
@@ -223,30 +225,32 @@ class SubmissionViewingEventsController < ApplicationController
     records = @store.where(map_id: map_id, round: round)
     ExpertizaLogger.info("Found #{records.length} records in local storage for timing events")
 
-    records.each do |record|
-      # push the uncommitted link on to the stack
-      uncommitted << record.link
+    if records and !records.empty?
+      records.each do |record|
+        # push the uncommitted link on to the stack
+        uncommitted << record.link
 
-      previous = SubmissionViewingEvent.where(
-        map_id: record.map_id,
-        round: record.round,
-        link: record.link
-      )
+        previous = SubmissionViewingEvent.where(
+          map_id: record.map_id,
+          round: record.round,
+          link: record.link
+        )
 
-      if previous
-        # make sure to add the total time on this record
-        # with what may have already been in the database
-        updated = record.merge(previous)
-        SubmissionViewingEvent.update(updated.to_h)
-      else
-        # if a previous record doesn't exist,
-        # we can delegate saving to `LocalStorage`
-        @store.hard_save(record)
+        if previous
+          # make sure to add the total time on this record
+          # with what may have already been in the database
+          updated = record.merge(previous)
+          SubmissionViewingEvent.update(updated.to_h)
+        else
+          # if a previous record doesn't exist,
+          # we can delegate saving to `LocalStorage`
+          @store.hard_save(record)
+        end
+
+        # once the data is updated or added to the database,
+        # remove it from `LocalStorage`
+        @store.remove(record)
       end
-
-      # once the data is updated or added to the database,
-      # remove it from `LocalStorage`
-      @store.remove(record)
     end
 
     ExpertizaLogger.info("Flushed #{uncommitted.length} links\n#{uncommitted}")

@@ -92,7 +92,7 @@ function endRound(map_id, round) {
     });
 }
 
-function saveAndEndRound(map_id, round) {
+function endRoundAndSave(map_id, round) {
     $.ajax({
         type: 'POST',
         dataType: 'json',

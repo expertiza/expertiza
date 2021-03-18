@@ -10,6 +10,27 @@ module GradesHelper
     end
   end
 
+  # Calculate all the penalties
+  def penalties(assignment_id)
+    @all_penalties = {}
+    @assignment = Assignment.find(assignment_id)
+    calculate_for_participants = true unless @assignment.is_penalty_calculated
+    Participant.where(parent_id: assignment_id).each do |participant|
+      penalties = calculate_penalty(participant.id)
+      @total_penalty = 0
+
+      unless penalties[:submission].zero? || penalties[:review].zero? || penalties[:meta_review].zero?
+
+        @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
+        l_policy = LatePolicy.find(@assignment.late_policy_id)
+        @total_penalty = l_policy.max_penalty if @total_penalty > l_policy.max_penalty
+        calculate_penalty_attributes(@participant) if calculate_for_participants
+      end
+      assign_all_penalties(participant, penalties)
+    end
+    @assignment.update_attribute[:is_penalty_calculated] = true unless @assignment.is_penalty_calculated
+  end
+
   def has_team_and_metareview?
     if params[:action] == "view"
       @assignment = Assignment.find(params[:id])

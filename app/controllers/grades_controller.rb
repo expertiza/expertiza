@@ -47,7 +47,7 @@ class GradesController < ApplicationController
     averages = calculate_average_vector(@assignment.scores(@questions))
     @average_chart = bar_chart(averages, 300, 100, 5)
     @avg_of_avg = mean(averages)
-    calculate_all_penalties(@assignment.id)
+    penalties(@assignment.id)
 
     @show_reputation = false
   end
@@ -64,7 +64,7 @@ class GradesController < ApplicationController
     make_chart
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
     @stage = @participant.assignment.get_current_stage(@topic_id)
-    calculate_all_penalties(@assignment.id)
+    penalties(@assignment.id)
     # prepare feedback summaries
     summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]
     sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewee(@questions, @assignment, @team_id, summary_ws_url)
@@ -199,26 +199,6 @@ class GradesController < ApplicationController
       return true unless current_user_id?(reviewer.try(:user_id))
     end
     false
-  end
-
-  def calculate_all_penalties(assignment_id)
-    @all_penalties = {}
-    @assignment = Assignment.find(assignment_id)
-    calculate_for_participants = true unless @assignment.is_penalty_calculated
-    Participant.where(parent_id: assignment_id).each do |participant|
-      penalties = calculate_penalty(participant.id)
-      @total_penalty = 0
-
-      unless penalties[:submission].zero? || penalties[:review].zero? || penalties[:meta_review].zero?
-
-        @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
-        l_policy = LatePolicy.find(@assignment.late_policy_id)
-        @total_penalty = l_policy.max_penalty if @total_penalty > l_policy.max_penalty
-        calculate_penalty_attributes(@participant) if calculate_for_participants
-      end
-      assign_all_penalties(participant, penalties)
-    end
-    @assignment.update_attribute[:is_penalty_calculated] = true unless @assignment.is_penalty_calculated
   end
 
   def calculate_penalty_attributes(_participant)

@@ -86,9 +86,9 @@ function compare(a, b, less) {
 /**************************** GLOBAL SYMBOLS AND PREFIXES **********************************/
 
 // Symbols added for users who cannot see the R/G Color spectrum well. Note that white spacing is added here as well.
-const symNoTag = "  " + "\u2298";        // Unicode universal "NO" circle-line symbol
-const symTagNotDone = " " + "\u26A0";   // Unicode Symbol Representing to-do ("Warning" Symbol)
-const symTagDone = " " + "\u2714";       // Unicode Heavy Check-Mark
+var symNoTag = "  " + "\u2298";        // Unicode universal "NO" circle-line symbol
+var symTagNotDone = " " + "\u26A0";   // Unicode Symbol Representing to-do ("Warning" Symbol)
+var symTagDone = " " + "\u2714";       // Unicode Heavy Check-Mark
 
 /********************************** ACTION HANDLERS ****************************************/
 
@@ -153,7 +153,7 @@ function updateTagsFraction(countMap) {
     // Get element to be updated
     let cell = document.getElementById("tagsSuperNumber");
     // Set text value with ratio
-    cell.innerText = countMap.get("onTags") + "/" + countMap.get("total");
+    cell.innerText = countMap.get("onTags") + " out of " + countMap.get("total");
     // Set background color class based on ratio
     cell.className = "c"+countMap.get("ratioClass").toString();
 }
@@ -210,7 +210,7 @@ function drawTagGrid(rowData) {
     let gridWidth = getGridWidth(rowData);
 
     //create the header
-    drawHeader(table, headerTooltipText);
+    drawHeader(table, headerTooltipText, gridWidth);
 
     //create table body
     let tbody = table.appendChild(document.createElement('tbody'));
@@ -236,7 +236,7 @@ function drawTagGrid(rowData) {
 }
 
 // Generates the header rows and cells for the tag heatgrid with "Tags Completed # out of #"
-function drawHeader(table, headerTooltipText) {
+function drawHeader(table, headerTooltipText,gridWidth) {
     let thead = table.createTHead();
     let row = thead.insertRow();
     row.setAttribute("class", "hide-scrollbar tablesorter-headerRow");
@@ -244,17 +244,21 @@ function drawHeader(table, headerTooltipText) {
     // Create "Tags Completed:" Cell
     let th = document.createElement("th");
     let text = document.createTextNode("\u2195 Tags Completed");
+    th.setAttribute("text-align", "center");
     th.setAttribute("id", "tagsSuperLabel");
-    th.colSpan = 3;
+    th.colSpan = gridWidth;
     addToolTip(th, "Click to collapse/expand");
     th.appendChild(text);
     row.appendChild(th);
+    row.setAttribute("onClick", "toggleHeatGridRows()");
 
-    // create "# / #" Cell to show number of completed tags
+    // create "# out of #" Cell to show number of completed tags
+    row = thead.insertRow();
     th = document.createElement("th");
-    text = document.createTextNode("0/0");
+    text = document.createTextNode("0 out of 0");
     th.setAttribute("id", "tagsSuperNumber");
-    th.colSpan = 2;
+    th.setAttribute("text-align", "center");
+    th.colSpan = gridWidth;
     addToolTip(th, headerTooltipText);
     th.appendChild(text);
     row.appendChild(th);

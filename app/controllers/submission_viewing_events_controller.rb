@@ -143,17 +143,17 @@ class SubmissionViewingEventsController < ApplicationController
 
     # check for pre-existing record
     records = @store.where(
-      map_id: args[:map_id],
-      round: args[:round],
-      link: args[:link]
+      map_id: map_id,
+      round: round,
+      link: link
     )
 
     if records
       _record_start_time(records)
     else
-      new = LocalSubmittedContent.new map_id: args[:map_id],
-                                      round: args[:round],
-                                      link: args[:link],
+      new = LocalSubmittedContent.new map_id: map_id,
+                                      round: round,
+                                      link: link,
                                       start_at: start_time,
                                       end_at: nil,
                                       created_at: start_time,
@@ -166,8 +166,8 @@ class SubmissionViewingEventsController < ApplicationController
   def start_timing_for_round(map_id, round)
     # check for pre-existing record
     records = @store.where(
-      map_id: args[:map_id],
-      round: args[:round]
+      map_id: map_id,
+      round: round
     )
 
     _record_start_time(records)

@@ -2,7 +2,7 @@ class SubmissionViewingEventsController < ApplicationController
   include SubmittedContentHelper
   include SubmissionViewingEventHelper
 
-  before_action :ensure_store
+  before_action :ensure_store, only: %i[start_timing end_timing reset_timing hard_save end_round_and_save]
 
   def action_allowed?
     true

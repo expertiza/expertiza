@@ -219,6 +219,7 @@ class SubmissionViewingEventsController < ApplicationController
     ExpertizaLogger.info("Flushing LocalStorage to the database...")
     uncommitted = []
     records = @store.where(map_id: map_id, round: round)
+    ExpertizaLogger.info("Found #{records.length} records in local storage for timing events")
 
     records.each do |record|
       # push the uncommitted link on to the stack
@@ -238,12 +239,12 @@ class SubmissionViewingEventsController < ApplicationController
       else
         # if a previous record doesn't exist,
         # we can delegate saving to `LocalStorage`
-        store.hard_save(record)
+        @store.hard_save(record)
       end
 
       # once the data is updated or added to the database,
       # remove it from `LocalStorage`
-      store.remove(record)
+      @store.remove(record)
     end
 
     ExpertizaLogger.info("Flushed #{uncommitted.length} links\n#{uncommitted}")

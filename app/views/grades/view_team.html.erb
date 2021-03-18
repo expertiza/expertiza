@@ -85,7 +85,6 @@
             <% end %>
             <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Colors are scaled from poor to excellent in the following order: red, orange, yellow, light-green, dark-green">color legend</span>
             <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Click a row to see the comments for the respective question. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience.">interaction legend</span>
-
           </span>
             <!--
                 Changes to this was done as part of E1788_OSS_project_Maroon_Heatmap_fixes
@@ -123,10 +122,8 @@
               <th class="sorter-false">
                 <span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback.">metric-1</span>
               </th>
-
             </tr>
             </thead>
-
 
             <% score_row_count = vm.list_of_rows.first.score_row.count %>
             <% j = 1 %>
@@ -145,7 +142,6 @@
                         <span class="<%=  underlined?(score) %>"><%= score.score_value.to_s %></span>
                       </td>
                   <% end %>
-
 
                   <% if row.score_row.count == 0 %>
                       <% for index in 0 .. score_row_count - 1 %>
@@ -178,7 +174,8 @@
                               <td>Review <%=index + 1%></td>
                               <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
                               <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
-                                <td id="<%= 'rr'+ j.to_s + '_' + index.to_s %>" data-round="<%= vm.round.to_s %>=" data-qNum="<%= j.to_s %>" data-rNum="<%= index.to_s %>" data-hasTag="<%= row.score_row[index].vm_prompts.count > 0 ? "true":"false"%>">
+                                <!-- Set id and data of this <td> to be queried by jQuery for the tagging report -->
+                                <td id="<%= 'rr'+ j.to_s + '_' + index.to_s %>" data-round="<%= vm.round.to_s %>=" data-question_num="<%= j.to_s %>" data-review_num="<%= index.to_s %>" data-has_tag="<%= row.score_row[index].vm_prompts.count > 0 ? "true":"false"%>">
                               <% else %>
                                 <td>
                               <% end %>
@@ -224,7 +221,6 @@
                 </div>
               </td>
             </tr>
-
           </table>
         </div>
           <!-- Display the list of team members, for Peer Reviews. -->
@@ -246,7 +242,6 @@
    @course_id = Assignment.find_by(id: @participant.parent_id).course_id;
    @ta_id = @participant.user_id;  
 %>
-
 
   <h4 style="font-weight:bold;display:inline-block;">Grade and comment for submission</h4><br/>
   <% if ['Student', 'Teaching Assistant'].include? current_user.role.name %>

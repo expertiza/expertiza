@@ -126,18 +126,18 @@ function getTagPrompts() {
 function getRowData() {
     // Get all valid review rows
     let rowsList = $("[id^=rr]");
-    // Set up matrix of questionNumber, reviewNumber, hasTag?, and pointer to tags if true
+    // Set up matrix of questionNumber, reviewNumber, hasTag?, and reference to tags if true
     let rowData = new Array(rowsList.length);
     $.each(rowsList, function(i) {
         rowData[i] = new Map();
         //Round Number
         rowData[i].set('round_num', $( this ).data("round"));
         // Question Number
-        rowData[i].set('question_num', $( this ).data("qnum"));
+        rowData[i].set('question_num', $( this ).data("question_num"));
         // Review Number
-        rowData[i].set('review_num',$( this ).data("rnum"));
+        rowData[i].set('review_num',$( this ).data("review_num"));
         // Has tag bool?
-        rowData[i].set('has_tag',$( this ).data("hastag"));
+        rowData[i].set('has_tag',$( this ).data("has_tag"));
         // Reference to tag objects
         if (rowData[i].get('has_tag') == true) {
             rowData[i].set('tag_list', $( this ).find('input[name^="tag_checkboxes"]'));
@@ -162,7 +162,7 @@ function updateTagsFraction(countMap) {
 function updateTagGrid(tagPrompts){
     for(let i = 0; i< tagPrompts.length; ++i) {
         // Look up the heatmap cell associated with this tag
-        let tempId = tagPrompts[i].getAttribute("data-tagheatmapid");
+        let tempId = tagPrompts[i].getAttribute("data-tag_heatgrid_id");
         // Get the cell object from the document
         let gridCell = document.getElementById(tempId);
         // Update the heatgrid cell based on the value of this tag.
@@ -257,7 +257,6 @@ function drawHeader(table, headerTooltipText,gridWidth) {
     th = document.createElement("th");
     text = document.createTextNode("0 out of 0");
     th.setAttribute("id", "tagsSuperNumber");
-    th.setAttribute("text-align", "center");
     th.colSpan = gridWidth;
     addToolTip(th, headerTooltipText);
     th.appendChild(text);
@@ -314,7 +313,7 @@ function drawReviewRow(trow, questionNum, reviewNum, gridWidth, rowData, rIndex,
                 cell.setAttribute("class", "c5");
                 innerText += symTagDone;
             }
-            rowData[rIndex].get('tag_list').get(cIndex).setAttribute("data-tagheatmapid", idString);
+            rowData[rIndex].get('tag_list').get(cIndex).setAttribute("data-tag_heatgrid_id", idString);
         }
         let text = document.createTextNode(innerText);
         //add to table
@@ -388,19 +387,12 @@ function calcTagRatio(tagPrompts){
 // For now, because of the broken round numbers in the backend, use changes in question number to find rounds
 function countRounds(rowData) {
     let numRounds = 1;
-/*    let round = 0;
-    for(const row of rowData) {
-        if(row.get('round_num')>round) {
-            ++numRounds;
-        }
-    }*/
     let questionNum = 1;
     for(const row of rowData) {
         if(row.get('question_num') < questionNum) {
             ++numRounds;
         }
         questionNum = row.get('question_num');
-
     }
     return numRounds;
 }

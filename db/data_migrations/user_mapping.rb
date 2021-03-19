@@ -7,7 +7,7 @@ class UserMapping
 		User.find_each do |user|
 			count += 1
 			if count % 50 == 0
-				puts user.id + ',' + "#{user.role.name.downcase.gsub(/[- ]/,'_')}#{user.id}"
+				puts user.id.to_s + ',' + "#{user.role.name.downcase.gsub(/[- ]/,'_')}#{user.id}"
 			end
 			user_id = user.id
 			scrubbed_name = "#{user.role.name.downcase.gsub(/[- ]/,'_')}#{user.id}"

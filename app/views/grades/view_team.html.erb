@@ -175,7 +175,9 @@
                               <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
                               <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
                                 <!-- Set id and data of this <td> to be queried by jQuery for the tagging report -->
-                                <td id="<%= 'rr'+ j.to_s + '_' + index.to_s %>" data-round="<%= vm.round.to_s %>=" data-question_num="<%= j.to_s %>" data-review_num="<%= index.to_s %>" data-has_tag="<%= row.score_row[index].vm_prompts.count > 0 ? "true":"false"%>">
+                                <td id="<%= 'rr'+ j.to_s + '_' + index.to_s %>" data-round="<%= vm.round.to_s %>="
+                                    data-question_num="<%= j.to_s %>" data-review_num="<%= index.to_s %>"
+                                    data-has_tag="<%= row.score_row[index].vm_prompts.count > 0 ? "true":"false"%>">
                               <% else %>
                                 <td>
                               <% end %>

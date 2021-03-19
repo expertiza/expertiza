@@ -240,7 +240,7 @@ class QuestionnairesController < ApplicationController
   def save
     @questionnaire.save!
 
-    save_questions @questionnaire.id if !@questionnaire.id.nil? and @questionnaire.id > 0
+    save_questions @questionnaire.id if !@questionnaire.id.nil? and !@questionnaire.id.zero?
     # We do not create node for quiz questionnaires
     if @questionnaire.type != "QuizQuestionnaire"
       p_folder = TreeFolder.find_by(name: @questionnaire.display_type)

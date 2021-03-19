@@ -1,6 +1,6 @@
 #timeModalBody{
     overflow: auto;
-    height:428px;
+    height:100%;
 }
 
 .time-canvas-container{
@@ -33,6 +33,30 @@
     color: black;
 }
 
+.stat-table {
+    margin: 10px auto;
+    width: 100%;
+    border: none;
+}
+
+#statTableBody tr:nth-child(even) {
+    background-color: #eee;
+}
+
+#statTableBody tr:nth-child(odd) {
+    background-color: lightgrey;
+}
+
+#statTable th {
+    background-color: darkred;
+    color: white;
+}
+
+#statTable td {
+    padding: 0.6em;
+    color: black;
+}
+
 .t-modal {
     display: none;
     position: fixed;
@@ -54,7 +78,7 @@
     padding: 0;
     border: 1px solid #888;
     width: 450px;
-    height:500px;
+    height:700px;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
     -webkit-animation-name: animatetop;
     -webkit-animation-duration: 0.4s;

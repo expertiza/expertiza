@@ -3,6 +3,7 @@
 function drawTimeCanvas(chartdata,resd) {
 
     var table = resd.tables;
+    var stats = resd.stats;
 
     if(table.length == 0 || chartdata.datasets[0].data.length == 0){
         $("#timeModalBody").empty().html("<p>This review has no time detail avaliable</p>");
@@ -21,25 +22,34 @@ function drawTimeCanvas(chartdata,resd) {
         "<th>Avg.</th>"+
         "</tr>" +
         "</tbody>" +
+        "</table>" +
+        "<table id=\"statTable\" class=\"stat-table\">"+
+        "<tbody id=\"statTableBody\">"+
+        "<tr>"+
+        "<th>Class Stats</th>"+
+        "<th>Value</th>"+
+        "</tr>" +
+        "</tbody>" +
         "</table>");
-
-    console.log(table.length)
 
     for(var i = 0 ; i < table.length ; i++){
         var d = table[i];
         $('#timeTable > :last-child').append("<tr>" +
             "<td>" + d.subject + "</td>" +
-            "<td>" + d.timecost + "</td>" +
-            "<td>" + d.clsavg + "</td>" +
+            "<td>" + d.timeCost + "</td>" +
+            "<td>" + d.avgTime +"</td>" +
             "</tr>");
 
     }
 
-    $('#timeTable > :last-child').append("<tr>" +
-        "<td>Total</td>" +
-        "<td>" + resd.total + "</td>" +
-        "<td>" + resd.totalavg + "</td>" +
-        "</tr>");
+    for(var i = 0 ; i < stats.length ; i++){
+        var d = stats[i];
+        $('#statTable > :last-child').append("<tr>" +
+            "<td>" + d.title + "</td>" +
+            "<td>" + d.value + "</td>" +
+            "</tr>");
+
+    }
 
     var ctx = $("#timeCanvas").get(0).getContext("2d");
     var pieChart = new Chart(ctx, {
@@ -75,8 +85,6 @@ function displayTimeDetail(resp_map_id,round){
                     borderWidth: 1
                 }]
             };
-
-            console.log(jsonResponse);
 
             drawTimeCanvas(chartData,jsonResponse);
         },

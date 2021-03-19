@@ -91,35 +91,58 @@ class SubmissionViewingEventsController < ApplicationController
 
   # Respond with a JSON containing relevant timing information for specified review and round
   def getTimingDetails
-    require 'json'
     labels = [] # store links accessed during review
-    percentages = [] # store percentages per link for pie chart
+    percentages = [] # store percentage time per link for pie chart
     tables = [] # store timing data breakdown per link
+    stats = [] # store class stat data
 
     # get total time spent on review
     totalTime = getTotalTime(params[:reponse_map_id], params[:round])
 
-    # get all timing entries for review (each link has one entry)
-    timingEntries = SubmissionViewingEvent.where(map_id: params[:reponse_map_id], round: params[:round])
-
-    # push all data into relevant arrays for JSON
-    timingEntries.each do |entry|
+    # push relevant data for each row into arrays used to fill in JSON
+    SubmissionViewingEvent.where(map_id: params[:reponse_map_id], round: params[:round]).each do |entry|
       labels.push(entry.link)
       percentages.push((entry.end_at - entry.start_at).to_f/totalTime)
       tables.push({
                       "subject" => entry.link,
-                      "timecost" => secondsToHuman((entry.end_at - entry.start_at).to_i),
-                      "clsavg" => 0
+                      "timeCost" => secondsToHuman((entry.end_at - entry.start_at).to_i),
+                      "avgTime" => secondsToHuman(getAvgRevTime(params[:reponse_map_id], params[:round], entry.link))
                   })
     end
 
+    tables.push({
+                    "subject" => "Total",
+                    # contains total time spent in human format
+                    "timeCost" => secondsToHuman(totalTime),
+                    # contains average review time for this submission in human format
+                    "avgTime" => secondsToHuman(getAvgRevTime(params[:reponse_map_id], params[:round]))
+                })
+
+    stats.push({
+                    "title" => 'Class Average',
+                    "value" => secondsToHuman(getClassAvgRevTime(params[:reponse_map_id], params[:round]))
+              })
+
+    stats.push({
+                   "title" => 'Median',
+                   "value" => secondsToHuman(getMedianRevTime(params[:reponse_map_id], params[:round]))
+               })
+
+    stats.push({
+                   "title" => 'Standard Deviation',
+                   "value" => secondsToHuman(getStdDevRevTime(params[:reponse_map_id], params[:round]))
+               })
+
     # create JSON
     @timingDetails = {
+        # contains links accessed in review
         'Labels'=> labels,
+        # contains percentage time spent per link
         'Data' => percentages,
+        # contains link name and time spent for display table
         'tables' => tables,
-        'total' => secondsToHuman(totalTime),
-        'totalavg' => 0
+        # contains class stats
+        'stats' => stats
     }
 
     # respond to request with JSON containing all data

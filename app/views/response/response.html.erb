@@ -491,77 +491,83 @@
 <% if @submission_check %>
   <script type="text/javascript">
       $(document).ready(function () {
-          let map_id = <%= @map.id %>;
-          let round = <%= @current_round %>;
-          let current_window_timer = null;
-          let auto_window_timer = null;
-          let timer_flag = false;
-
-          const time_out_interval = 120000; // in milliseconds, checkout end time when not interaction on review page
-          const time_period = 30000; // automatically record end time every minute
-
-          function startTimer() {
-              // resetTimer();
-              // autoTimer();
-              $("#timeout_flag").val("false");
-              $("#restart_file_timing_flag").val("true");
-              $("#restart_link_timing_flag").val("true");
-              document.onload = resetTimer;      // page is loaded
-              document.onmousemove = resetTimer; // mouse moves over an element
-              document.onkeypress = resetTimer;  // user presses key on keyboard
-              document.onmousedown = resetTimer; // mouse is pressed on element
-              document.ontouchstart = resetTimer;// user touches on an element (relevant for touchscreen)
-              document.onclick = resetTimer;     // user clicks on an element
-              document.onscroll = resetTimer;    // scrolling with arrow keys
-          }
-
-          function resetTimer() {
-              clearTimeout(current_window_timer);
-              current_window_timer = setTimeout(timeoutAction, time_out_interval);
-              timer_flag = true;
-          }
-
-          function autoTimer() {
-              clearInterval(auto_window_timer);
-              auto_window_timer = setInterval(autoRecordTime, time_period);
-          }
-
-          function timeoutAction() {
-              window.focus();
-              timer_flag = false;
-              // markEndTime(map_id, round);
-              endRound(map_id, round);
-              if (confirm("Are you still reviewing your submissions? Press OK to continue")) {
-                  startTimer();
-                  resetTimer();
-              } else {
-                  clearTimeout(current_window_timer);
-                  clearInterval(auto_window_timer);
-                  $("#timeout_flag").val("true");
-                  alert("The page has not been interacted for a long time, and will close reference windows and go back!");
-                  window.history.back();
-              }
-          }
-
-          function autoRecordTime() {
-              // markEndTime(map_id, round);
-              resetRound(map_id, round);
-              if (timer_flag === true) {
-                  startTimer();
-              }
-          }
-
-          startTimer();
-          resetTimer();
-          autoTimer();
-
-          $("#save_review").click(function () {
-              endRoundAndSave(map_id, round);
+          $(window).addEventListener("focus", function() {
+              console.log("Expertiza Review Window has focus");
           });
-
-          $("#Submit").click(function () {
-              endRoundAndSave(map_id, round);
+          $(window).addEventListener("blur", function() {
+              console.log("Expertiza Review Window lost focus");
           });
+<!--          let map_id = <%#= @map.id %>;-->
+<!--          let round = <%#= @current_round %>;-->
+          // let current_window_timer = null;
+          // let auto_window_timer = null;
+          // let timer_flag = false;
+
+          // const time_out_interval = 120000; // in milliseconds, checkout end time when not interaction on review page
+          // const time_period = 30000; // automatically record end time every minute
+          //
+          // function startTimer() {
+          //     // resetTimer();
+          //     // autoTimer();
+          //     $("#timeout_flag").val("false");
+          //     $("#restart_file_timing_flag").val("true");
+          //     $("#restart_link_timing_flag").val("true");
+          //     document.onload = resetTimer;      // page is loaded
+          //     document.onmousemove = resetTimer; // mouse moves over an element
+          //     document.onkeypress = resetTimer;  // user presses key on keyboard
+          //     document.onmousedown = resetTimer; // mouse is pressed on element
+          //     document.ontouchstart = resetTimer;// user touches on an element (relevant for touchscreen)
+          //     document.onclick = resetTimer;     // user clicks on an element
+          //     document.onscroll = resetTimer;    // scrolling with arrow keys
+          // }
+
+          // function resetTimer() {
+          //     clearTimeout(current_window_timer);
+          //     current_window_timer = setTimeout(timeoutAction, time_out_interval);
+          //     timer_flag = true;
+          // }
+          //
+          // function autoTimer() {
+          //     clearInterval(auto_window_timer);
+          //     auto_window_timer = setInterval(autoRecordTime, time_period);
+          // }
+          //
+          // function timeoutAction() {
+          //     window.focus();
+          //     timer_flag = false;
+          //     // markEndTime(map_id, round);
+          //     endRound(map_id, round);
+          //     if (confirm("Are you still reviewing your submissions? Press OK to continue")) {
+          //         startTimer();
+          //         resetTimer();
+          //     } else {
+          //         clearTimeout(current_window_timer);
+          //         clearInterval(auto_window_timer);
+          //         $("#timeout_flag").val("true");
+          //         alert("The page has not been interacted for a long time, and will close reference windows and go back!");
+          //         window.history.back();
+          //     }
+          // }
+          //
+          // function autoRecordTime() {
+          //     // markEndTime(map_id, round);
+          //     resetRound(map_id, round);
+          //     if (timer_flag === true) {
+          //         startTimer();
+          //     }
+          // }
+          //
+          // startTimer();
+          // resetTimer();
+          // autoTimer();
+          //
+          // $("#save_review").click(function () {
+          //     endRoundAndSave(map_id, round);
+          // });
+
+          // $("#Submit").click(function () {
+          //     endRoundAndSave(map_id, round);
+          // });
       });
   </script>
 <% end %> 

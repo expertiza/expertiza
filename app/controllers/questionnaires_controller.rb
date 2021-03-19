@@ -184,7 +184,8 @@ class QuestionnairesController < ApplicationController
   # Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions
     questionnaire_id = params[:id] unless params[:id].nil?
-    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
+    questionnaire = Questionnaire.find(questionnaire_id)
+    num_of_existed_questions = questionnaire.questions.size
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
       if question.is_a? ScoredQuestion
@@ -194,7 +195,8 @@ class QuestionnairesController < ApplicationController
       end
       question.size = '50, 3' if question.is_a? Criterion
       question.size = '50, 3' if question.is_a? Cake
-      question.alternatives = (:min_question_score..:max_question_score).to_a.join('|') if question.is_a? Dropdown
+      #question.alternatives = '0|1|2|3|4|5' if question.is_a? Dropdown
+      question.alternatives = (questionnaire.min_question_score..questionnaire.max_question_score).to_a.join('|') if question.is_a? Dropdown
       question.size = '60, 5' if question.is_a? TextArea
       question.size = '30' if question.is_a? TextField
       begin

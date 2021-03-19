@@ -435,7 +435,7 @@ describe User do
     it 'returns correct real name from anonymized name' do
       student = create(:student)
       expect(student.name).not_to eq "Student " + student.id.to_s
-      real_student = User.real_user_from_anonymized_name("Student " + student.id.to_s)
+      real_student = User.real_user_from_anonymized_name("Student" + student.id.to_s)
       expect(student.name).to eq real_student.name
       expect(student).to eq real_student
     end

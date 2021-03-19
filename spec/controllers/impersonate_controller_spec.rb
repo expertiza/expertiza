@@ -55,9 +55,9 @@ describe ImpersonateController do
             allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
             allow(instructor).to receive(:can_impersonate?).with(student1).and_return(true)
             allow(User).to receive(:anonymized_view?).and_return(true)
-            allow(User).to receive(:real_user_from_anonymized_name).with("Student 30").and_return(student1)
+            allow(User).to receive(:real_user_from_anonymized_name).with("Student30").and_return(student1)
             request.env["HTTP_REFERER"] = "http://www.example.com"
-            @params = { user: { name: "Student 30" } }
+            @params = { user: { name: "Student30" } }
             @session = { user: instructor }
             post :impersonate, @params, @session
             expect(session[:super_user]).to eq instructor

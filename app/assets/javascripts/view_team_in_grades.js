@@ -198,11 +198,6 @@ function toggleHeatGridRows() {
     });
 }
 
-// Collapse the heatgrid rows which make up the Map of tags.
-function collapseHeatGrid() {
-
-}
-
 /********************************** ELEMENT/CODE GENERATORS ****************************************/
 
 // Renders the review tag heatgrid table based on the review rowData array.

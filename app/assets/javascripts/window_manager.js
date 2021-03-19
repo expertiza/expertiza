@@ -44,3 +44,7 @@ WindowManager.prototype.newViewingWindow = function(response_map_id, response_ro
     return w;
 };
 
+WindowManager.prototype.checkWindowClosed = function(window) {
+    return window.closed;
+};
+

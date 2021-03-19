@@ -96,7 +96,7 @@ class Response < ActiveRecord::Base
 
   # This populate_new_response method returns a Response object used to populate the
   # @response instance object with the correct response according to the rubric review round
-  # or with a new Response object that the controller can use 
+  # or with a new Response object that the controller can use
   # this method is called within the new method in response_controller
   def populate_new_response(response_map, current_round)
     response = Response.where(map_id: response_map.id, round: current_round.to_i).order(updated_at: :desc).first
@@ -109,7 +109,6 @@ class Response < ActiveRecord::Base
     end
     response
   end
-
 
   def questionnaire_by_answer(answer)
     if !answer.nil? # for all the cases except the case that  file submission is the only question in the rubric.

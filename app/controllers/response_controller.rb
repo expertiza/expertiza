@@ -287,9 +287,7 @@ class ResponseController < ApplicationController
     @max = @questionnaire.max_question_score
     # The new response is created here so that the controller has access to it in the new method
     # This response object is populated later in the new method
-    if new_response
-      @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
-    end
+    @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0) if new_response
   end
 
   # This method is called within the Edit or New actions

@@ -194,7 +194,7 @@ class QuestionnairesController < ApplicationController
       end
       question.size = '50, 3' if question.is_a? Criterion
       question.size = '50, 3' if question.is_a? Cake
-      question.alternatives = '0|1|2|3|4|5' if question.is_a? Dropdown
+      question.alternatives = (:min_question_score..:max_question_score).to_a.join('|') if question.is_a? Dropdown
       question.size = '60, 5' if question.is_a? TextArea
       question.size = '30' if question.is_a? TextField
       begin
@@ -241,6 +241,7 @@ class QuestionnairesController < ApplicationController
     @questionnaire.save!
 
     @questionnaire.save_questions(params) if !@questionnaire.id.nil? and !@questionnaire.id.zero?
+
     # We do not create node for quiz questionnaires
     if @questionnaire.type != "QuizQuestionnaire"
       p_folder = TreeFolder.find_by(name: @questionnaire.display_type)

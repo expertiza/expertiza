@@ -220,7 +220,7 @@ class Response < ActiveRecord::Base
     review_response = review_response_map.response[0]
     assignment = Assignment.find(calibration_response_map.reviewed_object_id)
     review_questionnaire_ids = ReviewQuestionnaire.select("id")
-    assignment_questionnaire = AssignmentQuestionnaire.where(["assignment_id = ? and questionnaire_id IN (?)", assignment.id, review_questionnaire_ids]).first
+    assignment_questionnaire = AssignmentQuestionnaire.find_by(["assignment_id = ? and questionnaire_id IN (?)", assignment.id, review_questionnaire_ids])
     questions = assignment_questionnaire.questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }
     [calibration_response, review_response, assignment, questions]
   end

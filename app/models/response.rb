@@ -211,14 +211,14 @@ class Response < ActiveRecord::Base
     review_response_map = ReviewResponseMap.find(response_id)
     calibration_response = calibration_response_map.response[0]
     review_response = review_response_map.response[0]
-    assignment = Assignment.find(calibration_response_map.reviewed_object_id)
-    questions = Response.find_calibrations_questions(assignment)
+    assignment, questions = Response.find_calibrations_questions_and_assignment(calibration_response_map.reviewed_object_id)
     [calibration_response, review_response, assignment, questions]
   end
 
-  def self.find_calibrations_questions(assignment)
+  def self.find_calibrations_questions_and_assignment(reviewed_object_id)
     review_questionnaire_ids = ReviewQuestionnaire.select("id")
-    AssignmentQuestionnaire.find_by(["assignment_id = ? and questionnaire_id IN (?)", assignment.id, review_questionnaire_ids]).questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }
+    [Assignment.find(reviewed_object_id), AssignmentQuestionnaire.find_by(["assignment_id = ? and questionnaire_id IN (?)",
+       Assignment.find(reviewed_object_id).id, review_questionnaire_ids]).questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }]
   end
 
   def notify_instructor_on_difference

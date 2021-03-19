@@ -97,11 +97,11 @@
                     alert("Open file " + file_name + " in new window to view it online.");
                     window_handler = window.open(file_path, "_blank")
                     window_handler.onload = function() {
-                        this.addEventListener("focus", function() {
+                        $(this).addEventListener("focus", function() {
                             startTime2(map_id, round, file_name);
                             console.log("Viewing window has focus!");
                         });
-                        this.addEventListener("blur", function() {
+                        $(this).addEventListener("blur", function() {
                             endTime2(map_id, round, file_name);
                             console.log("Viewing window lost focus!");
                         });

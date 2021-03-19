@@ -82,9 +82,7 @@
         $(document).ready(function () {
             let map_id = <%= @map.id %>;
             let round = <%= @current_round %>;
-            let filesToUpdate = {};
             let windowManager = new WindowManager();
-            const time_out_interval = 1000; // in milliseconds
 
             $("#1_myDiv #file_table a.fileLink").click(function (event) {
                 event.preventDefault();
@@ -98,8 +96,14 @@
                 if (supported_file_type.includes(file_name_extension)) {
                     alert("Open file " + file_name + " in new window to view it online.");
                     window_handler = window.open(file_path, "_blank")
-                    window_handler.addEventListener("focus", function() { startTime2(map_id, round, file_path); });
-                    window_handler.addEventListener("blur", function() { endTime2(map_id, round, file_path); });
+                    window_handler.addEventListener("focus", function() {
+                        startTime2(map_id, round, file_name);
+                        console.log("Viewing window has focus!");
+                    });
+                    window_handler.addEventListener("blur", function() {
+                        endTime2(map_id, round, file_name);
+                        console.log("Viewing window lost focus!");
+                    });
                     // window_handler = window.open(file_path, "_blank");
                     // windowManager.manage(window_handler)
                     // link_timer = setInterval(checkWindowStatus, time_out_interval);

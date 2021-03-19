@@ -95,10 +95,7 @@
 
                 if (supported_file_type.includes(file_name_extension)) {
                     alert("Open file " + file_name + " in new window to view it online.");
-                    windowHandler = window.open(file_path, "_blank");
-                    windowHandler.onload = function() {
-                        document.title = "Hello Hi Hello Hey this works!";
-                        alert("Alert!");
+                    windowManager.newViewingWindow(map_id, round, file_name);
                     //     $(this).addEventListener("focus", function() {
                     //         startTime2(map_id, round, file_name);
                     //         console.log("Viewing window has focus!");
@@ -107,7 +104,7 @@
                     //         endTime2(map_id, round, file_name);
                     //         console.log("Viewing window lost focus!");
                     //     });
-                    };
+                    // }
                     // window_handler = window.open(file_path, "_blank");
                     // windowManager.manage(window_handler)
                     // link_timer = setInterval(checkWindowStatus, time_out_interval);

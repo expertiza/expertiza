@@ -90,31 +90,33 @@
                 let file_name = $(this).attr("download");
                 let file_name_extension = file_name.split(".").pop();
 
-                let window_handler = null;
+                let windowHandler = null;
                 let link_timer = null;
 
                 if (supported_file_type.includes(file_name_extension)) {
                     alert("Open file " + file_name + " in new window to view it online.");
-                    window_handler = window.open(file_path, "_blank")
-                    window_handler.onload = function() {
-                        $(this).addEventListener("focus", function() {
-                            startTime2(map_id, round, file_name);
-                            console.log("Viewing window has focus!");
-                        });
-                        $(this).addEventListener("blur", function() {
-                            endTime2(map_id, round, file_name);
-                            console.log("Viewing window lost focus!");
-                        });
+                    windowHandler = window.open(file_path, "_blank");
+                    windowHandler.onload = function() {
+                        document.title = "Hello Hi Hello Hey this works!";
+                        alert("Alert!");
+                    //     $(this).addEventListener("focus", function() {
+                    //         startTime2(map_id, round, file_name);
+                    //         console.log("Viewing window has focus!");
+                    //     });
+                    //     $(this).addEventListener("blur", function() {
+                    //         endTime2(map_id, round, file_name);
+                    //         console.log("Viewing window lost focus!");
+                    //     });
                     };
                     // window_handler = window.open(file_path, "_blank");
                     // windowManager.manage(window_handler)
                     // link_timer = setInterval(checkWindowStatus, time_out_interval);
                 } else {
                     alert("Download file " + file_name + " to view it locally.");
-                    window_handler = window.open(file_path, "_blank");
+                    windowHandler = window.open(file_path, "_blank");
                 }
 
-                windowManager.manage(window_handler);
+                windowManager.manage(windowHandler);
             })
         });
     </script>

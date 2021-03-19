@@ -5,13 +5,21 @@
         var total_tags = countTotalTags()   // Added March 2021 -- Set up the on page counter on first loading the page
         var tagged_tags = countTaggedTags()
         document.getElementById("tag_stats").innerHTML = "Tag Finished: " + tagged_tags + "/" + total_tags
+        // Added March 2021 - E2100 -- Hides links when no reviews to tag
+        var link_main = document.getElementById("view_link");
+        if (total_tags === 0) {
+            link_main.style.display = "none";
+        }
     });
 </script>
 
 
 <H1>Score for <%= @assignment.name %></H1>
-<div id="tag_stats"></div>
-
+<div id="view_link">
+  <div id="tag_stats"></div>
+  <%= link_to "Main View", controller: 'grades', action: 'view_team', id: params[:id] %>
+  <BR/>
+</div>
 
 <table class="grades" >
 <%= render :partial => 'grades/participant_charts', :locals => {:prefix => nil} %> 

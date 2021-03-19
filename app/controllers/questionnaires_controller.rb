@@ -194,7 +194,7 @@ class QuestionnairesController < ApplicationController
       end
       question.size = '50, 3' if question.is_a? Criterion
       question.size = '50, 3' if question.is_a? Cake
-      question.alternatives = (@questionnaire.min_question_score..@questionnaire.max_question_score).to_a.join("|") if question.is_a? Dropdown
+      question.alternatives = (:min_question_score..:max_question_score).to_a.join('|') if question.is_a? Dropdown
       question.size = '60, 5' if question.is_a? TextArea
       question.size = '30' if question.is_a? TextField
       begin

@@ -223,8 +223,9 @@ class Response < ActiveRecord::Base
   end
 
   def self.find_calibrations_questions_and_assignment(reviewed_object_id)
-    [Assignment.find(reviewed_object_id), AssignmentQuestionnaire.find_by(["assignment_id = ? and questionnaire_id IN (?)",
-     Assignment.find(reviewed_object_id).id, ReviewQuestionnaire.select("id")]).questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader)}]
+    [Assignment.find(reviewed_object_id),
+     AssignmentQuestionnaire.find_by(["assignment_id = ? and questionnaire_id IN (?)",
+        Assignment.find(reviewed_object_id).id, ReviewQuestionnaire.select("id")]).questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) } ]
   end
 
   def notify_instructor_on_difference

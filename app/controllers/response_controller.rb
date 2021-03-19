@@ -256,16 +256,14 @@ class ResponseController < ApplicationController
     end
   end
 
-  # assigning variables for the expert reviews
+  # This method controls what is shown students when they view results from a calibration.
+  # Most of the business logic lives in the model, where the :calibration_response_map_id and :review_response_map_id are used
+  # to find the appropriate references to calibration responses, review responses as well as the assignment and response questions
   def show_calibration_results_for_student
-    calibration_response_map = ReviewResponseMap.find(params[:calibration_response_map_id])
-    review_response_map = ReviewResponseMap.find(params[:review_response_map_id])
-    @calibration_response = calibration_response_map.response[0]
-    @review_response = review_response_map.response[0]
-    @assignment = Assignment.find(calibration_response_map.reviewed_object_id)
-    @review_questionnaire_ids = ReviewQuestionnaire.select("id")
-    @assignment_questionnaire = AssignmentQuestionnaire.where(["assignment_id = ? and questionnaire_id IN (?)", @assignment.id, @review_questionnaire_ids]).first
-    @questions = @assignment_questionnaire.questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }
+    @calibration_response,
+    @review_response,
+    @assignment,
+    @questions = Response.calibration_results_info(params[:calibration_response_map_id], params[:review_response_map_id])
   end
 
   def toggle_permission

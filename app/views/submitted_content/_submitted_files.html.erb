@@ -92,59 +92,25 @@
                 let file_name = $(this).attr("download");
                 let file_name_extension = file_name.split(".").pop();
 
-                $("#restart_file_timing_flag").val("false");
-
-                startTime2(map_id, round, file_name);
-
-                filesToUpdate[file_name] = true;
-
                 let window_handler = null;
                 let link_timer = null;
 
                 if (supported_file_type.includes(file_name_extension)) {
                     alert("Open file " + file_name + " in new window to view it online.");
-                    windowManager.manage(
-                        windowManager.newViewingWindow(
-                            map_id,
-                            round,
-                            file_path,
-                            function() { console.log("Window has focus!") },
-                            function() { console.log("Window has lost focus!") }
-                        )
-                    );
+                    window_handler = window.open(file_path, "_blank").focus(function() {
+                        startTime2(map_id, round, file_path);
+                    }).blur(function() {
+                        endTime2(map_id, round, file_path);
+                    });
                     // window_handler = window.open(file_path, "_blank");
                     // windowManager.manage(window_handler)
                     // link_timer = setInterval(checkWindowStatus, time_out_interval);
                 } else {
                     alert("Download file " + file_name + " to view it locally.");
-                    // window_handler = window.open(file_path, "_blank");
+                    window_handler = window.open(file_path, "_blank");
                 }
 
-                function checkWindowStatus() {
-                    let timeout_flag = $('#timeout_flag').val() == 'true';
-                    if (window_handler.closed) {
-                        endTime2(map_id, round, file_name);
-                        filesToUpdate[file_name] = false;
-                        clearInterval(link_timer);
-                    }
-                    timeoutAction(timeout_flag);
-                }
-
-                function timeoutAction(timeout_flag) {
-                    if (timeout_flag) {
-                        windowManager.closeAll();
-                    }
-
-                    if ($("#restart_file_timing_flag").val() === 'true') {
-                        for (let file in filesToUpdate) {
-                            if (filesToUpdate[file]) {
-                                startTime2(map_id, round, file);
-                            }
-                        }
-
-                        $("#restart_file_timing_flag").val('false');
-                    }
-                }
+                windowManager.manage(window_handler);
             })
         });
     </script>

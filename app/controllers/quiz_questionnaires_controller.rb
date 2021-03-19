@@ -42,7 +42,7 @@ class QuizQuestionnairesController < QuestionnairesController
   # create quiz questionnaire
   def create
     valid = validate_quiz
-    if valid.eql?("valid") # The value of valid could either be valid or a msg to address before moving forward
+    if valid.eql?("valid") # The value of valid could either be "valid" or a string indicating why the quiz cannot be created
       @questionnaire = QuizQuestionnaire.new(questionnaire_params)
       participant_id = params[:pid] # Gets the participant id to be used when finding team and editing submitted content
       @questionnaire.min_question_score = params[:questionnaire][:min_question_score] # 0
@@ -112,6 +112,7 @@ class QuizQuestionnairesController < QuestionnairesController
   end
 
   # validate quiz name, questions, answers
+  # Returns "valid" if there are no issues, or a string indicating why the quiz is invalid
   def validate_quiz
     num_questions = Assignment.find(params[:aid]).num_quiz_questions
     valid = "valid"

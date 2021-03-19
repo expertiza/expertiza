@@ -258,12 +258,12 @@ class ResponseController < ApplicationController
 
   # This method controls what is shown students when they view results from a calibration.
   # Most of the business logic lives in the model, where the :calibration_response_map_id and :review_response_map_id are used
-  # to find the appropriate references to calibration responses, review responses as well as the assignment and response questions
+  # to find the appropriate references to calibration responses, review responses as well as the response questions
   def show_calibration_results_for_student
+    @assignment = Assignment.find(params[:assignment_id])
     @calibration_response,
     @review_response,
-    @assignment,
-    @questions = Response.calibration_results_info(params[:calibration_response_map_id], params[:review_response_map_id])
+    @questions = Response.calibration_results_info(params[:calibration_response_map_id], params[:review_response_map_id], params[:assignment_id])
   end
 
   def toggle_permission

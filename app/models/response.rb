@@ -213,16 +213,15 @@ class Response < ActiveRecord::Base
 
   # This method returns references to a calibration response, review response, assignment, and questions
   # This method is used within show_calibration_results_for_student when a student views their calibration results for a particular review/assignment.
-  def self.calibration_results_info(calibration_id, response_id)
+  def self.calibration_results_info(calibration_id, response_id, assignment_id)
     calibration_response_map = ReviewResponseMap.find(calibration_id)
     review_response_map = ReviewResponseMap.find(response_id)
     calibration_response = calibration_response_map.response[0]
     review_response = review_response_map.response[0]
-    assignment,
-    questions = [Assignment.find(calibration_response_map.reviewed_object_id),
-                 AssignmentQuestionnaire.find_by(["assignment_id = ? and questionnaire_id IN (?)", Assignment.find(calibration_response_map.reviewed_object_id).id, ReviewQuestionnaire.select("id")])
-                 .questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }]
-    [calibration_response, review_response, assignment, questions]
+    questions = AssignmentQuestionnaire.find_by(["assignment_id = ? and questionnaire_id IN (?)", Assignment.find(assignment_id).id, ReviewQuestionnaire.select("id")])
+                .questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }
+
+    [calibration_response, review_response, questions]
   end
 
   def notify_instructor_on_difference

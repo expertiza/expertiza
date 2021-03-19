@@ -30,7 +30,7 @@
             <% calibration_response_map = ReviewResponseMap.where(["reviewed_object_id = ? and reviewee_id = ? and calibrate_to = ?", @assignment.id, map.reviewee_id, 1]).first rescue nil %>
             <% if @assignment.is_calibrated and calibration_response_map and calibration_response_map.response and map.response.any? %>
               <td>&nbsp;&nbsp;</td>
-              <td><%= link_to "Show calibration results", {controller: 'response', action: 'show_calibration_results_for_student', calibration_response_map_id: calibration_response_map.id, review_response_map_id: map.id} %></td>
+              <td><%= link_to "Show calibration results", {controller: 'response', action: 'show_calibration_results_for_student', calibration_response_map_id: calibration_response_map.id, review_response_map_id: map.id, assignment_id: @assignment.id%></td>
             <% end %>
           </tr>
       <% end %>

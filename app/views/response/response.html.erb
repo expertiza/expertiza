@@ -510,9 +510,11 @@
           // if the page is shown, play the video
           function handleVisibilityChange() {
               if (document[hidden]) {
-                  startTime2(map_id, round, "Expertiza Review");
-              } else {
+                  console.log("Stopping timer for Expertiza Review!");
                   endTime2(map_id, round, "Expertiza Review");
+              } else {
+                  console.log("Starting timer for Expertiza Review!");
+                  startTime2(map_id, round, "Expertiza Review");
               }
           }
 

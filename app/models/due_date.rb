@@ -90,4 +90,51 @@ class DueDate < ActiveRecord::Base
     end
     next_due_date
   end
+
+  ########################################################################################################
+def email_reminder(emails, deadline_type)
+    assignment = Assignment.find(self.assignment_id)
+    subject = "Message regarding #{deadline_type} for assignment #{assignment.name}"
+    body = "This is a reminder to complete #{deadline_type} for assignment #{assignment.name}. \
+    Deadline is #{self.due_at}.If you have already done the  #{deadline_type}, Please ignore this mail."
+
+    emails.each do |mail|
+      Rails.logger.info mail
+    end
+
+    @mail = sync_message(bcc: emails, subject: subject, body: body)
+    @mail.deliver_now
+  end
+
+ 
+
+  def sync_message(defn)
+    if Rails.env.development? || Rails.env.test?
+        default from: 'expertiza.development@gmail.com'
+      else
+        default from: 'expertiza-support@lists.ncsu.edu'
+      end
+    @body = defn[:body]
+    @type = defn[:body][:type]
+    @obj_name = defn[:body][:obj_name]
+    @first_name = defn[:body][:first_name]
+    @partial_name = defn[:body][:partial_name]
+
+    defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
+    mail(subject: defn[:subject],
+         # content_type: "text/html",
+         to: defn[:to])
+  end
+
+
+
+def find_participant_emails
+    emails = []
+    participants = Participant.where(parent_id: self.assignment_id)
+    participants.each do |participant|
+      emails << participant.user.email unless participant.user.nil?
+    end
+    emails
+  end
+
 end

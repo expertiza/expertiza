@@ -92,6 +92,34 @@ class DueDate < ActiveRecord::Base
   end
 
   ########################################################################################################
+
+  
+after_save :start_reminder
+  
+def start_reminder
+  reminder
+end
+
+
+def reminder
+ 
+    assignment = Assignment.find(self.assignment_id)
+    participant_mails = find_participant_emails
+
+    if self.deadline_type=='review' || self.deadline_type=='submission' || self.deadline_type=='metareview'
+
+        if self.deadline_type == 'metareview'
+            deadlineText="Team Review"
+        else
+            deadlineText=self.deadline_type
+        end
+        email_reminder(participant_mails, deadlineText) unless participant_mails.empty?
+        
+    end 
+
+end
+
+
 def email_reminder(emails, deadline_type)
     assignment = Assignment.find(self.assignment_id)
     subject = "Message regarding #{deadline_type} for assignment #{assignment.name}"
@@ -137,4 +165,23 @@ def find_participant_emails
     emails
   end
 
+
+  
+def when_to_run_reminder
+  hours_before_deadline = self.threshold.hours 
+  adjusted_datetime = (self.due_at.to_time - hours_before_deadline).to_datetime
 end
+
+def when_to_run_start_reminder
+  days_before_deadline = 3.days
+  adjusted_datetime = (self.due_at - days_before_deadline).to_datetime
+end
+
+handle_asynchronously :start_reminder, :run_at => Proc.new { |i| i.when_to_run_start_reminder }
+handle_asynchronously :reminder, :run_at => Proc.new { |i| i.when_to_run_reminder }
+
+
+end
+
+
+

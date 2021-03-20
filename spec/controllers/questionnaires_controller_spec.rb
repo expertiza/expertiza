@@ -399,7 +399,7 @@ describe QuestionnairesController do
     context 'when adding unScoredQuestion' do
       it 'redirects to questionnaires#edit page after adding new questions' do
         question = double('Dropdown', size: '', alternatives: '')
-        allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', id: 1, questions: [question]))
+        allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', id: 1, questions: [question], min_question_score: 0, max_question_score: 5))
         allow(question).to receive(:save).and_return(true)
         params = {id: 1,
                   question: {total_num: 2,

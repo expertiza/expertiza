@@ -401,6 +401,7 @@ resources :institution, except: [:destroy] do
     collection do
       get :list
       get :view
+      put :permission_granted
       get '/*other', to: redirect('/student_task/list')
     end
   end
@@ -536,5 +537,6 @@ resources :institution, except: [:destroy] do
   post '/response_toggle_permission/:id' => 'response#toggle_permission'
   post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'
   post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'
+  post 'student_task/permission_granted', controller: :student_task, action: :permission_granted,method: :put
 end
 

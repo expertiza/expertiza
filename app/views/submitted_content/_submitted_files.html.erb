@@ -77,44 +77,44 @@
   about local variables in this partial -->
   <% if local_assigns[:submission_check] %>
     <script type="text/javascript">
-        // const supported_file_type = ["pdf", "txt", "doc", "ppt", "png", "jpg"];
+        const supported_file_type = ["pdf", "txt", "doc", "ppt", "png", "jpg"];
 
-        // $(document).ready(function () {
-<!--            let map_id = <%#= @map.id %>;-->
-<!--            let round = <%#= @current_round %>;-->
-        //     let filesToUpdate = {};
-        //     let windowManager = new WindowManager();
-        //     const time_out_interval = 1000; // in milliseconds
-        //
-        //     $("#1_myDiv #file_table a.fileLink").click(function (event) {
-        //         event.preventDefault();
-        //         let file_path = $(this).attr("href");
-        //         let file_name = $(this).attr("download");
-        //         let file_name_extension = file_name.split(".").pop();
-        //         let window_handler = null;
-        //         let link_timer = null;
-        //
-        //         if ($.inArray(file_name_extension, supported_file_type) >= 0) {
-        //             alert("Open file " + file_name + " in new window to view it online.");
-        //             window_handler = window.open(file_path, "_blank");
-        //             windowManager.manage(window_handler)
-        //             link_timer = setInterval(checkWindowStatus, time_out_interval);
-        //         } else {
-        //             alert("Download file " + file_name + " to view it locally.");
-        //             window_handler = window.open(file_path, "_blank");
-        //         }
-        //
-        //         startTime2(map_id, round, file_name);
-        //
-        //         function checkWindowStatus() {
-        //             if (window_handler.closed) {
-        //                 endTime2(map_id, round, file_name);
-        //                 filesToUpdate[file_name] = false;
-        //                 clearInterval(link_timer);
-        //             }
-        //         }
-        //     })
-        // });
+        $(document).ready(function () {
+            let map_id = <%= @map.id %>;
+            let round = <%= @current_round %>;
+            let filesToUpdate = {};
+            let windowManager = new WindowManager();
+            const time_out_interval = 1000; // in milliseconds
+
+            $("#1_myDiv #file_table a.fileLink").click(function (event) {
+                event.preventDefault();
+                let file_path = $(this).attr("href");
+                let file_name = $(this).attr("download");
+                let file_name_extension = file_name.split(".").pop();
+                let window_handler = null;
+                let link_timer = null;
+
+                if ($.inArray(file_name_extension, supported_file_type) >= 0) {
+                    alert("Open file " + file_name + " in new window to view it online.");
+                    window_handler = window.open(file_path, "_blank");
+                    windowManager.manage(window_handler)
+                    link_timer = setInterval(checkWindowStatus, time_out_interval);
+                } else {
+                    alert("Download file " + file_name + " to view it locally.");
+                    window_handler = window.open(file_path, "_blank");
+                }
+
+                startTime2(map_id, round, file_name);
+
+                function checkWindowStatus() {
+                    if (window_handler.closed) {
+                        endTime2(map_id, round, file_name);
+                        filesToUpdate[file_name] = false;
+                        clearInterval(link_timer);
+                    }
+                }
+            })
+        });
     </script>
   <% end %>
 <% else %>

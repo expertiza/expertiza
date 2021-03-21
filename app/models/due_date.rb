@@ -1,6 +1,7 @@
 class DueDate < ActiveRecord::Base
   validate :due_at_is_valid_datetime
   #  has_paper_trail
+  after_save :start_reminder
 
   def self.default_permission(deadline_type, permission_type)
     DeadlineRight::DEFAULT_PERMISSION[deadline_type][permission_type]
@@ -89,38 +90,21 @@ class DueDate < ActiveRecord::Base
       next_due_date = AssignmentDueDate.find_by(['parent_id = ? && due_at >= ?', assignment_id, Time.zone.now])
     end
     next_due_date
+    end
+
+  def start_reminder
+    reminder
   end
 
-  ########################################################################################################
+  def reminder
+    if %w[submission review metareview].include? self.deadline_type
+      deadline_text = self.deadline_type
+      deadline_text = "Team Review" if self.deadline_type == 'metareview'
+      email_reminder(finding_participant_emails, deadline_text) unless finding_participant_emails.empty?
+    end
+  end
 
-  
-after_save :start_reminder
-  
-def start_reminder
-  reminder
-end
-
-
-def reminder
- 
-    assignment = Assignment.find(self.assignment_id)
-    participant_mails = find_participant_emails
-
-    if self.deadline_type=='review' || self.deadline_type=='submission' || self.deadline_type=='metareview'
-
-        if self.deadline_type == 'metareview'
-            deadlineText="Team Review"
-        else
-            deadlineText=self.deadline_type
-        end
-        email_reminder(participant_mails, deadlineText) unless participant_mails.empty?
-        
-    end 
-
-end
-
-
-def email_reminder(emails, deadline_type)
+  def email_reminder(emails, deadline_type)
     assignment = Assignment.find(self.assignment_id)
     subject = "Message regarding #{deadline_type} for assignment #{assignment.name}"
     body = "This is a reminder to complete #{deadline_type} for assignment #{assignment.name}. \
@@ -134,14 +118,13 @@ def email_reminder(emails, deadline_type)
     @mail.deliver_now
   end
 
- 
-
   def sync_message(defn)
     if Rails.env.development? || Rails.env.test?
-        default from: 'expertiza.development@gmail.com'
-      else
-        default from: 'expertiza-support@lists.ncsu.edu'
-      end
+      default from: 'expertiza.development@gmail.com'
+    else
+      default from: 'expertiza-support@lists.ncsu.edu'
+    end
+
     @body = defn[:body]
     @type = defn[:body][:type]
     @obj_name = defn[:body][:obj_name]
@@ -154,34 +137,25 @@ def email_reminder(emails, deadline_type)
          to: defn[:to])
   end
 
-
-
-def find_participant_emails
-    emails = []
-    participants = Participant.where(parent_id: self.assignment_id)
-    participants.each do |participant|
-      emails << participant.user.email unless participant.user.nil?
+  def finding_participant_emails
+    email_list = []
+    participant_list = Participant.where(parent_id: self.assignment_id)
+    participant_list.each do |participant|
+      email_list << participant.user.email unless participant.user.nil?
     end
-    emails
+    email_list
   end
 
+  def when_to_run_reminder
+    hours_before_deadline = self.threshold.hours
+    return (self.due_at.to_time - hours_before_deadline).to_datetime
+  end
 
-  
-def when_to_run_reminder
-  hours_before_deadline = self.threshold.hours 
-  adjusted_datetime = (self.due_at.to_time - hours_before_deadline).to_datetime
+  def when_to_run_start_reminder
+    days_before_deadline = 3.days
+    return (self.due_at - days_before_deadline).to_datetime
+  end
+
+  handle_asynchronously :start_reminder, run_at: proc { |i| i.when_to_run_start_reminder }
+  handle_asynchronously :reminder, run_at: proc { |i| i.when_to_run_reminder }
 end
-
-def when_to_run_start_reminder
-  days_before_deadline = 3.days
-  adjusted_datetime = (self.due_at - days_before_deadline).to_datetime
-end
-
-handle_asynchronously :start_reminder, :run_at => Proc.new { |i| i.when_to_run_start_reminder }
-handle_asynchronously :reminder, :run_at => Proc.new { |i| i.when_to_run_reminder }
-
-
-end
-
-
-

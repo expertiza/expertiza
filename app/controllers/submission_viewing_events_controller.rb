@@ -1,5 +1,5 @@
-require 'lib/local_storage'
-require 'models/local_submitted_content'
+require 'local_storage'
+require 'local_submitted_content'
 
 class SubmissionViewingEventsController < ApplicationController
   include SubmittedContentHelper

@@ -1,3 +1,6 @@
+require 'lib/local_storage'
+require 'models/local_submitted_content'
+
 class SubmissionViewingEventsController < ApplicationController
   include SubmittedContentHelper
   include SubmissionViewingEventHelper
@@ -198,8 +201,7 @@ class SubmissionViewingEventsController < ApplicationController
   # End timing for all links for the given [map_id] and [round].
   def end_timing_for_round(map_id, round)
     # if no specific link is provided, then update the end
-    # time for all links _except_ the Expertiza Review
-    # TODO: determine _why_ the last group needed this logic
+    # time for all links
     records = @store.where(map_id: map_id, round: round)
     _record_end_time(records)
   end

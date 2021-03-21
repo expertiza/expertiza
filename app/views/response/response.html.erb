@@ -524,143 +524,23 @@
         }
 
         if (typeof document.addEventListener === "undefined" || hidden === undefined) {
-            console.log("This demo requires a browser, such as Google Chrome or Firefox, that supports the Page Visibility API.");
+            console.log("This requires a browser, such as Google Chrome or Firefox, that supports the Page Visibility API.");
         } else {
             // Handle page visibility change
             document.addEventListener(visibilityChange, handleVisibilityChange, false);
         }
 
-
-        // submitted files
-        const time_out_interval = 1000; // in milliseconds
-        var windowManager = new WindowManager();
-
-        $("#1_myDiv #file_table a.fileLink").click(function (event) {
-            event.preventDefault();
-            let file_path = $(this).attr("href");
-            let file_name = $(this).attr("download");
-            let file_name_extension = file_name.split(".").pop();
-            let window_handler = null;
-
-            if (supported_file_type.includes(file_name_extension)) {
-                alert("Open file " + file_name + " in new window to view it online.");
-                window_handler = window.open(file_path, "_blank");
-                windowManager.manage(window_handler)
-                setInterval(function () {
-                        if (windowManager.checkWindowClosed(window_handler)) {
-                            endTime2(map_id, round, file_name);
-                        }
-                    },
-                    time_out_interval
-                );
-            } else {
-                alert("Download file " + file_name + " to view it locally.");
-                window_handler = window.open(file_path, "_blank");
-            }
-
-            startTime2(map_id, round, file_name);
-        });
-
-        // hyperlinks
-        // Prevents right click on hyperlink
-        $('#url a.review_link').on("contextmenu", function (event) {
-            event.preventDefault(); // prevents default action i.e. does nothing on right click
-        });
-
-        // Prevents middle-click on hyperlink
-        $("#url a.review_link").on("auxclick", function (event) {
-            event.preventDefault(); // prevents default action i.e. does nothing on middle click
-        });
-
-        // Occurs on click of hyperlink
-        $("#url a.review_link").click(function linkAction(event) {
-            event.preventDefault(); // prevents defaults action of opening from occurring allowing our script to run
-            let address = $(this).attr("href"); // url address of the current link
-
-            let window_handler = window.open(address); // open link in new window/tab
-            windowManager.manage(window_handler); // track open windows
-            setInterval(function() {
-                  if (windowManager.checkWindowClosed(window_handler)) {
-                      endTime2(map_id, round, address); // save end time of link
-                  }
-                },
-                time_out_interval
-            );
-
-            startTime2(map_id, round, address); // save start time of link
-        });
-
-<!--          let map_id = <%#= @map.id %>;-->
-<!--          let round = <%#= @current_round %>;-->
-        // let current_window_timer = null;
-        // let auto_window_timer = null;
-        // let timer_flag = false;
-
-        // const time_out_interval = 120000; // in milliseconds, checkout end time when not interaction on review page
-        // const time_period = 30000; // automatically record end time every minute
-        //
-        // function startTimer() {
-        //     // resetTimer();
-        //     // autoTimer();
-        //     $("#timeout_flag").val("false");
-        //     $("#restart_file_timing_flag").val("true");
-        //     $("#restart_link_timing_flag").val("true");
-        //     document.onload = resetTimer;      // page is loaded
-        //     document.onmousemove = resetTimer; // mouse moves over an element
-        //     document.onkeypress = resetTimer;  // user presses key on keyboard
-        //     document.onmousedown = resetTimer; // mouse is pressed on element
-        //     document.ontouchstart = resetTimer;// user touches on an element (relevant for touchscreen)
-        //     document.onclick = resetTimer;     // user clicks on an element
-        //     document.onscroll = resetTimer;    // scrolling with arrow keys
-        // }
-
-        // function resetTimer() {
-        //     clearTimeout(current_window_timer);
-        //     current_window_timer = setTimeout(timeoutAction, time_out_interval);
-        //     timer_flag = true;
-        // }
-        //
-        // function autoTimer() {
-        //     clearInterval(auto_window_timer);
-        //     auto_window_timer = setInterval(autoRecordTime, time_period);
-        // }
-        //
-        // function timeoutAction() {
-        //     window.focus();
-        //     timer_flag = false;
-        //     // markEndTime(map_id, round);
-        //     endRound(map_id, round);
-        //     if (confirm("Are you still reviewing your submissions? Press OK to continue")) {
-        //         startTimer();
-        //         resetTimer();
-        //     } else {
-        //         clearTimeout(current_window_timer);
-        //         clearInterval(auto_window_timer);
-        //         $("#timeout_flag").val("true");
-        //         alert("The page has not been interacted for a long time, and will close reference windows and go back!");
-        //         window.history.back();
-        //     }
-        // }
-        //
-        // function autoRecordTime() {
-        //     // markEndTime(map_id, round);
-        //     resetRound(map_id, round);
-        //     if (timer_flag === true) {
-        //         startTimer();
-        //     }
-        // }
-        //
-        // startTimer();
-        // resetTimer();
-        // autoTimer();
-        //
         // $("#save_review").click(function () {
         //     endRoundAndSave(map_id, round);
         // });
 
-        // $("#Submit").click(function () {
-        //     endRoundAndSave(map_id, round);
-        // });
+        $("#Submit").click(function () {
+            // remove the visibility API listener before ending and saving
+            // this should prevent any more updates to the timing events once
+            // this tab is closed
+            document.removeEventListener(visibilityChange, handleVisibilityChange)
+            endRoundAndSave(map_id, round);
+        });
     });
   </script>
 <% end %> 

@@ -497,4 +497,5 @@ resources :institution, except: [:destroy] do
   match '*path' => 'content_pages#view', :via => %i[get post] unless Rails.env.development?
   put 'student_task/make_public', controller: :student_task,  action: :make_public, method: :put
   post '/suggestion/update_visibility/', to: 'suggestion#update_visibility'
+  get '/answer_tags/machine_tagging', to: 'answer_tags#machine_tagging'
 end

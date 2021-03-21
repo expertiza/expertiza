@@ -106,13 +106,16 @@
         $('#save_confirm').html('')
       }, 5000);
     });
-
-    // display loader and disable button
-    $("#Submit").click(function(e){
-      $('#Submit').addClass('disabled');
-      $('#loader').html('<div class="loader"></div>\n' + 'Please wait for the system to process your review. It should take about one minutes. If the page does not redirect, refresh the page and try again.');
+    $('#Submit').click(function(e){
+      if(!confirm('Once a review has been submitted, you cannot edit it again')){
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }else{
+        jQuery('#isSubmit').val('Yes');
+        window.location.href= "../../../student_review/list?id=<%= @map.reviewer.id %>";
+      }
     });
-
     // update the values in the form using ajax
     function updateForm(){
       //update the additional comments
@@ -416,7 +419,6 @@
         <%= submit_tag "Submit "+@title, :name => "Submit", :id => "Submit" %>
         <img src="/assets/info.png" title='- SAVE will only store the peer-review as draft and the peer-review will not be displayed to the reviewee. After clicking SUBMIT, the peer-review will be displayed to reviewee, and you will not be able to update it any more.'>
     <% end %>
-    <div id="loader"></div>
     <%= hidden_field_tag('return', @return) %>
     <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %>
 <% end %>

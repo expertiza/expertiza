@@ -265,22 +265,20 @@ jQuery(document).ready(function() {
   var MachineTagging = React.createClass({
     getInitialState: function() {
       return {
-        current: 0,
-        visible: false,
+        current: -1,
         responses: []
       }
     },
     handleClick: function(e) {
       this.setState({
-        visible: true
+        current: 0,
+        responses: []
       });
-
       var _this = this;
       jQuery.get("/answer_tags/machine_tagging?assignment_id=" + this.props.assignment_id, function(responses) {
         _this.setState({
           responses: responses
         });
-
         for (var i = 0;  i < responses.length; i++) {
           jQuery.get("/answer_tags/machine_tagging?assignment_id=" + _this.props.assignment_id + "&response_id=" + responses[i], function(data) {
             _this.setState({
@@ -291,13 +289,14 @@ jQuery(document).ready(function() {
       });
     },
     render: function () {
-      const {current, responses, visible} = this.state;
+      const {current, responses } = this.state;
       return (
         <span>
           <a title="Machine tagging" onClick={this.handleClick}>
             <img src="/assets/tree_view/machine-tagging.png" />
           </a>
-          { visible ? "" + current + "/" + responses.length : "" }
+          { current > -1 ? "" + current + "/" + responses.length : "" }
+          { current > 0 && current === responses.length ? " Done" : "" }
         </span>
       )
     }

@@ -104,11 +104,11 @@
                     window_handler = window.open(file_path, "_blank");
                 }
 
-                startTime2(map_id, round, file_name);
+                startTime(map_id, round, file_name);
 
                 function checkWindowStatus() {
                     if (window_handler.closed) {
-                        endTime2(map_id, round, file_name);
+                        endTime(map_id, round, file_name);
                         filesToUpdate[file_name] = false;
                         clearInterval(link_timer);
                     }

@@ -221,7 +221,6 @@ class SubmissionViewingEventsController < ApplicationController
 
   # End timing for a single [link] in the given review and [round].
   def end_timing_for_link(map_id, round, link)
-    # if link is provided, we'll update the end time for it
     records = @store.where(map_id: map_id, round: round, link: link)
     _record_end_time(records)
   end

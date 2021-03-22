@@ -14,7 +14,7 @@ class SubmissionViewingEventsController < ApplicationController
   # Records the start time for a review asset and clears the end time.
   # The intent here is to signal "we're currently tracking this as being reviewed."
   def start_timing
-    args = request_params2
+    args = request_params
 
     if !args[:link].nil?
       start_timing_for_link(args[:map_id], args[:round], args[:link])
@@ -33,7 +33,7 @@ class SubmissionViewingEventsController < ApplicationController
   #
   # The intent here is that "these are done being review for now."
   def end_timing
-    args = request_params2
+    args = request_params
     if !args[:link].nil?
       end_timing_for_link(args[:map_id], args[:round], args[:link])
     else
@@ -45,7 +45,7 @@ class SubmissionViewingEventsController < ApplicationController
   end
 
   def reset_timing
-    args = request_params2
+    args = request_params
     if !args[:link].nil?
       end_timing_for_link(args[:map_id], args[:round], args[:link])
       start_timing_for_link(args[:map_id], args[:round], args[:link])
@@ -60,7 +60,7 @@ class SubmissionViewingEventsController < ApplicationController
   # Provide a function to explicitly flush local storage to
   # the database.
   def hard_save
-    args = request_params2
+    args = request_params
     @uncommitted = save_and_remove_all(args[map_id], args[:round])
     # TODO: why does the previous group render json with the
     # links that were just committed?
@@ -75,7 +75,7 @@ class SubmissionViewingEventsController < ApplicationController
   # This allows the client to combine these actions
   # without necessarily having to send back-to-back requests.
   def end_round_and_save
-    args = request_params2
+    args = request_params
     end_timing_for_round(args[:map_id], args[:round])
     save_and_remove_all(args[:map_id], args[:round])
     head :no_content
@@ -124,7 +124,7 @@ class SubmissionViewingEventsController < ApplicationController
 
   # Require: :map_id, :round
   # Permit: :link
-  def request_params2
+  def request_params
     params.require(:submission_viewing_event).permit(:map_id, :round, :link)
   end
 

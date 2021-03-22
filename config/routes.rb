@@ -50,12 +50,13 @@ Expertiza::Application.routes.draw do
   resources :assignments, except: [:destroy] do
     collection do
       get :associate_assignment_with_course
-      get :copy
+      post :copy
       get :toggle_access
       get :delayed_mailer
       get :list_submissions
       get :delete_delayed_mailer
       get :remove_assignment_from_course
+      get :checktopicscopy
     end
   end
 
@@ -145,7 +146,7 @@ Expertiza::Application.routes.draw do
     end
   end
 
-resources :institution, except: [:destroy] do
+  resources :institution, except: [:destroy] do
     collection do
       get :list
       post ':id', action: :update

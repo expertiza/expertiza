@@ -31,7 +31,7 @@ class SubmissionViewingEventsController < ApplicationController
   # This function records the end time, and accumulates
   # total_time for a given record.
   #
-  # The intent here is that "these are done being review for now."
+  # The intent here is that "these are done being reviewed for now."
   def end_timing
     args = request_params
     if !args[:link].nil?

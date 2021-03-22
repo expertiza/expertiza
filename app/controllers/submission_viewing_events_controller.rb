@@ -227,8 +227,6 @@ class SubmissionViewingEventsController < ApplicationController
 
   # End timing for all links for the given [map_id] and [round].
   def end_timing_for_round(map_id, round)
-    # if no specific link is provided, then update the end
-    # time for all links
     records = @store.where(map_id: map_id, round: round)
     _record_end_time(records)
   end

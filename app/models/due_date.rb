@@ -105,11 +105,9 @@ class DueDate < ActiveRecord::Base
   end
 
   def reminder
-    if %w[submission review metareview].include? self.deadline_type
-      deadline_text = self.deadline_type
-      deadline_text = "Team Review" if self.deadline_type == 'metareview'
-      email_reminder(create_mailworker_object.find_participant_emails, deadline_text) unless create_mailworker_object.find_participant_emails.empty?
-    end
+    deadline_text = self.deadline_type if %w[submission review].include? self.deadline_type
+    deadline_text = "Team Review" if self.deadline_type == 'metareview'
+    email_reminder(create_mailworker_object.find_participant_emails, deadline_text) unless create_mailworker_object.find_participant_emails.empty?
   end
 
   def email_reminder(emails, deadline_type)

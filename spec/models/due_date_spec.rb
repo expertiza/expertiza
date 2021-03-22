@@ -1,5 +1,3 @@
-require 'rails_helper'
-
 describe "due_date_functions" do
   before(:each) do
     @deadline_type = build(:deadline_type)
@@ -139,17 +137,13 @@ class DueDateTest < ActiveSupport::TestCase
     def queue_adapter_for_test
       ActiveJob::QueueAdapters::DelayedJobAdapter.new
     end
-        
+
     it 'enqueues remainder email in delayed job queue' do
-      expect {
-        delay.reminder()
-      }.to change(Delayed::Job.count).by(1)
+      expect { delay.reminder }.to change(Delayed::Job, :count).by(1)
     end
     
     it 'enqueues remainder job in delayed job queue' do
-      expect {
-        delay.start_reminder()
-      }.to change(Delayed::Job.count).by(1)
+      expect { delay.start_reminder }.to change(Delayed::Job, :count).by(1)
     end
   end
-end  
+end

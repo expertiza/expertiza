@@ -492,11 +492,13 @@
   <script type="text/javascript">
     $(document).ready(function () {
         $(window).on("load", function() {
-            console.log("Starting timer for Expertiza Review!");
             startTime(map_id, round, "Expertiza Review");
         })
 
+        // Special thanks to MDN for an example using the Page Visibility API provided here:
         // https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API#example
+        // Using this, we greatly improved how timing on the Expertiza Review page is handled.
+        //
         // Set the name of the hidden property and the change event for visibility
         var hidden, visibilityChange;
         if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support
@@ -510,15 +512,14 @@
             visibilityChange = "webkitvisibilitychange";
         }
 
-
-        // If the page is hidden, pause the video;
-        // if the page is shown, play the video
+        // handles visibility change events by starting or
+        // stopping timing for the Expertiza Review
         function handleVisibilityChange() {
             if (document[hidden]) {
-                console.log("Stopping timer for Expertiza Review!");
+                // If the page is hidden, stop timing.
                 endTime(map_id, round, "Expertiza Review");
             } else {
-                console.log("Starting timer for Expertiza Review!");
+                // if the page is shown, start timing.
                 startTime(map_id, round, "Expertiza Review");
             }
         }
@@ -530,10 +531,12 @@
             document.addEventListener(visibilityChange, handleVisibilityChange, false);
         }
 
-        // $("#save_review").click(function () {
-        //     endRoundAndSave(map_id, round);
-        // });
+        // on a save, update the timing and persist
+        $("#save_review").click(function () {
+            endRoundAndSave(map_id, round);
+        });
 
+        // on a submit, update the timing and persist
         $("#Submit").click(function () {
             // remove the visibility API listener before ending and saving
             // this should prevent any more updates to the timing events once

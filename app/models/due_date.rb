@@ -90,7 +90,15 @@ class DueDate < ActiveRecord::Base
       next_due_date = AssignmentDueDate.find_by(['parent_id = ? && due_at >= ?', assignment_id, Time.zone.now])
     end
     next_due_date
-    end
+  end
+
+  def create_mailer_object
+    Mailer.new
+  end
+
+  def create_mailworker_object
+    MailWorker.new(self.assignment_id, self.deadline_type, self.due_at)
+  end
 
   def start_reminder
     reminder
@@ -100,7 +108,7 @@ class DueDate < ActiveRecord::Base
     if %w[submission review metareview].include? self.deadline_type
       deadline_text = self.deadline_type
       deadline_text = "Team Review" if self.deadline_type == 'metareview'
-      email_reminder(finding_participant_emails, deadline_text) unless finding_participant_emails.empty?
+      email_reminder(create_mailworker_object.find_participant_emails, deadline_text) unless create_mailworker_object.find_participant_emails.empty?
     end
   end
 
@@ -113,49 +121,19 @@ class DueDate < ActiveRecord::Base
     emails.each do |mail|
       Rails.logger.info mail
     end
-
-    @mail = sync_message(bcc: emails, subject: subject, body: body)
-    @mail.deliver_now
-  end
-
-  def sync_message(defn)
-    if Rails.env.development? || Rails.env.test?
-      default from: 'expertiza.development@gmail.com'
-    else
-      default from: 'expertiza-support@lists.ncsu.edu'
-    end
-
-    @body = defn[:body]
-    @type = defn[:body][:type]
-    @obj_name = defn[:body][:obj_name]
-    @first_name = defn[:body][:first_name]
-    @partial_name = defn[:body][:partial_name]
-
-    defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
-    mail(subject: defn[:subject],
-         # content_type: "text/html",
-         to: defn[:to])
-  end
-
-  def finding_participant_emails
-    email_list = []
-    participant_list = Participant.where(parent_id: self.assignment_id)
-    participant_list.each do |participant|
-      email_list << participant.user.email unless participant.user.nil?
-    end
-    email_list
+    create_mailer_object.sync_message(Hash[bcc: emails, subject: subject, body: body]).deliver
   end
 
   def when_to_run_reminder
     hours_before_deadline = self.threshold.hours
-    return (self.due_at.to_time - hours_before_deadline).to_datetime
+    (self.due_at.to_time_in_current_zone - hours_before_deadline).to_datetime
   end
 
   def when_to_run_start_reminder
     days_before_deadline = 3.days
-    return (self.due_at - days_before_deadline).to_datetime
+    (self.due_at - days_before_deadline).to_datetime
   end
 
-  handle_asynchronously :start_reminder, run_at: proc { |i| i.when_to_run_start_reminder }
-  handle_asynchronously :reminder, run_at: proc { |i| i.when_to_run_reminder }
+  handle_asynchronously :start_reminder, run_at: proc {|i| i.when_to_run_start_reminder }
+  handle_asynchronously :reminder, run_at: proc {|i| i.when_to_run_reminder }
 end

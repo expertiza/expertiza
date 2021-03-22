@@ -129,4 +129,8 @@ class Answer < ActiveRecord::Base
     map.reviewee_id
   end
   # end added by ferry for answer tagging
+
+  def de_tag_comments
+    ActionView::Base.full_sanitizer.sanitize(comments)
+  end
 end

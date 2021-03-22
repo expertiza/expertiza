@@ -135,7 +135,7 @@ end
 class DueDateTest < ActiveSupport::TestCase
   describe "due_date_reminder_functions" do
     before(:all) do
-      @due_at = Date.today - 4.days
+      @due_at = Date.current - 4.days
       @threshold = 3
     end
 

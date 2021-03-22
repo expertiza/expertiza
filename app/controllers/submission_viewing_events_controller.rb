@@ -128,14 +128,23 @@ class SubmissionViewingEventsController < ApplicationController
     params.require(:submission_viewing_event).permit(:map_id, :round, :link)
   end
 
-  # Ensure that we have a non-nil instance of LocalStorage
-  # to work with.
   attr_accessor :store
 
+  # Ensure that we have a non-nil instance of LocalStorage
+  # to work with.
   def ensure_store
     @store ||= LocalStorage.new
   end
 
+  # Record the start time and clear the end time
+  # for the given (map_id, round, link) combination.
+  #
+  # This method first checks whether a new LocalSubmittedContent
+  # entry needs to be created for the given (map_id, round, link)
+  # combination and creates one if it does.
+  #
+  # If a new entry does not need to be created, simply record the
+  # start time for the existing entry.
   def start_timing_for_link(map_id, round, link)
     start_time = DateTime.now
 
@@ -161,6 +170,8 @@ class SubmissionViewingEventsController < ApplicationController
     end
   end
 
+  # Record the start time and clear the end time for
+  # every entry with the (map_id, round) combination.
   def start_timing_for_round(map_id, round)
     # check for pre-existing record
     records = @store.where(
@@ -171,6 +182,9 @@ class SubmissionViewingEventsController < ApplicationController
     _record_start_time(records)
   end
 
+  # Actually does the work of recording the start
+  # time for the set of LocalSubmittedContent records
+  # provided.
   def _record_start_time(records)
     start_time = DateTime.now
     unless records.empty?

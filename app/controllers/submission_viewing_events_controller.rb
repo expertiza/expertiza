@@ -15,7 +15,6 @@ class SubmissionViewingEventsController < ApplicationController
   # The intent here is to signal "we're currently tracking this as being reviewed."
   def start_timing
     args = request_params2
-    ExpertizaLogger.info "Received request to start timing event with params #{args}"
 
     if !args[:link].nil?
       start_timing_for_link(args[:map_id], args[:round], args[:link])
@@ -35,7 +34,6 @@ class SubmissionViewingEventsController < ApplicationController
   # The intent here is that "these are done being review for now."
   def end_timing
     args = request_params2
-    ExpertizaLogger.info "Received request to stop timing event with params #{args}"
     if !args[:link].nil?
       end_timing_for_link(args[:map_id], args[:round], args[:link])
     else
@@ -48,7 +46,6 @@ class SubmissionViewingEventsController < ApplicationController
 
   def reset_timing
     args = request_params2
-    ExpertizaLogger.info "Received request to reset timing event with params #{args}"
     if !args[:link].nil?
       end_timing_for_link(args[:map_id], args[:round], args[:link])
       start_timing_for_link(args[:map_id], args[:round], args[:link])
@@ -64,7 +61,6 @@ class SubmissionViewingEventsController < ApplicationController
   # the database.
   def hard_save
     args = request_params2
-    ExpertizaLogger.info "Received request to flush local storage with params #{args}"
     @uncommitted = save_and_remove_all(args[map_id], args[:round])
     # TODO: why does the previous group render json with the
     # links that were just committed?
@@ -80,7 +76,6 @@ class SubmissionViewingEventsController < ApplicationController
   # without necessarily having to send back-to-back requests.
   def end_round_and_save
     args = request_params2
-    ExpertizaLogger.info "Received request to end and save timing for round #{args[:round]} with params #{args}"
     end_timing_for_round(args[:map_id], args[:round])
     save_and_remove_all(args[:map_id], args[:round])
     head :no_content
@@ -130,7 +125,6 @@ class SubmissionViewingEventsController < ApplicationController
   # Require: :map_id, :round
   # Permit: :link
   def request_params2
-    ExpertizaLogger.info("Submission Viewing Event Params: #{params}")
     params.require(:submission_viewing_event).permit(:map_id, :round, :link)
   end
 
@@ -140,7 +134,6 @@ class SubmissionViewingEventsController < ApplicationController
 
   def ensure_store
     @store ||= LocalStorage.new
-    ExpertizaLogger.info("Local Storage: #{@store}")
   end
 
   def start_timing_for_link(map_id, round, link)
@@ -154,10 +147,8 @@ class SubmissionViewingEventsController < ApplicationController
     )
 
     if !records.empty?
-      ExpertizaLogger.info("#{records.length} previous link records found, updating start time.")
       _record_start_time(records)
     else
-      ExpertizaLogger.info("No previous link record found, creating a new one.")
       new = LocalSubmittedContent.new map_id: map_id,
                                       round: round,
                                       link: link,
@@ -222,10 +213,8 @@ class SubmissionViewingEventsController < ApplicationController
   # Actually performs the work flushing records from
   # local storage to the database and removing them.
   def save_and_remove_all(map_id, round)
-    ExpertizaLogger.info("Flushing LocalStorage to the database...")
     uncommitted = []
     records = @store.where(map_id: map_id, round: round)
-    ExpertizaLogger.info("Found #{records.length} records in local storage for timing events")
 
     unless records.empty?
       records.each do |record|
@@ -257,7 +246,6 @@ class SubmissionViewingEventsController < ApplicationController
       end
     end
 
-    ExpertizaLogger.info("Flushed #{uncommitted.length} links\n#{uncommitted}")
     uncommitted
   end
 end

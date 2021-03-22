@@ -1,4 +1,4 @@
-require 'test_helper'
+require 'rails_helper'
 
 describe "due_date_functions" do
   before(:each) do

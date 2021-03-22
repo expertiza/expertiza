@@ -331,15 +331,4 @@ describe ResponseController do
     end
   end
 
-  describe '#confirm_submit' do
-    it 'sets the input response to "submitted" and redirects to response#save page' do
-      params = {
-        id: 1
-      }
-      session = {user: instructor}
-      expect(review_response).to receive(:update_attribute)
-      get :confirm_submit, params, session
-      expect(response).to redirect_to('/response/save?id=1&msg=Your+response+was+successfully+saved.')
-    end
-  end
 end

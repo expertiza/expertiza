@@ -42,14 +42,14 @@
   <% if local_assigns[:submission_check] %>
     <script type="text/javascript">
         $(document).ready(function () {
-            let map_id = <%= @map.id %>; // map_id from response
-            let round = <%= @current_round %>; // round from response
+            let map_id = <%= @map.id %>;
+            let round = <%= @current_round %>;
             let linksToUpdate = {}; // track links to restart timing on
             let windowManager = new WindowManager()
-            const time_out_interval = 500; // in milliseconds
-            
+            const time_out_interval = 1000; // in milliseconds
+
             function markEndAndCloseWindows() {
-                markEndTime(map_id, round); // saves end time of all open links
+                endRoundAndSave(map_id, round); // saves end time of all open links
                 windowManager.closeAll()
             }
 

@@ -84,20 +84,13 @@
             let round = <%= @current_round %>;
             let filesToUpdate = {};
             let windowManager = new WindowManager();
-            const time_out_interval = 500; // in milliseconds
+            const time_out_interval = 1000; // in milliseconds
 
             $("#1_myDiv #file_table a.fileLink").click(function (event) {
                 event.preventDefault();
                 let file_path = $(this).attr("href");
                 let file_name = $(this).attr("download");
                 let file_name_extension = file_name.split(".").pop();
-
-                $("#restart_file_timing_flag").val("false");
-
-                startTime(map_id, round, file_name);
-
-                filesToUpdate[file_name] = true;
-
                 let window_handler = null;
                 let link_timer = null;
 
@@ -111,29 +104,13 @@
                     window_handler = window.open(file_path, "_blank");
                 }
 
+                startTime(map_id, round, file_name);
+
                 function checkWindowStatus() {
-                    let timeout_flag = $('#timeout_flag').val() == 'true';
                     if (window_handler.closed) {
                         endTime(map_id, round, file_name);
                         filesToUpdate[file_name] = false;
                         clearInterval(link_timer);
-                    }
-                    timeoutAction(timeout_flag);
-                }
-
-                function timeoutAction(timeout_flag) {
-                    if (timeout_flag) {
-                        windowManager.closeAll();
-                    }
-
-                    if ($("#restart_file_timing_flag").val() === 'true') {
-                        filesToUpdate.forEach(function (file) {
-                            if (filesToUpdate[file]) {
-                                startTime(map_id, round, file);
-                            }
-                        });
-
-                        $("#restart_file_timing_flag").val('false');
                     }
                 }
             })

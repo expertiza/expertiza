@@ -432,12 +432,12 @@ resources :institution, except: [:destroy] do
 
   resources :submission_viewing_events do
     collection do
-      post :record_start_time
-      post :record_end_time
-      post :mark_end_time
       post :getTimingDetails
-      get :record_start_time
-      get :record_end_time
+      post :start_timing
+      post :end_timing
+      post :hard_save
+      post :end_round_and_save
+      post :reset_timing
     end
   end
 

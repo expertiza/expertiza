@@ -1,5 +1,6 @@
 module SubmittedContentHelper
   require 'pstore'
+
   def display_directory_tree(participant, files, display_to_reviewer_flag)
     index = 0
     participant = @participant if @participant # TODO: Verify why this is needed
@@ -30,7 +31,7 @@ module SubmittedContentHelper
           #                                     :id => participant.id,
           #                                     :download => File.basename(file),
           #                                     "current_folder[name]" => File.dirname(file)
-          ret += link_to File.basename(file), {:controller => 'submitted_content', :action => 'download', :id => participant.id, :download => File.basename(file), "current_folder[name]" => File.dirname(file)}, :class => "fileLink", :download => File.basename(file).to_s
+          ret += link_to File.basename(file), { :controller => 'submitted_content', :action => 'download', :id => participant.id, :download => File.basename(file), "current_folder[name]" => File.dirname(file) }, :class => "fileLink", :download => File.basename(file).to_s
         end
         ret += "\n   </td>\n   <td valign = top>\n"
         ret += File.size(file).to_s
@@ -118,123 +119,7 @@ module SubmittedContentHelper
       # The zip file is no longer needed, so delete it
       File.delete(file_name)
     end
-  # rescue
-  # end
-end
-
-  #Holds information related to a link pressed during a review
-  class LocalSubmittedContent
-    attr_accessor :map_id, :round, :link , :start_at, :end_at, :created_at, :updated_at
-
-    def initialize(**args)
-      @map_id = args.fetch(:map_id,nil)
-      @round = args.fetch(:round,nil)
-      @link = args.fetch(:link,nil)
-      @start_at = args.fetch(:start_at,nil)
-      @end_at = args.fetch(:end_at,nil)
-      @created_at = args.fetch(:created_at,nil)
-      @updated_at = args.fetch(:updated_at,nil)
-    end
-
-    def initialize(args)
-      @map_id = args.fetch(:map_id,nil)
-      @round = args.fetch(:round,nil)
-      @link = args.fetch(:link,nil)
-      @start_at = args.fetch(:start_at,nil)
-      @end_at = args.fetch(:end_at,nil)
-      @created_at = args.fetch(:created_at,nil)
-      @updated_at = args.fetch(:updated_at,nil)
-    end
-
-    #Turns a LocalSubmittedContent object into a hash
-    def to_h()
-        return {map_id: @map_id, round: @round, link: @link, start_at: @start_at, end_at: @end_at, created_at: @created_at, updated_at: @updated_at}
-    end
-
-    def ==(other)
-      return @map_id = other.map_id && @round == other.round && @link == other.link &&
-      @start_at == other.start_at && @end_at == other.end_at &&
-      @created_at == other.created_at && @updated_at == other.updated_at
-    end
-
+    # rescue
+    # end
   end
-
-  #LocalStorage implementation using PStore
-  class LocalStorage
-
-    def initialize()
-      @registry = []
-      @pstore = PStore.new("local_submitted_content.pstore")
-      @pstore.transaction do
-        @pstore[:registry] ||= []
-      end
-      @registry = read()
-    end
-
-    #saves an instance of LocalSubmittedContent to pstore file and pushes to registry list
-    def save(instance)
-        @pstore.transaction do
-          @registry << instance
-          @pstore[:registry] = @registry
-        end
-    end
-
-    #Ensures the registry list and pstore file always have the same instances
-    def sync()
-      @pstore.transaction do
-        @pstore[:registry] = @registry
-      end
-    end
-
-    # Find all entries that meet every field in the params hash
-    # return list of matching entries 
-    def where(params)
-        found = []
-
-        @registry.each do |item|
-          if item.to_h().values_at(*params.keys) == params.values
-            found << item
-          end
-        end
-        return found
-    end
-
-
-    # Reads and returns data from Pstore registry
-    def read()
-      @pstore.transaction do 
-        return @pstore[:registry]
-      end
-    end
-
-    # Actually saves into the database
-    def hard_save(instance)
-        return SubmissionViewingEvent.create(instance.to_h())
-    end
-
-    # Actually saves all instances in registry list to database
-    def hard_save_all()
-      @registry.each do |item|
-        SubmissionViewingEvent.create(item.to_h())
-      end
-    end
-
-    #Removes instance from registry list then syncs to update pstore file
-    def remove(instance)
-      @registry.each_with_index do |item,i|
-        if item.to_h() == instance.to_h()
-          @registry.delete_at(i)
-        end
-      end
-      sync()
-    end
-
-    #Clears registry and PStore file
-    def remove_all()
-      @registry = []
-      sync()
-    end
-
-  end
-
 end

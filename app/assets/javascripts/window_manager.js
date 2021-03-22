@@ -35,4 +35,3 @@ WindowManager.prototype.closeAll = function() {
 WindowManager.prototype.size = function() {
     return this.windows.length;
 };
-

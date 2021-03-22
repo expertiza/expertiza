@@ -97,19 +97,22 @@ module ReportFormatterHelper
 
   def user_summary_report(line)
     if @user_tagging_report[line.user.name].nil?
-      @user_tagging_report[line.user.name] = VmUserAnswerTagging.new(line.user, line.percentage, line.no_tagged, line.no_not_tagged, line.no_tagable)
+      @user_tagging_report[line.user.name] = VmUserAnswerTagging.new(line.user, line.no_total, line.no_inferred, line.no_taggable,
+                                                                     line.no_tagged, line.no_not_tagged, line.percentage)
     else
+      @user_tagging_report[line.user.name].no_total += line.no_total
+      @user_tagging_report[line.user.name].no_inferred += line.no_inferred
+      @user_tagging_report[line.user.name].no_taggable += line.no_taggable
       @user_tagging_report[line.user.name].no_tagged += line.no_tagged
       @user_tagging_report[line.user.name].no_not_tagged += line.no_not_tagged
-      @user_tagging_report[line.user.name].no_tagable += line.no_tagable
       @user_tagging_report[line.user.name].percentage = calculate_formatted_percentage(line)
     end
   end
 
   def calculate_formatted_percentage(line)
     number_tagged = @user_tagging_report[line.user.name].no_tagged.to_f
-    number_taggable = @user_tagging_report[line.user.name].no_tagable
+    number_taggable = @user_tagging_report[line.user.name].no_taggable
     formatted_percentage = format("%.1f", (number_tagged / number_taggable) * 100)
-    @user_tagging_report[line.user.name].no_tagable.zero? ? '-' : formatted_percentage
+    @user_tagging_report[line.user.name].no_taggable.zero? ? '-' : formatted_percentage
   end
 end

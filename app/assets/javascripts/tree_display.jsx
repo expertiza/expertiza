@@ -212,6 +212,7 @@ jQuery(document).ready(function() {
               <a title="View survey responses" href={"/survey_response/view_responses?id="+(parseInt(this.props.id)/2).toString()}>
                   <img src="/assets/tree_view/view-survey-24.png" />
                 </a>
+                <MachineTagging assignment_id={(parseInt(this.props.id)/2).toString()} />
               </span>
             )
 
@@ -256,6 +257,46 @@ jQuery(document).ready(function() {
           <button style={moreButtonStyle} name="more" type="button" className="glyphicon glyphicon-option-horizontal">
           </button>
           {moreContent}
+        </span>
+      )
+    }
+  })
+
+  var MachineTagging = React.createClass({
+    getInitialState: function() {
+      return {
+        current: -1,
+        responses: []
+      }
+    },
+    handleClick: function(e) {
+      this.setState({
+        current: 0,
+        responses: []
+      });
+      var _this = this;
+      jQuery.get("/answer_tags/machine_tagging?assignment_id=" + this.props.assignment_id, function(responses) {
+        _this.setState({
+          responses: responses
+        });
+        for (var i = 0;  i < responses.length; i++) {
+          jQuery.get("/answer_tags/machine_tagging?assignment_id=" + _this.props.assignment_id + "&response_id=" + responses[i], function(data) {
+            _this.setState({
+              current: _this.state.current + data['increment']
+            })
+          })
+        }
+      });
+    },
+    render: function () {
+      const {current, responses } = this.state;
+      return (
+        <span>
+          <a title="Machine tagging" onClick={this.handleClick}>
+            <img src="/assets/tree_view/machine-tagging.png" />
+          </a>
+          { current > -1 ? "" + current + "/" + responses.length : "" }
+          { current > 0 && current === responses.length ? " Done" : "" }
         </span>
       )
     }

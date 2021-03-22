@@ -36,4 +36,11 @@ toggleLabel = function(range) {
         $('#' + yes_text_id).attr('class', 'toggle-true-msg textActive');
         $('#' + range.id).attr('value', '1');
     }
+
+    // gray-out and allow student to override tag
+    var toggle = $('#' + range.id);
+    if (toggle.attr('class').indexOf('gray-out') >= 0 || toggle.attr('class').indexOf('overridden') >= 0) {
+      $('#' + range.id).attr('class', 'rangeAll overridden');
+    }
+    $('#' + range.id).closest(".toggle-container").find('.toggle-caption').attr('class', 'toggle-caption');
 }

@@ -66,7 +66,7 @@ module GradesHelper
       end
       assign_all_penalties(participant, penalties)
     end
-    @assignment.update_attribute[:is_penalty_calculated] = true unless @assignment.is_penalty_calculated
+    @assignment[:is_penalty_calculated] = true unless @assignment.is_penalty_calculated
   end
 
   def has_team_and_metareview?

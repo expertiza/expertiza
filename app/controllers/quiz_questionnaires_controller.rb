@@ -261,7 +261,7 @@ class QuizQuestionnairesController < QuestionnairesController
   end
 
   # factory method to create the appropriate question based on the question type (true/false or multiple choice)
-  def question_factory(q_type, question, choice_key, q_answer_choices):
+  def question_factory(q_type, question, choice_key, q_answer_choices)
     if q_type == "TrueFalse"
       create_truefalse(question, choice_key, q_answer_choices)
     else # create MultipleChoice of either type, rather than creating them separately based on q_type

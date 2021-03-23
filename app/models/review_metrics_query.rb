@@ -2,7 +2,7 @@ class ReviewMetricsQuery
   # The certainty threshold is the fraction (between 0 and 1) that says how certain
   # the ML algorithm must be of a tag value before it will ask the author to tag it
   # manually.
-  TAG_CERTAINTY_THRESHOLD = 0.9
+  TAG_CERTAINTY_THRESHOLD = 0.8
 
   # link each tag prompt to the corresponding key in the review hash
   PROMPT_TO_METRIC = {'mention problems?' => 'problem',

@@ -109,7 +109,7 @@
                 <% (1..@assignment.num_review_rounds).each do |round| %>
                   <% show_time = secondsToHuman(getTotalTime(reviewer_map.id, round)) %>
                   <% if show_time == "0 sec" %>
-                    <a style="pointer-events: none; color: gray;" disabled="disabled" href="javascript:void(0);"> <%= "R#{round}: No-data" %> </a>
+                    <a style="pointer-events: none; color: gray;" disabled="disabled" href="javascript:void(0);"> <%= "R#{round}: No Data" %> </a>
                   <% else %>
                     <a onclick="displayTimeDetail(<%= reviewer_map.id %>, <%= round %>)" href="javascript:void(0);"> <%= "R#{round}: " + show_time  %></a>
                   <% end %>

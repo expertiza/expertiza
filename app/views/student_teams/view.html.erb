@@ -10,7 +10,7 @@
     <%= submit_tag "Name team" %>
   <% end %>
 <% else %>
-  <b style="text-align: center">Team Name: &nbsp;&nbsp;</b><%= @student.team.name %> &nbsp;&nbsp;&nbsp;
+  <b style="text-align: center">Team Name: &nbsp;&nbsp;</b><%= @student.team.name(session[:ip]) %> &nbsp;&nbsp;&nbsp;
     <%= link_to "Edit name", controller: 'StudentTeams', action: 'edit', team_id: @student.team.id, student_id: @student.id %>
   <br/><br/>
   <b>Team members</b>

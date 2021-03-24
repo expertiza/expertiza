@@ -106,9 +106,14 @@
                     <!--later we can create a hyperlink question type to deal with this situation.-->
                     <%= list_hyperlink_submission(reviewer_map.id, 5386) if Assignment.find_by(id: @id.to_i).try(:course).try(:instructor).try(:name) == 'Jkidd' %>
                 <!-- Link that displays the time tracking detail -->
-                    <% (1..@assignment.num_review_rounds).each do |round| %>
-                      <a onclick="displayTimeDetail(<%= reviewer_map.id %>, <%= round %>)" href="javascript:void(0);"> <%= "R#{round}: "%><%= secondsToHuman(getTotalTime(reviewer_map.id, round)) %> </a>
-                    <% end %>
+                <% (1..@assignment.num_review_rounds).each do |round| %>
+                  <% show_time = secondsToHuman(getTotalTime(reviewer_map.id, round)) %>
+                  <% if show_time == "0 sec" %>
+                    <a style="pointer-events: none; color: gray;" disabled="disabled" href="javascript:void(0);"> <%= "R#{round}: No Data" %> </a>
+                  <% else %>
+                    <a onclick="displayTimeDetail(<%= reviewer_map.id %>, <%= round %>)" href="javascript:void(0);"> <%= "R#{round}: " + show_time  %></a>
+                  <% end %>
+                <% end %>
                 </div>
                 </div>
               <% end %>

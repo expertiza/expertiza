@@ -247,27 +247,21 @@ class SubmissionViewingEventsController < ApplicationController
   # Actually performs the work flushing records from
   # local storage to the database and removing them.
   def save_and_remove_all(map_id, round)
-    uncommitted = []
     records = @store.where(map_id: map_id, round: round)
+    uncommitted = records.map { |record| record.link }
 
     unless records.empty?
       records.each do |record|
-        # push the uncommitted link on to the stack
-        uncommitted << record.link
-
         previous = SubmissionViewingEvent.where(
           map_id: record.map_id,
           round: record.round,
           link: record.link
-        )
+        ).first
 
-        if !previous.empty?
+        if previous
           # make sure to add the total time on this record
           # with what may have already been in the database
-          previous.each do |event|
-            updated = record.merge(event)
-            event.update_attribute(:total_time, updated)
-          end
+          previous.update_attribute(:total_time, record.merge(event))
         else
           # if a previous record doesn't exist,
           # we can delegate saving to `LocalStorage`

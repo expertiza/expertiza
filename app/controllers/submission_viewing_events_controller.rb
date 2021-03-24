@@ -103,10 +103,10 @@ class SubmissionViewingEventsController < ApplicationController
     # push relevant data for each row into arrays used to fill in JSON
     SubmissionViewingEvent.where(map_id: params[:reponse_map_id], round: params[:round]).each do |entry|
       labels.push(entry.link)
-      percentages.push((entry.end_at - entry.start_at).to_f / totalTime)
+      percentages.push(entry.total_time.to_f / totalTime)
       tables.push({
                       "subject" => entry.link,
-                      "timeCost" => secondsToHuman((entry.end_at - entry.start_at).to_i),
+                      "timeCost" => secondsToHuman(entry.total_time.to_i),
                       "avgTime" => secondsToHuman(getAvgRevTime(params[:reponse_map_id], params[:round], entry.link))
                   })
     end

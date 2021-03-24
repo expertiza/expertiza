@@ -14,7 +14,7 @@ module SubmissionViewingEventHelper
 
     # Finds submission_viewing_event rows corresponding to map and round given
       SubmissionViewingEvent.where(searchParams).each do |linkTime|
-        totalSeconds = totalSeconds + (linkTime.end_at - linkTime.start_at).to_i # accumulates total time for review
+        totalSeconds = totalSeconds + linkTime.total_time # accumulates total time for review
       end
 
     return totalSeconds

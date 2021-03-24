@@ -94,7 +94,7 @@ describe Assignment do
     context 'when rubrics varies over rounds' do
       it 'should return true' do
         assignment_questionnaire1.used_in_round = 2
-        assignment_questionnaire2.used_in_round = 1
+        assignment_questionnaire2.used_in_round = 2
         allow(AssignmentQuestionnaire).to receive(:where).and_return([assignment_questionnaire1, assignment_questionnaire2])
         expect(assignment.varying_rubrics_by_round?).to be true
       end
@@ -102,8 +102,8 @@ describe Assignment do
 
     context 'when rubrics do not vary over rounds' do
       it 'should return false' do
-        assignment_questionnaire1.used_in_round = 1
         assignment_questionnaire1.used_in_round = 2
+        assignment_questionnaire2.used_in_round = 1
         allow(AssignmentQuestionnaire).to receive(:where).and_return([assignment_questionnaire1])
         expect(assignment.varying_rubrics_by_round?).to be false
       end

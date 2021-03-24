@@ -7,7 +7,8 @@ module SubmissionViewingEventHelper
     # Removes link parameter if not specified
     searchParams = {
         map_id: map_id,
-        round: round, link: link
+        round: round,
+        link: link
     }.delete_if{ |key, value| value.blank? }
 
     totalSeconds = 0; # Storage for number of seconds

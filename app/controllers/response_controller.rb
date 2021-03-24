@@ -130,15 +130,7 @@ class ResponseController < ApplicationController
     # So do the answers, otherwise the response object can't find the questionnaire when the user hasn't saved his new review and closed the window.
     # A new response has to be created when there hasn't been any reviews done for the current round,
     # or when there has been a submission after the most recent review in this round.
-<<<<<<< HEAD
-    @response = Response.where(map_id: @map.id, round: @current_round.to_i).order(updated_at: :desc).first
-    teams_most_recent_submission = AssignmentTeam.find(@map.reviewee_id).most_recent_submission
-    if @response.nil? || (!teams_most_recent_submission.nil? && teams_most_recent_submission.updated_at > @response.updated_at)
-      @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
-    end
-=======
     @response = @response.populate_new_response(@map, @current_round)
->>>>>>> 519c2f01b... Refactor the new method of the response controller. The business logic of determining whether or not the response object is a new object or one from a previous round has been moved to the populate_new_response method in the response model.
     questions = sort_questions(@questionnaire.questions)
     store_total_cake_score
     init_answers(questions)
@@ -330,7 +322,9 @@ class ResponseController < ApplicationController
     @max = @questionnaire.max_question_score
     # The new response is created here so that the controller has access to it in the new method
     # This response object is populated later in the new method
-    @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0) if new_response
+    if new_response
+      @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
+    end
   end
 
   # This method is called within the Edit or New actions

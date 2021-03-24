@@ -44,9 +44,18 @@ class SubmissionViewingEventsController < ApplicationController
     end
   end
 
+  # Reset the timer for a single link, or
+  # a whole round.
+  #
+  # If :link is present in the request params, then
+  # this function resets timing for that particular link.
+  #
+  # If :link is not present in the request params, then
+  # this function resets timing for the whole round given
+  # in the request params.
   def reset_timing
     args = request_params
-    if !args[:link].nil?
+    if args[:link]
       end_timing_for_link(args[:map_id], args[:round], args[:link])
       start_timing_for_link(args[:map_id], args[:round], args[:link])
     else
@@ -145,8 +154,8 @@ class SubmissionViewingEventsController < ApplicationController
 
   private
 
-  # Require: :map_id, :round
-  # Permit: :link
+  # Require: :submission_viewing_event object
+  # Permit: :map_id, :round, :link
   def request_params
     params.require(:submission_viewing_event).permit(:map_id, :round, :link)
   end

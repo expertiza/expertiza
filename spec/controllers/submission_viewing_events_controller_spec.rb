@@ -1,59 +1,58 @@
 describe SubmissionViewingEventsController do
 
+  before :each do
+    args = {
+      submission_viewing_event: {
+        :map_id => 123456,
+        :round => 1,
+        :link => "https://www.github.com" }
+    }
+  end
+
   describe '#action_allowed?' do
     it "should return true" do
-      expect(true).to be_truthy
+      expect(controller.action_allowed?).to be true
     end
   end
-  
-  describe '#record_start_time' do
-    context 'when the link is opened and timed' do
-      it 'should update time record with end time as current time' do
-	    submission_viewing_event_records=double('SubmissionViewingEvent')
-        allow(SubmissionViewingEvent).to receive(:where).with([:map_id,:round,:link]).and_return(submission_viewing_event_records)		
-		dummy = double('BasicObject')
-        allow(SubmissionViewingEvent).to receive(:end_at).and_return(dummy)
-        allow(dummy).to receive(:nil?).and_return(true)
-		expect(response.body).to be_blank
+
+  describe '#start_timing' do
+    context 'when the link is opened' do
+      it 'should record the start time as the current time and clear the end time' do
+        expect(controller.start_timing(args)).to have_http_status :ok
       end
-	  
-	  it 'should update time record with end time as current time for an Expertiza Review link' do
-	    submission_viewing_event_records=double('SubmissionViewingEvent')
-        allow(SubmissionViewingEvent).to receive(:where).with([:map_id,:round,link: 'Expertiza Review']).and_return(submission_viewing_event_records)		
-		dummy = double('BasicObject')
-        allow(SubmissionViewingEvent).to receive(:end_at).and_return(dummy)
-        allow(dummy).to receive(:nil?).and_return(true)
-		expect(response.body).to be_blank
+    end
+  end
+
+  describe '#end_timing' do
+    context 'when a tab is closed' do
+      it 'should record the end time as the current time and update the total time' do
+        expect(controller.end_timing(args)).to have_http_status :ok
       end
-    end	  
-  end
-  
-  describe '#record_end_time' do
-    context 'when response does not have a end time' do
-      it 'should update time record with end time as current time' do
-	    submission_viewing_event_records=double('SubmissionViewingEvent')
-        allow(SubmissionViewingEvent).to receive(:where).with([:map_id,:round,:link]).and_return(submission_viewing_event_records)
-        dummy = double('BasicObject')
-        allow(SubmissionViewingEvent).to receive(:end_at).and_return(dummy)
-        allow(dummy).to receive(:nil?).and_return(true)
-        allow(SubmissionViewingEvent).to receive(:update_attributes).with(:end_at,Time.now.to_date).and_return(submission_viewing_event_records)
-        expect(response.body).to be_blank
+    end
+    end
+
+  describe '#reset_timing' do
+    context 'when a reivew is saved or submitted' do
+      it 'should record the end time as the current time and update the total time, and restart timing' do
+        expect(controller.reset_timing(args)).to have_http_status :ok
       end
-	end
+    end
   end
-  
-  describe '#mark_end_time' do
-    context 'end time for all uncommitted files' do
-	  it 'update end time for all the files that are not having an end time' do
-	    submission_viewing_event_records=double('SubmissionViewingEvent')
-        allow(SubmissionViewingEvent).to receive(:where).with([:map_id,:round,:link]).and_return(submission_viewing_event_records)
-		dummy = double('BasicObject')
-        allow(SubmissionViewingEvent).to receive(:end_at).and_return(dummy)
-        allow(dummy).to receive(:nil?).and_return(true)
-		allow(dummy).to receive(:update_attributes).with(:end_at,Time.now.to_date).and_return(submission_viewing_event_records)
-        expect(response.body).to be_blank
-	  end
-	end	
+
+  describe '#hard_save' do
+    context 'when explicitly requested to' do
+      it 'should save all storage proxy records in the database and remove them from the storage proxy' do
+        expect(controller.hard_save(args)).to have_http_status :ok
+      end
+    end
   end
-  
+
+  describe '#end_round_and_save' do
+    context 'when explicitly requested to' do
+      it 'stop timing for all links for the given round, and save them to the database' do
+        expect(controller.end_round_and_save(args)).to have_http_status :ok
+      end
+    end
+  end
+
 end

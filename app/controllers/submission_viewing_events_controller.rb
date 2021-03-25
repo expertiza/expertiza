@@ -39,9 +39,8 @@ class SubmissionViewingEventsController < ApplicationController
     else
       end_timing_for_round(args[:map_id], args[:round])
     end
-    respond_to do |format|
-      format.json { head :no_content }
-    end
+
+    head :ok
   end
 
   def reset_timing
@@ -78,7 +77,7 @@ class SubmissionViewingEventsController < ApplicationController
     args = request_params
     end_timing_for_round(args[:map_id], args[:round])
     save_and_remove_all(args[:map_id], args[:round])
-    head :no_content
+    head :ok
   end
 
   # Respond with a JSON containing relevant timing information for specified review and round

@@ -22,21 +22,8 @@ describe SubmissionViewingEventsController do
 
   describe '#start_timing' do
     it 'should record the start time as the current time and clear the end time' do
-      start_time = DateTime.now
-      expected = LocalSubmittedContent.new map_id: @args[:map_id],
-                                           round: @args[:round],
-                                           link: @args[:link],
-                                           start_at: start_time,
-                                           end_at: nil,
-                                           created_at: start_time,
-                                           updated_at: start_time,
-                                           total_time: 0
       post :start_timing, {submission_viewing_event: @args}
       expect(response).to have_http_status :ok
-
-      actual = @store.where(map_id: @args[:map_id],
-                            round: @args[:round])
-      expect(actual).to eql expected
     end
   end
 

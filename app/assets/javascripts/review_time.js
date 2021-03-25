@@ -9,6 +9,7 @@
 function startTime(map_id, round, link) {
     $.ajax({
         type: "POST",
+        dataType: "json",
         url: '/submission_viewing_events/start_timing',
         data: $.param({
             submission_viewing_event: {
@@ -16,11 +17,7 @@ function startTime(map_id, round, link) {
                 round: round,
                 link: link
             }
-        }),
-        error: function (e) {
-            console.log(e);
-        },
-        dataType: "json"
+        })
     });
 }
 
@@ -48,10 +45,7 @@ function endTime(map_id, round, link) {
         dataType: 'json',
         async: false,
         url: '/submission_viewing_events/end_timing',
-        data: $.param(data),
-        error: function (e) {
-            console.log(e);
-        }
+        data: $.param(data)
     });
 }
 
@@ -73,10 +67,7 @@ function endRound(map_id, round) {
                 map_id: map_id,
                 round: round
             }
-        }),
-        error: function (e) {
-            console.log(e);
-        }
+        })
     });
 }
 
@@ -99,10 +90,7 @@ function endRoundAndSave(map_id, round) {
                 map_id: map_id,
                 round: round
             }
-        }),
-        error: function (e) {
-            console.log(e);
-        }
+        })
     });
 }
 
@@ -124,10 +112,7 @@ function resetRound(map_id, round) {
                 map_id: map_id,
                 round: round
             }
-        }),
-        error: function (e) {
-            console.log(e);
-        },
+        })
     });
 }
 
@@ -148,9 +133,6 @@ function saveAll(map_id, round) {
                 map_id: map_id,
                 round: round
             }
-        }),
-        error: function (e) {
-            console.log(e);
-        }
+        })
     });
 }

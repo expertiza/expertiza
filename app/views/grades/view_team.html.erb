@@ -180,7 +180,14 @@
                               <td>Review <%=index + 1%></td>
                               <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
                               <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
-                                <!-- Set id and data of this <td> to be queried by jQuery for the tagging report -->
+                                <!-- E2100 : Set id and data of this <td> to be queried by jQuery for the tagging report
+                                     HTML "id" format: "rr3_13" == ReviewRow Question 3 Review 13
+                                     "j" "index" and "round" are legacy variables from past projects; populate jQueryable
+                                            data- fields with these data to be queried later.
+                                     "round" represents number of this review round
+                                     "j"     represents number of this question
+                                     "index" represents number of this review
+                                -->
                                 <td id="<%= 'rr'+ j.to_s + '_' + index.to_s %>" data-round="<%= vm.round.to_s %>="
                                     data-question_num="<%= j.to_s %>" data-review_num="<%= index.to_s %>"
                                     data-has_tag="<%= row.score_row[index].vm_prompts.count > 0 ? "true":"false"%>">

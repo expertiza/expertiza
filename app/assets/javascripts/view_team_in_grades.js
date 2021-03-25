@@ -94,23 +94,42 @@ var symTagDone = " " + "\u2714";       // Unicode Symbol: Done (Heavy Check-Mark
 
 // Initialize Tag Report Heat grid and hide if empty.
 function tagActionOnLoad() {
+    // Get an HTMLCollection of all tag prompts on the page
     let tagPrompts = getTagPrompts();
+
+    // Hide heatgrid and stop load action if no tags exist.
     if(tagPrompts.length == 0) {
-        // Hide heatgrid and stop load action if no tags exist.
         document.getElementById("tagHeatMap").style.display = 'none';
     } else {
+        // Get a HashMap count of all, on, and off tags, and the ratio of done tags to total in decimal and
+        // (special rounding) integer form to associate with existing heatgrid color classes.
         let countMap = calcTagRatio(tagPrompts);
+
+        // Get a HashMap containing all review rows, their round, question, and review numbers, whether they have tags,
+        // and a reference to an array containing the tag prompt object references.
         let rowData =  getRowData();
+
+        // Generate the dynamic tagging report heatgrid
         drawTagGrid(rowData);
+
+        // Update the "12 out of 250" Cell text and color
         updateTagsFraction(countMap);
     }
 }
 
 // Update Tag Report Heat grid each time a tag is changed
 function tagActionOnUpdate() {
+    // Get an HTMLCollection of all tag prompts on the page
     let tagPrompts = getTagPrompts();
+
+    // Get a HashMap count of all, on, and off tags, and the ratio of done tags to total in decimal and
+    // (special rounding) integer form to associate with existing heatgrid color classes.
     let countMap = calcTagRatio(tagPrompts);
+
+    // Update the body of the tagging report (review rows)
     updateTagGrid(tagPrompts);
+
+    // Update the "12 out of 250" cell of the tagging report
     updateTagsFraction(countMap);
 }
 
@@ -167,7 +186,7 @@ function updateTagsFraction(countMap) {
     }
 }
 
-// Updates the Review Tag Heat Grid each time a tag is changed
+// Updates the Review Tag Heat Grid body each time a tag is changed
 function updateTagGrid(tagPrompts){
     for(let i = 0; i< tagPrompts.length; ++i) {
         // Get the heatmap cell associated with this tag
@@ -219,15 +238,19 @@ function drawTagGrid(rowData) {
 
     //create table body
     let tBody = table.appendChild(document.createElement('tbody'));
+
+    // Need to keep track of the question number of the previous row generated using priorQuestionNum
     let priorQuestionNum = -1;
     let roundNum = 1;
+
+    // Loop through all review rows, generating appropriate table rows for each
     for(let rIndex = 0; rIndex < rowData.length; ++rIndex) {
         let tRow = tBody.insertRow();
         // Handle the backend inconsistency, Question Indices start with One and Review Indices start with Zero
         let questionNum = rowData[rIndex].get('question_num');
         let reviewNum = rowData[rIndex].get('review_num') + 1;
 
-        // If this is a new question number, add a row indicating a new question.
+        // If this review is for a new question number, add a question label row, eg "Round 2 -- Question 3"
         if(questionNum !== priorQuestionNum) {
             let labelRowData = drawQuestionRow(priorQuestionNum, questionNum, roundNum, tRow, gridWidth, tooltipText,
                 reviewNum, numRounds, roundPrefix, tBody);
@@ -236,7 +259,7 @@ function drawTagGrid(rowData) {
             roundNum = labelRowData.roundNum;
         }
 
-        // If not a new question, add a row containing review grid cells
+        // Generate a table row for this review containing tag status cells
         drawReviewRow(tRow, questionNum, reviewNum, gridWidth, rowData, rIndex, tooltipText);
     }
 }

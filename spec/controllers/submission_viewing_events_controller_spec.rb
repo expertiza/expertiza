@@ -23,7 +23,8 @@ describe SubmissionViewingEventsController do
 
   describe '#start_timing' do
     it 'should record the start time as the current time and clear the end time' do
-      expect(controller.start_timing(@args)).to have_http_status :ok
+      post :start_timing, :params => @args
+      expect response to have_http_status :ok
     end
   end
 

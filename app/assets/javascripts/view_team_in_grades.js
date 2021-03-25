@@ -270,6 +270,7 @@ function drawHeader(table, headerTooltipText,gridWidth) {
     row.setAttribute("onClick", "toggleHeatGridRows()");
 }
 
+// Generate a sub-heading heatgrid row, once per question, format: "Round 2 -- Question 3"
 function drawQuestionRow(priorQuestionNum, questionNum, roundNum, tRow, gridWidth, tooltipText, reviewNum, numRounds, roundPrefix, tBody) {
     // Determine if this question row belongs to a new round
     if (priorQuestionNum !== -1 && priorQuestionNum > questionNum) {

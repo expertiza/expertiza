@@ -1,11 +1,12 @@
 <script type="text/javascript" src="/assets/view_my_scores_helper.js"></script>
 
 <script type="text/javascript">
+    // Added March 2021 -- Set up the mini tagging report on first loading the page
     $( document ).ready(function() {
-        var total_tags = countTotalTags()   // Added March 2021 -- Set up the on page counter on first loading the page
+        var total_tags = countTotalTags()
         var tagged_tags = countTaggedTags()
         document.getElementById("tag_stats").innerHTML = "Tag Finished: " + tagged_tags + "/" + total_tags
-        // Added March 2021 - E2100 -- Hides links when no reviews to tag
+        //  Hides Mini Tagging Report when no reviews to tag
         var link_main = document.getElementById("view_link");
         if (total_tags === 0) {
             link_main.style.display = "none";

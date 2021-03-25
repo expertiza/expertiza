@@ -86,9 +86,9 @@ function compare(a, b, less) {
 /**************************** GLOBAL SYMBOLS AND PREFIXES **********************************/
 
 // Symbols added for users who cannot see the R/G Color spectrum well. Note that white spacing is added here as well.
-var symNoTag = "  " + "\u2298";        // Unicode universal "NO" circle-line symbol
-var symTagNotDone = " " + "\u26A0";   // Unicode Symbol Representing to-do ("Warning" Symbol)
-var symTagDone = " " + "\u2714";       // Unicode Heavy Check-Mark
+var symNoTag = "  " + "\u2298";        // Unicode Symbol: No Tag (universal "NO" circle-line)
+var symTagNotDone = " " + "\u26A0";    // Unicode Symbol: To-do ("Warning" Symbol)
+var symTagDone = " " + "\u2714";       // Unicode Symbol: Done (Heavy Check-Mark)
 
 /********************************** ACTION HANDLERS ****************************************/
 
@@ -218,33 +218,33 @@ function drawTagGrid(rowData) {
     drawHeader(table, headerTooltipText, gridWidth);
 
     //create table body
-    let tbody = table.appendChild(document.createElement('tbody'));
+    let tBody = table.appendChild(document.createElement('tbody'));
     let priorQuestionNum = -1;
     let roundNum = 1;
     for(let rIndex = 0; rIndex < rowData.length; ++rIndex) {
-        let trow = tbody.insertRow();
+        let tRow = tBody.insertRow();
         // Handle the backend inconsistency, Question Indices start with One and Review Indices start with Zero
         let questionNum = rowData[rIndex].get('question_num');
         let reviewNum = rowData[rIndex].get('review_num') + 1;
 
         // If this is a new question number, add a row indicating a new question.
         if(questionNum !== priorQuestionNum) {
-            let labelRowData = drawQuestionRow(priorQuestionNum, questionNum, roundNum, trow, gridWidth, tooltipText,
-                reviewNum, numRounds, roundPrefix, tbody);
+            let labelRowData = drawQuestionRow(priorQuestionNum, questionNum, roundNum, tRow, gridWidth, tooltipText,
+                reviewNum, numRounds, roundPrefix, tBody);
             priorQuestionNum = labelRowData.priorQuestionNum;
-            trow = labelRowData.trow;
+            tRow = labelRowData.tRow;
             roundNum = labelRowData.roundNum;
         }
 
         // If not a new question, add a row containing review grid cells
-        drawReviewRow(trow, questionNum, reviewNum, gridWidth, rowData, rIndex, tooltipText);
+        drawReviewRow(tRow, questionNum, reviewNum, gridWidth, rowData, rIndex, tooltipText);
     }
 }
 
 // Generates the header rows and cells for the tag heatgrid with "Tags Completed # out of #"
 function drawHeader(table, headerTooltipText,gridWidth) {
-    let thead = table.createTHead();
-    let row = thead.insertRow();
+    let tHead = table.createTHead();
+    let row = tHead.insertRow();
     row.setAttribute("class", "hide-scrollbar tablesorter-headerRow");
 
     // Create "Tags Completed:" Cell
@@ -259,7 +259,7 @@ function drawHeader(table, headerTooltipText,gridWidth) {
     row.setAttribute("onClick", "toggleHeatGridRows()");
 
     // create "# out of #" Cell to show number of completed tags
-    row = thead.insertRow();
+    row = tHead.insertRow();
     th = document.createElement("th");
     text = document.createTextNode("0 out of 0");
     th.setAttribute("id", "tagsSuperNumber");
@@ -270,37 +270,38 @@ function drawHeader(table, headerTooltipText,gridWidth) {
     row.setAttribute("onClick", "toggleHeatGridRows()");
 }
 
-function drawQuestionRow(priorQuestionNum, questionNum, roundNum, trow, gridWidth, tooltipText, reviewNum, numRounds, roundPrefix, tbody) {
+function drawQuestionRow(priorQuestionNum, questionNum, roundNum, tRow, gridWidth, tooltipText, reviewNum, numRounds, roundPrefix, tBody) {
+    // Determine if this question row belongs to a new round
     if (priorQuestionNum !== -1 && priorQuestionNum > questionNum) {
         ++roundNum;
     }
     // Update prior question index
     priorQuestionNum = questionNum;
     // Draw a "Question: # " Row that spans all columns
-    let cell = trow.insertCell();
+    let cell = tRow.insertCell();
     cell.colSpan = gridWidth;
     cell.className = "tag_heat_grid_criterion";
     addToolTip(cell, tooltipText);
-    trow.id = "hg_row" + questionNum + "_" + reviewNum;
-    trow.setAttribute("data-questionnum", questionNum);
+    tRow.id = "hg_row" + questionNum + "_" + reviewNum;
+    tRow.setAttribute("data-questionnum", questionNum);
     if (numRounds > 1) {
         roundPrefix = "Round " + roundNum + " -- ";
     }
     let text = document.createTextNode(roundPrefix + "Question " + questionNum);
     cell.appendChild(text);
     // Initialize new row to be used by the inner loop for reviews.
-    trow = tbody.insertRow();
-    let temp = reviewNum - 1;
-    trow.id = "hg_row" + questionNum + "_" + temp;
-    return {priorQuestionNum, trow, roundNum};
+    tRow = tBody.insertRow();
+    let reviewNumZeroIndex = reviewNum - 1;
+    tRow.id = "hg_row" + questionNum + "_" + reviewNumZeroIndex;
+    return {priorQuestionNum, tRow, roundNum};
 }
 
 // Draws a row of grid cells containing information from a single review's tags.
-function drawReviewRow(trow, questionNum, reviewNum, gridWidth, rowData, rIndex, tooltipText) {
-    trow.id = "hg_row" + questionNum + "_" + reviewNum;
-    trow.setAttribute("data-questionnum", questionNum);
+function drawReviewRow(tRow, questionNum, reviewNum, gridWidth, rowData, rIndex, tooltipText) {
+    tRow.id = "hg_row" + questionNum + "_" + reviewNum;
+    tRow.setAttribute("data-questionnum", questionNum);
     for (let cIndex = 0; cIndex < gridWidth; ++cIndex) {
-        let cell = trow.insertCell();
+        let cell = tRow.insertCell();
         // Set the text value of the grid cell
         let innerText = "R." + reviewNum;
         // If review doesn't have tag prompts

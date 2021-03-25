@@ -31,24 +31,25 @@ describe SubmissionViewingEventsController do
                                            created_at: start_time,
                                            updated_at: start_time,
                                            total_time: 0
-      post :start_timing, params: {:submission_viewing_event => @args}
+      post :start_timing, {submission_viewing_event: @args}
       expect(response).to have_http_status :ok
 
-      actual = @store.where(@args)
+      actual = @store.where(map_id: @args[:map_id],
+                            round: @args[:round])
       expect(actual).to eql expected
     end
   end
 
   describe '#end_timing' do
     it 'should record the end time as the current time and update the total time' do
-      post :start_timing, params: {:submission_viewing_event => @args}
+      post :end_timing, {submission_viewing_event: @args}
       expect(response).to have_http_status :ok
     end
   end
 
   describe '#reset_timing' do
     it 'should record the end time as the current time and update the total time, and restart timing' do
-      post :start_timing, params: {:submission_viewing_event => @args}
+      post :reset_timing, {submission_viewing_event: @args}
       expect(response).to have_http_status :ok
     end
   end
@@ -56,7 +57,7 @@ describe SubmissionViewingEventsController do
   describe '#hard_save' do
     it 'should save all storage proxy records in the database and remove them from the storage proxy' do
       expected = {}.to_json
-      post :start_timing, params: {:submission_viewing_event => @args}
+      post :hard_save, {submission_viewing_event: @args}
       expect(response.body).to eql expected
       expect(response).to_render :show
     end
@@ -64,7 +65,7 @@ describe SubmissionViewingEventsController do
 
   describe '#end_round_and_save' do
       it 'stop timing for all links for the given round, and save them to the database' do
-        post :start_timing, params: {:submission_viewing_event => @args}
+        post :end_round_and_save, {submission_viewing_event: @args}
         expect(response).to have_http_status :ok
       end
   end

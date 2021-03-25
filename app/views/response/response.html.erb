@@ -525,7 +525,11 @@
         }
 
         if (typeof document.addEventListener === "undefined" || hidden === undefined) {
-            console.log("This requires a browser, such as Google Chrome or Firefox, that supports the Page Visibility API.");
+            let msg = "Timing how long is spent on the Review page requires a browser, " +
+                "such as Google Chrome or Firefox, that supports the Page Visibility API.\n" +
+                "If you have such a browser, please try re-opening the review in that browser " +
+                "or review timing information may be inaccurate."
+            window.alert(msg);
         } else {
             // Handle page visibility change
             document.addEventListener(visibilityChange, handleVisibilityChange, false);

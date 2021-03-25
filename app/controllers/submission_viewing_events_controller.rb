@@ -43,9 +43,18 @@ class SubmissionViewingEventsController < ApplicationController
     head :ok
   end
 
+  # Reset the timer for a single link, or
+  # a whole round.
+  #
+  # If :link is present in the request params, then
+  # this function resets timing for that particular link.
+  #
+  # If :link is not present in the request params, then
+  # this function resets timing for the whole round given
+  # in the request params.
   def reset_timing
     args = request_params
-    if !args[:link].nil?
+    if args[:link]
       end_timing_for_link(args[:map_id], args[:round], args[:link])
       start_timing_for_link(args[:map_id], args[:round], args[:link])
     else
@@ -89,10 +98,10 @@ class SubmissionViewingEventsController < ApplicationController
     # push relevant data for each row into arrays used to fill in JSON
     SubmissionViewingEvent.where(map_id: params[:reponse_map_id], round: params[:round]).each do |entry|
       labels.push(entry.link)
-      percentages.push((entry.end_at - entry.start_at).to_f / totalTime)
+      percentages.push(entry.total_time.to_f / totalTime)
       tables.push({
                       "subject" => entry.link,
-                      "timeCost" => secondsToHuman((entry.end_at - entry.start_at).to_i),
+                      "timeCost" => secondsToHuman(entry.total_time.to_i),
                       "avgTime" => secondsToHuman(getAvgRevTime(params[:reponse_map_id], params[:round], entry.link))
                   })
     end
@@ -140,8 +149,8 @@ class SubmissionViewingEventsController < ApplicationController
 
   private
 
-  # Require: :map_id, :round
-  # Permit: :link
+  # Require: :submission_viewing_event object
+  # Permit: :map_id, :round, :link
   def request_params
     params.require(:submission_viewing_event).permit(:map_id, :round, :link)
   end
@@ -242,27 +251,21 @@ class SubmissionViewingEventsController < ApplicationController
   # Actually performs the work flushing records from
   # local storage to the database and removing them.
   def save_and_remove_all(map_id, round)
-    uncommitted = []
     records = @store.where(map_id: map_id, round: round)
+    uncommitted = records.map { |record| record.link }
 
     unless records.empty?
       records.each do |record|
-        # push the uncommitted link on to the stack
-        uncommitted << record.link
-
         previous = SubmissionViewingEvent.where(
           map_id: record.map_id,
           round: record.round,
           link: record.link
-        )
+        ).first
 
-        if !previous.empty?
+        if previous
           # make sure to add the total time on this record
           # with what may have already been in the database
-          previous.each do |event|
-            updated = record.merge(event)
-            event.update_attribute(:total_time, updated)
-          end
+          previous.update_attribute(:total_time, record.merge(event))
         else
           # if a previous record doesn't exist,
           # we can delegate saving to `LocalStorage`

@@ -31,13 +31,7 @@
   <h4>Topic: <%= topic_id + '. ' + topic_name %></h4>
 <% end %>
 <!--Obtain only review scores-->
-<% if @pscore[:review1] && @pscore[:review2] %>
-  <% rscore_review1 = Rscore.new(@pscore,:review1)%>
-  <% rscore_review2 = Rscore.new(@pscore,:review2)%>
-  <% average = rscore_review1.my_avg + rscore_review2.my_avg %>
-  <% average /= 2 %>
-  <h4>Average peer review score: <span class = "c5"><%= average.is_a?(Float)? sprintf("%.2f",average): average %></span></h4>
-<% elsif @pscore[:review]  %>
+<% if @pscore[:review]  %>
 <% rscore_review = Rscore.new(@pscore,:review)%>
 <h4>Average peer review score: <span class = "c5"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span></h4>
 <%else %>

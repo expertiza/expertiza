@@ -61,11 +61,7 @@ class SubmissionViewingEventsController < ApplicationController
   def hard_save
     args = request_params
     @uncommitted = save_and_remove_all(args[:map_id], args[:round])
-    # TODO: why does the previous group render json with the
-    # links that were just committed?
-    respond_to do |format|
-      format.json { render json: @uncommitted }
-    end
+    render json: @uncommitted
   end
 
   # Provide a convenience function to stop timing for all

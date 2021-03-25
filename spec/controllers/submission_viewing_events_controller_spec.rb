@@ -1,6 +1,6 @@
 describe SubmissionViewingEventsController do
 
-  before :each do
+  before :all do
     @args_without_link = {
       :map_id => 123456,
       :round => 1
@@ -49,11 +49,17 @@ describe SubmissionViewingEventsController do
 
   describe '#reset_timing' do
     it 'should record the end time as the current time, update the total time, and restart timing' do
+      # no need to test this response, as it's already tested
+      post :start_timing, paramify(@args_with_link)
       post :reset_timing, paramify(@args_with_link)
       expect(response).to have_http_status :ok
     end
 
     it 'should record the end time as the current time, update the total time, and restart timing for all links in a given round' do
+      post :start_timing, paramify(@args_with_link)
+      post :start_timing, paramify(@args_with_link_2)
+      post :start_timing, paramify(@args_with_link_3)
+
       post :reset_timing, paramify(@args_without_link)
       expect(response).to have_http_status :ok
     end

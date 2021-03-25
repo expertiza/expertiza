@@ -56,9 +56,14 @@ describe SubmissionViewingEventsController do
     end
 
     it 'should record the end time as the current time, update the total time, and restart timing for all links in a given round' do
-      post :start_timing, paramify(@args_with_link)
-      post :start_timing, paramify(@args_with_link_2)
-      post :start_timing, paramify(@args_with_link_3)
+      to_post = [
+        @args_with_link,
+        @args_with_link_2,
+        @args_with_link_3
+      ]
+
+      # start timing each one
+      to_post.each { |it| post :start_timing, paramify(it)}
 
       post :reset_timing, paramify(@args_without_link)
       expect(response).to have_http_status :ok

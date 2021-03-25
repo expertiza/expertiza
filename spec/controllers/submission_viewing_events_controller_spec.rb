@@ -46,7 +46,6 @@ describe SubmissionViewingEventsController do
       expected = [].to_json
       post :hard_save, {submission_viewing_event: @args}
       expect(response.body).to eql expected
-      expect(response).to render_template(:show)
     end
   end
 

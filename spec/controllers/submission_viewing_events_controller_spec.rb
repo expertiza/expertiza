@@ -67,8 +67,21 @@ describe SubmissionViewingEventsController do
 
   describe '#hard_save' do
     it 'should save all storage proxy records in the database and remove them from the storage proxy' do
-      expected = [].to_json
+      to_post = [
+        @args_with_link,
+        @args_with_link_2,
+        @args_with_link_3
+      ]
+
+      # start timing each one
+      to_post.each { |it| post :start_timing, paramify(it)}
+
+      post :end_timing, paramify(@args_without_link)
+
+      expected = to_post.map { |it| it[:link] }.to_json
+
       post :hard_save, paramify(@args_with_link)
+
       expect(response.body).to eql expected
     end
   end

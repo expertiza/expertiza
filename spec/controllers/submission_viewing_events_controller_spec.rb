@@ -1,29 +1,4 @@
 describe SubmissionViewingEventsController do
-
-  let(:github_timing) {
-    build(
-      :submission_viewing_event,
-      map_id: 123456,
-      round: 1,
-      link: "https://www.github.com",
-      start_at: DateTime(2021, 03, 25, 00, 15, 00),
-      end_at: DateTime(2021, 03, 25, 00, 20, 00),
-      total_time: 300
-    )
-  }
-
-  let(:readme_timing) {
-    build(
-      :submission_viewing_event,
-      map_id: 123456,
-      round: 1,
-      link: "README.md",
-      start_at: DateTime(2021, 03, 25, 00, 20, 00),
-      end_at: DateTime(2021, 03, 25, 00, 30, 00),
-      total_time: 600
-    )
-  }
-
   before :all do
     @args_without_link = {
       :map_id => 123456,
@@ -120,14 +95,6 @@ describe SubmissionViewingEventsController do
         post :end_round_and_save, paramify(@args_with_link)
         expect(response).to have_http_status :ok
       end
-  end
-
-  describe '#getTimingDetails' do
-    it 'should return timing details from the database' do
-      allow(SubmissionViewingEvent).to receive(:where).with(123456, 1).and_return([github_timing, readme_timing])
-      post :getTimingDetails
-      expect(response.body).not_to be_nil
-    end
   end
 
   private

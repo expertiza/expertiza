@@ -1,11 +1,14 @@
 describe SubmissionViewingEventsController do
 
   before :each do
-    @args = {
-        :map_id => 123456,
-        :round => 1,
-        :link => "https://www.github.com"
+    @args_without_link = {
+      :map_id => 123456,
+      :round => 1
     }
+
+    @args_with_link = @args_without_link.merge :link => "https://www.github.com"
+    @args_with_link_2 = @args_without_link.merge :link => "https://www.google.com"
+    @args_with_link_3 = @args_without_link.merge :link => "https://www.example.com"
 
     @store = LocalStorage.new
   end
@@ -21,22 +24,37 @@ describe SubmissionViewingEventsController do
   end
 
   describe '#start_timing' do
-    it 'should record the start time as the current time and clear the end time' do
-      post :start_timing, {submission_viewing_event: @args}
+    it 'should record the start time as the current time and clear the end time for the given link' do
+      post :start_timing, paramify(@args_with_link)
+      expect(response).to have_http_status :ok
+    end
+
+    it 'should record the start time as the current time and clear the end time for all links for a given round' do
+      post :start_timing, paramify(@args_without_link)
       expect(response).to have_http_status :ok
     end
   end
 
   describe '#end_timing' do
     it 'should record the end time as the current time and update the total time' do
-      post :end_timing, {submission_viewing_event: @args}
+      post :end_timing, paramify(@args_with_link)
+      expect(response).to have_http_status :ok
+    end
+
+    it 'should record the end time as the current time and update the total time for all links in a given round' do
+      post :end_timing, paramify(@args_without_link)
       expect(response).to have_http_status :ok
     end
   end
 
   describe '#reset_timing' do
-    it 'should record the end time as the current time and update the total time, and restart timing' do
-      post :reset_timing, {submission_viewing_event: @args}
+    it 'should record the end time as the current time, update the total time, and restart timing' do
+      post :reset_timing, paramify(@args_with_link)
+      expect(response).to have_http_status :ok
+    end
+
+    it 'should record the end time as the current time, update the total time, and restart timing for all links in a given round' do
+      post :reset_timing, paramify(@args_without_link)
       expect(response).to have_http_status :ok
     end
   end
@@ -44,16 +62,22 @@ describe SubmissionViewingEventsController do
   describe '#hard_save' do
     it 'should save all storage proxy records in the database and remove them from the storage proxy' do
       expected = [].to_json
-      post :hard_save, {submission_viewing_event: @args}
+      post :hard_save, paramify(@args_with_link)
       expect(response.body).to eql expected
     end
   end
 
   describe '#end_round_and_save' do
       it 'stop timing for all links for the given round, and save them to the database' do
-        post :end_round_and_save, {submission_viewing_event: @args}
+        post :end_round_and_save, paramify(@args_with_link)
         expect(response).to have_http_status :ok
       end
   end
 
+  private
+
+  def paramify(args)
+    {submission_viewing_event: args}
+  end
+  
 end

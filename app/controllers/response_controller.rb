@@ -1,4 +1,4 @@
-class ResponseController < ApplicationController
+questionnaire_from_responseclass ResponseController < ApplicationController
   include AuthorizationHelper
 
   helper :submitted_content
@@ -86,7 +86,7 @@ class ResponseController < ApplicationController
     @questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
-    @questionnaire = get_questionnaire_from_response
+    @questionnaire = questionnaire_from_response
     render action: 'response'
   end
 
@@ -107,7 +107,7 @@ class ResponseController < ApplicationController
         return
       end
       @response.update_attribute('additional_comment', params[:review][:comments])
-      @questionnaire = get_questionnaire_from_response
+      @questionnaire = questionnaire_from_response
       questions = sort_questions(@questionnaire.questions)
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
@@ -312,7 +312,7 @@ class ResponseController < ApplicationController
     end
     @participant = @map.reviewer
     @contributor = @map.contributor
-    new_response ? get_questionnaire_from_response_map : get_questionnaire_from_response
+    new_response ? questionnaire_from_response_map : questionnaire_from_response
     set_dropdown_or_scale
     @questions = sort_questions(@questionnaire.questions)
     @min = @questionnaire.min_question_score
@@ -347,7 +347,7 @@ class ResponseController < ApplicationController
   # This method is called within set_content and when the new_response flag is set to true
   # Depending on what type of response map corresponds to this response, the method gets the reference to the proper questionnaire
   # This is called after assign_instance_vars in the new method
-  def get_questionnaire_from_response_map
+  def questionnaire_from_response_map
     case @map.type
     when "ReviewResponseMap", "SelfReviewResponseMap"
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
@@ -367,7 +367,7 @@ class ResponseController < ApplicationController
 
   # This method is called within set_content when the new_response flag is set to False
   # This method gets the questionnaire directly from the response object since it is available.
-  def get_questionnaire_from_response
+  def questionnaire_from_response
     # if user is not filling a new rubric, the @response object should be available.
     # we can find the questionnaire from the question_id in answers
     answer = @response.scores.first

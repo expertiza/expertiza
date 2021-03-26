@@ -212,5 +212,3 @@ pg_data
 mysql2psql.yml
 *.pem
 t.csv
-
-*.pstore

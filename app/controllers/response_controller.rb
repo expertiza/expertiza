@@ -418,4 +418,3 @@ questionnaire_from_responseclass ResponseController < ApplicationController
       end
     end
   end
-end

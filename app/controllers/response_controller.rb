@@ -1,4 +1,4 @@
-questionnaire_from_responseclass ResponseController < ApplicationController
+class ResponseController < ApplicationController
   include AuthorizationHelper
 
   helper :submitted_content

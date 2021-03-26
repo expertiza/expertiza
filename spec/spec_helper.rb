@@ -1,3 +1,6 @@
+#add lib folder to the LOAD_PATH
+$: << '../lib'
+
 # Record code coverage with coveralls on Travis
 require 'factory_bot_rails'
 require 'coveralls'

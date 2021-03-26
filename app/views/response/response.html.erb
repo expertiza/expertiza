@@ -16,8 +16,9 @@
 
     window.onbeforeunload = release_lock;
 
-    // todo: to be moved to assets, once it's fixed so that not every script is loaded in every page.
-    //detect if the window is in foreground or background
+    // to be moved to assets, once it's fixed so that not every
+    // script is loaded in every page.
+    // detect if the window is in foreground or background
     var vis = (function () {
         var stateKey, eventKey, keys = {
             hidden: "visibilitychange",

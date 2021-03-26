@@ -418,3 +418,4 @@ class ResponseController < ApplicationController
       end
     end
   end
+end

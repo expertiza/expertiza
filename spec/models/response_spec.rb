@@ -141,7 +141,6 @@ describe Response do
     context 'when current round response is found' do
       it 'returns a new response object' do
         allow(response).to receive(:populate_new_response).with(:review_response_map, nil).and_return(:new_response)
-        expect(:new_response.id)
       end
     end
   end

@@ -39,9 +39,8 @@ class SubmissionViewingEventsController < ApplicationController
     else
       end_timing_for_round(args[:map_id], args[:round])
     end
-    respond_to do |format|
-      format.json { head :no_content }
-    end
+
+    head :ok
   end
 
   # Reset the timer for a single link, or
@@ -70,12 +69,8 @@ class SubmissionViewingEventsController < ApplicationController
   # the database.
   def hard_save
     args = request_params
-    @uncommitted = save_and_remove_all(args[map_id], args[:round])
-    # TODO: why does the previous group render json with the
-    # links that were just committed?
-    respond_to do |format|
-      format.json { render json: @uncommitted }
-    end
+    @uncommitted = save_and_remove_all(args[:map_id], args[:round])
+    render json: @uncommitted
   end
 
   # Provide a convenience function to stop timing for all
@@ -87,7 +82,7 @@ class SubmissionViewingEventsController < ApplicationController
     args = request_params
     end_timing_for_round(args[:map_id], args[:round])
     save_and_remove_all(args[:map_id], args[:round])
-    head :no_content
+    head :ok
   end
 
   # Respond with a JSON containing relevant timing information for specified review and round

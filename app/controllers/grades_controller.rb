@@ -202,7 +202,7 @@ class GradesController < ApplicationController
       submission_hyperlink_tokens = hyperlink.split('/')
       hyperlink_data = {}
       hyperlink_data["repository_name"] = submission_hyperlink_tokens[4]
-      next if hyperlink_data["repository_name"] == "servo" || hyperlink_data["repository_name"] == "expertiza"
+      #  next if hyperlink_data["repository_name"] == "servo" || hyperlink_data["repository_name"] == "expertiza"
       hyperlink_data["owner_name"] = submission_hyperlink_tokens[3]
       github_data = get_github_repository_details(hyperlink_data)
       parse_github_repository_data(github_data)
@@ -359,7 +359,7 @@ class GradesController < ApplicationController
     http.verify_mode = OpenSSL::SSL::VERIFY_PEER
     request = Net::HTTP::Post.new(uri.path, 'Authorization' => 'Bearer' + ' ' + session["github_access_token"])
     request.body = data.to_json
-    http.request(request)
+    #    http.request(request)
     response = http.request(request)
     ActiveSupport::JSON.decode(response.body.to_s)
   end
@@ -393,7 +393,7 @@ class GradesController < ApplicationController
         repository(owner: \"" + hyperlink_data["owner_name"] + "\", name:\"" + hyperlink_data["repository_name"] + "\") {
           pullRequest(number: " + hyperlink_data["pull_request_number"] + ") {
             number additions deletions changedFiles mergeable merged headRefOid
-              commits(first:100, after:" + @end_cursor + "){
+              commits(first:100 #{"after:" + @end_cursor unless @end_cursor.empty? }){
                 totalCount
                   pageInfo{
                     hasNextPage startCursor endCursor

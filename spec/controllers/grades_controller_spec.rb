@@ -41,7 +41,8 @@ describe GradesController do
         get :view, params
         expect(controller.instance_variable_get(:@questions)[:review1].size).to eq(1)
         expect(response).to render_template(:view)
-     end
+      end
+      end
 
     context 'when user hasn\'t logged in to GitHub' do
       before(:each) do

@@ -595,7 +595,7 @@ describe GradesController do
 
     it 'gets data from GitHub api v4(graphql)' do
       response = controller.make_github_graphql_request("{\"team\":\"rails\",\"players\":\"36\"}")
-      expect(response).to eq("message" => "Bad credentials", "documentation_url" => "https://developer.github.com/v4")
+      expect(response).to eq("message" => "Bad credentials", "documentation_url" => "https://docs.github.com/graphql")
     end
   end
 
@@ -609,7 +609,7 @@ describe GradesController do
         repository(owner: \"expertiza\", name:\"expertiza\") {
           pullRequest(number: 1228) {
             number additions deletions changedFiles mergeable merged headRefOid
-              commits(first:100, after:){
+              commits(first:100 ){
                 totalCount
                   pageInfo{
                     hasNextPage startCursor endCursor

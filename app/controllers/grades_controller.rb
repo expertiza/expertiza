@@ -31,11 +31,15 @@ class GradesController < ApplicationController
   # It also gives a final score, which is an average of all the reviews and greatest difference
   # in the scores of all the reviews.
   def view
-    if session["github_access_token"].nil?
-      session["assignment_id"] = params[:id]
-      session["github_view_type"] = "view_scores"
-      return redirect_to authorize_github_grades_path
-    end
+    # This code needs to be moved to the new github metrics controller slated as part of E2111, and needs to be
+    # made optional in some manner. TAs and instructors should not HAVE to have an authorized github token to
+    # browse this page. Instead, this authorization should take place only if github metrics are specifically requested.
+    #
+    # if session["github_access_token"].nil?
+    #   session["assignment_id"] = params[:id]
+    #   session["github_view_type"] = "view_scores"
+    #   return redirect_to authorize_github_grades_path
+    # end
     @assignment = Assignment.find(params[:id])
     questionnaires = @assignment.questionnaires
 

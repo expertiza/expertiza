@@ -1,23 +1,247 @@
+<script>
+    function getQueryForSinglePullRequest(pull_request_url) {
+        var dataArray = pull_request_url.split('/');
+        var pullRequestNumber = dataArray.pop();
+        dataArray.pop();
+        var repositoryName = dataArray.pop();
+        var ownerName = dataArray.pop();
+        return `pull${pullRequestNumber}: repository(owner: "${ownerName}", name: "${repositoryName}") {
+                    pullRequest(number: ${pullRequestNumber}) {
+                      id
+                      number
+                      title
+                      commits(first:100) {
+                        edges {
+                          node {
+                            id
+                            commit{
+                              author{
+                                name
+                                email
+                                user {
+                                  name
+                                }
+                              }
+                              additions
+                              deletions
+                              committedDate
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }`;
+    }
+
+    function getQueryForSingleRepo(repoURL) {
+        var dataArray = repoURL.split('/');
+        var repositoryName = dataArray[4];
+        var ownerName = dataArray[3];
+        // Check for Mozilla and Expertiza projects.
+        if(repositoryName === "expertiza" || repositoryName === "servo") return "";
+
+        return `${repositoryName.replace(/\W/g, '_')} :repository(owner: "${ownerName}", name: "${repositoryName}") {
+                defaultBranchRef{
+                    target{
+                      ... on Commit {
+                        history{
+                          totalCount
+                          nodes{
+                            author{
+                              name
+                              email
+                              user {
+                                name
+                              }
+                            }
+                            additions
+                            deletions
+                            committedDate
+                          }
+                        }
+                      }
+                    }
+                  }
+                }`;
+    }
+
+    function getAllQueries(links, mode) {
+        var queryFunction = mode === "PULL_REQUEST" ? getQueryForSinglePullRequest: getQueryForSingleRepo;
+        return links.reduce(function(accumulator, link){
+            accumulator += queryFunction($(link).attr("href"));
+            return accumulator;
+        }, "");
+    }
+
+    function getAccumulatorObject(accumulator, commit) {
+        var author = commit.author;
+        var authorName = author.name;
+        var accumulatorObject;
+        if (accumulator.hasOwnProperty(authorName)) {
+            accumulatorObject = {
+                additions: accumulator[authorName].additions + commit.additions,
+                deletions: accumulator[authorName].deletions + commit.deletions,
+                totalCommits: accumulator[authorName].totalCommits + 1,
+                email: author.email,
+                displayName: (author.user && author.user.name) || `${authorName}(${author.email})`
+            };
+        } else {
+            accumulatorObject = {
+                additions: commit.additions,
+                deletions: commit.deletions,
+                totalCommits: 1,
+                email: author.email,
+                displayName: (author.user && author.user.name) || `${authorName}(${author.email})`
+            }
+        }
+
+        return accumulatorObject;
+    }
+
+    function getPullRequestResults(response) {
+        var processedResults = [];
+        for(result in response.data) {
+            var edges = response.data[result].pullRequest.commits.edges;
+            if (!edges.length) {
+                continue;
+            }
+            processedResults.push(edges.reduce(function (accumulator, edge) {
+                var commit = edge.node.commit;
+                var authorName = commit.author.name;
+                accumulator[authorName] = getAccumulatorObject(accumulator, commit);
+                return accumulator;
+            }, {}));
+        }
+        return processedResults;
+    }
+
+    function getRepoResults(response) {
+        var processedResults = [];
+        for(result in response.data) {
+            var nodes = response.data[result].defaultBranchRef.target.history.nodes;
+            processedResults.push(nodes.reduce(function(accumulator, commit){
+                var authorName = commit.author.name;
+                accumulator[authorName] = getAccumulatorObject(accumulator, commit);
+                return accumulator;
+            }, {}));
+        }
+        return processedResults;
+    }
+
+    function getResultsForRender(response, mode) {
+        return mode === "PULL_REQUEST" ? getPullRequestResults(response) : getRepoResults(response);
+    }
+
+    function getRenderHTML(processedResults) {
+        return processedResults.reduce(function(accumulator, result, index) {
+            accumulator += "<table id='myTable" + index + "' class='table table-bordered tablesorter'>" +
+                "<caption>GitHub Metrics</caption>" +
+                "<colgroup><col><col class='c5'><col class='c1'><col class='c5'></colgroup>" +
+                "<thead><th>Student</th><th>Lines of Code added</th><th>Lines of code deleted</th><th>Total Commits</th></thead>" +
+                "<tbody>";
+            for (author in result) {
+                if (result.hasOwnProperty(author)) {
+                    var authorData = result[author];
+                    accumulator += `<tr><td>${authorData.displayName}</td><td>${authorData.additions}</td><td>${authorData.deletions}</td><td>${authorData.totalCommits}</td></tr>`
+                }
+            }
+            accumulator += "</tbody></table>";
+            return accumulator;
+        }, "");
+    }
+
+    (function(){
+        // Create a closure and invoke it immediately to store token.
+        var accessToken = '<%= session["github_access_token"] %>';
+
+        $(document).ready(function () {
+            $("#tmr tr ul").on("click", "li.tmr_tab", function (e, s) {
+                var currentTab = $(e.delegateTarget).siblings(".tmr_tab_content");
+                currentTab.find("div.github").html("");
+
+                var links;
+                var mode = "";
+                var pullLinks = currentTab.find("table.participants tr div#url a[href*='/pull/']");
+
+                // If pull links were submitted, get query strings for all of them.
+                if(pullLinks.length) {
+                    mode = "PULL_REQUEST";
+                    links = pullLinks;
+                } else {
+                    mode = "REPO";
+                    // If no Pull request links were submitted, check for GitHub links
+                    links = currentTab.find("table.participants tr div#url a[href^='https://github']");
+                }
+
+                var queries = getAllQueries(links.toArray(), mode);
+
+                if(!queries) {
+                    return;
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: "https://api.github.com/graphql",
+                    headers: {
+                        'Authorization': 'Bearer' + ' ' + accessToken
+                    },
+                    data: JSON.stringify({
+                        query: `query {${queries}}`
+                    }),
+                    success: function (response) {
+                        try {
+                            currentTab.find("div.github").html(getRenderHTML(getResultsForRender(response, mode)));
+                            currentTab.find("div.github table").each(function (index, element) {
+                                $(element).tablesorter().trigger("update")
+                            });
+                        } catch (e) {
+                          console.error(e);
+                        }
+                    },
+                    error: function (httpObject, textStatus) {
+                        switch(httpObject.status){
+                            case 401:
+                                // If token has expired, get a new one.
+                                // status 401: unauthorized
+                                //window.location.replace("https://github.com/login/oauth/authorize?client_id=9bc295b263c0386b247a");
+                                $.ajax({
+                                    type: "GET",
+                                    url: "/grades/authorize_github"
+                                });
+                                break;
+                            case 403:
+                                // Forbidden. Most likely excedded rate limit or wrong creds.
+                                currentTab.find("div.github").html("<p>GitHub rate limit exceeded.</p>");
+                        }
+                    }
+                });
+            });
+        });
+    })();
+</script>
 <h1>Summary report for <%= @assignment.name %></h1>
+
 <BR/>
 <% if @scores[:teams] %>
-    <a href="#" onClick="toggleAll(<%= @scores[:teams].length %>);return false;" id="teamAll" name="teamAll">Show all teams</a>
-    <BR/><BR/>
+  <a href="#" onClick="toggleAll(<%= @scores[:teams].length %>);return false;" id="teamAll" name="teamAll">Show all
+    teams</a>
+  <BR/><BR/>
 <% end %>
 <!-- If there are 1-member teams, the Teammate Review column should not appear in the score report.
 If there is no metareviewing deadline, the “Reviewing” column should not appear in the score report.-->
-
 <!-- E1877: charts implemented before table-->
 <% if !@avg_of_avg.nan? %>
   <%= render :partial => 'team_charts', :locals => {:prefix => nil} %>
 <% end %>
 <table id="report_Table" class="table tablesorter table-striped grades" width="100%">
   <!--ACS Render the appropriate partial for displaying the scores depending on the team size -->
-<% if @assignment.team_assignment? && @scores[:teams].length > 0 %>
-  <%= render :partial => 'teams' %>
-<% else %>
-  <tr><td>No teams are defined for this assignment</td></tr>
-<% end %>
+  <% if @assignment.team_assignment? && @scores[:teams].length > 0 %>
+    <%= render :partial => 'teams' %>
+  <% else %>
+    <tr>
+      <td>No teams are defined for this assignment</td>
+    </tr>
+  <% end %>
 </table>
 <BR/><BR/>
 <%= link_to 'Export '+'Grades',

@@ -8,7 +8,7 @@ class AuthController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'login', 'logout', 'login_failed', 'google_login'
+    when 'login', 'logout', 'login_failed', 'google_login', 'oauth_login'
       true
     else
       current_user_has_super_admin_privileges?
@@ -38,6 +38,26 @@ class AuthController < ApplicationController
     AuthController.set_current_role(user.role_id, session)
     redirect_to controller: AuthHelper.get_home_controller(session[:user]),
                 action: AuthHelper.get_home_action(session[:user])
+  end
+
+  def oauth_login
+    case params[:provider]
+    when "github"
+      github_login
+    when "google_oauth2"
+      google_login
+    else
+      ExpertizaLogger.error LoggerMessage.new(controller_name, user.name, "Invalid OAuth Provider", "")
+    end
+  end
+
+  def github_login
+    session["github_access_token"] = env['omniauth.auth']["credentials"]["token"]
+    if session["github_view_type"] == "view_submissions"
+      redirect_to controller: 'grades', action: 'view_github_metrics', id: session["participant_id"]
+    elsif session["github_view_type"] == "view_scores"
+      redirect_to view_grades_path(id: session["assignment_id"])
+    end
   end
 
   # Login functionality for google login feature using omniAuth2

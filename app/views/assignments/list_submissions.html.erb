@@ -57,6 +57,8 @@
             <%elsif current_user_is_assignment_participant?(@assignment.id) %>
               <%= render :partial => 'responses', :locals => {:team => team ,:topic_id => topic_identifier, :title => 'Review'} %>
             <% end %>
+            <br>
+            <%= link_to 'GitHub Metrics', { controller: 'grades', action: 'view_github_metrics', id: participants.first.id }, target: '_blank' %></td>
           <% end %>
         <% end %>
 
@@ -87,7 +89,7 @@
         </td>
         <td width="10%">
 
-          <%= link_to "History", submission_records_path(team_id: team.id) %>
+          <%= link_to "History", submission_records_path(team_id: team.id) %> 
 
         </td>
       </tr>

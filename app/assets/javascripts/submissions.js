@@ -123,7 +123,7 @@ $(document).ready(function(){
 	            //Make changes to the DB via AJAX request
 	            $.ajax({
 	                type: 'PUT',
-	                url: "permission_granted",
+	                url: "publishing_rights_update",
 	                data: {
 	                    id: $(event.target).attr("id"),
 	                    status: $(event.target).prop("checked")
@@ -139,8 +139,8 @@ $(document).ready(function(){
 	    //Check the value of checkbox and take action accordingly
 	    $(".make-permit-change").click(function (event) {
 	        if (!$(this).prop("checked"))
-	            confirmAndUpdate("Please press OK to revoke permission.", event);
+	            confirmAndUpdate("Please press OK to revoke publishing rights permit.", event);
 	        else
-	            confirmAndUpdate("Please press OK to provide permission.", event);
+	            confirmAndUpdate("Please press OK to provide publishing rights .", event);
 	    });
 	});

@@ -32,7 +32,6 @@ describe GradesController do
       session["github_access_token"] = "QWERTY"
     end
 
-<<<<<<< HEAD
     context 'when current assignment varies rubrics by round' do
       it 'retrieves questions, calculates scores and renders grades#view page' do
         allow(assignment).to receive(:vary_by_round).and_return(true)
@@ -42,7 +41,8 @@ describe GradesController do
         get :view, params
         expect(controller.instance_variable_get(:@questions)[:review1].size).to eq(1)
         expect(response).to render_template(:view)
-=======
+     end
+
     context 'when user hasn\'t logged in to GitHub' do
       before(:each) do
         @params = {id: 900}
@@ -58,23 +58,10 @@ describe GradesController do
       it 'redirects user to GitHub authorization page' do
         get :view, @params
         expect(response).to redirect_to(authorize_github_grades_path)
->>>>>>> 66fafd0e0d070eb16d50b12235a04dc3cba5cdd2
       end
     end
-
-    context "when user has logged into to GitHub" do
-      context 'when current assignment varies rubric by round' do
-        it 'retrieves questions, calculates scores and renders grades#view page' do
-          allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([assignment_questionnaire])
-          allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, questionnaire_id: 1).and_return([assignment_questionnaire])
-          params = {id: 1}
-          get :view, params
-          expect(controller.instance_variable_get(:@questions)[:review1].size).to eq(1)
-          expect(response).to render_template(:view)
-        end
-      end
-
-      context 'when current assignment does not vary rubric by round' do
+  
+    context 'when current assignment does not vary rubric by round' do
         it 'calculates scores and renders grades#view page' do
           allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
           allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([review_response])
@@ -84,9 +71,8 @@ describe GradesController do
           expect(response).to render_template(:view)
         end
       end
-    end
   end
-
+  
   describe '#view_my_scores' do
     before(:each) do
       allow(Participant).to receive(:find_by).with(id: '1').and_return(participant)

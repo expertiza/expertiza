@@ -1,18 +1,21 @@
 class ImpersonateController < ApplicationController
   include SecurityHelper
-  include AuthorizationHelper
-
+ 
   def action_allowed?
     # Check for TA privileges first since TA's also have student privileges.
-    if current_user_has_ta_privileges?
-      true
-    # Then check for student privileges as they have one more hurdle to surmount.
-    elsif current_user_has_student_privileges?
+    if ['Student'].include? current_role_name
       !session[:super_user].nil?
-    # Not even student privileges?  Definitely not allowed.
     else
-      false
+      ['Super-Administrator',
+       'Administrator',
+       'Instructor',
+       'Teaching Assistant'].include? current_role_name
     end
+  end
+
+  def auto_complete_for_user_name
+    @users = session[:user].get_available_users(params[:user][:name])
+    render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
 
   def start

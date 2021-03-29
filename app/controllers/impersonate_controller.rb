@@ -15,7 +15,7 @@ class ImpersonateController < ApplicationController
     end
   end
 
-	@@ -24,95 +21,147 @@ def start
+  def start
     flash[:error] = "This page doesn't take any query string." unless request.GET.empty?
   end
 

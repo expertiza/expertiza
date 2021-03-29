@@ -5,7 +5,6 @@ class UnityMapping
 		User.find_each do |user|
 			user_id = user.id
 			unity_id = user.email.split('@').first
-			puts user.email
 			File.write("user_mapping.csv", user_id.to_s + ", " + unity_id + ",\n", mode: "a")
 		end
 	file.close

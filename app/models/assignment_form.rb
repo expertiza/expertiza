@@ -1,4 +1,3 @@
-
 require 'active_support/time_with_zone'
 
 class AssignmentForm
@@ -379,12 +378,24 @@ class AssignmentForm
   end
 
   # Copies the inputted assignment into new one and returns the new assignment id
-  def self.copy(assignment_id, user)
+  def self.copy(assignment_id, copyoption, user)
     Assignment.record_timestamps = false
     old_assign = Assignment.find(assignment_id)
     new_assign = old_assign.dup
     user.set_instructor(new_assign)
-    new_assign.update_attribute('name', 'Copy of ' + new_assign.name)
+
+    # Set name of new assignment as 'Copy of <old assignment name>'. If it already exists, set it as 'Copy of <old assignment name> (1)'.
+    # Repeated till unique name is found.
+
+    name_counter = 0
+    new_name = 'Copy of ' + new_assign.name
+    until Assignment.find_by(name: new_name).nil?
+      new_name = 'Copy of ' + new_assign.name
+      name_counter += 1
+      new_name += ' (' + name_counter.to_s + ')'
+    end
+
+    new_assign.update_attribute('name', new_name)
     new_assign.update_attribute('created_at', Time.now)
     new_assign.update_attribute('updated_at', Time.now)
     new_assign.update_attribute('directory_path', new_assign.directory_path + '_copy') if new_assign.directory_path.present?
@@ -396,9 +407,28 @@ class AssignmentForm
       new_assign.create_node
       new_assign_id = new_assign.id
       # also copy topics from old assignment
-      topics = SignUpTopic.where(assignment_id: old_assign.id)
-      topics.each do |topic|
-        SignUpTopic.create(topic_name: topic.topic_name, assignment_id: new_assign_id, max_choosers: topic.max_choosers, category: topic.category, topic_identifier: topic.topic_identifier, micropayment: topic.micropayment)
+
+      if copyoption != 'copyWithoutTopics'
+        topics = SignUpTopic.where(assignment_id: old_assign.id)
+        topics.each do |topic|
+          new_sign_up_topic = SignUpTopic.create(
+            topic_name: topic.topic_name,
+            assignment_id: new_assign_id,
+            max_choosers: topic.max_choosers,
+            category: topic.category,
+            topic_identifier: topic.topic_identifier,
+            micropayment: topic.micropayment
+          )
+
+          if copyoption == 'copyWithTopicsTeams'
+            old_signed_up_teams = SignedUpTeam.where(topic_id: topic.id)
+            old_signed_up_teams.each do |old_signed_up_team|
+              new_signed_up_team = old_signed_up_team.dup
+              new_signed_up_team.update_attribute('topic_id', new_sign_up_topic.id)
+              new_signed_up_team.save
+            end
+          end
+        end
       end
     else
       new_assign_id = nil

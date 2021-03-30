@@ -22,14 +22,18 @@ toggleLabel = function(range) {
     var element_id = range.id.replace("tag_prompt_","")
     var no_text_id = "no_text_" + element_id
     var yes_text_id = "yes_text_" + element_id
+    // Changing the value of particular tags dynamically
     if (val < 0) {
         $('#' + no_text_id).attr('class', 'toggle-false-msg textActive');
         $('#' + yes_text_id).attr('class', 'toggle-true-msg');
+        $('#' + range.id).attr('value', '-1');
     } else if (val == 0) {
         $('#' + no_text_id).attr('class', 'toggle-false-msg');
         $('#' + yes_text_id).attr('class', 'toggle-true-msg');
+        $('#' + range.id).attr('value', '0');
     } else if (val > 0) {
         $('#' + no_text_id).attr('class', 'toggle-false-msg');
         $('#' + yes_text_id).attr('class', 'toggle-true-msg textActive');
+        $('#' + range.id).attr('value', '1');
     }
 }

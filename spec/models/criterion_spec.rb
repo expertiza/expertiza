@@ -7,7 +7,11 @@ describe "criterion" do
   describe "#edit" do
     it "returns the html " do
       html = criterion.edit(0).to_s
+<<<<<<< HEAD
       expect(html).to eq("<tr><td align=\"center\"><a rel=\"nofollow\" data-method=\"delete\" href=\"/questions/1\">Remove</a></td><td><input size=\"6\" value=\"1.0\" name=\"question[1][seq]\" id=\"question_1_seq\" type=\"text\"></td><td><textarea cols=\"50\" rows=\"1\" name=\"question[1][txt]\" id=\"question_1_txt\" placeholder=\"Edit question content here\">test txt</textarea></td><td><input size=\"10\" disabled=\"disabled\" value=\"Criterion\" name=\"question[1][type]\" id=\"question_1_type\" type=\"text\"></td><td><input size=\"2\" value=\"1\" name=\"question[1][weight]\" id=\"question_1_weight\" type=\"text\"></td><td>text area size <input size=\"3\" value=\"\" name=\"question[1][size]\" id=\"question_1_size\" type=\"text\"></td><td> max_label <input size=\"10\" value=\"\" name=\"question[1][max_label]\" id=\"question_1_max_label\" type=\"text\">  min_label <input size=\"12\" value=\"\" name=\"question[1][min_label]\" id=\"question_1_min_label\" type=\"text\"></td></tr>")
+=======
+      expect(html).to eq("<tr><td align=\"center\"><a rel=\"nofollow\" data-method=\"delete\" href=\"/questions/1\">Remove</a></td><td><input size=\"6\" value=\"1.0\" name=\"question[1][seq]\" id=\"question_1_seq\" type=\"text\"></td><td><textarea cols=\"50\" rows=\"1\" name=\"question[1][txt]\" id=\"question_1_txt\" placeholder=\"Edit question content here\">test txt</textarea></td><td><input size=\"10\" disabled=\"disabled\" value=\"Criterion\" name=\"question[1][type]\" id=\"question_1_type\" type=\"text\"></td><td><input size=\"2\" value=\"1\" name=\"question[1][weight]\" id=\"question_1_weight\" type=\"text\"></td><td><input size=\"4\" value=\"\" name=\"question[1][size]\" id=\"question_1_size\" type=\"text\"></td><td> min_label <input size=\"10\" value=\"\" name=\"question[1][min_label]\" id=\"question_1_min_label\" type=\"text\">  max_label <input size=\"12\" value=\"\" name=\"question[1][max_label]\" id=\"question_1_max_label\" type=\"text\"></td></tr>")
+>>>>>>> master
     end
   end
 
@@ -21,7 +25,7 @@ describe "criterion" do
   describe "#complete" do
     it "returns the html without answer and no dropdown or scale" do
       html = criterion.complete(0, nil, 0, 5).to_s
-      expect(html).to eq("<div><label for=\"responses_0\">test txt</label></div>")
+      expect(html).to eq("<div><br><br><label for=\"responses_0\"><b style=\"color: #986633; font-size: x-large\">test txt</b></label></div>")
     end
 
     it "returns the html without answer and dropdown" do

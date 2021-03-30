@@ -8,6 +8,7 @@
   <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
   <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor.participants.first, :stage => @assignment.get_current_stage(topic_id)} %>
 <% end %>
+<<<<<<< HEAD
 
 <!-- Added a checkbox to enable students to mark their review as a sample for others, by E2022 @SujalAhrodia -->
 <input type="checkbox" id="sample_cbx" checked="false"/>
@@ -16,13 +17,23 @@
 <% @review_versions = @map.get_all_versions() %>
 <% if !@review_versions.empty? %>
     <%= @review_versions.each do |response| %>
+=======
+<% @review_versions = @map.get_all_versions %>
+<% unless @review_versions.empty? %>
+    <hr>
+    <h3>Reviews used for Meta-Reviewing</h3>
+    <% @review_versions.each do |response| %>
+>>>>>>> master
     	<%= response.display_as_html() %>
         <br/>
     <% end %>
-    <hr/>
+    <hr>
 <% end %>
 
 <% file_url = nil %>
+  <%if @map.type == 'MetareviewResponseMap'%>
+    <h3>Meta-Review Performed</h3>
+  <%end%>
 <%= @response.display_as_html(nil, nil, file_url) %>
 <br/>
 

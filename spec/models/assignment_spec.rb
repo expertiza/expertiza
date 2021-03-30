@@ -190,7 +190,7 @@ describe Assignment do
         expect(assignment.scores(review1: [question]).inspect).to eq("{:participants=>{:\"1\"=>98}, :teams=>{:\"0\"=>{:team=>#<AssignmentTeam id: 1, "\
           "name: \"no team\", parent_id: 1, type: \"AssignmentTeam\", comments_for_advertisement: nil, advertise_for_partner: nil, "\
           "submitted_hyperlinks: \"---\\n- https://www.expertiza.ncsu.edu\", directory_num: 0, grade_for_submission: nil, "\
-          "comment_for_submission: nil>, :scores=>{:max=>95, :min=>88, :avg=>90.0}}}}")
+          "comment_for_submission: nil, make_public: false>, :scores=>{:max=>95, :min=>88, :avg=>90.0}}}}")
       end
     end
 
@@ -203,7 +203,7 @@ describe Assignment do
         expect(assignment.scores(review: [question]).inspect).to eq("{:participants=>{:\"1\"=>98}, :teams=>{:\"0\"=>{:team=>#<AssignmentTeam id: 1, "\
           "name: \"no team\", parent_id: 1, type: \"AssignmentTeam\", comments_for_advertisement: nil, advertise_for_partner: nil, "\
           "submitted_hyperlinks: \"---\\n- https://www.expertiza.ncsu.edu\", directory_num: 0, grade_for_submission: nil, "\
-          "comment_for_submission: nil>, :scores=>{:max=>95, :min=>88, :avg=>90}}}}")
+          "comment_for_submission: nil, make_public: false>, :scores=>{:max=>95, :min=>88, :avg=>90}}}}")
       end
     end
   end

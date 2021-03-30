@@ -46,7 +46,9 @@
         <% end %>
 
         <!--Team name-->
+        <% team_name_color = get_team_name_color_in_list_submission(team) %>
         <% if @assignment.max_team_size > 1 %>
+<<<<<<< HEAD
           <% team_name_color = get_team_name_color_in_list_submission(team) %>
           <td><p style = <%="color:#{team_name_color}"%>><%= team.name(session[:ip]) %></p>
           <% unless participants.empty? %>
@@ -57,15 +59,24 @@
             <%elsif current_user_is_assignment_participant?(@assignment.id) %>
               <%= render :partial => 'responses', :locals => {:team => team ,:topic_id => topic_identifier, :title => 'Review'} %>
             <% end %>
+=======
+          <td><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
+          <% unless participants.empty? or participants[0].nil?%>
+            <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %></td>
+>>>>>>> master
           <% end %>
         <% end %>
 
         <!--Team member(s) / Participant name-->
           <td>
               <% users_for_curr_team.each do |user| %>
-                  <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
+                  <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post , id:"name"+@l.to_s%>
                   (<%= user.fullname(session[:ip])%>)<br>
               <% end %>
+            <% if @assignment.max_team_size < 2 and ( !participants.empty? or !participants[0].nil?)%>
+              <script>document.getElementById("name<%=@l.to_s %>").style.color = "<%=team_name_color%>"</script>
+              <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %>
+            <%end %>
           </td>
 
         <!--Submitted item(s)-->

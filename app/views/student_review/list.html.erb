@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 -<h2>Reviews for "<%= @assignment.name %>"</h2>
 
+=======
+<h2>Reviews for "<%= @assignment.name %>"</h2>
+<br>
+>>>>>>> master
 <!-- Added the feature to find the reviews and meta-reviews left for students by E1839 @Rayan Dasoriya -->
 <% if @assignment.num_reviews_allowed.nil? || @assignment.num_reviews_allowed == -1%>
     <h4>Your instructor expects you to do <%= @assignment.num_reviews_required %> reviews. You are not allowed to do any extra reviews. </h4>
@@ -8,10 +13,24 @@
     <h4>You should perform exactly <%= @assignment.num_reviews_allowed %> reviews </h4>
 <% else %>
 
-    <h4>You may perform between <%= @assignment.num_reviews_required %> and <%= @assignment.num_reviews_allowed %> reviews</h4>
+    <h4>You may perform between <%= @assignment.num_reviews_required %> to <%= @assignment.num_reviews_allowed %> reviews</h4>
+    <h4>You are required to do <%= @assignment.num_reviews_required %> reviews</h4>
 <% end %>
-<h4>You are required to do <%= @assignment.num_reviews_required %> reviews</h4>
-<h4> Number of reviews left: <%= @assignment.num_reviews_allowed - @num_reviews_completed %></h4>
+
+<br>
+<%if @assignment.num_reviews_required - @num_reviews_completed > -1 %>
+  <h4> Number of required reviews left : <%=  @assignment.num_reviews_required - @num_reviews_completed %></h4>
+<%else %>
+  <h4> Number of required reviews left : 0</h4>
+<%end %>
+<%tot_reviews_left = @assignment.num_reviews_allowed - @num_reviews_completed %>
+<h4> Number of reviews which can be done: <%= tot_reviews_left < 0? 0 : tot_reviews_left %></h4>
+<br>
+
+<%if @assignment.allow_selecting_additional_reviews_after_1st_round.nil? or @assignment.allow_selecting_additional_reviews_after_1st_round == 0  %>
+    <span class="alert-warning">Note: You can only review those works which you reviewed in round 1</span>
+  <br><br>
+<%end%>
 
 <% if !@response_ids.empty? %>
     <%= link_to "Sample Reviews" , sample_reviews_path(:id => @assignment.id)%>
@@ -38,14 +57,14 @@
 <% else %>
     <p><em>Reviews cannot be performed at this time</em></p >
 <% end %>
-
+<br>
 <% if @assignment.metareview_allowed(@topic_id) or @assignment.get_current_stage() == "Complete" %>
     <h2>Metareviews for "<%= @assignment.name %>"</h2>
-
+  <br>
     <% if @assignment.num_metareviews_allowed.nil? || @assignment.num_metareviews_allowed == -1%>
 
     <% else %>
-        <h4>Number of Meta-Reviews Allowed: "<%= @assignment.num_metareviews_allowed %>"</h4>
+        <h4>Number of Meta-Reviews Allowed: <%= @assignment.num_metareviews_allowed %></h4>
     <% end %>
     <h4>You are required to do <%= @assignment.num_metareviews_required %> meta-reviews</h4>
     <h4> Number of Meta-Reviews left: <%= @assignment.num_metareviews_allowed - @num_metareviews_completed %></h4>
@@ -61,4 +80,5 @@
 <% end %>
 
 <br><br>
-<a href="javascript:window.history.back()">Back</a>
+<!--<a href="javascript:window.history.back()">Back</a>-->
+<%= link_to "back",:controller => 'student_task',:action=>"view", :id => params[:id] %>

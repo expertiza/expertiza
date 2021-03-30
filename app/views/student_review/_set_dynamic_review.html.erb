@@ -41,7 +41,7 @@
       <% end %>
     </table>
 
-  <p><input type='submit' value='Request a new submission to review'/></p>
+  <p><input type='submit' value='Request a new submission to review' data-disable-with="Requesting.."/></p>
     <% end %>
   <%end%>
 <% else %>
@@ -51,7 +51,7 @@
                  :action => 'assign_reviewer_dynamically',
                  :assignment_id => assignment.id,
                  :reviewer_id => session[:user].id do %>
-    <p><input type='submit' value='Request a new submission to review'/></p>
+    <p><input type='submit' value='Request a new submission to review' data-disable-with="Requesting.."/></p>
   <% end %>
   <%end%>
 <% end %>

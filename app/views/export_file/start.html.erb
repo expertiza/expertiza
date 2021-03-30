@@ -58,9 +58,13 @@
     <input type='submit' value='Export Advices' onclick='{export_advices.submit();}'/>
     <br/><br/>
   <% end %>
+<<<<<<< HEAD
 <% else %>
   <!-- Hiding Export Details feature from the Course Participant view -->
   <% if @model != 'CourseParticipant' %>
+=======
+<% elsif @model == 'Assignment'%>
+>>>>>>> master
   <h2>Export Details</h2>
   <%= form_tag({:controller => 'export_file', :action => 'exportdetails'}, {:method => 'post', :multipart => true, :name => 'export_details_form'}) do %>
     <table>

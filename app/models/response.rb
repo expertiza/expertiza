@@ -6,7 +6,10 @@ class Response < ActiveRecord::Base
   include Lockable
   include ResponseAnalytic
   belongs_to :response_map, class_name: 'ResponseMap', foreign_key: 'map_id', inverse_of: false
+<<<<<<< HEAD
   
+=======
+>>>>>>> master
   has_many :scores, class_name: 'Answer', foreign_key: 'response_id', dependent: :destroy, inverse_of: false
   # TODO: change metareview_response_map relationship to belongs_to
   has_many :metareview_response_maps, class_name: 'MetareviewResponseMap', foreign_key: 'reviewed_object_id', dependent: :destroy, inverse_of: false
@@ -152,9 +155,15 @@ class Response < ActiveRecord::Base
     overall_avg_vol = (Lingua::EN::Readability.new(comments).num_words / (counter.zero? ? 1 : counter)).round(0)
     review_comments_volume = []
     review_comments_volume.push(overall_avg_vol)
+<<<<<<< HEAD
     (1..num_rounds).each do |round|
       num = Lingua::EN::Readability.new(@comments_in_round[round]).num_words
       den = (@counter_in_round[round].zero? ? 1 : @counter_in_round[round])
+=======
+    (1..3).each do |i|
+      num = Lingua::EN::Readability.new(instance_variable_get('@comments_in_round' + i.to_s)).num_words
+      den = (instance_variable_get('@counter_in_round' + i.to_s).zero? ? 1 : instance_variable_get('@counter_in_round' + i.to_s))
+>>>>>>> master
       avg_vol_in_round = (num / den).round(0)
       review_comments_volume.push(avg_vol_in_round)
     end

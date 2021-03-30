@@ -5,11 +5,18 @@
 <% assignment = Assignment.find(@assignment_id) %>
 <% if !assignment.vary_by_topic %>
 
+<<<<<<< HEAD
   <h2> Review scores: <%= Participant.find(@reviewer_id).name %> </h2>
 
   <% keys = @review_final_versions.keys %>
   <% keys.each do |key| %>
 
+=======
+<% keys = @review_final_versions.keys %>
+<% keys.each do |key| %>
+    <br>
+    <hr>
+>>>>>>> master
     <h4>Course: <%= Assignment.find(@assignment_id).course.name %></h4>
     <h4> Assignment: <%= Assignment.find(@assignment_id).name %></h4>
     <% roundtitle = key.to_s %>
@@ -21,7 +28,6 @@
       <% num_responses = @review_final_versions[key][:response_ids].length %>
       <% responses = @review_final_versions[key][:response_ids] %>
       <% questions.each do |question| %>
-
           <% if !question.is_a?(QuestionnaireHeader) && num_responses > 0 %>
               <tr>
                 <th colspan="3" style="background-color:#DDDDBB" > [Question] <%= question.txt %> </th>
@@ -33,7 +39,11 @@
                         <tr>
                           <% responses.each do |response_id| %>
                               <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
+<<<<<<< HEAD
                               <td><%= team.name(session[:ip]) %></td>
+=======
+                              <td><b><%= team.name %></b> <div style ="font-size:11px"> done at -- <%= Response.find(response_id).updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p") %> &nbsp&nbsp</div></td>
+>>>>>>> master
                           <% end %>
                         </tr>
 
@@ -55,6 +65,7 @@
                     <td width="70%"> Comments</td>
                   </tr>
 
+<<<<<<< HEAD
             <% responses.each do |response_id| %>
               <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
                 <% if !answer.nil? %>
@@ -77,6 +88,36 @@
                           <td align='center'>
                             <p style="color: <%= col_color %>"><%= answer.answer == 0 ? image_tag("delete_icon.png") : image_tag("Check-icon.png") %></p>
                           </td>
+=======
+                  <% responses.each do |response_id| %>
+                      <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
+                      <% if !answer.nil? %>
+                          <tr>
+                            <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
+                            <% response_map = ReviewResponseMap.where(reviewed_object_id: @assignment_id,
+                                                                      reviewer_id: @reviewer_id,
+                                                                      reviewee_id: team.id).last %>
+                            <% response_update_at = response_map.try(:response).try(:last).try(:updated_at) %>
+                            <% review_graded_at = ReviewGrade.find_by(participant_id: @reviewer_id).try(:review_graded_at) %>
+                            <% col_color = 'black' %>
+                            <% col_color = 'blue' if review_graded_at && response_update_at && response_update_at > review_graded_at %>
+                            <!--Reviewee-->
+                            <td>
+                              <b><%= team.name %></b>  <div style ="font-size:11px"> done at -- <%= Response.find(response_id).updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p") %> &nbsp&nbsp</div>
+                            </td>
+                            <!--Score-->
+                            <% if question.instance_of? Checkbox %>
+                                <td align='center'>
+                                  <p style="color: <%= col_color %>"><%= answer.answer == 0 ? image_tag("delete_icon.png") : image_tag("Check-icon.png") %></p>
+                                </td>
+                            <% else %>
+                                <td align='center'><p style="color: <%= col_color %>"><%= answer.answer %></p></td>
+                            <% end %>
+
+                            <!--Comments-->
+                            <td align='left'><p style="color: <%= col_color %>"><%= answer.comments.html_safe unless answer.comments.nil? %></p></td>
+                          </tr>
+>>>>>>> master
                       <% else %>
                           <td align='center'><p style="color: <%= col_color %>"><%= answer.answer %></p></td>
                       <% end %>
@@ -91,9 +132,15 @@
               <% end %>
             <% end %>
           <% end %>
+<<<<<<< HEAD
         <% else %>
           <% next %>
         <% end %>
+=======
+        <tr>
+          <td style=" border-left: hidden; border-right: hidden; height: 10px;" colspan="3"></td>
+        </tr>
+>>>>>>> master
       <% end %>
       <tr>
         <th align='left' style="background-color:#DDDDBB"> Reviewee</th>
@@ -103,7 +150,11 @@
       <% responses.each do |response_id| %>
           <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
           <tr>
+<<<<<<< HEAD
             <td> <%= team.name(session[:ip]) %> </td>
+=======
+            <td> <b><%= team.name %></b> <div style ="font-size:11px"> done at -- <%= Response.find(response_id).updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p") %> &nbsp&nbsp</div></td>
+>>>>>>> master
             <td colspan="2"> <%=sanitize Response.find(response_id).additional_comment %> </td>
           </tr>
       <% end %>

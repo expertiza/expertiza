@@ -1,3 +1,45 @@
+<script>
+
+    window.onpageshow = function (event) {
+        if (event.persisted) {
+            window.location.reload(); //reload page if it has been loaded from history (back button)
+        }
+    };
+
+    function putOverlay(){
+            // freeze the form until it's updated
+            displayOverlay("Please Wait...");
+            // delay one second to let the data saved if the user switch back and forth
+            setTimeout(function() {
+                removeOverlay();
+            }, 50000);
+    }
+    //overlay to block user entering new info before the form is updated with data from the server
+    function displayOverlay(text) {
+        $("<table id='overlay'><tbody><tr><td>" + text + "</td></tr></tbody></table>").css({
+            "position": "fixed",
+            "top": "0px",
+            "left": "0px",
+            "width": "100%",
+            "height": "100%",
+            "background-color": "rgba(0,0,0,.5)",
+            "z-index": "10000",
+            "vertical-align": "middle",
+            "text-align": "center",
+            "color": "#fff",
+            "font-size": "40px",
+            "font-weight": "bold",
+            "cursor": "wait"
+        }).appendTo("body");
+    }
+
+    function removeOverlay() {
+        $("#overlay").remove();
+    }
+
+</script>
+
+
 
 
 <h1>
@@ -19,6 +61,7 @@
   <%if @topics.size > 0 %>
     <% if @authorization == 'participant' || @authorization == 'submitter' %>
       <li>
+<<<<<<< HEAD
         <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.id%>
         (Sign up for a topic)
       </li>
@@ -34,13 +77,24 @@
       <% end %>
     <% end %>
   <%end%>
+=======
+        <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'list', :id => @participant.id, :onclick => 'putOverlay()'%>
+        (Sign up for a topic)  &nbsp
+      <%end%>
+  <%end%>
+      <%if @can_provide_suggestions == true %>
+          <%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id}, :onclick => 'putOverlay()' %>
+        <% end %>
+      </li>
+
+>>>>>>> master
 
 <!--ACS Here we need to know the size of the team to decide whether or not
 to display the label "Your team" in the student assignment tasks-->
   <%if @assignment.max_team_size > 1 %>
     <% if @authorization == 'participant' %>
       <li>
-        <%= link_to 'Your team', view_student_teams_path(student_id: @participant.id) %>
+        <%= link_to 'Your team', view_student_teams_path(student_id: @participant.id), :onclick => 'putOverlay()' %>
         (View and manage your team)
       </li>
     <% end %>
@@ -51,14 +105,14 @@ to display the label "Your team" in the student assignment tasks-->
     <li>
       <% if @topics.size > 0 %>
         <% if @topic_id and @assignment.submission_allowed(@topic_id) %>
-          <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> (Submit and view your work)
+          <%= link_to 'Your work', {:controller => 'submitted_content', :action => 'edit', :id => @participant.id} ,data: { disable_with: "Loading..." }, :onclick => 'putOverlay()'%> (Submit and view your work)
         <% else %>
           <!--if one team do not hold a topic (still in waitlist), they cannot submit their work.-->
           <font color="gray">Your work</font> (You have to choose a topic first)
         <% end %>
       <% else %>
         <% if @assignment.submission_allowed(@topic_id) %>
-          <%= link_to 'Your work', :controller => 'submitted_content', :action => 'edit', :id => @participant.id %> (Submit and view your work)
+          <%= link_to 'Your work', {:controller => 'submitted_content', :action => 'edit', :id => @participant.id },data: { disable_with: "Loading...."}, :onclick => 'putOverlay()' %> (Submit and view your work)
         <% else %>
           <font color="gray">Your work</font> (You are not allowed to submit your work right now)
         <% end %>
@@ -76,10 +130,15 @@ to display the label "Your team" in the student assignment tasks-->
       <% end %>
       <!--Zhewei: professor mentioned that a submission is reviewable if the submission is in a stage where reviews can be done. It does not depend on the stage of the topic the reviewer is writing on-->
       <!--Akshay: Fix Issue 1218 - this link is disabled if assignment does not require any peer reviews-->
+<<<<<<< HEAD
       <%if @can_review==false and @assignment.is_conference_assignment%>
         <font color="gray"><%= @alias_name%></font>
       <% elsif review_deadline?(@assignment) and (check_reviewable_topics(@assignment) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@topic_id) == "Finished") %>
         <%= link_to "#{@alias_name}",{:controller => 'student_review', :action => 'list', :id => @participant.id} %>
+=======
+      <% if review_deadline?(@assignment) and  (check_reviewable_topics(@assignment) or @assignment.metareview_allowed(nil) or @assignment.get_current_stage(@topic_id) == "Finished") %>
+        <%= link_to "#{@alias_name}",{:controller => 'student_review', :action => 'list', :id => @participant.id}, :onclick => 'putOverlay()' %>
+>>>>>>> master
       <% else %>
         <font color="gray"><%= @alias_name%></font>
       <% end %>
@@ -112,14 +171,16 @@ to display the label "Your team" in the student assignment tasks-->
       <% end %>
     </li>
   <% end %>
-    <%if @can_provide_suggestions == true %>
-      <li><%= link_to "Suggest a topic",{:controller => 'suggestion', :action => 'new', :id => @assignment.id} %></li>
-    <% end %>
 
     <% if @assignment.get_current_stage(@topic_id) == "Complete" %>
       <!-- removed code for survey assignment add in line above && SurveyHelper::is_user_eligible_for_survey?	(@assignment.id, session[:user].id)  -->
       <li><%= link_to "Take a survey",{:controller => 'survey_response', :action => 'begin_survey', :id => @assignment.id} %> (This will log you out)</li>
     <% end %>
+      <li>
+            <%= link_to "Sample submissions", controller: 'sample_submissions', :action => 'index', :id => @assignment.id %>
+            (View sample work submitted by other participants/teams)
+      </li>
+
     <li><%= link_to "Change your handle", {:controller => 'participants', :action => 'change_handle', :id => @participant.id} %> (Provide a different handle for this assignment)</li>
   </ul>
   <br>

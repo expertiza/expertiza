@@ -21,10 +21,10 @@
       <ul class="nav navbar-nav navbar-right">
         <% if current_user %>
             <% if session[:super_user] %>
-                <li class="impersonate-box">
+            <li class="impersonate-box">
                   <%= form_for :impersonate, url: '/impersonate/impersonate', html: {id: 'impersonate-form'} do |f| %>
                       <div class="input-group">
-                        <%= f.text_field :name, {id: 'inputImpersonateBox', class: 'form-control', placeholder: "impersonate..."} %>
+                        <%= f.text_field :name, {id: 'inputImpersonateBox', class: 'form-control', placeholder: "impersonate...", autocomplete: "off"} %>
                         <span class="input-group-btn">
                         <button type="button" class="btn btn-primary" id="impersonate-button">Revert</button>
                         </span>
@@ -39,7 +39,16 @@
                 </li>
             <% end %>
             <li id="user-label">
-              <span >User: <%= current_user.name(session[:ip]) %></span>
+              <table style="height:55px">
+                <% if session[:super_user] %>
+                  <tr>
+                <td><span >Original User: <%= session[:super_user].name %></span></td>
+                  </tr>
+                <%end %>
+                <tr>
+                <td><span >Current User: <%= current_user.name(session[:ip]) %></span></td>
+                </tr>
+              </table>
             </li>
             <li class="divider-vertical"></li>
             <li class="right-most logout-box">

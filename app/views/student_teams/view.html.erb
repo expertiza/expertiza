@@ -1,13 +1,13 @@
 <h1>Team Information for <%= @student.assignment.name %></h1>
 
 <% if @student.team == nil %>
-  You no longer have a team!
+  You are currently on no team.
   <h3>Name team</h3>
   <%= form_tag :controller => 'student_teams', :action => 'create' do %>
     <%= hidden_field_tag 'student_id', @student.id %>
     <label for="team_name">Team name:</label>&nbsp;
     <%= text_field 'team', 'name' %>
-    <%= submit_tag "Name team" %>
+    <%= submit_tag "Name team", data: { disable_with: "Submitting..." } %>
   <% end %>
 <% else %>
   <b style="text-align: center">Team Name: &nbsp;&nbsp;</b><%= @student.team.name(session[:ip]) %> &nbsp;&nbsp;&nbsp;
@@ -59,7 +59,7 @@
     <tr>
       <td colspan="3">
         <br/>
-        <%= link_to "Leave team", remove_participant_student_teams_path(student_id: @student.id, team_id: @student.team.id) %>
+        <%= link_to "Leave team", remove_participant_student_teams_path(student_id: @student.id, team_id: @student.team.id), data: { disable_with: "Leave team" } %>
       <td>
     </tr> <!--E2081 TODO Table for self contribution Cake questions-->
     <%# <% if @teammate_review_allowed %>
@@ -102,7 +102,7 @@
                   <td align = "center">Declined</td>
                 <% else %>
                   <td align = "center">Waiting for reply
-                  &nbsp;&nbsp;<%= link_to "Retract", {:controller => 'invitations', :action => 'cancel', :inv_id => inv.id, :student_id => @student.id} %></td>
+                  &nbsp;&nbsp;<%= link_to "Retract", {:controller => 'invitations', :action => 'cancel', :inv_id => inv.id, :student_id => @student.id}, data: { disable_with: "Retract" } %></td>
                 <% end %>
              </tr>
           <% end %>
@@ -131,7 +131,7 @@
            <tr>
             <td>
               Enter user login: <%= text_field_with_auto_complete :user, :name, {:size => 41} %>
-              <input type='submit' value='Invite'/>
+              <%= submit_tag "Invite", data: { disable_with: "Sending..." } %>
             </td>
            </tr>
          </table>
@@ -192,7 +192,8 @@
                   %>
                   |
                   <%= link_to "Decline",
-                              {:controller => 'invitations', :action => 'decline', :inv_id => inv.id, :student_id => @student.id}
+                              {:controller => 'invitations', :action => 'decline', :inv_id => inv.id, :student_id => @student.id},
+                              data: { disable_with: "Decline" }
                   %>
                 </td>
               </tr>

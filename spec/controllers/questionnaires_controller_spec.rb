@@ -47,11 +47,16 @@ describe QuestionnairesController do
 
       context 'when current user is the ta of the course which current questionnaires belongs to' do
         it 'allows certain action' do
+<<<<<<< HEAD
           teaching_assistant = create(:teaching_assistant)
           stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
           course = create(:course)
           TaMapping.create(ta_id: teaching_assistant.id, course_id: course.id)
           check_access(teaching_assistant).to be true
+=======
+          allow(TaMapping).to receive(:exists?).with(ta_id: 8, course_id: 1).and_return(true)
+          check_access(ta).to be false
+>>>>>>> master
         end
       end
 

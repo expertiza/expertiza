@@ -170,9 +170,11 @@ class ReviewMappingController < ApplicationController
   def assign_metareviewer_dynamically
     assignment = Assignment.find(params[:assignment_id])
     metareviewer = AssignmentParticipant.where(user_id: params[:metareviewer_id], parent_id: assignment.id).first
-
-    assignment.assign_metareviewer_dynamically(metareviewer)
-
+    begin
+      assignment.assign_metareviewer_dynamically(metareviewer)
+    rescue StandardError => e
+      flash[:error] = e
+    end
     redirect_to controller: 'student_review', action: 'list', id: metareviewer.id
   end
 
@@ -191,8 +193,22 @@ class ReviewMappingController < ApplicationController
     team = AssignmentTeam.find(params[:contributor_id])
     review_response_maps = team.review_mappings
     num_remain_review_response_maps = review_response_maps.size
+    # Iterate through every response and related answers and check whether they are empty or not
     review_response_maps.each do |review_response_map|
-      unless Response.exists?(map_id: review_response_map.id)
+      flag = nil
+      if review_response_map and Response.exists?(map_id: review_response_map.id)
+        Response.where(map_id: review_response_map.id).each do |response|
+          break unless flag.nil?
+          flag = 1 unless response.additional_comment.empty?
+          Answer.where(response_id: response.id).each do |answer|
+            if !answer.comments.empty? or (answer.answer != 0 and !answer.answer.nil?)
+              flag = 1
+            end
+            break unless flag.nil?
+          end
+        end
+      end
+      if flag.nil?
         ReviewResponseMap.find(review_response_map.id).destroy
         num_remain_review_response_maps -= 1
       end
@@ -246,11 +262,28 @@ class ReviewMappingController < ApplicationController
 
   def delete_reviewer
     review_response_map = ReviewResponseMap.find_by(id: params[:id])
-    if review_response_map and !Response.exists?(map_id: review_response_map.id)
+    if review_response_map and Response.exists?(map_id: review_response_map.id)
+      # Iterate through every response and related answers and check whether they are empty or not
+      Response.where(map_id: review_response_map.id).each do |response|
+        unless response.additional_comment.empty?
+          flash[:error] = "This reviewer has already started the review. Hence, it cannot been deleted."
+          redirect_to :back
+          return
+        end
+        Answer.where(response_id: response.id).each do |answer|
+          if !answer.comments.empty? or (answer.answer != 0 and !answer.answer.nil?)
+            flash[:error] = "This reviewer has already started the review. Hence, it cannot been deleted."
+            redirect_to :back
+            return
+          end
+        end
+      end
+    end
+    if review_response_map
       review_response_map.destroy
       flash[:success] = "The review mapping for \"" + review_response_map.reviewee.name + "\" and \"" + review_response_map.reviewer.name + "\" has been deleted."
     else
-      flash[:error] = "This review has already been done. It cannot been deleted."
+      flash[:error] = "No review found."
     end
     redirect_to :back
   end

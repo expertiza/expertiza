@@ -3,6 +3,7 @@
 <%= tinymce_assets %>
 <%= tinymce %>
 <script>
+<<<<<<< HEAD
 
   /*
    * Added for E1973, team-based reviewing:
@@ -15,6 +16,15 @@
   window.onbeforeunload = release_lock;
 
   // todo: to be moved to assets, once it's fixed so that not every script is loaded in every page.
+=======
+  // Code to restrict user to come back to this page
+  // using browser's back button
+    window.history.forward();
+    function noBack() {
+        window.history.forward();
+    }
+// todo: to be moved to assets, once it's fixed so that not every script is loaded in every page.
+>>>>>>> master
   //detect if the window is in foreground or background
   var vis = (function(){
     var stateKey, eventKey, keys = {
@@ -334,14 +344,15 @@
 <% end %>
 
 <!-- display all versions available -->
-<% @responses_versions = Array.new %>
-<% @responses_versions = @map.get_all_versions() %>
-
-<% if @responses_versions.empty? %>
-    <I>No previous review was performed.</I><br/><hr/><br/>
-<% else %>
-    <%= render :partial => 'review', :locals => {:versions => @responses_versions} %>
+<% @review_versions = @map.get_all_versions %>
+<% unless @review_versions.empty? %>
+  <%@review_versions.each do |response| %>
+    <%= response.display_as_html %>
+    <br/>
+  <% end %>
+  <hr/>
 <% end %>
+
 <h2>Directions for the reviewer</h2>
 <input type="checkbox" id="autosave_cbx" checked>
 <label id="autosave_cbx_lbl" for="autosave_cbx"></label>
@@ -362,8 +373,11 @@
               <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
             <% elsif question.instance_of? Scale %>
               <%= question.complete(i, @questionnaire.min_question_score, @questionnaire.max_question_score, answer) %>
+<<<<<<< HEAD
             <% elsif question.instance_of? Cake %>
               <%= question.complete(i, answer, @total_score[question.id].to_s) %>  
+=======
+>>>>>>> master
             <% else %>
               <%= question.complete(i, answer) %>
             <% end %>
@@ -377,7 +391,8 @@
       </tr>
       <tr>
         <td>
-          <label for="review_comments">Additional Comments</label><BR/>
+          <br><br>
+          <label for="review_comments"><b style="color: #986633; font-size: x-large">Additional Comments:</b></label><br/>
           <textarea cols="70" rows="1" id="review_comments" name="review[comments]" style="overflow:hidden;" class="tinymce">
             <% if controller.action_name != 'new' and @response.additional_comment != nil %>
                 <%= @response.additional_comment.strip if !@response.nil?%>

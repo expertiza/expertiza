@@ -175,7 +175,7 @@
             <!-- FeedbackResponseMap is NOT blank, prepare table data: -->
               <% @reviewee_name = Participant.find(@frm.reviewee_id).user.fullname(session[:ip]) %>
               <% if Response.exists?(map_id: @frm.id) %>
-                <% feedback_response = Response.where(map_id: @frm.id).first %>
+                <% feedback_response = Response.where(map_id: @frm.id).last %>
                 <!--Review response rejoined-->
                 <td id = "green"  align='left' colspan=1>
                   <!-- Display link with username of reviewer -->

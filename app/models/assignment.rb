@@ -18,6 +18,7 @@ class Assignment < ActiveRecord::Base
   belongs_to :course
   belongs_to :instructor, class_name: 'User',inverse_of: :assignments
   has_one :assignment_node, foreign_key: 'node_object_id', dependent: :destroy, inverse_of: :assignment
+  has_one :assignment, foreign_key: 'sample_assignment_id', dependent: :destroy
   has_many :participants, class_name: 'AssignmentParticipant', foreign_key: 'parent_id', dependent: :destroy
   has_many :users, through: :participants, inverse_of: :assignment
   has_many :due_dates, class_name: 'AssignmentDueDate', foreign_key: 'parent_id', dependent: :destroy, inverse_of: :assignment
@@ -478,8 +479,14 @@ class Assignment < ActiveRecord::Base
     questionnaires = @assignment.questionnaires
     questionnaires.each do |questionnaire|
       if @assignment.vary_by_round
-        round = AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: @questionnaire.id).used_in_round
-        questionnaire_symbol = round.nil? ? questionnaire.symbol : (questionnaire.symbol.to_s + round.to_s).to_sym
+
+      # if @assignment.varying_rubrics_by_round?
+        round = AssignmentQuestionnaire.find_by(assignment_id: @assignment.id, questionnaire_id: questionnaire.id).used_in_round
+        questionnaire_symbol = if round.nil?
+                                 questionnaire.symbol
+                               else
+                                 (questionnaire.symbol.to_s + round.to_s).to_sym
+                               end
       else
         questionnaire_symbol = questionnaire.symbol
       end
@@ -495,8 +502,10 @@ class Assignment < ActiveRecord::Base
     (0..@scores[:teams].length - 1).each do |index|
       team = @scores[:teams][index.to_s.to_sym]
       first_participant = team[:team].participants[0] unless team[:team].participants[0].nil?
-      teams_csv = []
-      teams_csv << team[:team].name
+      next if first_participant.nil?
+      pscore = @scores[:participants][first_participant.id.to_s.to_sym]
+      tcsv = []
+      tcsv << team[:team].name
       names_of_participants = ''
       team[:team].participants.each do |p|
         names_of_participants += p.fullname

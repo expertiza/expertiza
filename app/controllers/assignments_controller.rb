@@ -8,7 +8,15 @@ class AssignmentsController < ApplicationController
   # determines if an action is allowed for a user
   def action_allowed?
     if %w[edit update list_submissions].include? params[:action]
+<<<<<<< HEAD
       current_user_has_admin_privileges? || current_user_teaching_staff_of_assignment?(params[:id])
+=======
+      assignment = Assignment.find(params[:id])
+      (%w[Super-Administrator Administrator].include? current_role_name) ||
+          (assignment.instructor_id == current_user.try(:id)) ||
+          TaMapping.exists?(ta_id: current_user.try(:id), course_id: assignment.course_id) ||
+          (assignment.course_id && Course.find(assignment.course_id).instructor_id == current_user.try(:id))
+>>>>>>> master
     else
       current_user_has_ta_privileges?
     end
@@ -126,13 +134,29 @@ class AssignmentsController < ApplicationController
     file_path
   end
 
+<<<<<<< HEAD
   # makes a copy of an assignment
+=======
+  def checktopicscopy
+    @assignment_id = params[:id]
+  end
+
+>>>>>>> master
   def copy
     update_copy_session
     # check new assignment submission directory and old assignment submission directory
+<<<<<<< HEAD
     new_assign_id = AssignmentForm.copy(params[:id], @user)
     if new_assign_id
       if check_same_directory?(params[:id], new_assign_id)
+=======
+    old_assign = Assignment.find(params[:id])
+    new_assign_id = AssignmentForm.copy(params[:id], params[:copyoption], @user)
+    if new_assign_id
+      flash[:success] = 'The assignment was successfully Copied.'
+      new_assign = Assignment.find(new_assign_id)
+      if old_assign.directory_path == new_assign.directory_path
+>>>>>>> master
         flash[:note] = "Warning: The submission directory for the copy of this assignment will be the same as the submission directory "\
           "for the existing assignment. This will allow student submissions to one assignment to overwrite submissions to the other assignment. "\
           "If you do not want this to happen, change the submission directory in the new copy of the assignment."
@@ -396,7 +420,7 @@ class AssignmentsController < ApplicationController
   # ensures due dates ahave a name, description and at least either meta reviews, topic drops, signups, or team formations
   def validate_due_date
     @due_date_nameurl_not_empty && @due_date_nameurl_not_empty_checkbox &&
-      (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
+        (@metareview_allowed || @drop_topic_allowed || @signup_allowed || @team_formation_allowed)
   end
 
   # checks if each questionnaire in an assignment is used
@@ -473,8 +497,10 @@ class AssignmentsController < ApplicationController
   def retrieve_assignment_form
     @assignment_form = AssignmentForm.create_form_object(params[:id])
     @assignment_form.assignment.instructor ||= current_user
-    params[:assignment_form][:assignment_questionnaire].reject! do |q|
-      q[:questionnaire_id].empty?
+    unless params[:assignment_form][:assignment_questionnaire].nil?
+      params[:assignment_form][:assignment_questionnaire].reject! do |q|
+        q[:questionnaire_id].empty?
+      end
     end
 
     # Deleting Due date info from table if meta-review is unchecked. - UNITY ID: ralwan and vsreeni

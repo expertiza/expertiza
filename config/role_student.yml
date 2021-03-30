@@ -240,6 +240,16 @@ development:
         parent_id:
         site_controller_id: 23
         url: "/student_task/list"
+      50: &24 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 15
+        id: 50
+        label: Anonymized view
+        name: anonymized_view
+        parent:
+        parent_id:
+        site_controller_id:
+        url: "/users/set_anonymized_view"
       30: &3 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 42
@@ -307,6 +317,7 @@ development:
       children:
       - 1
       - 26
+      - 50
       - 30
       - 27
       - 2
@@ -506,6 +517,7 @@ test:
       - 1
       - 5
       - 6
+      - 50
       - 7
       - 50
     by_id:
@@ -529,6 +541,16 @@ test:
         controller_action_id: 33
         content_page_id:
         url: "/student_task/list"
+      50: &24 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 15
+        id: 50
+        label: Anonymized view
+        name: anonymized_view
+        parent:
+        parent_id:
+        site_controller_id:
+        url: "/users/set_anonymized_view"
       6: &3 !ruby/object:Menu::Node
         parent:
         parent_id:
@@ -827,6 +849,16 @@ production:
         parent_id:
         site_controller_id: 23
         url: "/student_task/list"
+      50: &24 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 15
+        id: 50
+        label: Anonymized view
+        name: anonymized_view
+        parent:
+        parent_id:
+        site_controller_id:
+        url: "/users/set_anonymized_view"
       30: &3 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 42
@@ -894,6 +926,7 @@ production:
       children:
       - 1
       - 26
+      - 50
       - 30
       - 27
       - 2

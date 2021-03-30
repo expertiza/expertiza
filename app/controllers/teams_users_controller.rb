@@ -24,12 +24,15 @@ class TeamsUsersController < ApplicationController
   def create
     user = User.find_by(name: params[:user][:name].strip)
     unless user
-      urlCreate = url_for controller: 'users', action: 'new'
+      urlCreate = url_for controller: 'users', action: 'new', role: 'Student'
       flash[:error] = "\"#{params[:user][:name].strip}\" is not defined. Please <a href=\"#{urlCreate}\">create</a> this user before continuing."
+      redirect_to controller: 'teams_users', action: 'new', id: params[:id]
+      return
     end
 
     team = Team.find(params[:id])
 
+<<<<<<< HEAD
     if !user.nil?
       if team.is_a?(AssignmentTeam)
         assignment = Assignment.find(team.parent_id)
@@ -55,6 +58,32 @@ class TeamsUsersController < ApplicationController
           @teams_user = TeamsUser.last
           undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
         end
+=======
+    if team.is_a?(AssignmentTeam)
+      assignment = Assignment.find(team.parent_id)
+      #error was undefined column assignment_id in Participants
+      if AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id).nil?
+        urlAssignmentParticipantList = url_for controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment', authorization: 'participant'
+        flash[:error] = "\"#{user.name}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
+      else
+        add_member_return = team.add_member(user, team.parent_id)
+        flash[:error] = "This team already has the maximum number of members." if add_member_return == false
+
+        @teams_user = TeamsUser.last
+        undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
+      end
+    else # CourseTeam
+      course = Course.find(team.parent_id)
+      if CourseParticipant.find_by(user_id: user.id, parent_id: course.id).nil?
+        urlCourseParticipantList = url_for controller: 'participants', action: 'list', id: course.id, model: 'Course', authorization: 'participant'
+        flash[:error] = "\"#{user.name}\" is not a participant of the current course. Please <a href=\"#{urlCourseParticipantList}\">add</a> this user before continuing."
+      else
+        add_member_return = team.add_member(user)
+        flash[:error] = "This team already has the maximum number of members." if add_member_return == false
+
+        @teams_user = TeamsUser.last
+        undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
+>>>>>>> master
       end
     end
     

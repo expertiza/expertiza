@@ -5,7 +5,10 @@ module AssignmentHelper
       ta = Ta.find(session[:user].id)
       ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id) }
       # If a TA created some courses before, s/he can still add new assignments to these courses.
+<<<<<<< HEAD
       #Only those courses should be shown in the dropdown list of courses, the assignment is part of and the instructor or TA has access to.
+=======
+>>>>>>> master
       courses << Course.where(instructor_id: ta.id)
       courses.flatten!
     # Administrator and Super-Administrator can see all courses
@@ -28,9 +31,21 @@ module AssignmentHelper
       options << ['-----------', nil]
     end
     courses.each do |course|
-      options << [course.name, course.id]
+      options << [course.name.strip, course.id]
     end
     options.uniq.sort
+  end
+
+  # Sample submission options
+  def sample_sub_options
+    assignments = Assignment.where.not(course_id: [nil, 0])
+    options = []
+    assignments.each do |assignment|
+      course_name = Course.find(assignment.course_id).try(:name)
+      options << [course_name + ' - ' + assignment.name, assignment.id]
+    end
+    options.uniq.sort
+    options.unshift(['-----------', nil])
   end
 
   # round=0 added by E1450

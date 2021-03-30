@@ -4,6 +4,8 @@ class Checkbox < UnscoredQuestion
   def edit(count)
     html = edit_remove_button(count) + edit_seq(count) + edit_question(count)
     html += edit_type(count) + edit_weight(count)
+    html += '<td style="color: grey">N/A</td>'
+    html += '<td style="color: grey">No labels required</td>'
     safe_join(["<tr>".html_safe, "</tr>".html_safe], html.html_safe)
   end
 
@@ -32,7 +34,7 @@ class Checkbox < UnscoredQuestion
   end
 
   def edit_weight(_count)
-    html = '<td><!--placeholder (UnscoredQuestion does not need weight)--></td>'
+    html = '<td style="color: grey">Checkbox questions does not need weight</td>'
     html
   end
 

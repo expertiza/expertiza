@@ -302,8 +302,8 @@ describe AssignmentsController do
     end
 
     context 'when new assignment directory is same as old' do
-      it 'should show an error and redirect to assignments#edit page' do
-        allow(AssignmentForm).to receive(:copy).with('1', instructor).and_return(2)
+      it 'should show an error and redirect to assignments#checktopicscopy page' do
+        allow(AssignmentForm).to receive(:copy).with("1", nil, instructor).and_return(2)
         allow(Assignment).to receive(:find).with(2).and_return(new_assignment2)
         params = {id: 1}
         session = {user: instructor}
@@ -316,16 +316,25 @@ describe AssignmentsController do
       end
     end
 
-    context 'when new assignment id does not fetch successfully' do
-      it 'shows an error flash message and redirects to assignments#edit page' do
-        allow(assignment).to receive(:dup).and_return(new_assignment)
-        allow(new_assignment).to receive(:save).and_return(false)
+    context 'when new assignment is not able to be copied' do
+      it 'should show an error and redirect to assignments#tree display page' do
+        allow(AssignmentForm).to receive(:copy).with("1", nil, instructor).and_return(false)
+        allow(Assignment).to receive(:find).with(2).and_return(false)
         params = {id: 1}
         get :copy, params
         expect(flash[:note]).to be_nil
         expect(flash[:error]).to eq('The assignment was not able to be copied. Please check the original assignment for missing information.')
         expect(response).to redirect_to('/tree_display/list')
       end
+    end
+  end
+
+  describe '#checktopicscopy' do
+    it 'renders checktopicscopy page' do
+      allow(Assignment).to receive(:find).with(1).and_return(true)
+      params = {id: 1}
+      get :checktopicscopy, params
+      expect(response).to render_template(:checktopicscopy)
     end
   end
 

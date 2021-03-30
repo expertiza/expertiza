@@ -7,6 +7,7 @@ class MultipleChoiceRadio < QuizQuestion
     html += 'id="question_' + self.id.to_s + '_txt">' + self.txt + '</textarea>'
     html += '</td></tr>'
 
+<<<<<<< HEAD
     html += '<tr><td>'
     html += 'Question Weight: '
     html += '<input type="number" name="question_weights[' + self.id.to_s + '][txt]" '
@@ -14,6 +15,8 @@ class MultipleChoiceRadio < QuizQuestion
     html += 'value="' + self.weight.to_s + '" min="0" />'
     html += '</td></tr>'
 
+=======
+>>>>>>> master
     # for i in 0..3
     [0, 1, 2, 3].each do |i|
       html += "<tr><td>"

@@ -10,10 +10,19 @@ module OnTheFlyCalc
   def compute_reviews_hash
     @review_scores = {}
     @response_type = 'ReviewResponseMap'
+<<<<<<< HEAD
     @response_maps = ResponseMap.where(reviewed_object_id: self.id, type: @response_type)
     if self.vary_by_round
       scores_varying_rubrics
     else
+=======
+    @response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', self.id, @response_type)
+    if self.varying_rubrics_by_round?
+      # @response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', self.id, @response_type)
+      scores_varying_rubrics
+    else
+      # @response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', self.id, @response_type)
+>>>>>>> master
       scores_non_varying_rubrics
     end
     @review_scores
@@ -78,7 +87,9 @@ def scores_varying_rubrics
       @respective_scores = {}
       @respective_scores = reviewer[round] if !reviewer.nil? && !reviewer[round].nil?
       calc_review_score
+      @review_scores[response_map.reviewer_id] = {} unless @review_scores[response_map.reviewer_id]
       @respective_scores[response_map.reviewee_id] = @this_review_score
+      @review_scores[response_map.reviewer_id][round] = @respective_scores
       reviewer = {} if reviewer.nil?
       reviewer[round] = {} if reviewer[round].nil?
       reviewer[round] = @respective_scores

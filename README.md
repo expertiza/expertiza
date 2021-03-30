@@ -32,10 +32,10 @@ Contributing
 ------------
 
  * [Fork](http://help.github.com/fork-a-repo/) the expertiza project
- * [Create a new branch](http://progit.org/book) for your contribution with a descriptive name
- * [Commit and push](http://progit.org/book) until you are happy with your contribution - follow the style guidelines below
+ * [Create a new branch](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/creating-and-deleting-branches-within-your-repository) for your contribution with a descriptive name
+ * Commit and push until you are happy with your contribution - follow the style guidelines below
  * Make sure to add tests for it; the tests should fail before your contribution/fix and pass afterward
- * [Send a pull request](http://help.github.com/send-pull-requests) to have your code reviewed for merging back into Expertiza
+ * [Send a pull request](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/about-pull-requests) to have your code reviewed for merging back into Expertiza
 
 Style Guidelines
 ----------------

@@ -23,7 +23,67 @@
                 &nbsp; (author: <%= participant.fullname%>)
               <%end%>
             </td>
+<<<<<<< HEAD
             <%= render partial: 'shared/responses/response_actions', :locals => {:team => team ,:topic_id => topic_id, :map =>map, :reviewer_role => :student, :title => 'Review'} %>
+=======
+            <% latest_submission = team.most_recent_submission %>
+            <td>&nbsp;</td>
+            <% if !map.response.empty? && latest_submission %>
+                <% array_not_empty = 0 %>
+                <% @sorted_responses = Array.new %>
+                <% @prev = Response.where(:map_id => map.id) %>
+                <% for element in @prev %>
+                    <% array_not_empty = 1 %>
+                    <% @sorted_responses << element %>
+                <% end %>
+
+                <% if array_not_empty == 1 %>
+                    <% @sorted_responses = @sorted_responses.sort_by {|obj| obj.updated_at} # the latest should be at the last%>
+                    <% @latest_response = @sorted_responses.last %>
+
+                    <%if @latest_response.round.nil?%>
+                      <% last_response_round = AssignmentDueDate.done_in_assignment_round(@assignment.id,@latest_response) %>
+                    <%else%>
+                      <% last_response_round = @latest_response.round %>
+                    <%end%>
+
+                    <% current_round = @assignment.number_of_current_round(topic_id) %>
+
+                    <td>
+                        <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
+                    </td>
+
+                    <% if @assignment.get_current_stage(topic_id) != "Finished" %>
+                      <%- # show the link as 'Edit' when latest review is done in current round -%>
+                      <%- # show link as 'Update' when latest review is done in different round or there has been a new submission in current round -%>
+                      <% if last_response_round == current_round%>
+
+                        <td>
+                          <%- # If review is not submitted (is still being edited), show an 'Edit' link. -%>
+                          <% if !@latest_response.is_submitted %>
+                              <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
+
+                          <%- # If the submission has been updated since it was last reviewed, show an 'Update' link-%>
+                          <% elsif @latest_response.updated_at < latest_submission.updated_at %>
+                              <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
+                          <%end%>
+                        </td>
+                      <% else %>
+                        <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
+                      <% end %>
+                    <% end %>
+                    <td><%= "  -- latest update at #{@latest_response.updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p")}" %></td>
+          <%end%>
+            <% elsif @assignment.get_current_stage(topic_id) != "Complete" && ((map.type.to_s == "MetareviewResponseMap" && @assignment.metareview_allowed(topic_id)) || @assignment.can_review(topic_id)) && latest_submission%>
+                <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
+                <td>&nbsp;&nbsp;</td>
+
+            <%- # If the team being reviewed has not submitted yet -%>
+            <% else %>
+                <td> Work has not yet been submitted for Review
+                <%= review_no  %></td>
+            <% end %>
+>>>>>>> master
             <% review_no+=1 %>
 
             <!--[zhewei, 1/20/2016]: show calibration results-->

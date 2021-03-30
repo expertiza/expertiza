@@ -14,6 +14,10 @@ class Questionnaire < ActiveRecord::Base
   DEFAULT_MIN_QUESTION_SCORE = 0  # The lowest score that a reviewer can assign to any questionnaire question
   DEFAULT_MAX_QUESTION_SCORE = 5  # The highest score that a reviewer can assign to any questionnaire question
   DEFAULT_QUESTIONNAIRE_URL = "http://www.courses.ncsu.edu/csc517".freeze
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
   QUESTIONNAIRE_TYPES = ['ReviewQuestionnaire',
                          'MetareviewQuestionnaire',
                          'Author FeedbackQuestionnaire',
@@ -27,8 +31,12 @@ class Questionnaire < ActiveRecord::Base
                          'GlobalSurveyQuestionnaire',
                          'Course SurveyQuestionnaire',
                          'CourseSurveyQuestionnaire',
+<<<<<<< HEAD
                          'Bookmark RatingQuestionnaire',
                          'BookmarkRatingQuestionnaire',
+=======
+                         'BookmarkratingQuestionnaire',
+>>>>>>> master
                          'QuizQuestionnaire'].freeze
   has_paper_trail
 
@@ -50,12 +58,6 @@ class Questionnaire < ActiveRecord::Base
     else
       0
     end
-  end
-
-  # Does this questionnaire contain true/false questions?
-  def true_false_questions?
-    questions.each {|question| return true if question.type == "Checkbox" }
-    false
   end
 
   def delete

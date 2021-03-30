@@ -11,6 +11,34 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.js"></script>
   <script type="text/javascript" src="https://www.viralpatel.net/demo/jquery/jquery.shorten.1.0.js"></script>
   <script src='https://www.google.com/recaptcha/api.js'></script>
+  <script>
+      $(document).ready(function(){
+          $("#inputImpersonateBox, #user_name").keyup(function(){
+              var text = this.value;
+              var id = this.id;
+
+              console.log(id)
+              // alert(text);
+              if (text.length >= 2 ) {
+                  $.ajax({
+                      type: "get",
+                      url: "/impersonate/ajax_search/",
+                      data: { search: text },
+                      success: function(response) {
+                          show_data(response,id);
+                          $(".ui-autocomplete").css({"z-index":"9999"})
+                      }
+                  });
+              }
+          });
+          function show_data(response,id) {
+              console.log(id);
+              $("#"+id).autocomplete({
+                  source: response
+              });
+          }
+      });
+  </script>
 </head>
 
 <body>

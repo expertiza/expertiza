@@ -93,17 +93,26 @@
                           <div id= <%= team_name_color %>>
                         <% end %>
                 <% else %>
+<<<<<<< HEAD
                         <% if Response.exists?(map_id: reviewer_map.id) %>
                             <div id = <%= team_name_color %> style='border-top: solid; border-width: 1px;'>&#10004;
                         <% else %>
                             <div id = <%= team_name_color %> style='border-top: solid; border-width: 1px;'>
                         <% end %>
+=======
+                  <div id = <%= team_name_color %> style="border-top:solid;border-width:1px;">
+>>>>>>> master
                 <% end %>
                     <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => reviewer_map.reviewee_id, :id2 => reviewer_map.id, :assignment_id=>@id %>
                     <%= list_review_submissions(reviewer.id, reviewer_map.reviewee_id, reviewer_map.id) %>
                     <!--Hard-coded Dr.Kidd's question in order to display link.-->
                     <!--later we can create a hyperlink question type to deal with this situation.-->
+<<<<<<< HEAD
                     <%= list_hyperlink_submission(reviewer_map.id, 5386) if Assignment.find_by(id: @id.to_i).try(:course).try(:instructor).try(:name) == 'Jkidd' %>
+=======
+                    <%= list_hyperlink_submission(ri.id, 5386) if Assignment.find_by(id: @id.to_i).course.instructor.name == 'Jkidd' %>
+                    <div style="display: inline; float: right; font-size: 10px"><%= "done at - " + ri.response.last.updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p") if ri.response and ri.response.last %>&nbsp&nbsp&nbsp</div>
+>>>>>>> master
                   </div>
                 </div>
               <% end %>

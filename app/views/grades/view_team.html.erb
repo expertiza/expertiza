@@ -1,23 +1,31 @@
 <script type="text/javascript" src="/assets/view_team_in_grades.js"></script>
 <script type="text/javascript">
-  $( document ).ready(function() {
-    $('#tag_prompt_toggler').click(function () {
-      if ($('#tag_prompt_toggler').text() == "hide tags")
-        $('#tag_prompt_toggler').text("show tags")
-      else
-        $('#tag_prompt_toggler').text("hide tags")
-      $('.tag_prompt_container').toggle();
-    });
-  });
+  // Added logic to differentiate all toggle tags
+  // elementId is the element which needs to be toggled and
+  // caller is the element which caused the call to this function.
+  function tags_toggler(elementId,caller){
+      var target_list = document.getElementsByName(elementId)
+      var caller_element = document.getElementById(caller.id)
+      // target_list.forEach(custom_toggle)
+      for(i =0; i<target_list.length; i++){
+          toggleFunction(target_list[i],caller_element)
+      }
+  }
+  function toggleFunction(target,caller){
+      if (!(target instanceof Element)){
+        // Assigning dummy element if the caller is not specified
+        target = document.getElementById(target);
+        caller = document.getElementById('dummy');
+      }
+      if (target.style.display === 'none') {
+          caller.innerHTML = 'hide tags'
+          target.style.display = 'block';
+      } else {
+          caller.innerHTML = 'show tags'
+          target.style.display = 'none';
+      }
+  }
 
-  function toggleFunction(elementId) {
-    var target = document.getElementById(elementId);
-    if (target.style.display === 'none') {
-        target.style.display = 'block';
-    } else {
-        target.style.display = 'none';
-    }
-}
 </script>
 <h2>Summary Report for assignment: <%= @assignment.name %></h2>
 <h4>Team: <%= @team.name(session[:ip]) %></h4>
@@ -33,8 +41,13 @@
 <%else %>
   <h4> There are no reviews for this assignment</h4>
 <%end %>
+<<<<<<< HEAD
 <!--Toggle submission-->
 <button onclick="toggleFunction('<%= @participant.id.to_s%>')" class="btn btn-default">Show Submission</button>
+=======
+  <!--Toggle submission-->
+<button onclick="toggleFunction('<%= @participant.id.to_s%>',null)" class="btn btn-default">Show Submission</button>
+>>>>>>> master
 <div id="<%= @participant.id.to_s%>" style="display:none;">
 <% if @participant.team.hyperlinks.try(:length) %>
   <%= render :partial => 'submitted_content/hyperlink', :locals => {participant: @participant, stage: @stage} %>
@@ -44,9 +57,11 @@
 </div><br><br>
 
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
+<div id = 'dummy' style="display: none"></div>
 <% table_count = 0 %>
+<% iteration = 0 %>
 <% @vmlist.each do |vm| %>
-
+  <% iteration += 1 %>
     <% if (vm.questionnaire_display_type == "Metareview" or vm.questionnaire_display_type == "Author Feedback" or vm.questionnaire_display_type == "Teammate Review") and @current_role_name.eql?'Student' %>
     <% else %>
         <% if vm.list_of_reviewers.length > 0 %>
@@ -79,7 +94,7 @@
               </h4>
               <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions">toggle question list</span>
             <% if @assignment.is_answer_tagging_allowed %>
-            <span class="spn_qsttog" id="tag_prompt_toggler" title="">hide tags</span>
+            <span class="spn_qsttog" id="tag_prompt_toggler<%=iteration%>" onclick="tags_toggler('tag_prompt_container<%=iteration%>',this)" title="">hide tags</span>
             <% end %>
             <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Colors are scaled from poor to excellent in the following order: red, orange, yellow, light-green, dark-green">color legend</span>
             <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Click a row to see the comments for the respective question. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience.">interaction legend</span>
@@ -178,7 +193,7 @@
                               <td>
                                 <%= row.score_row[index].comment.html_safe unless row.score_row[index].comment.nil?  %>
                                 <% if row.score_row[index].vm_prompts.count > 0 %>
-                                    <div class="tag_prompt_container">
+                                    <div name="tag_prompt_container<%=iteration%>" class="tag_prompt_container">
                                       <% row.score_row[index].vm_prompts.each do |vm_tag_prompt| %>
                                           <%= vm_tag_prompt.tag_prompt.html_control(vm_tag_prompt.tag_dep, vm_tag_prompt.answer, @current_user) %> &nbsp;
                                       <% end %>

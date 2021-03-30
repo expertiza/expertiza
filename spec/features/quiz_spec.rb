@@ -308,8 +308,8 @@ describe 'Instructor', js: true do
   it 'can view quiz questions and scores' do
     login_as @instructor.name
     visit "/student_quizzes/review_questions?id=#{@assignment.id}&type=Assignment"
-    student = all("tr > td")[0]
-    score = all("tr > td")[1]
+    student = all("tr > td")[1]
+    score = all("tr > td")[2]
     expect(student).to have_text(@student2.fullname)
     expect(score).to have_text('100.0')
     expect(page).to have_text('Average score for quiz takers: 100.0 ')

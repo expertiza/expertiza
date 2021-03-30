@@ -2,6 +2,7 @@ class ReviewResponseMap < ResponseMap
   belongs_to :reviewee, class_name: 'Team', foreign_key: 'reviewee_id', inverse_of: false
   belongs_to :contributor, class_name: 'Team', foreign_key: 'reviewee_id', inverse_of: false
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id', inverse_of: false
+<<<<<<< HEAD
   
   # Added for E1973:
   # http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_Project_E1973._Team_Based_Reviewing
@@ -10,6 +11,8 @@ class ReviewResponseMap < ResponseMap
     # If an assignment supports team reviews, it is marked in each mapping
     reviewer_is_team = assignment.reviewer_is_team
   end
+=======
+>>>>>>> master
 
   # Find a review questionnaire associated with this review response map's assignment
   def questionnaire(round_number = nil, topic_id = nil)
@@ -44,19 +47,9 @@ class ReviewResponseMap < ResponseMap
   end
 
   def self.import(row_hash, _session, assignment_id)
-    reviewee_user_name = row_hash[:reviewee].to_s
-    reviewee_user = User.find_by(name: reviewee_user_name)
-    raise ArgumentError, "Cannot find reviewee user." unless reviewee_user
-    reviewee_participant = AssignmentParticipant.find_by(user_id: reviewee_user.id, parent_id: assignment_id)
-    raise ArgumentError, "Reviewee user is not a participant in this assignment." unless reviewee_participant
-    reviewee_team = AssignmentTeam.team(reviewee_participant)
-    if reviewee_team.nil? # lazy team creation: if the reviewee does not have team, create one.
-      reviewee_team = AssignmentTeam.create(name: 'Team' + '_' + rand(1000).to_s,
-                                            parent_id: assignment_id, type: 'AssignmentTeam')
-      t_user = TeamsUser.create(team_id: reviewee_team.id, user_id: reviewee_user.id)
-      team_node = TeamNode.create(parent_id: assignment_id, node_object_id: reviewee_team.id)
-      TeamUserNode.create(parent_id: team_node.id, node_object_id: t_user.id)
-    end
+    reviewee_team = Team.find_by(name: row_hash[:reviewee].to_s, parent_id: assignment_id)
+    raise ArgumentError, "Could not find a team with name #{row_hash[:reviewee].to_s}, please import teams first" unless reviewee_team
+    return unless reviewee_team
     row_hash[:reviewers].each do |reviewer|
       reviewer_user_name = reviewer.to_s
       reviewer_user = User.find_by(name: reviewer_user_name)
@@ -205,7 +198,10 @@ class ReviewResponseMap < ResponseMap
       where_map = {map_id: map.id}
       where_map[:round] = round unless round.nil?
       responses = Response.where(where_map)
-      response_ids << responses.last.id unless responses.empty?
+      next if responses.empty?
+      responses.each do |response|
+        response_ids << response.id
+      end
     end
     review_final_versions[symbol][:response_ids] = response_ids
   end

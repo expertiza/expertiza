@@ -119,16 +119,15 @@ describe ReviewResponseMap do
     assignment_id = 1
     # when reviewee user = nil
     allow(User).to receive(:find_by).and_return(nil)
-    expect { ReviewResponseMap.import(row_hash, session, 1) }.to raise_error(ArgumentError, "Cannot find reviewee user.")
     # when reviewee user exists but reviewee user is not a participant in this assignment
     allow(User).to receive(:find_by).with(name: "name").and_return(student)
     allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(nil)
-    expect { ReviewResponseMap.import(row_hash, session, 1) }.to raise_error(ArgumentError, "Reviewee user is not a participant in this assignment.")
     # when reviewee user exists and reviewee user is a participant in this assignment
     allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
     allow(AssignmentTeam).to receive(:team).with(participant).and_return(team)
     ## when reviewer user doesn't exist
     allow(User).to receive(:find_by).with(name: "name1").and_return(nil)
+    allow(Team).to receive(:find_by).with(name: "name", parent_id: 1).and_return(team)
     expect { ReviewResponseMap.import(row_hash, session, 1) }.to raise_error(ArgumentError, "Cannot find reviewer user.")
     ## when reviewer user exist
     allow(User).to receive(:find_by).with(name: "name1").and_return(student1)

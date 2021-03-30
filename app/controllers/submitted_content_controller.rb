@@ -67,6 +67,9 @@ class SubmittedContentController < ApplicationController
       end
       ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The link has been successfully submitted.', request)
       undo_link("The link has been successfully submitted.")
+
+      mail_assigned_reviewers(team)
+      flash[:success] = "The link has been successfully submitted."
     end
     redirect_to action: 'edit', id: @participant.id
   end
@@ -139,13 +142,32 @@ class SubmittedContentController < ApplicationController
                             assignment_id: assignment.id,
                             operation: "Submit File")
     ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The file has been submitted.', request)
-    # send message to reviewers when submission has been updated
-    # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
-    participant.assignment.email(participant.id) rescue nil
+    # Send link to update the review to all the reviewers assigned to this reviewee
+    mail_assigned_reviewers(team)
+    # participant.assignment.email(participant.id) rescue nil
     if params[:origin] == 'review'
       redirect_to :back
     else
       redirect_to action: 'edit', id: participant.id
+    end
+  end
+
+  # This function will find if there are already reviews present for the current submission,
+  # If the reviews are present then it will mail each reviewer a mail with the link to update the current review.
+
+  def mail_assigned_reviewers(team)
+    maps = ResponseMap.where(reviewed_object_id: @participant.assignment.id, reviewee_id: team.id, type: 'ReviewResponseMap')
+    unless maps.nil?
+      maps.each do |map|
+        # Mailing function
+        Mailer.general_email(
+          to: User.find(Participant.find(map.reviewer_id).user_id).email,
+          subject:  "Link to update the review for Assignment '#{@participant.assignment.name}'",
+          cc: User.find_by(@participant.assignment.instructor_id).email,
+          link: "Link: https://expertiza.ncsu.edu/response/new?id=#{map.id}",
+          assignment: @participant.assignment.name
+        ).deliver_now
+      end
     end
   end
 

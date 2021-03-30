@@ -283,7 +283,7 @@ describe Assessment360Controller do
         returned_assignment_grades = controller.instance_variable_get(:@assignment_grades)
         expect(returned_assignment_grades[nil][1]).to eq(95)
         returned_peer_review_scores = controller.instance_variable_get(:@peer_review_scores)
-        expect(returned_peer_review_scores[nil][1]).to eq(90)
+        expect(returned_peer_review_scores[nil][1]).to eq(nil)
         returned_final_grades = controller.instance_variable_get(:@final_grades)
         expect(returned_final_grades[nil]).to eq(95)
       end

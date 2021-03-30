@@ -10,7 +10,7 @@
   <tr id='assignment_review_assignment_strategy_row' class="form-inline">
     <td>
       <%= label_tag('assignment_form[assignment][review_assignment_strategy]', 'Review strategy:') %>
-      <img src="/assets/info.png" title='- Instructor-Selected: Instructor decides who reviews whom- Auto-Selected: When a student is about to begin a review, Expertiza assigns that student a particular review.'>
+      <img src="/assets/info.png" title='Instructor-Selected: Instructor decides who reviews whose work <br>Auto-Selected: When a student is about to begin a review, Expertiza assigns that student a particular review.'>
       <%= select('assignment_form[assignment]', 'review_assignment_strategy', review_strategy_options,  {:selected => @assignment_form.assignment.review_assignment_strategy, :style => 'margin-left :250px', :class => "form-control width-200"}) %>
       <script>
           jQuery(document).ready(function() {reviewStrategyChanged();});
@@ -32,7 +32,7 @@
   <tr id="assignment_review_topic_threshold_row" class="form-inline">
     <td>
       <%= label_tag('assignment_form[assignment][max_reviews_per_submission]', 'Maximum number of reviews per submission:') %>
-      <img src="/assets/info.png" title='You can set the maximum number of reviews can be done for a particular submissions.'>
+      <img src="/assets/info.png" title='Select whether this submission needs to have a maximum review limit.'>
       <%= text_field_tag('assignment_form[assignment][max_reviews_per_submission]', @assignment_form.assignment.max_reviews_per_submission ||= 10, size: 2, class: "form-control width-70", :style => 'margin-left : 100px') %>
     </td>
   </tr>
@@ -63,7 +63,7 @@
     <td>
       <%= check_box_tag('meta_review', 'true', true, {:onChange => 'hasMetaReviewChanged()'}) %>
       <%= label_tag('meta_review', 'Has meta-review limit?') %>  
-      <img src="/assets/info.png" title='You can set if a particular submission can have a Meta-review or not.'>
+      <img src="/assets/info.png" title='Does this particular assignment have a meta-review limit for each review?'>
     </td>
   </tr>
 
@@ -126,7 +126,7 @@
       <input name="assignment_form[assignment][is_anonymous]" type="hidden" value="false"/>
       <%= check_box_tag('assignment_form[assignment][is_anonymous]', 'true', @assignment_form.assignment.is_anonymous) %>
       <%= label_tag('assignment_form[assignment][is_anonymous]', 'Is Review Anonymous?') %>
-      <img src="/assets/info.png" title='You can select whether the review name should be visible or not'>
+      <img src="/assets/info.png" title='You can select whether the reviewer’s name should be visible or not'>
     </td>
   </tr>
 
@@ -145,7 +145,7 @@
       <input name="assignment_form[assignment][is_selfreview_enabled]" type="hidden" value="false"/>
       <%= check_box_tag('assignment_form[assignment][is_selfreview_enabled]', 'true', @assignment_form.assignment.is_selfreview_enabled) %>
       <%= label_tag('assignment_form[assignment][is_selfreview_enabled]', 'Allow Self Reviews?') %>
-      <img src="/assets/info.png" title='Select if you want a person to allow review their own submission'>
+      <img src="/assets/info.png" title='Check the box to allow authors to review their own submission.'>
     </td>
   </tr>
 
@@ -155,7 +155,7 @@
       <td id='assignment_allow_selecting_additional_reviews_after_1st_round'>
         <input name="assignment_form[assignment][allow_selecting_additional_reviews_after_1st_round]" type="hidden" value="false"/>
         <%= check_box_tag('assignment_form[assignment][allow_selecting_additional_reviews_after_1st_round]', 'true', @assignment_form.assignment.allow_selecting_additional_reviews_after_1st_round) %>
-        <%= label_tag('assignment_form[assignment][allow_selecting_additional_reviews_after_1st_round]', 'Allow students to join reviews late') %>
+        <%= label_tag('assignment_form[assignment][allow_selecting_additional_reviews_after_1st_round]', 'Allow reviews to be begun in later rounds.') %>
         <img src="/assets/info.png" title='Should a student who does not do a first-round review be allowed to review this work in subsequent rounds?'>
       </td>
     </tr>

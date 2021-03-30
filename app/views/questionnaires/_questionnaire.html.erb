@@ -15,7 +15,7 @@
      <tr class="form-inline">
        <td><label for="min_question_score">Min item score:</label>&nbsp;<%= text_field 'questionnaire', 'min_question_score', :size=> 1, :value=>@questionnaire.min_question_score ||= 0, :class => "form-control width-40" %>&nbsp;&nbsp;</td>
        <td><label for="max_question_score">Max item score:</label>&nbsp;<%= text_field 'questionnaire', 'max_question_score', :size=> 1, :value=>@questionnaire.max_question_score ||= 5, :class => "form-control width-40" %>&nbsp;&nbsp;</td>
-       <td><label for="questionnaire_private">Is this <%= @questionnaire.display_type %> private:</label>&nbsp;<%= select(:questionnaire, :private, [ ['no', false],['yes',  true]], {}, {class: "form-control"})%>
+       <td><label for="questionnaire_private">Is this <%= @questionnaire.display_type %> private?</label>&nbsp;<%= select(:questionnaire, :private, [ ['no', false],['yes',  true]], {}, {class: "form-control"})%>
        </td>
      </tr>
   </table>
@@ -24,6 +24,7 @@
   <% end %>
 <% end %>
 
+<<<<<<< HEAD
 <!--Question part-->
 <hr/>
 <% if !params[:id].nil? and params[:action] == 'edit' %>
@@ -56,12 +57,31 @@
   
   <%= form_tag :action => 'save_all_questions', :id => params[:id],  :questionnaire_type => params[:model], :private => params[:private] do %>
     <table id="questions_table">
+=======
+  <!--Questions part-->
+  <hr/>
+  <% if !params[:id].nil? and params[:action] == 'edit' %>
+    <table id="question_actions_table">
+      <tr>
+        <td>
+          <p class="form-inline"> <%= submit_tag 'Add', name: "add_new_questions", class: "btn btn-default"%>
+            <%= text_field 'new_question', 'total_num', :size => 1, :value => "1", :class => "form-control" %> more
+            <%= select "new_question", "type", @question_types, {}, {class: "form-control"} %> question(s)
+          </p>
+        </td>
+      </tr>
+    </table>
+
+    <table id="questions_table" class="table table-striped">
+>>>>>>> master
       <tr>
         <th class="head" align="center" width="30">Action</td>
         <th class="head" align="center" width="30">Seq</td>
         <th class="head" align="center" width="300">Question</td>
         <th class="head" align="center" width="100">Type</td>
         <th class="head" align="center">Weight</td>
+        <th class="head" align="center">Text Area Size</td>
+        <th class="head" align="center">Labels</td>
       </tr>
       <% i = 1 %>
       <%questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }%>

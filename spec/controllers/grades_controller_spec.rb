@@ -1,6 +1,6 @@
 describe GradesController do
   let(:review_response) { build(:response) }
-  let(:assignment) { build(:assignment, id: 1, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
+  let(:assignment) { build(:assignment, id: 1, questionnaires: [review_questionnaire], is_penalty_calculated: true), max_team_size: 2 }
   let(:assignment_questionnaire) { build(:assignment_questionnaire, used_in_round: 1, assignment: assignment) }
   let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
   let(:participant2) { build(:participant, id: 2, assignment: assignment, user_id: 1) }
@@ -208,5 +208,15 @@ describe GradesController do
         expect(controller.action_allowed?).to eq(true)
       end
     end
+  end
+
+  describe '#redirect_when_disallowed' do
+    context 'when a participant without a team exists' do
+      it 'raises an error' do
+        allow(participant).to receive(:team).and_return(nil)
+        @participant = participant
+        expect(controller.redirect_when_disallowed).to raise_error
+      end
+    end 
   end
 end

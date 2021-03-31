@@ -203,7 +203,7 @@ describe GradesController do
     end
     context 'when the user is an instructor' do
       it 'returns true' do 
-        params[:action] = 'view_team'
+        params = {action: 'view_team'} 
         session[:user].role.name = 'Instructor'
         expect(GradesController.action_allowed(params, session)).to eq(true)
       end

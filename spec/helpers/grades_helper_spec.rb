@@ -56,4 +56,10 @@ describe GradesHelper, type: :helper do
     end 
   end
 
+  it 'returns nil when there is no score' do
+    @participant_score = {}
+    expect(charts(symbol)).to eq(nil)
+  end
+
+
 end

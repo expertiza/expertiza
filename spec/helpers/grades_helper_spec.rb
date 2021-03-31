@@ -43,8 +43,8 @@ describe GradesHelper, type: :helper do
 
   describe 'charts' do
     it 'it should return a chart url' do
-      symbol = 's'
-      @participant_score = {:s => {:assessment => [review_response, review_response]}}
+      symbol = :s
+      @participant_score = {symbol => {:assessments => [review_response, review_response]}}
       allow(Answer).to receive(:get_total_score).with(response: [review_response], questions: [question], q_types: []).and_return(75)
       allow(GradesController).to receive(:bar_chart).with([75,75]).and_return(
         'http://chart.apis.google.com/chart?chs=800x200&cht=bvg&chco=0000ff,ff0000,00ff00&chd=s:yoeKey,KUeoy9,9yooy9&chdl=Trend+1|Trend+2|Trend+3&chtt=Bar+Chart'

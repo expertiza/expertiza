@@ -218,9 +218,9 @@ describe GradesController do
         allow(participant).to receive(:team).and_return(nil)
         allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
         allow(TeamsUser).to receive(:team_id).and_return(1)
-        expect(
+        expect{
           get :view_my_scores, params
-        ).to raise_error
+        }.to raise_error
         expect(response).to redirect_to('/')
       end
     end 

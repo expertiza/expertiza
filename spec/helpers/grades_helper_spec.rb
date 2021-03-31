@@ -44,6 +44,7 @@ describe GradesHelper, type: :helper do
   describe 'charts' do
     it 'it should return a chart url' do
       symbol = :s
+      @grades_bar_charts = {:s => nil}
       @participant_score = {symbol => {:assessments => [review_response, review_response]}}
       allow(Answer).to receive(:get_total_score).with(response: [review_response], questions: [question], q_types: []).and_return(75)
       allow(GradesController).to receive(:bar_chart).with([75,75]).and_return(

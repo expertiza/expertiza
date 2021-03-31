@@ -41,4 +41,14 @@ describe GradesHelper, type: :helper do
     end
   end
 
+  describe 'charts' do
+    it 'it should return a chart' do
+      symbol = 's'
+      @participant_score = {:s => {:assessment => [review_response, review_response]}}
+      allow(Answer).to receive(:get_total_score).with(response: [review_response], questions: [question], q_types: []).and_return(75)
+      @questions = {:s => [question]}
+      expect(charts(symbol).class).to eq(bar_chart([75,75]))
+    end 
+  end
+
 end

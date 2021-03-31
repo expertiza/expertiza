@@ -196,7 +196,7 @@ describe GradesController do
   describe '#action_allowed' do
     context 'when the student does not belong to a team' do
       it 'returns false' do 
-        params[:action] = 'view_team'
+        params = {action: 'view_team'}
         session[:user].role.name = 'Student'
         expect(GradesController.action_allowed(params, session)).to eq(false)
       end

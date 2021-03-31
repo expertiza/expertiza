@@ -198,14 +198,14 @@ describe GradesController do
       it 'returns false' do 
         params = {action: 'view_team'}
         session[:user].role.name = 'Student'
-        expect(controller.action_allowed?(params, session)).to eq(false)
+        expect(controller.action_allowed?).to eq(false)
       end
     end
     context 'when the user is an instructor' do
       it 'returns true' do 
         params = {action: 'view_team'} 
         session[:user].role.name = 'Instructor'
-        expect(controller.action_allowed?(params, session)).to eq(true)
+        expect(controller.action_allowed?).to eq(true)
       end
     end
   end

@@ -23,7 +23,7 @@ module GradesHelper
     if @participant_score and @participant_score[symbol]
       scores = score_vector @participant_score[symbol][:assessments], symbol.to_s
       scores.select! { |score| score > 0 }
-      @grades_bar_charts[symbol] = bar_chart(scores)
+      @grades_bar_charts[symbol] = GradesController.bar_chart(scores)
     end
   end
 

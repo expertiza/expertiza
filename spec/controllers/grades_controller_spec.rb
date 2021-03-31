@@ -212,15 +212,13 @@ describe GradesController do
 
   describe '#redirect_when_disallowed' do
     context 'when a participant without a team exists' do
-      it 'raises an error' do
+      it 'redirects to /' do
         params = {id: 1}
         session
         allow(participant).to receive(:team).and_return(nil)
         allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
         allow(TeamsUser).to receive(:team_id).and_return(1)
-        expect{
-          get :view_my_scores, params
-        }.to raise_error
+        get :view_my_scores, params
         expect(response).to redirect_to('/')
       end
     end 

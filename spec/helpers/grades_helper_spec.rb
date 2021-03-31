@@ -35,7 +35,7 @@ describe GradesHelper, type: :helper do
 
   describe 'score_vector' do
     it 'should return the scores from the questions in a vector' do
-      allow(Answer).to_receive(:get_total_score).with(review_response, [question], []).and_return(75)
+      allow(Answer).to receive(:get_total_score).with(review_response, [question], []).and_return(75)
       expect(score_vector([review_response, review_response])).to_eq([75,75])
     end
   end

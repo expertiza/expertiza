@@ -54,13 +54,13 @@ describe GradesHelper, type: :helper do
       expect(charts(symbol).class).to eq(String)
       expect(charts(symbol)).to include ('http://chart.apis.google.com/chart')
     end 
+    it 'returns nil when there is no score' do
+      @participant_score = {:s => nil}
+      symbol = :s
+      expect(charts(symbol)).to eq(nil)
+    end
   end
-
-  it 'returns nil when there is no score' do
-    @participant_score = {:s => nil}
-    symbol = :s
-    expect(charts(symbol)).to eq(nil)
-  end
+    
 
 
 end

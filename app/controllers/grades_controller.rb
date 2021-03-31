@@ -169,6 +169,21 @@ class GradesController < ApplicationController
     redirect_to controller: 'grades', action: 'view_team', id: participant.id
   end
 
+  def bar_chart(scores, width = 100, height = 100, spacing = 1)
+    link = nil
+    GoogleChart::BarChart.new("#{width}x#{height}", " ", :vertical, false) do |bc|
+      data = scores
+      bc.data "Line green", data, '990000'
+      bc.axis :y, range: [0, data.max], positions: data.minmax
+      bc.show_legend = false
+      bc.stacked = false
+      bc.width_spacing_options(bar_width: (width - 30) / (data.size + 1), bar_spacing: 1, group_spacing: spacing)
+      bc.data_encoding = :extended
+      link = bc.to_url
+    end
+    link
+  end
+
   private
 
   def populate_view_model(questionnaire)
@@ -227,21 +242,6 @@ class GradesController < ApplicationController
       end
     end
     participant_score_types.each {|symbol| charts(symbol) }
-  end
-
-  def bar_chart(scores, width = 100, height = 100, spacing = 1)
-    link = nil
-    GoogleChart::BarChart.new("#{width}x#{height}", " ", :vertical, false) do |bc|
-      data = scores
-      bc.data "Line green", data, '990000'
-      bc.axis :y, range: [0, data.max], positions: data.minmax
-      bc.show_legend = false
-      bc.stacked = false
-      bc.width_spacing_options(bar_width: (width - 30) / (data.size + 1), bar_spacing: 1, group_spacing: spacing)
-      bc.data_encoding = :extended
-      link = bc.to_url
-    end
-    link
   end
 
   def self_review_finished?

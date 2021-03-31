@@ -192,4 +192,21 @@ describe GradesController do
       expect(response).to redirect_to('/grades/view_team?id=1')
     end
   end
+
+  describe '#action_allowed' do
+    context 'when the student does not belong to a team' do
+      it 'returns false' do 
+        params[:action] = 'view_team'
+        session[:user].role.name = 'Student'
+        expect(GradesController.action_allowed(params, session)).to eq(false)
+      end
+    end
+    context 'when the user is an instructor' do
+      it 'returns true' do 
+        params[:action] = 'view_team'
+        session[:user].role.name = 'Instructor'
+        expect(GradesController.action_allowed(params, session)).to eq(false)
+      end
+    end
+  end
 end

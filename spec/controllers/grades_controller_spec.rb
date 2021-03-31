@@ -213,9 +213,13 @@ describe GradesController do
   describe '#redirect_when_disallowed' do
     context 'when a participant without a team exists' do
       it 'raises an error' do
+        params = {id: 1}
         allow(participant).to receive(:team).and_return(nil)
-        @participant = participant
-        expect(controller.redirect_when_disallowed).to raise_error
+        allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+        allow(TeamsUser).to receive(:team_id).and_return(1)
+        get :view_my_scores, params
+        expect(flash[:error]).to eq('You are not on the team that wrote this feedback')
+        expect(response).to redirect_to('/')
       end
     end 
   end

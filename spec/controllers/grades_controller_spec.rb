@@ -205,7 +205,7 @@ describe GradesController do
       it 'returns true' do 
         params[:action] = 'view_team'
         session[:user].role.name = 'Instructor'
-        expect(GradesController.action_allowed(params, session)).to eq(false)
+        expect(GradesController.action_allowed(params, session)).to eq(true)
       end
     end
   end

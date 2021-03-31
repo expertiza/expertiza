@@ -1,6 +1,6 @@
 describe GradesController do
   let(:review_response) { build(:response) }
-  let(:assignment) { build(:assignment, id: 1, , max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true)}
+  let(:assignment) { build(:assignment, id: 1, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true)}
   let(:assignment_questionnaire) { build(:assignment_questionnaire, used_in_round: 1, assignment: assignment) }
   let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
   let(:participant2) { build(:participant, id: 2, assignment: assignment, user_id: 1) }

@@ -15,7 +15,9 @@ describe ReviewMetricsQuery do
   let!(:answer_tag_4) { AnswerTag.create(answer: answer, tag_prompt_deployment: tag_prompt_deployment_4, value: 1, confidence_level: 0.8) }
 
   before(:each) do
-    stub_const("ReviewMetricsQuery::TAG_CERTAINTY_THRESHOLD", 0.8)
+    team_id = answer.response.response_map.reviewee_id
+    ReviewMetricsQuery.class_variable_set(:@@thresholds, team_id => 0.8)
+    # stub_const("ReviewMetricsQuery::TAG_CERTAINTY_THRESHOLD", 0.8)
   end
 
   describe 'confident?' do

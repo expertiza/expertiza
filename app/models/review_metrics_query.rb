@@ -94,12 +94,10 @@ class ReviewMetricsQuery
   def self.confident?(tag_prompt_deployment_id, review_id)
     response_map = Answer.find(review_id).response.response_map
     team = AssignmentTeam.find(response_map.reviewee_id)
-    unless @@thresholds[team.id]
-      cache_threshold(team)
-    end
+    cache_threshold(team) unless @@thresholds[team.id]
     tag = machine_tags(review_id, tag_prompt_deployment_id).first
     confidence = tag ? tag.confidence_level : 0
-    confidence > @@thresholds[team.id]
+    confidence >= @@thresholds[team.id]
   end
 
   def self.has?(tag_prompt_deployment_id, review_id)

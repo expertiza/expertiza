@@ -28,12 +28,6 @@ describe ReviewMetricsQuery do
     end
   end
 
-  describe 'confidence' do
-    it 'returns the confidence level of certain metric prediction on the inputted answer' do
-      expect(ReviewMetricsQuery.confidence(tag_prompt_deployment_2.id, answer.id)).to eq(0.9)
-    end
-  end
-
   describe 'has?' do
     it 'returns the predicted value of the inputted answer' do
       expect(ReviewMetricsQuery.has?(tag_prompt_deployment_1.id, answer.id)).to be(true)

@@ -1,17 +1,20 @@
 class ReviewMetricsQuery
-  # The certainty threshold is the fraction (between 0 and 1) that says how certain
-  # the ML algorithm must be of a tag value before it will ask the author to tag it
-  # manually.
-  TAG_CERTAINTY_THRESHOLD = 0.8
-
   # link each tag prompt to the corresponding key in the review hash
   PROMPT_TO_METRIC = {'mention problems?' => 'problem',
                       'suggest solutions?' => 'suggestions',
                       'mention praise?' => 'sentiment',
                       'positive tone?' => 'emotions'}.freeze
 
-  def self.retrieve_from_cache(tag_prompt_deployment_id, review_id)
-    AnswerTag.where(answer_id: review_id, tag_prompt_deployment_id: tag_prompt_deployment_id).where.not(confidence_level: nil).first
+  # Cache tag certainty threshold for different assignment teams
+  # The certainty threshold is the fraction (between 0 and 1) that says how certain
+  # the ML algorithm must be of a tag value before it will ask the author to tag it
+  # manually.
+  @@thresholds = {}
+
+  def self.machine_tags(review_id, tag_prompt_deployment_id=nil)
+    tags = AnswerTag.where(answer_id: review_id).where.not(confidence_level: nil)
+    tags = tags.where(tag_prompt_deployment_id: tag_prompt_deployment_id) if tag_prompt_deployment_id
+    tags
   end
 
   def self.cache_ws_results(reviews, tag_prompt_deployments)
@@ -47,6 +50,18 @@ class ReviewMetricsQuery
     tags.each(&:save)
   end
 
+  def self.cache_threshold(team)
+    answers = []
+    TagPromptDeployment.where(assignment_id: team.assignment.id).find_each do |tag_dep|
+      questions_ids = Question.where(questionnaire_id: tag_dep.questionnaire.id, type: tag_dep.question_type).map(&:id)
+      answers += Answer.where(question_id: questions_ids, response_id: team.responses.map(&:id))
+    end
+    machine_tags = machine_tags(answers.map(&:id))
+    machine_tags = machine_tags.sort_by {|tag| -tag.confidence_level }
+    tag = machine_tags.last(150).first
+    @@thresholds[team.id] = tag ? tag.confidence_level : 0
+  end
+
   def self.inferred_value(metric, review)
     value = case metric
             when 'problem'
@@ -76,19 +91,20 @@ class ReviewMetricsQuery
     end
   end
 
-  def self.confidence(tag_prompt_deployment_id, review_id)
-    review = retrieve_from_cache(tag_prompt_deployment_id, review_id)
-    review ? review.confidence_level : 0
-  end
-
   def self.confident?(tag_prompt_deployment_id, review_id)
-    confidence = confidence(tag_prompt_deployment_id, review_id)
-    confidence >= TAG_CERTAINTY_THRESHOLD
+    response_map = Answer.find(review_id).response.response_map
+    team = AssignmentTeam.find(response_map.reviewee_id)
+    unless @@thresholds[team.id]
+      cache_threshold(team)
+    end
+    tag = machine_tags(review_id, tag_prompt_deployment_id).first
+    confidence = tag ? tag.confidence_level : 0
+    confidence > @@thresholds[team.id]
   end
 
   def self.has?(tag_prompt_deployment_id, review_id)
-    review = retrieve_from_cache(tag_prompt_deployment_id, review_id)
-    review ? review.value == '1' : false
+    tag = machine_tags(review_id, tag_prompt_deployment_id).first
+    tag ? tag.value == '1' : false
   end
 
   # return the average number of qualifying comments (comments that meet the description of the

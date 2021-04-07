@@ -75,7 +75,7 @@ describe GradesHelper, type: :helper do
         row = VmQuestionResponseRow.new('Some question text', 1, 5, 95, 2)
         allow(Question).to receive(:find).with(1).and_return(question)
         allow(question).to receive(:is_a?).and_return(ScoredQuestion)
-        expect(type_and_max(row)).to eq(9311 + @row.question_max_score)
+        expect(type_and_max(row)).to eq(9311 + row.question_max_score)
       end
     end
     context 'when the question is something else' do

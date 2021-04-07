@@ -72,6 +72,12 @@ describe 'type_and_max' do
       expect(type_and_max(@row)).to eq(10_003)
     end
   end
+  context 'when the question is a ScoredQuestion' do
+    it 'returns the correct code adn the max score' do
+      allow(question).to receive(:is_a?).and_return(ScoredQuestion)
+      expect(type_and_max(@row)).to eq(9311 + @row.question_max_score)
+    end
+  end
   context 'when the question is something else' do
     it 'returns 9998'
     question[type] == 'NotACheckbox'

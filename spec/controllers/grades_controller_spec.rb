@@ -385,8 +385,8 @@ describe GradesController do
       before(:each) do
         session["github_access_token"] = "qwerty"
         allow(controller).to receive(:get_statuses_for_pull_request).and_return("status")
-        allow(controller).to receive(:retrieve_github_data)
-        allow(controller).to receive(:retrieve_check_run_statuses)
+        allow(controller).to receive(:retrieve_github_data).and_return("data")
+        allow(controller).to receive(:retrieve_check_run_statuses).and_return("status")
       end
 
       it 'stores the GitHub access token for later use' do

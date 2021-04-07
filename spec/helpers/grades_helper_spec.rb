@@ -105,4 +105,27 @@ describe GradesHelper, type: :helper do
       expect(mean(array)).to be(3.0)
     end
   end
+
+  describe 'vector' do 
+    context 'when there are nil scores' do
+      it 'filters them out' do
+        scores = {
+          teams: {
+            a: {
+              scores: {}
+            }, b: {
+              scores: {
+                avg: 75
+              }
+            }, c: {
+              scores: {
+                avg: 65
+              }
+            }
+          }
+        }
+        expect(vector(scores)).to be([75, 65]) 
+      end 
+    end
+  end
 end

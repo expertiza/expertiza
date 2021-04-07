@@ -64,26 +64,30 @@ describe GradesHelper, type: :helper do
   describe 'type_and_max' do  
     context 'when the question is a Checkbox' do
       it 'returns 10_003' do
-        @row = {question_id: 1, question_max_score: 95}
+        row = {}
+        allow(row).to receive(:question_id).and_return(1)
         allow(Question).to receive(:find).with(1).and_return(question)
         question[:type] == 'Checkbox'
-        expect(type_and_max(@row)).to eq(10_003)
+        expect(type_and_max(row)).to eq(10_003)
       end
     end
     context 'when the question is a ScoredQuestion' do
       it 'returns the correct code adn the max score' do
-        @row = {question_id: 1, question_max_score: 95}
+        row = {}
+        allow(row).to receive(:question_id).and_return(1)
+        allow(row).to receive(:question_max_score).and_return(95)
         allow(Question).to receive(:find).with(1).and_return(question)
         allow(question).to receive(:is_a?).and_return(ScoredQuestion)
-        expect(type_and_max(@row)).to eq(9311 + @row.question_max_score)
+        expect(type_and_max(row)).to eq(9311 + @row.question_max_score)
       end
     end
     context 'when the question is something else' do
       it 'returns 9998' do
-        @row = {question_id: 1, question_max_score: 95}
+        row = {}
+        allow(row).to receive(:question_id).and_return(1)
         allow(Question).to receive(:find).with(1).and_return(question)
         question[:type] == 'NotACheckbox'
-        expect(type_and_max(@row)).to eq(9998)
+        expect(type_and_max(row)).to eq(9998)
       end
     end 
   end

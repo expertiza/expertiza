@@ -64,7 +64,7 @@ describe GradesHelper, type: :helper do
   describe 'type_and_max' do  
     context 'when the question is a Checkbox' do
       it 'returns 10_003' do
-        row = {}
+        row = VmQuestionResponseRow.new
         allow(row).to receive(:question_id).and_return(1)
         allow(Question).to receive(:find).with(1).and_return(question)
         question[:type] == 'Checkbox'
@@ -73,7 +73,7 @@ describe GradesHelper, type: :helper do
     end
     context 'when the question is a ScoredQuestion' do
       it 'returns the correct code adn the max score' do
-        row = {}
+        row = VmQuestionResponseRow.new
         allow(row).to receive(:question_id).and_return(1)
         allow(row).to receive(:question_max_score).and_return(95)
         allow(Question).to receive(:find).with(1).and_return(question)
@@ -83,7 +83,7 @@ describe GradesHelper, type: :helper do
     end
     context 'when the question is something else' do
       it 'returns 9998' do
-        row = {}
+        row = VmQuestionResponseRow.new
         allow(row).to receive(:question_id).and_return(1)
         allow(Question).to receive(:find).with(1).and_return(question)
         question[:type] == 'NotACheckbox'

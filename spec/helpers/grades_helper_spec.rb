@@ -67,7 +67,7 @@ describe GradesHelper, type: :helper do
         row = VmQuestionResponseRow.new('Some question text', 1, 5, 95, 2)
         allow(Question).to receive(:find).with(1).and_return(question)
         question[:type] == 'Checkbox'
-         allow(question).to receive(:is_a?).and_return(Question)
+         allow(question).to receive(:is_a?).and_return(Checkbox)
         expect(type_and_max(row)).to eq(10_003)
       end
     end
@@ -83,7 +83,7 @@ describe GradesHelper, type: :helper do
       it 'returns 9998' do
         row = VmQuestionResponseRow.new('Some question text', 1, 5, 95, 2)
         allow(Question).to receive(:find).with(1).and_return(question)
-        allow(question).to receive(:is_a?).and_return(Question)
+        allow(question).to receive(:is_a?).and_return(UnscoredQuestion)
         question[:type] == 'NotACheckbox'
         expect(type_and_max(row)).to eq(9998)
       end

@@ -134,6 +134,7 @@ describe GradesHelper, type: :helper do
 
   describe 'attributes' do 
     it 'returns the penalty attributes' do 
+      allow(Assignment).to receive(:find).with(1).and_return(assignment)
       expect(attributes(participant)).to eq([1, 'submission'])
     end
   end

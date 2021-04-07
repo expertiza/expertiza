@@ -44,7 +44,7 @@ module GradesHelper
     deadline_type_id = [1, 2, 5]
     penalties_symbols = %i[submission review meta_review]
     deadline_type_id.zip(penalties_symbols).each do |id, symbol|
-      CalculatedPenalty.create(deadline_type_id: id, participant_id: @participant.id, penalty_points: penalties[symbol])
+      CalculatedPenalty.create(deadline_type_id: id, participant_id: _participant.id, penalty_points: penalties[symbol])
     end
   end
 

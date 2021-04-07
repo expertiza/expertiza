@@ -2,6 +2,8 @@ describe GradesHelper, type: :helper do
   let(:review_response) { build(:response, id: 1, map_id: 1) }
   let(:question) { build(:question) }
   let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
+  let(:assignment) { build(:assignment, id: 1, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true)}
+  let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
 
   describe 'get_accordion_title' do
     it 'should render is_first:true if last_topic is nil' do

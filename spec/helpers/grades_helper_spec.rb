@@ -98,4 +98,11 @@ describe GradesHelper, type: :helper do
       end
     end
   end
+
+  describe 'mean' do
+    it 'computes the mean of an array' do
+      array = [2,3,4]
+      expect(mean(array)).to be(3.0)
+    end
+  end
 end

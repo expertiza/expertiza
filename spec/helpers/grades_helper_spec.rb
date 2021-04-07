@@ -1,6 +1,7 @@
 describe GradesHelper, type: :helper do
   let(:review_response) { build(:response, id: 1, map_id: 1) }
   let(:question) { build(:question) }
+  let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
 
   describe 'get_accordion_title' do
     it 'should render is_first:true if last_topic is nil' do
@@ -126,6 +127,12 @@ describe GradesHelper, type: :helper do
         }
         expect(vector(scores)).to eq([75, 65]) 
       end 
+    end
+  end
+
+  describe 'attributes' do 
+    it 'returns the penalty attributes' do 
+      expect(attributes(participant)).to eq([1, 'submission'])
     end
   end
 end

@@ -40,11 +40,11 @@ module GradesHelper
   end
 
   # This function returns the penalty attributes
-  def attributes(_participant)
+  def attributes(participant)
     deadline_type_id = [1, 2, 5]
     penalties_symbols = %i[submission review meta_review]
     deadline_type_id.zip(penalties_symbols).each do |id, symbol|
-      CalculatedPenalty.create(deadline_type_id: id, participant_id: _participant.id, penalty_points: penalties_symbols[symbol])
+      CalculatedPenalty.create(deadline_type_id: id, participant_id: participant.id, penalty_points: penalties(@assignment.id)[symbol])
     end
   end
 

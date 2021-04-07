@@ -124,7 +124,7 @@ describe GradesHelper, type: :helper do
             }
           }
         }
-        expect(vector(scores)).to be([75, 65]) 
+        expect(vector(scores)).to eq([75, 65]) 
       end 
     end
   end

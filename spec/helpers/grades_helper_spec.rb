@@ -63,7 +63,7 @@ describe GradesHelper, type: :helper do
 
   describe 'type_and_max' do  
     context 'when the question is a Checkbox' do
-      it 'returns 10_003'
+      it 'returns 10_003' do
         @row = {question_id => 1, question_max_score => 95}
         allow(Question).to receive(:find).with(1).and_return(question)
         question[type] == 'Checkbox'

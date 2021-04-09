@@ -17,7 +17,6 @@ describe ReviewMetricsQuery do
   before(:each) do
     team_id = answer.response.response_map.reviewee_id
     ReviewMetricsQuery.class_variable_set(:@@thresholds, team_id => 0.8)
-    # stub_const("ReviewMetricsQuery::TAG_CERTAINTY_THRESHOLD", 0.8)
   end
 
   describe 'confident?' do

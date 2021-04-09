@@ -61,17 +61,7 @@ class AnswerTagsController < ApplicationController
       end
       render json: {increment: 1}
     else
-      rids = []
-      assignment.teams.each do |team|
-        if assignment.varying_rubrics_by_round?
-          (1..assignment.rounds_of_reviews).each do |round|
-            rids += ReviewResponseMap.get_responses_for_team_round(team, round).map(&:id)
-          end
-        else
-          rids += ResponseMap.get_assessments_for(team).map(&:id)
-        end
-      end
-      render json: rids
+      render json: assignment.teams.map {|team| team.responses.map(&:id) }.flatten
     end
   end
 end

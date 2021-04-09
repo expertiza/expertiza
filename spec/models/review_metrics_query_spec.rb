@@ -15,7 +15,8 @@ describe ReviewMetricsQuery do
   let!(:answer_tag_4) { AnswerTag.create(answer: answer, tag_prompt_deployment: tag_prompt_deployment_4, value: 1, confidence_level: 0.8) }
 
   before(:each) do
-    stub_const("ReviewMetricsQuery::TAG_CERTAINTY_THRESHOLD", 0.8)
+    team_id = answer.response.response_map.reviewee_id
+    ReviewMetricsQuery.class_variable_set(:@@thresholds, team_id => 0.8)
   end
 
   describe 'confident?' do
@@ -25,12 +26,6 @@ describe ReviewMetricsQuery do
     end
     it 'returns false if the confidence level is lower than the TAG_CERTAINTY_THRESHOLD' do
       expect(ReviewMetricsQuery.confident?(tag_prompt_deployment_1.id, answer.id)).to be(false)
-    end
-  end
-
-  describe 'confidence' do
-    it 'returns the confidence level of certain metric prediction on the inputted answer' do
-      expect(ReviewMetricsQuery.confidence(tag_prompt_deployment_2.id, answer.id)).to eq(0.9)
     end
   end
 

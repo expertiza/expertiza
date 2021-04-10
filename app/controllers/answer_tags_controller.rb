@@ -61,7 +61,7 @@ class AnswerTagsController < ApplicationController
       end
       render json: {increment: 1}
     else
-      render json: assignment.teams.map {|team| team.responses.map(&:id) }.flatten
+      render json: assignment.teams.map {|team| team.all_responses.map(&:id)}.flatten
     end
   end
 end

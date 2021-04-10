@@ -20,11 +20,11 @@ describe ReviewMetricsQuery do
   end
 
   describe 'confident?' do
-    it 'returns true if the confidence level is higher than or equal to the TAG_CERTAINTY_THRESHOLD' do
+    it 'returns true if the confidence level is higher than the TAG_CERTAINTY_THRESHOLD' do
       expect(ReviewMetricsQuery.confident?(tag_prompt_deployment_2.id, answer.id)).to be(true)
-      expect(ReviewMetricsQuery.confident?(tag_prompt_deployment_4.id, answer.id)).to be(true)
     end
-    it 'returns false if the confidence level is lower than the TAG_CERTAINTY_THRESHOLD' do
+    it 'returns false if the confidence level is lower than or equal to the TAG_CERTAINTY_THRESHOLD' do
+      expect(ReviewMetricsQuery.confident?(tag_prompt_deployment_4.id, answer.id)).to be(false)
       expect(ReviewMetricsQuery.confident?(tag_prompt_deployment_1.id, answer.id)).to be(false)
     end
   end

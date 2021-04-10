@@ -51,15 +51,20 @@ class ReviewMetricsQuery
   end
 
   def self.cache_threshold(team)
-    answers = []
+    total_tags = 0
+    machine_tags = []
     TagPromptDeployment.where(assignment_id: team.assignment.id).find_each do |tag_dep|
       questions_ids = Question.where(questionnaire_id: tag_dep.questionnaire.id, type: tag_dep.question_type).map(&:id)
-      answers += Answer.where(question_id: questions_ids, response_id: team.responses.map(&:id))
+      ans = Answer.where(question_id: questions_ids, response_id: team.all_responses.map(&:id))
+      ans = ans.where("length(comments) > ?", tag_dep.answer_length_threshold.to_s) unless tag_dep.answer_length_threshold.nil?
+      total_tags += ans.length # how many tags that a student have to tag
+      machine_tags += machine_tags(ans.map(&:id), tag_dep.id) # how many tags that are tagged by machine
     end
-    machine_tags = machine_tags(answers.map(&:id))
-    machine_tags = machine_tags.sort_by {|tag| -tag.confidence_level }
-    tag = machine_tags.last(150).first
-    @@thresholds[team.id] = tag ? tag.confidence_level : 0
+    # confidence level of all tags, those not tagged by machine have confidence level = 0
+    confidence_levels = machine_tags.map(&:confidence_level).compact.sort_by(&:-@) + [0] * (total_tags - machine_tags.length)
+    # get the confidence level of the 200th most uncertain tag and make it the threshold to compare against
+    threshold = confidence_levels.last(200).first
+    @@thresholds[team.id] = threshold
   end
 
   def self.inferred_value(metric, review)
@@ -97,7 +102,7 @@ class ReviewMetricsQuery
     cache_threshold(team) unless @@thresholds[team.id]
     tag = machine_tags(review_id, tag_prompt_deployment_id).first
     confidence = tag ? tag.confidence_level : 0
-    confidence >= @@thresholds[team.id]
+    confidence > @@thresholds[team.id]
   end
 
   def self.has?(tag_prompt_deployment_id, review_id)

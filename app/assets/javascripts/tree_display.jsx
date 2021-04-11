@@ -270,7 +270,6 @@ jQuery(document).ready(function() {
       }
     },
     callForEachResponse: function(_this, index) {
-      console.log("??");
       if (index < 0) {
         return;
       }

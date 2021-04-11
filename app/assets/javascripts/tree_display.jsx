@@ -269,24 +269,33 @@ jQuery(document).ready(function() {
         responses: []
       }
     },
+    callForEachResponse: function(_this, index) {
+      console.log("??");
+      if (index < 0) {
+        return;
+      }
+      jQuery.get("/answer_tags/machine_tagging?assignment_id=" + _this.props.assignment_id + "&response_id=" + _this.state.responses[index], function(data) {
+        _this.setState({
+          current: _this.state.current + data['increment']
+        })
+        _this.callForEachResponse(_this, --index);
+      })
+    },
+    callForNumberOfResponses: function(_this) {
+      jQuery.get("/answer_tags/machine_tagging?assignment_id=" + this.props.assignment_id, function(responses) {
+        _this.setState({
+          responses: responses
+        });
+        _this.callForEachResponse(_this,responses.length - 1);
+      });
+    },
     handleClick: function(e) {
       this.setState({
         current: 0,
         responses: []
       });
       var _this = this;
-      jQuery.get("/answer_tags/machine_tagging?assignment_id=" + this.props.assignment_id, function(responses) {
-        _this.setState({
-          responses: responses
-        });
-        for (var i = 0;  i < responses.length; i++) {
-          jQuery.get("/answer_tags/machine_tagging?assignment_id=" + _this.props.assignment_id + "&response_id=" + responses[i], function(data) {
-            _this.setState({
-              current: _this.state.current + data['increment']
-            })
-          })
-        }
-      });
+      this.callForNumberOfResponses(_this);
     },
     render: function () {
       const {current, responses } = this.state;

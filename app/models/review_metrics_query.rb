@@ -4,6 +4,7 @@ class ReviewMetricsQuery
                       'suggest solutions?' => 'suggestions',
                       'mention praise?' => 'sentiment',
                       'positive tone?' => 'emotions'}.freeze
+  NUMBER_OF_MOST_UNCERTAIN_MACHINE_TAGS = 100
 
   # Cache tag certainty threshold for different assignment teams
   # The certainty threshold is the fraction (between 0 and 1) that says how certain
@@ -11,6 +12,8 @@ class ReviewMetricsQuery
   # manually.
   @@thresholds = {}
 
+  # return all machine tags for the review (Answer object)
+  # when tag_prompt_deployment_id is supplied, return only its tag
   def self.machine_tags(review_id, tag_prompt_deployment_id=nil)
     tags = AnswerTag.where(answer_id: review_id).where.not(confidence_level: nil)
     tags = tags.where(tag_prompt_deployment_id: tag_prompt_deployment_id) if tag_prompt_deployment_id
@@ -18,53 +21,52 @@ class ReviewMetricsQuery
   end
 
   def self.cache_ws_results(reviews, tag_prompt_deployments)
-    ws_input = {'reviews' => []}
-    reviews.each do |review|
-      ws_input['reviews'] << {'id' => review.id, 'text' => review.de_tag_comments} if review.comments.present?
-    end
-
     tags = []
-
-    # ask MetricsController to make a call to the review metrics web service
-    tag_prompt_deployments.each do |tag_prompt_deployment|
-      tag_prompt = tag_prompt_deployment.tag_prompt
-      metric = PROMPT_TO_METRIC[tag_prompt.prompt.downcase]
-      begin
-        ws_output = MetricsController.new.bulk_retrieve_metric(metric, ws_input, false)
-        ws_output_confidence = MetricsController.new.bulk_retrieve_metric(metric, ws_input, true)
-      rescue StandardError
-        break
-      else
-        next unless ws_output && ws_output['reviews'] && ws_output_confidence && ws_output_confidence['reviews']
-        ws_output['reviews'].zip(ws_output_confidence['reviews']).each do |review_with_value, review_with_confidence|
-          tag = AnswerTag.where(answer_id: review_with_value['id'],
-                                tag_prompt_deployment_id: tag_prompt_deployment.id)
-                         .where.not(confidence_level: [nil]).first_or_initialize
-          tag.assign_attributes(value: inferred_value(metric, review_with_value),
-                                confidence_level: inferred_confidence(metric, review_with_confidence))
-          tags << tag
+    # send every 10 reviews per request (web service returns failure if request body is too large)
+    reviews.each_slice(10) do |rs|
+      # prepare input
+      ws_input = {'reviews' => []}
+      rs.each do |review|
+        ws_input['reviews'] << {'id' => review.id, 'text' => review.de_tag_comments} if review.comments.present?
+      end
+      tag_prompt_deployments.each do |tag_prompt_deployment|
+        tag_prompt = tag_prompt_deployment.tag_prompt
+        metric = PROMPT_TO_METRIC[tag_prompt.prompt.downcase]
+        begin
+          # these two can be merged into one call
+          ws_output = MetricsController.new.bulk_retrieve_metric(metric, ws_input, false)
+          ws_output_confidence = MetricsController.new.bulk_retrieve_metric(metric, ws_input, true)
+        rescue StandardError # rescue any error thrown from the MetricsController so the code can keep running
+          break
+        else
+          next unless ws_output && ws_output['reviews'] && ws_output_confidence && ws_output_confidence['reviews']
+          ws_output['reviews'].zip(ws_output_confidence['reviews']).each do |review_with_value, review_with_confidence|
+            tag = AnswerTag.where(answer_id: review_with_value['id'],
+                                  tag_prompt_deployment_id: tag_prompt_deployment.id)
+                           .where.not(confidence_level: [nil]).first_or_initialize
+            tag.assign_attributes(value: inferred_value(metric, review_with_value),
+                                  confidence_level: inferred_confidence(metric, review_with_confidence))
+            tags << tag
+          end
         end
       end
     end
-
     tags.each(&:save)
   end
 
+  # cache different tag certainty threshold for different teams
+  # only open NUMBER_OF_MOST_UNCERTAIN_MACHINE_TAGS for students to tag
   def self.cache_threshold(team)
-    total_tags = 0
     machine_tags = []
     TagPromptDeployment.where(assignment_id: team.assignment.id).find_each do |tag_dep|
       questions_ids = Question.where(questionnaire_id: tag_dep.questionnaire.id, type: tag_dep.question_type).map(&:id)
       ans = Answer.where(question_id: questions_ids, response_id: team.all_responses.map(&:id))
       ans = ans.where("length(comments) > ?", tag_dep.answer_length_threshold.to_s) unless tag_dep.answer_length_threshold.nil?
-      total_tags += ans.length # how many tags that a student have to tag
       machine_tags += machine_tags(ans.map(&:id), tag_dep.id) # how many tags that are tagged by machine
     end
-    # confidence level of all tags, those not tagged by machine have confidence level = 0
-    confidence_levels = machine_tags.map(&:confidence_level).compact.sort_by(&:-@) + [0] * (total_tags - machine_tags.length)
-    # get the confidence level of the 200th most uncertain tag and make it the threshold to compare against
-    threshold = confidence_levels.last(200).first
-    @@thresholds[team.id] = threshold
+    confidence_levels = machine_tags.map(&:confidence_level).compact.sort_by(&:-@)
+    threshold = confidence_levels.last(NUMBER_OF_MOST_UNCERTAIN_MACHINE_TAGS).first
+    @@thresholds[team.id] = threshold || 0
   end
 
   def self.inferred_value(metric, review)

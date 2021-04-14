@@ -138,7 +138,8 @@ describe GradesHelper, type: :helper do
       allow(GradesHelper).to receive(:penalties).with(1).and_return()
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
       allow(GradesHelper).to receive(penalties).with('submission').and_return({})
-      expect(attributes(@participant)).to eq([1, 'submission'])
+      @participant = participant
+      expect(attributes(@articipant)).to eq([1, 'submission'])
     end
   end
 end

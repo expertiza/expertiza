@@ -31,7 +31,7 @@
           <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Participant name</th>
         <% end %>  
         <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Links</th> 
-        <th class="sorter-false" style="font-weight: bold; font-size: 15px;"></th>
+        <th class="sorter-false" style="font-weight: bold; font-size: 15px;">History</th>
       </tr>                    
     </thead>
     <% @l = -1 %>
@@ -52,7 +52,7 @@
           <% unless participants.empty? %>
             <!-- “Assign Grade” will show if the final deadline of this assignment pass -->
             <% if @assignment.get_current_stage() == "Finished" %>
-              <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %></td>
+              <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %>
             <!-- if current user(TA/instructor) is participant in assignment then the user can perform review -->
             <%elsif current_user_is_assignment_participant?(@assignment.id) %>
               <%= render :partial => 'responses', :locals => {:team => team ,:topic_id => topic_identifier, :title => 'Review'} %>
@@ -87,6 +87,7 @@
             <%= display_directory_tree(participant, files, true).html_safe if files and files.length > 0 %>
           <% end %>
         </td>
+
         <td width="10%">
 
           <%= link_to "History", submission_records_path(team_id: team.id) %> 

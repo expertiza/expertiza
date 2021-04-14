@@ -49,9 +49,7 @@ class StudentTaskController < ApplicationController
     @can_review = @participant.can_review
     @can_take_quiz = @participant.can_take_quiz
     @authorization = Participant.get_authorization(@can_submit, @can_review, @can_take_quiz)
-    @team_id = TeamsUser.team_id(@participant.parent_id, @participant.user_id)
-    puts @team_id
-    @team = Team.find(@team_id)
+    @team = @participant.team
     denied unless current_user_id?(@participant.user_id)
     @assignment = @participant.assignment
     @can_provide_suggestions = @assignment.allow_suggestions

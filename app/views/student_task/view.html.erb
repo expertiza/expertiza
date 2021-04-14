@@ -42,7 +42,7 @@ to display the label "Your team" in the student assignment tasks-->
   <%if @assignment.max_team_size > 1 %>
     <% if @authorization == 'participant' %>
       <li>
-        <%= link_to 'Your team', view_student_teams_path(student_id: @participant.id) %>
+        <%= link_to 'Your team', view_student_teams_path(student_id: @participant.user.id) %>
         (View and manage your team)
       </li>
     <% end %>

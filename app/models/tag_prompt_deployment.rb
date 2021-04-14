@@ -3,6 +3,8 @@ class TagPromptDeployment < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :questionnaire
 
+  require "time"
+
   def tag_prompt
     TagPrompt.find(self.tag_prompt_id)
   end
@@ -39,9 +41,21 @@ class TagPromptDeployment < ActiveRecord::Base
         users = TeamsUser.where(team_id: team.id).map(&:user)
         users.each do |user|
           tags = AnswerTag.where(tag_prompt_deployment_id: self.id, user_id: user.id, answer_id: taggable_answers.map(&:id))
+
+          # E2082 Track_Time_Between_Successive_Tag_Assignments
+          # Extract time where each tag is generated / modified
+          tag_updated_times = tags.map(&:updated_at)
+          # tag_updated_times.sort_by{|time_string| Time.parse(time_string)}.reverse
+          tag_updated_times.sort_by{|time_string| time_string}.reverse
+          number_of_updated_time = tag_updated_times.length
+          tag_update_intervals = []
+          for i in 1..(number_of_updated_time -1) do
+            tag_update_intervals.append(tag_updated_times[i] - tag_updated_times[i-1])
+          end
+
           percentage = taggable_answers.count.zero? ? "-" : format("%.1f", tags.count.to_f / taggable_answers.count * 100)
           not_tagged_answers = taggable_answers.reject {|a| tags.map(&:answer_id).include?(a.id) }
-          answer_tagging = VmUserAnswerTagging.new(user, answers.count, answers_inferred_by_ml.count, taggable_answers.count, tags.count, not_tagged_answers.count, percentage)
+          answer_tagging = VmUserAnswerTagging.new(user, answers.count, answers_inferred_by_ml.count, taggable_answers.count, tags.count, not_tagged_answers.count, percentage, tag_update_intervals)
           user_answer_tagging.append(answer_tagging)
         end
       end

@@ -41,6 +41,8 @@
               <th class="sorter-true"># tags actually set by author<img src='/assets/info.png' title='Number of tags that the author did assign'></th>
               <th class="sorter-true"># tags not set by author<img src='/assets/info.png' title='Number of tags that the author could have assigned, but did not'></th>
               <th class="sorter-true">% tags actually set by author<img src='/assets/info.png' title='Of the number of tags that machine learning did not assign, the percentage that the author did assign'></th>
+              <th class="sorter-true"># intervals<img src='/assets/info.png' title='Track time between successive tag assignments'></th>
+              <th class="sorter-true">Key Graph Info<img src='/assets/info.png' title='Key information of time intervals'></th>
             </tr>
             </thead>
             <% report_lines.each do |report_line| %>
@@ -53,6 +55,24 @@
                 <td><%= report_line.no_tagged.to_s %></td>
                 <td><%= report_line.no_not_tagged.to_s %></td>
                 <td><%= report_line.percentage.to_s %>%</td>
+                <!-- E2082 Call chart plotting function from review_mapping_helper -->
+                <td align='left'>
+                  <%= display_tagging_interval_chart(report_line.tag_update_intervals) %>
+                </td>
+                <!-- <td><%= report_line.tag_update_intervals.to_s %></td> -->
+                <% key_chart_information = calculate_key_chart_information(report_line.tag_update_intervals) %>
+                <td>
+                  <!-- Populates statistics only if backend returned details -->
+                  <% if(key_chart_information.is_a?(Hash))%>
+                      <ul>
+                        <li>Mean: <%= key_chart_information[:mean] %></li>
+                        <li>Min: <%= key_chart_information[:min] %></li>
+                        <li>Max: <%= key_chart_information[:max] %></li>
+                        <li>Variance: <%= key_chart_information[:variance] %></li>
+                        <li>Standard Deviation: <%= key_chart_information[:stand_dev] %></li>
+                      </ul>
+                  <% end %>
+                </td>
               </tr>
             <% end %>
           </table>

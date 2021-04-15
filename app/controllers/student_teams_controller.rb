@@ -19,7 +19,6 @@ class StudentTeamsController < ApplicationController
   before_action :student, only: %i[view update edit create remove_participant]
 
   def action_allowed?
-    return true
     # note, this code replaces the following line that cannot be called before action allowed?
     return false unless current_user_has_student_privileges?
     case action_name

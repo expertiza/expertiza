@@ -1,4 +1,8 @@
+require 'singleton'
+
 class ReviewMetricsQuery
+  include Singleton
+
   # link each tag prompt to the corresponding key in the review hash
   PROMPT_TO_METRIC = {'mention problems?' => 'problem',
                       'suggest solutions?' => 'suggestions',
@@ -6,18 +10,12 @@ class ReviewMetricsQuery
                       'positive tone?' => 'emotions'}.freeze
   NUMBER_OF_MOST_UNCERTAIN_MACHINE_TAGS = 100
 
-  # Cache tag certainty threshold for different assignment teams
-  # The certainty threshold is the fraction (between 0 and 1) that says how certain
-  # the ML algorithm must be of a tag value before it will ask the author to tag it
-  # manually.
-  @@thresholds = {}
-
-  # return all machine tags for the review (Answer object)
-  # when tag_prompt_deployment_id is supplied, return only its tag
-  def self.machine_tags(review_id, tag_prompt_deployment_id=nil)
-    tags = AnswerTag.where(answer_id: review_id).where.not(confidence_level: nil)
-    tags = tags.where(tag_prompt_deployment_id: tag_prompt_deployment_id) if tag_prompt_deployment_id
-    tags
+  def initialize
+    # Cache tag certainty threshold for different assignment teams
+    # The certainty threshold is the fraction (between 0 and 1) that says how certain
+    # the ML algorithm must be of a tag value before it will ask the author to tag it
+    # manually.
+    @thresholds = {}
   end
 
   def self.cache_ws_results(reviews, tag_prompt_deployments)
@@ -54,21 +52,6 @@ class ReviewMetricsQuery
     tags.each(&:save)
   end
 
-  # cache different tag certainty threshold for different teams
-  # only open NUMBER_OF_MOST_UNCERTAIN_MACHINE_TAGS for students to tag
-  def self.cache_threshold(team)
-    machine_tags = []
-    TagPromptDeployment.where(assignment_id: team.assignment.id).find_each do |tag_dep|
-      questions_ids = Question.where(questionnaire_id: tag_dep.questionnaire.id, type: tag_dep.question_type).map(&:id)
-      ans = Answer.where(question_id: questions_ids, response_id: team.all_responses.map(&:id))
-      ans = ans.where("length(comments) > ?", tag_dep.answer_length_threshold.to_s) unless tag_dep.answer_length_threshold.nil?
-      machine_tags += machine_tags(ans.map(&:id), tag_dep.id) # how many tags that are tagged by machine
-    end
-    confidence_levels = machine_tags.map(&:confidence_level).compact.sort_by(&:-@)
-    threshold = confidence_levels.last(NUMBER_OF_MOST_UNCERTAIN_MACHINE_TAGS).first
-    @@thresholds[team.id] = threshold || 0
-  end
-
   def self.inferred_value(metric, review)
     value = case metric
             when 'problem'
@@ -98,16 +81,47 @@ class ReviewMetricsQuery
     end
   end
 
+  # return all machine tags for the review (Answer object)
+  # when tag_prompt_deployment_id is supplied, return only its tag
+  def machine_tags(review_id, tag_prompt_deployment_id=nil)
+    tags = AnswerTag.where(answer_id: review_id).where.not(confidence_level: nil)
+    tags = tags.where(tag_prompt_deployment_id: tag_prompt_deployment_id) if tag_prompt_deployment_id
+    tags
+  end
+
+  # cache different tag certainty threshold for different teams
+  # only open NUMBER_OF_MOST_UNCERTAIN_MACHINE_TAGS for students to tag
+  def cache_threshold(team)
+    machine_tags = []
+    TagPromptDeployment.where(assignment_id: team.assignment.id).find_each do |tag_dep|
+      questions_ids = Question.where(questionnaire_id: tag_dep.questionnaire.id, type: tag_dep.question_type).map(&:id)
+      ans = Answer.where(question_id: questions_ids, response_id: team.all_responses.map(&:id))
+      ans = ans.where("length(comments) > ?", tag_dep.answer_length_threshold.to_s) unless tag_dep.answer_length_threshold.nil?
+      machine_tags += machine_tags(ans.map(&:id), tag_dep.id) # how many tags that are tagged by machine
+    end
+    confidence_levels = machine_tags.map(&:confidence_level).compact.sort_by(&:-@)
+    threshold = confidence_levels.last(NUMBER_OF_MOST_UNCERTAIN_MACHINE_TAGS).first
+    @thresholds[team.id] = threshold || 0
+  end
+
   def self.confident?(tag_prompt_deployment_id, review_id)
+    ReviewMetricsQuery.instance.confident?(tag_prompt_deployment_id, review_id)
+  end
+
+  def confident?(tag_prompt_deployment_id, review_id)
     response_map = Answer.find(review_id).response.response_map
     team = AssignmentTeam.find(response_map.reviewee_id)
-    cache_threshold(team) unless @@thresholds[team.id]
+    cache_threshold(team) unless @thresholds[team.id]
     tag = machine_tags(review_id, tag_prompt_deployment_id).first
     confidence = tag ? tag.confidence_level : 0
-    confidence > @@thresholds[team.id]
+    confidence > @thresholds[team.id]
   end
 
   def self.has?(tag_prompt_deployment_id, review_id)
+    ReviewMetricsQuery.instance.has?(tag_prompt_deployment_id, review_id)
+  end
+
+  def has?(tag_prompt_deployment_id, review_id)
     tag = machine_tags(review_id, tag_prompt_deployment_id).first
     tag ? tag.value == '1' : false
   end

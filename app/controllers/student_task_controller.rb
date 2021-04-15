@@ -5,6 +5,7 @@ class StudentTaskController < ApplicationController
 
   def action_allowed?
     #current_user_has_student_privileges?
+    true
   end
 
   def impersonating_as_admin?

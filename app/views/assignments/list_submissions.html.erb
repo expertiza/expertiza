@@ -31,7 +31,7 @@
           <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Participant name</th>
         <% end %>  
         <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Links</th> 
-        <th class="sorter-false" style="font-weight: bold; font-size: 15px;"></th>
+        <th class="sorter-false" style="font-weight: bold; font-size: 15px;">History</th>
       </tr>                    
     </thead>
     <% @l = -1 %>
@@ -58,7 +58,7 @@
               <%= render :partial => 'responses', :locals => {:team => team ,:topic_id => topic_identifier, :title => 'Review'} %>
             <% end %>
             <br>
-            <%= link_to 'GitHub Metrics', { controller: 'grades', action: 'view_github_metrics', id: participants.first.id }, target: '_blank' %></td>
+              <%= link_to 'GitHub Metrics', { controller: 'metrics', action: 'view', id: participants.first.id }, target: '_blank' %></td>
           <% end %>
         <% end %>
 
@@ -87,6 +87,7 @@
             <%= display_directory_tree(participant, files, true).html_safe if files and files.length > 0 %>
           <% end %>
         </td>
+
         <td width="10%">
 
           <%= link_to "History", submission_records_path(team_id: team.id) %>

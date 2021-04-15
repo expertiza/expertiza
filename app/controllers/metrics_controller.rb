@@ -9,6 +9,11 @@ class MetricsController < ApplicationController
   include AuthorizationHelper
   include MetricsHelper # this module is currently empty
 
+  # currently only give instructor this right, can be further discussed
+  def action_allowed?
+    current_user_has_instructor_privileges?
+  end
+
   # render the view_github_metrics page
   def view
     if session["github_access_token"].nil? # check if there is a github_access_token in current session
@@ -17,7 +22,6 @@ class MetricsController < ApplicationController
       redirect_to authorize_github_grades_path # if no github_access_token present, redirect to authorization page
       return
     end
-
     @head_refs = {} # global reference hash, key is PR number, value is the head commit global id, owner, and repo
     @parsed_data = {} # a hash track each author's commits grouped by date
     @authors = {} # pull request authors

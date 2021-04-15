@@ -23,7 +23,7 @@ class MentorManagement
   #   they are assigned to. Returns `nil` if there are
   #   no participants with mentor duty for [assignment_id].
   def self.select_mentor(assignment_id)
-    mentor_user_id, _ = self.zip_mentors_with_team_count(assignment_id).first(1)
+    mentor_user_id, _ = self.zip_mentors_with_team_count(assignment_id).first
     mentor_user_id
   end
 

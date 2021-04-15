@@ -4,8 +4,7 @@ class StudentTaskController < ApplicationController
   helper :submitted_content
 
   def action_allowed?
-    #current_user_has_student_privileges?
-    true
+    current_user_has_student_privileges?
   end
 
   def impersonating_as_admin?

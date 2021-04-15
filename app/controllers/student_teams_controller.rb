@@ -25,9 +25,9 @@ class StudentTeamsController < ApplicationController
     case action_name
     when 'view'
       if are_needed_authorizations_present?(params[:student_id], "reader", "reviewer", "submitter")
-	 return false unless current_user_has_id? student.user_id
+        return true unless current_user_has_id? student.user_id
       else
-	 return false
+        return false
       end
     when 'create'
       current_user_has_id? student.user_id

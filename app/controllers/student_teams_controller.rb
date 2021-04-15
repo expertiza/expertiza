@@ -20,13 +20,15 @@ class StudentTeamsController < ApplicationController
 
   def action_allowed?
     # note, this code replaces the following line that cannot be called before action allowed?
+    flash[:notice] = action_name.to_s + '\n'
+    flash[:notice] += are_needed_authorizations_present?(params[:student_id], "reader", "reviewer", "submitter").to_s + '\n'
     return false unless current_user_has_student_privileges?
     case action_name
     when 'view'
       if are_needed_authorizations_present?(params[:student_id], "reader", "reviewer", "submitter")
-	 return false unless current_user_has_id? student.user_id
+        return true if current_user_has_id? student.user_id
       else
-	 return false
+        return false
       end
     when 'create'
       current_user_has_id? student.user_id

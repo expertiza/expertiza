@@ -105,7 +105,6 @@ module GradesHelper
     return "underlined" if score.comment.present?
   end
 
-
   def retrieve_questions(questionnaires, assignment_id)
     questions = {}
     questionnaires.each do |questionnaire|
@@ -120,6 +119,11 @@ module GradesHelper
     questions
   end
   
+  # Fall 2018, E1858
+  # Creates the bar graph for the github metrics data.
+  # Links the authors with their github data and assigns
+  # them a color. Currently supports up to 6 different colors and will
+  # loop if it goes over.
   def display_github_metrics(parsed_data, authors, dates)
     data_array = []
     color = %w[red yellow blue gray green magenta]
@@ -142,6 +146,8 @@ module GradesHelper
     horizontal_bar_chart data, chart_options
   end
 
+  # Fall 2018, E1858
+  # Defines the general settings of the github metrics chart
   def chart_options
     {
       responsive: true,
@@ -152,6 +158,8 @@ module GradesHelper
     }
   end
 
+  # Fall 2018, E1858
+  # Defines the labels and display of the data on the github metrics chart
   def graph_scales
     {
       yAxes: [{

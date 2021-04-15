@@ -40,6 +40,8 @@ class AuthController < ApplicationController
                 action: AuthHelper.get_home_action(session[:user])
   end
 
+  # Fall 2018, E1858
+  # Uses oauth protocol to attempt to authorize user for either google or Github
   def oauth_login
     case params[:provider]
     when "github"
@@ -51,6 +53,8 @@ class AuthController < ApplicationController
     end
   end
 
+  # Fall 2018, E1858
+  # Login functionality for Github login feature using omniAuth2
   def github_login
     session["github_access_token"] = env['omniauth.auth']["credentials"]["token"]
     if session["github_view_type"] == "view_submissions"

@@ -11,20 +11,20 @@ class MentorManagement
   # 3) Return the mentor with the fewest number of
   #    teams they're currently mentoring.
   #
-  # Implementation detail: An empty array is returned
-  # in the event there are no mentors meeting the
-  # criteria. If `nil` is preferred in this case, change
-  # `first(1)` to `first`.
-  #
-  # Implementation detail: Any tie between the top 2
-  # mentors is decided by the Hash#sort_by algorithm.
-  #
   # This method's runtime is O(n lg n) due to the call to
   # Hash#sort_by. This assertion assumes that the
   # database management system is capable of fetching the
   # required rows at least as quickly.
+  #
+  # Implementation detail: Any tie between the top 2
+  # mentors is decided by the Hash#sort_by algorithm.
+  #
+  # @return The id of the mentor with the fewest teams
+  #   they are assigned to. Returns `nil` if there are
+  #   no participants with mentor duty for [assignment_id].
   def self.select_mentor(assignment_id)
-    self.zip_mentors_with_team_count(assignment_id).first(1)
+    mentor_user_id, _ = self.zip_mentors_with_team_count(assignment_id).first(1)
+    mentor_user_id
   end
 
   private

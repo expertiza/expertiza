@@ -20,6 +20,7 @@ class StudentTeamsController < ApplicationController
 
   def action_allowed?
     # note, this code replaces the following line that cannot be called before action allowed?
+    flash[:notice] = 'Called action_allowed?'
     return false unless current_user_has_student_privileges?
     case action_name
     when 'view'

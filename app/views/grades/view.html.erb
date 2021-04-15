@@ -220,12 +220,10 @@
     })();
 </script>
 <h1>Summary report for <%= @assignment.name %></h1>
-
 <BR/>
 <% if @scores[:teams] %>
-  <a href="#" onClick="toggleAll(<%= @scores[:teams].length %>);return false;" id="teamAll" name="teamAll">Show all
-    teams</a>
-  <BR/><BR/>
+    <a href="#" onClick="toggleAll(<%= @scores[:teams].length %>);return false;" id="teamAll" name="teamAll">Show all teams</a>
+    <BR/><BR/>
 <% end %>
 <!-- If there are 1-member teams, the Teammate Review column should not appear in the score report.
 If there is no metareviewing deadline, the “Reviewing” column should not appear in the score report.-->
@@ -235,13 +233,11 @@ If there is no metareviewing deadline, the “Reviewing” column should not app
 <% end %>
 <table id="report_Table" class="table tablesorter table-striped grades" width="100%">
   <!--ACS Render the appropriate partial for displaying the scores depending on the team size -->
-  <% if @assignment.team_assignment? && @scores[:teams].length > 0 %>
-    <%= render :partial => 'teams' %>
-  <% else %>
-    <tr>
-      <td>No teams are defined for this assignment</td>
-    </tr>
-  <% end %>
+<% if @assignment.team_assignment? && @scores[:teams].length > 0 %>
+  <%= render :partial => 'teams' %>
+<% else %>
+  <tr><td>No teams are defined for this assignment</td></tr>
+<% end %>
 </table>
 <BR/><BR/>
 <%= link_to 'Export '+'Grades',

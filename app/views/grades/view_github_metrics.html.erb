@@ -1,3 +1,10 @@
+<!--
+  This view was added as part of Fall 2018, E1858.
+
+  Shows Team Github metric data by using a bar graph of individuals' commits.
+  Shows Team Github metric data by reporting the total number of commits, lines added,
+  lines removed, files changed, merge status, and pull request details.
+-->
 <script type="text/javascript" src="/assets/view_team_in_grades.js"></script>
 <script type="text/javascript">
     github_token = '<%= @token %>';
@@ -40,12 +47,14 @@
   <% end %>
 </div><br><br>
 
-
+<!--Github Metrics Data-->
 <% if @parsed_data && @authors.present? && @dates %>
+  <!--Github Metrics Bar Graph-->
   <h3>Code frequency</h3>
   <div class="chart-container" style="width: 1000px; height:600px;">
     <%= display_github_metrics(@parsed_data, @authors, @dates) %>
   </div>
+  <!--Github Metrics Team Statistics-->
   <h3>Team Statistics</h3>
   <ul>
     <li>Total number of commits:<%= @total_commits %></li>

@@ -142,7 +142,6 @@ class MetricsController < ApplicationController
   # Fall 2018, E1858
   # render the view_github_metrics page
   def view_github_metrics
-    byebug
     if session["github_access_token"].nil? # check if there is a github_access_token in current session
       session["participant_id"] = params[:id]
       session["github_view_type"] = "view_submissions"

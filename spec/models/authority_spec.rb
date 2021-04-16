@@ -1,6 +1,5 @@
 describe Authority do
 	let(:user1) { create(:student, name: "expertizauser", id: 1) }
-	@admin_role = build(:role_of_administrator, id: 3, name: "Administrator_role_test", description: '', parent_id: nil, default_page_id: nil)
 	describe '#initialize' do
 		it 'sets the current user' do
 			authority = Authority.new({current_user: user1})

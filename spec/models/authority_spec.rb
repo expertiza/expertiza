@@ -1,5 +1,6 @@
 describe Authority do
 	let(:user1) { create(:student, name: "expertizauser", id: 1) }
+	let(:admin) { build(:admin) }
 	describe '#initialize' do
 		it 'sets the current user' do
 			authority = Authority.new({current_user: user1})
@@ -10,7 +11,10 @@ describe Authority do
 	describe 'allow?' do
 		context 'the current user is an admin' do
 			it 'returns true' do
-
+				authority = Authority.new({current_user: admin})
+				controller = nil
+				action = nil
+				expect(authority.allow?(controller, action)).to eq(true)
 			end
 		end
 		context 'you try to use the page controller' do

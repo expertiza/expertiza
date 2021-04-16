@@ -24,8 +24,10 @@ describe Authority do
 
 		context 'you are not an admin and not trying to access the page controller' do
 			it 'returns false' do
-
-
+				controller = 'menu'
+				action = nil
+				authority = Authority.new({current_user: user1})
+				expect(authority.allow?(controller, action)).to eq(false)
 			end
 		end
 	end

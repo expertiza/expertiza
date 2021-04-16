@@ -1,5 +1,5 @@
 describe Authority do
-	let(:user1) { create(:student, name: "expertiza user", id: 1) }
+	let(:user1) { create(:student, name: "expertizauser", id: 1) }
 	describe '#initialize' do
 		it 'sets the current user' do
 			authority = Authority.new({current_user: user1})

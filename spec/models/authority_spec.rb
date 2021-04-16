@@ -27,7 +27,7 @@ describe Authority do
 				controller = 'menu'
 				action = nil
 				authority = Authority.new({current_user: user1})
-				expect(authority.allow?(controller, action)).to eq(false)
+				expect(authority.allow?(controller, action)).to eq(nil)
 			end
 		end
 	end

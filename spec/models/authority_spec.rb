@@ -19,7 +19,7 @@ describe Authority do
 				controller = 'pages'
 				action = nil
 				authority = Authority.new({current_user: user1})
-				expect(authority.allow?(controller, action))).to eq(true)
+				expect(authority.allow?(controller, action)).to eq(true)
 			end
 		end
 

@@ -24,4 +24,22 @@ describe CourseSurveyResponseMap do
   		expect(@course_survey_response_map.questionnaire).to eq(course_survey_questionnaire)
   	end
   end
+
+  describe '#contribute' do
+  	it 'returns nil until it is implemented' do
+  		expect(@course_survey_response_map.contributor).to eq(nil)
+  	end
+  end
+
+  describe '#survey_parent' do
+  	it 'returns the course associated with the course_survey_response_map' do
+  		expect(@course_survey_response_map.survey_parent).to eq(course)
+  	end
+  end
+
+  describe '#get_title' do
+  	it 'returns Course Survey' do
+  		expect(@course_survey_response_map.get_survey).to eq('Course Survey')
+  	end
+  end
 end

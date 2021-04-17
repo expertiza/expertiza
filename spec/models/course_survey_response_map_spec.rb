@@ -39,7 +39,7 @@ describe CourseSurveyResponseMap do
 
   describe '#get_title' do
   	it 'returns Course Survey' do
-  		expect(@course_survey_response_map.get_survey).to eq('Course Survey')
+  		expect(@course_survey_response_map.get_title).to eq('Course Survey')
   	end
   end
 end

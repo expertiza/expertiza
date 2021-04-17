@@ -21,7 +21,7 @@ describe CourseSurveyResponseMap do
   describe '#questionnaire' do
   	it 'returns the associated course survey questionnaire' do
   		allow(Questionnaire).to receive(:find_by).with( {:id => 985} ).and_return(:course_survey_questionnaire)
-  		expect(@course_survey_response_map.questionnaire).to_eq(course_survey_questionnaire)
+  		expect(@course_survey_response_map.questionnaire).to eq(course_survey_questionnaire)
   	end
   end
 end

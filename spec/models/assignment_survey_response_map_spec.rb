@@ -21,7 +21,7 @@ describe AssignmentSurveyResponseMap do
   describe '#questionnaire' do
   	it 'returns the associated assignment survey questionnaire' do
   		allow(Questionnaire).to receive(:find_by).with( {:id => 1} ).and_return(assignment_questionnaire1)
-  		expect(@assignment_survey_response_map.questionnaire).to eq(assignment_survey_questionnaire)
+  		expect(@assignment_survey_response_map.questionnaire).to eq(assignment_questionnaire1)
   	end
   end
 

@@ -85,10 +85,6 @@ describe Invitation do
   describe '#update_users_topic_after_invite_accept' do
   	context 'the invited user was already in another team before accepting their invitation' do
   		it 'updates their team user mapping' do
-  			# invitee belongs to team
-  			# invited belongs to team2
-  			# user 2 is invitee
-  			# user 3 is invited
   			updated_teams_user = TeamsUser.new
   			updated_teams_user.team_id = team.id
   			updated_teams_user.user_id = user3.id
@@ -107,10 +103,6 @@ describe Invitation do
   	end
   	context 'the invited user was never in another team before accepting their invitation' do
   		it 'creates a team user mapping' do
-  			# invitee belongs to team
-  			# invited belongs to no team
-  			# user 2 is invitee
-  			# user 3 is invited
   			created_teams_user = TeamsUser.new
   			created_teams_user.team_id = team.id
   			created_teams_user.user_id = user3.id

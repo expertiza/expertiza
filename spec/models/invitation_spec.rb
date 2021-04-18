@@ -5,7 +5,7 @@ describe Invitation do
   let(:team) { build(:assignment_team, id: 1, parent_id: 1) }
   let(:team2) { build(:assignment_team, id: 2, parent_id: 1) }
   let(:topic) { build(:topic, id: 1, assignment_id: 1) }
-  let(:signed_up_team) { build(:signed_up_team, is_waitlisted = true) }
+  let(:signed_up_team) { build(:signed_up_team, is_waitlisted: true) }
 
   it { should belong_to :to_user }
   it { should belong_to :from_user }

@@ -75,8 +75,9 @@ describe Invitation do
 
   describe '#remove_users_sent_invites_for_assignment' do
   	it 'deletes the invitations sent for a given assignment' do
-  		allow(Invitation).to receive(:where).with('from_id = ? and assignment_id = ?', user2.id, assignment.id).and_return([Invitation.new, Invitation.new])
-  		expect(Invitation.remove_users_sent_invites_for_assignment(user2.id, assignment.id)).to eq([]) 
+  		invites = [Invitation.new, Invitation.new]
+  		allow(Invitation).to receive(:where).with('from_id = ? and assignment_id = ?', user2.id, assignment.id).and_return(invites)
+  		expect(Invitation.remove_users_sent_invites_for_assignment(user2.id, assignment.id)).to be(invites) 
   	end
   end
 end

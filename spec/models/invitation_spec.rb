@@ -28,9 +28,9 @@ describe Invitation do
   		it 'puts the user on a team and returns true' do
   			team_id = 0
   			allow(TeamsUser).to receive(:is_team_empty).with(team_id).and_return(false)
-  			allow(Invitation).to receive(:remove_users_sent_invites_for_assignment).with(user2.id, assignment.id).and_return(true)
+  			allow(Invitation).to receive(:remove_users_sent_invites_for_assignment).with(user3.id, assignment.id).and_return(true)
   			allow(TeamsUser).to receive(:add_member_to_invited_team).with(user2.id, user3.id, assignment.id).and_return(true)
-  			allow(Invitation).to receive(:update_users_topic_after_invite_accept).with(user2.id, assignment.id).and_return(true)
+  			allow(Invitation).to receive(:update_users_topic_after_invite_accept).with(user3.id, assignment.id).and_return(true)
   			expect(Invitation.accept_invite(team_id, user2.id, user3.id, assignment.id)).to eq(true)
   		end
   	end
@@ -48,7 +48,7 @@ describe Invitation do
   		it 'returns false' do
   			team_id = 0
   			allow(TeamsUser).to receive(:is_team_empty).with(team_id).and_return(false)
-  			allow(Invitation).to receive(:remove_users_sent_invites_for_assignment).with(user2.id, assignment.id).and_return(true)
+  			allow(Invitation).to receive(:remove_users_sent_invites_for_assignment).with(user3.id, assignment.id).and_return(true)
   			allow(TeamsUser).to receive(:add_member_to_invited_team).with(user2.id, user3.id, assignment.id).and_return(false)
   			expect(Invitation.accept_invite(team_id, user2.id, user3.id, assignment.id)).to eq(false)
   		end

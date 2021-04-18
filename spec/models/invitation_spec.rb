@@ -123,7 +123,7 @@ describe Invitation do
   		allow(SignedUpTeam).to receive(:find_by).with(topic_id: topic.id, is_waitlisted: true).and_return(signed_up_team)
   		allow(SignUpTopic).to receive(:find).with(topic.id).and_return(topic)
   		allow(Waitlist).to receive(:cancel_all_waitlists).with(team.id, topic.assignment_id).and_return([topic])
-  		expect(Invitation.remove_waitlists_for_team(topic.id, assignment.id))
+  		expect(Invitation.remove_waitlists_for_team(topic.id, assignment.id)).to eq([topic])
   	end
   end
 end

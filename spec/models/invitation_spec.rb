@@ -89,8 +89,16 @@ describe Invitation do
   			# invited belongs to team2
   			# user 2 is invitee
   			# user 3 is invited
+  			updated_teams_user = TeamsUser.new
+  			updated_teams_user.team_id = team.id
+  			updated_teams_user.user_id = user3.id
+  			created_teams_user = TeamsUser.new
+  			created_teams_user.team_id = team.id
+  			created_teams_user.user_id = user3.id
   			allow(TeamsUser).to receive(:team_id).with(assignment.id, user2.id).and_return(team.id)
   			allow(TeamsUser).to receive(:team_id).with(assignment.id, user3.id).and_return(team2.id)
+  			allow(TeamsUser).to receive(:find_by).with(team_id: team2.id, user_id: user3.id).and_return(created_teams_user)
+  			allow(TeamsUser).to receive(:update).with(team_id: team.id, user_id: user3.id).and_return(updated_teams_user)
   			teams_user = Invitation.update_users_topic_after_invite_accept(user2.id, user3.id, assignment.id)
   			expect(teams_user.team_id).to eq(team.id)
   			expect(teams_user.user_id).to eq(user3.id)

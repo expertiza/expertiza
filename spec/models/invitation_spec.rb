@@ -3,6 +3,7 @@ describe Invitation do
   let(:user3) { build(:student, id: 3) }
   let(:assignment) { build(:assignment, id: 1) }
   let(:team) { build(:assignment_team, id: 1, parent_id: 1) }
+  let(:team2) { build(:assignment_team, id: 2, parent_id: 1) }
 
   it { should belong_to :to_user }
   it { should belong_to :from_user }
@@ -78,6 +79,35 @@ describe Invitation do
   		invites = [Invitation.new, Invitation.new]
   		allow(Invitation).to receive(:where).with('from_id = ? and assignment_id = ?', user2.id, assignment.id).and_return(invites)
   		expect(Invitation.remove_users_sent_invites_for_assignment(user2.id, assignment.id)).to be(invites) 
+  	end
+  end
+
+  describe '#update_users_topic_after_invite_accept' do
+  	context 'the invited user was already in another team before accepting their invitation' do
+  		it 'updates their team user mapping' do
+  			# invitee belongs to team
+  			# invited belongs to team2
+  			# user 2 is invitee
+  			# user 3 is invited
+  			allow(TeamsUser).to receive(:team_id).with(assignment.id, user2.id).and_return(team)
+  			allow(TeamsUser).to receive(:team_id).with(assignment.id, user3.id).and_return(team2)
+  			teams_user = Invitation.update_users_topic_after_invite_accept(user2.id, user3.id, assignment.id)
+  			expect(teams_user.team_id).to eq(team.id)
+  			expect(teams_user.user_id).to eq(user3.id)
+  		end 
+  	end
+  	context 'the invited user was never in another team before accepting their invitation' do
+  		it 'creates a team user mapping' do
+  			# invitee belongs to team
+  			# invited belongs to no team
+  			# user 2 is invitee
+  			# user 3 is invited
+  			allow(TeamsUser).to receive(:team_id).with(assignment.id, user2.id).and_return(team)
+  			allow(TeamsUser).to receive(:team_id).with(assignment.id, user3.id).and_return(nil)
+  			teams_user = Invitation.update_users_topic_after_invite_accept(user2.id, user3.id, assignment.id)
+  			expect(teams_user.team_id).to eq(team.id)
+  			expect(teams_user.user_id).to eq(user3.id)
+  		end 
   	end
   end
 end

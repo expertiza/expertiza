@@ -2,7 +2,7 @@ describe Invitation do
 	let(:user2) { build(:student, id: 2) }
   let(:user3) { build(:student, id: 3) }
   let(:assignment) { build(:assignment, id: 1) }
-  let(:team) { build(:assignment_team, id: 1, parent_id: 1, is_waitlisted: true) }
+  let(:team) { build(:assignment_team, id: 1, parent_id: 1) }
   let(:team2) { build(:assignment_team, id: 2, parent_id: 1) }
   let(:topic) { build(:topic, id: 1, assignment_id: 1, team_id: 1) }
 
@@ -19,10 +19,6 @@ describe Invitation do
   	end
   	context 'an invitation has not been sent between user1 and user2' do
   		it 'returns true' do
-  			allow(Invitation).to receive(:where).with('from_id = ? and to_id = ? and assignment_id = ? and reply_status = "W"',
-                                       user2.id, user3.id, assignment.id).and_return([])
-  			expect(Invitation.is_invited?(user2.id, user3.id, assignment.id)).to eq(true)
-  		end
   	end
   end
 
@@ -121,6 +117,7 @@ describe Invitation do
   	it 'removes a currently waitlisted team from the topic waitlist and removes the team from all other waitlists it was on' do
   		allow(SignedUpTeam).to receive(:find_by).with(topic_id: topic.id, is_waitlisted: true).and_return(team)
   		allow(SignUpTopic).to receive(:find).with(topic.id).and_return(topic)
+  		allow(assignment)
   		allow(Waitlist).to receive(:cancel_all_waitlists).with(team.id, topic.assignment_id).and_return([topic])
   		expect(Invitation.remove_waitlists_for_team(topic.id, assignment.id))
   		expect(team.is_waitlisted).to eq(false)

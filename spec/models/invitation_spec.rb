@@ -92,10 +92,10 @@ describe Invitation do
   			updated_teams_user = TeamsUser.new
   			updated_teams_user.team_id = team.id
   			updated_teams_user.user_id = user3.id
-  			allow(updated_teams_user).to receive(:id).and_return(1)
   			created_teams_user = TeamsUser.new
   			created_teams_user.team_id = team.id
   			created_teams_user.user_id = user3.id
+  			allow(created_teams_user).to receive(:id).and_return(1)
   			allow(TeamsUser).to receive(:team_id).with(assignment.id, user2.id).and_return(team.id)
   			allow(TeamsUser).to receive(:team_id).with(assignment.id, user3.id).and_return(team2.id)
   			allow(TeamsUser).to receive(:find_by).with(team_id: team2.id, user_id: user3.id).and_return(created_teams_user)

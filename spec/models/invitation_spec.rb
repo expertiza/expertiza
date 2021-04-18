@@ -29,7 +29,7 @@ describe Invitation do
 
   describe '#accept_invite' do
   	context 'a user is not on a team and wishes to join a team with open slots' do
-  		it 'puts the user on a team and returns true' do
+  		it 'places the user on a team and returns true' do
   			team_id = 0
   			allow(TeamsUser).to receive(:is_team_empty).with(team_id).and_return(false)
   			allow(Invitation).to receive(:remove_users_sent_invites_for_assignment).with(user3.id, assignment.id).and_return(true)

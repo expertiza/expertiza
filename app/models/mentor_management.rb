@@ -27,6 +27,23 @@ class MentorManagement
     mentor_user_id
   end
 
+  def self.update_mentor_state(assignment_id, team_id)
+    assignment = Assignment.where(id: assignment_id)
+    team = Team.where(id: team_id)
+    unless assignment.topics? && team.topic.nil?
+      curr_team_size = Team.size(team_id)
+      max_team_members = Assignment.find(team_id).max_team_size
+      if curr_team_size * 2 > max_team_members
+        unless team.participants.any? { |it| it.duty == DUTY_MENTOR }
+          mentor_id = select_mentor(assignment_id)
+          unless mentor_id.nil?
+            team.add_member(mentor_id, assignment_id=assignment_id)
+          end
+        end
+      end
+    end
+  end
+
   private
 
   # Select all the participants who's duty in the participant

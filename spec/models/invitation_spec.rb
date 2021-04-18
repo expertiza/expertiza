@@ -39,7 +39,7 @@ describe Invitation do
   		end
   	end
   	context 'a user is on a team and wishes to join a team with open slots' do
-  		it 'removes the user from their previous team, puts the user on a team, and returns true' do
+  		it 'removes the user from their previous team, places the user on a team, and returns true' do
   			team_id = 1
   			allow(TeamsUser).to receive(:is_team_empty).with(team_id).and_return(true)
   			allow(AssignmentTeam).to receive(:find).with(team_id).and_return(team)

@@ -19,6 +19,9 @@ describe Invitation do
   	end
   	context 'an invitation has not been sent between user1 and user2' do
   		it 'returns true' do
+  		allow(Invitation).to receive(:where).with('from_id = ? and to_id = ? and assignment_id = ? and reply_status = "W"',
+  													user2.id, user3.id, assignment.id).and_return([])
+  		expect(Invitation.is_invited?(user2.id, user3.id, assignment.id)).to eq(true)
   	end
   end
 
@@ -117,10 +120,8 @@ describe Invitation do
   	it 'removes a currently waitlisted team from the topic waitlist and removes the team from all other waitlists it was on' do
   		allow(SignedUpTeam).to receive(:find_by).with(topic_id: topic.id, is_waitlisted: true).and_return(team)
   		allow(SignUpTopic).to receive(:find).with(topic.id).and_return(topic)
-  		allow(assignment)
   		allow(Waitlist).to receive(:cancel_all_waitlists).with(team.id, topic.assignment_id).and_return([topic])
   		expect(Invitation.remove_waitlists_for_team(topic.id, assignment.id))
-  		expect(team.is_waitlisted).to eq(false)
   	end
   end
 end

@@ -4,7 +4,7 @@ describe Invitation do
   let(:assignment) { build(:assignment, id: 1) }
   let(:team) { build(:assignment_team, id: 1, parent_id: 1) }
   let(:team2) { build(:assignment_team, id: 2, parent_id: 1) }
-  let(:topic) { build(:topic, id: 1, assignment_id: 1, team_id: 1) }
+  let(:topic) { build(:topic, id: 1, assignment_id: 1) }
 
   it { should belong_to :to_user }
   it { should belong_to :from_user }

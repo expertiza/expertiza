@@ -5,6 +5,7 @@ describe Invitation do
   let(:team) { build(:assignment_team, id: 1, parent_id: 1) }
   let(:team2) { build(:assignment_team, id: 2, parent_id: 1) }
   let(:topic) { build(:topic, id: 1, assignment_id: 1) }
+  let(:signed_up_team) { build(:signed_up_team), is_waitlisted = true}
 
   it { should belong_to :to_user }
   it { should belong_to :from_user }
@@ -119,7 +120,7 @@ describe Invitation do
 
   describe '#remove_waitlists_for_team' do
   	it 'removes a currently waitlisted team from the topic waitlist and removes the team from all other waitlists it was on' do
-  		allow(SignedUpTeam).to receive(:find_by).with(topic_id: topic.id, is_waitlisted: true).and_return(team)
+  		allow(SignedUpTeam).to receive(:find_by).with(topic_id: topic.id, is_waitlisted: true).and_return(signed_up_team)
   		allow(SignUpTopic).to receive(:find).with(topic.id).and_return(topic)
   		allow(Waitlist).to receive(:cancel_all_waitlists).with(team.id, topic.assignment_id).and_return([topic])
   		expect(Invitation.remove_waitlists_for_team(topic.id, assignment.id))

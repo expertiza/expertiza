@@ -17,7 +17,7 @@ describe Invitation do
   	context 'an invitation has not been sent between user1 and user2' do
   		it 'returns false' do
   			allow(Invitation).to receive(:where).with('from_id = ? and to_id = ? and assignment_id = ? and reply_status = "W"',
-                                       user2.id, user3.id, assignment.id).and_return([nil])
+                                       user2.id, user3.id, assignment.id).and_return([])
   			expect(Invitation.is_invited?(user2.id, user3.id, assignment.id)).to eq(false)
   		end
   	end

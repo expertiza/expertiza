@@ -61,7 +61,7 @@ class Invitation < ActiveRecord::Base
 
     if can_add_member # The member was successfully added to the team (the team was not full)
       Invitation.update_users_topic_after_invite_accept(inviter_user_id, invited_user_id, assignment_id)
-
+      MentorManagement.update_mentor_state(assignment_id, team_id)
       # invited_participant = Participant.where(user_id: invited_user_id, parent_id: assignment_id).first
       # inviter_participant = Participant.where(user_id: inviter_user_id, parent_id: assignment_id).first
       # inviter_assignment_team = AssignmentTeam.team(inviter_participant)

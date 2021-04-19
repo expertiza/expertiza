@@ -24,20 +24,20 @@ class MentorManagement
   #   no participants with mentor duty for [assignment_id].
   def self.select_mentor(assignment_id)
     mentor_user_id, _ = self.zip_mentors_with_team_count(assignment_id).first
-    mentor_user_id
+    User.where(id: mentor_user_id).first
   end
 
   def self.update_mentor_state(assignment_id, team_id)
-    assignment = Assignment.where(id: assignment_id)
-    team = Team.where(id: team_id)
+    assignment = Assignment.find(assignment_id)
+    team = Team.find(team_id)
     unless assignment.topics? && team.topic.nil?
       curr_team_size = Team.size(team_id)
-      max_team_members = Assignment.find(team_id).max_team_size
+      max_team_members = Assignment.find(assignment_id).max_team_size
       if curr_team_size * 2 > max_team_members
-        unless team.participants.any? { |it| it.duty == DUTY_MENTOR }
-          mentor_id = select_mentor(assignment_id)
-          unless mentor_id.nil?
-            team.add_member(mentor_id, assignment_id=assignment_id)
+        unless team.participants.any? { |it| it.duty == Participant::DUTY_MENTOR }
+          mentor_user = select_mentor(assignment_id)
+          unless mentor_user.nil?
+            team.add_member(mentor_user, assignment_id=assignment_id)
           end
         end
       end
@@ -51,7 +51,7 @@ class MentorManagement
   #
   # @see participant.rb for the value of DUTY_MENTOR
   def self.get_all_mentors
-    Participant.where(duty: DUTY_MENTOR)
+    Participant.where(duty: Participant::DUTY_MENTOR)
   end
 
   # Select all the participants who's duty in the participant
@@ -60,18 +60,22 @@ class MentorManagement
   #
   # @see participant.rb for the value of DUTY_MENTOR
   def self.get_mentors_for_assignment(assignment_id)
-    Participant.where(parent_id: assignment_id, duty: DUTY_MENTOR)
+    Participant.where(parent_id: assignment_id, duty: Participant::DUTY_MENTOR)
   end
 
   # Produces a hash mapping mentor's user_ids to the aggregated
   # number of teams they're part of, which acts as a proxy for
   # the number of teams they're mentoring.
   def self.zip_mentors_with_team_count(assignment_id)
-    mentor_ids = self.get_mentors_for_assignment(assignment_id).pluck(:id)
+    mentor_ids = self.get_mentors_for_assignment(assignment_id).pluck(:user_id)
 
     return {} if mentor_ids.empty?
 
-    team_counts = TeamsUser.where(user_id: mentor_ids).group(:user_id).count(:team_id)
+    team_counts = {}
+    mentor_ids.each { |id| team_counts[id] = 0 }
+    team_counts.update(TeamsUser.where(user_id: mentor_ids).group(:user_id).count(:team_id))
+
     team_counts.sort_by { |_, v| v }
+
   end
 end

@@ -6,7 +6,7 @@ describe QuizAssignment do
 		context 'when the assignment does not have topics' do
 			it 'returns nil' do
 				allow(assignment).to receive(:sign_up_topics).and_return([])
-				expect(QuizAssignment.candidate_topics_for_quiz()).to eq(nil)
+				expect(candidate_topics_for_quiz()).to eq(nil)
 			end
 		end
 	end

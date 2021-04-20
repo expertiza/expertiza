@@ -1,3 +1,5 @@
+include QuizAssignment
+
 describe QuizAssignment do
 
 	let(:assignment) { build(:assignment, id: 1)}

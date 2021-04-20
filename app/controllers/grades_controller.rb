@@ -35,15 +35,15 @@ class GradesController < ApplicationController
     # made optional in some manner. TAs and instructors should not HAVE to have an authorized github token to
     # browse this page. Instead, this authorization should take place only if github metrics are specifically requested.
     #
-    if session["github_access_token"].nil?
-       session["assignment_id"] = params[:id]
-       session["github_view_type"] = "view_scores"
-       return redirect_to authorize_github_grades_path
-    end
+    # if session["github_access_token"].nil?
+    #    session["assignment_id"] = params[:id]
+    #    session["github_view_type"] = "view_scores"
+    #    return redirect_to authorize_github_grades_path
+    # end
     @assignment = Assignment.find(params[:id])
     questionnaires = @assignment.questionnaires
 
-    if @assignment.vary_by_round
+    if @assignment.varying_rubrics_by_round?
       @questions = retrieve_questions questionnaires, @assignment.id
     else
       @questions = {}
@@ -182,10 +182,12 @@ class GradesController < ApplicationController
       flash[:error] = $ERROR_INFO
     end
     redirect_to controller: 'grades', action: 'view_team', id: participant.id
-  end
+    end
 
+=begin
   # Fall 2018, E1858
   # example pull_links: https://github.com/expertiza/expertiza/pull/1858
+
   def retrieve_pull_request_data(pull_links)
     pull_links.each do |hyperlink|
       submission_hyperlink_tokens = hyperlink.split('/') # parse the link
@@ -504,6 +506,7 @@ class GradesController < ApplicationController
                         }}}}}}}"
     }
   end
+=end
 
   private
 

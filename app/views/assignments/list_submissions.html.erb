@@ -58,7 +58,7 @@
               <%= render :partial => 'responses', :locals => {:team => team ,:topic_id => topic_identifier, :title => 'Review'} %>
             <% end %>
             <br>
-              <%= link_to 'GitHub Metrics', { controller: 'metrics', action: 'view', id: participants.first.id }, target: '_blank' %></td>
+              <%= link_to 'GitHub Metrics', { controller: 'metrics', action: 'show', id: participants.first.id }, target: '_blank' %></td>
           <% end %>
         <% end %>
 

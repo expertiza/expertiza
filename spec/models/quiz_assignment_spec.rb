@@ -7,7 +7,7 @@ describe QuizAssignment do
 	describe '#candidate_topics_for_quiz' do
 		context 'when the assignment does not have topics' do
 			it 'returns nil' do
-				assignment.sign_up_topics = []
+				allow(sign_up_topics).to receive(:empty?.and_return(true)
 				expect(candidate_topics_for_quiz()).to eq(nil)
 			end
 		end

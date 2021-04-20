@@ -1,11 +1,11 @@
 class MetricsController < ApplicationController
-  helper :file
-  helper :submitted_content
-  helper :penalty
-  include PenaltyHelper
-  include StudentTaskHelper
-  include AssignmentHelper
-  include GradesHelper
+  #helper :file
+  #helper :submitted_content
+  #helper :penalty
+  #include PenaltyHelper
+  #include StudentTaskHelper
+  #include AssignmentHelper
+  #include GradesHelper
   include AuthorizationHelper
   include MetricsHelper # this module is currently empty
 
@@ -15,7 +15,7 @@ class MetricsController < ApplicationController
   end
 
   # render the view_github_metrics page
-  def view
+  def show
     if session["github_access_token"].nil? # check if there is a github_access_token in current session
       session["participant_id"] = params[:id] # team number
       session["github_view_type"] = "view_submissions"
@@ -323,9 +323,6 @@ class MetricsController < ApplicationController
       process_github_authors_and_dates(author_name, commit_date[0, 10])
     end
     organize_commit_dates
-  end
-
-  def show
   end
 
 end

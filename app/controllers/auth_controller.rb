@@ -48,6 +48,8 @@ class AuthController < ApplicationController
       github_login
     when "google_oauth2"
       google_login
+    when "github2021" # due to github https://developer.github.com/changes/2020-02-10-deprecating-auth-through-query-param/
+      custom_github_login
     else
       ExpertizaLogger.error LoggerMessage.new(controller_name, user.name, "Invalid OAuth Provider", "")
     end
@@ -75,6 +77,22 @@ class AuthController < ApplicationController
     else
       after_login(user)
     end
+  end
+
+  def custom_github_login
+    session_code = request.env['rack.request.query_hash']['code']
+    result = RestClient.post('https://github.com/login/oauth/access_token',
+                               {:client_id => GITHUB_CONFIG['client_key'],
+                                :client_secret => GITHUB_CONFIG['client_secret'],
+                                :code => session_code},
+                               :accept => :json)
+    access_token = JSON.parse(result)['access_token']
+    session["github_access_token"] = access_token
+    #if session["github_view_type"] == "view_submissions"
+    redirect_to controller: 'metrics', action: 'show', id: session["participant_id"]
+    #elsif session["github_view_type"] == "view_scores"
+    #  redirect_to view_grades_path(id: session["assignment_id"])
+    #end
   end
 
   def login_failed

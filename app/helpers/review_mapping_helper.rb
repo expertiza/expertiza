@@ -293,40 +293,40 @@ module ReviewMappingHelper
   def display_tagging_interval_chart(intervals)
     # if someone did not do any tagging in 30 seconds, then ignore this interval
     threshold = 30
-    intervals = intervals.select{ |v| v < threshold }
+    intervals = intervals.select {|v| v < threshold }
     unless intervals.empty?
       interval_mean = intervals.reduce(:+) / intervals.size.to_f
     end
     # build the parameters for the chart
     data = {
-              labels: [*1..intervals.length],
-              datasets: [
-                  {
-                      backgroundColor: "rgba(255,99,132,0.8)",
-                      data: intervals,
-                      label: "time intervals"
-                  },
-                  unless intervals.empty?
-                    {
-                        data: Array.new(intervals.length, interval_mean),
-                        label: "Mean time spent"
-                    }
-                  end
-              ]
+      labels: [*1..intervals.length],
+      datasets: [
+        {
+          backgroundColor: "rgba(255,99,132,0.8)",
+          data: intervals,
+          label: "time intervals"
+        },
+        unless intervals.empty?
+          {
+            data: Array.new(intervals.length, interval_mean),
+            label: "Mean time spent"
+          }
+        end
+      ]
     }
     options = {
         width: "200",
         height: "125",
         scales: {
-            yAxes: [{
-                        stacked: false,
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }],
-            xAxes: [{
-                        stacked: false
-                    }]
+          yAxes: [{
+            stacked: false,
+            ticks: {
+              beginAtZero: true
+            }
+          }],
+          xAxes: [{
+            stacked: false
+          }]
         }
     }
     line_chart data, options
@@ -337,7 +337,7 @@ module ReviewMappingHelper
     # if someone did not do any tagging in 30 seconds, then ignore this interval
     threshold = 30
     interval_precision = 2 # Round to 2 Decimal Places
-    intervals = intervals.select{ |v| v < threshold }
+    intervals = intervals.select {|v| v < threshold }
 
     # Get Metrics once tagging intervals are available
     unless intervals.empty?
@@ -345,7 +345,7 @@ module ReviewMappingHelper
       metrics[:mean] = (intervals.reduce(:+) / intervals.size.to_f).round(interval_precision)
       metrics[:min] = intervals.min
       metrics[:max] = intervals.max
-      sum = intervals.inject(0){ |accum, i| accum + (i - metrics[:mean]) ** 2 }
+      sum = intervals.inject(0) {|accum, i| accum + (i - metrics[:mean])**2 }
       metrics[:variance] = (sum / intervals.size.to_f).round(interval_precision)
       metrics[:stand_dev] = Math.sqrt(metrics[:variance]).round(interval_precision)
       return metrics

@@ -1,5 +1,4 @@
 describe ReviewMappingHelper, type: :helper do
-
   describe 'test calculate_key_chart_information' do
     it 'should return new Hash if intervals are not empty' do
       intervals = [1.00, 2.00, 3.00, 4.00, 5.00, 6.00]
@@ -12,7 +11,6 @@ describe ReviewMappingHelper, type: :helper do
       expect(result[:stand_dev]).to eq(1.71)
     end
   end
-
   describe 'test calculate_key_chart_information' do
     it 'should return nil if intervals are empty' do
       intervals = []
@@ -20,5 +18,4 @@ describe ReviewMappingHelper, type: :helper do
       expect(result).to be_nil
     end
   end
-
 end

@@ -47,10 +47,10 @@ class TagPromptDeployment < ActiveRecord::Base
           tag_updated_times = tags.map(&:updated_at)
           # tag_updated_times.sort_by{|time_string| Time.parse(time_string)}.reverse
           tag_updated_times.sort_by{|time_string| time_string}.reverse
-          number_of_updated_time = tag_updated_times.length
           tag_update_intervals = []
-          for i in 1..(number_of_updated_time -1) do
-            tag_update_intervals.append(tag_updated_times[i] - tag_updated_times[i-1])
+          tag_updated_times.each_index do |i|
+            next if i == 0
+            tag_update_intervals.append(tag_updated_times[i] - tag_updated_times[i - 1])
           end
 
           percentage = taggable_answers.count.zero? ? "-" : format("%.1f", tags.count.to_f / taggable_answers.count * 100)

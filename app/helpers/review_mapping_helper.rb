@@ -149,52 +149,62 @@ module ReviewMappingHelper
     end
   end
 
-  def get_review_volume(round, team_id)
-    # Setting values of instance variables
-    ['max', 'min', 'avg'].each { |metric| instance_variable_set('@' + metric, '-----') }
-    # Fetching value of @avg_and_ranges[team_id][round] 
-    x = nil
-    if @avg_and_ranges.key?(team_id)
-      if @avg_and_ranges[team_id].key?(round)
-        x = @avg_and_ranges[team_id][round]
-      end
-    end
-
-    if x && %i[max min avg].all? { |k| x.key? k }
-      # Iterating though the list
-      ['max', 'min', 'avg'].each do |metric|
-        # setting values of variables based on certain conditions
-        average_metric = nil
-        if @avg_and_ranges[team_id][round].key?(metric)
-          average_metric = @avg_and_ranges[team_id][round][metric]
-        end
-        metric_value = average_metric.nil? ? '-----' : average_metric.round(0).to_s + '%'
-        instance_variable_set('@' + metric, metric_value)
+  def get_review_metrics(round, team_id)
+    %i[max min avg].each {|metric| instance_variable_set('@' + metric.to_s, '-----') }
+    if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? {|k| @avg_and_ranges[team_id][round].key? k }
+      %i[max min avg].each do |metric|
+        metric_value = @avg_and_ranges[team_id][round][metric].nil? ? '-----' : @avg_and_ranges[team_id][round][metric].round(0).to_s + '%'
+        instance_variable_set('@' + metric.to_s, metric_value)
       end
     end
   end
+
+  # def get_review_volume(round, team_id)
+  #   # Setting values of instance variables
+  #   ['max', 'min', 'avg'].each { |metric| instance_variable_set('@' + metric, '-----') }
+  #   # Fetching value of @avg_and_ranges[team_id][round]
+  #   x = nil
+  #   if @avg_and_ranges.key?(team_id)
+  #     if @avg_and_ranges[team_id].key?(round)
+  #       x = @avg_and_ranges[team_id][round]
+  #     end
+  #   end
+  #
+  #   if x && %i[max min avg].all? { |k| x.key? k }
+  #     # Iterating though the list
+  #     ['max', 'min', 'avg'].each do |metric|
+  #       # setting values of variables based on certain conditions
+  #       average_metric = nil
+  #       if @avg_and_ranges[team_id][round].key?(metric)
+  #         average_metric = @avg_and_ranges[team_id][round][metric]
+  #       end
+  #       metric_value = average_metric.nil? ? '-----' : average_metric.round(0).to_s + '%'
+  #       instance_variable_set('@' + metric, metric_value)
+  #     end
+  #   end
+  # end
 
   # sorts the reviewers by the average volume of reviews in each round, in descending order
   def sort_reviewer_by_review_volume_desc
     @reviewers.each do |r|
       # get the volume of review comments
       review_volumes = Response.get_volume_of_review_comments(@assignment.id, r.id)
-      r.avg_vol_per_round = []     
+      r.avg_vol_per_round = []
       review_volumes.each_index do |i|
-        if i == 0 
+        if i == 0
           r.overall_avg_vol = review_volumes[0]
-        else 
+        else
           r.avg_vol_per_round.push(review_volumes[i])
         end
       end
     end
-    # get the number of review rounds for the assignment 
+    # get the number of review rounds for the assignment
     @num_rounds = @assignment.num_review_rounds.to_f.to_i
     @all_reviewers_avg_vol_per_round = []
     @all_reviewers_overall_avg_vol = @reviewers.inject(0) {|sum, r| sum += r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
     @num_rounds.times do |round|
       @all_reviewers_avg_vol_per_round.push(@reviewers.inject(0) {|sum, r| sum += r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
-    end 
+    end
     @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 
@@ -214,7 +224,7 @@ module ReviewMappingHelper
         reviewer_data.push reviewer.avg_vol_per_round[rnd]
         all_reviewers_data.push @all_reviewers_avg_vol_per_round[rnd]
       end
-    end 
+    end
 
     labels.push 'Total'
     reviewer_data.push reviewer.overall_avg_vol

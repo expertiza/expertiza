@@ -38,7 +38,7 @@ class MetricsController < ApplicationController
     retrieve_github_data
 
     # get each PR's status info
-    retrieve_pull_link_statuses
+    query_all_merge_statuses
 
     @authors = @authors.keys # only keep the author name info
     @dates = @dates.keys.sort # only keep the date info and sort
@@ -138,7 +138,7 @@ class MetricsController < ApplicationController
   end
 
   # save each PR's statuses in a hash, this is done by github REST API not graphql
-  def retrieve_pull_link_statuses
+  def query_all_merge_statuses
     @head_refs.each do |pull_number, pr_object|
       @check_statuses[pull_number] = query_pull_request_status(pr_object)
     end

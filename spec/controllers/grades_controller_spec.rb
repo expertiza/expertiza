@@ -356,7 +356,7 @@ describe GradesController do
     it 'gets and stores the statuses associated with head commits of PRs' do
       expect(controller).to receive(:query_pull_request_status).with("qwerty")
       expect(controller).to receive(:query_pull_request_status).with("asdfg")
-      controller.retrieve_pull_link_statuses
+      controller.query_all_merge_statuses
       expect(controller.instance_variable_get(:@check_statuses)).to eq("1234" => "check_status",
                                                                        "5678" => "check_status")
     end
@@ -386,7 +386,7 @@ describe GradesController do
         session["github_access_token"] = "qwerty"
         allow(controller).to receive(:query_pull_request_status).and_return("status")
         allow(controller).to receive(:retrieve_github_data).and_return("data")
-        allow(controller).to receive(:retrieve_pull_link_statuses).and_return("status")
+        allow(controller).to receive(:query_all_merge_statuses).and_return("status")
       end
 
       it 'stores the GitHub access token for later use' do
@@ -400,7 +400,7 @@ describe GradesController do
       end
 
       it 'calls retrieve_check_run_statuses to retrieve check runs data' do
-        expect(controller).to receive(:retrieve_pull_link_statuses)
+        expect(controller).to receive(:query_all_merge_statuses)
         get :view_github_metrics, id: '1'
       end
     end

@@ -52,6 +52,7 @@
     <li>Total number of lines added: <%= @total_additions %></li>
     <li>Total number of lines removed: <%= @total_deletions %></li>
     <li>Total number of files changed: <%= @total_files_changed %></li>
+    <% unless @merge_status[-1]%>
     <li>
       <div>Merge statuses:</div>
       <ul>
@@ -84,6 +85,7 @@
             </li>
           <% end %>
         </ul>
+      <% end %>
       <% end %>
     </li>
   </ul>

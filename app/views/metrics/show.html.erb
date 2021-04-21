@@ -43,9 +43,12 @@
 
 <% if @parsed_data && @authors.present? && @dates %>
   <h3>Code frequency</h3>
-  <div class="chart-container" style="width: 1000px; height:600px;">
+  <span>
+  <div class="chart-container" style="width: 600px; height:450px;display: block;alignment: left">
     <%= display_github_metrics(@parsed_data, @authors, @dates) %>
   </div>
+  <img src="<%= display_totals_graph(@parsed_data, @authors, @dates) %>" style="display: block; alignment: right  ">
+  </span>
   <h3>Team Statistics</h3>
   <ul>
     <li>Total number of commits:<%= @total_commits %></li>

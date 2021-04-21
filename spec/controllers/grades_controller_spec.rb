@@ -1,6 +1,6 @@
 describe GradesController do
   let(:review_response) { build(:response) }
-  let(:assignment) { build(:assignment, id: 1, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
+  let(:assignment) { build(:assignment, id: 1, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true)}
   let(:assignment_questionnaire) { build(:assignment_questionnaire, used_in_round: 1, assignment: assignment) }
   let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
   let(:participant2) { build(:participant, id: 2, assignment: assignment, user_id: 1) }
@@ -48,7 +48,7 @@ describe GradesController do
     # E2111
     # is to decouple this code from the grades controller, where both the code itself and the testing are
     # significantly coupled into the grades controller.
-    xcontext 'when user hasn\'t logged in to GitHub' do
+    context 'when user hasn\'t logged in to GitHub' do
       before(:each) do
         @params = {id: 900}
         session["github_access_token"] = nil
@@ -238,6 +238,7 @@ describe GradesController do
     end
   end
 
+
   describe '#get_statuses_for_pull_request' do
     before(:each) do
       allow(Net::HTTP).to receive(:get) { "{\"team\":\"rails\", \"players\":\"36\"}" }
@@ -344,7 +345,24 @@ describe GradesController do
         controller.retrieve_github_data
       end
     end
+  describe '#action_allowed' do
+    context 'when the student does not belong to a team' do
+      it 'returns false' do 
+        params = {action: 'view_team'}
+        session[:user].role.name = 'Student'
+        expect(controller.action_allowed?).to eq(false)
+      end
+    end
+    context 'when the user is an instructor' do
+      it 'returns true' do 
+        params = {action: 'view_team'} 
+        session[:user].role.name = 'Instructor'
+        expect(controller.action_allowed?).to eq(true)
+
+      end
+    end
   end
+
 
   describe '#retrieve_check_run_statuses' do
     before(:each) do
@@ -714,5 +732,18 @@ describe GradesController do
       expect(controller.instance_variable_get(:@parsed_data)).to eq("abc" => {"2017-04-05" => 2, "2017-04-13" => 2,
                                                                               "2017-04-14" => 2})
     end
+  end
+  describe '#redirect_when_disallowed' do
+    context 'when a participant without a team exists' do
+      it 'redirects to /' do
+        params = {id: 1}
+        session
+        allow(participant).to receive(:team).and_return(nil)
+        allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+        allow(TeamsUser).to receive(:team_id).and_return(1)
+        get :view_my_scores, params
+        expect(response).to redirect_to('/')
+      end
+    end 
   end
 end

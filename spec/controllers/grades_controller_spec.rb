@@ -42,6 +42,7 @@ describe GradesController do
         expect(response).to render_template(:view)
       end
     end
+  end
 
   describe '#view_my_scores' do
     before(:each) do

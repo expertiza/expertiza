@@ -20,7 +20,7 @@
     <tr style="border: 1px outset #000000; padding: 10px 20px" >
       <th class="head">Username</th>
       <th class="head">Full name</th>
-      <!--<th class="head">Team-member role (duty)</th>-->
+      <th class="head">Team-member role (duty)</th>
       <th class="head">Email address</th>
       <% if @teammate_review_allowed %>
         <th class="head">Review action</th>
@@ -31,6 +31,7 @@
       <tr>
         <td><%= member.user.name(session[:ip]) %></td>
         <td><%= member.user.fullname(session[:ip]) %></td>
+        <td><%= member.duty.present? ? member.duty : "" %></td>
         <td><%= member.user.email(session[:ip]) %></td>
 
         <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->

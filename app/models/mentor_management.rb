@@ -1,5 +1,4 @@
 class MentorManagement
-
   # Select a mentor using the following algorithm
   #
   # 1) Find all assignment participants for the
@@ -30,21 +29,25 @@ class MentorManagement
   def self.update_mentor_state(assignment_id, team_id)
     assignment = Assignment.find(assignment_id)
     team = Team.find(team_id)
-    unless assignment.topics? && team.topic.nil?
-      curr_team_size = Team.size(team_id)
-      max_team_members = Assignment.find(assignment_id).max_team_size
-      if curr_team_size * 2 > max_team_members
-        unless team.participants.any? { |it| it.duty == Participant::DUTY_MENTOR }
-          mentor_user = select_mentor(assignment_id)
-          unless mentor_user.nil?
-            team.add_member(mentor_user, assignment_id=assignment_id)
-          end
-        end
-      end
-    end
+
+    return if assignment.topics? || !team.topic.nil?
+
+    curr_team_size = Team.size(team_id)
+    max_team_members = Assignment.find(assignment_id).max_team_size
+
+    # RuboCop 'use guard clause instead of nested conditionals'
+    return if curr_team_size * 2 <= max_team_members
+
+    # RuboCop 'use guard clause instead of nested conditionals'
+    return if team.participants.any? { |participant| participant.duty == Participant::DUTY_MENTOR }
+
+    mentor_user = select_mentor(assignment_id)
+    team.add_member(mentor_user, assignment_id=assignment_id) unless mentor_user.nil?
   end
 
-  private
+  def self.user_a_mentor?(user)
+    Participant.exists?(user_id: user.id, duty: Participant::DUTY_MENTOR)
+  end
 
   # Select all the participants who's duty in the participant
   # table is [DUTY_MENTOR].
@@ -76,6 +79,6 @@ class MentorManagement
     team_counts.update(TeamsUser.where(user_id: mentor_ids).group(:user_id).count(:team_id))
 
     team_counts.sort_by { |_, v| v }
-
   end
+
 end

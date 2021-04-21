@@ -1,7 +1,4 @@
 describe MetricsController do
-    
-    session["github_access_token"] = "QWERTY"
-
 
     # This test is expected to fail due to the commented code on lines 38-42 in grades_controller. One of the aims of
     # E2111
@@ -23,32 +20,31 @@ describe MetricsController do
           get :view, @params
           expect(response).to redirect_to(authorize_github_grades_path)
         end
-      end
+    end
     
-      context 'when current assignment does not vary rubric by round' do
-          it 'calculates scores and renders grades#view page' do
-            allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
-            allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([review_response])
-            params = {id: 1}
-            get :view, params
-            expect(controller.instance_variable_get(:@questions)[:review].size).to eq(1)
-            expect(response).to render_template(:view)
-          end
-        end
+    context 'when current assignment does not vary rubric by round' do
+      it 'calculates scores and renders grades#view page' do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
+        allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([review_response])
+        params = {id: 1}
+        get :view, params
+        expect(controller.instance_variable_get(:@questions)[:review].size).to eq(1)
+        expect(response).to render_template(:view)
+      end
     end
 
     describe '#get_statuses_for_pull_request' do
-    before(:each) do
-      allow(Net::HTTP).to receive(:get) { "{\"team\":\"rails\", \"players\":\"36\"}" }
-    end
+      before(:each) do
+        allow(Net::HTTP).to receive(:get) { "{\"team\":\"rails\", \"players\":\"36\"}" }
+      end
 
-    it 'makes a call to the GitHub API to get status of the head commit passed' do
-      expect(controller.query_pull_request_status({
-          owner: 'expertiza',
-          repository: 'expertiza',
-          head_commit: 'qwerty123'})).to eq("team" => "rails", "players" => "36")
+      it 'makes a call to the GitHub API to get status of the head commit passed' do
+        expect(controller.query_pull_request_status({
+            owner: 'expertiza',
+            repository: 'expertiza',
+            head_commit: 'qwerty123'})).to eq("team" => "rails", "players" => "36")
+      end
     end
-  end
 
   describe '#retrieve_pull_request_data' do
     before(:each) do
@@ -447,7 +443,7 @@ describe MetricsController do
 
     it 'parses team data from github data for merged pull Request' do
       controller.team_statistics(
-        "data" => {
+        {
           "repository" => {
             "pullRequest" => {
               "number" => 8,
@@ -464,7 +460,7 @@ describe MetricsController do
               }
             }
           }
-        }
+        }, :pull
       )
       expect(controller.instance_variable_get(:@total_additions)).to eq(2)
       expect(controller.instance_variable_get(:@total_deletions)).to eq(1)
@@ -475,7 +471,7 @@ describe MetricsController do
 
     it 'parses team data from github data for non-merged pull Request' do
       controller.team_statistics(
-          "data" => {
+          {
               "repository" => {
                   "pullRequest" => {
                       "number" => 8,
@@ -492,7 +488,7 @@ describe MetricsController do
                       }
                   }
               }
-          }
+          }, :pull
       )
       expect(controller.instance_variable_get(:@total_additions)).to eq(2)
       expect(controller.instance_variable_get(:@total_deletions)).to eq(1)

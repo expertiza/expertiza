@@ -42,7 +42,7 @@ class MentorManagement
     return if team.participants.any? { |participant| participant.duty == Participant::DUTY_MENTOR }
 
     mentor_user = select_mentor(assignment_id)
-    team.add_member(mentor_user, assignment_id=assignment_id) unless mentor_user.nil?
+    team.add_member(mentor_user, assignment_id) unless mentor_user.nil?
   end
 
   def self.user_a_mentor?(user)

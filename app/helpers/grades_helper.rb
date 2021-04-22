@@ -177,5 +177,4 @@ module GradesHelper
     end
     questions
   end
-
 end

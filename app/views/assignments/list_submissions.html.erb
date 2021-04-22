@@ -31,7 +31,7 @@
           <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Participant name</th>
         <% end %>  
         <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Links</th> 
-        <th class="sorter-false" style="font-weight: bold; font-size: 15px;">History</th>
+        <th class="sorter-false" style="font-weight: bold; font-size: 15px;"></th>
       </tr>                    
     </thead>
     <% @l = -1 %>
@@ -87,7 +87,6 @@
             <%= display_directory_tree(participant, files, true).html_safe if files and files.length > 0 %>
           <% end %>
         </td>
-
         <td width="10%">
 
           <%= link_to "History", submission_records_path(team_id: team.id) %>

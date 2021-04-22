@@ -2,6 +2,16 @@ class MetricsController < ApplicationController
   include AuthorizationHelper
   include MetricsHelper
 
+  # This code needs to be moved to the new github metrics controller slated as part of E2111, and needs to be
+  # made optional in some manner. TAs and instructors should not HAVE to have an authorized github token to
+  # browse this page. Instead, this authorization should take place only if github metrics are specifically requested.
+  #
+  # if session["github_access_token"].nil?
+  #    session["assignment_id"] = params[:id]
+  #    session["github_view_type"] = "view_scores"
+  #    return redirect_to authorize_github_grades_path
+  # end
+
   # currently only give instructor this right, can be further discussed
   def action_allowed?
     current_user_has_instructor_privileges?

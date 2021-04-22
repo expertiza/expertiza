@@ -6,6 +6,7 @@
 <% end %>
 <!-- If there are 1-member teams, the Teammate Review column should not appear in the score report.
 If there is no metareviewing deadline, the “Reviewing” column should not appear in the score report.-->
+
 <!-- E1877: charts implemented before table-->
 <% if !@avg_of_avg.nan? %>
   <%= render :partial => 'team_charts', :locals => {:prefix => nil} %>

@@ -109,6 +109,15 @@ function microtaskChanged() {
     </td>
   </tr>
 
+  <!-- E2115 Mentor Management -->
+  <tr>
+    <td style='padding:5px' id='assignment_auto_assign_mentor_field'>
+      <input name="assignment_form[assignment][auto_assign_mentor]" type="hidden" value="false"/>
+      <%= check_box_tag('assignment_form[assignment][auto_assign_mentor]', 'true', @assignment_form.assignment.auto_assign_mentor?) %>
+      <%= label_tag('assignment_form[assignment][auto_assign_mentor]', 'Auto assign mentors when team hits > 50% capacity?') %>
+    </td>
+  </tr>
+
   <!--Quiz fields-->
   <tr>
     <td style='padding:5px' id='assignment_require_quiz_field'>
@@ -263,9 +272,17 @@ function microtaskChanged() {
     function topicsChanged() {
         var msg = 'Warning! Un-checking this box will remove all topics that have been created.';
         var checkbox = jQuery('#assignment_has_topics');
+
+        // E2115 - bind enabled state of mentor checkbox to checked property
+        // of topics checkbox
+        var mentorCheckbox = jQuery("#mentor_checkbox");
+        mentorCheckbox.prop("disabled", checkbox.is(':checked'));
+
         if (checkbox.is(':checked')) {
             // If this box is checked, display the 'Topics' tab
             jQuery("#topics_tab_header").show();
+            // E2115 - if 'has topics' is checked, uncheck mentor
+            mentorCheckbox.prop("checked", false);
         } else {
             if (confirm(msg)) {
                 // If this box is un-checked, remove all topics and reload page
@@ -300,6 +317,7 @@ function microtaskChanged() {
             team_formation_due_date_checkbox.removeAttr('hidden')
             jQuery('#assignment_form_assignment_max_team_size').val('2');
             teammate_reviews_field.removeAttr('hidden');
+            // TODO: hide/unhide the mentor checkbox here
             addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
             <% assignment_questionnaire = @assignment_form.assignment_questionnaire('TeammateReviewQuestionnaire', nil, nil) %>
             <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'TeammateReviewQuestionnaire') %>

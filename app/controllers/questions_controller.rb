@@ -70,9 +70,22 @@ class QuestionsController < ApplicationController
   def destroy
     question = Question.find(params[:id])
     questionnaire_id = question.questionnaire_id
+
+    question_ids=Question.where(questionnaire_id: questionnaire_id).ids
+    flash[:success] = ""
+    if AnswerHelper.in_active_period(questionnaire_id)
+      # Fetch the Answers for the Questionnaire, delete and send them to User
+      begin
+        AnswerHelper.delete_existing_responses(question_ids, questionnaire_id)
+        flash[:success] = "All existing reviews done in review period have been deleted. "
+      rescue StandardError
+        flash[:error] = $ERROR_INFO
+      end
+    end
+
     begin
       question.destroy
-      flash[:success] = "You have successfully deleted the question!"
+      flash[:success] += "You have successfully deleted the question!"
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end

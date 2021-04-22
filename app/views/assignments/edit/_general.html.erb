@@ -275,7 +275,7 @@ function microtaskChanged() {
 
         // E2115 - bind enabled state of mentor checkbox to checked property
         // of topics checkbox
-        var mentorCheckbox = jQuery("#mentor_checkbox");
+        var mentorCheckbox = jQuery("#auto_assign_mentor");
         mentorCheckbox.prop("disabled", checkbox.is(':checked'));
 
         if (checkbox.is(':checked')) {

@@ -113,8 +113,8 @@ function microtaskChanged() {
   <tr>
     <td style='padding:5px' id='assignment_auto_assign_mentor_field'>
       <input name="assignment_form[assignment][auto_assign_mentor]" type="hidden" value="false"/>
-      <%= check_box_tag('assignment_form[assignment][auto_assign_mentor]', 'true', @assignment_form.assignment.auto_assign_mentor?) %>
-      <%= label_tag('assignment_form[assignment][auto_assign_mentor]', 'Auto assign mentors when team hits > 50% capacity?') %>
+      <%= check_box_tag('auto_assign_mentor', 'true', @assignment_form.assignment.auto_assign_mentor?) %>
+      <%= label_tag('auto_assign_mentor', 'Auto assign mentors when team hits > 50% capacity?') %>
     </td>
   </tr>
 

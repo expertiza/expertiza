@@ -157,7 +157,7 @@ describe MetricsController do
     end
   end
 
-  describe '#view_github_metrics' do
+  describe '#show' do
     context 'when user hasn\'t logged in to GitHub' do
       before(:each) do
         @params = {id: 900}
@@ -165,13 +165,13 @@ describe MetricsController do
       end
 
       it 'stores the current participant id and the view action' do
-        get :view_github_metrics, @params
+        get :show, @params
         expect(session["participant_id"]).to eq("900")
         expect(session["github_view_type"]).to eq("view_submissions")
       end
 
       it 'redirects user to GitHub authorization page' do
-        get :view_github_metrics, @params
+        get :show, @params
         expect(response).to redirect_to(authorize_github_grades_path)
       end
     end
@@ -185,18 +185,18 @@ describe MetricsController do
       end
 
       it 'stores the GitHub access token for later use' do
-        get :view_github_metrics, id: '1'
+        get :show, id: '1'
         expect(controller.instance_variable_get(:@token)).to eq("qwerty")
       end
 
       it 'calls retrieve_github_data to retrieve data from GitHub' do
         expect(controller).to receive(:retrieve_github_data)
-        get :view_github_metrics, id: '1'
+        get :show, id: '1'
       end
 
       it 'calls retrieve_check_run_statuses to retrieve check runs data' do
         expect(controller).to receive(:query_all_merge_statuses)
-        get :view_github_metrics, id: '1'
+        get :show, id: '1'
       end
     end
   end

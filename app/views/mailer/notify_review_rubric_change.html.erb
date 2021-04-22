@@ -1,0 +1,12 @@
+
+<p>
+  Dear <%=@name%>,
+
+  The review rubric for the assignment <%=@assignment_name%>, has been changed and below are your answers to the previous rubric.
+
+  <%@answers.each do |answer|%>
+    <%=answer%><br/>
+  <%end%>
+</p>
+
+<BR/> 

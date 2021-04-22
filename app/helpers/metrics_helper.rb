@@ -26,6 +26,33 @@ module MetricsHelper
     horizontal_bar_chart data, chart_options
   end
 
+  def display_totals_piechart(parsed_data, authors, dates)
+    data_array = []
+    color = %w[ff0000 ffff00 0000ff aaaaaa 00ff00 ff00ff]
+    i = 0
+    authors.each do |author|
+      data_object = {}
+      data_object[:author] = author
+      data_object[:commits] = parsed_data[author].values.inject(0) {|sum, value| sum += value}
+      data_object[:color] = color[i]
+      data_array.push(data_object)
+      i += 1
+      i = 0 if i > 4
+    end
+
+     link = nil
+    GoogleChart::PieChart.new('600x300', '# Commits By Author', false) do |pc|
+      data_array.each do |datapoint|
+        label = datapoint[:author] + " (" + datapoint[:commits].to_s + ")"
+        pc.data label, datapoint[:commits], datapoint[:color]
+      end
+      link = pc.to_url
+    end
+
+      link
+
+  end
+
   # Fall 2018, E1858
   # Defines the general settings of the github metrics chart
   def chart_options

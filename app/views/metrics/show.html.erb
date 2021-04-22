@@ -1,6 +1,6 @@
-<script type="text/javascript" src="/assets/view_team_in_grades.js"></script>
+<!--<script type="text/javascript" src="/assets/view_team_in_grades.js"></script>-->
 <script type="text/javascript">
-    github_token = '<%= @token %>';
+/*    github_token = ' @token ';
     $(document).ready(function () {
         $('#tag_prompt_toggler').click(function () {
             if ($('#tag_prompt_toggler').text() == "hide tags")
@@ -18,7 +18,7 @@
         } else {
             target.style.display = 'none';
         }
-    }
+    }*/
 </script>
 <% status_classes = {"failure" => "failed", "success" => "passed"} %>
 <h2>GitHub Metrics for assignment: <%= @assignment.name %></h2>
@@ -42,10 +42,23 @@
 
 
 <% if @parsed_data && @authors.present? && @dates %>
-  <h3>Code frequency</h3>
-  <div class="chart-container" style="width: 1000px; height:600px;">
-    <%= display_github_metrics(@parsed_data, @authors, @dates) %>
-  </div>
+
+  <table>
+    <tr>
+      <td align="center"><h3>Code Frequency</h3></td>
+      <td align="center"><h3>Total contributions by author</h3></td>
+    </tr>
+    <tr>
+      <td>
+        <div class="chart-container" style="width: 600px; height:450px;display: block;alignment: left">
+          <%= display_github_metrics(@parsed_data, @authors, @dates) %>
+        </div>
+      </td>
+      <td>
+        <img src="<%= display_totals_piechart(@parsed_data, @authors, @dates) %>" style="display: block; alignment: right  ">
+      </td>
+    </tr>
+  </table>
   <h3>Team Statistics</h3>
   <ul>
     <li>Total number of commits:<%= @total_commits %></li>

@@ -1,6 +1,6 @@
 describe GradesController do
   let(:review_response) { build(:response) }
-  let(:assignment) { build(:assignment, id: 1, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
+  let(:assignment) { build(:assignment, id: 1, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true)}
   let(:assignment_questionnaire) { build(:assignment_questionnaire, used_in_round: 1, assignment: assignment) }
   let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
   let(:participant2) { build(:participant, id: 2, assignment: assignment, user_id: 1) }
@@ -39,6 +39,17 @@ describe GradesController do
         params = {id: 1}
         get :view, params
         expect(controller.instance_variable_get(:@questions)[:review1].size).to eq(1)
+        expect(response).to render_template(:view)
+      end
+    end
+
+    context 'when current assignment does not vary rubric by round' do
+      it 'calculates scores and renders grades#view page' do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
+        allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([review_response])
+        params = {id: 1}
+        get :view, params
+        expect(controller.instance_variable_get(:@questions)[:review].size).to eq(1)
         expect(response).to render_template(:view)
       end
     end
@@ -202,5 +213,36 @@ describe GradesController do
       expect(flash[:error]).to be nil
       expect(response).to redirect_to('/grades/view_team?id=1')
     end
+  end
+
+  describe '#action_allowed' do
+    context 'when the student does not belong to a team' do
+      it 'returns false' do 
+        params = {action: 'view_team'}
+        session[:user].role.name = 'Student'
+        expect(controller.action_allowed?).to eq(false)
+      end
+    end
+    context 'when the user is an instructor' do
+      it 'returns true' do 
+        params = {action: 'view_team'} 
+        session[:user].role.name = 'Instructor'
+        expect(controller.action_allowed?).to eq(true)
+      end
+    end
+  end
+
+  describe '#redirect_when_disallowed' do
+    context 'when a participant without a team exists' do
+      it 'redirects to /' do
+        params = {id: 1}
+        session
+        allow(participant).to receive(:team).and_return(nil)
+        allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+        allow(TeamsUser).to receive(:team_id).and_return(1)
+        get :view_my_scores, params
+        expect(response).to redirect_to('/')
+      end
+    end 
   end
 end

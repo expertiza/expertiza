@@ -186,7 +186,7 @@ class QuestionnairesController < ApplicationController
     questionnaire_id = params[:id] unless params[:id].nil?
     num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
 
-    question_ids = Questionnaire.find(questionnaire_id).questions.ids
+    question_ids = Questionnaire.find(questionnaire_id).questions.ids #Find all question_ids for that questionnaire
     if AnswerHelper.in_active_period(questionnaire_id)
       # Fetch the Answers for the Questionnaire, delete and send them to User
       begin

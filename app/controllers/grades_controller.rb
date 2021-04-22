@@ -167,7 +167,7 @@ class GradesController < ApplicationController
       flash[:error] = $ERROR_INFO
     end
     redirect_to controller: 'grades', action: 'view_team', id: participant.id
-    end
+  end
 
   def bar_chart(scores, width = 100, height = 100, spacing = 1)
     link = nil

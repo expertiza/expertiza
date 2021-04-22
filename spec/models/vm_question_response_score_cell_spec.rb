@@ -9,8 +9,8 @@ describe VmQuestionResponseScoreCell do
   		color_code_number = ((5.to_f / 5.to_f) * 5.0).ceil
   		color_code = "c#{color_code_number}"
   		vm_tag_prompts = [tp, tp2]
-  		vmqrsc = VmQuestionResponseScoreCell.new(5, color_code, answer.comments, vm_tag_prompts)
-  		expect(vmqrsc.score_value).to eq(5)
+  		vmqrsc = VmQuestionResponseScoreCell.new(answer.answer, color_code, answer.comments, vm_tag_prompts)
+  		expect(vmqrsc.score_value).to eq(answer.answer)
   		expect(vmqrsc.color_code).to eq(color_code)
   		expect(vmqrsc.comment).to eq(answer.comments)
   		expect(vmqrsc.vm_prompts).to eq(vm_tag_prompts)

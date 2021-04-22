@@ -185,6 +185,20 @@ class QuestionnairesController < ApplicationController
   def add_new_questions
     questionnaire_id = params[:id] unless params[:id].nil?
     num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
+
+    question_ids = Questionnaire.find(questionnaire_id).questions.ids
+    if AnswerHelper.in_active_period(questionnaire_id)
+      # Fetch the Answers for the Questionnaire, delete and send them to User
+      begin
+        AnswerHelper.delete_existing_responses(question_ids, questionnaire_id)
+        flash[:success] = "You have successfully added a new question. The existing reviews for the questionnaire have been deleted!"
+      rescue StandardError
+        flash[:error] = $ERROR_INFO
+      end
+    else
+      flash[:success] = "You have successfully added a new question."
+    end
+
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
       if question.is_a? ScoredQuestion

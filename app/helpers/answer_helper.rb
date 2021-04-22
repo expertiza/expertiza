@@ -72,7 +72,7 @@ module AnswerHelper
     end
   end
 
-  #The in_active_period method returns true if
+  #The in_active_period method returns true if the start & end range includes the current time
   def self.in_active_period(questionnaire_id, answer=nil)
     assignment, round_number = AssignmentQuestionnaire.get_latest_assignment(questionnaire_id)
     unless assignment.nil? #If the assignment doesn't exist, return false

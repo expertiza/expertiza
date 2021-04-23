@@ -26,19 +26,41 @@ class MentorManagement
     User.where(id: mentor_user_id).first
   end
 
+  # = Mentor Management
+  # E2115: Handles calls when an assignment has the auto_assign_mentor flag enabled and triggered by the event when a new member joins an assignment team.
+  #
+  # This event happens when:
+  #   1.) An invited student user accepts and successfully added to a team from
+  #       app/models/invitation.rb
+  #   2.) A student user is successfully added to the team manually from
+  #       app/controllers/teams_users_controller.rb.
+  #
+  # This method will determine if a mentor needs to be assigned, if so,
+  # selects one, and adds the mentor to the team if:
+  #   1.) The assignment does not have a topic.
+  #   2.) If the team has reached >50% full capacity.
+  #   3.) If the team does not have a mentor.
   def self.update_mentor_state(assignment_id, team_id)
     assignment = Assignment.find(assignment_id)
     team = Team.find(team_id)
 
+    # RuboCop 'use guard clause instead of nested conditionals'
+    # return if assignments can't accept mentors
+    return unless assignment.auto_assign_mentor
+
+    # RuboCop 'use guard clause instead of nested conditionals'
+    # return if the assignment or team already have a topic
     return if assignment.topics? || !team.topic.nil?
 
     curr_team_size = Team.size(team_id)
     max_team_members = Assignment.find(assignment_id).max_team_size
 
     # RuboCop 'use guard clause instead of nested conditionals'
+    # return if the team size hasn't reached > 50% of capacity
     return if curr_team_size * 2 <= max_team_members
 
     # RuboCop 'use guard clause instead of nested conditionals'
+    # return if there's already a mentor in place
     return if team.participants.any? { |participant| participant.duty == Participant::DUTY_MENTOR }
 
     mentor_user = select_mentor(assignment_id)

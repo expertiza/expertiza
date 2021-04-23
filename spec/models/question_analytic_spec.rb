@@ -33,7 +33,7 @@ describe QuestionAnalytic do
   	it 'counts the number of characters in a string' do
   		text = 'ABCABCabcabc'
   		dc = DummyClass.new(text)
-  		expect(dc.char_count).to eq(18)
+  		expect(dc.char_count).to eq(12)
   	end
   end
 end

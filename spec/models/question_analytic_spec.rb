@@ -1,5 +1,5 @@
 class DummyClass 
-	attr_accessible :txt
+	attr_accessor :txt
 	include QuestionAnalytic
 	
 	def initialize(txt)

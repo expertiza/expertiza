@@ -7,7 +7,7 @@ class DummyClass
 	end
  	
  	def unique_character_count
- 		unique_character_count
+ 		QuestionAnalytic.unique_character_count
  	end
 end
 

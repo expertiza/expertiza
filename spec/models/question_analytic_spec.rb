@@ -46,7 +46,7 @@ describe QuestionAnalytic do
   		dc = DummyClass.new(text)
   		expect(dc.wc).to eq(2)
 
-  		dc.text = ''
+  		dc.txt = ''
   		expect(dc.wc).to eq(0)
   	end
   end

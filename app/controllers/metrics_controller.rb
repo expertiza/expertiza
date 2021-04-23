@@ -1,10 +1,30 @@
 class MetricsController < ApplicationController
   include AuthorizationHelper
+  include AssignmentHelper
   include MetricsHelper
 
   # currently only give instructor this right, can be further discussed
   def action_allowed?
     current_user_has_instructor_privileges?
+  end
+
+  def create_github_metric(team_id, github_id, participant_id, total_commits)
+    unless participant_id.nil?
+      metric = Metric.where("team_id = ? AND github_id = ?", team_id, github_id).first
+
+      unless metric.nil?
+        metric.total_commits=total_commits
+        metric.save
+      else
+        # create new
+        Metric.create :metric_source_id => MetricSource.find_by_name("Github").id,
+                      :team_id => team_id,
+                      :github_id => github_id,
+                      :participant_id => participant_id,
+                      :total_commits => total_commits
+
+      end
+    end
   end
 
   # render the view_github_metrics page
@@ -42,6 +62,22 @@ class MetricsController < ApplicationController
 
     @authors = @authors.keys # only keep the author name info
     @dates = @dates.keys.sort # only keep the date info and sort
+
+    @participants = get_data_for_list_submissions(@team)
+begin
+    data_array = []
+    @authors.each do |author|
+      data_object = {}
+      data_object[:author] = author
+      data_object[:commits] = @parsed_data[author].values.inject(0) {|sum, value| sum += value}
+      data_array.push(data_object)
+      create_github_metric(@team_id, author, User.find_by_github_id(author).id, data_object[:commits])
+    end
+end
+    puts :asdff
+    #sushreeta2106 #8995
+    # amolgautam25 #8980
+    # skollip #9013
   end
 
   # authorize with token to use github API with 5000 rate limits. Unauthorized user only has 60 limits, which is not enough.
@@ -69,7 +105,7 @@ class MetricsController < ApplicationController
   end
 
 
-  ######################### Handling of Pull Request Links ####################
+  ################################ Handling of Pull Request Links #############################################
 
   # example pull_links: https://github.com/expertiza/expertiza/pull/1858
   def query_all_pull_requests(pull_links)

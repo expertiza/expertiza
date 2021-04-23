@@ -230,11 +230,11 @@
         <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
             <br><div class="alert alert-warning">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>
         <% end %>
-        <br/>  
+        <br/>
     <% end %>
 <% end %>
 <!-- termination of the main outer loop.-->
-
+<img src="<%= display_github_piechart(@team_id) %>" style="display: block; alignment: right  ">
 <!-- Get course ID and TA ID to restrict TAs ability to update his grades-->
 <%
    @course_id = Assignment.find_by(id: @participant.parent_id).course_id;

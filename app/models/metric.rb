@@ -1,4 +1,6 @@
 class Metric < ActiveRecord::Base
+  # attr_accessor :team_id, :github_id, :participant_id, :total_commits
+
   def self.pull_query(hyperlink_data, after)
     {
       query: "query {

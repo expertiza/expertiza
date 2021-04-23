@@ -177,4 +177,34 @@ module GradesHelper
     end
     questions
   end
+
+  def display_github_piechart(team)
+    metrics = Metric.where("team_id = ?", team)
+
+
+    data_array = []
+    color = %w[ff0000 ffff00 0000ff aaaaaa 00ff00 ff00ff]
+    i = 0
+    metrics.each do |metric|
+      data_object = {}
+      data_object[:author] = User.find(metric.participant_id).fullname
+      data_object[:commits] = metric.total_commits
+      data_object[:color] = color[i]
+      data_array.push(data_object)
+      i += 1
+      i = 0 if i > 4
+    end
+
+    link = nil
+    GoogleChart::PieChart.new('600x300', '# Commits By Author', false) do |pc|
+      data_array.each do |datapoint|
+        label = datapoint[:author].to_s + " (Total: " + datapoint[:commits].to_s + ")"
+        pc.data label, datapoint[:commits], datapoint[:color]
+      end
+      link = pc.to_url
+    end
+
+    link
+
+  end
 end

@@ -206,7 +206,6 @@ class Assignment < ActiveRecord::Base
     if self.course_id.nil? && self.instructor_id.nil?
       raise 'The path cannot be created. The assignment must be associated with either a course or an instructor.'
     end
-    path_text = ""
     path_text = if !self.course_id.nil? && self.course_id > 0
                   Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(self.instructor[:name]) + '/' +
                     FileHelper.clean_path(self.course.directory_path) + '/'

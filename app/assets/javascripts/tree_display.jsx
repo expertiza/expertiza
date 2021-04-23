@@ -219,6 +219,7 @@ jQuery(document).ready(function() {
               <a title="View survey responses" href={"/survey_response/view_responses?id="+(parseInt(this.props.id)/2).toString()}>
                   <img src="/assets/tree_view/view-survey-24.png" />
                 </a>
+                <MachineTagging assignment_id={(parseInt(this.props.id)/2).toString()} />
               </span>
                         )
 
@@ -267,6 +268,55 @@ jQuery(document).ready(function() {
             )
         }
     })
+
+
+  var MachineTagging = React.createClass({
+    getInitialState: function() {
+      return {
+        current: -1,
+        responses: []
+      }
+    },
+    callForEachResponse: function(_this, index) {
+      if (index < 0) {
+        return;
+      }
+      jQuery.get("/answer_tags/machine_tagging?assignment_id=" + _this.props.assignment_id + "&response_id=" + _this.state.responses[index], function(data) {
+        _this.setState({
+          current: _this.state.current + data['increment']
+        })
+        _this.callForEachResponse(_this, --index);
+      })
+    },
+    callForNumberOfResponses: function(_this) {
+      jQuery.get("/answer_tags/machine_tagging?assignment_id=" + this.props.assignment_id, function(responses) {
+        _this.setState({
+          responses: responses
+        });
+        _this.callForEachResponse(_this,responses.length - 1);
+      });
+    },
+    handleClick: function(e) {
+      this.setState({
+        current: 0,
+        responses: []
+      });
+      var _this = this;
+      this.callForNumberOfResponses(_this);
+    },
+    render: function () {
+      const {current, responses } = this.state;
+      return (
+        <span>
+          <a title="Machine tagging" onClick={this.handleClick}>
+            <img src="/assets/tree_view/machine-tagging.png" />
+          </a>
+          { current > -1 ? "" + current + "/" + responses.length : "" }
+          { current > 0 && current === responses.length ? " Done" : "" }
+        </span>
+      )
+    }
+  })
 
     var SimpleTableRow = React.createClass({
         render: function () {

@@ -241,4 +241,16 @@ class AssignmentTeam < Team
     assignment = Assignment.find(self.parent_id)
     SubmissionRecord.where(team_id: self.id, assignment_id: assignment.id).order(updated_at: :desc).first
   end
+
+  def all_responses
+    if self.assignment.varying_rubrics_by_round?
+      responses = []
+      (1..self.assignment.rounds_of_reviews).each { |round|
+        responses += ReviewResponseMap.get_responses_for_team_round(self, round)
+      }
+      responses
+    else
+      ResponseMap.get_assessments_for(self)
+    end
+  end
 end

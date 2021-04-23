@@ -14,6 +14,10 @@ describe TagPrompt do
   let(:tag_dep_slider) { TagPromptDeployment.new id: 2, tag_prompt: tp2,  question_type: "Criterion", answer_length_threshold: 5 }
   let(:answer_tag) { AnswerTag.new(tag_prompt_deployment_id: 2, answer: an_long, user_id: 1, value: 1) }
 
+  before :each do
+    allow(ReviewMetricsQuery).to receive(:confident?).and_return(false)
+  end
+
   it "is valid with valid attributes" do
     expect(TagPrompt.new(prompt: "test prompt", desc: "test desc", control_type: "Checkbox")).to be_valid
   end

@@ -1,6 +1,6 @@
 class DummyClass 
 	attr_accessor :txt
-	include QuestionAnalytic
+	require_relative "/app/models/analytic/question_analytic.rb"
 	
 	def initialize(txt)
 		@txt = txt

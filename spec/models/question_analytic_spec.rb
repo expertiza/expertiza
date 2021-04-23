@@ -14,6 +14,10 @@ class DummyClass
  	def char_count
  		character_count
  	end
+
+ 	def wc
+ 		word_count 
+ 	end
 end
 
 describe QuestionAnalytic do
@@ -34,6 +38,16 @@ describe QuestionAnalytic do
   		text = 'ABCABCabcabc'
   		dc = DummyClass.new(text)
   		expect(dc.char_count).to eq(12)
+  	end
+  end
+  describe '#word_count' do
+  	it 'counts the words in a string' do
+  		text = 'John Bumgardner'
+  		dc = DummyClass.new(text)
+  		expect(dc.wc).to eq(2)
+
+  		dc.text = ''
+  		expect(dc.wc).to eq(0)
   	end
   end
 end

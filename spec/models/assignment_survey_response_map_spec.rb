@@ -55,7 +55,17 @@ describe AssignmentSurveyResponseMap do
     it 'should send an email to the associated user' do
       allow(User).to receive(:find).with(1).and_return(user) 
       survey_parent = {name: 'Assignment1'}
-      @assignment_survey_response_map.email({},participant, survey_parent)
+      defn = {
+        to: '',
+        body: {
+          type: '',
+          obj_name: '',
+          first_name: ''
+        }
+      }
+
+
+      @assignment_survey_response_map.email(defn, participant, survey_parent)
       expect(email.from[0]).to eq("expertiza.development@gmail.com")
       expect(email.to[0]).to eq('expertiza.development@gmail.com')
       expect(email.subject).to eq('Test')

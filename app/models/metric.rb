@@ -9,15 +9,85 @@ class Metric < ActiveRecord::Base
 
 
 
+# Get problems analysis for review ( get_review_response_metrics ) 
+def response_problems_metrics(input_params)
+
+  uri = URI.parse('http://152.7.99.200:5000/problem') 
+  http = Net::HTTP.new(uri.hostname, uri.port)
+  req = Net::HTTP::Post.new(uri, initheader = {'Content-Type' =>'application/json'})
+  req.body = input_params
+  # http.use_ssl = true
+  # http.ssl_version = 'TLSv1'
+  # http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+  begin
+
+    @sent_hash = Hash.new
+    res = http.request(req)
+   
+      if (res.code == "200" && res.content_type == "application/json")
+        @output = res.body
+        @output=JSON.parse(@output)
+
+        0.upto(@output['reviews'].length-1) do |i|                  
+
+            @problems = @output['reviews'][i]['problems']           
+            @sent_hash[i] = @problems 
+            
+        end
+        return @sent_hash
+      else 
+        return nil 
+      end
+  rescue StandardError
+    return nil
+  end
+end
+
+
+
+
+# Get suggestions analysis for review ( get_review_response_metrics ) 
+def response_suggestions_metrics(input_params)
+
+  uri = URI.parse('http://152.7.99.200:5000/suggestions') 
+  http = Net::HTTP.new(uri.hostname, uri.port)
+  req = Net::HTTP::Post.new(uri, initheader = {'Content-Type' =>'application/json'})
+  req.body = input_params
+  # http.use_ssl = true
+  # http.ssl_version = 'TLSv1'
+  # http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+  begin
+
+    @sent_hash = Hash.new
+    res = http.request(req)
+   
+      if (res.code == "200" && res.content_type == "application/json")
+        @output = res.body
+        @output=JSON.parse(@output)
+
+        0.upto(@output['reviews'].length-1) do |i|                  
+
+            @suggestions = @output['reviews'][i]['suggestions']           
+            @sent_hash[i] = @suggestions 
+            
+        end
+        return @sent_hash
+      else 
+        return nil 
+      end
+  rescue StandardError
+    return nil
+  end
+end
 
 
 
 # Get sentiment analysis for review ( get_review_response_metrics ) 
   def response_sentiments_metrics(input_params)
 
-    uri = URI.parse('https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk')
-    puts uri.hostname
-    puts uri.port
+    uri = URI.parse('https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk')   
     http = Net::HTTP.new(uri.hostname, uri.port)
     req = Net::HTTP::Post.new(uri, initheader = {'Content-Type' =>'application/json'})
     req.body = input_params
@@ -29,7 +99,7 @@ class Metric < ActiveRecord::Base
 
       @sent_hash = Hash.new
       res = http.request(req)
-      puts res.code
+     
         if (res.code == "200" && res.content_type == "application/json")
           @output = res.body
           @output=JSON.parse(@output)

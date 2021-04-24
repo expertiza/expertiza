@@ -61,12 +61,12 @@ describe AssignmentSurveyResponseMap do
           first_name: "no one", 
           partial_name: "new_submission"
         }, 
-        to: "expertiza@mailinator.com"}
+        to: 'expertiza.development@gmail.com'}
 
 
-      @assignment_survey_response_map.email(defn, participant, assignment)
-      expect(email.from[0]).to eq("expertiza.development@gmail.com")
-      expect(email.to[0]).to eq('expertiza.development@gmail.com')
+      email = @assignment_survey_response_map.email(defn, participant, assignment)
+      expect(defn.from[0]).to eq("expertiza.development@gmail.com")
+      expect(defn.to[0]).to eq('expertiza.development@gmail.com')
       expect(email.subject).to eq('Test')
     end
   end

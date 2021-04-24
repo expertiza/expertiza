@@ -267,7 +267,11 @@ describe MetricsController do
     end
 
     it 'gets pull request data for link passed' do
-      data = controller.pull_request_data("https://github.com/expertiza/expertiza")
+      hyperlink_data = {};
+      hyperlink_data["pull_request_number"] = "1917";
+      hyperlink_data["repository_name"] = "expertiza";
+      hyperlink_data["owner_name"] = "expertiza";
+      data = controller.pull_request_data(hyperlink_data)
       expect(data).to eq(
         "data" => {
           "repository" => {
@@ -352,6 +356,7 @@ describe MetricsController do
     before(:each) do
       allow(controller).to receive(:count_github_authors_and_dates)
       allow(controller).to receive(:sort_commit_dates)
+      controller.instance_variable_set(:@merge_status, {})
       @github_data = {
         "data" => {
           "repository" => {
@@ -400,6 +405,7 @@ describe MetricsController do
 
   describe 'get_query' do
     before(:each) do
+      session["github_access_token"] = "qwerty"
       controller.instance_variable_set(:@end_cursor, "")
     end
     it 'constructs the graphql query' do
@@ -426,7 +432,7 @@ describe MetricsController do
       hyperlink_data["owner_name"] = "expertiza"
       hyperlink_data["repository_name"] = "expertiza"
       hyperlink_data["pull_request_number"] = "1228"
-      response = controller.get_query(hyperlink_data)
+      response = controller.pull_request_data(hyperlink_data)
       expect(response).to eq(query)
     end
   end
@@ -442,26 +448,27 @@ describe MetricsController do
     end
 
     it 'parses team data from github data for merged pull Request' do
-      controller.team_statistics(
-        {
-          "repository" => {
-            "pullRequest" => {
-              "number" => 8,
-              "additions" => 2,
-              "deletions" => 1,
-              "changedFiles" => 3,
-              "mergeable" => "UNKNOWN",
-              "merged" => true,
-              "headRefOid" => "123abc",
-              "commits" => {
-                "totalCount" => 16,
-                "pageInfo" => {},
-                "edges" => []
+      github_data = {
+          "data" => {
+              "repository" => {
+                  "pullRequest" => {
+                      "number" => 8,
+                      "additions" => 2,
+                      "deletions" => 1,
+                      "changedFiles" => 3,
+                      "mergeable" => "UNKNOWN",
+                      "merged" => true,
+                      "headRefOid" => "123abc",
+                      "commits" => {
+                          "totalCount" => 16,
+                          "pageInfo" => {},
+                          "edges" => []
+                      }
+                  }
               }
-            }
           }
-        }, :pull
-      )
+      }
+      controller.team_statistics(github_data, :pull)
       expect(controller.instance_variable_get(:@total_additions)).to eq(2)
       expect(controller.instance_variable_get(:@total_deletions)).to eq(1)
       expect(controller.instance_variable_get(:@total_files_changed)).to eq(3)
@@ -470,8 +477,8 @@ describe MetricsController do
     end
 
     it 'parses team data from github data for non-merged pull Request' do
-      controller.team_statistics(
-          {
+      github_data = {
+          "data" => {
               "repository" => {
                   "pullRequest" => {
                       "number" => 8,
@@ -488,8 +495,9 @@ describe MetricsController do
                       }
                   }
               }
-          }, :pull
-      )
+          }
+      }
+      controller.team_statistics(github_data, :pull)
       expect(controller.instance_variable_get(:@total_additions)).to eq(2)
       expect(controller.instance_variable_get(:@total_deletions)).to eq(1)
       expect(controller.instance_variable_get(:@total_files_changed)).to eq(3)

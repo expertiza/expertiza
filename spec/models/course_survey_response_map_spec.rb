@@ -42,4 +42,11 @@ describe CourseSurveyResponseMap do
   		expect(@course_survey_response_map.get_title).to eq('Course Survey')
   	end
   end
+
+  #tests for the inherited super class
+  describe '#survey?' do
+    it 'should return true' do
+      expect(@assignment_survey_response_map.survey?).to eq(true)
+    end
+  end
 end

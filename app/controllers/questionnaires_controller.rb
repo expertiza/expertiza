@@ -187,15 +187,12 @@ class QuestionnairesController < ApplicationController
     question_ids = Questionnaire.find(questionnaire_id).questions.ids
     if AnswerHelper.in_active_period(questionnaire_id)
       # Fetch the Answers for the Questionnaire, delete and send them to User
-      begin
         AnswerHelper.delete_existing_responses(question_ids, questionnaire_id)
         flash[:success] = "You have successfully added a new question. The existing reviews for the questionnaire have been deleted!"
-      rescue StandardError
-        flash[:error] = $ERROR_INFO
-      end
     else
       flash[:success] = "You have successfully added a new question."
     end
+
     num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
@@ -204,16 +201,14 @@ class QuestionnairesController < ApplicationController
         question.max_label = 'Strongly agree'
         question.min_label = 'Strongly disagree'
       end
+
       question.size = '50, 3' if question.is_a? Criterion
       question.size = '50, 3' if question.is_a? Cake
       question.alternatives = '0|1|2|3|4|5' if question.is_a? Dropdown
       question.size = '60, 5' if question.is_a? TextArea
       question.size = '30' if question.is_a? TextField
-      begin
-        question.save
-      rescue StandardError
-        flash[:error] = $ERROR_INFO
-      end
+
+      question.save
     end
     redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
   end

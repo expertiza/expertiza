@@ -65,9 +65,9 @@ describe AssignmentSurveyResponseMap do
 
 
       email = @assignment_survey_response_map.email(defn, participant, assignment)
-      expect(defn.from[0]).to eq("expertiza.development@gmail.com")
-      expect(defn.to[0]).to eq('expertiza.development@gmail.com')
-      expect(email.subject).to eq('Test')
+      expect(email.from[0]).to eq("expertiza.development@gmail.com")
+      expect(email.to[0]).to eq('expertiza.development@gmail.com')
+      
     end
   end
 end

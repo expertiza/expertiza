@@ -62,12 +62,9 @@ describe AssignmentSurveyResponseMap do
           partial_name: "new_submission"
         }, 
         to: 'expertiza.development@gmail.com'}
-
-
       email = @assignment_survey_response_map.email(defn, participant, assignment)
       expect(email.from[0]).to eq("expertiza.development@gmail.com")
       expect(email.to[0]).to eq('expertiza.development@gmail.com')
-      
     end
   end
 end

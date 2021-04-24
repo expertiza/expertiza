@@ -1,5 +1,5 @@
 describe AssignmentSurveyResponseMap do
-	let(:participant) { build(:participant, user: build(:student, name: "Jane", fullname: "Doe, Jane", id: 1)) }
+	let(:participant) { build(:participant, user_id: 1, user: build(:student, email: "expertiza.development@gmail.com", name: "Jane", fullname: "Doe, Jane", id: 1)) }
 	let(:assignment_questionnaire1) { build(:assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 1) }
 	let(:previous_day) { (Time.now.getlocal - 1 * 86_400).strftime("%Y-%m-%d %H:%M:%S") }
   let(:next_day) { (Time.now.getlocal + 1 * 86_400).strftime("%Y-%m-%d %H:%M:%S") }
@@ -47,6 +47,17 @@ describe AssignmentSurveyResponseMap do
   describe '#survey?' do
     it 'should return true' do
       expect(@assignment_survey_response_map.survey?).to eq(true)
+    end
+  end
+
+  describe '#email' do
+    it 'should send an email to the associated user' do
+      allow(User).to receive(:find).with(1).and_return(user) 
+      survey_parent = {name: 'Assignment1'}
+      @assignment_survey_response_map.email({},participant, survey_parent)
+      expect(email.from[0]).to eq("expertiza.development@gmail.com")
+      expect(email.to[0]).to eq('expertiza.development@gmail.com')
+      expect(email.subject).to eq('Test')
     end
   end
 end

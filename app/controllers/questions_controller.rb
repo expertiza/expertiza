@@ -88,7 +88,7 @@ class QuestionsController < ApplicationController
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
-    redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
+    redirect_to edit_questionnaire_path(questionnaire_id.to_s.to_sym)
   end
 
   # required for answer tagging

@@ -184,9 +184,7 @@ class QuestionnairesController < ApplicationController
   # Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions
     questionnaire_id = params[:id] unless params[:id].nil?
-    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
-
-    question_ids = Questionnaire.find(questionnaire_id).questions.ids #Find all question_ids for that questionnaire
+    question_ids = Questionnaire.find(questionnaire_id).questions.ids
     if AnswerHelper.in_active_period(questionnaire_id)
       # Fetch the Answers for the Questionnaire, delete and send them to User
       begin
@@ -198,7 +196,7 @@ class QuestionnairesController < ApplicationController
     else
       flash[:success] = "You have successfully added a new question."
     end
-
+    num_of_existed_questions = Questionnaire.find(questionnaire_id).questions.size
     ((num_of_existed_questions + 1)..(num_of_existed_questions + params[:question][:total_num].to_i)).each do |i|
       question = Object.const_get(params[:question][:type]).create(txt: '', questionnaire_id: questionnaire_id, seq: i, type: params[:question][:type], break_before: true)
       if question.is_a? ScoredQuestion

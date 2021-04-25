@@ -22,7 +22,6 @@ class MetricsController < ApplicationController
                       :github_id => github_id,
                       :participant_id => participant_id,
                       :total_commits => total_commits
-
       end
     end
   end
@@ -32,7 +31,8 @@ class MetricsController < ApplicationController
     if session["github_access_token"].nil? # check if there is a github_access_token in current session
       session["participant_id"] = params[:id] # team number
       session["github_view_type"] = "view_submissions"
-      redirect_to authorize_github_grades_path # if no github_access_token present, redirect to authorization page
+      #redirect_to authorize_github_grades_path # if no github_access_token present, redirect to authorization page
+      redirect_to :controller => 'metrics', :action => 'authorize_github'
       return
     end
 
@@ -66,11 +66,16 @@ class MetricsController < ApplicationController
     @participants = get_data_for_list_submissions(@team)
 begin
     data_array = []
+    #puts @authors
+    #puts "========"
     @authors.each do |author|
       data_object = {}
       data_object[:author] = author
       data_object[:commits] = @parsed_data[author].values.inject(0) {|sum, value| sum += value}
       data_array.push(data_object)
+      puts @team_id
+      puts author
+      puts User.find_by_github_id(author)
       create_github_metric(@team_id, author, User.find_by_github_id(author).id, data_object[:commits])
     end
 end

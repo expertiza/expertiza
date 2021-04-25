@@ -70,12 +70,7 @@ class QuestionsController < ApplicationController
   def destroy
     question = Question.find(params[:id])
     questionnaire_id = question.questionnaire_id
-<<<<<<< HEAD
-
-    question_ids=Question.where(questionnaire_id: questionnaire_id).ids #Find all question_ids for that questionnaire
-=======
-    question_ids = Question.find(questionnaire_id).questions.ids
->>>>>>> f099405... Spacing fixes
+    question_ids = Questionnaire.find(questionnaire_id).questions.ids
     flash[:success] = ""
     if AnswerHelper.in_active_period(questionnaire_id)
       # Fetch the Answers for the Questionnaire, delete and send them to User

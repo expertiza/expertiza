@@ -64,7 +64,25 @@ class MentorManagement
     return if team.participants.any? { |participant| participant.duty == Participant::DUTY_MENTOR }
 
     mentor_user = select_mentor(assignment_id)
-    team.add_member(mentor_user, assignment_id) unless mentor_user.nil?
+
+    # Add the mentor using team model class.
+    team_member_added = mentor_user.nil? ? false : team.add_member(mentor_user, assignment_id)
+
+    return unless team_member_added
+
+    notify_team_of_mentor_assignment(mentor_user, team)
+  end
+
+  def self.notify_team_of_mentor_assignment(mentor, team)
+    members = team.users
+    emails = members.map(&:email)
+    members_info = members.map{|mem| "#{mem.fullname} - #{mem.email}"}
+    mentor_info = "#{mentor.fullname} (#{mentor.email})"
+    message = "#{mentor_info} has been assigned as your mentor for assignment #{Assignment.find(team.parent_id).name} <br>Current members:<br> #{members_info.join('<br>')}"
+
+    Mailer.delayed_message(bcc: emails,
+                           subject: "[Expertiza]: New Mentor Assignment",
+                           body: message).deliver_now
   end
 
   def self.user_a_mentor?(user)

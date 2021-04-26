@@ -1,0 +1,14 @@
+# Rename this file to local_env.yml
+# Add account Expertiza developing team's github account into this file
+# For example, setting:
+# BLACKLIST_AUTHOR: 'Expertiza Developer'
+# extend this list wiht comma separated github ids
+# the list is available as ENV["BLACKLIST_AUTHOR"]
+development:
+  BLACKLIST_AUTHOR: 'Saurabh Shingte,expertiza_developer,Saurabh Vinod Shingte,Winbobob'
+
+test:
+  BLACKLIST_AUTHOR: 'Saurabh Shingte,expertiza_developer,Saurabh Vinod Shingte,Winbobob'
+
+production:
+  BLACKLIST_AUTHOR: 'Saurabh Shingte,expertiza_developer,Saurabh Vinod Shingte,Winbobob'

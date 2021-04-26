@@ -66,12 +66,15 @@ class MetricsController < ApplicationController
     @participants = get_data_for_list_submissions(@team)
 
     data_array = []
+
     @authors.each do |author|
-      data_object = {}
-      data_object[:author] = author
-      data_object[:commits] = @parsed_data[author].values.inject(0) {|sum, value| sum += value}
-      data_array.push(data_object)
-      create_github_metric(@team_id, author, User.find_by_github_id(author).id, data_object[:commits])
+      unless LOCAL_ENV["BLACKLIST_AUTHOR"].include? author
+        data_object = {}
+        data_object[:author] = author
+        data_object[:commits] = @parsed_data[author].values.inject(0) {|sum, value| sum += value}
+        data_array.push(data_object)
+        create_github_metric(@team_id, author, User.find_by_github_id(author).id, data_object[:commits])
+      end
     end
   end
 
@@ -237,7 +240,8 @@ class MetricsController < ApplicationController
 
   # do accounting, aggregate each authors' number of commits on each date
   def count_github_authors_and_dates(author_name, commit_date)
-    unless Metric.blacklist_author(author_name)
+    #unless Metric.blacklist_author(author_name)
+    unless LOCAL_ENV["BLACKLIST_AUTHOR"].include? author_name
       @authors[author_name] ||= 1 # a hash record all the authors
       @dates[commit_date] ||= 1 # a hash record all the date that has commits
       @parsed_data[author_name] ||= {} # a hash account each author's commits grouped by date

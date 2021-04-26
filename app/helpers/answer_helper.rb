@@ -2,9 +2,7 @@
 
 module AnswerHelper
 
-  #Function will serve 2 purposes
-  #One - Identify the existing responses for the modified questionnaire in the database
-  #Two - Mail the response to the user and delete the object in the database
+  # Delete responses for given questionnaire
   def self.delete_existing_responses(question_ids, questionnaire_id)
     response_ids=[]
     question_ids.each do |question|

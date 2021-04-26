@@ -10,9 +10,9 @@ module AnswerHelper
         response_ids << answer.response_id if self.in_active_period(questionnaire_id, answer)
       end
     end
-    response_ids=response_ids.uniq
+
     user_id_to_answers={}
-    response_ids.each do |response_id| #For each response id in the array, gather map and info about reviewer
+    response_ids.uniq.each do |response_id| #For each response id in the array, gather map and info about reviewer
       response_map = Response.find(response_id).response_map
       reviewer_id = response_map.reviewer_id
       reviewed_object_id = response_map.reviewed_object_id

@@ -203,8 +203,46 @@ module GradesHelper
       end
       link = pc.to_url
     end
-
     link
+  end
 
+  def metrics_table(team)
+    metrics = Metric.where("team_id = ?", team)
+
+    unless metrics.nil?
+      data_array = {}
+      metrics.each do |metric|
+        user = User.find(metric.participant_id).fullname
+        if data_array[user]
+          data_array[user][:commits] += metric.total_commits
+        else
+          data_array[user] = {}
+          data_array[user][:commits] = metric.total_commits
+        end
+      end
+      map = data_array.map {|k,v| v[:commits]}
+      max = map.max
+      min = map.min
+      mean = map.sum / map.size
+      data_array.each do |key, element|
+        case element[:commits]
+        when min
+          element[:color] = "c1"
+        when max
+          element[:color] = "c5"
+        when mean
+          element[:color] = "c3"
+        when min..mean
+          element[:color] = "c2"
+        when mean .. max
+          element[:color] = "c4"
+        else
+          element[:color] = "c3"
+        end
+      end
+      data_array
+    else
+      nil
+    end
   end
 end

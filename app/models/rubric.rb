@@ -13,8 +13,4 @@ class Rubric < Questionnaire
   validates :name, presence: true
   validates :max_question_score, numericality: true
   validates :min_question_score, numericality: true
-
-  def update_mapping
-    redirect_to action: 'list', type_id: type_id
-  end
 end

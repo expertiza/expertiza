@@ -105,7 +105,7 @@ class Mailer < ActionMailer::Base
     @answers = defn[:body][:answers]
     @name = defn[:body][:name]
     @assignment_name = defn[:body][:assignment_name]
-    defn[:to] = 'jwboerge@ncsu.edu' if Rails.env.development? || Rails.env.test?
+    defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
     mail(:subject => defn[:subject],
          :to => defn[:to])
   end

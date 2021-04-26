@@ -6,13 +6,13 @@ describe Rubric do
     expect(Rubric.new(name: nil)).to_not be_valid
   end
   it 'is invalid without a numerical max question score' do
-  	expect(Rubric.new(max_question_score: 'Not an number')).to_not be_valid
-  end	
+    expect(Rubric.new(max_question_score: 'Not an number')).to_not be_valid
+  end
   it 'is invalid without a numerical min question score' do
-  	expect(Rubric.new(min_question_score: 'Not an number')).to_not be_valid
-  end	
+    expect(Rubric.new(min_question_score: 'Not an number')).to_not be_valid
+  end
   describe '#update_mapping' do
-    rubric = Rubric.new(type_id: 1)
+    rubric = Rubric.new()
     response = rubric.update_mapping
     expect(response).to render_template(:list)
   end

@@ -66,8 +66,6 @@ class MetricsController < ApplicationController
     @participants = get_data_for_list_submissions(@team)
 
     data_array = []
-    #puts @authors
-    #puts "========"
     @authors.each do |author|
       data_object = {}
       data_object[:author] = author

@@ -1,6 +1,6 @@
 describe GradesController do
   let(:review_response) { build(:response) }
-  let(:assignment) { build(:assignment, id: 1, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
+  let(:assignment) { build(:assignment, id: 1, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true)}
   let(:assignment_questionnaire) { build(:assignment_questionnaire, used_in_round: 1, assignment: assignment) }
   let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
   let(:participant2) { build(:participant, id: 2, assignment: assignment, user_id: 1) }
@@ -48,7 +48,7 @@ describe GradesController do
     # E2111
     # is to decouple this code from the grades controller, where both the code itself and the testing are
     # significantly coupled into the grades controller.
-    xcontext 'when user hasn\'t logged in to GitHub' do
+    context 'when user hasn\'t logged in to GitHub' do
       before(:each) do
         @params = {id: 900}
         session["github_access_token"] = nil
@@ -238,13 +238,14 @@ describe GradesController do
     end
   end
 
+
   describe '#get_statuses_for_pull_request' do
     before(:each) do
       allow(Net::HTTP).to receive(:get) { "{\"team\":\"rails\", \"players\":\"36\"}" }
     end
 
     it 'makes a call to the GitHub API to get status of the head commit passed' do
-      expect(controller.get_statuses_for_pull_request({
+      expect(controller.query_pull_request_status({
           owner: 'expertiza',
           repository: 'expertiza',
           head_commit: 'qwerty123'})).to eq("team" => "rails", "players" => "36")
@@ -254,44 +255,44 @@ describe GradesController do
   describe '#retrieve_pull_request_data' do
     before(:each) do
       controller.instance_variable_set(:@head_refs, {})
-      allow(controller).to receive(:get_pull_request_details).and_return({"data" => {
+      allow(controller).to receive(:pull_request_data).and_return({ "data" => {
           "repository" => {
               "pullRequest" => {
                   "headRefOid" => "qwerty123"
               }
           }
       }})
-      allow(controller).to receive(:parse_github_pull_request_data)
+      allow(controller).to receive(:parse_pull_request_data)
     end
 
     it 'gets pull request details for each PR link submitted' do
-      expect(controller).to receive(:get_pull_request_details).with("pull_request_number" => "1261",
-                                                                    "repository_name" => "expertiza",
-                                                                    "owner_name" => "expertiza")
-      expect(controller).to receive(:get_pull_request_details).with("pull_request_number" => "1293",
-                                                                    "repository_name" => "mamaMiya",
-                                                                    "owner_name" => "Shantanu")
-      controller.retrieve_pull_request_data(["https://github.com/expertiza/expertiza/pull/1261",
-                                             "https://github.com/Shantanu/mamaMiya/pull/1293"])
+      expect(controller).to receive(:pull_request_data).with("pull_request_number" => "1261",
+                                                             "repository_name" => "expertiza",
+                                                             "owner_name" => "expertiza")
+      expect(controller).to receive(:pull_request_data).with("pull_request_number" => "1293",
+                                                             "repository_name" => "mamaMiya",
+                                                             "owner_name" => "Shantanu")
+      controller.query_all_pull_requests(["https://github.com/expertiza/expertiza/pull/1261",
+                                          "https://github.com/Shantanu/mamaMiya/pull/1293"])
     end
 
     it 'calls parse_github_data_pull on each of the PR details' do
-      expect(controller).to receive(:parse_github_pull_request_data).with({"data" => {
+      expect(controller).to receive(:parse_pull_request_data).with({ "data" => {
           "repository" => {
               "pullRequest" => {
                   "headRefOid" => "qwerty123"
               }
           }
       }}).twice
-      controller.retrieve_pull_request_data(["https://github.com/expertiza/expertiza/pull/1261",
-                                             "https://github.com/Shantanu/mamaMiya/pull/1293"])
+      controller.query_all_pull_requests(["https://github.com/expertiza/expertiza/pull/1261",
+                                          "https://github.com/Shantanu/mamaMiya/pull/1293"])
     end
   end
 
   describe '#retrieve_repository_data' do
     before(:each) do
       allow(controller).to receive(:get_github_repository_details).and_return("pr" => "details")
-      allow(controller).to receive(:parse_github_repository_data)
+      allow(controller).to receive(:parse_repository_data)
     end
 
     it 'gets details for each repo link submitted, excluding those for expertiza and servo' do
@@ -305,14 +306,14 @@ describe GradesController do
     end
 
     it 'calls parse_github_data_repo on each of the PR details' do
-      expect(controller).to receive(:parse_github_repository_data).with("pr" => "details").twice
+      expect(controller).to receive(:parse_repository_data).with("pr" => "details").twice
       controller.retrieve_repository_data(["https://github.com/Shantanu/website", "https://github.com/Edward/OODD"])
     end
   end
 
   describe '#retrieve_github_data' do
     before(:each) do
-      allow(controller).to receive(:retrieve_pull_request_data)
+      allow(controller).to receive(:query_all_pull_requests)
       allow(controller).to receive(:retrieve_repository_data)
     end
 
@@ -325,7 +326,7 @@ describe GradesController do
       end
 
       it 'retrieves PR data only' do
-        expect(controller).to receive(:retrieve_pull_request_data).with(["https://github.com/Shantanu/website/pull/1123"])
+        expect(controller).to receive(:query_all_pull_requests).with(["https://github.com/Shantanu/website/pull/1123"])
         controller.retrieve_github_data
       end
     end
@@ -344,19 +345,36 @@ describe GradesController do
         controller.retrieve_github_data
       end
     end
+  describe '#action_allowed' do
+    context 'when the student does not belong to a team' do
+      it 'returns false' do 
+        params = {action: 'view_team'}
+        session[:user].role.name = 'Student'
+        expect(controller.action_allowed?).to eq(false)
+      end
+    end
+    context 'when the user is an instructor' do
+      it 'returns true' do 
+        params = {action: 'view_team'} 
+        session[:user].role.name = 'Instructor'
+        expect(controller.action_allowed?).to eq(true)
+
+      end
+    end
   end
+
 
   describe '#retrieve_check_run_statuses' do
     before(:each) do
-      allow(controller).to receive(:get_statuses_for_pull_request).and_return("check_status")
+      allow(controller).to receive(:query_pull_request_status).and_return("check_status")
       controller.instance_variable_set(:@head_refs, "1234" => "qwerty", "5678" => "asdfg")
       controller.instance_variable_set(:@check_statuses, {})
     end
 
     it 'gets and stores the statuses associated with head commits of PRs' do
-      expect(controller).to receive(:get_statuses_for_pull_request).with("qwerty")
-      expect(controller).to receive(:get_statuses_for_pull_request).with("asdfg")
-      controller.retrieve_check_run_statuses
+      expect(controller).to receive(:query_pull_request_status).with("qwerty")
+      expect(controller).to receive(:query_pull_request_status).with("asdfg")
+      controller.query_all_merge_statuses
       expect(controller.instance_variable_get(:@check_statuses)).to eq("1234" => "check_status",
                                                                        "5678" => "check_status")
     end
@@ -384,9 +402,9 @@ describe GradesController do
     context 'when user has logged in to GitHub' do
       before(:each) do
         session["github_access_token"] = "qwerty"
-        allow(controller).to receive(:get_statuses_for_pull_request).and_return("status")
+        allow(controller).to receive(:query_pull_request_status).and_return("status")
         allow(controller).to receive(:retrieve_github_data).and_return("data")
-        allow(controller).to receive(:retrieve_check_run_statuses).and_return("status")
+        allow(controller).to receive(:query_all_merge_statuses).and_return("status")
       end
 
       it 'stores the GitHub access token for later use' do
@@ -400,7 +418,7 @@ describe GradesController do
       end
 
       it 'calls retrieve_check_run_statuses to retrieve check runs data' do
-        expect(controller).to receive(:retrieve_check_run_statuses)
+        expect(controller).to receive(:query_all_merge_statuses)
         get :view_github_metrics, id: '1'
       end
     end
@@ -415,7 +433,7 @@ describe GradesController do
 
   describe '#get_github_repository_details' do
     before(:each) do
-      allow(controller).to receive(:make_github_graphql_request).and_return("github": "github")
+      allow(controller).to receive(:query_commit_statistics).and_return("github": "github")
     end
 
     it 'gets  make_github_graphql_request with query for repository' do
@@ -424,7 +442,7 @@ describe GradesController do
         "repository_name" => "expertiza"
       }
 
-      expect(controller).to receive(:make_github_graphql_request).with(
+      expect(controller).to receive(:query_commit_statistics).with(
         query:       "query {
         repository(owner: \"" + hyperlink_data["owner_name"] + "\", name: \"" + hyperlink_data["repository_name"] + "\") {
           ref(qualifiedName: \"master\") {
@@ -454,7 +472,7 @@ describe GradesController do
   describe '#get_pull_request_details' do
     before(:each) do
       allow(controller).to receive(:get_query)
-      allow(controller).to receive(:make_github_graphql_request).and_return(
+      allow(controller).to receive(:query_commit_statistics).and_return(
         "data" => {
           "repository" => {
             "pullRequest" => {
@@ -472,7 +490,7 @@ describe GradesController do
     end
 
     it 'gets pull request data for link passed' do
-      data = controller.get_pull_request_details("https://github.com/expertiza/expertiza")
+      data = controller.pull_request_data("https://github.com/expertiza/expertiza")
       expect(data).to eq(
         "data" => {
           "repository" => {
@@ -498,21 +516,21 @@ describe GradesController do
       controller.instance_variable_set(:@parsed_data, {})
     end
     it 'sets authors and data for GitHub data' do
-      controller.process_github_authors_and_dates("author", "date")
+      controller.count_github_authors_and_dates("author", "date")
       expect(controller.instance_variable_get(:@authors)).to eq("author" => 1)
       expect(controller.instance_variable_get(:@dates)).to eq("date" => 1)
       expect(controller.instance_variable_get(:@parsed_data)).to eq("author" => {"date" => 1})
 
-      controller.process_github_authors_and_dates("author", "date")
+      controller.count_github_authors_and_dates("author", "date")
       expect(controller.instance_variable_get(:@parsed_data)).to eq("author" => {"date" => 2})
     end
   end
 
   describe '#parse_github_pull_request_data' do
     before(:each) do
-      allow(controller).to receive(:process_github_authors_and_dates)
+      allow(controller).to receive(:count_github_authors_and_dates)
       allow(controller).to receive(:team_statistics)
-      allow(controller).to receive(:organize_commit_dates)
+      allow(controller).to receive(:sort_commit_dates)
       @github_data = {
         "data" => {
           "repository" => {
@@ -539,24 +557,24 @@ describe GradesController do
 
     it 'calls team_statistics' do
       expect(controller).to receive(:team_statistics).with(@github_data)
-      controller.parse_github_pull_request_data(@github_data)
+      controller.parse_pull_request_data(@github_data)
     end
 
     it 'calls process_github_authors_and_dates for each commit object of GitHub data passed in' do
-      expect(controller).to receive(:process_github_authors_and_dates).with("Shantanu", "2018-12-10")
-      controller.parse_github_pull_request_data(@github_data)
+      expect(controller).to receive(:count_github_authors_and_dates).with("Shantanu", "2018-12-10")
+      controller.parse_pull_request_data(@github_data)
     end
 
     it 'calls organize_commit_dates' do
-      expect(controller).to receive(:organize_commit_dates)
-      controller.parse_github_pull_request_data(@github_data)
+      expect(controller).to receive(:sort_commit_dates)
+      controller.parse_pull_request_data(@github_data)
     end
   end
 
   describe '#parse_github_repository_data' do
     before(:each) do
-      allow(controller).to receive(:process_github_authors_and_dates)
-      allow(controller).to receive(:organize_commit_dates)
+      allow(controller).to receive(:count_github_authors_and_dates)
+      allow(controller).to receive(:sort_commit_dates)
       @github_data = {
         "data" => {
           "repository" => {
@@ -582,13 +600,13 @@ describe GradesController do
     end
 
     it 'calls process_github_authors_and_dates for each commit object of GitHub data passed in' do
-      expect(controller).to receive(:process_github_authors_and_dates).with("Shantanu", "2018-12-10")
-      controller.parse_github_repository_data(@github_data)
+      expect(controller).to receive(:count_github_authors_and_dates).with("Shantanu", "2018-12-10")
+      controller.parse_repository_data(@github_data)
     end
 
     it 'calls organize_commit_dates' do
-      expect(controller).to receive(:organize_commit_dates)
-      controller.parse_github_repository_data(@github_data)
+      expect(controller).to receive(:sort_commit_dates)
+      controller.parse_repository_data(@github_data)
     end
   end
 
@@ -598,7 +616,7 @@ describe GradesController do
     end
 
     it 'gets data from GitHub api v4(graphql)' do
-      response = controller.make_github_graphql_request("{\"team\":\"rails\",\"players\":\"36\"}")
+      response = controller.query_commit_statistics("{\"team\":\"rails\",\"players\":\"36\"}")
       expect(response).to eq("message" => "Bad credentials", "documentation_url" => "https://docs.github.com/graphql")
     end
   end
@@ -710,9 +728,22 @@ describe GradesController do
     end
 
     it 'calls organize_commit_dates to sort parsed commits by dates' do
-      controller.organize_commit_dates
+      controller.sort_commit_dates
       expect(controller.instance_variable_get(:@parsed_data)).to eq("abc" => {"2017-04-05" => 2, "2017-04-13" => 2,
                                                                               "2017-04-14" => 2})
     end
+  end
+  describe '#redirect_when_disallowed' do
+    context 'when a participant without a team exists' do
+      it 'redirects to /' do
+        params = {id: 1}
+        session
+        allow(participant).to receive(:team).and_return(nil)
+        allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+        allow(TeamsUser).to receive(:team_id).and_return(1)
+        get :view_my_scores, params
+        expect(response).to redirect_to('/')
+      end
+    end 
   end
 end

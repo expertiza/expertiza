@@ -134,7 +134,6 @@ Expertiza::Application.routes.draw do
       get :view_reviewer
       get :view_my_scores
       get :instructor_review
-      get :authorize_github
       post :remove_hyperlink
       post :save_grade_and_comment_for_submission
     end

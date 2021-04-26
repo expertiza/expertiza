@@ -1,17 +1,29 @@
 class MetricsController < ApplicationController
-  #helper :file
-  #helper :submitted_content
-  #helper :penalty
-  #include PenaltyHelper
-  #include StudentTaskHelper
-  #include AssignmentHelper
-  #include GradesHelper
   include AuthorizationHelper
-  include MetricsHelper # this module is currently empty
+  include AssignmentHelper
+  include MetricsHelper
 
   # currently only give instructor this right, can be further discussed
   def action_allowed?
     current_user_has_instructor_privileges?
+  end
+
+  def create_github_metric(team_id, github_id, participant_id, total_commits)
+    unless participant_id.nil?
+      metric = Metric.where("team_id = ? AND github_id = ?", team_id, github_id).first
+
+      unless metric.nil?
+        metric.total_commits=total_commits
+        metric.save
+      else
+        # create new
+        Metric.create :metric_source_id => MetricSource.find_by_name("Github").id,
+                      :team_id => team_id,
+                      :github_id => github_id,
+                      :participant_id => participant_id,
+                      :total_commits => total_commits
+      end
+    end
   end
 
   # render the view_github_metrics page
@@ -19,7 +31,8 @@ class MetricsController < ApplicationController
     if session["github_access_token"].nil? # check if there is a github_access_token in current session
       session["participant_id"] = params[:id] # team number
       session["github_view_type"] = "view_submissions"
-      redirect_to authorize_github_grades_path # if no github_access_token present, redirect to authorization page
+      #redirect_to authorize_github_grades_path # if no github_access_token present, redirect to authorization page
+      redirect_to :controller => 'metrics', :action => 'authorize_github'
       return
     end
 
@@ -45,12 +58,31 @@ class MetricsController < ApplicationController
     retrieve_github_data
 
     # get each PR's status info
-    retrieve_check_run_statuses
+    query_all_merge_statuses
 
     @authors = @authors.keys # only keep the author name info
     @dates = @dates.keys.sort # only keep the date info and sort
+
+    @participants = get_data_for_list_submissions(@team)
+
+    data_array = []
+    @authors.each do |author|
+      data_object = {}
+      data_object[:author] = author
+      data_object[:commits] = @parsed_data[author].values.inject(0) {|sum, value| sum += value}
+      data_array.push(data_object)
+      create_github_metric(@team_id, author, User.find_by_github_id(author).id, data_object[:commits])
+    end
   end
 
+  # authorize with token to use github API with 5000 rate limits. Unauthorized user only has 60 limits, which is not enough.
+  def authorize_github
+    redirect_to "https://github.com/login/oauth/authorize?client_id=#{GITHUB_CONFIG['client_key']}"
+  end
+
+
+  private
+  ##################### Process Links and Branch according to Pull Request or Repo ############################
   # retrieve pull request data and repo data respectively
   def retrieve_github_data
     team_links = @team.hyperlinks # all links that a team submitted
@@ -58,7 +90,7 @@ class MetricsController < ApplicationController
       link.match(/pull/) && link.match(/github.com/) # all links that contain both pull and github.com
     end
     if !pull_links.empty? # have pull links, retrieve pull request info
-      retrieve_pull_request_data(pull_links)
+      query_all_pull_requests(pull_links)
     else # retrieve repo info if no PR is submitted
     repo_links = team_links.select do |link|
       link.match(/github.com/)
@@ -67,8 +99,11 @@ class MetricsController < ApplicationController
     end
   end
 
+
+  ############### Handling of Pull Request Links #####################
+
   # example pull_links: https://github.com/expertiza/expertiza/pull/1858
-  def retrieve_pull_request_data(pull_links)
+  def query_all_pull_requests(pull_links)
     pull_links.each do |hyperlink|
       submission_hyperlink_tokens = hyperlink.split('/') # parse the link
       hyperlink_data = {}
@@ -77,48 +112,29 @@ class MetricsController < ApplicationController
       hyperlink_data["repository_name"] = submission_hyperlink_tokens.pop # expertiza
       hyperlink_data["owner_name"] = submission_hyperlink_tokens.pop # expertiza
       # yet another wrapper fot github api call, take repository name, owner name, and pull request number as parameter
-      github_data = get_pull_request_details(hyperlink_data)
-      # github_data hash, each field is explained in get_query:
-      # {"data"=>{"repository"=>{"pullRequest"=>{"number", "additions", "deletions", "changedFiles", "mergeable", "merged", "headRefOid",
-      #                                          "commits"=>{"totalCount",
-      #                                                      "pageInfo"=>{"hasNextPage", "startCursor", "endCursor"},
-      #                                                      "edges"=>[{"node"=>{"id",
-      #                                                                          "commit"=>{"author"=>{"name"},
-      #                                                                                     "additions", "deletions", "changedFiles", "committedDate"
-      #                                                                                    }
-      #                                                                         }
-      #                                                                },
-      #                                                                {"node"=>...}
-      #                                                                {"node"=>...}
-      #                                                                ...
-      #                                                                each node stands for a commit in the pull request with the same fields listed above
-      #                                                                ]
-      #                                                      }
-      #                                          }
-      #                         }
-      #           }
-      # }
+      github_data = pull_request_data(hyperlink_data)
+
       # save the global reference id for this pull request
       @head_refs[hyperlink_data["pull_request_number"]] = {
         head_commit: github_data["data"]["repository"]["pullRequest"]["headRefOid"],
         owner: hyperlink_data["owner_name"],
         repository: hyperlink_data["repository_name"]
       }
-      parse_github_pull_request_data(github_data)
+      parse_pull_request_data(github_data)
     end
   end
 
   # call the api with hyperlink parameter
-  def get_pull_request_details(hyperlink_data)
-    @has_next_page = true # parameter for github api call
-    @end_cursor = "" # parameter needed for github api call
+  def pull_request_data(hyperlink_data)
+    has_next_page = true # parameter for github api call
+    end_cursor = nil # parameter needed for github api call
     all_edges = []
     response_data = {}
-    while @has_next_page
+    while has_next_page
       # 1.make the query message
       # 2.make the http request with the query
       # response_data is a ruby Hash class
-      response_data = make_github_graphql_request(get_query(hyperlink_data))
+      response_data = query_commit_statistics(Metric.pull_query(hyperlink_data, end_cursor))
       # every commits in this pull request and page info
       current_commits = response_data["data"]["repository"]["pullRequest"]["commits"]
       # page info for commits in this pull request, because too many commits may spread multiple pages
@@ -127,17 +143,130 @@ class MetricsController < ApplicationController
       # every element in all_edges is a single commit in the pull request
       all_edges.push(*current_commits["edges"])
       # page info used in query for next page
-      @has_next_page = current_page_info["hasNextPage"]
-      @end_cursor = current_page_info["endCursor"]
+      has_next_page = current_page_info["hasNextPage"]
+      end_cursor = current_page_info["endCursor"]
     end
     # add every single commit into response_data hash and return it
     response_data["data"]["repository"]["pullRequest"]["commits"]["edges"] = all_edges
     response_data
   end
 
+  # save elements in the hash into corresponding variables
+  def parse_pull_request_data(github_data)
+    team_statistics(github_data, :pull)
+    pull_request_object = github_data["data"]["repository"]["pullRequest"]
+    commit_objects = pull_request_object["commits"]["edges"]
+    # loop through all commits and do the accounting
+    commit_objects.each do |commit_object|
+      commit = commit_object["node"]["commit"] # each commit
+      author_name = commit["author"]["name"]
+      commit_date = commit["committedDate"].to_s # datetime object to string in format 2019-04-30T02:44:08Z
+      # commit_date[0, 10]: xxxx-xx-xx year-month-date
+      count_github_authors_and_dates(author_name, commit_date[0, 10])
+    end
+    # sort author's commits based on dates
+    sort_commit_dates
+  end
+
+  # save each PR's statuses in a hash, this is done by github REST API not graphql
+  def query_all_merge_statuses
+    @head_refs.each do |pull_number, pr_object|
+      @check_statuses[pull_number] = query_pull_request_status(pr_object)
+    end
+  end
+
+
+  ####################### Handling of Repository Links #########################
+  # example repo_links: github.com/expertiza/expertiza/
+  def retrieve_repository_data(repo_links)
+    has_next_page = true # parameter for github api call
+    end_cursor = nil # parameter needed for github api call
+
+    repo_links.each do |hyperlink|
+      submission_hyperlink_tokens = hyperlink.split('/') # parse the link
+      hyperlink_data = {}
+      hyperlink_data["repository_name"] = submission_hyperlink_tokens[4]
+      hyperlink_data["owner_name"] = submission_hyperlink_tokens[3]
+      while has_next_page
+        query_text = Metric.repo_query(hyperlink_data, @assignment.created_at, end_cursor)
+        github_data = query_commit_statistics(query_text)
+        parse_repository_data(github_data)
+        has_next_page = false unless github_data["data"]["repository"]["ref"]["target"]["history"]["pageInfo"]["hasNextPage"] == "true"
+      end
+
+    end
+  end
+
+  def parse_repository_data(github_data)
+    commit_objects = github_data["data"]["repository"]["ref"]["target"]["history"]["edges"]
+    commit_objects.each do |commit_object|
+      commit_author = commit_object["node"]["author"]
+      author_name = commit_author["name"]
+      commit_date = commit_author["date"].to_s
+      count_github_authors_and_dates(author_name, commit_date[0, 10])
+    end
+    sort_commit_dates
+    team_statistics(github_data, :repo)
+  end
+
+  ####################### Shared Math/Stats and Sorting Methods ################
+
+  # save valuable info that we queried from github into variables
+  def team_statistics(github_data, data_type)
+    if data_type == :pull
+      @total_additions += github_data["data"]["repository"]["pullRequest"]["additions"] # additions in this PR
+      @total_deletions += github_data["data"]["repository"]["pullRequest"]["deletions"] # deletions in this PR
+      @total_files_changed += github_data["data"]["repository"]["pullRequest"]["changedFiles"] # num of files changed in this PR
+      @total_commits += github_data["data"]["repository"]["pullRequest"]["commits"]["totalCount"] # num of commits in this PR
+      pull_request_number = github_data["data"]["repository"]["pullRequest"]["number"] # PR number
+      # merged or mergeable
+      @merge_status[pull_request_number] = if github_data["data"]["repository"]["pullRequest"]["merged"]
+                                             "MERGED"
+                                           else
+                                             github_data["data"]["repository"]["pullRequest"]["mergeable"]
+                                           end
+    else
+      @total_additions = "Not Available" # additions in this PR
+      @total_deletions = "Not Available" # deletions in this PR
+      @total_files_changed = "Not Available" # num of files changed in this PR
+      pull_request_number = -1
+      # merged or mergeable
+      @merge_status[pull_request_number] = "Not A Pull Request"
+    end
+  end
+
+  # do accounting, aggregate each authors' number of commits on each date
+  def count_github_authors_and_dates(author_name, commit_date)
+    unless Metric.blacklist_author(author_name)
+      @authors[author_name] ||= 1 # a hash record all the authors
+      @dates[commit_date] ||= 1 # a hash record all the date that has commits
+      @parsed_data[author_name] ||= {} # a hash account each author's commits grouped by date
+      @parsed_data[author_name][commit_date] = if @parsed_data[author_name][commit_date]
+                                                 @parsed_data[author_name][commit_date] + 1
+                                               else
+                                                 1
+                                               end
+    end
+  end
+
+  # sort each author's commits based on date
+  def sort_commit_dates
+    @dates.each_key do |date|
+      @parsed_data.each_value do |commits|
+        commits[date] ||= 0
+      end
+    end
+    @parsed_data.each do |author, commits|
+      @parsed_data[author] = Hash[commits.sort_by {|date, _commit_count| date }]
+      @total_commits += commits.inject (0) {|sum,value| sum + value[1] }
+    end
+  end
+
+  ######################## HTTP Query Execution #########################
+
   # make the actual github api request with graphql and query message.
   # data: the query message made in get_query method. Documented in detail in get_query method
-  def make_github_graphql_request(data)
+  def query_commit_statistics(data)
     uri = URI.parse("https://api.github.com/graphql")
     http = Net::HTTP.new(uri.host, uri.port) # host: api.github.com, port: 443
     http.use_ssl = true
@@ -149,180 +278,11 @@ class MetricsController < ApplicationController
     ActiveSupport::JSON.decode(response.body.to_s) # convert the response body to string, decoded then return
   end
 
-  # hyperlink_data: {"pull_request_number"=>"1858", "repository_name"=>"expertiza", "owner_name"=>"expertiza"}
-  # make the query message string that will be used in the github graphql library.
-  # For the detailed explanation check https://docs.github.com/en/graphql/reference/objects#pullrequest
-  # and https://docs.github.com/en/graphql/reference/objects#repository
-  # name: The name of the repository. owner: The User owner of the repository. number: Identifies the pull request number.
-  # Everything between the opening #{ and closing } bits is evaluated as Ruby code,
-  # and the result of this evaluation will be embedded into the string surrounding it.
-  # #{"after:" + @end_cursor unless @end_cursor.empty? } This line only evaluate when
-  # @end_cursor.empty evaluate to false, handle edge case that there is next page in the page info.
-  # This query message queries the {owner}'s {name} repo's {number} pull request that you passed in.
-  # For the example provided above, this query will queries expertiza's expertiza repo's pull request
-  # number 1858.
-  # In each pull request, it will return:
-  # 1.number: pull request number
-  # 2.additions: the number of additions in this pull request
-  # 3.deletions: the number of deletions in this pull request
-  # 4.changedFiles: the number of changed files in this pull request
-  # 5.mergeable: whether or not the pull request can be merged based on the existence of merge conflicts
-  # 6.merged: whether or not the pull request was merged
-  # 7.headRefOid: identifies the oid of the head ref associated with the pull request, this is a global id
-  # 8.A list(first 100) of commits present in this pull request
-  # In the list of these commits, it will return:
-  # 1.totalCount: identifies the total count of items in the connection
-  # In each of the commit, it will return:
-  # 1.name: the name in the Git commit
-  # 2.additions: the number of additions in this pull request
-  # 3.deletions: the number of deletions in this pull request
-  # 4.changedFiles: the number of changed files in this pull request
-  # 5.committedDate: The datetime when this commit was committed
-  def get_query(hyperlink_data)
-    {
-      query: "query {
-        repository(owner: \"" + hyperlink_data["owner_name"] + "\", name:\"" + hyperlink_data["repository_name"] + "\") {
-          pullRequest(number: " + hyperlink_data["pull_request_number"] + ") {
-            number additions deletions changedFiles mergeable merged headRefOid
-              commits(first:100 #{"afterwhether or not the pull rwhether or not the pull request can be merged based on the existence of merge conflictsequest can be merged based on the existence of merge conflicts:" + @end_cursor unless @end_cursor.empty? }){
-                totalCount
-                  pageInfo{
-                    hasNextPage startCursor endCursor
-                    }
-                      edges{
-                        node{
-                          id  commit{
-                                author{
-                                  name
-                                }
-                               additions deletions changedFiles committedDate
-                        }}}}}}}"
-    }
-  end
-
-  # save elements in the hash into corresponding variables
-  def parse_github_pull_request_data(github_data)
-    team_statistics(github_data)
-    pull_request_object = github_data["data"]["repository"]["pullRequest"]
-    commit_objects = pull_request_object["commits"]["edges"]
-    # loop through all commits and do the accounting
-    commit_objects.each do |commit_object|
-      commit = commit_object["node"]["commit"] # each commit
-      author_name = commit["author"]["name"]
-      commit_date = commit["committedDate"].to_s # datetime object to string in format 2019-04-30T02:44:08Z
-      # commit_date[0, 10]: xxxx-xx-xx year-month-date
-      process_github_authors_and_dates(author_name, commit_date[0, 10])
-    end
-    # sort author's commits based on dates
-    organize_commit_dates
-  end
-
-  # save valuable info that we queried from github into variables
-  def team_statistics(github_data)
-    @total_additions += github_data["data"]["repository"]["pullRequest"]["additions"] # additions in this PR
-    @total_deletions += github_data["data"]["repository"]["pullRequest"]["deletions"] # deletions in this PR
-    @total_files_changed += github_data["data"]["repository"]["pullRequest"]["changedFiles"] # num of files changed in this PR
-    @total_commits += github_data["data"]["repository"]["pullRequest"]["commits"]["totalCount"] # num of commits in this PR
-    pull_request_number = github_data["data"]["repository"]["pullRequest"]["number"] # PR number
-    # merged or mergeable
-    @merge_status[pull_request_number] = if github_data["data"]["repository"]["pullRequest"]["merged"]
-                                           "MERGED"
-                                         else
-                                           github_data["data"]["repository"]["pullRequest"]["mergeable"]
-                                         end
-  end
-
-  # do accounting, aggregate each authors' number of commits on each date
-  def process_github_authors_and_dates(author_name, commit_date)
-    @authors[author_name] ||= 1 # a hash record all the authors
-    @dates[commit_date] ||= 1 # a hash record all the date that has commits
-    @parsed_data[author_name] ||= {} # a hash account each author's commits grouped by date
-    @parsed_data[author_name][commit_date] = if @parsed_data[author_name][commit_date]
-                                               @parsed_data[author_name][commit_date] + 1
-                                             else
-                                               1
-                                             end
-  end
-
-  # sort each author's commits based on date
-  def organize_commit_dates
-    @dates.each_key do |date|
-      @parsed_data.each_value do |commits|
-        commits[date] ||= 0
-      end
-    end
-    @parsed_data.each {|author, commits| @parsed_data[author] = Hash[commits.sort_by {|date, _commit_count| date }] }
-  end
-
-  # example repo_links: github.com/expertiza/expertiza/
-  def retrieve_repository_data(repo_links)
-    repo_links.each do |hyperlink|
-      submission_hyperlink_tokens = hyperlink.split('/') # parse the link
-      hyperlink_data = {}
-      hyperlink_data["repository_name"] = submission_hyperlink_tokens[4]
-      # next if hyperlink_data["repository_name"] == "servo" || hyperlink_data["repository_name"] == "expertiza"
-      hyperlink_data["owner_name"] = submission_hyperlink_tokens[3]
-      github_data = get_github_repository_details(hyperlink_data)
-      parse_github_repository_data(github_data)
-    end
-  end
-
   # pr_object contain head commit reference num, author name, and repo name
   # using the github api end point to get the pr status info
-  def get_statuses_for_pull_request(pr_object)
+  def query_pull_request_status(pr_object)
     url = "https://api.github.com/repos/" + pr_object[:owner] + "/" + pr_object[:repository] + "/commits/" + pr_object[:head_commit] + "/status"
     ActiveSupport::JSON.decode(Net::HTTP.get(URI(url)))
-  end
-
-  # save each PR's statuses in a hash, this is done by github REST API not graphql
-  def retrieve_check_run_statuses
-    @head_refs.each do |pull_number, pr_object|
-      @check_statuses[pull_number] = get_statuses_for_pull_request(pr_object)
-    end
-  end
-
-  # authorize with token to use github API with 5000 rate limits. Unauthorized user only has 60 limits, which is not enough.
-  def authorize_github
-    redirect_to "https://github.com/login/oauth/authorize?client_id=#{GITHUB_CONFIG['client_key']}"
-  end
-
-  # make the query message to query a github repo and do the actual query
-  def get_github_repository_details(hyperlink_data)
-    data = {
-      query: "query {
-        repository(owner: \"" + hyperlink_data["owner_name"] + "\", name: \"" + hyperlink_data["repository_name"] + "\") {
-          ref(qualifiedName: \"master\") {
-            target {
-              ... on Commit {
-                id
-                  history(first: 100) {
-                    edges {
-                      node {
-                        id author {
-                          name email date
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }"
-    }
-    make_github_graphql_request(data)
-  end
-
-  def parse_github_repository_data(github_data)
-    commit_history = github_data["data"]["repository"]["ref"]["target"]["history"]
-    commit_objects = commit_history["edges"]
-    commit_objects.each do |commit_object|
-      commit_author = commit_object["node"]["author"]
-      author_name = commit_author["name"]
-      commit_date = commit_author["date"].to_s
-      process_github_authors_and_dates(author_name, commit_date[0, 10])
-    end
-    organize_commit_dates
   end
 
 end

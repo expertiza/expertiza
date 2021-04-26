@@ -10,6 +10,65 @@ module GradesHelper
     end
   end
 
+  def score_vector(reviews, symbol)
+    scores = []
+    reviews.each do |review|
+      scores << Answer.get_total_score(response: [review], questions: @questions[symbol.to_sym], q_types: [])
+    end
+    scores
+  end
+
+  # This function removes negative scores and build charts
+  def charts(symbol)
+    if @participant_score and @participant_score[symbol]
+      scores = score_vector @participant_score[symbol][:assessments], symbol.to_s
+      scores.select! { |score| score > 0 }
+      @grades_bar_charts[symbol] = GradesController.bar_chart(scores)
+    end
+  end
+
+  # Filters all non nil values and converts them to integer
+  # Returns a vector
+  def vector(scores)
+    scores[:teams].reject! {|_k, v| v[:scores][:avg].nil? }
+    scores[:teams].map {|_k, v| v[:scores][:avg].to_i }
+  end
+
+  # This function returns the average
+  def mean(array)
+    array.inject(0) {|sum, x| sum + x } / array.size.to_f
+  end
+
+  # This function returns the penalty attributes
+  def attributes(_participant)
+    deadline_type_id = [1, 2, 5]
+    penalties_symbols = %i[submission review meta_review]
+    deadline_type_id.zip(penalties_symbols).each do |id, symbol|
+      CalculatedPenalty.create(deadline_type_id: id, participant_id: @participant.id, penalty_points: penalties[symbol])
+    end
+  end
+
+  # This function calculates all the penalties
+  def penalties(assignment_id)
+    @all_penalties = {}
+    @assignment = Assignment.find(assignment_id)
+    calculate_for_participants = true unless @assignment.is_penalty_calculated
+    Participant.where(parent_id: assignment_id).each do |participant|
+      penalties = calculate_penalty(participant.id)
+      @total_penalty = 0
+
+      unless penalties[:submission].zero? || penalties[:review].zero? || penalties[:meta_review].zero?
+
+        @total_penalty = (penalties[:submission] + penalties[:review] + penalties[:meta_review])
+        l_policy = LatePolicy.find(@assignment.late_policy_id)
+        @total_penalty = l_policy.max_penalty if @total_penalty > l_policy.max_penalty
+        attributes(@participant) if calculate_for_participants
+      end
+      assign_all_penalties(participant, penalties)
+    end
+    @assignment[:is_penalty_calculated] = true unless @assignment.is_penalty_calculated
+  end
+
   def has_team_and_metareview?
     if params[:action] == "view"
       @assignment = Assignment.find(params[:id])
@@ -105,7 +164,6 @@ module GradesHelper
     return "underlined" if score.comment.present?
   end
 
-
   def retrieve_questions(questionnaires, assignment_id)
     questions = {}
     questionnaires.each do |questionnaire|
@@ -119,63 +177,72 @@ module GradesHelper
     end
     questions
   end
-  
-  def display_github_metrics(parsed_data, authors, dates)
+
+  def display_github_piechart(team)
+    metrics = Metric.where("team_id = ?", team)
+
+
     data_array = []
-    color = %w[red yellow blue gray green magenta]
+    color = %w[ff0000 ffff00 0000ff aaaaaa 00ff00 ff00ff]
     i = 0
-    authors.each do |author|
+    metrics.each do |metric|
       data_object = {}
-      data_object['label'] = author
-      data_object['data'] = parsed_data[author].values
-      data_object['backgroundColor'] = color[i]
-      data_object['borderWidth'] = 1
+      data_object[:author] = User.find(metric.participant_id).fullname
+      data_object[:commits] = metric.total_commits
+      data_object[:color] = color[i]
       data_array.push(data_object)
       i += 1
-      i = 0 if i > 5
+      i = 0 if i > 4
     end
 
-    data = {
-      labels: dates,
-      datasets: data_array
-    }
-    horizontal_bar_chart data, chart_options
+    link = nil
+    GoogleChart::PieChart.new('600x300', '# Commits By Author', false) do |pc|
+      data_array.each do |datapoint|
+        label = datapoint[:author].to_s + " (Total: " + datapoint[:commits].to_s + ")"
+        pc.data label, datapoint[:commits], datapoint[:color]
+      end
+      link = pc.to_url
+    end
+    link
   end
 
-  def chart_options
-    {
-      responsive: true,
-      maintainAspectRatio: false,
-      width: 100,
-      height: 100,
-      scales: graph_scales
-    }
-  end
+  def metrics_table(team)
+    metrics = Metric.where("team_id = ?", team)
 
-  def graph_scales
-    {
-      yAxes: [{
-        stacked: true,
-        ticks: {
-          beginAtZero: true
-        },
-        barThickness: 30,
-        scaleLabel: {
-          display: true,
-          labelString: 'Submission timeline'
-        }
-      }],
-      xAxes: [{
-        stacked: true,
-        ticks: {
-          beginAtZero: true
-        },
-        barThickness: 30,
-        scaleLabel: {
-          display: true,
-          labelString: '# of Commits'
-        }
-      }]
-    }
+    unless metrics.nil?
+      data_array = {}
+      metrics.each do |metric|
+        user = User.find(metric.participant_id).fullname
+        if data_array[user]
+          data_array[user][:commits] += metric.total_commits
+        else
+          data_array[user] = {}
+          data_array[user][:commits] = metric.total_commits
+        end
+      end
+      map = data_array.map {|k,v| v[:commits]}
+      max = map.max
+      min = map.min
+      mean = map.sum / map.size
+      data_array.each do |key, element|
+        case element[:commits]
+        when min
+          element[:color] = "c1"
+        when max
+          element[:color] = "c5"
+        when mean
+          element[:color] = "c3"
+        when min..mean
+          element[:color] = "c2"
+        when mean .. max
+          element[:color] = "c4"
+        else
+          element[:color] = "c3"
+        end
+      end
+      data_array
+    else
+      nil
+    end
   end
 end

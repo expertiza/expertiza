@@ -23,10 +23,9 @@ module AnswerHelper
       user_id_to_answers[response_id] = [user.email, answers_per_user, user.name, assignment_name] unless user.nil?
     end
 
-    # Second part of the function that mails the answers to each user and if successful, delete the answers
     begin
-      user_id_to_answers.each do |response_id, answers| #The dictionary has key [response_id] and info above as "answers"
-        #Feeds review_mailer (email, answers, name, assignment_name) info. Emails and then deletes answers
+      user_id_to_answers.each do |response_id, answers| # The dictionary has key [response_id] and info above as "answers"
+        # Feeds review_mailer (email, answers, name, assignment_name) info. Emails and then deletes answers
         self.delete_answers(response_id) if self.review_mailer(answers[0], answers[1], answers[2], answers[3])
       end
     rescue StandardError
@@ -34,7 +33,7 @@ module AnswerHelper
     end
   end
 
-  #Mail the existing response in the databse to the reviewer
+  # Mail the existing response in the database to the reviewer
   def self.review_mailer(email, answers, name, assignment_name)
     begin #Call the notify_review_rubric_change method in mailer.rb to send an email with given user info
       Mailer.notify_review_rubric_change(
@@ -53,7 +52,7 @@ module AnswerHelper
     end
   end
 
-  #Delete the users' answers to the modified questionnaire, if the mailer worked successfully
+  # Delete the users response to the modified questionnaire
   def self.delete_answers(response_id)
     response = Response.find(response_id)
     response.is_submitted = false
@@ -62,7 +61,7 @@ module AnswerHelper
     Response.find(response_id).destroy
   end
 
-  #The in_active_period method returns true if the start & end range includes the current time
+  # The in_active_period method returns true if the start & end range includes the current time
   def self.in_active_period(questionnaire_id, answer=nil)
     assignment, round_number = AssignmentQuestionnaire.get_latest_assignment(questionnaire_id)
     unless assignment.nil? #If the assignment doesn't exist, return false

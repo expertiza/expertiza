@@ -9,8 +9,6 @@ class CreateMetrics < ActiveRecord::Migration
       t.timestamps null: false
     end
     add_column :users, :github_id, :string
-    # Metric.create :metric_source_id => MetricSource.find_by_name("Github").id
-    #Metric.create :metric_source_id => MetricSource.find_by_name("TravisCI").id
   end
   def down
     drop_table :metrics

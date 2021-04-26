@@ -71,9 +71,6 @@ class MetricsController < ApplicationController
       data_object[:author] = author
       data_object[:commits] = @parsed_data[author].values.inject(0) {|sum, value| sum += value}
       data_array.push(data_object)
-      puts @team_id
-      puts author
-      puts User.find_by_github_id(author)
       create_github_metric(@team_id, author, User.find_by_github_id(author).id, data_object[:commits])
     end
   end

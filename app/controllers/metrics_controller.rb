@@ -64,7 +64,7 @@ class MetricsController < ApplicationController
     @dates = @dates.keys.sort # only keep the date info and sort
 
     @participants = get_data_for_list_submissions(@team)
-begin
+
     data_array = []
     #puts @authors
     #puts "========"
@@ -78,11 +78,6 @@ begin
       puts User.find_by_github_id(author)
       create_github_metric(@team_id, author, User.find_by_github_id(author).id, data_object[:commits])
     end
-end
-    puts :asdff
-    #sushreeta2106 #8995
-    # amolgautam25 #8980
-    # skollip #9013
   end
 
   # authorize with token to use github API with 5000 rate limits. Unauthorized user only has 60 limits, which is not enough.

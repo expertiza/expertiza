@@ -12,7 +12,7 @@ describe Rubric do
     expect(Rubric.new(min_question_score: 'Not an number')).to_not be_valid
   end
   describe '#update_mapping' do
-    rubric = Rubric.new()
+    rubric = Rubric.new
     response = rubric.update_mapping
     expect(response).to render_template(:list)
   end

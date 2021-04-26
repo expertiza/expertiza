@@ -110,7 +110,7 @@ end
   end
 
 
-  ################################ Handling of Pull Request Links #############################################
+  ############### Handling of Pull Request Links #####################
 
   # example pull_links: https://github.com/expertiza/expertiza/pull/1858
   def query_all_pull_requests(pull_links)

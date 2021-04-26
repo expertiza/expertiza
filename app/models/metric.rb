@@ -23,7 +23,9 @@ def response_problems_metrics(input_params)
   begin
 
     @sent_hash = Hash.new
+   
     res = http.request(req)
+    
    
       if (res.code == "200" && res.content_type == "application/json")
         @output = res.body
@@ -127,22 +129,23 @@ end
     end
   end
 
-  def show_confirmation_page
-        flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
-        flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
+  def show_confirmation_page(review_comments)
+        # flash[:error] = params[:error_msg] unless params[:error_msg] and params[:error_msg].empty?
+        # flash[:note] = params[:msg] unless params[:msg] and params[:msg].empty?
 
-        @response = Response.find(params[:id])
-        @metric = Metric.new
+        # @response = Response.find(params[:id])
+        # @metric = Metric.new
 
-        # a response should already exist when viewing this page
-        render nothing:true unless @response
+        # # a response should already exist when viewing this page
+        # render nothing:true unless @response
         @all_comments = []
+        
 
         # NEW change: since response already saved 
         # fetch comments from Answer model in db instead
-        answers = Answer.where(response_id: @response.id)
-        answers.each do |a|
-        comment = a.comments
+       # answers = Answer.where(response_id: @response.id)
+       review_comments.each do |comment|
+        # comment = a.comments
         comment.slice! "<p>"
         comment.slice! "</p>"
         @all_comments.push(comment) unless comment.empty?
@@ -165,7 +168,15 @@ end
 
 
         # send user review to API for analysis
+
+        @start_sentiments_time = Time.now
+
         @api_response = response_sentiments_metrics(final_hash_json)
+        
+        @total_sentiments_time = Time.now- @start_sentiments_time
+
+        return @api_response
+
 
     end
 

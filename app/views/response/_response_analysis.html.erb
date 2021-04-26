@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Convert JSON Data to HTML Table</title>
+    <style>
+        th, td, p, input, h3 {
+            font:15px 'Segoe UI';
+        }
+        table, th, td {
+            border: solid 1px #ddd;
+            border-collapse: collapse;
+            padding: 2px 3px;
+            text-align: center;
+        }
+        th {
+            font-weight:bold;
+        }
+    </style>
+</head>
+<body>
+	<h3>
+    	Click the button to create a dynamic table using data extracted from a JSON array.
+    </h3>
+    <input type='button' onclick='tableFromJson()' 
+    	value='Generate review metric' />
+        
+    <p id='showData'></p>
+    
+   
+</body>
+
+<script  src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+ <script>
+
+        function tableFromJson() 
+        {
+
+            var de = $("form").serialize();      
+            $("#d").text($("form").serialize());
+
+         
+            var myBooks = [Object.fromEntries(new URLSearchParams(de))]
+        
+            var obj = new Object();           
+            var jsonString = "";
+
+            var id = 0;
+            var reviews = [];
+
+           for (var i = 2; i < 100; i++) {              
+
+                if (document.getElementById("responses_"+i+"_comments") == null)
+                     continue;
+                 else
+                 {                     
+                    var dict = {};
+
+                    dict["id"] = id;
+                    var tem = (document.getElementById("responses_"+i+"_comments").value);
+                    dict["text"] =  $("<p>").html(tem).text();
+                   
+                    id++;
+                    reviews.push(dict);
+
+                 }
+           }
+
+            var final_obj = {};
+
+            final_obj["reviews"] = reviews;
+                    
+            var final_json = JSON.stringify(final_obj);
+          
+            var response = null;
+            const xhr = new XMLHttpRequest()
+            xhr.withCredentials = false
+
+            xhr.addEventListener('readystatechange', function() {
+            if (this.readyState === this.DONE) {
+                console.log(this.responseText)
+            }
+            })
+
+            xhr.open('POST', 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk')
+            xhr.setRequestHeader('content-type', 'application/json')
+
+            response = xhr.send(final_json)        
+            // console.log("Now printing response");
+
+            // console.log(response);            
+
+
+
+            // var temp = [];
+            //  for (var i = 0; i < 6; i++) {
+            //     temp.push(myBooks['0']['responses['+i+'][comment]']);
+
+            //  }
+
+            //  console.log(temp);
+
+            // Extract value from table header. 
+            // ('Book ID', 'Book Name', 'Category' and 'Price')
+            var col = [];
+            for (var i = 0; i < myBooks.length; i++) {
+                for (var key in myBooks[i]) {
+                    if (col.indexOf(key) === -1) {
+                        col.push(key);
+                    }
+                }
+            }
+
+            // Create a table.
+            var table = document.createElement("table");
+
+            // Create table header row using the extracted headers above.
+            var tr = table.insertRow(-1);                   // table row.
+
+            for (var i = 0; i < col.length; i++) {
+                var th = document.createElement("th");      // table header.
+                th.innerHTML = col[i];
+                tr.appendChild(th);
+            }
+
+            // add json data to the table as rows.
+            for (var i = 0; i < myBooks.length; i++) {
+
+                tr = table.insertRow(-1);
+
+                for (var j = 0; j < col.length; j++) {
+                    var tabCell = tr.insertCell(-1);
+                    tabCell.innerHTML = myBooks[i][col[j]];
+                }
+            }
+
+            // Now, add the newly created table with json data, to a container.
+            var divShowData = document.getElementById('showData');
+            divShowData.innerHTML = "";
+            divShowData.appendChild(table);
+            
+            
+        }
+   
+</script>
+</html>

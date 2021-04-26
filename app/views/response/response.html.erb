@@ -428,6 +428,8 @@
     <% end %>
     <%= hidden_field_tag('return', @return) %>
     <%= hidden_field_tag  "isSubmit", :id=>"isSubmit" %>
+    <%= render partial: 'response/response_analysis', locals: {origin: 'review'}%>
+
 <% end %>
 
 <!--Check whether there is a UploadFile question.-->

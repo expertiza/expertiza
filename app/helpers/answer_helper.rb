@@ -58,16 +58,8 @@ module AnswerHelper
     response = Response.find(response_id)
     response.is_submitted = false
     response.save! #Unsubmit the response before destroying it
-    answers = Answer.where(response_id: response_id)
-    answers.each do |answer|
-      begin
-        answer.destroy #Destroy each answer of a response
-        true
-      rescue StandardError
-        raise $ERROR_INFO
-        false
-      end
-    end
+
+    Response.find(response_id).destroy
   end
 
   #The in_active_period method returns true if the start & end range includes the current time

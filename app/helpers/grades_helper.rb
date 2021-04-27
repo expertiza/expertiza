@@ -184,8 +184,19 @@ module GradesHelper
     unless metrics.nil?
       data_array = {}
       metrics.each do |metric|
-        user = User.find(metric.participant_id) unless metric.participant_id.nil?
-        user_fullname = user.nil? ? "Profile Github ID Not Set, Github Userid: " + metric.github_id : user.fullname
+        unless metric.participant_id.nil?
+          #Lookup user if ID was stored at query time
+          user = User.find(metric.participant_id)
+        else
+          # If not, try to find user by recently-entered github ID
+          user = User.find_by_github_id(metric.github_id)
+          # If still not, try to find user by their NCSU email if it's the same as github.com
+          user = User.find_by_email(metric.github_id) if user.nil?
+        end
+
+        #Finally, if user was not found, handle by using github email in the
+        # Student Name field, or Student Fullname if found.
+        user_fullname = user.nil? ? "Github Email: " + metric.github_id : user.fullname
         if data_array[user_fullname]
           data_array[user_fullname][:commits] += metric.total_commits
         else

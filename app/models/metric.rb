@@ -15,7 +15,7 @@ class Metric < ActiveRecord::Base
                         node{
                           id  commit{
                                 author{
-                                  name
+                                  name email
                                 }
                                additions deletions changedFiles committedDate
                         }}}}}}}"

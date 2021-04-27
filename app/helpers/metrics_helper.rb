@@ -10,8 +10,8 @@ module MetricsHelper
     i = 0
     authors.each do |author|
       data_object = {}
-      data_object['label'] = author
-      data_object['data'] = parsed_data[author].values
+      data_object['label'] = author[0]
+      data_object['data'] = parsed_data[author[0]].values
       data_object['backgroundColor'] = color[i]
       data_object['borderWidth'] = 1
       data_array.push(data_object)
@@ -32,8 +32,8 @@ module MetricsHelper
     i = 0
     authors.each do |author|
       data_object = {}
-      data_object[:author] = author
-      data_object[:commits] = parsed_data[author].values.inject(0) {|sum, value| sum += value}
+      data_object[:author] = author[0]
+      data_object[:commits] = parsed_data[author[0]].values.inject(0) {|sum, value| sum += value}
       data_object[:color] = color[i]
       data_array.push(data_object)
       i += 1

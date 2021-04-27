@@ -121,7 +121,7 @@ class MetricsController < ApplicationController
 
 
 
-  private
+
   ##################### Process Links and Branch according to Pull Request or Repo ############################
   # retrieve pull request data and repo data respectively
   def retrieve_github_data

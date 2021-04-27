@@ -190,7 +190,7 @@ describe Assignment do
         scores = assignment.scores(review: [question])
         expect(scores[:teams][:"0"][:scores][:avg]).to eq(90)
         expect(scores[:teams][:"0"][:scores][:min]).to eq(88)
-        expect(scores[:teams][:"0"][:scores][:avg]).to eq(95)
+        expect(scores[:teams][:"0"][:scores][:max]).to eq(95)
       end
     end
 
@@ -203,7 +203,7 @@ describe Assignment do
         scores = assignment.scores(review: [question])
         expect(scores[:teams][:"0"][:scores][:avg]).to eq(90)
         expect(scores[:teams][:"0"][:scores][:min]).to eq(88)
-        expect(scores[:teams][:"0"][:scores][:avg]).to eq(95)
+        expect(scores[:teams][:"0"][:scores][:max]).to eq(95)
       end
     end
   end

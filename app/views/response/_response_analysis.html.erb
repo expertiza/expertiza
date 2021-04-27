@@ -18,13 +18,18 @@
     </style>
 </head>
 <body>
+<br>
 	<h3>
     	Click the button to create a dynamic table using data extracted from a JSON array.
     </h3>
+    <br>
     <input type='button' onclick='tableFromJson()' 
     	value='Generate review metric' />
         
     <p id='showData'></p>
+<br>
+    <div id='timeTaken'></div>
+
     
    
 </body>
@@ -69,6 +74,7 @@
 
          async function tableFromJson() 
         {
+            var t0 = performance.now();
 
             var de = $("form").serialize();      
             $("#d").text($("form").serialize());
@@ -388,8 +394,21 @@
             var divShowData = document.getElementById('showData');
             divShowData.innerHTML = "";
             divShowData.appendChild(table);
+
             
+            t1 = performance.now();
+
+            var time = t1 - t0;
             
+            var obj5 = document.getElementById('timeTaken');
+            console.log("Printing Time taken ");
+            console.log(obj5);
+      //      obj.value = "Time Taken: "+time;
+
+            obj5.innerHTML = `<p> Time taken is ${time/1000} seconds. </p>`;
+            
+
+
         }
    
 </script>

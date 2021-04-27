@@ -32,7 +32,42 @@
 <script  src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
  <script>
 
-        function tableFromJson() 
+        var final_json;
+        var response_general = null;
+       
+        
+       function makeRequest(final_json,url) {
+               return new Promise(function (resolve, reject) {
+                    let xhr = new XMLHttpRequest();
+                    xhr.open('POST', url);
+                    xhr.setRequestHeader('content-type', 'application/json');
+                    xhr.onload = function () {
+                        if (this.status >= 200 && this.status < 300) {
+                            resolve(xhr.response);
+                           
+                            response_general = xhr.response;
+                            //console.log(xhr.response);
+                        } else {
+                            reject({
+                                status: this.status,
+                                statusText: xhr.statusText
+                            });
+                        }
+                    };
+                    xhr.onerror = function () {
+                        reject({
+                            status: this.status,
+                            statusText: xhr.statusText
+                        });
+                    };
+                    xhr.send(final_json);
+                });
+
+            }
+
+
+
+         async function tableFromJson() 
         {
 
             var de = $("form").serialize();      
@@ -40,57 +75,272 @@
 
          
             var myBooks = [Object.fromEntries(new URLSearchParams(de))]
-        
+            console.log(myBooks[0]);
+            var j = 0;
+            for(j =0; j <1000; j++)
+            {
+                if (document.getElementById("responses_"+j+"_comments") == null)
+                {break;}
+
+            }
+            console.log("value of j");
+            console.log(j);
+
+
+
             var obj = new Object();           
             var jsonString = "";
 
             var id = 0;
             var reviews = [];
 
-           for (var i = 2; i < 100; i++) {              
+           for (var i =2; i < (j); i++) {              
 
                 if (document.getElementById("responses_"+i+"_comments") == null)
                      continue;
                  else
-                 {                     
+                 {         
+
                     var dict = {};
 
                     dict["id"] = id;
                     var tem = (document.getElementById("responses_"+i+"_comments").value);
-                    dict["text"] =  $("<p>").html(tem).text();
-                   
+                   console.log(tem);
+                  
+                   tem =  $("<p>").html(tem).text();
+                   tem = tem.replace("\n"," ");
+                     dict["text"] = tem.replace("\r","");
                     id++;
                     reviews.push(dict);
 
                  }
            }
 
+                        var dict = {};
+                        dict["id"] = id;
+                        var tem =  (document.getElementById("responses_"+0+"_comments").value);
+                        tem =  $("<p>").html(tem).text();
+                        tem = tem.replace("\n"," ");
+                        dict["text"] = tem.replace("\r","");                        
+                        id++;
+                        reviews.push(dict);
+
+                        dict = {};
+                        dict["id"] = id;
+                        tem = myBooks[0]['review[comments]'];
+                        tem =  $("<p>").html(tem).text();
+                        tem = tem.replace("\n"," ");
+                        dict["text"] = tem.replace("\r","");                       
+                        id++;
+                        reviews.push(dict);                        
+
+            console.log(reviews);
+
             var final_obj = {};
 
             final_obj["reviews"] = reviews;
                     
-            var final_json = JSON.stringify(final_obj);
+            final_json = JSON.stringify(final_obj);
           
-            var response = null;
-            const xhr = new XMLHttpRequest()
-            xhr.withCredentials = false
+     
+           
 
-            xhr.addEventListener('readystatechange', function() {
-            if (this.readyState === this.DONE) {
-                console.log(this.responseText)
+//////////////////// **** Sentiment ********* //////////////////////////////   
+        
+
+            console.log("Now printing response_sentiment");
+
+            console.log("**********");
+            var promise_sentiment = await makeRequest(final_json, 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk')
+
+           console.log("printing response_sentiment");
+          var response_sentiment = JSON.parse(response_general);
+           response_general = null;
+           console.log(response_sentiment);
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //     var response_sentiment = null;
+
+        //      const xhr_sentiment = new XMLHttpRequest()
+        //     xhr_sentiment.withCredentials = false
+
+        //     xhr_sentiment.addEventListener('readystatechange', function() {
+        //     if (this.readyState === this.DONE) {
+        //  //       console.log(this.responseText)
+        //     }
+        //     })
+
+        //     xhr_sentiment.open('POST', 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk')
+        //     xhr_sentiment.setRequestHeader('content-type', 'application/json')
+
+        //     response_sentiment =  xhr_sentiment.send(final_json)        
+        //     console.log("Now printing response_sentiment");
+
+        //     console.log(response_sentiment);      
+
+            
+            // var response_sentiment_promise = await sentimentProcess();
+            // console.log(response_sentiment_promise);
+
+
+        //  //  var response_sentiment = response_sentiment_promise;
+         
+        //     if(response_sentiment['sentiments'] === undefined)
+        //         console.log("Its undefined");
+        //     else      
+        //          console.log(response_sentiment['sentiments']);
+
+            // console.log("Now printing response_sentiment");
+            // console.log(response_sentiment);  
+
+
+//////////////////// **** Problem ********* //////////////////////////////   
+        
+       
+
+        console.log("Now printing response_problem");
+
+        console.log("**********");
+        var promise_problem = await makeRequest(final_json, 'http://152.7.99.200:5000/problem')
+
+        console.log("printing response_problem");
+        var response_problem = JSON.parse(response_general);
+        response_general = null;
+        console.log(response_problem);
+          
+
+
+
+
+
+
+
+       
+       
+        //     var response_problem = null;
+
+        //      const xhr_problem = new XMLHttpRequest()
+        //     xhr_problem.withCredentials = false
+
+        //     xhr_problem.addEventListener('readystatechange', function() {
+        //     if (this.readyState === this.DONE) {
+        // //        console.log(this.responseText)
+        //     }
+        //     })
+
+        //     xhr_problem.open('POST', 'http://152.7.99.200:5000/problem')
+        //     xhr_problem.setRequestHeader('content-type', 'application/json')
+
+        //     response_problem =  xhr_problem.send(final_json)        
+        // //    console.log("Now printing response_problem");
+
+        //  //   console.log(response_problem);  
+
+//////////////////// **** Suggestion ********* //////////////////////////////   
+        
+        console.log("Now printing response_suggestion");
+
+        console.log("**********");
+        var promise_suggestion = await makeRequest(final_json, 'http://152.7.99.200:5000/suggestions')
+
+        console.log("printing response_suggestion");
+        var response_suggestion = JSON.parse(response_general);
+        response_general = null;
+        console.log(response_suggestion);
+          
+       //     console.log("Now printing response_suggestion");
+
+       //     console.log(response_suggestion);        
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+            
+            
+         
+             
+
+
+            
+
+         //   Object obj = new Object();
+            var obj;
+            var obj_id = 1;
+            var pos; var neg; var neu;
+
+            myBooks = [];
+      //        console.log("*****1213213213213****");
+      //      console.log(response_sentiment['sentiments']);
+
+            for(var i =0; i<response_sentiment['sentiments'].length; i++)        
+            {
+
+                var dict_final = {};
+
+
+            
+
+              dict_final["response_id"] = i+1;
+
+              pos = response_sentiment['sentiments'][i]['pos'];
+              neg = response_sentiment['sentiments'][i]['neg'];
+              neu = response_sentiment['sentiments'][i]['neu'];
+
+              if ( pos > neg && pos > neu )
+                dict_final["sentiment"] = 'positive'; 
+              if ( neu > pos && neu > neg )
+                dict_final["sentiment"] = 'neutral'; 
+              if ( neg > neu && neg > pos )
+                dict_final["sentiment"] = 'negative';    
+              
+              dict_final["suggestions"] = response_suggestion['reviews'][i]['suggestions']
+              dict_final["problems"] = response_problem['reviews'][i]['problems'] 
+
+           //   obj_id++; 
+
+              myBooks.push(dict_final);              
             }
-            })
 
-            xhr.open('POST', 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk')
-            xhr.setRequestHeader('content-type', 'application/json')
+            
 
-            response = xhr.send(final_json)        
-            // console.log("Now printing response");
-
-            // console.log(response);            
+            console.log(myBooks);
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
             // var temp = [];
             //  for (var i = 0; i < 6; i++) {
             //     temp.push(myBooks['0']['responses['+i+'][comment]']);
@@ -101,6 +351,7 @@
 
             // Extract value from table header. 
             // ('Book ID', 'Book Name', 'Category' and 'Price')
+
             var col = [];
             for (var i = 0; i < myBooks.length; i++) {
                 for (var key in myBooks[i]) {

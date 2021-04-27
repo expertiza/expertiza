@@ -2,9 +2,7 @@
 
 module AnswerHelper
 
-  #Function will serve 2 purposes
-  #One - Identify the existing responses for the modified questionnaire in the database
-  #Two - Mail the response to the user and delete the object in the database
+  # Delete responses for given questionnaire
   def self.delete_existing_responses(question_ids, questionnaire_id)
     response_ids=[]
     question_ids.each do |question|
@@ -12,9 +10,9 @@ module AnswerHelper
         response_ids << answer.response_id if self.in_active_period(questionnaire_id, answer)
       end
     end
-    response_ids=response_ids.uniq
+
     user_id_to_answers={}
-    response_ids.each do |response_id| #For each response id in the array, gather map and info about reviewer
+    response_ids.uniq.each do |response_id| #For each response id in the array, gather map and info about reviewer
       response_map = Response.find(response_id).response_map
       reviewer_id = response_map.reviewer_id
       reviewed_object_id = response_map.reviewed_object_id
@@ -25,10 +23,9 @@ module AnswerHelper
       user_id_to_answers[response_id] = [user.email, answers_per_user, user.name, assignment_name] unless user.nil?
     end
 
-    # Second part of the function that mails the answers to each user and if successful, delete the answers
     begin
-      user_id_to_answers.each do |response_id, answers| #The dictionary has key [response_id] and info above as "answers"
-        #Feeds review_mailer (email, answers, name, assignment_name) info. Emails and then deletes answers
+      user_id_to_answers.each do |response_id, answers| # The dictionary has key [response_id] and info above as "answers"
+        # Feeds review_mailer (email, answers, name, assignment_name) info. Emails and then deletes answers
         self.delete_answers(response_id) if self.review_mailer(answers[0], answers[1], answers[2], answers[3])
       end
     rescue StandardError
@@ -36,7 +33,7 @@ module AnswerHelper
     end
   end
 
-  #Mail the existing response in the databse to the reviewer
+  # Mail the existing response in the database to the reviewer
   def self.review_mailer(email, answers, name, assignment_name)
     begin #Call the notify_review_rubric_change method in mailer.rb to send an email with given user info
       Mailer.notify_review_rubric_change(
@@ -55,24 +52,16 @@ module AnswerHelper
     end
   end
 
-  #Delete the users' answers to the modified questionnaire, if the mailer worked successfully
+  # Delete the users response to the modified questionnaire
   def self.delete_answers(response_id)
     response = Response.find(response_id)
     response.is_submitted = false
     response.save! #Unsubmit the response before destroying it
-    answers = Answer.where(response_id: response_id)
-    answers.each do |answer|
-      begin
-        answer.destroy #Destroy each answer of a response
-        true
-      rescue StandardError
-        raise $ERROR_INFO
-        false
-      end
-    end
+
+    Response.find(response_id).destroy
   end
 
-  #The in_active_period method returns true if the start & end range includes the current time
+  # The in_active_period method returns true if the start & end range includes the current time
   def self.in_active_period(questionnaire_id, answer=nil)
     assignment, round_number = AssignmentQuestionnaire.get_latest_assignment(questionnaire_id)
     unless assignment.nil? #If the assignment doesn't exist, return false

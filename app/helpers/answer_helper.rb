@@ -4,13 +4,36 @@ module AnswerHelper
 
   # Delete responses for given questionnaire
   def self.delete_existing_responses(question_ids, questionnaire_id)
+    # For each of the question's answers, log the response_id if in active period
+    response_ids = self.log_answer_responses(question_ids, questionnaire_id)
+
+    # For each of the response_ids, log info to be used in answer deletion
+    user_id_to_answers = self.log_response_info(response_ids)
+
+    # For each pair of response_id and answers, delete the answers if the mailer successfully sends mail
+    begin
+      user_id_to_answers.each do |response_id, answers| # The dictionary has key [response_id] and info as "answers"
+        # Feeds review_mailer (email, answers, name, assignment_name) info. Emails and then deletes answers
+        self.delete_answers(response_id) if self.review_mailer(answers[0], answers[1], answers[2], answers[3])
+      end
+    rescue StandardError
+      raise $ERROR_INFO
+    end
+  end
+
+  # Log the response_id if in active period for each of the question's answers
+  def self.log_answer_responses(question_ids, questionnaire_id)
     response_ids=[]
     question_ids.each do |question|
       Answer.where(question_id: question).each do |answer| #For each of the question's answers, log the response_id if in active period
         response_ids << answer.response_id if self.in_active_period(questionnaire_id, answer)
       end
     end
+    return response_ids
+  end
 
+  # Log info from each response_id to be used in answer deletion
+  def self.log_response_info(response_ids)
     user_id_to_answers={}
     response_ids.uniq.each do |response_id| #For each response id in the array, gather map and info about reviewer
       response_map = Response.find(response_id).response_map
@@ -22,15 +45,7 @@ module AnswerHelper
       #For each response_id, add its info to the dictionary
       user_id_to_answers[response_id] = [user.email, answers_per_user, user.name, assignment_name] unless user.nil?
     end
-
-    begin
-      user_id_to_answers.each do |response_id, answers| # The dictionary has key [response_id] and info above as "answers"
-        # Feeds review_mailer (email, answers, name, assignment_name) info. Emails and then deletes answers
-        self.delete_answers(response_id) if self.review_mailer(answers[0], answers[1], answers[2], answers[3])
-      end
-    rescue StandardError
-      raise $ERROR_INFO
-    end
+    return user_id_to_answers
   end
 
   # Mail the existing response in the database to the reviewer

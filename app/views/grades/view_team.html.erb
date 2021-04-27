@@ -110,7 +110,7 @@
                     <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i} %>
                   <% else %>
                       <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
-                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i} %>
+                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i, user_name: user_name} %>
                   <% end %>
                   <% i += 1 %>
               <% end %>

@@ -9,11 +9,11 @@ class MetricsController < ApplicationController
   end
 
   def create_github_metric(team_id, github_id, participant_id, total_commits)
-    unless participant_id.nil?
       metric = Metric.where("team_id = ? AND github_id = ?", team_id, github_id).first
 
       unless metric.nil?
         metric.total_commits=total_commits
+        metric.participant_id = participant_id
         metric.save
       else
         # create new
@@ -23,11 +23,31 @@ class MetricsController < ApplicationController
                       :participant_id => participant_id,
                       :total_commits => total_commits
       end
+  end
+
+  #Runs a query against all the link submissions for an entire assignment, populating the DB fields that are
+  # used by the view_team in grades heatgrid showing user contributions
+  def query_assignment_statistics
+    @assignment = Assignment.find(params[:id])
+    teams = @assignment.teams
+    teams.each do |team|
+      topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team)
+      single_submission_initial_query(participants.first.id)
     end
+
   end
 
   # render the view_github_metrics page
   def show
+    single_submission_initial_query(params[:id])
+  end
+
+  # authorize with token to use github API with 5000 rate limits. Unauthorized user only has 60 limits, which is not enough.
+  def authorize_github
+    redirect_to "https://github.com/login/oauth/authorize?client_id=#{GITHUB_CONFIG['client_key']}"
+  end
+
+  def single_submission_initial_query(id)
     if session["github_access_token"].nil? # check if there is a github_access_token in current session
       session["participant_id"] = params[:id] # team number
       session["github_view_type"] = "view_submissions"
@@ -49,7 +69,7 @@ class MetricsController < ApplicationController
 
     @token = session["github_access_token"]
 
-    @participant = AssignmentParticipant.find(params[:id])
+    @participant = AssignmentParticipant.find(id)
     @assignment = @participant.assignment # participant has belong_to relationship with assignment
     @team = @participant.team # team method in AssignmentParticipant return the AssignmentTeam of this participant
     @team_id = @team.id
@@ -67,21 +87,20 @@ class MetricsController < ApplicationController
 
     data_array = []
 
+    # Create database entry for basic statistics. These data are queried later by view_team in grades (the heatgrid)
     @authors.each do |author|
       unless LOCAL_ENV["BLACKLIST_AUTHOR"].include? author
         data_object = {}
         data_object[:author] = author
         data_object[:commits] = @parsed_data[author].values.inject(0) {|sum, value| sum += value}
         data_array.push(data_object)
-        create_github_metric(@team_id, author, User.find_by_github_id(author).id, data_object[:commits])
+        user = User.find_by_github_id(author)
+        user_id = user.nil? ? nil : user.id
+        create_github_metric(@team_id, author, user_id, data_object[:commits])
       end
     end
   end
 
-  # authorize with token to use github API with 5000 rate limits. Unauthorized user only has 60 limits, which is not enough.
-  def authorize_github
-    redirect_to "https://github.com/login/oauth/authorize?client_id=#{GITHUB_CONFIG['client_key']}"
-  end
 
 
   private
@@ -110,10 +129,9 @@ class MetricsController < ApplicationController
     pull_links.each do |hyperlink|
       submission_hyperlink_tokens = hyperlink.split('/') # parse the link
       hyperlink_data = {}
-      hyperlink_data["pull_request_number"] = submission_hyperlink_tokens.pop # 1858
-      submission_hyperlink_tokens.pop # keyword pull, not need to keep
-      hyperlink_data["repository_name"] = submission_hyperlink_tokens.pop # expertiza
-      hyperlink_data["owner_name"] = submission_hyperlink_tokens.pop # expertiza
+      hyperlink_data["pull_request_number"] = submission_hyperlink_tokens[6] # 1858
+      hyperlink_data["repository_name"] = submission_hyperlink_tokens[4] # expertiza
+      hyperlink_data["owner_name"] = submission_hyperlink_tokens[3] # expertiza
       # yet another wrapper fot github api call, take repository name, owner name, and pull request number as parameter
       github_data = pull_request_data(hyperlink_data)
 
@@ -188,7 +206,7 @@ class MetricsController < ApplicationController
     repo_links.each do |hyperlink|
       submission_hyperlink_tokens = hyperlink.split('/') # parse the link
       hyperlink_data = {}
-      hyperlink_data["repository_name"] = submission_hyperlink_tokens[4]
+      hyperlink_data["repository_name"] = submission_hyperlink_tokens[4].gsub('.git', '')
       hyperlink_data["owner_name"] = submission_hyperlink_tokens[3]
       while has_next_page
         query_text = Metric.repo_query(hyperlink_data, @assignment.created_at, end_cursor)

@@ -7,6 +7,7 @@
     });
   });
 </script>
+<%= link_to 'Refresh Github data', { controller: 'metrics', action: 'query_assignment_statistics', id: @assignment.id }, target: '_blank' %></td>
 <% headers = {} %>
 <% headers["Topic_name"] = "16%" if @assignment.topics? %>
 <% if @assignment.max_team_size > 1 %>
@@ -58,7 +59,9 @@
               <%= render :partial => 'responses', :locals => {:team => team ,:topic_id => topic_identifier, :title => 'Review'} %>
             <% end %>
             <br>
+              <% unless Metric.find_by_team_id(team.id).nil? %>
               <%= link_to 'GitHub metrics', { controller: 'metrics', action: 'show', id: participants.first.id }, target: '_blank' %></td>
+                <% end %>
           <% end %>
         <% end %>
 

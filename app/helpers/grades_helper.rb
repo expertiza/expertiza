@@ -178,46 +178,19 @@ module GradesHelper
     questions
   end
 
-  def display_github_piechart(team)
-    metrics = Metric.where("team_id = ?", team)
-
-
-    data_array = []
-    color = %w[ff0000 ffff00 0000ff aaaaaa 00ff00 ff00ff]
-    i = 0
-    metrics.each do |metric|
-      data_object = {}
-      data_object[:author] = User.find(metric.participant_id).fullname
-      data_object[:commits] = metric.total_commits
-      data_object[:color] = color[i]
-      data_array.push(data_object)
-      i += 1
-      i = 0 if i > 4
-    end
-
-    link = nil
-    GoogleChart::PieChart.new('600x300', '# Commits By Author', false) do |pc|
-      data_array.each do |datapoint|
-        label = datapoint[:author].to_s + " (Total: " + datapoint[:commits].to_s + ")"
-        pc.data label, datapoint[:commits], datapoint[:color]
-      end
-      link = pc.to_url
-    end
-    link
-  end
-
   def metrics_table(team)
     metrics = Metric.where("team_id = ?", team)
 
     unless metrics.nil?
       data_array = {}
       metrics.each do |metric|
-        user = User.find(metric.participant_id).fullname
-        if data_array[user]
-          data_array[user][:commits] += metric.total_commits
+        user = User.find(metric.participant_id) unless metric.participant_id.nil?
+        user_fullname = user.nil? ? "Profile Github ID Not Set, Github Userid: " + metric.github_id : user.fullname
+        if data_array[user_fullname]
+          data_array[user_fullname][:commits] += metric.total_commits
         else
-          data_array[user] = {}
-          data_array[user][:commits] = metric.total_commits
+          data_array[user_fullname] = {}
+          data_array[user_fullname][:commits] = metric.total_commits
         end
       end
       map = data_array.map {|k,v| v[:commits]}

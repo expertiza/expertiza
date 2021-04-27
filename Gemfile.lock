@@ -683,6 +683,7 @@ DEPENDENCIES
   seer
   selenium-webdriver
   shoulda
+  shoulda-matchers
   sidekiq
   simplecov
   sprockets

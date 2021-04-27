@@ -200,7 +200,7 @@ describe Assignment do
         allow(assignment).to receive(:vary_by_round).and_return(false)
         allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([response])
         allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
-        scores = assignment.scores(review: [question])
+        scores = assignment.scores(review1: [question])
         expect(scores[:teams][:"0"][:scores][:avg]).to eq(90)
         expect(scores[:teams][:"0"][:scores][:min]).to eq(88)
         expect(scores[:teams][:"0"][:scores][:max]).to eq(95)

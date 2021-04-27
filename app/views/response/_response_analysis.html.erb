@@ -16,16 +16,18 @@
             font-weight:bold;
         }
     </style>
+
+    
+
 </head>
 <body>
 <br>
-	<h3>
-    	Click the button to create a dynamic table using data extracted from a JSON array.
-    </h3>
+	
     <br>
     <input type='button' onclick='tableFromJson()' 
-    	value='Generate review metric' />
-        
+    	value='Get Review Feedback' />
+    <br>    
+    <br>
     <p id='showData'></p>
 <br>
     <div id='timeTaken'></div>   
@@ -142,22 +144,22 @@
             for(var i =0; i<response_sentiment['sentiments'].length; i++)        
             {
               var dict_final = {};
-              dict_final["response_id"] = i+1;
+              dict_final["Comment_Number"] = i+1;
               pos = response_sentiment['sentiments'][i]['pos'];
               neg = response_sentiment['sentiments'][i]['neg'];
               neu = response_sentiment['sentiments'][i]['neu'];
 
               if ( pos > neg && pos > neu )
-                dict_final["sentiment"] = 'positive'; 
+                dict_final["Sentiment"] = 'Positive'; 
               if ( neu > pos && neu > neg )
-                dict_final["sentiment"] = 'neutral'; 
+                dict_final["Sentiment"] = 'Neutral'; 
               if ( neg > neu && neg > pos )
-                dict_final["sentiment"] = 'negative';    
+                dict_final["Sentiment"] = 'Negative';    
               
-              dict_final["suggestions"] = response_suggestion['reviews'][i]['suggestions']
-              dict_final["problems"] = response_problem['reviews'][i]['problems'] 
-
-              myBooks.push(dict_final);              
+            dict_final["Problem_Detected?"] = response_problem['reviews'][i]['problems'] 
+            dict_final["Suggestion?"] = response_suggestion['reviews'][i]['suggestions']
+             
+            myBooks.push(dict_final);              
             }
             console.log(myBooks);
 
@@ -204,7 +206,7 @@
             var obj5 = document.getElementById('timeTaken');
             console.log("Printing Time taken ");
             console.log(obj5);
-            obj5.innerHTML = `<p> Time taken is ${time/1000} seconds. </p>`;
+            obj5.innerHTML = `<p> Time taken is ${(time/1000).toFixed(2)} seconds. </p>`;
         }
    
 </script>

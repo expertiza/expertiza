@@ -93,6 +93,8 @@ GEM
       abstract_type (~> 0.0.7)
       adamantium (~> 0.2)
       equalizer (~> 0.0.11)
+    archive-zip (0.12.0)
+      io-like (~> 0.3.0)
     arel (6.0.4)
     ast (2.4.2)
     awesome_nested_set (3.4.0)
@@ -204,6 +206,8 @@ GEM
     formatador (0.2.5)
     gchartrb (0.8)
     gdata (1.1.2)
+    geckodriver-helper (0.0.5)
+      archive-zip (~> 0.7)
     generator (0.0.1)
     gherkin (6.0.15)
       c21e (~> 1.1.8)
@@ -252,6 +256,7 @@ GEM
     i18n (0.9.5)
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)
+    io-like (0.3.1)
     jaro_winkler (1.5.4)
     jquery-colorbox-rails (1.7.6)
       railties (>= 3.1)
@@ -635,6 +640,7 @@ DEPENDENCIES
   foreman
   gchartrb
   gdata
+  geckodriver-helper (~> 0.0.3)
   gherkin
   googlecharts
   guard-rails

@@ -187,7 +187,7 @@ describe Assignment do
         allow(assignment).to receive(:num_review_rounds).and_return(1)
         allow(ReviewResponseMap).to receive(:get_responses_for_team_round).with(team, 1).and_return([response])
         allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
-        expect(assignment.scores(review1: [question])).to eq({max: 95, min: 88, avg: 90})
+        expect(assignment.scores(review1: [question])[:team]["0"][:scores]).to eq({max: 95, min: 88, avg: 90})
       end
     end
 
@@ -197,7 +197,7 @@ describe Assignment do
         allow(assignment).to receive(:vary_by_round).and_return(false)
         allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([response])
         allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
-        expect(assignment.scores(review1: [question])).to eq({max: 95, min: 88, avg: 90})
+        expect(assignment.scores(review: [question])).to eq({max: 95, min: 88, avg: 90})
       end
     end
   end

@@ -187,10 +187,7 @@ describe Assignment do
         allow(assignment).to receive(:num_review_rounds).and_return(1)
         allow(ReviewResponseMap).to receive(:get_responses_for_team_round).with(team, 1).and_return([response])
         allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
-        expect(assignment.scores(review1: [question]).inspect).to eq("{:participants=>{:\"1\"=>98}, :teams=>{:\"0\"=>{:team=>#<AssignmentTeam id: 1, "\
-          "name: \"no team\", parent_id: nil, type: \"AssignmentTeam\", comments_for_advertisement: nil, advertise_for_partner: nil, "\
-          "submitted_hyperlinks: \"---\\n- https://www.expertiza.ncsu.edu\", directory_num: 0, grade_for_submission: nil, "\
-          "comment_for_submission: nil>, :scores=>{:max=>95, :min=>88, :avg=>90.0}}}}")
+        expect(assignment.scores(review1: [question])).to eq({max: 95, min: 88, avg: 90})
       end
     end
 
@@ -200,10 +197,7 @@ describe Assignment do
         allow(assignment).to receive(:vary_by_round).and_return(false)
         allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([response])
         allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
-        expect(assignment.scores(review: [question]).inspect).to eq("{:participants=>{:\"1\"=>98}, :teams=>{:\"0\"=>{:team=>#<AssignmentTeam id: 1, "\
-          "name: \"no team\", parent_id: nil, type: \"AssignmentTeam\", comments_for_advertisement: nil, advertise_for_partner: nil, "\
-          "submitted_hyperlinks: \"---\\n- https://www.expertiza.ncsu.edu\", directory_num: 0, grade_for_submission: nil, "\
-          "comment_for_submission: nil>, :scores=>{:max=>95, :min=>88, :avg=>90}}}}")
+        expect(assignment.scores(review1: [question])).to eq({max: 95, min: 88, avg: 90})
       end
     end
   end

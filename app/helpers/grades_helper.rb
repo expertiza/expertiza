@@ -207,7 +207,7 @@ module GradesHelper
       map = data_array.map {|k,v| v[:commits]}
       max = map.max
       min = map.min
-      mean = map.sum / map.size
+      mean = map.sum / map.size unless map.size.zero?
       data_array.each do |key, element|
         case element[:commits]
         when min

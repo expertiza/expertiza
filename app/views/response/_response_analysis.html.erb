@@ -17,6 +17,45 @@
         }
     </style>
 
+    <style>
+		table {
+		    border-color: black;
+		}
+
+		.vGood {
+		    background-color: #BCED91;
+		}
+
+		.avg {
+		    background-color: #FFEC8B;
+		}
+
+		.poor {
+		    background-color: #FF8080;
+		}
+	</style>
+	<style>
+	    .parentCell_metric_table{
+	        position: relative;
+	    }
+	    .tooltip_metric_table{
+	        display: none;
+	        position: absolute;
+	        z-index: 100;
+	        border: 1px;
+	        background-color: white;
+	        border: 1px solid black;
+	        padding: 3px;
+	        color: black;
+	        top: 20px;
+	        left: 20px;
+	    }
+	    .parentCell_metric_table:hover span.tooltip_metric_table{
+	        display:block;
+	    }
+	</style>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" />
+
     
 
 </head>
@@ -63,6 +102,9 @@
             }
          async function tableFromJson() 
         {
+            // var config_file_manage = <% REVIEW_METRIC_CONFIG["metrics"] %>;
+            // console.log("-----------printing config file fetch---------");
+            // console.log(config_file_manage);
             var t0 = performance.now();
             var de = $("form").serialize();      
             $("#d").text($("form").serialize());
@@ -165,6 +207,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////
         
+          var tooltip_json = {"Comment_Number":'The comment number from the top in the form.', "Sentiment": 'This column shows the tone of the comment.', "Problem_Detected?": 'This shows whether any problem is mentioned in the comment or not.',"Suggestion?": 'This shows whether any problem is mentioned in the comment or not.'}
+
             var col = [];
             for (var i = 0; i < myBooks.length; i++) {
                 for (var key in myBooks[i]) {
@@ -182,7 +226,8 @@
 
             for (var i = 0; i < col.length; i++) {
                 var th = document.createElement("th");      // table header.
-                th.innerHTML = col[i];
+                th.innerHTML = col[i] + ` <span class="tooltip_metric_table">`+tooltip_json[col[i]]+`</span>`;
+                th.classList.add("parentCell_metric_table");
                 tr.appendChild(th);
             }
 
@@ -207,7 +252,27 @@
             console.log("Printing Time taken ");
             console.log(obj5);
             obj5.innerHTML = `<p> Time taken is ${(time/1000).toFixed(2)} seconds. </p>`;
+            color();
         }
    
+</script>
+
+<script>
+function color(){    $('td').each(
+
+function() {
+    var score = $(this).text();
+    
+    if (score == 'Positive' || score == 'Present') {
+        $(this).addClass('vGood');
+    }
+    
+    else if (score == 'Neutral') {
+        $(this).addClass('avg');
+    }
+    else if (score == 'Negative' || score == 'Absent') {
+        $(this).addClass('poor');
+    }
+    });}
 </script>
 </html>

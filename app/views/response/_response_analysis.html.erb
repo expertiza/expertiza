@@ -158,23 +158,25 @@
         id++;
         reviews.push(single_comment_json);
 
+        var number_of_comments = reviews.length; 
+
         //converts the reviews list into a json object, which is later converted into stringified json.
         var processed_comment_json = {};
         processed_comment_json["reviews"] = reviews;
         processed_comment_json_string = JSON.stringify(processed_comment_json);
 
-        return processed_comment_json_string
+        return [processed_comment_json_string, number_of_comments]
     }
 
     //combines output from all API calls into a single list object after processing the api output data    
-    function combine_api_output(config_file_values, response_sentiment = null, response_problem = null, response_suggestion = null)
+    function combine_api_output(number_of_comments, config_file_values, response_sentiment = null, response_problem = null, response_suggestion = null)
     {
         var pos; var neg; var neu;
         
         combined_api_output = [];
         
         //processes api output comment by comment
-        for(var i =0; i< processed_comment_json["reviews"].length; i++)        
+        for(var i =0; i< number_of_comments; i++)        
         {
             var single_comment_api_output = {};
             single_comment_api_output["Comment_Number"] = i+1;
@@ -265,9 +267,12 @@
         time_taken_obj.innerHTML = "Loading..."
 
         //start the timer here - which will be used to calculate total time taken.
-        var time_start = performance.now();
-        
+        var time_start = performance.now();        
+      
         var processed_comment_json_string = fetch_response_comments();
+
+        var number_of_comments = processed_comment_json_string[1];
+        processed_comment_json_string = processed_comment_json_string[0];
 
         //Sentiment API Call
         var response_sentiment = null;
@@ -296,7 +301,7 @@
             response_general = null;
         }
 
-        var combined_api_output = combine_api_output(config_file_values, response_sentiment, response_problem, response_suggestion);
+        var combined_api_output = combine_api_output(number_of_comments, config_file_values, response_sentiment, response_problem, response_suggestion);
 
         generateTable(combined_api_output);
 

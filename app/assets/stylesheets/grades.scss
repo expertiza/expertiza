@@ -40,6 +40,28 @@ background-color: #d3d3d3;
   background-color: #FFFFFF;
 }
 
+/* The next three classes are for
+ top-left justifying and coloring the scores and text in review scores summary page */
+.td_review {
+  vertical-align: top;
+}
+
+.revscore {
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  font-size:15px;
+  color:black;
+  line-height:30px;
+  margin: auto;
+  vertical-align: top;
+  text-align: center;
+}
+
+.revcomment {
+  text-align: left;
+}
+
 /* To underline scores which have a comment. */
 .underlined {
     text-decoration: underline;

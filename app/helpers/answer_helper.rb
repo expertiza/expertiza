@@ -72,7 +72,6 @@ module AnswerHelper
     response = Response.find(response_id)
     response.is_submitted = false
     response.save! #Unsubmit the response before destroying it
-
     Response.find(response_id).destroy
   end
 

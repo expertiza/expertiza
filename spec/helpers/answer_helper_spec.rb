@@ -38,6 +38,21 @@ describe AnswerHelper do
     end
   end
 
+  describe '#log_answer_responses' do
+    it 'logs the response_id if in active period for each of the questions answers' do
+      AnswerHelper.log_answer_responses([@question.id], @questionnaire2.id)
+      expect(AnswerHelper.log_answer_responses([@question.id], @questionnaire2.id)).to eql([1])
+    end
+  end
+
+  describe '#log_response_info' do
+    it 'logs info from each response_id to be used in answer deletion' do
+      response_ids = AnswerHelper.log_answer_responses([@question.id], @questionnaire2.id)
+      AnswerHelper.log_response_info(response_ids)
+      expect(AnswerHelper.log_response_info(response_ids)).to eql({1=>["expertiza@mailinator.com", "comment", "name", "name1"]})
+    end
+  end
+
   describe '#review_mailer' do
     it 'calls method in Mailer to send emails' do
       allow(Mailer).to receive(:notify_review_rubric_change).with(

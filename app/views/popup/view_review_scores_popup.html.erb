@@ -14,61 +14,74 @@
       <% questions = Question.where(questionnaire_id: questionnaire_id) %>
       <% num_responses = @review_final_versions[key][:response_ids].length %>
       <% responses = @review_final_versions[key][:response_ids] %>
-      <!--      set column length of responses-->
-      <% col_percent = 100/num_responses%>
-      <% col_percent_comment = 100/num_responses - 1%>
+      
+      <!--      set column length equal for all responses-->
+      <% item_width  = 100/(num_responses+1) %>
+      
       <!-- show the team which did the review -->
+      <!-- First Row -->
       <tr>
-        <th colspan="3" style="background-color:#DDDDBB" width="<%= col_percent %>%" > <b>QUESTION</b> </th>
-        <td colspan="3" style="padding: 0px;" width="(100-<%= col_percent %>)%">
-          <table width="100%">
-            <tr>
-              <% responses.each do |response_id| %>
-                  <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
-                  <td> <b><%= team.name %></b> <div style ="font-size:11px"> done at -- <%= Response.find(response_id).updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p") %> &nbsp&nbsp</div></td>
-              <% end %>
-            </tr>
-          </table>
-        </td>
-
+        <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <b>QUESTION</b></th>
+        <% responses.each do |response_id| %>  
+          <td width="<%= item_width %>%">
+          <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
+          <b><%= team.name %></b> <div style ="font-size:11px"> done at -- <%= Response.find(response_id).updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p") %> &nbsp&nbsp</div>
+          </td>
+        <% end %>
       </tr>
+
+      <!-- Questions and Responses Row -->
       <% questions.each do |question| %>
-          <% if !question.is_a?(QuestionnaireHeader) && num_responses > 0 %>
-              <tr>
-                <th colspan="3" style="background-color:#DDDDBB" width="<%= col_percent %>%" > <%= question.txt %></th>
-                <% if question.instance_of? Checkbox %>
-                    <!-- Show review summary of checkbox question -->
-                    <td colspan="3" style="padding: 0px;" width="100-<%= col_percent %>%">
-                      <%= render :partial => 'checkbox_question_review', :locals => {:question => question, :responses => responses} %> 
-                    </td>
-                  
-                <% else %><!-- Show review summary of a non checkbox question -->
-                   <td colspan="3" style="padding: 0px;" width="100-<%= col_percent %>%"> 
-                      <%= render :partial => 'non_checkbox_question_review', :locals => {:question => question, :responses => responses} %> 
-                   </td>
-                   </tr>
+        <% if !question.is_a?(QuestionnaireHeader) && num_responses > 0 %>
+          <tr>
+            <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <%= question.txt %></th>
+            <!-- Show review summary of checkbox question -->
+            <% if question.instance_of? Checkbox %>
+              
+              <% responses.each do |response_id| %>  
+                <td align="center" width="<%= item_width %>%">
+                  <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
+                  <% if !answer.nil? %>
+                    <%= answer.answer == 0 ? image_tag("delete_icon.png") : image_tag("Check-icon.png") %>
+                  <% end %>
+                </td>
               <% end %>
-          <% else %>
-              <% next %>
-          <% end %>
-      <% end %>
 
+            <!-- Show review summary of a non checkbox question -->  
+            <% else %>
+            
+              <% responses.each do |response_id| %>  
+                <td align="center" width="<%= item_width %>%">
+                  <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
+                  <% if !answer.nil? %>
+                    <p><%= answer.answer %></p>
+                    <p><%= answer.comments.html_safe unless answer.comments.nil? %></p>
+                  <% end %>
+                </td>
+              <% end %>
+              
+            <% end %>
+          </tr>
+        
+        <% else %>
+          <% next %>
+        
+        <% end %>
+      <% end %>  
 
-
+      <!-- Last Row additional Comments -->
       <tr>
-        <th colspan="3" style="background-color:#DDDDBB" width="<%= col_percent %>%" >Additional Comments </th>
-        <td colspan="3" style="padding: 0px;" width="(100-<%= col_percent %>)%">
-          <table width="100%">
-            <tr>
-              <% responses.each do |response_id| %>
-                  <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
-                  <td colspan="2"> <%=sanitize Response.find(response_id).additional_comment %> </td>
-              <% end %>
-            </tr>
-          </table>
-        </td>
-      </tr>
+        <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <b>Additional Comments</b></th>
+        <% responses.each do |response_id| %>  
+          <td width="<%= item_width %>%">
+          <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
+          <%=sanitize Response.find(response_id).additional_comment %>
+          </td>
+        <% end %>
+      </tr>      
+
+
     </table>
 
 <% end #loop for keys %>
-<br/>
+<br>

@@ -564,7 +564,10 @@ class Assignment < ActiveRecord::Base
     submission_type = DeadlineType.find_by(name: 'submission').id
     review_type = DeadlineType.find_by(name: 'review').id
 
-    
+    due_dates = []
+    due_dates += self.find_due_dates('submission')
+    due_dates += self.find_due_dates('review')
+    due_dates.sort_by! {|obj| obj.id}
 
     start_dates = []
     end_dates = []

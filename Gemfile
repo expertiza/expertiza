@@ -90,8 +90,6 @@ group :test do
   gem 'database_cleaner'
   gem "factory_bot_rails"
   gem 'geckodriver-helper', '~> 0.0.3'
-  gem 'capybara'
-  gem 'selenium-webdriver'
   gem 'gherkin'
   gem 'guard-rails'
   gem 'guard-rspec'

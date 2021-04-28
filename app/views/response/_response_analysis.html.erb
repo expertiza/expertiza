@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Convert JSON Data to HTML Table</title>
+    <title>Generate Review Feedback Metrics</title>
     <style>
         th, td, p, input, h3 {
             font:15px 'Segoe UI';
@@ -20,15 +20,12 @@
 		table {
 		    border-color: black;
 		}
-
 		.good {
 		    background-color: #BCED91;
 		}
-
 		.neutral {
 		    background-color: #FFEC8B;
 		}
-
 		.poor {
 		    background-color: #FF8080;
 		}
@@ -54,10 +51,8 @@
 	    .parentCell_metric_table:hover span.tooltip_metric_table {
 	        display:block;
 	    }
-	</style>
-    
+	</style>    
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" />
-
 </head>
 <body>
     <br>
@@ -70,9 +65,10 @@
 </body>
 <script  src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>
-    var final_json;
+
     var response_general = null;        
-       
+
+    //This function makes POST API call to the given url with final_json data   
     function makeRequest(final_json,url) 
     {
         return new Promise(function (resolve, reject) 
@@ -107,10 +103,12 @@
             xhr.send(final_json);
         });
     }
+
+    //The driver code to fetch the review comments, get API call output and display them in tabular format
     async function tableFromJson() 
     {
         var config_file_values =   $('.temp_information').data('temp');
-        
+
         var time_taken_obj = document.getElementById('timeTaken');
         time_taken_obj.innerHTML = "Loading..."
 

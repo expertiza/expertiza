@@ -571,6 +571,7 @@ class Assignment < ActiveRecord::Base
 
     start_dates = []
     end_dates = []
+
     if round.nil?
       round = 1
       while self.due_dates.exists?(round: round)

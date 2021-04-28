@@ -427,18 +427,14 @@ class ResponseController < ApplicationController
     end
   end
 
+  # fetches the review metric configuration from config file review_metrics.yml file
   def fetch_review_metric
     @temp = REVIEW_METRIC_CONFIG['metrics']
-   
     @review_options = []
-    
     for i in 0..@temp.length-1
       @review_options.push(@temp[i]) unless REVIEW_METRIC_CONFIG[@temp[i]] == false
-   end
-
-   return @review_options
-
-
+    end
+    @review_options
   end
 end
 

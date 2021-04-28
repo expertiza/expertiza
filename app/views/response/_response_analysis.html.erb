@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Generate Review Feedback Metrics</title>
-    <style>
+    <style>/*This style tag provides css styling to the table */
         th, td, p, input, h3 {
             font:15px 'Segoe UI';
         }
@@ -16,7 +16,7 @@
             font-weight:bold;
         }
     </style>
-    <style>
+    <style>/*This style tag provides css styling to the table conditional formatting in color() function*/
 		table {
 		    border-color: black;
 		}
@@ -30,7 +30,8 @@
 		    background-color: #FF8080;
 		}
 	</style>
-	<style>
+
+	<style>/*This style tag provides css styling to the table tooltip*/
 	    .parentCell_metric_table {
 	        position: relative;
             padding-left: 15px;
@@ -56,7 +57,7 @@
 </head>
 <body>
     <br>
-    <input type='button' onclick='tableFromJson()' value='Get Review Feedback' />
+    <input type='button' onclick='getReviewFeedback()' value='Get Review Feedback' />
     <br>    
     <br>
     <p id='showData'></p>
@@ -66,7 +67,7 @@
 <script  src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>
 
-    var response_general = null;        
+    var response_general = null; //global variable to store the data from promise returned by async await api call.       
 
     //This function makes POST API call to the given url with final_json data   
     function makeRequest(final_json,url) 
@@ -104,19 +105,13 @@
         });
     }
 
-    //The driver code to fetch the review comments, get API call output and display them in tabular format
-    async function tableFromJson() 
+    //fetches the review form comments one by one - formats them into a single stringified json
+    function fetch_response_comments()
     {
-        var config_file_values =   $('.temp_information').data('temp');
-
-        var time_taken_obj = document.getElementById('timeTaken');
-        time_taken_obj.innerHTML = "Loading..."
-
-        var time_start = performance.now();
-        
         var serialized_form = $("form").serialize();      
         var form_value_to_json = [Object.fromEntries(new URLSearchParams(serialized_form))]
 
+        //for loop counts the number of comments in review form
         var j = 0;
         for(j =0; j <1000; j++)
         {
@@ -124,6 +119,7 @@
             {break;}
         }
 
+        //for loop parses comments from review form and pushes all of them into 'reviews' list
         var id = 0;
         var reviews = [];
         for (var i =2; i < j; i++) {              
@@ -142,6 +138,7 @@
              }
         }
         
+        //fetches the last comment(just above 'additional comments') in review form
         var single_comment_json = {};
         single_comment_json["id"] = id;
         var comment_string =  (document.getElementById("responses_"+0+"_comments").value);
@@ -151,6 +148,7 @@
         id++;
         reviews.push(single_comment_json);
 
+        //fetches the 'additional comment' text present at the end of review form
         single_comment_json = {};
         single_comment_json["id"] = id;
         comment_string = form_value_to_json[0]['review[comments]'];
@@ -160,43 +158,28 @@
         id++;
         reviews.push(single_comment_json);
 
+        //converts the reviews list into a json object, which is later converted into stringified json.
         var processed_comment_json = {};
         processed_comment_json["reviews"] = reviews;
         processed_comment_json_string = JSON.stringify(processed_comment_json);
 
-        //Sentiment API Call
-        if(config_file_values.includes('sentiment'))
-        {
-            await makeRequest(processed_comment_json_string, 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk')
-            var response_sentiment = JSON.parse(response_general);
-            response_general = null;
-        }
+        return processed_comment_json_string
+    }
 
-        //Problem API Call  
-        if(config_file_values.includes('problem'))
-        { 
-            await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/problem')
-            var response_problem = JSON.parse(response_general);
-            response_general = null;
-        }
-
-        //Suggestion API Call
-        if(config_file_values.includes('suggestion'))
-        {
-            await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/suggestions')
-            var response_suggestion = JSON.parse(response_general);
-            response_general = null;
-        }
-
+    //combines output from all API calls into a single list object after processing the api output data    
+    function combine_api_output(config_file_values, response_sentiment = null, response_problem = null, response_suggestion = null)
+    {
         var pos; var neg; var neu;
         
         combined_api_output = [];
         
+        //processes api output comment by comment
         for(var i =0; i< processed_comment_json["reviews"].length; i++)        
         {
             var single_comment_api_output = {};
             single_comment_api_output["Comment_Number"] = i+1;
 
+            //This convert the sentiment api output from sentiment values to positive, negative, neutral string
             if(config_file_values.includes('sentiment'))
             {
                 pos = response_sentiment['sentiments'][i]['pos'];
@@ -220,6 +203,13 @@
             combined_api_output.push(single_comment_api_output);              
         }
 
+        return combined_api_output        
+    }    
+
+    //This function takes in the processed api output to display a table(populated with API output) on UI
+    function generateTable(combined_api_output)
+    {
+        //tooltip_json to store the text displayed in tooltip
         var tooltip_json = {"Comment_Number":'The comment number from the top in the form.', "Sentiment": 'This column shows the tone of the comment.', "Problem_Detected?": 'This shows whether any problem is mentioned in the comment or not.',"Suggestion?": 'This shows whether any problem is mentioned in the comment or not.'}
 
         var col = [];
@@ -260,16 +250,66 @@
         divShowData.innerHTML = "";
         divShowData.appendChild(table);
 
+        //provides conditional formatting to the generated table
+        color();
+    }
+
+    //The driver code to fetch the review comments, get API call output and display them in tabular format
+    async function getReviewFeedback() 
+    {
+        //this variable fetches and stores the review metrics setting stored in config file review_metrics.yml
+        var config_file_values =   $('.fetch_review_metric').data('params');
+
+        //displays text 'Loading...' when 'get review feedback' button is pressed until table is displayed
+        var time_taken_obj = document.getElementById('timeTaken');
+        time_taken_obj.innerHTML = "Loading..."
+
+        //start the timer here - which will be used to calculate total time taken.
+        var time_start = performance.now();
+        
+        var processed_comment_json_string = fetch_response_comments();
+
+        //Sentiment API Call
+        var response_sentiment = null;
+        if(config_file_values.includes('sentiment'))
+        {
+            await makeRequest(processed_comment_json_string, 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk')
+            response_sentiment = JSON.parse(response_general);
+            response_general = null;
+        }
+
+        //Problem API Call 
+        var response_problem = null; 
+        if(config_file_values.includes('problem'))
+        { 
+            await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/problem')
+            response_problem = JSON.parse(response_general);
+            response_general = null;
+        }
+
+        //Suggestion API Call
+        var response_suggestion = null;
+        if(config_file_values.includes('suggestion'))
+        {
+            await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/suggestions')
+            response_suggestion = JSON.parse(response_general);
+            response_general = null;
+        }
+
+        var combined_api_output = combine_api_output(config_file_values, response_sentiment, response_problem, response_suggestion);
+
+        generateTable(combined_api_output);
+
         time_end = performance.now();
         var time_taken = time_end - time_start;
         var time_taken_obj = document.getElementById('timeTaken');
         time_taken_obj.innerHTML = `<p> Time taken is ${(time_taken/1000).toFixed(2)} seconds. </p>`;
         
-        color();
     }
 </script>
 
 <script>
+//This function does the conditional formatting of the output table on UI
 function color(){ $('td').each(
 
 function() {

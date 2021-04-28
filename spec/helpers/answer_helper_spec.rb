@@ -50,8 +50,8 @@ describe AnswerHelper do
     it 'logs info from each response_id to be used in answer deletion' do
       response_ids = AnswerHelper.log_answer_responses([@question.id], @questionnaire2.id)
       AnswerHelper.log_response_info(response_ids)
-      expect(AnswerHelper.log_response_info(response_ids).to eql(true)
-      expect(AnswerHelper.log_response_info(response_ids).to be_a(hash)
+      expect(AnswerHelper.log_response_info(response_ids)).to eql(true)
+      expect(AnswerHelper.log_response_info(response_ids)).to be_a(hash)
     end
   end
 

@@ -32,6 +32,7 @@ describe AnswerHelper do
       it 'deletes the answers' do
         allow(AnswerHelper).to receive(:review_mailer).with(@user.email, @answer.comments, @user.name, @assignment1.name).and_return(true)
         expect(AnswerHelper).to receive(:review_mailer).with(@user.email, @answer.comments, @user.name, @assignment1.name)
+        expect(Answer.exists?(response_id: @answer.response_id)).to eql(true) # verify the answer exists before deleting
         AnswerHelper.delete_existing_responses([@question.id], @questionnaire2.id)
         expect(Answer.exists?(response_id: @answer.response_id)).to eql(false)
       end

@@ -38,6 +38,18 @@ describe AnswerHelper do
     end
   end
 
+  describe '#log_answer_responses' do
+    it 'logs the response_id if in active period for each of the questions answers' do
+
+    end
+  end
+
+  describe '#log_response_info' do
+    it 'logs info from each response_id to be used in answer deletion' do
+
+    end
+  end
+
   describe '#review_mailer' do
     it 'calls method in Mailer to send emails' do
       allow(Mailer).to receive(:notify_review_rubric_change).with(

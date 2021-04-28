@@ -16,17 +16,16 @@
             font-weight:bold;
         }
     </style>
-
     <style>
 		table {
 		    border-color: black;
 		}
 
-		.vGood {
+		.good {
 		    background-color: #BCED91;
 		}
 
-		.avg {
+		.neutral {
 		    background-color: #FFEC8B;
 		}
 
@@ -35,10 +34,12 @@
 		}
 	</style>
 	<style>
-	    .parentCell_metric_table{
+	    .parentCell_metric_table {
 	        position: relative;
+            padding-left: 15px;
+            padding-right: 15px;            
 	    }
-	    .tooltip_metric_table{
+	    .tooltip_metric_table {
 	        display: none;
 	        position: absolute;
 	        z-index: 100;
@@ -50,246 +51,243 @@
 	        top: 20px;
 	        left: 20px;
 	    }
-	    .parentCell_metric_table:hover span.tooltip_metric_table{
+	    .parentCell_metric_table:hover span.tooltip_metric_table {
 	        display:block;
 	    }
 	</style>
-    <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" />
-
     
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" />
 
 </head>
 <body>
-<br>
-	
     <br>
-    <input type='button' onclick='tableFromJson()' 
-    	value='Get Review Feedback' />
+    <input type='button' onclick='tableFromJson()' value='Get Review Feedback' />
     <br>    
     <br>
     <p id='showData'></p>
-<br>
+    <br>
     <div id='timeTaken'></div>   
 </body>
 <script  src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
- <script>
-        var final_json;
-        var response_general = null;        
-       function makeRequest(final_json,url) {
-               return new Promise(function (resolve, reject) {
-                    let xhr = new XMLHttpRequest();
-                    xhr.open('POST', url);
-                    xhr.setRequestHeader('content-type', 'application/json');
-                    xhr.onload = function () {
-                        if (this.status >= 200 && this.status < 300) {
-                            resolve(xhr.response);
-                            response_general = xhr.response;
-                        } else {
-                            reject({
-                                status: this.status,
-                                statusText: xhr.statusText
-                            });
-                        }
-                    };
-                    xhr.onerror = function () {
-                        reject({
-                            status: this.status,
-                            statusText: xhr.statusText
-                        });
-                    };
-                    xhr.send(final_json);
-                });
-            }
-         async function tableFromJson() 
+<script>
+    var final_json;
+    var response_general = null;        
+       
+    function makeRequest(final_json,url) 
+    {
+        return new Promise(function (resolve, reject) 
         {
-
-            var config_file_manage =   $('.temp_information').data('temp') ;
-          
-           
-            var t0 = performance.now();
-            var de = $("form").serialize();      
-            $("#d").text($("form").serialize());
-            var myBooks = [Object.fromEntries(new URLSearchParams(de))]
-            console.log(myBooks[0]);
-            var j = 0;
-            for(j =0; j <1000; j++)
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST', url);
+            xhr.setRequestHeader('content-type', 'application/json');
+            xhr.onload = function () 
             {
-                if (document.getElementById("responses_"+j+"_comments") == null)
-                {break;}
-            }
-            var obj = new Object();           
-            var jsonString = "";
-            var id = 0;
-            var reviews = [];
-           for (var i =2; i < (j); i++) {              
-                if (document.getElementById("responses_"+i+"_comments") == null)
-                     continue;
-                 else
-                 {
-                    var dict = {};
-                    dict["id"] = id;
-                    var tem = (document.getElementById("responses_"+i+"_comments").value);
-                   console.log(tem);
-                   tem =  $("<p>").html(tem).text();
-                   tem = tem.replace("\n"," ");
-                     dict["text"] = tem.replace("\r","");
-                    id++;
-                    reviews.push(dict);
-                 }
-           }
-                        var dict = {};
-                        dict["id"] = id;
-                        var tem =  (document.getElementById("responses_"+0+"_comments").value);
-                        tem =  $("<p>").html(tem).text();
-                        tem = tem.replace("\n"," ");
-                        dict["text"] = tem.replace("\r","");                        
-                        id++;
-                        reviews.push(dict);
-                        dict = {};
-                        dict["id"] = id;
-                        tem = myBooks[0]['review[comments]'];
-                        tem =  $("<p>").html(tem).text();
-                        tem = tem.replace("\n"," ");
-                        dict["text"] = tem.replace("\r","");                       
-                        id++;
-                        reviews.push(dict);
-            console.log(reviews);
-            var final_obj = {};
-            final_obj["reviews"] = reviews;
-            final_json = JSON.stringify(final_obj);
-
-//////////////////// **** Sentiment ********* //////////////////////////////   
-    if(config_file_manage.includes('sentiment'))
-    {
-        console.log("Now printing response_sentiment");
-        var promise_sentiment = await makeRequest(final_json, 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk')
-        var response_sentiment = JSON.parse(response_general);
-        response_general = null;
-        console.log(response_sentiment);
-    }
-//////////////////// **** Problem ********* //////////////////////////////  
-    if(config_file_manage.includes('problem'))
-    { 
-        console.log("Now printing response_problem");
-        var promise_problem = await makeRequest(final_json, 'http://152.7.99.200:5000/problem')
-        var response_problem = JSON.parse(response_general);
-        response_general = null;
-        console.log(response_problem);
-    }
-
-//////////////////// **** Suggestion ********* //////////////////////////////   
-    if(config_file_manage.includes('suggestion'))
-    {
-        console.log("Now printing response_suggestion");
-        var promise_suggestion = await makeRequest(final_json, 'http://152.7.99.200:5000/suggestions')
-        var response_suggestion = JSON.parse(response_general);
-        response_general = null;
-        console.log(response_suggestion);
-    }
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-            var obj;
-            var obj_id = 1;
-            var pos; var neg; var neu;
-            myBooks = [];
-            for(var i =0; i< final_obj["reviews"].length; i++)        
-            {
-
-              var dict_final = {};
-              dict_final["Comment_Number"] = i+1;
-
-                if(config_file_manage.includes('sentiment'))
+                if (this.status >= 200 && this.status < 300) 
                 {
-                    pos = response_sentiment['sentiments'][i]['pos'];
-                    neg = response_sentiment['sentiments'][i]['neg'];
-                    neu = response_sentiment['sentiments'][i]['neu'];
-
-                    if ( pos > neg && pos > neu )
-                        dict_final["Sentiment"] = 'Positive'; 
-                    if ( neu > pos && neu > neg )
-                        dict_final["Sentiment"] = 'Neutral'; 
-                    if ( neg > neu && neg > pos )
-                        dict_final["Sentiment"] = 'Negative';  
-                }  
-              
-               if(config_file_manage.includes('problem'))
-                   { dict_final["Problem_Detected?"] = response_problem['reviews'][i]['problems'] }
-
-                if(config_file_manage.includes('suggestion'))
-                    { dict_final["Suggestion?"] = response_suggestion['reviews'][i]['suggestions'] }
-             
-            myBooks.push(dict_final);              
-            }
-            console.log(myBooks);
-
-////////////////////////////////////////////////////////////////////////////////
+                    resolve(xhr.response);
+                    response_general = xhr.response;
+                } 
+                else 
+                {
+                    reject(
+                    {
+                        status: this.status,
+                        statusText: xhr.statusText
+                    });
+                }
+            };
+            xhr.onerror = function () 
+            {
+                reject(
+                {
+                    status: this.status,
+                    statusText: xhr.statusText
+                });
+            };    
+            xhr.send(final_json);
+        });
+    }
+    async function tableFromJson() 
+    {
+        var config_file_values =   $('.temp_information').data('temp');
         
-          var tooltip_json = {"Comment_Number":'The comment number from the top in the form.', "Sentiment": 'This column shows the tone of the comment.', "Problem_Detected?": 'This shows whether any problem is mentioned in the comment or not.',"Suggestion?": 'This shows whether any problem is mentioned in the comment or not.'}
+        var time_taken_obj = document.getElementById('timeTaken');
+        time_taken_obj.innerHTML = "Loading..."
 
-            var col = [];
-            for (var i = 0; i < myBooks.length; i++) {
-                for (var key in myBooks[i]) {
-                    if (col.indexOf(key) === -1) {
-                        col.push(key);
-                    }
-                }
-            }
+        var time_start = performance.now();
+        
+        var serialized_form = $("form").serialize();      
+        var form_value_to_json = [Object.fromEntries(new URLSearchParams(serialized_form))]
 
-            // Create a table.
-            var table = document.createElement("table");
-
-            // Create table header row using the extracted headers above.
-            var tr = table.insertRow(-1);                   // table row.
-
-            for (var i = 0; i < col.length; i++) {
-                var th = document.createElement("th");      // table header.
-                th.innerHTML = col[i] + ` <span class="tooltip_metric_table">`+tooltip_json[col[i]]+`</span>`;
-                th.classList.add("parentCell_metric_table");
-                tr.appendChild(th);
-            }
-
-            // add json data to the table as rows.
-            for (var i = 0; i < myBooks.length; i++) {
-
-                tr = table.insertRow(-1);
-
-                for (var j = 0; j < col.length; j++) {
-                    var tabCell = tr.insertCell(-1);
-                    tabCell.innerHTML = myBooks[i][col[j]];
-                }
-            }
-
-            // Now, add the newly created table with json data, to a container.
-            var divShowData = document.getElementById('showData');
-            divShowData.innerHTML = "";
-            divShowData.appendChild(table);
-            t1 = performance.now();
-            var time = t1 - t0;
-            var obj5 = document.getElementById('timeTaken');
-            console.log("Printing Time taken ");
-            console.log(obj5);
-            obj5.innerHTML = `<p> Time taken is ${(time/1000).toFixed(2)} seconds. </p>`;
-            color();
+        var j = 0;
+        for(j =0; j <1000; j++)
+        {
+            if (document.getElementById("responses_"+j+"_comments") == null)
+            {break;}
         }
-   
+
+        var id = 0;
+        var reviews = [];
+        for (var i =2; i < j; i++) {              
+            if (document.getElementById("responses_"+i+"_comments") == null)
+                 continue;
+            else
+            {
+                var single_comment_json = {};
+                single_comment_json["id"] = id;
+                var comment_string = (document.getElementById("responses_"+i+"_comments").value);
+                comment_string =  $("<p>").html(comment_string).text();
+                comment_string = comment_string.replace("\n"," ");
+                single_comment_json["text"] = comment_string.replace("\r","");
+                id++;
+                reviews.push(single_comment_json);
+             }
+        }
+        
+        var single_comment_json = {};
+        single_comment_json["id"] = id;
+        var comment_string =  (document.getElementById("responses_"+0+"_comments").value);
+        comment_string =  $("<p>").html(comment_string).text();
+        comment_string = comment_string.replace("\n"," ");
+        single_comment_json["text"] = comment_string.replace("\r","");                        
+        id++;
+        reviews.push(single_comment_json);
+
+        single_comment_json = {};
+        single_comment_json["id"] = id;
+        comment_string = form_value_to_json[0]['review[comments]'];
+        comment_string =  $("<p>").html(comment_string).text();
+        comment_string = comment_string.replace("\n"," ");
+        single_comment_json["text"] = comment_string.replace("\r","");                       
+        id++;
+        reviews.push(single_comment_json);
+
+        var processed_comment_json = {};
+        processed_comment_json["reviews"] = reviews;
+        processed_comment_json_string = JSON.stringify(processed_comment_json);
+
+        //Sentiment API Call
+        if(config_file_values.includes('sentiment'))
+        {
+            await makeRequest(processed_comment_json_string, 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk')
+            var response_sentiment = JSON.parse(response_general);
+            response_general = null;
+        }
+
+        //Problem API Call  
+        if(config_file_values.includes('problem'))
+        { 
+            await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/problem')
+            var response_problem = JSON.parse(response_general);
+            response_general = null;
+        }
+
+        //Suggestion API Call
+        if(config_file_values.includes('suggestion'))
+        {
+            await makeRequest(processed_comment_json_string, 'http://152.7.99.200:5000/suggestions')
+            var response_suggestion = JSON.parse(response_general);
+            response_general = null;
+        }
+
+        var pos; var neg; var neu;
+        
+        combined_api_output = [];
+        
+        for(var i =0; i< processed_comment_json["reviews"].length; i++)        
+        {
+            var single_comment_api_output = {};
+            single_comment_api_output["Comment_Number"] = i+1;
+
+            if(config_file_values.includes('sentiment'))
+            {
+                pos = response_sentiment['sentiments'][i]['pos'];
+                neg = response_sentiment['sentiments'][i]['neg'];
+                neu = response_sentiment['sentiments'][i]['neu'];
+
+                if ( pos > neg && pos > neu )
+                    single_comment_api_output["Sentiment"] = 'Positive'; 
+                if ( neu > pos && neu > neg )
+                    single_comment_api_output["Sentiment"] = 'Neutral'; 
+                if ( neg > neu && neg > pos )
+                    single_comment_api_output["Sentiment"] = 'Negative';  
+            }  
+          
+            if(config_file_values.includes('problem'))
+                { single_comment_api_output["Problem_Detected?"] = response_problem['reviews'][i]['problems'] }
+
+            if(config_file_values.includes('suggestion'))
+                { single_comment_api_output["Suggestion?"] = response_suggestion['reviews'][i]['suggestions'] }
+         
+            combined_api_output.push(single_comment_api_output);              
+        }
+
+        var tooltip_json = {"Comment_Number":'The comment number from the top in the form.', "Sentiment": 'This column shows the tone of the comment.', "Problem_Detected?": 'This shows whether any problem is mentioned in the comment or not.',"Suggestion?": 'This shows whether any problem is mentioned in the comment or not.'}
+
+        var col = [];
+        for (var i = 0; i < combined_api_output.length; i++) {
+            for (var key in combined_api_output[i]) {
+                if (col.indexOf(key) === -1) {
+                    col.push(key);
+                }
+            }
+        }
+
+        // Create a table.
+        var table = document.createElement("table");
+
+        // Create table header row using the extracted headers above.
+        var tr = table.insertRow(-1);                   // table row.
+
+        for (var i = 0; i < col.length; i++) {
+            var th = document.createElement("th");      // table header.
+            th.innerHTML = col[i] + ` <span class="tooltip_metric_table">`+tooltip_json[col[i]]+`</span>`;
+            th.classList.add("parentCell_metric_table");
+            tr.appendChild(th);
+        }
+
+        // add json data to the table as rows.
+        for (var i = 0; i < combined_api_output.length; i++) {
+
+            tr = table.insertRow(-1);
+
+            for (var j = 0; j < col.length; j++) {
+                var tabCell = tr.insertCell(-1);
+                tabCell.innerHTML = combined_api_output[i][col[j]];
+            }
+        }
+
+        // Now, add the newly created table with json data, to a container.
+        var divShowData = document.getElementById('showData');
+        divShowData.innerHTML = "";
+        divShowData.appendChild(table);
+
+        time_end = performance.now();
+        var time_taken = time_end - time_start;
+        var time_taken_obj = document.getElementById('timeTaken');
+        time_taken_obj.innerHTML = `<p> Time taken is ${(time_taken/1000).toFixed(2)} seconds. </p>`;
+        
+        color();
+    }
 </script>
 
 <script>
-function color(){    $('td').each(
+function color(){ $('td').each(
 
 function() {
     var score = $(this).text();
     
     if (score == 'Positive' || score == 'Present') {
-        $(this).addClass('vGood');
+        $(this).addClass('good');
     }
     
     else if (score == 'Neutral') {
-        $(this).addClass('avg');
+        $(this).addClass('neutral');
     }
     else if (score == 'Negative' || score == 'Absent') {
         $(this).addClass('poor');
     }
-    });}
+    });
+}
 </script>
 </html>

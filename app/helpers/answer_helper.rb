@@ -14,7 +14,7 @@ module AnswerHelper
     begin
       user_id_to_answers.each do |response_id, answers| # The dictionary has key [response_id] and info as "answers"
         # Feeds review_mailer (email, answers, name, assignment_name) info. Emails and then deletes answers
-        self.delete_answers(response_id) if self.review_mailer(answers[0], answers[1], answers[2], answers[3])
+        self.delete_answers(response_id) if self.review_mailer(answers[:email], answers[:answers], answers[:name], answers[:assignment_name])
       end
     rescue StandardError
       raise $ERROR_INFO
@@ -23,7 +23,7 @@ module AnswerHelper
 
   # Log the response_id if in active period for each of the question's answers
   def self.log_answer_responses(question_ids, questionnaire_id)
-    response_ids=[]
+    response_ids = Array.new
     question_ids.each do |question|
       Answer.where(question_id: question).each do |answer| #For each of the question's answers, log the response_id if in active period
         response_ids << answer.response_id if self.in_active_period(questionnaire_id, answer)
@@ -34,7 +34,7 @@ module AnswerHelper
 
   # Log info from each response_id to be used in answer deletion
   def self.log_response_info(response_ids)
-    user_id_to_answers={}
+    user_id_to_answers = Hash.new
     response_ids.uniq.each do |response_id| #For each response id in the array, gather map and info about reviewer
       response_map = Response.find(response_id).response_map
       reviewer_id = response_map.reviewer_id
@@ -43,7 +43,7 @@ module AnswerHelper
       user = Participant.find(reviewer_id).user
       answers_per_user = Answer.find_by(response_id: response_id).comments
       #For each response_id, add its info to the dictionary
-      user_id_to_answers[response_id] = [user.email, answers_per_user, user.name, assignment_name] unless user.nil?
+      user_id_to_answers[response_id] = {email: user.email, answers: answers_per_user, name: user.name, assignment_name: assignment_name} unless user.nil?
     end
     return user_id_to_answers
   end
@@ -72,7 +72,6 @@ module AnswerHelper
     response = Response.find(response_id)
     response.is_submitted = false
     response.save! #Unsubmit the response before destroying it
-
     Response.find(response_id).destroy
   end
 

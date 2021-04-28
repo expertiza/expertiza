@@ -560,6 +560,12 @@ class Assignment < ActiveRecord::Base
   def find_review_period(round)
     # If round is nil, it means the same questionnaire is used for every round. Thus, we return all periods.
     # If round is not nil, we return only the period of that round.
+
+    submission_type = DeadlineType.find_by(name: 'submission').id
+    review_type = DeadlineType.find_by(name: 'review').id
+
+    
+
     start_dates = []
     end_dates = []
     if round.nil?

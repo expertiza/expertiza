@@ -23,7 +23,7 @@ module AnswerHelper
 
   # Log the response_id if in active period for each of the question's answers
   def self.log_answer_responses(question_ids, questionnaire_id)
-    response_ids=[]
+    response_ids = Array.new
     question_ids.each do |question|
       Answer.where(question_id: question).each do |answer| #For each of the question's answers, log the response_id if in active period
         response_ids << answer.response_id if self.in_active_period(questionnaire_id, answer)

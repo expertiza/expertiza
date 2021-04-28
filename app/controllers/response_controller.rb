@@ -62,6 +62,7 @@ class ResponseController < ApplicationController
 
   # Prepare the parameters when student clicks "Edit"
   def edit
+    @review_metric_config = fetch_review_metric
     assign_instance_vars
     @prev = Response.where(map_id: @map.id)
     @review_scores = @prev.to_a
@@ -122,6 +123,7 @@ class ResponseController < ApplicationController
   end
 
   def new
+    @review_metric_config = fetch_review_metric
     assign_instance_vars
     set_content(true)
     @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
@@ -423,6 +425,20 @@ class ResponseController < ApplicationController
         @total_score[question.id] = total_score
       end
     end
+  end
+
+  def fetch_review_metric
+    @temp = REVIEW_METRIC_CONFIG['metrics']
+   
+    @review_options = []
+    
+    for i in 0..@temp.length-1
+      @review_options.push(@temp[i]) unless REVIEW_METRIC_CONFIG[@temp[i]] == false
+   end
+
+   return @review_options
+
+
   end
 end
 

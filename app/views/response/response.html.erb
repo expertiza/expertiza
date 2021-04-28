@@ -422,6 +422,10 @@
     
     <div id="save_confirm"></div>
     <%= submit_tag "Save "+@title, :name => "save", :id => "save_review" %>
+
+    <%= content_tag :div, class: "temp_information", data: {temp: @review_metric_config} do %>
+    <% end %>
+
      <%= render partial: 'response/response_analysis', locals: {origin: 'review'}%>
     <!--#E1600 check title for selfreview to show submit button-->
     <% if @title && ((@title.eql? 'Review') || (@title.eql? 'Self Review')) %>

@@ -102,9 +102,10 @@
             }
          async function tableFromJson() 
         {
-            // var config_file_manage = <% REVIEW_METRIC_CONFIG["metrics"] %>;
-            // console.log("-----------printing config file fetch---------");
-            // console.log(config_file_manage);
+
+            var config_file_manage =   $('.temp_information').data('temp') ;
+          
+           
             var t0 = performance.now();
             var de = $("form").serialize();      
             $("#d").text($("form").serialize());
@@ -158,48 +159,64 @@
             final_json = JSON.stringify(final_obj);
 
 //////////////////// **** Sentiment ********* //////////////////////////////   
-            console.log("Now printing response_sentiment");
-            var promise_sentiment = await makeRequest(final_json, 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk')
-          var response_sentiment = JSON.parse(response_general);
-           response_general = null;
-           console.log(response_sentiment);
-
-//////////////////// **** Problem ********* //////////////////////////////   
+    if(config_file_manage.includes('sentiment'))
+    {
+        console.log("Now printing response_sentiment");
+        var promise_sentiment = await makeRequest(final_json, 'https://peerlogic.csc.ncsu.edu/sentiment/analyze_reviews_bulk')
+        var response_sentiment = JSON.parse(response_general);
+        response_general = null;
+        console.log(response_sentiment);
+    }
+//////////////////// **** Problem ********* //////////////////////////////  
+    if(config_file_manage.includes('problem'))
+    { 
         console.log("Now printing response_problem");
         var promise_problem = await makeRequest(final_json, 'http://152.7.99.200:5000/problem')
         var response_problem = JSON.parse(response_general);
         response_general = null;
         console.log(response_problem);
+    }
 
 //////////////////// **** Suggestion ********* //////////////////////////////   
+    if(config_file_manage.includes('suggestion'))
+    {
         console.log("Now printing response_suggestion");
         var promise_suggestion = await makeRequest(final_json, 'http://152.7.99.200:5000/suggestions')
         var response_suggestion = JSON.parse(response_general);
         response_general = null;
         console.log(response_suggestion);
+    }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
             var obj;
             var obj_id = 1;
             var pos; var neg; var neu;
             myBooks = [];
-            for(var i =0; i<response_sentiment['sentiments'].length; i++)        
+            for(var i =0; i< final_obj["reviews"].length; i++)        
             {
+
               var dict_final = {};
               dict_final["Comment_Number"] = i+1;
-              pos = response_sentiment['sentiments'][i]['pos'];
-              neg = response_sentiment['sentiments'][i]['neg'];
-              neu = response_sentiment['sentiments'][i]['neu'];
 
-              if ( pos > neg && pos > neu )
-                dict_final["Sentiment"] = 'Positive'; 
-              if ( neu > pos && neu > neg )
-                dict_final["Sentiment"] = 'Neutral'; 
-              if ( neg > neu && neg > pos )
-                dict_final["Sentiment"] = 'Negative';    
+                if(config_file_manage.includes('sentiment'))
+                {
+                    pos = response_sentiment['sentiments'][i]['pos'];
+                    neg = response_sentiment['sentiments'][i]['neg'];
+                    neu = response_sentiment['sentiments'][i]['neu'];
+
+                    if ( pos > neg && pos > neu )
+                        dict_final["Sentiment"] = 'Positive'; 
+                    if ( neu > pos && neu > neg )
+                        dict_final["Sentiment"] = 'Neutral'; 
+                    if ( neg > neu && neg > pos )
+                        dict_final["Sentiment"] = 'Negative';  
+                }  
               
-            dict_final["Problem_Detected?"] = response_problem['reviews'][i]['problems'] 
-            dict_final["Suggestion?"] = response_suggestion['reviews'][i]['suggestions']
+               if(config_file_manage.includes('problem'))
+                   { dict_final["Problem_Detected?"] = response_problem['reviews'][i]['problems'] }
+
+                if(config_file_manage.includes('suggestion'))
+                    { dict_final["Suggestion?"] = response_suggestion['reviews'][i]['suggestions'] }
              
             myBooks.push(dict_final);              
             }

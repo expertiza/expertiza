@@ -4,10 +4,10 @@
 <% keys.each do |key| %>
     <br>
     <hr>
-    <h4>Course: <%= Assignment.find(@assignment_id).course.name %></h4>
-    <h4> Assignment: <%= Assignment.find(@assignment_id).name %></h4>
+    <h4 align="center"><b> Course    :</b> <%= Assignment.find(@assignment_id).course.name %></h4>
+    <h4 align="center"><b> Assignment:</b> <%= Assignment.find(@assignment_id).name %></h4>
     <% roundtitle = key.to_s %>
-    <h4><%= roundtitle.titlecase %></h4>
+    <h4 align="center"><b><%= roundtitle.titlecase %></b></h4>
 
     <table class="general" border="1">
       <% questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id]) %>
@@ -83,5 +83,6 @@
 
     </table>
 
+<br>
 <% end #loop for keys %>
 <br>

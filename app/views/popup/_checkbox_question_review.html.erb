@@ -1,0 +1,12 @@
+<table width="100%">
+  <tr>
+    <!-- checkbox -->
+    <% responses.each do |response_id| %>
+        <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
+        <% if !answer.nil? %>
+          <td align="center">
+            <p><%= answer.answer == 0 ? image_tag("delete_icon.png") : image_tag("Check-icon.png") %></p></td>
+      <% end %>      
+    <% end %>
+  </tr>
+</table>

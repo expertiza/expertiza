@@ -72,6 +72,7 @@ describe AnswerHelper do
 
   describe '#delete_answers' do
     it 'deletes the answers corresponding to the provided answer ids' do
+      expect(Answer.exists?(response_id: @answer.response_id)).to eql(true)
       AnswerHelper.delete_answers(@answer.response_id)
       expect(Answer.exists?(response_id: @answer.response_id)).to eql(false)
     end

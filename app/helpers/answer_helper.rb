@@ -14,7 +14,7 @@ module AnswerHelper
     begin
       user_id_to_answers.each do |response_id, answers| # The dictionary has key [response_id] and info as "answers"
         # Feeds review_mailer (email, answers, name, assignment_name) info. Emails and then deletes answers
-        self.delete_answers(response_id) if self.review_mailer(answers.email, answers.answers, answers.name, answers.assignment_name)
+        self.delete_answers(response_id) if self.review_mailer(answers[:email], answers[:answers], answers[:name], answers[:assignment_name])
       end
     rescue StandardError
       raise $ERROR_INFO

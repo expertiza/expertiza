@@ -7,7 +7,12 @@
     });
   });
 </script>
-<%= link_to 'Refresh Github data', { controller: 'metrics', action: 'query_assignment_statistics', id: @assignment.id }, target: '_blank' %></td>
+<% if session["github_access_token"].nil? %>
+  <% topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(@teams.first) %>
+  <%= link_to 'Login to Query Github data', { controller: 'metrics', action: 'show', id: participants.first.id }, target: '_blank' %>
+  <% else %>
+<%= link_to 'Refresh Github data', { controller: 'metrics', action: 'query_assignment_statistics', id: @assignment.id }, target: '_blank' %>
+  <% end %>
 <% headers = {} %>
 <% headers["Topic_name"] = "16%" if @assignment.topics? %>
 <% if @assignment.max_team_size > 1 %>

@@ -52,7 +52,7 @@ class MetricsController < ApplicationController
     teams = @assignment.teams
     teams.each do |team|
       topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team)
-      single_submission_initial_query(participants.first.id)
+      single_submission_initial_query(participants.first.id) unless participants.first.nil?
     end
 
   end
@@ -230,8 +230,8 @@ class MetricsController < ApplicationController
       while has_next_page
         query_text = Metric.repo_query(hyperlink_data, @assignment.created_at, end_cursor)
         github_data = query_commit_statistics(query_text)
-        parse_repository_data(github_data)
-        has_next_page = false unless github_data["data"]["repository"]["ref"]["target"]["history"]["pageInfo"]["hasNextPage"] == "true"
+        parse_repository_data(github_data) unless github_data["errors"] || github_data["data"]["repository"].nil? || github_data["data"]["repository"]["ref"].nil?
+        has_next_page = false if github_data.nil? || github_data["data"]["repository"].nil? || github_data["data"]["repository"]["ref"].nil?|| github_data["errors"] || github_data["data"]["repository"]["ref"]["target"]["history"]["pageInfo"]["hasNextPage"] != "true"
       end
 
     end

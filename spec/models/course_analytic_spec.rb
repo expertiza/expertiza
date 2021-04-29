@@ -144,9 +144,9 @@ describe CourseAnalytic do
 		context 'three assignments have been added to the course, and one has a 90, one has a 95, and one has a 100' do
 			it 'returns 100' do
 				dc = DummyClass.new(course, [], [assignment, assignment2, assignment3])
-				allow(assignment).to receive(:average_team_score).and_return(90)
-				allow(assignment2).to receive(:average_team_score).and_return(95)
-				allow(assignment3).to receive(:average_team_score).and_return(100)
+				allow(assignment).to receive(:max_team_score).and_return(90)
+				allow(assignment2).to receive(:max_team_score).and_return(95)
+				allow(assignment3).to receive(:max_team_score).and_return(100)
 				expect(dc.max_assignment_score).to eq(100)
 			end
 		end
@@ -155,15 +155,15 @@ describe CourseAnalytic do
 		context 'when there are no assignments' do
 			it 'returns zero' do
 				dc = DummyClass.new(course, [], [])
-				expect(dc.average_assignment_score).to eq(0)
+				expect(dc.min_assignment_score).to eq(0)
 			end
 		end
 		context 'three assignments have been added to the course, and one has a 90, one has a 95, and one has a 100' do
 			it 'returns 90' do
 				dc = DummyClass.new(course, [], [assignment, assignment2, assignment3])
-				allow(assignment).to receive(:average_team_score).and_return(90)
-				allow(assignment2).to receive(:average_team_score).and_return(95)
-				allow(assignment3).to receive(:average_team_score).and_return(100)
+				allow(assignment).to receive(:min_team_score).and_return(90)
+				allow(assignment2).to receive(:min_team_score).and_return(95)
+				allow(assignment3).to receive(:min_team_score).and_return(100)
 				expect(dc.min_assignment_score).to eq(90)
 			end
 		end

@@ -59,6 +59,9 @@ describe CourseAnalytic do
 		context 'when there are three assignments with each having one team' do
 			it 'returns three' do
 				dc = DummyClass.new(course, [], [assignment, assignment2, assignment3])
+				allow(assignment).to receive(:num_teams).and_return(1)
+				allow(assignment2).to receive(:num_teams).and_return(1)
+				allow(assignment3).to receive(:num_teams).and_return(1)
 				expect(dc.total_num_assignment_teams).to eq(3)
 			end
 		end

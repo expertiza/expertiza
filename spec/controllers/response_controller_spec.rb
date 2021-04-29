@@ -377,7 +377,7 @@ describe ResponseController do
         metrics.push("")
         expect(metrics.length).to be <= 4
         metrics.each do |metric|
-        expect(["sentiment","problem","suggestion",""].include? metric).to eq(true)
+          expect(["sentiment","problem","suggestion",""].include? metric).to eq(true)
         end
       end
     end

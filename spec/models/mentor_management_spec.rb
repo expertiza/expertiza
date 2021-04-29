@@ -1,6 +1,6 @@
 describe MentorManagement do
   describe '#select_mentor' do
-    context 'it returns selected mentor' do
+    it 'returns the mentor with the fewest teams they mentor' do
       allow(zip_mentors_with_team_count).to receive(assignment_id).and_return([user_id])
       expect(user_id).to eq(1)
     end
@@ -25,24 +25,25 @@ describe MentorManagement do
   end
 
   describe '#user_a_mentor?' do
-    context 'it returns false if user is not mentor' do
-      it 'should return true if user is a mentor' do
-        non_mentor = FactoryBot.create(:participant)
-        expect(MentorManagement.user_a_mentor?(non_mentor)).to be false
-        mentor = FactoryBot.create(:participant, duty: Participant::DUTY_MENTOR)
-        user = FactoryBot.build(:teaching_assistant, id: mentor.user_id)
-        expect(MentorManagement.user_a_mentor?(user)).to be true
-      end
+    it 'should return true if user is a mentor' do
+      non_mentor = FactoryBot.create(:participant)
+      expect(MentorManagement.user_a_mentor?(non_mentor)).to be false
+      mentor = FactoryBot.create(:participant, duty: Participant::DUTY_MENTOR)
+      user = FactoryBot.build(:teaching_assistant, id: mentor.user_id)
+      expect(MentorManagement.user_a_mentor?(user)).to be true
     end
   end
 
   describe '#get_mentors_for_assignment' do
-    context 'it returns the mentor for assignment' do
+    it 'returns all mentors for the given assignment' do
       allow(Participant).to receive(find_by).with(assignment_id: 1, duty: 'mentor').and_return(participant)
     end
   end
 
   describe '#zip_mentors_with_team_count' do
+    it 'returns sorted tuples of (mentor ID, # of teams they mentor)' do
 
+    end
   end
+
 end

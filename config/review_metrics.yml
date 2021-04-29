@@ -1,6 +1,6 @@
 development:
   metrics: ["sentiment","problem","suggestion"]
-  sentiment:  false
+  sentiment:  true
   problem:  true
   suggestion: true
 production:

@@ -45,7 +45,7 @@ describe CourseAnalytic do
 		context 'when the course has three assignments in it' do
 			it 'should return three' do
 				dc = DummyClass.new(course, [], [assignment, assignment2, assignment3])
-				expect(dc.count_of_parts).to eq(3)
+				expect(dc.num_assignments).to eq(3)
 			end
 		end
 	end

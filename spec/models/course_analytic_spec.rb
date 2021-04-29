@@ -278,12 +278,46 @@ describe CourseAnalytic do
 			end
 		end
 		context 'three assignments have been added to the course, and one has a 90, one has 95, and one has 100' do
-			it 'should return [1,2,3]' do
+			it 'should return [90,95,100]' do
 				dc = DummyClass.new(course, [], [assignment, assignment2, assignment3])
 				allow(assignment).to receive(:average_team_score).and_return(90)
 				allow(assignment2).to receive(:average_team_score).and_return(95)
 				allow(assignment3).to receive(:average_team_score).and_return(100)
 				expect(dc.assignment_average_scores).to eq([90,95,100])
+			end
+		end
+	end
+	describe '#assignment_max_scores' do
+		context 'there have been no assignments added to a course' do
+			it 'should return zero' do
+				dc = DummyClass.new(course, [], [])
+				expect(dc.assignment_max_scores).to eq([0])
+			end
+		end
+		context 'three assignments have been added to the course, and one has a 90, one has 95, and one has 100' do
+			it 'should return [90,95,100]' do
+				dc = DummyClass.new(course, [], [assignment, assignment2, assignment3])
+				allow(assignment).to receive(:max_team_score).and_return(90)
+				allow(assignment2).to receive(:max_team_score).and_return(95)
+				allow(assignment3).to receive(:max_team_score).and_return(100)
+				expect(dc.assignment_max_scores).to eq([90,95,100])
+			end
+		end
+	end
+	describe '#assignment_min_scores' do
+		context 'there have been no assignments added to a course' do
+			it 'should return zero' do
+				dc = DummyClass.new(course, [], [])
+				expect(dc.assignment_min_scores).to eq([0])
+			end
+		end
+		context 'three assignments have been added to the course, and one has a 90, one has 95, and one has 100' do
+			it 'should return [90,95,100]' do
+				dc = DummyClass.new(course, [], [assignment, assignment2, assignment3])
+				allow(assignment).to receive(:min_team_score).and_return(90)
+				allow(assignment2).to receive(:min_team_score).and_return(95)
+				allow(assignment3).to receive(:min_team_score).and_return(100)
+				expect(dc.assignment_min_scores).to eq([90,95,100])
 			end
 		end
 	end

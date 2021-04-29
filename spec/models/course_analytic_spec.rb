@@ -66,4 +66,12 @@ describe CourseAnalytic do
 			end
 		end
 	end
+	describe '#average_num_assignment_reviews' do
+		context 'there have been no assignments added to a course' do
+			it 'should return zero' do
+				dc = DummyClass.new(course, [], [])
+				expect(dc.average_num_assignment_reviews).to eq(0)
+			end
+		end
+	end
 end

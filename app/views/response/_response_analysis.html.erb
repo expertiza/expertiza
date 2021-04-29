@@ -30,7 +30,6 @@
 		    background-color: #FF8080;
 		}
 	</style>
-
 	<style>/*This style tag provides css styling to the table tooltip*/
 	    .parentCell_metric_table {
 	        position: relative;
@@ -66,7 +65,6 @@
 </body>
 <script  src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script>
-
     var response_general = null; //global variable to store the data from promise returned by async await api call.       
 
     //This function makes POST API call to the given url with final_json data   
@@ -104,7 +102,6 @@
             xhr.send(final_json);
         });
     }
-
     //fetches the review form comments one by one - formats them into a single stringified json
     function fetch_response_comments()
     {
@@ -164,7 +161,6 @@
         var processed_comment_json = {};
         processed_comment_json["reviews"] = reviews;
         processed_comment_json_string = JSON.stringify(processed_comment_json);
-
         return [processed_comment_json_string, number_of_comments]
     }
 
@@ -172,7 +168,6 @@
     function combine_api_output(number_of_comments, config_file_values, response_sentiment = null, response_problem = null, response_suggestion = null)
     {
         var pos; var neg; var neu;
-        
         combined_api_output = [];
         
         //processes api output comment by comment
@@ -195,7 +190,6 @@
                 if ( neg > neu && neg > pos )
                     single_comment_api_output["Sentiment"] = 'Negative';  
             }  
-          
             if(config_file_values.includes('problem'))
                 { single_comment_api_output["Problem_Detected?"] = response_problem['reviews'][i]['problems'] }
 
@@ -204,7 +198,6 @@
          
             combined_api_output.push(single_comment_api_output);              
         }
-
         return combined_api_output        
     }    
 
@@ -223,10 +216,8 @@
             }
         }
 
-        // Create a table.
+        // Create a table header row using the extracted headers above.
         var table = document.createElement("table");
-
-        // Create table header row using the extracted headers above.
         var tr = table.insertRow(-1);                   // table row.
 
         for (var i = 0; i < col.length; i++) {
@@ -246,7 +237,6 @@
                 tabCell.innerHTML = combined_api_output[i][col[j]];
             }
         }
-
         // Now, add the newly created table with json data, to a container.
         var divShowData = document.getElementById('showData');
         divShowData.innerHTML = "";
@@ -268,9 +258,7 @@
 
         //start the timer here - which will be used to calculate total time taken.
         var time_start = performance.now();        
-      
         var processed_comment_json_string = fetch_response_comments();
-
         var number_of_comments = processed_comment_json_string[1];
         processed_comment_json_string = processed_comment_json_string[0];
 
@@ -302,7 +290,6 @@
         }
 
         var combined_api_output = combine_api_output(number_of_comments, config_file_values, response_sentiment, response_problem, response_suggestion);
-
         generateTable(combined_api_output);
 
         time_end = performance.now();
@@ -312,18 +299,14 @@
         
     }
 </script>
-
 <script>
 //This function does the conditional formatting of the output table on UI
 function color(){ $('td').each(
-
 function() {
     var score = $(this).text();
-    
     if (score == 'Positive' || score == 'Present') {
         $(this).addClass('good');
-    }
-    
+    } 
     else if (score == 'Neutral') {
         $(this).addClass('neutral');
     }

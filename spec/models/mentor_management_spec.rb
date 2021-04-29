@@ -43,7 +43,7 @@ describe MentorManagement do
   describe '#zip_mentors_with_team_count' do
     it 'returns an empty map' do
       assignment = FactoryBot.build(:assignment)
-      expect(MentorManagement.zip_mentors_with_team_count(assignment.id)).to eq(Hash.new)
+      expect(MentorManagement.zip_mentors_with_team_count(assignment.id)).to eq([])
     end
 
     it 'returns sorted tuples of (mentor ID, # of teams they mentor)' do

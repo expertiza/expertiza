@@ -64,7 +64,11 @@ describe MetricsController do
     end
   end
 
-  describe '#retrieve_repository_data' do
+  # This test is XDESCRIBED because Github will invalidate and ban any secret token that gets pushed in a commit.
+  # To run this test, using your own valid token, update the github access token on line 75 below with a valid token,
+  # and run the test locally. Do not push with a valid token unless you are happy with the token being banned, and needing
+  # to obtain a new token from the Github omniauth API.
+  xdescribe '#retrieve_repository_data' do
     before(:each) do
       assignment_mock = double
       allow(assignment_mock).to receive(:created_at).and_return(DateTime.new(2021,1,1,0,0,0))

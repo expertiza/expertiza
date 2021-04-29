@@ -184,7 +184,7 @@ class QuestionnairesController < ApplicationController
   # Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions
     questionnaire_id = params[:id] unless params[:id].nil?
-    question_ids = Questionnaire.find(questionnaire_id).questions.ids
+    question_ids = Questionnaire.find(questionnaire_id).questions_ids
     if AnswerHelper.in_active_period(questionnaire_id)
       # Fetch the Answers for the Questionnaire, delete and send them to User
         AnswerHelper.delete_existing_responses(question_ids, questionnaire_id)

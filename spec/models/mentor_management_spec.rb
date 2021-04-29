@@ -26,13 +26,13 @@ describe MentorManagement do
 
   describe '#user_a_mentor?' do
     context 'it returns false if user is not mentor' do
-      expect('Student').to eq(false)
-    end
-  end
-
-  describe '#get_all_mentors' do
-    it 'returns participant with duty of mentor' do
-      expect(Participant::DUTY_MENTOR).to eq('mentor')
+      it 'should return true if user is a mentor' do
+        non_mentor = FactoryBot.create(:participant)
+        expect(MentorManagement.user_a_mentor?(non_mentor)).to be false
+        mentor = FactoryBot.create(:participant, duty: Participant::DUTY_MENTOR)
+        user = FactoryBot.build(:teaching_assistant, id: mentor.user_id)
+        expect(MentorManagement.user_a_mentor?(user)).to be true
+      end
     end
   end
 

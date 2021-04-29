@@ -24,7 +24,7 @@ describe CourseAnalytic do
 	describe '#num_participants' do
 		context 'when the course has no students in it' do
 			it 'should return zero' do
-				dc = DummyClass.new(course, [], []])
+				dc = DummyClass.new(course, [], [])
 				expect(dc.num_participants).to eq(0)
 			end
 		end

@@ -1,5 +1,7 @@
 class Metric < ActiveRecord::Base
 
+  # Generate the graphQL query text for a PULL REQUEST link, based on the link data and "after", which is a pointer
+  # provided by the Github API to where the last query left off. Used to handle pulls containing more than 100 commits.
   def self.pull_query(hyperlink_data, after)
     {
       query: "query {
@@ -22,6 +24,8 @@ class Metric < ActiveRecord::Base
     }
   end
 
+  # Generate the graphQL query text for a REPOSITORY link, based on the link data and "after", which is a pointer
+  # provided by the Github API to where the last query left off. Used to handle repositories containing more than 100 commits.
   def self.repo_query(hyperlink_data, date, after=nil)
     date = date.to_time.iso8601.to_s[0..18] # Format assignment start date for github api
     { query: "query {
@@ -50,18 +54,5 @@ class Metric < ActiveRecord::Base
       }"
     }
   end
-
-  # Return true if the author is on the "blacklist" of expertiza development team members
-  def self.blacklist_author(author_name)
-    expertiza_devs_list =
-      ["Saurabh Shingte",
-       "Expertiza Developer",
-       "Saurabh Vinod Shingte",
-       "Winbobob"
-      ]
-    expertiza_devs_list.member?(author_name)
-  end
-
-  private
 
 end

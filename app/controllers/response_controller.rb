@@ -298,6 +298,16 @@ class ResponseController < ApplicationController
     redirect_to action: 'redirect', id: @map.map_id, return: params[:return], msg: params[:msg], error_msg: params[:error_msg]
   end
 
+  # fetches the review metric configuration from config file review_metrics.yml file
+  def fetch_review_metric
+    @temp = REVIEW_METRIC_CONFIG['metrics']
+    @review_options = []
+    for i in 0..@temp.length-1
+      @review_options.push(@temp[i]) unless REVIEW_METRIC_CONFIG[@temp[i]] == false
+    end
+    @review_options
+  end  
+
   private
   
   # Added for E1973, team-based reviewing:
@@ -425,16 +435,6 @@ class ResponseController < ApplicationController
         @total_score[question.id] = total_score
       end
     end
-  end
-
-  # fetches the review metric configuration from config file review_metrics.yml file
-  def fetch_review_metric
-    @temp = REVIEW_METRIC_CONFIG['metrics']
-    @review_options = []
-    for i in 0..@temp.length-1
-      @review_options.push(@temp[i]) unless REVIEW_METRIC_CONFIG[@temp[i]] == false
-    end
-    @review_options
   end
 end
 

@@ -15,11 +15,8 @@ module CourseAnalytic
   end
 
   def average_num_assignment_teams
-    if num_assignments == 0
-      0
-    else
-      total_num_assignment_teams.to_f / num_assignments
-    end
+    return total_num_assignment_teams.to_f / num_assignments unless num_assignments == 0
+    0
   end
 
   def max_num_assignment_teams

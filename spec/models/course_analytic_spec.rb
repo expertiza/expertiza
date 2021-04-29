@@ -66,6 +66,23 @@ describe CourseAnalytic do
 			end
 		end
 	end
+	describe '#average_num_assignment_teams' do
+		context 'when there are no assignments' do
+			it 'returns zero' do
+				dc = DummyClass.new(course, [], [])
+				expect(dc.average_num_assignment_teams).to eq(0)
+			end
+		end
+		context 'three assignments have been added to the course, and one has one team, one has two, and one has three' do
+			it 'returns two' do
+				dc = DummyClass.new(course, [], [assignment, assignment2, assignment3])
+				allow(assignment).to receive(:num_teams).and_return(1)
+				allow(assignment2).to receive(:num_teams).and_return(2)
+				allow(assignment3).to receive(:num_teams).and_return(3)
+				expect(dc.total_num_assignment_teams).to eq(3)
+			end
+		end
+	end
 	describe '#average_num_assignment_reviews' do
 		context 'there have been no assignments added to a course' do
 			it 'should return zero' do

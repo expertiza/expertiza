@@ -11,7 +11,8 @@ describe QuestionsController do
       it 'deletes the question' do
         params = {id: 1}
         post :destroy,params
-        expect(flash[:success]).to eq("You have successfully deleted the question!")
+        expect(flash[:success]).to eq("All existing reviews done in review period have been deleted. You have successfully deleted the question!")
+        expect(flash[:error]).to eq nil
       end
 
       it 'AnswerHelper.in_active_period should be called to check if this change is in the period.' do
@@ -22,7 +23,7 @@ describe QuestionsController do
 
       it 'AnswerHelper.delete_existing_responses should be called to check if this change is in the period.' do
         params = {id: 1}
-        allow(AnswerHelper).to receive(:in_active_period).with(1).and_return('true')
+        allow(AnswerHelper).to receive(:in_active_period).with(1).and_return(true)
         expect(AnswerHelper).to receive(:delete_existing_responses).with([1], 1)
         post :destroy, params
       end

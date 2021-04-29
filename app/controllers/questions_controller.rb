@@ -84,7 +84,11 @@ class QuestionsController < ApplicationController
 
     begin
       question.destroy
-      flash[:success] += "You have successfully deleted the question!"
+      if defined?(flash[:success])
+        flash[:success] = "All existing reviews done in review period have been deleted. You have successfully deleted the question!"
+      else
+        flash[:success] = "You have successfully deleted the question!"
+      end
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end

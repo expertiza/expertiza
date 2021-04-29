@@ -1,8 +1,14 @@
 describe MentorManagement do
   describe '#select_mentor' do
     it 'returns the mentor with the fewest teams they mentor' do
-      allow(zip_mentors_with_team_count).to receive(assignment_id).and_return([user_id])
-      expect(user_id).to eq(1)
+      assignment = FactoryBot.build(:assignment)
+      mentor = FactoryBot.build(:participant, duty: Participant::DUTY_MENTOR, user_id: 1)
+      allow(MentorManagement).to receive(:zip_mentors_with_team_count)
+              .with(assignment.id)
+              .and_return([mentor.id, 0])
+      allow(User).to receive(:where).with(id: mentor.id).and_return([mentor])
+      mentor_user = MentorManagement.select_mentor assignment.id
+      expect(mentor_user).to eq(mentor)
     end
   end
 

@@ -49,7 +49,7 @@ describe AnswerHelper do
 
   describe '#log_response_info' do
     it 'logs info from each response_id to be used in answer deletion' do
-      AnswerHelper.log_response_info(@answer.response_id)
+      AnswerHelper.log_response_info([@answer.response_id])
       expect(AnswerHelper.log_response_info(response_ids)).to eql({1=>["expertiza@mailinator.com", "comment", "name", "name1"]})
     end
   end

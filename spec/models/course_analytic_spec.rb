@@ -56,5 +56,11 @@ describe CourseAnalytic do
 				expect(dc.total_num_assignment_teams).to eq(0)
 			end
 		end
+		context 'when there are three assignments with each having one team' do
+			it 'returns three' do
+				dc = DummyClass.new(course, [], [assignment, assignment2, assignment3])
+				expect(dc.total_num_assignment_teams).to eq(3)
+			end
+		end
 	end
 end

@@ -70,7 +70,7 @@ class QuestionsController < ApplicationController
   def destroy
     question = Question.find(params[:id])
     questionnaire_id = question.questionnaire_id
-    question_ids = Questionnaire.find(questionnaire_id).questions_ids
+    question_ids = Questionnaire.find(questionnaire_id).question_ids
     flash[:success] = ""
     if AnswerHelper.in_active_period(questionnaire_id)
       # Fetch the Answers for the Questionnaire, delete and send them to User

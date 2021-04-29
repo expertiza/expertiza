@@ -65,7 +65,9 @@ module CourseAnalytic
   end
 
   def average_num_assignment_reviews
-    total_num_assignment_reviews.to_f / num_assignments
+    
+    return total_num_assignment_reviews.to_f / num_assignments unless num_assignments == 0
+    0
   end
 
   def max_num_assignment_reviews

@@ -1,4 +1,4 @@
-class QuestionAnalyticTestQuestionAnalyticTestDummyClass 
+class QuestionAnalyticTestDummyClass 
 	attr_accessor :txt
 	require 'analytic/question_analytic'
 	include QuestionAnalytic

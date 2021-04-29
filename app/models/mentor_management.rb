@@ -85,16 +85,14 @@ class MentorManagement
                            body: message).deliver_now
   end
 
+  # Returns true if [user] is a mentor, and false if not.
+  #
+  # [user] must be a User object.
+  #
+  # Checks the Participant relation to see if a row exists with
+  # user_id == user.id that also has 'mentor' in the duty attribute.
   def self.user_a_mentor?(user)
     Participant.exists?(user_id: user.id, duty: Participant::DUTY_MENTOR)
-  end
-
-  # Select all the participants who's duty in the participant
-  # table is [DUTY_MENTOR].
-  #
-  # @see participant.rb for the value of DUTY_MENTOR
-  def self.get_all_mentors
-    Participant.where(duty: Participant::DUTY_MENTOR)
   end
 
   # Select all the participants who's duty in the participant

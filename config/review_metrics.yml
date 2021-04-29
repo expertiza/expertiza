@@ -12,4 +12,5 @@ test:
   metrics: ["sentiment","problem","suggestion"]
   sentiment:  true
   problem:  true
-  suggestion: true  
+  suggestion: true
+   

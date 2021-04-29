@@ -79,7 +79,7 @@ describe CourseAnalytic do
 				allow(assignment).to receive(:num_teams).and_return(1)
 				allow(assignment2).to receive(:num_teams).and_return(2)
 				allow(assignment3).to receive(:num_teams).and_return(3)
-				expect(dc.total_num_assignment_teams).to eq(3)
+				expect(dc.average_num_assignment_teams).to eq(3)
 			end
 		end
 	end

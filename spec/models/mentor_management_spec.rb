@@ -13,7 +13,9 @@ describe MentorManagement do
   end
 
   describe '#update_mentor_state' do
+    it 'assigns a mentor to a team when the team size passes 50% max capacity' do
 
+    end
   end
 
   describe '#user_a_mentor?' do
@@ -43,5 +45,4 @@ describe MentorManagement do
 
     end
   end
-
 end

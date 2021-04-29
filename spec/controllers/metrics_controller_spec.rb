@@ -158,53 +158,25 @@ describe MetricsController do
         expect(response.status).to eq(302) #redirected
       end
     end
-
-    xcontext 'when user has logged in to GitHub' do
-      before(:each) do
-=begin
-        session["github_access_token"] = "47a9e77a0b7067aa22d5aac868dc69a73482ff0b"
-        allow(controller).to receive(:query_pull_request_status)
-        allow(controller).to receive(:retrieve_github_data)
-        allow(controller).to receive(:query_all_merge_statuses)
-=end
-        assignment_mock = double
-        allow(assignment_mock).to receive(:created_at).and_return(DateTime.new(2021,1,1,0,0,0))
-        controller.instance_variable_set(:@assignment, assignment_mock)
-        session["github_access_token"]="47a9e77a0b7067aa22d5aac868dc69a73482ff0b"
-      end
-
-      it 'stores the GitHub access token for later use' do
-        params = {id: 900}
-        get :show, params
-        expect(controller.instance_variable_get(:@token)).to eq("47a9e77a0b7067aa22d5aac868dc69a73482ff0b")
-      end
-
-      it 'calls retrieve_github_data to retrieve data from GitHub' do
-        get :show, params
-        expect(controller).to receive(:retrieve_github_data)
-      end
-
-      it 'calls retrieve_check_run_statuses to retrieve check runs data' do
-        get :show, id: '1'
-        expect(controller).to receive(:query_all_merge_statuses)
-      end
-    end
   end
-
 
     ###### Are we not testing an outgoing command message here to the METRICS model? Do we need to do that here or elsewhere?
     # X-describing for now
-    xdescribe '#get_github_repository_details' do
-           before(:each) do
+    describe '#get_github_repository_details' do
+      before(:each) do
+        assignment_mock = double
+        allow(assignment_mock).to receive(:created_at).and_return(DateTime.new(2021,1,1,0,0,0))
+        allow(controller).to receive(:parse_repository_data)
+        controller.instance_variable_set(:@assignment, assignment_mock)
         allow(controller).to receive(:query_commit_statistics).and_return("github": "github")
-    end
+      end
 
     it 'gets  make_github_graphql_request with query for repository' do
       hyperlink_data = {
         "owner_name" => "Shantanu",
         "repository_name" => "expertiza"
       }
-      @assignment = create(:assignment, :created_at => DateTime.yesterday)
+
       expect(controller).to receive(:query_commit_statistics).with(
         query:       "query {
         repository(owner: \"" + hyperlink_data["owner_name"] + "\", name: \"" + hyperlink_data["repository_name"] + "\") {
@@ -212,7 +184,7 @@ describe MetricsController do
             target {
               ... on Commit {
                 id
-                  history(first: 100) {
+                  history( since:\"2020-12-31T19:00:00\") {
                     edges {
                       node {
                         id author {
@@ -220,16 +192,20 @@ describe MetricsController do
                         }
                       }
                     }
+                  pageInfo {
+                    endCursor
+                    hasNextPage
                   }
                 }
               }
             }
           }
-        }"
+        }
+      }"
       )
 
       details = controller.retrieve_repository_data(["https://github.com/Shantanu/expertiza/"])
-      expect(details).to eq("github": "github")
+      expect(details).to eq(["https://github.com/Shantanu/expertiza/"])
     end
   end
 
@@ -392,40 +368,7 @@ describe MetricsController do
     end
   end
 
-    #Should be moved to the METRICS MODEL
-    xdescribe 'get_query' do
-    before(:each) do
-      session["github_access_token"] = "qwerty"
-      controller.instance_variable_set(:@end_cursor, "")
-    end
-    it 'constructs the graphql query' do
-      query = {
-        query:   "query {
-        repository(owner: \"expertiza\", name:\"expertiza\") {
-          pullRequest(number: 1228) {
-            number additions deletions changedFiles mergeable merged headRefOid
-              commits(first:100 ){
-                totalCount
-                  pageInfo{
-                    hasNextPage startCursor endCursor
-                    }
-                      edges{
-                        node{
-                          id  commit{
-                                author{
-                                  name
-                                }
-                               additions deletions changedFiles committedDate
-                        }}}}}}}"
-      }
-      hyperlink_data = {}
-      hyperlink_data["owner_name"] = "expertiza"
-      hyperlink_data["repository_name"] = "expertiza"
-      hyperlink_data["pull_request_number"] = "1228"
-      response = controller.pull_request_data(hyperlink_data)
-      expect(response).to eq(query)
-    end
-  end
+
 
   describe '#team_statistics' do
     before(:each) do

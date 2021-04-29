@@ -16,20 +16,6 @@ describe MentorManagement do
 
   end
 
-  describe '#notify_team_of_mentor_assignment' do
-    it 'should send email to required email address with proper content ' do
-      # Send the email, then test that it got queued
-      email = Mailer.delayed_message(bcc: 'bwanza@ncsu.edu',
-                             subject: '[Expertiza]: New Mentor Assignment',
-                             body: 'test message').deliver_now
-
-      expect(email.from[0]).to eq('expertiza.development@gmail.com')
-      expect(email.to[0]).to eq('expertiza.development@gmail.com')
-      expect(email.body).to eq('test message')
-      expect(email.subject).to eq('[Expertiza]: New Mentor Assignment')
-    end
-  end
-
   describe '#user_a_mentor?' do
     it 'should return true if user is a mentor' do
       non_mentor = FactoryBot.create(:participant)

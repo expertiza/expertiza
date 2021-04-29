@@ -59,7 +59,7 @@ describe MentorManagement do
         random_id
       }
       team_ids.each { |team_id| FactoryBot.create(:team_user, team_id: team_id, user_id: user.id) }
-      expect(MentorManagement.zip_mentors_with_team_count(assignment.id)).to eq([mentor.user_id, team_count])
+      expect(MentorManagement.zip_mentors_with_team_count(assignment.id)).to eq([[mentor.user_id, team_count]])
     end
   end
 end

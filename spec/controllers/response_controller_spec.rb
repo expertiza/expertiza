@@ -368,5 +368,18 @@ describe ResponseController do
         expect(fetch_review_metric).not_to be_nil
       end
     end
-  end  
+  end
+
+  describe '#fetch_review_metric' do
+    context 'fetches the review metrics from review_metric.yml file' do
+      it 'returns a list of configuration' do
+        metrics = fetch_review_metric
+        metrics.push("")
+        expect(metrics.length) to be <= 4
+        metrics.each do |metric|
+        expect(["sentiment","problem","suggestion",""].include? metric).to eq(true)
+        end
+      end
+    end
+  end    
 end

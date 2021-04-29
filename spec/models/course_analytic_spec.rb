@@ -1,10 +1,12 @@
 class DummyClass 
 	attr_accessor :course
+	attr_accessor :participants
 	require 'analytic/course_analytic'
 	include CourseAnalytic
 	
-	def initialize(course)
+	def initialize(course, participants)
 		@course = course
+		@participants = participants
 	end
  	
  	def count_of_parts
@@ -21,15 +23,13 @@ describe CourseAnalytic do
 	describe '#num_participants' do
 		context 'when the course has no students in it' do
 			it 'should return zero' do
-				dc = DummyClass.new(course)
-				allow(course).to receive(:participants).and_return([])
+				dc = DummyClass.new(course, [])
 				expect(dc.count_of_parts).to eq(0)
 			end
 		end
 		context 'when the course has three students in it' do
 			it 'should return three' do
-				dc = DummyClass.new(course)
-				allow(course).to receive(:participants).and_return([participant, participant2, participant3])
+				dc = DummyClass.new(course, [participant, participant2, participant3])
 				expect(dc.count_of_parts).to eq(3)
 			end
 		end

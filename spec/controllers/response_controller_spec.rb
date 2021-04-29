@@ -362,4 +362,11 @@ describe ResponseController do
     end
   end
 
+  describe '#fetch_review_metric' do
+    context 'fetches the review metrics from review_metric.yml file' do
+      it 'returns a list of configuration' do
+        expect(fetch_review_metric).not_to be_nil
+      end
+    end
+  end  
 end

@@ -29,11 +29,8 @@ module CourseAnalytic
 
   #===== assignment score =====#
   def average_assignment_score
-    if num_assignments == 0
-      0
-    else
-      assignment_average_scores.inject(:+).to_f / num_assignments
-    end
+    return assignment_average_scores.inject(:+).to_f / num_assignments unless num_assignments == 0
+    0
   end
 
   def max_assignment_score

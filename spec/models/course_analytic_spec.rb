@@ -117,6 +117,57 @@ describe CourseAnalytic do
 			end
 		end
 	end
+	describe '#average_assignment_score' do
+		context 'when there are no assignments' do
+			it 'returns zero' do
+				dc = DummyClass.new(course, [], [])
+				expect(dc.average_assignment_score).to eq(0)
+			end
+		end
+		context 'three assignments have been added to the course, and one has a 90, one has a 95, and one has a 100' do
+			it 'returns 95' do
+				dc = DummyClass.new(course, [], [assignment, assignment2, assignment3])
+				allow(assignment).to receive(:average_team_score).and_return(90)
+				allow(assignment2).to receive(:average_team_score).and_return(95)
+				allow(assignment3).to receive(:average_team_score).and_return(100)
+				expect(dc.average_assignment_score).to eq(95)
+			end
+		end
+	end
+	describe '#max_assignment_score' do
+		context 'when there are no assignments' do
+			it 'returns zero' do
+				dc = DummyClass.new(course, [], [])
+				expect(dc.max_assignment_score).to eq(0)
+			end
+		end
+		context 'three assignments have been added to the course, and one has a 90, one has a 95, and one has a 100' do
+			it 'returns 100' do
+				dc = DummyClass.new(course, [], [assignment, assignment2, assignment3])
+				allow(assignment).to receive(:average_team_score).and_return(90)
+				allow(assignment2).to receive(:average_team_score).and_return(95)
+				allow(assignment3).to receive(:average_team_score).and_return(100)
+				expect(dc.max_assignment_score).to eq(100)
+			end
+		end
+	end
+	describe '#min_assignment_score' do
+		context 'when there are no assignments' do
+			it 'returns zero' do
+				dc = DummyClass.new(course, [], [])
+				expect(dc.average_assignment_score).to eq(0)
+			end
+		end
+		context 'three assignments have been added to the course, and one has a 90, one has a 95, and one has a 100' do
+			it 'returns 90' do
+				dc = DummyClass.new(course, [], [assignment, assignment2, assignment3])
+				allow(assignment).to receive(:average_team_score).and_return(90)
+				allow(assignment2).to receive(:average_team_score).and_return(95)
+				allow(assignment3).to receive(:average_team_score).and_return(100)
+				expect(dc.min_assignment_score).to eq(90)
+			end
+		end
+	end
 	describe '#average_num_assignment_reviews' do
 		context 'there have been no assignments added to a course' do
 			it 'should return zero' do

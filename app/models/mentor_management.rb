@@ -110,7 +110,7 @@ class MentorManagement
   def self.zip_mentors_with_team_count(assignment_id)
     mentor_ids = self.get_mentors_for_assignment(assignment_id).pluck(:user_id)
 
-    return {} if mentor_ids.empty?
+    return [] if mentor_ids.empty?
 
     team_counts = {}
     mentor_ids.each { |id| team_counts[id] = 0 }

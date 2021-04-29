@@ -174,7 +174,7 @@
         for(var i =0; i< number_of_comments; i++)        
         {
             var single_comment_api_output = {};
-            single_comment_api_output["Comment_Number"] = i+1;
+            single_comment_api_output["Comment Number"] = i+1;
 
             //This convert the sentiment api output from sentiment values to positive, negative, neutral string
             if(config_file_values.includes('sentiment'))
@@ -191,7 +191,7 @@
                     single_comment_api_output["Sentiment"] = 'Negative';  
             }  
             if(config_file_values.includes('problem'))
-                { single_comment_api_output["Problem_Detected?"] = response_problem['reviews'][i]['problems'] }
+                { single_comment_api_output["Problem Detected?"] = response_problem['reviews'][i]['problems'] }
 
             if(config_file_values.includes('suggestion'))
                 { single_comment_api_output["Suggestion?"] = response_suggestion['reviews'][i]['suggestions'] }
@@ -205,7 +205,7 @@
     function generateTable(combined_api_output)
     {
         //tooltip_json to store the text displayed in tooltip
-        var tooltip_json = {"Comment_Number":'The comment number from the top in the form.', "Sentiment": 'This column shows the tone of the comment.', "Problem_Detected?": 'This shows whether any problem is mentioned in the comment or not.',"Suggestion?": 'This shows whether any problem is mentioned in the comment or not.'}
+        var tooltip_json = {"Comment Number":'The comment number from the top in the form.', "Sentiment": 'This column shows the tone of the comment.', "Problem Detected?": 'This shows whether any problem is mentioned in the comment or not.',"Suggestion?": 'This shows whether any problem is mentioned in the comment or not.'}
 
         var col = [];
         for (var i = 0; i < combined_api_output.length; i++) {
@@ -222,7 +222,7 @@
 
         for (var i = 0; i < col.length; i++) {
             var th = document.createElement("th");      // table header.
-            th.innerHTML = col[i] + ` <span class="tooltip_metric_table">`+tooltip_json[col[i]]+`</span>`;
+            th.innerHTML = col[i] + `<img src="/assets/info.png" title='`+tooltip_json[col[i]]+`'>`;
             th.classList.add("parentCell_metric_table");
             tr.appendChild(th);
         }

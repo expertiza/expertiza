@@ -49,4 +49,12 @@ describe CourseAnalytic do
 			end
 		end
 	end
+	describe '#total_num_assignment_teams' do
+		context 'when there are no assignments' do
+			it 'returns zero' do
+				dc = DummyClass.new(course, [], [])
+				expect(dc.total_num_assignment_teams).to eq(0)
+			end
+		end
+	end
 end

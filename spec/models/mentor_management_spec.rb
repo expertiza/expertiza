@@ -28,7 +28,13 @@ describe MentorManagement do
 
   describe '#get_mentors_for_assignment' do
     it 'returns all mentors for the given assignment' do
-      allow(Participant).to receive(find_by).with(assignment_id: 1, duty: 'mentor').and_return(participant)
+      mentor = FactoryBot.build(:participant, id: 998, user_id: 999, duty: Participant::DUTY_MENTOR)
+      assignment = FactoryBot.build(:assignment)
+      allow(Participant).to receive(:where)
+                              .with(parent_id: assignment.id, duty: Participant::DUTY_MENTOR)
+                              .and_return([mentor])
+      mentor_user = MentorManagement.get_mentors_for_assignment(assignment.id).first
+      expect(mentor_user).to eq(mentor)
     end
   end
 

@@ -184,7 +184,7 @@ describe MetricsController do
             target {
               ... on Commit {
                 id
-                  history( since:\"2020-12-31T19:00:00\") {
+                  history( since:\"2021-01-01T00:00:00\") {
                     edges {
                       node {
                         id author {

@@ -69,10 +69,10 @@ class MetricsController < ApplicationController
 
   def single_submission_initial_query(id)
     if session["github_access_token"].nil? # check if there is a github_access_token in current session
-      session["participant_id"] = params[:id] # team number
+      session["participant_id"] = id # team number
       session["github_view_type"] = "view_submissions"
-      #redirect_to authorize_github_grades_path # if no github_access_token present, redirect to authorization page
-      redirect_to :controller => 'metrics', :action => 'authorize_github'
+      redirect_to authorize_github # if no github_access_token present, redirect to authorization page
+      # redirect_to :controller => 'metrics', :action => 'authorize_github'
       return
     end
 

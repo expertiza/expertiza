@@ -78,7 +78,7 @@ module CourseAnalytic
 
   def assignment_team_counts
     list = []
-    self.assignments.each do |assignment| unless self.assignments.empty?
+    self.assignments.each do |assignment| 
       list << assignment.num_teams
     end
     if list.empty?

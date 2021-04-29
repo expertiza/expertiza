@@ -394,8 +394,7 @@ describe QuestionnairesController do
   describe '#add_new_questions' do
     context 'when adding ScoredQuestion' do
       it 'redirects to questionnaires#edit page after adding new questions' do
-        question = double('Criterion', weight: 1, max_label: '', min_label: '', size: '', alternatives: '')
-        allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', id: 1, questions: [question]))
+        allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
         allow(question).to receive(:save).and_return(true)
         params = {id: 1,
                   question: {total_num: 2,
@@ -407,8 +406,7 @@ describe QuestionnairesController do
 
     context 'when adding unScoredQuestion' do
       it 'redirects to questionnaires#edit page after adding new questions' do
-        question = double('Dropdown', size: '', alternatives: '')
-        allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', id: 1, questions: [question]))
+        allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
         allow(question).to receive(:save).and_return(true)
         params = {id: 1,
                   question: {total_num: 2,

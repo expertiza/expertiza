@@ -30,8 +30,10 @@ describe AnswerHelper do
   describe '#delete_existing_responses' do
     context 'when the response is in reviewing period' do
       it 'deletes the answers' do
-        allow(AnswerHelper).to receive(:review_mailer).with(@user.email, @answer.comments, @user.name, @assignment1.name).and_return(true)
-        expect(AnswerHelper).to receive(:review_mailer).with(@user.email, @answer.comments, @user.name, @assignment1.name)
+        allow(AnswerHelper).to receive(:log_answer_responses).with([@question.id], @questionnaire2.id).and_return([@answer.response_id])
+        allow(AnswerHelper).to receive(:log_response_info).with([@answer.response_id]).and_return({@answer.response_id=>[@user.email, @answer.comments, @user.name, @assignment1.name]})
+        expect(AnswerHelper).to receive(:review_mailer).with(@user.email, @answer.comments, @user.name, @assignment1.name).and_return(true)
+        expect(Answer.exists?(response_id: @answer.response_id)).to eql(true) # verify the answer exists before deleting
         AnswerHelper.delete_existing_responses([@question.id], @questionnaire2.id)
         expect(Answer.exists?(response_id: @answer.response_id)).to eql(false)
       end
@@ -47,8 +49,7 @@ describe AnswerHelper do
 
   describe '#log_response_info' do
     it 'logs info from each response_id to be used in answer deletion' do
-      response_ids = AnswerHelper.log_answer_responses([@question.id], @questionnaire2.id)
-      AnswerHelper.log_response_info(response_ids)
+      AnswerHelper.log_response_info([@answer.response_id])
       expect(AnswerHelper.log_response_info(response_ids)).to eql({1=>{:email=>"expertiza@mailinator.com", :answers=>"comment", :name=>"name", :assignment_name=>"name1"}})
     end
   end
@@ -71,6 +72,7 @@ describe AnswerHelper do
 
   describe '#delete_answers' do
     it 'deletes the answers corresponding to the provided answer ids' do
+      expect(Answer.exists?(response_id: @answer.response_id)).to eql(true) # verify the answer exists before deleting
       AnswerHelper.delete_answers(@answer.response_id)
       expect(Answer.exists?(response_id: @answer.response_id)).to eql(false)
     end

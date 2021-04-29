@@ -198,7 +198,7 @@ describe CourseAnalytic do
 				allow(assignment).to receive(:total_num_team_reviews).and_return(1)
 				allow(assignment2).to receive(:total_num_team_reviews).and_return(2)
 				allow(assignment3).to receive(:total_num_team_reviews).and_return(3)
-				expect(dc.assignment_review_counts).to eq(6)
+				expect(dc.total_num_assignment_reviews).to eq(6)
 			end
 		end
 	end

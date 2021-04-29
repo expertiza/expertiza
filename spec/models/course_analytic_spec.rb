@@ -8,7 +8,6 @@ class DummyClass
 		@participants = participants
 		@assignments = assignments
 	end
- 	
 end
 
 describe CourseAnalytic do

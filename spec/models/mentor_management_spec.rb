@@ -41,8 +41,25 @@ describe MentorManagement do
   end
 
   describe '#zip_mentors_with_team_count' do
-    it 'returns sorted tuples of (mentor ID, # of teams they mentor)' do
+    it 'returns an empty map' do
+      assignment = FactoryBot.build(:assignment)
+      expect(MentorManagement.zip_mentors_with_team_count(assignment.id)).to eq(Hash.new)
+    end
 
+    it 'returns sorted tuples of (mentor ID, # of teams they mentor)' do
+      team_count = 3
+      r = Random.new(42)
+      assignment = FactoryBot.create(:assignment, id: 999)
+      user = FactoryBot.create(:teaching_assistant, id: 999)
+      mentor = FactoryBot.create(:participant, id: 998, user_id: user.id, parent_id: assignment.id, duty: Participant::DUTY_MENTOR)
+
+      team_ids = team_count.times.map {
+        random_id = r.rand(1000..10000)
+        FactoryBot.create(:team, id: random_id)
+        random_id
+      }
+      team_ids.each { |team_id| FactoryBot.create(:team_user, team_id: team_id, user_id: user.id) }
+      expect(MentorManagement.zip_mentors_with_team_count(assignment.id)).to eq([mentor.user_id, team_count])
     end
   end
 end

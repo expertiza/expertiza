@@ -2,7 +2,13 @@
 require 'active_support/time_with_zone'
 
 class AssignmentForm
-  attr_accessor :assignment, :assignment_questionnaires, :due_dates, :tag_prompt_deployments, :is_conference_assignment
+  attr_accessor :assignment,
+                :assignment_questionnaires,
+                :due_dates,
+                :tag_prompt_deployments,
+                :is_conference_assignment,
+                :auto_assign_mentor
+
   attr_accessor :errors
 
   DEFAULT_MAX_TEAM_SIZE = 1

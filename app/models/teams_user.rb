@@ -6,7 +6,11 @@ class TeamsUser < ActiveRecord::Base
   attr_accessible :user_id, :team_id
 
   def name(ip_address = nil)
-    self.user.name(ip_address)
+    name = self.user.name(ip_address)
+    if MentorManagement.user_a_mentor?(self.user)
+      name += " (Mentor)"
+    end
+    name
   end
 
   def delete

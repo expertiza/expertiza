@@ -40,8 +40,12 @@ class TeamsUsersController < ApplicationController
           add_member_return = team.add_member(user, team.parent_id)
           flash[:error] = "This team already has the maximum number of members." if add_member_return == false
   
-          @teams_user = TeamsUser.last
-          undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
+          user = TeamsUser.last
+          undo_link("The team @teams_user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
+          # E2115 - Mentor Mangement Check/Update.
+          if add_member_return
+            MentorManagement.update_mentor_state(assignment.id, team.id)
+          end
         end
       else # CourseTeam
         course = Course.find(team.parent_id)
@@ -51,7 +55,9 @@ class TeamsUsersController < ApplicationController
         else
           add_member_return = team.add_member(user)
           flash[:error] = "This team already has the maximum number of members." if add_member_return == false
-  
+
+          # E2115 - mentor management is _not_ currently triggered for CourseTeams
+
           @teams_user = TeamsUser.last
           undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
         end

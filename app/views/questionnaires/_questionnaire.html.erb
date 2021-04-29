@@ -85,8 +85,10 @@
 <% end %>
 <BR/>
 
-<script>
-$('a[data-method="delete"]').click(function(e) {
-    return window.confirm("It's the reviewing period now. All existing reviews for the questionnaire would be deleted. Are you sure you want to continue?");
-});
-</script>
+<% if AnswerHelper.in_active_period(params[:id]) %>
+    <script>
+        $('a[data-method="delete"]').click(function(e) {
+            return window.confirm("It's the reviewing period now. All existing reviews for the questionnaire would be deleted. Are you sure you want to continue?");
+        });
+    </script>
+<% end %>

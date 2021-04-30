@@ -100,7 +100,7 @@ class MentorManagement
   # [assignment_id].
   #
   # @see participant.rb for the value of DUTY_MENTOR
-  def self.get_mentors_for_assignment(assignment_id)
+  def self.mentors_for_assignment(assignment_id)
     Participant.where(parent_id: assignment_id, duty: Participant::DUTY_MENTOR)
   end
 
@@ -108,7 +108,7 @@ class MentorManagement
   # number of teams they're part of, which acts as a proxy for
   # the number of teams they're mentoring.
   def self.zip_mentors_with_team_count(assignment_id)
-    mentor_ids = self.get_mentors_for_assignment(assignment_id).pluck(:user_id)
+    mentor_ids = self.mentors_for_assignment(assignment_id).pluck(:user_id)
 
     return [] if mentor_ids.empty?
 

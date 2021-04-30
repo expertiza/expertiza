@@ -102,7 +102,7 @@ describe MentorManagement do
       allow(Participant).to receive(:where)
                               .with(parent_id: assignment.id, duty: Participant::DUTY_MENTOR)
                               .and_return([mentor])
-      mentor_user = MentorManagement.get_mentors_for_assignment(assignment.id).first
+      mentor_user = MentorManagement.mentors_for_assignment(assignment.id).first
       expect(mentor_user).to eq mentor
     end
   end

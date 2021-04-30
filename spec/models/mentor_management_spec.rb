@@ -22,6 +22,52 @@ describe MentorManagement do
   end
 
   describe '#update_mentor_state' do
+    it 'returns early if auto_assign_mentor is false' do
+      no_mentor_assignment = FactoryBot.build(:assignment)
+      allow(Assignment).to receive(:find).with(no_mentor_assignment.id).and_return(no_mentor_assignment)
+      allow(Team).to receive(:find).with(team.id).and_return(team)
+      MentorManagement.update_mentor_state(no_mentor_assignment.id, team.id)
+      expect(MentorManagement).to receive(:notify_team_of_mentor_assignment).exactly(0).times
+    end
+
+    it 'returns early if the assignment has a topic' do
+      allow(Assignment).to receive(:find).with(assignment.id).and_return(assignment)
+      allow(Team).to receive(:find).with(team.id).and_return(team)
+
+      allow(assignment).to receive(:topics?).and_return true
+
+      MentorManagement.update_mentor_state(assignment.id, team.id)
+      expect(MentorManagement).to receive(:notify_team_of_mentor_assignment).exactly(0).times
+    end
+
+    it 'returns early if the team has a topic assigned' do
+      allow(Assignment).to receive(:find).with(assignment.id).and_return(assignment)
+      allow(Team).to receive(:find).with(team.id).and_return(team)
+
+      topic = FactoryBot.build(:topic)
+      allow(team).to receive(:topics).and_return topic
+
+      MentorManagement.update_mentor_state(assignment.id, team.id)
+      expect(MentorManagement).to receive(:notify_team_of_mentor_assignment).exactly(0).times
+    end
+
+    it 'returns early if capacity is not met' do
+      allow(Assignment).to receive(:find).with(assignment.id).and_return(assignment)
+      allow(Team).to receive(:find).with(team.id).and_return(team)
+      # we've added no one to this team, so we will not meet the capacity criteria
+      MentorManagement.update_mentor_state(assignment.id, team.id)
+      expect(MentorManagement).to receive(:notify_team_of_mentor_assignment).exactly(0).times
+    end
+
+    it 'returns early if team already has a mentor' do
+      allow(Assignment).to receive(:find).with(assignment.id).and_return(assignment)
+      allow(Team).to receive(:find).with(team.id).and_return(team)
+      # stub the call to `team.participants` so that `any?` returns `true`
+      allow(team).to receive(:participants).and_return([mentor])
+      MentorManagement.update_mentor_state(assignment.id, team.id)
+      expect(MentorManagement).to receive(:notify_team_of_mentor_assignment).exactly(0).times
+    end
+
     it 'assigns a mentor to a team when the team size passes 50% max capacity' do
       allow(Assignment).to receive(:find).with(assignment.id).and_return(assignment)
       allow(Team).to receive(:find).with(team.id).and_return(team)

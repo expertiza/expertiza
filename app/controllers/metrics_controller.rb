@@ -261,7 +261,7 @@ class MetricsController < ApplicationController
   # do accounting, aggregate each authors' number of commits on each date
   def count_github_authors_and_dates(author_name, author_email, commit_date)
     # Only count a commit if it was not made by a member of the Expertiza development team
-    unless LOCAL_ENV["BLACKLIST_AUTHOR"].include? author_name
+    unless LOCAL_ENV["COLLABORATORS"].include? author_name
       @authors[author_name] ||= author_email # a hash record all the authors and their emails
       @dates[commit_date] ||= 1 # a hash record all the date that has commits
       @parsed_data[author_name] ||= {} # a hash account each author's commits grouped by date

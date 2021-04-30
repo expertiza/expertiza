@@ -45,26 +45,26 @@ module OnTheFlyCalc
     end
     scores
   end
-end
 
-# Build a hash for the author feedback scores
-#
-# author_feedback_scores[reviewer.id][round][reviewee.id] returns the average author feedback
-# score for AssignmentParticipant reviewer's review of the AssignmentTeam reviewee.
-def compute_author_feedback_scores
-  @author_feedback_scores = {}
-  @response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', self.id, 'ReviewResponseMap')
-  rounds = self.rounds_of_reviews
-  (1..rounds).each do |round|
-    @response_maps.each do |response_map|
-      response = Response.where('map_id = ?', response_map.id)
-      response = response.select {|response| response.round == round }
-      @round = round
-      @response_map = response_map
-      calc_avg_feedback_score(response) unless response.empty?
-      end
+  # Build a hash for the author feedback scores
+  #
+  # author_feedback_scores[reviewer.id][round][reviewee.id] returns the average author feedback
+  # score for AssignmentParticipant reviewer's review of the AssignmentTeam reviewee.
+  def compute_author_feedback_scores
+    @author_feedback_scores = {}
+    @response_maps = ResponseMap.where('reviewed_object_id = ? && type = ?', self.id, 'ReviewResponseMap')
+    rounds = self.rounds_of_reviews
+    (1..rounds).each do |round|
+      @response_maps.each do |response_map|
+        response = Response.where('map_id = ?', response_map.id)
+        response = response.select {|response| response.round == round }
+        @round = round
+        @response_map = response_map
+        calc_avg_feedback_score(response) unless response.empty?
+        end
+    end
+    @author_feedback_scores
   end
-  @author_feedback_scores
 end
 
 private

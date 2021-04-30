@@ -373,6 +373,12 @@ class Assignment < ActiveRecord::Base
     nil
   end
 
+  def feedback_questionnaire_id(feedback_response)
+    feedback_answer = Answer.where(response_id: feedback_response.first.id)
+    question = Question.find(feedback_answer.first.question_id)
+    question.questionnaire_id
+  end
+
   def self.export_details(csv, parent_id, detail_options)
     return csv unless detail_options.value?('true')
     @assignment = Assignment.find(parent_id)

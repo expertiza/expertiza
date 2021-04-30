@@ -17,19 +17,19 @@ describe ResponseAnalytic do
 	let!(:answer2) { create(:answer, question: question1, response_id: 1, id: 2) }
   let!(:answer3) { create(:answer, question: question1, response_id: 1, id: 3) }
   before(:each) do
-    scores = [answer1, answer2, answer3]
+    @scores = [answer1, answer2, answer3]
   end
 
   describe '#word_count_list' do
     context 'there are no answers associated with the response' do
       it 'will return [0]' do
-        dc = ResponseAnalyticTestDummyClass.new(nil)
+        dc = ResponseAnalyticTestDummyClass.new([])
         expect(dc.word_count_list).to eq([0])
       end
     end
     context 'there are three answers associated with the response, with word counts of 50, 75, and 100' do
       it 'will return [50, 75, 100]' do
-        dc = ResponseAnalyticTestDummyClass.new(scores)
+        dc = ResponseAnalyticTestDummyClass.new(@scores)
         allow(answer1).to receive(:word_count).and_return(50)
         allow(answer2).to receive(:word_count).and_return(75)
         allow(answer3).to receive(:word_count).and_return(100)

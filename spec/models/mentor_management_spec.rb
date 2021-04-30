@@ -3,10 +3,12 @@ describe MentorManagement do
   # this could also be accomplished with before(:each) and instance methods
   # but the rest of the code base makes use of let alot, so this is consistent
   # with that, while achieving the same goal as before(:each)
-  let!(:assignment) { create(:assignment, id: 999) }
+  let!(:assignment) { create(:assignment, id: 999, auto_assign_mentor: true) }
   let!(:ta) { create(:teaching_assistant, id: 999) }
-  let!(:student) { create(:student, id: 998) }
+  let!(:student1) { create(:student, id: 998) }
+  let!(:student2) { create(:student, id: 997) }
   let!(:mentor) { create(:participant, id: 998, user_id: 999, parent_id: assignment.id, duty: Participant::DUTY_MENTOR)}
+  let!(:team) { create(:assignment_team, id: 999) }
 
   describe '#select_mentor' do
     it 'returns the mentor with the fewest teams they mentor' do
@@ -27,7 +29,7 @@ describe MentorManagement do
 
   describe '#user_a_mentor?' do
     it 'should return true if user is a mentor' do
-      expect(MentorManagement.user_a_mentor?(student)).to be false
+      expect(MentorManagement.user_a_mentor?(student1)).to be false
       expect(MentorManagement.user_a_mentor?(ta)).to be true
     end
   end

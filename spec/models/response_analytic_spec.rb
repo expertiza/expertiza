@@ -72,7 +72,26 @@ describe ResponseAnalytic do
     end
   end
   describe '#comments_text_list' do
-
+    context 'there are no answers associated with the response' do
+      it 'will return []' do
+        dc = ResponseAnalyticTestDummyClass.new([])
+        expect(dc.comment_text_list).to eq([])
+      end
+    end
+    context 'there are three answers associated with the response, with comment text of 
+    \'This is a very good submission! \', 
+    \'Well written comments and easy to follow documentation. \', and 
+    \'I think this could have been better if your tests were less shallow.\'' do
+      it 'will return an array of the text above, in that order' do
+        dc = ResponseAnalyticTestDummyClass.new(@scores)
+        allow(answer1).to receive(:comments).and_return('This is a very good submission!')
+        allow(answer2).to receive(:comments).and_return('Well written comments and easy to follow documentation.')
+        allow(answer3).to receive(:comments).and_return('I think this could have been better if your tests were less shallow.')
+        expect(dc.comments_text_list).to eq
+        (['This is a very good submission!', 'Well written comments and easy to follow documentation.',
+         'I think this could have been better if your tests were less shallow.'])
+      end
+    end
   end
   describe '#total_character_count' do
 

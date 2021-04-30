@@ -34,7 +34,7 @@ describe MentorManagement do
       allow(Assignment).to receive(:find).with(assignment.id).and_return(assignment)
       allow(Team).to receive(:find).with(team.id).and_return(team)
 
-      allow(assignment).to receive(:topics?).and_return true
+      allow(assignment).to receive(:topics?).and_return(true)
 
       MentorManagement.update_mentor_state(assignment.id, team.id)
       expect(MentorManagement).to receive(:notify_team_of_mentor_assignment).exactly(0).times
@@ -45,7 +45,7 @@ describe MentorManagement do
       allow(Team).to receive(:find).with(team.id).and_return(team)
 
       topic = FactoryBot.build(:topic)
-      allow(team).to receive(:topics).and_return topic
+      allow(team).to receive(:topics).and_return(topic)
 
       MentorManagement.update_mentor_state(assignment.id, team.id)
       expect(MentorManagement).to receive(:notify_team_of_mentor_assignment).exactly(0).times
@@ -75,11 +75,11 @@ describe MentorManagement do
       # add 2 students to our team
       [student1, student2].each { |student| FactoryBot.create(:team_user, team_id: team.id, user_id: student.id)}
 
-      allow(assignment).to receive(:topics?).and_return false
-      allow(team).to receive(:topics).and_return nil
+      allow(assignment).to receive(:topics?).and_return(false)
+      allow(team).to receive(:topics).and_return(nil)
 
       allow(MentorManagement).to receive(:select_mentor).with(assignment.id).and_return(ta)
-      allow(team).to receive(:add_member).and_return true
+      allow(team).to receive(:add_member).and_return(true)
 
       # if we've made it this far without failing, then there's nothing
       # left for Mentor Management to test. The only question left to answer

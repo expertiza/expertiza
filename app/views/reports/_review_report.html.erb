@@ -42,17 +42,18 @@
     <thead>
     <tr bgcolor='#CCCCCC'>
       <!-- class value decides whether the column should be sortable or not  -->
-      <th rowspan ="2" width="16%" class="sorter-true">Reviewer <span></span></th>
+      <th rowspan ="2" width="15%" class="sorter-true">Reviewer <span></span></th>
       <th rowspan ="2" width="10%" class="sorter-true">Reviews done<span></span></th>
-      <th rowspan ="2" width="24%" class="sorter-true">Team reviewed <span></span></th>
-      <th width="6%" colspan=  "2" class="sorter-false">Scores<span></span></th>
+      <th rowspan ="2" width="15%" class="sorter-true">Team reviewed <span></span></th>
+      <th width="16%" colspan=  "3" class="sorter-false">Scores<span></span></th>
       <th rowspan ="2" width="14%" class="sorter-true">Metrics <span></span></th>
       <th rowspan ="2" class="sorter-false">Assign grade and write comments <span></span></th>
     </tr>
     <tr bgcolor='#CCCCCC'>
 
-		  <th width="6%" class="sorter-true"> Score awarded <span></span></th>
-		  <th width="6%" class="sorter-true"> AVG Score <span></span></th>
+		  <th width="4%" class="sorter-true"> Score awarded <span></span></th>
+		  <th width="4%" class="sorter-true"> AVG Score <span></span></th>
+      <th width="8%" class="sorter-true"> Author Feedback <span></span></th>
     </tr>
     </thead>
     <tbody>
@@ -125,6 +126,15 @@
                 <% @team = Team.find(reviewer_map.reviewee_id) %>
                 <%= render partial: 'team_score', locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: reviewer.id} %>
               <% end %>
+            <% end %>
+          </td>
+          <!--Render partial view corresponding to the author feedback score-->
+          <td align='left'>
+            <% @response_maps.each_with_index do |reviewer_map, index| %>
+                <% if Team.where(id: reviewer_map.reviewee_id).length > 0 %>
+                    <% @team = Team.find(reviewer_map.reviewee_id) %>
+                    <%= render partial: 'team_score', locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: reviewer.id} %>
+                <% end %>
             <% end %>
           </td>
           <!--Metrics-->

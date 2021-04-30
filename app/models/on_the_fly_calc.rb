@@ -89,6 +89,12 @@ def calc_avg_feedback_score(response)
   end
 end
 
+def feedback_questionnaire_id(feedback_response)
+  feedback_answer = Answer.where(response_id: feedback_response.first.id)
+  question = Question.find(feedback_answer.first.question_id)
+  question.questionnaire_id
+end
+
 # Add the score of the feedback attached to this feedback response (review) to the sum of feedback scores
 # for the response (review) reviewed by one of the authors.
 def calc_feedback_scores_sum

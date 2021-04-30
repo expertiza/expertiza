@@ -312,7 +312,7 @@ describe 'Instructor', js: true do
     score = all("tr > td")[1]
     expect(student).to have_text(@student2.fullname)
     expect(score).to have_text('100.0')
-    expect(page).to have_text('Average score for quiz takers: 100.0 ')
+    expect(page).to have_text('Average score for quiz takers: 100.0')
     expect(page).to have_text('1')
     expect(page).to have_text(@question.txt)
     expect(page).to have_text("Question Type: MultipleChoiceRadio")

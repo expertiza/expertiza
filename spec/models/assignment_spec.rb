@@ -187,10 +187,10 @@ describe Assignment do
         allow(assignment).to receive(:num_review_rounds).and_return(1)
         allow(ReviewResponseMap).to receive(:get_responses_for_team_round).with(team, 1).and_return([response])
         allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
-        expect(assignment.scores(review1: [question]).inspect).to eq("{:participants=>{:\"1\"=>98}, :teams=>{:\"0\"=>{:team=>#<AssignmentTeam id: 1, "\
-          "name: \"no team\", parent_id: 1, type: \"AssignmentTeam\", comments_for_advertisement: nil, advertise_for_partner: nil, "\
-          "submitted_hyperlinks: \"---\\n- https://www.expertiza.ncsu.edu\", directory_num: 0, grade_for_submission: nil, "\
-          "comment_for_submission: nil>, :scores=>{:max=>95, :min=>88, :avg=>90.0}}}}")
+        scores = assignment.scores(review1: [question])
+        expect(scores[:teams][:"0"][:scores][:avg]).to eq(90)
+        expect(scores[:teams][:"0"][:scores][:min]).to eq(88)
+        expect(scores[:teams][:"0"][:scores][:max]).to eq(95)
       end
     end
 
@@ -200,10 +200,10 @@ describe Assignment do
         allow(assignment).to receive(:vary_by_round).and_return(false)
         allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([response])
         allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
-        expect(assignment.scores(review: [question]).inspect).to eq("{:participants=>{:\"1\"=>98}, :teams=>{:\"0\"=>{:team=>#<AssignmentTeam id: 1, "\
-          "name: \"no team\", parent_id: 1, type: \"AssignmentTeam\", comments_for_advertisement: nil, advertise_for_partner: nil, "\
-          "submitted_hyperlinks: \"---\\n- https://www.expertiza.ncsu.edu\", directory_num: 0, grade_for_submission: nil, "\
-          "comment_for_submission: nil>, :scores=>{:max=>95, :min=>88, :avg=>90}}}}")
+        scores = assignment.scores(review: [question])
+        expect(scores[:teams][:"0"][:scores][:avg]).to eq(90)
+        expect(scores[:teams][:"0"][:scores][:min]).to eq(88)
+        expect(scores[:teams][:"0"][:scores][:max]).to eq(95)
       end
     end
   end

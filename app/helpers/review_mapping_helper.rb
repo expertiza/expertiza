@@ -149,27 +149,6 @@ module ReviewMappingHelper
     end
   end
 
-  # def get_author_feedback_score(reviewer_id, team_id)
-  #   # Storing redundantly computed value in num_rounds variable
-  #   num_rounds = @assignment.num_review_rounds
-  #   # Setting values of instance variables
-  #   (1..num_rounds).each { |round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----') }
-  #   # Iterating through list
-  #   (1..num_rounds).each do |round|
-  #     # Changing values of instance variable based on below condition
-  #     if team_id != nil && team_id != -1.0
-  #       puts 'review scores'
-  #       puts reviewer_id
-  #       if @review_scores.key?(reviewer_id)
-  #         puts 'good'
-  #         instance_variable_set("@score_awarded_round_" + round.to_s, @review_scores[reviewer_id][round].to_s + '%')
-  #       else
-  #         puts 'bad'
-  #       end
-  #     end
-  #   end
-  # end
-
   # varying rubric by round
   def get_each_round_score_awarded_for_review_report(reviewer_id, team_id)
     (1..@assignment.num_review_rounds).each {|round| instance_variable_set("@score_awarded_round_" + round.to_s, '-----') }

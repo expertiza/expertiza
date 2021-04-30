@@ -55,7 +55,21 @@ describe ResponseAnalytic do
     end
   end
   describe '#question_score_list' do
-
+    context 'there are no answers associated with the response' do
+      it 'will return [0]' do
+        dc = ResponseAnalyticTestDummyClass.new([])
+        expect(dc.question_score_list).to eq([0])
+      end
+    end
+    context 'there are three answers associated with the response, with question scores of 50, 75, and 100' do
+      it 'will return [50, 75, 100]' do
+        dc = ResponseAnalyticTestDummyClass.new(@scores)
+        allow(answer1).to receive(:score).and_return(50)
+        allow(answer2).to receive(:score).and_return(75)
+        allow(answer3).to receive(:score).and_return(100)
+        expect(dc.question_score_list).to eq([50, 75, 100])
+      end
+    end
   end
   describe '#comments_text_list' do
 

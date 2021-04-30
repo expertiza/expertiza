@@ -56,6 +56,7 @@ gem 'redis-rails'
 gem 'rest-client'
 gem 'rgl', require: 'rgl/adjacency'
 gem 'rjb'
+gem 'rubocop'
 gem 'rubyzip'
 gem 'rwordnet'
 gem 'sass-rails'
@@ -79,7 +80,6 @@ group :development do
   gem 'pry-nav'
   gem 'pry-remote'
   gem 'quiet_assets'
-  gem 'rubocop'
 end
 
 group :test do

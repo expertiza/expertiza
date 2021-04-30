@@ -7,8 +7,9 @@ class AssignmentForm
                 :due_dates,
                 :tag_prompt_deployments,
                 :is_conference_assignment,
-                :auto_assign_mentor,
-                :errors
+                :auto_assign_mentor
+
+  attr_accessor :errors
 
   DEFAULT_MAX_TEAM_SIZE = 1
 

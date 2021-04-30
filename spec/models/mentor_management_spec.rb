@@ -45,10 +45,6 @@ describe MentorManagement do
   end
 
   describe '#zip_mentors_with_team_count' do
-    it 'returns an empty map' do
-      expect(MentorManagement.zip_mentors_with_team_count(assignment.id)).to eq([])
-    end
-
     it 'returns sorted tuples of (mentor ID, # of teams they mentor)' do
       team_count = 3
       r = Random.new(42)

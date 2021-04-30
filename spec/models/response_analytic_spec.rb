@@ -75,7 +75,7 @@ describe ResponseAnalytic do
     context 'there are no answers associated with the response' do
       it 'will return []' do
         dc = ResponseAnalyticTestDummyClass.new([])
-        expect(dc.comment_text_list).to eq([])
+        expect(dc.comments_text_list).to eq([])
       end
     end
     context 'there are three answers associated with the response, with comment text of 
@@ -87,8 +87,7 @@ describe ResponseAnalytic do
         allow(answer1).to receive(:comments).and_return('This is a very good submission!')
         allow(answer2).to receive(:comments).and_return('Well written comments and easy to follow documentation.')
         allow(answer3).to receive(:comments).and_return('I think this could have been better if your tests were less shallow.')
-        expect(dc.comments_text_list).to eq
-        (['This is a very good submission!', 'Well written comments and easy to follow documentation.',
+        expect(dc.comments_text_list).to eq(['This is a very good submission!', 'Well written comments and easy to follow documentation.',
          'I think this could have been better if your tests were less shallow.'])
       end
     end

@@ -17,7 +17,7 @@ describe MentorManagement do
                                    .and_return([mentor.id, 0])
       allow(User).to receive(:where).with(id: mentor.id).and_return([mentor])
       mentor_user = MentorManagement.select_mentor assignment.id
-      expect(mentor_user).to eq(mentor)
+      expect(mentor_user).to eq mentor
     end
   end
 
@@ -103,7 +103,7 @@ describe MentorManagement do
                               .with(parent_id: assignment.id, duty: Participant::DUTY_MENTOR)
                               .and_return([mentor])
       mentor_user = MentorManagement.get_mentors_for_assignment(assignment.id).first
-      expect(mentor_user).to eq(mentor)
+      expect(mentor_user).to eq mentor
     end
   end
 
@@ -117,7 +117,7 @@ describe MentorManagement do
         random_id
       }
       team_ids.each { |team_id| FactoryBot.create(:team_user, team_id: team_id, user_id: ta.id) }
-      expect(MentorManagement.zip_mentors_with_team_count(assignment.id)).to eq([[mentor.user_id, team_count]])
+      expect(MentorManagement.zip_mentors_with_team_count(assignment.id)).to eq [[mentor.user_id, team_count]]
     end
   end
 end

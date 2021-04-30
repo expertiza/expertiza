@@ -1,0 +1,18 @@
+<!--Assignments have vary_rubric_by_rounds-->
+<!--Feedback Score awarded-->
+<!--Use the review score method with the average author feedback score.-->
+<% temp = @review_scores %>
+<% @review_scores = @author_feedback_scores %>
+<% get_each_round_score_awarded_for_review_report(reviewer_id, team_id) %>
+<% @review_scores = temp %>
+<div>
+  <% (1..@assignment.num_review_rounds).each do |round| %>
+      <% get_review_volume(round, team_id) %>
+      <%= instance_variable_get("@score_awarded_round_" + round.to_s) %> / <%= @avg %>
+      <%= ', ' unless round == @assignment.num_review_rounds %>
+      <!--Score range
+        <td bgcolor=<%= bgcolor %> align = 'left' >
+            (<%= @min %>% - <%= @max %>%)
+        </td>-->
+  <%end%>
+</div>

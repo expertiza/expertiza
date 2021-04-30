@@ -18,7 +18,7 @@ class MetricsController < ApplicationController
       topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team)
       single_submission_initial_query(participants.first.id) unless participants.first.nil?
     end
-
+    redirect_to controller: 'assignments', action: 'list_submissions', id: @assignment.id
   end
 
   # render the view_github_metrics page, which displays detailed metrics for a single team of participants.
@@ -40,6 +40,7 @@ class MetricsController < ApplicationController
   def single_submission_initial_query(id)
     if session["github_access_token"].nil? # check if there is a github_access_token in current session
       session["participant_id"] = id # team number
+      session["assignment_id"] =AssignmentParticipant.find(id).assignment.id
       session["github_view_type"] = "view_submissions"
       #redirect_to authorize_github # if no github_access_token present, redirect to authorization page
        redirect_to :controller => 'metrics', :action => 'authorize_github'

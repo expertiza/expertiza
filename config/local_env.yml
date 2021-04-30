@@ -5,10 +5,10 @@
 # extend this list wiht comma separated github ids
 # the list is available as ENV["BLACKLIST_AUTHOR"]
 development:
-  BLACKLIST_AUTHOR: 'Saurabh Shingte,expertiza_developer,Saurabh Vinod Shingte,Winbobob'
+  COLLABORATORS: 'efg@ncsu.edu,sgpai2@ncsu.edu,saurabh.shingte@gmail.com'
 
 test:
-  BLACKLIST_AUTHOR: 'Saurabh Shingte,expertiza_developer,Saurabh Vinod Shingte,Winbobob'
+  COLLABORATORS: 'efg@ncsu.edu,sgpai2@ncsu.edu,saurabh.shingte@gmail.com'
 
 production:
-  BLACKLIST_AUTHOR: 'Saurabh Shingte,expertiza_developer,Saurabh Vinod Shingte,Winbobob'
+  COLLABORATORS: 'efg@ncsu.edu,sgpai2@ncsu.edu,saurabh.shingte@gmail.com'

@@ -54,5 +54,4 @@ class Metric < ActiveRecord::Base
       }"
     }
   end
-
 end

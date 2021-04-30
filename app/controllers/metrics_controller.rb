@@ -77,13 +77,15 @@ class MetricsController < ApplicationController
 
     # Create database entry for basic statistics. These data are queried later by view_team in grades (the heatgrid)
     @authors.each do |author|
-      unless LOCAL_ENV["BLACKLIST_AUTHOR"].include? author[0]
+      # Check to see if this author is a member of the expertiza dev team. This COULD be done with a query,
+      # But will only work if the authenticated user running the query has push access to the github repository
+      # (Per Github API security rules)
+      unless LOCAL_ENV["COLLABORATORS"].include? author[1]
+        # If author is a student, keep the commit data and store the total as a Metric
         data_object = {}
-        data_object[:author] = author[0]
-        data_object[:email] = author[1]
-        data_object[:commits] = @parsed_data[author[0]].values.inject(0) {|sum, value| sum += value}
-        # user = User.find_by_github_id(author[1])
-        # user_id = user.nil? ? nil : user.id
+        data_object[:author] = author[0] # Github Name
+        data_object[:email] = author[1] # Github Email
+        data_object[:commits] = @parsed_data[author[0]].values.inject(0) {|sum, value| sum += value} #Sum of commits
         create_github_metric(@team_id, author[1], data_object[:commits])
       end
     end

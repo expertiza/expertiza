@@ -40,7 +40,7 @@ class MentorManagement
   #   1.) The assignment does not have a topic.
   #   2.) If the team has reached >50% full capacity.
   #   3.) If the team does not have a mentor.
-  def self.update_mentor_state(assignment_id, team_id)
+  def self.assign_mentor(assignment_id, team_id)
     assignment = Assignment.find(assignment_id)
     team = Team.find(team_id)
 

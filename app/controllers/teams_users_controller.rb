@@ -44,7 +44,7 @@ class TeamsUsersController < ApplicationController
           undo_link("The team @teams_user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
           # E2115 - Mentor Mangement Check/Update.
           if add_member_return
-            MentorManagement.update_mentor_state(assignment.id, team.id)
+            MentorManagement.assign_mentor(assignment.id, team.id)
           end
         end
       else # CourseTeam

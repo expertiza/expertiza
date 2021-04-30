@@ -207,7 +207,7 @@ describe ResponseAnalytic do
         allow(answer1).to receive(:word_count).and_return(50)
         allow(answer2).to receive(:word_count).and_return(75)
         allow(answer3).to receive(:word_count).and_return(100)
-        expect(dc.max_word_count).to eq(75)
+        expect(dc.max_word_count).to eq(100)
       end
     end
   end
@@ -219,7 +219,7 @@ describe ResponseAnalytic do
       end
     end
     context 'there are three answers associated with the response, with word counts of 50, 75, and 100' do
-      it 'will return 100' do
+      it 'will return 50' do
         dc = ResponseAnalyticTestDummyClass.new(@scores)
         allow(answer1).to receive(:word_count).and_return(50)
         allow(answer2).to receive(:word_count).and_return(75)

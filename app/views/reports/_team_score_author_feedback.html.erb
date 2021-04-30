@@ -8,7 +8,7 @@
 <div>
   <% (1..@assignment.num_review_rounds).each do |round| %>
       <% get_review_volume(round, team_id) %>
-      <%= instance_variable_get("@score_awarded_round_" + round.to_s) %> / <%= @avg %>
+      <%= instance_variable_get("@score_awarded_round_" + round.to_s) %>
       <%= ', ' unless round == @assignment.num_review_rounds %>
       <!--Score range
         <td bgcolor=<%= bgcolor %> align = 'left' >

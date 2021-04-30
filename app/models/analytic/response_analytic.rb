@@ -51,8 +51,6 @@ module ResponseAnalytic
     character_count_list.min
   end
 
-  private
-
   # return an array of strings containing the word count of al the comments
   def word_count_list
     list = []

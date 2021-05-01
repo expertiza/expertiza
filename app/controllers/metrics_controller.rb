@@ -139,7 +139,8 @@ class MetricsController < ApplicationController
     end
   end
 
-  # call the api with hyperlink parameter
+  # Iterate across pages of 100 commits queried from the Github API, getting the query from the Metric model, running
+  # the query, then calling the data parser
   def pull_request_data(hyperlink_data)
     has_next_page = true # parameter for github api call
     end_cursor = nil # parameter needed for github api call

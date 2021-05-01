@@ -122,12 +122,55 @@ end
     end
   end
   describe '#character_count_list' do
-
+    context 'when there are no questions' do
+      it 'returns an array that is [0]' do
+        dc = QuestionnaireAnalyticTestDummyClass.new([])
+        expect(dc.character_count_list).to eq([0])
+  	  end
+    end
+    context 'when there are three questions with text' do
+      it 'returns an array of size 3 with the character count' do
+        dc = QuestionnaireAnalyticTestDummyClass.new([question, question2, question3])
+        allow(question).to receive(:character_count).and_return(100)
+        allow(question2).to receive(:character_count).and_return(75)
+        allow(question3).to receive(:character_count).and_return(50)
+        expect(dc.character_count_list.length).to eq(3)
+        expect(dc.character_count_list).to eq([100, 75, 50])
+  	  end
+    end
   end
   describe '#total_character_count' do
-
+    context 'when there are no questions' do
+      it 'returns 0' do
+        dc = QuestionnaireAnalyticTestDummyClass.new([])
+        expect(dc.total_character_count).to eq(0)
+  	  end
+    end
+    context 'when there are three questions with text' do
+      it 'returns 225' do
+        dc = QuestionnaireAnalyticTestDummyClass.new([question, question2, question3])
+        allow(question).to receive(:character_count).and_return(100)
+        allow(question2).to receive(:character_count).and_return(75)
+        allow(question3).to receive(:character_count).and_return(50)
+        expect(dc.total_character_count).to eq(225)
+  	  end
+    end
   end
   describe '#average_character_count' do
-
+    context 'when there are no questions' do
+      it 'returns 0' do
+        dc = QuestionnaireAnalyticTestDummyClass.new([])
+        expect(dc.average_character_count).to eq([0])
+  	  end
+    end
+    context 'when there are three questions with text' do
+      it 'returns 75' do
+        dc = QuestionnaireAnalyticTestDummyClass.new([question, question2, question3])
+        allow(question).to receive(:character_count).and_return(100)
+        allow(question2).to receive(:character_count).and_return(75)
+        allow(question3).to receive(:character_count).and_return(50)
+        expect(dc.average_character_count).to eq(75)
+  	  end
+    end
   end
 end

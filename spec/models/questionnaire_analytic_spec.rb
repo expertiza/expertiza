@@ -53,9 +53,9 @@ end
   end
   describe '#questions_text_list' do
     context 'when there are no questions' do
-      it 'returns an empty array' do
+      it 'returns an array that is [0]' do
         dc = QuestionnaireAnalyticTestDummyClass.new([])
-        expect(dc.questions_text_list.empty?).to eq(true)
+        expect(dc.questions_text_list).to eq([0])
   	  end
     end
     context 'when there are three questions with text' do
@@ -71,9 +71,9 @@ end
   end
   describe '#word_count_list' do
     context 'when there are no questions' do
-      it 'returns an empty array' do
+      it 'returns an array that is [0]' do
         dc = QuestionnaireAnalyticTestDummyClass.new([])
-        expect(dc.word_count_list.empty?).to eq(true)
+        expect(dc.word_count_list).to eq([0])
   	  end
     end
     context 'when there are three questions with text' do

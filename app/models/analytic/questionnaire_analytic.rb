@@ -26,7 +26,11 @@ module QuestionnaireAnalytic
     self.questions.each do |question|
       word_count_list << question.word_count
     end
-    word_count_list
+    if word_count_list.empty?
+      [0]
+    else
+      word_count_list
+    end
   end
 
   def total_word_count
@@ -43,7 +47,11 @@ module QuestionnaireAnalytic
     self.questions.each do |question|
       character_count_list << question.character_count
     end
-     character_count_list
+     if character_count_list.empty?
+      [0]
+    else
+      character_count_list
+    end
   end
 
   def total_character_count

@@ -160,7 +160,7 @@ end
     context 'when there are no questions' do
       it 'returns 0' do
         dc = QuestionnaireAnalyticTestDummyClass.new([])
-        expect(dc.average_character_count).to eq([0])
+        expect(dc.average_character_count).to eq(0)
   	  end
     end
     context 'when there are three questions with text' do

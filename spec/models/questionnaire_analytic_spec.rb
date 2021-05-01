@@ -88,10 +88,38 @@ end
     end
   end
   describe '#total_word_count' do
-
+    context 'when there are no questions' do
+      it 'returns 0' do
+        dc = QuestionnaireAnalyticTestDummyClass.new([])
+        expect(dc.total_word_count).to eq(0)
+  	  end
+    end
+    context 'when there are three questions with text' do
+      it 'returns an the sum of the word count which is 225' do
+        dc = QuestionnaireAnalyticTestDummyClass.new([question, question2, question3])
+        allow(question).to receive(:word_count).and_return(100)
+        allow(question2).to receive(:word_count).and_return(75)
+        allow(question3).to receive(:word_count).and_return(50)
+        expect(dc.total_word_count).to eq(225)
+  	  end
+    end
   end
   describe '#average_word_count' do
-
+    context 'when there are no questions' do
+      it 'returns 0' do
+        dc = QuestionnaireAnalyticTestDummyClass.new([])
+        expect(dc.average_word_count).to eq(0)
+  	  end
+    end
+    context 'when there are three questions with text' do
+      it 'returns an the average of the word count which is 75' do
+        dc = QuestionnaireAnalyticTestDummyClass.new([question, question2, question3])
+        allow(question).to receive(:word_count).and_return(100)
+        allow(question2).to receive(:word_count).and_return(75)
+        allow(question3).to receive(:word_count).and_return(50)
+        expect(dc.average_word_count).to eq(75)
+  	  end
+    end
   end
   describe '#character_count_list' do
 

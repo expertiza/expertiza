@@ -34,7 +34,8 @@ module QuestionnaireAnalytic
   end
 
   def average_word_count
-    total_word_count.to_f / num_questions
+    return total_word_count.to_f / num_questions unless num_questions == 0
+    0
   end
 
   def character_count_list
@@ -50,6 +51,7 @@ module QuestionnaireAnalytic
   end
 
   def average_character_count
-    total_character_count / num_questions
+    return total_character_count.to_f / num_questions unless num_questions == 0
+    0  
   end
 end

@@ -30,6 +30,12 @@ end
         expect(dc.types).to eq(['TextArea'])
   	  end
     end
+    context 'when there are no questions' do
+      it 'returns an empty array' do
+        dc = QuestionnaireAnalyticTestDummyClass.new([])
+        expect(dc.types.empty?).to eq(true)
+  	  end
+    end
   end
   describe '#num_questions' do
 

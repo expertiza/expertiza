@@ -18,7 +18,11 @@ module QuestionnaireAnalytic
     self.questions.each do |question|
       question_list << question.txt
     end
-    question_list
+    if question_list.empty?
+      [0]
+    else
+      question_list
+    end
   end
 
   def word_count_list

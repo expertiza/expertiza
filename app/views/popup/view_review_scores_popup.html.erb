@@ -51,11 +51,15 @@
             <% else %>
             
               <% responses.each do |response_id| %>  
-                <td class=td_rev width="<%= item_width %>%">
+                <td width="<%= item_width %>%">
                   <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
                   <% if !answer.nil? %>
-                    <div class="c<%= answer.answer %> revscore" ><p><%= answer.answer %></p></div> 
-                    <div class=revcomment ><p><%= answer.comments.html_safe unless answer.comments.nil? %></p></div>
+                  <div>
+                    <div class="c<%= answer.answer %> grade-circle" ><p><%= answer.answer %></p></div>
+                    <div><p><%= answer.comments.html_safe unless answer.comments.nil? %></p></div>
+                  </div>
+          <!--          <div class="c<%= answer.answer %> reviewscore" ><p><%= answer.answer %></p></div> 
+                    <div class=reviewcomment ><p><%= answer.comments.html_safe unless answer.comments.nil? %></p></div> -->
                   <% end %>
                 </td>
               <% end %>

@@ -149,6 +149,7 @@ module ReviewMappingHelper
     end
   end
 
+  # gets minimum, maximum and average grade value for all the reviews present
   def get_review_metrics(round, team_id)
     %i[max min avg].each {|metric| instance_variable_set('@' + metric.to_s, '-----') }
     if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? {|k| @avg_and_ranges[team_id][round].key? k }

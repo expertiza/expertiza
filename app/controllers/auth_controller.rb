@@ -79,6 +79,7 @@ class AuthController < ApplicationController
     end
   end
 
+  #E2111 Catch return of 3-way handshake when 2021 Github API custom authentication is being used.
   def custom_github_login
     session_code = request.env['rack.request.query_hash']['code']
     result = RestClient.post('https://github.com/login/oauth/access_token',
@@ -88,11 +89,7 @@ class AuthController < ApplicationController
                                :accept => :json)
     access_token = JSON.parse(result)['access_token']
     session["github_access_token"] = access_token
-    #if session["github_view_type"] == "view_submissions"
     redirect_to controller: 'metrics', action: 'show', id: session["participant_id"]
-    #elsif session["github_view_type"] == "view_scores"
-    #  redirect_to view_grades_path(id: session["assignment_id"])
-    #end
   end
 
   def login_failed

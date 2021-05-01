@@ -38,7 +38,18 @@ end
     end
   end
   describe '#num_questions' do
-
+    context 'when there are no questions' do
+      it 'returns 0' do
+        dc = QuestionnaireAnalyticTestDummyClass.new([])
+        expect(dc.num_questions).to eq(0)
+  	  end
+    end
+    context 'when there are three questions' do
+      it 'returns 0' do
+        dc = QuestionnaireAnalyticTestDummyClass.new([question, question2, question3])
+        expect(dc.num_questions).to eq(3)
+  	  end
+    end
   end
   describe '#questions_text_list' do
 

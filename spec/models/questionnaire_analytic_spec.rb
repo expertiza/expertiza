@@ -1,22 +1,33 @@
 class QuestionnaireAnalyticTestDummyClass 
-  attr_accessor :questionnaires
+  attr_accessor :questions
   require 'analytic/questionnaire_analytic'
   include QuestionnaireAnalytic
-  def initialize(questionnaires)
-    @questionnaires = questionnaires
+  def initialize(questions)
+    @questions = questions
   end
 end
 
   describe QuestionnaireAnalytic do
-  let(:questionnaire) { Questionnaire.new name: "abc", private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234 }
-  let(:questionnaire1) { Questionnaire.new name: "xyz", private: 0, max_question_score: 20, instructor_id: 1234 }
+  let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
+  let(:question2) { TextArea.new(id: 1, weight: 2, break_before: true) }
+  let(:question3) { TextArea.new(id: 2, weight: 2, break_before: true) }
   describe '#types' do
-  	context 'when there are two questionnaires, with differing types' do
-      it 'returns an array of size two with the two types of questionnaires' do
-        dc = QuestionnaireAnalyticTestDummyClass.new([questionnaire, questionnaire1])
-        allow(questionnaire).to receive(:type).and_return('MetareviewQuestionnaire')
-        allow(questionnaire1).to receive(:type).and_return('AuthorFeedbackQuestionnaire')
-        expect(QuestionnaireAnalyticTestDummyClass::QuestionnaireAnalytic.types.length).to eq(2)
+  	context 'when there are two questions, with differing types' do
+      it 'returns an array of size two with the two types of questions' do
+        dc = QuestionnaireAnalyticTestDummyClass.new([question, question2])
+        allow(question).to receive(:type).and_return('Criterion')
+        allow(question2).to receive(:type).and_return('TextArea')
+        expect(dc.types.length).to eq(2)
+        expect(dc.types).to eq(['Criterion', 'TextArea'])
+  	  end
+    end
+    context 'when there are two questions, with the same types' do
+      it 'returns an array of size one with the one type of questions' do
+        dc = QuestionnaireAnalyticTestDummyClass.new([question3, question2])
+        allow(question3).to receive(:type).and_return('TextArea')
+        allow(question2).to receive(:type).and_return('TextArea')
+        expect(dc.types.length).to eq(1)
+        expect(dc.types).to eq(['TextArea'])
   	  end
     end
   end

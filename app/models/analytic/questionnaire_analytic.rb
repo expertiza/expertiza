@@ -1,10 +1,10 @@
 require 'analytic/question_analytic'
 module QuestionnaireAnalytic
-  # return all possible questionnaire types
-  def self.types
+  # return all possible question types
+  def types
     type_list = []
-    self.find_each do |questionnaire|
-      type_list << questionnaire.type unless type_list.include?(questionnaire.type)
+    self.questions.each do |question|
+      type_list << question.type unless type_list.include?(question.type)
     end
     type_list
   end

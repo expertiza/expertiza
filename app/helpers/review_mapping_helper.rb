@@ -159,31 +159,6 @@ module ReviewMappingHelper
     end
   end
 
-  # def get_review_volume(round, team_id)
-  #   # Setting values of instance variables
-  #   ['max', 'min', 'avg'].each { |metric| instance_variable_set('@' + metric, '-----') }
-  #   # Fetching value of @avg_and_ranges[team_id][round]
-  #   x = nil
-  #   if @avg_and_ranges.key?(team_id)
-  #     if @avg_and_ranges[team_id].key?(round)
-  #       x = @avg_and_ranges[team_id][round]
-  #     end
-  #   end
-  #
-  #   if x && %i[max min avg].all? { |k| x.key? k }
-  #     # Iterating though the list
-  #     ['max', 'min', 'avg'].each do |metric|
-  #       # setting values of variables based on certain conditions
-  #       average_metric = nil
-  #       if @avg_and_ranges[team_id][round].key?(metric)
-  #         average_metric = @avg_and_ranges[team_id][round][metric]
-  #       end
-  #       metric_value = average_metric.nil? ? '-----' : average_metric.round(0).to_s + '%'
-  #       instance_variable_set('@' + metric, metric_value)
-  #     end
-  #   end
-  # end
-
   # sorts the reviewers by the average volume of reviews in each round, in descending order
   def sort_reviewer_by_review_volume_desc
     @reviewers.each do |r|

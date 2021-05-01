@@ -66,12 +66,26 @@ end
         allow(question3).to receive(:txt).and_return('What is life?')
         expect(dc.questions_text_list.length).to eq(3)
         expect(dc.questions_text_list).to eq(['What is the answer?', 'What is 1 + 1?', 'What is life?'])
-
   	  end
     end
   end
   describe '#word_count_list' do
-
+    context 'when there are no questions' do
+      it 'returns an empty array' do
+        dc = QuestionnaireAnalyticTestDummyClass.new([])
+        expect(dc.word_count_list.empty?).to eq(true)
+  	  end
+    end
+    context 'when there are three questions with text' do
+      it 'returns an array of size 3 with the word count' do
+        dc = QuestionnaireAnalyticTestDummyClass.new([question, question2, question3])
+        allow(question).to receive(:word_count).and_return(100)
+        allow(question2).to receive(:word_count).and_return(75)
+        allow(question3).to receive(:word_count).and_return(50)
+        expect(dc.word_count_list.length).to eq(3)
+        expect(dc.word_count_list).to eq([100, 75, 50])
+  	  end
+    end
   end
   describe '#total_word_count' do
 

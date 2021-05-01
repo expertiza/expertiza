@@ -15,7 +15,7 @@ module QuestionnaireAnalytic
 
   def questions_text_list
     question_list = []
-    self.questions.each do |_questions|
+    self.questions.each do |question|
       question_list << question.txt
     end
     question_list

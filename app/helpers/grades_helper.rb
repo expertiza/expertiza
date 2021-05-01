@@ -178,6 +178,7 @@ module GradesHelper
     questions
   end
 
+  # E2111 This method creates the code to display the metrics heatgrid in view_team in grades.
   def metrics_table(team)
     metrics = Metric.where("team_id = ?", team)
 

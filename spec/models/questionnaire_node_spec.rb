@@ -71,7 +71,7 @@ describe QuestionnaireNode do
     context 'when the user is not a teaching assistant' do
       it 'returns the questionnaires associated with the student' do
       	condition = '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
-      	values = [1]
+      	values = 1
       	sortvar = 'name'
       	sortorder = 'ASC'
       	arr = [questionnaire, questionnaire2, questionnaire3]

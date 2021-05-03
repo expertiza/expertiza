@@ -56,13 +56,14 @@ describe QuestionnaireNode do
       it 'returns the questionnaires associated with the TA' do
       	condition = '(questionnaires.private = 0 or questionnaires.instructor_id in (?))'
       	values = [1]
-      	sortvar = nil
+      	sortvar = name
+      	sortorder = 'ASC'
       	arr = [questionnaire, questionnaire2, questionnaire3]
         allow(User).to receive(:find).with(1).and_return(teaching_assistant)
         allow(Questionnaire).to receive(:where).with([condition, values]).and_return(arr)
         allow(QuestionnaireNode).to receive(:includes).with(:questionnaire).and_return(Questionnaire)
         allow(Ta).to receive(:get_mapped_instructor_ids).with(1).and_return([1])
-        allow(arr).to receive(:order).with("questionnaires.#{sortvar}").and_return(arr)
+        allow(arr).to receive(:order).with("questionnaires.#{sortvar} #{sortorder}").and_return(arr)
         expect(QuestionnaireNode.get(sortvar = nil, sortorder = nil, user_id = 1, show = nil, parent_id = nil, _search = nil)).to eq(arr)
       end
     end

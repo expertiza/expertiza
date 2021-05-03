@@ -393,8 +393,8 @@ describe QuestionnairesController do
 
   describe '#add_new_questions' do
 
-    let(:criterion) { build(:criterion, weight: 1, max_label: '', min_label: '', size: '', alternatives: '') }
-    let(:dropdown) { build(:dropdown, size: '', alternatives: '') }
+    let(:criterion) { Criterion.new(weight: 1, max_label: '', min_label: '', size: '', alternatives: '') }
+    let(:dropdown) { Dropdown.new(size: '', alternatives: '') }
 
     context 'when adding ScoredQuestion' do
       it 'redirects to questionnaires#edit page after adding new questions' do

@@ -1,4 +1,5 @@
 module MetricsHelper
+  include Chartjs::ChartHelpers::Implicit
   # Fall 2018, E1858
   # Creates the bar graph for the github metrics data.
   # Links the authors with their github data and assigns
@@ -48,9 +49,7 @@ module MetricsHelper
       end
       link = pc.to_url
     end
-
       link
-
   end
 
   # Fall 2018, E1858

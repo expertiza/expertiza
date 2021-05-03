@@ -40,9 +40,9 @@ class MetricsController < ApplicationController
   def single_submission_initial_query(id)
     if session["github_access_token"].nil? # check if there is a github_access_token in current session
       session["participant_id"] = id # team number
-      session["assignment_id"] =AssignmentParticipant.find(id).assignment.id
+      session["assignment_id"] = AssignmentParticipant.find(id).assignment.id
       session["github_view_type"] = "view_submissions"
-      #redirect_to authorize_github # if no github_access_token present, redirect to authorization page
+      # redirect_to authorize_github if no github_access_token present, redirect to authorization page
        redirect_to :controller => 'metrics', :action => 'authorize_github'
       return
     end
@@ -123,7 +123,15 @@ class MetricsController < ApplicationController
     pull_links.each do |hyperlink|
       submission_hyperlink_tokens = hyperlink.split('/') # parse the link
       hyperlink_data = {}
-      hyperlink_data["pull_request_number"] = submission_hyperlink_tokens[6] # 1858
+      #Example: https://github.com/student/expertiza/pull/1234
+      # submission_hyperlink_tokens[6] == 1234
+      # submission_hyperlink_tokens[5] == "pull"
+      # submission_hyperlink_tokens[4] == "expertiza"
+      # submission_hyperlink_tokens[3] == "student"
+      # submission_hyperlink_tokens[2] == "github.com"
+      # submission_hyperlink_tokens[1] == ""
+      # submission_hyperlink_tokens[0] == "https:"
+      hyperlink_data["pull_request_number"] = submission_hyperlink_tokens[6]
       hyperlink_data["repository_name"] = submission_hyperlink_tokens[4] # expertiza
       hyperlink_data["owner_name"] = submission_hyperlink_tokens[3] # expertiza
       # yet another wrapper fot github api call, take repository name, owner name, and pull request number as parameter
@@ -203,6 +211,12 @@ class MetricsController < ApplicationController
     repo_links.each do |hyperlink|
       submission_hyperlink_tokens = hyperlink.split('/') # parse the link
       hyperlink_data = {}
+      #Example: https://github.com/student/expertiza.git
+      # submission_hyperlink_tokens[4] == "expertiza.git"
+      # submission_hyperlink_tokens[3] == "student"
+      # submission_hyperlink_tokens[2] == "github.com"
+      # submission_hyperlink_tokens[1] == ""
+      # submission_hyperlink_tokens[0] == "https:"
       hyperlink_data["repository_name"] = submission_hyperlink_tokens[4].gsub('.git', '')
       hyperlink_data["owner_name"] = submission_hyperlink_tokens[3]
       while has_next_page
@@ -213,7 +227,6 @@ class MetricsController < ApplicationController
         # Only run iteration across an additional page in case of no API errors and presence of additional pages of commits are detected
         has_next_page = false if github_data.nil? || github_data["data"].nil? || github_data["data"]["repository"].nil? || github_data["data"]["repository"]["ref"].nil?|| github_data["errors"] || github_data["data"]["repository"]["ref"]["target"]["history"]["pageInfo"]["hasNextPage"] != "true"
       end
-
     end
   end
 
@@ -300,7 +313,6 @@ class MetricsController < ApplicationController
     http.verify_mode = OpenSSL::SSL::VERIFY_PEER
     request = Net::HTTP::Post.new(uri.path, 'Authorization' => 'Bearer' + ' ' + session["github_access_token"]) # set up authorization
     request.body = data.to_json # convert query message to json and pass as request body
-    #    http.request(request)
     response = http.request(request) # make the actual request
     ActiveSupport::JSON.decode(response.body.to_s) # convert the response body to string, decoded then return
   end
@@ -330,7 +342,7 @@ class MetricsController < ApplicationController
         # If success, go ahead and save this mapping for future queries
         user.github_id = github_id unless user.nil?
         user.save unless user.nil?
-      else # Try mapping from unityID@gmail.com or unityID@anotherprovider.com
+      else # Try mapping from unityID@any_email_provider.com or unityID@anotherprovider.com
         user = User.find_by_email(email[0] + "@ncsu.edu")
         # If success, go ahead and save this mapping for future queries
         user.github_id = github_id unless user.nil?
@@ -355,5 +367,4 @@ class MetricsController < ApplicationController
                   :total_commits => total_commits
     end
   end
-
 end

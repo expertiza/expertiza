@@ -371,7 +371,7 @@ FactoryBot.define do
     instruction_loc nil
   end
 
-  factory :questionnaire_node, class do
+  factory :questionnaire_node, class: QuestionnaireNode do
     parent_id 0
     node_object_id 0
     type 'QuestionnaireNode'

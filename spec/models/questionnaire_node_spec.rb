@@ -12,7 +12,7 @@ describe QuestionnaireNode do
   end
   describe '#is_leaf' do
     it 'returns whether the node is a leaf' do
-      expect(questionnaire_node).to eq(true)
+      expect(questionnaire_node.is_leaf).to eq(true)
     end
   end
 end

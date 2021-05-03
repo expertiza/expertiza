@@ -56,7 +56,7 @@ describe QuestionnaireNode do
       it 'returns the questionnaires associated with the TA' do
       	condition = '(questionnaires.private = 0 or questionnaires.instructor_id in (?))'
       	values = [1]
-      	sortvar = name
+      	sortvar = 'name'
       	sortorder = 'ASC'
       	arr = [questionnaire, questionnaire2, questionnaire3]
         allow(User).to receive(:find).with(1).and_return(teaching_assistant)

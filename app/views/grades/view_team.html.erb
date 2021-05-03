@@ -234,6 +234,7 @@
     <% end %>
 <% end %>
 <!-- termination of the main outer loop.-->
+<!--E2111 Github Metrics integration. Only display github metrics heatgrid if Github is being used and metrics exist -->
 <% metrics = metrics_table(@team_id) %>
 <% unless metrics.nil? %>
   <br />

@@ -6,7 +6,7 @@ class QuestionnaireNode < Node
     "questionnaires"
   end
 
-  def self.questionnaires(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, _search = nil)
+  def self.get(sortvar = nil, sortorder = nil, user_id = nil, show = nil, parent_id = nil, _search = nil)
     conditions = if show
                    if User.find(user_id).role.name != "Teaching Assistant"
                      'questionnaires.instructor_id = ?'
@@ -36,30 +36,30 @@ class QuestionnaireNode < Node
         %w[ASC DESC asc desc].include? sortorder)
   end
 
-  def name
+  def get_name
     Questionnaire.find_by(id: self.node_object_id).try(:name)
   end
 
   # this method return instructor id associated with a questionnaire
   # expects no arguments
   # returns int
-  def instructor_id
+  def get_instructor_id
     Questionnaire.find_by(id: self.node_object_id).try(:instructor_id)
   end
 
-  def private
+  def get_private
     Questionnaire.find_by(id: self.node_object_id).try(:private)
   end
 
-  def creation_date
+  def get_creation_date
     Questionnaire.find_by(id: self.node_object_id).try(:created_at)
   end
 
-  def modified_date
+  def get_modified_date
     Questionnaire.find_by(id: self.node_object_id).try(:updated_at)
   end
 
-  def leaf?
+  def is_leaf
     true
   end
 end

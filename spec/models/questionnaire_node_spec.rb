@@ -15,4 +15,11 @@ describe QuestionnaireNode do
       expect(questionnaire_node.is_leaf).to eq(true)
     end
   end
+  describe '#get_modified_date' do
+    it 'returns when the questionnaire was last changed' do
+      allow(Questionnaire).to receive(:find_by).with(id: 0).and_return(questionnaire)
+      allow(questionnaire).to receive(:updated_at).and_return('2011-11-11 11:11:11')
+      expect(questionnaire_node.get_modified_date).to eq('2011-11-11 11:11:11')
+    end
+  end
 end

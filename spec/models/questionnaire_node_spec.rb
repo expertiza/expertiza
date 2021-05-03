@@ -4,6 +4,7 @@ describe QuestionnaireNode do
 	let(:questionnaire3) {build (:questionnaire)}
   let(:questionnaire_node) {build (:questionnaire_node)}
   let(:teaching_assistant) {build (:teaching_assistant)}
+  let(:student) {build(:student)}
   it { should belong_to(:questionnaire) }
   it { should belong_to(:node_object) }
   describe '#table' do
@@ -60,6 +61,21 @@ describe QuestionnaireNode do
       	sortorder = 'ASC'
       	arr = [questionnaire, questionnaire2, questionnaire3]
         allow(User).to receive(:find).with(1).and_return(teaching_assistant)
+        allow(Questionnaire).to receive(:where).with([condition, values]).and_return(arr)
+        allow(QuestionnaireNode).to receive(:includes).with(:questionnaire).and_return(Questionnaire)
+        allow(Ta).to receive(:get_mapped_instructor_ids).with(1).and_return([1])
+        allow(arr).to receive(:order).with("questionnaires.#{sortvar} #{sortorder}").and_return(arr)
+        expect(QuestionnaireNode.get(sortvar = nil, sortorder = nil, user_id = 1, show = nil, parent_id = nil, _search = nil)).to eq(arr)
+      end
+    end
+    context 'when the user is not a teaching assistant' do
+      it 'returns the questionnaires associated with the student' do
+      	condition = '(questionnaires.private = 0 or questionnaires.instructor_id = ?)'
+      	values = [1]
+      	sortvar = 'name'
+      	sortorder = 'ASC'
+      	arr = [questionnaire, questionnaire2, questionnaire3]
+        allow(User).to receive(:find).with(1).and_return(student)
         allow(Questionnaire).to receive(:where).with([condition, values]).and_return(arr)
         allow(QuestionnaireNode).to receive(:includes).with(:questionnaire).and_return(Questionnaire)
         allow(Ta).to receive(:get_mapped_instructor_ids).with(1).and_return([1])

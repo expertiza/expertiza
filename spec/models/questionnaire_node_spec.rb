@@ -34,4 +34,18 @@ describe QuestionnaireNode do
       expect(questionnaire_node.get_private).to eq(true)
     end
   end
+  describe '#get_instructor_id' do
+    it 'returns whether the associated instructor id with the questionnaire' do
+      allow(Questionnaire).to receive(:find_by).with(id: 0).and_return(questionnaire)
+      allow(questionnaire).to receive(:instructor_id).and_return(1)
+      expect(questionnaire_node.get_instructor_id).to eq(1)
+    end
+  end
+  describe '#get_name' do
+    it 'returns questionnaire name' do
+      allow(Questionnaire).to receive(:find_by).with(id: 0).and_return(questionnaire)
+      allow(questionnaire).to receive(:name).and_return('CSC 517 Assignment 1')
+      expect(questionnaire_node.get_name).to eq('CSC 517 Assignment 1')
+    end
+  end
 end

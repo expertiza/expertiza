@@ -101,7 +101,7 @@ describe QuestionnaireNode do
     end
     context 'when the user is a teaching assistant and show is enabled and parent_id is enabled' do
       it 'returns the questionnaires associated with the student' do
-      	condition = 'questionnaires.instructor_id = ?'
+      	conditions = 'questionnaires.instructor_id = ?'
       	name = "AssignmentQuestionnaire"
         conditions += " and questionnaires.type = \"#{name}\""
       	values = 1
@@ -110,7 +110,7 @@ describe QuestionnaireNode do
       	arr = [questionnaire, questionnaire2, questionnaire3]
         allow(TreeFolder).to receive(:find).with(2).and_return(assignment)
         allow(User).to receive(:find).with(1).and_return(student)
-        allow(Questionnaire).to receive(:where).with([condition, values]).and_return(arr)
+        allow(Questionnaire).to receive(:where).with([conditions, values]).and_return(arr)
         allow(QuestionnaireNode).to receive(:includes).with(:questionnaire).and_return(Questionnaire)
         allow(Ta).to receive(:get_mapped_instructor_ids).with(1).and_return([1])
         allow(arr).to receive(:order).with("questionnaires.#{sortvar} #{sortorder}").and_return(arr)

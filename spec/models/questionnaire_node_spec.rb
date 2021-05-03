@@ -108,7 +108,6 @@ describe QuestionnaireNode do
       	sortvar = 'name'
       	sortorder = 'ASC'
       	arr = [questionnaire, questionnaire2, questionnaire3]
-      	name = TreeFolder.find(parent_id).name + "Questionnaire"
         allow(TreeFolder).to receive(:find).with(2).and_return(assignment)
         allow(User).to receive(:find).with(1).and_return(student)
         allow(Questionnaire).to receive(:where).with([condition, values]).and_return(arr)

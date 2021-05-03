@@ -1,7 +1,5 @@
 describe QuestionnaireNode do
-	let(:questionnaire) do
-    build(id: 1, name: 'questionnaire', ta_id: 8, course_id: 1, private: false, min_question_score: 0, max_question_score: 5, type: 'ReviewQuestionnaire')
-  end
+	let(:questionnaire) {build (:questionnaire)}
   let(:questionnaire_node) {build (:questionnaire_node)}
   it { should belong_to(:questionnaire) }
   it { should belong_to(:node_object) }

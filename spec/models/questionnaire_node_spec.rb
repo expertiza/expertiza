@@ -54,11 +54,12 @@ describe QuestionnaireNode do
   describe '#get' do
     context 'when the user is a teaching assistant' do
       it 'returns the questionnaires associated with the TA' do
-      	condition = 'questionnaires.instructor_id = ?'
-      	values = 1
+      	condition = '(questionnaires.private = 0 or questionnaires.instructor_id in (?))'
+      	values = [1]
         allow(User).to receive(:find).with(1).and_return(teaching_assistant)
         allow(Questionnaire).to receive(:where).with(condition, values).and_return([questionnaire, questionnaire2, questionnaire3])
         allow(QuestionnaireNode).to receive(:includes).with(:questionnaire).and_return(Questionnaire)
+        allow(Ta).to receive(:get_mapped_instructor_ids).with(1).and_return([1])
         expect(QuestionnaireNode.get(sortvar = nil, sortorder = nil, user_id = 1, show = nil, parent_id = nil, _search = nil)).to eq([questionnaire, questionnaire2, questionnaire3])
       end
     end

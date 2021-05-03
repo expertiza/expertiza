@@ -6,12 +6,12 @@ describe QuestionnaireNode do
   it { should belong_to(:questionnaire) }
   it { should belong_to(:node_object) }
   describe '#table' do
-    it 'returns the name of the table'
+    it 'returns the name of the table' do
       expect(QuestionnaireNode.table).to eq('questionnaires')
     end
   end
   describe '#is_leaf' do
-    it 'returns whether the node is a leaf'
+    it 'returns whether the node is a leaf' do
       expect(questionnaire_node).to eq(true)
     end
   end

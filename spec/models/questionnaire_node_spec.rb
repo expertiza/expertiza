@@ -58,6 +58,7 @@ describe QuestionnaireNode do
       	values = 1
         allow(User).to receive(:find).with(1).and_return(teaching_assistant)
         allow(Questionnaire).to receive(:where).with(condition, values).and_return([questionnaire, questionnaire2, questionnaire3])
+        allow(QuestionnaireNode).to receive(:includes).with(:questionnaire).and_return(Questionnaire)
         expect(QuestionnaireNode.get(sortvar = nil, sortorder = nil, user_id = 1, show = nil, parent_id = nil, _search = nil)).to eq([questionnaire, questionnaire2, questionnaire3])
       end
     end

@@ -1,6 +1,9 @@
 describe QuestionnaireNode do
 	let(:questionnaire) {build (:questionnaire)}
+	let(:questionnaire2) {build (:questionnaire)}
+	let(:questionnaire3) {build (:questionnaire)}
   let(:questionnaire_node) {build (:questionnaire_node)}
+  let(:teaching_assistant) {build (:teaching_assistant)}
   it { should belong_to(:questionnaire) }
   it { should belong_to(:node_object) }
   describe '#table' do
@@ -48,4 +51,15 @@ describe QuestionnaireNode do
       expect(questionnaire_node.get_name).to eq('CSC 517 Assignment 1')
     end
   end
+  describe '#get' do
+    context 'when the user is a teaching assistant' do
+      it 'returns the questionnaires associated with the TA' do
+      	condition = 'questionnaires.instructor_id = ?'
+      	values = 1
+        allow(User).to receive(:find).with(1).and_return(teaching_assistant)
+        allow(Questionnaire).to receive(:where).with(condition, values).and_return([questionnaire, questionnaire2, questionnaire3])
+        expect(QuestionnaireNode.get(sortvar = nil, sortorder = nil, user_id = 1, show = nil, parent_id = nil, _search = nil)).to eq([questionnaire, questionnaire2, questionnaire3])
+      end
+    end
+  end 
 end

@@ -89,7 +89,7 @@ class AuthController < ApplicationController
                                :accept => :json)
     access_token = JSON.parse(result)['access_token']
     session["github_access_token"] = access_token
-    redirect_to controller: 'metrics', action: 'show', id: session["participant_id"]
+    redirect_to controller: 'assignments', action: 'list_submissions', id: session["assignment_id"]
   end
 
   def login_failed

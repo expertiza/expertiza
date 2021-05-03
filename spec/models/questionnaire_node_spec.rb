@@ -20,4 +20,18 @@ describe QuestionnaireNode do
       expect(questionnaire_node.get_modified_date).to eq('2011-11-11 11:11:11')
     end
   end
+  describe '#get_creation_date' do
+    it 'returns when the questionnaire was created' do
+      allow(Questionnaire).to receive(:find_by).with(id: 0).and_return(questionnaire)
+      allow(questionnaire).to receive(:created_at).and_return('2011-11-11 11:11:11')
+      expect(questionnaire_node.get_creation_date).to eq('2011-11-11 11:11:11')
+    end
+  end
+  describe '#get_private' do
+    it 'returns whether the associated questionnaire is private' do
+      allow(Questionnaire).to receive(:find_by).with(id: 0).and_return(questionnaire)
+      allow(questionnaire).to receive(:private).and_return(true)
+      expect(questionnaire_node.get_private).to eq(true)
+    end
+  end
 end

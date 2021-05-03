@@ -527,5 +527,13 @@ FactoryBot.define do
 
   factory :survey_deployment, class: SurveyDeployment do
     type 'AssignmentSurveyDeployment'
-    end
+  end
+
+  factory :metric, class: Metric do
+    id 1
+    metric_source_id 1
+    team_id 1
+    github_id "student@ncsu.edu"
+    total_commits 20
+  end
 end

@@ -184,7 +184,7 @@ class QuestionnairesController < ApplicationController
   # Zhewei: This method is used to add new questions when editing questionnaire.
   def add_new_questions
     questionnaire_id = params[:id] unless params[:id].nil?
-
+    # If the questionnaire is being used in the active period of an assignment, delete existing responses before adding new questions
     if AnswerHelper.check_and_delete_responses(questionnaire_id)
       flash[:success] = "You have successfully added a new question. Any existing reviews for the questionnaire have been deleted!"
     else

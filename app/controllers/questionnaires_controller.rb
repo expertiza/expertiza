@@ -206,7 +206,11 @@ class QuestionnairesController < ApplicationController
       question.size = '60, 5' if question.is_a? TextArea
       question.size = '30' if question.is_a? TextField
 
-      question.save
+      begin
+        question.save
+      rescue StandardError
+        flash[:error] = $ERROR_INFO
+      end
     end
     redirect_to edit_questionnaire_path(questionnaire_id.to_sym)
   end

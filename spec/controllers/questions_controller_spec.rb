@@ -11,7 +11,7 @@ describe QuestionsController do
       it 'deletes the question' do
         params = {id: 1}
         post :destroy,params
-        expect(flash[:success]).to eq("All existing reviews done in review period have been deleted. You have successfully deleted the question!")
+        expect(flash[:success]).to eq("You have successfully deleted the question.")
         expect(flash[:error]).to eq nil
       end
 

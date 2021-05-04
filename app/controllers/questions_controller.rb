@@ -74,7 +74,7 @@ class QuestionsController < ApplicationController
     if AnswerHelper.check_and_delete_responses(questionnaire_id)
       flash[:success] = "You have successfully deleted the question. Any existing reviews for the questionnaire have been deleted!"
     else
-      flash[:success] = "You have successfully deleted the question."
+      flash[:success] = "You have successfully deleted the question!"
     end
 
     begin

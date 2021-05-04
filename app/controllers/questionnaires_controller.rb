@@ -185,6 +185,7 @@ class QuestionnairesController < ApplicationController
   def add_new_questions
     questionnaire_id = params[:id] unless params[:id].nil?
     question_ids = Questionnaire.find(questionnaire_id).questions.ids
+    # If the questionnaire is being used in the active period of an assignment, delete existing responses before adding new questions
     if AnswerHelper.in_active_period(questionnaire_id)
       # Fetch the Answers for the Questionnaire, delete and send them to User
         AnswerHelper.delete_existing_responses(question_ids, questionnaire_id)

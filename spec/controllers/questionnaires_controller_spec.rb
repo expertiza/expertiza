@@ -392,9 +392,14 @@ describe QuestionnairesController do
   end
 
   describe '#add_new_questions' do
+
+    let(:criterion) { Criterion.new(id: 2, weight: 1, max_label: '', min_label: '', size: '', alternatives: '') }
+    let(:dropdown) { Dropdown.new(id: 3, size: '', alternatives: '') }
+
     context 'when adding ScoredQuestion' do
       it 'redirects to questionnaires#edit page after adding new questions' do
-        allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
+        allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', id: 1, questions: [criterion]))
+        allow_any_instance_of(Array).to receive(:ids).and_return([2]) # need to stub since .ids isn't recognized in the context of testing
         allow(question).to receive(:save).and_return(true)
         params = {id: 1,
                   question: {total_num: 2,
@@ -406,7 +411,8 @@ describe QuestionnairesController do
 
     context 'when adding unScoredQuestion' do
       it 'redirects to questionnaires#edit page after adding new questions' do
-        allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
+        allow(Questionnaire).to receive(:find).with('1').and_return(double('Questionnaire', id: 1, questions: [dropdown]))
+        allow_any_instance_of(Array).to receive(:ids).and_return([3]) # need to stub since .ids isn't recognized in the context of testing
         allow(question).to receive(:save).and_return(true)
         params = {id: 1,
                   question: {total_num: 2,

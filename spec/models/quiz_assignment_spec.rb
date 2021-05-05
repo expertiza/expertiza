@@ -77,6 +77,8 @@ describe QuizAssignment do
         allow(assignment).to receive(:candidate_topics_for_quiz).and_return(check_set)
       	allow(assignment).to receive(:contributors).and_return([team])
         allow(assignment).to receive(:quiz_taken_by?).with(team, participant).and_return(false)
+        allow(team).to receive(:includes?).with(participant).and_return(false)
+        allow(assignment).to receive(:signed_up_topic).with(team).and_return(topic)
         expect(assignment.contributor_for_quiz(participant, topic)).to eq(team)
       end
     end

@@ -13,10 +13,10 @@ describe QuizAssignment do
       end
     end
     context 'when there is a sign up topic but no team has signed up for topics' do
-      it 'returns all available topics' do
+      it 'returns an empty set' do
         allow(assignment).to receive(:contributors).and_return([team])
         allow(assignment).to receive(:signed_up_topic).with(team).and_return(nil)  
-        expect(assignment(candidate_topics_for_quiz)).to eq(Set.new)  
+        expect(assignment.candidate_topics_for_quiz).to eq(Set.new)  
       end
     end
   end

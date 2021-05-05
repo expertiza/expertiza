@@ -15,7 +15,7 @@ describe QuizAssignment do
     end
   end
   describe '#quiz_taken_by?' do
-  	context 'when the participant has taken 2 quizzes'c do
+  	context 'when the participant has taken 2 quizzes' do
       it 'returns true' do
         allow(QuizQuestionnaire).to receive(:find_by).with(instructor_id: 6).and_return(questionnaire1)
         allow(QuizResponseMap).to receive(:where).with('reviewee_id = 6 AND reviewer_id = 1 AND reviewed_object_id = 1').and_return([quiz_response_map1, quiz_response_map2])

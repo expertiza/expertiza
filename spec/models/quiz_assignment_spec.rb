@@ -69,5 +69,16 @@ describe QuizAssignment do
         expect{assignment.contributor_for_quiz(participant, topic)}.to raise_error("There are no more submissions to take quiz on for this topic.")
       end
     end
+    context 'when only one team can take the quiz' do
+      it 'return the team' do
+      	assignment.sign_up_topics << topic
+        check_set = Set.new
+        check_set.add(topic) 
+        allow(assignment).to receive(:candidate_topics_for_quiz).and_return(check_set)
+      	allow(assignment).to receive(:contributors).and_return([team])
+        allow(assignment).to receive(:quiz_taken_by?).with(team, participant).and_return(false)
+        expect(assignment.contributor_for_quiz(participant, topic)).to eq(team)
+      end
+    end
   end
 end

@@ -25,8 +25,10 @@ describe QuizAssignment do
       it 'returns a set of the topic' do
       	assignment.sign_up_topics << topic
         allow(assignment).to receive(:contributors).and_return([team])
-        allow(assignment).to receive(:signed_up_topic).with(team).and_return(topic)  
-        expect(assignment.candidate_topics_for_quiz).to eq(Set.new)  
+        allow(assignment).to receive(:signed_up_topic).with(team).and_return(topic) 
+        check_set = Set.new
+        check_set.add(topic) 
+        expect(assignment.candidate_topics_for_quiz).to eq(check_set)  
       end
     end
   end

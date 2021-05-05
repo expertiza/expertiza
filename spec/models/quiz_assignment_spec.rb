@@ -6,6 +6,7 @@ describe QuizAssignment do
   let(:team) { build(:assignment_team, id: 1, parent_id: 1) }
   let(:questionnaire1) { build(:questionnaire, id: 1, type: 'ReviewQuestionnaire') }
   let(:teammate_review_response_map) { build(:review_response_map, type: 'TeammateReviewResponseMap') }
+  let(:topic) { build(:topic) }
   describe '#candidate_topics_for_quiz' do
     context 'when there are no signup topics' do
       it 'returns nil' do
@@ -14,9 +15,17 @@ describe QuizAssignment do
     end
     context 'when there is a sign up topic but no team has signed up for topics' do
       it 'returns an empty set' do
-      	assignment.sign_up_topics << build(:topic)
+      	assignment.sign_up_topics << topic
         allow(assignment).to receive(:contributors).and_return([team])
         allow(assignment).to receive(:signed_up_topic).with(team).and_return(nil)  
+        expect(assignment.candidate_topics_for_quiz).to eq(Set.new)  
+      end
+    end
+    context 'when there is a sign up topic and the team has signed up for topics' do
+      it 'returns a set of the topic' do
+      	assignment.sign_up_topics << topic
+        allow(assignment).to receive(:contributors).and_return([team])
+        allow(assignment).to receive(:signed_up_topic).with(team).and_return(topic)  
         expect(assignment.candidate_topics_for_quiz).to eq(Set.new)  
       end
     end

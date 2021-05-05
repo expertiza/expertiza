@@ -60,5 +60,14 @@ describe QuizAssignment do
         expect{assignment.contributor_for_quiz(participant, topic)}.to raise_error("Too many quizes have been taken for this topic; please select another one.")
       end
     end
+    context 'when the quiz has accepted too many submissions' do
+      it 'raises an error' do
+        assignment.sign_up_topics << topic
+        check_set = Set.new
+        check_set.add(topic) 
+        allow(assignment).to receive(:candidate_topics_for_quiz).and_return(check_set)
+        expect{assignment.contributor_for_quiz(participant, topic)}.to raise_error("There are no more submissions to take quiz on for this topic.")
+      end
+    end
   end
 end

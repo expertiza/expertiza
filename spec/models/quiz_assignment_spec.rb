@@ -3,8 +3,8 @@ describe QuizAssignment do
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 3, name: 'no one') }
   let(:participant) { build(:participant, id: 1) }
-  let(:team) { build(:assignment_team, id: 1, name: 'no team') }
-  let(:questionnaire1) { build(:questionnaire, id: 1, type: 'QuizQuestionnaire') }
+  let(:team) { build(:assignment_team, id: 1, parent_id: 1) }
+  let(:questionnaire1) { build(:questionnaire, id: 1, type: 'ReviewQuestionnaire') }
   let(:quiz_response_map1) { build(:quiz_response_map, id: 1) }
   let(:quiz_response_map2) { build(:quiz_response_map, id: 2) }
   describe '#candidate_topics_for_quiz' do

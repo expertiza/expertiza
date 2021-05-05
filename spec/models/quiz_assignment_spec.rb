@@ -23,7 +23,7 @@ describe QuizAssignment do
     end
     context 'when there is a sign up topic and the team has signed up for topics' do
       it 'returns a set of the topic' do
-      	assignment.sign_up_topics << topic
+        assignment.sign_up_topics << topic
         allow(assignment).to receive(:contributors).and_return([team])
         allow(assignment).to receive(:signed_up_topic).with(team).and_return(topic) 
         check_set = Set.new
@@ -51,6 +51,15 @@ describe QuizAssignment do
     context 'when the assignment does not have topics' do
       it 'raises an error' do
         expect{assignment.contributor_for_quiz(participant, topic)}.to raise_error("This assignment does not have topics.")
+      end
+    end
+    context 'when the quiz has already been taken' do
+      it 'raises an error' do
+        assignment.sign_up_topics << topic
+        check_set = Set.new
+        check_set.add(topic) 
+        allow(assignment).to_receive(:candidate_topics_for_quiz).and_return(check_set)
+        expect{assignment.contributor_for_quiz(participant, topic)}.to raise_error("Too many quizes have been taken for this topic; please select another one.")
       end
     end
   end

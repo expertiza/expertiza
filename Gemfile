@@ -43,6 +43,7 @@ gem 'mimemagic', github: 'mimemagicrb/mimemagic', ref: '01f92d86d15d85cfd0f20dab
 gem 'momentjs-rails', '>= 2.9.0'
 gem 'mysql2'
 gem 'nokogiri'
+gem 'omniauth-github'
 gem 'omniauth-google-oauth2'
 gem 'open-uri-cached'
 gem 'paper_trail'

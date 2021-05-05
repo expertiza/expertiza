@@ -11,7 +11,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20201125202200) do
+
+ActiveRecord::Schema.define(version: 20210408232305) do
+
 
   create_table "account_requests", force: :cascade do |t|
     t.string   "name",              limit: 255
@@ -126,6 +128,7 @@ ActiveRecord::Schema.define(version: 20201125202200) do
     t.boolean  "has_badge"
     t.integer  "sample_assignment_id",                               limit: 4
     t.boolean  "allow_selecting_additional_reviews_after_1st_round"
+    t.integer  "sample_assignment_id",                               limit: 4
     t.boolean  "vary_by_topic",                                                    default: false
     t.boolean  "vary_by_round",                                                    default: false
     t.boolean  "reviewer_is_team"
@@ -362,6 +365,23 @@ ActiveRecord::Schema.define(version: 20201125202200) do
   add_index "menu_items", ["content_page_id"], name: "fk_menu_item_content_page_id", using: :btree
   add_index "menu_items", ["controller_action_id"], name: "fk_menu_item_controller_action_id", using: :btree
   add_index "menu_items", ["parent_id"], name: "fk_menu_item_parent_id", using: :btree
+
+  create_table "metric_sources", force: :cascade do |t|
+    t.string   "name",        limit: 255
+    t.string   "description", limit: 255
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
+  create_table "metrics", force: :cascade do |t|
+    t.integer  "metric_source_id", limit: 4
+    t.integer  "team_id",          limit: 4
+    t.string   "github_id",        limit: 255
+    t.integer  "participant_id",   limit: 4
+    t.integer  "total_commits",    limit: 4
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
 
   create_table "nodes", force: :cascade do |t|
     t.integer "parent_id",      limit: 4
@@ -748,14 +768,14 @@ ActiveRecord::Schema.define(version: 20201125202200) do
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 
   create_table "track_notifications", force: :cascade do |t|
-    t.integer  "notification_id", limit: 4
     t.integer  "user_id",         limit: 4
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "notification_id", limit: 4, null: false
   end
 
-  add_index "track_notifications", ["notification_id"], name: "index_track_notifications_on_notification_id", using: :btree
-  add_index "track_notifications", ["user_id"], name: "index_track_notifications_on_user_id", using: :btree
+  add_index "track_notifications", ["notification_id"], name: "notification_id", using: :btree
+  add_index "track_notifications", ["user_id"], name: "user_id", using: :btree
 
   create_table "tree_folders", force: :cascade do |t|
     t.string  "name",       limit: 255
@@ -794,6 +814,7 @@ ActiveRecord::Schema.define(version: 20201125202200) do
     t.boolean "copy_of_emails",                             default: false
     t.integer "institution_id",            limit: 4
     t.boolean "preference_home_flag",                       default: true
+    t.string  "github_id",                 limit: 255
   end
 
   add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree
@@ -852,6 +873,4 @@ ActiveRecord::Schema.define(version: 20201125202200) do
   add_foreign_key "tag_prompt_deployments", "tag_prompts"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
-  add_foreign_key "track_notifications", "notifications"
-  add_foreign_key "track_notifications", "users"
 end

@@ -6,7 +6,24 @@
       sortList: [[0,0]] //E1877: sort First Column by default when page loads
     });
   });
+
+  // E2111 Used to display the laoding icon when a github query is running
+  function showLoadIcon(){
+      icon = document.getElementById("load_icon");
+      icon.setAttribute("style", "")
+  }
+
 </script>
+<h4><%=@assignment.name%> </h4><h6><%="  Created on:  " + @assignment.created_at.to_s[0..10]%></h6>
+<%if @assignment.uses_github? %>
+<% if session["github_access_token"].nil? %>
+  <% topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(@teams.first) %>
+  <%= link_to 'Login to Query Github data', { controller: 'metrics', action: 'show', id: participants.first.id } %>
+  <% else %>
+<%= link_to 'Refresh Github data', { controller: 'metrics', action: 'query_assignment_statistics', id: @assignment.id}, :onclick => "showLoadIcon()"%>
+  <img id="load_icon" src="<%= image_url('ajax-loader.gif') %>" style="display:none">
+  <% end %>
+<% end %>
 <% headers = {} %>
 <% headers["Topic_name"] = "16%" if @assignment.topics? %>
 <% if @assignment.max_team_size > 1 %>
@@ -52,11 +69,15 @@
           <% unless participants.empty? %>
             <!-- “Assign Grade” will show if the final deadline of this assignment pass -->
             <% if @assignment.get_current_stage() == "Finished" %>
-              <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %></td>
+              <%= link_to 'Assign grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %>
             <!-- if current user(TA/instructor) is participant in assignment then the user can perform review -->
             <%elsif current_user_is_assignment_participant?(@assignment.id) %>
               <%= render :partial => 'responses', :locals => {:team => team ,:topic_id => topic_identifier, :title => 'Review'} %>
             <% end %>
+            <br>
+              <% unless Metric.find_by_team_id(team.id).nil? %>
+              <%= link_to 'GitHub metrics', { controller: 'metrics', action: 'show', id: participants.first.id }, target: '_blank' %></td>
+                <% end %>
           <% end %>
         <% end %>
 

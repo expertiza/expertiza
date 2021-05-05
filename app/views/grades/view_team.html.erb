@@ -107,10 +107,10 @@
               <% vm.list_of_reviews.each do |review| %>
                   <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
                   <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
-                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i} %>
+                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i, user_name: nil} %>
                   <% else %>
                       <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
-                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i} %>
+                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i, user_name: user_name} %>
                   <% end %>
                   <% i += 1 %>
               <% end %>
@@ -230,10 +230,32 @@
         <% elsif vm.questionnaire_type != "ReviewQuestionnaire" %>
             <br><div class="alert alert-warning">NO REVIEW OF <%= vm.questionnaire_type %> TYPE EXISTS. </div>
         <% end %>
-        <br/>  
+        <br/>
     <% end %>
 <% end %>
 <!-- termination of the main outer loop.-->
+<!--E2111 Github Metrics integration. Only display github metrics heatgrid if Github is being used and metrics exist -->
+<% metrics = metrics_table(@team_id) %>
+<% unless metrics.nil? %>
+  <br />
+  <h4>Github Contributions</h4>
+  <table id="metrics" class="scoresTable tbl_heat">
+    <thead>
+      <th>Student: </th>
+      <th>Total Commits: </th>
+    </thead>
+    <tbody>
+    <% metrics.each do |author, value| %>
+      <tr>
+        <td><%= author %></td>
+        <td class="<%=value[:color] %>" align="center"><%= value[:commits] %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table><img src="/assets/info.png" title="Lines of Code contribution unavailable for Repository links. Please check Github or the Github Metrics link in the Assignment Submissions page for details "/>
+  <br />
+<% end %>
+
 
 <!-- Get course ID and TA ID to restrict TAs ability to update his grades-->
 <%
@@ -247,7 +269,7 @@
     Grade: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
     Comment: <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %><br>
   <% end %>
-  <% if TaMapping.where(ta_id: @ta_id, course_id: @course_id).exists? %>
+  <% if TaMapping.where(ta_id: @ta_id, course_id: @course_id).exists? || @current_role_name == 'Instructor' %>
   <h4 style="font-weight:bold;display:inline-block;">TA Grade-Comment:</h4><br/>
     <%= form_tag 'save_grade_and_comment_for_submission' do %>
       <%= hidden_field_tag :participant_id, params[:id] %>

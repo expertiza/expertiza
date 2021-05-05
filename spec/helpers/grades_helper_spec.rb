@@ -4,9 +4,11 @@ describe GradesHelper, type: :helper do
   let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
   let(:assignment) { build(:assignment, id: 1, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true)}
   let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
-  
-  
+  let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
+  let(:team) { build(:assignment_team, id: 1, name: 'no team') }
+  let(:metric) { build(:metric, id: 1, metric_source_id: 1, participant_id: participant.id, github_id:"student@ncsu.edu") }
   # describe 'get_accordion_title' do
+  #
   #   it 'should render is_first:true if last_topic is nil' do
   #    get_accordion_title(nil, 'last question')
   #    expect(response).to render_template(partial: 'response/_accordion', locals: {title: 'last question', is_first: true})
@@ -132,4 +134,23 @@ describe GradesHelper, type: :helper do
       end 
     end
   end
+
+  describe "metrics_table" do
+    it "returns a dataset when a metric exists for this team" do
+    create(:assignment)
+    @assignment_team = create(:assignment_team, id: 1, name: 'team1', submitted_hyperlinks: ["https://www.github.com/anonymous/expertiza", "https://github.com/expertiza/expertiza/pull/1234"])
+    create(:metric)
+    allow(metrics_table(@assignment_team)).to receive(:metric)
+    expect(metrics_table(@assignment_team)).to eq({"Github Email: student@ncsu.edu"=>{:color=>"c1", :commits=>20}})
+    end
+
+    it "returns an empty set when no metrics exist for this team" do
+      create(:assignment)
+      @assignment_team = create(:assignment_team, id: 1, name: 'team1', submitted_hyperlinks: ["https://www.github.com/anonymous/expertiza", "https://github.com/expertiza/expertiza/pull/1234"])
+      allow(metrics_table(@assignment_team)).to receive(:metric)
+      expect(metrics_table(@assignment_team)).to eq({})
+    end
+
+  end
+
 end

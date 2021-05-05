@@ -556,6 +556,19 @@ class Assignment < ActiveRecord::Base
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: type).id }
   end
 
+  # E2111 Github Metrics Integration. Checks submissions for an assignment to determine if the assignment contains github
+  # links, which can be used to run github metric integration.
+  def uses_github?
+    teams = self.teams
+      teams.each do |team|
+        team_links = team.hyperlinks # all links that a team submitted
+        team_links.each do |link|
+          return true if link.include? "github.com"   # Github.com link found
+        end
+      end
+    false # No github links found in this assignment
+  end
+
   private
   #Below private methods are extracted and added as part of refactoring project E2009 - Spring 2020
   #This method computes and returns grades by rounds, total_num_of_assessments and total_score

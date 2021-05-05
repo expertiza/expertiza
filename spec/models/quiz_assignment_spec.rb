@@ -41,5 +41,17 @@ describe QuizAssignment do
       end
     end 
   end
-
+  describe '#contributor_for_quiz' do
+    context 'when no topic is selected' do
+      it 'raises an error' do
+        assignment.sign_up_topics << topic
+        expect(assignment.contributor_for_quiz(participant, nil)).to raise_error("Please select a topic.")
+      end
+    end
+    context 'when the assignment does not have topics' do
+      it 'raises an error' do
+        expect(assignment.contributor_for_quiz(participant, topic)).to raise_error("This assignment does not have topics.")
+      end
+    end
+  end
 end

@@ -56,9 +56,7 @@ describe QuizAssignment do
     context 'when the quiz has already been taken' do
       it 'raises an error' do
         assignment.sign_up_topics << topic
-        check_set = Set.new
-        check_set.add(topic) 
-        allow(assignment).to receive(:candidate_topics_for_quiz).and_return(check_set)
+        allow(assignment).to receive(:candidate_topics_for_quiz).and_return(Set.new)
         expect{assignment.contributor_for_quiz(participant, topic)}.to raise_error("Too many quizes have been taken for this topic; please select another one.")
       end
     end

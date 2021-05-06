@@ -34,7 +34,7 @@ describe "HttpRequest" do
     end
     context 'when you call a url that is bad' do
       it 'returns a string' do
-        url = 'https://fnhiashfisbg.com'
+        url = 'https://httpbin.org/status/404'
         expect(HttpRequest.get(url, 5)).to eq('')
       end
     end

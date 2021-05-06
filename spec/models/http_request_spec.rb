@@ -27,9 +27,15 @@ describe "HttpRequest" do
       end
     end
     context 'when you call a url that will redirect' do
-      it 'a 302 redirect response' do
+      it 'redirects 2 times then errors' do
         url = 'https://httpbin.org/absolute-redirect/2'
-        expect(HttpRequest.get(url, 5).message).to eq('OK')
+        expect(HttpRequest.get(url, 5)).to eq('')
+      end
+    end
+    context 'when you call a url that is bad' do
+      it 'returns a string' do
+        url = 'https://fnhiashfisbg.com'
+        expect(HttpRequest.get(url, 5)).to eq('')
       end
     end
   end

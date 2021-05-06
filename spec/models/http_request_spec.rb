@@ -21,9 +21,9 @@ describe "HttpRequest" do
      end
     end
     context 'when you call a valid url' do
-      it 'the result' do
+      it 'a 200 OK response' do
         url = 'https://httpbin.org'
-        expect(HttpRequest.get(url, 5)).to eq('')
+        expect(HttpRequest.get(url, 5)).to eq(Net::HTTPSuccess)
       end
     end
   end

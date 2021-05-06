@@ -23,7 +23,7 @@ describe "HttpRequest" do
     context 'when you call a valid url' do
       it 'a 200 OK response' do
         url = 'https://httpbin.org'
-        expect(HttpRequest.get(url, 5)).to eq(Net::HTTPSuccess)
+        expect(HttpRequest.get(url, 5).message).to eq(Net::HTTPSuccess)
       end
     end
   end

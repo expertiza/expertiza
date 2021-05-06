@@ -22,7 +22,7 @@ describe "HttpRequest" do
     end
     context 'when you call a valid url' do
       it 'the result' do
-        url = 'httpbin.org'
+        url = 'https://httpbin.org'
         expect(HttpRequest.get(url, 5)).to eq('')
       end
     end

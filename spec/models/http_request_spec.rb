@@ -28,7 +28,7 @@ describe "HttpRequest" do
     end
     context 'when you call a url that will redirect' do
       it 'a 302 redirect response' do
-        url = 'https://httpbin.org/redirect-to?url=https%3A%2F%2Fwww.google.com'
+        url = 'https://httpbin.org/absolute-redirect/2'
         expect(HttpRequest.get(url, 5).message).to eq('OK')
       end
     end

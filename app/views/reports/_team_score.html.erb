@@ -1,8 +1,8 @@
-<% if !@assignment.varying_rubrics_by_round? %>
+<% unless @assignment.varying_rubrics_by_round? %>
     <!--Score awarded / Avg. score-->
     <div>
     <% if @review_scores[reviewer_id][team_id] && @review_scores[reviewer_id][team_id] != -1 %>
-	<% if !@review_scores[reviewer_id][team_id].nil? %>
+	<% unless @review_scores[reviewer_id][team_id].nil? %>
         <%= @review_scores[reviewer_id][team_id].inspect %>%
 	<% end %>
     <% else %>

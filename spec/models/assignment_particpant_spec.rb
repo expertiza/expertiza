@@ -3,7 +3,7 @@ describe AssignmentParticipant do
   let(:team) { build(:assignment_team, id: 1) }
   let(:team2) { build(:assignment_team, id: 2) }
   let(:response_map) { build(:review_response_map, reviewer_id: 2, response: [response]) }
-  let(:participant) { build(:participant, id: 1, assignment: assignment) }
+  let(:participant) { build(:participant, id: 1, assignment: assignment, team: team) }
   let(:participant2) { build(:participant, id: 2, grade: 100) }
   let(:assignment) { build(:assignment, id: 1) }
   let(:review_questionnaire) { build(:questionnaire, id: 1) }
@@ -24,6 +24,15 @@ describe AssignmentParticipant do
       allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', 1).and_return([response_map])
       allow(AssignmentParticipant).to receive(:find).with(2).and_return(participant2)
       expect(participant.reviewers).to eq([participant2])
+    end
+  end
+  
+  describe '#get_reviewer' do
+    context 'when the associated assignment is reviewed by his team' do
+      it 'returns the team' do
+        allow(assignment).to receive(:reviewer_is_team).and_return(true)
+        expect(participant.get_reviewer).to eq(team)
+      end
     end
   end
 

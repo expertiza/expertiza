@@ -37,6 +37,15 @@ describe AssignmentParticipant do
     end
   end
 
+  describe '#path' do
+    it 'returns the path name of the associated assignment submission for the team' do
+      allow(assignment).to receive(:path).and_return('assignment780')
+      allow(participant).to receive(:team).and_return(team)
+      allow(team).to receive(:directory_num).and_return(780)
+      expect(participant.path).to eq('assignment780/780')
+    end
+  end
+
   describe '#scores' do
     before(:each) do
       allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)

@@ -399,6 +399,7 @@ describe Assignment do
       allow(CourseNode).to receive(:find_by).with(node_object_id: 1).and_return(double('CourseNode', id: 1))
       expect { assignment.create_node }.to change { AssignmentNode.count }.from(0).to(1)
       expect(AssignmentNode.first.parent_id).to eq(1)
+      expect(AssignmentNode.table).to eq("assignments")
     end
   end
 

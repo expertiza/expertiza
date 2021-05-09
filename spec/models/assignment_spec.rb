@@ -183,7 +183,7 @@ describe Assignment do
     context 'when the assignment does not have rounds' do
       it 'it returns the ids of the associated questionnaires' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire1])
-        expect(assignment.get_questionnaire_ids).to eq([assignment_questionnaire1])
+        expect(assignment.get_questionnaire_ids(nil)).to eq([assignment_questionnaire1])
       end
     end
     context 'when the assignment has rounds' do
@@ -195,7 +195,7 @@ describe Assignment do
     context 'when the assignment has no associated questionnaires' do
       it 'returns an empty list' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([])
-        expect(assignment.get_questionnaire_ids).to eq([])
+        expect(assignment.get_questionnaire_ids(nil)).to eq([])
       end
     end
   end

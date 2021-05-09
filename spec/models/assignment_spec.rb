@@ -193,9 +193,11 @@ describe Assignment do
       end
     end
     context 'when the assignment has no associated questionnaires' do
-      it 'returns an empty list' do
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([])
-        expect(assignment.get_questionnaire_ids(nil)).to eq([])
+      it 'returns a review questionnaire' do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 1).and_return([])
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire1])
+        allow(assignment_questionnaire1).to receive(:questionnaire).and_return(questionnaire1)
+        expect(assignment.get_questionnaire_ids(1)).to eq([assignment_questionnaire1])
       end
     end
   end

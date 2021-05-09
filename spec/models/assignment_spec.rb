@@ -400,6 +400,9 @@ describe Assignment do
       expect { assignment.create_node }.to change { AssignmentNode.count }.from(0).to(1)
       expect(AssignmentNode.first.parent_id).to eq(1)
       expect(AssignmentNode.table).to eq("assignments")
+      expect(AssignmentNode.first.is_leaf).to eq(true)
+      allow(Assignment).to receive(:find_by).with(id: 1).and_return(assignment)
+      expect(AssignmentNode.first.get_private).to eq(false)
     end
   end
 

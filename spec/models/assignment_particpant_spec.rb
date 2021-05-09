@@ -26,6 +26,25 @@ describe AssignmentParticipant do
       expect(participant.reviewers).to eq([participant2])
     end
   end
+  
+  describe '#get_reviewer' do
+    context 'when the associated assignment is reviewed by his team' do
+      it 'returns the team' do
+        allow(assignment).to receive(:reviewer_is_team).and_return(true)
+        allow(participant).to receive(:team).and_return(team)
+        expect(participant.get_reviewer).to eq(team)
+      end
+    end
+  end
+
+  describe '#path' do
+    it 'returns the path name of the associated assignment submission for the team' do
+      allow(assignment).to receive(:path).and_return('assignment780')
+      allow(participant).to receive(:team).and_return(team)
+      allow(team).to receive(:directory_num).and_return(780)
+      expect(participant.path).to eq('assignment780/780')
+    end
+  end
 
   describe '#scores' do
     before(:each) do

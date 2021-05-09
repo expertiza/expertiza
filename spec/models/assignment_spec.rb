@@ -178,6 +178,32 @@ describe Assignment do
       end
     end
   end
+  
+  describe '#get_questionnaire_ids' do
+    context 'when the assignment does not have rounds' do
+      it 'it returns the ids of the associated questionnaires' do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire1])
+        expect(assignment.get_questionnaire_ids(nil)).to eq([assignment_questionnaire1])
+      end
+    end
+    context 'when the assignment has rounds' do
+      it 'it returns the id of the associated questionnaires from the round' do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 1).and_return([assignment_questionnaire1])
+        expect(assignment.get_questionnaire_ids(1)).to eq([assignment_questionnaire1])
+      end
+    end
+    context 'when the assignment has no associated questionnaires' do
+      it 'returns a review questionnaire' do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 1).and_return([])
+        arr = [assignment_questionnaire1, assignment_questionnaire2]
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return(arr)
+        allow(arr).to receive(:find_each).and_yield(assignment_questionnaire1).and_yield(assignment_questionnaire2)
+        allow(assignment_questionnaire1).to receive(:questionnaire).and_return(questionnaire1)
+        allow(assignment_questionnaire2).to receive(:questionnaire).and_return(questionnaire2)
+        expect(assignment.get_questionnaire_ids(1)).to eq([assignment_questionnaire1])
+      end
+    end
+  end
 
   describe '#scores' do
     context 'when assignment is varying rubric by round assignment' do
@@ -373,6 +399,10 @@ describe Assignment do
       allow(CourseNode).to receive(:find_by).with(node_object_id: 1).and_return(double('CourseNode', id: 1))
       expect { assignment.create_node }.to change { AssignmentNode.count }.from(0).to(1)
       expect(AssignmentNode.first.parent_id).to eq(1)
+      expect(AssignmentNode.table).to eq("assignments")
+      expect(AssignmentNode.first.is_leaf).to eq(true)
+      allow(Assignment).to receive(:find_by).with(id: 1).and_return(assignment)
+      expect(AssignmentNode.first.get_private).to eq(false)
     end
   end
 

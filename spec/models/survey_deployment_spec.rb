@@ -23,7 +23,7 @@ describe 'SurveyDeployment' do
 
   describe '#response_maps' do
     it 'should return the associated response map' do
-      survey_deployment = AssignmentSurveyDeployment.new(questionnaire_id: 986, start_date: previous_day, end_date: nil, parent_id: "12345678", type: "AssignmentSurveyDeployment", reviewee_id: 1)
+      survey_deployment = AssignmentSurveyDeployment.new(questionnaire_id: 986, start_date: previous_day, end_date: nil, parent_id: "12345678", type: "AssignmentSurveyDeployment", id: 1)
       allow(AssignmentSurveyResponseMap).to receive(:where).with(reviewee_id: 1).and_return([response_map])
       expect(survey_deployment.response_maps).to eq([response_map])
     end

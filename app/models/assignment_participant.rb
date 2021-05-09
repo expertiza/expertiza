@@ -153,7 +153,7 @@ class AssignmentParticipant < Participant
   # returns the reviewer of the assignment. Checks the reviewer_is_team flag to
   # determine whether this AssignmentParticipant or their team is the reviewer
   def get_reviewer
-    self.team if self.assignment.reviewer_is_team
+    return self.team if self.assignment.reviewer_is_team
     self
   end
 

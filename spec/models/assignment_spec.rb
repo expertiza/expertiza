@@ -178,6 +178,27 @@ describe Assignment do
       end
     end
   end
+  
+  describe '#get_questionnaire_ids' do
+    context 'when the assignment does not have rounds' do
+      it 'it returns the ids of the associated questionnaires' do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire1])
+        expect(assignment.get_questionnaire_ids).to eq([assignment_questionnaire1])
+      end
+    end
+    context 'when the assignment has rounds' do
+      it 'it returns the id of the associated questionnaires from the round' do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 1).and_return([assignment_questionnaire1])
+        expect(assignment.get_questionnaire_ids(1)).to eq([assignment_questionnaire1])
+      end
+    end
+    context 'when the assignment has no associated questionnaires' do
+      it 'returns an empty list' do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([])
+        expect(assignment.get_questionnaire_ids).to eq([])
+      end
+    end
+  end
 
   describe '#scores' do
     context 'when assignment is varying rubric by round assignment' do

@@ -197,8 +197,9 @@ describe Assignment do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 1).and_return([])
         arr = [assignment_questionnaire1, assignment_questionnaire2]
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return(arr)
-        arr.stub(:find_each).and_yield(assignment_questionnaire1).and_yield(assignment_questionnaire2)
+        allow(arr).to receive(:find_each).and_yield(assignment_questionnaire1).and_yield(assignment_questionnaire2)
         allow(assignment_questionnaire1).to receive(:questionnaire).and_return(questionnaire1)
+        allow(assignment_questionnaire2).to receive(:questionnaire).and_return(questionnaire2)
         expect(assignment.get_questionnaire_ids(1)).to eq([assignment_questionnaire1])
       end
     end

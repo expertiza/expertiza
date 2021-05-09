@@ -191,7 +191,7 @@ describe ReviewResponseMap do
     allow(Response).to receive(:where).with(map_id: 1, round: 2).and_return([response1])
     allow(assignment).to receive(:review_questionnaire_id).with(2).and_return(1)
     expect(ReviewResponseMap.final_versions_from_reviewer(1, 1))
-      .to eq("review round1": {questionnaire_id: 1, response_ids: [1]}, "review round2": {questionnaire_id: 1, response_ids: [2]})
+      .to eq("review round 1": {questionnaire_id: 1, response_ids: [1]}, "review round 2": {questionnaire_id: 1, response_ids: [2]})
   end
 
   it '#review_response_report' do
@@ -240,7 +240,7 @@ describe ReviewResponseMap do
     current_assignment = Assignment.find(Participant.find(reviewer_id).parent_id)
     meta_review_response_maps = MetareviewResponseMap.where(reviewed_object_id: 1)
     expect(ReviewResponseMap.prepare_final_review_versions(current_assignment, meta_review_response_maps))
-      .to eq("review round1": {questionnaire_id: 1, response_ids: [1]}, "review round2": {questionnaire_id: 1, response_ids: [2]})
+      .to eq("review round 1": {questionnaire_id: 1, response_ids: [1]}, "review round 2": {questionnaire_id: 1, response_ids: [2]})
     # when round = nil
     reviewer_id = 2
     allow(Participant).to receive(:find).with(2).and_return(participant1)

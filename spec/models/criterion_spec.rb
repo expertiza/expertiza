@@ -3,7 +3,7 @@ describe "criterion" do
   let(:criterion) { Criterion.new id: 1, type: "Criterion", seq: 1.0, txt: "test txt", weight: 1, questionnaire: questionnaire }
   let(:answer_no_comments) { Answer.new answer:8 }
   let(:answer_comments) {Answer.new answer:3, comments: "text comments"}
-
+  let(:question_advice) { build(:question_advice) }
   describe "#edit" do
     it "returns the html " do
       html = criterion.edit(0).to_s
@@ -94,6 +94,13 @@ describe "criterion" do
     it "returns the html " do
       html = criterion.view_completed_question(0, answer_no_comments, 5).to_s
       expect(html).to eq("<b>0. test txt [Max points: 5]</b><table cellpadding=\"5\"><tr><td><div class=\"c5\" style=\"width:30px; height:30px; border-radius:50%; font-size:15px; color:black; line-height:30px; text-align:center;\">8</div></td></tr></table>")
+    end
+  end
+
+  describe '#advices_criterion_question'do
+    it 'returns the html' do
+      html = criterion.advices_criterion_question2(1, [question_advice]]).to_s
+      expect(html).to eq("")
     end
   end
 end

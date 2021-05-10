@@ -2,15 +2,17 @@
     <!--Score awarded / Avg. score-->
     <div>
     <% if @review_scores[reviewer_id][team_id] %>
-	<% unless @review_scores[reviewer_id][team_id].nil? && @review_scores[reviewer_id][team_id] == -1 %>
+	<% unless @review_scores[reviewer_id][team_id].nil? || @review_scores[reviewer_id][team_id] == -1.0 %>
         <%= @review_scores[reviewer_id][team_id].inspect %>%
 	<% end %>
     <% else %>
         --
     <% end %>
     /
-    <%if @avg_and_ranges[team_id] && !@avg_and_ranges[team_id][:avg].nil? && @avg_and_ranges[team_id][:avg] != -1.0 %>
+    <%if @avg_and_ranges[team_id] %>
+    <% unless @avg_and_ranges[team_id][:avg].nil? ||  @avg_and_ranges[team_id][:avg].round(0) == -1.0 %>
         <%= @avg_and_ranges[team_id][:avg].round(0) %>%
+    <% end %>
     <%else%>
         --
     <%end%>

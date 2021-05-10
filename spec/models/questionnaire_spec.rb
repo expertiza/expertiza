@@ -6,9 +6,9 @@ describe Questionnaire do
   let(:participant) { build(:participant, id: 1) }
   let(:assignment_questionnaire1) { build(:assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 2) }
   let(:questionnaire2) { build(:questionnaire, id: 2, type: 'MetareviewQuestionnaire') }
-  let!(:checkbox1) { Checkbox.create(id: 1, type: 'Checkbox', seq: 2.0, txt: 'test txt2', weight: 11) }
-  let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }
-  let(:question2) { create(:question, questionnaire: questionnaire, weight: 2, id: 2) }
+  let!(:checkbox1) { Checkbox.create(id: 3, type: 'Checkbox', seq: 2.0, txt: 'test txt2', weight: 11) }
+  let(:question1) { create(:question, questionnaire: questionnaire2, weight: 1, id: 1) }
+  let(:question2) { create(:question, questionnaire: questionnaire2, weight: 2, id: 2) }
   describe "#name" do
     it "returns the name of the Questionnaire" do
       expect(questionnaire.name).to eq("abc")

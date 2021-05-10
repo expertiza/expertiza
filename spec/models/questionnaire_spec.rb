@@ -109,7 +109,7 @@ describe Questionnaire do
   describe '#delete' do
     it 'deletes all dependent objects and itself' do
       allow(questionnaire2).to receive(:questions).and_return([question1, question2])
-      allow(questionnaire2).to receive(:assignments).and_return([assignment])
+      allow(questionnaire2).to receive(:assignments).and_return([])
       allow(QuestionnaireNode).to receive(:find_by).with(node_object_id: 2).and_return(questionnaire_node)
       expect(questionnaire2.delete).to be_truthy 
     end

@@ -167,7 +167,7 @@ module ReviewMappingHelper
       review_volumes = Response.get_volume_of_review_comments(@assignment.id, r.id)
       r.avg_vol_per_round = []
       review_volumes.each_index do |i|
-        if i == 0
+        if i.zero?
           r.overall_avg_vol = review_volumes[0]
         else
           r.avg_vol_per_round.push(review_volumes[i])

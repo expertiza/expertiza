@@ -99,7 +99,7 @@ describe "criterion" do
 
   describe '#advices_criterion_question'do
     it 'returns the html' do
-      html = criterion.advices_criterion_question2(1, [question_advice]]).to_s
+      html = criterion.advices_criterion_question2(1, [question_advice]).to_s
       expect(html).to eq("")
     end
   end

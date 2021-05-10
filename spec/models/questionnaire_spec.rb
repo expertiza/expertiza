@@ -73,8 +73,8 @@ describe Questionnaire do
        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 2).and_return(assignment_questionnaire1)
        allow(assignment_questionnaire1).to receive(:used_in_round).and_return(nil)
        allow(questionnaire2).to receive(:symbol).and_return('a')
-       allow(questionnaire2).to receive(:assignment_questionnaires).and_return(assignment_questionnaire2)
-       allow(assignment_questionnaire1).to receive(:find_by).with(assignment_id: 1).and_return(assignment_questionnaire2)
+       allow(questionnaire2).to receive(:assignment_questionnaires).and_return(assignment_questionnaire1)
+       allow(assignment_questionnaire1).to receive(:find_by).with(assignment_id: 1).and_return(assignment_questionnaire1)
        scores = {
          'a': {
            scores: {

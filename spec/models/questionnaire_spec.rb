@@ -75,13 +75,7 @@ describe Questionnaire do
        allow(questionnaire2).to receive(:symbol).and_return('a')
        allow(questionnaire2).to receive(:assignment_questionnaires).and_return(assignment_questionnaire1)
        allow(assignment_questionnaire1).to receive(:find_by).with(assignment_id: 1).and_return(assignment_questionnaire1)
-       scores = {
-         'a': {
-           scores: {
-             avg: 100
-           } 
-         }
-       }
+       scores = {'a' => {:scores => {:avg => 100}}}
        expect(questionnaire2.get_weighted_score(assignment, scores)).to eq(100)
      end
     end

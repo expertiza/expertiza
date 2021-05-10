@@ -6,6 +6,9 @@ describe Questionnaire do
   let(:participant) { build(:participant, id: 1) }
   let(:assignment_questionnaire1) { build(:assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 2) }
   let(:questionnaire2) { build(:questionnaire, id: 2, type: 'MetareviewQuestionnaire') }
+  let!(:checkbox1) { Checkbox.create(id: 1, type: 'Checkbox', seq: 2.0, txt: 'test txt2', weight: 11) }
+  let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }
+  let(:question2) { create(:question, questionnaire: questionnaire, weight: 2, id: 2) }
   describe "#name" do
     it "returns the name of the Questionnaire" do
       expect(questionnaire.name).to eq("abc")
@@ -80,5 +83,26 @@ describe Questionnaire do
      end
     end
   end 
+
+  describe '#true_false_questions?' do
+    context 'when there are no true/false questions' do
+      it 'returns false' do
+        allow(questionnaire2).to receive(questions).and_return([question1, question2])
+        expect(questionnaire2.true_false_questions?).to eq(false)
+      end
+    end
+    context 'when there is a true/false question' do
+      it 'returns true' do
+        allow(questionnaire2).to receive(questions).and_return([question1, question2, checkbox1])
+        expect(questionnaire2.true_false_questions?).to eq(true)
+      end
+    end
+    context 'when there are no assocaited questions' do
+      it 'returns false' do
+        allow(questionnaire2).to receive(questions).and_return([])
+        expect(questionnaire2.true_false_questions?).to eq(false)
+      end
+    end
+  end
 
 end

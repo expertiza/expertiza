@@ -1,7 +1,11 @@
 describe Questionnaire do
   let(:questionnaire) { Questionnaire.new name: "abc", private: 0, min_question_score: 0, max_question_score: 10, instructor_id: 1234 }
   let(:questionnaire1) { Questionnaire.new name: "xyz", private: 0, max_question_score: 20, instructor_id: 1234 }
-
+  let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
+  let(:team) { build(:assignment_team, id: 1, name: 'no team') }
+  let(:participant) { build(:participant, id: 1) }
+  let(:assignment_questionnaire1) { build(:assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 2) }
+  let(:questionnaire2) { build(:questionnaire, id: 2, type: 'MetareviewQuestionnaire') }
   describe "#name" do
     it "returns the name of the Questionnaire" do
       expect(questionnaire.name).to eq("abc")
@@ -62,4 +66,25 @@ describe Questionnaire do
     question_advice = build(:question_advice)
     allow(QuestionAdvice).to receive(:where).with(question_id: 1).and_return([question_advice])
   end
+
+  describe '#get_weighted_score' do
+    context 'when there are no rounds' do
+     it 'just uses the symbol with no round' do
+       allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 2).and_return(assignment_questionnaire1)
+       allow(assignment_questionnaire2).to receive(:used_in_round).and_return(nil)
+       allow(questionnaire2).to receive(:symbol).and_return('a')
+       allow(questionnaire2).to receive(:assignment_questionnaires).and_return(assignment_questionnaire2)
+       allow(assignment_questionnaire2).to receive(:find_by).with(assignment_id: 1).and_return(assignment_questionnaire2)
+       scores = {
+         'a': {
+           scores: {
+             avg: 100
+           } 
+         }
+       }
+       expect(questionnaire2.get_weighted_score(assignment, scores)).to eq(100)
+     end
+    end
+  end 
+
 end

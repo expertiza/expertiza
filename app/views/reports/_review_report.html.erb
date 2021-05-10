@@ -61,7 +61,7 @@
     <% sort_reviewer_by_review_volume_desc.each_with_index do |reviewer, index| %>
       <% @response_maps, @rspan = get_data_for_review_report(@id, reviewer.id, @type) %>
       <tr>
-        <% if reviewer.id != -1 %>
+        <% unless reviewer.id == 1 %>
           <% user = Participant.find(reviewer.id).user %>
             <!--reviewer-->
 			

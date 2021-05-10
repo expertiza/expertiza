@@ -9,6 +9,7 @@ describe Questionnaire do
   let!(:checkbox1) { Checkbox.create(id: 3, type: 'Checkbox', seq: 2.0, txt: 'test txt2', weight: 11) }
   let(:question1) { create(:question, questionnaire: questionnaire2, weight: 1, id: 1) }
   let(:question2) { create(:question, questionnaire: questionnaire2, weight: 2, id: 2) }
+  let(:questionnaire_node) {build (:questionnaire_node)}
   describe "#name" do
     it "returns the name of the Questionnaire" do
       expect(questionnaire.name).to eq("abc")
@@ -104,5 +105,13 @@ describe Questionnaire do
       end
     end
   end
-
+  
+  describe '#delete' do
+    it 'deletes all dependent objects and itself' do
+      allow(questionnaire2).to receive(:questions).and_return([question1, question2])
+      allow(questionnaire2).to receive(:assignments).and_return([assignment])
+      allow(QuestionnaireNode).to receive(:find_by).with(node_object_id: 2).and_return(questionnaire_node)
+      expect(questionnaire2.delete).to be_truthy 
+    end
+  end
 end

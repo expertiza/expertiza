@@ -114,4 +114,15 @@ describe Questionnaire do
       expect(questionnaire2.delete).to be_truthy 
     end
   end
+
+  describe '#max_possible_score' do
+    it 'returns the highest possible score for the questionnaire' do
+      questions = [question1, question2, checkbox1]
+      allow(Questionnaire).to receive(:joins).with('INNER JOIN questions ON questions.questionnaire_id = questionnaires.id').and_return(questions)
+      allow(questions).to receive(:select).with('SUM(questions.weight) * questionnaires.max_question_score as max_score').and_return(questions)
+      allow(questions).to receive(:where).with('questionnaires.id = ?', 2).and_return(questions)
+      allow(question1).to receive(:max_score).and_return(100)
+      expect(questionnaire2.max_possible_score).to eq(100)
+    end
+  end
 end

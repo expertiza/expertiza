@@ -87,19 +87,19 @@ describe Questionnaire do
   describe '#true_false_questions?' do
     context 'when there are no true/false questions' do
       it 'returns false' do
-        allow(questionnaire2).to receive(questions).and_return([question1, question2])
+        allow(questionnaire2).to receive(:questions).and_return([question1, question2])
         expect(questionnaire2.true_false_questions?).to eq(false)
       end
     end
     context 'when there is a true/false question' do
       it 'returns true' do
-        allow(questionnaire2).to receive(questions).and_return([question1, question2, checkbox1])
+        allow(questionnaire2).to receive(:questions).and_return([question1, question2, checkbox1])
         expect(questionnaire2.true_false_questions?).to eq(true)
       end
     end
     context 'when there are no assocaited questions' do
       it 'returns false' do
-        allow(questionnaire2).to receive(questions).and_return([])
+        allow(questionnaire2).to receive(:questions).and_return([])
         expect(questionnaire2.true_false_questions?).to eq(false)
       end
     end

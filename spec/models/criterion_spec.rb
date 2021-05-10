@@ -100,7 +100,7 @@ describe "criterion" do
   describe '#advices_criterion_question'do
     it 'returns the html' do
       html = criterion.advices_criterion_question(1, [question_advice]).to_s
-      expect(html).to eq("")
+      expect(html).to eq("<a id=\"showAdvice_1\" onclick=\"showAdvice(1)\">Show advice</a><script>function showAdvice(i){var e..._score\");var opts = elem.children(\"option\").length;elem.val((5 - j).toString());}</script></div>")
     end
   end
 end

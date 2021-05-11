@@ -119,7 +119,7 @@ describe Questionnaire do
         allow(questionnaire2).to receive(:questions).and_return([question1, question2])
         allow(questionnaire2).to receive(:assignments).and_return([assignment])
         allow(QuestionnaireNode).to receive(:find_by).with(node_object_id: 2).and_return(questionnaire_node)
-        expect{questionnaire2.delete}.to raise_error
+        expect{questionnaire2.delete}.to raise_error('Do you want to <A href=\'../assignment/delete/1\'>delete</A> the assignment?>')
       end
     end
   end

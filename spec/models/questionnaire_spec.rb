@@ -131,7 +131,7 @@ describe Questionnaire do
       allow(questions).to receive(:select).with('SUM(questions.weight) * questionnaires.max_question_score as max_score').and_return(questions)
       allow(questions).to receive(:where).with('questionnaires.id = ?', 2).and_return(questions)
       allow(question1).to receive(:max_score).and_return(100)
-      expect(questionnaire2.max_possible_score).to eq(100)
+      expect{questionnaire2.max_possible_score}.to eq(100)
     end
   end
 end

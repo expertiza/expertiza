@@ -119,7 +119,7 @@ describe Questionnaire do
         allow(questionnaire2).to receive(:questions).and_return([question1, question2])
         allow(questionnaire2).to receive(:assignments).and_return([assignment])
         allow(QuestionnaireNode).to receive(:find_by).with(node_object_id: 2).and_return(questionnaire_node)
-        expect(questionnaire2.delete).to raise_error
+        expect{questionnaire2.delete}.to raise_error
       end
     end
   end
@@ -131,7 +131,7 @@ describe Questionnaire do
       allow(questions).to receive(:select).with('SUM(questions.weight) * questionnaires.max_question_score as max_score').and_return(questions)
       allow(questions).to receive(:where).with('questionnaires.id = ?', 2).and_return(questions)
       allow(question1).to receive(:max_score).and_return(100)
-      expect{questionnaire2.max_possible_score}.to eq(100)
+      expect(questionnaire2.max_possible_score).to eq(100)
     end
   end
 end

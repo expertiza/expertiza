@@ -58,15 +58,16 @@
     <tbody>
 
     <!-- Set the review data and row span for each reviewer -->
-    <% sort_reviewer_by_review_volume_desc.each do |reviewer| %>
+    <% sort_reviewer_by_review_volume_desc.each_with_index do |reviewer, index| %>
       <% @response_maps, @rspan = get_data_for_review_report(@id, reviewer.id, @type) %>
       <tr>
-        <% if reviewer.id != -1 %>
+        <% unless reviewer.id == 1 %>
           <% user = Participant.find(reviewer.id).user %>
             <!--reviewer-->
 			
 			<!-- added class attribute and span tag to extract full name and unityID of the user for scraping (Used in export to CSV functionality) -->
             <td>
+              <%= index + 1 %>.
               <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post, :class => "user_unityID" %>
               (<span class="user_name"><%= user.fullname(session[:ip]) %></span>)
             </td>

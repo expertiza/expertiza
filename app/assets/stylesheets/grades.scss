@@ -40,6 +40,17 @@ background-color: #d3d3d3;
   background-color: #FFFFFF;
 }
 
+/* To color the grades in the summary report  */
+.grade-circle {
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  font-size:15px;
+  color:black;
+  line-height:30px;
+  text-align:center;
+}
+
 /* To underline scores which have a comment. */
 .underlined {
     text-decoration: underline;

@@ -22,6 +22,11 @@ with network lag and having to reinstall gems every time you connect. Installing
 Life is full of tradeoffs. :-) The good news is that you can start on one environment, push your work to git,
 and switch to another environment if you don't like the one you started with.
 
+### Anonymized Database
+
+For students researching educational data collected from Expertiza, here [is the database with scrubbed names](https://drive.google.com/file/d/1vMe1MX2aUahAzLMGUdFlXX1cNyDuljQ6/view?usp=sharing).
+
+
 ### Installing locally
 
 See the Google doc on [setting up the Expertiza development environment](https://docs.google.com/document/d/1tXmwju6R7KQbvycku-bdXxa6rXSUN4BMyvjY3ROmMSw/edit).

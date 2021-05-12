@@ -483,8 +483,8 @@ describe "assignment function" do
     it "Add new topic" do
       click_link 'New topic'
       click_button 'OK'
-      fill_in 'topic_topic_identifier', with: '1'
-      fill_in 'topic_topic_name', with: 'Test'
+      fill_in 'topic_identifier', with: '1'
+      fill_in 'topic_name', with: 'Test'
       fill_in 'topic_category', with: 'Test Category'
       fill_in 'topic_max_choosers', with: 2
       click_button 'Create'

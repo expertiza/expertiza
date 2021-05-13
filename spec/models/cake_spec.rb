@@ -75,6 +75,7 @@ describe "cake" do
           allow(arr).to receive(:where).with("participants.id = ? and teams.parent_id in (?)", 1, 1).and_return([team])
           allow(cake).to receive(:get_answers_for_teammmate_review).with(1,1,1,1,1).and_return([arr])
           expect(cake.get_total_score_for_question('TeammateReviewResponseMap', 1, 1, 1, 1)).to eq(95)
+        end
       end
     end
   end 

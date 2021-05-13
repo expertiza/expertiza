@@ -1,6 +1,6 @@
 describe "cake" do
     let(:questionnaire) { Questionnaire.new min_question_score: 0, max_question_score: 5 }
-    let(:cake) { Cake.new id: 1, type: "Cake", seq: 1.0, txt: "Cake type question?", weight: 1, questionnaire: questionnaire, size: '50,40' }
+    let(:cake) { Cake.new id: 1, type: "Cake", seq: 1.0, txt: "Cake type question?", weight: 1, questionnaire: questionnaire, size: '50' }
     let(:answer) { Answer.new answer: 45 }
     let(:answer1) { Answer.new answer: 50 }
   
@@ -36,7 +36,7 @@ describe "cake" do
         it 'return the html ' do
           html = cake.complete(10, answer, 95)
           allow(answer).to receive(:comments).and_return('comment')
-          expect(html).to eq('<table> <tbody> <tr><td><label for="responses_20"">Cake type question?&nbsp;&nbsp;</label><input class="form-control" id="responses_20" min="0" name="responses[20][score]"value="45"type="number" size = 5 onchange="validateScore(this.value,90,this.id)"> </td></tr></tbody></table><td width="10%"></td></tr></table><p>Total contribution so far (excluding current review): 90% </p><textarea cols=50 rows=40 id="responses_20_comments" name="responses[20][comment]" class="tinymce">comment</textarea><script> function validateScore(val, total_score,id) {
+          expect(html).to eq('<table> <tbody> <tr><td><label for="responses_20"">Cake type question?&nbsp;&nbsp;</label><input class="form-control" id="responses_20" min="0" name="responses[20][score]"value="45"type="number" size = 5 onchange="validateScore(this.value,90,this.id)"> </td></tr></tbody></table><td width="10%"></td></tr></table><p>Total contribution so far (excluding current review): 90% </p><textarea cols=50 rows= id="responses_20_comments" name="responses[20][comment]" class="tinymce">comment</textarea><script> function validateScore(val, total_score,id) {
                 var int_val = parseInt(val);
                 var int_total_score = parseInt(total_score);                
                 if (int_val+int_total_score > 100 || int_val < 0)

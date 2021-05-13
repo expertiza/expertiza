@@ -96,7 +96,7 @@ describe "cake" do
         allow(arr1).to receive(:where).with("teams_users.team_id in (?) and participants.parent_id in (?)", 1, 1).and_return(part)
         allow(part).to receive(:ids).and_return([1])
         allow(Answer).to receive(:joins).with([{response: :response_map}, :question]).and_return(arr1)
-        allow(arr1).to receive(:where).with("response_maps.reviewee_id in (?) and response_maps.reviewed_object_id = (?) 
+        allow(arr1).to receive(:where).with("response_maps.reviewee_id in (?) and response_maps.reviewed_object_id = (?  
           and answer is not null and response_maps.reviewer_id in (?) and answers.question_id in (?) and response_maps.reviewee_id not in (?)", [1], 1, 1, 1, 1).and_return([answer, answer1])
         expect(cake.get_answers_for_teammatereview(1,1,1,1,1))
       end

@@ -2,6 +2,7 @@ describe "cake" do
     let(:questionnaire) { Questionnaire.new min_question_score: 0, max_question_score: 5 }
     let(:cake) { Cake.new id: 1, type: "Cake", seq: 1.0, txt: "Cake type question?", weight: 1, questionnaire: questionnaire, size: 50 }
     let(:answer) { Answer.new answer: 45 }
+    let(:answer1) { Answer.new answer: 50 }
   
     describe "#edit" do
       it "returns the html " do
@@ -21,6 +22,12 @@ describe "cake" do
       it "returns the html " do
         html = cake.view_completed_question(0, answer).to_s
         expect(html).to eq("<b>0. Cake type question?</b><div class=\"c5\" style=\"width:30px; height:30px; border-radius:50%; font-size:15px; color:black; line-height:30px; text-align:center;\">45</div><b>Comments:</b>")
+      end
+    end
+
+    describe '#calculate_total_score' do
+      it 'Sums up the scores given by all teammates that should be less than or equal to 100' do
+        expect(cake.calculate_total_score([answer, answer1]).to eq(95)
       end
     end
   end 

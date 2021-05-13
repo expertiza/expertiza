@@ -36,7 +36,7 @@ describe "cake" do
         it 'return the html ' do
           allow(answer).to receive(:comments).and_return('comment')
           html = cake.complete(10, answer, 95)
-          expect(html).to eq('<table> <tbody> <tr><td><label for="responses_20"">Cake type question?&nbsp;&nbsp;</label><input class="form-control" id="responses_20" min="0" name="responses[20][score]"value="45"type="number" size = 5 onchange="validateScore(this.value,90,this.id)"> </td></tr></tbody></table><td width="10%"></td></tr></table><p>Total contribution so far (excluding current review): 90% </p><textarea cols=50 rows= id="responses_20_comments" name="responses[20][comment]" class="tinymce">comment</textarea><script> function validateScore(val, total_score,id) {
+          expect(html).to eq('<table> <tbody> <tr><td><label for="responses_10"">Cake type question?&nbsp;&nbsp;</label><input class="form-control" id="responses_10" min="0" name="responses[10][score]"value="45"type="number" size = 5 onchange="validateScore(this.value,95,this.id)"> </td></tr></tbody></table><td width="10%"></td></tr></table><p>Total contribution so far (excluding current review): 95% </p><textarea cols=50 rows= id="responses_10_comments" name="responses[10][comment]" class="tinymce">comment</textarea><script> function validateScore(val, total_score,id) {
                 var int_val = parseInt(val);
                 var int_total_score = parseInt(total_score);                
                 if (int_val+int_total_score > 100 || int_val < 0)

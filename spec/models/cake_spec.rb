@@ -27,7 +27,7 @@ describe "cake" do
 
     describe '#calculate_total_score' do
       it 'Sums up the scores given by all teammates that should be less than or equal to 100' do
-        expect(cake.calculate_total_score([answer, answer1]).to eq(95)
+        expect(cake.calculate_total_score([answer, answer1])).to eq(95)
       end
     end
   end 

@@ -82,7 +82,7 @@ class Cake < ScoredQuestion
       if review_type == 'TeammateReviewResponseMap'
         answers_for_team_members =  get_answers_for_teammatereview(team_id, question_id, participant_id, assignment_id, reviewee_id)
       end
-      calculate_total_score(answers_for_team_members)
+      calculate_total_score(answers_for_team_members) unless answers_for_team_members.nil?
     end
   
     # Finds the scores for all teammates for this question

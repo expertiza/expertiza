@@ -83,7 +83,7 @@ describe "cake" do
           allow(Team).to receive(:joins).with([:teams_users, teams_users: [{user: :participants}]]).and_return(arr)
           allow(arr).to receive(:where).with("participants.id = ? and teams.parent_id in (?)", 1, 1).and_return([team])
           allow(cake).to receive(:get_answers_for_teammatereview).with(1,1,1,1,1).and_return(arr)
-          expect(cake.get_total_score_for_question('NotTeammateReviewResponseMap', 1, 1, 1, 1)).to eq(0)
+          expect(cake.get_total_score_for_question('NotTeammateReviewResponseMap', 1, 1, 1, 1)).to eq(nil)
         end
       end
     end

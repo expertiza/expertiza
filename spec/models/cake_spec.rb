@@ -47,5 +47,21 @@ describe "cake" do
               }</script>')
         end 
       end
+      context 'when size has not been set' do
+        it 'defaults to 70 and 1' do
+          cake.size = nil
+          allow(answer).to receive(:comments).and_return('comment')
+          html = cake.complete(10, answer, 95)
+          expect(html).to eq('<table> <tbody> <tr><td><label for="responses_10"">Cake type question?&nbsp;&nbsp;</label><input class="form-control" id="responses_10" min="0" name="responses[10][score]"value="45"type="number" size = 5 onchange="validateScore(this.value,95,this.id)"> </td></tr></tbody></table><td width="10%"></td></tr></table><p>Total contribution so far (excluding current review): 95% </p><textarea cols=70 rows=1 id="responses_10_comments" name="responses[10][comment]" class="tinymce">comment</textarea><script> function validateScore(val, total_score,id) {
+                var int_val = parseInt(val);
+                var int_total_score = parseInt(total_score);                
+                if (int_val+int_total_score > 100 || int_val < 0)
+                {
+                  alert("Total contribution cannot exceed 100 or be a negative value, current total: " + (int_val+int_total_score));
+                  document.getElementById(id).value = 0
+                }
+              }</script>')
+        end
+      end
     end
   end 

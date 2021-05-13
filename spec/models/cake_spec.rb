@@ -87,4 +87,17 @@ describe "cake" do
         end
       end
     end
+
+    describe '#get_answers_for_teammatereview' do
+      it 'gets an array of answers' do
+        arr1 = []
+        part = [participant]
+        allow(Participant).to receive(:joins).with(user: :teams_users).and_return(arr1)
+        allow(arr1).to receive(:where).with("teams_users.team_id in (?) and participants.parent_id in (?)", 1, 1).to_return([part1])
+        allow(part1).to_receive(:ids).and_return[1]
+        allow(Answer).to recieve(:joins).with([{response: :response_map}, :question]).and_return(arr1)
+        allow(arr1).to receive(:where).with("response_maps.reviewee_id in (?) and response_maps.reviewed_object_id = (?) and answer is not null and response_maps.reviewer_id in (?) and answers.question_id in (?) and response_maps.reviewee_id not in (?)", [1], 1, 1, 1, 1).and_return([answer, answer1])
+        expect(cake.get_answers_for_teammatereview(1,1,1,1,1))
+      end
+    end
   end 

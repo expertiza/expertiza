@@ -3,7 +3,9 @@ describe "cake" do
     let(:cake) { Cake.new id: 1, type: "Cake", seq: 1.0, txt: "Cake type question?", weight: 1, questionnaire: questionnaire, size: '50' }
     let(:answer) { Answer.new answer: 45 }
     let(:answer1) { Answer.new answer: 50 }
-  
+    let(:team) { build(:assignment_team, id: 1, name: 'no team', users: [user]) }
+    let(:user) { build(:student, id: 1, name: 'no name', fullname: 'no one', participants: [participant]) }
+    let(:participant) { build(:participant, user_id: 1) }
     describe "#edit" do
       it "returns the html " do
         html = cake.edit(0).to_s
@@ -62,6 +64,17 @@ describe "cake" do
                 }
               }</script>')
         end
+      end
+    end
+
+    describe '#get_total_score_for_question' do
+      context 'when the review is a Teammate Review Response Map' do
+        it 'returns the scores of the team' do
+          arr = [answer, answer1]
+          allow(Team).to receive(:joins).with([:teams_users, teams_users: [{user: :participants}]]).and_return(arr)
+          allow(arr).to receive(:where).with("participants.id = ? and teams.parent_id in (?)", 1, 1).and_return([team])
+          allow(cake).to receive(:get_answers_for_teammmate_review).with(1,1,1,1,1).and_return([arr])
+          expect(cake.get_total_score_for_question('TeammateReviewResponseMap', 1, 1, 1, 1)).to eq(95)
       end
     end
   end 

@@ -1,5 +1,10 @@
 describe MultipleChoiceCheckbox do
   let(:multiple_choice_checkbox) { build(:multiple_choice_checkbox, id: 1)}
+  let(:questionnaire1) { build(:questionnaire, id: 1, type: 'ReviewQuestionnaire') }
+  let(:questionnaire2) { build(:questionnaire, id: 2, type: 'MetareviewQuestionnaire') }
+  let(:team) { build(:assignment_team, id: 1, name: 'no team') }
+  let(:participant) { build(:participant, id: 1) }
+  let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
   describe '#edit' do
     it 'returns the html' do
       qc = double('QuizQuestionChoice')
@@ -73,6 +78,16 @@ describe MultipleChoiceCheckbox do
   describe '#export_fields' do
     it 'returns the column headers' do
       expect(Question.export_fields([])).to eq(["Seq", "Question", "Type", "Weight", "text area size", "max_label", "min_label"])
+    end
+  end
+
+  describe '#get_all_questions_with_comments_available' do
+    context 'when the assignment has no questionnaires associated' do
+      it 'returns an empty array' do 
+        allow(Assignment).to receive(:find).with(1).and_return(assignment)
+        allow(assignment).to receive(:questionnaires).and_return([])
+        expect(Question.get_all_questions_with_comments_available(assignment.id)).to eq([]) 
+      end
     end
   end
 end

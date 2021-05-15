@@ -72,7 +72,7 @@ describe MultipleChoiceCheckbox do
   end
   describe '#export_fields' do
     it 'returns the column headers' do
-      expect(Question.export_fields).to eq(["Seq", "Question", "Type", "Weight", "text area size", "max_label", "min_label"])
+      expect(Question.export_fields([])).to eq(["Seq", "Question", "Type", "Weight", "text area size", "max_label", "min_label"])
     end
   end
 end

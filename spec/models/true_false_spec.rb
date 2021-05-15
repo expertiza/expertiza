@@ -35,7 +35,7 @@ describe TrueFalse do
   end
   describe '#get_formatted_question_type' do
     it 'returns "True/False"' do
-      expect(multiple_choice_checkbox.get_formatted_question_type).to eq('True/False')
+      expect(true_false.get_formatted_question_type).to eq('True/False')
     end
   end
 

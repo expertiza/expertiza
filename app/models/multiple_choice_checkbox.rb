@@ -78,8 +78,8 @@ class MultipleChoiceCheckbox < QuizQuestion
     correct_count = 0
     # choice_info.each do |_idx, value|
     choice_info.each_value do |value|
-      return "Please make sure every question has text for all options" if value[:txt].nil? || value[:txt].empty? 
-      correct_count += 1 if value[:iscorrect] == 1.to_s
+      return "Please make sure every question has text for all options" if value.txt.nil? || value.txt.empty? 
+      correct_count += 1 if value.iscorrect == 1.to_s
     end
     # if correct_count == 0
     if correct_count.zero?

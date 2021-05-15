@@ -73,24 +73,20 @@ class MultipleChoiceCheckbox < QuizQuestion
     # safe_join(html)
   end
 
-  def isvalid(choice_info)
-    valid = "valid"
-    valid = "Please make sure all questions have text" if self.txt == ''
+  def valid?(choice_info)
+    return "Please make sure all questions have text" if self.txt.empty? || self.txt.nil?
     correct_count = 0
     # choice_info.each do |_idx, value|
     choice_info.each_value do |value|
-      if value[:txt] == ''
-        valid = "Please make sure every question has text for all options"
-        break
-      end
+      return "Please make sure every question has text for all options" if value[:txt].empty? || value[:txt].nil?
       correct_count += 1 if value[:iscorrect] == 1.to_s
     end
     # if correct_count == 0
     if correct_count.zero?
-      valid = "Please select a correct answer for all questions"
+      return "Please select a correct answer for all questions"
     elsif correct_count == 1
-      valid = "A multiple-choice checkbox question should have more than one correct answer."
+      return "A multiple-choice checkbox question should have more than one correct answer."
     end
-    valid
+    "valid"
   end
 end

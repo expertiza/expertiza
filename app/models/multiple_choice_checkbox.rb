@@ -75,7 +75,7 @@ class MultipleChoiceCheckbox < QuizQuestion
 
   def valid?(choice_info)
     valid = "valid"
-    valid = "Please make sure all questions have text" if self.txt == ''
+    valid = "Please make sure all questions have text" if self.txt.nil? || self.txt.empty? 
     correct_count = 0
     # choice_info.each do |_idx, value|
     choice_info.each_value do |value|

@@ -377,6 +377,7 @@ FactoryBot.define do
     node_object_id 0
     type 'QuestionnaireNode'
   end
+
   factory :question, class: Criterion do
     txt 'Test question:'
     weight 1
@@ -529,9 +530,27 @@ FactoryBot.define do
     name 'username'
     fullname 'full name'
     email 'abc@mailinator.com'
-    end
+  end
 
   factory :survey_deployment, class: SurveyDeployment do
     type 'AssignmentSurveyDeployment'
-    end
+  end
+
+  factory :multiple_choice_checkbox, class: MultipleChoiceCheckbox do
+    txt 'Test question:'
+    weight 1
+    questionnaire { Questionnaire.first || association(:questionnaire) }
+    seq 1.00
+    type 'MultipleChoiceCheckbox'
+    size '70,1'
+  end
+
+  factory :scored_question, class: ScoredQuestion do
+    txt 'Test question:'
+    weight 1
+    questionnaire { Questionnaire.first || association(:questionnaire) }
+    seq 1.00
+    type 'ScoredQuestion'
+    size '70,1'
+  end
 end

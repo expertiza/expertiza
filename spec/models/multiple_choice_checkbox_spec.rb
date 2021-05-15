@@ -6,6 +6,7 @@ describe MultipleChoiceCheckbox do
   let(:participant) { build(:participant, id: 1) }
   let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
   let(:scored_question) { build(:scored_question, id: 1)}
+  let(:question) { build(:question)}
   describe '#edit' do
     it 'returns the html' do
       qc = double('QuizQuestionChoice')
@@ -91,6 +92,17 @@ describe MultipleChoiceCheckbox do
         allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(nil)
         expect{Question.import(['header1', 'header2', 'header3', 'header4', 'header5'], [], [], 1)}.to raise_error(ArgumentError)
       end
+    end
+  end
+  describe '#export' do
+    it 'writes to a csv file' do
+      csv = CSV.new
+      csv << [question.seq, question.txt, question.type,
+              question.weight, question.size, question.max_label,
+              question.min_label]
+      allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire1)
+      allow(questionnaire1).to receive(:questions).and_return([question])
+      expect(Question.export(csv, 1, nil)).to eq(csv)
     end
   end
 

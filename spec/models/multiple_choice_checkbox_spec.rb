@@ -60,4 +60,9 @@ describe MultipleChoiceCheckbox do
       end
     end
   end
+  describe '#get_formatted_question_type' do
+    it 'returns "Multiple Choice - Checked"' do
+      expect(multiple_choice_checkbox.get_formatted_question_type).to eq('Multiple Choice - Checked')
+    end
+  end
 end

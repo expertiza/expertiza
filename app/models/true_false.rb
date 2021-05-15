@@ -76,7 +76,7 @@ class TrueFalse < QuizQuestion
     valid = "valid"
     valid = "Please make sure all questions have text" if self.txt == ''
     correct_count = 0
-    choice_info.each_value do |value|
+    choice_info.each do |_idx, value|
       if value[:txt] == ''
         valid = "Please make sure every question has text for all options"
         break

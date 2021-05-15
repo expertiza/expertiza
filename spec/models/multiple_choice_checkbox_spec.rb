@@ -13,14 +13,17 @@ describe MultipleChoiceCheckbox do
     context 'when the question itself does not have txt' do
       it 'returns "Please make sure all questions have text"' do
         allow(multiple_choice_checkbox).to receive(:txt).and_return(nil)
-        expect(multiple_choice_checkbox.valid?([qc, qc, qc, qc])).to eq("Please make sure all questions have text")
+        qc = double('QuizQuestionChoice')
+        questions = {"1" => qc, "2" => qc, "3" => qc, "4" => qc}
+        expect(multiple_choice_checkbox.valid?(questions)).to eq("Please make sure all questions have text")
       end
     end
     context 'when a choice does not have txt' do
       it 'returns "Please make sure every question has text for all options"' do
         qc = double('QuizQuestionChoice')
         allow(qc).to receive(:txt).and_return(nil)
-        expect(multiple_choice_checkbox.valid?([qc, qc, qc, qc])).to eq("Please make sure every question has text for all options")
+        questions = {"1" => qc, "2" => qc, "3" => qc, "4" => qc}
+        expect(multiple_choice_checkbox.valid?(questions)).to eq("Please make sure every question has text for all options")
       end
     end
     context 'when no choices are correct' do
@@ -28,7 +31,8 @@ describe MultipleChoiceCheckbox do
         qc = double('QuizQuestionChoice')
         allow(qc).to receive(:iscorrect).and_return(false)
         allow(qc).to receive(:txt).and_return('question text')
-        expect(multiple_choice_checkbox.valid?([qc, qc, qc, qc])).to eq("Please select a correct answer for all questions")
+        questions = {"1" => qc, "2" => qc, "3" => qc, "4" => qc}
+        expect(multiple_choice_checkbox.valid?(questions)).to eq("Please select a correct answer for all questions")
       end
     end
     context 'when only 1 choices are correct' do
@@ -39,7 +43,8 @@ describe MultipleChoiceCheckbox do
         qc_true = double('QuizQuestionChoice')
         allow(qc_true).to receive(:iscorrect).and_return(true)
         allow(qc_true).to receive(:txt).and_return('question text')
-        expect(multiple_choice_checkbox.valid?([qc_true, qc, qc, qc])).to eq("A multiple-choice checkbox question should have more than one correct answer.")
+        questions = {"1" => qc_true, "2" => qc, "3" => qc, "4" => qc}
+        expect(multiple_choice_checkbox.valid?(questions)).to eq("A multiple-choice checkbox question should have more than one correct answer.")
       end
     end
     context 'when 2 choices are correct' do
@@ -50,7 +55,8 @@ describe MultipleChoiceCheckbox do
         qc_true = double('QuizQuestionChoice')
         allow(qc_true).to receive(:iscorrect).and_return(true)
         allow(qc_true).to receive(:txt).and_return('question text')
-        expect(multiple_choice_checkbox.valid?([qc_true, qc, qc, qc])).to eq("valid")
+        questions = {"1" => qc_true, "2" => qc, "3" => qc, "4" => qc}
+        expect(multiple_choice_checkbox.valid?(questions)).to eq("valid")
       end
     end
   end

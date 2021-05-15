@@ -38,7 +38,6 @@ describe QuizAssignment do
         allow(QuizQuestionnaire).to receive(:find_by).with(instructor_id: 6).and_return(questionnaire1)
         allow(QuizResponseMap).to receive(:where).with('reviewee_id = ? AND reviewer_id = ? AND reviewed_object_id = ?', 6, 1, 1).and_return([teammate_review_response_map])
         expect(assignment.quiz_taken_by?(instructor, participant)).to eq(true)
-        expect(questionnaire1.symbol).to eq("quiz".to_sym)
       end
     end 
   end

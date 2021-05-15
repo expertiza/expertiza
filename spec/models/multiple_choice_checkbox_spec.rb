@@ -18,14 +18,14 @@ describe MultipleChoiceCheckbox do
   describe '#valid?' do
     context 'when the question itself does not have txt' do
       it 'returns "Please make sure all questions have text"' do
-        allow(multiple_choice_checkbox).to receive(:txt).and_return(nil)
+        allow(multiple_choice_checkbox).to receive(:txt).and_return('')
         questions = {"1" => {txt: 'question text', iscorrect: '1'}, "2" => {txt: 'question text', iscorrect: '1'}, "3" => {txt: 'question text', iscorrect: '0'}, "4" => {txt: 'question text', iscorrect: '0'}}
         expect(multiple_choice_checkbox.valid?(questions)).to eq("Please make sure all questions have text")
       end
     end
     context 'when a choice does not have txt' do
       it 'returns "Please make sure every question has text for all options"' do
-        questions = {"1" => {txt: nil, iscorrect: '1'}, "2" => {txt: nil, iscorrect: '1'}, "3" => {txt: nil, iscorrect: '0'}, "4" => {txt: nil, iscorrect: '0'}}
+        questions = {"1" => {txt: '', iscorrect: '1'}, "2" => {txt: '', iscorrect: '1'}, "3" => {txt: '', iscorrect: '0'}, "4" => {txt: '', iscorrect: '0'}}
         expect(multiple_choice_checkbox.valid?(questions)).to eq("Please make sure every question has text for all options")
       end
     end

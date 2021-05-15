@@ -5,6 +5,7 @@ describe MultipleChoiceCheckbox do
   let(:team) { build(:assignment_team, id: 1, name: 'no team') }
   let(:participant) { build(:participant, id: 1) }
   let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
+  let(:scored_question) { build(:scored_question, id: 1)}
   describe '#edit' do
     it 'returns the html' do
       qc = double('QuizQuestionChoice')
@@ -87,6 +88,14 @@ describe MultipleChoiceCheckbox do
         allow(Assignment).to receive(:find).with(1).and_return(assignment)
         allow(assignment).to receive(:questionnaires).and_return([])
         expect(Question.get_all_questions_with_comments_available(assignment.id)).to eq([]) 
+      end
+    end
+    context 'when the assignment has two questionnaires associated, metareview and review, with one scored question' do
+      it 'returns an array of the id of the scored question' do 
+        allow(Assignment).to receive(:find).with(1).and_return(assignment)
+        allow(assignment).to receive(:questionnaires).and_return([questionnaire1, questionnaire2])
+        allow(questionnaire1).to receive(:questions).and_return([scored_question])
+        expect(Question.get_all_questions_with_comments_available(assignment.id)).to eq([1]) 
       end
     end
   end

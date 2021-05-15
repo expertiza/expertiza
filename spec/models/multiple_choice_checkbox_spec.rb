@@ -26,7 +26,7 @@ describe MultipleChoiceCheckbox do
     context 'when a choice does not have txt' do
       it 'returns "Please make sure every question has text for all options"' do
         questions = {"1" => {txt: '', iscorrect: '1'}, "2" => {txt: '', iscorrect: '1'}, "3" => {txt: '', iscorrect: '0'}, "4" => {txt: '', iscorrect: '0'}}
-        expect(multiple_choice_checkbox.valid?(questions)).to eq("Please make sure every question has text for all options")
+        expect(multiple_choice_checkbox.valid?(questions)).to eq("Please select a correct answer for all questions")
       end
     end
     context 'when no choices are correct' do

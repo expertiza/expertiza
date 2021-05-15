@@ -73,7 +73,7 @@ class MultipleChoiceCheckbox < QuizQuestion
     # safe_join(html)
   end
 
-  def isvalid(choice_info)
+  def valid?(choice_info)
     valid = "valid"
     valid = "Please make sure all questions have text" if self.txt == ''
     correct_count = 0

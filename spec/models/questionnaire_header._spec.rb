@@ -5,5 +5,7 @@ describe QuestionnaireHeader do
       expect(questionnaire_header.view_question_text).to eq('<TR><TD align="left"> Test question: </TD><TD align="left">QuestionnaireHeader</TD><td align="center">1</TD><TD align="center">&mdash;</TD></TR>')
     end
   end
-
+  describe '#complete' do
+    expect(questionnaire_header.complete).to eq('Test question:')
+  end
 end

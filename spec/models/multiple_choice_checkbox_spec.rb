@@ -81,7 +81,6 @@ describe MultipleChoiceCheckbox do
       expect(Question.export_fields([])).to eq(["Seq", "Question", "Type", "Weight", "text area size", "max_label", "min_label"])
     end
   end
-
   describe '#get_all_questions_with_comments_available' do
     context 'when the assignment has no questionnaires associated' do
       it 'returns an empty array' do 
@@ -99,4 +98,13 @@ describe MultipleChoiceCheckbox do
       end
     end
   end
+  describe '#import' do
+    context 'when the row length is not 5' do
+      it 'throws an error' do
+        expect{Question.import(2, [], [], nil)}.to raise_error(ArgumentError)
+      end
+    end
+  end
+
+
 end

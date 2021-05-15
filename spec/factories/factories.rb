@@ -545,6 +545,15 @@ FactoryBot.define do
     size '70,1'
   end
 
+  factory :true_false, class: TrueFalse do
+    txt 'Test question:'
+    weight 1
+    questionnaire { Questionnaire.first || association(:questionnaire) }
+    seq 1.00
+    type 'TrueFalse'
+    size '70,1'
+  end
+
   factory :scored_question, class: ScoredQuestion do
     txt 'Test question:'
     weight 1

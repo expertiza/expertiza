@@ -1,5 +1,5 @@
 describe QuizQuestionnaire do 
-   let(:quiz_questionnaire) { build(:questionnaire, type: 'QuizQuestionnaire') }
+   let(:quiz_questionnaire) { QuizQuestionnaire.new }
    let(:quiz_response_map) {build (:quiz_response_map)}
    describe '#symbol' do
      it 'returns the quiz symbol' do

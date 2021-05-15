@@ -75,7 +75,7 @@ class MultipleChoiceRadio < QuizQuestion
     # safe_join(html)
   end
 
-  def valid?(choice_info)
+  def isvalid(choice_info)
     valid = "valid"
     valid = "Please make sure all questions have text" if self.txt == ''
     correct_count = 0

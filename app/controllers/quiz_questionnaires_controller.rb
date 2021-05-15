@@ -156,7 +156,7 @@ class QuizQuestionnairesController < QuestionnairesController
       valid = if choice_info.nil?
                 "Please select a correct answer for all questions"
               else
-                @new_question.valid?(choice_info)
+                @new_question.isvalid(choice_info)
               end
     end
     valid

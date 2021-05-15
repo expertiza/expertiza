@@ -342,7 +342,7 @@ describe QuizQuestionnairesController do
                              new_choices: {'1' => {'TrueFalse' => 'sth'}}}
         question = build(:question, type: 'TrueFalse')
         allow(TrueFalse).to receive(:create).with(txt: '', type: 'TrueFalse', break_before: true).and_return(question)
-        allow(question).to receive(:valid?).with('sth').and_return('valid')
+        allow(question).to receive(:isvalid).with('sth').and_return('valid')
         expect(controller.validate_quiz).to eq('valid')
       end
     end

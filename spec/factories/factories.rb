@@ -534,4 +534,13 @@ FactoryBot.define do
   factory :survey_deployment, class: SurveyDeployment do
     type 'AssignmentSurveyDeployment'
     end
+
+  factory :multiple_choice_checkbox, class: MultipleChoiceCheckbox do
+    txt 'Test question:'
+    weight 1
+    questionnaire { Questionnaire.first || association(:questionnaire) }
+    seq 1.00
+    type 'MultipleChoiceCheckbox'
+    size '70,1'
+  end
 end

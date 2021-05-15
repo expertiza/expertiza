@@ -65,4 +65,9 @@ describe MultipleChoiceCheckbox do
       expect(multiple_choice_checkbox.get_formatted_question_type).to eq('Multiple Choice - Checked')
     end
   end
+  describe '#compute_question_score' do
+    it 'returns 0' do
+      expect(Question.compute_question_score).to eq(0)
+    end
+  end
 end

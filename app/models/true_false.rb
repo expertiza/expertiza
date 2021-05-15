@@ -79,9 +79,8 @@ class TrueFalse < QuizQuestion
     choice_info.each do |_idx, value|
       if value[:txt] == ''
         valid = "Please make sure every question has text for all options"
-        break
       end
-      correct_count += 1 if value.key?(:iscorrect)
+      correct_count += 1 if if value[:iscorrect] == 1.to_s
     end
     valid = "Please select a correct answer for all questions" if correct_count == 0
     valid

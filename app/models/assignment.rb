@@ -84,7 +84,7 @@ class Assignment < ActiveRecord::Base
     teams.delete(empty_teams)
   end
 
-  #checks whether the assignment is getting a valid number of reviews (less than number of reviews allowed)
+  # checks whether the assignment is getting a valid number of reviews (less than number of reviews allowed)
   def valid_num_review
     self.num_reviews = self.num_reviews_allowed
     if num_reviews_greater?(self.num_reviews_required, self.num_reviews_allowed)

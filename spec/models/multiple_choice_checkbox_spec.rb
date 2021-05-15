@@ -96,11 +96,11 @@ describe MultipleChoiceCheckbox do
   end
   describe '#export' do
     it 'writes to a csv file' do
-      csv = CSV.new
+      csv = []
       csv << [question.seq, question.txt, question.type,
               question.weight, question.size, question.max_label,
               question.min_label]
-      csv_1 = CSV.new
+      csv_1 = []
       allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire1)
       allow(questionnaire1).to receive(:questions).and_return([question])
       expect(Question.export(csv_1, 1, nil)).to eq(csv)

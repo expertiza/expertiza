@@ -22,7 +22,7 @@ FactoryBot.define do
   # superclass, is the field used to store the team id.
   factory :quiz_questionnaire, class: QuizQuestionnaire do
     name 'Quiz Questionnaire'
-    # instructor_id { AssignmentTeam.first.id || association(:assignment_team).id }
+    instructor_id { AssignmentTeam.first.id || association(:assignment_team).id }
     private 0
     min_question_score 0
     max_question_score 1

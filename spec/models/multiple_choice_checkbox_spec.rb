@@ -101,7 +101,7 @@ describe MultipleChoiceCheckbox do
   describe '#import' do
     context 'when the row length is not 5' do
       it 'throws an error' do
-        expect{Question.import(2, [], [], nil)}.to raise_error(ArgumentError)
+        expect{Question.import(['header1', 'header2', 'header3'], [], [], nil)}.to raise_error(ArgumentError)
       end
     end
   end

@@ -27,7 +27,9 @@ describe TrueFalse do
     end
     context 'when no right answer was selected' do
       it 'returns "Please select a correct answer for all questions"' do
-
+        allow(true_false).to receive(:txt).and_return('Text')
+        questions = {"1" => {txt: 'question text', iscorrect: '0'}, "2" => {txt: 'question text', iscorrect: '0'}}
+        expect(true_false.isvalid(questions)).to eq('Please select a correct answer for all questions')
       end
     end
   end

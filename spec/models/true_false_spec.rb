@@ -13,7 +13,9 @@ describe TrueFalse do
   describe '#isvalid' do
     context 'when the question does not have text' do
       it 'returns "Please make sure all questions have text"' do
-
+        allow(true_false).to receive(:txt).and_return('')
+        questions = {"1" => {txt: 'question text', iscorrect: '1'}, "2" => {txt: 'question text', iscorrect: '0'}}
+        expect(true_false.isvalid(questions)).to eq('Please make sure all questions have text')
       end
     end
     context 'when the choice does not have text' do

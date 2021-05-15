@@ -29,7 +29,7 @@ describe MultipleChoiceCheckbox do
     context 'when no choices are correct' do
       it 'returns "Please select a correct answer for all questions"' do
         qc = double('QuizQuestionChoice')
-        allow(qc).to receive(:iscorrect).and_return(false)
+        allow(qc).to receive(:iscorrect).and_return('0')
         allow(qc).to receive(:txt).and_return('question text')
         questions = {"1" => qc, "2" => qc, "3" => qc, "4" => qc}
         expect(multiple_choice_checkbox.valid?(questions)).to eq("Please select a correct answer for all questions")
@@ -38,10 +38,10 @@ describe MultipleChoiceCheckbox do
     context 'when only 1 choices are correct' do
       it 'returns "A multiple-choice checkbox question should have more than one correct answer."' do
         qc = double('QuizQuestionChoice')
-        allow(qc).to receive(:iscorrect).and_return(false)
+        allow(qc).to receive(:iscorrect).and_return('0')
         allow(qc).to receive(:txt).and_return('question text')
         qc_true = double('QuizQuestionChoice')
-        allow(qc_true).to receive(:iscorrect).and_return(true)
+        allow(qc_true).to receive(:iscorrect).and_return('1')
         allow(qc_true).to receive(:txt).and_return('question text')
         questions = {"1" => qc_true, "2" => qc, "3" => qc, "4" => qc}
         expect(multiple_choice_checkbox.valid?(questions)).to eq("A multiple-choice checkbox question should have more than one correct answer.")
@@ -50,10 +50,10 @@ describe MultipleChoiceCheckbox do
     context 'when 2 choices are correct' do
       it 'returns "valid"' do
         qc = double('QuizQuestionChoice')
-        allow(qc).to receive(:iscorrect).and_return(true)
+        allow(qc).to receive(:iscorrect).and_return('1')
         allow(qc).to receive(:txt).and_return('question text')
         qc_true = double('QuizQuestionChoice')
-        allow(qc_true).to receive(:iscorrect).and_return(true)
+        allow(qc_true).to receive(:iscorrect).and_return('1')
         allow(qc_true).to receive(:txt).and_return('question text')
         questions = {"1" => qc_true, "2" => qc, "3" => qc, "4" => qc}
         expect(multiple_choice_checkbox.valid?(questions)).to eq("valid")

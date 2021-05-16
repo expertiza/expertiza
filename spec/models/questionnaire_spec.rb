@@ -21,7 +21,7 @@ describe Questionnaire do
     end
   end
 
-  describe "#instrucor_id" do
+  describe "#instructor_id" do
     it "returns the instructor id" do
       expect(questionnaire.instructor_id).to eq(1234)
     end

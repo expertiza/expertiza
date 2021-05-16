@@ -79,7 +79,7 @@ describe CourseTeam do
         allow(participant2).to receive(:user_id).and_return(2)
         allow(course).to receive(:add_participant).with('abc').and_raise("The user abc is already a participant.", StandardError)
         allow(course).to receive(:add_participant).with('bcd').and_raise("The user bcd is already a participant.", StandardError)
-        expect{course.copy_participants(1)}.to raise_error(RuntimeError)
+        expect{course.copy_participants(1)}.to raise_error(TypeError)
 
     	end
     end
@@ -92,7 +92,8 @@ describe CourseTeam do
         allow(participant2).to receive(:user_id).and_return(2)
         allow(course).to receive(:add_participant).with('abc').and_return(participant)
         allow(course).to receive(:add_participant).with('bcd').and_return(participant2)
-        expect(course.copy_participants(1)).to eq(participant2)
+        expect(course.copy_participants(1)).to eq(nil)
+        expect(course.participants.length).to eq(2)
       end
     end
   end

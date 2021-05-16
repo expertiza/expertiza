@@ -3,6 +3,7 @@ describe CourseTeam do
   let(:course_team1) { build(:course_team, id: 1) }
   let(:course_team2) { build(:course_team, id: 2) }
   let(:instructor) { build(:instructor, id: 6) }
+  let(:user1) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
   describe '#get_teams' do
     it 'returns the associated teams with the course' do
       allow(CourseTeam).to receive(:where).with(parent_id: 1).and_return([course_team1, course_team2])
@@ -20,6 +21,7 @@ describe CourseTeam do
     context 'when there is no associated instructor' do
       it 'an error is raised' do
         allow(course).to receive(:instructor_id).and_return(6)
+        allow(User).to receive(:find).with(6).and_return(user1)
         allow(course.path).to eq('')        
       end
     end

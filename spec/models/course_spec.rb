@@ -22,7 +22,7 @@ describe CourseTeam do
       it 'returns a directory' do
         allow(course).to receive(:instructor_id).and_return(6)
         allow(User).to receive(:find).with(6).and_return(user1)
-        expect(course.path.directory?).to be_true        
+        expect(course.path.directory?).to be_truthy        
       end
     end
   end

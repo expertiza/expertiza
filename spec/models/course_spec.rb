@@ -4,6 +4,8 @@ describe CourseTeam do
   let(:course_team2) { build(:course_team, id: 2) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:user1) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
+  let(:participant) { build(:participant, user: build(:student, name: "Jane", fullname: "Doe, Jane", id: 1)) }
+  let(:participant2) { build(:participant, user: build(:student, name: "John", fullname: "Doe, John", id: 2)) }
   describe '#get_teams' do
     it 'returns the associated teams with the course' do
       allow(CourseTeam).to receive(:where).with(parent_id: 1).and_return([course_team1, course_team2])
@@ -24,6 +26,13 @@ describe CourseTeam do
         allow(User).to receive(:find).with(6).and_return(user1)
         expect(course.path.directory?).to be_truthy        
       end
+    end
+  end
+  describe '#get_participants' do
+    it 'returns associated participants' do
+      allow(CourseParticipant).to receive(:where).with(parent_id: 1).and_return([participant, participant2])
+      expect(course.get_participants.length).to eq(2)
+      expect(course.get_participants).to eq([participant, participant2])
     end
   end
 end

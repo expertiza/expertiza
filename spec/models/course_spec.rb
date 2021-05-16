@@ -9,4 +9,12 @@ describe CourseTeam do
       expect(course.get_teams).to eq([course_team1, course_team2])
     end
   end
+  describe '#path' do
+    context 'when there is no associated instructor' do
+      it 'an error is raised' do
+        allow(course).to receive(:instructor_id).and_return(nil)
+        expect(course.path).to raise_error("Path can not be created. The course must be associated with an instructor.")
+      end
+    end
+  end
 end

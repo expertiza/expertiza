@@ -27,4 +27,12 @@ describe BookmarkRatingResponseMap do
       expect(model.questionnaire).to eq(questionnaire2)
     end  
   end
+  describe '#bookmark_response_report' do
+    it 'returns the matching map' do
+      out = [model]
+      allow(BookmarkRatingResponseMap).to receive(:select).with("DISTINCT reviewer_id").and_return(out)
+      allow(out).to receive(:where).with("reviewed_object_id = ?", 1).and_return(out)
+      expect(BookmarkRatingResponseMap.bookmark_response_report(1)).to eq([model])
+    end
+  end
 end

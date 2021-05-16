@@ -103,7 +103,7 @@ describe MultipleChoiceCheckbox do
       csv_1 = []
       allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire1)
       allow(questionnaire1).to receive(:questions).and_return([question])
-      expect(Question.export(csv_1, 1, nil)).to eq(csv)
+      expect(Question.export(csv_1, 1, nil)).to eq([question]])
     end
   end
 

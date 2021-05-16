@@ -92,7 +92,7 @@ describe CourseTeam do
         allow(participant2).to receive(:user_id).and_return(2)
         allow(course).to receive(:add_participant).with('abc').and_return(participant)
         allow(course).to receive(:add_participant).with('bcd').and_return(participant2)
-        allow(course).to receive(:participants).and_return[participant, participant2]
+        allow(course).to receive(:participants).and_return([participant, participant2])
         expect(course.copy_participants(1)).to eq(nil)
         expect(course.participants.length).to eq(2)
       end

@@ -22,7 +22,7 @@ describe CourseTeam do
       it 'an error is raised' do
         allow(course).to receive(:instructor_id).and_return(6)
         allow(User).to receive(:find).with(6).and_return(user1)
-        allow(course.path).to eq('')        
+        expect(course.path).to eq('')        
       end
     end
   end

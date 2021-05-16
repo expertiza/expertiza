@@ -35,4 +35,10 @@ describe CourseTeam do
       expect(course.get_participants).to eq([participant, participant2])
     end
   end
+  describe '#get_participant' do
+    it 'returns a specific participant from the user id' do
+      allow(CourseParticipant).to receive(:where).with(parent_id: 1, user_id: 2).and_return([participant2])
+      expect(course.get_participant(2)).to eq([participant2])
+    end
+  end
 end

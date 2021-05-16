@@ -52,15 +52,15 @@ describe CourseTeam do
     context 'if the user is already added to the course' do
       it 'returns an error that the user is already a participant' do
         allow(User).to receive(:find_by).with(name: 'abc').and_return(user1)
-        allow(user1).to receive(:user_id).and_return(1)
+        allow(user1).to receive(:id).and_return(1)
         allow(CourseParticipant).to receive(:where).with(parent_id: 1, user_id: 1).and_return([participant])
-        expect{course.add_participant('abc')}.to raise_error
+        expect{course.add_participant('abc')}.to raise_error("The user abc is already a participant.")
       end
     end
     context 'the user can be added successfully' do
       it 'returns a participant to the course' do
         allow(User).to receive(:find_by).with(name: 'abc').and_return(user1)
-        allow(user1).to receive(:user_id).and_return(1)
+        allow(user1).to receive(:id).and_return(1)
         allow(CourseParticipant).to receive(:where).with(parent_id: 1, user_id: 1).and_return([nil])
         allow(CourseParticipant).to receive(:create).with(parent_id: 1, user_id: 1, permission_granted: false).and_return(participant)
         expect(course.add_participant('abc')).to eq(participant)

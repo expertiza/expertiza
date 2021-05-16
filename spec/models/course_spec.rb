@@ -62,7 +62,7 @@ describe CourseTeam do
         allow(User).to receive(:find_by).with(name: 'abc').and_return(user1)
         allow(user1).to receive(:id).and_return(1)
         allow(CourseParticipant).to receive(:where).with(parent_id: 1, user_id: 1).and_return([nil])
-        allow(CourseParticipant).to receive(:create).with(parent_id: 1, user_id: 1, permission_granted: false).and_return(participant)
+        allow(CourseParticipant).to receive(:create).with(parent_id: 1, user_id: 1, permission_granted: 0).and_return(participant)
         expect(course.add_participant('abc')).to eq(participant)
       end
     end

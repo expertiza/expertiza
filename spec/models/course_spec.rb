@@ -18,11 +18,11 @@ describe CourseTeam do
         expect{course.path}.to raise_error("Path can not be created. The course must be associated with an instructor.")
       end
     end
-    context 'when there is no associated instructor' do
-      it 'an error is raised' do
+    context 'when there is an associated instructor' do
+      it 'returns a directory' do
         allow(course).to receive(:instructor_id).and_return(6)
         allow(User).to receive(:find).with(6).and_return(user1)
-        expect(course.path).to eq('')        
+        expect(course.path.directory?).to be_true        
       end
     end
   end

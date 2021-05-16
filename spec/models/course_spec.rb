@@ -45,6 +45,7 @@ describe CourseTeam do
     context 'when the user cannot be found' do
       it 'returns an error and requests that the user creates a user with the username' do
         allow(User).to receive(:find_by).with(name: 'bcd').and_return(nil)
+        allow(course).to receive(:url_for).and_return('users/new')
         expect{course.add_participant('bcd')}.to raise_error(RuntimeError)
       end
     end

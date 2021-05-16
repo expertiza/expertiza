@@ -4,8 +4,10 @@ describe CourseTeam do
   let(:course_team2) { build(:course_team, id: 2) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:user1) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
+  let(:user2) { User.new name: 'cbd', fullname: 'cbd ccd', email: 'bcdccd@gmail.com', password: '123456789', password_confirmation: '123456789' }
   let(:participant) { build(:participant, user: build(:student, name: "Jane", fullname: "Doe, Jane", id: 1)) }
   let(:participant2) { build(:participant, user: build(:student, name: "John", fullname: "Doe, John", id: 2)) }
+  let(:assignment) { build(:assignment, id: 1, name: 'no assgt') }
   describe '#get_teams' do
     it 'returns the associated teams with the course' do
       allow(CourseTeam).to receive(:where).with(parent_id: 1).and_return([course_team1, course_team2])
@@ -64,6 +66,26 @@ describe CourseTeam do
         allow(CourseParticipant).to receive(:where).with(parent_id: 1, user_id: 1).and_return([nil])
         allow(CourseParticipant).to receive(:create).with(parent_id: 1, user_id: 1, permission_granted: 0).and_return(participant)
         expect(course.add_participant('abc')).to eq(participant)
+      end
+    end
+  end
+  describe '#copy_participants' do
+    context 'when there are errors' do
+    	it 'raises an error to the user' do
+        allow(AssignmentParticipant).to receive(:where).with(parent_id: 1).and_return([participant, participant2])
+        allow(User).to receive(:find).with(1).and_return(user1)
+        allow(User).to receive(:find).with(2).and_return(user2)
+        allow(participant).to receive(:user_id).and_return(1)
+        allow(participant2).to receive(:user_id).and_return(2)
+        allow(course).to receive(:add_participant).with('abc').and_raise("The user abc is already a participant.")
+        allow(course).to receive(:add_participant).with('bcd').and_raise("The user bcd is already a participant.")
+        expect{course.copy_participants(1)}.to raise_error("")
+
+    	end
+    end
+    context 'when there are no errors' do
+      it 'the participants are added to the course' do
+
       end
     end
   end

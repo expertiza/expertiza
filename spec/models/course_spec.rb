@@ -41,4 +41,22 @@ describe CourseTeam do
       expect(course.get_participant(2)).to eq([participant2])
     end
   end
+  describe '#add_participant' do
+    context 'when the user cannot be found' do
+      it 'returns an error and requests that the user creates a user with the username' do
+        allow(User).to receive(:find_by).with(name: 'bcd').and_return(nil)
+        expect{course.add_participant('bcd')}.to raise_error("No user account exists with the name bcd. Please <a href='" + url_for(controller: 'users', action: 'new') + "'>create</a> the user first.")
+      end
+    end
+    context 'if the user is already added to the course' do
+      it 'returns an error that the user is already a participant' do
+
+      end
+    end
+    context 'the user can be added successfully' do
+      it 'returns a participant to the course' do
+
+      end
+    end
+  end
 end

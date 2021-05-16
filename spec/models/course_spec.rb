@@ -85,7 +85,14 @@ describe CourseTeam do
     end
     context 'when there are no errors' do
       it 'the participants are added to the course' do
-
+        allow(AssignmentParticipant).to receive(:where).with(parent_id: 1).and_return([participant, participant2])
+        allow(User).to receive(:find).with(1).and_return(user1)
+        allow(User).to receive(:find).with(2).and_return(user2)
+        allow(participant).to receive(:user_id).and_return(1)
+        allow(participant2).to receive(:user_id).and_return(2)
+        allow(course).to receive(:add_participant).with('abc').and_return(participant)
+        allow(course).to receive(:add_participant).with('bcd').and_return(participant2)
+        expect{course.copy_participants(1)}.to eq(participant2)
       end
     end
   end

@@ -35,14 +35,14 @@ describe Ta do
   describe '#list_mine' do
     context 'when the object is an assignment' do
       it 'finds associated assignments with TA' do
-        allow(Assignment).to receive(:where).with(["select assignments.id, assignments.name, assignments.directory_path " \
+        allow(Assignment).to receive(:find_by_sql).with(["select assignments.id, assignments.name, assignments.directory_path " \
       "from assignments, ta_mappings where assignments.course_id = ta_mappings.course_id and ta_mappings.ta_id=?", 6]).and_return([assignment])
         expect(ta.list_mine(Assignment, 6)).to eq([assignment])
       end
     end
     context 'when the object is not an assignment' do
       it 'finds associated courses with TA' do
-        allow(Course).to receive(:where).with(["instructor_id = ? OR private = 0", 6]).and_return([course1, course2])
+        allow(Course).to receive(:where).with(["instructor_id = ?", 6]).and_return([course1, course2])
         expect(ta.list_mine(Course, 6)).to eq([course1, course2])
       end
     end

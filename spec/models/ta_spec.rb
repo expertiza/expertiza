@@ -27,7 +27,9 @@ describe Ta do
     end
   end
   describe '#list_all' do
-    allow(Assignment).to receive(:where).with(["instructor_id = ? OR private = 0", 6]).and_return([assignment])
-    expect(ta.list_all(Assignment, 6)).to eq([assignment])
+    it 'returns all objects of a given type associated with a user' do
+      allow(Assignment).to receive(:where).with(["instructor_id = ? OR private = 0", 6]).and_return([assignment])
+      expect(ta.list_all(Assignment, 6)).to eq([assignment])
+    end
   end
 end

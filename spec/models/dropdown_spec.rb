@@ -3,7 +3,7 @@ describe Dropdown do
   describe '#view_question_text' do
     it 'returns the html' do
       html = dropdown.view_question_text
-      expect(html).to eq('')
+      expect(html).to eq('<TR><TD align=\"left\"> Test question: </TD><TD align=\"left\">TrueFalse</TD><td align=\"center\">1</TD><TD align=\"center\">&mdash;</TD></TR>')
     end
   end
 end

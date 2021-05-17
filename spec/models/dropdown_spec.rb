@@ -4,7 +4,7 @@ describe Dropdown do
   let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1, type: "Criterion") }
   let(:response_map) { create(:review_response_map, id: 1, reviewed_object_id: 1) }
   let!(:response_record) { create(:response, id: 1, response_map: response_map) }
-  let!(:answer) { create(:answer, question: question1, comments: "test comment", response_id: 1) }
+  let!(:answer) { create(:answer, question: question1, comments: "Alternative 1", response_id: 1) }
   describe '#view_question_text' do
     it 'returns the html' do
       html = dropdown.view_question_text
@@ -17,4 +17,11 @@ describe Dropdown do
       expect(html).to eq('<b>1. Test question:</b><BR>&nbsp&nbsp&nbsp&nbsptest comment')
     end
   end
+  describe '#complete_for_alternatives' do
+    it 'returns the html' do
+      alternatives = ["Alternative 1", "Alternative 2", "Alternative 3"]
+      html = dropdown.complete_for_alternatives(alternatives, answer)
+      expect(html).to eq('')
+    end
+  end 
 end

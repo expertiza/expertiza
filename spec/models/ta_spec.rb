@@ -104,6 +104,7 @@ describe Ta do
       allow(participant).to receive(:user).and_return(user)
       r = Role.new
       allow(user).to receive(:role).and_return(@student_role)
+      @student_role.name = "Student"
       allow(@student_role).to receive(:hasAllPrivilegesOf).with(participant.user.role).and_return(true)
       expect(Ta.get_user_list(ta)).to eq([user])
 

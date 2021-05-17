@@ -14,14 +14,14 @@ describe Dropdown do
   describe '#view_completed_question' do
     it 'returns the html' do
       html = dropdown.view_completed_question(1, answer)
-      expect(html).to eq('<b>1. Test question:</b><BR>&nbsp&nbsp&nbsp&nbsptest comment')
+      expect(html).to eq("<b>1. Test question:</b><BR>&nbsp&nbsp&nbsp&nbspAlternative 1")
     end
   end
   describe '#complete_for_alternatives' do
     it 'returns the html' do
       alternatives = ["Alternative 1", "Alternative 2", "Alternative 3"]
       html = dropdown.complete_for_alternatives(alternatives, answer)
-      expect(html).to eq('')
+      expect(html).to eq("<option value=\"Alternative 1\" selected>Alternative 1</option><option value=\"Alternative 2\">Alternative 2</option><option value=\"Alternative 3\">Alternative 3</option>")
     end
   end 
 end

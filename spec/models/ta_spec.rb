@@ -53,4 +53,21 @@ describe Ta do
       expect(ta.get(Assignment, 999, 6)).to eq(assignment)
     end
   end
+  describe '#get_my_instructors' do
+    context 'there are no TaMappings for the user' do
+      it 'returns an empty array' do
+        allow(TaMapping).to receive(:where).with(ta_id: 999).and_return([])
+        expect(Ta.get_my_instructors(ta.id)).to be_empty
+      end
+    end
+    context 'there are  TaMappings for the user' do
+      it 'returns an empty array' do
+        allow(TaMapping).to receive(:where).with(ta_id: 999).and_return(ta_mapping)
+        allow(ta_mapping).to receive(:course_id).and_return(1)
+        allow(Course).to receive(:find).with(1).and_return(course1)
+        allow(course1).to receive(:instructor_id).and_return(6)
+        expect(Ta.get_my_instructors(ta.id)).to eq([6])
+      end
+    end
+  end
 end

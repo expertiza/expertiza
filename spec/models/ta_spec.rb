@@ -82,8 +82,8 @@ describe Ta do
   end
   describe '#get_instructor' do
     it 'returns associated instructor' do
-      allow(Ta).to receive(:get_my_instructor).with(999).and_return(instructor)
-      expect(ta.get_instructor).to eq(instructor)
+      allow(Ta).to receive(:get_my_instructors).with(999).and_return([6])
+      expect(ta.get_instructor).to eq([6])
     end
   end
 end

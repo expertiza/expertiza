@@ -81,7 +81,7 @@ class Ta < User
   end
 
   def get_instructor
-    Ta.get_my_instructor(self.id)
+    Ta.get_my_instructors(self.id)
   end
 
   def set_instructor(new_assign)

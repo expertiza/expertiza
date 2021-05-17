@@ -71,4 +71,13 @@ describe Ta do
       end
     end
   end
+  describe 'get_mapped_instructor_ids' do
+    it 'returns instructor ids' do
+      ta_mapping = TaMapping.new
+      allow(TaMapping).to receive(:where).with(ta_id: 999).and_return([ta_mapping])
+      allow(ta_mapping).to receive(:course).and_return(course1)
+      allow(course1).to receive(:instructor).and_return(instructor)
+      expect(Ta.get_mapped_instructor_ids(999)).to eq(6)
+    end
+  end
 end

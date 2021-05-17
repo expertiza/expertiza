@@ -63,7 +63,7 @@ describe Ta do
     context 'there are  TaMappings for the user' do
       it 'returns an empty array' do
       	ta_mapping = TaMapping.new
-        allow(TaMapping).to receive(:where).with(ta_id: 999).and_return(ta_mapping)
+        allow(TaMapping).to receive(:where).with(ta_id: 999).and_return([ta_mapping])
         allow(ta_mapping).to receive(:course_id).and_return(1)
         allow(Course).to receive(:find).with(1).and_return(course1)
         allow(course1).to receive(:instructor_id).and_return(6)

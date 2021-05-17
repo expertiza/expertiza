@@ -47,4 +47,10 @@ describe Ta do
       end
     end
   end
+  describe '#get' do
+    it 'returns all objects of a given type associated with a user' do
+      allow(Assignment).to receive(:where).with(["id = ? AND (instructor_id = ? OR private = 0)", 999, 6]).and_return([assignment])
+      expect(ta.get(Assignment, 999, 6)).to eq(assignment)
+    end
+  end
 end

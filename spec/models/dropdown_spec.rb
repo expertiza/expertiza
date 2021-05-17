@@ -24,4 +24,12 @@ describe Dropdown do
       expect(html).to eq("<option value=\"Alternative 1\" selected>Alternative 1</option><option value=\"Alternative 2\">Alternative 2</option><option value=\"Alternative 3\">Alternative 3</option>")
     end
   end 
+  describe '#complete' do
+    it 'returns the html' do
+      alternatives = ["Alternative 1|Alternative 2|Alternative 3"]
+      allow(dropdown).to receive(:alternatives).and_return(alternatives)
+      html = dropdown.complete(1, answer)
+      expect(html).to eq("")
+    end
+  end 
 end

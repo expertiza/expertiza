@@ -7,6 +7,7 @@ describe Ta do
   let(:participant) { build(:participant, id: 1) }
   let(:team) { build(:assignment_team, id: 1, name: 'no team') }
   let(:user) { build(:student, id: 4, name: 'no name', fullname: 'no two') }
+
   describe '#teaching_assistant?' do
     it 'returns true for a teaching assistant' do
       expect(ta.teaching_assistant?).to be_truthy
@@ -96,13 +97,14 @@ describe Ta do
   end
   describe '#get_user_list' do
     it 'gets a list of users that belong to the TA' do
+    	@student_role = build(:role_of_student, id: 1, name: "Student_role_test", description: '', parent_id: nil, default_page_id: nil)
       allow(Ta).to receive(:get_mapped_courses).with(999).and_return([1])
       allow(Course).to receive(:find).with(1).and_return(course1)
       allow(course1).to receive(:get_participants).and_return([participant])
       allow(participant).to receive(:user).and_return(user)
       r = Role.new
-      allow(user).to receive(:role).and_return(r)
-      allow(r).to receive(:hasAllPrivilegesOf).with(participant.user.role).and_return(true)
+      allow(user).to receive(:role).and_return(@student_role)
+      allow(@student_role).to receive(:hasAllPrivilegesOf).with(participant.user.role).and_return(true)
       expect(Ta.get_user_list(ta)).to eq([user])
 
     end

@@ -80,4 +80,10 @@ describe Ta do
       expect(Ta.get_mapped_instructor_ids(999)).to eq([6])
     end
   end
+  describe '#get_instructor' do
+    it 'returns associated instructor' do
+      allow(Ta).to receive(:get_my_instructor).with(999).and_return(instructor)
+      expect(ta.get_instructor).to eq(instructor)
+    end
+  end
 end

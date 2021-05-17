@@ -28,6 +28,7 @@ describe Dropdown do
     it 'returns the html' do
       alternatives = ["Alternative 1|Alternative 2|Alternative 3"]
       allow(dropdown).to receive(:alternatives).and_return(alternatives)
+      allow(dropdown).to receive(:complete_for_alternatives).and_return('')
       html = dropdown.complete(1, answer)
       expect(html).to eq("")
     end

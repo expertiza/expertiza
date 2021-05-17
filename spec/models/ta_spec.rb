@@ -82,8 +82,16 @@ describe Ta do
   end
   describe '#get_instructor' do
     it 'returns associated instructor' do
-      allow(Ta).to receive(:get_my_instructors).with(999).and_return([6])
-      expect(ta.get_instructor).to eq([6])
+      allow(Ta).to receive(:get_my_instructor).with(999).and_return(6)
+      expect(ta.get_instructor).to eq(6)
+    end
+  end
+  describe '#set_instructor' do
+    it 'assigns the instructor id and course id' do
+      assignee = {instructor_id => nil, course_id => nil}
+      allow(Ta).to receive(:get_my_instructor).with(999).and_return(6)
+      allow(TaMapping).to receive(:get_course_id).with(999).and_return(1)
+      expect(ta.set_instructor(assignee)).to eq({instructor_id => 6, course_id => 1})
     end
   end
 end

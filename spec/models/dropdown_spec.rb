@@ -30,7 +30,7 @@ describe Dropdown do
       allow(dropdown).to receive(:alternatives).and_return(alternatives)
       allow(dropdown).to receive(:complete_for_alternatives).and_return('')
       html = dropdown.complete(1, answer)
-      expect(html).to eq("")
+      expect(html).to eq('<p style="width: 80%;"><label for="responses_1"">Test question:&nbsp;&nbsp;</label><input id="responses_1_score" name="responses[1][score]" type="hidden" value="" style="min-width: 100px;"><select id="responses_1_comments" label=Test question: name="responses[1][comment]"></select></p>')
     end
   end 
 end

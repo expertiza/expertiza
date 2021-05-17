@@ -1,8 +1,8 @@
 describe Dropdown do
 	let(:dropdown) {build(:dropdown, id: 1)}
-	let!(:answer) { create(:answer, question: question1, comments: "test comment", response_id: 1) }
 	let(:questionnaire) { create(:questionnaire, id: 1) }
   let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1, type: "Criterion") }
+  let!(:answer) { create(:answer, question: question1, comments: "test comment", response_id: 1) }
   describe '#view_question_text' do
     it 'returns the html' do
       html = dropdown.view_question_text

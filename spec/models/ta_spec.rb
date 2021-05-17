@@ -88,10 +88,9 @@ describe Ta do
   end
   describe '#set_instructor' do
     it 'assigns the instructor id and course id' do
-      ta_mapping = TaMapping.new
       allow(Ta).to receive(:get_my_instructor).with(999).and_return(6)
       allow(TaMapping).to receive(:get_course_id).with(999).and_return(1)
-      expect(ta.set_instructor(ta_mapping)).to eq(1)
+      expect(ta.set_instructor(assignment)).to eq(1)
     end
   end
 end

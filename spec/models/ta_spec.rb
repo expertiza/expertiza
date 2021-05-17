@@ -19,7 +19,7 @@ describe Ta do
     	allow(ta_mapping).to receive(:course_id).and_return(1)
       allow(TaMapping).to receive(:where).with(ta_id: 999).and_return([ta_mapping])
       allow(Course).to receive(:find).with(1).and_return(course1)
-      expect(ta.courses_assisted_with).eq([course1])
+      expect(ta.courses_assisted_with).to eq([course1])
     end
   end
 end

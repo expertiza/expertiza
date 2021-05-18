@@ -6,9 +6,10 @@ describe FeedbackResponseMap do
   let(:team) { build(:assignment_team) }
   let(:assignment_participant) { build(:participant, id: 2, assignment: assignment) }
   let(:feedback_response_map) { build(:feedback_response_map) }
-  let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
+  let(:review_response_map) { build(:review_response_map, id: 2, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
   let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer]) }
+  let(:user1) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
   before(:each) do
   	questionnaires = [questionnaire1, questionnaire2]
     allow(feedback_response_map).to receive(:reviewee).and_return(participant)
@@ -53,6 +54,33 @@ describe FeedbackResponseMap do
   describe '#contributor' do
     it 'returns the reviewee' do
       expect(feedback_response_map.contributor).to eq(team)
+    end
+  end
+  describe '#feedback_response_report' do
+    it 'returns a report' do
+      # This function should probably be refactored and moved into a controller
+      maps = [review_response_map]
+      allow(ReviewResponseMap).to receive(:where).with(["reviewed_object_id = ?", 1]).and_return(map)
+      allow(map).to receive(:pluck).with("id").and_return(review_response_map.id)
+      allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team])
+      allow(team)to receive(:users).and_return([user1])
+      allow(user1).to receive(:id).and_return(1)
+      allow(AssignmentParticipant).to receive(:where).with(parent_id: 1, user_id: 1).and_return([participant])
+      response1 = double('Response', round: 1, additional_comment: '')
+      response2 = double('Response', round: 2, additional_comment: 'LGTM')
+      response3 = double('Response', round: 3, additional_comment: 'Bad')
+      rounds = [response1, response2]
+      allow(Response).to receive(:where).with(["map_id IN (?)", 2]).and_return(rounds)
+      allow(rounds).to receive(:order).with("created_at DESC").and_return(rounds)
+      allow(Assignment).to receive(:find).with(1).and_return(assignment)
+      allow(assignment).to receive(:vary_with_round).and_return(true)
+      allow(response1).to receive(:map_id).and_return(1)
+      allow(response2).to receive(:map_id).and_return(2)
+      allow(response3).to receive(:map_id).and_return(3)
+      allow(response1).to receive(:id).and_return(1)
+      allow(response2).to receive(:id).and_return(2)
+      allow(response3).to receive(:id).and_return(3)
+      expect(FeedbackResponseMap.feedback_response_report(1, nil)).to eq({})
     end
   end
 end

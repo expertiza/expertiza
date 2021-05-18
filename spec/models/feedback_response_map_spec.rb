@@ -80,7 +80,12 @@ describe FeedbackResponseMap do
       allow(response1).to receive(:id).and_return(1)
       allow(response2).to receive(:id).and_return(2)
       allow(response3).to receive(:id).and_return(3)
-      expect(FeedbackResponseMap.feedback_response_report(1, nil)).to eq({})
+      report = FeedbackResponseMap.feedback_response_report(1, nil)
+      expect(report[0]).to eq(participant)
+      expect(report[1]).to eq([1])
+      expect(report[2]).to eq([2])
+      expect(report[3]).to eq([3])
+      
     end
   end
 end

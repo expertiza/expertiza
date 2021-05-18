@@ -127,10 +127,10 @@ describe FeedbackResponseMap do
       allow(review_response_map).to receive(:reviewer_id).and_return(1)
       allow(AssignmentParticipant).to receive(:find).with(1).and_return(assignment_participant)
       allow(assignment).to receive(:name).and_return('Big Assignment')
-      allow(participant).to receive(:user_id).and_return(1)
+      allow(assignment_participant).to receive(:user_id).and_return(1)
       allow(User).to receive(:find).with(1).and_return(user1)
       defn = {:body => {:type => nil, :obj_name => nil, :first_name => nil }, :to => nil}
-      expect(feedback_response_map.email(defn, participant, assignment)).to eq('')
+      expect(feedback_response_map.email(defn, assignment_participant, assignment)).to eq('')
     end
   end
 end

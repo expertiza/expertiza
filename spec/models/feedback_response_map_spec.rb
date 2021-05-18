@@ -13,7 +13,6 @@ describe FeedbackResponseMap do
     allow(feedback_response_map).to receive(:reviewee).and_return(participant)
     allow(feedback_response_map).to receive(:review).and_return(response)
     allow(feedback_response_map).to receive(:reviewer).and_return(assignment_participant)
-    allow()
   end
   describe '#assignment' do
     it 'returns the assignment associated with this FeedbackResponseMap' do

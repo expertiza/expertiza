@@ -114,7 +114,7 @@ describe FeedbackResponseMap do
         allow(response3).to receive(:id).and_return(3)
         report = FeedbackResponseMap.feedback_response_report(1, nil)
         expect(report[0]).to eq([participant])
-        expect(report[1]).to eq([1])
+        expect(report[1]).to eq([1, 2, 3])
       end   
     end
   end

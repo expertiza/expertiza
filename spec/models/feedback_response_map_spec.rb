@@ -52,7 +52,7 @@ describe FeedbackResponseMap do
   end
   describe '#contributor' do
     it 'returns the reviewee' do
-      expect(feedback_response_map.contributor).to eq(assignment_participant)
+      expect(feedback_response_map.contributor).to eq(assignment_team)
     end
   end
 end

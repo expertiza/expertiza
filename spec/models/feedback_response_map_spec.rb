@@ -103,7 +103,7 @@ describe FeedbackResponseMap do
         response3 = double('Response', round: 1, additional_comment: 'Bad')
         reviews = [response1, response2, response3]
         allow(Response).to receive(:where).with(["map_id IN (?)", 2]).and_return(reviews)
-        allow(rounds).to receive(:order).with("created_at DESC").and_return(reviews)
+        allow(reviews).to receive(:order).with("created_at DESC").and_return(reviews)
         allow(Assignment).to receive(:find).with(1).and_return(assignment)
         allow(assignment).to receive(:vary_with_round).and_return(false)
         allow(response1).to receive(:map_id).and_return(1)

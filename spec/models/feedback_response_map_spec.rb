@@ -2,7 +2,7 @@ describe FeedbackResponseMap do
   let(:questionnaire1) { build(:questionnaire, id: 1, type: 'AuthorFeedbackQuestionnaire') }
   let(:questionnaire2) { build(:questionnaire, id: 2, type: 'MetareviewQuestionnaire') }
   let(:participant) { build(:participant, id: 1) }
-  let(:assignment) { build(:assignment, id: 1, user_id: 1) }
+  let(:assignment) { build(:assignment, id: 1) }
   let(:team) { build(:assignment_team) }
   let(:assignment_participant) { build(:participant, id: 2, assignment: assignment) }
   let(:feedback_response_map) { build(:feedback_response_map) }
@@ -127,6 +127,7 @@ describe FeedbackResponseMap do
       allow(review_response_map).to receive(:reviewer_id).and_return(1)
       allow(AssignmentParticipant).to receive(:find).with(1).and_return(assignment_participant)
       allow(assignment).to receive(:name).and_return('Big Assignment')
+      allow(participant).to receive(:user_id).and_return(1)
       allow(User).to receive(:find).with(1).and_return(user1)
       defn = {:body => {:type => nil, :obj_name => nil, :first_name => nil }, :to => nil}
       expect(feedback_response_map.email(defn, participant, assignment)).to eq('')

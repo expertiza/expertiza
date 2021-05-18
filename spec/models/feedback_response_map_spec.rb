@@ -24,7 +24,7 @@ describe FeedbackResponseMap do
   describe '#show_review' do
     context 'when there is a review' do
       it 'displays the html' do
-        allow(review).to receive(:display_as_html).and_return('HTML')
+        allow(response).to receive(:display_as_html).and_return('HTML')
         expect(feedback_response_map.show_review).to eq('HTML')
       end
     end

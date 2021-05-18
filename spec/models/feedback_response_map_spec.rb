@@ -15,6 +15,7 @@ describe FeedbackResponseMap do
     allow(feedback_response_map).to receive(:review).and_return(response)
     allow(feedback_response_map).to receive(:reviewer).and_return(assignment_participant)
     allow(response).to receive(:map).and_return(review_response_map)
+    allow(response).to receive(:reviewee).and_return(assignment_participant)
     allow(review_response_map).to receive(:assignment).and_return(assignment)
     allow(feedback_response_map).to receive(:assignment).and_return(assignment)
     allow(assignment).to receive(:questionnaires).and_return(questionnaires)
@@ -47,6 +48,11 @@ describe FeedbackResponseMap do
   describe '#questionnaire' do
     it 'returns an AuthorFeedbackQuestionnaire' do
       expect(feedback_response_map.questionnaire.first.type).to eq('AuthorFeedbackQuestionnaire')
+    end
+  end
+  describe '#contributor' do
+    it 'returns the reviewee' do
+      expect(feedback_response_map.contributor).to eq(assignment_participant)
     end
   end
 end

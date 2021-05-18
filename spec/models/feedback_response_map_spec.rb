@@ -20,5 +20,19 @@ describe FeedbackResponseMap do
     it 'returns the assignment associated with this FeedbackResponseMap' do
       expect(feedback_response_map.assignment).to eq(assignment)
     end 
+  end
+  describe '#show_review' do
+    context 'when there is a review' do
+      it 'displays the html' do
+        allow(review).to receive(:display_as_html).and_return('HTML')
+        expect(feedback_response_map.show_review).to eq('HTML')
+      end
+    end
+    context 'when there is no review available' do
+      it 'returns an error' do
+        allow(feedback_response_map).to receive(:review).and_return(nil)
+        expect(feedback_response_map.show_review).to eq('No review was performed')
+      end
+    end
   end  
 end

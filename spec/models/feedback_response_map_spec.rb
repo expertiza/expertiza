@@ -130,7 +130,7 @@ describe FeedbackResponseMap do
       allow(assignment_participant).to receive(:user_id).and_return(1)
       allow(User).to receive(:find).with(1).and_return(user1)
       defn = {:body => {:type => nil, :obj_name => nil, :first_name => nil }, :to => nil}
-      expect(feedback_response_map.email(defn, assignment_participant, assignment)).to eq('')
+      expect(feedback_response_map.email(defn, assignment_participant, assignment)).to raise_error(ActionView::Template::Error)
     end
   end
 end

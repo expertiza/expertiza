@@ -57,35 +57,65 @@ describe FeedbackResponseMap do
     end
   end
   describe '#feedback_response_report' do
-    it 'returns a report' do
-      # This function should probably be refactored and moved into a controller
-      maps = [review_response_map]
-      allow(ReviewResponseMap).to receive(:where).with(["reviewed_object_id = ?", 1]).and_return(maps)
-      allow(maps).to receive(:pluck).with("id").and_return(review_response_map.id)
-      allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team])
-      allow(team).to receive(:users).and_return([user1])
-      allow(user1).to receive(:id).and_return(1)
-      allow(AssignmentParticipant).to receive(:where).with(parent_id: 1, user_id: 1).and_return([participant])
-      response1 = double('Response', round: 1, additional_comment: '')
-      response2 = double('Response', round: 2, additional_comment: 'LGTM')
-      response3 = double('Response', round: 3, additional_comment: 'Bad')
-      rounds = [response1, response2, response3]
-      allow(Response).to receive(:where).with(["map_id IN (?)", 2]).and_return(rounds)
-      allow(rounds).to receive(:order).with("created_at DESC").and_return(rounds)
-      allow(Assignment).to receive(:find).with(1).and_return(assignment)
-      allow(assignment).to receive(:vary_with_round).and_return(true)
-      allow(response1).to receive(:map_id).and_return(1)
-      allow(response2).to receive(:map_id).and_return(2)
-      allow(response3).to receive(:map_id).and_return(3)
-      allow(response1).to receive(:id).and_return(1)
-      allow(response2).to receive(:id).and_return(2)
-      allow(response3).to receive(:id).and_return(3)
-      report = FeedbackResponseMap.feedback_response_report(1, nil)
-      expect(report[0]).to eq([participant])
-      expect(report[1]).to eq([1, 2, 3])
-      expect(report[2]).to eq([1, 2, 3])
-      expect(report[3]).to eq([1, 2, 3])
-      
+  	context 'when the assignment has reviews that vary by round' do
+      it 'returns a report' do
+        # This function should probably be refactored and moved into a controller
+        maps = [review_response_map]
+        allow(ReviewResponseMap).to receive(:where).with(["reviewed_object_id = ?", 1]).and_return(maps)
+        allow(maps).to receive(:pluck).with("id").and_return(review_response_map.id)
+        allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team])
+        allow(team).to receive(:users).and_return([user1])
+        allow(user1).to receive(:id).and_return(1)
+        allow(AssignmentParticipant).to receive(:where).with(parent_id: 1, user_id: 1).and_return([participant])
+        response1 = double('Response', round: 1, additional_comment: '')
+        response2 = double('Response', round: 2, additional_comment: 'LGTM')
+        response3 = double('Response', round: 3, additional_comment: 'Bad')
+        rounds = [response1, response2, response3]
+        allow(Response).to receive(:where).with(["map_id IN (?)", 2]).and_return(rounds)
+        allow(rounds).to receive(:order).with("created_at DESC").and_return(rounds)
+        allow(Assignment).to receive(:find).with(1).and_return(assignment)
+        allow(assignment).to receive(:vary_with_round).and_return(true)
+        allow(response1).to receive(:map_id).and_return(1)
+        allow(response2).to receive(:map_id).and_return(2)
+        allow(response3).to receive(:map_id).and_return(3)
+        allow(response1).to receive(:id).and_return(1)
+        allow(response2).to receive(:id).and_return(2)
+        allow(response3).to receive(:id).and_return(3)
+        report = FeedbackResponseMap.feedback_response_report(1, nil)
+        expect(report[0]).to eq([participant])
+        expect(report[1]).to eq([1, 2, 3])
+        expect(report[2]).to eq(nil)
+        expect(report[3]).to eq(nil)
+      end   
+    end
+    context 'when the assignment has reviews that do not vary by round' do
+      it 'returns a report' do
+        # This function should probably be refactored and moved into a controller
+        maps = [review_response_map]
+        allow(ReviewResponseMap).to receive(:where).with(["reviewed_object_id = ?", 1]).and_return(maps)
+        allow(maps).to receive(:pluck).with("id").and_return(review_response_map.id)
+        allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team])
+        allow(team).to receive(:users).and_return([user1])
+        allow(user1).to receive(:id).and_return(1)
+        allow(AssignmentParticipant).to receive(:where).with(parent_id: 1, user_id: 1).and_return([participant])
+        response1 = double('Response', round: 1, additional_comment: '')
+        response2 = double('Response', round: 1, additional_comment: 'LGTM')
+        response3 = double('Response', round: 1, additional_comment: 'Bad')
+        reviews = [response1, response2, response3]
+        allow(Response).to receive(:where).with(["map_id IN (?)", 2]).and_return(reviews)
+        allow(rounds).to receive(:order).with("created_at DESC").and_return(reviews)
+        allow(Assignment).to receive(:find).with(1).and_return(assignment)
+        allow(assignment).to receive(:vary_with_round).and_return(false)
+        allow(response1).to receive(:map_id).and_return(1)
+        allow(response2).to receive(:map_id).and_return(2)
+        allow(response3).to receive(:map_id).and_return(3)
+        allow(response1).to receive(:id).and_return(1)
+        allow(response2).to receive(:id).and_return(2)
+        allow(response3).to receive(:id).and_return(3)
+        report = FeedbackResponseMap.feedback_response_report(1, nil)
+        expect(report[0]).to eq([participant])
+        expect(report[1]).to eq([1])
+      end   
     end
   end
 end

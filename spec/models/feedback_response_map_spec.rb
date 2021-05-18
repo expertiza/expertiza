@@ -60,8 +60,8 @@ describe FeedbackResponseMap do
     it 'returns a report' do
       # This function should probably be refactored and moved into a controller
       maps = [review_response_map]
-      allow(ReviewResponseMap).to receive(:where).with(["reviewed_object_id = ?", 1]).and_return(map)
-      allow(map).to receive(:pluck).with("id").and_return(review_response_map.id)
+      allow(ReviewResponseMap).to receive(:where).with(["reviewed_object_id = ?", 1]).and_return(maps)
+      allow(maps).to receive(:pluck).with("id").and_return(review_response_map.id)
       allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team])
       allow(team).to receive(:users).and_return([user1])
       allow(user1).to receive(:id).and_return(1)
@@ -69,7 +69,7 @@ describe FeedbackResponseMap do
       response1 = double('Response', round: 1, additional_comment: '')
       response2 = double('Response', round: 2, additional_comment: 'LGTM')
       response3 = double('Response', round: 3, additional_comment: 'Bad')
-      rounds = [response1, response2]
+      rounds = [response1, response2, response3]
       allow(Response).to receive(:where).with(["map_id IN (?)", 2]).and_return(rounds)
       allow(rounds).to receive(:order).with("created_at DESC").and_return(rounds)
       allow(Assignment).to receive(:find).with(1).and_return(assignment)

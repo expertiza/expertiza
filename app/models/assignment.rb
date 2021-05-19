@@ -584,7 +584,7 @@ class Assignment < ActiveRecord::Base
       end_dates << due_dates.select {|due_date| due_date.deadline_type_id == review_type && due_date.round == round}.last
     end
     return start_dates, end_dates
-
+  end
   # for program 1 like assignment, if same rubric is used in both rounds,
   # the 'used_in_round' field in 'assignment_questionnaires' will be null,
   # since one field can only store one integer

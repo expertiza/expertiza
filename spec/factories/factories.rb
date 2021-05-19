@@ -198,6 +198,7 @@ FactoryBot.define do
     is_calibrated false
     has_badge false
     allow_selecting_additional_reviews_after_1st_round false
+    auto_assign_mentor false
   end
 
   factory :assignment_team, class: AssignmentTeam do
@@ -371,6 +372,12 @@ FactoryBot.define do
     instruction_loc nil
   end
 
+  factory :questionnaire_node, class: QuestionnaireNode do
+    parent_id 0
+    node_object_id 0
+    type 'QuestionnaireNode'
+  end
+
   factory :question, class: Criterion do
     txt 'Test question:'
     weight 1
@@ -413,6 +420,11 @@ FactoryBot.define do
     reviewer { AssignmentParticipant.first || association(:participant) }
     reviewee { AssignmentTeam.first || association(:assignment_team) }
     type 'ReviewResponseMap'
+    calibrate_to 0
+  end
+
+  factory :feedback_response_map, class: FeedbackResponseMap do
+    type 'FeedbackResponseMap'
     calibrate_to 0
   end
 
@@ -523,9 +535,54 @@ FactoryBot.define do
     name 'username'
     fullname 'full name'
     email 'abc@mailinator.com'
-    end
+  end
 
   factory :survey_deployment, class: SurveyDeployment do
     type 'AssignmentSurveyDeployment'
-    end
+  end
+
+  factory :multiple_choice_checkbox, class: MultipleChoiceCheckbox do
+    txt 'Test question:'
+    weight 1
+    questionnaire { Questionnaire.first || association(:questionnaire) }
+    seq 1.00
+    type 'MultipleChoiceCheckbox'
+    size '70,1'
+  end
+
+  factory :true_false, class: TrueFalse do
+    txt 'Test question:'
+    weight 1
+    questionnaire { Questionnaire.first || association(:questionnaire) }
+    seq 1.00
+    type 'TrueFalse'
+    size '70,1'
+  end
+
+  factory :scored_question, class: ScoredQuestion do
+    txt 'Test question:'
+    weight 1
+    questionnaire { Questionnaire.first || association(:questionnaire) }
+    seq 1.00
+    type 'ScoredQuestion'
+    size '70,1'
+  end
+  
+  factory :questionnaire_header, class: QuestionnaireHeader do
+    txt 'Test question:'
+    weight 1
+    questionnaire { Questionnaire.first || association(:questionnaire) }
+    seq 1.00
+    type 'QuestionnaireHeader'
+    size '70,1'
+  end
+  
+  factory :dropdown, class: Dropdown do
+    txt 'Test question:'
+    weight 1
+    questionnaire { Questionnaire.first || association(:questionnaire) }
+    seq 1.00
+    type 'TrueFalse'
+    size '70,1'
+  end
 end

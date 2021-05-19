@@ -84,7 +84,7 @@ class Assignment < ActiveRecord::Base
     teams.delete(empty_teams)
   end
 
-  #checks whether the assignment is getting a valid number of reviews (less than number of reviews allowed)
+  # checks whether the assignment is getting a valid number of reviews (less than number of reviews allowed)
   def valid_num_review
     self.num_reviews = self.num_reviews_allowed
     if num_reviews_greater?(self.num_reviews_required, self.num_reviews_allowed)
@@ -584,6 +584,23 @@ class Assignment < ActiveRecord::Base
       end_dates << due_dates.select {|due_date| due_date.deadline_type_id == review_type && due_date.round == round}.last
     end
     return start_dates, end_dates
+
+  # for program 1 like assignment, if same rubric is used in both rounds,
+  # the 'used_in_round' field in 'assignment_questionnaires' will be null,
+  # since one field can only store one integer
+  # if questionnaire_ids is empty, Expertiza will try to find questionnaire whose type is 'ReviewQuestionnaire'.
+  def get_questionnaire_ids(round)
+    questionnaire_ids = if round.nil?
+                          AssignmentQuestionnaire.where(assignment_id: self.id)
+                        else
+                          AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
+                        end
+    if questionnaire_ids.empty?
+      AssignmentQuestionnaire.where(assignment_id: self.id).find_each do |aq|
+        questionnaire_ids << aq if aq.questionnaire.type == "ReviewQuestionnaire"
+      end
+    end
+    questionnaire_ids
   end
 
   private
@@ -634,24 +651,6 @@ class Assignment < ActiveRecord::Base
   #returns true if reviews required is greater than reviews allowed
   def num_reviews_greater?(reviews_required, reviews_allowed)
     reviews_allowed && reviews_allowed != -1 && reviews_required > reviews_allowed
-  end
-
-  # for program 1 like assignment, if same rubric is used in both rounds,
-  # the 'used_in_round' field in 'assignment_questionnaires' will be null,
-  # since one field can only store one integer
-  # if questionnaire_ids is empty, Expertiza will try to find questionnaire whose type is 'ReviewQuestionnaire'.
-  def get_questionnaire_ids(round)
-    questionnaire_ids = if round.nil?
-                          AssignmentQuestionnaire.where(assignment_id: self.id)
-                        else
-                          AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
-                        end
-    if questionnaire_ids.empty?
-      AssignmentQuestionnaire.where(assignment_id: self.id).find_each do |aq|
-        questionnaire_ids << aq if aq.questionnaire.type == "ReviewQuestionnaire"
-      end
-    end
-    questionnaire_ids
   end
 
   def get_min_metareview(response_map_set)

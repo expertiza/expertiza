@@ -668,4 +668,31 @@ describe Assignment do
       end
     end
   end
+
+  describe 'find_review_period' do
+    context 'if round number is specified' do
+      it 'returns the start date and end date for that round' do
+        assignment = create(:assignment)
+        dead_right = create(:deadline_right)
+        @deadline_type_sub = create(:deadline_type, name: 'submission')
+        @deadline_type_rev = create(:deadline_type, name: 'review')
+        @assignment_due_date_sub = create(:assignment_due_date, parent_id: assignment.id, review_allowed_id: dead_right.id, review_of_review_allowed_id: dead_right.id, submission_allowed_id: dead_right.id, deadline_type: @deadline_type_sub)
+        @assignment_due_date_rev = create(:assignment_due_date, parent_id: assignment.id, review_allowed_id: dead_right.id, review_of_review_allowed_id: dead_right.id, submission_allowed_id: dead_right.id, deadline_type: @deadline_type_rev)
+        expect(assignment.find_review_period(1)).to eql([[@assignment_due_date_sub], [@assignment_due_date_rev]])
+      end
+    end
+    context 'if round number is nil' do
+      it 'returns all start dates and end dates for that assignment' do
+        assignment = create(:assignment)
+        dead_right = create(:deadline_right)
+        @deadline_type_sub = create(:deadline_type, name: 'submission')
+        @deadline_type_rev = create(:deadline_type, name: 'review')
+        @assignment_due_date_sub1 = create(:assignment_due_date, round: 1, parent_id: assignment.id, review_allowed_id: dead_right.id, review_of_review_allowed_id: dead_right.id, submission_allowed_id: dead_right.id, deadline_type: @deadline_type_sub)
+        @assignment_due_date_rev1 = create(:assignment_due_date, round: 1, parent_id: assignment.id, review_allowed_id: dead_right.id, review_of_review_allowed_id: dead_right.id, submission_allowed_id: dead_right.id, deadline_type: @deadline_type_rev)
+        @assignment_due_date_sub2 = create(:assignment_due_date, round: 2, parent_id: assignment.id, review_allowed_id: dead_right.id, review_of_review_allowed_id: dead_right.id, submission_allowed_id: dead_right.id, deadline_type: @deadline_type_sub)
+        @assignment_due_date_rev2 = create(:assignment_due_date, round: 2, parent_id: assignment.id, review_allowed_id: dead_right.id, review_of_review_allowed_id: dead_right.id, submission_allowed_id: dead_right.id, deadline_type: @deadline_type_rev)
+        expect(assignment.find_review_period(nil)).to eql([[@assignment_due_date_sub1, @assignment_due_date_sub2], [@assignment_due_date_rev1, @assignment_due_date_rev2]])
+      end
+    end
+  end
 end

@@ -85,7 +85,7 @@ describe "peer review testing" do
   it "Should contain html target and javascript calls for tag heatgrid" do
     # Load Summary Report with no reviews
     load_your_scores
-    expect(page).to have_content "Average peer review score: "
+    expect(page).to have_content "Average peer review score:"
 
     # Add review as first user
     click_link "Logout"

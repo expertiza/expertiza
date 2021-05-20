@@ -35,8 +35,8 @@ describe Instructor do
       allow(participant1).to receive(:user).and_return(user1)
       allow(participant2).to receive(:user).and_return(user2)
       allow(instructor).to receive(:role).and_return(instructor_role)
-      allow(participant1).to receive(:role).and_return(instructor_role) 
-      allow(participant2).to receive(:role).and_return(instructor_role)      
+      allow(user1).to receive(:role).and_return(instructor_role) 
+      allow(user2).to receive(:role).and_return(instructor_role)      
       allow(instructor_role).to receive(:hasAllPrivilegesOf).and_return(true)
       expect(Instructor.get_user_list(instructor)).to eq([user1, user2])
     end

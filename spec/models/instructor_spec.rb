@@ -22,15 +22,15 @@ describe Instructor do
   describe '#get' do
     it 'gets all objects of a given type' do
       allow(Assignment).to receive(:where).with("id = ? AND (instructor_id = ? OR private = 0)", 1, 6).and_return([assignment])
-      expect(instructor.list_get(Assignment, participant1.id, instructor.id)).to eq([assignment])
+      expect(instructor.get(Assignment, participant1.id, instructor.id)).to eq([assignment])
     end
   end
   describe '#get_user_list' do
     it 'get all users from participants of a given assignments' do
     	instructor_role = build(:role_of_instructor, id: 2, name: "Instructor_role_test", description: '', parent_id: nil, default_page_id: nil)
-      allow(Course).to receive(:where).with(instructor_id: 6).and_yield(course)
+      allow(Course).to receive(:where).with(instructor_id: 6).and_return([course])
       allow(course).to receive(:get_participants).and_return([participant1])
-      allow(Assignment).to receive(:where).with(instructor_id: 6).and_yield(assignment)
+      allow(Assignment).to receive(:where).with(instructor_id: 6).and_return([assignment])
       allow(assignment).to receive(:participants).and_return([participant2])
       allow(participant1).to receive(:user).and_return(user1)
       allow(participant2).to receive(:user).and_return(user2)

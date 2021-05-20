@@ -16,7 +16,7 @@ describe Instructor do
   describe '#list mine' do
     it 'lists all of some object type that are public and associated with the instructor' do
       allow(Assignment).to receive(:where).with("instructor_id = ?", 6).and_return([assignment])
-      expect(instructor.list_mine(Assignment, instructor.id)).to eq([assignment])
+      expect(instructor.list_mine(Assignment, instructor.id)).to eq(assignment)
     end
   end
   describe '#get' do

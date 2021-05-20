@@ -1,5 +1,5 @@
 describe Instructor do
-  let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
+  let(:assignment) { build(:assignment, id: 1, name: 'no assignment') }
   let(:instructor) { build(:instructor, id: 6) }
   let(:participant1) { build(:participant, id: 1) }
   let(:participant2) { build(:participant, id: 2) }
@@ -22,7 +22,7 @@ describe Instructor do
   describe '#get' do
     it 'gets all objects of a given type' do
       allow(Assignment).to receive(:where).with("id = ? AND (instructor_id = ? OR private = 0)", 1, 6).and_return([assignment])
-      expect(instructor.list_all(Assignment, participant.id, instructor.id)).to eq([assignment])
+      expect(instructor.list_all(Assignment, participant1.id, instructor.id)).to eq([assignment])
     end
   end
   describe '#get_user_list' do

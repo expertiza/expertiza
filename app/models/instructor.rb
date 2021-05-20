@@ -38,6 +38,7 @@ class Instructor < User
   def self.get_user_list(user)
     participants = []
     user_list = []
+    # Refactor
     courses = Course.where(instructor_id: user.id)
     courses.each do |course|
       participants << course.get_participants

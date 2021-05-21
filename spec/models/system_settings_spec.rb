@@ -10,6 +10,8 @@ describe SystemSettings do
     end
   end
   describe '#public_role' do
-    expect(@system_settings.public_role).to be(@student_role)
+  	it 'returns role' do
+      expect(@system_settings.public_role).to be(@student_role)
+    end
   end
 end

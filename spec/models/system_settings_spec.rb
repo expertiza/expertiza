@@ -1,6 +1,7 @@
 describe SystemSettings do
   before :all do
   	@system_settings = SystemSettings.new
+  	@system_settings1 = SystemSettings.new
   	@student_role = build(:role_of_student, id: 1, name: "Student_role_test", description: '', parent_id: nil, default_page_id: nil)
   	@system_settings.public_role = @student_role
   	@markup_style = MarkupStyle.new(name: 'Header for Question')
@@ -13,8 +14,8 @@ describe SystemSettings do
   end
   context 'when there is no markup style set' do
     it 'returns a new one' do
-    	allow(@system_settings).to receive(:default_markup_style_id).and_return(nil)
-      expect(@system_settings.default_markup_style.name).to eq('(None)')
+    	allow(@system_settings1).to receive(:default_markup_style_id).and_return(nil)
+      expect(@system_settings1.default_markup_style.name).to eq('(None)')
     end
   end
   context 'when there is a markup style set' do

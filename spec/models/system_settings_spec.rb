@@ -13,7 +13,7 @@ describe SystemSettings do
   end
   context 'when there is no markup style set' do
     it 'returns a new one' do
-    	allow(@system_settings).to receive(:default_markup_style_id).and_return(false)
+    	allow(@system_settings).to receive(:default_markup_style_id).and_return(nil)
       expect(@system_settings.default_markup_style.name).to eq('(None)')
     end
   end

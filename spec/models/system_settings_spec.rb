@@ -21,7 +21,7 @@ describe SystemSettings do
     it 'returns it' do
     	allow(@system_settings).to receive(:default_markup_style_id).and_return(1)
     	allow(MarkupStyle).to receive(:find).with(1).and_return(@markup_style)
-    	expecr(@system_settings.default_markup_style).to eq(@markup_style)
+    	expect(@system_settings.default_markup_style).to eq(@markup_style)
     end
   end
 end

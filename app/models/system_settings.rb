@@ -44,6 +44,6 @@ class SystemSettings < ActiveRecord::Base
     pages << "Not found page" if self.not_found_page_id == pageid
     pages << "Permission denied page" if self.permission_denied_page_id == pageid
     pages << "Session expired page" if self.session_expired_page_id == pageid
-    return pages unless pages.empty?
+    pages unless pages.empty?
   end
 end

@@ -8,7 +8,7 @@ describe Rubric do
   describe '#update_mapping' do
     it 'redirects to action list' do
       rubric = Rubric.new(name: 'Test Assignment Rubric', max_question_score: 100, min_question_score: 0)
-      expect{rubric.update_mapping}.to redirect_to('/assignments/1/edit')
+      expect(rubric.update_mapping).to eq('/assignments/1/edit')
     end
   end
 end

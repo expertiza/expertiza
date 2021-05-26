@@ -1,7 +1,7 @@
 describe 'CourseTeam' do
   let(:course_team1) { build(:course_team, id: 1) }
   let(:user2) { build(:student, id: 2) }
-  let(:participant) { build(:participant, user: user2)) }
+  let(:participant) { build(:participant, user: user2) }
   describe "copy course team to assignment team" do
     it "should allow course team to be copied to assignment team" do
       assignment = build(Assignment)

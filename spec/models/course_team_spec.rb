@@ -80,7 +80,7 @@ describe 'CourseTeam' do
         allow(course_team1).to receive(:user?).with(user2).and_return(false)
         allow(TeamsUser).to receive(:create).with(user_id: 2, team_id: 1).and_return(team_user)
         allow(TeamNode).to receive(:find_by).with(node_object_id: 1).and_return(node)
-        allow(course_team1).to receive(:add_participant).with(1, user).and_return(participant)
+        allow(course_team1).to receive(:add_participant).with(1, user2).and_return(participant)
         allow(course_team1).to receive(:parent_id).and_return(1)
         expect(course_team1.add_member(user2)).to eq(participant)
       end

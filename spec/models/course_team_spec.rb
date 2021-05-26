@@ -62,4 +62,9 @@ describe 'CourseTeam' do
       expect(CourseTeam.export([], 1, {team_name: 'false'})).to eq([["no team", "no name"]])
     end
   end
+  describe '#export_fields' do
+    it 'returns a list of headers' do
+      expect(CourseTeam.export_fields({team_name: 'false'})).to eq(['Team Name', 'Team members', 'Course Name'])
+    end
+  end
 end

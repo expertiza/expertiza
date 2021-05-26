@@ -24,4 +24,9 @@ describe 'CourseTeam' do
       expect(course_team.assignment_id).to be_nil
     end
   end
+  describe '#prototype' do
+    it 'creates a course team' do
+      expect(CourseTeam.prototype.class).to eq(CourseTeam) 
+    end
+  end
 end

@@ -67,4 +67,12 @@ describe 'CourseTeam' do
       expect(CourseTeam.export_fields({team_name: 'false'})).to eq(['Team Name', 'Team members', 'Course Name'])
     end
   end
+  describe '#add_member' do
+    context 'when the user is already on the team' do
+      it 'raises an error' do
+        allow(course_team1).to receive(:user?).with(user2).and_return(true)
+        expect{course_team1.add_member(user2)}.to raise_error("The user no name is already a member of the team, no team")
+      end
+    end
+  end
 end

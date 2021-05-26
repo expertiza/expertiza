@@ -39,4 +39,12 @@ describe 'CourseTeam' do
       expect(course_team1.add_participant(1, user2)).to eq(participant)
     end
   end
+  describe '#import' do
+    context 'when the course does not exist' do
+      it 'raises an import error' do
+        allow(Course).to receive(:find).with(1).and_return(nil)
+        expect(CourseTeam.import({}, 1, nil).to raise_error(ImportError)
+      end
+    end
+  end
 end

@@ -2,6 +2,7 @@ describe 'CourseTeam' do
   let(:course_team1) { build(:course_team, id: 1) }
   let(:user2) { build(:student, id: 2) }
   let(:participant) { build(:participant, user: user2) }
+  let(:course) { build(:course, id: 1, name: 'ECE517') }
   describe "copy course team to assignment team" do
     it "should allow course team to be copied to assignment team" do
       assignment = build(Assignment)
@@ -44,6 +45,12 @@ describe 'CourseTeam' do
       it 'raises an import error' do
         allow(Course).to receive(:find).with(1).and_return(nil)
         expect{CourseTeam.import({}, 1, nil)}.to raise_error(ImportError)
+      end
+    end
+    context 'when the course does exist' do
+      it 'raises an error with empty row hash' do
+        allow(Course).to receive(:find).with(1).and_return(course)
+        expect{CourseTeam.import({}, 1, nil)}.to raise_error(ArgumentError)
       end
     end
   end

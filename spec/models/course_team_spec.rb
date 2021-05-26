@@ -1,4 +1,7 @@
 describe 'CourseTeam' do
+  let(:course_team1) { build(:course_team, id: 1) }
+  let(:user2) { build(:student, id: 2) }
+  let(:participant) { build(:participant, user: user2)) }
   describe "copy course team to assignment team" do
     it "should allow course team to be copied to assignment team" do
       assignment = build(Assignment)
@@ -27,6 +30,13 @@ describe 'CourseTeam' do
   describe '#prototype' do
     it 'creates a course team' do
       expect(CourseTeam.prototype.class).to eq(CourseTeam) 
+    end
+  end
+  describe '#add_participant' do
+    it 'adds a participant to the course when it is not already added' do
+      allow(CourseParticipant).to receive(:find_by).with(parent_id: 1, user_id: 2).and_return(nil)
+      allow(CourseParticipant).to receive(:create).with(course_id: 1, user_id: 2, permission_granted: 0).and_return(participant)
+      expect(course_team1.add_participant(1, user2)).to eq(participant)
     end
   end
 end

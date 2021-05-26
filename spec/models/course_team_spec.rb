@@ -1,8 +1,9 @@
 describe 'CourseTeam' do
-  let(:course_team1) { build(:course_team, id: 1) }
-  let(:user2) { build(:student, id: 2) }
+  let(:course_team1) { build(:course_team, id: 1, name: 'no team') }
+  let(:user2) { build(:student, id: 2, name: 'no name') }
   let(:participant) { build(:participant, user: user2) }
   let(:course) { build(:course, id: 1, name: 'ECE517') }
+  let(:team_user) { build(:team_user, id: 1, user: user2) }
   describe "copy course team to assignment team" do
     it "should allow course team to be copied to assignment team" do
       assignment = build(Assignment)
@@ -52,6 +53,13 @@ describe 'CourseTeam' do
         allow(Course).to receive(:find).with(1).and_return(course)
         expect{CourseTeam.import({}, 1, nil)}.to raise_error(ArgumentError)
       end
+    end
+  end
+  describe '#export' do
+    it 'writes to a csv' do
+      allow(CourseTeam).to receive(:where).with(parent_id: 1).and_return([course_team1])
+      allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
+      expect(CourseTeam.export([], 1, {team_name: 'false'})).to eq([["no team", "no name"]])
     end
   end
 end

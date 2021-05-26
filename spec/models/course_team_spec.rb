@@ -12,4 +12,16 @@ describe 'CourseTeam' do
       expect(assignment_team.copy_members(assignment_team.id))
     end
   end
+  describe '#parent_model' do
+    it 'returns parent_model' do
+      course_team = CourseTeam.new
+      expect(course_team.parent_model).to eq('Course')
+    end
+  end
+  describe '#assignment_id' do
+    it 'returns nil since this team is not an assignment team' do
+      course_team = CourseTeam.new
+      expect(course_team.assignment_id).to be_nil
+    end
+  end
 end

@@ -576,6 +576,15 @@ FactoryBot.define do
     type 'QuestionnaireHeader'
     size '70,1'
   end
+
+  factory :section_header, class: SectionHeader do
+    txt 'Test question:'
+    weight 1
+    questionnaire { Questionnaire.first || association(:questionnaire) }
+    seq 1.00
+    type 'SectionHeader'
+    size '70,1'
+  end
   
   factory :dropdown, class: Dropdown do
     txt 'Test question:'

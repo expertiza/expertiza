@@ -21,4 +21,12 @@ describe QuestionnaireTypeNode do
       expect(questionnaire_type_node.get_partial_name).to eq("questionnaire_type_actions")
     end
   end
+  describe '#get_name' do
+    it 'returns the name of the associated tree folder' do
+      tree_folder = double('TreeFolder', id: 1)
+      allow(TreeFolder).to receive(:find).with(1).and_return(tree_folder)
+      allow(tree_folder).to receive(:name).and_return("No folder")
+      expect(questionnaire_type_node.get_name).to eq("No folder")
+    end
+  end
 end

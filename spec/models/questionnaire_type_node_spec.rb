@@ -1,4 +1,5 @@
 describe QuestionnaireTypeNode do
+  let(:questionnaire_type_node) { build(:questionnaire_type_node)}
   it { should belong_to(:table) }
   it { should belong_to(:node_object) }
   describe '#table' do
@@ -13,6 +14,11 @@ describe QuestionnaireTypeNode do
       allow(TreeFolder).to receive(:where).with(parent_id: 1).and_return([double('FolderNode', id: 1)])
       allow(FolderNode).to receive(:find_by).with(node_object_id: 1).and_return(double('QuestionnaireNode'))
       expect(QuestionnaireTypeNode.get().length).to eq(1)
+    end
+  end
+  describe '#get_partial_name' do
+    it 'returns questionnaire_type_actions' do
+      expect(questionnaire_type_node.get_partial_name).to eq("questionnaire_type_actions")
     end
   end
 end

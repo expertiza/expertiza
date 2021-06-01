@@ -9,7 +9,7 @@ describe Credentials do
       allow(role).to receive(:id).and_return(1)
       expect(cred.role_id).to eq(1)
       expect(cred.updated_at).to eq(1)
-      expect(cred.role_ids).to eq({:1=>role})
+      expect(cred.role_ids).to eq({1=>role})
     end
   end
 end

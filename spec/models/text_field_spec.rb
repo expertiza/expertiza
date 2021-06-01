@@ -19,7 +19,7 @@ describe TextField do
         tf.break_before = true
         allow(Question).to receive(:exists?).and_return(false)
         html = tf.view_completed_question(1, answer)
-        expect(html).to eq('')
+        expect(html).to eq('<b>1. Field Text</b>&nbsp;&nbsp;&nbsp;&nbsp;test comment')
       end
     end
     context 'when the type is a TextField and there is not a break before' do
@@ -31,7 +31,7 @@ describe TextField do
         tf.break_before = false
         allow(Question).to receive(:exists?).and_return(false)
         html = tf.view_completed_question(1, answer)
-        expect(html).to eq('')
+        expect(html).to eq('Field Texttest comment<BR/><BR/>')
       end
     end
   end

@@ -44,6 +44,10 @@ class Assignment < ActiveRecord::Base
   DEFAULT_MAX_REVIEWERS = 3
   DEFAULT_MAX_OUTSTANDING_REVIEWS = 2
 
+  # Constants for common fields, to reduce complexity if change is needed
+  FINISHED_CONST = 'Finished'.freeze
+  UNKNOWN_CONST = 'Unknown'.freeze
+
   def self.max_outstanding_reviews
     DEFAULT_MAX_OUTSTANDING_REVIEWS
   end
@@ -51,6 +55,7 @@ class Assignment < ActiveRecord::Base
   def team_assignment?
     true
   end
+
   alias team_assignment team_assignment?
 
   def topics?
@@ -66,11 +71,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.remove_assignment_from_course(assignment)
-    oldpath = assignment.path rescue nil
+    old_path = assignment.path rescue nil
     assignment.course_id = nil
     assignment.save
-    newpath = assignment.path rescue nil
-    FileHelper.update_file_location(oldpath, newpath)
+    new_path = assignment.path rescue nil
+    FileHelper.update_file_location(old_path, new_path)
   end
 
   def teams?
@@ -143,11 +148,13 @@ class Assignment < ActiveRecord::Base
     end
     mappings
   end
+
   #--------------------metareview assignment end
 
   def dynamic_reviewer_assignment?
     self.review_assignment_strategy == RS_AUTO_SELECTED
   end
+
   alias is_using_dynamic_reviewer_assignment? dynamic_reviewer_assignment?
 
   def scores(questions)
@@ -208,7 +215,7 @@ class Assignment < ActiveRecord::Base
     end
     path_text = if !self.course_id.nil? && self.course_id > 0
                   Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(self.instructor[:name]) + '/' +
-                    FileHelper.clean_path(self.course.directory_path) + '/'
+                      FileHelper.clean_path(self.course.directory_path) + '/'
                 else
                   Rails.root.to_s + '/pg_data/' + FileHelper.clean_path(self.instructor[:name]) + '/'
                 end
@@ -220,7 +227,7 @@ class Assignment < ActiveRecord::Base
   # The permissions of TopicDueDate is the same as AssignmentDueDate.
   # Here, column is usually something like 'review_allowed_id'
   def check_condition(column, topic_id = nil)
-    next_due_date = DueDate.get_next_due_date(self.id, topic_id)
+    next_due_date = next_due_date(topic_id)
     return false if next_due_date.nil?
     right_id = next_due_date.send column
     right = DeadlineRight.find(right_id)
@@ -298,7 +305,7 @@ class Assignment < ActiveRecord::Base
     user = User.find_by(name: user_name)
     if user.nil?
       raise "The user account with the name #{user_name} does not exist. Please <a href='" +
-        url_for(controller: 'users', action: 'new') + "'>create</a> the user first."
+                url_for(controller: 'users', action: 'new') + "'>create</a> the user first."
     end
     participant = AssignmentParticipant.find_by(parent_id: self.id, user_id: user.id)
     raise "The user #{user.name} is already a participant." if participant
@@ -321,7 +328,7 @@ class Assignment < ActiveRecord::Base
   # if current  stage is submission or review, find the round number
   # otherwise, return 0
   def number_of_current_round(topic_id)
-    next_due_date = DueDate.get_next_due_date(self.id, topic_id)
+    next_due_date = next_due_date(topic_id)
     return 0 if next_due_date.nil?
     next_due_date.round ||= 0
   end
@@ -329,12 +336,12 @@ class Assignment < ActiveRecord::Base
   # For varying rubric feature
   def current_stage_name(topic_id = nil)
     if self.staggered_deadline?
-      return (topic_id.nil? ? 'Unknown' : get_current_stage(topic_id))
+      return (topic_id.nil? ? UNKNOWN_CONST : get_current_stage(topic_id))
     end
     due_date = find_current_stage(topic_id)
 
     unless self.staggered_deadline?
-      if due_date != 'Finished' && !due_date.nil? && !due_date.deadline_name.nil?
+      if due_date != FINISHED_CONST && !due_date.nil? && !due_date.deadline_name.nil?
         return due_date.deadline_name
       else
         return get_current_stage(topic_id)
@@ -352,7 +359,7 @@ class Assignment < ActiveRecord::Base
       return nil if topic_id.nil?
     end
     due_date = find_current_stage(topic_id)
-    if due_date.nil? or due_date == 'Finished' or due_date.is_a?(TopicDueDate)
+    if due_date.nil? or due_date == FINISHED_CONST or due_date.is_a?(TopicDueDate)
       return nil
     else
       due_date.description_url
@@ -360,9 +367,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def stage_deadline(topic_id = nil)
-    return 'Unknown' if topic_id.nil? and self.staggered_deadline?
+    return UNKNOWN_CONST if topic_missing?(topic_id)
     due_date = find_current_stage(topic_id)
-    due_date.nil? || due_date == 'Finished' ? due_date : due_date.due_at.to_s
+    due_date.nil? || due_date == FINISHED_CONST ? due_date : due_date.due_at.to_s
   end
 
   def num_review_rounds
@@ -375,16 +382,16 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_current_stage(topic_id = nil)
-    next_due_date = DueDate.get_next_due_date(self.id, topic_id)
-    return 'Finished' if next_due_date.nil?
+    next_due_date = next_due_date(topic_id)
+    return FINISHED_CONST if next_due_date.nil?
     next_due_date
   end
 
   # Zhewei: this method is almost the same as 'stage_deadline'
   def get_current_stage(topic_id = nil)
-    return 'Unknown' if topic_id.nil? and self.staggered_deadline?
+    return UNKNOWN_CONST if topic_missing?(topic_id)
     due_date = find_current_stage(topic_id)
-    due_date.nil? || due_date == 'Finished' ? 'Finished' : DeadlineType.find(due_date.deadline_type_id).name
+    due_date.nil? || due_date == FINISHED_CONST ? FINISHED_CONST : DeadlineType.find(due_date.deadline_type_id).name
   end
 
   def review_questionnaire_id(round = nil)
@@ -593,6 +600,21 @@ class Assignment < ActiveRecord::Base
     else
       tcsv.push('---', '---', '---') if options[score_name]
     end
+  end
+
+  # New function to check if the assignment is finished
+  def finished?(topic_id = nil)
+    next_due_date(topic_id).nil?
+  end
+
+  # Function to check if topic id is null when its a staggered assignment, to prevent redundancy
+  def topic_missing?(topic_id = nil)
+    topic_id.nil? and self.staggered_deadline?
+  end
+
+  # returns the next due date
+  def next_due_date(topic_id = nil)
+    DueDate.get_next_due_date(self.id, topic_id)
   end
 
   # This method is used for export contents of grade#view.  -Zhewei

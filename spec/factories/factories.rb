@@ -599,4 +599,13 @@ FactoryBot.define do
     type 'TrueFalse'
     size '70,1'
   end
+
+  factory :text_area, class: TextArea do
+    txt 'Test question:'
+    weight 1
+    questionnaire { Questionnaire.first || association(:questionnaire) }
+    seq 1.00
+    type 'TextArea'
+    size '70,1'
+  end
 end

@@ -20,7 +20,7 @@ describe TextArea do
   describe '#view_completed_questions' do
     it 'return html' do
       html = text_area.view_completed_question(1,answer)
-      expect(html).to eq('')
+      expect(html).to eq("<b>1. Test question:</b><BR/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;test comment<BR/><BR/>")
     end
   end
 end

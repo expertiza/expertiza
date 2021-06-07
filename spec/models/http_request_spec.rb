@@ -7,7 +7,6 @@ describe "HttpRequest" do
     expect(HttpRequest.valid_url?("http://www.google.com")).to be_truthy
     expect(HttpRequest.valid_url?("https://www.google.com")).to be_truthy
     expect(HttpRequest.valid_url?("https://www.google.com:80")).to be_truthy
-
     expect(HttpRequest.valid_url?("http://www.google.com/")).to be_truthy
     expect(HttpRequest.valid_url?("http://www.google.com?")).to be_truthy
     expect(HttpRequest.valid_url?("http://www.google.com?arg1=123&arg2=456")).to be_truthy

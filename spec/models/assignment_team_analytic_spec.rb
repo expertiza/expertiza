@@ -13,7 +13,8 @@ describe AssignmentTeamAnalytic do
   describe '#num_participants' do
     context 'when the participants are set to an empty array' do
       it 'should return zero' do
-
+        dc = AssignmentTeamAnalyticTestDummyClass.new([],[])
+        expect(dc.num_participants).to eq(0)
       end
     end
     context 'when the participants are set a list of three participants' do

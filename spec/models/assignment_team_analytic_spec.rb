@@ -10,6 +10,9 @@ class AssignmentTeamAnalyticTestDummyClass
 end
 
 describe AssignmentTeamAnalytic do
+  let(:participant) { build(:participant, user: build(:student, name: "Jane", fullname: "Doe, Jane", id: 1)) }
+  let(:participant2) { build(:participant, user: build(:student, name: "John", fullname: "Doe, John", id: 2)) }
+  let(:participant3) { build(:participant, can_review: false, user: build(:student, name: "King", fullname: "Titan, King", id: 3)) }
   describe '#num_participants' do
     context 'when the participants are set to an empty array' do
       it 'should return zero' do
@@ -19,7 +22,8 @@ describe AssignmentTeamAnalytic do
     end
     context 'when the participants are set a list of three participants' do
       it 'should return three' do
-
+        dc = AssignmentTeamAnalyticTestDummyClass.new([participant, participant2, participant3],[])
+        expect(dc.num_participants).to eq(3)
       end
     end
   end

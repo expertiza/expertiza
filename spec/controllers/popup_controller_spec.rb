@@ -1,4 +1,5 @@
 describe PopupController do
+  let(:instructor) { build(:instructor, id: 6) }
   let(:team) { build(:assignment_team, id: 1, name: "team1", assignment: assignment) }
   let(:student) { build(:student, id: 1, name: "student") }
   let(:student2) { build(:student, id: 2, name: "student2") }
@@ -25,10 +26,15 @@ describe PopupController do
 
   describe '#team_users_popup' do
     ## INSERT CONTEXT/DESCRIPTION/CODE HERE
-  end
+    it "renders the page successfuly as Instructor" do 
+      allow(Team).to receive(:find).and_return(team)
+      allow(Assignment).to receive(:find).and_return(assignment)
+      params = {id: team.id, assignment: assignment, reviewer_id: participant2.id}
+      session = {user: instructor}
+      result = get :team_users_popup, params, session
+      expect(result.status).to eq 200
 
-  describe '#participants_popup' do
-    ## INSERT CONTEXT/DESCRIPTION/CODE HERE
+    end
   end
 
   ######### Tone Analysis Tests ##########
@@ -39,14 +45,6 @@ describe PopupController do
       allow(ReviewResponseMap).to receive(:final_versions_from_reviewer).with(1).and_return(final_versions)
       allow(Answer).to receive(:where).with(any_args).and_return(mocked_comments_one)
       @request.host = test_url
-    end
-    describe '#tone_analysis_chart_popup' do
-      context 'when tone analysis page is loaded, review tone analysis is calculated' do
-        it 'builds a tone analysis report for both the summery and tone analysis pages and returns an array of heat map URLs' do
-          result = get :tone_analysis_chart_popup
-          expect(result["Location"]).to eq(test_url + "/") ## Placeholder URL should be returned since GET returns a 302 status redirection error
-        end
-      end
     end
 
     describe '#view_review_scores_popup' do

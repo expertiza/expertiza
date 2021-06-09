@@ -45,6 +45,7 @@
     <% end %>
   <%end%>
 <% else %>
+    
     <%if assignment.get_current_stage()!="Finished" %>
     <%= form_tag :controller => 'review_mapping',
                  :action => 'assign_reviewer_dynamically',

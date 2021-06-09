@@ -112,3 +112,35 @@ function deleteSelectedFile(){
 		}
 	else return false;	
 }
+
+$(document).ready(function(){
+	
+	    // Function that confirms user action via a popup message.
+	    // If confirmed, it creates the backend API request.
+	    function confirmAndUpdate(confirmationMessage, event) {
+	
+	        if (confirm(confirmationMessage)) {
+	            //Make changes to the DB via AJAX request
+	            $.ajax({
+	                type: 'PUT',
+	                url: "publishing_rights_update",
+	                data: {
+	                    id: $(event.target).attr("id"),
+	                    status: $(event.target).prop("checked")
+	                }
+	            });
+	        }
+	        else {
+	            //Cancel checkbox checking/unchecking
+	            event.preventDefault();
+	        }
+	    }
+	
+	    //Check the value of checkbox and take action accordingly
+	    $(".make-permit-change").click(function (event) {
+	        if (!$(this).prop("checked"))
+	            confirmAndUpdate("Please press OK to revoke publishing rights permit.", event);
+	        else
+	            confirmAndUpdate("Please press OK to provide publishing rights .", event);
+	    });
+	});

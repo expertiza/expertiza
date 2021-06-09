@@ -3,6 +3,7 @@ describe Response do
   let(:participant2) { build(:participant, id: 2) }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
   let(:team) { build(:assignment_team) }
+  let(:signed_up_team) { build(:signed_up_team, team_id: team.id) }
   let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer]) }
   let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
@@ -108,6 +109,9 @@ describe Response do
   end
 
   describe '#questionnaire_by_answer' do
+    before(:each) do
+      allow(SignedUpTeam).to receive(:find_by).with(team_id: team.id).and_return(signed_up_team)
+    end
     context 'when answer is not nil' do
       it 'returns the questionnaire of the question of current answer' do
         allow(Question).to receive(:find).with(1).and_return(question)
@@ -115,7 +119,6 @@ describe Response do
         expect(response.questionnaire_by_answer(answer)).to eq(questionnaire2)
       end
     end
-
     context 'when answer is nil' do
       it 'returns review questionnaire of current assignment' do
         allow(ResponseMap).to receive(:find).with(1).and_return(review_response_map)
@@ -124,6 +127,20 @@ describe Response do
         allow(assignment).to receive(:review_questionnaire_id).and_return(1)
         allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire2)
         expect(response.questionnaire_by_answer(nil)).to eq(questionnaire2)
+      end
+    end
+  end
+
+  describe '#populate_new_response' do
+    context 'when current round response is found' do
+      it 'returns the current round response' do
+        allow(response).to receive(:populate_new_response).with(:review_response_map, "0").and_return(response)
+        expect(response.id).to eq(1)
+      end
+    end
+    context 'when current round response is found' do
+      it 'returns a new response object' do
+        allow(response).to receive(:populate_new_response).with(:review_response_map, nil).and_return(:new_response)
       end
     end
   end
@@ -140,14 +157,14 @@ describe Response do
       allow(review_response_map).to receive(:response).and_return([response1, response2])
       allow(response1).to receive(:scores).and_return([answer])
       allow(response2).to receive(:scores).and_return([answer2])
-      expect(Response.concatenate_all_review_comments(1, 1)).to eq(["Answer textAnswer textLGTM", 2, "Answer text", 1, "Answer textLGTM", 1, "", 0])
+      expect(Response.concatenate_all_review_comments(1, 1)).to eq(["Answer textAnswer textLGTM", 2, [nil, "Answer text", "Answer textLGTM", ""], [nil, 1, 1, 0]])
     end
   end
 
   describe '.get_volume_of_review_comments' do
     it 'returns volumes of review comments in each round' do
       allow(Response).to receive(:concatenate_all_review_comments).with(1, 1)
-                                                                  .and_return(["Answer textAnswer textLGTM", 2, "Answer text", 1, "Answer textLGTM", 1, "", 0])
+                                                                  .and_return(["Answer textAnswer textLGTM", 2, [nil, "Answer text", "Answer textLGTM", ""], [nil, 1, 1, 0]])
       expect(Response.get_volume_of_review_comments(1, 1)).to eq([1, 2, 2, 0])
     end
   end

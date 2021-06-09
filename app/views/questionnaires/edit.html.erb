@@ -1,8 +1,8 @@
+<%= render :partial => 'question_weight' %>
 <h1>Edit <%= @questionnaire.display_type %></h1>
 
 <% if @questionnaire.type == "QuizQuestionnaire" %>
-  <%= form_tag({:controller=>'quiz_questionnaire', :action=>'update_quiz', :id=>@questionnaire.id, :pid => params[:pid]}, :multipart => true) do %>
-
+  <%= form_tag({:controller=>'quiz_questionnaires', :action=>'update', :id=>@questionnaire.id, :pid => params[:pid]}, :method => "put", :multipart => true) do %>
     <table>
         <tr>
           <td valign="top"><label for="questionnaire_name">Name:</label>
@@ -27,7 +27,7 @@
         <tr><td><br></tr></td>
         
       <% end %>
-    </table> 
+    </table>
 
     <%= submit_tag "Save #{@questionnaire.display_type.downcase}", :name=>"save" %>
     <br />

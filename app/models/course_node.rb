@@ -2,6 +2,15 @@ class CourseNode < Node
   belongs_to :course, class_name: "Course", foreign_key: "node_object_id"
   belongs_to :node_object, class_name: "Course", foreign_key: "node_object_id"
 
+  # Creates a new courese node from the given course
+  def create_course_node(course)
+    parent_id = CourseNode.get_parent_id
+    @course_node = CourseNode.new
+    @course_node.node_object_id = course.id
+    @course_node.parent_id = parent_id if parent_id
+    @course_node.save
+  end
+
   # Returns the table in which to locate Courses
   def self.table
     "courses"
@@ -31,13 +40,13 @@ class CourseNode < Node
                      "courses.instructor_id = #{user_id}"
                    else
                      'courses.id in (?)'
-                                end
+                   end
                  else
                    if current_user.teaching_assistant? == false
                      "(courses.private = 0 or courses.instructor_id = #{user_id})"
                    else
                      "((courses.private = 0 and courses.instructor_id != #{user_id}) or courses.instructor_id = #{user_id})"
-                                end
+                   end
                  end
     conditions
   end

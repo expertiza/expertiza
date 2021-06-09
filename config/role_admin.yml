@@ -484,7 +484,7 @@ development:
         parent:
         parent_id: 37
         site_controller_id: 10
-        url: "/users/list_pending_requested"
+        url: "/account_request/list_pending_requested"
     by_name:
       home: *1
       manage instructor content: *2
@@ -1469,7 +1469,7 @@ production:
        parent:
        parent_id: 37
        site_controller_id: 10
-       url: "/users/list_pending_requested"
+       url: "/account_request/list_pending_requested"
     by_name:
       home: *1
       manage instructor content: *2

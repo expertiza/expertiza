@@ -6,7 +6,16 @@ class TeamsUser < ActiveRecord::Base
   attr_accessible :user_id, :team_id
 
   def name(ip_address = nil)
-    self.user.name(ip_address)
+    name = self.user.name(ip_address)
+
+    # E2115 Mentor Management
+    # Indicate that someone is a Mentor in the UI. The view code is
+    # often hard to follow, and this is the best place we could find
+    # for this to go.
+    if MentorManagement.user_a_mentor?(self.user)
+      name += " (Mentor)"
+    end
+    name
   end
 
   def delete

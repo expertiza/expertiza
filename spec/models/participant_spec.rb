@@ -98,7 +98,7 @@ describe Participant do
 
   describe '#email' do
     it 'sends an email to the participant' do
-      expect { participant.email("Missing 'pw'", "Missing 'home_page'") }.to change { ActionMailer::Base.deliveries.count }.by(1)
+      expect { participant.email("Missing 'pw'", "Missing 'home_page'") }.to change { ActionMailer::Base.deliveries.count }.by(2)
     end
   end
 

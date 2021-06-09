@@ -8,6 +8,7 @@ gem 'activesupport', '~> 4.2.11.1'
 gem 'airbrake'
 gem 'awesome_nested_set'
 gem 'bind-it'
+gem 'bootstrap3-datetimepicker-rails', '~> 4.17.47'
 gem 'capistrano'
 gem 'capistrano-bundler'
 gem "capistrano-db-tasks", require: false
@@ -18,7 +19,7 @@ gem 'capistrano-rvm'
 gem 'chartjs-ror'
 gem 'coffee-rails'
 gem 'coveralls', require: false
-gem 'danger', git: 'https://github.com/Winbobob/danger.git', ref: '6df469a', require: false
+gem 'danger', git: 'https://github.com/Winbobob/danger.git', ref: '1ccfed23f809a1e5c46e2533cfd7a3138f6cd821', require: false
 gem 'delayed_job_active_record'
 gem 'dynamic_form'
 gem 'edavis10-ruby-web-search'
@@ -38,6 +39,8 @@ gem 'jquery-tablesorter'
 gem 'jquery-ui-sass-rails'
 gem 'json'
 gem 'lingua'
+gem 'mimemagic', github: 'mimemagicrb/mimemagic', ref: '01f92d86d15d85cfd0f20dabd025dcbd36a8a60f'
+gem 'momentjs-rails', '>= 2.9.0'
 gem 'mysql2'
 gem 'nokogiri'
 gem 'omniauth-google-oauth2'
@@ -58,9 +61,10 @@ gem 'rgl', require: 'rgl/adjacency'
 gem 'rjb'
 gem 'rubyzip'
 gem 'rwordnet'
-gem 'sass-rails'
+gem 'sass-rails', '5.0.3'
 gem 'scrypt'
 gem 'seer'
+gem 'shoulda-matchers'
 gem 'sidekiq'
 gem 'sprockets'
 gem 'stanford-core-nlp'
@@ -85,6 +89,9 @@ end
 group :test do
   gem 'database_cleaner'
   gem "factory_bot_rails"
+  gem 'geckodriver-helper', '~> 0.0.3'
+  gem 'capybara'
+  gem 'selenium-webdriver'
   gem 'gherkin'
   gem 'guard-rails'
   gem 'guard-rspec'
@@ -92,6 +99,7 @@ group :test do
   gem 'mutant-rspec'
   gem 'rspec-rails'
   gem 'shoulda'
+  gem 'puma'
 end
 
 group :development, :test do

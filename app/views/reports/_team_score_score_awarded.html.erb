@@ -1,0 +1,22 @@
+<% unless @assignment.varying_rubrics_by_round? %>
+    <!--Score awarded-->
+    <div>
+    <% if @review_scores[reviewer_id][team_id] != -1 %>
+    <% unless @review_scores[reviewer_id][team_id].nil? %>
+        <%= @review_scores[reviewer_id][team_id].inspect %>% 
+    <% end %>
+    <% else %>
+        --
+    <% end %>
+<%else%>
+    <!--Assignments have vary_rubric_by_rounds-->
+    <!--Score awarded-->
+    <% get_awarded_review_score(reviewer_id, team_id) %>
+    <div>
+    <% (1..@assignment.num_review_rounds).each do |round| %>
+        <% review_metrics(round, team_id) %>
+            <%= @score_awarded = instance_variable_get("@score_awarded_round_" + round.to_s) %>
+            <%=  @score_awarded.tr('%','').to_i  %>
+    <%end%>
+    </div>
+<%end%>

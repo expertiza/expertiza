@@ -10,7 +10,7 @@ class Team < ActiveRecord::Base
   scope :find_team_for_assignment_and_user, lambda {|assignment_id, user_id|
     joins(:teams_users).where("teams.parent_id = ? AND teams_users.user_id = ?", assignment_id, user_id)
   }
-
+  
   # Get the participants of the given team
   def participants
     users.where(parent_id: parent_id || current_user_id).flat_map(&:participants)
@@ -248,7 +248,7 @@ class Team < ActiveRecord::Base
 
   # Create the team with corresponding tree node
   def self.create_team_and_node(id)
-    parent = parent_model id # current_task will be either a course object or an assignment object. # current_task will be either a course object or an assignment object.
+    parent = parent_model id # current_task will be either a course object or an assignment object.
     team_name = Team.generate_team_name(parent.name)
     team = self.create(name: team_name, parent_id: id)
     # new teamnode will have current_task.id as parent_id and team_id as node_object_id.
@@ -256,6 +256,39 @@ class Team < ActiveRecord::Base
     ExpertizaLogger.info LoggerMessage.new('Model:Team', '', "New TeamNode created with teamname #{team_name}")
     team
   end
+  
+  # E1991 : This method allows us to generate
+  # team names based on whether anonymized view
+  # is set or not. The logic is similar to 
+  # existing logic of User model.
+  def name(ip_address = nil)
+    if User.anonymized_view?(ip_address)
+      team_name = "Anonymized_Team_#{self[:id]}"
+    else
+      self[:name]
+    end
+  end
 
   # REFACTOR END:: class methods import export moved from course_team & assignment_team to here
+
+  # Create the team with corresponding tree node and given users
+  def self.create_team_with_users(parent_id, user_ids)
+    team = self.create_team_and_node(parent_id)
+
+    user_ids.each do |user_id|
+      remove_user_from_previous_team(parent_id, user_id)
+
+      # Create new team_user and team_user node
+      team.add_member(User.find(user_id))
+    end
+    return team
+  end
+  
+  private
+
+  # Removes the specified user from any team of the specified assignment
+  def self.remove_user_from_previous_team(parent_id, user_id)
+    team_user = TeamsUser.where(user_id: user_id).find { |team_user| team_user.team.parent_id == parent_id }
+    team_user.destroy rescue nil
+  end
 end

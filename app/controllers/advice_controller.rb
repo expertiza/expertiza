@@ -1,8 +1,8 @@
 class AdviceController < ApplicationController
+  include AuthorizationHelper
+
   def action_allowed?
-    ['Administrator',
-     'Instructor',
-     'Teaching Assistant'].include? current_user.role.name
+    current_user_has_ta_privileges?
   end
 
   # Modify the advice associated with a questionnaire

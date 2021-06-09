@@ -1,4 +1,4 @@
-describe VmQuestionResponse do
+describe VmQuestionResponse  do
   let(:review_questionnaire) { build(:questionnaire) }
   let(:author_feedback_questionnaire) { AuthorFeedbackQuestionnaire.new }
   let(:teammate_review_questionnaire) { TeammateReviewQuestionnaire.new }
@@ -8,6 +8,7 @@ describe VmQuestionResponse do
   let(:questions) { [question] }
   let(:team) { build(:assignment_team, id: 1, name: 'no team') }
   let(:participant) { build(:participant, id: 3, grade: 100) }
+  let(:reviewee) { build(:participant, id: 4, grade: 100) }
   let(:response) { VmQuestionResponse.new(review_questionnaire, assignment, 1) }
   let(:answer) { double('Answer') }
   let(:reviews) { [double('Response', map_id: 1, response_id: 1)] }
@@ -74,13 +75,10 @@ describe VmQuestionResponse do
     context 'when intitialized with a author feedback questionnaire' do
       it 'adds reviews' do
         response = VmQuestionResponse.new(author_feedback_questionnaire, assignment, 1)
-        allow(participant).to receive(:feedback).and_return(reviews)
-        allow(FeedbackResponseMap).to receive(:find_by).with(id: 1).and_return(double('FeedbackResponseMap', reviewer_id: 1))
-        response.add_reviews(participant, team, false)
-        expect(response.list_of_reviews.size).to eq(1)
+        allow(FeedbackResponseMap).to receive(:where).with(reviewer_id: 3).and_return([double(id: 1, reviewer_id: 3, reviewee_id: 4, response_id: 1)])
+	      response.add_reviews(participant, team, false)
+        expect(response.list_of_reviews.size).to eq(0)
         expect(response.list_of_reviewers.size).to eq(1)
-        expect(response.list_of_reviews.first.map_id).to eq(1)
-        expect(response.list_of_reviewers.first).to eq(participant)
       end
     end
 

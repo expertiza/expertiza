@@ -3,8 +3,9 @@ describe Answer do
   let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }
   let(:question2) { create(:question, questionnaire: questionnaire, weight: 2, id: 2) }
   let(:response_map) { create(:review_response_map, id: 1, reviewed_object_id: 1) }
-  let!(:response_record) { create(:response, id: 1, response_map: response_map) }
+  let!(:response_record) { create(:response, id: 1, map_id: 1, response_map: response_map) }
   let!(:answer) { create(:answer, question: question1, response_id: 1) }
+  let(:team1) { build(:assignment_team, id: 2, name: 'team has name') }
 
   describe "# test dependancy between question.rb and answer.rb"
   it { should belong_to(:question) }
@@ -152,6 +153,15 @@ describe Answer do
       allow(AssignmentDueDate).to receive(:where).and_return(nil)
       allow(AssignmentDueDate).to receive(:order).and_return(nil)
       expect { Answer.submission_valid?(response_record) }.to raise_error
+    end
+  end
+
+  describe '#get_reviewee_from_answer' do
+    it 'finds the reviewee from the answer' do
+      allow(Response).to receive(:find).with(1).and_return(response_record)
+      allow(ResponseMap).to receive(:find).with(1).and_return(response_map)
+      allow(response_map).to receive(:reviewee_id).and_return(team1)
+      expect(answer.get_reviewee_from_answer(answer)).to eq(team1)
     end
   end
 end

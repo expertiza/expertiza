@@ -18,11 +18,6 @@ module QuizAssignment
     candidate_topics
   end
 
-  def assign_quiz_dynamically(reviewer, topic)
-    contributor = contributor_for_quiz(reviewer, topic)
-    reviewer.assign_quiz(contributor, reviewer, topic) unless contributor.nil?
-  end
-
   # Returns a contributor whose quiz is to be taken if available, otherwise will raise an error
   def contributor_for_quiz(reviewer, topic)
     raise "Please select a topic." if topics? and topic.nil?
@@ -32,7 +27,7 @@ module QuizAssignment
     # select topic page and other students have already selected this topic.
     # Another scenario is someone that deliberately modifies the view.
     if topic
-      raise "To many quizes have been taken for this topic; please select another one." unless candidate_topics_for_quiz.include?(topic)
+      raise "Too many quizes have been taken for this topic; please select another one." unless candidate_topics_for_quiz.include?(topic)
     end
 
     contributor_set = Array.new(contributors)

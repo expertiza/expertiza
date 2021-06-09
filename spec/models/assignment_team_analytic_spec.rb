@@ -76,7 +76,16 @@ describe AssignmentTeamAnalytic do
   describe '#total_review_word_count' do
     context 'if there are no reviews' do
       it 'should return zero' do
-
+        dc = AssignmentTeamAnalyticTestDummyClass.new([response, response2, response3],[])
+        allow(dc).to receive(:review_word_counts).and_return([0])
+        expect(dc.total_review_word_count).to eq(0)
+      end
+    end
+    context 'if there are three reviews with word counts 20, 20, and 20' do
+      it 'should return 60' do
+        dc = AssignmentTeamAnalyticTestDummyClass.new([response, response2, response3],[])
+        allow(dc).to receive(:review_word_counts).and_return([20, 20, 20])
+        expect(dc.total_review_word_count).to eq(60)
       end
     end
   end

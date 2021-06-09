@@ -6,7 +6,7 @@ describe SuperAdministrator do
     it 'should return a list of all users in the system' do
       obj = [user1, user2]
       allow(User).to receive(:all).and_return(obj)
-      expect(obj).to receive(:find_each).and_yield(obj.first).and_yield(object.last)
+      expect(obj).to receive(:find_each).and_yield(obj.first).and_yield(obj.last)
       expect(superadmin.get_user_list).to eq(obj)
     end
   end

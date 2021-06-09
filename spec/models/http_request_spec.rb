@@ -12,7 +12,6 @@ describe "HttpRequest" do
     expect(HttpRequest.valid_url?("http://www.google.com?arg1=123&arg2=456")).to be_truthy
     expect(HttpRequest.valid_url?("http://www.google.com/arg1/123/arg2/456")).to be_truthy
   end
-
   describe '#get' do
     context 'when the limit is too small' do
      it 'returns an empty string' do

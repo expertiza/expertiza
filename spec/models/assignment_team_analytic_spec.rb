@@ -22,7 +22,7 @@ describe AssignmentTeamAnalytic do
     end
     context 'when the participants are set a list of three participants' do
       it 'should return three' do
-        dc = AssignmentTeamAnalyticTestDummyClass.new([participant, participant2, participant3],[])
+        dc = AssignmentTeamAnalyticTestDummyClass.new([], [participant, participant2, participant3])
         expect(dc.num_participants).to eq(3)
       end
     end

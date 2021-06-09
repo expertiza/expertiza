@@ -208,8 +208,7 @@ describe Team do
       end
     end
 
-    #Add tests to handle duplicates in various ways, in .import method and handle_duplicates method
-
+    # Add tests to handle duplicates in various ways, in .import method and handle_duplicates method
     context 'when there are duplicates in new teams with existing teams' do
       let(:row) do
         {teammembers: %w(member1 member2), teamname: 'name'}

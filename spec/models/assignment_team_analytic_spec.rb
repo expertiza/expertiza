@@ -47,12 +47,15 @@ describe AssignmentTeamAnalytic do
   describe '#average_review_score' do
     context 'when there are no reviews' do
       it 'returns zero' do
-
+        dc = AssignmentTeamAnalyticTestDummyClass.new([],[])
+        expect(dc.average_review_score).to eq(0)
       end
     end
     context 'when there are reviews of [2, 4, 6]' do
       it 'return 4 as the average' do
-
+        dc = AssignmentTeamAnalyticTestDummyClass.new([response, response2, response3],[])
+        allow(dc).to receive(:review_scores).and_return([2,4,6])
+        expect(dc.average_review_score).to eq(4)
       end
     end
   end

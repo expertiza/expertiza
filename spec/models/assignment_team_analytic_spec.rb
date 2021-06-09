@@ -61,12 +61,16 @@ describe AssignmentTeamAnalytic do
   end
   describe '#max_review_score' do
     it 'should return the highest score' do
-
+      dc = AssignmentTeamAnalyticTestDummyClass.new([response, response2, response3],[])
+      allow(dc).to receive(:review_scores).and_return([2,4,6])
+      expect(dc.max_review_score).to eq(6)
     end
   end
   describe '#min_review_score' do
     it 'should return the lowest score' do
-
+      dc = AssignmentTeamAnalyticTestDummyClass.new([response, response2, response3],[])
+      allow(dc).to receive(:review_scores).and_return([2,4,6])
+      expect(dc.min_review_score).to eq(2)
     end
   end
   describe '#total_review_word_count' do

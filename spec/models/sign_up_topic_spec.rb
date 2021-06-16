@@ -6,7 +6,6 @@ describe SignUpTopic do
         expect { SignUpTopic.import({}, nil, nil) }.to raise_error(ArgumentError, 'The CSV File expects the format: Topic identifier, Topic name, Max choosers, Topic Category (optional), Topic Description (Optional), Topic Link (optional).')
       end
     end
-
     context 'when record is not empty' do
       let(:row) do
         {topic_identifier: 'identifier', topic_name: 'name', max_choosers: 'chooser', category: 'category', description: 'description', link: 'link'}
@@ -17,7 +16,6 @@ describe SignUpTopic do
       let(:attributes) do
         {topic_identifier: 'identifier', topic_name: 'name', max_choosers: 'chooser', category: 'category', description: 'description', link: 'link'}
       end
-
       context 'when the topic is not found' do
         it 'creates a new sign up topic' do
           allow(SignUpTopic).to receive_message_chain(:where, :first).with(topic_name: row[:topic_name], assignment_id: session[:assignment_id]).with(no_args).and_return(nil)
@@ -27,7 +25,6 @@ describe SignUpTopic do
           SignUpTopic.import(row, session, nil)
         end
       end
-
       context 'when the topic is found' do
         it 'changes the max_chooser and topic_identifier of the existing topic' do
           allow(SignUpTopic).to receive_message_chain(:where, :first).with(topic_name: row[:topic_name], assignment_id: session[:assignment_id]).with(no_args).and_return(topic)

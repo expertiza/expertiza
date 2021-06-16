@@ -343,8 +343,8 @@ describe Team do
           allow(Team).to receive(:generate_team_name).with('no assignment').and_return('new team name')
           allow(team).to receive(:name=).with('new team name')
           allow(team).to receive(:save)
-          expect(Team.handle_duplicate(team, 'no name', 1, 'replace_existing', CourseTeam.new)).not_to be nil
-          expect(Team.handle_duplicate(team, 'no name', 1, 'replace_existing', AssignmentTeam.new)).not_to be nil
+          expect(Team.handle_duplicate(team, 'no name', 1, 'replace_existing', CourseTeam.new)).to be nil
+          expect(Team.handle_duplicate(team, 'no name', 1, 'replace_existing', AssignmentTeam.new)).to be nil
         end
       end
     end

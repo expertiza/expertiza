@@ -84,7 +84,7 @@ class Assignment < ActiveRecord::Base
     teams.delete(empty_teams)
   end
 
-  #checks whether the assignment is getting a valid number of reviews (less than number of reviews allowed)
+  # checks whether the assignment is getting a valid number of reviews (less than number of reviews allowed)
   def valid_num_review
     self.num_reviews = self.num_reviews_allowed
     if num_reviews_greater?(self.num_reviews_required, self.num_reviews_allowed)
@@ -556,6 +556,53 @@ class Assignment < ActiveRecord::Base
     self.due_dates.select {|due_date| due_date.deadline_type_id == DeadlineType.find_by(name: type).id }
   end
 
+  #Method find_review_period is used in answer_helper.rb to get the start and end dates of a round
+  def find_review_period(round)
+    # If round is nil, it means the same questionnaire is used for every round. Thus, we return all periods.
+    # If round is not nil, we return only the period of that round.
+
+    submission_type = DeadlineType.find_by(name: 'submission').id
+    review_type = DeadlineType.find_by(name: 'review').id
+
+    due_dates = Array.new
+    due_dates += self.find_due_dates('submission')
+    due_dates += self.find_due_dates('review')
+    due_dates.sort_by! {|obj| obj.id}
+
+    start_dates = Array.new
+    end_dates = Array.new
+
+    if round.nil?
+      round = 1
+      while self.due_dates.exists?(round: round)
+        start_dates << due_dates.select {|due_date| due_date.deadline_type_id == submission_type && due_date.round == round}.last
+        end_dates << due_dates.select {|due_date| due_date.deadline_type_id == review_type && due_date.round == round}.last
+        round += 1
+      end
+    else
+      start_dates << due_dates.select {|due_date| due_date.deadline_type_id == submission_type && due_date.round == round}.last
+      end_dates << due_dates.select {|due_date| due_date.deadline_type_id == review_type && due_date.round == round}.last
+    end
+    return start_dates, end_dates
+  end
+  # for program 1 like assignment, if same rubric is used in both rounds,
+  # the 'used_in_round' field in 'assignment_questionnaires' will be null,
+  # since one field can only store one integer
+  # if questionnaire_ids is empty, Expertiza will try to find questionnaire whose type is 'ReviewQuestionnaire'.
+  def get_questionnaire_ids(round)
+    questionnaire_ids = if round.nil?
+                          AssignmentQuestionnaire.where(assignment_id: self.id)
+                        else
+                          AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
+                        end
+    if questionnaire_ids.empty?
+      AssignmentQuestionnaire.where(assignment_id: self.id).find_each do |aq|
+        questionnaire_ids << aq if aq.questionnaire.type == "ReviewQuestionnaire"
+      end
+    end
+    questionnaire_ids
+  end
+
   private
   #Below private methods are extracted and added as part of refactoring project E2009 - Spring 2020
   #This method computes and returns grades by rounds, total_num_of_assessments and total_score
@@ -604,24 +651,6 @@ class Assignment < ActiveRecord::Base
   #returns true if reviews required is greater than reviews allowed
   def num_reviews_greater?(reviews_required, reviews_allowed)
     reviews_allowed && reviews_allowed != -1 && reviews_required > reviews_allowed
-  end
-
-  # for program 1 like assignment, if same rubric is used in both rounds,
-  # the 'used_in_round' field in 'assignment_questionnaires' will be null,
-  # since one field can only store one integer
-  # if questionnaire_ids is empty, Expertiza will try to find questionnaire whose type is 'ReviewQuestionnaire'.
-  def get_questionnaire_ids(round)
-    questionnaire_ids = if round.nil?
-                          AssignmentQuestionnaire.where(assignment_id: self.id)
-                        else
-                          AssignmentQuestionnaire.where(assignment_id: self.id, used_in_round: round)
-                        end
-    if questionnaire_ids.empty?
-      AssignmentQuestionnaire.where(assignment_id: self.id).find_each do |aq|
-        questionnaire_ids << aq if aq.questionnaire.type == "ReviewQuestionnaire"
-      end
-    end
-    questionnaire_ids
   end
 
   def get_min_metareview(response_map_set)

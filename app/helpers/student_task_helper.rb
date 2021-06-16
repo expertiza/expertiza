@@ -31,7 +31,7 @@ module StudentTaskHelper
     participant.awarded_badges.each do |awarded_badge|
       badge = awarded_badge.badge
       # In the student task homepage, list only those badges that are approved
-      if awarded_badge.is_approved?
+      if awarded_badge.approved?
         info += '<img width="30px" src="/assets/badges/' + badge.image_name + '" title="' + badge.name + '" />'
       end
     end

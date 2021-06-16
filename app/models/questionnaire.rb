@@ -35,7 +35,7 @@ class Questionnaire < ActiveRecord::Base
   def get_weighted_score(assignment, scores)
     # create symbol for "varying rubrics" feature -Yang
     round = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: self.id).used_in_round
-    questionnaire_symbol = if !round.nil?
+    questionnaire_symbol = unless round.nil?
                              (self.symbol.to_s + round.to_s).to_sym
                            else
                              self.symbol
@@ -45,7 +45,7 @@ class Questionnaire < ActiveRecord::Base
 
   def compute_weighted_score(symbol, assignment, scores)
     aq = self.assignment_questionnaires.find_by(assignment_id: assignment.id)
-    if !scores[symbol][:scores][:avg].nil?
+    unless scores[symbol][:scores][:avg].nil?
       scores[symbol][:scores][:avg] * aq.questionnaire_weight / 100.0
     else
       0

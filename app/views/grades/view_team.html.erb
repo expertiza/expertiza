@@ -7,7 +7,9 @@
       else
         $('#tag_prompt_toggler').text("hide tags")
       $('.tag_prompt_container').toggle();
+      $('.tag_heat_grid').toggle();
     });
+   tagActionOnLoad();   // Added March 2021 -- Sets up Tagging Report Heatgrid On Load
   });
 
   function toggleFunction(elementId) {
@@ -17,18 +19,34 @@
     } else {
         target.style.display = 'none';
     }
-}
+  }
 </script>
 <h2>Summary Report for assignment: <%= @assignment.name %></h2>
-<h4>Team: <%= @team.name %></h4>
+<!-- Anchor for Tag Heatgrid. Heatgrid generation code located in /assets/javascripts/view_team_in_grades.js -->
+<table id="tag_heat_grid" class="tag_heat_grid"></table>
+<h4>Team: <%= @team.name(session[:ip]) %></h4>
 <!--Obtain topic name from assignment helper-->
 <% topic_id, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(@team) %>
 <% if @assignment.topics? %>
   <h4>Topic: <%= topic_id + '. ' + topic_name %></h4>
 <% end %>
-<!--Obtain only review scores-->
-<% rscore_review = Rscore.new(@pscore,:review) if @pscore[:review] %>
+<!--Obtain only review scores
+    Bugfix E2100 -- Single-round reviews use the :review symbol, multi-round reviews use :review1 and :review2. Average
+    score not being computed and shown for multi-round reviews. Check for :review1 and :review2 symbols, generate arithmetic
+    means of each, and take arithmetic mean of both to display. If :review symbol present, use original logic.
+-->
+<% if @pscore[:review1] && @pscore[:review2] %>
+  <% rscore_review1 = Rscore.new(@pscore,:review1) %>
+  <% rscore_review2 = Rscore.new(@pscore,:review2) %>
+  <% average = rscore_review1.my_avg + rscore_review2.my_avg %>
+  <% average /= 2 %>
+  <h4>Average peer review score: <span class = "c5"><%= average.is_a?(Float)? sprintf("%.2f",average): average %></span></h4>
+<% elsif @pscore[:review]  %>
+<% rscore_review = Rscore.new(@pscore,:review)%>
 <h4>Average peer review score: <span class = "c5"><%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %></span></h4>
+<%else %>
+  <h4> There are no reviews for this assignment</h4>
+<%end %>
 <!--Toggle submission-->
 <button onclick="toggleFunction('<%= @participant.id.to_s%>')" class="btn btn-default">Show Submission</button>
 <div id="<%= @participant.id.to_s%>" style="display:none;">
@@ -38,18 +56,16 @@
  <b>No Submission</b>
 <% end %>
 </div><br><br>
-
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
 <% table_count = 0 %>
 <% @vmlist.each do |vm| %>
-
     <% if (vm.questionnaire_display_type == "Metareview" or vm.questionnaire_display_type == "Author Feedback" or vm.questionnaire_display_type == "Teammate Review") and @current_role_name.eql?'Student' %>
     <% else %>
         <% if vm.list_of_reviewers.length > 0 %>
 
           <!-- display the list of questions for this questionnaire -->
-          <div id="hid<%= vm.questionnaire_type + vm.round.to_s %>" class="accordion-body collapse" >
-            <table class="table table-striped" >
+          <div id="hid<%= vm.questionnaire_type + vm.round.to_s %>" class="accordion-body collapse" style="max-width: 80%">
+            <table class="table table-striped">
               <thead>
               <th>#</th>
               <th>Question</th>
@@ -79,7 +95,6 @@
             <% end %>
             <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Colors are scaled from poor to excellent in the following order: red, orange, yellow, light-green, dark-green">color legend</span>
             <span class="spn_tooltip" data-toggle="tooltip" data-placement="right" title="Click a row to see the comments for the respective question. Click 'Review Total' row to see Add'l Comments. Useful tip: decreasing your browser's zoom to 75% or 90% many improve your experience.">interaction legend</span>
-
           </span>
             <!--
                 Changes to this was done as part of E1788_OSS_project_Maroon_Heatmap_fixes
@@ -97,7 +112,7 @@
             <!-- display the header row of the heatgrid table. this involves iterating through reviewers.-->
             <thead>
             <tr class="hide-scrollbar">
-              <th class="sorter-true">Criterion<span></span></th>
+              <th class="sorter-true">Question<span></span></th>
             
               <% i = 1 %>
               <% vm.list_of_reviews.each do |review| %>
@@ -117,10 +132,8 @@
               <th class="sorter-false">
                 <span  data-toggle="tooltip" data-placement="right" title="A count of comments, for the respective question, which have word count > 10. The purpose of this metric is to represent how many comments for the question are of a substantial length to provide quality feedback.">metric-1</span>
               </th>
-
             </tr>
             </thead>
-
 
             <% score_row_count = vm.list_of_rows.first.score_row.count %>
             <% j = 1 %>
@@ -139,7 +152,6 @@
                         <span class="<%=  underlined?(score) %>"><%= score.score_value.to_s %></span>
                       </td>
                   <% end %>
-
 
                   <% if row.score_row.count == 0 %>
                       <% for index in 0 .. score_row_count - 1 %>
@@ -171,7 +183,21 @@
                             <tr>
                               <td>Review <%=index + 1%></td>
                               <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
-                              <td>
+                              <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
+                                <!-- E2100 : Set id and data of this <td> to be queried by jQuery for the tagging report
+                                     HTML "id" format: "rr3_13" == ReviewRow Question 3 Review 13
+                                     "j" "index" and "round" are legacy variables from past projects; populate jQueryable
+                                            data- fields with these data to be queried later.
+                                     "round" represents number of this review round
+                                     "j"     represents number of this question
+                                     "index" represents number of this review
+                                -->
+                                <td id="<%= 'rr'+ j.to_s + '_' + index.to_s %>" data-round="<%= vm.round.to_s %>="
+                                    data-question_num="<%= j.to_s %>" data-review_num="<%= index.to_s %>"
+                                    data-has_tag="<%= row.score_row[index].vm_prompts.count > 0 ? "true":"false"%>">
+                              <% else %>
+                                <td>
+                              <% end %>
                                 <%= row.score_row[index].comment.html_safe unless row.score_row[index].comment.nil?  %>
                                 <% if row.score_row[index].vm_prompts.count > 0 %>
                                     <div class="tag_prompt_container">
@@ -191,7 +217,7 @@
                 <% j += 1 %>
             <% end %>
 
-            <!--displays the row for the add'l comments, by default: collapsed. -->
+            <!--displays the row for the addl comments, by default: collapsed. -->
             <tr>
               <td colspan="<%= (i+1).to_s %>" class="hiddenRow" >
                 <div id="hid<%= vm.questionnaire_type + vm.round.to_s + "comment" %>" class="accordion-body collapse" style="margin-left:10px;">
@@ -214,7 +240,6 @@
                 </div>
               </td>
             </tr>
-
           </table>
         </div>
           <!-- Display the list of team members, for Peer Reviews. -->
@@ -231,15 +256,23 @@
 <% end %>
 <!-- termination of the main outer loop.-->
 
-<h4 style="font-weight:bold;display:inline-block;">Grade and comment for submission</h4><br/>
-<% if ['Student'].include? current_user.role.name %>
-  Grade: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
-  Comment: <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %>
-<% else %>
-  <%= form_tag 'save_grade_and_comment_for_submission' do %>
-    <%= hidden_field_tag :participant_id, params[:id] %>
-    <%= number_field_tag 'grade_for_submission', @team.try(:grade_for_submission) ,min: 0, max: 100, maxlength: 3, size: 3, class: "form-control width-150", placeholder: 'Grade' %><br/>
-    <%= text_area_tag 'comment_for_submission', @team.try(:comment_for_submission), size: '75x10', placeholder: 'Comment', class: "form-control width-500" %><br>
-    <%= submit_tag 'Save' ,class: "btn btn-default" %>
+<!-- Get course ID and TA ID to restrict TAs ability to update his grades-->
+<%
+   @course_id = Assignment.find_by(id: @participant.parent_id).course_id;
+   @ta_id = @participant.user_id;  
+%>
+
+  <h4 style="font-weight:bold;display:inline-block;">Grade and comment for submission</h4><br/>
+  <% if ['Student', 'Teaching Assistant'].include? current_user.role.name %>
+    Grade: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
+    Comment: <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %><br>
   <% end %>
-<% end %>
+  <% if TaMapping.where(ta_id: @ta_id, course_id: @course_id).exists? %>
+  <h4 style="font-weight:bold;display:inline-block;">TA Grade-Comment:</h4><br/>
+    <%= form_tag 'save_grade_and_comment_for_submission' do %>
+      <%= hidden_field_tag :participant_id, params[:id] %>
+      <%= number_field_tag 'grade_for_submission', @team.try(:grade_for_submission) ,min: 0, max: 100, maxlength: 3, size: 3, class: "form-control width-150", placeholder: 'Grade' %><br/>
+      <%= text_area_tag 'comment_for_submission', @team.try(:comment_for_submission), size: '75x10', placeholder: 'Comment', class: "form-control width-500" %><br>
+      <%= submit_tag 'Save' ,class: "btn btn-default" %>
+    <% end %>
+  <% end %>

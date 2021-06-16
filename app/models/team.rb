@@ -248,13 +248,25 @@ class Team < ActiveRecord::Base
 
   # Create the team with corresponding tree node
   def self.create_team_and_node(id)
-    parent = parent_model id # current_task will be either a course object or an assignment object. # current_task will be either a course object or an assignment object.
+    parent = parent_model id # current_task will be either a course object or an assignment object.
     team_name = Team.generate_team_name(parent.name)
     team = self.create(name: team_name, parent_id: id)
     # new teamnode will have current_task.id as parent_id and team_id as node_object_id.
     TeamNode.create(parent_id: id, node_object_id: team.id)
     ExpertizaLogger.info LoggerMessage.new('Model:Team', '', "New TeamNode created with teamname #{team_name}")
     team
+  end
+  
+  # E1991 : This method allows us to generate
+  # team names based on whether anonymized view
+  # is set or not. The logic is similar to 
+  # existing logic of User model.
+  def name(ip_address = nil)
+    if User.anonymized_view?(ip_address)
+      team_name = "Anonymized_Team_#{self[:id]}"
+    else
+      self[:name]
+    end
   end
 
   # REFACTOR END:: class methods import export moved from course_team & assignment_team to here

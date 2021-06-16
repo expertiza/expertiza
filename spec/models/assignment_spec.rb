@@ -178,6 +178,32 @@ describe Assignment do
       end
     end
   end
+  
+  describe '#get_questionnaire_ids' do
+    context 'when the assignment does not have rounds' do
+      it 'it returns the ids of the associated questionnaires' do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire1])
+        expect(assignment.get_questionnaire_ids(nil)).to eq([assignment_questionnaire1])
+      end
+    end
+    context 'when the assignment has rounds' do
+      it 'it returns the id of the associated questionnaires from the round' do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 1).and_return([assignment_questionnaire1])
+        expect(assignment.get_questionnaire_ids(1)).to eq([assignment_questionnaire1])
+      end
+    end
+    context 'when the assignment has no associated questionnaires' do
+      it 'returns a review questionnaire' do
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 1).and_return([])
+        arr = [assignment_questionnaire1, assignment_questionnaire2]
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return(arr)
+        allow(arr).to receive(:find_each).and_yield(assignment_questionnaire1).and_yield(assignment_questionnaire2)
+        allow(assignment_questionnaire1).to receive(:questionnaire).and_return(questionnaire1)
+        allow(assignment_questionnaire2).to receive(:questionnaire).and_return(questionnaire2)
+        expect(assignment.get_questionnaire_ids(1)).to eq([assignment_questionnaire1])
+      end
+    end
+  end
 
   describe '#scores' do
     context 'when assignment is varying rubric by round assignment' do
@@ -187,10 +213,10 @@ describe Assignment do
         allow(assignment).to receive(:num_review_rounds).and_return(1)
         allow(ReviewResponseMap).to receive(:get_responses_for_team_round).with(team, 1).and_return([response])
         allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
-        expect(assignment.scores(review1: [question]).inspect).to eq("{:participants=>{:\"1\"=>98}, :teams=>{:\"0\"=>{:team=>#<AssignmentTeam id: 1, "\
-          "name: \"no team\", parent_id: 1, type: \"AssignmentTeam\", comments_for_advertisement: nil, advertise_for_partner: nil, "\
-          "submitted_hyperlinks: \"---\\n- https://www.expertiza.ncsu.edu\", directory_num: 0, grade_for_submission: nil, "\
-          "comment_for_submission: nil>, :scores=>{:max=>95, :min=>88, :avg=>90.0}}}}")
+        scores = assignment.scores(review1: [question])
+        expect(scores[:teams][:"0"][:scores][:avg]).to eq(90)
+        expect(scores[:teams][:"0"][:scores][:min]).to eq(88)
+        expect(scores[:teams][:"0"][:scores][:max]).to eq(95)
       end
     end
 
@@ -200,10 +226,10 @@ describe Assignment do
         allow(assignment).to receive(:vary_by_round).and_return(false)
         allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([response])
         allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
-        expect(assignment.scores(review: [question]).inspect).to eq("{:participants=>{:\"1\"=>98}, :teams=>{:\"0\"=>{:team=>#<AssignmentTeam id: 1, "\
-          "name: \"no team\", parent_id: 1, type: \"AssignmentTeam\", comments_for_advertisement: nil, advertise_for_partner: nil, "\
-          "submitted_hyperlinks: \"---\\n- https://www.expertiza.ncsu.edu\", directory_num: 0, grade_for_submission: nil, "\
-          "comment_for_submission: nil>, :scores=>{:max=>95, :min=>88, :avg=>90}}}}")
+        scores = assignment.scores(review: [question])
+        expect(scores[:teams][:"0"][:scores][:avg]).to eq(90)
+        expect(scores[:teams][:"0"][:scores][:min]).to eq(88)
+        expect(scores[:teams][:"0"][:scores][:max]).to eq(95)
       end
     end
   end
@@ -373,6 +399,10 @@ describe Assignment do
       allow(CourseNode).to receive(:find_by).with(node_object_id: 1).and_return(double('CourseNode', id: 1))
       expect { assignment.create_node }.to change { AssignmentNode.count }.from(0).to(1)
       expect(AssignmentNode.first.parent_id).to eq(1)
+      expect(AssignmentNode.table).to eq("assignments")
+      expect(AssignmentNode.first.is_leaf).to eq(true)
+      allow(Assignment).to receive(:find_by).with(id: 1).and_return(assignment)
+      expect(AssignmentNode.first.get_private).to eq(false)
     end
   end
 
@@ -635,6 +665,33 @@ describe Assignment do
       it ' return assignment nil' do
         assignment = create(:assignment)
         expect(assignment.find_due_dates("submission").first).to eq(nil)
+      end
+    end
+  end
+
+  describe 'find_review_period' do
+    context 'if round number is specified' do
+      it 'returns the start date and end date for that round' do
+        assignment = create(:assignment)
+        dead_right = create(:deadline_right)
+        @deadline_type_sub = create(:deadline_type, name: 'submission')
+        @deadline_type_rev = create(:deadline_type, name: 'review')
+        @assignment_due_date_sub = create(:assignment_due_date, parent_id: assignment.id, review_allowed_id: dead_right.id, review_of_review_allowed_id: dead_right.id, submission_allowed_id: dead_right.id, deadline_type: @deadline_type_sub)
+        @assignment_due_date_rev = create(:assignment_due_date, parent_id: assignment.id, review_allowed_id: dead_right.id, review_of_review_allowed_id: dead_right.id, submission_allowed_id: dead_right.id, deadline_type: @deadline_type_rev)
+        expect(assignment.find_review_period(1)).to eql([[@assignment_due_date_sub], [@assignment_due_date_rev]])
+      end
+    end
+    context 'if round number is nil' do
+      it 'returns all start dates and end dates for that assignment' do
+        assignment = create(:assignment)
+        dead_right = create(:deadline_right)
+        @deadline_type_sub = create(:deadline_type, name: 'submission')
+        @deadline_type_rev = create(:deadline_type, name: 'review')
+        @assignment_due_date_sub1 = create(:assignment_due_date, round: 1, parent_id: assignment.id, review_allowed_id: dead_right.id, review_of_review_allowed_id: dead_right.id, submission_allowed_id: dead_right.id, deadline_type: @deadline_type_sub)
+        @assignment_due_date_rev1 = create(:assignment_due_date, round: 1, parent_id: assignment.id, review_allowed_id: dead_right.id, review_of_review_allowed_id: dead_right.id, submission_allowed_id: dead_right.id, deadline_type: @deadline_type_rev)
+        @assignment_due_date_sub2 = create(:assignment_due_date, round: 2, parent_id: assignment.id, review_allowed_id: dead_right.id, review_of_review_allowed_id: dead_right.id, submission_allowed_id: dead_right.id, deadline_type: @deadline_type_sub)
+        @assignment_due_date_rev2 = create(:assignment_due_date, round: 2, parent_id: assignment.id, review_allowed_id: dead_right.id, review_of_review_allowed_id: dead_right.id, submission_allowed_id: dead_right.id, deadline_type: @deadline_type_rev)
+        expect(assignment.find_review_period(nil)).to eql([[@assignment_due_date_sub1, @assignment_due_date_sub2], [@assignment_due_date_rev1, @assignment_due_date_rev2]])
       end
     end
   end

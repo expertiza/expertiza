@@ -13,7 +13,7 @@ describe CourseNode do
   end
   describe '#table' do
     it 'returns courses' do
-  
+      expect(CourseNode.table).to eq('courses')
     end
   end
   describe '#get_course_query_conditions' do

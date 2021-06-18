@@ -6,7 +6,7 @@ describe CourseNode do
   before(:each) do
   	course_node.node_object_id = 1
   	course.private = true
-    course.survey_distribution_id = 1
+    allow(course).to receive(:survey_distribution_id).and_return(1)
     allow(Course).to receive(:find_by).with(id: 1).and_return(course)
     allow(User).to receive(:find_by).with(id: 1).and_return(user1)
     allow(User).to receive(:find).with(1).and_return(user1)

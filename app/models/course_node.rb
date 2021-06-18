@@ -66,7 +66,7 @@ class CourseNode < Node
   def self.get_parent_id
     folder = TreeFolder.find_by(name: 'Courses')
     parent = FolderNode.find_by(node_object_id: folder.id)
-    parent_id if parent
+    parent.id if parent
   end
 
   # Gets any children associated with this object

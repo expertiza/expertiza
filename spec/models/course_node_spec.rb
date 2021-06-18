@@ -7,6 +7,7 @@ describe CourseNode do
     allow(Course).to receive(:find_by).with(id: 1).and_return(course)
     allow(CourseNode).to receive(:get_parent_id).and_return(1)
     allow(User).to receive(:find_by).with(id: 1).and_return(user1)
+    allow(User).to receive(:find).with(1).and_return(user1)
     allow(user1).to receive(:id).and_return(1)
   end
   describe '#create_course_node' do

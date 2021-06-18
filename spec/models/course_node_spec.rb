@@ -8,7 +8,9 @@ describe CourseNode do
   end
   describe '#create_course_node' do
     it 'saves a course node with course data' do
-      
+      cn = course_node.create_course_node(course)
+      expect(cn.node_object_id).to eq(1)
+      expect(cn.parent_id).to eq(1)
     end
   end
   describe '#table' do

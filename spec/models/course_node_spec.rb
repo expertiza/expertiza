@@ -51,12 +51,18 @@ describe CourseNode do
   describe '#get_parent_id' do
     context 'when parent is found' do
       it 'returns the id of the parent folder' do
-
+      	parent = 'parent'
+      	allow(parent).to receive(:id).and_return(1)
+        allow(TreeFolder).to receive(:find_by).with(name: 'Courses').and_return(course)
+        allow(FolderNode).to receive(:find_by).with(node_object_id: 1).and_return(parent)
+        expect(CourseNode.get_parent_id).to eq(1)
       end
     end
     context 'when parent is found' do
       it 'returns nil' do
-
+        allow(TreeFolder).to receive(:find_by).with(name: 'Courses').and_return(course)
+        allow(FolderNode).to receive(:find_by).with(node_object_id: 1).and_return(nil)
+        expect(CourseNode.get_parent_id).to eq(nil)
       end
     end
   end

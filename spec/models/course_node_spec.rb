@@ -2,6 +2,7 @@ describe CourseNode do
   let(:course) { build(:course, id: 1, name: 'ECE517') }
   let(:course_node) { build(:course_node, id: 1) }
   let(:user1) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
+  let(:assignment) { build(:assignment, id: 1) }
   before(:each) do
   	course_node.node_object_id = 1
     allow(Course).to receive(:find_by).with(id: 1).and_return(course)
@@ -69,7 +70,8 @@ describe CourseNode do
   end
   describe '#get_children' do
     it 'returns assignment node' do
-
+      allow(AssignmentNode).to receive(:get).and_return([assignment])
+      expect(CourseNode.get_children).to eq([assignment])
     end
   end
   describe '#get_private' do

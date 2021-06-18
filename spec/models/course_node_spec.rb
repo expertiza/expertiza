@@ -71,7 +71,7 @@ describe CourseNode do
   describe '#get_children' do
     it 'returns assignment node' do
       allow(AssignmentNode).to receive(:get).and_return([assignment])
-      expect(CourseNode.get_children).to eq([assignment])
+      expect(course_node.get_children).to eq([assignment])
     end
   end
   describe '#get_private' do

@@ -60,8 +60,9 @@ describe CourseNode do
     end
     context 'when parent is found' do
       it 'returns nil' do
+      	parent = false
         allow(TreeFolder).to receive(:find_by).with(name: 'Courses').and_return(course)
-        allow(FolderNode).to receive(:find_by).with(node_object_id: 1).and_return(false)
+        allow(FolderNode).to receive(:find_by).with(node_object_id: 1).and_return(parent)
         expect(CourseNode.get_parent_id).to eq(nil)
       end
     end

@@ -5,13 +5,13 @@ describe CourseNode do
   before(:each) do
   	course_node.node_object_id = 1
     allow(Course).to receive(:find_by).with(id: 1).and_return(course)
-    allow(CourseNode).to receive(:get_parent_id).and_return(1)
     allow(User).to receive(:find_by).with(id: 1).and_return(user1)
     allow(User).to receive(:find).with(1).and_return(user1)
     allow(user1).to receive(:id).and_return(1)
   end
   describe '#create_course_node' do
     it 'saves a course node with course data' do
+      allow(CourseNode).to receive(:get_parent_id).and_return(1)
       expect(course_node.create_course_node(course)).to be_truthy
     end
   end

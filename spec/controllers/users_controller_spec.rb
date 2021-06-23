@@ -261,7 +261,7 @@ describe UsersController do
       ActionMailer::Base.deliveries.last.tap do |mail|
         expect(mail.from).to eq(["expertiza.development@gmail.com"])
         expect(mail.to).to eq(["expertiza.development@gmail.com"])
-        expect(mail.subject).to eq('New account Request: 6 instructor')
+        expect(mail.subject).to eq('New account Request from 6 instructor')
       end
     end
 

@@ -115,7 +115,7 @@ class ReviewMappingController < ApplicationController
             end
           end
         else
-          flash[:error] = "You cannot do more reviews when you have "+ assignment.max_outstanding_reviews + "reviews to do"
+          flash[:error] = "You cannot do more reviews when you have "+ Assignment.max_outstanding_reviews + "reviews to do"
         end
       else
         flash[:error] = "You cannot do more than " + assignment.num_reviews_allowed.to_s + " reviews based on assignment policy"
@@ -149,7 +149,7 @@ class ReviewMappingController < ApplicationController
         @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
       end
       @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed
-      @num_reviews_in_progress < assignment.max_outstanding_reviews
+      @num_reviews_in_progress < Assignment.max_outstanding_reviews
     end
   end
   # assigns the quiz dynamically to the participant

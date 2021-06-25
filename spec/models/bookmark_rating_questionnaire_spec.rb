@@ -8,7 +8,7 @@ describe BookmarkRatingQuestionnaire do
   end
   describe '#get_assessments_for' do
     it 'returns the assessments for a given participant' do
-      allow(participant).to receive(:bookmark_review).and_return([questionnaire])
+      allow(participant).to receive(:bookmark_reviews).and_return([questionnaire])
       expect(questionnaire.get_assessments_for(participant)).to eq([questionnaire])
     end
   end

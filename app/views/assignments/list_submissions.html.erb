@@ -48,7 +48,7 @@
         <!--Team name-->
         <% if @assignment.max_team_size > 1 %>
           <% team_name_color = get_team_name_color_in_list_submission(team) %>
-          <td><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
+          <td><p style = <%="color:#{team_name_color}"%>><%= team.name(session[:ip]) %></p>
           <% unless participants.empty? %>
             <!-- “Assign Grade” will show if the final deadline of this assignment pass -->
             <% if @assignment.get_current_stage() == "Finished" %>
@@ -79,7 +79,7 @@
           <% end %>
           <br>
           <!--Display submitted files-->
-          <% p team.submitted_files %>
+          <% team.submitted_files %>
           <% if participant and !team.submitted_files.empty? %>
             <% files = team.submitted_files %>
             <%= display_directory_tree(participant, files, true).html_safe if files and files.length > 0 %>

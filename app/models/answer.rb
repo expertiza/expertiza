@@ -125,7 +125,7 @@ class Answer < ActiveRecord::Base
   # start added by ferry for answer tagging
   def get_reviewee_from_answer(answer)
     resp = Response.find(answer.response_id)
-    map = ResponseMap find(resp.map_id)
+    map = ResponseMap.find(resp.map_id)
     map.reviewee_id
   end
   # end added by ferry for answer tagging

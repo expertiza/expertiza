@@ -40,6 +40,17 @@ background-color: #d3d3d3;
   background-color: #FFFFFF;
 }
 
+/* To color the grades in the summary report  */
+.grade-circle {
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  font-size:15px;
+  color:black;
+  line-height:30px;
+  text-align:center;
+}
+
 /* To underline scores which have a comment. */
 .underlined {
     text-decoration: underline;
@@ -116,3 +127,42 @@ background-color: #d3d3d3;
 .hide-scrollbar th{
   overflow-y: hidden;
 }
+
+// Add classes for E2100 Tag Reports for Students to style the new HeatGrid of review tags
+
+.action_row {
+  border: 1px black solid;
+  padding: 1px 2px 2px 1px;
+  font-size: 11px;
+  text-align: center;
+}
+
+.tag_heat_grid {
+  padding:0;
+  spacing: 0;
+  border: 1px solid black;
+  position: relative;
+  float: right;
+  top:0px;
+  right:0px;
+  z-index:2;
+}
+.tag_heat_grid th {
+  border: 1px solid black;
+  font-size:12px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.tag_heat_grid td {
+  border: 0.5px solid black;;
+  font-size: 8px;
+  text-align: center;
+}
+
+.tag_heat_grid_criterion {
+  font-size: 11px !important;
+  font-weight: bold !important;
+}
+
+

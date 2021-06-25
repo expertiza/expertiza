@@ -98,4 +98,15 @@ class Mailer < ActionMailer::Base
     mail(subject: defn[:subject],
          to: defn[:to])
   end
+
+  #Email about a review rubric being changed. If this is successful, then the answers are deleted for a user's response
+  def notify_review_rubric_change(defn)
+    @body = defn[:body]
+    @answers = defn[:body][:answers]
+    @name = defn[:body][:name]
+    @assignment_name = defn[:body][:assignment_name]
+    defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
+    mail(:subject => defn[:subject],
+         :to => defn[:to])
+  end
 end

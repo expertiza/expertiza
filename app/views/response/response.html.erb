@@ -13,7 +13,25 @@
     function release_lock() {
         $.post("../../../lock/release_lock?id=<%= @response.id %>,&type=Response");
     }
+    return function(c) {
+      if (c) document.addEventListener(eventKey, c);
+      return !document[stateKey];
+    }
+  })();
 
+  jQuery(document).ready(function() {
+
+    //use bar-rating for dropdown
+    $('.review-rating').each(function(index, el) {
+      var $El;
+      $El = $(el);
+      $El.barrating({
+        theme: 'fontawesome-stars',
+        initialRating: $El.attr('data-current-rating'),
+        showSelectedRating: true
+      });
+    });
+    
     window.onbeforeunload = release_lock;
 
     // to be moved to assets, once it's fixed so that not every

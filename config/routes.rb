@@ -401,6 +401,8 @@ resources :institution, except: [:destroy] do
     collection do
       get :list
       get :view
+      put :publishing_rights_update
+      #added a new route for updating publishing rights
       get '/*other', to: redirect('/student_task/list')
     end
   end
@@ -547,5 +549,7 @@ resources :institution, except: [:destroy] do
   post '/response_toggle_permission/:id' => 'response#toggle_permission'
   post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'
   post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'
+  post 'student_task/publishing_rights_update', controller: :student_task, action: :publishing_rights_update,method: :put
+  #updated route and added specific controller action upon accessing this route
 end
 

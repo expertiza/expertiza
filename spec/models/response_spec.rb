@@ -131,6 +131,20 @@ describe Response do
     end
   end
 
+  describe '#populate_new_response' do
+    context 'when current round response is found' do
+      it 'returns the current round response' do
+        allow(response).to receive(:populate_new_response).with(:review_response_map, "0").and_return(response)
+        expect(response.id).to eq(1)
+      end
+    end
+    context 'when current round response is found' do
+      it 'returns a new response object' do
+        allow(response).to receive(:populate_new_response).with(:review_response_map, nil).and_return(:new_response)
+      end
+    end
+  end
+
   describe '.concatenate_all_review_comments' do
     it 'returns concatenated review comments and # of reviews in each round' do
       allow(Assignment).to receive(:find).with(1).and_return(assignment)

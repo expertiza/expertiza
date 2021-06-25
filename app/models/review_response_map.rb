@@ -189,7 +189,7 @@ class ReviewResponseMap < ResponseMap
     symbol = if round.nil?
                :review
              else
-               ("review round" + round.to_s).to_sym
+               ("review round" + " " + round.to_s).to_sym
              end
     review_final_versions[symbol] = {}
     # TODO E1936 (future work)

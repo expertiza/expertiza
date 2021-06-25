@@ -1,5 +1,5 @@
 describe BookmarkRatingQuestionnaire do
-  let(:questionnaire) { build(:bookmark_questionnaire, id: 2') }
+  let(:questionnaire) { build(:bookmark_questionnaire, id: 2) }
   let(:participant) { build(:participant, id: 1) }
   describe '#symbol' do
     it 'returns the symbol for a Bookmark Rating Questionnaire' do

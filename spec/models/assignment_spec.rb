@@ -109,6 +109,12 @@ describe Assignment do
       allow(review_response_map).to receive(:metareview_response_maps).and_return([double('MetareviewResponseMap')])
       expect(assignment.response_map_to_metareview(metareviewer)).to eq(review_response_map)
     end
+
+    it 'raises an error is review response is nil' do
+      metareviewer = nil
+      expect { assignment.response_map_to_metareview(metareviewer) }
+        .to raise_error(RuntimeError, /There are no reviews to metareview at this time for this assignment./)
+    end
   end
 
   describe '#metareview_mappings' do
@@ -362,7 +368,7 @@ describe Assignment do
     end
 
     context 'when assignment does not have staggered deadline' do
-      before(:each) { allow(assignment).to receive(:staggered_deadline?).and_return(false) }
+      before(:each) { allow(assignment).to receive(:topic_missing?).and_return(false) }
       context "when due date is not equal to 'Finished', due date is not nil and its deadline name is not nil" do
         it 'returns the deadline name of current due date' do
           allow(assignment).to receive(:find_current_stage).with(123).and_return(assignment_due_date)
@@ -543,6 +549,22 @@ describe Assignment do
       it ' return assignment nil' do
         assignment = create(:assignment)
         expect(assignment.find_due_dates("submission").first).to eq(nil)
+      end
+    end
+  end
+
+  describe '#finished?' do
+    context 'when assignment next due date is nil' do
+      it 'returns True' do
+        allow(DueDate).to receive(:get_next_due_date).with(1, 123).and_return(nil)
+        expect(assignment.finished?(123)).to eq(true)
+      end
+    end
+
+    context 'when there is a next due date' do
+      it 'returns False' do
+        allow(DueDate).to receive(:get_next_due_date).with(1, 123).and_return('2021-11-11 11:11:11')
+        expect(assignment.finished?(123)).to eq(false)
       end
     end
   end

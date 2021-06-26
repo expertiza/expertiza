@@ -59,10 +59,6 @@ describe PopupController do
         end
       end
     end
-
-    describe '#build_tone_analysis_heatmap' do
-      ## INSERT CONTEXT/DESCRIPTION/CODE HERE
-    end
   end
   ##########################################
 

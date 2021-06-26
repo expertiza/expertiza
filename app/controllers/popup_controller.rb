@@ -12,8 +12,9 @@ class PopupController < ApplicationController
     @response_id = params[:response_id]
     @reviewee_id = params[:reviewee_id]
     unless @response_id.nil?
-      first_question_in_questionnaire = Answer.where(response_id: @response_id).first.question_id
-      questionnaire_id = Question.find(first_question_in_questionnaire).questionnaire_id
+      first_question_in_questionnaire = Answer.where(response_id: @response_id).first
+      redirect_to :back if first_question_in_questionnaire.nil?
+      questionnaire_id = Question.find(first_question_in_questionnaire.question_id).questionnaire_id
       questionnaire = Questionnaire.find(questionnaire_id)
       @maxscore = questionnaire.max_question_score
       @scores = Answer.where(response_id: @response_id)
@@ -88,7 +89,7 @@ class PopupController < ApplicationController
     assignment = Assignment.find(@assignment_id)
     flash.now[:error] = "This report is not implemented for assignments where the rubric varies by topic." if assignment.vary_by_topic
   end
-  
+
   # this can be called from "response_report" by clicking reviewer names from instructor end.
   def reviewer_details_popup
     @userid = Participant.find(params[:id]).user_id

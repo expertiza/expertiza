@@ -23,16 +23,18 @@
       <th width = "5%"> Score </th>
       <th width = "45%"> Comments </th>
     </tr>
-    <% @scores.each do |s|%>
-      <tr>
-        <td align = 'left'> <%= Question.find(s.question_id).txt %></td>
-        <%if Question.find(s.question_id).is_a?(ScoredQuestion) %>
-          <td align = 'center'> <%= s.answer %>/<%= @maxscore %></td>
-        <%else%>
-          <td align = 'center'> <%= s.answer %></td>
-        <%end%>
-        <td align = 'left'> <%= sanitize s.comments.html_safe unless s.comments.nil? %> </td>
-      </tr>
+    <% unless @scores.nil? %>
+      <% @scores.each do |s|%>
+        <tr>
+          <td align = 'left'> <%= Question.find(s.question_id).txt %></td>
+          <%if Question.find(s.question_id).is_a?(ScoredQuestion) %>
+            <td align = 'center'> <%= s.answer %>/<%= @maxscore %></td>
+          <%else%>
+            <td align = 'center'> <%= s.answer %></td>
+          <%end%>
+          <td align = 'left'> <%= sanitize s.comments.html_safe unless s.comments.nil? %> </td>
+        </tr>
+      <%end%>
     <%end%>
     <tr>
       <th>Reviewer Score (Σ weighted score/Σ weighted available score)</th>

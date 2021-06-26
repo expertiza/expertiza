@@ -37,31 +37,6 @@ describe PopupController do
     end
   end
 
-  ######### Tone Analysis Tests ##########
-  describe "tone analysis tests" do
-    before(:each) do
-      allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team.id).and_return([response_map])
-      allow(Assignment).to receive(:find).with('reviewee_id = ?', team.id).and_return(assignment)
-      allow(ReviewResponseMap).to receive(:final_versions_from_reviewer).with(1).and_return(final_versions)
-      allow(Answer).to receive(:where).with(any_args).and_return(mocked_comments_one)
-      @request.host = test_url
-    end
-
-    describe '#view_review_scores_popup' do
-      ## INSERT CONTEXT/DESCRIPTION/CODE HERE
-    end
-
-    describe '#build_tone_analysis_report' do
-      context 'upon selecting summery, the tone analysis for review comments is calculated and applied to the page' do
-        it 'builds a tone analysis report and returns the heat map URLs' do
-          result = get :build_tone_analysis_report
-          expect(result["Location"]).to eq(test_url + "/") ## Placeholder URL should be returned since GET returns a 302 status redirection error
-        end
-      end
-    end
-  end
-  ##########################################
-
   describe '#reviewer_details_popup' do
     ## INSERT CONTEXT/DESCRIPTION/CODE HERE
   end

@@ -47,7 +47,7 @@
         <th> Additional Comment</th>
       </tr>
       <tr>
-        <%if @response.additional_comment.nil? or @response.nil?%>
+        <%if @response.nil? or @response.additional_comment.nil? %>
           <td> No Comments </td>
         <%else%>
           <td> <%= sanitize @response.additional_comment.html_safe unless @response.additional_comment.html_safe.nil? %> </td>

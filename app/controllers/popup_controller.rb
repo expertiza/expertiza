@@ -13,6 +13,7 @@ class PopupController < ApplicationController
     @reviewee_id = params[:reviewee_id]
     unless @response_id.nil?
       first_question_in_questionnaire = Answer.where(response_id: @response_id).first
+      puts first_question_in_questionnaire
       redirect_to :back if first_question_in_questionnaire.nil?
       questionnaire_id = Question.find(first_question_in_questionnaire.question_id).questionnaire_id
       questionnaire = Questionnaire.find(questionnaire_id)

@@ -1,4 +1,4 @@
-<h2> Review by <%= Participant.find(@reviewer_id).name %> </h2>
+<h2> Review by <%= Participant.find(@reviewer_id).fullname(@ip) %> </h2>
 
 <% keys = @review_final_versions.keys %>
 <% keys.each do |key| %>

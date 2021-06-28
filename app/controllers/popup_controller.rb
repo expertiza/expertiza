@@ -33,6 +33,7 @@ class PopupController < ApplicationController
 
   # this can be called from "response_report" by clicking team names from instructor end.
   def team_users_popup
+    @session = session
     @sum = 0
     @team = Team.find(params[:id])
     @assignment = Assignment.find(@team.parent_id)

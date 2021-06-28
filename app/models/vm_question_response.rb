@@ -105,7 +105,7 @@ class VmQuestionResponse
     if @questionnaire_type == "MetareviewQuestionnaire" || @questionnaire_type == "ReviewQuestionnaire"
       @output = "Team members:"
       @list_of_team_participants.each do |participant|
-        @output = @output + " (" + participant.fullname + ") "
+        @output = @output + " (" + participant.fullname(session[:ip]) + ") "
       end
 
     end

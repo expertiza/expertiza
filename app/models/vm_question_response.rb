@@ -100,12 +100,12 @@ class VmQuestionResponse
     end
   end
 
-  def display_team_members
+  def display_team_members(ip_address = nil)
     @output = ""
     if @questionnaire_type == "MetareviewQuestionnaire" || @questionnaire_type == "ReviewQuestionnaire"
       @output = "Team members:"
       @list_of_team_participants.each do |participant|
-        @output = @output + " (" + participant.fullname + ") "
+        @output = @output + " (" + participant.fullname(ip_address) + ") "
       end
 
     end

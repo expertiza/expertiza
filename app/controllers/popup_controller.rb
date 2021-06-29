@@ -33,6 +33,7 @@ class PopupController < ApplicationController
 
   # this can be called from "response_report" by clicking team names from instructor end.
   def team_users_popup
+    @ip = session[:ip]
     @sum = 0
     @team = Team.find(params[:id])
     @assignment = Assignment.find(@team.parent_id)
@@ -80,6 +81,7 @@ class PopupController < ApplicationController
 
   # Views tone analysis report and heatmap
   def view_review_scores_popup
+    @ip = session[:ip]
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
     @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@assignment_id, @reviewer_id)

@@ -1,9 +1,6 @@
-<h2> Review by <%= Participant.find(@reviewer_id).name %> </h2>
-
+<h2> Review by <%= Participant.find(@reviewer_id).fullname(@ip) %> </h2>
 <% keys = @review_final_versions.keys %>
-<% keys.each do |key| %>
-    
-    
+<% keys.each do |key| %>    
     <h4><b> Course    :</b> <%= Assignment.find(@assignment_id).course.name %></h4>
     <h4><b> Assignment:</b> <%= Assignment.find(@assignment_id).name %></h4>
     <% roundtitle = key.to_s %>

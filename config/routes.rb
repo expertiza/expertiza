@@ -432,6 +432,17 @@ resources :institution, except: [:destroy] do
 
   resources :submission_records, only: [:index]
 
+  resources :submission_viewing_events do
+    collection do
+      post :getTimingDetails
+      post :start_timing
+      post :end_timing
+      post :hard_save
+      post :end_round_and_save
+      post :reset_timing
+    end
+  end
+
   resources :suggestion, only: %i[show new create] do
     collection do
       get :list

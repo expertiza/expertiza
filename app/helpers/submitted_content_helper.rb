@@ -1,7 +1,9 @@
 module SubmittedContentHelper
+  require 'pstore'
+
   def display_directory_tree(participant, files, display_to_reviewer_flag)
     index = 0
-    participant = @participant if @participant # TODO: Verify why this is needed
+    participant = @participant if @participant
     assignment = participant.assignment # participant is @map.contributor
     topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) # participant is @map.reviewer
     check_stage = assignment.get_current_stage(topic_id)
@@ -24,11 +26,12 @@ module SubmittedContentHelper
           ret += link_to File.basename(file), :controller => 'submitted_content', :action => 'edit', :id => participant.id, "current_folder[name]" => file
         else
           ret += "\n      "
-          ret += link_to File.basename(file), :controller => 'submitted_content',
-                                              :action => 'download',
-                                              :id => participant.id,
-                                              :download => File.basename(file),
-                                              "current_folder[name]" => File.dirname(file)
+          # ret += link_to File.basename(file), :controller => 'submitted_content',
+          #                                     :action => 'download',
+          #                                     :id => participant.id,
+          #                                     :download => File.basename(file),
+          #                                     "current_folder[name]" => File.dirname(file)
+          ret += link_to File.basename(file), { :controller => 'submitted_content', :action => 'download', :id => participant.id, :download => File.basename(file), "current_folder[name]" => File.dirname(file) }, :class => "fileLink", :download => File.basename(file).to_s
         end
         ret += "\n   </td>\n   <td valign = top>\n"
         ret += File.size(file).to_s
@@ -48,7 +51,7 @@ module SubmittedContentHelper
   # Zhewei: this method is used to display reviewer uploaded files during peer review.
   def display_review_files_directory_tree(participant, files)
     index = 0
-    participant = @participant if @participant # TODO: Verify why this is needed
+    participant = @participant if @participant
     assignment = participant.assignment # participant is @map.contributor
     html = ''
 
@@ -116,7 +119,7 @@ module SubmittedContentHelper
       # The zip file is no longer needed, so delete it
       File.delete(file_name)
     end
-  # rescue
-  # end
-end
+    # rescue
+    # end
+  end
 end

@@ -1,6 +1,6 @@
 describe Badge do
+  let(:awarded_badge) { build(:awarded_badge) }
   before(:all) do
-  	let(:awarded_badge) { build(:awarded_badge) }
     allow(Badge).to receive(:find_by).and_return(awarded_badge)
     allow(awarded_badge).to receive(:try).with(:id).and_return(1)
     allow(awarded_badge).to receive(:try).with(:image_name).and_return('image_name')	

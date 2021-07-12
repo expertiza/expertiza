@@ -624,19 +624,20 @@ class Assignment < ActiveRecord::Base
   # merge the grades from multiple rounds
   def merge_grades_by_rounds(grades_by_rounds, num_of_assessments, total_score)
     team_scores = {:max => 0, :min => 0, :avg => nil}
-    if num_of_assessments == 0
+    if num_of_assessments.zero?
       return team_scores
     end
-
     team_scores[:max] = -999_999_999
     team_scores[:min] = 999_999_999
-    team_scores[:avg] = total_score/num_of_assessments
+    team_scores[:avg] = total_score / num_of_assessments
     (1..self.num_review_rounds).each do |i|
       round_sym = ("review" + i.to_s).to_sym
-      if !grades_by_rounds[round_sym][:max].nil? && team_scores[:max] < grades_by_rounds[round_sym][:max]
+      # if (!A && b<a)
+      # if! (A || b>=a)
+      unless grades_by_rounds[round_sym][:max].nil? || team_scores[:max] >= grades_by_rounds[round_sym][:max]
         team_scores[:max] = grades_by_rounds[round_sym][:max]
       end
-      if !grades_by_rounds[round_sym][:min].nil? && team_scores[:min] > grades_by_rounds[round_sym][:min]
+      unless grades_by_rounds[round_sym][:min].nil? || team_scores[:min] <= grades_by_rounds[round_sym][:min]
         team_scores[:min] = grades_by_rounds[round_sym][:min]
       end
     end

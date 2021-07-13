@@ -29,7 +29,7 @@ class Answer < ActiveRecord::Base
         end
         total_score += curr_score
       end
-      scores[:avg] = if length_of_assessments != 0
+      scores[:avg] = unless length_of_assessments.zero?
                        total_score.to_f / length_of_assessments
                      else
                        0

@@ -56,7 +56,7 @@ class Response < ActiveRecord::Base
   # bug fixed
   # Returns the average score for this response as an integer (0-100)
   def average_score
-    if maximum_score != 0
+    unless maximum_score.zero?
       ((total_score.to_f / maximum_score.to_f) * 100).round
     else
       "N/A"
@@ -114,7 +114,7 @@ class Response < ActiveRecord::Base
   end
 
   def questionnaire_by_answer(answer)
-    if !answer.nil? # for all the cases except the case that  file submission is the only question in the rubric.
+    unless answer.nil? # for all the cases except the case that  file submission is the only question in the rubric.
       questionnaire = Question.find(answer.question_id).questionnaire
     else
       # there is small possibility that the answers is empty: when the questionnaire only have 1 question and it is a upload file question

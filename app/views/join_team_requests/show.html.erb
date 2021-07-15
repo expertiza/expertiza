@@ -5,7 +5,11 @@
 
 <p>
   <b>Comments:</b>  <br>
-  <%=h @join_team_request.comments %>
+
+  <% @join_team_request.comments.each do |comment| %>
+    <%=h comment %>
+  <% end %> 
+  
 </p>
 
 <p>

@@ -49,6 +49,5 @@ class QuizResponseMap < ResponseMap
 
     # convert the obtained percentage to float and round it to 1st precision
     weighted_quiz_score = calculated_score[0].graded_percent.to_f.round(1)
-    return weighted_quiz_score
   end
 end

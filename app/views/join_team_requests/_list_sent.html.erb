@@ -22,7 +22,7 @@
         <% end %>
       </td>
       <td>
-        <%= request.comments[2..-3] unless @join_team_request.comments.nil %>
+        <%= request.comments[2..-3] unless request.comments.nil? %>
       </td>
       <td>
         <% if request.status == 'P' %>

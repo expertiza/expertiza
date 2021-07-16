@@ -159,7 +159,7 @@ class Assessment360Controller < ApplicationController
       hash_per_stu[course_participant.id][assignment.id] = avg_grades.to_s + '%'
     end
     # Calculate sum of averages to get student's overall grade
-    if avg_grades and grades > 0
+    if avg_grades and grades >= 0
       # for each assignment
       review_info_per_stu[0] += avg_grades
       review_info_per_stu[1] += 1

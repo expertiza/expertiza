@@ -191,7 +191,7 @@ class ResponseController < ApplicationController
     msg = "Your response was successfully saved."
     error_msg = ""
     # only notify if is_submitted changes from false to true
-    if (@map.is_a? ReviewResponseMap) && (was_submitted == false && @response.is_submitted) && @response.significant_difference?
+    if (@map.is_a? ReviewResponseMap) && (!was_submitted && @response.is_submitted) && @response.significant_difference?
       @response.notify_instructor_on_difference
       @response.email
     end
@@ -399,8 +399,8 @@ class ResponseController < ApplicationController
   def init_answers(questions)
     questions.each do |q|
       # it's unlikely that these answers exist, but in case the user refresh the browser some might have been inserted.
-      a = Answer.where(response_id: @response.id, question_id: q.id).first
-      Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '') if a.nil?
+      answer = Answer.where(response_id: @response.id, question_id: q.id).first
+      Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '') if answer.nil?
     end
   end
 

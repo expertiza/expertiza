@@ -41,7 +41,7 @@ class AssignmentParticipant < Participant
     scores = {}
     scores[:participant] = self
     # Retrieve assignment score
-    compute_assignment_score(questions, scores)
+    # compute_assignment_score(questions, scores)
     # Compute the Total Score (with question weights factored in)
     scores[:total_score] = self.assignment.compute_total_score(scores) 
 
@@ -65,28 +65,6 @@ class AssignmentParticipant < Participant
       scores[:total_score] = 100 if scores[:total_score] > 100
     end
     scores
-  end
-
-  def compute_assignment_score(questions, scores)
-    self.assignment.questionnaires.each do |questionnaire|
-      round = AssignmentQuestionnaire.find_by(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id).used_in_round
-      # create symbol for "varying rubrics" feature -Yang
-      questionnaire_symbol = if round.nil?
-                               questionnaire.symbol
-                             else
-                               (questionnaire.symbol.to_s + round.to_s).to_sym
-                             end
-
-      scores[questionnaire_symbol] = {}
-
-      scores[questionnaire_symbol][:assessments] = if round.nil?
-                                                     questionnaire.get_assessments_for(self)
-                                                   else
-                                                     questionnaire.get_assessments_round_for(self, round)
-                                                   end
-      # Anser.compute_scores computes the total score for a *list of assessments*                                                    
-      scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
-    end
   end
 
   # E1973, dummy method to match the functionality of AssignmentTeam

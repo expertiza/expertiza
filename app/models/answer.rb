@@ -9,39 +9,39 @@ class Answer < ActiveRecord::Base
   # parameters
   #  assessments - a list of assessments of some type (e.g., author feedback, teammate review)
   #  questions - the list of questions that was filled out in the process of doing those assessments
-  #def self.compute_scores(assessments, questions)
-  #  scores = {}
-  #  if assessments.present?
-  #    scores[:max] = -999_999_999
-  #    scores[:min] = 999_999_999
-  #    total_score = 0
-  #    length_of_assessments = assessments.length.to_f
-  #    assessments.each do |assessment|
-  #      curr_score = get_total_score(response: [assessment], questions: questions)
+  def self.compute_scores(assessments, questions)
+    scores = {}
+    if assessments.present?
+      scores[:max] = -999_999_999
+      scores[:min] = 999_999_999
+      total_score = 0
+      length_of_assessments = assessments.length.to_f
+      assessments.each do |assessment|
+        curr_score = get_total_score(response: [assessment], questions: questions)
 
-  #      scores[:max] = curr_score if curr_score > scores[:max]
-  #      scores[:min] = curr_score if curr_score < scores[:min] and curr_score != -1
+        scores[:max] = curr_score if curr_score > scores[:max]
+        scores[:min] = curr_score if curr_score < scores[:min] and curr_score != -1
 
         # Check if the review is invalid. If is not valid do not include in score calculation
-  #      if @invalid == 1 or curr_score == -1
-  #       length_of_assessments -= 1
-  #        curr_score = 0
-  #      end
-  #      total_score += curr_score
-  #    end
-  #    scores[:avg] = unless length_of_assessments.zero?
-  #                     total_score.to_f / length_of_assessments
-  #                   else
-  #                     0
-  #                   end
-  #  else
-  #    scores[:max] = nil
-  #    scores[:min] = nil
-  #    scores[:avg] = nil
-  #  end
+        if @invalid == 1 or curr_score == -1
+         length_of_assessments -= 1
+          curr_score = 0
+        end
+        total_score += curr_score
+      end
+      scores[:avg] = unless length_of_assessments.zero?
+                       total_score.to_f / length_of_assessments
+                     else
+                       0
+                     end
+    else
+      scores[:max] = nil
+      scores[:min] = nil
+      scores[:avg] = nil
+    end
 
-  #  scores
-  #end
+    scores
+  end
 
   # Computes the total score for an assessment
   # params

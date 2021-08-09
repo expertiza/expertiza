@@ -180,6 +180,19 @@ describe AssignmentsController do
   end
 
   describe '#update' do
+    context 'when the assignment has no participants' do
+      it 'flashes a warning to the user' do
+        allow(assignment).to receive(:save).and_return(true)
+        allow(assignment).to receive(:participants).and_return([])
+        params = {
+            id: 1,
+            course_id: 1
+          }
+          session = {user: instructor}
+          post :update, params, session
+          expect(flash[:error]).to eq(%Q[Saved assignment is missing participants. Add them <a href="/participants/list?id=1&model=Assignment">here</a>])
+      end
+    end
     context 'when params does not have key :assignment_form' do
       context 'when assignment is saved successfully' do
         it 'shows a note flash message and redirects to tree_display#index page' do

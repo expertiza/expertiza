@@ -511,7 +511,7 @@ class AssignmentsController < ApplicationController
   def query_participants_and_alert
     assignment = Assignment.find(params[:id])
     if assignment.participants.size == 0
-      flash[:notice] = %Q[Saved assignment is missing participants. Add them here <a href="participants/list?id=#{assignment.id}&model=Assignment">#{assignment.id}</a>]
+      flash[:alert] = %Q[Saved assignment is missing participants. Add them here <a href="participants/list?id=#{assignment.id}&model=Assignment">#{assignment.id}</a>]
     end
   end
 

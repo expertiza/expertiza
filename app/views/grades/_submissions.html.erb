@@ -16,5 +16,5 @@
         display = "Create Review"
       end
    %>      
-      <%= link_to display, :action => "instructor_review", :id => participant.id %> 
+      <%= link_to display, :action => "instructor_review", :id => participant.id unless participant.nil?%> 
 <% end %>   	     

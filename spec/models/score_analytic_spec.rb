@@ -1,7 +1,7 @@
 class ScoreAnalyticTestDummyClass 
   attr_accessor :comments
   require 'analytic/score_analytic'
-  include QuestionAnalytic
+  include ScoreAnalytic
   def initialize(comments)
     @comments = comments
   end  

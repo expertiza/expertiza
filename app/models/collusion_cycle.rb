@@ -13,13 +13,13 @@ class CollusionCycle
       if assignment_participant.reviews_by_reviewer(ap).nil?
         next
       else
-        s01 = assignment_participant.reviews_by_reviewer(ap).total_score
+        s01 = assignment_participant.reviews_by_reviewer(ap).aggregate_questionnaire_score
       end
 
       if ap.reviews_by_reviewer(assignment_participant).nil?
         next
       else
-        s10 = ap.reviews_by_reviewer(assignment_participant).total_score
+        s10 = ap.reviews_by_reviewer(assignment_participant).aggregate_questionnaire_score
       end
 
       collusion_cycles.push([[assignment_participant, s01], [ap, s10]])

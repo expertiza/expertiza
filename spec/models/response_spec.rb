@@ -62,6 +62,7 @@ describe Response do
       question2 = double('ScoredQuestion', weight: 2)
       allow(Question).to receive(:find).with(1).and_return(question2)
       allow(question2).to receive(:is_a?).with(ScoredQuestion).and_return(true)
+      allow(question2).to receive(:answer).and_return(answer)
       expect(response.aggregate_questionnaire_score).to eq(2)
     end
   end

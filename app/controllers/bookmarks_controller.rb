@@ -86,7 +86,7 @@ class BookmarksController < ApplicationController
           reviewed_object_id: assessment.id,
           reviewee_id: bookmark.id,
           reviewer_id: AssignmentParticipant.find_by(user_id: current_user.id).id).flat_map {|r| Response.where(map_id: r.id) }
-      score = Answer.get_total_score(response: responses, questions: questions)
+      score = Answer.assessment_score(response: responses, questions: questions)
       if score.nil?
         return '-'
       else

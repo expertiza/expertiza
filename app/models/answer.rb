@@ -17,7 +17,7 @@ class Answer < ActiveRecord::Base
       total_score = 0
       length_of_assessments = assessments.length.to_f
       assessments.each do |assessment|
-        curr_score = get_total_score(response: [assessment], questions: questions)
+        curr_score = assessment_score(response: [assessment], questions: questions)
 
         scores[:max] = curr_score if curr_score > scores[:max]
         scores[:min] = curr_score if curr_score < scores[:min] and curr_score != -1
@@ -48,7 +48,7 @@ class Answer < ActiveRecord::Base
   #  assessment - specifies the assessment for which the total score is being calculated
   #  questions  - specifies the list of questions being evaluated in the assessment
 
-  def self.get_total_score(params)
+  def self.assessment_score(params)
     @response = params[:response].last
     if @response
       @questions = params[:questions]

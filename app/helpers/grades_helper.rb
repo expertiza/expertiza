@@ -13,7 +13,7 @@ module GradesHelper
   def score_vector(reviews, symbol)
     scores = []
     reviews.each do |review|
-      scores << Answer.get_total_score(response: [review], questions: @questions[symbol.to_sym], q_types: [])
+      scores << Answer.assessment_score(response: [review], questions: @questions[symbol.to_sym], q_types: [])
     end
     scores
   end

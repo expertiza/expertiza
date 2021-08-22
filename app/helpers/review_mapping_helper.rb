@@ -337,26 +337,12 @@ module ReviewMappingHelper
     participant = Participant.find(participant_id)
     team = AssignmentTeam.find(reviewee_team_id)
     html = ''
-    if !team.nil? and !participant.nil?
+    unless team.nil? || participant.nil?
       review_submissions_path = team.path + "_review" + "/" + response_map_id.to_s
       files = team.submitted_files(review_submissions_path)
       html += display_review_files_directory_tree(participant, files) if files.present?
     end
     html.html_safe
-  end
-
-  # Zhewei - 2017-02-27
-  # This is for all Dr.Kidd's courses
-  def calculate_average_author_feedback_score(assignment_id, max_team_size, response_map_id, reviewee_id)
-    review_response = ResponseMap.where(id: response_map_id).try(:first).try(:response).try(:last)
-    author_feedback_avg_score = "-- / --"
-    unless review_response.nil?
-      user = TeamsUser.where(team_id: reviewee_id).try(:first).try(:user) if max_team_size == 1
-      author = Participant.where(parent_id: assignment_id, user_id: user.id).try(:first) unless user.nil?
-      feedback_response = ResponseMap.where(reviewed_object_id: review_response.id, reviewer_id: author.id).try(:first).try(:response).try(:last) unless author.nil?
-      author_feedback_avg_score = feedback_response.nil? ? "-- / --" : "#{feedback_response.total_score} / #{feedback_response.maximum_score}"
-    end
-    author_feedback_avg_score
   end
 
   # Zhewei - 2016-10-20

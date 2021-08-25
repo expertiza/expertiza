@@ -37,13 +37,14 @@ class Response < ActiveRecord::Base
   end
 
   # Computes the total score awarded for a review
-  def total_score
+  def aggregate_questionnaire_score
     # only count the scorable questions, only when the answer is not nil
     # we accept nil as answer for scorable questions, and they will not be counted towards the total score
     sum = 0
     scores.each do |s|
       question = Question.find(s.question_id)
-      sum += s.answer * question.weight if !s.answer.nil? && question.is_a?(ScoredQuestion)
+      # For quiz responses, the weights will be 1 or 0, depending on if correct
+      sum += s.answer * question.weight unless s.answer.nil? || !question.is_a?(ScoredQuestion)
     end
     sum
   end
@@ -57,7 +58,7 @@ class Response < ActiveRecord::Base
   # Returns the average score for this response as an integer (0-100)
   def average_score
     unless maximum_score.zero?
-      ((total_score.to_f / maximum_score.to_f) * 100).round
+      ((aggregate_questionnaire_score.to_f / maximum_score.to_f) * 100).round
     else
       "N/A"
     end
@@ -188,7 +189,7 @@ class Response < ActiveRecord::Base
     # if this response is the first on this artifact, there's no grade conflict
     return false if count.zero?
     # This score has already skipped the unfilled scorable question(s)
-    score = total_score.to_f / maximum_score
+    score = aggregate_questionnaire_score.to_f / maximum_score
     questionnaire = questionnaire_by_answer(self.scores.first)
     assignment = self.map.assignment
     assignment_questionnaire = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: questionnaire.id)
@@ -205,7 +206,7 @@ class Response < ActiveRecord::Base
     existing_responses.each do |existing_response|
       if existing_response.id != current_response.id # the current_response is also in existing_responses array
         count += 1
-        scores_assigned << existing_response.total_score.to_f / existing_response.maximum_score
+        scores_assigned << existing_response.aggregate_questionnaire_score.to_f / existing_response.maximum_score
       end
     end
     [scores_assigned.sum / scores_assigned.size.to_f, count]
@@ -240,7 +241,7 @@ class Response < ActiveRecord::Base
         reviewer_name: reviewer_name,
         type: 'review',
         reviewee_name: reviewee_name,
-        new_score: total_score.to_f / maximum_score,
+        new_score: aggregate_questionnaire_score.to_f / maximum_score,
         assignment: assignment,
         conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s,
         summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,

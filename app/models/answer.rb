@@ -17,7 +17,7 @@ class Answer < ActiveRecord::Base
       total_score = 0
       length_of_assessments = assessments.length.to_f
       assessments.each do |assessment|
-        curr_score = get_total_score(response: [assessment], questions: questions)
+        curr_score = assessment_score(response: [assessment], questions: questions)
 
         scores[:max] = curr_score if curr_score > scores[:max]
         scores[:min] = curr_score if curr_score < scores[:min] and curr_score != -1
@@ -48,7 +48,7 @@ class Answer < ActiveRecord::Base
   #  assessment - specifies the assessment for which the total score is being calculated
   #  questions  - specifies the list of questions being evaluated in the assessment
 
-  def self.get_total_score(params)
+  def self.assessment_score(params)
     @response = params[:response].last
     if @response
       @questions = params[:questions]
@@ -57,7 +57,7 @@ class Answer < ActiveRecord::Base
       sum_of_weights = 0
       max_question_score = 0
 
-      @questionnaire = Questionnaire.find(@questions[0].questionnaire_id)
+      @questionnaire = Questionnaire.find(@questions.first.questionnaire_id)
 
       questionnaireData = ScoreView.find_by_sql ["SELECT q1_max_question_score ,SUM(question_weight) as sum_of_weights,SUM(question_weight * s_score) as weighted_score FROM score_views WHERE type in('Criterion', 'Scale') AND q1_id = ? AND s_response_id = ?", @questions[0].questionnaire_id, @response.id]
       # zhewei: we should check whether weighted_score is nil,

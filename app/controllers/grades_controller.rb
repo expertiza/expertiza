@@ -143,7 +143,7 @@ class GradesController < ApplicationController
   def update
     participant = AssignmentParticipant.find(params[:id])
     total_score = params[:total_score]
-    if format("%.2f", total_score) != params[:participant][:grade]
+    unless format("%.2f", total_score) == params[:participant][:grade]
       participant.update_attribute(:grade, params[:participant][:grade])
       message = if participant.grade.nil?
                   "The computed score will be used for " + participant.user.name + "."

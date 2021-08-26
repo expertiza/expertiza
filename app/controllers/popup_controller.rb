@@ -19,7 +19,7 @@ class PopupController < ApplicationController
       @scores = Answer.where(response_id: @response_id)
       @response = Response.find(@response_id)
       @total_percentage = @response.average_score
-      @sum = @response.total_score
+      @sum = @response.aggregate_questionnaire_score
       @total_possible = @response.maximum_score
     end
 
@@ -64,7 +64,7 @@ class PopupController < ApplicationController
         total_percentage = response.average_score
         total_percentage += '%' if total_percentage.is_a? Float
         instance_variable_set('@total_percentage_round_' + round.to_s, total_percentage)
-        instance_variable_set('@sum_round_' + round.to_s, response.total_score)
+        instance_variable_set('@sum_round_' + round.to_s, response.aggregate_questionnaire_score)
         instance_variable_set('@total_possible_round_' + round.to_s, response.maximum_score)
       end
     end
@@ -110,7 +110,7 @@ class PopupController < ApplicationController
       @scores = Answer.where(response_id: @response_id)
       @response = Response.find(@response_id)
       @total_percentage = @response.average_score
-      @sum = @response.total_score
+      @sum = @response.aggregate_questionnaire_score
       @total_possible = @response.maximum_score
     end
     @maxscore = 5 if @maxscore.nil?

@@ -287,7 +287,7 @@ class Response < ActiveRecord::Base
       tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id) : nil
       code = add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments, current_user
     end
-    comment = unless self.additional_comment.nil?
+    comment = if !self.additional_comment.nil?
                 self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
               else
                 ''
@@ -305,7 +305,7 @@ class Response < ActiveRecord::Base
       row_class = count.even? ? "info" : "warning"
       row_class = "" if question.is_a? QuestionnaireHeader
       code += '<tr class="' + row_class + '"><td>'
-      unless answer.nil? or !question.is_a? QuestionnaireHeader
+      unless answer.nil? || !question.is_a? QuestionnaireHeader
         code += if question.instance_of? Criterion
                   # Answer Tags are enabled only for Criterion questions at the moment.
                   question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments, current_user) || ''

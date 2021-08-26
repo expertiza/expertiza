@@ -76,7 +76,7 @@ def scores_varying_rubrics
       @corresponding_response = Response.where('map_id = ?', response_map.id)
       @corresponding_response = @corresponding_response.select {|response| response.round == round } unless @corresponding_response.empty?
       @respective_scores = {}
-      @respective_scores = reviewer[round] if !reviewer.nil? && !reviewer[round].nil?
+      @respective_scores = reviewer[round] unless reviewer.nil? || reviewer[round].nil?
       calc_review_score
       @respective_scores[response_map.reviewee_id] = @this_review_score
       reviewer = {} if reviewer.nil?

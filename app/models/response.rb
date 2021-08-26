@@ -300,12 +300,12 @@ class Response < ActiveRecord::Base
     count = 0
     # loop through questions so the the questions are displayed in order based on seq (sequence number)
     questions.each do |question|
-      count += 1 unless question.is_a? QuestionnaireHeader || !question.break_before == true
+      count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
       answer = answers.find {|a| a.question_id == question.id }
       row_class = count.even? ? "info" : "warning"
       row_class = "" if question.is_a? QuestionnaireHeader
       code += '<tr class="' + row_class + '"><td>'
-      unless answer.nil? && !question.is_a? QuestionnaireHeader
+      if !answer.nil? or question.is_a? QuestionnaireHeader
         code += if question.instance_of? Criterion
                   # Answer Tags are enabled only for Criterion questions at the moment.
                   question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments, current_user) || ''

@@ -1,6 +1,6 @@
 describe Permission do
-    it { should has_many(:content_pages) }
-    it { should has_many(:controller_actions) }
+    it { should have_many(:content_pages) }
+    it { should have_many(:controller_actions) }
 
     it "should have a name" do
         perm = Permission.new()

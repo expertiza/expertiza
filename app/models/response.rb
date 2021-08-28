@@ -204,7 +204,7 @@ class Response < ActiveRecord::Base
     scores_assigned = []
     count = 0
     existing_responses.each do |existing_response|
-      if existing_response.id != current_response.id # the current_response is also in existing_responses array
+      unless existing_response.id == current_response.id # the current_response is also in existing_responses array
         count += 1
         scores_assigned << existing_response.aggregate_questionnaire_score.to_f / existing_response.maximum_score
       end

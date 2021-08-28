@@ -49,6 +49,9 @@ describe AdminController do
 
     describe '#list_super_administrators' do
         it 'returns super admins' do 
+
+            allow(Role).to receive(:superadministrator).and_return(super_admin_1)
+            allow(super_admin_1).to receive(:id).and_return(1)
             allow(User).to receive(:where).with(["role_id = ?", Role.superadministrator.id]).and_return([super_admin_1, super_admin_2])
             get :list_super_administrators
             expect(response).to eq([super_admin_1, super_admin_2])

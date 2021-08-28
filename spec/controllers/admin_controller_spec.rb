@@ -26,7 +26,7 @@ describe AdminController do
         context 'when the student has admin privileges' do
             it 'returns true' do 
                 params = {action: 'list_instructors'}
-                session[:user].role.name = 'Instructor'
+                session[:admin].role.name = 'Administrator'
                 expect(controller.action_allowed?).to eq(true)
             end
         end

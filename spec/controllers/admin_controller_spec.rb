@@ -26,7 +26,7 @@ describe AdminController do
         context 'when the student has admin privileges' do
             it 'returns true' do 
                 params = {action: 'list_instructors'}
-                session[:admin].role.name = 'Administrator'
+                session[:user].role.name = 'Instructor'
                 expect(controller.action_allowed?).to eq(true)
             end
         end
@@ -35,6 +35,13 @@ describe AdminController do
                 params = {action: 'remove_instructor'}
                 session[:user].role.name = 'Student'
                 expect(controller.action_allowed?).to eq(false)
+            end
+        end
+        context 'when the student has super-admin privileges' do
+            it 'returns true' do
+                params = {action: 'fake_case'}
+                session[:user].role.name = 'Super-Administrator'
+                expect(controller.action_allowed?).to eq(true) 
             end
         end
     end

@@ -143,7 +143,7 @@ module ReviewMappingHelper
     # Iterating through list
     (1..num_rounds).each do |round|
       # Changing values of instance variable based on below condition
-      if team_id != nil && team_id != -1.0
+      unless team_id.nil? || team_id == -1.0
         instance_variable_set("@score_awarded_round_" + round.to_s, @review_scores[reviewer_id][round][team_id].to_s + '%')
       end
     end
@@ -164,7 +164,7 @@ module ReviewMappingHelper
   def sort_reviewer_by_review_volume_desc
     @reviewers.each do |r|
       # get the volume of review comments
-      review_volumes = Response.get_volume_of_review_comments(@assignment.id, r.id)
+      review_volumes = Response.volume_of_review_comments(@assignment.id, r.id)
       r.avg_vol_per_round = []
       review_volumes.each_index do |i|
         if i.zero?

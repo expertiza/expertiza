@@ -14,7 +14,7 @@ class TagPromptDeployment < ActiveRecord::Base
     responses = Response.joins(:response_maps).where(response_maps: {reviewed_object_id: self.assignment.id, reviewee_id: team.id})
     questions = Question.where(questionnaire_id: self.questionnaire.id, type: self.question_type)
 
-    unless responses.empty? or questions.empty?
+    unless responses.empty? || questions.empty?
       responses_ids = responses.map(&:id)
       questions_ids = questions.map(&:id)
 

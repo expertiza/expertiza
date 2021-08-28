@@ -24,7 +24,7 @@ class Scale < ScoredQuestion
     html += '<TD align="left">' + self.type + '</TD>'
     html += '<td align="center">' + self.weight.to_s + '</TD>'
     questionnaire = self.questionnaire
-    if !self.max_label.nil? && !self.min_label.nil?
+    unless self.max_label.nil? || self.min_label.nil?
       html += '<TD align="center"> (' + self.min_label + ') ' + questionnaire.min_question_score.to_s + ' to '
       html += questionnaire.max_question_score.to_s + ' (' + self.max_label + ')</TD>'
     else
@@ -48,7 +48,7 @@ class Scale < ScoredQuestion
     end
     html += '<td width="10%"></td></tr><tr>'
 
-    html += if !self.min_label.nil?
+    html += unless self.min_label.nil?
               '<td width="10%">' + self.min_label + '</td>'
             else
               '<td width="10%"></td>'
@@ -56,7 +56,7 @@ class Scale < ScoredQuestion
     (questionnaire_min..questionnaire_max).each do |j|
       html += '<td width="10%"><input type="radio" id="' + j.to_s
       html += '" value="' + j.to_s + '" name="Radio_' + self.id.to_s + '"'
-      html += 'checked="checked"' if (!answer.nil? and answer.answer == j) or (answer.nil? and questionnaire_min == j)
+      html += 'checked="checked"' unless (answer.nil? or answer.answer != j) and (answer or questionnaire_min != j)
       html += '></td>'
     end
     html += '<script>jQuery("input[name=Radio_' + self.id.to_s + ']:radio").change(function() {'
@@ -64,7 +64,7 @@ class Scale < ScoredQuestion
     html += 'var checked_value = jQuery("input[name=Radio_' + self.id.to_s + ']:checked").val();'
     html += 'response_score.val(checked_value);});</script>'
 
-    html += if !self.max_label.nil?
+    html += unless self.max_label.nil?
               '<td width="10%">' + self.max_label + '</td>'
             else
               '<td width="10%"></td>'

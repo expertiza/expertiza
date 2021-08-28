@@ -10,6 +10,7 @@ class QuizQuestionnairesController < QuestionnairesController
       current_user_has_student_privileges?
     end
   end
+
   # View a quiz questionnaire
   def view
     @questionnaire = Questionnaire.find(params[:id])
@@ -17,8 +18,6 @@ class QuizQuestionnairesController < QuestionnairesController
     render :view
   end
 
-
-  
   def new
     valid_request = true # A request is valid if the assignment requires a quiz, the participant has a team, and that team has a topic if the assignment has a topic
     @assignment_id = params[:aid] # creating an instance variable to hold the assignment id
@@ -75,7 +74,7 @@ class QuizQuestionnairesController < QuestionnairesController
   # edit a quiz questionnaire
   def edit
     @questionnaire = Questionnaire.find(params[:id])
-    if !@questionnaire.taken_by_anyone? # quiz can be edited only if its not taken by anyone
+    unless @questionnaire.taken_by_anyone? # quiz can be edited only if its not taken by anyone
       render :'questionnaires/edit'
     else
       flash[:error] = "Your quiz has been taken by one or more students; you cannot edit it anymore."
@@ -120,7 +119,7 @@ class QuizQuestionnairesController < QuestionnairesController
       valid = "Please specify quiz name (please do not use your name or id)."
     end
     (1..num_questions).each do |i|
-      break if valid != "valid"
+      break unless valid == "valid"
       valid = validate_question(i)
     end
     valid
@@ -143,7 +142,7 @@ class QuizQuestionnairesController < QuestionnairesController
 
   # A question is valid if it has a valid type ('TrueFalse', 'MultipleChoiceCheckbox', 'MultipleChoiceRadio') and a correct answer selected
   def validate_question(i)
-    if !params.key?(:question_type) || !params[:question_type].key?(i.to_s) || params[:question_type][i.to_s][:type].nil?
+    unless params.key?(:question_type) && params[:question_type].key?(i.to_s) && params[:question_type][i.to_s][:type]
       # A type isn't selected for a question
       valid = "Please select a type for each question"
     else
@@ -164,44 +163,52 @@ class QuizQuestionnairesController < QuestionnairesController
   # create multiple choice (radio or checkbox) item(s)
   def create_multchoice(question, choice_key, q_answer_choices)
     # this method combines the functionality of create_radio and create_checkbox, so that all mult choice items are create by 1 func
-    questionChoice = if q_answer_choices[choice_key][:iscorrect] == 1.to_s
+    question_choice = if q_answer_choices[choice_key][:iscorrect] == 1.to_s
           QuizQuestionChoice.new(txt: q_answer_choices[choice_key][:txt], iscorrect: "true", question_id: question.id)
         else
           QuizQuestionChoice.new(txt: q_answer_choices[choice_key][:txt], iscorrect: "false", question_id: question.id)
         end
-    questionChoice.save
+    question_choice.save
   end
 
   # create true/false item
   def create_truefalse(question, choice_key, q_answer_choices)
     if q_answer_choices[1.to_s][:iscorrect] == choice_key
-      questionChoice = QuizQuestionChoice.new(txt: "True", iscorrect: "true", question_id: question.id)
-      questionChoice.save
-      questionChoice = QuizQuestionChoice.new(txt: "False", iscorrect: "false", question_id: question.id)
-      questionChoice.save
+      question_choice = QuizQuestionChoice.new(txt: "True", iscorrect: "true", question_id: question.id)
+      question_choice.save
+      question_choice = QuizQuestionChoice.new(txt: "False", iscorrect: "false", question_id: question.id)
+      question_choice.save
     else
-      questionChoice = QuizQuestionChoice.new(txt: "True", iscorrect: "false", question_id: question.id)
-      questionChoice.save
-      questionChoice = QuizQuestionChoice.new(txt: "False", iscorrect: "true", question_id: question.id)
-      questionChoice.save
+      question_choice = QuizQuestionChoice.new(txt: "True", iscorrect: "false", question_id: question.id)
+      question_choice.save
+      question_choice = QuizQuestionChoice.new(txt: "False", iscorrect: "true", question_id: question.id)
+      question_choice.save
     end
   end
 
   # update checkbox item
   def update_checkbox(question_choice, question_index)
     if params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s]
-      question_choice.update_attributes(iscorrect: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:iscorrect], txt: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:txt])
+      question_choice.update_attributes(
+        iscorrect: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:iscorrect], 
+        txt: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:txt])
     else
-      question_choice.update_attributes(iscorrect: '0', txt: params[:quiz_question_choices][question_choice.id.to_s][:txt])
+      question_choice.update_attributes(
+        iscorrect: '0', 
+        txt: params[:quiz_question_choices][question_choice.id.to_s][:txt])
     end
   end
 
   # update radio item
   def update_radio(question_choice, question_index)
     if params[:quiz_question_choices][@question.id.to_s][@question.type][:correctindex] == question_index.to_s
-      question_choice.update_attributes(iscorrect: '1', txt: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:txt])
+      question_choice.update_attributes(
+        iscorrect: '1', 
+        txt: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:txt])
     else
-      question_choice.update_attributes(iscorrect: '0', txt: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:txt])
+      question_choice.update_attributes(
+        iscorrect: '0', 
+        txt: params[:quiz_question_choices][@question.id.to_s][@question.type][question_index.to_s][:txt])
     end
   end
 
@@ -219,8 +226,7 @@ class QuizQuestionnairesController < QuestionnairesController
   # save questionnaire
   def save
     @questionnaire.save!
-
-    save_questions @questionnaire.id if !@questionnaire.id.nil? and @questionnaire.id > 0
+    save_questions @questionnaire.id unless @questionnaire.id.nil? || @questionnaire.id <= 0
     undo_link("Questionnaire \"#{@questionnaire.name}\" has been updated successfully. ")
   end
 

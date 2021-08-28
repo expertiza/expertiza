@@ -20,7 +20,7 @@ class Answer < ActiveRecord::Base
         curr_score = assessment_score(response: [assessment], questions: questions)
 
         scores[:max] = curr_score if curr_score > scores[:max]
-        scores[:min] = curr_score if curr_score < scores[:min] and curr_score != -1
+        scores[:min] = curr_score unless curr_score >= scores[:min] || curr_score == -1
 
         # Check if the review is invalid. If is not valid do not include in score calculation
         if @invalid == 1 or curr_score == -1
@@ -79,7 +79,7 @@ class Answer < ActiveRecord::Base
         end
       end
       max_question_score = questionnaireData[0].q1_max_question_score.to_f
-      if sum_of_weights > 0 && max_question_score && !weighted_score.nil?
+      unless sum_of_weights <= 0 || !max_question_score || weighted_score.nil?
         return (weighted_score / (sum_of_weights * max_question_score)) * 100
       else
         return -1.0 # indicating no score

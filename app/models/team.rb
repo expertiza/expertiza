@@ -54,7 +54,7 @@ class Team < ActiveRecord::Base
     return false if self.parent_id.nil? # course team, does not max_team_size
     max_team_members = Assignment.find(self.parent_id).max_team_size
     curr_team_size = Team.size(self.id)
-    (curr_team_size >= max_team_members)
+    curr_team_size >= max_team_members
   end
 
   # Add member to the team, changed to hash by E1776

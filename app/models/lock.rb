@@ -73,7 +73,7 @@ class Lock < ActiveRecord::Base
       return
     end
     lock = find_by(lockable: lockable)
-    if !lock.nil?
+    unless lock.nil?
       Lock.where(lockable: lockable).destroy_all
     end
   end
@@ -91,6 +91,5 @@ class Lock < ActiveRecord::Base
       lock.save!
       return lockable
     end
-    return nil
   end
 end

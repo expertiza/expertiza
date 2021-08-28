@@ -21,12 +21,12 @@ describe AdminController do
       allow(Assignment).to receive(:find).with('1').and_return(assignment)
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
     end
-    
+
     describe '#action_allowed?' do
         context 'when the student has admin privileges' do
             it 'returns true' do 
                 params = {action: 'list_instructors'}
-                session[:user].role.name = 'Administrator'
+                session[:user].role.name = 'Instructor'
                 expect(controller.action_allowed?).to eq(true)
             end
         end

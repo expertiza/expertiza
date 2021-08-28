@@ -6,8 +6,8 @@ describe AdminController do
     let(:participant2) { build(:participant, id: 2, assignment: assignment, user_id: 1) }
     let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
     let(:admin) { build(:admin) }
-    let(:super_admin_1) { build(:super_admin, id:1)}
-    let(:super_admin_2) { build(:super_admin, id:2)}
+    let(:super_admin_1) { build(:superadmin, id:1)}
+    let(:super_admin_2) { build(:superadmin, id:2)}
     let(:instructor) { build(:instructor, id: 6) }
     let(:question) { build(:question) }
     let(:team) { build(:assignment_team, id: 1, assignment: assignment, users: [instructor]) }

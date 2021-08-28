@@ -6,7 +6,8 @@ describe AdminController do
     let(:participant2) { build(:participant, id: 2, assignment: assignment, user_id: 1) }
     let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
     let(:admin) { build(:admin) }
-    let(:administrator) { build(:administrator) }
+    let(:super_admin_1) { build(:super_admin, id:1)}
+    let(:super_admin_2) { build(:super_admin, id:2)}
     let(:instructor) { build(:instructor, id: 6) }
     let(:question) { build(:question) }
     let(:team) { build(:assignment_team, id: 1, assignment: assignment, users: [instructor]) }
@@ -48,8 +49,6 @@ describe AdminController do
 
     describe '#list_super_administrators' do
         it 'returns super admins' do 
-            let(:super_admin_1) { build(:super_admin, id:1)}
-            let(:super_admin_2) { build(:super_admin, id:2)}
             allow(User).to receive(:where).with(["role_id = ?", Role.superadministrator.id]).and_return([super_admin_1, super_admin_2])
             get :list_super_administrators
             expect(response).to eq([super_admin_1, super_admin_2])

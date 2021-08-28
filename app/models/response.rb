@@ -71,7 +71,7 @@ class Response < ActiveRecord::Base
     total_weight = 0
     scores.each do |s|
       question = Question.find(s.question_id)
-      total_weight += question.weight if !s.answer.nil? && question.is_a?(ScoredQuestion)
+      total_weight += question.weight unless s.answer.nil? || !question.is_a?(ScoredQuestion)
     end
     questionnaire = if scores.empty?
                       questionnaire_by_answer(nil)
@@ -161,7 +161,7 @@ class Response < ActiveRecord::Base
     [comments, counter, @comments_in_round, @counter_in_round]
   end
 
-  def self.get_volume_of_review_comments(assignment_id, reviewer_id)
+  def self.volume_of_review_comments(assignment_id, reviewer_id)
     comments, counter,
       @comments_in_round, @counter_in_round = Response.concatenate_all_review_comments(assignment_id, reviewer_id)
     num_rounds = @comments_in_round.count - 1 #ignore nil element (index 0)
@@ -287,7 +287,7 @@ class Response < ActiveRecord::Base
       tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id) : nil
       code = add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments, current_user
     end
-    comment = if !self.additional_comment.nil?
+    comment = unless self.additional_comment.nil?
                 self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
               else
                 ''

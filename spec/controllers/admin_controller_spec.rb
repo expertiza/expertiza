@@ -54,14 +54,14 @@ describe AdminController do
             allow(super_admin_1).to receive(:id).and_return(1)
             allow(User).to receive(:where).with(["role_id = ?", Role.superadministrator.id]).and_return([super_admin_1, super_admin_2])
             get :list_super_administrators
-            expect(response).to render_template(:list_super_administrators)
+            expect(response).to render_template([:list_super_administrators])
         end
     end
 
     describe '#show_super_administrator' do
         it 'returns a super admin' do
             get :show_super_administrator, id: 1
-            expect(response).to render_template(:show_super_administrator)
+            expect(response).to render_template([:show_super_administrator])
         end
     end
 

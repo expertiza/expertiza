@@ -47,11 +47,13 @@ describe AdminController do
     end
 
     describe '#list_super_administrators' do
-        let(:super_admin_1) { build(:super_admin, id:1)}
-        let(:super_admin_2) { build(:super_admin, id:2)}
-        allow(User).to receive(:where).with(["role_id = ?", Role.superadministrator.id]).and_return([super_admin_1, super_admin_2])
-        get :list_super_administrators
-        expect(response).to eq([super_admin_1, super_admin_2])
+        it 'returns super admins' do 
+            let(:super_admin_1) { build(:super_admin, id:1)}
+            let(:super_admin_2) { build(:super_admin, id:2)}
+            allow(User).to receive(:where).with(["role_id = ?", Role.superadministrator.id]).and_return([super_admin_1, super_admin_2])
+            get :list_super_administrators
+            expect(response).to eq([super_admin_1, super_admin_2])
+        end
     end
 
     describe '#show_super_administrator' do

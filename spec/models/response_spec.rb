@@ -57,12 +57,13 @@ describe Response do
     end
   end
 
-  describe '#total_score' do
+  describe '#aggregate_questionnaire_score' do
     it 'computes the total score of a review' do
       question2 = double('ScoredQuestion', weight: 2)
       allow(Question).to receive(:find).with(1).and_return(question2)
       allow(question2).to receive(:is_a?).with(ScoredQuestion).and_return(true)
-      expect(response.total_score).to eq(2)
+      allow(question2).to receive(:answer).and_return(answer)
+      expect(response.aggregate_questionnaire_score).to eq(2)
     end
   end
 
@@ -76,7 +77,7 @@ describe Response do
 
     context 'when maximum_score does not return 0' do
       it 'calculates the maximum score' do
-        allow(response).to receive(:total_score).and_return(4)
+        allow(response).to receive(:aggregate_questionnaire_score).and_return(4)
         allow(response).to receive(:maximum_score).and_return(5)
         expect(response.average_score).to eq(80)
       end
@@ -185,7 +186,7 @@ describe Response do
       context 'when the difference between average score on same artifact from others and current score is bigger thatn allowed percentage' do
         it 'returns true' do
           allow(Response).to receive(:avg_scores_and_count_for_prev_reviews).with([response], response).and_return([0.8, 2])
-          allow(response).to receive(:total_score).and_return(93)
+          allow(response).to receive(:aggregate_questionnaire_score).and_return(93)
           allow(response).to receive(:maximum_score).and_return(100)
           allow(response).to receive(:questionnaire_by_answer).with(answer).and_return(questionnaire)
           allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
@@ -199,7 +200,7 @@ describe Response do
   describe '.avg_scores_and_count_for_prev_reviews' do
     context 'when current response is not in current response array' do
       it 'returns the average score and count of previous reviews' do
-        allow(response).to receive(:total_score).and_return(96)
+        allow(response).to receive(:aggregate_questionnaire_score).and_return(96)
         allow(response).to receive(:maximum_score).and_return(100)
         expect(Response.avg_scores_and_count_for_prev_reviews([response], double('Response', id: 6))).to eq([0.96, 1])
       end

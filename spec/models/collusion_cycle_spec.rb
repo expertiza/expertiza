@@ -82,12 +82,12 @@ describe CollusionCycle do
     allow(AssignmentParticipant).to receive(:find).with(2).and_return(participant2)
     allow(AssignmentParticipant).to receive(:find).with(3).and_return(participant3)
     allow(AssignmentParticipant).to receive(:find).with(4).and_return(participant4)
-    allow(response_1_2).to receive(:total_score).and_return(90)
-    allow(response_2_1).to receive(:total_score).and_return(95)
-    allow(response_2_3).to receive(:total_score).and_return(82)
-    allow(response_3_1).to receive(:total_score).and_return(97)
-    allow(response_3_4).to receive(:total_score).and_return(80)
-    allow(response_4_1).to receive(:total_score).and_return(0)
+    allow(response_1_2).to receive(:aggregate_questionnaire_score).and_return(90)
+    allow(response_2_1).to receive(:aggregate_questionnaire_score).and_return(95)
+    allow(response_2_3).to receive(:aggregate_questionnaire_score).and_return(82)
+    allow(response_3_1).to receive(:aggregate_questionnaire_score).and_return(97)
+    allow(response_3_4).to receive(:aggregate_questionnaire_score).and_return(80)
+    allow(response_4_1).to receive(:aggregate_questionnaire_score).and_return(0)
   end
 
   describe '#two_node_cycles' do

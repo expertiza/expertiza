@@ -166,7 +166,7 @@ class AssignmentTeam < Team
     assignment.questionnaires.each do |questionnaire|
       scores[questionnaire.symbol] = {}
       scores[questionnaire.symbol][:assessments] = ReviewResponseMap.where(reviewee_id: self.id)
-      scores[questionnaire.symbol][:scores] = Answer.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+      scores[questionnaire.symbol][:scores] = Response.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
     end
     scores[:total_score] = assignment.compute_total_score(scores)
     scores

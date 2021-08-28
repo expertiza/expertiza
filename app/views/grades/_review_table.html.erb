@@ -28,7 +28,7 @@
 
 		<% for review in reviews %>
 		   <td align="center">
-             <% score = Answer.assessment_score(:response => [review], :questions => @questions[symbol], :q_types => []) %>
+             <% score = Response.assessment_score(:response => [review], :questions => @questions[symbol], :q_types => []) %>
              <% if controller.action_name != "view_my_scores" %>
                <input type="hidden" class="form-control" id="mailer_<%= review.map.reviewer.fullname(session[:ip]) %>_grade" name="mailer[<%= review.map.reviewer.fullname(session[:ip]) %>_grade]" value="<%= score %>">
              <% end %>

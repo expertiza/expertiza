@@ -319,4 +319,80 @@ class Response < ActiveRecord::Base
     end
     code
   end
+
+  # Computes the total score for a *list of assessments*
+  # parameters
+  #  assessments - a list of assessments of some type (e.g., author feedback, teammate review)
+  #  questions - the list of questions that was filled out in the process of doing those assessments
+  def self.compute_scores(assessments, questions)
+    scores = {}
+    if assessments.present?
+      scores[:max] = -999_999_999
+      scores[:min] = 999_999_999
+      total_score = 0
+      length_of_assessments = assessments.length.to_f
+      assessments.each do |assessment|
+        curr_score = assessment_score(response: [assessment], questions: questions)
+
+        scores[:max] = curr_score if curr_score > scores[:max]
+        scores[:min] = curr_score unless curr_score >= scores[:min] || curr_score == -1
+
+        # Check if the review is invalid. If is not valid do not include in score calculation
+        if @invalid == 1 || curr_score == -1
+          length_of_assessments -= 1
+          curr_score = 0
+        end
+        total_score += curr_score
+      end
+      scores[:avg] = unless length_of_assessments.zero?
+                       total_score.to_f / length_of_assessments
+                     else
+                       0
+                     end
+    else
+      scores[:max] = nil
+      scores[:min] = nil
+      scores[:avg] = nil
+    end
+
+    scores
+  end
+
+  # Computes the total score for an assessment
+  # params
+  #  assessment - specifies the assessment for which the total score is being calculated
+  #  questions  - specifies the list of questions being evaluated in the assessment
+
+  def self.assessment_score(params)
+    @response = params[:response].last
+    if @response
+      @questions = params[:questions]
+
+      weighted_score = 0
+      sum_of_weights = 0
+      max_question_score = 0
+
+      @questionnaire = Questionnaire.find(@questions.first.questionnaire_id)
+
+      # Retrieve data for questionnaire (max score, sum of scores, weighted scores, etc.)
+      questionnaire_data = ScoreView.questionnaire_data(@questions[0].questionnaire_id, @response.id)
+      weighted_score = questionnaire_data.weighted_score.to_f unless questionnaire_data.weighted_score.nil?
+      sum_of_weights = questionnaire_data.sum_of_weights.to_f
+      answers = Answer.where(response_id: @response.id)
+      answers.each do |answer|
+        question = Question.find(answer.question_id)
+        if answer.answer.nil? && question.is_a?(ScoredQuestion)
+          sum_of_weights -= Question.find(answer.question_id).weight
+        end
+      end
+      max_question_score = questionnaire_data.q1_max_question_score.to_f
+      if sum_of_weights > 0 && max_question_score && weighted_score
+        return (weighted_score / (sum_of_weights * max_question_score)) * 100
+      else
+        return -1.0 # indicating no score
+      end
+    end
+  end
+
+
 end

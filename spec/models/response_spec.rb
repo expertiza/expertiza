@@ -291,19 +291,19 @@ describe Response do
     end
 
     it "returns -1 when answer is nil for scored question which makes sum of weights = 0" do
-      allow(ScoreView).to receive(:questionnaire_data).and_return(double("scoreview", weighted_score: 20, sum_of_weights: 1, q1_max_question_score: 4))
+      allow(ScoreView).to receive(:questionnaire_data).and_return(double("scoreview", weighted_score: 20, sum_of_weights: 1, q1_max_question_score: 5))
       allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
       expect(Response.assessment_score(response: [response_record], questions: [question1])).to eq -1.0
     end
 
     it "returns -1 when weighted_score of questionnaireData is nil" do
-      allow(ScoreView).to receive(:questionnaire_data).and_return(double("scoreview", weighted_score: nil, sum_of_weights: 5, q1_max_question_score: 4))
+      allow(ScoreView).to receive(:questionnaire_data).and_return(double("scoreview", weighted_score: nil, sum_of_weights: 5, q1_max_question_score: 5))
       allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
       expect(Response.assessment_score(response: [response_record], questions: [question1])).to eq -1.0
     end
 
     it "checks if submission_valid? is called" do
-      allow(ScoreView).to receive(:questionnaire_data).and_return(double("scoreview", weighted_score: nil, sum_of_weights: 5, q1_max_question_score: 4))
+      allow(ScoreView).to receive(:questionnaire_data).and_return(double("scoreview", weighted_score: nil, sum_of_weights: 5, q1_max_question_score: 5))
       allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
       expect(Answer).to receive(:submission_valid?)
       Response.assessment_score(response: [response_record], questions: [question1])

@@ -57,8 +57,8 @@ def peer_review_questions_for_team(team, round_number = nil)
 end
 
 def calc_review_score
-  if !@corresponding_response.empty?
-    @this_review_score_raw = Answer.get_total_score(response: @corresponding_response, questions: @questions)
+  unless @corresponding_response.empty?
+    @this_review_score_raw = Answer.assessment_score(response: @corresponding_response, questions: @questions)
     if @this_review_score_raw
       @this_review_score = ((@this_review_score_raw * 100) / 100.0).round if @this_review_score_raw >= 0.0
     end
@@ -76,7 +76,7 @@ def scores_varying_rubrics
       @corresponding_response = Response.where('map_id = ?', response_map.id)
       @corresponding_response = @corresponding_response.select {|response| response.round == round } unless @corresponding_response.empty?
       @respective_scores = {}
-      @respective_scores = reviewer[round] if !reviewer.nil? && !reviewer[round].nil?
+      @respective_scores = reviewer[round] unless reviewer.nil? || reviewer[round].nil?
       calc_review_score
       @respective_scores[response_map.reviewee_id] = @this_review_score
       reviewer = {} if reviewer.nil?

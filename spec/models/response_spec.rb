@@ -15,6 +15,7 @@ describe Response do
   let(:questionnaire2) { ReviewQuestionnaire.new(id: 2, questions: [question2], max_question_score: 5) }
   let(:tag_prompt) {TagPrompt.new(id: 1, prompt: "prompt")}
   let(:tag_prompt_deployment) {TagPromptDeployment.new(id: 1, tag_prompt_id: 1, assignment_id: 1, questionnaire_id: 1, question_type: 'Criterion')}
+  let(:response_map) { create(:review_response_map, id: 1, reviewed_object_id: 1) }
   let!(:response_record) { create(:response, id: 1, map_id: 1, response_map: response_map) }
   before(:each) do
     allow(response).to receive(:map).and_return(review_response_map)

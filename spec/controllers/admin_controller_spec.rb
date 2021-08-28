@@ -6,6 +6,7 @@ describe AdminController do
     let(:participant2) { build(:participant, id: 2, assignment: assignment, user_id: 1) }
     let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
     let(:admin) { build(:admin) }
+    let(:administrator) { build(:administrator) }
     let(:instructor) { build(:instructor, id: 6) }
     let(:question) { build(:question) }
     let(:team) { build(:assignment_team, id: 1, assignment: assignment, users: [instructor]) }
@@ -26,7 +27,7 @@ describe AdminController do
         context 'when the student has admin privileges' do
             it 'returns true' do 
                 params = {action: 'list_instructors'}
-                session[:user].role.name = 'Instructor'
+                session[:user].role.name = 'Administrator'
                 expect(controller.action_allowed?).to eq(true)
             end
         end

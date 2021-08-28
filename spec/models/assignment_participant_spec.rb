@@ -52,7 +52,7 @@ describe AssignmentParticipant do
                                                          .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
       allow(review_questionnaire).to receive(:symbol).and_return(:review)
       allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([response])
-      allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
+      allow(Response).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
       allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
     end
     context 'when assignment is not varying rubric by round and not an microtask' do
@@ -109,7 +109,7 @@ describe AssignmentParticipant do
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
                                                            .and_return(double('AssignmentQuestionnaire', used_in_round: nil))
         allow(review_questionnaire).to receive(:get_assessments_for).with(participant).and_return([response])
-        allow(Answer).to receive(:compute_scores).with(any_args).and_return(score_map)
+        allow(Response).to receive(:compute_scores).with(any_args).and_return(score_map)
         participant.compute_assignment_score(question_hash, scores)
         expect(scores[:review][:assessments]).to eq([response])
         expect(scores[:review][:scores]).to eq(score_map)
@@ -124,7 +124,7 @@ describe AssignmentParticipant do
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
                                                            .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
         allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([response])
-        allow(Answer).to receive(:compute_scores).with(any_args).and_return(score_map)
+        allow(Response).to receive(:compute_scores).with(any_args).and_return(score_map)
         participant.compute_assignment_score(question_hash, scores)
         expect(scores[:review1][:assessments]).to eq([response])
         expect(scores[:review1][:scores]).to eq(score_map)

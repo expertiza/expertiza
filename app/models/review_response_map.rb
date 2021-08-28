@@ -137,7 +137,7 @@ class ReviewResponseMap < ResponseMap
         @reviewers << ReviewResponseMap.get_reviewer_with_id(assignment.id, reviewer_id_from_response_map.reviewer_id)
       end
       # we sort the reviewer by name here, using whichever class it is an instance of
-      if not assignment.reviewer_is_team
+      unless assignment.reviewer_is_team
         @reviewers = Participant.sort_by_name(@reviewers)
       else
         @reviewers = Team.sort_by_name(@reviewers)
@@ -146,13 +146,13 @@ class ReviewResponseMap < ResponseMap
       # This is a search, so find reviewers by user's full name
       user_ids = User.select("DISTINCT id").where('fullname LIKE ?', '%' + review_user[:fullname] + '%')
       #E1973 - we use a separate query depending on if the reviewer is a team or participant
-      if not assignment.reviewer_is_team
+      unless assignment.reviewer_is_team
         @reviewers = AssignmentParticipant.where('user_id IN (?) and parent_id = ?', user_ids, assignment.id)
       else
         reviewer_participants = AssignmentTeam.where('id IN (?) and parent_id = ?', team_ids, assignment.id)
         @reviewers = []
         reviewer_participants.each do |participant|
-          if not @reviewers.include? participant.team
+          unless @reviewers.include? participant.team
             @reviewers << participant.team
           end
         end

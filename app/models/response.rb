@@ -43,7 +43,7 @@ class Response < ActiveRecord::Base
     sum = 0
     scores.each do |s|
       question = Question.find(s.question_id)
-      sum += s.answer * question.weight if !s.answer.nil? && question.is_a?(ScoredQuestion)
+      sum += s.answer * question.weight unless s.answer.nil? || !question.is_a?(ScoredQuestion)
     end
     sum
   end
@@ -70,7 +70,7 @@ class Response < ActiveRecord::Base
     total_weight = 0
     scores.each do |s|
       question = Question.find(s.question_id)
-      total_weight += question.weight if !s.answer.nil? && question.is_a?(ScoredQuestion)
+      total_weight += question.weight unless s.answer.nil? || !question.is_a?(ScoredQuestion)
     end
     questionnaire = if scores.empty?
                       questionnaire_by_answer(nil)
@@ -160,7 +160,7 @@ class Response < ActiveRecord::Base
     [comments, counter, @comments_in_round, @counter_in_round]
   end
 
-  def self.get_volume_of_review_comments(assignment_id, reviewer_id)
+  def self.volume_of_review_comments(assignment_id, reviewer_id)
     comments, counter,
       @comments_in_round, @counter_in_round = Response.concatenate_all_review_comments(assignment_id, reviewer_id)
     num_rounds = @comments_in_round.count - 1 #ignore nil element (index 0)
@@ -203,7 +203,7 @@ class Response < ActiveRecord::Base
     scores_assigned = []
     count = 0
     existing_responses.each do |existing_response|
-      if existing_response.id != current_response.id # the current_response is also in existing_responses array
+      unless existing_response.id == current_response.id # the current_response is also in existing_responses array
         count += 1
         scores_assigned << existing_response.total_score.to_f / existing_response.maximum_score
       end
@@ -286,7 +286,7 @@ class Response < ActiveRecord::Base
       tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id) : nil
       code = add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments, current_user
     end
-    comment = if !self.additional_comment.nil?
+    comment = unless self.additional_comment.nil?
                 self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
               else
                 ''
@@ -299,12 +299,12 @@ class Response < ActiveRecord::Base
     count = 0
     # loop through questions so the the questions are displayed in order based on seq (sequence number)
     questions.each do |question|
-      count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
+      count += 1 unless question.is_a? QuestionnaireHeader || !question.break_before
       answer = answers.find {|a| a.question_id == question.id }
       row_class = count.even? ? "info" : "warning"
       row_class = "" if question.is_a? QuestionnaireHeader
       code += '<tr class="' + row_class + '"><td>'
-      if !answer.nil? or question.is_a? QuestionnaireHeader
+      unless answer.nil? && !question.is_a? QuestionnaireHeader
         code += if question.instance_of? Criterion
                   # Answer Tags are enabled only for Criterion questions at the moment.
                   question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments, current_user) || ''

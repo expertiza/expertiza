@@ -386,7 +386,7 @@ class Response < ActiveRecord::Base
         end
       end
       max_question_score = questionnaire_data.q1_max_question_score.to_f
-      if sum_of_weights > 0 && max_question_score && !weighted_score.nil?
+      if sum_of_weights > 0 && max_question_score && weighted_score > 0
         return (weighted_score / (sum_of_weights * max_question_score)) * 100
       else
         return -1.0 # indicating no score

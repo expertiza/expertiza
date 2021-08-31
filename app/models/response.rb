@@ -71,7 +71,7 @@ class Response < ActiveRecord::Base
     total_weight = 0
     scores.each do |s|
       question = Question.find(s.question_id)
-      total_weight += question.weight if !s.answer.nil? && question.is_a?(ScoredQuestion)
+      total_weight += question.weight unless s.answer.nil? || !question.is_a?(ScoredQuestion)
     end
     questionnaire = if scores.empty?
                       questionnaire_by_answer(nil)
@@ -108,7 +108,7 @@ class Response < ActiveRecord::Base
 
     most_recent_submission_by_reviewee = reviewee_team.most_recent_submission if reviewee_team
 
-    if response.nil? || (most_recent_submission_by_reviewee and most_recent_submission_by_reviewee.updated_at > response.updated_at)
+    if response.nil? || (most_recent_submission_by_reviewee && most_recent_submission_by_reviewee.updated_at > response.updated_at)
       response = Response.create(map_id: response_map.id, additional_comment: '', round: current_round, is_submitted: 0)
     end
     response
@@ -287,7 +287,7 @@ class Response < ActiveRecord::Base
       tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id) : nil
       code = add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments, current_user
     end
-    comment = if !self.additional_comment.nil?
+    comment = unless self.additional_comment.nil?
                 self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
               else
                 ''
@@ -305,7 +305,7 @@ class Response < ActiveRecord::Base
       row_class = count.even? ? "info" : "warning"
       row_class = "" if question.is_a? QuestionnaireHeader
       code += '<tr class="' + row_class + '"><td>'
-      if !answer.nil? or question.is_a? QuestionnaireHeader
+      unless answer.nil? && !question.is_a? QuestionnaireHeader
         code += if question.instance_of? Criterion
                   # Answer Tags are enabled only for Criterion questions at the moment.
                   question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments, current_user) || ''
@@ -386,7 +386,7 @@ class Response < ActiveRecord::Base
         end
       end
       max_question_score = questionnaire_data.q1_max_question_score.to_f
-      unless sum_of_weights <= 0 || !max_question_score || weighted_score.nil?
+      if sum_of_weights > 0  && max_question_score && !weighted_score.nil?
         return (weighted_score / (sum_of_weights * max_question_score)) * 100
       else
         return -1.0 # indicating no score

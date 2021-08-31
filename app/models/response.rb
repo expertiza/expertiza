@@ -326,7 +326,7 @@ class Response < ActiveRecord::Base
   #  questions - the list of questions that was filled out in the process of doing those assessments
   def self.compute_scores(assessments, questions)
     scores = {}
-    if assessments.present? || questions.any?
+    if assessments.present?
       scores[:max] = -999_999_999
       scores[:min] = 999_999_999
       total_score = 0

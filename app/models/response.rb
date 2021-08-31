@@ -365,10 +365,10 @@ class Response < ActiveRecord::Base
 
   def self.assessment_score(params)
     @response = params[:response].last
-    return "no response found" if @response.nil? 
+    return -1.0 "no response found" if @response.nil? 
     if @response
       @questions = params[:questions]
-      return if @questions.nil? 
+      return -1.0 if @questions.nil? 
       weighted_score = 0
       sum_of_weights = 0
       max_question_score = 0

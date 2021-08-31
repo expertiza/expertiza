@@ -365,14 +365,15 @@ class Response < ActiveRecord::Base
 
   def self.assessment_score(params)
     @response = params[:response].last
+    raise "no response found" if @response.nil? 
     if @response
       @questions = params[:questions]
-
+      raise "no questions found" if @questions.nil? 
       weighted_score = 0
       sum_of_weights = 0
       max_question_score = 0
 
-      @questionnaire = Questionnaire.find(@questions.first.questionnaire_id)
+      @questionnaire = Questionnaire.find(@questions.first.questionnaire_id) 
 
       # Retrieve data for questionnaire (max score, sum of scores, weighted scores, etc.)
       questionnaire_data = ScoreView.questionnaire_data(@questions[0].questionnaire_id, @response.id)

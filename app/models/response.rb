@@ -365,7 +365,7 @@ class Response < ActiveRecord::Base
 
   def self.assessment_score(params)
     @response = params[:response].last
-    return -1.0 "no response found" if @response.nil? 
+    return -1.0 if @response.nil? 
     if @response
       @questions = params[:questions]
       return -1.0 if @questions.nil? 

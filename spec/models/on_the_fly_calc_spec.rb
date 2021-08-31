@@ -32,7 +32,7 @@ describe OnTheFlyCalc do
     let!(:response_record) { create(:response, id: 1, response_map: response_map) }
     let!(:response_record2) { create(:response, id: 2, response_map: response_map2) }
     before(:each) do
-      allow(Answer).to receive(:assessment_score).and_return(50, 30)
+      allow(Response).to receive(:assessment_score).and_return(50, 30)
       allow(ResponseMap).to receive(:where).and_return([response_map, response_map2])
       allow(SignedUpTeam).to receive(:find_by).with(team_id: contributor.id).and_return(signed_up_team)
     end
@@ -56,7 +56,7 @@ describe OnTheFlyCalc do
     before(:each) do
       score = {min: 50.0, max: 50.0, avg: 50.0}
       allow(on_the_fly_calc).to receive(:contributors).and_return([contributor])
-      allow(Answer).to receive(:compute_scores).with([], [question1]).and_return(score)
+      allow(Response).to receive(:compute_scores).with([], [question1]).and_return(score)
       allow(ReviewResponseMap).to receive(:get_assessments_for).with(contributor).and_return([])
       allow(SignedUpTeam).to receive(:find_by).with(team_id: contributor.id).and_return(signed_up_team)
       allow(on_the_fly_calc).to receive(:review_questionnaire_id).and_return(1)

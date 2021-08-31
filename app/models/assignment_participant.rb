@@ -84,8 +84,8 @@ class AssignmentParticipant < Participant
                                                    else
                                                      questionnaire.get_assessments_round_for(self, round)
                                                    end
-      # Anser.compute_scores computes the total score for a *list of assessments*                                                    
-      scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
+      # Response.compute_scores computes the total score for a list of responses to a questionnaire                                                    
+      scores[questionnaire_symbol][:scores] = Response.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
     end
   end
 

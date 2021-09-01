@@ -9,7 +9,8 @@ class AssignmentForm
                 :is_conference_assignment,
                 :auto_assign_mentor
 
-  attr_accessor :errors
+  attr_accessor :errors,
+                :rubric_weight_error
 
   DEFAULT_MAX_TEAM_SIZE = 1
 
@@ -33,6 +34,7 @@ class AssignmentForm
     assignment_form.due_dates = AssignmentDueDate.where(parent_id: assignment_id)
     assignment_form.set_up_assignment_review
     assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: assignment_id)
+    assignment_form.rubric_weight_error = false
     assignment_form
   end
 
@@ -106,6 +108,20 @@ class AssignmentForm
   def validate_assignment_questionnaires_weights(attributes)
     total_weight = 0
     attributes.each do |assignment_questionnaire|
+      # Check rubrics to make sure weight is 0 if there are no Scored Questions
+      scored_questionnaire = false
+      questions = Question.where(questionnaire_id: assignment_questionnaire[:questionnaire_id])
+      questions.each do |question|
+        if question.is_a? ScoredQuestion
+          scored_questionnaire = true
+        end
+      end
+      unless scored_questionnaire || assignment_questionnaire[:questionnaire_weight].to_i == 0
+        assignment_form.rubric_weight_error = true
+      else
+        assignment_form.rubric_weight_error = false
+      end
+
       total_weight += assignment_questionnaire[:questionnaire_weight].to_i
     end
     if total_weight != 0 and total_weight != 100

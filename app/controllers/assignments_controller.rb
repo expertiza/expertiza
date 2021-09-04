@@ -109,7 +109,7 @@ class AssignmentsController < ApplicationController
     else
       # SAVE button was used (do a redirect)
       redirect_to edit_assignment_path @assignment_form.assignment.id
-      if @assignment_form.assignment.rubric_weight_error
+      if @assignment_form.rubric_weight_error
         flash[:error] = "A rubric has no ScoredQuestions, but still has a weight. Please change the weight to 0."
       end
     end

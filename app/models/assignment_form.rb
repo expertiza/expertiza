@@ -24,7 +24,7 @@ class AssignmentForm
     @assignment.num_review_of_reviews = @assignment.num_metareviews_allowed
     @assignment_questionnaires = Array(args[:assignment_questionnaires])
     @due_dates = Array(args[:due_dates])
-    @assignment.rubric_weight_error = false
+    @rubric_weight_error = false
   end
 
   # create a form object for this assignment_id

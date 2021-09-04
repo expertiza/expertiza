@@ -1,6 +1,7 @@
 class AuthController < ApplicationController
   include AuthorizationHelper
   helper :auth
+  before_action :authenticate_user!
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[login logout],
@@ -20,7 +21,7 @@ class AuthController < ApplicationController
       AuthController.clear_session(session)
     else
       user = User.find_by_login(params[:login][:name])
-      if user and user.valid_password?(params[:login][:password])
+      if user_signed_in?
         after_login(user)
       else
         ExpertizaLogger.error LoggerMessage.new(controller_name, "", 'Failed login attempt. Invalid username/password', request)

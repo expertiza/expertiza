@@ -6,9 +6,9 @@ Expertiza::Application.configure do
   # since you don't have to restart the webserver when you make code changes.
   config.cache_classes = false
   #config.serve_static_assets = false
-  # config.action_mailer.default_url_options = { :host => 'localhost:3000' }
+  config.action_mailer.default_url_options = { :host => 'localhost:3000' }
   host = '152.7.98.82:8080'
-  config.action_mailer.default_url_options = { :host => '152.7.98.82:8080', protocol: 'http'  }
+  # config.action_mailer.default_url_options = { :host => '152.7.98.82:8080', protocol: 'http'  }
   # Do not eager load code on boot.
   config.eager_load = false
 

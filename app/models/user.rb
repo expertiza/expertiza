@@ -1,10 +1,8 @@
 class User < ActiveRecord::Base
-  acts_as_authentic do |config|
-    config.validates_uniqueness_of_email_field_options = {if: -> { false }} # Don't validate email uniqueness
-    config.crypto_provider = Authlogic::CryptoProviders::Sha1
-    Authlogic::CryptoProviders::Sha1.join_token = ''
-    Authlogic::CryptoProviders::Sha1.stretches = 1
-  end
+  # Include default devise modules. Others available are:
+  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
+  devise :database_authenticatable, :registerable,
+         :recoverable, :rememberable, :validatable
   #Added for E1973. A user can hold a lock on a resource
   has_many :locks, class_name: 'Lock', foreign_key: 'user_id', dependent: :destroy, inverse_of: false
   has_many :participants, class_name: 'Participant', foreign_key: 'user_id', dependent: :destroy

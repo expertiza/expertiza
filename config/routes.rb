@@ -1,5 +1,6 @@
 
 Expertiza::Application.routes.draw do
+  devise_for :users
   ###
   # Please insert new routes alphabetically!
   ###

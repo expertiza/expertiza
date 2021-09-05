@@ -503,6 +503,8 @@ class AssignmentsController < ApplicationController
   def update_feedback_attributes
     if params[:set_pressed][:bool] == 'false'
       flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."
+    elsif @assignment_form.update_attributes(assignment_form_params, current_user)
+      # flash[:note] = 'The assignment was successfully saved....'
     else
       flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.get(:message)}"
     end

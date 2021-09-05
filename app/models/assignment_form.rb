@@ -116,7 +116,7 @@ class AssignmentForm
           scored_questionnaire = true
         end
       end
-      unless scored_questionnaire || assignment_questionnaire[:questionnaire_weight].to_i == 0
+      unless scored_questionnaire || assignment_questionnaire[:questionnaire_weight].to_i.zero?
         @rubric_weight_error = true
       else
         @rubric_weight_error = false

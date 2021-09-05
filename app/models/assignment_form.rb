@@ -37,7 +37,7 @@ class AssignmentForm
   end
 
   def rubric_weight_error(attributes)
-    attributes.each do |assignment_questionnaire|
+    attributes[:assignment_questionnaire].each do |assignment_questionnaire|
       # Check rubrics to make sure weight is 0 if there are no Scored Questions
       scored_questionnaire = false
       questionnaire = Questionnaire.find(assignment_questionnaire[:questionnaire_id])

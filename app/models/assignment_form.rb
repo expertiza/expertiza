@@ -46,6 +46,7 @@ class AssignmentForm
         if question.is_a? ScoredQuestion
           scored_questionnaire = true
         end
+        puts scored_questionnaire
       end
       unless scored_questionnaire || assignment_questionnaire[:questionnaire_weight].to_i.zero?
         true

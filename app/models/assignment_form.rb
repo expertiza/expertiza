@@ -40,7 +40,7 @@ class AssignmentForm
     attributes.each do |assignment_questionnaire|
       # Check rubrics to make sure weight is 0 if there are no Scored Questions
       scored_questionnaire = false
-      questions = Question.where(questionnaire_id: assignment_questionnaire[:questionnaire_id])
+      questions = Question.where(questionnaire_id: assignment_questionnaire.questionnaire.id)
       questions.each do |question|
         if question.is_a? ScoredQuestion
           scored_questionnaire = true

@@ -15,7 +15,7 @@ cache:
   directories:
     - vendor/assets/components
 rvm:
-  - 2.6.3
+  - 2.3.7
 branches:
   only:
     - master

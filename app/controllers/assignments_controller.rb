@@ -506,7 +506,7 @@ class AssignmentsController < ApplicationController
         flash[:error] = "A rubric has no ScoredQuestions, but still has a weight. Please change the weight to 0."
       end
     else
-      flash[:error] = "Failed to save the assignment: #{@assignment_form.errors.full_messages.join(' ')}"
+      flash[:error] = "Failed to save the assignment: #{@assignment_form.errors}"
     end
     ExpertizaLogger.info LoggerMessage.new("", session[:user].name, "The assignment was saved: #{@assignment_form.as_json}", request)
   end

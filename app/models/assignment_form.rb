@@ -51,8 +51,6 @@ class AssignmentForm
       puts scored_questionnaire
       unless scored_questionnaire || assignment_questionnaire[:questionnaire_weight].to_i.zero?
         error = true
-      else
-        error = false
       end
     end
     error

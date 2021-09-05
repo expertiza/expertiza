@@ -502,7 +502,7 @@ class AssignmentsController < ApplicationController
       flash[:error] = "There has been some submissions for the rounds of reviews that you're trying to reduce. You can only increase the round of review."
     elsif @assignment_form.update_attributes(assignment_form_params, current_user)
       # flash[:note] = 'The assignment was successfully saved....'
-      if @assignment_form.rubric_weight_error
+      if @assignment_form.rubric_weight_error(assignment_form_params)
         flash[:note] = "A rubric has no ScoredQuestions, but still has a weight. Please change the weight to 0."
       end
     else

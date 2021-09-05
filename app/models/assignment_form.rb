@@ -9,8 +9,7 @@ class AssignmentForm
                 :is_conference_assignment,
                 :auto_assign_mentor
 
-  attr_accessor :errors,
-                :rubric_weight_error
+  attr_accessor :errors
 
   DEFAULT_MAX_TEAM_SIZE = 1
 
@@ -24,7 +23,6 @@ class AssignmentForm
     @assignment.num_review_of_reviews = @assignment.num_metareviews_allowed
     @assignment_questionnaires = Array(args[:assignment_questionnaires])
     @due_dates = Array(args[:due_dates])
-    @rubric_weight_error = false
   end
 
   # create a form object for this assignment_id
@@ -36,6 +34,23 @@ class AssignmentForm
     assignment_form.set_up_assignment_review
     assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: assignment_id)
     assignment_form
+  end
+
+  def rubric_weight_error(attributes)
+    attributes.each do |assignment_questionnaire|
+      # Check rubrics to make sure weight is 0 if there are no Scored Questions
+      scored_questionnaire = false
+      questions = Question.where(questionnaire_id: assignment_questionnaire[:questionnaire_id])
+      questions.each do |question|
+        if question.is_a? ScoredQuestion
+          scored_questionnaire = true
+        end
+      end
+      unless scored_questionnaire || assignment_questionnaire[:questionnaire_weight].to_i.zero?
+        true
+      else
+        false
+      end
   end
 
   def update(attributes, user, vary_by_topic_desired = false)
@@ -108,20 +123,6 @@ class AssignmentForm
   def validate_assignment_questionnaires_weights(attributes)
     total_weight = 0
     attributes.each do |assignment_questionnaire|
-      # Check rubrics to make sure weight is 0 if there are no Scored Questions
-      scored_questionnaire = false
-      questions = Question.where(questionnaire_id: assignment_questionnaire[:questionnaire_id])
-      questions.each do |question|
-        if question.is_a? ScoredQuestion
-          scored_questionnaire = true
-        end
-      end
-      unless scored_questionnaire || assignment_questionnaire[:questionnaire_weight].to_i.zero?
-        @rubric_weight_error = true
-      else
-        @rubric_weight_error = false
-      end
-
       total_weight += assignment_questionnaire[:questionnaire_weight].to_i
     end
     if total_weight != 0 and total_weight != 100

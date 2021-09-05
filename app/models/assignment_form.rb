@@ -51,6 +51,7 @@ class AssignmentForm
       else
         false
       end
+    end
   end
 
   def update(attributes, user, vary_by_topic_desired = false)

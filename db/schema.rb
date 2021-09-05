@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210422185445) do
+ActiveRecord::Schema.define(version: 20210904060510) do
 
   create_table "account_requests", force: :cascade do |t|
     t.string   "name",              limit: 255
@@ -124,8 +124,8 @@ ActiveRecord::Schema.define(version: 20210422185445) do
     t.integer  "simicheck_threshold",                                limit: 4,     default: 100
     t.boolean  "is_answer_tagging_allowed"
     t.boolean  "has_badge"
-    t.integer  "sample_assignment_id",                               limit: 4
     t.boolean  "allow_selecting_additional_reviews_after_1st_round"
+    t.integer  "sample_assignment_id",                               limit: 4
     t.boolean  "vary_by_topic",                                                    default: false
     t.boolean  "vary_by_round",                                                    default: false
     t.boolean  "reviewer_is_team"
@@ -749,14 +749,14 @@ ActiveRecord::Schema.define(version: 20210422185445) do
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 
   create_table "track_notifications", force: :cascade do |t|
-    t.integer  "notification_id", limit: 4
     t.integer  "user_id",         limit: 4
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "notification_id", limit: 4, null: false
   end
 
-  add_index "track_notifications", ["notification_id"], name: "index_track_notifications_on_notification_id", using: :btree
-  add_index "track_notifications", ["user_id"], name: "index_track_notifications_on_user_id", using: :btree
+  add_index "track_notifications", ["notification_id"], name: "notification_id", using: :btree
+  add_index "track_notifications", ["user_id"], name: "user_id", using: :btree
 
   create_table "tree_folders", force: :cascade do |t|
     t.string  "name",       limit: 255
@@ -773,30 +773,40 @@ ActiveRecord::Schema.define(version: 20210422185445) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string  "name",                      limit: 255,      default: "",    null: false
-    t.string  "crypted_password",          limit: 40,       default: "",    null: false
-    t.integer "role_id",                   limit: 4,        default: 0,     null: false
-    t.string  "password_salt",             limit: 255
-    t.string  "fullname",                  limit: 255
-    t.string  "email",                     limit: 255
-    t.integer "parent_id",                 limit: 4
-    t.boolean "private_by_default",                         default: false
-    t.string  "mru_directory_path",        limit: 128
-    t.boolean "email_on_review"
-    t.boolean "email_on_submission"
-    t.boolean "email_on_review_of_review"
-    t.boolean "is_new_user",                                default: true,  null: false
-    t.integer "master_permission_granted", limit: 1,        default: 0
-    t.string  "handle",                    limit: 255
-    t.text    "digital_certificate",       limit: 16777215
-    t.string  "persistence_token",         limit: 255
-    t.string  "timezonepref",              limit: 255
-    t.text    "public_key",                limit: 16777215
-    t.boolean "copy_of_emails",                             default: false
-    t.integer "institution_id",            limit: 4
-    t.boolean "preference_home_flag",                       default: true
+    t.string   "name",                      limit: 255,      default: "",    null: false
+    t.string   "crypted_password",          limit: 40,       default: "",    null: false
+    t.integer  "role_id",                   limit: 4,        default: 0,     null: false
+    t.string   "fullname",                  limit: 255
+    t.string   "email",                     limit: 255
+    t.integer  "parent_id",                 limit: 4
+    t.boolean  "private_by_default",                         default: false
+    t.string   "mru_directory_path",        limit: 128
+    t.boolean  "email_on_review"
+    t.boolean  "email_on_submission"
+    t.boolean  "email_on_review_of_review"
+    t.boolean  "is_new_user",                                default: true,  null: false
+    t.integer  "master_permission_granted", limit: 1,        default: 0
+    t.string   "handle",                    limit: 255
+    t.text     "digital_certificate",       limit: 16777215
+    t.string   "persistence_token",         limit: 255
+    t.string   "timezonepref",              limit: 255
+    t.text     "public_key",                limit: 16777215
+    t.boolean  "copy_of_emails",                             default: false
+    t.integer  "institution_id",            limit: 4
+    t.boolean  "preference_home_flag",                       default: true
+    t.string   "reset_password_token",      limit: 255
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.string   "unconfirmed_email",         limit: 254
+    t.string   "remember_token",            limit: 255
+    t.string   "authentication_token",      limit: 255
+    t.string   "confirmation_token",        limit: 255
+    t.datetime "confirmed_at"
+    t.datetime "confirmation_sent_at"
   end
 
+  add_index "users", ["email"], name: "index_users_on_email", using: :btree
+  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree
 
   create_table "versions", force: :cascade do |t|
@@ -853,6 +863,4 @@ ActiveRecord::Schema.define(version: 20210422185445) do
   add_foreign_key "tag_prompt_deployments", "tag_prompts"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
-  add_foreign_key "track_notifications", "notifications"
-  add_foreign_key "track_notifications", "users"
 end

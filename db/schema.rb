@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210904060510) do
+ActiveRecord::Schema.define(version: 20210422185445) do
 
   create_table "account_requests", force: :cascade do |t|
     t.string   "name",              limit: 255
@@ -125,7 +125,6 @@ ActiveRecord::Schema.define(version: 20210904060510) do
     t.boolean  "is_answer_tagging_allowed"
     t.boolean  "has_badge"
     t.boolean  "allow_selecting_additional_reviews_after_1st_round"
-    t.integer  "sample_assignment_id",                               limit: 4
     t.boolean  "vary_by_topic",                                                    default: false
     t.boolean  "vary_by_round",                                                    default: false
     t.boolean  "reviewer_is_team"
@@ -136,7 +135,6 @@ ActiveRecord::Schema.define(version: 20210904060510) do
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
   add_index "assignments", ["instructor_id"], name: "fk_assignments_instructors", using: :btree
   add_index "assignments", ["late_policy_id"], name: "fk_late_policy_id", using: :btree
-  add_index "assignments", ["sample_assignment_id"], name: "fk_rails_b01b82a1a2", using: :btree
 
   create_table "automated_metareviews", force: :cascade do |t|
     t.float    "relevance",         limit: 24
@@ -648,12 +646,11 @@ ActiveRecord::Schema.define(version: 20210904060510) do
   end
 
   create_table "suggestion_comments", force: :cascade do |t|
-    t.text     "comments",           limit: 65535
-    t.string   "commenter",          limit: 255
-    t.string   "vote",               limit: 255
-    t.integer  "suggestion_id",      limit: 4
+    t.text     "comments",      limit: 65535
+    t.string   "commenter",     limit: 255
+    t.string   "vote",          limit: 255
+    t.integer  "suggestion_id", limit: 4
     t.datetime "created_at"
-    t.boolean  "visible_to_student",               default: false
   end
 
   create_table "suggestions", force: :cascade do |t|
@@ -737,7 +734,6 @@ ActiveRecord::Schema.define(version: 20210904060510) do
     t.integer "directory_num",              limit: 4
     t.integer "grade_for_submission",       limit: 4
     t.text    "comment_for_submission",     limit: 65535
-    t.boolean "make_public",                              default: false
   end
 
   create_table "teams_users", force: :cascade do |t|
@@ -773,40 +769,30 @@ ActiveRecord::Schema.define(version: 20210904060510) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string   "name",                      limit: 255,      default: "",    null: false
-    t.string   "crypted_password",          limit: 40,       default: "",    null: false
-    t.integer  "role_id",                   limit: 4,        default: 0,     null: false
-    t.string   "fullname",                  limit: 255
-    t.string   "email",                     limit: 255
-    t.integer  "parent_id",                 limit: 4
-    t.boolean  "private_by_default",                         default: false
-    t.string   "mru_directory_path",        limit: 128
-    t.boolean  "email_on_review"
-    t.boolean  "email_on_submission"
-    t.boolean  "email_on_review_of_review"
-    t.boolean  "is_new_user",                                default: true,  null: false
-    t.integer  "master_permission_granted", limit: 1,        default: 0
-    t.string   "handle",                    limit: 255
-    t.text     "digital_certificate",       limit: 16777215
-    t.string   "persistence_token",         limit: 255
-    t.string   "timezonepref",              limit: 255
-    t.text     "public_key",                limit: 16777215
-    t.boolean  "copy_of_emails",                             default: false
-    t.integer  "institution_id",            limit: 4
-    t.boolean  "preference_home_flag",                       default: true
-    t.string   "reset_password_token",      limit: 255
-    t.datetime "reset_password_sent_at"
-    t.datetime "remember_created_at"
-    t.string   "unconfirmed_email",         limit: 254
-    t.string   "remember_token",            limit: 255
-    t.string   "authentication_token",      limit: 255
-    t.string   "confirmation_token",        limit: 255
-    t.datetime "confirmed_at"
-    t.datetime "confirmation_sent_at"
+    t.string  "name",                      limit: 255,      default: "",    null: false
+    t.string  "crypted_password",          limit: 40,       default: "",    null: false
+    t.integer "role_id",                   limit: 4,        default: 0,     null: false
+    t.string  "password_salt",             limit: 255
+    t.string  "fullname",                  limit: 255
+    t.string  "email",                     limit: 255
+    t.integer "parent_id",                 limit: 4
+    t.boolean "private_by_default",                         default: false
+    t.string  "mru_directory_path",        limit: 128
+    t.boolean "email_on_review"
+    t.boolean "email_on_submission"
+    t.boolean "email_on_review_of_review"
+    t.boolean "is_new_user",                                default: true,  null: false
+    t.integer "master_permission_granted", limit: 1,        default: 0
+    t.string  "handle",                    limit: 255
+    t.text    "digital_certificate",       limit: 16777215
+    t.string  "persistence_token",         limit: 255
+    t.string  "timezonepref",              limit: 255
+    t.text    "public_key",                limit: 16777215
+    t.boolean "copy_of_emails",                             default: false
+    t.integer "institution_id",            limit: 4
+    t.boolean "preference_home_flag",                       default: true
   end
 
-  add_index "users", ["email"], name: "index_users_on_email", using: :btree
-  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree
 
   create_table "versions", force: :cascade do |t|
@@ -829,7 +815,6 @@ ActiveRecord::Schema.define(version: 20210904060510) do
   add_foreign_key "assignment_badges", "badges"
   add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
   add_foreign_key "assignment_questionnaires", "questionnaires", name: "fk_aq_questionnaire_id"
-  add_foreign_key "assignments", "assignments", column: "sample_assignment_id"
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
   add_foreign_key "assignments", "users", column: "instructor_id", name: "fk_assignments_instructors"
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"

@@ -86,6 +86,7 @@ group :development do
   gem 'pry-remote'
   gem 'quiet_assets'
   gem 'rubocop'
+  gem 'capybara'
 end
 
 group :test do
@@ -101,9 +102,11 @@ group :test do
   gem 'rspec-rails'
   gem 'shoulda'
   gem 'puma'
+  gem 'capybara'
 end
 
 group :development, :test do
   gem 'selenium-webdriver'
   gem 'simplecov', require: false
+  gem 'capybara'
 end

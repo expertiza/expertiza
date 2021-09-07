@@ -93,7 +93,7 @@ group :test do
   gem 'database_cleaner'
   gem "factory_bot_rails"
   gem 'geckodriver-helper', '~> 0.0.3'
-  gem 'selenium-webdriver'
+  gem 'selenium-webdriver', '~> 2.53.4'
   gem 'gherkin'
   gem 'guard-rails'
   gem 'guard-rspec'
@@ -106,7 +106,7 @@ group :test do
 end
 
 group :development, :test do
-  gem 'selenium-webdriver'
+  gem 'selenium-webdriver', '~> 2.53.4'
   gem 'simplecov', require: false
   gem 'capybara'
 end

@@ -16,7 +16,6 @@ gem "capistrano-db-tasks", require: false
 gem 'capistrano-passenger'
 gem 'capistrano-rails'
 gem 'capistrano-rvm'
-gem 'capybara'
 gem 'chartjs-ror'
 gem 'coffee-rails'
 gem 'coveralls', require: false
@@ -93,7 +92,7 @@ group :test do
   gem 'database_cleaner'
   gem "factory_bot_rails"
   gem 'geckodriver-helper', '~> 0.0.3'
-  gem 'selenium-webdriver', '~> 2.53.4'
+  gem 'selenium-webdriver', '~> 3.141.0'
   gem 'gherkin'
   gem 'guard-rails'
   gem 'guard-rspec'
@@ -106,7 +105,7 @@ group :test do
 end
 
 group :development, :test do
-  gem 'selenium-webdriver', '~> 2.53.4'
+  gem 'selenium-webdriver', '~> 3.141.0'
   gem 'simplecov', require: false
   gem 'capybara'
 end

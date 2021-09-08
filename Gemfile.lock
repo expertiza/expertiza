@@ -514,10 +514,9 @@ GEM
     scrypt (3.0.7)
       ffi-compiler (>= 1.0, < 2.0)
     seer (0.10.0)
-    selenium-webdriver (2.53.4)
+    selenium-webdriver (3.141.0)
       childprocess (~> 0.5)
-      rubyzip (~> 1.0)
-      websocket (~> 1.0)
+      rubyzip (~> 1.2, >= 1.2.2)
     sexp_processor (4.15.3)
     shellany (0.0.1)
     shoulda (4.0.0)
@@ -594,7 +593,6 @@ GEM
       procto (~> 0.0.2)
     variable (0.0.1)
       equalizer (~> 0.0.11)
-    websocket (1.2.9)
     will_paginate (3.3.1)
     xpath (3.1.0)
       nokogiri (~> 1.8)
@@ -684,7 +682,7 @@ DEPENDENCIES
   sass-rails (= 5.0.3)
   scrypt (~> 3.0, >= 3.0.7)
   seer
-  selenium-webdriver (~> 2.53.4)
+  selenium-webdriver (~> 3.141.0)
   shoulda
   shoulda-matchers
   sidekiq

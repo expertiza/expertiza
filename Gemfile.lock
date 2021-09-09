@@ -655,7 +655,7 @@ DEPENDENCIES
   momentjs-rails (>= 2.9.0)
   mutant-rspec
   mysql2
-  nokogiri
+  nokogiri (~> 1.9, >= 1.9.1)
   omniauth-google-oauth2
   open-uri-cached
   paper_trail

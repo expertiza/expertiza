@@ -653,6 +653,7 @@ DEPENDENCIES
   launchy
   lingua
   mimemagic!
+  mini_portile2 (~> 2.4)
   momentjs-rails (>= 2.9.0)
   mutant-rspec
   mysql2

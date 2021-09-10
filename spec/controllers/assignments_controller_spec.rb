@@ -219,7 +219,6 @@ describe AssignmentsController do
         allow(AssignmentQuestionnaire).to receive(:new).and_return(new_assignment_questionnaire)
         allow(Questionnaire).to receive(:find).with('666').and_return(questionnaire)
         allow(new_assignment_questionnaire).to receive(:save).and_return(true)
-        allow(AssignmentForm).to receive(:rubric_weight_error).and_return(false)
         @params = {
           vary_by_topic: true,
           id: 1,
@@ -229,7 +228,7 @@ describe AssignmentsController do
           },
           assignment_form: {
             assignment_questionnaire: [{"assignment_id" => "1", "questionnaire_id" => "666", "dropdown" => "true",
-                                        "questionnaire_weight" => "100", "notification_limit" => "15", "used_in_round" => "1"}],
+                                        "questionnaire_weight" => "0", "notification_limit" => "15", "used_in_round" => "1"}],
             assignment: {
               instructor_id: 2,
               course_id: 1,

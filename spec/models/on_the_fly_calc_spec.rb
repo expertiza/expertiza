@@ -57,7 +57,7 @@ describe OnTheFlyCalc do
       score = {min: 50.0, max: 50.0, avg: 50.0}
       allow(on_the_fly_calc).to receive(:contributors).and_return([contributor])
       allow(Response).to receive(:compute_scores).with([], [question1]).and_return(score)
-      allow(ReviewResponseMap).to receive(:get_assessments_for).with(contributor).and_return([])
+      allow(ReviewResponseMap).to receive(:assessments_for).with(contributor).and_return([])
       allow(SignedUpTeam).to receive(:find_by).with(team_id: contributor.id).and_return(signed_up_team)
       allow(on_the_fly_calc).to receive(:review_questionnaire_id).and_return(1)
     end

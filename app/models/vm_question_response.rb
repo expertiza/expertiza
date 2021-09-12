@@ -47,7 +47,7 @@ class VmQuestionResponse
       reviews = if vary
                   ReviewResponseMap.get_responses_for_team_round(team, @round)
                 else
-                  ReviewResponseMap.get_assessments_for(team)
+                  ReviewResponseMap.assessments_for(team)
                 end
       reviews.each do |review|
         review_mapping = ReviewResponseMap.find(review.map_id)

@@ -28,7 +28,7 @@ module OnTheFlyCalc
       (1..rounds).each do |round|
         contributors.each do |contributor|
           questions = peer_review_questions_for_team(contributor, round)
-          assessments = ReviewResponseMap.get_assessments_for(contributor)
+          assessments = ReviewResponseMap.assessments_for(contributor)
           assessments = assessments.select {|assessment| assessment.round == round }
           scores[contributor.id] = {} if round == 1
           scores[contributor.id][round] = {}
@@ -38,7 +38,7 @@ module OnTheFlyCalc
     else
       contributors.each do |contributor|
         questions = peer_review_questions_for_team(contributor)
-        assessments = ReviewResponseMap.get_assessments_for(contributor)
+        assessments = ReviewResponseMap.assessments_for(contributor)
         scores[contributor.id] = {}
         scores[contributor.id] = Response.compute_scores(assessments, questions)
       end

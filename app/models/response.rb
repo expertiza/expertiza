@@ -181,10 +181,10 @@ class Response < ActiveRecord::Base
   # compare the current response score with other scores on the same artifact, and test if the difference
   # is significant enough to notify instructor.
   # Precondition: the response object is associated with a ReviewResponseMap
-  ### "map_class.get_assessments_for" method need to be refactored
+  ### "map_class.assessments_for" method need to be refactored
   def significant_difference?
     map_class = self.map.class
-    existing_responses = map_class.get_assessments_for(self.map.reviewee)
+    existing_responses = map_class.assessments_for(self.map.reviewee)
     average_score_on_same_artifact_from_others, count = Response.avg_scores_and_count_for_prev_reviews(existing_responses, self)
     # if this response is the first on this artifact, there's no grade conflict
     return false if count.zero?

@@ -172,7 +172,7 @@ describe Response do
 
   describe '#significant_difference?' do
     before(:each) do
-      allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([response])
+      allow(ReviewResponseMap).to receive(:assessments_for).with(team).and_return([response])
     end
 
     context 'when count is 0' do

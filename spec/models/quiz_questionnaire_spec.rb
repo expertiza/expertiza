@@ -11,7 +11,7 @@ describe QuizQuestionnaire do
    end
    describe '#get_assessments_for' do
      it 'returns the responses associated with the participant' do
-       allow(QuizResponseMap).to receive(:get_assessments_for).with(participant).and_return([response])
+       allow(QuizResponseMap).to receive(:assessments_for).with(participant).and_return([response])
        expect(quiz_questionnaire.get_assessments_for(participant)).to eq([response])
      end
    end

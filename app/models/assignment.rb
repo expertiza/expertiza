@@ -9,7 +9,7 @@ class Assignment < ActiveRecord::Base
   include AssignmentAnalytic
   include ReviewAssignment
   include QuizAssignment
-  include OnTheFlyCalc
+  include AssignmentScoreHelper
   has_paper_trail
   # When an assignment is created, it needs to
   # be created as an instance of a subclass of the Assignment (model) class;

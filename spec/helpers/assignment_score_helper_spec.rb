@@ -1,6 +1,6 @@
-describe OnTheFlyCalc do
+describe AssignmentScoreHelper do
 
-  let(:on_the_fly_calc) { Class.new { extend OnTheFlyCalc } }
+  let(:assignment_score_helper) { Class.new { extend AssignmentScoreHelper } }
   let(:questionnaire) { create(:questionnaire, id: 1) }
   let(:question1) { create(:question, questionnaire: questionnaire, weight: 1, id: 1) }
   let(:response) { build(:response, id: 1, map_id: 1, scores: [answer]) }
@@ -14,14 +14,14 @@ describe OnTheFlyCalc do
   describe '#compute_total_score' do
     context 'when avg score is nil' do
       it 'computes total score for this assignment by summing the score given on all questionnaires' do
-        on_the_fly_calc = Assignment.new(id: 1, name: 'Test Assgt')
+        assignment_score_helper = Assignment.new(id: 1, name: 'Test Assgt')
         scores = {review1: {scores: {max: 80, min: 0, avg: nil}, assessments: [response]}}
-        allow(on_the_fly_calc).to receive(:questionnaires).and_return([questionnaire1])
+        allow(assignment_score_helper).to receive(:questionnaires).and_return([questionnaire1])
         allow(ReviewQuestionnaire).to receive_message_chain(:assignment_questionnaires, :find_by)
           .with(no_args).with(assignment_id: 1).and_return(double('AssignmentQuestionnaire', id: 1))
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: nil)
                                                            .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
-        expect(on_the_fly_calc.compute_total_score(scores)).to eq(0)
+        expect(assignment_score_helper.compute_total_score(scores)).to eq(0)
       end
     end
   end
@@ -55,30 +55,30 @@ describe OnTheFlyCalc do
   describe '#compute_avg_and_ranges_hash' do
     before(:each) do
       score = {min: 50.0, max: 50.0, avg: 50.0}
-      allow(on_the_fly_calc).to receive(:contributors).and_return([contributor])
+      allow(assignment_score_helper).to receive(:contributors).and_return([contributor])
       allow(Response).to receive(:compute_scores).with([], [question1]).and_return(score)
       allow(ReviewResponseMap).to receive(:assessments_for).with(contributor).and_return([])
       allow(SignedUpTeam).to receive(:find_by).with(team_id: contributor.id).and_return(signed_up_team)
-      allow(on_the_fly_calc).to receive(:review_questionnaire_id).and_return(1)
+      allow(assignment_score_helper).to receive(:review_questionnaire_id).and_return(1)
     end
     context 'when current assignment varies rubrics by round' do
       it 'computes avg score and score range for each team in each round and return scores' do
-        allow(on_the_fly_calc).to receive(:vary_by_round).and_return(true)
-        allow(on_the_fly_calc).to receive(:rounds_of_reviews).and_return(1)
-        expect(on_the_fly_calc.compute_avg_and_ranges_hash).to eq(1 => {1 => {min: 50.0, max: 50.0, avg: 50.0}})
+        allow(assignment_score_helper).to receive(:vary_by_round).and_return(true)
+        allow(assignment_score_helper).to receive(:rounds_of_reviews).and_return(1)
+        expect(assignment_score_helper.compute_avg_and_ranges_hash).to eq(1 => {1 => {min: 50.0, max: 50.0, avg: 50.0}})
       end
     end
     context 'when current assignment does not vary rubrics by round' do
       it 'computes avg score and score range for each team and return scores' do
-        allow(on_the_fly_calc).to receive(:vary_by_round).and_return(false)
-        expect(on_the_fly_calc.compute_avg_and_ranges_hash).to eq(1 => {min: 50.0, max: 50.0, avg: 50.0})
+        allow(assignment_score_helper).to receive(:vary_by_round).and_return(false)
+        expect(assignment_score_helper.compute_avg_and_ranges_hash).to eq(1 => {min: 50.0, max: 50.0, avg: 50.0})
       end
     end
   end
   describe '#peer_review_questions_for_team' do
     context 'when there is no signed up team' do
       it 'peer review questions should return nil' do
-        val = on_the_fly_calc.send(:peer_review_questions_for_team, nil)
+        val = assignment_score_helper.send(:peer_review_questions_for_team, nil)
         expect(val).to be_nil
       end
     end

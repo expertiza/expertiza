@@ -386,8 +386,8 @@ describe 'AssignmentTeam' do
 
         allow(team.assignment).to receive(:questionnaires).with(no_args).and_return([questionnaire1, questionnaire2])
         allow(ReviewResponseMap).to receive(:where).with(reviewee_id: team.id).and_return(review_response_map)
-        allow(Answer).to receive(:compute_scores).with(scores[:questionnaire1][:assessments], questions[:questionnaire1]).and_return(5)
-        allow(Answer).to receive(:compute_scores).with(scores[:questionnaire2][:assessments], questions[:questionnaire2]).and_return(5)
+        allow(Response).to receive(:compute_scores).with(scores[:questionnaire1][:assessments], questions[:questionnaire1]).and_return(5)
+        allow(Response).to receive(:compute_scores).with(scores[:questionnaire2][:assessments], questions[:questionnaire2]).and_return(5)
         allow(questionnaire1).to receive(:symbol).with(no_args).and_return(:questionnaire1)
         allow(questionnaire2).to receive(:symbol).with(no_args).and_return(:questionnaire2)
         allow(team.assignment).to receive(:compute_total_score).with(scores.except(:total_score)).and_return(10)

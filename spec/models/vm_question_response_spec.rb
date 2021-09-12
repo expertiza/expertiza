@@ -62,7 +62,7 @@ describe VmQuestionResponse  do
 
     context 'when intitialized with a review questionnaire' do
       it 'adds reviews' do
-        allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return(reviews)
+        allow(ReviewResponseMap).to receive(:assessments_for).with(team).and_return(reviews)
         allow(ReviewResponseMap).to receive(:find).with(1).and_return(double('ReviewResponseMap', reviewer_id: 1))
         response.add_reviews(participant, team, false)
         expect(response.list_of_reviews.size).to eq(1)

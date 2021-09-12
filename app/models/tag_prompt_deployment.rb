@@ -39,7 +39,7 @@ class TagPromptDeployment < ActiveRecord::Base
             responses += ReviewResponseMap.get_responses_for_team_round(team, round)
           end
         else
-          responses = ResponseMap.get_assessments_for(team)
+          responses = ResponseMap.assessments_for(team)
         end
         responses_ids = responses.map(&:id)
         answers = Answer.where(question_id: questions_ids, response_id: responses_ids)

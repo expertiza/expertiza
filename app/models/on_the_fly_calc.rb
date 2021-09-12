@@ -28,19 +28,19 @@ module OnTheFlyCalc
       (1..rounds).each do |round|
         contributors.each do |contributor|
           questions = peer_review_questions_for_team(contributor, round)
-          assessments = ReviewResponseMap.get_assessments_for(contributor)
+          assessments = ReviewResponseMap.assessments_for(contributor)
           assessments = assessments.select {|assessment| assessment.round == round }
           scores[contributor.id] = {} if round == 1
           scores[contributor.id][round] = {}
-          scores[contributor.id][round] = Answer.compute_scores(assessments, questions)
+          scores[contributor.id][round] = Response.compute_scores(assessments, questions)
         end
       end
     else
       contributors.each do |contributor|
         questions = peer_review_questions_for_team(contributor)
-        assessments = ReviewResponseMap.get_assessments_for(contributor)
+        assessments = ReviewResponseMap.assessments_for(contributor)
         scores[contributor.id] = {}
-        scores[contributor.id] = Answer.compute_scores(assessments, questions)
+        scores[contributor.id] = Response.compute_scores(assessments, questions)
       end
     end
     scores
@@ -58,7 +58,7 @@ end
 
 def calc_review_score
   unless @corresponding_response.empty?
-    @this_review_score_raw = Answer.assessment_score(response: @corresponding_response, questions: @questions)
+    @this_review_score_raw = Response.assessment_score(response: @corresponding_response, questions: @questions)
     if @this_review_score_raw
       @this_review_score = ((@this_review_score_raw * 100) / 100.0).round if @this_review_score_raw >= 0.0
     end

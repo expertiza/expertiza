@@ -52,7 +52,7 @@ describe AssignmentParticipant do
                                                          .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
       allow(review_questionnaire).to receive(:symbol).and_return(:review)
       allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([response])
-      allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
+      allow(Response).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
       allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
     end
     context 'when assignment is not varying rubric by round and not an microtask' do
@@ -109,7 +109,7 @@ describe AssignmentParticipant do
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
                                                            .and_return(double('AssignmentQuestionnaire', used_in_round: nil))
         allow(review_questionnaire).to receive(:get_assessments_for).with(participant).and_return([response])
-        allow(Answer).to receive(:compute_scores).with(any_args).and_return(score_map)
+        allow(Response).to receive(:compute_scores).with(any_args).and_return(score_map)
         participant.compute_assignment_score(question_hash, scores)
         expect(scores[:review][:assessments]).to eq([response])
         expect(scores[:review][:scores]).to eq(score_map)
@@ -124,7 +124,7 @@ describe AssignmentParticipant do
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
                                                            .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
         allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([response])
-        allow(Answer).to receive(:compute_scores).with(any_args).and_return(score_map)
+        allow(Response).to receive(:compute_scores).with(any_args).and_return(score_map)
         participant.compute_assignment_score(question_hash, scores)
         expect(scores[:review1][:assessments]).to eq([response])
         expect(scores[:review1][:scores]).to eq(score_map)
@@ -167,42 +167,42 @@ describe AssignmentParticipant do
 
   describe '#feedback' do
     it 'returns corrsponding author feedback responses given by current participant' do
-      allow(FeedbackResponseMap).to receive(:get_assessments_for).with(participant).and_return([response])
+      allow(FeedbackResponseMap).to receive(:assessments_for).with(participant).and_return([response])
       expect(participant.feedback).to eq([response])
     end
   end
 
   describe '#reviews' do
     it 'returns corrsponding peer review responses given by current team' do
-      allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([response])
+      allow(ReviewResponseMap).to receive(:assessments_for).with(team).and_return([response])
       expect(participant.reviews).to eq([response])
     end
   end
 
   describe '#quizzes_taken' do
     it 'returns corrsponding quiz responses given by current participant' do
-      allow(QuizResponseMap).to receive(:get_assessments_for).with(participant).and_return([response])
+      allow(QuizResponseMap).to receive(:assessments_for).with(participant).and_return([response])
       expect(participant.quizzes_taken).to eq([response])
     end
   end
 
   describe '#metareviews' do
     it 'returns corrsponding metareview responses given by current participant' do
-      allow(MetareviewResponseMap).to receive(:get_assessments_for).with(participant).and_return([response])
+      allow(MetareviewResponseMap).to receive(:assessments_for).with(participant).and_return([response])
       expect(participant.metareviews).to eq([response])
     end
   end
 
   describe '#teammate_reviews' do
     it 'returns corrsponding teammate review responses given by current participant' do
-      allow(TeammateReviewResponseMap).to receive(:get_assessments_for).with(participant).and_return([response])
+      allow(TeammateReviewResponseMap).to receive(:assessments_for).with(participant).and_return([response])
       expect(participant.teammate_reviews).to eq([response])
     end
   end
 
   describe '#bookmark_reviews' do
     it 'returns corrsponding bookmark review responses given by current participant' do
-      allow(BookmarkRatingResponseMap).to receive(:get_assessments_for).with(participant).and_return([response])
+      allow(BookmarkRatingResponseMap).to receive(:assessments_for).with(participant).and_return([response])
       expect(participant.bookmark_reviews).to eq([response])
     end
   end

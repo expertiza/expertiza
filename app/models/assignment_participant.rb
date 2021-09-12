@@ -84,8 +84,8 @@ class AssignmentParticipant < Participant
                                                    else
                                                      questionnaire.get_assessments_round_for(self, round)
                                                    end
-      # Anser.compute_scores computes the total score for a *list of assessments*                                                    
-      scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
+      # Response.compute_scores computes the total score for a list of responses to a questionnaire                                                    
+      scores[questionnaire_symbol][:scores] = Response.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
     end
   end
 
@@ -141,13 +141,13 @@ class AssignmentParticipant < Participant
   end
 
   def feedback
-    FeedbackResponseMap.get_assessments_for(self)
+    FeedbackResponseMap.assessments_for(self)
   end
 
   def reviews
     # ACS Always get assessments for a team
     # removed check to see if it is a team assignment
-    ReviewResponseMap.get_assessments_for(self.team)
+    ReviewResponseMap.assessments_for(self.team)
   end
 
   # returns the reviewer of the assignment. Checks the reviewer_is_team flag to
@@ -169,19 +169,19 @@ class AssignmentParticipant < Participant
   end
 
   def quizzes_taken
-    QuizResponseMap.get_assessments_for(self)
+    QuizResponseMap.assessments_for(self)
   end
 
   def metareviews
-    MetareviewResponseMap.get_assessments_for(self)
+    MetareviewResponseMap.assessments_for(self)
   end
 
   def teammate_reviews
-    TeammateReviewResponseMap.get_assessments_for(self)
+    TeammateReviewResponseMap.assessments_for(self)
   end
 
   def bookmark_reviews
-    BookmarkRatingResponseMap.get_assessments_for(self)
+    BookmarkRatingResponseMap.assessments_for(self)
   end
 
   def files(directory)

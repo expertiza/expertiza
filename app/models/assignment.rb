@@ -165,8 +165,8 @@ class Assignment < ActiveRecord::Base
         # merge the grades from multiple rounds
         scores[:teams][index.to_s.to_sym][:scores] = merge_grades_by_rounds(grades_by_rounds, total_num_of_assessments, total_score)
       else
-        assessments = ReviewResponseMap.get_assessments_for(team)
-        scores[:teams][index.to_s.to_sym][:scores] = Answer.compute_scores(assessments, questions[:review])
+        assessments = ReviewResponseMap.assessments_for(team)
+        scores[:teams][index.to_s.to_sym][:scores] = Response.compute_scores(assessments, questions[:review])
       end
       index += 1
     end
@@ -614,7 +614,7 @@ class Assignment < ActiveRecord::Base
     (1..self.num_review_rounds).each do |i|
       assessments = ReviewResponseMap.get_responses_for_team_round(team, i)
       round_sym = ("review" + i.to_s).to_sym
-      grades_by_rounds[round_sym] = Answer.compute_scores(assessments, questions[round_sym])
+      grades_by_rounds[round_sym] = Response.compute_scores(assessments, questions[round_sym])
       total_num_of_assessments += assessments.size
       total_score += grades_by_rounds[round_sym][:avg] * assessments.size.to_f unless grades_by_rounds[round_sym][:avg].nil?
     end

@@ -1,4 +1,4 @@
-module OnTheFlyCalc
+module AssignmentScoreHelper
   # Compute total score for this assignment by summing the scores given on all questionnaires.
   # Only scores passed in are included in this sum.
   def compute_total_score(scores)

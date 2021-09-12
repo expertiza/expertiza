@@ -29,7 +29,8 @@ describe ReviewResponseMap do
   let(:questionnaire1) { build(:questionnaire, type: 'ReviewQuestionnaire') }
   let(:questionnaire2) { build(:questionnaire, type: 'MetareviewQuestionnaire') }
   let(:next_due_date) { build(:assignment_due_date, round: 1) }
-
+  let(:question) { double('Question') }
+  
   before(:each) do
     allow(review_response_map).to receive(:response).and_return(response)
   end

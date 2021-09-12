@@ -1,6 +1,7 @@
 describe ReviewResponseMap do
 
   let(:team) { build(:assignment_team, id: 1, name: 'team no name', assignment: assignment, users: [student], parent_id: 1) }
+  let(:team2) { build(:assignment_team, id: 3, name: 'no team') }
   let(:team1) { build(:assignment_team, id: 2, name: 'team has name', assignment: assignment, users: [student]) }
   let(:review_response_map) { build(:review_response_map, id: 1, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:review_response_map1) do
@@ -30,7 +31,7 @@ describe ReviewResponseMap do
   let(:questionnaire2) { build(:questionnaire, type: 'MetareviewQuestionnaire') }
   let(:next_due_date) { build(:assignment_due_date, round: 1) }
   let(:question) { double('Question') }
-  
+
   before(:each) do
     allow(review_response_map).to receive(:response).and_return(response)
   end
@@ -40,7 +41,9 @@ describe ReviewResponseMap do
       it 'calculates scores in each round of each team in current assignment' do
         allow(participant).to receive(:scores).with(review1: [question]).and_return(98)
         allow(assignment).to receive(:vary_by_round).and_return(true)
+        allow(assignment).to receive(:participants).and_return([participant])
         allow(assignment).to receive(:num_review_rounds).and_return(1)
+        allow(assignment).to receive(:teams).and_return([team2])
         allow(ReviewResponseMap).to receive(:get_responses_for_team_round).with(team, 1).and_return([response])
         allow(Response).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
         scores = ResponseMap.scores(assignment, review1: [question])
@@ -54,6 +57,7 @@ describe ReviewResponseMap do
       it 'calculates scores of each team in current assignment' do
         allow(participant).to receive(:scores).with(review: [question]).and_return(98)
         allow(assignment).to receive(:vary_by_round).and_return(false)
+        allow(assignment).to receive(:participants).and_return([participant])
         allow(ReviewResponseMap).to receive(:assessments_for).with(team).and_return([response])
         allow(Response).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
         scores = ResponseMap.scores(assignment, review: [question])

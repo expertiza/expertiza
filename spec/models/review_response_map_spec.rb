@@ -34,6 +34,35 @@ describe ReviewResponseMap do
     allow(review_response_map).to receive(:response).and_return(response)
   end
 
+  describe '#scores' do
+    context 'when assignment is varying rubric by round assignment' do
+      it 'calculates scores in each round of each team in current assignment' do
+        allow(participant).to receive(:scores).with(review1: [question]).and_return(98)
+        allow(assignment).to receive(:vary_by_round).and_return(true)
+        allow(assignment).to receive(:num_review_rounds).and_return(1)
+        allow(ReviewResponseMap).to receive(:get_responses_for_team_round).with(team, 1).and_return([response])
+        allow(Response).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
+        scores = ResponseMap.scores(assignment, review1: [question])
+        expect(scores[:teams][:"0"][:scores][:avg]).to eq(90)
+        expect(scores[:teams][:"0"][:scores][:min]).to eq(88)
+        expect(scores[:teams][:"0"][:scores][:max]).to eq(95)
+      end
+    end
+
+    context 'when assignment is not varying rubric by round assignment' do
+      it 'calculates scores of each team in current assignment' do
+        allow(participant).to receive(:scores).with(review: [question]).and_return(98)
+        allow(assignment).to receive(:vary_by_round).and_return(false)
+        allow(ReviewResponseMap).to receive(:assessments_for).with(team).and_return([response])
+        allow(Response).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
+        scores = ResponseMap.scores(assignment, review: [question])
+        expect(scores[:teams][:"0"][:scores][:avg]).to eq(90)
+        expect(scores[:teams][:"0"][:scores][:min]).to eq(88)
+        expect(scores[:teams][:"0"][:scores][:max]).to eq(95)
+      end
+    end
+  end
+
   describe '#questionnaire' do
     # This method is little more than a wrapper for assignment.review_questionnaire_id()
     # Test how it responds to the combinations of various arguments it could receive

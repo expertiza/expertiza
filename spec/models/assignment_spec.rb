@@ -205,35 +205,6 @@ describe Assignment do
     end
   end
 
-  describe '#scores' do
-    context 'when assignment is varying rubric by round assignment' do
-      it 'calculates scores in each round of each team in current assignment' do
-        allow(participant).to receive(:scores).with(review1: [question]).and_return(98)
-        assignment.vary_by_round = true 
-        allow(assignment).to receive(:num_review_rounds).and_return(1)
-        allow(ReviewResponseMap).to receive(:get_responses_for_team_round).with(team, 1).and_return([response])
-        allow(Response).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
-        scores = assignment.scores(review1: [question])
-        expect(scores[:teams][:"0"][:scores][:avg]).to eq(90)
-        expect(scores[:teams][:"0"][:scores][:min]).to eq(88)
-        expect(scores[:teams][:"0"][:scores][:max]).to eq(95)
-      end
-    end
-
-    context 'when assignment is not varying rubric by round assignment' do
-      it 'calculates scores of each team in current assignment' do
-        allow(participant).to receive(:scores).with(review: [question]).and_return(98)
-        allow(assignment).to receive(:vary_by_round).and_return(false)
-        allow(ReviewResponseMap).to receive(:assessments_for).with(team).and_return([response])
-        allow(Response).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
-        scores = assignment.scores(review: [question])
-        expect(scores[:teams][:"0"][:scores][:avg]).to eq(90)
-        expect(scores[:teams][:"0"][:scores][:min]).to eq(88)
-        expect(scores[:teams][:"0"][:scores][:max]).to eq(95)
-      end
-    end
-  end
-
   describe '#path' do
     context 'when both course_id and instructor_id are nil' do
       it 'raises an error' do

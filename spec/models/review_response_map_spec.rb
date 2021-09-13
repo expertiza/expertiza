@@ -313,6 +313,7 @@ describe ReviewResponseMap do
       allow(Response).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
       allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
       allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
+      allow(participant).to receive(:assignment).and_return(assignment)
     end
     context 'when assignment is not varying rubric by round and not an microtask' do
       it 'calculates scores that this participant has been given' do
@@ -358,6 +359,7 @@ describe ReviewResponseMap do
     before(:each) do
       allow(review_questionnaire).to receive(:symbol).and_return(:review)
       allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
+      allow(participant).to receive(:assignment).and_return(assignment)
     end
 
     context 'when the round of questionnaire is nil' do
@@ -394,6 +396,7 @@ describe ReviewResponseMap do
   describe '#merge_scores' do
     context 'when all of the review_n are nil' do
       it 'set max, min, avg of review score as 0' do
+        allow(participant).to receive(:assignment).and_return(assignment)
         scores = {}
         allow(assignment).to receive(:num_review_rounds).and_return(1)
         ResponseMap.merge_scores(participant, scores)
@@ -405,6 +408,7 @@ describe ReviewResponseMap do
 
     context 'when the review_n is not nil' do
       it 'merge the score of review_n to the score of review' do
+        allow(participant).to receive(:assignment).and_return(assignment)
         score_map = {max: 100, min: 100, avg: 100}
         scores = {review1: {scores: score_map, assessments: [response]}}
         allow(assignment).to receive(:num_review_rounds).and_return(1)

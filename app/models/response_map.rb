@@ -142,8 +142,8 @@ class ResponseMap < ActiveRecord::Base
     
     # update :total_score key in scores hash to user's current grade if they have one
     # update :total_score key in scores hash to 100 if the current value is greater than 100
-    if grade
-      scores[:total_score] = grade
+    if participant.grade
+      scores[:total_score] = participant.grade
     else
       scores[:total_score] = 100 if scores[:total_score] > 100
     end

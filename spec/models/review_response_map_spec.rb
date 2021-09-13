@@ -314,6 +314,7 @@ describe ReviewResponseMap do
       allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
       allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
       allow(participant).to receive(:assignment).and_return(assignment)
+      allow(participant).to receive(:user_id).and_return(2)
     end
     context 'when assignment is not varying rubric by round and not an microtask' do
       it 'calculates scores that this participant has been given' do

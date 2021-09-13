@@ -2,6 +2,7 @@ describe ReviewResponseMap do
   let(:team) { build(:assignment_team, id: 1, name: 'team no name', assignment: assignment, users: [student], parent_id: 1) }
   let(:team2) { build(:assignment_team, id: 3, name: 'no team') }
   let(:team1) { build(:assignment_team, id: 2, name: 'team has name', assignment: assignment, users: [student]) }
+  let(:team3) { build(:assignment_team, id: 4, name: 'team has name1', assignment: assignment, users: [student1]) }
   let(:review_response_map) { build(:review_response_map, id: 1, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:review_response_map1) do
     build :review_response_map,
@@ -313,12 +314,12 @@ describe ReviewResponseMap do
       allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
       allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
       allow(participant).to receive(:assignment).and_return(assignment)
-      allow(participant).to receive(:team).and_return(team1)
+      allow(participant).to receive(:team).and_return(team3)
     end
     context 'when assignment is not varying rubric by round and not an microtask' do
       it 'calculates scores that this participant has been given' do
         allow(assignment).to receive(:vary_by_round).and_return(false)
-        expect(ResponseMap.participant_scores(participant2, review1: [question]).inspect).to eq("{:participant=>#<AssignmentParticipant id: 1, can_submit: true, can_review: true, "\
+        expect(ResponseMap.participant_scores(participant, review1: [question]).inspect).to eq("{:participant=>#<AssignmentParticipant id: 1, can_submit: true, can_review: true, "\
           "user_id: 2, parent_id: 1, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, "\
           "type: \"AssignmentParticipant\", handle: \"handle\", time_stamp: nil, digital_signature: nil, duty: nil, "\
           "can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, :review1=>{:assessments=>[#<Response id: nil, map_id: 1, "\

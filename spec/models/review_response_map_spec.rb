@@ -315,6 +315,7 @@ describe ReviewResponseMap do
       allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
       allow(participant).to receive(:assignment).and_return(assignment)
       allow(participant).to receive(:team).and_return(team3)
+      allow(participant).to receive(:user).and_return(student1)
     end
     context 'when assignment is not varying rubric by round and not an microtask' do
       it 'calculates scores that this participant has been given' do

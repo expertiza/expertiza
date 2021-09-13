@@ -63,7 +63,7 @@ class GradesController < ApplicationController
     @pscore = @participant.scores(@questions)
     make_chart
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
-    @stage = @participant.assignment.get_current_stage(@topic_id)
+    @stage = @participant.assignment.current_stage(@topic_id)
     penalties(@assignment.id)
     # prepare feedback summaries
     summary_ws_url = WEBSERVICE_CONFIG["summary_webservice_url"]

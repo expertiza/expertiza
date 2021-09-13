@@ -179,17 +179,17 @@ describe Assignment do
     end
   end
   
-  describe '#get_questionnaire_ids' do
+  describe '#questionnaire_ids' do
     context 'when the assignment does not have rounds' do
       it 'it returns the ids of the associated questionnaires' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire1])
-        expect(assignment.get_questionnaire_ids(nil)).to eq([assignment_questionnaire1])
+        expect(assignment.questionnaire_ids(nil)).to eq([assignment_questionnaire1])
       end
     end
     context 'when the assignment has rounds' do
       it 'it returns the id of the associated questionnaires from the round' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 1).and_return([assignment_questionnaire1])
-        expect(assignment.get_questionnaire_ids(1)).to eq([assignment_questionnaire1])
+        expect(assignment.questionnaire_ids(1)).to eq([assignment_questionnaire1])
       end
     end
     context 'when the assignment has no associated questionnaires' do
@@ -200,7 +200,7 @@ describe Assignment do
         allow(arr).to receive(:find_each).and_yield(assignment_questionnaire1).and_yield(assignment_questionnaire2)
         allow(assignment_questionnaire1).to receive(:questionnaire).and_return(questionnaire1)
         allow(assignment_questionnaire2).to receive(:questionnaire).and_return(questionnaire2)
-        expect(assignment.get_questionnaire_ids(1)).to eq([assignment_questionnaire1])
+        expect(assignment.questionnaire_ids(1)).to eq([assignment_questionnaire1])
       end
     end
   end
@@ -404,7 +404,7 @@ describe Assignment do
 
       context 'topic_id is not nil' do
         it 'returns Submission' do
-          allow(assignment).to receive(:get_current_stage).with(123).and_return('Submission')
+          allow(assignment).to receive(:current_stage).with(123).and_return('Submission')
           expect(assignment.current_stage_name(123)).to eq('Submission')
         end
       end

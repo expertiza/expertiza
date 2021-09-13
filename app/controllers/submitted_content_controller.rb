@@ -30,7 +30,7 @@ class SubmittedContentController < ApplicationController
     SignUpSheet.signup_team(@assignment.id, @participant.user_id, nil) if @participant.team.nil?
     # @can_submit is the flag indicating if the user can submit or not in current stage
     @can_submit = !params.key?(:view)
-    @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
+    @stage = @assignment.current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
   end
 
   # view is called when @assignment.submission_allowed(topic_id) is false
@@ -41,7 +41,7 @@ class SubmittedContentController < ApplicationController
     @assignment = @participant.assignment
     # @can_submit is the flag indicating if the user can submit or not in current stage
     @can_submit = false
-    @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
+    @stage = @assignment.current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
     redirect_to action: 'edit', id: params[:id], view: true
   end
 

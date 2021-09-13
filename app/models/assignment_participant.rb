@@ -271,7 +271,7 @@ class AssignmentParticipant < Participant
 
   def current_stage
     topic_id = SignedUpTeam.topic_id(self.parent_id, self.user_id)
-    assignment.try :get_current_stage, topic_id
+    assignment.try :current_stage, topic_id
   end
 
   def stage_deadline

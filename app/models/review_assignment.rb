@@ -142,7 +142,7 @@ module ReviewAssignment
 
   def reject_by_deadline(contributor_set)
     contributor_set.reject! do |contributor|
-      contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == 'Complete' or
+      contributor.assignment.current_stage(signed_up_topic(contributor).id) == 'Complete' or
           !contributor.assignment.can_review(signed_up_topic(contributor).id)
     end
     contributor_set

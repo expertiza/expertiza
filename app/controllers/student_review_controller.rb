@@ -16,7 +16,7 @@ class StudentReviewController < ApplicationController
     @assignment = @participant.assignment
     # Find the current phase that the assignment is in.
     @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
-    @review_phase = @assignment.get_current_stage(@topic_id)
+    @review_phase = @assignment.current_stage(@topic_id)
     # E-1973 calling get_reviewer on a participant will return either that participant
     # or there team, depending on if reviewers are teams. If the reviewer is not yet on a team, just set review_mappings
     # to an empty list to prevent errors

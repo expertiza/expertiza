@@ -1,5 +1,5 @@
 <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)%>
-<% stage = participant.assignment.get_current_stage(topic_id) %>
+<% stage = participant.assignment.current_stage(topic_id) %>
 <% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
 
   <% if stage == "Complete" %>

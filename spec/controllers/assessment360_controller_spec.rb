@@ -271,7 +271,7 @@ describe Assessment360Controller do
         allow(TeamsUser).to receive(:team_id).with(assignment.id, course_participant.user_id).and_return(1)
         allow(Team).to receive(:find).with(1).and_return(team_with_grade)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: course_participant.user_id, parent_id: assignment.id).and_return(course_participant)
-        allow(ResponseMap).to receive(:participant_scores).with([course_participant, {}]).and_return(review: {scores: {avg: 90}})
+        allow(ResponseMap).to receive(:participant_scores).with(course_participant, {}).and_return(review: {scores: {avg: 90}})
         params = {course_id: 1}
         session = {user: instructor}
         get :course_student_grade_summary, params, session
@@ -358,7 +358,7 @@ describe Assessment360Controller do
         allow(TeamsUser).to receive(:team_id).with(assignment.id, course_participant.user_id).and_return(1)
         allow(Team).to receive(:find).with(1).and_return(team)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: course_participant.user_id, parent_id: assignment.id).and_return(course_participant)
-        allow(ResponseMap).to receive(:participant_scores).with([course_participant, {}]).and_return(review: {scores: {avg: 90}})
+        allow(ResponseMap).to receive(:participant_scores).with(course_participant, {}).and_return(review: {scores: {avg: 90}})
         params = {course_id: 1}
         session = {user: instructor}
         get :course_student_grade_summary, params, session

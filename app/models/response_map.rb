@@ -118,6 +118,102 @@ class ResponseMap < ActiveRecord::Base
     scores
   end
 
+  # Return scores that this participant has been given
+  def self.participant_scores(participant, questions)
+    assignment = participant.assignment
+    scores = {}
+    scores[:participant] = participant
+    # Retrieve assignment score
+    compute_assignment_score(participant, questions, scores)
+    # Compute the Total Score (with question weights factored in)
+    scores[:total_score] = assignment.compute_total_score(scores) 
+
+    # merge scores[review#] (for each round) to score[review]
+    merge_scores(participant, scores) if assignment.vary_by_round
+    # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
+    if assignment.microtask?
+      topic = SignUpTopic.find_by(assignment_id: assignment.id)
+      return if topic.nil?
+      scores[:total_score] *= (topic.micropayment.to_f / 100.to_f) 
+      scores[:max_pts_available] = topic.micropayment
+    end
+
+    scores[:total_score] = assignment.compute_total_score(scores)
+    
+    # update :total_score key in scores hash to user's current grade if they have one
+    # update :total_score key in scores hash to 100 if the current value is greater than 100
+    if grade
+      scores[:total_score] = grade
+    else
+      scores[:total_score] = 100 if scores[:total_score] > 100
+    end
+    scores
+  end
+
+  def self.compute_assignment_score(participant, questions, scores)
+    participant.assignment.questionnaires.each do |questionnaire|
+      round = AssignmentQuestionnaire.find_by(assignment_id: participant.assignment.id, questionnaire_id: questionnaire.id).used_in_round
+      # create symbol for "varying rubrics" feature -Yang
+      questionnaire_symbol = if round.nil?
+                               questionnaire.symbol
+                             else
+                               (questionnaire.symbol.to_s + round.to_s).to_sym
+                             end
+
+      scores[questionnaire_symbol] = {}
+
+      scores[questionnaire_symbol][:assessments] = if round.nil?
+                                                     questionnaire.get_assessments_for(participant)
+                                                   else
+                                                     questionnaire.get_assessments_round_for(participant, round)
+                                                   end
+      # Response.compute_scores computes the total score for a list of responses to a questionnaire                                                    
+      scores[questionnaire_symbol][:scores] = Response.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
+    end
+  end
+
+  # for each assignment review all scores and determine a max, min and average value
+  def self.merge_scores(participant, scores)
+    review_sym = "review".to_sym
+    scores[review_sym] = {}
+    scores[review_sym][:assessments] = []
+    scores[review_sym][:scores] = {max: -999_999_999, min: 999_999_999, avg: 0}
+    total_score = 0
+    (1..participant.assignment.num_review_rounds).each do |i|
+      round_sym = ("review" + i.to_s).to_sym
+      # check if that assignment round is empty 
+      next if scores[round_sym].nil? || scores[round_sym][:assessments].nil? || scores[round_sym][:assessments].empty?
+      length_of_assessments = scores[round_sym][:assessments].length.to_f
+      scores[review_sym][:assessments] += scores[round_sym][:assessments]
+
+      # update the max value if that rounds max exists and is higher than the current max
+      update_max_or_min(scores, round_sym, review_sym, :max)
+      # update the min value if that rounds min exists and is lower than the current min
+      update_max_or_min(scores, round_sym, review_sym, :min)
+      # Compute average score for current round, and sets overall total score to be average_from_round * length of assignment (# of questions)      
+      total_score += scores[round_sym][:scores][:avg] * length_of_assessments unless scores[round_sym][:scores][:avg].nil?
+    end
+    # if the scores max and min weren't updated set them to zero.
+    if scores[review_sym][:scores][:max] == -999_999_999 && scores[review_sym][:scores][:min] == 999_999_999
+      scores[review_sym][:scores][:max] = 0
+      scores[review_sym][:scores][:min] = 0
+    end
+    # Compute the average score for a particular review (all rounds)
+    scores[review_sym][:scores][:avg] = total_score / scores[review_sym][:assessments].length.to_f
+  end
+
+  def self.update_max_or_min(scores, round_sym, review_sym, symbol)
+    op = :< if symbol == :max
+    op = :> if symbol == :min
+      # check if there is a max/min score for this particular round
+    unless scores[round_sym][:scores][symbol].nil? 
+      # if scores[review_sym][:scores][symbol] (< or >) scores[round_sym][:scores][symbol]
+      if scores[review_sym][:scores][symbol].send(op, scores[round_sym][:scores][symbol])
+        scores[review_sym][:scores][symbol] = scores[round_sym][:scores][symbol]
+      end
+    end
+  end
+
   private
   #Below private methods are extracted and added as part of refactoring project E2009 - Spring 2020
   #This method computes and returns grades by rounds, total_num_of_assessments and total_score

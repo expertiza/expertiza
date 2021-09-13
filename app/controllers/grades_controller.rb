@@ -60,7 +60,7 @@ class GradesController < ApplicationController
     questionnaires = @assignment.questionnaires
     @questions = retrieve_questions questionnaires, @assignment.id
     # @pscore has the newest versions of response for each response map, and only one for each response map (unless it is vary rubric by round)
-    @pscore = @participant.scores(@questions)
+    @pscore = ResponseMap.participant_scores(@participant, @questions)
     make_chart
     @topic_id = SignedUpTeam.topic_id(@participant.assignment.id, @participant.user_id)
     @stage = @participant.assignment.current_stage(@topic_id)
@@ -81,7 +81,7 @@ class GradesController < ApplicationController
     @team_id = @team.id
     questionnaires = @assignment.questionnaires
     @questions = retrieve_questions questionnaires, @assignment.id
-    @pscore = @participant.scores(@questions)
+    @pscore = ResponseMap.participant_scores(@participant, @questions)
     @vmlist = []
 
     # loop through each questionnaire, and populate the view model for all data necessary
@@ -108,7 +108,7 @@ class GradesController < ApplicationController
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment
     @questions = list_questions(@assignment)
-    @scores = @participant.scores(@questions)
+    @scores = ResponseMap.participant_scores(@participant, @questions)
   end
 
   def instructor_review

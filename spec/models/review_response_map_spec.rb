@@ -32,7 +32,7 @@ describe ReviewResponseMap do
   let(:next_due_date) { build(:assignment_due_date, round: 1) }
   let(:question) { double('Question') }
   let(:review_questionnaire) { build(:questionnaire, id: 1) }
-
+  let(:response3) { build(:response) }
   before(:each) do
     allow(review_response_map).to receive(:response).and_return(response)
   end
@@ -359,6 +359,7 @@ describe ReviewResponseMap do
     before(:each) do
       allow(review_questionnaire).to receive(:symbol).and_return(:review)
       allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
+      allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
       allow(participant).to receive(:assignment).and_return(assignment)
     end
 
@@ -369,10 +370,10 @@ describe ReviewResponseMap do
         score_map = {max: 100, min: 100, avg: 100}
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
                                                            .and_return(double('AssignmentQuestionnaire', used_in_round: nil))
-        allow(review_questionnaire).to receive(:get_assessments_for).with(participant).and_return([response])
+        allow(review_questionnaire).to receive(:get_assessments_for).with(participant).and_return([response3])
         allow(Response).to receive(:compute_scores).with(any_args).and_return(score_map)
         ResponseMap.compute_assignment_score(participant, question_hash, scores)
-        expect(scores[:review][:assessments]).to eq([response])
+        expect(scores[:review][:assessments]).to eq([response3])
         expect(scores[:review][:scores]).to eq(score_map)
       end
     end
@@ -384,10 +385,10 @@ describe ReviewResponseMap do
         score_map = {max: 100, min: 100, avg: 100}
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
                                                            .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
-        allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([response])
+        allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([response3])
         allow(Response).to receive(:compute_scores).with(any_args).and_return(score_map)
         ResponseMap.compute_assignment_score(participant, question_hash, scores)
-        expect(scores[:review1][:assessments]).to eq([response])
+        expect(scores[:review1][:assessments]).to eq([response3])
         expect(scores[:review1][:scores]).to eq(score_map)
       end
     end

@@ -1,7 +1,7 @@
 module GradesHelper
   # Render the title
-  def get_accordion_title(last_topic, new_topic)
-    if last_topic.eql? nil
+  def accordion_title(last_topic, new_topic)
+    if last_topic.nil?
       # this is the first accordion
       render partial: "response/accordion", locals: {title: new_topic, is_first: true}
     elsif !new_topic.eql? last_topic
@@ -168,7 +168,7 @@ module GradesHelper
     questions = {}
     questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.where(assignment_id: assignment_id, questionnaire_id: questionnaire.id).first.used_in_round
-      questionnaire_symbol = if !round.nil?
+      questionnaire_symbol = unless round.nil?
                                (questionnaire.symbol.to_s + round.to_s).to_sym
                              else
                                questionnaire.symbol

@@ -38,7 +38,7 @@ describe ReviewResponseMap do
   before(:each) do
     allow(review_response_map).to receive(:response).and_return(response)
     allow(response_map).to receive(:response).and_return(response3)
-    allow(response_map).to receive(:id).and_return(3)
+    allow(response_map).to receive(:id).and_return(1)
   end
 
   describe '#scores' do
@@ -318,7 +318,7 @@ describe ReviewResponseMap do
       allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
       allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
       allow(participant).to receive(:assignment).and_return(assignment)
-      allow(response3).to rece
+      allow(response3).to receeive(:id).and_return(nil)
     end
     context 'when assignment is not varying rubric by round and not an microtask' do
       it 'calculates scores that this participant has been given' do

@@ -34,8 +34,11 @@ describe ReviewResponseMap do
   let(:question) { double('Question') }
   let(:review_questionnaire) { build(:questionnaire, id: 1) }
   let(:response3) { build(:response) }
+  let(:response_map) { build(:review_response_map, reviewer_id: 2, response: [response3]) }
   before(:each) do
     allow(review_response_map).to receive(:response).and_return(response)
+    allow(response_map).to receive(:response).and_return(response3)
+    allow(response_map).to receive(:id).and_return(3)
   end
 
   describe '#scores' do
@@ -310,11 +313,12 @@ describe ReviewResponseMap do
       allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
                                                          .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
       allow(review_questionnaire).to receive(:symbol).and_return(:review)
-      allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([response])
-      allow(Response).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
+      allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([response3])
+      allow(Response).to receive(:compute_scores).with([response3], [question]).and_return(max: 95, min: 88, avg: 90)
       allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
       allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
       allow(participant).to receive(:assignment).and_return(assignment)
+      allow(response3).to rece
     end
     context 'when assignment is not varying rubric by round and not an microtask' do
       it 'calculates scores that this participant has been given' do

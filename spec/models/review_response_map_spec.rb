@@ -22,6 +22,7 @@ describe ReviewResponseMap do
   let(:response) { build(:response, id: 1, map_id: 1, round: 1, response_map: review_response_map,  is_submitted: true) }
   let(:response1) { build(:response, id: 2, map_id: 1, round: 2, response_map: review_response_map) }
   let(:response2) { build(:response, id: 3, map_id: 1, round: nil, response_map: review_response_map, is_submitted: true) }
+  let(:response3) { build(:response) }
   let(:metareview_response_map) { build(:meta_review_response_map, reviewed_object_id: 1) }
   let(:student) { build(:student, id: 1, name: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
   let(:student1) { build(:student, id: 2, name: "name1", fullname: 'no one', email: 'expertiza@mailinator.com') }

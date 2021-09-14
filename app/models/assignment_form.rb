@@ -36,6 +36,25 @@ class AssignmentForm
     assignment_form
   end
 
+  def rubric_weight_error(attributes)
+    error = false
+    attributes[:assignment_questionnaire].each do |assignment_questionnaire|
+      # Check rubrics to make sure weight is 0 if there are no Scored Questions
+      scored_questionnaire = false
+      questionnaire = Questionnaire.find(assignment_questionnaire[:questionnaire_id])
+      questions = Question.where(questionnaire_id: questionnaire.id)
+      questions.each do |question|
+        if question.is_a? ScoredQuestion
+          scored_questionnaire = true
+        end
+      end
+      unless scored_questionnaire || assignment_questionnaire[:questionnaire_weight].to_i.zero?
+        error = true
+      end
+    end
+    error
+  end
+
   def update(attributes, user, vary_by_topic_desired = false)
     @has_errors = false
     has_late_policy = false

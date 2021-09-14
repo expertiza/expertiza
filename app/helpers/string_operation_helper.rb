@@ -8,7 +8,7 @@ module StringOperationHelper
     pairs1 = get_ngrams(str1,3)
     pairs2 = get_ngrams(str2,3)
 
-    return (2.0 * (pairs1 & pairs2).size / (pairs1.size + pairs2.size))
+    (2.0 * (pairs1 & pairs2).size / (pairs1.size + pairs2.size))
   end
 
   private

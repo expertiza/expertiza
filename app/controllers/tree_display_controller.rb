@@ -295,8 +295,8 @@ class TreeDisplayController < ApplicationController
         serialize_assignment_to_json(node, json)
       end
     end
-    
-    return json
+
+    json
   end
   
   # Creates a json object that can be displayed by the UI
@@ -320,8 +320,8 @@ class TreeDisplayController < ApplicationController
         serialize_assignment_to_json(node, json)
       end
     end
-    
-    return json
+
+    json
   end
 
   # Checks if the user is the instructor for the course or assignment node provided.

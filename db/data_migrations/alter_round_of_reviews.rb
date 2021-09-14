@@ -8,7 +8,7 @@ class AlterRoundOfReviews
       reviews = assignments[i].find_due_dates('review') + assignments[i].find_due_dates('rereview')
       assignments[i].rounds_of_reviews = [assignments[i].rounds_of_reviews, submissions.count, reviews.count].max
       assignments[i].save
-      i=i+1;
+      i++
     end
   end
 end

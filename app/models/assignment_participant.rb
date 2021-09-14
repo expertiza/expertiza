@@ -65,12 +65,12 @@ class AssignmentParticipant < Participant
   # polymorphic twin of method in AssignmentTeam
   # this method is called to check if the current user is this one
   def get_logged_in_reviewer_id(current_user_id)
-    return self.id
+    self.id
   end
 
   # checks if this assignment participant is the currently logged on user, given their user id
   def current_user_is_reviewer?(current_user_id)
-    return user_id == current_user_id
+    user_id == current_user_id
   end
 
   def quizzes_taken

@@ -320,7 +320,7 @@ module ReviewMappingHelper
     intervals = intervals.select{|v| v < threshold}
 
     #Get Metrics once tagging intervals are available
-    if not intervals.empty?
+    unless intervals.empty?
       metrics = Hash.new
       metrics[:mean] = (intervals.reduce(:+) / intervals.size.to_f).round(interval_precision)
       metrics[:min] = intervals.min
@@ -328,7 +328,7 @@ module ReviewMappingHelper
       sum = intervals.inject(0){|accum, i| accum +(i- metrics[:mean])**2}
       metrics[:variance] = (sum/(intervals.size).to_f).round(interval_precision)
       metrics[:stand_dev] = Math.sqrt(metrics[:variance]).round(interval_precision)
-      return metrics
+      metrics
     end
     #if no Hash object is returned, the UI handles it accordingly
   end

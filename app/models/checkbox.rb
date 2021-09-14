@@ -9,31 +9,26 @@ class Checkbox < UnscoredQuestion
 
   def edit_remove_button(_count)
     html = '<td align="center"><a rel="nofollow" data-method="delete" href="/questions/'
-    html += self.id.to_s + '">Remove</a></td>'
-    html
+    self.id.to_s + '">Remove</a></td>'
   end
 
   def edit_seq(_count)
     html = '<td><input size="6" value="' + self.seq.to_s + '" name="question['
-    html += self.id.to_s + '][seq]" id="question_' + self.id.to_s + '_seq" type="text"></td>'
-    html
+    self.id.to_s + '][seq]" id="question_' + self.id.to_s + '_seq" type="text"></td>'
   end
 
   def edit_question(_count)
     html = '<td><textarea cols="50" rows="1" name="question[' + self.id.to_s + '][txt]" id="question_'
-    html += self.id.to_s + '_txt" placeholder="Edit question content here">' + self.txt + '</textarea></td>'
-    html
+    self.id.to_s + '_txt" placeholder="Edit question content here">' + self.txt + '</textarea></td>'
   end
 
   def edit_type(_count)
     html = '<td><input size="10" disabled="disabled" value="' + self.type + '" name="question['
-    html += self.id.to_s + '][type]" id="question_' + self.id.to_s + '_type" type="text"></td>'
-    html
+    self.id.to_s + '][type]" id="question_' + self.id.to_s + '_type" type="text"></td>'
   end
 
   def edit_weight(_count)
-    html = '<td><!--placeholder (UnscoredQuestion does not need weight)--></td>'
-    html
+    '<td><!--placeholder (UnscoredQuestion does not need weight)--></td>'
   end
 
   # This method returns what to display if an instructor (etc.) is viewing a questionnaire
@@ -58,12 +53,11 @@ class Checkbox < UnscoredQuestion
   def check_previous_question
     curr_question = Question.find(self.id)
     prev_question = Question.where("seq < ?", curr_question.seq).order(:seq).last
-    html = if prev_question.type == 'ColumnHeader'
-             '<td style="padding: 15px;">'
-           else
-             ''
-           end
-    html
+    if prev_question.type == 'ColumnHeader'
+                 '<td style="padding: 15px;">'
+        else
+                 ''
+        end
   end
 
   def complete_first_second_input(count, answer = nil)
@@ -74,16 +68,13 @@ class Checkbox < UnscoredQuestion
             else
               'value="0"'
             end
-    html += '>'
-    html
+    '>'
   end
 
   def complete_third_input(count, answer = nil)
     html = '<input id="responses_' + count.to_s + '_checkbox" type="checkbox" onchange="checkbox' + count.to_s + 'Changed()"'
     html += 'checked="checked"' if !answer.nil? and answer.answer == 1
-    html += '>'
-
-    html
+    '>'
   end
 
   def complete_script(count)
@@ -93,21 +84,19 @@ class Checkbox < UnscoredQuestion
     html += 'if (checkbox.is(":checked")) {'
     html += 'response_score.val("1");'
     html += '} else {'
-    html += 'response_score.val("0");}}</script>'
-    html
+    'response_score.val("0");}}</script>'
   end
 
   def complete_if_column_header
     curr_question = Question.find(self.id)
     next_question = Question.where("seq > ?", curr_question.seq).order(:seq).first
-    html = if next_question.type == 'ColumnHeader'
-             '</td></tr>'
-           elsif next_question.type == 'SectionHeader' or next_question.type == 'TableHeader'
-             '</td></tr></table><br/>'
-           else
-             '<BR/>'
-           end
-    html
+    if next_question.type == 'ColumnHeader'
+                 '</td></tr>'
+        elsif next_question.type == 'SectionHeader' or next_question.type == 'TableHeader'
+                 '</td></tr></table><br/>'
+        else
+                 '<BR/>'
+        end
   end
 
   # This method returns what to display if a student is viewing a filled-out questionnaire
@@ -119,24 +108,22 @@ class Checkbox < UnscoredQuestion
   end
 
   def view_completed_question_answer(count, answer)
-    html = if answer.answer == 1
+    if answer.answer == 1
              '<b>' + count.to_s + '. &nbsp;&nbsp;<img src="/assets/Check-icon.png">' + self.txt + '</b>'
            else
              '<b>' + count.to_s + '. &nbsp;&nbsp;<img src="/assets/delete_icon.png">' + self.txt + '</b>'
            end
-    html
   end
 
   def view_completed_question_if_column_header
     curr_question = Question.find(self.id)
     next_question = Question.where("seq > ?", curr_question.seq).order(:seq).first
-    html = if next_question.type == 'ColumnHeader'
-             '</td></tr>'
-           elsif next_question.type == 'TableHeader'
-             '</td></tr></table>'
-           else
-             ''
-           end
-    html
+    if next_question.type == 'ColumnHeader'
+                 '</td></tr>'
+        elsif next_question.type == 'TableHeader'
+                 '</td></tr></table>'
+        else
+                 ''
+        end
   end
 end

@@ -152,16 +152,16 @@ module GradesHelper
   def type_and_max(row)
     question = Question.find(row.question_id)
     if question.type == "Checkbox"
-      return 10_003
+      10_003
     elsif question.is_a? ScoredQuestion
       return 9311 + row.question_max_score
     else
-      return 9998
+      9998
     end
   end
 
   def underlined?(score)
-    return "underlined" if score.comment.present?
+    "underlined" if score.comment.present?
   end
 
   def retrieve_questions(questionnaires, assignment_id)

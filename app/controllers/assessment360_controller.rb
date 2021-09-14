@@ -174,7 +174,7 @@ class Assessment360Controller < ApplicationController
     participant = AssignmentParticipant.find_by(user_id: user_id, parent_id: assignment_id)
     assignment = participant.assignment
     questions = retrieve_questions assignment.questionnaires, assignment_id
-    participant.scores(questions)
+    ResponseMap.participant_scores(participant, questions)
   end
 
   def format_topic(topic)

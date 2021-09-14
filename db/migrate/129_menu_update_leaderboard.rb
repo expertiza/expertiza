@@ -1,8 +1,8 @@
 class MenuUpdateLeaderboard < ActiveRecord::Migration
   def self.up
     # get Permission entry
-    permission1 = Permission.find_by_name('public actions - execute');
-    
+    permission1 = Permission.find_by_name('public actions - execute')
+
     # is there already a leaderboard?
     site_controller = SiteController.find_by_name('leaderboard')
     # if not, create a leaderboard

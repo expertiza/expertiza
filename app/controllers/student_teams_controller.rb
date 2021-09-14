@@ -171,7 +171,7 @@ class StudentTeamsController < ApplicationController
       return false
     end
     #checks that the student has selected some topics
-    return @student.assignment.topics? 
+    @student.assignment.topics?
 
   end
 

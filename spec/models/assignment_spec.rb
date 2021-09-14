@@ -179,17 +179,17 @@ describe Assignment do
     end
   end
   
-  describe '#get_questionnaire_ids' do
+  describe '#questionnaire_ids' do
     context 'when the assignment does not have rounds' do
       it 'it returns the ids of the associated questionnaires' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1).and_return([assignment_questionnaire1])
-        expect(assignment.get_questionnaire_ids(nil)).to eq([assignment_questionnaire1])
+        expect(assignment.questionnaire_ids(nil)).to eq([assignment_questionnaire1])
       end
     end
     context 'when the assignment has rounds' do
       it 'it returns the id of the associated questionnaires from the round' do
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 1).and_return([assignment_questionnaire1])
-        expect(assignment.get_questionnaire_ids(1)).to eq([assignment_questionnaire1])
+        expect(assignment.questionnaire_ids(1)).to eq([assignment_questionnaire1])
       end
     end
     context 'when the assignment has no associated questionnaires' do
@@ -200,36 +200,7 @@ describe Assignment do
         allow(arr).to receive(:find_each).and_yield(assignment_questionnaire1).and_yield(assignment_questionnaire2)
         allow(assignment_questionnaire1).to receive(:questionnaire).and_return(questionnaire1)
         allow(assignment_questionnaire2).to receive(:questionnaire).and_return(questionnaire2)
-        expect(assignment.get_questionnaire_ids(1)).to eq([assignment_questionnaire1])
-      end
-    end
-  end
-
-  describe '#scores' do
-    context 'when assignment is varying rubric by round assignment' do
-      it 'calculates scores in each round of each team in current assignment' do
-        allow(participant).to receive(:scores).with(review1: [question]).and_return(98)
-        assignment.vary_by_round = true 
-        allow(assignment).to receive(:num_review_rounds).and_return(1)
-        allow(ReviewResponseMap).to receive(:get_responses_for_team_round).with(team, 1).and_return([response])
-        allow(Response).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
-        scores = assignment.scores(review1: [question])
-        expect(scores[:teams][:"0"][:scores][:avg]).to eq(90)
-        expect(scores[:teams][:"0"][:scores][:min]).to eq(88)
-        expect(scores[:teams][:"0"][:scores][:max]).to eq(95)
-      end
-    end
-
-    context 'when assignment is not varying rubric by round assignment' do
-      it 'calculates scores of each team in current assignment' do
-        allow(participant).to receive(:scores).with(review: [question]).and_return(98)
-        allow(assignment).to receive(:vary_by_round).and_return(false)
-        allow(ReviewResponseMap).to receive(:assessments_for).with(team).and_return([response])
-        allow(Response).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
-        scores = assignment.scores(review: [question])
-        expect(scores[:teams][:"0"][:scores][:avg]).to eq(90)
-        expect(scores[:teams][:"0"][:scores][:min]).to eq(88)
-        expect(scores[:teams][:"0"][:scores][:max]).to eq(95)
+        expect(assignment.questionnaire_ids(1)).to eq([assignment_questionnaire1])
       end
     end
   end
@@ -433,7 +404,7 @@ describe Assignment do
 
       context 'topic_id is not nil' do
         it 'returns Submission' do
-          allow(assignment).to receive(:get_current_stage).with(123).and_return('Submission')
+          allow(assignment).to receive(:current_stage).with(123).and_return('Submission')
           expect(assignment.current_stage_name(123)).to eq('Submission')
         end
       end

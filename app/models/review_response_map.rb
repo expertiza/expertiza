@@ -74,7 +74,7 @@ class ReviewResponseMap < ResponseMap
   def show_feedback(response)
     return unless self.response.any? and response
     map = FeedbackResponseMap.find_by(reviewed_object_id: response.id)
-    return map.response.last.display_as_html if map and map.response.any?
+    map.response.last.display_as_html if map and map.response.any?
   end
 
   def metareview_response_maps
@@ -104,7 +104,7 @@ class ReviewResponseMap < ResponseMap
 
   #E-1973 - returns the reviewer of the response, either a participant or a team
   def get_reviewer
-    return ReviewResponseMap.get_reviewer_with_id(assignment.id, reviewer_id)
+    ReviewResponseMap.get_reviewer_with_id(assignment.id, reviewer_id)
   end
 
   # E-1973 - gets the reviewer of the response, given the assignment and the reviewer id

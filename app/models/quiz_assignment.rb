@@ -9,8 +9,8 @@ module QuizAssignment
 
     # Reject contributions of topics whose deadline has passed
     contributor_set.reject! do |contributor|
-      contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "Complete" or
-          contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "submission"
+      contributor.assignment.current_stage(signed_up_topic(contributor).id) == "Complete" or
+          contributor.assignment.current_stage(signed_up_topic(contributor).id) == "submission"
     end
 
     candidate_topics = Set.new

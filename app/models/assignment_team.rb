@@ -67,7 +67,7 @@ class AssignmentTeam < Team
 
   # E-1973 If a team is being treated as a reviewer of an assignment, then they are the reviewer
   def get_reviewer
-    return self
+    self
   end
 
   # Evaluates whether any contribution by this team was reviewed by reviewer
@@ -276,12 +276,12 @@ class AssignmentTeam < Team
         return participant.id
       end
     end
-    return nil
+    nil
   end
 
   # determines if the team contains a participant who is currently logged in
   def current_user_is_reviewer?(current_user_id)
-    return get_logged_in_reviewer_id(current_user_id) != nil
+    get_logged_in_reviewer_id(current_user_id) != nil
   end
 
 end

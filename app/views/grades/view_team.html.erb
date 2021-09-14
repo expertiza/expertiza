@@ -258,8 +258,8 @@
 
 <!-- Get course ID and TA ID to restrict TAs ability to update his grades-->
 <%
-   @course_id = Assignment.find_by(id: @participant.parent_id).course_id;
-   @ta_id = @participant.user_id;  
+   @course_id = Assignment.find_by(id: @participant.parent_id).course_id
+   @ta_id = @participant.user_id
 %>
 
   <h4 style="font-weight:bold;display:inline-block;">Grade and comment for submission</h4><br/>

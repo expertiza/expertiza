@@ -6,17 +6,17 @@ describe GradesHelper, type: :helper do
   let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
   
   
-  # describe 'get_accordion_title' do
+  # describe 'accordion_title' do
   #   it 'should render is_first:true if last_topic is nil' do
-  #    get_accordion_title(nil, 'last question')
+  #    accordion_title(nil, 'last question')
   #    expect(response).to render_template(partial: 'response/_accordion', locals: {title: 'last question', is_first: true})
   #  end
   #  it 'should render is_first:false if last_topic is not equal to next_topic' do
-  #    get_accordion_title('last question', 'next question')
+  #    accordion_title('last question', 'next question')
   #    expect(response).to render_template(partial: 'response/_accordion', locals: {title: 'next question', is_first: false})
   #  end
   #  it 'should render nothing if last_topic is equal to next_topic' do
-  #    get_accordion_title('question', 'question')
+  #    accordion_title('question', 'question')
   #    expect(response).to render_template(nil)
   #  end
   # end  

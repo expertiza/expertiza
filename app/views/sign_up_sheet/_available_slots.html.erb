@@ -6,6 +6,6 @@
     <% found_in_slots = true %>
   <% end %>
 <% end %>
-<% if found_in_slots == false %>
+<% if !found_in_slots %>
   <td align="center"><%= topic.max_choosers %></td>
 <% end %>

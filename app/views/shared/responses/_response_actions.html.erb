@@ -25,7 +25,7 @@
             <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
         <% end %>
 
-        <% if @assignment.get_current_stage(topic_id) != "Finished" %>
+        <% unless @assignment.current_stage(topic_id) == "Finished" %>
           <%- # show the link as 'Edit' when latest review is done in current round -%>
           <%- # show link as 'Update' when latest review is done in different round or there has been a new submission in current round -%>
           <% if last_response_round == current_round%>
@@ -62,7 +62,7 @@
             <td><%= "  -- latest update at #{@latest_response.updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p")}" %></td>
         <% end %>
     <% end %>
-<% elsif @assignment.get_current_stage(topic_id) != "Finished" && @assignment.can_review(topic_id) && latest_submission%>
+<% elsif @assignment.current_stage(topic_id) != "Finished" && @assignment.can_review(topic_id) && latest_submission%>
         <% if reviewer_role == :student %>
         <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
         <td>&nbsp;&nbsp;</td>

@@ -297,7 +297,7 @@ class User < ActiveRecord::Base
   end
 
   def teaching_assistant?
-    return true if self.role.ta?
+    true if self.role.ta?
   end
 
   def self.search_users(role, user_id, letter, search_by)

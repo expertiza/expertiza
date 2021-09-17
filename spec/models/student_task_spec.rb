@@ -246,7 +246,7 @@ describe StudentTask do
       it "return empty time_list array" do
         allow(due_date).to receive(:deadline_type).and_return(deadline_type)
         timeline_list = []
-        due_date.due_at=nil;
+        due_date.due_at=nil
         assignment.due_dates = [due_date]
         StudentTask.get_due_date_data(assignment, timeline_list)
         expect(timeline_list).to eq([])

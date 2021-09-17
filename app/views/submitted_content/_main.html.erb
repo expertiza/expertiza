@@ -25,7 +25,7 @@
     <% if !t_id.nil? && questionnaire = QuizQuestionnaire.where(["instructor_id = ?", t_id]).first %>
       <%= link_to 'View quiz', :controller => :quiz_questionnaires, :action => :view, :id => questionnaire.id, :pid => participant.id %>
       <br/>
-      <% if !questionnaire.taken_by_anyone?%>
+      <% unless questionnaire.taken_by_anyone?%>
         <%= link_to 'Edit quiz', :controller => :quiz_questionnaires, :action => :edit, :id => questionnaire.id, :pid => participant.id %>
       <% end %>
       <br/>

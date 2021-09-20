@@ -107,4 +107,3 @@ group :development, :test do
   gem 'selenium-webdriver'
   gem 'simplecov', require: false
 end
-

@@ -104,7 +104,9 @@ module SummaryHelper
 
       # get all teams in this assignment
       teams = Team.select(:id, :name).where(parent_id: assignment.id).order(:name)
-
+      
+      threads = []
+      
       teams.each do |reviewee|
         reviewee_name = session ? reviewee.name(session[:ip]) : reviewee.name
         self.summary[reviewee_name] = []

@@ -42,7 +42,7 @@
                           %tr
                             %td
                               - #print the summary of reviews
-                              - if !@summary[team][i][q].eql?("")
+                              - if !@summary[team][i][q].eql?("") && @summary[team][i][q].respond_to?(:each)
                                 - @summary[team][i][q].each do |sentence|
                                   - safe_concat "<li>"
                                   - concat sentence

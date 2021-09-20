@@ -39,7 +39,7 @@ gem 'jquery-tablesorter'
 gem 'jquery-ui-sass-rails'
 gem 'json'
 gem 'lingua'
-gem 'mimemagic'
+gem 'mimemagic', github: 'mimemagicrb/mimemagic', ref: '01f92d86d15d85cfd0f20dabd025dcbd36a8a60f'
 gem 'momentjs-rails', '>= 2.9.0'
 gem 'mysql2'
 gem 'nokogiri'
@@ -64,6 +64,7 @@ gem 'rwordnet'
 gem 'sass-rails', '5.0.3'
 gem 'scrypt'
 gem 'seer'
+gem 'shoulda-matchers'
 gem 'sidekiq'
 gem 'sprockets'
 gem 'stanford-core-nlp'
@@ -88,6 +89,9 @@ end
 group :test do
   gem 'database_cleaner'
   gem "factory_bot_rails"
+  gem 'geckodriver-helper', '~> 0.0.3'
+  gem 'capybara'
+  gem 'selenium-webdriver'
   gem 'gherkin'
   gem 'guard-rails'
   gem 'guard-rspec'
@@ -95,6 +99,7 @@ group :test do
   gem 'mutant-rspec'
   gem 'rspec-rails'
   gem 'shoulda'
+  gem 'puma'
 end
 
 group :development, :test do
@@ -102,3 +107,4 @@ group :development, :test do
   gem 'selenium-webdriver'
   gem 'simplecov', require: false
 end
+

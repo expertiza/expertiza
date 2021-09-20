@@ -49,7 +49,7 @@ class ResponseController < ApplicationController
         return
       end
     end
-    
+
     # user cannot delete other people's responses. Needs to be authenticated.
     map_id = @response.map.id
     # The lock will be automatically destroyed when the response is destroyed
@@ -62,7 +62,7 @@ class ResponseController < ApplicationController
 
   # Prepare the parameters when student clicks "Edit"
   def edit
-    assign_instance_vars
+    assign_action_parameters
     @prev = Response.where(map_id: @map.id)
     @review_scores = @prev.to_a
     if @prev.present?
@@ -78,7 +78,7 @@ class ResponseController < ApplicationController
         return
       end
     end
-    
+
     @modified_object = @response.response_id
     # set more handy variables for the view
     set_content
@@ -86,8 +86,7 @@ class ResponseController < ApplicationController
     @questions.each do |question|
       @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
     end
-    @questionnaire = set_questionnaire
-    store_total_cake_score
+    @questionnaire = questionnaire_from_response
     render action: 'response'
   end
 
@@ -96,7 +95,7 @@ class ResponseController < ApplicationController
   # Update the response and answers when student "edit" existing response
   def update
     render nothing: true unless action_allowed?
-    
+
     msg = ""
     begin
       # the response to be updated
@@ -108,7 +107,7 @@ class ResponseController < ApplicationController
         return
       end
       @response.update_attribute('additional_comment', params[:review][:comments])
-      @questionnaire = set_questionnaire
+      @questionnaire = questionnaire_from_response
       questions = sort_questions(@questionnaire.questions)
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
@@ -122,19 +121,15 @@ class ResponseController < ApplicationController
   end
 
   def new
-    assign_instance_vars
+    assign_action_parameters
     set_content(true)
-    @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
+    @stage = @assignment.current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)) if @assignment
     # Because of the autosave feature and the javascript that sync if two reviewing windows are opened
     # The response must be created when the review begin.
     # So do the answers, otherwise the response object can't find the questionnaire when the user hasn't saved his new review and closed the window.
     # A new response has to be created when there hasn't been any reviews done for the current round,
     # or when there has been a submission after the most recent review in this round.
-    @response = Response.where(map_id: @map.id, round: @current_round.to_i).order(updated_at: :desc).first
-    teams_most_recent_submission = AssignmentTeam.find(@map.reviewee_id).most_recent_submission
-    if @response.nil? || (!teams_most_recent_submission.nil? && teams_most_recent_submission.updated_at > @response.updated_at)
-      @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
-    end
+    @response = @response.populate_new_response(@map, @current_round)
     questions = sort_questions(@questionnaire.questions)
     store_total_cake_score
     init_answers(questions)
@@ -196,7 +191,7 @@ class ResponseController < ApplicationController
     msg = "Your response was successfully saved."
     error_msg = ""
     # only notify if is_submitted changes from false to true
-    if (@map.is_a? ReviewResponseMap) && (was_submitted == false && @response.is_submitted) && @response.significant_difference?
+    if (@map.is_a? ReviewResponseMap) && (!was_submitted && @response.is_submitted) && @response.significant_difference?
       @response.notify_instructor_on_difference
       @response.email
     end
@@ -260,16 +255,14 @@ class ResponseController < ApplicationController
     end
   end
 
-  # assigning variables for the expert reviews
+  # This method controls what is shown students when they view results from a calibration.
+  # Most of the business logic lives in the model, where the :calibration_response_map_id and :review_response_map_id are used
+  # to find the appropriate references to calibration responses, review responses as well as the response questions
   def show_calibration_results_for_student
-    calibration_response_map = ReviewResponseMap.find(params[:calibration_response_map_id])
-    review_response_map = ReviewResponseMap.find(params[:review_response_map_id])
-    @calibration_response = calibration_response_map.response[0]
-    @review_response = review_response_map.response[0]
-    @assignment = Assignment.find(calibration_response_map.reviewed_object_id)
-    @review_questionnaire_ids = ReviewQuestionnaire.select("id")
-    @assignment_questionnaire = AssignmentQuestionnaire.where(["assignment_id = ? and questionnaire_id IN (?)", @assignment.id, @review_questionnaire_ids]).first
-    @questions = @assignment_questionnaire.questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }
+    @assignment = Assignment.find(params[:assignment_id])
+    @calibration_response,
+    @review_response,
+    @questions = Response.calibration_results_info(params[:calibration_response_map_id], params[:review_response_map_id], params[:assignment_id])
   end
 
   def toggle_permission
@@ -297,7 +290,7 @@ class ResponseController < ApplicationController
   end
 
   private
-  
+
   # Added for E1973, team-based reviewing:
   # http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2019_-_Project_E1973._Team_Based_Reviewing
   # This action gets taken if the response is locked and cannot be edit right now
@@ -319,14 +312,21 @@ class ResponseController < ApplicationController
     end
     @participant = @map.reviewer
     @contributor = @map.contributor
-    new_response ? set_questionnaire_for_new_response : set_questionnaire
+    new_response ? questionnaire_from_response_map : questionnaire_from_response
     set_dropdown_or_scale
     @questions = sort_questions(@questionnaire.questions)
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score
+    # The new response is created here so that the controller has access to it in the new method
+    # This response object is populated later in the new method
+    if new_response
+      @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round, is_submitted: 0)
+    end
   end
-  # assigning the instance variables for Edit and New actions
-  def assign_instance_vars
+
+  # This method is called within the Edit or New actions
+  # It will create references to the objects that the controller will need when a user creates a new response or edits an existing one.
+  def assign_action_parameters
     case params[:action]
     when 'edit'
       @header = 'Edit'
@@ -343,9 +343,11 @@ class ResponseController < ApplicationController
     end
     @return = params[:return]
   end
-  # identifying the questionnaire type
-  # updating the current round for the reviewer's responses
-  def set_questionnaire_for_new_response
+
+  # This method is called within set_content and when the new_response flag is set to true
+  # Depending on what type of response map corresponds to this response, the method gets the reference to the proper questionnaire
+  # This is called after assign_instance_vars in the new method
+  def questionnaire_from_response_map
     case @map.type
     when "ReviewResponseMap", "SelfReviewResponseMap"
       reviewees_topic = SignedUpTeam.topic_id_by_team_id(@contributor.id)
@@ -362,18 +364,10 @@ class ResponseController < ApplicationController
       @questionnaire = @map.questionnaire
     end
   end
-  # stores the first instance of the score for each question
-  def scores
-    @review_scores = []
-    @questions.each do |question|
-      @review_scores << Answer.where(
-        response_id: @response.id,
-        question_id:  question.id
-      ).first
-    end
-  end
 
-  def set_questionnaire
+  # This method is called within set_content when the new_response flag is set to False
+  # This method gets the questionnaire directly from the response object since it is available.
+  def questionnaire_from_response
     # if user is not filling a new rubric, the @response object should be available.
     # we can find the questionnaire from the question_id in answers
     answer = @response.scores.first
@@ -405,8 +399,8 @@ class ResponseController < ApplicationController
   def init_answers(questions)
     questions.each do |q|
       # it's unlikely that these answers exist, but in case the user refresh the browser some might have been inserted.
-      a = Answer.where(response_id: @response.id, question_id: q.id).first
-      Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '') if a.nil?
+      answer = Answer.where(response_id: @response.id, question_id: q.id).first
+      Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '') if answer.nil?
     end
   end
 
@@ -425,4 +419,3 @@ class ResponseController < ApplicationController
     end
   end
 end
-

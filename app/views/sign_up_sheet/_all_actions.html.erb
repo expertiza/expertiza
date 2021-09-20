@@ -28,7 +28,7 @@
               <% end %>
           <% end %>
       <% end %>
-      <% if action_symbol_added == false %>
+      <% if !action_symbol_added %>
           <!--#if there is a signup topic deadline in current assignment, after the signup topic deadline, student will not see the choice of signing up topics any more. -->
           <% if @assignment.is_intelligent %>
             <td><%= form_tag({:controller=>"sign_up_sheet", :action=>"set_priority",:id => topic.id,:assignment_id => params[:assignment_id]}, method: :post) do %>

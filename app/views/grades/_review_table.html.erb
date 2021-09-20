@@ -9,7 +9,7 @@
 			<th style="text-align:center;"><%= collabel %>&nbsp;<%=i+1%>&nbsp;</th>
 		<% end %>
 	</tr>
-	<% if controller.action_name != "view_my_scores" || !@assignment.is_anonymous?%>
+	<% unless controller.action_name == "view_my_scores" && @assignment.is_anonymous?%>
 	<tr class="head"><td align="right"><b><%= rowlabel %></b></td>	    	
 		<% for review in reviews %>
        <td align="center">
@@ -28,7 +28,7 @@
 
 		<% for review in reviews %>
 		   <td align="center">
-             <% score = Answer.get_total_score(:response => [review], :questions => @questions[symbol], :q_types => Array.new) %>
+             <% score = Response.assessment_score(:response => [review], :questions => @questions[symbol], :q_types => []) %>
              <% if controller.action_name != "view_my_scores" %>
                <input type="hidden" class="form-control" id="mailer_<%= review.map.reviewer.fullname(session[:ip]) %>_grade" name="mailer[<%= review.map.reviewer.fullname(session[:ip]) %>_grade]" value="<%= score %>">
              <% end %>

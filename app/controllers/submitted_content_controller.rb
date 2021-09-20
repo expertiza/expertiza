@@ -30,7 +30,7 @@ class SubmittedContentController < ApplicationController
     SignUpSheet.signup_team(@assignment.id, @participant.user_id, nil) if @participant.team.nil?
     # @can_submit is the flag indicating if the user can submit or not in current stage
     @can_submit = !params.key?(:view)
-    @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
+    @stage = @assignment.current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
   end
 
   # view is called when @assignment.submission_allowed(topic_id) is false
@@ -41,7 +41,7 @@ class SubmittedContentController < ApplicationController
     @assignment = @participant.assignment
     # @can_submit is the flag indicating if the user can submit or not in current stage
     @can_submit = false
-    @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
+    @stage = @assignment.current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
     redirect_to action: 'edit', id: params[:id], view: true
   end
 
@@ -191,7 +191,7 @@ class SubmittedContentController < ApplicationController
   def check_content_type_integrity(file_content)
     limited_types = ['application/pdf', 'image/png', 'image/jpeg', 'application/zip', 'application/x-tar', 'application/x-7z-compressed', 'application/vnd.oasis.opendocument.text', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
     mime = MimeMagic.by_magic(file_content)
-    return limited_types.include? mime.to_s
+    limited_types.include? mime.to_s
   end
 
   # Verify the size of uploaded file is under specific value.
@@ -199,12 +199,12 @@ class SubmittedContentController < ApplicationController
   # @param size [Integer] maximum size(MB)
   # @return [Boolean] the result of verification
   def check_content_size(file, size)
-    return !(file.size > size*1024*1024)
+    !(file.size > size*1024*1024)
   end
 
   def get_file_type file_name
     base = File.basename(file_name)
-    return base.split(".")[base.split(".").size - 1] if base.split(".").size > 1
+    base.split(".")[base.split(".").size - 1] if base.split(".").size > 1
   end
 
   def move_selected_file

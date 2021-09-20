@@ -15,8 +15,6 @@ class MetareviewResponseMap < ResponseMap
       @sorted = @sorted_array.sort {|m1, m2| m1.version_num and m2.version_num ? m1.version_num <=> m2.version_num : (m1.version_num ? -1 : 1) }
       # return all the lists in ascending order.
       @sorted
-    else
-      nil # "<I>No review was performed.</I><br/><hr/><br/>"
     end
   end
 

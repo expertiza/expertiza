@@ -84,5 +84,18 @@ class StudentTaskController < ApplicationController
     @review_of_review_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
   end
 
+  def publishing_rights_update
+	@participant = AssignmentParticipant.find(params[:id])
+        @participant.permission_granted = params[:status]
+	@participant.save
+	respond_to do |format|
+		format.html {head :no_content}
+	end
+   end  
+
+  
+
+  
+  
   def your_work; end
 end

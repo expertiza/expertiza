@@ -103,8 +103,7 @@ class User < ActiveRecord::Base
   # real name is exactly opposite of what we'd do to get
   # anonymized name from their real name.
   def self.real_user_from_anonymized_name(anonymized_name)
-    user_id = anonymized_name.split(' ')[1]
-    user = User.find_by(id: user_id)
+    user = User.find_by(name: anonymized_name)
     return user
   end
 
@@ -298,7 +297,7 @@ class User < ActiveRecord::Base
   end
 
   def teaching_assistant?
-    return true if self.role.ta?
+    true if self.role.ta?
   end
 
   def self.search_users(role, user_id, letter, search_by)

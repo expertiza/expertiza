@@ -150,9 +150,9 @@ class CreateResponseMaps < ActiveRecord::Migration
           score_found = true
           score.update_attribute('response_id',response.id)
         end
-      }      
-      if !score_found
-        response.destroy        
+      }
+      unless score_found
+        response.destroy
       end
       return response
   end

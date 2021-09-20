@@ -9,8 +9,7 @@ class AnswerTag < ActiveRecord::Base
 
   def tag_prompt
     tag_dep = TagPromptDeployment.find(self.tag_prompt_deployment_id)
-    tag_prompt = TagPrompt.find(tag_dep.tag_prompt_id)
-    tag_prompt
+    TagPrompt.find(tag_dep.tag_prompt_id)
   end
 
   def tag_prompt_html_control user_id

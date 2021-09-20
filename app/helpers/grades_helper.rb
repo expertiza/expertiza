@@ -1,7 +1,7 @@
 module GradesHelper
   # Render the title
-  def get_accordion_title(last_topic, new_topic)
-    if last_topic.eql? nil
+  def accordion_title(last_topic, new_topic)
+    if last_topic.nil?
       # this is the first accordion
       render partial: "response/accordion", locals: {title: new_topic, is_first: true}
     elsif !new_topic.eql? last_topic
@@ -13,7 +13,7 @@ module GradesHelper
   def score_vector(reviews, symbol)
     scores = []
     reviews.each do |review|
-      scores << Answer.get_total_score(response: [review], questions: @questions[symbol.to_sym], q_types: [])
+      scores << Response.assessment_score(response: [review], questions: @questions[symbol.to_sym], q_types: [])
     end
     scores
   end
@@ -152,23 +152,23 @@ module GradesHelper
   def type_and_max(row)
     question = Question.find(row.question_id)
     if question.type == "Checkbox"
-      return 10_003
+      10_003
     elsif question.is_a? ScoredQuestion
       return 9311 + row.question_max_score
     else
-      return 9998
+      9998
     end
   end
 
   def underlined?(score)
-    return "underlined" if score.comment.present?
+    "underlined" if score.comment.present?
   end
 
   def retrieve_questions(questionnaires, assignment_id)
     questions = {}
     questionnaires.each do |questionnaire|
       round = AssignmentQuestionnaire.where(assignment_id: assignment_id, questionnaire_id: questionnaire.id).first.used_in_round
-      questionnaire_symbol = if !round.nil?
+      questionnaire_symbol = unless round.nil?
                                (questionnaire.symbol.to_s + round.to_s).to_sym
                              else
                                questionnaire.symbol

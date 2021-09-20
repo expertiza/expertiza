@@ -73,18 +73,18 @@ class TeamsController < ApplicationController
     @team = Team.find_by(id: params[:id])
     unless @team.nil?
       course = Object.const_get(session[:team_type]).find(@team.parent_id)
-      @signUps = SignedUpTeam.where(team_id: @team.id)
+      @signed_up_team = SignedUpTeam.where(team_id: @team.id)
       @teams_users = TeamsUser.where(team_id: @team.id)
 
-      if @signUps.size == 1 and @signUps.first.is_waitlisted == false # this team hold a topic
+      if @signed_up_team == 1 && !@signUps.first.is_waitlisted # this team hold a topic
         # if there is another team in waitlist, make this team hold this topic
-        topic_id = @signUps.first.topic_id
+        topic_id = @signed_up_team.first.topic_id
         next_wait_listed_team = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
         # if slot exist, then confirm the topic for this team and delete all waitlists for this team
         SignUpTopic.assign_to_first_waiting_team(next_wait_listed_team) if next_wait_listed_team
       end
 
-      @signUps.destroy_all if @signUps
+      @sign_up_team.destroy_all if @sign_up_team
       @teams_users.destroy_all if @teams_users
       @team.destroy if @team
       undo_link("The team \"#{@team.name}\" has been successfully deleted.")
@@ -99,7 +99,7 @@ class TeamsController < ApplicationController
     if assignment.course_id >= 0
       course = Course.find(assignment.course_id)
       teams = course.get_teams
-      if !teams.empty?
+      unless teams.empty?
         teams.each do |team|
           team.copy(assignment.id)
         end

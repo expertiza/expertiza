@@ -90,6 +90,24 @@ class TreeDisplayController < ApplicationController
       format.html { render json: folders } 
     end
   end
+  
+  # for child nodes
+  def children_node_ng
+    flash[:error] = "Invalid JSON in the TreeList" unless json_valid? params[:reactParams][:child_nodes]
+    child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
+    tmp_res = {}
+    begin
+      child_nodes.each do |node|
+        initialize_fnode_update_children(params, node, tmp_res)
+      end
+      flash[:error] = "Invalid child nodes in the TreeList"
+    rescue
+    end
+    
+    respond_to do |format|
+      format.html { render json: contents }
+    end
+  end
 
   # Returns the contents of the Courses and Questionaire subfolders
   def get_sub_folder_contents
@@ -107,11 +125,12 @@ class TreeDisplayController < ApplicationController
     child_nodes.each do |node|
       contents.push(serialize_sub_folder_to_json(node))
     end
-    
     respond_to do |format|
       format.html { render json: contents }
     end
   end
+
+   
   
   # # for child nodes
   # def children_node_2_ng
@@ -276,8 +295,8 @@ class TreeDisplayController < ApplicationController
         serialize_assignment_to_json(node, json)
       end
     end
-    
-    return json
+
+    json
   end
   
   # Creates a json object that can be displayed by the UI
@@ -301,8 +320,8 @@ class TreeDisplayController < ApplicationController
         serialize_assignment_to_json(node, json)
       end
     end
-    
-    return json
+
+    json
   end
 
   # Checks if the user is the instructor for the course or assignment node provided.

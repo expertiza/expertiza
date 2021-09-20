@@ -95,6 +95,7 @@ class Question < ActiveRecord::Base
     end
     # questionnaire = Questionnaire.find_by_id(_id)
     questionnaire = Questionnaire.find_by(id: q_id)
+    raise ArgumentError, "Questionnaire Not Found" if questionnaire.nil?
     questions = questionnaire.questions
     qid = 0
     questions.each do |q|
@@ -103,7 +104,6 @@ class Question < ActiveRecord::Base
         break
       end
     end
-    raise ArgumentError, "Questionnaire Not Found" if questionnaire.nil?
 
     if qid > 0
       # question = Question.find_by_id(qid)

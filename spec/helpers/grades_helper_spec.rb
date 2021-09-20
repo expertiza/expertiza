@@ -4,21 +4,22 @@ describe GradesHelper, type: :helper do
   let(:participant) { build(:participant, id: 1, assignment: assignment, user_id: 1) }
   let(:assignment) { build(:assignment, id: 1, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true)}
   let(:review_questionnaire) { build(:questionnaire, id: 1, questions: [question]) }
-
-  describe 'get_accordion_title' do
-    it 'should render is_first:true if last_topic is nil' do
-      get_accordion_title(nil, 'last question')
-      expect(response).to render_template(partial: 'response/_accordion', locals: {title: 'last question', is_first: true})
-    end
-    it 'should render is_first:false if last_topic is not equal to next_topic' do
-      get_accordion_title('last question', 'next question')
-      expect(response).to render_template(partial: 'response/_accordion', locals: {title: 'next question', is_first: false})
-    end
-    it 'should render nothing if last_topic is equal to next_topic' do
-      get_accordion_title('question', 'question')
-      expect(response).to render_template(nil)
-    end
-  end
+  
+  
+  # describe 'accordion_title' do
+  #   it 'should render is_first:true if last_topic is nil' do
+  #    accordion_title(nil, 'last question')
+  #    expect(response).to render_template(partial: 'response/_accordion', locals: {title: 'last question', is_first: true})
+  #  end
+  #  it 'should render is_first:false if last_topic is not equal to next_topic' do
+  #    accordion_title('last question', 'next question')
+  #    expect(response).to render_template(partial: 'response/_accordion', locals: {title: 'next question', is_first: false})
+  #  end
+  #  it 'should render nothing if last_topic is equal to next_topic' do
+  #    accordion_title('question', 'question')
+  #    expect(response).to render_template(nil)
+  #  end
+  # end  
 
   describe 'get_css_style_for_X_reputation' do
     hamer_input = [-0.1, 0, 0.5, 1, 1.5, 2, 2.1]
@@ -38,7 +39,7 @@ describe GradesHelper, type: :helper do
 
   describe 'score_vector' do
     it 'should return the scores from the questions in a vector' do
-      allow(Answer).to receive(:get_total_score).with(response: [review_response], questions: [question], q_types: []).and_return(75)
+      allow(Response).to receive(:assessment_score).with(response: [review_response], questions: [question], q_types: []).and_return(75)
       @questions = {:s => [question]}
       expect(score_vector([review_response, review_response], 's')).to eq([75,75])
     end
@@ -49,7 +50,7 @@ describe GradesHelper, type: :helper do
       symbol = :s
       @grades_bar_charts = {:s => nil}
       @participant_score = {symbol => {:assessments => [review_response, review_response]}}
-      allow(Answer).to receive(:get_total_score).with(response: [review_response], questions: [question], q_types: []).and_return(75)
+      allow(Response).to receive(:assessment_score).with(response: [review_response], questions: [question], q_types: []).and_return(75)
       allow(GradesController).to receive(:bar_chart).with([75,75]).and_return(
         'http://chart.apis.google.com/chart?chs=800x200&cht=bvg&chco=0000ff,ff0000,00ff00&chd=s:yoeKey,KUeoy9,9yooy9&chdl=Trend+1|Trend+2|Trend+3&chtt=Bar+Chart'
       )

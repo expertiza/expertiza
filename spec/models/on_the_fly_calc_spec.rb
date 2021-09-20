@@ -32,7 +32,7 @@ describe OnTheFlyCalc do
     let!(:response_record) { create(:response, id: 1, response_map: response_map) }
     let!(:response_record2) { create(:response, id: 2, response_map: response_map2) }
     before(:each) do
-      allow(Answer).to receive(:get_total_score).and_return(50, 30)
+      allow(Response).to receive(:assessment_score).and_return(50, 30)
       allow(ResponseMap).to receive(:where).and_return([response_map, response_map2])
       allow(SignedUpTeam).to receive(:find_by).with(team_id: contributor.id).and_return(signed_up_team)
     end
@@ -40,14 +40,14 @@ describe OnTheFlyCalc do
       it 'scores varying rubrics and returns review scores' do
         allow(assignment).to receive(:vary_by_round).and_return(true)
         allow(assignment).to receive(:rounds_of_reviews).and_return(1)
-        expect(assignment.compute_reviews_hash).to eql({})
+        expect(assignment.compute_reviews_hash).to eq({})
       end
     end
     context 'when current assignment does not vary rubrics by round' do
       it 'scores rubrics and returns review scores' do
         allow(assignment).to receive(:vary_by_round).and_return(false)
         allow(DueDate).to receive(:get_next_due_date).with(assignment.id).and_return(double(:DueDate, round: 1))
-        expect(assignment.compute_reviews_hash).to eql(1 => {1 => 50}, 2 => {1 => 30})
+        expect(assignment.compute_reviews_hash).to eq(1 => {1 => 50}, 2 => {1 => 30})
       end
     end
   end
@@ -56,8 +56,8 @@ describe OnTheFlyCalc do
     before(:each) do
       score = {min: 50.0, max: 50.0, avg: 50.0}
       allow(on_the_fly_calc).to receive(:contributors).and_return([contributor])
-      allow(Answer).to receive(:compute_scores).with([], [question1]).and_return(score)
-      allow(ReviewResponseMap).to receive(:get_assessments_for).with(contributor).and_return([])
+      allow(Response).to receive(:compute_scores).with([], [question1]).and_return(score)
+      allow(ReviewResponseMap).to receive(:assessments_for).with(contributor).and_return([])
       allow(SignedUpTeam).to receive(:find_by).with(team_id: contributor.id).and_return(signed_up_team)
       allow(on_the_fly_calc).to receive(:review_questionnaire_id).and_return(1)
     end

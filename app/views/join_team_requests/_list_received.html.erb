@@ -1,5 +1,5 @@
 <% @join_team_requests = JoinTeamRequest.where(team_id: team_id) %>
-<% if !@join_team_requests.empty? %>
+<% unless @join_team_requests.empty? %>
 <h2>Received Requests</h2>
 <table style="width:80%" align="center" >
   <tr style="border: 1px outset #000000; ">

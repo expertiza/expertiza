@@ -36,9 +36,9 @@
         end
       %>
 
-      <%if !@contributor.nil?%>
+      <%unless @contributor.nil?%>
         <%signed_up_teams = SignedUpTeam.find_user_signup_topics(assignment.id, @contributor)%>
-        <%if !signed_up_teams.nil?%>
+        <%unless signed_up_teams.nil?%>
           <%@topics = ""%>
           <%signed_up_teams.each do |signed_up_team|%>
             <%if signed_up_team.is_waitlisted?%>

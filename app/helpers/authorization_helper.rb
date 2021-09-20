@@ -150,7 +150,7 @@ module AuthorizationHelper
     response = Response.find(response_id.to_i)
     response_map = response.response_map
     if response_map.assignment
-      return response_map.assignment
+      response_map.assignment
     else
       find_assignment_from_response_id(response_map.reviewed_object_id)
     end

@@ -108,15 +108,15 @@ module AssignmentHelper
   end
 
   def compute_reviews_hash
-    @review_scores = {}
-    @response_type = 'ReviewResponseMap'
-    @response_maps = ResponseMap.where(reviewed_object_id: self.id, type: @response_type)
+    review_scores = {}
+    response_type = 'ReviewResponseMap'
+    response_maps = ResponseMap.where(reviewed_object_id: self.id, type: response_type)
     if self.vary_by_round
-      scores_varying_rubrics
+      review_scores = scores_varying_rubrics(review_scores, response_maps)
     else
-      scores_non_varying_rubrics
+      review_scores = scores_non_varying_rubrics(review_scores, response_maps)
     end
-    @review_scores
+    review_scores
   end
 
   # calculate the avg score and score range for each reviewee(team), only for peer-review
@@ -157,45 +157,47 @@ def peer_review_questions_for_team(team, round_number = nil)
   Question.where(questionnaire_id: review_questionnaire_id) unless team.nil?
 end
 
-def calc_review_score
-  unless @corresponding_response.empty?
-    @this_review_score_raw = Response.assessment_score(response: @corresponding_response, questions: @questions)
-    if @this_review_score_raw
-      @this_review_score = ((@this_review_score_raw * 100) / 100.0).round if @this_review_score_raw >= 0.0
+def calc_review_score(corresponding_response, questions)
+  unless corresponding_response.empty?
+    this_review_score_raw = Response.assessment_score(response: corresponding_response, questions: questions)
+    if this_review_score_raw
+      this_review_score = ((this_review_score_raw * 100) / 100.0).round if this_review_score_raw >= 0.0
     end
   else
-    @this_review_score = -1.0
+    this_review_score = -1.0
   end
 end
 
-def scores_varying_rubrics
+def scores_varying_rubrics(review_scores, response_maps)
   rounds = self.rounds_of_reviews
   (1..rounds).each do |round|
-    @response_maps.each do |response_map|
-      @questions = peer_review_questions_for_team(response_map.reviewee, round)
-      reviewer = @review_scores[response_map.reviewer_id]
-      @corresponding_response = Response.where('map_id = ?', response_map.id)
-      @corresponding_response = @corresponding_response.select {|response| response.round == round } unless @corresponding_response.empty?
-      @respective_scores = {}
-      @respective_scores = reviewer[round] unless reviewer.nil? || reviewer[round].nil?
-      calc_review_score
-      @respective_scores[response_map.reviewee_id] = @this_review_score
+    response_maps.each do |response_map|
+      questions = peer_review_questions_for_team(response_map.reviewee, round)
+      reviewer = review_scores[response_map.reviewer_id]
+      corresponding_response = Response.where('map_id = ?', response_map.id)
+      corresponding_response = corresponding_response.select {|response| response.round == round } unless corresponding_response.empty?
+      respective_scores = {}
+      respective_scores = reviewer[round] unless reviewer.nil? || reviewer[round].nil?
+      this_review_score = calc_review_score(corresponding_response, questions)
+      respective_scores[response_map.reviewee_id] = this_review_score
       reviewer = {} if reviewer.nil?
       reviewer[round] = {} if reviewer[round].nil?
-      reviewer[round] = @respective_scores
+      reviewer[round] = respective_scores
     end
   end
+  review_scores
 end
 
-def scores_non_varying_rubrics
-  @response_maps.each do |response_map|
-    @questions = peer_review_questions_for_team(response_map.reviewee)
-    reviewer = @review_scores[response_map.reviewer_id]
-    @corresponding_response = Response.where('map_id = ?', response_map.id)
-    @respective_scores = {}
-    @respective_scores = reviewer unless reviewer.nil?
-    calc_review_score
-    @respective_scores[response_map.reviewee_id] = @this_review_score
-    @review_scores[response_map.reviewer_id] = @respective_scores
+def scores_non_varying_rubrics(review_scores, response_maps)
+  response_maps.each do |response_map|
+    questions = peer_review_questions_for_team(response_map.reviewee)
+    reviewer = review_scores[response_map.reviewer_id]
+    corresponding_response = Response.where('map_id = ?', response_map.id)
+    respective_scores = {}
+    respective_scores = reviewer unless reviewer.nil?
+    this_review_score = calc_review_score(corresponding_response, questions)
+    respective_scores[response_map.reviewee_id] = this_review_score
+    review_scores[response_map.reviewer_id] = respective_scores
   end
+  review_scores
 end

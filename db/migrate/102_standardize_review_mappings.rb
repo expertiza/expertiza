@@ -125,12 +125,10 @@ class StandardizeReviewMappings < ActiveRecord::Migration
   end
   
   def self.delete(mapping, reason)
-    puts reason
     begin
       execute "delete from `review_mappings` where id = #{mapping["id"]}"
       mapping.delete(true)
     rescue
-      puts $!
     end
   end
   
@@ -150,7 +148,6 @@ class StandardizeReviewMappings < ActiveRecord::Migration
        begin
         reviewee = AssignmentTeam.find(mapping["team_id"])
        rescue
-        puts "   "+$!
        end
     elsif mapping["author_id"] != nil
        participant = make_participant(mapping["author_id"],mapping["reviewed_object_id"])

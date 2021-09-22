@@ -172,7 +172,6 @@ class SimiCheckWebService
   # # Checks where a NxN comparison has terminated - NOT WORKING?
   # def self.get_similarity_status(comparison_id)
   #   full_url = @@base_uri + '/similarity_status/' + comparison_id
-  #   puts full_url
   #   RestClient::Request.execute(method: :get,
   #                                          url: full_url,
   #                                          headers:

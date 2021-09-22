@@ -7,7 +7,7 @@
   <%elsif @show_actions %>
       <% action_symbol_added = false %>
       <% unless @selected_topics.nil? || @selected_topics.size.zero? %>
-          <% @selected_topic.each do | selected_topic |  %>
+          <% @selected_topics.each do | selected_topic |  %>
               <% if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted %>
                   <!--#if there is a drop topic deadline in current assignment, after the drop topic deadline, student will not see the choice of dropping topics any more. -->
                   <% if @drop_topic_deadline.nil? or (!@drop_topic_deadline.nil? and Time.now < @drop_topic_deadline.due_at) %>

@@ -11,7 +11,6 @@ class ConvertRoundInResponsesTableFromNilToSpecificRoundNum < ActiveRecord::Migr
   		end
   		response_maps.each do |response_map|
   			index += 1
-  			print '.' if index % 100 == 0
   			responses = response_map.response
   			responses.each do |response|
   				if response.round == nil
@@ -42,7 +41,6 @@ class ConvertRoundInResponsesTableFromNilToSpecificRoundNum < ActiveRecord::Migr
   		end
   		response_maps.each do |response_map|
   			index += 1
-  			print '.' if index % 100 == 0
   			responses = response_map.response
   			responses.each do |response|
   				if response.created_at.nil?

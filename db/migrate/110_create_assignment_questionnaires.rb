@@ -71,8 +71,6 @@ class CreateAssignmentQuestionnaires < ActiveRecord::Migration
           association.update_attribute("user_id",assignment.instructor_id)
         end
       rescue
-        puts "Assignment: #{assignment.id}"
-        puts "  "+$!
       end     
   end
 

@@ -2,7 +2,6 @@ class ConvertRoundInResponsesTableFromNilToSpecificRoundNum < ActiveRecord::Migr
   def change
   	# 1st kind of assignment which has both 'review' and 'rereview' deadline type.
   	# this kind of assignment only has one round of 'review' deadline.
-  	puts '1st type'
   	index = 0
   	assignments = Assignment.where(['id in (?)', [16,17,18,19,20,21,23,24,25,26,27,29,30,31,33,36,39,40,45,46,47,72,73,75,90,93,94,95,100,101,112,113,124,126,203,215,217,218,220,223,224,228,229,232,233,234,236,238,239,240,241,242,246,255,256,258,260,261,266,272,275,277,279,280,281,283,284,285,287,292,296,298,299,300,303,308,309,311,320,323,399,433,435,447,481,483,484,489,497,499,516,519,522,523,524,525,526,529,531,532,533,534,537,539,544,545,546,549,551,552,553,554,556,559,560,561,564,565,573,577,581,582,585,587,588,592,593,596,599,600,601,602,673]])
   	assignments.each do |assignment|

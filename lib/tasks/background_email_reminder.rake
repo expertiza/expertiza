@@ -38,8 +38,7 @@ end
     assign_type = DeadlineType.find(due_date.deadline_type_id).name
     allParticipants.each do |participant|
       email = participant.user.email
-      assign_name = assign.name
-      if participant.submitted_at.nil? && participant.team.hyperlinks.empty? #if(participant.has_submissions == false)
+      if participant.submitted_at.nil? && participant.team.hyperlinks.empty?
         emails << email
       end
     end

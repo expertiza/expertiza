@@ -1,28 +1,28 @@
 Hi <%= @first_name %>,
 
-A new <%= @type %> for the "<%= @obj_name %>" assignment has just been entered.
+A new <%=@type%> for the "<%= @obj_name %>" assignment has just been entered.
 You may log into Expertiza and view it now.
 
-<% if @review_scores != nil %>
+<% unless @review_scores.nil? %>
   Review Content:
-  <% @review_scores.each { |@rs| %>
+  <% @review_scores.each do | rs | %>
     -----------------------------------------------------------
-    Question: <%= Question.find(@rs.question_id).txt %>
+    Question: <%=Question.find(rs.question_id).txt %>
 
-    Comment: <%= @rs.comments %>
+    Comment: <%=rs.comments%>
 
-    Score: <%= @rs.answer %>
-  <% } %>
+    Score: <%=rs.answer%>
+  <% end %>
 <% end %>
 
 <% unless @ror_review_scores.nil? %>
   Review Content:
-  <% @ror_review_scores.each { |@rs| %>
+  <% @ror_review_scores.each do | rs | %>
     -----------------------------------------------------------
-    Question: <%= Question.find(@rs.question_id).txt %>
+    Question: <%=Question.find(rs.question_id).txt %>
 
-    Comment: <%= @rs.comments %>
+    Comment: <%=rs.comments%>
 
-    Score: <%= @rs.answer %>
-  <% } %>
+    Score: <%=rs.answer%>
+  <% end %>
 <% end %>

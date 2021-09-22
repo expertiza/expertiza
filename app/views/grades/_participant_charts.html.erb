@@ -65,7 +65,7 @@
 </TR>
 
 <script type="text/javascript">
-  <% ['review', 'metareview', 'feedback', 'teammate'].each do |type| %>
+  <% %w[review metareview feedback teammate].each do |type| %>
   <% if @pscore[type.to_sym] && @pscore[type.to_sym][:scores][:avg]%>
   <% if type == 'teammate' && @assignment.show_teammate_reviews == true %>
   var myCircle = Circles.create({

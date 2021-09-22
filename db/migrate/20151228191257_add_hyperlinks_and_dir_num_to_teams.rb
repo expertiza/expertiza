@@ -4,8 +4,8 @@ class AddHyperlinksAndDirNumToTeams < ActiveRecord::Migration
     add_column :teams, :directory_num, :integer
 
     teams=AssignmentTeam.all
-    teams. each do |team|
-      participants=team.participants
+    teams.each do |team|
+      participants = team.participants
       unless participants.empty?
         team.directory_num = participants.first.directory_num
         hyperlinks = []

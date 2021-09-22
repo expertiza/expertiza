@@ -31,7 +31,7 @@ class StudentQuizzesController < ApplicationController
   end
 
   # Create an array of candidate quizzes for current reviewer
-  def self.take_quiz assignment_id, reviewer_id
+  def self.take_quiz(assignment_id, reviewer_id)
     quizzes = []
     reviewer = Participant.where(user_id: reviewer_id, parent_id: assignment_id).first
     reviewed_team_response_maps = ReviewResponseMap.where(reviewer_id: reviewer.id)

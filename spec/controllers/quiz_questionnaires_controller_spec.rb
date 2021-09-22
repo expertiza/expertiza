@@ -16,7 +16,7 @@ describe QuizQuestionnairesController do
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
 
-  def check_access username
+  def check_access(username)
     stub_current_user(username, username.role.name, username.role)
     expect(controller.send(:action_allowed?))
   end

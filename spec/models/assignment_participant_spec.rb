@@ -120,7 +120,7 @@ describe AssignmentParticipant do
         allow(File).to receive(:directory?).with("a/b").and_return(true)
         allow(Dir).to receive(:[]).with("a/b/*").and_return(["a/b/k.rb"])
         allow(File).to receive(:directory?).with("a/b/k.rb").and_return(false)
-        expect(participant.files("a")).to eq(["a/b/k.rb", "a/b"])
+        expect(participant.files("a")).to eq(%w[a/b/k.rb a/b])
       end
     end
   end

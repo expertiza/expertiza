@@ -24,7 +24,7 @@ describe QuestionnairesController do
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
 
-  def check_access username
+  def check_access(username)
     stub_current_user(username, username.role.name, username.role)
     expect(controller.send(:action_allowed?))
   end
@@ -122,7 +122,7 @@ describe QuestionnairesController do
       session = {user: instructor}
       get :copy, params, session
       expect(response).to redirect_to('/questionnaires/view?id=2')
-      expect(controller.instance_variable_get(:@questionnaire).name).to eq ('Copy of ' + questionnaire.name)
+      expect(controller.instance_variable_get(:@questionnaire).name).to eq('Copy of ' + questionnaire.name)
       expect(controller.instance_variable_get(:@questionnaire).private).to eq false
       expect(controller.instance_variable_get(:@questionnaire).min_question_score).to eq 0
       expect(controller.instance_variable_get(:@questionnaire).max_question_score).to eq 5

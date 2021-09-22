@@ -18,7 +18,7 @@
     <option value='Hour' >Hour</option>
     <option value='Day' >Day</option>
     </select-->
-    <% @units=["Minute","Hour","Day"]%>
+    <% @units= %w[Minute Hour Day]%>
     <%= f.select "penalty_unit", @units %>
   </p>
   <p>

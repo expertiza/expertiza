@@ -3,7 +3,7 @@ require_relative 'helpers/assignment_creation_helper'
 describe "Assignment creation topics tab", js: true do
 	include AssignmentCreationHelper
 	before(:each) do
-		create_deadline_types()
+		create_deadline_types
 		(1..3).each do |i|
 			create(:course, name: "Course #{i}")
 		end

@@ -36,8 +36,8 @@ class SignUpSheet < ActiveRecord::Base
       end
     else
       # If all the topics choosen by the user are waitlisted,
-      for user_signup_topic in user_signup
-        return false if !user_signup_topic.is_waitlisted
+      user_signup.each do | user_signup_topic |
+        return false unless user_signup_topic.is_waitlisted
       end
 
       # Using a DB transaction to ensure atomic inserts

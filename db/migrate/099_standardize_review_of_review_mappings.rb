@@ -92,7 +92,7 @@ class StandardizeReviewOfReviewMappings < ActiveRecord::Migration
         
         if participant.nil?       
           participant = AssignmentParticipant.create(:user_id => user_id, :parent_id => assignment_id)
-          participant.set_handle()      
+          participant.set_handle
         end
       end     
     end

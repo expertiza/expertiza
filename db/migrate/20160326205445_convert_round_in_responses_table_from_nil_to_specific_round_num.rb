@@ -52,7 +52,7 @@ class ConvertRoundInResponsesTableFromNilToSpecificRoundNum < ActiveRecord::Migr
   						response.save
   						next
   				end
-  				if response.round == nil and size < 3
+  				if response.round.nil? && size < 3
   					if response.created_at <= due_dates[0].due_at
   						response.round = 1
   						response.save
@@ -60,7 +60,7 @@ class ConvertRoundInResponsesTableFromNilToSpecificRoundNum < ActiveRecord::Migr
   						response.round = 2
   						response.save
   					end
-  				elsif response.round == nil and size >= 3
+  				elsif response.round.nil? && size >= 3
   					 if response.created_at <= due_dates[0].due_at
   						response.round = 1
   						response.save

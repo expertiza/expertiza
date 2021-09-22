@@ -42,11 +42,11 @@ task :send_email_reminders => :environment do
                  :conditions => ["assignment_id = ?", assign.id])
           #puts "~~~~~~~~~~~~~~~~~~~~~due dates size #{due_dates.size} and due_at #{due_dates[0].due_at} and date.due_at - Time.now is #{due_dates[0].due_at - (Time.now-14400)}\n"
           
-          if(due_dates.size > 0)#making sure that the assignmefnt does have due dates
+          if due_dates.size > 0 #making sure that the assignmefnt does have due dates
             #the above query picks all deadlines for an asisgnment and we check for each and based on the assignment type we perform specific checks and then send email reminders
             for date in due_dates 
               #puts "~~~~~~~~~~Date is: #{date.due_at} and date.due_at - Time.now is: #{date.due_at - Time.now} and flag is #{date.flag}\n"
-              if((date.due_at - Time.now) <= date.threshold * 3600 && (date.due_at - Time.now) > 0 && date.flag == false)#send reminder
+              if (date.due_at - Time.now) <= date.threshold * 3600 && (date.due_at - Time.now) > 0 && date.flag == false #send reminder
                 #puts "~~~~~~~~~~Deadline type is: #{date.deadline_type_id} threshold is: #{date.threshold}\n"
                 deadlinetype = date.deadline_type_id
                 if deadlinetype == 1 #1 is submission
@@ -74,14 +74,14 @@ end
     emails = Array.new
     Rails.logger.info "Inside submission_reminder for assignment #{assign.name}"
     assign_type = DeadlineType.find(due_date.deadline_type_id).name
-    for participant in allParticipants 
+    allParticipants.each do |participant|
       email = participant.user.email
       #puts "~~~~~~~~~~Email: #{email}\n"                  
       assign_name = assign.name        
       #puts "~~~~~~~~~~Assignment name: #{assign_name}\n"                                  
       #puts "~~~~~~~~~~Assignment stage: #{assign_type}\n"      
       #puts "~~~~~~~~~~Sending submission_reminder if no submissions found ... submitted at nil #{(participant.submitted_at == nil)} .. hyperlink nil #{participant.submitted_hyperlink == nil} hyperlink empty #{participant.submitted_hyperlink != ""}\n"
-      if (participant.submitted_at.nil? && participant.team.hyperlinks.empty?)#if(participant.has_submissions == false)
+      if participant.submitted_at.nil? && participant.team.hyperlinks.empty? #if(participant.has_submissions == false)
         emails << email
       end
     end#end of for loop
@@ -91,35 +91,35 @@ end
   end
 
   def review_reminder(assign, due_date)
-    allParticipants = assign.participants
-    emails = Array.new
+    participants = assign.participants
+    emails = []
     Rails.logger.info "Inside review_reminder for assignment #{assign.name}"
     assign_type = DeadlineType.find(due_date.deadline_type_id).name
     #puts "~~~~~~~~~~Assignment stage: #{assign_type}\n"      
-    for participant in allParticipants                
+    participants.each do | participant |
       email = participant.user.email
       #puts "~~~~~~~~~~Email: #{email}\n"                  
       assign_name = assign.name        
       #puts "~~~~~~~~~~Assignment name: #{assign_name}\n"                                  
       #check if the participant/reviewer has reviewed the latest version of the resubmitted file, else send him a reminder
-      allresponsemaps = participant.review_mappings
+      response_maps = participant.review_mappings
       #puts" ~~~~~number of response maps #{allresponsemaps.size}\n"
-      if(allresponsemaps.size > 0)
-        for eachresponsemap in allresponsemaps
-            response = eachresponsemap.response.last
-            resubmission_times = ResubmissionTime.find(:all, :conditions => ["participant_id = ?", eachresponsemap.reviewee_id], :order => "resubmitted_at DESC")           
+      if response_maps.size > 0
+         response_maps.each do | response_map |
+            response = response_map.response.last
+            resubmission_times = ResubmissionTime.find(:all, :conditions => ["participant_id = ?", response_map.reviewee_id], :order => "resubmitted_at DESC")
             #puts" ~~~~~resubmission times: #{resubmission_times.size}\n"
-            if(!response.nil? && resubmission_times.size > 0)#meaning the reviewer has submitted a response for that map_id  
-              if(response.updated_at < resubmission_times[0].resubmitted_at) #participant/reviewer has reviewed an older version
+            unless response.nil? || resubmission_times.size <= 0 #meaning the reviewer has submitted a response for that map_id
+              if response.updated_at < resubmission_times[0].resubmitted_at #participant/reviewer has reviewed an older version
                   emails << email
-              end
-            elsif(response.nil?) #where the reviewee has submitted and reviewer has provided no response
-              if(resubmission_times.size > 0)
+            elsif response.nil?  #where the reviewee has submitted and reviewer has provided no response
+              #noinspection RubyParenthesesAroundConditionInspection
+              if resubmission_times.size > 0
                 emails << email
               else #if the reviewee has made some sort of submission
-                reviewee = eachresponsemap.reviewee
+                reviewee = response_map.reviewee
                 #puts "~~~~~~~~~~Sending review_reminder if no responses found ... submitted at nil #{(reviewee[0].submitted_at == nil)} .. hyperlink nil #{reviewee[0].submitted_hyperlink == nil} hyperlink empty #{reviewee[0].submitted_hyperlink == ""}\n"
-                unless (reviewee[0].submitted_at.nil? && reviewee[0].team.hyperlinks.empty?)
+                unless reviewee[0].submitted_at.nil? && reviewee[0].team.hyperlinks.empty?
                   #puts "~~~~~~~~~~Email: #{email}\n"   
                   emails << email
                 end
@@ -134,25 +134,25 @@ end
   end
 
   def metareview_reminder(assign, due_date)
-    allParticipants = assign.participants
-    emails = Array.new
+    participants = assign.participants
+    emails = []
     Rails.logger.info "Inside metareview_reminder for assignment #{assign.name}"
     assign_type = DeadlineType.find(due_date.deadline_type_id).name
     #puts "~~~~~~~~~~Assignment stage: #{assign_type}\n"      
-    for participant in allParticipants               
+    participants.each do | participant |
       email = participant.user.email
       #puts "~~~~~~~~~~Email: #{email}\n"                  
       assign_name = assign.name        
       #puts "~~~~~~~~~~Assignment name: #{assign_name}\n"                                  
       #check if the participant/reviewer has completed the meta-review
       #puts "~~~~~~~~~participant id #{participant.id}"
-      allresponsemaps = participant.metareview_mappings
-      if(allresponsemaps.size > 0)
-        for eachresponsemap in allresponsemaps
+      response_maps = participant.metareview_mappings
+      if response_maps.size > 0
+        response_maps.each do | response_map |
             #checking to see if the response map was for a review in the same assignment
-            checkresponsemap = ResponseMap.find(:all, :conditions => ["id = ? AND type = 'ParticipantReviewResponseMap' AND reviewed_object_id = ?", eachresponsemap.reviewed_object_id, assign.id])
-            if(checkresponsemap.size > 0)
-              if eachresponsemap.response.empty?
+            check_response_map = ResponseMap.find(:all, :conditions => ["id = ? AND type = 'ParticipantReviewResponseMap' AND reviewed_object_id = ?", response_map.reviewed_object_id, assign.id])
+            if check_response_map.size > 0
+              if response_map.response.empty?
                 emails << email
               end
             end

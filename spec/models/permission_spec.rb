@@ -3,7 +3,7 @@ describe Permission do
     it { should have_many(:controller_actions) }
 
     it "should have a name" do
-        perm = Permission.new()
+        perm = Permission.new
         expect(perm).not_to be_valid
     end
 

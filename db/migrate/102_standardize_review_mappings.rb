@@ -162,7 +162,7 @@ class StandardizeReviewMappings < ActiveRecord::Migration
     if reviewee.nil?
        reviewee = create_team(mapping)
     end    
-    return reviewee
+    reviewee
   end  
   
   # create a participant based on a user and assignment
@@ -175,7 +175,7 @@ class StandardizeReviewMappings < ActiveRecord::Migration
         
         if participant.nil?       
           participant = AssignmentParticipant.create(:user_id => user_id, :parent_id => assignment_id)
-          participant.set_handle()      
+          participant.set_handle
         end
       end     
     end
@@ -196,7 +196,7 @@ class StandardizeReviewMappings < ActiveRecord::Migration
      end
      
      # if the user was found, create a team based on the user
-     if user != nil
+     unless user.nil?
          team = AssignmentTeam.create(:name => 'Team'+mapping["author_id"].to_s, :parent_id => mapping["reviewed_object_id"])
          TeamsUser.create(:team_id => team.id, :user_id => mapping["author_id"])         
      end    

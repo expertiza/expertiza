@@ -35,8 +35,8 @@
           </tr>
       <% end %>
 
-     <% if map.type.to_s != "MetareviewResponseMap" %>
-       <% if @sorted_responses !=nil %>
+     <% unless map.type.to_s == "MetareviewResponseMap" %>
+       <% unless @sorted_responses.nil? %>
          <table class="grades" style=" font-style: italic; margin-left: 90px;">
          <% if @sorted_responses.size > 1 %>
            <%@sorted_responses = @sorted_responses.reverse%>

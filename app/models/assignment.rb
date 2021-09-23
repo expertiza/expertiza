@@ -9,7 +9,7 @@ class Assignment < ActiveRecord::Base
   include AssignmentAnalytic
   include ReviewAssignment
   include QuizAssignment
-  include OnTheFlyCalc
+  include AssignmentHelper
   has_paper_trail
   # When an assignment is created, it needs to
   # be created as an instance of a subclass of the Assignment (model) class;
@@ -214,7 +214,7 @@ class Assignment < ActiveRecord::Base
 
     # destroy instances of invitations, teams, particiapnts, etc, refactored by Rajan, Jasmine, Sreenidhi 3/30/2020
     #You can now add the instances to be deleted into the list.
-    delete_instances = ['invitations','teams','participants','due_dates','assignment_questionnaires']
+    delete_instances = %w[invitations teams participants due_dates assignment_questionnaires]
     delete_instances.each do |instance|
       self.instance_eval(instance).each(&:destroy)
     end

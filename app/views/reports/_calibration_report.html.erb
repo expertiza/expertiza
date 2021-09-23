@@ -8,7 +8,7 @@ th, td {
 	<% min_question_score = @assignment_questionnaire.questionnaire.min_question_score %>
 	<% max_question_score = @assignment_questionnaire.questionnaire.max_question_score %>
 	<% current_responses = @responses.select{|response|response.response_map.reviewee_id == response_map.reviewee_id} %>
-	<% response_ids = Array.new %>
+	<% response_ids = [] %>
 	<% current_responses.each { |curr_response|response_ids << curr_response.id } %>
 	<% participant_num = current_responses.count %>
 	
@@ -26,7 +26,7 @@ th, td {
 			<tr>
 				<td> % of students </td>
 				<% max_count = 0 %>
-				<% count_hash = Hash.new %>
+				<% count_hash = {} %>
 				<% (min_question_score..max_question_score).each do |answer| %>
 					<% count = Answer.where(["question_id = ? and response_id IN (?) and answer = ?", question.id, response_ids, answer]).size %>
 					<% count_hash[answer] = count %>

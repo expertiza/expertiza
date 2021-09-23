@@ -56,7 +56,7 @@ describe GradesHelper, type: :helper do
       )
       @questions = {:s => [question]}
       expect(charts(symbol).class).to eq(String)
-      expect(charts(symbol)).to include ('http://chart.apis.google.com/chart')
+      expect(charts(symbol)).to include('http://chart.apis.google.com/chart')
     end 
     it 'returns nil when there is no score' do
       @participant_score = {:s => nil}

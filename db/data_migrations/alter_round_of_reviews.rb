@@ -1,6 +1,5 @@
 class AlterRoundOfReviews
   def self.run!
-    puts 'AlterRoundOfReviews.run!'
     assignments = Assignment.all
     i =0
     while i < assignments.length

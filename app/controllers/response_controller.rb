@@ -66,7 +66,12 @@ class ResponseController < ApplicationController
     @prev = Response.where(map_id: @map.id)
     @review_scores = @prev.to_a
     if @prev.present?
-      @sorted = @review_scores.sort {|m1, m2| m1.version_num.to_i && m2.version_num.to_i ? m2.version_num.to_i <=> m1.version_num.to_i : (m1.version_num ? -1 : 1) }
+      @sorted = @review_scores.sort {|m1, m2|
+        if m1.version_num.to_i && m2.version_num.to_i
+          m2.version_num.to_i <=> m1.version_num.to_i
+        else
+          m1.version_num ? -1 : 1
+        end }
       @largest_version_num = @sorted[0]
     end
     #Added for E1973, team-based reviewing
@@ -279,7 +284,7 @@ class ResponseController < ApplicationController
 
       # Updating visibility for the response object, by E2022 @SujalAhrodia -->
       visibility = params[:visibility]
-      if (!visibility.nil?)
+      unless visibility.nil?
         @response.update_attribute("visibility",visibility)
       end
 

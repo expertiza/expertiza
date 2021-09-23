@@ -13,10 +13,10 @@
 <input type="checkbox" id="sample_cbx" checked="false"/>
 <label id="sample_cbx_lbl" for="sample_cbx">I agree to share my review as a sample for others</label>
 
-<% @review_versions = @map.get_all_versions() %>
-<% if !@review_versions.empty? %>
+<% @review_versions = @map.get_all_versions %>
+<% unless @review_versions.empty? %>
     <%= @review_versions.each do |response| %>
-    	<%= response.display_as_html() %>
+    	<%= response.display_as_html %>
         <br/>
     <% end %>
     <hr/>

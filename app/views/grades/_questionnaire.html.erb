@@ -5,7 +5,7 @@
      i = 0
      # Get score given by the reviewer for each question in this review
      score = Answer.where(response_id: review.id, question_id:  question.id).first
-     if !score.nil?
+     unless score.nil?
        ques_type = QuestionType.where(question_id: question.id)%>
         <%#- Render accordion title -%>
         <%= get_accordion_title(current_topic, ques_type[0].parameters.split("::")[0]) %>

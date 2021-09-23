@@ -258,25 +258,25 @@ class Response < ActiveRecord::Base
 
   private
 
-  def construct_instructor_html identifier, self_id, count
+  def construct_instructor_html(identifier, self_id, count)
     identifier += '<h4><B>Review ' + count.to_s + '</B></h4>'
     identifier += '<B>Reviewer: </B>' + self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
     identifier + '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' \
            "'review_" + self_id + "','review'" + ');return false;">hide review</a><BR/>'
   end
 
-  def construct_student_html identifier, self_id, count
-    identifier += '<table width="100%">'\
-						 '<tr>'\
-						 '<td align="left" width="70%"><b>Review ' + count.to_s + '</b>&nbsp;&nbsp;&nbsp;'\
-						 '<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' + "'review_" + self_id + "','review'" + ');return false;">hide review</a>'\
-						 '</td>'\
-						 '<td align="left"><b>Last Reviewed:</b>'\
-						 "<span>#{(self.updated_at.nil? ? 'Not available' : self.updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span></td>"\
+  def construct_student_html(identifier, self_id, count)
+    identifier += '<table width="100%">' \
+						 '<tr>' \
+						 '<td align="left" width="70%"><b>Review ' + count.to_s + '</b>&nbsp;&nbsp;&nbsp;' \
+						 '<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' + "'review_" + self_id + "','review'" + ');return false;">hide review</a>' \
+						 '</td>' \
+						 '<td align="left"><b>Last Reviewed:</b>' \
+						 "<span>#{(self.updated_at.nil? ? 'Not available' : self.updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span></td>" \
 						 '</tr></table>'
   end
 
-  def construct_review_response code, self_id, show_tags = nil, current_user = nil
+  def construct_review_response(code, self_id, show_tags = nil, current_user = nil)
     code += '<table id="review_' + self_id + '" class="table table-bordered">'
     answers = Answer.where(response_id: self.response_id)
     unless answers.empty?
@@ -296,12 +296,12 @@ class Response < ActiveRecord::Base
     code += '</table>'
   end
 
-  def add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, current_user = nil
+  def add_table_rows(questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, current_user = nil)
     count = 0
     # loop through questions so the the questions are displayed in order based on seq (sequence number)
     questions.each do |question|
       count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
-      answer = answers.find {|a| a.question_id == question.id }
+      answer = answers.find { |a| a.question_id == question.id }
       row_class = count.even? ? "info" : "warning"
       row_class = "" if question.is_a? QuestionnaireHeader
       code += '<tr class="' + row_class + '"><td>'

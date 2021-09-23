@@ -18,7 +18,7 @@
     </thead>
     <tbody>
       <% i=1 %>
-      <% for topic in @sign_up_topics %>
+      <% @sign_up_topics.each do | topic | %>
         <tr>
           <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
         </tr>

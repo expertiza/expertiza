@@ -1,9 +1,9 @@
 describe QuestionnaireNode do
-	let(:questionnaire) {build (:questionnaire)}
-	let(:questionnaire2) {build (:questionnaire)}
-	let(:questionnaire3) {build (:questionnaire)}
-  let(:questionnaire_node) {build (:questionnaire_node)}
-  let(:teaching_assistant) {build (:teaching_assistant)}
+	let(:questionnaire) {build(:questionnaire)}
+	let(:questionnaire2) {build(:questionnaire)}
+	let(:questionnaire3) {build(:questionnaire)}
+  let(:questionnaire_node) {build(:questionnaire_node)}
+  let(:teaching_assistant) {build(:teaching_assistant)}
   let(:student) {build(:student)}
   let(:assignment) { build(:assignment, id: 1, name: 'Assignment') }
   it { should belong_to(:questionnaire) }

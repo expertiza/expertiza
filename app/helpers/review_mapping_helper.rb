@@ -274,7 +274,7 @@ module ReviewMappingHelper
     # if someone did not do any tagging in 30 seconds, then ignore this interval
     threshold = 30
     intervals = intervals.select{|v| v < threshold}
-    if not intervals.empty?
+    unless  intervals.empty?
       interval_mean = intervals.reduce(:+) / intervals.size.to_f
     end
     #build the parameters for the chart
@@ -286,7 +286,7 @@ module ReviewMappingHelper
           data: intervals,
           label: "time intervals"
         },
-        if not intervals.empty?
+        unless  intervals.empty?
           {
             data: Array.new(intervals.length, interval_mean),
             label: "Mean time spent"

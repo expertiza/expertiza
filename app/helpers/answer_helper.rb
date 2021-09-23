@@ -63,7 +63,6 @@ module AnswerHelper
       true
     rescue StandardError
       raise $ERROR_INFO
-      false
     end
   end
 

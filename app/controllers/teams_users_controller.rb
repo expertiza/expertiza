@@ -30,7 +30,7 @@ class TeamsUsersController < ApplicationController
 
     team = Team.find(params[:id])
 
-    if !user.nil?
+    unless user.nil?
       if team.is_a?(AssignmentTeam)
         assignment = Assignment.find(team.parent_id)
         if AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id).nil?

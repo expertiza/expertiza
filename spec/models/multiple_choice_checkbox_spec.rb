@@ -84,13 +84,13 @@ describe MultipleChoiceCheckbox do
   describe '#import' do
     context 'when the row length is not 5' do
       it 'throws an error' do
-        expect{Question.import(['header1', 'header2', 'header3'], [], [], nil)}.to raise_error(ArgumentError)
+        expect{Question.import(%w[header1 header2 header3], [], [], nil)}.to raise_error(ArgumentError)
       end
     end
     context 'when there is no questionnaire' do
       it 'throws an error' do
         allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(nil)
-        expect{Question.import(['header1', 'header2', 'header3', 'header4', 'header5'], [], [], 1)}.to raise_error(ArgumentError)
+        expect{Question.import(%w[header1 header2 header3 header4 header5], [], [], 1)}.to raise_error(ArgumentError)
       end
     end
   end

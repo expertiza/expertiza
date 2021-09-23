@@ -18,7 +18,7 @@ end
         allow(question).to receive(:type).and_return('Criterion')
         allow(question2).to receive(:type).and_return('TextArea')
         expect(dc.types.length).to eq(2)
-        expect(dc.types).to eq(['Criterion', 'TextArea'])
+        expect(dc.types).to eq(%w[Criterion TextArea])
   	  end
     end
     context 'when there are two questions, with the same types' do

@@ -102,7 +102,7 @@
           <td width="50%" style="vertical-align:top;"><%= map.get_reviewer.name %> (<%= map.get_reviewer.fullname %>)
             <div style="text-align:right">
               <div id="review_status<%=map.map_id%>">
-                <% if(Response.where(map_id: map.map_id).last.nil?) %>
+                <% if Response.where(map_id: map.map_id).last.nil? %>
                     Review Status: Assigned
                 <% elsif Response.where(map_id: map.map_id).last.is_submitted == true%>
                     Review Status: Submitted

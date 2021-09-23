@@ -12,7 +12,11 @@ class MetareviewResponseMap < ResponseMap
       @prev.each do |element|
         @sorted_array << element if element.map_id == self.review_mapping.map_id
       end
-      @sorted = @sorted_array.sort {|m1, m2| m1.version_num and m2.version_num ? m1.version_num <=> m2.version_num : (m1.version_num ? -1 : 1) }
+      @sorted = @sorted_array.sort {|m1, m2| m1.version_num || if m2.version_num
+                                                                  m1.version_num <=> m2.version_num
+                                                                else
+                                                                  m1.version_num ? -1 : 1
+                                                                end }
       # return all the lists in ascending order.
       @sorted
     end

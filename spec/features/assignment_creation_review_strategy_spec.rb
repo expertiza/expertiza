@@ -4,7 +4,7 @@ require_relative 'helpers/assignment_creation_helper'
 describe "Assignment creation review strategy tab", js: true do
 	include AssignmentCreationHelper
 	before(:each) do
-		create_deadline_types()
+		create_deadline_types
 		create(:assignment, name: 'public assignment for test')
 		@assignment_id = Assignment.where(name: 'public assignment for test').first.id
 	end

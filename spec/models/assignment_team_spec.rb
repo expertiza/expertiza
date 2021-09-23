@@ -259,10 +259,10 @@ describe 'AssignmentTeam' do
         allow(team).to receive(:submitted_hyperlinks=)
         allow(team).to receive(:save)
         allow(Net::HTTP).to receive(:get_response).and_return("0")
-        allow(YAML).to receive(:dump).with(["https://expertiza.ncsu.edu", "www.ncsu.edu"])
+        allow(YAML).to receive(:dump).with(%w[https://expertiza.ncsu.edu www.ncsu.edu])
         expect(team).to receive(:submitted_hyperlinks=)
         expect(team).to receive(:save)
-        expect(YAML).to receive(:dump).with(["https://expertiza.ncsu.edu", "http://www.ncsu.edu"])
+        expect(YAML).to receive(:dump).with(%w[https://expertiza.ncsu.edu http://www.ncsu.edu])
         team.submit_hyperlink("www.ncsu.edu  ")
       end
     end
@@ -271,7 +271,7 @@ describe 'AssignmentTeam' do
   describe "#remove_hyperlink" do
     context "when the hyperlink is in the assignment team's hyperlinks" do
       it "is removed from the team's list of hyperlinks" do
-        allow(team).to receive(:hyperlinks).and_return(["https://expertiza.ncsu.edu", "https://www.ncsu.edu"])
+        allow(team).to receive(:hyperlinks).and_return(%w[https://expertiza.ncsu.edu https://www.ncsu.edu])
         expect(team).to receive(:submitted_hyperlinks=)
         expect(team).to receive(:save)
         expect(YAML).to receive(:dump).with(["https://expertiza.ncsu.edu"])

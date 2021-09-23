@@ -99,7 +99,7 @@ class SubmittedContentController < ApplicationController
     file_size_limit = 5
     
     # check file size
-    if !check_content_size(file, file_size_limit)
+    unless check_content_size(file, file_size_limit)
       flash[:error] = "File size must smaller than #{file_size_limit}MB"
       redirect_to action: 'edit', id: participant.id
       return
@@ -108,7 +108,7 @@ class SubmittedContentController < ApplicationController
     file_content = file.read
 
     # check file type
-    if !check_content_type_integrity(file_content)
+    unless check_content_type_integrity(file_content)
       flash[:error] = 'File type error'
       redirect_to action: 'edit', id: participant.id
       return
@@ -189,7 +189,7 @@ class SubmittedContentController < ApplicationController
   # @param file_content [Object] the content of uploaded file
   # @return [Boolean] the result of verification
   def check_content_type_integrity(file_content)
-    limited_types = ['application/pdf', 'image/png', 'image/jpeg', 'application/zip', 'application/x-tar', 'application/x-7z-compressed', 'application/vnd.oasis.opendocument.text', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+    limited_types = %w[application/pdf image/png image/jpeg application/zip application/x-tar application/x-7z-compressed application/vnd.oasis.opendocument.text application/vnd.openxmlformats-officedocument.wordprocessingml.document]
     mime = MimeMagic.by_magic(file_content)
     limited_types.include? mime.to_s
   end
@@ -199,10 +199,10 @@ class SubmittedContentController < ApplicationController
   # @param size [Integer] maximum size(MB)
   # @return [Boolean] the result of verification
   def check_content_size(file, size)
-    !(file.size > size*1024*1024)
+    file.size <= size*1024*1024
   end
 
-  def get_file_type file_name
+  def get_file_type(file_name)
     base = File.basename(file_name)
     base.split(".")[base.split(".").size - 1] if base.split(".").size > 1
   end

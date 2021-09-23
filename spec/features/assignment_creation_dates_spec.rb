@@ -4,7 +4,7 @@ include AssignmentCreationHelper
 describe "assignment creation due dates", js: true do
 
   before(:each) do
-    create_deadline_types()
+    create_deadline_types
     @assignment = create(:assignment, name: 'public assignment for test')
     login_as("instructor6")
     visit "/assignments/#{@assignment.id}/edit"

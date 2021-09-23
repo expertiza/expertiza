@@ -58,7 +58,7 @@
                   <% key_chart_information = calculate_key_chart_information(report_line.tag_update_intervals) %>
                   <td>
                     <!-- Populates statistics only if backend returned details -->
-                    <% if(key_chart_information.is_a?(Hash))%>
+                    <% if key_chart_information.is_a?(Hash)%>
                       <ul>
                           <li>Mean: <%= key_chart_information[:mean] %></li>
                           <li>Min: <%= key_chart_information[:min] %></li>

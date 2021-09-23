@@ -9,7 +9,7 @@ describe Questionnaire do
   let!(:checkbox1) { Checkbox.create(id: 3, type: 'Checkbox', seq: 2.0, txt: 'test txt2', weight: 11) }
   let(:question1) { create(:question, questionnaire: questionnaire2, weight: 1, id: 1) }
   let(:question2) { create(:question, questionnaire: questionnaire2, weight: 2, id: 2) }
-  let(:questionnaire_node) {build (:questionnaire_node)}
+  let(:questionnaire_node) {build(:questionnaire_node)}
   describe "#name" do
     it "returns the name of the Questionnaire" do
       expect(questionnaire.name).to eq("abc")

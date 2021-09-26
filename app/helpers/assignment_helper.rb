@@ -101,9 +101,9 @@ module AssignmentHelper
 
   # Compute total score for this assignment by summing the scores given on all questionnaires.
   # Only scores passed in are included in this sum.
-  def compute_total_score(scores)
+  def compute_total_score(assignment, scores)
     total = 0
-    self.questionnaires.each {|questionnaire| total += questionnaire.get_weighted_score(self, scores) }
+    assignment.questionnaires.each {|questionnaire| total += questionnaire.get_weighted_score(assignment, scores) }
     total
   end
 

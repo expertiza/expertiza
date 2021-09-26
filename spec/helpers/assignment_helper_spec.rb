@@ -29,14 +29,14 @@ describe AssignmentHelper do
   describe '#compute_total_score' do
     context 'when avg score is nil' do
       it 'computes total score for this assignment by summing the score given on all questionnaires' do
-        assignment_helper = Assignment.new(id: 1, name: 'Test Assgt')
+        test_assignment = Assignment.new(id: 1, name: 'Test Assgt')
         scores = {review1: {scores: {max: 80, min: 0, avg: nil}, assessments: [response]}}
-        allow(assignment_helper).to receive(:questionnaires).and_return([questionnaire1])
+        allow(test_assignment).to receive(:questionnaires).and_return([questionnaire1])
         allow(ReviewQuestionnaire).to receive_message_chain(:assignment_questionnaires, :find_by)
           .with(no_args).with(assignment_id: 1).and_return(double('AssignmentQuestionnaire', id: 1))
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: nil)
                                                            .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
-        expect(assignment_helper.compute_total_score(scores)).to eq(0)
+        expect(compute_total_score(test_assignment, scores)).to eq(0)
       end
     end
   end

@@ -315,7 +315,7 @@ describe ReviewResponseMap do
       allow(review_questionnaire).to receive(:symbol).and_return(:review)
       allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([response3])
       allow(Response).to receive(:compute_scores).with([response3], [question]).and_return(max: 95, min: 88, avg: 90)
-      allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
+      allow_any_instance_of(AssignmentHelper).to receive(:compute_total_score).with(any_args).and_return(100)
       allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
       allow(participant).to receive(:assignment).and_return(assignment)
       allow(response3).to receive(:id).and_return(nil)
@@ -363,7 +363,7 @@ describe ReviewResponseMap do
   describe '#compute_assignment_score' do
     before(:each) do
       allow(review_questionnaire).to receive(:symbol).and_return(:review)
-      allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
+      allow_any_instance_of(AssignmentHelper).to receive(:compute_total_score).with(any_args).and_return(100)
       allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
       allow(participant).to receive(:assignment).and_return(assignment)
     end

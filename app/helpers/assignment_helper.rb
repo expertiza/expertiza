@@ -120,11 +120,11 @@ module AssignmentHelper
   end
 
   # calculate the avg score and score range for each reviewee(team), only for peer-review
-  def compute_avg_and_ranges_hash
+  def compute_avg_and_ranges_hash(assignment)
     scores = {}
-    contributors = self.contributors # assignment_teams
-    if self.vary_by_round
-      rounds = self.rounds_of_reviews
+    contributors = assignment.contributors # assignment_teams
+    if assignment.vary_by_round
+      rounds = assignment.rounds_of_reviews
       (1..rounds).each do |round|
         contributors.each do |contributor|
           questions = peer_review_questions_for_team(contributor, round)

@@ -107,11 +107,11 @@ module AssignmentHelper
     total
   end
 
-  def compute_reviews_hash
+  def compute_reviews_hash(assignment)
     review_scores = {}
     response_type = 'ReviewResponseMap'
-    response_maps = ResponseMap.where(reviewed_object_id: self.id, type: response_type)
-    if self.vary_by_round
+    response_maps = ResponseMap.where(reviewed_object_id: assignment.id, type: response_type)
+    if assignment.vary_by_round
       review_scores = scores_varying_rubrics(review_scores, response_maps)
     else
       review_scores = scores_non_varying_rubrics(review_scores, response_maps)

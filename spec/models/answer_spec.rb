@@ -6,9 +6,6 @@ describe Answer do
   let!(:response_record) { create(:response, id: 1, response_map: response_map) }
   let!(:answer) { create(:answer, question: question1, response_id: 1) }
 
-  describe "# test dependancy between question.rb and answer.rb"
-  it { should belong_to(:question) }
-
   describe "#test get total score" do
     it "returns total score when required conditions are met" do
       # stub for ScoreView.find_by_sql to revent prevent unit testing sql db queries

@@ -1,6 +1,7 @@
 class AssignmentTeam < Team
   require File.dirname(__FILE__) + '/analytic/assignment_team_analytic'
   include AssignmentTeamAnalytic
+  include AssignmentHelper
 
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'parent_id'
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewee_id'
@@ -168,7 +169,7 @@ class AssignmentTeam < Team
       scores[questionnaire.symbol][:assessments] = ReviewResponseMap.where(reviewee_id: self.id)
       scores[questionnaire.symbol][:scores] = Response.compute_scores(scores[questionnaire.symbol][:assessments], questions[questionnaire.symbol])
     end
-    scores[:total_score] = AssignmentHelper.compute_total_score(assignment, scores)
+    scores[:total_score] = compute_total_score(assignment, scores)
     scores
   end
 

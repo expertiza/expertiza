@@ -1,4 +1,5 @@
 class ResponseMap < ActiveRecord::Base
+  include AssignmentHelper
 
   has_many :response, foreign_key: 'map_id', dependent: :destroy, inverse_of: false
   belongs_to :reviewer, class_name: 'Participant', foreign_key: 'reviewer_id', inverse_of: false
@@ -127,7 +128,7 @@ class ResponseMap < ActiveRecord::Base
     # Retrieve assignment score
     compute_assignment_score(participant, questions, scores)
     # Compute the Total Score (with question weights factored in)
-    scores[:total_score] = AssignmentHelper.compute_total_score(assignment, scores) 
+    scores[:total_score] = compute_total_score(assignment, scores) 
 
     # merge scores[review#] (for each round) to score[review]
     merge_scores(participant, scores) if assignment.vary_by_round
@@ -139,7 +140,7 @@ class ResponseMap < ActiveRecord::Base
       scores[:max_pts_available] = topic.micropayment
     end
 
-    scores[:total_score] = AssignmentHelper.compute_total_score(assignment, scores)
+    scores[:total_score] = compute_total_score(assignment, scores)
     
     # update :total_score key in scores hash to user's current grade if they have one
     # update :total_score key in scores hash to 100 if the current value is greater than 100

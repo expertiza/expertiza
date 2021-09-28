@@ -11,11 +11,11 @@
             <% if params[:has_reviewee] == 'true_first' %>
                 <li>Contributor</li>
                 <li>Reviewers</li>
-                <% @contents_hash[:header] = ["reviewee","reviewers"]%>
+                <% @contents_hash[:header] = %w[reviewee reviewers]%>
             <% elsif params[:has_reviewee] == 'true_last' %>
                 <li>Reviewers</li>
                 <li>Contributor</li>
-                <%@contents_hash[:header] = ["reviewers","reviewee"]%>
+                <%@contents_hash[:header] = %w[reviewers reviewee]%>
            <% end %>
           </ol>
         </strong>

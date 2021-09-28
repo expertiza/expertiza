@@ -1,14 +1,14 @@
 module ConferenceHelper
     def is_valid_conference_assignment?
         #if assignment id is present in url the check if it's a valid conference assignment.
-        if !params[:assignment_id].nil?
+        unless params[:assignment_id].nil?
           @assignment = Assignment.find_by_id(params[:assignment_id])
           if !@assignment.nil? and @assignment.is_conference_assignment
             true
           else
             false
           end
-       end
+        end
     end
 
     def current_user_has_admin_rights
@@ -29,9 +29,9 @@ module ConferenceHelper
         #if conference user is already logged in the redirect to Student_task list page
         # else redirect to login page.
         if current_user && current_role_name == "Student"
-            return '/student_task/list'
+          '/student_task/list'
         else
-            return '/'
+          '/'
         end
     end
 
@@ -68,7 +68,7 @@ module ConferenceHelper
         password = @user.reset_password
         #Mail to be sent to co-author once the user has been created. New partial is used as content for email is different from normal user
         MailerHelper.send_mail_for_conference_user(@user, "Your Expertiza account has been created.", "user_conference_invitation", password,current_user.name).deliver
-        return @user
+        @user
       end
     end
 

@@ -1,10 +1,10 @@
 <% found_in_slots = false %>
-<% for slot in @slots_filled %>
+<% @slots_filled.each do |slot| %>
   <% if slot.topic_id.to_s == topic.id.to_s %>
-    <td align="center"><%=  topic.micropayment %></td>
+    <td align="center"><%= topic.micropayment %></td>
     <% found_in_slots = true %>
   <% end %>
 <% end %>
-<% if found_in_slots == false %>
+<% unless found_in_slots %>
   <td align="center">0</td>
 <% end %>

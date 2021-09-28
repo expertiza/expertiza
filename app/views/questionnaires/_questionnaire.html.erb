@@ -27,11 +27,17 @@
 <!--Question part-->
 <hr/>
 <% if !params[:id].nil? and params[:action] == 'edit' %>
+  <% if AnswerHelper.in_active_period(params[:id]) %>
+    A review period is in progress. All existing reviews for the questionnaire <b>will be deleted</b> if you ADD or REMOVE a question.
+  <% end %>
   <table id="question_actions_table">
     <tr>
       <td>
         <%= form_tag :action => 'add_new_questions', :id => params[:id], :questionnaire_type => params[:model], :private => params[:private] do %>
-         <p class="form-inline"> <%= submit_tag 'Add', class: "btn btn-default"%>
+         <p class="form-inline">
+           <%= submit_tag 'Add',
+                          confirm: AnswerHelper.in_active_period(params[:id]) ? "A review period is in progress. All existing reviews for the questionnaire would be deleted. Are you sure you want to continue?" : nil,
+                          class: "btn btn-primary"%>
           <%= text_field 'question', 'total_num', :size => 1, :value => "1", :class => "form-control" %> more
           <%= select "question", "type",
               {"Criterion" =>"Criterion",
@@ -65,8 +71,8 @@
       </tr>
       <% i = 1 %>
       <%questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }%>
-      <% for @question in questions %>
-        <%=@question.edit(i)%>
+      <% questions.each do |question| %>
+        <%=question.edit(i)%>
         <% i += 1 %>
       <% end %>
     </table>
@@ -78,3 +84,11 @@
   <% end %>
 <% end %>
 <BR/>
+
+<% if AnswerHelper.in_active_period(params[:id]) %>
+    <script>
+        $('a[data-method="delete"]').click(function(e) {
+            return window.confirm("A review period is in progress. All existing reviews for the questionnaire would be deleted. Are you sure you want to continue?");
+        });
+    </script>
+<% end %>

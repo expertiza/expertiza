@@ -37,13 +37,14 @@ class Response < ActiveRecord::Base
   end
 
   # Computes the total score awarded for a review
-  def total_score
+  def aggregate_questionnaire_score
     # only count the scorable questions, only when the answer is not nil
     # we accept nil as answer for scorable questions, and they will not be counted towards the total score
     sum = 0
     scores.each do |s|
       question = Question.find(s.question_id)
-      sum += s.answer * question.weight if !s.answer.nil? && question.is_a?(ScoredQuestion)
+      # For quiz responses, the weights will be 1 or 0, depending on if correct
+      sum += s.answer * question.weight unless s.answer.nil? || !question.is_a?(ScoredQuestion)
     end
     sum
   end
@@ -56,8 +57,8 @@ class Response < ActiveRecord::Base
   # bug fixed
   # Returns the average score for this response as an integer (0-100)
   def average_score
-    if maximum_score != 0
-      ((total_score.to_f / maximum_score.to_f) * 100).round
+    unless maximum_score.zero?
+      ((aggregate_questionnaire_score.to_f / maximum_score.to_f) * 100).round
     else
       "N/A"
     end
@@ -70,7 +71,7 @@ class Response < ActiveRecord::Base
     total_weight = 0
     scores.each do |s|
       question = Question.find(s.question_id)
-      total_weight += question.weight if !s.answer.nil? && question.is_a?(ScoredQuestion)
+      total_weight += question.weight unless s.answer.nil? || !question.is_a?(ScoredQuestion)
     end
     questionnaire = if scores.empty?
                       questionnaire_by_answer(nil)
@@ -97,8 +98,24 @@ class Response < ActiveRecord::Base
     response_map.email(defn, participant, parent)
   end
 
+  # This populate_new_response method returns a Response object used to populate the
+  # @response instance object with the correct response according to the rubric review round
+  # or with a new Response object that the controller can use
+  # this method is called within the new method in response_controller
+  def populate_new_response(response_map, current_round)
+    response = Response.where(map_id: response_map.id, round: current_round.to_i).order(updated_at: :desc).first
+    reviewee_team = AssignmentTeam.find_by(id: response_map.reviewee_id)
+
+    most_recent_submission_by_reviewee = reviewee_team.most_recent_submission if reviewee_team
+
+    if response.nil? || (most_recent_submission_by_reviewee && most_recent_submission_by_reviewee.updated_at > response.updated_at)
+      response = Response.create(map_id: response_map.id, additional_comment: '', round: current_round, is_submitted: 0)
+    end
+    response
+  end
+
   def questionnaire_by_answer(answer)
-    if !answer.nil? # for all the cases except the case that  file submission is the only question in the rubric.
+    unless answer.nil? # for all the cases except the case that  file submission is the only question in the rubric.
       questionnaire = Question.find(answer.question_id).questionnaire
     else
       # there is small possibility that the answers is empty: when the questionnaire only have 1 question and it is a upload file question
@@ -144,7 +161,7 @@ class Response < ActiveRecord::Base
     [comments, counter, @comments_in_round, @counter_in_round]
   end
 
-  def self.get_volume_of_review_comments(assignment_id, reviewer_id)
+  def self.volume_of_review_comments(assignment_id, reviewer_id)
     comments, counter,
       @comments_in_round, @counter_in_round = Response.concatenate_all_review_comments(assignment_id, reviewer_id)
     num_rounds = @comments_in_round.count - 1 #ignore nil element (index 0)
@@ -164,15 +181,15 @@ class Response < ActiveRecord::Base
   # compare the current response score with other scores on the same artifact, and test if the difference
   # is significant enough to notify instructor.
   # Precondition: the response object is associated with a ReviewResponseMap
-  ### "map_class.get_assessments_for" method need to be refactored
+  ### "map_class.assessments_for" method need to be refactored
   def significant_difference?
     map_class = self.map.class
-    existing_responses = map_class.get_assessments_for(self.map.reviewee)
+    existing_responses = map_class.assessments_for(self.map.reviewee)
     average_score_on_same_artifact_from_others, count = Response.avg_scores_and_count_for_prev_reviews(existing_responses, self)
     # if this response is the first on this artifact, there's no grade conflict
     return false if count.zero?
     # This score has already skipped the unfilled scorable question(s)
-    score = total_score.to_f / maximum_score
+    score = aggregate_questionnaire_score.to_f / maximum_score
     questionnaire = questionnaire_by_answer(self.scores.first)
     assignment = self.map.assignment
     assignment_questionnaire = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: questionnaire.id)
@@ -187,12 +204,25 @@ class Response < ActiveRecord::Base
     scores_assigned = []
     count = 0
     existing_responses.each do |existing_response|
-      if existing_response.id != current_response.id # the current_response is also in existing_responses array
+      unless existing_response.id == current_response.id # the current_response is also in existing_responses array
         count += 1
-        scores_assigned << existing_response.total_score.to_f / existing_response.maximum_score
+        scores_assigned << existing_response.aggregate_questionnaire_score.to_f / existing_response.maximum_score
       end
     end
     [scores_assigned.sum / scores_assigned.size.to_f, count]
+  end
+
+  # This method returns references to a calibration response, review response, assignment, and questions
+  # This method is used within show_calibration_results_for_student when a student views their calibration results for a particular review/assignment.
+  def self.calibration_results_info(calibration_id, response_id, assignment_id)
+    calibration_response_map = ReviewResponseMap.find(calibration_id)
+    review_response_map = ReviewResponseMap.find(response_id)
+    calibration_response = calibration_response_map.response[0]
+    review_response = review_response_map.response[0]
+    questions = AssignmentQuestionnaire.find_by(["assignment_id = ? and questionnaire_id IN (?)",Assignment.find(assignment_id).id, ReviewQuestionnaire.select("id")])
+                                       .questionnaire.questions.reject {|q| q.is_a?(QuestionnaireHeader) }
+
+    [calibration_response, review_response, questions]
   end
 
   def notify_instructor_on_difference
@@ -211,7 +241,7 @@ class Response < ActiveRecord::Base
         reviewer_name: reviewer_name,
         type: 'review',
         reviewee_name: reviewee_name,
-        new_score: total_score.to_f / maximum_score,
+        new_score: aggregate_questionnaire_score.to_f / maximum_score,
         assignment: assignment,
         conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s,
         summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
@@ -223,30 +253,30 @@ class Response < ActiveRecord::Base
   # Check if this review was done by TA/instructor return True or False
   def done_by_staff_participant?
     role = Role.find(User.find(Participant.find(ResponseMap.find(Response.find(self.id).map_id).reviewer_id).user_id).role_id).name
-    return (role == "Instructor") || (role == "Teaching Assistant")
+    (role == "Instructor") || (role == "Teaching Assistant")
   end
 
   private
 
-  def construct_instructor_html identifier, self_id, count
+  def construct_instructor_html(identifier, self_id, count)
     identifier += '<h4><B>Review ' + count.to_s + '</B></h4>'
     identifier += '<B>Reviewer: </B>' + self.map.reviewer.fullname + ' (' + self.map.reviewer.name + ')'
     identifier + '&nbsp;&nbsp;&nbsp;<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' \
            "'review_" + self_id + "','review'" + ');return false;">hide review</a><BR/>'
   end
 
-  def construct_student_html identifier, self_id, count
-    identifier += '<table width="100%">'\
-						 '<tr>'\
-						 '<td align="left" width="70%"><b>Review ' + count.to_s + '</b>&nbsp;&nbsp;&nbsp;'\
-						 '<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' + "'review_" + self_id + "','review'" + ');return false;">hide review</a>'\
-						 '</td>'\
-						 '<td align="left"><b>Last Reviewed:</b>'\
-						 "<span>#{(self.updated_at.nil? ? 'Not available' : self.updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span></td>"\
+  def construct_student_html(identifier, self_id, count)
+    identifier += '<table width="100%">' \
+						 '<tr>' \
+						 '<td align="left" width="70%"><b>Review ' + count.to_s + '</b>&nbsp;&nbsp;&nbsp;' \
+						 '<a href="#" name= "review_' + self_id + 'Link" onClick="toggleElement(' + "'review_" + self_id + "','review'" + ');return false;">hide review</a>' \
+						 '</td>' \
+						 '<td align="left"><b>Last Reviewed:</b>' \
+						 "<span>#{(self.updated_at.nil? ? 'Not available' : self.updated_at.strftime('%A %B %d %Y, %I:%M%p'))}</span></td>" \
 						 '</tr></table>'
   end
 
-  def construct_review_response code, self_id, show_tags = nil, current_user = nil
+  def construct_review_response(code, self_id, show_tags = nil, current_user = nil)
     code += '<table id="review_' + self_id + '" class="table table-bordered">'
     answers = Answer.where(response_id: self.response_id)
     unless answers.empty?
@@ -257,7 +287,7 @@ class Response < ActiveRecord::Base
       tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: self.map.assignment.id) : nil
       code = add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments, current_user
     end
-    comment = if !self.additional_comment.nil?
+    comment = unless self.additional_comment.nil?
                 self.additional_comment.gsub('^p', '').gsub(/\n/, '<BR/>')
               else
                 ''
@@ -266,12 +296,12 @@ class Response < ActiveRecord::Base
     code += '</table>'
   end
 
-  def add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, current_user = nil
+  def add_table_rows(questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, current_user = nil)
     count = 0
     # loop through questions so the the questions are displayed in order based on seq (sequence number)
     questions.each do |question|
       count += 1 if !question.is_a? QuestionnaireHeader and question.break_before == true
-      answer = answers.find {|a| a.question_id == question.id }
+      answer = answers.find { |a| a.question_id == question.id }
       row_class = count.even? ? "info" : "warning"
       row_class = "" if question.is_a? QuestionnaireHeader
       code += '<tr class="' + row_class + '"><td>'
@@ -288,5 +318,80 @@ class Response < ActiveRecord::Base
       code += '</td></tr>'
     end
     code
+  end
+
+  # Computes the total score for a *list of assessments*
+  # parameters
+  #  assessments - a list of assessments of some type (e.g., author feedback, teammate review)
+  #  questions - the list of questions that was filled out in the process of doing those assessments
+  def self.compute_scores(assessments, questions)
+    scores = {}
+    if assessments.present?
+      scores[:max] = -999_999_999
+      scores[:min] = 999_999_999
+      total_score = 0
+      length_of_assessments = assessments.length.to_f
+      assessments.each do |assessment|
+        curr_score = assessment_score(response: [assessment], questions: questions)
+
+        scores[:max] = curr_score if curr_score > scores[:max]
+        scores[:min] = curr_score unless curr_score >= scores[:min] || curr_score == -1
+
+        # Check if the review is invalid. If is not valid do not include in score calculation
+        if @invalid == 1 || curr_score == -1
+          length_of_assessments -= 1
+          curr_score = 0
+        end
+        total_score += curr_score
+      end
+      scores[:avg] = unless length_of_assessments.zero?
+                       total_score.to_f / length_of_assessments
+                     else
+                       0
+                     end
+    else
+      scores[:max] = nil
+      scores[:min] = nil
+      scores[:avg] = nil
+    end
+
+    scores
+  end
+
+  # Computes the total score for an assessment
+  # params
+  #  assessment - specifies the assessment for which the total score is being calculated
+  #  questions  - specifies the list of questions being evaluated in the assessment
+
+  def self.assessment_score(params)
+    @response = params[:response].last
+    return -1.0 if @response.nil? 
+    if @response
+      @questions = params[:questions]
+      return -1.0 if @questions.nil? 
+      weighted_score = 0
+      sum_of_weights = 0
+      max_question_score = 0
+
+      @questionnaire = Questionnaire.find(@questions.first.questionnaire_id) 
+
+      # Retrieve data for questionnaire (max score, sum of scores, weighted scores, etc.)
+      questionnaire_data = ScoreView.questionnaire_data(@questions[0].questionnaire_id, @response.id)
+      weighted_score = questionnaire_data.weighted_score.to_f unless questionnaire_data.weighted_score.nil?
+      sum_of_weights = questionnaire_data.sum_of_weights.to_f
+      answers = Answer.where(response_id: @response.id)
+      answers.each do |answer|
+        question = Question.find(answer.question_id)
+        if answer.answer.nil? && question.is_a?(ScoredQuestion)
+          sum_of_weights -= Question.find(answer.question_id).weight
+        end
+      end
+      max_question_score = questionnaire_data.q1_max_question_score.to_f
+      if sum_of_weights > 0 && max_question_score && weighted_score > 0
+        return (weighted_score / (sum_of_weights * max_question_score)) * 100
+      else
+        return -1.0 # indicating no score
+      end
+    end
   end
 end

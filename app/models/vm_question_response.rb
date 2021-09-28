@@ -47,7 +47,7 @@ class VmQuestionResponse
       reviews = if vary
                   ReviewResponseMap.get_responses_for_team_round(team, @round)
                 else
-                  ReviewResponseMap.get_assessments_for(team)
+                  ReviewResponseMap.assessments_for(team)
                 end
       reviews.each do |review|
         review_mapping = ReviewResponseMap.find(review.map_id)
@@ -100,12 +100,12 @@ class VmQuestionResponse
     end
   end
 
-  def display_team_members
+  def display_team_members(ip_address = nil)
     @output = ""
     if @questionnaire_type == "MetareviewQuestionnaire" || @questionnaire_type == "ReviewQuestionnaire"
       @output = "Team members:"
       @list_of_team_participants.each do |participant|
-        @output = @output + " (" + participant.fullname + ") "
+        @output = @output + " (" + participant.fullname(ip_address) + ") "
       end
 
     end

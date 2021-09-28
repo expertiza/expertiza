@@ -53,7 +53,7 @@ module SummaryHelper
       self.summary = self.avg_scores_by_criterion = self.avg_scores_by_round = Array.new(assignment.rounds_of_reviews)
       rubric = get_questions_by_assignment(assignment)
 
-      (0..nround - 1).each do |round|
+      (0..assignment.num_review_rounds - 1).each do |round|
         self.avg_scores_by_round[round] = 0.0
         self.summary[round] = {}
         self.avg_scores_by_criterion[round] = {}
@@ -104,7 +104,9 @@ module SummaryHelper
 
       # get all teams in this assignment
       teams = Team.select(:id, :name).where(parent_id: assignment.id).order(:name)
-
+      
+      threads = []
+      
       teams.each do |reviewee|
         reviewee_name = session ? reviewee.name(session[:ip]) : reviewee.name
         self.summary[reviewee_name] = []

@@ -9,7 +9,7 @@ class StudentTaskController < ApplicationController
 
   def impersonating_as_admin?
     original_user = session[:original_user]
-    admin_role_ids = Role.where(name:['Administrator','Super-Administrator']).pluck(:id)
+    admin_role_ids = Role.where(name:%w[Administrator Super-Administrator]).pluck(:id)
     admin_role_ids.include? original_user.role_id
   end
 
@@ -84,5 +84,18 @@ class StudentTaskController < ApplicationController
     @review_of_review_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
   end
 
+  def publishing_rights_update
+	@participant = AssignmentParticipant.find(params[:id])
+        @participant.permission_granted = params[:status]
+	@participant.save
+	respond_to do |format|
+		format.html {head :no_content}
+	end
+   end  
+
+  
+
+  
+  
   def your_work; end
 end

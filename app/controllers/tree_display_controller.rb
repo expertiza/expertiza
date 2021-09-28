@@ -10,12 +10,12 @@ class TreeDisplayController < ApplicationController
 
   # refactored method to provide direct access to parameters
   # added an argument prevTab for sending the respective tab to be highlighted on homepage
-  def goto_controller(name_parameter, prevTab)
+  def goto_controller(name_parameter, prev_tab)
     node_object = TreeFolder.find_by(name: name_parameter)
     session[:root] = FolderNode.find_by(node_object_id: node_object.id).id
     # if we have to highlight a tab, we store this arg. to the last_open_tab elements of session
-    if(prevTab!=nil)
-      session[:last_open_tab] = prevTab
+    unless prev_tab.nil?
+      session[:last_open_tab] = prev_tab
     end
     redirect_to controller: 'tree_display', action: 'list', currCtlr: name_parameter
   end
@@ -90,6 +90,24 @@ class TreeDisplayController < ApplicationController
       format.html { render json: folders } 
     end
   end
+  
+  # for child nodes
+  def children_node_ng
+    flash[:error] = "Invalid JSON in the TreeList" unless json_valid? params[:reactParams][:child_nodes]
+    child_nodes = child_nodes_from_params(params[:reactParams][:child_nodes])
+    tmp_res = {}
+    begin
+      child_nodes.each do |node|
+        initialize_fnode_update_children(params, node, tmp_res)
+      end
+      flash[:error] = "Invalid child nodes in the TreeList"
+    rescue
+    end
+    
+    respond_to do |format|
+      format.html { render json: contents }
+    end
+  end
 
   # Returns the contents of the Courses and Questionaire subfolders
   def get_sub_folder_contents
@@ -107,11 +125,12 @@ class TreeDisplayController < ApplicationController
     child_nodes.each do |node|
       contents.push(serialize_sub_folder_to_json(node))
     end
-    
     respond_to do |format|
       format.html { render json: contents }
     end
   end
+
+   
   
   # # for child nodes
   # def children_node_2_ng
@@ -261,8 +280,8 @@ class TreeDisplayController < ApplicationController
       "type" => node.type
     }
     
-    if folder_type == "Courses" or folder_type == "Assignments"
-      json.merge! ({
+    if folder_type == "Courses" || folder_type == "Assignments"
+      json.merge!({
         "directory" => node.get_directory,
         "creation_date" => node.get_creation_date,
         "updated_date" => node.get_modified_date,
@@ -276,8 +295,8 @@ class TreeDisplayController < ApplicationController
         serialize_assignment_to_json(node, json)
       end
     end
-    
-    return json
+
+    json
   end
   
   # Creates a json object that can be displayed by the UI
@@ -301,8 +320,8 @@ class TreeDisplayController < ApplicationController
         serialize_assignment_to_json(node, json)
       end
     end
-    
-    return json
+
+    json
   end
 
   # Checks if the user is the instructor for the course or assignment node provided.

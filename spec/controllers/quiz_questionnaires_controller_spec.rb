@@ -16,7 +16,7 @@ describe QuizQuestionnairesController do
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
 
-  def check_access username
+  def check_access(username)
     stub_current_user(username, username.role.name, username.role)
     expect(controller.send(:action_allowed?))
   end
@@ -206,7 +206,7 @@ describe QuizQuestionnairesController do
         allow(Assignment).to receive(:find).with('1').and_return(assignment)
         allow(assignment).to receive(:require_quiz?).and_return(false)
         get :new, params
-        expect(flash[:error]).to eq('This assignment does not support the quizzing feature.')
+        expect(flash[:error]).to eq('This assignment is not configured to use quizzes.')
         expect(response).to redirect_to('/submitted_content/view?id=1')
       end
     end

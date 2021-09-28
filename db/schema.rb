@@ -11,9 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
-ActiveRecord::Schema.define(version: 20201125202200) do
-
+ActiveRecord::Schema.define(version: 20210422185445) do
 
   create_table "account_requests", force: :cascade do |t|
     t.string   "name",              limit: 255
@@ -131,6 +129,7 @@ ActiveRecord::Schema.define(version: 20201125202200) do
     t.boolean  "vary_by_round",                                                    default: false
     t.boolean  "reviewer_is_team"
     t.boolean  "is_conference_assignment",                                         default: false
+    t.boolean  "auto_assign_mentor",                                               default: false
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -270,7 +269,7 @@ ActiveRecord::Schema.define(version: 20201125202200) do
     t.string   "queue",      limit: 255
   end
 
-  add_index "delayed_jobs", ["priority", "run_at"], name: "delayed_jobs_priority", using: :btree
+  add_index "delayed_jobs", %w[priority run_at], name: "delayed_jobs_priority", using: :btree
 
   create_table "due_dates", force: :cascade do |t|
     t.datetime "due_at"
@@ -801,7 +800,7 @@ ActiveRecord::Schema.define(version: 20201125202200) do
     t.datetime "created_at"
   end
 
-  add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
+  add_index "versions", %w[item_type item_id], name: "index_versions_on_item_type_and_item_id", using: :btree
 
   add_foreign_key "answer_tags", "answers"
   add_foreign_key "answer_tags", "tag_prompt_deployments"

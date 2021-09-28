@@ -50,8 +50,8 @@
 
           
         <!--Rejoinder-->
-        <% ['one', 'two', 'three'].each do |round| %> <!-- hardcoded for 3 rounds of review -->
-        <% if @first_col_identifier == true %>
+        <% %w[one two three].each do |round| %> <!-- hardcoded for 3 rounds of review -->
+        <% if @first_col_identifier %>
             <% @reviewer_name = rejoinder.user.fullname(session[:ip]) %>
             <%row_span = @assignment.varying_rubrics_by_round? ? (@rspan_round_one + @rspan_round_two + @rspan_round_three) : @rspan %>
         <%# If no  feedback has been submitted, rowspan is seen as 0, then rowspan manually set to 1 so that it takes up its own row.%>

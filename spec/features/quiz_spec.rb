@@ -8,7 +8,7 @@ def create_assignment_due_date
   create :assignment_due_date, due_at: (DateTime.now.in_time_zone + 1.day), deadline_type: @review_deadline_type
 end
 
-def create_default_test_data num_qs
+def create_default_test_data(num_qs)
   @instructor = create(:instructor)
   @student = create(:student)
   @assignment = create :assignment, require_quiz: true, instructor: @instructor, course: nil, num_quiz_questions: num_qs
@@ -312,7 +312,7 @@ describe 'Instructor', js: true do
     score = all("tr > td")[1]
     expect(student).to have_text(@student2.fullname)
     expect(score).to have_text('100.0')
-    expect(page).to have_text('Average score for quiz takers: 100.0 ')
+    expect(page).to have_text('Average score for quiz takers: 100.0')
     expect(page).to have_text('1')
     expect(page).to have_text(@question.txt)
     expect(page).to have_text("Question Type: MultipleChoiceRadio")

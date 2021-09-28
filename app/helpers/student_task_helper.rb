@@ -14,7 +14,7 @@ module StudentTaskHelper
   end
 
   def check_reviewable_topics(assignment)
-    return true if !assignment.topics? and assignment.get_current_stage != "submission"
+    return true if !assignment.topics? and assignment.current_stage != "submission"
     sign_up_topics = SignUpTopic.where(assignment_id: assignment.id)
     sign_up_topics.each {|topic| return true if assignment.can_review(topic.id) }
     false
@@ -31,7 +31,7 @@ module StudentTaskHelper
     participant.awarded_badges.each do |awarded_badge|
       badge = awarded_badge.badge
       # In the student task homepage, list only those badges that are approved
-      if awarded_badge.is_approved?
+      if awarded_badge.approved?
         info += '<img width="30px" src="/assets/badges/' + badge.image_name + '" title="' + badge.name + '" />'
       end
     end

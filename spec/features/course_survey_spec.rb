@@ -1,6 +1,6 @@
 include InstructorInterfaceHelperSpec
 
-def create_course_questionnaire survey_name
+def create_course_questionnaire (survey_name)
   visit '/questionnaires/new?model=Course+SurveyQuestionnaire&private=0'
   fill_in 'questionnaire_name', with: survey_name
   find('input[name="commit"]').click

@@ -113,9 +113,9 @@ module ReviewMappingHelper
   end
 
   # For assignments with 1 team member, the following method returns user's fullname else it returns "team name" that a particular reviewee belongs to.
-  def get_team_reviewed_link_name(max_team_size, response, reviewee_id)
+  def get_team_reviewed_link_name(max_team_size, response, reviewee_id, ip_address)
     team_reviewed_link_name = if max_team_size == 1
-                                TeamsUser.where(team_id: reviewee_id).first.user.fullname
+                                TeamsUser.where(team_id: reviewee_id).first.user.fullname(ip_address)
                               else
                                 # E1991 : check anonymized view here
                                 Team.find(reviewee_id).name
@@ -143,33 +143,19 @@ module ReviewMappingHelper
     # Iterating through list
     (1..num_rounds).each do |round|
       # Changing values of instance variable based on below condition
-      if team_id != nil && team_id != -1.0
+      unless team_id.nil? || team_id == -1.0
         instance_variable_set("@score_awarded_round_" + round.to_s, @review_scores[reviewer_id][round][team_id].to_s + '%')
       end
     end
   end
 
-  def get_review_volume(round, team_id)
-    # Setting values of instance variables
-    ['max', 'min', 'avg'].each { |metric| instance_variable_set('@' + metric, '-----') }
-    # Fetching value of @avg_and_ranges[team_id][round] 
-    x = nil
-    if @avg_and_ranges.key?(team_id)
-      if @avg_and_ranges[team_id].key?(round)
-        x = @avg_and_ranges[team_id][round]
-      end
-    end
-
-    if x && %i[max min avg].all? { |k| x.key? k }
-      # Iterating though the list
-      ['max', 'min', 'avg'].each do |metric|
-        # setting values of variables based on certain conditions
-        average_metric = nil
-        if @avg_and_ranges[team_id][round].key?(metric)
-          average_metric = @avg_and_ranges[team_id][round][metric]
-        end
-        metric_value = average_metric.nil? ? '-----' : average_metric.round(0).to_s + '%'
-        instance_variable_set('@' + metric, metric_value)
+  # gets minimum, maximum and average grade value for all the reviews present
+  def review_metrics(round, team_id)
+    %i[max min avg].each {|metric| instance_variable_set('@' + metric.to_s, '-----') }
+    if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? {|k| @avg_and_ranges[team_id][round].key? k }
+      %i[max min avg].each do |metric|
+        metric_value = @avg_and_ranges[team_id][round][metric].nil? ? '-----' : @avg_and_ranges[team_id][round][metric].round(0).to_s + '%'
+        instance_variable_set('@' + metric.to_s, metric_value)
       end
     end
   end
@@ -178,23 +164,23 @@ module ReviewMappingHelper
   def sort_reviewer_by_review_volume_desc
     @reviewers.each do |r|
       # get the volume of review comments
-      review_volumes = Response.get_volume_of_review_comments(@assignment.id, r.id)
-      r.avg_vol_per_round = []     
+      review_volumes = Response.volume_of_review_comments(@assignment.id, r.id)
+      r.avg_vol_per_round = []
       review_volumes.each_index do |i|
-        if i == 0 
+        if i.zero?
           r.overall_avg_vol = review_volumes[0]
-        else 
+        else
           r.avg_vol_per_round.push(review_volumes[i])
         end
       end
     end
-    # get the number of review rounds for the assignment 
+    # get the number of review rounds for the assignment
     @num_rounds = @assignment.num_review_rounds.to_f.to_i
     @all_reviewers_avg_vol_per_round = []
     @all_reviewers_overall_avg_vol = @reviewers.inject(0) {|sum, r| sum += r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
     @num_rounds.times do |round|
       @all_reviewers_avg_vol_per_round.push(@reviewers.inject(0) {|sum, r| sum += r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
-    end 
+    end
     @reviewers.sort! {|r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 
@@ -214,7 +200,7 @@ module ReviewMappingHelper
         reviewer_data.push reviewer.avg_vol_per_round[rnd]
         all_reviewers_data.push @all_reviewers_avg_vol_per_round[rnd]
       end
-    end 
+    end
 
     labels.push 'Total'
     reviewer_data.push reviewer.overall_avg_vol
@@ -288,7 +274,7 @@ module ReviewMappingHelper
     # if someone did not do any tagging in 30 seconds, then ignore this interval
     threshold = 30
     intervals = intervals.select{|v| v < threshold}
-    if not intervals.empty?
+    unless  intervals.empty?
       interval_mean = intervals.reduce(:+) / intervals.size.to_f
     end
     #build the parameters for the chart
@@ -300,7 +286,7 @@ module ReviewMappingHelper
           data: intervals,
           label: "time intervals"
         },
-        if not intervals.empty?
+        unless  intervals.empty?
           {
             data: Array.new(intervals.length, interval_mean),
             label: "Mean time spent"
@@ -334,7 +320,7 @@ module ReviewMappingHelper
     intervals = intervals.select{|v| v < threshold}
 
     #Get Metrics once tagging intervals are available
-    if not intervals.empty?
+    unless intervals.empty?
       metrics = Hash.new
       metrics[:mean] = (intervals.reduce(:+) / intervals.size.to_f).round(interval_precision)
       metrics[:min] = intervals.min
@@ -342,7 +328,7 @@ module ReviewMappingHelper
       sum = intervals.inject(0){|accum, i| accum +(i- metrics[:mean])**2}
       metrics[:variance] = (sum/(intervals.size).to_f).round(interval_precision)
       metrics[:stand_dev] = Math.sqrt(metrics[:variance]).round(interval_precision)
-      return metrics
+      metrics
     end
     #if no Hash object is returned, the UI handles it accordingly
   end
@@ -351,26 +337,12 @@ module ReviewMappingHelper
     participant = Participant.find(participant_id)
     team = AssignmentTeam.find(reviewee_team_id)
     html = ''
-    if !team.nil? and !participant.nil?
+    unless team.nil? || participant.nil?
       review_submissions_path = team.path + "_review" + "/" + response_map_id.to_s
       files = team.submitted_files(review_submissions_path)
       html += display_review_files_directory_tree(participant, files) if files.present?
     end
     html.html_safe
-  end
-
-  # Zhewei - 2017-02-27
-  # This is for all Dr.Kidd's courses
-  def calculate_average_author_feedback_score(assignment_id, max_team_size, response_map_id, reviewee_id)
-    review_response = ResponseMap.where(id: response_map_id).try(:first).try(:response).try(:last)
-    author_feedback_avg_score = "-- / --"
-    unless review_response.nil?
-      user = TeamsUser.where(team_id: reviewee_id).try(:first).try(:user) if max_team_size == 1
-      author = Participant.where(parent_id: assignment_id, user_id: user.id).try(:first) unless user.nil?
-      feedback_response = ResponseMap.where(reviewed_object_id: review_response.id, reviewer_id: author.id).try(:first).try(:response).try(:last) unless author.nil?
-      author_feedback_avg_score = feedback_response.nil? ? "-- / --" : "#{feedback_response.total_score} / #{feedback_response.maximum_score}"
-    end
-    author_feedback_avg_score
   end
 
   # Zhewei - 2016-10-20

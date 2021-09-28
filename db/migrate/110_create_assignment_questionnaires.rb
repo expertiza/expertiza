@@ -42,7 +42,6 @@ class CreateAssignmentQuestionnaires < ActiveRecord::Migration
       begin
         association = AssignmentQuestionnaire.create(:user_id => l['user_id'], :notification_limit => l['limit'])
       rescue
-        puts $!
       end
     }
     
@@ -72,8 +71,6 @@ class CreateAssignmentQuestionnaires < ActiveRecord::Migration
           association.update_attribute("user_id",assignment.instructor_id)
         end
       rescue
-        puts "Assignment: #{assignment.id}"
-        puts "  "+$!
       end     
   end
 

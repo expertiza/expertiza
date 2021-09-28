@@ -1,4 +1,4 @@
-<h1>Your calibration results <%= " for " + @assignment.name if !@assignment.course.nil?%></h1>
+<h1>Your calibration results <%= " for " + @assignment.name unless @assignment.course.nil?%></h1>
 <style>
 th, td {
     padding: 5px;

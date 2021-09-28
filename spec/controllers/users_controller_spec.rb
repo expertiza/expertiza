@@ -1,6 +1,6 @@
 describe UsersController do
   let(:admin) { build(:admin, id: 3) }
-  let(:super_admin) {build (:superadmin)}
+  let(:super_admin) {build(:superadmin)}
   let(:instructor) { build(:instructor, id: 2) }
   let(:student1) { build(:student, id: 1, name: :lily) }
   let(:student2) { build(:student) }

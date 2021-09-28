@@ -44,11 +44,10 @@ class Invitation < ActiveRecord::Base
   # Last the users team entry will be added to the TeamsUser table and their assigned topic is updated
   def self.accept_invite(team_id, inviter_user_id, invited_user_id, assignment_id)
     # if you are on a team and you accept another invitation and if your old team does not have any members, delete the entry for the team
-    if TeamsUser.is_team_empty(team_id) and team_id != '0'
+    if TeamsUser.team_empty?(team_id) and team_id != '0'
       assignment_id = AssignmentTeam.find(team_id).assignment.id
       # Release topics for the team has selected by the invited users empty team
       SignedUpTeam.release_topics_selected_by_team_for_assignment(team_id, assignment_id)
-
       AssignmentTeam.remove_team_by_id(team_id)
     end
 
@@ -62,6 +61,19 @@ class Invitation < ActiveRecord::Base
     if can_add_member # The member was successfully added to the team (the team was not full)
       Invitation.update_users_topic_after_invite_accept(inviter_user_id, invited_user_id, assignment_id)
 
+      # E2115 Mentor Management
+      # Kick off the Mentor Management workflow
+      # Since there are two places in the code base where members are added to
+      # teams we have to call the MentorManagement class in both places.
+      # Those places are here when a student accepts an invitation to join a
+      # team, and in teams_users_controller.rb. Ideally, both code paths would
+      # call the same method to perform this action and we could DRY this up.
+      # It is worth noting that while ultimately, both code paths do call Team#add_member
+      # adding this code there would risk a recursive loop since MentorManagement
+      # also calls Team#add_member to add a mentor to the team
+      new_team_id = TeamsUser.team_id(assignment_id, inviter_user_id)
+      MentorManagement.assign_mentor(assignment_id, new_team_id)
+
       # invited_participant = Participant.where(user_id: invited_user_id, parent_id: assignment_id).first
       # inviter_participant = Participant.where(user_id: inviter_user_id, parent_id: assignment_id).first
       # inviter_assignment_team = AssignmentTeam.team(inviter_participant)
@@ -73,7 +85,6 @@ class Invitation < ActiveRecord::Base
   def self.is_invited?(invitee_user_id, invited_user_id, assignment_id)
     sent_invitation = Invitation.where('from_id = ? and to_id = ? and assignment_id = ? and reply_status = "W"',
                                        invitee_user_id, invited_user_id, assignment_id)
-    return true if sent_invitation.empty?
-    false
+    sent_invitation.empty?
   end
 end

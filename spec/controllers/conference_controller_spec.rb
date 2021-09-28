@@ -1,6 +1,6 @@
 describe ConferenceController do
     let(:admin) { build(:admin, id: 3) }
-    let(:super_admin) {build (:superadmin)}
+    let(:super_admin) {build(:superadmin)}
     let(:instructor) { build(:instructor, id: 2) }
     let(:instructor1) { build(:instructor, id: 2, timezonepref: 'Eastern Time (US & Canada)') }
     let(:student1) { build(:student, id: 1, name: :lily) }

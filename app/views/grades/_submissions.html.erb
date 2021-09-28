@@ -1,19 +1,20 @@
 <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)%>
-<%= render :partial => 'submitted_content/main', :locals => {:participant => participant, :stage => participant.assignment.get_current_stage(topic_id)} %>
+<%= render :partial => 'submitted_content/main', :locals => {:participant => participant, :stage => participant.assignment.current_stage(topic_id)} %>
 
-<% if controller.action_name != "view_my_scores" %>
-   <% reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, @assignment.id).get_reviewer
+<% unless controller.action_name == "view_my_scores" %>
+   <% participant = AssignmentParticipant.find_by_user_id_and_parent_id(session[:user].id, @assignment.id)
+      reviewer = participant.get_reviewer unless participant.nil?
       #ACS Map the reviewee to a team
-      if reviewer != nil
+      unless reviewer.nil?
          reviewee = participant.team  
          map = ReviewResponseMap.find_by_reviewee_id_and_reviewer_id(reviewee.id, reviewer.id)        
       end       
             
-      if map != nil and !map.response.empty?
+      unless map.nil? || map.response.empty?
       	display = "Edit Review"
       else
         display = "Create Review"
       end
    %>      
-      <%= link_to display, :action => "instructor_review", :id => participant.id %> 
+      <%= link_to display, :action => "instructor_review", :id => participant.id unless participant.nil?%> 
 <% end %>   	     

@@ -525,8 +525,8 @@ describe ReviewMappingHelper, type: :helper do
 
   end
 
-  # rspec test for get_review_volume method
-  describe 'get_review_volume' do
+  # rspec test for review_metrics method
+  describe 'review_metrics' do
 
     before(:each) do
 
@@ -544,7 +544,7 @@ describe ReviewMappingHelper, type: :helper do
       @reviewee = create(:assignment_team, assignment: @assignment)
       @reviewer = create(:participant, assignment: @assignment, user: student)
 
-      # Populate @avg_and_ranges instance variable required for lookup to extract the metrics for the given round in get_review_volume method.
+      # Populate @avg_and_ranges instance variable required for lookup to extract the metrics for the given round in review_metrics method.
       # Each round in avg_and_ranges must have a symbol and a string for the metric as indicated by corresponding source code
       # Here, key is the round number (1, 2, 3 ., etc) and the value is the metrics (min, max, avg) for the given round number.
       @avg_and_ranges = {
@@ -584,7 +584,7 @@ describe ReviewMappingHelper, type: :helper do
     # assert the value for metrics in round 1 for given team_id
     it 'should return minimum maximum and average score for round 1' do
       @round = 1
-      get_review_volume(@round, @reviewee.id)
+      review_metrics(@round, @reviewee.id)
       expect(@min).to eq '2%'
       expect(@max).to eq '4%'
       expect(@avg).to eq '3%'
@@ -594,7 +594,7 @@ describe ReviewMappingHelper, type: :helper do
     # assert the value for metrics in round 2 for given team_id
     it 'should return the minimum, maximum and average score for round 2' do
       @round = 2
-      get_review_volume(@round, @reviewee.id)
+      review_metrics(@round, @reviewee.id)
       expect(@min).to eq '5%'
       expect(@max).to eq '7%'
       expect(@avg).to eq '6%'
@@ -603,7 +603,7 @@ describe ReviewMappingHelper, type: :helper do
     # assert the value metrics in round 3 for given team_id
     it 'should return the minimum, maximum and average score for round 3' do
       @round = 3
-      get_review_volume(@round, @reviewee.id)
+      review_metrics(@round, @reviewee.id)
       expect(@min).to eq '8%'
       expect(@max).to eq '10%'
       expect(@avg).to eq '9%'

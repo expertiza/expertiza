@@ -82,7 +82,7 @@ function microtaskChanged() {
     <td style='padding:5px' id='assignment_team_assignment_field'>
 
       <div class="form-inline">
-      <% if(@assignment_form.assignment.max_team_size == 1)%>
+      <% if @assignment_form.assignment.max_team_size == 1%>
         <%= check_box_tag('team_assignment', 'true', false, {:onChange => 'hasTeamsChanged()'}) %>
       <% else %>
         <%= check_box_tag('team_assignment', 'true', @assignment_form.assignment.team_assignment?, {:onChange => 'hasTeamsChanged()'}) %>
@@ -106,6 +106,19 @@ function microtaskChanged() {
     </span>
       &nbsp;&nbsp;&nbsp;&nbsp;
       <!--Maximum number of members per team-->
+    </td>
+  </tr>
+
+  <!-- E2115 Mentor Management -->
+  <tr>
+    <td style='padding:5px' id='assignment_auto_assign_mentor_field'>
+      <input name="assignment_form[assignment][auto_assign_mentor]" type="hidden" value="false"/>
+      <%= check_box_tag(
+            'assignment_form[assignment][auto_assign_mentor]',
+            value='true',
+            checked=@assignment_form.assignment.auto_assign_mentor
+          ) %>
+      <%= label_tag('auto_assign_mentor_label', 'Auto assign mentors when team hits > 50% capacity?') %>
     </td>
   </tr>
 
@@ -204,7 +217,7 @@ function microtaskChanged() {
       <div class="form-inline">
       <!--<input name="assignment_form[assignment][reputation_algorithm]" type="hidden" value="false"/>-->
       <%= label_tag('assignment_form[assignment][reputation_algorithm]', 'Reputation Algorithm?') %>
-      <%= select('assignment_form[assignment]','reputation_algorithm', [['--', ''],['Lauw', 'Lauw'],['Hamer','Hamer']], {:selected => @assignment_form.assignment.reputation_algorithm}, {:class => 'form-control', :style => 'width: 100px'}) %>
+      <%= select('assignment_form[assignment]', 'reputation_algorithm', [['--', ''], %w[Lauw Lauw], %w[Hamer Hamer]], { :selected => @assignment_form.assignment.reputation_algorithm}, { :class => 'form-control', :style => 'width: 100px'}) %>
       </div>
     </td>
   </tr>
@@ -263,9 +276,17 @@ function microtaskChanged() {
     function topicsChanged() {
         var msg = 'Warning! Un-checking this box will remove all topics that have been created.';
         var checkbox = jQuery('#assignment_has_topics');
+
+        // E2115 - bind enabled state of mentor checkbox to checked property
+        // of topics checkbox
+        var mentorCheckbox = jQuery("#auto_assign_mentor_checkbox");
+        mentorCheckbox.prop("disabled", checkbox.is(':checked'));
+
         if (checkbox.is(':checked')) {
             // If this box is checked, display the 'Topics' tab
             jQuery("#topics_tab_header").show();
+            // E2115 - if 'has topics' is checked, uncheck mentor
+            mentorCheckbox.prop("checked", false);
         } else {
             if (confirm(msg)) {
                 // If this box is un-checked, remove all topics and reload page
@@ -292,7 +313,8 @@ function microtaskChanged() {
         var checkbox = jQuery('#team_assignment');
         var team_count_field = jQuery('#assignment_team_count_field');
         var teammate_reviews_field = jQuery('#assignment_show_teammate_reviews');
-        var team_formation_due_date_checkbox = jQuery('#team_formation_due_date_checkbox')
+        var team_formation_due_date_checkbox = jQuery('#team_formation_due_date_checkbox');
+        var autoAssignMentorCheckbox = jQuery('#auto_assign_mentor_checkbox');
 
         jQuery("#questionnaire_table_TeammateReviewQuestionnaire").remove()
         if (checkbox.is(':checked')) {
@@ -300,6 +322,10 @@ function microtaskChanged() {
             team_formation_due_date_checkbox.removeAttr('hidden')
             jQuery('#assignment_form_assignment_max_team_size').val('2');
             teammate_reviews_field.removeAttr('hidden');
+            // E2115 hide auto assign mentor checkbox when an
+            // an assignment does not have teams
+            // what would the mentor be assigned to if there are no teams?
+            autoAssignMentorCheckbox.hide();
             addDueDateTableElement(<%= @due_date_nameurl_not_empty==nil ? false:@due_date_nameurl_not_empty %>,'team_formation', 0,<%= due_date(@assignment_form.assignment, 'team_formation').to_json.html_safe %>);
             <% assignment_questionnaire = @assignment_form.assignment_questionnaire('TeammateReviewQuestionnaire', nil, nil) %>
             <% questionnaire = @assignment_form.questionnaire(assignment_questionnaire, 'TeammateReviewQuestionnaire') %>
@@ -316,6 +342,9 @@ function microtaskChanged() {
               team_count_field.attr('hidden', true);
               team_formation_due_date_checkbox.attr('hidden', true)
               teammate_reviews_field.attr('hidden', true);
+              // E2115 show auto assign mentor checkbox when an
+              // an assignment has teams
+              autoAssignMentorCheckbox.show();
               document.getElementById('assignment_form_assignment_max_team_size').value = '1';
               removeDueDateTableElement('team_formation', 0);
 

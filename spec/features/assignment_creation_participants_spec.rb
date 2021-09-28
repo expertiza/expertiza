@@ -4,7 +4,7 @@ require_relative 'helpers/assignment_creation_helper'
 describe "Assignment creation participants", js: true do
 	include AssignmentCreationHelper
 	before(:each) do
-		create_deadline_types()
+		create_deadline_types
 		create(:course)
 		create(:assignment, name: 'participants Assignment')
 		create(:assignment_node)

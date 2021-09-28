@@ -54,7 +54,7 @@ class Team < ActiveRecord::Base
     return false if self.parent_id.nil? # course team, does not max_team_size
     max_team_members = Assignment.find(self.parent_id).max_team_size
     curr_team_size = Team.size(self.id)
-    (curr_team_size >= max_team_members)
+    curr_team_size >= max_team_members
   end
 
   # Add member to the team, changed to hash by E1776
@@ -182,7 +182,7 @@ class Team < ActiveRecord::Base
   #  changed to hash by E1776
   def self.import(row_hash, id, options, teamtype)
 
-    raise ArgumentError, "Not enough fields on this line." if row_hash.empty? || (row_hash[:teammembers].length < 2 && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last")) || (row_hash[:teammembers].empty? && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"))
+    raise ArgumentError, "Not enough fields on this line." if row_hash.empty? || (row_hash[:teammembers].length < 1 && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last")) || (row_hash[:teammembers].empty? && (options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"))
     if options[:has_teamname] == "true_first" || options[:has_teamname] == "true_last"
       name = row_hash[:teamname].to_s
       team = where(["name =? && parent_id =?", name, id]).first
@@ -248,7 +248,7 @@ class Team < ActiveRecord::Base
 
   # Create the team with corresponding tree node
   def self.create_team_and_node(id)
-    parent = parent_model id # current_task will be either a course object or an assignment object. # current_task will be either a course object or an assignment object.
+    parent = parent_model id # current_task will be either a course object or an assignment object.
     team_name = Team.generate_team_name(parent.name)
     team = self.create(name: team_name, parent_id: id)
     # new teamnode will have current_task.id as parent_id and team_id as node_object_id.

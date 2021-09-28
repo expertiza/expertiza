@@ -36,7 +36,7 @@ class CoursesController < ApplicationController
   # POST /courses
   def update
     @course = Course.find(params[:id])
-    if params[:course][:directory_path] && @course.directory_path != params[:course][:directory_path]
+    unless params[:course][:directory_path].nil? || @course.directory_path == params[:course][:directory_path]
       begin
         FileHelper.delete_directory(@course)
       rescue StandardError

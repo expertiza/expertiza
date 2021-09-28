@@ -26,115 +26,23 @@ describe AssignmentParticipant do
       expect(participant.reviewers).to eq([participant2])
     end
   end
-
-  describe '#scores' do
-    before(:each) do
-      allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
-                                                         .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
-      allow(review_questionnaire).to receive(:symbol).and_return(:review)
-      allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([response])
-      allow(Answer).to receive(:compute_scores).with([response], [question]).and_return(max: 95, min: 88, avg: 90)
-      allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
-    end
-    context 'when assignment is not varying rubric by round and not an microtask' do
-      it 'calculates scores that this participant has been given' do
-        allow(assignment).to receive(:vary_by_round).and_return(false)
-        expect(participant.scores(review1: [question]).inspect).to eq("{:participant=>#<AssignmentParticipant id: 1, can_submit: true, can_review: true, "\
-          "user_id: 2, parent_id: 1, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, "\
-          "type: \"AssignmentParticipant\", handle: \"handle\", time_stamp: nil, digital_signature: nil, duty: nil, "\
-          "can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, :review1=>{:assessments=>[#<Response id: nil, map_id: 1, "\
-          "additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, round: 1, is_submitted: false, visibility: \"private\">], "\
-          ":scores=>{:max=>95, :min=>88, :avg=>90}}, :total_score=>100}")
-      end
-    end
-
-    context 'when assignment is varying rubric by round but not an microtask' do
-      it 'calculates scores that this participant has been given' do
-        allow(assignment).to receive(:vary_by_round).and_return(true)
-        allow(assignment).to receive(:num_review_rounds).and_return(1)
-        expect(participant.scores(review1: [question]).inspect).to eq("{:participant=>#<AssignmentParticipant id: 1, can_submit: true, can_review: true, "\
-          "user_id: 2, parent_id: 1, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, "\
-          "type: \"AssignmentParticipant\", handle: \"handle\", time_stamp: nil, digital_signature: nil, duty: nil, "\
-          "can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, :review1=>{:assessments=>[#<Response id: nil, map_id: 1, "\
-          "additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, round: 1, is_submitted: false, visibility: \"private\">], "\
-          ":scores=>{:max=>95, :min=>88, :avg=>90}}, :total_score=>100, :review=>{:assessments=>[#<Response id: nil, map_id: 1, additional_comment: nil, "\
-          "created_at: nil, updated_at: nil, version_num: nil, round: 1, is_submitted: false, visibility: \"private\">], :scores=>{:max=>95, :min=>88, :avg=>90.0}}}")
-      end
-    end
-
-    context 'when assignment is not varying rubric by round but an microtask' do
-      it 'calculates scores that this participant has been given' do
-        assignment.microtask = true
-        allow(assignment).to receive(:vary_by_round).and_return(false)
-        allow(SignUpTopic).to receive(:find_by).with(assignment_id: 1).and_return(double('SignUpTopic', micropayment: 66))
-        expect(participant.scores(review1: [question]).inspect).to eq("{:participant=>#<AssignmentParticipant id: 1, can_submit: true, can_review: true, "\
-          "user_id: 2, parent_id: 1, submitted_at: nil, permission_granted: nil, penalty_accumulated: 0, grade: nil, type: \"AssignmentParticipant\", "\
-          "handle: \"handle\", time_stamp: nil, digital_signature: nil, duty: nil, can_take_quiz: true, Hamer: 1.0, Lauw: 0.0>, "\
-          ":review1=>{:assessments=>[#<Response id: nil, map_id: 1, additional_comment: nil, created_at: nil, updated_at: nil, version_num: nil, round: 1, "\
-          "is_submitted: false, visibility: \"private\">], :scores=>{:max=>95, :min=>88, :avg=>90}}, :total_score=>100, :max_pts_available=>66}")
+  
+  describe '#get_reviewer' do
+    context 'when the associated assignment is reviewed by his team' do
+      it 'returns the team' do
+        allow(assignment).to receive(:reviewer_is_team).and_return(true)
+        allow(participant).to receive(:team).and_return(team)
+        expect(participant.get_reviewer).to eq(team)
       end
     end
   end
 
-  describe '#compute_assignment_score' do
-    before(:each) do
-      allow(review_questionnaire).to receive(:symbol).and_return(:review)
-      allow(assignment).to receive(:compute_total_score).with(any_args).and_return(100)
-    end
-
-    context 'when the round of questionnaire is nil' do
-      it 'record the result as review scores' do
-        scores = {}
-        question_hash = {review: question}
-        score_map = {max: 100, min: 100, avg: 100}
-        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
-                                                           .and_return(double('AssignmentQuestionnaire', used_in_round: nil))
-        allow(review_questionnaire).to receive(:get_assessments_for).with(participant).and_return([response])
-        allow(Answer).to receive(:compute_scores).with(any_args).and_return(score_map)
-        participant.compute_assignment_score(question_hash, scores)
-        expect(scores[:review][:assessments]).to eq([response])
-        expect(scores[:review][:scores]).to eq(score_map)
-      end
-    end
-
-    context 'when the round of questionnaire is not nil' do
-      it 'record the result as review#{n} scores' do
-        scores = {}
-        question_hash = {review: question}
-        score_map = {max: 100, min: 100, avg: 100}
-        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
-                                                           .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
-        allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([response])
-        allow(Answer).to receive(:compute_scores).with(any_args).and_return(score_map)
-        participant.compute_assignment_score(question_hash, scores)
-        expect(scores[:review1][:assessments]).to eq([response])
-        expect(scores[:review1][:scores]).to eq(score_map)
-      end
-    end
-  end
-
-  describe '#merge_scores' do
-    context 'when all of the review_n are nil' do
-      it 'set max, min, avg of review score as 0' do
-        scores = {}
-        allow(assignment).to receive(:num_review_rounds).and_return(1)
-        participant.merge_scores(scores)
-        expect(scores[:review][:scores][:max]).to eq(0)
-        expect(scores[:review][:scores][:min]).to eq(0)
-        expect(scores[:review][:scores][:min]).to eq(0)
-      end
-    end
-
-    context 'when the review_n is not nil' do
-      it 'merge the score of review_n to the score of review' do
-        score_map = {max: 100, min: 100, avg: 100}
-        scores = {review1: {scores: score_map, assessments: [response]}}
-        allow(assignment).to receive(:num_review_rounds).and_return(1)
-        participant.merge_scores(scores)
-        expect(scores[:review][:scores][:max]).to eq(100)
-        expect(scores[:review][:scores][:min]).to eq(100)
-        expect(scores[:review][:scores][:min]).to eq(100)
-      end
+  describe '#path' do
+    it 'returns the path name of the associated assignment submission for the team' do
+      allow(assignment).to receive(:path).and_return('assignment780')
+      allow(participant).to receive(:team).and_return(team)
+      allow(team).to receive(:directory_num).and_return(780)
+      expect(participant.path).to eq('assignment780/780')
     end
   end
   
@@ -148,42 +56,42 @@ describe AssignmentParticipant do
 
   describe '#feedback' do
     it 'returns corrsponding author feedback responses given by current participant' do
-      allow(FeedbackResponseMap).to receive(:get_assessments_for).with(participant).and_return([response])
+      allow(FeedbackResponseMap).to receive(:assessments_for).with(participant).and_return([response])
       expect(participant.feedback).to eq([response])
     end
   end
 
   describe '#reviews' do
     it 'returns corrsponding peer review responses given by current team' do
-      allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([response])
+      allow(ReviewResponseMap).to receive(:assessments_for).with(team).and_return([response])
       expect(participant.reviews).to eq([response])
     end
   end
 
   describe '#quizzes_taken' do
     it 'returns corrsponding quiz responses given by current participant' do
-      allow(QuizResponseMap).to receive(:get_assessments_for).with(participant).and_return([response])
+      allow(QuizResponseMap).to receive(:assessments_for).with(participant).and_return([response])
       expect(participant.quizzes_taken).to eq([response])
     end
   end
 
   describe '#metareviews' do
     it 'returns corrsponding metareview responses given by current participant' do
-      allow(MetareviewResponseMap).to receive(:get_assessments_for).with(participant).and_return([response])
+      allow(MetareviewResponseMap).to receive(:assessments_for).with(participant).and_return([response])
       expect(participant.metareviews).to eq([response])
     end
   end
 
   describe '#teammate_reviews' do
     it 'returns corrsponding teammate review responses given by current participant' do
-      allow(TeammateReviewResponseMap).to receive(:get_assessments_for).with(participant).and_return([response])
+      allow(TeammateReviewResponseMap).to receive(:assessments_for).with(participant).and_return([response])
       expect(participant.teammate_reviews).to eq([response])
     end
   end
 
   describe '#bookmark_reviews' do
     it 'returns corrsponding bookmark review responses given by current participant' do
-      allow(BookmarkRatingResponseMap).to receive(:get_assessments_for).with(participant).and_return([response])
+      allow(BookmarkRatingResponseMap).to receive(:assessments_for).with(participant).and_return([response])
       expect(participant.bookmark_reviews).to eq([response])
     end
   end
@@ -212,7 +120,7 @@ describe AssignmentParticipant do
         allow(File).to receive(:directory?).with("a/b").and_return(true)
         allow(Dir).to receive(:[]).with("a/b/*").and_return(["a/b/k.rb"])
         allow(File).to receive(:directory?).with("a/b/k.rb").and_return(false)
-        expect(participant.files("a")).to eq(["a/b/k.rb", "a/b"])
+        expect(participant.files("a")).to eq(%w[a/b/k.rb a/b])
       end
     end
   end
@@ -228,6 +136,7 @@ describe AssignmentParticipant do
       context 'when the record has less than 4 items' do
         it 'raises an ArgumentError' do
           row = {name: 'no one', fullname: 'no one', email: 'no_one@email.com'}
+          expect(ImportFileHelper).not_to receive(:create_new_user)
           expect { AssignmentParticipant.import(row, nil, nil, nil) }.to raise_error('The record containing no one does not have enough items.')
         end
       end
@@ -279,6 +188,7 @@ describe AssignmentParticipant do
         context 'when certain assignment cannot be found' do
           it 'creates a new user based on import information and raises an ImportError' do
             allow(Assignment).to receive(:find).with(1).and_return(nil)
+            expect(ImportFileHelper).to receive(:create_new_user)
             expect { AssignmentParticipant.import(row, nil, {}, 1) }.to raise_error('The assignment with id "1" was not found.')
           end
         end
@@ -289,6 +199,7 @@ describe AssignmentParticipant do
             allow(AssignmentParticipant).to receive(:exists?).with(user_id: 1, parent_id: 1).and_return(false)
             allow(AssignmentParticipant).to receive(:create).with(user_id: 1, parent_id: 1).and_return(participant)
             allow(participant).to receive(:set_handle).and_return('handle')
+            expect(ImportFileHelper).to receive(:create_new_user)
             expect(AssignmentParticipant.import(row, nil, {}, 1)).to be_truthy
           end
         end
@@ -391,51 +302,5 @@ describe AssignmentParticipant do
         end
       end
     end
-  end
-
-  describe '#update_max_or_min' do
-    context 'test updating the max' do
-      it 'should not update the max if :max is nil' do
-        scores = {:round1 => {:scores => { :max => nil } }, :review => {:scores => { :max => 90 }}}
-        #Scores[:review][:scores][:max] should not change to nil (currently 90)
-        participant.update_max_or_min(scores, :round1, :review, :max)
-        expect(scores[:review][:scores][:max]).to eq(90) 
-      end
-
-      it 'should update the review max score to the round max score if round was higher' do
-        scores = {:round1 => {:scores => { :max => 90 } }, :review => {:scores => { :max => 80 }}}
-        participant.update_max_or_min(scores, :round1, :review, :max)
-        expect(scores[:review][:scores][:max]).to eq(90) 
-      end
-
-      it 'review max score should be unchanged if round max score is less than review max score' do
-        scores = {:round1 => {:scores => { :max => 70 } }, :review => {:scores => { :max => 80 }}}
-        participant.update_max_or_min(scores, :round1, :review, :max)
-        expect(scores[:review][:scores][:max]).to eq(80) 
-      end
-
-    end
-    context 'test updating the min' do
-      it 'should not update the min if :min is nil' do
-        scores = {:round1 => {:scores => { :min => nil } }, :review => {:scores => { :min => 90 }}}
-        #Scores[:review][:scores][:max] should not change to nil (currently 90)
-        participant.update_max_or_min(scores, :round1, :review, :min)
-        expect(scores[:review][:scores][:min]).to eq(90) 
-      end
-
-      it 'update the review min score to the round min score if round was less' do
-        scores = {:round1 => {:scores => { :min => 20 } }, :review => {:scores => { :min => 30 }}}
-        participant.update_max_or_min(scores, :round1, :review, :min)
-        expect(scores[:review][:scores][:min]).to eq(20) 
-      end
-
-      it 'review min score should be unchanged if round min score greater than the review min score' do
-        scores = {:round1 => {:scores => { :min => 60 } }, :review => {:scores => { :min => 20 }}}
-        participant.update_max_or_min(scores, :round1, :review, :min)
-        expect(scores[:review][:scores][:min]).to eq(20) 
-      end
-
-    end
-
   end
 end

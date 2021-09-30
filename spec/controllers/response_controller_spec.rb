@@ -330,4 +330,5 @@ describe ResponseController do
       end
     end
   end
+
 end

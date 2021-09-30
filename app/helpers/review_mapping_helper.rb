@@ -166,7 +166,7 @@ module ReviewMappingHelper
   end
 
   # moves data of reviews in each round from a current round
-  def initialize_chart_elements(reviewer)
+  def initialize_volume_metric_chart_elements(reviewer)
     round = 0
     labels = []
     reviewer_data = []
@@ -197,19 +197,50 @@ module ReviewMappingHelper
 
   # The data of all the reviews is displayed in the form of a bar chart
   def display_volume_metric_chart(reviewer)
-    labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
-    data = {
+    labels, reviewer_data, all_reviewers_data = initialize_volume_metric_chart_elements(reviewer)
+    data = prepare_chart_data(labels, reviewer_data, all_reviewers_data, "rgba(255,99,132,0.8)")
+    options = prepare_chart_options(125, 50, 400)
+    horizontal_bar_chart data, options
+  end
+
+  def initialize_review_metrics_chart_elements(reviewer)
+    labels = []
+    reviewer_data = []
+    all_reviewers_data = []
+
+    tag_prompt_deployments = TagPromptDeployment.where(assignment_id: reviewer.assignment.id)
+    tag_prompt_deployments.each do |tag_prompt_deployment|
+      labels.push tag_prompt_deployment.tag_prompt.prompt
+      reviewer_avg = ReviewMetricsQuery.average_number_of_qualifying_comments(tag_prompt_deployment.id, reviewer)
+      all_reviewers_avg = ReviewMetricsQuery.average_number_of_qualifying_comments(tag_prompt_deployment.id)
+
+      reviewer_data.push reviewer_avg
+      all_reviewers_data.push all_reviewers_avg
+    end
+
+    [labels, reviewer_data, all_reviewers_data]
+  end
+
+  def display_review_metrics_chart(reviewer)
+    labels, reviewer_data, all_reviewers_data = initialize_review_metrics_chart_elements(reviewer)
+    data = prepare_chart_data(labels, reviewer_data, all_reviewers_data, "rgba(71,119,158,0.8)")
+    options = prepare_chart_options(78.125 + 15.625 * labels.count, 1, 16)
+    horizontal_bar_chart data, options
+  end
+
+  def prepare_chart_data(labels, reviewer_data, all_reviewers_data, color)
+    {
       labels: labels,
       datasets: [
         {
-          label: 'vol.',
-          backgroundColor: "rgba(255,99,132,0.8)",
+          label: 'reviewer avg.',
+          backgroundColor: color,
           borderWidth: 1,
           data: reviewer_data,
           yAxisID: "bar-y-axis1"
         },
         {
-          label: 'avg. vol.',
+          label: 'class avg.',
           backgroundColor: "rgba(255,206,86,0.8)",
           borderWidth: 1,
           data: all_reviewers_data,
@@ -217,7 +248,10 @@ module ReviewMappingHelper
         }
       ]
     }
-    options = {
+  end
+
+  def prepare_chart_options(height, step_size, max)
+    {
       legend: {
         position: 'top',
         labels: {
@@ -225,7 +259,7 @@ module ReviewMappingHelper
         }
       },
       width: "200",
-      height: "125",
+      height: height.to_s,
       scales: {
         yAxes: [{
           stacked: true,
@@ -247,13 +281,12 @@ module ReviewMappingHelper
           stacked: false,
           ticks: {
             beginAtZero: true,
-            stepSize: 50,
-            max: 400
+            stepSize: step_size,
+            max: max
           }
         }]
       }
     }
-    horizontal_bar_chart data, options
   end
 
   def list_review_submissions(participant_id, reviewee_team_id, response_map_id)

@@ -4,6 +4,7 @@ Expertiza
 [![Build Status](https://travis-ci.org/expertiza/expertiza.svg?branch=master)](https://travis-ci.org/expertiza/expertiza)
 [![Coverage Status](https://coveralls.io/repos/github/expertiza/expertiza/badge.svg?branch=master)](https://coveralls.io/github/expertiza/expertiza?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/f3a41f16c2b6e45aa9d4/maintainability)](https://codeclimate.com/github/expertiza/expertiza/maintainability)
+[![Discord](https://img.shields.io/badge/chat-on%20discord-7289da.svg?sanitize=true)](https://discord.gg/EwH6DmqAJn)
 
 #### Peer review system
 
@@ -20,6 +21,11 @@ Using the VCL is the quickest way to get started, but you may find it awkward de
 with network lag and having to reinstall gems every time you connect. Installing locally can be a pain though too.
 Life is full of tradeoffs. :-) The good news is that you can start on one environment, push your work to git,
 and switch to another environment if you don't like the one you started with.
+
+### Anonymized Database
+
+For students researching educational data collected from Expertiza, here [is the database with scrubbed names](https://drive.google.com/file/d/1vMe1MX2aUahAzLMGUdFlXX1cNyDuljQ6/view?usp=sharing).
+
 
 ### Installing locally
 

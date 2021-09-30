@@ -75,9 +75,11 @@ class Questionnaire < ActiveRecord::Base
 
   # validate the entries for this questionnaire
   def validate_questionnaire
-    errors.add(:max_question_score, "The maximum question score must be a positive integer.") if max_question_score < 1
-    errors.add(:min_question_score, "The minimum question score must be less than the maximum") if min_question_score >= max_question_score
-
+    if max_question_score and min_question_score
+      errors.add(:max_question_score, "The maximum question score must be a positive integer.") if max_question_score < 1
+      errors.add(:min_question_score, "The minimum question score must be less than the maximum") if min_question_score >= max_question_score
+    end
+    
     results = Questionnaire.where("id <> ? and name = ? and instructor_id = ?", id, name, instructor_id)
     errors.add(:name, "Questionnaire names must be unique.") if results.present?
   end

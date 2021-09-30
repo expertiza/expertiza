@@ -11,7 +11,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20201116005244) do
+ActiveRecord::Schema.define(version: 20210422185445) do
+
+  create_table "account_requests", force: :cascade do |t|
+    t.string   "name",              limit: 255
+    t.integer  "role_id",           limit: 4
+    t.string   "fullname",          limit: 255
+    t.string   "institution_id",    limit: 255
+    t.string   "email",             limit: 255
+    t.string   "status",            limit: 255
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.text     "self_introduction", limit: 65535
+  end
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -56,6 +68,7 @@ ActiveRecord::Schema.define(version: 20201116005244) do
     t.integer "questionnaire_weight", limit: 4, default: 0,    null: false
     t.integer "used_in_round",        limit: 4
     t.boolean "dropdown",                       default: true
+    t.integer "topic_id",             limit: 4
   end
 
   add_index "assignment_questionnaires", ["assignment_id"], name: "fk_aq_assignments_id", using: :btree
@@ -114,6 +127,11 @@ ActiveRecord::Schema.define(version: 20201116005244) do
     t.boolean  "has_badge"
     t.boolean  "allow_selecting_additional_reviews_after_1st_round"
     t.integer  "sample_assignment_id",                               limit: 4
+    t.boolean  "vary_by_topic",                                                    default: false
+    t.boolean  "vary_by_round",                                                    default: false
+    t.boolean  "reviewer_is_team"
+    t.boolean  "is_conference_assignment",                                         default: false
+    t.boolean  "auto_assign_mentor",                                               default: false
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -319,6 +337,17 @@ ActiveRecord::Schema.define(version: 20201116005244) do
 
   add_index "late_policies", ["instructor_id"], name: "fk_instructor_id", using: :btree
 
+  create_table "locks", force: :cascade do |t|
+    t.integer  "timeout_period", limit: 4
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "user_id",        limit: 4
+    t.integer  "lockable_id",    limit: 4
+    t.string   "lockable_type",  limit: 255
+  end
+
+  add_index "locks", ["user_id"], name: "fk_rails_426f571216", using: :btree
+
   create_table "markup_styles", force: :cascade do |t|
     t.string "name", limit: 255, default: "", null: false
   end
@@ -457,18 +486,6 @@ ActiveRecord::Schema.define(version: 20201116005244) do
     t.boolean "iscorrect",                 default: false
   end
 
-  create_table "requested_users", force: :cascade do |t|
-    t.string   "name",              limit: 255
-    t.integer  "role_id",           limit: 4
-    t.string   "fullname",          limit: 255
-    t.string   "institution_id",    limit: 255
-    t.string   "email",             limit: 255
-    t.string   "status",            limit: 255
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
-    t.text     "self_introduction", limit: 65535
-  end
-
   create_table "response_maps", force: :cascade do |t|
     t.integer  "reviewed_object_id", limit: 4,   default: 0,     null: false
     t.integer  "reviewer_id",        limit: 4,   default: 0,     null: false
@@ -477,18 +494,20 @@ ActiveRecord::Schema.define(version: 20201116005244) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "calibrate_to",                   default: false
+    t.boolean  "reviewer_is_team"
   end
 
   add_index "response_maps", ["reviewer_id"], name: "fk_response_map_reviewer", using: :btree
 
   create_table "responses", force: :cascade do |t|
-    t.integer  "map_id",             limit: 4,     default: 0,     null: false
+    t.integer  "map_id",             limit: 4,     default: 0,         null: false
     t.text     "additional_comment", limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "version_num",        limit: 4
     t.integer  "round",              limit: 4
     t.boolean  "is_submitted",                     default: false
+    t.string   "visibility",         limit: 255,   default: "private"
   end
 
   add_index "responses", ["map_id"], name: "fk_response_response_map", using: :btree
@@ -539,6 +558,13 @@ ActiveRecord::Schema.define(version: 20201116005244) do
 
   add_index "roles_permissions", ["permission_id"], name: "fk_roles_permission_permission_id", using: :btree
   add_index "roles_permissions", ["role_id"], name: "fk_roles_permission_role_id", using: :btree
+
+  create_table "sample_reviews", force: :cascade do |t|
+    t.integer  "assignment_id", limit: 4
+    t.integer  "response_id",   limit: 4
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
 
   create_table "score_views", id: false, force: :cascade do |t|
     t.integer  "question_weight",       limit: 4
@@ -769,6 +795,7 @@ ActiveRecord::Schema.define(version: 20201116005244) do
     t.text    "public_key",                limit: 16777215
     t.boolean "copy_of_emails",                             default: false
     t.integer "institution_id",            limit: 4
+    t.boolean "preference_home_flag",                       default: true
   end
 
   add_index "users", ["role_id"], name: "fk_user_role_id", using: :btree
@@ -808,6 +835,7 @@ ActiveRecord::Schema.define(version: 20201116005244) do
   add_foreign_key "invitations", "users", column: "from_id", name: "fk_invitationfrom_users"
   add_foreign_key "invitations", "users", column: "to_id", name: "fk_invitationto_users"
   add_foreign_key "late_policies", "users", column: "instructor_id", name: "fk_instructor_id"
+  add_foreign_key "locks", "users"
   add_foreign_key "participants", "users", name: "fk_participant_users"
   add_foreign_key "plagiarism_checker_assignment_submissions", "assignments"
   add_foreign_key "plagiarism_checker_comparisons", "plagiarism_checker_assignment_submissions"

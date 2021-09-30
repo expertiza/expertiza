@@ -34,7 +34,7 @@
                           <% responses.each do |response_id| %>
                               <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
                               <td align='center'>
-                                <p><%= answer.answer == 0 ? image_tag("delete_icon.png") : image_tag("Check-icon.png") %></p></td>
+                                <p><%= answer.answer == 0 ? image_tag("delete_icon.png") : image_tag("Check-icon.png") unless answer.nil? %></p></td>
                           <% end %>
                         </tr>
                       </table>

@@ -64,7 +64,7 @@ class AuthController < ApplicationController
     redirect_to '/'
   end
 # changing spelling of the authorised to authorized 
-  def self.authorised?(session, params)
+  def self.authorized?(session, params)
     authorized = false # default
     check_controller = false
 

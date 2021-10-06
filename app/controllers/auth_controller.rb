@@ -76,7 +76,7 @@ class AuthController < ApplicationController
     else
       # Check if there's a specific permission for an action
       if session[:credentials].actions.key?(params[:controller])
-        #Cheking
+        #Checking params
         if session[:credentials].actions[params[:controller]].key?(params[:action]) and session[:credentials].actions[params[:controller]][params[:action]]
           authorized = true
         else

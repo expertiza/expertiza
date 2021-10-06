@@ -91,8 +91,8 @@ class AuthController < ApplicationController
       end
     end # Check permissions
 
-    ExpertizaLogger.info "Authorized? #{authorized}, check_controller? #{check_controller}"
-    authorised
+    ExpertizaLogger.info "Authorised? #{authorized}, check_controller? #{check_controller}"
+    authorized
   end
 
   protected

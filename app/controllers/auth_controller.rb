@@ -87,12 +87,12 @@ class AuthController < ApplicationController
 
       # Check if there's a general permission for a controller
       if check_controller
-        authorized = true if session[:credentials].controllers.key?(params[:controller]) and session[:credentials].controllers[params[:controller]]
+        authorised = true if session[:credentials].controllers.key?(params[:controller]) and session[:credentials].controllers[params[:controller]]
       end
     end # Check permissions
 
     ExpertizaLogger.info "Authorized? #{authorized}, check_controller? #{check_controller}"
-    authorized
+    authorised
   end
 
   protected

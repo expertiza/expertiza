@@ -1,7 +1,7 @@
 <h1>Signup sheet for <%= @assignment.name %> assignment</h1>
 
 <table class="general">
-  <tr><%= render :partial => 'table_header' %></tr>
+  <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
   <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
       <b>Your topic(s):</b>
       <% for selected_topic in @selected_topics %>
@@ -30,7 +30,7 @@
         <tr id="topic_<%= topic.id %>">
       <% end %>
       <% is_suggested_topic = false %>
-      <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
+      <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
       </tr>
       <% i=i+1 %>
     <% end %>

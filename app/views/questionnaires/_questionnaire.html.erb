@@ -15,57 +15,80 @@
      <tr class="form-inline">
        <td><label for="min_question_score">Min item score:</label>&nbsp;<%= text_field 'questionnaire', 'min_question_score', :size=> 1, :value=>@questionnaire.min_question_score ||= 0, :class => "form-control width-40" %>&nbsp;&nbsp;</td>
        <td><label for="max_question_score">Max item score:</label>&nbsp;<%= text_field 'questionnaire', 'max_question_score', :size=> 1, :value=>@questionnaire.max_question_score ||= 5, :class => "form-control width-40" %>&nbsp;&nbsp;</td>
-       <td><label for="questionnaire_private">Is this <%= @questionnaire.display_type %> private?</label>&nbsp;<%= select(:questionnaire, :private, [ ['no', false],['yes',  true]], {}, {class: "form-control"})%>
+       <td><label for="questionnaire_private">Is this <%= @questionnaire.display_type %> private:</label>&nbsp;<%= select(:questionnaire, :private, [ ['no', false],['yes',  true]], {}, {class: "form-control"})%>
        </td>
      </tr>
   </table>
   <% if params[:action] == 'new' %>
     <%= submit_tag 'Create', class: "btn btn-default" %>
   <% end %>
+<% end %>
 
-  <!--Questions part-->
-  <hr/>
-  <% if !params[:id].nil? and params[:action] == 'edit' %>
-    <table id="question_actions_table">
-      <tr>
-        <td>
-          <p class="form-inline"> <%= submit_tag 'Add', name: "add_new_questions", class: "btn btn-default"%>
-            <%= text_field 'new_question', 'total_num', :size => 1, :value => "1", :class => "form-control" %> more
-            <%= select "new_question", "type", @question_types, {}, {class: "form-control"} %> question(s)
-          </p>
-        </td>
-      </tr>
-    </table>
-
-    <table id="questions_table" class="table table-striped">
+<!--Question part-->
+<hr/>
+<% if !params[:id].nil? and params[:action] == 'edit' %>
+  <% if AnswerHelper.in_active_period(params[:id]) %>
+    A review period is in progress. All existing reviews for the questionnaire <b>will be deleted</b> if you ADD or REMOVE a question.
+  <% end %>
+  <table id="question_actions_table">
+    <tr>
+      <td>
+        <%= form_tag :action => 'add_new_questions', :id => params[:id], :questionnaire_type => params[:model], :private => params[:private] do %>
+         <p class="form-inline">
+           <%= submit_tag 'Add',
+                          confirm: AnswerHelper.in_active_period(params[:id]) ? "A review period is in progress. All existing reviews for the questionnaire would be deleted. Are you sure you want to continue?" : nil,
+                          class: "btn btn-primary"%>
+          <%= text_field 'question', 'total_num', :size => 1, :value => "1", :class => "form-control" %> more
+          <%= select "question", "type",
+              {"Criterion" =>"Criterion",
+               "Scale"=>"Scale",
+               "Cake" => "Cake",
+               "Dropdown"=>"Dropdown",
+               "Checkbox"=>"Checkbox",
+               "TextArea"=>"TextArea",
+               "TextField"=>"TextField",
+               "UploadFile"=>"UploadFile",
+               "SectionHeader"=>"SectionHeader",
+               "TableHeader"=>"TableHeader",
+               "ColumnHeader"=>"ColumnHeader"
+               }, {}, {class: "form-control", onchange: "checkQuestionType()"} %> question(s)
+           <span id = "new_question_weight">
+            Add question weight <%= text_field 'question', 'weight', :size => 1, :value => "1", :class => "form-control" %>
+           </span></p>
+        <% end %>
+      </td>
+    </tr>
+  </table>
+  
+  <%= form_tag :action => 'save_all_questions', :id => params[:id],  :questionnaire_type => params[:model], :private => params[:private] do %>
+    <table id="questions_table">
       <tr>
         <th class="head" align="center" width="30">Action</td>
         <th class="head" align="center" width="30">Seq</td>
         <th class="head" align="center" width="300">Question</td>
         <th class="head" align="center" width="100">Type</td>
         <th class="head" align="center">Weight</td>
-        <th class="head" align="center">Text Area Size</td>
-        <th class="head" align="center">Labels</td>
       </tr>
       <% i = 1 %>
       <%questions = @questionnaire.questions.sort { |a,b| a.seq <=> b.seq }%>
-      <% for @question in questions %>
-        <%=@question.edit(i)%>
+      <% questions.each do |question| %>
+        <%=question.edit(i)%>
         <% i += 1 %>
       <% end %>
     </table>
     <%= submit_tag "Save #{@questionnaire.display_type.downcase} questionnaire", :name=>"save", :class => "btn btn-primary" %>
     <input style="margin-left:36em" type="submit" name="view_advice" value="Edit/View advice" class="btn btn-default"/>
     <hr/>
-        <%= link_to 'Import Questionnaire', :controller=>'import_file', :action=>'start', :model => 'Question', :id=> @questionnaire.id, :expected_fields => 'txt, type ,seq,size, break_before' %>|
-        <%= link_to 'Export Questionnaire', :controller=>'export_file',:action=>'start',:model=> 'Question',:id=> @questionnaire.id %>
-    <!--<h4>Import/Export (from/to CSV format)</h4>
-    <input type="file" name="csv" />
-    <br />
-    <input type="submit" name="import" value="Import questions"/>
-    <br />
-    <input type="submit" name="export" value="Export questions to CSV"%>-->
-
+    <%= link_to 'Import Questionnaire', :controller=>'import_file', :action=>'start', :model => 'Question', :id=> @questionnaire.id, :expected_fields => 'txt, type ,seq,size, break_before' %>|
+    <%= link_to 'Export Questionnaire', :controller=>'export_file',:action=>'start',:model=> 'Question',:id=> @questionnaire.id %>
   <% end %>
 <% end %>
 <BR/>
+
+<% if AnswerHelper.in_active_period(params[:id]) %>
+    <script>
+        $('a[data-method="delete"]').click(function(e) {
+            return window.confirm("A review period is in progress. All existing reviews for the questionnaire would be deleted. Are you sure you want to continue?");
+        });
+    </script>
+<% end %>

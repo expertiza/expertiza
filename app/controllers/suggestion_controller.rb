@@ -1,19 +1,12 @@
 class SuggestionController < ApplicationController
+  include AuthorizationHelper
+
   def action_allowed?
     case params[:action]
-    when 'create', 'new', 'student_view', 'student_edit', 'update_suggestion'
-      current_role_name.eql? 'Student'
-    when 'submit'
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator',
-       'Student'].include? current_role_name
+    when 'create', 'new', 'student_view', 'student_edit', 'update_suggestion', 'submit'
+      current_user_has_student_privileges?
     else
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator'].include? current_role_name
+      current_user_has_ta_privileges?
     end
   end
 
@@ -26,7 +19,7 @@ class SuggestionController < ApplicationController
     else
       flash[:error] = "There was an error in adding your comment."
     end
-    if current_role_name.eql? 'Student'
+    if current_user_has_student_privileges?
       redirect_to action: "student_view", id: params[:id]
     else
       redirect_to action: "show", id: params[:id]

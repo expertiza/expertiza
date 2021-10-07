@@ -54,7 +54,7 @@
     <!--And if one reviewer did not do first-round review and did second round directly, Expertiza will display only second round.-->
     <!--If another reviewer only finished first-round review and did not do second round, Expertiza will display only first round.-->
     <!--If this assignment does not support varying rubrics by round, Expertiza will display last round review.--> 
-    <% rounds = Array.new %>
+    <% rounds = [] %>
     <% rscore[:assessments].uniq{|response| response.round }.each do |response| %>
         <% rounds << response.round %>
     <% end %>
@@ -74,7 +74,7 @@
                 <% count = count + 1 %>
                 <% prefix = nil if controller.action_name == "view_my_scores" %>
                 <!--change code in order to compat to multi-round review-->
-                <% if @assignment.varying_rubrics_by_round? and !review.round.nil? %>
+                <% if @assignment.vary_by_round and !review.round.nil? %>
                     <% review_symbol = 'review' + review.round.to_s %>
                 <% else %>
                     <% review_symbol = 'review' %>

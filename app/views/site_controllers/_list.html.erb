@@ -12,7 +12,7 @@
     </tr>
     <% actions = site_controller.actions
     if actions.length -%>
-  <% for action in actions %>
+  <% actions.each do | action | %>
     <tr class="depth1"><td><div class="menu_title"><%= link_to action.name, :controller => 'controller_actions',
       :action => 'show', :id => action.id %></div></td>
   <td><%= if action.permission_id

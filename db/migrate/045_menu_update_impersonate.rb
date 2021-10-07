@@ -1,7 +1,7 @@
 class MenuUpdateImpersonate < ActiveRecord::Migration
   def self.up
-    permission1 = Permission.find_by_name('administer assignments');
-    permission2 = Permission.find_by_name('do assignments');
+    permission1 = Permission.find_by_name('administer assignments')
+    permission2 = Permission.find_by_name('do assignments')
     site_controller = SiteController.find_by_name('impersonate')
     if site_controller == nil
        site_controller = SiteController.create(:name => 'impersonate', :permission_id => permission1.id, :builtin => 0)

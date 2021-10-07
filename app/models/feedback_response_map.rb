@@ -45,7 +45,7 @@ class FeedbackResponseMap < ResponseMap
     @temp_review_responses = Response.where(["map_id IN (?)", @review_response_map_ids]).order("created_at DESC")
     # we need to pick the latest version of review for each round
     @temp_response_map_ids = []
-    if Assignment.find(id).varying_rubrics_by_round?
+    if Assignment.find(id).vary_by_round
       @all_review_response_ids_round_one = []
       @all_review_response_ids_round_two = []
       @all_review_response_ids_round_three = []
@@ -67,7 +67,7 @@ class FeedbackResponseMap < ResponseMap
     end
     # @feedback_response_map_ids = ResponseMap.where(["reviewed_object_id IN (?) and type = ?", @all_review_response_ids, type]).pluck("id")
     # @feedback_responses = Response.where(["map_id IN (?)", @feedback_response_map_ids]).pluck("id")
-    if Assignment.find(id).varying_rubrics_by_round?
+    if Assignment.find(id).vary_by_round
       return @authors, @all_review_response_ids_round_one, @all_review_response_ids_round_two, @all_review_response_ids_round_three
     else
       return @authors, @all_review_response_ids

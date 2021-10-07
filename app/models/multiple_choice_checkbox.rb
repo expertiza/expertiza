@@ -7,6 +7,13 @@ class MultipleChoiceCheckbox < QuizQuestion
     html += 'id="question_' + self.id.to_s + '_txt">' + self.txt + '</textarea>'
     html += '</td></tr>'
 
+    html += '<tr><td>'
+    html += 'Question Weight: '
+    html += '<input type="number" name="question_weights[' + self.id.to_s + '][txt]" '
+    html += 'id="question_wt_' + self.id.to_s + '_txt" '
+    html += 'value="' + self.weight.to_s + '" min="0" />'
+    html += '</td></tr>'
+
     # for i in 0..3
     [0, 1, 2, 3].each do |i|
       html += "<tr><td>"
@@ -27,7 +34,7 @@ class MultipleChoiceCheckbox < QuizQuestion
     end
 
     html.html_safe
-    safe_join(html)
+    # safe_join(html)
   end
 
   def complete

@@ -10,10 +10,9 @@ class Scale < ScoredQuestion
     html += '][type]" id="question_' + self.id.to_s + '_type" type="text"></td>'
     html += '<td><input size="2" value="' + self.weight.to_s + '" name="question[' + self.id.to_s
     html += '][weight]" id="question_' + self.id.to_s + '_weight" type="text"></td>'
-    html += '<td style="color: grey">N/A</td>'
-    html += '<td> min_label <input size="10" value="' + self.min_label.to_s + '" name="question[' + self.id.to_s + '][min_label]" id="question_' + self.id.to_s
-    html += '_min_label" type="text">  max_label <input size="12" value="' + self.max_label.to_s + '" name="question[' + self.id.to_s
-    html += '][max_label]" id="question_' + self.id.to_s + '_max_label" type="text"></td>'
+    html += '<td> max_label <input size="10" value="' + self.max_label.to_s + '" name="question[' + self.id.to_s + '][max_label]" id="question_' + self.id.to_s
+    html += '_max_label" type="text">  min_label <input size="12" value="' + self.min_label.to_s + '" name="question[' + self.id.to_s
+    html += '][min_label]" id="question_' + self.id.to_s + '_min_label" type="text"></td>'
     html += '</tr>'
 
     html.html_safe
@@ -25,7 +24,7 @@ class Scale < ScoredQuestion
     html += '<TD align="left">' + self.type + '</TD>'
     html += '<td align="center">' + self.weight.to_s + '</TD>'
     questionnaire = self.questionnaire
-    if !self.max_label.nil? && !self.min_label.nil?
+    unless self.max_label.nil? || self.min_label.nil?
       html += '<TD align="center"> (' + self.min_label + ') ' + questionnaire.min_question_score.to_s + ' to '
       html += questionnaire.max_question_score.to_s + ' (' + self.max_label + ')</TD>'
     else
@@ -49,7 +48,7 @@ class Scale < ScoredQuestion
     end
     html += '<td width="10%"></td></tr><tr>'
 
-    html += if !self.min_label.nil?
+    html += unless self.min_label.nil?
               '<td width="10%">' + self.min_label + '</td>'
             else
               '<td width="10%"></td>'
@@ -57,7 +56,7 @@ class Scale < ScoredQuestion
     (questionnaire_min..questionnaire_max).each do |j|
       html += '<td width="10%"><input type="radio" id="' + j.to_s
       html += '" value="' + j.to_s + '" name="Radio_' + self.id.to_s + '"'
-      html += 'checked="checked"' if (!answer.nil? and answer.answer == j) or (answer.nil? and questionnaire_min == j)
+      html += 'checked="checked"' unless (answer.nil? or answer.answer != j) and (answer or questionnaire_min != j)
       html += '></td>'
     end
     html += '<script>jQuery("input[name=Radio_' + self.id.to_s + ']:radio").change(function() {'
@@ -65,7 +64,7 @@ class Scale < ScoredQuestion
     html += 'var checked_value = jQuery("input[name=Radio_' + self.id.to_s + ']:checked").val();'
     html += 'response_score.val(checked_value);});</script>'
 
-    html += if !self.max_label.nil?
+    html += unless self.max_label.nil?
               '<td width="10%">' + self.max_label + '</td>'
             else
               '<td width="10%"></td>'

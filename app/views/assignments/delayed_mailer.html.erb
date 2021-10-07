@@ -16,10 +16,10 @@
   <th width="25 %">Action</th>
   <th width="25 %">Delete</th>
   <% i=1 %>
-  <% for delayed_job in @delayed_mailer %>
+  <% @delayed_mailer.each do | delayed_job | %>
       <tr>
         <% if delayed_job.handler.include? "assignment_id: #{@assignment.id}"%>
-            <% handler = delayed_job.handler.split()%>
+            <% handler = delayed_job.handler.split%>
             <td><%= handler[5] %></td>
             <td><%= delayed_job.run_at %></td>
             <td><%= handler[7][1..-1] + ":" + handler[8][0..-2]%></td>

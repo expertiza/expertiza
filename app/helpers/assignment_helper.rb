@@ -121,7 +121,7 @@ module AssignmentHelper
   end
   module_function :compute_reviews_hash
 
-  # Calculate the avg score and score range for each reviewee(team), only for peer-review
+  # calculate the avg score and score range for each reviewee(team), only for peer-review
   def compute_avg_and_ranges_hash(assignment)
     scores = {}
     contributors = assignment.contributors # assignment_teams

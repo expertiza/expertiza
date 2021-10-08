@@ -1,5 +1,5 @@
 module ReportFormatterHelper
-  include AssignmentHelper
+  extend AssignmentHelper
 
   # E1936 team recommends this method be REMOVED (it does not seem to be used anywhere in Expertiza as of 4/21/19)
   def summary_by_reviewee_and_criteria(params, _session = nil)

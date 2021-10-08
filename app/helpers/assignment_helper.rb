@@ -106,7 +106,6 @@ module AssignmentHelper
     assignment.questionnaires.each {|questionnaire| total += questionnaire.get_weighted_score(assignment, scores) }
     total
   end
-  module_function :compute_total_score
 
   def compute_reviews_hash(assignment)
     review_scores = {}
@@ -119,7 +118,6 @@ module AssignmentHelper
     end
     review_scores
   end
-  module_function :compute_reviews_hash
 
   # calculate the avg score and score range for each reviewee(team), only for peer-review
   def compute_avg_and_ranges_hash(assignment)
@@ -147,7 +145,6 @@ module AssignmentHelper
     end
     scores
   end
-  module_function :compute_avg_and_ranges_hash
 
 end
 

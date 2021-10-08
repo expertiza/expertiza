@@ -77,7 +77,8 @@ class StudentQuizzesController < ApplicationController
             scores.push(new_score)
           end
         end
-      else # TrueFalse and MultipleChoiceRadio
+      else
+        # TrueFalse and MultipleChoiceRadio
         correct_answer = correct_answers.first
         score = correct_answer.txt == params[question.id.to_s] ? 1 : 0
         new_score = Answer.new comments: params[question.id.to_s], question_id: question.id, response_id: response.id, answer: score

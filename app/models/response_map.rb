@@ -1,5 +1,5 @@
 class ResponseMap < ActiveRecord::Base
-  require './app/helpers/assignment_helper'
+  require '/app/helpers/assignment_helper'
   include AssignmentHelper
 
   has_many :response, foreign_key: 'map_id', dependent: :destroy, inverse_of: false

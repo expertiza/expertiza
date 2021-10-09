@@ -1,5 +1,5 @@
 module ReportFormatterHelper
-  require './app/helpers/assignment_helper'
+  require '/app/helpers/assignment_helper'
   include AssignmentHelper
 
   # E1936 team recommends this method be REMOVED (it does not seem to be used anywhere in Expertiza as of 4/21/19)

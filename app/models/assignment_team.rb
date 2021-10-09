@@ -1,6 +1,6 @@
 class AssignmentTeam < Team
   require File.dirname(__FILE__) + '/analytic/assignment_team_analytic'
-  require './app/helpers/assignment_helper'
+  require '/app/helpers/assignment_helper'
   include AssignmentTeamAnalytic
   include AssignmentHelper
 

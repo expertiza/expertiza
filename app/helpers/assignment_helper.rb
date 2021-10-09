@@ -112,7 +112,7 @@ module AssignmentHelper
     response_type = 'ReviewResponseMap'
     response_maps = ResponseMap.where(reviewed_object_id: assignment.id, type: response_type)
     if assignment.vary_by_round
-      review_scores = scores_varying_rubrics(review_scores, response_maps)
+      review_scores = scores_varying_rubrics(assignment, review_scores, response_maps)
     else
       review_scores = scores_non_varying_rubrics(review_scores, response_maps)
     end
@@ -168,8 +168,8 @@ def calc_review_score(corresponding_response, questions)
   end
 end
 
-def scores_varying_rubrics(review_scores, response_maps)
-  rounds = self.rounds_of_reviews
+def scores_varying_rubrics(assignment, review_scores, response_maps)
+  rounds = assignment.rounds_of_reviews
   (1..rounds).each do |round|
     response_maps.each do |response_map|
       questions = peer_review_questions_for_team(response_map.reviewee, round)

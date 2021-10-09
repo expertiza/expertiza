@@ -70,7 +70,7 @@ class ReputationWebServiceController < ApplicationController
     raw_data_array
   end
 
-  def json_generator(assignment_id, another_assignment_id = 0, round_num = 2, type = 'peer review grades')
+  def generate_json(assignment_id, another_assignment_id = 0, round_num = 2, type = 'peer review grades')
     assignment = Assignment.find_by(id: assignment_id)
     has_topic = !SignUpTopic.where(assignment_id: assignment_id).empty?
 
@@ -84,7 +84,7 @@ class ReputationWebServiceController < ApplicationController
       request_body['submission' + record[1].to_s] = {} unless request_body.key?('submission' + record[1].to_s)
       request_body['submission' + record[1].to_s]['stu' + record[0].to_s] = record[2]
     end
-    # sort the 2-dimention hash
+    # sort the 2-dimension hash
     request_body.each {|k, v| request_body[k] = v.sort.to_h }
     request_body.sort.to_h
   end
@@ -204,7 +204,6 @@ class ReputationWebServiceController < ApplicationController
     encrypted_string = cipertext
     private_key = OpenSSL::PKey::RSA.new(File.read(private_key_file), Base64.decode64(password))
     string = private_key.private_decrypt(Base64.decode64(encrypted_string))
-
     string
   end
 

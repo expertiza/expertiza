@@ -63,8 +63,11 @@ class LatePoliciesController < ApplicationController
         @late_policy.save!
         flash[:notice] = "The penalty policy was successfully created."
         redirect_to action: 'index'
-      rescue StandardError
-        flash[:error] = "The following error occurred while saving the penalty policy: "
+      rescue ActiveRecord::RecordInvalid => exception
+        flash[:error] = exception.record.errors.full_messages.join("<br />").html_safe
+        redirect_to action: 'new'
+      rescue StandardError => exception
+        flash[:error] = "The following error occurred while saving the penalty policy: #{exception}"
         redirect_to action: 'new'
       end
     else

@@ -33,23 +33,21 @@ class ImpersonateController < ApplicationController
       session[:original_user] = @original_user
       session[:impersonate] = true
       session[:user] = user
-    else
       # If some user is to be impersonated, their session details are overwritten onto the current to impersonate
-      if !params[:impersonate][:name].empty?
-        # E1991 : check whether instructor is currently in anonymized view
-        user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:impersonate][:name]) : user = user = User.find_by(name: params[:impersonate][:name])
-        AuthController.clear_user_info(session, nil)
-        session[:user] = user
-        session[:impersonate] =  true
-        session[:original_user] = @original_user
-      else
-        # E1991 : check whether instructor is currently in anonymized view
-        user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:user][:name]) : user = User.find_by(name: params[:user][:name])
-        AuthController.clear_user_info(session, nil)
-        session[:user] = session[:super_user]
-        user = session[:user]
-        session[:super_user] = nil
-      end
+    elsif !params[:impersonate][:name].empty?
+      # E1991 : check whether instructor is currently in anonymized view
+      user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:impersonate][:name]) : user = user = User.find_by(name: params[:impersonate][:name])
+      AuthController.clear_user_info(session, nil)
+      session[:user] = user
+      session[:impersonate] =  true
+      session[:original_user] = @original_user
+    else
+      # E1991 : check whether instructor is currently in anonymized view
+      user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:user][:name]) : user = User.find_by(name: params[:user][:name])
+      AuthController.clear_user_info(session, nil)
+      session[:user] = session[:super_user]
+      user = session[:user]
+      session[:super_user] = nil
     end
   end
 

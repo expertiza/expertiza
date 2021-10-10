@@ -3,7 +3,7 @@ class CourseNode < Node
   belongs_to :node_object, class_name: "Course", foreign_key: "node_object_id"
 
   # Creates a new courese node from the given course
-  def create_course_node(course)
+  def self.create_course_node(course)
     parent_id = CourseNode.get_parent_id
     @course_node = CourseNode.new
     @course_node.node_object_id = course.id
@@ -35,17 +35,17 @@ class CourseNode < Node
   # get the query conditions for a public course
   def self.get_course_query_conditions(show = nil, user_id = nil)
     current_user = User.find_by(id: user_id)
-    conditions = if show and current_user
-                   if current_user.teaching_assistant? == false
-                     "courses.instructor_id = #{user_id}"
-                   else
+    conditions = if show && current_user
+                   if current_user.teaching_assistant?
                      'courses.id in (?)'
+                   else
+                     "courses.instructor_id = #{user_id}"
                    end
                  else
-                   if current_user.teaching_assistant? == false
-                     "(courses.private = 0 or courses.instructor_id = #{user_id})"
-                   else
+                   if current_user.teaching_assistant?
                      "((courses.private = 0 and courses.instructor_id != #{user_id}) or courses.instructor_id = #{user_id})"
+                   else
+                      "(courses.private = 0 or courses.instructor_id = #{user_id})"
                    end
                  end
     conditions
@@ -54,10 +54,10 @@ class CourseNode < Node
   # get the courses managed by the user
   def self.get_courses_managed_by_user(user_id = nil)
     current_user = User.find(user_id)
-    values = if current_user.teaching_assistant? == false
-               user_id
-             else
+    values = if current_user.teaching_assistant?
                Ta.get_mapped_courses(user_id)
+             else
+               user_id
              end
     values
   end

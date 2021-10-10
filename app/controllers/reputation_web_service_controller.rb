@@ -133,6 +133,16 @@ class ReputationWebServiceController < ApplicationController
     aes_decrypt(aes_encrypted_response_data, key, vi)
   end
 
+  def update_reputation(body)
+    JSON.parse(body.to_s).each do |alg, list|
+      next unless alg == "Hamer" || alg == "Lauw"
+      list.each do |id, rep|
+        Participant.find_by(user_id: id).update(alg.to_sym => rep) unless /leniency/ =~ id.to_s
+      end
+    end
+    redirect_to action: 'client'
+  end
+
   def send_post_request
     # https://www.socialtext.net/open/very_simple_rest_in_ruby_part_3_post_to_create_a_new_workspace
     req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader = {'Content-Type' => 'application/json', 'charset' => 'utf-8'})
@@ -181,15 +191,7 @@ class ReputationWebServiceController < ApplicationController
     # {response.body}"
     @@response = response
     @@response_body = response.body
-
-    JSON.parse(response.body.to_s).each do |alg, list|
-      next unless alg == "Hamer" || alg == "Lauw"
-      list.each do |id, rep|
-        Participant.find_by(user_id: id).update(alg.to_sym => rep) unless /leniency/ =~ id.to_s
-      end
-    end
-
-    redirect_to action: 'client'
+    update_reputation(response.body)
   end
 
   def rsa_public_key1(data)

@@ -20,6 +20,21 @@ class ReputationWebServiceController < ApplicationController
     current_user_has_ta_privileges?
   end
 
+  def calculate_peer_grade(response)
+    answers = Answer.where(response_id: response.id)
+    max_question_score = answers.first.question.questionnaire.max_question_score rescue 1
+    temp_sum = 0
+    weight_sum = 0
+    valid_answer = answers.select {|a| a.question.type == 'Criterion' and !a.answer.nil? }
+    return nil if valid_answer.empty?
+    valid_answer.each do |answer|
+      temp_sum += answer.answer * answer.question.weight
+      weight_sum += answer.question.weight
+    end
+    peer_review_grade = 100.0 * temp_sum / (weight_sum * max_question_score)
+    return peer_review_grade.round(4)
+  end
+
   def db_query(assignment_id, round_num, has_topic, another_assignment_id = 0)
     raw_data_array = []
     assignment_ids = []
@@ -33,18 +48,10 @@ class ReputationWebServiceController < ApplicationController
       valid_response = [last_valid_response] unless last_valid_response.nil?
       next unless topic_condition == true and !valid_response.nil? and !valid_response.empty?
       valid_response.each do |response|
-        answers = Answer.where(response_id: response.id)
-        max_question_score = answers.first.question.questionnaire.max_question_score rescue 1
-        temp_sum = 0
-        weight_sum = 0
-        valid_answer = answers.select {|a| a.question.type == 'Criterion' and !a.answer.nil? }
-        next if valid_answer.empty?
-        valid_answer.each do |answer|
-          temp_sum += answer.answer * answer.question.weight
-          weight_sum += answer.question.weight
+        peer_review_grade = calculate_peer_grade(response)
+        if !peer_review_grade.nil?
+          raw_data_array << [reviewer.id, team.id, peer_review_grade.round(4)]
         end
-        peer_review_grade = 100.0 * temp_sum / (weight_sum * max_question_score)
-        raw_data_array << [reviewer.id, team.id, peer_review_grade.round(4)]
       end
     end
     raw_data_array

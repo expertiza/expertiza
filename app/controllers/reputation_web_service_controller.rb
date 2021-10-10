@@ -125,6 +125,14 @@ class ReputationWebServiceController < ApplicationController
     body
   end
 
+  def decrypt_review_data(body) # decrypting the peer review grade data using AES
+    body = JSON.parse(body)
+    key = rsa_private_key2(body["keys"][0, 350])  # RSA asymmetric algorithm decrypts keys of AES
+    vi = rsa_private_key2(body["keys"][350, 350])
+    aes_encrypted_response_data = body["data"]  # AES symmetric algorithm decrypts data
+    aes_decrypt(aes_encrypted_response_data, key, vi)
+  end
+
   def send_post_request
     # https://www.socialtext.net/open/very_simple_rest_in_ruby_part_3_post_to_create_a_new_workspace
     req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader = {'Content-Type' => 'application/json', 'charset' => 'utf-8'})
@@ -157,7 +165,6 @@ class ReputationWebServiceController < ApplicationController
     else
       @@additional_info = ''
     end
-
     # Eg.
     # "{"initial_hamer_reputation": {"stu1": 0.90, "stu2":0.88, "stu3":0.93, "stu4":0.8, "stu5":0.93, "stu8":0.93},  #optional
     # "initial_lauw_leniency": {"stu1": 1.90, "stu2":0.98, "stu3":1.12, "stu4":0.94, "stu5":1.24, "stu8":1.18},  #optional
@@ -169,14 +176,8 @@ class ReputationWebServiceController < ApplicationController
     # Encryption
     req.body = encrypt_review_data(req.body)  # AES symmetric algorithm encrypts raw data
     response = Net::HTTP.new('peerlogic.csc.ncsu.edu').start {|http| http.request(req) }
-    # RSA asymmetric algorithm decrypts keys of AES
     # Decryption
-    response.body = JSON.parse(response.body)
-    key = rsa_private_key2(response.body["keys"][0, 350])
-    vi = rsa_private_key2(response.body["keys"][350, 350])
-    # AES symmetric algorithm decrypts data
-    aes_encrypted_response_data = response.body["data"]
-    response.body = aes_decrypt(aes_encrypted_response_data, key, vi)
+    response.body = decrypt_review_data(response.body)
     # {response.body}"
     @@response = response
     @@response_body = response.body

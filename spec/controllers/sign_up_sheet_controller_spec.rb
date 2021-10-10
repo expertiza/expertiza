@@ -1,9 +1,11 @@
 describe SignUpSheetController do
   let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true) }
+  let(:assignment2) { build(:assignment, id: 2, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: false) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 8) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
   let(:topic) { build(:topic, id: 1) }
+  let(:topic2) { build(:topic, id: 2) }
   let(:signed_up_team) { build(:signed_up_team, team: team, topic: topic) }
   let(:signed_up_team2) { build(:signed_up_team, team_id: 2, is_waitlisted: true) }
   let(:team) { build(:assignment_team, id: 1, assignment: assignment) }
@@ -123,7 +125,7 @@ describe SignUpSheetController do
   end
 
   describe '#delete_all_selected_topics' do
-    it 'delete_all_selected_topics and redirects to edit assignment page with single topic as input' do
+    it 'delete_all_selected_topics with staggered deadline true and redirects to edit assignment page with single topic as input' do
       allow(SignUpTopic).to receive(:find).with(assignment_id: 1,topic_identifier: ['E1732']).and_return(topic)
       params = {assignment_id: 1, topic_ids: ['E1732']}
       post :delete_all_selected_topics, params
@@ -133,8 +135,9 @@ describe SignUpSheetController do
       expect(response).to redirect_to('/assignments/1/edit#tabs-2')
     end
   end
+
   describe '#delete_all_topics_for_assignment' do
-    it 'deletes all topics for the assignment and redirects to edit assignment page' do
+    it 'deletes all topics for the assignment with staggered deadline true and redirects to edit assignment page' do
       allow(SignUpTopic).to receive(:find).with(assignment_id: '1').and_return(topic)
       params = {assignment_id: 1}
       post :delete_all_topics_for_assignment, params

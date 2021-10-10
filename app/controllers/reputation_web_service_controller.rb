@@ -131,7 +131,7 @@ class ReputationWebServiceController < ApplicationController
       @@additional_info = 'add initial lauw reputation values'
     elsif params[:checkbox][:quiz] == 'Add quiz scores'
       @@additional_info = 'add quiz scores'
-      quiz_str = json_generator(params[:assignment_id].to_i, params[:another_assignment_id].to_i, params[:round_num].to_i, 'quiz scores').to_json
+      quiz_str = generate_json(params[:assignment_id].to_i, params[:another_assignment_id].to_i, params[:round_num].to_i, 'quiz scores').to_json
       quiz_str[0] = ''
       quiz_str.prepend('"quiz_scores":{')
       quiz_str += ','

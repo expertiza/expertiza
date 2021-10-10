@@ -108,11 +108,28 @@ class ReputationWebServiceController < ApplicationController
     @response = @@response
   end
 
+  def encrypt_review_data(body) # encrypting the peer review grade data using AES
+    aes_encrypted_request_data = aes_encrypt(body)
+    body = aes_encrypted_request_data[0]
+    # RSA asymmetric algorithm encrypts keys of AES
+    encrypted_key = rsa_public_key1(aes_encrypted_request_data[1])
+    encrypted_vi = rsa_public_key1(aes_encrypted_request_data[2])
+    # fixed length 350
+    body.prepend('", "data":"')
+    body.prepend(encrypted_vi)
+    body.prepend(encrypted_key)
+    # request body should be in JSON format.
+    body.prepend('{"keys":"')
+    body << '"}'
+    body.gsub!(/\n/, '\\n')
+    body
+  end
+
   def send_post_request
     # https://www.socialtext.net/open/very_simple_rest_in_ruby_part_3_post_to_create_a_new_workspace
     req = Net::HTTP::Post.new('/reputation/calculations/reputation_algorithms', initheader = {'Content-Type' => 'application/json', 'charset' => 'utf-8'})
     curr_assignment_id = (params[:assignment_id].empty? ? '754' : params[:assignment_id])
-    req.body = json_generator(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
+    req.body = generate_json(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
     req.body[0] = '' # remove the first '{'
     @@assignment_id = params[:assignment_id]
     @@round_num = params[:round_num]
@@ -150,20 +167,7 @@ class ReputationWebServiceController < ApplicationController
     req.body.prepend("{")
     @@request_body = req.body
     # Encryption
-    # AES symmetric algorithm encrypts raw data
-    aes_encrypted_request_data = aes_encrypt(req.body)
-    req.body = aes_encrypted_request_data[0]
-    # RSA asymmetric algorithm encrypts keys of AES
-    encrypted_key = rsa_public_key1(aes_encrypted_request_data[1])
-    encrypted_vi = rsa_public_key1(aes_encrypted_request_data[2])
-    # fixed length 350
-    req.body.prepend('", "data":"')
-    req.body.prepend(encrypted_vi)
-    req.body.prepend(encrypted_key)
-    # request body should be in JSON format.
-    req.body.prepend('{"keys":"')
-    req.body << '"}'
-    req.body.gsub!(/\n/, '\\n')
+    req.body = encrypt_review_data(req.body)  # AES symmetric algorithm encrypts raw data
     response = Net::HTTP.new('peerlogic.csc.ncsu.edu').start {|http| http.request(req) }
     # RSA asymmetric algorithm decrypts keys of AES
     # Decryption

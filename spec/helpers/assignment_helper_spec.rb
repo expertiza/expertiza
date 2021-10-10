@@ -93,7 +93,7 @@ describe AssignmentHelper do
   describe '#peer_review_questions_for_team' do
     context 'when there is no signed up team' do
       it 'peer review questions should return nil' do
-        val = assignment_helper.send(:peer_review_questions_for_team, nil)
+        val = assignment_helper.send(:peer_review_questions_for_team, nil, nil)
         expect(val).to be_nil
       end
     end

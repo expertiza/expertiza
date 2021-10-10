@@ -1,8 +1,7 @@
 class AssignmentTeam < Team
   require File.dirname(__FILE__) + '/analytic/assignment_team_analytic'
-  require './app/helpers/assignment_helper'
   include AssignmentTeamAnalytic
-  include AssignmentHelper
+  extend AssignmentHelper
 
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'parent_id'
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewee_id'

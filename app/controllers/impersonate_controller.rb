@@ -27,7 +27,11 @@ class ImpersonateController < ApplicationController
     # If not impersonatable, then original user's session remains
     if params[:impersonate].nil?
       # E1991 : check whether instructor is currently in anonymized view
-      user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:user][:name]) : User.find_by(name: params[:user][:name])
+      if User.anonymized_view?(session[:ip])
+        user = User.real_user_from_anonymized_name(params[:user][:name])
+      else
+        user = User.find_by(name: params[:user][:name])
+      end
       session[:super_user] = session[:user] if session[:super_user].nil?
       AuthController.clear_user_info(session, nil)
       session[:original_user] = @original_user
@@ -36,7 +40,11 @@ class ImpersonateController < ApplicationController
       # If some user is to be impersonated, their session details are overwritten onto the current to impersonate
     elsif !params[:impersonate][:name].empty?
       # E1991 : check whether instructor is currently in anonymized view
-      user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:impersonate][:name]) : User.find_by(name: params[:impersonate][:name])
+      if User.anonymized_view?(session[:ip])
+        user = User.real_user_from_anonymized_name(params[:impersonate][:name])
+      else
+        user = User.find_by(name: params[:impersonate][:name])
+      end
       AuthController.clear_user_info(session, nil)
       session[:user] = user
       session[:impersonate] =  true
@@ -70,7 +78,11 @@ class ImpersonateController < ApplicationController
   def check_if_user_impersonateable
     if params[:impersonate].nil?
       # E1991 : check whether instructor is currently in anonymized view
-      user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:user][:name]) : User.find_by(name: params[:user][:name])
+      if User.anonymized_view?(session[:ip])
+        user = User.real_user_from_anonymized_name(params[:user][:name])
+      else
+        user = User.find_by(name: params[:user][:name])
+      end
       if !@original_user.can_impersonate? user
         @message = "You cannot impersonate '#{params[:user][:name]}'."
         temp
@@ -129,7 +141,11 @@ class ImpersonateController < ApplicationController
         # Check if special chars /\?<>|&$# are used to avoid html tags or system command
         check_if_special_char
         # E1991 : check whether instructor is currently in anonymized view
-        user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:user][:name]) : User.find_by(name: params[:user][:name])
+        if User.anonymized_view?(session[:ip])
+          user = User.real_user_from_anonymized_name(params[:user][:name])
+        else
+          user = User.find_by(name: params[:user][:name])
+        end
         do_main_operation(user)
       else
         # Impersonate a new account
@@ -137,7 +153,11 @@ class ImpersonateController < ApplicationController
           #check if special chars /\?<>|&$# are used to avoid html tags or system command
           check_if_special_char
           # E1991 : check whether instructor is currently in anonymized view
-          user = User.anonymized_view?(session[:ip]) ? User.real_user_from_anonymized_name(params[:impersonate][:name]) : User.find_by(name: params[:impersonate][:name])
+          if User.anonymized_view?(session[:ip])
+            user = User.real_user_from_anonymized_name(params[:impersonate][:name])
+          else
+            user = User.find_by(name: params[:impersonate][:name])
+          end
           do_main_operation(user)
           # Revert to original account when currently in the impersonated session
         else

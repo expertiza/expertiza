@@ -59,18 +59,14 @@ class ImpersonateController < ApplicationController
 
   # Checking if special characters are present in the username provided, only alphanumeric should be used
   def check_if_special_char
-    if params[:user]
-      if warn_for_special_chars(params[:user][:name], "Username")
-        redirect_back
-        return
-      end
+    if params[:user] && warn_for_special_chars(params[:user][:name], "Username")
+      redirect_back
+      return
     end
 
-    if params[:impersonate]
-      if warn_for_special_chars(params[:impersonate][:name], "Username")
-        redirect_back
-        return
-      end
+    if params[:impersonate] && warn_for_special_chars(params[:impersonate][:name], "Username")
+      redirect_back
+      return
     end
   end
 
@@ -104,16 +100,12 @@ class ImpersonateController < ApplicationController
       @message = "No user exists with the name '#{params[:user][:name]}'."
     elsif params[:impersonate]
       @message = "No user exists with the name '#{params[:impersonate][:name]}'."
+    elsif params[:impersonate].nil?
+      @message = "You cannot impersonate '#{params[:user][:name]}'."
+    elsif !params[:impersonate][:name].empty?
+      @message = "You cannot impersonate '#{params[:impersonate][:name]}'."
     else
-      if params[:impersonate].nil?
-        @message = "You cannot impersonate '#{params[:user][:name]}'."
-      else
-        if !params[:impersonate][:name].empty?
-          @message = "You cannot impersonate '#{params[:impersonate][:name]}'."
-        else
-          @message = "No original account was found. Please close your browser and start a new session."
-        end
-      end
+      @message = "No original account was found. Please close your browser and start a new session."
     end
   rescue Exception => e
     flash[:error] = @message
@@ -147,29 +139,25 @@ class ImpersonateController < ApplicationController
           user = User.find_by(name: params[:user][:name])
         end
         do_main_operation(user)
-      else
+      elsif !params[:impersonate][:name].empty?
         # Impersonate a new account
-        if !params[:impersonate][:name].empty?
-          #check if special chars /\?<>|&$# are used to avoid html tags or system command
-          check_if_special_char
-          # E1991 : check whether instructor is currently in anonymized view
-          if User.anonymized_view?(session[:ip])
-            user = User.real_user_from_anonymized_name(params[:impersonate][:name])
-          else
-            user = User.find_by(name: params[:impersonate][:name])
-          end
-          do_main_operation(user)
-          # Revert to original account when currently in the impersonated session
+        #check if special chars /\?<>|&$# are used to avoid html tags or system command
+        check_if_special_char
+        # E1991 : check whether instructor is currently in anonymized view
+        if User.anonymized_view?(session[:ip])
+          user = User.real_user_from_anonymized_name(params[:impersonate][:name])
         else
-          if !session[:super_user].nil?
-            AuthController.clear_user_info(session, nil)
-            session[:user] = session[:super_user]
-            user = session[:user]
-            session[:super_user] = nil
-          else
-            display_error_msg
-          end
+          user = User.find_by(name: params[:impersonate][:name])
         end
+        do_main_operation(user)
+        # Revert to original account when currently in the impersonated session
+      elsif !session[:super_user].nil?
+        AuthController.clear_user_info(session, nil)
+        session[:user] = session[:super_user]
+        user = session[:user]
+        session[:super_user] = nil
+      else
+        display_error_msg
       end
       # Navigate to user's home location as the default landing page after impersonating or reverting
       AuthController.set_current_role(user.role_id, session)

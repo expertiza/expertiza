@@ -40,20 +40,20 @@ describe PasswordRetrievalController do
       @password_retrival.save!
 
       Timecop.freeze(Time.zone.today + 2.days) do
-        get :check_reset_url, token: local_token
+        get :check_token_validity, token: local_token
         expect(response).to render_template "password_retrieval/forgotten"
       end
     end
 
     it "checks when token does not exist" do
-      local_token = "some random strin"
+      local_token = "some random string"
       local_token_sent_as_parameter = "randome some"
       @password_retrival = PasswordReset.new
       @password_retrival.token = Digest::SHA1.hexdigest(local_token)
       @password_retrival.user_email = "example@example.edu"
       @password_retrival.save!
 
-      get :check_reset_url, token: local_token_sent_as_parameter
+      get :check_token_validity, token: local_token_sent_as_parameter
       expect(response).to render_template "password_retrieval/forgotten"
     end
 
@@ -64,7 +64,7 @@ describe PasswordRetrievalController do
       @password_retrival.user_email = "example@example.edu"
       @password_retrival.save!
       Timecop.freeze(@password_retrival.updated_at + 2.hours) do
-        get :check_reset_url, token: local_token
+        get :check_token_validity, token: local_token
         expect(response).to render_template "password_retrieval/reset_password"
       end
     end

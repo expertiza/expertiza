@@ -1,6 +1,4 @@
 
-require 'active_support/time_with_zone'
-
 class AssignmentForm
   attr_accessor :assignment,
                 :assignment_questionnaires,
@@ -209,15 +207,15 @@ class AssignmentForm
     duedates = AssignmentDueDate.where(parent_id: @assignment.id)
     duedates.each do |due_date|
       deadline_type = DeadlineType.find(due_date.deadline_type_id).name
-      diff_btw_time_left_and_threshold, min_left = get_time_diff_btw_due_date_and_now(due_date)
-      next unless diff_btw_time_left_and_threshold > 0
-      delayed_job_id = add_delayed_job(@assignment, deadline_type, due_date, diff_btw_time_left_and_threshold)
+      diff_btw_time_left_and_threshold_duration, min_left_duration = DueDate.get_time_diff_btw_due_date_and_now(due_date)
+      next unless diff_btw_time_left_and_threshold_duration > 0
+      delayed_job_id = add_delayed_job(@assignment, deadline_type, due_date, diff_btw_time_left_and_threshold_duration)
       due_date.update_attribute(:delayed_job_id, delayed_job_id)
       # If the deadline type is review, add a delayed job to drop outstanding review
-      add_delayed_job(@assignment, "drop_outstanding_reviews", due_date, min_left) if deadline_type == "review"
+      add_drop_outstanding_reviews_delayed_job(@assignment, due_date, min_left_duration) if deadline_type == "review"
       # If the deadline type is team_formation, add a delayed job to drop one member team
       next unless deadline_type == "team_formation" and @assignment.team_assignment?
-      add_delayed_job(@assignment, "drop_one_member_topics", due_date, min_left)
+      add_delayed_job(@assignment, "drop_one_member_topics", due_date, min_left_duration)
     end
   end
 
@@ -284,18 +282,15 @@ class AssignmentForm
     Object.const_get(questionnaire_type).new
   end
 
-  def get_time_diff_btw_due_date_and_now(due_date)
-    due_at = due_date.due_at.to_s(:db)
-    Time.parse(due_at)
-    due_at = Time.parse(due_at)
-    time_left_in_min = find_min_from_now(due_at)
-    diff_btw_time_left_and_threshold = time_left_in_min - due_date.threshold * 60
-    [diff_btw_time_left_and_threshold, time_left_in_min]
-  end
-
   # add DelayedJob into queue and return it
   def add_delayed_job(_assignment, deadline_type, due_date, min_left)
-    MailWorker.perform_in(min_left * 60, due_date.parent_id, deadline_type, due_date.due_at)
+    seconds_left = min_left.to_i
+    MailWorker.perform_in(seconds_left, due_date.parent_id, deadline_type, due_date.due_at)
+  end
+
+  def add_drop_outstanding_reviews_delayed_job(_assignment, due_date, min_left)
+    c = min_left.to_i
+    DropOutstandingReviewsMailWorker.perform_in(seconds_left, due_date.parent_id, due_date.due_at)
   end
 
   # Deletes the job with id equal to "delayed_job_id" from the delayed_jobs queue
@@ -317,14 +312,6 @@ class AssignmentForm
     # delete from delayed_jobs queue related to this assignment
     delete_from_delayed_queue
     @assignment.delete(force)
-  end
-
-  # This functions finds the epoch time in seconds of the due_at parameter and finds the difference of it
-  # from the current time and returns this difference in minutes
-  def find_min_from_now(due_at)
-    curr_time = DateTime.now.in_time_zone(zone = 'UTC').to_s(:db)
-    curr_time = Time.parse(curr_time)
-    ((due_at - curr_time).to_i / 60)
   end
 
   # Save the assignment
@@ -385,19 +372,23 @@ class AssignmentForm
     require_quiz
   end
 
-  def add_simicheck_to_delayed_queue(simicheck_delay)
+  def add_simicheck_to_delayed_queue(simicheck_delay_hours_string)
     delete_from_delayed_queue
-    if simicheck_delay.to_i >= 0
+    simicheck_delay_hours = simicheck_delay_hours_string.to_i
+    if simicheck_delay_hours >= 0
+      simicheck_delay_hours_duration = simicheck_delay_hours.hour # Convert to ActiveSupport::Duration
       duedates = AssignmentDueDate.where(parent_id: @assignment.id)
       duedates.each do |due_date|
         next if DeadlineType.find(due_date.deadline_type_id).name != "submission"
-        enqueue_simicheck_task(due_date, simicheck_delay)
+        enqueue_simicheck_task(due_date, simicheck_delay_hours_duration)
       end
     end
   end
 
-  def enqueue_simicheck_task(due_date, simicheck_delay)
-    MailWorker.perform_in(find_min_from_now(Time.parse(due_date.due_at.to_s(:db)) + simicheck_delay.to_i.hours).minutes.from_now * 60, @assignment.id, "compare_files_with_simicheck", due_date.due_at.to_s(:db))
+  def enqueue_simicheck_task(due_date, simicheck_delay_hours_duration)
+    dequeue_time_as_seconds_duration_from_now = DueDate.get_dequeue_time_as_seconds_duration_from_now(due_date, simicheck_delay_hours_duration)
+
+    SimicheckMailWorker.perform_in(dequeue_time_as_seconds_duration_from_now.to_i, @assignment.id, due_date.due_at.to_s(:db))
   end
 
   # Copies the inputted assignment into new one and returns the new assignment id

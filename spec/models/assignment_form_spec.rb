@@ -551,7 +551,7 @@ describe AssignmentForm do
   describe '#add_to_delayed_queue' do
     before(:each) do
       allow(AssignmentDueDate).to receive(:where).with(parent_id: 1).and_return([due_date])
-      allow_any_instance_of(AssignmentForm).to receive(:find_min_from_now).with(any_args).and_return(666)
+      allow_any_instance_of(AssignmentForm).to receive(:find_min_from_now_duration).with(any_args).and_return(666)
       allow(due_date).to receive(:update_attribute).with(:delayed_job_id, any_args).and_return('Succeed!')
       Sidekiq::Testing.inline!
     end
@@ -648,7 +648,7 @@ describe AssignmentForm do
     it 'returns the difference between current time and due date in minutes' do
       allow(DateTime).to receive(:now).and_return(DateTime.new(2017, 10, 7, 11, 11, 11).in_time_zone)
       due_at = Time.parse(DateTime.new(2017, 10, 7, 12, 12, 12).in_time_zone.to_s(:db))
-      expect(assignment_form.find_min_from_now(due_at)).to eq(61)
+      expect(assignment_form.find_min_from_now_duration(due_at)).to eq(61)
     end
   end
 

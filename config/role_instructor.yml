@@ -484,6 +484,26 @@ development:
         parent_id: 38
         site_controller_id: 38
         url: "/tree_display/goto_bookmark_reviews"
+      58: &58 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 58
+        id: 58
+        label: Student View
+        name: student_view
+        parent:
+        parent_id:
+        site_controller_id: 58
+        url: "#"
+      59: &59 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 59
+        id: 59
+        label: Instructor View
+        name: instructor_view
+        parent:
+        parent_id:
+        site_controller_id: 59
+        url: "#"
     by_name:
       home: *1
       manage instructor content: *2
@@ -509,6 +529,8 @@ development:
       manage/questionnaires/course surveys: *23
       manage/questionnaires/bookmark rating rubrics: *38
       anonymized_view: *24
+      student_view: *58
+      instructor_view : *59
     crumbs:
     - 1
     root: &24 !ruby/object:Menu::Node
@@ -521,6 +543,8 @@ development:
       - 30
       - 27
       - 2
+      - 58
+      - 59
     selected:
       1: *1
     vector:
@@ -963,6 +987,26 @@ test:
         parent_id: 38
         site_controller_id: 38
         url: "/tree_display/goto_bookmark_reviews"
+      58: &58 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 58
+        id: 58
+        label: Student View
+        name: student_view
+        parent:
+        parent_id:
+        site_controller_id: 58
+        url: "#"
+      59: &59 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 59
+        id: 59
+        label: Instructor View
+        name: instructor_view
+        parent:
+        parent_id:
+        site_controller_id: 59
+        url: "#"
     by_name:
       home: *1
       manage instructor content: *2
@@ -986,6 +1030,8 @@ test:
       manage/questionnaires/assignment surveys: *21
       manage/questionnaires/course course: *22
       manage/questionnaires/bookmark rating rubrics: *38
+      student_view: *58
+      instructor_view: *59
     selected:
       1: *1
     vector:
@@ -1479,6 +1525,26 @@ production:
         parent_id: 38
         site_controller_id: 38
         url: "/tree_display/goto_bookmark_reviews"
+      58: &58 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 58
+        id: 58
+        label: Student View
+        name: student_view
+        parent:
+        parent_id:
+        site_controller_id: 58
+        url: "#"
+      59: &59 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 59
+        id: 59
+        label: Instructor View
+        name: instructor_view
+        parent:
+        parent_id:
+        site_controller_id: 59
+        url: "#"
     by_name:
       home: *1
       manage instructor content: *2
@@ -1504,6 +1570,8 @@ production:
       manage/questionnaires/course surveys: *23
       manage/questionnaires/bookmark rating rubrics: *38
       anonymized_view: *24
+      student_view: *58
+      instructor_view: *59
     crumbs:
     - 1
     root: &24 !ruby/object:Menu::Node
@@ -1516,6 +1584,8 @@ production:
       - 30
       - 27
       - 2
+      - 58
+      - 59
     selected:
       1: *1
     vector:

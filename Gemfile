@@ -19,7 +19,7 @@ gem 'capistrano-rvm'
 gem 'chartjs-ror'
 gem 'coffee-rails'
 gem 'coveralls', require: false
-gem 'danger', git: 'http://github.com/Winbobob/danger.git', ref: '1ccfed23f809a1e5c46e2533cfd7a3138f6cd821', require: false
+gem 'danger', git: 'https://github.com/Winbobob/danger.git', ref: '1ccfed23f809a1e5c46e2533cfd7a3138f6cd821', require: false
 gem 'delayed_job_active_record'
 gem 'dynamic_form'
 gem 'edavis10-ruby-web-search'
@@ -62,7 +62,7 @@ gem 'rjb'
 gem 'rubyzip'
 gem 'rwordnet'
 gem 'sass-rails', '5.0.3'
-gem 'scrypt', '3.0.7'
+gem 'scrypt'
 gem 'seer'
 gem 'shoulda-matchers'
 gem 'sidekiq'

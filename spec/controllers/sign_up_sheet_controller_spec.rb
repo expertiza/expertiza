@@ -1,7 +1,7 @@
 describe SignUpSheetController do
   let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true) }
   let(:assignment2) { build(:assignment, id: 2, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: false, private:true) }
-  let(:assignment) { build(:assignment, id: 3, instructor_id: 6, due_dates: [due_date], microtask: false, staggered_deadline: true) }
+  let(:assignment3) { build(:assignment, id: 3, instructor_id: 6, due_dates: [due_date], microtask: false, staggered_deadline: true) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 8) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }

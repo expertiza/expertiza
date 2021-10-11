@@ -1,7 +1,7 @@
 describe SignUpSheetController do
   let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true) }
-  let(:assignment2) { build(:assignment, id: 2, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: false, private: false) }
-  let(:assignment3) { build(:assignment, id: 3, instructor_id: 6, due_dates: [due_date], microtask: false, staggered_deadline: true, private: true) }
+  let(:assignment6) { build(:assignment, id: 6, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: false, private: false) }
+  let(:assignment7) { build(:assignment, id: 7, instructor_id: 6, due_dates: [due_date], microtask: false, staggered_deadline: true, private: true) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 8) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
@@ -17,6 +17,10 @@ describe SignUpSheetController do
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(Assignment).to receive(:find).with(1).and_return(assignment)
+    allow(Assignment).to receive(:find).with('6').and_return(assignment6)
+    allow(Assignment).to receive(:find).with(6).and_return(assignment6)
+    allow(Assignment).to receive(:find).with('7').and_return(assignment7)
+    allow(Assignment).to receive(:find).with(7).and_return(assignment7)
     stub_current_user(instructor, instructor.role.name, instructor.role)
     allow(SignUpTopic).to receive(:find).with('1').and_return(topic)
     allow(Participant).to receive(:find_by).with(id: '1').and_return(participant)
@@ -161,6 +165,16 @@ describe SignUpSheetController do
       allow(SignUpTopic).to receive(:find).with(assignment_id: '1').and_return(topic)
       params = {assignment_id: 1}
       post :delete_all_topics_for_assignment, params
+      expect(flash[:success]).to eq('All topics have been deleted successfully.')
+      expect(response).to redirect_to('/assignments/1/edit')
+    end
+
+    it 'deletes all topics for the microtask assignment and redirects to edit assignment page' do
+      allow(SignUpTopic).to receive(:find).with(assignment_id: 6).and_return([topic, topic3])
+      params = {assignment_id: 1}
+      post :delete_all_topics_for_assignment, params
+      topics_exist = SignUpTopic.where(assignment_id: 6).count
+      expect(topics_exist).to be_eql 0
       expect(flash[:success]).to eq('All topics have been deleted successfully.')
       expect(response).to redirect_to('/assignments/1/edit')
     end

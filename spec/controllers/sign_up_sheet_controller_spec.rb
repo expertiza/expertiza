@@ -1,6 +1,7 @@
 describe SignUpSheetController do
-  let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: false, staggered_deadline: true) }
+  let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true) }
   let(:assignment2) { build(:assignment, id: 2, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: false, private:true) }
+  let(:assignment) { build(:assignment, id: 3, instructor_id: 6, due_dates: [due_date], microtask: false, staggered_deadline: true) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 8) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
@@ -126,13 +127,13 @@ describe SignUpSheetController do
 
   describe '#delete_all_selected_topics' do
     it 'delete_all_selected_topics (single topic) with staggered deadline true and redirects to edit assignment page with single topic as input' do
-      allow(SignUpTopic).to receive(:find).with(assignment_id: 1,topic_identifier: ['E1732']).and_return(topic)
-      params = {assignment_id: 1, topic_ids: ['E1732']}
+      allow(SignUpTopic).to receive(:find).with(assignment_id: 3,topic_identifier: ['E1732']).and_return(topic)
+      params = {assignment_id: 3, topic_ids: ['E1732']}
       post :delete_all_selected_topics, params
       expect(flash[:success]).to eq('All selected topics have been deleted successfully.')
-      topics_exist = SignUpTopic.where(assignment_id: 1).count
+      topics_exist = SignUpTopic.where(assignment_id: 3).count
       expect(topics_exist).to be_eql 0
-      expect(response).to redirect_to('/assignments/1/edit#tabs-2')
+      expect(response).to redirect_to('/assignments/3/edit#tabs-2')
     end
 
     it 'delete_all_selected_topics (single topic) with staggered deadline false and redirects to edit assignment page with single topic as input' do
@@ -148,11 +149,11 @@ describe SignUpSheetController do
 
   describe '#delete_all_topics_for_assignment' do
     it 'deletes all topics for the assignment with staggered deadline true and redirects to edit assignment page' do
-      allow(SignUpTopic).to receive(:find).with(assignment_id: '1').and_return(topic)
-      params = {assignment_id: 1}
+      allow(SignUpTopic).to receive(:find).with(assignment_id: '3').and_return(topic)
+      params = {assignment_id: 3}
       post :delete_all_topics_for_assignment, params
       expect(flash[:success]).to eq('All topics have been deleted successfully.')
-      expect(response).to redirect_to('/assignments/1/edit')
+      expect(response).to redirect_to('/assignments/3/edit')
     end
   end
 

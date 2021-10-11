@@ -155,6 +155,14 @@ describe SignUpSheetController do
       expect(flash[:success]).to eq('All topics have been deleted successfully.')
       expect(response).to redirect_to('/assignments/3/edit')
     end
+
+    it 'deletes all topics for the assignment with staggered deadline false and redirects to edit assignment page' do
+      allow(SignUpTopic).to receive(:find).with(assignment_id: '2').and_return(topic)
+      params = {assignment_id: 2}
+      post :delete_all_topics_for_assignment, params
+      expect(flash[:success]).to eq('All topics have been deleted successfully.')
+      expect(response).to redirect_to('/assignments/2/edit')
+    end
   end
 
   describe '#edit' do

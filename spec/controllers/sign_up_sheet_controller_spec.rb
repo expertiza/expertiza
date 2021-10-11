@@ -6,7 +6,8 @@ describe SignUpSheetController do
   let(:student) { build(:student, id: 8) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
   let(:topic) { build(:topic, id: 1) }
-  let(:topic3) { build(:topic, id: 3) }
+  let(:topic2) { build(:topic, id: 1, topic_identifier: 'topic2', assignment_id: 6) }
+  let(:topic3) { build(:topic, id: 3, topic_identifier: 'topic3') }
   let(:signed_up_team) { build(:signed_up_team, team: team, topic: topic) }
   let(:signed_up_team2) { build(:signed_up_team, team_id: 2, is_waitlisted: true) }
   let(:team) { build(:assignment_team, id: 1, assignment: assignment) }
@@ -130,6 +131,7 @@ describe SignUpSheetController do
   end
 
   describe '#delete_all_selected_topics' do
+  let(:topic2) { build(:topic, id: 1, topic_identifier: 'topic2', assignment_id: 6) }
     it 'delete_all_selected_topics and redirects to edit assignment page with single topic as input' do
       allow(SignUpTopic).to receive(:find).with(assignment_id: 1,topic_identifier: ['E1732']).and_return(topic)
       params = {assignment_id: 1, topic_ids: ['E1732']}
@@ -141,8 +143,11 @@ describe SignUpSheetController do
     end
 
     it 'delete_all_selected_topics for a microtask assignment and redirects to edit assignment page with single topic selected' do
-      allow(SignUpTopic).to receive(:find).with(assignment_id: 6,topic_identifier: ['E1732']).and_return(topic)
-      params = {assignment_id: 6, topic_ids: ['E1732']}
+      # allow(SignUpTopic).to receive(:find).with(assignment_id: 6,topic_identifier: ['E1732']).and_return(topic)
+      params = {assignment_id: 6, topic_ids: ['topic2']}
+      puts Assignment.all.count
+      puts SignUpTopic.all.count
+      puts SignUpTopic.where(assignment_id: 6).count
       post :delete_all_selected_topics, params
       expect(flash[:success]).to eq('All selected topics have been deleted successfully.')
       topics_exist = SignUpTopic.where(assignment_id: 6).count
@@ -153,6 +158,17 @@ describe SignUpSheetController do
     it 'delete_all_selected_topics for not microtask assignment and redirects to edit assignment page with single topic selected' do
       allow(SignUpTopic).to receive(:find).with(assignment_id: 7,topic_identifier: ['E1732']).and_return(topic)
       params = {assignment_id: 7, topic_ids: ['E1732']}
+      post :delete_all_selected_topics, params
+      expect(flash[:success]).to eq('All selected topics have been deleted successfully.')
+      topics_exist = SignUpTopic.where(assignment_id: 7).count
+      expect(topics_exist).to be_eql 0
+      expect(response).to redirect_to('/assignments/7/edit#tabs-2')
+    end
+
+    it 'delete_all_selected_topics for not microtask assignment and redirects to edit assignment page with multiple topic selected' do
+      allow(SignUpTopic).to receive(:find).with(assignment_id: 7,topic_identifier: ['E1732', 'E1733']).and_return([topic, topic3])
+      params = {assignment_id: 7, topic_ids: ['E1732', 'E1733']}
+      puts SignUpTopic.where(assignment_id: 7).count
       post :delete_all_selected_topics, params
       expect(flash[:success]).to eq('All selected topics have been deleted successfully.')
       topics_exist = SignUpTopic.where(assignment_id: 7).count

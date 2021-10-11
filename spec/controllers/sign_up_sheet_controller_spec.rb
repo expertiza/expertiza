@@ -6,7 +6,6 @@ describe SignUpSheetController do
   let(:student) { build(:student, id: 8) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
   let(:topic) { build(:topic, id: 1) }
-  let(:topic2) { build(:topic, id: 2) }
   let(:signed_up_team) { build(:signed_up_team, team: team, topic: topic) }
   let(:signed_up_team2) { build(:signed_up_team, team_id: 2, is_waitlisted: true) }
   let(:team) { build(:assignment_team, id: 1, assignment: assignment) }
@@ -126,7 +125,7 @@ describe SignUpSheetController do
   end
 
   describe '#delete_all_selected_topics' do
-    it 'delete_all_selected_topics (single topic) with staggered deadline true and redirects to edit assignment page with single topic as input' do
+    it 'delete_all_selected_topics with staggered deadline true and redirects to edit assignment page with single topic as input' do
       allow(SignUpTopic).to receive(:find).with(assignment_id: 3,topic_identifier: ['E1732']).and_return(topic)
       params = {assignment_id: 3, topic_ids: ['E1732']}
       post :delete_all_selected_topics, params
@@ -136,7 +135,7 @@ describe SignUpSheetController do
       expect(response).to redirect_to('/assignments/3/edit#tabs-2')
     end
 
-    it 'delete_all_selected_topics (single topic) with staggered deadline false and redirects to edit assignment page with single topic as input' do
+    it 'delete_all_selected_topics with staggered deadline false and redirects to edit assignment page with single topic as input' do
       allow(SignUpTopic).to receive(:find).with(assignment_id: 2,topic_identifier: ['E1733']).and_return(topic)
       params = {assignment_id: 2, topic_ids: ['E1733']}
       post :delete_all_selected_topics, params
@@ -144,6 +143,18 @@ describe SignUpSheetController do
       topics_exist = SignUpTopic.where(assignment_id: 2).count
       expect(topics_exist).to be_eql 0
       expect(response).to redirect_to('/assignments/2/edit#tabs-2')
+    end
+
+    it 'delete_all_selected_topics with staggered deadline true and redirects to edit assignment page with multiple topics as input' do
+      allow(SignUpTopic).to receive(:find).with(assignment_id: 3,topic_identifier: ['E1732']).and_return(topic)
+      allow(SignUpTopic).to receive(:find).with(assignment_id: 3,topic_identifier: ['E1733']).and_return(topic)
+      allow(SignUpTopic).to receive(:find).with(assignment_id: 3,topic_identifier: ['E1734']).and_return(topic)
+      params = {assignment_id: 3, topic_ids: ['E1732', 'E1733', 'E1734']}
+      post :delete_all_selected_topics, params
+      expect(flash[:success]).to eq('All selected topics have been deleted successfully.')
+      topics_exist = SignUpTopic.where(assignment_id: 3).count
+      expect(topics_exist).to be_eql 0
+      expect(response).to redirect_to('/assignments/3/edit#tabs-2')
     end
   end
 

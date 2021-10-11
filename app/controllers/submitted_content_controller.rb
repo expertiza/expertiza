@@ -141,6 +141,7 @@ class SubmittedContentController < ApplicationController
     ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The file has been submitted.', request)
     # send message to reviewers when submission has been updated
     # If the user has no team: 1) there are no reviewers to notify; 2) calling email will throw an exception. So rescue and ignore it.
+    # will have to edit stuff here
     participant.assignment.email(participant.id) rescue nil
     if params[:origin] == 'review'
       redirect_to :back

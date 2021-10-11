@@ -13,7 +13,7 @@
 
       <ul class="nav navbar-nav menuposition">
       <% if session[:menu] %>
-            <!-- optimized logic and easy to maintain module with most straightforward implementation -->
+            <!-- optimized logic and easy to maintain module with straightforward implementation -->
           <% if session[:user].role.name == '[TODO]Instructor' %>
                 <!-- original instructor check + add above to check flag -->
               <%= render :partial => 'menu_items/suckerfish',

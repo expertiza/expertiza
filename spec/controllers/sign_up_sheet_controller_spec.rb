@@ -1,5 +1,7 @@
 describe SignUpSheetController do
   let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true) }
+  let(:assignment6) { build(:assignment, id: 6, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: false, private: false) }
+  let(:assignment7) { build(:assignment, id: 7, instructor_id: 6, due_dates: [due_date], microtask: false, staggered_deadline: true, private: true) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 8) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
@@ -131,6 +133,16 @@ describe SignUpSheetController do
       topics_exist = SignUpTopic.where(assignment_id: 1).count
       expect(topics_exist).to be_eql 0
       expect(response).to redirect_to('/assignments/1/edit#tabs-2')
+    end
+
+    it 'delete_all_selected_topics for a microtask assignment and redirects to edit assignment page with single topic selected' do
+      allow(SignUpTopic).to receive(:find).with(assignment_id: 6,topic_identifier: ['E1732']).and_return(topic)
+      params = {assignment_id: 6, topic_ids: ['E1732']}
+      post :delete_all_selected_topics, params
+      expect(flash[:success]).to eq('All selected topics have been deleted successfully.')
+      topics_exist = SignUpTopic.where(assignment_id: 6).count
+      expect(topics_exist).to be_eql 0
+      expect(response).to redirect_to('/assignments/2/edit#tabs-2')
     end
   end
   describe '#delete_all_topics_for_assignment' do

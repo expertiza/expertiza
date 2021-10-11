@@ -150,6 +150,16 @@ describe SignUpSheetController do
       expect(response).to redirect_to('/assignments/6/edit#tabs-2')
     end
 
+    it 'delete_all_selected_topics for not microtask assignment and redirects to edit assignment page with single topic selected' do
+      allow(SignUpTopic).to receive(:find).with(assignment_id: 7,topic_identifier: ['E1732']).and_return(topic)
+      params = {assignment_id: 7, topic_ids: ['E1732']}
+      post :delete_all_selected_topics, params
+      expect(flash[:success]).to eq('All selected topics have been deleted successfully.')
+      topics_exist = SignUpTopic.where(assignment_id: 7).count
+      expect(topics_exist).to be_eql 0
+      expect(response).to redirect_to('/assignments/7/edit#tabs-2')
+    end
+
     it 'delete_all_selected_topics for a microtask assignment and redirects to edit assignment page with multiple topic selected' do
       allow(SignUpTopic).to receive(:find).with(assignment_id: 6,topic_identifier: ['E1732', 'E1733']).and_return([topic, topic3])
       params = {assignment_id: 6, topic_ids: ['E1732', 'E1733']}

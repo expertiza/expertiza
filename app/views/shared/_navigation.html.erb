@@ -25,6 +25,9 @@
               <% session[:menu] = Role.instructor.cache[:menu] %>
               <%= render :partial => 'menu_items/suckerfish',
                          :locals => { items: session[:menu].get_menu(0) & [59], level: 0 } %>
+              <script>
+                  $("[title='Pending_surveys']").prop('href', '/response/pending_surveys');
+              </script>
           <% else %>
               <%= render :partial => 'menu_items/suckerfish',
                          :locals => { items: session[:menu].get_menu(0), level: 0 } %>

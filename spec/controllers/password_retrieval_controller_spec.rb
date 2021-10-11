@@ -46,7 +46,7 @@ describe PasswordRetrievalController do
     end
 
     it "checks when token does not exist" do
-      local_token = "some random strin"
+      local_token = "some random string"
       local_token_sent_as_parameter = "randome some"
       @password_retrival = PasswordReset.new
       @password_retrival.token = Digest::SHA1.hexdigest(local_token)

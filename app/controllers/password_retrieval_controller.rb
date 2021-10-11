@@ -26,6 +26,7 @@ class PasswordRetrievalController < ApplicationController
         flash[:success] = "A link to reset your password has been sent to your e-mail address."
         redirect_to "/"
       else
+	#If no user is found with given credentials send error message
         ExpertizaLogger.error LoggerMessage.new(controller_name, params[:user][:email], 'No user is registered with provided email id!', request)
         flash[:error] = "No account is associated with the e-mail address: \"" + params[:user][:email] + "\". Please try again."
         render template: "password_retrieval/forgotten"

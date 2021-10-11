@@ -1,5 +1,6 @@
 describe SignUpSheetController do
   let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true) }
+  let(:assignment) { build(:assignment, id: 2, instructor_id: 6, due_dates: [due_date], private: true) }
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 8) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
@@ -140,6 +141,28 @@ describe SignUpSheetController do
       post :delete_all_topics_for_assignment, params
       expect(flash[:success]).to eq('All topics have been deleted successfully.')
       expect(response).to redirect_to('/assignments/1/edit')
+    end
+  end
+
+  describe '#delete_all_selected_topics' do
+    it 'delete_all_selected_topics for a private assignment and redirects to edit assignment page with single topic as input' do
+      allow(SignUpTopic).to receive(:find).with(assignment_id: 2,topic_identifier: ['E1732']).and_return(topic)
+      params = {assignment_id: 2, topic_ids: ['E1732']}
+      post :delete_all_selected_topics, params
+      expect(flash[:success]).to eq('All selected topics have been deleted successfully.')
+      topics_exist = SignUpTopic.where(assignment_id: 2).count
+      expect(topics_exist).to be_eql 0
+      expect(response).to redirect_to('/assignments/2/edit#tabs-2')
+    end
+  end
+
+  describe '#delete_all_topics_for_assignment' do
+    it 'deletes all topics for a private assignment and redirects to edit assignment page' do
+      allow(SignUpTopic).to receive(:find).with(assignment_id: 2).and_return(topic)
+      params = {assignment_id: 2}
+      post :delete_all_topics_for_assignment, params
+      expect(flash[:success]).to eq('All topics have been deleted successfully.')
+      expect(response).to redirect_to('/assignments/2/edit')
     end
   end
 

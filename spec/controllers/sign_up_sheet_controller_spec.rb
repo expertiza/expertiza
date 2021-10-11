@@ -156,16 +156,6 @@ describe SignUpSheetController do
     end
   end
 
-  describe '#delete_all_topics_for_assignment' do
-    it 'deletes all topics for a private assignment and redirects to edit assignment page' do
-      allow(SignUpTopic).to receive(:find).with(assignment_id: 2).and_return(topic)
-      params = {assignment_id: 2}
-      post :delete_all_topics_for_assignment, params
-      expect(flash[:success]).to eq('All topics have been deleted successfully.')
-      expect(response).to redirect_to('/assignments/2/edit')
-    end
-  end
-
   describe '#edit' do
     it 'renders sign_up_sheet#edit page' do
       params = {id: 1}

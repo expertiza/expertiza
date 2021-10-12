@@ -28,6 +28,7 @@ describe LatePoliciesController do
       expect(flash[:error]).to include("Penalty per unit can't be blank")
     end
 
+<<<<<<< 7ff681a32639011643a32eec58e40008c01018b4
     it 'shows error on penalty per unit being negative' do
       get :new
       params = {
@@ -115,6 +116,20 @@ describe LatePoliciesController do
       }
       post :create, params
       expect(flash[:error]).to include("Successfully saved")
+=======
+    it "Max penalty should be less than penalty per unit" do
+      get :new
+      params = {
+        late_policy: {
+            policy_name: '',
+            penalty_per_unit: 1,
+            penalty_unit: '',
+            max_penalty: 0,
+        }
+      }
+      post :create, params
+      expect(flash[:error]).to include("The maximum penalty cannot be less than penalty per unit.")
+>>>>>>> Add test for max penalty should be greater than penalty per point
     end
 
   end

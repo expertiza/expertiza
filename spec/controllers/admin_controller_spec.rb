@@ -125,15 +125,14 @@ describe AdminController do
     end
   end
 
-   context '#list_super_administrators' do
-     it 'list all the Super-Administrators and render #list' do
-       controller.send(:list_super_administrators)
-       #expect(response.body).to eq([])
-       expect(super_admin.role.name).to eq('Super-Administrator')
-       expect(@user).to eq([ super_admin ])
-  #     expect(response).to render_template(list_super_administrators)
-     end
-   end
+  context '#list_super_administrators' do
+    it 'list all the Super-Administrators and render #list' do
+      user = super_admin
+      stub_current_user(user, user.role.name, user.role)
+      get :list_super_administrators
+      expect(assigns(:users)).to eq([user])
+    end
+  end
   #
   # context '#show_super_administrator' do
   #   it 'find selected Super-Administrator and render #show' do

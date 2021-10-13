@@ -1,7 +1,7 @@
 describe AdminController do
   # create fake users
-  let(:admin1) { build(:admin, id: 3, role_id: 4) }
-  let(:admin2) { build(:admin, id: 4, role_id: 4) }
+  let(:admin1) { build(:admin, id: 3, role_id: 4, parent_id: 10) }
+  let(:admin2) { build(:admin, id: 4, role_id: 4, parent_id: 10) }
   let(:super_admin) { build(:superadmin, id: 1, role_id: 5) }
   let(:instructor1) { build(:instructor, id: 10, role_id: 2) }
   let(:instructor2) { build(:instructor, id: 11, role_id: 2) }
@@ -12,9 +12,8 @@ describe AdminController do
     allow(User).to receive(:find).with('1').and_return(super_admin)
     allow(User).to receive(:find).with('10').and_return(instructor1)
     allow(User).to receive(:find).with('21').and_return(student1)
-  #  allow(User).to receive(:where).with(:role_id => 4).and_return([ admin1, admin2 ])
     allow(User).to receive(:where).with(["role_id = ?", super_admin.role_id]).and_return([ super_admin ])
-  #  allow(User).to receive(:where).with(:role_id => super_admin.role_id).and_return([ super_admin ])
+  #  allow(User).to receive(:admin).and_return([ admin1, admin2 ])
   #  allow(User).to receive(:where).with(:role_id => 2).and_return([ instructor1, instructor2 ])
   #  allow(Role).to recieve(superadministrator).to receive(id).and_return(5)
   #  allow(Role).to recieve(administrator).to receive(id).and_return(4)
@@ -125,27 +124,28 @@ describe AdminController do
     end
   end
 
-  context '#list_super_administrators' do
-    it 'list all the Super-Administrators and render #list' do
-      user = super_admin
-      stub_current_user(user, user.role.name, user.role)
-      get :list_super_administrators
-      expect(assigns(:users)).to eq([user])
+   context '#list_super_administrators' do
+     it 'lists all the Super-Administrators' do
+       stub_current_user(super_admin, super_admin.role.name, super_admin.role)
+       get :list_super_administrators
+       expect(assigns(:users)).to eq([ super_admin ])
+     end
+   end
+
+  context '#show_super_administrator' do
+    it 'find selected Super-Administrator and render #show' do
+      stub_current_user(super_admin, super_admin.role.name, super_admin.role)
+      params = {id: '1'}
+      get :show_super_administrator, params
+      expect(assigns(:user)).to eq(super_admin)
+      expect(assigns(:role)).to eq(super_admin.role)
+      expect(response).to render_template(:show_super_administrator)
     end
   end
   #
-  # context '#show_super_administrator' do
-  #   it 'find selected Super-Administrator and render #show' do
-  #     controller.params = {id: '1'}
-  #     controller.send(:show_super_administrators)
-  #     expect(@user).to eql(super_admin)
-  #     expect(@role).to eql(5)
-  #     expect(response).to render_template(show_super_administrator)
-  #   end
-  # end
-  #
   # context '#list_administrators' do
-  #   it 'list all the admins and render #list' do
+  #   it 'lists all the admins' do
+  #     stub_current_user(super_admin, super_admin.role.name, super_admin.role)
   #     get :list_administrators
   #     expect(response).to render_template(list_administrators)
   #   end
@@ -162,7 +162,7 @@ describe AdminController do
   # end
   #
   # context '#list_instructors' do
-  #   it 'list all the instructors and render #list' do
+  #   it 'lists all the instructors' do
   #     get :list_instructors
   #     expect(response).to render_template(list_instructors)
   #   end

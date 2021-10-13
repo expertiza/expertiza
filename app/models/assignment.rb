@@ -34,6 +34,8 @@ class Assignment < ActiveRecord::Base
   validates :name, presence: true
   validates :name, uniqueness: {scope: :course_id}
   validate :valid_num_review
+  validates :directory_path, presence: true # E2138 Validation for unique submission directory
+  validates :directory_path, uniqueness: {scope: :course_id}
 
   REVIEW_QUESTIONNAIRES = {author_feedback: 0, metareview: 1, review: 2, teammate_review: 3}.freeze
 

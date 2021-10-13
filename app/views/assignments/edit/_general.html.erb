@@ -26,6 +26,17 @@ function microtaskChanged() {
   }
 }
 
+$(function() {
+    $("#assignment_form_assignment_name").change(function() {
+        filename = $( "#assignment_form_assignment_name" ).val().replace(/ /g,"_").replace(/[/\\?%*:|"<>/$&!#%^@]/g, '');;
+        $('#assignment_form_assignment_directory_path').val(filename);
+    });
+});
+
+function autogenerate_submission(){
+  assignment_form.assignment.directory_path = assignment_form.assignment.name;
+}
+
 </script>
 
 <table id='assignment_general_info_table' class="borderless">

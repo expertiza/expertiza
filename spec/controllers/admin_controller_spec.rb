@@ -1,22 +1,32 @@
 describe AdminController do
   # create fake users
-  let(:admin1) { build(:admin, id: 3, role_id: 4, parent_id: 10) }
-  let(:admin2) { build(:admin, id: 4, role_id: 4, parent_id: 10) }
+  let(:admin1) { build(:admin, id: 3, role_id: 4, parent_id: 1, name: 'Administrator1') }
+  let(:admin2) { build(:admin, id: 4, role_id: 4, parent_id: 1, name: 'Administrator2') }
   let(:super_admin) { build(:superadmin, id: 1, role_id: 5) }
-  let(:instructor1) { build(:instructor, id: 10, role_id: 2) }
-  let(:instructor2) { build(:instructor, id: 11, role_id: 2) }
+  let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, name: 'Instructor1') }
+  let(:instructor2) { build(:instructor, id: 11, role_id: 3, parent_id: 4, name: 'Instructor2') }
   let(:student1) { build(:student, id: 21, role_id: 1) }
+
+  let(:admin_list) { [admin1, admin2] }
+  let(:instructor_list) { [instructor1, instructor2] }
+  let(:instructor_list_pid3) { [instructor1] }
+  let(:instructor_list_pid4) { [instructor2] }
 
   before(:each) do
     allow(User).to receive(:find).with('3').and_return(admin1)
     allow(User).to receive(:find).with('1').and_return(super_admin)
     allow(User).to receive(:find).with('10').and_return(instructor1)
     allow(User).to receive(:where).with(["role_id = ?", super_admin.role_id]).and_return([ super_admin ])
-  #  allow(User).to receive(:admin).and_return([ admin1, admin2 ])
-  #  allow(User).to receive(:where).with(:role_id => 2).and_return([ instructor1, instructor2 ])
-  #  allow(Role).to recieve(superadministrator).to receive(id).and_return(5)
-  #  allow(Role).to recieve(administrator).to receive(id).and_return(4)
-  #  allow(Role).to recieve(instructor).to receive(id).and_return(2)
+
+    allow(User).to receive(:where).with(role_id: admin1.role).and_return(admin_list)
+    allow(admin_list).to receive(:order).with(:name).and_return(admin_list)
+    allow(admin_list).to receive(:where).with("parent_id = ?", super_admin.id).and_return(admin_list)
+    allow(admin_list).to receive(:paginate).with(page: '1', per_page: 50).and_return(admin_list)
+
+    allow(User).to receive(:where).with(role_id: instructor1.role).and_return(instructor_list)
+    allow(instructor_list).to receive(:order).with(:name).and_return(instructor_list)
+    allow(instructor_list).to receive(:where).with("parent_id = ?", admin1.id).and_return(instructor_list_pid3)
+    allow(instructor_list_pid3).to receive(:paginate).with(page: '1', per_page: 50).and_return(instructor_list_pid3)
   end
 
   describe '#action_allowed?' do
@@ -142,13 +152,14 @@ describe AdminController do
     end
   end
 
-  # context '#list_administrators' do
-  #   it 'lists all the admins' do
-  #     stub_current_user(super_admin, super_admin.role.name, super_admin.role)
-  #     get :list_administrators
-  #     expect(response).to render_template(list_administrators)
-  #   end
-  # end
+  context '#list_administrators' do
+    it 'lists all the admins' do
+      stub_current_user(super_admin, super_admin.role.name, super_admin.role)
+      params = {page: '1'}
+      get :list_administrators, params
+      expect(assigns(:users)).to eq(admin_list)
+    end
+  end
 
   context '#show_administrator' do
     it 'find selected admin and render #show' do
@@ -161,12 +172,14 @@ describe AdminController do
     end
   end
 
-  # context '#list_instructors' do
-  #   it 'lists all the instructors' do
-  #     get :list_instructors
-  #     expect(response).to render_template(list_instructors)
-  #   end
-  # end
+  context '#list_instructors' do
+    it 'lists all the instructors' do
+      stub_current_user(admin1, admin1.role.name, admin1.role)
+      params = {page: '1'}
+      get :list_instructors, params
+      expect(assigns(:users)).to eq(instructor_list_pid3)
+    end
+  end
 
   context '#show_instructor' do
     it 'find selected instructor and render #show' do

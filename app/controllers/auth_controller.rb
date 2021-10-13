@@ -1,4 +1,7 @@
 class AuthController < ApplicationController
+  before_action :login,:google_login
+  around_action :self.authorised, self.set_current_role
+  after_action : logout, after_login
   include AuthorizationHelper
   helper :auth
 

@@ -1,12 +1,11 @@
 require 'byebug'
 describe LatePoliciesController do
 
+  # use id:1, since the factory for late_policy uses first generated id
+  # for instructor_id
   let(:instructor) { build(:instructor, id: 1) }
-  let(:late_policy) { 
-    # byebug
-    create(:late_policy) 
-  }
-    # , instructor_id: 6
+  let(:late_policy) { create(:late_policy) }
+
   before(:each) do
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
@@ -69,10 +68,6 @@ describe LatePoliciesController do
         }
       }
       post :create, params
-      puts response.body
-    #   byebug
-      # expect('aaa').to include('a')
-      puts flash[:error]
       expect(flash[:error]).to include("A policy with the same name already exists.")
     end 
 

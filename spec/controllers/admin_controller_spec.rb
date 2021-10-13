@@ -7,11 +7,13 @@ describe AdminController do
   let(:instructor2) { build(:instructor, id: 11, role_id: 3, parent_id: 4, name: 'Instructor2') }
   let(:student1) { build(:student, id: 21, role_id: 1) }
 
+  # create fake lists
   let(:admin_list) { [admin1, admin2] }
   let(:instructor_list) { [instructor1, instructor2] }
   let(:instructor_list_pid3) { [instructor1] }
   let(:instructor_list_pid4) { [instructor2] }
 
+  # define default behaviors for each method call
   before(:each) do
     allow(User).to receive(:find).with('3').and_return(admin1)
     allow(User).to receive(:find).with('1').and_return(super_admin)

@@ -129,6 +129,6 @@ describe LatePoliciesController do
       post :create, params
       expect(flash[:error]).to include("The maximum penalty cannot be less than penalty per unit.")
     end
-
+  end
   end
 end

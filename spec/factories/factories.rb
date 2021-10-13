@@ -124,28 +124,11 @@ FactoryBot.define do
 
   factory :late_policy, class: LatePolicy do
     policy_name "Late Policy"
-    # name "Late Policy"
     penalty_per_unit 1.0
     max_penalty 10
     penalty_unit 'Minute'
     times_used 1
-    # instructor_id factory: :instructor
-    # instructor factory: :instructor
-    instructor_id { 
-      # byebug
-      # Instructor.first&.id ||
-       ins = association(:instructor)
-       ins.save
-       Instructor.all.each do |i|
-        puts "Id: #{i.id}"
-       end
-       puts "assoc id: #{ins.id}"
-       ins.id
-      }
-    # instructor_id {
-    #   ins = factory: :instructor
-    #   ins.id
-    # }
+    instructor_id { association(:instructor).id }
   end
 
   factory :teaching_assistant, class: Ta do

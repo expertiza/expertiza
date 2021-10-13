@@ -15,6 +15,9 @@ describe LatePoliciesController do
       get :new
       expect(response).to render_template(:new)
     end
+  end
+
+  context "#request create" do
 
     it 'shows error on empty submission' do
       get :new
@@ -70,6 +73,6 @@ describe LatePoliciesController do
       post :create, params
       expect(flash[:error]).to include("A policy with the same name already exists.")
     end 
-
   end
+
 end

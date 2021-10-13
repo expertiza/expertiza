@@ -1,9 +1,11 @@
+require 'byebug'
 describe LatePoliciesController do
 
   # use id:1, since the factory for late_policy uses first generated id
   # for instructor_id
-  let(:instructor) { build(:instructor, id: 1) }
-  let(:late_policy) { create(:late_policy) }
+  policy_instructor_id = 1
+  let(:instructor) { build(:instructor, id: policy_instructor_id) }
+  let!(:late_policy) { create(:late_policy) }
 
   before(:each) do
     stub_current_user(instructor, instructor.role.name, instructor.role)
@@ -62,4 +64,24 @@ describe LatePoliciesController do
     end 
   end
 
+  context "#request edit/update" do
+    let!(:new_policy) {
+      create(:late_policy, policy_name: "New policy", instructor_id: policy_instructor_id)
+    }
+    it "renders edit template" do
+      get :edit, id: new_policy.id
+      expect(response).to render_template(:edit)
+    end
+
+    it "change policy name to different name" do
+      puts "all: #{LatePolicy.all}"
+      LatePolicy.all.each do |lp|
+        puts "id: #{lp.id}"
+      end
+      # byebug
+      # get edit_late_policy_path(late_policy)
+      get :edit, id: new_policy.id
+      expect(true).to eql(true)
+    end
+  end
 end

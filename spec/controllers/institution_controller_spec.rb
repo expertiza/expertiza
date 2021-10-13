@@ -111,7 +111,21 @@ describe InstitutionController do
             }
         }
         put :update, @params
+        expect(flash[:success]).to eq('The institution was successfully updated.')
         expect(response).to redirect_to("/institution/list")
+      end
+    end
+    context 'when institution is not updated successfully' do
+      it 'renders institution#edit' do
+        @params = {
+            id:1,
+            institution: {
+                name: "test institution"
+            }
+        }
+        allow(institution).to receive(:update_attribute).with(any_args).and_return(false)
+        put :update, @params
+        expect(response).to render_template(:edit)
       end
     end
   end

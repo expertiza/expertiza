@@ -1,6 +1,12 @@
+require 'byebug'
 describe LatePoliciesController do
 
-  let(:instructor) { build(:instructor, id: 6) }
+  let(:instructor) { build(:instructor, id: 1) }
+  let(:late_policy) { 
+    # byebug
+    create(:late_policy) 
+  }
+    # , instructor_id: 6
   before(:each) do
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
@@ -39,6 +45,36 @@ describe LatePoliciesController do
       post :create, params
       expect(flash[:error]).to include("The maximum penalty cannot be less than penalty per unit.")
     end
+
+    it "Check for policy with same name" do
+      get :new
+      # existing_policy = LatePolicy.new(
+      #   :policy_name=> "Late Policy",
+      #   :penalty_per_unit=> 1.0,
+      #   :max_penalty=> 10,
+      #   :penalty_unit=> 'Minute',
+      #   :times_used=> 1,
+      #   :instructor_id=> 6
+      # )
+      puts late_policy.policy_name
+      # existing_policy.save
+
+      # byebug
+      params = {
+        late_policy: {
+            policy_name: late_policy.policy_name,
+            penalty_per_unit: 1,
+            penalty_unit: 'Minute',
+            max_penalty: 9,
+        }
+      }
+      post :create, params
+      puts response.body
+    #   byebug
+      # expect('aaa').to include('a')
+      puts flash[:error]
+      expect(flash[:error]).to include("A policy with the same name already exists.")
+    end 
 
   end
 end

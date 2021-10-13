@@ -1,4 +1,3 @@
-require 'byebug'
 describe LatePoliciesController do
 
   # use id:1, since the factory for late_policy uses first generated id
@@ -50,18 +49,6 @@ describe LatePoliciesController do
 
     it "Check for policy with same name" do
       get :new
-      # existing_policy = LatePolicy.new(
-      #   :policy_name=> "Late Policy",
-      #   :penalty_per_unit=> 1.0,
-      #   :max_penalty=> 10,
-      #   :penalty_unit=> 'Minute',
-      #   :times_used=> 1,
-      #   :instructor_id=> 6
-      # )
-      puts late_policy.policy_name
-      # existing_policy.save
-
-      # byebug
       params = {
         late_policy: {
             policy_name: late_policy.policy_name,

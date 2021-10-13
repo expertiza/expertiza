@@ -11,7 +11,6 @@ describe AdminController do
     allow(User).to receive(:find).with('3').and_return(admin1)
     allow(User).to receive(:find).with('1').and_return(super_admin)
     allow(User).to receive(:find).with('10').and_return(instructor1)
-    allow(User).to receive(:find).with('21').and_return(student1)
     allow(User).to receive(:where).with(["role_id = ?", super_admin.role_id]).and_return([ super_admin ])
   #  allow(User).to receive(:admin).and_return([ admin1, admin2 ])
   #  allow(User).to receive(:where).with(:role_id => 2).and_return([ instructor1, instructor2 ])
@@ -142,7 +141,7 @@ describe AdminController do
       expect(response).to render_template(:show_super_administrator)
     end
   end
-  #
+
   # context '#list_administrators' do
   #   it 'lists all the admins' do
   #     stub_current_user(super_admin, super_admin.role.name, super_admin.role)
@@ -150,31 +149,33 @@ describe AdminController do
   #     expect(response).to render_template(list_administrators)
   #   end
   # end
-  #
-  # context '#show_administrator' do
-  #   it 'find selected admin and render #show' do
-  #     controller.params = {id: '3'}
-  #     controller.send(:show_administrator)
-  #     expect(@user).to eql(admin1)
-  #     expect(@role).to eql(4)
-  #     expect(response).to render_template(show_administrator)
-  #   end
-  # end
-  #
+
+  context '#show_administrator' do
+    it 'find selected admin and render #show' do
+      stub_current_user(super_admin, super_admin.role.name, super_admin.role)
+      params = {id: '3'}
+      get :show_administrator, params
+      expect(assigns(:user)).to eq(admin1)
+      expect(assigns(:role)).to eq(admin1.role)
+      expect(response).to render_template(:show_administrator)
+    end
+  end
+
   # context '#list_instructors' do
   #   it 'lists all the instructors' do
   #     get :list_instructors
   #     expect(response).to render_template(list_instructors)
   #   end
   # end
-  #
-  # context '#show_instructors' do
-  #   it 'find selected instructor and render #show' do
-  #     controller.params = {id: '10'}
-  #     controller.send(:show_instructor)
-  #     expect(@user).to eql(instructor1)
-  #     expect(@role).to eql(2)
-  #     expect(response).to render_template(show_instructor)
-  #   end
-  # end
+
+  context '#show_instructor' do
+    it 'find selected instructor and render #show' do
+      stub_current_user(super_admin, super_admin.role.name, super_admin.role)
+      params = {id: '10'}
+      get :show_instructor, params
+      expect(assigns(:user)).to eq(instructor1)
+      expect(assigns(:role)).to eq(instructor1.role)
+      expect(response).to render_template(:show_instructor)
+    end
+  end
 end

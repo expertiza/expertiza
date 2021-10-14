@@ -19,7 +19,7 @@ describe ReviewMappingHelper, type: :helper do
     end
 
     it 'color should be blue if the a review was submitted for each round' do
-      # deadline_right inspired from bookmark_review_spec
+      # deadline_right inspired from bookmark_review_
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')
@@ -143,6 +143,55 @@ describe ReviewMappingHelper, type: :helper do
       expect(color).to eq('purple')
     end
   end
+
+  describe 'response_for_each_round?' do
+    before(:each) do
+      @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
+      @reviewer = create(:participant, review_grade: nil)
+      @reviewee = create(:assignment_team)
+      @reviewee_with_assignment = create(:assignment_team, assignment: @assignment)
+      @response_map = create(:review_response_map, reviewer: @reviewer)
+    end
+
+    it 'should return false if response wasnt submitted in every round' do
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2)
+
+      create(:response, response_map: @response_map)
+      check_response = response_for_each_round?(@response_map)
+      expect(check_response).to eq(false)
+    end
+
+    it 'should return true if review was submitted in every round' do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+
+      # make a team for the assignment
+      create(:assignment_team, assignment: @assignment)
+
+      response_map_with_reviewee = create(:review_response_map, reviewer: @reviewer, reviewee: @reviewee)
+      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'random link')
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
+      create(:response, response_map: response_map_with_reviewee)
+
+      check_response = response_for_each_round?(response_map_with_reviewee)
+      expect(check_response).to eq(true)
+    end
+  end
+
+  #submitted_within_round?
+  #submitted_hyperlink
+  #get_link_updated_at
+  #get_team_reviewed_link_name
+  #initialize_chart_elements
+  #sort_reviewer_by_review_volume_desc
+  #display_volume_metric_chart
+  #display_tagging_interval_chart
+  #list_review_submissions
+  #list_hyperlink_submission
+  #get_certain_review_and_feedback_response_map
+  #get_css_style_for_calibration_report
 
   describe 'get_each_review_and_feedback_response' do
     before(:each) do

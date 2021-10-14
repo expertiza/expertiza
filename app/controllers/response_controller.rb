@@ -138,6 +138,7 @@ class ResponseController < ApplicationController
     questions = sort_questions(@questionnaire.questions)
     store_total_cake_score
     init_answers(questions)
+    ReviewStatusMap.where(reviewee_id:@response.map.reviewee_id,reviewer_id:@response.map.reviewer_id,review_object_id:@response.map.reviewed_object_id).update_all(:status=>"Started")
     render action: 'response'
   end
 
@@ -160,6 +161,7 @@ class ResponseController < ApplicationController
   def view
     @response = Response.find(params[:id])
     @map = @response.map
+    ReviewStatusMap.where(reviewee_id:@response.map.reviewee_id,reviewer_id:@response.map.reviewer_id,review_object_id:@response.map.reviewed_object_id).update_all(:status=>"Started")
     set_content
   end
 
@@ -207,6 +209,8 @@ class ResponseController < ApplicationController
   def save
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
+    ReviewStatusMap.where(reviewee_id:@map.reviewee_id,reviewer_id:@map.reviewer_id,review_object_id:@map.reviewed_object_id).update_all(:status=>"Completed")
+    return
     @map.save
     participant = Participant.find_by(id: @map.reviewee_id)
     # E1822: Added logic to insert a student suggested 'Good Teammate' or 'Good Reviewer' badge in the awarded_badges table.

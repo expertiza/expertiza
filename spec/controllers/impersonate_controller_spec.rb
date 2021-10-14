@@ -123,12 +123,7 @@ describe ImpersonateController do
         end
 
         it 'when typing the user name, there should be all possible complete user names appearing ' do
-          /allow(User).to receive(:find_by).with(name: 'A').and_return('A')/
-
-          /allow(User).to receive(:get_available_users).with('A').and_return('Amanda')/
             @params = { user:  {name: 'A' }}
-          / controller.session[:user] = double('User', id: 1)/
-
             get :auto_complete_for_user_name,@params
             expect(response.body).to eq  "<%= auto_complete_result @users, 'Amanda' %>"
 

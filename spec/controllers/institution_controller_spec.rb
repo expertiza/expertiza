@@ -161,7 +161,8 @@ describe InstitutionController do
         @params = {
             id:1
         }
-        allow(institution).to receive(:delete).with(any_args).and_return(true)
+        # mock a situation that delete action successfully
+        allow(institution).to receive(:destroy).with(any_args).and_return(true)
         post :delete, @params
         expect(response).to redirect_to("/institution/list")
       end

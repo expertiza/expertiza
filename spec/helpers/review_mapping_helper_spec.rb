@@ -180,7 +180,53 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  #submitted_within_round?
+  #round, response_map, assignment_created, assignment_due_dates
+  describe 'submitted_within_round?' do
+    before(:each) do
+      @assignment = create(:assignment, name: 'assignment', created_at: DateTime.now.in_time_zone - 13.day)
+      @reviewer = create(:participant, review_grade: nil)
+      @reviewee = create(:assignment_team, assignment: @assignment)
+      @response_map = create(:review_response_map, reviewer: @reviewer, reviewee: @reviewee)
+
+      # create due dates for assignment
+      @round = 2
+    end
+
+    it 'should return true if a work was submitted within 2 round' do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 7.day)
+      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 1.day)
+      create(:response, response_map: @response_map)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 5.day)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone + 6.day)
+
+      assignment_created = @assignment.created_at
+      assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
+
+      check_submitetd = submitted_within_round?(@round, @response_map, assignment_created, assignment_due_dates)
+      expect(check_submitetd).to eq(true)
+    end
+
+    it 'should return false if works was submitted late' do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 4.day)
+      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 3.day)
+      create(:response, response_map: @response_map)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 10.day)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone - 5.day)
+
+      assignment_created = @assignment.created_at
+      assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
+
+      check_submitetd = submitted_within_round?(@round, @response_map, assignment_created, assignment_due_dates)
+      expect(check_submitetd).to eq(false)
+    end
+
+  end
   #submitted_hyperlink
   #get_link_updated_at
   #get_team_reviewed_link_name

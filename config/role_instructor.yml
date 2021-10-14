@@ -493,7 +493,7 @@ development:
         parent:
         parent_id:
         site_controller_id: 58
-        url: "#"
+        url: "/student_view/flip_view"
       59: &59 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 59
@@ -503,7 +503,7 @@ development:
         parent:
         parent_id:
         site_controller_id: 59
-        url: "#"
+        url: "/student_view/flip_view"
     by_name:
       home: *1
       manage instructor content: *2
@@ -1534,7 +1534,7 @@ production:
         parent:
         parent_id:
         site_controller_id: 58
-        url: "#"
+        url: "/student_view/flip_view"
       59: &59 !ruby/object:Menu::Node
         content_page_id:
         controller_action_id: 59
@@ -1544,7 +1544,7 @@ production:
         parent:
         parent_id:
         site_controller_id: 59
-        url: "#"
+        url: "/student_view/flip_view"
     by_name:
       home: *1
       manage instructor content: *2

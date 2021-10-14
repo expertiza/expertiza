@@ -14,13 +14,13 @@
       <ul class="nav navbar-nav menuposition">
       <% if session[:menu] %>
             <!-- optimized logic and easy to maintain module with straightforward implementation -->
-          <% if session[:user].role.name == '[TODO]Instructor' %>
+          <% if !session[:flip_user] || session[:flip_user] == nil  %>
                 <!-- original instructor check + add above to check flag -->
               <%= render :partial => 'menu_items/suckerfish',
                            :locals => { items: session[:menu].get_menu(0) - [26, 59], level: 0 } %>
           <% elsif session[:user].role.name == 'Instructor' %>
               <% session[:menu] = Role.student.cache[:menu] %>
-              <%= render :partial => 'menu_items/suckerfish',
+      l => 'menu        <%= render :partial => 'menu_items/suckerfish',
                          :locals => { items: session[:menu].get_menu(0), level: 0 } %>
               <% session[:menu] = Role.instructor.cache[:menu] %>
               <%= render :partial => 'menu_items/suckerfish',

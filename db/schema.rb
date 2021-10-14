@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210422185445) do
+ActiveRecord::Schema.define(version: 20211012012655) do
 
   create_table "account_requests", force: :cascade do |t|
     t.string   "name",              limit: 255
@@ -125,6 +125,7 @@ ActiveRecord::Schema.define(version: 20210422185445) do
     t.boolean  "is_answer_tagging_allowed"
     t.boolean  "has_badge"
     t.boolean  "allow_selecting_additional_reviews_after_1st_round"
+    t.integer  "sample_assignment_id",                               limit: 4
     t.boolean  "vary_by_topic",                                                    default: false
     t.boolean  "vary_by_round",                                                    default: false
     t.boolean  "reviewer_is_team"
@@ -135,6 +136,7 @@ ActiveRecord::Schema.define(version: 20210422185445) do
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
   add_index "assignments", ["instructor_id"], name: "fk_assignments_instructors", using: :btree
   add_index "assignments", ["late_policy_id"], name: "fk_late_policy_id", using: :btree
+  add_index "assignments", ["sample_assignment_id"], name: "fk_rails_b01b82a1a2", using: :btree
 
   create_table "automated_metareviews", force: :cascade do |t|
     t.float    "relevance",         limit: 24
@@ -269,7 +271,7 @@ ActiveRecord::Schema.define(version: 20210422185445) do
     t.string   "queue",      limit: 255
   end
 
-  add_index "delayed_jobs", %w[priority run_at], name: "delayed_jobs_priority", using: :btree
+  add_index "delayed_jobs", ["priority", "run_at"], name: "delayed_jobs_priority", using: :btree
 
   create_table "due_dates", force: :cascade do |t|
     t.datetime "due_at"
@@ -445,6 +447,10 @@ ActiveRecord::Schema.define(version: 20210422185445) do
 
   add_index "question_advices", ["question_id"], name: "fk_question_question_advices", using: :btree
 
+  create_table "question_types", force: :cascade do |t|
+    t.string "type", limit: 255
+  end
+
   create_table "questionnaires", force: :cascade do |t|
     t.string   "name",               limit: 64
     t.integer  "instructor_id",      limit: 4,     default: 0,     null: false
@@ -531,6 +537,15 @@ ActiveRecord::Schema.define(version: 20210422185445) do
   end
 
   add_index "review_grades", ["participant_id"], name: "fk_rails_29587cf6a9", using: :btree
+
+  create_table "review_status_maps", force: :cascade do |t|
+    t.integer  "reviewee_id",      limit: 4
+    t.integer  "reviewer_id",      limit: 4
+    t.string   "status",           limit: 255
+    t.integer  "review_object_id", limit: 4
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
 
   create_table "roles", force: :cascade do |t|
     t.string   "name",            limit: 255, default: "", null: false
@@ -642,11 +657,12 @@ ActiveRecord::Schema.define(version: 20210422185445) do
   end
 
   create_table "suggestion_comments", force: :cascade do |t|
-    t.text     "comments",      limit: 65535
-    t.string   "commenter",     limit: 255
-    t.string   "vote",          limit: 255
-    t.integer  "suggestion_id", limit: 4
+    t.text     "comments",           limit: 65535
+    t.string   "commenter",          limit: 255
+    t.string   "vote",               limit: 255
+    t.integer  "suggestion_id",      limit: 4
     t.datetime "created_at"
+    t.boolean  "visible_to_student",               default: false
   end
 
   create_table "suggestions", force: :cascade do |t|
@@ -730,6 +746,7 @@ ActiveRecord::Schema.define(version: 20210422185445) do
     t.integer "directory_num",              limit: 4
     t.integer "grade_for_submission",       limit: 4
     t.text    "comment_for_submission",     limit: 65535
+    t.boolean "make_public",                              default: false
   end
 
   create_table "teams_users", force: :cascade do |t|
@@ -741,14 +758,14 @@ ActiveRecord::Schema.define(version: 20210422185445) do
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 
   create_table "track_notifications", force: :cascade do |t|
-    t.integer  "notification_id", limit: 4
     t.integer  "user_id",         limit: 4
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "notification_id", limit: 4, null: false
   end
 
-  add_index "track_notifications", ["notification_id"], name: "index_track_notifications_on_notification_id", using: :btree
-  add_index "track_notifications", ["user_id"], name: "index_track_notifications_on_user_id", using: :btree
+  add_index "track_notifications", ["notification_id"], name: "notification_id", using: :btree
+  add_index "track_notifications", ["user_id"], name: "user_id", using: :btree
 
   create_table "tree_folders", force: :cascade do |t|
     t.string  "name",       limit: 255
@@ -800,7 +817,7 @@ ActiveRecord::Schema.define(version: 20210422185445) do
     t.datetime "created_at"
   end
 
-  add_index "versions", %w[item_type item_id], name: "index_versions_on_item_type_and_item_id", using: :btree
+  add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
 
   add_foreign_key "answer_tags", "answers"
   add_foreign_key "answer_tags", "tag_prompt_deployments"
@@ -811,6 +828,7 @@ ActiveRecord::Schema.define(version: 20210422185445) do
   add_foreign_key "assignment_badges", "badges"
   add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
   add_foreign_key "assignment_questionnaires", "questionnaires", name: "fk_aq_questionnaire_id"
+  add_foreign_key "assignments", "assignments", column: "sample_assignment_id"
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
   add_foreign_key "assignments", "users", column: "instructor_id", name: "fk_assignments_instructors"
   add_foreign_key "automated_metareviews", "responses", name: "fk_automated_metareviews_responses_id"
@@ -844,6 +862,4 @@ ActiveRecord::Schema.define(version: 20210422185445) do
   add_foreign_key "tag_prompt_deployments", "tag_prompts"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
-  add_foreign_key "track_notifications", "notifications"
-  add_foreign_key "track_notifications", "users"
 end

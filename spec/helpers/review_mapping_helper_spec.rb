@@ -629,4 +629,15 @@ describe ReviewMappingHelper, type: :helper do
       expect(result).to be_nil
     end
   end
+
+  describe 'test get_css_style_for_calibration_report' do
+    it 'should return correct css class' do
+      css_class_0 = helper.get_css_style_for_calibration_report(0)
+      css_class_1 = helper.get_css_style_for_calibration_report(-1)
+      css_class_6 = helper.get_css_style_for_calibration_report(6)
+      expect(css_class_0). to eq('c5')
+      expect(css_class_1). to eq('c4')
+      expect(css_class_6). to eq('c1')
+    end
+  end
 end

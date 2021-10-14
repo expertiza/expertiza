@@ -11,14 +11,9 @@ describe InstitutionController do
     build(:institution, id: 1, name: 'test institution')
   end
 
-  let(:course) do
-    build(:course, instructor_id: 6, institutions_id:1, name: 'abc')
-  end
-
   # set default testing user
   before(:each) do
     allow(Institution).to receive(:find).with('1').and_return(institution)
-    allow(Course).to receive(:where).with(institution_id: '1').and_return(course)
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
   describe '#action_allowed?' do
@@ -28,7 +23,7 @@ describe InstitutionController do
         controller.params = {id: '1', action: 'edit'}
       end
 
-      context 'when the role name of current user is super admin or admin' do
+      context 'when the role name of current user is admin' do
         it 'allows certain action' do
           stub_current_user(admin, admin.role.name, admin.role)
           (controller.send(:action_allowed?)).should be true
@@ -43,12 +38,13 @@ describe InstitutionController do
       end
 
       context 'when current user is the TAs or the students' do
-        it 'deny certain action if current user is the TA' do
+        it 'deny certain action' do
           stub_current_user(ta, ta.role.name, ta.role)
           (controller.send(:action_allowed?)).should be false
         end
-
-        it 'deny certain action if current user is the student' do
+      end
+      context 'when current user is the students' do
+        it 'deny certain action' do
           stub_current_user(student, student.role.name, student.role)
           (controller.send(:action_allowed?)).should be false
         end
@@ -58,6 +54,7 @@ describe InstitutionController do
 
   describe '#new' do
     it 'creates a new Institution object and renders institution#new page' do
+      stub_current_user(instructor, instructor.role.name, instructor.role)
       get :new
       expect(response).to render_template(:new)
     end
@@ -65,7 +62,8 @@ describe InstitutionController do
 
   describe '#create' do
     context 'when institution is saved successfully' do
-      it 'redirects to institution#list page' do
+      it 'redirects to institution#list page and returns a successful message' do
+        stub_current_user(instructor, instructor.role.name, instructor.role)
         allow(institution).to receive(:name).and_return("test institution")
         @params = {
             institution: {
@@ -73,12 +71,15 @@ describe InstitutionController do
             }
         }
         post :create, @params
+        expect(flash.now[:success]).to eq('The institution was successfully created.')
         expect(response).to redirect_to("/institution/list")
       end
     end
 
     context 'when institution is not saved successfully' do
-      it 'renders institution#new page' do
+      it 'renders institution#new page and returns an error message' do
+        stub_current_user(instructor, instructor.role.name, instructor.role)
+        # make save function always return false
         allow(institution).to receive(:save).and_return(false)
         @params = {
             institution: {
@@ -103,7 +104,8 @@ describe InstitutionController do
 
   describe '#update' do
     context 'when institution is updated successfully' do
-      it 'renders institution#list' do
+      it 'renders institution#list and returns a successful message' do
+        stub_current_user(instructor, instructor.role.name, instructor.role)
         @params = {
             id:1,
             institution: {
@@ -117,6 +119,7 @@ describe InstitutionController do
     end
     context 'when institution is not updated successfully' do
       it 'renders institution#edit' do
+        stub_current_user(instructor, instructor.role.name, instructor.role)
         @params = {
             id:1,
             institution: {
@@ -154,10 +157,13 @@ describe InstitutionController do
   describe '#delete' do
     context 'when try to delete a institution' do
       it 'renders institution#list when delete successfully' do
+        stub_current_user(instructor, instructor.role.name, instructor.role)
         @params = {
             id:1
         }
-        post :delete, @params, session
+        # mock a situation that delete action successfully
+        allow(institution).to receive(:destroy).with(any_args).and_return(true)
+        post :delete, @params
         expect(response).to redirect_to("/institution/list")
       end
     end

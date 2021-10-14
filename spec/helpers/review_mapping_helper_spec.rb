@@ -311,9 +311,26 @@ describe ReviewMappingHelper, type: :helper do
 
   end
 
+  #max_team_size, response, reviewee_id, ip_address
+  describe 'get_team_reviewed_link_name' do
+    before(:each) do
+      @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
 
-  #get_link_updated_at
-  #get_team_reviewed_link_name
+      @reviewer = create(:participant, review_grade: nil)
+      @reviewee = create(:assignment_team, name: 'Team_1')
+      @response_map = create(:review_response_map, reviewer: @reviewer)
+    end
+
+    it 'should return Team_1 if max_team_size != 1' do
+      max_team_size = 2
+      @response = create(:response, response_map: @response_map)
+      ip_address = '0.0.0.0'
+      reviewed_team_name = get_team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
+      expect(reviewed_team_name).to eq('(Team_1)')
+    end
+  end
+
+
   #initialize_chart_elements
   #sort_reviewer_by_review_volume_desc
   #display_volume_metric_chart

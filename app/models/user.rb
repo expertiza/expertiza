@@ -107,6 +107,17 @@ class User < ActiveRecord::Base
     return user
   end
 
+  def institution(ip_address = nil)
+    if User.anonymized_view?(ip_address)
+      self.role.name + ', ' + self.id.to_s
+    else
+      if self[:role_id] == 2
+        self[:institution_id].nil? ? "" : Institution.find(self[:institution_id]).name
+      end
+    end
+  end
+
+
   def name(ip_address = nil)
     User.anonymized_view?(ip_address) ? self.role.name + ' ' + self.id.to_s : self[:name]
   end

@@ -213,9 +213,6 @@ class AssignmentForm
       due_date.update_attribute(:delayed_job_id, delayed_job_id)
       # If the deadline type is review, add a delayed job to drop outstanding review
       add_drop_outstanding_reviews_delayed_job(@assignment, due_date, min_left_duration) if deadline_type == "review"
-      # If the deadline type is team_formation, add a delayed job to drop one member team
-      next unless deadline_type == "team_formation" and @assignment.team_assignment?
-      add_delayed_job(@assignment, "drop_one_member_topics", due_date, min_left_duration)
     end
   end
 

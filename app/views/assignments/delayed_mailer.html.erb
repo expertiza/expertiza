@@ -38,9 +38,6 @@
             <% if handler[5] == "drop_outstanding_reviews" %>
                 <td><%= "Drop outstanding reviews and send emails to those students"%></td>
             <%end%>
-            <% if handler[5] == "drop_one_member_topics" %>
-                <td><%= "Drop one member team topics"%></td>
-            <%end%>
             <td><%= link_to image_tag('delete_icon.png', :title => 'Delete'),
                             {:controller => 'assignments', :action => 'delete_delayed_mailer',
                              :id => @assignment.id, :delayed_job_id => delayed_job.id}%></td>

@@ -1008,7 +1008,7 @@ describe ReviewMappingHelper, type: :helper do
       @answer = create(:answer, response_id: @response.id, question_id: @question.id, comments: "comment")
       @team = create(:assignment_team)
       allow(AssignmentTeam).to receive(:find).with(@team.id).and_return(team)
-      allow(team).to receive(:submitted_files).with(any_args).and_return(["/home/expertiza_developer/expertiza/.rspec"])
+      allow(team).to receive(:submitted_files).with(any_args).and_return(["./.rspec"])
     end
     it 'should return correct html a tag' do
       result = helper.list_review_submissions(@participant.id, @team.id, @response_map.id)

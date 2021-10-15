@@ -36,7 +36,7 @@ describe AssignmentHelper do
           .with(no_args).with(assignment_id: 1).and_return(double('AssignmentQuestionnaire', id: 1))
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: nil)
                                                            .and_return(double('AssignmentQuestionnaire', used_in_round: 1))
-        expect(compute_total_score(test_assignment, scores)).to eq(0)
+        expect(AssignmentHelper.compute_total_score(test_assignment, scores)).to eq(0)
       end
     end
   end
@@ -55,14 +55,14 @@ describe AssignmentHelper do
       it 'scores varying rubrics and returns review scores' do
         allow(assignment).to receive(:vary_by_round).and_return(true)
         allow(assignment).to receive(:rounds_of_reviews).and_return(1)
-        expect(compute_reviews_hash(assignment)).to eq({})
+        expect(AssignmentHelper.compute_reviews_hash(assignment)).to eq({})
       end
     end
     context 'when current assignment does not vary rubrics by round' do
       it 'scores rubrics and returns review scores' do
         allow(assignment).to receive(:vary_by_round).and_return(false)
         allow(DueDate).to receive(:get_next_due_date).with(assignment.id).and_return(double(:DueDate, round: 1))
-        expect(compute_reviews_hash(assignment)).to eq(1 => {1 => 50}, 2 => {1 => 30})
+        expect(AssignmentHelper.compute_reviews_hash(assignment)).to eq(1 => {1 => 50}, 2 => {1 => 30})
       end
     end
   end
@@ -80,13 +80,13 @@ describe AssignmentHelper do
       it 'computes avg score and score range for each team in each round and return scores' do
         allow(assignment_helper).to receive(:vary_by_round).and_return(true)
         allow(assignment_helper).to receive(:rounds_of_reviews).and_return(1)
-        expect(compute_avg_and_ranges_hash(assignment_helper)).to eq(1 => {1 => {min: 50.0, max: 50.0, avg: 50.0}})
+        expect(AssignmentHelper.compute_avg_and_ranges_hash(assignment_helper)).to eq(1 => {1 => {min: 50.0, max: 50.0, avg: 50.0}})
       end
     end
     context 'when current assignment does not vary rubrics by round' do
       it 'computes avg score and score range for each team and return scores' do
         allow(assignment_helper).to receive(:vary_by_round).and_return(false)
-        expect(compute_avg_and_ranges_hash(assignment_helper)).to eq(1 => {min: 50.0, max: 50.0, avg: 50.0})
+        expect(AssignmentHelper.compute_avg_and_ranges_hash(assignment_helper)).to eq(1 => {min: 50.0, max: 50.0, avg: 50.0})
       end
     end
   end

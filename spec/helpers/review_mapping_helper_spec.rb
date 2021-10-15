@@ -1012,7 +1012,7 @@ describe ReviewMappingHelper, type: :helper do
     end
     it 'should return correct html a tag' do
       result = helper.list_review_submissions(@participant.id, @team.id, @response_map.id)
-      expect(result).to start_with('<a href')
+      expect(result).to start_with("<a href")
     end
   end
 

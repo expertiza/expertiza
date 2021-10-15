@@ -16,10 +16,10 @@ describe SignUpSheetController do
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(Assignment).to receive(:find).with(1).and_return(assignment)
-    allow(Assignment).to receive(:find).with('2').and_return(assignment6)
-    allow(Assignment).to receive(:find).with(2).and_return(assignment6)
-    allow(Assignment).to receive(:find).with('3').and_return(assignment7)
-    allow(Assignment).to receive(:find).with(3).and_return(assignment7)
+    allow(Assignment).to receive(:find).with('2').and_return(assignment2)
+    allow(Assignment).to receive(:find).with(2).and_return(assignment2)
+    allow(Assignment).to receive(:find).with('3').and_return(assignment3)
+    allow(Assignment).to receive(:find).with(3).and_return(assignment3)
     stub_current_user(instructor, instructor.role.name, instructor.role)
     allow(SignUpTopic).to receive(:find).with('1').and_return(topic)
     allow(Participant).to receive(:find_by).with(id: '1').and_return(participant)
@@ -216,6 +216,17 @@ describe SignUpSheetController do
       expect(topics_exist).to be_eql 0
       expect(flash[:success]).to eq('All topics have been deleted successfully.')
       expect(response).to redirect_to('/assignments/2/edit')
+    end
+
+    it 'deletes all topics for not microtask assignment and redirects to edit assignment page' do
+      create(:topic, id: 2, assignment_id: 3)
+      create(:topic, id: 3, assignment_id: 3)
+      params = {assignment_id: 3}
+      post :delete_all_topics_for_assignment, params.merge(format: :html)
+      topics_exist = SignUpTopic.where(assignment_id: 3).count
+      expect(topics_exist).to be_eql 0
+      expect(flash[:success]).to eq('All topics have been deleted successfully.')
+      expect(response).to redirect_to('/assignments/3/edit')
     end
   end
 

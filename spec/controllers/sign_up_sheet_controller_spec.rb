@@ -177,6 +177,25 @@ describe SignUpSheetController do
       expect(topics_exist).to be_eql 0
       expect(response).to redirect_to('/assignments/3/edit#tabs-2')
     end
+
+    it 'delete_all_selected_topics for a private assignment and redirects to edit assignment page with multiple topic selected' do
+      create(:topic, id: 2, assignment_id: 2, topic_identifier: 'topic2')
+      create(:topic, id: 3, assignment_id: 2, topic_identifier: 'topic3')
+      create(:topic, id: 4, assignment_id: 2, topic_identifier: 'topic4')
+      params = {assignment_id: 2, topic_ids: ['topic2', 'topic3']}
+      post :delete_all_selected_topics, params
+      expect(flash[:success]).to eq('All selected topics have been deleted successfully.')
+      topics_exist = SignUpTopic.where(assignment_id: 2).count
+      expect(topics_exist).to be_eql 1
+      expect(response).to redirect_to('/assignments/2/edit#tabs-2')
+
+      params = {assignment_id: 2, topic_ids: ['topic4']}
+      post :delete_all_selected_topics, params
+      expect(flash[:success]).to eq('All selected topics have been deleted successfully.')
+      topics_exist = SignUpTopic.where(assignment_id: 2).count
+      expect(topics_exist).to be_eql 0
+      expect(response).to redirect_to('/assignments/2/edit#tabs-2')
+    end
   end
 
   describe '#delete_all_topics_for_assignment' do

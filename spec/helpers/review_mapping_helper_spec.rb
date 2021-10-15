@@ -1,12 +1,6 @@
 require 'spec_helper'
 require 'rails_helper'
 
-class MOCK_HTTP
-  def self.get_response(foo)
-    {'last-modified' => DateTime.now.in_time_zone}
-  end
-end
-
 describe ReviewMappingHelper, type: :helper do
   describe 'get_team_color' do
     before(:each) do
@@ -132,6 +126,7 @@ describe ReviewMappingHelper, type: :helper do
 
     it 'color should be purple if submission link has been updated since due date for a specified round' do
       # deadline_right inspired from bookmark_review_spec
+      allow(Net::HTTP).to receive(:get_response).and_return({'last-modified' => DateTime.now.in_time_zone})
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')
@@ -281,7 +276,6 @@ describe ReviewMappingHelper, type: :helper do
 
   describe 'check_submission_state' do
     before(:each) do
-      Net::HTTP = MOCK_HTTP
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
       @reviewer = create(:participant, review_grade: nil)
       @reviewee = create(:assignment_team, assignment: @assignment)
@@ -336,7 +330,7 @@ describe ReviewMappingHelper, type: :helper do
     end
 
     it 'should return purple color if the assignment was submitted within the round' do
-      # expect_any_instance_of(Net::HTTP).to receive(:get_response) {{'last-modified' => DateTime.now.in_time_zone} }
+      allow(Net::HTTP).to receive(:get_response).and_return({'last-modified' => DateTime.now.in_time_zone})
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')

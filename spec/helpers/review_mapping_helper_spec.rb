@@ -154,6 +154,7 @@ describe ReviewMappingHelper, type: :helper do
       @response_map = create(:review_response_map, reviewer: @reviewer)
     end
 
+    #one round, no response
     it 'should return false if response wasnt submitted in every round' do
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2)
@@ -163,7 +164,8 @@ describe ReviewMappingHelper, type: :helper do
       expect(check_response).to eq(false)
     end
 
-    it 'should return true if review was submitted in every round' do
+    #one round, one response
+    it 'should return true if there is one response with one round' do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')
@@ -180,7 +182,30 @@ describe ReviewMappingHelper, type: :helper do
       expect(check_response).to eq(true)
     end
 
-    it 'should return false if first review was late' do
+    #two round,two response
+    it 'should return true if there were both response' do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+
+      # make a team for the assignment
+      create(:assignment_team, assignment: @assignment)
+
+      response_map_with_reviewee = create(:review_response_map, reviewer: @reviewer, reviewee: @reviewee)
+      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'random link', created_at: DateTime.now.in_time_zone - 7.day)
+      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'random link', created_at: DateTime.now.in_time_zone - 3.day)
+
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 5.day)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone - 2.day)
+      create(:response, response_map: response_map_with_reviewee, round: 1)
+      create(:response, response_map: response_map_with_reviewee, round: 2)
+
+      check_response = response_for_each_round?(response_map_with_reviewee)
+      expect(check_response).to eq(true)
+    end
+
+    #two round, only have first response
+    it 'should return false if only have first response' do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')
@@ -194,13 +219,14 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 5.day)
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone + 6.day)
-      create(:response, response_map: response_map_with_reviewee)
+      create(:response, response_map: response_map_with_reviewee, round: 1)
 
       check_response = response_for_each_round?(response_map_with_reviewee)
       expect(check_response).to eq(false)
     end
 
-    it 'should return false if second review was late' do
+    #two round,only have second response
+    it 'should return false if only have second response' do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')
@@ -214,7 +240,7 @@ describe ReviewMappingHelper, type: :helper do
 
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 5.day)
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone - 2.day)
-      create(:response, response_map: response_map_with_reviewee)
+      create(:response, response_map: response_map_with_reviewee, round: 2)
 
       check_response = response_for_each_round?(response_map_with_reviewee)
       expect(check_response).to eq(false)
@@ -233,7 +259,8 @@ describe ReviewMappingHelper, type: :helper do
       @round = 2
     end
 
-    it 'should return true if a work was submitted within 2 round' do
+    #for two round, both of the submissions are on time
+    it 'should return true if works were submitted within 2 round' do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')
@@ -250,6 +277,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(check_submitetd).to eq(true)
     end
 
+    #for two round, both of the submissions are late
     it 'should return false if both works was submitted late' do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
@@ -267,6 +295,29 @@ describe ReviewMappingHelper, type: :helper do
       expect(check_submitetd).to eq(false)
     end
 
+    # for two round, only the second submission is on time
+    # We spent some time to figure out the logic in this function,
+    # but now we believe whether an assignment is late depends on the last due date.
+    # So, assignment will view as on time if user submitted before the last deadline.
+    it 'should return true if first work was submitted late' do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 7.day)
+      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 6.day)
+      create(:response, response_map: @response_map)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 10.day)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone - 5.day)
+
+      assignment_created = @assignment.created_at
+      assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
+
+      check_submitetd = submitted_within_round?(@round, @response_map, assignment_created, assignment_due_dates)
+      expect(check_submitetd).to eq(true)
+    end
+
+    # for two round, only the first submission is on time
+    # If you miss the last submission, than it will return false
     it 'should return false if second work was submitted late' do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
@@ -298,6 +349,7 @@ describe ReviewMappingHelper, type: :helper do
       @round = 2
     end
 
+    # If there were several submissions on time, than it will return the latest one
     it 'should return https://wiki.archlinux.org/123 if works was submitted on time' do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
@@ -315,6 +367,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(hyper_link).to eq('https://wiki.archlinux.org/123')
     end
 
+    # If there were some submissions miss the due date, than ignore them
     it 'should return https://wiki.archlinux.org/123 if only a work was submitted on time' do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
@@ -332,6 +385,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(hyper_link).to eq('https://wiki.archlinux.org/123')
     end
 
+    # If there were some submissions miss the due date, than ignore them
     it 'should return https://wiki.archlinux.org/ if only a work was submitted on time' do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
@@ -348,25 +402,6 @@ describe ReviewMappingHelper, type: :helper do
       hyper_link = submitted_hyperlink(@round, @response_map, assignment_created, assignment_due_dates)
       expect(hyper_link).to eq('https://wiki.archlinux.org/')
     end
-
-
-    it 'should return https://wiki.archlinux.org/ if only a work was Submit Hyperlink' do
-      create(:deadline_right, name: 'No')
-      create(:deadline_right, name: 'Late')
-      create(:deadline_right, name: 'OK')
-      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 12.day)
-      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Not Submit Hyperlink', content: 'https://wiki.archlinux.org/123', created_at: DateTime.now.in_time_zone - 6.day)
-      create(:response, response_map: @response_map)
-      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 10.day)
-      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone - 5.day)
-
-      assignment_created = @assignment.created_at
-      assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
-
-      hyper_link = submitted_hyperlink(@round, @response_map, assignment_created, assignment_due_dates)
-      expect(hyper_link).to eq('https://wiki.archlinux.org/')
-    end
-
   end
 
   #input max_team_size, response, reviewee_id, ip_address
@@ -379,6 +414,7 @@ describe ReviewMappingHelper, type: :helper do
       @response_map = create(:review_response_map, reviewer: @reviewer)
     end
 
+    # return the team name if team size not equal 1
     it 'should return (Team_1) if max_team_size = 3' do
       max_team_size = 3
       @response = create(:response, response_map: @response_map)
@@ -387,6 +423,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(reviewed_team_name).to eq('(Team_1)')
     end
 
+    # return the team name if team size not equal 1
     it 'should return (Team_1) if max_team_size = 2' do
       max_team_size = 2
       @response = create(:response, response_map: @response_map)
@@ -395,6 +432,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(reviewed_team_name).to eq('(Team_1)')
     end
 
+    # return the user name if team size equal 1
     it 'should return (Adam) if max_team_size = 1' do
       max_team_size = 1
       student = create(:student, fullname: 'Adam')
@@ -406,6 +444,7 @@ describe ReviewMappingHelper, type: :helper do
       expect(reviewed_team_name).to eq('(Adam)')
     end
 
+    # return the team name if team size not equal 1
     it 'should return (Team_1) if max_team_size = 0' do
       max_team_size = 0
       @response = create(:response, response_map: @response_map)
@@ -415,6 +454,7 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
+  # the function will sort reviewer based on the comment length
   describe 'sort_reviewer_by_review_volume_desc' do
     before(:each) do
       @assignment = create(:assignment, name: 'assignment', created_at: DateTime.now.in_time_zone - 13.day)
@@ -466,6 +506,7 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
+  # I found the test case by internet, and I think it will fail if the website update in future
   describe 'get_link_updated_at' do
     it 'should return ? by input http://www.example.com' do
       updated_time = get_link_updated_at('http://www.example.com')
@@ -1029,6 +1070,5 @@ describe ReviewMappingHelper, type: :helper do
     it 'should return an empty string when comment does not exist' do
       result = helper.list_hyperlink_submission(@response_map.id, @question.id)
       expect(result).to eq('')
-    end
-  end
+    end  end
 end

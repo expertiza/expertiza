@@ -171,12 +171,52 @@ describe ReviewMappingHelper, type: :helper do
       create(:assignment_team, assignment: @assignment)
 
       response_map_with_reviewee = create(:review_response_map, reviewer: @reviewer, reviewee: @reviewee)
-      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'random link')
-      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1)
+      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'random link', created_at: DateTime.now.in_time_zone - 7.day)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 5.day)
       create(:response, response_map: response_map_with_reviewee)
 
       check_response = response_for_each_round?(response_map_with_reviewee)
       expect(check_response).to eq(true)
+    end
+
+    it 'should return false if first review was late' do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+
+      # make a team for the assignment
+      create(:assignment_team, assignment: @assignment)
+
+      response_map_with_reviewee = create(:review_response_map, reviewer: @reviewer, reviewee: @reviewee)
+      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'random link', created_at: DateTime.now.in_time_zone - 2.day)
+      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'random link', created_at: DateTime.now.in_time_zone - 3.day)
+
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 5.day)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone + 6.day)
+      create(:response, response_map: response_map_with_reviewee)
+
+      check_response = response_for_each_round?(response_map_with_reviewee)
+      expect(check_response).to eq(false)
+    end
+
+    it 'should return false if second review was late' do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+
+      # make a team for the assignment
+      create(:assignment_team, assignment: @assignment)
+
+      response_map_with_reviewee = create(:review_response_map, reviewer: @reviewer, reviewee: @reviewee)
+      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'random link', created_at: DateTime.now.in_time_zone - 7.day)
+      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'random link', created_at: DateTime.now.in_time_zone - 1.day)
+
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 5.day)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone - 2.day)
+      create(:response, response_map: response_map_with_reviewee)
+
+      check_response = response_for_each_round?(response_map_with_reviewee)
+      expect(check_response).to eq(false)
     end
   end
 
@@ -209,12 +249,46 @@ describe ReviewMappingHelper, type: :helper do
       expect(check_submitetd).to eq(true)
     end
 
-    it 'should return false if works was submitted late' do
+    it 'should return false if both works was submitted late' do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')
       create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 4.day)
       create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 3.day)
+      create(:response, response_map: @response_map)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 10.day)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone - 5.day)
+
+      assignment_created = @assignment.created_at
+      assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
+
+      check_submitetd = submitted_within_round?(@round, @response_map, assignment_created, assignment_due_dates)
+      expect(check_submitetd).to eq(false)
+    end
+
+    it 'should return false if first work was submitted late' do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 7.day)
+      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 6.day)
+      create(:response, response_map: @response_map)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 10.day)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone - 5.day)
+
+      assignment_created = @assignment.created_at
+      assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
+
+      check_submitetd = submitted_within_round?(@round, @response_map, assignment_created, assignment_due_dates)
+      expect(check_submitetd).to eq(false)
+    end
+
+    it 'should return false if second work was submitted late' do
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 11.day)
+      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 2.day)
       create(:response, response_map: @response_map)
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 10.day)
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone - 5.day)
@@ -330,15 +404,16 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-
+  #get_link_updated_at
   #initialize_chart_elements
+
+
   #sort_reviewer_by_review_volume_desc
   #display_volume_metric_chart
   #display_tagging_interval_chart
   #list_review_submissions
   #list_hyperlink_submission
   #get_certain_review_and_feedback_response_map
-  #get_css_style_for_calibration_report
 
   describe 'get_each_review_and_feedback_response' do
     before(:each) do

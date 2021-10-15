@@ -1,7 +1,7 @@
 <!--[form:course]-->
 <p><label for="institution_name">Institution Name</label><br/>
-<%= select("course", "institutions_id", Institution.all.collect{ |c| [ c.name, c.id] }) %></p>
-
+<!--<%= select("course", "institutions_id", Institution.all.collect{ |c| [ c.name, c.id] }) %></p>-->
+<%= select("course", "institutions_id", Institution.all.order(:name).collect{ |c| [ c.name, c.id] }) %>
 <p><label for="course_name">Course Name</label><br/>
 <%= text_field 'course', 'name'  %></p>
 

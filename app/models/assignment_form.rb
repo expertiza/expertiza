@@ -209,10 +209,10 @@ class AssignmentForm
       deadline_type = DeadlineType.find(due_date.deadline_type_id).name
       diff_btw_time_left_and_threshold_duration, min_left_duration = DueDate.get_time_diff_btw_due_date_and_now(due_date)
       next unless diff_btw_time_left_and_threshold_duration > 0
-      delayed_job_id = add_delayed_job(@assignment, deadline_type, due_date, diff_btw_time_left_and_threshold_duration)
+      delayed_job_id = add_delayed_job(deadline_type, due_date, diff_btw_time_left_and_threshold_duration)
       due_date.update_attribute(:delayed_job_id, delayed_job_id)
       # If the deadline type is review, add a delayed job to drop outstanding review
-      add_drop_outstanding_reviews_delayed_job(@assignment, due_date, min_left_duration) if deadline_type == "review"
+      add_drop_outstanding_reviews_delayed_job(min_left_duration) if deadline_type == "review"
     end
   end
 
@@ -280,19 +280,19 @@ class AssignmentForm
   end
 
   # add DelayedJob into queue and return it
-  def add_delayed_job(_assignment, deadline_type, due_date, min_left)
+  def add_delayed_job(deadline_type, due_date, min_left)
     seconds_left = min_left.to_i
-    MailWorker.perform_in(seconds_left, due_date.parent_id, deadline_type, due_date.due_at)
+    MailWorker.perform_in(seconds_left, @assignment.id, deadline_type, due_date.due_at)
   end
 
-  def add_drop_outstanding_reviews_delayed_job(_assignment, due_date, min_left)
-    c = min_left.to_i
-    DropOutstandingReviewsMailWorker.perform_in(seconds_left, due_date.parent_id, due_date.due_at)
+  def add_drop_outstanding_reviews_delayed_job(min_left)
+    seconds_left = min_left.to_i
+    DropOutstandingReviewsWorker.perform_in(seconds_left, @assignment.id)
   end
 
   # Deletes the job with id equal to "delayed_job_id" from the delayed_jobs queue
   def delete_from_delayed_queue
-    queue = Sidekiq::Queue.new("mailers")
+    queue = Sidekiq::Queue.new("jobs")
     queue.each do |job|
       assignmentId = job.args.first
       job.delete if @assignment.id == assignmentId
@@ -385,7 +385,7 @@ class AssignmentForm
   def enqueue_simicheck_task(due_date, simicheck_delay_hours_duration)
     dequeue_time_as_seconds_duration_from_now = DueDate.get_dequeue_time_as_seconds_duration_from_now(due_date, simicheck_delay_hours_duration)
 
-    SimicheckMailWorker.perform_in(dequeue_time_as_seconds_duration_from_now.to_i, @assignment.id, due_date.due_at.to_s(:db))
+    SimicheckWorker.perform_in(dequeue_time_as_seconds_duration_from_now.to_i, @assignment.id)
   end
 
   # Copies the inputted assignment into new one and returns the new assignment id

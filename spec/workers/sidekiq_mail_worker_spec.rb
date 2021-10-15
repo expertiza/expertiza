@@ -25,7 +25,7 @@ describe MailWorker do
     it "should expect the queue size of one" do
       Sidekiq::Testing.fake!
       MailWorker.perform_in(3.hours, "1", "metareview", "2018-12-31 00:00:01")
-      queue = Sidekiq::Queues["mailers"]
+      queue = Sidekiq::Queues["jobs"]
       expect(queue.size).to eq(1)
     end
   end

@@ -564,7 +564,7 @@ describe AssignmentForm do
         Sidekiq::ScheduledSet.new.clear
         Sidekiq::Stats.new.reset
         Sidekiq::DeadSet.new.clear
-        queue = Sidekiq::Queues["mailers"]
+        queue = Sidekiq::Queues["jobs"]
         expect { assignment_form.add_to_delayed_queue }.to change { queue.size }.by(2)
       end
     end
@@ -577,7 +577,7 @@ describe AssignmentForm do
         Sidekiq::ScheduledSet.new.clear
         Sidekiq::Stats.new.reset
         Sidekiq::DeadSet.new.clear
-        queue = Sidekiq::Queues["mailers"]
+        queue = Sidekiq::Queues["jobs"]
         expect { assignment_form.add_to_delayed_queue }.to change { queue.size }.by(2)
       end
     end

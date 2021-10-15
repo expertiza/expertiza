@@ -27,7 +27,7 @@ module ReportFormatterHelper
     # If review response is required call review_response_report method in review_response_map model
     @reviewers = ReviewResponseMap.review_response_report(@id, @assignment, @type, @review_user)
     @review_scores = AssignmentHelper.compute_reviews_hash(@assignment)
-    @avg_and_ranges = compute_avg_and_ranges_hash(@assignment)
+    @avg_and_ranges = AssignmentHelper.compute_avg_and_ranges_hash(@assignment)
   end
 
   def feedback_response_map(params, _session = nil)

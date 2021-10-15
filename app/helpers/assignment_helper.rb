@@ -101,13 +101,13 @@ module AssignmentHelper
 
   # Compute total score for this assignment by summing the scores given on all questionnaires.
   # Only scores passed in are included in this sum.
-  def compute_total_score(assignment, scores)
+  def self.compute_total_score(assignment, scores)
     total = 0
     assignment.questionnaires.each {|questionnaire| total += questionnaire.get_weighted_score(assignment, scores) }
     total
   end
 
-  def compute_reviews_hash(assignment)
+  def self.compute_reviews_hash(assignment)
     review_scores = {}
     response_type = 'ReviewResponseMap'
     response_maps = ResponseMap.where(reviewed_object_id: assignment.id, type: response_type)
@@ -120,7 +120,7 @@ module AssignmentHelper
   end
 
   # calculate the avg score and score range for each reviewee(team), only for peer-review
-  def compute_avg_and_ranges_hash(assignment)
+  def self.compute_avg_and_ranges_hash(assignment)
     scores = {}
     contributors = assignment.contributors # assignment_teams
     if assignment.vary_by_round

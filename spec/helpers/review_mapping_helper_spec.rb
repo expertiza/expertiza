@@ -679,4 +679,20 @@ describe ReviewMappingHelper, type: :helper do
       expect(result).to start_with('<a href="/submitted_content/download?current_folder%')
     end
   end
+
+  describe 'test list_hyperlink_submission' do
+    before(:each) do
+      @assignment1 = create(:assignment, name: "name1")
+      @questionnaire = create(:questionnaire)
+      @question = create(:question, questionnaire_id: @questionnaire.id)
+      @user = create(:student, name: "name", fullname: "name")
+      @participant = create(:participant, user_id: @user.id, parent_id: @assignment1.id)
+      @response_map = create(:review_response_map, reviewer: @participant, assignment: @assignment1)
+      @id = @assignment1.id
+    end
+    it 'should return an empty string when comment does not exist' do
+      result = helper.list_hyperlink_submission(@response_map.id, @question.id)
+      expect(result).to eq('')
+    end
+  end
 end

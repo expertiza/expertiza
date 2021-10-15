@@ -269,8 +269,8 @@ ActiveRecord::Schema.define(version: 20210422185445) do
     t.string   "queue",      limit: 255
   end
 
-  add_index "delayed_jobs", ["priority", "run_at"], name: "delayed_jobs_priority", using: :btree
-
+  add_index "delayed_jobs", %w[priority run_at], name: "delayed_jobs_priority", using: :btree
+  
   create_table "due_dates", force: :cascade do |t|
     t.datetime "due_at"
     t.integer  "deadline_type_id",            limit: 4
@@ -800,7 +800,7 @@ ActiveRecord::Schema.define(version: 20210422185445) do
     t.datetime "created_at"
   end
 
-  add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
+  add_index "versions", %w[item_type item_id], name: "index_versions_on_item_type_and_item_id", using: :btree
 
   add_foreign_key "answer_tags", "answers"
   add_foreign_key "answer_tags", "tag_prompt_deployments"

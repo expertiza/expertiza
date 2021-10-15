@@ -1,4 +1,4 @@
-class SimicheckWorker < MailWorker
+class SimicheckWorker < Worker
   @@deadline_type = "compare_files_with_simicheck"
 
   def perform(assignment_id)

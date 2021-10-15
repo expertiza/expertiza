@@ -1,4 +1,4 @@
-class DropOutstandingReviewsWorker < MailWorker
+class DropOutstandingReviewsWorker < Worker
   @@deadline_type = "drop_outstanding_reviews"
 
   def perform(assignment_id)

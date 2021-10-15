@@ -1,10 +1,4 @@
-require 'sidekiq'
-
-class MailWorker
-  include Sidekiq::Worker
-  # ActionMailer in Rail 4 submits jobs in jobs queue instead of default queue. Rails 5 and onwards
-  # ActionMailer will submit mailer jobs to default queue. We need to remove the line below in that case!
-  sidekiq_options queue: 'jobs'
+class MailWorker < Worker
   attr_accessor :assignment
   attr_accessor :deadline_type
   attr_accessor :deadline_text

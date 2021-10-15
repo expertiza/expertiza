@@ -385,18 +385,45 @@ describe ReviewMappingHelper, type: :helper do
 
   end
 
-  #max_team_size, response, reviewee_id, ip_address
+  #input max_team_size, response, reviewee_id, ip_address
   describe 'get_team_reviewed_link_name' do
     before(:each) do
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
-
       @reviewer = create(:participant, review_grade: nil)
+
       @reviewee = create(:assignment_team, name: 'Team_1')
       @response_map = create(:review_response_map, reviewer: @reviewer)
     end
 
-    it 'should return Team_1 if max_team_size != 1' do
+    it 'should return (Team_1) if max_team_size = 3' do
+      max_team_size = 3
+      @response = create(:response, response_map: @response_map)
+      ip_address = '0.0.0.0'
+      reviewed_team_name = get_team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
+      expect(reviewed_team_name).to eq('(Team_1)')
+    end
+
+    it 'should return (Team_1) if max_team_size = 2' do
       max_team_size = 2
+      @response = create(:response, response_map: @response_map)
+      ip_address = '0.0.0.0'
+      reviewed_team_name = get_team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
+      expect(reviewed_team_name).to eq('(Team_1)')
+    end
+
+    it 'should return (Adam) if max_team_size = 1' do
+      max_team_size = 1
+      student = create(:student, fullname: 'Adam')
+      create(:team_user, user: student, team: @reviewee)
+
+      @response = create(:response, response_map: @response_map)
+      ip_address = '0.0.0.0'
+      reviewed_team_name = get_team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
+      expect(reviewed_team_name).to eq('(Adam)')
+    end
+
+    it 'should return (Team_1) if max_team_size = 0' do
+      max_team_size = 0
       @response = create(:response, response_map: @response_map)
       ip_address = '0.0.0.0'
       reviewed_team_name = get_team_reviewed_link_name(max_team_size, @response, @reviewee.id, ip_address)
@@ -455,12 +482,17 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  #get_link_updated_at
+  describe 'get_link_updated_at' do
+    it 'should return ? by input http://www.example.com' do
+      updated_time = get_link_updated_at('http://www.example.com')
+      expect(updated_time).to eq('2019-10-17 03:18:26.000000000 -0400')
+    end
+  end
+
+
   #initialize_chart_elements
   #display_volume_metric_chart
   #display_tagging_interval_chart
-
-
   #list_review_submissions
   #list_hyperlink_submission
   #get_certain_review_and_feedback_response_map

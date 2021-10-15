@@ -45,9 +45,7 @@ module ReviewMappingHelper
 
   # loops through the number of assignment review rounds and obtains the team colour
   def obtain_team_color(response_map, assignment_created, assignment_due_dates)
-    color = []
     check_submission_state(response_map, assignment_created, assignment_due_dates, @assignment.num_review_rounds)
-    color[-1]
   end
 
   # checks the submission state within each round and assigns team colour

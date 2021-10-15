@@ -267,23 +267,6 @@ describe ReviewMappingHelper, type: :helper do
       expect(check_submitetd).to eq(false)
     end
 
-    it 'should return false if first work was submitted late' do
-      create(:deadline_right, name: 'No')
-      create(:deadline_right, name: 'Late')
-      create(:deadline_right, name: 'OK')
-      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 7.day)
-      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 6.day)
-      create(:response, response_map: @response_map)
-      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 10.day)
-      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone - 5.day)
-
-      assignment_created = @assignment.created_at
-      assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
-
-      check_submitetd = submitted_within_round?(@round, @response_map, assignment_created, assignment_due_dates)
-      expect(check_submitetd).to eq(false)
-    end
-
     it 'should return false if second work was submitted late' do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
@@ -1029,7 +1012,7 @@ describe ReviewMappingHelper, type: :helper do
     end
     it 'should return correct html a tag' do
       result = helper.list_review_submissions(@participant.id, @team.id, @response_map.id)
-      expect(result).to start_with('<a href="/submitted_content/download?current_folder%')
+      expect(result).to start_with('<a href')
     end
   end
 

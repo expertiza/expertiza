@@ -206,6 +206,17 @@ describe SignUpSheetController do
       expect(flash[:success]).to eq('All topics have been deleted successfully.')
       expect(response).to redirect_to('/assignments/1/edit')
     end
+
+    it 'deletes all topics for the private assignment and redirects to edit assignment page' do
+      create(:topic, id: 2, assignment_id: 2)
+      create(:topic, id: 3, assignment_id: 2)
+      params = {assignment_id: 2}
+      post :delete_all_topics_for_assignment, params.merge(format: :html)
+      topics_exist = SignUpTopic.where(assignment_id: 2).count
+      expect(topics_exist).to be_eql 0
+      expect(flash[:success]).to eq('All topics have been deleted successfully.')
+      expect(response).to redirect_to('/assignments/2/edit')
+    end
   end
 
   describe '#edit' do

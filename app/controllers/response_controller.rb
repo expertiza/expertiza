@@ -116,6 +116,7 @@ class ResponseController < ApplicationController
       questions = sort_questions(@questionnaire.questions)
       create_answers(params, questions) unless params[:responses].nil? # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
       @response.update_attribute('is_submitted', true) if params['isSubmit'] && params['isSubmit'] == 'Yes'
+      ReviewStatusMap.where(reviewee_id:@response.map.reviewee_id,reviewer_id:@response.map.reviewer_id,review_object_id:@response.map.reviewed_object_id).update_all(:status=>"Completed") if params['isSubmit'] && params['isSubmit'] == 'Yes'
       @response.notify_instructor_on_difference if (@map.is_a? ReviewResponseMap) && @response.is_submitted && @response.significant_difference?
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
@@ -211,12 +212,6 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
-    if (params[:id] == 'Submit')
-      ReviewStatusMap.where(reviewee_id:@map.reviewee_id,reviewer_id:@map.reviewer_id,review_object_id:@map.reviewed_object_id).update_all(:status=>"Completed")
-    else
-      ReviewStatusMap.where(reviewee_id:@map.reviewee_id,reviewer_id:@map.reviewer_id,review_object_id:@map.reviewed_object_id).update_all(:status=>params[:name])
-    end
-
     participant = Participant.find_by(id: @map.reviewee_id)
     # E1822: Added logic to insert a student suggested 'Good Teammate' or 'Good Reviewer' badge in the awarded_badges table.
     if @map.assignment.badge?

@@ -81,7 +81,19 @@ describe LatePoliciesController do
       # byebug
       # get edit_late_policy_path(late_policy)
       get :edit, id: new_policy.id
-      expect(true).to eql(true)
+      params = {
+        id: new_policy.id,
+        late_policy: {
+          policy_name: late_policy.policy_name,
+          penalty_per_unit: 1,
+          penalty_unit: 'Minute',
+          max_penalty: 9,
+        }
+      }
+      post :update, params
+
+      expect(response).to redirect_to(edit_late_policy_path(new_policy.id))
+      expect(flash[:error]).to include("Cannot edit the policy. A policy with the same name")
     end
   end
 end

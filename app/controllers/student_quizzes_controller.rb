@@ -108,7 +108,7 @@ class StudentQuizzesController < ApplicationController
 
       calculate_score map, response
     else
-      flash[:error] = "You have already taken this quiz. Your previous responses are listed below."
+      flash[:error] = "You have already taken this quiz. Please find your previous submission below."
       redirect_to controller: 'student_quizzes', action: 'finished_quiz', map_id: map.id
     end
   end

@@ -96,6 +96,7 @@ class StudentQuizzesController < ApplicationController
     end
   end
 
+  # Saves the response by the student only if the student has not taken the quiz before.
   def record_response
     map = ResponseMap.find(params[:map_id])
     # check if there is any response for this map_id. This is to prevent student take same quiz twice

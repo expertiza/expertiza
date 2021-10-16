@@ -201,6 +201,7 @@ class ResponseController < ApplicationController
     if (@map.is_a? ReviewResponseMap) && (!was_submitted && @response.is_submitted) && @response.significant_difference?
       @response.notify_instructor_on_difference
       @response.email
+      ReviewStatusMap.where(reviewee_id:@map.reviewee_id,reviewer_id:@map.reviewer_id,review_object_id:@map.reviewed_object_id).update_all(:status=>"Completed")
     end
     redirect_to controller: 'response', action: 'save', id: @map.map_id,
                 return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]
@@ -209,9 +210,13 @@ class ResponseController < ApplicationController
   def save
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
-    ReviewStatusMap.where(reviewee_id:@map.reviewee_id,reviewer_id:@map.reviewer_id,review_object_id:@map.reviewed_object_id).update_all(:status=>"Completed")
-    return
     @map.save
+    if (params[:id] == 'Submit')
+      ReviewStatusMap.where(reviewee_id:@map.reviewee_id,reviewer_id:@map.reviewer_id,review_object_id:@map.reviewed_object_id).update_all(:status=>"Completed")
+    else
+      ReviewStatusMap.where(reviewee_id:@map.reviewee_id,reviewer_id:@map.reviewer_id,review_object_id:@map.reviewed_object_id).update_all(:status=>params[:name])
+    end
+
     participant = Participant.find_by(id: @map.reviewee_id)
     # E1822: Added logic to insert a student suggested 'Good Teammate' or 'Good Reviewer' badge in the awarded_badges table.
     if @map.assignment.badge?

@@ -20,6 +20,7 @@ class StudentQuizzesController < ApplicationController
     @quiz_mappings = QuizResponseMap.mappings_for_reviewer(@participant.id)
   end
 
+  # Gets the last submission for a quiz by a student
   def finished_quiz
     @response = Response.where(map_id: params[:map_id]).last # Get the last score if a student took a quiz multiple times
     @response_map = QuizResponseMap.find(params[:map_id])

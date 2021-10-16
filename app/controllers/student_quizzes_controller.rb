@@ -21,7 +21,7 @@ class StudentQuizzesController < ApplicationController
   end
 
   def finished_quiz
-    @response = Response.where(map_id: params[:map_id]).first
+    @response = Response.where(map_id: params[:map_id]).last # Get the last score if a student took a quiz multiple times
     @response_map = QuizResponseMap.find(params[:map_id])
     @questions = Question.where(questionnaire_id: @response_map.reviewed_object_id) # for quiz response map, the reivewed_object_id is questionnaire id
     @map = ResponseMap.find(params[:map_id])

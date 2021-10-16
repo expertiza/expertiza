@@ -65,34 +65,29 @@ describe LatePoliciesController do
   end
 
   context "#request edit/update" do
-    let!(:new_policy) {
+    let!(:edit_policy) {
       create(:late_policy, policy_name: "New policy", instructor_id: policy_instructor_id)
     }
     it "renders edit template" do
-      get :edit, id: new_policy.id
+      get :edit, id: edit_policy.id
       expect(response).to render_template(:edit)
     end
 
-    it "change policy name to different name" do
-      puts "all: #{LatePolicy.all}"
-      LatePolicy.all.each do |lp|
-        puts "id: #{lp.id}"
-      end
-      # byebug
-      # get edit_late_policy_path(late_policy)
-      get :edit, id: new_policy.id
+    it "change policy name to an existing policy's name" do
+      get :edit, id: edit_policy.id
       params = {
-        id: new_policy.id,
+        id: edit_policy.id,
         late_policy: {
+          # Change name to an existing policy name
           policy_name: late_policy.policy_name,
-          penalty_per_unit: 1,
-          penalty_unit: 'Minute',
-          max_penalty: 9,
+          penalty_per_unit: edit_policy.penalty_per_unit,
+          penalty_unit: edit_policy.penalty_unit,
+          max_penalty: edit_policy.max_penalty,
         }
       }
       post :update, params
 
-      expect(response).to redirect_to(edit_late_policy_path(new_policy.id))
+      expect(response).to redirect_to(edit_late_policy_path(edit_policy.id))
       expect(flash[:error]).to include("Cannot edit the policy. A policy with the same name")
     end
   end

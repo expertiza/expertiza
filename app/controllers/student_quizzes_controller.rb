@@ -20,6 +20,7 @@ class StudentQuizzesController < ApplicationController
     @quiz_mappings = QuizResponseMap.mappings_for_reviewer(@participant.id)
   end
 
+  # Gets the last submission for a quiz by a student
   def finished_quiz
     @response = Response.where(map_id: params[:map_id]).last # Get the last score if a student took a quiz multiple times
     @response_map = QuizResponseMap.find(params[:map_id])
@@ -109,7 +110,7 @@ class StudentQuizzesController < ApplicationController
 
       calculate_score map, response
     else
-      flash[:error] = "You have already taken this quiz. Your previous responses are listed below."
+      flash[:error] = "You have already taken this quiz. Please find your previous submission below."
       redirect_to controller: 'student_quizzes', action: 'finished_quiz', map_id: map.id
     end
   end

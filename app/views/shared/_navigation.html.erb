@@ -20,7 +20,7 @@
                            :locals => { items: session[:menu].get_menu(0) - [26, 59], level: 0 } %>
           <% elsif session[:user].role.name == 'Instructor' %>
               <% session[:menu] = Role.student.cache[:menu] %>
-      l => 'menu        <%= render :partial => 'menu_items/suckerfish',
+              <%= render :partial => 'menu_items/suckerfish',
                          :locals => { items: session[:menu].get_menu(0), level: 0 } %>
               <% session[:menu] = Role.instructor.cache[:menu] %>
               <%= render :partial => 'menu_items/suckerfish',

@@ -1,6 +1,7 @@
 class DueDate < ActiveRecord::Base
   validate :due_at_is_valid_datetime
   #  has_paper_trail
+  after_save :start_reminder
 
   def self.default_permission(deadline_type, permission_type)
     DeadlineRight::DEFAULT_PERMISSION[deadline_type][permission_type]
@@ -111,4 +112,50 @@ class DueDate < ActiveRecord::Base
     end
     next_due_date
   end
+
+  # TODO E2135. Email notification to reviewers and instructors
+  def create_mailer_object
+    Mailer.new
+  end
+
+  def create_mailworker_object
+    MailWorker.new(self.assignment_id, self.deadline_type, self.due_at)
+  end
+
+  def start_reminder
+    reminder
+  end
+
+  def reminder
+    deadline_text = self.deadline_type if %w[submission review].include? self.deadline_type
+    deadline_text = "Team Review" if self.deadline_type == 'metareview'
+    email_reminder(create_mailworker_object.find_participant_emails, deadline_text) unless create_mailworker_object.find_participant_emails.empty?
+  end
+
+  def email_reminder(emails, deadline_type)
+    assignment = Assignment.find(self.assignment_id)
+    subject = "Message regarding #{deadline_type} for assignment #{assignment.name}"
+    body = "This is a reminder to complete #{deadline_type} for assignment #{assignment.name}. \
+    Deadline is #{self.due_at}.If you have already done the  #{deadline_type}, Please ignore this mail."
+
+    emails.each do |mail|
+      Rails.logger.info mail
+    end
+    create_mailer_object.sync_message(Hash[bcc: emails, subject: subject, body: body]).deliver
+  end
+
+  def when_to_run_reminder
+    hours_before_deadline = self.threshold.hours
+    (self.due_at.to_time_in_current_zone - hours_before_deadline).to_datetime
+  end
+
+  def when_to_run_start_reminder
+    days_before_deadline = 3.days
+    (self.due_at - days_before_deadline).to_datetime
+  end
+
+  handle_asynchronously :start_reminder, run_at: proc {|i| i.when_to_run_start_reminder }
+  handle_asynchronously :reminder, run_at: proc {|i| i.when_to_run_reminder }
+
+
 end

@@ -131,3 +131,24 @@ describe "due_date_functions" do
     expect(DueDate.default_permission('review', 'submission_allowed')).to be == DeadlineRight::NO
   end
 end
+
+class DueDateTest < ActiveSupport::TestCase
+  describe "due_date_reminder_functions" do
+    before(:all) do
+      @due_at = Date.current - 4.days
+      @threshold = 3
+    end
+
+    def queue_adapter_for_test
+      ActiveJob::QueueAdapters::DelayedJobAdapter.new
+    end
+
+    it 'enqueues remainder email in delayed job queue' do
+      expect { delay.reminder }.to change(Delayed::Job, :count).by(1)
+    end
+
+    it 'enqueues remainder job in delayed job queue' do
+      expect { delay.start_reminder }.to change(Delayed::Job, :count).by(1)
+    end
+  end
+end

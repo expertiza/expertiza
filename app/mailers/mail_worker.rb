@@ -9,6 +9,12 @@ class MailWorker
   attr_accessor :deadline_type
   attr_accessor :due_at
 
+  def initialize(assignment_id, deadline_type, due_at)
+    @assignment_id = assignment_id
+    @deadline_type = deadline_type
+    @due_at = due_at
+  end
+
   def perform(assignment_id, deadline_type, due_at)
     self.assignment_id = assignment_id
     self.deadline_type = deadline_type

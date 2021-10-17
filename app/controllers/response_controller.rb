@@ -189,6 +189,7 @@ class ResponseController < ApplicationController
         is_submitted: is_submitted
       )
     end
+    ReviewStatusMap.where(reviewee_id:@map.reviewee_id,reviewer_id:@map.reviewer_id,review_object_id:@map.reviewed_object_id).update_all(:status=>"Completed") if is_submitted
     was_submitted = @response.is_submitted
     @response.update(additional_comment: params[:review][:comments], is_submitted: is_submitted) # ignore if autoupdate try to save when the response object is not yet created.
 
@@ -202,7 +203,6 @@ class ResponseController < ApplicationController
     if (@map.is_a? ReviewResponseMap) && (!was_submitted && @response.is_submitted) && @response.significant_difference?
       @response.notify_instructor_on_difference
       @response.email
-      ReviewStatusMap.where(reviewee_id:@map.reviewee_id,reviewer_id:@map.reviewer_id,review_object_id:@map.reviewed_object_id).update_all(:status=>"Completed")
     end
     redirect_to controller: 'response', action: 'save', id: @map.map_id,
                 return: params[:return], msg: msg, error_msg: error_msg, review: params[:review], save_options: params[:save_options]

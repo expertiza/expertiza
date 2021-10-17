@@ -34,9 +34,6 @@ class AssignmentsController < ApplicationController
         @assignment_form.create_assignment_node
         current_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
         assignment_form_params[:assignment][:id] = current_assignment.id.to_s
-        #if assignment_form_params[:assignment][:directory_path].blank?
-        #  assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
-        #end
         ques_array = assignment_form_params[:assignment_questionnaire]
         due_array = assignment_form_params[:due_date]
         ques_array.each do |cur_questionnaire|
@@ -54,13 +51,14 @@ class AssignmentsController < ApplicationController
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
         return
       else
+        flash[:error] = "Failed to create assignment."
         if find_existing_assignment
-          flash[:error] = @assignment_form.assignment.name + " already exists as an assignment name"
+          flash[:error] << "<br>  " + @assignment_form.assignment.name + " already exists as an assignment name"
         end
         if find_existing_directory
-          flash[:error] = dir_path + " already exists as a submission directory name"
+          flash[:error] << "<br>  " + dir_path + " already exists as a submission directory name"
         end
-        redirect_to "/assignments/new?private=1" 
+        redirect_to "/assignments/new?private=1"
       end
     else
       render 'new'

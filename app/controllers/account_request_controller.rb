@@ -32,30 +32,14 @@ class AccountRequestController < ApplicationController
     users.each do |user|
       requested_user = AccountRequest.find_by(id: user.first)
       requested_user.status = is_approved
+      puts "Here"
       if requested_user.status.nil?
         flash[:error] = "Please Approve or Reject before submitting"
       elsif requested_user.update_attributes(params[:user])
         flash[:success] = "The user \"#{requested_user.name}\" has been successfully updated."
       end
       if requested_user.status == "Approved"
-        new_user = User.new
-        new_user.name = requested_user.name
-        new_user.role_id = requested_user.role_id
-        new_user.institution_id = requested_user.institution_id
-        new_user.fullname = requested_user.fullname
-        new_user.email = requested_user.email
-        new_user.parent_id = session[:user].id
-        new_user.timezonepref = User.find_by(id: new_user.parent_id).timezonepref
-        if new_user.save
-          password = new_user.reset_password
-          # Mail is sent to the user with a new password
-          prepared_mail = MailerHelper.send_mail_to_user(new_user, "Your Expertiza account and password have been created.", "user_welcome", password)
-          prepared_mail.deliver_now
-          flash[:success] = "A new password has been sent to new user's e-mail address."
-          undo_link("The user \"#{requested_user.name}\" has been successfully created. ")
-        else
-          foreign
-        end
+        initialize(requested_user)
       elsif requested_user.status == "Rejected"
         # If the user request has been rejected, a flash message is shown and redirected to review page
         if requested_user.update_columns(status: is_approved)
@@ -68,6 +52,28 @@ class AccountRequestController < ApplicationController
       end
     end
     redirect_to action: 'list_pending_requested'
+  end
+
+  def initialize(requested_user)
+    puts requested_user.inspect
+    new_user = User.new
+    new_user.name = requested_user.name
+    new_user.role_id = requested_user.role_id
+    new_user.institution_id = requested_user.institution_id
+    new_user.fullname = requested_user.fullname
+    new_user.email = requested_user.email
+    new_user.parent_id = session[:user].id
+    new_user.timezonepref = User.find_by(id: new_user.parent_id).timezonepref
+    if new_user.save
+      password = new_user.reset_password
+      # Mail is sent to the user with a new password
+      prepared_mail = MailerHelper.send_mail_to_user(new_user, "Your Expertiza account and password have been created.", "user_welcome", password)
+      prepared_mail.deliver_now
+      flash[:success] = "A new password has been sent to new user's e-mail address."
+      undo_link("The user \"#{requested_user.name}\" has been successfully created. ")
+    else
+      foreign
+    end
   end
 
   # If the registered user status is Approved and if the new_user couldn't be saved, foreign function saves the role id in @all_roles variable

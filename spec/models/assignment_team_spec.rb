@@ -335,8 +335,8 @@ describe 'AssignmentTeam' do
         allow(ReviewResponseMap).to receive(:create).
           with(reviewee_id: team.id, reviewer_id: participant1.id, reviewed_object_id: assignment.id, reviewer_is_team: nil).and_return(review_response_map)
         expect(team.assign_reviewer(participant1)).to eq(review_response_map)
-        expect(ReviewStatusMap.count).to be(1)
-        # expect(ReviewStatusMap.where(reviewer_id:participant1.id).status).to be("Ready")
+        # expect(ReviewStatusMap.count).to be(1)
+        expect(ReviewStatusMap.where(reviewer_id:participant1.id).pluck("status")[0]).to eq("Ready")
       end
     end
   end

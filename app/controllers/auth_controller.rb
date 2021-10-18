@@ -1,6 +1,6 @@
 class AuthController < ApplicationController
-  before_action :action_allowed?, only:[:login,:logout,:login_failed,:google_login]
-  
+  before_action :action_allowed?, only:[:login,:login_failed,:google_login]
+  after_action :action_allowed?, only:[:logout]
   include AuthorizationHelper
   helper :auth
 

@@ -15,6 +15,7 @@ class Assessment360Controller < ApplicationController
     @peer_review_scores = {}
     @final_grades = {}
     course = Course.find(params[:course_id])
+    @course_id = params[:course_id]
     @assignments = course.assignments.reject(&:is_calibrated).reject {|a| a.participants.empty? }
     @course_participants = course.get_participants
     insure_existence_of(@course_participants,course)
@@ -22,6 +23,13 @@ class Assessment360Controller < ApplicationController
     @meta_review = {}
     @teammate_review = {}
     @teamed_count = {}
+
+
+    @show_teammate_reviews = false
+    @show_meta_reviews = false
+    @show_peer_scores = false
+    @show_instructor_grades = false
+    @show_avg_peer_reviews = false
     # for course
     # eg. @overall_teammate_review_grades = {assgt_id1: 100, assgt_id2: 178, ...}
     # @overall_teammate_review_count = {assgt_id1: 1, assgt_id2: 2, ...}

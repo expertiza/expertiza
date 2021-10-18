@@ -5,8 +5,8 @@ describe ReputationWebServiceController do
     before(:each) do
       @assignment_1 = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day, submitter_count: 0, num_reviews: 3, rounds_of_reviews: 2, reputation_algorithm: 'lauw', id: 1)
       @assignment_2 = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day, submitter_count: 0, num_reviews: 3, rounds_of_reviews: 2, reputation_algorithm: 'hamer', id: 2)
-      @questionnaire_1 = create(:questionnaire, min_question_score: 0, max_question_score: 5, default_num_choices: 1, type: 'ReviewQuestionnaire', id: 1)
-      @questionnaire_2 = create(:questionnaire, min_question_score: 0, max_question_score: 5, default_num_choices: 1, type: 'ReviewQuestionnaire', id: 2)
+      @questionnaire_1 = create(:questionnaire, min_question_score: 0, max_question_score: 5, type: 'ReviewQuestionnaire', id: 1)
+      @questionnaire_2 = create(:questionnaire, min_question_score: 0, max_question_score: 5, type: 'ReviewQuestionnaire', id: 2)
       @assignment_questionnaire_1_1 = create(:assignment_questionnaire, assignment_id: @assignment_1.id, questionnaire_id: @questionnaire_1.id, used_in_round: 1, id: 1)
       @assignment_questionnaire_1_2 = create(:assignment_questionnaire, assignment_id: @assignment_1.id, questionnaire_id: @questionnaire_2.id, used_in_round: 2, id: 2)
       @assignment_questionnaire_2_1 = create(:assignment_questionnaire, assignment_id: @assignment_2.id, questionnaire_id: @questionnaire_1.id, used_in_round: 1, id: 3)

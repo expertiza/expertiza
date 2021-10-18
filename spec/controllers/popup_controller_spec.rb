@@ -85,10 +85,41 @@ describe PopupController do
   end
 
   describe '#reviewer_details_popup' do
-    ## INSERT CONTEXT/DESCRIPTION/CODE HERE
+    it "render reviewer_details_popup page successfully" do
+      participant = double(:participant, user_id: 1)
+      user = double(:user, fullname: "Test User", name: "Test", email: "test@gmail.com", handle: 1)
+      allow(Participant).to receive(:find).with("1").and_return(participant)
+      allow(User).to receive(:find).with(participant.user_id).and_return(user)
+      params = {id: 1, assignment_id: 1}
+      session = {user: instructor}
+      get :reviewer_details_popup, params, session
+      expect(@response).to have_http_status(200)
+      expect(user.fullname).to eq("Test User")
+      expect(user.name).to eq("Test")
+      expect(user.email).to eq("test@gmail.com")
+      expect(user.handle).to eq(1)
+    end
   end
 
   describe '#self_review_popup' do
-    ## INSERT CONTEXT/DESCRIPTION/CODE HERE
+    context "when current user is the participant" do
+      it "render page successfully as Instructor to get maximum_score " do
+        question1 = double(:question1, questionnaire_id: 1)
+        questionnaire1 = double(:questionnaire1, min_question_score: 1, max_question_score: 3, name: 'Test questionnaire')
+        answer1 = double('Answer', question_id: 1)
+        response1 = double('response1', response_id: 1, responses: "this is test response")
+        allow(Answer).to receive_message_chain(:where, :first).with(response_id: 1).with(no_args).and_return(answer1)
+        allow(Question).to receive(:find).with(1).and_return(question1)
+        allow(Questionnaire).to receive(:find).and_return(questionnaire1)
+        allow(Answer).to receive(:where).with("1").and_return(answer1)
+        allow(Response).to receive_message_chain(:find, :average_score).with("1").with(no_args).and_return(response1)
+        allow(Response).to receive_message_chain(:find, :aggregate_questionnaire_score).with("1").with(no_args).and_return(response1)
+        allow(Response).to receive_message_chain(:find, :maximum_score).with("1").with(no_args).and_return(response1)
+        params = {response_id: 1, user_fullname: questionnaire1.name}
+        session = {user: instructor}
+        get :self_review_popup, params, session
+        expect(@response).to have_http_status(200)
+      end
+    end
   end
 end

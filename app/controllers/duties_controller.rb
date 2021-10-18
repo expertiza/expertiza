@@ -1,4 +1,10 @@
 class DutiesController < ApplicationController
+  def action_allowed?
+    ['Instructor',
+     'Teaching Assistant',
+     'Administrator'].include? current_role_name
+  end
+
   before_action :set_duty, only: [:show, :edit, :update, :destroy]
 
   # GET /duties

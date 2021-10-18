@@ -229,7 +229,6 @@ describe SignUpSheetController do
       create(:topic, id: 30, assignment_id: 40, topic_identifier: 'E1740')
       create(:topic, id: 40, assignment_id: 40, topic_identifier: 'E1741')
       create(:topic, id: 50, assignment_id: 40, topic_identifier: 'E1742')
-      allow(SignUpTopic).to receive(:find).with(assignment_id: '40').and_return(topic)
       params = {assignment_id: 40}
       post :delete_all_topics_for_assignment, params
       topics_exist = SignUpTopic.where(assignment_id: 40).count
@@ -238,7 +237,17 @@ describe SignUpSheetController do
       expect(response).to redirect_to('/assignments/40/edit')
     end
 
-  
+    it 'deletes all topics for the non-staggered deadline assignment and redirects to edit assignment page' do
+      create(:topic, id: 30, assignment_id: 30, topic_identifier: 'E1740')
+      create(:topic, id: 40, assignment_id: 30, topic_identifier: 'E1741')
+      create(:topic, id: 50, assignment_id: 30, topic_identifier: 'E1742')
+      params = {assignment_id: 30}
+      post :delete_all_topics_for_assignment, params
+      topics_exist = SignUpTopic.where(assignment_id: 30).count
+      expect(topics_exist).to be_eql 0
+      expect(flash[:success]).to eq('All topics have been deleted successfully.')
+      expect(response).to redirect_to('/assignments/30/edit')
+    end  
   end
 
   describe '#edit' do

@@ -130,13 +130,13 @@ describe SignUpSheetController do
 
   describe '#delete_all_selected_topics' do
     it 'delete_all_selected_topics with staggered deadline true and redirects to edit assignment page with single topic as input' do
-      allow(SignUpTopic).to receive(:find).with(assignment_id: 3,topic_identifier: ['E1732']).and_return(topic)
-      params = {assignment_id: 3, topic_ids: ['E1732']}
+      allow(SignUpTopic).to receive(:find).with(assignment_id: 1,topic_identifier: ['E1732']).and_return(topic)
+      params = {assignment_id: 1, topic_ids: ['E1732']}
       post :delete_all_selected_topics, params
       expect(flash[:success]).to eq('All selected topics have been deleted successfully.')
-      topics_exist = SignUpTopic.where(assignment_id: 3).count
+      topics_exist = SignUpTopic.where(assignment_id: 1).count
       expect(topics_exist).to be_eql 0
-      expect(response).to redirect_to('/assignments/3/edit#tabs-2')
+      expect(response).to redirect_to('/assignments/1/edit#tabs-2')
     end
 
     it 'create topic and delete_all_selected_topics for a staggered deadline assignment and redirects to edit assignment page with single topic selected' do

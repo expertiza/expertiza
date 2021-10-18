@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20211017193309) do
+ActiveRecord::Schema.define(version: 20211018005615) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -52,13 +52,16 @@ ActiveRecord::Schema.define(version: 20211017193309) do
     t.integer "assignment_id",        limit: 4
     t.integer "questionnaire_id",     limit: 4
     t.integer "user_id",              limit: 4
-    t.integer "notification_limit",   limit: 4, default: 15,   null: false
-    t.integer "questionnaire_weight", limit: 4, default: 0,    null: false
+    t.integer "notification_limit",   limit: 4,   default: 15,   null: false
+    t.integer "questionnaire_weight", limit: 4,   default: 0,    null: false
     t.integer "used_in_round",        limit: 4
-    t.boolean "dropdown",                       default: true
+    t.boolean "dropdown",                         default: true
+    t.string  "references",           limit: 255
+    t.integer "duty_id",              limit: 4
   end
 
   add_index "assignment_questionnaires", ["assignment_id"], name: "fk_aq_assignments_id", using: :btree
+  add_index "assignment_questionnaires", ["duty_id"], name: "index_assignment_questionnaires_on_duty_id", using: :btree
   add_index "assignment_questionnaires", ["questionnaire_id"], name: "fk_aq_questionnaire_id", using: :btree
   add_index "assignment_questionnaires", ["user_id"], name: "fk_aq_user_id", using: :btree
 
@@ -114,6 +117,8 @@ ActiveRecord::Schema.define(version: 20211017193309) do
     t.boolean  "has_badge"
     t.boolean  "allow_selecting_additional_reviews_after_1st_round"
     t.integer  "sample_assignment_id",                               limit: 4
+    t.boolean  "questionnaire_varies_by_duty"
+    t.boolean  "is_duty_based_assignment"
   end
 
   add_index "assignments", ["course_id"], name: "fk_assignments_courses", using: :btree
@@ -728,8 +733,10 @@ ActiveRecord::Schema.define(version: 20211017193309) do
   create_table "teams_users", force: :cascade do |t|
     t.integer "team_id", limit: 4
     t.integer "user_id", limit: 4
+    t.integer "duty_id", limit: 4
   end
 
+  add_index "teams_users", ["duty_id"], name: "index_teams_users_on_duty_id", using: :btree
   add_index "teams_users", ["team_id"], name: "fk_users_teams", using: :btree
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 
@@ -802,6 +809,7 @@ ActiveRecord::Schema.define(version: 20211017193309) do
   add_foreign_key "assignment_badges", "assignments"
   add_foreign_key "assignment_badges", "badges"
   add_foreign_key "assignment_questionnaires", "assignments", name: "fk_aq_assignments_id"
+  add_foreign_key "assignment_questionnaires", "duties"
   add_foreign_key "assignment_questionnaires", "questionnaires", name: "fk_aq_questionnaire_id"
   add_foreign_key "assignments", "assignments", column: "sample_assignment_id"
   add_foreign_key "assignments", "late_policies", name: "fk_late_policy_id"
@@ -835,6 +843,7 @@ ActiveRecord::Schema.define(version: 20211017193309) do
   add_foreign_key "tag_prompt_deployments", "assignments"
   add_foreign_key "tag_prompt_deployments", "questionnaires"
   add_foreign_key "tag_prompt_deployments", "tag_prompts"
+  add_foreign_key "teams_users", "duties"
   add_foreign_key "teams_users", "teams", name: "fk_users_teams"
   add_foreign_key "teams_users", "users", name: "fk_teams_users"
 end

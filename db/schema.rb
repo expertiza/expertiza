@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20211018005615) do
+ActiveRecord::Schema.define(version: 20211018011356) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -52,16 +52,15 @@ ActiveRecord::Schema.define(version: 20211018005615) do
     t.integer "assignment_id",        limit: 4
     t.integer "questionnaire_id",     limit: 4
     t.integer "user_id",              limit: 4
-    t.integer "notification_limit",   limit: 4,   default: 15,   null: false
-    t.integer "questionnaire_weight", limit: 4,   default: 0,    null: false
+    t.integer "notification_limit",   limit: 4, default: 15,   null: false
+    t.integer "questionnaire_weight", limit: 4, default: 0,    null: false
     t.integer "used_in_round",        limit: 4
-    t.boolean "dropdown",                         default: true
-    t.string  "references",           limit: 255
+    t.boolean "dropdown",                       default: true
     t.integer "duty_id",              limit: 4
   end
 
   add_index "assignment_questionnaires", ["assignment_id"], name: "fk_aq_assignments_id", using: :btree
-  add_index "assignment_questionnaires", ["duty_id"], name: "index_assignment_questionnaires_on_duty_id", using: :btree
+  add_index "assignment_questionnaires", ["duty_id"], name: "fk_rails_cd3ee38327", using: :btree
   add_index "assignment_questionnaires", ["questionnaire_id"], name: "fk_aq_questionnaire_id", using: :btree
   add_index "assignment_questionnaires", ["user_id"], name: "fk_aq_user_id", using: :btree
 
@@ -736,7 +735,7 @@ ActiveRecord::Schema.define(version: 20211018005615) do
     t.integer "duty_id", limit: 4
   end
 
-  add_index "teams_users", ["duty_id"], name: "index_teams_users_on_duty_id", using: :btree
+  add_index "teams_users", ["duty_id"], name: "fk_rails_cdb43d4cbd", using: :btree
   add_index "teams_users", ["team_id"], name: "fk_users_teams", using: :btree
   add_index "teams_users", ["user_id"], name: "fk_teams_users", using: :btree
 

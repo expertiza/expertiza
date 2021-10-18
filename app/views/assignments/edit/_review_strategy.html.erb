@@ -151,15 +151,13 @@
     </tr>
   <% end %>
 
+  <!--E2147 Duty Based Reviewing-->
   <tr>
-    <td id='assignment_is_duty_based'>
-
-        <input name="assignment_form[assignment][assignment_is_duty_based]" type="hidden" value="false"/>
-            <%= check_box_tag('duty_assignment', 'true', false, {:onChange => 'hasDutiesChanged()'}) %>
-
-        <%= label_tag('duty_assignment', 'Has duties?') %>
-
-
+    <td id='is_duty_based_assignment'>
+        <input name="assignment_form[assignment][is_duty_based_assignment]" type="hidden" value="false"/>
+        <%= check_box_tag('assignment_form[assignment][is_duty_based_assignment]', 'true', @assignment_form.assignment.is_duty_based_assignment, {:onChange => 'hasDutiesChanged()'}) %>
+        <%= label_tag('duty_assignment', 'Is Duty Based Assignment?') %>
+        <img src="/assets/info.png" title='Check the box if this assignment allows duty assignment within the team'>
     </td>
   </tr>
 

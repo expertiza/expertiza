@@ -9,8 +9,9 @@ describe PopupController do
   let(:assignment) { build(:assignment, id: 1) }
   let(:response_map) { build(:review_response_map, id: 1, reviewee_id: team.id, reviewer_id: participant2.id, response: [response], assignment: assignment) }
   final_versions = {
-    "review round 1": {questionnaire_id: nil, response_ids: []},
-    "review round 2": {questionnaire_id: nil, response_ids: []}
+    review_round_one: {questionnaire_id: 1, response_ids: [77024]},
+    review_round_two: {questionnaire_id: 2, response_ids: []},
+    review_round_three: {questionnaire_id: 3, response_ids: []}
   }
   test_url = "http://peerlogic.csc.ncsu.edu/reviewsentiment/viz/478-5hf542"
   mocked_comments_one = OpenStruct.new(comments: "test comment")
@@ -36,30 +37,6 @@ describe PopupController do
       result = get :team_users_popup, params, session
       expect(result.status).to eq 200
 
-    end
-  end
-
-  describe '#view_review_scores_popup'do
-    context 'review tone analysis operation is performed' do
-      it 'Prepares scores and review analysis report for rendering purpose' do
-        allow(Assignment).to receive(:find).and_return(assignment)
-        allow(Participant).to receive(:find).and_return(participant)
-        params = {reviewer_id: participant.id, assignment_id: assignment.id}
-        session = {user: instructor}
-        result = get :view_review_scores_popup, params, session
-        expect(controller.instance_variable_get(:@review_final_versions)).to eq final_versions
-      end
-    end
-
-    context 'when view_review_scores_popup page is not allowed to access' do
-      it 'redirects to root path (/)' do
-        session[:user] = nil
-        allow(Assignment).to receive(:find).and_return(assignment)
-        allow(Participant).to receive(:find).and_return(participant)
-        params = {reviewer_id: participant.id, assignment_id: assignment.id}
-        get :view_review_scores_popup, params
-        expect(response).to redirect_to('/')
-      end
     end
   end
 

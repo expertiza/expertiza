@@ -122,6 +122,15 @@ FactoryBot.define do
     copy_of_emails false
   end
 
+  factory :late_policy, class: LatePolicy do
+    policy_name "Late Policy"
+    penalty_per_unit 1.0
+    max_penalty 10
+    penalty_unit 'Minute'
+    times_used 1
+    instructor_id { association(:instructor).id }
+  end
+
   factory :teaching_assistant, class: Ta do
     name 'teaching_assistant5888'
     role { Role.where(name: 'Teaching Assistant').first || association(:role_of_teaching_assistant) }

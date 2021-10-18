@@ -10,6 +10,10 @@ class Assessment360Controller < ApplicationController
   # Find the list of all students and assignments pertaining to the course.
   # This data is used to compute the metareview and teammate review scores.
   def all_students_all_reviews
+    @topics = {}
+    @assignment_grades = {}
+    @peer_review_scores = {}
+    @final_grades = {}
     course = Course.find(params[:course_id])
     @assignments = course.assignments.reject(&:is_calibrated).reject {|a| a.participants.empty? }
     @course_participants = course.get_participants
@@ -28,16 +32,30 @@ class Assessment360Controller < ApplicationController
     @course_participants.each do |cp|
       # for each assignment
       # [aggregrate_review_grades_per_stu, review_count_per_stu] --> [0, 0]
+      @topics[cp.id] = {}
+      @assignment_grades[cp.id] = {}
+      @peer_review_scores[cp.id] = {}
+      @final_grades[cp.id] = 0
       %w[teammate meta].each {|type| instance_variable_set("@#{type}_review_info_per_stu", [0, 0]) }
       students_teamed = StudentTask.teamed_students(cp.user)
       @teamed_count[cp.id] = students_teamed[course.id].try(:size).to_i
       @assignments.each do |assignment|
+        user_id = cp.user_id
+        assignment_id = assignment.id
         @meta_review[cp.id] = {} unless @meta_review.key?(cp.id)
         @teammate_review[cp.id] = {} unless @teammate_review.key?(cp.id)
-        assignment_participant = assignment.participants.find_by(user_id: cp.user_id)
-        next if assignment_participant.nil?
+        assignment_participant = assignment.participants.find_by(user_id: user_id)
+        next if assignment.participants.find_by(user_id: user_id).nil? # break out of the loop if there are no participants in the assignment
+        next if TeamsUser.team_id(assignment_id, user_id).nil? # break out of the loop if the participant has no team
         teammate_reviews = assignment_participant.teammate_reviews
         meta_reviews = assignment_participant.metareviews
+        assignment_grade_summary(cp, assignment_id)
+        peer_review_score = find_peer_review_score(user_id, assignment_id)
+        next if peer_review_score.nil? #Skip if there are no peers
+        next if peer_review_score[:review].nil? #Skip if there are no reviews done by peer
+        next if peer_review_score[:review][:scores].nil? #Skip if there are no reviews scores assigned by peer
+        next if peer_review_score[:review][:scores][:avg].nil? #Skip if there are is no peer review average score
+        @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
         calc_overall_review_info(assignment,
                                  cp,
                                  teammate_reviews,
@@ -77,43 +95,6 @@ class Assessment360Controller < ApplicationController
     if review_info_per_stu[1] > 0
       temp_avg_grade = review_info_per_stu[0] * 1.0 / review_info_per_stu[1]
       review[cp.id][:avg_grade_for_assgt] = temp_avg_grade.round.to_s + '%'
-    end
-  end
-
-  # Find the list of all students and assignments pertaining to the course.
-  # This data is used to compute the instructor assigned grade and peer review scores.
-  # There are many nuances about how to collect these scores. See our design document for more deails
-  # http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2018_E1871_Grade_Summary_By_Student
-  def course_student_grade_summary
-    @topics = {}
-    @assignment_grades = {}
-    @peer_review_scores = {}
-    @final_grades = {}
-    course = Course.find(params[:course_id])
-    @assignments = course.assignments.reject(&:is_calibrated).reject {|a| a.participants.empty? }
-    @course_participants = course.get_participants
-    insure_existence_of(@course_participants,course)
-    @course_participants.each do |cp|
-      @topics[cp.id] = {}
-      @assignment_grades[cp.id] = {}
-      @peer_review_scores[cp.id] = {}
-      @final_grades[cp.id] = 0
-      @assignments.each do |assignment|
-        user_id = cp.user_id
-        assignment_id = assignment.id
-        assignment_participant = assignment.participants.find_by(user_id: user_id)
-        next if assignment.participants.find_by(user_id: user_id).nil? # break out of the loop if there are no participants in the assignment
-        next if TeamsUser.team_id(assignment_id, user_id).nil? # break out of the loop if the participant has no team
-        
-        assignment_grade_summary(cp, assignment_id) # pull information about the student's grades for particular assignment
-        peer_review_score = find_peer_review_score(user_id, assignment_id)
-        
-        next if peer_review_score.nil? #Skip if there are no peers
-        next if peer_review_score[:review].nil? #Skip if there are no reviews done by peer
-        next if peer_review_score[:review][:scores].nil? #Skip if there are no reviews scores assigned by peer
-        next if peer_review_score[:review][:scores][:avg].nil? #Skip if there are is no peer review average score
-        @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
-      end
     end
   end
 

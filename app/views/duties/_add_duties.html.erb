@@ -1,0 +1,21 @@
+<% @assignment = Assignment.find(params[:id]) %>
+<% if flash[:notice] %>
+    <div class="flash_note"><%= flash_message :notice %></div>
+<% end %>
+
+<% @duties = Duty.where(['assignment_id = ?', @assignment.id]) %>
+
+
+<% if @duties.size != 0 %>
+
+
+<% else %>
+    <div class="flash_note alert alert-danger">
+      <%= "Duties have not yet been created." %>
+    </div>
+<% end %>
+
+<% session[:return_to] = request.url %>
+<br/><br/>
+
+<%= render :partial => '/duties/add_duty' %>

@@ -155,9 +155,15 @@
   <tr>
     <td id='is_duty_based_assignment'>
         <input name="assignment_form[assignment][is_duty_based_assignment]" type="hidden" value="false"/>
-        <%= check_box_tag('assignment_form[assignment][is_duty_based_assignment]', 'true', @assignment_form.assignment.is_duty_based_assignment, {:onChange => 'hasDutiesChanged()'}) %>
+        <input type="checkbox" name = "is_duty_checkbox" id="is_duty_checkbox" <%= "checked" if @assignment_form.assignment.is_duty_based_assignment %> onclick="hasDutiesChanged()"></input>
         <%= label_tag('duty_assignment', 'Is Duty Based Assignment?') %>
         <img src="/assets/info.png" title='Check the box if this assignment allows duty assignment within the team'>
+
+        <div id="add_duties" <%= "hidden" if not @assignment_form.assignment.is_duty_based_assignment %> >
+          <br>
+
+          <%= render '/duties/add_duties' %>
+        </div>
     </td>
   </tr>
 
@@ -187,8 +193,14 @@
     }
 
     function hasDutiesChanged() {
-        var checkbox = jQuery('#duty_assignment');
-        alert(checkbox);
+        var checkbox = jQuery('#is_duty_checkbox');
+        var add_duties_div = jQuery('#add_duties');
 
+        if (checkbox.is(':checked')) {
+          add_duties_div.removeAttr('hidden');
+        }
+        else {
+          add_duties_div.attr('hidden', true);
+        }
     }
 </script>

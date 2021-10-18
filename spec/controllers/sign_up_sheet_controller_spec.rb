@@ -217,21 +217,28 @@ describe SignUpSheetController do
   end
 
   describe '#delete_all_topics_for_assignment' do
-    it 'deletes all topics for the assignment with staggered deadline true and redirects to edit assignment page' do
-      allow(SignUpTopic).to receive(:find).with(assignment_id: '3').and_return(topic)
-      params = {assignment_id: 3}
+    it 'deletes all topics for the assignment and redirects to edit assignment page' do
+      allow(SignUpTopic).to receive(:find).with(assignment_id: '1').and_return(topic)
+      params = {assignment_id: 1}
       post :delete_all_topics_for_assignment, params
       expect(flash[:success]).to eq('All topics have been deleted successfully.')
-      expect(response).to redirect_to('/assignments/3/edit')
+      expect(response).to redirect_to('/assignments/1/edit')
     end
 
-  #   it 'deletes all topics for the assignment with staggered deadline false and redirects to edit assignment page' do
-  #     allow(SignUpTopic).to receive(:find).with(assignment_id: '2').and_return(topic)
-  #     params = {assignment_id: 2}
-  #     post :delete_all_topics_for_assignment, params
-  #     expect(flash[:success]).to eq('All topics have been deleted successfully.')
-  #     expect(response).to redirect_to('/assignments/2/edit')
-  #   end
+    it 'deletes all topics for the staggered deadline assignment and redirects to edit assignment page' do
+      create(:topic, id: 30, assignment_id: 40, topic_identifier: 'E1740')
+      create(:topic, id: 40, assignment_id: 40, topic_identifier: 'E1741')
+      create(:topic, id: 50, assignment_id: 40, topic_identifier: 'E1742')
+      allow(SignUpTopic).to receive(:find).with(assignment_id: '40').and_return(topic)
+      params = {assignment_id: 40}
+      post :delete_all_topics_for_assignment, params
+      topics_exist = SignUpTopic.where(assignment_id: 40).count
+      expect(topics_exist).to be_eql 0
+      expect(flash[:success]).to eq('All topics have been deleted successfully.')
+      expect(response).to redirect_to('/assignments/40/edit')
+    end
+
+  
   end
 
   describe '#edit' do

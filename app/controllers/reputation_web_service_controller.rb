@@ -183,8 +183,8 @@ class ReputationWebServiceController < ApplicationController
 
   def rsa_private_key2(cipertext)
     private_key_file = 'private2.pem'
-    password = "ZXhwZXJ0aXph\n"
     encrypted_string = cipertext
+    password = KeyMapping.find_by(name:'rsa_key').value
     private_key = OpenSSL::PKey::RSA.new(File.read(private_key_file), Base64.decode64(password))
     string = private_key.private_decrypt(Base64.decode64(encrypted_string))
     string

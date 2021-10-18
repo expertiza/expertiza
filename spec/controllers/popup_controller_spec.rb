@@ -17,7 +17,10 @@ describe PopupController do
   mocked_comments_one = OpenStruct.new(comments: "test comment")
 
   describe '#action_allowed?' do
-    ## INSERT CONTEXT/DESCRIPTION/CODE HERE
+    context 'when user is valid' do
+      it 'user is Super Admin' do
+      end
+    end
   end
 
   describe '#author_feedback_popup' do

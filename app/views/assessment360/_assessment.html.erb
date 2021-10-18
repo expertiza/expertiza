@@ -29,6 +29,7 @@
 </script>
 
 <div>
+  <%# This section renders the checkboxes and passes values to controller as different variables %>
   <%= form_tag({:action => 'all_students_all_reviews'},{:method => :get}) %>
   <p>Which review do you want to see?</p>
   <div style="display: inline-flex;">
@@ -42,6 +43,12 @@
 </div>
 
 <table class="table table-striped sortable">
+    <%# Format of table %>
+    <%#                          |                   Assignment1         |     Assignment2     |     Assignment3   |  Final Grades     |     Aggregate Score          %>
+    <%# Students  Teammate Count |Meta Teammate Topic Peer Instructor    |                     |                   | Total Inst Grade  | Metareview | Teammate Review %>
+    <%#  s1                      |                                       |                     |                   |                   |            |                 %>
+    <%#  s2                      |                                       |                     |                   |                   |            |                 %>
+    <%# Class Average            |  x%    y%          N/A  N/A    N/A    |                     |                   |       N/A         |     x'%    |      y'%        %>
     <thead>
         <tr>
           <th rowspan=2 width="320" class="sorter-true">Students</th>

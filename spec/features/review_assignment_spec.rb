@@ -113,9 +113,10 @@ describe "peer review testing" do
     click_link "Others' work"
     find(:css, "#i_dont_care").set(true)
     click_button "Request a new submission to review"
-    within_frame('student_review list') do
-      color = find('body').native.css_value('background-color')
-      expect(color).to eq('rgba(255, 0, 0, 1)')
-    end
+    #within_frame('wrapper') do
+    #  color = find('body').native.css_value('background-color')
+    #  expect(color).to eq('rgba(255, 0, 0, 1)')
+    #end
+    expect(browser.td(class: "ReviewItem").style('background-color')).to eq('rgba(255, 0, 0, 1)')
   end
 end

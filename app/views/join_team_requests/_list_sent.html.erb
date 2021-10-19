@@ -1,6 +1,6 @@
 <% participant = Participant.where(user_id: session[:user].id, parent_id:  assignment_id).first
    requests=JoinTeamRequest.where(participant_id: participant.id) %>
-<% unless requests.empty? %>
+<% if !requests.empty? %>
 
 <h2>Sent Requests </h2>
 <table style="width:80%" align="center" >
@@ -15,14 +15,14 @@
 
     <tr>
       <td>
-        <% unless Team.exists?(request.team_id)  %>
+        <% if Team.exists?(request.team_id)==false  %>
           <font color="#FF0000">  This team no longer exists. </font>
         <% else %>
           <%= Team.find(request.team_id).name %>
         <% end %>
       </td>
       <td>
-        <%= request.comments[2..-3] unless request.comments.nil? %>
+        <%= request.comments %>
       </td>
       <td>
         <% if request.status == 'P' %>

@@ -5,8 +5,6 @@ describe ParticipantsController do
   let(:participant) { build(:participant) }
   let(:assignment_node) { build(:assignment_node) }
   let(:assignment) { build(:assignment) }
-  let(:team) { build(:team) }
-  let(:participant) { build(:participant)}
   describe '#action_allowed?' do
     context 'when current user is student' do
       it 'allows update_duties action' do
@@ -47,13 +45,13 @@ describe ParticipantsController do
     end
   end
 
-  describe '#delete' do
+  describe '#delete_assignment_participant' do
     it 'deletes the assignment_participant and redirects to #review_mapping/list_mappings page' do
       allow(Participant).to receive(:find).with('1').and_return(participant)
       allow(participant).to receive(:destroy).and_return(true)
       params = {id: 1}
       session = {user: instructor}
-      get :delete, params, session
+      get :delete_assignment_participant, params, session
       expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
     end
   end
@@ -78,33 +76,6 @@ describe ParticipantsController do
     end
   end
 
-  describe '#validate_authorizations' do
-  #Test case for successful update of participant to reviewer, expects the success flash message after role is updated.
-  it 'updates the authorizations for the participant to make them reviewer' do
-    allow(Participant).to receive(:find).with('1').and_return(participant)
-    params = {authorization: 'reviewer', id: 1}
-    session = {user: instructor}
-    get :update_authorizations, params, session
-    expect(flash[:success]).to eq 'The role of the selected participants has been successfully updated.'
-    expect(participant.can_review).to eq(true)
-    expect(participant.can_submit).to eq(false)
-    expect(participant.can_take_quiz).to eq(false)
-  end
-
-  #Test for case where we expect to encounter an error in update_attributes method
-  it ' throws an exception while validating authorizations' do
-    allow(Participant).to receive(:find).with('1').and_return(participant)
-    allow(participant).to receive(:update_attributes).and_raise(StandardError)
-    params = {authorization: 'reviewer', id: 1}
-    session = {user: instructor}
-    get :update_authorizations, params, session
-    expect(flash[:error]).to eq 'The update action failed.'
-  end
-
-  end
-
-
-
   describe '#list' do
     it 'lists the participants' do
       allow(AssignmentNode).to receive(:find_by).with(node_object_id: '1').and_return(assignment_node)
@@ -115,7 +86,6 @@ describe ParticipantsController do
       expect(controller.instance_variable_get(:@participants)).to be_empty
     end
   end
-
 
   describe '#add' do
     it 'adds a participant' do
@@ -155,18 +125,6 @@ describe ParticipantsController do
       get :bequeath_all, params, session
       expect(flash[:note]).to eq 'All assignment participants are already part of the course'
       expect(response).to redirect_to('/participants/list?model=Assignment')
-    end
-  end
-
-  describe '#get_user_info' do
-    it 'gives the user information from the the team user' do
-      allow(assignment).to receive(:participants).and_return([participant])
-      allow(participant).to receive(:permission_granted?).and_return(true)
-      allow(participant).to receive(:user).and_return(student)
-      allow(student).to receive(:name).and_return('name')
-      allow(student).to receive(:fullname).and_return('fullname')
-      pc = ParticipantsController.new
-      expect(pc.send(:get_user_info, student, assignment)).to eq({:name=>'name', :fullname=>'fullname', :pub_rights=>'Granted', :verified=>false})
     end
   end
 end

@@ -18,7 +18,7 @@
     <option value='Hour' >Hour</option>
     <option value='Day' >Day</option>
     </select-->
-    <% @units= %w[Minute Hour Day]%>
+    <% @units=["Minute","Hour","Day"]%>
     <%= f.select "penalty_unit", @units %>
   </p>
   <p>
@@ -31,4 +31,4 @@
 
 <br>
 <br>
-<%= link_to 'Back', :action => 'index' %>
+<%= link_to 'Back', 'javascript:history.back()' %>

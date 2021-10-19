@@ -9,6 +9,7 @@ class DataMigrations
     end
 
     files.each do |file|
+      puts "Running #{file}"
       file[/\w+.rb/][/\w+/].camelize.constantize.run!
     end
   end

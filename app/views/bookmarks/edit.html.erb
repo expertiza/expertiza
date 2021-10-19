@@ -1,23 +1,16 @@
 <h1>Editing bookmark</h1>
 
 <%= form_for @bookmark, :action => 'update' do |f| %>
-  <!-- :required attribute checks to see if title, url, and description are all present -->
   <p>
     <%= label_tag 'Title' %><br/>
-    <%= f.text_field :title, :required => true %><br/><br/>
+    <%= f.text_field :title %><br/><br/>
     <%= label_tag 'Url' %><br/>
-    <%= f.text_field :url, :required => true %><br/><br/>
+    <%= f.text_field :url %><br/><br/>
     <%= label_tag 'Description' %><br/>
-    <%= f.text_area :description, :required => true %><br/>
+    <%= f.text_area :description %><br/>
   </p>
   <p>
     <%= f.submit 'Update' %> |
-    <%= link_to 'Back', '#', :onclick => 'pageBack()' %>
+	<%= link_to 'Back', :action => 'list', :id => @bookmark.topic_id %>
   </p>
 <% end %>
-
-<script>
-    function pageBack() {
-        history.back()
-    }
-</script>

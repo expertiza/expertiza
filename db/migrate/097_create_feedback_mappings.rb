@@ -27,11 +27,11 @@ class CreateFeedbackMappings < ActiveRecord::Migration
        review = ActiveRecord::Base.connection.select_one("select * from `reviews` where id = #{feedback["review_id"]}")
        reviewmap = ActiveRecord::Base.connection.select_one("select * from `review_mappings` where id = #{review["review_mapping_id"]}")
        
-       unless reviewmap.nil?
+       if reviewmap != nil
          reviewer = get_reviewer(reviewmap, feedback)
          reviewee = AssignmentParticipant.where(['user_id = ? and parent_id = ?',reviewmap["reviewer_id"], feedback["assignment_id"]]).first
        end       
-       unless reviewer.nil? || reviewee.nil?
+       if reviewer != nil and reviewee != nil 
          execute "INSERT INTO `feedback_mappings (`reviewer_id`, `reviewee_id`, `reviewed_object_id`) VALUES
             (#{reviewer.id}, #{reviewee.id}, #{review["id"]});" 
          map = ActiveRecord::Base.connection.select_one("select * from `feedback_mappings` where id = (select max(id) from `feedback_mappings`)")

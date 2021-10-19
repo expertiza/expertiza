@@ -119,6 +119,9 @@ class CreateResponseMaps < ActiveRecord::Migration
     today = Time.now             
     oldest_allowed_time = Time.local(today.year - 1,today.month,today.day,0,0,0)    
        review = ActiveRecord::Base.connection.select_all("select * from #{review_type} where mapping_id = #{map['id']}")
+       if review[0] == nil and (assignment.created_at.nil? or assignment.created_at < oldest_allowed_time)
+         puts "IGNORE: #{map['type']} #{map['id']} is at least a year old and has no review associated with it."         
+       else       
         rmap = Object.const_get(map_type).create(
                   :reviewed_object_id => map['reviewed_object_id'].to_i,
                   :reviewer_id => map['reviewer_id'].to_i,
@@ -147,9 +150,9 @@ class CreateResponseMaps < ActiveRecord::Migration
           score_found = true
           score.update_attribute('response_id',response.id)
         end
-      }
-      unless score_found
-        response.destroy
+      }      
+      if !score_found
+        response.destroy        
       end
       return response
   end

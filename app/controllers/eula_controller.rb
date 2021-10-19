@@ -1,8 +1,10 @@
 class EulaController < ApplicationController
-  include AuthorizationHelper
-
   def action_allowed?
-    current_user_has_student_privileges?
+    ['Super-Administrator',
+     'Administrator',
+     'Instructor',
+     'Teaching Assistant',
+     'Student'].include? current_role_name
   end
 
   def display; end

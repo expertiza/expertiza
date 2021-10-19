@@ -5,8 +5,6 @@ class User < ActiveRecord::Base
     Authlogic::CryptoProviders::Sha1.join_token = ''
     Authlogic::CryptoProviders::Sha1.stretches = 1
   end
-  #Added for E1973. A user can hold a lock on a resource
-  has_many :locks, class_name: 'Lock', foreign_key: 'user_id', dependent: :destroy, inverse_of: false
   has_many :participants, class_name: 'Participant', foreign_key: 'user_id', dependent: :destroy
   has_many :assignment_participants, class_name: 'AssignmentParticipant', foreign_key: 'user_id', dependent: :destroy
   has_many :assignments, through: :participants
@@ -98,15 +96,6 @@ class User < ActiveRecord::Base
     false
   end
 
-  # E1991 : This function returns original name of the user 
-  # from their anonymized names. The process of obtaining
-  # real name is exactly opposite of what we'd do to get
-  # anonymized name from their real name.
-  def self.real_user_from_anonymized_name(anonymized_name)
-    user = User.find_by(name: anonymized_name)
-    return user
-  end
-
   def name(ip_address = nil)
     User.anonymized_view?(ip_address) ? self.role.name + ' ' + self.id.to_s : self[:name]
   end
@@ -137,8 +126,7 @@ class User < ActiveRecord::Base
 
   # Function which has a MailerHelper which sends the mail welcome email to the user after signing up
   def email_welcome
-    #this will send an account creation notification to user via email.
-    MailerHelper.send_mail_to_user(self, "Your Expertiza account and password has been created", "user_welcome", password).deliver_now
+    MailerHelper.send_mail_to_user(self, "Your Expertiza password has been created", "user_welcome", password)
   end
 
   def valid_password?(password)
@@ -159,6 +147,8 @@ class User < ActiveRecord::Base
     if user.nil?
       attributes = ImportFileHelper.define_attributes(row_hash)
       user = ImportFileHelper.create_new_user(attributes, session)
+      password = user.reset_password
+      MailerHelper.send_mail_to_user(user, "Your Expertiza account has been created.", "user_welcome", password).deliver
     else
       user.email = row_hash[:email]
       user.fullname = row_hash[:fullname]
@@ -225,8 +215,8 @@ class User < ActiveRecord::Base
     # when replacing an existing key, update any digital signatures made previously with the new key
     if replacing_key
       participants = AssignmentParticipant.where(user_id: self.id)
-      participants.each do |participant|
-        participant.assign_copyright(new_key.to_pem) if participant.permission_granted
+      for participant in participants
+        AssignmentParticipant.grant_publishing_rights(new_key.to_pem, [participant]) if participant.permission_granted
       end
     end
 
@@ -241,7 +231,6 @@ class User < ActiveRecord::Base
     @email_on_submission = true
     @email_on_review_of_review = true
     @copy_of_emails = false
-    @preference_home_flag = true
   end
 
   def self.export(csv, _parent_id, options)
@@ -253,7 +242,6 @@ class User < ActiveRecord::Base
       tcsv.push(user.parent.name) if options["parent"] == "true"
       tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails) if options["email_options"] == "true"
       tcsv.push(user.handle) if options["handle"] == "true"
-      tcsv.push(user.preference_home_flag) if options["preference_home_flag"] == "true"
       csv << tcsv
     end
   end
@@ -297,7 +285,7 @@ class User < ActiveRecord::Base
   end
 
   def teaching_assistant?
-    true if self.role.ta?
+    return true if self.role.ta?
   end
 
   def self.search_users(role, user_id, letter, search_by)

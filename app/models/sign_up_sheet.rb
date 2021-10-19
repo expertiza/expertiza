@@ -36,8 +36,8 @@ class SignUpSheet < ActiveRecord::Base
       end
     else
       # If all the topics choosen by the user are waitlisted,
-      user_signup.each do | user_signup_topic |
-        return false unless user_signup_topic.is_waitlisted
+      for user_signup_topic in user_signup
+        return false if user_signup_topic.is_waitlisted == false
       end
 
       # Using a DB transaction to ensure atomic inserts
@@ -51,7 +51,7 @@ class SignUpSheet < ActiveRecord::Base
   end
 
   def self.sign_up_wailisted(assignment_id, sign_up, team_id, topic_id, user_id)
-    unless slotAvailable?(topic_id)
+    if !slotAvailable?(topic_id)
       sign_up.is_waitlisted = true
       result = true if sign_up.save
       ExpertizaLogger.info LoggerMessage.new('SignUpSheet', '', "Sign up sheet created for waitlisted with teamId #{team_id}")
@@ -125,7 +125,7 @@ class SignUpSheet < ActiveRecord::Base
                 .select('teams.*')
                 .where('teams.advertise_for_partner = 1 and signed_up_teams.topic_id = ?', topic_id).to_a
     teams.reject!(&:full?)
-    teams.any?
+    !teams.empty?
   end
 
   class << self

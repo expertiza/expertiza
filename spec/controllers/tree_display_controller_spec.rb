@@ -1,11 +1,11 @@
 describe TreeDisplayController do
   # Airbrake-1517247902792549741
   describe "#list" do
-    it "should not redirect if current user is an instructor" do
+    it "should not redirect to tree_display#list if current user is an instructor" do
       user = build(:instructor)
       stub_current_user(user, user.role.name, user.role)
       get "list"
-      expect(response).to have_http_status(200)
+      expect(response).not_to redirect_to('/tree_display/list')
     end
 
     it "should redirect to student_task#list if current user is a student" do
@@ -15,16 +15,40 @@ describe TreeDisplayController do
       expect(response).to redirect_to('/student_task/list')
     end
 
-    it "should not redirect if current user is a TA" do
-      user = build(:teaching_assistant)
-      stub_current_user(user, user.role.name, user.role)
-      get "list"
-      expect(response).to have_http_status(200)
-    end
-
     it "should redirect to login page if current user is nil" do
       get "list"
       expect(response).to redirect_to('/auth/failure')
+    end
+  end
+
+  describe "#confirm_notifications_access" do
+    it "should verify usertype" do
+      user = build(:student)
+      stub_current_user(user, user.role.name, user.role)
+      get "confirm_notifications_access"
+      expect(response).to redirect_to('/notifications/list')
+    end
+  end
+
+  describe "#ta_for_current_mappings?" do
+    it "should return true if current user is a TA for current course" do
+      allow(session[:user]).to receive("ta?").and_return(true)
+    end
+  end
+
+  describe "#populate_rows" do
+    let(:dbl) { double }
+    before { expect(dbl).to receive(:populate_rows).with(Hash, String) }
+    it "passes when the arguments match" do
+      dbl.populate_rows({}, "")
+    end
+  end
+
+  describe "#populate_1_row" do
+    let(:dbl) { double }
+    before { expect(dbl).to receive(:populate_1_row).with(Node) }
+    it "passes when the arguments match" do
+      dbl.populate_1_row(Node.new)
     end
   end
 
@@ -36,8 +60,33 @@ describe TreeDisplayController do
     end
   end
 
-  it { is_expected.to respond_to(:get_folder_contents) }
-  it { is_expected.to respond_to(:get_sub_folder_contents) }
+  describe "GET #folder_node_ng_getter" do
+    before(:each) do
+      @treefolder = TreeFolder.new
+      @treefolder.parent_id = nil
+      @treefolder.name = "Courses"
+      @treefolder.child_type = "CourseNode"
+      @treefolder.save
+      @foldernode = FolderNode.new
+      @foldernode.parent_id = nil
+      @foldernode.type = "FolderNode"
+    end
+    it "populates a list of FolderNodes when there is a match" do
+      @foldernode.node_object_id = 1
+      @foldernode.save
+      get :folder_node_ng_getter
+      expect(response.body).to match [@foldernode].to_json
+    end
+    it "populates an empty list when there is no match" do
+      @foldernode.node_object_id = 2
+      @foldernode.save
+      get :folder_node_ng_getter
+      expect(response.body).to eq "[]"
+    end
+  end
+  it { is_expected.to respond_to(:folder_node_ng_getter) }
+  it { is_expected.to respond_to(:children_node_ng) }
+  it { is_expected.to respond_to(:children_node_2_ng) }
 
   describe "GET #session_last_open_tab" do
     it "returns HTTP status 200" do
@@ -46,14 +95,7 @@ describe TreeDisplayController do
     end
   end
 
-  describe "GET #set_session_last_open_tab" do
-    it "returns HTTP status 200" do
-      get :set_session_last_open_tab
-      expect(response).to have_http_status(200)
-      end
-  end
-
-  describe "GET #get_folder_contents" do
+  describe "POST #children_node_ng" do
     before(:each) do
       @treefolder = TreeFolder.new
       @treefolder.parent_id = nil
@@ -65,24 +107,15 @@ describe TreeDisplayController do
       @foldernode.type = "FolderNode"
       @foldernode.node_object_id = 1
       @foldernode.save
-      @instructor = create(:instructor)
-      stub_current_user(@instructor, @instructor.role.name, @instructor.role)
-      # Course will be associated with the first instructor record we have
-      # For robustness, associate explicitly with our instructor
-      @course = create(:course, instructor_id: @instructor.id)
-      # Course node will be associated with the first course record we have
-      # For robustness, associate explicitly with our course
-      create(:course_node, course: @course)
-      # Assignment node will be associated with the first assignment record we have
-      # (or will cause a new assignment to be built)
+      @course = create(:course)
       create(:assignment_node)
+      create(:course_node)
+      @instructor = User.where(role_id: 1).first
     end
 
     it "returns a list of course objects(private) as json" do
       params = FolderNode.all
-      @course.private = true
-      @course.save
-      get :get_folder_contents, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @instructor
+      post :children_node_ng, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @instructor
       expect(response.body).to match /csc517\/test/
     end
 
@@ -90,7 +123,7 @@ describe TreeDisplayController do
       params = FolderNode.all
       Assignment.delete(1)
       Course.delete(1)
-      get :get_folder_contents, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @instructor
+      post :children_node_ng, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @instructor
       expect(response.body).to eq "{\"Courses\":[]}"
     end
 
@@ -98,12 +131,12 @@ describe TreeDisplayController do
       params = FolderNode.all
       @course.private = false
       @course.save
-      get :get_folder_contents, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @instructor
+      post :children_node_ng, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @instructor
       expect(response.body).to match /csc517\/test/
     end
   end
 
-  describe "GET #get_folder_contents for TA" do
+  describe "POST #children_node_ng for TA" do
     before(:each) do
       @treefolder = TreeFolder.new
       @treefolder.parent_id = nil
@@ -154,11 +187,11 @@ describe TreeDisplayController do
       # create ta-course mapping for the student
       ta_mapping = TaMapping.new
       ta_mapping.ta_id = User.where(role_id: student.role_id).first.id
-      ta_mapping.course_id = @course1.id
+      ta_mapping.course_id = Course.find(@course1.id).id
       ta_mapping.save!
 
       params = FolderNode.all
-      get :get_folder_contents, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: student
+      post :children_node_ng, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: student
 
       # service should not return anything as the user is student
       output = JSON.parse(response.body)['Courses']
@@ -169,14 +202,14 @@ describe TreeDisplayController do
       # create ta-course mapping
       ta_mapping = TaMapping.new
       ta_mapping.ta_id = User.where(role_id: @ta.role_id).first.id
-      ta_mapping.course_id = @course1.id
+      ta_mapping.course_id = Course.find(@course1.id).id
       ta_mapping.save!
 
       # make sure it's the current user
       stub_current_user(@ta, @role.name, @role)
 
       params = FolderNode.all
-      get :get_folder_contents, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @ta
+      post :children_node_ng, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @ta
 
       # service should return the course as per the ta-course mapping
       output = JSON.parse(response.body)['Courses']
@@ -191,7 +224,7 @@ describe TreeDisplayController do
       # make sure it's the current user
       stub_current_user(@ta, @role.name, @role)
 
-      get :get_folder_contents, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @ta
+      post :children_node_ng, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @ta
 
       # service should not return anything as there is no mapping
       output = JSON.parse(response.body)['Courses']
@@ -222,13 +255,13 @@ describe TreeDisplayController do
       # create a ta mapping for the other existing course (other than in which he is ta of)
       ta_mapping = TaMapping.new
       ta_mapping.ta_id = User.where(role_id: @ta.role_id).first.id
-      ta_mapping.course_id = @course1.id
+      ta_mapping.course_id = Course.find(@course1.id).id
       ta_mapping.save!
 
       # make sure it's the current user
       stub_current_user(@ta, @role.name, @role)
 
-      get :get_folder_contents, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @ta
+      post :children_node_ng, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @ta
 
       output = JSON.parse(response.body)['Courses']
       # service should return 1 course and should be course 1 not course 2
@@ -255,13 +288,13 @@ describe TreeDisplayController do
       # create a ta mapping for the same course he is ta of
       ta_mapping = TaMapping.new
       ta_mapping.ta_id = User.where(role_id: @ta.role_id).first.id
-      ta_mapping.course_id = @course1.id
+      ta_mapping.course_id = Course.find(@course1.id).id
       ta_mapping.save!
 
       # make sure it's the current user
       stub_current_user(@ta, @role.name, @role)
 
-      get :get_folder_contents, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @ta
+      post :children_node_ng, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @ta
 
       # service should return 1 course
       output = JSON.parse(response.body)['Courses']
@@ -291,7 +324,7 @@ describe TreeDisplayController do
       # make sure it's the current user
       stub_current_user(@ta, @role.name, @role)
 
-      get :get_folder_contents, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @ta
+      post :children_node_ng, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @ta
 
       # service should return 2 assignments as those are mapped
       # the sequence of assignments could be random so just checking for array size
@@ -299,7 +332,7 @@ describe TreeDisplayController do
       expect(output.length).to eq 2
 
       new_params = Node.find_by!(node_object_id: @course1.id)
-      get :get_folder_contents, {reactParams2: {child_nodes: new_params.to_json, nodeType: "CourseNode"}}, user: @ta
+      post :children_node_2_ng, {reactParams2: {child_nodes: new_params.to_json, nodeType: "CourseNode"}}, user: @ta
       output = JSON.parse(response.body)
       expect(output.length).to eq 2
     end
@@ -319,7 +352,7 @@ describe TreeDisplayController do
       # make sure it's the current user
       stub_current_user(@ta, @role.name, @role)
 
-      get :get_folder_contents, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @ta
+      post :children_node_ng, {reactParams: {child_nodes: params.to_json, nodeType: "FolderNode"}}, user: @ta
 
       # service should not return anything as there is no mapping
       output = JSON.parse(response.body)['Assignments']

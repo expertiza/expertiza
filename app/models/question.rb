@@ -1,5 +1,6 @@
 class Question < ActiveRecord::Base
   belongs_to :questionnaire # each question belongs to a specific questionnaire
+  belongs_to :review_score  # each review_score pertains to a particular question
   belongs_to :review_of_review_score # ditto
   has_many :question_advices, dependent: :destroy # for each question, there is separate advice about each possible score
   has_many :signup_choices # ?? this may reference signup type questionnaires
@@ -95,7 +96,6 @@ class Question < ActiveRecord::Base
     end
     # questionnaire = Questionnaire.find_by_id(_id)
     questionnaire = Questionnaire.find_by(id: q_id)
-    raise ArgumentError, "Questionnaire Not Found" if questionnaire.nil?
     questions = questionnaire.questions
     qid = 0
     questions.each do |q|
@@ -104,6 +104,7 @@ class Question < ActiveRecord::Base
         break
       end
     end
+    raise ArgumentError, "Questionnaire Not Found" if questionnaire.nil?
 
     if qid > 0
       # question = Question.find_by_id(qid)

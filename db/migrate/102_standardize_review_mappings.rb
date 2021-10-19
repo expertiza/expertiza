@@ -125,10 +125,12 @@ class StandardizeReviewMappings < ActiveRecord::Migration
   end
   
   def self.delete(mapping, reason)
+    puts reason
     begin
       execute "delete from `review_mappings` where id = #{mapping["id"]}"
       mapping.delete(true)
     rescue
+      puts $!
     end
   end
   
@@ -148,6 +150,7 @@ class StandardizeReviewMappings < ActiveRecord::Migration
        begin
         reviewee = AssignmentTeam.find(mapping["team_id"])
        rescue
+        puts "   "+$!
        end
     elsif mapping["author_id"] != nil
        participant = make_participant(mapping["author_id"],mapping["reviewed_object_id"])
@@ -159,7 +162,7 @@ class StandardizeReviewMappings < ActiveRecord::Migration
     if reviewee.nil?
        reviewee = create_team(mapping)
     end    
-    reviewee
+    return reviewee
   end  
   
   # create a participant based on a user and assignment
@@ -172,7 +175,7 @@ class StandardizeReviewMappings < ActiveRecord::Migration
         
         if participant.nil?       
           participant = AssignmentParticipant.create(:user_id => user_id, :parent_id => assignment_id)
-          participant.set_handle
+          participant.set_handle()      
         end
       end     
     end
@@ -193,7 +196,7 @@ class StandardizeReviewMappings < ActiveRecord::Migration
      end
      
      # if the user was found, create a team based on the user
-     unless user.nil?
+     if user != nil
          team = AssignmentTeam.create(:name => 'Team'+mapping["author_id"].to_s, :parent_id => mapping["reviewed_object_id"])
          TeamsUser.create(:team_id => team.id, :user_id => mapping["author_id"])         
      end    

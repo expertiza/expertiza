@@ -1,12 +1,18 @@
 class ParticipantsController < ApplicationController
-  include AuthorizationHelper
   autocomplete :user, :name
 
   def action_allowed?
     if %w[change_handle update_duties].include? params[:action]
-      current_user_has_student_privileges?
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator',
+       'Student'].include? current_role_name
     else
-      current_user_has_ta_privileges?
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator'].include? current_role_name
     end
   end
 
@@ -50,7 +56,6 @@ class ParticipantsController < ApplicationController
     # E1721 changes End.
   end
 
-  #when you change the duties, changes the permissions based on the new duty you go to
   def update_authorizations
     permissions = Participant.get_permissions(params[:authorization])
     can_submit = permissions[:can_submit]
@@ -58,18 +63,11 @@ class ParticipantsController < ApplicationController
     can_take_quiz = permissions[:can_take_quiz]
     participant = Participant.find(params[:id])
     parent_id = participant.parent_id
-    # Upon successfully updating the attributes based on user role, a flash message is displayed to the user after the
-    # change in the database. This also gives the user the error message if the update fails.
-    begin
-      participant.update_attributes(can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz)
-      flash[:success] = "The role of the selected participants has been successfully updated."
-    rescue StandardError
-      flash[:error] = 'The update action failed.'
-    end
+    participant.update_attributes(can_submit: can_submit, can_review: can_review, can_take_quiz: can_take_quiz)
     redirect_to action: 'list', id: parent_id, model: participant.class.to_s.gsub("Participant", "")
   end
 
-  # Example of duties: manager, designer, programmer, tester
+  # duties: manager, designer, programmer, tester
   def update_duties
     participant = Participant.find(params[:student_id])
     participant.update_attributes(duty: params[:duty])
@@ -83,7 +81,7 @@ class ParticipantsController < ApplicationController
       participant.destroy
       flash[:note] = undo_link("The user \"#{participant.user.name}\" has been successfully removed as a participant.")
     rescue StandardError
-      flash[:error] = 'This participant is on a team, or is assigned as a reviewer for someone’s work.'
+      flash[:error] = 'The delete action failed: At least one review mapping or team membership exist for this participant.'
     end
     redirect_to action: 'list', id: parent_id, model: participant.class.to_s.gsub("Participant", "")
   end
@@ -115,14 +113,13 @@ class ParticipantsController < ApplicationController
     redirect_to controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment'
   end
 
-  # Take all participants from an assignment and "bequeath" them to course as course_participants.
   def bequeath_all
     @copied_participants = []
     assignment = Assignment.find(params[:id])
     if assignment.course
       course = assignment.course
       assignment.participants.each do |participant|
-        new_participant = participant.copy_to_course(course.id)
+        new_participant = participant.copy(course.id)
         @copied_participants.push new_participant if new_participant
       end
       # only display undo link if copies of participants are created
@@ -156,8 +153,7 @@ class ParticipantsController < ApplicationController
     end
   end
 
-  # Deletes participants from an assignment
-  def delete
+  def delete_assignment_participant
     contributor = AssignmentParticipant.find(params[:id])
     name = contributor.name
     assignment_id = contributor.assignment
@@ -170,9 +166,9 @@ class ParticipantsController < ApplicationController
     redirect_to controller: 'review_mapping', action: 'list_mappings', id: assignment_id
   end
 
-  # A ‘copyright grant’ means the author has given permission to the instructor to use the work outside the course.  
-  # This is incompletely implemented, but the values in the last column in http://expertiza.ncsu.edu/student_task/list are sourced from here.
-  def view_copyright_grants
+  # Seems like this function is similar to the above function> we are not quite sure what publishing rights mean. Seems like
+  # the values for the last column in http://expertiza.ncsu.edu/student_task/list are sourced from here
+  def view_publishing_rights
     assignment_id = params[:id]
     assignment = Assignment.find(assignment_id)
     @assignment_name = assignment.name
@@ -181,7 +177,7 @@ class ParticipantsController < ApplicationController
     teams = Team.where(parent_id: assignment_id)
     teams.each do |team|
       team_info = {}
-      team_info[:name] = team.name(session[:ip])
+      team_info[:name] = team.name
       users = []
       team.users {|team_user| users.append(get_user_info(team_user, assignment)) }
       team_info[:users] = users
@@ -206,14 +202,15 @@ class ParticipantsController < ApplicationController
     user = {}
     user[:name] = team_user.name
     user[:fullname] = team_user.fullname
-    #set by default
     permission_granted = false
+    has_signature = false
+    signature_valid = false
     assignment.participants.each do |participant|
       permission_granted = participant.permission_granted? if team_user.id == participant.user.id
     end
     # If permission is granted, set the publisting rights string
     user[:pub_rights] = permission_granted ? "Granted" : "Denied"
-    user[:verified] = false
+    user[:verified] = permission_granted && has_signature && signature_valid
     user
   end
 

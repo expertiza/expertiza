@@ -11,7 +11,7 @@ class MenuUpdateTeamList < ActiveRecord::Migration
 
   def self.down
     item = Menu.find_by_label('Add teams to assignment')
-    unless item.nil?
+    if item != nil
       item.name = 'Create team'
       item.label = 'Create team'
     end

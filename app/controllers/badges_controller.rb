@@ -1,10 +1,11 @@
 # added the badges controller as part of E1822
 # added a create method for badge creation functionality
 class BadgesController < ApplicationController
-  include AuthorizationHelper
-
   def action_allowed?
-    current_user_has_ta_privileges?
+    ['Instructor',
+     'Teaching Assistant',
+     'Administrator',
+     'Super-Administrator'].include? current_role_name
   end
 
   def new

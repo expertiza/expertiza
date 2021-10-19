@@ -1,8 +1,9 @@
 class ImportFileController < ApplicationController
-  include AuthorizationHelper
-
   def action_allowed?
-    current_user_has_ta_privileges?
+    ['Instructor',
+     'Teaching Assistant',
+     'Administrator',
+     'Super-Administrator'].include? current_role_name
   end
 
   def show
@@ -11,32 +12,32 @@ class ImportFileController < ApplicationController
     @options = params[:options]
     @delimiter = get_delimiter(params)
     @has_header = params[:has_header]
-    if @model == 'AssignmentTeam' || @model == 'CourseTeam'
+    if (@model == 'AssignmentTeam'|| @model == 'CourseTeam')
       @has_teamname = params[:has_teamname]
     else
       @has_teamname = "nil"
     end
-    if @model == 'ReviewResponseMap'
+    if (@model == 'ReviewResponseMap')
       @has_reviewee = params[:has_reviewee]
     else
       @has_reviewee = nil
     end
-    if @model == 'MetareviewResponseMap'
+    if (@model == 'MetareviewResponseMap')
       @has_reviewee = params[:has_reviewee]
       @has_reviewer = params[:has_reviewer]
     else
       @has_reviewee = "nil"
       @has_reviewer = "nil"
     end
-    if @model == 'SignUpTopic'
+    if (@model == 'SignUpTopic')
       @optional_count = 0
-      if params[:category] == 'true'
+      if (params[:category] == 'true')
         @optional_count += 1
       end
-      if params[:description] == 'true'
+      if (params[:description] == 'true')
         @optional_count += 1
       end
-      if params[:link] == 'true'
+      if (params[:link] == 'true')
         @optional_count += 1
       end
     else
@@ -44,6 +45,8 @@ class ImportFileController < ApplicationController
     end
     @current_file = params[:file]
     @current_file_contents = @current_file.read
+    # Removing BOM characters from the file - svshingt
+    @current_file_contents.sub!("\xEF\xBB\xBF".force_encoding("ASCII-8BIT"), '')
     @contents_grid = parse_to_grid(@current_file_contents, @delimiter)
     @contents_hash = parse_to_hash(@contents_grid, params[:has_header])
     session[:contents_hash] = @contents_hash
@@ -73,6 +76,18 @@ class ImportFileController < ApplicationController
     end
     redirect_to session[:return_to]
   end
+
+  # def import
+  #   errors = importFile(session, params)
+  #   err_msg = "The following errors were encountered during import.<br/>Other records may have been added. A second submission will not duplicate these records.<br/><ul>"
+  #   errors.each do |error|
+  #     err_msg = err_msg + "<li>" + error.to_s + "<br/>"
+  #   end
+  #   err_msg += "</ul>"
+  #   flash[:error] = err_msg unless errors.empty?
+  #   undo_link("The file has been successfully imported.")
+  #   redirect_to session[:return_to]
+  # end
 
   def import_from_hash(session, params)
     if params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
@@ -203,7 +218,7 @@ class ImportFileController < ApplicationController
     elsif params[:model] == "AssignmentTeam" or params[:model] == "CourseTeam"
       header.map! { |column_name| column_name.to_sym }
       body.each do |row|
-        h = { }
+        h = Hash.new()
         if params[:has_teamname] == "true_first"
           h[header[0]] = row.shift
           h[header[1]] = row
@@ -218,7 +233,7 @@ class ImportFileController < ApplicationController
     elsif params[:model] == "ReviewResponseMap"
       header.map! { |column_name| column_name.to_sym }
       body.each do |row|
-        h = {}
+        h = Hash.new()
         if params[:has_reviewee] == "true_first"
           h[header[0]] = row.shift
           h[header[1]] = row
@@ -233,7 +248,7 @@ class ImportFileController < ApplicationController
     elsif params[:model] == "MetareviewResponseMap"
       header.map! { |column_name| column_name.to_sym }
       body.each do |row|
-        h = {}
+        h = Hash.new()
         if params[:has_reviewee] == "true_first"
           h[header[0]] = row.shift
           h[header[1]] = row.shift

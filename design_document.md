@@ -6,7 +6,10 @@ This document provides the common design features to be followed while developin
 
 Icons are available in 4 sizes : 16, 24, 32, 48. It is possibility that we might not have all sizes for all icons. Edit the number as per size chose, everything else will remain same.
 
-**Sr. No.** | **Element Name** | **Image** | **Guide**	
+**Sr. No.**
+**Element Name**
+**Image**
+**Guide**	
 |---|---|---|---|
 |  1 |  Add assignment | ![Add Assignment](app/assets/images/tree_view/image4.png)  | To add 'add assignment' icon, use path **```/assets/tree_view/add-assignment-24.png```** |
 |  2 |  Add Teaching assistant | ![Add TA](app/assets/images/tree_view/add-ta-24.png)  | To add 'add TA' icon, use path **```/assets/tree_view/add-ta-24.png```** |
@@ -37,7 +40,11 @@ Icons are available in 4 sizes : 16, 24, 32, 48. It is possibility that we might
 
 ## Buttons : 
 
-**Sr. No.** | **Element Name** | **Image** | **Guide** | **Class**	
+**Sr. No.**
+**Element Name**
+**Image**
+**Guide**
+**Class**	
 |---|---|---|---|---|
 |  1 |  Button - Default style | *to be added*  | Default button | ```btn btn-default btn-md``` |
 |  2 |  Button - Success style | *to be added*  | For accepting. | ```btn btn-success btn-md``` |
@@ -56,7 +63,10 @@ The class to be used in a table tag is ```table table-striped```.
 
 ## Notifications :
 
-**Sr. No.** | **Element Name** | **Image** | **Guide**	
+**Sr. No.**
+**Element Name**
+**Image**
+**Guide**	
 |---|---|---|---|
 |  1 |  Success | *to be added*  | For notification, add class as ```flash_note alert alert-success``` |
 |  2 |  Error | *to be added*  | For notification, add class as ```flash_note alert alert-danger``` |

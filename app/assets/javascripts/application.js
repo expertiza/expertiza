@@ -15,6 +15,7 @@
 //= require components
 //= require jquery
 // //= require bootstrap-sass/assets/javascripts/bootstrap-sprockets
+//= require bootstrap
 //= require jquery_ujs
 //= require jquery-colorbox
 //= require jquery.colorbox

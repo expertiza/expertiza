@@ -1,27 +1,30 @@
 require 'rails_helper'
 describe ReviewMappingController do
   let(:assignment) { double('Assignment', id: 1) }
+  let(:reviewer) {double('Participant', id: 1, name: 'reviewer')}
   let(:review_response_map) do
     double('ReviewResponseMap', id: 1, map_id: 1, assignment: assignment,
-                                reviewer: double('Participant', id: 1, name: 'reviewer'), reviewee: double('Participant', id: 2, name: 'reviewee'))
+                                reviewer: reviewer, reviewee: double('Participant', id: 2, name: 'reviewee'))
   end
   let(:metareview_response_map) do
     double('MetareviewResponseMap', id: 1, map_id: 1, assignment: assignment,
-                                    reviewer: double('Participant', id: 1, name: 'reviewer'), reviewee: double('Participant', id: 2, name: 'reviewee'))
+                                    reviewer: reviewer, reviewee: double('Participant', id: 2, name: 'reviewee'))
   end
   let(:participant) { double('AssignmentParticipant', id: 1, can_review: false, user: double('User', id: 1)) }
   let(:participant1) { double('AssignmentParticipant', id: 2, can_review: true, user: double('User', id: 2)) }
   let(:user) { double('User', id: 3) }
   let(:participant2) { double('AssignmentParticipant', id: 3, can_review: true, user: user) }
-  let(:participant3) { double('Participant', user_id: 1, parent_id: '1', can_review: true) }
   let(:team) { double('AssignmentTeam', name: 'no one') }
   let(:team1) { double('AssignmentTeam', name: 'no one1') }
-  let(:response1) { [double('Response', id: 1, map_id: 1, additional_comment: 'Test Comment')] }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     instructor = build(:instructor)
     stub_current_user(instructor, instructor.role.name, instructor.role)
+    allow(participant).to receive(:get_reviewer).and_return(participant)
+    allow(participant1).to receive(:get_reviewer).and_return(participant1)
+    allow(participant2).to receive(:get_reviewer).and_return(participant2)
+    allow(reviewer).to receive(:get_reviewer).and_return(reviewer)
   end
 
   describe '#add_calibration' do
@@ -56,7 +59,7 @@ describe ReviewMappingController do
     end
   end
 
-  describe '#assign_reviewer_manually and #get_reviewer' do
+  describe '#add_reviewer and #get_reviewer' do
     before(:each) do
       allow(User).to receive_message_chain(:where, :first).with(name: 'expertiza').with(no_args).and_return(double('User', id: 1))
       @params = {
@@ -70,7 +73,7 @@ describe ReviewMappingController do
     context 'when team_user does not exist' do
       it 'shows an error message and redirects to review_mapping#list_mappings page' do
         allow(TeamsUser).to receive(:exists?).with(team_id: '1', user_id: 1).and_return(true)
-        post :assign_reviewer_manually, @params
+        post :add_reviewer, @params
         expect(response).to redirect_to '/review_mapping/list_mappings?id=1'
       end
     end
@@ -82,14 +85,12 @@ describe ReviewMappingController do
         user = double('User', id: 1)
         allow(User).to receive(:from_params).with(any_args).and_return(user)
         allow(AssignmentParticipant).to receive(:where).with(user_id: 1, parent_id: 1)
-                                                       .and_return([double('AssignmentParticipant', id: 1, name: 'no one')])
-        allow(Participant).to receive_message_chain(:where, :first)
-          .with(parent_id: '1', user_id: 1).with(no_args).and_return(participant3)
+                                                       .and_return([reviewer])
         allow(ReviewResponseMap).to receive_message_chain(:where, :first)
           .with(reviewee_id: '1', reviewer_id: 1).with(no_args).and_return(nil)
         allow(ReviewResponseMap).to receive(:create).with(reviewee_id: '1', reviewer_id: 1, reviewed_object_id: 1).and_return(nil)
-        post :assign_reviewer_manually, @params
-        expect(response).to redirect_to '/review_mapping/list_mappings?id=1'
+        post :add_reviewer, @params
+        expect(response).to redirect_to '/review_mapping/list_mappings?id=1&msg='
       end
     end
   end
@@ -120,7 +121,9 @@ describe ReviewMappingController do
         topic = double('SignUpTopic')
         allow(SignUpTopic).to receive(:find).with('1').and_return(topic)
         allow(assignment).to receive(:assign_reviewer_dynamically).with(participant, topic).and_return(true)
-        params = {
+        allow(ReviewResponseMap).to receive(:reviewer_id).with(1).and_return(0)
+	allow(assignment).to receive(:num_reviews_allowed).and_return(1)
+	params = {
           assignment_id: 1,
           reviewer_id: 1,
           topic_id: 1
@@ -133,18 +136,103 @@ describe ReviewMappingController do
     context 'when assignment does not have topics' do
       it 'runs another algorithms and redirects to student_review#list page' do
         allow(assignment).to receive(:topics?).and_return(false)
+        allow(participant).to receive(:set_current_user)
         team1 = double('AssignmentTeam')
         team2 = double('AssignmentTeam')
         teams = [team1, team2]
         allow(assignment).to receive(:candidate_assignment_teams_to_review).with(participant).and_return(teams)
         allow(teams).to receive_message_chain(:to_a, :sample).and_return(team2)
         allow(assignment).to receive(:assign_reviewer_dynamically_no_topic).with(participant, team2).and_return(true)
-        params = {
+        allow(ReviewResponseMap).to receive(:reviewer_id).with(1).and_return(0)
+        allow(assignment).to receive(:num_reviews_allowed).and_return(1)
+	params = {
           assignment_id: 1,
           reviewer_id: 1,
           topic_id: 1
         }
         post :assign_reviewer_dynamically, params
+        expect(response).to redirect_to '/student_review/list?id=1'
+      end
+    end
+
+    context 'when number of reviews are less than the assignment policy' do
+      it 'redirects to student review page' do
+        allow(assignment).to receive(:topics?).and_return(true)
+        topic = double('SignUpTopic')
+        allow(SignUpTopic).to receive(:find).with('1').and_return(topic)
+        allow(ReviewResponseMap).to receive(:where).with(reviewer_id: 1, reviewed_object_id: 1 )
+                                  .and_return([])
+        allow(assignment).to receive(:assign_reviewer_dynamically).with(participant, topic).and_return(true)
+        allow(assignment).to receive(:num_reviews_allowed).and_return(1)
+        params = {
+            assignment_id: 1,
+            reviewer_id: 1,
+            topic_id: 1
+        }
+        post :assign_reviewer_dynamically, params
+        expect(response).to redirect_to '/student_review/list?id=1'
+      end
+    end
+
+    context 'when number of reviews are greater than the assignment policy' do
+      it 'shows a flash error and redirects to student review page' do
+        allow(assignment).to receive(:topics?).and_return(true)
+        topic = double('SignUpTopic')
+        allow(SignUpTopic).to receive(:find).with('1').and_return(topic)
+        allow(ReviewResponseMap).to receive(:where).with(reviewer_id: 1, reviewed_object_id: 1 )
+                                        .and_return([1,2,3])
+        allow(assignment).to receive(:assign_reviewer_dynamically).with(participant, topic).and_return(true)
+        allow(assignment).to receive(:num_reviews_allowed).and_return(1)
+        params = {
+            assignment_id: 1,
+            reviewer_id: 1,
+            topic_id: 1
+        }
+        post :assign_reviewer_dynamically, params
+        expect(response).to redirect_to '/student_review/list?id=1'
+        expect(flash[:error]).to be_present
+      end
+    end
+
+    context 'when user has outstanding reviews less than assignment policy'  do
+      it 'redirects to student review page' do
+        allow(assignment).to receive(:topics?).and_return(true)
+        topic = double('SignUpTopic')
+        allow(SignUpTopic).to receive(:find).with('1').and_return(topic)
+        allow(ReviewResponseMap).to receive(:where).with(reviewer_id: 1, reviewed_object_id: 1 )
+                                        .and_return(:review_response_map)
+        allow(assignment).to receive(:assign_reviewer_dynamically).with(participant, topic).and_return(true)
+        allow(assignment).to receive(:num_reviews_allowed).and_return(1)
+        allow(assignment).to receive(:max_outstanding_reviews).and_return(0)
+
+        params = {
+            assignment_id: 1,
+            reviewer_id: 1,
+            topic_id: 1
+        }
+        post :assign_reviewer_dynamically, params
+        expect(response).to redirect_to '/student_review/list?id=1'
+      end
+    end
+
+    context 'when user has outstanding reviews greater than assignment policy'  do
+      it 'redirects to student review page and shows flash error' do
+        allow(assignment).to receive(:topics?).and_return(true)
+        topic = double('SignUpTopic')
+        allow(SignUpTopic).to receive(:find).with('1').and_return(topic)
+        allow(ReviewResponseMap).to receive(:where).with(reviewer_id: 1, reviewed_object_id: 1 )
+                                        .and_return(:review_response_map)
+        allow(assignment).to receive(:assign_reviewer_dynamically).with(participant, topic).and_return(true)
+        allow(assignment).to receive(:num_reviews_allowed).and_return(1)
+        allow(assignment).to receive(:max_outstanding_reviews).and_return(3)
+
+        params = {
+            assignment_id: 1,
+            reviewer_id: 1,
+            topic_id: 1
+        }
+        post :assign_reviewer_dynamically, params
+        expect(flash[:error]).to be_present
         expect(response).to redirect_to '/student_review/list?id=1'
       end
     end
@@ -228,7 +316,6 @@ describe ReviewMappingController do
     context 'when review response map has corresponding responses' do
       it 'shows a flash error and redirects to review_mapping#list_mappings page' do
         allow(Response).to receive(:exists?).with(map_id: 1).and_return(true)
-        allow(Response).to receive(:where).with(map_id: 1).and_return(response1)
         params = {
           id: 1,
           contributor_id: 1
@@ -347,10 +434,9 @@ describe ReviewMappingController do
     context 'when corresponding response exists to current review response map' do
       it 'shows an error flash message and redirects to previous page' do
         allow(Response).to receive(:exists?).with(map_id: 1).and_return(true)
-        allow(Response).to receive(:where).with(map_id: 1).and_return(response1)
         params = {id: 1}
         post :delete_reviewer, params
-        expect(flash[:error]).to eq('This reviewer has already started the review. Hence, it cannot been deleted.')
+        expect(flash[:error]).to eq('This review has already been done. It cannot been deleted.')
         expect(flash[:success]).to be nil
         expect(response).to redirect_to('www.google.com')
       end
@@ -531,7 +617,10 @@ describe ReviewMappingController do
 
   describe '#save_grade_and_comment_for_reviewer' do
     it 'redirects to reports#response_report page' do
+      # Use factories to create stubs (user must be instructor or above to perform this action)
       review_grade = build(:review_grade)
+      instructor = build(:instructor)
+      # Stub out other items
       allow(ReviewGrade).to receive(:find_by).with(participant_id: '1').and_return(review_grade)
       allow(review_grade).to receive(:save).and_return(true)
       params = {
@@ -539,7 +628,8 @@ describe ReviewMappingController do
         grade_for_reviewer: 90,
         comment_for_reviewer: 'keke'
       }
-      session = {user: double('User', id: 1)}
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      # Perform test
       post :save_grade_and_comment_for_reviewer, params, session
       expect(flash[:note]).to be nil
       expect(response).to redirect_to('/reports/response_report')

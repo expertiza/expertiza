@@ -16,8 +16,7 @@
   <td><b>Approval Status:</b></td>
   <td><%=h @suggestion.status %></td>
 </tr>
-</table>
-<br>
+
 <table class="general" cellpadding=5 border="1">
   <colgroup>
     <col width=15% />
@@ -30,8 +29,7 @@
     <th>Comment</th>
   </tr>
   <%if @suggestion.suggestion_comments.size > 0 %>
-    <% @suggestion.suggestion_comments.each do |suggestion_comment|%>
-      <% next unless suggestion_comment.visible_to_student %>
+    <% for suggestion_comment in @suggestion.suggestion_comments %>
       <tr class="listingRow">
         <td align="center"><%=suggestion_comment.commenter %></td>
         <td align="center">

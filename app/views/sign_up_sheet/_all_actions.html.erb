@@ -6,8 +6,8 @@
         <%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Delete Topic', :align => 'middle'), sign_up_sheet_path(:id=>topic.id, :assignment_id => params[:id]), method: :delete, confirm: 'Are you sure?' %>
   <%elsif @show_actions %>
       <% action_symbol_added = false %>
-      <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
-          <% for selected_topic in @selected_topics %>
+      <% unless @selected_topics.nil? || @selected_topics.size.zero? %>
+          <% @selected_topics.each do | selected_topic |  %>
               <% if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted %>
                   <!--#if there is a drop topic deadline in current assignment, after the drop topic deadline, student will not see the choice of dropping topics any more. -->
                   <% if @drop_topic_deadline.nil? or (!@drop_topic_deadline.nil? and Time.now < @drop_topic_deadline.due_at) %>
@@ -28,7 +28,7 @@
               <% end %>
           <% end %>
       <% end %>
-      <% if action_symbol_added == false %>
+      <% unless action_symbol_added %>
           <!--#if there is a signup topic deadline in current assignment, after the signup topic deadline, student will not see the choice of signing up topics any more. -->
           <% if @assignment.is_intelligent %>
             <td><%= form_tag({:controller=>"sign_up_sheet", :action=>"set_priority",:id => topic.id,:assignment_id => params[:assignment_id]}, method: :post) do %>
@@ -45,7 +45,7 @@
             <% end %></td>
           <% elsif (@signup_topic_deadline.nil? || (Time.now < @signup_topic_deadline.due_at)) && 
           (!@assignment.staggered_deadline? || get_topic_deadline([@assignment.due_dates.find_by(deadline_type_id: 1)], topic.id).nil? ||  (Time.now < get_topic_deadline([@assignment.due_dates.find_by(deadline_type_id: 1)], topic.id))) %>
-              <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), {:controller=>'sign_up_sheet', :action=> 'sign_up', :id=>params[:id],:topic_id => topic.id, :assignment_id => params[:assignment_id]}, data:{ :disable_with =>"Working.." } %></td>
+              <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'sign_up', :id=>params[:id],:topic_id => topic.id, :assignment_id => params[:assignment_id] %></td>
           <% end %>
       <% end %>
   <% end %>

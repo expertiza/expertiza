@@ -2,20 +2,14 @@
 
 <%= will_paginate @users %>
 
-<table class="table table-striped">
-  <tr><th>Name</th><th>Full Name</th><th>Email Address</th><th>Institution</th><th>Parent</th></tr>
+<table>
+  <tr><th>Name</th><th>Full Name</th><th>Email Address</th><th>Parent</th></tr>
   <% for user in @users%>
     <tr>
       <td><%= link_to user.name(session[:ip]), :action => 'show_instructor',
         :id => user.id %></td>
       <td><%= user.fullname(session[:ip]) %></td>
       <td><%= user.email(session[:ip]) %></td>
-      <td><%= if user.institution_id.nil?
-                "- - - - - - - -"
-              else
-                Institution.find(user.institution_id).name
-              end
-      %></td>
       <td><%= (User.find(user.parent_id)).name  %></td>
     </tr>
   <% end -%>

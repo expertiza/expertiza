@@ -5,7 +5,6 @@ question_type = %w[Criterion Scale Dropdown Checkbox TextArea TextField UploadFi
 describe "Questionnaire tests for instructor interface" do
   before(:each) do
     assignment_setup
-    allow(QuestionType).to receive(:pluck).with(:type).and_return(%w[Criterion Scale Dropdown Checkbox TextArea TextField UploadFile SectionHeader TableHeader ColumnHeader])
   end
   describe "Instructor login" do
     it "with valid username and password" do
@@ -23,7 +22,7 @@ describe "Questionnaire tests for instructor interface" do
     end
   end
 
-  def make_questionnaire private
+  def make_questionnaire(private)
     login_as("instructor6")
     visit '/questionnaires/new?model=ReviewQuestionnaire&private=' + (private ? '1' : '0')
     fill_in('questionnaire_name', with: 'Review 1')
@@ -57,10 +56,10 @@ describe "Questionnaire tests for instructor interface" do
     click_button "Create"
   end
 
-  def load_question question_type
+  def load_question(question_type)
     load_questionnaire
-    fill_in('new_question_total_num', with: '1')
-    select(question_type, from: 'new_question_type')
+    fill_in('question_total_num', with: '1')
+    select(question_type, from: 'question_type')
     click_button "Add"
   end
 
@@ -70,7 +69,7 @@ describe "Questionnaire tests for instructor interface" do
         load_question q_type
         expect(page).to have_content('Remove')
         click_button "Save review questionnaire"
-        expect(page).to have_content('The questionnaire has been successfully updated!')
+        expect(page).to have_content('All questions have been successfully saved!')
       end
     end
   end
@@ -78,7 +77,7 @@ describe "Questionnaire tests for instructor interface" do
   def edit_created_question
     first("textarea[placeholder='Edit question content here']").set "Question edit"
     click_button "Save review questionnaire"
-    expect(page).to have_content('The questionnaire has been successfully updated!')
+    expect(page).to have_content('All questions have been successfully saved!')
     expect(page).to have_content('Question edit')
   end
 
@@ -87,7 +86,7 @@ describe "Questionnaire tests for instructor interface" do
     expect(page).to have_content('You have successfully deleted the question!')
   end
 
-  def choose_check_type command_type
+  def choose_check_type(command_type)
     if command_type == 'edit'
       edit_created_question
     else

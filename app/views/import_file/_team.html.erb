@@ -10,11 +10,11 @@
         <% if @has_teamname == 'true_first' %>
               <li>Team Name</li>
               <li>Team Members</li>
-                <% @contents_hash[:header] = ["teamname","teammembers"]%>
+                <% @contents_hash[:header] = %w[teamname teammembers]%>
         <% elsif @has_teamname == 'true_last' %>
               <li>Team Members</li>
               <li>Team Name</li>
-                <%@contents_hash[:header] = ["teammembers","teamname"]%>
+                <%@contents_hash[:header] = %w[teammembers teamname]%>
         <% else %>
               <li>Team Members</li>
               <%@contents_hash[:header] = ["teammembers"] %>

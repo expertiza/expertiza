@@ -19,7 +19,6 @@ describe TeamsController do
       team = double('Team', id: 1, name: 'test team', parent_id: 1)
       signed_up_teams = [double('SignedUpTeam', topic_id: 1, is_waitlisted: true)]
       controller.session[:team_type] = 'Assignment'
-      controller.session[:user] = double('User', id: 1)
 
       allow(Team).to receive(:find).with(any_args).and_return(team)
       allow(Team).to receive(:find_by).with(any_args).and_return(team)
@@ -118,7 +117,7 @@ describe ReviewMappingController do
       allow(ReviewResponseMap).to receive(:find).with(any_args).and_return(nil)
       allow(ReviewResponseMap).to receive(:find_by).with(any_args).and_return(nil)
       post :delete_reviewer, id: 1
-      expect(flash[:error]).to eq('No review found.')
+      expect(flash[:error]).to eq('This review has already been done. It cannot been deleted.')
       expect(response).to redirect_to 'www.google.com'
     end
 

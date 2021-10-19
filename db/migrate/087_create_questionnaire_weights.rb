@@ -13,7 +13,7 @@ class CreateQuestionnaireWeights < ActiveRecord::Migration
         qweight = ReviewWeight.create(
           :assignment_id => assignment.id,
           :questionnaire_id => assignment.review_questionnaire_id            
-        );
+        )
         if assignment.review_weight != nil and assignment.review_weight > 0
           qweight.weight = assignment.review_weight
         else
@@ -25,7 +25,7 @@ class CreateQuestionnaireWeights < ActiveRecord::Migration
         mweight = MetareviewWeight.create(
           :assignment_id => assignment.id,
           :questionnaire_id => assignment.review_of_review_questionnaire_id         
-        );
+        )
         if assignment.review_weight != nil
           mweight.weight = 100 - assignment.review_weight          
         else
@@ -37,13 +37,13 @@ class CreateQuestionnaireWeights < ActiveRecord::Migration
         AuthorFeedbackWeight.create(
           :assignment_id => assignment.id,
           :questionnaire_id => assignment.author_feedback_questionnaire_id
-        );
+        )
       end
       if (assignment.teammate_review_questionnaire_id)
         TeammateReviewWeight.create(
           :assignment_id => assignment.id,
           :questionnaire_id => assignment.teammate_review_questionnaire_id && assignment.teammate_review_questionnaire_id != 0
-        );
+        )
       end
     }    
     remove_column :assignments, :review_weight

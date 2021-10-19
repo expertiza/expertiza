@@ -1,11 +1,11 @@
 <% request_user ||= false %>
-<%if !request_user%>
+<%unless request_user%>
 <div>
   <table class="table borderless">
     <tr>
       <th align='left'>E-mail options</th>
       <tr>
-        <td>Check the boxes to set the times when you want to receive emails.
+        <td>Check the boxes representing the times when you want to receive e-mail.
           <tr>
             <td><label for="user_email_on_review">When someone else <strong>reviews</strong> my work</label></td>
             <td><%= check_box 'user', 'email_on_review', {},  true, false  %></td>

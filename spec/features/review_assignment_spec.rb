@@ -19,7 +19,7 @@ describe "peer review testing" do
 
   def signup_topic
     user = User.find_by(name: "student2064")
-    stub_current_user(user, user.role.name, user.role)
+    login_as(user.name)
     visit '/student_task/list'
     visit '/sign_up_sheet/sign_up?id=1&topic_id=1' # signup topic
     visit '/student_task/list'
@@ -41,16 +41,13 @@ describe "peer review testing" do
     expect(page).to have_http_status(200)
   end
 
-  # Replace i_dont_care to no_particular_topic. This boolean variable is an indicator to
-  # address i f a student is interested in and selected any particular topic or not. With
-  # the variable renaming, it is more clear what this variable means.
   it "is not able to select review with no submissions" do
     user = User.find_by(name: "student2065")
-    stub_current_user(user, user.role.name, user.role)
+    login_as(user.name)
     visit '/student_task/list'
     click_link "TestAssignment"
     click_link "Others' work"
-    find(:css, "#no_particular_topic").set(true)
+    find(:css, "#i_dont_care").set(true)
     click_button "Request a new submission to review"
     expect(page).to have_content "No topics are available to review at this time. Please try later."
   end
@@ -60,7 +57,7 @@ describe "peer review testing" do
     visit '/student_task/list'
     click_link "TestAssignment"
     click_link "Others' work"
-    find(:css, "#no_particular_topic").set(true)
+    find(:css, "#i_dont_care").set(true)
     click_button "Request a new submission to review"
     expect(page).to have_content "No topics are available to review at this time. Please try later."
   end
@@ -76,8 +73,9 @@ describe "peer review testing" do
 
   it "is able to select topic for review with valid submissions" do
     submit_to_topic
+    click_link "Logout"
     user = User.find_by(name: "student2065")
-    stub_current_user(user, user.role.name, user.role)
+    login_as(user.name)
     visit '/student_task/list'
     visit '/sign_up_sheet/sign_up?id=1&topic_id=1'
     visit '/student_task/list'
@@ -90,14 +88,15 @@ describe "peer review testing" do
 
   it "is able to be assigned random topic for review" do
     submit_to_topic
+    click_link "Logout"
     user = User.find_by(name: "student2065")
-    stub_current_user(user, user.role.name, user.role)
+    login_as(user.name)
     visit '/student_task/list'
     visit '/sign_up_sheet/sign_up?id=1&topic_id=1'
     visit '/student_task/list'
     click_link "TestAssignment"
     click_link "Others' work"
-    find(:css, "#no_particular_topic").set(true)
+    find(:css, "#i_dont_care").set(true)
     click_button "Request a new submission to review"
     expect(page).to have_content "No previous versions available"
   end

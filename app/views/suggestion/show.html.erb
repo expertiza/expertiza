@@ -1,33 +1,10 @@
-<script>
-    $(document).ready(function(){
-        $('input[type="checkbox"].suggestion_comment_class').change(function(e) {
-            var checkbox, visibility, cmnt_id;
-            checkbox = $(this);
-            visibility = checkbox.is(":checked");
-            cmnt_id = checkbox.attr('id');
-            $.ajax({
-                method: "post",
-                url: '/suggestion/update_visibility/',
-                data: {
-                    cmnt_id: cmnt_id,
-                    visibility: visibility
-                },
-                success: function(data) {
-
-                }
-            });
-        });
-    });
-</script>
-
-
 <h2>Suggestion</h2>
 
 <!--displaying suggestion information-->
 <table border=0 cellspacing=10>
 <colgroup>
-<col width=20%>
-    <col width=50%>
+<col width=25%>
+    <col width=60%>
 </colgroup>
 <tr>
   <td><b>Title:</b></td>
@@ -64,9 +41,17 @@
   <td><%=h @suggestion.status %></td>
 </tr>
 </table>
+<p>
+  <% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' && session[:user] != nil && (session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4) %>
+    <%= form_tag :action => 'submit', :id => @suggestion do %>
+      <%= submit_tag "Approve suggestion", :name => 'approve_suggestion' %>
+      &nbsp; &nbsp;
+      <%= submit_tag "Reject suggestion", :name => 'reject_suggestion' %>
+    <% end %>
+  <% end %>
+</p>
 
-
-<br><hr>
+<br><br>
 <!--displaying comments-->
 <h2>Comments</h2>
 <%if @suggestion.suggestion_comments.size > 0 %>
@@ -80,7 +65,6 @@
       <th>Commenter</th>
       <th>Vote</th>
       <th>Comment</th>
-      <th>Visible to the student</th>
     </tr>
 
     <% for suggestion_comment in @suggestion.suggestion_comments %>
@@ -98,41 +82,25 @@
           <%end%>
         </td>
         <td><%= suggestion_comment.comments %></td>
-        <td style="padding-left: 10px"><%= check_box_tag "#{suggestion_comment.id}",
-                              suggestion_comment.id, suggestion_comment.visible_to_student,
-                              :class => 'suggestion_comment_class' %></td>
       </tr>
     <% end %>
   </table>
 <%end%>
-<br><br>
+<br>
 <!--Add new comment and vote-->
-<div style="width: min-content">
 <% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' %>
-    <h4>Add a new comment and vote</h4>
-    <%= form_tag :action => 'submit', :id => @suggestion do %>
-      <%= text_area "suggestion_comment", "comments", :rows => 5, :cols => 60, :placeholder => 'Comment..' %>
-      <p>
-        <%= "Vote"%>
-        <%= select("suggestion_comment","vote",{"Yes" =>"Y","No"=>"N","Revise"=>"R"}) %>
-      </p>
-        <%= submit_tag "Submit comment and vote", :name => 'add_comment', :style=> "float: right" %>
-    <% end %>
-  </div>
+  <b>Add new comment and vote</b> <br>
+  <%= form_tag :action => 'submit', :id => @suggestion do %>
+    <%= text_area "suggestion_comment", "comments", :rows => 5, :cols => 50 %>
+    <p>
+      <%= "Vote"%>
+      <%= select("suggestion_comment","vote",{"Yes" =>"Y","No"=>"N","Revise"=>"R"}) %>
+    </p>
+
+    <%= submit_tag "Submit vote", :name => 'add_comment' %>
+  <% end %>
 
 <% end %>
-<br>
-<hr>
-<p>
-  <% if @suggestion.status != 'Approved' && @suggestion.status != 'Rejected' && session[:user] != nil && (session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4) %>
-    <%= form_tag :action => 'submit', :id => @suggestion do %>
-      <%= submit_tag "Approve suggestion", :name => 'approve_suggestion' ,:class => "btn btn-success"%>
-      &nbsp; &nbsp;
-      <%= submit_tag "Reject suggestion", :name => 'reject_suggestion', :class => "btn btn-danger" %>
-    <% end %>
-  <% end %>
-</p>
-<br>
 <p>
   <%= link_to 'Back', :action => 'list', :id => @suggestion.assignment_id %>
 </p>

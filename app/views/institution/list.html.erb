@@ -1,28 +1,24 @@
-<h1>List of institutions</h1>
-<br>
-<%= link_to 'New institution', new_institution_path %>
-<br>
-<table class=" table table-bordered table-striped">
+<h1>Listing institutions</h1>
+
+<table>
   <tr>
-    <th>#</th>
     <% for column in Institution.content_columns %>
       <th><%= column.human_name %></th>
     <% end %>
-    <th colspan="3">Actions</th>
   </tr>
-  <%i = 1 %>
+
   <% for institution in @institutions %>
     <tr>
-      <td><%= i %></td>
       <% for column in Institution.content_columns %>
         <td><%=h institution.send(column.name) %></td>
       <% end %>
       <td><%= link_to 'Show', :action => 'show', :id => institution %></td>
       <td><%= link_to 'Edit', :action => 'edit', :id => institution %></td>
-<!--      Need to implement a proper flow to delete every reference-->
-<!--      <td><%#= link_to 'Delete', :action => 'delete', :id => institution.id  %></td>-->
+      <td><%= link_to 'Delete', :action => 'delete', :id => institution.id  %></td>
     </tr>
-    <% i+=1 %>
   <% end %>
 </table>
 
+<br />
+
+<%= link_to 'New institution', new_institution_path %>

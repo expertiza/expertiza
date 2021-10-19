@@ -35,31 +35,48 @@
             <tr>
               <th class="sorter-true">Username</th>
               <th class="sorter-true">Name</th>
-              <th class="sorter-true">Total # tags that could be set<img src='/assets/info.png' title='# of review comments to which a tag can be applied'></th>
-              <th class="sorter-true"># tags inferred by ML<img src='/assets/info.png' title='# of tags that the machine-learning algorithm thinks it knows how to assign; these tags are grayed out, but the author can still modify them if they seem to be wrong.'></th>
-              <th class="sorter-true"># tags to be set by author<img src='/assets/info.png' title='Number of tags that were not set by machine learning, and therefore can be set by the author.'></th>
-              <th class="sorter-true"># tags actually set by author<img src='/assets/info.png' title='Number of tags that the author did assign'></th>
-              <th class="sorter-true"># tags not set by author<img src='/assets/info.png' title='Number of tags that the author could have assigned, but did not'></th>
-              <th class="sorter-true">% tags actually set by author<img src='/assets/info.png' title='Of the number of tags that machine learning did not assign, the percentage that the author did assign'></th>
+              <th class="sorter-true">Percentage of answers tagged</th>
+              <th class="sorter-true"># answers tagged</th>
+              <th class="sorter-true"># answers not tagged</th>
+              <th class="sorter-true"># intervals</th>
+              <th class="sorter-true">Key Graph Info</th>
+              <th class="sorter-true"># taggable answers<img src='/assets/info.png' title='As set up in the assignment setting, the authors can only tag answers of <%= tag_dep.question_type %> question type that are more than <%= tag_dep.answer_length_threshold %> character(s).'/></th>
             </tr>
             </thead>
             <% report_lines.each do |report_line| %>
-              <tr>
-                <td><%= report_line.user.name(session[:ip]) %></td>
-                <td><%= report_line.user.fullname(session[:ip]) %></td>
-                <td><%= report_line.no_total.to_s %></td>
-                <td><%= report_line.no_inferred.to_s %></td>
-                <td><%= report_line.no_taggable.to_s %></td>
-                <td><%= report_line.no_tagged.to_s %></td>
-                <td><%= report_line.no_not_tagged.to_s %></td>
-                <td><%= report_line.percentage.to_s %>%</td>
-              </tr>
+                <tr>
+                  <td><%= report_line.user.name(session[:ip]) %></td>
+                  <td><%= report_line.user.fullname(session[:ip]) %></td>
+                  <td><%= report_line.percentage.to_s %>%</td>
+                  <td><%= report_line.no_tagged.to_s %></td>
+                  <td><%= report_line.no_not_tagged.to_s %></td>
+                  <!-- E2082 Call chart plotting function from review_mapping_helper -->
+                  <td align='left'>
+                    <%= display_tagging_interval_chart(report_line.tag_update_intervals) %>
+                  </td>
+                  <!-- <td><%= report_line.tag_update_intervals.to_s %></td> -->
+                  <% key_chart_information = calculate_key_chart_information(report_line.tag_update_intervals) %>
+                  <td>
+                    <!-- Populates statistics only if backend returned details -->
+                    <% if key_chart_information.is_a?(Hash)%>
+                      <ul>
+                          <li>Mean: <%= key_chart_information[:mean] %></li>
+                          <li>Min: <%= key_chart_information[:min] %></li>
+                          <li>Max: <%= key_chart_information[:max] %></li>
+                          <li>Variance: <%= key_chart_information[:variance] %></li>
+                          <li>Standard Deviation: <%= key_chart_information[:stand_dev] %></li>
+                      </ul>
+                    <% end %>
+                  </td>
+                  <td><%= report_line.no_tagable %></td>
+                </tr>
             <% end %>
           </table>
         </div>
         </p>
       <% end %>
       <p>
+      <%= form_tag('/tags.csv', method: 'put',:id => 'tst') do %>
       <div id="tab-summary">
         <h4  align="center">Summary for each user</h4>
         <table class="table table-striped sortable">
@@ -67,28 +84,29 @@
           <tr>
             <th class="sorter-true">Username</th>
             <th class="sorter-true">Name</th>
-            <th class="sorter-true">Total # tags that could be set<img src='/assets/info.png' title='# of review comments to which a tag can be applied ⨉ # characteristics that authors are asked to tag for each comment'></th>
-            <th class="sorter-true"># tags inferred by ML<img src='/assets/info.png' title='# of tags that the machine-learning algorithm thinks it knows how to assign; these tags are grayed out, but the author can still modify them if they seem to be wrong.'></th>
-            <th class="sorter-true"># tags to be set by author<img src='/assets/info.png' title='Number of tags that were not set by machine learning, and therefore can be set by the author.'></th>
-            <th class="sorter-true"># tags actually set by author<img src='/assets/info.png' title='Number of tags that the author did assign'></th>
-            <th class="sorter-true"># tags not set by author<img src='/assets/info.png' title='Number of tags that the author could have assigned, but did not'></th>
-            <th class="sorter-true">% tags actually set by author<img src='/assets/info.png' title='Of the number of tags that machine learning did not assign, the percentage that the author did assign'></th>
+            <th class="sorter-true">Percentage of tags done</th>
+            <th class="sorter-true"># tags done</th>
+            <th class="sorter-true"># tags not done</th>
+            <th class="sorter-true"># possible tags to do<img src='/assets/info.png' title='Number of answers that fulfil the prerequisite setup for each tags (Answer of certain question types and has a length of greater than the threshold).'/></th>
+            <th>Tags export</th>
           </tr>
           </thead>
+
           <% @user_tagging_report.each do |key, val| %>
               <tr>
                 <td><%= val.user.name(session[:ip]) %></td>
                 <td><%= val.user.fullname(session[:ip]) %></td>
-                <td><%= val.no_total.to_s %></td>
-                <td><%= val.no_inferred.to_s %></td>
-                <td><%= val.no_taggable.to_s %></td>
+                <td><%= val.percentage.to_s %>%</td>
                 <td><%= val.no_tagged.to_s %></td>
                 <td><%= val.no_not_tagged.to_s %></td>
-                <td><%= val.percentage.to_s %>%</td>
+                <td><%= val.no_tagable %></td>
+                <td><%= check_box_tag 'names[]', val.user.name(session[:ip]), true %></td>
               </tr>
           <% end %>
         </table>
       </div>
+      <%= submit_tag "Export",:value => 'Export' ,:form => 'tst',method: 'put' %>
+      <% end %>
       </p>
     </div>
 <% end %>

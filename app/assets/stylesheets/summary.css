@@ -25,34 +25,3 @@
 .question {
 
 }
-
-.tags_remaining_text{
-    opacity:0.7;
-    position:fixed;
-    border-radius:5px;
-    right:10px;
-    top:100px;
-    width:auto;
-    height:auto;
-    font-size:19px;
-    padding:5px;
-    color:#fff;
-    text-align:center;
-    background:#000;
-}
-
-.tags_remaining_count{
-    opacity:0.8;
-    position:fixed;
-    right:55px;
-    top:145px;
-    width:55px;
-    height:55px;
-    border-radius:50px;
-    font-size:22px;
-    color:#fff;
-    line-height:45px;
-    text-align:center;
-    padding:4px;
-    background:#92c230
-}

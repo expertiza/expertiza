@@ -1,5 +1,5 @@
 <%unless @suggestions.empty? %>
-<h2>Your suggestions for <%= @assignment.name %></h2>
+<h2>Suggested topics for <%= @assignment.name %></h2>
   <table class="general" cellpadding="5" width="50%" border="1">
     <tr>
       <th style="text-align:center;">Title</th>
@@ -7,7 +7,7 @@
       <th style="text-align:center;">Action</th>
     </tr>
 
-    <% @suggestions.each do |suggestion| %>
+    <% for suggestion in @suggestions %>
       <tr class="listingRow">
         <td style="text-align:center; max-width: 200px;"><%=h suggestion.title %></td>
         <td align="center"><%=h suggestion.status %></td>

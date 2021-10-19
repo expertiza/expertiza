@@ -39,7 +39,7 @@ class StudentTask
   end
 
   def content_submitted_in_current_stage?
-    current_stage == "submission" && !participant.team.nil? && participant.team.has_submissions?
+    current_stage == "submission" && hyperlinks.present?
   end
 
   delegate :course, to: :assignment
@@ -170,7 +170,7 @@ class StudentTask
     timeline_list = []
     get_due_date_data(assignment, timeline_list)
     get_submission_data(assignment.try(:id), team.try(:id), timeline_list)
-    get_peer_review_data(participant.try(:id), timeline_list)
+    get_peer_review_data(participant.get_reviewer.try(:id), timeline_list)
     get_author_feedback_data(participant.try(:id), timeline_list)
     timeline_list.sort_by {|f| Time.zone.parse f[:updated_at] }
   end

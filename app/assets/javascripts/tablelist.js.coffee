@@ -14,9 +14,3 @@ jQuery ->
     items: ">*:not(.sort-disabled)"
     update: ->
       $.post($(this).data('update-url'), $(this).sortable('serialize'))
-      $("#overlay").show()
-      close = () ->
-        $("#overlay").hide()
-      setTimeout(close, 5650)
-
-

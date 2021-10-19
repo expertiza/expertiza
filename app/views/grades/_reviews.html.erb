@@ -3,14 +3,6 @@
     $('.tag_prompt_container').toggle();
   };
   $( document ).ready(function() {
-
-    $('#remaining_tags').text($(":input[value='0']").length)
-    //  Onclick function for all tags, which will calculate number of
-    //  tags with value 0. (i.e. incomplete tags)
-    $(".rangeAll").click(function() {
-      $('#remaining_tags').text($(":input[value='0']").length)
-    });
-
     $('#tag_prompt_toggler').click(function () {
       if ($('#tag_prompt_toggler').text() == "hide tags")
         $('#tag_prompt_toggler').text("show tags")
@@ -46,15 +38,12 @@
     <%end%>
     <BR/>
     <HR/>
-
-  <div class="tags_remaining_text">Number of tags remaining</div>
-  <div class="tags_remaining_count" id='remaining_tags'></div>
     <% count = 0 %>
     <!--Zhewei: If this assignment supports varying rubrics by round, Expertiza will display all-round reviews. -->
     <!--And if one reviewer did not do first-round review and did second round directly, Expertiza will display only second round.-->
     <!--If another reviewer only finished first-round review and did not do second round, Expertiza will display only first round.-->
     <!--If this assignment does not support varying rubrics by round, Expertiza will display last round review.--> 
-    <% rounds = Array.new %>
+    <% rounds = [] %>
     <% rscore[:assessments].uniq{|response| response.round }.each do |response| %>
         <% rounds << response.round %>
     <% end %>
@@ -74,7 +63,7 @@
                 <% count = count + 1 %>
                 <% prefix = nil if controller.action_name == "view_my_scores" %>
                 <!--change code in order to compat to multi-round review-->
-                <% if @assignment.varying_rubrics_by_round? and !review.round.nil? %>
+                <% if @assignment.vary_by_round and !review.round.nil? %>
                     <% review_symbol = 'review' + review.round.to_s %>
                 <% else %>
                     <% review_symbol = 'review' %>
@@ -94,8 +83,8 @@
                 <% map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: participant.id).first
                     review_feedbacks = map.try :response %>
                 <% if review_feedbacks && !review_feedbacks.empty? %>
-                    <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedbacks[-1].id %> or
-                    <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedbacks[-1].id, :return => "feedback" %> feedback for Review <%= count %>
+                    <%= link_to "View", :controller => 'response', :action => 'view', :id => review_feedbacks.first.id %> or
+                    <%= link_to "Edit", :controller => 'response', :action => 'edit', :id => review_feedbacks.first.id, :return => "feedback" %> feedback for Review <%= count %>
                 <% else %>
                     <%= link_to "Give feedback", :controller => 'response', :action => 'new_feedback', :id => review.id %> for Review <%= count %>
                 <% end %>

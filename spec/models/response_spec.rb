@@ -3,16 +3,21 @@ describe Response do
   let(:participant2) { build(:participant, id: 2) }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt') }
   let(:team) { build(:assignment_team) }
+  let(:signed_up_team) { build(:signed_up_team, team_id: team.id) }
   let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map, scores: [answer]) }
   let(:answer) { Answer.new(answer: 1, comments: 'Answer text', question_id: 1) }
   let(:answer2) { Answer.new(answer: 2, comments: 'Answer text', question_id: 2) }
   let(:question) { Criterion.new(id: 1, weight: 2, break_before: true) }
+  let(:questionnaire1) { create(:questionnaire, id: 1) }
+  let(:question1) { create(:question, questionnaire: questionnaire1, weight: 1, id: 1) }
   let(:question2) { TextArea.new(id: 1, weight: 2, break_before: true) }
   let(:questionnaire) { ReviewQuestionnaire.new(id: 1, questions: [question], max_question_score: 5) }
   let(:questionnaire2) { ReviewQuestionnaire.new(id: 2, questions: [question2], max_question_score: 5) }
   let(:tag_prompt) {TagPrompt.new(id: 1, prompt: "prompt")}
   let(:tag_prompt_deployment) {TagPromptDeployment.new(id: 1, tag_prompt_id: 1, assignment_id: 1, questionnaire_id: 1, question_type: 'Criterion')}
+  let(:response_map) { create(:review_response_map, id: 1, reviewed_object_id: 1) }
+  let!(:response_record) { create(:response, id: 1, map_id: 1, response_map: response_map) }
   before(:each) do
     allow(response).to receive(:map).and_return(review_response_map)
   end
@@ -56,12 +61,13 @@ describe Response do
     end
   end
 
-  describe '#total_score' do
+  describe '#aggregate_questionnaire_score' do
     it 'computes the total score of a review' do
       question2 = double('ScoredQuestion', weight: 2)
       allow(Question).to receive(:find).with(1).and_return(question2)
       allow(question2).to receive(:is_a?).with(ScoredQuestion).and_return(true)
-      expect(response.total_score).to eq(2)
+      allow(question2).to receive(:answer).and_return(answer)
+      expect(response.aggregate_questionnaire_score).to eq(2)
     end
   end
 
@@ -75,7 +81,7 @@ describe Response do
 
     context 'when maximum_score does not return 0' do
       it 'calculates the maximum score' do
-        allow(response).to receive(:total_score).and_return(4)
+        allow(response).to receive(:aggregate_questionnaire_score).and_return(4)
         allow(response).to receive(:maximum_score).and_return(5)
         expect(response.average_score).to eq(80)
       end
@@ -108,6 +114,9 @@ describe Response do
   end
 
   describe '#questionnaire_by_answer' do
+    before(:each) do
+      allow(SignedUpTeam).to receive(:find_by).with(team_id: team.id).and_return(signed_up_team)
+    end
     context 'when answer is not nil' do
       it 'returns the questionnaire of the question of current answer' do
         allow(Question).to receive(:find).with(1).and_return(question)
@@ -115,7 +124,6 @@ describe Response do
         expect(response.questionnaire_by_answer(answer)).to eq(questionnaire2)
       end
     end
-
     context 'when answer is nil' do
       it 'returns review questionnaire of current assignment' do
         allow(ResponseMap).to receive(:find).with(1).and_return(review_response_map)
@@ -124,6 +132,20 @@ describe Response do
         allow(assignment).to receive(:review_questionnaire_id).and_return(1)
         allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire2)
         expect(response.questionnaire_by_answer(nil)).to eq(questionnaire2)
+      end
+    end
+  end
+
+  describe '#populate_new_response' do
+    context 'when current round response is found' do
+      it 'returns the current round response' do
+        allow(response).to receive(:populate_new_response).with(:review_response_map, "0").and_return(response)
+        expect(response.id).to eq(1)
+      end
+    end
+    context 'when current round response is found' do
+      it 'returns a new response object' do
+        allow(response).to receive(:populate_new_response).with(:review_response_map, nil).and_return(:new_response)
       end
     end
   end
@@ -140,21 +162,21 @@ describe Response do
       allow(review_response_map).to receive(:response).and_return([response1, response2])
       allow(response1).to receive(:scores).and_return([answer])
       allow(response2).to receive(:scores).and_return([answer2])
-      expect(Response.concatenate_all_review_comments(1, 1)).to eq(["Answer textAnswer textLGTM", 2, "Answer text", 1, "Answer textLGTM", 1, "", 0])
+      expect(Response.concatenate_all_review_comments(1, 1)).to eq(["Answer textAnswer textLGTM", 2, [nil, "Answer text", "Answer textLGTM", ""], [nil, 1, 1, 0]])
     end
   end
 
-  describe '.get_volume_of_review_comments' do
+  describe '.volume_of_review_comments' do
     it 'returns volumes of review comments in each round' do
       allow(Response).to receive(:concatenate_all_review_comments).with(1, 1)
-                                                                  .and_return(["Answer textAnswer textLGTM", 2, "Answer text", 1, "Answer textLGTM", 1, "", 0])
-      expect(Response.get_volume_of_review_comments(1, 1)).to eq([1, 2, 2, 0])
+                                                                  .and_return(["Answer textAnswer textLGTM", 2, [nil, "Answer text", "Answer textLGTM", ""], [nil, 1, 1, 0]])
+      expect(Response.volume_of_review_comments(1, 1)).to eq([1, 2, 2, 0])
     end
   end
 
   describe '#significant_difference?' do
     before(:each) do
-      allow(ReviewResponseMap).to receive(:get_assessments_for).with(team).and_return([response])
+      allow(ReviewResponseMap).to receive(:assessments_for).with(team).and_return([response])
     end
 
     context 'when count is 0' do
@@ -168,7 +190,7 @@ describe Response do
       context 'when the difference between average score on same artifact from others and current score is bigger thatn allowed percentage' do
         it 'returns true' do
           allow(Response).to receive(:avg_scores_and_count_for_prev_reviews).with([response], response).and_return([0.8, 2])
-          allow(response).to receive(:total_score).and_return(93)
+          allow(response).to receive(:aggregate_questionnaire_score).and_return(93)
           allow(response).to receive(:maximum_score).and_return(100)
           allow(response).to receive(:questionnaire_by_answer).with(answer).and_return(questionnaire)
           allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1)
@@ -182,10 +204,109 @@ describe Response do
   describe '.avg_scores_and_count_for_prev_reviews' do
     context 'when current response is not in current response array' do
       it 'returns the average score and count of previous reviews' do
-        allow(response).to receive(:total_score).and_return(96)
+        allow(response).to receive(:aggregate_questionnaire_score).and_return(96)
         allow(response).to receive(:maximum_score).and_return(100)
         expect(Response.avg_scores_and_count_for_prev_reviews([response], double('Response', id: 6))).to eq([0.96, 1])
       end
+    end
+  end
+
+  describe "#test compute scores" do
+    let(:response1) { double("respons1") }
+    let(:response2) { double("respons2") }
+
+    before(:each) do
+      @total_score = 100.0
+      allow(Response).to receive(:assessment_score).and_return(@total_score)
+    end
+
+    it "returns nil if list of assessments is empty" do
+      assessments = []
+      scores = Response.compute_scores(assessments, [question1])
+      expect(scores[:max]).to eq nil
+      expect(scores[:min]).to eq nil
+      expect(scores[:avg]).to eq nil
+    end
+
+    it "returns scores when a single valid assessment of total score 100 is give" do
+      assessments = [response1]
+      Response.instance_variable_set(:@invalid, 0)
+      scores = Response.compute_scores(assessments, [question1])
+      expect(scores[:max]).to eq @total_score
+      expect(scores[:min]).to eq @total_score
+      expect(scores[:avg]).to eq @total_score
+    end
+
+    it "returns scores when two valid assessments of total scores 80 and 100 are given" do
+      assessments = [response1, response2]
+      Response.instance_variable_set(:@invalid, 0)
+      total_score1 = 100.0
+      total_score2 = 80.0
+      allow(Response).to receive(:assessment_score).and_return(total_score1, total_score2)
+      scores = Response.compute_scores(assessments, [question1])
+      expect(scores[:max]).to eq total_score1
+      expect(scores[:min]).to eq total_score2
+      expect(scores[:avg]).to eq (total_score1 + total_score2) / 2
+    end
+
+    it "returns scores when an invalid assessments is given" do
+      assessments = [response1]
+      Response.instance_variable_set(:@invalid, 1)
+      scores = Response.compute_scores(assessments, [question1])
+      expect(scores[:max]).to eq @total_score
+      expect(scores[:min]).to eq @total_score
+      expect(scores[:avg]).to eq 0
+    end
+
+    it "returns scores when invalid flag is nil" do
+      assessments = [response1]
+      Response.instance_variable_set(:@invalid, nil)
+      scores = Response.compute_scores(assessments, [question1])
+      expect(scores[:max]).to eq @total_score
+      expect(scores[:min]).to eq @total_score
+      expect(scores[:avg]).to eq @total_score
+    end
+
+    it "checks if assessment_score function is called" do
+      assessments = [response1]
+      expect(Response).to receive(:assessment_score).with(response: assessments, questions: [question1]).and_return(@total_score)
+      scores = Response.compute_scores(assessments, [question1])
+    end
+  end
+
+  describe "#test get total score" do
+    it "returns total score when required conditions are met" do
+      # stub for ScoreView.find_by_sql to revent prevent unit testing sql db queries
+      allow(ScoreView).to receive(:questionnaire_data).and_return(double("scoreview", weighted_score: 20, sum_of_weights: 5, q1_max_question_score: 4))
+      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: "1")])
+      expect(Response.assessment_score(response: [response_record], questions: [question1])).to eq 100.0
+      # output calculation is (weighted_score / (sum_of_weights * max_question_score)) * 100
+      # 4.0
+    end
+
+    it "returns total score when one answer is nil for scored question and its weight gets removed from sum_of_weights" do
+      allow(ScoreView).to receive(:questionnaire_data).and_return(double("scoreview", weighted_score: 20, sum_of_weights: 5, q1_max_question_score: 4))
+      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
+      expect(Response.assessment_score(response: [response_record], questions: [question1])).to be_within(0.01).of(125.0)
+    end
+
+    it "returns -1 when answer is nil for scored question which makes sum of weights = 0" do
+      allow(ScoreView).to receive(:questionnaire_data).and_return(double("scoreview", weighted_score: 20, sum_of_weights: 1, q1_max_question_score: 5))
+      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
+      expect(Response.assessment_score(response: [response_record], questions: [question1])).to eq -1.0
+    end
+
+    it "returns -1 when weighted_score of questionnaireData is nil" do
+      allow(ScoreView).to receive(:questionnaire_data).and_return(double("scoreview", weighted_score: nil, sum_of_weights: 5, q1_max_question_score: 5))
+      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
+      expect(Response.assessment_score(response: [response_record], questions: [question1])).to eq -1.0
+    end
+
+    xit "checks if submission_valid? is called" do
+      allow(ScoreView).to receive(:questionnaire_data).and_return(double("scoreview", weighted_score: nil, sum_of_weights: 5, q1_max_question_score: 5))
+      allow(Answer).to receive(:where).and_return([double("row1", question_id: 1, answer: nil)])
+      expect(Answer).to receive(:submission_valid?)
+      Response.assessment_score(response: [response_record], questions: [question1])
     end
   end
 end

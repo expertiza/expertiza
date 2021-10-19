@@ -4,7 +4,6 @@ Expertiza
 [![Build Status](https://travis-ci.org/expertiza/expertiza.svg?branch=master)](https://travis-ci.org/expertiza/expertiza)
 [![Coverage Status](https://coveralls.io/repos/github/expertiza/expertiza/badge.svg?branch=master)](https://coveralls.io/github/expertiza/expertiza?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/f3a41f16c2b6e45aa9d4/maintainability)](https://codeclimate.com/github/expertiza/expertiza/maintainability)
-[![Discord](https://img.shields.io/badge/chat-on%20discord-7289da.svg?sanitize=true)](https://discord.gg/EwH6DmqAJn)
 
 #### Peer review system
 
@@ -22,11 +21,6 @@ with network lag and having to reinstall gems every time you connect. Installing
 Life is full of tradeoffs. :-) The good news is that you can start on one environment, push your work to git,
 and switch to another environment if you don't like the one you started with.
 
-### Anonymized Database
-
-For students researching educational data collected from Expertiza, here [is the database with scrubbed names](https://drive.google.com/file/d/1vMe1MX2aUahAzLMGUdFlXX1cNyDuljQ6/view?usp=sharing).
-
-
 ### Installing locally
 
 See the Google doc on [setting up the Expertiza development environment](https://docs.google.com/document/d/1tXmwju6R7KQbvycku-bdXxa6rXSUN4BMyvjY3ROmMSw/edit).
@@ -38,10 +32,10 @@ Contributing
 ------------
 
  * [Fork](http://help.github.com/fork-a-repo/) the expertiza project
- * [Create a new branch](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/creating-and-deleting-branches-within-your-repository) for your contribution with a descriptive name
- * Commit and push until you are happy with your contribution - follow the style guidelines below
+ * [Create a new branch](http://progit.org/book) for your contribution with a descriptive name
+ * [Commit and push](http://progit.org/book) until you are happy with your contribution - follow the style guidelines below
  * Make sure to add tests for it; the tests should fail before your contribution/fix and pass afterward
- * [Send a pull request](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/about-pull-requests) to have your code reviewed for merging back into Expertiza
+ * [Send a pull request](http://help.github.com/send-pull-requests) to have your code reviewed for merging back into Expertiza
 
 Style Guidelines
 ----------------

@@ -1,4 +1,4 @@
-<% if !view.nil? %>
+<% unless view.nil? %>
     <p><i><%= ques_text %> </i> <%= view %> </p></br>
 <% else %>
     <p><b><font color='red' size="4">WARNING!!</font> You must save your review
@@ -11,8 +11,8 @@
     <% @current_folder = DisplayOption.new
        @current_folder.name = ""
        files_list = Dir[@participant.assignment.path.to_s+ "/" +@map.map_id.to_s + @current_folder.name + "/*"]
-       files = Array.new
-       for file in files_list
+       files = []
+       files_list.each do | file |
          if File.directory?(file) then
            dir_files = get_files(file)
            dir_files.each { |f| files << f }
@@ -20,11 +20,11 @@
          files << file
        end
        file = files[0]
-       if !file.nil?
+       unless file.nil?
          parentFolder = File.dirname(file)
          location = parentFolder + File.basename(file) %>
-        <u><i><%= link_to File.basename(file), :controller => 'submitted_content', :action => 'download', :download => File.basename(file), "current_folder[name]" => File.dirname(file) %></i></u>
-    <% end %>&nbsp &nbsp &nbsp &nbsp &nbsp&nbsp
+<u><i><%=  link_to File.basename(file), :controller => 'submitted_content', :action => 'download', :download => File.basename(file), "current_folder[name]" => File.dirname(file) %></i></u>
+<% end %>&nbsp &nbsp &nbsp &nbsp &nbsp&nbsp
     <% if @map.response.empty?
          return_to = "new"
        else

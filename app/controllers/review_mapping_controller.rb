@@ -395,8 +395,9 @@ class ReviewMappingController < ApplicationController
   def automatic_review_mapping_strategy(assignment_id,
                                         participants, teams, num_reviews_per_student = 0,
                                         submission_review_num = 0)
-    participants_hash = {}
-    participants.each {|participant| participants_hash[participant.id] = 0 }
+    team_participants_hash = {}
+
+    participants.each {|participant| team_participants_hash[participant.id] = 0 }
     # calculate reviewers for each team
     if num_reviews_per_student != 0 and submission_review_num == 0
       review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, teams, num_reviews_per_student)
@@ -409,12 +410,12 @@ class ReviewMappingController < ApplicationController
     # should be fixed.  StudentReviewStrategy is very likely an artifact of "individual assignments," which were
     # removed from Expertiza years ago.  Try removing that branch of the if statement, as wall as all other refs to them. -efg
     if review_strategy
-      peer_review_strategy(assignment_id, review_strategy, participants_hash)
+      peer_review_strategy(assignment_id, review_strategy, team_participants_hash)
 
       # after assigning peer reviews for each team,
       # if there are still some peer reviewers not obtain enough peer review,
       # just assign them to valid teams
-      assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
+      assign_reviewers_for_team(assignment_id, review_strategy, team_participants_hash)
     end
   end
 
@@ -469,13 +470,13 @@ class ReviewMappingController < ApplicationController
 
   private
 
-  def assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
+  def assign_reviewers_for_team(assignment_id, review_strategy, team_participants_hash)
     if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0)
                         .where("created_at > :time",
                                time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
 
       participants_with_insufficient_review_num = []
-      participants_hash.each do |participant_id, review_num|
+      team_participants_hash.each do |participant_id, review_num|
         participants_with_insufficient_review_num << participant_id if review_num < review_strategy.reviews_per_student
       end
       unsorted_teams_hash = {}
@@ -509,7 +510,7 @@ class ReviewMappingController < ApplicationController
                                                last.created_at
   end
 
-  def peer_review_strategy(assignment_id, review_strategy, participants_hash)
+  def peer_review_strategy(assignment_id, review_strategy, team_participants_hash)
     teams = review_strategy.teams
     participants = review_strategy.participants
     num_participants = participants.size
@@ -534,11 +535,11 @@ class ReviewMappingController < ApplicationController
           if iterator.zero?
             rand_num = rand(0..num_participants - 1)
           else
-            min_value = participants_hash.values.min
+            min_value = team_participants_hash.values.min
             # get the temp array including indices of participants, each participant has minimum review number in hash table.
             participants_with_min_assigned_reviews = []
             participants.each do |participant|
-              participants_with_min_assigned_reviews << participants.index(participant) if participants_hash[participant.id] == min_value
+              participants_with_min_assigned_reviews << participants.index(participant) if team_participants_hash[participant.id] == min_value
             end
             # if participants_with_min_assigned_reviews is blank
             if_condition_1 = participants_with_min_assigned_reviews.empty?
@@ -555,16 +556,16 @@ class ReviewMappingController < ApplicationController
           # prohibit one student to review his/her own artifact
           next if TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id)
 
-          if_condition_1 = (participants_hash[participants[rand_num].id] < review_strategy.reviews_per_student)
+          if_condition_1 = (team_participants_hash[participants[rand_num].id] < review_strategy.reviews_per_student)
           if_condition_2 = (!selected_participants.include? participants[rand_num].id)
           if if_condition_1 and if_condition_2
             # selected_participants cannot include duplicate num
             selected_participants << participants[rand_num].id
-            participants_hash[participants[rand_num].id] += 1
+            team_participants_hash[participants[rand_num].id] += 1
           end
           # remove students who have already been assigned enough num of reviews out of participants array
           participants.each do |participant|
-            if participants_hash[participant.id] == review_strategy.reviews_per_student
+            if team_participants_hash[participant.id] == review_strategy.reviews_per_student
               participants.delete_at(rand_num)
               num_participants -= 1
             end
@@ -577,7 +578,7 @@ class ReviewMappingController < ApplicationController
           # avoid last team receives too many peer reviews
           if !TeamsUser.exists?(team_id: team.id, user_id: participant.user_id) and selected_participants.size < review_strategy.reviews_per_team
             selected_participants << participant.id
-            participants_hash[participant.id] += 1
+            team_participants_hash[participant.id] += 1
           end
         end
       end

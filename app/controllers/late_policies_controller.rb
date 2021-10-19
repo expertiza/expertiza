@@ -67,7 +67,8 @@ class LatePoliciesController < ApplicationController
         flash[:error] = exception.record.errors.full_messages.join("<br />").html_safe
         redirect_to action: 'new'
       rescue StandardError => exception
-        flash[:error] = "The following error occurred while saving the penalty policy: #{exception}"
+        # In case it's some error, this error should not be shown to users
+        flash[:error] = "Something went wrong"
         redirect_to action: 'new'
       end
     else

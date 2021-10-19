@@ -1,23 +1,17 @@
 class StudentQuizzesController < ApplicationController
-  include AuthorizationHelper
-
   def action_allowed?
-    if current_user_is_a? 'Student'
-      if action_name.eql? 'index'
-        return are_needed_authorizations_present?(params[:id], "reviewer", "submitter")
-      else
-        true
-      end
-    else
-      current_user_has_ta_privileges?
-    end
+    ['Administrator',
+     'Instructor',
+     'Teaching Assistant'].include? current_role_name or
+    (current_role_name.eql?("Student") and
+      ((%w[index].include? action_name) ? are_needed_authorizations_present?(params[:id], "reviewer", "submitter") : true))
   end
 
   def index
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
     @assignment = Assignment.find(@participant.parent_id)
-    @quiz_mappings = QuizResponseMap.mappings_for_reviewer(@participant.id)
+    @quiz_mappings = QuizResponseMap.get_mappings_for_reviewer(@participant.id)
   end
 
   def finished_quiz
@@ -31,14 +25,14 @@ class StudentQuizzesController < ApplicationController
   end
 
   # Create an array of candidate quizzes for current reviewer
-  def self.take_quiz(assignment_id, reviewer_id)
+  def self.take_quiz assignment_id, reviewer_id
     quizzes = []
     reviewer = Participant.where(user_id: reviewer_id, parent_id: assignment_id).first
     reviewed_team_response_maps = ReviewResponseMap.where(reviewer_id: reviewer.id)
     reviewed_team_response_maps.each do |team_response_map_record|
       reviewee_id = team_response_map_record.reviewee_id
       reviewee_team = Team.find(reviewee_id) # reviewees should always be teams
-      next unless reviewee_team.parent_id == assignment_id
+      next if reviewee_team.parent_id != assignment_id
       quiz_questionnaire = QuizQuestionnaire.where(instructor_id: reviewee_team.id).first
 
       # if the reviewee team has created quiz
@@ -73,6 +67,7 @@ class StudentQuizzesController < ApplicationController
           # for MultipleChoiceCheckbox, score =1 means the quiz taker have done this question correctly, not just make select this choice correctly.
           params[question.id.to_s].each do |choice|
             new_score = Answer.new comments: choice, question_id: question.id, response_id: response.id, answer: score
+
             valid = false unless new_score.valid?
             scores.push(new_score)
           end

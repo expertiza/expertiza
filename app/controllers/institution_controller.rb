@@ -1,8 +1,8 @@
 class InstitutionController < ApplicationController
-  include AuthorizationHelper
-
   def action_allowed?
-    current_user_has_instructor_privileges?
+    ['Super-Administrator',
+     'Administrator',
+     'Instructor'].include? current_role_name
   end
 
   def index

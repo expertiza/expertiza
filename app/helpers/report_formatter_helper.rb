@@ -1,11 +1,7 @@
 module ReportFormatterHelper
-
-  # E1936 team recommends this method be REMOVED (it does not seem to be used anywhere in Expertiza as of 4/21/19)
   def summary_by_reviewee_and_criteria(params, _session = nil)
     assign_basics(params)
-    # E1991 : pass extra session variable to address anonymized view
-    # note that this is already passed from parent method in _session
-    sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(@assignment, @summary_ws_url, _session)
+    sum = SummaryHelper::Summary.new.summarize_reviews_by_reviewees(@assignment, @summary_ws_url)
     @summary = sum.summary
     @reviewers = sum.reviewers
     @avg_scores_by_reviewee = sum.avg_scores_by_reviewee
@@ -13,7 +9,6 @@ module ReportFormatterHelper
     @avg_scores_by_criterion = sum.avg_scores_by_criterion
   end
 
-  # E1936 team recommends this method be REMOVED (it does not seem to be used anywhere in Expertiza as of 4/21/19)
   def summary_by_criteria(params, _session = nil)
     assign_basics(params)
     sum = SummaryHelper::Summary.new.summarize_reviews_by_criterion(@assignment, @summary_ws_url)
@@ -34,7 +29,7 @@ module ReportFormatterHelper
   def feedback_response_map(params, _session = nil)
     assign_basics(params)
     # If review report for feedback is required call feedback_response_report method in feedback_review_response_map model
-    if @assignment.vary_by_round
+    if @assignment.varying_rubrics_by_round?
       @authors, @all_review_response_ids_round_one, @all_review_response_ids_round_two, @all_review_response_ids_round_three =
         FeedbackResponseMap.feedback_response_report(@id, @type)
     else
@@ -46,13 +41,6 @@ module ReportFormatterHelper
     assign_basics(params)
     @reviewers = TeammateReviewResponseMap.teammate_response_report(@id)
   end
-
-  # Get reviewers for bookmark ratings and topics for assignment
-  def bookmark_rating_response_map(params, _session = nil)
-    assign_basics(params)
-    @reviewers = BookmarkRatingResponseMap.bookmark_response_report(@id)
-    @topics = @assignment.sign_up_topics
-   end
 
   def calibration(params, session)
     assign_basics(params)
@@ -109,20 +97,22 @@ module ReportFormatterHelper
 
   def user_summary_report(line)
     if @user_tagging_report[line.user.name].nil?
-      # E2082 Adding extra field of interval array into data structure
-      @user_tagging_report[line.user.name] = VmUserAnswerTagging.new(line.user, line.percentage, line.no_tagged, line.no_not_tagged, line.no_tagable, line.tag_update_intervals)
+      @user_tagging_report[line.user.name] = VmUserAnswerTagging.new(line.user, line.no_total, line.no_inferred, line.no_taggable,
+                                                                     line.no_tagged, line.no_not_tagged, line.percentage)
     else
+      @user_tagging_report[line.user.name].no_total += line.no_total
+      @user_tagging_report[line.user.name].no_inferred += line.no_inferred
+      @user_tagging_report[line.user.name].no_taggable += line.no_taggable
       @user_tagging_report[line.user.name].no_tagged += line.no_tagged
       @user_tagging_report[line.user.name].no_not_tagged += line.no_not_tagged
-      @user_tagging_report[line.user.name].no_tagable += line.no_tagable
       @user_tagging_report[line.user.name].percentage = calculate_formatted_percentage(line)
     end
   end
 
   def calculate_formatted_percentage(line)
     number_tagged = @user_tagging_report[line.user.name].no_tagged.to_f
-    number_taggable = @user_tagging_report[line.user.name].no_tagable
+    number_taggable = @user_tagging_report[line.user.name].no_taggable
     formatted_percentage = format("%.1f", (number_tagged / number_taggable) * 100)
-    @user_tagging_report[line.user.name].no_tagable.zero? ? '-' : formatted_percentage
+    @user_tagging_report[line.user.name].no_taggable.zero? ? '-' : formatted_percentage
   end
 end

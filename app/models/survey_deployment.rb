@@ -8,11 +8,11 @@ class SurveyDeployment < ActiveRecord::Base
       errors[:base] << "The start and end time should be specified."
       return false
     end
-    unless end_date.nil? || start_date.nil? || (end_date - start_date) >= 0
+    if !end_date.nil? && !start_date.nil? && (end_date - start_date) < 0
       errors[:base] << "The End Date should be after the Start Date."
       return false
     end
-    unless end_date.nil? || end_date >= Time.now
+    if !end_date.nil? && end_date < Time.now
       errors[:base] << "The End Date should be in the future."
       return false
     end

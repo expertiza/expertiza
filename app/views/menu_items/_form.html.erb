@@ -35,8 +35,8 @@
                                                        <% end -%>
                                                      </table>
 
-                                                     <% unless @can_change_parent -%>
-<%=  hidden_field :menu_item, :parent_id  %>
-<% end -%>
+                                                     <% if not @can_change_parent -%>
+                                                       <%= hidden_field :menu_item, :parent_id %>
+                                                     <% end -%>
                                                      <!--[eoform:menu_item]-->
 

@@ -1,5 +1,4 @@
 describe PopupController do
-  let(:instructor) { build(:instructor, id: 6) }
   let(:team) { build(:assignment_team, id: 1, name: "team1", assignment: assignment) }
   let(:student) { build(:student, id: 1, name: "student") }
   let(:student2) { build(:student, id: 2, name: "student2") }
@@ -26,16 +25,36 @@ describe PopupController do
 
   describe '#team_users_popup' do
     ## INSERT CONTEXT/DESCRIPTION/CODE HERE
-    it "renders the page successfuly as Instructor" do 
-      allow(Team).to receive(:find).and_return(team)
-      allow(Assignment).to receive(:find).and_return(assignment)
-      params = {id: team.id, assignment: assignment, reviewer_id: participant2.id}
-      session = {user: instructor}
-      result = get :team_users_popup, params, session
-      expect(result.status).to eq 200
+  end
 
+  ######### Tone Analysis Tests ##########
+  describe "tone analysis tests" do
+    before(:each) do
+      allow(ReviewResponseMap).to receive(:where).with('reviewee_id = ?', team.id).and_return([response_map])
+      allow(Assignment).to receive(:find).with('reviewee_id = ?', team.id).and_return(assignment)
+      allow(ReviewResponseMap).to receive(:final_versions_from_reviewer).with(1).and_return(final_versions)
+      allow(Answer).to receive(:where).with(any_args).and_return(mocked_comments_one)
+      @request.host = test_url
+    end
+
+    describe '#view_review_scores_popup' do
+      ## INSERT CONTEXT/DESCRIPTION/CODE HERE
+    end
+
+    describe '#build_tone_analysis_report' do
+      context 'upon selecting summery, the tone analysis for review comments is calculated and applied to the page' do
+        it 'builds a tone analysis report and returns the heat map URLs' do
+          result = get :build_tone_analysis_report
+          expect(result["Location"]).to eq(test_url + "/") ## Placeholder URL should be returned since GET returns a 302 status redirection error
+        end
+      end
+    end
+
+    describe '#build_tone_analysis_heatmap' do
+      ## INSERT CONTEXT/DESCRIPTION/CODE HERE
     end
   end
+  ##########################################
 
   describe '#reviewer_details_popup' do
     ## INSERT CONTEXT/DESCRIPTION/CODE HERE

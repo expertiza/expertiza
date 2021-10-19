@@ -1,8 +1,6 @@
 class SiteControllersController < ApplicationController
-  include AuthorizationHelper
-
   def action_allowed?
-    current_user_has_super_admin_privileges?
+    current_role_name.eql?("Super-Administrator")
   end
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)

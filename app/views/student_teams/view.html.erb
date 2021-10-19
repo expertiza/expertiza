@@ -10,7 +10,7 @@
     <%= submit_tag "Name team", data: { disable_with: "Submitting..." } %>
   <% end %>
 <% else %>
-  <b style="text-align: center">Team Name: &nbsp;&nbsp;</b><%= @student.team.name(session[:ip]) %> &nbsp;&nbsp;&nbsp;
+  <b style="text-align: center">Team Name: &nbsp;&nbsp;</b><%= @student.team.name %> &nbsp;&nbsp;&nbsp;
     <%= link_to "Edit name", controller: 'StudentTeams', action: 'edit', team_id: @student.team.id, student_id: @student.id %>
   <br/><br/>
   <b>Team members</b>
@@ -20,7 +20,7 @@
     <tr style="border: 1px outset #000000; padding: 10px 20px" >
       <th class="head">Username</th>
       <th class="head">Full name</th>
-      <th class="head">Team-member role (duty)</th>
+      <!--<th class="head">Team-member role (duty)</th>-->
       <th class="head">Email address</th>
       <% if @teammate_review_allowed %>
         <th class="head">Review action</th>
@@ -31,7 +31,6 @@
       <tr>
         <td><%= member.user.name(session[:ip]) %></td>
         <td><%= member.user.fullname(session[:ip]) %></td>
-        <td><%= member.duty.nil? ? "" : member.duty.capitalize %></td>
         <td><%= member.user.email(session[:ip]) %></td>
 
         <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
@@ -62,13 +61,7 @@
         <br/>
         <%= link_to "Leave team", remove_participant_student_teams_path(student_id: @student.id, team_id: @student.team.id), data: { disable_with: "Leave team" } %>
       <td>
-    </tr> <!--E2081 TODO Table for self contribution Cake questions-->
-    <%# <% if @teammate_review_allowed %>
-      <%# <tr style="border: 1px outset #000000; padding: 10px 20px" >
-        <th class="head">Teammate review question</th>
-        <th class="head">Self contribution percentage</th>
-      </tr> %>
-    <%# <% end %> <!--end self contribution for Cake questions-->
+    </tr>
   </table>
 <% end %>
 

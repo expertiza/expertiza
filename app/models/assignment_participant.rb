@@ -18,12 +18,18 @@ class AssignmentParticipant < Participant
   # has_many    :responses, :finder_sql => 'SELECT r.* FROM responses r, response_maps m, participants p WHERE r.map_id = m.id AND m.type = \'ReviewResponseMap\' AND m.reviewee_id = p.id AND p.id = #{id}'
   belongs_to :user
   validates :handle, presence: true
-  #array of the average volume in each round of reviews
-  attr_accessor :avg_vol_per_round
   attr_accessor :overall_avg_vol
+  attr_accessor :avg_vol_in_round_1
+  attr_accessor :avg_vol_in_round_2
+  attr_accessor :avg_vol_in_round_3
 
   def dir_path
     assignment.try :directory_path
+  end
+
+  def assign_quiz(contributor, reviewer, _topic = nil)
+    quiz = QuizQuestionnaire.find_by(instructor_id: contributor.id)
+    QuizResponseMap.create(reviewed_object_id: quiz.try(:id), reviewee_id: contributor.id, reviewer_id: reviewer.id)
   end
 
   # all the participants in this assignment who have reviewed the team where this participant belongs
@@ -36,57 +42,136 @@ class AssignmentParticipant < Participant
     reviewers
   end
 
-  # E1973, dummy method to match the functionality of AssignmentTeam
-  def set_current_user(current_user)
+  def review_score
+    review_questionnaire = self.assignment.questionnaires.select {|q| q.type == "ReviewQuestionnaire" }[0]
+    assessment = review_questionnaire.get_assessments_for(self)
+    (Answer.compute_scores(assessment, review_questionnaire.questions)[:avg] / 100.00) * review_questionnaire.max_possible_score.to_f
+  end
+
+  # Return scores that this participant has been given
+  # methods extracted from scores method: merge_scores, topic_total_scores, calculate_scores
+  def scores(questions)
+    scores = {}
+    scores[:participant] = self
+    compute_assignment_score(questions, scores)
+    scores[:total_score] = self.assignment.compute_total_score(scores)
+    # merge scores[review#] (for each round) to score[review]  -Yang
+    merge_scores(scores) if self.assignment.varying_rubrics_by_round?
+    # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
+    # PS: I don't like the fact that we are doing this here but it is difficult to make it work anywhere else
+    topic_total_scores(scores) if self.assignment.microtask?
+
+    # for all quiz questionnaires (quizzes) taken by the participant
+    # quiz_responses = []
+    # quiz_response_mappings = QuizResponseMap.where(reviewer_id: self.id)
+    # quiz_response_mappings.each do |qmapping|
+    #   quiz_responses << qmapping.response if qmapping.response
+    # end
+    # scores[:quiz] = Hash.new
+    # scores[:quiz][:assessments] = quiz_responses
+    # scores[:quiz][:scores] = Answer.compute_quiz_scores(scores[:quiz][:assessments])
+    scores[:total_score] = assignment.compute_total_score(scores)
+    # scores[:total_score] += compute_quiz_scores(scores)
+    # move lots of calculation from view(_participant.html.erb) to model
+    calculate_scores(scores)
+  end
+
+  def compute_assignment_score(questions, scores)
+    self.assignment.questionnaires.each do |questionnaire|
+      round = AssignmentQuestionnaire.find_by(assignment_id: self.assignment.id, questionnaire_id: questionnaire.id).used_in_round
+      # create symbol for "varying rubrics" feature -Yang
+      questionnaire_symbol = if round.nil?
+                               questionnaire.symbol
+                             else
+                               (questionnaire.symbol.to_s + round.to_s).to_sym
+                             end
+
+      scores[questionnaire_symbol] = {}
+
+      scores[questionnaire_symbol][:assessments] = if round.nil?
+                                                     questionnaire.get_assessments_for(self)
+                                                   else
+                                                     questionnaire.get_assessments_round_for(self, round)
+                                                   end
+      scores[questionnaire_symbol][:scores] = Answer.compute_scores(scores[questionnaire_symbol][:assessments], questions[questionnaire_symbol])
+    end
+  end
+
+  def merge_scores(scores)
+    review_sym = "review".to_sym
+    scores[review_sym] = {}
+    scores[review_sym][:assessments] = []
+    scores[review_sym][:scores] = {max: -999_999_999, min: 999_999_999, avg: 0}
+    total_score = 0
+    (1..self.assignment.num_review_rounds).each do |i|
+      round_sym = ("review" + i.to_s).to_sym
+      next if scores[round_sym].nil? || scores[round_sym][:assessments].nil? || scores[round_sym][:assessments].empty?
+      length_of_assessments = scores[round_sym][:assessments].length.to_f
+      scores[review_sym][:assessments] += scores[round_sym][:assessments]
+      if !scores[round_sym][:scores][:max].nil? && scores[review_sym][:scores][:max] < scores[round_sym][:scores][:max]
+        scores[review_sym][:scores][:max] = scores[round_sym][:scores][:max]
+      end
+      if !scores[round_sym][:scores][:min].nil? && scores[review_sym][:scores][:min] > scores[round_sym][:scores][:min]
+        scores[review_sym][:scores][:min] = scores[round_sym][:scores][:min]
+      end
+      total_score += scores[round_sym][:scores][:avg] * length_of_assessments unless scores[round_sym][:scores][:avg].nil?
+    end
+    if scores[review_sym][:scores][:max] == -999_999_999 && scores[review_sym][:scores][:min] == 999_999_999
+      scores[review_sym][:scores][:max] = 0
+      scores[review_sym][:scores][:min] = 0
+    end
+    scores[review_sym][:scores][:avg] = total_score / scores[review_sym][:assessments].length.to_f
+  end
+
+  def topic_total_scores(scores)
+    topic = SignUpTopic.find_by(assignment_id: self.assignment.id)
+    return if topic.nil?
+    scores[:total_score] *= (topic.micropayment.to_f / 100.to_f)
+    scores[:max_pts_available] = topic.micropayment
+  end
+
+  def calculate_scores(scores)
+    if self.grade
+      scores[:total_score] = self.grade
+    else
+      scores[:total_score] = 100 if scores[:total_score] > 100
+      scores
+    end
   end
 
   # Copy this participant to a course
-  def copy_to_course(course_id)
+  def copy(course_id)
     CourseParticipant.find_or_create_by(user_id: self.user_id, parent_id: course_id)
   end
 
   def feedback
-    FeedbackResponseMap.assessments_for(self)
+    FeedbackResponseMap.get_assessments_for(self)
   end
 
   def reviews
     # ACS Always get assessments for a team
     # removed check to see if it is a team assignment
-    ReviewResponseMap.assessments_for(self.team)
+    ReviewResponseMap.get_assessments_for(self.team)
   end
 
-  # returns the reviewer of the assignment. Checks the reviewer_is_team flag to
-  # determine whether this AssignmentParticipant or their team is the reviewer
-  def get_reviewer
-    return self.team if self.assignment.reviewer_is_team
-    self
-  end
-
-  # polymorphic twin of method in AssignmentTeam
-  # this method is called to check if the current user is this one
-  def get_logged_in_reviewer_id(current_user_id)
-    self.id
-  end
-
-  # checks if this assignment participant is the currently logged on user, given their user id
-  def current_user_is_reviewer?(current_user_id)
-    user_id == current_user_id
+  def reviews_by_reviewer(reviewer)
+    ReviewResponseMap.get_reviewer_assessments_for(self.team, reviewer)
   end
 
   def quizzes_taken
-    QuizResponseMap.assessments_for(self)
+    QuizResponseMap.get_assessments_for(self)
   end
 
   def metareviews
-    MetareviewResponseMap.assessments_for(self)
+    MetareviewResponseMap.get_assessments_for(self)
   end
 
   def teammate_reviews
-    TeammateReviewResponseMap.assessments_for(self)
+    TeammateReviewResponseMap.get_assessments_for(self)
   end
 
   def bookmark_reviews
-    BookmarkRatingResponseMap.assessments_for(self)
+    BookmarkRatingResponseMap.get_assessments_for(self)
   end
 
   def files(directory)
@@ -113,24 +198,14 @@ class AssignmentParticipant < Participant
   def self.import(row_hash, _row_header = nil, session, id)
     raise ArgumentError, "No user id has been specified." if row_hash.empty?
     user = User.find_by(name: row_hash[:name])
-
-    #if user with provided name in csv file is not present then new user will be created.
+    # Create new user if not already present in the system - svshingt
     if user.nil?
       raise ArgumentError, "The record containing #{row_hash[:name]} does not have enough items." if row_hash.length < 4
-
-      #define_attributes method will return an element that stores values from the row_hash.
       attributes = ImportFileHelper.define_attributes(row_hash)
-
-      #create_new_user method will create new user with values present in attribute.
       user = ImportFileHelper.create_new_user(attributes, session)
-
+      raise ImportError, "The assignment with id \"#{id}\" was not found." if Assignment.find(id).nil?
     end
-    raise ImportError, "The assignment with id \"#{id}\" was not found." if Assignment.find(id).nil?
-
-    #if user is already added to the assignment then return.
     return if AssignmentParticipant.exists?(user_id: user.id, parent_id: id)
-
-    #if user is not already a participant then, user will be added to the assignment.
     new_part = AssignmentParticipant.create(user_id: user.id, parent_id: id)
     new_part.set_handle
   end
@@ -138,11 +213,13 @@ class AssignmentParticipant < Participant
   # grant publishing rights to one or more assignments. Using the supplied private key,
   # digital signatures are generated.
   # reference: http://stuff-things.net/2008/02/05/encrypting-lots-of-sensitive-data-with-ruby-on-rails/
-  def assign_copyright(private_key)
-    # now, check to make sure the digital signature is valid, if not raise error
-    self.permission_granted = self.verify_digital_signature(private_key)
-    self.save
-    raise 'Invalid key' unless self.permission_granted  
+  def self.grant_publishing_rights(private_key, participants)
+    participants.each do |participant|
+      # now, check to make sure the digital signature is valid, if not raise error
+      participant.permission_granted = participant.verify_digital_signature(private_key)
+      participant.save
+      raise 'Invalid key' unless participant.permission_granted
+    end
   end
 
   # verify the digital signature is valid
@@ -176,7 +253,7 @@ class AssignmentParticipant < Participant
 
   def current_stage
     topic_id = SignedUpTeam.topic_id(self.parent_id, self.user_id)
-    assignment.try :current_stage, topic_id
+    assignment.try :get_current_stage, topic_id
   end
 
   def stage_deadline

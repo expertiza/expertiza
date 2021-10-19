@@ -1,6 +1,6 @@
 module QuestionAnalytic
   def unique_character_count
-    self.txt.gsub(/\s+/, "").downcase.split(//).uniq.length
+    self.txt.gsub(/[^0-9A-Za-z ]/, '').downcase.split(" ").uniq.count
   end
 
   def character_count

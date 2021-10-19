@@ -8,11 +8,11 @@ th, td {
 	<% min_question_score = @assignment_questionnaire.questionnaire.min_question_score %>
 	<% max_question_score = @assignment_questionnaire.questionnaire.max_question_score %>
 	<% current_responses = @responses.select{|response|response.response_map.reviewee_id == response_map.reviewee_id} %>
-	<% response_ids = [] %>
+	<% response_ids = Array.new %>
 	<% current_responses.each { |curr_response|response_ids << curr_response.id } %>
 	<% participant_num = current_responses.count %>
 	
-	<h3> <%= "Calibration #{index+1} (team name:  #{team.name(session[:ip])})" %></h3>
+	<h3> <%= "Calibration #{index+1} (team name:  #{team.name})" %></h3>
 	<% @questions.each_with_index do |question, index| %>
 		<% instructor_answer = Answer.select('answer').where(["question_id = ? and response_id = ?", question.id, response_map.response[0].id]).first.answer ||= 0 %>
 		<b><%= "Question #{index+1}: " %></b><%= question.txt %>
@@ -26,7 +26,7 @@ th, td {
 			<tr>
 				<td> % of students </td>
 				<% max_count = 0 %>
-				<% count_hash = {} %>
+				<% count_hash = Hash.new %>
 				<% (min_question_score..max_question_score).each do |answer| %>
 					<% count = Answer.where(["question_id = ? and response_id IN (?) and answer = ?", question.id, response_ids, answer]).size %>
 					<% count_hash[answer] = count %>

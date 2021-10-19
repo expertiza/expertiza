@@ -1,5 +1,5 @@
 <% request_user ||= false %>
-<%unless request_user%>
+<%if !request_user%>
 <div>
   <table class="table borderless">
     <tr>

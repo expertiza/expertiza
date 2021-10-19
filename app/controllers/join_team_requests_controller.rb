@@ -1,11 +1,9 @@
 class JoinTeamRequestsController < ApplicationController
-  include AuthorizationHelper
-
   before_action :check_team_status, only: [:create]
   before_action :find_request, only: %i[show edit update destroy decline]
 
   def action_allowed?
-    current_user_has_student_privileges?
+    current_role_name.eql?("Student")
   end
 
   def index

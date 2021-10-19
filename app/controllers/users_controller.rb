@@ -1,9 +1,6 @@
 require 'will_paginate/array'
 
 class UsersController < ApplicationController
-  include AuthorizationHelper
-  include ConferenceHelper
-
   autocomplete :user, :name
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify method: :post, only: %i[destroy create update],
@@ -11,27 +8,27 @@ class UsersController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'list_pending_requested'
-      current_user_has_admin_privileges?
-    when 'new', 'create_requested_user_record'
+    when 'set_anonymized_view'
       true
-    when 'keys', 'index'
-      # These action methods are all written with the clear expectation
-      # that a student should be allowed to proceed
-      current_user_has_student_privileges?
-    when 'show', 'set_anonymized_view'
-      # This action method is written with the clear expectation
-      # that a student should be allowed to proceed
-      # Furthermore, there is an RSPec test that a 'student' with no role id
-      # should be allowed to proceed
-      user_logged_in?
+    when 'list_pending_requested'
+      ['Super-Administrator',
+       'Administrator'].include? current_role_name
+    when 'request_new'
+      true
+    when 'create_requested_user_record'
+      true
+    when 'keys'
+      current_role_name.eql? 'Student'
     else
-      current_user_has_ta_privileges?
+      ['Super-Administrator',
+       'Administrator',
+       'Instructor',
+       'Teaching Assistant'].include? current_role_name
     end
   end
 
   def index
-    if current_user_is_a? 'Student'
+    if current_user_role? == "Student"
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
       list
@@ -46,7 +43,9 @@ class UsersController < ApplicationController
     render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
   end
 
+  #
   # for anonymized view for demo purposes
+  #
   def set_anonymized_view
     anonymized_view_starter_ips = $redis.get('anonymized_view_starter_ips') || ''
     session[:ip] = request.remote_ip
@@ -63,20 +62,17 @@ class UsersController < ApplicationController
   def list
     user = session[:user]
     @users = user.get_user_list
-    # paginate_list is called with the entire list of users
-    # @paginated_users can be used to display set number of users per page
-    @paginated_users = paginate_list(@users)
   end
 
+  def list_pending_requested
+    @requested_users = RequestedUser.all
+    @roles = Role.all
+  end
 
-
-  # for displaying users which are being searched for editing purposes after checking whether current user is authorized to do so
-  def show_if_authorized
+  def show_selection
     @user = User.find_by(name: params[:user][:name])
     if !@user.nil?
-      role
-      #check whether current user is authorized to edit the user being searched, call show if true
-
+      get_role
       if @role.parent_id.nil? || @role.parent_id < session[:user].role_id || @user.id == session[:user].id
         render action: 'show'
       else
@@ -90,11 +86,11 @@ class UsersController < ApplicationController
   end
 
   def show
-    if params[:id].nil? || ((current_user_is_a? 'Student') && (!current_user_has_id? params[:id]))
+    if params[:id].nil? || ((current_user_role? == "Student") && (session[:user].id != params[:id].to_i))
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
       @user = User.find(params[:id])
-      role
+      get_role
       # obtain number of assignments participated
       @assignment_participant_num = 0
       AssignmentParticipant.where(user_id: @user.id).each {|_participant| @assignment_participant_num += 1 }
@@ -111,14 +107,32 @@ class UsersController < ApplicationController
     foreign
   end
 
+  def request_new
+    flash[:warn] = "If you are a student, please contact your teaching staff to get your Expertiza ID."
+    @user = User.new
+    @rolename = Role.find_by(name: params[:role])
+    roles_for_request_sign_up
+  end
 
   def create
     # if the user name already exists, register the user by email address
     check = User.find_by(name: params[:user][:name])
     params[:user][:name] = params[:user][:email] unless check.nil?
-    is_user=true
-    # Assign all user params for creating user using assign_user_params function
-    @user=assign_user_params(is_user)
+    @user = User.new(user_params)
+    if params[:user][:institution_id].blank?
+      begin
+        params[:user][:institution_id] = (Institution.create(name: params[:institution][:name])).id
+      rescue StandardError
+        flash[:error] = "Institution with same name already exists"
+        redirect_to action: 'new', role: 'Student'
+      end
+      # params[:user][:institution_id] = params[:user][:institution_id]
+    end
+    @user.institution_id = params[:user][:institution_id]
+    # record the person who created this new user
+    @user.parent_id = session[:user].id
+    # set the user's timezone to its parent's
+    @user.timezonepref = User.find(@user.parent_id).timezonepref
     if @user.save
       password = @user.reset_password # the password is reset
       prepared_mail = MailerHelper.send_mail_to_user(@user, "Your Expertiza account and password have been created.", "user_welcome", password)
@@ -134,7 +148,8 @@ class UsersController < ApplicationController
       redirect_to action: 'list'
     else
       foreign
-      render action: 'new'
+      flash[:error] = "Another user with these credentials already exists"
+      redirect_to action: 'new', role: 'Student'
     end
   end
 
@@ -164,7 +179,7 @@ class UsersController < ApplicationController
       flash[:error] = requested_user.errors.full_messages.to_sentence
     end
     ExpertizaLogger.error LoggerMessage.new(controller_name, requested_user.name, flash[:error], request)
-    redirect_to controller: 'users', action: 'new', role: 'Student'
+    redirect_to controller: 'users', action: 'request_new', role: 'Student'
   end
 
   def create_approved_user
@@ -185,7 +200,10 @@ class UsersController < ApplicationController
       new_user.parent_id = session[:user].id
       new_user.timezonepref = User.find_by(id: new_user.parent_id).timezonepref
       if new_user.save
+        password = new_user.reset_password
         # Mail is sent to the user with a new password
+        prepared_mail = MailerHelper.send_mail_to_user(new_user, "Your Expertiza account and password have been created.", "user_welcome", password)
+        prepared_mail.deliver
         flash[:success] = "A new password has been sent to new user's e-mail address."
         undo_link("The user \"#{requested_user.name}\" has been successfully created. ")
       else
@@ -206,7 +224,7 @@ class UsersController < ApplicationController
 
   def edit
     @user = User.find(params[:id])
-    role
+    get_role
     foreign
   end
 
@@ -243,7 +261,7 @@ class UsersController < ApplicationController
   end
 
   def keys
-    if params[:id].nil? || ((current_user_is_a? 'Student') && (!current_user_has_id? params[:id]))
+    if params[:id].nil? || ((current_user_role? == "Student") && (session[:user].id != params[:id].to_i))
       redirect_to(action: AuthHelper.get_home_action(session[:user]), controller: AuthHelper.get_home_controller(session[:user]))
     else
       @user = User.find(params[:id])
@@ -254,15 +272,17 @@ class UsersController < ApplicationController
   protected
 
   def foreign
-    # stores all the roles that are possible 
-    # when a new user joins or an existing user updates his/her profile they will get to choose
-    # from all the roles available
     role = Role.find(session[:user].role_id)
     @all_roles = Role.where('id in (?) or id = ?', role.get_available_roles, role.id)
   end
 
+  def roles_for_request_sign_up
+    roles_can_be_requested_online = ["Instructor", "Teaching Assistant"]
+    @all_roles = Role.where(name: roles_can_be_requested_online)
+  end
+
   private
- #add user preference_home_flag
+
   def user_params
     params.require(:user).permit(:name,
                                  :crypted_password,
@@ -284,12 +304,15 @@ class UsersController < ApplicationController
                                  :timezonepref,
                                  :public_key,
                                  :copy_of_emails,
-                                 :institution_id,
-                                 :preference_home_flag)
+                                 :institution_id)
   end
 
-  #to find the role of a given user object and set the @role accordingly
-  def role
+  def requested_user_params
+    params.require(:user).permit(:name, :role_id, :fullname, :institution_id, :email)
+          .merge(self_introduction: params[:requested_user][:self_introduction])
+  end
+
+  def get_role
     if @user && @user.role_id
       @role = Role.find(@user.role_id)
     elsif @user
@@ -309,7 +332,7 @@ class UsersController < ApplicationController
 
     # The type of condition for the search depends on what the user has selected from the search_by dropdown
     @search_by = params[:search_by]
-    @per_page = 3
+
     # search for corresponding users
     # users = User.search_users(role, user_id, letter, @search_by)
 

@@ -1,12 +1,13 @@
 class UserPastebinsController < ApplicationController
-  include AuthorizationHelper
-
   before_action :set_user_pastebin, only: %i[show edit update destroy]
 
   def action_allowed?
     case params[:action]
     when 'index', 'create'
-      current_user_has_student_privileges?
+      ['Instructor',
+       'Teaching Assistant',
+       'Student',
+       'Administrator'].include? current_role_name
     end
   end
 

@@ -33,16 +33,17 @@ class ContentPage < ActiveRecord::Base
 
   def markup_content
     markup = self.markup_style
-    if markup and markup.name
-                         if markup.name == 'Textile'
-                           RedCloth.new(self.content).to_html(:textile)
-                         elsif markup.name == 'Markdown'
-                           RedCloth.new(self.content).to_html(:markdown)
-                         else
-                           self.content
-                                        end
-        else
-                         self.content
-        end
+    content_html = if markup and markup.name
+                     if markup.name == 'Textile'
+                       RedCloth.new(self.content).to_html(:textile)
+                     elsif markup.name == 'Markdown'
+                       RedCloth.new(self.content).to_html(:markdown)
+                     else
+                       self.content
+                                    end
+                   else
+                     self.content
+                   end
+    content_html
   end
 end

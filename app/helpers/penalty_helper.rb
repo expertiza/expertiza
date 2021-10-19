@@ -17,7 +17,7 @@ module PenaltyHelper
     # use its value to check if the penalty is to be calculated for the assignment or not
     if calculate_penalty == true
       topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
-      stage = @assignment.current_stage(topic_id)
+      stage = @assignment.get_current_stage(topic_id)
       if stage == "Finished"
         penalties[:submission] = calculate_submission_penalty
         penalties[:review] = calculate_review_penalty
@@ -52,7 +52,7 @@ module PenaltyHelper
     penalty = 0
     num_of_reviews_required = @assignment.num_reviews
     if num_of_reviews_required > 0
-      review_mappings = ReviewResponseMap.where(reviewer_id: @participant.get_reviewer.id)
+      review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
       review_due_date = AssignmentDueDate.where(deadline_type_id: @review_deadline_type_id,
                                                 parent_id:  @assignment.id).first
       penalty = compute_penalty_on_reviews(review_mappings, review_due_date.due_at, num_of_reviews_required) unless review_due_date.nil?

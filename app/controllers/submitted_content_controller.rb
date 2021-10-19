@@ -65,6 +65,7 @@ class SubmittedContentController < ApplicationController
         ExpertizaLogger.error LoggerMessage.new(controller_name, @participant.name, "The URL or URI is invalid. Reason: #{$ERROR_INFO}", request)
         flash[:error] = "The URL or URI is invalid. Reason: #{$ERROR_INFO}"
       end
+      AssignmentTeam.mail_assigned_reviewers(@participant, team)
       ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The link has been successfully submitted.', request)
       undo_link("The link has been successfully submitted.")
     end
@@ -141,35 +142,12 @@ class SubmittedContentController < ApplicationController
     ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The file has been submitted.', request)
 
     # Notify all reviewers assigned to this reviewee
-    mail_assigned_reviewers(team)
+    AssignmentTeam.mail_assigned_reviewers(@participant, team)
 
     if params[:origin] == 'review'
       redirect_to :back
     else
       redirect_to action: 'edit', id: participant.id
-    end
-  end
-
-  def mail_assigned_reviewers(team)
-    maps = ResponseMap.where(reviewed_object_id: @participant.assignment.id, reviewee_id: team.id, type: 'ReviewResponseMap')
-    unless maps.nil?
-      maps.each do |map|
-        reviewer = User.find(Participant.find(map.reviewer_id).user_id)
-        Mailer.sync_message(
-          {
-            :to => reviewer.email,
-            subject:  "Assignment '#{@participant.assignment.name}': A submission has been updated since you last reviewed it",
-            cc: User.find_by(@participant.assignment.instructor_id).email,
-            :body => {
-              :obj_name => @participant.assignment.name,
-              :link => "https://expertiza.ncsu.edu/response/new?id=#{map.id}",
-              :type => 'submission',
-              :first_name => ApplicationHelper::get_user_first_name(User.find(Participant.find(map.reviewer_id).user_id)),
-              :partial_name => 'updated_submission_since_review'
-           }
-          }
-        ).deliver_now
-      end
     end
   end
 

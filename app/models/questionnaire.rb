@@ -6,6 +6,7 @@ class Questionnaire < ActiveRecord::Base
   has_many :assignment_questionnaires, dependent: :destroy
   has_many :assignments, through: :assignment_questionnaires
   has_one :questionnaire_node, foreign_key: 'node_object_id', dependent: :destroy, inverse_of: :questionnaire
+  belongs_to :tree_folder
 
   validate :validate_questionnaire
   validates :name, presence: true
@@ -112,5 +113,14 @@ class Questionnaire < ActiveRecord::Base
 
     results = Questionnaire.where("id <> ? and name = ? and instructor_id = ?", id, name, instructor_id)
     errors.add(:name, "Questionnaire names must be unique.") if results.present?
+  end
+
+  def display_type
+    self.tree_folder.name
+  end
+
+  def display_type= (display_type)
+    puts TreeFolder.where(["replace(name, ' ', '') = ?", display_type]).to_sql
+    self.tree_folder = TreeFolder.where(["replace(name, ' ', '') = ?", display_type]).first
   end
 end

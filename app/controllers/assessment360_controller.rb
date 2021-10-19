@@ -7,9 +7,31 @@ class Assessment360Controller < ApplicationController
     current_user_has_ta_privileges?
   end
 
+  def isRefresh? checkboxes_array
+      return not(checkboxes_array.any?)
+  end
+
+  def colspan checkboxes_array
+    if not checkboxes_array.any?
+      return 5
+    end
+    return checkboxes_array.count("true")
+  end
+
+  def colspan_review checkboxes_array
+    if checkboxes_array[0] && checkboxes_array[1]
+      return 2
+    elsif checkboxes_array[0] || checkboxes_array[1]
+      return 1
+    else
+      return 0
+    end
+  end
+
   # Find the list of all students and assignments pertaining to the course.
   # This data is used to compute the metareview and teammate review scores.
   def all_students_all_reviews
+    required = [:show_teammate_reviews,:show_meta_reviews,:show_peer_scores,:show_instructor_grades,:show_topics]
     @topics = {}
     @assignment_grades = {}
     @peer_review_scores = {}
@@ -18,73 +40,91 @@ class Assessment360Controller < ApplicationController
     @course_id = params[:course_id]
     @assignments = course.assignments.reject(&:is_calibrated).reject {|a| a.participants.empty? }
     @course_participants = course.get_participants
+    @render_partial = false
     insure_existence_of(@course_participants,course)
     # hashes for view
     @meta_review = {}
     @teammate_review = {}
     @teamed_count = {}
-
-
-    @show_teammate_reviews = false
-    @show_meta_reviews = false
-    @show_peer_scores = false
-    @show_instructor_grades = false
-    @show_avg_peer_reviews = false
+    @form_complete = ""
+    required.each do |f|
+      if params.has_key? f and not params[f].blank?
+        if params[f]
+          @form_complete += f.to_s
+        end
+      end
+      @form_complete += " "
+    end
+    @show_teammate_reviews = params[:show_teammate_reviews] || false
+    @show_meta_reviews = params[:show_meta_reviews] || false
+    @show_peer_scores = params[:show_peer_scores] || false
+    @show_instructor_grades = params[:show_instructor_grades] || false
+    @show_topics = params[:show_topics] || false
+    @checkboxes_array = [@show_teammate_reviews,@show_meta_reviews,@show_peer_scores,@show_instructor_grades,@show_topics]
+    @colspan = colspan @checkboxes_array
+    @colspan_review = colspan_review @checkboxes_array
+    if isRefresh? @checkboxes_array
+      @render_partial = false
+    else
+      @render_partial = true
+    end
     # for course
     # eg. @overall_teammate_review_grades = {assgt_id1: 100, assgt_id2: 178, ...}
     # @overall_teammate_review_count = {assgt_id1: 1, assgt_id2: 2, ...}
-    %w[teammate meta].each do |type|
-      instance_variable_set("@overall_#{type}_review_grades", {})
-      instance_variable_set("@overall_#{type}_review_count", {})
-    end
-    @course_participants.each do |cp|
-      # for each assignment
-      # [aggregrate_review_grades_per_stu, review_count_per_stu] --> [0, 0]
-      @topics[cp.id] = {}
-      @assignment_grades[cp.id] = {}
-      @peer_review_scores[cp.id] = {}
-      @final_grades[cp.id] = 0
-      %w[teammate meta].each {|type| instance_variable_set("@#{type}_review_info_per_stu", [0, 0]) }
-      students_teamed = StudentTask.teamed_students(cp.user)
-      @teamed_count[cp.id] = students_teamed[course.id].try(:size).to_i
-      @assignments.each do |assignment|
-        user_id = cp.user_id
-        assignment_id = assignment.id
-        @meta_review[cp.id] = {} unless @meta_review.key?(cp.id)
-        @teammate_review[cp.id] = {} unless @teammate_review.key?(cp.id)
-        assignment_participant = assignment.participants.find_by(user_id: user_id)
-        next if assignment.participants.find_by(user_id: user_id).nil? # break out of the loop if there are no participants in the assignment
-        next if TeamsUser.team_id(assignment_id, user_id).nil? # break out of the loop if the participant has no team
-        teammate_reviews = assignment_participant.teammate_reviews
-        meta_reviews = assignment_participant.metareviews
-        assignment_grade_summary(cp, assignment_id)
-        peer_review_score = find_peer_review_score(user_id, assignment_id)
-        next if peer_review_score.nil? #Skip if there are no peers
-        next if peer_review_score[:review].nil? #Skip if there are no reviews done by peer
-        next if peer_review_score[:review][:scores].nil? #Skip if there are no reviews scores assigned by peer
-        next if peer_review_score[:review][:scores][:avg].nil? #Skip if there are is no peer review average score
-        @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
-        calc_overall_review_info(assignment,
-                                 cp,
-                                 teammate_reviews,
-                                 @teammate_review,
-                                 @overall_teammate_review_grades,
-                                 @overall_teammate_review_count,
-                                 @teammate_review_info_per_stu)
-        calc_overall_review_info(assignment,
-                                 cp,
-                                 meta_reviews,
-                                 @meta_review,
-                                 @overall_meta_review_grades,
-                                 @overall_meta_review_count,
-                                 @meta_review_info_per_stu)
+    if @render_partial
+      %w[teammate meta].each do |type|
+        instance_variable_set("@overall_#{type}_review_grades", {})
+        instance_variable_set("@overall_#{type}_review_count", {})
       end
-      # calculate average grade for each student on all assignments in this course
-      avg_review_calc_per_student(cp, @teammate_review_info_per_stu, @teammate_review)
-      avg_review_calc_per_student(cp, @meta_review_info_per_stu, @meta_review)
+      @course_participants.each do |cp|
+        # for each assignment
+        # [aggregrate_review_grades_per_stu, review_count_per_stu] --> [0, 0]
+        @topics[cp.id] = {}
+        @assignment_grades[cp.id] = {}
+        @peer_review_scores[cp.id] = {}
+        @final_grades[cp.id] = 0
+        %w[teammate meta].each {|type| instance_variable_set("@#{type}_review_info_per_stu", [0, 0]) }
+        students_teamed = StudentTask.teamed_students(cp.user)
+        @teamed_count[cp.id] = students_teamed[course.id].try(:size).to_i
+        @assignments.each do |assignment|
+          user_id = cp.user_id
+          assignment_id = assignment.id
+          @meta_review[cp.id] = {} unless @meta_review.key?(cp.id)
+          @teammate_review[cp.id] = {} unless @teammate_review.key?(cp.id)
+          assignment_participant = assignment.participants.find_by(user_id: user_id)
+          next if assignment.participants.find_by(user_id: user_id).nil? # break out of the loop if there are no participants in the assignment
+          next if TeamsUser.team_id(assignment_id, user_id).nil? # break out of the loop if the participant has no team
+          teammate_reviews = assignment_participant.teammate_reviews
+          meta_reviews = assignment_participant.metareviews
+          assignment_grade_summary(cp, assignment_id)
+          peer_review_score = find_peer_review_score(user_id, assignment_id)
+          next if peer_review_score.nil? #Skip if there are no peers
+          next if peer_review_score[:review].nil? #Skip if there are no reviews done by peer
+          next if peer_review_score[:review][:scores].nil? #Skip if there are no reviews scores assigned by peer
+          next if peer_review_score[:review][:scores][:avg].nil? #Skip if there are is no peer review average score
+          @peer_review_scores[cp.id][assignment_id] = peer_review_score[:review][:scores][:avg].round(2)
+          calc_overall_review_info(assignment,
+                                  cp,
+                                  teammate_reviews,
+                                  @teammate_review,
+                                  @overall_teammate_review_grades,
+                                  @overall_teammate_review_count,
+                                  @teammate_review_info_per_stu)
+          calc_overall_review_info(assignment,
+                                  cp,
+                                  meta_reviews,
+                                  @meta_review,
+                                  @overall_meta_review_grades,
+                                  @overall_meta_review_count,
+                                  @meta_review_info_per_stu)
+        end
+        # calculate average grade for each student on all assignments in this course
+        avg_review_calc_per_student(cp, @teammate_review_info_per_stu, @teammate_review)
+        avg_review_calc_per_student(cp, @meta_review_info_per_stu, @meta_review)
+      end
+      # avoid divide by zero error
+      overall_review_count(@assignments, @overall_teammate_review_count, @overall_meta_review_count)
     end
-    # avoid divide by zero error
-    overall_review_count(@assignments, @overall_teammate_review_count, @overall_meta_review_count)
   end
 
   # to avoid divide by zero error

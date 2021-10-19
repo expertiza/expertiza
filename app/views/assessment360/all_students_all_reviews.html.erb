@@ -1,2 +1,17 @@
-<h1>All_Students_all_reviews</h1>
-<%= render 'assessment' %> 
+<p>Currently Showing: <%= @form_complete %></p>
+<div>
+  <%# This section renders the checkboxes and passes values to controller as different variables %>
+  <%= form_tag({:action => 'all_students_all_reviews'},{:method => :get}) %>
+  <p>Which review do you want to see?</p>
+  <div style="display: inline-flex;">
+    <p><input type="checkbox" name="show_teammate_reviews" id="show_teammate_reviews" value=true>Show Teammate Reviews &nbsp;</p>
+    <p><input type="checkbox" name="show_meta_reviews" id="show_meta_reviews" value=true>Show Meta Reviews &nbsp;</p>
+    <p><input type="checkbox" name="show_peer_scores" id="show_peer_scores" value=true>Show Peer Scores &nbsp;</p>
+    <p><input type="checkbox" name="show_topics" id="show_topics" value=true>Show Topics &nbsp;</p>
+    <p><input type="checkbox" name="show_instructor_grades" id="show_instructor_grades" value=true>Show Instructor Grades&nbsp;</p>
+  </div>
+  <%= button_tag 'Go', value: @course_id, type: :submit, name: :course_id%>
+</div>
+<% if @render_partial %>
+    <%= render 'assessment' %> 
+<% end %>

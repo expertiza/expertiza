@@ -28,20 +28,6 @@
     });
 </script>
 
-<div>
-  <%# This section renders the checkboxes and passes values to controller as different variables %>
-  <%= form_tag({:action => 'all_students_all_reviews'},{:method => :get}) %>
-  <p>Which review do you want to see?</p>
-  <div style="display: inline-flex;">
-    <p><input type="checkbox" name="show_teammate_reviews" id="show_teammate_reviews" value="true">Show Teammate Reviews &nbsp;</p>
-    <p><input type="checkbox" name="show_meta_reviews" id="show_meta_reviews" value="true">Show Meta Reviews &nbsp;</p>
-    <p><input type="checkbox" name="show_peer_scores" id="show_peer_scores" value="true">Show Peer Scores &nbsp;</p>
-    <p><input type="checkbox" name="show_instructor_grades" id="show_instructor_grades" value="true">Show Instructor Grades&nbsp;</p>
-    <p><input type="checkbox" name="show_avg_peer_reviews" id="show_avg_peer_reviews" value="true">Show Avg Peer Reviews&nbsp;</p>
-  </div>
-  <%= button_tag 'Go', value: @course_id, type: :submit, name: :course_id%>
-</div>
-
 <table class="table table-striped sortable">
     <%# Format of table %>
     <%#                          |                   Assignment1         |     Assignment2     |     Assignment3   |  Final Grades     |     Aggregate Score          %>
@@ -54,22 +40,42 @@
           <th rowspan=2 width="320" class="sorter-true">Students</th>
           <th rowspan=2 width="30">Teammate Count</th>
           <% @assignments.each do |assignment| %>
-              <th colspan=5 class="sorter-false"> <%= assignment.name %> </th>
+              <th colspan="<%= @colspan %>" class="sorter-false"><%= assignment.name %> </th>
           <% end %>
-          <th colspan=1>Final Grades</th>
-          <th colspan=2 width="300">Aggregate Score</th>
+          <% if @show_instructor_grades %>
+            <th colspan=1>Final Grades</th>
+          <% end %>
+          <% if @colspan_review != 0 %>
+            <th colspan="<%= @colspan_review %>" width="300">Aggregate Score</th>
+          <% end %>
         </tr>
         <tr>
           <% @assignments.each do |assignment| %>
-              <th><b>Metareviews</b></th>
-              <th><b>Teammate Reviews</b></th>
-              <th><b>Topic</b></th>
-              <th><b>Peer Score</b></th>
-              <th><b>Instructor Grade</b></th>
+              <% if @show_meta_reviews %>
+                <th><b>Metareviews</b></th>
+              <% end %>
+              <% if @show_teammate_reviews %>
+                <th><b>Teammate Reviews</b></th>
+              <% end %>
+              <% if @show_topics%>
+                <th><b>Topic</b></th>
+              <% end %>
+              <% if @show_peer_scores %>
+                <th><b>Peer Score</b></th>
+              <% end %>
+              <% if @show_instructor_grades %>
+                <th><b>Instructor Grade</b></th>
+              <% end %>
           <% end %>
-          <th class="sorter-true"><b>Total Instructor Grade</b></th>
-          <th><b>Metareviews</b></th>
-          <th><b>Teammate Reviews</b></th>
+          <% if @show_instructor_grades %>
+            <th class="sorter-true"><b>Total Instructor Grade</b></th>
+          <% end %>
+          <% if @show_meta_reviews %>
+            <th><b>Metareviews</b></th>
+          <% end %>
+          <% if @show_teammate_reviews %>
+            <th><b>Teammate Reviews</b></th>
+          <% end %>
         </tr>
     </thead>
     <% @course_participants.each do |cp|%>
@@ -77,36 +83,68 @@
           <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
           <td><%= @teamed_count[cp.id] %></td>
           <% @assignments.each do |assignment|%>
+            <% if @show_meta_reviews %>
               <td><%= @meta_review[cp.id][assignment.id] %></td>
+            <% end %>
+            <% if @show_teammate_reviews %>
               <td><%= @teammate_review[cp.id][assignment.id] %></td>
+            <% end %>
+            <% if @show_topics%>
               <% topic = format_topic(@topics[cp.id][assignment.id]) %>
               <td title="<%= topic %>" class="topic topic-tooltip">
                 <%= topic %>
               </td>
+            <% end %>
+            <% if @show_peer_scores %>
               <td><%= format_score(@peer_review_scores[cp.id][assignment.id]) %></td>
+            <% end %>
+            <% if @show_instructor_grades %>
               <td><%= format_score(@assignment_grades[cp.id][assignment.id]) %> </td>
+            <% end %>
           <% end %>
-          <td><%= @final_grades[cp.id] %></td>
-          <td><%= @meta_review[cp.id][:avg_grade_for_assgt] %></td>
-          <td><%= @teammate_review[cp.id][:avg_grade_for_assgt] %></td>
+          <% if @show_instructor_grades %>
+            <td><%= @final_grades[cp.id] %></td>
+          <% end %>
+          <% if @show_meta_reviews %>
+            <td><%= @meta_review[cp.id][:avg_grade_for_assgt] %></td>
+          <% end %>
+          <% if @show_teammate_reviews %>
+            <td><%= @teammate_review[cp.id][:avg_grade_for_assgt] %></td>
+          <% end %>
       </tr>
     <% end %>
     <tr>
-        <td><b>Class Average</b></td>
-        <td></td>
-        <% @assignments.each do |assignment|%>
-            <td><%= "#{@overall_meta_review_grades[assignment.id] / @overall_meta_review_count[assignment.id]}%" %></td>
-            <td><%= "#{@overall_teammate_review_grades[assignment.id] / @overall_teammate_review_count[assignment.id]}%" %></td>
-            <td><%= "N/A" %></td>
-            <td><%= "N/A" %></td>
-            <td><%= "N/A" %></td>
-        <% end%>
-        <% total_meta_review_grade = @overall_meta_review_grades.inject(0) {|sum, (k, v)| sum + v } %>
-        <% total_meta_review_count = @overall_meta_review_count.inject(0) {|sum, (k, v)| sum + v } %>
+      <td><b>Class Average</b></td>
+      <td></td>
+      <% @assignments.each do |assignment|%>
+        <% if @show_meta_reviews %>
+          <td><%= "#{@overall_meta_review_grades[assignment.id] / @overall_meta_review_count[assignment.id]}%" %></td>
+        <% end %>
+        <% if @show_teammate_reviews %>
+          <td><%= "#{@overall_teammate_review_grades[assignment.id] / @overall_teammate_review_count[assignment.id]}%" %></td>
+        <% end %>
+        <% if @show_topics%>
+          <td><%= "N/A" %></td>
+        <% end %>
+        <% if @show_peer_scores %>
+          <td><%= "N/A" %></td>
+        <% end %>
+        <% if @show_instructor_grades %>
+          <td><%= "N/A" %></td>
+        <% end %>
+      <% end%>
+      <% total_meta_review_grade = @overall_meta_review_grades.inject(0) {|sum, (k, v)| sum + v } %>
+      <% total_meta_review_count = @overall_meta_review_count.inject(0) {|sum, (k, v)| sum + v } %>
+      <% if @show_instructor_grades %>
         <td><%= "N/A" %></td>
+      <% end %>
+      <% if @show_meta_reviews %>
         <td><%= "#{total_meta_review_grade / total_meta_review_count}%" %></td>
-        <% total_teammate_review_grade = @overall_teammate_review_grades.inject(0) {|sum, (k, v)| sum + v } %>
-        <% total_teammate_review_count = @overall_teammate_review_count.inject(0) {|sum, (k, v)| sum + v } %>
-        <td><%= "#{total_teammate_review_grade / total_teammate_review_count}%" %></td>
+      <% end %>
+      <% total_teammate_review_grade = @overall_teammate_review_grades.inject(0) {|sum, (k, v)| sum + v } %>
+      <% total_teammate_review_count = @overall_teammate_review_count.inject(0) {|sum, (k, v)| sum + v } %>
+      <% if @show_teammate_reviews %>
+      <td><%= "#{total_teammate_review_grade / total_teammate_review_count}%" %></td>
+      <% end %>
     </tr>
 </table>

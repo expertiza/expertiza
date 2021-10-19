@@ -35,6 +35,13 @@ class Team < ActiveRecord::Base
     "TeamNode"
   end
 
+  # This function is used to create teams with random names.
+  # Instructors can call by clicking "Create temas" icon anc then click "Create teams" at the bottom.
+  def self.create_teams(session,params)
+    parent = Object.const_get(session[:team_type]).find(params[:id])
+    Team.randomize_all_by_parent(parent, session[:team_type], params[:team_size].to_i)
+  end
+
   # Get the names of the users
   def author_names
     names = []

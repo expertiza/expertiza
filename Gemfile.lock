@@ -529,7 +529,7 @@ GEM
     sshkit (1.15.1)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
-    stanford-core-nlp (0.2.7)
+    stanford-core-nlp (0.5.3)
       bind-it (~> 0.2.7)
     stream (0.5)
     superfish-rails (1.6.0.1)

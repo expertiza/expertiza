@@ -1,3 +1,4 @@
+
 class PasswordReset < ActiveRecord::Base
   validates :user_email, presence: true
   attr_accessible :user_email, :token

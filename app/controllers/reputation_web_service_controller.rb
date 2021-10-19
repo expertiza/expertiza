@@ -7,15 +7,6 @@ require 'base64'
 class ReputationWebServiceController < ApplicationController
   include AuthorizationHelper
 
-  @@request_body = ''
-  @@response_body = ''
-  @@assignment_id = ''
-  @@another_assignment_id = ''
-  @@round_num = ''
-  @@algorithm = ''
-  @@additional_info = ''
-  @@response = ''
-
   def action_allowed?
     current_user_has_ta_privileges?
   end
@@ -96,16 +87,9 @@ class ReputationWebServiceController < ApplicationController
     request_body.sort.to_h
   end
 
-  def client
-    @request_body = @@request_body
-    @response_body = @@response_body
+  def fetch_assignment_details
     @max_assignment_id = Assignment.last.id
-    @assignment = Assignment.find(@@assignment_id) rescue nil
-    @another_assignment = Assignment.find(@@another_assignment_id) rescue nil
-    @round_num = @@round_num
-    @algorithm = @@algorithm
-    @additional_info = @@additional_info
-    @response = @@response
+    @result
   end
 
   def encrypt_review_data(body) # encrypting the peer review grade data using AES
@@ -137,7 +121,7 @@ class ReputationWebServiceController < ApplicationController
         Participant.find_by(user_id: id).update(alg.to_sym => rep) unless /leniency/ =~ id.to_s  # skipping lenient Id's
       end
     end
-    redirect_to action: 'client'
+    redirect_to action: 'fetch_assignment_details'
   end
 
   def send_post_request
@@ -146,23 +130,22 @@ class ReputationWebServiceController < ApplicationController
     curr_assignment_id = (params[:assignment_id].empty? ? '754' : params[:assignment_id])
     req.body = generate_json(curr_assignment_id, params[:another_assignment_id].to_i, params[:round_num].to_i, 'peer review grades').to_json
     req.body[0] = '' # remove the first '{'
-    @@assignment_id = params[:assignment_id]
-    @@round_num = params[:round_num]
-    @@algorithm = params[:algorithm]
-    @@another_assignment_id = params[:another_assignment_id]
-
+    @assignment = params[:assignment_id]
+    @round_num = params[:round_num]
+    @algorithm = params[:algorithm]
+    @another_assignment = params[:another_assignment_id]
     if params[:checkbox][:expert_grade] == 'Add expert grades'
-      @@additional_info = 'add expert grades'
+      @additional_info = 'add expert grades'
       case params[:assignment_id]
       when '754' # expert grades of Wiki contribution (754)
         req.body.prepend("\"expert_grades\": {\"submission25030\":95,\"submission25031\":92,\"submission25033\":88,\"submission25034\":98,\"submission25035\":100,\"submission25037\":95,\"submission25038\":95,\"submission25039\":93,\"submission25040\":96,\"submission25041\":90,\"submission25042\":100,\"submission25046\":95,\"submission25049\":90,\"submission25050\":88,\"submission25053\":91,\"submission25054\":96,\"submission25055\":94,\"submission25059\":96,\"submission25071\":85,\"submission25082\":100,\"submission25086\":95,\"submission25097\":90,\"submission25098\":85,\"submission25102\":97,\"submission25103\":94,\"submission25105\":98,\"submission25114\":95,\"submission25115\":94},")
       end
     elsif params[:checkbox][:hamer] == 'Add initial Hamer reputation values'
-      @@additional_info = 'add initial hamer reputation values'
+      @additional_info = 'add initial hamer reputation values'
     elsif params[:checkbox][:lauw] == 'Add initial Lauw reputation values'
-      @@additional_info = 'add initial lauw reputation values'
+      @additional_info = 'add initial lauw reputation values'
     elsif params[:checkbox][:quiz] == 'Add quiz scores'
-      @@additional_info = 'add quiz scores'
+      @additional_info = 'add quiz scores'
       quiz_str = generate_json(params[:assignment_id].to_i, params[:another_assignment_id].to_i, params[:round_num].to_i, 'quiz scores').to_json
       quiz_str[0] = ''
       quiz_str.prepend('"quiz_scores":{')
@@ -170,7 +153,7 @@ class ReputationWebServiceController < ApplicationController
       quiz_str = quiz_str.gsub('"N/A"', '20.0')
       req.body.prepend(quiz_str)
     else
-      @@additional_info = ''
+      @additional_info = ''
     end
     # Eg.
     # "{"initial_hamer_reputation": {"stu1": 0.90, "stu2":0.88, "stu3":0.93, "stu4":0.8, "stu5":0.93, "stu8":0.93},  #optional
@@ -179,15 +162,15 @@ class ReputationWebServiceController < ApplicationController
     # "quiz_scores" : {"submission1" : {"stu1":100, "stu3":80}, "submission2":{"stu2":40, "stu1":60}}, #optional
     # "submission1": {"stu1":91, "stu3":99},"submission2": {"stu5":92, "stu8":90},"submission3": {"stu2":91, "stu4":88}}"
     req.body.prepend("{")
-    @@request_body = req.body
+    @request_body = req.body
     # Encryption
     req.body = encrypt_review_data(req.body)  # AES symmetric algorithm encrypts raw data
     response = Net::HTTP.new('peerlogic.csc.ncsu.edu').start {|http| http.request(req) }
     # Decryption
     response.body = decrypt_review_data(response.body)
     # {response.body}"
-    @@response = response
-    @@response_body = response.body
+    @response = response
+    @response_body = response.body
     update_reputation(response.body)
   end
 
@@ -195,14 +178,13 @@ class ReputationWebServiceController < ApplicationController
     public_key_file = 'public1.pem'
     public_key = OpenSSL::PKey::RSA.new(File.read(public_key_file))
     encrypted_string = Base64.encode64(public_key.public_encrypt(data))
-
     encrypted_string
   end
 
   def rsa_private_key2(cipertext)
     private_key_file = 'private2.pem'
-    password = "ZXhwZXJ0aXph\n"
     encrypted_string = cipertext
+    password = KeyMapping.find_by(name:'rsa_key').value
     private_key = OpenSSL::PKey::RSA.new(File.read(private_key_file), Base64.decode64(password))
     string = private_key.private_decrypt(Base64.decode64(encrypted_string))
     string

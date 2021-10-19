@@ -208,6 +208,7 @@ describe SignUpSheetController do
       expect(topics_exist).to be_eql 0
       expect(response).to redirect_to('/assignments/2/edit#tabs-2')
     end
+
     it 'create topic and delete_all_selected_topics for a staggered deadline assignment and redirects to edit assignment page with single topic selected' do
       create(:topic, id: 40, assignment_id: 40, topic_identifier: 'E1733')
       params = {assignment_id: 40, topic_ids: ['E1733']}
@@ -363,7 +364,7 @@ describe SignUpSheetController do
       expect(response).to redirect_to('/assignments/2/edit')
     end
 
-    it 'deletes all topics for not microtask assignment and redirects to edit assignment page' do
+    it 'deletes all topics for not private assignment and redirects to edit assignment page' do
       create(:topic, id: 2, assignment_id: 3)
       create(:topic, id: 3, assignment_id: 3)
       params = {assignment_id: 3}
@@ -373,6 +374,7 @@ describe SignUpSheetController do
       expect(flash[:success]).to eq('All topics have been deleted successfully.')
       expect(response).to redirect_to('/assignments/3/edit')
     end
+
     it 'deletes all topics for the staggered deadline assignment and redirects to edit assignment page' do
       create(:topic, id: 30, assignment_id: 40, topic_identifier: 'E1740')
       create(:topic, id: 40, assignment_id: 40, topic_identifier: 'E1741')

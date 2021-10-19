@@ -120,7 +120,8 @@ class Questionnaire < ActiveRecord::Base
   end
 
   def display_type= (display_type)
-    puts TreeFolder.where(["replace(name, ' ', '') = ?", display_type]).to_sql
+    cleaned_display_type = display_type.gsub(/[%\s]/, '')
+    message "Original display type: #{display_type}\nCleaned display type: #{cleaned_display_type}" if cleaned_display_type != display_type
     self.tree_folder = TreeFolder.where(["replace(name, ' ', '') = ?", display_type]).first
   end
 end

@@ -13,10 +13,17 @@ class Participant < ActiveRecord::Base
   validates :grade, numericality: {allow_nil: true}
   has_paper_trail
   delegate :course, to: :assignment
-  delegate :get_current_stage, to: :assignment
+  delegate :current_stage, to: :assignment
   delegate :stage_deadline, to: :assignment
 
   PARTICIPANT_TYPES = %w[Course Assignment].freeze
+
+  # define a constant to hold the duty title Mentor
+  # this will be used in the duty column of the participant
+  # table to define participants who can mentor teams, topics, or assignments
+  # since the column's type is VARCHAR(255), other string constants should be
+  # defined here to add different duty titles
+  DUTY_MENTOR = "mentor"
 
   def team
     TeamsUser.find_by(user: user).try(:team)

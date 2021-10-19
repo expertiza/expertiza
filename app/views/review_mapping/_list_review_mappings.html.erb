@@ -36,9 +36,9 @@
         end
       %>
 
-      <%if !@contributor.nil?%>
+      <%unless @contributor.nil?%>
         <%signed_up_teams = SignedUpTeam.find_user_signup_topics(assignment.id, @contributor)%>
-        <%if !signed_up_teams.nil?%>
+        <%unless signed_up_teams.nil?%>
           <%@topics = ""%>
           <%signed_up_teams.each do |signed_up_team|%>
             <%if signed_up_team.is_waitlisted?%>
@@ -72,7 +72,7 @@
       <div style="text-align:right">
         <!-- ACS removed check to see if it is a team assignment-->
         <% if assignment.max_team_size < 2 %>
-          <%= link_to 'delete', :controller=> 'participants', :action => 'delete_assignment_participant', :id => contributor.id %><br/>
+          <%= link_to 'delete', :controller=> 'participants', :action => 'delete', :id => contributor.id %><br/>
         <% end %>
         <%= link_to 'add reviewer', :action => 'select_reviewer', :id => assignment.id, :contributor_id => contributor.id %><br/>
         <%= link_to 'delete outstanding reviewers', :action => 'delete_outstanding_reviewers', :id => assignment.id, :contributor_id => contributor.id %>
@@ -99,10 +99,10 @@
 
         <!--Reviewed by-->
         <tr style="background-color:<%=bgcolor2%>">
-          <td width="50%" style="vertical-align:top;"><%= map.reviewer.name(session[:ip]) %> (<%= map.reviewer.fullname(session[:ip]) %>)
+          <td width="50%" style="vertical-align:top;"><%= map.get_reviewer.name %> (<%= map.get_reviewer.fullname %>)
             <div style="text-align:right">
               <div id="review_status<%=map.map_id%>">
-                <% if(Response.where(map_id: map.map_id).last.nil?) %>
+                <% if Response.where(map_id: map.map_id).last.nil? %>
                     Review Status: Assigned
                 <% elsif Response.where(map_id: map.map_id).last.is_submitted == true%>
                     Review Status: Submitted

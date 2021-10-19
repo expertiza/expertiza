@@ -19,8 +19,6 @@ end %>
         <% } %>
       </select>
     </td>
-    <%if @assignment %>
-      <td><%= link_to 'New late policy', :controller => 'late_policies', :action => 'new', :assignment_id => @assignment.id %></td>
-    <%end %>
+    <td><%= link_to 'New late policy', :controller => 'late_policies', :action => 'new' %></td>
   </tr>
 </table>

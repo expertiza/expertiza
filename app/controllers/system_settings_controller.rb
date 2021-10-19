@@ -1,6 +1,8 @@
 class SystemSettingsController < ApplicationController
+  include AuthorizationHelper
+
   def action_allowed?
-    current_role_name.eql?("Super-Administrator")
+    current_user_has_super_admin_privileges?
   end
 
   def index

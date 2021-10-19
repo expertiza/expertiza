@@ -9,8 +9,8 @@ module QuizAssignment
 
     # Reject contributions of topics whose deadline has passed
     contributor_set.reject! do |contributor|
-      contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "Complete" or
-          contributor.assignment.get_current_stage(signed_up_topic(contributor).id) == "submission"
+      contributor.assignment.current_stage(signed_up_topic(contributor).id) == "Complete" or
+          contributor.assignment.current_stage(signed_up_topic(contributor).id) == "submission"
     end
 
     candidate_topics = Set.new
@@ -18,21 +18,16 @@ module QuizAssignment
     candidate_topics
   end
 
-  def assign_quiz_dynamically(reviewer, topic)
-    contributor = contributor_for_quiz(reviewer, topic)
-    reviewer.assign_quiz(contributor, reviewer, topic) unless contributor.nil?
-  end
-
   # Returns a contributor whose quiz is to be taken if available, otherwise will raise an error
   def contributor_for_quiz(reviewer, topic)
     raise "Please select a topic." if topics? and topic.nil?
-    raise "This assignment does not have topics." if !topics? and topic
+    raise "This assignment does not have topics." unless topics? || !topic
 
     # This condition might happen if the reviewer/quiz taker waited too much time in the
     # select topic page and other students have already selected this topic.
     # Another scenario is someone that deliberately modifies the view.
     if topic
-      raise "To many quizes have been taken for this topic; please select another one." unless candidate_topics_for_quiz.include?(topic)
+      raise "Too many quizes have been taken for this topic; please select another one." unless candidate_topics_for_quiz.include?(topic)
     end
 
     contributor_set = Array.new(contributors)

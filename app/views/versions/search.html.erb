@@ -38,24 +38,16 @@
 
 <br/>
 <script type="text/javascript">
-jQuery('.datetimeklass').datetimepicker({
-            dateFormat: 'yy/mm/dd',
-            timeFormat: 'HH:mm:ss z',
-            controlType: 'select',
-            timezoneList: [
-                { value: -000, label: 'GMT'},
-                { value: -300, label: 'Eastern'},
-                { value: -360, label: 'Central' },
-                { value: -420, label: 'Mountain' },
-                { value: -480, label: 'Pacific' }
-            ]
-        });
+    jQuery('.datetimeklass').datetimepicker({
+        format: 'YYYY/MM/DD HH:mm z',
+        sideBySide: true
+    });
 </script>
 <%= render :partial => 'versions/pagination' %>
 
 <div>
   <table>
-    <tr><th class="head">ID</th><th class="head">Type</th><th class="head">Item ID</th><th class="head">Event</th><th class="head">User</th><th class="head">Created</th></tr>
+    <tr id="version_result"><th class="head">ID</th><th class="head">Type</th><th class="head">Item ID</th><th class="head">Event</th><th class="head">User</th><th class="head">Created</th></tr>
     <% for version in @versions %>
         <tr>
           <td><%= link_to version.id, :action => 'show', :id => version.id %></td>

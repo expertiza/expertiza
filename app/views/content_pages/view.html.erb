@@ -3,7 +3,7 @@
   <h1>Welcome!</h1>
   <div class="login-panel">
   <!-- This logic checking if user is logged in or not, should be done in the controller -->
-  <% if not session[:user] %>
+  <% unless session[:user] %>
     <%= render :partial => 'auth/login' %><br/>
     <% if session[:user].nil? %>
     <% else %>

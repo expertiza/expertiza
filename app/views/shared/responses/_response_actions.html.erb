@@ -1,0 +1,79 @@
+<% latest_submission = team.most_recent_submission %>
+<% if !map.response.empty? && latest_submission %>
+  <% @sorted_responses = [] %>
+  <% @prev = Response.where(:map_id => map.id) %>
+  <% @prev.each { |element| %>
+    <% @sorted_responses << element %>
+  <% } %>
+  <% if @prev %>
+    <% @sorted_responses = @sorted_responses.sort_by { |obj| obj.updated_at } # the latest should be at the last %>
+    <% @latest_response = @sorted_responses.last %>
+
+    <% if @latest_response.round.nil? %>
+      <% last_response_round = AssignmentDueDate.done_in_assignment_round(@assignment.id, @latest_response) %>
+    <% else %>
+      <% last_response_round = @latest_response.round %>
+    <% end %>
+
+    <% current_round = @assignment.number_of_current_round(topic_id) %>
+    <% if reviewer_role == :student %>
+      <td>&nbsp;</td>
+      <td>
+        <%= link_to "View", { :controller => 'response', :action => 'view', :id => @latest_response.id } %>
+      </td>
+    <% elsif reviewer_role == :staff %>
+      <%= link_to "View", { :controller => 'response', :action => 'view', :id => @latest_response.id } %>
+    <% end %>
+
+    <% unless @assignment.current_stage(topic_id) == "Finished" %>
+      <%- # show the link as 'Edit' when latest review is done in current round  -%>
+      <%- # show link as 'Update' when latest review is done in different round or there has been a new submission in current round  -%>
+      <% if last_response_round == current_round %>
+        <% if reviewer_role == :student %>
+          <td>
+            <%- # If review is not submitted (is still being edited), show an 'Edit' link.  -%>
+            <% if !@latest_response.is_submitted %>
+              <%= link_to "Edit", { :controller => 'response', :action => 'edit', :id => @latest_response.id } %>
+
+              <%- # If the submission has been updated since it was last reviewed, show an 'Update' link -%>
+            <% elsif @latest_response.updated_at < latest_submission.updated_at %>
+            <td><%= link_to "Update", { :controller => 'response', :action => 'new', :id => map.map_id } %></td>
+          <% end %>
+          </td>
+        <% elsif reviewer_role == :staff %>
+          <%- # If review is not submitted (is still being edited), show an 'Edit' link.  -%>
+          <% if !@latest_response.is_submitted %>
+            <%= link_to "Edit", { :controller => 'response', :action => 'edit', :id => @latest_response.id, :return => "ta_review" } %>
+
+            <%- # If the submission has been updated since it was last reviewed, show an 'Update' link -%>
+          <% elsif @latest_response.updated_at < latest_submission.updated_at %>
+            <%= link_to "Update", { :controller => 'response', :action => 'new', :id => map.map_id, :return => "ta_review" } %>
+          <% end %>
+        <% end %>
+      <% else %>
+        <% if reviewer_role == :student %>
+          <td><%= link_to "Update", { :controller => 'response', :action => 'new', :id => map.map_id } %></td>
+        <% elsif reviewer_role == :staff %>
+          <%= link_to "Update", { :controller => 'response', :action => 'new', :id => map.map_id, :return => "ta_review" } %>
+        <% end %>
+      <% end %>
+    <% end %>
+    <% if reviewer_role == :student %>
+      <td><%= "  -- latest update at #{@latest_response.updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p")}" %></td>
+    <% end %>
+  <% end %>
+<% elsif @assignment.current_stage(topic_id) != "Finished" && @assignment.can_review(topic_id) && latest_submission %>
+  <% if reviewer_role == :student %>
+    <td><%= link_to "Begin", { :controller => 'response', :action => 'new', :id => map.id } %></td>
+    <td>&nbsp;&nbsp;</td>
+  <% elsif reviewer_role == :staff %>
+    <%= link_to 'Begin review', { controller: 'response', action: 'new', :id => map.id, :return => "ta_review" } %><br>
+  <% end %>
+
+  <%- # If the team being reviewed has not submitted yet  -%>
+<% else %>
+  <% if reviewer_role == :student %>
+    <td> Work has not yet been submitted for Review
+      <% review_no = 1 %></td>
+  <% end %>
+<% end %>

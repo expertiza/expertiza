@@ -1,5 +1,5 @@
 <table class="table table-striped grades" class="width: 100%">
-  <%if ctrl=='review' && @assignment.varying_rubrics_by_round? %>
+  <%if ctrl=='review' && @assignment.vary_by_round %>
       <% reviews = reviews.select{|response| response.round == round}.reverse.uniq{|response| response.map_id}.sort_by{|response| response.map_id} %>
   <%else%>
       <% reviews = reviews.sort_by{|response| response.map_id} %>
@@ -9,11 +9,11 @@
 			<th style="text-align:center;"><%= collabel %>&nbsp;<%=i+1%>&nbsp;</th>
 		<% end %>
 	</tr>
-	<% if controller.action_name != "view_my_scores" || !@assignment.is_anonymous?%>
+	<% unless controller.action_name == "view_my_scores" && @assignment.is_anonymous?%>
 	<tr class="head"><td align="right"><b><%= rowlabel %></b></td>	    	
 		<% for review in reviews %>
        <td align="center">
-       <% if controller.action_name != "view_my_scores"%>
+       <% unless controller.action_name == "view_my_scores"%>
          &nbsp;<%= review.map.reviewer.fullname(session[:ip]) %></a>&nbsp;<%=link_to image_tag("/assets/delete_icon.png", :border => 0), {:controller => 'response', :action => 'delete', :id => review.id, :return => 'instructor'} %>
 		   <% else %>
          &nbsp;<%= review.map.reviewer.fullname(session[:ip]) %>&nbsp;
@@ -28,8 +28,8 @@
 
 		<% for review in reviews %>
 		   <td align="center">
-             <% score = Answer.get_total_score(:response => [review], :questions => @questions[symbol], :q_types => Array.new) %>
-             <% if controller.action_name != "view_my_scores" %>
+             <% score = Response.assessment_score(:response => [review], :questions => @questions[symbol], :q_types => []) %>
+             <% unless controller.action_name == "view_my_scores" %>
                <input type="hidden" class="form-control" id="mailer_<%= review.map.reviewer.fullname(session[:ip]) %>_grade" name="mailer[<%= review.map.reviewer.fullname(session[:ip]) %>_grade]" value="<%= score %>">
              <% end %>
              <%if score==-1%>

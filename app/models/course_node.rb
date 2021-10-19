@@ -2,6 +2,15 @@ class CourseNode < Node
   belongs_to :course, class_name: "Course", foreign_key: "node_object_id"
   belongs_to :node_object, class_name: "Course", foreign_key: "node_object_id"
 
+  # Creates a new courese node from the given course
+  def self.create_course_node(course)
+    parent_id = CourseNode.get_parent_id
+    @course_node = CourseNode.new
+    @course_node.node_object_id = course.id
+    @course_node.parent_id = parent_id if parent_id
+    @course_node.save
+  end
+
   # Returns the table in which to locate Courses
   def self.table
     "courses"
@@ -27,16 +36,16 @@ class CourseNode < Node
   def self.get_course_query_conditions(show = nil, user_id = nil)
     current_user = User.find_by(id: user_id)
     conditions = if show and current_user
-                   if current_user.teaching_assistant?
-                     'courses.id in (?)'
-                   else
+                   if current_user.teaching_assistant? == false
                      "courses.instructor_id = #{user_id}"
+                   else
+                     'courses.id in (?)'
                    end
                  else
-                   if current_user.teaching_assistant?
-                     "((courses.private = 0 and courses.instructor_id != #{user_id}) or courses.id in (?))"
-                   else
+                   if current_user.teaching_assistant? == false
                      "(courses.private = 0 or courses.instructor_id = #{user_id})"
+                   else
+                     "((courses.private = 0 and courses.instructor_id != #{user_id}) or courses.instructor_id = #{user_id})"
                    end
                  end
     conditions
@@ -57,11 +66,7 @@ class CourseNode < Node
   def self.get_parent_id
     folder = TreeFolder.find_by(name: 'Courses')
     parent = FolderNode.find_by(node_object_id: folder.id)
-    if parent
-      return parent.id
-    else
-      return nil
-    end
+    parent.id if parent
   end
 
   # Gets any children associated with this object

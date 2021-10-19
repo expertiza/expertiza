@@ -9,12 +9,12 @@
 <% @participants = SignedUpTeam.find_team_participants(@assignment.id, session[:ip])  %>
 
 <a id="teamsAndMembers" onclick="showHideTeamAndMembers(<%= @sign_up_topics.size%>)">Hide all teams</a>
-<% if @sign_up_topics.size != 0 %>
-    <table class="table table-striped">
+<% unless @sign_up_topics.size.zero? %>
+    <table class="table table-striped" id="topics">
       <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
 
       <% i=1 %>
-      <% for topic in @sign_up_topics %>
+      <% @sign_up_topics.each do | topic | %>
           <tr>
             <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
           </tr>

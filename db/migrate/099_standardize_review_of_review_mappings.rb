@@ -92,7 +92,7 @@ class StandardizeReviewOfReviewMappings < ActiveRecord::Migration
         
         if participant.nil?       
           participant = AssignmentParticipant.create(:user_id => user_id, :parent_id => assignment_id)
-          participant.set_handle()      
+          participant.set_handle
         end
       end     
     end
@@ -100,12 +100,10 @@ class StandardizeReviewOfReviewMappings < ActiveRecord::Migration
   end  
   
   def self.delete(mapping, reason)
-    puts reason
     begin
       execute "delete from `review_of_review_mappings` where id = #{mapping["id"]}"
       mapping.delete(true)
     rescue
-      puts $!
     end
   end  
 

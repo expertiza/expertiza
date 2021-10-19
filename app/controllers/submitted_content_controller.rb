@@ -1,12 +1,22 @@
 class SubmittedContentController < ApplicationController
+  require 'mimemagic'
+  require 'mimemagic/overlay'
+
+  include AuthorizationHelper
+
   def action_allowed?
-    ['Instructor',
-     'Teaching Assistant',
-     'Administrator',
-     'Super-Administrator',
-     'Student'].include? current_role_name and
-    ((%w[edit].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "reviewer") : true) and
-    one_team_can_submit_work?
+
+    case params[:action]
+    when 'edit'
+      current_user_has_student_privileges? &&
+      are_needed_authorizations_present?(params[:id], "reader", "reviewer")
+    when 'submit_file', 'submit_hyperlink'
+      current_user_has_student_privileges? &&
+      one_team_can_submit_work?
+    else
+      current_user_has_student_privileges?
+    end
+
   end
 
   # The view have already tested that @assignment.submission_allowed(topic_id) is true,
@@ -20,7 +30,7 @@ class SubmittedContentController < ApplicationController
     SignUpSheet.signup_team(@assignment.id, @participant.user_id, nil) if @participant.team.nil?
     # @can_submit is the flag indicating if the user can submit or not in current stage
     @can_submit = !params.key?(:view)
-    @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
+    @stage = @assignment.current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
   end
 
   # view is called when @assignment.submission_allowed(topic_id) is false
@@ -31,7 +41,7 @@ class SubmittedContentController < ApplicationController
     @assignment = @participant.assignment
     # @can_submit is the flag indicating if the user can submit or not in current stage
     @can_submit = false
-    @stage = @assignment.get_current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
+    @stage = @assignment.current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
     redirect_to action: 'edit', id: params[:id], view: true
   end
 
@@ -89,6 +99,24 @@ class SubmittedContentController < ApplicationController
     participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(participant.user_id)
     file = params[:uploaded_file]
+    file_size_limit = 5
+    
+    # check file size
+    unless check_content_size(file, file_size_limit)
+      flash[:error] = "File size must smaller than #{file_size_limit}MB"
+      redirect_to action: 'edit', id: participant.id
+      return
+    end
+
+    file_content = file.read
+
+    # check file type
+    unless check_content_type_integrity(file_content)
+      flash[:error] = 'File type error'
+      redirect_to action: 'edit', id: participant.id
+      return
+    end
+
     participant.team.set_student_directory_num
     @current_folder = DisplayOption.new
     @current_folder.name = "/"
@@ -102,7 +130,7 @@ class SubmittedContentController < ApplicationController
     safe_filename = file.original_filename.tr('\\', "/")
     safe_filename = FileHelper.sanitize_filename(safe_filename) # new code to sanitize file path before upload*
     full_filename = curr_directory + File.split(safe_filename).last.tr(" ", '_') # safe_filename #curr_directory +
-    File.open(full_filename, "wb") {|f| f.write(file.read) }
+    File.open(full_filename, "wb") {|f| f.write(file_content) }
     if params['unzip']
       SubmittedContentHelper.unzip_file(full_filename, curr_directory, true) if get_file_type(safe_filename) == "zip"
     end
@@ -179,9 +207,26 @@ class SubmittedContentController < ApplicationController
 
   private
 
-  def get_file_type file_name
+  # Verify the integrity of uploaded files.
+  # @param file_content [Object] the content of uploaded file
+  # @return [Boolean] the result of verification
+  def check_content_type_integrity(file_content)
+    limited_types = %w[application/pdf image/png image/jpeg application/zip application/x-tar application/x-7z-compressed application/vnd.oasis.opendocument.text application/vnd.openxmlformats-officedocument.wordprocessingml.document]
+    mime = MimeMagic.by_magic(file_content)
+    limited_types.include? mime.to_s
+  end
+
+  # Verify the size of uploaded file is under specific value.
+  # @param file [Object] uploaded file
+  # @param size [Integer] maximum size(MB)
+  # @return [Boolean] the result of verification
+  def check_content_size(file, size)
+    file.size <= size*1024*1024
+  end
+
+  def get_file_type(file_name)
     base = File.basename(file_name)
-    return base.split(".")[base.split(".").size - 1] if base.split(".").size > 1
+    base.split(".")[base.split(".").size - 1] if base.split(".").size > 1
   end
 
   def move_selected_file
@@ -248,7 +293,6 @@ class SubmittedContentController < ApplicationController
 
   # if one team do not hold a topic (still in waitlist), they cannot submit their work.
   def one_team_can_submit_work?
-    return true unless %w[submit_file submit_hyperlink].include? action_name # should work only when submit_file/hyperlink is called
     @participant = if params[:id].nil?
                      AssignmentParticipant.find(params[:hyperlinks][:participant_id])
                    else

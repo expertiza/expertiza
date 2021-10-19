@@ -3,26 +3,26 @@ Hi <%= @first_name %>,
 A new <%=@type%> for the "<%= @obj_name %>" assignment has just been entered.
 You may log into Expertiza and view it now.
 
-<% if @review_scores != nil %>
+<% unless @review_scores.nil? %>
   Review Content:
-  <% for @rs in @review_scores %>
+  <% @review_scores.each do | rs | %>
     -----------------------------------------------------------
-    Question: <%=Question.find(@rs.question_id).txt %>
+    Question: <%=Question.find(rs.question_id).txt %>
 
-  Comment: <%=@rs.comments%>
+    Comment: <%=rs.comments%>
 
-Score: <%=@rs.answer%>
+    Score: <%=rs.answer%>
+  <% end %>
 <% end %>
-<% end %>
 
-<% if @ror_review_scores != nil %>
+<% unless @ror_review_scores.nil? %>
   Review Content:
-  <% for @rs in @ror_review_scores %>
+  <% @ror_review_scores.each do | rs | %>
     -----------------------------------------------------------
-    Question: <%=Question.find(@rs.question_id).txt %>
+    Question: <%=Question.find(rs.question_id).txt %>
 
-  Comment: <%=@rs.comments%>
+    Comment: <%=rs.comments%>
 
-Score: <%=@rs.answer%>
-<% end %>
+    Score: <%=rs.answer%>
+  <% end %>
 <% end %>

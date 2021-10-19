@@ -292,6 +292,16 @@ development:
         parent_id: 2
         site_controller_id:
         url: "/credits"
+      50: &24 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 15
+        id: 50
+        label: Anonymized view
+        name: anonymized_view
+        parent:
+        parent_id: 37
+        site_controller_id: 35
+        url: "/users/set_anonymized_view"
     by_name:
       home: *1
       student_task: *2
@@ -311,6 +321,7 @@ development:
       - 30
       - 27
       - 2
+      - 50
     selected:
       1: *1
     vector:
@@ -508,6 +519,7 @@ test:
       - 6
       - 50
       - 7
+      - 50
     by_id:
       1: &1 !ruby/object:Menu::Node
         parent:
@@ -571,6 +583,16 @@ test:
         controller_action_id:
         content_page_id: 8
         url: "/credits"
+      50: &24 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 15
+        id: 50
+        label: Anonymized view
+        name: anonymized_view
+        parent:
+        parent_id: 37
+        site_controller_id: 35
+        url: "/users/set_anonymized_view"
     by_name:
       home: *1
       student_task: *2
@@ -879,6 +901,16 @@ production:
         parent_id: 2
         site_controller_id:
         url: "/credits"
+      50: &24 !ruby/object:Menu::Node
+        content_page_id:
+        controller_action_id: 15
+        id: 50
+        label: Anonymized view
+        name: anonymized_view
+        parent:
+        parent_id: 37
+        site_controller_id: 35
+        url: "/users/set_anonymized_view"
     by_name:
       home: *1
       student_task: *2
@@ -898,6 +930,7 @@ production:
       - 30
       - 27
       - 2
+      - 50
     selected:
       1: *1
     vector:

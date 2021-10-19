@@ -15,7 +15,7 @@
   <BR/>         
   <HR/> 
   <% count = 0 %>
-  <% for feedback in rscore[:assessments] %>
+  <% rscore[:assessments].each do | feedback | %>
     <% count = count + 1 %>
     <% if controller.action_name != "view_my_scores" %>
       <a name="<%= prefix + "_" + feedback.map.reviewer.name(session[:ip]) %>"></a><%= feedback.display_as_html(prefix, count) %><BR/><BR/>

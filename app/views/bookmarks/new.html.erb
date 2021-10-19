@@ -3,18 +3,25 @@
 <table>
   <%= form_tag :action => "create" do %>
     <%= hidden_field_tag("topic_id", @topic.id) %>
+
+    <!-- :required attribute checks to see if title, url, and description are all present -->
     <p>
       <%= label_tag 'Title' %><br/>
-      <%= text_field_tag :title %><br/><br/>
+      <%= text_field_tag :title, params[:title], :required => true %><br/><br/>
       <%= label_tag 'Url' %><br/>
-      <%= text_field_tag :url %><br/><br/>
+      <%= text_field_tag :url, params[:url], :required => true %><br/><br/>
       <%= label_tag 'Description' %><br/>
-      <%= text_area_tag :description %><br/>
+      <%= text_area_tag :description, params[:description], :required => true %><br/>
     </p>
     <p>
       <td> <%= submit_tag "Add new bookmark" %> |
-      <%= link_to 'Back', :controller=> 'sign_up_sheet', :action=>'list', :assignment_id => @topic.assignment_id %></td>
+        <%= link_to 'Back', '#', :onclick => 'pageBack()' %>
     </p>
   <% end %>
 
 </table>
+<script>
+    function pageBack() {
+        history.back()
+    }
+</script>

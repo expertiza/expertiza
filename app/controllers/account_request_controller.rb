@@ -125,18 +125,7 @@ class AccountRequestController < ApplicationController
     #Stores a boolean value with respect to whether the user data is saved or not
 
     if !user_existed and requested_user_saved
-      super_users = User.joins(:role).where('roles.name = ?', 'Super-Administrator')
-      super_users.each do |super_user|
-        prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, requested_user, 'New account Request')
-        prepared_mail.deliver
-      end
-      #Notifying an email to the administrator regarding the new user request!
-      ExpertizaLogger.info LoggerMessage.new(controller_name, requested_user.name, 'The account you are requesting has been created successfully.', request)
-      flash[:success] = "User signup for \"#{requested_user.name}\" has been successfully requested."
-      redirect_to '/instructions/home'
-      #Print out the acknowledgement message to the user and redirect to /instructors/home page when successful
-
-      return
+      notify_supers_new_request(requested_user)
     elsif user_existed
       flash[:error] = "The account you are requesting has already existed in Expertiza."
       #If the user account already exists, log error to the user
@@ -147,6 +136,19 @@ class AccountRequestController < ApplicationController
     ExpertizaLogger.error LoggerMessage.new(controller_name, requested_user.name, flash[:error], request)
     redirect_to controller: 'account_request', action: 'new', role: 'Student'
     #if the first if clause fails, redirect back to the account requests page!
+  end
+
+  def notify_supers_new_request(requested_user)
+    super_users = User.joins(:role).where('roles.name = ?', 'Super-Administrator')
+    super_users.each do |super_user|
+      prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, requested_user, 'New account Request')
+      prepared_mail.deliver
+    end
+    #Notifying an email to the administrator regarding the new user request!
+    ExpertizaLogger.info LoggerMessage.new(controller_name, requested_user.name, 'The account you are requesting has been created successfully.', request)
+    flash[:success] = "User signup for \"#{requested_user.name}\" has been successfully requested."
+    redirect_to '/instructions/home'
+    #Print out the acknowledgement message to the user and redirect to /instructors/home page when successful
   end
 #Changes Completed Here
 

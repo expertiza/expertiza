@@ -76,13 +76,7 @@ class TeamsController < ApplicationController
       @signed_up_team = SignedUpTeam.where(team_id: @team.id)
       @teams_users = TeamsUser.where(team_id: @team.id)
 
-      if @signed_up_team == 1 && !@signUps.first.is_waitlisted # this team hold a topic
-        # if there is another team in waitlist, make this team hold this topic
-        topic_id = @signed_up_team.first.topic_id
-        next_wait_listed_team = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
-        # if slot exist, then confirm the topic for this team and delete all waitlists for this team
-        SignUpTopic.assign_to_first_waiting_team(next_wait_listed_team) if next_wait_listed_team
-      end
+      SignedUpTeam.assign_topic_to_first_in_waitlist_post_team_deletion(@signed_up_team, @signUps)
 
       @sign_up_team.destroy_all if @sign_up_team
       @teams_users.destroy_all if @teams_users

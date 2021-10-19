@@ -69,6 +69,16 @@ class SignedUpTeam < ActiveRecord::Base
     end
   end
 
+  def self.assign_topic_to_first_in_waitlist_post_team_deletion (signed_up_team, signUps)
+    if signed_up_team == 1 && !signUps.first.is_waitlisted # this team hold a topic
+      # if there is another team in waitlist, make this team hold this topic
+      topic_id = signed_up_team.first.topic_id
+      next_wait_listed_team = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
+      # if slot exist, then confirm the topic for this team and delete all waitlists for this team
+      SignUpTopic.assign_to_first_waiting_team(next_wait_listed_team) if next_wait_listed_team
+    end
+  end
+
   # This method is used to returns topic_id from [signed_up_teams] table and the inputs are assignment_id and user_id.
   def self.topic_id(assignment_id, user_id)
     # team_id variable represents the team_id for this user in this assignment

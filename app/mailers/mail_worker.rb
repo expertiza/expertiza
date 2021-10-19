@@ -36,22 +36,15 @@ class MailWorker
   def email_reminder(emails, deadline_type)
     assignment = Assignment.find(self.assignment_id)
     subject = "Message regarding #{deadline_type} for assignment #{assignment.name}"
-    body = "This is a reminder to complete #{deadline_type} for assignment #{assignment.name}."
+    body = "This is a reminder to complete #{deadline_type} for assignment #{assignment.name}. \
+    Deadline is #{self.due_at}.If you have already done the  #{deadline_type}, Please ignore this mail."
 
     emails.each do |mail|
-      user = User.where({email: mail}).first
-      participant_assignment_id = Participant.where(user_id: user.id, parent_id: self.assignment_id).id
-
-      link_to_destination = "Please follow the lilnk: http://expertiza.ncsu.edu/student_task/view?id=#{participant_assignment_id}"
-      body = body + link_to_destination + " Deadline is #{self.due_at}.If you have already done the  #{deadline_type}, Please ignore this mail.";
-
-
-      @mail = Mailer.delayed_message(bcc: mail, subject: subject, body: body)
-      @mail.deliver_now
       Rails.logger.info mail
     end
 
-
+    @mail = Mailer.delayed_message(bcc: emails, subject: subject, body: body)
+    @mail.deliver_now
   end
 
   def find_participant_emails

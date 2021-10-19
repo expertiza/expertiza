@@ -105,11 +105,14 @@ class ReviewMappingController < ApplicationController
   # This method is used for assign submissions to students for peer review.
   # This method is different from 'assignment_reviewer_automatically', which is in 'review_mapping_controller'
   # and is used for instructor assigning reviewers in instructor-selected assignment.
+  # Replace i_dont_care to no_particular_topic. This boolean variable is an indicator to
+  # address i f a student is interested in and selected any particular topic or not. With
+  # the variable renaming, it is more clear what the variable actually means.
   def assign_reviewer_dynamically
     assignment = Assignment.find(params[:assignment_id])
     reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
 
-    if params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
+    if params[:no_particular_topic].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
       flash[:error] = "No topic is selected.  Please go back and select a topic."
     else
 

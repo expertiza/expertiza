@@ -15,7 +15,6 @@
 //= require components
 //= require jquery
 //= require jquery_ujs
-//= require jquery-colorbox
 //= require jquery.colorbox
 //= require tinymce-jquery
 //= require jquery.datetimepicker

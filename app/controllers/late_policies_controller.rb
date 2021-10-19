@@ -78,33 +78,32 @@ class LatePoliciesController < ApplicationController
   # PUT /late_policies/1
   # PUT /late_policies/1.xml
   def update
-    @penalty_policy = LatePolicy.find(params[:id])
+
     invalid_penalty_per_unit = params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i
-    flash[:error] = "The maximum penalty cannot be less than penalty per unit." if invalid_penalty_per_unit
-    same_policy_name = false
-    # if name has changed then only check for this
-    if params[:late_policy][:policy_name] != @penalty_policy.policy_name
-      if same_policy_name == LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
-        flash[:error] = "The policy could not be updated because a policy with the same name already exists."
-      end
-    end
-    if !same_policy_name && !invalid_penalty_per_unit
-      begin
-        @penalty_policy.update_attributes(late_policy_params)
-        @penalty_policy.save!
-        LatePolicy.update_calculated_penalty_objects(@penalty_policy)
-        flash[:notice] = "The late policy was successfully updated."
-        redirect_to action: 'index'
-      rescue StandardError
-        flash[:error] = "The following error occurred while updating the penalty policy: "
-        redirect_to action: 'edit', id: params[:id]
-      end
-    elsif invalid_penalty_per_unit
+    # If penaly per unit is invalid, exit early
+    if invalid_penalty_per_unit
       flash[:error] = "Cannot edit the policy. The maximum penalty cannot be less than penalty per unit."
       redirect_to action: 'edit', id: params[:id]
-    elsif same_policy_name
-      flash[:error] = "Cannot edit the policy. A policy with the same name " + params[:late_policy][:policy_name] + " already exists."
-      redirect_to action: 'edit', id: params[:id]
+    end
+
+    @penalty_policy = LatePolicy.find(params[:id])
+    # if name has changed then only check for this
+    if params[:late_policy][:policy_name] != @penalty_policy.policy_name
+      if LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
+        flash[:error] = "Cannot edit the policy. A policy with the same name " + params[:late_policy][:policy_name] + " already exists."
+        redirect_to action: 'edit', id: params[:id] and return
+      end
+    end
+
+    begin
+      @penalty_policy.update_attributes(late_policy_params)
+      @penalty_policy.save!
+      LatePolicy.update_calculated_penalty_objects(@penalty_policy)
+      flash[:notice] = "The late policy was successfully updated."
+      redirect_to action: 'index' and return
+    rescue StandardError
+      flash[:error] = "The following error occurred while updating the penalty policy: "
+      redirect_to action: 'edit', id: params[:id] and return
     end
   end
 

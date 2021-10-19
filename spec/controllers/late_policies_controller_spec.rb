@@ -1,3 +1,5 @@
+require 'byebug'
+
 describe LatePoliciesController do
 
   # use id:1, since the factory for late_policy uses first generated id
@@ -34,20 +36,94 @@ describe LatePoliciesController do
       expect(flash[:error]).to include("Penalty per unit can't be blank")
     end
 
-    it "Max penalty should be less than penalty per unit" do
+    it 'shows error on penalty per unit being negative' do
       get :new
       params = {
         late_policy: {
-            policy_name: '',
-            penalty_per_unit: 1,
-            penalty_unit: '',
+            policy_name: 'assignment 1',
+            penalty_per_unit: 'Minute',
+            penalty_unit: 10,
             max_penalty: 0,
+        }
+      }
+      post :create, params
+      expect(flash[:error]).to include("Max penalty must be greater than 0")
+    end
+
+    it 'shows error on max penalty being less than penalty per unit' do
+      get :new
+      params = {
+        late_policy: {
+            policy_name: 'assignment 1',
+            penalty_per_unit: 'Minute',
+            penalty_unit: -10,
+            max_penalty: -100,
         }
       }
       post :create, params
       expect(flash[:error]).to include("The maximum penalty cannot be less than penalty per unit.")
     end
 
+    # shows error
+    it 'shows error on policy name greater than 255 characters' do
+      get :new
+      params = {
+        late_policy: {
+            policy_name: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+            penalty_per_unit: 1,
+            penalty_unit: 'Minute',
+            max_penalty: 10,
+        }
+      }
+      post :create, params
+      expect(flash[:error]).to include("Policy name is invalid")
+    end
+    
+    # error
+    it 'shows error on policy per unit is random string' do
+      get :new
+      params = {
+        late_policy: {
+            policy_name: 'assignment 1',
+            penalty_per_unit: 10,
+            penalty_unit: 'xyz',
+            max_penalty: 50,
+        }
+      }
+      post :create, params
+      expect(flash[:error]).to include("Policy per unit should be days/hours/minutes")
+      expect(flash[:error]).to include("Policy per unit should be days/hours/minutes")
+    end
+
+    # it 'basic happy flow test' do
+    #   get :new
+    #   params = {
+    #     late_policy: {
+    #         policy_name: 'assignment 1',
+    #         penalty_per_unit: 10,
+    #         penalty_unit: 'Minute',
+    #         max_penalty: 50,
+    #     }
+    #   }
+    #   # byebug
+    #   post :create, params
+    #   expect(flash[:error]).to include("Successfully saved")
+    # end
+
+    # it 'basic test to test all limits' do
+    #   get :new
+    #   params = {
+    #     late_policy: {
+    #         policy_name: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+    #         penalty_per_unit: 50,
+    #         penalty_unit: 'Minute',
+    #         max_penalty: 50,
+    #     }
+    #   }
+    #   byebug
+    #   post :create, params
+    #   expect(flash[:error]).to include("Successfully saved")
+    # end
     it "Check for policy with same name" do
       get :new
       params = {

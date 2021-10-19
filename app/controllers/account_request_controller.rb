@@ -101,32 +101,14 @@ class AccountRequestController < ApplicationController
 
   #Changes Started Here
   def create_requested_user_record
-  
     requested_user = AccountRequest.new(requested_user_params)
     #An object is created with respect to AccountRequest model inorder to populate the users information when account is requested
+    user_exists = User.find_by(name: requested_user.name) or User.find_by(name: requested_user.email)
+    requested_user_saved = save_requested_user(requested_user, params)
 
-    if params[:user][:institution_id].empty?
-      institution = Institution.find_or_create_by(name: params[:institution][:name])
-      requested_user.institution_id = institution.id
-    end
-    #If user enters others and adds a new institution, an institution id will be created with respect to the institution model. 
-    #This institution_attribute will be added to the AccountRequest model under institution_id attribute!
-
-    #
-    requested_user.status = 'Under Review'
-    #The status is by default 'Under Review' until the super admin approves or rejects
-
-    user_existed = User.find_by(name: requested_user.name) or User.find_by(name: requested_user.email)
-    # default to instructor role
-    if requested_user.role_id == nil
-      requested_user.role_id = Role.where(:name => "Instructor")[0].id
-    end
-    requested_user_saved = requested_user.save
-    #Stores a boolean value with respect to whether the user data is saved or not
-
-    if !user_existed and requested_user_saved
+    if !user_exists and requested_user_saved
       notify_supers_new_request(requested_user)
-    elsif user_existed
+    elsif user_exists
       flash[:error] = "The account you are requesting has already existed in Expertiza."
       #If the user account already exists, log error to the user
     else
@@ -138,6 +120,25 @@ class AccountRequestController < ApplicationController
     #if the first if clause fails, redirect back to the account requests page!
   end
 
+  def save_requested_user(requested_user, params)
+    if params[:user][:institution_id].empty?
+      institution = Institution.find_or_create_by(name: params[:institution][:name])
+      requested_user.institution_id = institution.id
+    end
+    #If user enters others and adds a new institution, an institution id will be created with respect to the institution model.
+    #This institution_attribute will be added to the AccountRequest model under institution_id attribute!
+
+    #
+    requested_user.status = 'Under Review'
+    #The status is by default 'Under Review' until the super admin approves or rejects
+    # default to instructor role
+    if requested_user.role_id == nil
+      requested_user.role_id = Role.where(:name => "Instructor")[0].id
+    end
+    return requested_user.save
+    #StorReturnses a boolean value with respect to whether the user data is saved or not
+
+  end
   def notify_supers_new_request(requested_user)
     super_users = User.joins(:role).where('roles.name = ?', 'Super-Administrator')
     super_users.each do |super_user|

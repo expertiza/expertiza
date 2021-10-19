@@ -5,7 +5,7 @@
 
 <p>
   <b>Comments:</b>  <br>
-  <%=h @join_team_request.comments %>
+  <%=h @join_team_request.comments[2..-3] unless @join_team_request.comments.nil?  %>
 </p>
 
 <p>

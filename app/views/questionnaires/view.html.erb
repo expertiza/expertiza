@@ -2,7 +2,9 @@
 <BR/>
 <B>Created by:</B> <%= link_to @questionnaire.instructor_id,"mailto:"+@questionnaire.instructor_id.to_s %><BR/>
 <B>Created at:</B> <%= @questionnaire.created_at %><BR/>
-<B>Last modified at:</B> <%= @questionnaire.updated_at %>
+<B>Last modified at:</B> <%= @questionnaire.updated_at %><BR/>
+<B>Max quiz score:</B> <%= @questionnaire.max_question_score %><BR/>
+<B>Min quiz score:</B> <%= @questionnaire.min_question_score %><BR/>
 <BR/><BR/>
 
 <TABLE>
@@ -26,7 +28,8 @@
 
     <BR/>
     <% if @questionnaire.type == "QuizQuestionnaire" %>
-      <%= link_to 'Edit', :controller => :questionnaires, :action => :edit_quiz, :id => @questionnaire.id, :pid => @participant.id %>|
+      <%= link_to 'Edit', :controller => :quiz_questionnaires, :action => :edit, :id => 
+@questionnaire.id, :pid => @participant.id %>|
     <% else %>
       <!--The following line may have bugs when @questionnaire.type != "QuizQuestionnaire"-->
       <!--The bug will be invoked when click Save button in edit page-->

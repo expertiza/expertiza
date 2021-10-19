@@ -4,13 +4,9 @@ class SelfReviewResponseMap < ResponseMap
   belongs_to :reviewee, class_name: 'Team', foreign_key: 'reviewee_id'
   belongs_to :assignment, class_name: 'Assignment', foreign_key: 'reviewed_object_id'
 
-  # This method is used to get questionnaire for self-review to be performed by user
-  def questionnaire(round)
-    if self.assignment.varying_rubrics_by_round?
-      Questionnaire.find(self.assignment.review_questionnaire_id(round))
-    else
-      Questionnaire.find(self.assignment.review_questionnaire_id)
-    end
+  # Find a review questionnaire associated with this self-review response map's assignment
+  def questionnaire(round_number = nil, topic_id = nil)
+    Questionnaire.find(self.assignment.review_questionnaire_id(round_number, topic_id))
   end
 
   # This method helps to find contributor - here Team ID

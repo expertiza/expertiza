@@ -25,7 +25,7 @@
       <% end %>
     <% end %>
 
-<% if @global_survey_present == true %>
+<% if @global_survey_present %>
 <h1>Global Survey: <%= @global_questionnaire.name %></h1>
 
 <% @global_questions.each_with_index do |question,index| %>

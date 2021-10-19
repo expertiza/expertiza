@@ -9,8 +9,8 @@ class TagPrompt < ActiveRecord::Base
       stored_tags = AnswerTag.where(tag_prompt_deployment_id: tag_prompt_deployment.id, answer_id: answer.id, user_id: user_id)
 
       length_valid = false
-      if !tag_prompt_deployment.answer_length_threshold.nil?
-        length_valid = true if !answer.comments.nil? and (answer.comments.length > tag_prompt_deployment.answer_length_threshold)
+      unless tag_prompt_deployment.answer_length_threshold.nil?
+        length_valid = true unless answer.comments.nil? || answer.comments.length <= tag_prompt_deployment.answer_length_threshold
       else
         length_valid = true
       end

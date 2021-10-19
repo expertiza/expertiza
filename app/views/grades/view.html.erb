@@ -8,7 +8,7 @@
 If there is no metareviewing deadline, the “Reviewing” column should not appear in the score report.-->
 
 <!-- E1877: charts implemented before table-->
-<% if !@avg_of_avg.nan? %>
+<% unless @avg_of_avg.nan? %>
   <%= render :partial => 'team_charts', :locals => {:prefix => nil} %>
 <% end %>
 <table id="report_Table" class="table tablesorter table-striped grades" width="100%">

@@ -28,7 +28,7 @@
                 <tr>
                   <td>
                     <%
-                      if !@summary[round][q].eql?("")
+                      if !@summary[round][q].eql?("") and @summary[round][q].class.method_defined?(:each)
                         @summary[round][q].each do |sentence|
                           safe_concat "<li>"
                           concat sentence

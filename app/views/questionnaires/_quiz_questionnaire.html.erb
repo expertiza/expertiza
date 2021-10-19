@@ -1,69 +1,89 @@
-<%= error_messages_for 'questionnaire' %>
-
-  <table>
-    <tr>
-      <td valign="top"><label for="questionnaire_name">Name:</label>
-        <%= text_field 'questionnaire', 'name'  %>
-        <%= hidden_field 'questionnaire', 'id' %>
-        <%= hidden_field 'questionnaire', 'type' %>
-      </td>
-    </tr>
-  </table>
-  <br/>
-  <% if @questionnaire.type == 'QuizQuestionnaire' %>        
-  <!--handle a questionnaire differently if it is a quiz-->
-    <table id="questions_table">
-      <% if $disp_flag != 1 %>
-        <tr>
-          <td align=left width=300>Questions:</td>
-          <%  if @questionnaire.type != 'QuizQuestionnaire' %><td align=left>weight</td><%end%>
-
-        </tr>
+<% if @questionnaire.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= pluralize(@questionnaire.errors.count, "error") %> prohibited this article from being saved:</h2>
+    <ul>
+      <% @questionnaire.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
       <% end %>
+    </ul>
+  </div>
+<% end %>
 
-      <% for @question in @questionnaire.questions %>
-          <% questionnum=@question.id %>
+<table>
+  <tr>
+    <td valign="top"><label for="questionnaire_name">Name:</label>
+      <%= text_field 'questionnaire', 'name' %>
+      <%= hidden_field 'questionnaire', 'id' %>
+      <%= hidden_field 'questionnaire', 'type' %>
+    </td>
+  </tr>
+</table>
+<br/>
+<% if @questionnaire.type == 'QuizQuestionnaire' %>
+  <!--handle a questionnaire differently if it is a quiz-->
+  <td><label for="min_question_score">Min item
+    score:</label>&nbsp;<%= text_field 'questionnaire', 'min_question_score', :size => 1, :value => @questionnaire.min_question_score ||= 0, :class => "form-control width-40" %>&nbsp;&nbsp;
+  </td>
+  <td><label for="max_question_score">Max item
+    score:</label>&nbsp;<%= text_field 'questionnaire', 'max_question_score', :size => 1, :value => @questionnaire.max_question_score ||= 5, :class => "form-control width-40" %>&nbsp;&nbsp;
+  </td>
+  </td>
+  <table id="questions_table">
+    <% if $disp_flag != 1 %>
+      <tr>
+        <td align=left width=300>Questions:</td>
+        <% if @questionnaire.type != 'QuizQuestionnaire' %>
+          <td align=left>weight</td>
+        <% end %>
+
+      </tr>
+      </table>
+      </tr>
+    <% end %>
+
+    <% @questionnaire.questions.each { |question| %>
+      <% questionnum = question.id %>
+      <tr>
+        <% unless $disp_flag == 1 %>
+          <td> <%= text_area "question[]", 'txt', :cols => 100 %></td>
+        <% end %>
+        <% @quiz_question_choices = QuizQuestionChoice.where(question_id: question.id) %>
+      </tr>
+      <% i = 1 %>
+      <% for @quiz_question_choice in @quiz_question_choices %>
         <tr>
-          <% if $disp_flag != 1 %>
-            <td > <%= text_area "question[]", 'txt', :cols=>100 %></td>
-          <% end %>
-          <%  @quiz_question_choices = QuizQuestionChoice.where(question_id: @question.id) %>
-
-        </tr>
-        <% i=1 %>
-
-        <% for @quiz_question_choice in @quiz_question_choices %>
-          <tr>
           <td>
             &nbsp;&nbsp;&nbsp;
-              <% if @question.type=="MultipleChoiceCheckbox" %>
-                  <%= hidden_field_tag("quiz_question_choices[#{questionnum}][MultipleChoiceCheckbox][#{i}][iscorrect]",'0') %>
-                  <%= check_box_tag("quiz_question_choices[#{questionnum}][MultipleChoiceCheckbox][#{i}][iscorrect]",'1', @quiz_question_choice.iscorrect) %>
-                  &nbsp;<%= text_field_tag "quiz_question_choices[#{questionnum}][MultipleChoiceCheckbox][#{i}][txt]", @quiz_question_choice.txt, :size=>40 %>
+            <% if question.type == "MultipleChoiceCheckbox" %>
+              <%= hidden_field_tag("quiz_question_choices[#{questionnum}][MultipleChoiceCheckbox][#{i}][iscorrect]", '0') %>
+              <%= check_box_tag("quiz_question_choices[#{questionnum}][MultipleChoiceCheckbox][#{i}][iscorrect]", '1', @quiz_question_choice.iscorrect) %>
+              &nbsp;<%= text_field_tag "quiz_question_choices[#{questionnum}][MultipleChoiceCheckbox][#{i}][txt]", @quiz_question_choice.txt, :size => 40 %>
 
+            <% end %>
+
+            <% if question.type == "MultipleChoiceRadio" %>
+              <%= radio_button_tag("quiz_question_choices[#{questionnum}][MultipleChoiceRadio][correctindex]", "#{i}", @quiz_question_choice.iscorrect) %>
+              &nbsp;<%= text_field_tag "quiz_question_choices[#{questionnum}][MultipleChoiceRadio][#{i}][txt]", @quiz_question_choice.txt, :size => 40 %>
+            <% end %>
+
+            <% if question.type == "TrueFalse" %>
+              <% if @quiz_question_choice.txt == "True" %>
+                <%= radio_button_tag("quiz_question_choices[#{questionnum}][TrueFalse][1][iscorrect]", 'True', @quiz_question_choice.iscorrect) %>
+                True
               <% end %>
 
-              <%if @question.type=="MultipleChoiceRadio" %>
-                <%= radio_button_tag("quiz_question_choices[#{questionnum}][MultipleChoiceRadio][correctindex]", "#{i}", @quiz_question_choice.iscorrect)%>
-                &nbsp;<%= text_field_tag "quiz_question_choices[#{questionnum}][MultipleChoiceRadio][#{i}][txt]", @quiz_question_choice.txt, :size=>40 %>
+              <% if @quiz_question_choice.txt == "False" %>
+                <%= radio_button_tag("quiz_question_choices[#{questionnum}][TrueFalse][1][iscorrect]", 'False', @quiz_question_choice.iscorrect) %>
+                False
               <% end %>
-
-              <%if @question.type=="TrueFalse" %>
-                <% if @quiz_question_choice.txt=="True"%>
-                  <%= radio_button_tag("quiz_question_choices[#{questionnum}][TrueFalse][1][iscorrect]", 'True', @quiz_question_choice.iscorrect) %>   True
-                <%end%>
-
-                <% if @quiz_question_choice.txt=="False"%>
-                    <%= radio_button_tag("quiz_question_choices[#{questionnum}][TrueFalse][1][iscorrect]", 'False', @quiz_question_choice.iscorrect) %>   False
-                <%end%>
-              <% end %>
+            <% end %>
           </td>
-          </tr>
-          <% i+=1 %>
-        <%end %>
-
+        </tr>
+        <% i += 1 %>
       <% end %>
-    </table> 
-  <% end %>
+
+    <% } %>
+    </table>
+<% end %>
 <BR/>
 

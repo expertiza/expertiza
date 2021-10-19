@@ -38,10 +38,13 @@ class Instructor < User
   def self.get_user_list(user)
     participants = []
     user_list = []
-    Course.where(instructor_id: user.id).find_each do |course|
+    # Refactor
+    courses = Course.where(instructor_id: user.id)
+    courses.each do |course|
       participants << course.get_participants
     end
-    Assignment.where(instructor_id: user.id).find_each do |assignment|
+    assignments = Assignment.where(instructor_id: user.id)
+    assignments.each do |assignment|
       participants << assignment.participants
     end
     participants.each do |p_s|

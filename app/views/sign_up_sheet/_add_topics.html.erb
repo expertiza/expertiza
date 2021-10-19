@@ -62,5 +62,35 @@
                 :model => 'SignUpSheet',
                 :id => params[:id],
                 :expected_fields => 'Topic identifier, User Name1, User Name2, ...' %>|
-
+    <input type="button" value="Delete selected topics" onclick="deleteTopics()" />|
+    <input id='select_all' type="checkbox" onClick="selectAll(this)" />Select All |
 <% end %>
+
+<script>
+    // javascript Function to delete all selected topics
+    function deleteTopics() {
+        var msg = 'Are you sure? It will delete all selected topics';
+        if (confirm(msg)) {
+            var topic_identifiers = []
+            $("#topics input[type=checkbox]:checked").each(function() {
+                var topic_id = $(this).closest('tr').find('#topic_id').text();
+                topic_identifiers.push(topic_id);
+                
+            });
+            
+            jQuery.ajax({
+                url: '/sign_up_sheet/delete_all_selected_topics',
+                method: 'POST',
+                data: {
+                    topic_ids: topic_identifiers,
+                    assignment_id: <%= @assignment.id %>  
+                },
+                success: function() {
+                    location.reload();
+                }
+            });
+        } else {
+            window.location.href = '<%= edit_assignment_path(@assignment.id) + "#tabs-2" %>';
+        }
+    }
+</script> 

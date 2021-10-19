@@ -1,5 +1,7 @@
 describe SignUpSheetController do
   let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true) }
+  let(:assignment2) { create(:assignment, id: 2, microtask: false, staggered_deadline: false, private: true) }
+  let(:assignment3) { create(:assignment, id: 3, microtask: true, staggered_deadline: true, private: false) }
   let(:assignment30) { create(:assignment, id: 30, microtask: true, staggered_deadline: false, private: true) }
   let(:assignment40) { create(:assignment, id: 40, microtask: false, staggered_deadline: true, private: false) }
   let(:assignment6) { create(:assignment, id: 6000, microtask: true, staggered_deadline: false, private: false) }
@@ -18,6 +20,10 @@ describe SignUpSheetController do
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(Assignment).to receive(:find).with(1).and_return(assignment)
+    allow(Assignment).to receive(:find).with('2').and_return(assignment2)
+    allow(Assignment).to receive(:find).with(2).and_return(assignment2)
+    allow(Assignment).to receive(:find).with('3').and_return(assignment3)
+    allow(Assignment).to receive(:find).with(3).and_return(assignment3)
     allow(Assignment).to receive(:find).with('30').and_return(assignment30)
     allow(Assignment).to receive(:find).with(30).and_return(assignment30)
     allow(Assignment).to receive(:find).with('40').and_return(assignment40)
@@ -145,6 +151,63 @@ describe SignUpSheetController do
       expect(response).to redirect_to('/assignments/1/edit#tabs-2')
     end
 
+    it 'delete_all_selected_topics for a private assignment and redirects to edit assignment page with single topic selected' do
+      create(:topic, id: 2, assignment_id: 2, topic_identifier: 'topic2')
+      params = {assignment_id: 2, topic_ids: ['topic2']}
+      post :delete_all_selected_topics, params
+      expect(flash[:success]).to eq('All selected topics have been deleted successfully.')
+      topics_exist = SignUpTopic.where(assignment_id: 2).count
+      expect(topics_exist).to be_eql 0
+      expect(response).to redirect_to('/assignments/2/edit#tabs-2')
+    end
+
+    it 'delete_all_selected_topics for a non private assignment and redirects to edit assignment page with single topic selected' do
+      create(:topic, id: 2, assignment_id: 3, topic_identifier: 'topic2')
+      params = {assignment_id: 3, topic_ids: ['topic2']}
+      post :delete_all_selected_topics, params
+      expect(flash[:success]).to eq('All selected topics have been deleted successfully.')
+      topics_exist = SignUpTopic.where(assignment_id: 3).count
+      expect(topics_exist).to be_eql 0
+      expect(response).to redirect_to('/assignments/3/edit#tabs-2')
+    end
+
+    it 'delete_all_selected_topics for a non private assignment and redirects to edit assignment page with multiple topic selected' do
+      create(:topic, id: 2, assignment_id: 3, topic_identifier: 'topic2')
+      create(:topic, id: 3, assignment_id: 3, topic_identifier: 'topic3')
+      create(:topic, id: 8, assignment_id: 3, topic_identifier: 'topic4')
+      params = {assignment_id: 3, topic_ids: ['topic2', 'topic3']}
+      post :delete_all_selected_topics, params
+      expect(flash[:success]).to eq('All selected topics have been deleted successfully.')
+      topics_exist = SignUpTopic.where(assignment_id: 3).count
+      expect(topics_exist).to be_eql 1
+      expect(response).to redirect_to('/assignments/3/edit#tabs-2')
+
+      params = {assignment_id: 3, topic_ids: ['topic4']}
+      post :delete_all_selected_topics, params
+      expect(flash[:success]).to eq('All selected topics have been deleted successfully.')
+      topics_exist = SignUpTopic.where(assignment_id: 3).count
+      expect(topics_exist).to be_eql 0
+      expect(response).to redirect_to('/assignments/3/edit#tabs-2')
+    end
+
+    it 'delete_all_selected_topics for a private assignment and redirects to edit assignment page with multiple topic selected' do
+      create(:topic, id: 2, assignment_id: 2, topic_identifier: 'topic2')
+      create(:topic, id: 3, assignment_id: 2, topic_identifier: 'topic3')
+      create(:topic, id: 4, assignment_id: 2, topic_identifier: 'topic4')
+      params = {assignment_id: 2, topic_ids: ['topic2', 'topic3']}
+      post :delete_all_selected_topics, params
+      expect(flash[:success]).to eq('All selected topics have been deleted successfully.')
+      topics_exist = SignUpTopic.where(assignment_id: 2).count
+      expect(topics_exist).to be_eql 1
+      expect(response).to redirect_to('/assignments/2/edit#tabs-2')
+
+      params = {assignment_id: 2, topic_ids: ['topic4']}
+      post :delete_all_selected_topics, params
+      expect(flash[:success]).to eq('All selected topics have been deleted successfully.')
+      topics_exist = SignUpTopic.where(assignment_id: 2).count
+      expect(topics_exist).to be_eql 0
+      expect(response).to redirect_to('/assignments/2/edit#tabs-2')
+    end
     it 'create topic and delete_all_selected_topics for a staggered deadline assignment and redirects to edit assignment page with single topic selected' do
       create(:topic, id: 40, assignment_id: 40, topic_identifier: 'E1733')
       params = {assignment_id: 40, topic_ids: ['E1733']}
@@ -289,6 +352,27 @@ describe SignUpSheetController do
       expect(response).to redirect_to('/assignments/1/edit')
     end
 
+    it 'deletes all topics for the private assignment and redirects to edit assignment page' do
+      create(:topic, id: 2, assignment_id: 2)
+      create(:topic, id: 3, assignment_id: 2)
+      params = {assignment_id: 2}
+      post :delete_all_topics_for_assignment, params.merge(format: :html)
+      topics_exist = SignUpTopic.where(assignment_id: 2).count
+      expect(topics_exist).to be_eql 0
+      expect(flash[:success]).to eq('All topics have been deleted successfully.')
+      expect(response).to redirect_to('/assignments/2/edit')
+    end
+
+    it 'deletes all topics for not microtask assignment and redirects to edit assignment page' do
+      create(:topic, id: 2, assignment_id: 3)
+      create(:topic, id: 3, assignment_id: 3)
+      params = {assignment_id: 3}
+      post :delete_all_topics_for_assignment, params.merge(format: :html)
+      topics_exist = SignUpTopic.where(assignment_id: 3).count
+      expect(topics_exist).to be_eql 0
+      expect(flash[:success]).to eq('All topics have been deleted successfully.')
+      expect(response).to redirect_to('/assignments/3/edit')
+    end
     it 'deletes all topics for the staggered deadline assignment and redirects to edit assignment page' do
       create(:topic, id: 30, assignment_id: 40, topic_identifier: 'E1740')
       create(:topic, id: 40, assignment_id: 40, topic_identifier: 'E1741')

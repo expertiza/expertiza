@@ -459,7 +459,8 @@ resources :institution, except: [:destroy] do
     collection do
       get :list
       # post ':id', action: :create_teams
-      post :create_teams
+      post ':id', action: :update
+      post :random_teams
       post :inherit
     end
   end

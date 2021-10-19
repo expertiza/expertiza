@@ -45,7 +45,7 @@ class Assessment360Controller < ApplicationController
     # hashes for view
     @meta_review = {}
     @teammate_review = {}
-    @teamed_count = {}
+    @teammate_count = {}
     @form_complete = ""
     required.each do |f|
       if params.has_key? f and not params[f].blank?
@@ -85,7 +85,7 @@ class Assessment360Controller < ApplicationController
         @final_grades[cp.id] = 0
         %w[teammate meta].each {|type| instance_variable_set("@#{type}_review_info_per_stu", [0, 0]) }
         students_teamed = StudentTask.teamed_students(cp.user)
-        @teamed_count[cp.id] = students_teamed[course.id].try(:size).to_i
+        @teammate_count[cp.id] = students_teamed[course.id].try(:size).to_i
         @assignments.each do |assignment|
           user_id = cp.user_id
           assignment_id = assignment.id
@@ -207,11 +207,11 @@ class Assessment360Controller < ApplicationController
   end
 
   def format_topic(topic)
-    topic.nil? ? '-' : topic.format_for_display
+    topic.nil? ? '—' : topic.format_for_display
   end
 
   def format_score(score)
-    score.nil? ? '-' : score
+    score.nil? ? '—' : score
   end
 
   helper_method :format_score

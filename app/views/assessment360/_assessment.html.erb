@@ -1,3 +1,10 @@
+<%# Partial to render the table %>
+<%# Format of table %>
+<%#                          |                   Assignment1                      |     Assignment2     |     Assignment3   |  Final Grades     |     Aggregate Score          %>
+<%# Students  Teammate_Count |Metareview Teammate_review Topic Peer Instructor    |                     |                   | Total Inst Grade  | Metareview | Teammate Review %>
+<%#  s1                      |                                                    |                     |                   |                   |            |                 %>
+<%#  s2                      |                                                    |                     |                   |                   |            |                 %>
+<%# Class_Average            |  x%            y%          N/A  N/A    N/A         |                     |                   |       N/A         |     x'%    |      y'%        %>
 <style>
 
   table {
@@ -29,12 +36,6 @@
 </script>
 
 <table class="table table-striped sortable">
-    <%# Format of table %>
-    <%#                          |                   Assignment1         |     Assignment2     |     Assignment3   |  Final Grades     |     Aggregate Score          %>
-    <%# Students  Teammate Count |Meta Teammate Topic Peer Instructor    |                     |                   | Total Inst Grade  | Metareview | Teammate Review %>
-    <%#  s1                      |                                       |                     |                   |                   |            |                 %>
-    <%#  s2                      |                                       |                     |                   |                   |            |                 %>
-    <%# Class Average            |  x%    y%          N/A  N/A    N/A    |                     |                   |       N/A         |     x'%    |      y'%        %>
     <thead>
         <tr>
           <th rowspan=2 width="320" class="sorter-true">Students</th>

@@ -40,7 +40,7 @@ class DutiesController < ApplicationController
   # PATCH/PUT /duties/1
   def update
     if @duty.update(duty_params)
-      redirect_to @duty, notice: 'Duty was successfully updated.'
+      redirect_to edit_assignment_path(duty_params[:assignment_id]), notice: 'Duty was successfully updated.'
     else
       render :edit
     end

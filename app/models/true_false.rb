@@ -8,13 +8,6 @@ class TrueFalse < QuizQuestion
     html += '</td></tr>'
 
     html += '<tr><td>'
-    html += 'Question Weight: '
-    html += '<input type="number" name="question_weights[' + self.id.to_s + '][txt]" '
-    html += 'id="question_wt_' + self.id.to_s + '_txt" '
-    html += 'value="' + self.weight.to_s + '" min="0" />'
-    html += '</td></tr>'
-
-    html += '<tr><td>'
     html += '<input type="radio" name="quiz_question_choices[' + self.id.to_s + '][TrueFalse][1][iscorrect]" '
     html += 'id="quiz_question_choices_' + self.id.to_s + '_TrueFalse_1_iscorrect_True" value="True" '
     html += 'checked="checked" ' if quiz_question_choices[0].iscorrect
@@ -79,8 +72,9 @@ class TrueFalse < QuizQuestion
     choice_info.each do |_idx, value|
       if value[:txt] == ''
         valid = "Please make sure every question has text for all options"
+        break
       end
-      correct_count += 1 if value[:iscorrect] == 1.to_s
+      correct_count += 1 if value.key?(:iscorrect)
     end
     valid = "Please select a correct answer for all questions" if correct_count == 0
     valid

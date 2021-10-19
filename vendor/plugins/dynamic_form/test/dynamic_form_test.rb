@@ -52,7 +52,6 @@ class DynamicFormTest < ActionView::TestCase
   def setup_post
     @post = Post.new
     def @post.errors
-      #noinspection RubyDefParenthesesInspection
       Class.new {
         def [](field)
           case field.to_s
@@ -64,33 +63,21 @@ class DynamicFormTest < ActionView::TestCase
             []
           end
         end
-        def empty?
-          false
-        end
-        def count
-          1
-        end
-        def full_messages
-          [ "Author name can't be empty" ]
-        end
+        def empty?() false end
+        def count() 1 end
+        def full_messages() [ "Author name can't be empty" ] end
       }.new
     end
 
-    def @post.persisted?
-      false
-    end
-    def @post.to_param
-      nil
-    end
+    def @post.persisted?() false end
+    def @post.to_param() nil end
 
     def @post.column_for_attribute(attr_name)
       Post.content_columns.select { |column| column.name == attr_name }.first
     end
 
     silence_warnings do
-      def Post.content_columns
-        [Column.new(:string, "title", "Title"), Column.new(:text, "body", "Body") ]
-      end
+      def Post.content_columns() [ Column.new(:string, "title", "Title"), Column.new(:text, "body", "Body") ] end
     end
 
     @post.title       = "Hello World"
@@ -105,9 +92,7 @@ class DynamicFormTest < ActionView::TestCase
     def @user.errors
       Class.new {
         def [](field) field == "email" ? ['nonempty'] : [] end
-        def empty?
-          false
-        end
+        def empty?() false end
         def count() 1 end
         def full_messages() [ "User email can't be empty" ] end
       }.new

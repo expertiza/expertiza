@@ -41,6 +41,11 @@ class MoveFiles < ActiveRecord::Migration
       directories = Assignment.find_all_by(directory_path: assignment.directory_path)
       if directories.length ==  1
         oldpath = Rails.root + "/pg_data/"+ assignment.directory_path
+         if assignment.name == 'Another assignment'
+            puts assignment.directory_path
+            puts assignment.directory_path.length
+         end     
+      
          if assignment.directory_path == nil or assignment.directory_path.length == 0
           assignment.directory_path = FileHelper.clean_path(assignment.name)        
         end
@@ -77,6 +82,8 @@ class MoveFiles < ActiveRecord::Migration
         oldcontents = Dir.glob(oldpath + "/*")        
         FileUtils.mv(oldcontents,assignment.dir_path)
       end
+    else
+      puts "Two or more assignments exist for the same path. Assignment: "+assignment.name+" Path: "+assignment.directory_path
     end
     }
   end

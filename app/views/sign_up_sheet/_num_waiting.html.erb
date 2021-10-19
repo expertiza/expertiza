@@ -1,10 +1,10 @@
 <% found_in_slots = false %>
-<% @slots_filled.each do | slot | %>
+<% for slot in @slots_waitlisted %>
   <% if slot.topic_id.to_s == topic.id.to_s %>
     <td align="center"><%= slot.count.to_i %></td>
     <% found_in_slots = true %>
   <% end %>
 <% end %>
-<% unless found_in_slots %>
+<% if found_in_slots == false %>
   <td align="center">0</td>
 <% end %>

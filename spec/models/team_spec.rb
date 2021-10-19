@@ -182,90 +182,11 @@ describe Team do
     end
   end
 
-  # E1991 : we check whether anonymized view 
-  # sets the team name to anonymized. the test
-  # case should test both when anonymized view
-  # is set and when anonymized view is not set
-  describe '#anonymized_view' do
-    it 'returns anonymized name of team when anonymized view is set' do
-      allow(User).to receive(:anonymized_view?).and_return(true)
-      expect(team.name).to eq 'Anonymized_Team_' + team.id.to_s
-      expect(team.name).not_to eq 'no team'
-    end
-
-    it 'returns real name of team when anonymized view is not set' do
-      allow(User).to receive(:anonymized_view?).and_return(false)
-      expect(team.name).not_to eq 'Team_' + team.id.to_s
-      expect(team.name).to eq 'no team'
-    end
-  end 
-
   describe '.import' do
     context 'when row is empty and has_column_names option is not true' do
       it 'raises an ArgumentError' do
         expect { Team.import({}, 1, {has_column_names: 'false'}, AssignmentTeam.new) }
           .to raise_error(ArgumentError, 'Not enough fields on this line.')
-      end
-    end
-
-    # Add tests to handle duplicates in various ways, in .import method and handle_duplicates method
-    context 'when there are duplicates in new teams with existing teams' do
-      let(:row) do
-        {teammembers: %w(member1 member2), teamname: 'name'}
-      end
-      let(:options) do
-        {has_teamname: 'true_first'}
-      end
-      let(:id) {1}
-      before(:each) do
-        allow(Team).to receive_message_chain(:where, :first).with(["name =? && parent_id =?", row[:teamname], id]).with(no_args).and_return(team)
-        allow(AssignmentTeam).to receive(:create_team_and_node).with(id).and_return(team)
-        allow(team).to receive(:save).and_return(true)
-        allow(team).to receive(:import_team_members)
-      end
-      context 'when choosing to ignore the new team' do
-        it 'handles duplicates with "ignore" argument' do
-          options[:handle_dups] = "ignore"
-          allow(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, "ignore", AssignmentTeam).and_return(nil)
-          expect(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, "ignore", AssignmentTeam).and_return(nil)
-          Team.import(row, id, options, AssignmentTeam)
-        end
-      end
-
-      context 'when choosing to replace the existing team with the new team' do
-        it 'handles duplicates with "replace" argument' do
-          options[:handle_dups] = "replace"
-          allow(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, "replace", AssignmentTeam).and_return(row[:teamname])
-          expect(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, "replace", AssignmentTeam).and_return(row[:teamname])
-          Team.import(row, id, options, AssignmentTeam)
-        end
-      end
-
-      context 'when choosing to insert any new members to existing team' do
-        it 'handles duplicates with "insert" argument' do
-          options[:handle_dups] = "insert"
-          allow(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, "insert", AssignmentTeam).and_return(nil)
-          expect(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, "insert", AssignmentTeam).and_return(nil)
-          Team.import(row, id, options, AssignmentTeam)
-        end
-      end
-
-      context 'when choosing to rename the new team and import' do
-        it 'handles duplicates with "rename" argument' do
-          options[:handle_dups] = "rename"
-          allow(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, "rename", AssignmentTeam).and_return(row[:teamname])
-          expect(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, "rename", AssignmentTeam).and_return(row[:teamname])
-          Team.import(row, id, options, AssignmentTeam)
-        end
-      end
-
-      context 'when choosing to rename the existing team and import' do
-        it 'handles duplicates with "rename_existing" argument' do
-          options[:handle_dups] = "rename_existing"
-          allow(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, "rename_existing", AssignmentTeam).and_return(row[:teamname])
-          expect(Team).to receive(:handle_duplicate).with(team, row[:teamname], id, "rename_existing", AssignmentTeam).and_return(row[:teamname])
-          Team.import(row, id, options, AssignmentTeam)
-        end
       end
     end
 
@@ -312,39 +233,16 @@ describe Team do
       context 'when handle_dups option is rename' do
         it 'returns new team name' do
           allow(Course).to receive(:find).with(1).and_return(double('Course', name: 'no course'))
-          allow(Assignment).to receive(:find).with(1).and_return(double('Assignment', name: 'no assignment'))
           allow(Team).to receive(:generate_team_name).with('no course').and_return('new team name')
-          allow(Team).to receive(:generate_team_name).with('no assignment').and_return('new team name')
           expect(Team.handle_duplicate(team, 'no name', 1, 'rename', CourseTeam.new)).to eq('new team name')
-          expect(Team.handle_duplicate(team, 'no name', 1, 'rename', AssignmentTeam.new)).to eq('new team name')
         end
       end
 
       context 'when handle_dups option is replace' do
         it 'deletes the old team' do
-          allow(team).to receive(:delete)
+          allow(TeamsUser).to receive_message_chain(:where, :find_each).with(team_id: 1).with(no_args).and_yield(team_user)
+          allow(team_user).to receive(:destroy).and_return(team_user)
           expect(Team.handle_duplicate(team, 'no name', 1, 'replace', CourseTeam.new)).to eq('no name')
-        end
-      end
-
-      context 'when handle_dups option is insert' do
-        it 'does nothing and returns nil' do
-          expect(Team.handle_duplicate(team, 'no name', 1, 'insert', CourseTeam.new)).to be nil
-        end
-      end
-
-      # By the time this test is added (by E1949), the renaming existing team function does not exist yet,
-      # so it should fail unless the function is implemented and the existing team is renamed and saved.
-      context 'when handle_dups option is rename_existing' do
-        it 'renames the existing team and returns nil' do
-          allow(Course).to receive(:find).with(1).and_return(double('Course', name: 'no course'))
-          allow(Assignment).to receive(:find).with(1).and_return(double('Assignment', name: 'no assignment'))
-          allow(Team).to receive(:generate_team_name).with('no course').and_return('new team name')
-          allow(Team).to receive(:generate_team_name).with('no assignment').and_return('new team name')
-          allow(team).to receive(:name=).with('new team name')
-          allow(team).to receive(:save)
-          expect(Team.handle_duplicate(team, 'no name', 1, 'replace_existing', CourseTeam.new)).to be nil
-          expect(Team.handle_duplicate(team, 'no name', 1, 'replace_existing', AssignmentTeam.new)).to be nil
         end
       end
     end

@@ -146,7 +146,7 @@ FactoryBot.define do
 
   factory :course, class: Course do
     sequence(:name) {|n| "CSC517, test#{n}" }
-    instructor { Instructor.first || association(:instructor) }
+    instructor { Instructor.where(role_id: 1).first || association(:instructor) }
     directory_path 'csc517/test'
     info 'Object-Oriented Languages and Systems'
     private true
@@ -154,9 +154,7 @@ FactoryBot.define do
   end
 
   factory :assignment, class: Assignment do
-    # Help multiple factory-created assignments get unique names
-    # Let the first created assignment have the name 'final2' to avoid breaking some fragile existing tests
-    name { "#{Assignment.last ? ('assignment' + (Assignment.last.id + 1).to_s) : 'final2'}" }
+    name 'final2'
     directory_path 'final_test'
     submitter_count 0
     course { Course.first || association(:course) }
@@ -176,8 +174,6 @@ FactoryBot.define do
     review_topic_threshold 0
     copy_flag false
     rounds_of_reviews 2
-    vary_by_round false
-    vary_by_topic false
     microtask false
     require_quiz false
     num_quiz_questions 0
@@ -198,7 +194,6 @@ FactoryBot.define do
     is_calibrated false
     has_badge false
     allow_selecting_additional_reviews_after_1st_round false
-    auto_assign_mentor false
   end
 
   factory :assignment_team, class: AssignmentTeam do
@@ -225,16 +220,9 @@ FactoryBot.define do
 
   factory :team_user, class: TeamsUser do
     team { AssignmentTeam.first || association(:assignment_team) }
-    # Beware: it is fragile to assume that role_id of student is 2 (or any other unchanging value)
     user { User.where(role_id: 2).first || association(:student) }
   end
 
-  factory :team, class: Team do
-    id 1
-    name 'testteam'
-    parent_id 1
-  end
-  
   factory :invitation, class: Invitation do
     reply_status 'W'
   end
@@ -302,9 +290,9 @@ FactoryBot.define do
     due_at DateTime.now.in_time_zone + 1.day
     deadline_type { DeadlineType.first || association(:deadline_type) }
     assignment { Assignment.first || association(:assignment) }
-    submission_allowed_id { DeadlineRight.first.nil? ? association(:deadline_right).id : DeadlineRight.first.id }
-    review_allowed_id { DeadlineRight.first.nil? ? association(:deadline_right).id : DeadlineRight.first.id  }
-    review_of_review_allowed_id { DeadlineRight.first.nil? ? association(:deadline_right).id : DeadlineRight.first.id  }
+    submission_allowed_id 3
+    review_allowed_id 3
+    review_of_review_allowed_id 3
     round 1
     flag false
     threshold 1
@@ -339,24 +327,13 @@ FactoryBot.define do
   end
 
   factory :deadline_right, class: DeadlineRight do
-    name  'OK'
+    name  'No'
   end
 
   factory :assignment_node, class: AssignmentNode do
     assignment { Assignment.first || association(:assignment) }
     node_object_id 1
     type 'AssignmentNode'
-  end
-
-  factory :questionnaire_type_node, class: QuestionnaireTypeNode do
-    node_object_id 1
-    type 'QuestionnaireTypeNode'
-  end
-
-  factory :assignment_team_node, class: TeamNode do
-    node_object { AssignmentTeam.first || association(:assignment_team) }
-    node_object_id 1
-    type 'TeamNode'
   end
 
   factory :course_node, class: CourseNode do
@@ -367,20 +344,13 @@ FactoryBot.define do
 
   factory :questionnaire, class: ReviewQuestionnaire do
     name 'Test questionnaire'
-    # Beware: it is fragile to assume that role_id of instructor is 1 (or any other unchanging value)
-    instructor { Instructor.first || association(:instructor) }
+    instructor { Instructor.where(role_id: 1).first || association(:instructor) }
     private 0
     min_question_score 0
     max_question_score 5
     type 'ReviewQuestionnaire'
     display_type 'Review'
     instruction_loc nil
-  end
-
-  factory :questionnaire_node, class: QuestionnaireNode do
-    parent_id 0
-    node_object_id 0
-    type 'QuestionnaireNode'
   end
 
   factory :question, class: Criterion do
@@ -408,32 +378,10 @@ FactoryBot.define do
     user_id 1
     questionnaire_weight 100
     used_in_round nil
-    topic_id nil
     dropdown 1
   end
 
-  factory :bookmark_questionnaire, class: BookmarkRatingQuestionnaire do
-    name "BookmarkRatingQuestionnaire"
-    assignments {[ Assignment.first || association(:assignment) ]}
-    min_question_score 0
-    max_question_score 5
-    type 'BookmarkRatingQuestionnaire'
-  end
-
   factory :review_response_map, class: ReviewResponseMap do
-    assignment { Assignment.first || association(:assignment) }
-    reviewer { AssignmentParticipant.first || association(:participant) }
-    reviewee { AssignmentTeam.first || association(:assignment_team) }
-    type 'ReviewResponseMap'
-    calibrate_to 0
-  end
-
-  factory :feedback_response_map, class: FeedbackResponseMap do
-    type 'FeedbackResponseMap'
-    calibrate_to 0
-  end
-
-  factory :self_review_response_map, class: SelfReviewResponseMap do
     assignment { Assignment.first || association(:assignment) }
     reviewer { AssignmentParticipant.first || association(:participant) }
     reviewee { AssignmentTeam.first || association(:assignment_team) }
@@ -449,21 +397,12 @@ FactoryBot.define do
     calibrate_to 0
   end
 
-  factory :bookmark_review_response_map, class: BookmarkRatingResponseMap do
-    assignment { Assignment.first || association(:assignment) }
-    reviewer { AssignmentParticipant.first || association(:participant) }
-    reviewee { Bookmark.first || association(:assignment_team) }
-    type 'BookmarkRatingResponseMap'
-    calibrate_to 0
-  end
-
   factory :response, class: Response do
     response_map { ReviewResponseMap.first || association(:review_response_map) }
     additional_comment nil
     version_num nil
     round 1
     is_submitted false
-    visibility 'private'
   end
 
   factory :submission_record, class: SubmissionRecord do
@@ -475,7 +414,7 @@ FactoryBot.define do
     created_at Time.now
   end
 
-  factory :requested_user, class: AccountRequest do
+  factory :requested_user, class: RequestedUser do
     name 'requester1'
     role_id 2
     fullname 'requester, requester'
@@ -511,101 +450,8 @@ FactoryBot.define do
     content_page_id nil
   end
 
-  factory :bookmark, class: Bookmark do
-    id 1
-    url 'example.com'
-    title 'Test Bookmark'
-    description 'Test description'
-    user_id '1234'
-    topic_id '1'
-    created_at '2020-03-24 12:10:20'
-    updated_at '2020-03-24 12:10:20'
-  end
-
   factory :site_controller, class: SiteController do
     id 1
     name 'fake_site'
-  end
-
-  factory :version, class: Version do
-    item_type 'Node'
-    item_id 1
-    event 'create'
-    whodunnit nil
-    object nil
-    created_at '2015-06-11 15:11:51'
-  end
-
-  factory :test_user, class: User do
-    name 'username'
-    fullname 'full name'
-    email 'abc@mailinator.com'
-  end
-
-  factory :survey_deployment, class: SurveyDeployment do
-    type 'AssignmentSurveyDeployment'
-  end
-
-  factory :multiple_choice_checkbox, class: MultipleChoiceCheckbox do
-    txt 'Test question:'
-    weight 1
-    questionnaire { Questionnaire.first || association(:questionnaire) }
-    seq 1.00
-    type 'MultipleChoiceCheckbox'
-    size '70,1'
-  end
-
-  factory :true_false, class: TrueFalse do
-    txt 'Test question:'
-    weight 1
-    questionnaire { Questionnaire.first || association(:questionnaire) }
-    seq 1.00
-    type 'TrueFalse'
-    size '70,1'
-  end
-
-  factory :scored_question, class: ScoredQuestion do
-    txt 'Test question:'
-    weight 1
-    questionnaire { Questionnaire.first || association(:questionnaire) }
-    seq 1.00
-    type 'ScoredQuestion'
-    size '70,1'
-  end
-  
-  factory :questionnaire_header, class: QuestionnaireHeader do
-    txt 'Test question:'
-    weight 1
-    questionnaire { Questionnaire.first || association(:questionnaire) }
-    seq 1.00
-    type 'QuestionnaireHeader'
-    size '70,1'
-  end
-
-  factory :section_header, class: SectionHeader do
-    txt 'Test question:'
-    weight 1
-    questionnaire { Questionnaire.first || association(:questionnaire) }
-    seq 1.00
-    type 'SectionHeader'
-    size '70,1'
-  end
-  
-  factory :dropdown, class: Dropdown do
-    txt 'Test question:'
-    weight 1
-    questionnaire { Questionnaire.first || association(:questionnaire) }
-    seq 1.00
-    type 'TrueFalse'
-    size '70,1'
-  end
-
-  factory :text_area, class: TextArea do
-    txt 'Test question:'
-    weight 1
-    questionnaire { Questionnaire.first || association(:questionnaire) }
-    seq 1.00
-    type 'TextArea'
-    size '70,1'
   end
 end

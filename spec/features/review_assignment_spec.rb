@@ -19,7 +19,7 @@ describe "peer review testing" do
 
   def signup_topic
     user = User.find_by(name: "student2064")
-    login_as(user.name)
+    stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     visit '/sign_up_sheet/sign_up?id=1&topic_id=1' # signup topic
     visit '/student_task/list'
@@ -46,7 +46,7 @@ describe "peer review testing" do
   # the variable renaming, it is more clear what this variable means.
   it "is not able to select review with no submissions" do
     user = User.find_by(name: "student2065")
-    login_as(user.name)
+    stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     click_link "TestAssignment"
     click_link "Others' work"
@@ -76,9 +76,8 @@ describe "peer review testing" do
 
   it "is able to select topic for review with valid submissions" do
     submit_to_topic
-    click_link "Logout"
     user = User.find_by(name: "student2065")
-    login_as(user.name)
+    stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     visit '/sign_up_sheet/sign_up?id=1&topic_id=1'
     visit '/student_task/list'
@@ -91,9 +90,8 @@ describe "peer review testing" do
 
   it "is able to be assigned random topic for review" do
     submit_to_topic
-    click_link "Logout"
     user = User.find_by(name: "student2065")
-    login_as(user.name)
+    stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     visit '/sign_up_sheet/sign_up?id=1&topic_id=1'
     visit '/student_task/list'

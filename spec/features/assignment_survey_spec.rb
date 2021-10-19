@@ -1,6 +1,6 @@
 include InstructorInterfaceHelperSpec
 
-def create_assignment_questionnaire (survey_name)
+def create_assignment_questionnaire survey_name
   visit '/questionnaires/new?model=Assignment+SurveyQuestionnaire&private=0'
   fill_in 'questionnaire_name', with: survey_name
   find('input[name="commit"]').click
@@ -60,14 +60,14 @@ describe "Survey questionnaire tests for instructor interface" do
 
     # adding some questions for the deployed survey
     visit '/questionnaires/' + survey_questionnaire_1.id.to_s + '/edit'
-    fill_in('question_total_num', with: '1')
-    select('Criterion', from: 'question_type')
+    fill_in('new_question_total_num', with: '1')
+    select('Criterion', from: 'new_question_type')
     click_button "Add"
     expect(page).to have_content('Remove')
 
     fill_in "Edit question content here", with: "Test question 1"
     click_button "Save assignment survey questionnaire"
-    expect(page).to have_content('All questions have been successfully saved!')
+    expect(page).to have_content('The questionnaire has been successfully updated!')
 
     survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_1.id).first
     question = Question.find_by_sql(\
@@ -86,33 +86,6 @@ describe "Survey questionnaire tests for instructor interface" do
 
     survey_questionnaire_1 = Questionnaire.where(name: survey_name).first
     survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_1.id).first
-
-    # after adding a response:
-    visit '/survey_deployment/view_responses/' + survey_deployment.id.to_s
-    expect(page).to have_content(survey_name)
-  end
-
-  it "is able to add a second survey" do
-    login_as('instructor6')
-    survey_name = "Assignment Survey Questionnaire 2"
-    create_assignment_questionnaire survey_name
-    expect(Questionnaire.where(name: survey_name)).to exist
-  end
-
-  it "is able to deploy a second assignment survey with valid dates" do
-    survey_name = 'Assignment Survey Questionnaire 2'
-
-    # passing current time + 1 day for start date and current time + 2 days for end date
-    deploy_assignment_survey(@next_day, @next_to_next_day, survey_name)
-    expect(page).to have_content(survey_name)
-  end
-
-  it "is able to view responses of a second survey" do
-    survey_name = 'Assignment Survey Questionnaire 2'
-    deploy_assignment_survey(@next_day, @next_to_next_day, survey_name)
-
-    survey_questionnaire_2 = Questionnaire.where(name: survey_name).first
-    survey_deployment = SurveyDeployment.where(questionnaire_id: survey_questionnaire_2.id).first
 
     # after adding a response:
     visit '/survey_deployment/view_responses/' + survey_deployment.id.to_s

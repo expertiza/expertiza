@@ -47,7 +47,7 @@ class VmQuestionResponse
       reviews = if vary
                   ReviewResponseMap.get_responses_for_team_round(team, @round)
                 else
-                  ReviewResponseMap.assessments_for(team)
+                  ReviewResponseMap.get_assessments_for(team)
                 end
       reviews.each do |review|
         review_mapping = ReviewResponseMap.find(review.map_id)
@@ -57,21 +57,13 @@ class VmQuestionResponse
         end
       end
       @list_of_reviews = reviews
-    elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"   #ISSUE E-1967 updated
-      reviews = []
-      #finding feedbacks where current pariticipant of assignment (author) is reviewer 
-      feedbacks = FeedbackResponseMap.where(reviewer_id: participant.id) 
-      feedbacks.each do |feedback|
-        #finding the participant ids for each reviewee of feedback
-        #participant is really reviewee here.
-        participant = Participant.find_by(id: feedback.reviewee_id)
-        #finding the all the responses for the feedback
-        response = Response.where(map_id: feedback.id).order('updated_at').last
-        if response
-          reviews << response
-          @list_of_reviews << response
-        end 
+    elsif @questionnaire_type == "AuthorFeedbackQuestionnaire"
+      reviews = participant.feedback # feedback reviews
+      reviews.each do |review|
+        review_mapping = FeedbackResponseMap.find_by(id: review.map_id)
+        participant = Participant.find(review_mapping.reviewer_id)
         @list_of_reviewers << participant
+        @list_of_reviews << review
       end
     elsif @questionnaire_type == "TeammateReviewQuestionnaire"
       reviews = participant.teammate_reviews
@@ -92,6 +84,7 @@ class VmQuestionResponse
         @list_of_reviews << review
       end
     end
+
     reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
       answers.each do |answer|
@@ -100,12 +93,12 @@ class VmQuestionResponse
     end
   end
 
-  def display_team_members(ip_address = nil)
+  def display_team_members
     @output = ""
     if @questionnaire_type == "MetareviewQuestionnaire" || @questionnaire_type == "ReviewQuestionnaire"
       @output = "Team members:"
       @list_of_team_participants.each do |participant|
-        @output = @output + " (" + participant.fullname(ip_address) + ") "
+        @output = @output + " (" + participant.fullname + ") "
       end
 
     end

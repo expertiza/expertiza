@@ -32,7 +32,6 @@ describe User do
   end
 
   describe '#email' do
-
     it 'returns the email of the user' do
       expect(user.email).to eq('abcxyz@gmail.com')
     end
@@ -401,43 +400,6 @@ describe User do
     it 'returns false if current user is not a TA' do
       allow(user).to receive_message_chain(:role, :ta?).and_return(false)
       expect(user.teaching_assistant?).to be nil
-    end
-  end
-
-  # E1991 : tests for anonymized view helper function
-  describe '#anonymized_view?' do
-    it 'returns true when anonymized view is set' do
-      allow(user).to receive(:anonymized_view?).and_return(true)
-      expect(user.anonymized_view?).to be true
-    end
-
-    it 'returns false when anonymized view is set' do
-      allow(user).to receive(:anonymized_view?).and_return(false)
-      expect(user.anonymized_view?).to be false
-    end
-  end
-
-  # E1991 : checking whether anonymized view names functionality works
-  describe '#anonymized_view' do
-    it 'returns anonymized name when anonymized view is set' do
-      student = create(:student)
-      allow(User).to receive(:anonymized_view?).and_return(true)
-      expect(student.name).to eq "Student " + student.id.to_s
-    end
-
-    it 'returns real name when anonymized view is not set' do
-      student = create(:student)
-      allow(User).to receive(:anonymized_view?).and_return(false)
-      expect(student.name).not_to eq "Student " + student.id.to_s
-    end
-
-    # this test case is applicable to impersonate mode
-    it 'returns correct real name from anonymized name' do
-      student = create(:student)
-      expect(student.name).not_to eq "Student" + student.id.to_s
-      real_student = User.real_user_from_anonymized_name(student.name)
-      expect(student.name).to eq real_student.name
-      expect(student).to eq real_student
     end
   end
 

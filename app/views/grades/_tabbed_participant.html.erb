@@ -97,7 +97,7 @@
     end %>
 
     <% topic_id = SignedUpTeam.topic_id(@assignment.id, participant.user_id) %>
-    <% stage = @assignment.current_stage(topic_id) %>
+    <% stage = @assignment.get_current_stage(topic_id) %>
     <% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
       <TD ALIGN="CENTER">
       <% if stage == "Finished" %>

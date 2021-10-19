@@ -1,13 +1,12 @@
 class NotificationsController < ApplicationController
   before_action :set_notification, only: %i[show edit update destroy]
   helper_method :validate_params
-
   include SecurityHelper
-  include AuthorizationHelper
-
   # Give permission to manage notifications to appropriate roles
   def action_allowed?
-    current_user_has_ta_privileges?
+    ['Instructor',
+     'Teaching Assistant',
+     'Administrator'].include? current_role_name
   end
 
   def run_get_notification

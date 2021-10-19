@@ -1,5 +1,5 @@
 <div class='letters'>
-  <% @letters.each do | letter | %>
+  <% for letter in @letters %>
     <%= link_to letter, :action => 'list', :letter => letter, :from_letter => 1 %>&nbsp;
   <% end %>
 </div>

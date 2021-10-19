@@ -99,7 +99,6 @@ class AccountRequestController < ApplicationController
     @roles = Role.all
   end
 
-  #Changes Started Here
   def create_requested_user_record
   
     requested_user = AccountRequest.new(requested_user_params)
@@ -138,7 +137,7 @@ class AccountRequestController < ApplicationController
 
       return
     elsif user_existed
-      flash[:error] = "The account you are requesting has already existed in Expertiza."
+      flash[:error] = "The account you are requesting already exists in Expertiza."
       #If the user account already exists, log error to the user
     else
       flash[:error] = requested_user.errors.full_messages.to_sentence
@@ -148,7 +147,6 @@ class AccountRequestController < ApplicationController
     redirect_to controller: 'account_request', action: 'new', role: 'Student'
     #if the first if clause fails, redirect back to the account requests page!
   end
-#Changes Completed Here
 
   def roles_for_request_sign_up
     roles_can_be_requested_online = ["Instructor"]

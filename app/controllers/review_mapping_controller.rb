@@ -44,7 +44,8 @@ class ReviewMappingController < ApplicationController
     @mapping = ResponseMap.find(params[:id])
   end
 
-  def add_reviewer
+  # Zijun
+  def assign_reviewer_manually
     assignment = Assignment.find(params[:id])
     topic_id = params[:topic_id]
     if params[:user][:name] == ""

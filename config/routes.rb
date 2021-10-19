@@ -284,12 +284,12 @@ Expertiza::Application.routes.draw do
       post :confirm_submit
     end
   end
-
+#zijun
   resources :review_mapping, only: [] do
     collection do
       post :add_metareviewer
-      get :add_reviewer
-      post :add_reviewer
+      get :assign_reviewer_manually
+      post :assign_reviewer_manually
       post :add_self_reviewer
       get :add_self_reviewer
       get :add_user_to_assignment

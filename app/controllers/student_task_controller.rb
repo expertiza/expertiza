@@ -1,13 +1,15 @@
 class StudentTaskController < ApplicationController
+  include AuthorizationHelper
+
   helper :submitted_content
 
   def action_allowed?
-    ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator', 'Student'].include? current_role_name
+    current_user_has_student_privileges?
   end
 
   def impersonating_as_admin?
     original_user = session[:original_user]
-    admin_role_ids = Role.where(name:['Administrator','Super-Administrator']).pluck(:id)
+    admin_role_ids = Role.where(name:%w[Administrator Super-Administrator]).pluck(:id)
     admin_role_ids.include? original_user.role_id
   end
 
@@ -27,18 +29,10 @@ class StudentTaskController < ApplicationController
         ta_course_ids = TaMapping.where(:ta_id => session[:original_user].id).pluck(:course_id)
         @student_tasks = @student_tasks.select {|t| ta_course_ids.include?t.assignment.course_id }
       else
-        # Changed logic to adapt to free standing assignments with the same course ID
-        @student_tasks = @student_tasks.select do |t|
-          session[:original_user].id == if t.assignment.course.nil?
-                                          t.assignment.instructor_id
-                                        else
-                                          t.assignment.course.instructor_id
-                                        end
-        end
+        @student_tasks = @student_tasks.select {|t| t.assignment.course and session[:original_user].id == t.assignment.course.instructor_id or !t.assignment.course and session[:original_user].id == t.assignment.instructor_id }
       end
     end
-
-    @student_tasks.select! {|t| t.assignment.availability_flag } unless @assignment.nil?
+    @student_tasks.select! {|t| t.assignment.availability_flag }
 
     # #######Tasks and Notifications##################
     @tasknotstarted = @student_tasks.select(&:not_started?)
@@ -61,6 +55,7 @@ class StudentTaskController < ApplicationController
     @can_provide_suggestions = @assignment.allow_suggestions
     @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
     @topics = SignUpTopic.where(assignment_id: @assignment.id)
+    @use_bookmark = @assignment.use_bookmark
     # Timeline feature
     @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
   end
@@ -89,15 +84,18 @@ class StudentTaskController < ApplicationController
     @review_of_review_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
   end
 
-  # To give permission for making a submission available to others
-  def make_public
-    @team = Team.find(params[:id])
-    @team.make_public = params[:status]
-    @team.save
-    respond_to do |format|
-      format.html { head :no_content }
-    end
-  end
+  def publishing_rights_update
+	@participant = AssignmentParticipant.find(params[:id])
+        @participant.permission_granted = params[:status]
+	@participant.save
+	respond_to do |format|
+		format.html {head :no_content}
+	end
+   end  
 
+  
+
+  
+  
   def your_work; end
 end

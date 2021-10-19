@@ -1,108 +1,90 @@
-<h2> Review scores: <%= Participant.find(@reviewer_id).name %> </h2>
-
+<h2> Review by <%= Participant.find(@reviewer_id).fullname(@ip) %> </h2>
 <% keys = @review_final_versions.keys %>
-<% keys.each do |key| %>
-    <br>
-    <hr>
-    <h4>Course: <%= Assignment.find(@assignment_id).course.name %></h4>
-    <h4> Assignment: <%= Assignment.find(@assignment_id).name %></h4>
+<% keys.each do |key| %>    
+    <h4><b> Course    :</b> <%= Assignment.find(@assignment_id).course.name %></h4>
+    <h4><b> Assignment:</b> <%= Assignment.find(@assignment_id).name %></h4>
     <% roundtitle = key.to_s %>
-    <h4><%= roundtitle.titlecase %></h4>
+    <h4><b><%= roundtitle.titlecase %></b></h4>
 
     <table class="general" border="1">
       <% questionnaire_id = Questionnaire.find(@review_final_versions[key][:questionnaire_id]) %>
       <% questions = Question.where(questionnaire_id: questionnaire_id) %>
       <% num_responses = @review_final_versions[key][:response_ids].length %>
       <% responses = @review_final_versions[key][:response_ids] %>
-      <% questions.each do |question| %>
-          <% if !question.is_a?(QuestionnaireHeader) && num_responses > 0 %>
-              <tr>
-                <th colspan="3" style="background-color:#DDDDBB" > [Question] <%= question.txt %> </th>
-              </tr>
-              <% if question.instance_of? Checkbox %>
-                  <tr>
-                    <td colspan="3" style="padding: 0px;">
-                      <table width="100%">
-                        <tr>
-                          <% responses.each do |response_id| %>
-                              <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
-                              <td><b><%= team.name %></b> <div style ="font-size:11px"> done at -- <%= Response.find(response_id).updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p") %> &nbsp&nbsp</div></td>
-                          <% end %>
-                        </tr>
-
-                        <tr>
-                          <% responses.each do |response_id| %>
-                              <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
-                              <td align='center'>
-                                <p><%= answer.answer == 0 ? image_tag("delete_icon.png") : image_tag("Check-icon.png") %></p></td>
-                          <% end %>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-              <% else %>
-                  <!-- Only assign these column headers if the question isn't a checkbox question -->
-                  <tr>
-                    <td width="20%"> Reviewee</td>
-                    <td width="10%"> Score</td>
-                    <td width="70%"> Comments</td>
-                  </tr>
-
-                  <% responses.each do |response_id| %>
-                      <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
-                      <% if !answer.nil? %>
-                          <tr>
-                            <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
-                            <% response_map = ReviewResponseMap.where(reviewed_object_id: @assignment_id,
-                                                                      reviewer_id: @reviewer_id,
-                                                                      reviewee_id: team.id).last %>
-                            <% response_update_at = response_map.try(:response).try(:last).try(:updated_at) %>
-                            <% review_graded_at = ReviewGrade.find_by(participant_id: @reviewer_id).try(:review_graded_at) %>
-                            <% col_color = 'black' %>
-                            <% col_color = 'blue' if review_graded_at && response_update_at && response_update_at > review_graded_at %>
-                            <!--Reviewee-->
-                            <td>
-                              <b><%= team.name %></b>  <div style ="font-size:11px"> done at -- <%= Response.find(response_id).updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p") %> &nbsp&nbsp</div>
-                            </td>
-                            <!--Score-->
-                            <% if question.instance_of? Checkbox %>
-                                <td align='center'>
-                                  <p style="color: <%= col_color %>"><%= answer.answer == 0 ? image_tag("delete_icon.png") : image_tag("Check-icon.png") %></p>
-                                </td>
-                            <% else %>
-                                <td align='center'><p style="color: <%= col_color %>"><%= answer.answer %></p></td>
-                            <% end %>
-
-                            <!--Comments-->
-                            <td align='left'><p style="color: <%= col_color %>"><%= answer.comments.html_safe unless answer.comments.nil? %></p></td>
-                          </tr>
-                      <% else %>
-                          <td>N/A</td>
-                          <td>N/A</td>
-                          <td>N/A</td>
-                      <% end %>
-                  <% end %>
-              <% end %>
-          <% else %>
-              <% next %>
-          <% end %>
-        <tr>
-          <td style=" border-left: hidden; border-right: hidden; height: 10px;" colspan="3"></td>
-        </tr>
-      <% end %>
+      
+      <!--      set column length equal for all responses-->
+      <% item_width  = 100/(num_responses+1) %>
+      
+      <!-- show the team which did the review -->
+      <!-- First Row -->
       <tr>
-        <th align='left' style="background-color:#DDDDBB"> Reviewee</th>
-        <th align='left' colspan="2" style="background-color:#DDDDBB"> Additional Comment</th>
+        <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <b>ITEM</b></th>
+        <% responses.each do |response_id| %>  
+          <td width="<%= item_width %>%">
+          <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
+          <b><%= team.name %></b> <div style ="font-size:11px"> done at -- <%= Response.find(response_id).updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p") %> &nbsp&nbsp</div>
+          </td>
+        <% end %>
       </tr>
 
-      <% responses.each do |response_id| %>
-          <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
+      <!-- Questions and Responses Row -->
+      <% questions.each do |question| %>
+        <% unless question.is_a?(QuestionnaireHeader) && num_responses > 0 %>
           <tr>
-            <td> <b><%= team.name %></b> <div style ="font-size:11px"> done at -- <%= Response.find(response_id).updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p") %> &nbsp&nbsp</div></td>
-            <td colspan="2"> <%=sanitize Response.find(response_id).additional_comment %> </td>
+            <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <%= question.txt %></th>
+            <!-- Show review summary of checkbox question -->
+            <% if question.instance_of? Checkbox %>
+              
+              <% responses.each do |response_id| %>  
+                <td align="center" width="<%= item_width %>%">
+                  <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
+                  <% unless answer.nil? %>
+                    <%= answer.answer == 0 ? image_tag("delete_icon.png") : image_tag("Check-icon.png") %>
+                  <% end %>
+                </td>
+              <% end %>
+
+            <!-- Show review summary of a non checkbox question -->  
+            <% else %>
+            
+              <% responses.each do |response_id| %>  
+                <td width="<%= item_width %>%">
+                  <% answer = Answer.where(response_id: response_id, question_id: question.id).first %>
+                  <% unless answer.nil? %>
+                  <div>
+                    <div class="c<%= answer.answer %> grade-circle" ><p><%= answer.answer %></p></div>
+                    <div><p><%= answer.comments.html_safe unless answer.comments.nil? %></p></div>
+                  </div>
+          <!--          <div class="c<%= answer.answer %> reviewscore" ><p><%= answer.answer %></p></div> 
+                    <div class=reviewcomment ><p><%= answer.comments.html_safe unless answer.comments.nil? %></p></div> -->
+                  <% end %>
+                </td>
+              <% end %>
+              
+            <% end %>
           </tr>
-      <% end %>
+        
+        <% else %>
+          <% next %>
+        
+        <% end %>
+      <% end %>  
+
+      <!-- Last Row additional Comments -->
+      <tr>
+        <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <b>Additional Comments</b></th>
+        <% responses.each do |response_id| %>  
+          <td width="<%= item_width %>%">
+          <% team = Team.find(ResponseMap.find(Response.find(response_id).map_id).reviewee_id) %>
+          <%=sanitize Response.find(response_id).additional_comment %>
+          </td>
+        <% end %>
+      </tr>      
+
+
     </table>
 
+<br>
 <% end #loop for keys %>
-<br/>
+<br>
+ 

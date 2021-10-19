@@ -46,24 +46,26 @@
         <% end %>
 
         <!--Team name-->
-        <% team_name_color = get_team_name_color_in_list_submission(team) %>
         <% if @assignment.max_team_size > 1 %>
-          <td><p style = <%="color:#{team_name_color}"%>><%= team.name %></p>
-          <% unless participants.empty? or participants[0].nil?%>
-            <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %></td>
+          <% team_name_color = get_team_name_color_in_list_submission(team) %>
+          <td><p style = <%="color:#{team_name_color}"%>><%= team.name(session[:ip]) %></p>
+          <% unless participants.empty? %>
+            <!-- “Assign Grade” will show if the final deadline of this assignment pass -->
+            <% if @assignment.current_stage == "Finished" %>
+              <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %></td>
+            <!-- if current user(TA/instructor) is participant in assignment then the user can perform review -->
+            <%elsif current_user_is_assignment_participant?(@assignment.id) %>
+              <%= render :partial => 'responses', :locals => {:team => team ,:topic_id => topic_identifier, :title => 'Review'} %>
+            <% end %>
           <% end %>
         <% end %>
 
         <!--Team member(s) / Participant name-->
           <td>
               <% users_for_curr_team.each do |user| %>
-                  <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post , id:"name"+@l.to_s%>
+                  <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
                   (<%= user.fullname(session[:ip])%>)<br>
               <% end %>
-            <% if @assignment.max_team_size < 2 and ( !participants.empty? or !participants[0].nil?)%>
-              <script>document.getElementById("name<%=@l.to_s %>").style.color = "<%=team_name_color%>"</script>
-              <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %>
-            <%end %>
           </td>
 
         <!--Submitted item(s)-->
@@ -77,7 +79,7 @@
           <% end %>
           <br>
           <!--Display submitted files-->
-          <% p team.submitted_files %>
+          <% team.submitted_files %>
           <% if participant and !team.submitted_files.empty? %>
             <% files = team.submitted_files %>
             <%= display_directory_tree(participant, files, true).html_safe if files and files.length > 0 %>

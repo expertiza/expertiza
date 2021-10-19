@@ -6,7 +6,8 @@ module ResponseAnalytic
 
   #====== score =======#
   def average_score
-    question_score_list.inject(:+) / num_questions
+    return question_score_list.inject(:+) / num_questions unless num_questions == 0
+    0
   end
 
   def max_question_score
@@ -23,7 +24,8 @@ module ResponseAnalytic
   end
 
   def average_word_count
-    total_word_count.to_f / num_questions
+    return total_word_count.to_f / num_questions unless num_questions == 0
+    0
   end
 
   def max_word_count
@@ -40,7 +42,8 @@ module ResponseAnalytic
   end
 
   def average_character_count
-    total_character_count.to_f / num_questions
+    return total_character_count.to_f / num_questions unless num_questions == 0
+    0
   end
 
   def max_character_count
@@ -50,8 +53,6 @@ module ResponseAnalytic
   def min_character_count
     character_count_list.min
   end
-
-  private
 
   # return an array of strings containing the word count of al the comments
   def word_count_list

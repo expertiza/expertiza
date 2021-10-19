@@ -1,4 +1,6 @@
 class StudentTeamsController < ApplicationController
+  include AuthorizationHelper
+
   autocomplete :user, :name
 
   def team
@@ -18,48 +20,45 @@ class StudentTeamsController < ApplicationController
 
   def action_allowed?
     # note, this code replaces the following line that cannot be called before action allowed?
-    if ['Instructor',
-        'Teaching Assistant',
-        'Administrator',
-        'Super-Administrator',
-        'Student'].include? current_role_name and
-       ((%w[view].include? action_name) ? are_needed_authorizations_present?(params[:student_id], "reader", "reviewer", "submitter") : true)
-      # make sure the student is the owner if they are trying to create it
-      return current_user_id? student.user_id if %w[create].include? action_name
-      # make sure the student belongs to the group before allowed them to try and edit or update
-      return team.get_participants.map(&:user_id).include? current_user.id if %w[edit update].include? action_name
-      true
+    return false unless current_user_has_student_privileges?
+    case action_name
+    when 'view'
+      if are_needed_authorizations_present?(params[:student_id], "reader", "reviewer", "submitter")
+        return true if current_user_has_id? student.user_id
+      else
+        return false
+      end
+    when 'create'
+      current_user_has_id? student.user_id
+    when 'edit', 'update'
+      team.get_participants.map(&:user_id).include? current_user.id
     else
-      false
+      true
     end
   end
 
   def view
     # View will check if send_invs and recieved_invs are set before showing
     # only the owner should be able to see those.
+
     return unless current_user_id? student.user_id
 
     @send_invs = Invitation.where from_id: student.user.id, assignment_id: student.assignment.id
     @received_invs = Invitation.where to_id: student.user.id, assignment_id: student.assignment.id, reply_status: 'W'
-    # Get the current due dates
-    @student.assignment.due_dates.each do |due_date|
-      if due_date.due_at > Time.now
-        @current_due_date = due_date
-        break
-      end
-    end
 
-    current_team = @student.team
 
-    @users_on_waiting_list = (SignUpTopic.find(current_team.topic).users_on_waiting_list if @student.assignment.topics? && current_team && current_team.topic)
+    @current_due_date = DueDate.current_due_date(@student.assignment.due_dates)
 
-    @teammate_review_allowed = true if @student.assignment.find_current_stage == 'Finished' || @current_due_date && (@current_due_date.teammate_review_allowed_id == 3 || @current_due_date.teammate_review_allowed_id == 2) # late(2) or yes(3)
+    #this line generates a list of users on the waiting list for the topic of a student's team,  
+    @users_on_waiting_list = (SignUpTopic.find(@student.team.topic).users_on_waiting_list if student_team_requirements_met?)
+
+    @teammate_review_allowed = DueDate.teammate_review_allowed(@student)
   end
 
   def create
-    existing_assignments = AssignmentTeam.where name: params[:team][:name], parent_id: student.parent_id
+    existing_teams = AssignmentTeam.where name: params[:team][:name], parent_id: student.parent_id
     # check if the team name is in use
-    if existing_assignments.empty?
+    if existing_teams.empty?
       if params[:team][:name].blank?
         flash[:notice] = 'The team name is empty.'
         ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Team name missing while creating team', request)
@@ -85,6 +84,7 @@ class StudentTeamsController < ApplicationController
   def edit; end
 
   def update
+    # Update the team name only if the given team name is not used already
     matching_teams = AssignmentTeam.where name: params[:team][:name], parent_id: team.parent_id
     if matching_teams.length.zero?
       if team.update_attribute('name', params[:team][:name])
@@ -93,7 +93,7 @@ class StudentTeamsController < ApplicationController
         redirect_to view_student_teams_path student_id: params[:student_id]
 
       end
-    elsif matching_teams.length == 1 && (matching_teams[0].name <=> team.name).zero?
+    elsif matching_teams.length == 1 && (matching_teams[0].name == team.name)
 
       team_created_successfully
       redirect_to view_student_teams_path student_id: params[:student_id]
@@ -105,11 +105,12 @@ class StudentTeamsController < ApplicationController
 
     end
   end
-
+  #The following two methods are necessary to improve readability
+  #update the advertise_for_partner of team table
   def advertise_for_partners
     Team.update_all advertise_for_partner: true, id: params[:team_id]
   end
-
+  
   def remove_advertisement
     Team.update_all advertise_for_partner: false, id: params[:team_id]
     redirect_to view_student_teams_path student_id: params[:team_id]
@@ -126,22 +127,7 @@ class StudentTeamsController < ApplicationController
         old_team.destroy
         # if assignment has signup sheet then the topic selected by the team has to go back to the pool
         # or to the first team in the waitlist
-        sign_ups = SignedUpTeam.where team_id: params[:team_id]
-        sign_ups.each do |sign_up|
-          # get the topic_id
-          sign_up_topic_id = sign_up.topic_id
-          # destroy the sign_up
-          sign_up.destroy
-          # get the number of non-waitlisted users signed up for this topic
-          non_waitlisted_users = SignedUpTeam.where topic_id: sign_up_topic_id, is_waitlisted: false
-          # get the number of max-choosers for the topic
-          max_choosers = SignUpTopic.find(sign_up_topic_id).max_choosers
-          # check if this number is less than the max choosers
-          next unless non_waitlisted_users.length < max_choosers
-          first_waitlisted_team = SignedUpTeam.find_by topic_id: sign_up_topic_id, is_waitlisted: true
-          # moving the waitlisted team into the confirmed signed up teams list and delete all waitlists for this team
-          SignUpTopic.assign_to_first_waiting_team(first_waitlisted_team) if first_waitlisted_team
-        end
+        Waitlist.remove_from_waitlists(params[:team_id])
       end
     end
     # remove all the sent invitations
@@ -167,8 +153,26 @@ class StudentTeamsController < ApplicationController
     ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'The team has been successfully created.', request)
   end
 
+  # This method is used to show the Author Feedback Questionnaire of current assignment
   def review
     @assignment = Assignment.find params[:assignment_id]
     redirect_to view_questionnaires_path id: @assignment.questionnaires.find_by(type: 'AuthorFeedbackQuestionnaire').id
   end
+
+
+  #used to check student team requirements
+  def student_team_requirements_met?
+    #checks if the student has a team
+    if @student.team.nil?
+      return false
+    end
+    #checks that the student's team has a topic
+    if @student.team.topic.nil? 
+      return false
+    end
+    #checks that the student has selected some topics
+    @student.assignment.topics?
+
+  end
+
 end

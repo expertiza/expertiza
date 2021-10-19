@@ -3,6 +3,7 @@ class SignUpTopic < ActiveRecord::Base
   has_many :teams, through: :signed_up_teams # list all teams choose this topic, no matter in waitlist or not
   has_many :due_dates, class_name: 'TopicDueDate', foreign_key: 'parent_id', dependent: :destroy
   has_many :bids, foreign_key: 'topic_id', dependent: :destroy
+  has_many :assignment_questionnaires, class_name: 'AssignmentQuestionnaire', foreign_key: 'topic_id', dependent: :destroy
   belongs_to :assignment
 
   has_paper_trail
@@ -33,26 +34,6 @@ class SignUpTopic < ActiveRecord::Base
     end
   end
 
-  # The old method is commented out below.
-  #
-  # def self.import(columns, session, _id = nil)
-  #   if columns.length < 3
-  #     raise ArgumentError, "The CSV File expects the format: Topic identifier, Topic name, Max choosers, Topic Category (optional), Topic Description (Optional), Topic Link (optional)."
-  #   end
-  #
-  #   topic = SignUpTopic.where(topic_name: columns[1], assignment_id: session[:assignment_id]).first
-  #
-  #   if topic.nil?
-  #     attributes = ImportTopicsHelper.define_attributes(columns)
-  #     ImportTopicsHelper.create_new_sign_up_topic(attributes, session)
-  #   else
-  #     topic.max_choosers = columns[2]
-  #     topic.topic_identifier = columns[0]
-  #     # topic.assignment_id = session[:assignment_id]
-  #     topic.save
-  #   end
-  # end
-
   def self.find_slots_filled(assignment_id)
     # SignUpTopic.find_by_sql("SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id =" + assignment_id+  " and u.is_waitlisted = false GROUP BY t.id")
     SignUpTopic.find_by_sql(["SELECT topic_id as topic_id, COUNT(t.max_choosers) as count FROM sign_up_topics t JOIN signed_up_teams u ON t.id = u.topic_id WHERE t.assignment_id = ? and u.is_waitlisted = false GROUP BY t.id", assignment_id])
@@ -72,7 +53,7 @@ class SignUpTopic < ActiveRecord::Base
     topic = SignUpTopic.find(topic_id)
     no_of_students_who_selected_the_topic = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: false)
 
-    if !no_of_students_who_selected_the_topic.nil?
+    unless no_of_students_who_selected_the_topic.nil?
       if topic.max_choosers > no_of_students_who_selected_the_topic.size
         return true
       else
@@ -89,7 +70,7 @@ class SignUpTopic < ActiveRecord::Base
 
     # making sure that the drop date deadline hasn't passed
     dropDate = AssignmentDueDate.where(parent_id: assignment.id, deadline_type_id: '6').first
-    if !dropDate.nil? && dropDate.due_at < Time.now
+    unless dropDate.nil? || dropDate.due_at >= Time.now
       # flash[:error] = "You cannot drop this topic because the drop deadline has passed."
     else
       # if team assignment find the creator id from teamusers table and teams
@@ -101,7 +82,7 @@ class SignUpTopic < ActiveRecord::Base
       assignment = Assignment.find(assignment_id)
       # if a confirmed slot is deleted then push the first waiting list member to confirmed slot if someone is on the waitlist
       unless assignment.is_intelligent?
-        if signup_record.try(:is_waitlisted) == false
+        unless signup_record.try(:is_waitlisted)
           # find the first wait listed user if exists
           first_waitlisted_user = SignedUpTeam.where(topic_id: topic_id, is_waitlisted: true).first
 
@@ -143,8 +124,7 @@ class SignUpTopic < ActiveRecord::Base
   def self.has_suggested_topic?(assignment_id)
     sign_up_topics = SignUpTopic.where(assignment_id: assignment_id, private_to: nil)
     all_topics = SignUpTopic.where(assignment_id: assignment_id)
-    return false if sign_up_topics.size == all_topics.size
-    true
+    sign_up_topics.size != all_topics.size
   end
 
   def users_on_waiting_list

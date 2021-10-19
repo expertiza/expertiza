@@ -14,7 +14,6 @@ class Questionnaire < ActiveRecord::Base
   DEFAULT_MIN_QUESTION_SCORE = 0  # The lowest score that a reviewer can assign to any questionnaire question
   DEFAULT_MAX_QUESTION_SCORE = 5  # The highest score that a reviewer can assign to any questionnaire question
   DEFAULT_QUESTIONNAIRE_URL = "http://www.courses.ncsu.edu/csc517".freeze
-
   QUESTIONNAIRE_TYPES = ['ReviewQuestionnaire',
                          'MetareviewQuestionnaire',
                          'Author FeedbackQuestionnaire',
@@ -28,14 +27,15 @@ class Questionnaire < ActiveRecord::Base
                          'GlobalSurveyQuestionnaire',
                          'Course SurveyQuestionnaire',
                          'CourseSurveyQuestionnaire',
-                         'BookmarkratingQuestionnaire',
+                         'Bookmark RatingQuestionnaire',
+                         'BookmarkRatingQuestionnaire',
                          'QuizQuestionnaire'].freeze
   has_paper_trail
 
   def get_weighted_score(assignment, scores)
     # create symbol for "varying rubrics" feature -Yang
     round = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: self.id).used_in_round
-    questionnaire_symbol = if !round.nil?
+    questionnaire_symbol = unless round.nil?
                              (self.symbol.to_s + round.to_s).to_sym
                            else
                              self.symbol
@@ -45,11 +45,17 @@ class Questionnaire < ActiveRecord::Base
 
   def compute_weighted_score(symbol, assignment, scores)
     aq = self.assignment_questionnaires.find_by(assignment_id: assignment.id)
-    if !scores[symbol][:scores][:avg].nil?
+    unless scores[symbol][:scores][:avg].nil?
       scores[symbol][:scores][:avg] * aq.questionnaire_weight / 100.0
     else
       0
     end
+  end
+
+  # Does this questionnaire contain true/false questions?
+  def true_false_questions?
+    questions.each {|question| return true if question.type == "Checkbox" }
+    false
   end
 
   def delete
@@ -73,13 +79,37 @@ class Questionnaire < ActiveRecord::Base
     results[0].max_score
   end
 
+  # clones the contents of a questionnaire, including the questions and associated advice
+  def self.copy_questionnaire_details(params, instructor_id)
+    orig_questionnaire = Questionnaire.find(params[:id])
+    questions = Question.where(questionnaire_id: params[:id])
+    questionnaire = orig_questionnaire.dup
+    questionnaire.instructor_id = instructor_id
+    questionnaire.name = 'Copy of ' + orig_questionnaire.name
+    questionnaire.created_at = Time.zone.now
+    questionnaire.save!
+    questions.each do |question|
+      new_question = question.dup
+      new_question.questionnaire_id = questionnaire.id
+      new_question.size = '50,3' if (new_question.is_a? Criterion or new_question.is_a? TextResponse) and new_question.size.nil?
+      new_question.save!
+      advices = QuestionAdvice.where(question_id: question.id)
+      next if advices.empty?
+      advices.each do |advice|
+        new_advice = advice.dup
+        new_advice.question_id = new_question.id
+        new_advice.save!
+      end
+    end
+    questionnaire
+  end  
+
   # validate the entries for this questionnaire
   def validate_questionnaire
-    if max_question_score and min_question_score
-      errors.add(:max_question_score, "The maximum question score must be a positive integer.") if max_question_score < 1
-      errors.add(:min_question_score, "The minimum question score must be less than the maximum") if min_question_score >= max_question_score
-    end
-    
+    errors.add(:max_question_score, "The maximum question score must be a positive integer.") if max_question_score < 1
+    errors.add(:min_question_score, "The minimum question score must be a positive integer.") if min_question_score < 0
+    errors.add(:min_question_score, "The minimum question score must be less than the maximum.") if min_question_score >= max_question_score
+
     results = Questionnaire.where("id <> ? and name = ? and instructor_id = ?", id, name, instructor_id)
     errors.add(:name, "Questionnaire names must be unique.") if results.present?
   end

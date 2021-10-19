@@ -1,4 +1,6 @@
 class QuestionsController < ApplicationController
+  include AuthorizationHelper
+
   # A question is a single entry within a questionnaire
   # Questions provide a way of scoring an object
   # based on either a numeric value or a true/false
@@ -11,10 +13,7 @@ class QuestionsController < ApplicationController
   end
 
   def action_allowed?
-    ['Super-Administrator',
-     'Administrator',
-     'Instructor',
-     'Teaching Assistant'].include? current_role_name
+    current_user_has_ta_privileges?
   end
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
@@ -71,9 +70,15 @@ class QuestionsController < ApplicationController
   def destroy
     question = Question.find(params[:id])
     questionnaire_id = question.questionnaire_id
+
+    if AnswerHelper.check_and_delete_responses(questionnaire_id)
+      flash[:success] = "You have successfully deleted the question. Any existing reviews for the questionnaire have been deleted!"
+    else
+      flash[:success] = "You have successfully deleted the question!"
+    end
+
     begin
       question.destroy
-      flash[:success] = "You have successfully deleted the question!"
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end

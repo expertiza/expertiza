@@ -1,0 +1,23 @@
+<script type="text/javascript">
+
+    // this invokes checkQuestionType() when
+    // the page loads for the first time
+    $(document).ready(function () {
+        var ques_type = $("#question_type")[0].value;
+        checkQuestionType();
+    });
+
+    // this is invoked every time the dropdown
+    // value is changed and it checks whether the
+    // selected question is a scored question in
+    // which case it displays the field to enter weight
+    function checkQuestionType() {
+        ques_type = $("#question_type")[0].value;
+        if (ques_type == 'Scale' || ques_type == 'Criterion') {
+            $("#new_question_weight").show();
+        } else {
+            $("#new_question_weight").hide();
+        }
+    }
+
+</script>

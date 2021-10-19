@@ -39,7 +39,7 @@ class AccountRequestController < ApplicationController
         flash[:success] = "The user \"#{requested_user.name}\" has been successfully updated."
       end
       if requested_user.status == "Approved"
-        initialize(requested_user)
+        user_new(requested_user)
       elsif requested_user.status == "Rejected"
         # If the user request has been rejected, a flash message is shown and redirected to review page
         if requested_user.update_columns(status: is_approved)
@@ -54,7 +54,7 @@ class AccountRequestController < ApplicationController
     redirect_to action: 'list_pending_requested'
   end
 
-  def initialize(requested_user)
+  def user_new(requested_user)
     puts requested_user.inspect
     new_user = User.new
     new_user.name = requested_user.name

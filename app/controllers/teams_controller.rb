@@ -76,7 +76,7 @@ class TeamsController < ApplicationController
       @signed_up_team = SignedUpTeam.where(team_id: @team.id)
       @teams_users = TeamsUser.where(team_id: @team.id)
 
-      SignedUpTeam.assign_topic_to_first_in_waitlist_post_team_deletion(@signed_up_team, @signUps)
+      SignedUpTeam.assign_topic_to_first_in_waitlist_post_team_deletion(@signed_up_team, @signups)
 
       @sign_up_team.destroy_all if @sign_up_team
       @teams_users.destroy_all if @teams_users

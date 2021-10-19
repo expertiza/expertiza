@@ -93,6 +93,7 @@ GEM
     babel-transpiler (0.7.0)
       babel-source (>= 4.0, < 6)
       execjs (~> 2.0)
+    bigdecimal (1.3.5)
     bind-it (0.2.7)
       rjb (~> 1.4.3)
     builder (3.2.3)
@@ -584,6 +585,7 @@ DEPENDENCIES
   activesupport (~> 4.2.11.1)
   airbrake
   awesome_nested_set
+  bigdecimal (= 1.3.5)
   bind-it
   capistrano
   capistrano-bundler
@@ -668,4 +670,4 @@ DEPENDENCIES
   zip-zip
 
 BUNDLED WITH
-   1.16.2
+   1.17.3

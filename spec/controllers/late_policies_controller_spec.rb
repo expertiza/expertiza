@@ -31,8 +31,6 @@ describe LatePoliciesController do
             max_penalty: 0,
         }
       }
-
-      byebug
       post :create, params
       expect(flash[:error]).to include("Policy name can't be blank")
       expect(flash[:error]).to include("Penalty per unit can't be blank")
@@ -48,7 +46,6 @@ describe LatePoliciesController do
             max_penalty: 0,
         }
       }
-      byebug
       post :create, params
       expect(flash[:error]).to include("Max penalty must be greater than 0")
     end
@@ -63,7 +60,6 @@ describe LatePoliciesController do
             max_penalty: -100,
         }
       }
-      byebug
       post :create, params
       expect(flash[:error]).to include("The maximum penalty cannot be less than penalty per unit.")
     end
@@ -79,7 +75,6 @@ describe LatePoliciesController do
             max_penalty: 10,
         }
       }
-      byebug
       post :create, params
       expect(flash[:error]).to include("Policy name is invalid")
     end
@@ -95,7 +90,6 @@ describe LatePoliciesController do
             max_penalty: 50,
         }
       }
-      byebug
       post :create, params
       expect(flash[:error]).to include("Policy per unit should be days/hours/minutes")
       expect(flash[:error]).to include("Policy per unit should be days/hours/minutes")

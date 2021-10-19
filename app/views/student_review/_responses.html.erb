@@ -7,8 +7,21 @@
 
       <% if participant %>
           <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
+      <table>
           <tr>
-            <td>
+            <%bgcolor2 = "#00FF00" %>
+            <% status_mappings.each do |status_map| %>
+              <% if status_map.review_object_id == map.reviewed_object_id and status_map.reviewee_id == map.reviewee_id  %>
+                <% if status_map.status == "Ready" %>
+                  <% bgcolor2 = "#FF0000" %>
+                <% elsif status_map.status == "Started"  %>
+                  <% bgcolor2 = "#FFA500" %>
+                <% else %>
+                  <% bgcolor2 = "#00FF00"%>
+                <%end %>
+              <%end %>
+            <%end %>
+            <td style="background-color:<%=bgcolor2%>">
               <b><%= "#{title} #{review_no}." %></b>
               <!--In ‘student_review/list’ page, if the topic_identifier is empty, ‘:’ sign should not be displayed.-->
               <% unless topic_id.nil? %>
@@ -33,6 +46,7 @@
               <td><%= link_to "Show calibration results", {controller: 'response', action: 'show_calibration_results_for_student', calibration_response_map_id: calibration_response_map.id, review_response_map_id: map.id, assignment_id: @assignment.id} %></td>
             <% end %>
           </tr>
+        </table>
       <% end %>
 
      <% unless map.type.to_s == "MetareviewResponseMap" %>

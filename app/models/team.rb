@@ -256,7 +256,13 @@ class Team < ActiveRecord::Base
     ExpertizaLogger.info LoggerMessage.new('Model:Team', '', "New TeamNode created with teamname #{team_name}")
     team
   end
-  
+
+  def self.copyAssignment(teams,assignment)
+    teams.each do |team|
+      team.copy(assignment.id)
+    end
+  end
+
   # E1991 : This method allows us to generate
   # team names based on whether anonymized view
   # is set or not. The logic is similar to 

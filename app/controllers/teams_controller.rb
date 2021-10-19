@@ -94,9 +94,7 @@ class TeamsController < ApplicationController
       course = Course.find(assignment.course_id)
       teams = course.get_teams
       unless teams.empty?
-        teams.each do |team|
-          team.copy(assignment.id)
-        end
+        Team.copyAssignment(teams,assignment)
       else
         flash[:note] = "No teams were found when trying to inherit."
       end

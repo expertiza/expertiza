@@ -69,6 +69,8 @@ class SignedUpTeam < ActiveRecord::Base
     end
   end
 
+  # this method checks when a team is deleted if there is a team in waitlist for the topic
+  # deleted team was holding, then assign topic to first team in waitlist
   def self.assign_topic_to_first_in_waitlist_post_team_deletion (signed_up_team, signups)
     if signed_up_team == 1 && !signups.first.is_waitlisted # this team hold a topic
       # if there is another team in waitlist, make this team hold this topic

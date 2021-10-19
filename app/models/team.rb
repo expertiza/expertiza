@@ -265,7 +265,7 @@ class Team < ActiveRecord::Base
     team
   end
 
-  def self.copyAssignment(teams,assignment)
+  def self.copy_assignment(teams,assignment)
     teams.each do |team|
       team.copy(assignment.id)
     end

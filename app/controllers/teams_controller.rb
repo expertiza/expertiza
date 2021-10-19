@@ -16,6 +16,7 @@ class TeamsController < ApplicationController
     redirect_to action: 'list', id: parent.id
   end
 
+  # This method lists all the teams for the assignment.
   def list
     allowed_types = %w[Assignment Course]
     session[:team_type] = params[:type] if params[:type] && allowed_types.include?(params[:type])
@@ -58,7 +59,7 @@ class TeamsController < ApplicationController
     end
   end
 
-  # It updates an existing team id
+  # It updates an existing team name
   def update
     @team = Team.find(params[:id])
     begin
@@ -85,6 +86,7 @@ class TeamsController < ApplicationController
       @signed_up_team = SignedUpTeam.where(team_id: @team.id)
       @teams_users = TeamsUser.where(team_id: @team.id)
 
+      # On team deletion topic team was holding will be assigned to first team in waitlist.
       SignedUpTeam.assign_topic_to_first_in_waitlist_post_team_deletion(@signed_up_team, @signups)
 
       @sign_up_team.destroy_all if @sign_up_team
@@ -103,7 +105,8 @@ class TeamsController < ApplicationController
       course = Course.find(assignment.course_id)
       teams = course.get_teams
       unless teams.empty?
-        Team.copyAssignment(teams,assignment)
+        # copy_assignment method copies teams to assignment
+        Team.copy_assignment(teams,assignment)
       else
         flash[:note] = "No teams were found when trying to inherit."
       end
@@ -119,6 +122,7 @@ class TeamsController < ApplicationController
     team = AssignmentTeam.find(params[:id])
     assignment = Assignment.find(team.parent_id)
     if assignment.course_id >= 0
+      # here we copy teams to a course
       course = Course.find(assignment.course_id)
       team.copy(course.id)
       flash[:note] = "The team \"" + team.name + "\" was successfully copied to \"" + course.name + "\""

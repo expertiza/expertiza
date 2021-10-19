@@ -22,7 +22,6 @@
 //= require hoverIntent
 //= require superfish
 //= require jquery.ui.all
-//= require react-simpletabs
 //= require sisyphus
 //= require awesomplete
 //= require_self

@@ -494,6 +494,7 @@ GEM
     sawyer (0.8.2)
       addressable (>= 2.3.5)
       faraday (> 0.8, < 2.0)
+    scanf (1.0.0)
     scrypt (2.1.1)
       ffi-compiler (>= 0.0.2)
       rake
@@ -652,6 +653,7 @@ DEPENDENCIES
   rubyzip
   rwordnet
   sass-rails
+  scanf
   scrypt
   seer
   selenium-webdriver

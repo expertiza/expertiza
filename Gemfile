@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 
 gem 'rails', '~> 4.2.11.1'
 
+gem 'scanf'
 ## Gems in Alphabetical Order
 gem 'activerecord-session_store'
 gem 'activesupport', '~> 4.2.11.1'

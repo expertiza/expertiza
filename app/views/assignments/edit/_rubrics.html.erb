@@ -308,6 +308,10 @@
 <input name="assignment_questionnaire[used_in_round]" type="hidden" value="false" />
 <%= check_box_tag('assignment_questionnaire[used_in_round]', 'true', @reviewvarycheck,:onclick=>"handleCheckReviewVary(this)" ) %>
 <%= label_tag('assignment_questionnaire[used_in_round]', 'Review rubric varies by round?') %>
+<br>
+<input name="assignment_form[assignment][assignment_is_duty_based]" type="hidden" value="false"/>
+<%= check_box_tag('duty_assignment', 'true', false, {:onChange => 'hasDutiesChanged()'}) %>
+<%= label_tag('duty_assignment', 'Review rubric varies by duty?') %>
 <div>
 <table class='exp table table-striped' id='assignment_questionnaire_table' style='padding:20px; font-size: 15px; width: 100%'>
   <tr class='heading'>
@@ -325,6 +329,11 @@
     </th>
   </tr>
   <script>
+      function hasDutiesChanged() {
+          var checkbox = jQuery('#duty_assignment');
+          alert(checkbox);
+
+      }
       jQuery(document).ready(function () {
           <% if @reviewvarycheck%>
           <% for i in 1..@assignment_form.assignment.rounds_of_reviews %>

@@ -43,7 +43,7 @@ describe "peer review testing" do
 
   # Replace i_dont_care to no_particular_topic. This boolean variable is an indicator to
   # address i f a student is interested in and selected any particular topic or not. With
-  # the variable renaming, it is more clear what this variable actually means.
+  # the variable renaming, it is more clear what this variable means.
   it "is not able to select review with no submissions" do
     user = User.find_by(name: "student2065")
     stub_current_user(user, user.role.name, user.role)

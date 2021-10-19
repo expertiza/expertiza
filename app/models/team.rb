@@ -312,8 +312,7 @@ class Team < ActiveRecord::Base
                     :partial_name => 'updated_submission_since_review'
                 }
             }
-        )
-        #.deliver_now
+        ).deliver_now
       end
     end
   end

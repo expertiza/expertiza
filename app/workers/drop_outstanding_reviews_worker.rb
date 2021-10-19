@@ -1,20 +1,14 @@
-class DropOutstandingReviewsMailWorker < MailWorker
+class DropOutstandingReviewsWorker < Worker
   @@deadline_type = "drop_outstanding_reviews"
 
-  def perform(assignment_id, due_at)
-    super(assignment_id, @@deadline_type, due_at)
-  end
-
-  protected
-
-  def prepare_data
-    drop_outstanding_reviews
+  def perform(assignment_id)
+    drop_outstanding_reviews(assignment_id)
   end
 
   private
 	
-  def drop_outstanding_reviews
-    reviews = ResponseMap.where(reviewed_object_id: @assignment.id)
+  def drop_outstanding_reviews(assignment_id)
+    reviews = ResponseMap.where(reviewed_object_id: assignment_id)
     reviews.each do |review|
       review_has_began = Response.where(map_id: review.id)
       if review_has_began.size.zero?

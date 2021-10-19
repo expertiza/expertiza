@@ -1,10 +1,4 @@
-require 'sidekiq'
-
-class MailWorker
-  include Sidekiq::Worker
-  # ActionMailer in Rail 4 submits jobs in mailers queue instead of default queue. Rails 5 and onwards
-  # ActionMailer will submit mailer jobs to default queue. We need to remove the line below in that case!
-  sidekiq_options queue: 'mailers'
+class MailWorker < Worker
   attr_accessor :assignment
   attr_accessor :deadline_type
   attr_accessor :deadline_text
@@ -18,16 +12,10 @@ class MailWorker
 
     participant_emails = find_participant_emails
 
-    prepare_data
-
-    email_reminder(participant_emails, self.deadline_text) unless participant_emails.empty?
-  end
-
-  protected
-
-  def prepare_data
     # Can we rename deadline_type(metareview) to "teammate review". If, yes then we do not need this if clause below!
     self.deadline_text = self.deadline_type == "metareview" ? "teammate review" : self.deadline_type
+
+    email_reminder(participant_emails, self.deadline_text) unless participant_emails.empty?
   end
 
   private

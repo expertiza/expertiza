@@ -19,6 +19,7 @@ class DutiesController < ApplicationController
   # GET /duties/new
   def new
     @duty = Duty.new
+    @id = params[:id]
   end
 
   # GET /duties/1/edit

@@ -1,10 +1,5 @@
 
-
-    <%= link_to 'New duty',
-                {
-                    :controller => 'duties',
-                    :action => 'new',
-                    :id => params[:id]
-                },
-                :duty => @duties,
-                :method => :get%>
+<%= link_to 'New duty',
+                :controller => 'duties',
+                :action => 'new',
+                :id => params[:id]%>

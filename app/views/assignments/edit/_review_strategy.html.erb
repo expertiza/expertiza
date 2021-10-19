@@ -151,21 +151,25 @@
     </tr>
   <% end %>
 
-  <!--E2147 Duty Based Reviewing-->
-  <tr>
-    <td id='is_duty_based_assignment'>
-        <input name="assignment_form[assignment][is_duty_based_assignment]" type="hidden" value="false"/>
-        <%= check_box_tag('assignment_form[assignment][is_duty_based_assignment]', 'true', @assignment_form.assignment.is_duty_based_assignment, {:id => "is_duty_checkbox", :onChange => 'hasDutiesChanged()'}) %>
-        <%= label_tag('duty_assignment', 'Is Duty Based Assignment?') %>
-        <img src="/assets/info.png" title='Check the box if this assignment allows duty assignment within the team'>
+  <% if current_page?(action: 'edit') %>
+      <!--E2147 Duty Based Reviewing-->
+      <tr>
+        <td id='is_duty_based_assignment'>
+          <input name="assignment_form[assignment][is_duty_based_assignment]" type="hidden" value="false"/>
+          <%= check_box_tag('assignment_form[assignment][is_duty_based_assignment]', 'true', @assignment_form.assignment.is_duty_based_assignment, {:id => "is_duty_checkbox", :onChange => 'hasDutiesChanged()'}) %>
+          <%= label_tag('duty_assignment', 'Is Duty Based Assignment?') %>
+          <img src="/assets/info.png" title='Check the box if this assignment allows duty assignment within the team'>
 
-        <div id="add_duties" <%= "hidden" if not @assignment_form.assignment.is_duty_based_assignment %> >
-          <br>
+          <div id="add_duties" <%= "hidden" if not @assignment_form.assignment.is_duty_based_assignment %> >
+            <br>
 
-          <%= render '/duties/add_duties' %>
-        </div>
-    </td>
-  </tr>
+            <%= render '/duties/add_duties' %>
+          </div>
+        </td>
+      </tr>
+  <% end %>
+
+
 
 </table>
 <script>

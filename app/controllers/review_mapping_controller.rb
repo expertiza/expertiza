@@ -3,6 +3,7 @@ class ReviewMappingController < ApplicationController
   # add for pull testing
   # hchen63 yli273 zlu5
   # E2124
+  # add for heroku deploying test
 
   autocomplete :user, :name
   # use_google_charts

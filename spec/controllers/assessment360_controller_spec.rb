@@ -172,10 +172,10 @@ describe Assessment360Controller do
         allow(SignUpTopic).to receive(:find_by).with(id: nil).and_return(topic)
         params = {course_id: 1}
         session = {user: instructor}
-        get :course_student_grade_summary, params, session
+        get :all_students_all_reviews, params, session
         expect(controller.send(:action_allowed?)).to be true
         expect(response.status).to eq(200)
-        expect(response).to render_template(:course_student_grade_summary)
+        expect(response).to render_template(:all_students_all_reviews)
         returned_assignment_grades = controller.instance_variable_get(:@assignment_grades)
         expect(returned_assignment_grades[nil]).to eq({})
         returned_peer_review_scores = controller.instance_variable_get(:@peer_review_scores)
@@ -197,10 +197,10 @@ describe Assessment360Controller do
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: course_participant.user_id, parent_id: assignment.id).and_return(course_participant)
         params = {course_id: 1}
         session = {user: instructor}
-        get :course_student_grade_summary, params, session
+        get :all_students_all_reviews, params, session
         expect(controller.send(:action_allowed?)).to be true
         expect(response.status).to eq(200)
-        expect(response).to render_template(:course_student_grade_summary)
+        expect(response).to render_template(:all_students_all_reviews)
         returned_topics = controller.instance_variable_get(:@topics)
         expect(returned_topics[nil][1]).to eq(topic)
         returned_assignment_grades = controller.instance_variable_get(:@assignment_grades)
@@ -225,10 +225,10 @@ describe Assessment360Controller do
         allow(ResponseMap).to receive(:participant_scores).with(course_participant, {}).and_return(review: {scores: {avg: 90}})
         params = {course_id: 1}
         session = {user: instructor}
-        get :course_student_grade_summary, params, session
+        get :all_students_all_reviews, params, session
         expect(controller.send(:action_allowed?)).to be true
         expect(response.status).to eq(200)
-        expect(response).to render_template(:course_student_grade_summary)
+        expect(response).to render_template(:all_students_all_reviews)
         returned_topics = controller.instance_variable_get(:@topics)
         expect(returned_topics[nil][1]).to eq(topic)
         returned_assignment_grades = controller.instance_variable_get(:@assignment_grades)

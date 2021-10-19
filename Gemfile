@@ -8,7 +8,6 @@ gem 'activesupport', '~> 4.2.11.1'
 gem 'airbrake'
 gem 'awesome_nested_set'
 gem 'bind-it'
-gem 'bigdecimal', '1.3.5'
 gem 'capistrano'
 gem 'capistrano-bundler'
 gem "capistrano-db-tasks", require: false

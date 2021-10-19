@@ -3,6 +3,8 @@ require 'rails_helper'
 
 describe ReviewMappingHelper, type: :helper do
   let(:team){build(:assignment_team, id:1)}
+  let(:test_item) {build(:answer, id:1, comments: "https://wiki.archlinux.org/")}
+  let(:test_response){build(:response, id:1)}
   describe 'get_team_color' do
     before(:each) do
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
@@ -693,6 +695,24 @@ describe ReviewMappingHelper, type: :helper do
     it 'should return an empty string when comment does not exist' do
       result = helper.list_hyperlink_submission(@response_map.id, @question.id)
       expect(result).to eq('')
+    end
+  end
+
+  describe 'test list_hyperlink_submission' do
+    before(:each) do
+      @assignment1 = create(:assignment, name: "name1")
+      @questionnaire = create(:questionnaire)
+      @question = create(:question, questionnaire_id: @questionnaire.id)
+      @user = create(:student, name: "name", fullname: "name")
+      @participant = create(:participant, user_id: @user.id, parent_id: @assignment1.id)
+      @response_map = create(:review_response_map, reviewer: @participant, assignment: @assignment1)
+      @id = @assignment1.id
+      allow(Response).to receive(:where).with(any_args).and_return([test_response])
+      allow(Answer).to receive(:where).with(any_args).and_return([test_item])
+    end
+    it 'should return correct html a tag' do
+      result = helper.list_hyperlink_submission(@response_map.id, @question.id)
+      expect(result).to start_with('<a target="_blank"')
     end
   end
 end

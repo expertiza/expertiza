@@ -104,12 +104,12 @@ class AccountRequestController < ApplicationController
     requested_user = AccountRequest.new(requested_user_params)
     #An object is created with respect to AccountRequest model inorder to populate the users information when account is requested
     user_exists = User.find_by(name: requested_user.name) or User.find_by(name: requested_user.email)
-    requested_user_saved = save_requested_user(requested_user, params)
+    requested_user_saved = save_requested_user(requested_user, params[:user][:institution_id].empty?, params[:institution][:name])
 
     if !user_exists and requested_user_saved
       notify_supers_new_request(requested_user)
     elsif user_exists
-      flash[:error] = "The account you are requesting has already existed in Expertiza."
+      flash[:error] = "The account you are requesting already exists in Expertiza."
       #If the user account already exists, log error to the user
     else
       flash[:error] = requested_user.errors.full_messages.to_sentence
@@ -120,9 +120,9 @@ class AccountRequestController < ApplicationController
     #if the first if clause fails, redirect back to the account requests page!
   end
 
-  def save_requested_user(requested_user, params)
-    if params[:user][:institution_id].empty?
-      institution = Institution.find_or_create_by(name: params[:institution][:name])
+  def save_requested_user(requested_user, inst_empty, inst_name)
+    if inst_empty
+      institution = Institution.find_or_create_by(name: inst_name)
       requested_user.institution_id = institution.id
     end
     #If user enters others and adds a new institution, an institution id will be created with respect to the institution model.
@@ -139,6 +139,7 @@ class AccountRequestController < ApplicationController
     #StorReturnses a boolean value with respect to whether the user data is saved or not
 
   end
+
   def notify_supers_new_request(requested_user)
     super_users = User.joins(:role).where('roles.name = ?', 'Super-Administrator')
     super_users.each do |super_user|

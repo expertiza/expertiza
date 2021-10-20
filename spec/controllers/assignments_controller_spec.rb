@@ -150,7 +150,7 @@ describe AssignmentsController do
       it 'renders assignment#new page' do
         allow(assignment_form).to receive(:save).and_return(false)
         post :create, @params
-        expect(response).to render_template(:new)
+        expect(response).to redirect_to('/assignments/new?private=1')
       end
     end
   end

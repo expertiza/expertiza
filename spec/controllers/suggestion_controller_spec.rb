@@ -33,11 +33,8 @@ describe SuggestionController do
   end
 
   describe '#update_suggestion' do
-    before(:each) do
-      allow(Suggestion).to receive(:update_suggestion).with(any_args).and_return(suggestion)
-    end
     it "checks updated is saved" do
-      params = {title:"new title", description: "new description", signup_preference:"N"}
+      params = {id: 1, title:"new title", description: "new description", signup_preference:"N"}
       post :update_suggestion, params
       expect(response).to render_template('suggestion/new?id=1')
     end

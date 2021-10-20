@@ -9,8 +9,6 @@
 # to
 
 class SignUpSheetController < ApplicationController
-  include AuthorizationHelper
-
   require 'rgl/adjacency'
   require 'rgl/dot'
   require 'rgl/topsort'
@@ -18,12 +16,17 @@ class SignUpSheetController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
-      (current_user_has_student_privileges? &&
-          (%w[list].include? action_name) &&
-          are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer")) ||
-          current_user_has_student_privileges?
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator',
+       'Student'].include? current_role_name and
+      ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer") : true)
     else
-      current_user_has_ta_privileges?
+      ['Instructor',
+       'Teaching Assistant',
+       'Administrator',
+       'Super-Administrator'].include? current_role_name
     end
   end
 
@@ -86,9 +89,14 @@ class SignUpSheetController < ApplicationController
   def update
     @topic = SignUpTopic.find(params[:id])
     if @topic
+      @topic.topic_identifier = params[:topic][:topic_identifier]
       update_max_choosers @topic
-      updated_max_choosers = @topic.max_choosers
-      @topic.update_attributes(topic_identifier: params[:topic][:topic_identifier], max_choosers: updated_max_choosers, category: params[:topic][:category], topic_name: params[:topic][:topic_name], micropayment: params[:topic][:micropayment], description: params[:topic][:description], link: params[:topic][:link])
+      @topic.category = params[:topic][:category]
+      @topic.topic_name = params[:topic][:topic_name]
+      @topic.micropayment = params[:topic][:micropayment]
+      @topic.description = params[:topic][:description]
+      @topic.link = params[:topic][:link]
+      @topic.save
       undo_link("The topic: \"#{@topic.topic_name}\" has been successfully updated. ")
     else
       flash[:error] = "The topic could not be updated."
@@ -108,27 +116,23 @@ class SignUpSheetController < ApplicationController
     end
   end
 
-  # This deletes all selected topics for the given assignment
-  def delete_all_selected_topics
-    load_all_selected_topics
-    @stopics.each(&:destroy)
-    flash[:success] = "All selected topics have been deleted successfully."
-    respond_to do |format|
-      format.html { redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"}
-      format.js {}
-    end
-  end  
-  
-  # This loads all selected topics based on all the topic identifiers selected for that assignment into stopics variable
-  def load_all_selected_topics
-    @stopics = SignUpTopic.where(assignment_id: params[:assignment_id], topic_identifier: params[:topic_ids])
-  end
-
   # This displays a page that lists all the available topics for an assignment.
   # Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
   # Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics can have different deadlines.
   def add_signup_topics
-    load_add_signup_topics(params[:id])
+    / load_add_signup_topics(params[:id])/
+    # retrieves all the data associated with the given assignment. Includes all topics,
+    @id = params[:id]
+    @sign_up_topics = SignUpTopic.where('assignment_id = ?', params[:id])
+    @slots_filled = SignUpTopic.find_slots_filled(params[:id])
+    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(params[:id])
+
+    @assignment = Assignment.find(params[:id])
+    # ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
+    # to treat all assignments as team assignments
+    # Though called participants, @participants are actually records in signed_up_teams table, which
+    # is a mapping table between teams and topics (waitlisted recored are also counted)
+    @participants = SignedUpTeam.find_team_participants(params[:id], session[:ip])
     SignUpSheet.add_signup_topic(params[:id])
   end
 
@@ -137,7 +141,7 @@ class SignUpSheetController < ApplicationController
   end
 
   # retrieves all the data associated with the given assignment. Includes all topics,
-  def load_add_signup_topics(assignment_id)
+  / def load_add_signup_topics(assignment_id)
     @id = assignment_id
     @sign_up_topics = SignUpTopic.where('assignment_id = ?', assignment_id)
     @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
@@ -148,9 +152,8 @@ class SignUpSheetController < ApplicationController
     # to treat all assignments as team assignments
     # Though called participants, @participants are actually records in signed_up_teams table, which
     # is a mapping table between teams and topics (waitlisted recored are also counted)
-    ip = session[:ip]
-    @participants = SignedUpTeam.find_team_participants(@id, ip)
-  end
+    @participants = SignedUpTeam.find_team_participants(assignment_id, session[:ip])
+  end/
 
   def set_values_for_new_topic
     @sign_up_topic = SignUpTopic.new
@@ -186,7 +189,6 @@ class SignUpSheetController < ApplicationController
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     @max_team_size = @assignment.max_team_size
     team_id = @participant.team.try(:id)
-    @use_bookmark = @assignment.use_bookmark
 
     if @assignment.is_intelligent
       @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
@@ -236,21 +238,25 @@ class SignUpSheetController < ApplicationController
   def signup_as_instructor; end
 
   def signup_as_instructor_action
+    #put name of student and team in log
+    # flash name of student and team
     user = User.find_by(name: params[:username])
+    team = Team.find_team_for_assignment_and_user(params[:assignment.id], user_id).first
+    assignment = Assignment.find(params[:assignment_id])
     if user.nil? # validate invalid user
-      flash[:error] = "That student does not exist!"
+      flash[:error] = user.name + " does not exist!"
     else
       if AssignmentParticipant.exists? user_id: user.id, parent_id: params[:assignment_id]
         if SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
-          flash[:success] = "You have successfully signed up the student for the topic!"
-          ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor signed up student for topic: ' + params[:topic_id].to_s)
+          flash[:success] = "You have successfully signed up " + user.name + " on " + team.name + "  for the topic " + params[:topic_id].to_s
+          ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor signed up ' + user.name + ' on team ' + team.name + ' for topic: ' + params[:topic_id].to_s)
         else
-          flash[:error] = "The student has already signed up for a topic!"
-          ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor is signing up a student who already has a topic')
+          flash[:error] = user.name + " on " + team.name + " has already signed up for a topic!"
+          ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor is signing up a ' + user.name + 'on ' + team.name + ' who already has a topic')
         end
       else
-        flash[:error] = "The student is not registered for the assignment!"
-        ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'The student is not registered for the assignment: ' << user.id)
+        flash[:error] = user.name + " is not registered for the assignment!"
+        ExpertizaLogger.info LoggerMessage.new(controller_name, '', user.name + ' is not registered for the assignment: ' + assignment.name)
       end
     end
     redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
@@ -390,7 +396,7 @@ class SignUpSheetController < ApplicationController
   # This method is called when a student click on the trumpet icon. So this is a bad method name. --Yang
   def show_team
     if !(assignment = Assignment.find(params[:assignment_id])).nil? and !(topic = SignUpTopic.find(params[:id])).nil?
-      @results = ad_info(assignment.id, topic.id)
+      @results = ads_for_topic(assignment.id, topic.id)
       @results.each do |result|
         result.keys.each do |key|
           @current_team_name = result[key] if key.equal? :name
@@ -474,26 +480,27 @@ class SignUpSheetController < ApplicationController
 
   # get info related to the ad for partners so that it can be displayed when an assignment_participant
   # clicks to see ads related to a topic
-  def ad_info(_assignment_id, topic_id)
+  # ads_for_topic
+  def ads_for_topic(_assignment_id, topic_id)
     # List that contains individual result object
-    @result_list = []
+    ads = []
     # Get the results
-    @results = SignedUpTeam.where("topic_id = ?", topic_id.to_s)
+    signed_up_teams = SignedUpTeam.where("topic_id = ?", topic_id.to_s)
     # Iterate through the results of the query and get the required attributes
-    @results.each do |result|
+    signed_up_teams.each do |result|
       team = result.team
       topic = result.topic
-      resultMap = {}
-      resultMap[:team_id] = team.id
-      resultMap[:comments_for_advertisement] = team.comments_for_advertisement
-      resultMap[:name] = team.name
-      resultMap[:assignment_id] = topic.assignment_id
-      resultMap[:advertise_for_partner] = team.advertise_for_partner
+      new_ad = {}
+      new_ad[:team_id] = team.id
+      new_ad[:comments_for_advertisement] = team.comments_for_advertisement
+      new_ad[:name] = team.name
+      new_ad[:assignment_id] = topic.assignment_id
+      new_ad[:advertise_for_partner] = team.advertise_for_partner
 
       # Append to the list
-      @result_list.append(resultMap)
+      ads.append(new_ad)
     end
-    @result_list
+    ads
   end
 
   def delete_signup_for_topic(assignment_id, topic_id, user_id)

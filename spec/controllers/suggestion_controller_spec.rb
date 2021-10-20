@@ -34,7 +34,7 @@ describe SuggestionController do
 
   describe '#update_suggestion' do
     before(:each) do
-      allow(suggestion).to receive(:update_suggestion).with(any_args).and_return(suggestion)
+      allow(Suggestion).to receive(:update_suggestion).with(any_args).and_return(suggestion)
     end
     it "checks updated is saved" do
       params = {title:"new title", description: "new description", signup_preference:"N"}

@@ -79,6 +79,8 @@ class AssignmentsController < ApplicationController
     @assigned_badges = @assignment_form.assignment.badges
     @badges = Badge.all
     @use_bookmark = @assignment.use_bookmark
+    # Stored the last edited assignment
+    session[:edit_assignment] = @assignment
 
   end
 

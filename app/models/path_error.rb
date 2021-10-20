@@ -1,2 +1,0 @@
-class PathError < StandardError
-end

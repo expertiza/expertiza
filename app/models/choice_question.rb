@@ -1,2 +1,0 @@
-class ChoiceQuestion < Question
-end

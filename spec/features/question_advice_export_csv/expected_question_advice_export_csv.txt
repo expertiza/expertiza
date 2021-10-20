@@ -1,2 +1,0 @@
-id,question_id,score,advice
-1,1,5,LGTM

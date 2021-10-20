@@ -1,8 +1,0 @@
-name: morpher
-namespace: Morpher
-zombie: true
-expect_coverage: 71.21
-ignore_subjects:
-# Infinite runtime mutations here
-- Morpher::TypeLookup
-- Morpher::Compiler::Preprocessor

@@ -18,7 +18,7 @@ describe SuggestionController do
   end
   describe '#student_view' do
     it 'renders suggestions#student_view' do
-      get :student_view, id: 1
+      get :student_view, id: 79
       expect(response).to render_template(:student_view)
     end
   end

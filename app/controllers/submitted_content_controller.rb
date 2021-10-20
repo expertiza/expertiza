@@ -35,13 +35,17 @@ class SubmittedContentController < ApplicationController
     redirect_to action: 'edit', id: params[:id], view: true
   end
 
+  def log_info(controller_name, participant_name, message, request)
+    ExpertizaLogger.info LoggerMessage.new(controller_name, participant_name, message, request)
+  end
+
   def submit_hyperlink
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
     team = @participant.team
     team_hyperlinks = team.hyperlinks
     if team_hyperlinks.include?(params['submission'])
-      ExpertizaLogger.error LoggerMessage.new(controller_name, @participant.name, 'You or your teammate(s) have already submitted the same hyperlink.', request)
+      log_info(controller_name, @participant.name, 'You or your teammate(s) have already submitted the same hyperlink.', request)
       flash[:error] = "You or your teammate(s) have already submitted the same hyperlink."
     else
       begin
@@ -52,10 +56,10 @@ class SubmittedContentController < ApplicationController
                                 assignment_id: @participant.assignment.id,
                                 operation: "Submit Hyperlink")
       rescue StandardError
-        ExpertizaLogger.error LoggerMessage.new(controller_name, @participant.name, "The URL or URI is invalid. Reason: #{$ERROR_INFO}", request)
+        log_info(controller_name, @participant.name, "The URL or URI is invalid. Reason: #{$ERROR_INFO}", request)
         flash[:error] = "The URL or URI is invalid. Reason: #{$ERROR_INFO}"
       end
-      ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The link has been successfully submitted.', request)
+      log_info(controller_name, @participant.name, 'The link has been successfully submitted.', request)
       undo_link("The link has been successfully submitted.")
 
       mail_assigned_reviewers(team)
@@ -63,6 +67,7 @@ class SubmittedContentController < ApplicationController
     end
     redirect_to action: 'edit', id: @participant.id
   end
+
 
   # Note: This is not used yet in the view until we all decide to do so
   def remove_hyperlink

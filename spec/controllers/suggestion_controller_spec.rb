@@ -31,4 +31,13 @@ describe SuggestionController do
         expect(response).to render_template(:student_edit)
       end
   end
+
+  describe '#update_suggestion' do
+    it "checks updated is saved" do
+      params = {title:"new title", description: "new description", signup_preference:"N"}
+      session = {student: 1}
+      post :update, params, session
+      expect(response).to render_template('suggestion/new?id=1')
+    end
+  end
 end

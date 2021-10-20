@@ -11,7 +11,6 @@ describe SuggestionController do
   let(:student) { build(:student, id: 1)}
   let(:questionnaire) { build(:questionnaire, id: 666) }
   let(:suggestion){build(:suggestion)}
-  let(comment){build()}
   let(:assignment_questionnaire) { build(:assignment_questionnaire, id: 1, questionnaire: questionnaire) }
 
   before(:each) do

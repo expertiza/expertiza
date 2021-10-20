@@ -10,7 +10,7 @@ describe SuggestionController do
   let(:ta) { build(:teaching_assistant, id: 8) }
   let(:student) { build(:student, id: 1)}
   let(:questionnaire) { build(:questionnaire, id: 666) }
-  let(:suggestion1){create(:suggestion, id:1, assignment_id:1,title:'oss topic', description:'add oss topic', status:'Initiated', unityID:'student2065',signup_preference:'Y')}
+  let(:suggestion){create(:suggestion, id:1, assignment_id:1,title:'oss topic', description:'add oss topic', status:'Initiated', unityID:'student2065',signup_preference:'Y')}
   let(:assignment_questionnaire) { build(:assignment_questionnaire, id: 1, questionnaire: questionnaire) }
 
   before(:each) do

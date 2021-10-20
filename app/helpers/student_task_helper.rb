@@ -13,6 +13,16 @@ module StudentTaskHelper
     result.html_safe
   end
 
+  def get_submission_grade_info(participant)
+    info = ''
+    if participant.try(:grade).nil?
+      result = "N/A"
+    else
+      info = participant.try(:grade).to_s
+    end
+    result.html_safe
+  end
+
   def check_reviewable_topics(assignment)
     return true if !assignment.topics? and assignment.current_stage != "submission"
     sign_up_topics = SignUpTopic.where(assignment_id: assignment.id)

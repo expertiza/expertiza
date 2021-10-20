@@ -1,12 +1,14 @@
 class DropOutstandingReviewsWorker < Worker
   @@deadline_type = "drop_outstanding_reviews"
 
+  # Runs the delayed Sidekiq function for dropping outstanding reviews
   def perform(assignment_id)
     drop_outstanding_reviews(assignment_id)
   end
 
   private
-	
+
+  # Drops reviews that have not been worked on	
   def drop_outstanding_reviews(assignment_id)
     reviews = ResponseMap.where(reviewed_object_id: assignment_id)
     reviews.each do |review|
@@ -18,3 +20,4 @@ class DropOutstandingReviewsWorker < Worker
     end
   end
 end
+

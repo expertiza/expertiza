@@ -148,7 +148,7 @@ class SubmittedContentController < ApplicationController
     end
   end
 
-  def folder_action
+  def perform_folder_action
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
     @current_folder = DisplayOption.new

@@ -254,16 +254,16 @@ class SignUpSheetController < ApplicationController
     assignment = Assignment.find(params[:assignment_id])
     if user.nil? # validate invalid user
       flash[:error] = user.name + " does not exist!"
-    else
+    else #If the user is not null and the student exists then sign up student for topic
       if AssignmentParticipant.exists? user_id: user.id, parent_id: params[:assignment_id]
         if SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
           flash[:success] = "You have successfully signed up " + user.name + " on " + team.name + "  for the topic " + params[:topic_id].to_s
           ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor signed up ' + user.name + ' on team ' + team.name + ' for topic: ' + params[:topic_id].to_s)
-        else
+        else #If the students team already has a topic then cancel the sign up
           flash[:error] = user.name + " on " + team.name + " has already signed up for a topic!"
           ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor is signing up a ' + user.name + 'on ' + team.name + ' who already has a topic')
         end
-      else
+      else #If the student isn't a part of the assignment then cancel the sign up
         flash[:error] = user.name + " is not registered for the assignment!"
         ExpertizaLogger.info LoggerMessage.new(controller_name, '', user.name + ' is not registered for the assignment: ' + assignment.name)
       end

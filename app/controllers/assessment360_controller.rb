@@ -8,20 +8,20 @@ class Assessment360Controller < ApplicationController
   end
 
   # checks if need to render partial or just the checkboxes
-  def isRefresh? checkboxes_array
-      return not(checkboxes_array.any?)
+  def show_table? checkboxes_array
+      return checkboxes_array.any?
   end
 
-  # returns the colspan of each assignment header
-  def colspan checkboxes_array
+  # returns the number of columns used to display each assignment
+  def assignment_colspan checkboxes_array
     if not checkboxes_array.any?
       return 5
     end
     return checkboxes_array.count("true")
   end
 
-  # returns colspan of Aggregate Review Score
-  def colspan_review checkboxes_array
+  # returns number of columns used to display aggregate review scores
+  def review_colspan checkboxes_array
     if checkboxes_array[0] && checkboxes_array[1]
       return 2
     elsif checkboxes_array[0] || checkboxes_array[1]
@@ -34,8 +34,6 @@ class Assessment360Controller < ApplicationController
   # Find the list of all students and assignments pertaining to the course.
   # This data is used to compute the metareview and teammate review scores.
   def all_students_all_reviews
-    # required checkboxes parameters
-    required = [:show_teammate_reviews,:show_meta_reviews,:show_peer_scores,:show_instructor_grades,:show_topics]
     @topics = {}
     @assignment_grades = {}
     @peer_review_scores = {}
@@ -51,16 +49,6 @@ class Assessment360Controller < ApplicationController
     @meta_review = {}
     @teammate_review = {}
     @teammate_count = {}
-    # variable to track current selection of checkboxes
-    @form_complete = ""
-    required.each do |f|
-      if params.has_key? f and not params[f].blank?
-        if params[f]
-          @form_complete += f.to_s
-        end
-      end
-      @form_complete += " "
-    end
     # instance variables based on each checkbox
     @show_teammate_reviews = params[:show_teammate_reviews] || false
     @show_meta_reviews = params[:show_meta_reviews] || false
@@ -69,19 +57,14 @@ class Assessment360Controller < ApplicationController
     @show_topics = params[:show_topics] || false
     @checkboxes_array = [@show_teammate_reviews,@show_meta_reviews,@show_peer_scores,@show_instructor_grades,@show_topics]
     # number of columns to span for each assignment
-    @colspan = colspan @checkboxes_array
+    @colspan = assignment_colspan @checkboxes_array
     # number of columns to span for Aggregate Score table header
-    @colspan_review = colspan_review @checkboxes_array
-    # checks if the call is with all the false checkboxes or not and sets @render_partial
-    if isRefresh? @checkboxes_array
-      @render_partial = false
-    else
-      @render_partial = true
-    end
+    @colspan_review = review_colspan @checkboxes_array
     # for course
     # eg. @overall_teammate_review_grades = {assgt_id1: 100, assgt_id2: 178, ...}
     # @overall_teammate_review_count = {assgt_id1: 1, assgt_id2: 2, ...}
     # network calls to be done only when we need to render_partial
+    @render_partial = show_table? @checkboxes_array
     if @render_partial
       %w[teammate meta].each do |type|
         instance_variable_set("@overall_#{type}_review_grades", {})

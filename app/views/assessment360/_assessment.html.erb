@@ -14,15 +14,20 @@
 
   th, td {
     text-align: center;
+    border-right: 2px solid;
   }
 
   td.topic {
-    display:inline-block;
     margin-top: -1px;
     white-space:nowrap;
     position:relative; /* must be relative */
     width:250px; /* fit to table cell width */
     overflow:hidden;
+    border-right: 2px solid;
+  }
+
+  th.noborder, td.noborder {
+    border: none;
   }
 </style>
 
@@ -38,8 +43,8 @@
 <table class="table table-striped sortable">
     <thead>
         <tr>
-          <th rowspan=2 width="320" class="sorter-true">Students</th>
-          <th rowspan=2 width="30">Teammate Count</th>
+          <th rowspan=2 width="320" class="noborder sorter-true">Students</th>
+          <th rowspan=2 width="30" class="noborder">Teammate Count</th>
           <% @assignments.each do |assignment| %>
               <th colspan="<%= @colspan %>" class="sorter-false"><%= assignment.name %> </th>
           <% end %>
@@ -67,6 +72,7 @@
               <% if @show_instructor_grades %>
                 <th><b>Instructor Grade</b></th>
               <% end %>
+
           <% end %>
           <% if @show_instructor_grades %>
             <th class="sorter-true"><b>Total Instructor Grade</b></th>
@@ -125,19 +131,19 @@
           <td><%= "#{@overall_teammate_review_grades[assignment.id] / @overall_teammate_review_count[assignment.id]}%" %></td>
         <% end %>
         <% if @show_topics%>
-          <td><%= "N/A" %></td>
+          <td><%= "—" %></td>
         <% end %>
         <% if @show_peer_scores %>
-          <td><%= "N/A" %></td>
+          <td><%= "—" %></td>
         <% end %>
         <% if @show_instructor_grades %>
-          <td><%= "N/A" %></td>
+          <td><%= "—" %></td>
         <% end %>
       <% end%>
       <% total_meta_review_grade = @overall_meta_review_grades.inject(0) {|sum, (k, v)| sum + v } %>
       <% total_meta_review_count = @overall_meta_review_count.inject(0) {|sum, (k, v)| sum + v } %>
       <% if @show_instructor_grades %>
-        <td><%= "N/A" %></td>
+        <td><%= "—" %></td>
       <% end %>
       <% if @show_meta_reviews %>
         <td><%= "#{total_meta_review_grade / total_meta_review_count}%" %></td>

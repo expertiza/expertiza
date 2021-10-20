@@ -47,7 +47,7 @@ describe "peer review testing" do
     visit '/student_task/list'
     click_link "TestAssignment"
     click_link "Others' work"
-    find(:css, "#i_dont_care").set(true)
+    find(:css, "#no_particular_topic").set(true)
     click_button "Request a new submission to review"
     expect(page).to have_content "No topics are available to review at this time. Please try later."
   end
@@ -57,7 +57,7 @@ describe "peer review testing" do
     visit '/student_task/list'
     click_link "TestAssignment"
     click_link "Others' work"
-    find(:css, "#i_dont_care").set(true)
+    find(:css, "#no_particular_topic").set(true)
     click_button "Request a new submission to review"
     expect(page).to have_content "No topics are available to review at this time. Please try later."
   end
@@ -96,7 +96,7 @@ describe "peer review testing" do
     visit '/student_task/list'
     click_link "TestAssignment"
     click_link "Others' work"
-    find(:css, "#i_dont_care").set(true)
+    find(:css, "#no_particular_topic").set(true)
     click_button "Request a new submission to review"
     expect(page).to have_content "No previous versions available"
   end

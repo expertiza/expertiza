@@ -119,7 +119,7 @@ class StudentQuizzesController < ApplicationController
     Answer.where(question_id: question.id, response_id: response.id).first
   end
 
-  # Gets all the questionnaire responses by all the teams for an particular assignment 
+  # Gets all the questionnaire responses by all the teams for a particular assignment 
   def review_questions
     @assignment_id = params[:id]
     @quiz_questionnaires = []

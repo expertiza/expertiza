@@ -117,7 +117,7 @@ class DueDate < ActiveRecord::Base
   def self.get_time_diff_btw_due_date_and_now(due_date)
     due_date_time = to_time(due_date)
     time_left_in_minutes_duration = find_min_from_now_duration(due_date_time)
-    diff_btw_time_left_and_threshold_minutes_duration = time_left_in_minutes_duration - due_date.threshold.hour.in_minutes
+    diff_btw_time_left_and_threshold_minutes_duration = time_left_in_minutes_duration - (due_date.threshold.hour / 60.0)
     [diff_btw_time_left_and_threshold_minutes_duration, time_left_in_minutes_duration]
   end
 
@@ -131,14 +131,14 @@ class DueDate < ActiveRecord::Base
   private
 
   def self.find_min_from_now_duration(due_at_time)
-    find_seconds_from_now_duration(due_at_time).in_minutes
+    find_seconds_from_now_duration(due_at_time) / 60.0
   end
 
   def self.find_seconds_from_now_duration(due_at_time)
     current_datetime = DateTime.now.in_time_zone(zone = 'UTC').to_s(:db)
     current_time = Time.parse(current_datetime)
 
-    (due_at_time - current_time).second
+    due_at_time - current_time
   end
 
   def self.to_time(due_date)

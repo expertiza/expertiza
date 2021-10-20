@@ -668,4 +668,13 @@ describe ReviewMappingController do
       end
     end
   end
+
+  describe '#select_metareviewer' do
+    it 'there is no such a ResponseMap' do
+        allow(ResponseMap).to receive(:find).with('-1').and_return(metareview_response_map)
+        params = {id: -1}
+        post :select_metareviewer, params
+        expect(flash[:error]).to be nil
+    end
+  end
 end

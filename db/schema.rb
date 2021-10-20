@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20211018011356) do
+ActiveRecord::Schema.define(version: 20211019040630) do
 
   create_table "answer_tags", force: :cascade do |t|
     t.integer  "answer_id",                limit: 4
@@ -381,12 +381,13 @@ ActiveRecord::Schema.define(version: 20211018011356) do
     t.string   "handle",              limit: 255
     t.datetime "time_stamp"
     t.text     "digital_signature",   limit: 65535
-    t.string   "duty",                limit: 255
     t.boolean  "can_take_quiz",                     default: true
     t.float    "Hamer",               limit: 24,    default: 1.0
     t.float    "Lauw",                limit: 24,    default: 0.0
+    t.integer  "duty_id",             limit: 4
   end
 
+  add_index "participants", ["duty_id"], name: "fk_duty_id", using: :btree
   add_index "participants", ["user_id"], name: "fk_participant_users", using: :btree
 
   create_table "password_resets", force: :cascade do |t|
@@ -826,6 +827,7 @@ ActiveRecord::Schema.define(version: 20211018011356) do
   add_foreign_key "invitations", "users", column: "from_id", name: "fk_invitationfrom_users"
   add_foreign_key "invitations", "users", column: "to_id", name: "fk_invitationto_users"
   add_foreign_key "late_policies", "users", column: "instructor_id", name: "fk_instructor_id"
+  add_foreign_key "participants", "duties"
   add_foreign_key "participants", "users", name: "fk_participant_users"
   add_foreign_key "plagiarism_checker_assignment_submissions", "assignments"
   add_foreign_key "plagiarism_checker_comparisons", "plagiarism_checker_assignment_submissions"

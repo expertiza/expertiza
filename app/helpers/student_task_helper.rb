@@ -15,6 +15,9 @@ module StudentTaskHelper
   end
 
   def self.get_submission_grade_info(participant)
+    # Gets the submission grade for a participant from the grade column of the participant table
+    # If no grade is assigned to the participant, it returns "N/A"
+    # All returns are in string to keep them HTML safe 
     info = ''
     if participant.try(:grade).nil?
       info = "N/A"

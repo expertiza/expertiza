@@ -36,7 +36,7 @@ describe SuggestionController do
     it "checks updated is saved" do
       params = {title:"new title", description: "new description", signup_preference:"N"}
       session = {student: 1}
-      post :update, params, session
+      post :update_suggestion, params, session
       expect(response).to render_template('suggestion/new?id=1')
     end
   end

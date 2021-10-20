@@ -84,7 +84,7 @@ class LatePoliciesController < ApplicationController
     # If penaly per unit is invalid, exit early
     if invalid_penalty_per_unit
       flash[:error] = "Cannot edit the policy. The maximum penalty cannot be less than penalty per unit."
-      redirect_to action: 'edit', id: params[:id]
+      redirect_to action: 'edit', id: params[:id] and return
     end
 
     @penalty_policy = LatePolicy.find(params[:id])

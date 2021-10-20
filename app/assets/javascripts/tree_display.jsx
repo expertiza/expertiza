@@ -162,11 +162,6 @@ const node_attributes = {
         src: '/assets/tree_view/create-teams-24.png'
       },
       {
-        title: 'View grade summary by student',
-        href: '/assessment360/course_student_grade_summary?course_id=',
-        src: '/assets/tree_view/360-dashboard-24.png'
-      },
-      {
         title: 'Assign survey',
         href: '/survey_deployment/new?type=CourseSurveyDeployment&id=',
         src: '/assets/tree_view/assign-survey-24.png'

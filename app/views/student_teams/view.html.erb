@@ -41,7 +41,7 @@
                     <%if  member.user.id == session[:user].id%>
                         <%= render :partial=>'select_duty_form', :locals => {:assignment_id => @student.assignment.id, :member => member}%>
                     <%else%>
-                        Teammate has not selected a duty
+                        Not Selected
                     <%end%>
                   </td>
               <%end%>
@@ -49,7 +49,9 @@
         <td><%= member.user.email(session[:ip]) %></td>
 
         <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
-        <% if @teammate_review_allowed %>
+        <% if (@teammate_review_allowed &&
+            ((@student.assignment.is_duty_based_assignment && !member.duty_id.nil?) || (not @student.assignment.is_duty_based_assignment)))%>
+
           <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
             <% map = TeammateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first
             if map.nil?
@@ -63,11 +65,14 @@
           <% else %>
             <td>
               <%= link_to "View", {:controller => 'response', :action => 'view', :id => review.id} %>
-              &nbsp;&nbsp;
               <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => review.id, :return => "teammate"} %>
             </td>
           <% end %>
         <% end %>
+        <%else%>
+            <td>
+              N/A
+            </td>
       <% end %>
     </tr>
   <% end %>   <!--end team member content-->

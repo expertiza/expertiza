@@ -5,6 +5,9 @@ class TeammateReviewResponseMap < ResponseMap
   def questionnaire
     self.assignment.questionnaires.find_by(type: 'TeammateReviewQuestionnaire')
   end
+  def questionnaire_by_duty(duty_id)
+    Questionnaire.find(AssignmentQuestionnaire.find_by(assignment_id: self.assignment.id, duty_id: duty_id).questionnaire_id)
+  end
 
   def contributor
     nil

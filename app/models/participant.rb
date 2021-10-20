@@ -70,6 +70,31 @@ class Participant < ActiveRecord::Base
     end
   end
 
+  # send email to team's reviewers in case a new submission is made
+  def mail_assigned_reviewers()
+    team = self.team
+    maps = ResponseMap.where(reviewed_object_id: self.assignment.id, reviewee_id: team.id, type: 'ReviewResponseMap')
+    unless maps.nil?
+      maps.each do |map|
+        reviewer = User.find(Participant.find(map.reviewer_id).user_id)
+        Mailer.sync_message(
+            {
+                :to => reviewer.email,
+                subject:  "Assignment '#{self.assignment.name}': A submission has been updated since you last reviewed it",
+                cc: User.find_by(self.assignment.instructor_id).email,
+                :body => {
+                    :obj_name => self.assignment.name,
+                    :link => "https://expertiza.ncsu.edu/response/new?id=#{map.id}",
+                    :type => 'submission',
+                    :first_name => ApplicationHelper::get_user_first_name(User.find(Participant.find(map.reviewer_id).user_id)),
+                    :partial_name => 'updated_submission_since_review'
+                }
+            }
+        ).deliver_now
+      end
+    end
+  end
+
   def able_to_review
     can_review
   end

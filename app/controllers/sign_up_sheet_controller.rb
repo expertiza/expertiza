@@ -53,7 +53,8 @@ class SignUpSheetController < ApplicationController
     if topic.nil?
       setup_new_topic
     else
-      update_existing_topic topic
+      flash[:error] = "That topic already exists!"
+      redirect_to edit_assignment_path(topic.assignment_id) + "#tabs-2"
     end
   end
 

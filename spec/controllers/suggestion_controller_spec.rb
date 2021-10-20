@@ -17,7 +17,7 @@ describe SuggestionController do
     stub_current_user(student, student.role.name, student.role)
   end
   describe '#student_view' do
-    it 'renders assignments#student_view' do
+    it 'renders suggestions#student_view' do
       get :student_view, id: 1
       expect(response).to render_template(:student_view)
     end

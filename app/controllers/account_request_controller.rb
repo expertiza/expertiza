@@ -100,43 +100,16 @@ class AccountRequestController < ApplicationController
   end
 
   def create_requested_user_record
-  
     requested_user = AccountRequest.new(requested_user_params)
     #An object is created with respect to AccountRequest model inorder to populate the users information when account is requested
-
-    if params[:user][:institution_id].empty?
-      institution = Institution.find_or_create_by(name: params[:institution][:name])
-      requested_user.institution_id = institution.id
-    end
-    #If user enters others and adds a new institution, an institution id will be created with respect to the institution model. 
-    #This institution_attribute will be added to the AccountRequest model under institution_id attribute!
-
-    #
-    requested_user.status = 'Under Review'
-    #The status is by default 'Under Review' until the super admin approves or rejects
-
-    user_existed = User.find_by(name: requested_user.name) or User.find_by(name: requested_user.email)
-    # default to instructor role
-    if requested_user.role_id == nil
-      requested_user.role_id = Role.where(:name => "Instructor")[0].id
-    end
-    requested_user_saved = requested_user.save
+    user_exists = User.find_by(name: requested_user.name) or User.find_by(name: requested_user.email)
+    requested_user_saved = save_requested_user(requested_user, params)
     #Stores a boolean value with respect to whether the user data is saved or not
-
-    if !user_existed and requested_user_saved
-      super_users = User.joins(:role).where('roles.name = ?', 'Super-Administrator')
-      super_users.each do |super_user|
-        prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, requested_user, 'New account Request')
-        prepared_mail.deliver
-      end
-      #Notifying an email to the administrator regarding the new user request!
-      ExpertizaLogger.info LoggerMessage.new(controller_name, requested_user.name, 'The account you are requesting has been created successfully.', request)
-      flash[:success] = "User signup for \"#{requested_user.name}\" has been successfully requested."
+    if !user_exists and requested_user_saved
+      notify_supers_new_request(requested_user)
       redirect_to '/instructions/home'
-      #Print out the acknowledgement message to the user and redirect to /instructors/home page when successful
-
       return
-    elsif user_existed
+    elsif user_exists
       flash[:error] = "The account you are requesting already exists in Expertiza."
       #If the user account already exists, log error to the user
     else
@@ -146,6 +119,34 @@ class AccountRequestController < ApplicationController
     ExpertizaLogger.error LoggerMessage.new(controller_name, requested_user.name, flash[:error], request)
     redirect_to controller: 'account_request', action: 'new', role: 'Student'
     #if the first if clause fails, redirect back to the account requests page!
+  end
+
+  def save_requested_user(requested_user, params)
+    if params[:user][:institution_id].empty?
+      institution = Institution.find_or_create_by(name: params[:institution][:name])
+      requested_user.institution_id = institution.id
+    end
+    #If user enters others and adds a new institution, an institution id will be created with respect to the institution model.
+    #This institution_attribute will be added to the AccountRequest model under institution_id attribute!
+    requested_user.status = 'Under Review'
+    #The status is by default 'Under Review' until the super admin approves or rejects
+    # default to instructor role
+    if requested_user.role_id == nil
+      requested_user.role_id = Role.where(:name => "Instructor")[0].id
+    end
+    return requested_user.save
+  end
+
+  def  notify_supers_new_request(requested_user)
+    super_users = User.joins(:role).where('roles.name = ?', 'Super-Administrator')
+    super_users.each do |super_user|
+      prepared_mail = MailerHelper.send_mail_to_all_super_users(super_user, requested_user, 'New account Request')
+      prepared_mail.deliver
+    end
+    #Notifying an email to the administrator regarding the new user request!
+    ExpertizaLogger.info LoggerMessage.new(controller_name, requested_user.name, 'The account you are requesting has been created successfully.', request)
+    flash[:success] = "User signup for \"#{requested_user.name}\" has been successfully requested."
+    #Print out the acknowledgement message to the user and redirect to /instructors/home page when successful
   end
 
   def roles_for_request_sign_up

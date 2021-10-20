@@ -32,7 +32,7 @@ describe "Assignment creation review strategy tab", js: true do
 		visit '/assignments/1/edit'
 		find_link('ReviewStrategy').click
 		select "Instructor-Selected", from: 'assignment_form_assignment_review_assignment_strategy'
-		check 'num_reviews_student'
+		check 'num_reviews_per_student'
 		fill_in 'num_reviews_per_student', with: 5
 	end
 end

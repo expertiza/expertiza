@@ -1,0 +1,39 @@
+# == Schema Information
+
+# Table name: Participants
+
+#     can_submit              :boolean  
+#     can_review              :boolean  
+#     user_id                 :integer  
+#     parent_id               :integer  
+#     submitted_at            :datetime 
+#     permission_granted      :boolean  
+#     penalty_accumulated     :integer    not null 
+#     grade                   :float    
+#     type                    :string   
+#     handle                  :string   
+#     time_stamp              :datetime 
+#     digital_signature       :text     
+#     duty                    :string   
+#     can_take_quiz           :boolean  
+#     Hamer                   :float    
+#     Lauw                    :float    
+
+
+one:
+  can_submit: true
+  can_review: true
+  user_id:  1
+  parent_id:  1
+  permission_granted: true
+  penalty_accumulated: 0
+  grade: 98.4
+
+
+two:
+  can_submit: true
+  can_review: true
+  user_id:  1
+  parent_id:  1
+  permission_granted: true
+  penalty_accumulated: 0

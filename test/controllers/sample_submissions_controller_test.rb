@@ -1,4 +1,5 @@
 require 'test_helper'
+require './app/controllers/sample_submissions_controller'
 
 class SampleSubmissionsControllerTest < ActionController::TestCase
   setup do

@@ -1,4 +1,5 @@
 module StudentTaskHelper
+
   def get_review_grade_info(participant)
     info = ''
     if participant.try(:review_grade).try(:grade_for_reviewer).nil? ||
@@ -13,14 +14,14 @@ module StudentTaskHelper
     result.html_safe
   end
 
-  def get_submission_grade_info(participant)
+  def self.get_submission_grade_info(participant)
     info = ''
     if participant.try(:grade).nil?
-      result = "N/A"
+      info = "N/A"
     else
       info = participant.try(:grade).to_s
     end
-    result.html_safe
+  info
   end
 
   def check_reviewable_topics(assignment)

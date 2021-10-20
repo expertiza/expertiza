@@ -92,6 +92,8 @@ describe ImpersonateController do
             @params = { user: { name: student1.name } }
             @session = { user: instructor }
             post :impersonate, @params, @session
+            expect(session[:user]).to eq student1
+            expect(session[:super_user]).to eq instructor
             # nav bar uses the :impersonate as the param name, so let make sure it always works from there too.
             @params = { impersonate: { name: student2.name } }
             post :impersonate, @params, @session
@@ -100,5 +102,33 @@ describe ImpersonateController do
             expect(session[:original_user]).to eq instructor
             expect(session[:impersonate]).to be true
         end
+
+        it 'instructor should revert to himself while already impersonating a user' do
+            allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
+            allow(User).to receive(:find_by).with(name: '').and_return('')
+            allow(instructor).to receive(:can_impersonate?).with(student1).and_return(true)
+            allow(instructor).to receive(:can_impersonate?).with('').and_return(true)
+            request.env["HTTP_REFERER"] = "http://www.example.com"
+            @params = { user: { name: student1.name } }
+            @session = { user: instructor }
+            post :impersonate, @params, @session
+            expect(session[:user]).to eq student1
+            expect(session[:impersonate]).to be true
+            # nav bar uses the :impersonate as the param name, so let make sure it always works from there too.
+            @params = { impersonate: { name: '' } }
+            post :impersonate, @params, @session
+            expect(session[:user]).to eq instructor
+            expect(session[:impersonate]).to be true
+            expect(session[:super_user]).to eq nil
+        end
+
+        it 'when typing the user name, there should be all possible complete user names appearing ' do
+            @params = { user:  {name: 'A' }}
+            get :auto_complete_for_user_name,@params
+            expect(response.body).to eq  "<%= auto_complete_result @users, 'Amanda' %>"
+
+        end
+
+
     end
 end

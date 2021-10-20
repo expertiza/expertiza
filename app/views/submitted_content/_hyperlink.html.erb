@@ -1,0 +1,35 @@
+<%= form_for :hyperlinks, url: '/submitted_content/remove_hyperlink' do |f| %>
+  <% if stage != "Finished" %>
+    <% team_id = TeamsUser.team_id(participant.parent_id, participant.user_id) %>
+    <% display_to_author = Team.exists?(team_id) && Team.find(team_id).user?(@current_user)%>
+
+    <% if display_to_author %>
+      <h5>Hyperlink Actions:</h5>
+      <%= f.submit 'Delete selected hyperlink' %>
+    <% end  %>
+    </br>
+
+    <%= f.hidden_field :participant_id, value: participant.id %>
+    </br>
+  <% end %>
+
+  <a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;">hide links</a><br/>
+  <div id="url" style="">
+    <ul>
+      <% participant.team.hyperlinks.each_with_index {
+        |link, index| %>
+      <% if stage != "Complete" %>
+        <% if display_to_author%>
+          <% if index == 0 %>
+            <input type="radio" id='chk_links' name='chk_links' checked value="<%= index %>"/>
+          <% else %>
+            <input type="radio" id='chk_links' name='chk_links' value="<%= index %>"/>
+          <% end %>
+        <% end %>
+              <a href="<%= link %>" target="_blank"><%= link %></a>
+              <br/>
+      <% end %>
+      <% } %>
+    </ul>
+  </div>
+<% end %>

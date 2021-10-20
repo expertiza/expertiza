@@ -1,0 +1,177 @@
+<!-- PARTICIPANT -->
+
+<!-- required by auto summarization -->
+<link rel="stylesheet" type="text/css" href="/assets/summary.css">
+<script type="text/javascript" src="/assets/summary.js" ></script>
+<!-- end required by auto summarization -->
+
+<% 
+    participant = pscore[:participant]
+    rscore_review = Rscore.new(pscore,:review) if pscore[:review]
+    rscore_metareview = Rscore.new(pscore,:metareview) if pscore[:metareview]
+    rscore_feedback = Rscore.new(pscore,:feedback) if pscore[:feedback]
+    rscore_teammate = Rscore.new(pscore,:teammate) if pscore[:teammate]
+%>
+
+<TR <% if team %> id="<%= prefix %>" style="display:none; background-color: white;" <% end %>>
+    <TD><%= link_to participant.name(session[:ip]), impersonate_impersonate_path(:user => {:name => User.find(participant.user_id).name}), :method => :post %> (<%= participant.fullname(session[:ip]) %>)<BR/>
+        <% if (controller.action_name != "view_my_scores" and index == team_size - 1) or controller.action_name == "view_my_scores" %>
+            <FONT SIZE="-1"><a href="#" id="<%=prefix%>_filesLink" name="<%=prefix%>_filesLink" onClick="toggleElement('<%=prefix%>_files','submission');return false;">show submission</a>
+            <% if @topic_id %> (<%= SignUpTopic.find(@topic_id).topic_identifier %>)<% end %>
+            </FONT>
+        <% end %>
+    </TD>
+
+    <% if !rscore_review.nil? && rscore_review.my_avg %>
+        <% if (controller.action_name != "view_my_scores" and index == 0) or controller.action_name == "view_my_scores" %>
+            <TD id=<%="rowspanTd1#{participant_id}"%> ALIGN="CENTER" rowspan=<%=team_size.to_s%>>
+                <%= rscore_review.my_avg.is_a?(Float)? sprintf("%.2f",rscore_review.my_avg): rscore_review.my_avg %>%<BR/>
+                <FONT SIZE="-1"><a href="#" id="<%=prefix%>_reviewsLink" name="<%=prefix%>_reviewsLink" onClick="var td=document.getElementById('<%="rowspanTd1#{participant_id}"%>'); var td2=document.getElementById('<%="rowspanTd2#{participant_id}"%>'); if(td.rowSpan=='1'){td.rowSpan=<%=team_size.to_s%>;td2.rowSpan=<%=team_size.to_s%>;}else{td.rowSpan='1'; td2.rowSpan='1';};toggleElement('<%=prefix%>_reviews','reviews');return false;">show reviews</a> (<%= pscore[:review][:assessments].size %>)</FONT>
+              <!-- add a fake link to the auto summarization table, and only show it to the reviewee-->
+              <% if controller.action_name == "view_my_scores" %>
+                  <br/><div align="center" data-toggle="collapse" data-target="#summary_review_table" class="fake-link" id="show_hide_summary_link">show review summary</div>
+              <% end %>
+            </TD>
+        
+           
+            <TD id=<%="rowspanTd2#{participant_id}"%> ALIGN="CENTER" rowspan=<%=team_size.to_s%>>
+                <%= rscore_review.my_min.is_a?(Float)? sprintf("%.0f",rscore_review.my_min): rscore_review.my_min %>% - <%= rscore_review.my_max.is_a?(Float)? sprintf("%.0f",rscore_review.my_max): rscore_review.my_max %>%
+            </TD>
+        <% end %>
+    <% else %>
+        <TD ALIGN="CENTER">---</TD>
+        <TD ALIGN="CENTER">---</TD>
+    <% end %>
+
+    <% if has_team_and_metareview?[:has_metareview] %>
+        <% if rscore_metareview && rscore_metareview.my_avg %>
+            <TD ALIGN="CENTER" VALIGN="TOP"><%= rscore_metareview.my_avg.is_a?(Float)? sprintf("%.2f",rscore_metareview.my_avg):rscore_metareview.my_avg %>%
+                <BR/>
+                <FONT SIZE="-1">
+                    <a href="#" id="<%=prefix%>_mreviewsLink" name="<%=prefix%>_mreviewsLink" onClick="toggleElement('<%=prefix%>_mreviews','metareviews');return false;">show metareviews</a> (<%= pscore[:metareview][:assessments].size %>)
+                </FONT>
+            </TD>
+            <TD ALIGN="CENTER" VALIGN="TOP"><%= rscore_metareview.my_min.is_a?(Float)? sprintf("%.0f",rscore_metareview.my_min):rscore_metareview.my_min %>% - <%= rscore_metareview.my_max.is_a?(Float)?sprintf("%.0f",rscore_metareview.my_max):rscore_metareview.my_max %>%
+            </TD>
+            <% else %>
+                <TD ALIGN="CENTER">---</TD>
+                <TD ALIGN="CENTER">---</TD>
+        <% end %>
+    <% end %>
+
+    <% if !rscore_feedback.nil? && rscore_feedback.my_avg %>
+        <TD ALIGN="CENTER" VALIGN="TOP"><%= rscore_feedback.my_avg.is_a?(Float)? sprintf("%.2f",rscore_feedback.my_avg): rscore_feedback.my_avg %>%
+            <BR/>
+            <FONT SIZE="-1">
+                <a href="#" id="<%=prefix%>_feedbackLink" name="<%=prefix%>_feedbackLink" onClick="toggleElement('<%=prefix%>_feedback','author feedbacks');return false;">show author feedback</a> (<%= pscore[:feedback][:assessments].size %>)
+            </FONT>
+        </TD>
+        <TD ALIGN="CENTER" VALIGN="TOP"><%= rscore_feedback.my_min.is_a?(Float)? sprintf("%.0f",rscore_feedback.my_min): rscore_feedback.my_min %>% - <%= rscore_feedback.my_max.is_a?(Float)? sprintf("%.0f",rscore_feedback.my_max):rscore_feedback.my_max %>%
+        </TD>
+    <% else %>
+            <TD ALIGN="CENTER">---</TD>
+            <TD ALIGN="CENTER">---</TD>
+    <% end %>
+
+    <!--ACS Teammate review needs to be done only if there are more than one person in the team-->
+    <% if has_team_and_metareview?[:has_team] %>
+        <% if @assignment.show_teammate_reviews || session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4 || session[:user].role_id == 6%>
+            <% if rscore_teammate and rscore_teammate.my_avg %>
+                <TD ALIGN="CENTER" VALIGN="TOP">
+                    <% avg_score = rscore_teammate.my_avg.is_a?(Float)?sprintf("%.2f",rscore_teammate.my_avg):rscore_teammate.my_avg %>
+                    <%if @assignment%>
+                        <%= avg_score %>
+                    <%end%>
+                    <BR/><FONT SIZE="-1"><a href="#" id="<%=prefix%>_teammate_reviewsLink" name="<%=prefix%>_teammate_reviewsLink" onClick="toggleElement('<%=prefix%>_teammate_reviews','teammate reviews');return false;">show teammate reviews</a> (<%= pscore[:teammate][:assessments].size %>)</FONT>
+                </TD>
+                <TD ALIGN="CENTER" VALIGN="TOP">
+                <% range =  rscore_teammate.my_min.is_a?(Float) ? sprintf("%.0f",rscore_teammate.my_min) : rscore_teammate.my_min.to_s + '%' + ' - ' %>
+                <% range += rscore_teammate.my_max.is_a?(Float) ? sprintf("%.0f",rscore_teammate.my_max) : rscore_teammate.my_max.to_s + '%' %>
+
+                <%if @assignment %>
+                    <%= range %>
+                <% end %>
+                </TD>
+            <% else %>
+                <TD ALIGN="CENTER">---</TD>
+                <TD ALIGN="CENTER">---</TD>
+            <% end %>    
+        <% else %>
+            <TD ALIGN="CENTER">---</TD>
+            <TD ALIGN="CENTER">---</TD>
+        <%end%>
+    <%end%>
+
+    <!-- If we have a total point value, display in "out of" format rather than percentage for total score -->
+    <% if pscore[:max_pts_available]
+        score_postfix = sprintf(" / %.2f",pscore[:max_pts_available])
+    else
+        score_postfix = "%"
+    end %>
+
+    <% topic_id = SignedUpTeam.topic_id(@assignment.id, participant.user_id) %>
+    <% stage = @assignment.get_current_stage(topic_id) %>
+    <% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
+      <TD ALIGN="CENTER">
+      <% if stage == "Finished" %>
+
+        <% if participant.grade %>
+          <% total_score = participant.grade %>
+          <% title = "A score in blue indicates that the value was overwritten by the instructor or teaching assistant." %>
+        <% else %>
+          <% total_score = pscore[:total_score] %>
+          <% title = nil %>
+        <% end %>
+
+        <div <% if title %>title="<%=title%>" style="color:#0033FF"<% end %>><%= total_score==(-1)? "N/A": sprintf("%.2f",total_score) %><%= score_postfix %></div>
+
+        <% if controller.action_name != "view_my_scores" %>
+            <FONT SIZE="-1"><a href="../grades/view_team?id=<%= participant.id%>"  >view heatgrid</a></FONT>
+            <!--Zhewei: Since edit grade does not work now, hide this link temporarily.-->
+            <!--<BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>-->
+        <% else %>
+            <FONT SIZE="-1">(in <%= stage %>)</FONT>
+        <% end %>
+
+      <% else %>
+            <% if !rscore_review.nil? && rscore_review.my_avg %>
+                <%= rscore_review.my_avg.is_a?(Float)?sprintf("%.2f",rscore_review.my_avg):rscore_review.my_avg %><%= score_postfix %>
+            <% else %>
+                <%= '---' %>
+            <% end %>
+      <% end %>
+      </TD>
+    <% end %>
+</TR>
+
+<% if (controller.action_name != "view_my_scores" and index == team_size - 1) or controller.action_name == "view_my_scores" %>
+    <TR id="<%= prefix %>_files" style="display:none; background-color: white;">
+        <TD COLSPAN="10"><%= render :partial=>'grades/submissions', :locals => {:participant => participant} %></TD>
+    </TR>
+<% end %>
+
+<!-- summarization table, only shown to the reviewee-->
+<% if controller.action_name == "view_my_scores" %>
+    <TR>
+      <TD COLSPAN="10">
+        <div id="summary_review_table" class="collapse">
+          <%= render :partial=>'grades/summary_reviews'  %>
+        </div>
+      </TD>
+    </TR>
+<%end%>
+<!-- end summarization table -->
+
+<TR id="<%= prefix %>_reviews" style="display:none; background-color: white;">
+    <TD COLSPAN="10"><%= render :partial=>'grades/reviews', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:review]} %></TD>
+</TR>
+<TR id="<%= prefix %>_mreviews" style="display:none; background-color: white;">
+    <TD COLSPAN="10"><%= render :partial=>'grades/metareviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:metareview]} %></TD>
+</TR>
+<TR id="<%= prefix %>_feedback" style="display:none; background-color: white;">
+    <TD COLSPAN="10"><%= render :partial=>'grades/author_feedbacks', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:feedback]} %></TD>
+</TR>
+<TR id="<%= prefix %>_teammate_reviews" style="display:none; background-color: white;">
+    <TD COLSPAN="10"><%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:teammate]} %></TD>
+</TR>
+    <!-- END PARTICIPANT -->

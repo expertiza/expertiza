@@ -1,0 +1,18 @@
+<% if SignUpTopic.has_suggested_topic?(@assignment.id) %>
+    <h2>Your approved suggested topic</h2>
+    <table class="general">
+      <tr><%= render :partial => 'table_header' %></tr>
+      <br/>
+      <% i=1 %>
+      <% @suggested_topics = get_suggested_topics(@assignment.id) %>
+      <%if !@suggested_topics.nil? %>
+          <% @suggested_topics.each do |topic| %>
+              <tr>
+                <% is_suggested_topic = true %>
+                <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
+              </tr>
+              <% i=i+1 %>
+          <% end %>
+      <% end %>
+    </table>
+<% end %>

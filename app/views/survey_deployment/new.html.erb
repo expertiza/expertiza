@@ -1,0 +1,64 @@
+
+<%= error_messages_for(:survey_deployment) %>
+
+<h1> New Survey Deployment </h1>
+
+<%= form_tag :action => 'create', :type => @survey_deployment_type do %>
+
+    <input type="hidden" name="survey_deployment[parent_id]" value=<%=@parent.id%> />
+    <input type="hidden" name="type" value=<%=@survey_deployment_type%> />
+
+  <table class="table borderless">
+    <tr>
+      <td>
+        <table>
+          <tr>
+          <td><label for="start_date">Start Date:</label></td>
+          <td class="form-inline">
+            <input type="text" id="survey_deployment_start_date" name ="survey_deployment[start_date]" class="form-control width-250" onClick="$('#survey_deployment_start_date').datetimepicker()"/>
+          </td>
+        </tr>
+
+        <tr>
+          <td><label for="end_date">End Date:</label></td>
+        <td class="form-inline">
+          <input type="text" id="survey_deployment_end_date" name ="survey_deployment[end_date]" class="form-control width-250"  onClick="$('#survey_deployment_end_date').datetimepicker()"/>
+        </td>
+      </tr>
+
+    <tr>
+      <td><label for="num_of_students">Total number of students:</label></td>
+      <td>
+        <input type="text" name="survey_deployment[num_of_students]" value=<%= @total_students %> readonly class="form-control width-250"/>
+      </td>
+    </tr>
+
+    <tr>
+      <td><label for="add_global_survey">Include Global Survey?</label></td>
+      <td>
+        <input type="checkbox" name="add_global_survey") />
+      </td>
+    </tr>
+
+  <tr>
+    <td><label>Select Survey:</label></td>
+  <td>
+    <%= select(:survey_deployment, :questionnaire_id, @surveys, {}, {:class => "form-control width-250"} ) %>
+  </td>
+</tr>
+    </table>
+  </td>
+</tr>
+   </table>
+   <p>
+     <%= submit_tag "Add", class: "btn btn-default" %>
+
+
+
+
+   <% end %>
+   <br />
+   <%= link_to 'Back', :action => 'list' %>
+
+
+

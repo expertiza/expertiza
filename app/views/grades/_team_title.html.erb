@@ -1,0 +1,20 @@
+<!-- E1877: charts removed from here and add in "view.html.erb" before defining table-->
+<!-- <TR class="team"
+<% if prefix %>id='<%= prefix %>_<%= num + 4 %>' style="display:none"
+<% end %>>
+	<th style="text-align:center;">&nbsp;</th>
+	<th style="text-align:center;" COLSPAN="<%= col_outer_th_span_value %>">Submitted work</th>
+	<th style="text-align:center;" WIDTH="9">&nbsp;</th>
+</TR> -->
+
+<!--E1877:class "sorter-true/false" added to add sorting to each attribute of the table-->
+<tr class="team"
+    <% if prefix %>id='<%= prefix %>_<%= num + 5 %>' style="display:none"
+<% end %>>
+  <th class="sorter-false" style="text-align:left;" WIDTH="9"></th>
+  <th class="sorter-true" style="text-align:left;">Team</th>
+  <th class="sorter-true" style="text-align:left;">Average</th>
+  <th class="sorter-true" style="text-align:left;">Range</th>
+  <th class="sorter-false" style="text-align:left;" WIDTH="9">&nbsp;</th>
+</tr>
+

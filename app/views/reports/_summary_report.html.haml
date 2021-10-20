@@ -1,0 +1,27 @@
+%link{:href => "/assets/summary.css", :rel => "stylesheet", :type => "text/css"}/
+%script{:src => "/assets/javascripts/summary.js", :type => "text/javascript"}
+.reviewreport
+  %table{:class => "table table-striped"}
+    - for i in 0..@assignment.rounds_of_reviews-1
+      %tr.header_class{:bgcolor => "", "data-target" => "#round_#{(i+1).to_s}", "data-toggle" => "collapse"}
+        %td{:style => "padding: 10px;"}
+          %img#icon_header_team.arrow_icon{:src => "/assets/expand.png"}>/
+          [avg score : #{@avg_scores_by_round[i].to_s}%] Round #{(i+1).to_s}
+      %tr
+        %td.data_column
+          .collapse{:id => "round_#{(i+1).to_s}"}
+            %table.table.table-striped
+              - @summary[i].keys.each do |question|
+                %tr{:bgcolor => "#f9f9f9"}
+                  %td
+                    %h5
+                      - safe_concat question
+                      %div{:style => "text-decoration: underline overline;"} Average score: #{@avg_scores_by_criterion[i][question].to_s}%
+                %tr
+                  %td
+                    - if !@summary[i][question].eql?("")
+                      - @summary[i][question].each do |sentence|
+                        - safe_concat "<li>"
+                        - concat sentence
+                    - else
+                      - safe_concat "&nbsp;"

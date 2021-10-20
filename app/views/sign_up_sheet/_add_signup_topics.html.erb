@@ -1,0 +1,36 @@
+<% @assignment = Assignment.find(params[:id]) %>
+<% if flash[:notice] %>
+    <div class="flash_note"><%= flash_message :notice %></div>
+<% end %>
+
+<% @sign_up_topics = SignUpTopic.where(['assignment_id = ?', @assignment.id]) %>
+<% @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)  %>
+<% @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id) %>
+<% @participants = SignedUpTeam.find_team_participants(@assignment.id, session[:ip])  %>
+
+<a id="teamsAndMembers" onclick="showHideTeamAndMembers(<%= @sign_up_topics.size%>)">Hide all teams</a>
+<% if @sign_up_topics.size != 0 %>
+    <table class="table table-striped">
+      <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
+
+      <% i=1 %>
+      <% for topic in @sign_up_topics %>
+          <tr>
+            <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
+          </tr>
+          <% i=i+1 %>
+      <% end %>
+
+    </table>
+
+<% else %>
+    <div class="flash_note alert alert-danger">
+      <%= "Signup topics have not yet been created." %>
+    </div>
+<% end %>
+
+<% session[:return_to] = request.url %>
+<br/><br/>
+
+<%= render :partial => '/sign_up_sheet/add_topics' %>
+<a href="javascript:history.back()">Back</a>

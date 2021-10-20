@@ -1,0 +1,102 @@
+<table class="general">
+  <tr>
+    <th>#</th>
+    <th>Topic name</th>
+    <th>Submission deadline</th>
+    <th>Review deadline</th>
+    <%for i in 2..review_rounds%>
+      <th>Submission deadline <%=i%></th>
+      <th>Review deadline <%=i%></th>
+    <%end%>
+  </tr>
+  <% i=0 %>
+  <% for i in 0..(@assignment.sign_up_topics.size - 1) %>
+    <tr>
+      <td><%= @assignment.sign_up_topics[i].topic_identifier %></td>
+      <td><%= @assignment.sign_up_topics[i].topic_name %></td>
+      <% for review_round in 1..review_rounds %>
+        <% topic_id = @assignment.sign_up_topics[i].id %>
+        <%# Add the javascript trigger for onfocusout only for the first input field in the table, this way we do not intentinally trigger it when changing the other dates %>
+        <%# Do not add for first topic because we use that as a references %>
+        <td><%= text_field :due_date, (topic_id.to_s + '_submission_' + review_round.to_s + '_due_date').to_s, size: 20, value: check_topic_due_date_value(assignment_submission_due_dates, topic_id, 1, review_round), class: 'datetimepicker', onfocusout: (i != 0 && review_round == 1) ? "javascript:populateDueDates(#{topic_id}, #{review_rounds})" : nil %></td>
+        <td><%= text_field :due_date, (topic_id.to_s + '_review_' + review_round.to_s + '_due_date').to_s, size: 20, value: check_topic_due_date_value(assignment_review_due_dates, topic_id, 2, review_round), class: 'datetimepicker' %></td>
+      <%end%>
+    </tr>
+  <% end %>
+</table>
+<br/>
+<%= submit_tag "Save start/due dates" %>
+
+
+<%# E1860 : Auto Populate the Dates when the instructor enters the first submission date of the topic %>
+<%# This is done based on the difference in dates of the first topic in that staggered Assignment %>
+<script type="text/javascript">
+$('.datetimepicker').datetimepicker({
+    dateFormat: 'yy/mm/dd',
+    timeFormat: 'HH:mm:ss'
+});
+
+function populateDueDates(topic_id, review_rounds) {
+    elementsArray = [];
+    $('[id^="due_date_<%= @assignment.sign_up_topics[0].id %>"]').each( function(i, e) {
+        /* you can use e.id instead of $(e).attr('id') */
+        elementsArray.push($(e).attr('value'));
+    });
+
+    // Calculate the offset Days from the difference in days of the first Topic.
+    var offsetArray = [];
+    var offset = 0
+    for (var i = 1; i < elementsArray.length; i++) {
+        // Check if the dates for first topic is filled up!
+        if (elementsArray[i] != "" && elementsArray[i-1] != "") {
+            offset += dateDiffInDays(new Date(elementsArray[i-1]), new Date(elementsArray[i]))
+            offsetArray.push(offset);
+        } else {
+            offsetArray.push(0);
+        }
+    }
+
+    // Get the ids of input field we need to populate
+    var ids = [];
+    for (i = 1; i <= review_rounds; i++) {
+        ids.push('due_date_' + topic_id + '_submission_' + i + '_due_date');
+        ids.push('due_date_' + topic_id + '_review_' + i + '_due_date');
+    }
+
+    // Date for the first Submission of the topic.
+    var initialDate = jQuery("#" + ids[0]).val();
+    for (i = 1; i < ids.length; i++) {
+        // Do not update the value if offset is 0
+        if (offsetArray[i-1] != 0) {
+            // Add Days to the starting date
+            var d = addDays(new Date(initialDate), offsetArray[i-1]);
+            // "00" + d.getHours() -> slice(-2) returns date and time in the format 08 instead of 8 when the date or time is in single digit
+            var formattedDate = d.getFullYear() + "-"  + 
+                                ("00" + (d.getMonth() + 1)).slice(-2) + "-" + 
+                                ("00" + d.getDate()).slice(-2) + " " + 
+                                ("00" + d.getHours()).slice(-2) + ":" + 
+                                ("00" + d.getMinutes()).slice(-2) + ":" + 
+                                ("00" + d.getSeconds()).slice(-2)
+            // Only Change the value of the field if it is empty, Do not change in case there is a date present there already
+            if (jQuery("#" + ids[i]).val() == "") {
+                jQuery("#" + ids[i]).val(formattedDate);
+            }
+        }
+    }
+}
+
+// Add the offset day to the current date
+function addDays(curDate, days) {
+    curDate.setDate(curDate.getDate() + days);
+    return curDate;
+}
+
+// Function used to calculate the difference between different deadline dates of the topic.
+function dateDiffInDays(a, b) {
+    const _MS_IN_DAY = 24 * 60 * 60 * 1000;
+    // Discard the time and time-zone information.
+    const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+    const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+    return Math.floor((utc2 - utc1) / _MS_IN_DAY);
+}
+</script>

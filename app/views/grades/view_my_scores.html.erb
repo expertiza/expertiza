@@ -1,0 +1,26 @@
+<H1>Score for <%= @assignment.name %></H1>
+
+
+
+<table class="grades" >
+<%= render :partial => 'grades/participant_charts', :locals => {:prefix => nil} %> 
+<%= render :partial => 'grades/participant_title', :locals => {:prefix => nil} %>
+<%= render :partial => 'grades/participant', :locals => {:prefix => 'user',
+								:team => false,
+								:participant_id => ptid = @participant.id,
+								:index => 0,
+								:team_size => 1, 
+								:pscore => @pscore} %>
+
+</table>
+<% case @assignment.reputation_algorithm %>
+<% when 'Hamer' %>
+	<h3>Reputation</h3>
+    <p id = "reputation_score" class = <%= get_css_style_for_hamer_reputation(@participant.Hamer)%> style = "width:60px;"><%= @participant.Hamer %></p>
+<% when 'Lauw' %>
+	<h3>Reputation</h3>
+    <p id = "reputation_score" class = <%= get_css_style_for_lauw_reputation(@participant.Lauw)%> style = "width:60px;"><%= @participant.Lauw %></p>
+<%end%>
+<BR/>
+<a href="javascript:window.history.back()">Back</a>
+

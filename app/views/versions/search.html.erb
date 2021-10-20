@@ -1,0 +1,73 @@
+<h1>Search logs</h1>
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <%= form_tag({controller: 'versions', action: 'search'}, method: 'get') do %>
+        <table>
+          <tr>
+            <td><%= label_tag(:type, 'ID:') %></td>
+            <td><%= number_field_tag(:id) %></td>
+            <td><%= label_tag(:user, "User:") %></td>
+            <td><%= select("post", "user_id",
+                    if current_user_role?.name == 'Super-Administrator'
+                        (User.all.collect {|u| [ u.name(session[:ip]), u.id ] }.insert(0, ['Any', 0]))
+                    else
+                        (User.where("id = #{current_user.id}").collect {|u| [ u.name(session[:ip]), u.id ] })
+                    end,
+                    ) %></td>
+          </tr>
+          <tr>
+            <td><%= label_tag(:item, "Type:") %></td>
+            <td><%= select("post", "item_type",
+                         Version.uniq.pluck(:item_type) << 'Any') %></td>
+            <td><%= label_tag(:before, "Start Date:") %></td>
+            <td><%= text_field_tag :start_time, Date.today.beginning_of_day.strftime("%Y-%m-%d %H:%M"), class: 'datetimeklass' %></td>
+          </tr>
+          <tr>
+            <td><%= label_tag(:event, "Event:") %></td>
+            <td><%= select("post", "event",
+                         Version.uniq.pluck(:event) << 'Any') %></td>
+            <td><%= label_tag(:after, "End Date:") %></td>
+            <td><%= text_field_tag :end_time, Time.now.strftime("%Y-%m-%d %H:%M"), class: 'datetimeklass' %></td>
+          </tr>
+        </table>
+        <br/>
+        <%= submit_tag('Search') %>
+    <% end %>
+  </div>
+</div>
+
+<br/>
+<script type="text/javascript">
+jQuery('.datetimeklass').datetimepicker({
+            dateFormat: 'yy/mm/dd',
+            timeFormat: 'HH:mm:ss z',
+            controlType: 'select',
+            timezoneList: [
+                { value: -000, label: 'GMT'},
+                { value: -300, label: 'Eastern'},
+                { value: -360, label: 'Central' },
+                { value: -420, label: 'Mountain' },
+                { value: -480, label: 'Pacific' }
+            ]
+        });
+</script>
+<%= render :partial => 'versions/pagination' %>
+
+<div>
+  <table>
+    <tr><th class="head">ID</th><th class="head">Type</th><th class="head">Item ID</th><th class="head">Event</th><th class="head">User</th><th class="head">Created</th></tr>
+    <% for version in @versions %>
+        <tr>
+          <td><%= link_to version.id, :action => 'show', :id => version.id %></td>
+          <td><%= version.item_type %></td>
+          <td><%= version.item_id %></td>
+          <td><%= version.event %></td>
+          <td><%= version.whodunnit %></td>
+          <td><%= version.created_at %></td>
+        </tr>
+    <% end -%>
+  </table>
+</div>
+<hr/>
+<%= render :partial => 'versions/pagination' %>
+<hr/>

@@ -1,0 +1,120 @@
+<table>
+  <% review_no = 1 %>
+  <% mappings.each do |map| %>
+      <%@sorted_responses=[]%>
+      <%- # ACS Have metareviews done for all teams   -%>
+      <%- # removed code that handles team and individual assignments differently   -%>
+      <% if map.type.to_s == "MetareviewResponseMap" %>
+          <% review_mapping = ResponseMap.find_by(id: map.reviewed_object_id) %>
+          <% team = AssignmentTeam.find_by(id: review_mapping.reviewee_id) %>
+      <% else %>
+          <% team = AssignmentTeam.find(map.reviewee_id) %>
+      <% end %>
+      <% participant = team.participants.first %>
+
+      <% if participant %>
+          <% topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id) %>
+          <tr>
+            <td>
+              <b><%= "#{title} #{review_no}." %></b>
+              <!--In ‘student_review/list’ page, if the topic_identifier is empty, ‘:’ sign should not be displayed.-->
+              <% if !topic_id.nil? %>
+                  <% if SignUpTopic.find(topic_id).topic_identifier != '' %>
+                      <%= " #{SignUpTopic.find(topic_id).topic_identifier}: #{SignUpTopic.find(topic_id).topic_name}" %>
+                  <% else %>
+                      <%= " #{SignUpTopic.find(topic_id).topic_name}" %>
+                  <% end %>
+              <% end %>
+
+              <%if !@assignment.is_anonymous%>
+                &nbsp; (author: <%= participant.fullname%>)
+              <%end%>
+            </td>
+            <% latest_submission = team.most_recent_submission %>
+            <td>&nbsp;</td>
+            <% if !map.response.empty? && latest_submission %>
+                <% array_not_empty = 0 %>
+                <% @sorted_responses = Array.new %>
+                <% @prev = Response.where(:map_id => map.id) %>
+                <% for element in @prev %>
+                    <% array_not_empty = 1 %>
+                    <% @sorted_responses << element %>
+                <% end %>
+
+                <% if array_not_empty == 1 %>
+                    <% @sorted_responses = @sorted_responses.sort_by {|obj| obj.updated_at} # the latest should be at the last%>
+                    <% @latest_response = @sorted_responses.last %>
+
+                    <%if @latest_response.round.nil?%>
+                      <% last_response_round = AssignmentDueDate.done_in_assignment_round(@assignment.id,@latest_response) %>
+                    <%else%>
+                      <% last_response_round = @latest_response.round %>
+                    <%end%>
+
+                    <% current_round = @assignment.number_of_current_round(topic_id) %>
+
+                    <td>
+                        <%= link_to "View", {:controller => 'response', :action => 'view', :id => @latest_response.id} %>
+                    </td>
+
+                    <% if @assignment.get_current_stage(topic_id) != "Finished" %>
+                      <%- # show the link as 'Edit' when latest review is done in current round -%>
+                      <%- # show link as 'Update' when latest review is done in different round or there has been a new submission in current round -%>
+                      <% if last_response_round == current_round%>
+
+                        <td>
+                          <%- # If review is not submitted (is still being edited), show an 'Edit' link. -%>
+                          <% if !@latest_response.is_submitted %>
+                              <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => @latest_response.id} %>
+
+                          <%- # If the submission has been updated since it was last reviewed, show an 'Update' link-%>
+                          <% elsif @latest_response.updated_at < latest_submission.updated_at %>
+                              <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
+                          <%end%>
+                        </td>
+                      <% else %>
+                        <td><%= link_to "Update", {:controller => 'response', :action => 'new', :id => map.map_id} %></td>
+                      <% end %>
+                    <% end %>
+                    <td><%= "  -- latest update at #{@latest_response.updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p")}" %></td>
+          <%end%>
+            <% elsif @assignment.get_current_stage(topic_id) != "Complete" && ((map.type.to_s == "MetareviewResponseMap" && @assignment.metareview_allowed(topic_id)) || @assignment.can_review(topic_id)) && latest_submission%>
+                <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
+                <td>&nbsp;&nbsp;</td>
+
+            <%- # If the team being reviewed has not submitted yet -%>
+            <% else %>
+                <td> Work has not yet been submitted for Review
+                <%= review_no  %></td>
+            <% end %>
+            <% review_no+=1 %>
+
+            <!--[zhewei, 1/20/2016]: show calibration results-->
+            <% calibration_response_map = ReviewResponseMap.where(["reviewed_object_id = ? and reviewee_id = ? and calibrate_to = ?", @assignment.id, map.reviewee_id, 1]).first rescue nil %>
+            <% if @assignment.is_calibrated and calibration_response_map and calibration_response_map.response and map.response.any? %>
+              <td>&nbsp;&nbsp;</td>
+              <td><%= link_to "Show calibration results", {controller: 'response', action: 'show_calibration_results_for_student', calibration_response_map_id: calibration_response_map.id, review_response_map_id: map.id} %></td>
+            <% end %>
+          </tr>
+      <% end %>
+
+     <% if map.type.to_s != "MetareviewResponseMap" %>
+       <% if @sorted_responses !=nil %>
+         <table class="grades" style=" font-style: italic; margin-left: 90px;">
+         <% if @sorted_responses.size > 1 %>
+           <%@sorted_responses = @sorted_responses.reverse%>
+           <% for i in 1..@sorted_responses.size-1 %>
+             <tr>
+               <td colspan="10"><%= link_to "Review done at --#{@sorted_responses[i].updated_at.strftime("%a, %b %d, %Y %I:%M:%S %p")}", {:controller => 'response', :action => 'view', :id => @sorted_responses[i].id} %></td>
+             </tr>
+           <% end %>
+         <% else %>
+           <tr>
+             <td> <font color="gray" style="font-style: italic;">No previous versions available</font></td>
+           </tr>
+         <% end %>
+         </table>
+       <% end %>
+     <% end %>
+  <% end %>
+</table>

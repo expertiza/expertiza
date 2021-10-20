@@ -1,0 +1,19 @@
+= render :partial => 'searchbox'
+- if @type == "ReviewResponseMap"
+  = render :partial => 'review_report'
+- elsif @type == "SelfReview"
+  = render :partial => 'self_review_report'
+- elsif @type == "SummaryByCriteria"
+  = render :partial => 'summary_report'
+- elsif @type == "SummaryByRevieweeAndCriteria"
+  = render :partial => 'summary_reviewee_report'
+- elsif @type == "FeedbackResponseMap"
+  = render :partial => 'feedback_report'
+- elsif @type == "TeammateReviewResponseMap"
+  = render :partial => 'teammate_review_report'
+- elsif @type == "Calibration"
+  = render :partial => 'calibration_report'
+- elsif @type == "PlagiarismCheckerReport"
+  = render :partial => 'plagiarism_checker_report'
+- elsif @type == "AnswerTaggingReport"
+  = render :partial => 'answer_tagging_report'

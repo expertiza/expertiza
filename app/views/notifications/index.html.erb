@@ -1,0 +1,32 @@
+<h1>Listing Notifications</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Course</th>
+      <th>Subject</th>
+      <th>Description</th>
+      <th>Expiration date</th>
+      <th>Active flag</th>
+      <th colspan="3">Actions</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @notifications.each do |notification| %>
+      <tr>
+        <td><%= notification.course.name rescue 'N/A' %></td>
+        <td><%= notification.subject %></td>
+        <td><%= notification.description %></td>
+        <td><%= notification.expiration_date %></td>
+        <td><%= notification.active_flag %></td>
+        <td><%= link_to 'Edit', edit_notification_path(notification) %></td>
+        <td><%= link_to 'Destroy', notification, method: :delete, :confirm => 'Are you sure?' %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Notification', new_notification_path %>

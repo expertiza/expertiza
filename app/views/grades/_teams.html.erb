@@ -1,0 +1,46 @@
+<% col_outer_th_span_value = 0 %>
+<% col_avg_th_span_value = 0 %>
+<% col_range_th_span_value = 0 %>
+<% case has_team_and_metareview?[:true_num] %>
+<% when 0 %>
+	<% col_outer_th_span_value = 4 %>
+	<% col_avg_th_span_value = 2 %>
+	<% col_range_th_span_value = 2 %>
+<% when 1 %>
+	<% col_outer_th_span_value = 6 %>
+	<% if has_team_and_metareview?[:has_team] and !has_team_and_metareview?[:has_metareview] %>
+		<% col_avg_th_span_value = 2 %>
+		<% col_range_th_span_value = 4 %>
+	<% else %>
+		<% col_avg_th_span_value = 4 %>
+		<% col_range_th_span_value = 2 %>
+	<% end %>
+<% else %>
+	<% col_outer_th_span_value = 8 %>
+	<% col_avg_th_span_value = 4 %>
+	<% col_range_th_span_value = 4 %>
+<% end %>
+
+<!-- TEAMS -->
+
+<% index = 0 %>
+<!--E1877: thead added to the row-->
+<thead>
+<%= render :partial => 'team_title', :locals => {:prefix => nil, 
+	 :col_outer_th_span_value => col_outer_th_span_value,
+	 :col_avg_th_span_value => col_avg_th_span_value,
+	 :col_range_th_span_value => col_range_th_span_value}  %>
+</thead>
+<!--E1877: tbody tag added to the table structure-->
+<tbody>
+<% for index in 0 .. @scores[:teams].length - 1 %>   
+     <%= render :partial => 'grades/team',
+                :locals => {:prefix => 'team'+index.to_s,
+                            :tscore => @scores[:teams][index.to_s.to_sym],
+                            :col_outer_th_span_value => col_outer_th_span_value,
+                            :col_avg_th_span_value => col_avg_th_span_value,
+			    			:col_range_th_span_value => col_range_th_span_value}  %>    
+  <% end %>
+</tbody>
+<!-- END TEAMS --> 
+

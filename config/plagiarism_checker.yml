@@ -1,0 +1,14 @@
+#This file contains the API keys used by the PlagiarismChecker
+
+development:
+  simicheck_api_key: 34fdeffbe203432383df873a0306b005595ff4c6f040447a9ec52cf7bee0af2a4b6ef22fdb414fe09dba556a50085505388f8b837afc4364b226d058a2dc84bc
+  google_docs_key: AIzaSyCL29lEEYdaWj-M6_cQRpUeNIJFN_gTrP4
+
+test:
+  simicheck_api_key: 34fdeffbe203432383df873a0306b005595ff4c6f040447a9ec52cf7bee0af2a4b6ef22fdb414fe09dba556a50085505388f8b837afc4364b226d058a2dc84bc
+  google_docs_key: AIzaSyCL29lEEYdaWj-M6_cQRpUeNIJFN_gTrP4
+
+# Change these values to appropriate values when deploying to production
+production:
+ simicheck_api_key: <%= ENV['SIMICHECK_API_KEY'] %>
+ google_docs_key: <%= ENV['GOOGLE_DOCS_KEY'] %>

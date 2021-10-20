@@ -1,0 +1,48 @@
+<h1>Signup sheet for <%= @assignment.name %> assignment</h1>
+
+<table class="general">
+  <tr><%= render :partial => 'table_header' %></tr>
+  <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
+      <b>Your topic(s):</b>
+      <% for selected_topic in @selected_topics %>
+        <br/><%= selected_topic.topic_name %>
+        <% if selected_topic.is_waitlisted == true %>
+          <font color='red'>(waitlisted)</font>
+        <% end %>
+      <% end %>
+  <% end %>
+  <br/><br/>
+
+  <% i=1 %>
+  <tbody id="tablelist">
+    <% for topic in @sign_up_topics %>
+      <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
+        <% for selected_topic in @selected_topics %>
+          <% if selected_topic.topic_id == topic.id and !selected_topic.is_waitlisted %>
+            <tr bgcolor="yellow">
+          <% elsif selected_topic.topic_id == topic.id and selected_topic.is_waitlisted%>
+           <tr bgcolor="lightgray">
+          <% else %>
+            <tr id="topic_<%= topic.id %>">
+          <% end %>
+        <% end %>
+      <% else %>
+        <tr id="topic_<%= topic.id %>">
+      <% end %>
+      <% is_suggested_topic = false %>
+      <%= render :partial => 'table_line', :locals => {:i=>i, :topic=>topic, :is_suggested_topic=>is_suggested_topic} %>
+      </tr>
+      <% i=i+1 %>
+    <% end %>
+  </tbody>
+</table>
+<br/><br/>
+
+<% if SignUpTopic.has_suggested_topic?(@assignment.id) %>
+    <%= render :partial => '/sign_up_sheet/suggested_topic' %>
+<% end %>
+
+<% session[:return_to] = request.url %>
+<br/><br/>
+<a href="javascript:history.back()">Back</a>
+<br/>

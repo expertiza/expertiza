@@ -1,0 +1,24 @@
+<div class="exp">
+
+  <table>
+    <tr><th class="head">Name</th><th class="head">Full Name</th><th class="head">Email Address</th><th class="head">Role</th><th class="head">Self Introduction</th><th class="head">Status</th><th class="head">Actions</th></tr>
+
+    <% @requested_users.each do |requested_user| %>
+      <%= form_tag action: :create_approved_user, id: requested_user.id do %>
+        <tr class="exp">
+          <td><%= requested_user.name %></td>
+          <td><%= requested_user.fullname %></td>
+          <td><%= mail_to requested_user.email, requested_user.email %></td>
+          <td><%= Role.find_by(id: requested_user.role_id).try(:name) %></td>
+          <td><%= requested_user.self_introduction %></td>
+          <td><%= requested_user.status %></td>
+          <% if requested_user.status == 'Under Review' %>
+            <td> <input type="radio" name="status" value="Approved"> Accept </td>
+            <td> <input type="radio" name="status" value="Rejected"> Reject </td>
+            <td> <%= submit_tag "Submit"%> </td>
+          <% end %>
+        </tr>
+      <% end %>
+    <% end %>
+  </table>
+</div>

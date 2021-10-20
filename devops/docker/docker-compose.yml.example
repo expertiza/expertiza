@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  expertiza:
+    image: winbobob/expertiza:ruby-2.2.7
+    ports:
+      - '3000:3000'
+    volumes:
+      - '.:/root/expertiza'
+    depends_on:
+      - scrubbed_db
+      - redis
+    links:
+      - scrubbed_db
+      - redis
+    working_dir: /root/expertiza
+    command: bundle exec thin start -p 3000
+    environment:
+      REDIS_HOST: redis
+
+  scrubbed_db:
+    image: mysql:5.7
+    volumes:
+      # https://stackoverflow.com/questions/25920029/setting-up-mysql-and-importing-dump-within-dockerfile
+      - './devops/docker/scrubbed_db:/docker-entrypoint-initdb.d'
+    environment:
+      MYSQL_ROOT_PASSWORD: [YOUR PASSWORD]
+
+  redis:
+    image: redis:alpine

@@ -1,0 +1,16 @@
+<p>
+  <b>Team:</b> <br>
+  <%=h Team.find_by(id: @join_team_request.team_id).try(:name) %>
+</p>
+
+<p>
+  <b>Comments:</b>  <br>
+  <%=h @join_team_request.comments %>
+</p>
+
+<p>
+  <b>Status:</b>  <br>
+  <%= display_request_status(@join_team_request) %>
+</p>
+
+<%= link_to "Edit Comment", action: 'edit' %>

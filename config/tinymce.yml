@@ -1,0 +1,11 @@
+menubar: false
+toolbar:
+  - link | media | codesample | undo redo |  formatselect | bold italic backcolor  | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help
+plugins:
+  - link
+  - media
+  - codesample
+height: 150
+width: 70%
+media_live_embeds: true
+browser_spellcheck: true

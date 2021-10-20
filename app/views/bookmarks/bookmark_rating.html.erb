@@ -1,0 +1,26 @@
+<h1>Rate bookmark <%= @bookmark.title %></h1>
+
+<p>
+  <%= label_tag 'Title:' %><br/>
+  <%= label_tag 'title', @bookmark.title %><br/><br/>
+  <%= label_tag 'Url:' %><br/>
+  <a href= <%= "http://#{@bookmark.url}" %> target='_blank'><%= label_tag 'url', @bookmark.url %></a><br/><br/>
+  <%= label_tag 'Description:' %><br/>
+  <%= label_tag 'description', @bookmark.description %><br/>
+</p>
+<%= form_tag :action => "save_bookmark_rating_score", :id => @bookmark.id do %>
+  <p>
+    <% params[:rate_score] = "0" %>
+    <select id="rate_score" name="rate_score" style="font-size:20px">
+      <% (0..5).each do |i| %>
+        <option value=<%= i.to_s %> 
+          <% if params[:rate_score] == i.to_s -%>
+            selected
+          <% end -%>
+        ><%= i.to_s %></option>
+      <% end %>
+    </select>
+    <%= submit_tag 'Rate bookmark' %> |
+  	<%= link_to 'Back', :action => 'list', :id => @bookmark.topic_id %>
+  </p>
+<% end %>

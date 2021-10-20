@@ -1,0 +1,136 @@
+<h2>Import <strong><em><%= @model %></em></strong> List</h2>
+
+<br/>
+
+<%= form_tag( { :controller => 'import_file', :action => 'show' },
+              { :method => 'post', :multipart => true, :name => 'import_form', :id => 'import_form' } ) do %>
+
+    <table>
+
+      <tr>
+        <td><strong>Delimiter:</strong></td>
+      </tr>
+      <tr>
+        <td>
+          <%= radio_button_tag 'delim_type','comma',true %> Comma<br/>
+          <%= radio_button_tag 'delim_type','space' %> Space<br/>
+          <%= radio_button_tag 'delim_type','tab' %> Tab<br/>
+          <%= radio_button_tag 'delim_type','other' %> Other <%= text_field_tag 'other_char' %><br/>
+        </td>
+      </tr>
+
+      <tr><td><br/></td></tr>
+
+      <tr>
+        <td><strong>Header:</strong></td>
+      </tr>
+      <tr>
+        <td>
+          <%= radio_button_tag 'has_header', 'true' %> File has a header<br/>
+          <%= radio_button_tag 'has_header', 'false', true %> File does not have a header<br/>
+        </td>
+      </tr>
+
+      <% if @model == 'SignUpTopic' %>
+
+          <tr><td><br/></td></tr>
+
+          <tr>
+            <td><strong>Optional Columns:</strong></td>
+          </tr>
+          <tr>
+            <td>
+              <%= check_box_tag('category', 'true') %> Topic Category<br/>
+              <%= check_box_tag('description', 'true') %> Topic Description<br/>
+              <%= check_box_tag('link', 'true') %> Topic Link<br/>
+            </td>
+          </tr>
+
+      <% end %>
+
+    </table>
+
+    <% if @model == 'AssignmentTeam' or @model == 'CourseTeam' %>
+       <br/>
+       <table>
+        <tr>
+          <td><strong>Team Name:</strong></td>
+        </tr>
+        <tr>
+          <td>
+            <%= radio_button_tag 'has_teamname', 'true_first', true %> File has a team name as first column<br/>
+            <%= radio_button_tag 'has_teamname', 'true_last' %> File has a team name as last column<br/>
+            <%= radio_button_tag 'has_teamname', 'false' %> File does not contain team names<br/>
+          </td>
+        </tr>
+       </table>
+        <br/>
+
+        <label for="options[handle_dups]">If a duplicate team name is found in the roster,</label>
+        <select id="options[handle_dups]" name="options[handle_dups]">
+          <option value="ignore">ignore the new team</option>
+          <option value="replace">replace the existing team with the new team</option>
+          <option value="insert">insert any new members into the existing team</option>
+          <option value="rename">rename the new team and import</option>
+        </select>
+
+        <br/>
+
+    <% end %>
+
+    <br/>
+
+    <% if @model == 'ReviewResponseMap' %>
+        <table>
+          <tr>
+            <td><strong>Contributor:</strong></td>
+          </tr>
+          <tr>
+            <td>
+              <%= radio_button_tag 'has_reviewee', 'true_first',true %> File has a contributor as first column<br/>
+              <%= radio_button_tag 'has_reviewee', 'true_last' %> File has a contributor as last column<br/>
+            </td>
+          </tr>
+        </table>
+        <br/>
+    <% end %>
+
+    <% if @model == 'MetareviewResponseMap' %>
+        <table>
+          <tr>
+            <td><strong>Contributor and Reviewer:</strong></td>
+          </tr>
+          <tr>
+            <td>
+              <%= radio_button_tag 'has_reviewee', 'true_first',true%> File has a contributor and reviewer as first and second columns<br/>
+              <%= radio_button_tag 'has_reviewee', 'true_last' %> File has a contributor and reviewer as last and second last columns<br/>
+            </td>
+          </tr>
+        </table>
+        <br/>
+    <% end %>
+
+    <label for="file">File to import: </label>
+    <%= file_field_tag 'file', :size => 40, :id => 'import_file' %>
+
+    <br/>
+
+    <%= hidden_field_tag('model', @model) %>
+
+    <%= hidden_field_tag('id', @id) %>
+
+    <p>
+      <strong>NOTE:</strong>
+      <br/>
+      The import process expects the following columns:
+      <br/>
+      <%= @expected_fields.html_safe unless @expected_fields.nil? %>
+    </p>
+
+    <button type="button" class='btn btn-primary' onclick='checkForFile()'>Import</button>
+
+<% end %>
+
+<br/>
+
+<a href="<%= session[:return_to]%>">Back</a>

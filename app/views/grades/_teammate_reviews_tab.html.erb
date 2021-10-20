@@ -1,0 +1,20 @@
+<!--ACS Teammate review needs to be done only if there are more than one person in the team-->
+<% if has_team_and_metareview?[:has_team] %>
+  <% if @assignment.show_teammate_reviews || session[:user].role_id == 2 || session[:user].role_id == 3 || session[:user].role_id == 4 || session[:user].role_id == 6%>
+    <table class="participants" width="100%">
+      <% tscore[:team].participants.each_with_index do |participant, index| %>
+        <% pscore = @scores[:participants][participant.id.to_s.to_sym] %>
+        <tr style="background-color: #f9f9f9">
+          <td>
+            <a href="#" id="<%=prefix%>_<%=index.to_s%>_teammate_reviewsLink" name="<%=prefix%>_teammate_reviewsLink" onClick="toggleElement('<%=prefix%>_<%=index.to_s%>_teammate_reviews','teammate reviews');return false;"> <b> <%=participant.fullname(session[:ip]) %></b></a> (<%= pscore[:teammate][:assessments].size %>)
+          </td>
+        </tr>
+        <tr id="<%=prefix%>_<%=index.to_s%>_teammate_reviews" style="display:none">
+           <td>
+        <%= view_heatgrid(participant.id, "TeammateReviewQuestionnaire") %>
+      </td>
+        </tr>
+      <% end %>
+    </table>
+  <% end %>
+<% end %>

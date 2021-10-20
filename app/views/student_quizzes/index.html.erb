@@ -1,0 +1,11 @@
+<h2>Quizzes for "<%= @assignment.name %>"</h2>
+
+<% if @assignment.quiz_allowed(@reviewee_topic_id) or @assignment.get_current_stage(@reviewee_topic_id) == "Complete" %>
+  <%= render :partial => 'responses', :locals => {:mappings => @quiz_mappings} %>
+  <%= render :partial => 'set_dynamic_quiz', :locals => {:assignment => @assignment, :participant => @participant} %>
+<% else %>
+  <p><em>This assignment does not support quizzes</em></p>
+<% end %>
+
+<br><br>
+<a href="javascript:window.history.back()">Back</a>

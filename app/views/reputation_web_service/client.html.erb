@@ -1,0 +1,176 @@
+<%= form_tag action: "send_post_request" do %>
+	<b style="font-size: 20px;">Step 1: </b>Assignment_id: <%= number_field_tag 'assignment_id', nil, in: 1..@max_assignment_id, value: @assignment.nil? ? 724 : @assignment.id, style: 'width: 3em;' %> + <%= number_field_tag 'another_assignment_id', nil, in: 1..@max_assignment_id, value: @another_assignment.nil? ? '' : @another_assignment.id, style: 'width: 3em;' %> (optional) with round <%= number_field_tag 'round_num', nil, in: 1..3, value: 2, style: 'width: 2em;' %><br>
+
+	<b style="font-size: 20px;">Step 2: </b>Choose reputation algorithm:
+	<select id='algorithm' name='algorithm' style="width: 13em">
+	    <option value='hamer' selected>
+	      Hamer's algorithm
+	    </option>
+	    <option value='hamer-expert' >
+	      Hamer-expert algorithm
+	    </option>
+	    <option value='lauw' >
+	      Lauw's algorithm
+	    </option>
+	    <option value='lauw-expert' >
+	      Lauw-expert algorithm
+	    </option>
+	    <option value='quiz' >
+	      Quiz-based algorithm
+	    </option>
+	    <!--
+	    <option value='cho' >
+	      Cho's algorithm
+	    </option>
+	    -->
+	</select><br>
+
+	<b style="font-size: 20px;">Step 3: </b>Additional information: <br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<%= hidden_field_tag 'checkbox[expert_grade]', '' %>
+	<%= check_box_tag 'checkbox[expert_grade]', 'Add expert grades' %>Add expert grades <br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<%= hidden_field_tag 'checkbox[hamer]', '' %>
+	<%= check_box_tag 'checkbox[hamer]', 'Add initial Hamer reputation values' %>Add initial Hamer reputation values 
+	with assignment_id: <%= number_field_tag 'hamer_assignment_id', nil, in: 1..@max_assignment_id, value: '', style: 'width: 3em;' %> + <%= number_field_tag 'another_hamer_assignment_id', nil, in: 1..@max_assignment_id, value: '', style: 'width: 3em;' %> (optional) <br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<%= hidden_field_tag 'checkbox[lauw]', '' %> 
+	<%= check_box_tag 'checkbox[lauw]', 'Add initial Lauw reputation values' %>Add initial Lauw reputation values 
+	with assignment_id:&nbsp;&nbsp;&nbsp;<%= number_field_tag 'lauw_assignment_id', nil, in: 1..@max_assignment_id, value: '', style: 'width: 3em;' %> + <%= number_field_tag 'another_lauw_assignment_id', nil, in: 1..@max_assignment_id, value: '', style: 'width: 3em;' %> (optional) <br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<%= hidden_field_tag 'checkbox[quiz]', '' %>
+	<%= check_box_tag 'checkbox[quiz]', 'Add quiz scores' %>Add quiz scores <br/>
+	<b style="font-size: 20px;">Step 4: </b><%= submit_tag 'Send request' %>
+<% end %>
+<hr>
+<!--Request information-->
+<%= "Request info: #{@assignment.name} (#{@assignment.id})" unless @assignment.nil? %>
+<%= " + #{@another_assignment.name} (#{@another_assignment.id})" unless @another_assignment.nil? %>
+<%= " + round #{@round_num}" unless @assignment.nil? %>
+<%= " + #{@algorithm} algorithm" unless @assignment.nil? %>
+<%= " + #{@additional_info}" unless @additional_info.try(:empty?) %>
+<br/><br/>
+
+<!--Beautified request and response message-->
+<b>Beautified request and response information</b>
+<table border = '1' width="60%">
+	<tr>
+		<th style="text-align: center;"> Request JSON </th>
+		<th style="text-align: center;"> Response JSON </th>
+	</tr>
+	<tr>
+		<td valign="top" width="50%"> <pre><code id='request'></code></pre> </td>
+		<td valign="top" width="50%"> <pre><code id='response'></code></pre> </td>
+	</tr>
+</table>
+<br/>
+
+<!--Minified request and response message-->
+<b>Minified request and response message</b><br/>
+<p style="background-color: #fdf6e3; color: #657b83; padding: 5px; word-wrap: break-word;">
+	<%=@request_body unless @request_body.try(:empty?) %><br/><br/>
+	<%="Response #{@response.try(:code)} #{@response.try(:message)}:
+          #{@response.try(:body)}" unless @response == '' %>
+</p>
+
+
+<style>
+	pre {
+	   background-color: white;
+	   border: 0px;
+	   padding: 10px 30px;
+	   margin: 20px; 
+	   }
+	.json-key {
+	   color: brown;
+	   }
+	.json-value {
+	   color: navy;
+	   }
+	.json-string {
+	   color: olive;
+	   }
+</style>
+
+<script>
+
+	$(document).ready(function beautifyJson() {
+		if (!library)
+   			var library = {};
+
+		library.json = {
+		   replacer: function(match, pIndent, pKey, pVal, pEnd) {
+		      var key = '<span class=json-key>';
+		      var val = '<span class=json-value>';
+		      var str = '<span class=json-string>';
+		      var r = pIndent || '';
+		      if (pKey)
+		         r = r + key + pKey.replace(/[": ]/g, '') + '</span>: ';
+		      if (pVal)
+		         r = r + (pVal[0] == '"' ? str : val) + pVal + '</span>';
+		      return r + (pEnd || '');
+		      },
+		   prettyPrint: function(obj) {
+		      var jsonLine = /^( *)("[\w]+": )?("[^"]*"|[\w.+-]*)?([,[{])?$/mg;
+		      return JSON.stringify(obj, null, 3)
+		         .replace(/&/g, '&amp;').replace(/\\"/g, '&quot;')
+		         .replace(/</g, '&lt;').replace(/>/g, '&gt;')
+		         .replace(jsonLine, library.json.replacer);
+		      }
+		   };
+		// http://stackoverflow.com/questions/5410682/parsing-a-json-string-in-ruby
+		// http://stackoverflow.com/questions/9244824/how-to-remove-quot-from-my-json-in-javascript
+		// &quot; is not valid in a JSON object, and g in replace means replace globally
+		var request = JSON.parse('<%= @request_body %>'.replace(/&quot;/g,'"'));
+		var response = JSON.parse('<%= @response_body %>'.replace(/&quot;/g,'"'));
+		
+		$('#request').html(library.json.prettyPrint(request));
+		$('#response').html(library.json.prettyPrint(response));
+	});
+
+	$('#algorithm').change(function changeDropdown(){
+		var selectedDropdownValue = $('#algorithm').find(":selected").val();
+		switch(selectedDropdownValue) {
+	    case 'hamer-expert':
+	    case 'lauw-expert':
+	        $("input[id='checkbox_expert_grade'][type='checkbox']").prop("checked", true);
+	        $("input[id='checkbox_hamer'][type='checkbox']").prop("checked", false);
+	        $("input[id='checkbox_lauw'][type='checkbox']").prop("checked", false);
+	        $("input[id='checkbox_quiz'][type='checkbox']").prop("checked", false);
+	        $("input[id='checkbox_expert_grade'][type='checkbox']").prop("disabled", true);
+	        $("input[id='checkbox_hamer'][type='checkbox']").prop("disabled", false);
+	        $("input[id='checkbox_lauw'][type='checkbox']").prop("disabled", false);
+	        $("input[id='checkbox_quiz'][type='checkbox']").prop("disabled", false);
+	        // in order to pass the params of disabled checkbox
+	        // we have to assign the value to a hidden input with same id
+	        $("input[id='checkbox_expert_grade'][type='hidden']").prop("value", 'Add expert grades');
+	        $("input[id='checkbox_quiz'][type='hidden']").prop("value", '');
+	        break;
+	    case 'quiz':
+	   		$("input[id='checkbox_expert_grade'][type='checkbox']").prop("checked", false);
+	        $("input[id='checkbox_hamer'][type='checkbox']").prop("checked", false);
+	        $("input[id='checkbox_lauw'][type='checkbox']").prop("checked", false);
+	        $("input[id='checkbox_quiz'][type='checkbox']").prop("checked", true);
+	        $("input[id='checkbox_expert_grade'][type='checkbox']").prop("disabled", false);
+	        $("input[id='checkbox_hamer'][type='checkbox']").prop("disabled", false);
+	        $("input[id='checkbox_lauw'][type='checkbox']").prop("disabled", false);
+	        $("input[id='checkbox_quiz'][type='checkbox']").prop("disabled", true);
+	        // hidden field
+	        $("input[id='checkbox_expert_grade'][type='hidden']").prop("value", '');
+	        $("input[id='checkbox_quiz'][type='hidden']").prop("value", 'Add quiz scores');
+	        break;
+	    default:
+	    	$("input[id='checkbox_expert_grade'][type='checkbox']").prop("checked", false);
+	        $("input[id='checkbox_hamer'][type='checkbox']").prop("checked", false);
+	        $("input[id='checkbox_lauw'][type='checkbox']").prop("checked", false);
+	        $("input[id='checkbox_quiz'][type='checkbox']").prop("checked", false);
+	        $("input[id='checkbox_expert_grade'][type='checkbox']").prop("disabled", false);
+	        $("input[id='checkbox_hamer'][type='checkbox']").prop("disabled", false);
+	        $("input[id='checkbox_lauw'][type='checkbox']").prop("disabled", false);
+	        $("input[id='checkbox_quiz'][type='checkbox']").prop("disabled", false);
+	        //hidden field
+	        $("input[id='checkbox_expert_grade'][type='hidden']").prop("value", '');
+	        $("input[id='checkbox_quiz'][type='hidden']").prop("value", '');
+		}
+	});	
+</script>

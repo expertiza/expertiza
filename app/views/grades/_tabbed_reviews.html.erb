@@ -1,0 +1,59 @@
+<% if rscore and rscore[:assessments].length > 0 %>
+    <% count = 0 %>
+    <!--Zhewei: If this assignment supports varying rubrics by round, Expertiza will display all-round reviews. -->
+    <!--And if one reviewer did not do first-round review and did second round directly, Expertiza will display only second round.-->
+    <!--If another reviewer only finished first-round review and did not do second round, Expertiza will display only first round.-->
+    <!--If this assignment does not support varying rubrics by round, Expertiza will display last round review.--> 
+    <% rounds = Array.new %>
+    <% rscore[:assessments].uniq{|response| response.round }.each do |response| %>
+        <% rounds << response.round %>
+    <% end %>
+
+    <% rounds.each do |round| %>
+        <h3>Round <%= round %></h3>
+        <a href="#" name= <%= participant.id.to_s + '_' + round.to_s + "Link" %> onClick="toggleElement('<%= participant.id.to_s + '_' + round.to_s %>','round <%= round.to_s%> reviews');return false;">show round <%= round.to_s%> reviews</a>
+        <table class="table table-striped" style="display: none;" id=<%= participant.id.to_s + '_' + round.to_s %>>
+            <% rscore[:assessments].select{|response| response.round == round}.reverse.uniq{|response| response.map_id}.sort_by{|response| response.map_id}.each_with_index do |review, index| %>
+                <tr><td>
+                <% review_feedback = nil %>
+                <% count = count + 1 %>
+                <% prefix = nil if controller.action_name == "view_my_scores" %>
+
+                <!--<%= review.display_as_html(nil, count, nil, true) %><BR/>-->
+                <!--change code in order to compat to multi-round review-->
+                <% if @assignment.varying_rubrics_by_round? and !review.round.nil? %>
+                    <% review_symbol = 'review' + review.round.to_s %>
+                <% else %>
+                    <% review_symbol = 'review' %>
+                <% end %>
+                <% @questions[review_symbol.to_sym].each do |question| %>
+                    <% if question.instance_of? UploadFile %>
+                        <!-- Display FileUpload question type -->
+                        <% current_folder = DisplayOption.new %>
+                        <% current_folder.name = "" %>
+                        <% files = @participant.files(@participant.review_file_path(review.response_map.id).to_s + current_folder.name) %>
+                        <%= display_directory_tree(@participant, files, true).html_safe %>
+                    <% end %>
+                <% end %>
+
+                <!-- Generate the feedback html -->
+                <% feedback_html = '' %>
+                <% map = FeedbackResponseMap.where(reviewed_object_id: review.id, reviewer_id: participant.id).first
+                   review_feedbacks = map.try :response %>
+                <% if review_feedbacks && !review_feedbacks.empty? %>
+                    <% feedback_html = link_to 'View', :controller => 'response', :action => 'view', :id => review_feedbacks.first.id %>
+                    <% feedback_html += ' or ' %>
+                    <% feedback_html += link_to 'Edit', :controller => 'response', :action => 'edit', :id => review_feedbacks.first.id, :return => "feedback" %>
+                    <% feedback_html += ' feedback for Review ' + count.to_s %>
+                <% else %>
+                    <% feedback_html += link_to 'Give feedback', :controller => 'response', :action => 'new_feedback', :id => review.id %>
+                    <% feedback_html += ' for Review ' + count.to_s %>
+                <% end %>
+                <%= review.display_as_html(prefix, index + 1, nil, true) %>
+                </td></tr>
+            <% end %>
+        </table><hr>
+    <% end %>
+<% else %>
+    <i>No reviews have been completed for this user's submissions.</i>
+<% end %>

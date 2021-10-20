@@ -1,0 +1,30 @@
+<% level += 1 %>
+<% items.each do |item_id|
+  item = session[:menu].get_item(item_id)
+  selected = session[:menu].selected?(item.id)
+  long_name = item.name.split(/\W/).collect{|word| word.capitalize}.join(' ')
+%>
+    <% if level == 1 %>
+        <li class="dropdown first-level">
+    <% elsif level == 2 %>
+        <li class="dropdown-submenu">
+    <% else %>
+        <li class="dropdown">
+    <% end %>
+    <a href=<%= URI.encode("/menu/#{item.name}") %>
+                 <%= if item.children
+                       ' class="daddy"'
+                     end %>title='<%= long_name %>'><%= item.label.html_safe %></a>
+    <% if item.children -%>
+        <% if level == 1 %>
+            <ul class="dropdown-menu pull-left">
+              <%= render :partial => 'menu_items/suckerfish', :locals => {:items => item.children, :level => level} %>
+            </ul>
+        <% else %>
+            <ul class="dropdown-menu">
+              <%= render :partial => 'menu_items/suckerfish', :locals => {:items => item.children, :level => level} %>
+            </ul>
+        <% end %>
+    <% end -%>
+    </li>
+<% end -%>

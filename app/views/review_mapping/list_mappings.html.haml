@@ -1,0 +1,6 @@
+#flash_message
+%h1 Participants
+%h2
+  Assignment: #{@assignment.name}
+= render :partial => "list_review_mappings", :locals => { :assignment => @assignment, :items => @items }
+= link_to 'Back', :controller => 'tree_display', :action => 'list'

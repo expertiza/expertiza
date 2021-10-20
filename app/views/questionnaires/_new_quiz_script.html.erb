@@ -1,0 +1,48 @@
+<script type="text/javascript">
+  jQuery(function(){
+    // For each radio button whose name is 'content[id]':
+      jQuery("input[type='radio'][value='MultipleChoiceRadio']").each(function(index, button){
+        // Give the button a certain click behaviour:
+          jQuery(button).change(function(){
+            var question_num = index + 1;
+              $('#check_boxes' + question_num).hide();
+              $('#essay' + question_num).hide();
+              $('#true_false' + question_num).hide();
+              $('#radio_buttons' + question_num).show();
+          });
+      });
+
+      jQuery("input[type='radio'][value='TrueFalse']").each(function(index, button){
+        // Give the button a certain click behaviour:
+          jQuery(button).change(function(){
+            var question_num = index + 1;
+              $('#check_boxes' + question_num).hide();
+              $('#radio_buttons' + question_num).hide();
+              $('#essay' + question_num).hide();
+              $('#true_false' + question_num).show();
+          });
+      });
+
+      jQuery("input[type='radio'][value='Essay']").each(function(index, button){
+        // Give the button a certain click behaviour:
+          jQuery(button).change(function(){
+            var question_num = index + 1;
+              $('#check_boxes' + question_num).hide();
+              $('#true_false' + question_num).hide();
+              $('#radio_buttons' + question_num).hide();
+              $('#essay' + question_num).show();
+          });
+      });
+
+      jQuery("input[type='radio'][value='MultipleChoiceCheckbox']").each(function(index, button){
+        // Give the button a certain click behaviour:
+          jQuery(button).change(function(){
+            var question_num = index + 1;
+              $('#radio_buttons' + question_num).hide();
+              $('#true_false' + question_num).hide();
+              $('#essay' + question_num).hide();
+              $('#check_boxes' + question_num).show();
+          });
+      });
+  });
+</script>

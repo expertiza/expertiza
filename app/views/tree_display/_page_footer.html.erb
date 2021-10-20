@@ -1,0 +1,21 @@
+<% if @child_nodes.length > 0 %>
+  <table id="theTable" width="80%" cell="5">
+    <tr id="header"><th colspan="5" width="70%">Details</th><th width="10%">Actions</th></tr>
+    <%
+      index = 1
+    @child_nodes.each do |node|
+      if index % 2 == 0
+        rowtype = "odd"
+      else
+        rowtype = "even"
+      end
+    %>
+  <!-- Start Listing -->
+  <%= render :partial=> '/tree_display/entry', :locals => {:search => @search, :node => node, :prefix => node.node_object_id.to_s+"_"+index.to_s, :depth => 0, :rowtype => rowtype} %>
+  <!-- End Listing -->
+  <%
+      index+=1
+    end
+  %>
+</table>
+<% end %>

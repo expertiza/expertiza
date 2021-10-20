@@ -1,0 +1,13 @@
+Instructor of  <%= @assignment.name %>,<br/>
+
+<p>
+  <%= @reviewer_name %> has just submitted a <%= @type %> of <%= @reviewee_name %>'s artifact.The new score is <%= sprintf("%.2f",@new_score*100) %>%.
+  This score differs from the previous average score by more than the threshold.
+  The url for conflicting response url is <%= @conflicting_response_url%>.<br/>
+  The url for summary of responses is <%= @summary_url%>.<br/>
+  If you want to change the notification threshold on grade conflicts, you can find it on "Rubrics" tab on assignment edit page: <%= @assignment_edit_url%>.
+</p>
+
+<BR/>
+Assignment: <%= @assignment.name %>
+<BR/>

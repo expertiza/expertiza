@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<script>
+
+  $(function () {
+    /*Function for sorting the table */
+    $(".sortable").tablesorter({
+      sortList: [[0,0]] //sort First Column by default when page loads
+    });
+  });
+
+  /*Function to create tabs of the rubric-tag_prompt pairs */
+  $( function() {
+    $( "#tabs" ).tabs();
+  } );
+</script>
+
+<div id="main div">
+  <% if @review_final_versions.keys.nil? or @review_final_versions.keys.length < 1 %>
+    <h2>No scores</h2>
+  <% else %>
+    <div class="text-center">
+      <h4>Tone Analysis Charts</h4>
+    </div>
+
+    <div class="chart-table" id="tabs">
+      <ul>
+        <% @review_final_versions.keys.each_index do | idx | %>
+          <li>
+            <a href="#tab-<%= idx + 1 %>" id="tabmenu_<%= idx + 1 %>"><%= "Round " + (idx + 1).to_s %></a>
+          </li>
+        <% end %>
+      </ul>
+      <% @review_final_versions.keys.each_index do | idx | %>
+        <p>
+          <div id="tab-<%= idx + 1 %>">
+            <div class="intrinsic-container intrinsic-container-16x9">
+              <% if !@heatmap_urls[ idx ].nil?%>
+                  <iframe src="<%= @heatmap_urls[ idx ][ 'url' ] %>"></iframe>
+              <% else %>
+                  <h3>No reviews found in this round</h3>
+              <% end %>
+            </div>
+          </div>
+        </p>
+      <% end %>
+    </div>
+  <% end %>
+  
+</div>
+
+<style>
+.intrinsic-container {
+  position: relative;
+  height: 0;
+  overflow: hidden;
+}
+ 
+/* 16x9 Aspect Ratio */
+.intrinsic-container-16x9 {
+  padding-bottom: 56.25%;
+  border:none;
+  min-width: 600px;
+  min-height: 600px;
+}
+ 
+/* 4x3 Aspect Ratio */
+.intrinsic-container-4x3 {
+  padding-bottom: 75%;
+  border:none;
+}
+ 
+.intrinsic-container iframe {
+  position: absolute;
+  top:0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+</style>

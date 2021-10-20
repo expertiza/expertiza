@@ -1,0 +1,115 @@
+/**
+* stylesheet for changes specific to review form page
+* includes css changes for star rating
+**/
+#stars_div{
+  display: inline-block;
+  height: 20px;
+  width: 11%;
+  padding-top: 6px;
+  padding-left: 10px;
+}
+
+#min_label{
+  display: inline-block;
+  color: #606360;
+  padding-right: 10px;
+}
+
+#max_label{
+  display: inline-block;
+  color: #606360;
+  padding-left: 5px;
+}
+
+.br-theme-fontawesome-stars .br-widget {
+  height: 28px;
+  white-space: nowrap;
+}
+.br-theme-fontawesome-stars .br-widget a {
+  font: normal normal normal 20px/1 FontAwesome;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  text-decoration: none;
+  margin-right: 2px;
+}
+.br-theme-fontawesome-stars .br-widget a:after {
+  content: '\f005';
+  color: #d2d2d2;
+}
+.br-theme-fontawesome-stars .br-widget a.br-active:after {
+  color:  #986633
+;
+}
+.br-theme-fontawesome-stars .br-widget a.br-selected:after {
+  color:  #986633
+;
+}
+.br-theme-fontawesome-stars .br-widget .br-current-rating {
+  display: none;
+}
+.br-theme-fontawesome-stars .br-readonly a {
+  cursor: default;
+}
+
+@media print {
+  .br-theme-fontawesome-stars .br-widget a:after {
+    content: '\f006';
+    color: black;
+  }
+  .br-theme-fontawesome-stars .br-widget a.br-active:after,
+  .br-theme-fontawesome-stars .br-widget a.br-selected:after {
+    content: '\f005';
+    color: black;
+  }
+}
+
+
+.br-wrapper.br-theme-fontawesome-stars .br-widget{
+  float: left;
+  position: absolute;
+  width: 8%;
+}
+
+.br-theme-fontawesome-stars .br-widget .br-current-rating {
+  display: inline-block;
+  line-height: 1.3;
+  color:  #986633;
+  font-size: 17px;
+  font-weight: 400;
+  top: 0px;
+  //float: right;
+  padding-left: 12px;
+  padding-right: 5px;
+}
+
+#save_progress{
+  float: right;
+}
+
+#tick{
+  font-size: 25px;
+  color: forestgreen;
+}
+
+input[type=submit].disabled,
+input[type=button].disabled {
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.loader {
+  border: 5px solid #f3f3f3; /* Light grey */
+  border-top: 5px solid #030303; /* Blue */
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

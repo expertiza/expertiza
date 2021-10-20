@@ -1,0 +1,39 @@
+<!-- PARTICIPANT -->
+<%
+    participant = pscore[:participant]
+
+%>
+
+
+<% namecolwidth = 18 %>
+<% colwidth = 7  %>
+
+<TABLE class="grades">
+
+  <TR>
+    <th style="text-align:left;" WIDTH="<%=colwidth %>%">Contributor</th>
+    <th style="text-align:center;" WIDTH="<%= colwidth %>%">Average</th>
+    <th style="text-align:center;" WIDTH="<%= colwidth %>%">Range</th>
+  </TR>
+
+  <TR <% if team %> id="<%= prefix %>" style="display:none; background-color: white;" <% end %>>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= participant.fullname(session[:ip]) %>
+    <% if participant.topic %> (<%= participant.topic.topic_identifier %>)<% end %>
+  </FONT>
+</TD>
+<% if @rscore_feedback.my_avg %>
+  <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",@rscore_feedback.my_avg) %>%
+  </TD>
+  <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",@rscore_feedback.my_min) %>% - <%= sprintf("%.0f",@rscore_feedback.my_max) %>%
+
+  </TD>
+<% else %>
+  <TD ALIGN="CENTER">---</TD>
+  <TD ALIGN="CENTER">---</TD>
+<% end %>
+
+</TABLE>
+</br> </br>
+<%= render :partial=>'grades/author_feedbacks', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:feedback]} %>
+
+</br>

@@ -1,0 +1,49 @@
+<style>
+  th, td {
+    text-align: center;
+}
+</style>
+  <table class="table table-striped">
+    <tr>
+      <th rowspan=2 width="320">Students</th>
+      <th rowspan=2 width="30">Teammate Count</th>
+      <% @assignments.each do |assignment| %>
+        <th colspan=2 width="300"> <%= assignment.name %> </th>
+      <% end %>
+      <th colspan="2" width="300">Aggregate Score</th>
+    </tr>
+    <tr>
+      <% (0..@assignments.size).each do %>
+        <td><b>Metareviews</b></td>
+        <td><b>Teammate Reviews</b></td>
+      <% end %>
+    </tr>
+
+    <% @course_participants.each do |cp|%>
+        <tr>
+            <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
+            <td><%= @teamed_count[cp.id] %></td>
+            <% @assignments.each do |assignment|%>
+                <td><%= @meta_review[cp.id][assignment.id] %></td>
+                <td><%= @teammate_review[cp.id][assignment.id] %></td>
+            <% end%>
+            <td><%= @meta_review[cp.id][:avg_grade_for_assgt] %></td>
+            <td><%= @teammate_review[cp.id][:avg_grade_for_assgt] %></td>
+        </tr>
+    <%end%>
+        <tr>
+            <td><b>Class Average</b></td>
+            <td></td>
+            <% @assignments.each do |assignment|%>
+                <td><%= "#{@overall_meta_review_grades[assignment.id] / @overall_meta_review_count[assignment.id]}%" %></td>
+                <td><%= "#{@overall_teammate_review_grades[assignment.id] / @overall_teammate_review_count[assignment.id]}%" %></td>
+            <% end%>
+            <% total_meta_review_grade = @overall_meta_review_grades.inject(0) {|sum, (k, v)| sum + v } %>
+            <% total_meta_review_count = @overall_meta_review_count.inject(0) {|sum, (k, v)| sum + v } %>
+            <td><%= "#{total_meta_review_grade / total_meta_review_count}%" %></td>
+            <% total_teammate_review_grade = @overall_teammate_review_grades.inject(0) {|sum, (k, v)| sum + v } %>
+            <% total_teammate_review_count = @overall_teammate_review_count.inject(0) {|sum, (k, v)| sum + v } %>
+            <td><%= "#{total_teammate_review_grade / total_teammate_review_count}%" %></td>
+        </tr>
+    </table>
+</div>

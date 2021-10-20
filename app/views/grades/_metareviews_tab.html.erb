@@ -1,0 +1,19 @@
+<% if has_team_and_metareview?[:has_metareview] %>
+<table class="participants" width="100%">
+  <% tscore[:team].participants.each_with_index do |participant, index| %>
+    <% pscore = @scores[:participants][participant.id.to_s.to_sym] %>
+    <tr style="background-color: #f9f9f9">
+      <td>
+        <a href="#" id="<%=prefix%>_mreviewsLink" name="<%=prefix%>_mreviewsLink" onClick="toggleElement('<%=prefix%>_<%=index.to_s%>_mreviews','metareviews');return false;"> <b> <%=participant.fullname(session[:ip]) %></b></a> (<%= pscore[:metareview][:assessments].size %>)
+      </td>
+    <tr id="<%=prefix%>_<%=index.to_s%>_mreviews" style="display:none">
+      <td>
+        <%= view_heatgrid(participant.id, "MetaReviewQuestionnaire") %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+<% else %>
+<span style="color:red">There are no metareviews for this assignment.</span>
+<% end %>

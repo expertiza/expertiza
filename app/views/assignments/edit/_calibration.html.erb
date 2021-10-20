@@ -1,0 +1,71 @@
+<h3>Submit reviews for calibration</h3>
+<% assignment = @assignment_form.assignment %>
+<% teams = assignment.teams %>
+
+  <table width="100%" cellspacing="0" cellpadding="2" border="1" class="table table-striped">
+    <tr>
+          <th width = "38%">
+            Participant name
+          </th>
+          <th width = "15%">
+            Action
+          </th>
+          <th>
+            Submitted item(s)
+          </th>
+    </tr>
+
+    <% teams.each do |team| %>
+        <tr>
+          <% teams_users = TeamsUser.where(team_id: team.id) %>
+          <% users_for_curr_team = "" %>
+          <% teams_users.each do |teams_user| %>
+              <% user = User.find(teams_user.user_id) %>
+              <% users_for_curr_team += user.name(session[:ip]) + ' (' + user.fullname(session[:ip]) + ')' + '<br/>' %>
+              <% participants = Array.new %>
+              <% participants << Participant.where(["parent_id = ? AND user_id = ?", assignment.id, user.id]).first %>
+          <% end %>
+          <td>
+            <%= users_for_curr_team.html_safe %>
+          </td>
+          <td>
+            <% assignment = Assignment.find(params[:id]) rescue nil %>
+            <% instructor = Participant.where(parent_id: params[:id], user_id: assignment.instructor.id).first %>
+            <% map = ReviewResponseMap.where(reviewed_object_id: params[:id], reviewer_id: instructor.id, reviewee_id: team.id, calibrate_to: true).first rescue nil %>
+
+            <!--Only the instructor of this assignment can do the expert peer-review-->
+            <!--Other teaching staff of this assignment can only view the expert peer-review-->
+            <% if !map.nil? and !map.response.empty? %>
+              <%= link_to "View", {:controller => 'response', :action => 'view', :id => map.response.last.id, return: 'assignment_edit'} %>
+              <% if session[:user].id == assignment.instructor.id %>
+                <%= link_to "Edit", {:controller => 'response', :action => 'edit', :id => map.response.last.id, return: 'assignment_edit'} if map.response.first.is_submitted == false %>
+              <% end %>
+            <% else %>
+              <% if session[:user].id == assignment.instructor.id %>
+                <%= link_to "Begin", {:controller => 'review_mapping', :action => 'add_calibration', :id => assignment.id, :team_id => team.id} %>
+              <% end %>
+            <% end %>
+          </td>
+          <td>
+            <!--Display submitted hyperlinks-->
+            <% participant = team.participants.first %>
+            <% if !participant.nil? and !participant.team.hyperlinks.empty? %>
+                <%= "Hyperlinks:<br/>".html_safe %>
+                <% participant.team.hyperlinks.each do |link| %>
+                    <a href="<%= link %>" target="_blank"><%= link %></a><br/>
+                <% end %>
+            <% end %>
+
+            <!--Display submitted files-->
+            <% if !participant.nil? and !participant.team.submitted_files.empty? %>
+                <% files = participant.team.submitted_files %>
+                <%= "Files:".html_safe %>
+                <% if files and files.length > 0 %>
+                    <%= display_directory_tree(participant, files, true).html_safe %>
+                <% end %>
+            <% end %>
+
+          </td>
+        </tr>
+    <% end %>
+  </table>

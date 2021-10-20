@@ -1,0 +1,25 @@
+<h1>New topic</h1>
+
+<%= form_tag :action => 'create' do %>
+
+
+  <%= render :partial => 'topic', topic: @topic %>
+  <%= hidden_field_tag('id', @id) %>
+  <%= submit_tag "Create", id: 'createTopic', :onclick  => 'showZeroSlotWarning();'%>
+<% end %>
+
+<%= link_to 'Back', edit_assignment_path(@id, anchor: 'tabs-5') %>
+
+
+<script>
+	var loadTime;
+	$(document).ready(function () {
+	    loadTime = 1;
+	});
+	function showZeroSlotWarning(){
+		if ($(loadTime == 1 && '#topic_max_choosers').val() == 0){
+			$('#createTopic').attr('confirm', 'If you create a topic with 0 slots,  students cannot assign this topic.')
+		}
+		loadTime += 1;
+	};
+</script>

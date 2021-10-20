@@ -1,0 +1,53 @@
+<% current_folder = DisplayOption.new %>
+<% current_folder.name = "" %>
+<% if origin == 'review' %>
+  <% files = participant.files(participant.review_file_path(response_map_id).to_s + current_folder.name) %>
+<% else %>
+  <% files = participant.team.files(participant.team.path.to_s + current_folder.name) %>
+<%end%>
+
+<%session_participant = AssignmentParticipant.where(parent_id: @assignment.id, user_id: session[:user].id).first%>
+<%session_participants_team = AssignmentTeam.team(session_participant)%>
+<%same_team_flag = false %>
+<% if !session_participants_team.nil? and session_participants_team.includes? (participant) %>
+  <%same_team_flag = true%>
+<%end%>
+<% if params[:controller] == 'submitted_content' %>
+  or
+<% end %>
+<br/><br/>
+
+<% if (files.length > 0 or stage != "Finished")  %>
+  <% if same_team_flag && stage != "Finished" %>
+    <h4>&#8226; Submit a file:</h4>
+    <%= form_tag({:controller=>'submitted_content',:action=>'submit_file',:id => participant.id, :origin => origin ||= nil, :response_map_id => response_map_id ||= nil},{:method => 'post', :enctype => "multipart/form-data", :onSubmit => "return checkIfFileExists(uploaded_file.value,1);"}) do %>
+      <!--<input type="checkbox" name="unzip" value=""/> Unzip submission-->
+      <div class="form-group">
+        <input type="file" id="uploaded_file" name="uploaded_file" size=40 />
+      </div>
+      <%= submit_tag 'Upload file', class: 'btn btn-default' %>
+      <br/><br/>
+    <% end %>
+  <% end %>
+
+  <%= form_tag({:controller=>'submitted_content',:action=>'folder_action', :id => participant.id, :origin => origin ||= nil}, {:multipart => true, id: 'folder-action-form'}) do %>
+    <% if files.length > 0 and participant.team.directory_num != nil and participant.team.directory_num >= 0 %>
+      <% if same_team_flag && stage != "Finished" %>
+        <div style="padding-bottom:0.6em"><h5>File actions:</h5>
+        <!--<input type="button" onclick="createNewFolder()"     value="Create new folder"    />
+          <input type="button" onclick="copySelectedFile()"    value="Copy selected file"   />
+          <input type="button" onclick="moveSelectedFile()"    value="Move selected file"   />
+          <input type="button" onclick="renameFile()"          value="Rename selected file" />-->
+          <input type="button" onclick="deleteSelectedFile();" value="Delete selected file" />
+          <input type="reset" value="Reset">
+        </div>
+      <% end %>
+
+      <table>
+        <tr><td>&nbsp;</td><td><div id="1_myDiv"><%= display_directory_tree(participant, files, !same_team_flag).html_safe %> </div></td></tr>
+      </table>
+    <% end %>
+  <% end %>
+<% else %>
+<!--No files have been submitted.-->
+<% end %>

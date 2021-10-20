@@ -1,0 +1,15 @@
+<%= render :partial => 'submitted_content/title' %>    
+<% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
+<%@stage = @assignment.get_current_stage(topic_id)%>
+<%= render :partial => 'submitted_content/main', :locals => {:participant => @participant, :stage => @stage, :can_submit =>@can_submit} %>
+
+<!--#E1600-->
+<!--Launch self_review partial if self reviews are enabled for a given assignment-->
+<% if (@map.instance_of? SelfReviewResponseMap or @map.nil?) and (@assignment.is_selfreview_enabled == true)%>
+    <br/><br/>
+    <%= render partial: 'submitted_content/self_review', locals: {participant: @participant, stage: @stage, origin: ''} %>
+<% end %>
+
+<BR/>
+<BR/>
+<a href="javascript:window.history.back()">Back</a>

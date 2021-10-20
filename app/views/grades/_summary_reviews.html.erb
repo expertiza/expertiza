@@ -1,0 +1,52 @@
+<link rel="stylesheet" type="text/css" href="/assets/summary.css" >
+<script type="text/javascript" src="/assets/summary.js" ></script>
+
+<!-- SUMMARY REVIEWS -->
+  <table width="100%">
+    <%
+      i = 0
+      @summary.keys.each do |round|
+    %>
+        <tr class='header_class' data-toggle='collapse' data-target='#round_<%= round %>'>
+          <td style="padding: 10px;">
+            <h5><img src='/assets/arrow_down.png' class='arrow_icon'/>Round <%=round %> &nbsp; | &nbsp;Average score: <%= @avg_scores_by_round[round].to_s %>%</h5>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div id = 'round_<%=round %>' class='collapse'>
+              <table class="table_stretch">
+        <% @summary[round].keys.each do |q| %>
+                <tr bgcolor='#BDBDBD'>
+                  <td >
+                    <h5>
+                      <%= q %>
+                      <div style="text-decoration: underline overline;">Average score: <%=@avg_scores_by_criterion[round][q].round(2).to_s %></div>
+                    </h5>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <%
+                      if !@summary[round][q].eql?("")
+                        @summary[round][q].each do |sentence|
+                          safe_concat "<li>"
+                          concat sentence
+                        end
+                      else
+                        safe_concat "&nbsp;"
+                      end
+                    %>
+                  </td>
+                </tr>
+       <%
+         i += 1
+         end
+       %>
+              </table>
+            </div>
+          </td>
+        </tr>
+    <% end %>
+  </table>
+<!-- END SUMMARY REVIEWS -->

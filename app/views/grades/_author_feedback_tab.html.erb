@@ -1,0 +1,14 @@
+<table class="participants" width="100%">
+  <% tscore[:team].participants.each_with_index do |participant, index| %>
+    <% pscore = @scores[:participants][participant.id.to_s.to_sym] %>
+    <tr style="background-color: #f9f9f9">
+      <td>
+        <a href="#" id="<%=prefix%>_<%=index.to_s%>_feedbackLink" name="<%=prefix%>_feedbackLink" onClick="toggleElement('<%=prefix%>_<%=index.to_s%>_feedback','author feedbacks');return false;"><b> <%=participant.fullname(session[:ip]) %></b></a> (<%= pscore[:feedback][:assessments].size rescue 0 %>)
+      </td>
+    <tr id="<%=prefix%>_<%=index.to_s%>_feedback" style="display:none">
+      <td>
+        <%= view_heatgrid(participant.id, "AuthorFeedbackQuestionnaire") %>
+      </td>
+    </tr>
+  <% end %>
+</table>

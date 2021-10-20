@@ -1,0 +1,48 @@
+<% @assignment = Assignment.find(params[:id]) %>
+<% @sign_up_topics = SignUpTopic.where(['assignment_id = ?', @assignment.id]) %>
+<% @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)  %>
+<% @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id) %>
+<% @participants = SignedUpTeam.find_team_participants(@assignment.id, session[:ip])  %>
+<!--Zhewei: the reason why we(E1524) put an empty form_tag is because these reasons:-->
+<!--1.Now we decide to remove the 'Edit sign up sheet' icon on assignment pop up dialog and merge these content into assignment->edit->topics panel-->
+<!--2.The assignment edit panel itself is a big form, and we have one smaller form to save staggered deadlines. And rails is not support one form inside another form very well-->
+<!--3.During debugging, we found that the action of the button ('Save start/due dates') in smaller form is actually submit the whole assignment edit page.-->
+<!--4.So according to this, we build another empty form and place it before the original smaller forms used to save staggered deadlines. The new small form even do not have 'submit' button. So all forms work well now.-->
+<%= form_tag controller: 'assignment', action: 'edit', assignment_id: @assignment.id do %>
+<% end %>
+
+  <% if @sign_up_topics.size != 0 %>
+    <table class="table table-striped" id="topics">
+      <thead>
+      <tr><%= render :partial => '/sign_up_sheet/table_header' %></tr>
+    </thead>
+    <tbody>
+      <% i=1 %>
+      <% for topic in @sign_up_topics %>
+        <tr>
+          <%= render :partial => '/sign_up_sheet/table_line', :locals => {:i=>i, :topic=>topic} %>
+        </tr>
+        <% i=i+1 %>
+      <% end %>
+      </tbody>
+    </table>
+    <br/>
+  <% else %>
+    <div class="flash_note alert alert-danger"><%= "Signup topics have not yet been created." %></div>
+  <% end %>
+
+<% session[:return_to] = request.url %>
+<br/><br/>
+<%= render :partial => '/sign_up_sheet/add_topics' %>
+
+<% if @assignment.staggered_deadline == true %>
+  <a href="#due_date" onClick="toggleVis('due_date');">
+    <span class="inline" id="due_date_show">Show start/due date</span>
+    <span class="inline" id="due_date_hide" style="display: none">Hide start/due date</span>
+  </a>
+  <%= form_tag :controller => 'sign_up_sheet', :action => 'save_topic_deadlines', :assignment_id => @assignment.id do %>
+    <div id="due_date_myDiv" style="display:none" align="left">
+      <br/><%= render :partial => '/sign_up_sheet/due_dates', :locals => {review_rounds: review_rounds, assignment_submission_due_dates: assignment_submission_due_dates, assignment_review_due_dates: assignment_review_due_dates} %>
+    </div>
+  <% end %>
+<% end %>

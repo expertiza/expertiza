@@ -1,0 +1,28 @@
+<h1> <%= @role.name %> </h1>
+
+<table>
+  <tr><th>Description</th><td> <%= @role.description %></td></tr>
+  <tr><th>Created At</th><td> <%= @role.created_at %></td></tr>
+  <tr><th>Updated At</th><td> <%= @role.updated_at %></td></tr>
+</table>
+
+<hr />
+
+<h2> <%= @role.name %> Users </h2>
+<% if @users and @users.length > 0 -%>
+  <ul>
+    <% for user in @users do -%>
+      <li><%= link_to user.name(session[:ip]), :controller => 'users',
+        :action => 'show', :id => user.id %></li>
+    <% end -%>
+  </ul>
+<% else -%>
+  <p>(No Users for this Role)</p>
+<% end -%>
+
+<hr/>
+<p><%= link_to 'Edit', :action => 'edit', :id => @role %> |
+  <%= link_to 'Delete', @role, confirm: 'Are you sure?', method: :delete %> </p>
+
+<p><%= link_to 'Back', Role %> to Roles list</p>
+

@@ -1,0 +1,23 @@
+<th width="5%">Topic #</th>
+<th width="50%">Topic name(s)</th>
+<% if @assignment.microtask? %>
+  <th width="5%">Micro- payment</th>
+<% end %>
+<% if not @assignment.is_intelligent or  ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].include? current_user_role?.name %>
+  <th width="5%">Num. of slots</th>
+  <th width="5%">Available slots</th>
+  <th width="5%">Num. on waitlist</th>
+  <th width="10%">Bookmarks</th>
+  <% if @assignment.current_stage_name(@topic_id) != 'Finished' %>
+      <th width="10%">Actions</th>
+      <th width="5%">Advertise- ment(s)</th>
+  <% end %>
+
+<% end %>
+
+
+
+
+
+
+

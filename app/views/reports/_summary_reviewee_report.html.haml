@@ -1,0 +1,51 @@
+%link{:href => "/assets/summary.css", :rel => "stylesheet", :type => "text/css"}/
+%script{:src => "/assets/javascripts/summary.js", :type => "text/javascript"}
+.reviewreport
+  %br/
+  %table{:class => "table"}
+    - row_round_index = 0
+    - @reviewers.keys.each do |team|
+      %tr
+        %th.header_class{"data-target" => "#team_#{row_round_index.to_s}", "data-toggle" => "collapse"}
+          %h5
+            %img#icon_header_team.arrow_icon{:src => "/assets/expand.png"}>/
+            [avg score: #{@avg_scores_by_reviewee[team].to_s}%] &nbsp; #{team}
+      %tr
+        %td{:bgcolor => "#f9f9f9"}
+          Reviewers : #{@reviewers[team].join(", ")}
+      / print the team name and put the reviews in a div so it can be collapsed smoothly
+      %tr
+        %td.data_column
+          .collapse{:id => "team_#{row_round_index.to_s}"}
+            %table.table.table-striped
+              - for i in 0..@assignment.rounds_of_reviews-1
+              - #var to name the div
+              - team_assg_index = row_round_index.to_s + i.to_s
+                / print the round header
+                %tr
+                  %td.fake-link-large{"data-target" => "#round_#{team_assg_index}", "data-toggle" => "collapse", :style => "padding: 10px;" }
+                    %h5
+                      %img.arrow_icon{:src => "/assets/expand.png"}>/
+                      [score avg : #{@avg_scores_by_round[team][i].to_s}%] &nbsp; Round #{(i+1).to_s}
+                %tr
+                  %td.data_column{:bgcolor => "#f9f9f9"}
+                    / print the summary per round in a new div so it can be collapsed smoothly
+                    .collapse{:id => "round_#{team_assg_index}"}
+                      %table.table.table-striped
+                        - @summary[team][i].keys.each do | q |
+                          / print the avg scores of each question
+
+                          %tr
+                            %td{:bgcolor => "#e9e9e9"}
+                              %i
+                                [score avg : #{@avg_scores_by_criterion[team][i][q].to_s}%]   #{q}
+                          %tr
+                            %td
+                              - #print the summary of reviews
+                              - if !@summary[team][i][q].eql?("")
+                                - @summary[team][i][q].each do |sentence|
+                                  - safe_concat "<li>"
+                                  - concat sentence
+                              - else
+                                - safe_concat "&nbsp;"
+              - row_round_index += 1

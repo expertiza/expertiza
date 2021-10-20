@@ -1,0 +1,14 @@
+#This file contains the CLIENT_KEY & CLIENT_SECRET for Google OmniAuth 2.0
+
+development: 
+  client_key: '1025716012590-2nlv84m8uo3pled9bide8442r2020gc3.apps.googleusercontent.com'
+  client_secret: 'kWjKq314ywRKAF5s5A0F8Wxh'
+
+test: 
+  client_key: '1025716012590-2nlv84m8uo3pled9bide8442r2020gc3.apps.googleusercontent.com'
+  client_secret: 'kWjKq314ywRKAF5s5A0F8Wxh'
+
+# Change these values to appropriate values when deploying to production
+production: 
+ client_key: <%= ENV['GOOGLE_KEY'] %>
+ client_secret: <%= ENV['GOOGLE_SECRET'] %>

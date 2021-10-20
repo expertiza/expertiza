@@ -1,0 +1,29 @@
+<p id="notice"></p>
+
+<p>
+  <strong>Course:</strong>
+  <%= @notification.course.name rescue 'N/A' %>
+</p>
+
+<p>
+  <strong>Subject:</strong>
+  <%= @notification.subject %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @notification.description %>
+</p>
+
+<p>
+  <strong>Expiration date:</strong>
+  <%= @notification.expiration_date %>
+</p>
+
+<p>
+  <strong>Active flag:</strong>
+  <%= @notification.active_flag %>
+</p>
+
+<%= link_to 'Edit', edit_notification_path(@notification) %> |
+<%= link_to 'Back', notifications_path %>

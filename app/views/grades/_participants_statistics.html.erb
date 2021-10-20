@@ -1,0 +1,20 @@
+<table class="participants table table-striped" width="100%">
+  <tr style="background-color: #ffffff">
+    <td colspan="8">
+      <h3>Participants Statistics</h3>
+    </td>
+  </tr>
+
+<%= render :partial => 'participant_title', :locals => {:prefix => prefix } %>        
+<% pindex = 3 %>
+  <% tscore[:team].participants.each_with_index do |participant, index| %>
+     <%= render :partial => 'grades/tabbed_participant',
+                :locals => {:prefix => prefix+"_"+pindex.to_s,
+     	 			                :team => true,
+                            :participant_id => participant.id,
+                            :index => index,
+                            :team_size => tscore[:team].participants.size,
+                            :pscore => @scores[:participants][participant.id.to_s.to_sym]} %>  
+     <% pindex += 1 %>                            
+<% end %>
+</table>

@@ -1,0 +1,28 @@
+<div id="flash_message"></div>
+<h1>Teaching assistants</h1>
+<h2>Course: <%= @course.name %></h2>
+
+  <table id="ta_list" class="table borderless table-not-full-width">
+    <tr>
+      <th>Teaching Assistant Name</th>
+      <th></th>
+      <th></th>
+    </tr>
+    <%= render partial: 'ta', collection: @course.ta_mappings %>
+  </table>
+
+<%=
+  render :partial => 'add_individual',
+    :locals => {:form_action => "add_ta",
+                :obj_type => "course_id",
+                :obj_id => @course.id,
+                :remote => :true}
+              %>
+            <%
+            session[:return_to] = request.url
+            session[:expected_fields] = 'username, full name (first[ middle] last), e-mail address, password'
+            session[:course_id] = @course.id
+          %>
+
+        <hr/>
+

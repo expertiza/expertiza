@@ -1,0 +1,31 @@
+<h1 class="center">Submission Record</h1>
+
+<table class="table table-striped">
+  <thead>
+  <tr>
+    <th>Team Id</th>
+    <th>Operation</th>
+    <th>User</th>
+    <th>Content</th>
+    <th>Created</th>
+  </tr>
+  </thead>
+  <!--This is the main view of the table. This will add table with either hyperlink or the content nased on the operation. -->
+  <tbody>
+  <% @submission_records.each do |record| %>
+      <tr>
+        <td><%= record.team_id %></td>
+        <td><%= record.operation %></td>
+        <td><%= record.user %></td>
+
+        <% if record.operation == "Submit Hyperlink" %>
+        <td><a href="<%= record.content %>" target="_blank"><%= record.content %></a><br/></td>
+
+        <% else %>
+            <td><%= record.content.split("\/").last() %></td>
+         <% end %>
+        <td><%= record.created_at %></td>
+      </tr>
+  <% end %>
+  </tbody>
+</table>

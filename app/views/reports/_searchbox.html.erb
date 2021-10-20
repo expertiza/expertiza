@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<%= form_tag :action => 'response_report', :id => @id, :class => "form-inline" do %>
+  <table>
+    <tr>
+      <td><select name='report[type]' style="width: 15em" class="form-control">
+    <option value='ReviewResponseMap' selected>
+      Review report
+    </option>
+    <option value='FeedbackResponseMap' >
+      Author feedback report
+    </option>
+    <option value='TeammateReviewResponseMap' >
+      Teammate review report
+    </option>
+    <% if @assignment.calibrated? %>
+      <option value='Calibration' >
+        Calibration report
+      </option>
+    <% end %>
+    <% if @assignment.is_selfreview_enabled %>
+      <option value='SelfReview' >
+        Self review report
+      </option>
+    <% end %>
+    <option value='SummaryByCriteria' >
+      Aggregated comments by rubric question
+    </option>
+    <option value='SummaryByRevieweeAndCriteria' >
+      Comment summary by reviewee (team)
+    </option>
+    <!--- Collusion report is not supported yet
+    Refer collusion_cycle.rb for more details
+    <option value='Collusion' >
+      Potential collusion report
+    </option>
+    --->
+    <option value='AnswerTaggingReport' >
+      Answer tagging report
+    </option>
+    <% if @assignment.simicheck > -1 %>
+        <option value='PlagiarismCheckerReport' >
+          Plagiarism checker report
+        </option>
+    <% end %>
+  </select></td>
+      <td align = "right"><%= submit_tag("View", :class => "btn btn-default") %></td>
+    </tr>
+
+  </table>
+  
+  
+<% end %>
+
+<% if @type == "ReviewResponseMap" %>
+  <h1> Review report for <%= @assignment.name%> </h1>
+    <div id="searchbox">
+
+      <div id="searchlink">
+        <%= link_to 'Back', :controller=> 'tree_display', :action=>'list', :id => @userid%>
+      </div>
+
+
+      <div id="searchform">
+
+        <%= form_for :user, :url => {:action => 'response_report', :id => @id} do |n| %>
+            <table>
+              <tr>
+                <th>Reviewer's Name</th>
+                <td><%= n.text_field :fullname, :class => "form-control"%></td>
+                <td align = "right"><%= submit_tag "Search", :class => "btn btn-default"%></td>
+              </tr>
+
+            </table>
+        <%end%>
+
+      </div>
+      <br>
+    </div>
+
+<% elsif @type == "FeedbackResponseMap" %>
+  <h1> Author feedback report for <%= @assignment.name%> </h1>
+<% elsif @type == "TeammateReviewResponseMap" %>
+  <h1> Teammate review report for <%= @assignment.name%> </h1>
+<% elsif @type == "Calibration" %>
+  <h1> Calibration report for <%= @assignment.name%> </h1>
+<!--Show summary reports-->
+<% elsif @type == "SummaryByCriteria" %>
+    <h1> Review summary report for <%= @assignment.name%> </h1>
+<% elsif @type == "SummaryByRevieweeAndCriteria" %>
+    <h1> Reviewees summary report for <%= @assignment.name%> </h1>
+<!--End show summary reports-->
+<% elsif @type == "Collusion" %>
+    <h1> Potential collusion report for <%= @assignment.name%> </h1>
+<% elsif @type == "PlagiarismCheckerReport" %>
+    <h1> Plagiarism Checker Report for <%= @assignment.name%> </h1>
+
+<% end %>
+
+

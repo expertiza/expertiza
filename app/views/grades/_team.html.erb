@@ -1,0 +1,40 @@
+<tr id="<%= prefix %>_header" style="background-color: white">
+  <!--E1877: table structure modified-->
+  <td WIDTH="9" style="max-width:30px;">
+    <a href="#" id="<%= prefix %>Link" name="<%= prefix %>Link" onclick="toggleTeam('<%= prefix %>');return false;"><%= image_tag("expand.png") %></a>
+    <%= render :partial => 'tabbing', :locals => {:prefix => prefix, :tscore => tscore} %>
+
+  </td>
+  <td>
+      <% topic_id = tscore[:team].topic %>
+      <% if topic_id %>
+        <%= tscore[:team].name + ' (' + SignUpTopic.find(topic_id).topic_identifier + ')' %>
+      <% else %>
+        <% if @assignment.max_team_size == 1 %>
+          <%= tscore[:team].users.first.name(session[:ip]) + ' (' + tscore[:team].users.first.fullname(session[:ip]) + ')' rescue '' %>
+        <% else %>
+          <%= tscore[:team].name %> |
+          <% for index in 0..tscore[:team].users.length - 2 %>
+            <%= tscore[:team].users[index].name(session[:ip]) %>,
+          <% end %>
+          <%unless tscore[:team].users.length == 0 %>
+            <%= tscore[:team].users[tscore[:team].users.length - 1].name(session[:ip]) %>
+          <%end %>
+        <% end %>
+      <% end %>
+  </td>
+  <% if tscore[:scores][:avg] %>
+    <td ALIGN="left"><%= sprintf("%.2f", tscore[:scores][:avg]) %>%</td>
+    <td ALIGN="left"><%= sprintf("%.0f", tscore[:scores][:min]) %>%
+      - <%= sprintf("%.0f", tscore[:scores][:max]) %>%
+    </td>
+  <% else %>
+    <td  ALIGN="left">---</td>
+    <td ALIGN="left">---</td>
+  <% end %>
+  <td WIDTH="9" style="max-width:10px;">
+
+  </td>
+</tr>
+
+

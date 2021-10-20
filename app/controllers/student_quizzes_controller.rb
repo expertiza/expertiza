@@ -119,7 +119,7 @@ class StudentQuizzesController < ApplicationController
     Answer.where(question_id: question.id, response_id: response.id).first
   end
 
-  # This method is only for quiz questionnaires, it is called when instructors click "view quiz questions" on the pop-up panel.
+  # Gets all the questionnaire responses by all the teams for an particular assignment 
   def review_questions
     @assignment_id = params[:id]
     @quiz_questionnaires = []

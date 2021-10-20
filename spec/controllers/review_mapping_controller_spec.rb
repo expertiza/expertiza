@@ -59,7 +59,7 @@ describe ReviewMappingController do
     end
   end
 
-  describe '#add_reviewer and #get_reviewer' do
+  describe '#assign_reviewer_manually and #get_reviewer' do
     before(:each) do
       allow(User).to receive_message_chain(:where, :first).with(name: 'expertiza').with(no_args).and_return(double('User', id: 1))
       @params = {
@@ -73,7 +73,7 @@ describe ReviewMappingController do
     context 'when team_user does not exist' do
       it 'shows an error message and redirects to review_mapping#list_mappings page' do
         allow(TeamsUser).to receive(:exists?).with(team_id: '1', user_id: 1).and_return(true)
-        post :add_reviewer, @params
+        post :assign_reviewer_manually, @params
         expect(response).to redirect_to '/review_mapping/list_mappings?id=1'
       end
     end
@@ -89,7 +89,7 @@ describe ReviewMappingController do
         allow(ReviewResponseMap).to receive_message_chain(:where, :first)
           .with(reviewee_id: '1', reviewer_id: 1).with(no_args).and_return(nil)
         allow(ReviewResponseMap).to receive(:create).with(reviewee_id: '1', reviewer_id: 1, reviewed_object_id: 1).and_return(nil)
-        post :add_reviewer, @params
+        post :assign_reviewer_manually, @params
         expect(response).to redirect_to '/review_mapping/list_mappings?id=1&msg='
       end
     end
@@ -666,6 +666,15 @@ describe ReviewMappingController do
         post :start_self_review, params
         expect(response).to redirect_to('/submitted_content/1/edit?msg=Self+review+already+assigned%21')
       end
+    end
+  end
+
+  describe '#select_metareviewer' do
+    it 'there is no such a ResponseMap' do
+        allow(ResponseMap).to receive(:find).with('-1').and_return(metareview_response_map)
+        params = {id: -1}
+        post :select_metareviewer, params
+        expect(flash[:error]).to be nil
     end
   end
 end

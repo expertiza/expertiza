@@ -155,6 +155,22 @@ describe AssignmentsController do
         expect(response).to redirect_to('/assignments/new?private=1')
       end
     end
+
+    context 'when assignment_form name already exists and is not saved properly' do
+      it 'redirects to assignment#new page' do
+        allow(assignment_form).to receive(:assignment).and_return(assignment)
+        allow(Assignment).to receive(:find_by).with(any_args).and_return(false)
+        allow(Assignment).to receive(:find_by).with(any_args).and_return(false)
+        allow(assignment_form).to receive(:save).and_return(true)
+        allow(assignment_form).to receive(:create_assignment_node).and_return(double('node'))
+        allow(assignment_form).to receive(:update).with(any_args).and_return(true)
+        allow(assignment).to receive(:id).and_return(1)
+        allow(Assignment).to receive(:find_by).with(course_id:1, name:'test assignment').and_return(assignment)
+        post :create, @params
+        expect(flash[:error]).to eq('Failed to create assignment.<br>  test assignment already exists as an assignment name')
+        expect(response).to redirect_to('/assignments/new?private=1')
+      end
+    end
   end
 
   describe '#edit' do

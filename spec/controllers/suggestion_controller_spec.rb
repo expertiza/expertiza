@@ -11,6 +11,7 @@ describe SuggestionController do
   let(:student) { build(:student, id: 1)}
   let(:questionnaire) { build(:questionnaire, id: 666) }
   let(:suggestion){build(:suggestion)}
+  let(comment){build()}
   let(:assignment_questionnaire) { build(:assignment_questionnaire, id: 1, questionnaire: questionnaire) }
 
   before(:each) do
@@ -35,42 +36,25 @@ describe SuggestionController do
 
   describe '#update_suggestion' do
     it "checks updated is saved" do
-      params = {id: 1,suggestion:{title:"new title", description: "new description", signup_preference:"N"} }
+      params = {id: 1,suggestion:{title:'new title', description: 'new description', signup_preference:'N'} }
       post :update_suggestion, params
       expect(response).to render_template('suggestion/new?id=1')
     end
   end
 
-  describe '#create' do
-    let(:comment) { double('OODD', instructor_id: 2, path: '/cs', name: 'xyz') }
-    before(:each) do
-      allow(Course).to receive(:new).and_return(course_double)
-      allow(course_double).to receive(:save).and_return(true)
-    end
 
-    it "redirects to the correct url" do
-      post :create
-      expect(response).to redirect_to root_url
+
+  describe '#add_comment' do
+    it 'adds a participant' do
+      allow(Assignment).to receive(:find).with('1').and_return(assignment)
+      allow(User).to receive(:find_by).with(name: student.name).and_return(student)
+      @comment = SuggestionComment.new
+      @comment.suggestion_id = 1;
+      params = { id:1, comment:{vote:"Y", comments:"comments"}}
+      session = {user: instructor}
+      xhr :get, :add_comment, params, session
+      expect(flash[:notice]).to eq 'Your comment has been successfully added.'
     end
   end
-
-  # describe '#add' do
-  #   it 'adds a participant' do
-  #     allow(Assignment).to receive(:find).with('1').and_return(assignment)
-  #     allow(User).to receive(:find_by).with(name: student.name).and_return(student)
-  #     params = {model: 'Assignment', authorization: 'participant', id: 1, user: {name: student.name}}
-  #     session = {user: instructor}
-  #     xhr :get, :add, params, session
-  #     expect(response).to render_template('add.js.erb')
-  #   end
-  #   it 'does not add a participant for a non-existing user' do
-  #     allow(Assignment).to receive(:find).with('1').and_return(assignment)
-  #     params = {model: 'Assignment', authorization: 'participant', id: 1, user: {name: 'Aaa'}}
-  #     session = {user: instructor}
-  #     xhr :get, :add, params, session
-  #     expect(flash[:error]).to eq 'The user <b>Aaa</b> does not exist or has already been added.'
-  #     expect(response).to render_template('add.js.erb')
-  #   end
-  # end
 
 end

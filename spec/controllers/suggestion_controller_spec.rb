@@ -61,8 +61,7 @@ describe SuggestionController do
 
   describe '#reject_suggestion' do
     it 'reject a suggestion' do
-      stub_current_user(instructor, instructor.role.name, instructor.role)
-      allow(suggestion).to receive(:reject_suggestion).with(any_args).and_return(suggestion)
+      get :reject_suggestion, id: 1
       expect(flash[:notice]).to eq 'The suggestion has been successfully rejected.'
     end
   end

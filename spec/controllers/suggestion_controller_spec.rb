@@ -60,7 +60,7 @@ describe SuggestionController do
     it 'reject a suggestion' do
       stub_current_user(instructor, instructor.role.name, instructor.role)
       allow(Suggestion).to receive(:reject_suggestion).with('1').and_return(suggestion)
-      expect(response).to render_template('suggestion/show')
+      expect(flash[:notice]).to eq 'The suggestion has been successfully rejected.'
     end
   end
 

@@ -9,6 +9,8 @@
 # to
 
 class SignUpSheetController < ApplicationController
+  include AuthorizationHelper
+
   require 'rgl/adjacency'
   require 'rgl/dot'
   require 'rgl/topsort'
@@ -16,17 +18,12 @@ class SignUpSheetController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator',
-       'Student'].include? current_role_name and
-      ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer") : true)
+      (current_user_has_student_privileges? &&
+          (%w[list].include? action_name) &&
+          are_needed_authorizations_present?(params[:id], "reader", "submitter", "reviewer")) ||
+          current_user_has_student_privileges?
     else
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator'].include? current_role_name
+      current_user_has_ta_privileges?
     end
   end
 
@@ -89,14 +86,9 @@ class SignUpSheetController < ApplicationController
   def update
     @topic = SignUpTopic.find(params[:id])
     if @topic
-      @topic.topic_identifier = params[:topic][:topic_identifier]
       update_max_choosers @topic
-      @topic.category = params[:topic][:category]
-      @topic.topic_name = params[:topic][:topic_name]
-      @topic.micropayment = params[:topic][:micropayment]
-      @topic.description = params[:topic][:description]
-      @topic.link = params[:topic][:link]
-      @topic.save
+      updated_max_choosers = @topic.max_choosers
+      @topic.update_attributes(topic_identifier: params[:topic][:topic_identifier], max_choosers: updated_max_choosers, category: params[:topic][:category], topic_name: params[:topic][:topic_name], micropayment: params[:topic][:micropayment], description: params[:topic][:description], link: params[:topic][:link])
       undo_link("The topic: \"#{@topic.topic_name}\" has been successfully updated. ")
     else
       flash[:error] = "The topic could not be updated."
@@ -114,6 +106,22 @@ class SignUpSheetController < ApplicationController
       format.html { redirect_to edit_assignment_path(params[:assignment_id]) }
       format.js {}
     end
+  end
+
+  # This deletes all selected topics for the given assignment
+  def delete_all_selected_topics
+    load_all_selected_topics
+    @stopics.each(&:destroy)
+    flash[:success] = "All selected topics have been deleted successfully."
+    respond_to do |format|
+      format.html { redirect_to edit_assignment_path(params[:assignment_id]) + "#tabs-2"}
+      format.js {}
+    end
+  end
+
+  # This loads all selected topics based on all the topic identifiers selected for that assignment into stopics variable
+  def load_all_selected_topics
+    @stopics = SignUpTopic.where(assignment_id: params[:assignment_id], topic_identifier: params[:topic_ids])
   end
 
   # This displays a page that lists all the available topics for an assignment.
@@ -146,7 +154,6 @@ class SignUpSheetController < ApplicationController
     @sign_up_topics = SignUpTopic.where('assignment_id = ?', assignment_id)
     @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
     @slots_waitlisted = SignUpTopic.find_slots_waitlisted(assignment_id)
-
     @assignment = Assignment.find(assignment_id)
     # ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
@@ -189,6 +196,7 @@ class SignUpSheetController < ApplicationController
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     @max_team_size = @assignment.max_team_size
     team_id = @participant.team.try(:id)
+    @use_bookmark = @assignment.use_bookmark
 
     if @assignment.is_intelligent
       @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)

@@ -56,4 +56,13 @@ describe SuggestionController do
     end
   end
 
+  describe '#reject_suggestion' do
+    it 'reject a suggestion' do
+      stub_current_user(instructor, instructor.role.name, instructor.role)
+      allow(Suggestion).to receive(:reject_suggestion).with('1').and_return(suggestion)
+      expect(response).to render_template('suggestion/show')
+    end
+  end
+
+
 end

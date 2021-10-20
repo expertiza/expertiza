@@ -9,7 +9,7 @@ def login_and_assign_reviewer(user, assignment_id, student_num, submission_num)
   click_on('Assign reviewers')
 end
 
-def add_reviewer(student_name)
+def assign_reviewer_manually(student_name)
   fill_in 'user_name', with: student_name
   click_on 'Add Reviewer'
   expect(page).to have_content student_name
@@ -52,16 +52,16 @@ describe "review mapping" do
     login_as("instructor6")
     visit "/review_mapping/list_mappings?id=#{@assignment.id}"
 
-    # add_reviewer
+    # assign_reviewer_manually
     first(:link, 'add reviewer').click
-    add_reviewer(participant_reviewer.user.name)
+    assign_reviewer_manually(participant_reviewer.user.name)
     expect(page).to have_content participant_reviewer.user.name
     click_link('delete')
     expect(page).to have_content "The review mapping for \"#{@team1.name}\" and \"#{participant_reviewer.user.name}\" has been deleted"
 
     # add_meta_reviewer
     first(:link, 'add reviewer').click
-    add_reviewer(participant_reviewer.user.name)
+    assign_reviewer_manually(participant_reviewer.user.name)
     click_link('add metareviewer')
     add_matareviewer(participant_reviewer2.user.name)
     expect(page).to have_content participant_reviewer2.user.name
@@ -110,9 +110,9 @@ describe "review mapping" do
   it "can unsubmit a review", js: true do
     participant_reviewer = create :participant, assignment: @assignment
     login_and_assign_reviewer("instructor6", @assignment.id, 0, 2)
-    # add_reviewer
+    # assign_reviewer_manually
     first(:link, 'add reviewer').click
-    add_reviewer(participant_reviewer.user.name)
+    assign_reviewer_manually(participant_reviewer.user.name)
     expect(page).to have_content participant_reviewer.user.name
 
     # create new submitted review

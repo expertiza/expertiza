@@ -1,2 +1,5 @@
-Select a duty |
-<%= link_to "Save Duty", controller: 'ParticipantsController', action: 'update_duties', duty_id: 1, participant_id: member.id %>
+<%= form_tag :controller => 'participants', :action => 'update_duties' do %>
+    <%= hidden_field_tag 'member_id', member.id %>
+    <%= collection_select(:member, :duty_id, Duty.where("assignment_id = ?", assignment_id) , :id, :duty_name, {:prompt => 'Please select a duty'},{:onChange => "getOption()"}) %>
+    <%= submit_tag "Save", data: { disable_with: "Submitting..." } %>
+<% end %>

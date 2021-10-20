@@ -15,7 +15,7 @@
                  :assignment_id => assignment.id,
                  :reviewer_id => session[:user].id do %>
 
-        <input id="no_particular_topic" name="no_particular_topic" type="checkbox" onchange="toggleVis(this.checked, 'topic_list');" />
+        <input id="i_dont_care" name="i_dont_care" type="checkbox" onchange="toggleVis(this.checked, 'topic_list');" />
         I don't care which topic I review.
         <p><b>Select a topic below to begin a new review:</b></p>
 

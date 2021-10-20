@@ -14,6 +14,7 @@ describe SuggestionController do
   let(:assignment_questionnaire) { build(:assignment_questionnaire, id: 1, questionnaire: questionnaire) }
 
   before(:each) do
+    allow(assignment).to receive(:find).with('1').and_return(assignment)
     allow(Suggestion).to receive(:find).with('1').and_return(suggestion)
     stub_current_user(student, student.role.name, student.role)
   end

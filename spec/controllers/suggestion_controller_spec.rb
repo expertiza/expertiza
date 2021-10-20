@@ -34,7 +34,7 @@ describe SuggestionController do
 
   describe '#update_suggestion' do
     it "checks updated is saved" do
-      params = {id: 1, title:"new title", description: "new description", signup_preference:"N"}
+      params = {id: 1,suggestion:{title:"new title", description: "new description", signup_preference:"N"} }
       post :update_suggestion, params
       expect(response).to render_template('suggestion/new?id=1')
     end

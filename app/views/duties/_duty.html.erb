@@ -2,11 +2,11 @@
 
 <table>
   <tr>
-    <td><label for="duty_name">Duty Name: </label></td>
+    <td><label for="duty_name">Role name: </label></td>
     <td><%= text_field 'duty', 'duty_name', size: 42 %></td>
   </tr>
   <tr>
-    <td><label for="max_duty_limit">Max Duty Limit: </label></td>
+    <td><label for="max_duty_limit">Maximum member limit: <img src="/assets/info.png" title='The maximum number of members on the team that can have the role.'></label></td>
     <td><%= number_field 'duty', 'max_duty_limit' %></td>
   </tr>
   <tr hidden>

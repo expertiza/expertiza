@@ -28,10 +28,15 @@ class DutiesController < ApplicationController
 
   # POST /duties
   def create
-    @duty = Duty.new(duty_params)
+    @duty = Duty.new
+
+    @duty.assignment_id = params[:duty][:assignment_id]
+    @duty.max_duty_limit = params[:duty][:max_duty_limit]
+    @duty.duty_name = params[:duty][:duty_name]
 
     if @duty.save
-      redirect_to edit_assignment_path(duty_params[:assignment_id]), notice: 'Duty was successfully created.'
+      # When the duty (role) is created successfully we return back to the assignment edit page
+      redirect_to edit_assignment_path(params[:duty][:assignment_id]), notice: 'Role was successfully created.'
     else
       render :new
     end
@@ -39,8 +44,14 @@ class DutiesController < ApplicationController
 
   # PATCH/PUT /duties/1
   def update
-    if @duty.update(duty_params)
-      redirect_to edit_assignment_path(duty_params[:assignment_id]), notice: 'Duty was successfully updated.'
+    @duty = Duty.find(params[:id])
+
+    @duty.assignment_id = params[:duty][:assignment_id]
+    @duty.max_duty_limit = params[:duty][:max_duty_limit]
+    @duty.duty_name = params[:duty][:duty_name]
+
+    if @duty.save
+      redirect_to edit_assignment_path(params[:duty][:assignment_id]), notice: 'Role was successfully updated.'
     else
       render :edit
     end
@@ -48,18 +59,14 @@ class DutiesController < ApplicationController
 
   # DELETE /duties/1
   def destroy
+    @duty = Duty.find(params[:id])
     @duty.destroy
-    redirect_to duties_url, notice: 'Duty was successfully destroyed.'
+    redirect_to edit_assignment_path(params[:assignment_id]), notice: 'Role was successfully destroyed.'
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_duty
       @duty = Duty.find(params[:id])
-    end
-
-    # Only allow a trusted parameter "white list" through.
-    def duty_params
-      params.require(:duty).permit(:duty_name, :max_duty_limit, :assignment_id)
     end
 end

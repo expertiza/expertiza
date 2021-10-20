@@ -608,4 +608,14 @@ FactoryBot.define do
     type 'TextArea'
     size '70,1'
   end
+
+  factory :suggestion, class: Suggestion do
+    id 1
+    assignment_id 1
+    title 'oss topic'
+    description 'add oss topic'
+    status 'Initiated'
+    unityID 'student2065'
+    signup_preference 'Y'
+  end
 end

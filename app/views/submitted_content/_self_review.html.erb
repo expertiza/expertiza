@@ -39,7 +39,7 @@
                 <% current_round = @assignment.number_of_current_round(@topic_id) %>
 
                 <td>&nbsp;&nbsp;</td>
-                <td><%= link_to 'View', {:controller => 'response', :action => 'view', :id => @latest_response.id} %></td>
+                <td><%= link_to 'View', {:controller => 'response', :action => 'disable_submission', :id => @latest_response.id} %></td>
                 <td>&nbsp;&nbsp;</td>
 
                 <% if @assignment.get_current_stage(@topic_id) != 'Finished' %>

@@ -644,14 +644,6 @@ describe AssignmentForm do
     end
   end
 
-  describe '#find_min_from_now' do
-    it 'returns the difference between current time and due date in minutes' do
-      allow(DateTime).to receive(:now).and_return(DateTime.new(2017, 10, 7, 11, 11, 11).in_time_zone)
-      due_at = Time.parse(DateTime.new(2017, 10, 7, 12, 12, 12).in_time_zone.to_s(:db))
-      expect(assignment_form.find_min_from_now_duration(due_at)).to eq(61)
-    end
-  end
-
   describe '#set_up_assignment_review' do
     it 'updates round_of_reviews (eg. from 1 to 2) and directory_path of current assignment' do
       allow(assignment).to receive(:set_up_defaults).and_return('OK!')

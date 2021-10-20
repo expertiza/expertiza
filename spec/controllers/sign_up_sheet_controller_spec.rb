@@ -37,7 +37,7 @@ describe SignUpSheetController do
         it 'sets up a new topic and redirects to assignment#edit page' do
           allow(SignUpTopic).to receive(:where).with(topic_name: 'Hello world!', assignment_id: '1').and_return([nil])
           allow_any_instance_of(SignUpSheetController).to receive(:undo_link)
-            .with("The topic: \"Hello world!\" has been created successfully. ").and_return('OK')
+                                                            .with("The topic: \"Hello world!\" has been created successfully. ").and_return('OK')
           allow(topic).to receive(:save).and_return('OK')
           params = {
             id: 1,
@@ -58,7 +58,7 @@ describe SignUpSheetController do
         it 'sets up a new topic and renders sign_up_sheet#new page' do
           allow(SignUpTopic).to receive(:where).with(topic_name: 'Hello world!', assignment_id: '1').and_return([nil])
           allow_any_instance_of(SignUpSheetController).to receive(:undo_link)
-            .with("The topic: \"Hello world!\" has been created successfully. ").and_return('OK')
+                                                            .with("The topic: \"Hello world!\" has been created successfully. ").and_return('OK')
           allow(topic).to receive(:save).and_return('OK')
           params = {
             id: 1,
@@ -102,7 +102,7 @@ describe SignUpSheetController do
     context 'when topic can be found' do
       it 'redirects to assignment#edit page' do
         allow_any_instance_of(SignUpSheetController).to receive(:undo_link)
-          .with("The topic: \"Hello world!\" has been successfully deleted. ").and_return('OK')
+                                                          .with("The topic: \"Hello world!\" has been successfully deleted. ").and_return('OK')
         params = {id: 1, assignment_id: 1}
         post :destroy, params
         expect(response).to redirect_to('/assignments/1/edit')
@@ -113,7 +113,7 @@ describe SignUpSheetController do
       it 'shows an error flash message and redirects to assignment#edit page' do
         allow(SignUpTopic).to receive(:find).with('1').and_return(nil)
         allow_any_instance_of(SignUpSheetController).to receive(:undo_link)
-          .with("The topic: \"Hello world!\" has been successfully deleted. ").and_return('OK')
+                                                          .with("The topic: \"Hello world!\" has been successfully deleted. ").and_return('OK')
         params = {id: 1, assignment_id: 1}
         post :destroy, params
         expect(flash[:error]).to eq('The topic could not be deleted.')
@@ -170,7 +170,7 @@ describe SignUpSheetController do
         allow(Team).to receive(:find).with(2).and_return(team)
         allow(SignUpTopic).to receive(:find_waitlisted_topics).with(1, 2).and_return(nil)
         allow_any_instance_of(SignUpSheetController).to receive(:undo_link)
-          .with("The topic: \"Hello world!\" has been successfully updated. ").and_return('OK')
+                                                          .with("The topic: \"Hello world!\" has been successfully updated. ").and_return('OK')
         params = {
           id: 2,
           assignment_id: 1,
@@ -242,7 +242,7 @@ describe SignUpSheetController do
         allow(Team).to receive(:find).with(1).and_return(team)
         params = {username: 'no name', assignment_id: 1}
         get :signup_as_instructor_action, params
-        expect(flash[:error]).to eq('That student does not exist!')
+        expect(flash[:error]).to eq(User.find_by(name: params[:username]).name + ' does not exist!')
         expect(response).to redirect_to('/assignments/1/edit')
       end
     end
@@ -250,6 +250,7 @@ describe SignUpSheetController do
     context 'when user can be found' do
       before(:each) do
         allow(User).to receive(:find_by).with(name: 'no name').and_return(student)
+        allow(Team).to receive(:find).with(1).and_return(team)
       end
 
       context 'when an assignment_participant can be found' do
@@ -264,13 +265,14 @@ describe SignUpSheetController do
             allow(TeamsUser).to receive(:team_id).with('1', 8).and_return(1)
             allow(SignedUpTeam).to receive(:topic_id).with('1', 8).and_return(1)
             allow_any_instance_of(SignedUpTeam).to receive(:save).and_return(team)
+            allow(Team).to receive(:find).with(1).and_return(team)
             params = {
               username: 'no name',
               assignment_id: 1,
               topic_id: 1
             }
             get :signup_as_instructor_action, params
-            expect(flash[:success]).to eq('You have successfully signed up the student for the topic!')
+            expect(flash[:success]).to eq('You have successfully signed up ' + User.find_by(name: params[:username]).name + ' on team ' + Team.find_team_for_assignment_and_user(params[:assignment_id], user.id).first.name + ' for the topic: ' + params[:topic_id].to_s)
             expect(response).to redirect_to('/assignments/1/edit')
           end
         end
@@ -282,12 +284,13 @@ describe SignUpSheetController do
             allow(Assignment).to receive(:find).with(1).and_return(assignment)
             allow(TeamsUser).to receive(:create).with(user_id: 8, team_id: 1).and_return(double('TeamsUser', id: 1))
             allow(TeamUserNode).to receive(:create).with(parent_id: 1, node_object_id: 1).and_return(double('TeamUserNode', id: 1))
+            allow(Team).to receive(:find).with(1).and_return(team)
             params = {
               username: 'no name',
               assignment_id: 1
             }
             get :signup_as_instructor_action, params
-            expect(flash[:error]).to eq('The student has already signed up for a topic!')
+            expect(flash[:error]).to eq(User.find_by(name: params[:username]).name + + ' has already signed up for a topic!')
             expect(response).to redirect_to('/assignments/1/edit')
           end
         end
@@ -296,12 +299,13 @@ describe SignUpSheetController do
       context 'when an assignment_participant cannot be found' do
         it 'shows a flash error message and redirects to assignment#edit page' do
           allow(AssignmentParticipant).to receive(:exists?).with(user_id: 8, parent_id: '1').and_return(false)
+          allow(Team).to receive(:find).with(1).and_return(team)
           params = {
             username: 'no name',
             assignment_id: 1
           }
           get :signup_as_instructor_action, params
-          expect(flash[:error]).to eq('The student is not registered for the assignment!')
+          expect(flash[:error]).to eq(User.find_by(name: params[:username]).name + ' is not registered for the assignment!')
           expect(response).to redirect_to('/assignments/1/edit')
         end
       end

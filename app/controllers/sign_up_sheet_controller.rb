@@ -249,7 +249,7 @@ class SignUpSheetController < ApplicationController
     #put name of student and team in log
     # flash name of student and team
     user = User.find_by(name: params[:username])
-    team = Team.find_team_for_assignment_and_user(params[:assignment.id], user_id).first
+    team = Team.find_team_for_assignment_and_user(params[:assignment_id], user.id).first
     assignment = Assignment.find(params[:assignment_id])
     if user.nil? # validate invalid user
       flash[:error] = user.name + " does not exist!"

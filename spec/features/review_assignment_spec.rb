@@ -100,23 +100,4 @@ describe "peer review testing" do
     click_button "Request a new submission to review"
     expect(page).to have_content "No previous versions available"
   end
-
-  it "check the color of review topic" do
-    submit_to_topic
-    click_link "Logout"
-    user = User.find_by(name: "student2065")
-    login_as(user.name)
-    visit '/student_task/list'
-    visit '/sign_up_sheet/sign_up?id=1&topic_id=1'
-    visit '/student_task/list'
-    click_link "TestAssignment"
-    click_link "Others' work"
-    find(:css, "#i_dont_care").set(true)
-    click_button "Request a new submission to review"
-    #within_frame('wrapper') do
-    #  color = find('body').native.css_value('background-color')
-    #  expect(color).to eq('rgba(255, 0, 0, 1)')
-    #end
-    expect(browser.td(class: "ReviewItem").style('background-color')).to eq('rgba(255, 0, 0, 1)')
-  end
 end

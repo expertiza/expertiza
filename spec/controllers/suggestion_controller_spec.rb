@@ -17,10 +17,18 @@ describe SuggestionController do
     allow(Suggestion).to receive(:find).with('1').and_return(suggestion)
     stub_current_user(student, student.role.name, student.role)
   end
+
   describe '#student_view' do
     it 'renders suggestions#student_view' do
       get :student_view, id: 1
       expect(response).to render_template(:student_view)
     end
+  end
+
+  describe '#student_edit' do
+      it 'renders suggestions#student_edit' do
+        get :student_edit, id: 1
+        expect(response).to render_template(:student_edit)
+      end
   end
 end

@@ -64,6 +64,7 @@ describe "Late Policy Creation" do
       policies_with_same_name = LatePolicy.where policy_name: existing_policy.policy_name
       # Ensure only 1 policy exists with the name
       expect(policies_with_same_name.length).to eql(1)
+      expect(page).to have_content("A policy with the same name already exists.")
 
     end
 

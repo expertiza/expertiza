@@ -1,5 +1,51 @@
 module Helper_methods
   #E2124 4.create modules for subclass methods
+  # Helper Method to check num_reviews_per_student and num_reviews_per_submission arguments passed in by params hash.
+  def check_num_reviews_args(num_reviews_per_student, num_reviews_per_submission, teams)
+    has_error_not_raised = true
+    # check for exit paths first
+    if num_reviews_per_student == 0 and num_reviews_per_submission == 0
+      flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
+      has_error_not_raised = false
+    elsif num_reviews_per_student != 0 and num_reviews_per_submission != 0
+      flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
+      has_error_not_raised = false
+    elsif num_reviews_per_student >= teams.size
+      # Exception detection: If instructor want to assign too many reviews done
+      # by each student, there will be an error msg.
+      flash[:error] = 'You cannot set the number of reviews done ' \
+                       'by each student to be greater than or equal to total number of teams ' \
+                       '[or "participants" if it is an individual assignment].'
+      has_error_not_raised = false
+    end
+  end
+
+  ## Helper Method for generating a random participant which is to be used in peer_review_strategy method.
+  def gen_random_participant_id(iterator, participants_hash, num_participants, participants)
+    if iterator.zero?
+      rand_num = rand(0..num_participants - 1)
+    else
+      min_value = participants_hash.values.min
+      # get the temp array including indices of participants, each participant has minimum review number in hash table.
+      participants_with_min_assigned_reviews = []
+      participants.each do |participant|
+        participants_with_min_assigned_reviews << participants.index(participant) if participants_hash[participant.id] == min_value
+      end
+      # if participants_with_min_assigned_reviews is blank
+      no_particpants = participants_with_min_assigned_reviews.empty?
+      # or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
+      participant_is_owner = (participants_with_min_assigned_reviews.size == 1 and TeamsUser.exists?(team_id: team.id, user_id: participants[participants_with_min_assigned_reviews[0]].user_id))
+      rand_num = if no_particpants or participant_is_owner
+                   # use original method to get random number
+                   rand(0..num_participants - 1)
+                 else
+                   # rand_num should be the position of this participant in original array
+                   participants_with_min_assigned_reviews[rand(0..participants_with_min_assigned_reviews.size - 1)]
+                 end
+    end
+    return rand_num
+  end
+
   def peer_review_strategy(assignment_id, review_strategy, team_participants_hash)
     teams = review_strategy.teams
     participants = review_strategy.participants
@@ -22,27 +68,8 @@ module Helper_methods
           break if selected_participants.size == participants.size - num_participants_this_team
 
           # generate random number
-          if iterator.zero?
-            rand_num = rand(0..num_participants - 1)
-          else
-            min_value = team_participants_hash.values.min
-            # get the temp array including indices of participants, each participant has minimum review number in hash table.
-            participants_with_min_assigned_reviews = []
-            participants.each do |participant|
-              participants_with_min_assigned_reviews << participants.index(participant) if team_participants_hash[participant.id] == min_value
-            end
-            # if participants_with_min_assigned_reviews is blank
-            if_condition_1 = participants_with_min_assigned_reviews.empty?
-            # or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
-            if_condition_2 = (participants_with_min_assigned_reviews.size == 1 and TeamsUser.exists?(team_id: team.id, user_id: participants[participants_with_min_assigned_reviews[0]].user_id))
-            rand_num = if if_condition_1 or if_condition_2
-                         # use original method to get random number
-                         rand(0..num_participants - 1)
-                       else
-                         # rand_num should be the position of this participant in original array
-                         participants_with_min_assigned_reviews[rand(0..participants_with_min_assigned_reviews.size - 1)]
-                       end
-          end
+          rand_num = gen_random_participant_id(iterator, team_participants_hash, num_participants, participants)
+
           # prohibit one student to review his/her own artifact
           next if TeamsUser.exists?(team_id: team.id, user_id: participants[rand_num].user_id)
 
@@ -493,25 +520,14 @@ class ReviewMappingController < ApplicationController
         teams << team
       end
     end
-    student_review_num = params[:num_reviews_per_student].to_i
-    submission_review_num = params[:num_reviews_per_submission].to_i
-    calibrated_artifacts_num = params[:num_calibrated_artifacts].to_i
-    uncalibrated_artifacts_num = params[:num_uncalibrated_artifacts].to_i
-    if calibrated_artifacts_num.zero? and uncalibrated_artifacts_num.zero?
-      # check for exit paths first
-      if student_review_num == 0 and submission_review_num == 0
-        flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
-      elsif student_review_num != 0 and submission_review_num != 0
-        flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
-      elsif student_review_num >= teams.size
-        # Exception detection: If instructor want to assign too many reviews done
-        # by each student, there will be an error msg.
-        flash[:error] = 'You cannot set the number of reviews done ' \
-                         'by each student to be greater than or equal to total number of teams ' \
-                         '[or "participants" if it is an individual assignment].'
-      else
+    num_reviews_per_student = params[:num_reviews_per_student].to_i         # Number of sumbissions that can be reviewed by a single student
+    num_reviews_per_submission = params[:num_reviews_per_submission].to_i   # Toal number of reviews that can be performed on a single submission (or equivalently, number of students that can review the same submiss)
+    num_calibrated_artifacts = params[:num_calibrated_artifacts].to_i
+    num_uncalibrated_artifacts = params[:num_uncalibrated_artifacts].to_i
+    if num_calibrated_artifacts.zero? and num_uncalibrated_artifacts.zero?
+      if check_num_reviews_args(num_reviews_per_student, num_reviews_per_submission, teams)
         # REVIEW: mapping strategy
-        automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num, submission_review_num)
+        automatic_review_mapping_strategy(assignment_id, participants, teams, num_reviews_per_student, num_reviews_per_submission)
       end
     else
       teams_with_calibrated_artifacts = []
@@ -521,11 +537,11 @@ class ReviewMappingController < ApplicationController
       end
       teams_with_uncalibrated_artifacts = teams - teams_with_calibrated_artifacts
       # REVIEW: mapping strategy
-      automatic_review_mapping_strategy(assignment_id, participants, teams_with_calibrated_artifacts.shuffle!, calibrated_artifacts_num, 0)
+      automatic_review_mapping_strategy(assignment_id, participants, teams_with_calibrated_artifacts.shuffle!, num_calibrated_artifacts, 0)
       # REVIEW: mapping strategy
       # since after first mapping, participants (delete_at) will be nil
       participants = AssignmentParticipant.where(parent_id: params[:id].to_i).to_a.select(&:can_review).shuffle!
-      automatic_review_mapping_strategy(assignment_id, participants, teams_with_uncalibrated_artifacts.shuffle!, uncalibrated_artifacts_num, 0)
+      automatic_review_mapping_strategy(assignment_id, participants, teams_with_uncalibrated_artifacts.shuffle!, num_uncalibrated_artifacts, 0)
     end
     redirect_to action: 'list_mappings', id: assignment_id
   end

@@ -618,4 +618,5 @@ FactoryBot.define do
     unityID 'student2065'
     signup_preference 'Y'
   end
+
 end

@@ -11,16 +11,18 @@ describe SuggestionController do
   let(:student) { build(:student, id: 1)}
   let(:questionnaire) { build(:questionnaire, id: 666) }
   let(:suggestion){build(:suggestion)}
+  let(:comment){build(:comment)}
   let(:assignment_questionnaire) { build(:assignment_questionnaire, id: 1, questionnaire: questionnaire) }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(Suggestion).to receive(:find).with('1').and_return(suggestion)
-    #stub_current_user(student, student.role.name, student.role)
+
   end
 
   describe '#student_view' do
     it 'renders suggestions#student_view' do
+      stub_current_user(student, student.role.name, student.role)
       get :student_view, id: 1
       expect(response).to render_template(:student_view)
     end
@@ -28,6 +30,7 @@ describe SuggestionController do
 
   describe '#student_edit' do
       it 'renders suggestions#student_edit' do
+        stub_current_user(student, student.role.name, student.role)
         get :student_edit, id: 1
         expect(response).to render_template(:student_edit)
       end
@@ -59,7 +62,7 @@ describe SuggestionController do
   describe '#reject_suggestion' do
     it 'reject a suggestion' do
       stub_current_user(instructor, instructor.role.name, instructor.role)
-      allow(Suggestion).to receive(:reject_suggestion).with('1').and_return(suggestion)
+      allow(suggestion).to receive(:reject_suggestion).with(and_args).and_return(suggestion)
       expect(flash[:notice]).to eq 'The suggestion has been successfully rejected.'
     end
   end

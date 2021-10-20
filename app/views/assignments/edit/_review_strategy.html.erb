@@ -139,6 +139,9 @@
     </td>
   </tr>
 
+  <!-- #E2147 -->
+  <%= render '/duties/checkbox' %>
+
   <!--#E1870-->
   <% if @assignment_form.assignment.rounds_of_reviews > 1 %>
     <tr>
@@ -151,21 +154,9 @@
     </tr>
   <% end %>
 
-  <!--E2147 Duty Based Reviewing-->
-  <tr>
-    <td id='is_duty_based_assignment'>
-        <input name="assignment_form[assignment][is_duty_based_assignment]" type="hidden" value="false"/>
-        <input type="checkbox" name = "is_duty_checkbox" id="is_duty_checkbox" <%= "checked" if @assignment_form.assignment.is_duty_based_assignment %> onclick="hasDutiesChanged()"></input>
-        <%= label_tag('duty_assignment', 'Is Duty Based Assignment?') %>
-        <img src="/assets/info.png" title='Check the box if this assignment allows duty assignment within the team'>
 
-        <div id="add_duties" <%= "hidden" if not @assignment_form.assignment.is_duty_based_assignment %> >
-          <br>
 
-          <%= render '/duties/add_duties' %>
-        </div>
-    </td>
-  </tr>
+
 
 </table>
 <script>

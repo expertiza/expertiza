@@ -7,11 +7,21 @@
 
 
 <% if @duties.size != 0 %>
+    <table class="table table-striped">
+      <tr><%= render :partial => '/duties/table_header' %></tr>
 
+      <% i=1 %>
+      <% for duty in @duties %>
+          <tr>
+            <%= render :partial => '/duties/table_line', :locals => {:i=>i, :duty=>duty} %>
+          </tr>
+          <% i=i+1 %>
+      <% end %>
 
+    </table>
 <% else %>
     <div class="flash_note alert alert-danger">
-      <%= "Duties have not yet been created." %>
+      <%= "Roles have not yet been created." %>
     </div>
 <% end %>
 

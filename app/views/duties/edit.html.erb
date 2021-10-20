@@ -1,0 +1,10 @@
+<h1>Edit Role</h1>
+
+<% @id = @duty.assignment_id %>
+
+<%= form_tag url_for(:action => 'update'), method: "put" do %>
+    <%= render :partial => 'duty', duty: @duty %>
+    <%= submit_tag "Update"%>
+<% end %>
+
+<%= link_to 'Back', edit_assignment_path(@duty.assignment_id) %>

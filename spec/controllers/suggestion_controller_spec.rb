@@ -16,7 +16,7 @@ describe SuggestionController do
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(Suggestion).to receive(:find).with('1').and_return(suggestion)
-    stub_current_user(student, student.role.name, student.role)
+    #stub_current_user(student, student.role.name, student.role)
   end
 
   describe '#student_view' do

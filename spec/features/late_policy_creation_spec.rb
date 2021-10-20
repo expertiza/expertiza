@@ -66,6 +66,33 @@ describe "Late Policy Creation" do
       expect(policies_with_same_name.length).to eql(1)
 
     end
+
+    it "does not create new policy if fields are empty" do
+
+      visit edit_assignment_path(assignment)
+      click_on "Due dates"
+      click_on "New late policy"
+      expect(page).to have_current_path(new_late_policy_path)
+
+      # Use empty fields
+      policy_name = ''
+      penalty_per_unit = ''
+      max_penalty = ''
+      fill_in "late_policy[policy_name]", :with => policy_name
+      fill_in "late_policy[penalty_per_unit]", :with => penalty_per_unit
+      fill_in "late_policy[max_penalty]", :with => max_penalty
+
+      expect {
+        click_on "Create"
+      }.to_not change{LatePolicy.all.length}
+
+      expect(page).to have_current_path(new_late_policy_path)
+      expect(page).to have_content("Policy name can't be blank")
+      expect(page).to have_content("Penalty per unit can't be blank")
+
+    end
+
+
   end
 
 end

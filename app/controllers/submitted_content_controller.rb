@@ -62,7 +62,7 @@ class SubmittedContentController < ApplicationController
       log_info(controller_name, @participant.name, 'The link has been successfully submitted.', request)
       undo_link("The link has been successfully submitted.")
 
-      mail_assigned_reviewers(team)
+      MailerHelper.mail_assigned_reviewers(team)
       flash[:success] = "The link has been successfully submitted."
     end
     redirect_to action: 'edit', id: @participant.id
@@ -95,14 +95,8 @@ class SubmittedContentController < ApplicationController
     return unless current_user_id?(participant.user_id)
     file = params[:uploaded_file]
     participant.team.set_student_directory_num
-    @current_folder = DisplayOption.new
-    @current_folder.name = "/"
-    @current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name]) if params[:current_folder]
-    curr_directory = if params[:origin] == 'review'
-                       participant.review_file_path(params[:response_map_id]).to_s + @current_folder.name
-                     else
-                       participant.team.path.to_s + @current_folder.name
-                     end
+
+    curr_directory = tested()
     FileUtils.mkdir_p(curr_directory) unless File.exist? curr_directory
     safe_filename = file.original_filename.tr('\\', "/")
     safe_filename = FileHelper.sanitize_filename(safe_filename) # new code to sanitize file path before upload*
@@ -120,7 +114,7 @@ class SubmittedContentController < ApplicationController
                             operation: "Submit File")
     ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The file has been submitted.', request)
     # Send link to update the review to all the reviewers assigned to this reviewee
-    mail_assigned_reviewers(team)
+    MailerHelper.mail_assigned_reviewers(team)
     # participant.assignment.email(participant.id) rescue nil
     if params[:origin] == 'review'
       redirect_to :back
@@ -129,23 +123,16 @@ class SubmittedContentController < ApplicationController
     end
   end
 
-  # This function will find if there are already reviews present for the current submission,
-  # If the reviews are present then it will mail each reviewer a mail with the link to update the current review.
-
-  def mail_assigned_reviewers(team)
-    maps = ResponseMap.where(reviewed_object_id: @participant.assignment.id, reviewee_id: team.id, type: 'ReviewResponseMap')
-    unless maps.nil?
-      maps.each do |map|
-        # Mailing function
-        Mailer.general_email(
-          to: User.find(Participant.find(map.reviewer_id).user_id).email,
-          subject:  "Link to update the review for Assignment '#{@participant.assignment.name}'",
-          cc: User.find_by(@participant.assignment.instructor_id).email,
-          link: "Link: https://expertiza.ncsu.edu/response/new?id=#{map.id}",
-          assignment: @participant.assignment.name
-        ).deliver_now
-      end
-    end
+  def tested
+    @current_folder = DisplayOption.new
+    @current_folder.name = "/"
+    @current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name]) if params[:current_folder]
+    curr_directory = if params[:origin] == 'review'
+                       participant.review_file_path(params[:response_map_id]).to_s + @current_folder.name
+                     else
+                       participant.team.path.to_s + @current_folder.name
+                     end
+    return curr_directory
   end
 
   def perform_folder_action
@@ -155,13 +142,13 @@ class SubmittedContentController < ApplicationController
     @current_folder.name = "/"
     @current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name]) if params[:current_folder]
     if params[:faction][:delete]
-      delete_selected_files
+      SubmittedFiles.delete_selected_files
     elsif params[:faction][:rename]
-      rename_selected_file
+      SubmittedFiles.rename_selected_file
     elsif params[:faction][:move]
-      move_selected_file
+      SubmittedFiles.move_selected_file
     elsif params[:faction][:copy]
-      copy_selected_file
+      SubmittedFiles.copy_selected_file
     elsif params[:faction][:create]
       create_new_folder
     end
@@ -187,56 +174,6 @@ class SubmittedContentController < ApplicationController
   def get_file_type file_name
     base = File.basename(file_name)
     return base.split(".")[base.split(".").size - 1] if base.split(".").size > 1
-  end
-
-  def move_selected_file
-    old_filename = params[:directories][params[:chk_files]] + "/" + params[:filenames][params[:chk_files]]
-    newloc = @participant.dir_path
-    newloc += "/"
-    newloc += params[:faction][:move]
-    begin
-        FileHelper.move_file(old_filename, newloc)
-        flash[:note] = "The file was successfully moved from \"/#{params[:filenames][params[:chk_files]]}\" to \"/#{params[:faction][:move]}\""
-      rescue StandardError => e
-        flash[:error] = "There was a problem moving the file: " + e.message
-      end
-  end
-
-  def rename_selected_file
-    old_filename = params[:directories][params[:chk_files]] + "/" + params[:filenames][params[:chk_files]]
-    new_filename = params[:directories][params[:chk_files]] + "/" + FileHelper.sanitize_filename(params[:faction][:rename])
-    begin
-      raise "A file already exists in this directory with the name \"#{params[:faction][:rename]}\"" if File.exist?(new_filename)
-      File.send("rename", old_filename, new_filename)
-    rescue StandardError => e
-      flash[:error] = "There was a problem renaming the file: " + e.message
-    end
-  end
-
-  def delete_selected_files
-    filename = params[:directories][params[:chk_files]] + "/" + params[:filenames][params[:chk_files]]
-    FileUtils.rm_r(filename)
-    participant = Participant.find_by(id: params[:id])
-    assignment = participant.try(:assignment)
-    team = participant.try(:team)
-    SubmissionRecord.create(team_id: team.try(:id),
-                            content: filename,
-                            user: participant.try(:name),
-                            assignment_id: assignment.try(:id),
-                            operation: "Remove File")
-    ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The selected file has been deleted.', request)
-  end
-
-  def copy_selected_file
-    old_filename = params[:directories][params[:chk_files]] + "/" + params[:filenames][params[:chk_files]]
-    new_filename = params[:directories][params[:chk_files]] + "/" + FileHelper.sanitize_filename(params[:faction][:copy])
-    begin
-      raise "A file with this name already exists. Please delete the existing file before copying." if File.exist?(new_filename)
-      raise "The referenced file does not exist." unless File.exist?(old_filename)
-      FileUtils.cp_r(old_filename, new_filename)
-    rescue StandardError => e
-      flash[:error] = "There was a problem copying the file: " + e.message
-    end
   end
 
   def create_new_folder

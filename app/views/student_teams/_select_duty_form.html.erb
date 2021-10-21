@@ -1,5 +1,5 @@
 <%= form_tag :controller => 'participants', :action => 'update_duties' do %>
     <%= hidden_field_tag 'member_id', member.id %>
-    <%= collection_select(:member, :duty_id, Duty.where("assignment_id = ?", assignment_id) , :id, :duty_name, {:prompt => 'Please select a duty'},{:onChange => "getOption()"}) %>
+    <%= collection_select(:member, :duty_id, Duty.where("assignment_id = ?", assignment_id).select{|duty| duty.can_be_assigned?(@student.team)} , :id, :duty_name, {:prompt => 'Please select a duty'}) %>
     <%= submit_tag "Save", data: { disable_with: "Submitting..." } %>
 <% end %>

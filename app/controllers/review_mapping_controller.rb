@@ -1,14 +1,15 @@
 module Helper_methods
   #E2124 4.create modules for subclass methods
-
+  #Remove hardcoded parameter
   def check_num_reviews_args(num_reviews_per_student, num_reviews_per_submission, teams)
     # E2124 3.Replace switch statements with subclasses methods
     has_error_not_raised = true
     # check for exit paths first
-    if num_reviews_per_student == 0 and num_reviews_per_submission == 0
+    zero_review = 0
+    if num_reviews_per_student == zero_review and num_reviews_per_submission == zero_review
       flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student)."
       has_error_not_raised = false
-    elsif num_reviews_per_student != 0 and num_reviews_per_submission != 0
+    elsif num_reviews_per_student != zero_review and num_reviews_per_submission != zero_review
       flash[:error] = "Please choose either the number of reviews per student or the number of reviewers per team (student), not both."
       has_error_not_raised = false
     elsif num_reviews_per_student >= teams.size
@@ -23,6 +24,7 @@ module Helper_methods
 
   ## Helper Method for generating a random participant which is to be used in peer_review_strategy method.
   def gen_random_participant_id(iterator, participants_hash, num_participants, participants)
+    one_reivew = 1
     if iterator.zero?
       rand_num = rand(0..num_participants - 1)
     else
@@ -35,7 +37,7 @@ module Helper_methods
       # if participants_with_min_assigned_reviews is blank
       no_particpants = participants_with_min_assigned_reviews.empty?
       # or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
-      participant_is_owner = (participants_with_min_assigned_reviews.size == 1 and TeamsUser.exists?(team_id: team.id, user_id: participants[participants_with_min_assigned_reviews[0]].user_id))
+      participant_is_owner = (participants_with_min_assigned_reviews.size == one_reivew and TeamsUser.exists?(team_id: team.id, user_id: participants[participants_with_min_assigned_reviews[0]].user_id))
       rand_num = if no_particpants or participant_is_owner
                    # use original method to get random number
                    rand(0..num_participants - 1)
@@ -110,15 +112,17 @@ module Helper_methods
     end
   end
 
+  # remove hardcoded parameter
   def automatic_review_mapping_strategy(assignment_id,
                                         participants, teams, student_review_num = 0,
                                         submission_review_num = 0)
+    zero_review = 0
     team_participants_hash = {}
     participants.each {|participant| team_participants_hash[participant.id] = 0 }
     # calculate reviewers for each team
-    if student_review_num != 0 and submission_review_num == 0
+    if student_review_num != zero_review and submission_review_num == zero_review
       review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, teams, student_review_num)
-    elsif student_review_num == 0 and submission_review_num != 0
+    elsif student_review_num == zero_review and submission_review_num != zero_review
       review_strategy = ReviewMappingHelper::TeamReviewStrategy.new(participants, teams, submission_review_num)
     end
 
@@ -180,13 +184,15 @@ module Helper_methods
   # else we compute total reviews completed by adding each response
   # we then check of the reviews in progress are less than assignment's policy
 
+  # remove hardcoded parameter
   def check_outstanding_reviews?(assignment, reviewer)
+    zero_review = 0
     @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
     @num_reviews_total = @review_mappings.size
-    if @num_reviews_total == 0
+    if @num_reviews_total == zero_review
       true
     else
-      @num_reviews_completed = 0
+      @num_reviews_completed = zero_review
       @review_mappings.each do |map|
         @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
       end
@@ -417,6 +423,7 @@ class ReviewMappingController < ApplicationController
   end
 
   def delete_outstanding_reviewers
+    zero_map_size = 0
     assignment = Assignment.find(params[:id])
     team = AssignmentTeam.find(params[:contributor_id])
     review_response_maps = team.review_mappings
@@ -427,7 +434,7 @@ class ReviewMappingController < ApplicationController
         num_remain_review_response_maps -= 1
       end
     end
-    if num_remain_review_response_maps > 0
+    if num_remain_review_response_maps > zero_map_size
       flash[:error] = "#{num_remain_review_response_maps} reviewer(s) cannot be deleted because they have already started a review."
     else
       flash[:success] = "All review mappings for \"#{team.name}\" have been deleted."
@@ -435,7 +442,9 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment.id
   end
 
+  # remove hardcoded parameter
   def delete_all_metareviewers
+    zero_unsuccessful_delete = 0
     mapping = ResponseMap.find(params[:id])
     mmappings = MetareviewResponseMap.where(reviewed_object_id: mapping.map_id)
     num_unsuccessful_deletes = 0
@@ -447,7 +456,7 @@ class ReviewMappingController < ApplicationController
       end
     end
 
-    if num_unsuccessful_deletes > 0
+    if num_unsuccessful_deletes > zero_unsuccessful_delete
       url_yes = url_for action: 'delete_all_metareviewers', id: mapping.map_id, force: 1
       url_no = url_for action: 'delete_all_metareviewers', id: mapping.map_id
       flash[:error] = "A delete action failed:<br/>#{num_unsuccessful_deletes} metareviews exist for these mappings. " \

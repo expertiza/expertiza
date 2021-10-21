@@ -59,15 +59,27 @@ describe PopupController do
   end
 
   describe '#team_users_popup' do
-    ## INSERT CONTEXT/DESCRIPTION/CODE HERE
-    it "renders the page successfuly as Instructor" do 
+    it "renders the page successfuly as Instructor" do
       allow(Team).to receive(:find).and_return(team)
       allow(Assignment).to receive(:find).and_return(assignment)
-      params = {id: team.id, assignment: assignment, reviewer_id: participant2.id}
+
+      reviewer = double(:reviewer1, reviewer_id: 1)
+      user_id = double(:user_id, user_id: 1)
+      response = double('response1', response_id: 1, responses: "this is test response")
+      answer = double('answer', question_id: 1)
+
+      allow(ResponseMap).to receive(:find).with(1).and_return(reviewer)
+      allow(Participant).to receive(:find).with(1).and_return(user_id)
+      allow(Response).to receive_message_chain(:where, :last).with(map_id: 1, round: 1).with(no_args).and_return(response)
+      allow(Answer).to receive(:where).with(response_id: 1).and_return(answer)
+      allow(Response).to receive_message_chain(:average_score).and_return(90)
+      allow(Response).to receive_message_chain(:aggregate_questionnaire_score).with(no_args).and_return(response)
+      allow(Response).to receive_message_chain(:maximum_score).with(no_args).and_return(response)
+
+      params = {id: team.id}
       session = {user: instructor}
       result = get :team_users_popup, params, session
       expect(result.status).to eq 200
-
     end
   end
 

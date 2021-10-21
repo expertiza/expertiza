@@ -123,6 +123,14 @@ describe "due_date_functions" do
     end
   end
 
+  describe "#find_min_from_now_duration" do
+    it "returns time difference between due_date and now" do
+      allow(DateTime).to receive(:now).and_return(DateTime.new(2021, 10, 20, 11, 11, 11).in_time_zone)
+      due_at = Time.parse(DateTime.new(2021, 10, 20, 12, 12, 12).in_time_zone.to_s(:db))
+      expect(DueDate.find_min_from_now_duration(due_at)).to eq(61)
+    end
+  end
+
   it "metareview review_of_review_allowed default permission OK" do
     expect(DueDate.default_permission('metareview', 'review_of_review_allowed')).to be == DeadlineRight::OK
   end

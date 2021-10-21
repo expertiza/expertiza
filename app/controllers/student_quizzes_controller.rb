@@ -26,7 +26,7 @@ class StudentQuizzesController < ApplicationController
     @response_map = QuizResponseMap.find(params[:map_id])
     @questions = Question.where(questionnaire_id: @response_map.reviewed_object_id) # for quiz response map, the reivewed_object_id is questionnaire id
     @map = ResponseMap.find(params[:map_id])
-    @participant = AssignmentTeam.find(@map.reviewee_id).participants.first
+    @participant = AssignmentTeam.find(@map.reviewee_id).participants.first # Gets the first participant of the team.
 
     @quiz_score = @response_map.quiz_score
   end

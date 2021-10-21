@@ -578,7 +578,7 @@ describe AssignmentForm do
         Sidekiq::Stats.new.reset
         Sidekiq::DeadSet.new.clear
         queue = Sidekiq::Queues["jobs"]
-        expect { assignment_form.add_to_delayed_queue }.to change { queue.size }.by(2)
+        expect { assignment_form.add_to_delayed_queue }.to change { queue.size }.by(1)
       end
     end
   end
@@ -641,14 +641,6 @@ describe AssignmentForm do
         expect(assignment_form.questionnaire(nil, 'ReviewQuestionnaire').id).to eq nil
       end
 
-    end
-  end
-
-  describe '#find_min_from_now' do
-    it 'returns the difference between current time and due date in minutes' do
-      allow(DateTime).to receive(:now).and_return(DateTime.new(2017, 10, 7, 11, 11, 11).in_time_zone)
-      due_at = Time.parse(DateTime.new(2017, 10, 7, 12, 12, 12).in_time_zone.to_s(:db))
-      expect(assignment_form.find_min_from_now_duration(due_at)).to eq(61)
     end
   end
 

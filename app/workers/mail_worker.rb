@@ -7,7 +7,7 @@ class MailWorker < Worker
   # Note the name perform is required for the MailWorker to properly use Sidekiq
   # Performs the delayed mailer funcction for sending the deadline emails using Sidekiq
   def perform(assignment_id, deadline_type, due_at)
-    self.assignment_id = Assignment.find(assignment_id)
+    self.assignment = Assignment.find(assignment_id)
     self.deadline_type = deadline_type
     self.deadline_text = deadline_type
     self.due_at = due_at
@@ -39,7 +39,7 @@ class MailWorker < Worker
   #Finds the emails of the users on an assignment
   def find_participant_emails
     emails = []
-    participants = Participant.where(parent_id: self.assignment_id)
+    participants = Participant.where(parent_id: self.assignment.id)
     participants.each do |participant|
       emails << participant.user.email unless participant.user.nil?
     end

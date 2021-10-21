@@ -7,8 +7,9 @@ class AccountRequestController < ApplicationController
          redirect_to: {action: :list}
 
   def captcha_test
-    valid = false
-    if verify_recaptcha == true
+    valid = true
+    @something
+    if verify_recaptcha(model: @something) == true
       valid = true
     end
     return valid

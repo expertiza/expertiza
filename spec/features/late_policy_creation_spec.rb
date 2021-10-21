@@ -87,7 +87,6 @@ describe "Late Policy Creation" do
     click_on "Create"
     expect(page).to have_current_path(new_late_policy_path)
     expect(page).to have_content("Policy name can't be blank")
-    expect(page).to have_content("Policy name is invalid")
     expect(page).to have_content("Max penalty can't be blank")
     expect(page).to have_content("Max penalty is not a number")
     expect(page).to have_content("Penalty per unit can't be blank")
@@ -101,9 +100,9 @@ describe "Late Policy Creation" do
     click_on "New late policy"
     expect(page).to have_current_path(new_late_policy_path)
 
-    policy_name = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    policy_name = "a" * 257
     penalty_per_unit = 10
-    max_penalty = 1
+    max_penalty = 40
     fill_form_fields({
         :policy_name => policy_name,
         :penalty_per_unit => penalty_per_unit,
@@ -112,7 +111,7 @@ describe "Late Policy Creation" do
 
     click_on "Create"
     expect(page).to have_current_path(new_late_policy_path)
-    expect(page).to have_content("Policy name is invalid")
+    expect(page).to have_content("Something went wrong")
   end
 
   context "creation errors are triggered" do

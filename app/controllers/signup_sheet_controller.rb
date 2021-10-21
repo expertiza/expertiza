@@ -8,7 +8,7 @@
 # Hence each topic has a field called assignment_id which points which can be used to identify the assignment that this topic belongs
 # to
 
-class SignUpSheetController < ApplicationController
+class SignupSheetController < ApplicationController
   include AuthorizationHelper
 
   require 'rgl/adjacency'
@@ -141,27 +141,14 @@ class SignUpSheetController < ApplicationController
     # to treat all assignments as team assignments
     # Though called participants, @participants are actually records in signed_up_teams table, which
     # is a mapping table between teams and topics (waitlisted recored are also counted)
-    @participants = SignedUpTeam.find_team_participants(params[:id], session[:ip])
+    ip = session[:ip]
+    @participants = SignedUpTeam.find_team_participants(@id, ip)
     SignUpSheet.add_signup_topic(params[:id])
   end
 
   def add_signup_topics_staggered
     add_signup_topics
   end
-
-  # retrieves all the data associated with the given assignment. Includes all topics,
-  / def load_add_signup_topics(assignment_id)
-    @id = assignment_id
-    @sign_up_topics = SignUpTopic.where('assignment_id = ?', assignment_id)
-    @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
-    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(assignment_id)
-    @assignment = Assignment.find(assignment_id)
-    # ACS Removed the if condition (and corresponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
-    # Though called participants, @participants are actually records in signed_up_teams table, which
-    # is a mapping table between teams and topics (waitlisted recored are also counted)
-    @participants = SignedUpTeam.find_team_participants(assignment_id, session[:ip])
-  end/
 
   def set_values_for_new_topic
     @sign_up_topic = SignUpTopic.new
@@ -230,7 +217,7 @@ class SignUpSheetController < ApplicationController
                            SignedUpTeam.find_user_signup_topics(@assignment.id, users_team[0].t_id)
                          end
     end
-    render 'sign_up_sheet/intelligent_topic_selection' and return if @assignment.is_intelligent
+    render 'signup_sheet/intelligent_topic_selection' and return if @assignment.is_intelligent
   end
 
   def sign_up

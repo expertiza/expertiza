@@ -4,17 +4,14 @@ class SubmittedContentController < ApplicationController
 
   include AuthorizationHelper
 
-  def action_allowed?
-
-    case params[:action]
-    when 'edit'
-      current_user_has_student_privileges? &&
-      are_needed_authorizations_present?(params[:id], "reader", "reviewer")
-    when 'submit_file', 'submit_hyperlink'
-      current_user_has_student_privileges? &&
-      one_team_can_submit_work?
+  def action_allowed
+    case current_role_name 
+    when 'Instructor','Teaching Assistant','Administrator'
+      ,'Super-Administrator','Student'
+      ((%w[edit].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "reviewer") : true) 
+      && one_team_can_submit_work?
     else
-      current_user_has_student_privileges?
+      return false
     end
 
   end

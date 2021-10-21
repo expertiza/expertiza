@@ -7,6 +7,15 @@ require 'base64'
 class ReputationWebServiceController < ApplicationController
   include AuthorizationHelper
 
+  @request_body = ''
+  @response_body = ''
+  @assignment_id = ''
+  @another_assignment_id = ''
+  @round_num = ''
+  @algorithm = ''
+  @additional_info = ''
+  @response = ''
+
   def action_allowed?
     current_user_has_ta_privileges?
   end

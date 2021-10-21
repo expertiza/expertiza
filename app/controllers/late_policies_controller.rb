@@ -60,6 +60,7 @@ class LatePoliciesController < ApplicationController
         valid[:policy_name_already_exists] = true
       end
     end
+    valid
   end
   # POST /late_policies
   # POST /late_policies.xml

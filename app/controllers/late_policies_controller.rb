@@ -55,6 +55,7 @@ class LatePoliciesController < ApplicationController
       flash[:error] = "A policy with the same name already exists."
       valid[:same_policy_name] = true
     end
+    valid
   end
   # POST /late_policies
   # POST /late_policies.xml

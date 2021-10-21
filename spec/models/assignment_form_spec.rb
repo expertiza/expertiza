@@ -578,7 +578,7 @@ describe AssignmentForm do
         Sidekiq::Stats.new.reset
         Sidekiq::DeadSet.new.clear
         queue = Sidekiq::Queues["jobs"]
-        expect { assignment_form.add_to_delayed_queue }.to change { queue.size }.by(2)
+        expect { assignment_form.add_to_delayed_queue }.to change { queue.size }.by(1)
       end
     end
   end

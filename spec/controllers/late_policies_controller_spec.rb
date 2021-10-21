@@ -69,7 +69,6 @@ describe LatePoliciesController do
       expect(flash[:error]).to include("The maximum penalty cannot be less than penalty per unit.")
     end
 
-  #   # shows error
     it 'shows error on policy name greater than 255 characters' do
       get :new
       params = {

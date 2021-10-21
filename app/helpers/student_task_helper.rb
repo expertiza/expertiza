@@ -1,4 +1,5 @@
 module StudentTaskHelper
+
   def get_review_grade_info(participant)
     info = ''
     if participant.try(:review_grade).try(:grade_for_reviewer).nil? ||
@@ -11,6 +12,19 @@ module StudentTaskHelper
       result = "<img src = '/assets/info.png' title = '" + info + "'>"
     end
     result.html_safe
+  end
+
+  def self.get_submission_grade_info(participant)
+    # Gets the submission grade for a participant from the grade column of the participant table
+    # If no grade is assigned to the participant, it returns "N/A"
+    # All returns are in string to keep them HTML safe 
+    info = ''
+    if participant.try(:grade).nil?
+      info = "N/A"
+    else
+      info = participant.try(:grade).to_s
+    end
+  info
   end
 
   def check_reviewable_topics(assignment)

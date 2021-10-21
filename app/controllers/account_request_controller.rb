@@ -31,7 +31,7 @@ class AccountRequestController < ApplicationController
 
   def create_approved_user
     if params[:selection] == nil
-      flash[:error] = "Please Approve or Reject before submitting"
+      flash[:error] = "Please select at least one user before approving or rejecting"
       redirect_to action: 'list_pending_requested'
       return 
     end

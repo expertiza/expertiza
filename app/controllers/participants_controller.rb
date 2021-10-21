@@ -69,9 +69,9 @@ class ParticipantsController < ApplicationController
 
   # duties: manager, designer, programmer, tester
   def update_duties
-    participant = Participant.find(params[:student_id])
-    participant.update_attributes(duty: params[:duty])
-    redirect_to controller: 'student_teams', action: 'view', student_id: participant.id
+    participant = Participant.find(params[:member_id])
+    participant.update_attributes(duty_id: params[:member]["duty_id"])
+    redirect_to controller: 'student_teams', action: 'view', student_id: params[:member_id]
   end
 
   def destroy

@@ -329,7 +329,11 @@ class ResponseController < ApplicationController
       "CourseSurveyResponseMap",
       "AssignmentSurveyResponseMap",
       "GlobalSurveyResponseMap"
-      @questionnaire = @map.questionnaire
+      if @assignment.is_duty_based_assignment
+        @questionnaire = @map.questionnaire_by_duty(@map.reviewee.duty_id)
+      else
+        @questionnaire = @map.questionnaire
+      end
     end
   end
 

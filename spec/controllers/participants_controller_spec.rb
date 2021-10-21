@@ -55,7 +55,7 @@ describe ParticipantsController do
       expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
     end
   end
-
+=begin
   describe '#update_duties' do
     it 'updates the duties for the participant' do
       allow(Participant).to receive(:find).with('1').and_return(participant)
@@ -65,7 +65,7 @@ describe ParticipantsController do
       expect(response).to redirect_to('/student_teams/view?student_id=1')
     end
   end
-
+=end
   describe '#update_authorizations' do
     it 'updates the authorizations for the participant' do
       allow(Participant).to receive(:find).with('1').and_return(participant)

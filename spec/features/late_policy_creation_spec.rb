@@ -69,7 +69,10 @@ describe "Late Policy Creation" do
           :max_penalty => max_penalty,
         })
 
-      click_on "Create"
+      expect {
+        click_on "Create"
+      }.to_not change{LatePolicy.all.length}
+
       expect(page).to have_current_path(new_late_policy_path)
       expect(page).to have_content("Penalty per unit must be greater than 0")
     end

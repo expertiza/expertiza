@@ -2,8 +2,8 @@ describe PopupController do
   let(:superadmin) { build_stubbed(:superadmin)}
   let(:admin) { build_stubbed(:admin)}
   let(:ta) { build_stubbed(:teaching_assistant) }
-  let(:questionnaire) { build(:questionnaire, id: 1, max_question_score: 20) }
-  let(:question) { build(:question, id: 1, questionnaire_id: questionnaire.id) }
+  let(:questionnaire) { build_stubbed(:questionnaire, id: 1, max_question_score: 20) }
+  let(:question) { build_stubbed(:question, id: 1, questionnaire_id: questionnaire.id) }
   let(:answer) { build_stubbed(:answer, id: 1, question_id: question.id, response_id: response.id, answer: 15) }
   
   let(:instructor) { build_stubbed(:instructor, id: 6) }
@@ -55,11 +55,30 @@ describe PopupController do
       it 'fail to get any info' do; expect(controller.send(:author_feedback_popup)).to be nil; end
     end
     context 'when response_id exists' do
+      it 'passes tests in first block' do        
+        allow(Question).to receive_message_chain(:find, :questionnaire_id).with(answer.question_id).with(no_args).and_return(questionnaire.id)
+        allow(Questionnaire).to receive(:find).with(questionnaire.id).and_return(questionnaire)
+        allow(questionnaire).to receive(:max_question_score).and_return(20)
+        allow(Answer).to receive(:where).with(any_args).and_return([answer]) 
+        allow(Response).to receive(:find).with(any_args).and_return(response) 
+        allow(response).to receive(:average_score).and_return(16)  
+        allow(response).to receive(:aggregate_questionnaire_score).and_return(20)
+        allow(response).to receive(:maximum_score).and_return(19)
+        allow(Participant).to receive(:find).with("1").and_return(participant)
+        allow(User).to receive(:find).with(participant.user_id).and_return(participant)
+
+        params = {response_id: 1, reviewee_id: 1}
+        session = {user: ta}
+        result = get :author_feedback_popup, params, session
+        expect(result.status).to eq 200
+        expect(controller.instance_variable_get(:@sum)).to eq 20
+        expect(controller.instance_variable_get(:@total_possible)).to eq 19
+        expect(controller.instance_variable_get(:@total_percentage)).to eq 16
+      end
     end
   end
 
   describe '#team_users_popup' do
-    ## INSERT CONTEXT/DESCRIPTION/CODE HERE
     it "renders the page successfuly as Instructor" do 
       allow(Team).to receive(:find).and_return(team)
       allow(Assignment).to receive(:find).and_return(assignment)

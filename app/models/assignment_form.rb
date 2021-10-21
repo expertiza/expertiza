@@ -211,7 +211,7 @@ class AssignmentForm
       delayed_job_id = add_delayed_job(deadline_type, due_date, diff_btw_time_left_and_threshold_duration)
       due_date.update_attribute(:delayed_job_id, delayed_job_id)
       # If the deadline type is review, add a delayed job to drop outstanding review
-      add_drop_outstanding_reviews_delayed_job(min_left_duration) if deadline_type == "review"
+      add_drop_outstanding_reviews_delayed_job(min_left_duration, due_date) if deadline_type == "review"
     end
   end
 
@@ -281,12 +281,12 @@ class AssignmentForm
   # add DelayedJob into queue and return it
   def add_delayed_job(deadline_type, due_date, min_left)
     seconds_left = min_left.to_i
-    MailWorker.perform_in(seconds_left, @assignment.id, deadline_type, due_date.due_at)
+    MailWorker.perform_in(seconds_left, due_date.parent_id, deadline_type, due_date.due_at)
   end
 
-  def add_drop_outstanding_reviews_delayed_job(min_left)
+  def add_drop_outstanding_reviews_delayed_job(min_left, due_date)
     seconds_left = min_left.to_i
-    DropOutstandingReviewsWorker.perform_in(seconds_left, @assignment.id)
+    DropOutstandingReviewsWorker.perform_in(seconds_left, due_date.parent_id)
   end
 
   # Deletes the job with id equal to "delayed_job_id" from the delayed_jobs queue

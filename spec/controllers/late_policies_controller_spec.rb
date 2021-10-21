@@ -1,4 +1,3 @@
-require 'byebug'
 describe LatePoliciesController do
 
   # use id:1, since the factory for late_policy uses first generated id
@@ -29,7 +28,6 @@ describe LatePoliciesController do
             max_penalty: 0,
         }
       }
-      byebug
       post :create, params
       policy = LatePolicy.where(policy_name: '').first
       expect(policy).to eq(nil)
@@ -49,7 +47,6 @@ describe LatePoliciesController do
         }
       }
       post :create, params
-      byebug
       policy = LatePolicy.where(policy_name: 'assignment 1').first
       expect(policy).to eq(nil)
 
@@ -66,7 +63,6 @@ describe LatePoliciesController do
             max_penalty: -100,
         }
       }
-      byebug
       post :create, params
       policy = LatePolicy.where(policy_name: 'assignment 1').first
       expect(policy).to eq(nil)
@@ -84,7 +80,6 @@ describe LatePoliciesController do
             max_penalty: 10,
         }
       }
-      byebug
       post :create, params
       policy = LatePolicy.where(policy_name: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa').first
       expect(policy).to eq(nil)
@@ -102,7 +97,6 @@ describe LatePoliciesController do
             max_penalty: 40,
         }
       }
-      byebug
       post :create, params
       policy = LatePolicy.where(policy_name: 'assignment 1').first
       expect(policy).to eq(nil)
@@ -119,7 +113,6 @@ describe LatePoliciesController do
             max_penalty: 9,
         }
       }
-      byebug
       post :create, params
       expect(flash[:error]).to include("A policy with the same name already exists.")
     end 

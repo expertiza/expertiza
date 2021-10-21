@@ -67,7 +67,8 @@ class LatePoliciesController < ApplicationController
         flash[:error] = exception.record.errors.full_messages.join("<br />").html_safe
         redirect_to action: 'new'
       rescue StandardError => exception
-        flash[:error] = "The following error occurred while saving the penalty policy: #{exception}"
+        # In case it's some error, this error should not be shown to users
+        flash[:error] = "Something went wrong"
         redirect_to action: 'new'
       end
     else
@@ -80,14 +81,15 @@ class LatePoliciesController < ApplicationController
   def update
 
     invalid_penalty_per_unit = params[:late_policy][:max_penalty].to_i < params[:late_policy][:penalty_per_unit].to_i
-    # If penaly per unit is invalid, exit early
+    # If penalty per unit is invalid, exit early
     if invalid_penalty_per_unit
       flash[:error] = "Cannot edit the policy. The maximum penalty cannot be less than penalty per unit."
-      redirect_to action: 'edit', id: params[:id]
+      redirect_to action: 'edit', id: params[:id] and return
     end
 
+    # Only do DB search if we pass the invalid penalty check
     @penalty_policy = LatePolicy.find(params[:id])
-    # if name has changed then only check for this
+    # if name has changed, then only check for this
     if params[:late_policy][:policy_name] != @penalty_policy.policy_name
       if LatePolicy.check_policy_with_same_name(params[:late_policy][:policy_name], instructor_id)
         flash[:error] = "Cannot edit the policy. A policy with the same name " + params[:late_policy][:policy_name] + " already exists."

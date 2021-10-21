@@ -6,12 +6,20 @@ class AccountRequestController < ApplicationController
   verify method: :post, only: %i[destroy create update],
          redirect_to: {action: :list}
 
+  def captcha_test
+    valid = false
+    if verify_recaptcha == true
+      valid = true
+    end
+    return valid
+  end
+
   def action_allowed?
     case params[:action]
     when 'list_pending_requested'
       current_user_has_admin_privileges?
     when 'new'
-      true
+      captcha_test
     when 'create_requested_user_record'
       true
     when 'keys'

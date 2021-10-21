@@ -178,6 +178,10 @@ GEM
     docile (1.3.5)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
+    dotenv (2.7.6)
+    dotenv-rails (2.7.6)
+      dotenv (= 2.7.6)
+      railties (>= 3.2)
     dynamic_form (1.1.4)
     edavis10-ruby-web-search (0.0.2)
       json
@@ -630,6 +634,7 @@ DEPENDENCIES
   danger!
   database_cleaner
   delayed_job_active_record
+  dotenv-rails
   dynamic_form
   edavis10-ruby-web-search
   engtagger
@@ -705,4 +710,3 @@ DEPENDENCIES
 
 BUNDLED WITH
    1.16.6
-

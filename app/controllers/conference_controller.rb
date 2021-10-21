@@ -40,7 +40,7 @@ class ConferenceController < ApplicationController
     
     def create
       # Check if user needs to be created as author for conference type assignment and add author to assignment
-      @recaptcha_succeeded = verify_recaptcha secret_key: '6Lfb_uEZAAAAAPcSk-9fcNh3syzfvfagPeNc8Y_B'
+      @recaptcha_succeeded = verify_recaptcha
       if @recaptcha_succeeded==true && add_conference_user
         add_conference_user_as_participant
       else

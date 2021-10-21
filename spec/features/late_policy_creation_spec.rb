@@ -1,5 +1,13 @@
 require_relative 'helpers/assignment_creation_helper'
 include AssignmentCreationHelper
+
+# Use this method to reduce WET operations
+def fill_form_fields(args_hash={})
+  fill_in "late_policy[policy_name]", :with => args_hash[:policy_name]
+  fill_in "late_policy[penalty_per_unit]", :with => args_hash[:penalty_per_unit]
+  fill_in "late_policy[max_penalty]", :with => args_hash[:max_penalty]
+end
+
 describe "Late Policy Creation" do
   let!(:instructor) { create(:instructor, id: 6) }
   let(:assignment) {
@@ -20,9 +28,11 @@ describe "Late Policy Creation" do
     policy_name = "Late policy name"
     penalty_per_unit = 1
     max_penalty = 10
-    fill_in "late_policy[policy_name]", :with => policy_name
-    fill_in "late_policy[penalty_per_unit]", :with => penalty_per_unit
-    fill_in "late_policy[max_penalty]", :with => max_penalty
+    fill_form_fields({
+      :policy_name => policy_name,
+      :penalty_per_unit => penalty_per_unit,
+      :max_penalty => max_penalty,
+    })
 
     click_on "Create"
 
@@ -54,9 +64,11 @@ describe "Late Policy Creation" do
       policy_name = existing_policy.policy_name
       penalty_per_unit = 1
       max_penalty = 10
-      fill_in "late_policy[policy_name]", :with => policy_name
-      fill_in "late_policy[penalty_per_unit]", :with => penalty_per_unit
-      fill_in "late_policy[max_penalty]", :with => max_penalty
+      fill_form_fields({
+        :policy_name => policy_name,
+        :penalty_per_unit => penalty_per_unit,
+        :max_penalty => max_penalty,
+      })
 
       click_on "Create"
 
@@ -79,9 +91,12 @@ describe "Late Policy Creation" do
       policy_name = ''
       penalty_per_unit = ''
       max_penalty = ''
-      fill_in "late_policy[policy_name]", :with => policy_name
-      fill_in "late_policy[penalty_per_unit]", :with => penalty_per_unit
-      fill_in "late_policy[max_penalty]", :with => max_penalty
+
+      fill_form_fields({
+        :policy_name => policy_name,
+        :penalty_per_unit => penalty_per_unit,
+        :max_penalty => max_penalty,
+      })
 
       expect {
         click_on "Create"

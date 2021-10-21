@@ -108,6 +108,32 @@ describe "Late Policy Creation" do
 
     end
 
+    it "shows error on policy name greater than 255 characters" do
+
+      visit edit_assignment_path(assignment)
+      click_on "Due dates"
+      click_on "New late policy"
+      expect(page).to have_current_path(new_late_policy_path)
+
+      # Use policy name longer than 255 chars
+      policy_name = 'a' * 256
+      penalty_per_unit = 1
+      max_penalty = 10
+
+      fill_form_fields({
+        :policy_name => policy_name,
+        :penalty_per_unit => penalty_per_unit,
+        :max_penalty => max_penalty,
+      })
+
+      expect {
+        click_on "Create"
+      }.to_not change{LatePolicy.all.length}
+
+      expect(page).to have_current_path(new_late_policy_path)
+      expect(page).to have_content("Something went wrong")
+
+    end
 
   end
 

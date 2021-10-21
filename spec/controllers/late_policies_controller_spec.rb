@@ -85,23 +85,6 @@ describe LatePoliciesController do
       expect(policy).to eq(nil)
       expect(flash[:error]).to include("Something went wrong")
     end
-    
-  #   # error
-    it 'shows error on policy per unit is random string' do
-      get :new
-      params = {
-        late_policy: {
-            policy_name: 'assignment 1',
-            penalty_per_unit: 10,
-            penalty_unit: 'xyz',
-            max_penalty: 40,
-        }
-      }
-      post :create, params
-      policy = LatePolicy.where(policy_name: 'assignment 1').first
-      expect(policy).to eq(nil)
-      expect(flash[:error]).to include("Policy per unit should be days/hours/minutes")
-    end
 
     it "Check for policy with same name" do
       get :new

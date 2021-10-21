@@ -1,5 +1,3 @@
-require 'byebug'
-
 describe LatePoliciesController do
 
   # use id:1, since the factory for late_policy uses first generated id

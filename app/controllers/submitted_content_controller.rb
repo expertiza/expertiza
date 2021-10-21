@@ -1,12 +1,13 @@
 class SubmittedContentController < ApplicationController
-  def action_allowed?
-    ['Instructor',
-     'Teaching Assistant',
-     'Administrator',
-     'Super-Administrator',
-     'Student'].include? current_role_name and
-    ((%w[edit].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "reviewer") : true) and
-    one_team_can_submit_work?
+  def action_allowed
+    case current_role_name 
+    when 'Instructor','Teaching Assistant','Administrator'
+      ,'Super-Administrator','Student'
+      ((%w[edit].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "reviewer") : true) 
+      && one_team_can_submit_work?
+    else
+      return false
+    end
   end
 
   # The view have already tested that @assignment.submission_allowed(topic_id) is true,

@@ -7,15 +7,6 @@ require 'base64'
 class ReputationWebServiceController < ApplicationController
   include AuthorizationHelper
 
-  @request_body = ''
-  @response_body = ''
-  @assignment_id = ''
-  @another_assignment_id = ''
-  @round_num = ''
-  @algorithm = ''
-  @additional_info = ''
-  @response = ''
-
   def action_allowed?
     current_user_has_ta_privileges?
   end
@@ -96,7 +87,7 @@ class ReputationWebServiceController < ApplicationController
     request_body.sort.to_h
   end
 
-  def fetch_assignment_details
+  def client
     @max_assignment_id = Assignment.last.id
     @result
   end
@@ -130,7 +121,7 @@ class ReputationWebServiceController < ApplicationController
         Participant.find_by(user_id: id).update(alg.to_sym => rep) unless /leniency/ =~ id.to_s  # skipping lenient Id's
       end
     end
-    redirect_to action: 'fetch_assignment_details'
+    redirect_to action: 'client'
   end
 
   def send_post_request

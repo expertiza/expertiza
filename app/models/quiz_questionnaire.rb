@@ -1,9 +1,6 @@
 class QuizQuestionnaire < Questionnaire
   attr_accessor :questionnaire
-  after_initialize :post_initialization
-  def post_initialization
-    self.display_type = 'Quiz'
-  end
+  DISPLAY_TYPE = 'Quiz'.freeze
 
   def symbol
     "quiz".to_sym

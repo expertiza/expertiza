@@ -1,12 +1,8 @@
 class AssignmentSurveyQuestionnaire < SurveyQuestionnaire
-  after_initialize :post_initialization
   @print_name = "Assignment Survey"
+  DISPLAY_TYPE = 'Assignment Survey'.freeze
 
   class << self
     attr_reader :print_name
-  end
-
-  def post_initialization
-    self.display_type = 'Assignment Survey'
   end
 end

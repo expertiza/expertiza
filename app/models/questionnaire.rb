@@ -113,4 +113,12 @@ class Questionnaire < ActiveRecord::Base
     results = Questionnaire.where("id <> ? and name = ? and instructor_id = ?", id, name, instructor_id)
     errors.add(:name, "Questionnaire names must be unique.") if results.present?
   end
+
+  def self.new_by_type(type)
+    if QUESTIONNAIRE_TYPES.include? type
+      return type.constantize.new
+    else
+      raise StandardError.new 'Invalid Questionnaire Type'
+    end
+  end
 end

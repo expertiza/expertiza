@@ -55,30 +55,8 @@ class QuestionnairesController < ApplicationController
       flash[:error] = 'A rubric or survey must have a title.'
       redirect_to controller: 'questionnaires', action: 'new', model: params[:questionnaire][:type], private: params[:questionnaire][:private]
     else
-      questionnaire_private = params[:questionnaire][:private] == 'true'
-      display_type = params[:questionnaire][:type].split('Questionnaire')[0]
       begin
-        @questionnaire = Object.const_get(params[:questionnaire][:type]).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:questionnaire][:type]
-      rescue StandardError
-        flash[:error] = $ERROR_INFO
-      end
-      begin
-        @questionnaire.private = questionnaire_private
-        @questionnaire.name = params[:questionnaire][:name]
-        @questionnaire.instructor_id = session[:user].id
-        @questionnaire.min_question_score = params[:questionnaire][:min_question_score]
-        @questionnaire.max_question_score = params[:questionnaire][:max_question_score]
-        @questionnaire.type = params[:questionnaire][:type]
-        # Zhewei: Right now, the display_type in 'questionnaires' table and name in 'tree_folders' table are not consistent.
-        # In the future, we need to write migration files to make them consistency.
-        # E1903 : We are not sure of other type of cases, so have added a if statement. If there are only 5 cases, remove the if statement
-        if %w[AuthorFeedback CourseSurvey TeammateReview GlobalSurvey AssignmentSurvey BookmarkRating].include?(display_type)
-          display_type = (display_type.split /(?=[A-Z])/).join("%")
-        end
-        @questionnaire.display_type = display_type
-        @questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
-        @questionnaire.save
-        # Create node
+        @questionnaire = create_questionnaire_from_params
         tree_folder = TreeFolder.where(['name like ?', @questionnaire.display_type]).first
         parent = FolderNode.find_by(node_object_id: tree_folder.id)
         QuestionnaireNode.create(parent_id: parent.id, node_object_id: @questionnaire.id, type: 'QuestionnaireNode')
@@ -321,5 +299,19 @@ class QuestionnairesController < ApplicationController
                                      :alternatives, :break_before, :max_label, :min_label)
   end
 
+  def create_questionnaire_from_params
+    begin
+      questionnaire = Questionnaire.new_by_type(params[:questionnaire][:type])
+      questionnaire.private = params[:questionnaire][:private] == 'true'
+      questionnaire.name = params[:questionnaire][:name]
+      questionnaire.instructor_id = session[:user].id
+      questionnaire.min_question_score = params[:questionnaire][:min_question_score]
+      questionnaire.max_question_score = params[:questionnaire][:max_question_score]
+      questionnaire.type = params[:questionnaire][:type]
+      questionnaire.instruction_loc = Questionnaire::DEFAULT_QUESTIONNAIRE_URL
+      questionnaire.save
+    end
+    questionnaire
+  end
   # FIXME: These private methods belong in the Questionnaire model
 end

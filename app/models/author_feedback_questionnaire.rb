@@ -1,13 +1,9 @@
 class AuthorFeedbackQuestionnaire < Questionnaire
-  after_initialize :post_initialization
   @print_name = "Author Feedback Rubric"
+  DISPLAY_TYPE = 'Author Feedback'.freeze
 
   class << self
     attr_reader :print_name
-  end
-
-  def post_initialization
-    self.display_type = 'Author Feedback'
   end
 
   def symbol

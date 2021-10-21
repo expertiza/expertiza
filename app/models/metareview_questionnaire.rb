@@ -1,13 +1,9 @@
 class MetareviewQuestionnaire < Questionnaire
-  after_initialize :post_initialization
   @print_name = "Metareview Rubric"
+  DISPLAY_TYPE = 'Metareview'.freeze
 
   class << self
     attr_reader :print_name
-  end
-
-  def post_initialization
-    self.display_type = 'Metareview'
   end
 
   def symbol

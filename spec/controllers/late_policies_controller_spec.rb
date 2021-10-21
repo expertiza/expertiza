@@ -18,7 +18,6 @@ describe LatePoliciesController do
   end
 
   context "#request create" do
-
     it 'shows error on empty submission' do
       get :new
       params = {
@@ -30,6 +29,9 @@ describe LatePoliciesController do
         }
       }
       post :create, params
+      policy = LatePolicy.where(policy_name: '').first
+      expect(policy).to eq(nil)
+
       expect(flash[:error]).to include("Policy name can't be blank")
       expect(flash[:error]).to include("Penalty per unit can't be blank")
     end
@@ -45,6 +47,9 @@ describe LatePoliciesController do
         }
       }
       post :create, params
+      policy = LatePolicy.where(policy_name: 'assignment 1').first
+      expect(policy).to eq(nil)
+
       expect(flash[:error]).to include("Max penalty must be greater than 0")
     end
 
@@ -59,10 +64,12 @@ describe LatePoliciesController do
         }
       }
       post :create, params
+      policy = LatePolicy.where(policy_name: 'assignment 1').first
+      expect(policy).to eq(nil)
       expect(flash[:error]).to include("The maximum penalty cannot be less than penalty per unit.")
     end
 
-    # shows error
+  #   # shows error
     it 'shows error on policy name greater than 255 characters' do
       get :new
       params = {
@@ -74,10 +81,12 @@ describe LatePoliciesController do
         }
       }
       post :create, params
-      expect(flash[:error]).to include("Policy name is invalid")
+      policy = LatePolicy.where(policy_name: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa').first
+      expect(policy).to eq(nil)
+      expect(flash[:error]).to include("Something went wrong")
     end
     
-    # error
+  #   # error
     it 'shows error on policy per unit is random string' do
       get :new
       params = {
@@ -85,43 +94,15 @@ describe LatePoliciesController do
             policy_name: 'assignment 1',
             penalty_per_unit: 10,
             penalty_unit: 'xyz',
-            max_penalty: 50,
+            max_penalty: 40,
         }
       }
       post :create, params
-      expect(flash[:error]).to include("Policy per unit should be days/hours/minutes")
+      policy = LatePolicy.where(policy_name: 'assignment 1').first
+      expect(policy).to eq(nil)
       expect(flash[:error]).to include("Policy per unit should be days/hours/minutes")
     end
 
-    # it 'basic happy flow test' do
-    #   get :new
-    #   params = {
-    #     late_policy: {
-    #         policy_name: 'assignment 1',
-    #         penalty_per_unit: 10,
-    #         penalty_unit: 'Minute',
-    #         max_penalty: 50,
-    #     }
-    #   }
-    #   # byebug
-    #   post :create, params
-    #   expect(flash[:error]).to include("Successfully saved")
-    # end
-
-    # it 'basic test to test all limits' do
-    #   get :new
-    #   params = {
-    #     late_policy: {
-    #         policy_name: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-    #         penalty_per_unit: 50,
-    #         penalty_unit: 'Minute',
-    #         max_penalty: 50,
-    #     }
-    #   }
-    #   byebug
-    #   post :create, params
-    #   expect(flash[:error]).to include("Successfully saved")
-    # end
     it "Check for policy with same name" do
       get :new
       params = {

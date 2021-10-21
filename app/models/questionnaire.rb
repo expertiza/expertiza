@@ -13,42 +13,44 @@ class Questionnaire < ActiveRecord::Base
 
   DEFAULT_MIN_QUESTION_SCORE = 0  # The lowest score that a reviewer can assign to any questionnaire question
   DEFAULT_MAX_QUESTION_SCORE = 5  # The highest score that a reviewer can assign to any questionnaire question
-  DEFAULT_QUESTIONNAIRE_URL = "http://www.courses.ncsu.edu/csc517".freeze
-  QUESTIONNAIRE_TYPES = ['ReviewQuestionnaire',
-                         'MetareviewQuestionnaire',
-                         'Author FeedbackQuestionnaire',
-                         'AuthorFeedbackQuestionnaire',
-                         'Teammate ReviewQuestionnaire',
-                         'TeammateReviewQuestionnaire',
-                         'SurveyQuestionnaire',
-                         'AssignmentSurveyQuestionnaire',
-                         'Assignment SurveyQuestionnaire',
-                         'Global SurveyQuestionnaire',
-                         'GlobalSurveyQuestionnaire',
-                         'Course SurveyQuestionnaire',
-                         'CourseSurveyQuestionnaire',
-                         'Bookmark RatingQuestionnaire',
-                         'BookmarkRatingQuestionnaire',
-                         'QuizQuestionnaire'].freeze
+  DEFAULT_QUESTIONNAIRE_URL = "http://www.courses.ncsu.edu/csc517".freeze # This needs to be replaced with the correct default URL
+  QUESTIONNAIRE_TYPES = %w[
+                            AssignmentSurveyQuestionnaire
+                            AuthorFeedbackQuestionnaire
+                            BookmarkRatingQuestionnaire
+                            CourseSurveyQuestionnaire
+                            GlobalSurveyQuestionnaire
+                            MetareviewQuestionnaire
+                            QuizQuestionnaire
+                            ReviewQuestionnaire
+                            SurveyQuestionnaire
+                            TeammateReviewQuestionnaire
+                          ].freeze
   has_paper_trail
+
+  DISPLAY_TYPE = 'Questionnaire'.freeze
+
+  def display_type
+    self.class::DISPLAY_TYPE
+  end
 
   def get_weighted_score(assignment, scores)
     # create symbol for "varying rubrics" feature -Yang
     round = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: self.id).used_in_round
-    questionnaire_symbol = unless round.nil?
-                             (self.symbol.to_s + round.to_s).to_sym
-                           else
+    questionnaire_symbol = if round.nil?
                              self.symbol
+                           else
+                             (self.symbol.to_s + round.to_s).to_sym
                            end
     compute_weighted_score(questionnaire_symbol, assignment, scores)
   end
 
   def compute_weighted_score(symbol, assignment, scores)
     aq = self.assignment_questionnaires.find_by(assignment_id: assignment.id)
-    unless scores[symbol][:scores][:avg].nil?
-      scores[symbol][:scores][:avg] * aq.questionnaire_weight / 100.0
-    else
+    if scores[symbol][:scores][:avg].nil?
       0
+    else
+      scores[symbol][:scores][:avg] * aq.questionnaire_weight / 100.0
     end
   end
 

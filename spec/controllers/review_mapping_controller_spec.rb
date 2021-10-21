@@ -671,19 +671,11 @@ describe ReviewMappingController do
 
   describe '#select_metareviewer' do
     it 'there is no such a ResponseMap' do
-        allow(ResponseMap).to receive(:find).with('-1').and_return(metareview_response_map)
-        params = {id: -1}
+        allow(ResponseMap).to receive(:find).with('1').and_return(metareview_response_map)
+        params = {id: 1}
         post :select_metareviewer, params
-        expect(flash[:error]).to be nil
+        expect(flash[:note]).to eq('There is such a mapping')
     end
   end
 
-  describe '#select_reviewer' do
-    it 'should not success when no arg received' do
-      allow(AssignmentTeam).to receive(:find).with('-1').and_return(assignment_team)
-      params = {id: -1}
-      post :select_reviewer, params
-      expect(flash[:error]).to be nil
-    end
-  end
 end

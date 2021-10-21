@@ -207,6 +207,10 @@ module Route_methods_withou_test
 
   def select_metareviewer
     @mapping = ResponseMap.find(params[:id])
+    # add flash[:error] for test
+    if @mapping
+      flash[:note] = "There is such a mapping"
+    end
   end
 end
 

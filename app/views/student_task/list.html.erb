@@ -140,7 +140,7 @@
 	        <td><%= get_review_grade_info(participant) %></td>
 	  
           <!--submission grade-->
-          <td><%= get_submission_grade_info(participant) %></td>
+          <td><%= StudentTaskHelper.get_submission_grade_info(participant) %></td>
           
           <!--badges-->
           <% if student_has_any_awarded_badges?(@student_tasks) %>

@@ -1,4 +1,3 @@
-
 class AssignmentForm
   attr_accessor :assignment,
                 :assignment_questionnaires,
@@ -294,14 +293,14 @@ class AssignmentForm
   def delete_from_delayed_queue
     queue = Sidekiq::Queue.new("jobs")
     queue.each do |job|
-      assignmentId = job.args.first
-      job.delete if @assignment.id == assignmentId
+      assignment_id = job.args.first
+      job.delete if @assignment.id == assignment_id
     end
 
     queue = Sidekiq::ScheduledSet.new
     queue.each do |job|
-      assignmentId = job.args.first
-      job.delete if @assignment.id == assignmentId
+      assignment_id = job.args.first
+      job.delete if @assignment.id == assignment_id
     end
   end
 

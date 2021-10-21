@@ -30,3 +30,4 @@ describe MailWorker do
     end
   end
 end
+

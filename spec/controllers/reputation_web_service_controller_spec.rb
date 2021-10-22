@@ -8,7 +8,7 @@ describe ReputationWebServiceController do
   let(:review_questionnaire) { build(:questionnaire, id: 1) }
   let(:question) { double('Question') }
 
-  describe '#calculate' do
+  describe '#calculate review grades and quiz scores' do
     it 'should calculate peer review grades' do
       has_topic = !SignUpTopic.where(41).empty?
       raw_data_array = controller.fetch_peer_reviews(41, 1, has_topic, 0)
@@ -16,7 +16,7 @@ describe ReputationWebServiceController do
       expect(raw_data_array).should_not be(nil)
     end
 
-    it 'should calculate quiz scores and return them as an array' do
+    it 'should calculate quiz scores and return an array' do
       result = controller.fetch_quiz_scores(52,0)
       expect(result).to be_an_instance_of(Array)
       expect(result).to_not eq(nil)

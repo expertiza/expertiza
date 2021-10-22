@@ -9,11 +9,6 @@ describe ReputationWebServiceController do
   let(:question) { double('Question') }
 
   describe '#calculate' do
-    it 'should query database and return review responses' do
-      result = controller.get_review_responses(1, 0)
-      expect(result).to_not eq(nil)
-    end
-
     it 'should calculate peer review grades' do
       has_topic = !SignUpTopic.where(41).empty?
       raw_data_array = controller.fetch_peer_reviews(41, 1, has_topic, 0)

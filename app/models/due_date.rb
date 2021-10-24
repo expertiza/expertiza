@@ -119,43 +119,87 @@ class DueDate < ActiveRecord::Base
   end
 
   def create_mailworker_object
-    MailWorker.new(self.assignment_id, self.deadline_type, self.due_at)
+    MailWorker.new(self.parent_id, self.deadline_type, self.due_at)
   end
 
   def start_reminder
-    reminder
+    puts "call start reminder"
+    if self.changed?
+      @extra_param = self.parent_id.to_s
+      puts "extra: " + @extra_param
+      Delayed::Job.where(extra_param: @extra_param).each do |job|
+        puts job.id
+        job.delete
+      end
+      self.delay(run_at: proc {|i| i.when_to_run_reminder }, :queue => @queue_name, :extra_param => @extra_param).reminder
+      # reminder
+    else
+      puts "nothing changed"
+    end
   end
 
   def reminder
+    puts "call reminder"
+    # first deleted existed delayed jobs with same id
+
     deadline_text = self.deadline_type if %w[submission review].include? self.deadline_type
     deadline_text = "Team Review" if self.deadline_type == 'metareview'
-    email_reminder(create_mailworker_object.find_participant_emails, deadline_text) unless create_mailworker_object.find_participant_emails.empty?
+    mail_worker = create_mailworker_object
+    email_reminder(mail_worker.find_participant_emails, deadline_text) unless mail_worker.find_participant_emails.empty?
   end
 
   def email_reminder(emails, deadline_type)
-    assignment = Assignment.find(self.assignment_id)
+    assignment = Assignment.find(self.parent_id)
     subject = "Message regarding #{deadline_type} for assignment #{assignment.name}"
     body = "This is a reminder to complete #{deadline_type} for assignment #{assignment.name}. \
     Deadline is #{self.due_at}.If you have already done the  #{deadline_type}, Please ignore this mail."
 
+    # defn = Hash[bcc: emails, subject: subject, body: {}]
+    # defn[:body][:obj_name] = assignment.name
+    # defn[:body][:type] = "no type"
+    # defn[:body][:partial_name] = "new_submission"
+    # defn[:body][:first_name] = "first name"
+
     emails.each do |mail|
       Rails.logger.info mail
     end
-    create_mailer_object.sync_message(Hash[bcc: emails, subject: subject, body: body]).deliver
+
+    Mailer.delayed_message(bcc: emails, subject: subject, body: body).deliver_now
+
+    # email = Mailer.sync_message(
+    #     to: 'tluo@ncsu.edu',
+    #     subject: "Test",
+    #     body: {
+    #         obj_name: 'assignment',
+    #         type: 'submission',
+    #         location: '1',
+    #         first_name: 'User',
+    #         partial_name: 'update'
+    #     }
+    # ).deliver_now
+
   end
 
   def when_to_run_reminder
+    puts "call when_to_run_reminder"
+
     hours_before_deadline = self.threshold.hours
-    (self.due_at.to_time_in_current_zone - hours_before_deadline).to_datetime
+    result = (self.due_at.in_time_zone - hours_before_deadline).to_datetime
+    puts result.to_s
+    result
   end
 
   def when_to_run_start_reminder
+    puts "when_to_run_start_reminder"
+
     days_before_deadline = 3.days
-    (self.due_at - days_before_deadline).to_datetime
+    result = (self.due_at - days_before_deadline).to_datetime
+    puts result.to_s
+    result
   end
 
-  handle_asynchronously :start_reminder, run_at: proc {|i| i.when_to_run_start_reminder }
-  handle_asynchronously :reminder, run_at: proc {|i| i.when_to_run_reminder }
-
+  # run asynchronously by using Delayed_Jobs module, the operation will be serialized into database(in delayed_jobs table)
+  # handle_asynchronously :start_reminder, run_at: proc { |i| i.when_to_run_start_reminder }
+  # handle_asynchronously :reminder, run_at: proc {|i| i.when_to_run_reminder }, :queue => @queue_name, :extra_param => @extra_param
 
 end

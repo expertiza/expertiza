@@ -291,6 +291,7 @@ class SignupSheetController < ApplicationController
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].id, 'Student has dropped the topic: ' + params[:topic_id].to_s)
     end
   end
+
   # this function is used to delete a previous signup
   def delete_signup
     participant = AssignmentParticipant.find(params[:id])

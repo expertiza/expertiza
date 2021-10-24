@@ -16,14 +16,14 @@ describe "Late Policy Creation" do
   before(:each) do
     create_deadline_types
       login_as("instructor6")
-  end
-
-  it "create new late policy for assignment successfully" do
-
+    #Setting up the intial conditions of the test
     visit edit_assignment_path(assignment)
     click_on "Due dates"
     click_on "New late policy"
     expect(page).to have_current_path(new_late_policy_path)
+  end
+
+  it "create new late policy for assignment successfully" do
 
     policy_name = "Late policy name"
     penalty_per_unit = 1
@@ -55,10 +55,6 @@ describe "Late Policy Creation" do
 
     it "[negative] create new late policy for assignment with negative penalties" do
       # the flow is by editing assignment
-      visit edit_assignment_path(assignment)
-      click_on "Due dates"
-      click_on "New late policy"
-      expect(page).to have_current_path(new_late_policy_path)
 
       policy_name = "Negative penalty points late policy"
       penalty_per_unit = -1
@@ -78,11 +74,6 @@ describe "Late Policy Creation" do
     end
 
     it "does not create new policy if policy name already exists" do
-
-      visit edit_assignment_path(assignment)
-      click_on "Due dates"
-      click_on "New late policy"
-      expect(page).to have_current_path(new_late_policy_path)
 
       # Use the name for an existing policy
       policy_name = existing_policy.policy_name
@@ -105,11 +96,6 @@ describe "Late Policy Creation" do
     end
 
     it "does not create new policy if fields are empty" do
-
-      visit edit_assignment_path(assignment)
-      click_on "Due dates"
-      click_on "New late policy"
-      expect(page).to have_current_path(new_late_policy_path)
 
       # Use empty fields
       policy_name = ''
@@ -137,11 +123,6 @@ describe "Late Policy Creation" do
 
     it "shows error on policy name greater than 255 characters" do
 
-      visit edit_assignment_path(assignment)
-      click_on "Due dates"
-      click_on "New late policy"
-      expect(page).to have_current_path(new_late_policy_path)
-
       # Use policy name longer than 255 chars
       policy_name = 'a' * 256
       penalty_per_unit = 1
@@ -163,10 +144,6 @@ describe "Late Policy Creation" do
     end
 
     it "shows error on max penalty being less than penalty per unit" do 
-      visit edit_assignment_path(assignment)
-      click_on "Due dates"
-      click_on "New late policy"
-      expect(page).to have_current_path(new_late_policy_path)
 
       policy_name = 'Assignment 1'
       penalty_per_unit = 10

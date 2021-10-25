@@ -60,7 +60,7 @@ class MailWorker
 
   def find_participant_emails
     emails = []
-    participants = Participant.where(parent_id: self.assignment_id)
+    participants = Participant.includes(:user).where(parent_id: self.assignment_id)
     participants.each do |participant|
       emails << participant.user.email unless participant.user.nil?
     end

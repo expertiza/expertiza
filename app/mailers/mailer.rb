@@ -60,7 +60,6 @@ class Mailer < ActionMailer::Base
 
     defn[:to] = 'expertiza.development@gmail.com' if Rails.env.development? || Rails.env.test?
     mail(subject: defn[:subject],
-         # content_type: "text/html",
          to: defn[:to])
   end
 

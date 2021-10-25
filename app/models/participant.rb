@@ -72,20 +72,24 @@ class Participant < ActiveRecord::Base
 
   # send email to team's reviewers in case a new submission is made
   def mail_assigned_reviewers
-    maps = ResponseMap.where(reviewed_object_id: self.assignment.id, reviewee_id: self.team.id, type: 'ReviewResponseMap')
-    unless maps.nil?
-      maps.each do |map|
-        reviewer = User.find(Participant.find(map.reviewer_id).user_id)
+    # Find review mappings for the work done by this participant's team
+    mappings = ResponseMap.includes(reviewer: [:user]) # prefetch the reviewer, user for preparing the emails
+                          .where(reviewed_object_id: self.assignment.id,
+                                 reviewee_id: self.team.id,
+                                 type: 'ReviewResponseMap')
+    unless mappings.nil?
+      mappings.each do |mapping|
+        reviewer = mapping.reviewer.user
         Mailer.sync_message(
             {
                 :to => reviewer.email,
                 subject:  "Assignment '#{self.assignment.name}': A submission has been updated since you last reviewed it",
-                cc: User.find_by(self.assignment.instructor_id).email,
+                cc: self.assignment.instructor.email,
                 :body => {
                     :obj_name => self.assignment.name,
-                    :link => "https://expertiza.ncsu.edu/response/new?id=#{map.id}",
+                    :link => "https://expertiza.ncsu.edu/response/new?id=#{mapping.id}",
                     :type => 'submission',
-                    :first_name => ApplicationHelper::get_user_first_name(User.find(Participant.find(map.reviewer_id).user_id)),
+                    :first_name => ApplicationHelper::get_user_first_name(reviewer),
                     :partial_name => 'updated_submission_since_review'
                 }
             }

@@ -71,9 +71,8 @@ class Participant < ActiveRecord::Base
   end
 
   # send email to team's reviewers in case a new submission is made
-  def mail_assigned_reviewers()
-    team = self.team
-    maps = ResponseMap.where(reviewed_object_id: self.assignment.id, reviewee_id: team.id, type: 'ReviewResponseMap')
+  def mail_assigned_reviewers
+    maps = ResponseMap.where(reviewed_object_id: self.assignment.id, reviewee_id: self.team.id, type: 'ReviewResponseMap')
     unless maps.nil?
       maps.each do |map|
         reviewer = User.find(Participant.find(map.reviewer_id).user_id)

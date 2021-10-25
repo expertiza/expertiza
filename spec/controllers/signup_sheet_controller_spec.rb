@@ -36,7 +36,7 @@ describe SignupSheetController do
       context 'when new topic can be saved successfully' do
         it 'sets up a new topic and redirects to assignment#edit page' do
           allow(SignUpTopic).to receive(:where).with(topic_name: 'Hello world!', assignment_id: '1').and_return([nil])
-          allow_any_inst  ance_of(SignUpSheetController).to receive(:undo_link)
+          allow_any_inst  ance_of(SignupSheetController).to receive(:undo_link)
                                                             .with("The topic: \"Hello world!\" has been created successfully. ").and_return('OK')
           allow(topic).to receive(:save).and_return('OK')
           params = {
@@ -57,7 +57,7 @@ describe SignupSheetController do
       context 'when new topic cannot be saved successfully' do
         it 'sets up a new topic and renders signup_sheet#new page' do
           allow(SignUpTopic).to receive(:where).with(topic_name: 'Hello world!', assignment_id: '1').and_return([nil])
-          allow_any_instance_of(SignUpSheetController).to receive(:undo_link)
+          allow_any_instance_of(SignupSheetController).to receive(:undo_link)
                                                             .with("The topic: \"Hello world!\" has been created successfully. ").and_return('OK')
           allow(topic).to receive(:save).and_return('OK')
           params = {
@@ -101,7 +101,7 @@ describe SignupSheetController do
   describe '#destroy' do
     context 'when topic can be found' do
       it 'redirects to assignment#edit page' do
-        allow_any_instance_of(SignUpSheetController).to receive(:undo_link)
+        allow_any_instance_of(SignupSheetController).to receive(:undo_link)
                                                           .with("The topic: \"Hello world!\" has been successfully deleted. ").and_return('OK')
         params = {id: 1, assignment_id: 1}
         post :destroy, params
@@ -112,7 +112,7 @@ describe SignupSheetController do
     context 'when topic cannot be found' do
       it 'shows an error flash message and redirects to assignment#edit page' do
         allow(SignUpTopic).to receive(:find).with('1').and_return(nil)
-        allow_any_instance_of(SignUpSheetController).to receive(:undo_link)
+        allow_any_instance_of(SignupSheetController).to receive(:undo_link)
                                                           .with("The topic: \"Hello world!\" has been successfully deleted. ").and_return('OK')
         params = {id: 1, assignment_id: 1}
         post :destroy, params
@@ -169,7 +169,7 @@ describe SignupSheetController do
         allow(SignedUpTeam).to receive(:where).with(topic_id: 2, is_waitlisted: true).and_return([signed_up_team2])
         allow(Team).to receive(:find).with(2).and_return(team)
         allow(SignUpTopic).to receive(:find_waitlisted_topics).with(1, 2).and_return(nil)
-        allow_any_instance_of(SignUpSheetController).to receive(:undo_link)
+        allow_any_instance_of(SignupSheetController).to receive(:undo_link)
                                                           .with("The topic: \"Hello world!\" has been successfully updated. ").and_return('OK')
         params = {
           id: 2,

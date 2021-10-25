@@ -238,11 +238,10 @@ describe SignupSheetController do
     context 'when user cannot be found' do
       it 'shows an flash error message and redirects to assignment#edit page' do
         allow(User).to receive(:find_by).with(name: 'no name').and_return(nil)
-        allow(User).to receive(:find).with(8).and_return(student)
         allow(Team).to receive(:find).with(1).and_return(team)
         params = {username: 'no name', assignment_id: 1}
         get :signup_as_instructor_action, params
-        expect(flash[:error]).to eq(User.find_by(name: params[:username]).name + ' does not exist!')
+        expect(flash[:error]).to eq(params[:username] + ' does not exist!')
         expect(response).to redirect_to('/assignments/1/edit')
       end
     end
@@ -371,7 +370,7 @@ describe SignupSheetController do
         params = {id: 1}
         session = {user: instructor}
         get :delete_signup_as_instructor, params, session
-        expect(flash[:error]).to eq('The student has already submitted their work, so you are not allowed to remove them.')
+        expect(flash[:error]).to eq('The team has already submitted their work, so you are not allowed to remove them.')
         expect(response).to redirect_to('/assignments/1/edit')
       end
     end

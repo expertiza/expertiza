@@ -237,11 +237,11 @@ class SignupSheetController < ApplicationController
     #put name of student and team in log
     # flash name of student and team
     user = User.find_by(name: params[:username])
-    team = Team.find_team_for_assignment_and_user(params[:assignment_id], user.id).first
     assignment = Assignment.find(params[:assignment_id])
     if user.nil? # validate invalid user
-      flash[:error] = user.name + " does not exist!"
+      flash[:error] = params[:username] + " does not exist!"
     else #If the user is not null and the student exists then sign up student for topic
+      team = Team.find_team_for_assignment_and_user(params[:assignment_id], user.id).first
       if AssignmentParticipant.exists? user_id: user.id, parent_id: params[:assignment_id]
         if SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
           flash[:success] = "You have successfully signed up " + user.name + " on " + team.name + "  for the topic " + params[:topic_id].to_s

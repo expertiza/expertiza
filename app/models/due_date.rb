@@ -122,26 +122,24 @@ class DueDate < ActiveRecord::Base
     MailWorker.new(self.parent_id, self.deadline_type, self.due_at)
   end
 
+  # main function to start email reminder
   def start_reminder
-    puts "call start reminder"
+    puts when_to_run_reminder
     if self.changed?
-      @extra_param = self.parent_id.to_s
-      puts "extra: " + @extra_param
+      @extra_param = self.parent_id.to_s + "," + self.deadline_type_id.to_s
+      # first deleted existed delayed jobs with same parent_id(which is assignment id actually)
       Delayed::Job.where(extra_param: @extra_param).each do |job|
-        puts job.id
         job.delete
       end
-      self.delay(run_at: proc {|i| i.when_to_run_reminder }, :queue => @queue_name, :extra_param => @extra_param).reminder
-      # reminder
-    else
-      puts "nothing changed"
+      # add a delayed job to the delayed job queue, the job will run at what when_to_run_reminder return
+      run_at_time = when_to_run_reminder
+      if run_at_time >= 0.seconds.from_now
+        self.delay(run_at: run_at_time, :extra_param => @extra_param).reminder
+      end
     end
   end
 
   def reminder
-    puts "call reminder"
-    # first deleted existed delayed jobs with same id
-
     deadline_text = self.deadline_type if %w[submission review].include? self.deadline_type
     deadline_text = "Team Review" if self.deadline_type == 'metareview'
     mail_worker = create_mailworker_object
@@ -154,47 +152,24 @@ class DueDate < ActiveRecord::Base
     body = "This is a reminder to complete #{deadline_type} for assignment #{assignment.name}. \
     Deadline is #{self.due_at}.If you have already done the  #{deadline_type}, Please ignore this mail."
 
-    # defn = Hash[bcc: emails, subject: subject, body: {}]
-    # defn[:body][:obj_name] = assignment.name
-    # defn[:body][:type] = "no type"
-    # defn[:body][:partial_name] = "new_submission"
-    # defn[:body][:first_name] = "first name"
-
     emails.each do |mail|
       Rails.logger.info mail
     end
 
     Mailer.delayed_message(bcc: emails, subject: subject, body: body).deliver_now
 
-    # email = Mailer.sync_message(
-    #     to: 'tluo@ncsu.edu',
-    #     subject: "Test",
-    #     body: {
-    #         obj_name: 'assignment',
-    #         type: 'submission',
-    #         location: '1',
-    #         first_name: 'User',
-    #         partial_name: 'update'
-    #     }
-    # ).deliver_now
-
   end
 
+  # after duedate - threshold hours, then we can send the reminder email
   def when_to_run_reminder
-    puts "call when_to_run_reminder"
-
     hours_before_deadline = self.threshold.hours
     result = (self.due_at.in_time_zone - hours_before_deadline).to_datetime
-    puts result.to_s
     result
   end
 
   def when_to_run_start_reminder
-    puts "when_to_run_start_reminder"
-
     days_before_deadline = 3.days
     result = (self.due_at - days_before_deadline).to_datetime
-    puts result.to_s
     result
   end
 

@@ -114,16 +114,16 @@ module Helper_methods
 
   # remove hardcoded parameter
   def automatic_review_mapping_strategy(assignment_id,
-                                        participants, teams, student_review_num = 0,
-                                        submission_review_num = 0)
+                                        participants, teams, num_reviews_per_student = 0,
+                                        num_reviews_per_submission = 0)
     zero_review = 0
     team_participants_hash = {}
     participants.each {|participant| team_participants_hash[participant.id] = 0 }
     # calculate reviewers for each team
-    if student_review_num != zero_review and submission_review_num == zero_review
-      review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, teams, student_review_num)
-    elsif student_review_num == zero_review and submission_review_num != zero_review
-      review_strategy = ReviewMappingHelper::TeamReviewStrategy.new(participants, teams, submission_review_num)
+    if num_reviews_per_student != zero_review and num_reviews_per_submission == zero_review
+      review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, teams, num_reviews_per_student)
+    elsif num_reviews_per_student == zero_review and num_reviews_per_submission != zero_review
+      review_strategy = ReviewMappingHelper::TeamReviewStrategy.new(participants, teams, num_reviews_per_submission)
     end
 
     peer_review_strategy(assignment_id, review_strategy, team_participants_hash)

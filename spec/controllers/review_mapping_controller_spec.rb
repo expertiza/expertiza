@@ -518,7 +518,7 @@ describe ReviewMappingController do
         end
       end
 
-      context 'when all nums in params are 0 except student_review_num' do
+      context 'when all nums in params are 0 except num_reviews_per_student' do
         it 'runs automatic review mapping strategy and redirects to review_mapping#list_mappings page' do
           allow_any_instance_of(ReviewMappingController).to receive(:automatic_review_mapping_strategy).with(any_args).and_return(true)
           params = {

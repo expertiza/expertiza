@@ -112,7 +112,11 @@ module Helper_methods
     end
   end
 
-  # remove hardcoded parameter
+  # remove hardcoded parameter such as 0, and giving meaningful zero_review to enhancing readability
+  # rename method add_review to assign_reviewer_manually to better address this method is to assign a reviewer to a submission
+  # rename variable student_review_num to num_reviews_per_student to better demonstrate purpose
+  # rename variable submission_review_num to num_reviews_per_submission to better demonstrate purpose
+  # rename variable participants_hash to team_participants_hash to better demonstrate purpose
   def automatic_review_mapping_strategy(assignment_id,
                                         participants, teams, num_reviews_per_student = 0,
                                         num_reviews_per_submission = 0)

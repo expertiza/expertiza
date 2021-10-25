@@ -22,7 +22,9 @@ class AccountRequestController < ApplicationController
     end
   end
 
+  # Decides whether a new user should be created or not
   def create_approved_user
+    # If a user isn't selected before approving or denying, they are given an error message
     if params[:selection] == nil
       flash[:error] = "Please select at least one user before approving or rejecting"
       redirect_to action: 'list_pending_requested'
@@ -39,8 +41,11 @@ class AccountRequestController < ApplicationController
       elsif requested_user.update_attributes(params[:user])
         flash[:success] = "The user \"#{requested_user.name}\" has been successfully updated."
       end
+      # If the users request is approved, they are stored as a user in the database
       if requested_user.status == "Approved"
         user_new(requested_user)
+      # If the user's request is denied, their entry is updated in the database and
+      # a confirmation message is given saying their request has been denied
       elsif requested_user.status == "Rejected"
         # If the user request has been rejected, a flash message is shown and redirected to review page
         if requested_user.update_columns(status: is_approved)
@@ -55,6 +60,7 @@ class AccountRequestController < ApplicationController
     redirect_to action: 'list_pending_requested'
   end
 
+  # Creates a new user if their request is approved
   def user_new(requested_user)
     puts requested_user.inspect
     new_user = User.new
@@ -65,6 +71,7 @@ class AccountRequestController < ApplicationController
     new_user.email = requested_user.email
     new_user.parent_id = session[:user].id
     new_user.timezonepref = User.find_by(id: new_user.parent_id).timezonepref
+    # If the user is created, it sends the requested user an email with password instructions
     if new_user.save
       password = new_user.reset_password
       # Mail is sent to the user with a new password

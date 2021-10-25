@@ -91,7 +91,7 @@ describe "due_date_functions" do
     end
 
     it "get next due date from topic for staggered deadline" do
-      assignment_id = create(:assignment, staggered_deadline: true, name: "TestAssignment", directory_path: "TestAssignment").id
+      assignment_id = create(:assignment, staggered_deadline: true, name: "TestAssignment1", directory_path: "TestAssignment1").id
       due_date = create(:topic_due_date, deadline_type: @deadline_type,
                                          submission_allowed_id: @deadline_right.id, review_allowed_id: @deadline_right.id,
                                          review_of_review_allowed_id: @deadline_right.id, due_at: Time.zone.now + 5000, parent_id: assignment_id)
@@ -99,7 +99,7 @@ describe "due_date_functions" do
     end
 
     it "next due date does not exist for staggered deadline" do
-      assignment_id = create(:assignment, staggered_deadline: true, name: "TestAssignment", directory_path: "TestAssignment").id
+      assignment_id = create(:assignment, staggered_deadline: true, name: "TestAssignment2", directory_path: "TestAssignment2").id
       due_date = create(:topic_due_date, deadline_type: @deadline_type,
                                          submission_allowed_id: @deadline_right, review_allowed_id: @deadline_right,
                                          review_of_review_allowed_id: @deadline_right, due_at: Time.zone.now + 5000, parent_id: assignment_id)
@@ -107,7 +107,7 @@ describe "due_date_functions" do
     end
 
     it "next due date is before Time.now for staggered deadline" do
-      assignment_id = create(:assignment, staggered_deadline: true, name: "TestAssignment", directory_path: "TestAssignment").id
+      assignment_id = create(:assignment, staggered_deadline: true, name: "TestAssignment3", directory_path: "TestAssignment3").id
       due_date = create(:topic_due_date, deadline_type: @deadline_type,
                                          submission_allowed_id: @deadline_right, review_allowed_id: @deadline_right,
                                          review_of_review_allowed_id: @deadline_right, due_at: Time.zone.now - 5000, parent_id: assignment_id)
@@ -115,7 +115,7 @@ describe "due_date_functions" do
     end
 
     it "get next due date from assignment for staggered deadline" do
-      assignment_id = create(:assignment, staggered_deadline: true, name: "TestAssignment", directory_path: "TestAssignment").id
+      assignment_id = create(:assignment, staggered_deadline: true, name: "TestAssignment4", directory_path: "TestAssignment4").id
       due_date = create(:assignment_due_date, deadline_type: @deadline_type,
                                               submission_allowed_id: @deadline_right, review_allowed_id: @deadline_right,
                                               review_of_review_allowed_id: @deadline_right, due_at: Time.zone.now + 5000, parent_id: assignment_id)

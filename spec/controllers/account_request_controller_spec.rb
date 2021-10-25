@@ -31,7 +31,7 @@ describe AccountRequestController do
           commit: 'Reject'
       }
       post :create_approved_user, params
-      expect(flash[:error]).to eq 'Please Approve or Reject before submitting'
+      expect(flash[:error]).to eq 'Please select at least one user before approving or rejecting'
       expect(response).to redirect_to('http://test.host/account_request/list_pending_requested')
     end
 

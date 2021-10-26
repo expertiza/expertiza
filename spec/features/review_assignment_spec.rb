@@ -100,4 +100,21 @@ describe "peer review testing" do
     click_button "Request a new submission to review"
     expect(page).to have_content "No previous versions available"
   end
+
+  it "is able to view red color on ui for review not started" do
+    submit_to_topic
+    click_link "Logout"
+    user = User.find_by(name: "student2065")
+    login_as(user.name)
+    visit '/student_task/list'
+    visit '/sign_up_sheet/sign_up?id=1&topic_id=1'
+    visit '/student_task/list'
+    click_link "TestAssignment"
+    click_link "Others' work"
+    find(:css, "#i_dont_care").set(true)
+    click_button "Request a new submission to review"
+    find(:css, ".ReviewItem")['style'].should == 'background-color:#FF0000'
+    expect(page).to have_content "No previous versions available"
+    expect(page).to have_content "Review 1"
+  end
 end

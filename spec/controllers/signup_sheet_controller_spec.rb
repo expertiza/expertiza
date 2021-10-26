@@ -36,7 +36,7 @@ describe SignupSheetController do
       context 'when new topic can be saved successfully' do
         it 'sets up a new topic and redirects to assignment#edit page' do
           allow(SignUpTopic).to receive(:where).with(topic_name: 'Hello world!', assignment_id: '1').and_return([nil])
-          allow_any_inst  ance_of(SignupSheetController).to receive(:undo_link)
+          allow_any_instance_of(SignupSheetController).to receive(:undo_link)
                                                             .with("The topic: \"Hello world!\" has been created successfully. ").and_return('OK')
           allow(topic).to receive(:save).and_return('OK')
           params = {

@@ -92,7 +92,8 @@ describe SignupSheetController do
           }
         }
         post :create, params
-        expect(SignedUpTeam.first.is_waitlisted).to be false
+        expect(flash[:error]).to eq("That topic already exists!")
+        expect(response).to redirect_to('/assignments/1/edit#tabs-2')
         expect(response).to redirect_to('/signup_sheet/add_signup_topics_staggered?id=1')
       end
     end

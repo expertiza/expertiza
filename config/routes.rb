@@ -418,12 +418,12 @@ resources :institution, except: [:destroy] do
   resources :submitted_content, only: [:edit] do
     collection do
       get :download
-      get :folder_action
+      get :perform_folder_action
       get :remove_hyperlink
       post :remove_hyperlink
       get :submit_file
       post :submit_file
-      post :folder_action
+      post :perform_folder_action
       post :submit_hyperlink
       get :submit_hyperlink
       get :view

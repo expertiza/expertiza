@@ -30,7 +30,7 @@
     <% end %>
   <% end %>
 
-  <%= form_tag({:controller=>'submitted_content',:action=>'folder_action', :id => participant.id, :origin => origin ||= nil}, {:multipart => true, id: 'folder-action-form'}) do %>
+  <%= form_tag({:controller=>'submitted_content',:action=>'perform_folder_action', :id => participant.id, :origin => origin ||= nil}, {:multipart => true, id: 'folder-action-form'}) do %>
     <% if files.length > 0 and participant.team.directory_num != nil and participant.team.directory_num >= 0 %>
       <% if same_team_flag && stage != "Finished" %>
         <div style="padding-bottom:0.6em"><h5>File actions:</h5>

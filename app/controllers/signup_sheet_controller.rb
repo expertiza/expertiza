@@ -244,7 +244,7 @@ class SignupSheetController < ApplicationController
       team = Team.find_team_for_assignment_and_user(params[:assignment_id], user.id).first
       if AssignmentParticipant.exists? user_id: user.id, parent_id: params[:assignment_id]
         if SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
-          flash[:success] = "You have successfully signed up " + user.name + " on " + team.name + "  for the topic " + params[:topic_id].to_s
+          flash[:success] = "You have successfully signed up " + user.name + " on " + team.name + " for the topic " + params[:topic_id].to_s
           ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Instructor signed up ' + user.name + ' on team ' + team.name + ' for topic: ' + params[:topic_id].to_s)
         else #If the students team already has a topic then cancel the sign up
           flash[:error] = user.name + " on " + team.name + " has already signed up for a topic!"

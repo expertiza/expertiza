@@ -393,7 +393,7 @@ describe SignupSheetController do
       it 'shows a flash success message and redirects to assignment#edit page' do
         allow(team).to receive(:submitted_files).and_return([])
         allow(team).to receive(:hyperlinks).and_return([])
-        allow(SignedUpTeam).to receive(:find_team_users).with(1, 6).and_return([team])
+        allow(SignedUpTeam).to receive(:find_team_users).with(1, 1).and_return([team])
         allow(team).to receive(:t_id).and_return(1)
         params = {id: 1, topic_id: 1}
         session = {user: instructor}

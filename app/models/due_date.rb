@@ -135,7 +135,7 @@ class DueDate < ActiveRecord::Base
   end
 
   def self.find_seconds_from_now_duration(due_at_time)
-    current_datetime = DateTime.now.in_time_zone(zone = 'UTC').to_s(:db)
+    current_datetime = DateTime.now.in_time_zone.to_s(:db)
     current_time = Time.parse(current_datetime)
 
     due_at_time - current_time

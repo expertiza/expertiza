@@ -3,7 +3,7 @@ class SubmittedContentController < ApplicationController
   require 'mimemagic/overlay'
 
   include AuthorizationHelper
-  include SubmittedFiles
+  include SubmittedFilesHelper
 
   def action_allowed
     case current_role_name 
@@ -154,15 +154,15 @@ class SubmittedContentController < ApplicationController
     @current_folder.name = "/"
     @current_folder.name = FileHelper.sanitize_folder(params[:current_folder][:name]) if params[:current_folder]
     if params[:faction][:delete]
-      SubmittedFiles.delete_selected_files
+      SubmittedFilesHelper.delete_selected_files
     elsif params[:faction][:rename]
-      SubmittedFiles.rename_selected_file
+      SubmittedFilesHelper.rename_selected_file
     elsif params[:faction][:move]
-      SubmittedFiles.move_selected_file
+      SubmittedFilesHelper.move_selected_file
     elsif params[:faction][:copy]
-      SubmittedFiles.copy_selected_file
+      SubmittedFilesHelper.copy_selected_file
     elsif params[:faction][:create]
-      SubmittedFiles.create_new_folder
+      SubmittedFilesHelper.create_new_folder
     end
     redirect_to action: 'edit', id: @participant.id
   end

@@ -1,4 +1,4 @@
-module SubmittedFiles
+module SubmittedFilesHelper
     
   def move_selected_file
     old_filename = params[:directories][params[:chk_files]] + "/" + params[:filenames][params[:chk_files]]
@@ -61,4 +61,6 @@ module SubmittedFiles
     rescue StandardError => e
       flash[:error] = e.message
     end
-  end
+end
+end
+  

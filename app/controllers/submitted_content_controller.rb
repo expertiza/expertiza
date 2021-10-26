@@ -24,7 +24,7 @@ class SubmittedContentController < ApplicationController
     return unless current_user_id?(@participant.user_id)
     @assignment = @participant.assignment
     # ACS We have to check if this participant has team or not
-    # hence use team count for the check
+    
     SignUpSheet.signup_team(@assignment.id, @participant.user_id, nil) if @participant.team.nil?
     # @can_submit is the flag indicating if the user can submit or not in current stage
     @can_submit = !params.key?(:view)
@@ -33,7 +33,7 @@ class SubmittedContentController < ApplicationController
 
   # view is called when @assignment.submission_allowed(topic_id) is false
   # so @can_submit should be false
-  def view
+  def disable_submission
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
     @assignment = @participant.assignment

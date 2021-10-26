@@ -24,6 +24,33 @@ describe MailWorker do
       MailWorker.perform_in(3.hours, 1, "metareview", "2018-12-31 00:00:01")
       queue = Sidekiq::Queues["jobs"]
       expect(queue.size).to eq(1)
+      queue.clear
+    end
+  end
+
+  describe "test different workers" do
+    it "should increase the size of queue by 1 when MailWorker is used" do
+      Sidekiq::Testing.fake!
+      MailWorker.perform_in(42.minutes, 1, "review", "2021-10-27 00:00:01")
+      queue = Sidekiq::Queues["jobs"]
+      expect(queue.size).to eq(1)
+      queue.clear
+    end
+
+    it "should increase the size of queue by 1 when SimicheckWorker is used" do
+      Sidekiq::Testing.fake!
+      SimicheckWorker.perform_in(42.minutes, 1, "review", "2021-10-27 00:00:01")
+      queue = Sidekiq::Queues["jobs"]
+      expect(queue.size).to eq(1)
+      queue.clear
+    end
+
+    it "should increase the size of queue by 1 when DropOutstandingReviewsWorker is used" do
+      Sidekiq::Testing.fake!
+      DropOutstandingReviewsWorker.perform_in(42.minutes, 1, "review", "2021-10-27 00:00:01")
+      queue = Sidekiq::Queues["jobs"]
+      expect(queue.size).to eq(1)
+      queue.clear
     end
   end
 end

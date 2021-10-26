@@ -9,6 +9,8 @@ describe AssignmentForm do
   let(:aq_attributes2) { double('AssignmentQuestionnaire') }
   let(:questionnaire1) { double('Questionnaire', type: 'ReviewQuestionnaire') }
   let(:questionnaire2) { double('Questionnaire', type: 'MetareviewQuestionnaire') }
+  let(:other_assignment) { build(:assignment, id: 2) }
+  let(:other_assignment_form) { AssignmentForm.new }
   before(:each) do
     assignment_form.instance_variable_set(:@assignment, assignment)
   end
@@ -28,7 +30,8 @@ describe AssignmentForm do
       attributes = {
         assignment: {
           late_policy_id: 1,
-          simicheck: true
+          simicheck: true,
+          simicheck_threshold: '2'
         },
         assignment_questionnaire: [assignment_questionnaire1, assignment_questionnaire2],
         due_date: [double('DueDate'), double('DueDate')]
@@ -37,9 +40,9 @@ describe AssignmentForm do
       allow_any_instance_of(AssignmentForm).to receive(:update_assignment_questionnaires).with(attributes[:assignment_questionnaire]).and_return(true)
       allow_any_instance_of(AssignmentForm).to receive(:update_assignment_questionnaires).with(attributes[:topic_questionnaire]).and_return(true)
       allow_any_instance_of(AssignmentForm).to receive(:update_due_dates).with(attributes[:due_date], user).and_return(true)
-      allow_any_instance_of(AssignmentForm).to receive(:add_simicheck_to_delayed_queue).with(attributes[:assignment][:simicheck]).and_return(true)
-      allow_any_instance_of(AssignmentForm).to receive(:delete_from_delayed_queue).and_return(true)
-      allow_any_instance_of(AssignmentForm).to receive(:add_to_delayed_queue).and_return(true)
+      # allow_any_instance_of(AssignmentForm).to receive(:add_simicheck_to_delayed_queue).with(attributes[:assignment][:simicheck]).and_return(true)
+      # allow_any_instance_of(AssignmentForm).to receive(:delete_from_delayed_queue).and_return(true)
+      # allow_any_instance_of(AssignmentForm).to receive(:add_to_delayed_queue).and_return(true)
       expect(assignment_form.update(attributes, user)).to be true
     end
   end
@@ -582,6 +585,31 @@ describe AssignmentForm do
       end
     end
   end
+
+  describe '#delete_from_delayed_queue' do
+    before(:each) do
+      allow(AssignmentDueDate).to receive(:where).with(parent_id: 1).and_return([due_date])
+      allow_any_instance_of(AssignmentForm).to receive(:find_min_from_now_duration).with(any_args).and_return(666)
+      allow(due_date).to receive(:update_attribute).with(:delayed_job_id, any_args).and_return('Succeed!')
+      other_assignment_form.instance_variable_set(:@assignment, other_assignment)
+      Sidekiq::Testing.inline!
+    end
+
+    context "when there are no jobs with the assignment id that is to be deleted" do
+      it 'does not change the # of DelayedJob' do
+        allow(DeadlineType).to receive(:find).with(1).and_return(double('DeadlineType', name: 'review'))
+        Sidekiq::Testing.fake!
+        Sidekiq::RetrySet.new.clear
+        Sidekiq::ScheduledSet.new.clear
+        Sidekiq::Stats.new.reset
+        Sidekiq::DeadSet.new.clear
+        queue = Sidekiq::Queue.new("jobs")
+        assignment_form.add_to_delayed_queue
+        expect { other_assignment_form.delete_from_delayed_queue }.to change { queue.size }.by(0)
+      end
+    end
+  end
+
 
   describe '#assignment_questionnaire' do
     context 'when multiple active records of assignment_questionnaire are found for a given assignment_id, used_in_round, and topic_id' do

@@ -107,6 +107,7 @@ class AccountRequestController < ApplicationController
     @roles = Role.all
   end
 
+  # Creates an account request for the user if it is not a duplicate
   def create_requested_user_record
     requested_user = AccountRequest.new(requested_user_params)
     #An object is created with respect to AccountRequest model inorder to populate the users information when account is requested
@@ -129,6 +130,7 @@ class AccountRequestController < ApplicationController
     #if the first if clause fails, redirect back to the account requests page!
   end
 
+  # Verifies the requested user account has the institution, status, and role filled out then saves the object to the database
   def save_requested_user(requested_user, params)
     if params[:user][:institution_id].empty?
       institution = Institution.find_or_create_by(name: params[:institution][:name])
@@ -145,6 +147,7 @@ class AccountRequestController < ApplicationController
     return requested_user.save
   end
 
+  # Notifies all the super admins by email that request for a new account has been created
   def  notify_supers_new_request(requested_user)
     super_users = User.joins(:role).where('roles.name = ?', 'Super-Administrator')
     super_users.each do |super_user|

@@ -265,13 +265,14 @@ describe SignupSheetController do
             allow(SignedUpTeam).to receive(:topic_id).with('1', 8).and_return(1)
             allow_any_instance_of(SignedUpTeam).to receive(:save).and_return(team)
             allow(Team).to receive(:find).with(1).and_return(team)
+            allow(Team).to receive(:find_team_for_assignment_and_user).with('1',8).and_return([double('Team', id: 1, name: "Test_team")])
             params = {
               username: 'no name',
               assignment_id: 1,
               topic_id: 1
             }
             get :signup_as_instructor_action, params
-            expect(flash[:success]).to eq('You have successfully signed up ' + User.find_by(name: params[:username]).name + ' on team ' + Team.find_team_for_assignment_and_user(params[:assignment_id], user.id).first.name + ' for the topic: ' + params[:topic_id].to_s)
+            expect(flash[:success]).to eq('You have successfully signed up ' + User.find_by(name: params[:username]).name + ' on ' + Team.find_team_for_assignment_and_user('1', 8).first.name + ' for the topic ' + params[:topic_id].to_s)
             expect(response).to redirect_to('/assignments/1/edit')
           end
         end
@@ -284,12 +285,13 @@ describe SignupSheetController do
             allow(TeamsUser).to receive(:create).with(user_id: 8, team_id: 1).and_return(double('TeamsUser', id: 1))
             allow(TeamUserNode).to receive(:create).with(parent_id: 1, node_object_id: 1).and_return(double('TeamUserNode', id: 1))
             allow(Team).to receive(:find).with(1).and_return(team)
+            allow(Team).to receive(:find_team_for_assignment_and_user).with('1',8).and_return([double('Team', id: 1, name: "Test_team")])
             params = {
               username: 'no name',
               assignment_id: 1
             }
             get :signup_as_instructor_action, params
-            expect(flash[:error]).to eq(User.find_by(name: params[:username]).name + + ' has already signed up for a topic!')
+            expect(flash[:error]).to eq(User.find_by(name: params[:username]).name + ' on ' + Team.find_team_for_assignment_and_user('1', 8).first.name + ' has already signed up for a topic!')
             expect(response).to redirect_to('/assignments/1/edit')
           end
         end

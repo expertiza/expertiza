@@ -73,7 +73,7 @@ class SuggestionController < ApplicationController
     end
 
     if @suggestion.save
-      flash[:success] = 'Thank you for your suggestion!' unless @suggestion.unityID.empty?
+      flash[:success] = 'Thank you for your suggestion!' unless @suggestion.unityID.empty?  #Change these two lines of codes to Ruby style
       flash[:success] = 'You have submitted an anonymous suggestion. It will not show in the suggested topic table below.' if @suggestion.unityID.empty?
     end
     redirect_to action: 'new', id: @suggestion.assignment_id

@@ -44,7 +44,7 @@ class QuestionnairesController < ApplicationController
 
   def new
     begin
-      @questionnaire = Object.const_get(params[:model].split.join).new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model].split.join
+      @questionnaire = params[:model].split.join.constantize.new if Questionnaire::QUESTIONNAIRE_TYPES.include? params[:model].split.join
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end

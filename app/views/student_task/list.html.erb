@@ -1,4 +1,4 @@
-<h1>Assignments/h1>
+<h1>Assignments</h1>
 
 
 <div style="">
@@ -88,6 +88,7 @@
  <table class="table table-striped" cellpadding="2">
     <tr class="taskheader">
       <th>Assignment</th>
+      <!--wrap column headings with the helper functions which decide if the column should be displayed-->
       <% if student_has_any_courses?(@student_tasks) %>
         <th>Course</th>
       <% end %>  
@@ -115,6 +116,7 @@
             <td><b><%= link_to student_task.assignment.name, :action => 'view', :id => participant %></b></td>
           
           <!--course-->
+          <!--wrap column contents with the helper functions which decide if the column should be displayed-->
           <% if student_has_any_courses?(@student_tasks) %>
             <td><%= student_task.course.try :name %></td>
           <% end %>  
@@ -127,6 +129,7 @@
             <% end %>
           
           <!--current stage-->
+          <!--wrap column contents with the helper functions which decide if the column should be displayed-->
           <% if student_has_any_current_stages?(@student_tasks) %>
             <td>
             <% if participant.assignment.link_for_current_stage(topic_id)!= nil && participant.assignment.link_for_current_stage(topic_id).length!=0%>
@@ -143,6 +146,7 @@
           <td><%= StudentTaskHelper.get_submission_grade_info(participant) %></td>
           
           <!--badges-->
+          <!--wrap column contents with the helper functions which decide if the column should be displayed-->
           <% if student_has_any_awarded_badges?(@student_tasks) %>
             <td><%= get_awarded_badges(participant) %></td>
           <% end %>

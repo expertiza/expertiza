@@ -57,6 +57,10 @@ module StudentTaskHelper
   end
 
   def student_has_any_awarded_badges?(student_tasks)
+    # We maintain an initial count as zero
+    # and if we find any non empty string in the badges column, we update the count
+    # in the end if the count is zero, it means the column didn't have any content
+    # we return the boolean value back which can be used to display or drop a column
     count = 0
     student_tasks.each do |student_task| 
       participant = student_task.participant
@@ -75,11 +79,12 @@ module StudentTaskHelper
     count = 0
     student_tasks.each do |student_task| 
       course_name = student_task.course.try :name
+      # check if course name exists for a row, and if it exists, increase the count
       unless course_name.blank?
         count = count + 1
       end
     end
-
+    # if no topic exists in the column, we should not display the column
     if count == 0
       return false
     end
@@ -91,11 +96,12 @@ module StudentTaskHelper
     student_tasks.each do |student_task| 
       participant = student_task.participant
       topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
+      # check if student topic exists for a row, and if it exists, increase the count
       if SignUpTopic.exists?(topic_id)
         count = count + 1
       end
     end
-
+    # if no topic exists in the column, we should not display the column
     if count == 0
       return false
     end
@@ -106,13 +112,14 @@ module StudentTaskHelper
     count = 0
     student_tasks.each do |student_task| 
       participant = student_task.participant
+      # check if student's current stages exists for a row, and if it exists, increase the count
       topic_id = SignedUpTeam.topic_id(participant.parent_id, participant.user_id)
       current_stage_name = participant.assignment.current_stage_name(topic_id)
       unless current_stage_name.blank?
         count = count + 1
       end
     end
-
+    # if no current stage exists in the column, we should not display the column
     if count == 0
       return false
     end
@@ -123,11 +130,12 @@ module StudentTaskHelper
     count = 0
     student_tasks.each do |student_task| 
       stage_deadline = student_task.stage_deadline.in_time_zone(session[:user].timezonepref)
+      # check if student's stage deadline exists for a row, and if it exists, increase the count
       unless stage_deadline.blank?
         count = count + 1
       end
     end
-
+    # if no stage deadlines exists in the column, we should not display the column
     if count == 0
       return false
     end

@@ -52,10 +52,10 @@ class AssignmentsController < ApplicationController
         return
       else
         flash[:error] = "Failed to create assignment."
-        if find_existing_assignment
+        if find_existing_assignment #Throw error if assignment name already found.
           flash[:error] << "<br>  " + @assignment_form.assignment.name + " already exists as an assignment name"
         end
-        if find_existing_directory
+        if find_existing_directory #Throw error if directory path already found.
           flash[:error] << "<br>  " + dir_path + " already exists as a submission directory name"
         end
         redirect_to "/assignments/new?private=1"

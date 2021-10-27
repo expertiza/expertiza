@@ -116,6 +116,7 @@ class Questionnaire < ActiveRecord::Base
     errors.add(:name, "Questionnaire names must be unique.") if results.present?
   end
 
+  # Create a new questionnaire of the type passed in and validated against the questionnaire types constant
   def self.new_by_type(type)
     if QUESTIONNAIRE_TYPES.include? type
       return type.constantize.new

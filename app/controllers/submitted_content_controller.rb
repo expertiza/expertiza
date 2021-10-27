@@ -5,34 +5,35 @@ class SubmittedContentController < ApplicationController
   include AuthorizationHelper
   include SubmittedFilesHelper
 
+  # User access controls, distinguishes views based on the user logged in
   def action_allowed
     case current_role_name 
-    when 'Instructor','Teaching Assistant','Administrator'
-      ,'Super-Administrator','Student'
-      ((%w[edit].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "reviewer") : true) 
-      && one_team_can_submit_work?
+    when 'Instructor','Teaching Assistant','Administrator','Super-Administrator','Student'
+      ((%w[edit].include? action_name) ? are_needed_authorizations_present?(params[:id], "reader", "reviewer") : true) && one_team_can_submit_work?
     else
       return false
     end
 
   end
 
-  # The view have already tested that @assignment.submission_allowed(topic_id) is true,
-  # so @can_submit should be true
+  # View for actions allowed when submissions are being accepted
   def edit
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
     @assignment = @participant.assignment
     # ACS We have to check if this participant has team or not
-    
     SignUpSheet.signup_team(@assignment.id, @participant.user_id, nil) if @participant.team.nil?
     # @can_submit is the flag indicating if the user can submit or not in current stage
     @can_submit = !params.key?(:view)
     @stage = @assignment.current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
   end
 
-  # view is called when @assignment.submission_allowed(topic_id) is false
-  # so @can_submit should be false
+  # Function to log messages
+  def log_info(controller_name, participant_name, message, request)
+    ExpertizaLogger.error LoggerMessage.new(controller_name, participant_name, message, request )
+  end
+
+  # View when submissions aren't being accepted; for instance when deadline is passed
   def disable_submission
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
@@ -43,13 +44,14 @@ class SubmittedContentController < ApplicationController
     redirect_to action: 'edit', id: params[:id], view: true
   end
 
+  # Display to submit and register hyperlinks submitted
   def submit_hyperlink
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
     team = @participant.team
     team_hyperlinks = team.hyperlinks
     if team_hyperlinks.include?(params['submission'])
-      ExpertizaLogger.error LoggerMessage.new(controller_name, @participant.name, 'You or your teammate(s) have already submitted the same hyperlink.', request)
+      log_info(controller_name, @participant.name, 'You or your teammate(s) have already submitted the same hyperlink.', request)
       flash[:error] = "You or your teammate(s) have already submitted the same hyperlink."
     else
       begin
@@ -60,16 +62,16 @@ class SubmittedContentController < ApplicationController
                                 assignment_id: @participant.assignment.id,
                                 operation: "Submit Hyperlink")
       rescue StandardError
-        ExpertizaLogger.error LoggerMessage.new(controller_name, @participant.name, "The URL or URI is invalid. Reason: #{$ERROR_INFO}", request)
+        log_info(controller_name, @participant.name, "The URL or URI is invalid. Reason: #{$ERROR_INFO}", request)
         flash[:error] = "The URL or URI is invalid. Reason: #{$ERROR_INFO}"
       end
-      ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The link has been successfully submitted.', request)
+      log_info(controller_name, @participant.name, 'The link has been successfully submitted.', request)
       undo_link("The link has been successfully submitted.")
     end
     redirect_to action: 'edit', id: @participant.id
   end
 
-  # Note: This is not used yet in the view until we all decide to do so
+  # Remove existing submission links
   def remove_hyperlink
     @participant = AssignmentParticipant.find(params[:hyperlinks][:participant_id])
     return unless current_user_id?(@participant.user_id)
@@ -78,7 +80,8 @@ class SubmittedContentController < ApplicationController
     team.remove_hyperlink(hyperlink_to_delete)
     ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The link has been successfully removed.', request)
     undo_link("The link has been successfully removed.")
-    # determine if the user should be redirected to "edit" or  "view" based on the current deadline right
+    # determine if the user should be redirected to "edit" or  "view" based on the current deadline
+    #
     topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
     assignment = Assignment.find(@participant.parent_id)
     SubmissionRecord.create(team_id: team.id,
@@ -90,6 +93,7 @@ class SubmittedContentController < ApplicationController
     redirect_to action: action, id: @participant.id
   end
 
+  # Display to submit and register files submitted
   def submit_file
     participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(participant.user_id)
@@ -147,6 +151,7 @@ class SubmittedContentController < ApplicationController
     end
   end
 
+  # Folder Actions performed
   def perform_folder_action
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
@@ -167,6 +172,7 @@ class SubmittedContentController < ApplicationController
     redirect_to action: 'edit', id: @participant.id
   end
 
+  # Allows downloading content submitted
   def download
     begin
       folder_name = params['current_folder']['name']

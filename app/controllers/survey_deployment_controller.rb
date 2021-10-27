@@ -165,7 +165,7 @@ class SurveyDeploymentController < ApplicationController
 
   def view_responses
     sd = SurveyDeployment.find_by(parent_id: params[:id])
-    @questionnaire = Questionnaire.find(sd.questionnaire_id)
+    @questionnaire = Questionnaire.find_as_type(sd.questionnaire_id)
     @questions = Question.where(questionnaire_id: @questionnaire.id)
     response_map_list = ResponseMap.where(reviewee_id: sd.id)
     # retrieve all the answers on this survey based on survey_response_maps and questions
@@ -174,7 +174,7 @@ class SurveyDeploymentController < ApplicationController
 
     if sd.global_survey_id
       @global_survey_present = true
-      @global_questionnaire = Questionnaire.find(sd.global_survey_id)
+      @global_questionnaire = Questionnaire.find_as_type(sd.global_survey_id)
       @global_questions = Question.where(questionnaire_id: @global_questionnaire.id)
       # retrieve all the answers on the global survey based on this survey deploment.
       # Please note that, for a survey deployment which requires taking a global survey,

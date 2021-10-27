@@ -41,7 +41,7 @@ class AssignmentForm
     attributes[:assignment_questionnaire].each do |assignment_questionnaire|
       # Check rubrics to make sure weight is 0 if there are no Scored Questions
       scored_questionnaire = false
-      questionnaire = Questionnaire.find(assignment_questionnaire[:questionnaire_id])
+      questionnaire = Questionnaire.find_as_type(assignment_questionnaire[:questionnaire_id])
       questions = Question.where(questionnaire_id: questionnaire.id)
       questions.each do |question|
         if question.is_a? ScoredQuestion
@@ -102,7 +102,7 @@ class AssignmentForm
       # Update AQ if found, otherwise create new entry
       attributes.each do |attr|
         unless attr[:questionnaire_id].blank?
-          questionnaire_type = Questionnaire.find(attr[:questionnaire_id]).type
+          questionnaire_type = Questionnaire.find_as_type(attr[:questionnaire_id]).type
           topic_id = attr[:topic_id] if attr.key?(:topic_id)
           aq = assignment_questionnaire(questionnaire_type, attr[:used_in_round], topic_id)
           if aq.id.nil?
@@ -230,14 +230,14 @@ class AssignmentForm
         assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number, topic_id: topic_id)
         assignment_questionnaires.each do |aq|
           # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-          return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+          return aq if !aq.questionnaire_id.nil? && aq.find(aq.questionnaire_id).type == questionnaire_type
         end
     elsif @assignment.vary_by_round
         # Get all AQs for the assignment and specified round number by round #
         assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, used_in_round: round_number)
         assignment_questionnaires.each do |aq|
           # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-          return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+          return aq if !aq.questionnaire_id.nil? && aq.type == questionnaire_type
         end
     elsif @assignment.vary_by_topic
         # Get all AQs for the assignment and specified round number by topic
@@ -251,7 +251,7 @@ class AssignmentForm
         assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id)
         assignment_questionnaires.each do |aq|
           # If the AQ questionnaire matches the type of the questionnaire that needs to be updated, return it
-          return aq if !aq.questionnaire_id.nil? && Questionnaire.find(aq.questionnaire_id).type == questionnaire_type
+          return aq if !aq.questionnaire_id.nil? && aq.type == questionnaire_type
         end
     end
 
@@ -279,7 +279,7 @@ class AssignmentForm
   # Find a questionnaire for the given AQ and questionnaire type
   def questionnaire(assignment_questionnaire, questionnaire_type)
     return Object.const_get(questionnaire_type).new if assignment_questionnaire.nil?
-    questionnaire =Questionnaire.find_by_as_type(id: assignment_questionnaire.questionnaire_id)
+    questionnaire = Questionnaire.find_by(id: assignment_questionnaire.questionnaire_id)
     return questionnaire unless questionnaire.nil?
     Object.const_get(questionnaire_type).new
   end

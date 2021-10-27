@@ -50,6 +50,7 @@ describe PopupController do
     end
   end
 
+  # this can be called from "response_report" by clicking student names from instructor end.
   describe '#author_feedback_popup' do
     context 'when response_id does not exist' do
       it 'fail to get any info' do; expect(controller.send(:author_feedback_popup)).to be nil; end
@@ -78,6 +79,7 @@ describe PopupController do
     end
   end
 
+  # this can be called from "response_report" by clicking team names from instructor end.
   describe '#team_users_popup' do
     it "renders the page successfuly as Instructor" do 
       allow(Team).to receive(:find).and_return(team)
@@ -103,6 +105,7 @@ describe PopupController do
     end
   end
 
+  # Views tone analysis report and heatmap
   describe '#view_review_scores_popup'do
     context 'review tone analysis operation is performed' do
       it 'Prepares scores and review analysis report for rendering purpose' do
@@ -116,6 +119,7 @@ describe PopupController do
     end
   end
 
+  # this can be called from "response_report" by clicking reviewer names from instructor end.
   describe '#reviewer_details_popup' do
     it "render reviewer_details_popup page successfully" do
       participant = double(:participant, user_id: 1)
@@ -133,6 +137,7 @@ describe PopupController do
     end
   end
 
+  # this can be called from "response_report" by clicking reviewer names from instructor end.
   describe '#self_review_popup' do
     context "when current user is the participant" do
       it "render page successfully as Instructor to get maximum_score " do

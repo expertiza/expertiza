@@ -66,9 +66,7 @@ class AssignmentForm
     update_assignment_questionnaires(attributes[:topic_questionnaire]) unless @has_errors || attributes[:assignment][:vary_by_topic] == 'false'
     update_due_dates(attributes[:due_date], user) unless @has_errors
     update_assigned_badges(attributes[:badge], attributes[:assignment]) unless @has_errors
-    if attributes[:assignment][:simicheck]
-      add_simicheck_to_delayed_queue(attributes[:assignment][:simicheck_threshold])
-    end
+    add_simicheck_to_delayed_queue(attributes[:assignment][:simicheck])
     # delete the old queued items and recreate new ones if the assignment has late policy.
     if attributes[:due_date] and !@has_errors and has_late_policy
       delete_from_delayed_queue

@@ -2,6 +2,17 @@ describe Participant do
   let(:team) { build(:assignment_team, id: 1, name: 'myTeam') }
   let(:user) { build(:student, id: 4, name: 'no name', fullname: 'no two') }
   let(:team_user) { build(:team_user, id: 1, user: user, team: team) }
+  let(:participant) { build(:participant, user: user) }
+  let(:participant2) { build(:participant, user: build(:student, name: "John", fullname: "Doe, John", id: 2)) }
+  let(:assignment) { build(:assignment, id: 1, name: 'no assgt') }
+  let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant2, reviewee: team) }
+  after(:each) do
+    ActionMailer::Base.deliveries.clear
+  end
+=begin
+  let(:team) { build(:assignment_team, id: 1, name: 'myTeam') }
+  let(:user) { build(:student, id: 4, name: 'no name', fullname: 'no two') }
+  let(:team_user) { build(:team_user, id: 1, user: user, team: team) }
   let(:topic) { build(:topic) }
   let(:participant) { build(:participant, user: build(:student, name: "Jane", fullname: "Doe, Jane", id: 1)) }
   let(:participant2) { build(:participant, user: build(:student, name: "John", fullname: "Doe, John", id: 2)) }
@@ -16,9 +27,7 @@ describe Participant do
   let(:questionnaire1) { ReviewQuestionnaire.new(id: 1, questions: [question1], max_question_score: 5) }
   let(:questionnaire2) { ReviewQuestionnaire.new(id: 2, questions: [question2], max_question_score: 5) }
 
-  after(:each) do
-    ActionMailer::Base.deliveries.clear
-  end
+
 
   describe '#team' do
     it 'returns the team of the participant' do
@@ -139,4 +148,21 @@ describe Participant do
       expect(Participant.sort_by_name(unsorted)).to eq(sorted)
     end
   end
+=end
+  describe '#check' do
+
+    it 'participants assignment reviewers are sent email for a new submission' do
+      allow(TeamsUser).to receive(:find_by).and_return(team_user)
+      puts participant.assignment.name
+      puts participant.team.id
+      #allow(ResponseMap).to receive(:where).and_return(review_response_map)
+      #puts review_response_map
+      #allow(User).to receive(:find_by).and_return(user)
+
+
+      expect { participant.mail_assigned_reviewers }.to change { ActionMailer::Base.deliveries.count }.by(1)
+    end
+  end
+
+
 end

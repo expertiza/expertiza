@@ -156,10 +156,10 @@ describe AssignmentsController do
       end
     end
 
+    #Create an assignment with name that already exists and expect the create method in assignments_controller_spec.rb to throw error
     context 'when assignment_form name already exists and is not saved properly' do
       it 'redirects to assignment#new page' do
         allow(assignment_form).to receive(:assignment).and_return(assignment)
-        allow(Assignment).to receive(:find_by).with(any_args).and_return(false)
         allow(Assignment).to receive(:find_by).with(any_args).and_return(false)
         allow(assignment_form).to receive(:save).and_return(true)
         allow(assignment_form).to receive(:create_assignment_node).and_return(double('node'))

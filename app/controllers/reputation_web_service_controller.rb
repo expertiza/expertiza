@@ -11,13 +11,16 @@ class ReputationWebServiceController < ApplicationController
     current_user_has_ta_privileges?
   end
 
-  def calculate_peer_grade(response)  # calculating the grade for each review
+  # calculating the grade for each review
+  def calculate_peer_grade(response)
     answers = Answer.where(response_id: response.id)
     max_question_score = answers.first.question.questionnaire.max_question_score rescue 1
     temp_sum = 0
     weight_sum = 0
-    valid_answer = answers.select {|a| a.question.type == 'Criterion' and !a.answer.nil? } # filtering the valid answers
-    return nil if valid_answer.empty? # skipping this if its empty!
+    # filtering the valid answers
+    valid_answer = answers.select {|a| a.question.type == 'Criterion' and !a.answer.nil? }
+    # skipping this if its empty!
+    return nil if valid_answer.empty?
     valid_answer.each do |answer|
       temp_sum += answer.answer * answer.question.weight
       weight_sum += answer.question.weight
@@ -26,7 +29,8 @@ class ReputationWebServiceController < ApplicationController
     peer_review_grade.round(4)
   end
 
-  def fetch_peer_reviews(assignment_id, round_num, has_topic, another_assignment_id = 0) # returning the grades for all valid reviews
+  # returning the grades for all valid reviews
+  def fetch_peer_reviews(assignment_id, round_num, has_topic, another_assignment_id = 0)
     raw_data_array = []
     assignment_ids = []
     assignment_ids << assignment_id
@@ -35,12 +39,15 @@ class ReputationWebServiceController < ApplicationController
       reviewer = response_map.reviewer.user
       team = AssignmentTeam.find(response_map.reviewee_id)
       topic_condition = ((has_topic and SignedUpTeam.where(team_id: team.id).first.is_waitlisted == false) or !has_topic)
-      last_valid_response = response_map.response.select {|r| r.round == round_num }.sort.last  # filtering the responses that are round_num
+      # filtering the responses that are round_num
+      last_valid_response = response_map.response.select {|r| r.round == round_num }.sort.last
       valid_response = [last_valid_response] unless last_valid_response.nil?
       next unless topic_condition == true and !valid_response.nil? and !valid_response.empty?
       valid_response.each do |response|
-        peer_review_grade = calculate_peer_grade(response) # calculating grades for each review
-        if !peer_review_grade.nil? # skipping if the grade is nil
+        # calculating grades for each review
+        peer_review_grade = calculate_peer_grade(response)
+        # skipping if the grade is nil
+        if !peer_review_grade.nil?
           raw_data_array << [reviewer.id, team.id, peer_review_grade.round(4)]
         end
       end
@@ -60,7 +67,8 @@ class ReputationWebServiceController < ApplicationController
     quiz_questionnnaires = QuizQuestionnaire.where('instructor_id in (?)', team_ids)
     quiz_questionnnaire_ids = []
     quiz_questionnnaires.each {|questionnaire| quiz_questionnnaire_ids << questionnaire.id }
-    QuizResponseMap.where('reviewed_object_id in (?)', quiz_questionnnaire_ids).each do |response_map| # Getting quiz score for each team
+    # Getting quiz score for each team
+    QuizResponseMap.where('reviewed_object_id in (?)', quiz_questionnnaire_ids).each do |response_map|
       quiz_score = response_map.quiz_score
       participant = Participant.find(response_map.reviewer_id)
       raw_data_array << [participant.user_id, response_map.reviewee_id, quiz_score]
@@ -68,7 +76,8 @@ class ReputationWebServiceController < ApplicationController
     raw_data_array # returning quiz scores of all the teams
   end
 
-  def generate_json(assignment_id, another_assignment_id = 0, round_num = 2, type = 'peer review grades')  # generating json for the fetched scores/reviews
+  # generating json for the fetched scores/reviews
+  def generate_json(assignment_id, another_assignment_id = 0, round_num = 2, type = 'peer review grades')
     assignment = Assignment.find_by(id: assignment_id)
     has_topic = !SignUpTopic.where(assignment_id: assignment_id).empty?
 
@@ -92,25 +101,32 @@ class ReputationWebServiceController < ApplicationController
     @result
   end
 
-  def encrypt_review_data(body) # encrypting the peer review grade data using AES
+  # encrypting the peer review grade data using AES
+  def encrypt_review_data(body)
     aes_encrypted_request_data = aes_encrypt(body)
     body = aes_encrypted_request_data[0]
-    encrypted_key = rsa_public_key1(aes_encrypted_request_data[1]) # RSA asymmetric algorithm encrypts keys of AES
+    # RSA asymmetric algorithm encrypts keys of AES
+    encrypted_key = rsa_public_key1(aes_encrypted_request_data[1])
     encrypted_vi = rsa_public_key1(aes_encrypted_request_data[2])
-    body.prepend('", "data":"')  # fixed length 350
+    # fixed length 350
+    body.prepend('", "data":"')
     body.prepend(encrypted_vi)
     body.prepend(encrypted_key)
-    body.prepend('{"keys":"') # request body should be in JSON format.
+    # request body should be in JSON format.
+    body.prepend('{"keys":"')
     body << '"}'
     body.gsub!(/\n/, '\\n')
     body
   end
 
-  def decrypt_review_data(body) # decrypting the peer review grade data using AES
+  # decrypting the peer review grade data using AES
+  def decrypt_review_data(body)
     body = JSON.parse(body)
-    key = rsa_private_key2(body["keys"][0, 350])  # RSA asymmetric algorithm decrypts keys of AES
+    # RSA asymmetric algorithm decrypts keys of AES
+    key = rsa_private_key2(body["keys"][0, 350])
     vi = rsa_private_key2(body["keys"][350, 350])
-    aes_encrypted_response_data = body["data"]  # AES symmetric algorithm decrypts data
+    # AES symmetric algorithm decrypts data
+    aes_encrypted_response_data = body["data"]
     aes_decrypt(aes_encrypted_response_data, key, vi)
   end
 
@@ -118,7 +134,8 @@ class ReputationWebServiceController < ApplicationController
     JSON.parse(body.to_s).each do |alg, list|
       next unless alg == "Hamer" || alg == "Lauw"
       list.each do |id, rep|
-        Participant.find_by(user_id: id).update(alg.to_sym => rep) unless /leniency/ =~ id.to_s  # skipping lenient Id's
+        # skipping lenient Id's
+        Participant.find_by(user_id: id).update(alg.to_sym => rep) unless /leniency/ =~ id.to_s
       end
     end
     redirect_to action: 'client'
@@ -181,15 +198,18 @@ class ReputationWebServiceController < ApplicationController
     encrypted_string
   end
 
+  # returns the decrypted private key
   def rsa_private_key2(cipertext)
     private_key_file = 'private2.pem'
     encrypted_string = cipertext
+    # getting the password from DB
     password = KeyMapping.find_by(name:'rsa_key').value
     private_key = OpenSSL::PKey::RSA.new(File.read(private_key_file), Base64.decode64(password))
     string = private_key.private_decrypt(Base64.decode64(encrypted_string))
     string
   end
 
+  # encrypting the request body
   def aes_encrypt(data)
     cipher = OpenSSL::Cipher::AES.new(256, :CBC)
     cipher.encrypt
@@ -199,6 +219,7 @@ class ReputationWebServiceController < ApplicationController
     [cipertext, key, iv]
   end
 
+  # decrypting the response body
   def aes_decrypt(cipertext, key, iv)
     decipher = OpenSSL::Cipher::AES.new(256, :CBC)
     decipher.decrypt
